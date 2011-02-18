@@ -1,0 +1,302 @@
+object IBDatabaseEditForm: TIBDatabaseEditForm
+  Left = 487
+  Height = 483
+  Top = 125
+  Width = 462
+  ActiveControl = LocalRbtn
+  BorderStyle = bsDialog
+  BorderWidth = 5
+  Caption = 'Database Component Editor'
+  ClientHeight = 483
+  ClientWidth = 462
+  HelpFile = 'ibx.hlp'
+  OnCreate = FormCreate
+  ParentFont = True
+  Position = poScreenCenter
+  LCLVersion = '0.9.28.2'
+  object Panel1: TPanel
+    Left = 5
+    Height = 36
+    Top = 442
+    Width = 452
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 36
+    ClientWidth = 452
+    TabOrder = 2
+    object OKBtn: TButton
+      Left = 51
+      Height = 24
+      Top = 7
+      Width = 75
+      Caption = 'OK'
+      Default = True
+      OnClick = OKBtnClick
+      TabOrder = 0
+    end
+    object CancelBtn: TButton
+      Left = 132
+      Height = 24
+      Top = 7
+      Width = 74
+      Cancel = True
+      Caption = 'Cancel'
+      ModalResult = 2
+      TabOrder = 1
+    end
+    object HelpBtn: TButton
+      Left = 293
+      Height = 24
+      Top = 7
+      Width = 75
+      Caption = '&Help'
+      OnClick = HelpBtnClick
+      TabOrder = 3
+    end
+    object Test: TButton
+      Left = 212
+      Height = 25
+      Top = 6
+      Width = 75
+      Caption = '&Test'
+      OnClick = TestClick
+      TabOrder = 2
+    end
+  end
+  object GroupBox2: TGroupBox
+    Left = 5
+    Height = 151
+    Top = 5
+    Width = 452
+    Align = alTop
+    Caption = 'Connection'
+    ClientHeight = 131
+    ClientWidth = 448
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 25
+      Height = 19
+      Top = 81
+      Width = 86
+      Caption = '&Database:'
+      FocusControl = DatabaseName
+      ParentColor = False
+    end
+    object Label7: TLabel
+      Left = 24
+      Height = 19
+      Top = 33
+      Width = 64
+      Caption = '&Server:'
+      Enabled = False
+      FocusControl = ServerName
+      ParentColor = False
+    end
+    object Label8: TLabel
+      Left = 209
+      Height = 19
+      Top = 33
+      Width = 76
+      Caption = '&Protocol:'
+      Enabled = False
+      FocusControl = Protocol
+      ParentColor = False
+    end
+    object DatabaseName: TEdit
+      Left = 24
+      Height = 28
+      Top = 97
+      Width = 414
+      TabOrder = 5
+    end
+    object LocalRbtn: TRadioButton
+      Left = 24
+      Height = 22
+      Top = 9
+      Width = 62
+      Caption = '&Local'
+      Checked = True
+      OnClick = LocalRbtnClick
+      State = cbChecked
+      TabOrder = 0
+    end
+    object RemoteRbtn: TRadioButton
+      Left = 89
+      Height = 22
+      Top = 9
+      Width = 81
+      Caption = '&Remote'
+      OnClick = RemoteRbtnClick
+      TabOrder = 1
+      TabStop = False
+    end
+    object Browse: TButton
+      Left = 353
+      Height = 24
+      Top = 52
+      Width = 75
+      Caption = '&Browse'
+      OnClick = BrowseClick
+      TabOrder = 2
+    end
+    object ServerName: TEdit
+      Left = 25
+      Height = 28
+      Top = 52
+      Width = 144
+      Enabled = False
+      TabOrder = 3
+    end
+    object Protocol: TComboBox
+      Left = 209
+      Height = 30
+      Top = 52
+      Width = 120
+      Enabled = False
+      ItemHeight = 0
+      Items.Strings = (
+        'TCP'
+        'NamedPipe'
+        'SPX'
+      )
+      TabOrder = 4
+    end
+  end
+  object GroupBox1: TGroupBox
+    Left = 5
+    Height = 286
+    Top = 156
+    Width = 452
+    Align = alClient
+    Caption = 'Database Parameters'
+    ClientHeight = 266
+    ClientWidth = 448
+    TabOrder = 1
+    object Label2: TLabel
+      Left = 25
+      Height = 19
+      Top = 10
+      Width = 96
+      Caption = '&User Name:'
+      FocusControl = UserName
+      ParentColor = False
+    end
+    object Label3: TLabel
+      Left = 25
+      Height = 19
+      Top = 66
+      Width = 84
+      Caption = 'Pass&word:'
+      FocusControl = Password
+      ParentColor = False
+    end
+    object Label4: TLabel
+      Left = 24
+      Height = 19
+      Top = 114
+      Width = 77
+      Caption = 'S&QLRole:'
+      FocusControl = SQLRole
+      ParentColor = False
+    end
+    object Label5: TLabel
+      Left = 249
+      Height = 19
+      Top = 10
+      Width = 76
+      Caption = 'Se&ttings:'
+      FocusControl = DatabaseParams
+      ParentColor = False
+    end
+    object Label6: TLabel
+      Left = 25
+      Height = 19
+      Top = 170
+      Width = 117
+      Caption = '&Character Set:'
+      FocusControl = CharacterSet
+      ParentColor = False
+    end
+    object UserName: TEdit
+      Left = 24
+      Height = 28
+      Top = 32
+      Width = 137
+      OnChange = UserNameChange
+      OnExit = UserNameChange
+      TabOrder = 0
+    end
+    object Password: TEdit
+      Left = 25
+      Height = 28
+      Top = 82
+      Width = 137
+      OnChange = PasswordChange
+      OnExit = PasswordChange
+      TabOrder = 1
+    end
+    object SQLRole: TEdit
+      Left = 25
+      Height = 28
+      Top = 130
+      Width = 134
+      OnChange = SQLRoleChange
+      OnExit = SQLRoleChange
+      TabOrder = 2
+    end
+    object DatabaseParams: TMemo
+      Left = 248
+      Height = 124
+      Top = 33
+      Width = 183
+      TabOrder = 5
+    end
+    object LoginPrompt: TCheckBox
+      Left = 25
+      Height = 22
+      Top = 234
+      Width = 119
+      Caption = 'Lo&gin Prompt'
+      TabOrder = 4
+    end
+    object CharacterSet: TComboBox
+      Left = 25
+      Height = 30
+      Top = 194
+      Width = 134
+      ItemHeight = 0
+      ItemIndex = 0
+      Items.Strings = (
+        'None'
+        'ASCII'
+        'BIG_5'
+        'CYRL'
+        'DOS437'
+        'DOS850'
+        'DOS852'
+        'DOS857'
+        'DOS860'
+        'DOS861'
+        'DOS863'
+        'DOS865'
+        'EUCJ_0208'
+        'GB_2312'
+        'ISO8859_1'
+        'KSC_5601'
+        'NEXT'
+        'OCTETS'
+        'SJIS_0208'
+        'UNICODE_FSS'
+        'UTF-8'
+        'WIN1250'
+        'WIN1251'
+        'WIN1252'
+        'WIN1253'
+        'WIN1254'
+      )
+      OnCloseUp = CharacterSetCloseUp
+      TabOrder = 3
+      Text = 'None'
+    end
+  end
+end

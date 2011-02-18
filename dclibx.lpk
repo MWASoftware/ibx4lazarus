@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Package Version="3">
+    <Name Value="dclibx"/>
+    <CompilerOptions>
+      <Version Value="8"/>
+      <SearchPaths>
+        <IncludeFiles Value="design/"/>
+        <OtherUnitFiles Value="design/"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Parsing>
+        <SyntaxOptions>
+          <CStyleOperator Value="False"/>
+        </SyntaxOptions>
+      </Parsing>
+      <Other>
+        <CompilerPath Value="$(CompPath)"/>
+      </Other>
+    </CompilerOptions>
+    <Files Count="29">
+      <Item1>
+        <Filename Value="design/IBDBReg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="IBDBReg"/>
+      </Item1>
+      <Item2>
+        <Filename Value="design/IBEventsEditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item2>
+      <Item3>
+        <Filename Value="design/IBEventsEditor.lrs"/>
+        <Type Value="LRS"/>
+      </Item3>
+      <Item4>
+        <Filename Value="design/IBEventsEditor.pas"/>
+        <UnitName Value="IBEventsEditor"/>
+      </Item4>
+      <Item5>
+        <Filename Value="design/IBTransactionEdit.lfm"/>
+        <Type Value="LFM"/>
+      </Item5>
+      <Item6>
+        <Filename Value="design/IBTransactionEdit.lrs"/>
+        <Type Value="LRS"/>
+      </Item6>
+      <Item7>
+        <Filename Value="design/IBTransactionEdit.pas"/>
+        <UnitName Value="IBTransactionEdit"/>
+      </Item7>
+      <Item8>
+        <Filename Value="design/IBDatabaseEdit.lfm"/>
+        <Type Value="LFM"/>
+      </Item8>
+      <Item9>
+        <Filename Value="design/IBDatabaseEdit.lrs"/>
+        <Type Value="LRS"/>
+      </Item9>
+      <Item10>
+        <Filename Value="design/IBDatabaseEdit.pas"/>
+        <UnitName Value="IBDatabaseEdit"/>
+      </Item10>
+      <Item11>
+        <Filename Value="design/IBSystemTables.pas"/>
+        <UnitName Value="IBSystemTables"/>
+      </Item11>
+      <Item12>
+        <Filename Value="design/ibdeletesqleditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item12>
+      <Item13>
+        <Filename Value="design/ibdeletesqleditor.lrs"/>
+        <Type Value="LRS"/>
+      </Item13>
+      <Item14>
+        <Filename Value="design/ibdeletesqleditor.pas"/>
+        <UnitName Value="ibdeletesqleditor"/>
+      </Item14>
+      <Item15>
+        <Filename Value="design/ibgeneratoreditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item15>
+      <Item16>
+        <Filename Value="design/ibgeneratoreditor.lrs"/>
+        <Type Value="LRS"/>
+      </Item16>
+      <Item17>
+        <Filename Value="design/ibgeneratoreditor.pas"/>
+        <UnitName Value="IBGeneratorEditor"/>
+      </Item17>
+      <Item18>
+        <Filename Value="design/ibinsertsqleditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item18>
+      <Item19>
+        <Filename Value="design/ibinsertsqleditor.lrs"/>
+        <Type Value="LRS"/>
+      </Item19>
+      <Item20>
+        <Filename Value="design/ibinsertsqleditor.pas"/>
+        <UnitName Value="ibinsertsqleditor"/>
+      </Item20>
+      <Item21>
+        <Filename Value="design/ibmodifysqleditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item21>
+      <Item22>
+        <Filename Value="design/ibmodifysqleditor.lrs"/>
+        <Type Value="LRS"/>
+      </Item22>
+      <Item23>
+        <Filename Value="design/ibmodifysqleditor.pas"/>
+        <UnitName Value="ibmodifysqleditor"/>
+      </Item23>
+      <Item24>
+        <Filename Value="design/ibselectsqleditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item24>
+      <Item25>
+        <Filename Value="design/ibselectsqleditor.lrs"/>
+        <Type Value="LRS"/>
+      </Item25>
+      <Item26>
+        <Filename Value="design/ibselectsqleditor.pas"/>
+        <UnitName Value="ibselectsqleditor"/>
+      </Item26>
+      <Item27>
+        <Filename Value="design/ibupdatesqleditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item27>
+      <Item28>
+        <Filename Value="design/ibupdatesqleditor.lrs"/>
+        <Type Value="LRS"/>
+      </Item28>
+      <Item29>
+        <Filename Value="design/ibupdatesqleditor.pas"/>
+        <UnitName Value="IBUpdateSQLEditor"/>
+      </Item29>
+    </Files>
+    <Type Value="DesignTime"/>
+    <RequiredPkgs Count="4">
+      <Item1>
+        <PackageName Value="ibexpress"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="IDEIntf"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="LCL"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="FCL"/>
+        <MinVersion Major="1" Valid="True"/>
+      </Item4>
+    </RequiredPkgs>
+    <UsageOptions>
+      <CustomOptions Value="-dUseCThreads
+"/>
+      <UnitPath Value="$(PkgOutDir)/"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Package Version="3">
+    <Name Value="ibexpress"/>
+    <CompilerOptions>
+      <Version Value="8"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="runtime/"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Linking>
+        <Debugging>
+          <GenerateDebugInfo Value="True"/>
+        </Debugging>
+      </Linking>
+      <Other>
+        <CompilerPath Value="$(CompPath)"/>
+      </Other>
+    </CompilerOptions>
+    <Files Count="22">
+      <Item1>
+        <Filename Value="runtime/IB.pas"/>
+        <UnitName Value="IB"/>
+      </Item1>
+      <Item2>
+        <Filename Value="runtime/IBBatchMove.pas"/>
+        <UnitName Value="IBBatchMove"/>
+      </Item2>
+      <Item3>
+        <Filename Value="runtime/IBBlob.pas"/>
+        <UnitName Value="IBBlob"/>
+      </Item3>
+      <Item4>
+        <Filename Value="runtime/IBCustomDataSet.pas"/>
+        <UnitName Value="IBCustomDataSet"/>
+      </Item4>
+      <Item5>
+        <Filename Value="runtime/IBDatabase.pas"/>
+        <UnitName Value="IBDatabase"/>
+      </Item5>
+      <Item6>
+        <Filename Value="runtime/IBDialogs.pas"/>
+        <UnitName Value="IBDialogs"/>
+      </Item6>
+      <Item7>
+        <Filename Value="runtime/IBErrorCodes.pas"/>
+        <UnitName Value="IBErrorCodes"/>
+      </Item7>
+      <Item8>
+        <Filename Value="runtime/IBEvents.pas"/>
+        <UnitName Value="IBEvents"/>
+      </Item8>
+      <Item9>
+        <Filename Value="runtime/IBExternals.pas"/>
+        <UnitName Value="IBExternals"/>
+      </Item9>
+      <Item10>
+        <Filename Value="runtime/IBExtract.pas"/>
+        <UnitName Value="IBExtract"/>
+      </Item10>
+      <Item11>
+        <Filename Value="runtime/IBHeader.pas"/>
+        <UnitName Value="IBHeader"/>
+      </Item11>
+      <Item12>
+        <Filename Value="runtime/IBUtils.pas"/>
+        <UnitName Value="IBUtils"/>
+      </Item12>
+      <Item13>
+        <Filename Value="runtime/IBXConst.pas"/>
+        <UnitName Value="IBXConst"/>
+      </Item13>
+      <Item14>
+        <Filename Value="runtime/IBIntf.pas"/>
+        <UnitName Value="IBIntf"/>
+      </Item14>
+      <Item15>
+        <Filename Value="runtime/IBQuery.pas"/>
+        <UnitName Value="IBQuery"/>
+      </Item15>
+      <Item16>
+        <Filename Value="runtime/IBServices.pas"/>
+        <UnitName Value="IBServices"/>
+      </Item16>
+      <Item17>
+        <Filename Value="runtime/IBSQL.pas"/>
+        <UnitName Value="IBSQL"/>
+      </Item17>
+      <Item18>
+        <Filename Value="runtime/IBStoredProc.pas"/>
+        <UnitName Value="IBStoredProc"/>
+      </Item18>
+      <Item19>
+        <Filename Value="runtime/IBDatabaseInfo.pas"/>
+        <UnitName Value="IBDatabaseInfo"/>
+      </Item19>
+      <Item20>
+        <Filename Value="runtime/IBUpdateSQL.pas"/>
+        <UnitName Value="IBUpdateSQL"/>
+      </Item20>
+      <Item21>
+        <Filename Value="runtime/dblogindlg.pas"/>
+        <UnitName Value="dblogindlg"/>
+      </Item21>
+      <Item22>
+        <Filename Value="runtime/IBTable.pas"/>
+        <UnitName Value="IBTable"/>
+      </Item22>
+    </Files>
+    <RequiredPkgs Count="2">
+      <Item1>
+        <PackageName Value="LCL"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="FCL"/>
+        <MinVersion Major="1" Valid="True"/>
+      </Item2>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)/"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

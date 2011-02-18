@@ -1,0 +1,10 @@
+{ This is an automatically generated lazarus resource file }
+
+LazarusResources.Add('TIBInsertSQLEditor','FORMDATA',[
+  'TPF0'#241#18'TIBInsertSQLEditor'#17'IBInsertSQLEditor'#4'Left'#3#205#1#3'Top'
+  +#3#0#1#7'Caption'#6#17'Insert SQL Editor'#0#241#6'TLabel'#6'Label4'#7'Visibl'
+  +'e'#8#0#0#241#8'TListBox'#9'FieldList'#6'Height'#3#6#1#4'Hint'#6'OSelect fie'
+  +'lds to include in update statement, or leave unselected to select all'#11'M'
+  +'ultiSelect'#9#14'ParentShowHint'#8#8'ShowHint'#9#0#0#241#8'TListBox'#14'Pri'
+  +'maryKeyList'#7'Visible'#8#0#0#0
+]);
