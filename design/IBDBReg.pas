@@ -124,7 +124,7 @@ type
 
 { TIBQueryEditor }
 
-  TIBQueryEditor = class(TComponentEditor)
+  TIBQueryEditor = class(TFieldsComponentEditor)
   public
     procedure ExecuteVerb(Index: Integer); override;
     function GetVerb(Index: Integer): string; override;
@@ -133,7 +133,7 @@ type
 
 { TIBStoredProcEditor }
 
-  TIBStoredProcEditor = class(TComponentEditor)
+  TIBStoredProcEditor = class(TFieldsComponentEditor)
   public
     procedure ExecuteVerb(Index: Integer); override;
     function GetVerb(Index: Integer): string; override;
@@ -142,7 +142,7 @@ type
 
 { TIBDataSetEditor }
 
-  TIBDataSetEditor = class(TComponentEditor)
+  TIBDataSetEditor = class(TFieldsComponentEditor)
   public
     procedure ExecuteVerb(Index: Integer); override;
     function GetVerb(Index: Integer): string; override;
@@ -298,6 +298,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
 
 procedure Register;
 begin
+  RegisterClasses([TIBStringField, TIBBCDField]);
   RegisterComponents(IBPalette1, [TIBTable, TIBQuery,
     TIBStoredProc, TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBBatchMove,
     TIBDataSet, TIBSQL, TIBDatabaseInfo, (*TIBSQLMonitor,*) TIBEvents, TIBExtract]);
@@ -305,7 +306,6 @@ begin
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
       TIBRestoreService, TIBValidationService, TIBStatisticalService,
       TIBLogService, TIBSecurityService, TIBServerProperties]);
-  RegisterClasses([TIBStringField, TIBBCDField]);
 //  RegisterFields([TIBStringField, TIBBCDField]); --not sure if this is needed in lazarus
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'DatabaseName', TIBFileNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'StoredProcName', TIBStoredProcNameProperty); {do not localize}
@@ -327,6 +327,7 @@ begin
   RegisterPropertyEditor(TypeInfo(TStrings), TIBUpdateSQL, 'DeleteSQL', TIBUpdateSQLDeleteProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBEvents, 'Events', TIBEventListProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TPersistent), TIBDataSet, 'Generator', TIBGeneratorProperty);  {do not localize}
+  RegisterPropertyEditor(TypeInfo(TPersistent), TIBQuery, 'Generator', TIBGeneratorProperty);  {do not localize}
 
   RegisterComponentEditor(TIBDatabase, TIBDatabaseEditor);
   RegisterComponentEditor(TIBTransaction, TIBTransactionEditor);
@@ -516,7 +517,7 @@ end;
 
 function TIBUpdateSQLEditor.GetVerbCount: Integer;
 begin
-  Result := 2;
+  Result :=  2;
 end;
 
 { TIBDataSetEditor }
@@ -525,12 +526,17 @@ procedure TIBDataSetEditor.ExecuteVerb(Index: Integer);
 var
   IBDataset: TIBDataset;
 begin
+  if Index < inherited GetVerbCount then
+    inherited ExecuteVerb(Index) else
+  begin
+    Dec(Index, inherited GetVerbCount);
     case Index of
       0:
         if IBDataSetEditor.EditIBDataSet(TIBDataSet(Component)) then
           Designer.Modified;
       1: (Component as TIBDataSet).ExecSQL;
     end;
+  end;
 end;
 
 function TIBDataSetEditor.GetVerb(Index: Integer): string;
@@ -549,7 +555,7 @@ end;
 
 function TIBDataSetEditor.GetVerbCount: Integer;
 begin
-  Result := 3;
+  Result := inherited GetVerbCount + 3;
 end;
 
 { TIBEventListProperty }
@@ -633,12 +639,16 @@ procedure TIBQueryEditor.ExecuteVerb(Index: Integer);
 var
   Query: TIBQuery;
 begin
+  if Index < inherited GetVerbCount then
+    inherited ExecuteVerb(Index) else
+  begin
     Query := Component as TIBQuery;
     Dec(Index, inherited GetVerbCount);
     case Index of
       0: Query.ExecSQL;
       1: if ibselectsqleditor.EditSQL(Query.Database,Query.Transaction,Query.SQL) then Designer.Modified;
     end;
+  end;
 end;
 
 function TIBQueryEditor.GetVerb(Index: Integer): string;
@@ -657,22 +667,32 @@ end;
 
 function TIBQueryEditor.GetVerbCount: Integer;
 begin
-  Result :=  3;
+  Result := inherited GetVerbCount + 3;
 end;
 
 { TIBStoredProcEditor }
 
 procedure TIBStoredProcEditor.ExecuteVerb(Index: Integer);
 begin
+  if Index < inherited GetVerbCount then
+    inherited ExecuteVerb(Index) else
+  begin
+    Dec(Index, inherited GetVerbCount);
     if Index = 0 then (Component as TIBStoredProc).ExecProc;
+  end;
 end;
 
 function TIBStoredProcEditor.GetVerb(Index: Integer): string;
 begin
+  if Index < inherited GetVerbCount then
+    Result := inherited GetVerb(Index) else
+  begin
+    Dec(Index, inherited GetVerbCount);
     case Index of
       0: Result := SExecute;
       1: Result := SInterbaseExpressVersion;
     end;
+  end;
 end;
 
 function TIBStoredProcEditor.GetVerbCount: Integer;

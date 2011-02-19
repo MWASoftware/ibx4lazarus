@@ -107,6 +107,7 @@ type
     property CachedUpdates;
     property DataSource read GetDataSource write SetDataSource;
     property Constraints stored ConstraintsStored;
+    property Generator;
     property ParamCheck;
     property SQL: TStrings read FSQL write SetQuery;
     property Params: TParams read FParams write SetParamsList stored False;

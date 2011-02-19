@@ -48,11 +48,14 @@ function EditGenerator(AGenerator: TIBGenerator): boolean;
 
 implementation
 
+uses IBQuery;
+
 function EditGenerator(AGenerator: TIBGenerator): boolean;
 var Database: TIBDatabase;
 begin
   Result := false;
-  if AGenerator.SelectSQL = '' then
+  if (AGenerator.Owner is TIBQuery and ((AGenerator.Owner as TIBQuery).SQL.Text = '')) or
+   (AGenerator.Owner is TIBDataSet and ((AGenerator.Owner as TIBDataSet).SelectSQL.Text = '')) then
   begin
     ShowMessage('No Select SQL Found!');
     Exit
@@ -122,7 +125,13 @@ end;
 
 procedure TGeneratorEditor.LoadFieldNames;
 begin
-  FIBSystemTables.GetTableAndColumns(FGenerator.SelectSQL,FTableName,FieldNames.Items)
+  if FGenerator.Owner is TIBDataSet then
+    FIBSystemTables.GetTableAndColumns((FGenerator.Owner as TIBDataSet).SelectSQL.Text,FTableName,FieldNames.Items)
+  else
+  if FGenerator.Owner is TIBQuery then
+    FIBSystemTables.GetTableAndColumns((FGenerator.Owner as TIBQuery).SQL.Text,FTableName,FieldNames.Items)
+  else
+    raise Exception.CreateFmt('Don''t know how to edit a %s',[FGenerator.Owner.ClassName])
 end;
 
 function TGeneratorEditor.GetPrimaryKey: string;

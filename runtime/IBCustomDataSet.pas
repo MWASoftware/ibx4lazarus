@@ -159,7 +159,6 @@ type
     FFieldName: string;
     FGeneratorName: string;
     FIncrement: integer;
-    function GetSelectSQL: string;
     procedure SetIncrement(const AValue: integer);
   protected
     function GetNextValue(ADatabase: TIBDatabase; ATransaction: TIBTransaction): integer;
@@ -167,7 +166,6 @@ type
     constructor Create(Owner: TIBCustomDataSet);
     procedure Apply;
     property Owner: TIBCustomDataSet read FOwner;
-    property SelectSQL: string read GetSelectSQL;
   published
     property GeneratorName: string read FGeneratorName write FGeneratorName;
     property FieldName: string read FFieldName write FFieldName;
@@ -3894,11 +3892,6 @@ begin
   if AValue < 0 then
      raise Exception.Create('A Generator Increment cannot be negative');
   FIncrement := AValue
-end;
-
-function TIBGenerator.GetSelectSQL: string;
-begin
-  Result := FOwner.SelectSQL.Text
 end;
 
 function TIBGenerator.GetNextValue(ADatabase: TIBDatabase;
