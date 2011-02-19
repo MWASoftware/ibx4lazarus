@@ -70,23 +70,23 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     Width = 452
     Align = alTop
     Caption = 'Connection'
-    ClientHeight = 131
+    ClientHeight = 132
     ClientWidth = 448
     TabOrder = 0
     object Label1: TLabel
       Left = 25
-      Height = 19
+      Height = 18
       Top = 81
-      Width = 86
+      Width = 78
       Caption = '&Database:'
       FocusControl = DatabaseName
       ParentColor = False
     end
     object Label7: TLabel
       Left = 24
-      Height = 19
+      Height = 18
       Top = 33
-      Width = 64
+      Width = 58
       Caption = '&Server:'
       Enabled = False
       FocusControl = ServerName
@@ -94,9 +94,9 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object Label8: TLabel
       Left = 209
-      Height = 19
+      Height = 18
       Top = 33
-      Width = 76
+      Width = 68
       Caption = '&Protocol:'
       Enabled = False
       FocusControl = Protocol
@@ -104,7 +104,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object DatabaseName: TEdit
       Left = 24
-      Height = 28
+      Height = 27
       Top = 97
       Width = 414
       TabOrder = 5
@@ -113,7 +113,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       Left = 24
       Height = 22
       Top = 9
-      Width = 62
+      Width = 57
       Caption = '&Local'
       Checked = True
       OnClick = LocalRbtnClick
@@ -124,7 +124,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       Left = 89
       Height = 22
       Top = 9
-      Width = 81
+      Width = 73
       Caption = '&Remote'
       OnClick = RemoteRbtnClick
       TabOrder = 1
@@ -141,7 +141,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object ServerName: TEdit
       Left = 25
-      Height = 28
+      Height = 27
       Top = 52
       Width = 144
       Enabled = False
@@ -149,7 +149,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object Protocol: TComboBox
       Left = 209
-      Height = 30
+      Height = 29
       Top = 52
       Width = 120
       Enabled = False
@@ -169,57 +169,57 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     Width = 452
     Align = alClient
     Caption = 'Database Parameters'
-    ClientHeight = 266
+    ClientHeight = 267
     ClientWidth = 448
     TabOrder = 1
     object Label2: TLabel
       Left = 25
-      Height = 19
+      Height = 18
       Top = 10
-      Width = 96
+      Width = 89
       Caption = '&User Name:'
       FocusControl = UserName
       ParentColor = False
     end
     object Label3: TLabel
       Left = 25
-      Height = 19
+      Height = 18
       Top = 66
-      Width = 84
+      Width = 75
       Caption = 'Pass&word:'
       FocusControl = Password
       ParentColor = False
     end
     object Label4: TLabel
       Left = 24
-      Height = 19
+      Height = 18
       Top = 114
-      Width = 77
+      Width = 68
       Caption = 'S&QLRole:'
       FocusControl = SQLRole
       ParentColor = False
     end
     object Label5: TLabel
       Left = 249
-      Height = 19
+      Height = 18
       Top = 10
-      Width = 76
+      Width = 69
       Caption = 'Se&ttings:'
       FocusControl = DatabaseParams
       ParentColor = False
     end
     object Label6: TLabel
       Left = 25
-      Height = 19
+      Height = 18
       Top = 170
-      Width = 117
+      Width = 105
       Caption = '&Character Set:'
       FocusControl = CharacterSet
       ParentColor = False
     end
     object UserName: TEdit
       Left = 24
-      Height = 28
+      Height = 27
       Top = 32
       Width = 137
       OnChange = UserNameChange
@@ -228,7 +228,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object Password: TEdit
       Left = 25
-      Height = 28
+      Height = 27
       Top = 82
       Width = 137
       OnChange = PasswordChange
@@ -237,7 +237,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object SQLRole: TEdit
       Left = 25
-      Height = 28
+      Height = 27
       Top = 130
       Width = 134
       OnChange = SQLRoleChange
@@ -255,13 +255,13 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       Left = 25
       Height = 22
       Top = 234
-      Width = 119
+      Width = 109
       Caption = 'Lo&gin Prompt'
       TabOrder = 4
     end
     object CharacterSet: TComboBox
       Left = 25
-      Height = 30
+      Height = 29
       Top = 194
       Width = 134
       ItemHeight = 0

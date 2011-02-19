@@ -51,7 +51,7 @@ unit IBDBReg;
 interface
 
 uses {Windows,} SysUtils, Classes, Graphics, Dialogs, Controls, Forms, TypInfo,
-     DB, IBTable, IBDatabase,  IBEventsEditor,
+     DB, IBTable, IBDatabase,  IBEventsEditor,  LazarusPackageIntf,
       IBUpdateSQL, IBXConst, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor;
 
 type
@@ -298,7 +298,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
 
 procedure Register;
 begin
-  RegisterClasses([TIBStringField, TIBBCDField]);
+  RegisterNoIcon([TIBStringField, TIBBCDField]);
   RegisterComponents(IBPalette1, [TIBTable, TIBQuery,
     TIBStoredProc, TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBBatchMove,
     TIBDataSet, TIBSQL, TIBDatabaseInfo, (*TIBSQLMonitor,*) TIBEvents, TIBExtract]);
@@ -306,7 +306,6 @@ begin
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
       TIBRestoreService, TIBValidationService, TIBStatisticalService,
       TIBLogService, TIBSecurityService, TIBServerProperties]);
-//  RegisterFields([TIBStringField, TIBBCDField]); --not sure if this is needed in lazarus
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'DatabaseName', TIBFileNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'StoredProcName', TIBStoredProcNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TParams), TIBStoredProc, 'Params', TIBStoredProcParamsProperty);

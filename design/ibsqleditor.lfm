@@ -1,0 +1,371 @@
+object IBSQLEditorForm: TIBSQLEditorForm
+  Left = 280
+  Height = 431
+  Top = 347
+  Width = 729
+  ActiveControl = PageControl
+  Caption = 'IBSQL Editor'
+  ClientHeight = 431
+  ClientWidth = 729
+  OnShow = FormShow
+  LCLVersion = '0.9.28.2'
+  object Label3: TLabel
+    Left = 288
+    Height = 18
+    Top = 8
+    Width = 27
+    Caption = 'SQL'
+    ParentColor = False
+  end
+  object SQLText: TMemo
+    Left = 288
+    Height = 341
+    Top = 27
+    Width = 431
+    ScrollBars = ssVertical
+    TabOrder = 0
+  end
+  object Button3: TButton
+    Left = 280
+    Height = 29
+    Top = 380
+    Width = 102
+    AutoSize = True
+    Caption = 'Generate SQL'
+    TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 640
+    Height = 30
+    Top = 380
+    Width = 72
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 2
+  end
+  object QuoteFields: TCheckBox
+    Left = 16
+    Height = 22
+    Top = 380
+    Width = 129
+    Caption = '&Quote Identifiers'
+    TabOrder = 3
+  end
+  object Button1: TButton
+    Left = 552
+    Height = 30
+    Top = 379
+    Width = 72
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 4
+  end
+  object PageControl: TPageControl
+    Left = 16
+    Height = 337
+    Top = 27
+    Width = 251
+    ActivePage = SelectPage
+    TabIndex = 0
+    TabOrder = 5
+    TabPosition = tpLeft
+    object SelectPage: TTabSheet
+      Caption = 'Select'
+      ClientHeight = 331
+      ClientWidth = 182
+      OnShow = SelectPageShow
+      object Label1: TLabel
+        Left = 7
+        Height = 18
+        Top = 3
+        Width = 76
+        Caption = 'Table Name'
+        ParentColor = False
+      end
+      object Label2: TLabel
+        Left = 7
+        Height = 18
+        Top = 69
+        Width = 36
+        Caption = 'Fields'
+        ParentColor = False
+      end
+      object Label4: TLabel
+        Left = 7
+        Height = 18
+        Top = 250
+        Width = 83
+        Caption = 'Primary Keys'
+        ParentColor = False
+      end
+      object SelectTableName: TComboBox
+        Left = 7
+        Height = 29
+        Top = 19
+        Width = 169
+        ItemHeight = 0
+        OnCloseUp = SelectTableNameCloseUp
+        ParentColor = True
+        TabOrder = 0
+      end
+      object SelectFieldsList: TListBox
+        Left = 7
+        Height = 136
+        Hint = 'Select Fields to include in Select Statement or leave unselected to select all'
+        Top = 82
+        Width = 169
+        ItemHeight = 0
+        MultiSelect = True
+        OnDblClick = SelectFieldsListDblClick
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 1
+        TopIndex = -1
+      end
+      object SelectPrimaryKeys: TListBox
+        Left = 7
+        Height = 55
+        Top = 266
+        Width = 159
+        ItemHeight = 0
+        TabOrder = 2
+        TopIndex = -1
+      end
+    end
+    object InsertPage: TTabSheet
+      Caption = 'Insert'
+      ClientHeight = 331
+      ClientWidth = 182
+      OnShow = InsertPageShow
+      object Label8: TLabel
+        Left = 7
+        Height = 18
+        Top = 3
+        Width = 76
+        Caption = 'Table Name'
+        ParentColor = False
+      end
+      object Label9: TLabel
+        Left = 7
+        Height = 18
+        Top = 69
+        Width = 36
+        Caption = 'Fields'
+        ParentColor = False
+      end
+      object InsertTableNames: TComboBox
+        Left = 7
+        Height = 29
+        Top = 19
+        Width = 169
+        ItemHeight = 0
+        OnCloseUp = InsertTableNamesCloseUp
+        ParentColor = True
+        TabOrder = 0
+      end
+      object InsertFieldsList: TListBox
+        Left = 7
+        Height = 231
+        Hint = 'Select Fields to include in Insert  Statement or leave unselected to select all'
+        Top = 83
+        Width = 169
+        ItemHeight = 0
+        MultiSelect = True
+        OnDblClick = SelectFieldsListDblClick
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 1
+        TopIndex = -1
+      end
+    end
+    object ModifyPage: TTabSheet
+      Caption = 'Modify'
+      ClientHeight = 331
+      ClientWidth = 182
+      OnShow = ModifyPageShow
+      object Label10: TLabel
+        Left = 7
+        Height = 18
+        Top = 3
+        Width = 76
+        Caption = 'Table Name'
+        ParentColor = False
+      end
+      object Label11: TLabel
+        Left = 7
+        Height = 18
+        Top = 69
+        Width = 36
+        Caption = 'Fields'
+        ParentColor = False
+      end
+      object Label12: TLabel
+        Left = 7
+        Height = 18
+        Top = 250
+        Width = 83
+        Caption = 'Primary Keys'
+        ParentColor = False
+      end
+      object Label13: TLabel
+        Left = 30
+        Height = 18
+        Top = 230
+        Width = 70
+        Caption = 'in Field List'
+        ParentColor = False
+      end
+      object ModifyTableNames: TComboBox
+        Left = 7
+        Height = 29
+        Top = 19
+        Width = 169
+        ItemHeight = 0
+        OnCloseUp = ModifyTableNamesCloseUp
+        ParentColor = True
+        TabOrder = 0
+      end
+      object ModifyFieldsList: TListBox
+        Left = 7
+        Height = 120
+        Hint = 'Select Fields to include in Update Statement or leave unselected to select all'
+        Top = 83
+        Width = 169
+        ItemHeight = 0
+        MultiSelect = True
+        OnClick = SelectFieldsListDblClick
+        TabOrder = 1
+        TopIndex = -1
+      end
+      object ModifyPrimaryKeys: TListBox
+        Left = 7
+        Height = 55
+        Top = 266
+        Width = 159
+        ItemHeight = 0
+        OnClick = SelectFieldsListDblClick
+        TabOrder = 2
+        TopIndex = -1
+      end
+      object IncludePrimaryKeys: TCheckBox
+        Left = 7
+        Height = 22
+        Top = 210
+        Width = 159
+        Caption = 'Include Primary keys '
+        TabOrder = 3
+      end
+    end
+    object DeletePage: TTabSheet
+      Caption = 'Delete'
+      ClientHeight = 331
+      ClientWidth = 182
+      OnShow = DeletePageShow
+      object Label14: TLabel
+        Left = 7
+        Height = 18
+        Top = 3
+        Width = 76
+        Caption = 'Table Name'
+        ParentColor = False
+      end
+      object Label15: TLabel
+        Left = 7
+        Height = 18
+        Top = 66
+        Width = 83
+        Caption = 'Primary Keys'
+        ParentColor = False
+      end
+      object DeleteTableNames: TComboBox
+        Left = 7
+        Height = 29
+        Top = 19
+        Width = 169
+        ItemHeight = 0
+        OnCloseUp = DeleteTableNamesCloseUp
+        ParentColor = True
+        TabOrder = 0
+      end
+      object DeletePrimaryKeys: TListBox
+        Left = 7
+        Height = 55
+        Top = 82
+        Width = 159
+        ItemHeight = 0
+        OnDblClick = SelectFieldsListDblClick
+        TabOrder = 1
+        TopIndex = -1
+      end
+    end
+    object ExecutePage: TTabSheet
+      Caption = 'Execute'
+      ClientHeight = 331
+      ClientWidth = 182
+      OnShow = ExecutePageShow
+      object Label16: TLabel
+        Left = 7
+        Height = 18
+        Top = 3
+        Width = 109
+        Caption = 'Procedure Name'
+        ParentColor = False
+      end
+      object Label17: TLabel
+        Left = 10
+        Height = 18
+        Top = 69
+        Width = 111
+        Caption = 'Input Parameters'
+        ParentColor = False
+      end
+      object Label18: TLabel
+        Left = 11
+        Height = 18
+        Top = 190
+        Width = 123
+        Caption = 'Output Parameters'
+        ParentColor = False
+      end
+      object ProcedureNames: TComboBox
+        Left = 7
+        Height = 29
+        Top = 19
+        Width = 169
+        ItemHeight = 0
+        ParentColor = True
+        TabOrder = 0
+      end
+      object ProcInputList: TListBox
+        Left = 10
+        Height = 80
+        Top = 90
+        Width = 164
+        IntegralHeight = True
+        ItemHeight = 0
+        TabOrder = 1
+        TopIndex = -1
+      end
+      object ProcOutputList: TListBox
+        Left = 6
+        Height = 80
+        Top = 210
+        Width = 164
+        IntegralHeight = True
+        ItemHeight = 0
+        TabOrder = 2
+        TopIndex = -1
+      end
+    end
+  end
+  object Button4: TButton
+    Left = 416
+    Height = 30
+    Top = 380
+    Width = 66
+    Caption = 'Test'
+    TabOrder = 6
+  end
+end

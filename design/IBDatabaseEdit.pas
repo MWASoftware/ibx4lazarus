@@ -28,7 +28,23 @@
 
 unit IBDatabaseEdit;
 
-{$MODE Delphi}  {$H-}
+{$MODE Delphi}
+
+{$A+}                           (* Aligned records: On *)
+{$B-}                           (* Short circuit boolean expressions: Off *)
+{$G+}                           (* Imported data: On *)
+{$H+}                           (* Huge Strings: On *)
+{$J-}                           (* Modification of Typed Constants: Off *)
+{$M+}                           (* Generate run-time type information: On *)
+{$O+}                           (* Optimization: On *)
+{$Q-}                           (* Overflow checks: Off *)
+{$R-}                           (* Range checks: Off *)
+{$T+}                           (* Typed address: On *)
+{$U+}                           (* Pentim-safe FDIVs: On *)
+{$W-}                           (* Always generate stack frames: Off *)
+{$X+}                           (* Extended syntax: On *)
+{$Z1}                           (* Minimum Enumeration Size: 1 Byte *)
+
 
 interface
 

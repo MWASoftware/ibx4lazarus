@@ -17,6 +17,7 @@ type
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
+    IncludePrimaryKeys: TCheckBox;
     FieldList: TListBox;
     Label1: TLabel;
     Label2: TLabel;
@@ -88,7 +89,7 @@ begin
   if TableNamesCombo.Items.Count > 0 then
   begin
     TableNamesCombo.ItemIndex := 0;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,false);
+    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,IncludePrimaryKeys.checked);
     FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
   end;
 end;
@@ -134,7 +135,7 @@ end;
 
 procedure TIBModifySQLEditorForm.TableNamesComboCloseUp(Sender: TObject);
 begin
-  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,false);
+  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,IncludePrimaryKeys.checked);
   FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
 end;
 
