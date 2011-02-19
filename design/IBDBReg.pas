@@ -291,7 +291,7 @@ implementation
 
 uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBIntf, IBSQL, (*IBSQLMonitor,*) IBDatabaseInfo, IBEvents,
-     IBServices, (*IBInstall,*) IBDatabaseEdit, IBTransactionEdit,
+     IBServices, IBDatabaseEdit, IBTransactionEdit,
      IBBatchMove, DBLoginDlg, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor;
