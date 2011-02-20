@@ -116,7 +116,21 @@ function MonitoringEnabled: Boolean;
 implementation
 
 uses
-  contnrs, syncobjs;
+  contnrs {$IFDEF LINUX}, ipc {$ENDIF};
+
+const
+  MonitorHookNames: array[0..5] of String = (
+    'FB.SQL.MONITOR.Mutex1_0',
+    'FB.SQL.MONITOR.SharedMem1_0',
+    'FB.SQL.MONITOR.WriteEvent1_0',
+    'FB.SQL.MONITOR.WriteFinishedEvent1_0',
+    'FB.SQL.MONITOR.ReadEvent1_0',
+    'FB.SQL.MONITOR.ReadFinishedEvent1_0'
+  );
+  cMonitorHookSize = 1024;
+  cMaxBufferSize = cMonitorHookSize - (4 * SizeOf(Integer)) - SizeOf(TDateTime);
+  cDefaultTimeout = 500; { 1 seconds }
+
 
 type
 
@@ -125,13 +139,10 @@ type
   private
     FTraceFlags: TTraceFlags;
     FEnabled: Boolean;
-    FEventsCreated : Boolean;
-    procedure CreateEvents;
   protected
     procedure WriteSQLData(Text: String; DataType: TTraceFlag);
   public
     constructor Create;
-    destructor Destroy; override;
     procedure RegisterMonitor(SQLMonitor : TIBCustomSQLMonitor);
     procedure UnregisterMonitor(SQLMonitor : TIBCustomSQLMonitor);
     procedure ReleaseMonitor(Arg : TIBCustomSQLMonitor);
@@ -164,6 +175,8 @@ type
     The second object is a Release object.  It holds the handle that
     the CM_RELEASE message is to be queued to. }
 
+  { TTraceObject }
+
   TTraceObject = Class(TObject)
     FDataType : TTraceFlag;
     FMsg : String;
@@ -171,6 +184,7 @@ type
   public
     constructor Create(Msg : String; DataType : TTraceFlag); overload;
     constructor Create(obj : TTraceObject); overload;
+    constructor Create(obj : TTraceObject; MsgOffset, MsgLen: integer); overload;
   end;
 
   TReleaseObject = Class(TObject)
@@ -215,33 +229,358 @@ type
     procedure RemoveMonitor(Arg : TIBCustomSQLMonitor);
   end;
 
-const
-  MonitorHookNames: array[0..5] of String = (
-    'IB.SQL.MONITOR.Mutex4_1',
-    'IB.SQL.MONITOR.SharedMem4_1',
-    'IB.SQL.MONITOR.WriteEvent4_1',
-    'IB.SQL.MONITOR.WriteFinishedEvent4_1',
-    'IB.SQL.MONITOR.ReadEvent4_1',
-    'IB.SQL.MONITOR.ReadFinishedEvent4_1'
-  );
-  cMonitorHookSize = 1024;
-  cMaxBufferSize = cMonitorHookSize - (4 * SizeOf(Integer)) - SizeOf(TDateTime);
-  cDefaultTimeout = 500; { 1 seconds }
+  {Interprocess Communication Objects. All platform dependent IPC is abstracted
+   into this set of objects }
+
+  { TCommonSecurityAttributes }
+
+  TCommonSecurityAttributes = class
+  protected
+    {$IFDEF LINUX}
+    {$ELSE}
+    Sa : TSecurityAttributes;
+    {$ENDIF}
+  public
+    constructor Create;
+  end;
+
+  { TSyncEvent }
+
+  TSyncGate = class(TCommonSecurityAttributes)
+  private
+    {$IFDEF LINUX}
+    {$ELSE}
+    FEvent: THandle;
+    {$ENDIF}
+  public
+    constructor Create(EventName: string; InitialState: boolean);
+    constructor Open(EventName: string);
+    destructor Destroy; override;
+    function WaitFor(Timeout: DWORD): DWORD;
+    procedure OpenGate;
+    procedure CloseGate;
+  end;
+
+  {TMutex}
+
+  TMutex = class(TCommonSecurityAttributes)
+  private
+    {$IFDEF LINUX}
+    {$ELSE}
+    FMutex: THandle;
+    {$ENDIF}
+  public
+    constructor Create(MutexName: string);
+    constructor Open(MutexName: string);
+    destructor Destroy; override;
+    procedure Lock;
+    procedure Unlock;
+  end;
+
+  { TGlobalInterface }
+
+  TGlobalInterface = class(TCommonSecurityAttributes)
+  private
+    {$IFDEF LINUX}
+    {$ELSE}
+    FSharedBuffer: THandle;
+    {$ENDIF}
+    FWriteLock: TMutex;
+    FBuffer: PChar;
+    FMonitorCount,
+    FReaderCount,
+    FTraceDataType,
+    FBufferSize: PInteger;
+    FTimeStamp: PDateTime;
+    FReadEvent: TSyncGate;
+    FReadFinishedEvent: TSyncGate;
+    FWriteEvent: TSyncGate;
+    FWriteFinishedEvent: TSyncGate;
+    function GetMonitorCount: integer;
+    function GetReaderCount: integer;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function IncMonitorCount: integer;
+    function DecMonitorCount: integer;
+    function IncReaderCount: integer;
+    function DecReaderCount: integer;
+    procedure SendTrace(TraceObject: TTraceObject);
+    procedure ReceiveTrace(TraceObject: TTraceObject);
+    property MontorCount: integer read GetMonitorCount;
+    property ReaderCount: integer read GetReaderCount;
+    property WriteEvent: TSyncGate read FWriteEvent;
+    property WriteFinishedEvent: TSyncGate read FWriteFinishedEvent;
+    property ReadEvent: TSyncGate read FReadEvent;
+    property ReadFinishedEvent: TSyncGate read FReadFinishedEvent;
+    property WriteLock: TMutex read FMutex;
+  end;
+
+{ TCommonSecurityAttributes }
+
+constructor TCommonSecurityAttributes.Create;
+{$IFDEF LINUX}
+begin
+{$ELSE}
+var Sd : TSecurityDescriptor;
+begin
+  { Setup Security so anyone can connect to the MMF/Mutex/Event.  This is
+    needed when IBX is used in a Service. }
+
+  InitializeSecurityDescriptor(@Sd,SECURITY_DESCRIPTOR_REVISION);
+  SetSecurityDescriptorDacl(@Sd,true,nil,false);
+  Sa.nLength := SizeOf(Sa);
+  Sa.lpSecurityDescriptor := @Sd;
+  Sa.bInheritHandle := true;
+{$ENDIF}
+end;
+
+  { TMutex }
+
+constructor TMutex.Create(MutexName: string);
+{$IFDEF LINUX}
+begin
+{$ELSE}
+begin
+  inherited Create;
+  FMutex := CreateMutex(@sa, False, PChar(MutexName))
+{$ENDIF}
+end;
+
+constructor TMutex.Open(MutexName: string);
+{$IFDEF LINUX}
+begin
+{$ELSE}
+begin
+  inherited Create;
+  FMutex := OpenMutex(MUTEX_ALL_ACCESS, False, PChar(MutexName))
+{$ENDIF}
+end;
+
+destructor TMutex.Destroy;
+begin
+{$IFDEF LINUX}
+{$ELSE}
+  CloseHandle(FMutex);
+{$ENDIF}
+  inherited Destroy;
+end;
+
+{ Obtain ownership of the Mutex and prevent other threads from accessing protected resource }
+
+procedure TMutex.Lock;
+begin
+{$IFDEF LINUX}
+{$ELSE}
+  WaitForSingleObject(FMutex, INFINITE);
+{$ENDIF}
+end;
+
+{Give up ownership of the Mutex and allow other threads access }
+
+procedure TMutex.Unlock;
+begin
+{$IFDEF LINUX}
+{$ELSE}
+  ReleaseMutex(FMutex);
+{$ENDIF}
+end;
+
+{ TSyncGate }
+
+constructor TSyncGate.Create(EventName: string; InitialState: boolean);
+{$IFDEF LINUX}
+begin
+{$ELSE}
+begin
+  inherited Create;
+  FEvent := CreateEvent(@sa, true, InitialState, PChar(EventName))
+
+  if FEvent = 0 then
+    IBError(ibxeCannotCreateSharedResource, [GetLastError])
+{$ENDIF}
+end;
+
+constructor TSyncGate.Open(EventName: string);
+{$IFDEF LINUX}
+begin
+{$ELSE}
+begin
+  inherited Create;
+  FEvent := OpenEvent(EVENT_ALL_ACCESS, true, PChar(EventName));
+
+  if FEvent = 0 then
+    IBError(ibxeCannotCreateSharedResource, [GetLastError])
+{$ENDIF}
+end;
+
+destructor TSyncGate.Destroy;
+begin
+{$IFDEF LINUX}
+{$ELSE}
+  CloseHandle(FEvent);
+{$ENDIF}
+  inherited Destroy;
+end;
+
+function TSyncGate.WaitFor(Timeout: DWORD): DWORD;
+begin
+  Result := WaitForSingleObject(FEvent,Timeout)  //Returns when Event is "signaled"
+end;
+
+procedure TSyncGate.OpenGate;
+begin
+{$IFDEF LINUX}
+{$ELSE}
+  SetEvent(FEvent) //Event State set to "signaled"
+{$ENDIF}
+end;
+
+procedure TSyncGate.CloseGate;
+begin
+{$IFDEF LINUX}
+{$ELSE}
+  ResetEvent(FEvent) //Event State set to "unsignaled"
+{$ENDIF}
+end;
+
+
+{ TGlobalInterface }
+
+function TGlobalInterface.GetMonitorCount: integer;
+begin
+  Result := FMonitorCount^
+end;
+
+function TGlobalInterface.GetReaderCount: integer;
+begin
+  Result := FReaderCount^
+end;
+
+constructor TGlobalInterface.Create;
+{$IFDEF LINUX}
+begin
+{$ELSE}
+begin
+  inherited Create;
+
+  FSharedBuffer := CreateFileMapping($FFFFFFFF, @sa, PAGE_READWRITE,
+                       0, cMonitorHookSize, PChar(MonitorHookNames[1]));
+
+  if GetLastError = ERROR_ALREADY_EXISTS then
+  begin
+    FSharedBuffer := OpenFileMapping(FILE_MAP_ALL_ACCESS, false, PChar(MonitorHookNames[1]));
+    if (FSharedBuffer = 0) then
+      IBError(ibxeCannotCreateSharedResource, [GetLastError]);
+
+    FBuffer := MapViewOfFile(FSharedBuffer, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+
+    if FBuffer = nil then
+      IBError(ibxeCannotCreateSharedResource, [GetLastError]);
+
+    FMonitorCount := PInteger(FBuffer + cMonitorHookSize - SizeOf(Integer));
+    FReaderCount := PInteger(PChar(FMonitorCount) - SizeOf(Integer));
+    FTraceDataType := PInteger(PChar(FReaderCount) - SizeOf(Integer));
+    FTimeStamp := PDateTime(PChar(FTraceDataType) - SizeOf(TDateTime));
+    FBufferSize := PInteger(PChar(FTimeStamp) - SizeOf(Integer));
+    FWriteLock := TMutex.Create(PChar(MonitorHookNames[0]));
+    FWriteEvent := TSyncGate.Create(MonitorHookNames[2],true);
+    FWriteFinishedEvent := TSyncGate.Create(MonitorHookNames[3],true);
+    FReadEvent := TSyncGate.Create(MonitorHookNames[4],true);
+    FReadFinishedEvent := TSyncGate.Create(MonitorHookNames[5],true);
+  end
+  else
+  begin
+    FWriteLock := TMutex.Open(PChar(MonitorHookNames[0]));
+    FWriteEvent := TSyncGate.Open(MonitorHookNames[2], False);
+    FWriteFinishedEvent := TSyncGate.Open(MonitorHookNames[3], True);
+    FReadEvent := TSyncGate.Open(MonitorHookNames[4], False);
+    FReadFinishedEvent := TSyncGate.Open(MonitorHookNames[5], False);
+
+    FBuffer := MapViewOfFile(FSharedBuffer, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+    FMonitorCount := PInteger(FBuffer + cMonitorHookSize - SizeOf(Integer));
+    FReaderCount := PInteger(PChar(FMonitorCount) - SizeOf(Integer));
+    FTraceDataType := PInteger(PChar(FReaderCount) - SizeOf(Integer));
+    FTimeStamp := PDateTime(PChar(FTraceDataType) - SizeOf(TDateTime));
+    FBufferSize := PInteger(PChar(FTimeStamp) - SizeOf(Integer));
+    FMonitorCount^ := 0;
+    FReaderCount^ := 0;
+    FBufferSize^ := 0;
+  end;
+
+  { This should never evaluate to true, if it does
+  there has been a hiccup somewhere. }
+
+  if FMonitorCount^ < 0 then
+    FMonitorCount^ := 0;
+  if FReaderCount^ < 0 then
+    FReaderCount^ := 0;
+{$ENDIF}
+end;
+
+destructor TGlobalInterface.Destroy;
+begin
+{$IFDEF LINUX}
+{$ELSE}
+    UnmapViewOfFile(FBuffer);
+    CloseHandle(FSharedBuffer);
+{$ENDIF}
+    if assigned(FWriteLock) then FWriteLock.Free;
+    if assigned(FWriteEvent) then FWriteEvent.Free;
+    if assigned(FWriteFinishedEvent) then FWriteFinishedEvent.Free;
+    if assigned(FReadEvent) then FReadEvent.Free;
+    if assigned(FReadFinishedEvent) then FReadFinishedEvent.Free;
+  inherited Destroy;
+end;
+
+function TGlobalInterface.IncMonitorCount: integer;
+begin
+{$IFDEF LINUX}
+{$ELSE}
+  InterlockedIncrement(FMonitorCount^);
+{$ENDIF}
+  Result := FMonitorCount^
+end;
+
+function TGlobalInterface.DecMonitorCount: integer;
+begin
+{$IFDEF LINUX}
+{$ELSE}
+  InterlockedDecrement(FMonitorCount^);
+{$ENDIF}
+  Result := FMonitorCount^
+end;
+
+function TGlobalInterface.IncReaderCount: integer;
+begin
+  InterlockedIncrement(FReaderCount^);
+  Result := FReaderCount^
+end;
+
+function TGlobalInterface.DecReaderCount: integer;
+begin
+  InterlockedDecrement(FReaderCount^);
+  Result := FReaderCount^
+end;
+
+procedure TGlobalInterface.SendTrace(TraceObject: TTraceObject);
+begin
+  FTraceDataType^ := Integer(TraceObject.FDataType);
+  FTimeStamp^ := TraceObject.FTimeStamp;
+  FBufferSize^ := Min(Lrngth(TraceObject.FMsg), cMaxBufferSize);
+  Move(TraceObject.FMsg[1], FBuffer[0], FBufferSize^);
+end;
+
+procedure TGlobalInterface.ReceiveTrace(TraceObject: TTraceObject);
+begin
+  SetString(TraceObject.FMsg, FBuffer, FBufferSize^);
+  TraceObject.FDataType := TTraceFlag(FTraceDataType^);
+  TraceObject.FTimeStamp := TDateTime(FTimeStamp^);
+end;
+
 
 var
-  FSharedBuffer,
-  FWriteLock,
-  FWriteEvent,
-  FWriteFinishedEvent,
-  FReadEvent,
-  FReadFinishedEvent : THandle;
-  FBuffer : PChar;
-  FMonitorCount,
-  FReaderCount,
-  FTraceDataType,
-  FBufferSize : PInteger;
-  FTimeStamp : PDateTime;
-
+  FGlobalInterface: TGlobalInterface;
   FWriterThread : TWriterThread;
   FReaderThread : TReaderThread;
   _MonitorHook: TIBSQLMonitorHook;
@@ -317,89 +656,8 @@ end;
 constructor TIBSQLMonitorHook.Create;
 begin
   inherited Create;
-  FEventsCreated := false;
   FTraceFlags := [tfQPrepare..tfMisc];
   FEnabled := true;
-end;
-
-procedure TIBSQLMonitorHook.CreateEvents;
-var
-  Sa : TSecurityAttributes;
-  Sd : TSecurityDescriptor;
-
-  function OpenLocalEvent(Idx: Integer): THandle;
-  begin
-    result := OpenEvent(EVENT_ALL_ACCESS, true, PChar(MonitorHookNames[Idx]));
-    if result = 0 then
-      IBError(ibxeCannotCreateSharedResource, [GetLastError]);
-  end;
-
-  function CreateLocalEvent(Idx: Integer; InitialState: Boolean): THandle;
-  begin
-    result := CreateEvent(@sa, true, InitialState, PChar(MonitorHookNames[Idx]));
-    if result = 0 then
-      IBError(ibxeCannotCreateSharedResource, [GetLastError]);
-  end;
-
-begin
-  { Setup Secureity so anyone can connect to the MMF/Mutex/Events.  This is
-    needed when IBX is used in a Service. }
-
-  InitializeSecurityDescriptor(@Sd,SECURITY_DESCRIPTOR_REVISION);
-  SetSecurityDescriptorDacl(@Sd,true,nil,false);
-  Sa.nLength := SizeOf(Sa);
-  Sa.lpSecurityDescriptor := @Sd;
-  Sa.bInheritHandle := true;
-
-  FSharedBuffer := CreateFileMapping($FFFFFFFF, @sa, PAGE_READWRITE,
-                       0, cMonitorHookSize, PChar(MonitorHookNames[1]));
-
-  if GetLastError = ERROR_ALREADY_EXISTS then
-  begin
-    FSharedBuffer := OpenFileMapping(FILE_MAP_ALL_ACCESS, false, PChar(MonitorHookNames[1]));
-    if (FSharedBuffer = 0) then
-      IBError(ibxeCannotCreateSharedResource, [GetLastError]);
-    FBuffer := MapViewOfFile(FSharedBuffer, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-    if FBuffer = nil then
-      IBError(ibxeCannotCreateSharedResource, [GetLastError]);
-    FMonitorCount := PInteger(FBuffer + cMonitorHookSize - SizeOf(Integer));
-    FReaderCount := PInteger(PChar(FMonitorCount) - SizeOf(Integer));
-    FTraceDataType := PInteger(PChar(FReaderCount) - SizeOf(Integer));
-    FTimeStamp := PDateTime(PChar(FTraceDataType) - SizeOf(TDateTime));
-    FBufferSize := PInteger(PChar(FTimeStamp) - SizeOf(Integer));
-    FWriteLock := OpenMutex(MUTEX_ALL_ACCESS, False, PChar(MonitorHookNames[0]));
-    FWriteEvent := OpenLocalEvent(2);
-    FWriteFinishedEvent := OpenLocalEvent(3);
-    FReadEvent := OpenLocalEvent(4);
-    FReadFinishedEvent := OpenLocalEvent(5);
-  end
-  else
-  begin
-    FWriteLock := CreateMutex(@sa, False, PChar(MonitorHookNames[0]));
-    FWriteEvent := CreateLocalEvent(2, False);
-    FWriteFinishedEvent := CreateLocalEvent(3, True);
-    FReadEvent := CreateLocalEvent(4, False);
-    FReadFinishedEvent := CreateLocalEvent(5, False);
-
-    FBuffer := MapViewOfFile(FSharedBuffer, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-    FMonitorCount := PInteger(FBuffer + cMonitorHookSize - SizeOf(Integer));
-    FReaderCount := PInteger(PChar(FMonitorCount) - SizeOf(Integer));
-    FTraceDataType := PInteger(PChar(FReaderCount) - SizeOf(Integer));
-    FTimeStamp := PDateTime(PChar(FTraceDataType) - SizeOf(TDateTime));
-    FBufferSize := PInteger(PChar(FTimeStamp) - SizeOf(Integer));
-    FMonitorCount^ := 0;
-    FReaderCount^ := 0;
-    FBufferSize^ := 0;
-  end;
-
-  { This should never evaluate to true, if it does
-  there has been a hiccup somewhere. }
-
-  if FMonitorCount^ < 0 then
-    FMonitorCount^ := 0;
-  if FReaderCount^ < 0 then
-    FReaderCount^ := 0;
-  FEventsCreated := true;
 end;
 
 procedure TIBSQLMonitorHook.DBConnect(db: TIBDatabase);
@@ -429,21 +687,6 @@ begin
   end;
 end;
 
-destructor TIBSQLMonitorHook.Destroy;
-begin
-  if FEventsCreated then
-  begin
-    UnmapViewOfFile(FBuffer);
-    CloseHandle(FSharedBuffer);
-    CloseHandle(FWriteEvent);
-    CloseHandle(FWriteFinishedEvent);
-    CloseHandle(FReadEvent);
-    CloseHandle(FReadFinishedEvent);
-    CloseHandle(FWriteLock);
-  end;
-  inherited Destroy;
-end;
-
 function TIBSQLMonitorHook.GetEnabled: Boolean;
 begin
   Result := FEnabled;
@@ -451,7 +694,7 @@ end;
 
 function TIBSQLMonitorHook.GetMonitorCount: Integer;
 begin
-  Result := FMonitorCount^;
+  Result := FGlobalInterface.MonitorCount
 end;
 
 function TIBSQLMonitorHook.GetTraceFlags: TTraceFlags;
@@ -461,8 +704,8 @@ end;
 
 procedure TIBSQLMonitorHook.RegisterMonitor(SQLMonitor: TIBCustomSQLMonitor);
 begin
-  if not FEventsCreated then
-    CreateEvents;
+  if not assigned(FGlobalInterface) then
+    FGlobalInterface := TGlobalInterface.Create;
   if not Assigned(FReaderThread) then
     FReaderThread := TReaderThread.Create;
   FReaderThread.AddMonitor(SQLMonitor);
@@ -726,8 +969,8 @@ end;
 procedure TIBSQLMonitorHook.WriteSQLData(Text: String;
   DataType: TTraceFlag);
 begin
-  if not FEventsCreated then
-    CreateEvents;
+  if not assigned(FGlobalInterface) then
+    FGlobalInterface := TGlobalInterface.Create;
   Text := CRLF + '[Application: ' + Application.Title + ']' + CRLF + Text; {do not localize}
   if not Assigned(FWriterThread) then
     FWriterThread := TWriterThread.Create;
@@ -757,7 +1000,7 @@ begin
         (FMsgs.Count <> 0) do
   begin
     { Any one listening? }
-    if FMonitorCount^ = 0 then
+    if FGlobalInterface.MonitorCount = 0 then
     begin
       if FMsgs.Count <> 0 then
         Synchronize(RemoveFromList);
@@ -783,12 +1026,12 @@ end;
 
 procedure TWriterThread.Lock;
 begin
-  WaitForSingleObject(FWriteLock, INFINITE);
+  FGlobalInterface.WriteLock.Lock;
 end;
 
 procedure TWriterThread.Unlock;
 begin
-  ReleaseMutex(FWriteLock);
+  FGlobalInterface.WriteLock.Unlock;
 end;
 
 procedure TWriterThread.WriteSQLData(Msg : String; DataType: TTraceFlag);
@@ -814,28 +1057,32 @@ begin
    * 7. Unblock all readers waiting for a write to be finished.
    * 8. Unlock the mutex.
    }
-  while WaitForSingleObject(FReadEvent, cDefaultTimeout) = WAIT_TIMEOUT do
+  with FGlobalInterface do
   begin
-    if FMonitorCount^ > 0 then
-      InterlockedDecrement(FMonitorCount^);
-    if (FReaderCount^ = FMonitorCount^ - 1) or (FMonitorCount^ = 0) then
-      SetEvent(FReadEvent);
+    while ReadEvent.WaitFor(cDefaultTimeout)= WAIT_TIMEOUT do
+    { If we have timed out then we have lost a monitor }
+    begin
+      if MonitorCount > 0 then
+        DecMonitorCount;
+      if (ReaderCount = MonitorCount - 1) or (MonitorCount = 0) then
+        ReadEvent.OpenGate
+    end;
+    WriteFinishedEvent.CloseGate;
+    ReadFinishedEvent.CloseGate;
+    WriteEvent.OpenGate; { Let all readers pass through. }
+    while ReadFinishedEvent.WaitFor(cDefaultTimeout) = WAIT_TIMEOUT do
+    { If we have timed out then we have lost a monitor }
+      if (ReaderCount = 0) or (DecReaderCount = 0) then
+        ReadFinishedEvent.OpenGate;
+    WriteEvent.CloseGate;
+    WriteFinishedEvent.OpenGate;
   end;
-  ResetEvent(FWriteFinishedEvent);
-  ResetEvent(FReadFinishedEvent);
-  SetEvent(FWriteEvent); { Let all readers pass through. }
-  while WaitForSingleObject(FReadFinishedEvent, cDefaultTimeout) = WAIT_TIMEOUT do
-    if (FReaderCount^ = 0) or (InterlockedDecrement(FReaderCount^) = 0) then
-      SetEvent(FReadFinishedEvent);
-  ResetEvent(FWriteEvent);
-  SetEvent(FWriteFinishedEvent);
   Unlock;
 end;
 
 procedure TWriterThread.WriteToBuffer;
-var
-  i, len: Integer;
-  Text : String;
+var I, len: integer;
+    Temp: TTraceObject;
 begin
   Lock;
   try
@@ -843,29 +1090,34 @@ begin
       The alternative is to have messages queue up until a
       monitor is ready.}
 
-    if FMonitorCount^ = 0 then
+    if FGlobalInterface.MonitorCount = 0 then
       Synchronize(RemoveFromList)
     else
     begin
-      Text := TTraceObject(FMsgs[0]).FMsg;
       i := 1;
-      len := Length(Text);
-      while (len > 0) do begin
-        BeginWrite;
+      len := Length(TTraceObject(FMsgs[0]).FMsg);
+      if len <= cMaxBufferSize then
+        FGlobalInterface.SendTrace(TTraceObject(FMsgs[0]))
+      else
+      while len > 0 do
+      begin
+        Temp := TTraceObject.Create(TTraceObject(FMsgs[0]),i,Min(len,cMaxBufferSize));
         try
-          FTraceDataType^ := Integer(TTraceObject(FMsgs[0]).FDataType);
-          FTimeStamp^ := TTraceObject(FMsgs[0]).FTimeStamp;
-          FBufferSize^ := Min(len, cMaxBufferSize);
-          Move(Text[i], FBuffer[0], FBufferSize^);
-          Inc(i, cMaxBufferSize);
-          Dec(len, cMaxBufferSize);
-        finally
+          BeginWrite;
+          try
+            FGlobalInterface.SendTrace(Temp);
+            Inc(i,cMaxBufferSize);
+            Dec(len,cMaxBufferSize);
+          finally
           {Do this in the main thread so the main thread
           adds and deletes}
-          Synchronize(RemoveFromList);
-          EndWrite;
-        end;
-      end;
+            Synchronize(RemoveFromList);
+           EndWrite;
+          end;
+        finally
+          Temp.Free
+        end
+      end
     end;
   finally
     Unlock;
@@ -898,6 +1150,13 @@ begin
   FTimeStamp := obj.FTimeStamp;
 end;
 
+constructor TTraceObject.Create(obj: TTraceObject; MsgOffset, MsgLen: integer);
+begin
+  FDataType := obj.FDataType;
+  FTimeStamp := obj.FTimeStamp;
+  FMsg := copy(obj.FMsg,MsgOffset,MsgLen)
+end;
+
 { TReleaseObject }
 
 constructor TReleaseObject.Create(Handle: THandle);
@@ -924,11 +1183,14 @@ begin
    *    inform the system that all readers are ready.
    * 4. Finally, wait for the FWriteEvent to signal.
    }
-  WaitForSingleObject(FWriteFinishedEvent, INFINITE);
-  InterlockedIncrement(FReaderCount^);
-  if FReaderCount^ = FMonitorCount^ then
-    SetEvent(FReadEvent);
-  WaitForSingleObject(FWriteEvent, INFINITE);
+  with FGlobalInterface do
+  begin
+    WriteFinishedEvent.WaitFor(INFINITE);
+    IncReaderCount;
+    if ReaderCount = MonitorCount then
+      ReadEvent.OpenGate;
+    WriteEvent.WaitFor(INFINITE);
+  end;
 end;
 
 constructor TReaderThread.Create;
@@ -936,14 +1198,14 @@ begin
   inherited Create(true);
   st := TTraceObject.Create('', tfMisc);
   FMonitors := TObjectList.Create(false);
-  InterlockedIncrement(FMonitorCount^);
+  FGlobalInterface.IncMonitorCount;
   Resume;
 end;
 
 destructor TReaderThread.Destroy;
 begin
-  if FMonitorCount^ > 0 then
-    InterlockedDecrement(FMonitorCount^);
+  if FGlobalInterface.MonitorCount > 0 then
+    FGlobalInterface.DecMonitorCount;
   FMonitors.Free;
   st.Free;
   inherited Destroy;
@@ -951,10 +1213,16 @@ end;
 
 procedure TReaderThread.EndRead;
 begin
-  if InterlockedDecrement(FReaderCount^) = 0 then
+  {
+    * 1. Decrement the number of interested readers
+    * 2. Once all readers have completed, reset read gate
+    * 3. Tell the writer that all readers have completed
+  }
+
+  if FGlobalInterface.DecReaderCount = 0 then
   begin
-    ResetEvent(FReadEvent);
-    SetEvent(FReadFinishedEvent);
+    FGlobalInterface.ReadEvent.CloseGate;
+    FGlobalInterface.ReadFinishedEvent.OpenGate;
   end;
 end;
 
@@ -988,9 +1256,7 @@ begin
   BeginRead;
   if not bDone then
   try
-    SetString(st.FMsg, FBuffer, FBufferSize^);
-    st.FDataType := TTraceFlag(FTraceDataType^);
-    st.FTimeStamp := TDateTime(FTimeStamp^);
+    FGlobalInterface.ReadTrace(st)
   finally
     EndRead;
   end;
@@ -1053,6 +1319,7 @@ end;
 
 initialization
   InitializeCriticalSection(CS);
+  FGlobalInterface := nil;
   _MonitorHook := nil;
   FWriterThread := nil;
   FReaderThread := nil;
@@ -1071,6 +1338,7 @@ finalization
     CloseThreads;
     if Assigned(_MonitorHook) then
       _MonitorHook._Release;
+    if assigned(FGlobalInterface) then FreeAndNil(FGlobalInterface);
   finally
     _MonitorHook := nil;
     DeleteCriticalSection(CS);
