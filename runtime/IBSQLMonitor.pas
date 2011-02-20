@@ -113,12 +113,26 @@ procedure EnableMonitoring;
 procedure DisableMonitoring;
 function MonitoringEnabled: Boolean;
 
+{$IFDEF LINUX}
+const
+  IPCFileName: string = '.FB.SQL.MONITOR1_0';
+{$ENDIF}
+
 implementation
 
 uses
   contnrs {$IFDEF LINUX}, ipc {$ENDIF};
 
 const
+{$IFDEF LINUX}
+  cNumberOfGates = 4;
+  cNumberOfSemaphores = 1 + cNumderOfGates*3;
+  cMutexSemaphore = 0;
+  cReadEventSemaphore = 1;
+  cReadFinishedEventSemaphore = 4;
+  cWriteEventSemaphore = 7;
+  cWriteFinishedEventSemaphore = 10;
+{$ELSE}
   MonitorHookNames: array[0..5] of String = (
     'FB.SQL.MONITOR.Mutex1_0',
     'FB.SQL.MONITOR.SharedMem1_0',
@@ -127,6 +141,7 @@ const
     'FB.SQL.MONITOR.ReadEvent1_0',
     'FB.SQL.MONITOR.ReadFinishedEvent1_0'
   );
+{$ENDIF}
   cMonitorHookSize = 1024;
   cMaxBufferSize = cMonitorHookSize - (4 * SizeOf(Integer)) - SizeOf(TDateTime);
   cDefaultTimeout = 500; { 1 seconds }
@@ -232,11 +247,13 @@ type
   {Interprocess Communication Objects. All platform dependent IPC is abstracted
    into this set of objects }
 
-  { TCommonSecurityAttributes }
+  { TIpcCommon }
 
-  TCommonSecurityAttributes = class
+  TIpcCommon = class
   protected
     {$IFDEF LINUX}
+    FSemaphoreSetID: cint; static;
+    FSharedMemoryID: cint; static;
     {$ELSE}
     Sa : TSecurityAttributes;
     {$ENDIF}
@@ -244,11 +261,41 @@ type
     constructor Create;
   end;
 
-  { TSyncEvent }
+  { TIpcEvent }
 
-  TSyncGate = class(TCommonSecurityAttributes)
+  {
+    In the original Windows implementation, a Windows Event is used to implement
+    a "gate". The gate can either be "open" when any thread can pass through the gate
+    unimpeded or "closed" when the thread must wait for the gate to open. When the
+    gate is opened, all waiting threads are activated.
+
+    In the Linux implementation, three semaphores are used to achieve the same effect.
+    One semaphore is used to represent the state of the gate. A value of one indicates
+    that the gate is open, while a value of zero indicates that the gate is closed.
+
+    The second (event) semaphore is used to signal the waiting threads when
+    the gate is opened, while the third acts as a mutex to avoid two threads
+    trying simultaneously to open or close the gate.
+
+    When a thread passes through the gate, it first checks the value of the "gate"
+    semaphore. If this is "one", then the thread continues through the gate. If zero
+    tben it decrements the event semaphone by one and thus waits on the gate.
+
+    When a thread closes the gate, it decrements the "gate" semaphore, thus setting
+    it to zero. When it later opens the gate, it first increments the gate semaphone,
+    then checks the number of waiting threads and then increments the event semaphore
+    by this number thus releasing them. It is important that the gate is
+    incremented before the count of the number of waiting threads is obtained as
+    otherwise a race condition could occur should a thread pass through the gate
+    between these two events.
+  }
+
+  TIpcEvent = class(TIpcCommon)
   private
     {$IFDEF LINUX}
+    FGateSemaphore: cint;
+    FEventSemaphore: cint;
+    FMutexSemaphore: cint;
     {$ELSE}
     FEvent: THandle;
     {$ENDIF}
@@ -263,15 +310,21 @@ type
 
   {TMutex}
 
-  TMutex = class(TCommonSecurityAttributes)
+  TMutex = class(TIpcCommon)
   private
     {$IFDEF LINUX}
+    FMutexSemaphore: cint;
+    FLockCount: integer;
     {$ELSE}
     FMutex: THandle;
     {$ENDIF}
   public
+    {$IFDEF LINUX}
+    constructor Create(SemNumber: cint);
+    {$ELSE}
     constructor Create(MutexName: string);
     constructor Open(MutexName: string);
+    {$ENDIF}
     destructor Destroy; override;
     procedure Lock;
     procedure Unlock;
@@ -279,7 +332,7 @@ type
 
   { TGlobalInterface }
 
-  TGlobalInterface = class(TCommonSecurityAttributes)
+  TGlobalInterface = class(TIpcCommon)
   private
     {$IFDEF LINUX}
     {$ELSE}
@@ -292,10 +345,10 @@ type
     FTraceDataType,
     FBufferSize: PInteger;
     FTimeStamp: PDateTime;
-    FReadEvent: TSyncGate;
-    FReadFinishedEvent: TSyncGate;
-    FWriteEvent: TSyncGate;
-    FWriteFinishedEvent: TSyncGate;
+    FReadEvent: TIpcEvent;
+    FReadFinishedEvent: TIpcEvent;
+    FWriteEvent: TIpcEvent;
+    FWriteFinishedEvent: TIpcEvent;
     function GetMonitorCount: integer;
     function GetReaderCount: integer;
   public
@@ -309,16 +362,16 @@ type
     procedure ReceiveTrace(TraceObject: TTraceObject);
     property MontorCount: integer read GetMonitorCount;
     property ReaderCount: integer read GetReaderCount;
-    property WriteEvent: TSyncGate read FWriteEvent;
-    property WriteFinishedEvent: TSyncGate read FWriteFinishedEvent;
-    property ReadEvent: TSyncGate read FReadEvent;
-    property ReadFinishedEvent: TSyncGate read FReadFinishedEvent;
+    property WriteEvent: TIpcEvent read FWriteEvent;
+    property WriteFinishedEvent: TIpcEvent read FWriteFinishedEvent;
+    property ReadEvent: TIpcEvent read FReadEvent;
+    property ReadFinishedEvent: TIpcEvent read FReadFinishedEvent;
     property WriteLock: TMutex read FMutex;
   end;
 
 { TCommonSecurityAttributes }
 
-constructor TCommonSecurityAttributes.Create;
+constructor TIpcCommon.Create;
 {$IFDEF LINUX}
 begin
 {$ELSE}
@@ -337,25 +390,34 @@ end;
 
   { TMutex }
 
-constructor TMutex.Create(MutexName: string);
 {$IFDEF LINUX}
+constructor TMutex.Create(SemNumber: cint);
+var Semopts : TSemun;
 begin
+  inherited Create;
+  FMutexSemaphore := SemNumber;
+  Semopts.val := 1;
+  if semctl(FSemaphoreID,FMutexSemaphore,SEM_SETVAL,Semopts)  < 0 then
+     IBError(ibxeCannotCreateSharedResource,'Unable to initialise Mutex Semaphone');
+end;
+
 {$ELSE}
+constructor TMutex.Create(MutexName: string);
 begin
   inherited Create;
   FMutex := CreateMutex(@sa, False, PChar(MutexName))
-{$ENDIF}
+  if FMutex = 0 then
+    IBError(ibxeCannotCreateSharedResource, [GetLastError])
 end;
 
 constructor TMutex.Open(MutexName: string);
-{$IFDEF LINUX}
-begin
-{$ELSE}
 begin
   inherited Create;
   FMutex := OpenMutex(MUTEX_ALL_ACCESS, False, PChar(MutexName))
-{$ENDIF}
+  if FMutex = 0 then
+    IBError(ibxeCannotCreateSharedResource, [GetLastError])
 end;
+{$ENDIF}
 
 destructor TMutex.Destroy;
 begin
@@ -369,9 +431,20 @@ end;
 { Obtain ownership of the Mutex and prevent other threads from accessing protected resource }
 
 procedure TMutex.Lock;
-begin
 {$IFDEF LINUX}
+var op: TSEMbuf;
+begin
+  if FLockCount = 0 then
+  begin
+    op.sem_num := FMutexSemaphore;
+    op.sem_op:= -1;
+    op.sem_flg := 0;
+    if semop(FSemaphoreID,@op,1) < 0 then
+       IBError(ibxeLInuxAPIError,'Unable to lock Semaphore');
+  end;
+  Inc(FLockCount);
 {$ELSE}
+begin
   WaitForSingleObject(FMutex, INFINITE);
 {$ENDIF}
 end;
@@ -379,16 +452,25 @@ end;
 {Give up ownership of the Mutex and allow other threads access }
 
 procedure TMutex.Unlock;
+var op: TSEMbuf;
 begin
 {$IFDEF LINUX}
+  if FLockCount = 0 then Exit;
+
+  op.sem_num := FMutexSemaphore;
+  op.sem_op:= 1;
+  op.sem_flg := 0;
+  if semop(FSemaphoreID,@op,1) < 0 then
+     IBError(ibxeLInuxAPIError,'Unable to unlock Semaphore');
+  Dec(FLockCount);
 {$ELSE}
   ReleaseMutex(FMutex);
 {$ENDIF}
 end;
 
-{ TSyncGate }
+{ TIpcEvent }
 
-constructor TSyncGate.Create(EventName: string; InitialState: boolean);
+constructor TIpcEvent.Create(EventName: string; InitialState: boolean);
 {$IFDEF LINUX}
 begin
 {$ELSE}
@@ -401,7 +483,7 @@ begin
 {$ENDIF}
 end;
 
-constructor TSyncGate.Open(EventName: string);
+constructor TIpcEvent.Open(EventName: string);
 {$IFDEF LINUX}
 begin
 {$ELSE}
@@ -414,7 +496,7 @@ begin
 {$ENDIF}
 end;
 
-destructor TSyncGate.Destroy;
+destructor TIpcEvent.Destroy;
 begin
 {$IFDEF LINUX}
 {$ELSE}
@@ -423,12 +505,12 @@ begin
   inherited Destroy;
 end;
 
-function TSyncGate.WaitFor(Timeout: DWORD): DWORD;
+function TIpcEvent.WaitFor(Timeout: DWORD): DWORD;
 begin
   Result := WaitForSingleObject(FEvent,Timeout)  //Returns when Event is "signaled"
 end;
 
-procedure TSyncGate.OpenGate;
+procedure TIpcEvent.OpenGate;
 begin
 {$IFDEF LINUX}
 {$ELSE}
@@ -436,7 +518,7 @@ begin
 {$ENDIF}
 end;
 
-procedure TSyncGate.CloseGate;
+procedure TIpcEvent.CloseGate;
 begin
 {$IFDEF LINUX}
 {$ELSE}
