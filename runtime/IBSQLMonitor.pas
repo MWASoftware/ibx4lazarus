@@ -456,13 +456,15 @@ var op: TSEMbuf;
 begin
 {$IFDEF LINUX}
   if FLockCount = 0 then Exit;
-
-  op.sem_num := FMutexSemaphore;
-  op.sem_op:= 1;
-  op.sem_flg := 0;
-  if semop(FSemaphoreID,@op,1) < 0 then
-     IBError(ibxeLInuxAPIError,'Unable to unlock Semaphore');
   Dec(FLockCount);
+  if FLockCount = 0 then
+  begin
+    op.sem_num := FMutexSemaphore;
+    op.sem_op:= 1;
+    op.sem_flg := 0;
+    if semop(FSemaphoreID,@op,1) < 0 then
+       IBError(ibxeLInuxAPIError,'Unable to unlock Semaphore');
+  end;
 {$ELSE}
   ReleaseMutex(FMutex);
 {$ENDIF}
