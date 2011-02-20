@@ -421,8 +421,7 @@ end;
 
 destructor TMutex.Destroy;
 begin
-{$IFDEF LINUX}
-{$ELSE}
+{$IFNDEF LINUX}
   CloseHandle(FMutex);
 {$ENDIF}
   inherited Destroy;
