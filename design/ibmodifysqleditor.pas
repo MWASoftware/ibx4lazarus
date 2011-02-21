@@ -107,24 +107,14 @@ begin
 end;
 
 procedure TIBModifySQLEditorForm.Button3Click(Sender: TObject);
-var FieldNames: TStringList;
-    I: integer;
+var FieldNames: TStrings;
 begin
-  if FieldList.SelCount = 0 then
+  FieldNames :=  FIBSystemTables.GetFieldNames(FieldList);
+  try
     FIBSystemTables.GenerateModifySQL(TableNamesCombo.Text,QuoteFields.Checked,
-               FieldList.Items,SQLText.Lines)
-  else
-  begin
-    FieldNames := TStringList.Create;
-    try
-      for I := 0 to FieldList.Items.Count - 1 do
-        if FieldList.Selected[I] then
-          FieldNames.Add(FieldList.Items[I]);
-      FIBSystemTables.GenerateModifySQL(TableNamesCombo.Text,QuoteFields.Checked,
-               FieldNames,SQLText.Lines)
-    finally
-      FieldNames.Free
-    end;
+             FieldNames,SQLText.Lines)
+  finally
+    FieldNames.Free
   end;
 end;
 

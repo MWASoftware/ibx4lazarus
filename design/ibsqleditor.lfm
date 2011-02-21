@@ -32,6 +32,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Width = 102
     AutoSize = True
     Caption = 'Generate SQL'
+    OnClick = Button3Click
     TabOrder = 1
   end
   object Button2: TButton
@@ -63,7 +64,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     TabOrder = 4
   end
   object PageControl: TPageControl
-    Left = 16
+    Left = 24
     Height = 337
     Top = 27
     Width = 251
@@ -87,7 +88,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       object Label2: TLabel
         Left = 7
         Height = 18
-        Top = 69
+        Top = 66
         Width = 36
         Caption = 'Fields'
         ParentColor = False
@@ -100,13 +101,13 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Caption = 'Primary Keys'
         ParentColor = False
       end
-      object SelectTableName: TComboBox
+      object SelectTableNames: TComboBox
         Left = 7
         Height = 29
         Top = 19
         Width = 169
         ItemHeight = 0
-        OnCloseUp = SelectTableNameCloseUp
+        OnCloseUp = SelectTableNamesCloseUp
         ParentColor = True
         TabOrder = 0
       end
@@ -136,8 +137,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object InsertPage: TTabSheet
       Caption = 'Insert'
-      ClientHeight = 331
-      ClientWidth = 182
+      ClientHeight = 302
+      ClientWidth = 245
       OnShow = InsertPageShow
       object Label8: TLabel
         Left = 7
@@ -182,8 +183,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object ModifyPage: TTabSheet
       Caption = 'Modify'
-      ClientHeight = 331
-      ClientWidth = 182
+      ClientHeight = 302
+      ClientWidth = 245
       OnShow = ModifyPageShow
       object Label10: TLabel
         Left = 7
@@ -260,8 +261,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object DeletePage: TTabSheet
       Caption = 'Delete'
-      ClientHeight = 331
-      ClientWidth = 182
+      ClientHeight = 302
+      ClientWidth = 245
       OnShow = DeletePageShow
       object Label14: TLabel
         Left = 7
@@ -302,8 +303,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object ExecutePage: TTabSheet
       Caption = 'Execute'
-      ClientHeight = 331
-      ClientWidth = 182
+      ClientHeight = 302
+      ClientWidth = 245
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
@@ -335,6 +336,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Top = 19
         Width = 169
         ItemHeight = 0
+        OnCloseUp = ProcedureNamesCloseUp
         ParentColor = True
         TabOrder = 0
       end
@@ -366,6 +368,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Top = 380
     Width = 66
     Caption = 'Test'
+    OnClick = Button4Click
     TabOrder = 6
   end
 end

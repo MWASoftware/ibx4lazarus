@@ -141,34 +141,34 @@ procedure TIBUpdateSQLEditorForm.GenerateButtonClick(Sender: TObject);
 var FieldNames: TStringList;
     I: integer;
 begin
-  FUpdateObject.RefreshSQL.Clear;
-  FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,FRefreshSQL);
-  FIBSystemTables.GenerateDeleteSQL(TableNamesCombo.Text,QuoteFields.Checked,FDeleteSQL);
-  if FieldList.SelCount = 0 then
-  begin
-    FIBSystemTables.GenerateModifySQL(TableNamesCombo.Text,QuoteFields.Checked,
-      FieldList.Items,FModifySQL);
+  FieldNames := TStringList.Create;
+  try
+    FUpdateObject.RefreshSQL.Clear;
+    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldNames);
+    FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,FRefreshSQL);
+    FIBSystemTables.GenerateDeleteSQL(TableNamesCombo.Text,QuoteFields.Checked,FDeleteSQL);
     FIBSystemTables.GenerateInsertSQL(TableNamesCombo.Text,QuoteFields.Checked,
-      FieldList.Items,FInsertSQL);
-
-  end
-  else
-  begin
-    FieldNames := TStringList.Create;
-    try
-      for I := 0 to FieldList.Items.Count - 1 do
-        if FieldList.Selected[I] then
-          FieldNames.Add(FieldList.Items[I]);
+        FieldNames,FInsertSQL);
+    if FieldList.SelCount = 0 then
+    begin
       FIBSystemTables.GenerateModifySQL(TableNamesCombo.Text,QuoteFields.Checked,
-        FieldNames,FModifySQL);
-    FIBSystemTables.GenerateInsertSQL(TableNamesCombo.Text,QuoteFields.Checked,
-      FieldNames,FInsertSQL);
-    finally
-      FieldNames.Free
+        FieldList.Items,FModifySQL);
+
+    end
+    else
+    begin
+      FieldNames.Clear;
+      for I := 0 to FieldList.Items.Count - 1 do
+          if FieldList.Selected[I] then
+               FieldNames.Add(FieldList.Items[I]);
+      FIBSystemTables.GenerateModifySQL(TableNamesCombo.Text,QuoteFields.Checked,
+           FieldNames,FModifySQL);
     end;
+    FDirty := false;
+    PageControl.ActivePage := SQLPage;
+  finally
+    FieldNames.Free
   end;
-  FDirty := false;
-  PageControl.ActivePage := SQLPage;
 end;
 
 procedure TIBUpdateSQLEditorForm.SQLMemoChange(Sender: TObject);

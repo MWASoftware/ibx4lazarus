@@ -9,7 +9,8 @@ interface
 uses
     IBDBReg, IBEventsEditor, IBTransactionEdit, IBDatabaseEdit, 
   IBSystemTables, ibdeletesqleditor, IBGeneratorEditor, ibinsertsqleditor, 
-  ibmodifysqleditor, ibselectsqleditor, IBUpdateSQLEditor, LazarusPackageIntf;
+  ibmodifysqleditor, ibselectsqleditor, IBUpdateSQLEditor, IBSQLEditor, 
+  LazarusPackageIntf;
 
 implementation
 

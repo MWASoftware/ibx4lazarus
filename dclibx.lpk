@@ -18,7 +18,7 @@
         <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="29">
+    <Files Count="31">
       <Item1>
         <Filename Value="design/IBDBReg.pas"/>
         <HasRegisterProc Value="True"/>
@@ -136,6 +136,14 @@
         <Filename Value="design/ibupdatesqleditor.pas"/>
         <UnitName Value="IBUpdateSQLEditor"/>
       </Item29>
+      <Item30>
+        <Filename Value="design/ibsqleditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item30>
+      <Item31>
+        <Filename Value="design/ibsqleditor.pas"/>
+        <UnitName Value="IBSQLEditor"/>
+      </Item31>
     </Files>
     <Type Value="DesignTime"/>
     <RequiredPkgs Count="4">

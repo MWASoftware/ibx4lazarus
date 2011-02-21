@@ -17,54 +17,54 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
     Height = 352
     Top = 8
     Width = 641
-    ActivePage = SQLPage
+    ActivePage = FieldsPage
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 0
     object FieldsPage: TTabSheet
       Caption = 'Options'
-      ClientHeight = 316
+      ClientHeight = 317
       ClientWidth = 635
       object GroupBox1: TGroupBox
         Left = 8
-        Height = 311
+        Height = 312
         Top = 4
         Width = 617
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = ' SQL Generation '
-        ClientHeight = 291
+        ClientHeight = 293
         ClientWidth = 613
         TabOrder = 0
         object Label1: TLabel
           Left = 12
-          Height = 19
+          Height = 18
           Top = 18
-          Width = 103
+          Width = 91
           Caption = 'Table &Name:'
           FocusControl = TableNamesCombo
           ParentColor = False
         end
         object Label3: TLabel
           Left = 228
-          Height = 19
+          Height = 18
           Top = 19
-          Width = 87
+          Width = 77
           Caption = '&Key Fields:'
           FocusControl = PrimaryKeyList
           ParentColor = False
         end
         object Label4: TLabel
           Left = 371
-          Height = 19
+          Height = 18
           Top = 19
-          Width = 113
+          Width = 102
           Caption = 'Update &Fields:'
           FocusControl = FieldList
           ParentColor = False
         end
         object TableNamesCombo: TComboBox
           Left = 9
-          Height = 30
+          Height = 29
           Top = 35
           Width = 171
           ItemHeight = 0
@@ -73,7 +73,7 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         end
         object PrimaryKeyList: TListBox
           Left = 228
-          Height = 230
+          Height = 232
           Top = 36
           Width = 136
           Anchors = [akTop, akLeft, akBottom]
@@ -84,8 +84,8 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         end
         object FieldList: TListBox
           Left = 371
-          Height = 230
-          Hint = 'Select Fields to include in Update and Insert Statements, or leave unselected to select all'
+          Height = 232
+          Hint = 'Select Fields to include in Update Statements, or leave unselected to select all'
           Top = 36
           Width = 136
           Anchors = [akTop, akLeft, akBottom]
@@ -109,7 +109,7 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
           Left = 9
           Height = 22
           Top = 131
-          Width = 144
+          Width = 129
           Caption = '&Quote Identifiers'
           TabOrder = 2
         end
@@ -117,21 +117,21 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
     end
     object SQLPage: TTabSheet
       Caption = 'SQL'
-      ClientHeight = 316
+      ClientHeight = 317
       ClientWidth = 635
       OnShow = SQLPageShow
       object Label2: TLabel
         Left = 10
-        Height = 19
+        Height = 18
         Top = 81
-        Width = 80
+        Width = 71
         Caption = 'S&QL Text:'
         FocusControl = SQLMemo
         ParentColor = False
       end
       object SQLMemo: TMemo
         Left = 9
-        Height = 204
+        Height = 205
         Top = 105
         Width = 615
         Anchors = [akTop, akLeft, akRight, akBottom]
@@ -141,9 +141,9 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
       end
       object StatementType: TRadioGroup
         Left = 10
-        Height = 54
+        Height = 53
         Top = 9
-        Width = 372
+        Width = 342
         AutoFill = True
         AutoSize = True
         Caption = 'Statement Type'
@@ -156,7 +156,7 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 5
         ClientHeight = 34
-        ClientWidth = 368
+        ClientWidth = 338
         Columns = 5
         ItemIndex = 0
         Items.Strings = (

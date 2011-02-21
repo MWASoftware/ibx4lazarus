@@ -106,8 +106,14 @@ begin
 end;
 
 procedure TIBRefreshSQLEditorForm.Button3Click(Sender: TObject);
+var FieldNames: TStrings;
 begin
-  FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,SQLText.Lines)
+  FieldNames :=  FIBSystemTables.GetFieldNames(FieldList);
+  try
+    FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,SQLText.Lines)
+  finally
+    FieldNames.Free
+  end;
 end;
 
 procedure TIBRefreshSQLEditorForm.Button4Click(Sender: TObject);

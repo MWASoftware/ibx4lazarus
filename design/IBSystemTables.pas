@@ -5,7 +5,7 @@ unit IBSystemTables;
 interface
 
 uses
-  Classes, SysUtils, IBSQL, IBDatabase;
+  Classes, SysUtils, IBSQL, IBDatabase, StdCtrls;
 
 type
 
@@ -37,14 +37,15 @@ type
     procedure GetProcedureNames(ProcNames: TStrings);
     procedure GetProcParams(ProcName: string; InputParams, OutputParams: TStrings); overload;
     procedure GetGenerators(GeneratorNames: TStrings);
-    procedure GenerateSelectSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);
-    procedure GenerateRefreshSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);
+    procedure GenerateSelectSQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
+    procedure GenerateRefreshSQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
     procedure GenerateInsertSQL(TableName: string; QuotedStrings: boolean; FieldNames, SQL: TStrings);
     procedure GenerateModifySQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
     procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);
     procedure GenerateExecuteSQL(ProcName: string; QuotedStrings: boolean;
               InputParams, OutputParams, ExecuteSQL: TStrings);
     function GetStatementType(SQL: string): TIBSQLTypes;
+    function GetFieldNames(FieldList: TListBox): TStrings;
     procedure TestSQL(SQL: string);
   end;
 
@@ -82,7 +83,7 @@ const
                      'RDB$PROCEDURE_OUTPUTS From RDB$PROCEDURES '+
 		     'Where RDB$SYSTEM_FLAG = 0 Order by 1 asc';
 
-  sqlGETPROCPARAM  = 'Select Trim(P.RDB$PARAMETER_NAME) '+
+  sqlGETPROCPARAM  = 'Select Trim(P.RDB$PARAMETER_NAME) as ParamName '+
                      'From RDB$PROCEDURE_PARAMETERS P '+
 		     'JOIN RDB$FIELDS F On F.RDB$FIELD_NAME = P.RDB$FIELD_SOURCE '+
 		     'Where P.RDB$SYSTEM_FLAG = 0 and P.RDB$PROCEDURE_NAME = :ProcName and P.RDB$PARAMETER_TYPE = :type '+
@@ -162,7 +163,7 @@ begin
     try
       while not EOF do
       begin
-        ParamList.Add(FieldByName('ProcName').AsString);
+        ParamList.Add(FieldByName('ParamName').AsString);
         Next;
       end;
     finally
@@ -304,7 +305,10 @@ begin
   FTableAndColumnSQL.SQL.Text := SelectSQL;
   try
     FTableAndColumnSQL.Prepare;
-    FirstTableName := strpas(FTableAndColumnSQL.Current.Vars[0].Data^.relname);
+    if FTableAndColumnSQL.Current.Count > 0 then
+      FirstTableName := strpas(FTableAndColumnSQL.Current.Vars[0].Data^.relname)
+    else
+      FirstTableName := '';
     if assigned(Columns) then
     begin
       Columns.Clear;
@@ -370,39 +374,31 @@ begin
 
 end;
 
-procedure TIBSystemTables.GenerateSelectSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);
+procedure TIBSystemTables.GenerateSelectSQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
 var SelectSQL: string;
     Separator : string;
+    I: integer;
 begin
   if not assigned(FGetFieldNames.Database) or not FGetFieldNames.Database.Connected or
     not assigned(FGetFieldNames.Transaction) then
     Exit;
   SelectSQL := 'Select';
   Separator := ' A.';
-  FGetFieldNames.SQL.Text := sqlGETFIELDS;
-  FGetFieldNames.Prepare;
-  FGetFieldNames.ParamByName('TableName').AsString := TableName;
-  FGetFieldNames.ExecQuery;
-  try
-    while not FGetFieldNames.EOF do
-    begin
-      if QuotedStrings then
-        SelectSQL := SelectSQL + Separator + '"' + FGetFieldNames.FieldByName('ColumnName').AsString + '"'
-      else
-        SelectSQL := SelectSQL + Separator + FGetFieldNames.FieldByName('ColumnName').AsString;
-      Separator := ', A.';
-      FGetFieldNames.Next
-    end;
-  finally
-    FGetFieldNames.Close
+  for I := 0 to FieldNames.Count - 1 do
+  begin
+    if QuotedStrings then
+      SelectSQL := SelectSQL + Separator + '"' + FieldNames[I] + '"'
+    else
+      SelectSQL := SelectSQL + Separator + FieldNames[I];
+    Separator := ', A.';
   end;
   SelectSQL := SelectSQL + ' From ' + TableName + ' A';
   SQL.Add(SelectSQL);
 end;
 
-procedure TIBSystemTables.GenerateRefreshSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);
+procedure TIBSystemTables.GenerateRefreshSQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
 begin
-  GenerateSelectSQL(TableName,QuotedStrings,SQL);
+  GenerateSelectSQL(TableName,QuotedStrings,FieldNames,SQL);
   AddWhereClause(TableName,QuotedStrings,SQL)
 end;
 
@@ -476,22 +472,19 @@ begin
     SQL := 'Select ';
     for I := 0 to OutputParams.Count - 1 do
     begin
-      SQL := SQL + Separator + OutputParams[I];
+      if QuotedStrings then
+        SQL := SQL + Separator + '"' + OutputParams[I] + '"'
+      else
+        SQL := SQL + Separator + OutputParams[I];
       Separator := ', ';
     end;
-    if QuotedStrings then
-      SQL := SQL + ' From "' + ProcName + '"'
-    else
-      SQL := SQL + ' From ' + ProcName;
+    SQL := SQL + ' From ' + ProcName;
     if InputParams.Count > 0 then
     begin
       Separator := '(:';
       for I := 0 to InputParams.Count - 1 do
       begin
-        if QuotedStrings then
-          SQL := SQL + Separator + '"' + InputParams[I] + '"'
-        else
-          SQL := SQL + Separator + InputParams[I];
+        SQL := SQL + Separator + InputParams[I];
         Separator := ', :';
       end;
       SQL := SQL + ')'
@@ -505,7 +498,7 @@ begin
       SQL := 'Execute Procedure ' + ProcName;
     if InputParams.Count > 0 then
     begin
-      Separator := ':';
+      Separator := ' :';
       for I := 0 to InputParams.Count - 1 do
       begin
         if QuotedStrings then
@@ -532,6 +525,23 @@ begin
       ShowMessage(E.Message);
   end;
 
+end;
+
+function TIBSystemTables.GetFieldNames(FieldList: TListBox): TStrings;
+var I: integer;
+begin
+  Result := TStringList.Create;
+  try
+    if FieldList.SelCount = 0 then
+      Result.Assign(FieldList.Items)
+    else
+      for I := 0 to FieldList.Items.Count - 1 do
+        if FieldList.Selected[I] then
+          Result.Add(FieldList.Items[I]);
+  except
+    Result.Free;
+    raise
+  end;
 end;
 
 procedure TIBSystemTables.TestSQL(SQL: string);

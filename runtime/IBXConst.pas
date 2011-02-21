@@ -167,6 +167,7 @@ resourcestring
 
   SInterbaseExpressVersion = 'Firebird Express for Lazarus 1.0';
   SEditSQL = 'Edit SQL';
+  SIBSQLEditor = 'IBSQL Editor';
   SDPBConstantUnknownEx = 'DPB Constant (%s) is unknown';
   STPBConstantUnknownEx = 'TPB Constant (%s) is unknown';
 

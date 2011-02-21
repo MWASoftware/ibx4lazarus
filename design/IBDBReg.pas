@@ -158,6 +158,15 @@ type
    function GetVerbCount: Integer; override;
   end;
 
+{ TIBSQLEditor }
+
+  TIBSQLEditor  = class(TComponentEditor)
+  public
+    procedure ExecuteVerb(Index: Integer); override;
+    function GetVerb(Index: Integer): string; override;
+   function GetVerbCount: Integer; override;
+  end;
+
   TIBStoredProcParamsProperty = class(TCollectionPropertyEditor)
   public
     procedure Edit; override;
@@ -185,6 +194,13 @@ type
 { TIBQuerySQLProperty }
 
   TIBQuerySQLProperty = class(TSQLPropertyEditor)
+  public
+    procedure Edit; override;
+  end;
+
+{TIBSQLSQLPropertyEditor }
+
+  TIBSQLSQLPropertyEditor = class(TSQLPropertyEditor)
   public
     procedure Edit; override;
   end;
@@ -294,7 +310,8 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBServices, IBDatabaseEdit, IBTransactionEdit,
      IBBatchMove, DBLoginDlg, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
-     IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor;
+     IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
+     IBSQLEditor;
 
 procedure Register;
 begin
@@ -319,7 +336,7 @@ begin
   RegisterPropertyEditor(TypeInfo(TStrings), TIBDataSet, 'InsertSQL', TIBInsertSQLProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBDataSet, 'RefreshSQL', TIBRefreshSQLProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBDataSet, 'DeleteSQL', TIBDeleteSQLProperty); {do not localize}
-  RegisterPropertyEditor(TypeInfo(TStrings), TIBSQL, 'SQL', TIBSQLProperty); {do not localize}
+  RegisterPropertyEditor(TypeInfo(TStrings), TIBSQL, 'SQL', TIBSQLSQLPropertyEditor); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBUpdateSQL, 'RefreshSQL', TIBUpdateSQLRefreshSQLProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBUpdateSQL, 'ModifySQL', TIBUpdateSQLUpdateProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBUpdateSQL, 'InsertSQL', TIBUpdateSQLInsertSQLProperty); {do not localize}
@@ -334,6 +351,7 @@ begin
   RegisterComponentEditor(TIBDataSet, TIBDataSetEditor);
   RegisterComponentEditor(TIBQuery, TIBQueryEditor);
   RegisterComponentEditor(TIBStoredProc, TIBStoredProcEditor);
+  RegisterComponentEditor(TIBSQL, TIBSQLEditor);
 end;
 
 { TIBFileNameProperty }
@@ -858,6 +876,36 @@ end;
 procedure TIBGeneratorProperty.Edit;
 begin
   if IBGeneratorEditor.EditGenerator(GetPersistentReference as TIBGenerator) then Modified;
+end;
+
+{ TIBSQLEditor }
+
+procedure TIBSQLEditor.ExecuteVerb(Index: Integer);
+begin
+  if IBSQLEditor.EditIBSQL(TIBSQL(Component)) then Modified;
+end;
+
+function TIBSQLEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0 : Result := SIBSQLEditor;
+    1: Result := SInterbaseExpressVersion;
+  end;
+end;
+
+function TIBSQLEditor.GetVerbCount: Integer;
+begin
+  Result:= 2
+end;
+
+{ TIBSQLSQLPropertyEditor }
+
+procedure TIBSQLSQLPropertyEditor.Edit;
+var
+  IBSQL: TIBSQL;
+begin
+  IBSQL := GetComponent(0) as TIBSQL;
+  if IBSQLEditor.EditIBSQL(IBSQL) then Modified;
 end;
 
 initialization

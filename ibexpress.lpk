@@ -18,7 +18,7 @@
       </Other>
     </CompilerOptions>
     <Version Major="1"/>
-    <Files Count="23">
+    <Files Count="22">
       <Item1>
         <Filename Value="runtime/IB.pas"/>
         <UnitName Value="IB"/>
@@ -107,10 +107,6 @@
         <Filename Value="runtime/IBTable.pas"/>
         <UnitName Value="IBTable"/>
       </Item22>
-      <Item23>
-        <Filename Value="runtime/IBSQLMonitor.pas"/>
-        <UnitName Value="IBSQLMonitor"/>
-      </Item23>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>

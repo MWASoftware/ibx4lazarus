@@ -1,7 +1,7 @@
 object IBModifySQLEditorForm: TIBModifySQLEditorForm
-  Left = 500
+  Left = 504
   Height = 438
-  Top = 202
+  Top = 226
   Width = 749
   ActiveControl = TableNamesCombo
   Caption = 'Modify SQL Editor'

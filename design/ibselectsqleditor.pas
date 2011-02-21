@@ -106,8 +106,14 @@ begin
 end;
 
 procedure TIBSelectSQLEditorForm.Button3Click(Sender: TObject);
+var FieldNames: TStrings;
 begin
-  FIBSystemTables.GenerateSelectSQL(TableNamesCombo.Text,QuoteFields.Checked,SQLText.Lines)
+  FieldNames :=  FIBSystemTables.GetFieldNames(FieldList);
+  try
+    FIBSystemTables.GenerateSelectSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,SQLText.Lines)
+  finally
+    FieldNames.Free
+  end;
 end;
 
 procedure TIBSelectSQLEditorForm.Button4Click(Sender: TObject);
