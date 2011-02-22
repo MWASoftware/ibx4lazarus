@@ -11,9 +11,9 @@ object IBSQLEditorForm: TIBSQLEditorForm
   LCLVersion = '0.9.28.2'
   object Label3: TLabel
     Left = 288
-    Height = 18
+    Height = 19
     Top = 8
-    Width = 27
+    Width = 29
     Caption = 'SQL'
     ParentColor = False
   end
@@ -27,9 +27,9 @@ object IBSQLEditorForm: TIBSQLEditorForm
   end
   object Button3: TButton
     Left = 280
-    Height = 29
+    Height = 30
     Top = 380
-    Width = 102
+    Width = 112
     AutoSize = True
     Caption = 'Generate SQL'
     OnClick = Button3Click
@@ -49,7 +49,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Left = 16
     Height = 22
     Top = 380
-    Width = 129
+    Width = 144
     Caption = '&Quote Identifiers'
     TabOrder = 3
   end
@@ -74,8 +74,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     TabPosition = tpLeft
     object SelectPage: TTabSheet
       Caption = 'Select'
-      ClientHeight = 331
-      ClientWidth = 182
+      ClientHeight = 301
+      ClientWidth = 245
       OnShow = SelectPageShow
       object Label1: TLabel
         Left = 7
@@ -137,8 +137,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object InsertPage: TTabSheet
       Caption = 'Insert'
-      ClientHeight = 331
-      ClientWidth = 182
+      ClientHeight = 301
+      ClientWidth = 245
       OnShow = InsertPageShow
       object Label8: TLabel
         Left = 7
@@ -183,7 +183,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object ModifyPage: TTabSheet
       Caption = 'Modify'
-      ClientHeight = 302
+      ClientHeight = 301
       ClientWidth = 245
       OnShow = ModifyPageShow
       object Label10: TLabel
@@ -261,7 +261,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object DeletePage: TTabSheet
       Caption = 'Delete'
-      ClientHeight = 302
+      ClientHeight = 301
       ClientWidth = 245
       OnShow = DeletePageShow
       object Label14: TLabel
@@ -304,35 +304,35 @@ object IBSQLEditorForm: TIBSQLEditorForm
     object ExecutePage: TTabSheet
       Caption = 'Execute'
       ClientHeight = 331
-      ClientWidth = 182
+      ClientWidth = 175
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
-        Height = 18
+        Height = 19
         Top = 3
-        Width = 109
+        Width = 121
         Caption = 'Procedure Name'
         ParentColor = False
       end
       object Label17: TLabel
         Left = 10
-        Height = 18
+        Height = 19
         Top = 69
-        Width = 111
+        Width = 125
         Caption = 'Input Parameters'
         ParentColor = False
       end
       object Label18: TLabel
         Left = 11
-        Height = 18
+        Height = 19
         Top = 190
-        Width = 123
+        Width = 138
         Caption = 'Output Parameters'
         ParentColor = False
       end
       object ProcedureNames: TComboBox
         Left = 7
-        Height = 29
+        Height = 30
         Top = 19
         Width = 169
         ItemHeight = 0
