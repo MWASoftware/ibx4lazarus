@@ -68,8 +68,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Height = 337
     Top = 27
     Width = 251
-    ActivePage = ExecutePage
-    TabIndex = 4
+    ActivePage = ModifyPage
+    TabIndex = 2
     TabOrder = 5
     TabPosition = tpLeft
     object SelectPage: TTabSheet
@@ -183,44 +183,45 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object ModifyPage: TTabSheet
       Caption = 'Modify'
-      ClientHeight = 301
-      ClientWidth = 245
+      ClientHeight = 331
+      ClientWidth = 175
       OnShow = ModifyPageShow
       object Label10: TLabel
         Left = 7
-        Height = 18
+        Height = 19
         Top = 3
-        Width = 76
+        Width = 87
         Caption = 'Table Name'
         ParentColor = False
       end
       object Label11: TLabel
         Left = 7
-        Height = 18
+        Height = 19
         Top = 69
-        Width = 36
+        Width = 41
         Caption = 'Fields'
         ParentColor = False
       end
       object Label12: TLabel
         Left = 7
-        Height = 18
+        Height = 19
         Top = 250
-        Width = 83
+        Width = 93
         Caption = 'Primary Keys'
         ParentColor = False
       end
       object Label13: TLabel
         Left = 30
-        Height = 18
+        Height = 19
         Top = 230
-        Width = 70
+        Width = 80
         Caption = 'in Field List'
         ParentColor = False
+        OnClick = Label13Click
       end
       object ModifyTableNames: TComboBox
         Left = 7
-        Height = 29
+        Height = 30
         Top = 19
         Width = 169
         ItemHeight = 0
@@ -254,8 +255,9 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Left = 7
         Height = 22
         Top = 210
-        Width = 159
+        Width = 175
         Caption = 'Include Primary keys '
+        OnClick = IncludePrimaryKeysClick
         TabOrder = 3
       end
     end
@@ -303,8 +305,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object ExecutePage: TTabSheet
       Caption = 'Execute'
-      ClientHeight = 331
-      ClientWidth = 175
+      ClientHeight = 301
+      ClientWidth = 245
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7

@@ -60,7 +60,9 @@ type
     procedure DeleteTableNamesCloseUp(Sender: TObject);
     procedure ExecutePageShow(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure IncludePrimaryKeysClick(Sender: TObject);
     procedure InsertPageShow(Sender: TObject);
+    procedure Label13Click(Sender: TObject);
     procedure ModifyPageShow(Sender: TObject);
     procedure ModifyTableNamesCloseUp(Sender: TObject);
     procedure ProcedureNamesCloseUp(Sender: TObject);
@@ -137,6 +139,12 @@ begin
     end;
     FIBSystemTables.GetTableAndColumns(SQLText.Text,FTableName,nil)
   end;
+end;
+
+procedure TIBSQLEditorForm.IncludePrimaryKeysClick(Sender: TObject);
+begin
+  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked);
+  FIBSystemTables.GetPrimaryKeys(ModifyTableNames.Text,ModifyPrimaryKeys.Items);
 end;
 
 procedure TIBSQLEditorForm.DeletePageShow(Sender: TObject);
@@ -243,6 +251,12 @@ begin
 
 end;
 
+procedure TIBSQLEditorForm.Label13Click(Sender: TObject);
+begin
+  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked);
+  FIBSystemTables.GetPrimaryKeys(ModifyTableNames.Text,ModifyPrimaryKeys.Items);
+end;
+
 procedure TIBSQLEditorForm.ModifyPageShow(Sender: TObject);
 var TableName: string;
 begin
@@ -260,14 +274,14 @@ begin
     FIBSystemTables.GetTableAndColumns(SQLText.Text,TableName,nil);
     ModifyTableNames.ItemIndex := ModifyTableNames.Items.IndexOf(TableName);
   end;
-  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items);
+  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked);
   FIBSystemTables.GetPrimaryKeys(ModifyTableNames.Text,ModifyPrimaryKeys.Items);
 end;
 
 procedure TIBSQLEditorForm.ModifyTableNamesCloseUp(Sender: TObject);
 begin
   FTableName := ModifyTableNames.Text;
-  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items);
+  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked);
   FIBSystemTables.GetPrimaryKeys(ModifyTableNames.Text,ModifyPrimaryKeys.Items);
 end;
 
