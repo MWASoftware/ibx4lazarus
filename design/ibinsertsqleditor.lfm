@@ -1,7 +1,7 @@
 object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
-  Left = 330
+  Left = 334
   Height = 438
-  Top = 215
+  Top = 239
   Width = 749
   ActiveControl = TableNamesCombo
   Caption = 'Insert SQL Editor'

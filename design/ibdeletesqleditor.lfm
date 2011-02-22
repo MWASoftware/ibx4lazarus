@@ -1,7 +1,7 @@
 object IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
-  Left = 334
+  Left = 338
   Height = 438
-  Top = 239
+  Top = 263
   Width = 749
   ActiveControl = TableNamesCombo
   Caption = 'Delete SQL Editor'

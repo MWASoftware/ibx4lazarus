@@ -3,7 +3,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   Height = 438
   Top = 457
   Width = 749
-  ActiveControl = ProcedureNames
+  ActiveControl = PageControl
   Caption = 'Select SQL Editor'
   ClientHeight = 438
   ClientWidth = 749

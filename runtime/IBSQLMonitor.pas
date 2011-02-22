@@ -269,55 +269,52 @@ type
     destructor Destroy; override;
   end;
 
-  { TIpcEvent }
+  { TSingleLockGate }
 
   {
-    In the original Windows implementation, a Windows Event is used to implement
-    a "gate". The gate can either be "open" when any thread can pass through the gate
-    unimpeded or "closed" when the thread must wait for the gate to open. When the
-    gate is opened, all waiting threads are activated.
+    A single lock gate is either open or closed. When open, any thread can pass
+    through it while, when closed all threads are blocked as they try to pass
+    through it. When the gate is opened, all blocked threads are resumed.
 
-    In the Linux implementation, three semaphores are used to achieve the same effect.
-    One semaphore is used to represent the state of the gate. A value of one indicates
-    that the gate is open, while a value of zero indicates that the gate is closed.
+    Windows:
 
-    The second (event) semaphore is used to signal the waiting threads when
-    the gate is opened, while the third acts as a mutex to avoid two threads
-    trying simultaneously to open or close the gate.
+    In the Windows implementation, a Windows Event is used to implement
+    the "gate". No additional functionality is required as the behaviour
+    of a Windows even meets the requirement.
 
-    When a thread passes through the gate, it first checks the value of the "gate"
-    semaphore. If this is "one", then the thread continues through the gate. If zero
-    tben it decrements the event semaphone by one and thus waits on the gate.
+    Linux:
 
-    When a thread closes the gate, it decrements the "gate" semaphore, thus setting
-    it to zero. When it later opens the gate, it first increments the gate semaphone,
-    then checks the number of waiting threads and then increments the event semaphore
-    by this number thus releasing them. It is important that the gate is
-    incremented before the count of the number of waiting threads is obtained as
-    otherwise a race condition could occur should a thread pass through the gate
-    between these two events.
+    In the Linux implementation, the gate is implemented by a semaphore
+    and a share memory integer used as a bi-state variable. When the gate
+    is open, the bi-state variable is non-zero. It is set to zero when closed.
+
+    The semaphore is initialised to zero. When a thread passes through the gate
+    it checks the state. If open, the thread continues. If closed then it
+    decrements the semaphore and hence enters an indefinite wait state.
+
+    When the gate is locked, the state is set to zero. When unlocked, the state
+    is set to one and the semaphore incremented until it is set to zero.
   }
 
-  TIpcEvent = class(TIpcCommon)
+  TSingleLockGate = class(TIpcCommon)
   private
     {$IFDEF LINUX}
-    FGateSemaphore: cint;
-    FEventSemaphore: cint;
-    FMutexSemaphore: cint;
+    FSemaphore: cint;
+    FGateState: PInteger;
     {$ELSE}
     FEvent: THandle;
     {$ENDIF}
   public
     {$IFDEF LINUX}
-    constructor Create(SemNum: cint; InitialState: boolean);
+    constructor Create(SemNum: cint; GateState: PInteger; InitialState: boolean);
     {$ELSE}
     constructor Create(EventName: string; InitialState: boolean);
     constructor Open(EventName: string);
     {$ENDIF}
     destructor Destroy; override;
-    function WaitFor(Timeout: DWORD): DWORD;
-    procedure OpenGate;
-    procedure CloseGate;
+    procedure PassthroughGate;
+    procedure Unlock;
+    procedure Lock;
   end;
 
   {TMutex}
@@ -342,6 +339,72 @@ type
     procedure Unlock;
   end;
 
+  { TMultilockGate }
+
+  { This type of Gate is used where several reader threads must pass
+    through the gate before it can be opened for a writer thread.
+
+    The reader threads register their interest by each locking the gate.
+    The writer thread then waits on the locked gate until all the reader
+    threads have separately unlocked the gate.
+
+    There is an underlying assumption of a single writer. A Mutex must
+    be used to control access to the gate from the writer side if this
+    assumption is invalid.
+
+    Linux:
+
+    The Linux implementation uses a single semaphore to implement the gate,
+    which is initialised to 1 (unlocked) or 0 (locked). Locking the gate is
+    achieved by decrementing the semaphore (but not waiting on it)
+    and which is decremented for each reader locking the gate. The writer
+    similarly decrements the semaphore but will wait indefinitely until the
+    semaphore is incremented to zero. The readers unlock the gate by
+    incrementing the semaphore.
+
+    Once through the gate, the writer will increment the semaphore to leave it
+    in its open state. GAte lock operations are always undoable to avoid
+    the writer being left in an indefinite wait state should a reader
+    terminate abnormally.
+
+    Windows:
+
+    The Windows implementation uses an IPC Event and shared memory to hold
+    an integer - the reader count.
+
+    The readers lock the gate by resetting the event and incrementing the
+    reader count. They unlock the gate by decrementing the reader count
+    and calling set event when the reader count reaches zero.
+
+    The writer waits on the event for the gate to open. This is a timed wait
+    to avoid the writer being left in an indefinite wait state should a reader
+    terminate abnormally.
+
+  }
+
+  TMultilockGate = class(TIpcCommon)
+  private
+    {$IFDEF LINUX}
+    FSemaphore: cint;
+    {$ELSE}
+    FLockCount: PInteger;
+    FEvent: THandle;
+    {$ENDIF}
+    function GetLockCount: integer;
+  public
+    {$IFDEF LINUX}
+    constructor Create(SemNum: cint);
+    {$ELSE}
+    constructor Create(EventName: string; LockCount: PInteger);
+    constructor Open(EventName: string; LockCount: PInteger);
+    {$ENDIF}
+    destructor Destroy; override;
+    procedure Lock;
+    procedure Unlock;
+    procedure PassthroughGate;
+    property LockCount: integer read GetLockCount;
+  end;
+
   { TGlobalInterface }
 
   TGlobalInterface = class(TIpcCommon)
@@ -351,36 +414,26 @@ type
     {$ENDIF}
     FWriteLock: TMutex;
     FBuffer: PChar;
-    FMonitorCount,
-    FReaderCount,
     FTraceDataType,
     FBufferSize: PInteger;
     FTimeStamp: PDateTime;
-    FReadEvent: TIpcEvent;
-    FReadFinishedEvent: TIpcEvent;
-    FWriteEvent: TIpcEvent;
-    FWriteFinishedEvent: TIpcEvent;
-    function GetMonitorCount: integer;
-    function GetReaderCount: integer;
+    FReadEvent: TMultiLockGate;
+    FReadFinishedEvent: TMultiLockGate;
+    FDataAvailableEvent: TSingleLockGate;
+    FWriterBusyEvent: TSingleLockGate;
   public
     constructor Create;
     destructor Destroy; override;
-    function IncMonitorCount: integer;
-    function DecMonitorCount: integer;
-    function IncReaderCount: integer;
-    function DecReaderCount: integer;
     procedure SendTrace(TraceObject: TTraceObject);
     procedure ReceiveTrace(TraceObject: TTraceObject);
-    property MontorCount: integer read GetMonitorCount;
-    property ReaderCount: integer read GetReaderCount;
-    property WriteEvent: TIpcEvent read FWriteEvent;
-    property WriteFinishedEvent: TIpcEvent read FWriteFinishedEvent;
-    property ReadEvent: TIpcEvent read FReadEvent;
-    property ReadFinishedEvent: TIpcEvent read FReadFinishedEvent;
+    property DataAvailableEvent: TSingleLockGate read FDataAvailableEvent;
+    property WriterBusyEvent: TSingleLockGate read FWriterBusyEvent;
+    property ReadEvent: TMultiLockGate read FReadEvent;
+    property ReadFinishedEvent: TMultiLockGate read FReadFinishedEvent;
     property WriteLock: TMutex read FMutex;
   end;
 
-{ TCommonSecurityAttributes }
+{ TIpcCommon }
 
 function TIpcCommon.semop(SemNum, op: integer; flags: cshort): cint;
 var sembuf: TSEMbuf;
@@ -481,7 +534,7 @@ end;
 
 constructor TIpcCommon.Create;
 begin
-  Init;
+ //
 end;
 
 {$ELSE}
@@ -572,27 +625,23 @@ begin
 {$ENDIF}
 end;
 
-{ TIpcEvent }
+{ TSingleLockGate }
 {$IFDEF LINUX}
-constructor TIpcEvent.Create(SemNum: cint; InitialState: boolean);
+constructor TSingleLockGate.Create(SemNum: cint; GateState: PInteger; InitialState: boolean);
 begin
   inherited Create;
-  FEventSemaphore := SemNum;
-  FGateSemaphore := SemNum + 1;
-  FMutexSemaphore := SemNum + 2;
+  FGateState := GateState;
+  if InitialState then
+    FGateState := 1
+  else
+    FGateState := 0;
+  FSemaphore := SemNum;
   if FInitialise then
-  begin
-    SemInit(FEventSemaphore,0);
-    if InitialState then
-      SemInit(FGateSemanphore,1)
-    else
-      SemInit(FGateSemanphore,0);
-    SemInit(FMutexSemaphore,1);
-  end
+    SemInit(FSemaphore,0);
 end;
 {$ELSE}
 
-constructor TIpcEvent.Create(EventName: string; InitialState: boolean);
+constructor TSingleLockGate.Create(EventName: string; InitialState: boolean);
 begin
   inherited Create;
   FEvent := CreateEvent(@sa, true, InitialState, PChar(EventName))
@@ -601,7 +650,7 @@ begin
     IBError(ibxeCannotCreateSharedResource, [GetLastError])
 end;
 
-constructor TIpcEvent.Open(EventName: string);
+constructor TSingleLockGate.Open(EventName: string);
 begin
   inherited Create;
   FEvent := OpenEvent(EVENT_ALL_ACCESS, true, PChar(EventName));
@@ -612,7 +661,7 @@ end;
 
 {$ENDIF}
 
-destructor TIpcEvent.Destroy;
+destructor TSingleLockGate.Destroy;
 begin
 {$IFNDEF LINUX}
   CloseHandle(FEvent);
@@ -621,48 +670,117 @@ begin
 end;
 
 
-function TIpcEvent.WaitFor(Timeout: DWORD): DWORD;
+procedure TSingleLockGate.Passthrough;
 begin
 {$IFDEF LINUX}
-  //Timeout ignored in Linux as semtimeop is not always available
-  //instead rely on undo
-  if GetSemValue(FGateSemaphore) = 0 then
-    semop(FEventSemaphore,-1)
+  if FGateState^ = 0 then
+    semop(FSemaphore,-1,0)
 {$ELSE}
-  Result := WaitForSingleObject(FEvent,Timeout)  //Returns when Event is "signaled"
+  Result := WaitForSingleObject(FEvent,INDEFINITE)
 {$ENDIF}
 end;
 
-procedure TIpcEvent.OpenGate;
+procedure TSingleLockGate.Unlock;
 begin
 {$IFDEF LINUX}
-  semop(FMutexSemaphore,-1);
-  try
-    if GetSemValue(FGateSemaphore) = 0 then
-    begin
-      semop(FGateSemaphore,1);
-      semop(FEventSemaphore,abs(GetSemValue(FEventSemaphor))
-    end;
-  finally
-    semop(FMutexSemaphore,1)
+  if FGateState^ = 0 then
+  begin
+    FGateState^ := 1;
+    semop(FSemaphore,abs(GetSemValue(FSemaphore),0);
   end;
 {$ELSE}
   SetEvent(FEvent) //Event State set to "signaled"
 {$ENDIF}
 end;
 
-procedure TIpcEvent.CloseGate;
+procedure TSingleLockGate.Lock;
 begin
 {$IFDEF LINUX}
-  semop(FMutexSemaphore,-1);
-  try
-    if GetSemValue(FGateSemaphore) = 1 then
-      semop(FGateSemaphore,-1);
-  finally
-    semop(FMutexSemaphore,1)
-  end;
+  if FGateState^ = 1 then
+    FGateState^ := 0;
 {$ELSE}
   ResetEvent(FEvent) //Event State set to "unsignaled"
+{$ENDIF}
+end;
+
+{ TMultilockGate }
+
+{$IFDEF LINUX}
+constructor TMultilockGate.Create(SemNum: cint);
+begin
+  FSemaphore := SemNum;
+  if FInitialise then
+    SemInit(FSemaphore,1);
+end;
+{$ELSE}
+constructor TMultilockGate.Create(EventName: string; LockCount: PInteger);
+begin
+  inherited Create;
+  FLockCount := LockCount;
+  FLockCount^ := 0;
+  FEvent := CreateEvent(@sa, true, true, PChar(EventName))
+
+  if FEvent = 0 then
+    IBError(ibxeCannotCreateSharedResource, [GetLastError])
+end;
+
+constructor TMultilockGate.Open(EventName: string; LockCount: PInteger);
+begin
+  inherited Create;
+  FLockCount := LockCount;
+  FLockCount^ := 0;
+  FEvent := OpenEvent(EVENT_ALL_ACCESS, true, PChar(EventName));
+
+  if FEvent = 0 then
+    IBError(ibxeCannotCreateSharedResource, [GetLastError])
+end;
+{$ENDIF}
+
+destructor TMultilockGate.Destroy;
+begin
+{$IFNDEF LINUX}
+  CloseHandle(FEvent);
+{$ENDIF}
+  inherited Destroy;
+end;
+
+function TMultilockGate.GetLockCount: integer;
+begin
+  Result := FLockCount^
+end;
+
+procedure TMultilockGate.Lock;
+begin
+{$IFDEF LINUX}
+  semop(FSemaphore,-1,IPC_NOWAIT or SEM_UNDO);
+{$ELSE}
+  InterlockedIncrement(FLockCount^);
+  ResetEvent(FEvent);
+{$ENDIF}
+end;
+
+procedure TMultilockGate.Unlock;
+begin
+{$IFDEF LINUX}
+  semop(FSemaphore,1,IPC_NOWAIT);
+{$ELSE}
+  InterlockedDecrement(FLockCount^);
+  if FLockCount^ = 0 then
+     SetEvent(FEvent)
+{$ENDIF}
+end;
+
+procedure TMultilockGate.PassthroughGate;
+begin
+{$IFDEF LINUX}
+  semop(FSemaphore,-1,SEM_UNDO);
+  semop(FSemaphore,1,SEM_UNDO);
+{$ELSE}
+  while WaitForSingleObject(FEvent,cDefaultTimeout)= WAIT_TIMEOUT do
+  { If we have timed out then we have lost a reader }
+  begin
+    if FLockCount^ > 0 then UnLock
+  end;
 {$ENDIF}
 end;
 
@@ -684,25 +802,20 @@ begin
   inherited Create;
 
 {$IFDEF LINUX}
+  Init;
   FBuffer := ipc.shmat(FSharedMemoryID,nil,0);
   if (integer(FBuffer) = -1 then
     IBError(ibxeCannotCreateSharedResource,StrError(Errno));
   FWriteLock := TMutex.Create(cMutexSemaphore);
-  FWriteEvent := TSyncGate.Create(cWriteEventSemaphore,true);
-  FWriteFinishedEvent := TSyncGate.Create(cWriteFinishedEventSemaphore,true);
-  FReadEvent := TSyncGate.Create(cReadEventSemaphoretrue);
-  FReadFinishedEvent := TSyncGate.Create(cReadFinishedEventSemaphore,true);
+  FDataAvailableEvent := TSingleLockGate.Create(cDataAvailableEventSemaphore,true);
+  FWriterBusyEvent := TSingleLockGate.Create(cWriterBusyEventSemaphore,true);
+  FReadEvent := TMultiLockGate.Create(cReadEventSemaphoretrue);
+  FReadFinishedEvent := TMultiLockGate.Create(cReadFinishedEventSemaphore,true);
   FMonitorCount := PInteger(FBuffer + cMonitorHookSize - SizeOf(Integer));
   FReaderCount := PInteger(PChar(FMonitorCount) - SizeOf(Integer));
   FTraceDataType := PInteger(PChar(FReaderCount) - SizeOf(Integer));
   FTimeStamp := PDateTime(PChar(FTraceDataType) - SizeOf(TDateTime));
   FBufferSize := PInteger(PChar(FTimeStamp) - SizeOf(Integer));
-  if FInitialiser then
-  begin
-    FMonitorCount^ := 0;
-    FReaderCount^ := 0;
-    FBufferSize^ := 0;
-  end
 {$ELSE}
   FSharedBuffer := CreateFileMapping($FFFFFFFF, @sa, PAGE_READWRITE,
                        0, cMonitorHookSize, PChar(MonitorHookNames[1]));
@@ -718,16 +831,14 @@ begin
     if FBuffer = nil then
       IBError(ibxeCannotCreateSharedResource, [GetLastError]);
 
-    FMonitorCount := PInteger(FBuffer + cMonitorHookSize - SizeOf(Integer));
-    FReaderCount := PInteger(PChar(FMonitorCount) - SizeOf(Integer));
     FTraceDataType := PInteger(PChar(FReaderCount) - SizeOf(Integer));
     FTimeStamp := PDateTime(PChar(FTraceDataType) - SizeOf(TDateTime));
     FBufferSize := PInteger(PChar(FTimeStamp) - SizeOf(Integer));
     FWriteLock := TMutex.Open(PChar(MonitorHookNames[0]));
-    FWriteEvent := TSyncGate.Open(MonitorHookNames[2], False);
-    FWriteFinishedEvent := TSyncGate.Open(MonitorHookNames[3], True);
-    FReadEvent := TSyncGate.Open(MonitorHookNames[4], False);
-    FReadFinishedEvent := TSyncGate.Open(MonitorHookNames[5], False);
+    FDataAvailableEvent := TSingleLockGate.Open(MonitorHookNames[2], False);
+    FWriterBusyEvent := TSingleLockGate.Open(MonitorHookNames[3], True);
+    FReadEvent := TMultiLockGate.Open(MonitorHookNames[4], False);
+    FReadFinishedEvent := TMultiLockGate.Open(MonitorHookNames[5], False);
   end
   else
   begin
@@ -741,27 +852,20 @@ begin
     FReaderCount^ := 0;
     FBufferSize^ := 0;
     FWriteLock := TMutex.Create(PChar(MonitorHookNames[0]));
-    FWriteEvent := TSyncGate.Create(MonitorHookNames[2],true);
-    FWriteFinishedEvent := TSyncGate.Create(MonitorHookNames[3],true);
-    FReadEvent := TSyncGate.Create(MonitorHookNames[4],true);
-    FReadFinishedEvent := TSyncGate.Create(MonitorHookNames[5],true);
+    FDataAvailableEvent := TSingleLockGate.Create(MonitorHookNames[2],true);
+    FWriterBusyEvent := TSingleLockGate.Create(MonitorHookNames[3],true);
+    FReadEvent := TMultiLockGate.Create(MonitorHookNames[4],true);
+    FReadFinishedEvent := TMultiLockGate.Create(MonitorHookNames[5],true);
   end;
 {$ENDIF}
 
-  { This should never evaluate to true, if it does
-  there has been a hiccup somewhere. }
-
-  if FMonitorCount^ < 0 then
-    FMonitorCount^ := 0;
-  if FReaderCount^ < 0 then
-    FReaderCount^ := 0;
 end;
 
 destructor TGlobalInterface.Destroy;
 begin
     if assigned(FWriteLock) then FWriteLock.Free;
-    if assigned(FWriteEvent) then FWriteEvent.Free;
-    if assigned(FWriteFinishedEvent) then FWriteFinishedEvent.Free;
+    if assigned(FDataAvailableEvent) then FDataAvailableEvent.Free;
+    if assigned(FWriterBusyEvent) then FWriterBusyEvent.Free;
     if assigned(FReadEvent) then FReadEvent.Free;
     if assigned(FReadFinishedEvent) then FReadFinishedEvent.Free;
 {$IFDEF LINUX}
@@ -772,36 +876,6 @@ begin
     CloseHandle(FSharedBuffer);
 {$ENDIF}
   inherited Destroy;
-end;
-
-function TGlobalInterface.IncMonitorCount: integer;
-begin
-{$IFDEF LINUX}
-{$ELSE}
-  InterlockedIncrement(FMonitorCount^);
-{$ENDIF}
-  Result := FMonitorCount^
-end;
-
-function TGlobalInterface.DecMonitorCount: integer;
-begin
-{$IFDEF LINUX}
-{$ELSE}
-  InterlockedDecrement(FMonitorCount^);
-{$ENDIF}
-  Result := FMonitorCount^
-end;
-
-function TGlobalInterface.IncReaderCount: integer;
-begin
-  InterlockedIncrement(FReaderCount^);
-  Result := FReaderCount^
-end;
-
-function TGlobalInterface.DecReaderCount: integer;
-begin
-  InterlockedDecrement(FReaderCount^);
-  Result := FReaderCount^
 end;
 
 procedure TGlobalInterface.SendTrace(TraceObject: TTraceObject);
@@ -1241,7 +1315,7 @@ begin
         (FMsgs.Count <> 0) do
   begin
     { Any one listening? }
-    if FGlobalInterface.MonitorCount = 0 then
+    if FGlobalInterface.ReadEvent.LockCount = 0 then
     begin
       if FMsgs.Count <> 0 then
         Synchronize(RemoveFromList);
@@ -1287,36 +1361,14 @@ end;
 
 procedure TWriterThread.EndWrite;
 begin
-  {
-   * 1. Wait to end the write until all registered readers have
-   *    started to wait for a write event
-   * 2. Block all of those waiting for the write to finish.
-   * 3. Block all of those waiting for all readers to finish.
-   * 4. Unblock all readers waiting for a write event.
-   * 5. Wait until all readers have finished reading.
-   * 6. Now, block all those waiting for a write event.
-   * 7. Unblock all readers waiting for a write to be finished.
-   * 8. Unlock the mutex.
-   }
   with FGlobalInterface do
   begin
-    while ReadEvent.WaitFor(cDefaultTimeout)= WAIT_TIMEOUT do
-    { If we have timed out then we have lost a monitor }
-    begin
-      if MonitorCount > 0 then
-        DecMonitorCount;
-      if (ReaderCount = MonitorCount - 1) or (MonitorCount = 0) then
-        ReadEvent.OpenGate
-    end;
-    WriteFinishedEvent.CloseGate;
-    ReadFinishedEvent.CloseGate;
-    WriteEvent.OpenGate; { Let all readers pass through. }
-    while ReadFinishedEvent.WaitFor(cDefaultTimeout) = WAIT_TIMEOUT do
-    { If we have timed out then we have lost a monitor }
-      if (ReaderCount = 0) or (DecReaderCount = 0) then
-        ReadFinishedEvent.OpenGate;
-    WriteEvent.CloseGate;
-    WriteFinishedEvent.OpenGate;
+    ReadEvent.PassThrough;         {Wait for readers to become ready }
+    WriterBusyEvent.CloseGate;     {Set Busy State}
+    DataAvailableEvent.OpenGate;   { Signal Data Available. }
+    ReadFinishedEvent.PassThrough; {Wait for readers to finish }
+    DataAvailableEvent.CloseGate;  {reset Data Available }
+    WriterBusyEvent.OpenGate;      {Signal not Busy }
   end;
   Unlock;
 end;
@@ -1331,7 +1383,7 @@ begin
       The alternative is to have messages queue up until a
       monitor is ready.}
 
-    if FGlobalInterface.MonitorCount = 0 then
+    if FGlobalInterface.ReadEvent.LockCount = 0 then
       Synchronize(RemoveFromList)
     else
     begin
@@ -1424,20 +1476,12 @@ end;
 
 procedure TReaderThread.BeginRead;
 begin
-  {
-   * 1. Wait for the "previous" write event to complete.
-   * 2. Increment the number of readers.
-   * 3. if the reader count is the number of interested readers, then
-   *    inform the system that all readers are ready.
-   * 4. Finally, wait for the FWriteEvent to signal.
-   }
   with FGlobalInterface do
   begin
-    WriteFinishedEvent.WaitFor(INFINITE);
-    IncReaderCount;
-    if ReaderCount = MonitorCount then
-      ReadEvent.OpenGate;
-    WriteEvent.WaitFor(INFINITE);
+    WriterBusyEvent.Passthrough;     { Wait for Writer not busy}
+    ReadFinishedEvent.Lock;          { Prepare Read Finished Gate}
+    ReadEvent.Unlock;                { Signal read ready  }
+    DataAvailableEvent.Passthrough;  { Wait for a Data Available }
   end;
 end;
 
@@ -1461,17 +1505,8 @@ end;
 
 procedure TReaderThread.EndRead;
 begin
-  {
-    * 1. Decrement the number of interested readers
-    * 2. Once all readers have completed, reset read gate
-    * 3. Tell the writer that all readers have completed
-  }
-
-  if FGlobalInterface.DecReaderCount = 0 then
-  begin
-    FGlobalInterface.ReadEvent.CloseGate;
-    FGlobalInterface.ReadFinishedEvent.OpenGate;
-  end;
+  FGlobalInterface.ReadEvent.Lock;           { reset Read Ready}
+  FGlobalInterface.ReadFinishedEvent.Unlock; {Signal Read completed }
 end;
 
 procedure TReaderThread.Execute;

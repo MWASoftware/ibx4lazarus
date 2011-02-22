@@ -1,5 +1,3 @@
-{ This is an automatically generated lazarus resource file }
-
 LazarusResources.Add('TIBUpdateSQLEditorForm','FORMDATA',[
   'TPF0'#22'TIBUpdateSQLEditorForm'#21'IBUpdateSQLEditorForm'#4'Left'#3'^'#1#6
   +'Height'#3#154#1#3'Top'#3'D'#1#5'Width'#3#150#2#13'ActiveControl'#7#11'PageC'
