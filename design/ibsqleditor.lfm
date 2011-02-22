@@ -1,7 +1,7 @@
 object IBSQLEditorForm: TIBSQLEditorForm
-  Left = 280
+  Left = 284
   Height = 431
-  Top = 347
+  Top = 371
   Width = 729
   ActiveControl = PageControl
   Caption = 'IBSQL Editor'
@@ -68,8 +68,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Height = 337
     Top = 27
     Width = 251
-    ActivePage = SelectPage
-    TabIndex = 0
+    ActivePage = ExecutePage
+    TabIndex = 4
     TabOrder = 5
     TabPosition = tpLeft
     object SelectPage: TTabSheet
@@ -137,8 +137,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object InsertPage: TTabSheet
       Caption = 'Insert'
-      ClientHeight = 302
-      ClientWidth = 245
+      ClientHeight = 331
+      ClientWidth = 182
       OnShow = InsertPageShow
       object Label8: TLabel
         Left = 7
@@ -303,8 +303,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object ExecutePage: TTabSheet
       Caption = 'Execute'
-      ClientHeight = 302
-      ClientWidth = 245
+      ClientHeight = 331
+      ClientWidth = 182
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
@@ -341,7 +341,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         TabOrder = 0
       end
       object ProcInputList: TListBox
-        Left = 10
+        Left = 6
         Height = 80
         Top = 90
         Width = 164
@@ -351,10 +351,10 @@ object IBSQLEditorForm: TIBSQLEditorForm
         TopIndex = -1
       end
       object ProcOutputList: TListBox
-        Left = 6
+        Left = 10
         Height = 80
         Top = 210
-        Width = 164
+        Width = 160
         IntegralHeight = True
         ItemHeight = 0
         TabOrder = 2

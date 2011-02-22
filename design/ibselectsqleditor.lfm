@@ -3,42 +3,18 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   Height = 438
   Top = 457
   Width = 749
-  ActiveControl = TableNamesCombo
+  ActiveControl = ProcedureNames
   Caption = 'Select SQL Editor'
   ClientHeight = 438
   ClientWidth = 749
   OnShow = FormShow
   LCLVersion = '0.9.28.2'
-  object Label1: TLabel
-    Left = 16
-    Height = 18
-    Top = 16
-    Width = 76
-    Caption = 'Table Name'
-    ParentColor = False
-  end
-  object Label2: TLabel
-    Left = 19
-    Height = 18
-    Top = 84
-    Width = 36
-    Caption = 'Fields'
-    ParentColor = False
-  end
   object Label3: TLabel
     Left = 279
     Height = 18
     Top = 16
     Width = 27
     Caption = 'SQL'
-    ParentColor = False
-  end
-  object Label4: TLabel
-    Left = 23
-    Height = 18
-    Top = 285
-    Width = 83
-    Caption = 'Primary Keys'
     ParentColor = False
   end
   object SQLText: TMemo
@@ -69,29 +45,6 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     ModalResult = 2
     TabOrder = 2
   end
-  object TableNamesCombo: TComboBox
-    Left = 23
-    Height = 29
-    Top = 38
-    Width = 201
-    ItemHeight = 0
-    OnCloseUp = TableNamesComboCloseUp
-    TabOrder = 3
-  end
-  object FieldList: TListBox
-    Left = 21
-    Height = 170
-    Hint = 'Select Fields to include in Select Statements, or leave unselected to select all'
-    Top = 102
-    Width = 204
-    ItemHeight = 0
-    MultiSelect = True
-    OnDblClick = FieldListDblClick
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 4
-    TopIndex = -1
-  end
   object Button3: TButton
     Left = 279
     Height = 29
@@ -100,7 +53,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     AutoSize = True
     Caption = 'Generate SQL'
     OnClick = Button3Click
-    TabOrder = 5
+    TabOrder = 3
   end
   object Button4: TButton
     Left = 416
@@ -109,7 +62,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Width = 66
     Caption = 'Test'
     OnClick = Button4Click
-    TabOrder = 6
+    TabOrder = 4
   end
   object QuoteFields: TCheckBox
     Left = 16
@@ -117,16 +70,138 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Top = 380
     Width = 129
     Caption = '&Quote Identifiers'
-    TabOrder = 7
+    TabOrder = 5
   end
-  object PrimaryKeyList: TListBox
-    Left = 23
-    Height = 59
-    Top = 304
-    Width = 200
-    ItemHeight = 0
-    OnDblClick = PrimaryKeyListDblClick
-    TabOrder = 8
-    TopIndex = -1
+  object PageControl: TPageControl
+    Left = 24
+    Height = 335
+    Top = 28
+    Width = 232
+    ActivePage = ExecutePage
+    TabIndex = 1
+    TabOrder = 6
+    object SelectPage: TTabSheet
+      Caption = 'Tables'
+      ClientHeight = 300
+      ClientWidth = 226
+      OnShow = SelectPageShow
+      object Label1: TLabel
+        Left = 7
+        Height = 18
+        Top = 4
+        Width = 76
+        Caption = 'Table Name'
+        ParentColor = False
+      end
+      object Label2: TLabel
+        Left = 7
+        Height = 18
+        Top = 72
+        Width = 36
+        Caption = 'Fields'
+        ParentColor = False
+      end
+      object Label4: TLabel
+        Left = 7
+        Height = 18
+        Top = 244
+        Width = 83
+        Caption = 'Primary Keys'
+        ParentColor = False
+      end
+      object TableNamesCombo: TComboBox
+        Left = 7
+        Height = 29
+        Top = 20
+        Width = 201
+        ItemHeight = 0
+        OnCloseUp = TableNamesComboCloseUp
+        TabOrder = 0
+      end
+      object FieldList: TListBox
+        Left = 7
+        Height = 138
+        Hint = 'Select Fields to include in Select Statements, or leave unselected to select all'
+        Top = 92
+        Width = 204
+        ItemHeight = 0
+        MultiSelect = True
+        OnDblClick = FieldListDblClick
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 1
+        TopIndex = -1
+      end
+      object PrimaryKeyList: TListBox
+        Left = 7
+        Height = 28
+        Top = 260
+        Width = 200
+        ItemHeight = 0
+        OnDblClick = PrimaryKeyListDblClick
+        TabOrder = 2
+        TopIndex = -1
+      end
+    end
+    object ExecutePage: TTabSheet
+      Caption = 'Procedures'
+      ClientHeight = 300
+      ClientWidth = 226
+      OnShow = ExecutePageShow
+      object Label16: TLabel
+        Left = 7
+        Height = 18
+        Top = 3
+        Width = 109
+        Caption = 'Procedure Name'
+        ParentColor = False
+      end
+      object Label17: TLabel
+        Left = 10
+        Height = 18
+        Top = 69
+        Width = 111
+        Caption = 'Input Parameters'
+        ParentColor = False
+      end
+      object Label18: TLabel
+        Left = 11
+        Height = 18
+        Top = 190
+        Width = 123
+        Caption = 'Output Parameters'
+        ParentColor = False
+      end
+      object ProcedureNames: TComboBox
+        Left = 7
+        Height = 29
+        Top = 20
+        Width = 201
+        ItemHeight = 0
+        OnCloseUp = ProcedureNamesCloseUp
+        ParentColor = True
+        TabOrder = 0
+      end
+      object ProcInputList: TListBox
+        Left = 10
+        Height = 80
+        Top = 90
+        Width = 198
+        IntegralHeight = True
+        ItemHeight = 0
+        TabOrder = 1
+        TopIndex = -1
+      end
+      object ProcOutputList: TListBox
+        Left = 10
+        Height = 80
+        Top = 210
+        Width = 198
+        IntegralHeight = True
+        ItemHeight = 0
+        TabOrder = 2
+        TopIndex = -1
+      end
+    end
   end
 end

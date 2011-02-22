@@ -47,7 +47,7 @@ LazarusResources.Add('TIBUpdateSQLEditorForm','FORMDATA',[
   +'ze'#27'ChildSizing.EnlargeVertical'#7#24'crsHomogenousChildResize'#28'Child'
   +'Sizing.ShrinkHorizontal'#7#14'crsScaleChilds'#26'ChildSizing.ShrinkVertical'
   +#7#14'crsScaleChilds'#18'ChildSizing.Layout'#7#29'cclLeftToRightThenTopToBot'
-  +'tom'#27'ChildSizing.ControlsPerLine'#2#4#12'ClientHeight'#2'"'#11'ClientWid'
+  +'tom'#27'ChildSizing.ControlsPerLine'#2#4#12'ClientHeight'#2'1'#11'ClientWid'
   +'th'#3#18#1#7'Columns'#2#4#9'ItemIndex'#2#0#13'Items.Strings'#1#6#7'&Modify'
   +#6#7'&Insert'#6#7'&Delete'#6#8'&Refresh'#0#7'OnClick'#7#18'StatementTypeClic'
   +'k'#8'TabOrder'#2#1#0#0#7'TButton'#7'Button1'#4'Left'#3#29#2#6'Height'#2#25#3

@@ -76,7 +76,11 @@ begin
       Exit
     end;
 
-    DataSet.Database.Connected := true;
+    try
+      DataSet.Database.Connected := true;
+    except on E: Exception do
+      ShowMessage(E.Message)
+    end;
   end;
 
   with TIBDataSetEditorForm.Create(Application) do

@@ -77,7 +77,11 @@ begin
       Exit
     end;
 
-    UpdateObject.DataSet.Database.Connected := true;
+    try
+      UpdateObject.DataSet.Database.Connected := true;
+    except on E: Exception do
+      ShowMessage(E.Message)
+    end;
   end;
 
   with TIBUpdateSQLEditorForm.Create(Application) do

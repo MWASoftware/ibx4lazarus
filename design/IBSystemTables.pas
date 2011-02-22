@@ -24,6 +24,7 @@ type
     function GetSQLType(SQLType: TIBSQLTypes): string;
     procedure AddWhereClause(TableName: string; QuotedStrings: boolean; SQL: TStrings);
     procedure GetProcParams(ProcName: string; ParamList: TStrings; InputParams: boolean); overload;
+    function GetWord(S: string; WordNo: integer): string;
  public
     constructor Create;
     destructor Destroy; override;
@@ -34,7 +35,7 @@ type
     procedure GetPrimaryKeys(TableName: string; PrimaryKeys: TStrings);
     procedure GetTableAndColumns(SelectSQL: string; var FirstTableName: string;
                 Columns: TStrings);
-    procedure GetProcedureNames(ProcNames: TStrings);
+    procedure GetProcedureNames(ProcNames: TStrings; WithOutputParams: boolean=false);
     procedure GetProcParams(ProcName: string; InputParams, OutputParams: TStrings); overload;
     procedure GetGenerators(GeneratorNames: TStrings);
     procedure GenerateSelectSQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
@@ -44,7 +45,7 @@ type
     procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);
     procedure GenerateExecuteSQL(ProcName: string; QuotedStrings: boolean;
               InputParams, OutputParams, ExecuteSQL: TStrings);
-    function GetStatementType(SQL: string): TIBSQLTypes;
+    function GetStatementType(SQL: string; var IsStoredProcedure: boolean): TIBSQLTypes;
     function GetFieldNames(FieldList: TListBox): TStrings;
     procedure TestSQL(SQL: string);
   end;
@@ -81,13 +82,15 @@ const
 
   sqlGETPROCEDURES = 'Select Trim(RDB$PROCEDURE_NAME) as ProcName, RDB$PROCEDURE_INPUTS, '+
                      'RDB$PROCEDURE_OUTPUTS From RDB$PROCEDURES '+
-		     'Where RDB$SYSTEM_FLAG = 0 Order by 1 asc';
+		     'Where RDB$SYSTEM_FLAG = 0 and RDB$PROCEDURE_OUTPUTS >= :MinOutput Order by 1 asc';
 
   sqlGETPROCPARAM  = 'Select Trim(P.RDB$PARAMETER_NAME) as ParamName '+
                      'From RDB$PROCEDURE_PARAMETERS P '+
 		     'JOIN RDB$FIELDS F On F.RDB$FIELD_NAME = P.RDB$FIELD_SOURCE '+
 		     'Where P.RDB$SYSTEM_FLAG = 0 and P.RDB$PROCEDURE_NAME = :ProcName and P.RDB$PARAMETER_TYPE = :type '+
 		     'Order by P.RDB$PARAMETER_NUMBER asc';
+
+  sqlCheckProcedureNames = 'Select * From RDB$PROCEDURES Where Upper(Trim(RDB$PROCEDURE_NAME)) = Upper(:ProcName)';
 
 function TIBSystemTables.GetSQLType(SQLType: TIBSQLTypes): string;
 begin
@@ -169,6 +172,42 @@ begin
     finally
       Close
     end;
+  end;
+end;
+
+function TIBSystemTables.GetWord(S: string; WordNo: integer): string;
+const
+    SpaceChars = [' ',#$0a,#$0d,#$09,'('];
+var I: integer;
+    StartIdx: integer;
+    InWhiteSpace: boolean;
+begin
+  Result := '';
+  StartIdx := 1;
+  InWhiteSpace := true;
+  for I := 1 to Length(S) do
+  begin
+    if InWhiteSpace then
+    begin
+      if not (S[I] in SpaceChars) then
+      begin
+        StartIdx := I;
+        InWhiteSpace := false
+      end
+    end
+    else
+    begin
+      if S[I] in SpaceChars then
+      begin
+        Dec(WordNo);
+        if WordNo = 0 then
+        begin
+          Result := System.copy(S,StartIdx,I - StartIdx);
+          Exit
+        end;
+        InWhiteSpace := true
+      end
+    end
   end;
 end;
 
@@ -305,22 +344,34 @@ begin
   FTableAndColumnSQL.SQL.Text := SelectSQL;
   try
     FTableAndColumnSQL.Prepare;
-    if FTableAndColumnSQL.Current.Count > 0 then
-      FirstTableName := strpas(FTableAndColumnSQL.Current.Vars[0].Data^.relname)
+    case FTableAndColumnSQL.SQLType of
+    SQLSelect:
+      begin
+        if FTableAndColumnSQL.Current.Count > 0 then
+          FirstTableName := strpas(FTableAndColumnSQL.Current.Vars[0].Data^.relname)
+        else
+          FirstTableName := '';
+        if assigned(Columns) then
+        begin
+          Columns.Clear;
+          for I := 0 to FTableAndColumnSQL.Current.Count - 1 do
+              Columns.Add(FTableAndColumnSQL.Current.Vars[I].Name)
+        end;
+      end;
+    { If not a select statement then return table or procedure name
+      as First Table Name }
+    SQLUpdate:
+      FirstTableName := GetWord(SelectSQL,2);
+
     else
-      FirstTableName := '';
-    if assigned(Columns) then
-    begin
-      Columns.Clear;
-      for I := 0 to FTableAndColumnSQL.Current.Count - 1 do
-        Columns.Add(FTableAndColumnSQL.Current.Vars[I].Name)
-    end;
+      FirstTableName := GetWord(SelectSQL,3);
+    end
   except on E:EIBError do
       ShowMessage(E.Message);
   end;
 end;
 
-procedure TIBSystemTables.GetProcedureNames(ProcNames: TStrings);
+procedure TIBSystemTables.GetProcedureNames(ProcNames: TStrings; WithOutputParams: boolean);
 begin
   if not assigned(FGetProcedures.Database) or not FGetProcedures.Database.Connected or
     not assigned(FGetProcedures.Transaction) then
@@ -330,6 +381,11 @@ begin
   begin
     with Transaction do
       if not InTransaction then StartTransaction;
+    Prepare;
+    if WithOutputParams then
+      ParamByName('MinOutput').AsInteger := 1
+    else
+      ParamByName('MinOutput').AsInteger := 0;
     ExecQuery;
     try
       while not EOF do
@@ -379,6 +435,7 @@ var SelectSQL: string;
     Separator : string;
     I: integer;
 begin
+  SQL.Clear;
   if not assigned(FGetFieldNames.Database) or not FGetFieldNames.Database.Connected or
     not assigned(FGetFieldNames.Transaction) then
     Exit;
@@ -512,11 +569,13 @@ begin
   ExecuteSQL.Text := SQL
 end;
 
-function TIBSystemTables.GetStatementType(SQL: string): TIBSQLTypes;
+function TIBSystemTables.GetStatementType(SQL: string; var IsStoredProcedure: boolean): TIBSQLTypes;
+var TableName: string;
 begin
   if not assigned(FTestSQL.Database) or not FTestSQL.Database.Connected or
     not assigned(FTestSQL.Transaction) then
     Exit;
+  IsStoredProcedure := false;
   FTestSQL.SQL.Text := SQL;
   try
     FTestSQL.Prepare;
@@ -524,7 +583,19 @@ begin
   except on E:EIBError do
       ShowMessage(E.Message);
   end;
-
+  if (Result = SQLSelect) and (FTestSQL.Current.Count > 0)  then
+  begin
+    TableName := strpas(FTestSQL.Current.Vars[0].Data^.relname);
+    FTestSQL.SQL.Text := sqlCheckProcedureNames;
+    FTestSQL.Prepare;
+    FTestSQL.ParamByName('ProcName').AsString := TableName;
+    FTestSQL.ExecQuery;
+    try
+      IsStoredProcedure := not FTestSQL.EOF;
+    finally
+      FTestSQL.Close
+    end;
+  end;
 end;
 
 function TIBSystemTables.GetFieldNames(FieldList: TListBox): TStrings;

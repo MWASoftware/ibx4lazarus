@@ -68,7 +68,12 @@ begin
       ShowMessage('No Transaction assigned to DataSet!');
       Exit
     end;
-    Database.Connected := true;
+
+    try
+      Database.Connected := true;
+    except on E: Exception do
+      ShowMessage(E.Message)
+    end;
 
     with TGeneratorEditor.Create(Application) do
     try
@@ -89,9 +94,12 @@ begin
   if Generator.GeneratorName <> '' then
     GeneratorNames.ItemIndex := GeneratorNames.Items.IndexOf(Generator.GeneratorName);
   if Generator.FieldName <> '' then
-    FieldNames.ItemIndex := FieldNames.Items.IndexOf(Generator.FieldName)
+    FieldNames.ItemIndex := FieldNames.Items.IndexOf(UpperCase(Generator.FieldName))
   else
     FieldNames.ItemIndex := FieldNames.Items.IndexOf(GetPrimaryKey);
+
+  if FieldNames.ItemIndex = -1 then
+    FieldNames.Text := Generator.FieldName;
 
   if Generator.ApplyOnEvent = gaeOnNewRecord then
     OnNewRecord.Checked := true

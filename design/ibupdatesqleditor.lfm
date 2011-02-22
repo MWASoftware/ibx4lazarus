@@ -155,7 +155,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 4
-        ClientHeight = 34
+        ClientHeight = 49
         ClientWidth = 274
         Columns = 4
         ItemIndex = 0

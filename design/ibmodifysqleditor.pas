@@ -65,7 +65,11 @@ begin
       Transaction := Database.DefaultTransaction
     end;
 
-    Database.Connected := true;
+    try
+      Database.Connected := true;
+    except on E: Exception do
+      ShowMessage(E.Message)
+    end;
   end;
 
   with TIBModifySQLEditorForm.Create(Application) do
@@ -83,12 +87,18 @@ end;
 { TIBModifySQLEditorForm }
 
 procedure TIBModifySQLEditorForm.FormShow(Sender: TObject);
+var TableName: string;
 begin
   TableNamesCombo.Items.Clear;
   FIBSystemTables.GetTableNames(TableNamesCombo.Items);
   if TableNamesCombo.Items.Count > 0 then
   begin
     TableNamesCombo.ItemIndex := 0;
+    if SQLText.Text <> '' then
+    begin
+      FIBSystemTables.GetTableAndColumns(SQLText.Text,TableName,nil);
+      TableNamesCombo.ItemIndex := TableNamesCombo.Items.IndexOf(TableName)
+    end;
     FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,IncludePrimaryKeys.checked);
     FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
   end;

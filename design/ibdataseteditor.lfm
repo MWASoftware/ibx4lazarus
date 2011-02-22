@@ -155,7 +155,7 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 5
-        ClientHeight = 34
+        ClientHeight = 49
         ClientWidth = 338
         Columns = 5
         ItemIndex = 0
