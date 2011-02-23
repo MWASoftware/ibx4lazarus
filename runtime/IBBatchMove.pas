@@ -38,7 +38,7 @@ uses
 {$ELSE}
   Windows,
 {$ENDIF}
-  SysUtils, Graphics, Classes, Controls, Db,
+  SysUtils, {Graphics,} Classes, Controls, Db,
      IB, IBCustomDataSet, IBDatabase, IBTable;
 
 type

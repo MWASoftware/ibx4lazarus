@@ -179,7 +179,8 @@ type
     ibxeInvalidOnErrorResult,
     ibxeInvalidOnStatusResult,
     ibxeDPBConstantUnknownEx,
-    ibxeTPBConstantUnknownEx
+    ibxeTPBConstantUnknownEx,
+    ibxeLinuxAPIError
     );
 
   TStatusVector              = array[0..19] of ISC_STATUS;
@@ -310,7 +311,8 @@ const
     SInvalidOnErrorResult,
     SInvalidOnStatusResult,
     SDPBConstantUnknownEx,
-    STPBConstantUnknownEx
+    STPBConstantUnknownEx,
+    SLinuxAPIError
   );
 
 var

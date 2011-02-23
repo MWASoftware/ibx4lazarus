@@ -170,6 +170,7 @@ resourcestring
   SIBSQLEditor = 'IBSQL Editor';
   SDPBConstantUnknownEx = 'DPB Constant (%s) is unknown';
   STPBConstantUnknownEx = 'TPB Constant (%s) is unknown';
+  SLinuxAPIError = 'Linux API Error - %s';
 
 implementation
 
