@@ -34,7 +34,7 @@ interface
 
 uses
 {$IFDEF LINUX }
-  unix, baseunix, Errors,
+  unix, baseunix, Errors,{$IF FPC_FULLVERSION <= 20402 } initc, {$ENDIF}
 {$ELSE}
   Windows,
 {$ENDIF}
@@ -121,7 +121,7 @@ const
 implementation
 
 uses
-  contnrs {$IFDEF LINUX}, ipc {$ENDIF};
+  contnrs {$IFDEF LINUX}, ipc, UnixType, Errors {$ENDIF};
 
 const
   cMonitorHookSize = 1024;
@@ -147,6 +147,19 @@ const
 {$ENDIF}
   cDefaultTimeout = 500; { 1 seconds }
 
+{
+  The call to semctl in ipc is broken in release 2.4.2 and earlier. Hence
+  need to replace with a working libc call
+}
+
+{$IF FPC_FULLVERSION <= 20402 }
+Function real_semctl(semid:cint; semnum:cint; cmd:cint): cint; cdecl; varargs; external clib name 'semctl';
+
+Function semctl(semid:cint; semnum:cint; cmd:cint; var arg: tsemun): cint;
+  begin
+    semctl := real_semctl(semid,semnum,cmd,pointer(arg));
+  end;
+{$ENDIF}
 
 type
 
@@ -273,6 +286,10 @@ type
     through it while, when closed all threads are blocked as they try to pass
     through it. When the gate is opened, all blocked threads are resumed.
 
+    There is an implementation assumption that only one writer thread at
+    a time (i.e. the thread which locks or unlocks the gate can have access to
+    it at any one time. I.e. an external Mutex prevents race conditions.
+
     Windows:
 
     In the Windows implementation, a Windows Event is used to implement
@@ -284,13 +301,17 @@ type
     In the Linux implementation, the gate is implemented by a semaphore
     and a share memory integer used as a bi-state variable. When the gate
     is open, the bi-state variable is non-zero. It is set to zero when closed.
+    Another shared memory integer is used to count the number of waiting
+    threads, and a second semaphore is used to protect access to this.
 
-    The semaphore is initialised to zero. When a thread passes through the gate
+    The event semaphore is initialised to zero. When a thread passes through the gate
     it checks the state. If open, the thread continues. If closed then it
-    decrements the semaphore and hence enters an indefinite wait state.
+    increments the count of waiting threads and then decrements the semaphore
+    and hence enters an indefinite wait state.
 
     When the gate is locked, the state is set to zero. When unlocked, the state
-    is set to one and the semaphore incremented until it is set to zero.
+    is set to one and the semaphore incremented by the number of waiting threads,
+    which itself is then zeroed.
 
     Always initialised to the Unlocked state
   }
@@ -299,13 +320,16 @@ type
   private
     {$IFDEF LINUX}
     FSemaphore: cint;
-    FGateState: PInteger;
+    FMutex: cint;
+    FSignalledState: PInteger;
+    FWaitingThreads: PInteger;
     {$ELSE}
     FEvent: THandle;
     {$ENDIF}
   public
     {$IFDEF LINUX}
-    constructor Create(SemNum: cint; GateState: PInteger);
+    constructor Create(SemNum: cint; SignalledStateVar,
+                                     WaitingThreadsVar: PInteger);
     {$ELSE}
     constructor Create(EventName: string);
     constructor Open(EventName: string);
@@ -386,14 +410,15 @@ type
   private
     {$IFDEF LINUX}
     FSemaphore: cint;
+    FMutex: cint;
     {$ELSE}
-    FLockCount: PInteger;
     FEvent: THandle;
     {$ENDIF}
-    function GetLockCount: integer;
+    FLockCount: PInteger;
+    function GetLockCountCount: integer;
   public
     {$IFDEF LINUX}
-    constructor Create(SemNum: cint);
+    constructor Create(SemNum: cint; LockCountVar: PInteger);
     {$ELSE}
     constructor Create(EventName: string; LockCount: PInteger);
     constructor Open(EventName: string; LockCount: PInteger);
@@ -402,7 +427,7 @@ type
     procedure Lock;
     procedure Unlock;
     procedure PassthroughGate;
-    property LockCount: integer read GetLockCount;
+    property LockCountCount: integer read GetLockCountCount;
   end;
 
   { TGlobalInterface }
@@ -447,26 +472,26 @@ begin
     sembuf.sem_num := SemNum;
     sembuf.sem_op:= op;
     sembuf.sem_flg := flags or SEM_UNDO;
-    Result := ipc.semop(FSemaphoreID,@sembuf,1);
+    Result := semop(FSemaphoreID,@sembuf,1);
     if Result < 0 then
-       IBError(ibxeLinuxAPIError,strError(errno));
+       IBError(ibxeLinuxAPIError,strError(fpgeterrno));
 end;
 
 function TIpcCommon.GetSemValue(SemNum: integer): cint;
 var args :TSEMun;
 begin
-  Result := ipc.semctl(FSemaphoreID,SemNum,GETVAL,args);
+  Result := semctl(FSemaphoreID,SemNum,GETVAL,args);
   if Result < 0 then
-     IBError(ibxeLinuxAPIError,strError(errno));
+     IBError(ibxeLinuxAPIError,strError(fpgeterrno));
 end;
 
 procedure TIpcCommon.SemInit(SemNum, AValue: cint);
 var args :TSEMun;
 begin
   args.val := AValue;
-  if ipc.semctl(FSemaphoreID,SemNum,SEM_SETVAL,args)  < 0 then
+  if semctl(FSemaphoreID,SemNum,SEM_SETVAL,args)  < 0 then
      IBError(ibxeCannotCreateSharedResource,'Unable to initialise Semaphone ' +
-                          IntToStr(SemNum) + '- ' + StrError(ErrNo));
+                          IntToStr(SemNum) + '- ' + StrError(fpgeterrno));
 
 end;
 
@@ -498,13 +523,13 @@ begin
 
     if FInitialiser then
     begin
-      FSharedMemoryID := ipc.shmget(IPC_PRIVATE,cMonitorHookSize, IPC_CREAT or
+      FSharedMemoryID := shmget(IPC_PRIVATE,cMonitorHookSize, IPC_CREAT or
                            S_IRUSR or S_IWUSR or S_IRGRP or S_IWGRP);
       if FSharedMemoryID < 0 then
           IBError(ibxeCannotCreateSharedResource,'Cannot create shared memory segment - ' +
                                                  StrError(getFpErrno));
 
-      FSemaphoreID := ipc.semget(IPC_PRIVATE, cNumberOfSemaphores,IPC_CREAT or
+      FSemaphoreID := semget(IPC_PRIVATE, cNumberOfSemaphores,IPC_CREAT or
                            S_IRUSR or S_IWUSR or S_IRGRP or S_IWGRP);
       if FSemaphoreID < 0 then
           IBError(ibxeCannotCreateSharedResource,'Cannot create shared semaphore set - ' +
@@ -526,12 +551,12 @@ end;
 procedure TIpcCommon.Drop;
 var ds: TShmid_ds;
 begin
-  if ipc.shmctl(FSharedMemoryID,IPC_STAT,@ds) < 0 then
+  if shmctl(FSharedMemoryID,IPC_STAT,@ds) < 0 then
     IBError(ibxeLinuxAPIError,'Error getting shared memory info' + strError(errno));
   if ds.shm_nattch = 0 then  { we are the last one out - so, turn off the lights }
   begin
-    ipc.shmctl(FSharedMemoryID,IPC_RMID,nil);
-    ipc.semctl(FSharedSemaphoreID,IPC_RMID,nil);
+    shmctl(FSharedMemoryID,IPC_RMID,nil);
+    semctl(FSharedSemaphoreID,IPC_RMID,nil);
     unlink(IPCFileName);
   end;
 end;
@@ -631,14 +656,21 @@ end;
 
 { TSingleLockGate }
 {$IFDEF LINUX}
-constructor TSingleLockGate.Create(SemNum: cint; GateState: PInteger);
+constructor TSingleLockGate.Create(SemNum: cint; SignalledStateVar,
+                                     WaitingThreadsVar: PInteger);
 begin
   inherited Create;
-  FGateState := GateState;
-  FGateState := 1;
+  FSignalledState := SignalledStateVar;
+  FWaitingThreads := WaitingThreadsVar;
+  FSignalledState^ := 1;
+  FWaitingThreads^ := 0;
   FSemaphore := SemNum;
+  FMutex := SemNum + 1;
   if FInitialiser then
+  begin
     SemInit(FSemaphore,0);
+    SemInit(FMutex,1);
+  end;
 end;
 {$ELSE}
 
@@ -674,8 +706,13 @@ end;
 procedure TSingleLockGate.Passthrough;
 begin
 {$IFDEF LINUX}
-  if FGateState^ = 0 then
-    semop(FSemaphore,-1,0)
+  if FSignalledState^ = 0 then
+  begin
+    semop(FMutex,-1,0); //Acquire Mutex
+    Inc(FWaitingThreads^);
+    semop(FMutex,1,0); //Release Mutex
+    semop(FSemaphore,-1,0) //Enter Wait
+  end;
 {$ELSE}
   Result := WaitForSingleObject(FEvent,INDEFINITE)
 {$ENDIF}
@@ -684,10 +721,14 @@ end;
 procedure TSingleLockGate.Unlock;
 begin
 {$IFDEF LINUX}
-  if FGateState^ = 0 then
+  if FSignalledState^ = 0 then
   begin
-    FGateState^ := 1;
-    semop(FSemaphore,abs(GetSemValue(FSemaphore),0);
+    FSignalledState^ := 1;
+    semop(FMutex,-1,0); //Acquire Mutex
+    semop(FSemaphore,FWaitingThreads^,0);
+    FWaitingThreads^ := 0;
+    SemInit(FSemaphore,0); //Just in case a waiting thread was aborted
+    semop(FMutex,1,0); //Release Mutex
   end;
 {$ELSE}
   SetEvent(FEvent) //Event State set to "signaled"
@@ -697,8 +738,8 @@ end;
 procedure TSingleLockGate.Lock;
 begin
 {$IFDEF LINUX}
-  if FGateState^ = 1 then
-    FGateState^ := 0;
+  if FSignalledState^ = 1 then
+    FSignalledState^ := 0;
 {$ELSE}
   ResetEvent(FEvent) //Event State set to "unsignaled"
 {$ENDIF}
@@ -707,11 +748,17 @@ end;
 { TMultilockGate }
 
 {$IFDEF LINUX}
-constructor TMultilockGate.Create(SemNum: cint);
+constructor TMultilockGate.Create(SemNum: cint; LockCountVar: PInteger);
 begin
   FSemaphore := SemNum;
+  FMutex := SemNum + 1;
+  FLockCount := LockCount;
   if FInitialise then
+  begin
+    FLockCount^ := 0;
     SemInit(FSemaphore,1);
+    SemInit(FMutex,1);
+  end;
 end;
 {$ELSE}
 constructor TMultilockGate.Create(EventName: string; LockCount: PInteger);
@@ -745,19 +792,18 @@ begin
   inherited Destroy;
 end;
 
-function TMultilockGate.GetLockCount: integer;
+function TMultilockGate.GetLockCountCount: integer;
 begin
-{$IFDEF LINUX}
-  Result := abs(GetSemValue(FSemaphore));
-{$ELSE}
   Result := FLockCount^
-{$ENDIF}
 end;
 
 procedure TMultilockGate.Lock;
 begin
 {$IFDEF LINUX}
-  semop(FSemaphore,-1,IPC_NOWAIT);
+    semop(FMutex,-1,0); //Acquire Mutex
+    semop(FSemaphore,-1,IPC_NOWAIT);
+    Inc(FLockCount^);
+    semop(FMutex,1,0); //Release Mutex
 {$ELSE}
   InterlockedIncrement(FLockCount^);
   ResetEvent(FEvent);
@@ -767,7 +813,10 @@ end;
 procedure TMultilockGate.Unlock;
 begin
 {$IFDEF LINUX}
-  semop(FSemaphore,1,IPC_NOWAIT);
+    semop(FMutex,-1,0); //Acquire Mutex
+    Dec(FLockCount^);
+    semop(FSemaphore,-1,IPC_NOWAIT);
+    semop(FMutex,1,0); //Release Mutex
 {$ELSE}
   InterlockedDecrement(FLockCount^);
   if FLockCount^ = 0 then
