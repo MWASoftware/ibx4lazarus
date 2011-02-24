@@ -14,6 +14,7 @@
         </Debugging>
       </Linking>
       <Other>
+        <CustomOptions Value="-dHAS_SQLMONITOR"/>
         <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>

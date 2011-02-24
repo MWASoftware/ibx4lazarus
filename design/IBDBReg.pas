@@ -306,7 +306,7 @@ procedure Register;
 implementation
 
 uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
-     IBIntf, IBSQL, (*IBSQLMonitor,*) IBDatabaseInfo, IBEvents,
+     IBIntf, IBSQL, IBSQLMonitor, IBDatabaseInfo, IBEvents,
      IBServices, IBDatabaseEdit, IBTransactionEdit,
      IBBatchMove, DBLoginDlg, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
@@ -318,7 +318,7 @@ begin
   RegisterNoIcon([TIBStringField, TIBBCDField]);
   RegisterComponents(IBPalette1, [TIBTable, TIBQuery,
     TIBStoredProc, TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBBatchMove,
-    TIBDataSet, TIBSQL, TIBDatabaseInfo, (*TIBSQLMonitor,*) TIBEvents, TIBExtract]);
+    TIBDataSet, TIBSQL, TIBDatabaseInfo, TIBSQLMonitor, TIBEvents, TIBExtract]);
   if (TryIBLoad) and IBServiceAPIPresent  then
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
       TIBRestoreService, TIBValidationService, TIBStatisticalService,

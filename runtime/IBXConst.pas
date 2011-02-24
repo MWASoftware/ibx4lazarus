@@ -107,7 +107,11 @@ resourcestring
   SSQLParseError = 'SQL Parse Error:' + CRLF + CRLF + '%s';
   SUserAbort = 'User abort';
   SDataSetUniDirectional = 'Data set is uni-directional';
+  {$IFDEF LINUX}
+  SCannotCreateSharedResource = 'Cannot create shared resource. %s';
+  {$ELSE}
   SCannotCreateSharedResource = 'Cannot create shared resource. (Windows error %d)';
+  {$ENDIF}
   SWindowsAPIError = 'Windows API error. (Windows error %d [$%.8x])';
   SColumnListsDontMatch = 'Column lists do not match';
   SColumnTypesDontMatch = 'Column types don''t match. (From index: %d; To index: %d)';
