@@ -113,20 +113,19 @@ procedure EnableMonitoring;
 procedure DisableMonitoring;
 function MonitoringEnabled: Boolean;
 
-{$IFDEF LINUX}
-{$STATIC ON}
-const
-  IPCFileName: string = '.FB.SQL.MONITOR1_0';
-{$ENDIF}
-
 implementation
 
 uses
   contnrs {$IFDEF LINUX}, ipc, Errors, baseunix, {$IF FPC_FULLVERSION <= 20402 } initc {$ENDIF}{$ENDIF};
 
+{$IFDEF LINUX}
+{$STATIC ON}
+{$ENDIF}
+
 const
   cMonitorHookSize = 1024;
 {$IFDEF LINUX}
+  IPCFileName: string = 'FB.SQL.MONITOR1_0';
   cNumberOfSemaphores = 10;
   cMutexSemaphore = 0;
   cMonitorCounter = 1;
@@ -1113,12 +1112,12 @@ constructor TIBCustomSQLMonitor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FTraceFlags := [tfqPrepare .. tfMisc];
-  if not (csDesigning in ComponentState) then
+  if not (csDesigning in ComponentState)  then
   begin
     FHWnd := AllocateHWnd(MonitorWndProc);
     MonitorHook.RegisterMonitor(self);
   end;
-  FEnabled := true;
+  FEnabled := false;
 end;
 
 destructor TIBCustomSQLMonitor.Destroy;
@@ -1231,7 +1230,7 @@ procedure TIBSQLMonitorHook.RegisterMonitor(SQLMonitor: TIBCustomSQLMonitor);
 begin
   if not assigned(FGlobalInterface) then
     FGlobalInterface := TGlobalInterface.Create;
-  if not Assigned(FReaderThread) then
+ if not Assigned(FReaderThread) then
     FReaderThread := TReaderThread.Create(FGlobalInterface);
   FReaderThread.AddMonitor(SQLMonitor);
 end;
@@ -1531,6 +1530,7 @@ end;
 
 procedure TWriterThread.Execute;
 begin
+ try
   { Place thread code here }
   while ((not Terminated) and (not bDone)) or
         (FMsgs.Count <> 0) do
@@ -1558,6 +1558,7 @@ begin
       else
         Sleep(50);
   end;
+except end
 end;
 
 procedure TWriterThread.WriteSQLData(Msg : String; DataType: TTraceFlag);
@@ -1727,6 +1728,7 @@ var
   i : Integer;
   FTemp : TTraceObject;
 begin
+ try
   { Place thread code here }
   FGlobalInterface.ReadReadyEvent.Lock;           { Initialise Read Ready}
   while (not Terminated) and (not bDone) do
@@ -1745,6 +1747,8 @@ begin
       end;
     end;
   end;
+ except
+ end;
 end;
 
 procedure TReaderThread.ReadSQLData;
@@ -1821,7 +1825,10 @@ initialization
   FReaderThread := nil;
   bDone := False;
 {$IFDEF LINUX}
-  IPCFileName := strpas(FpGetEnv('HOME')) + '/' + IPCFileName;
+  if FpGetEnv('FBSQL_IPCFILENAME') <> nil then
+    IPCFileName := strpas(FpGetEnv('FBSQL_IPCFILENAME'))
+  else
+    IPCFileName := '/tmp/' + IPCFileName + '.' + strpas(FpGetEnv('USER'));
 {$ENDIF}
 
 finalization
