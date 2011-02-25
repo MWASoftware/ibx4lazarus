@@ -246,6 +246,8 @@ type
     procedure ReleaseMonitor(HWnd : THandle);
   end;
 
+  { TReaderThread }
+
   TReaderThread = class(TThread)
   private
     { Private declarations }
@@ -1117,7 +1119,7 @@ begin
   FTraceDataType^ := Integer(TraceObject.FDataType);
   FTimeStamp^ := TraceObject.FTimeStamp;
   FBufferSize^ := Min(Length(TraceObject.FMsg), MaxBufferSize);
-  Move(TraceObject.FMsg[1], FBuffer[0], FBufferSize^);
+  Move(TraceObject.FMsg[1], FBuffer^, FBufferSize^);
 end;
 
 procedure TGlobalInterface.ReceiveTrace(TraceObject: TTraceObject);
@@ -1524,7 +1526,6 @@ writeln('Unregister Monitor');
       FWriterThread.WriteSQLData(' ', tfMisc);
       writeln('Wait for read Terminate');
       FReaderThread.WaitFor;
-      Sleep(50);
       writeln('Freeing Reader Thread');
       FreeAndNil(FReaderThread);
       writeln('Reader Thread Freed');
@@ -1581,9 +1582,11 @@ writeln('Write Thread starts');
     { Any one listening? }
     if FGlobalInterface.DataAvailableEvent.WaitingThreads = 0 then
     begin
-    writeln('Write Thread Drop Message');
       if FMsgs.Count <> 0 then
-        Synchronize(RemoveFromList);
+      begin
+        writeln('Write Thread Drop Message');
+        RemoveFromList;
+      end;
       Sleep(50);
     end
     else
@@ -1611,7 +1614,12 @@ end;
 
 procedure TWriterThread.WriteSQLData(Msg : String; DataType: TTraceFlag);
 begin
-  FMsgs.Add(TTraceObject.Create(Msg, DataType));
+  EnterCriticalSection(CS);
+  try
+    FMsgs.Add(TTraceObject.Create(Msg, DataType));
+  finally
+    LeaveCriticalSection(CS);
+  end;
 end;
 
 procedure TWriterThread.BeginWrite;
@@ -1650,7 +1658,7 @@ begin
       monitor is ready.}
 
     if FGlobalInterface.DataAvailableEvent.WaitingThreads = 0 then
-      Synchronize(RemoveFromList)
+      RemoveFromList
     else
     begin
       i := 1;
@@ -1661,28 +1669,29 @@ begin
         try
           FGlobalInterface.SendTrace(TTraceObject(FMsgs[0]))
         finally
+          {Do this in the main thread so the main thread
+          adds and deletes}
+          RemoveFromList;
           EndWrite
         end;
       end
       else
       while len > 0 do
-      begin
+      try
         Temp := TTraceObject.Create(TTraceObject(FMsgs[0]),i,Min(len,FGlobalInterface.MaxBufferSize));
         try
           BeginWrite;
-          try
-            FGlobalInterface.SendTrace(Temp);
-            Inc(i,FGlobalInterface.MaxBufferSize);
-            Dec(len,FGlobalInterface.MaxBufferSize);
-          finally
-          {Do this in the main thread so the main thread
-          adds and deletes}
-            Synchronize(RemoveFromList);
-           EndWrite;
-          end;
+          FGlobalInterface.SendTrace(Temp);
+          Inc(i,FGlobalInterface.MaxBufferSize);
+          Dec(len,FGlobalInterface.MaxBufferSize);
         finally
           Temp.Free
         end
+      finally
+      {Do this in the main thread so the main thread
+       adds and deletes}
+       RemoveFromList;
+       EndWrite;
       end
     end;
   finally
@@ -1694,7 +1703,12 @@ end;
 procedure TWriterThread.RemoveFromList;
 begin
   writeln('Write Thread: Remove object From List');
-  FMsgs.Remove(FMsgs[0]); { Pop the written item }
+  EnterCriticalSection(CS);
+  try
+    FMsgs.Remove(FMsgs[0]); { Pop the written item }
+  finally
+    LeaveCriticalSection(CS);
+  end;
 end;
 
 procedure TWriterThread.ReleaseMonitor(HWnd: THandle);
@@ -1763,6 +1777,7 @@ begin
   FGlobalInterface.IncMonitorCount;
   FMonitors := TObjectList.Create(false);
   writeln('Reader Thread Created');
+  FGlobalInterface.ReadReadyEvent.Lock;           { Initialise Read Ready}
   Resume;
   Sleep(50);
 end;
@@ -1793,7 +1808,6 @@ begin
 writeln('Read Thread Starts');
  try
   { Place thread code here }
-  FGlobalInterface.ReadReadyEvent.Lock;           { Initialise Read Ready}
   while (not Terminated) and (not bDone) do
   begin
     ReadSQLData;
@@ -1898,6 +1912,7 @@ initialization
 {$ENDIF}
 
 finalization
+  writeln('Entered Finalisation');
   try
     { Write an empty string to force the reader to unlock during termination }
     bDone := True;
