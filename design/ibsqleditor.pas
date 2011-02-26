@@ -124,7 +124,7 @@ end;
 procedure TIBSQLEditorForm.FormShow(Sender: TObject);
 var IsProcedureName: boolean;
 begin
-  if SQLText.Text <> '' then
+  if Trim(SQLText.Text) = '' then
   begin
     case FIBSystemTables.GetStatementType(SQLText.Text,IsProcedureName) of
     SQLSelect:
@@ -151,7 +151,7 @@ procedure TIBSQLEditorForm.DeletePageShow(Sender: TObject);
 var TableName: string;
 begin
   FIBSystemTables.GetTableNames(DeleteTableNames.Items);
-  if SQLText.Text = '' then
+  if Trim(SQLText.Text) = '' then
   begin
     if FTableName <> '' then
       DeleteTableNames.ItemIndex := DeleteTableNames.Items.IndexOf(FTableName)
@@ -234,7 +234,7 @@ procedure TIBSQLEditorForm.InsertPageShow(Sender: TObject);
 var TableName: string;
 begin
   FIBSystemTables.GetTableNames(InsertTableNames.Items);
-  if SQLText.Text = '' then
+  if Trim(SQLText.Text) = '' then
   begin
     if FTableName <> '' then
       InsertTableNames.ItemIndex := InsertTableNames.Items.IndexOf(FTableName)
@@ -261,7 +261,7 @@ procedure TIBSQLEditorForm.ModifyPageShow(Sender: TObject);
 var TableName: string;
 begin
    FIBSystemTables.GetTableNames(ModifyTableNames.Items);
-  if SQLText.Text = '' then
+  if Trim(SQLText.Text) = '' then
   begin
     if FTableName <> '' then
       ModifyTableNames.ItemIndex := ModifyTableNames.Items.IndexOf(FTableName)
@@ -299,7 +299,7 @@ procedure TIBSQLEditorForm.SelectPageShow(Sender: TObject);
 var TableName: string;
 begin
   FIBSystemTables.GetTableNames(SelectTableNames.Items);
-  if SQLText.Text = '' then
+  if Trim(SQLText.Text) = '' then
   begin
     if FTableName <> '' then
       SelectTableNames.ItemIndex := SelectTableNames.Items.IndexOf(FTableName)

@@ -150,6 +150,7 @@ begin
   found := False;
   if Trim(Value) <> '' then
   begin
+    DatabaseParams.Lines.NameValueSeparator := '=';
     for i := 0 to DatabaseParams.Lines.Count - 1 do
     begin
       if (Pos(Name, LowerCase(DatabaseParams.Lines.Names[i])) = 1) then {mbcs ok}
@@ -232,7 +233,10 @@ var
   end;
 begin
   DecomposeDatabaseName;
-  DatabaseParams.Lines := Database.Params;
+  if Trim(Database.Params.Text) = '' then
+    DatabaseParams.Clear
+  else
+    DatabaseParams.Lines.Assign(Database.Params);
   LoginPrompt.Checked := Database.LoginPrompt;
   UserName.Text := GetParam('user_name');
   Password.Text := GetParam('password');

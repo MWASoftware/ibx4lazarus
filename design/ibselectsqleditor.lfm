@@ -11,9 +11,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   LCLVersion = '0.9.28.2'
   object Label3: TLabel
     Left = 279
-    Height = 18
+    Height = 19
     Top = 16
-    Width = 27
+    Width = 29
     Caption = 'SQL'
     ParentColor = False
   end
@@ -47,9 +47,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   end
   object Button3: TButton
     Left = 279
-    Height = 29
+    Height = 30
     Top = 380
-    Width = 102
+    Width = 112
     AutoSize = True
     Caption = 'Generate SQL'
     OnClick = Button3Click
@@ -68,7 +68,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Left = 16
     Height = 22
     Top = 380
-    Width = 129
+    Width = 144
     Caption = '&Quote Identifiers'
     TabOrder = 5
   end
@@ -82,7 +82,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 6
     object SelectPage: TTabSheet
       Caption = 'Tables'
-      ClientHeight = 300
+      ClientHeight = 299
       ClientWidth = 226
       OnShow = SelectPageShow
       object Label1: TLabel
@@ -145,36 +145,36 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     end
     object ExecutePage: TTabSheet
       Caption = 'Procedures'
-      ClientHeight = 300
+      ClientHeight = 299
       ClientWidth = 226
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
-        Height = 18
+        Height = 19
         Top = 3
-        Width = 109
+        Width = 121
         Caption = 'Procedure Name'
         ParentColor = False
       end
       object Label17: TLabel
         Left = 10
-        Height = 18
+        Height = 19
         Top = 69
-        Width = 111
+        Width = 125
         Caption = 'Input Parameters'
         ParentColor = False
       end
       object Label18: TLabel
         Left = 11
-        Height = 18
+        Height = 19
         Top = 190
-        Width = 123
+        Width = 138
         Caption = 'Output Parameters'
         ParentColor = False
       end
       object ProcedureNames: TComboBox
         Left = 7
-        Height = 29
+        Height = 30
         Top = 20
         Width = 201
         ItemHeight = 0

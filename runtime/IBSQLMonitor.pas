@@ -687,8 +687,6 @@ begin
     sembuf.sem_op:= op;
     sembuf.sem_flg := flags or SEM_UNDO;
     Result := semop(FSemaphoreSetID,@sembuf,1);
-    if Result < 0 then
-       IBError(ibxeLinuxAPIError,[strError(fpgeterrno)]);
 end;
 
 function TIpcCommon.sem_timedop(SemNum, op: integer; timeout_secs: integer;
@@ -702,8 +700,6 @@ begin
     timeout.tv_sec := timeout_secs;
     timeout.tv_nsec := 0;
     Result := semtimedop(FSemaphoreSetID,@sembuf,1,@timeout);
-    if Result < 0 then
-       IBError(ibxeLinuxAPIError,[strError(fpgeterrno)]);
 end;
 
 function TIpcCommon.GetSemValue(SemNum: integer): cint;
@@ -711,7 +707,7 @@ var args :TSEMun;
 begin
   Result := semctl(FSemaphoreSetID,SemNum,SEM_GETVAL,args);
   if Result < 0 then
-     IBError(ibxeLinuxAPIError,[strError(fpgeterrno)]);
+     IBError(ibxeLinuxAPIError,['GetSemVale: '+strError(fpgeterrno)]);
 end;
 
 procedure TIpcCommon.SemInit(SemNum, AValue: cint);
@@ -1001,6 +997,8 @@ end;
 procedure TMultilockGate.PassthroughGate;
 {$IFDEF LINUX}
 begin
+  if FLockCount^ = 0 then
+    Exit;
   //writeln(ClassName,': Waiting on ',FSemaphore);
   while sem_timedop(FSemaphore,-1,cDefaultTimeout) < 0 do
   {looks like we lost a reader}
@@ -1567,6 +1565,7 @@ end;
 procedure TWriterThread.Execute;
 begin
 //writeln('Write Thread starts');
+try
   { Place thread code here }
   while ((not Terminated) and (not bDone)) or
         (FMsgs.Count <> 0) do
@@ -1600,6 +1599,9 @@ begin
       else
         Sleep(50);
   end;
+except on E: Exception do
+  writeln('Writer: ',E.Message)
+end;
   //writeln('Write Thread Ends');
 end;
 
@@ -1812,8 +1814,10 @@ begin
 end;
 
 procedure TReaderThread.Execute;
+var err: string;
 begin
 //writeln('Read Thread Starts');
+try
   { Place thread code here }
   while (not Terminated) and (not bDone) do
   begin
@@ -1825,6 +1829,12 @@ begin
         Synchronize(AlertMonitors);
     end;
   end;
+except on E: Exception do
+begin
+  Err := E.Message;
+ writeln('Reader: ',E.Message)
+ end
+end;
   //writeln('Read Thread Ends');
 end;
 

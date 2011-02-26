@@ -102,7 +102,7 @@ end;
 procedure TIBSelectSQLEditorForm.FormShow(Sender: TObject);
 var IsProcedureName: boolean;
 begin
-  if SQLText.Text <> '' then
+  if Trim(SQLText.Text) <> '' then
   begin
     FIBSystemTables.GetStatementType(SQLText.Text,IsProcedureName);
     if IsProcedureName then
@@ -133,7 +133,7 @@ begin
   if TableNamesCombo.Items.Count > 0 then
   begin
     TableNamesCombo.ItemIndex := 0;
-    if SQLText.Text <> '' then
+    if Trim(SQLText.Text) <> '' then
     begin
       FIBSystemTables.GetTableAndColumns(SQLText.Text,TableName,nil);
       TableNamesCombo.ItemIndex := TableNamesCombo.Items.IndexOf(TableName)

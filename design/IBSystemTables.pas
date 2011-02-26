@@ -336,8 +336,9 @@ procedure TIBSystemTables.GetTableAndColumns(SelectSQL: string;
   var FirstTableName: string; Columns: TStrings);
 var I: integer;
 begin
+  FirstTableName := '';
   if not assigned(FTableAndColumnSQL.Database) or not FTableAndColumnSQL.Database.Connected or
-    not assigned(FTableAndColumnSQL.Transaction) then
+    not assigned(FTableAndColumnSQL.Transaction) or (Trim(SelectSQL) = '') then
     Exit;
   with FTableAndColumnSQL.Transaction do
     if not InTransaction then StartTransaction;
@@ -572,8 +573,9 @@ end;
 function TIBSystemTables.GetStatementType(SQL: string; var IsStoredProcedure: boolean): TIBSQLTypes;
 var TableName: string;
 begin
+  Result := sqlUnknown;
   if not assigned(FTestSQL.Database) or not FTestSQL.Database.Connected or
-    not assigned(FTestSQL.Transaction) then
+    not assigned(FTestSQL.Transaction) or (Trim(SQL) = '') then
     Exit;
   IsStoredProcedure := false;
   FTestSQL.SQL.Text := SQL;
