@@ -34,7 +34,7 @@ interface
 
 uses
 {$IFDEF LINUX }
-  {$IFNDEF DESIGNTIME} cthreads,{$ENDIF}unix,
+  unix,
 {$ELSE}
   Windows,
 {$ENDIF}  Classes, Graphics, Controls,
