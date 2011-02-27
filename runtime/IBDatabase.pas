@@ -24,6 +24,11 @@
 {       Corporation. All Rights Reserved.                                }
 {    Contributor(s): Jeff Overcash                                       }
 {                                                                        }
+{    IBX For Lazarus (Firebird Express)                                  }
+{    Contributor: Tony Whyman, MWA Software (http://www.mwasoftare.co.uk }
+{    Portions created by MWA Software are copyright McCallum Whyman      }
+{    Associates Ltd 2011                                                 }
+{                                                                        }
 {************************************************************************}
 
 unit IBDatabase;
@@ -33,11 +38,10 @@ unit IBDatabase;
 interface
 
 uses
-{$IFDEF LINUX }
-  unix,
-{$ELSE}
-{$DEFINE HAS_SQLMONITOR}
+{$IFDEF WINDOWS }
   Windows,
+{$ELSE}
+  unix,
 {$ENDIF}
   Dialogs, Controls, StdCtrls, SysUtils, Classes, Forms, ExtCtrls, IBHeader, IBExternals, DB,
   IB, DBLoginDlg;
@@ -408,7 +412,7 @@ procedure GenerateTPB(sl: TStrings; var TPB: string; var TPBLength: Short);
 
 implementation
 
-uses IBIntf,{$IFDEF HAS_SQLMONITOR}IBSQLMonitor,{$ENDIF} IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils, typInfo;
+uses IBIntf, IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils, typInfo;
 
 { TIBDatabase }
 
@@ -509,7 +513,7 @@ function TIBDatabase.AddSQLObject(ds: TIBBase): Integer;
 begin
   result := 0;
   if (ds.Owner is TIBCustomDataSet) then
-  {$IFDEF LINUX}
+  {$IFDEF FPC}
       FDataSets.Add(TDataSet(ds.Owner));
   {$ELSE}
       RegisterClient(TDataSet(ds.Owner));
@@ -730,10 +734,8 @@ begin
     FHandleIsShared := False;
   end;
 
-  {$IFDEF HAS_SQLMONITOR}
   if not (csDesigning in ComponentState) then
     MonitorHook.DBDisconnect(Self);
-  {$ENDIF}
 
   for i := 0 to FSQLObjects.Count - 1 do
     if FSQLObjects[i] <> nil then
@@ -905,10 +907,8 @@ begin
   end;
   FDBSQLDialect := GetDBSQLDialect;
   ValidateClientSQLDialect;
-  {$IFDEF HAS_SQLMONITOR}
   if not (csDesigning in ComponentState) then
     MonitorHook.DBConnect(Self);
-  {$ENDIF}
 end;
 
 procedure TIBDatabase.RemoveSQLObject(Idx: Integer);
@@ -921,7 +921,7 @@ begin
     FSQLObjects[Idx] := nil;
     ds.Database := nil;
     if (ds.owner is TDataSet) then
-    {$IFDEF LINUX}
+    {$IFDEF FPC}
       FDataSets.Remove(TDataSet(ds.Owner));
     {$ELSE}
       UnregisterClient(TDataSet(ds.Owner));
@@ -937,7 +937,7 @@ begin
   begin
     RemoveSQLObject(i);
     if (TIBBase(FSQLObjects[i]).owner is TDataSet) then
-    {$IFDEF LINUX}
+    {$IFDEF FPC}
       FDataSets.Remove(TDataSet(TIBBase(FSQLObjects[i]).owner));
     {$ELSE}
       UnregisterClient(TDataSet(TIBBase(FSQLObjects[i]).owner));
@@ -1452,7 +1452,6 @@ begin
     TARollbackRetaining:
       Call(isc_rollback_retaining(StatusVector, @FHandle), True);
   end;
-  {$IFDEF HAS_SQLMONITOR}
   if not (csDesigning in ComponentState) then
   begin
     case Action of
@@ -1466,7 +1465,6 @@ begin
         MonitorHook.TRRollbackRetaining(Self);
     end;
   end;
-  {$ENDIF}
 end;
 
 function TIBTransaction.GetDatabase(Index: Integer): TIBDatabase;
@@ -1740,10 +1738,8 @@ begin
       FHandle := nil;
       IBDataBaseError;
     end;
-  {$IFDEF HAS_SQLMONITOR}
     if not (csDesigning in ComponentState) then
       MonitorHook.TRStart(Self);
-  {$ENDIF}
   finally
     FreeMem(pteb);
   end;

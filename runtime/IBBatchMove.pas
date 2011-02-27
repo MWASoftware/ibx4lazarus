@@ -24,6 +24,11 @@
 {       Corporation. All Rights Reserved.                                }
 {    Contributor(s): Jeff Overcash                                       }
 {                                                                        }
+{    IBX For Lazarus (Firebird Express)                                  }
+{    Contributor: Tony Whyman, MWA Software (http://www.mwasoftare.co.uk }
+{    Portions created by MWA Software are copyright McCallum Whyman      }
+{    Associates Ltd 2011                                                 }
+{                                                                        }
 {************************************************************************}
 
 unit IBBatchMove;
@@ -33,10 +38,10 @@ unit IBBatchMove;
 interface
 
 uses
-{$IFDEF LINUX }
-  unix,
-{$ELSE}
+{$IFDEF WINDOWS }
   Windows,
+{$ELSE}
+  unix,
 {$ENDIF}
   SysUtils, {Graphics,} Classes, Controls, Db,
      IB, IBCustomDataSet, IBDatabase, IBTable;

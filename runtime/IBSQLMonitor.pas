@@ -24,7 +24,18 @@
 {       Corporation. All Rights Reserved.                                }
 {    Contributor(s): Jeff Overcash                                       }
 {                                                                        }
+{    IBX For Lazarus (Firebird Express)                                  }
+{    Contributor: Tony Whyman, MWA Software (http://www.mwasoftare.co.uk }
+{    Portions created by MWA Software are copyright McCallum Whyman      }
+{    Associates Ltd 2011                                                 }
+{                                                                        }
 {************************************************************************}
+
+{
+  This unit has been significantly revised for the Lazarus port. Specially,
+  there was a need to re-organise the code to isolate the Windows specific
+  IPC and to introduce SV5 IPC as an alternative for Linux and other platforms.
+}
 
 unit IBSQLMonitor;
 
@@ -36,11 +47,19 @@ uses
   LMessages, Messages, LCLIntf, LCLType, LCLProc,  Forms, Controls, Dialogs,
   IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, IBXConst,SysUtils,
   Classes,
-{$IFDEF LINUX }
-  unix
-{$ELSE}
+{$IFDEF WINDOWS }
+{$DEFINE USE_WINDOWS_IPC}
+{$DEFINE USE_POSTMESSAGE}
   Windows
-{$ENDIF}  ;
+{$ELSE}
+  unix
+{$ENDIF}
+;
+
+{$IFDEF LINUX}
+{$DEFINE USE_SV5_IPC}
+{$DEFINE HAS_SEMTIMEDOP}
+{$ENDIF}
 
 const
   WM_MIN_IBSQL_MONITOR = WM_USER;
@@ -56,20 +75,26 @@ type
   { TIBCustomSQLMonitor }
 
   TIBCustomSQLMonitor = class(TComponent)
+  {$IFDEF USE_POSTMESSAGE}
+  private
+    FHWnd: HWND;
+    procedure MonitorWndProc(var Message : TMessage);
+  {$ENDIF}
   private
     FOnSQLEvent: TSQLEvent;
     FTraceFlags: TTraceFlags;
     FEnabled: Boolean;
     procedure SetEnabled(const Value: Boolean);
   protected
+    procedure ReleaseObject(Ignored: PtrInt);  {Called from Writer Thread}
+    procedure ReceiveMessage(Data: PtrInt);    {Called from Reader Thread}
     property OnSQL: TSQLEvent read FOnSQLEvent write FOnSQLEvent;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
     property Enabled : Boolean read FEnabled write SetEnabled default true;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Release(Dummy: PtrInt);
-    procedure ReceiveMessage(Data: PtrInt);
+    procedure Release;
   end;
 
   TIBSQLMonitor = class(TIBCustomSQLMonitor)
@@ -117,15 +142,18 @@ function MonitoringEnabled: Boolean;
 implementation
 
 uses
-   contnrs {$IFDEF LINUX}, ipc, Errors, baseunix, {$IF FPC_FULLVERSION <= 20402 } initc {$ENDIF}{$ENDIF};
-
-{$IFDEF LINUX}
-{$STATIC ON}
-{$ENDIF}
+   contnrs, syncobjs,
+   {$IFDEF USE_SV5_IPC}
+   {$STATIC ON}
+   ipc, Errors, baseunix,
+   {$IF FPC_FULLVERSION <= 20402 } initc
+   {$ENDIF}{$ENDIF};
 
 const
   cMonitorHookSize = 1024;
-{$IFDEF LINUX}
+  cMsgWaitTime = 1000;
+  cWriteMessageAvailable = 'WriterMsgQueue';
+{$IFDEF USE_SV5_IPC}
   IPCFileName: string = 'FB.SQL.MONITOR1_0';
   cNumberOfSemaphores = 10;
   cMutexSemaphore = 0;
@@ -135,7 +163,8 @@ const
   cDataAvailableEventSemaphore = 6;
   cWriterBusyEventSemaphore = 8;
   cDefaultTimeout = 1; { 1 seconds }
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   MonitorHookNames: array[0..5] of String = (
     'FB.SQL.MONITOR.Mutex1_0',
     'FB.SQL.MONITOR.SharedMem1_0',
@@ -147,8 +176,9 @@ const
   cDefaultTimeout = 500; { 1 seconds }
 {$ENDIF}
 
+{$IFDEF USE_SV5_IPC}
 {
-  The call to semctl in ipc is broken in release 2.4.2 and earlier. Hence
+  The call to semctl in ipc is broken in FPC release 2.4.2 and earlier. Hence
   need to replace with a working libc call. semtimedop is not present in 2.4.2 and earlier.
 }
 
@@ -159,9 +189,12 @@ Function semctl(semid:cint; semnum:cint; cmd:cint; var arg: tsemun): cint;
   begin
     semctl := real_semctl(semid,semnum,cmd,pointer(arg));
   end;
+{$IFDEF HAS_SEMTIMEDOP}
 Function semtimedop(semid:cint; sops: psembuf; nsops: cuint; timeOut: ptimespec): cint; cdecl; external clib name 'semtimedop';
+{$ENDIF}
 Function semget(key:Tkey; nsems:cint; semflg:cint): cint; cdecl; external clib name 'semget';
 Function semop(semid:cint; sops: psembuf; nsops: cuint): cint; cdecl; external clib name 'semop';
+{$ENDIF}
 {$ENDIF}
 
 type
@@ -234,8 +267,10 @@ type
   TWriterThread = class(TThread)
   private
     { Private declarations }
-   FGlobalInterface: TGlobalInterface;
-   FMsgs : TObjectList;
+    FGlobalInterface: TGlobalInterface;
+    FMsgs : TObjectList;
+    FCriticalSection: TCriticalSection;
+    FMsgAvailable: TEventObject;
     procedure RemoveFromList;
     procedure PostRelease;
   protected
@@ -258,6 +293,7 @@ type
     st : TTraceObject;
     FMonitors : TObjectList;
     FGlobalInterface: TGlobalInterface;
+    FCriticalSection: TCriticalSection;
     procedure AlertMonitors;
   protected
     procedure BeginRead;
@@ -277,8 +313,10 @@ type
   { TIpcCommon }
 
   TIpcCommon = class
+  private
+    function GetSa: PSecurityAttributes;
   protected
-    {$IFDEF LINUX}
+    {$IFDEF USE_SV5_IPC}
     FSemaphoreSetID: cint;  static;
     FSharedMemoryID: cint;  static;
     FInitialiser: boolean;  static;
@@ -286,11 +324,13 @@ type
     function sem_timedop(SemNum, op: integer; timeout_secs: integer; flags: cshort = 0): cint;
     function GetSemValue(SemNum: integer): cint;
     procedure SemInit(SemNum, AValue: cint);
-    {$ELSE}
-    Sa : TSecurityAttributes;
+    {$ENDIF}
+    {$IFDEF USE_WINDOWS_IPC}
+    FSa : TSecurityAttributes;
     {$ENDIF}
   public
     constructor Create;
+    property Sa : PSecurityAttributes read GetSa;
   end;
 
   { TSharedMemory }
@@ -326,9 +366,10 @@ type
     FLastAllocationSize: integer;
     FUnused: integer;
     FBufptr: PChar;
-    {$IFDEF LINUX}
+    {$IFDEF USE_SV5_IPC}
     procedure DropSharedMemory;
-    {$ELSE}
+    {$ENDIF}
+    {$IFDEF USE_WINDOWS_IPC}
     FSharedBuffer: THandle;
     {$ENDIF}
     procedure GetSharedMemory(MemSize: integer);
@@ -343,16 +384,18 @@ type
 
   TMutex = class(TIpcCommon)
   private
-    {$IFDEF LINUX}
+    {$IFDEF USE_SV5_IPC}
     FMutexSemaphore: cint;
     FLockCount: integer;
-    {$ELSE}
+    {$ENDIF}
+    {$IFDEF USE_WINDOWS_IPC}
     FMutex: THandle;
     {$ENDIF}
   public
-    {$IFDEF LINUX}
+    {$IFDEF USE_SV5_IPC}
     constructor Create(SemNumber: cint);
-    {$ELSE}
+    {$ENDIF}
+    {$IFDEF USE_WINDOWS_IPC}
     constructor Create(MutexName: string);
     {$ENDIF}
     destructor Destroy; override;
@@ -400,19 +443,21 @@ type
   TSingleLockGate = class(TIpcCommon)
   private
     FOwner: TGlobalInterface;
-    {$IFDEF LINUX}
+    {$IFDEF USE_SV5_IPC}
     FSemaphore: cint;
     FMutex: cint;
     FSignalledState: PInteger;
     FWaitingThreads: PInteger;
     function GetWaitingThreads: integer;
-    {$ELSE}
+    {$ENDIF}
+    {$IFDEF USE_WINDOWS_IPC}
     FEvent: THandle;
     {$ENDIF}
   public
-    {$IFDEF LINUX}
+    {$IFDEF USE_SV5_IPC}
     constructor Create(SemNum: cint; AOwner: TGlobalInterface);
-    {$ELSE}
+    {$ENDIF}
+    {$IFDEF USE_WINDOWS_IPC}
     constructor Create(EventName: string; AOwner: TGlobalInterface);
     constructor Open(EventName: string);
     {$ENDIF}
@@ -476,18 +521,20 @@ type
   private
     FOnGateTimeout: TNotifyEvent;
     FOwner: TGlobalInterface;
-    {$IFDEF LINUX}
+    {$IFDEF USE_SV5_IPC}
     FSemaphore: cint;
     FMutex: cint;
-    {$ELSE}
+    {$ENDIF}
+    {$IFDEF USE_WINDOWS_IPC}
     FEvent: THandle;
     {$ENDIF}
     FLockCount: PInteger;
     function GetLockCount: integer;
   public
-    {$IFDEF LINUX}
+    {$IFDEF USE_SV5_IPC}
     constructor Create(SemNum: cint; AOwner: TGlobalInterface);
-    {$ELSE}
+    {$ENDIF}
+    {$IFDEF USE_WINDOWS_IPC}
     constructor Create(EventName: string; AOwner: TGlobalInterface);
     {$ENDIF}
     destructor Destroy; override;
@@ -513,7 +560,7 @@ type
     FReadFinishedEvent: TMultiLockGate;
     FDataAvailableEvent: TSingleLockGate;
     FWriterBusyEvent: TSingleLockGate;
-    {$IFNDEF LINUX}
+    {$IFNDEF USE_SV5_IPC}
     FMonitorCount: PInteger;
     procedure HandleGateTimeout(Sender: TObject);
     {$ENDIF}
@@ -537,7 +584,7 @@ type
 
 { TSharedMemory }
 
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
 procedure TSharedMemory.GetSharedMemory(MemSize: integer);
 var F: cint;
 begin
@@ -597,10 +644,11 @@ begin
     end;
     fpClose(F);
 end;
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
 procedure TSharedMemory.GetSharedMemory(MemSize: integer);
 begin
-  FSharedBuffer := CreateFileMapping($FFFFFFFF, @sa, PAGE_READWRITE,
+  FSharedBuffer := CreateFileMapping($FFFFFFFF, sa, PAGE_READWRITE,
                        0, MemSize, PChar(MonitorHookNames[1]));
 
   if GetLastError = ERROR_ALREADY_EXISTS then
@@ -612,13 +660,13 @@ begin
 end;
 {$ENDIF}
 
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
 procedure TSharedMemory.DropSharedMemory;
 var ds: TShmid_ds;
     arg: tsemun;
 begin
   if shmctl(FSharedMemoryID,IPC_STAT,@ds) < 0 then
-    IBError(ibxeLinuxAPIError,['Error getting shared memory info' + strError(Fpgeterrno)]);
+    IBError(ibxeSV5APIError,['Error getting shared memory info' + strError(Fpgeterrno)]);
   if ds.shm_nattch = 0 then  { we are the last one out - so, turn off the lights }
   begin
     shmctl(FSharedMemoryID,IPC_RMID,nil);
@@ -633,11 +681,12 @@ begin
   inherited Create;
   FInitialiser := false;
   GetSharedMemory(MemSize);
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   FBuffer := shmat(FSharedMemoryID,nil,0);
   if integer(FBuffer) = -1 then
     IBError(ibxeCannotCreateSharedResource,[StrError(Errno)]);
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   FBuffer := MapViewOfFile(FSharedBuffer, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 
   if FBuffer = nil then
@@ -649,10 +698,11 @@ end;
 
 destructor TSharedMemory.Destroy;
 begin
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   shmdt(FBuffer);
   DropSharedMemory;
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   UnmapViewOfFile(FBuffer);
   CloseHandle(FSharedBuffer);
 {$ENDIF}
@@ -680,6 +730,15 @@ end;
 
 { TIpcCommon }
 
+function TIpcCommon.GetSa: PSecurityAttributes;
+begin
+  {$IFDEF USE_WINDOWS_IPC}
+  Result := @FSa
+  {$ELSE}
+  Result := nil
+  {$ENDIF}
+end;
+
 function TIpcCommon.sem_op(SemNum, op: integer; flags: cshort): cint;
 var sembuf: TSEMbuf;
 begin
@@ -699,7 +758,11 @@ begin
     sembuf.sem_flg := flags or SEM_UNDO;
     timeout.tv_sec := timeout_secs;
     timeout.tv_nsec := 0;
+{$IFDEF HAS_SEMTIMEDOP}
     Result := semtimedop(FSemaphoreSetID,@sembuf,1,@timeout);
+{$ELSE}
+    Result := sem_op(FSemaphoreSetID,@sembuf,1);    {May hang on race condition}
+{$ENDIF}
 end;
 
 function TIpcCommon.GetSemValue(SemNum: integer): cint;
@@ -707,7 +770,7 @@ var args :TSEMun;
 begin
   Result := semctl(FSemaphoreSetID,SemNum,SEM_GETVAL,args);
   if Result < 0 then
-     IBError(ibxeLinuxAPIError,['GetSemVale: '+strError(fpgeterrno)]);
+     IBError(ibxeSV5APIError,['GetSemVale: '+strError(fpgeterrno)]);
 end;
 
 procedure TIpcCommon.SemInit(SemNum, AValue: cint);
@@ -721,13 +784,14 @@ begin
 
 end;
 
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
 constructor TIpcCommon.Create;
 begin
  {nothing}
 end;
 
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
 constructor TIpcCommon.Create;
 var Sd : TSecurityDescriptor;
 begin
@@ -736,16 +800,16 @@ begin
 
   InitializeSecurityDescriptor(@Sd,SECURITY_DESCRIPTOR_REVISION);
   SetSecurityDescriptorDacl(@Sd,true,nil,false);
-  Sa.nLength := SizeOf(Sa);
-  Sa.lpSecurityDescriptor := @Sd;
-  Sa.bInheritHandle := true;
+  FSa.nLength := SizeOf(Sa);
+  FSa.lpSecurityDescriptor := @Sd;
+  FSa.bInheritHandle := true;
 end;
 {$ENDIF}
 
 
   { TMutex }
 
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
 constructor TMutex.Create(SemNumber: cint);
 begin
   inherited Create;
@@ -754,12 +818,13 @@ begin
     SemInit(FMutexSemaphore,1)
 end;
 
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
 constructor TMutex.Create(MutexName: string);
 begin
   inherited Create;
   if FInitialiser then
-    FMutex := CreateMutex(@sa, False, PChar(MutexName))
+    FMutex := CreateMutex(sa, False, PChar(MutexName))
   else
     FMutex := OpenMutex(MUTEX_ALL_ACCESS, False, PChar(MutexName));
 
@@ -771,7 +836,7 @@ end;
 
 destructor TMutex.Destroy;
 begin
-{$IFNDEF LINUX}
+{$IFNDEF USE_SV5_IPC}
   CloseHandle(FMutex);
 {$ENDIF}
   inherited Destroy;
@@ -780,14 +845,15 @@ end;
 { Obtain ownership of the Mutex and prevent other threads from accessing protected resource }
 
 procedure TMutex.Lock;
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
 begin
   //writeln('Lock: Entering Mutex ',FMutexSemaphore,' LockCount=',FLockCount,' State = ',GetSemValue(FMutexSemaphore));
   if FLockCount = 0 then
     sem_op(FMutexSemaphore,-1);
   Inc(FLockCount);
   //writeln('Lock: Mutex Exit');
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
 begin
   WaitForSingleObject(FMutex, INFINITE);
 {$ENDIF}
@@ -797,20 +863,21 @@ end;
 
 procedure TMutex.Unlock;
 begin
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   //writeln('UnLock: Entering Mutex, LockCount=',FLockCount);
   if FLockCount = 0 then Exit;
   Dec(FLockCount);
   if FLockCount = 0 then
     sem_op(FMutexSemaphore,1);
   //writeln('UnLock: Mutex Exit',' State = ',GetSemValue(FMutexSemaphore));
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   ReleaseMutex(FMutex);
 {$ENDIF}
 end;
 
 { TSingleLockGate }
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
 
 function TSingleLockGate.GetWaitingThreads: integer;
 begin
@@ -833,14 +900,14 @@ begin
     SemInit(FMutex,1);
   end;
 end;
-{$ELSE}
-
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
 constructor TSingleLockGate.Create(EventName: string; AOwner: TGlobalInterface);
 begin
   inherited Create;
   FOwner := AOwner;
   if FInitialiser then
-    FEvent := CreateEvent(@sa, true, true, PChar(EventName))
+    FEvent := CreateEvent(sa, true, true, PChar(EventName))
   else
     FEvent := OpenEvent(EVENT_ALL_ACCESS, true, PChar(EventName));
 
@@ -852,7 +919,7 @@ end;
 
 destructor TSingleLockGate.Destroy;
 begin
-{$IFNDEF LINUX}
+{$IFNDEF USE_SV5_IPC}
   CloseHandle(FEvent);
 {$ENDIF}
   inherited Destroy;
@@ -861,7 +928,7 @@ end;
 
 procedure TSingleLockGate.PassthroughGate;
 begin
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   if FSignalledState^ = 0 then
   begin
     sem_op(FMutex,-1,0); //Acquire Mutex
@@ -871,14 +938,15 @@ begin
     sem_op(FSemaphore,-1,0); //Enter Wait
     //writeln(ClassName + ': Wait State Ends ',FSemaphore);
   end;
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   Result := WaitForSingleObject(FEvent,INDEFINITE)
 {$ENDIF}
 end;
 
 procedure TSingleLockGate.Unlock;
 begin
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   if FSignalledState^ = 0 then
   begin
     FSignalledState^ := 1;
@@ -888,28 +956,30 @@ begin
     FWaitingThreads^ := 0;
     sem_op(FMutex,1,0); //Release Mutex
   end;
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   SetEvent(FEvent) //Event State set to "signaled"
 {$ENDIF}
 end;
 
 procedure TSingleLockGate.Lock;
 begin
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   if FSignalledState^ = 1 then
   begin
     //writeln(ClassName + ': Locking Gate ',FSemaphore);
     SemInit(FSemaphore,0);
     FSignalledState^ := 0;
   end;
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   ResetEvent(FEvent) //Event State set to "unsignaled"
 {$ENDIF}
 end;
 
 { TMultilockGate }
 
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
 constructor TMultilockGate.Create(SemNum: cint; AOwner: TGlobalInterface);
 begin
   inherited Create;
@@ -924,7 +994,8 @@ begin
     SemInit(FMutex,1);
   end;
 end;
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
 constructor TMultilockGate.Create(EventName: string; AOwner: TGlobalInterface);
 begin
   inherited Create;
@@ -932,7 +1003,7 @@ begin
   FLockCount := PInteger(FOwner.SharedMemory.Allocate(sizeof(FLockCount)));
   FLockCount^ := 0;
   if Initialiser then
-    FEvent := CreateEvent(@sa, true, true, PChar(EventName))
+    FEvent := CreateEvent(sa, true, true, PChar(EventName))
   else
     FEvent := OpenEvent(EVENT_ALL_ACCESS, true, PChar(EventName));
 
@@ -944,7 +1015,7 @@ end;
 
 destructor TMultilockGate.Destroy;
 begin
-{$IFNDEF LINUX}
+{$IFNDEF USE_SV5_IPC}
   CloseHandle(FEvent);
 {$ENDIF}
   inherited Destroy;
@@ -957,7 +1028,7 @@ end;
 
 procedure TMultilockGate.Lock;
 begin
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
     sem_op(FMutex,-1,0); //Acquire Mutex
     if FLockCount^ = 0 then
     begin
@@ -966,7 +1037,8 @@ begin
     end;
     Inc(FLockCount^);
     sem_op(FMutex,1,0); //Release Mutex
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   InterlockedIncrement(FLockCount^);
   ResetEvent(FEvent);
 {$ENDIF}
@@ -974,7 +1046,7 @@ end;
 
 procedure TMultilockGate.Unlock;
 begin
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
     sem_op(FMutex,-1,0); //Acquire Mutex
     Dec(FLockCount^);
     if FLockCount^ <= 0 then
@@ -984,7 +1056,8 @@ begin
       FLockCount^ := 0
     end;
     sem_op(FMutex,1,0); //Release Mutex
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   InterlockedDecrement(FLockCount^);
   if FLockCount^ <= 0 then
   begin
@@ -995,7 +1068,7 @@ begin
 end;
 
 procedure TMultilockGate.PassthroughGate;
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
 begin
   if FLockCount^ = 0 then
     Exit;
@@ -1012,7 +1085,8 @@ begin
   end;
   sem_op(FSemaphore,1);
   //writeln(ClassName,': Wait done on ',FSemaphore);
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
 begin
   while WaitForSingleObject(FEvent,cDefaultTimeout)= WAIT_TIMEOUT do
   { If we have timed out then we have lost a reader }
@@ -1032,14 +1106,15 @@ end;
 
 function TGlobalInterface.GetMonitorCount: integer;
 begin
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   Result := GetSemValue(cMonitorCounter)
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   Result := FMonitorCount^
 {$ENDIF}
 end;
 
-{$IFNDEF LINUX}
+{$IFNDEF USE_SV5_IPC}
 procedure TGlobalInterface.HandleGateTimeout(Sender: TObject);
 begin
   DecMonitorCount
@@ -1051,7 +1126,7 @@ begin
   inherited Create;
   FSharedMemory := TSharedMemory.Create(cMonitorHookSize);
 
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   FWriteLock := TMutex.Create(cMutexSemaphore);
 
   FDataAvailableEvent := TSingleLockGate.Create(cDataAvailableEventSemaphore,self);
@@ -1061,7 +1136,8 @@ begin
 
   if FInitialiser then
     SemInit(cMonitorCounter,0);
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   FWriteLock := TMutex.Create(PChar(MonitorHookNames[0]));
   FDataAvailableEvent := TSingleLockGate.Create(MonitorHookNames[2],self);
   FWriterBusyEvent := TSingleLockGate.Create(MonitorHookNames[3],self);
@@ -1101,18 +1177,20 @@ end;
 
 procedure TGlobalInterface.IncMonitorCount;
 begin
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   sem_op(cMonitorCounter,1);
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
   InterlockedIncrement(FMontorCount^)
 {$ENDIF}
 end;
 
 procedure TGlobalInterface.DecMonitorCount;
 begin
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   sem_op(cMonitorCounter,-1,IPC_NOWAIT);
-{$ELSE}
+{$ENDIF}
+{$IFDEF USE_WINDOWS_IPC}
    InterlockedDeccrement(FMontorCount^)
 {$ENDIF}
 end;
@@ -1138,7 +1216,7 @@ var
   FReaderThread : TReaderThread;
   _MonitorHook: TIBSQLMonitorHook;
   bDone: Boolean;
-  CS : TRTLCriticalSection;
+  CS : TCriticalSection;
   
 { TIBCustomSQLMonitor }
 
@@ -1147,7 +1225,12 @@ begin
   inherited Create(AOwner);
   FTraceFlags := [tfqPrepare .. tfMisc];
   if not (csDesigning in ComponentState)  then
+  begin
+    {$IFDEF USE_POSTMESSAGE}
+    FHWnd := AllocateHWnd(MonitorWndProc);
+    {$ENDIF}
     MonitorHook.RegisterMonitor(self);
+  end;
   FEnabled := true;
 end;
 
@@ -1157,20 +1240,49 @@ begin
   begin
     if FEnabled and assigned(_MonitorHook) then
       MonitorHook.UnregisterMonitor(self);
+    {$IFDEF USE_POSTMESSAGE}
+    DeallocateHwnd(FHWnd);
+    {$ENDIF}
   end;
   inherited Destroy;
 end;
 
-procedure TIBCustomSQLMonitor.Release(Dummy: PtrInt);
+{$IFDEF USE_POSTMESSAGE}
+procedure TIBCustomSQLMonitor.MonitorWndProc(var Message: TMessage);
+var
+  st : TTraceObject;
+begin
+  case Message.Msg of
+    WM_IBSQL_SQL_EVENT:
+    begin
+      st := TTraceObject(Message.LParam);
+      if (Assigned(FOnSQLEvent)) and
+         (st.FDataType in FTraceFlags) then
+        FOnSQLEvent(st.FMsg, st.FTimeStamp);
+      st.Free;
+    end;
+    CM_RELEASE :
+      Free;
+    else
+      DefWindowProc(FHWnd, Message.Msg, Message.WParam, Message.LParam);
+  end;
+end;
+{$ENDIF}
+
+procedure TIBCustomSQLMonitor.Release;
 begin
   MonitorHook.ReleaseMonitor(self);
+end;
+
+procedure TIBCustomSQLMonitor.ReleaseObject(Ignored: PtrInt);
+begin
+  Free
 end;
 
 procedure TIBCustomSQLMonitor.ReceiveMessage(Data: PtrInt);
 var
   st : TTraceObject;
 begin
-  //writeln('Monitor Window Proc Called');
   st := TTraceObject(Data);
   if (Assigned(FOnSQLEvent)) and
          (st.FDataType in FTraceFlags) then
@@ -1517,6 +1629,8 @@ begin
       FWriterThread.WriteSQLData(' ', tfMisc);
       //writeln('Wait for read Terminate');
       FReaderThread.WaitFor;
+      if assigned(FReaderThread.FatalException) then
+        IBError(ibxeThreadFailed,['Reader',Exception(FReaderThread.FatalException).Message]);
       //writeln('Freeing Reader Thread');
       FreeAndNil(FReaderThread);
       //writeln('Reader Thread Freed');
@@ -1525,6 +1639,8 @@ begin
         FWriterThread.Terminate;
         //writeln('Wait for write Terminate');
         FWriterThread.WaitFor;
+        if assigned(FWriterThread.FatalException) then
+          IBError(ibxeThreadFailed,['Writer',Exception(FWriterThread.FatalException).Message]);
         FreeAndNil(FWriterThread);
       end;
     end;
@@ -1553,23 +1669,27 @@ begin
   //writeln('Write Object Created');
   FGlobalInterface := GlobalInterface;
   FMsgs := TObjectList.Create(true);
+  FCriticalSection := TCriticalSection.Create;
+  FMsgAvailable := TEventObject.Create(FGlobalInterface.Sa,true,false,cWriteMessageAvailable);
   Resume;
 end;
 
 destructor TWriterThread.Destroy;
 begin
-  FMsgs.Free;
+  if assigned(FMsgs) then FMsgs.Free;
+  if assigned(FCriticalSection) then FCriticalSection.Free;
+  if assigned(FMsgAvailable) then FMsgAvailable.Free;
   inherited Destroy;
 end;
 
 procedure TWriterThread.Execute;
 begin
 //writeln('Write Thread starts');
-try
   { Place thread code here }
   while ((not Terminated) and (not bDone)) or
         (FMsgs.Count <> 0) do
   begin
+    FMsgAvailable.WaitFor(cMsgWaitTime);
     { Any one listening? }
     if FGlobalInterface.MonitorCount = 0 then
     begin
@@ -1578,7 +1698,6 @@ try
         //writeln('Write Thread Drop Message');
         RemoveFromList;
       end;
-      Sleep(50);
     end
     else
       { Anything to process? }
@@ -1588,7 +1707,11 @@ try
         if FMsgs.Items[0] is TReleaseObject then
         begin
           //writeln('Post Release');
+          {$IFDEF USE_POSTMESSAGE}
+          PostMessage(TReleaseObject(FMsgs.Items[0]).FHandle, CM_RELEASE, 0, 0);
+          {$ELSE}
           Synchronize(PostRelease);
+          {$ENDIF}
         end
         else
         { Otherwise write the TraceObject to the buffer }
@@ -1597,22 +1720,28 @@ try
         end;
       end
       else
-        Sleep(50);
+      begin
+        FCriticalSection.Enter;
+        try
+          if FMsgs.Count = 0 then
+          FMsgAvailable.ResetEvent
+        finally
+          FCriticalSection.Leave
+        end;
+      end;
   end;
-except on E: Exception do
-  writeln('Writer: ',E.Message)
-end;
   //writeln('Write Thread Ends');
 end;
 
 procedure TWriterThread.WriteSQLData(Msg : String; DataType: TTraceFlag);
 begin
-  system.EnterCriticalSection(CS);
+  FCriticalSection.Enter;
   try
     FMsgs.Add(TTraceObject.Create(Msg, DataType));
   finally
-    system.LeaveCriticalSection(CS);
+    FCriticalSection.Leave;
   end;
+  FMsgAvailable.SetEvent
 end;
 
 procedure TWriterThread.BeginWrite;
@@ -1662,8 +1791,6 @@ begin
         try
           FGlobalInterface.SendTrace(TTraceObject(FMsgs[0]))
         finally
-          {Do this in the main thread so the main thread
-          adds and deletes}
           RemoveFromList;
           EndWrite
         end;
@@ -1696,11 +1823,11 @@ end;
 procedure TWriterThread.RemoveFromList;
 begin
   //writeln('Write Thread: Remove object From List');
-  system.EnterCriticalSection(CS);
+  FCriticalSection.Enter;
   try
     FMsgs.Remove(FMsgs[0]); { Pop the written item }
   finally
-    system.LeaveCriticalSection(CS);
+    FCriticalSection.Leave;
   end;
 end;
 
@@ -1708,7 +1835,7 @@ procedure TWriterThread.PostRelease;
 var Monitor: TIBCustomSQLMonitor;
 begin
   Monitor := TReleaseObject(FMsgs.Items[0]).FMonitor;
-  Application.QueueAsyncCall(Monitor.Release,0)
+  Application.QueueAsyncCall(Monitor.ReleaseObject,0)
 end;
 
 procedure TWriterThread.ReleaseMonitor(Arg : TIBCustomSQLMonitor);
@@ -1750,10 +1877,13 @@ end;
 
 procedure TReaderThread.AddMonitor(Arg: TIBCustomSQLMonitor);
 begin
-  system.EnterCriticalSection(CS);
-  if FMonitors.IndexOf(Arg) < 0 then
-    FMonitors.Add(Arg);
-  system.LeaveCriticalSection(CS);
+  FCriticalSection.Enter;
+  try
+    if FMonitors.IndexOf(Arg) < 0 then
+      FMonitors.Add(Arg);
+  finally
+    FCriticalSection.Leave
+  end;
 end;
 
 procedure TReaderThread.AlertMonitors;
@@ -1790,6 +1920,7 @@ begin
   st := TTraceObject.Create('', tfMisc);
   FGlobalInterface.IncMonitorCount;
   FMonitors := TObjectList.Create(false);
+  FCriticalSection := TCriticalSection.Create;
   //writeln('Reader Thread Created');
   FGlobalInterface.ReadReadyEvent.Lock;           { Initialise Read Ready}
   Resume;
@@ -1801,6 +1932,7 @@ begin
   if assigned(FGlobalInterface) and (FGlobalInterface.MonitorCount > 0) then
      FGlobalInterface.DecMonitorCount;
   FMonitors.Free;
+  if assigned(FCriticalSection) then FCriticalSection.Free;
   st.Free;
   inherited Destroy;
 end;
@@ -1814,10 +1946,13 @@ begin
 end;
 
 procedure TReaderThread.Execute;
-var err: string;
+{$IFDEF USE_POSTMESSAGE}
+var
+  i : Integer;
+  FTemp : TTraceObject;
+{$ENDIF}
 begin
 //writeln('Read Thread Starts');
-try
   { Place thread code here }
   while (not Terminated) and (not bDone) do
   begin
@@ -1825,16 +1960,21 @@ try
     if (st.FMsg <> '') and
        not ((st.FMsg = ' ') and (st.FDataType = tfMisc)) then
     begin
-        //writeln('Sending Message to Monitors');
-        Synchronize(AlertMonitors);
+      //writeln('Sending Message to Monitors');
+      {$IFDEF USE_POSTMESSAGE}
+      for i := 0 to FMonitors.Count - 1 do
+      begin
+        FTemp := TTraceObject.Create(st);
+        PostMessage(TIBCustomSQLMonitor(FMonitors[i]).Handle,
+                    WM_IBSQL_SQL_EVENT,
+                    0,
+                    LPARAM(FTemp));
+      end;
+      {$ELSE}
+      Synchronize(AlertMonitors);
+      {$ENDIF}
     end;
   end;
-except on E: Exception do
-begin
-  Err := E.Message;
- writeln('Reader: ',E.Message)
- end
-end;
   //writeln('Read Thread Ends');
 end;
 
@@ -1852,9 +1992,12 @@ end;
 
 procedure TReaderThread.RemoveMonitor(Arg: TIBCustomSQLMonitor);
 begin
-  system.EnterCriticalSection(CS);
-  FMonitors.Remove(Arg);
-  system.LeaveCriticalSection(CS);
+  FCriticalSection.Enter;
+  try
+    FMonitors.Remove(Arg);
+  finally
+    FCriticalSection.Leave
+  end;
 end;
 
 { Misc methods }
@@ -1863,13 +2006,13 @@ function MonitorHook: IIBSQLMonitorHook;
 begin
   if (_MonitorHook = nil) and (not bDone) then
   begin
-    system.EnterCriticalSection(CS);
+    CS.Enter;
     if (_MonitorHook = nil) and (not bDone) then
     begin
       _MonitorHook := TIBSQLMonitorHook.Create;
       _MonitorHook._AddRef;
     end;
-    system.LeaveCriticalSection(CS);
+    CS.Leave;
   end;
   result := _MonitorHook;
 end;
@@ -1907,12 +2050,12 @@ begin
 end;
 
 initialization
-  InitCriticalSection(CS);
+  CS := TCriticalSection.Create;
   _MonitorHook := nil;
   FWriterThread := nil;
   FReaderThread := nil;
   bDone := False;
-{$IFDEF LINUX}
+{$IFDEF USE_SV5_IPC}
   if FpGetEnv('FBSQL_IPCFILENAME') <> nil then
     IPCFileName := strpas(FpGetEnv('FBSQL_IPCFILENAME'))
   else
@@ -1931,6 +2074,6 @@ finalization
 
   finally
     _MonitorHook := nil;
-    DoneCriticalSection(CS);
+    if assigned(CS) then CS.Free;
   end;
 end.

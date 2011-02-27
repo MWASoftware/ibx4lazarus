@@ -24,6 +24,11 @@
 {       Corporation. All Rights Reserved.                                }
 {    Contributor(s): Jeff Overcash                                       }
 {                                                                        }
+{    IBX For Lazarus (Firebird Express)                                  }
+{    Contributor: Tony Whyman, MWA Software (http://www.mwasoftare.co.uk }
+{    Portions created by MWA Software are copyright McCallum Whyman      }
+{    Associates Ltd 2011                                                 }
+{                                                                        }
 {************************************************************************}
 
 unit IB;
@@ -33,10 +38,10 @@ unit IB;
 interface
 
 uses
-{$IFDEF LINUX }
-  unix,
-{$ELSE}
+{$IFDEF WINDOWS }
   Windows,
+{$ELSE}
+  unix,
 {$ENDIF}
   SysUtils, Classes, IBExternals, IBUtils, DB, IBXConst;
 
@@ -180,7 +185,8 @@ type
     ibxeInvalidOnStatusResult,
     ibxeDPBConstantUnknownEx,
     ibxeTPBConstantUnknownEx,
-    ibxeLinuxAPIError
+    ibxeSV5APIError,
+    ibxeThreadFailed
     );
 
   TStatusVector              = array[0..19] of ISC_STATUS;
@@ -312,7 +318,8 @@ const
     SInvalidOnStatusResult,
     SDPBConstantUnknownEx,
     STPBConstantUnknownEx,
-    SLinuxAPIError
+    SSV5APIError,
+    SThreadFailed
   );
 
 var

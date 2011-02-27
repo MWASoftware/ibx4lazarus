@@ -24,6 +24,11 @@
 {       Corporation. All Rights Reserved.                                }
 {    Contributor(s): Jeff Overcash                                       }
 {                                                                        }
+{    IBX For Lazarus (Firebird Express)                                  }
+{    Contributor: Tony Whyman, MWA Software (http://www.mwasoftare.co.uk }
+{    Portions created by MWA Software are copyright McCallum Whyman      }
+{    Associates Ltd 2011                                                 }
+{                                                                        }
 {************************************************************************}
 
 unit IBSQL;
@@ -33,11 +38,10 @@ unit IBSQL;
 interface
 
 uses
-{$IFDEF LINUX }
-  baseunix,unix,
-{$ELSE}
-{$DEFINE HAS_SQLMONITOR}
+{$IFDEF WINDOWS }
   Windows,
+{$ELSE}
+  baseunix, unix,
 {$ENDIF}
   SysUtils, Classes, Forms, Controls, IBHeader,
   IBErrorCodes, IBExternals, DB, IB, IBDatabase, IBUtils, IBXConst;
@@ -186,7 +190,7 @@ type
   { TIBOutputDelimitedFile }
   TIBOutputDelimitedFile = class(TIBBatchOutput)
   protected
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
     FHandle: cint;
   {$ELSE}
     FHandle: THandle;
@@ -229,7 +233,7 @@ type
   { TIBOutputRawFile }
   TIBOutputRawFile = class(TIBBatchOutput)
   protected
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
     FHandle: cint;
   {$ELSE}
     FHandle: THandle;
@@ -243,7 +247,7 @@ type
   { TIBInputRawFile }
   TIBInputRawFile = class(TIBBatchInput)
   protected
-   {$IFDEF LINUX}
+   {$IFDEF UNIX}
     FHandle: cint;
   {$ELSE}
     FHandle: THandle;
@@ -349,7 +353,7 @@ type
 implementation
 
 uses
-  IBIntf, IBBlob, Variants {$IFDEF HAS_SQLMONITOR}, IBSQLMonitor {$ENDIF};
+  IBIntf, IBBlob, Variants , IBSQLMonitor;
 
 { TIBXSQLVAR }
 constructor TIBXSQLVAR.Create(Parent: TIBXSQLDA; Query: TIBSQL);
@@ -1587,7 +1591,7 @@ end;
 
 destructor TIBOutputDelimitedFile.Destroy;
 begin
-{$IFDEF LINUX}
+{$IFDEF UNIX}
   if FHandle <> -1 then
      fpclose(FHandle);
 {$ELSE}
@@ -1603,7 +1607,7 @@ end;
 procedure TIBOutputDelimitedFile.ReadyFile;
 var
   i: Integer;
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
   BytesWritten: cint;
   {$ELSE}
   BytesWritten: DWORD;
@@ -1614,7 +1618,7 @@ begin
     FColDelimiter := TAB;
   if FRowDelimiter = '' then
     FRowDelimiter := CRLF;
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
   FHandle := FpOpen(Filename,O_WrOnly or O_Creat);
   {$ELSE}
   FHandle := CreateFile(PChar(Filename), GENERIC_WRITE, 0, nil, CREATE_ALWAYS,
@@ -1630,7 +1634,7 @@ begin
       else
         st := st + FColDelimiter + strpas(Columns[i].Data^.aliasname);
     st := st + FRowDelimiter;
-    {$IFDEF LINUX}
+    {$IFDEF UNIX}
     if FHandle <> -1 then
        BytesWritten := FpWrite(FHandle,st[1],Length(st));
     if BytesWritten = -1 then
@@ -1644,7 +1648,7 @@ end;
 function TIBOutputDelimitedFile.WriteColumns: Boolean;
 var
   i: Integer;
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
   BytesWritten: cint;
   {$ELSE}
   BytesWritten: DWORD;
@@ -1652,7 +1656,7 @@ var
   st: string;
 begin
   result := False;
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
   if FHandle <> -1 then
   {$ELSE}
   if FHandle <> 0 then
@@ -1666,7 +1670,7 @@ begin
       st := st + StripString(Columns[i].AsString, FColDelimiter + FRowDelimiter);
     end;
     st := st + FRowDelimiter;
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
     BytesWritten := FpWrite(FHandle,st[1],Length(st));
   {$ELSE}
     WriteFile(FHandle, st[1], Length(st), BytesWritten, nil);
@@ -1783,7 +1787,7 @@ end;
 { TIBOutputRawFile }
 destructor TIBOutputRawFile.Destroy;
 begin
-{$IFDEF LINUX}
+{$IFDEF UNIX}
   if FHandle <> -1 then
      fpclose(FHandle);
 {$ELSE}
@@ -1798,7 +1802,7 @@ end;
 
 procedure TIBOutputRawFile.ReadyFile;
 begin
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
   FHandle := FpOpen(Filename,O_WrOnly or O_Creat);
   {$ELSE}
   FHandle := CreateFile(PChar(Filename), GENERIC_WRITE, 0, nil, CREATE_ALWAYS,
@@ -1818,7 +1822,7 @@ begin
   begin
     for i := 0 to Columns.Count - 1 do
     begin
-      {$IFDEF LINUX}
+      {$IFDEF UNIX}
       BytesWritten := FpWrite(FHandle,Columns[i].Data^.sqldata^, Columns[i].Data^.sqllen);
       {$ELSE}
       WriteFile(FHandle, Columns[i].Data^.sqldata^, Columns[i].Data^.sqllen,
@@ -1834,7 +1838,7 @@ end;
 { TIBInputRawFile }
 destructor TIBInputRawFile.Destroy;
 begin
-{$IFDEF LINUX}
+{$IFDEF UNIX}
   if FHandle <> -1 then
      fpclose(FHandle);
 {$ELSE}
@@ -1850,7 +1854,7 @@ var
   BytesRead: DWord;
 begin
   result := False;
-{$IFDEF LINUX}
+{$IFDEF UNIX}
   if FHandle <> -1 then
 {$ELSE}
   if FHandle <> 0 then
@@ -1858,7 +1862,7 @@ begin
   begin
     for i := 0 to Params.Count - 1 do
     begin
-      {$IFDEF LINUX}
+      {$IFDEF UNIX}
       BytesRead := FpRead(FHandle,Params[i].Data^.sqldata^,Params[i].Data^.sqllen);
       {$ELSE}
       ReadFile(FHandle, Params[i].Data^.sqldata^, Params[i].Data^.sqllen);
@@ -1873,7 +1877,7 @@ end;
 
 procedure TIBInputRawFile.ReadyFile;
 begin
-{$IFDEF LINUX}
+{$IFDEF UNIX}
   if FHandle <> -1 then
      fpclose(FHandle);
   FHandle := FpOpen(Filename,O_RdOnly);
@@ -2087,10 +2091,8 @@ begin
                            Database.SQLDialect,
                            FSQLParams.AsXSQLDA), True)
   end;
-  {$IFDEF HAS_SQLMONITOR}
   if not (csDesigning in ComponentState) then
     MonitorHook.SQLExecute(Self);
-  {$ENDIF}
 end;
 
 function TIBSQL.GetEOF: Boolean;
@@ -2152,10 +2154,8 @@ begin
       FBOF := False;
       result := FSQLRecord;
     end;
-  {$IFDEF HAS_SQLMONITOR}
     if not (csDesigning in ComponentState) then
       MonitorHook.SQLFetch(Self);
-  {$ENDIF}
   end;
 end;
 
@@ -2486,10 +2486,8 @@ begin
       end;
     end;
     FPrepared := True;
-  {$IFDEF HAS_SQLMONITOR}
     if not (csDesigning in ComponentState) then
       MonitorHook.SQLPrepare(Self);
-  {$ENDIF}
   except
     on E: Exception do begin
       if (FHandle <> nil) then

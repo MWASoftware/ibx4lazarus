@@ -24,6 +24,11 @@
 {       Corporation. All Rights Reserved.                                }
 {    Contributor(s): Jeff Overcash                                       }
 {                                                                        }
+{    IBX For Lazarus (Firebird Express)                                  }
+{    Contributor: Tony Whyman, MWA Software (http://www.mwasoftare.co.uk }
+{    Portions created by MWA Software are copyright McCallum Whyman      }
+{    Associates Ltd 2011                                                 }
+{                                                                        }
 {************************************************************************}
 
 unit IBXConst;
@@ -107,7 +112,7 @@ resourcestring
   SSQLParseError = 'SQL Parse Error:' + CRLF + CRLF + '%s';
   SUserAbort = 'User abort';
   SDataSetUniDirectional = 'Data set is uni-directional';
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
   SCannotCreateSharedResource = 'Cannot create shared resource. %s';
   {$ELSE}
   SCannotCreateSharedResource = 'Cannot create shared resource. (Windows error %d)';
@@ -174,7 +179,8 @@ resourcestring
   SIBSQLEditor = 'IBSQL Editor';
   SDPBConstantUnknownEx = 'DPB Constant (%s) is unknown';
   STPBConstantUnknownEx = 'TPB Constant (%s) is unknown';
-  SLinuxAPIError = 'Linux API Error - %s';
+  SSV5APIError = 'SV5 API API Error - %s';
+  SThreadFailed = '%s Thread failed with Exception: %s';
 
 implementation
 

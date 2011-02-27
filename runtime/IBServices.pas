@@ -24,15 +24,19 @@
 {       Corporation. All Rights Reserved.                                }
 {    Contributor(s): Jeff Overcash                                       }
 {                                                                        }
+{    IBX For Lazarus (Firebird Express)                                  }
+{    Contributor: Tony Whyman, MWA Software (http://www.mwasoftare.co.uk }
+{    Portions created by MWA Software are copyright McCallum Whyman      }
+{    Associates Ltd 2011                                                 }
+{                                                                        }
 {************************************************************************}
 
 {
   InterBase Express provides component interfaces to
   functions introduced in InterBase 6.0.  The Services
-  components (TIB*Service, TIBServerProperties) and
-  Install components (TIBInstall, TIBUninstall, TIBSetup)
+  components (TIB*Service, TIBServerProperties)
   function only if you have installed InterBase 6.0 or
-  later software
+  later software, including Firebird
 }
 
 unit IBServices;
@@ -42,11 +46,10 @@ unit IBServices;
 interface
 
 uses
-{$IFDEF LINUX }
-  unix,
-{$ELSE}
-{$DEFINE HAS_SQLMONITOR}
+{$IFDEF WINDOWS }
   Windows,
+{$ELSE}
+  unix,
 {$ENDIF}
   Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   IBDialogs, IBHeader, IB, IBExternals;
@@ -508,7 +511,7 @@ type
 implementation
 
 uses
-  IBIntf {$IFDEF HAS_SQLMONITOR}, IBSQLMonitor {$ENDIF};
+  IBIntf , IBSQLMonitor;
 
 { TIBCustomService }
 
@@ -548,9 +551,7 @@ begin
   if Assigned(FOnAttach) then
     FOnAttach(Self);
 
-  {$IFDEF HAS_SQLMONITOR}
   MonitorHook.ServiceAttach(Self);
-  {$ENDIF}
 end;
 
 procedure TIBCustomService.Loaded;
@@ -671,9 +672,7 @@ begin
   end
   else
     FHandle := nil;
-  {$IFDEF HAS_SQLMONITOR}
   MonitorHook.ServiceDetach(Self);
-  {$ENDIF}
 end;
 
 function TIBCustomService.GetActive: Boolean;
@@ -727,9 +726,7 @@ begin
     FQuerySPBLength := 0;
     FQueryParams := '';
   end;
-  {$IFDEF HAS_SQLMONITOR}
   MonitorHook.ServiceQuery(Self);
-  {$ENDIF}
 end;
 
 procedure TIBCustomService.SetActive(const Value: Boolean);
@@ -1247,9 +1244,7 @@ begin
     FStartSPBLength := 0;
     FStartParams := '';
   end;
-  {$IFDEF HAS_SQLMONITOR}
   MonitorHook.ServiceStart(Self);
-  {$ENDIF}
 end;
 
 procedure TIBControlService.ServiceStart;

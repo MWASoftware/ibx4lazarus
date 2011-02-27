@@ -24,6 +24,11 @@
 {       Corporation. All Rights Reserved.                                }
 {    Contributor(s): Jeff Overcash                                       }
 {                                                                        }
+{    IBX For Lazarus (Firebird Express)                                  }
+{    Contributor: Tony Whyman, MWA Software (http://www.mwasoftare.co.uk }
+{    Portions created by MWA Software are copyright McCallum Whyman      }
+{    Associates Ltd 2011                                                 }
+{                                                                        }
 {************************************************************************}
 
 unit IBEvents;
@@ -33,11 +38,12 @@ unit IBEvents;
 interface
 
 uses
-{$IFDEF LINUX }
-  unix,
-{$ELSE}
+{$IFDEF WINDOWS }
   Windows,
-{$ENDIF}  Classes, Graphics, Controls,
+{$ELSE}
+  unix,
+{$ENDIF}
+  Classes, Graphics, Controls,
   Forms, Dialogs, IBHeader, IBExternals, IB, IBDatabase;
 
 const
