@@ -91,15 +91,15 @@ procedure TGeneratorEditor.FormShow(Sender: TObject);
 begin
   LoadGenerators;
   LoadFieldNames;
-  if Generator.GeneratorName <> '' then
-    GeneratorNames.ItemIndex := GeneratorNames.Items.IndexOf(Generator.GeneratorName);
-  if Generator.FieldName <> '' then
-    FieldNames.ItemIndex := FieldNames.Items.IndexOf(UpperCase(Generator.FieldName))
+  if Generator.Generator <> '' then
+    GeneratorNames.ItemIndex := GeneratorNames.Items.IndexOf(Generator.Generator);
+  if Generator.Field <> '' then
+    FieldNames.ItemIndex := FieldNames.Items.IndexOf(UpperCase(Generator.Field))
   else
     FieldNames.ItemIndex := FieldNames.Items.IndexOf(GetPrimaryKey);
 
   if FieldNames.ItemIndex = -1 then
-    FieldNames.Text := Generator.FieldName;
+    FieldNames.Text := Generator.Field;
 
   if Generator.ApplyOnEvent = gaeOnNewRecord then
     OnNewRecord.Checked := true
@@ -113,8 +113,8 @@ procedure TGeneratorEditor.FormClose(Sender: TObject;
 begin
   if ModalResult = mrOK then
   begin
-    Generator.GeneratorName := GeneratorNames.Text;
-    Generator.FieldName := FieldNames.Text;
+    Generator.Generator := GeneratorNames.Text;
+    Generator.Field := FieldNames.Text;
     if OnNewRecord.Checked then
       Generator.ApplyOnEvent := gaeOnNewRecord
     else

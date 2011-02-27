@@ -172,8 +172,8 @@ type
     procedure Apply;
     property Owner: TIBCustomDataSet read FOwner;
   published
-    property GeneratorName: string read FGeneratorName write FGeneratorName;
-    property FieldName: string read FFieldName write FFieldName;
+    property Generator: string read FGeneratorName write FGeneratorName;
+    property Field: string read FFieldName write FFieldName;
     property Increment: integer read FIncrement write SetIncrement default 1;
     property ApplyOnEvent: TIBGeneratorApplyOnEvent read FApplyOnEvent write FApplyOnEvent;
   end;
@@ -191,7 +191,7 @@ type
 
   TIBCustomDataSet = class(TDataset)
   private
-    FGenerator: TIBGenerator;
+    FGeneratorField: TIBGenerator;
     FNeedsRefresh: Boolean;
     FForcedRefresh: Boolean;
     FDidActivate: Boolean;
@@ -405,7 +405,7 @@ type
     property BufferChunks: Integer read FBufferChunks write SetBufferChunks;
     property CachedUpdates: Boolean read FCachedUpdates write SetCachedUpdates;
     property UniDirectional: Boolean read FUniDirectional write SetUniDirectional default False;
-    property Generator: TIBGenerator read FGenerator write FGenerator;
+    property GeneratorField: TIBGenerator read FGeneratorField write FGeneratorField;
     property DeleteSQL: TStrings read GetDeleteSQL write SetDeleteSQL;
     property InsertSQL: TStrings read GetInsertSQL write SetInsertSQL;
     property RefreshSQL: TStrings read GetRefreshSQL write SetRefreshSQL;
@@ -535,7 +535,7 @@ type
     property RefreshSQL;
     property SelectSQL;
     property ModifySQL;
-    property Generator;
+    property GeneratorField;
     property ParamCheck;
     property UniDirectional;
     property Filtered;
@@ -829,7 +829,7 @@ begin
   FUniDirectional := False;
   FBufferChunks := BufferCacheSize;
   FBlobStreamList := TList.Create;
-  FGenerator := TIBGenerator.Create(self);
+  FGeneratorField := TIBGenerator.Create(self);
   FDataLink := TIBDataLink.Create(Self);
   FQDelete := TIBSQL.Create(Self);
   FQDelete.OnSQLChanging := SQLChanging;
@@ -868,7 +868,7 @@ destructor TIBCustomDataSet.Destroy;
 begin
   if FIBLoaded then
   begin
-    if assigned(FGenerator) then FGenerator.Free;
+    if assigned(FGeneratorField) then FGeneratorField.Free;
     FDataLink.Free;
     FBase.Free;
     ClearBlobCache;
@@ -2422,8 +2422,8 @@ end;
 
 procedure TIBCustomDataSet.DoAfterInsert;
 begin
-  if Generator.ApplyOnEvent = gaeOnNewRecord then
-    Generator.Apply;
+  if GeneratorField.ApplyOnEvent = gaeOnNewRecord then
+    GeneratorField.Apply;
   inherited DoAfterInsert;
 end;
 
@@ -2431,8 +2431,8 @@ procedure TIBCustomDataSet.DoBeforePost;
 begin
   inherited DoBeforePost;
   if (State = dsInsert) and
-     (Generator.ApplyOnEvent = gaeOnPostRecord) then
-     Generator.Apply
+     (GeneratorField.ApplyOnEvent = gaeOnPostRecord) then
+     GeneratorField.Apply
 end;
 
 procedure TIBCustomDataSet.FetchAll;
@@ -3024,7 +3024,7 @@ begin
           Inc(FieldIndex);
           with FieldDefs.AddFieldDef do
           begin
-            Name := string( FieldAliasName );
+            Name := FieldAliasName;
  (*           FieldNo := FieldPosition;*)
             DataType := FieldType;
             Size := FieldSize;
@@ -3912,7 +3912,7 @@ begin
        IBError(ibxeCannotSetTransaction,[]);
     with Transaction do
       if not InTransaction then StartTransaction;
-    SQL.Text := Format('Select Gen_ID(%s,%d) as ID From RDB$Database',[GeneratorName,Increment]);
+    SQL.Text := Format('Select Gen_ID(%s,%d) as ID From RDB$Database',[FGeneratorName,Increment]);
     Prepare;
     ExecQuery;
     try
@@ -3934,8 +3934,8 @@ end;
 
 procedure TIBGenerator.Apply;
 begin
-  if (GeneratorName <> '') and (FieldName <> '')  then
-    Owner.FieldByName(FieldName).AsInteger := GetNextValue(Owner.Database,Owner.Transaction);
+  if (FGeneratorName <> '') and (FFieldName <> '')  then
+    Owner.FieldByName(FFieldName).AsInteger := GetNextValue(Owner.Database,Owner.Transaction);
 end;
 
 end.

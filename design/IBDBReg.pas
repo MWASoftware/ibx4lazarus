@@ -342,8 +342,8 @@ begin
   RegisterPropertyEditor(TypeInfo(TStrings), TIBUpdateSQL, 'InsertSQL', TIBUpdateSQLInsertSQLProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBUpdateSQL, 'DeleteSQL', TIBUpdateSQLDeleteProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBEvents, 'Events', TIBEventListProperty); {do not localize}
-  RegisterPropertyEditor(TypeInfo(TPersistent), TIBDataSet, 'Generator', TIBGeneratorProperty);  {do not localize}
-  RegisterPropertyEditor(TypeInfo(TPersistent), TIBQuery, 'Generator', TIBGeneratorProperty);  {do not localize}
+  RegisterPropertyEditor(TypeInfo(TPersistent), TIBDataSet, 'GeneratorField', TIBGeneratorProperty);  {do not localize}
+  RegisterPropertyEditor(TypeInfo(TPersistent), TIBQuery, 'GeneratorField', TIBGeneratorProperty);  {do not localize}
 
   RegisterComponentEditor(TIBDatabase, TIBDatabaseEditor);
   RegisterComponentEditor(TIBTransaction, TIBTransactionEditor);
