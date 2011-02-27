@@ -591,7 +591,11 @@ begin
   Events := TStringList.Create;
   try
     Events.Assign( IBEvents.Events);
-    if EditAlerterEvents( Events) then IBEvents.Events.Assign(Events);
+    if EditAlerterEvents( Events) then
+    begin
+      IBEvents.Events.Assign(Events);
+      Modified
+    end;
   finally
     Events.Free;
   end;
