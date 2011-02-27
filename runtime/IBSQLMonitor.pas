@@ -1456,6 +1456,7 @@ procedure TIBSQLMonitorHook.ForceRelease;
 begin
     if Assigned(FReaderThread) then
     begin
+      FReaderThread.Terminate;
       if not Assigned(FWriterThread) then
         FWriterThread := TWriterThread.Create(FGlobalInterface);
       FWriterThread.WriteSQLData(' ', tfMisc);
