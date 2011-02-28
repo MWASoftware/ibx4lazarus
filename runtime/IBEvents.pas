@@ -40,7 +40,9 @@
 
   Note that an error will occur if the TIBEvent's Registered property is set to
   true before the Database has been opened.
-}unit IBEvents;
+}
+
+unit IBEvents;
 
 {$Mode Delphi}
 
@@ -100,7 +102,7 @@ type
 implementation
 
 uses
-  IBIntf, syncobjs, Sysutils;
+  IBIntf, syncobjs;
 
 type
 
