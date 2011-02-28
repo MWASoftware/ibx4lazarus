@@ -116,7 +116,7 @@ type
   TEventHandler = class(TThread)
   private
     FOwner: TIBEvents;
-    FCriticalSection: TCriticalSection;
+    FCriticalSection: TCriticalSection;   {protects race conditions in stQueued state}
     FEventWaiting: TEventObject;
     FState: TEventHandlerStates;
     FEventBuffer: PChar;
@@ -161,12 +161,17 @@ var
 begin
   if FState <> stHasEvb then
     Exit;
-  callback := @IBEventCallback;
-  DBH := FOwner.DatabaseHandle;
-  if (isc_que_events( StatusVector, @DBH, @FEventID, FEventBufferLen,
+  FCriticalSection.Enter;
+  try
+    callback := @IBEventCallback;
+    DBH := FOwner.DatabaseHandle;
+    if (isc_que_events( StatusVector, @DBH, @FEventID, FEventBufferLen,
                      FEventBuffer, TISC_CALLBACK(callback), PVoid(Self)) <> 0) then
-    IBDatabaseError;
-  FState := stQueued
+      IBDatabaseError;
+    FState := stQueued
+  finally
+    FCriticalSection.Leave
+  end;
 end;
 
 procedure TEventHandler.CancelEvents;
@@ -278,6 +283,7 @@ begin
   FCriticalSection := TCriticalSection.Create;
   FEventWaiting := TEventObject.Create(PSa,false,true,FOwner.Name+'.Events');
   FEvents := TStringList.Create;
+  FreeOnTerminate := true;
   Resume
 end;
 
@@ -292,8 +298,8 @@ end;
 procedure TEventHandler.Terminate;
 begin
   inherited Terminate;
+  FEventWaiting.SetEvent;
   CancelEvents;
-  FEventWaiting.SetEvent
 end;
 
 procedure TEventHandler.RegisterEvents(Events: TStrings);
@@ -306,13 +312,11 @@ begin
   if Events.Count = 0 then
     exit;
 
-  FCriticalSection.Enter;
-  try
-    setlength(EventNames,MaxEvents);
-    for i := 0 to Events.Count-1 do
-      EventNames[i] := PChar(Events[i]);
-    FEvents.Assign(Events);
-    FEventBufferlen := isc_event_block(@FEventBuffer,@FResultBuffer,
+  setlength(EventNames,MaxEvents);
+  for i := 0 to Events.Count-1 do
+    EventNames[i] := PChar(Events[i]);
+  FEvents.Assign(Events);
+  FEventBufferlen := isc_event_block(@FEventBuffer,@FResultBuffer,
                         Events.Count,
                         EventNames[0],EventNames[1],EventNames[2],
                         EventNames[3],EventNames[4],EventNames[5],
@@ -320,12 +324,9 @@ begin
                         EventNames[9],EventNames[10],EventNames[11],
                         EventNames[12],EventNames[13],EventNames[14]
                         );
-    FState := stHasEvb;
-    FRegisteredState := true;
-    QueueEvents
-  finally
-    FCriticalSection.Leave
-  end;
+  FState := stHasEvb;
+  FRegisteredState := true;
+  QueueEvents
 end;
 
 procedure TEventHandler.UnregisterEvents;
@@ -337,6 +338,8 @@ begin
   end;
 end;
 
+{ TIBEvents }
+
 procedure TIBEvents.ValidateDatabase( Database: TIBDatabase);
 begin
   if not assigned( Database) then
@@ -344,8 +347,6 @@ begin
   if not Database.Connected then
     IBError(ibxeDatabaseClosed, [nil]);
 end;
-
-{ TIBEvents }
 
 constructor TIBEvents.Create( AOwner: TComponent);
 begin
@@ -375,11 +376,7 @@ begin
     FBase.Free;
   end;
   if assigned(FEventHandler) then
-  begin
     TEventHandler(FEventHandler).Terminate;
-    TEventHandler(FEventHandler).WaitFor;
-    TEventHandler(FEventHandler).Free
-  end;
   inherited Destroy;
 end;
 
