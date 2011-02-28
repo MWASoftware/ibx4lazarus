@@ -189,7 +189,7 @@ type
     ibxeThreadFailed
     );
 
-  TStatusVector              = array[0..19] of ISC_LONG;
+  TStatusVector              = array[0..19] of ISC_STATUS;
   PStatusVector              = ^TStatusVector;
 
 

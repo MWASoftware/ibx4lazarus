@@ -222,7 +222,8 @@ procedure TEventHandler.DoEventSignalled;
 var
   i: integer;
   CancelAlerts: boolean;
-  Status: TStatusVector;
+  Status: array[0..19] of ISC_LONG; {Note in 64 implementation the ibase.h implementation
+                                     is different from Interbase 6.0 API documentatoin}
 begin
     if FState <> stSignalled then
       Exit;

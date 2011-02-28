@@ -584,7 +584,7 @@ Tisc_event_block = function     (event_buffer               : PPChar;
 				 id_count                   : UShort):ISC_LONG; varargs;
                                 cdecl;
 
-Tisc_event_counts = procedure   (status_vector             : PISC_STATUS;
+Tisc_event_counts = procedure   (status_vector             : PISC_LONG;
 				 buffer_length             : Short;
 				 event_buffer              : PChar;
 				 result_buffer             : PChar);
