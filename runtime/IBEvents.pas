@@ -269,7 +269,7 @@ var
   PSa : PSecurityAttributes;
 {$IFDEF WINDOWS}
   Sd : TSecurityDescriptor;
-  Sa := TSecurityAttributes;
+  Sa : TSecurityAttributes;
 begin
   InitializeSecurityDescriptor(@Sd,SECURITY_DESCRIPTOR_REVISION);
   SetSecurityDescriptorDacl(@Sd,true,nil,false);

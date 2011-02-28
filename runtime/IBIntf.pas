@@ -166,7 +166,11 @@ var  IBServiceAPIPresent: boolean;
 
 implementation
 
-uses Sysutils, IB, Dynlibs;
+uses Sysutils, IB, Dynlibs
+{$IFDEF WINDOWS}
+,Forms
+{$ENDIF}
+;
 
 var
   IBLibrary: TLibHandle;
@@ -206,7 +210,7 @@ procedure LoadIBLibrary;
     if FileExists(InstallDir + FIREBIRD_CLIENT) then
     begin
       //assume firebird.conf and firebird.msg in same dir
-      SetEnvironmentVariable('FIREBIRD',InstallDir);
+      SetEnvironmentVariable('FIREBIRD',PChar(InstallDir));
       dllPathName := InstallDir +FIREBIRD_CLIENT;
       Result := LoadLibrary(dllPathName)
     end

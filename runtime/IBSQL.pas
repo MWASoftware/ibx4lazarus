@@ -1640,7 +1640,7 @@ begin
     if BytesWritten = -1 then
        raise Exception.Create('File Write Error');
     {$ELSE}
-    WriteFile(FHandle, PChar(st[1]), Length(st), BytesWritten, nil);
+    WriteFile(FHandle, st[1], Length(st), BytesWritten, nil);
     {$ENDIF}
   end;
 end;
@@ -1865,7 +1865,7 @@ begin
       {$IFDEF UNIX}
       BytesRead := FpRead(FHandle,Params[i].Data^.sqldata^,Params[i].Data^.sqllen);
       {$ELSE}
-      ReadFile(FHandle, Params[i].Data^.sqldata^, Params[i].Data^.sqllen);
+      ReadFile(FHandle, Params[i].Data^.sqldata^, Params[i].Data^.sqllen,
                BytesRead, nil);
       {$ENDIF}
       if BytesRead <> DWORD(Params[i].Data^.sqllen) then
