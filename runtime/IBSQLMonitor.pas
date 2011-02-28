@@ -86,8 +86,8 @@ type
     FEnabled: Boolean;
     procedure SetEnabled(const Value: Boolean);
   protected
-    procedure ReleaseObject(Ignored: PtrInt);  {Called from Writer Thread}
-    procedure ReceiveMessage(Data: PtrInt);    {Called from Reader Thread}
+    procedure ReleaseObject;  {Called from Writer Thread}
+    procedure ReceiveMessage(Msg: TObject);    {Called from Reader Thread}
     property OnSQL: TSQLEvent read FOnSQLEvent write FOnSQLEvent;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
     property Enabled : Boolean read FEnabled write SetEnabled default true;
@@ -176,7 +176,7 @@ const
     'FB.SQL.MONITOR.ReadEvent1_0',
     'FB.SQL.MONITOR.ReadFinishedEvent1_0'
   );
-  cDefaultTimeout = 500; { 1 seconds }
+  cDefaultTimeout = 1000; { 1 seconds }
 {$ENDIF}
 
 {$IFDEF USE_SV5_IPC}
@@ -578,7 +578,7 @@ type
     FReadFinishedEvent: TMultiLockGate;
     FDataAvailableEvent: TSingleLockGate;
     FWriterBusyEvent: TSingleLockGate;
-    {$IFNDEF USE_SV5_IPC}
+    {$IFDEF USE_WINDOWS_IPC}
     FMonitorCount: PInteger;
     procedure HandleGateTimeout(Sender: TObject);
     {$ENDIF}
@@ -1058,6 +1058,7 @@ begin
 {$IFDEF USE_WINDOWS_IPC}
   InterlockedIncrement(FLockCount^);
   ResetEvent(FEvent);
+  //writeln('Lock '+IntToStr(FLockCount^));
 {$ENDIF}
 end;
 
@@ -1075,12 +1076,14 @@ begin
     sem_op(FMutex,1,0); //Release Mutex
 {$ENDIF}
 {$IFDEF USE_WINDOWS_IPC}
+  //writeln('Start UnLock '+IntToStr(FLockCount^));
   InterlockedDecrement(FLockCount^);
   if FLockCount^ <= 0 then
   begin
      SetEvent(FEvent);
      FLockCount^ := 0
-  end
+  end;
+  //writeln('UnLock '+IntToStr(FLockCount^));
 {$ENDIF}
 end;
 
@@ -1134,6 +1137,7 @@ end;
 {$IFNDEF USE_SV5_IPC}
 procedure TGlobalInterface.HandleGateTimeout(Sender: TObject);
 begin
+  //writeln(ClassName+': Gate TimeOut');
   DecMonitorCount
 end;
 {$ENDIF}
@@ -1291,20 +1295,23 @@ begin
   MonitorHook.ReleaseMonitor(self);
 end;
 
-procedure TIBCustomSQLMonitor.ReleaseObject(Ignored: PtrInt);
+procedure TIBCustomSQLMonitor.ReleaseObject;
 begin
   Free
 end;
 
-procedure TIBCustomSQLMonitor.ReceiveMessage(Data: PtrInt);
+procedure TIBCustomSQLMonitor.ReceiveMessage(Msg: TObject);
 var
-  st : TTraceObject;
+  st: TTraceObject;
 begin
-  st := TTraceObject(Data);
+  st := (Msg as TTraceObject);
   if (Assigned(FOnSQLEvent)) and
          (st.FDataType in FTraceFlags) then
         FOnSQLEvent(st.FMsg, st.FTimeStamp);
   st.Free;
+  {$IFDEF WINDOWS}
+  Application.ProcessMessages
+  {$ENDIF}
 end;
 
 procedure TIBCustomSQLMonitor.SetEnabled(const Value: Boolean);
@@ -1379,7 +1386,7 @@ end;
 
 procedure TIBSQLMonitorHook.RegisterMonitor(SQLMonitor: TIBCustomSQLMonitor);
 begin
-  //writeln('Register Monitor');
+   //writeln('Register Monitor');
   if not assigned(FGlobalInterface) then
     FGlobalInterface := TGlobalInterface.Create;
  if not Assigned(FReaderThread) then
@@ -1673,7 +1680,7 @@ end;
 procedure TIBSQLMonitorHook.WriteSQLData(Text: String;
   DataType: TTraceFlag);
 begin
-  //writeln('Write SQL Data: ',Text);
+  //writeln('Write SQL Data: '+Text);
   if not assigned(FGlobalInterface) then
     FGlobalInterface := TGlobalInterface.Create;
   Text := CRLF + '[Application: ' + Application.Title + ']' + CRLF + Text; {do not localize}
@@ -1863,7 +1870,7 @@ procedure TWriterThread.PostRelease;
 var Monitor: TIBCustomSQLMonitor;
 begin
   Monitor := TReleaseObject(FMsgs.Items[0]).FMonitor;
-  Application.QueueAsyncCall(Monitor.ReleaseObject,0)
+  Monitor.ReleaseObject
 end;
 
 procedure TWriterThread.ReleaseMonitor(Arg : TIBCustomSQLMonitor);
@@ -1930,10 +1937,10 @@ var i : Integer;
 begin
   for i := 0 to FMonitors.Count - 1 do
   begin
-     //writeln('Sending Message to Monitor ',i);
+     //writeln('Sending Message to Monitor ' +IntToStr(i));
      FTemp := TTraceObject.Create(st);
      Monitor := TIBCustomSQLMonitor(FMonitors[i]);
-     Application.QueueAsyncCall(Monitor.ReceiveMessage,PtrInt(FTemp));
+     Monitor.ReceiveMessage(FTemp);
   end;
 end;
 
@@ -1945,6 +1952,7 @@ begin
     WriterBusyEvent.PassthroughGate;     { Wait for Writer not busy}
     ReadFinishedEvent.Lock;          { Prepare Read Finished Gate}
     ReadReadyEvent.Unlock;                { Signal read ready  }
+    //writeln('Read Ready Unlocked');
     DataAvailableEvent.PassthroughGate;  { Wait for a Data Available }
   end;
 //writeln('Begin Read Complete');
@@ -1966,6 +1974,7 @@ end;
 destructor TReaderThread.Destroy;
 begin
 //writeln('Reader Thread Destory');
+  FGlobalInterface.ReadReadyEvent.UnLock;
   if assigned(FGlobalInterface) and (FGlobalInterface.MonitorCount > 0) then
      FGlobalInterface.DecMonitorCount;
   FMonitors.Free;
