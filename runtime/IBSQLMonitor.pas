@@ -331,7 +331,6 @@ type
 
   TIpcCommon = class
   private
-    Sd : TSecurityDescriptor;
     function GetSa: PSecurityAttributes;
   protected
     FInitialiser: boolean;  static;
@@ -345,6 +344,8 @@ type
     {$ENDIF}
     {$IFDEF USE_WINDOWS_IPC}
     FSa : TSecurityAttributes;
+  private
+    Sd : TSecurityDescriptor;
     {$ENDIF}
   public
     constructor Create;

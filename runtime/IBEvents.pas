@@ -276,6 +276,7 @@ begin
   Sa.nLength := SizeOf(Sa);
   Sa.lpSecurityDescriptor := @Sd;
   Sa.bInheritHandle := true;
+  PSa := @Sa;
 {$ELSE}
 begin
   PSa:= nil;
