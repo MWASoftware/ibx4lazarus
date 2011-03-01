@@ -1019,9 +1019,11 @@ begin
   inherited Create;
   FOwner := AOwner;
   FLockCount := PInteger(FOwner.SharedMemory.Allocate(sizeof(FLockCount)));
-  FLockCount^ := 0;
   if FInitialiser then
-    FEvent := CreateEvent(sa, true, true, PChar(EventName))
+  begin
+    FEvent := CreateEvent(sa, true, true, PChar(EventName));
+    FLockCount^ := 0;
+  end
   else
     FEvent := OpenEvent(EVENT_ALL_ACCESS, true, PChar(EventName));
 
@@ -1109,6 +1111,8 @@ begin
 {$ENDIF}
 {$IFDEF USE_WINDOWS_IPC}
 begin
+  if FLockCount^ = 0 then
+    Exit;
   while WaitForSingleObject(FEvent,cDefaultTimeout)= WAIT_TIMEOUT do
   { If we have timed out then we have lost a reader }
   begin
