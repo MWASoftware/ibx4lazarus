@@ -98,6 +98,7 @@ type
   public
     constructor Create(Parent: TIBXSQLDA; Query: TIBSQL);
     procedure Assign(Source: TIBXSQLVAR);
+    procedure Clear;
     procedure LoadFromFile(const FileName: String);
     procedure LoadFromStream(Stream: TStream);
     procedure SaveToFile(const FileName: String);
@@ -430,6 +431,7 @@ begin
         0, nil), True);
       try
         IBBlob.WriteBlob(@d_bhandle, szBuff, iSize);
+        isNull := false
       finally
         FSQL.Call(isc_close_blob(StatusVector, @d_bhandle), True);
       end;
@@ -761,9 +763,12 @@ begin
         result := '(Array)'; {do not localize}
       SQL_BLOB: begin
         ss := TStringStream.Create('');
-        SaveToStream(ss);
-        result := ss.DataString;
-        ss.Free;
+        try
+          SaveToStream(ss);
+          result := ss.DataString;
+        finally
+          ss.Free;
+        end;
       end;
       SQL_TEXT, SQL_VARYING: begin
         sz := FXSQLVAR^.sqldata;
@@ -1368,6 +1373,12 @@ begin
       end;
     end;
 end;
+
+procedure TIBXSQLVAR.Clear;
+begin
+  IsNull := true;
+end;
+
 
 { TIBXSQLDA }
 constructor TIBXSQLDA.Create(Query: TIBSQL);

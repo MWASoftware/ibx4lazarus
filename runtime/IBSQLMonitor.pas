@@ -48,13 +48,21 @@ uses
   IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, IBXConst,SysUtils,
   Classes,
 {$IFDEF WINDOWS }
-{$DEFINE USE_WINDOWS_IPC}
-{ $DEFINE USE_POSTMESSAGE}
   Windows
 {$ELSE}
   unix
 {$ENDIF}
 ;
+
+{Note that the original inter-thread communication between the Reader Thread and
+ the ISQL Monitor used the Windows PostMessage interface. This is currently not
+ useable under the FPC RTL as AllocateHWnd is not functional. It has been replaced
+ by the use of the Synchronize method.}
+
+{$IFDEF WINDOWS}
+{$DEFINE USE_WINDOWS_IPC}
+{ $DEFINE USE_POSTMESSAGE}
+{$ENDIF}
 
 {$IFDEF LINUX}
 {$DEFINE USE_SV5_IPC}
@@ -854,7 +862,7 @@ end;
 
 destructor TMutex.Destroy;
 begin
-{$IFNDEF USE_SV5_IPC}
+{$IFDEF USE_WINDOWS_IPC}
   CloseHandle(FMutex);
 {$ENDIF}
   inherited Destroy;
@@ -937,7 +945,7 @@ end;
 
 destructor TSingleLockGate.Destroy;
 begin
-{$IFNDEF USE_SV5_IPC}
+{$IFDEF USE_WINDOWS_IPC}
   CloseHandle(FEvent);
 {$ENDIF}
   inherited Destroy;
@@ -1035,7 +1043,7 @@ end;
 
 destructor TMultilockGate.Destroy;
 begin
-{$IFNDEF USE_SV5_IPC}
+{$IFDEF USE_WINDOWS_IPC}
   CloseHandle(FEvent);
 {$ENDIF}
   inherited Destroy;
@@ -1139,7 +1147,7 @@ begin
 {$ENDIF}
 end;
 
-{$IFNDEF USE_SV5_IPC}
+{$IFDEF USE_WINDOWS_IPC}
 procedure TGlobalInterface.HandleGateTimeout(Sender: TObject);
 begin
   //writeln(ClassName+': Gate TimeOut');
