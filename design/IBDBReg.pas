@@ -316,9 +316,10 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
 procedure Register;
 begin
   RegisterNoIcon([TIBStringField, TIBBCDField]);
-  RegisterComponents(IBPalette1, [TIBTable, TIBQuery,
-    TIBStoredProc, TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBBatchMove,
-    TIBDataSet, TIBSQL, TIBDatabaseInfo, TIBSQLMonitor, TIBEvents, TIBExtract]);
+  RegisterComponents(IBPalette1, [ TIBQuery, TIBDataSet,
+   TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBEvents,
+     TIBSQL, TIBDatabaseInfo, TIBSQLMonitor,
+       TIBStoredProc,TIBBatchMove,  TIBTable,TIBExtract]);
   if (TryIBLoad) and IBServiceAPIPresent  then
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
       TIBRestoreService, TIBValidationService, TIBStatisticalService,

@@ -3469,7 +3469,7 @@ begin
     end;
   end;
   if not (State in [dsCalcFields, dsFilter, dsNewValue]) then
-      DataEvent(deFieldChange, Longint(Field));
+      DataEvent(deFieldChange, PtrInt(Field));
 end;
 
 procedure TIBCustomDataSet.SetRecNo(Value: Integer);
@@ -3852,6 +3852,7 @@ begin
 end;
 
 procedure TIBCustomDataSet.SetFieldData(Field: TField; Buffer: Pointer);
+{$IFDEF TDBDFIELD_IS_BCD}
 var
   lTempCurr : System.Currency;
 begin
@@ -3861,6 +3862,9 @@ begin
     InternalSetFieldData(Field, @lTempCurr);
   end
   else
+{$ELSE}
+begin
+{$ENDIF}
     InternalSetFieldData(Field, Buffer);
 end;
 
@@ -3925,7 +3929,7 @@ begin
   TIBCustomDataSet(FField.DataSet).RecordModified(True);
   TBlobField(FField).Modified := true;
   result := FBlobStream.Write(Buffer, Count);
-  TIBCustomDataSet(FField.DataSet).DataEvent(deFieldChange, Longint(FField));
+  TIBCustomDataSet(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
 end;
 
 { TIBGenerator }
