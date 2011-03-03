@@ -155,9 +155,9 @@ implementation
 uses
    contnrs, syncobjs
    {$IFDEF USE_SV5_IPC}
-   ,ipc, Errors, baseunix,
-   {$IF FPC_FULLVERSION <= 20402 } initc
-   {$ENDIF}{$ENDIF};
+   ,ipc, Errors, baseunix
+   {$IF FPC_FULLVERSION <= 20402 } , initc {$ENDIF}
+   {$ENDIF};
 
    {$STATIC ON}
 const
@@ -205,6 +205,17 @@ Function semtimedop(semid:cint; sops: psembuf; nsops: cuint; timeOut: ptimespec)
 {$ENDIF}
 Function semget(key:Tkey; nsems:cint; semflg:cint): cint; cdecl; external clib name 'semget';
 Function semop(semid:cint; sops: psembuf; nsops: cuint): cint; cdecl; external clib name 'semop';
+
+function GetLastErrno: cint;
+begin
+  Result := fpgetCerrno
+end;
+{$ELSE}
+function GetLastErrno: cint;
+begin
+  Result := fpgetErrno
+end;
+
 {$ENDIF}
 {$ENDIF}
 
@@ -622,21 +633,21 @@ begin
       F := fpOpen(IPCFileName, O_WrOnly or O_Creat or O_Excl);
       if F < 0 then
       begin
-        if FpgetErrno = 17 {EEXIST} then
+        if fpgetErrno = 17 {EEXIST} then
         begin
           { looks like it already exists}
           Sleep(100);
           F := fpOpen(IPCFileName,O_RdOnly);
-          if (F < 0) and (FpgetErrno = 2 {ENOENT}) then
+          if (F < 0) and (fpgetErrno = 2 {ENOENT}) then
             {probably just got deleted }
           else
           if F < 0 then
             IBError(ibxeCannotCreateSharedResource,['Error accessing IPC File - ' +
-                                                 StrError(FpgetErrno)]);
+                                                 StrError(fpgetErrno)]);
         end
         else
             IBError(ibxeCannotCreateSharedResource,['Error creating IPC File  - ' +
-                                                 StrError(FpgetErrno)]);
+                                                 StrError(fpgetErrno)]);
       end
       else
         FInitialiser := true
@@ -648,13 +659,13 @@ begin
                            S_IRUSR or S_IWUSR or S_IRGRP or S_IWGRP);
       if FSharedMemoryID < 0 then
           IBError(ibxeCannotCreateSharedResource,['Cannot create shared memory segment - ' +
-                                                 StrError(FpgetErrno)]);
+                                                 StrError(fpgetErrno)]);
 
       FSemaphoreSetID := semget(IPC_PRIVATE, cNumberOfSemaphores,IPC_CREAT or
                            S_IRUSR or S_IWUSR or S_IRGRP or S_IWGRP);
       if FSemaphoreSetID < 0 then
           IBError(ibxeCannotCreateSharedResource,['Cannot create shared semaphore set - ' +
-                                                 StrError(FpgetErrno)]);
+                                                 StrError(fpgetErrno)]);
 
       fpWrite(F,FSharedMemoryID,sizeof(FSharedMemoryID));
       fpWrite(F,FSemaphoreSetID,sizeof(FSemaphoreSetID));
@@ -693,7 +704,7 @@ var ds: TShmid_ds;
     arg: tsemun;
 begin
   if shmctl(FSharedMemoryID,IPC_STAT,@ds) < 0 then
-    IBError(ibxeSV5APIError,['Error getting shared memory info' + strError(Fpgeterrno)]);
+    IBError(ibxeSV5APIError,['Error getting shared memory info' + strError(fpgetErrno)]);
   if ds.shm_nattch = 0 then  { we are the last one out - so, turn off the lights }
   begin
     shmctl(FSharedMemoryID,IPC_RMID,nil);
@@ -798,7 +809,7 @@ var args :TSEMun;
 begin
   Result := semctl(FSemaphoreSetID,SemNum,SEM_GETVAL,args);
   if Result < 0 then
-     IBError(ibxeSV5APIError,['GetSemVale: '+strError(fpgeterrno)]);
+     IBError(ibxeSV5APIError,['GetSemValue: '+strError(GetLastErrno)]);
 end;
 
 procedure TIpcCommon.SemInit(SemNum, AValue: cint);
@@ -808,7 +819,7 @@ begin
   args.val := AValue;
   if semctl(FSemaphoreSetID,SemNum,SEM_SETVAL,args)  < 0 then
      IBError(ibxeCannotCreateSharedResource,['Unable to initialise Semaphone ' +
-                          IntToStr(SemNum) + '- ' + StrError(fpgeterrno)]);
+                          IntToStr(SemNum) + '- ' + StrError(GetLastErrno)]);
 
 end;
 

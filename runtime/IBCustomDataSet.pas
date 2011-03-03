@@ -35,6 +35,10 @@ unit IBCustomDataSet;
 
 {$Mode Delphi}
 
+{$IFDEF DELPHI}
+{$DEFINE TDBDFIELD_IS_BCD}
+{$ENDIF}
+
 interface
 
 uses
@@ -133,7 +137,7 @@ type
     function GetAsCurrency: Currency; override;
     function GetAsString: string; override;
     function GetAsVariant: Variant; override;
-//    function GetDataSize: Integer; override;
+    function GetDataSize: Integer; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -771,10 +775,14 @@ begin
     Result := Null;
 end;
 
-{function TIBBCDField.GetDataSize: Integer;
+function TIBBCDField.GetDataSize: Integer;
 begin
+{$IFDEF TBCDFIELD_IS_BCD}
   Result := 8;
-end;}
+{$ELSE}
+  Result := inherited GetDataSize
+{$ENDIF}
+end;
 
 { TIBDataLink }
 
@@ -2544,8 +2552,13 @@ begin
         Data := Buff + CurrentRecord^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdDataOfs;
         if (fdDataType = SQL_VARYING) or (fdDataType = SQL_TEXT) then
         begin
-          Move(Data^, Buffer^, fdDataLength);
-          PChar(Buffer)[fdDataLength] := #0;
+          if fdDataLength <= Field.Size then
+          begin
+            Move(Data^, Buffer^, fdDataLength);
+            PChar(Buffer)[fdDataLength] := #0;
+          end
+          else
+            IBError(ibxeFieldSizeError,[Field.FieldName])
         end
         else
           Move(Data^, Buffer^, Field.DataSize);
@@ -2983,8 +2996,19 @@ begin
               FieldSize := -sqlscale;
             end
             else
-              FieldType := ftFloat;
+            if Database.SQLDialect = 1 then
+              FieldType := ftFloat
+            else
+            if (FieldCount > i) and (Fields[i] is TFloatField) then
+              FieldType := ftFloat
+            else
+            begin
+              FieldType := ftFMTBCD;
+              FieldPrecision := 9;
+              FieldSize := -sqlscale;
             end;
+          end;
+
           SQL_INT64:
           begin
             if (sqlscale = 0) then
@@ -2996,9 +3020,19 @@ begin
               FieldSize := -sqlscale;
             end
             else
-              FieldType := ftFloat;
+            if Database.SQLDialect = 1 then
+              FieldType := ftFloat
+            else
+            if (FieldCount > i) and (Fields[i] is TFloatField) then
+              FieldType := ftFloat
+            else
+            begin
+              FieldType := ftFMTBCD;
+              FieldPrecision := 18;
+              FieldSize := -sqlscale;
             end;
-          SQL_TIMESTAMP: FieldType := ftTimeStamp;//ftDateTime;
+            end;
+          SQL_TIMESTAMP: FieldType := ftDateTime;
           SQL_TYPE_TIME: FieldType := ftTime;
           SQL_TYPE_DATE: FieldType := ftDate;
           SQL_BLOB:
@@ -3791,16 +3825,20 @@ end;
 
 function TIBCustomDataSet.GetFieldData(Field: TField;
   Buffer: Pointer): Boolean;
-//var
-//  lTempCurr : System.Currency;
+{$IFDEF TBCDFIELD_IS_BCD}
+var
+  lTempCurr : System.Currency;
 begin
-{  if (Field.DataType = ftBCD) and (Buffer <> nil) then
+  if (Field.DataType = ftBCD) and (Buffer <> nil) then
   begin
     Result := InternalGetFieldData(Field, @lTempCurr);
     if Result then
       CurrToBCD(lTempCurr, TBCD(Buffer^), 32, Field.Size);
   end
-  else }
+  else
+{$ELSE}
+begin
+{$ENDIF}
     Result := InternalGetFieldData(Field, Buffer);
 end;
 
