@@ -133,7 +133,7 @@ type
     function GetAsCurrency: Currency; override;
     function GetAsString: string; override;
     function GetAsVariant: Variant; override;
-    function GetDataSize: Integer; override;
+//    function GetDataSize: Integer; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -632,8 +632,8 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     TIBBCDField,       {ftFMTBcd}
     nil,  {ftFixedWideChar}
     TWideMemoField);   {ftWideMemo}
-
-(*    TADTField,          { ftADT }
+(*
+    TADTField,          { ftADT }
     TArrayField,        { ftArray }
     TReferenceField,    { ftReference }
     TDataSetField,     { ftDataSet }
@@ -642,7 +642,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     TVariantField,      { ftVariant }
     TInterfaceField,    { ftInterface }
     TIDispatchField,     { ftIDispatch }
-    TGuidField);        { ftGuid }*)
+    TGuidField);        { ftGuid } *)
 (*var
   CreateProviderProc: function(DataSet: TIBCustomDataSet): IProvider = nil;*)
 
@@ -771,10 +771,10 @@ begin
     Result := Null;
 end;
 
-function TIBBCDField.GetDataSize: Integer;
+{function TIBBCDField.GetDataSize: Integer;
 begin
   Result := 8;
-end;
+end;}
 
 { TIBDataLink }
 
@@ -2998,7 +2998,7 @@ begin
             else
               FieldType := ftFloat;
             end;
-          SQL_TIMESTAMP: FieldType := ftDateTime;
+          SQL_TIMESTAMP: FieldType := ftTimeStamp;//ftDateTime;
           SQL_TYPE_TIME: FieldType := ftTime;
           SQL_TYPE_DATE: FieldType := ftDate;
           SQL_BLOB:
@@ -3791,16 +3791,16 @@ end;
 
 function TIBCustomDataSet.GetFieldData(Field: TField;
   Buffer: Pointer): Boolean;
-var
-  lTempCurr : System.Currency;
+//var
+//  lTempCurr : System.Currency;
 begin
-  if (Field.DataType = ftBCD) and (Buffer <> nil) then
+{  if (Field.DataType = ftBCD) and (Buffer <> nil) then
   begin
     Result := InternalGetFieldData(Field, @lTempCurr);
     if Result then
       CurrToBCD(lTempCurr, TBCD(Buffer^), 32, Field.Size);
   end
-  else
+  else }
     Result := InternalGetFieldData(Field, Buffer);
 end;
 

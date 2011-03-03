@@ -1,4 +1,4 @@
-object LoginDlg: TLoginDlg
+object IBXLoginDlg: TIBXLoginDlg
   Left = 954
   Height = 230
   Top = 351
@@ -13,9 +13,9 @@ object LoginDlg: TLoginDlg
   LCLVersion = '0.9.28.2'
   object DatabaseName: TLabel
     Left = 121
-    Height = 23
+    Height = 25
     Top = 42
-    Width = 117
+    Width = 119
     ParentColor = False
   end
   object Label1: TLabel

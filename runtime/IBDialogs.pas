@@ -54,7 +54,7 @@ implementation
 function ServerLoginDialog(const AServerName: string;
   var AUserName, APassword: string): Boolean;
 begin
-  with TLoginDlg.Create(nil) do
+  with TIBXLoginDlg.Create(nil) do
   try
     Caption := 'Firebird Server Login';
     Label3.Caption := 'Server Name: ';

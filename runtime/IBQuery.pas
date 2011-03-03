@@ -230,7 +230,7 @@ begin
       FText := SQL.Text;
     DataEvent(dePropertyChange, 0);
   end else
-    FText := FParams.ParseSQL(SQL.Text, False);
+    FText := FParams.ParseSQL(SQL.Text, true);
   SelectSQL.Assign(SQL);
 end;
 

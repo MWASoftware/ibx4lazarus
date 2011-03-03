@@ -876,7 +876,7 @@ begin
     FDBParamsChanged := True;
   end;
   { Use builtin login prompt if requested }
-  if LoginPrompt and not Login then
+  if (LoginPrompt or (csDesigning in ComponentState)) and not Login then
     IBError(ibxeOperationCancelled, [nil]);
   { Generate a new DPB if necessary }
   if (FDBParamsChanged) then

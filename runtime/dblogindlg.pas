@@ -10,9 +10,9 @@ uses
 
 type
 
-  { TLoginDlg }
+  { TIBXLoginDlg }
 
-  TLoginDlg = class(TForm)
+  TIBXLoginDlg = class(TForm)
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
@@ -31,14 +31,14 @@ type
 function LoginDialogEx(const ADatabaseName: string;
   var AUserName, APassword: string; NameReadOnly: Boolean): Boolean;
 var
-  LoginDlg: TLoginDlg;
+  IBXLoginDlg: TIBXLoginDlg;
 
 implementation
 
 function LoginDialogEx(const ADatabaseName: string;
   var AUserName, APassword: string; NameReadOnly: Boolean): Boolean;
 begin
-  with TLoginDlg.Create(Application) do
+  with TIBXLoginDlg.Create(Application) do
   try
     DatabaseName.Caption := ADatabaseName;
     UserName.Text := AUserName;
