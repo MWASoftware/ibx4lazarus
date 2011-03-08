@@ -111,7 +111,7 @@ type
     property BufferChunks;
     property CachedUpdates;
     property DataSource read GetDataSource write SetDataSource;
-    property Constraints stored ConstraintsStored;
+ //   property Constraints stored ConstraintsStored;
     property GeneratorField;
     property ParamCheck;
     property SQL: TStrings read FSQL write SetQuery;

@@ -103,7 +103,7 @@ type
   TRecordData = record
     rdBookmarkFlag: TBookmarkFlag;
     rdFieldCount: Short;
-    rdRecordNumber: Long;
+    rdRecordNumber: Integer;
     rdCachedUpdateStatus: TCachedUpdateStatus;
     rdUpdateStatus: TUpdateStatus;
     rdSavedOffset: DWORD;

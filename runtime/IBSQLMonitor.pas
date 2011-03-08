@@ -1357,7 +1357,7 @@ constructor TIBSQLMonitorHook.Create;
 begin
   inherited Create;
   FTraceFlags := [tfQPrepare..tfMisc];
-  FEnabled := true;
+  FEnabled := false;
 end;
 
 destructor TIBSQLMonitorHook.Destroy;

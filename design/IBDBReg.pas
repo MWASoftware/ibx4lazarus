@@ -785,7 +785,8 @@ begin
   if not GetObjects then
     ShowMessage('Not Linked to an IBQuery object or Database not assigned')
   else
-  if IBModifySQLEditor.EditSQL(FDatabase,FDatabase.DefaultTransaction,FIBUpdateSQL.ModifySQL) then Modified;
+  if assigned(FDatabase) and
+      IBModifySQLEditor.EditSQL(FDatabase,FDatabase.DefaultTransaction,FIBUpdateSQL.ModifySQL) then Modified;
 end;
 
 { TIBRefreshSQLProperty }
@@ -868,7 +869,8 @@ begin
   if not GetObjects then
     ShowMessage('Not Linked to an IBQuery object or Database not assigned')
   else
-  if IBInsertSQLEditor.EditSQL(FDatabase,FDatabase.DefaultTransaction,FIBUpdateSQL.InsertSQL) then Modified;
+  if assigned(FDatabase) and
+    IBInsertSQLEditor.EditSQL(FDatabase,FDatabase.DefaultTransaction,FIBUpdateSQL.InsertSQL) then Modified;
 end;
 
 { TIBGeneratorProperty }
