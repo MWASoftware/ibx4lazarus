@@ -3,22 +3,23 @@
   <Package Version="3">
     <Name Value="dclibx"/>
     <CompilerOptions>
-      <Version Value="8"/>
+      <Version Value="9"/>
       <SearchPaths>
-        <IncludeFiles Value="design/"/>
-        <OtherUnitFiles Value="design/"/>
+        <IncludeFiles Value="design"/>
+        <OtherUnitFiles Value="design"/>
         <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Parsing>
         <SyntaxOptions>
           <CStyleOperator Value="False"/>
+          <UseAnsiStrings Value="False"/>
         </SyntaxOptions>
       </Parsing>
       <Other>
         <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="31">
+    <Files Count="34">
       <Item1>
         <Filename Value="design/IBDBReg.pas"/>
         <HasRegisterProc Value="True"/>
@@ -144,6 +145,18 @@
         <Filename Value="design/ibsqleditor.pas"/>
         <UnitName Value="IBSQLEditor"/>
       </Item31>
+      <Item32>
+        <Filename Value="design/ibdataseteditor.lfm"/>
+        <Type Value="LFM"/>
+      </Item32>
+      <Item33>
+        <Filename Value="design/ibdataseteditor.lrs"/>
+        <Type Value="LRS"/>
+      </Item33>
+      <Item34>
+        <Filename Value="design/ibdataseteditor.pas"/>
+        <UnitName Value="IBDataSetEditor"/>
+      </Item34>
     </Files>
     <Type Value="DesignTime"/>
     <RequiredPkgs Count="4">
