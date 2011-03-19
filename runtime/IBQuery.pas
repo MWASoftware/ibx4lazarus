@@ -295,6 +295,7 @@ procedure TIBQuery.SetParamsFromCursor;
 var
   I: Integer;
   DataSet: TDataSet;
+  Field: TField;
 
   procedure CheckRequiredParams;
   var
@@ -314,12 +315,15 @@ begin
     begin
       DataSet.FieldDefs.Update;
       for I := 0 to FParams.Count - 1 do
-        with FParams[I] do
-          if not Bound then
-          begin
-            AssignField(DataSet.FieldByName(Name));
-            Bound := False;
-          end;
+      if not FParams[I].Bound then
+      begin
+        Field := DataSet.FindField(FParams[I].Name);
+        if assigned(Field) then
+        begin
+            FParams[I].AssignField(Field);
+            FParams[I].Bound := False;
+        end;
+      end;
     end
     else
       CheckRequiredParams;

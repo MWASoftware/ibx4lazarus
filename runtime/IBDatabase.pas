@@ -747,7 +747,7 @@ var
   i: integer;
 begin
   try
-    if StreamedConnected and (not Connected) then
+    if not (csDesigning in ComponentState) and StreamedConnected and (not Connected) then
     begin
       inherited Loaded;
       for i := 0 to FTransactions.Count - 1 do
@@ -814,7 +814,7 @@ var
   end;
 
 begin
-  if Assigned(FOnLogin) then
+  if Assigned(FOnLogin) and not (csDesigning in ComponentState) then
   begin
     result := True;
     LoginParams := TStringList.Create;
@@ -882,7 +882,7 @@ begin
   if (FDBParamsChanged) then
   begin
     FDBParamsChanged := False;
-    if (not LoginPrompt) or (FHiddenPassword = '') then
+    if (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
       GenerateDPB(FDBParams, DPB, FDPBLength)
     else
     begin

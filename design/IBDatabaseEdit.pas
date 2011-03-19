@@ -269,6 +269,8 @@ begin
   Label8.Enabled := True;
   Protocol.Enabled := True;
   ServerName.Enabled := True;
+  if Protocol.Text = '' then
+    Protocol.Text := 'TCP';
 end;
 
 procedure TIBDatabaseEditForm.CharacterSetCloseUp(Sender: TObject);
@@ -364,7 +366,7 @@ begin
         2: tempDB.DatabaseName := Format('%s@%s', [ServerName.Text, DatabaseName.Text]); {do not localize}
       end;
     tempDB.Params.Assign(DatabaseParams.Lines);
-    tempDB.LoginPrompt := LoginPrompt.Checked;
+    tempDB.LoginPrompt := true;
     tempDB.Connected := true;
     ShowMessage('Successful Connection');
   finally

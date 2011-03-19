@@ -459,7 +459,7 @@ type
                     const ResultFields: string): Variant; override;
     function UpdateStatus: TUpdateStatus; override;
     function IsSequenced: Boolean; override;
-
+    function ParamByName(ParamName: String): TIBXSQLVAR;
     property DBHandle: PISC_DB_HANDLE read GetDBHandle;
     property TRHandle: PISC_TR_HANDLE read GetTRHandle;
     property UpdateObject: TIBDataSetUpdateObject read FUpdateObject write SetUpdateObject;
@@ -2208,6 +2208,19 @@ end;
 function TIBCustomDataSet.IsSequenced: Boolean;
 begin
   Result := Assigned( FQSelect ) and FQSelect.EOF;
+end;
+
+function TIBCustomDataSet.ParamByName(ParamName: String): TIBXSQLVAR;
+var DidActivate: boolean;
+begin
+  ActivateConnection;
+  DidActivate := ActivateTransaction;
+  try
+    Result := Params.ByName(ParamName);
+  finally
+    if DidActivate then
+      DeactivateTransaction
+  end;
 end;
 
 function TIBCustomDataSet.AdjustPosition(FCache: PChar; Offset: DWORD;
