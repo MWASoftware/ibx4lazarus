@@ -48,6 +48,7 @@ const
   DSQL_drop = 2;
 {$IFDEF UNIX}
   FIREBIRD_SO = 'libfbclient.so';
+  FIREBIRD_SO2 = 'libfbclient.so.2';
 {$ELSE}
   IBASE_DLL = 'gds32.dll';
   FIREBIRD_CLIENT = 'fbclient.dll'; {do not localize}

@@ -105,6 +105,7 @@ type
     property Text: string read FText;
     property RowsAffected: Integer read GetRowsAffected;
     property GenerateParamNames: Boolean read FGenerateParamNames write FGenerateParamNames;
+ //   property Params: TParams read FParams write SetParamsList;
 
   published
     property Active;
@@ -115,7 +116,7 @@ type
     property GeneratorField;
     property ParamCheck;
     property SQL: TStrings read FSQL write SetQuery;
-    property Params: TParams read FParams write SetParamsList stored False;
+   property Params: TParams read FParams write SetParamsList;
     property UniDirectional default False;
     property UpdateObject;
     property Filtered;
@@ -248,8 +249,10 @@ procedure TIBQuery.DefineProperties(Filer: TFiler);
 
   function WriteData: Boolean;
   begin
-    if Filer.Ancestor <> nil then
-      Result := not FParams.IsEqual(TIBQuery(Filer.Ancestor).FParams) else
+  {The following results in a stream read error with nested frames. Hence commented out until
+   someone fixes the LCL }
+{    if Filer.Ancestor <> nil then
+      Result := not FParams.IsEqual(TIBQuery(Filer.Ancestor).FParams) else}
       Result := FParams.Count > 0;
   end;
 
@@ -260,6 +263,7 @@ end;
 
 procedure TIBQuery.ReadParamData(Reader: TReader);
 begin
+  FParams.Clear;
   Reader.ReadValue;
   Reader.ReadCollection(FParams);
 end;

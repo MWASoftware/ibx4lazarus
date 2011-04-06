@@ -1866,13 +1866,13 @@ begin
         FQSelect.ParamCheck := ParamCheck;
         FQSelect.Prepare;
       end;
-      if (FQDelete.SQL.Text <> '') and (not FQDelete.Prepared) then
+      if (Trim(FQDelete.SQL.Text) <> '') and (not FQDelete.Prepared) then
         FQDelete.Prepare;
-      if (FQInsert.SQL.Text <> '') and (not FQInsert.Prepared) then
+      if (Trim(FQInsert.SQL.Text) <> '') and (not FQInsert.Prepared) then
         FQInsert.Prepare;
-      if (FQRefresh.SQL.Text <> '') and (not FQRefresh.Prepared) then
+      if (Trim(FQRefresh.SQL.Text) <> '') and (not FQRefresh.Prepared) then
         FQRefresh.Prepare;
-      if (FQModify.SQL.Text <> '') and (not FQModify.Prepared) then
+      if (Trim(FQModify.SQL.Text) <> '') and (not FQModify.Prepared) then
         FQModify.Prepare;
       FInternalPrepared := True;
       InternalInitFieldDefs;
@@ -2211,16 +2211,12 @@ begin
 end;
 
 function TIBCustomDataSet.ParamByName(ParamName: String): TIBXSQLVAR;
-var DidActivate: boolean;
 begin
   ActivateConnection;
-  DidActivate := ActivateTransaction;
-  try
-    Result := Params.ByName(ParamName);
-  finally
-    if DidActivate then
-      DeactivateTransaction
-  end;
+  ActivateTransaction;
+  if not FInternalPrepared then
+    InternalPrepare;
+  Result := Params.ByName(ParamName);
 end;
 
 function TIBCustomDataSet.AdjustPosition(FCache: PChar; Offset: DWORD;
@@ -2534,6 +2530,8 @@ function TIBCustomDataSet.GetFieldData(FieldNo: Integer; Buffer: Pointer): Boole
 begin
   result := GetFieldData(FieldByNumber(FieldNo), buffer);
 end;
+
+var   TestData: Int64;
 
 function TIBCustomDataSet.InternalGetFieldData(Field: TField; Buffer: Pointer): Boolean;
 var
@@ -3033,18 +3031,8 @@ begin
               FieldSize := -sqlscale;
             end
             else
-            if Database.SQLDialect = 1 then
               FieldType := ftFloat
-            else
-            if (FieldCount > i) and (Fields[i] is TFloatField) then
-              FieldType := ftFloat
-            else
-            begin
-              FieldType := ftFMTBCD;
-              FieldPrecision := 18;
-              FieldSize := -sqlscale;
-            end;
-            end;
+          end;
           SQL_TIMESTAMP: FieldType := ftDateTime;
           SQL_TYPE_TIME: FieldType := ftTime;
           SQL_TYPE_DATE: FieldType := ftDate;

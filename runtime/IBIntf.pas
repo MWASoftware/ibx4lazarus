@@ -189,8 +189,15 @@ procedure LoadIBLibrary;
   begin
     //Use default unless FBLIB overrides
     LibName := GetEnvironmentVariable('FBLIB');
-    if LibName = '' then LibName := FIREBIRD_SO;
-    Result := LoadLibrary(LibName);
+    if LibName = '' then
+    begin
+      LibName := FIREBIRD_SO2;
+      Result := LoadLibrary(LibName);
+      if Result = 0 then  LibName := FIREBIRD_SO;
+      Result := LoadLibrary(LibName);
+    end
+    else
+      Result := LoadLibrary(LibName);
   end;
 {$ENDIF}
 {$IFDEF WINDOWS}
