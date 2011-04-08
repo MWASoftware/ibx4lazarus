@@ -1617,64 +1617,77 @@ end;
 function TIBCustomDataSet.InternalLocate(const KeyFields: string;
   const KeyValues: Variant; Options: TLocateOptions): Boolean;
 var
-  fl: TList;
+  keyFieldList: TList;
   CurBookmark: string;
-  fld, val: Variant;
-  i, fld_cnt: Integer;
+  fieldValue: Variant;
+  lookupValues: array of variant;
+  i, fieldCount: Integer;
+  fieldValueAsString: string;
 begin
-  fl := TList.Create;
+  keyFieldList := TList.Create;
   try
-    GetFieldList(fl, KeyFields);
-    fld_cnt := fl.Count;
+    GetFieldList(keyFieldList, KeyFields);
+    fieldCount := keyFieldList.Count;
     CurBookmark := Bookmark;
-    result := False;
-    while ((not result) and (not EOF)) do
+    result := false;
+    SetLength(lookupValues, fieldCount);
+    if not EOF then
+    begin
+      for i := 0 to fieldCount - 1 do  {expand key values into lookupValues array}
+      begin
+        if VarIsArray(KeyValues) then
+          lookupValues[i] := KeyValues[i]
+        else
+          lookupValues[i] := KeyValues;
+
+        {convert to upper case is case insensitive search}
+        if (TField(keyFieldList[i]).DataType = ftString) and
+           not VarIsNull(lookupValues[i]) and (loCaseInsensitive in Options) then
+            lookupValues[i] := UpperCase(lookupValues[i]);
+      end;
+    end;
+    while not result and not EOF do   {search for a matching record}
     begin
       i := 0;
-      result := True;
-      while (result and (i < fld_cnt)) do
+      result := true;
+      while result and (i < fieldCount) do
+      {see if all of the key fields matches}
       begin
-        if fld_cnt > 1 then
-          val := KeyValues[i]
-        else
-          val := KeyValues;
-        fld := TField(fl[i]).Value;
-        result := not (VarIsNull(val) xor VarIsNull(fld));
-        if result and not VarIsNull(val) then
+        fieldValue := TField(keyFieldList[i]).Value;
+        result := not (VarIsNull(fieldValue) xor VarIsNull(lookupValues[i]));
+        if result and not VarIsNull(fieldValue) then
         begin
           try
-            fld := VarAsType(fld, VarType(val));
-          except
-            on E: EVariantError do result := False;
+            fieldValue := VarAsType(fieldValue, VarType(lookupValues[i]));
+          except on EVariantError do
+            result := False;
           end;
-          if Result then
-            if TField(fl[i]).DataType = ftString then
-            begin
-              if (loCaseInsensitive in Options) then
-              begin
-                fld := AnsiUpperCase(fld);
-                val := AnsiUpperCase(val);
-              end;
-              fld := TrimRight(fld);
-              val := TrimRight(val);
-              if (loPartialKey in Options) then
-                result := result and (AnsiPos(val, fld) = 1)
-              else
-                result := result and (val = fld);
-            end else
-                result := result and (val = fld);
+
+          if TField(keyFieldList[i]).DataType = ftString then
+          begin
+            fieldValueAsString := TField(keyFieldList[i]).AsString;
+            if (loCaseInsensitive in Options) then
+              fieldValueAsString := UpperCase(fieldValueAsString);
+            if (loPartialKey in Options) then
+              result := result and (Pos(lookupValues[i], fieldValueAsString) = 1)
+            else
+              result := result and (fieldValueAsString = lookupValues[i]);
+          end
+          else
+            result := result and (lookupValues[i] = fieldValue);
         end;
         Inc(i);
       end;
       if not result then
-        Next;
+          Next;
     end;
     if not result then
       Bookmark := CurBookmark
     else
       CursorPosChanged;
   finally
-    fl.Free;
+    keyFieldList.Free;
+    SetLength(lookupValues,0)
   end;
 end;
 
