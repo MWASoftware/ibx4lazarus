@@ -179,6 +179,7 @@ type
     FTimer: TTimer;
     FUserNames: TStringList;
     FDataSets: TList;
+    FLoginCalled: boolean;
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
     function GetSQLDialect: Integer;
@@ -209,7 +210,7 @@ type
     procedure DoConnect; override;
     procedure DoDisconnect; override;
     function GetConnected: Boolean; override;
-    procedure Loaded; override;
+    procedure CheckStreamConnect;
     procedure Notification( AComponent: TComponent; Operation: TOperation); override;
     function GetDataset(Index : longint) : TDataset; override;
     function GetDataSetCount : Longint; override;
@@ -443,6 +444,7 @@ begin
   FSQLDialect := 3;
   FTraceFlags := [];
   FDataSets := TList.Create;
+  CheckStreamConnect;
 end;
 
 destructor TIBDatabase.Destroy;
@@ -742,14 +744,13 @@ begin
       SQLObjects[i].DoAfterDatabaseDisconnect;
 end;
 
-procedure TIBDatabase.Loaded;
+procedure TIBDataBase.CheckStreamConnect;
 var
   i: integer;
 begin
   try
     if not (csDesigning in ComponentState) and StreamedConnected and (not Connected) then
     begin
-      inherited Loaded;
       for i := 0 to FTransactions.Count - 1 do
         if  FTransactions[i] <> nil then
         begin
@@ -814,6 +815,10 @@ var
   end;
 
 begin
+  Result := false;
+  if FLoginCalled then Exit;
+  FLoginCalled := true;
+  try
   if Assigned(FOnLogin) and not (csDesigning in ComponentState) then
   begin
     result := True;
@@ -859,6 +864,9 @@ begin
           HidePassword;
       end;
     end;
+  end;
+  finally
+    FLoginCalled := false
   end;
 end;
 

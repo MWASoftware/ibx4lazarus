@@ -35,6 +35,8 @@ var
 
 implementation
 
+{$R *.lfm}
+
 function LoginDialogEx(const ADatabaseName: string;
   var AUserName, APassword: string; NameReadOnly: Boolean): Boolean;
 begin
@@ -52,15 +54,12 @@ begin
       AUserName := UserName.Text;
       APassword := Password.Text;
       Result := True;
-    end;
+    end
   finally
     Free;
   end;
 end;
 
-
-initialization
-  {$I dblogindlg.lrs}
 
 end.
 
