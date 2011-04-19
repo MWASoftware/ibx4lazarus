@@ -104,7 +104,9 @@ var IsProcedureName: boolean;
 begin
   if Trim(SQLText.Text) <> '' then
   begin
-    FIBSystemTables.GetStatementType(SQLText.Text,IsProcedureName);
+    try
+      FIBSystemTables.GetStatementType(SQLText.Text,IsProcedureName);
+    except  end;
     if IsProcedureName then
       PageControl.ActivePage := ExecutePage
     else

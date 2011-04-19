@@ -164,6 +164,13 @@ procedure isc_decode_timestamp_stub(ib_timestamp     : PISC_TIMESTAMP;
 
 var  IBServiceAPIPresent: boolean;
 
+type
+  TOnGetLibraryName = procedure(var libname: string);
+
+const
+  OnGetLibraryName: TOnGetLibraryName = nil;
+
+
 implementation
 
 uses Sysutils, IB, Dynlibs
@@ -191,13 +198,12 @@ procedure LoadIBLibrary;
     LibName := GetEnvironmentVariable('FBLIB');
     if LibName = '' then
     begin
-      LibName := FIREBIRD_SO2;
-      Result := LoadLibrary(LibName);
-      if Result = 0 then  LibName := FIREBIRD_SO;
-      Result := LoadLibrary(LibName);
-    end
-    else
-      Result := LoadLibrary(LibName);
+      if assigned(OnGetLibraryName) then
+        OnGetLibraryName(LibName)
+      else
+        LibName := FIREBIRD_SO2;
+    end;
+    Result := LoadLibrary(LibName);
   end;
 {$ENDIF}
 {$IFDEF WINDOWS}
@@ -205,6 +211,13 @@ procedure LoadIBLibrary;
   var InstallDir: string;
       dllPathName: string;
   begin
+    if assigned(OnGetLibraryName) then
+    begin
+      OnGetLibraryName(dllPathName);
+      Result := LoadLibrary(dllPathName);
+      Exit
+    end;
+
     //First look for Firebird Embedded Server in installation dir
     InstallDir := ExtractFilePath(Application.ExeName);
     if FileExists(InstallDir + FIREBIRD_EMBEDDED) then
