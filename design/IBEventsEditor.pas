@@ -59,6 +59,7 @@ function EditAlerterEvents( Events: TStrings): Boolean;
 
 implementation
 
+{$R *.lfm}
 
 function EditAlerterEvents( Events: TStrings): Boolean;
 var
@@ -96,8 +97,5 @@ procedure TIBEventsEditor.Panel1Click(Sender: TObject);
 begin
 
 end;
-
-initialization
-  {$i IBEventsEditor.lrs}
 
 end.

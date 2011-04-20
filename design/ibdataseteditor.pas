@@ -1,3 +1,29 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2011 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*)
+
 unit IBDataSetEditor;
 
 {$mode objfpc}{$H+}
@@ -5,7 +31,7 @@ unit IBDataSetEditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
   ComCtrls, StdCtrls, ExtCtrls, IBSystemTables, IBCustomDataSet;
 
 type
@@ -64,6 +90,8 @@ var
 function EditIBDataSet(DataSet: TIBDataSet): boolean;
 
 implementation
+
+{$R *.lfm}
 
 function EditIBDataSet(DataSet: TIBDataSet): boolean;
 begin
@@ -256,10 +284,6 @@ begin
   if assigned(FDataSet) then
     FIBSystemTables.SelectDatabase(FDataSet.Database,FDataSet.Transaction);
 end;
-
-
-initialization
-  {$I ibdataseteditor.lrs}
 
 end.
 

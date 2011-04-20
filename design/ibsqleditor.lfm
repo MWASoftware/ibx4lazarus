@@ -8,12 +8,12 @@ object IBSQLEditorForm: TIBSQLEditorForm
   ClientHeight = 431
   ClientWidth = 729
   OnShow = FormShow
-  LCLVersion = '0.9.28.2'
+  LCLVersion = '0.9.30'
   object Label3: TLabel
     Left = 288
-    Height = 19
+    Height = 18
     Top = 8
-    Width = 29
+    Width = 26
     Caption = 'SQL'
     ParentColor = False
   end
@@ -27,9 +27,9 @@ object IBSQLEditorForm: TIBSQLEditorForm
   end
   object Button3: TButton
     Left = 280
-    Height = 30
+    Height = 29
     Top = 380
-    Width = 112
+    Width = 101
     AutoSize = True
     Caption = 'Generate SQL'
     OnClick = Button3Click
@@ -49,7 +49,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Left = 16
     Height = 22
     Top = 380
-    Width = 144
+    Width = 132
     Caption = '&Quote Identifiers'
     TabOrder = 3
   end
@@ -74,8 +74,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     TabPosition = tpLeft
     object SelectPage: TTabSheet
       Caption = 'Select'
-      ClientHeight = 301
-      ClientWidth = 245
+      ClientHeight = 331
+      ClientWidth = 181
       OnShow = SelectPageShow
       object Label1: TLabel
         Left = 7
@@ -137,8 +137,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object InsertPage: TTabSheet
       Caption = 'Insert'
-      ClientHeight = 301
-      ClientWidth = 245
+      ClientHeight = 331
+      ClientWidth = 181
       OnShow = InsertPageShow
       object Label8: TLabel
         Left = 7
@@ -184,44 +184,44 @@ object IBSQLEditorForm: TIBSQLEditorForm
     object ModifyPage: TTabSheet
       Caption = 'Modify'
       ClientHeight = 331
-      ClientWidth = 175
+      ClientWidth = 181
       OnShow = ModifyPageShow
       object Label10: TLabel
         Left = 7
-        Height = 19
+        Height = 18
         Top = 3
-        Width = 87
+        Width = 78
         Caption = 'Table Name'
         ParentColor = False
       end
       object Label11: TLabel
         Left = 7
-        Height = 19
+        Height = 18
         Top = 69
-        Width = 41
+        Width = 39
         Caption = 'Fields'
         ParentColor = False
       end
       object Label12: TLabel
         Left = 7
-        Height = 19
+        Height = 18
         Top = 250
-        Width = 93
+        Width = 87
         Caption = 'Primary Keys'
         ParentColor = False
       end
       object Label13: TLabel
         Left = 30
-        Height = 19
+        Height = 18
         Top = 230
-        Width = 80
+        Width = 75
         Caption = 'in Field List'
         ParentColor = False
         OnClick = Label13Click
       end
       object ModifyTableNames: TComboBox
         Left = 7
-        Height = 30
+        Height = 29
         Top = 19
         Width = 169
         ItemHeight = 0
@@ -255,7 +255,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Left = 7
         Height = 22
         Top = 210
-        Width = 175
+        Width = 165
         Caption = 'Include Primary keys '
         OnClick = IncludePrimaryKeysClick
         TabOrder = 3
@@ -263,8 +263,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object DeletePage: TTabSheet
       Caption = 'Delete'
-      ClientHeight = 301
-      ClientWidth = 245
+      ClientHeight = 331
+      ClientWidth = 181
       OnShow = DeletePageShow
       object Label14: TLabel
         Left = 7
@@ -305,8 +305,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object ExecutePage: TTabSheet
       Caption = 'Execute'
-      ClientHeight = 301
-      ClientWidth = 245
+      ClientHeight = 331
+      ClientWidth = 181
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7

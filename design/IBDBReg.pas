@@ -317,6 +317,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
      IBSQLEditor;
 
+
 procedure Register;
 begin
   RegisterNoIcon([TIBStringField, TIBBCDField]);

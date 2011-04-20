@@ -77,9 +77,7 @@ var
 
 implementation
 
-
-{uses
-  LibHelp;}
+{$R *.lfm}
 
 function EditIBtransaction(ATransaction: TIBtransaction): Boolean;
 begin
@@ -221,7 +219,5 @@ begin
   ParseParams;
 end;
 
-initialization
-  {$i IBTransactionEdit.lrs}
 
 end.

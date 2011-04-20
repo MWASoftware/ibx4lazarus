@@ -113,6 +113,7 @@ var
 
 implementation
 
+{$R *.lfm}
 
 uses {LibHelp,} TypInfo;
 
@@ -375,7 +376,5 @@ begin
   end;
 end;
 
-initialization
-  {$i IBDatabaseEdit.lrs}
 
 end.
