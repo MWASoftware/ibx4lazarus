@@ -1786,11 +1786,11 @@ begin
   end;
  except on E: Exception do
    begin
-     writeln('Write Thread raised Exception: ' + E.Message);
+     //writeln('Write Thread raised Exception: ' + E.Message);
      raise
    end
   end;
-  writeln('Write Thread Ends');
+  //writeln('Write Thread Ends');
 end;
 
 procedure TWriterThread.WriteSQLData(Msg : String; DataType: TTraceFlag);
@@ -1806,18 +1806,18 @@ end;
 
 procedure TWriterThread.BeginWrite;
 begin
-writeln('Begin Write');
+//writeln('Begin Write');
   with FGlobalInterface do
   begin
     ReadReadyEvent.PassThroughGate;    {Wait for readers to become ready }
     WriterBusyEvent.Lock;     {Set Busy State}
   end;
-writeln('Begin Write Complete');
+//writeln('Begin Write Complete');
 end;
 
 procedure TWriterThread.EndWrite;
 begin
-  writeln('End Write');
+  //writeln('End Write');
   with FGlobalInterface do
   begin
     DataAvailableEvent.Unlock;   { Signal Data Available. }
@@ -1825,7 +1825,7 @@ begin
     DataAvailableEvent.Lock;  {reset Data Available }
     WriterBusyEvent.Unlock;      {Signal not Busy }
   end;
-  writeln('End Write Complete');
+  //writeln('End Write Complete');
   end;
 
 procedure TWriterThread.WriteToBuffer;
@@ -1859,7 +1859,7 @@ begin
       try
         while len > 0 do
         begin
-          writeln('Sending Partial Message, len = ',len);
+          //writeln('Sending Partial Message, len = ',len);
           Temp := TTraceObject.Create(TTraceObject(FMsgs[0]),i,Min(len,FGlobalInterface.MaxBufferSize));
           try
             BeginWrite;
@@ -1878,12 +1878,12 @@ begin
   finally
     FGlobalInterface.WriteLock.Unlock;
   end;
-  writeln('Done Write');
+  //writeln('Done Write');
 end;
 
 procedure TWriterThread.RemoveFromList;
 begin
-  writeln('Write Thread: Remove object From List');
+  //writeln('Write Thread: Remove object From List');
   FCriticalSection.Enter;
   try
     FMsgs.Remove(FMsgs[0]); { Pop the written item }
