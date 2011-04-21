@@ -2137,7 +2137,8 @@ finalization
   try
     { Write an empty string to force the reader to unlock during termination }
     bDone := True;
-    _MonitorHook.ForceRelease;
+    if Assigned(_MonitorHook) then
+      _MonitorHook.ForceRelease;
     CloseThreads;
     if Assigned(_MonitorHook) then
       _MonitorHook._Release;

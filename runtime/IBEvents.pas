@@ -93,7 +93,7 @@ type
     procedure UnRegisterEvents;
     property DatabaseHandle: TISC_DB_HANDLE read GetDatabaseHandle;
   published
-    property  Database: TIBDatabase read GetDatabase write SetDatabase;
+    property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Events: TStrings read FEvents write SetEvents;
     property Registered: Boolean read FRegistered write SetRegistered;
     property OnEventAlert: TEventAlert read FOnEventAlert write FOnEventAlert;
@@ -374,13 +374,14 @@ begin
   if FIBLoaded then
   begin
     UnregisterEvents;
-    SetDatabase( nil);
+    SetDatabase(nil);
     TStringList(FEvents).OnChange := nil;
-    FEvents.Free;
     FBase.Free;
+    FEvents.Free;
   end;
   if assigned(FEventHandler) then
     TEventHandler(FEventHandler).Terminate;
+  FEventHandler := nil;
   inherited Destroy;
 end;
 
@@ -447,10 +448,11 @@ end;
 
 procedure TIBEvents.SetRegistered( value: Boolean);
 begin
-  if (csReading in ComponentState) then
-    FRegistered := value
-  else if FRegistered <> value  then
-    if value then RegisterEvents else UnregisterEvents;
+  if not assigned(FBase) or (FBase.Database = nil) then Exit;
+
+  if FRegistered <> value  then
+    FRegistered := value;
+  if value then RegisterEvents else UnregisterEvents;
 end;
 
 procedure TIBEvents.UnregisterEvents;
