@@ -49,6 +49,8 @@ function EditSQL(Database: TIBDatabase; Transaction: TIBTransaction; SelectSQL: 
 
 implementation
 
+{$R *.lfm}
+
 function EditSQL(Database: TIBDatabase; Transaction: TIBTransaction; SelectSQL: TStrings): boolean;
 begin
   Result := false;
@@ -153,9 +155,6 @@ procedure TIBRefreshSQLEditorForm.SetDatabase(Database: TIBDatabase; Transaction
 begin
   FIBSystemTables.SelectDatabase(Database,Transaction)
 end;
-
-initialization
-  {$I ibrefreshsqleditor.lrs}
 
 end.
 
