@@ -1704,7 +1704,7 @@ end;
 procedure TIBSQLMonitorHook.WriteSQLData(Text: String;
   DataType: TTraceFlag);
 begin
-  //writeln('Write SQL Data: '+Text);
+ //writeln('Write SQL Data: '+Text);
   if not assigned(FGlobalInterface) then
     FGlobalInterface := TGlobalInterface.Create;
   Text := CRLF + '[Application: ' + Application.Title + ']' + CRLF + Text; {do not localize}
@@ -1738,6 +1738,7 @@ end;
 procedure TWriterThread.Execute;
 begin
 //writeln('Write Thread starts');
+ try
   { Place thread code here }
   while ((not Terminated) and (not bDone)) or
         (FMsgs.Count <> 0) do
@@ -1783,7 +1784,13 @@ begin
         end;
       end;
   end;
-  //writeln('Write Thread Ends');
+ except on E: Exception do
+   begin
+     writeln('Write Thread raised Exception: ' + E.Message);
+     raise
+   end
+  end;
+  writeln('Write Thread Ends');
 end;
 
 procedure TWriterThread.WriteSQLData(Msg : String; DataType: TTraceFlag);
@@ -1799,18 +1806,18 @@ end;
 
 procedure TWriterThread.BeginWrite;
 begin
-//writeln('Begin Write');
+writeln('Begin Write');
   with FGlobalInterface do
   begin
     ReadReadyEvent.PassThroughGate;    {Wait for readers to become ready }
     WriterBusyEvent.Lock;     {Set Busy State}
   end;
-//writeln('Begin Write Complete');
+writeln('Begin Write Complete');
 end;
 
 procedure TWriterThread.EndWrite;
 begin
-  //writeln('End Write');
+  writeln('End Write');
   with FGlobalInterface do
   begin
     DataAvailableEvent.Unlock;   { Signal Data Available. }
@@ -1818,7 +1825,7 @@ begin
     DataAvailableEvent.Lock;  {reset Data Available }
     WriterBusyEvent.Unlock;      {Signal not Busy }
   end;
-  //writeln('End Write Complete');
+  writeln('End Write Complete');
   end;
 
 procedure TWriterThread.WriteToBuffer;
@@ -1849,33 +1856,34 @@ begin
         end;
       end
       else
-      while len > 0 do
       try
-        Temp := TTraceObject.Create(TTraceObject(FMsgs[0]),i,Min(len,FGlobalInterface.MaxBufferSize));
-        try
-          BeginWrite;
-          FGlobalInterface.SendTrace(Temp);
-          Inc(i,FGlobalInterface.MaxBufferSize);
-          Dec(len,FGlobalInterface.MaxBufferSize);
-        finally
-          Temp.Free
-        end
+        while len > 0 do
+        begin
+          writeln('Sending Partial Message, len = ',len);
+          Temp := TTraceObject.Create(TTraceObject(FMsgs[0]),i,Min(len,FGlobalInterface.MaxBufferSize));
+          try
+            BeginWrite;
+            FGlobalInterface.SendTrace(Temp);
+            Inc(i,FGlobalInterface.MaxBufferSize);
+            Dec(len,FGlobalInterface.MaxBufferSize);
+          finally
+            Temp.Free;
+            EndWrite
+          end
+        end;
       finally
-      {Do this in the main thread so the main thread
-       adds and deletes}
-       RemoveFromList;
-       EndWrite;
+        RemoveFromList;
       end
     end;
   finally
     FGlobalInterface.WriteLock.Unlock;
   end;
-  //writeln('Done Write');
+  writeln('Done Write');
 end;
 
 procedure TWriterThread.RemoveFromList;
 begin
-  //writeln('Write Thread: Remove object From List');
+  writeln('Write Thread: Remove object From List');
   FCriticalSection.Enter;
   try
     FMsgs.Remove(FMsgs[0]); { Pop the written item }
