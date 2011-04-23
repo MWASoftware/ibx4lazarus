@@ -99,6 +99,7 @@ type
     property OnEventAlert: TEventAlert read FOnEventAlert write FOnEventAlert;
   end;
 
+
 implementation
 
 uses
@@ -119,7 +120,13 @@ type
   private
     FOwner: TIBEvents;
     FCriticalSection: TCriticalSection;   {protects race conditions in stQueued state}
+    {$IFDEF WINDOWS}
+    {Make direct use of Windows API as TEventObject don't seem to work under
+     Windows!}
+    FEventHandler: THandle;
+    {$ELSE}
     FEventWaiting: TEventObject;
+    {$ENDIF}
     FState: TEventHandlerStates;
     FEventBuffer: PChar;
     FEventBufferLen: integer;
@@ -212,7 +219,11 @@ begin
       Exit;
     Move(Updated[0], FResultBuffer[0], Length);
     FState := stSignalled;
-    FEventWaiting.SetEvent
+    {$IFDEF WINDOWS}
+    SetEVent(FEventHandler);
+    {$ELSE}
+    FEventWaiting.SetEvent;
+    {$ENDIF}
   finally
     FCriticalSection.Leave
   end;
@@ -255,7 +266,11 @@ procedure TEventHandler.Execute;
 begin
   while not Terminated do
   begin
+    {$IFDEF WINDOWS}
+    WaitForSingleObject(FEventHandler,INFINITE);
+    {$ELSE}
     FEventWaiting.WaitFor(INFINITE);
+    {$ENDIF}
 
     if not Terminated and (FState = stSignalled) then
       Synchronize(DoEventSignalled)
@@ -285,7 +300,11 @@ begin
   FOwner := Owner;
   FState := stIdle;
   FCriticalSection := TCriticalSection.Create;
+  {$IFDEF WINDOWS}
+  FEventHandler := CreateEvent(PSa,false,true,'IBEvent');
+  {$ELSE}
   FEventWaiting := TEventObject.Create(PSa,false,true,FOwner.Name+'.Events');
+  {$ENDIF}
   FEvents := TStringList.Create;
   FreeOnTerminate := true;
   Resume
@@ -294,7 +313,11 @@ end;
 destructor TEventHandler.Destroy;
 begin
   if assigned(FCriticalSection) then FCriticalSection.Free;
+  {$IFDEF WINDOWS}
+  CloseHandle(FEventHandler);
+  {$ELSE}
   if assigned(FEventWaiting) then FEventWaiting.Free;
+  {$ENDIF}
   if assigned(FEvents) then FEvents.Free;
   inherited Destroy;
 end;
@@ -302,7 +325,11 @@ end;
 procedure TEventHandler.Terminate;
 begin
   inherited Terminate;
+  {$IFDEF WINDOWS}
+  SetEvent(FEventHandler);
+  {$ELSE}
   FEventWaiting.SetEvent;
+  {$ENDIF}
   CancelEvents;
 end;
 
@@ -317,10 +344,11 @@ begin
     exit;
 
   setlength(EventNames,MaxEvents);
-  for i := 0 to Events.Count-1 do
-    EventNames[i] := PChar(Events[i]);
-  FEvents.Assign(Events);
-  FEventBufferlen := isc_event_block(@FEventBuffer,@FResultBuffer,
+  try
+    for i := 0 to Events.Count-1 do
+      EventNames[i] := PChar(Events[i]);
+    FEvents.Assign(Events);
+    FEventBufferlen := isc_event_block(@FEventBuffer,@FResultBuffer,
                         Events.Count,
                         EventNames[0],EventNames[1],EventNames[2],
                         EventNames[3],EventNames[4],EventNames[5],
@@ -328,9 +356,12 @@ begin
                         EventNames[9],EventNames[10],EventNames[11],
                         EventNames[12],EventNames[13],EventNames[14]
                         );
-  FState := stHasEvb;
-  FRegisteredState := true;
-  QueueEvents
+    FState := stHasEvb;
+    FRegisteredState := true;
+    QueueEvents
+  finally
+    SetLength(EventNames,0)
+  end;
 end;
 
 procedure TEventHandler.UnregisterEvents;
