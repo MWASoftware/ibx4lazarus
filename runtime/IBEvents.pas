@@ -301,7 +301,7 @@ begin
   FState := stIdle;
   FCriticalSection := TCriticalSection.Create;
   {$IFDEF WINDOWS}
-  FEventHandler := CreateEvent(PSa,false,true,'IBEvent');
+  FEventHandler := CreateEvent(PSa,false,true,nil);
   {$ELSE}
   FEventWaiting := TEventObject.Create(PSa,false,true,FOwner.Name+'.Events');
   {$ENDIF}

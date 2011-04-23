@@ -2554,7 +2554,7 @@ begin
   result := False;
   Buff := GetActiveBuf;
   if (Buff = nil) or
-     (not IsVisible(Buff)) then
+     (not IsVisible(Buff)) or not assigned(Field.DataSet) then
     exit;
   { The intention here is to stuff the buffer with the data for the
    referenced field for the current record }
