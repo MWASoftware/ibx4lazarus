@@ -11,15 +11,15 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
   ClientWidth = 662
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '0.9.28.2'
+  LCLVersion = '0.9.30'
   object PageControl: TPageControl
     Left = 7
     Height = 352
     Top = 8
     Width = 641
-    ActivePage = FieldsPage
+    ActivePage = SQLPage
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     object FieldsPage: TTabSheet
       Caption = 'Options'
@@ -39,7 +39,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
           Left = 12
           Height = 18
           Top = 18
-          Width = 91
+          Width = 82
           Caption = 'Table &Name:'
           FocusControl = TableNamesCombo
           ParentColor = False
@@ -48,7 +48,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
           Left = 228
           Height = 18
           Top = 19
-          Width = 77
+          Width = 71
           Caption = '&Key Fields:'
           FocusControl = PrimaryKeyList
           ParentColor = False
@@ -57,7 +57,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
           Left = 371
           Height = 18
           Top = 19
-          Width = 102
+          Width = 94
           Caption = 'Update &Fields:'
           FocusControl = FieldList
           ParentColor = False
@@ -109,7 +109,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
           Left = 9
           Height = 22
           Top = 131
-          Width = 129
+          Width = 132
           Caption = '&Quote Identifiers'
           TabOrder = 2
         end
@@ -124,7 +124,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         Left = 10
         Height = 18
         Top = 81
-        Width = 71
+        Width = 61
         Caption = 'S&QL Text:'
         FocusControl = SQLMemo
         ParentColor = False
@@ -136,14 +136,14 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         Width = 615
         Anchors = [akTop, akLeft, akRight, akBottom]
         OnChange = SQLMemoChange
-        ScrollBars = ssVertical
+        ScrollBars = ssAutoBoth
         TabOrder = 0
       end
       object StatementType: TRadioGroup
         Left = 10
         Height = 53
         Top = 9
-        Width = 278
+        Width = 286
         AutoFill = True
         AutoSize = True
         Caption = 'Statement Type'
@@ -155,8 +155,8 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 4
-        ClientHeight = 49
-        ClientWidth = 274
+        ClientHeight = 34
+        ClientWidth = 282
         Columns = 4
         ItemIndex = 0
         Items.Strings = (

@@ -22,7 +22,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Height = 341
     Top = 27
     Width = 431
-    ScrollBars = ssVertical
+    ScrollBars = ssAutoBoth
     TabOrder = 0
   end
   object Button3: TButton

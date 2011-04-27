@@ -318,6 +318,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBSQLEditor;
 
 
+
 procedure Register;
 begin
   RegisterNoIcon([TIBStringField, TIBBCDField]);
