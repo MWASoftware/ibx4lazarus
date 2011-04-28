@@ -369,11 +369,13 @@ type
     FOwner: TObject;
     FBeforeDatabaseDisconnect: TNotifyEvent;
     FAfterDatabaseDisconnect: TNotifyEvent;
+    FAfterDatabaseConnect: TNotifyEvent;
     FOnDatabaseFree: TNotifyEvent;
     FBeforeTransactionEnd: TNotifyEvent;
     FAfterTransactionEnd: TNotifyEvent;
     FOnTransactionFree: TNotifyEvent;
 
+    procedure DoAfterDatabaseConnect; virtual;
     procedure DoBeforeDatabaseDisconnect; virtual;
     procedure DoAfterDatabaseDisconnect; virtual;
     procedure DoDatabaseFree; virtual;
@@ -390,6 +392,8 @@ type
     procedure CheckDatabase; virtual;
     procedure CheckTransaction; virtual;
   public
+    property AfterDatabaseConnect: TNotifyEvent read FAfterDatabaseConnect
+                                                write FAfterDatabaseConnect;
     property BeforeDatabaseDisconnect: TNotifyEvent read FBeforeDatabaseDisconnect
                                                    write FBeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect: TNotifyEvent read FAfterDatabaseDisconnect
@@ -874,6 +878,7 @@ procedure TIBDatabase.DoConnect;
 var
   DPB: String;
   TempDBParams: TStrings;
+  I: integer;
 
 begin
   CheckInactive;
@@ -915,6 +920,11 @@ begin
   end;
   FDBSQLDialect := GetDBSQLDialect;
   ValidateClientSQLDialect;
+  for i := 0 to FSQLObjects.Count - 1 do
+  begin
+      if FSQLObjects[i] <> nil then
+        SQLObjects[i].DoAfterDatabaseConnect;
+  end;
   if not (csDesigning in ComponentState) then
     MonitorHook.DBConnect(Self);
 end;
@@ -1816,6 +1826,12 @@ function TIBBase.GetTRHandle: PISC_TR_HANDLE;
 begin
   CheckTransaction;
   result := @FTransaction.Handle;
+end;
+
+procedure TIBBase.DoAfterDatabaseConnect;
+begin
+  if assigned(FAfterDatabaseConnect) then
+    AfterDatabaseConnect(self);
 end;
 
 procedure TIBBase.DoBeforeDatabaseDisconnect;

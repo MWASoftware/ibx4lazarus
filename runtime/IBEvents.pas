@@ -75,12 +75,14 @@ type
     FOnEventAlert: TEventAlert;
     FEventHandler: TObject;
     FRegistered: boolean;
+    FDeferredRegister: boolean;
     procedure EventChange(sender: TObject);
     function GetDatabase: TIBDatabase;
     function GetDatabaseHandle: TISC_DB_HANDLE;
     procedure SetDatabase( value: TIBDatabase);
     procedure ValidateDatabase( Database: TIBDatabase);
     procedure DoBeforeDatabaseDisconnect(Sender: TObject);
+    procedure DoAfterDatabaseConnect(Sender: TObject);
   protected
     procedure Notification( AComponent: TComponent; Operation: TOperation); override;
     procedure SetEvents( value: TStrings);
@@ -92,6 +94,7 @@ type
     procedure RegisterEvents;
     procedure UnRegisterEvents;
     property DatabaseHandle: TISC_DB_HANDLE read GetDatabaseHandle;
+    property DeferredRegister: boolean read FDeferredRegister write FDeferredRegister;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Events: TStrings read FEvents write SetEvents;
@@ -391,6 +394,7 @@ begin
   FIBLoaded := True;
   FBase := TIBBase.Create(Self);
   FBase.BeforeDatabaseDisconnect := DoBeforeDatabaseDisconnect;
+  FBase.AfterDatabaseConnect := DoAfterDatabaseConnect;
   FEvents := TStringList.Create;
   with TStringList( FEvents) do
   begin
@@ -452,8 +456,13 @@ begin
   if csDesigning in ComponentState then FRegistered := true
   else
   begin
-    TEventHandler(FEventHandler).RegisterEvents(Events);
-    FRegistered := true;
+    if not FBase.Database.Connected then
+      FDeferredRegister := true
+    else
+    begin
+      TEventHandler(FEventHandler).RegisterEvents(Events);
+      FRegistered := true;
+    end;
   end;
 end;
 
@@ -466,9 +475,11 @@ procedure TIBEvents.SetDatabase( value: TIBDatabase);
 begin
   if value <> FBase.Database then
   begin
-    UnregisterEvents;
+    if Registered then UnregisterEvents;
     if assigned( value) and value.Connected then ValidateDatabase( value);
     FBase.Database := value;
+    if (FBase.Database <> nil) and FBase.Database.Connected then
+      DoAfterDatabaseConnect(FBase.Database)
   end;
 end;
 
@@ -479,15 +490,19 @@ end;
 
 procedure TIBEvents.SetRegistered( value: Boolean);
 begin
-  if not assigned(FBase) or (FBase.Database = nil) then Exit;
+  FDeferredRegister := false;
+  if not assigned(FBase) or (FBase.Database = nil) then
+  begin
+    FDeferredRegister := value;
+    Exit;
+  end;
 
-  if FRegistered <> value  then
-    FRegistered := value;
   if value then RegisterEvents else UnregisterEvents;
 end;
 
 procedure TIBEvents.UnregisterEvents;
 begin
+  FDeferredRegister := false;
   if not FRegistered then
     Exit;
   if csDesigning in ComponentState then
@@ -502,6 +517,12 @@ end;
 procedure TIBEvents.DoBeforeDatabaseDisconnect(Sender: TObject);
 begin
   UnregisterEvents;
+end;
+
+procedure TIBEvents.DoAfterDatabaseConnect(Sender: TObject);
+begin
+  if FDeferredRegister then
+    Registered := true
 end;
 
 function TIBEvents.GetDatabaseHandle: TISC_DB_HANDLE;

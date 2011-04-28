@@ -48,7 +48,6 @@ type
     bOK: TButton;
     bCancel: TButton;
     procedure FormCreate(Sender: TObject);
-    procedure Panel1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -91,11 +90,6 @@ var
 begin
   for i := 1 to MaxEvents do
     cEvents.Cells[0, i-1] := IntToStr( i);
-end;
-
-procedure TIBEventsEditor.Panel1Click(Sender: TObject);
-begin
-
 end;
 
 end.

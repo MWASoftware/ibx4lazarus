@@ -9,7 +9,7 @@ object GeneratorEditor: TGeneratorEditor
   ClientWidth = 478
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '0.9.28.2'
+  LCLVersion = '0.9.30'
   object Bevel1: TBevel
     Left = 16
     Height = 336
@@ -18,25 +18,25 @@ object GeneratorEditor: TGeneratorEditor
   end
   object Label1: TLabel
     Left = 32
-    Height = 19
-    Top = 35
-    Width = 122
+    Height = 18
+    Top = 40
+    Width = 109
     Caption = 'Generator Name'
     ParentColor = False
   end
   object Label2: TLabel
     Left = 32
-    Height = 19
+    Height = 18
     Top = 192
-    Width = 81
+    Width = 75
     Caption = 'Field Name'
     ParentColor = False
   end
   object Label3: TLabel
     Left = 35
-    Height = 19
+    Height = 18
     Top = 269
-    Width = 97
+    Width = 88
     Caption = 'Increment By'
     ParentColor = False
   end
@@ -62,7 +62,7 @@ object GeneratorEditor: TGeneratorEditor
   end
   object GeneratorNames: TComboBox
     Left = 32
-    Height = 30
+    Height = 29
     Top = 58
     Width = 312
     ItemHeight = 0
@@ -72,24 +72,23 @@ object GeneratorEditor: TGeneratorEditor
     Left = 38
     Height = 22
     Top = 112
-    Width = 135
+    Width = 123
     Caption = 'On New Record'
     Checked = True
-    State = cbChecked
     TabOrder = 3
+    TabStop = True
   end
   object OnPost: TRadioButton
     Left = 38
     Height = 22
     Top = 144
-    Width = 78
+    Width = 74
     Caption = 'On Post'
     TabOrder = 4
-    TabStop = False
   end
   object FieldNames: TComboBox
     Left = 32
-    Height = 30
+    Height = 29
     Top = 213
     Width = 308
     ItemHeight = 0
@@ -98,16 +97,15 @@ object GeneratorEditor: TGeneratorEditor
   end
   object IncrementBy: TEdit
     Left = 39
-    Height = 28
+    Height = 27
     Top = 292
     Width = 52
-    OnKeyDown = nil
     TabOrder = 6
     Text = 'IncrementBy'
   end
   object UpDown1: TUpDown
     Left = 91
-    Height = 28
+    Height = 27
     Top = 292
     Width = 17
     Associate = IncrementBy
