@@ -175,7 +175,7 @@ implementation
 
 uses Sysutils, IB, Dynlibs
 {$IFDEF WINDOWS}
-,Forms
+,Forms, Registry
 {$ENDIF}
 ;
 
@@ -235,9 +235,29 @@ procedure LoadIBLibrary;
       Result := LoadLibrary(dllPathName)
     end
     else
-    //Otherwise see if Firebird client is in path
-    //and rely on registry for location of firebird.conf and firebird.msg
+    //Use Registry key if it exists to locate library
     begin
+      with TRegistry.Create do
+      try
+        RootKey := HKEY_LOCAL_MACHINE;
+        if OpenKey('SOFTWARE\Firebird Project\Firebird Server\Instances',false) then
+        begin
+          if ValueExists('DefaultInstance') then
+          begin
+            dllPathName := ReadString('DefaultInstance')  + DirectorySeparator + FIREBIRD_CLIENT;
+            if FileExists(dllPathName) then
+            begin
+              Result := LoadLibrary(dllPathName);
+              Exit
+            end
+          end
+        end
+      finally
+        Free
+      end;
+
+      //Otherwise see if Firebird client is in path
+      //and rely on registry for location of firebird.conf and firebird.msg
       Result := LoadLibrary(FIREBIRD_CLIENT);
       if Result <= HINSTANCE_ERROR then
          //well maybe InterBase is present...
