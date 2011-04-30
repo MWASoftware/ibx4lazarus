@@ -511,7 +511,7 @@ type
 implementation
 
 uses
-  IBIntf , IBSQLMonitor;
+  IBIntf , IBSQLMonitor, Math;
 
 { TIBCustomService }
 
@@ -646,6 +646,7 @@ begin
   FLoginPrompt := True;
   FTraceFlags := [];
   FOutputbuffer := nil;
+  FProtocol := Local;
 end;
 
 destructor TIBCustomService.Destroy;
@@ -1809,7 +1810,7 @@ end;
 
 function TIBSecurityService.GetUserInfoCount: Integer;
 begin
-  Result := High(FUSerInfo);
+  Result := Max(High(FUSerInfo),0);
 end;
 
 procedure TIBSecurityService.AddUser;

@@ -169,7 +169,6 @@ type
 
 const
   OnGetLibraryName: TOnGetLibraryName = nil;
-  UseEmbeddedServer: boolean = false;
 
 
 implementation
@@ -201,9 +200,6 @@ procedure LoadIBLibrary;
     begin
       if assigned(OnGetLibraryName) then
         OnGetLibraryName(LibName)
-      else
-      if UseEmbeddedServer then
-        LibName := FIREBIRD_EMBEDDED
       else
         LibName := FIREBIRD_SO2;
     end;

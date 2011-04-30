@@ -519,11 +519,7 @@ function TIBDatabase.AddSQLObject(ds: TIBBase): Integer;
 begin
   result := 0;
   if (ds.Owner is TIBCustomDataSet) then
-  {$IFDEF FPC}
-      FDataSets.Add(TDataSet(ds.Owner));
-  {$ELSE}
-      RegisterClient(TDataSet(ds.Owner));
-  {$ENDIF}
+    FDataSets.Add(ds.Owner);
   while (result < FSQLObjects.Count) and (FSQLObjects[result] <> nil) do
     Inc(result);
   if (result = FSQLObjects.Count) then
@@ -939,11 +935,7 @@ begin
     FSQLObjects[Idx] := nil;
     ds.Database := nil;
     if (ds.owner is TDataSet) then
-    {$IFDEF FPC}
       FDataSets.Remove(TDataSet(ds.Owner));
-    {$ELSE}
-      UnregisterClient(TDataSet(ds.Owner));
-    {$ENDIF}
   end;
 end;
 
@@ -955,11 +947,7 @@ begin
   begin
     RemoveSQLObject(i);
     if (TIBBase(FSQLObjects[i]).owner is TDataSet) then
-    {$IFDEF FPC}
       FDataSets.Remove(TDataSet(TIBBase(FSQLObjects[i]).owner));
-    {$ELSE}
-      UnregisterClient(TDataSet(TIBBase(FSQLObjects[i]).owner));
-    {$ENDIF}
   end;
 end;
 
