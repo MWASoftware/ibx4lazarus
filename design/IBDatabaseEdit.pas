@@ -73,7 +73,6 @@ type
     DatabaseParams: TMemo;
     OKBtn: TButton;
     CancelBtn: TButton;
-    HelpBtn: TButton;
     Label5: TLabel;
     LoginPrompt: TCheckBox;
     Label6: TLabel;
@@ -115,7 +114,7 @@ implementation
 
 {$R *.lfm}
 
-uses {LibHelp,} TypInfo;
+uses TypInfo;
 
 function EditIBDatabase(ADatabase: TIBDatabase): Boolean;
 begin

@@ -177,6 +177,7 @@ resourcestring
   SInterbaseExpressVersion = 'Firebird Express for Lazarus 1.0';
   SEditSQL = 'Edit SQL';
   SIBSQLEditor = 'IBSQL Editor';
+  SIBServiceEditor = 'Edit IB Service';
   SDPBConstantUnknownEx = 'DPB Constant (%s) is unknown';
   STPBConstantUnknownEx = 'TPB Constant (%s) is unknown';
   SSV5APIError = 'SV5 API API Error - %s';

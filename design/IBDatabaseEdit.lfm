@@ -25,9 +25,9 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     ClientWidth = 452
     TabOrder = 2
     object OKBtn: TButton
-      Left = 59
+      Left = 83
       Height = 30
-      Top = 7
+      Top = 6
       Width = 75
       Caption = 'OK'
       Default = True
@@ -35,7 +35,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       TabOrder = 0
     end
     object CancelBtn: TButton
-      Left = 140
+      Left = 164
       Height = 30
       Top = 7
       Width = 74
@@ -44,17 +44,8 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       ModalResult = 2
       TabOrder = 1
     end
-    object HelpBtn: TButton
-      Left = 301
-      Height = 30
-      Top = 7
-      Width = 75
-      Caption = '&Help'
-      OnClick = HelpBtnClick
-      TabOrder = 3
-    end
     object Test: TButton
-      Left = 220
+      Left = 244
       Height = 30
       Top = 6
       Width = 75

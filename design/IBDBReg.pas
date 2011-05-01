@@ -171,6 +171,15 @@ type
    function GetVerbCount: Integer; override;
   end;
 
+{ TIBServiceEditor}
+
+  TIBServiceEditor = class(TComponentEditor)
+  public
+    procedure ExecuteVerb(Index: Integer); override;
+    function GetVerb(Index: Integer): string; override;
+   function GetVerbCount: Integer; override;
+  end;
+
   TIBStoredProcParamsProperty = class(TCollectionPropertyEditor)
   public
     procedure Edit; override;
@@ -315,7 +324,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBBatchMove, DBLoginDlg, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
-     IBSQLEditor;
+     IBSQLEditor, ibserviceeditor;
 
 
 
@@ -359,6 +368,39 @@ begin
   RegisterComponentEditor(TIBQuery, TIBQueryEditor);
   RegisterComponentEditor(TIBStoredProc, TIBStoredProcEditor);
   RegisterComponentEditor(TIBSQL, TIBSQLEditor);
+  RegisterComponentEditor(TIBCustomService, TIBServiceEditor);
+end;
+
+{ TIBServiceEditor }
+
+procedure TIBServiceEditor.ExecuteVerb(Index: Integer);
+begin
+  if Index < inherited GetVerbCount then
+    inherited ExecuteVerb(Index) else
+  begin
+    Dec(Index, inherited GetVerbCount);
+    case Index of
+      0 : if ibserviceeditor.EditIBService(TIBCustomService(Component)) then Designer.Modified;
+    end;
+  end;
+end;
+
+function TIBServiceEditor.GetVerb(Index: Integer): string;
+begin
+  if Index < inherited GetVerbCount then
+    Result := inherited GetVerb(Index) else
+  begin
+    Dec(Index, inherited GetVerbCount);
+    case Index of
+      0: Result := SIBServiceEditor;
+      1 : Result := SInterbaseExpressVersion;
+    end;
+  end;
+end;
+
+function TIBServiceEditor.GetVerbCount: Integer;
+begin
+  Result := inherited GetVerbCount + 2;
 end;
 
 { TIBFileNameProperty }
