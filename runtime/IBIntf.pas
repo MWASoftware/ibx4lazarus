@@ -244,7 +244,7 @@ procedure LoadIBLibrary;
         begin
           if ValueExists('DefaultInstance') then
           begin
-            dllPathName := ReadString('DefaultInstance')  + DirectorySeparator + FIREBIRD_CLIENT;
+            dllPathName := ReadString('DefaultInstance')  + 'bin' + DirectorySeparator + FIREBIRD_CLIENT;
             if FileExists(dllPathName) then
             begin
               Result := LoadLibrary(dllPathName);
