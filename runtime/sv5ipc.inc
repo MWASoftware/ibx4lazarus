@@ -591,9 +591,9 @@ begin
 
   if FInitialiser then
     SemInit(cMonitorCounter,0);
-  FTraceDataType := PInteger(FSharedMemory.Allocate(sizeof(FTraceDataType)));
-  FTimeStamp := PDateTime(FSharedMemory.Allocate(sizeof(FTimeStamp)));
-  FBufferSize := PInteger(FSharedMemory.Allocate(sizeof(FBufferSize)));
+  FTraceDataType := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
+  FTimeStamp := PDateTime(FSharedMemory.Allocate(sizeof(TDateTime)));
+  FBufferSize := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
   FBuffer := FSharedMemory.Allocate(0); //All remaining
   FMaxBufferSize := FSharedMemory.LastAllocationSize;
 

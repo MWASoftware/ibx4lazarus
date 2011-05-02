@@ -92,19 +92,21 @@ const
                  'Where RDB$RELATION_NAME = :TableName ' +
                  'order by RDB$FIELD_POSITION asc ';
 
-  sqlGETFIELDS = 'Select Trim(RDB$FIELD_NAME) as ColumnName FROM RDB$RELATION_FIELDS ' +
-                 'Where RDB$RELATION_NAME = :TableName and RDB$UPDATE_FLAG = 1' +
-                 'order by RDB$FIELD_POSITION asc ';
+  sqlGETFIELDS = 'Select Trim(RF.RDB$FIELD_NAME) as ColumnName FROM RDB$RELATION_FIELDS RF ' +
+                 'JOIN RDB$FIELDS B On B.RDB$FIELD_NAME = RF.RDB$FIELD_SOURCE '+
+                 'Where RF.RDB$RELATION_NAME = :TableName and B.RDB$COMPUTED_SOURCE is NULL ' +
+                 'order by RF.RDB$FIELD_POSITION asc ';
 
   sqlGETPRIMARYKEYS = 'Select Trim(S.RDB$FIELD_NAME) as ColumnName From '+
                       '(Select RDB$INDEX_NAME,RDB$FIELD_NAME FROM RDB$INDEX_SEGMENTS Order by RDB$FIELD_POSITION ASC) S ' +
                       'JOIN RDB$RELATION_CONSTRAINTS C On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME ' +
                       'Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' and RDB$RELATION_NAME = :TableName';
 
-  sqlUPDATEFIELDS = 'Select Trim(RDB$FIELD_NAME) as ColumnName FROM RDB$RELATION_FIELDS RF ' +
-                    'Where RF.RDB$RELATION_NAME = :TableName  and RDB$FIELD_NAME not in ' +
+  sqlUPDATEFIELDS = 'Select Trim(RF.RDB$FIELD_NAME) as ColumnName FROM RDB$RELATION_FIELDS RF ' +
+                    'JOIN RDB$FIELDS B On B.RDB$FIELD_NAME = RF.RDB$FIELD_SOURCE '+
+                    'Where RF.RDB$RELATION_NAME = :TableName  and RF.RDB$FIELD_NAME not in ' +
                     '(Select RDB$FIELD_NAME FROM RDB$INDEX_SEGMENTS S JOIN RDB$RELATION_CONSTRAINTS C On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME '+
-                     'Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' and C.RDB$RELATION_NAME = RF.RDB$RELATION_NAME) and RF.RDB$UPDATE_FLAG = 1 ' +
+                     'Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' and C.RDB$RELATION_NAME = RF.RDB$RELATION_NAME) and B.RDB$COMPUTED_SOURCE is NULL ' +
                      'order by 1 asc ';
 
   sqlALLUPDATEFIELDS = 'Select Trim(RDB$FIELD_NAME) as ColumnName FROM RDB$RELATION_FIELDS RF ' +
