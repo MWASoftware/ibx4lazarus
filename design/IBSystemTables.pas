@@ -48,7 +48,8 @@ type
     FGetProcedures: TIBSQL;
     FGetProcedureParams: TIBSQL;
     function GetSQLType(SQLType: TIBSQLTypes): string;
-    procedure AddWhereClause(TableName: string; QuotedStrings: boolean; SQL: TStrings);
+    procedure AddWhereClause(TableName: string; QuotedStrings: boolean; SQL: TStrings;
+       UseOldValues: boolean = false);
     procedure GetProcParams(ProcName: string; ParamList: TStrings; InputParams: boolean); overload;
     function GetWord(S: string; WordNo: integer): string;
  public
@@ -57,7 +58,7 @@ type
     procedure SelectDatabase(Database: TIBDatabase; Transaction: TIBTransaction);
     procedure GetTableNames(TableNames: TStrings);
     procedure GetFieldNames(TableName: string; FieldNames: TStrings;
-              IncludePrimaryKeys:boolean=true);
+              IncludePrimaryKeys:boolean=true; IncludeReadOnlyFields: boolean = true);
     procedure GetPrimaryKeys(TableName: string; PrimaryKeys: TStrings);
     procedure GetTableAndColumns(SelectSQL: string; var FirstTableName: string;
                 Columns: TStrings);
@@ -87,8 +88,12 @@ const
                  'Where RDB$SYSTEM_FLAG = 0 ' +
                  'Order by 1';
 
-  sqlGETFIELDS = 'Select Trim(RDB$FIELD_NAME) as ColumnName FROM RDB$RELATION_FIELDS ' +
+  sqlGETALLFIELDS = 'Select Trim(RDB$FIELD_NAME) as ColumnName FROM RDB$RELATION_FIELDS ' +
                  'Where RDB$RELATION_NAME = :TableName ' +
+                 'order by RDB$FIELD_POSITION asc ';
+
+  sqlGETFIELDS = 'Select Trim(RDB$FIELD_NAME) as ColumnName FROM RDB$RELATION_FIELDS ' +
+                 'Where RDB$RELATION_NAME = :TableName and RDB$UPDATE_FLAG = 1' +
                  'order by RDB$FIELD_POSITION asc ';
 
   sqlGETPRIMARYKEYS = 'Select Trim(S.RDB$FIELD_NAME) as ColumnName From '+
@@ -97,6 +102,12 @@ const
                       'Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' and RDB$RELATION_NAME = :TableName';
 
   sqlUPDATEFIELDS = 'Select Trim(RDB$FIELD_NAME) as ColumnName FROM RDB$RELATION_FIELDS RF ' +
+                    'Where RF.RDB$RELATION_NAME = :TableName  and RDB$FIELD_NAME not in ' +
+                    '(Select RDB$FIELD_NAME FROM RDB$INDEX_SEGMENTS S JOIN RDB$RELATION_CONSTRAINTS C On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME '+
+                     'Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' and C.RDB$RELATION_NAME = RF.RDB$RELATION_NAME) and RF.RDB$UPDATE_FLAG = 1 ' +
+                     'order by 1 asc ';
+
+  sqlALLUPDATEFIELDS = 'Select Trim(RDB$FIELD_NAME) as ColumnName FROM RDB$RELATION_FIELDS RF ' +
                     'Where RF.RDB$RELATION_NAME = :TableName  and RDB$FIELD_NAME not in ' +
                     '(Select RDB$FIELD_NAME FROM RDB$INDEX_SEGMENTS S JOIN RDB$RELATION_CONSTRAINTS C On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME '+
                      'Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' and C.RDB$RELATION_NAME = RF.RDB$RELATION_NAME)' +
@@ -139,10 +150,11 @@ begin
 end;
 
 procedure TIBSystemTables.AddWhereClause(TableName: string;
-          QuotedStrings: boolean; SQL: TStrings);
+  QuotedStrings: boolean; SQL: TStrings; UseOldValues: boolean);
 var WhereClause: string;
     Separator: string;
     Count: integer;
+    Prefix: string;
 begin
   if not assigned(FGetPrimaryKeys.Database) or not FGetPrimaryKeys.Database.Connected or
     not assigned(FGetPrimaryKeys.Transaction) then
@@ -150,6 +162,10 @@ begin
   Count := 0;
   WhereClause := 'Where';
   Separator := ' A.';
+  if UseOldValues then
+    Prefix := ':OLD_'
+  else
+    Prefix := ':';
   FGetPrimaryKeys.Prepare;
   FGetPrimaryKeys.ParamByName('TableName').AsString := TableName;
   FGetPrimaryKeys.ExecQuery;
@@ -158,9 +174,11 @@ begin
     begin
       Inc(Count);
       if QuotedStrings then
-        WhereClause := WhereClause + Separator + '"' + FGetPrimaryKeys.FieldByName('ColumnName').AsString + '" = :' + FGetPrimaryKeys.FieldByName('ColumnName').AsString
+        WhereClause := WhereClause + Separator + '"' + FGetPrimaryKeys.FieldByName('ColumnName').AsString +
+               '" = ' + Prefix+ FGetPrimaryKeys.FieldByName('ColumnName').AsString
       else
-        WhereClause := WhereClause + Separator + FGetPrimaryKeys.FieldByName('ColumnName').AsString + ' = :' + FGetPrimaryKeys.FieldByName('ColumnName').AsString;
+        WhereClause := WhereClause + Separator + FGetPrimaryKeys.FieldByName('ColumnName').AsString +
+               ' = ' + Prefix + FGetPrimaryKeys.FieldByName('ColumnName').AsString;
       Separator := ' AND A.';
       FGetPrimaryKeys.Next
     end;
@@ -309,8 +327,9 @@ begin
   end;
 end;
 
-procedure TIBSystemTables.GetFieldNames(TableName: string; FieldNames: TStrings;
-              IncludePrimaryKeys:boolean=true);
+procedure TIBSystemTables.GetFieldNames(TableName: string;
+  FieldNames: TStrings; IncludePrimaryKeys: boolean;
+  IncludeReadOnlyFields: boolean);
 begin
   if not assigned(FGetFieldNames.Database) or not FGetFieldNames.Database.Connected or
     not assigned(FGetFieldNames.Transaction) then
@@ -319,7 +338,15 @@ begin
     if not InTransaction then StartTransaction;
   FieldNames.Clear;
   if IncludePrimaryKeys then
+  begin
+    if IncludeReadOnlyFields then
+      FGetFieldNames.SQL.Text := sqlGETALLFIELDS
+    else
       FGetFieldNames.SQL.Text := sqlGETFIELDS
+  end
+  else
+  if  IncludeReadOnlyFields then
+    FGetFieldNames.SQL.Text := sqlALLUPDATEFIELDS
   else
       FGetFieldNames.SQL.Text := sqlUPDATEFIELDS;
   FGetFieldNames.Prepare;
@@ -501,7 +528,7 @@ begin
          InsertSQL := InsertSQL + Separator + '"' + FieldNames[I] + '"'
       else
          InsertSQL := InsertSQL + Separator +  FieldNames[I] ;
-      Separator := ',';
+      Separator := ', ';
     end;
   InsertSQL := InsertSQL + ')';
   SQL.Add(InsertSQL);
@@ -510,7 +537,7 @@ begin
   for I := 0 to FieldNames.Count - 1 do
     begin
        InsertSQL := InsertSQL + Separator +  FieldNames[I] ;
-       Separator := ',:';
+       Separator := ', :';
     end;
   InsertSQL := InsertSQL + ')';
   SQL.Add(InsertSQL);
@@ -534,7 +561,7 @@ begin
       Separator := ','#$0d#$0a'  A.';
     end;
   SQL.Add(UpdateSQL);
-  AddWhereClause(TableName,QuotedStrings,SQL)
+  AddWhereClause(TableName,QuotedStrings,SQL,true)
 end;
 
 procedure TIBSystemTables.GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);

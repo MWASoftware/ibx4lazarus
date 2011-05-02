@@ -1,0 +1,308 @@
+object Form1: TForm1
+  Left = 460
+  Height = 454
+  Top = 310
+  Width = 743
+  Caption = 'Form1'
+  ClientHeight = 454
+  ClientWidth = 743
+  OnClose = FormClose
+  OnShow = FormShow
+  LCLVersion = '0.9.30'
+  object DBGrid1: TDBGrid
+    Left = 8
+    Height = 375
+    Top = 24
+    Width = 632
+    Color = clWindow
+    Columns = <    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Last Name'
+        Width = 150
+        FieldName = 'LAST_NAME'
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'First Name'
+        Width = 150
+        FieldName = 'FIRST_NAME'
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Employee No.'
+        Width = 100
+        FieldName = 'EMP_NO'
+      end    
+      item
+        Alignment = taCenter
+        Title.Alignment = taCenter
+        Title.Caption = 'Started'
+        Width = 80
+        FieldName = 'HIRE_DATE'
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Salary'
+        Width = 100
+        FieldName = 'SALARY'
+      end>
+    DataSource = Datasource1
+    TabOrder = 0
+    OnDblClick = DBGrid1DblClick
+  end
+  object Button1: TButton
+    Left = 656
+    Height = 25
+    Top = 24
+    Width = 75
+    Action = AddEmployee
+    TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 656
+    Height = 25
+    Top = 62
+    Width = 75
+    Action = EditEmployee
+    TabOrder = 2
+  end
+  object Button3: TButton
+    Left = 656
+    Height = 25
+    Top = 101
+    Width = 75
+    Action = DeleteEmployee
+    TabOrder = 3
+  end
+  object Button4: TButton
+    Left = 488
+    Height = 25
+    Top = 416
+    Width = 75
+    Action = SaveChanges
+    TabOrder = 4
+  end
+  object Button5: TButton
+    Left = 568
+    Height = 25
+    Top = 416
+    Width = 75
+    Action = CancelChanges
+    TabOrder = 5
+  end
+  object IBDatabase1: TIBDatabase
+    Connected = True
+    BeforeDisconnect = IBDatabase1BeforeDisconnect
+    StreamedConnected = False
+    DatabaseName = 'employee'
+    Params.Strings = (
+      'user_name=SYSDBA'
+      'lc_ctype=UTF-8'
+    )
+    DefaultTransaction = IBTransaction1
+    IdleTimer = 0
+    TraceFlags = []
+    left = 672
+    top = 224
+  end
+  object IBTransaction1: TIBTransaction
+    Active = True
+    DefaultDatabase = IBDatabase1
+    DefaultAction = TARollback
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait'
+    )
+    left = 672
+    top = 256
+  end
+  object IBQuery1: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AfterDelete = IBQuery1AfterDelete
+    AfterOpen = IBQuery1AfterOpen
+    BeforeClose = IBQuery1BeforeClose
+    Active = True
+    BufferChunks = 1000
+    CachedUpdates = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME From EMPLOYEE A'
+      'Order by LAST_NAME'
+    )
+    Params = <>
+    UpdateObject = IBUpdateSQL1
+    AfterTransactionEnd = IBQuery1AfterTransactionEnd
+    left = 672
+    top = 336
+    object IBQuery1EMP_NO: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'EMP_NO'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object IBQuery1FIRST_NAME: TIBStringField
+      DisplayWidth = 15
+      FieldKind = fkData
+      FieldName = 'FIRST_NAME'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 15
+    end
+    object IBQuery1LAST_NAME: TIBStringField
+      DisplayWidth = 20
+      FieldKind = fkData
+      FieldName = 'LAST_NAME'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object IBQuery1PHONE_EXT: TIBStringField
+      DisplayWidth = 4
+      FieldKind = fkData
+      FieldName = 'PHONE_EXT'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 4
+    end
+    object IBQuery1HIRE_DATE: TDateTimeField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'HIRE_DATE'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object IBQuery1DEPT_NO: TIBStringField
+      DisplayWidth = 3
+      FieldKind = fkData
+      FieldName = 'DEPT_NO'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 3
+    end
+    object IBQuery1JOB_CODE: TIBStringField
+      DisplayWidth = 5
+      FieldKind = fkData
+      FieldName = 'JOB_CODE'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 5
+    end
+    object IBQuery1JOB_GRADE: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'JOB_GRADE'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object IBQuery1JOB_COUNTRY: TIBStringField
+      DisplayWidth = 15
+      FieldKind = fkData
+      FieldName = 'JOB_COUNTRY'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 15
+    end
+    object IBQuery1SALARY: TIBBCDField
+      DisplayWidth = 18
+      FieldKind = fkData
+      FieldName = 'SALARY'
+      Index = 9
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      OnGetText = IBQuery1SALARYGetText
+      Precision = 18
+      Currency = False
+      MaxValue = 0
+      MinValue = 0
+      Size = 2
+    end
+    object IBQuery1FULL_NAME: TIBStringField
+      DisplayWidth = 37
+      FieldKind = fkData
+      FieldName = 'FULL_NAME'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = True
+      Required = False
+      Size = 37
+    end
+  end
+  object Datasource1: TDatasource
+    DataSet = IBQuery1
+    left = 672
+    top = 296
+  end
+  object ActionList1: TActionList
+    left = 672
+    top = 376
+    object AddEmployee: TAction
+      Caption = 'Add'
+      OnExecute = AddEmployeeExecute
+    end
+    object EditEmployee: TAction
+      Caption = 'Edit'
+      OnExecute = EditEmployeeExecute
+      OnUpdate = EditEmployeeUpdate
+    end
+    object DeleteEmployee: TAction
+      Caption = 'Delete'
+      OnExecute = DeleteEmployeeExecute
+      OnUpdate = EditEmployeeUpdate
+    end
+    object SaveChanges: TAction
+      Caption = 'Save'
+      OnExecute = SaveChangesExecute
+      OnUpdate = SaveChangesUpdate
+    end
+    object CancelChanges: TAction
+      Caption = 'Cancel'
+      OnExecute = CancelChangesExecute
+      OnUpdate = SaveChangesUpdate
+    end
+  end
+  object IBUpdateSQL1: TIBUpdateSQL
+    RefreshSQL.Strings = (
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME From EMPLOYEE A'
+      'Where A.EMP_NO = :EMP_NO'
+    )
+    DeleteSQL.Strings = (
+      'Delete From EMPLOYEE A'
+      'Where A.EMP_NO = :EMP_NO'
+    )
+    left = 712
+    top = 336
+  end
+end

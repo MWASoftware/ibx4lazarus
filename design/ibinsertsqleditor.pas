@@ -124,7 +124,7 @@ begin
       FIBSystemTables.GetTableAndColumns(SQLText.Text,TableName,nil);
       TableNamesCombo.ItemIndex := TableNamesCombo.Items.IndexOf(TableName)
     end;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items);
+    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,true,false);
   end;
   except {ignore}
   end;
@@ -155,7 +155,7 @@ end;
 
 procedure TIBInsertSQLEditorForm.TableNamesComboCloseUp(Sender: TObject);
 begin
-  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items);
+  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,true,false);
 end;
 
 constructor TIBInsertSQLEditorForm.Create(TheOwner: TComponent);

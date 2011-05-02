@@ -1,7 +1,7 @@
 object IBDataSetEditorForm: TIBDataSetEditorForm
-  Left = 350
+  Left = 475
   Height = 410
-  Top = 324
+  Top = 327
   Width = 662
   ActiveControl = PageControl
   BorderIcons = [biSystemMenu]
@@ -17,9 +17,9 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
     Height = 352
     Top = 8
     Width = 641
-    ActivePage = SQLPage
+    ActivePage = FieldsPage
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 0
     object FieldsPage: TTabSheet
       Caption = 'Options'
@@ -45,18 +45,18 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
           ParentColor = False
         end
         object Label3: TLabel
-          Left = 228
+          Left = 315
           Height = 18
-          Top = 19
+          Top = 18
           Width = 71
           Caption = '&Key Fields:'
           FocusControl = PrimaryKeyList
           ParentColor = False
         end
         object Label4: TLabel
-          Left = 371
+          Left = 458
           Height = 18
-          Top = 19
+          Top = 18
           Width = 94
           Caption = 'Update &Fields:'
           FocusControl = FieldList
@@ -72,9 +72,9 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
           TabOrder = 0
         end
         object PrimaryKeyList: TListBox
-          Left = 228
+          Left = 315
           Height = 232
-          Top = 36
+          Top = 35
           Width = 136
           Anchors = [akTop, akLeft, akBottom]
           ItemHeight = 0
@@ -83,10 +83,10 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
           TopIndex = -1
         end
         object FieldList: TListBox
-          Left = 371
+          Left = 458
           Height = 232
           Hint = 'Select Fields to include in Update Statements, or leave unselected to select all'
-          Top = 36
+          Top = 35
           Width = 136
           Anchors = [akTop, akLeft, akBottom]
           ItemHeight = 0
@@ -113,6 +113,17 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
           Caption = '&Quote Identifiers'
           TabOrder = 2
         end
+        object IncludePrimaryKeys: TCheckBox
+          Left = 12
+          Height = 22
+          Top = 163
+          Width = 239
+          Caption = 'Include Primary keys in Field List'
+          Checked = True
+          OnClick = TableNamesComboCloseUp
+          State = cbChecked
+          TabOrder = 5
+        end
       end
     end
     object SQLPage: TTabSheet
@@ -136,7 +147,7 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         Width = 615
         Anchors = [akTop, akLeft, akRight, akBottom]
         OnChange = SQLMemoChange
-        ScrollBars = ssAutoBoth
+        ScrollBars = ssAutoVertical
         TabOrder = 0
       end
       object StatementType: TRadioGroup

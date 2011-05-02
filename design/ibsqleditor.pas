@@ -301,14 +301,14 @@ begin
     FIBSystemTables.GetTableAndColumns(SQLText.Text,TableName,nil);
     ModifyTableNames.ItemIndex := ModifyTableNames.Items.IndexOf(TableName);
   end;
-  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked);
+  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked,false);
   FIBSystemTables.GetPrimaryKeys(ModifyTableNames.Text,ModifyPrimaryKeys.Items);
 end;
 
 procedure TIBSQLEditorForm.ModifyTableNamesCloseUp(Sender: TObject);
 begin
   FTableName := ModifyTableNames.Text;
-  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked);
+  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked,false);
   FIBSystemTables.GetPrimaryKeys(ModifyTableNames.Text,ModifyPrimaryKeys.Items);
 end;
 

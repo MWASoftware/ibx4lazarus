@@ -1,0 +1,7 @@
+inherited AddEmployeeDlg: TAddEmployeeDlg
+  Caption = 'Add New Employee'
+  OnShow = FormShow
+  inherited IBDataSet1: TIBDataSet
+    AfterInsert = IBDataSet1AfterInsert
+  end
+end

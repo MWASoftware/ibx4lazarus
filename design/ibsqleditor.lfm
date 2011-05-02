@@ -144,7 +144,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Left = 7
         Height = 18
         Top = 3
-        Width = 76
+        Width = 78
         Caption = 'Table Name'
         ParentColor = False
       end
@@ -152,7 +152,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Left = 7
         Height = 18
         Top = 69
-        Width = 36
+        Width = 39
         Caption = 'Fields'
         ParentColor = False
       end

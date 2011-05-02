@@ -291,6 +291,7 @@ type
     FDefaultAction      : TTransactionAction;
     FTRParams           : TStrings;
     FTRParamsChanged    : Boolean;
+    FInEndTransaction   : boolean;
     procedure EnsureNotInTransaction;
     procedure EndTransaction(Action: TTransactionAction; Force: Boolean);
     function GetDatabase(Index: Integer): TIBDatabase;
@@ -1420,6 +1421,9 @@ var
   i: Integer;
 begin
   CheckInTransaction;
+  if FInEndTransaction then Exit;
+  FInEndTransaction := true;
+  try
   case Action of
     TARollback, TACommit:
     begin
@@ -1470,6 +1474,9 @@ begin
       TARollbackRetaining:
         MonitorHook.TRRollbackRetaining(Self);
     end;
+  end;
+  finally
+    FInEndTransaction := false
   end;
 end;
 

@@ -43,6 +43,7 @@ type
     FieldsPage: TTabSheet;
     GenerateButton: TButton;
     GroupBox1: TGroupBox;
+    IncludePrimaryKeys: TCheckBox;
     PrimaryKeyList: TListBox;
     Label1: TLabel;
     Label2: TLabel;
@@ -144,7 +145,7 @@ begin
        TableNamesCombo.ItemIndex := TableNamesCombo.Items.IndexOf(TableName);
     except  //ignore
     end;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,false);
+    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,IncludePrimaryKeys.checked,false);
     FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
   end;
 end;
@@ -178,6 +179,8 @@ begin
     FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldNames);
     FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,FRefreshSQL);
     FIBSystemTables.GenerateDeleteSQL(TableNamesCombo.Text,QuoteFields.Checked,FDeleteSQL);
+    FieldNames.Clear;
+    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldNames,true,false);
     FIBSystemTables.GenerateInsertSQL(TableNamesCombo.Text,QuoteFields.Checked,
         FieldNames,FInsertSQL);
     if FieldList.SelCount = 0 then
@@ -219,7 +222,7 @@ end;
 
 procedure TIBUpdateSQLEditorForm.TableNamesComboCloseUp(Sender: TObject);
 begin
-  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,false);
+  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,IncludePrimaryKeys.checked,false);
   FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
 end;
 

@@ -136,7 +136,9 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Top = 256
     Width = 239
     Caption = 'Include Primary keys in Field List'
+    Checked = True
     OnClick = TableNamesComboCloseUp
+    State = cbChecked
     TabOrder = 9
   end
 end
