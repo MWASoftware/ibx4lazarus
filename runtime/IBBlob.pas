@@ -45,16 +45,16 @@ type
   private
     FBase: TIBBase;
     FBlobID: TISC_QUAD;
-    FBlobMaxSegmentSize,
-    FBlobNumSegments,
-    FBlobSize: Long;
+    FBlobMaxSegmentSize: Int64;
+    FBlobNumSegments: Long;
+    FBlobSize: Int64;
     FBlobType: Short;  { 0 = segmented, 1 = streamed }
     FBuffer: PChar;
     FBlobInitialized: Boolean;
     FHandle: TISC_BLOB_HANDLE;
     FMode: TBlobStreamMode;
     FModified: Boolean;
-    FPosition: Long;
+    FPosition: Int64;
   protected
     procedure CloseBlob;
     procedure CreateBlob;
@@ -81,15 +81,15 @@ type
     function Read(var Buffer; Count: Longint): Longint; override;
     procedure SaveToFile(Filename: string);
     procedure SaveToStream(Stream: TStream);
-    function Seek(Offset: Longint; Origin: Word): Longint; override;
-    procedure SetSize(NewSize: Long); override;
+    function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
+    procedure SetSize(const NewSize: Int64); override;
     procedure Truncate;
     function Write(const Buffer; Count: Longint): Longint; override;
     property Handle: TISC_BLOB_HANDLE read FHandle;
     property BlobID: TISC_QUAD read FBlobID write SetBlobID;
-    property BlobMaxSegmentSize: Long read FBlobMaxSegmentSize;
+    property BlobMaxSegmentSize: Int64 read FBlobMaxSegmentSize;
     property BlobNumSegments: Long read FBlobNumSegments;
-    property BlobSize: Long read FBlobSize;
+    property BlobSize: Int64 read FBlobSize;
     property BlobType: Short read FBlobType;
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property DBHandle: PISC_DB_HANDLE read GetDBHandle;
@@ -99,17 +99,17 @@ type
     property TRHandle: PISC_TR_HANDLE read GetTRHandle;
   end;
 
-  procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments, MaxSegmentSize,
-                       TotalSize: Long; var BlobType: Short);
-  procedure ReadBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Long);
-  procedure WriteBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Long);
+  procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments: Long; var MaxSegmentSize,
+                      TotalSize: Int64; var BlobType: Short);
+  procedure ReadBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);
+  procedure WriteBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);
 
 implementation
 
 uses IBIntf;
 
-procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments, MaxSegmentSize,
-                      TotalSize: Long; var BlobType: Short);
+procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments: Long; var MaxSegmentSize,
+                      TotalSize: Int64; var BlobType: Short);
 var
   items: array[0..3] of Char;
   results: array[0..99] of Char;
@@ -132,21 +132,21 @@ begin
     item_length := isc_vax_integer(@results[i], 2); Inc(i, 2);
     case item of
       isc_info_blob_num_segments:
-        NumSegments := isc_vax_integer(@results[i], item_length);
+        NumSegments := isc_portable_integer(@results[i], item_length);
       isc_info_blob_max_segment:
-        MaxSegmentSize := isc_vax_integer(@results[i], item_length);
+        MaxSegmentSize := isc_portable_integer(@results[i], item_length);
       isc_info_blob_total_length:
-        TotalSize := isc_vax_integer(@results[i], item_length);
+        TotalSize := isc_portable_integer(@results[i], item_length);
       isc_info_blob_type:
-        BlobType := isc_vax_integer(@results[i], item_length);
+        BlobType := isc_portable_integer(@results[i], item_length);
     end;
     Inc(i, item_length);
   end;
 end;
 
-procedure ReadBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Long);
+procedure ReadBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);
 var
-  CurPos: Long;
+  CurPos: Int64;
   BytesRead, SegLen: UShort;
   LocalBuffer: PChar;
 begin
@@ -168,9 +168,10 @@ begin
 end;
 
 procedure WriteBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar;
-  BlobSize: Long);
+  BlobSize: Int64);
 var
-  CurPos, SegLen: Long;
+  CurPos: Int64;
+  SegLen: Long;
 begin
   CurPos := 0;
   SegLen := DefaultBlobSegmentSize;
@@ -273,7 +274,7 @@ end;
 
 procedure TIBBlobStream.GetBlobInfo;
 var
-  iBlobSize: Long;
+  iBlobSize: Int64;
 begin
   IBBlob.GetBlobInfo(@FHandle, FBlobNumSegments, FBlobMaxSegmentSize,
     iBlobSize, FBlobType);
@@ -379,13 +380,13 @@ begin
   end;
 end;
 
-function TIBBlobStream.Seek(Offset: Longint; Origin: Word): Longint;
+function TIBBlobStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
 begin
   EnsureBlobInitialized;
   case Origin of
-    soFromBeginning     : FPosition := Offset;
-    soFromCurrent	: Inc(FPosition, Offset);
-    soFromEnd           : FPosition := FBlobSize + Offset;
+    soBeginning     : FPosition := Offset;
+    soCurrent	    : Inc(FPosition, Offset);
+    soEnd           : FPosition := FBlobSize + Offset;
   end;
   result := FPosition;
 end;
@@ -408,7 +409,7 @@ begin
   FBlobInitialized := False;
 end;
 
-procedure TIBBlobStream.SetSize(NewSize: Long);
+procedure TIBBlobStream.SetSize(const NewSize: Int64);
 begin
   if (NewSize <> FBlobSize) then
   begin

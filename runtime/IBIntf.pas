@@ -52,6 +52,7 @@ var
   isc_sql_interprete: Tisc_sql_interprete;
   isc_interprete: Tisc_interprete;
   isc_vax_integer: Tisc_vax_integer;
+  isc_portable_integer: Tisc_portable_integer;
   isc_blob_info: Tisc_blob_info;
   isc_open_blob2: Tisc_open_blob2;
   isc_close_blob: Tisc_close_blob;
@@ -276,6 +277,7 @@ begin
     isc_sql_interprete := GetProcAddr('isc_sql_interprete'); {do not localize}
     isc_interprete := GetProcAddr('isc_interprete'); {do not localize}
     isc_vax_integer := GetProcAddr('isc_vax_integer'); {do not localize}
+    isc_portable_integer := GetProcAddr('isc_portable_integer'); {do not localize}
     isc_blob_info := GetProcAddr('isc_blob_info'); {do not localize}
     isc_open_blob2 := GetProcAddr('isc_open_blob2'); {do not localize}
     isc_close_blob := GetProcAddr('isc_close_blob'); {do not localize}
