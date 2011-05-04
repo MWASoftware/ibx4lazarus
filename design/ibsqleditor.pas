@@ -151,7 +151,7 @@ end;
 procedure TIBSQLEditorForm.FormShow(Sender: TObject);
 var IsProcedureName: boolean;
 begin
-  if Trim(SQLText.Text) = '' then
+  if Trim(SQLText.Text) <> '' then
   begin
     case FIBSystemTables.GetStatementType(SQLText.Text,IsProcedureName) of
     SQLSelect:

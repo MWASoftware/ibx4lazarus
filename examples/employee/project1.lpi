@@ -42,7 +42,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="23">
+    <Units Count="27">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -60,8 +60,8 @@
         <UnitName Value="Unit1"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="105"/>
-        <CursorPos X="48" Y="111"/>
+        <TopLine Value="203"/>
+        <CursorPos X="18" Y="232"/>
         <UsageCount Value="41"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -102,7 +102,7 @@
         <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
         <TopLine Value="346"/>
-        <CursorPos X="1" Y="363"/>
+        <CursorPos X="67" Y="348"/>
         <UsageCount Value="16"/>
         <Loaded Value="True"/>
       </Unit5>
@@ -119,7 +119,7 @@
       <Unit7>
         <Filename Value="../../runtime/IBDatabase.pas"/>
         <UnitName Value="IBDatabase"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
         <TopLine Value="318"/>
         <CursorPos X="15" Y="305"/>
@@ -182,7 +182,7 @@
       <Unit15>
         <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/db.pas"/>
         <UnitName Value="db"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="6"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1205"/>
         <CursorPos X="15" Y="1222"/>
@@ -233,141 +233,175 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="95"/>
-        <CursorPos X="3" Y="42"/>
+        <TopLine Value="49"/>
+        <CursorPos X="59" Y="49"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit21>
       <Unit22>
         <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/dataset.inc"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="7"/>
         <WindowIndex Value="0"/>
         <TopLine Value="938"/>
         <CursorPos X="3" Y="941"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit22>
+      <Unit23>
+        <Filename Value="../../../../projects/cdream/dbclients/src/frames/SendEmailFrameUnit.lfm"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="414"/>
+        <CursorPos X="1" Y="6"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="../../../../projects/cdream/dbclients/src/framework/BaseFrameUnit.pas"/>
+        <UnitName Value="BaseFrameUnit"/>
+        <EditorIndex Value="4"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="205"/>
+        <CursorPos X="1" Y="214"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="../../../../projects/cdream/dbclients/src/framework/ToyShopDBUnit.pas"/>
+        <UnitName Value="ToyShopDBUnit"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="142"/>
+        <CursorPos X="1" Y="156"/>
+        <UsageCount Value="10"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="../../../../projects/cdream/dbclients/debian/changelog"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="60" Y="7"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit26>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2780" Column="1" TopLine="2763"/>
+        <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/dataset.inc"/>
+        <Caret Line="941" Column="3" TopLine="938"/>
       </Position1>
       <Position2>
-        <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/db.pas"/>
-        <Caret Line="1145" Column="46" TopLine="1135"/>
+        <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/dataset.inc"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position2>
       <Position3>
-        <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/db.pas"/>
-        <Caret Line="1146" Column="29" TopLine="1185"/>
+        <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/dataset.inc"/>
+        <Caret Line="200" Column="16" TopLine="172"/>
       </Position3>
       <Position4>
         <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="941" Column="3" TopLine="938"/>
+        <Caret Line="397" Column="34" TopLine="369"/>
       </Position4>
       <Position5>
         <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Caret Line="400" Column="15" TopLine="382"/>
       </Position5>
       <Position6>
-        <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="200" Column="16" TopLine="172"/>
-      </Position6>
-      <Position7>
-        <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="397" Column="34" TopLine="369"/>
-      </Position7>
-      <Position8>
-        <Filename Value="/usr/share/fpcsrc/2.4.2/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="400" Column="15" TopLine="382"/>
-      </Position8>
-      <Position9>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <Caret Line="3236" Column="11" TopLine="3221"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <Caret Line="354" Column="35" TopLine="330"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <Caret Line="304" Column="21" TopLine="288"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <Caret Line="1629" Column="42" TopLine="1617"/>
       </Position9>
       <Position10>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="46" Column="92" TopLine="71"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
       </Position10>
       <Position11>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="354" Column="35" TopLine="330"/>
+        <Caret Line="291" Column="19" TopLine="263"/>
       </Position11>
       <Position12>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="304" Column="21" TopLine="288"/>
+        <Caret Line="305" Column="31" TopLine="277"/>
       </Position12>
       <Position13>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1629" Column="42" TopLine="1617"/>
+        <Caret Line="354" Column="90" TopLine="326"/>
       </Position13>
       <Position14>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Caret Line="1298" Column="17" TopLine="1270"/>
       </Position14>
       <Position15>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="291" Column="19" TopLine="263"/>
+        <Caret Line="1308" Column="36" TopLine="1280"/>
       </Position15>
       <Position16>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="305" Column="31" TopLine="277"/>
+        <Caret Line="1431" Column="35" TopLine="1403"/>
       </Position16>
       <Position17>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="354" Column="90" TopLine="326"/>
+        <Caret Line="1562" Column="34" TopLine="1534"/>
       </Position17>
       <Position18>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1298" Column="17" TopLine="1270"/>
+        <Caret Line="1629" Column="42" TopLine="1601"/>
       </Position18>
       <Position19>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1308" Column="36" TopLine="1280"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="104" Column="61" TopLine="103"/>
       </Position19>
       <Position20>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1431" Column="35" TopLine="1403"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="198" Column="31" TopLine="168"/>
       </Position20>
       <Position21>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1562" Column="34" TopLine="1534"/>
+        <Filename Value="../../runtime/IB.pas"/>
+        <Caret Line="363" Column="1" TopLine="346"/>
       </Position21>
       <Position22>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1629" Column="42" TopLine="1601"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="197" Column="32" TopLine="169"/>
       </Position22>
       <Position23>
         <Filename Value="unit1.pas"/>
-        <Caret Line="104" Column="61" TopLine="103"/>
+        <Caret Line="205" Column="1" TopLine="176"/>
       </Position23>
       <Position24>
         <Filename Value="unit1.pas"/>
-        <Caret Line="198" Column="31" TopLine="168"/>
+        <Caret Line="172" Column="1" TopLine="156"/>
       </Position24>
       <Position25>
-        <Filename Value="../../runtime/IB.pas"/>
-        <Caret Line="363" Column="1" TopLine="346"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="171" Column="14" TopLine="156"/>
       </Position25>
       <Position26>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="197" Column="32" TopLine="169"/>
+        <Filename Value="../../runtime/IBExtract.pas"/>
+        <Caret Line="102" Column="51" TopLine="93"/>
       </Position26>
       <Position27>
         <Filename Value="unit1.pas"/>
-        <Caret Line="205" Column="1" TopLine="176"/>
+        <Caret Line="113" Column="48" TopLine="107"/>
       </Position27>
       <Position28>
         <Filename Value="unit1.pas"/>
-        <Caret Line="172" Column="1" TopLine="156"/>
+        <Caret Line="210" Column="20" TopLine="186"/>
       </Position28>
       <Position29>
         <Filename Value="unit1.pas"/>
-        <Caret Line="171" Column="14" TopLine="156"/>
+        <Caret Line="82" Column="22" TopLine="59"/>
       </Position29>
       <Position30>
-        <Filename Value="../../runtime/IBExtract.pas"/>
-        <Caret Line="102" Column="51" TopLine="93"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="99" Column="1" TopLine="66"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

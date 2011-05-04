@@ -56,6 +56,8 @@ type
     procedure IBQuery1AfterTransactionEnd(Sender: TObject);
     procedure IBQuery1BeforeClose(DataSet: TDataSet);
     procedure IBQuery1BeforeOpen(DataSet: TDataSet);
+    procedure IBQuery1PostError(DataSet: TDataSet; E: EDatabaseError;
+      var DataAction: TDataAction);
     procedure IBQuery1SALARYGetText(Sender: TField; var aText: string;
       DisplayText: Boolean);
     procedure SaveChangesExecute(Sender: TObject);
@@ -77,7 +79,22 @@ implementation
 
 {$R *.lfm}
 
-uses Unit2, Unit3;
+uses Unit2, Unit3, IB;
+
+function ExtractDBException(msg: string): string;
+var Lines: TStringList;
+begin
+     Lines := TStringList.Create;
+     try
+       Lines.Text := msg;
+       if pos('exception',Lines[0]) = 1 then
+         Result := Lines[2]
+       else
+         Result := msg
+     finally
+       Lines.Free
+     end;
+end;
 
 { TForm1 }
 
@@ -203,6 +220,17 @@ end;
 
 procedure TForm1.IBQuery1BeforeOpen(DataSet: TDataSet);
 begin
+end;
+
+procedure TForm1.IBQuery1PostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+  if E is EIBError then
+   begin
+       MessageDlg(ExtractDBException(EIBError(E).message),mtError,[mbOK],0);
+       DataSet.Cancel;
+       DataAction  := daAbort
+   end;
 end;
 
 end.

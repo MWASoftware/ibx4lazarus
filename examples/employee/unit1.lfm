@@ -125,6 +125,8 @@ object Form1: TForm1
     AfterOpen = IBQuery1AfterOpen
     BeforeClose = IBQuery1BeforeClose
     BeforeOpen = IBQuery1BeforeOpen
+    OnDeleteError = IBQuery1PostError
+    OnPostError = IBQuery1PostError
     Active = True
     BufferChunks = 1000
     CachedUpdates = False
