@@ -59,6 +59,8 @@ type
   TIBCustomDataSet = class;
   TIBDataSet = class;
 
+  { TIBDataSetUpdateObject }
+
   TIBDataSetUpdateObject = class(TComponent)
   private
     FRefreshSQL: TStrings;
@@ -66,8 +68,9 @@ type
   protected
     function GetDataSet: TIBCustomDataSet; virtual; abstract;
     procedure SetDataSet(ADataSet: TIBCustomDataSet); virtual; abstract;
-    procedure Apply(UpdateKind: TUpdateKind); virtual; abstract;
+    procedure Apply(UpdateKind: TUpdateKind; buff: PChar); virtual; abstract;
     function GetSQL(UpdateKind: TUpdateKind): TStrings; virtual; abstract;
+    procedure InternalSetParams(Query: TIBSQL; buff: PChar);
     property DataSet: TIBCustomDataSet read GetDataSet write SetDataSet;
   public
     constructor Create(AOwner: TComponent); override;
@@ -301,7 +304,7 @@ type
     procedure RefreshParams;
     procedure SQLChanging(Sender: TObject); virtual;
     function AdjustPosition(FCache: PChar; Offset: DWORD;
-                            Origin: Integer): Integer;
+                            Origin: Integer): PtrUInt;
     procedure ReadCache(FCache: PChar; Offset: DWORD; Origin: Integer;
                        Buffer: PChar);
     procedure ReadRecordCache(RecordNumber: Integer; Buffer: PChar;
@@ -990,7 +993,7 @@ var
   procedure UpdateUsingUpdateObject;
   begin
     try
-      FUpdateObject.Apply(UpdateKind);
+      FUpdateObject.Apply(UpdateKind,PChar(Buffer));
       ResetBufferUpdateStatus;
     except
       on E: Exception do
@@ -1600,7 +1603,7 @@ end;
 procedure TIBCustomDataSet.InternalDeleteRecord(Qry: TIBSQL; Buff: Pointer);
 begin
   if (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukDelete).Text <> '')) then
-    FUpdateObject.Apply(ukDelete)
+    FUpdateObject.Apply(ukDelete,Buff)
   else
   begin
     SetInternalSQLParams(FQDelete, Buff);
@@ -1715,11 +1718,11 @@ begin
   if Assigned(FUpdateObject) then
   begin
     if (Qry = FQDelete) then
-      FUpdateObject.Apply(ukDelete)
+      FUpdateObject.Apply(ukDelete,Buff)
     else if (Qry = FQInsert) then
-      FUpdateObject.Apply(ukInsert)
+      FUpdateObject.Apply(ukInsert,Buff)
     else
-      FUpdateObject.Apply(ukModify);
+      FUpdateObject.Apply(ukModify,Buff);
   end
   else begin
     SetInternalSQLParams(Qry, Buff);
@@ -2233,7 +2236,7 @@ begin
 end;
 
 function TIBCustomDataSet.AdjustPosition(FCache: PChar; Offset: DWORD;
-                                        Origin: Integer): Integer;
+                                        Origin: Integer): PtrUInt;
 var
   OldCacheSize: Integer;
 begin
@@ -2275,9 +2278,9 @@ begin
   bOld := (FCache = FOldBufferCache);
   pCache := PChar(AdjustPosition(FCache, Offset, Origin));
   if not bOld then
-    pCache := FBufferCache + Integer(pCache)
+    pCache := FBufferCache + PtrUInt(pCache)
   else
-    pCache := FOldBufferCache + Integer(pCache);
+    pCache := FOldBufferCache + PtrUInt(pCache);
   Move(pCache^, Buffer^, DWORD(FRecordBufferSize));
   AdjustPosition(FCache, FRecordBufferSize, FILE_CURRENT);
 end;
@@ -2313,9 +2316,9 @@ begin
   bOld := (FCache = FOldBufferCache);
   pCache := PChar(AdjustPosition(FCache, Offset, Origin));
   if not bOld then
-    pCache := FBufferCache + Integer(pCache)
+    pCache := FBufferCache + PtrUInt(pCache)
   else
-    pCache := FOldBufferCache + Integer(pCache);
+    pCache := FOldBufferCache + PtrUInt(pCache);
   Move(Buffer^, pCache^, FRecordBufferSize);
   dwEnd := AdjustPosition(FCache, FRecordBufferSize, FILE_CURRENT);
   if not bOld then
@@ -3908,6 +3911,12 @@ end;
 procedure TIBDataSetUpdateObject.SetRefreshSQL(Value: TStrings);
 begin
   FRefreshSQL.Assign(Value);
+end;
+
+procedure TIBDataSetUpdateObject.InternalSetParams(Query: TIBSQL; buff: PChar);
+begin
+  if not Assigned(DataSet) then Exit;
+  DataSet.SetInternalSQLParams(Query, buff);
 end;
 
 { TIBDSBlobStream }

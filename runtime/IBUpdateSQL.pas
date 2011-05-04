@@ -37,7 +37,7 @@ unit IBUpdateSQL;
 
 interface
 
-uses SysUtils, Classes, DB, IB, IBCustomDataSet, IBQuery;
+uses SysUtils, Classes, DB, IB, IBCustomDataSet, IBSQL;
 
 type
 { TIBUpdateSQL }
@@ -45,25 +45,25 @@ type
   TIBUpdateSQL = class(TIBDataSetUpdateObject)
   private
     FDataSet: TIBCustomDataSet;
-    FQueries: array[TUpdateKind] of TIBQuery;
+    FQueries: array[TUpdateKind] of TIBSQL;
     FSQLText: array[TUpdateKind] of TStrings;
-    function GetQuery(UpdateKind: TUpdateKind): TIBQuery;
+    function GetQuery(UpdateKind: TUpdateKind): TIBSQL;
     function GetSQLIndex(Index: Integer): TStrings;
     procedure SetSQL(UpdateKind: TUpdateKind; Value: TStrings);
     procedure SetSQLIndex(Index: Integer; Value: TStrings);
   protected
+    procedure InternalPrepare(UpdateKind: TUpdateKind);
     function GetSQL(UpdateKind: TUpdateKind): TStrings; override;
     function GetDataSet: TIBCustomDataSet; override;
     procedure SetDataSet(ADataSet: TIBCustomDataSet); override;
     procedure SQLChanged(Sender: TObject);
+    procedure Apply(UpdateKind: TUpdateKind; buff: PChar); override;
+    procedure ExecSQL(UpdateKind: TUpdateKind);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Apply(UpdateKind: TUpdateKind); override;
-    procedure ExecSQL(UpdateKind: TUpdateKind);
-    procedure SetParams(UpdateKind: TUpdateKind);
     property DataSet;
-    property Query[UpdateKind: TUpdateKind]: TIBQuery read GetQuery;
+    property Query[UpdateKind: TUpdateKind]: TIBSQL read GetQuery;
     property SQL[UpdateKind: TUpdateKind]: TStrings read GetSQL write SetSQL;
   published
     property ModifySQL: TStrings index 0 read GetSQLIndex write SetSQLIndex;
@@ -102,19 +102,19 @@ end;
 
 procedure TIBUpdateSQL.ExecSQL(UpdateKind: TUpdateKind);
 begin
+  InternalPrepare(UpdateKind);
   with Query[UpdateKind] do
   begin
-    Prepare;
-    ExecSQL;
+    ExecQuery;
     if RowsAffected <> 1 then IBError(ibxeUpdateFailed, [nil]);
   end;
 end;
 
-function TIBUpdateSQL.GetQuery(UpdateKind: TUpdateKind): TIBQuery;
+function TIBUpdateSQL.GetQuery(UpdateKind: TUpdateKind): TIBSQL;
 begin
   if not Assigned(FQueries[UpdateKind]) then
   begin
-    FQueries[UpdateKind] := TIBQuery.Create(Self);
+    FQueries[UpdateKind] := TIBSQL.Create(Self);
     FQueries[UpdateKind].SQL.Assign(FSQLText[UpdateKind]);
     if (FDataSet is TIBCustomDataSet) then
     begin
@@ -155,6 +155,16 @@ begin
   SetSQL(TUpdateKind(Index), Value);
 end;
 
+procedure TIBUpdateSQL.InternalPrepare(UpdateKind: TUpdateKind);
+begin
+  with Query[UpdateKind] do
+  begin
+    with Transaction do
+      if not InTransaction then StartTransaction;
+    if not Prepared then Prepare;
+  end;
+end;
+
 procedure TIBUpdateSQL.SQLChanged(Sender: TObject);
 var
   UpdateKind: TUpdateKind;
@@ -163,51 +173,16 @@ begin
     if Sender = FSQLText[UpdateKind] then
     begin
       if Assigned(FQueries[UpdateKind]) then
-      begin
-        FQueries[UpdateKind].Params.Clear;
         FQueries[UpdateKind].SQL.Assign(FSQLText[UpdateKind]);
-      end;
       Break;
     end;
 end;
 
-procedure TIBUpdateSQL.SetParams(UpdateKind: TUpdateKind);
-var
-  I: Integer;
-  Old: Boolean;
-  Param: TParam;
-  PName: string;
-  Field: TField;
-  Value: Variant;
+procedure TIBUpdateSQL.Apply(UpdateKind: TUpdateKind; buff: PChar);
 begin
   if not Assigned(FDataSet) then Exit;
-  with Query[UpdateKind] do
-  begin
-    for I := 0 to Params.Count - 1 do
-    begin
-      Param := Params[I];
-      PName := Param.Name;
-      Old := CompareText(Copy(PName, 1, 4), 'OLD_') = 0; {do not localize}
-      if Old then
-        System.Delete(PName, 1, 4);
-      Field := FDataSet.FindField(PName);
-      if not Assigned(Field) then
-        Continue;
-      if Old then
-        Param.AssignFieldValue(Field, Field.OldValue) else
-      begin
-        Value := Field.NewValue;
-        if VarIsEmpty(Value) then
-          Value := Field.OldValue;
-        Param.AssignFieldValue(Field, Value);
-      end;
-    end;
-  end;
-end;
-
-procedure TIBUpdateSQL.Apply(UpdateKind: TUpdateKind);
-begin
-  SetParams(UpdateKind);
+  InternalPrepare(UpdateKind);
+  InternalSetParams(Query[UpdateKind],buff);
   ExecSQL(UpdateKind);
 end;
 
