@@ -49,11 +49,13 @@ type
     procedure EditEmployeeUpdate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure IBDatabase1AfterConnect(Sender: TObject);
     procedure IBDatabase1BeforeDisconnect(Sender: TObject);
     procedure IBQuery1AfterDelete(DataSet: TDataSet);
     procedure IBQuery1AfterOpen(DataSet: TDataSet);
     procedure IBQuery1AfterTransactionEnd(Sender: TObject);
     procedure IBQuery1BeforeClose(DataSet: TDataSet);
+    procedure IBQuery1BeforeOpen(DataSet: TDataSet);
     procedure IBQuery1SALARYGetText(Sender: TField; var aText: string;
       DisplayText: Boolean);
     procedure SaveChangesExecute(Sender: TObject);
@@ -105,6 +107,8 @@ end;
 
 procedure TForm1.Reopen(Data: PtrInt);
 begin
+  with IBTransaction1 do
+    if not InTransaction then StartTransaction;
   IBQuery1.Active := true
 end;
 
@@ -163,6 +167,12 @@ begin
   FLastEmp_no := -1
 end;
 
+procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);
+begin
+  with IBTransaction1 do
+    if not InTransaction then StartTransaction
+end;
+
 procedure TForm1.IBDatabase1BeforeDisconnect(Sender: TObject);
 begin
   FClosing := true
@@ -189,6 +199,10 @@ end;
 procedure TForm1.IBQuery1BeforeClose(DataSet: TDataSet);
 begin
   FLastEmp_no := DataSet.FieldByName('Emp_no').AsInteger
+end;
+
+procedure TForm1.IBQuery1BeforeOpen(DataSet: TDataSet);
+begin
 end;
 
 end.

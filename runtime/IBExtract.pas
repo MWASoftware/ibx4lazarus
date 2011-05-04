@@ -35,7 +35,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  Messages, SysUtils, Classes, IBDatabase, IBDatabaseInfo,
+  SysUtils, Classes, IBDatabase, IBDatabaseInfo,
   IBSQL, IBUtils, IBHeader, IB, IBIntf;
 
 type

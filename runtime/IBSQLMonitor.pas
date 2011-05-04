@@ -44,7 +44,7 @@ unit IBSQLMonitor;
 interface
 
 uses
-  LMessages, Messages, LCLIntf, LCLType, LCLProc,  Forms, Controls, Dialogs,
+  LMessages, LCLIntf, LCLType, LCLProc,  Forms, Controls, Dialogs,
   IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, IBXConst,SysUtils,
   Classes,
 {$IFDEF WINDOWS }

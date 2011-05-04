@@ -326,7 +326,7 @@ begin
   FInitialiser := false;
   GetSharedMemory(MemSize);
   FBuffer := shmat(FSharedMemoryID,nil,0);
-  if integer(FBuffer) = -1 then
+  if PtrInt(FBuffer) = -1 then
     IBError(ibxeCannotCreateSharedResource,[StrError(Errno)]);
   FBufPtr := FBuffer;
   FUnused := MemSize

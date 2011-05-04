@@ -304,7 +304,7 @@ type
     procedure RefreshParams;
     procedure SQLChanging(Sender: TObject); virtual;
     function AdjustPosition(FCache: PChar; Offset: DWORD;
-                            Origin: Integer): PtrUInt;
+                            Origin: Integer): DWORD;
     procedure ReadCache(FCache: PChar; Offset: DWORD; Origin: Integer;
                        Buffer: PChar);
     procedure ReadRecordCache(RecordNumber: Integer; Buffer: PChar;
@@ -2235,8 +2235,13 @@ begin
   Result := Params.ByName(ParamName);
 end;
 
+{Beware: the parameter FCache is used as an identifier to determine which
+ cache is being operated on and is not referenced in the computation.
+ The result is an adjusted offset into the identified cache, either the
+ Buffer Cache or the old Buffer Cache.}
+
 function TIBCustomDataSet.AdjustPosition(FCache: PChar; Offset: DWORD;
-                                        Origin: Integer): PtrUInt;
+                                        Origin: Integer): DWORD;
 var
   OldCacheSize: Integer;
 begin
@@ -2273,14 +2278,15 @@ procedure TIBCustomDataSet.ReadCache(FCache: PChar; Offset: DWORD; Origin: Integ
                                     Buffer: PChar);
 var
   pCache: PChar;
+  AdjustedOffset: DWORD;
   bOld: Boolean;
 begin
   bOld := (FCache = FOldBufferCache);
-  pCache := PChar(AdjustPosition(FCache, Offset, Origin));
+  AdjustedOffset := AdjustPosition(FCache, Offset, Origin);
   if not bOld then
-    pCache := FBufferCache + PtrUInt(pCache)
+    pCache := FBufferCache + AdjustedOffset
   else
-    pCache := FOldBufferCache + PtrUInt(pCache);
+    pCache := FOldBufferCache + AdjustedOffset;
   Move(pCache^, Buffer^, DWORD(FRecordBufferSize));
   AdjustPosition(FCache, FRecordBufferSize, FILE_CURRENT);
 end;
@@ -2310,15 +2316,16 @@ procedure TIBCustomDataSet.WriteCache(FCache: PChar; Offset: DWORD; Origin: Inte
                                      Buffer: PChar);
 var
   pCache: PChar;
+  AdjustedOffset: DWORD;
   bOld: Boolean;
   dwEnd: DWORD;
 begin
   bOld := (FCache = FOldBufferCache);
-  pCache := PChar(AdjustPosition(FCache, Offset, Origin));
+  AdjustedOffset := AdjustPosition(FCache, Offset, Origin);
   if not bOld then
-    pCache := FBufferCache + PtrUInt(pCache)
+    pCache := FBufferCache + AdjustedOffset
   else
-    pCache := FOldBufferCache + PtrUInt(pCache);
+    pCache := FOldBufferCache + AdjustedOffset;
   Move(Buffer^, pCache^, FRecordBufferSize);
   dwEnd := AdjustPosition(FCache, FRecordBufferSize, FILE_CURRENT);
   if not bOld then
@@ -2546,8 +2553,6 @@ function TIBCustomDataSet.GetFieldData(FieldNo: Integer; Buffer: Pointer): Boole
 begin
   result := GetFieldData(FieldByNumber(FieldNo), buffer);
 end;
-
-var   TestData: Int64;
 
 function TIBCustomDataSet.InternalGetFieldData(Field: TField; Buffer: Pointer): Boolean;
 var

@@ -51,7 +51,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   IBDialogs, IBHeader, IB, IBExternals;
 
 const

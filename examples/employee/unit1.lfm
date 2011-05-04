@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 743
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '0.9.30'
+  LCLVersion = '0.9.30.1'
   object DBGrid1: TDBGrid
     Left = 8
     Height = 375
@@ -93,6 +93,7 @@ object Form1: TForm1
   end
   object IBDatabase1: TIBDatabase
     Connected = True
+    AfterConnect = IBDatabase1AfterConnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
     StreamedConnected = False
     DatabaseName = 'employee'
@@ -109,7 +110,6 @@ object Form1: TForm1
   object IBTransaction1: TIBTransaction
     Active = True
     DefaultDatabase = IBDatabase1
-    DefaultAction = TARollback
     Params.Strings = (
       'read_committed'
       'rec_version'
@@ -124,6 +124,7 @@ object Form1: TForm1
     AfterDelete = IBQuery1AfterDelete
     AfterOpen = IBQuery1AfterOpen
     BeforeClose = IBQuery1BeforeClose
+    BeforeOpen = IBQuery1BeforeOpen
     Active = True
     BufferChunks = 1000
     CachedUpdates = False
