@@ -1626,6 +1626,7 @@ var
   lookupValues: array of variant;
   i, fieldCount: Integer;
   fieldValueAsString: string;
+  lookupValueAsString: string;
 begin
   keyFieldList := TList.Create;
   try
@@ -1641,7 +1642,10 @@ begin
         if VarIsArray(KeyValues) then
           lookupValues[i] := KeyValues[i]
         else
-          lookupValues[i] := KeyValues;
+        if i > 0 then
+          lookupValues[i] := NULL
+        else
+          lookupValues[0] := KeyValues;
 
         {convert to upper case is case insensitive search}
         if (TField(keyFieldList[i]).DataType = ftString) and
@@ -1661,23 +1665,26 @@ begin
         if result and not VarIsNull(fieldValue) then
         begin
           try
-            fieldValue := VarAsType(fieldValue, VarType(lookupValues[i]));
+            if TField(keyFieldList[i]).DataType = ftString then
+            begin
+              {strings need special handling because of the locate options that
+               apply to them}
+              fieldValueAsString := TField(keyFieldList[i]).AsString;
+              lookupValueAsString := lookupValues[i];
+              if (loCaseInsensitive in Options) then
+                fieldValueAsString := UpperCase(fieldValueAsString);
+
+              if (loPartialKey in Options) then
+                result := result and (Pos(lookupValueAsString, fieldValueAsString) = 1)
+              else
+                result := result and (fieldValueAsString = lookupValueAsString);
+            end
+            else
+              result := result and (lookupValues[i] =
+                             VarAsType(fieldValue, VarType(lookupValues[i])));
           except on EVariantError do
             result := False;
           end;
-
-          if TField(keyFieldList[i]).DataType = ftString then
-          begin
-            fieldValueAsString := TField(keyFieldList[i]).AsString;
-            if (loCaseInsensitive in Options) then
-              fieldValueAsString := UpperCase(fieldValueAsString);
-            if (loPartialKey in Options) then
-              result := result and (Pos(lookupValues[i], fieldValueAsString) = 1)
-            else
-              result := result and (fieldValueAsString = lookupValues[i]);
-          end
-          else
-            result := result and (lookupValues[i] = fieldValue);
         end;
         Inc(i);
       end;
