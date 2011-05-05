@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 460
+  Left = 461
   Height = 454
-  Top = 310
+  Top = 312
   Width = 743
   Caption = 'Form1'
   ClientHeight = 454
@@ -95,7 +95,7 @@ object Form1: TForm1
     Connected = True
     AfterConnect = IBDatabase1AfterConnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
-    StreamedConnected = False
+    AllowStreamedConnected = False
     DatabaseName = 'employee'
     Params.Strings = (
       'user_name=SYSDBA'
@@ -108,7 +108,7 @@ object Form1: TForm1
     top = 224
   end
   object IBTransaction1: TIBTransaction
-    Active = True
+    Active = False
     DefaultDatabase = IBDatabase1
     Params.Strings = (
       'read_committed'
@@ -127,7 +127,6 @@ object Form1: TForm1
     BeforeOpen = IBQuery1BeforeOpen
     OnDeleteError = IBQuery1PostError
     OnPostError = IBQuery1PostError
-    Active = True
     BufferChunks = 1000
     CachedUpdates = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord

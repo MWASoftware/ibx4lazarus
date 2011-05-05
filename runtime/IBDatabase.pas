@@ -155,6 +155,7 @@ type
   { TIBDatabase }
   TIBDataBase = class(TCustomConnection)
   private
+    FAllowStreamedConnected: boolean;
     FHiddenPassword: string;
     FIBLoaded: Boolean;
     FOnLogin: TIBDatabaseLoginEvent;
@@ -214,7 +215,7 @@ type
     procedure Notification( AComponent: TComponent; Operation: TOperation); override;
     function GetDataset(Index : longint) : TDataset; override;
     function GetDataSetCount : Longint; override;
-
+    procedure SetConnected (Value : boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -251,7 +252,8 @@ type
 
   published
     property Connected;
-    property StreamedConnected;
+    property AllowStreamedConnected: boolean read FAllowStreamedConnected
+             write FAllowStreamedConnected;
     property DatabaseName: TIBFileName read FDBName write SetDatabaseName;
     property Params: TStrings read FDBParams write SetDBParams;
     property LoginPrompt default True;
@@ -1189,6 +1191,16 @@ end;
 function TIBDatabase.GetDataSetCount : Longint;
 begin
   Result := FDataSets.Count;
+end;
+
+procedure TIBDataBase.SetConnected(Value: boolean);
+begin
+  if StreamedConnected and not AllowStreamedConnected then
+  begin
+    StreamedConnected := false;
+    Value := false
+  end;
+  inherited SetConnected(Value);
 end;
 
 procedure TIBDatabase.GetFieldNames(const TableName: string; List: TStrings);

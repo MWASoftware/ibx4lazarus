@@ -181,7 +181,8 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  FLastEmp_no := -1
+  FLastEmp_no := -1;
+  IBQuery1.Active := true
 end;
 
 procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);
