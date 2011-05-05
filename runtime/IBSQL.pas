@@ -369,7 +369,7 @@ var
   szBuff: PChar;
   s_bhandle, d_bhandle: TISC_BLOB_HANDLE;
   bSourceBlob, bDestBlob: Boolean;
-  iSegs: Long;
+  iSegs: Int64;
   iMaxSeg: Int64;
   iSize: Int64;
   iBlobType: Short;

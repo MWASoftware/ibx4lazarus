@@ -46,7 +46,7 @@ type
     FBase: TIBBase;
     FBlobID: TISC_QUAD;
     FBlobMaxSegmentSize: Int64;
-    FBlobNumSegments: Long;
+    FBlobNumSegments: Int64;
     FBlobSize: Int64;
     FBlobType: Short;  { 0 = segmented, 1 = streamed }
     FBuffer: PChar;
@@ -88,7 +88,7 @@ type
     property Handle: TISC_BLOB_HANDLE read FHandle;
     property BlobID: TISC_QUAD read FBlobID write SetBlobID;
     property BlobMaxSegmentSize: Int64 read FBlobMaxSegmentSize;
-    property BlobNumSegments: Long read FBlobNumSegments;
+    property BlobNumSegments: Int64 read FBlobNumSegments;
     property BlobSize: Int64 read FBlobSize;
     property BlobType: Short read FBlobType;
     property Database: TIBDatabase read GetDatabase write SetDatabase;
@@ -99,7 +99,7 @@ type
     property TRHandle: PISC_TR_HANDLE read GetTRHandle;
   end;
 
-  procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments: Long; var MaxSegmentSize,
+  procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments: Int64; var MaxSegmentSize,
                       TotalSize: Int64; var BlobType: Short);
   procedure ReadBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);
   procedure WriteBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);
@@ -108,7 +108,7 @@ implementation
 
 uses IBIntf;
 
-procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments: Long; var MaxSegmentSize,
+procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments: Int64; var MaxSegmentSize,
                       TotalSize: Int64; var BlobType: Short);
 var
   items: array[0..3] of Char;
