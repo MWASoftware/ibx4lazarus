@@ -79,7 +79,6 @@ const
 type
   TIBCustomSQLMonitor = class;
 
-  { TIBSQLMonitor }
   TSQLEvent = procedure(EventText: String; EventTime : TDateTime) of object;
 
   { TIBCustomSQLMonitor }
@@ -101,6 +100,8 @@ type
     destructor Destroy; override;
     procedure Release;
   end;
+
+  { TIBSQLMonitor }
 
   TIBSQLMonitor = class(TIBCustomSQLMonitor)
   published
@@ -408,7 +409,7 @@ end;
 
 procedure TIBSQLMonitorHook.RegisterMonitor(SQLMonitor: TIBCustomSQLMonitor);
 begin
-   //writeln('Register Monitor');
+   {$IFDEF DEBUG}writeln('Register Monitor');{$ENDIF}
   if not assigned(FGlobalInterface) then
     FGlobalInterface := TGlobalInterface.Create;
  if not Assigned(FReaderThread) then
@@ -653,7 +654,7 @@ procedure TIBSQLMonitorHook.UnregisterMonitor(SQLMonitor: TIBCustomSQLMonitor);
 var
   Created : Boolean;
 begin
-//writeln('Unregister Monitor');
+{$IFDEF DEBUG}writeln('Unregister Monitor');{$ENDIF}
   if assigned(FReaderThread) then
   begin
     FReaderThread.RemoveMonitor(SQLMonitor);
@@ -674,17 +675,17 @@ begin
         Created := true;
       end;
       FWriterThread.WriteSQLData(' ', tfMisc);
-      //writeln('Wait for read Terminate');
+      {$IFDEF DEBUG}writeln('Wait for read Terminate');{$ENDIF}
       FReaderThread.WaitFor;
       if assigned(FReaderThread.FatalException) then
         IBError(ibxeThreadFailed,['Reader',Exception(FReaderThread.FatalException).Message]);
-      //writeln('Freeing Reader Thread');
+      {$IFDEF DEBUG}writeln('Freeing Reader Thread');{$ENDIF}
       FreeAndNil(FReaderThread);
-      //writeln('Reader Thread Freed');
+      {$IFDEF DEBUG}writeln('Reader Thread Freed');{$ENDIF}
       if Created then
       begin
         FWriterThread.Terminate;
-        //writeln('Wait for write Terminate');
+        {$IFDEF DEBUG}writeln('Wait for write Terminate');{$ENDIF}
         FWriterThread.WaitFor;
         if assigned(FWriterThread.FatalException) then
           IBError(ibxeThreadFailed,['Writer',Exception(FWriterThread.FatalException).Message]);
@@ -692,13 +693,13 @@ begin
       end;
     end;
   end;
-  //writeln('Unregister done')
+  {$IFDEF DEBUG}writeln('Unregister done'){$ENDIF}
 end;
 
 procedure TIBSQLMonitorHook.WriteSQLData(Text: String;
   DataType: TTraceFlag);
 begin
- //writeln('Write SQL Data: '+Text);
+ {$IFDEF DEBUG}writeln('Write SQL Data: '+Text);{$ENDIF}
   if not assigned(FGlobalInterface) then
     FGlobalInterface := TGlobalInterface.Create;
   Text := CRLF + '[Application: ' + Application.Title + ']' + CRLF + Text; {do not localize}
@@ -713,7 +714,7 @@ constructor TWriterThread.Create(GlobalInterface: TGlobalInterface);
 
 begin
   inherited Create(true);
-  //writeln('Write Object Created');
+  {$IFDEF DEBUG}writeln('Write Object Created');{$ENDIF}
   FGlobalInterface := GlobalInterface;
   FMsgs := TObjectList.Create(true);
   FCriticalSection := TCriticalSection.Create;
@@ -731,7 +732,7 @@ end;
 
 procedure TWriterThread.Execute;
 begin
-//writeln('Write Thread starts');
+{$IFDEF DEBUG}writeln('Write Thread starts');{$ENDIF}
  try
   { Place thread code here }
   while ((not Terminated) and (not bDone)) or
@@ -743,7 +744,7 @@ begin
     begin
       if FMsgs.Count <> 0 then
       begin
-        //writeln('Write Thread Drop Message');
+        {$IFDEF DEBUG}writeln('Write Thread Drop Message');{$ENDIF}
         RemoveFromList;
       end;
     end
@@ -754,7 +755,7 @@ begin
        { If the current queued message is a release release the object }
         if FMsgs.Items[0] is TReleaseObject then
         begin
-          //writeln('Post Release');
+          {$IFDEF DEBUG}writeln('Post Release');{$ENDIF}
           Synchronize(PostRelease);
         end
         else
@@ -776,11 +777,11 @@ begin
   end;
  except on E: Exception do
    begin
-     //writeln('Write Thread raised Exception: ' + E.Message);
+     {$IFDEF DEBUG}writeln('Write Thread raised Exception: ' + E.Message);{$ENDIF}
      raise
    end
   end;
-  //writeln('Write Thread Ends');
+  {$IFDEF DEBUG}writeln('Write Thread Ends');{$ENDIF}
 end;
 
 procedure TWriterThread.WriteSQLData(Msg : String; DataType: TTraceFlag);
@@ -796,18 +797,18 @@ end;
 
 procedure TWriterThread.BeginWrite;
 begin
-//writeln('Begin Write');
+{$IFDEF DEBUG}writeln('Begin Write');{$ENDIF}
   with FGlobalInterface do
   begin
     ReadReadyEvent.PassThroughGate;    {Wait for readers to become ready }
     WriterBusyEvent.Lock;     {Set Busy State}
   end;
-//writeln('Begin Write Complete');
+{$IFDEF DEBUG}writeln('Begin Write Complete');{$ENDIF}
 end;
 
 procedure TWriterThread.EndWrite;
 begin
-  //writeln('End Write');
+  {$IFDEF DEBUG}writeln('End Write');{$ENDIF}
   with FGlobalInterface do
   begin
     DataAvailableEvent.Unlock;   { Signal Data Available. }
@@ -815,14 +816,14 @@ begin
     DataAvailableEvent.Lock;  {reset Data Available }
     WriterBusyEvent.Unlock;      {Signal not Busy }
   end;
-  //writeln('End Write Complete');
+  {$IFDEF DEBUG}writeln('End Write Complete');{$ENDIF}
   end;
 
 procedure TWriterThread.WriteToBuffer;
 var I, len: integer;
     Temp: TTraceObject;
 begin
-  //writeln('Write to Buffer');
+  {$IFDEF DEBUG}writeln('Write to Buffer');{$ENDIF}
   FGlobalInterface.WriteLock.Lock;
   try
     { If there are no monitors throw out the message
@@ -849,7 +850,7 @@ begin
       try
         while len > 0 do
         begin
-          //writeln('Sending Partial Message, len = ',len);
+          {$IFDEF DEBUG}writeln('Sending Partial Message, len = ',len);{$ENDIF}
           Temp := TTraceObject.Create(TTraceObject(FMsgs[0]),i,Min(len,FGlobalInterface.MaxBufferSize));
           try
             BeginWrite;
@@ -868,12 +869,12 @@ begin
   finally
     FGlobalInterface.WriteLock.Unlock;
   end;
-  //writeln('Done Write');
+  {$IFDEF DEBUG}writeln('Done Write');{$ENDIF}
 end;
 
 procedure TWriterThread.RemoveFromList;
 begin
-  //writeln('Write Thread: Remove object From List');
+  {$IFDEF DEBUG}writeln('Write Thread: Remove object From List');{$ENDIF}
   FCriticalSection.Enter;
   try
     FMsgs.Remove(FMsgs[0]); { Pop the written item }
@@ -944,7 +945,7 @@ var i : Integer;
 begin
   for i := 0 to FMonitors.Count - 1 do
   begin
-     //writeln('Sending Message to Monitor ' +IntToStr(i));
+     {$IFDEF DEBUG}writeln('Sending Message to Monitor ' +IntToStr(i));{$ENDIF}
      FTemp := TTraceObject.Create(st);
      Monitor := TIBCustomSQLMonitor(FMonitors[i]);
      Monitor.ReceiveMessage(FTemp);
@@ -953,16 +954,16 @@ end;
 
 procedure TReaderThread.BeginRead;
 begin
-//writeln('Begin Read');
+{$IFDEF DEBUG}writeln('Begin Read');{$ENDIF}
   with FGlobalInterface do
   begin
     WriterBusyEvent.PassthroughGate;     { Wait for Writer not busy}
     ReadFinishedEvent.Lock;          { Prepare Read Finished Gate}
     ReadReadyEvent.Unlock;                { Signal read ready  }
-    //writeln('Read Ready Unlocked');
+    {$IFDEF DEBUG}writeln('Read Ready Unlocked');{$ENDIF}
     DataAvailableEvent.PassthroughGate;  { Wait for a Data Available }
   end;
-//writeln('Begin Read Complete');
+{$IFDEF DEBUG}writeln('Begin Read Complete');{$ENDIF}
 end;
 
 constructor TReaderThread.Create(GlobalInterface: TGlobalInterface);
@@ -973,14 +974,14 @@ begin
   FGlobalInterface.IncMonitorCount;
   FMonitors := TObjectList.Create(false);
   FCriticalSection := TCriticalSection.Create;
-  //writeln('Reader Thread Created');
+  {$IFDEF DEBUG}writeln('Reader Thread Created');{$ENDIF}
   FGlobalInterface.ReadReadyEvent.Lock;           { Initialise Read Ready}
   Resume;
 end;
 
 destructor TReaderThread.Destroy;
 begin
-//writeln('Reader Thread Destory');
+{$IFDEF DEBUG}writeln('Reader Thread Destory');{$ENDIF}
   FGlobalInterface.ReadReadyEvent.UnLock;
   if assigned(FGlobalInterface) and (FGlobalInterface.MonitorCount > 0) then
      FGlobalInterface.DecMonitorCount;
@@ -992,15 +993,15 @@ end;
 
 procedure TReaderThread.EndRead;
 begin
-//writeln('End Read');
+{$IFDEF DEBUG}writeln('End Read');{$ENDIF}
   FGlobalInterface.ReadReadyEvent.Lock;           { reset Read Ready}
   FGlobalInterface.ReadFinishedEvent.Unlock; {Signal Read completed }
-  //writeln('End Read Complete');
+  {$IFDEF DEBUG}writeln('End Read Complete');{$ENDIF}
 end;
 
 procedure TReaderThread.Execute;
 begin
-//writeln('Read Thread Starts');
+{$IFDEF DEBUG}writeln('Read Thread Starts');{$ENDIF}
   { Place thread code here }
   while (not Terminated) and (not bDone) do
   begin
@@ -1008,11 +1009,11 @@ begin
     if (st.FMsg <> '') and
        not ((st.FMsg = ' ') and (st.FDataType = tfMisc)) then
     begin
-      //writeln('Sending Message to Monitors');
+      {$IFDEF DEBUG}writeln('Sending Message to Monitors');{$ENDIF}
       Synchronize(AlertMonitors);
     end;
   end;
-  //writeln('Read Thread Ends');
+  {$IFDEF DEBUG}writeln('Read Thread Ends');{$ENDIF}
 end;
 
 procedure TReaderThread.ReadSQLData;
@@ -1071,7 +1072,7 @@ end;
 
 procedure CloseThreads;
 begin
-//writeln('Closed Threads Called');
+{$IFDEF DEBUG}writeln('Closed Threads Called');{$ENDIF}
   if Assigned(FReaderThread) then
   begin
     FReaderThread.Terminate;
@@ -1100,7 +1101,7 @@ initialization
 {$ENDIF}
 
 finalization
-  //writeln('Entered Finalisation');
+  {$IFDEF DEBUG}writeln('Entered Finalisation');{$ENDIF}
   try
     { Write an empty string to force the reader to unlock during termination }
     bDone := True;
