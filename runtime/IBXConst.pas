@@ -41,7 +41,7 @@ resourcestring
 { generic strings used in code }
   SIBDatabaseEditor = 'Da&tabase Editor...';
   SIBTransactionEditor = '&Transaction Editor...';
-  SDatabaseFilter = 'Database Files (*.gdb)|*.gdb|All files (*.*)|*.*';
+  SDatabaseFilter = 'Database Files (*.fdb; *.gdb)|*.gdb; *.fdb|All files (*.*)|*.*';
   SDisconnectDatabase = 'Database is currently connected. Disconnect and continue?';
   SCommitTransaction = 'Transaction is currently Active. Rollback and continue?';
   SExecute = 'E&xecute';
