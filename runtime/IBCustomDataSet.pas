@@ -2096,7 +2096,7 @@ begin
             SQL_TIMESTAMP:
               Qry.Params[i].AsDateTime :=
                 TimeStampToDateTime(
-                  MSecsToTimeStamp(PDouble(data)^));
+                  MSecsToTimeStamp(PComp(data)^));
           end;
         end;
       end;

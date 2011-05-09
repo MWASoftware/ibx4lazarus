@@ -150,7 +150,7 @@ type
     property Active;
     property BufferChunks;
     property CachedUpdates;
-    property Constraints stored ConstraintsStored;
+//    property Constraints stored ConstraintsStored;
     property DefaultIndex: Boolean read FDefaultIndex write FDefaultIndex default True;
     property FieldDefs stored FieldDefsStored;
     property Filter;

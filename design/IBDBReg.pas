@@ -409,7 +409,7 @@ begin
   with TOpenDialog.Create(Application) do
     try
       InitialDir := ExtractFilePath(GetStrValue);
-      Filter := 'Database Files|*.gdb'; {do not localize}
+      Filter := SDatabaseFilter; {do not localize}
       if Execute then
         SetStrValue(FileName);
     finally
