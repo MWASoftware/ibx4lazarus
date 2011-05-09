@@ -87,6 +87,7 @@ type
     procedure SaveToStream(Stream: TStream);
     function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
     procedure SetSize(const NewSize: Int64); override;
+    procedure SetSize(NewSize: Longint); override;
     procedure Truncate;
     function Write(const Buffer; Count: Longint): Longint; override;
     property Handle: TISC_BLOB_HANDLE read FHandle;
@@ -422,6 +423,11 @@ begin
     if NewSize = 0 then
       FBuffer := nil;
   end;
+end;
+
+procedure TIBBlobStream.SetSize(NewSize: Longint);
+begin
+  SetSize(Int64(NewSize));
 end;
 
 procedure TIBBlobStream.SetTransaction(Value: TIBTransaction);
