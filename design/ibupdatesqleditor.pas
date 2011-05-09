@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  ComCtrls, StdCtrls, ExtCtrls, IBSystemTables, IBUpdateSQL;
+  ComCtrls, StdCtrls, ExtCtrls, IBSystemTables, IBUpdateSQL, IBDatabase;
 
 type
 
@@ -80,7 +80,7 @@ type
     { public declarations }
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
-    procedure SetUpdateObject(AObject: TIBUpdateSQL);
+    procedure SetUpdateObject(AObject: TIBUpdateSQL; Transaction: TIBTransaction);
   end;
 
 var
@@ -95,14 +95,20 @@ uses IBQuery;
 {$R *.lfm}
 
 function EditIBUpdateSQL(UpdateObject: TIBUpdateSQL): boolean;
+var Transaction: TIBTransaction;
 begin
   Result := false;
   if assigned(UpdateObject.DataSet) and assigned(UpdateObject.DataSet.Database) then
   begin
-    if not assigned(UpdateObject.DataSet.Transaction) then
+    Transaction := UpdateObject.DataSet.Transaction;
+    if not assigned(Transaction) then
     begin
-      ShowMessage('No Default Transaction!');
-      Exit
+      if not assigned(UpdateObject.DataSet.Database.DefaultTransaction)then
+      begin
+        ShowMessage('No Default Transaction!');
+        Exit
+      end;
+      Transaction := UpdateObject.DataSet.Database.DefaultTransaction
     end;
 
     try
@@ -114,7 +120,7 @@ begin
 
   with TIBUpdateSQLEditorForm.Create(Application) do
   try
-    SetUpdateObject(UpdateObject);
+    SetUpdateObject(UpdateObject,Transaction);
     Result := ShowModal = mrOK
   finally
     Free
@@ -273,11 +279,12 @@ begin
   inherited Destroy;
 end;
 
-procedure TIBUpdateSQLEditorForm.SetUpdateObject(AObject: TIBUpdateSQL);
+procedure TIBUpdateSQLEditorForm.SetUpdateObject(AObject: TIBUpdateSQL;
+  Transaction: TIBTransaction);
 begin
   FUpdateObject := AObject;
   if assigned(FUpdateObject.DataSet) then
-    FIBSystemTables.SelectDatabase(FUpdateObject.DataSet.Database,FUpdateObject.DataSet.Transaction);
+    FIBSystemTables.SelectDatabase(FUpdateObject.DataSet.Database,Transaction);
 end;
 
 
