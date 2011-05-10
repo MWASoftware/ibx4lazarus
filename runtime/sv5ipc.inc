@@ -387,7 +387,7 @@ begin
 {$IFDEF HAS_SEMTIMEDOP}
     Result := semtimedop(FSemaphoreSetID,@sembuf,1,@timeout);
 {$ELSE}
-    Result := sem_op(FSemaphoreSetID,@sembuf,1);    {May hang on race condition}
+    Result := semop(FSemaphoreSetID,@sembuf,1);    {May hang on race condition}
 {$ENDIF}
 end;
 

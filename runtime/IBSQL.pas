@@ -592,6 +592,7 @@ end;
 function TIBXSQLVAR.GetAsDateTime: TDateTime;
 var
   tm_date: TCTimeStructure;
+  msecs: word;
 begin
   result := 0;
   if not IsNull then
@@ -630,12 +631,13 @@ begin
         try
           result := EncodeDate(Word(tm_date.tm_year + 1900), Word(tm_date.tm_mon + 1),
                               Word(tm_date.tm_mday));
+          msecs := (PISC_TIMESTAMP(FXSQLVAR^.sqldata)^.timestamp_time mod 10000) div 10;
           if result >= 0 then
             result := result + EncodeTime(Word(tm_date.tm_hour), Word(tm_date.tm_min),
-                                          Word(tm_date.tm_sec), 0)
+                                          Word(tm_date.tm_sec), msecs)
           else
             result := result - EncodeTime(Word(tm_date.tm_hour), Word(tm_date.tm_min),
-                                          Word(tm_date.tm_sec), 0)
+                                          Word(tm_date.tm_sec), msecs)
         except
           on E: EConvertError do begin
             IBError(ibxeInvalidDataConversion, [nil]);
@@ -1074,6 +1076,8 @@ begin
       xvar.FXSQLVAR^.sqllen := SizeOf(TISC_QUAD);
       IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
       isc_encode_date(@tm_date, PISC_QUAD(xvar.FXSQLVAR^.sqldata));
+      if Ms > 0 then
+        Inc(PISC_TIMESTAMP(xvar.FXSQLVAR^.sqldata)^.timestamp_time,Ms*10);
       xvar.FModified := True;
     end;
 end;

@@ -2010,7 +2010,6 @@ var
   fn, st: string;
   OldBuffer: Pointer;
   ts: TTimeStamp;
-  cts: comp;
 begin
   if (Buffer = nil) then
     IBError(ibxeBufferNotSet, [nil]);
@@ -2095,11 +2094,8 @@ begin
                 TimeStampToDateTime(ts);
             end;
             SQL_TIMESTAMP:
-              begin
-                cts := PDouble(data)^;
-                Qry.Params[i].AsDateTime :=
-                           TimeStampToDateTime(MSecsToTimeStamp(cts));
-              end;
+              Qry.Params[i].AsDateTime :=
+                       TimeStampToDateTime(MSecsToTimeStamp(trunc(PDouble(data)^)));
           end;
         end;
       end;
