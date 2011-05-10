@@ -618,8 +618,9 @@ begin
       SQL_TYPE_TIME: begin
         isc_decode_sql_time(PISC_TIME(FXSQLVAR^.sqldata), @tm_date);
         try
+          msecs :=  (PISC_TIME(FXSQLVAR^.sqldata)^ mod 10000) div 10;
           result := EncodeTime(Word(tm_date.tm_hour), Word(tm_date.tm_min),
-                               Word(tm_date.tm_sec), 0)
+                               Word(tm_date.tm_sec), msecs)
         except
           on E: EConvertError do begin
             IBError(ibxeInvalidDataConversion, [nil]);
@@ -1045,6 +1046,8 @@ begin
       xvar.FXSQLVAR^.sqllen := SizeOf(ISC_TIME);
       IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
       isc_encode_sql_time(@tm_date, PISC_TIME(xvar.FXSQLVAR^.sqldata));
+      if Ms > 0 then
+        Inc(PISC_TIME(xvar.FXSQLVAR^.sqldata)^,Ms*10);
       xvar.FModified := True;
     end;
 end;
