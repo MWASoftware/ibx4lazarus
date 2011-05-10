@@ -8,36 +8,36 @@ object IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm
   ClientHeight = 438
   ClientWidth = 749
   OnShow = FormShow
-  LCLVersion = '0.9.28.2'
+  LCLVersion = '0.9.30'
   object Label1: TLabel
     Left = 16
-    Height = 19
+    Height = 18
     Top = 16
-    Width = 87
+    Width = 78
     Caption = 'Table Name'
     ParentColor = False
   end
   object Label2: TLabel
     Left = 19
-    Height = 19
+    Height = 18
     Top = 84
-    Width = 41
+    Width = 39
     Caption = 'Fields'
     ParentColor = False
   end
   object Label3: TLabel
     Left = 279
-    Height = 19
+    Height = 18
     Top = 16
-    Width = 29
+    Width = 26
     Caption = 'SQL'
     ParentColor = False
   end
   object Label4: TLabel
     Left = 23
-    Height = 19
+    Height = 18
     Top = 285
-    Width = 93
+    Width = 87
     Caption = 'Primary Keys'
     ParentColor = False
   end
@@ -71,7 +71,7 @@ object IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm
   end
   object TableNamesCombo: TComboBox
     Left = 23
-    Height = 30
+    Height = 29
     Top = 38
     Width = 201
     ItemHeight = 0
@@ -92,30 +92,30 @@ object IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm
     TabOrder = 4
     TopIndex = -1
   end
-  object Button3: TButton
+  object GenerateBtn: TButton
     Left = 279
-    Height = 30
+    Height = 29
     Top = 380
-    Width = 112
+    Width = 101
     AutoSize = True
     Caption = 'Generate SQL'
-    OnClick = Button3Click
+    OnClick = GenerateBtnClick
     TabOrder = 5
   end
-  object Button4: TButton
+  object TestBtn: TButton
     Left = 416
     Height = 30
     Top = 380
     Width = 66
     Caption = 'Test'
-    OnClick = Button4Click
+    OnClick = TestBtnClick
     TabOrder = 6
   end
   object QuoteFields: TCheckBox
     Left = 16
     Height = 22
     Top = 380
-    Width = 144
+    Width = 132
     Caption = '&Quote Identifiers'
     TabOrder = 7
   end
@@ -128,5 +128,10 @@ object IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm
     OnDblClick = PrimaryKeyListDblClick
     TabOrder = 8
     TopIndex = -1
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    left = 205
+    top = 386
   end
 end

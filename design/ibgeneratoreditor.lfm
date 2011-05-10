@@ -114,4 +114,9 @@ object GeneratorEditor: TGeneratorEditor
     TabOrder = 7
     Wrap = False
   end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    left = 415
+    top = 243
+  end
 end

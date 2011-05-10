@@ -423,7 +423,7 @@ begin
       FirstTableName := GetWord(SelectSQL,3);
     end
   except on E:EIBError do
-      ShowMessage(E.Message);
+//      ShowMessage(E.Message);
   end;
 end;
 
@@ -494,7 +494,10 @@ begin
   SQL.Clear;
   if not assigned(FGetFieldNames.Database) or not FGetFieldNames.Database.Connected or
     not assigned(FGetFieldNames.Transaction) then
+  begin
+    Messagedlg('No Database Connected',mtError,[mbOK],0);
     Exit;
+  end;
   SelectSQL := 'Select';
   Separator := ' A.';
   for I := 0 to FieldNames.Count - 1 do
@@ -638,7 +641,7 @@ begin
     FTestSQL.Prepare;
     Result := FTestSQL.SQLType
   except on E:EIBError do
-      ShowMessage(E.Message);
+//      ShowMessage(E.Message);
   end;
   if (Result = SQLSelect) and (FTestSQL.Current.Count > 0)  then
   begin
@@ -676,7 +679,10 @@ procedure TIBSystemTables.TestSQL(SQL: string);
 begin
   if not assigned(FTestSQL.Database) or not FTestSQL.Database.Connected or
     not assigned(FTestSQL.Transaction) then
+  begin
+    Messagedlg('No Database Connected',mtError,[mbOK],0);
     Exit;
+  end;
   FTestSQL.SQL.Text := SQL;
   try
     FTestSQL.Prepare;

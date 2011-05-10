@@ -44,6 +44,7 @@ type
     Button2: TButton;
     GeneratorNames: TComboBox;
     FieldNames: TComboBox;
+    IBTransaction1: TIBTransaction;
     IncrementBy: TEdit;
     Label1: TLabel;
     Label2: TLabel;
@@ -88,15 +89,9 @@ begin
     ShowMessage('No Select SQL Found!');
     Exit
   end;
-  if assigned(Database) then
-  begin
-    Database := AGenerator.Owner.Database;
-    if not assigned(AGenerator.Owner.Transaction)then
-    begin
-      ShowMessage('No Transaction assigned to DataSet!');
-      Exit
-    end;
+  Database := AGenerator.Owner.Database;
 
+  if assigned(Database) then
     try
       Database.Connected := true;
     except on E: Exception do
@@ -110,7 +105,6 @@ begin
     finally
       Free
     end;
-  end;
 end;
 
 { TGeneratorEditor }
@@ -187,7 +181,8 @@ end;
 procedure TGeneratorEditor.SetGenerator(const AValue: TIBGenerator);
 begin
   FGenerator := AValue;
-  SetDatabase(Generator.Owner.Database,Generator.Owner.Transaction);
+  IBTransaction1.DefaultDatabase := Generator.Owner.Database;
+  SetDatabase(Generator.Owner.Database,IBTransaction1);
 end;
 
 procedure TGeneratorEditor.SetDatabase(ADatabase: TIBDatabase; ATransaction: TIBTransaction);

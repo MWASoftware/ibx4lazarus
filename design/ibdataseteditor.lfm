@@ -17,9 +17,9 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
     Height = 352
     Top = 8
     Width = 641
-    ActivePage = FieldsPage
+    ActivePage = SQLPage
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     object FieldsPage: TTabSheet
       Caption = 'Options'
@@ -180,14 +180,14 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         OnClick = StatementTypeClick
         TabOrder = 1
       end
-      object Button1: TButton
+      object TestBtn: TButton
         Left = 541
         Height = 25
         Top = 31
         Width = 75
         Anchors = [akTop, akRight]
         Caption = 'Test'
-        OnClick = Button1Click
+        OnClick = TestBtnClick
         TabOrder = 2
       end
     end
@@ -213,5 +213,10 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    left = 32
+    top = 368
   end
 end

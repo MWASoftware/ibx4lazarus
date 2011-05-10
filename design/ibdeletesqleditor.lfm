@@ -1,7 +1,7 @@
 object IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
-  Left = 338
+  Left = 824
   Height = 438
-  Top = 263
+  Top = 384
   Width = 749
   ActiveControl = TableNamesCombo
   Caption = 'Delete SQL Editor'
@@ -70,23 +70,23 @@ object IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
     OnCloseUp = TableNamesComboCloseUp
     TabOrder = 3
   end
-  object Button3: TButton
+  object GenerateBtn: TButton
     Left = 280
     Height = 29
     Top = 380
     Width = 101
     AutoSize = True
     Caption = 'Generate SQL'
-    OnClick = Button3Click
+    OnClick = GenerateBtnClick
     TabOrder = 4
   end
-  object Button4: TButton
+  object TestBtn: TButton
     Left = 416
     Height = 30
     Top = 380
     Width = 66
     Caption = 'Test'
-    OnClick = Button4Click
+    OnClick = TestBtnClick
     TabOrder = 5
   end
   object QuoteFields: TCheckBox
@@ -106,5 +106,10 @@ object IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
     OnDblClick = PrimaryKeyListDblClick
     TabOrder = 7
     TopIndex = -1
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    left = 24
+    top = 208
   end
 end

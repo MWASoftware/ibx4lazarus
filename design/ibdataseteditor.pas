@@ -32,18 +32,19 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  ComCtrls, StdCtrls, ExtCtrls, IBSystemTables, IBCustomDataSet;
+  ComCtrls, StdCtrls, ExtCtrls, IBSystemTables, IBCustomDataSet, IBDatabase;
 
 type
 
   { TIBDataSetEditorForm }
 
   TIBDataSetEditorForm = class(TForm)
-    Button1: TButton;
+    TestBtn: TButton;
     CancelButton: TButton;
     FieldsPage: TTabSheet;
     GenerateButton: TButton;
     GroupBox1: TGroupBox;
+    IBTransaction1: TIBTransaction;
     IncludePrimaryKeys: TCheckBox;
     PrimaryKeyList: TListBox;
     Label1: TLabel;
@@ -58,7 +59,7 @@ type
     StatementType: TRadioGroup;
     FieldList: TListBox;
     TableNamesCombo: TComboBox;
-    procedure Button1Click(Sender: TObject);
+    procedure TestBtnClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure GenerateButtonClick(Sender: TObject);
@@ -98,18 +99,10 @@ function EditIBDataSet(DataSet: TIBDataSet): boolean;
 begin
   Result := false;
   if assigned(DataSet) and assigned(DataSet.Database) then
-  begin
-    if not assigned(DataSet.Transaction) then
-    begin
-      ShowMessage('No Default Transaction!');
-      Exit
-    end;
-
-    try
-      DataSet.Database.Connected := true;
-    except on E: Exception do
-      ShowMessage(E.Message)
-    end;
+  try
+    DataSet.Database.Connected := true;
+  except on E: Exception do
+    ShowMessage(E.Message)
   end;
 
   with TIBDataSetEditorForm.Create(Application) do
@@ -133,6 +126,8 @@ begin
   FDeleteSQL.Assign(FDataSet.DeleteSQL);
   FRefreshSQL.Assign(FDataSet.RefreshSQL);
   FSelectSQL.Assign(FDataSet.SelectSQL);
+  GenerateButton.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
+  TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
   FCurrentStatement := -1;
   TableNamesCombo.Items.Clear;
   FIBSystemTables.GetTableNames(TableNamesCombo.Items);
@@ -163,7 +158,7 @@ begin
   end;
 end;
 
-procedure TIBDataSetEditorForm.Button1Click(Sender: TObject);
+procedure TIBDataSetEditorForm.TestBtnClick(Sender: TObject);
 begin
   if SQLMemo.Lines.Text <> '' then
     FIBSystemTables.TestSQL(SQLMemo.Lines.Text);
@@ -284,8 +279,9 @@ end;
 procedure TIBDataSetEditorForm.SetDataSet(AObject: TIBDataSet);
 begin
   FDataSet := AObject;
+  IBTransaction1.DefaultDatabase := FDataSet.Database;
   if assigned(FDataSet) then
-    FIBSystemTables.SelectDatabase(FDataSet.Database,FDataSet.Transaction);
+    FIBSystemTables.SelectDatabase(FDataSet.Database,IBTransaction1);
 end;
 
 end.

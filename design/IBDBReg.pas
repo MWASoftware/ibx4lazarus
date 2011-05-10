@@ -542,7 +542,7 @@ var
 begin
   Query := GetComponent(0) as TIBQuery;
   if Assigned(Query.Database) and
-    IBSelectSQLEditor.EditSQL(Query.Database,Query.Transaction,Query.SQL) then Modified;
+    IBSelectSQLEditor.EditSQL(Query.Database,Query.SQL) then Modified;
 end;
 
 { TIBDatasetSQLProperty }
@@ -553,7 +553,7 @@ var
 begin
   IBDataset := GetComponent(0) as TIBDataset;
   if Assigned(IBDataSet.Database) and
-     IBSelectSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.Transaction,IBDataSet.SelectSQL) then Modified;
+     IBSelectSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.SelectSQL) then Modified;
 end;
 
 { TIBSQLProperty }
@@ -563,7 +563,7 @@ var
   IBSQL: TIBSQL;
 begin
   IBSQL := GetComponent(0) as TIBSQL;
-  if IBSelectSQLEditor.EditSQL(IBSQL.Database,IBSQL.Transaction,IBSQL.SQL) then Modified;
+  if IBSelectSQLEditor.EditSQL(IBSQL.Database,IBSQL.SQL) then Modified;
 end;
 
 { TIBUpdateSQLEditor }
@@ -716,7 +716,7 @@ begin
     Dec(Index, inherited GetVerbCount);
     case Index of
       0: Query.ExecSQL;
-      1: if ibselectsqleditor.EditSQL(Query.Database,Query.Transaction,Query.SQL) then Designer.Modified;
+      1: if ibselectsqleditor.EditSQL(Query.Database,Query.SQL) then Designer.Modified;
     end;
   end;
 end;
@@ -823,7 +823,7 @@ var
 begin
   IBDataset := GetComponent(0) as TIBDataset;
   if Assigned(IBDataSet.Database) and
-    IBModifySQLEditor.EditSQL(IBDataSet.Database,IBDataSet.Transaction,IBDataSet.ModifySQL) then Modified;
+    IBModifySQLEditor.EditSQL(IBDataSet.Database,IBDataSet.ModifySQL) then Modified;
 end;
 
 { TIBUpdateSQLUpdateProperty }
@@ -834,7 +834,7 @@ begin
     ShowMessage('Not Linked to an IBQuery object or Database not assigned')
   else
   if assigned(FDatabase) and
-      IBModifySQLEditor.EditSQL(FDatabase,FDatabase.DefaultTransaction,FIBUpdateSQL.ModifySQL) then Modified;
+      IBModifySQLEditor.EditSQL(FDatabase,FIBUpdateSQL.ModifySQL) then Modified;
 end;
 
 { TIBRefreshSQLProperty }
@@ -845,7 +845,7 @@ var
 begin
   IBDataset := GetComponent(0) as TIBDataset;
   if Assigned(IBDataSet.Database) and
-    IBRefreshSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.Transaction,IBDataSet.RefreshSQL) then Modified;
+    IBRefreshSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.RefreshSQL) then Modified;
 end;
 
 { TIBUpdateSQLRefreshSQLProperty }
@@ -855,7 +855,7 @@ begin
   if not GetObjects then
     ShowMessage('Not Linked to an IBQuery object or Database not assigned')
   else
-  if IBRefreshSQLEditor.EditSQL(FDatabase,FDatabase.DefaultTransaction,FIBUpdateSQL.RefreshSQL) then Modified;
+  if IBRefreshSQLEditor.EditSQL(FDatabase,FIBUpdateSQL.RefreshSQL) then Modified;
 end;
 
 { TIBDeleteSQLProperty }
@@ -866,7 +866,7 @@ var
 begin
   IBDataset := GetComponent(0) as TIBDataset;
   if Assigned(IBDataSet.Database) and
-    IBDeleteSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.Transaction,IBDataSet.DeleteSQL) then Modified;
+    IBDeleteSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.DeleteSQL) then Modified;
 end;
 
 { TIBUpdateSQLDeleteProperty }
@@ -881,7 +881,7 @@ begin
   if not GetObjects then
     ShowMessage('Not Linked to an IBQuery object or Database not assigned')
   else
-  if IBDeleteSQLEditor.EditSQL(FDatabase,FDatabase.DefaultTransaction,FIBUpdateSQL.DeleteSQL) then Modified;
+  if IBDeleteSQLEditor.EditSQL(FDatabase,FIBUpdateSQL.DeleteSQL) then Modified;
 end;
 
 { TUpdateSQLPropertyEditor }
@@ -892,6 +892,7 @@ begin
   FIBUpdateSQL := GetComponent(0) as TIBUpdateSQL;
   if not assigned(FIBUpdateSQL) or not assigned(FIBUpdateSQL.DataSet) then
     Exit;
+  FDatabase := nil;
   if FIBUpdateSQL.DataSet is TIBQuery then
   begin
     FDatabase := (FIBUpdateSQL.DataSet as TIBQuery).Database;
@@ -907,7 +908,7 @@ var
 begin
   IBDataset := GetComponent(0) as TIBDataset;
   if Assigned(IBDataSet.Database) and
-    IBInsertSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.Transaction,IBDataSet.InsertSQL) then Modified;
+    IBInsertSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.InsertSQL) then Modified;
 end;
 
 { TIBUpdateSQLInsertSQLProperty }
@@ -918,7 +919,7 @@ begin
     ShowMessage('Not Linked to an IBQuery object or Database not assigned')
   else
   if assigned(FDatabase) and
-    IBInsertSQLEditor.EditSQL(FDatabase,FDatabase.DefaultTransaction,FIBUpdateSQL.InsertSQL) then Modified;
+    IBInsertSQLEditor.EditSQL(FDatabase,FIBUpdateSQL.InsertSQL) then Modified;
 end;
 
 { TIBGeneratorProperty }

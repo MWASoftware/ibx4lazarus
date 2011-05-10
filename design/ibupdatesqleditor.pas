@@ -38,11 +38,12 @@ type
   { TIBUpdateSQLEditorForm }
 
   TIBUpdateSQLEditorForm = class(TForm)
-    Button1: TButton;
+    TestBtn: TButton;
     CancelButton: TButton;
     FieldsPage: TTabSheet;
-    GenerateButton: TButton;
+    GenerateBtn: TButton;
     GroupBox1: TGroupBox;
+    IBTransaction1: TIBTransaction;
     IncludePrimaryKeys: TCheckBox;
     PrimaryKeyList: TListBox;
     Label1: TLabel;
@@ -57,10 +58,10 @@ type
     StatementType: TRadioGroup;
     FieldList: TListBox;
     TableNamesCombo: TComboBox;
-    procedure Button1Click(Sender: TObject);
+    procedure TestBtnClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
-    procedure GenerateButtonClick(Sender: TObject);
+    procedure GenerateBtnClick(Sender: TObject);
     procedure SQLMemoChange(Sender: TObject);
     procedure SQLPageShow(Sender: TObject);
     procedure StatementTypeClick(Sender: TObject);
@@ -80,7 +81,7 @@ type
     { public declarations }
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
-    procedure SetUpdateObject(AObject: TIBUpdateSQL; Transaction: TIBTransaction);
+    procedure SetUpdateObject(AObject: TIBUpdateSQL);
   end;
 
 var
@@ -95,32 +96,18 @@ uses IBQuery;
 {$R *.lfm}
 
 function EditIBUpdateSQL(UpdateObject: TIBUpdateSQL): boolean;
-var Transaction: TIBTransaction;
 begin
   Result := false;
   if assigned(UpdateObject.DataSet) and assigned(UpdateObject.DataSet.Database) then
-  begin
-    Transaction := UpdateObject.DataSet.Transaction;
-    if not assigned(Transaction) then
-    begin
-      if not assigned(UpdateObject.DataSet.Database.DefaultTransaction)then
-      begin
-        ShowMessage('No Default Transaction!');
-        Exit
-      end;
-      Transaction := UpdateObject.DataSet.Database.DefaultTransaction
-    end;
-
     try
       UpdateObject.DataSet.Database.Connected := true;
     except on E: Exception do
       ShowMessage(E.Message)
     end;
-  end;
 
   with TIBUpdateSQLEditorForm.Create(Application) do
   try
-    SetUpdateObject(UpdateObject,Transaction);
+    SetUpdateObject(UpdateObject);
     Result := ShowModal = mrOK
   finally
     Free
@@ -133,6 +120,8 @@ end;
 procedure TIBUpdateSQLEditorForm.FormShow(Sender: TObject);
 var TableName: string;
 begin
+  GenerateBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
+  TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
   PageControl.ActivePage := FieldsPage;
   FModifySQL.Assign(FUpdateObject.ModifySQL);
   FInsertSQL.Assign(FUpdateObject.InsertSQL);
@@ -169,13 +158,13 @@ begin
   end;
 end;
 
-procedure TIBUpdateSQLEditorForm.Button1Click(Sender: TObject);
+procedure TIBUpdateSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
   if SQLMemo.Lines.Text <> '' then
     FIBSystemTables.TestSQL(SQLMemo.Lines.Text);
 end;
 
-procedure TIBUpdateSQLEditorForm.GenerateButtonClick(Sender: TObject);
+procedure TIBUpdateSQLEditorForm.GenerateBtnClick(Sender: TObject);
 var FieldNames: TStringList;
     I: integer;
 begin
@@ -279,12 +268,14 @@ begin
   inherited Destroy;
 end;
 
-procedure TIBUpdateSQLEditorForm.SetUpdateObject(AObject: TIBUpdateSQL;
-  Transaction: TIBTransaction);
+procedure TIBUpdateSQLEditorForm.SetUpdateObject(AObject: TIBUpdateSQL);
 begin
   FUpdateObject := AObject;
   if assigned(FUpdateObject.DataSet) then
-    FIBSystemTables.SelectDatabase(FUpdateObject.DataSet.Database,Transaction);
+  begin
+    IBTransaction1.DefaultDatabase := FUpdateObject.DataSet.Database;
+    FIBSystemTables.SelectDatabase(FUpdateObject.DataSet.Database,IBTransaction1);
+  end;
 end;
 
 

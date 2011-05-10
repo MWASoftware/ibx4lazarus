@@ -45,23 +45,23 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     ModalResult = 2
     TabOrder = 2
   end
-  object Button3: TButton
+  object GenerateBtn: TButton
     Left = 279
     Height = 29
     Top = 380
     Width = 101
     AutoSize = True
     Caption = 'Generate SQL'
-    OnClick = Button3Click
+    OnClick = GenerateBtnClick
     TabOrder = 3
   end
-  object Button4: TButton
+  object TestBtn: TButton
     Left = 416
     Height = 30
     Top = 380
     Width = 66
     Caption = 'Test'
-    OnClick = Button4Click
+    OnClick = TestBtnClick
     TabOrder = 4
   end
   object QuoteFields: TCheckBox
@@ -77,8 +77,8 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Height = 335
     Top = 28
     Width = 232
-    ActivePage = ExecutePage
-    TabIndex = 1
+    ActivePage = SelectPage
+    TabIndex = 0
     TabOrder = 6
     object SelectPage: TTabSheet
       Caption = 'Tables'
@@ -89,7 +89,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Left = 7
         Height = 18
         Top = 4
-        Width = 76
+        Width = 78
         Caption = 'Table Name'
         ParentColor = False
       end
@@ -97,7 +97,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Left = 7
         Height = 18
         Top = 72
-        Width = 36
+        Width = 39
         Caption = 'Fields'
         ParentColor = False
       end
@@ -105,7 +105,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Left = 7
         Height = 18
         Top = 244
-        Width = 83
+        Width = 87
         Caption = 'Primary Keys'
         ParentColor = False
       end
@@ -203,5 +203,10 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         TopIndex = -1
       end
     end
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    left = 212
+    top = 390
   end
 end

@@ -40,8 +40,9 @@ type
   TIBSQLEditorForm = class(TForm)
     Button1: TButton;
     Button2: TButton;
-    Button3: TButton;
-    Button4: TButton;
+    GenerateBtn: TButton;
+    IBTransaction1: TIBTransaction;
+    TestBtn: TButton;
     IncludePrimaryKeys: TCheckBox;
     Label1: TLabel;
     Label10: TLabel;
@@ -79,8 +80,8 @@ type
     ModifyTableNames: TComboBox;
     DeleteTableNames: TComboBox;
     ProcedureNames: TComboBox;
-    procedure Button3Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
+    procedure GenerateBtnClick(Sender: TObject);
+    procedure TestBtnClick(Sender: TObject);
     procedure DeletePageShow(Sender: TObject);
     procedure DeleteTableNamesCloseUp(Sender: TObject);
     procedure ExecutePageShow(Sender: TObject);
@@ -103,7 +104,7 @@ type
     { public declarations }
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
-    procedure SetDatabase(Database: TIBDatabase; Transaction: TIBTransaction);
+    procedure SetDatabase(Database: TIBDatabase);
   end;
 
 var
@@ -118,24 +119,16 @@ implementation
 function EditIBSQL(DataSet: TIBSQL): boolean;
 begin
   Result := false;
-  if assigned(DataSet) and assigned(DataSet.Database) then
-  begin
-    if not assigned(DataSet.Transaction) then
-    begin
-      ShowMessage('No Default Transaction!');
-      Exit
-    end;
-
+  if assigned(DataSet.Database)  then
     try
       DataSet.Database.Connected := true;
     except on E: Exception do
       ShowMessage(E.Message)
     end;
-  end;
 
   with TIBSQLEditorForm.Create(Application) do
   try
-    SetDatabase(DataSet.Database,DataSet.Transaction);
+    SetDatabase(DataSet.Database);
     SQLText.Lines.Assign(DataSet.SQL);
     Result := ShowModal = mrOK;
     if Result then
@@ -151,6 +144,8 @@ end;
 procedure TIBSQLEditorForm.FormShow(Sender: TObject);
 var IsProcedureName: boolean;
 begin
+  GenerateBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
+  TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
   if Trim(SQLText.Text) <> '' then
   begin
     case FIBSystemTables.GetStatementType(SQLText.Text,IsProcedureName) of
@@ -163,6 +158,8 @@ begin
     SQLUpdate:  PageControl.ActivePage := ModifyPage;
     SQLDelete:  PageControl.ActivePage := DeletePage;
     SQLExecProcedure: PageControl.ActivePage := ExecutePage;
+    else
+      PageControl.ActivePage := SelectPage;
     end;
     FIBSystemTables.GetTableAndColumns(SQLText.Text,FTableName,nil)
   end;
@@ -195,7 +192,7 @@ begin
 
 end;
 
-procedure TIBSQLEditorForm.Button3Click(Sender: TObject);
+procedure TIBSQLEditorForm.GenerateBtnClick(Sender: TObject);
 var FieldNames: TStrings;
 begin
   FieldNames := nil;
@@ -228,7 +225,7 @@ begin
     FieldNames.Free
 end;
 
-procedure TIBSQLEditorForm.Button4Click(Sender: TObject);
+procedure TIBSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
   FIBSystemTables.TestSQL(SQLText.Text);
 end;
@@ -370,10 +367,10 @@ begin
   inherited Destroy;
 end;
 
-procedure TIBSQLEditorForm.SetDatabase(Database: TIBDatabase;
-  Transaction: TIBTransaction);
+procedure TIBSQLEditorForm.SetDatabase(Database: TIBDatabase);
 begin
-  FIBSystemTables.SelectDatabase(Database,Transaction)
+  IBTransaction1.DefaultDatabase := Database;
+  FIBSystemTables.SelectDatabase(Database,IBTransaction1)
 end;
 
 end.

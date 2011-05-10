@@ -96,13 +96,13 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
           TabOrder = 4
           TopIndex = -1
         end
-        object GenerateButton: TButton
+        object GenerateBtn: TButton
           Left = 9
           Height = 25
           Top = 83
           Width = 168
           Caption = '&Generate SQL'
-          OnClick = GenerateButtonClick
+          OnClick = GenerateBtnClick
           TabOrder = 1
         end
         object QuoteFields: TCheckBox
@@ -179,14 +179,14 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         OnClick = StatementTypeClick
         TabOrder = 1
       end
-      object Button1: TButton
+      object TestBtn: TButton
         Left = 541
         Height = 25
         Top = 31
         Width = 75
         Anchors = [akTop, akRight]
         Caption = 'Test'
-        OnClick = Button1Click
+        OnClick = TestBtnClick
         TabOrder = 2
       end
     end
@@ -212,5 +212,10 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    left = 51
+    top = 373
   end
 end
