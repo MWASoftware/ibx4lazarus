@@ -46,13 +46,17 @@ const
   ISC_FALSE = 0;
   DSQL_close = 1;
   DSQL_drop = 2;
-{$IFDEF UNIX}
+  {$IFDEF LINUX}
   FIREBIRD_SO2 = 'libfbclient.so.2';
-{$ELSE}
+  {$ENDIF}
+  {$IFDEF DARWIN}
+  FIREBIRD_SO2 = 'libfbclient.dylib';
+  {$ENDIF}
+  {$IFDEF WINDOWS}
   IBASE_DLL = 'gds32.dll';
   FIREBIRD_CLIENT = 'fbclient.dll'; {do not localize}
   FIREBIRD_EMBEDDED = 'fbembedded.dll';
-{$ENDIF}
+  {$ENDIF}
 
 const
   SQLDA_VERSION1	       = 1; (* pre V6.0 SQLDA *)
