@@ -437,9 +437,16 @@ var
    i : integer;
 begin
     StoredProc := GetComponent(0) as TIBStoredProc;
+    if StoredProc.Database = nil then
+      Exit;
+
     with StoredProc do
+    try
       for I := 0 to StoredProcedureNames.Count - 1 do
         Proc (StoredProcedureNames[i]);
+    except on E: Exception do
+      MessageDlg(E.Message,mtError,[mbOK],0)
+    end;
 end;
 
 { TIBTableNameProperty }
@@ -541,8 +548,7 @@ var
   Query: TIBQuery;
 begin
   Query := GetComponent(0) as TIBQuery;
-  if Assigned(Query.Database) and
-    IBSelectSQLEditor.EditSQL(Query.Database,Query.SQL) then Modified;
+  if IBSelectSQLEditor.EditSQL(Query.Database,Query.SQL) then Modified;
 end;
 
 { TIBDatasetSQLProperty }
@@ -552,8 +558,7 @@ var
   IBDataset: TIBDataset;
 begin
   IBDataset := GetComponent(0) as TIBDataset;
-  if Assigned(IBDataSet.Database) and
-     IBSelectSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.SelectSQL) then Modified;
+  if IBSelectSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.SelectSQL) then Modified;
 end;
 
 { TIBSQLProperty }
@@ -822,19 +827,15 @@ var
   IBDataset: TIBDataset;
 begin
   IBDataset := GetComponent(0) as TIBDataset;
-  if Assigned(IBDataSet.Database) and
-    IBModifySQLEditor.EditSQL(IBDataSet.Database,IBDataSet.ModifySQL) then Modified;
+  if IBModifySQLEditor.EditSQL(IBDataSet.Database,IBDataSet.ModifySQL) then Modified;
 end;
 
 { TIBUpdateSQLUpdateProperty }
 
 procedure TIBUpdateSQLUpdateProperty.Edit;
 begin
-  if not GetObjects then
-    ShowMessage('Not Linked to an IBQuery object or Database not assigned')
-  else
-  if assigned(FDatabase) and
-      IBModifySQLEditor.EditSQL(FDatabase,FIBUpdateSQL.ModifySQL) then Modified;
+  GetObjects;
+  if IBModifySQLEditor.EditSQL(FDatabase,FIBUpdateSQL.ModifySQL) then Modified;
 end;
 
 { TIBRefreshSQLProperty }
@@ -842,19 +843,17 @@ end;
 procedure TIBRefreshSQLProperty.Edit;
 var
   IBDataset: TIBDataset;
+  aDatabase: TIBDatabase;
 begin
   IBDataset := GetComponent(0) as TIBDataset;
-  if Assigned(IBDataSet.Database) and
-    IBRefreshSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.RefreshSQL) then Modified;
+  if IBRefreshSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.RefreshSQL) then Modified;
 end;
 
 { TIBUpdateSQLRefreshSQLProperty }
 
 procedure TIBUpdateSQLRefreshSQLProperty.Edit;
 begin
-  if not GetObjects then
-    ShowMessage('Not Linked to an IBQuery object or Database not assigned')
-  else
+  GetObjects;
   if IBRefreshSQLEditor.EditSQL(FDatabase,FIBUpdateSQL.RefreshSQL) then Modified;
 end;
 
@@ -865,8 +864,7 @@ var
   IBDataset: TIBDataset;
 begin
   IBDataset := GetComponent(0) as TIBDataset;
-  if Assigned(IBDataSet.Database) and
-    IBDeleteSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.DeleteSQL) then Modified;
+  if IBDeleteSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.DeleteSQL) then Modified;
 end;
 
 { TIBUpdateSQLDeleteProperty }
@@ -878,9 +876,7 @@ end;
 
 procedure TIBUpdateSQLDeleteProperty.Edit;
 begin
-  if not GetObjects then
-    ShowMessage('Not Linked to an IBQuery object or Database not assigned')
-  else
+  GetObjects;
   if IBDeleteSQLEditor.EditSQL(FDatabase,FIBUpdateSQL.DeleteSQL) then Modified;
 end;
 
@@ -907,19 +903,15 @@ var
   IBDataset: TIBDataset;
 begin
   IBDataset := GetComponent(0) as TIBDataset;
-  if Assigned(IBDataSet.Database) and
-    IBInsertSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.InsertSQL) then Modified;
+  if IBInsertSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.InsertSQL) then Modified;
 end;
 
 { TIBUpdateSQLInsertSQLProperty }
 
 procedure TIBUpdateSQLInsertSQLProperty.Edit;
 begin
-  if not GetObjects then
-    ShowMessage('Not Linked to an IBQuery object or Database not assigned')
-  else
-  if assigned(FDatabase) and
-    IBInsertSQLEditor.EditSQL(FDatabase,FIBUpdateSQL.InsertSQL) then Modified;
+  GetObjects;
+  if IBInsertSQLEditor.EditSQL(FDatabase,FIBUpdateSQL.InsertSQL) then Modified;
 end;
 
 { TIBGeneratorProperty }
