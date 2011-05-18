@@ -121,7 +121,7 @@ const
 
   sqlGETPROCEDURES = 'Select Trim(RDB$PROCEDURE_NAME) as ProcName, RDB$PROCEDURE_INPUTS, '+
                      'RDB$PROCEDURE_OUTPUTS From RDB$PROCEDURES '+
-		     'Where RDB$SYSTEM_FLAG = 0 and RDB$PROCEDURE_OUTPUTS >= :MinOutput Order by 1 asc';
+		     'Where RDB$SYSTEM_FLAG = 0 and coalesce(RDB$PROCEDURE_OUTPUTS,0) >= :MinOutput Order by 1 asc';
 
   sqlGETPROCPARAM  = 'Select Trim(P.RDB$PARAMETER_NAME) as ParamName '+
                      'From RDB$PROCEDURE_PARAMETERS P '+
