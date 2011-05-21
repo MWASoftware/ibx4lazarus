@@ -67,8 +67,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Height = 337
     Top = 27
     Width = 251
-    ActivePage = ExecutePage
-    TabIndex = 4
+    ActivePage = SelectPage
+    TabIndex = 0
     TabOrder = 5
     object SelectPage: TTabSheet
       Caption = 'Select'

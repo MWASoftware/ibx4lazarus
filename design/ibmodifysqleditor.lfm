@@ -76,7 +76,6 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Width = 201
     ItemHeight = 0
     OnCloseUp = TableNamesComboCloseUp
-    ParentColor = True
     TabOrder = 3
   end
   object FieldList: TListBox
