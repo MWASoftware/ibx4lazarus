@@ -42,6 +42,7 @@ type
     Button2: TButton;
     GenerateBtn: TButton;
     IBTransaction1: TIBTransaction;
+    Label5: TLabel;
     TestBtn: TButton;
     IncludePrimaryKeys: TCheckBox;
     Label1: TLabel;
@@ -115,6 +116,8 @@ implementation
 
 {$R *.lfm}
 
+uses InterfaceBase;
+
 function EditIBSQL(DataSet: TIBSQL): boolean;
 begin
   Result := false;
@@ -143,6 +146,10 @@ end;
 procedure TIBSQLEditorForm.FormShow(Sender: TObject);
 var IsProcedureName: boolean;
 begin
+  if WidgetSet.LCLPlatform = lpGtk2 then
+    PageControl.TabPosition := tpLeft
+  else
+  PageControl.TabPosition := tpTop;
   GenerateBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
   TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
   if Trim(SQLText.Text) <> '' then
