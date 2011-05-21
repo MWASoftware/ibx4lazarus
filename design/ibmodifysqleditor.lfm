@@ -95,10 +95,9 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
   end
   object GenerateBtn: TButton
     Left = 280
-    Height = 29
+    Height = 30
     Top = 380
     Width = 101
-    AutoSize = True
     Caption = 'Generate SQL'
     OnClick = GenerateBtnClick
     TabOrder = 5

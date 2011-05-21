@@ -67,8 +67,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Height = 337
     Top = 27
     Width = 251
-    ActivePage = InsertPage
-    TabIndex = 1
+    ActivePage = ExecutePage
+    TabIndex = 4
     TabOrder = 5
     object SelectPage: TTabSheet
       Caption = 'Select'
@@ -106,7 +106,6 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Width = 169
         ItemHeight = 0
         OnCloseUp = SelectTableNamesCloseUp
-        ParentColor = True
         TabOrder = 0
       end
       object SelectFieldsList: TListBox
@@ -162,7 +161,6 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Width = 169
         ItemHeight = 0
         OnCloseUp = InsertTableNamesCloseUp
-        ParentColor = True
         TabOrder = 0
       end
       object InsertFieldsList: TListBox
@@ -217,7 +215,6 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Width = 169
         ItemHeight = 0
         OnCloseUp = ModifyTableNamesCloseUp
-        ParentColor = True
         TabOrder = 0
       end
       object ModifyFieldsList: TListBox
@@ -289,7 +286,6 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Width = 169
         ItemHeight = 0
         OnCloseUp = DeleteTableNamesCloseUp
-        ParentColor = True
         TabOrder = 0
       end
       object DeletePrimaryKeys: TListBox
@@ -339,7 +335,6 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Width = 169
         ItemHeight = 0
         OnCloseUp = ProcedureNamesCloseUp
-        ParentColor = True
         TabOrder = 0
       end
       object ProcInputList: TListBox
