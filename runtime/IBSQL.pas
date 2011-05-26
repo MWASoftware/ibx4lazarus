@@ -270,6 +270,7 @@ type
   TIBSQL = class(TComponent)
   private
     FIBLoaded: Boolean;
+    function GetFieldCount: integer;
   protected
     FBase: TIBBase;
     FBOF,                          { At BOF? }
@@ -329,6 +330,7 @@ type
     property Eof: Boolean read GetEOF;
     property Fields[const Idx: Integer]: TIBXSQLVAR read GetFields;
     property FieldIndex[FieldName: String]: Integer read GetFieldIndex;
+    property FieldCount: integer read GetFieldCount;
     property Open: Boolean read FOpen;
     property Params: TIBXSQLDA read GetSQLParams;
     property Plan: String read GetPlan;
@@ -2045,6 +2047,11 @@ end;
 function TIBSQL.Current: TIBXSQLDA;
 begin
   result := FSQLRecord;
+end;
+
+function TIBSQL.GetFieldCount: integer;
+begin
+  Result := FSQLRecord.Count
 end;
 
 procedure TIBSQL.DoBeforeDatabaseDisconnect(Sender: TObject);
