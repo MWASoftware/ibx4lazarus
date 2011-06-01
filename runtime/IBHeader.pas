@@ -55,7 +55,7 @@ const
   {$IFDEF WINDOWS}
   IBASE_DLL = 'gds32.dll';
   FIREBIRD_CLIENT = 'fbclient.dll'; {do not localize}
-  FIREBIRD_EMBEDDED = 'fbembedded.dll';
+  FIREBIRD_EMBEDDED = 'fbembed.dll';
   {$ENDIF}
 
 const
