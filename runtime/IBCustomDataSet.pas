@@ -877,6 +877,7 @@ end;
 
 destructor TIBCustomDataSet.Destroy;
 begin
+  if Active then Active := false;
   if FIBLoaded then
   begin
     if assigned(FGeneratorField) then FGeneratorField.Free;

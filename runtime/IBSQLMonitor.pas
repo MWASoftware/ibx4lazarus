@@ -154,7 +154,7 @@ uses
    {$IF FPC_FULLVERSION <= 20402 } , initc {$ENDIF}
    {$ENDIF};
 
-   {$STATIC ON}
+   {$IF FPC_FULLVERSION < 20600 }{$STATIC ON} {$ENDIF}
 
 const
   cMonitorHookSize = 1024;

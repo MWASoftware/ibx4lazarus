@@ -82,7 +82,6 @@ type
     Label7: TLabel;
     Label8: TLabel;
     Test: TButton;
-    procedure CharacterSetCloseUp(Sender: TObject);
     procedure RemoteRbtnClick(Sender: TObject);
     procedure BrowseClick(Sender: TObject);
     procedure LocalRbtnClick(Sender: TObject);
@@ -273,15 +272,6 @@ begin
     Protocol.Text := 'TCP';
 end;
 
-procedure TIBDatabaseEditForm.CharacterSetCloseUp(Sender: TObject);
-begin
-  if (CharacterSet.Text <> 'None') then {do not localize}
-    AddParam('lc_ctype', CharacterSet.Text)
-  else
-    DeleteParam('lc_ctype');
-
-end;
-
 procedure TIBDatabaseEditForm.BrowseClick(Sender: TObject);
 begin
   with TOpenDialog.Create(Application) do
@@ -343,7 +333,6 @@ end;
 
 procedure TIBDatabaseEditForm.CharacterSetChange(Sender: TObject);
 begin
-  ShowMessage(CharacterSet.Text);
   if (CharacterSet.Text <> 'None') then {do not localize}
     AddParam('lc_ctype', CharacterSet.Text)
   else

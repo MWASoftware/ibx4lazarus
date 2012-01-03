@@ -29,7 +29,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       Height = 30
       Top = 6
       Width = 75
-      Caption = 'OK'
+      Caption = '&OK'
       Default = True
       OnClick = OKBtnClick
       TabOrder = 0
@@ -285,7 +285,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
         'WIN1253'
         'WIN1254'
       )
-      OnCloseUp = CharacterSetCloseUp
+      OnChange = CharacterSetChange
       TabOrder = 3
       Text = 'None'
     end
