@@ -147,7 +147,7 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         Width = 615
         Anchors = [akTop, akLeft, akRight, akBottom]
         OnChange = SQLMemoChange
-        ScrollBars = ssAutoVertical
+        ScrollBars = ssAutoBoth
         TabOrder = 0
       end
       object StatementType: TRadioGroup

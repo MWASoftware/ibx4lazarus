@@ -43,6 +43,7 @@ type
     GenerateBtn: TButton;
     IBTransaction1: TIBTransaction;
     Label5: TLabel;
+    SelectProcedure: TLabel;
     TestBtn: TButton;
     IncludePrimaryKeys: TCheckBox;
     Label1: TLabel;
@@ -100,6 +101,7 @@ type
     { private declarations }
     FTableName: string;
     FIBSystemTables: TIBSystemTables;
+    FExecuteOnly: boolean;
   public
     { public declarations }
     constructor Create(TheOwner: TComponent); override;
@@ -224,7 +226,7 @@ begin
      FIBSystemTables.GenerateDeleteSQL(DeleteTableNames.Text,QuoteFields.Checked,SQLText.Lines)
   else
   if PageControl.ActivePage = ExecutePage then
-     FIBSystemTables.GenerateExecuteSQL(ProcedureNames.Text,QuoteFields.Checked,
+     FIBSystemTables.GenerateExecuteSQL(ProcedureNames.Text,QuoteFields.Checked, FExecuteOnly,
              ProcInputList.Items,ProcOutputList.Items,SQLText.Lines);
 
   if FieldNames <> nil then
@@ -257,7 +259,8 @@ begin
     else
       ProcedureNames.ItemIndex := 0;
   end;
-  FIBSystemTables.GetProcParams(ProcedureNames.Text,ProcInputList.Items,ProcOutputList.Items);
+  FIBSystemTables.GetProcParams(ProcedureNames.Text,FExecuteOnly,ProcInputList.Items,ProcOutputList.Items);
+  SelectProcedure.Visible :=  not FExecuteOnly;
 end;
 
 procedure TIBSQLEditorForm.InsertPageShow(Sender: TObject);
@@ -317,7 +320,8 @@ end;
 
 procedure TIBSQLEditorForm.ProcedureNamesCloseUp(Sender: TObject);
 begin
-    FIBSystemTables.GetProcParams(ProcedureNames.Text,ProcInputList.Items,ProcOutputList.Items);
+    FIBSystemTables.GetProcParams(ProcedureNames.Text,FExecuteOnly,ProcInputList.Items,ProcOutputList.Items);
+    SelectProcedure.Visible := not FExecuteOnly
 end;
 
 procedure TIBSQLEditorForm.SelectFieldsListDblClick(Sender: TObject);

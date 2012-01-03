@@ -47,6 +47,7 @@ type
     FGetGeneratorsSQL: TIBSQL;
     FGetProcedures: TIBSQL;
     FGetProcedureParams: TIBSQL;
+    FGetProcedureInfo: TIBSQL;
     function GetSQLType(SQLType: TIBSQLTypes): string;
     procedure AddWhereClause(TableName: string; QuotedStrings: boolean; SQL: TStrings;
        UseOldValues: boolean = false);
@@ -63,14 +64,15 @@ type
     procedure GetTableAndColumns(SelectSQL: string; var FirstTableName: string;
                 Columns: TStrings);
     procedure GetProcedureNames(ProcNames: TStrings; WithOutputParams: boolean=false);
-    procedure GetProcParams(ProcName: string; InputParams, OutputParams: TStrings); overload;
+    procedure GetProcParams(ProcName: string; var ExecuteOnly: boolean;
+                            InputParams, OutputParams: TStrings); overload;
     procedure GetGenerators(GeneratorNames: TStrings);
     procedure GenerateSelectSQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
     procedure GenerateRefreshSQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
     procedure GenerateInsertSQL(TableName: string; QuotedStrings: boolean; FieldNames, SQL: TStrings);
     procedure GenerateModifySQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
     procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);
-    procedure GenerateExecuteSQL(ProcName: string; QuotedStrings: boolean;
+    procedure GenerateExecuteSQL(ProcName: string; QuotedStrings: boolean; ExecuteOnly: boolean;
               InputParams, OutputParams, ExecuteSQL: TStrings);
     function GetStatementType(SQL: string; var IsStoredProcedure: boolean): TIBSQLTypes;
     function GetFieldNames(FieldList: TListBox): TStrings;
@@ -121,7 +123,7 @@ const
 
   sqlGETPROCEDURES = 'Select Trim(RDB$PROCEDURE_NAME) as ProcName, RDB$PROCEDURE_INPUTS, '+
                      'RDB$PROCEDURE_OUTPUTS From RDB$PROCEDURES '+
-		     'Where RDB$SYSTEM_FLAG = 0 and coalesce(RDB$PROCEDURE_OUTPUTS,0) >= :MinOutput Order by 1 asc';
+		     'Where RDB$SYSTEM_FLAG = 0 and RDB$PROCEDURE_TYPE <= :ProcType Order by 1 asc';
 
   sqlGETPROCPARAM  = 'Select Trim(P.RDB$PARAMETER_NAME) as ParamName '+
                      'From RDB$PROCEDURE_PARAMETERS P '+
@@ -130,6 +132,8 @@ const
 		     'Order by P.RDB$PARAMETER_NUMBER asc';
 
   sqlCheckProcedureNames = 'Select * From RDB$PROCEDURES Where Upper(Trim(RDB$PROCEDURE_NAME)) = Upper(:ProcName)';
+
+  sqlGETPROCEDUREINFO = 'Select RDB$PROCEDURE_TYPE From RDB$PROCEDURES Where Upper(Trim(RDB$PROCEDURE_NAME)) = Upper(:ProcName)';
 
 function TIBSystemTables.GetSQLType(SQLType: TIBSQLTypes): string;
 begin
@@ -267,6 +271,7 @@ begin
   FTableAndColumnSQL := TIBSQL.Create(nil);
   FGetGeneratorsSQL := TIBSQL.Create(nil);
   FGetProcedureParams := TIBSQL.Create(nil);
+  FGetProcedureInfo := TIBSQL.Create(nil);
 end;
 
 destructor TIBSystemTables.Destroy;
@@ -279,6 +284,7 @@ begin
   if assigned(FGetGeneratorsSQL) then FGetGeneratorsSQL.Free;
   if assigned(FGetProcedures) then FGetProcedures.Free;
   if assigned(FGetProcedureParams) then FGetProcedureParams.Free;
+  if assigned(FGetProcedureInfo) then FGetProcedureInfo.Free;
   inherited Destroy;
 end;
 
@@ -304,6 +310,9 @@ begin
     FGetProcedureParams.Database := Database;
     FGetProcedureParams.Transaction := Transaction;
     FGetProcedureParams.SQL.Text := sqlGETPROCPARAM;
+    FGetProcedureInfo.Database := Database;
+    FGetProcedureInfo.Transaction := Transaction;
+    FGetProcedureInfo.SQL.Text := sqlGETPROCEDUREINFO;
     FGetProcedures.Database := Database;
     FGetProcedures.Transaction := Transaction;
     FGetProcedures.SQL.Text := sqlGETPROCEDURES;
@@ -439,9 +448,9 @@ begin
       if not InTransaction then StartTransaction;
     Prepare;
     if WithOutputParams then
-      ParamByName('MinOutput').AsInteger := 1
+      ParamByName('ProcType').AsInteger := 1
     else
-      ParamByName('MinOutput').AsInteger := 0;
+      ParamByName('ProcType').AsInteger := 2;
     ExecQuery;
     try
       while not EOF do
@@ -455,11 +464,27 @@ begin
   end;
 end;
 
-procedure TIBSystemTables.GetProcParams(ProcName: string; InputParams,
-  OutputParams: TStrings);
+procedure TIBSystemTables.GetProcParams(ProcName: string;
+  var ExecuteOnly: boolean; InputParams, OutputParams: TStrings);
 begin
   GetProcParams(ProcName,InputParams,true);
   GetProcParams(ProcName,OutputParams,false);
+  ExecuteOnly := OutputParams.Count = 0;
+  if not ExecuteOnly then
+  with FGetProcedureInfo do
+  begin
+    with Transaction do
+      if not InTransaction then StartTransaction;
+    Prepare;
+    ParamByName('ProcName').AsString := ProcName;
+    ExecQuery;
+    try
+      if not EOF then
+        ExecuteOnly := FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 2
+    finally
+      Close
+    end;
+  end;
 end;
 
 procedure TIBSystemTables.GetGenerators(GeneratorNames: TStrings);
@@ -577,13 +602,14 @@ begin
 end;
 
 procedure TIBSystemTables.GenerateExecuteSQL(ProcName: string;
-  QuotedStrings: boolean; InputParams, OutputParams, ExecuteSQL: TStrings);
+  QuotedStrings: boolean; ExecuteOnly: boolean; InputParams, OutputParams,
+  ExecuteSQL: TStrings);
 var SQL: string;
     I: integer;
     Separator: string;
 begin
   Separator := '';
-  if OutputParams.Count > 0 then //Select Query
+  if not ExecuteOnly and (OutputParams.Count > 0) then //Select Query
   begin
     SQL := 'Select ';
     for I := 0 to OutputParams.Count - 1 do

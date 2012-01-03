@@ -63,12 +63,12 @@ object IBSQLEditorForm: TIBSQLEditorForm
     TabOrder = 4
   end
   object PageControl: TPageControl
-    Left = 24
+    Left = 16
     Height = 337
     Top = 27
     Width = 251
-    ActivePage = SelectPage
-    TabIndex = 0
+    ActivePage = ExecutePage
+    TabIndex = 4
     TabOrder = 5
     object SelectPage: TTabSheet
       Caption = 'Select'
@@ -315,7 +315,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       object Label17: TLabel
         Left = 10
         Height = 18
-        Top = 69
+        Top = 61
         Width = 112
         Caption = 'Input Parameters'
         ParentColor = False
@@ -323,7 +323,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       object Label18: TLabel
         Left = 11
         Height = 18
-        Top = 190
+        Top = 181
         Width = 123
         Caption = 'Output Parameters'
         ParentColor = False
@@ -340,7 +340,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       object ProcInputList: TListBox
         Left = 6
         Height = 80
-        Top = 90
+        Top = 82
         Width = 164
         IntegralHeight = True
         ItemHeight = 0
@@ -349,14 +349,27 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object ProcOutputList: TListBox
         Left = 10
-        Height = 71
-        Top = 210
+        Height = 68
+        Top = 201
         Width = 160
         Anchors = [akTop, akLeft, akBottom]
         IntegralHeight = True
         ItemHeight = 0
         TabOrder = 2
         TopIndex = -1
+      end
+      object SelectProcedure: TLabel
+        Left = 7
+        Height = 15
+        Top = 280
+        Width = 127
+        Anchors = [akLeft, akBottom]
+        Caption = 'Is ''Select Procedure'''
+        Font.Height = -11
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+        Visible = False
       end
     end
   end

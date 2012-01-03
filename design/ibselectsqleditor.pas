@@ -42,6 +42,7 @@ type
     Button1: TButton;
     Button2: TButton;
     GenerateBtn: TButton;
+    SelectProcedure: TLabel;
     TestBtn: TButton;
     FieldList: TListBox;
     IBTransaction1: TIBTransaction;
@@ -74,6 +75,7 @@ type
   private
     { private declarations }
     FIBSystemTables: TIBSystemTables;
+    FExecuteOnly: boolean;
   public
     { public declarations }
     constructor Create(TheOwner: TComponent); override;
@@ -143,7 +145,8 @@ end;
 
 procedure TIBSelectSQLEditorForm.ProcedureNamesCloseUp(Sender: TObject);
 begin
-  FIBSystemTables.GetProcParams(ProcedureNames.Text,ProcInputList.Items,ProcOutputList.Items);
+  FIBSystemTables.GetProcParams(ProcedureNames.Text,FExecuteOnly,ProcInputList.Items,ProcOutputList.Items);
+  SelectProcedure.Visible := not FExecuteOnly
 end;
 
 procedure TIBSelectSQLEditorForm.SelectPageShow(Sender: TObject);
@@ -174,7 +177,7 @@ procedure TIBSelectSQLEditorForm.GenerateBtnClick(Sender: TObject);
 var FieldNames: TStrings;
 begin
   if PageControl.ActivePage = ExecutePage then
-    FIBSystemTables.GenerateExecuteSQL(ProcedureNames.Text,QuoteFields.Checked,
+    FIBSystemTables.GenerateExecuteSQL(ProcedureNames.Text,QuoteFields.Checked,FExecuteOnly,
           ProcInputList.Items,ProcOutputList.Items,SQLText.Lines)
   else
   begin
@@ -207,7 +210,8 @@ begin
     else
       ProcedureNames.ItemIndex := 0;
   end;
-  FIBSystemTables.GetProcParams(ProcedureNames.Text,ProcInputList.Items,ProcOutputList.Items);
+  FIBSystemTables.GetProcParams(ProcedureNames.Text,FExecuteOnly,ProcInputList.Items,ProcOutputList.Items);
+  SelectProcedure.Visible := not FExecuteOnly
 end;
 
 procedure TIBSelectSQLEditorForm.TableNamesComboCloseUp(Sender: TObject);

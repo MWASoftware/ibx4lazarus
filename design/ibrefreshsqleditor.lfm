@@ -46,7 +46,7 @@ object IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm
     Height = 328
     Top = 36
     Width = 439
-    ScrollBars = ssVertical
+    ScrollBars = ssAutoBoth
     TabOrder = 0
   end
   object Button1: TButton

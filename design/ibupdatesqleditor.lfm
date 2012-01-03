@@ -17,9 +17,9 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
     Height = 352
     Top = 8
     Width = 641
-    ActivePage = FieldsPage
+    ActivePage = SQLPage
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     object FieldsPage: TTabSheet
       Caption = 'Options'
