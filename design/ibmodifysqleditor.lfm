@@ -46,6 +46,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Height = 328
     Top = 36
     Width = 439
+    Anchors = [akTop, akLeft, akRight, akBottom]
     ScrollBars = ssAutoBoth
     TabOrder = 0
   end
@@ -54,6 +55,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Height = 30
     Top = 379
     Width = 72
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
@@ -64,6 +66,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Height = 30
     Top = 380
     Width = 72
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
@@ -97,6 +100,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Height = 30
     Top = 380
     Width = 101
+    Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
     OnClick = GenerateBtnClick
     TabOrder = 5
@@ -106,6 +110,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Height = 30
     Top = 380
     Width = 66
+    Anchors = [akRight, akBottom]
     Caption = 'Test'
     OnClick = TestBtnClick
     TabOrder = 6

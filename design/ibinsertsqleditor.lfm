@@ -1,12 +1,12 @@
 object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
   Left = 334
-  Height = 438
+  Height = 436
   Top = 239
-  Width = 749
+  Width = 748
   ActiveControl = TableNamesCombo
   Caption = 'Insert SQL Editor'
-  ClientHeight = 438
-  ClientWidth = 749
+  ClientHeight = 436
+  ClientWidth = 748
   OnShow = FormShow
   LCLVersion = '0.9.30'
   object Label1: TLabel
@@ -35,27 +35,30 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
   end
   object SQLText: TMemo
     Left = 279
-    Height = 328
+    Height = 326
     Top = 36
-    Width = 439
+    Width = 438
+    Anchors = [akTop, akLeft, akRight, akBottom]
     ScrollBars = ssAutoBoth
     TabOrder = 0
   end
   object Button1: TButton
-    Left = 552
+    Left = 551
     Height = 30
-    Top = 380
+    Top = 378
     Width = 72
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
     TabOrder = 1
   end
   object Button2: TButton
-    Left = 640
+    Left = 639
     Height = 30
-    Top = 380
+    Top = 378
     Width = 72
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
@@ -85,19 +88,21 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     TopIndex = -1
   end
   object GenerateBtn: TButton
-    Left = 280
+    Left = 279
     Height = 30
-    Top = 380
+    Top = 378
     Width = 101
+    Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
     OnClick = GenerateBtnClick
     TabOrder = 5
   end
   object TestBtn: TButton
-    Left = 416
+    Left = 415
     Height = 30
-    Top = 380
+    Top = 378
     Width = 66
+    Anchors = [akRight, akBottom]
     Caption = 'Test'
     OnClick = TestBtnClick
     TabOrder = 6

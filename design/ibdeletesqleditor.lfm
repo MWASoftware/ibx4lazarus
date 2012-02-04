@@ -1,12 +1,12 @@
 object IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
   Left = 824
-  Height = 438
+  Height = 439
   Top = 384
-  Width = 749
+  Width = 750
   ActiveControl = TableNamesCombo
   Caption = 'Delete SQL Editor'
-  ClientHeight = 438
-  ClientWidth = 749
+  ClientHeight = 439
+  ClientWidth = 750
   OnShow = FormShow
   LCLVersion = '0.9.30'
   object Label1: TLabel
@@ -35,27 +35,30 @@ object IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
   end
   object SQLText: TMemo
     Left = 279
-    Height = 328
+    Height = 329
     Top = 36
-    Width = 439
+    Width = 440
+    Anchors = [akTop, akLeft, akRight, akBottom]
     ScrollBars = ssAutoBoth
     TabOrder = 0
   end
   object Button1: TButton
-    Left = 552
+    Left = 553
     Height = 30
-    Top = 380
+    Top = 381
     Width = 72
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
     TabOrder = 1
   end
   object Button2: TButton
-    Left = 640
+    Left = 641
     Height = 30
-    Top = 380
+    Top = 381
     Width = 72
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
@@ -71,19 +74,21 @@ object IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
     TabOrder = 3
   end
   object GenerateBtn: TButton
-    Left = 280
+    Left = 281
     Height = 30
-    Top = 380
+    Top = 381
     Width = 101
+    Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
     OnClick = GenerateBtnClick
     TabOrder = 4
   end
   object TestBtn: TButton
-    Left = 416
+    Left = 417
     Height = 30
-    Top = 380
+    Top = 381
     Width = 66
+    Anchors = [akRight, akBottom]
     Caption = 'Test'
     OnClick = TestBtnClick
     TabOrder = 5

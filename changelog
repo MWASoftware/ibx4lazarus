@@ -1,0 +1,9 @@
+IBX Change Log
+
+1. Add "if active then active := false" to TIBCustomDataset destructor;
+
+2. Make use of $STATIC conditional in IBSQLMonitor
+
+3. Database Property Editor: Character Set drop down box now uses "OnChange" rather than "OnCloseUp" to react to changes
+
+4. Property editors should now correctly resize.

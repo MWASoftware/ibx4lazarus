@@ -1,12 +1,12 @@
 object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   Left = 272
-  Height = 438
+  Height = 437
   Top = 457
-  Width = 749
+  Width = 747
   ActiveControl = PageControl
   Caption = 'Select SQL Editor'
-  ClientHeight = 438
-  ClientWidth = 749
+  ClientHeight = 437
+  ClientWidth = 747
   OnShow = FormShow
   LCLVersion = '0.9.30'
   object Label3: TLabel
@@ -19,46 +19,51 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   end
   object SQLText: TMemo
     Left = 279
-    Height = 328
+    Height = 327
     Top = 36
-    Width = 439
+    Width = 437
+    Anchors = [akTop, akLeft, akRight, akBottom]
     ScrollBars = ssAutoBoth
     TabOrder = 0
   end
   object Button1: TButton
-    Left = 552
+    Left = 550
     Height = 30
-    Top = 380
+    Top = 379
     Width = 72
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
     TabOrder = 1
   end
   object Button2: TButton
-    Left = 640
+    Left = 638
     Height = 30
-    Top = 380
+    Top = 379
     Width = 72
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
   end
   object GenerateBtn: TButton
-    Left = 280
+    Left = 278
     Height = 30
-    Top = 380
+    Top = 379
     Width = 101
+    Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
     OnClick = GenerateBtnClick
     TabOrder = 3
   end
   object TestBtn: TButton
-    Left = 416
+    Left = 414
     Height = 30
-    Top = 380
+    Top = 379
     Width = 66
+    Anchors = [akRight, akBottom]
     Caption = 'Test'
     OnClick = TestBtnClick
     TabOrder = 4
