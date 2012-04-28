@@ -356,8 +356,12 @@ begin
       end;
     tempDB.Params.Assign(DatabaseParams.Lines);
     tempDB.LoginPrompt := LoginPrompt.Checked;
-    tempDB.Connected := true;
-    ShowMessage('Successful Connection');
+    try
+      tempDB.Connected := true;
+      ShowMessage('Successful Connection');
+    except on E: Exception do
+      ShowMessage(E.Message)
+    end;
   finally
     tempDB.Free;
     Test.Enabled := true;
