@@ -1,9 +1,12 @@
-IBX Change Log
+IBX Change Log  version 1.0-  Sat, 28 Apr 2012 16:40:35 +0100
 
-1. Add "if active then active := false" to TIBCustomDataset destructor;
+1. Add "if active then active := false" to TIBCustomDataset destructor. (Avoid error on database close).
 
-2. Make use of $STATIC conditional in IBSQLMonitor
+2. Make use of $STATIC conditional in IBSQLMonitor (Needed for FPC 2.6.0 compliance)
 
 3. Database Property Editor: Character Set drop down box now uses "OnChange" rather than "OnCloseUp" to react to changes
 
 4. Property editors should now correctly resize.
+
+5. In IBDatabaseEdit.TestClick, the LoginPrompt is now set to the state of the LoginPrompt Checkbox
+   (restored original functionality)

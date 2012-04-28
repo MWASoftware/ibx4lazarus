@@ -355,7 +355,7 @@ begin
         2: tempDB.DatabaseName := Format('%s@%s', [ServerName.Text, DatabaseName.Text]); {do not localize}
       end;
     tempDB.Params.Assign(DatabaseParams.Lines);
-    tempDB.LoginPrompt := true;
+    tempDB.LoginPrompt := LoginPrompt.Checked;
     tempDB.Connected := true;
     ShowMessage('Successful Connection');
   finally

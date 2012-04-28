@@ -6,6 +6,8 @@ compatible Initial Developers Public License for new software.
 
 See the "doc" directory for more information and installation instructions.
 
+See the "changelog" for information on changes from previous releases
+
 Bug Reports to: http://www.mwasoftware.co.uk/ibxbugs
 
 mailto: ibx@mwasoftware.co.uk 
