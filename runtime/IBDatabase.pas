@@ -1116,6 +1116,7 @@ begin
   Result := FSQLDialect;
 end;
 
+
 procedure TIBDatabase.SetSQLDialect(const Value: Integer);
 begin
   if (Value < 1) then IBError(ibxeSQLDialectInvalid, [nil]);

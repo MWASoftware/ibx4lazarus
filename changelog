@@ -1,4 +1,4 @@
-IBX Change Log  version 1.0-  Sat, 28 Apr 2012 16:40:35 +0100
+IBX Change Log  version 1.0-0-  Sat, 28 Apr 2012 16:43:00 +0100
 
 1. Add "if active then active := false" to TIBCustomDataset destructor. (Avoid error on database close).
 
