@@ -330,12 +330,14 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
 
 procedure Register;
 begin
+  if not TryIBLoad then Exit;
+
   RegisterNoIcon([TIBStringField, TIBBCDField]);
   RegisterComponents(IBPalette1, [ TIBQuery, TIBDataSet,
    TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBEvents,
      TIBSQL, TIBDatabaseInfo, TIBSQLMonitor,
        TIBStoredProc,TIBBatchMove,  TIBTable,TIBExtract]);
-  if (TryIBLoad) and IBServiceAPIPresent  then
+  if IBServiceAPIPresent  then
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
       TIBRestoreService, TIBValidationService, TIBStatisticalService,
       TIBLogService, TIBSecurityService, TIBServerProperties]);

@@ -10,3 +10,6 @@ IBX Change Log  version 1.0-0-  Sat, 28 Apr 2012 16:43:00 +0100
 
 5. In IBDatabaseEdit.TestClick, the LoginPrompt is now set to the state of the LoginPrompt Checkbox
    (restored original functionality)
+
+6. Under OSX, if IBX fails to load libfbclient.dylib, it will now try and load the firebird
+   library using the absolute path /Library/Frameworks/Firebird.framework/Firebird.

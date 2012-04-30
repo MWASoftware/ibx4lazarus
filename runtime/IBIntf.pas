@@ -205,6 +205,16 @@ procedure LoadIBLibrary;
         LibName := FIREBIRD_SO2;
     end;
     Result := LoadLibrary(LibName);
+    {$IFDEF DARWIN}
+    if Result = NilHandle then
+    begin
+      {See http://paulbeachsblog.blogspot.co.uk/2008/03/where-is-libfbclientdylib-on-macosx.html
+       Try loading direct from Firebird Framework}
+
+      LibName := '/Library/Frameworks/Firebird.framework/Firebird';
+      Result := LoadLibrary(LibName);
+    end
+    {$ENDIF}
   end;
 {$ENDIF}
 {$IFDEF WINDOWS}
