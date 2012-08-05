@@ -333,6 +333,7 @@ begin
   if not TryIBLoad then Exit;
 
   RegisterNoIcon([TIBStringField, TIBBCDField]);
+  RegisterNoIcon([TIntegerField]);
   RegisterComponents(IBPalette1, [ TIBQuery, TIBDataSet,
    TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBEvents,
      TIBSQL, TIBDatabaseInfo, TIBSQLMonitor,

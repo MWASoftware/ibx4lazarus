@@ -934,7 +934,7 @@ end;
 
 procedure TIBCustomDataSet.ApplyUpdates;
 var
-  CurBookmark: string;
+  CurBookmark: TBookmark;
   Buffer: PRecordData;
   CurUpdateTypes: TIBUpdateRecordTypes;
   UpdateAction: TIBUpdateAction;
@@ -1622,7 +1622,7 @@ function TIBCustomDataSet.InternalLocate(const KeyFields: string;
   const KeyValues: Variant; Options: TLocateOptions): Boolean;
 var
   keyFieldList: TList;
-  CurBookmark: string;
+  CurBookmark: TBookmark;
   fieldValue: Variant;
   lookupValues: array of variant;
   i, fieldCount: Integer;
@@ -2485,7 +2485,7 @@ end;
 procedure TIBCustomDataSet.FetchAll;
 var
   SetCursor: Boolean;
-  CurBookmark: string;
+  CurBookmark: TBookmark;
 begin
   SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
@@ -3374,7 +3374,7 @@ end;
 function TIBCustomDataSet.Locate(const KeyFields: string; const KeyValues: Variant;
                                  Options: TLocateOptions): Boolean;
 var
-  CurBookmark: string;
+  CurBookmark: TBookmark;
 begin
   DisableControls;
   try
@@ -3392,7 +3392,7 @@ function TIBCustomDataSet.Lookup(const KeyFields: string; const KeyValues: Varia
                                  const ResultFields: string): Variant;
 var
   fl: TList;
-  CurBookmark: string;
+  CurBookmark: TBookmark;
 begin
   DisableControls;
   fl := TList.Create;
