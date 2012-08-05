@@ -1,4 +1,4 @@
-IBX Change Log  version 1.0-1-  Sat, 28 Apr 2012 16:43:00 +0100
+IBX Change Log  version 1.0-1-  Sun, 05 Aug 2012 19:00:00 +0100
 
 1. In IBCustomDataset. Fixed weak typing i.e. changed CurBookmark from string to TBookmark.
    Necessary because of TBookmark type change in fpc 2.7.1
