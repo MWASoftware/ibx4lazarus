@@ -1,12 +1,12 @@
-IBX Change Log  version 1.0-1-  Sun, 05 Aug 2012 19:00:00 +0100
+IBX Change Log  version >  (1.0-1) Sun, 05 Aug 2012 19:28:14 +0100
 
-1. In IBCustomDataset. Fixed weak typing i.e. changed CurBookmark from string to TBookmark.
-   Necessary because of TBookmark type change in fpc 2.7.1
+1. In IBCustomDataset. Changed CurBookmark from string to TBookmark for compiler versions > 2.6.0
+   Necessary because of TBookmark type and TDataSet.Bookmark property change in fpc 2.7.1
 
 2. IBX now registers TIntegerField as a "No Icon" component. This may be removed if the fpc DB
    package is changed to do this (which it should do).
 
-IBX Change Log  version 1.0-0-  Sat, 28 Apr 2012 16:43:00 +0100
+IBX Change Log  version (1.0-0)  Sat, 28 Apr 2012 16:43:00 +0100
 
 1. Add "if active then active := false" to TIBCustomDataset destructor. (Avoid error on database close).
 
