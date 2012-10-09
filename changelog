@@ -1,4 +1,4 @@
-IBX Change Log  version    (1.0-2) tba, 05 Aug 2012 20:00:04 +0100
+IBX Change Log  version     (1.0-2) Tue, 09 Oct 2012 09:10:30 +0100
 
 1. TBookmark change conditional compile changed to > 2.6.2 to match expected availability of change.
 
