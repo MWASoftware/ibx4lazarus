@@ -445,7 +445,7 @@ begin
     FDBParams.Add('lc_ctype=UTF-8');
   {$else}
   {$ifdef WINDOWS}
-  if (csDesigning in ComponentState) and not (csLoading in ComponentState) then
+  if csDesigning in ComponentState then
   begin
     acp := GetACP;
     if (acp >= 1250) and (acp <= 1254) then
