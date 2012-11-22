@@ -421,7 +421,7 @@ procedure GenerateTPB(sl: TStrings; var TPB: string; var TPBLength: Short);
 implementation
 
 uses IBIntf, IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
-     {$ifdef WINDOWS} Windows, {$endif} typInfo;
+     typInfo;
 
 { TIBDatabase }
 
@@ -444,7 +444,7 @@ begin
   {$else}
   {$ifdef WINDOWS}
   acp := GetACP;
-  if (acp >= 1250 and acp <= 1254) then
+  if (acp >= 1250) and (acp <= 1254) then
     FDBParams.Values['lc_ctype'] := Format('WIN%d',[acp]);
   {$endif}
   {$endif}
