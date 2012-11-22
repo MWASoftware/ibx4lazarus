@@ -1,4 +1,4 @@
-IBX Change Log  version     (1.0-3) Tue, 09 Oct 2012 09:10:30 +0100
+IBX Change Log  version      (1.0-3) Thu, 22 Nov 2012 19:31:19 +0000
 
 1. Conditional compilation used to limit registration of TIntegerField to
    Lazarus versions less than 1.1

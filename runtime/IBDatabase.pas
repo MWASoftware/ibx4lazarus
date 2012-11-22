@@ -215,6 +215,7 @@ type
     procedure Notification( AComponent: TComponent; Operation: TOperation); override;
     function GetDataset(Index : longint) : TDataset; override;
     function GetDataSetCount : Longint; override;
+    procedure ReadState(Reader: TReader); override;
     procedure SetConnected (Value : boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -440,12 +441,16 @@ begin
   FDBName := '';
   FDBParams := TStringList.Create;
   {$ifdef UNIX}
-  FDBParams.Add('lc_ctype=UTF-8');
+  if csDesigning in ComponentState then
+    FDBParams.Add('lc_ctype=UTF-8');
   {$else}
   {$ifdef WINDOWS}
-  acp := GetACP;
-  if (acp >= 1250) and (acp <= 1254) then
-    FDBParams.Values['lc_ctype'] := Format('WIN%d',[acp]);
+  if (csDesigning in ComponentState) and not (csLoading in ComponentState) then
+  begin
+    acp := GetACP;
+    if (acp >= 1250) and (acp <= 1254) then
+      FDBParams.Values['lc_ctype'] := Format('WIN%d',[acp]);
+  end;
   {$endif}
   {$endif}
   FDBParamsChanged := True;
@@ -1205,6 +1210,12 @@ end;
 function TIBDatabase.GetDataSetCount : Longint;
 begin
   Result := FDataSets.Count;
+end;
+
+procedure TIBDataBase.ReadState(Reader: TReader);
+begin
+  FDBParams.Clear;
+  inherited ReadState(Reader);
 end;
 
 procedure TIBDataBase.SetConnected(Value: boolean);
