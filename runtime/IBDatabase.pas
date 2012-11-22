@@ -420,11 +420,15 @@ procedure GenerateTPB(sl: TStrings; var TPB: string; var TPBLength: Short);
 
 implementation
 
-uses IBIntf, IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils, typInfo;
+uses IBIntf, IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
+     {$ifdef WINDOWS} Windows, {$endif} typInfo;
 
 { TIBDatabase }
 
 constructor TIBDatabase.Create(AOwner: TComponent);
+{$ifdef WINDOWS}
+var acp: uint;
+{$endif}
 begin
   inherited Create(AOwner);
   FIBLoaded := False;
@@ -435,6 +439,15 @@ begin
   FTransactions := TList.Create;
   FDBName := '';
   FDBParams := TStringList.Create;
+  {$ifdef UNIX}
+  FDBParams.Add('lc_ctype=UTF-8');
+  {$else}
+  {$ifdef WINDOWS}
+  acp := GetACP;
+  if (acp >= 1250 and acp <= 1254) then
+    FDBParams.Values['lc_ctype'] := Format('WIN%d',[acp]);
+  {$endif}
+  {$endif}
   FDBParamsChanged := True;
   TStringList(FDBParams).OnChange := DBParamsChange;
   TStringList(FDBParams).OnChanging := DBParamsChanging;

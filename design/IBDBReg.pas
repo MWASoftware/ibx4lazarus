@@ -324,7 +324,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBBatchMove, DBLoginDlg, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
-     IBSQLEditor, ibserviceeditor;
+     IBSQLEditor, ibserviceeditor, LCLVersion;
 
 
 
@@ -333,7 +333,9 @@ begin
   if not TryIBLoad then Exit;
 
   RegisterNoIcon([TIBStringField, TIBBCDField]);
+  {$ifdef lcl_major < 1 or (lcl_major = 1 and lcl_minor = 0)}
   RegisterNoIcon([TIntegerField]);
+  {$endif}
   RegisterComponents(IBPalette1, [ TIBQuery, TIBDataSet,
    TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBEvents,
      TIBSQL, TIBDatabaseInfo, TIBSQLMonitor,

@@ -1,3 +1,12 @@
+IBX Change Log  version     (1.0-3) Tue, 09 Oct 2012 09:10:30 +0100
+
+1. Conditional compilation used to limit registration of TIntegerField to
+   Lazarus versions less than 1.1
+
+2. When a database connection is created, character set is now by default set
+   to UTF8 (Unix) or to the current Windows code page (Windows).
+
+
 IBX Change Log  version     (1.0-2) Tue, 09 Oct 2012 09:10:30 +0100
 
 1. TBookmark change conditional compile changed to > 2.6.2 to match expected availability of change.
