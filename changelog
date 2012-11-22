@@ -4,7 +4,8 @@ IBX Change Log  version     (1.0-3) Tue, 09 Oct 2012 09:10:30 +0100
    Lazarus versions less than 1.1
 
 2. When a database connection is created, character set is now by default set
-   to UTF8 (Unix) or to the current Windows code page (Windows).
+   to UTF8 (Unix) or to the current Windows code page (Windows) if in the range
+   1250 to 1254.
 
 
 IBX Change Log  version     (1.0-2) Tue, 09 Oct 2012 09:10:30 +0100
