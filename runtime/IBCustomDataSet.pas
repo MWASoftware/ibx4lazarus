@@ -4031,7 +4031,7 @@ end;
 
 procedure TIBGenerator.Apply;
 begin
-  if (FGeneratorName <> '') and (FFieldName <> '')  then
+  if (FGeneratorName <> '') and (FFieldName <> '') and Owner.FieldByName(FFieldName).IsNull then
     Owner.FieldByName(FFieldName).AsInteger := GetNextValue(Owner.Database,Owner.Transaction);
 end;
 
