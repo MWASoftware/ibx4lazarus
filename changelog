@@ -1,4 +1,4 @@
-IBX Change Log  version         (1.0-4) tba, 22 Nov 2012 22:53:39 +0000
+IBX Change Log  version          (1.0-4) Thu, 28 Feb 2013 16:56:13 +0000
 
 1. In a TIBCustomDataset descendent, a generator now only sets the value when
    it is null. This allows for alternative user defined setting of the generator

@@ -330,7 +330,11 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
 
 procedure Register;
 begin
-  if not TryIBLoad then Exit;
+  if not TryIBLoad then
+  begin
+    MessageDlg('IBX is unable to locate the Firebird Library - have you remembered to install it?',mtError,[mbOK],0);
+    Exit;
+  end;
 
   RegisterNoIcon([TIBStringField, TIBBCDField]);
   {$if lcl_fullversion < 01010000}
