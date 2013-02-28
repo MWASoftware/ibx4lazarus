@@ -5,6 +5,9 @@ IBX Change Log  version         (1.0-4) tba, 22 Nov 2012 22:53:39 +0000
 
    Many thanks to Julio Jiménez for this fix
 
+2. An Error Dialog is now displayed in the Lazarus IDE if IBX cannot find the Firebird Library
+   and suggests that the user may have forgotten to install it.
+
 IBX Change Log  version         (1.0-3) Thu, 22 Nov 2012 22:53:39 +0000
 
 1. Conditional compilation used to limit registration of TIntegerField to
