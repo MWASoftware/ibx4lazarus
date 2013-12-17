@@ -1,3 +1,7 @@
+IBX Change Log  version          (1.0-5) tba, 28 Feb 2013 16:56:13 +0000
+
+1. TBookmark change conditional compile changed to >= 2.7.0 to match revised availability of change.
+
 IBX Change Log  version          (1.0-4) Thu, 28 Feb 2013 16:56:13 +0000
 
 1. In a TIBCustomDataset descendent, a generator now only sets the value when

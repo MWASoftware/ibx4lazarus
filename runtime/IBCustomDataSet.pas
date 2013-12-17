@@ -934,7 +934,7 @@ end;
 
 procedure TIBCustomDataSet.ApplyUpdates;
 var
-  {$IF FPC_FULLVERSION > 20602 }
+  {$IF FPC_FULLVERSION >= 20700 }
   CurBookmark: TBookmark;
   {$ELSE}
   CurBookmark: string;
@@ -1626,7 +1626,7 @@ function TIBCustomDataSet.InternalLocate(const KeyFields: string;
   const KeyValues: Variant; Options: TLocateOptions): Boolean;
 var
   keyFieldList: TList;
-  {$IF FPC_FULLVERSION >  20602 }
+  {$IF FPC_FULLVERSION >= 20700 }
   CurBookmark: TBookmark;
   {$ELSE}
   CurBookmark: string;
@@ -2493,7 +2493,7 @@ end;
 procedure TIBCustomDataSet.FetchAll;
 var
   SetCursor: Boolean;
-  {$IF FPC_FULLVERSION >  20602 }
+  {$IF FPC_FULLVERSION >= 20700 }
   CurBookmark: TBookmark;
   {$ELSE}
   CurBookmark: string;
@@ -3386,7 +3386,7 @@ end;
 function TIBCustomDataSet.Locate(const KeyFields: string; const KeyValues: Variant;
                                  Options: TLocateOptions): Boolean;
 var
-  {$IF FPC_FULLVERSION >  20602 }
+  {$IF FPC_FULLVERSION >= 20700 }
   CurBookmark: TBookmark;
   {$ELSE}
   CurBookmark: string;
@@ -3408,7 +3408,7 @@ function TIBCustomDataSet.Lookup(const KeyFields: string; const KeyValues: Varia
                                  const ResultFields: string): Variant;
 var
   fl: TList;
-  {$IF FPC_FULLVERSION >  20602 }
+  {$IF FPC_FULLVERSION >= 20700 }
   CurBookmark: TBookmark;
   {$ELSE}
   CurBookmark: string;
