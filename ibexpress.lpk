@@ -4,7 +4,7 @@
     <Name Value="ibexpress"/>
     <Author Value="Various"/>
     <CompilerOptions>
-      <Version Major="1" Minor="0" Release = "5"
+      <Version Value="9"/>
       <SearchPaths>
         <OtherUnitFiles Value="runtime"/>
         <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
@@ -264,7 +264,7 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
       <UnitPath Value="$(PkgOutDir)"/>
     </UsageOptions>
     <PublishOptions>
-      <Version Major="1" Minor="0" Release = "5"
+      <Version Value="2"/>
       <IgnoreBinaries Value="False"/>
     </PublishOptions>
   </Package>
