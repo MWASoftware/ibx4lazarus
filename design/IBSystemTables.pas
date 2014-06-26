@@ -76,7 +76,7 @@ type
               InputParams, OutputParams, ExecuteSQL: TStrings);
     function GetStatementType(SQL: string; var IsStoredProcedure: boolean): TIBSQLTypes;
     function GetFieldNames(FieldList: TListBox): TStrings;
-    procedure TestSQL(SQL: string);
+    procedure TestSQL(SQL: string; GenerateParamNames: boolean = false);
   end;
 
 implementation
@@ -701,7 +701,7 @@ begin
   end;
 end;
 
-procedure TIBSystemTables.TestSQL(SQL: string);
+ procedure TIBSystemTables.TestSQL(SQL: string; GenerateParamNames: boolean);
 begin
   if not assigned(FTestSQL.Database) or not FTestSQL.Database.Connected or
     not assigned(FTestSQL.Transaction) then
@@ -709,6 +709,7 @@ begin
     Messagedlg('No Database Connected',mtError,[mbOK],0);
     Exit;
   end;
+  FTestSQL.GenerateParamNames := GenerateParamNames;
   FTestSQL.SQL.Text := SQL;
   try
     FTestSQL.Prepare;
@@ -719,4 +720,4 @@ begin
 end;
 
 end.
-
+
