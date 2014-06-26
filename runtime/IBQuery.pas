@@ -406,8 +406,8 @@ begin
           SQLParams[i].AsShort := Params[i].AsSmallInt;
         ftInteger:
           SQLParams[i].AsLong := Params[i].AsInteger;
-{        ftLargeInt:
-          SQLParams[i].AsInt64 := Params[i].AsLargeInt;  }
+        ftLargeInt:
+          SQLParams[i].AsInt64 := Params[i].AsLargeInt;
         ftFloat:
          SQLParams[i].AsDouble := Params[i].AsFloat;
         ftBCD, ftCurrency:
@@ -522,4 +522,4 @@ begin
 end;
  *)
 end.
-
+

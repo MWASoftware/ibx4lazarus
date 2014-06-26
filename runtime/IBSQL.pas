@@ -58,6 +58,7 @@ type
     FIndex: Integer;
     FModified: Boolean;
     FName: String;
+    FUniqueName: boolean;
     FXSQLVAR: PXSQLVAR;       { Point to the PXSQLVAR in the owner object }
 
     function AdjustScale(Value: Int64; Scale: Integer): Double;
@@ -95,6 +96,22 @@ type
     procedure SetAsXSQLVAR(Value: PXSQLVAR);
     procedure SetIsNull(Value: Boolean);
     procedure SetIsNullable(Value: Boolean);
+    procedure xSetAsCurrency(Value: Currency);
+    procedure xSetAsInt64(Value: Int64);
+    procedure xSetAsDate(Value: TDateTime);
+    procedure xSetAsTime(Value: TDateTime);
+    procedure xSetAsDateTime(Value: TDateTime);
+    procedure xSetAsDouble(Value: Double);
+    procedure xSetAsFloat(Value: Float);
+    procedure xSetAsLong(Value: Long);
+    procedure xSetAsPointer(Value: Pointer);
+    procedure xSetAsQuad(Value: TISC_QUAD);
+    procedure xSetAsShort(Value: Short);
+    procedure xSetAsString(Value: String);
+    procedure xSetAsVariant(Value: Variant);
+    procedure xSetAsXSQLVAR(Value: PXSQLVAR);
+    procedure xSetIsNull(Value: Boolean);
+    procedure xSetIsNullable(Value: Boolean);
   public
     constructor Create(Parent: TIBXSQLDA; Query: TIBSQL);
     procedure Assign(Source: TIBXSQLVAR);
@@ -132,6 +149,9 @@ type
   TIBXSQLVARArray = Array of TIBXSQLVAR;
 
   { TIBXSQLVAR }
+
+  { TIBXSQLDA }
+
   TIBXSQLDA = class(TObject)
   protected
     FSQL: TIBSQL;
@@ -152,7 +172,7 @@ type
   public
     constructor Create(Query: TIBSQL);
     destructor Destroy; override;
-    procedure AddName(FieldName: String; Idx: Integer);
+    procedure AddName(FieldName: String; Idx: Integer; GeneratedName: boolean = false);
     function ByName(Idx: String): TIBXSQLVAR;
     property AsXSQLDA: PXSQLDA read GetXSQLDA;
     property Count: Integer read FCount write SetCount;
@@ -340,10 +360,10 @@ type
     property SQLType: TIBSQLTypes read FSQLType;
     property TRHandle: PISC_TR_HANDLE read GetTRHandle;
     property Handle: TISC_STMT_HANDLE read FHandle;
-    property GenerateParamNames: Boolean read FGenerateParamNames write FGenerateParamNames;
     property UniqueRelationName: String read GetUniqueRelationName;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
+    property GenerateParamNames: Boolean read FGenerateParamNames write FGenerateParamNames;
     property GoToFirstRecordOnExecute: Boolean read FGoToFirstRecordOnExecute
                                                write FGoToFirstRecordOnExecute
                                                default True;
@@ -937,308 +957,361 @@ begin
   result := FXSQLVAR^.sqltype and (not 1);
 end;
 
+procedure TIBXSQLVAR.xSetAsCurrency(Value: Currency);
+begin
+  if IsNullable then
+    IsNull := False;
+  FXSQLVAR^.sqltype := SQL_INT64 or (FXSQLVAR^.sqltype and 1);
+  FXSQLVAR^.sqlscale := -4;
+  FXSQLVAR^.sqllen := SizeOf(Int64);
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  PCurrency(FXSQLVAR^.sqldata)^ := Value;
+  FModified := True;
+end;
+
 procedure TIBXSQLVAR.SetAsCurrency(Value: Currency);
 var
-  xvar: TIBXSQLVAR;
   i: Integer;
 begin
   if FSQL.Database.SQLDialect < 3 then
     AsDouble := Value
   else
   begin
-    if IsNullable then
-      IsNull := False;
+
+    if FUniqueName then
+       xSetAsCurrency(Value)
+    else
     for i := 0 to FParent.FCount - 1 do
-      if FParent.FNames[i] = FName then
-      begin
-        xvar := FParent[i];
-        xvar.FXSQLVAR^.sqltype := SQL_INT64 or (xvar.FXSQLVAR^.sqltype and 1);
-        xvar.FXSQLVAR^.sqlscale := -4;
-        xvar.FXSQLVAR^.sqllen := SizeOf(Int64);
-        IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
-        PCurrency(xvar.FXSQLVAR^.sqldata)^ := Value;
-        xvar.FModified := True;
-      end;
+      if FParent[i].FName = FName then
+           FParent[i].xSetAsCurrency(Value);
   end;
+end;
+
+procedure TIBXSQLVAR.xSetAsInt64(Value: Int64);
+begin
+  if IsNullable then
+    IsNull := False;
+
+  FXSQLVAR^.sqltype := SQL_INT64 or (FXSQLVAR^.sqltype and 1);
+  FXSQLVAR^.sqlscale := 0;
+  FXSQLVAR^.sqllen := SizeOf(Int64);
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  PInt64(FXSQLVAR^.sqldata)^ := Value;
+  FModified := True;
 end;
 
 procedure TIBXSQLVAR.SetAsInt64(Value: Int64);
 var
   i: Integer;
-  xvar: TIBXSQLVAR;
+begin
+  if FUniqueName then
+     xSetAsInt64(Value)
+  else
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+          FParent[i].xSetAsInt64(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsDate(Value: TDateTime);
+var
+   tm_date: TCTimeStructure;
+   Yr, Mn, Dy: Word;
 begin
   if IsNullable then
     IsNull := False;
-  for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
-    begin
-      xvar := FParent[i];
-      xvar.FXSQLVAR^.sqltype := SQL_INT64 or (xvar.FXSQLVAR^.sqltype and 1);
-      xvar.FXSQLVAR^.sqlscale := 0;
-      xvar.FXSQLVAR^.sqllen := SizeOf(Int64);
-      IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
-      PInt64(xvar.FXSQLVAR^.sqldata)^ := Value;
-      xvar.FModified := True;
-    end;
+
+  FXSQLVAR^.sqltype := SQL_TYPE_DATE or (FXSQLVAR^.sqltype and 1);
+  DecodeDate(Value, Yr, Mn, Dy);
+  with tm_date do begin
+    tm_sec := 0;
+    tm_min := 0;
+    tm_hour := 0;
+    tm_mday := Dy;
+    tm_mon := Mn - 1;
+    tm_year := Yr - 1900;
+  end;
+  FXSQLVAR^.sqllen := SizeOf(ISC_DATE);
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  isc_encode_sql_date(@tm_date, PISC_DATE(FXSQLVAR^.sqldata));
+  FModified := True;
 end;
 
 procedure TIBXSQLVAR.SetAsDate(Value: TDateTime);
 var
   i: Integer;
-  tm_date: TCTimeStructure;
-  Yr, Mn, Dy: Word;
-  xvar: TIBXSQLVAR;
 begin
   if FSQL.Database.SQLDialect < 3 then
   begin
     AsDateTime := Value;
     exit;
   end;
+
+  if FUniqueName then
+     xSetAsDate(Value)
+  else
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsDate(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsTime(Value: TDateTime);
+var
+  tm_date: TCTimeStructure;
+  Hr, Mt, S, Ms: Word;
+begin
   if IsNullable then
     IsNull := False;
-  for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
-    begin
-      xvar := FParent[i];
-      xvar.FXSQLVAR^.sqltype := SQL_TYPE_DATE or (xvar.FXSQLVAR^.sqltype and 1);
-      DecodeDate(Value, Yr, Mn, Dy);
-      with tm_date do begin
-        tm_sec := 0;
-        tm_min := 0;
-        tm_hour := 0;
-        tm_mday := Dy;
-        tm_mon := Mn - 1;
-        tm_year := Yr - 1900;
-      end;
-      xvar.FXSQLVAR^.sqllen := SizeOf(ISC_DATE);
-      IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
-      isc_encode_sql_date(@tm_date, PISC_DATE(xvar.FXSQLVAR^.sqldata));
-      xvar.FModified := True;
-    end;
+
+  FXSQLVAR^.sqltype := SQL_TYPE_TIME or (FXSQLVAR^.sqltype and 1);
+  DecodeTime(Value, Hr, Mt, S, Ms);
+  with tm_date do begin
+    tm_sec := S;
+    tm_min := Mt;
+    tm_hour := Hr;
+    tm_mday := 0;
+    tm_mon := 0;
+    tm_year := 0;
+  end;
+  FXSQLVAR^.sqllen := SizeOf(ISC_TIME);
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  isc_encode_sql_time(@tm_date, PISC_TIME(FXSQLVAR^.sqldata));
+  if Ms > 0 then
+    Inc(PISC_TIME(FXSQLVAR^.sqldata)^,Ms*10);
+  FModified := True;
 end;
 
 procedure TIBXSQLVAR.SetAsTime(Value: TDateTime);
 var
   i: Integer;
-  tm_date: TCTimeStructure;
-  Hr, Mt, S, Ms: Word;
-  xvar: TIBXSQLVAR;
 begin
   if FSQL.Database.SQLDialect < 3 then
   begin
     AsDateTime := Value;
     exit;
   end;
+
+  if FUniqueName then
+     xSetAsTime(Value)
+  else
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsTime(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsDateTime(Value: TDateTime);
+var
+  tm_date: TCTimeStructure;
+  Yr, Mn, Dy, Hr, Mt, S, Ms: Word;
+begin
   if IsNullable then
     IsNull := False;
-  for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
-    begin
-      xvar := FParent[i];
-      xvar.FXSQLVAR^.sqltype := SQL_TYPE_TIME or (xvar.FXSQLVAR^.sqltype and 1);
-      DecodeTime(Value, Hr, Mt, S, Ms);
-      with tm_date do begin
-        tm_sec := S;
-        tm_min := Mt;
-        tm_hour := Hr;
-        tm_mday := 0;
-        tm_mon := 0;
-        tm_year := 0;
-      end;
-      xvar.FXSQLVAR^.sqllen := SizeOf(ISC_TIME);
-      IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
-      isc_encode_sql_time(@tm_date, PISC_TIME(xvar.FXSQLVAR^.sqldata));
-      if Ms > 0 then
-        Inc(PISC_TIME(xvar.FXSQLVAR^.sqldata)^,Ms*10);
-      xvar.FModified := True;
-    end;
+
+  FXSQLVAR^.sqltype := SQL_TIMESTAMP or (FXSQLVAR^.sqltype and 1);
+  DecodeDate(Value, Yr, Mn, Dy);
+  DecodeTime(Value, Hr, Mt, S, Ms);
+  with tm_date do begin
+    tm_sec := S;
+    tm_min := Mt;
+    tm_hour := Hr;
+    tm_mday := Dy;
+    tm_mon := Mn - 1;
+    tm_year := Yr - 1900;
+  end;
+  FXSQLVAR^.sqllen := SizeOf(TISC_QUAD);
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  isc_encode_date(@tm_date, PISC_QUAD(FXSQLVAR^.sqldata));
+  if Ms > 0 then
+    Inc(PISC_TIMESTAMP(FXSQLVAR^.sqldata)^.timestamp_time,Ms*10);
+  FModified := True;
 end;
 
 procedure TIBXSQLVAR.SetAsDateTime(Value: TDateTime);
 var
   i: Integer;
-  tm_date: TCTimeStructure;
-  Yr, Mn, Dy, Hr, Mt, S, Ms: Word;
-  xvar: TIBXSQLVAR;
+begin
+  if FUniqueName then
+     xSetAsDateTime(value)
+  else
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsDateTime(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsDouble(Value: Double);
 begin
   if IsNullable then
     IsNull := False;
-  for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
-    begin
-      xvar := FParent[i];
-      xvar.FXSQLVAR^.sqltype := SQL_TIMESTAMP or (xvar.FXSQLVAR^.sqltype and 1);
-      DecodeDate(Value, Yr, Mn, Dy);
-      DecodeTime(Value, Hr, Mt, S, Ms);
-      with tm_date do begin
-        tm_sec := S;
-        tm_min := Mt;
-        tm_hour := Hr;
-        tm_mday := Dy;
-        tm_mon := Mn - 1;
-        tm_year := Yr - 1900;
-      end;
-      xvar.FXSQLVAR^.sqllen := SizeOf(TISC_QUAD);
-      IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
-      isc_encode_date(@tm_date, PISC_QUAD(xvar.FXSQLVAR^.sqldata));
-      if Ms > 0 then
-        Inc(PISC_TIMESTAMP(xvar.FXSQLVAR^.sqldata)^.timestamp_time,Ms*10);
-      xvar.FModified := True;
-    end;
+
+  FXSQLVAR^.sqltype := SQL_DOUBLE or (FXSQLVAR^.sqltype and 1);
+  FXSQLVAR^.sqllen := SizeOf(Double);
+  FXSQLVAR^.sqlscale := 0;
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  PDouble(FXSQLVAR^.sqldata)^ := Value;
+  FModified := True;
 end;
 
 procedure TIBXSQLVAR.SetAsDouble(Value: Double);
 var
   i: Integer;
-  xvar: TIBXSQLVAR;
+begin
+  if FUniqueName then
+     xSetAsDouble(Value)
+  else
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsDouble(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsFloat(Value: Float);
 begin
   if IsNullable then
     IsNull := False;
-  for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
-    begin
-      xvar := FParent[i];
-      xvar.FXSQLVAR^.sqltype := SQL_DOUBLE or (xvar.FXSQLVAR^.sqltype and 1);
-      xvar.FXSQLVAR^.sqllen := SizeOf(Double);
-      xvar.FXSQLVAR^.sqlscale := 0;
-      IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
-      PDouble(xvar.FXSQLVAR^.sqldata)^ := Value;
-      xvar.FModified := True;
-    end;
+
+  FXSQLVAR^.sqltype := SQL_FLOAT or (FXSQLVAR^.sqltype and 1);
+  FXSQLVAR^.sqllen := SizeOf(Float);
+  FXSQLVAR^.sqlscale := 0;
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  PSingle(FXSQLVAR^.sqldata)^ := Value;
+  FModified := True;
 end;
 
 procedure TIBXSQLVAR.SetAsFloat(Value: Float);
 var
   i: Integer;
-  xvar: TIBXSQLVAR;
+begin
+  if FUniqueName then
+     xSetAsFloat(Value)
+  else
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsFloat(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsLong(Value: Long);
 begin
   if IsNullable then
     IsNull := False;
-  for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
-    begin
-      xvar := FParent[i];
-      xvar.FXSQLVAR^.sqltype := SQL_FLOAT or (xvar.FXSQLVAR^.sqltype and 1);
-      xvar.FXSQLVAR^.sqllen := SizeOf(Float);
-      xvar.FXSQLVAR^.sqlscale := 0;
-      IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
-      PSingle(xvar.FXSQLVAR^.sqldata)^ := Value;
-      xvar.FModified := True;
-    end;
+
+  FXSQLVAR^.sqltype := SQL_LONG or (FXSQLVAR^.sqltype and 1);
+  FXSQLVAR^.sqllen := SizeOf(Long);
+  FXSQLVAR^.sqlscale := 0;
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  PLong(FXSQLVAR^.sqldata)^ := Value;
+  FModified := True;
 end;
 
 procedure TIBXSQLVAR.SetAsLong(Value: Long);
 var
   i: Integer;
-  xvar: TIBXSQLVAR;
 begin
-  if IsNullable then
-    IsNull := False;
+  if FUniqueName then
+     xSetAsLong(Value)
+  else
   for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
-    begin
-      xvar := FParent[i];
-      xvar.FXSQLVAR^.sqltype := SQL_LONG or (xvar.FXSQLVAR^.sqltype and 1);
-      xvar.FXSQLVAR^.sqllen := SizeOf(Long);
-      xvar.FXSQLVAR^.sqlscale := 0;
-      IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
-      PLong(xvar.FXSQLVAR^.sqldata)^ := Value;
-      xvar.FModified := True;
-    end;
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsLong(Value);
 end;
 
-procedure TIBXSQLVAR.SetAsPointer(Value: Pointer);
-var
-  i: Integer;
-  xvar: TIBXSQLVAR;
+procedure TIBXSQLVAR.xSetAsPointer(Value: Pointer);
 begin
   if IsNullable and (Value = nil) then
     IsNull := True
   else begin
     IsNull := False;
-    for i := 0 to FParent.FCount - 1 do
-      if FParent.FNames[i] = FName then
-      begin
-        xvar := FParent[i];
-        xvar.FXSQLVAR^.sqltype := SQL_TEXT or (FXSQLVAR^.sqltype and 1);
-        Move(Value^, xvar.FXSQLVAR^.sqldata^, xvar.FXSQLVAR^.sqllen);
-        xvar.FModified := True;
-      end;
+    FXSQLVAR^.sqltype := SQL_TEXT or (FXSQLVAR^.sqltype and 1);
+    Move(Value^, FXSQLVAR^.sqldata^, FXSQLVAR^.sqllen);
   end;
+  FModified := True;
+end;
+
+procedure TIBXSQLVAR.SetAsPointer(Value: Pointer);
+var
+  i: Integer;
+begin
+    if FUniqueName then
+       xSetAsPointer(Value)
+    else
+    for i := 0 to FParent.FCount - 1 do
+      if FParent[i].FName = FName then
+         FParent[i].xSetAsPointer(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsQuad(Value: TISC_QUAD);
+begin
+  if IsNullable then
+      IsNull := False;
+  if (FXSQLVAR^.sqltype and (not 1) <> SQL_BLOB) and
+     (FXSQLVAR^.sqltype and (not 1) <> SQL_ARRAY) then
+    IBError(ibxeInvalidDataConversion, [nil]);
+  FXSQLVAR^.sqllen := SizeOf(TISC_QUAD);
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  PISC_QUAD(FXSQLVAR^.sqldata)^ := Value;
+  FModified := True;
 end;
 
 procedure TIBXSQLVAR.SetAsQuad(Value: TISC_QUAD);
 var
   i: Integer;
-  xvar: TIBXSQLVAR;
+begin
+  if FUniqueName then
+     xSetAsQuad(Value)
+  else
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsQuad(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsShort(Value: Short);
 begin
   if IsNullable then
     IsNull := False;
-  for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
-    begin
-      xvar := FParent[i];
-      if (xvar.FXSQLVAR^.sqltype and (not 1) <> SQL_BLOB) and
-         (xvar.FXSQLVAR^.sqltype and (not 1) <> SQL_ARRAY) then
-        IBError(ibxeInvalidDataConversion, [nil]);
-      xvar.FXSQLVAR^.sqllen := SizeOf(TISC_QUAD);
-      IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
-      PISC_QUAD(xvar.FXSQLVAR^.sqldata)^ := Value;
-      xvar.FModified := True;
-    end;
+
+  FXSQLVAR^.sqltype := SQL_SHORT or (FXSQLVAR^.sqltype and 1);
+  FXSQLVAR^.sqllen := SizeOf(Short);
+  FXSQLVAR^.sqlscale := 0;
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  PShort(FXSQLVAR^.sqldata)^ := Value;
+  FModified := True;
 end;
 
 procedure TIBXSQLVAR.SetAsShort(Value: Short);
 var
   i: Integer;
-  xvar: TIBXSQLVAR;
 begin
-  if IsNullable then
-    IsNull := False;
+  if FUniqueName then
+     xSetAsShort(Value)
+  else
   for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
-    begin
-      xvar := FParent[i];
-      xvar.FXSQLVAR^.sqltype := SQL_SHORT or (xvar.FXSQLVAR^.sqltype and 1);
-      xvar.FXSQLVAR^.sqllen := SizeOf(Short);
-      xvar.FXSQLVAR^.sqlscale := 0;
-      IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen);
-      PShort(xvar.FXSQLVAR^.sqldata)^ := Value;
-      xvar.FModified := True;
-    end;
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsShort(Value);
 end;
 
-procedure TIBXSQLVAR.SetAsString(Value: String);
+procedure TIBXSQLVAR.xSetAsString(Value: String);
 var
-  stype: Integer;
-  ss: TStringStream;
+   stype: Integer;
+   ss: TStringStream;
 
-  procedure SetStringValue;
-  var
-    i: Integer;
-    xvar: TIBXSQLVAR;
-  begin
-    for i := 0 to FParent.FCount - 1 do
-      if FParent.FNames[i] = FName then
-      begin
-        xvar := FParent[i];
-        if (xvar.FXSQLVAR^.sqlname = 'DB_KEY') or {do not localize}
-           (xvar.FXSQLVAR^.sqlname = 'RDB$DB_KEY') then {do not localize}
-          Move(Value[1], xvar.FXSQLVAR^.sqldata^, xvar.FXSQLVAR^.sqllen)
-        else begin
-          xvar.FXSQLVAR^.sqltype := SQL_TEXT or (FXSQLVAR^.sqltype and 1);
-          xvar.FXSQLVAR^.sqllen := Length(Value);
-          IBAlloc(xvar.FXSQLVAR^.sqldata, 0, xvar.FXSQLVAR^.sqllen + 1);
-          if (Length(Value) > 0) then
-            Move(Value[1], xvar.FXSQLVAR^.sqldata^, xvar.FXSQLVAR^.sqllen);
-        end;
-        xvar.FModified := True;
+   procedure SetStringValue;
+   var
+      i: Integer;
+   begin
+      if (FXSQLVAR^.sqlname = 'DB_KEY') or {do not localize}
+         (FXSQLVAR^.sqlname = 'RDB$DB_KEY') then {do not localize}
+        Move(Value[1], FXSQLVAR^.sqldata^, FXSQLVAR^.sqllen)
+      else begin
+        FXSQLVAR^.sqltype := SQL_TEXT or (FXSQLVAR^.sqltype and 1);
+        FXSQLVAR^.sqllen := Length(Value);
+        IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen + 1);
+        if (Length(Value) > 0) then
+          Move(Value[1], FXSQLVAR^.sqldata^, FXSQLVAR^.sqllen);
       end;
-  end;
+      FModified := True;
+   end;
 
 begin
   if IsNullable then
     IsNull := False;
+
   stype := FXSQLVAR^.sqltype and (not 1);
   if (stype = SQL_TEXT) or (stype = SQL_VARYING) then
     SetStringValue
@@ -1256,21 +1329,36 @@ begin
       IsNull := True
     else if (stype = SQL_TIMESTAMP) or (stype = SQL_TYPE_DATE) or
       (stype = SQL_TYPE_TIME) then
-      SetAsDateTime(StrToDateTime(Value))
+      xSetAsDateTime(StrToDateTime(Value))
     else
       SetStringValue;
   end;
 end;
 
-procedure TIBXSQLVAR.SetAsVariant(Value: Variant);
+procedure TIBXSQLVAR.SetAsString(Value: String);
+var
+   i: integer;
+begin
+  if FUniqueName then
+     xSetAsString(Value)
+  else
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsString(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsVariant(Value: Variant);
 begin
   if VarIsNull(Value) then
     IsNull := True
   else case VarType(Value) of
     varEmpty, varNull:
       IsNull := True;
-    varSmallint, varInteger, varByte:
+    varSmallint, varInteger, varByte,
+      varWord, varShortInt:
       AsLong := Value;
+    varInt64:
+      AsInt64 := Value;
     varSingle, varDouble:
       AsDouble := Value;
     varCurrency:
@@ -1291,98 +1379,119 @@ begin
   end;
 end;
 
-procedure TIBXSQLVAR.SetAsXSQLVAR(Value: PXSQLVAR);
+procedure TIBXSQLVAR.SetAsVariant(Value: Variant);
 var
-  i: Integer;
-  xvar: TIBXSQLVAR;
+   i: integer;
+begin
+  if FUniqueName then
+     xSetAsVariant(Value)
+  else
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsVariant(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsXSQLVAR(Value: PXSQLVAR);
+var
   sqlind: PShort;
   sqldata: PChar;
   local_sqllen: Integer;
 begin
+  sqlind := FXSQLVAR^.sqlind;
+  sqldata := FXSQLVAR^.sqldata;
+  Move(Value^, FXSQLVAR^, SizeOf(TXSQLVAR));
+  FXSQLVAR^.sqlind := sqlind;
+  FXSQLVAR^.sqldata := sqldata;
+  if (Value^.sqltype and 1 = 1) then
+  begin
+    if (FXSQLVAR^.sqlind = nil) then
+      IBAlloc(FXSQLVAR^.sqlind, 0, SizeOf(Short));
+    FXSQLVAR^.sqlind^ := Value^.sqlind^;
+  end
+  else
+    if (FXSQLVAR^.sqlind <> nil) then
+      ReallocMem(FXSQLVAR^.sqlind, 0);
+  if ((FXSQLVAR^.sqltype and (not 1)) = SQL_VARYING) then
+    local_sqllen := FXSQLVAR^.sqllen + 2
+  else
+    local_sqllen := FXSQLVAR^.sqllen;
+  FXSQLVAR^.sqlscale := Value^.sqlscale;
+  IBAlloc(FXSQLVAR^.sqldata, 0, local_sqllen);
+  Move(Value^.sqldata[0], FXSQLVAR^.sqldata[0], local_sqllen);
+  FModified := True;
+end;
+
+procedure TIBXSQLVAR.SetAsXSQLVAR(Value: PXSQLVAR);
+var
+  i: Integer;
+begin
+  if FUniqueName then
+     xSetAsXSQLVAR(Value)
+  else
   for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsXSQLVAR(Value);
+end;
+
+procedure TIBXSQLVAR.xSetIsNull(Value: Boolean);
+begin
+  if Value then
+  begin
+    if not IsNullable then
+      IsNullable := True;
+
+    if Assigned(FXSQLVAR^.sqlind) then
+      FXSQLVAR^.sqlind^ := -1;
+    FModified := True;
+  end
+  else
+    if ((not Value) and IsNullable) then
     begin
-      xvar := FParent[i];
-      sqlind := xvar.FXSQLVAR^.sqlind;
-      sqldata := xvar.FXSQLVAR^.sqldata;
-      Move(Value^, xvar.FXSQLVAR^, SizeOf(TXSQLVAR));
-      xvar.FXSQLVAR^.sqlind := sqlind;
-      xvar.FXSQLVAR^.sqldata := sqldata;
-      if (Value^.sqltype and 1 = 1) then
-      begin
-        if (xvar.FXSQLVAR^.sqlind = nil) then
-          IBAlloc(xvar.FXSQLVAR^.sqlind, 0, SizeOf(Short));
-        xvar.FXSQLVAR^.sqlind^ := Value^.sqlind^;
-      end
-      else
-        if (xvar.FXSQLVAR^.sqlind <> nil) then
-          ReallocMem(xvar.FXSQLVAR^.sqlind, 0);
-      if ((xvar.FXSQLVAR^.sqltype and (not 1)) = SQL_VARYING) then
-        local_sqllen := xvar.FXSQLVAR^.sqllen + 2
-      else
-        local_sqllen := xvar.FXSQLVAR^.sqllen;
-      FXSQLVAR^.sqlscale := Value^.sqlscale;
-      IBAlloc(xvar.FXSQLVAR^.sqldata, 0, local_sqllen);
-      Move(Value^.sqldata[0], xvar.FXSQLVAR^.sqldata[0], local_sqllen);
-      xvar.FModified := True;
+      if Assigned(FXSQLVAR^.sqlind) then
+        FXSQLVAR^.sqlind^ := 0;
+      FModified := True;
     end;
 end;
 
 procedure TIBXSQLVAR.SetIsNull(Value: Boolean);
 var
   i: Integer;
-  xvar: TIBXSQLVAR;
 begin
-  if Value then
-  begin
-    if not IsNullable then
-      IsNullable := True;
-    for i := 0 to FParent.FCount - 1 do
-      if FParent.FNames[i] = FName then
-      begin
-        xvar := FParent[i];
-        if Assigned(xvar.FXSQLVAR^.sqlind) then
-          xvar.FXSQLVAR^.sqlind^ := -1;
-        xvar.FModified := True;
-      end;
-  end
+  if FUniqueName then
+     xSetIsNull(Value)
   else
-    if ((not Value) and IsNullable) then
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+       FParent[i].xSetIsNull(Value);
+end;
+
+procedure TIBXSQLVAR.xSetIsNullable(Value: Boolean);
+begin
+  if (Value <> IsNullable) then
+  begin
+    if Value then
     begin
-      for i := 0 to FParent.FCount - 1 do
-        if FParent.FNames[i] = FName then
-        begin
-          xvar := FParent[i];
-          if Assigned(xvar.FXSQLVAR^.sqlind) then
-            xvar.FXSQLVAR^.sqlind^ := 0;
-          xvar.FModified := True;
-        end;
+      FXSQLVAR^.sqltype := FXSQLVAR^.sqltype or 1;
+      IBAlloc(FXSQLVAR^.sqlind, 0, SizeOf(Short));
+    end
+    else
+    begin
+      FXSQLVAR^.sqltype := FXSQLVAR^.sqltype and (not 1);
+      ReallocMem(FXSQLVAR^.sqlind, 0);
     end;
+  end;
 end;
 
 procedure TIBXSQLVAR.SetIsNullable(Value: Boolean);
 var
   i: Integer;
-  xvar: TIBXSQLVAR;
 begin
+  if FUniqueName then
+     xSetIsNullable(Value)
+  else
   for i := 0 to FParent.FCount - 1 do
-    if FParent.FNames[i] = FName then
-    begin
-      xvar := FParent[i];
-      if (Value <> IsNullable) then
-      begin
-        if Value then
-        begin
-          xvar.FXSQLVAR^.sqltype := xvar.FXSQLVAR^.sqltype or 1;
-          IBAlloc(xvar.FXSQLVAR^.sqlind, 0, SizeOf(Short));
-        end
-        else
-        begin
-          xvar.FXSQLVAR^.sqltype := xvar.FXSQLVAR^.sqltype and (not 1);
-          ReallocMem(xvar.FXSQLVAR^.sqlind, 0);
-        end;
-      end;
-    end;
+    if FParent[i].FName = FName then
+       FParent[i].xSetIsNullable(Value);
 end;
 
 procedure TIBXSQLVAR.Clear;
@@ -1421,7 +1530,8 @@ begin
   inherited Destroy;
 end;
 
-procedure TIBXSQLDA.AddName(FieldName: String; Idx: Integer);
+ procedure TIBXSQLDA.AddName(FieldName: String; Idx: Integer;
+   GeneratedName: boolean);
 var
   fn: String;
 begin
@@ -1431,6 +1541,7 @@ begin
   FNames[Idx] := fn;
   FXSQLVARs[Idx].FName := fn;
   FXSQLVARs[Idx].FIndex := Idx;
+  FXSQLVARs[Idx].FUniqueName :=  GeneratedName
 end;
 
 function TIBXSQLDA.GetModified: Boolean;
@@ -2093,8 +2204,8 @@ begin
                             @FHandle,
                             Database.SQLDialect,
                             FSQLParams.AsXSQLDA,
-                            FSQLRecord.AsXSQLDA), False);
-      if (fetch_res <> 0) and (fetch_res <> isc_deadlock) then
+                            FSQLRecord.AsXSQLDA), True);
+(*      if (fetch_res <> 0) and (fetch_res <> isc_deadlock) then
       begin
          { Sometimes a prepared stored procedure appears to get
            off sync on the server ....This code is meant to try
@@ -2109,7 +2220,7 @@ begin
                             Database.SQLDialect,
                             FSQLParams.AsXSQLDA,
                             FSQLRecord.AsXSQLDA), True);
-      end;
+      end;  *)
     end
     else
       Call(isc_dsql_execute(StatusVector,
@@ -2392,7 +2503,8 @@ begin
               sParamName := 'IBXParam' + IntToStr(iParamSuffix); {do not localize}
               Inc(iParamSuffix);
               iCurState := DefaultState;
-              slNames.Add(sParamName);
+              slNames.AddObject(sParamName,self); //Note local convention
+                                                  //add pointer to self to mark entry
               sParamName := '';
             end
             else
@@ -2432,7 +2544,7 @@ begin
     AddToProcessedSQL(#0);
     FSQLParams.Count := slNames.Count;
     for i := 0 to slNames.Count - 1 do
-      FSQLParams.AddName(slNames[i], i);
+      FSQLParams.AddName(slNames[i], i,slNames.Objects[i] <> nil);
     FProcessedSQL.Text := sProcessedSQL;
   finally
     slNames.Free;

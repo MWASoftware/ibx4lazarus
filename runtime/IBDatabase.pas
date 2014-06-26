@@ -1687,7 +1687,7 @@ begin
     for i := 0 to FSQLObjects.Count - 1 do
       if (FSQLObjects[i] <> nil) and
          (TIBBase(FSQLObjects[i]).Database = nil) then
-        SetOrdProp(TIBBase(FSQLObjects[i]).Owner, 'Database', Integer(Value));
+         SetObjectProp(TIBBase(FSQLObjects[i]).Owner, 'Database', Value);
   end;
   FDefaultDatabase := Value;
 end;
@@ -2114,4 +2114,4 @@ end.
 
 
 
-
+

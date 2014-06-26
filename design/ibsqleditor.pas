@@ -102,6 +102,7 @@ type
     FTableName: string;
     FIBSystemTables: TIBSystemTables;
     FExecuteOnly: boolean;
+    FGenerateParamNames: boolean;
   public
     { public declarations }
     constructor Create(TheOwner: TComponent); override;
@@ -134,6 +135,7 @@ begin
   try
     SetDatabase(DataSet.Database);
     SQLText.Lines.Assign(DataSet.SQL);
+    FGenerateParamNames := DataSet.GenerateParamNames;
     Result := ShowModal = mrOK;
     if Result then
       DataSet.SQL.Assign(SQLText.Lines)
@@ -235,7 +237,7 @@ end;
 
 procedure TIBSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
-  FIBSystemTables.TestSQL(SQLText.Text);
+  FIBSystemTables.TestSQL(SQLText.Text,FGenerateParamNames);
 end;
 
 procedure TIBSQLEditorForm.DeleteTableNamesCloseUp(Sender: TObject);
@@ -384,4 +386,4 @@ begin
 end;
 
 end.
-
+
