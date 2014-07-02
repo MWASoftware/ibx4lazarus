@@ -35,6 +35,12 @@ unit IBSQL;
 
 {$Mode Delphi}
 
+{ $define ALLOWDIALECT3PARAMNAMES}
+
+{$ifndef ALLOWDIALECT3PARAMNAMES}
+{$define UseCaseSensitiveParamName}
+{$endif}
+
 interface
 
 uses
@@ -148,7 +154,7 @@ type
 
   TIBXSQLVARArray = Array of TIBXSQLVAR;
 
-  { TIBXSQLVAR }
+  TIBXSQLDAType = (daInput,daOutput);
 
   { TIBXSQLDA }
 
@@ -156,13 +162,12 @@ type
   protected
     FSQL: TIBSQL;
     FCount: Integer;
-    FNames: TStrings;
     FSize: Integer;
+    FInputSQLDA: boolean;
     FXSQLDA: PXSQLDA;
     FXSQLVARs: TIBXSQLVARArray; { array of IBXQLVARs }
     FUniqueRelationName: String;
     function GetModified: Boolean;
-    function GetNames: String;
     function GetRecordSize: Integer;
     function GetXSQLDA: PXSQLDA;
     function GetXSQLVAR(Idx: Integer): TIBXSQLVAR;
@@ -170,14 +175,13 @@ type
     procedure Initialize;
     procedure SetCount(Value: Integer);
   public
-    constructor Create(Query: TIBSQL);
+    constructor Create(Query: TIBSQL; sqldaType: TIBXSQLDAType);
     destructor Destroy; override;
-    procedure AddName(FieldName: String; Idx: Integer; GeneratedName: boolean = false);
+    procedure SetParamName(FieldName: String; Idx: Integer; UniqueName: boolean = false);
     function ByName(Idx: String): TIBXSQLVAR;
     property AsXSQLDA: PXSQLDA read GetXSQLDA;
     property Count: Integer read FCount write SetCount;
     property Modified: Boolean read GetModified;
-    property Names: String read GetNames;
     property RecordSize: Integer read GetRecordSize;
     property Vars[Idx: Integer]: TIBXSQLVAR read GetXSQLVAR; default;
     property UniqueRelationName: String read FUniqueRelationName;
@@ -290,7 +294,9 @@ type
   TIBSQL = class(TComponent)
   private
     FIBLoaded: Boolean;
+    FUniqueParamNames: Boolean;
     function GetFieldCount: integer;
+    procedure SetUniqueParamNames(AValue: Boolean);
   protected
     FBase: TIBBase;
     FBOF,                          { At BOF? }
@@ -364,6 +370,7 @@ type
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property GenerateParamNames: Boolean read FGenerateParamNames write FGenerateParamNames;
+    property UniqueParamNames: Boolean read FUniqueParamNames write SetUniqueParamNames;
     property GoToFirstRecordOnExecute: Boolean read FGoToFirstRecordOnExecute
                                                write FGoToFirstRecordOnExecute
                                                default True;
@@ -1501,20 +1508,19 @@ end;
 
 
 { TIBXSQLDA }
-constructor TIBXSQLDA.Create(Query: TIBSQL);
+ constructor TIBXSQLDA.Create(Query: TIBSQL; sqldaType: TIBXSQLDAType);
 begin
   inherited Create;
   FSQL := Query;
-  FNames := TStringList.Create;
   FSize := 0;
   FUniqueRelationName := '';
+  FInputSQLDA := sqldaType = daInput;
 end;
 
 destructor TIBXSQLDA.Destroy;
 var
   i: Integer;
 begin
-  FNames.Free;
   if FXSQLDA <> nil then
   begin
     for i := 0 to FSize - 1 do
@@ -1530,18 +1536,23 @@ begin
   inherited Destroy;
 end;
 
- procedure TIBXSQLDA.AddName(FieldName: String; Idx: Integer;
-   GeneratedName: boolean);
+procedure TIBXSQLDA.SetParamName(FieldName: String; Idx: Integer;
+    UniqueName: boolean);
 var
   fn: String;
 begin
+  {$ifdef ALLOWDIALECT3PARAMNAMES}
   fn := FormatIdentifierValue(FSQL.Database.SQLDialect, FieldName);
-  while FNames.Count <= Idx do
-    FNames.Add('');
-  FNames[Idx] := fn;
+  {$else}
+  {$ifdef UseCaseSensitiveParamName}
+  fn := AnsiUpperCase(FieldName);
+  {$else}
+  fn := FieldName;
+  {$endif}
+  {$endif}
   FXSQLVARs[Idx].FName := fn;
   FXSQLVARs[Idx].FIndex := Idx;
-  FXSQLVARs[Idx].FUniqueName :=  GeneratedName
+  FXSQLVARs[Idx].FUniqueName :=  UniqueName
 end;
 
 function TIBXSQLDA.GetModified: Boolean;
@@ -1555,11 +1566,6 @@ begin
       result := True;
       exit;
     end;
-end;
-
-function TIBXSQLDA.GetNames: String;
-begin
-  result := FNames.Text;
 end;
 
 function TIBXSQLDA.GetRecordSize: Integer;
@@ -1589,33 +1595,60 @@ end;
 function TIBXSQLDA.GetXSQLVARByName(Idx: String): TIBXSQLVAR;
 var
   s: String;
-  i, Cnt: Integer;
+  i: Integer;
 begin
+  {$ifdef ALLOWDIALECT3PARAMNAMES}
   s := FormatIdentifierValue(FSQL.Database.SQLDialect, Idx);
-  i := 0;
-  Cnt := FNames.Count;
-  while (i < Cnt) and (FNames[i] <> s) do Inc(i);
-  if i = Cnt then
-    result := nil
+  {$else}
+  if FInputSQLDA then
+     {$ifdef UseCaseSensitiveParamName}
+      s := AnsiUpperCase(Idx)
+     {$else}
+      s := Idx
+     {$endif}
   else
-    result := GetXSQLVAR(i);
+      s := FormatIdentifierValue(FSQL.Database.SQLDialect, Idx);
+  {$endif}
+  for i := 0 to FCount - 1 do
+      if Vars[i].FName = s then
+      begin
+           Result := GetXSQLVAR(i);
+           Exit;
+      end;
+  Result := nil;
 end;
 
 procedure TIBXSQLDA.Initialize;
+
+    function VarByName(idx: string; limit: integer): TIBXSQLVAR;
+    var
+       k: integer;
+    begin
+         for k := 0 to limit do
+             if Vars[k].FName = idx then
+             begin
+                  Result := GetXSQLVAR(k);
+                  Exit;
+             end;
+         Result := nil;
+    end;
+
 var
   i, j, j_len: Integer;
-  NamesWereEmpty: Boolean;
   st: String;
   bUnique: Boolean;
+  sFieldName, sBaseName: string;
 begin
   bUnique := True;
-  NamesWereEmpty := (FNames.Count = 0);
   if FXSQLDA <> nil then
   begin
     for i := 0 to FCount - 1 do
     begin
       with FXSQLVARs[i].Data^ do
       begin
+
+        {First get the unique relation name, if any}
+
         if bUnique and (strpas(relname) <> '') then
         begin
           if FUniqueRelationName = '' then
@@ -1627,7 +1660,10 @@ begin
               bUnique := False;
             end;
         end;
-        if NamesWereEmpty then
+
+        {If an output SQLDA then copy the aliasnames to the FName list}
+
+        if not FInputSQLDA then
         begin
           st := strpas(aliasname);
           if st = '' then
@@ -1635,26 +1671,50 @@ begin
             st := 'F_'; {do not localize}
             aliasname_length := 2;
             j := 1; j_len := 1;
-            StrPCopy(aliasname, st + IntToStr(j));
+            sFieldName := st + IntToStr(j);
+            StrPCopy(aliasname, sFieldName);
           end
           else
           begin
-            StrPCopy(aliasname, st);
+            sFieldName := FormatIdentifierValue(FSQL.Database.SQLDialect, st);
             j := 0; j_len := 0;
           end;
-          while GetXSQLVARByName(strpas(aliasname)) <> nil do
+
+          {Look for other columns with the same name and make unique}
+
+          sBaseName := sFieldName;
+          while VarByName(sFieldName,i-1) <> nil do
           begin
-            Inc(j); j_len := Length(IntToStr(j));
-            if j_len + aliasname_length > 31 then
-              StrPCopy(aliasname,
-                       Copy(st, 1, 31 - j_len) +
-                       IntToStr(j))
-            else
-              StrPCopy(aliasname, st + IntToStr(j));
+               Inc(j);
+               if (FSQL.Database.SQLDialect = 3) and (aliasname[0] = '"') then
+               {Double quote delimited Dialect 3 aliasname}
+               begin
+                    j_len := Length(IntToStr(j)) + 2;
+                    if j_len + Length(sBaseName) > 31 then
+                       sFieldName := Copy(sBaseName, 1, 31 - j_len) + IntToStr(j)
+                    else
+                        sFieldName := sBaseName + IntToStr(j);
+                    StrPCopy(aliasname, '"' + sFieldName + '"');
+               end
+               else
+               begin
+                    j_len := Length(IntToStr(j));
+                    if j_len + Length(sBaseName) > 31 then
+                       sFieldName := Copy(sBaseName, 1, 31 - j_len) + IntToStr(j)
+                    else
+                        sFieldName := sBaseName + IntToStr(j);
+                    StrPCopy(aliasname, sFieldName);
+                   end;
           end;
+
           Inc(aliasname_length, j_len);
-          AddName(strpas(aliasname), i);
+          FXSQLVARs[i].FName := sFieldName;
         end;
+
+        {Finally initialise the XSQLVAR}
+
+        FXSQLVARs[i].FIndex := i;
+
         case sqltype and (not 1) of
           SQL_TEXT, SQL_TYPE_DATE, SQL_TYPE_TIME, SQL_TIMESTAMP,
           SQL_BLOB, SQL_ARRAY, SQL_QUAD, SQL_SHORT,
@@ -1687,7 +1747,6 @@ var
   i, OldSize: Integer;
   p : PXSQLVAR;
 begin
-  FNames.Clear;
   FCount := Value;
   if FCount = 0 then
     FUniqueRelationName := ''
@@ -2046,8 +2105,8 @@ begin
   TStringList(FSQL).OnChanging := SQLChanging;
   FProcessedSQL := TStringList.Create;
   FHandle := nil;
-  FSQLParams := TIBXSQLDA.Create(self);
-  FSQLRecord := TIBXSQLDA.Create(self);
+  FSQLParams := TIBXSQLDA.Create(self,daInput);
+  FSQLRecord := TIBXSQLDA.Create(self,daOutput);
   FSQLType := SQLUnknown;
   FParamCheck := True;
   FCursor := Name + RandomString(8);
@@ -2163,6 +2222,13 @@ end;
 function TIBSQL.GetFieldCount: integer;
 begin
   Result := FSQLRecord.Count
+end;
+
+ procedure TIBSQL.SetUniqueParamNames(AValue: Boolean);
+begin
+  if FUniqueParamNames = AValue then Exit;
+  FreeHandle;
+  FUniqueParamNames := AValue;
 end;
 
 procedure TIBSQL.DoBeforeDatabaseDisconnect(Sender: TObject);
@@ -2360,7 +2426,7 @@ begin
   result := FRecordCount;
 end;
 
-function TIBSQL.GetRowsAffected: integer;
+ function TIBSQL.GetRowsAffected: Integer;
 var
   result_buffer: array[0..1048] of Char;
   info_request: Char;
@@ -2411,7 +2477,7 @@ var
   cCurChar, cNextChar, cQuoteChar: Char;
   sSQL, sProcessedSQL, sParamName: String;
   i, iLenSQL, iSQLPos: Integer;
-  iCurState, iCurParamState: Integer;
+  iCurState {$ifdef ALLOWDIALECT3PARAMNAMES}, iCurParamState {$endif}: Integer;
   iParamSuffix: Integer;
   slNames: TStrings;
 
@@ -2420,8 +2486,10 @@ const
   CommentState = 1;
   QuoteState = 2;
   ParamState = 3;
+ {$ifdef ALLOWDIALECT3PARAMNAMES}
   ParamDefaultState = 0;
   ParamQuoteState = 1;
+  {$endif}
 
   procedure AddToProcessedSQL(cChar: Char);
   begin
@@ -2441,7 +2509,9 @@ begin
     i := 1;
     iSQLPos := 1;
     iCurState := DefaultState;
+    {$ifdef ALLOWDIALECT3PARAMNAMES}
     iCurParamState := ParamDefaultState;
+    {$endif}
     { Now, traverse through the SQL string, character by character,
      picking out the parameters and formatting correctly for InterBase }
     while (i <= iLenSQL) do begin
@@ -2492,11 +2562,14 @@ begin
         ParamState:
         begin
           { collect the name of the parameter }
+          {$ifdef ALLOWDIALECT3PARAMNAMES}
           if iCurParamState = ParamDefaultState then
           begin
             if cCurChar = '"' then
               iCurParamState := ParamQuoteState
-            else if (cCurChar in ['A'..'Z', 'a'..'z', '0'..'9', '_', '$']) then
+            else
+            {$endif}
+            if (cCurChar in ['A'..'Z', 'a'..'z', '0'..'9', '_', '$']) then
                 sParamName := sParamName + cCurChar
             else if FGenerateParamNames then
             begin
@@ -2509,6 +2582,7 @@ begin
             end
             else
               IBError(ibxeSQLParseError, [SParamNameExpected]);
+          {$ifdef ALLOWDIALECT3PARAMNAMES}
           end
           else begin
             { determine if Quoted parameter name is finished }
@@ -2523,8 +2597,9 @@ begin
             else
               sParamName := sParamName + cCurChar
           end;
+          {$endif}
           { determine if the unquoted parameter name is finished }
-          if (iCurParamState <> ParamQuoteState) and
+          if {$ifdef ALLOWDIALECT3PARAMNAMES}(iCurParamState <> ParamQuoteState) and {$endif}
             (iCurState <> DefaultState) then
           begin
             if not (cNextChar in ['A'..'Z', 'a'..'z',
@@ -2544,7 +2619,7 @@ begin
     AddToProcessedSQL(#0);
     FSQLParams.Count := slNames.Count;
     for i := 0 to slNames.Count - 1 do
-      FSQLParams.AddName(slNames[i], i,slNames.Objects[i] <> nil);
+      FSQLParams.SetParamName(slNames[i], i,FUniqueParamNames or (slNames.Objects[i] <> nil));
     FProcessedSQL.Text := sProcessedSQL;
   finally
     slNames.Free;

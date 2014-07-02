@@ -2197,6 +2197,8 @@ begin
     InternalClose;
   if FInternalPrepared then
     InternalUnPrepare;
+  FieldDefs.Clear;
+  FieldDefs.Updated := false
 end;
 
 { I can "undelete" uninserted records (make them "inserted" again).
@@ -3589,6 +3591,7 @@ begin
   begin
     CheckDatasetClosed;
     FieldDefs.Clear;
+    FieldDefs.Updated := false;
     FInternalPrepared := False;
   end;
 end;
@@ -4035,4 +4038,4 @@ begin
     Owner.FieldByName(FFieldName).AsInteger := GetNextValue(Owner.Database,Owner.Transaction);
 end;
 
-end.
+end.
