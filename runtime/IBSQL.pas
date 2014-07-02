@@ -43,7 +43,7 @@ unit IBSQL;
  no longer supported. To enable support, ALLOWDIALECT3PARAMNAMES should be
  defined when IBX is compiled.
 
- Hint: remove the space between the brace and the dollar sign below}
+ Hint: remove the space between the brace and the dollar sign below
 }
 
 { $define ALLOWDIALECT3PARAMNAMES}
