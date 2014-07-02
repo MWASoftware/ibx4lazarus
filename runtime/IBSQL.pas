@@ -27,7 +27,7 @@
 {    IBX For Lazarus (Firebird Express)                                  }
 {    Contributor: Tony Whyman, MWA Software http://www.mwasoftware.co.uk }
 {    Portions created by MWA Software are copyright McCallum Whyman      }
-{    Associates Ltd 2011                                                 }
+{    Associates Ltd 2011 - 2014                                                }
 {                                                                        }
 {************************************************************************}
 
@@ -35,9 +35,26 @@ unit IBSQL;
 
 {$Mode Delphi}
 
+{ Prior to 1.1.0, IBSQL param anmes could be in dialect 3 format (e.g. :"MyParam").
+
+  Dialect 3 format parameter names are not believed to be very useful - but they
+ do cause a big processing overhead. The code to support these is now subject
+ to conditional compilation. By default, dialect 3 format parameter names are
+ no longer supported. To enable support, ALLOWDIALECT3PARAMNAMES should be
+ defined when IBX is compiled.
+
+ Hint: remove the space between the brace and the dollar sign below}
+}
+
 { $define ALLOWDIALECT3PARAMNAMES}
 
 {$ifndef ALLOWDIALECT3PARAMNAMES}
+
+{ Even when dialect 3 format parameter names are not supported, IBX still processes
+  parameter names case insensitive. This does result in some additional overhead
+  due to a call to "AnsiUpperCase". This can be avoided by undefining
+  "UseCaseSensitiveParamName" below.
+}
 {$define UseCaseSensitiveParamName}
 {$endif}
 

@@ -5,12 +5,12 @@ IBX Change Log  version                  (1.1-0) tba, 26 Jun 2014 16:51:37 +0100
 2. TIBSQL.ExecQuery retry on failure removed to avoid problems with "at most once"
    actions.
 
-3. TIBTransaction.SetDefaultDatabase uses SetObjectProp instead of mis-using SetOrdProp.
+3. TIBTransaction.SetDefaultDatabase uses SetObjectProp instead of mis-using SetOrdProp (with
+   thanks to Yuriy Kopnin for pointing this out).
 
-4. TIBXSQLVAR param setters are now optimised to avoid searching all other parameters
-   in the same TIBXSQLDA for another parameters with the same name, when positional
-   placeholder parameters are used (i.e. with a DSQL '?') and the TIBSQL "GenerateParamName"
-   property is set.
+4. TIBXSQLVAR code clean up and optimisation to improve client side "prepare" and parameter
+   setting performance. See "readme.clientside.performance in the doc folder.(Thanks to
+   Gabor Boros for reporting this problem and for testing the improvements).
 
 5. GenerateParamName is now a published property of TIBSQL
 
