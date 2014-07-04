@@ -20,14 +20,15 @@ IBX Change Log  version                  (1.1-0) tba, 26 Jun 2014 16:51:37 +0100
 7. Changes to the Select SQL in an IBCustomDataset descendent should now be
    visible in the Fields Editor immediately afterwards - rather than only after cycling the "active" property.
 
-8. Case now preserved in Field Names for Dialect 3 quoted column names. This allows IBX to support column
-   names that differ on in case (e.g. "MyCol1" and "mycol1") to referenced by name e.g.
+8. IBX can now support dialect 3 quoted column names that contain spaces and which differ only in their case. 
+   See readme.field+param.names in the doc folder.
 
-   IBSQL1.FieldByName('"MyCol1"'). AsInteger
-   IBSQL1.FieldByName('"mycol1"'). AsInteger
+9. IBX SQL Editors will now automatically add double quotes when the database dialect is "3" and the column name 
+   contains spaces or is a Firebird 2.5 SQL Reserved Word.
 
-   Note the use of double quotes in the fieldname to indicate a case senstive reference. If double quotes are
-   omitted, IBX always case insenstive.
+10. TIBSQL SQL editor will operate correctly and not report an SQL syntax error on SQL test, 
+    when DSQL ('?') parameter placeholders are used and the TIBSQL.GenerateParamNames property is set to true.   
+   
 
 IBX Change Log  version                 (1.0-5) Sat, 28 Dec 2013 19:22:23 +0000
 

@@ -282,7 +282,8 @@ end;
 
  function TIBSystemTables.QuoteIfNeeded(fieldName: string): string;
 begin
-  if (AnsiUpperCase(fieldName) <> fieldName) or IsReservedWord(fieldName) then
+  if (FGetFieldNames.Database.SQLDialect = 3) and
+    ((AnsiUpperCase(fieldName) <> fieldName) or IsReservedWord(fieldName)) then
      Result := '"' + fieldName + '"'
   else
     Result := fieldName
@@ -738,7 +739,8 @@ begin
   end;
 end;
 
- procedure TIBSystemTables.TestSQL(SQL: string; GenerateParamNames: boolean);
+  procedure TIBSystemTables.TestSQL(SQL: string;
+   GenerateParamNames: boolean);
 begin
   if not assigned(FTestSQL.Database) or not FTestSQL.Database.Connected or
     not assigned(FTestSQL.Transaction) then
