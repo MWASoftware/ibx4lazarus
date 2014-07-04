@@ -435,8 +435,8 @@ begin
           SQLParams[i].AsShort := Params[j].AsSmallInt;
         ftInteger:
           SQLParams[i].AsLong := Params[j].AsInteger;
-{        ftLargeInt:
-          SQLParams[i].AsInt64 := Params[j].AsLargeInt; }
+        ftLargeInt:
+          SQLParams[i].AsInt64 := Params[j].AsLargeInt;
         ftFloat, ftCurrency:
          SQLParams[i].AsDouble := Params[j].AsFloat;
         ftBCD:
@@ -520,4 +520,4 @@ begin
   Reader.ReadCollection(Params);
 end;
 
-end.
+end.

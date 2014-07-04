@@ -59,6 +59,7 @@ function RandomInteger(iLow, iHigh: Integer): Integer;
 function StripString(st: String; CharsToStrip: String): String;
 function FormatIdentifier(Dialect: Integer; Value: String): String;
 function FormatIdentifierValue(Dialect: Integer; Value: String): String;
+function FormatIdentifierValueNC(Dialect: Integer; Value: String): String;
 function ExtractIdentifier(Dialect: Integer; Value: String): String;
 function QuoteIdentifier(Dialect: Integer; Value: String): String;
 
@@ -137,6 +138,25 @@ begin
   Result := Value;
 end;
 
+function FormatIdentifierValueNC(Dialect: Integer; Value: String): String;
+begin
+  Value := Trim(Value);
+  if Dialect = 1 then
+    Value := AnsiUpperCase(Value)
+  else
+  begin
+    if (Value <> '') and (Value[1] = '"') then
+    begin
+      Delete(Value, 1, 1);
+      Delete(Value, Length(Value), 1);
+      Value := AnsiUpperCase(StringReplace (Value, '""', '"', [rfReplaceAll]));
+    end
+    else
+      Value := AnsiUpperCase(Value);
+  end;
+  Result := Value;
+end;
+
 function ExtractIdentifier(Dialect: Integer; Value: String): String;
 begin
   Value := Trim(Value);
@@ -165,4 +185,4 @@ begin
   Result := Value;
 end;
 
-end.
+end.

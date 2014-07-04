@@ -25,7 +25,7 @@ IBX supports both DSQL '?' and PSQL name style (e.g. :Param) parameters. In the 
 
 Although flexible, this amount of variation could give a high overhead for intensive users e.g. setting and calling an INSERT statement multiple times in short succession. Some performance gain has been achieved by code cleanup. However, there are some ways that you can now "tune" IBX in this area.
 
-a. Dialect 3 format parameter names are not believed to be very useful - but they do cause a big processing overhead. The code to support these is now subject to conditional compilation. By default, dialect 3 format parameter names are no longer supported. To enable support, ALLOWDIALECT3PARAMNAMES should be defined when IBX is compiled. IBSQL.pas may be edited to make this change permanent - see comments at this top of this file.
+a. Dialect 3 format parameter names are not believed to be very useful - but they do cause a big processing overhead. The code to support these is now subject to conditional compilation. By default, dialect 3 format parameter names are supported. To disable support, ALLOWDIALECT3PARAMNAMES should be undefined when IBX is compiled. IBSQL.pas may be edited to make this change  - see comments at this top of this file.
 
 For example, to support an SQL statement in the format:
 
@@ -35,11 +35,11 @@ and set using:
 
 IBQuery1.ParamByName('"MyKeyid"').AsInteger := ...
 
-you must define ALLOWDIALECT3PARAMNAMES at compilation time. On the other hand:
+you must define ALLOWDIALECT3PARAMNAMES at compilation time. On the other hand with:
 
 SELECT col1 From MYTABLE Where KeyID = :MyKeyid;
 
-is supported by default and the value of the input parameter can be set with
+and ALLOWDIALECT3PARAMNAMES undefined then the value of the input parameter can be set with
 
 IBQuery1.ParamByName('MyKeyid').AsInteger := ...
 
