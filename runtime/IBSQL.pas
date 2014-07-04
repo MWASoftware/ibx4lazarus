@@ -1650,6 +1650,16 @@ procedure TIBXSQLDA.Initialize;
          Result := nil;
     end;
 
+    function Space2Underscore(s: string): string;
+    var
+       k: integer;
+    begin
+        Result := s;
+        for k := 1 to Length(s) do
+            if Result[k] = ' ' then
+               Result[k] := '_';
+    end;
+
 var
   i, j, j_len: Integer;
   st: String;
@@ -1684,14 +1694,13 @@ begin
 
         if not FInputSQLDA then
         begin
-          st := AnsiUppercase(strpas(aliasname));
+          st := Space2Underscore(AnsiUppercase(strpas(aliasname)));
           if st = '' then
           begin
             sBaseName := 'F_'; {do not localize}
             aliasname_length := 2;
             j := 1; j_len := 1;
             st := sBaseName + IntToStr(j);
-            StrPCopy(aliasname, st);
           end
           else
           begin
@@ -1709,9 +1718,9 @@ begin
                   st := Copy(sBaseName, 1, 31 - j_len) + IntToStr(j)
                else
                   st := sBaseName + IntToStr(j);
-               StrPCopy(aliasname, st);
           end;
 
+          StrPCopy(aliasname, st);
           Inc(aliasname_length, j_len);
           FXSQLVARs[i].FName := st;
         end;

@@ -1,0 +1,83 @@
+IBX Field and Parameter Names
+=============================
+
+Column Names
+------------
+
+Firebird identifiers are typcially case insensitive and are converted to upper case when processed and reported. This translates into IBX always reporting upper case column names and matching column names to field names (e.g. in TDataSet.FieldByName) using a case insensitive match. 
+
+However, in SQL Dialect 3, Firebird has introduced the ability to enclose identifiers in double qoutes. This is necessary if, for example, you want a column name that is the same as an SQL Reserved word. It also allows you to have case sensitive column names, or column names containing spaces.
+
+For Example:
+
+Create Table MY_TABLE (
+  "KeyField" Integer,
+  "GRANT" VarChar(32),
+  "My Column" Float
+);
+
+IBX could readily handle case sensitive column names and isn't bothered by reserved words. However, it does have the problem that the Lazarus TDataSet model includes the ability to automatically generate TField properties and which are then added to the Form's list of properties. The name of the generated property is formed by concatenating the IBX object name with the column alias name.
+
+Pascal identifiers are also case insensitive and this could cause problems if two column names differ only in the case of their letters; the generated property names will cause a compilation error. Neither can Pascal identifiers contain spaces.
+
+IBX handles this by forcing all column names to upper case,  regardless of how they are defined in SQL. It also replaces spaces by underscores. The identifiers given to Generated column properties are then both valid Pascal and unambiguous. However, it is still necessary to handle cases where two column names differ only in their case - forcing the column names to upper case will only result in a name clash.
+
+Column alias Names aren't always unique anyway. For example, in the SQL:
+
+select sum(col1), sum(col2) from MyTable;
+
+Firebird will generate the alias name "SUM" for both cases. It will also allow you to use the same aliasname multiple times in the same statement.
+
+IBX handles this by checking for non-unique aliasnames when the SQL is prepared and disambiguating the column names by adding a numerical suffix (starting from one) to each non-unique column name it finds after the first one. The same approach is used when non-unique column names result after forcing the column name to upper case.
+
+For example, with a table defined as
+
+Create Table MY_TABLE (
+ TableKey Integer not null,
+ "My Field" VarChar(32),
+ "MY Field" VarChar(32),
+ Primary Key(TableKey)
+);
+
+The column names used by IBX will be
+
+TABLEKEY
+MY_FIELD
+MY_FIELD1
+
+respectively.
+
+IBQuery1.FieldByName('tableKey').AsInteger
+IBQuery1.FieldByName('MY_FIELD').AsString
+IBQuery1.FieldByName('my_field1').AsString
+
+Are then all valid examples for accessing the column values using TIBQuery.FieldByName.
+
+Parameter Names
+---------------
+
+IBX supports PSQL style parameter names in SQL Statements. These can then be set at run time using the ParamByName call. For example, if the select statement for a TIBQuery is
+
+Select Col1, Col2 From MYTABLE Where Col3 = :ColValue;
+
+Then, at run time, the parameter value can be set using
+
+IBQuery1.ParamByName('COLVALUE').AsInteger := ...
+
+or 
+
+IBQuery1.ParamByName('ColValue').AsInteger := ...
+
+etc.
+
+As with column names, parameter names are matched case insensitive.
+
+It is also possible to use a pseudo dialect 3 format parameter name e.g.
+
+Select Col1, Col2 From MYTABLE Where Col3 = :"ColValue";
+
+However, in this case, the double quotes are effectively ignored and the match is again made case insensitive. e.g.
+
+IBQuery1.ParamByName('COLVALUE').AsInteger := ...
+
+
