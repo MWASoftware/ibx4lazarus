@@ -1,35 +1,35 @@
 IBX Change Log  version                  (1.1-0) tba, 26 Jun 2014 16:51:37 +0100
 
-1. Param Type LargeInt now supported in TIBQuery and TIBStoredProc
-
-2. TIBSQL.ExecQuery retry on failure removed to avoid problems with "at most once"
-   actions.
-
-3. TIBTransaction.SetDefaultDatabase uses SetObjectProp instead of mis-using SetOrdProp (with
-   thanks to Yuriy Kopnin for pointing this out).
-
-4. TIBXSQLVAR code clean up and optimisation to improve client side "prepare" and parameter
-   setting performance. See "readme.clientside.performance in the doc folder.(Thanks to
+1. TIBXSQLVAR code clean up and optimisation to improve client side "prepare" and parameter
+   setting performance. See "readme.field+param.names in the doc folder.(Thanks to
    Gabor Boros for reporting this problem and for testing the improvements).
 
-5. GenerateParamName is now a published property of TIBSQL
-
-6. varWord, varShortInt and varInt64 added to TIBXSQLVAR.SetAsVariant and hence now available as variant types
-   for both fields and parameter setting.
-
-7. Changes to the Select SQL in an IBCustomDataset descendent should now be
-   visible in the Fields Editor immediately afterwards - rather than only after cycling the "active" property.
-
-8. IBX can now support dialect 3 quoted column names that contain spaces and which differ only in their case. 
+2. IBX can now support dialect 3 quoted column names that contain spaces and which differ only in their case.
    See readme.field+param.names in the doc folder.
 
-9. IBX SQL Editors will now automatically add double quotes when the database dialect is "3" and the column name 
+3. IBX SQL Editors will now automatically add double quotes when the database dialect is "3" and the column name
    contains spaces or is a Firebird 2.5 SQL Reserved Word.
 
-10. TIBSQL SQL editor will operate correctly and not report an SQL syntax error on SQL test, 
+4. Param Type LargeInt now supported in TIBQuery and TIBStoredProc
+
+5. TIBSQL.ExecQuery retry on failure removed to avoid problems with "at most once"
+   actions.
+
+6. TIBTransaction.SetDefaultDatabase uses SetObjectProp instead of mis-using SetOrdProp (with
+   thanks to Yuriy Kopnin for pointing this out).
+
+7. GenerateParamName is now a published property of TIBSQL, TIBQuery and TIBDataSet.
+
+8. varWord, varShortInt and varInt64 added to TIBXSQLVAR.SetAsVariant and hence now available as variant types
+   for both fields and parameter setting.
+
+9. Changes to the Select SQL in an IBCustomDataset descendent should now be
+   visible in the Fields Editor immediately afterwards - rather than only after cycling the "active" property.
+
+10. TIBSQL SQL editor will operate correctly and not report an SQL syntax error on SQL test,
     when DSQL ('?') parameter placeholders are used and the TIBSQL.GenerateParamNames property is set to true.
 
-11. TTable now has a property editor for "MasterFields"
+11. TIBTable now has a property editor for "MasterFields"
    
 
 IBX Change Log  version                 (1.0-5) Sat, 28 Dec 2013 19:22:23 +0000
