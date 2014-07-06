@@ -1,4 +1,4 @@
-IBX Change Log  version                   (1.1-0) Sun, 06 Jul 2014 19:20:57 +0100
+IBX Change Log  version                   (1.1-0) tba, 06 Jul 2014 19:20:57 +0100
 
 1. TIBXSQLVAR code clean up and optimisation to improve client side "prepare" and parameter
    setting performance. See "readme.field+param.names in the doc folder.(Thanks to
@@ -7,8 +7,8 @@ IBX Change Log  version                   (1.1-0) Sun, 06 Jul 2014 19:20:57 +010
 2. IBX can now support dialect 3 quoted column names that contain spaces and which differ only in their case.
    See readme.field+param.names in the doc folder.
 
-3. IBX SQL Editors will now automatically add double quotes when the database dialect is "3" and the column name
-   contains spaces or is a Firebird 2.5 SQL Reserved Word.
+3. IBX SQL Editors will now automatically add double quotes around column names when the database
+   dialect is "3" and the column name contains spaces or is a Firebird 2.5 SQL Reserved Word.
 
 4. Param Type LargeInt now supported in TIBQuery and TIBStoredProc
 
