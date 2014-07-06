@@ -250,6 +250,7 @@ type
     FBeforeTransactionEnd,
     FAfterTransactionEnd,
     FTransactionFree: TNotifyEvent;
+    FAliasNameMap: array of string;
 
     function GetSelectStmtHandle: TISC_STMT_HANDLE;
     procedure SetUpdateMode(const Value: TUpdateMode);
@@ -321,6 +322,7 @@ type
     procedure DeactivateTransaction;
     procedure CheckDatasetClosed;
     procedure CheckDatasetOpen;
+    procedure FieldDefsFromQuery(SourceQuery: TIBSQL);
     function GetActiveBuf: PChar;
     procedure InternalBatchInput(InputObject: TIBBatchInput); virtual;
     procedure InternalBatchOutput(OutputObject: TIBBatchOutput); virtual;
@@ -362,6 +364,8 @@ type
     function GetBookmarkFlag(Buffer: PChar): TBookmarkFlag; override;
     function GetCanModify: Boolean; override;
     function GetDataSource: TDataSource; override;
+    function GetDBAliasName(FieldNo: integer): string;
+    function GetFieldDefFromAlias(aliasName: string): TFieldDef;
     function GetFieldClass(FieldType: TFieldType): TFieldClass; override;
     function GetRecNo: Integer; override;
     function GetRecord(Buffer: PChar; GetMode: TGetMode;
@@ -2565,6 +2569,24 @@ begin
     result := FDataLink.DataSource;
 end;
 
+ function TIBCustomDataSet.GetDBAliasName(FieldNo: integer): string;
+begin
+  Result := FAliasNameMap[FieldNo-1]
+end;
+
+ function TIBCustomDataSet.GetFieldDefFromAlias(aliasName: string): TFieldDef;
+ var
+   i: integer;
+ begin
+   Result := nil;
+   for i := 0 to Length(FAliasNameMap) - 1 do
+       if FAliasNameMap[i] = aliasName then
+       begin
+         Result := FieldDefs[i+1];
+         Exit
+       end;
+ end;
+
 function TIBCustomDataSet.GetFieldClass(FieldType: TFieldType): TFieldClass;
 begin
   Result := DefaultFieldClasses[FieldType];
@@ -2875,6 +2897,16 @@ begin
 end;
 
 procedure TIBCustomDataSet.InternalInitFieldDefs;
+begin
+  if not InternalPrepared then
+  begin
+    InternalPrepare;
+    exit;
+  end;
+   FieldDefsFromQuery(FQSelect);
+ end;
+
+procedure TIBCustomDataSet.FieldDefsFromQuery(SourceQuery: TIBSQL);
 const
   DefaultSQL = 'Select F.RDB$COMPUTED_BLR, ' + {do not localize}
                'F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME ' + {do not localize}
@@ -2888,7 +2920,7 @@ var
   FieldSize: Word;
   FieldNullable : Boolean;
   i, FieldPosition, FieldPrecision: Integer;
-  FieldAliasName: string;
+  FieldAliasName, DBAliasName: string;
   RelationName, FieldName: string;
   Query : TIBSQL;
   FieldIndex: Integer;
@@ -2988,11 +3020,6 @@ var
   end;
 
 begin
-  if not InternalPrepared then
-  begin
-    InternalPrepare;
-    exit;
-  end;
   FRelationNodes := TRelationNode.Create;
   FNeedsRefresh := False;
   Database.InternalTransaction.StartTransaction;
@@ -3003,20 +3030,22 @@ begin
     FieldDefs.BeginUpdate;
     FieldDefs.Clear;
     FieldIndex := 0;
-    if (Length(FMappedFieldPosition) < FQSelect.Current.Count) then
-      SetLength(FMappedFieldPosition, FQSelect.Current.Count);
+    if (Length(FMappedFieldPosition) < SourceQuery.Current.Count) then
+      SetLength(FMappedFieldPosition, SourceQuery.Current.Count);
     Query.SQL.Text := DefaultSQL;
     Query.Prepare;
-    for i := 0 to FQSelect.Current.Count - 1 do
-      with FQSelect.Current[i].Data^ do
+    SetLength(FAliasNameMap, SourceQuery.Current.Count);
+    for i := 0 to SourceQuery.Current.Count - 1 do
+      with SourceQuery.Current[i].Data^ do
       begin
         { Get the field name }
-        SetString(FieldAliasName, aliasname, aliasname_length);
+        FieldAliasName := SourceQuery.Current[i].Name;
+        SetString(DBAliasName, aliasname, aliasname_length);
         SetString(RelationName, relname, relname_length);
         SetString(FieldName, sqlname, sqlname_length);
         FieldSize := 0;
         FieldPrecision := 0;
-        FieldNullable := FQSelect.Current[i].IsNullable;
+        FieldNullable := SourceQuery.Current[i].IsNullable;
         case sqltype and not 1 of
           { All VARCHAR's must be converted to strings before recording
            their values }
@@ -3102,7 +3131,7 @@ begin
           with FieldDefs.AddFieldDef do
           begin
             Name := FieldAliasName;
- (*           FieldNo := FieldPosition;*)
+            FAliasNameMap[FieldNo-1] := DBAliasName;
             DataType := FieldType;
             Size := FieldSize;
             Precision := FieldPrecision;

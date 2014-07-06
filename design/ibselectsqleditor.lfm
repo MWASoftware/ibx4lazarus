@@ -8,12 +8,12 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   ClientHeight = 437
   ClientWidth = 747
   OnShow = FormShow
-  LCLVersion = '0.9.30'
+  LCLVersion = '1.2.2.0'
   object Label3: TLabel
     Left = 279
-    Height = 18
+    Height = 15
     Top = 16
-    Width = 26
+    Width = 24
     Caption = 'SQL'
     ParentColor = False
   end
@@ -70,9 +70,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   end
   object QuoteFields: TCheckBox
     Left = 16
-    Height = 22
+    Height = 24
     Top = 380
-    Width = 132
+    Width = 127
     Caption = '&Quote Identifiers'
     TabOrder = 5
   end
@@ -86,36 +86,36 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 6
     object SelectPage: TTabSheet
       Caption = 'Tables'
-      ClientHeight = 300
-      ClientWidth = 226
+      ClientHeight = 298
+      ClientWidth = 224
       OnShow = SelectPageShow
       object Label1: TLabel
         Left = 7
-        Height = 18
+        Height = 15
         Top = 4
-        Width = 78
+        Width = 69
         Caption = 'Table Name'
         ParentColor = False
       end
       object Label2: TLabel
         Left = 7
-        Height = 18
+        Height = 15
         Top = 72
-        Width = 39
+        Width = 33
         Caption = 'Fields'
         ParentColor = False
       end
       object Label4: TLabel
         Left = 7
-        Height = 18
+        Height = 15
         Top = 244
-        Width = 87
+        Width = 77
         Caption = 'Primary Keys'
         ParentColor = False
       end
       object TableNamesCombo: TComboBox
         Left = 7
-        Height = 29
+        Height = 27
         Top = 20
         Width = 201
         ItemHeight = 0
@@ -132,6 +132,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         MultiSelect = True
         OnDblClick = FieldListDblClick
         ParentShowHint = False
+        ScrollWidth = 202
         ShowHint = True
         TabOrder = 1
         TopIndex = -1
@@ -143,14 +144,15 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Width = 200
         ItemHeight = 0
         OnDblClick = PrimaryKeyListDblClick
+        ScrollWidth = 198
         TabOrder = 2
         TopIndex = -1
       end
     end
     object ExecutePage: TTabSheet
       Caption = 'Procedures'
-      ClientHeight = 300
-      ClientWidth = 226
+      ClientHeight = 298
+      ClientWidth = 224
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
@@ -193,6 +195,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Width = 198
         IntegralHeight = True
         ItemHeight = 0
+        ScrollWidth = 196
         TabOrder = 1
         TopIndex = -1
       end
@@ -203,6 +206,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Width = 198
         IntegralHeight = True
         ItemHeight = 0
+        ScrollWidth = 196
         TabOrder = 2
         TopIndex = -1
       end

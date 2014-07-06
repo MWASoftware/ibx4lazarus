@@ -83,8 +83,6 @@ type
     procedure SetDatabase(Database: TIBDatabase);
   end; 
 
-var
-  IBSelectSQLEditorForm: TIBSelectSQLEditorForm;
 
 function EditSQL(Database: TIBDatabase;  SelectSQL: TStrings): boolean;
 
@@ -239,4 +237,4 @@ begin
 end;
 
 end.
-
+

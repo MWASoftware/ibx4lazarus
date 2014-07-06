@@ -52,6 +52,23 @@ const
   TAB  = #9;
   NULL_TERMINATOR = #0;
 
+  sqlReservedWords: array [0..166] of string = (
+  'ADD','ADMIN','ALL','ALTER','AND','ANY','AS','AT','AVG','BEGIN','BETWEEN','BIGINT','BIT_LENGTH','BLOB','BOTH',
+'BY','CASE','CAST','CHAR','CHAR_LENGTH','CHARACTER','CHARACTER_LENGTH','CHECK','CLOSE','COLLATE','COLUMN',
+'COMMIT','CONNECT','CONSTRAINT','COUNT','CREATE','CROSS','CURRENT','CURRENT_CONNECTION','CURRENT_DATE',
+'CURRENT_ROLE','CURRENT_TIME','CURRENT_TIMESTAMP','CURRENT_TRANSACTION','CURRENT_USER','CURSOR','DATE',
+'DAY','DEC','DECIMAL','DECLARE','DEFAULT','DELETE','DISCONNECT','DISTINCT','DOUBLE','DROP','ELSE','END',
+'ESCAPE','EXECUTE','EXISTS','EXTERNAL','EXTRACT','FETCH','FILTER','FLOAT','FOR','FOREIGN','FROM','FULL',
+'FUNCTION','GDSCODE','GLOBAL','GRANT','GROUP','HAVING','HOUR','IN','INDEX','INNER','INSENSITIVE','INSERT',
+'INT','INTEGER','INTO','IS','JOIN','LEADING','LEFT','LIKE','LONG','LOWER','MAX','MAXIMUM_SEGMENT','MERGE',
+'MIN','MINUTE','MONTH','NATIONAL','NATURAL','NCHAR','NO','NOT','NULL','NUMERIC','OCTET_LENGTH','OF','ON',
+'ONLY','OPEN','OR','ORDER','OUTER','PARAMETER','PLAN','POSITION','POST_EVENT','PRECISION','PRIMARY',
+'PROCEDURE','RDB$DB_KEY','REAL','RECORD_VERSION','RECREATE','RECURSIVE','REFERENCES','RELEASE','RETURNING_VALUES',
+'RETURNS','REVOKE','RIGHT','ROLLBACK','ROW_COUNT','ROWS','SAVEPOINT','SECOND','SELECT','SENSITIVE',
+'SET','SIMILAR','SMALLINT','SOME','SQLCODE','SQLSTATE','START','SUM','TABLE','THEN','TIME',
+'TIMESTAMP','TO','TRAILING','TRIGGER','TRIM','UNION','UNIQUE','UPDATE','UPPER','USER','USING',
+'VALUE','VALUES','VARCHAR','VARIABLE','VARYING','VIEW','WHEN','WHERE','WHILE','WITH','YEAR');
+
 function Max(n1, n2: Integer): Integer;
 function Min(n1, n2: Integer): Integer;
 function RandomString(iLength: Integer): String;
@@ -62,6 +79,8 @@ function FormatIdentifierValue(Dialect: Integer; Value: String): String;
 function FormatIdentifierValueNC(Dialect: Integer; Value: String): String;
 function ExtractIdentifier(Dialect: Integer; Value: String): String;
 function QuoteIdentifier(Dialect: Integer; Value: String): String;
+function QuoteIdentifierIfNeeded(Dialect: Integer; Value: String): String;
+function Space2Underscore(s: string): string;
 
 implementation
 
@@ -176,6 +195,16 @@ begin
   Result := Value;
 end;
 
+function IsReservedWord(w: string): boolean;
+var i: integer;
+begin
+     Result := true;
+     for i := 0 to Length(sqlReservedWords) - 1 do
+         if w = sqlReservedWords[i] then
+            Exit;
+     Result := false;
+end;
+
 function QuoteIdentifier(Dialect: Integer; Value: String): String;
 begin
   if Dialect = 1 then
@@ -184,5 +213,25 @@ begin
     Value := '"' + Value + '"';
   Result := Value;
 end;
+
+function QuoteIdentifierIfNeeded(Dialect: Integer; Value: String): String;
+begin
+  if (Dialect = 3) and
+    ((AnsiUpperCase(Value) <> Value) or IsReservedWord(Value)) then
+     Result := '"' + Value + '"'
+  else
+    Result := Value
+end;
+
+function Space2Underscore(s: string): string;
+var
+   k: integer;
+begin
+     Result := s;
+     for k := 1 to Length(s) do
+         if Result[k] = ' ' then
+            Result[k] := '_';
+end;
+
 
 end.

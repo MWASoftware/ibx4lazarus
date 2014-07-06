@@ -295,123 +295,36 @@ end;
 
 procedure TIBTable.InitFieldDefs;
 var
-  sqlscale: Integer;
+  DidActivate: Boolean;
   Query: TIBSQL;
 begin
   if FTableName = '' then IBError(ibxeNoTableName, [nil]);
-  if (InternalPrepared) then InternalInitFieldDefs else
+  if (InternalPrepared) then
+     InternalInitFieldDefs
+  else
   begin
-    Database.InternalTransaction.StartTransaction;
+    {Get the field defs from a simple query on the table}
+    ActivateConnection;
     Query := TIBSQL.Create(self);
     try
-      Query.GoToFirstRecordOnExecute := False;
-      Query.Database := DataBase;
-      Query.Transaction := Database.InternalTransaction;
-      Query.SQL.Text := 'Select R.RDB$FIELD_NAME, R.RDB$FIELD_POSITION, ' + {do not localize}
-                        'F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, ' + {do not localize}
-                        'F.RDB$NULL_FLAG, ' + {do not localize}
-                        'F.RDB$FIELD_LENGTH, F.RDB$FIELD_SCALE, ' + {do not localize}
-                        'F.RDB$FIELD_TYPE, F.RDB$FIELD_SUB_TYPE, ' + {do not localize}
-                        'F.RDB$EXTERNAL_LENGTH, F.RDB$EXTERNAL_SCALE, F.RDB$EXTERNAL_TYPE ' + {do not localize}
-                        'from RDB$RELATION_FIELDS R, RDB$FIELDS F ' + {do not localize}
-                        'where R.RDB$RELATION_NAME = ' + {do not localize}
-                        '''' +
-                        FormatIdentifierValue(Database.SQLDialect,
-                          QuoteIdentifier(DataBase.SQLDialect, FTableName)) +
-                        ''' ' +
-                        'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '+ {do not localize}
-                        'order by R.RDB$FIELD_POSITION'; {do not localize}
-
-      Query.Prepare;
-      Query.ExecQuery;
-      FieldDefs.BeginUpdate;
-      FieldDefs.Clear;
-      while (not Query.EOF) and (Query.Next <> nil) do
-      begin
-          with FieldDefs.AddFieldDef do
-          begin
- (*           FieldNo := Query.Current.ByName('RDB$FIELD_POSITION').AsInteger; {do not localize}*)
-            Name := TrimRight(Query.Current.ByName('RDB$FIELD_NAME').AsString); {do not localize}
-            case Query.Current.ByName('RDB$FIELD_TYPE').AsInteger of {do not localize}
-              blr_varying, blr_text:
+         Query.Database := DataBase;
+         Query.Transaction := Database.InternalTransaction;
+         DidActivate := false;
+         Query.SQL.Text := 'Select * from ' + QuoteIdentifier(DataBase.SQLDialect, FTableName);
+         with Query.Transaction do
+         begin
+              if not InTransaction then
               begin
-                DataType := ftString;
-                Size := Query.Current.ByName('RDB$FIELD_LENGTH').AsInteger; {do not localize}
+                StartTransaction;
+                DidActivate := true
               end;
-              blr_float, blr_double, blr_d_float: DataType := ftFloat;
-              blr_short:
-              begin
-                sqlscale := Query.Current.ByName('RDB$FIELD_SCALE').AsInteger; {do not localize}
-                if (sqlscale = 0) then
-                  DataType := ftSmallInt
-                else
-                begin
-                  DataType := ftBCD;
-                  Precision := 4;
-                end;
-              end;
-              blr_long:
-              begin
-                sqlscale := Query.Current.ByName('RDB$FIELD_SCALE').AsInteger; {do not localize}
-                if (sqlscale = 0) then
-                  DataType := ftInteger
-                else if (sqlscale >= (-4)) then
-                begin
-                  DataType := ftBCD;
-                  Precision := 9;
-                end
-                else
-                  DataType := ftFloat;
-              end;
-              blr_int64:
-              begin
-                sqlscale := Query.Current.ByName('RDB$FIELD_SCALE').AsInteger; {do not localize}
-                if (sqlscale = 0) then
-                  DataType := ftLargeInt
-                else if (sqlscale >= (-4)) then
-                begin
-                  DataType := ftBCD;
-                  Precision := 18;
-                end
-                else
-                  DataType := ftFloat;
-              end;
-              blr_timestamp: DataType := ftDateTime;
-              blr_sql_time: DataType := ftTime;
-              blr_sql_date: DataType := ftDate;
-              blr_blob:
-                if (Query.Current.ByName('RDB$FIELD_SUB_TYPE').AsInteger = 1) then {do not localize}
-                  DataType := ftMemo
-                else
-                  DataType := ftBlob;
-              blr_quad:
-              begin
-                DataType := ftUnknown;
-                Size := sizeof (TISC_QUAD);
-              end;
-              else
-                DataType := ftUnknown;
-            end;
-            if not (Query.Current.ByName('RDB$COMPUTED_BLR').IsNull) then {do not localize}
-            begin
-              Attributes := [faReadOnly];
-              InternalCalcField := True
-            end
-            else
-              InternalCalcField := False;
-            if ((not InternalCalcField) and
-                 Query.Current.ByName('RDB$DEFAULT_VALUE').IsNull and {do not localize}
-                 (Query.Current.ByName('RDB$NULL_FLAG').AsInteger = 1) )then {do not localize}
-            begin
-              Attributes := [faRequired];
-              Required := True;
-            end;
-          end;
-      end;
-      FieldDefs.EndUpdate;
+         end;
+         Query.Prepare;
+         if DidActivate then
+            Query.Transaction.Rollback;
+         FieldDefsFromQuery(Query);
     finally
-      Query.free;
-      Database.InternalTransaction.Commit;
+         Query.Free;
     end;
   end;
 end;
@@ -645,6 +558,8 @@ var
   Opts: TIndexOptions;
   Flds: string;
   Query, SubQuery: TIBSQL;
+  fn: string;
+  aField: TFieldDef;
 begin
   if not (csReading in ComponentState) then begin
   if not Active and not FSwitchingIndex  then
@@ -677,7 +592,14 @@ begin
         if Query.Current.ByName('RDB$INDEX_TYPE').AsInteger = 2  then Include(Opts, ixDescending); {do not localize}
         Options := Opts;
         if (Query.Current.ByName('RDB$SEGMENT_COUNT').AsInteger = 1) then {do not localize}
-          Fields := Trim(Query.Current.ByName('RDB$FIELD_NAME').AsString) {do not localize}
+        begin
+          fn := Trim(Query.Current.ByName('RDB$FIELD_NAME').AsString); {do not localize}
+          aField := GetFieldDefFromAlias(fn);
+          if assigned(aField) then
+             Fields := aField.Name
+          else
+              Fields := fn;
+        end
         else begin
           SubQuery := TIBSQL.Create(self);
         try
@@ -695,11 +617,15 @@ begin
           Flds := '';
           while (not SubQuery.EOF) and (SubQuery.Next <> nil) do
           begin
+            fn := TrimRight(SubQuery.Current.ByName('RDB$FIELD_NAME').AsString); {do not localize}
+            aField := GetFieldDefFromAlias(fn);
+            if assigned(aField) then
+               fn := aField.Name;
             if (Flds = '') then
-              Flds := TrimRight(SubQuery.Current.ByName('RDB$FIELD_NAME').AsString) {do not localize}
+               Flds := fn
             else begin
               Query.Next;
-              Flds := Flds + ';' + TrimRight(SubQuery.Current[0].AsString);
+              Flds := Flds + ';' + fn;
             end;
           end;
           Fields := Flds;
@@ -1299,6 +1225,8 @@ var
   SQL: TStrings;
   OrderByStr: string;
   bWhereClausePresent: Boolean;
+  fn: string;
+  aField: TFieldDef;
 begin
   bWhereClausePresent := False;
   Database.CheckActive;
@@ -1334,10 +1262,13 @@ begin
     begin
       if i > 0 then
         SQL.Text := SQL.Text + 'AND ';
+      aField := FieldDefs.Find(FDetailFieldsList.Strings[i]);
+      if assigned(aField) then
+         fn := GetDBAliasName(aField.FieldNo)
+      else
+          fn := FDetailFieldsList.Strings[i]; {something wrong if we get here - but should word}
       SQL.Text := SQL.Text +
-        QuoteIdentifier(DataBase.SQLDialect, FDetailFieldsList.Strings[i]) +
-        ' = :' +
-        QuoteIdentifier(DataBase.SQLDialect, FMasterFieldsList.Strings[i]);
+        QuoteIdentifier(DataBase.SQLDialect, fn) + ' = :' + FMasterFieldsList.Strings[i];
     end;
   end;
   if OrderByStr <> '' then
@@ -1375,17 +1306,14 @@ var
               WhereAllFieldList := WhereAllFieldList + ' AND ';
           end;
           InsertFieldList := InsertFieldList +
-            QuoteIdentifier(DataBase.SQLDialect, Name);
-          InsertParamList := InsertParamList + ':' +
-            QuoteIdentifier(DataBase.SQLDialect, Name);
+            QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo));
+          InsertParamList := InsertParamList + ':' +  Name;
           UpdateFieldList := UpdateFieldList +
-            QuoteIdentifier(DataBase.SQLDialect, Name) +
-            ' = :' +
-            QuoteIdentifier(DataBase.SQLDialect, Name);
+            QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo)) +
+            ' = :' + Name;
           if (DataType <> ftBlob) and (DataType <>ftMemo) then
             WhereAllFieldList := WhereAllFieldList +
-              QuoteIdentifier(DataBase.SQLDialect, Name) + ' = :' +
-              QuoteIdentifier(DataBase.SQLDialect, Name);{do not localize}
+              QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo)) + ' = :' +  Name;
         end;
       end;
     end;
@@ -1394,14 +1322,20 @@ var
   procedure GenerateWherePrimaryFieldList;
   var
     i: Integer;
-    tmp: String;
+    tmp, fn: String;
+    aField: TFieldDef;
   begin
     i := 1;
     while i <= Length(FPrimaryIndexFields) do
     begin
       tmp := ExtractFieldName(FPrimaryIndexFields, i);
+      aField := FieldDefs.Find(tmp);
+      if assigned(aField) then
+         fn := GetDBAliasName(aField.FieldNo)
+      else
+         fn := tmp; {something wrong if we get here - but will work in most cases}
       tmp :=
-        QuoteIdentifier(DataBase.SQLDialect, tmp) +  ' = :' +
+        QuoteIdentifier(DataBase.SQLDialect, fn) +  ' = :' +
         QuoteIdentifier(DataBase.SQLDialect, tmp);{do not localize}
       if WherePrimaryFieldList <> '' then
         WherePrimaryFieldList :=
@@ -1527,4 +1461,4 @@ begin
   end;
 end;
 
-end.
+end.

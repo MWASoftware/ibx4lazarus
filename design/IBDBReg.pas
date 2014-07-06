@@ -56,7 +56,8 @@ interface
 
 uses {Windows,} SysUtils, Classes, Graphics, Dialogs, Controls, Forms, TypInfo,
      DB, IBTable, IBDatabase,  IBEventsEditor,  LazarusPackageIntf,
-      IBUpdateSQL, IBXConst, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor;
+      IBUpdateSQL, IBXConst, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor,
+     dbFieldLinkPropEditor;
 
 type
 
@@ -184,11 +185,14 @@ type
   public
     procedure Edit; override;
   end;
- (*
+
+  { TIBTableFieldLinkProperty }
+
   TIBTableFieldLinkProperty = class(TFieldLinkProperty)
   private
     FTable: TIBTable;
   protected
+    function GetIndexDefs: TIndexDefs; override;
     function GetIndexFieldNames: string; override;
     function GetMasterFields: string; override;
     procedure SetIndexFieldNames(const Value: string); override;
@@ -196,7 +200,7 @@ type
   public
     procedure Edit; override;
   end;
-*)
+
 { TSQLPropertyEditor }
 
   TSQLPropertyEditor = class(TStringsPropertyEditor)
@@ -355,7 +359,7 @@ begin
   RegisterPropertyEditor(TypeInfo(string), TIBTable, 'TableName', TIBTableNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBTable, 'IndexName', TIBIndexNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBTable, 'IndexFieldNames', TIBIndexFieldNamesProperty); {do not localize}
-//  RegisterPropertyEditor(TypeInfo(string), TIBTable, 'MasterFields', TIBTableFieldLinkProperty); {do not localize}
+  RegisterPropertyEditor(TypeInfo(string), TIBTable, 'MasterFields', TIBTableFieldLinkProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBQuery, 'SQL', TIBQuerySQLProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBDataSet, 'SelectSQL', TIBDatasetSQLProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBDataSet, 'ModifySQL', TIBUpdateSQLProperty); {do not localize}
@@ -801,13 +805,19 @@ begin
   end;
   inherited Edit;
 end;
-(*
+
 { TIBTableFieldLinkProperty }
 
 procedure TIBTableFieldLinkProperty.Edit;
 begin
   FTable := DataSet as TIBTable;
+  FTable.Database.Connected := true;
   inherited Edit;
+end;
+
+ function TIBTableFieldLinkProperty.GetIndexDefs: TIndexDefs;
+begin
+  Result :=  FTable.IndexDefs
 end;
 
 function TIBTableFieldLinkProperty.GetIndexFieldNames: string;
@@ -828,7 +838,7 @@ end;
 procedure TIBTableFieldLinkProperty.SetMasterFields(const Value: string);
 begin
   FTable.MasterFields := Value;
-end;*)
+end;
 
 { TIBUpdateSQLProperty }
 
@@ -968,4 +978,4 @@ end;
 
 initialization
   {$I IBDBReg.lrs}
-end.
+end.

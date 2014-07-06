@@ -67,6 +67,7 @@ type
 
     procedure DefineProperties(Filer: TFiler); override;
     procedure SetFiltered(Value: Boolean); override;
+    procedure InitFieldDefs; override;
     function GetParamsCount: Word;
     procedure SetPrepared(Value: Boolean);
     procedure SetPrepare(Value: Boolean);
@@ -199,13 +200,46 @@ begin
     inherited SetFiltered(value);
 end;
 
+ procedure TIBStoredProc.InitFieldDefs;
+begin
+  if SelectSQL.Text = '' then
+     GenerateSQL;
+  inherited InitFieldDefs;
+end;
+
 procedure TIBStoredProc.GenerateSQL;
+
+var Params: TStringList;
+
+  function FormatParameter(Dialect: Integer; Value: String): String;
+  var j: integer;
+  begin
+    Value := Trim(Value);
+    if Dialect = 1 then
+       Result := AnsiUpperCase(Value)
+    else
+    begin
+      j := 0;
+      Value := Space2Underscore(AnsiUpperCase(Value));
+      Result := Value;
+      while Params.IndexOf(Result) <> -1 do
+      begin
+        Result := Value + IntToStr(j);
+        Inc(j)
+      end;
+      Params.Add(Result)
+    end;
+  end;
+
 var
   Query : TIBSQL;
   input : string;
 begin
+  if FProcName = '' then
+     IBError(ibxeNoStoredProcName,[nil]);
   ActivateConnection;
   Database.InternalTransaction.StartTransaction;
+  Params := TStringList.Create;
   Query := TIBSQL.Create(self);
   try
     Query.Database := DataBase;
@@ -222,15 +256,16 @@ begin
       if (Query.Current.ByName('RDB$PARAMETER_TYPE').AsInteger = 0) then begin {do not localize}
         if (input <> '') then
           input := input + ', :' +
-            FormatIdentifier(Database.SQLDialect, Query.Current.ByName('RDB$PARAMETER_NAME').AsString) else {do not localize}
+            FormatParameter(Database.SQLDialect, Query.Current.ByName('RDB$PARAMETER_NAME').AsString) else {do not localize}
           input := ':' +
-            FormatIdentifier(Database.SQLDialect, Query.Current.ByName('RDB$PARAMETER_NAME').AsString); {do not localize}
+            FormatParameter(Database.SQLDialect, Query.Current.ByName('RDB$PARAMETER_NAME').AsString); {do not localize}
       end
     end;
     SelectSQL.Text := 'Execute Procedure ' + {do not localize}
-                FormatIdentifier(Database.SQLDialect, FProcName) + ' ' + input;
+                FormatParameter(Database.SQLDialect, FProcName) + ' ' + input;
   finally
     Query.Free;
+    Params.Free;
     Database.InternalTransaction.Commit;
   end;
 end;

@@ -53,8 +53,6 @@ type
        UseOldValues: boolean = false);
     procedure GetProcParams(ProcName: string; ParamList: TStrings; InputParams: boolean); overload;
     function GetWord(S: string; WordNo: integer): string;
-    function QuoteIfNeeded(fieldName: string): string;
-    function IsReservedWord(w: string): boolean;
  public
     constructor Create;
     destructor Destroy; override;
@@ -83,7 +81,7 @@ type
 
 implementation
 
-uses IB, Dialogs;
+uses IB, Dialogs, IBUtils;
 
 { TIBSystemTables }
 
@@ -137,23 +135,6 @@ const
 
   sqlGETPROCEDUREINFO = 'Select RDB$PROCEDURE_TYPE From RDB$PROCEDURES Where Upper(Trim(RDB$PROCEDURE_NAME)) = Upper(:ProcName)';
 
-  sqlReservedWords: array [0..166] of string = (
-  'ADD','ADMIN','ALL','ALTER','AND','ANY','AS','AT','AVG','BEGIN','BETWEEN','BIGINT','BIT_LENGTH','BLOB','BOTH',
-'BY','CASE','CAST','CHAR','CHAR_LENGTH','CHARACTER','CHARACTER_LENGTH','CHECK','CLOSE','COLLATE','COLUMN',
-'COMMIT','CONNECT','CONSTRAINT','COUNT','CREATE','CROSS','CURRENT','CURRENT_CONNECTION','CURRENT_DATE',
-'CURRENT_ROLE','CURRENT_TIME','CURRENT_TIMESTAMP','CURRENT_TRANSACTION','CURRENT_USER','CURSOR','DATE',
-'DAY','DEC','DECIMAL','DECLARE','DEFAULT','DELETE','DISCONNECT','DISTINCT','DOUBLE','DROP','ELSE','END',
-'ESCAPE','EXECUTE','EXISTS','EXTERNAL','EXTRACT','FETCH','FILTER','FLOAT','FOR','FOREIGN','FROM','FULL',
-'FUNCTION','GDSCODE','GLOBAL','GRANT','GROUP','HAVING','HOUR','IN','INDEX','INNER','INSENSITIVE','INSERT',
-'INT','INTEGER','INTO','IS','JOIN','LEADING','LEFT','LIKE','LONG','LOWER','MAX','MAXIMUM_SEGMENT','MERGE',
-'MIN','MINUTE','MONTH','NATIONAL','NATURAL','NCHAR','NO','NOT','NULL','NUMERIC','OCTET_LENGTH','OF','ON',
-'ONLY','OPEN','OR','ORDER','OUTER','PARAMETER','PLAN','POSITION','POST_EVENT','PRECISION','PRIMARY',
-'PROCEDURE','RDB$DB_KEY','REAL','RECORD_VERSION','RECREATE','RECURSIVE','REFERENCES','RELEASE','RETURNING_VALUES',
-'RETURNS','REVOKE','RIGHT','ROLLBACK','ROW_COUNT','ROWS','SAVEPOINT','SECOND','SELECT','SENSITIVE',
-'SET','SIMILAR','SMALLINT','SOME','SQLCODE','SQLSTATE','START','SUM','TABLE','THEN','TIME',
-'TIMESTAMP','TO','TRAILING','TRIGGER','TRIM','UNION','UNIQUE','UPDATE','UPPER','USER','USING',
-'VALUE','VALUES','VARCHAR','VARIABLE','VARYING','VIEW','WHEN','WHERE','WHILE','WITH','YEAR');
-
 function TIBSystemTables.GetSQLType(SQLType: TIBSQLTypes): string;
 begin
   case SQLType of
@@ -202,7 +183,7 @@ begin
         WhereClause := WhereClause + Separator + '"' + FGetPrimaryKeys.FieldByName('ColumnName').AsString +
                '" = ' + Prefix+ AnsiUpperCase(FGetPrimaryKeys.FieldByName('ColumnName').AsString)
       else
-        WhereClause := WhereClause + Separator + QuoteIfNeeded(FGetPrimaryKeys.FieldByName('ColumnName').AsString) +
+        WhereClause := WhereClause + Separator + QuoteIdentifierIfNeeded(FGetFieldNames.Database.SQLDialect,FGetPrimaryKeys.FieldByName('ColumnName').AsString) +
                ' = ' + Prefix + AnsiUpperCase(FGetPrimaryKeys.FieldByName('ColumnName').AsString);
       Separator := ' AND A.';
       FGetPrimaryKeys.Next
@@ -279,25 +260,6 @@ begin
     end
   end;
 end;
-
- function TIBSystemTables.QuoteIfNeeded(fieldName: string): string;
-begin
-  if (FGetFieldNames.Database.SQLDialect = 3) and
-    ((AnsiUpperCase(fieldName) <> fieldName) or IsReservedWord(fieldName)) then
-     Result := '"' + fieldName + '"'
-  else
-    Result := fieldName
-end;
-
- function TIBSystemTables.IsReservedWord(w: string): boolean;
- var i: integer;
- begin
-      Result := true;
-      for i := 0 to Length(sqlReservedWords) - 1 do
-          if w = sqlReservedWords[i] then
-             Exit;
-      Result := false;
- end;
 
 constructor TIBSystemTables.Create;
 begin
@@ -568,7 +530,7 @@ begin
     if QuotedStrings then
       SelectSQL := SelectSQL + Separator + '"' + FieldNames[I] + '"'
     else
-      SelectSQL := SelectSQL + Separator + QuoteIfNeeded(FieldNames[I]);
+      SelectSQL := SelectSQL + Separator + QuoteIdentifierIfNeeded(FGetFieldNames.Database.SQLDialect,FieldNames[I]);
     Separator := ', A.';
   end;
   SelectSQL := SelectSQL + ' From ' + TableName + ' A';
@@ -595,7 +557,7 @@ begin
       if QuotedStrings then
          InsertSQL := InsertSQL + Separator + '"' + FieldNames[I] + '"'
       else
-         InsertSQL := InsertSQL + Separator +  QuoteIfNeeded(FieldNames[I]) ;
+         InsertSQL := InsertSQL + Separator +  QuoteIdentifierIfNeeded(FGetFieldNames.Database.SQLDialect,FieldNames[I]) ;
       Separator := ', ';
     end;
   InsertSQL := InsertSQL + ')';
@@ -625,7 +587,7 @@ begin
       if QuotedStrings then
         UpdateSQL := UpdateSQL + Separator + '"' + FieldNames[I] + '" = :' + AnsiUpperCase(FieldNames[I])
       else
-        UpdateSQL := UpdateSQL + Separator + QuoteIfNeeded(FieldNames[I]) + ' = :' + AnsiUpperCase(FieldNames[I]);
+        UpdateSQL := UpdateSQL + Separator + QuoteIdentifierIfNeeded(FGetFieldNames.Database.SQLDialect,FieldNames[I]) + ' = :' + AnsiUpperCase(FieldNames[I]);
       Separator := ','#$0d#$0a'  A.';
     end;
   SQL.Add(UpdateSQL);
@@ -655,7 +617,7 @@ begin
       if QuotedStrings then
         SQL := SQL + Separator + '"' + OutputParams[I] + '"'
       else
-        SQL := SQL + Separator + QuoteIfNeeded(OutputParams[I]);
+        SQL := SQL + Separator + QuoteIdentifierIfNeeded(FGetFieldNames.Database.SQLDialect,OutputParams[I]);
       Separator := ', ';
     end;
     SQL := SQL + ' From ' + ProcName;
@@ -675,7 +637,7 @@ begin
     if QuotedStrings then
       SQL := 'Execute Procedure "' + ProcName + '"'
     else
-      SQL := 'Execute Procedure ' + QuoteIfNeeded(ProcName);
+      SQL := 'Execute Procedure ' + QuoteIdentifierIfNeeded(FGetFieldNames.Database.SQLDialect,ProcName);
     if InputParams.Count > 0 then
     begin
       Separator := ' :';
