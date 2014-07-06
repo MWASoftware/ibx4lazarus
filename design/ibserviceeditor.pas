@@ -139,9 +139,13 @@ begin
     end;
     tempService.Params.Assign(ServiceParams.Lines);
     tempService.LoginPrompt := true;
-    tempService.Active := true;
-    ShowMessage('Successful Connection');
-    tempService.Active := false;
+    try
+      tempService.Active := true;
+      ShowMessage('Successful Connection');
+      tempService.Active := false;
+    except on E: Exception do
+      ShowMessage(E.Message)
+    end;
   finally
     tempService.Free;
     Test.Enabled := true;
@@ -244,4 +248,4 @@ end;
 
 
 end.
-
+

@@ -96,6 +96,8 @@ type
   { TDBStringProperty }
 
   TDBStringProperty = class(TStringProperty)
+  private
+    function ConnecttoDB: boolean;
   public
     function GetAttributes: TPropertyAttributes; override;
     procedure GetValueList(List: TStrings); virtual;
@@ -472,16 +474,34 @@ end;
 
 procedure TIBTableNameProperty.GetValues(Proc: TGetStrProc);
 var
-   TableName : TIBTable;
+   Table : TIBTable;
    i : integer;
 begin
-  TableName := GetComponent(0) as TIBTable;
-  with TableName do
+  Table := GetComponent(0) as TIBTable;
+   if Table.Database = nil then
+      Exit;
+  with Table do
     for I := 0 to TableNames.Count - 1 do
       Proc (TableNames[i]);
 end;
 
 { TDBStringProperty }
+
+ function TDBStringProperty.ConnecttoDB: boolean;
+ var DataSet: TIBCustomDataSet;
+begin
+  Result := false;
+  DataSet := (GetComponent(0) as TIBCustomDataSet);
+  if assigned(Dataset.Database) then
+  begin
+    try
+      DataSet.Database.Connected := true;
+    except on E: Exception do
+      ShowMessage(E.Message)
+    end;
+    Result := DataSet.Database.Connected
+  end;
+end;
 
 function TDBStringProperty.GetAttributes: TPropertyAttributes;
 begin
@@ -497,6 +517,7 @@ var
   I: Integer;
   Values: TStringList;
 begin
+  if not ConnecttoDB then Exit;
   Values := TStringList.Create;
   try
     GetValueList(Values);
@@ -506,16 +527,10 @@ begin
   end;
 end;
 
- procedure TDBStringProperty.Edit;
- var DataSet: TDBDataSet;
+procedure TDBStringProperty.Edit;
 begin
-  DataSet := (GetComponent(0) as TDBDataSet);
-  if assigned(Dataset.Database) then
-  try
-     DataSet.Database.Connected := true;
-     inherited Edit;
-  except
-  end;
+  if ConnecttoDB then
+    inherited Edit;
 end;
 
 { Utility Functions }

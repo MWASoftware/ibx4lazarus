@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 743
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '0.9.30.1'
+  LCLVersion = '1.2.2.0'
   object DBGrid1: TDBGrid
     Left = 8
     Height = 375
@@ -124,11 +124,11 @@ object Form1: TForm1
     AfterDelete = IBQuery1AfterDelete
     AfterOpen = IBQuery1AfterOpen
     BeforeClose = IBQuery1BeforeClose
-    BeforeOpen = IBQuery1BeforeOpen
     OnDeleteError = IBQuery1PostError
     OnPostError = IBQuery1PostError
     BufferChunks = 1000
     CachedUpdates = False
+    GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
       'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME From EMPLOYEE A'
@@ -234,35 +234,34 @@ object Form1: TForm1
       Required = True
       Size = 15
     end
-    object IBQuery1SALARY: TIBBCDField
-      DisplayWidth = 18
-      FieldKind = fkData
-      FieldName = 'SALARY'
-      Index = 9
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = True
-      OnGetText = IBQuery1SALARYGetText
-      Precision = 18
-      Currency = False
-      MaxValue = 0
-      MinValue = 0
-      Size = 2
-    end
     object IBQuery1FULL_NAME: TIBStringField
       DisplayWidth = 37
       FieldKind = fkData
       FieldName = 'FULL_NAME'
-      Index = 10
+      Index = 9
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = True
       Required = False
       Size = 37
     end
+    object IBQuery1SALARY: TIBBCDField
+      DisplayWidth = 18
+      FieldKind = fkData
+      FieldName = 'SALARY'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Precision = 18
+      Currency = False
+      MaxValue = 0
+      MinValue = 0
+      Size = 2
+    end
   end
-  object Datasource1: TDatasource
+  object Datasource1: TDataSource
     DataSet = IBQuery1
     left = 672
     top = 296

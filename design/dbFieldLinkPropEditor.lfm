@@ -42,8 +42,8 @@ object FieldLinkEditor: TFieldLinkEditor
     Left = 20
     Height = 15
     Top = 28
-    Width = 71
-    Caption = 'Detail Fields'
+    Width = 109
+    Caption = 'Detail Index Fields'
     ParentColor = False
   end
   object DetailedFieldListBox: TListBox

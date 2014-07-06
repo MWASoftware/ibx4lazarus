@@ -14,6 +14,7 @@ type
 
   TForm1 = class(TForm)
     CancelChanges: TAction;
+    IBQuery1SALARY: TIBBCDField;
     IBUpdateSQL1: TIBUpdateSQL;
     SaveChanges: TAction;
     DeleteEmployee: TAction;
@@ -39,7 +40,6 @@ type
     IBQuery1JOB_GRADE: TSmallintField;
     IBQuery1LAST_NAME: TIBStringField;
     IBQuery1PHONE_EXT: TIBStringField;
-    IBQuery1SALARY: TIBBCDField;
     IBTransaction1: TIBTransaction;
     procedure AddEmployeeExecute(Sender: TObject);
     procedure CancelChangesExecute(Sender: TObject);
@@ -55,7 +55,6 @@ type
     procedure IBQuery1AfterOpen(DataSet: TDataSet);
     procedure IBQuery1AfterTransactionEnd(Sender: TObject);
     procedure IBQuery1BeforeClose(DataSet: TDataSet);
-    procedure IBQuery1BeforeOpen(DataSet: TDataSet);
     procedure IBQuery1PostError(DataSet: TDataSet; E: EDatabaseError;
       var DataAction: TDataAction);
     procedure IBQuery1SALARYGetText(Sender: TField; var aText: string;
@@ -217,10 +216,6 @@ end;
 procedure TForm1.IBQuery1BeforeClose(DataSet: TDataSet);
 begin
   FLastEmp_no := DataSet.FieldByName('Emp_no').AsInteger
-end;
-
-procedure TForm1.IBQuery1BeforeOpen(DataSet: TDataSet);
-begin
 end;
 
 procedure TForm1.IBQuery1PostError(DataSet: TDataSet; E: EDatabaseError;

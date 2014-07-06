@@ -426,7 +426,7 @@ uses IBIntf, IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
 
 { TIBDatabase }
 
-constructor TIBDatabase.Create(AOwner: TComponent);
+ constructor TIBDataBase.Create(AOwner: TComponent);
 {$ifdef WINDOWS}
 var acp: uint;
 {$endif}
@@ -472,7 +472,7 @@ begin
   CheckStreamConnect;
 end;
 
-destructor TIBDatabase.Destroy;
+ destructor TIBDataBase.Destroy;
 var
   i: Integer;
 begin
@@ -498,8 +498,8 @@ begin
   inherited Destroy;
 end;
 
-function TIBDatabase.Call(ErrCode: ISC_STATUS;
-  RaiseError: Boolean): ISC_STATUS;
+ function TIBDataBase.Call(ErrCode: ISC_STATUS; RaiseError: Boolean
+   ): ISC_STATUS;
 begin
   result := ErrCode;
   FCanTimeout := False;
@@ -507,7 +507,7 @@ begin
     IBDataBaseError;
 end;
 
-procedure TIBDatabase.CheckActive;
+ procedure TIBDataBase.CheckActive;
 begin
   if StreamedConnected and (not Connected) then
     Loaded;
@@ -515,7 +515,7 @@ begin
     IBError(ibxeDatabaseClosed, [nil]);
 end;
 
-procedure TIBDatabase.EnsureInactive;
+ procedure TIBDataBase.EnsureInactive;
 begin
   if csDesigning in ComponentState then
   begin
@@ -524,19 +524,19 @@ begin
   end
 end;
 
-procedure TIBDatabase.CheckInactive;
+ procedure TIBDataBase.CheckInactive;
 begin
   if FHandle <> nil then
     IBError(ibxeDatabaseOpen, [nil]);
 end;
 
-procedure TIBDatabase.CheckDatabaseName;
+ procedure TIBDataBase.CheckDatabaseName;
 begin
   if (FDBName = '') then
     IBError(ibxeDatabaseNameMissing, [nil]);
 end;
 
-function TIBDatabase.AddSQLObject(ds: TIBBase): Integer;
+ function TIBDataBase.AddSQLObject(ds: TIBBase): Integer;
 begin
   result := 0;
   if (ds.Owner is TIBCustomDataSet) then
@@ -549,7 +549,7 @@ begin
     FSQLObjects[result] := ds;
 end;
 
-function TIBDatabase.AddTransaction(TR: TIBTransaction): Integer;
+ function TIBDataBase.AddTransaction(TR: TIBTransaction): Integer;
 begin
   result := FindTransaction(TR);
   if result <> -1 then
@@ -566,14 +566,14 @@ begin
     FTransactions[result] := TR;
 end;
 
-procedure TIBDatabase.DoDisconnect;
+ procedure TIBDataBase.DoDisconnect;
 begin
   if Connected then
     InternalClose(False);
   FDBSQLDialect := 1;
 end;
 
-procedure TIBDatabase.CreateDatabase;
+ procedure TIBDataBase.CreateDatabase;
 var
   tr_handle: TISC_TR_HANDLE;
 begin
@@ -586,24 +586,24 @@ begin
     True);
 end;
 
-procedure TIBDatabase.DropDatabase;
+ procedure TIBDataBase.DropDatabase;
 begin
   CheckActive;
   Call(isc_drop_database(StatusVector, @FHandle), True);
 end;
 
-procedure TIBDatabase.DBParamsChange(Sender: TObject);
+ procedure TIBDataBase.DBParamsChange(Sender: TObject);
 begin
   FDBParamsChanged := True;
 end;
 
-procedure TIBDatabase.DBParamsChanging(Sender: TObject);
+ procedure TIBDataBase.DBParamsChanging(Sender: TObject);
 begin
   EnsureInactive;
   CheckInactive;
 end;
 
-function TIBDatabase.FindTransaction(TR: TIBTransaction): Integer;
+ function TIBDataBase.FindTransaction(TR: TIBTransaction): Integer;
 var
   i: Integer;
 begin
@@ -616,7 +616,7 @@ begin
     end;
 end;
 
-function TIBDatabase.FindDefaultTransaction(): TIBTransaction;
+ function TIBDataBase.FindDefaultTransaction: TIBTransaction;
 var
   i: Integer;
 begin
@@ -634,23 +634,23 @@ begin
   end;
 end;
 
-procedure TIBDatabase.ForceClose;
+ procedure TIBDataBase.ForceClose;
 begin
   if Connected then
     InternalClose(True);
 end;
 
-function TIBDatabase.GetConnected: Boolean;
+ function TIBDataBase.GetConnected: Boolean;
 begin
   result := FHandle <> nil;
 end;
 
-function TIBDatabase.GetSQLObject(Index: Integer): TIBBase;
+ function TIBDataBase.GetSQLObject(Index: Integer): TIBBase;
 begin
   result := FSQLObjects[Index];
 end;
 
-function TIBDatabase.GetSQLObjectCount: Integer;
+ function TIBDataBase.GetSQLObjectCount: Integer;
 var
   i: Integer;
 begin
@@ -659,7 +659,7 @@ begin
     Inc(result);
 end;
 
-function TIBDatabase.GetDBParamByDPB(const Idx: Integer): String;
+ function TIBDataBase.GetDBParamByDPB( const Idx: Integer): String;
 var
   ConstIdx, EqualsIdx: Integer;
 begin
@@ -682,17 +682,17 @@ begin
     result := '';
 end;
 
-function TIBDatabase.GetIdleTimer: Integer;
+ function TIBDataBase.GetIdleTimer: Integer;
 begin
   result := FTimer.Interval;
 end;
 
-function TIBDatabase.GetTransaction(Index: Integer): TIBTransaction;
+ function TIBDataBase.GetTransaction(Index: Integer): TIBTransaction;
 begin
   result := FTransactions[Index];
 end;
 
-function TIBDatabase.GetTransactionCount: Integer;
+ function TIBDataBase.GetTransactionCount: Integer;
 var
   i: Integer;
 begin
@@ -702,7 +702,7 @@ begin
       Inc(result);
 end;
 
-function TIBDatabase.IndexOfDBConst(st: String): Integer;
+ function TIBDataBase.IndexOfDBConst(st: String): Integer;
 var
   i, pos_of_str: Integer;
 begin
@@ -718,7 +718,7 @@ begin
   end;
 end;
 
-procedure TIBDatabase.InternalClose(Force: Boolean);
+ procedure TIBDataBase.InternalClose(Force: Boolean);
 var
   i: Integer;
 begin
@@ -797,8 +797,8 @@ begin
   end;
 end;
 
-procedure TIBDatabase.Notification( AComponent: TComponent;
-                                        Operation: TOperation);
+ procedure TIBDataBase.Notification(AComponent: TComponent;
+   Operation: TOperation);
 var
   i: Integer;
 begin
@@ -812,7 +812,7 @@ begin
   end;
 end;
 
-function TIBDatabase.Login: Boolean;
+ function TIBDataBase.Login: Boolean;
 var
   IndexOfUser, IndexOfPassword: Integer;
   Username, Password, OldPassword: String;
@@ -891,7 +891,7 @@ begin
   end;
 end;
 
-procedure TIBDatabase.DoConnect;
+ procedure TIBDataBase.DoConnect;
 var
   DPB: String;
   TempDBParams: TStrings;
@@ -946,7 +946,7 @@ begin
     MonitorHook.DBConnect(Self);
 end;
 
-procedure TIBDatabase.RemoveSQLObject(Idx: Integer);
+ procedure TIBDataBase.RemoveSQLObject(Idx: Integer);
 var
   ds: TIBBase;
 begin
@@ -960,7 +960,7 @@ begin
   end;
 end;
 
-procedure TIBDatabase.RemoveSQLObjects;
+ procedure TIBDataBase.RemoveSQLObjects;
 var
   i: Integer;
 begin
@@ -972,7 +972,7 @@ begin
   end;
 end;
 
-procedure TIBDatabase.RemoveTransaction(Idx: Integer);
+ procedure TIBDataBase.RemoveTransaction(Idx: Integer);
 var
   TR: TIBTransaction;
 begin
@@ -986,7 +986,7 @@ begin
   end;
 end;
 
-procedure TIBDatabase.RemoveTransactions;
+ procedure TIBDataBase.RemoveTransactions;
 var
   i: Integer;
 begin
@@ -994,7 +994,7 @@ begin
     RemoveTransaction(i);
 end;
 
-procedure TIBDatabase.SetDatabaseName(const Value: TIBFileName);
+ procedure TIBDataBase.SetDatabaseName( const Value: TIBFileName);
 begin
   if FDBName <> Value then
   begin
@@ -1004,7 +1004,7 @@ begin
   end;
 end;
 
-procedure TIBDatabase.SetDBParamByDPB(const Idx: Integer; Value: String);
+ procedure TIBDataBase.SetDBParamByDPB( const Idx: Integer; Value: String);
 var
   ConstIdx: Integer;
 begin
@@ -1023,12 +1023,12 @@ begin
   end;
 end;
 
-procedure TIBDatabase.SetDBParams(Value: TStrings);
+ procedure TIBDataBase.SetDBParams(Value: TStrings);
 begin
   FDBParams.Assign(Value);
 end;
 
-procedure TIBDatabase.SetDefaultTransaction(Value: TIBTransaction);
+ procedure TIBDataBase.SetDefaultTransaction(Value: TIBTransaction);
 var
   i: Integer;
 begin
@@ -1046,7 +1046,7 @@ begin
   FDefaultTransaction := Value;
 end;
 
-procedure TIBDatabase.SetHandle(Value: TISC_DB_HANDLE);
+ procedure TIBDataBase.SetHandle(Value: TISC_DB_HANDLE);
 begin
   if HandleIsShared then
     Close
@@ -1056,7 +1056,7 @@ begin
   FHandleIsShared := (Value <> nil);
 end;
 
-procedure TIBDatabase.SetIdleTimer(Value: Integer);
+ procedure TIBDataBase.SetIdleTimer(Value: Integer);
 begin
   if Value < 0 then
     IBError(ibxeTimeoutNegative, [nil])
@@ -1075,7 +1075,7 @@ begin
       end;
 end;
 
-function TIBDatabase.TestConnected: Boolean;
+ function TIBDataBase.TestConnected: Boolean;
 var
   DatabaseInfo: TIBDatabaseInfo;
 begin
@@ -1096,7 +1096,7 @@ begin
   end;
 end;
 
-procedure TIBDatabase.TimeoutConnection(Sender: TObject);
+ procedure TIBDataBase.TimeoutConnection(Sender: TObject);
 begin
   if Connected then
   begin
@@ -1111,7 +1111,7 @@ begin
   end;
 end;
 
-function TIBDatabase.GetIsReadOnly: Boolean;
+ function TIBDataBase.GetIsReadOnly: Boolean;
 var
   DatabaseInfo: TIBDatabaseInfo;
 begin
@@ -1129,13 +1129,13 @@ begin
   DatabaseInfo.Free;
 end;
 
-function TIBDatabase.GetSQLDialect: Integer;
+ function TIBDataBase.GetSQLDialect: Integer;
 begin
   Result := FSQLDialect;
 end;
 
 
-procedure TIBDatabase.SetSQLDialect(const Value: Integer);
+ procedure TIBDataBase.SetSQLDialect( const Value: Integer);
 begin
   if (Value < 1) then IBError(ibxeSQLDialectInvalid, [nil]);
   if ((FHandle = nil) or (Value <= FDBSQLDialect))  then
@@ -1144,7 +1144,7 @@ begin
     IBError(ibxeSQLDialectInvalid, [nil]);
 end;
 
-function TIBDatabase.GetDBSQLDialect: Integer;
+ function TIBDataBase.GetDBSQLDialect: Integer;
 var
   DatabaseInfo: TIBDatabaseInfo;
 begin
@@ -1154,7 +1154,7 @@ begin
   DatabaseInfo.Free;
 end;
 
-procedure TIBDatabase.ValidateClientSQLDialect;
+ procedure TIBDataBase.ValidateClientSQLDialect;
 begin
   if (FDBSQLDialect < FSQLDialect) then
   begin
@@ -1164,7 +1164,7 @@ begin
   end;
 end;
 
-procedure TIBDatabase.ApplyUpdates(const DataSets: array of TDataSet);
+ procedure TIBDataBase.ApplyUpdates( const DataSets: array of TDataSet);
 var
   I: Integer;
   DS: TIBCustomDataSet;
@@ -1190,7 +1190,7 @@ begin
   TR.CommitRetaining;
 end;
 
-procedure TIBDatabase.CloseDataSets;
+ procedure TIBDataBase.CloseDataSets;
 var
   i: Integer;
 begin
@@ -1199,7 +1199,7 @@ begin
       DataSets[i].close;
 end;
 
-function TIBDatabase.GetDataset(Index : longint) : TDataset;
+ function TIBDataBase.GetDataset(Index: longint): TDataset;
 begin
   if (Index >= 0) and (Index < FDataSets.Count) then
     Result := TDataSet(FDataSets[Index])
@@ -1207,7 +1207,7 @@ begin
     raise Exception.Create('Invalid Index to DataSets');
 end;
 
-function TIBDatabase.GetDataSetCount : Longint;
+ function TIBDataBase.GetDataSetCount: Longint;
 begin
   Result := FDataSets.Count;
 end;
@@ -1228,7 +1228,7 @@ begin
   inherited SetConnected(Value);
 end;
 
-procedure TIBDatabase.GetFieldNames(const TableName: string; List: TStrings);
+ procedure TIBDataBase.GetFieldNames( const TableName: string; List: TStrings);
 var
   Query: TIBSQL;
 begin
@@ -1269,7 +1269,7 @@ begin
   end;
 end;
 
-procedure TIBDatabase.GetTableNames(List: TStrings; SystemTables: Boolean);
+ procedure TIBDataBase.GetTableNames(List: TStrings; SystemTables: Boolean);
 var
   Query : TIBSQL;
 begin
