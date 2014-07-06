@@ -4,7 +4,7 @@ IBX Field and Parameter Names
 Column Names
 ------------
 
-Firebird identifiers are typcially case insensitive and are converted to upper case when processed and reported. This translates into IBX always reporting upper case column names and matching column names to field names (e.g. in TDataSet.FieldByName) using a case insensitive match. 
+Firebird identifiers are typically case insensitive and are converted to upper case when processed and reported. This translates into IBX always reporting upper case column names and matching column names to field names (e.g. in TDataSet.FieldByName) using a case insensitive match.
 
 However, in SQL Dialect 3, Firebird introduced the ability to enclose identifiers in double qoutes. This is necessary if, for example, you want a column name that is the same as an SQL Reserved word. It also allows you to have case sensitive column names, or column names containing spaces.
 
@@ -74,19 +74,6 @@ etc.
 
 As with column names, parameter names are matched case insensitive.
 
-Pseudo Dialect 3 Parameter Names
---------------------------------
-
-It is also possible to use a pseudo dialect 3 format parameter name e.g.
-
-Select Col1, Col2 From MYTABLE Where Col3 = :"ColValue";
-
-However, in this case, the double quotes are effectively ignored and the match is again made case insensitive. e.g.
-
-IBQuery1.ParamByName('COLVALUE').AsInteger := ...
-
-is a valid way to set the above parameter.
-
 Duplicate Parameter Names
 -------------------------
 
@@ -107,10 +94,24 @@ IBQuery1.ParamByName('arg1').AsInteger := 3;
 
 Both cases will be set to 3. This capability is particularly useful when using Master/Detail datasets linked by the Detail's DataSource property and the Detail is given by a query similar to the above.
 
-Disabling Support for Pseudo Dialect 3 Parameter Names
+Pseudo Dialect 3 Parameter Names (disabled by default)
+--------------------------------
+
+It is also possible to use a pseudo dialect 3 format parameter name e.g.
+
+Select Col1, Col2 From MYTABLE Where Col3 = :"ColValue";
+
+However, in this case, the double quotes are effectively ignored and the match is again made case insensitive. e.g.
+
+IBQuery1.ParamByName('COLVALUE').AsInteger := ...
+
+is a valid way to set the above parameter.
+
+
+Enabling Support for Pseudo Dialect 3 Parameter Names
 ------------------------------------------------------
 
-Pseudo Dialect 3 quoted format parameter names are not believed to be very useful - but they do result in a significant client side processing overhead. The code to support these is now subject to conditional compilation and can hence be removed when not required. By default, pseudo dialect 3 format parameter names are supported. To disable support, ALLOWDIALECT3PARAMNAMES should be undefined when IBX is compiled. IBSQL.pas may be edited to make this change  - see comments at this top of that file. However, disabling support for pseudo Dialect 3 quoted format parameter names may break Master/Detail relationships when using TIBTable and hence should be used with care.
+Pseudo Dialect 3 quoted format parameter names are not believed to be very useful - but they do result in a significant client side processing overhead. The code to support these is now subject to conditional compilation and can hence be removed when not required. By default, pseudo dialect 3 format parameter names are disabled. To enable support, ALLOWDIALECT3PARAMNAMES should be defined when IBX is compiled. IBSQL.pas may be edited to make this change  - see comments at this top of that file. 
 
 For example, to support an SQL statement in the format:
 
@@ -122,7 +123,7 @@ IBQuery1.ParamByName('"MyKeyid"').AsInteger := ...
 
 you must define ALLOWDIALECT3PARAMNAMES at compilation time. 
 
-On the othert regardless of ALLOWDIALECT3PARAMNAMES
+On the other hand, regardless of ALLOWDIALECT3PARAMNAMES
 
 IBQuery1.ParamByName('MYKEYID').AsInteger := ...
 

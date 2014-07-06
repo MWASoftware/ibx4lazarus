@@ -198,6 +198,7 @@ type
 
   TIBCustomDataSet = class(TDataset)
   private
+    FGenerateParamNames: Boolean;
     FGeneratorField: TIBGenerator;
     FNeedsRefresh: Boolean;
     FForcedRefresh: Boolean;
@@ -394,6 +395,7 @@ type
     procedure SetBookmarkData(Buffer: PChar; Data: Pointer); override;
     procedure SetCachedUpdates(Value: Boolean);
     procedure SetDataSource(Value: TDataSource);
+    procedure SetGenerateParamNames(AValue: Boolean); virtual;
     procedure SetFieldData(Field : TField; Buffer : Pointer); override;
     procedure SetFieldData(Field : TField; Buffer : Pointer;
       NativeFormat : Boolean); overload; override;
@@ -460,6 +462,7 @@ type
     function GetFieldData(FieldNo: Integer; Buffer: Pointer): Boolean; overload; (*override;*)
     function GetFieldData(Field : TField; Buffer : Pointer;
       NativeFormat : Boolean) : Boolean; overload; override;
+    property GenerateParamNames: Boolean read FGenerateParamNames write SetGenerateParamNames;
     function Locate(const KeyFields: string; const KeyValues: Variant;
                     Options: TLocateOptions): Boolean; override;
     function Lookup(const KeyFields: string; const KeyValues: Variant;
@@ -547,6 +550,7 @@ type
     property SelectSQL;
     property ModifySQL;
     property GeneratorField;
+    property GenerateParamNames;
     property ParamCheck;
     property UniDirectional;
     property Filtered;
@@ -863,6 +867,7 @@ begin
   FQModify.GoToFirstRecordOnExecute := False;
   FUpdateRecordTypes := [cusUnmodified, cusModified, cusInserted];
   FParamCheck := True;
+  FGenerateParamNames := False;
   FForcedRefresh := False;
   {Bookmark Size is Integer for IBX}
   BookmarkSize := SizeOf(Integer);
@@ -1899,15 +1904,20 @@ begin
     begin
       if not FQSelect.Prepared then
       begin
+        FQSelect.GenerateParamNames := FGenerateParamNames;
         FQSelect.ParamCheck := ParamCheck;
         FQSelect.Prepare;
       end;
+      FQDelete.GenerateParamNames := FGenerateParamNames;
       if (Trim(FQDelete.SQL.Text) <> '') and (not FQDelete.Prepared) then
         FQDelete.Prepare;
+      FQInsert.GenerateParamNames := FGenerateParamNames;
       if (Trim(FQInsert.SQL.Text) <> '') and (not FQInsert.Prepared) then
         FQInsert.Prepare;
+      FQRefresh.GenerateParamNames := FGenerateParamNames;
       if (Trim(FQRefresh.SQL.Text) <> '') and (not FQRefresh.Prepared) then
         FQRefresh.Prepare;
+      FQModify.GenerateParamNames := FGenerateParamNames;
       if (Trim(FQModify.SQL.Text) <> '') and (not FQModify.Prepared) then
         FQModify.Prepare;
       FInternalPrepared := True;
@@ -3658,6 +3668,13 @@ end;
 function TIBCustomDataSet.GetSelectStmtHandle: TISC_STMT_HANDLE;
 begin
   Result := FQSelect.Handle;
+end;
+
+ procedure TIBCustomDataSet.SetGenerateParamNames(AValue: Boolean);
+begin
+  if FGenerateParamNames = AValue then Exit;
+  FGenerateParamNames := AValue;
+  Disconnect
 end;
 
 procedure TIBCustomDataSet.InitRecord(Buffer: PChar);

@@ -1,4 +1,4 @@
-IBX Change Log  version                  (1.1-0) tba, 26 Jun 2014 16:51:37 +0100
+IBX Change Log  version                   (1.1-0) Sun, 06 Jul 2014 19:20:57 +0100
 
 1. TIBXSQLVAR code clean up and optimisation to improve client side "prepare" and parameter
    setting performance. See "readme.field+param.names in the doc folder.(Thanks to

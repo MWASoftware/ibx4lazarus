@@ -219,7 +219,7 @@ var Params: TStringList;
        Result := AnsiUpperCase(Value)
     else
     begin
-      j := 0;
+      j := 1;
       Value := Space2Underscore(AnsiUpperCase(Value));
       Result := Value;
       while Params.IndexOf(Result) <> -1 do

@@ -58,7 +58,6 @@ type
     FText: string;
     FRowsAffected: Integer;
     FCheckRowsAffected: Boolean;
-    FGenerateParamNames: Boolean;
     function GetRowsAffected: Integer;
     procedure PrepareSQL(Value: PChar);
     procedure QueryChanged(Sender: TObject);
@@ -104,7 +103,6 @@ type
     property StatementType;
     property Text: string read FText;
     property RowsAffected: Integer read GetRowsAffected;
-    property GenerateParamNames: Boolean read FGenerateParamNames write FGenerateParamNames;
  //   property Params: TParams read FParams write SetParamsList;
 
   published
@@ -112,11 +110,12 @@ type
     property BufferChunks;
     property CachedUpdates;
     property DataSource read GetDataSource write SetDataSource;
+    property GenerateParamNames;
  //   property Constraints stored ConstraintsStored;
     property GeneratorField;
     property ParamCheck;
     property SQL: TStrings read FSQL write SetQuery;
-   property Params: TParams read FParams write SetParamsList;
+    property Params: TParams read FParams write SetParamsList;
     property UniDirectional default False;
     property UpdateObject;
     property Filtered;
@@ -141,7 +140,6 @@ begin
   TStringList(SQL).OnChange := QueryChanged;
   FParams := TParams.Create(Self);
   ParamCheck := True;
-  FGenerateParamNames := False;
   FRowsAffected := -1;
 end;
 
@@ -163,7 +161,7 @@ procedure TIBQuery.InternalOpen;
 begin
   ActivateConnection();
   ActivateTransaction;
-  QSelect.GenerateParamNames := FGenerateParamNames;
+  QSelect.GenerateParamNames := GenerateParamNames;
   SetPrepared(True);
   if DataSource <> nil then
     SetParamsFromCursor;
@@ -429,7 +427,7 @@ end;
 
 procedure TIBQuery.PrepareSQL(Value: PChar);
 begin
-  QSelect.GenerateParamNames := FGenerateParamNames;
+  QSelect.GenerateParamNames := GenerateParamNames;
   InternalPrepare;
 end;
 

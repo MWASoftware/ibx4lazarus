@@ -54,7 +54,7 @@ unit IBDBReg;
 
 interface
 
-uses {Windows,} SysUtils, Classes, Graphics, Dialogs, Controls, Forms, TypInfo,
+uses SysUtils, Classes, Graphics, Dialogs, Controls, Forms, TypInfo,
      DB, IBTable, IBDatabase,  IBEventsEditor,  LazarusPackageIntf,
       IBUpdateSQL, IBXConst, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor,
      dbFieldLinkPropEditor;
@@ -93,12 +93,17 @@ type
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
+  { TDBStringProperty }
+
   TDBStringProperty = class(TStringProperty)
   public
     function GetAttributes: TPropertyAttributes; override;
     procedure GetValueList(List: TStrings); virtual;
     procedure GetValues(Proc: TGetStrProc); override;
+    procedure Edit; override;
   end;
+
+  { TIBIndexFieldNamesProperty }
 
   TIBIndexFieldNamesProperty = class(TDBStringProperty)
   public
@@ -501,6 +506,18 @@ begin
   end;
 end;
 
+ procedure TDBStringProperty.Edit;
+ var DataSet: TDBDataSet;
+begin
+  DataSet := (GetComponent(0) as TDBDataSet);
+  if assigned(Dataset.Database) then
+  try
+     DataSet.Database.Connected := true;
+     inherited Edit;
+  except
+  end;
+end;
+
 { Utility Functions }
 
 function GetPropertyValue(Instance: TPersistent; const PropName: string): TPersistent;
@@ -811,7 +828,8 @@ end;
 procedure TIBTableFieldLinkProperty.Edit;
 begin
   FTable := DataSet as TIBTable;
-  FTable.Database.Connected := true;
+  if assigned(FTable.Database) then
+    FTable.Database.Connected := true;
   inherited Edit;
 end;
 
