@@ -1,4 +1,4 @@
-IBX Change Log  version                     (1.1-0) Sun, 06 Jul 2014 23:39:21 +0100
+IBX Change Log  version                     (1.1-0) tba, 06 Jul 2014 23:39:21 +0100
 
 1. TIBXSQLVAR code clean up and optimisation to improve client side "prepare" and parameter
    setting performance. See "readme.field+param.names in the doc folder.(Thanks to
@@ -30,6 +30,12 @@ IBX Change Log  version                     (1.1-0) Sun, 06 Jul 2014 23:39:21 +0
     when DSQL ('?') parameter placeholders are used and the TIBSQL.GenerateParamNames property is set to true.
 
 11. TIBTable now has a property editor for "MasterFields"
+
+12. SQL Property Editors now include a checkbox "Allow DSQL Placeholder". This corresponds to the
+    GenerateParamNames property and should be set when using DSQL (i.e. '?') style parameters.
+
+13. The IBTransaction editor now has a radio button ("Unspecified") which is set when the combination
+    of settings is unrecognised. Selecting this radio button has no effect on the settings.
    
 
 IBX Change Log  version                 (1.0-5) Sat, 28 Dec 2013 19:22:23 +0000
