@@ -32,7 +32,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, IBSystemTables, IBDatabase;
+  StdCtrls, IBSystemTables, IBDatabase, IBCustomDataSet;
 
 type
 
@@ -42,6 +42,7 @@ type
     Button1: TButton;
     Button2: TButton;
     GenerateBtn: TButton;
+    GenerateParams: TCheckBox;
     TestBtn: TButton;
     IBTransaction1: TIBTransaction;
     Label1: TLabel;
@@ -69,29 +70,37 @@ type
 var
   IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm;
 
-function EditSQL(Database: TIBDatabase; SelectSQL: TStrings): boolean;
+function EditSQL(DataSet: TIBCustomDataSet; SelectSQL: TStrings): boolean;
 
 implementation
 
 {$R *.lfm}
 
-function EditSQL(Database: TIBDatabase; SelectSQL: TStrings): boolean;
+function EditSQL(DataSet: TIBCustomDataSet; SelectSQL: TStrings): boolean;
 begin
   Result := false;
-  if assigned(Database) then
+  if assigned(DataSet) and assigned(DataSet.Database) then
     try
-      Database.Connected := true;
+      DataSet.Database.Connected := true;
     except on E: Exception do
       ShowMessage(E.Message)
     end;
 
   with TIBDeleteSQLEditorForm.Create(Application) do
   try
-    SetDatabase(Database);
+    if assigned(DataSet) then
+    begin
+        SetDatabase(DataSet.Database);
+        GenerateParams.Checked := DataSet.GenerateParamNames;
+    end;
     SQLText.Lines.Assign(SelectSQL);
     Result := ShowModal = mrOK;
     if Result then
-     SelectSQL.Assign(SQLText.Lines)
+    begin
+     SelectSQL.Assign(SQLText.Lines);
+     if assigned(DataSet) then
+          DataSet.GenerateParamNames := GenerateParams.Checked
+    end;
   finally
     Free
   end;
@@ -133,7 +142,7 @@ end;
 
 procedure TIBDeleteSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
-  FIBSystemTables.TestSQL(SQLText.Lines.Text)
+  FIBSystemTables.TestSQL(SQLText.Lines.Text,GenerateParams.Checked)
 end;
 
 procedure TIBDeleteSQLEditorForm.TableNamesComboCloseUp(Sender: TObject);
@@ -160,4 +169,4 @@ begin
 end;
 
 end.
-
+

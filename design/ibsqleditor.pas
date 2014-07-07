@@ -40,6 +40,7 @@ type
   TIBSQLEditorForm = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    GenerateParams: TCheckBox;
     GenerateBtn: TButton;
     IBTransaction1: TIBTransaction;
     Label5: TLabel;
@@ -102,7 +103,6 @@ type
     FTableName: string;
     FIBSystemTables: TIBSystemTables;
     FExecuteOnly: boolean;
-    FGenerateParamNames: boolean;
   public
     { public declarations }
     constructor Create(TheOwner: TComponent); override;
@@ -135,10 +135,13 @@ begin
   try
     SetDatabase(DataSet.Database);
     SQLText.Lines.Assign(DataSet.SQL);
-    FGenerateParamNames := DataSet.GenerateParamNames;
+    GenerateParams.Checked := DataSet.GenerateParamNames;
     Result := ShowModal = mrOK;
     if Result then
-      DataSet.SQL.Assign(SQLText.Lines)
+      begin
+            DataSet.SQL.Assign(SQLText.Lines);
+            DataSet.GenerateParamNames := GenerateParams.Checked
+      end;
   finally
     Free
   end;
@@ -237,7 +240,7 @@ end;
 
 procedure TIBSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
-  FIBSystemTables.TestSQL(SQLText.Text,FGenerateParamNames);
+  FIBSystemTables.TestSQL(SQLText.Text,GenerateParams.Checked);
 end;
 
 procedure TIBSQLEditorForm.DeleteTableNamesCloseUp(Sender: TObject);

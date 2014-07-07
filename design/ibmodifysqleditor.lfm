@@ -8,36 +8,36 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
   ClientHeight = 438
   ClientWidth = 749
   OnShow = FormShow
-  LCLVersion = '0.9.30'
+  LCLVersion = '1.2.2.0'
   object Label1: TLabel
     Left = 16
-    Height = 18
+    Height = 15
     Top = 16
-    Width = 78
+    Width = 69
     Caption = 'Table Name'
     ParentColor = False
   end
   object Label2: TLabel
     Left = 19
-    Height = 18
+    Height = 15
     Top = 84
-    Width = 39
+    Width = 33
     Caption = 'Fields'
     ParentColor = False
   end
   object Label3: TLabel
     Left = 279
-    Height = 18
+    Height = 15
     Top = 16
-    Width = 26
+    Width = 24
     Caption = 'SQL'
     ParentColor = False
   end
   object Label4: TLabel
     Left = 23
-    Height = 18
+    Height = 15
     Top = 285
-    Width = 87
+    Width = 77
     Caption = 'Primary Keys'
     ParentColor = False
   end
@@ -74,7 +74,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
   end
   object TableNamesCombo: TComboBox
     Left = 23
-    Height = 29
+    Height = 27
     Top = 38
     Width = 201
     ItemHeight = 0
@@ -91,6 +91,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     MultiSelect = True
     OnDblClick = FieldListDblClick
     ParentShowHint = False
+    ScrollWidth = 202
     ShowHint = True
     TabOrder = 4
     TopIndex = -1
@@ -117,9 +118,9 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
   end
   object QuoteFields: TCheckBox
     Left = 16
-    Height = 22
-    Top = 380
-    Width = 132
+    Height = 24
+    Top = 400
+    Width = 127
     Caption = '&Quote Identifiers'
     TabOrder = 7
   end
@@ -130,19 +131,28 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Width = 200
     ItemHeight = 0
     OnDblClick = PrimaryKeyListDblClick
+    ScrollWidth = 198
     TabOrder = 8
     TopIndex = -1
   end
   object IncludePrimaryKeys: TCheckBox
     Left = 19
-    Height = 22
+    Height = 24
     Top = 256
-    Width = 239
+    Width = 223
     Caption = 'Include Primary keys in Field List'
     Checked = True
     OnClick = TableNamesComboCloseUp
     State = cbChecked
     TabOrder = 9
+  end
+  object GenerateParams: TCheckBox
+    Left = 16
+    Height = 24
+    Top = 376
+    Width = 173
+    Caption = 'Allow DSQL Placeholders'
+    TabOrder = 10
   end
   object IBTransaction1: TIBTransaction
     Active = False

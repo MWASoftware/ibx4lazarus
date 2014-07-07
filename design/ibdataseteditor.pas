@@ -39,6 +39,7 @@ type
   { TIBDataSetEditorForm }
 
   TIBDataSetEditorForm = class(TForm)
+    GenerateParams: TCheckBox;
     TestBtn: TButton;
     CancelButton: TButton;
     FieldsPage: TTabSheet;
@@ -108,7 +109,11 @@ begin
   with TIBDataSetEditorForm.Create(Application) do
   try
     SetDataSet(DataSet);
-    Result := ShowModal = mrOK
+    if assigned(DataSet) then
+        GenerateParams.Checked := DataSet.GenerateParamNames;
+    Result := ShowModal = mrOK;
+    if Result and assigned(DataSet) then
+      DataSet.GenerateParamNames := GenerateParams.Checked
   finally
     Free
   end;
@@ -161,7 +166,7 @@ end;
 procedure TIBDataSetEditorForm.TestBtnClick(Sender: TObject);
 begin
   if SQLMemo.Lines.Text <> '' then
-    FIBSystemTables.TestSQL(SQLMemo.Lines.Text);
+    FIBSystemTables.TestSQL(SQLMemo.Lines.Text,GenerateParams.Checked);
 end;
 
 procedure TIBDataSetEditorForm.GenerateButtonClick(Sender: TObject);
@@ -285,4 +290,4 @@ begin
 end;
 
 end.
-
+

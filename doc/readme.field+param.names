@@ -94,6 +94,20 @@ IBQuery1.ParamByName('arg1').AsInteger := 3;
 
 Both cases will be set to 3. This capability is particularly useful when using Master/Detail datasets linked by the Detail's DataSource property and the Detail is given by a query similar to the above.
 
+OLD and NEW Parameters
+----------------------
+
+These are typically used in Modify SQL statements (UPDATE) when a (e.g.) the primary key value is changed. In this case, the row to be updated needs to be selected by the original value of the primary key, while the column needs to be set to the new value. In order to support this capability, IBX allows parameter names to be prefixed by "OLD_" and "NEW_" where the former references the fields value when it was read from the dataset (i.e. before a call to TDataset.Edit), while the latter is the default and refers to the modified value set after a call to TDataset.Edit. For example, specify an Update SQL statement in the form:
+
+UPDATE MYTABLE Set Key1 = :NEW_KEY1, COL2 = :COL2 Where Key1 = :OLD_KEY1;
+
+to correctly handle database updates such as:
+
+IBDataset1.Next;
+IBDataset1.Edit;
+IBDataset1.FieldByName('key1').AsInteger := <a new value>;
+IBDataset1.Post;
+
 Pseudo Dialect 3 Parameter Names (disabled by default)
 --------------------------------
 
@@ -174,13 +188,32 @@ IBSQL1.Params[1].AsString := ...
 
 Note that the first DSQL format placeholder is index 1 as 'COL1' is index 0.
 
-When you set TIBSQL.GenerateParamsName to true, each positional parameter is given a generated name in the format:
+When you set TIBSQL.GenerateParamNames to true, each positional parameter is given a generated name in the format:
 
 IBXParam<seqno>
 
 where the <seqno> is incremented for each positional parameter, These are numbered from zero and named parameters are ignored when generating the sequence number. Thus in the above example, you could have set the positional parameter using:
 
 IBSQL1.ParamByName('IBXParam0').AsString := ...
+
+SQL Generation
+--------------
+
+IBX generates Firebird compliant SQL for you:
+
+- when the "Generate SQL" button is clicked in a property editor.
+- when a TIBTable is opened
+- when a TIBStoredProc is executed.
+
+The SQL generated for TIBTable and TIBStoredProc is not normally visible and the purpose of these objects is to hide the bother of SQL editing from users that are unfamiliar with SQL.
+
+In all cases, the SQL is generated from the following rules:
+
+a. Column Names are as specified in the Database Schema and, for Dialect 3 schemas, double quotes are used to delimit column names that contain spaces or are mixed or lower case or contain double quotes.
+
+b. Parameter Names are always uppercase versions of the column name, if necessary disambiguated by adding a sequence number (starting from zero) to the end of the name. Any spaces or special characters are replaced by an underscore.
+
+c. In update statements, parameter names in a "Where" clause are prefixed by "OLD_".
 
 
 

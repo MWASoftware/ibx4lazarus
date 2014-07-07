@@ -594,7 +594,7 @@ var
   Query: TIBQuery;
 begin
   Query := GetComponent(0) as TIBQuery;
-  if IBSelectSQLEditor.EditSQL(Query.Database,Query.SQL) then Modified;
+  if IBSelectSQLEditor.EditSQL(Query,Query.SQL) then Modified;
 end;
 
 { TIBDatasetSQLProperty }
@@ -604,7 +604,7 @@ var
   IBDataset: TIBDataset;
 begin
   IBDataset := GetComponent(0) as TIBDataset;
-  if IBSelectSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.SelectSQL) then Modified;
+  if IBSelectSQLEditor.EditSQL(IBDataSet,IBDataSet.SelectSQL) then Modified;
 end;
 
 { TIBSQLProperty }
@@ -614,7 +614,7 @@ var
   IBSQL: TIBSQL;
 begin
   IBSQL := GetComponent(0) as TIBSQL;
-  if IBSelectSQLEditor.EditSQL(IBSQL.Database,IBSQL.SQL) then Modified;
+  if IBSQLEditor.EditIBSQL(IBSQL) then Modified;
 end;
 
 { TIBUpdateSQLEditor }
@@ -767,7 +767,7 @@ begin
     Dec(Index, inherited GetVerbCount);
     case Index of
       0: Query.ExecSQL;
-      1: if ibselectsqleditor.EditSQL(Query.Database,Query.SQL) then Designer.Modified;
+      1: if ibselectsqleditor.EditSQL(Query,Query.SQL) then Designer.Modified;
     end;
   end;
 end;
@@ -880,7 +880,7 @@ var
   IBDataset: TIBDataset;
 begin
   IBDataset := GetComponent(0) as TIBDataset;
-  if IBModifySQLEditor.EditSQL(IBDataSet.Database,IBDataSet.ModifySQL) then Modified;
+  if IBModifySQLEditor.EditSQL(IBDataSet,IBDataSet.ModifySQL) then Modified;
 end;
 
 { TIBUpdateSQLUpdateProperty }
@@ -888,7 +888,7 @@ end;
 procedure TIBUpdateSQLUpdateProperty.Edit;
 begin
   GetObjects;
-  if IBModifySQLEditor.EditSQL(FDatabase,FIBUpdateSQL.ModifySQL) then Modified;
+  if IBModifySQLEditor.EditSQL(FIBUpdateSQL.DataSet,FIBUpdateSQL.ModifySQL) then Modified;
 end;
 
 { TIBRefreshSQLProperty }
@@ -899,7 +899,7 @@ var
   aDatabase: TIBDatabase;
 begin
   IBDataset := GetComponent(0) as TIBDataset;
-  if IBRefreshSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.RefreshSQL) then Modified;
+  if IBRefreshSQLEditor.EditSQL(IBDataSet,IBDataSet.RefreshSQL) then Modified;
 end;
 
 { TIBUpdateSQLRefreshSQLProperty }
@@ -907,17 +907,17 @@ end;
 procedure TIBUpdateSQLRefreshSQLProperty.Edit;
 begin
   GetObjects;
-  if IBRefreshSQLEditor.EditSQL(FDatabase,FIBUpdateSQL.RefreshSQL) then Modified;
+  if IBRefreshSQLEditor.EditSQL(FIBUpdateSQL.DataSet,FIBUpdateSQL.RefreshSQL) then Modified;
 end;
 
 { TIBDeleteSQLProperty }
 
 procedure TIBDeleteSQLProperty.Edit;
 var
-  IBDataset: TIBDataset;
+  IBDataset: TIBDataSet;
 begin
-  IBDataset := GetComponent(0) as TIBDataset;
-  if IBDeleteSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.DeleteSQL) then Modified;
+  IBDataset := GetComponent(0) as TIBDataSet;
+  if IBDeleteSQLEditor.EditSQL(IBDataSet,IBDataSet.DeleteSQL) then Modified;
 end;
 
 { TIBUpdateSQLDeleteProperty }
@@ -930,7 +930,7 @@ end;
 procedure TIBUpdateSQLDeleteProperty.Edit;
 begin
   GetObjects;
-  if IBDeleteSQLEditor.EditSQL(FDatabase,FIBUpdateSQL.DeleteSQL) then Modified;
+  if IBDeleteSQLEditor.EditSQL(FIBUpdateSQL.DataSet,FIBUpdateSQL.DeleteSQL) then Modified;
 end;
 
 { TUpdateSQLPropertyEditor }
@@ -953,10 +953,10 @@ end;
 
 procedure TIBInsertSQLProperty.Edit;
 var
-  IBDataset: TIBDataset;
+  IBDataset: TIBDataSet;
 begin
-  IBDataset := GetComponent(0) as TIBDataset;
-  if IBInsertSQLEditor.EditSQL(IBDataSet.Database,IBDataSet.InsertSQL) then Modified;
+  IBDataset := GetComponent(0) as TIBDataSet;
+  if IBInsertSQLEditor.EditSQL(IBDataSet,IBDataSet.InsertSQL) then Modified;
 end;
 
 { TIBUpdateSQLInsertSQLProperty }
@@ -964,7 +964,7 @@ end;
 procedure TIBUpdateSQLInsertSQLProperty.Edit;
 begin
   GetObjects;
-  if IBInsertSQLEditor.EditSQL(FDatabase,FIBUpdateSQL.InsertSQL) then Modified;
+  if IBInsertSQLEditor.EditSQL(FIBUpdateSQL.Dataset,FIBUpdateSQL.InsertSQL) then Modified;
 end;
 
 { TIBGeneratorProperty }

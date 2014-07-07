@@ -269,6 +269,7 @@ begin
   FGetProcedures := TIBSQL.Create(nil);
   FTestSQL := TIBSQL.Create(nil);
   FTableAndColumnSQL := TIBSQL.Create(nil);
+  FTableAndColumnSQL.GenerateParamNames := true; {Permissive}
   FGetGeneratorsSQL := TIBSQL.Create(nil);
   FGetProcedureParams := TIBSQL.Create(nil);
   FGetProcedureInfo := TIBSQL.Create(nil);
@@ -663,6 +664,7 @@ begin
     Exit;
   IsStoredProcedure := false;
   FTestSQL.SQL.Text := SQL;
+  FTestSQL.GenerateParamNames := true; {permissive}
   try
     FTestSQL.Prepare;
     Result := FTestSQL.SQLType

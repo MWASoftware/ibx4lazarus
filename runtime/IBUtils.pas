@@ -229,7 +229,7 @@ var
 begin
      Result := s;
      for k := 1 to Length(s) do
-         if Result[k] = ' ' then
+         if not (Result[k] in ['0'..'9','A'..'Z','_','$'])  then
             Result[k] := '_';
 end;
 

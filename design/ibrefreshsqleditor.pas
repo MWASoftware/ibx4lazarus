@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, IBSystemTables, IBDatabase;
+  StdCtrls, IBSystemTables, IBDatabase, IBCustomDataSet;
 
 type
 
@@ -16,6 +16,7 @@ type
     Button1: TButton;
     Button2: TButton;
     GenerateBtn: TButton;
+    GenerateParams: TCheckBox;
     TestBtn: TButton;
     FieldList: TListBox;
     IBTransaction1: TIBTransaction;
@@ -46,29 +47,37 @@ type
 var
   IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm;
 
-function EditSQL(Database: TIBDatabase; SelectSQL: TStrings): boolean;
+function EditSQL(DataSet: TIBCustomDataSet; SelectSQL: TStrings): boolean;
 
 implementation
 
 {$R *.lfm}
 
-function EditSQL(Database: TIBDatabase;  SelectSQL: TStrings): boolean;
+function EditSQL(DataSet: TIBCustomDataSet; SelectSQL: TStrings): boolean;
 begin
   Result := false;
-  if assigned(Database) then
+  if assigned(DataSet) and assigned(DataSet.Database) then
     try
-      Database.Connected := true;
+      DataSet.Database.Connected := true;
     except on E: Exception do
       ShowMessage(E.Message)
     end;
 
   with TIBRefreshSQLEditorForm.Create(Application) do
   try
-    SetDatabase(Database);
+    if assigned(DataSet) then
+    begin
+        SetDatabase(DataSet.Database);
+        GenerateParams.Checked := DataSet.GenerateParamNames;
+    end;
     SQLText.Lines.Assign(SelectSQL);
     Result := ShowModal = mrOK;
     if Result then
-     SelectSQL.Assign(SQLText.Lines)
+    begin
+     SelectSQL.Assign(SQLText.Lines);
+     if assigned(DataSet) then
+          DataSet.GenerateParamNames := GenerateParams.Checked
+    end;
   finally
     Free
   end;
@@ -121,7 +130,7 @@ end;
 
 procedure TIBRefreshSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
-  FIBSystemTables.TestSQL(SQLText.Lines.Text)
+  FIBSystemTables.TestSQL(SQLText.Lines.Text,GenerateParams.Checked)
 end;
 
 procedure TIBRefreshSQLEditorForm.TableNamesComboCloseUp(Sender: TObject);
@@ -149,4 +158,4 @@ begin
 end;
 
 end.
-
+

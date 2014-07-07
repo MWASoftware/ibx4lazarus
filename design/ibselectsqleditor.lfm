@@ -69,9 +69,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 4
   end
   object QuoteFields: TCheckBox
-    Left = 16
+    Left = 24
     Height = 24
-    Top = 380
+    Top = 400
     Width = 127
     Caption = '&Quote Identifiers'
     TabOrder = 5
@@ -224,6 +224,14 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Visible = False
       end
     end
+  end
+  object GenerateParams: TCheckBox
+    Left = 24
+    Height = 24
+    Top = 376
+    Width = 173
+    Caption = 'Allow DSQL Placeholders'
+    TabOrder = 7
   end
   object IBTransaction1: TIBTransaction
     Active = False

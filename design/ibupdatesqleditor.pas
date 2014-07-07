@@ -38,6 +38,7 @@ type
   { TIBUpdateSQLEditorForm }
 
   TIBUpdateSQLEditorForm = class(TForm)
+    GenerateParams: TCheckBox;
     TestBtn: TButton;
     CancelButton: TButton;
     FieldsPage: TTabSheet;
@@ -108,7 +109,11 @@ begin
   with TIBUpdateSQLEditorForm.Create(Application) do
   try
     SetUpdateObject(UpdateObject);
-    Result := ShowModal = mrOK
+    if assigned(UpdateObject.DataSet) then
+      GenerateParams.Checked := UpdateObject.DataSet.GenerateParamNames;
+    Result := ShowModal = mrOK;
+    if Result and assigned(UpdateObject.DataSet) then
+      UpdateObject.DataSet.GenerateParamNames := GenerateParams.Checked
   finally
     Free
   end;
@@ -161,7 +166,7 @@ end;
 procedure TIBUpdateSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
   if SQLMemo.Lines.Text <> '' then
-    FIBSystemTables.TestSQL(SQLMemo.Lines.Text);
+    FIBSystemTables.TestSQL(SQLMemo.Lines.Text,GenerateParams.Checked);
 end;
 
 procedure TIBUpdateSQLEditorForm.GenerateBtnClick(Sender: TObject);
@@ -280,4 +285,4 @@ end;
 
 
 end.
-
+

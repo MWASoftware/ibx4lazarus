@@ -37,11 +37,15 @@ uses
   StdCtrls, IBDataBase, IB, ExtCtrls, IBXConst, LResources;
 
 type
+
+  { TIBTransactionEditForm }
+
   TIBTransactionEditForm = class(TForm)
     GroupBox1: TGroupBox;
     HelpBtn: TButton;
     Cancelbtn: TButton;
     OKBtn: TButton;
+    rbOtherButton: TRadioButton;
     rbSnapShot: TRadioButton;
     rbReadCommitted: TRadioButton;
     rbReadOnlyTableStability: TRadioButton;
@@ -147,7 +151,9 @@ begin
   else if Value = [read, consistency] then
     rbReadOnlyTableStability.Checked := True
   else if Value = [write, consistency] then
-    rbReadWriteTableStability.Checked := True;
+    rbReadWriteTableStability.Checked := True
+  else
+    rbOtherButton.Checked := true
 end;
 
 procedure TIBTransactionEditForm.ClearParamSelection;
@@ -220,4 +226,4 @@ begin
 end;
 
 
-end.
+end.

@@ -1,11 +1,11 @@
 object IBSQLEditorForm: TIBSQLEditorForm
   Left = 402
-  Height = 426
+  Height = 425
   Top = 369
   Width = 716
   ActiveControl = PageControl
   Caption = 'IBSQL Editor'
-  ClientHeight = 426
+  ClientHeight = 425
   ClientWidth = 716
   OnShow = FormShow
   LCLVersion = '1.2.2.0'
@@ -19,7 +19,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
   end
   object SQLText: TMemo
     Left = 288
-    Height = 336
+    Height = 335
     Top = 27
     Width = 418
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -29,7 +29,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
   object GenerateBtn: TButton
     Left = 267
     Height = 30
-    Top = 375
+    Top = 374
     Width = 104
     Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
@@ -39,7 +39,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
   object Button2: TButton
     Left = 627
     Height = 30
-    Top = 375
+    Top = 374
     Width = 72
     Anchors = [akRight, akBottom]
     Cancel = True
@@ -50,7 +50,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
   object QuoteFields: TCheckBox
     Left = 16
     Height = 24
-    Top = 380
+    Top = 392
     Width = 127
     Caption = '&Quote Identifiers'
     TabOrder = 3
@@ -58,7 +58,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
   object Button1: TButton
     Left = 539
     Height = 30
-    Top = 374
+    Top = 373
     Width = 72
     Anchors = [akRight, akBottom]
     Caption = 'OK'
@@ -388,12 +388,20 @@ object IBSQLEditorForm: TIBSQLEditorForm
   object TestBtn: TButton
     Left = 403
     Height = 30
-    Top = 375
+    Top = 374
     Width = 66
     Anchors = [akRight, akBottom]
     Caption = 'Test'
     OnClick = TestBtnClick
     TabOrder = 6
+  end
+  object GenerateParams: TCheckBox
+    Left = 16
+    Height = 24
+    Top = 368
+    Width = 173
+    Caption = 'Allow DSQL Placeholders'
+    TabOrder = 7
   end
   object IBTransaction1: TIBTransaction
     Active = False

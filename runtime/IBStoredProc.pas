@@ -263,6 +263,7 @@ begin
     end;
     SelectSQL.Text := 'Execute Procedure ' + {do not localize}
                 FormatParameter(Database.SQLDialect, FProcName) + ' ' + input;
+ {   writeln(SelectSQL.Text);}
   finally
     Query.Free;
     Params.Free;

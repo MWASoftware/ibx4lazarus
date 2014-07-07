@@ -237,7 +237,7 @@ begin
 {  writeln(SelectSQL.Text);
   writeln(InsertSQL.Text);
   writeln(DeleteSQL.Text);
-  writeln(ModifySQL.Text);}
+  writeln(ModifySQL.Text); }
   SetParams;
   inherited InternalOpen;
 end;

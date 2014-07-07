@@ -1,5 +1,5 @@
 object IBTransactionEditForm: TIBTransactionEditForm
-  Left = 247
+  Left = 248
   Height = 201
   Top = 213
   Width = 396
@@ -13,7 +13,7 @@ object IBTransactionEditForm: TIBTransactionEditForm
   OnCreate = FormCreate
   ParentFont = True
   Position = poScreenCenter
-  LCLVersion = '0.9.30'
+  LCLVersion = '1.2.2.0'
   object GroupBox1: TGroupBox
     Left = 5
     Height = 157
@@ -21,23 +21,23 @@ object IBTransactionEditForm: TIBTransactionEditForm
     Width = 386
     Align = alClient
     Caption = 'Transaction Properties'
-    ClientHeight = 138
+    ClientHeight = 140
     ClientWidth = 382
     TabOrder = 0
     object Label1: TLabel
       Left = 241
-      Height = 18
+      Height = 15
       Top = 9
-      Width = 58
+      Width = 54
       Caption = 'Se&ttings:'
       FocusControl = TransactionParams
       ParentColor = False
     end
     object rbSnapShot: TRadioButton
-      Left = 7
-      Height = 22
-      Top = 26
-      Width = 84
+      Left = 8
+      Height = 24
+      Top = 18
+      Width = 83
       Caption = '&Snapshot'
       Checked = True
       OnClick = rbSnapShotClick
@@ -45,28 +45,28 @@ object IBTransactionEditForm: TIBTransactionEditForm
       TabStop = True
     end
     object rbReadCommitted: TRadioButton
-      Left = 7
-      Height = 22
-      Top = 48
-      Width = 133
+      Left = 8
+      Height = 24
+      Top = 42
+      Width = 126
       Caption = 'Read &Committed'
       OnClick = rbReadCommittedClick
       TabOrder = 1
     end
     object rbReadOnlyTableStability: TRadioButton
       Left = 7
-      Height = 22
-      Top = 69
-      Width = 187
+      Height = 24
+      Top = 66
+      Width = 173
       Caption = '&Read-Only Table Stability'
       OnClick = rbReadOnlyTableStabilityClick
       TabOrder = 2
     end
     object rbReadWriteTableStability: TRadioButton
       Left = 7
-      Height = 22
-      Top = 91
-      Width = 194
+      Height = 24
+      Top = 90
+      Width = 181
       Caption = 'Read-&Write Table Stability '
       OnClick = rbReadWriteTableStabilityClick
       TabOrder = 3
@@ -84,6 +84,14 @@ object IBTransactionEditForm: TIBTransactionEditForm
       ScrollBars = ssAutoBoth
       TabOrder = 4
       WordWrap = False
+    end
+    object rbOtherButton: TRadioButton
+      Left = 7
+      Height = 24
+      Top = 114
+      Width = 97
+      Caption = 'Unspecified'
+      TabOrder = 5
     end
   end
   object Panel1: TPanel
