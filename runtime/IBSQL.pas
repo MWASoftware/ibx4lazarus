@@ -896,7 +896,7 @@ begin
           result := AsDouble;
       SQL_INT64:
         if FXSQLVAR^.sqlscale = 0 then
-          IBError(ibxeInvalidDataConversion, [nil])
+          result := AsInt64
         else if FXSQLVAR^.sqlscale >= (-4) then
           result := AsCurrency
         else

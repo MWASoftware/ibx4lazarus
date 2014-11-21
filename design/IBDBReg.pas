@@ -325,6 +325,15 @@ type
     procedure Edit; override;
   end;
 
+  { TDBDynamicGridFieldProperty }
+
+  TDBDynamicGridFieldProperty = class(TFieldProperty)
+  public
+    procedure FillValues(const Values: TStringList); override;
+  end;
+
+
+
 procedure Register;
 
 implementation
@@ -335,7 +344,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBBatchMove, DBLoginDlg, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
-     IBSQLEditor, ibserviceeditor, LCLVersion;
+     IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox;
 
 
 
@@ -360,6 +369,8 @@ begin
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
       TIBRestoreService, TIBValidationService, TIBStatisticalService,
       TIBLogService, TIBSecurityService, TIBServerProperties]);
+
+
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'DatabaseName', TIBFileNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'StoredProcName', TIBStoredProcNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TParams), TIBStoredProc, 'Params', TIBStoredProcParamsProperty);
@@ -390,6 +401,50 @@ begin
   RegisterComponentEditor(TIBStoredProc, TIBStoredProcEditor);
   RegisterComponentEditor(TIBSQL, TIBSQLEditor);
   RegisterComponentEditor(TIBCustomService, TIBServiceEditor);
+
+
+  {Firebird Data Access Controls}
+  RegisterComponents(IBPalette3,[TIBLookupComboEditBox]);
+  RegisterComponents(IBPalette3,[TIBDynamicGrid]);
+  RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'KeyField', TDBDynamicGridFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'ListField', TDBDynamicGridFieldProperty);
+
+
+
+
+end;
+
+procedure LoadDataSourceFields(DataSource: TDataSource; List: TStrings);
+var
+  DataSet: TDataSet;
+  i: Integer;
+begin
+  if Assigned(DataSource) then
+  begin
+    DataSet := DataSource.DataSet;
+    if Assigned(DataSet) then
+    begin
+      if DataSet.Fields.Count > 0 then
+        DataSet.GetFieldNames(List)
+      else
+      begin
+        DataSet.FieldDefs.Update;
+        for i := 0 to DataSet.FieldDefs.Count - 1 do
+          List.Add(DataSet.FieldDefs[i].Name);
+      end;
+    end;
+  end;
+end;
+
+{ TDBDynamicGridFieldProperty }
+
+procedure TDBDynamicGridFieldProperty.FillValues(const Values: TStringList);
+var
+  Column: TIBDynamicGridColumn;
+begin
+  Column:=TIBDynamicGridColumn(GetComponent(0));
+  if not (Column is TIBDynamicGridColumn) then exit;
+  LoadDataSourceFields(Column.ListSource, Values);
 end;
 
 { TIBServiceEditor }
@@ -1011,4 +1066,5 @@ end;
 
 initialization
   {$I IBDBReg.lrs}
+  {$I ibcontrols.lrs}
 end.

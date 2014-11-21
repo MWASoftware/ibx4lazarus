@@ -33,6 +33,8 @@
 
 unit IBCustomDataSet;
 
+{$R-}
+
 {$Mode Delphi}
 
 {$IFDEF DELPHI}
@@ -49,7 +51,7 @@ uses
 {$ENDIF}
   SysUtils, Classes, Forms, Controls, IBDatabase,
   IBExternals, IB, IBHeader,  IBSQL, Db,
-  IBUtils, IBBlob;
+  IBUtils, IBBlob, IBSQLParserUnit;
 
 const
   BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
@@ -252,8 +254,12 @@ type
     FAfterTransactionEnd,
     FTransactionFree: TNotifyEvent;
     FAliasNameMap: array of string;
+    FParser: TSelectSQLParser;
+    FBaseSQLSelect: TStrings;
 
+    function GetParser: TSelectSQLParser;
     function GetSelectStmtHandle: TISC_STMT_HANDLE;
+    procedure SetBaseSQLSelect(AValue: TStrings);
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
 
@@ -359,6 +365,7 @@ type
     procedure DoBeforeEdit; override;
     procedure DoBeforeInsert; override;
     procedure DoAfterInsert; override;
+    procedure DoBeforeOpen; override;
     procedure DoBeforePost; override;
     procedure FreeRecordBuffer(var Buffer: PChar); override;
     procedure GetBookmarkData(Buffer: PChar; Data: Pointer); override;
@@ -390,6 +397,7 @@ type
     procedure InternalSetFieldData(Field: TField; Buffer: Pointer); virtual;
     procedure InternalSetToRecord(Buffer: PChar); override;
     function IsCursorOpen: Boolean; override;
+    procedure Loaded; override;
     procedure ReQuery;
     procedure SetBookmarkFlag(Buffer: PChar; Value: TBookmarkFlag); override;
     procedure SetBookmarkData(Buffer: PChar; Data: Pointer); override;
@@ -426,6 +434,8 @@ type
     property ModifySQL: TStrings read GetModifySQL write SetModifySQL;
     property UpdateMode: TUpdateMode read FUpdateMode write SetUpdateMode default upWhereAll;
     property ParamCheck: Boolean read FParamCheck write FParamCheck default True;
+    property Parser: TSelectSQLParser read GetParser;
+    property BaseSQLSelect: TStrings read FBaseSQLSelect write SetBaseSQLSelect;
 
     property BeforeDatabaseDisconnect: TNotifyEvent read FBeforeDatabaseDisconnect
                                                  write FBeforeDatabaseDisconnect;
@@ -452,6 +462,7 @@ type
     procedure RecordModified(Value: Boolean);
     procedure RevertRecord;
     procedure Undelete;
+    procedure ResetParser;
 
     { TDataSet support methods }
     function BookmarkValid(Bookmark: TBookmark): Boolean; override;
@@ -539,6 +550,8 @@ type
     property QModify;
     property StatementType;
     property SelectStmtHandle;
+    property Parser;
+    property BaseSQLSelect;
 
   published
     { TIBCustomDataSet }
@@ -882,6 +895,7 @@ begin
   else
     if AOwner is TIBTransaction then
       Transaction := TIBTransaction(AOwner);
+  FBaseSQLSelect := TStringList.Create;
 end;
 
 destructor TIBCustomDataSet.Destroy;
@@ -902,6 +916,8 @@ begin
     FOldCacheSize := 0;
     FMappedFieldPosition := nil;
   end;
+  if assigned(FBaseSQLSelect) then FBaseSQLSelect.Free;
+  if assigned(FParser) then FParser.Free;
   inherited Destroy;
 end;
 
@@ -2212,7 +2228,7 @@ begin
   if FInternalPrepared then
     InternalUnPrepare;
   FieldDefs.Clear;
-  FieldDefs.Updated := false
+  FieldDefs.Updated := false;
 end;
 
 { I can "undelete" uninserted records (make them "inserted" again).
@@ -2496,6 +2512,14 @@ begin
   if GeneratorField.ApplyOnEvent = gaeOnNewRecord then
     GeneratorField.Apply;
   inherited DoAfterInsert;
+end;
+
+procedure TIBCustomDataSet.DoBeforeOpen;
+begin
+  DataEvent(deCheckBrowseMode,1); {Conventional use to report getting ready to prepare}
+  if assigned(FParser) and (FParser.SQLText <> FQSelect.SQL.Text) then
+    FQSelect.SQL.Text := FParser.SQLText;
+  inherited DoBeforeOpen;
 end;
 
 procedure TIBCustomDataSet.DoBeforePost;
@@ -3424,6 +3448,13 @@ begin
   result := FOpen;
 end;
 
+procedure TIBCustomDataSet.Loaded;
+begin
+  inherited Loaded;
+  if assigned(FBaseSQLSelect) and (FBaseSQLSelect.Text = '') then
+     FBaseSQLSelect.assign(QSelect.SQL);
+end;
+
 function TIBCustomDataSet.Locate(const KeyFields: string; const KeyValues: Variant;
                                  Options: TLocateOptions): Boolean;
 var
@@ -3506,6 +3537,7 @@ end;
 procedure TIBCustomDataSet.InternalSetFieldData(Field: TField; Buffer: Pointer);
 var
   Buff, TmpBuff: PChar;
+  MappedFieldPos: integer;
 begin
   Buff := GetActiveBuf;
   if Field.FieldNo < 0 then
@@ -3522,20 +3554,21 @@ begin
     begin
       { If inserting, Adjust record position }
       AdjustRecordOnInsert(Buff);
-      if (FMappedFieldPosition[Field.FieldNo - 1] > 0) and
-         (FMappedFieldPosition[Field.FieldNo - 1] <= rdFieldCount) then
+      MappedFieldPos := FMappedFieldPosition[Field.FieldNo - 1];
+      if (MappedFieldPos > 0) and
+         (MappedFieldPos <= rdFieldCount) then
       begin
         Field.Validate(Buffer);
         if (Buffer = nil) or
            (Field is TIBStringField) and (PChar(Buffer)[0] = #0) then
-          rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdIsNull := True
+          rdFields[MappedFieldPos].fdIsNull := True
         else begin
-          Move(Buffer^, Buff[rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdDataOfs],
-                 rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdDataSize);
-          if (rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdDataType = SQL_TEXT) or
-             (rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdDataType = SQL_VARYING) then
-            rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdDataLength := StrLen(PChar(Buffer));
-          rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdIsNull := False;
+          Move(Buffer^, Buff[rdFields[MappedFieldPos].fdDataOfs],
+                 rdFields[MappedFieldPos].fdDataSize);
+          if (rdFields[MappedFieldPos].fdDataType = SQL_TEXT) or
+             (rdFields[MappedFieldPos].fdDataType = SQL_VARYING) then
+            rdFields[MappedFieldPos].fdDataLength := StrLen(PChar(Buffer));
+          rdFields[MappedFieldPos].fdIsNull := False;
           if rdUpdateStatus = usUnmodified then
           begin
             if CachedUpdates then
@@ -3668,6 +3701,29 @@ end;
 function TIBCustomDataSet.GetSelectStmtHandle: TISC_STMT_HANDLE;
 begin
   Result := FQSelect.Handle;
+end;
+
+procedure TIBCustomDataSet.SetBaseSQLSelect(AValue: TStrings);
+begin
+  if FBaseSQLSelect = AValue then Exit;
+  FBaseSQLSelect.assign(AValue);
+  ResetParser;
+end;
+
+function TIBCustomDataSet.GetParser: TSelectSQLParser;
+begin
+  if not assigned(FParser) then
+     FParser := TSelectSQLParser.Create(FBaseSQLSelect);
+  Result := FParser
+end;
+
+procedure TIBCustomDataSet.ResetParser;
+begin
+  if assigned(FParser) then
+  begin
+    FParser.Free;
+    FParser := nil
+  end;
 end;
 
  procedure TIBCustomDataSet.SetGenerateParamNames(AValue: Boolean);

@@ -104,6 +104,8 @@ type
     property Text: string read FText;
     property RowsAffected: Integer read GetRowsAffected;
  //   property Params: TParams read FParams write SetParamsList;
+    property Parser;
+    property BaseSQLSelect;
 
   published
     property Active;
