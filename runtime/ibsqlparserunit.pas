@@ -49,6 +49,7 @@ type
   TSelectSQLParser = class
   private
     FHavingClause: string;
+    FOnSQLChanging: TNotifyEvent;
     FSelectClause: string;
     FGroupClause: string;
     FWhereClause: string;
@@ -82,6 +83,7 @@ type
     procedure SetFromClause(const Value: string);
   protected
     constructor Create(SQLText: TStrings; StartLine, StartIndex: integer); overload;
+    procedure Changed;
   public
     constructor Create(SQLText: TStrings); overload;
     constructor Create(const SQLText: string); overload;
@@ -99,6 +101,7 @@ type
     property SQLText: string read GetSQLText;
     property Union: TSelectSQLParser read FUnion;
     property ParamList: TStringList read FParamList;
+    property OnSQLChanging: TNotifyEvent read FOnSQLChanging write FOnSQLChanging;
   end;
 
   TFilterCallback = procedure(Parser: TSelectSQLParser; Key: integer) of object; 
@@ -488,6 +491,12 @@ begin
   AnalyseSQL(SQLText);
 end;
 
+procedure TSelectSQLParser.Changed;
+begin
+  if assigned(FOnSQLChanging) then
+     OnSQLChanging(self)
+end;
+
 function TSelectSQLParser.GetNextSymbol(C: char): TSQLSymbol;
 begin
     case C of
@@ -631,6 +640,7 @@ procedure TSelectSQLParser.SetSelectClause(const Value: string);
 begin
   if Union <> nil then Union.SelectClause := Value;
   FSelectClause := Value;
+  Changed
 end;
 
 procedure TSelectSQLParser.SetFromClause(const Value: string);
@@ -639,6 +649,7 @@ begin
     Union.FromClause := Value
   else
   FFromClause := Value;
+  Changed
 end;
 
 procedure TSelectSQLParser.SetGroupClause(const Value: string);
@@ -647,6 +658,7 @@ begin
     Union.GroupClause := Value
   else
   FGroupClause := Value;
+  Changed
 end;
 
 procedure TSelectSQLParser.SetOrderByClause(const Value: string);
@@ -655,6 +667,7 @@ begin
     Union.OrderByClause := Value
   else
     FOrderByClause := Value;
+  Changed
 end;
 
 procedure TSelectSQLParser.DropUnion;
@@ -662,13 +675,15 @@ begin
   if FUnion <> nil then
   begin
     FUnion.Free;
-    FUnion := nil
+    FUnion := nil;
+    Changed
   end
 end;
 
 procedure TSelectSQLParser.ResetWhereClause;
 begin
-  FWhereClause := FOriginalWhereClause
+  FWhereClause := FOriginalWhereClause;
+  Changed
 end;
 
 destructor TSelectSQLParser.Destroy;

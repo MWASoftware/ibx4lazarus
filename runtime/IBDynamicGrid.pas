@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DBGrids, DB,
-  IBSqlParserUnit, Grids, IBLookupComboEditBox, LMessages;
+  IBSqlParserUnit, Grids, IBLookupComboEditBox, LMessages, LookupIBComboBox;
 
 type
 
@@ -72,21 +72,33 @@ type
 
   TIBDynamicGridColumn = class(TDBDynamicGridColumn)
   private
+    FAutoComplete: boolean;
+    FAutoInsert: boolean;
+    FCaseSensitiveMatch: boolean;
     FInitialSortColumn: boolean;
     FKeyField: string;
+    FKeyPressInterval: integer;
     FListField: string;
     FListSource: TDataSource;
+    FOnCustomInsert: TCustomInsert;
     procedure SetInitialSortColumn(AValue: boolean);
+  public
+    constructor Create(ACollection: TCollection); override;
   published
     property InitialSortColumn: boolean read FInitialSortColumn write SetInitialSortColumn;
     property ListSource: TDataSource read FListSource write FListSource;
     property KeyField: string read FKeyField write FKeyField;
     property ListField: string read FListField write FListField;
+    property AutoInsert: boolean read FAutoInsert write FAutoInsert default true;
+    property AutoComplete: boolean read FAutoComplete write FAutoComplete default true;
+    property CaseSensitiveMatch: boolean read FCaseSensitiveMatch write FCaseSensitiveMatch;
+    property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
+    property OnCustomInsert: TCustomInsert read FOnCustomInsert write FOnCustomInsert;
   end;
 
   { TDBLookupCellEditor }
 
-  TDBLookupCellEditor = class(TIBLookupComboEditBox)
+  TDBLookupCellEditor = class(TLookupIBComboBox)
   private
     FGrid: TCustomGrid;
     FCol,FRow: Integer;
@@ -115,6 +127,7 @@ type
     procedure Loaded; override;
     procedure DoOnResize; override;
     function CreateColumns: TGridColumns; override;
+    procedure HeaderSized(IsColumn: Boolean; Index: Integer); override;
   public
     constructor Create(TheComponent: TComponent); override;
  end;
@@ -241,6 +254,7 @@ begin
     acol := TDBDynamicGridColumn(Columns[I]);
     if assigned(acol.FColumnTotalsControl) then
     begin
+      acol.FColumnTotalsControl.AutoSize :=  false;
       acol.FColumnTotalsControl.Left := LPos;
       acol.FColumnTotalsControl.Width := acol.Width
     end;
@@ -263,6 +277,12 @@ end;
 function TDBDynamicGrid.CreateColumns: TGridColumns;
 begin
   result := TDBGridColumns.Create(Self, TDBDynamicGridColumn);
+end;
+
+procedure TDBDynamicGrid.HeaderSized(IsColumn: Boolean; Index: Integer);
+begin
+  inherited HeaderSized(IsColumn, Index);
+  PositionTotals
 end;
 
 constructor TDBDynamicGrid.Create(TheComponent: TComponent);
@@ -317,7 +337,7 @@ end;
 
 procedure TDBLookupCellEditor.msg_GetValue(var Msg: TGridMessage);
 begin
-  EditingDone;
+  CheckAndInsert;
   Msg.Col := FCol;
   Msg.Row := FRow;
   Msg.Value:=Text;
@@ -361,6 +381,14 @@ begin
   if FInitialSortColumn = AValue then Exit;
   FInitialSortColumn := AValue;
   (Grid as TIBDynamicGrid).UpdateSortColumn(self)
+end;
+
+constructor TIBDynamicGridColumn.Create(ACollection: TCollection);
+begin
+  inherited Create(ACollection);
+  FAutoInsert := true;
+  FAutoComplete := true;
+  FKeyPressInterval := 500
 end;
 
 { TDynamicGridDataLink }
@@ -595,6 +623,11 @@ begin
          FDBLookupCellEditor.ListSource := C.ListSource;
          FDBLookupCellEditor.KeyField := C.KeyField;
          FDBLookupCellEditor.ListField := C.ListField;
+         FDBLookupCellEditor.AutoInsert := C.AutoInsert;
+         FDBLookupCellEditor.AutoComplete := C.AutoComplete;
+         FDBLookupCellEditor.CaseSensitiveMatch := C.CaseSensitiveMatch;
+         FDBLookupCellEditor.KeyPressInterval := C.KeyPressInterval;
+         FDBLookupCellEditor.OnCustomInsert := C.OnCustomInsert;
          Result := FDBLookupCellEditor;
       end
       else

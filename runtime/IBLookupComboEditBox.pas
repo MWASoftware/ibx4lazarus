@@ -31,15 +31,11 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DbCtrls,
-  ExtCtrls, IBSQLParserUnit, DB;
+  ExtCtrls, IBSQLParserUnit, DB, LookupIBComboBox;
 
 type
 
   TIBLookupComboEditBox = class;
-
-  TCustomInsert = procedure(Sender: TObject; aText: string; var KeyValue: variant) of object;
-
-  { TLookupDataLink }
 
   { TIBLookupComboEditBox }
 
@@ -48,17 +44,19 @@ type
     FAutoComplete: boolean;
     FAutoInsert: boolean;
     FCaseSensitiveMatch: boolean;
+    FKeyPressInterval: integer;
     { Private declarations }
      FTimer: TTimer;
      FFiltered: boolean;
      FOnCustomInsert: TCustomInsert;
      FOriginalTextValue: string;
-     procedure Handletimer(Sender: TObject);
+     procedure HandleTimer(Sender: TObject);
      procedure ResetParser;
      procedure UpdateList;
      procedure HandleEnter(Data: PtrInt);
   protected
     { Protected declarations }
+    procedure CheckAndInsert;
     procedure DataChange(Sender: TObject); override;
     procedure DoEnter; override;
     procedure DoExit; override;
@@ -74,6 +72,7 @@ type
     property AutoInsert: boolean read FAutoInsert write FAutoInsert default true;
     property AutoComplete: boolean read FAutoComplete write FAutoComplete default true;
     property CaseSensitiveMatch: boolean read FCaseSensitiveMatch write FCaseSensitiveMatch;
+    property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
     property OnCustomInsert: TCustomInsert read FOnCustomInsert write FOnCustomInsert;
   end;
 
@@ -84,11 +83,12 @@ uses IBQuery, IBCustomDataSet, LCLType, Variants;
 
 { TIBLookupComboEditBox }
 
-procedure TIBLookupComboEditBox.Handletimer(Sender: TObject);
+procedure TIBLookupComboEditBox.HandleTimer(Sender: TObject);
 var ActiveState: boolean;
 begin
   FTimer.Interval := 0;
-  if assigned(ListSource) and assigned(ListSource.DataSet) and (ListSource.DataSet is TIBCustomDataSet) then
+  if assigned(ListSource) and assigned(ListSource.DataSet) and (ListSource.DataSet is TIBCustomDataSet) and
+     ListSource.DataSet.Active then
   begin
     TIBDataSet(ListSource.DataSet).Parser.ResetWhereClause;
     if CaseSensitiveMatch then
@@ -102,7 +102,8 @@ end;
 
 procedure TIBLookupComboEditBox.ResetParser;
 begin
-  if FFiltered and assigned(ListSource.DataSet) and (ListSource.DataSet is TIBCustomDataSet) then
+  if FFiltered and assigned(ListSource.DataSet) and (ListSource.DataSet is TIBCustomDataSet) and
+     ListSource.DataSet.Active then
   begin
     TIBDataSet(ListSource.DataSet).Parser.ResetWhereClause;
     UpdateList;
@@ -115,8 +116,6 @@ var CurSelLength: integer;
 begin
   if assigned(ListSource) and assigned(ListSource.DataSet) and (ListSource.DataSet is TIBCustomDataSet) then
   begin
-       if ListSource.DataSet.Active then
-       begin
          ListSource.DataSet.Active := false;
          ListSource.DataSet.Active :=  true;
          if Focused then
@@ -129,7 +128,6 @@ begin
              SelLength := Length(Text) - CurSelLength
            end;
          end;
-       end
   end;
 end;
 
@@ -138,63 +136,7 @@ begin
   SelectAll
 end;
 
-procedure TIBLookupComboEditBox.DataChange(Sender: TObject);
-begin
-  inherited DataChange(Sender);
-  ResetParser;
-end;
-
-procedure TIBLookupComboEditBox.DoEnter;
-begin
-  inherited DoEnter;
-  FOriginalTextValue:= Text;
-  ResetParser;
-  Application.QueueAsyncCall(@HandleEnter,0);
-end;
-
-procedure TIBLookupComboEditBox.DoExit;
-begin
-  inherited DoExit;
-  FTimer.Interval := 0;
-end;
-
-procedure TIBLookupComboEditBox.KeyDown(var Key: Word; Shift: TShiftState);
-begin
-  inherited KeyDown(Key, Shift);
-  if Key = VK_RETURN then
-     EditingDone
-  else
-  if Key = VK_ESCAPE then
-  begin
-    ResetParser;
-    Text := FOriginalTextValue;
-  end;
-end;
-
-procedure TIBLookupComboEditBox.KeyPress(var Key: char);
-begin
-  inherited KeyPress(Key);
-  if AutoComplete and not (Word(Key)  in [VK_RETURN,VK_ESCAPE]) then
-    FTimer.Interval := 500
-end;
-
-constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
-begin
-  inherited Create(TheComponent);
-  FAutoInsert := true;
-  FAutoComplete := true;
-  FTimer := TTimer.Create(nil);
-  FTimer.Interval := 0;
-  FTimer.OnTimer := @HandleTimer;
-end;
-
-destructor TIBLookupComboEditBox.Destroy;
-begin
-  if assigned(FTimer) then FTimer.Free;
-  inherited Destroy;
-end;
-
-procedure TIBLookupComboEditBox.EditingDone;
+procedure TIBLookupComboEditBox.CheckAndInsert;
 var newid: variant;
     CurText: string;
 begin
@@ -235,6 +177,68 @@ begin
     end;
     UpdateData(nil);
   end;
+end;
+
+procedure TIBLookupComboEditBox.DataChange(Sender: TObject);
+begin
+  inherited DataChange(Sender);
+  ResetParser;
+end;
+
+procedure TIBLookupComboEditBox.DoEnter;
+begin
+  inherited DoEnter;
+  FOriginalTextValue:= Text;
+  ResetParser;
+  Application.QueueAsyncCall(@HandleEnter,0);
+end;
+
+procedure TIBLookupComboEditBox.DoExit;
+begin
+  inherited DoExit;
+  FTimer.Interval := 0;
+end;
+
+procedure TIBLookupComboEditBox.KeyDown(var Key: Word; Shift: TShiftState);
+begin
+  inherited KeyDown(Key, Shift);
+  if Key = VK_RETURN then
+     EditingDone
+  else
+  if Key = VK_ESCAPE then
+  begin
+    ResetParser;
+    Text := FOriginalTextValue;
+  end;
+end;
+
+procedure TIBLookupComboEditBox.KeyPress(var Key: char);
+begin
+  inherited KeyPress(Key);
+  if AutoComplete and not (Word(Key)  in [VK_RETURN,VK_ESCAPE]) then
+    FTimer.Interval := FKeyPressInterval
+end;
+
+constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
+begin
+  inherited Create(TheComponent);
+  FKeyPressInterval := 500;
+  FAutoInsert := true;
+  FAutoComplete := true;
+  FTimer := TTimer.Create(nil);
+  FTimer.Interval := 0;
+  FTimer.OnTimer := @HandleTimer;
+end;
+
+destructor TIBLookupComboEditBox.Destroy;
+begin
+  if assigned(FTimer) then FTimer.Free;
+  inherited Destroy;
+end;
+
+procedure TIBLookupComboEditBox.EditingDone;
+begin
+  CheckAndInsert;
   inherited EditingDone;
 end;
 

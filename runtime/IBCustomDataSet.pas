@@ -1916,6 +1916,8 @@ begin
     DidActivate := ActivateTransaction;
     FBase.CheckDatabase;
     FBase.CheckTransaction;
+    if assigned(FParser) and (FParser.SQLText <> FQSelect.SQL.Text) then
+      FQSelect.SQL.Text := FParser.SQLText;
     if FQSelect.SQL.Text <> '' then
     begin
       if not FQSelect.Prepared then
@@ -2223,8 +2225,9 @@ end;
 
 procedure TIBCustomDataSet.SQLChanging(Sender: TObject);
 begin
-  if FOpen then
-    InternalClose;
+  Active := false;
+{  if FOpen then
+    InternalClose;}
   if FInternalPrepared then
     InternalUnPrepare;
   FieldDefs.Clear;
@@ -2517,8 +2520,6 @@ end;
 procedure TIBCustomDataSet.DoBeforeOpen;
 begin
   DataEvent(deCheckBrowseMode,1); {Conventional use to report getting ready to prepare}
-  if assigned(FParser) and (FParser.SQLText <> FQSelect.SQL.Text) then
-    FQSelect.SQL.Text := FParser.SQLText;
   inherited DoBeforeOpen;
 end;
 
@@ -3713,7 +3714,10 @@ end;
 function TIBCustomDataSet.GetParser: TSelectSQLParser;
 begin
   if not assigned(FParser) then
+  begin
      FParser := TSelectSQLParser.Create(FBaseSQLSelect);
+     FParser.OnSQLChanging := SQLChanging
+  end;
   Result := FParser
 end;
 
@@ -3722,7 +3726,8 @@ begin
   if assigned(FParser) then
   begin
     FParser.Free;
-    FParser := nil
+    FParser := nil;
+    SQLChanging(nil)
   end;
 end;
 
