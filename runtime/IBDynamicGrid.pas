@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DBGrids, DB,
-  IBSqlParserUnit, Grids, IBLookupComboEditBox, LMessages, LookupIBComboBox;
+  IBSqlParserUnit, Grids, IBLookupComboEditBox, LMessages;
 
 type
 
@@ -98,7 +98,7 @@ type
 
   { TDBLookupCellEditor }
 
-  TDBLookupCellEditor = class(TLookupIBComboBox)
+  TDBLookupCellEditor = class(TIBLookupComboEditBox)
   private
     FGrid: TCustomGrid;
     FCol,FRow: Integer;

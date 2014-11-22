@@ -344,8 +344,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBBatchMove, DBLoginDlg, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
-     IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
-     LookupIBComboBox;
+     IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox;
 
 
 
@@ -405,11 +404,9 @@ begin
 
 
   {Firebird Data Access Controls}
-  RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TLookupIBComboBox]);
+  RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid]);
   RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'KeyField', TDBDynamicGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'ListField', TDBDynamicGridFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string),TLookupDBComboBox,'KeyField',TLookupFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string),TLookupDBComboBox,'ListField',TLookupFieldProperty);
 
 end;
 

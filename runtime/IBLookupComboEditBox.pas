@@ -31,9 +31,11 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DbCtrls,
-  ExtCtrls, IBSQLParserUnit, DB, LookupIBComboBox;
+  ExtCtrls, IBSQLParserUnit, DB;
 
 type
+
+  TCustomInsert = procedure(Sender: TObject; aText: string; var KeyValue: variant) of object;
 
   TIBLookupComboEditBox = class;
 
@@ -174,6 +176,8 @@ begin
       finally
         ListSource.DataSet.EnableControls
       end;
+      ListSource.DataSet.Active := false;
+      ListSource.DataSet.Active := true
     end;
     UpdateData(nil);
   end;

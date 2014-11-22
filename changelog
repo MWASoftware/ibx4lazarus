@@ -1,7 +1,40 @@
-IBX Change Log  version                      (1.1-1) tba, 07 Jul 2014 14:01:07 +0100
+IBX Change Log  version                      (1.2-0) tba, 07 Jul 2014 14:01:07 +0100
 
-1. When getting a field value using FieldByName.AsVariant, an SQL_INT64 with a
+1. An internal select SQL Parser is now available for TIBCustomDataset descendents.
+   This is typically used during an "OnBeforeOpen" event handler to manipulate the
+   "Where" and "Having" clauses to implement user specified filters of arbitrary
+   complexity.
+
+2. A new Component Palette entry "Firebird Data Controls" is now available. This has
+   two new data aware controls dependent on IBX and which make use of the SQL Parser.
+   These are:
+
+   - TIBLookupComboEditBox
+   - TDBDynamicGrid
+
+   TIBLookupComboEditBox is a TDBLookupComboBox descendent that implements "autocomplete"
+   of typed in text and "autoinsert" of new entries. Autocomplete uses SQL manipulation
+   to revise the available list and restrict it to items that are prefixed by the
+   typed text (either case sensitive or case insenstive). Autoinsert allows a
+   newly typed entry to be added to the list dataset and included in the available
+   list items.
+
+   TDBDynamicGrid is a TDBGrid descendent that provides for:
+   - automatic resizing of selected columns to fill the available row length
+   - automatic positioning and sizing of a "totals" control, typically at the
+     column footer, on a per column basis.
+   - DataSet resorting on header row click, sorting the dataset by the selected column.
+     A second click on the same header cell reversed the sort order.
+   - Reselection of the same row following resorting.
+   - A new cell editor that provides the same functionality as TIBLookupComboEditBox.
+     Its properties are specified on a per column basis and allows for one or more
+     columns to have their values selected from a list provided by a dataset.
+     Autocomplete and autoinsert are also available. The existing picklist editor
+     is unaffected by the extension.
+
+3. When getting a field value using FieldByName.AsVariant, an SQL_INT64 with a
    zero scale will no longer return an error. An Int64 will be returned instead.
+
 
 IBX Change Log  version                      (1.1-0) Mon, 07 Jul 2014 14:01:07 +0100
 
