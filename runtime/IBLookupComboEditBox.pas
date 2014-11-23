@@ -159,9 +159,7 @@ begin
       newid := Null;
       OnCustomInsert(self,Text,newid);
       if varIsNull(newid) then
-         Text := FOriginalTextValue
-      else
-        Text := CurText;
+         CurText := FOriginalTextValue
     end
     else
     if AutoInsert then
@@ -172,7 +170,6 @@ begin
         try
           ListSource.DataSet.FieldByName(ListField).AsString := CurText;
           ListSource.DataSet.Post;
-          Text := CurText;
        except
           ListSource.DataSet.Cancel;
           Text := FOriginalTextValue;
@@ -184,6 +181,7 @@ begin
     end;
     ResetParser;
     ListSource.DataSet.Active := true;
+    Text := CurText;
     UpdateData(nil);
   end;
 end;
