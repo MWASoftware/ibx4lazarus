@@ -179,7 +179,7 @@ begin
         ListSource.DataSet.EnableControls
       end;
     end;
-    ResetParser;
+    ResetParser; {Closes ListSource DataSet}
     ListSource.DataSet.Active := true;
     Text := CurText;
     UpdateData(nil);
