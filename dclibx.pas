@@ -2,7 +2,7 @@
   This source is only used to compile and install the package.
  }
 
- unit dclibx;
+unit dclibx;
 
 interface
 
@@ -10,9 +10,9 @@ uses
   IBDBReg, IBEventsEditor, IBTransactionEdit, IBDatabaseEdit, IBSystemTables, 
   ibdeletesqleditor, IBGeneratorEditor, ibinsertsqleditor, ibmodifysqleditor, 
   ibselectsqleditor, IBUpdateSQLEditor, IBSQLEditor, IBDataSetEditor, 
-  dbFieldLinkPropEditor, LazarusPackageIntf;
+  dbFieldLinkPropEditor, dbFieldListPropEditor, LazarusPackageIntf;
 
- implementation
+implementation
 
 procedure Register;
 begin

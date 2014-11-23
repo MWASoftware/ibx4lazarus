@@ -34,6 +34,20 @@ uses
   IBSqlParserUnit, Grids, IBLookupComboEditBox, LMessages;
 
 type
+  {
+  TIBDynamicGrid is a TDBGrid descendent that provides for:
+   - automatic resizing of selected columns to fill the available row length
+   - automatic positioning and sizing of a "totals" control, typically at the
+     column footer, on a per column basis.
+   - DataSet resorting on header row click, sorting the dataset by the selected column.
+     A second click on the same header cell reversed the sort order.
+   - Reselection of the same row following resorting.
+   - A new cell editor that provides the same functionality as TIBLookupComboEditBox.
+     Its properties are specified on a per column basis and allows for one or more
+     columns to have their values selected from a list provided by a dataset.
+     Autocomplete and autoinsert are also available. The existing picklist editor
+     is unaffected by the extension.
+  }
 
   TIBDynamicGrid = class;
 
@@ -144,8 +158,8 @@ type
     FDescending: boolean;
     FColHeaderClick: boolean;
     FLastColIndex: integer;
-    FIndexFieldNames: TStringList;
-    FIndexFields: string;
+    FIndexFieldNames: string;
+    FIndexFieldsList: TStringList;
     FBookmark: array of variant;
     FDBLookupCellEditor: TDBLookupCellEditor;
     FActive: boolean;
@@ -153,17 +167,15 @@ type
     procedure ColumnHeaderClick(Index: integer);
     function GetDataSource: TDataSource;
     function GetEditorBorderStyle: TBorderStyle;
-    function GetIndexFieldNames: TStrings;
     procedure SetDataSource(AValue: TDataSource);
     procedure SetEditorBorderStyle(AValue: TBorderStyle);
-    procedure SetIndexFieldNames(AValue: TStrings);
     procedure ProcessColumns;
-    procedure UpdateSQL(Sender: TObject; DataSet: TDataSet; Parser: TSelectSQLParser);
+    procedure SetIndexFieldNames(AValue: string);
+    procedure UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
     procedure UpdateSortColumn(Sender: TObject);
     procedure DataSetScrolled(Sender: TObject);
     procedure RestorePosition(Data: PtrInt);
     procedure DoReOpen(Data: PtrInt);
-    procedure CacheIndexFieldNames;
   protected
     { Protected declarations }
     procedure Loaded; override;
@@ -183,7 +195,7 @@ type
     property Descending: boolean read FDescending write FDescending;
     property EditorBorderStyle: TBorderStyle read GetEditorBorderStyle write SetEditorBorderStyle;
     property DefaultPositionAtEnd: boolean read  FDefaultPositionAtEnd write FDefaultPositionAtEnd;
-    property IndexFieldNames: TStrings read GetIndexFieldNames write SetIndexFieldNames;
+    property IndexFieldNames: string read FIndexFieldNames write SetIndexFieldNames;
     property OnUpdateSortOrder: TOnUpdateSortOrder read FOnUpdateSortOrder write FOnUpdateSortOrder;
  end;
 
@@ -398,10 +410,10 @@ begin
   if (Event = deCheckBrowseMode) and (Info = 1) and not DataSet.Active then
   begin
     if (DataSet is TIBDataSet) then
-      FOwner.UpdateSQL(self,DataSet,TIBDataSet(DataSet).Parser)
+      FOwner.UpdateSQL(self,TIBDataSet(DataSet).Parser)
     else
     if (DataSet is TIBQuery) then
-      FOwner.UpdateSQL(self,DataSet,TIBQuery(DataSet).Parser)
+      FOwner.UpdateSQL(self,TIBQuery(DataSet).Parser)
   end
   else
   inherited DataEvent(Event, Info);
@@ -460,11 +472,6 @@ begin
     Result := inherited EditorBorderStyle
 end;
 
-function TIBDynamicGrid.GetIndexFieldNames: TStrings;
-begin
-  Result := FIndexFieldNames
-end;
-
 procedure TIBDynamicGrid.SetDataSource(AValue: TDataSource);
 begin
   inherited DataSource := AValue;
@@ -482,15 +489,6 @@ begin
   end;
 end;
 
-procedure TIBDynamicGrid.SetIndexFieldNames(AValue: TStrings);
-begin
-  FIndexFieldNames.Assign(AValue);
-  CacheIndexFieldNames
-
-
-end;
-
-
 procedure TIBDynamicGrid.ProcessColumns;
 var i: integer;
 begin
@@ -501,8 +499,18 @@ begin
   end
 end;
 
-procedure TIBDynamicGrid.UpdateSQL(Sender: TObject; DataSet: TDataSet;
-  Parser: TSelectSQLParser);
+procedure TIBDynamicGrid.SetIndexFieldNames(AValue: string);
+var idx: integer;
+begin
+  if FIndexFieldNames = AValue then Exit;
+  FIndexFieldNames := AValue;
+  idx := 1;
+  FIndexFieldsList.Clear;
+  while idx <= Length(AValue) do
+        FIndexFieldsList.Add(ExtractFieldName(AValue,idx));
+end;
+
+procedure TIBDynamicGrid.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 var OrderBy: string;
 begin
     Parser.ResetWhereClause;
@@ -538,10 +546,10 @@ procedure TIBDynamicGrid.DataSetScrolled(Sender: TObject);
 var i: integer;
     F: TField;
 begin
-    SetLength(FBookmark,FIndexFieldNames.Count);
-    for i := 0 to FIndexFieldNames.Count - 1 do
+    SetLength(FBookmark,FIndexFieldsList.Count);
+    for i := 0 to FIndexFieldsList.Count - 1 do
     begin
-      F := DataSource.DataSet.FindField(FIndexFieldNames[i]);
+      F := DataSource.DataSet.FindField(FIndexFieldsList[i]);
       if assigned(F) then
          FBookmark[i] := F.AsVariant;
     end;
@@ -552,7 +560,7 @@ begin
   if assigned(DataSource) and assigned(DataSource.DataSet) and DataSource.DataSet.Active then
   begin
     if Length(FBookmark) > 0 then
-      DataSource.DataSet.Locate(FIndexFields,FBookmark,[])
+      DataSource.DataSet.Locate(FIndexFieldNames,FBookmark,[])
     else
     if FDefaultPositionAtEnd then
        DataSource.DataSet.Last
@@ -564,22 +572,10 @@ begin
   DataSource.DataSet.Active := true;
 end;
 
-procedure TIBDynamicGrid.CacheIndexFieldNames;
-var I: integer;
-begin
-  FIndexFields := '';
-  for i := 0 to FIndexFieldNames.Count - 1 do
-   if i = 0 then
-      FIndexFields := FIndexFieldNames[0]
-   else
-     FIndexFields := FIndexFields + ';' + FIndexFieldNames[i]
-end;
-
 procedure TIBDynamicGrid.Loaded;
 begin
   inherited Loaded;
   ProcessColumns;
-  CacheIndexFieldNames
 end;
 
 function TIBDynamicGrid.CreateColumns: TGridColumns;
@@ -647,7 +643,9 @@ begin
   inherited Create(TheComponent);
   FAllowColumnSort := true;
   FDataLink := TDynamicGridDataLink.Create(self);
-  FIndexFieldNames := TStringList.Create;
+  FIndexFieldsList := TStringList.Create;
+  FIndexFieldsList.Delimiter := ';';
+  FIndexFieldsList.StrictDelimiter := true;
   FDBLookupCellEditor := TDBLookupCellEditor.Create(nil);
   FDBLookupCellEditor.Name := 'DBLookupCellEditor';
   FDBLookupCellEditor.Visible := False;
@@ -657,7 +655,7 @@ end;
 destructor TIBDynamicGrid.Destroy;
 begin
   if assigned(FDataLink) then FDataLink.Free;
-  if assigned(FIndexFieldNames) then FIndexFieldNames.Free;
+  if assigned(FIndexFieldsList) then FIndexFieldsList.Free;
   if assigned(FDBLookupCellEditor) then FDBLookupCellEditor.Free;
   inherited Destroy;
 end;

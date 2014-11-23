@@ -57,7 +57,7 @@ interface
 uses SysUtils, Classes, Graphics, Dialogs, Controls, Forms, TypInfo,
      DB, IBTable, IBDatabase,  IBEventsEditor,  LazarusPackageIntf,
       IBUpdateSQL, IBXConst, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor,
-     dbFieldLinkPropEditor;
+     dbFieldLinkPropEditor, dbFieldListPropEditor;
 
 type
 
@@ -332,6 +332,15 @@ type
     procedure FillValues(const Values: TStringList); override;
   end;
 
+  { TIBDynamicGridIndexNamesProperty }
+
+  TIBDynamicGridIndexNamesProperty = class(TIndexFieldNamesProperty)
+  protected
+    function GetFieldDefs: TFieldDefs; override;
+    function GetIndexFieldNames: string; override;
+    procedure SetIndexFieldNames(const Value: string); override;
+  end;
+
 
 
 procedure Register;
@@ -407,6 +416,7 @@ begin
   RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid]);
   RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'KeyField', TDBDynamicGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'ListField', TDBDynamicGridFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TIBDynamicGrid, 'IndexFieldNames', TIBDynamicGridIndexNamesProperty);
 
 end;
 
@@ -430,6 +440,32 @@ begin
       end;
     end;
   end;
+end;
+
+{ TIBDynamicGridIndexNamesProperty }
+
+function TIBDynamicGridIndexNamesProperty.GetFieldDefs: TFieldDefs;
+var Grid: TIBDynamicGrid;
+begin
+  Result := nil;
+  Grid := TIBDynamicGrid(GetComponent(0));
+  if assigned(Grid.DataSource) and assigned(Grid.DataSource.DataSet) then
+     Result := Grid.DataSource.DataSet.FieldDefs
+end;
+
+function TIBDynamicGridIndexNamesProperty.GetIndexFieldNames: string;
+var Grid: TIBDynamicGrid;
+begin
+  Grid := TIBDynamicGrid(GetComponent(0));
+  Result := Grid.IndexFieldNames
+end;
+
+procedure TIBDynamicGridIndexNamesProperty.SetIndexFieldNames(
+  const Value: string);
+var Grid: TIBDynamicGrid;
+begin
+  Grid := TIBDynamicGrid(GetComponent(0));
+  Grid.IndexFieldNames := Value
 end;
 
 { TDBDynamicGridFieldProperty }

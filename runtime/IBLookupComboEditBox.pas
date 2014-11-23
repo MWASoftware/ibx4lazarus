@@ -35,6 +35,13 @@ uses
 
 type
 
+  {TIBLookupComboEditBox is a TDBLookupComboBox descendent that implements "autocomplete"
+   of typed in text and "autoinsert" of new entries. Autocomplete uses SQL manipulation
+   to revise the available list and restrict it to items that are prefixed by the
+   typed text (either case sensitive or case insenstive). Autoinsert allows a
+   newly typed entry to be added to the list dataset and included in the available
+   list items.    }
+
   TCustomInsert = procedure(Sender: TObject; aText: string; var KeyValue: variant) of object;
 
   TIBLookupComboEditBox = class;
@@ -155,14 +162,12 @@ begin
          Text := FOriginalTextValue
       else
         Text := CurText;
-      ResetParser
     end
     else
     if AutoInsert then
     begin
       ListSource.DataSet.DisableControls;
       try
-        ResetParser;
         ListSource.DataSet.Append;
         try
           ListSource.DataSet.FieldByName(ListField).AsString := CurText;
@@ -176,9 +181,9 @@ begin
       finally
         ListSource.DataSet.EnableControls
       end;
-      ListSource.DataSet.Active := false;
-      ListSource.DataSet.Active := true
     end;
+    ResetParser;
+    ListSource.DataSet.Active := true;
     UpdateData(nil);
   end;
 end;
