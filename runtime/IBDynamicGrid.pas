@@ -587,6 +587,8 @@ procedure TIBDynamicGrid.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 var Coord: TGridCoord;
 begin
+  if (Editor is TDBLookupCellEditor) and Editor.Visible then
+     Editor.Perform(CM_EXIT,0,0);  {Do insert new value if necessary}
   inherited MouseDown(Button, Shift, X, Y);
   Coord := MouseCoord(X,Y);
   if AllowColumnSort and

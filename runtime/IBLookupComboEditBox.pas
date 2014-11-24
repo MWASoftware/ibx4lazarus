@@ -203,6 +203,7 @@ end;
 procedure TIBLookupComboEditBox.DoExit;
 begin
   inherited DoExit;
+  CheckAndInsert;
   FTimer.Interval := 0;
 end;
 
