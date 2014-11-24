@@ -114,7 +114,7 @@ begin
   if FFiltered and assigned(ListSource.DataSet) and (ListSource.DataSet is TIBCustomDataSet) and
      ListSource.DataSet.Active then
   begin
-    TIBDataSet(ListSource.DataSet).Parser.ResetWhereClause;
+    TIBDataSet(ListSource.DataSet).Parser.Reset;
     UpdateList;
     FFiltered := false
   end;

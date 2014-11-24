@@ -259,7 +259,6 @@ type
 
     function GetParser: TSelectSQLParser;
     function GetSelectStmtHandle: TISC_STMT_HANDLE;
-    procedure SetBaseSQLSelect(AValue: TStrings);
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
 
@@ -435,7 +434,7 @@ type
     property UpdateMode: TUpdateMode read FUpdateMode write SetUpdateMode default upWhereAll;
     property ParamCheck: Boolean read FParamCheck write FParamCheck default True;
     property Parser: TSelectSQLParser read GetParser;
-    property BaseSQLSelect: TStrings read FBaseSQLSelect write SetBaseSQLSelect;
+    property BaseSQLSelect: TStrings read FBaseSQLSelect;
 
     property BeforeDatabaseDisconnect: TNotifyEvent read FBeforeDatabaseDisconnect
                                                  write FBeforeDatabaseDisconnect;
@@ -2162,6 +2161,7 @@ begin
   begin
     Disconnect;
     FQSelect.SQL.Assign(Value);
+    FBaseSQLSelect.assign(Value);
   end;
 end;
 
@@ -2519,6 +2519,8 @@ end;
 
 procedure TIBCustomDataSet.DoBeforeOpen;
 begin
+  if assigned(FParser) then
+     FParser.Reset;
   DataEvent(deCheckBrowseMode,1); {Conventional use to report getting ready to prepare}
   inherited DoBeforeOpen;
 end;
@@ -3452,8 +3454,8 @@ end;
 procedure TIBCustomDataSet.Loaded;
 begin
   inherited Loaded;
-  if assigned(FBaseSQLSelect) and (FBaseSQLSelect.Text = '') then
-     FBaseSQLSelect.assign(QSelect.SQL);
+  if assigned(FQSelect) then
+    FBaseSQLSelect.assign(FQSelect.SQL);
 end;
 
 function TIBCustomDataSet.Locate(const KeyFields: string; const KeyValues: Variant;
@@ -3702,13 +3704,6 @@ end;
 function TIBCustomDataSet.GetSelectStmtHandle: TISC_STMT_HANDLE;
 begin
   Result := FQSelect.Handle;
-end;
-
-procedure TIBCustomDataSet.SetBaseSQLSelect(AValue: TStrings);
-begin
-  if FBaseSQLSelect = AValue then Exit;
-  FBaseSQLSelect.assign(AValue);
-  ResetParser;
 end;
 
 function TIBCustomDataSet.GetParser: TSelectSQLParser;

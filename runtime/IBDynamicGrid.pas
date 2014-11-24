@@ -163,7 +163,6 @@ type
     FBookmark: array of variant;
     FDBLookupCellEditor: TDBLookupCellEditor;
     FActive: boolean;
-    procedure ActiveChanged(Sender: TObject);
     procedure ColumnHeaderClick(Index: integer);
     function GetDataSource: TDataSource;
     function GetEditorBorderStyle: TBorderStyle;
@@ -434,14 +433,6 @@ end;
 
 { TIBDynamicGrid }
 
-procedure TIBDynamicGrid.ActiveChanged(Sender: TObject);
-begin
-  if (Sender = TObject(FDataLink)) and assigned(FDataLink.DataSet)
-     and FDataLink.DataSet.Active then
-  begin
-  end;
-end;
-
 procedure TIBDynamicGrid.ColumnHeaderClick(Index: integer);
 begin
   FColHeaderClick := true;
@@ -513,7 +504,6 @@ end;
 procedure TIBDynamicGrid.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 var OrderBy: string;
 begin
-    Parser.ResetWhereClause;
     if Sender = TObject(FDataLink) then
     begin
       if Descending then
@@ -586,8 +576,17 @@ end;
 procedure TIBDynamicGrid.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 var Coord: TGridCoord;
+    function PtInRect(const Rect : TRect;const p : TPoint) : Boolean;
+
+    begin
+      PtInRect:=(p.y>=Rect.Top) and
+                (p.y<Rect.Bottom) and
+                (p.x>=Rect.Left) and
+                (p.x<Rect.Right);
+    end;
 begin
-  if (Editor is TDBLookupCellEditor) and Editor.Visible then
+  if (Editor is TDBLookupCellEditor) and Editor.Visible
+             and not PtInRect(Editor.BoundsRect,Point(X,Y)) then
      Editor.Perform(CM_EXIT,0,0);  {Do insert new value if necessary}
   inherited MouseDown(Button, Shift, X, Y);
   Coord := MouseCoord(X,Y);

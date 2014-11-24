@@ -514,7 +514,7 @@
 
    Contributor(s): ______________________________________. "/>
     <Version Major="1" Minor="2"/>
-    <Files Count="2">
+    <Files Count="3">
       <Item1>
         <Filename Value="runtime/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
@@ -523,6 +523,10 @@
         <Filename Value="runtime/IBDynamicGrid.pas"/>
         <UnitName Value="IBDynamicGrid"/>
       </Item2>
+      <Item3>
+        <Filename Value="runtime/IBTreeView.pas"/>
+        <UnitName Value="IBTreeView"/>
+      </Item3>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">

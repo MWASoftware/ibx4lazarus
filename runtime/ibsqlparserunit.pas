@@ -91,6 +91,7 @@ type
     procedure Add2WhereClause(const Condition: string; OrClause: boolean=false);
     procedure DropUnion;
     procedure ResetWhereClause;
+    procedure Reset;
     property SelectClause: string read FSelectClause write SetSelectClause;
     property FromClause: string read FFromClause write SetFromClause;
     property GroupClause: string read FGroupClause write SetGroupClause;
@@ -684,6 +685,11 @@ procedure TSelectSQLParser.ResetWhereClause;
 begin
   FWhereClause := FOriginalWhereClause;
   Changed
+end;
+
+procedure TSelectSQLParser.Reset;
+begin
+  ResetWhereClause
 end;
 
 destructor TSelectSQLParser.Destroy;

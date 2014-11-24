@@ -332,6 +332,13 @@ type
     procedure FillValues(const Values: TStringList); override;
   end;
 
+  { TIBTreeViewFieldProperty }
+
+  TIBTreeViewFieldProperty = class(TFieldProperty)
+  public
+    procedure FillValues(const Values: TStringList); override;
+  end;
+
   { TIBDynamicGridIndexNamesProperty }
 
   TIBDynamicGridIndexNamesProperty = class(TIndexFieldNamesProperty)
@@ -353,7 +360,8 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBBatchMove, DBLoginDlg, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
-     IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox;
+     IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
+     IBTreeView;
 
 
 
@@ -413,10 +421,14 @@ begin
 
 
   {Firebird Data Access Controls}
-  RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid]);
+  RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView]);
   RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'KeyField', TDBDynamicGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'ListField', TDBDynamicGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBDynamicGrid, 'IndexFieldNames', TIBDynamicGridIndexNamesProperty);
+  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'KeyField', TIBTreeViewFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ListField', TIBTreeViewFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ParentField', TIBTreeViewFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'HasChildField', TIBTreeViewFieldProperty);
 
 end;
 
@@ -440,6 +452,15 @@ begin
       end;
     end;
   end;
+end;
+
+{ TIBTreeViewFieldProperty }
+
+procedure TIBTreeViewFieldProperty.FillValues(const Values: TStringList);
+var ListSource: TDataSource;
+begin
+  ListSource :=  TIBTreeView(GetComponent(0)).ListSource;
+  LoadDataSourceFields(ListSource, Values);
 end;
 
 { TIBDynamicGridIndexNamesProperty }
