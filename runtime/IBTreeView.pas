@@ -38,12 +38,15 @@ type
     FExpandNode: TTreeNode;
     FRootNode: TTreeNode;
     FRootNodeTitle: string;
+    FEditingItem: TTreeNode;
+    FSavedOnEdited: TTVEditedEvent;
     procedure ActiveChanged(Sender: TObject);
     procedure AddNodes;
     procedure DataSetChanged(Sender: TObject);
     function GetDataSet: TDataSet;
     function GetListSource: TDataSource;
     function GetSelectedKeyValue: variant;
+    procedure HandleOnEdited(Sender: TObject; Node: TTreeNode; var NewText: string);
     procedure SetHasChildField(AValue: string);
     procedure SetKeyField(AValue: string);
     procedure SetListField(AValue: string);
@@ -275,6 +278,42 @@ begin
      Result := TNodeInfo(Selected.Data).KeyValue
 end;
 
+procedure TIBTreeView.HandleOnEdited(Sender: TObject; Node: TTreeNode;
+  var NewText: string);
+begin
+  FEditingItem := Node;
+  {Ideally, we woold have done these checks before editing began
+   as well as put the dataset in the correct mode - but "BeginEditing"
+   is not virtual....}
+  if assigned(DataSet) then
+  begin
+    {Scroll the DataSet to the edited item}
+    DataSet.Active := false;
+    DataSet.Active := true;
+    if DataSet.RecordCount > 1 then
+       raise Exception.Create('Record Key is ambiguous')
+  end;
+  {Now Update the DataSet}
+  if assigned(DataSet) and assigned(Selected) then
+  begin
+    if not assigned(Selected.Data) then
+    begin
+       DataSet.Append;
+       Node.Data := TNodeInfo.Create(DataSet.FieldByName(KeyField).AsVariant)
+    end
+    else
+      DataSet.Edit;
+    try
+      DataSet.FieldByName(ListField).AsString := NewText;
+      DataSet.Post
+    except
+      DataSet.Cancel;
+      raise
+    end
+  end;
+  if assigned(FSavedOnEdited) then FSavedOnEdited(Sender,Node,NewText)
+end;
+
 procedure TIBTreeView.SetHasChildField(AValue: string);
 begin
   if FHasChildField = AValue then Exit;
@@ -323,24 +362,24 @@ end;
 
 procedure TIBTreeView.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 begin
-  if not assigned(FExpandNode) then Exit; {avoid exception}
   Parser.ResetWhereClause;
-  if not assigned(FExpandNode) and assigned(Selected) then {Scrolling dataset}
+  if not assigned(FExpandNode) and assigned(FEditingItem) then {Scrolling dataset}
   begin
     Parser.Add2WhereClause(FKeyField + ' = :IBX_KEY_VALUE');
     if (Sender as TDataLink).DataSet is TIBQuery then
       TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
-        TNodeInfo(Selected.Data).KeyValue
+        TNodeInfo(FEditingItem.Data).KeyValue
     else
     if (Sender as TDataLink).DataSet is TIBDataSet then
       TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
-        TNodeInfo(Selected.Data).KeyValue
+        TNodeInfo(FEditingItem.Data).KeyValue
   end
   else
   if FExpandNode = FRootNode then
     {Need to Load Root Nodes}
     Parser.Add2WhereClause(FParentField + ' is null')
   else
+  if assigned(FExpandNode) then
   begin
     Parser.Add2WhereClause(FParentField + ' = :IBX_PARENT_VALUE');
     if (Sender as TDataLink).DataSet is TIBQuery then
@@ -368,35 +407,10 @@ end;
 
 procedure TIBTreeView.EditorEditingDone(Sender: TObject);
 begin
-  {Ideally, we woold have done these checks before editing began
-   as well as put the dataset in the correct mode - but "BeginEditing"
-   is not virtual....}
-  if assigned(DataSet) then
-  begin
-    {Scroll the DataSet to the edited item}
-    DataSet.Active := false;
-    DataSet.Active := true;
-    if DataSet.RecordCount > 1 then
-       raise Exception.Create('Record Key is ambiguous')
-  end;
+  FSavedOnEdited := OnEdited;
+  OnEdited := @HandleOnEdited;
   inherited EditorEditingDone(Sender);
-  {Now Update the DataSet}
-  if assigned(DataSet) and assigned(Selected) then
-  begin
-    if not assigned(Selected.Data) then
-    begin
-       DataSet.Append;
-       Selected.Data := TNodeInfo.Create(DataSet.FieldByName(KeyField).AsVariant)
-    end
-    else
-      DataSet.Edit;
-    try
-      DataSet.Post
-    except
-      DataSet.Cancel;
-      raise
-    end
-  end
+  OnEdited := FSavedOnEdited
 end;
 
 procedure TIBTreeView.Expand(Node: TTreeNode);
