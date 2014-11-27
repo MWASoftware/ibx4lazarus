@@ -59,7 +59,6 @@ type
     { Protected declarations }
      function CanEdit(Node: TTreeNode): Boolean; override;
      procedure Delete(Node: TTreeNode); override;
-     procedure EditorEditingDone(Sender: TObject); override;
      procedure Expand(Node: TTreeNode); override;
      procedure Loaded; override;
      procedure Reinitialise;
@@ -232,7 +231,7 @@ procedure TIBTreeView.ActiveChanged(Sender: TObject);
 begin
   if assigned(DataSet) and not DataSet.Active then
   begin
-    if not assigned(FExpandNode) then {must really be closing}
+    if not assigned(FExpandNode) and not assigned(FEditingItem) then {must really be closing}
       Reinitialise
   end
   else
@@ -282,36 +281,40 @@ procedure TIBTreeView.HandleOnEdited(Sender: TObject; Node: TTreeNode;
   var NewText: string);
 begin
   FEditingItem := Node;
-  {Ideally, we woold have done these checks before editing began
-   as well as put the dataset in the correct mode - but "BeginEditing"
-   is not virtual....}
-  if assigned(DataSet) then
-  begin
-    {Scroll the DataSet to the edited item}
-    DataSet.Active := false;
-    DataSet.Active := true;
-    if DataSet.RecordCount > 1 then
-       raise Exception.Create('Record Key is ambiguous')
-  end;
-  {Now Update the DataSet}
-  if assigned(DataSet) and assigned(Selected) then
-  begin
-    if not assigned(Selected.Data) then
-    begin
-       DataSet.Append;
-       Node.Data := TNodeInfo.Create(DataSet.FieldByName(KeyField).AsVariant)
-    end
-    else
-      DataSet.Edit;
-    try
-      DataSet.FieldByName(ListField).AsString := NewText;
-      DataSet.Post
-    except
-      DataSet.Cancel;
-      raise
-    end
-  end;
-  if assigned(FSavedOnEdited) then FSavedOnEdited(Sender,Node,NewText)
+  try
+    {Ideally, we woold have done these checks before editing began
+      as well as put the dataset in the correct mode - but "BeginEditing"
+      is not virtual....}
+     if assigned(DataSet) then
+     begin
+       {Scroll the DataSet to the edited item}
+       DataSet.Active := false;
+       DataSet.Active := true;
+       if DataSet.RecordCount > 1 then
+          raise Exception.Create('Record Key is ambiguous')
+     end;
+     {Now Update the DataSet}
+     if assigned(DataSet) and assigned(Node) then
+     begin
+       if not assigned(Node.Data) then
+       begin
+          DataSet.Append;
+          Node.Data := TNodeInfo.Create(DataSet.FieldByName(KeyField).AsVariant)
+       end
+       else
+         DataSet.Edit;
+       try
+         DataSet.FieldByName(ListField).AsString := NewText;
+         DataSet.Post
+       except
+         DataSet.Cancel;
+         raise
+       end
+     end;
+     if assigned(FSavedOnEdited) then FSavedOnEdited(Sender,Node,NewText)
+  finally
+    FEditingItem := nil
+  end
 end;
 
 procedure TIBTreeView.SetHasChildField(AValue: string);
@@ -363,7 +366,8 @@ end;
 procedure TIBTreeView.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 begin
   Parser.ResetWhereClause;
-  if not assigned(FExpandNode) and assigned(FEditingItem) then {Scrolling dataset}
+  if not assigned(FExpandNode) and assigned(FEditingItem)
+               and assigned(FEditingItem.Data) then {Scrolling dataset}
   begin
     Parser.Add2WhereClause(FKeyField + ' = :IBX_KEY_VALUE');
     if (Sender as TDataLink).DataSet is TIBQuery then
@@ -405,14 +409,6 @@ begin
     TNodeInfo(Node.Data).Free
 end;
 
-procedure TIBTreeView.EditorEditingDone(Sender: TObject);
-begin
-  FSavedOnEdited := OnEdited;
-  OnEdited := @HandleOnEdited;
-  inherited EditorEditingDone(Sender);
-  OnEdited := FSavedOnEdited
-end;
-
 procedure TIBTreeView.Expand(Node: TTreeNode);
 begin
   inherited Expand(Node);
@@ -427,6 +423,11 @@ end;
 procedure TIBTreeView.Loaded;
 begin
   inherited Loaded;
+  if FSavedOnEdited = nil then
+  begin
+    FSavedOnEdited := OnEdited;
+    OnEdited := @HandleOnEdited;
+  end;
   Reinitialise
 end;
 
