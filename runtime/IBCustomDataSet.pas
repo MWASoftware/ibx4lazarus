@@ -51,7 +51,7 @@ uses
 {$ENDIF}
   SysUtils, Classes, Forms, Controls, IBDatabase,
   IBExternals, IB, IBHeader,  IBSQL, Db,
-  IBUtils, IBBlob, IBSQLParserUnit;
+  IBUtils, IBBlob, IBSQLParser;
 
 const
   BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
