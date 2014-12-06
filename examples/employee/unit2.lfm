@@ -8,18 +8,18 @@ object EditEmployeeDlg: TEditEmployeeDlg
   ClientWidth = 395
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '0.9.30'
+  LCLVersion = '1.2.6.0'
   object Label1: TLabel
     Left = 20
-    Height = 18
+    Height = 15
     Top = 25
-    Width = 72
+    Width = 64
     Caption = 'First Name'
     ParentColor = False
   end
   object DBEdit1: TDBEdit
     Left = 20
-    Height = 27
+    Height = 25
     Top = 45
     Width = 194
     DataField = 'FIRST_NAME'
@@ -30,47 +30,47 @@ object EditEmployeeDlg: TEditEmployeeDlg
   end
   object Label2: TLabel
     Left = 20
-    Height = 18
+    Height = 15
     Top = 96
-    Width = 71
+    Width = 64
     Caption = 'Last Name'
     ParentColor = False
   end
   object Label3: TLabel
     Left = 248
-    Height = 18
+    Height = 15
     Top = 25
-    Width = 92
+    Width = 83
     Caption = 'Employee No.'
     ParentColor = False
   end
   object Label4: TLabel
     Left = 20
-    Height = 18
+    Height = 15
     Top = 168
-    Width = 83
+    Width = 77
     Caption = 'Date Started'
     ParentColor = False
   end
   object Label5: TLabel
     Left = 248
-    Height = 18
+    Height = 15
     Top = 168
-    Width = 42
+    Width = 37
     Caption = 'Salary'
     ParentColor = False
   end
   object Label6: TLabel
     Left = 20
-    Height = 18
+    Height = 15
     Top = 240
-    Width = 79
+    Width = 73
     Caption = 'Department'
     ParentColor = False
   end
   object DBEdit2: TDBEdit
     Left = 20
-    Height = 27
+    Height = 25
     Top = 120
     Width = 194
     DataField = 'LAST_NAME'
@@ -81,7 +81,7 @@ object EditEmployeeDlg: TEditEmployeeDlg
   end
   object DBEdit4: TDBEdit
     Left = 248
-    Height = 27
+    Height = 25
     Top = 45
     Width = 80
     DataField = 'EMP_NO'
@@ -90,35 +90,20 @@ object EditEmployeeDlg: TEditEmployeeDlg
     MaxLength = 0
     TabOrder = 2
   end
-  object DBLookupComboBox1: TDBLookupComboBox
-    Left = 20
-    Height = 29
-    Top = 259
-    Width = 189
-    DataField = 'DEPT_NO'
-    DataSource = Datasource1
-    KeyField = 'DEPT_NO'
-    ListField = 'DEPARTMENT'
-    ListFieldIndex = 0
-    ListSource = Datasource2
-    LookupCache = False
-    NullValueKey = 16430
-    TabOrder = 3
-  end
   object DBEdit5: TDBEdit
     Left = 248
-    Height = 27
+    Height = 25
     Top = 188
     Width = 96
     DataField = 'SALARY'
     DataSource = Datasource1
     CharCase = ecNormal
     MaxLength = 0
-    TabOrder = 4
+    TabOrder = 3
   end
   object DateEdit1: TDateEdit
     Left = 20
-    Height = 27
+    Height = 25
     Top = 188
     Width = 104
     CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
@@ -127,46 +112,10 @@ object EditEmployeeDlg: TEditEmployeeDlg
     DateOrder = doNone
     ButtonWidth = 23
     CharCase = ecNormal
-    Glyph.Data = {
-      36040000424D3604000000000000360000002800000010000000100000000100
-      2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
-      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00D69E
-      72C4D3996EF4D19668FFCE9263FFCB8E5EFFC98A5BFFC78756FFC38452FFC384
-      52FFC38452FFC38452FFC38452FFC38452FFBB7742B0FFFFFF00FFFFFF00D7A1
-      75FFF8F2EDFFF7F0EAFFF6EDE6FFF4EAE2FFF3E7DEFFF1E4DBFFF0E2D8FFEAD6
-      C8FFF2E5DCFFFAF4F1FFF9F3F0FFFAF5F2FFC58A5DFDFFFFFF00FFFFFF00D9A4
-      7AFFF9F3EEFFEBD2BEFFFFFFFFFFEBD3BFFFFFFFFFFFEBD3C0FFFFFFFFFFEAC7
-      ADFFECD9CDFFF1E4DBFFF9F3F0FFF9F2EFFFC68C5FFFFFFFFF00FFFFFF00DDA8
-      7EFFF9F3EFFFEBD0BAFFEBD0BBFF75B57AFF75B57AFF75B57AFFEBD1BDFFEACD
-      B5FFFAF4F0FFEBD9CCFFF1E4DBFFFAF4F1FFC68A5CFFFFFFFF00FFFFFF00DFAA
-      82FFF9F3EFFFEACEB7FFFFFFFFFF75B57AFF94D49BFF74B579FFFFFFFFFFEACF
-      BAFFFBF6F2FFFAF3F0FFEBD8CBFFF2E6DDFFC88D5FFFFFFFFF00FFFFFF00E1AE
-      87FFFAF4F0FFEACBB2FFEACCB3FF75B57AFF74B579FF73B478FFEACEB7FF70B3
-      75FF6FB274FF6EB172FFE8C8AEFFEAD7C9FFC48654FFFFFFFF00FFFFFF00E3B1
-      8CFFFAF6F1FFEAC9AEFFFFFFFFFFEAC9B0FFFFFFFFFFE9CBB3FFFFFFFFFF6FB1
-      73FF8ED295FF6BAF6FFFFFFFFFFFF1E5DBFFC68655FFFFFFFF00FFFFFF00E5B4
-      8FFFFAF6F2FFE9C6AAFFE9C6ACFFEAC7ACFFE9C7ADFFE9C9AEFFE9C9B0FF6CB0
-      71FF6AAF6EFF68AD6DFFE8CCB5FFF2E7DEFFC88A59FFFFFFFF00FFFFFF00E7B7
-      94FFFBF7F4FFE9C3A6FFFFFFFFFFE8C4A9FFFFFFFFFFE9C6AAFFFFFFFFFFE8C7
-      ACFFFFFFFFFFE8C8B0FFFFFFFFFFF7F1EBFFCB8F5FFFFFFFFF00FFFFFF00E9BA
-      98FFFBF7F4FF65A4FFFF64A3FFFF62A2FFFF61A1FFFF5F9FFFFF5C9DFFFF5A9A
-      FFFF5798FFFF5495FFFF5294FFFFFBF7F4FFCE9364FFFFFFFF00FFFFFF00EBBD
-      9BFFFBF7F4FF64A4FFFF79BDFFFF75BBFFFF71B9FFFF6DB8FFFF68B3FFFF61B0
-      FFFF5AABFFFF54A7FFFF3B7DFFFFFBF7F4FFD1976AFFFFFFFF00FFFFFF00ECBF
-      9EFFFBF7F4FF65A4FFFF64A3FFFF60A0FFFF5D9EFFFF5899FFFF5496FFFF4D90
-      FFFF478BFFFF4284FFFF3D7FFFFFFBF7F4FFD49B6FFFFFFFFF00FFFFFF00EEC1
-      A1EBFBF7F4FFFBF7F4FFFBF7F4FFFBF7F4FFFBF7F4FFFBF7F4FFFBF7F4FFFBF7
-      F4FFFBF7F4FFFBF7F4FFFBF7F4FFFBF7F4FFD7A074F8FFFFFF00FFFFFF00EFC2
-      A37EEFC1A2E3EDC09FFFEBBE9DFFEBBC9AFFE9BA96FFE7B793FFE6B590FFE4B2
-      8CFFE2AF88FFE0AC84FFDDA980FFDCA57DFFDAA37ACAFFFFFF00FFFFFF00FFFF
-      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
-    }
-    NumGlyphs = 0
+    NumGlyphs = 1
     MaxLength = 0
     OnChange = DateEdit1Change
-    TabOrder = 5
+    TabOrder = 4
   end
   object Button1: TButton
     Left = 113
@@ -176,7 +125,7 @@ object EditEmployeeDlg: TEditEmployeeDlg
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 6
+    TabOrder = 5
   end
   object Button2: TButton
     Left = 208
@@ -186,20 +135,35 @@ object EditEmployeeDlg: TEditEmployeeDlg
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 7
+    TabOrder = 6
   end
   object Label8: TLabel
     Left = 20
-    Height = 18
+    Height = 15
     Top = 304
-    Width = 52
+    Width = 48
     Caption = 'Country'
     ParentColor = False
   end
-  object DBLookupComboBox3: TDBLookupComboBox
-    Left = 21
-    Height = 29
-    Top = 321
+  object IBLookupComboEditBox1: TIBLookupComboEditBox
+    Left = 20
+    Height = 27
+    Top = 258
+    Width = 189
+    DataField = 'DEPT_NO'
+    DataSource = Datasource1
+    KeyField = 'DEPT_NO'
+    ListField = 'DEPARTMENT'
+    ListFieldIndex = 0
+    ListSource = Datasource2
+    LookupCache = False
+    TabOrder = 7
+    CaseSensitiveMatch = False
+  end
+  object IBLookupComboEditBox2: TIBLookupComboEditBox
+    Left = 20
+    Height = 27
+    Top = 320
     Width = 188
     DataField = 'JOB_COUNTRY'
     DataSource = Datasource1
@@ -209,6 +173,8 @@ object EditEmployeeDlg: TEditEmployeeDlg
     ListSource = Datasource4
     LookupCache = False
     TabOrder = 8
+    AutoInsert = False
+    CaseSensitiveMatch = False
   end
   object IBDataSet1: TIBDataSet
     Database = Form1.IBDatabase1
@@ -254,6 +220,7 @@ object EditEmployeeDlg: TEditEmployeeDlg
     GeneratorField.Generator = 'EMP_NO_GEN'
     GeneratorField.Field = 'EMP_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
     left = 288
     top = 80
     object IBDataSet1EMP_NO: TSmallintField
@@ -378,26 +345,12 @@ object EditEmployeeDlg: TEditEmployeeDlg
       Size = 37
     end
   end
-  object Datasource1: TDatasource
+  object Datasource1: TDataSource
     DataSet = IBDataSet1
     left = 248
     top = 80
   end
-  object Depts: TIBQuery
-    Database = Form1.IBDatabase1
-    Transaction = Form1.IBTransaction1
-    BufferChunks = 1000
-    CachedUpdates = False
-    GeneratorField.ApplyOnEvent = gaeOnNewRecord
-    SQL.Strings = (
-      'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO From DEPARTMENT A'
-      'Order by DEPARTMENT asc'
-    )
-    Params = <>
-    left = 288
-    top = 120
-  end
-  object Datasource2: TDatasource
+  object Datasource2: TDataSource
     DataSet = Depts
     left = 248
     top = 120
@@ -407,14 +360,39 @@ object EditEmployeeDlg: TEditEmployeeDlg
     Transaction = Form1.IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    DataSource = Datasource1
+    GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
       'Select A.COUNTRY, A.CURRENCY From COUNTRY A'
-      'Order by Country Asc'
+      'JOIN JOB J On J.JOB_COUNTRY = A.COUNTRY'
+      'Where J.JOB_CODE = :JOB_CODE and J.JOB_GRADE = :JOB_GRADE'
+      'Order by 1'
     )
-    Params = <>
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_CODE'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
     left = 367
     top = 120
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_CODE'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
     object CountriesCOUNTRY: TIBStringField
       DisplayWidth = 15
       FieldKind = fkData
@@ -438,9 +416,42 @@ object EditEmployeeDlg: TEditEmployeeDlg
       Size = 10
     end
   end
-  object Datasource4: TDatasource
+  object Datasource4: TDataSource
     DataSet = Countries
     left = 328
+    top = 120
+  end
+  object Depts: TIBDataSet
+    Database = Form1.IBDatabase1
+    Transaction = Form1.IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      'Delete From DEPARTMENT A'
+      'Where A.DEPT_NO = :DEPT_NO'
+    )
+    InsertSQL.Strings = (
+      'Insert Into DEPARTMENT(DEPT_NO, DEPARTMENT, HEAD_DEPT, MNGR_NO, BUDGET, LOCATION, PHONE_NO)'
+      'Values(:DEPT_NO, :DEPARTMENT, :HEAD_DEPT, :MNGR_NO, :BUDGET, :LOCATION, :PHONE_NO)'
+    )
+    RefreshSQL.Strings = (
+      'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO From DEPARTMENT A'
+      'Where A.DEPT_NO = :DEPT_NO'
+    )
+    SelectSQL.Strings = (
+      'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO From DEPARTMENT A'
+      ''
+      'order by Upper(Department)'
+    )
+    ModifySQL.Strings = (
+      'Update DEPARTMENT A Set '#13#10'  A.BUDGET = :BUDGET,'#13#10'  A.DEPARTMENT = :DEPARTMENT,'#13#10'  A.HEAD_DEPT = :HEAD_DEPT,'#13#10'  A.LOCATION = :LOCATION,'#13#10'  A.MNGR_NO = :MNGR_NO,'#13#10'  A.PHONE_NO = :PHONE_NO'
+      'Where A.DEPT_NO = :OLD_DEPT_NO'
+    )
+    GeneratorField.Generator = 'EMP_NO_GEN'
+    GeneratorField.Field = 'DEPT_NO'
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
+    left = 288
     top = 120
   end
 end

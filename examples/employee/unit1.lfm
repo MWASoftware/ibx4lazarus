@@ -2,94 +2,143 @@ object Form1: TForm1
   Left = 461
   Height = 454
   Top = 312
-  Width = 743
-  Caption = 'Form1'
+  Width = 878
+  Caption = 'Employee List'
   ClientHeight = 454
-  ClientWidth = 743
+  ClientWidth = 878
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.2.2.0'
-  object DBGrid1: TDBGrid
-    Left = 8
-    Height = 375
+  LCLVersion = '1.2.6.0'
+  object Button1: TButton
+    Left = 791
+    Height = 25
     Top = 24
-    Width = 632
+    Width = 75
+    Action = AddEmployee
+    Anchors = [akTop, akRight]
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 791
+    Height = 25
+    Top = 62
+    Width = 75
+    Action = EditEmployee
+    Anchors = [akTop, akRight]
+    TabOrder = 1
+  end
+  object Button3: TButton
+    Left = 791
+    Height = 25
+    Top = 101
+    Width = 75
+    Action = DeleteEmployee
+    Anchors = [akTop, akRight]
+    TabOrder = 2
+  end
+  object Button4: TButton
+    Left = 623
+    Height = 25
+    Top = 416
+    Width = 75
+    Action = SaveChanges
+    Anchors = [akRight, akBottom]
+    TabOrder = 3
+  end
+  object Button5: TButton
+    Left = 703
+    Height = 25
+    Top = 416
+    Width = 75
+    Action = CancelChanges
+    Anchors = [akRight, akBottom]
+    TabOrder = 4
+  end
+  object IBDynamicGrid1: TIBDynamicGrid
+    Left = 17
+    Height = 384
+    Top = 24
+    Width = 761
+    Anchors = [akTop, akLeft, akRight, akBottom]
     Color = clWindow
     Columns = <    
       item
         Title.Alignment = taCenter
         Title.Caption = 'Last Name'
-        Width = 150
+        Width = 120
         FieldName = 'LAST_NAME'
+        AutoSizeColumn = True
+        InitialSortColumn = False
+        CaseSensitiveMatch = False
       end    
       item
         Title.Alignment = taCenter
         Title.Caption = 'First Name'
-        Width = 150
+        Width = 120
         FieldName = 'FIRST_NAME'
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'Employee No.'
-        Width = 100
-        FieldName = 'EMP_NO'
+        AutoSizeColumn = True
+        InitialSortColumn = False
+        CaseSensitiveMatch = False
       end    
       item
         Alignment = taCenter
         Title.Alignment = taCenter
+        Title.Caption = 'Emp No.'
+        Width = 60
+        FieldName = 'EMP_NO'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        CaseSensitiveMatch = False
+      end    
+      item
+        ButtonStyle = cbsPickList
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'Dept'
+        Width = 120
+        FieldName = 'DEPARTMENT'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        AutoInsert = False
+        CaseSensitiveMatch = False
+      end    
+      item
+        ButtonStyle = cbsPickList
+        Title.Alignment = taCenter
+        Title.Caption = 'Located'
+        Width = 100
+        FieldName = 'JOB_COUNTRY'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        ListSource = CountrySource
+        ListField = 'COUNTRY'
+        AutoInsert = False
+        CaseSensitiveMatch = False
+      end    
+      item
+        Title.Alignment = taCenter
         Title.Caption = 'Started'
         Width = 80
         FieldName = 'HIRE_DATE'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        CaseSensitiveMatch = False
       end    
       item
         Title.Alignment = taCenter
         Title.Caption = 'Salary'
-        Width = 100
+        Width = 120
         FieldName = 'SALARY'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        CaseSensitiveMatch = False
       end>
-    DataSource = Datasource1
-    TabOrder = 0
-    OnDblClick = DBGrid1DblClick
-  end
-  object Button1: TButton
-    Left = 656
-    Height = 25
-    Top = 24
-    Width = 75
-    Action = AddEmployee
-    TabOrder = 1
-  end
-  object Button2: TButton
-    Left = 656
-    Height = 25
-    Top = 62
-    Width = 75
-    Action = EditEmployee
-    TabOrder = 2
-  end
-  object Button3: TButton
-    Left = 656
-    Height = 25
-    Top = 101
-    Width = 75
-    Action = DeleteEmployee
-    TabOrder = 3
-  end
-  object Button4: TButton
-    Left = 488
-    Height = 25
-    Top = 416
-    Width = 75
-    Action = SaveChanges
-    TabOrder = 4
-  end
-  object Button5: TButton
-    Left = 568
-    Height = 25
-    Top = 416
-    Width = 75
-    Action = CancelChanges
+    DataSource = EmplyeeSource
+    Scrollbars = ssAutoBoth
     TabOrder = 5
+    Descending = False
+    EditorBorderStyle = bsSingle
+    DefaultPositionAtEnd = False
   end
   object IBDatabase1: TIBDatabase
     Connected = True
@@ -104,7 +153,7 @@ object Form1: TForm1
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
-    left = 672
+    left = 784
     top = 224
   end
   object IBTransaction1: TIBTransaction
@@ -115,31 +164,36 @@ object Form1: TForm1
       'rec_version'
       'nowait'
     )
-    left = 672
+    left = 784
     top = 256
   end
-  object IBQuery1: TIBQuery
+  object Employees: TIBQuery
     Database = IBDatabase1
     Transaction = IBTransaction1
-    AfterDelete = IBQuery1AfterDelete
-    AfterOpen = IBQuery1AfterOpen
-    BeforeClose = IBQuery1BeforeClose
-    OnDeleteError = IBQuery1PostError
-    OnPostError = IBQuery1PostError
+    AfterClose = EmployeesAfterClose
+    AfterDelete = EmployeesAfterDelete
+    AfterEdit = EmployeesAfterDelete
+    BeforeOpen = EmployeesBeforeOpen
+    OnDeleteError = EmployeesPostError
+    OnPostError = EmployeesPostError
     BufferChunks = 1000
     CachedUpdates = False
     GenerateParamNames = False
+    GeneratorField.Generator = 'EMP_NO_GEN'
+    GeneratorField.Field = 'EMP_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
-      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME From EMPLOYEE A'
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPARTMENT'
+      ' From EMPLOYEE A'
+      'JOIN DEPARTMENT D On D.Dept_NO = A.DEPT_NO'
       'Order by LAST_NAME'
     )
     Params = <>
     UpdateObject = IBUpdateSQL1
-    AfterTransactionEnd = IBQuery1AfterTransactionEnd
-    left = 672
+    AfterTransactionEnd = EmployeesAfterTransactionEnd
+    left = 784
     top = 336
-    object IBQuery1EMP_NO: TSmallintField
+    object EmployeesEMP_NO: TSmallintField
       DisplayWidth = 10
       FieldKind = fkData
       FieldName = 'EMP_NO'
@@ -149,7 +203,7 @@ object Form1: TForm1
       ReadOnly = False
       Required = True
     end
-    object IBQuery1FIRST_NAME: TIBStringField
+    object EmployeesFIRST_NAME: TIBStringField
       DisplayWidth = 15
       FieldKind = fkData
       FieldName = 'FIRST_NAME'
@@ -160,7 +214,7 @@ object Form1: TForm1
       Required = True
       Size = 15
     end
-    object IBQuery1LAST_NAME: TIBStringField
+    object EmployeesLAST_NAME: TIBStringField
       DisplayWidth = 20
       FieldKind = fkData
       FieldName = 'LAST_NAME'
@@ -170,7 +224,7 @@ object Form1: TForm1
       ReadOnly = False
       Required = True
     end
-    object IBQuery1PHONE_EXT: TIBStringField
+    object EmployeesPHONE_EXT: TIBStringField
       DisplayWidth = 4
       FieldKind = fkData
       FieldName = 'PHONE_EXT'
@@ -181,7 +235,7 @@ object Form1: TForm1
       Required = False
       Size = 4
     end
-    object IBQuery1HIRE_DATE: TDateTimeField
+    object EmployeesHIRE_DATE: TDateTimeField
       DisplayWidth = 10
       FieldKind = fkData
       FieldName = 'HIRE_DATE'
@@ -191,7 +245,7 @@ object Form1: TForm1
       ReadOnly = False
       Required = True
     end
-    object IBQuery1DEPT_NO: TIBStringField
+    object EmployeesDEPT_NO: TIBStringField
       DisplayWidth = 3
       FieldKind = fkData
       FieldName = 'DEPT_NO'
@@ -202,7 +256,7 @@ object Form1: TForm1
       Required = True
       Size = 3
     end
-    object IBQuery1JOB_CODE: TIBStringField
+    object EmployeesJOB_CODE: TIBStringField
       DisplayWidth = 5
       FieldKind = fkData
       FieldName = 'JOB_CODE'
@@ -213,7 +267,7 @@ object Form1: TForm1
       Required = True
       Size = 5
     end
-    object IBQuery1JOB_GRADE: TSmallintField
+    object EmployeesJOB_GRADE: TSmallintField
       DisplayWidth = 10
       FieldKind = fkData
       FieldName = 'JOB_GRADE'
@@ -223,7 +277,7 @@ object Form1: TForm1
       ReadOnly = False
       Required = True
     end
-    object IBQuery1JOB_COUNTRY: TIBStringField
+    object EmployeesJOB_COUNTRY: TIBStringField
       DisplayWidth = 15
       FieldKind = fkData
       FieldName = 'JOB_COUNTRY'
@@ -234,7 +288,7 @@ object Form1: TForm1
       Required = True
       Size = 15
     end
-    object IBQuery1FULL_NAME: TIBStringField
+    object EmployeesFULL_NAME: TIBStringField
       DisplayWidth = 37
       FieldKind = fkData
       FieldName = 'FULL_NAME'
@@ -245,7 +299,7 @@ object Form1: TForm1
       Required = False
       Size = 37
     end
-    object IBQuery1SALARY: TIBBCDField
+    object EmployeesSALARY: TIBBCDField
       DisplayWidth = 18
       FieldKind = fkData
       FieldName = 'SALARY'
@@ -254,20 +308,32 @@ object Form1: TForm1
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = True
+      OnGetText = EmployeesSALARYGetText
       Precision = 18
       Currency = False
       MaxValue = 0
       MinValue = 0
       Size = 2
     end
+    object EmployeesDEPARTMENT: TIBStringField
+      DisplayWidth = 25
+      FieldKind = fkData
+      FieldName = 'DEPARTMENT'
+      Index = 11
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 25
+    end
   end
-  object Datasource1: TDataSource
-    DataSet = IBQuery1
-    left = 672
+  object EmplyeeSource: TDataSource
+    DataSet = Employees
+    left = 784
     top = 296
   end
   object ActionList1: TActionList
-    left = 672
+    left = 784
     top = 376
     object AddEmployee: TAction
       Caption = 'Add'
@@ -296,14 +362,73 @@ object Form1: TForm1
   end
   object IBUpdateSQL1: TIBUpdateSQL
     RefreshSQL.Strings = (
-      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME From EMPLOYEE A'
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPARTMENT'
+      ' From EMPLOYEE A'
+      'JOIN DEPARTMENT D On D.Dept_NO = A.DEPT_NO'
       'Where A.EMP_NO = :EMP_NO'
+    )
+    ModifySQL.Strings = (
+      'Update EMPLOYEE A Set '
+      '  A.DEPT_NO = :DEPT_NO,'
+      '  A.FIRST_NAME = :FIRST_NAME,'
+      '  A.HIRE_DATE = :HIRE_DATE,'
+      '  A.JOB_CODE = :JOB_CODE,'
+      '  A.JOB_COUNTRY = :JOB_COUNTRY,'
+      '  A.JOB_GRADE = :JOB_GRADE,'
+      '  A.LAST_NAME = :LAST_NAME,'
+      '  A.PHONE_EXT = :PHONE_EXT,'
+      '  A.SALARY = :SALARY'
+      'Where A.EMP_NO = :OLD_EMP_NO'
+    )
+    InsertSQL.Strings = (
+      'Insert Into EMPLOYEE(EMP_NO, FIRST_NAME, LAST_NAME, PHONE_EXT, HIRE_DATE, DEPT_NO, JOB_CODE, JOB_GRADE, JOB_COUNTRY, SALARY)'
+      'Values(:EMP_NO, :FIRST_NAME, :LAST_NAME, :PHONE_EXT, :HIRE_DATE, :DEPT_NO, :JOB_CODE, :JOB_GRADE, :JOB_COUNTRY, :SALARY)'
     )
     DeleteSQL.Strings = (
       'Delete From EMPLOYEE A'
       'Where A.EMP_NO = :EMP_NO'
     )
-    left = 712
+    left = 824
     top = 336
+  end
+  object CountrySource: TDataSource
+    DataSet = Countries
+    left = 832
+    top = 224
+  end
+  object Countries: TIBDataSet
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      'Delete From COUNTRY A'
+      'Where A.COUNTRY = :COUNTRY'
+    )
+    InsertSQL.Strings = (
+      'Insert Into COUNTRY(COUNTRY, CURRENCY)'
+      'Values(:COUNTRY, :CURRENCY)'
+    )
+    RefreshSQL.Strings = (
+      'Select A.COUNTRY, A.CURRENCY From COUNTRY A'
+      'Where A.COUNTRY = :COUNTRY'
+    )
+    SelectSQL.Strings = (
+      'Select A.COUNTRY, A.CURRENCY From COUNTRY A'
+      'JOIN JOB J On J.JOB_COUNTRY = A.COUNTRY'
+      'Where J.JOB_CODE = :JOB_CODE and J.JOB_GRADE = :JOB_GRADE'
+      'Order by 1'
+    )
+    ModifySQL.Strings = (
+      'Update COUNTRY A Set '
+      '  A.COUNTRY = :COUNTRY,'
+      '  A.CURRENCY = :CURRENCY'
+      'Where A.COUNTRY = :OLD_COUNTRY'
+    )
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
+    DataSource = EmplyeeSource
+    left = 830
+    top = 263
   end
 end

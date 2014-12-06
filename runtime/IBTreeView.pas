@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, ComCtrls,
-  DB, IBSQLParserUnit;
+  DB, IBSQLParser;
 
 type
   TVariantArray = array of variant;

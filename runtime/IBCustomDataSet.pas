@@ -1917,6 +1917,7 @@ begin
     FBase.CheckTransaction;
     if assigned(FParser) and (FParser.SQLText <> FQSelect.SQL.Text) then
       FQSelect.SQL.Text := FParser.SQLText;
+//    writeln( FQSelect.SQL.Text);
     if FQSelect.SQL.Text <> '' then
     begin
       if not FQSelect.Prepared then

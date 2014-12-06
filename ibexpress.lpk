@@ -252,8 +252,8 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <UnitName Value="IBSQLMonitor"/>
       </Item23>
       <Item24>
-        <Filename Value="runtime/ibsqlparserunit.pas"/>
-        <UnitName Value="IBSQLParserUnit"/>
+        <Filename Value="runtime/IBSQLParser.pas"/>
+        <UnitName Value="IBSQLParser"/>
       </Item24>
     </Files>
     <RequiredPkgs Count="2">

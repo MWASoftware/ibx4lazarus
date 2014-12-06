@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DBGrids, DB,
-  IBSqlParserUnit, Grids, IBLookupComboEditBox, LMessages;
+  IBSqlParser, Grids, IBLookupComboEditBox, LMessages;
 
 type
   {
@@ -90,7 +90,6 @@ type
     FAutoInsert: boolean;
     FCaseSensitiveMatch: boolean;
     FInitialSortColumn: boolean;
-    FKeyField: string;
     FKeyPressInterval: integer;
     FListField: string;
     FListSource: TDataSource;
@@ -101,7 +100,6 @@ type
   published
     property InitialSortColumn: boolean read FInitialSortColumn write SetInitialSortColumn;
     property ListSource: TDataSource read FListSource write FListSource;
-    property KeyField: string read FKeyField write FKeyField;
     property ListField: string read FListField write FListField;
     property AutoInsert: boolean read FAutoInsert write FAutoInsert default true;
     property AutoComplete: boolean read FAutoComplete write FAutoComplete default true;
@@ -135,13 +133,14 @@ type
   private
     { Private declarations }
     FResizing: boolean;
-    procedure DoGridResize;
     procedure PositionTotals;
   protected
+    procedure DoGridResize;
     procedure Loaded; override;
     procedure DoOnResize; override;
     function CreateColumns: TGridColumns; override;
     procedure HeaderSized(IsColumn: Boolean; Index: Integer); override;
+    procedure UpdateShowing; override;
   public
     constructor Create(TheComponent: TComponent); override;
  end;
@@ -211,7 +210,7 @@ var ColSum: integer;
     adjustment: integer;
     n: integer;
 begin
-  if Columns.Count = 0 then Exit;
+  if (csDesigning in ComponentState) or (Columns.Count = 0) then Exit;
 
   FResizing := true;
   try
@@ -230,7 +229,7 @@ begin
           Columns[I].Width := TDBDynamicGridColumn(Columns[I]).DesignWidth;
         end;
 
-        if Colsum < ClientWidth then
+        if (Colsum < ClientWidth) and (ResizeColCount > 0) then
         begin
           adjustment := (ClientWidth - ColSum) div ResizeColCount;
           n := (ClientWidth - ColSum) mod ResizeColCount;
@@ -294,6 +293,12 @@ procedure TDBDynamicGrid.HeaderSized(IsColumn: Boolean; Index: Integer);
 begin
   inherited HeaderSized(IsColumn, Index);
   PositionTotals
+end;
+
+procedure TDBDynamicGrid.UpdateShowing;
+begin
+  inherited UpdateShowing;
+  DoGridResize
 end;
 
 constructor TDBDynamicGrid.Create(TheComponent: TComponent);
@@ -617,9 +622,10 @@ begin
       bs := C.ButtonStyle;
       if (bs = cbsPickList) and assigned(C.ListSource) then
       begin
-         FDBLookupCellEditor.ListSource := C.ListSource;
-         FDBLookupCellEditor.KeyField := C.KeyField;
+         FDBLookupCellEditor.ListSource := nil;
+         FDBLookupCellEditor.KeyField := C.ListField;
          FDBLookupCellEditor.ListField := C.ListField;
+         FDBLookupCellEditor.ListSource := C.ListSource;
          FDBLookupCellEditor.AutoInsert := C.AutoInsert;
          FDBLookupCellEditor.AutoComplete := C.AutoComplete;
          FDBLookupCellEditor.CaseSensitiveMatch := C.CaseSensitiveMatch;

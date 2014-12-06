@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  DbCtrls, EditBtn, IBCustomDataSet, IBQuery, db;
+  DbCtrls, EditBtn, IBCustomDataSet, IBQuery, IBLookupComboEditBox, db;
 
 type
 
@@ -25,8 +25,6 @@ type
     DBEdit2: TDBEdit;
     DBEdit4: TDBEdit;
     DBEdit5: TDBEdit;
-    DBLookupComboBox1: TDBLookupComboBox;
-    DBLookupComboBox3: TDBLookupComboBox;
     IBDataSet1: TIBDataSet;
     IBDataSet1DEPT_NO: TIBStringField;
     IBDataSet1EMP_NO: TSmallintField;
@@ -39,8 +37,10 @@ type
     IBDataSet1LAST_NAME: TIBStringField;
     IBDataSet1PHONE_EXT: TIBStringField;
     IBDataSet1SALARY: TIBBCDField;
-    Depts: TIBQuery;
     Countries: TIBQuery;
+    Depts: TIBDataSet;
+    IBLookupComboEditBox1: TIBLookupComboEditBox;
+    IBLookupComboEditBox2: TIBLookupComboEditBox;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
