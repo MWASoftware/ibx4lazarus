@@ -1,0 +1,187 @@
+object Form1: TForm1
+  Left = 696
+  Height = 435
+  Top = 393
+  Width = 722
+  Caption = 'TIBTreeView Example'
+  ClientHeight = 435
+  ClientWidth = 722
+  OnClose = FormClose
+  OnShow = FormShow
+  LCLVersion = '1.2.6.0'
+  object Panel1: TPanel
+    Left = 11
+    Height = 383
+    Top = 13
+    Width = 682
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 383
+    ClientWidth = 682
+    TabOrder = 0
+    object IBTreeView1: TIBTreeView
+      Left = 0
+      Height = 379
+      Top = 0
+      Width = 280
+      Align = alLeft
+      DefaultItemHeight = 18
+      KeyField = 'DEPT_NO'
+      ListField = 'DEPARTMENT'
+      ListSource = DataSource1
+      ParentField = 'HEAD_DEPT'
+      RootNodeTitle = 'Departments'
+      ScrollBars = ssAutoBoth
+      TabOrder = 0
+    end
+    object Splitter1: TSplitter
+      Left = 280
+      Height = 379
+      Top = 0
+      Width = 5
+    end
+    object Panel2: TPanel
+      Left = 285
+      Height = 379
+      Top = 0
+      Width = 393
+      Align = alClient
+      BevelInner = bvLowered
+      BevelOuter = bvLowered
+      TabOrder = 2
+    end
+  end
+  object IBDatabase1: TIBDatabase
+    Connected = False
+    AllowStreamedConnected = False
+    DatabaseName = 'employee'
+    Params.Strings = (
+      'lc_ctype=UTF-8'
+      'user_name=SYSDBA'
+    )
+    DefaultTransaction = IBTransaction1
+    IdleTimer = 0
+    TraceFlags = []
+    left = 645
+    top = 352
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    left = 600
+    top = 352
+  end
+  object Departments: TIBDataSet
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      'Delete From DEPARTMENT A'
+      'Where A.DEPT_NO = :DEPT_NO'
+    )
+    InsertSQL.Strings = (
+      'Insert Into DEPARTMENT(DEPT_NO, DEPARTMENT, HEAD_DEPT, MNGR_NO, BUDGET, LOCATION, PHONE_NO)'
+      'Values(:DEPT_NO, :DEPARTMENT, :HEAD_DEPT, :MNGR_NO, :BUDGET, :LOCATION, :PHONE_NO)'
+    )
+    RefreshSQL.Strings = (
+      'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO From DEPARTMENT A'
+      'Where A.DEPT_NO = :DEPT_NO'
+    )
+    SelectSQL.Strings = (
+      'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO From DEPARTMENT A'
+      'Order by Department'
+    )
+    ModifySQL.Strings = (
+      'Update DEPARTMENT A Set '#13#10'  A.BUDGET = :BUDGET,'#13#10'  A.DEPARTMENT = :DEPARTMENT,'#13#10'  A.HEAD_DEPT = :HEAD_DEPT,'#13#10'  A.LOCATION = :LOCATION,'#13#10'  A.MNGR_NO = :MNGR_NO,'#13#10'  A.PHONE_NO = :PHONE_NO'
+      'Where A.DEPT_NO = :OLD_DEPT_NO'
+    )
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
+    left = 554
+    top = 352
+    object DepartmentsDEPT_NO: TIBStringField
+      DisplayWidth = 3
+      FieldKind = fkData
+      FieldName = 'DEPT_NO'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 3
+    end
+    object DepartmentsDEPARTMENT: TIBStringField
+      DisplayWidth = 25
+      FieldKind = fkData
+      FieldName = 'DEPARTMENT'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 25
+    end
+    object DepartmentsHEAD_DEPT: TIBStringField
+      DisplayWidth = 3
+      FieldKind = fkData
+      FieldName = 'HEAD_DEPT'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 3
+    end
+    object DepartmentsMNGR_NO: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'MNGR_NO'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DepartmentsBUDGET: TIBBCDField
+      DisplayWidth = 18
+      FieldKind = fkData
+      FieldName = 'BUDGET'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Precision = 18
+      Currency = False
+      MaxValue = 0
+      MinValue = 0
+      Size = 2
+    end
+    object DepartmentsLOCATION: TIBStringField
+      DisplayWidth = 15
+      FieldKind = fkData
+      FieldName = 'LOCATION'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 15
+    end
+    object DepartmentsPHONE_NO: TIBStringField
+      DisplayWidth = 20
+      FieldKind = fkData
+      FieldName = 'PHONE_NO'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+  end
+  object DataSource1: TDataSource
+    DataSet = Departments
+    left = 516
+    top = 351
+  end
+end

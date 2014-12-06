@@ -32,12 +32,8 @@ type
   TIBTreeNode = class(TTreeNode)
   private
     FKeyValue: variant;
-    function GetText: string;
-    procedure SetText(AValue: string);
   public
-    procedure MoveTo(Destination: TTreeNode; Mode: TNodeAttachMode); override;
     property KeyValue: variant read FKeyValue;
-    property Text: string read GetText write SetText;
   end;
 
   TIBTreeView = class(TCustomTreeView)
@@ -52,17 +48,13 @@ type
     FRootNode: TTreeNode;
     FRootNodeTitle: string;
     FNoAddNodeToDataset: boolean;
-    FEditingItem: TIBTreeNode;
-    FSaveEditingEnd: TTVEditingEndEvent;
-    FClearing: boolean;
+    FUpdateNode: TIBTreeNode;
     procedure ActiveChanged(Sender: TObject);
     procedure AddNodes;
     procedure DataSetChanged(Sender: TObject);
     function GetDataSet: TDataSet;
     function GetListSource: TDataSource;
     function GetSelectedKeyValue: variant;
-    procedure HandleEditingEnd(Sender: TObject; Node: TTreeNode;
-                              Cancel: Boolean);
     procedure NodeMoved(Node: TTreeNode);
     procedure NodeUpdated(Node: TTreeNode);
     procedure SetHasChildField(AValue: string);
@@ -82,6 +74,7 @@ type
      function CanEdit(Node: TTreeNode): Boolean; override;
      procedure Expand(Node: TTreeNode); override;
      procedure Loaded; override;
+     procedure NodeChanged(Node: TTreeNode; ChangeEvent: TTreeNodeChangeEvent); override;
      procedure Reinitialise;
   public
     { Public declarations }
@@ -164,7 +157,7 @@ type
     property OnDragOver;
     property OnEdited;
     property OnEditing;
-    property OnEditingEnd: TTVEditingEndEvent read FSaveEditingEnd write FSaveEditingEnd;
+    property OnEditingEnd;
     //property OnEndDock;
     property OnEndDrag;
     property OnEnter;
@@ -233,32 +226,14 @@ begin
         raise Exception.Create('Ordinal Type Expected when converting to integer string');
 end;
 
-{ TIBTreeNode }
-
-function TIBTreeNode.GetText: string;
-begin
-  Result := inherited Text
-end;
-
-procedure TIBTreeNode.SetText(AValue: string);
-begin
-  inherited Text := AValue;
-  (Owner.Owner as TIBTreeView).NodeUpdated(self)
-end;
-
-procedure TIBTreeNode.MoveTo(Destination: TTreeNode; Mode: TNodeAttachMode);
-begin
-  inherited MoveTo(Destination, Mode);
-  (Owner.Owner as TIBTreeView).NodeMoved(self);
-end;
-
 { TIBTreeView }
 
 procedure TIBTreeView.ActiveChanged(Sender: TObject);
 begin
+  if (csDesigning in ComponentState) then Exit;
   if assigned(DataSet) and not DataSet.Active then
   begin
-    if not assigned(FExpandNode) and not assigned(FEditingItem) then {must really be closing}
+    if not assigned(FExpandNode) and not assigned(FUpdateNode) then {must really be closing}
       Reinitialise
   end
   else
@@ -267,9 +242,11 @@ end;
 
 procedure TIBTreeView.AddNodes;
 var Node: TTreeNode;
+    ChildCount: integer;
 begin
   if assigned(FExpandNode) then
   begin
+    ChildCount := 0;
     FNoAddNodeToDataset := true;
     try
       DataSet.First;
@@ -277,12 +254,14 @@ begin
       begin
         Node := Items.AddChild(FExpandNode,DataSet.FieldByName(ListField).AsString);
         TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
-        Node.HasChildren := DataSet.FieldByName(HasChildField).AsInteger <> 0;
+        Node.HasChildren := (HasChildField = '') or (DataSet.FieldByName(HasChildField).AsInteger <> 0);
+        Inc(ChildCount);
         DataSet.Next
       end;
     finally
       FNoAddNodeToDataset := false
     end;
+    FExpandNode.HasChildren := ChildCount > 0;
     FExpandNode := nil
   end
 end;
@@ -307,14 +286,6 @@ begin
   Result := NULL;
   if assigned(Selected) and (Selected is TIBTreeNode) then
      Result := TIBTreeNode(Selected).KeyValue
-end;
-
-procedure TIBTreeView.HandleEditingEnd(Sender: TObject; Node: TTreeNode;
-  Cancel: Boolean);
-begin
-  NodeUpdated(Node);
-  if assigned(FSaveEditingEnd) then
-     FSaveEditingEnd(Sender,Node,Cancel);
 end;
 
 procedure TIBTreeView.NodeMoved(Node: TTreeNode);
@@ -394,12 +365,12 @@ begin
   Result :=  assigned(DataSet) and not varIsNull(Node.KeyValue);
   if Result then
   begin
-    FEditingItem := Node;
+    FUpdateNode := Node;
     try
       DataSet.Active := false;
       DataSet.Active := true;
     finally
-      FEditingItem := nil
+      FUpdateNode := nil
     end;
     Result := DataSet.FieldByName(KeyField).AsVariant = Node.KeyValue
   end;
@@ -414,16 +385,16 @@ end;
 procedure TIBTreeView.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 begin
   Parser.ResetWhereClause;
-  if not assigned(FExpandNode) and assigned(FEditingItem)  then {Scrolling dataset}
+  if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
   begin
     Parser.Add2WhereClause(FKeyField + ' = :IBX_KEY_VALUE');
     if (Sender as TDataLink).DataSet is TIBQuery then
       TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
-        FEditingItem.KeyValue
+        FUpdateNode.KeyValue
     else
     if (Sender as TDataLink).DataSet is TIBDataSet then
       TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
-        FEditingItem.KeyValue
+        FUpdateNode.KeyValue
   end
   else
   if FExpandNode = FRootNode then
@@ -462,8 +433,10 @@ end;
 
 procedure TIBTreeView.Delete(Node: TTreeNode);
 begin
-{  if not FClearing and ScrollToNode(TIBTreeNode(Node)) then
-     DataSet.Delete; }
+  if not (tvsUpdating in States) {TreeNodes being cleared}
+     and not (tvsManualNotify in States) {Tree Collapse with node delete}
+     and ScrollToNode(TIBTreeNode(Node)) then
+     DataSet.Delete;
   inherited Delete(Node);
 end;
 
@@ -503,24 +476,29 @@ end;
 procedure TIBTreeView.Loaded;
 begin
   inherited Loaded;
-  if assigned(OnEditingEnd) then
-    FSaveEditingEnd := OnEditingEnd;
-  OnEditingEnd := @HandleEditingEnd;
   Reinitialise
+end;
+
+procedure TIBTreeView.NodeChanged(Node: TTreeNode;
+  ChangeEvent: TTreeNodeChangeEvent);
+begin
+  inherited NodeChanged(Node, ChangeEvent);
+  if not FNoAddNodeToDataset then
+  case ChangeEvent of
+  ncTextChanged:
+    NodeUpdated(Node);
+  ncParentChanged:
+    NodeMoved(Node);
+  end;
 end;
 
 procedure TIBTreeView.Reinitialise;
 begin
-  if csLoading in ComponentState then Exit;
-  FClearing := true;
-  try
-    Items.Clear;
-  finally
-    FClearing := false
-  end;
+  if [csDesigning,csLoading] * ComponentState <> [] then Exit;
+  Items.Clear;
   FRootNode := nil;
-  if assigned(DataSet) then
-     DataSet.Active := false;
+//  if assigned(DataSet) then
+//     DataSet.Active := false;
   FNoAddNodeToDataset := true;
   try
     FRootNode := Items.Add(nil,FRootNodeTitle);

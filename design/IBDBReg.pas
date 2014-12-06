@@ -1119,5 +1119,4 @@ end;
 
 initialization
   {$I IBDBReg.lrs}
-  {$I ibcontrols.lrs}
 end.

@@ -3454,9 +3454,9 @@ end;
 
 procedure TIBCustomDataSet.Loaded;
 begin
-  inherited Loaded;
   if assigned(FQSelect) then
     FBaseSQLSelect.assign(FQSelect.SQL);
+  inherited Loaded;
 end;
 
 function TIBCustomDataSet.Locate(const KeyFields: string; const KeyValues: Variant;
