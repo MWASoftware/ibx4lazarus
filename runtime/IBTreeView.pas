@@ -22,6 +22,7 @@ type
     procedure ActiveChanged; override;
     procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     procedure DataSetChanged; override;
+    procedure RecordChanged(Field: TField); override;
     procedure UpdateData; override;
   public
     constructor Create(AOwner: TIBTreeView);
@@ -33,6 +34,7 @@ type
   private
     FKeyValue: variant;
   public
+    procedure DeleteAll;
     property KeyValue: variant read FKeyValue;
   end;
 
@@ -45,10 +47,10 @@ type
     FListField: string;
     FParentField: string;
     FExpandNode: TTreeNode;
-    FRootNode: TTreeNode;
-    FRootNodeTitle: string;
     FNoAddNodeToDataset: boolean;
     FUpdateNode: TIBTreeNode;
+    FModifiedNode: TIBTreeNode;
+    FUpdating: boolean;
     procedure ActiveChanged(Sender: TObject);
     procedure AddNodes;
     procedure DataSetChanged(Sender: TObject);
@@ -57,12 +59,12 @@ type
     function GetSelectedKeyValue: variant;
     procedure NodeMoved(Node: TTreeNode);
     procedure NodeUpdated(Node: TTreeNode);
+    procedure RecordChanged(Sender: TObject; Field: TField);
     procedure SetHasChildField(AValue: string);
     procedure SetKeyField(AValue: string);
     procedure SetListField(AValue: string);
     procedure SetListSource(AValue: TDataSource);
     procedure SetParentField(AValue: string);
-    procedure SetRootNodeTitle(AValue: string);
     function ScrollToNode(Node: TIBTreeNode): boolean;
     procedure UpdateData(Sender: TObject);
     procedure UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
@@ -70,6 +72,7 @@ type
     { Protected declarations }
      procedure Added(Node: TTreeNode); override;
      procedure Delete(Node: TTreeNode); override;
+     procedure Change(Node: TTreeNode); override;
      function CreateNode: TTreeNode; override;
      function CanEdit(Node: TTreeNode): Boolean; override;
      procedure Expand(Node: TTreeNode); override;
@@ -80,10 +83,10 @@ type
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy; override;
-    function FindNode(KeyValuePath: array of variant; SelectNode: boolean): TTreeNode;
+    function FindNode(KeyValuePath: array of variant; SelectNode: boolean): TIBTreeNode; overload;
+    function FindNode(KeyValue: variant): TIBTreeNode; overload;
     function GetSelectNodePath: TVariantArray;
     property DataSet: TDataSet read GetDataSet;
-    property RootNode: TTreeNode read FRootNode;
     property SelectedKeyValue: variant read GetSelectedKeyValue;
   published
     { Published declarations }
@@ -123,7 +126,6 @@ type
     property PopupMenu;
     property ReadOnly;
     property RightClickSelect;
-    property RootNodeTitle: string read FRootNodeTitle write SetRootNodeTitle;
     property RowSelect;
     property ScrollBars;
     property SelectionColor;
@@ -226,6 +228,22 @@ begin
         raise Exception.Create('Ordinal Type Expected when converting to integer string');
 end;
 
+{ TIBTreeNode }
+
+procedure TIBTreeNode.DeleteAll;
+var Node, NextNode: TTreeNode;
+begin
+    Expand(true);
+    Node := GetFirstChild;
+    while Node <> nil do
+    begin
+      NextNode := Node.GetNextSibling;
+      TIBTreeNode(Node).DeleteAll;
+      Node := NextNode;
+    end;
+    Delete
+end;
+
 { TIBTreeView }
 
 procedure TIBTreeView.ActiveChanged(Sender: TObject);
@@ -237,14 +255,18 @@ begin
       Reinitialise
   end
   else
+  begin
     AddNodes;
+    if (Selected = nil) and (Items.TopLvlCount > 0) then
+        Selected := Items.TopLvlItems[0];
+  end
 end;
 
 procedure TIBTreeView.AddNodes;
 var Node: TTreeNode;
     ChildCount: integer;
 begin
-  if assigned(FExpandNode) then
+  if assigned(FExpandNode) or (Items.Count = 0) then
   begin
     ChildCount := 0;
     FNoAddNodeToDataset := true;
@@ -261,7 +283,8 @@ begin
     finally
       FNoAddNodeToDataset := false
     end;
-    FExpandNode.HasChildren := ChildCount > 0;
+    if assigned(FExpandNode) then
+      FExpandNode.HasChildren := ChildCount > 0;
     FExpandNode := nil
   end
 end;
@@ -293,14 +316,8 @@ begin
   {Need to update Parent}
   if ScrollToNode(TIBTreeNode(Node))  then
   begin
-    DataSet.Edit;
-    try
-      DataSet.FieldByName(ParentField).AsVariant := TIBTreeNode(Node.Parent).KeyValue;
-      DataSet.Post
-    except
-      DataSet.Cancel;
-      raise
-    end;
+      FDataLink.Edit;
+      FModifiedNode := TIBTreeNode(Node)
   end;
 end;
 
@@ -309,15 +326,50 @@ begin
   {Need to Update List Field}
   if ScrollToNode(TIBTreeNode(Node)) then
   begin
-    DataSet.Edit;
-    try
-      DataSet.FieldByName(ListField).AsString := Node.Text;
-      DataSet.Post
-    except
-      DataSet.Cancel;
-      raise
-    end;
+    FDataLink.Edit;
+    FModifiedNode := TIBTreeNode(Node);
+    FDataLink.UpdateRecord
   end;
+end;
+
+procedure TIBTreeView.RecordChanged(Sender: TObject; Field: TField);
+var Node: TIBTreeNode;
+    Destination: TIBTreeNode;
+begin
+  if assigned(Field) and (Field.FieldName = ListField) then
+  begin
+    Node := FindNode(DataSet.FieldByName(KeyField).AsVariant);
+    if assigned(Node) then
+    begin
+      FUpdating := true;
+      try
+        Node.Text := Field.Text
+      finally
+        FUpdating := false
+      end;
+    end;
+  end
+  else
+  if assigned(Field) and (Field.FieldName = ParentField) then
+  begin
+    Node := FindNode(DataSet.FieldByName(KeyField).AsVariant);
+    if assigned(Node)  then
+    begin
+      if DataSet.FieldByName(ParentField).IsNull then
+         Destination := nil
+      else
+        Destination := FindNode(DataSet.FieldByName(ParentField).AsVariant);
+
+      if Destination = Node.Parent then Exit;
+
+      FUpdating := true;
+      try
+        Node.MoveTo(Destination,naAddChild);
+      finally
+        FUpdating := false
+      end;
+    end;
+  end
 end;
 
 procedure TIBTreeView.SetHasChildField(AValue: string);
@@ -353,18 +405,14 @@ begin
   Reinitialise
 end;
 
-procedure TIBTreeView.SetRootNodeTitle(AValue: string);
-begin
-  if FRootNodeTitle = AValue then Exit;
-  FRootNodeTitle := AValue;
-  Reinitialise
-end;
-
 function TIBTreeView.ScrollToNode(Node: TIBTreeNode): boolean;
 begin
-  Result :=  assigned(DataSet) and not varIsNull(Node.KeyValue);
+  Result :=  assigned(DataSet) and DataSet.Active and assigned(Node) and not varIsNull(Node.KeyValue);
   if Result then
   begin
+    if DataSet.Active and (DataSet.RecordCount > 0)
+         and (Node.KeyValue = DataSet.FieldByName(KeyField).AsVariant) then Exit;
+
     FUpdateNode := Node;
     try
       DataSet.Active := false;
@@ -378,57 +426,64 @@ end;
 
 procedure TIBTreeView.UpdateData(Sender: TObject);
 begin
-  if assigned(Selected) then
-    DataSet.FieldByName(ListField).AsString := Selected.Text;
+  if assigned(FModifiedNode) then
+  begin
+    DataSet.FieldByName(ListField).AsString := FModifiedNode.Text;
+    if FModifiedNode.Parent = nil then
+      DataSet.FieldByName(ParentField).Clear
+    else
+      DataSet.FieldByName(ParentField).AsVariant := TIBTreeNode(FModifiedNode.Parent).KeyValue;
+    FModifiedNode := nil
+  end;
 end;
 
 procedure TIBTreeView.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 begin
-  Parser.ResetWhereClause;
-  if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
-  begin
-    Parser.Add2WhereClause(FKeyField + ' = :IBX_KEY_VALUE');
-    if (Sender as TDataLink).DataSet is TIBQuery then
-      TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
-        FUpdateNode.KeyValue
+  DataSet.DisableControls;
+  try
+    Parser.ResetWhereClause;
+    if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
+    begin
+      Parser.Add2WhereClause(FKeyField + ' = :IBX_KEY_VALUE');
+      if (Sender as TDataLink).DataSet is TIBQuery then
+        TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
+          FUpdateNode.KeyValue
+      else
+      if (Sender as TDataLink).DataSet is TIBDataSet then
+        TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
+          FUpdateNode.KeyValue
+    end
     else
-    if (Sender as TDataLink).DataSet is TIBDataSet then
-      TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
-        FUpdateNode.KeyValue
-  end
-  else
-  if FExpandNode = FRootNode then
-    {Need to Load Root Nodes}
-    Parser.Add2WhereClause(FParentField + ' is null')
-  else
-  if assigned(FExpandNode) then
-  begin
-    Parser.Add2WhereClause(FParentField + ' = :IBX_PARENT_VALUE');
-    if (Sender as TDataLink).DataSet is TIBQuery then
-      TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
-        TIBTreeNode(FExpandNode).KeyValue
+    if (Items.Count = 0) then
+      {Need to Load Root Nodes}
+      Parser.Add2WhereClause(FParentField + ' is null')
     else
-    if (Sender as TDataLink).DataSet is TIBDataSet then
-      TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
-        TIBTreeNode(FExpandNode).KeyValue
-  end;
+    if assigned(FExpandNode) then
+    begin
+      Parser.Add2WhereClause(FParentField + ' = :IBX_PARENT_VALUE');
+      if (Sender as TDataLink).DataSet is TIBQuery then
+        TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
+          TIBTreeNode(FExpandNode).KeyValue
+      else
+      if (Sender as TDataLink).DataSet is TIBDataSet then
+        TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
+          TIBTreeNode(FExpandNode).KeyValue
+    end;
+  finally
+    DataSet.EnableControls
+ end
 end;
 
 procedure TIBTreeView.Added(Node: TTreeNode);
 begin
-  inherited Added(Node);
   if assigned(DataSet) and DataSet.Active and not FNoAddNodeToDataset then
   begin
     DataSet.Append;
-    try
-      DataSet.FieldByName(ListField).AsString := Node.Text;
-      DataSet.Post;
-    except
-      DataSet.Cancel;
-      raise
-    end;
-    TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant
+    TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
+    FModifiedNode := TIBTreeNode(Node);
+    FDataLink.UpdateRecord
   end;
+  inherited Added(Node);
 end;
 
 procedure TIBTreeView.Delete(Node: TTreeNode);
@@ -438,6 +493,12 @@ begin
      and ScrollToNode(TIBTreeNode(Node)) then
      DataSet.Delete;
   inherited Delete(Node);
+end;
+
+procedure TIBTreeView.Change(Node: TTreeNode);
+begin
+  inherited Change(Node);
+  ScrollToNode(TIBTreeNode(Node));
 end;
 
 function TIBTreeView.CreateNode: TTreeNode;
@@ -458,7 +519,7 @@ end;
 
 function TIBTreeView.CanEdit(Node: TTreeNode): Boolean;
 begin
-  Result := inherited CanEdit(Node) and (Node <> RootNode)
+  Result := inherited CanEdit(Node)
               and assigned(DataSet) and not DataSet.FieldByName(ListField).ReadOnly
 end;
 
@@ -469,7 +530,9 @@ begin
   begin
     FExpandNode := Node;
     DataSet.Active := false;
-    DataSet.Active := true
+    DataSet.Active := true;
+    if assigned(Selected) then
+      ScrollToNode(TIBTreeNode(Selected))
   end;
 end;
 
@@ -483,7 +546,7 @@ procedure TIBTreeView.NodeChanged(Node: TTreeNode;
   ChangeEvent: TTreeNodeChangeEvent);
 begin
   inherited NodeChanged(Node, ChangeEvent);
-  if not FNoAddNodeToDataset then
+  if not FNoAddNodeToDataset and not FUpdating then
   case ChangeEvent of
   ncTextChanged:
     NodeUpdated(Node);
@@ -496,16 +559,6 @@ procedure TIBTreeView.Reinitialise;
 begin
   if [csDesigning,csLoading] * ComponentState <> [] then Exit;
   Items.Clear;
-  FRootNode := nil;
-//  if assigned(DataSet) then
-//     DataSet.Active := false;
-  FNoAddNodeToDataset := true;
-  try
-    FRootNode := Items.Add(nil,FRootNodeTitle);
-  finally
-    FNoAddNodeToDataset := false
-  end;
-  FRootNode.HasChildren := assigned(DataSet)
 end;
 
 constructor TIBTreeView.Create(TheComponent: TComponent);
@@ -521,23 +574,25 @@ begin
 end;
 
 function TIBTreeView.FindNode(KeyValuePath: array of variant;
-  SelectNode: boolean): TTreeNode;
+  SelectNode: boolean): TIBTreeNode;
 var Node: TTreeNode;
-    i: integer;
+    i,j: integer;
 begin
   Result := nil;
-  Node := FRootNode;
-  i := 0;
-  Node.Expand(false);
-  Node := Node.GetFirstChild;
-  while assigned(Node) and assigned(Node.Data) do
+  for j := 0 to Items.TopLvlCount - 1 do
   begin
+    Node := Items.TopLvlItems[j];
+    i := 0;
+    Node.Expand(false);
+    Node := Node.GetFirstChild;
+    while assigned(Node)  do
+    begin
       if TIBTreeNode(Node).KeyValue = KeyValuePath[i] then
       begin
         Inc(i);
         if i = Length(KeyValuePath) then
         begin
-          Result := Node;
+          Result := TIBTreeNode(Node);
           if SelectNode then
              Selected := Node;
           Exit
@@ -550,7 +605,23 @@ begin
       end
       else
         Node := Node.GetNextSibling
+    end
   end
+end;
+
+function TIBTreeView.FindNode(KeyValue: variant): TIBTreeNode;
+var i: integer;
+begin
+  Result := nil;
+  if (Selected <> nil) and (TIBTreeNode(Selected).KeyValue = KeyValue) then
+     Result := TIBTreeNode(Selected)
+  else
+  {Find it the hard way}
+  for i := 0 to Items.Count -1 do
+      if TIBTreeNode(Items[i]).KeyValue = KeyValue then
+      begin
+        Result := TIBTreeNode(Items[i])
+      end;
 end;
 
 function TIBTreeView.GetSelectNodePath: TVariantArray;
@@ -606,6 +677,11 @@ end;
 procedure TIBTreeViewDatalink.DataSetChanged;
 begin
   FOwner.DataSetChanged(self)
+end;
+
+procedure TIBTreeViewDatalink.RecordChanged(Field: TField);
+begin
+  FOwner.RecordChanged(self,Field);
 end;
 
 procedure TIBTreeViewDatalink.UpdateData;

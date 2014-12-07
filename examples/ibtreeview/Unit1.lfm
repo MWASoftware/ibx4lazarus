@@ -1,58 +1,264 @@
 object Form1: TForm1
-  Left = 696
-  Height = 435
-  Top = 393
+  Left = 743
+  Height = 438
+  Top = 428
   Width = 722
   Caption = 'TIBTreeView Example'
-  ClientHeight = 435
+  ClientHeight = 438
   ClientWidth = 722
   OnClose = FormClose
   OnShow = FormShow
   LCLVersion = '1.2.6.0'
   object Panel1: TPanel
     Left = 11
-    Height = 383
-    Top = 13
+    Height = 367
+    Top = 32
     Width = 682
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
-    ClientHeight = 383
+    ClientHeight = 367
     ClientWidth = 682
     TabOrder = 0
     object IBTreeView1: TIBTreeView
       Left = 0
-      Height = 379
+      Height = 367
       Top = 0
       Width = 280
       Align = alLeft
       DefaultItemHeight = 18
+      HasChildField = 'CHILDCOUNT'
       KeyField = 'DEPT_NO'
       ListField = 'DEPARTMENT'
       ListSource = DataSource1
       ParentField = 'HEAD_DEPT'
-      RootNodeTitle = 'Departments'
+      PopupMenu = PopupMenu1
       ScrollBars = ssAutoBoth
       TabOrder = 0
     end
     object Splitter1: TSplitter
       Left = 280
-      Height = 379
+      Height = 367
       Top = 0
       Width = 5
     end
     object Panel2: TPanel
       Left = 285
-      Height = 379
+      Height = 367
       Top = 0
-      Width = 393
+      Width = 397
       Align = alClient
       BevelInner = bvLowered
       BevelOuter = bvLowered
+      ClientHeight = 367
+      ClientWidth = 397
       TabOrder = 2
+      object Panel3: TPanel
+        Left = 2
+        Height = 190
+        Top = 2
+        Width = 393
+        Align = alTop
+        BevelOuter = bvNone
+        ClientHeight = 190
+        ClientWidth = 393
+        TabOrder = 0
+        object Label2: TLabel
+          Left = 11
+          Height = 15
+          Top = 16
+          Width = 25
+          Caption = 'Title'
+          ParentColor = False
+        end
+        object DBEdit1: TDBEdit
+          Left = 11
+          Height = 25
+          Top = 31
+          Width = 373
+          DataField = 'DEPARTMENT'
+          DataSource = DataSource1
+          Anchors = [akTop, akLeft, akRight]
+          CharCase = ecNormal
+          MaxLength = 0
+          TabOrder = 0
+        end
+        object Label3: TLabel
+          Left = 13
+          Height = 15
+          Top = 71
+          Width = 51
+          Caption = 'Location'
+          ParentColor = False
+        end
+        object DBEdit4: TDBEdit
+          Left = 13
+          Height = 25
+          Top = 86
+          Width = 179
+          DataField = 'LOCATION'
+          DataSource = DataSource1
+          CharCase = ecNormal
+          MaxLength = 0
+          TabOrder = 1
+        end
+        object Label4: TLabel
+          Left = 219
+          Height = 15
+          Top = 71
+          Width = 44
+          Caption = 'Budget'
+          ParentColor = False
+        end
+        object DBEdit2: TDBEdit
+          Left = 219
+          Height = 25
+          Top = 86
+          Width = 165
+          DataField = 'BUDGET'
+          DataSource = DataSource1
+          Anchors = [akTop, akLeft, akRight]
+          CharCase = ecNormal
+          MaxLength = 0
+          TabOrder = 2
+        end
+        object Label5: TLabel
+          Left = 219
+          Height = 15
+          Top = 121
+          Width = 61
+          Caption = 'Phone No.'
+          ParentColor = False
+        end
+        object DBEdit3: TDBEdit
+          Left = 219
+          Height = 25
+          Top = 136
+          Width = 165
+          DataField = 'PHONE_NO'
+          DataSource = DataSource1
+          Anchors = [akTop, akLeft, akRight]
+          CharCase = ecNormal
+          MaxLength = 0
+          TabOrder = 3
+        end
+        object Label6: TLabel
+          Left = 12
+          Height = 15
+          Top = 121
+          Width = 52
+          Caption = 'Manager'
+          ParentColor = False
+        end
+        object IBLookupComboEditBox1: TIBLookupComboEditBox
+          Left = 13
+          Height = 27
+          Top = 136
+          Width = 180
+          DataField = 'MNGR_NO'
+          DataSource = DataSource1
+          KeyField = 'EMP_NO'
+          ListField = 'FULL_NAME'
+          ListFieldIndex = 0
+          ListSource = DataSource2
+          LookupCache = False
+          TabOrder = 4
+          CaseSensitiveMatch = False
+        end
+        object Label7: TLabel
+          Left = 12
+          Height = 15
+          Top = 172
+          Width = 115
+          Caption = 'Departmental Staff'
+          ParentColor = False
+        end
+      end
+      object IBDynamicGrid1: TIBDynamicGrid
+        Left = 16
+        Height = 159
+        Top = 192
+        Width = 365
+        Align = alClient
+        BorderSpacing.Left = 14
+        BorderSpacing.Right = 14
+        BorderSpacing.Bottom = 14
+        Color = clWindow
+        Columns = <        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Name'
+            Width = 100
+            FieldName = 'FULL_NAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            CaseSensitiveMatch = False
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Job Code'
+            Width = 60
+            FieldName = 'JOB_CODE'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            CaseSensitiveMatch = False
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Location'
+            Width = 70
+            FieldName = 'JOB_COUNTRY'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            CaseSensitiveMatch = False
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Salary'
+            Width = 100
+            FieldName = 'SALARY'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            CaseSensitiveMatch = False
+          end>
+        DataSource = DataSource3
+        Scrollbars = ssAutoVertical
+        TabOrder = 1
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
+      end
     end
   end
+  object Label1: TLabel
+    Left = 11
+    Height = 15
+    Top = 17
+    Width = 79
+    Caption = 'Departments'
+    ParentColor = False
+  end
+  object CancelBtn: TButton
+    Left = 616
+    Height = 25
+    Top = 408
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Cancel'
+    OnClick = CancelBtnClick
+    TabOrder = 1
+  end
+  object SaveBtn: TButton
+    Left = 536
+    Height = 25
+    Top = 408
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Save'
+    OnClick = SaveBtnClick
+    TabOrder = 2
+  end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AllowStreamedConnected = False
     DatabaseName = 'employee'
     Params.Strings = (
@@ -62,17 +268,22 @@ object Form1: TForm1
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
-    left = 645
-    top = 352
+    left = 24
+    top = 96
   end
   object IBTransaction1: TIBTransaction
     Active = False
-    left = 600
-    top = 352
+    left = 24
+    top = 136
   end
   object Departments: TIBDataSet
     Database = IBDatabase1
     Transaction = IBTransaction1
+    AfterDelete = DepartmentsAfterDelete
+    AfterEdit = DepartmentsAfterDelete
+    AfterInsert = DepartmentsAfterInsert
+    BeforeClose = DepartmentsBeforeClose
+    BeforeScroll = DepartmentsBeforeScroll
     BufferChunks = 1000
     CachedUpdates = False
     DeleteSQL.Strings = (
@@ -84,21 +295,35 @@ object Form1: TForm1
       'Values(:DEPT_NO, :DEPARTMENT, :HEAD_DEPT, :MNGR_NO, :BUDGET, :LOCATION, :PHONE_NO)'
     )
     RefreshSQL.Strings = (
-      'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO From DEPARTMENT A'
+      'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO,'
+      'count(B.DEPT_NO) as ChildCount'
+      'From DEPARTMENT A'
+      'Left Outer JOIN DEPARTMENT B On B.HEAD_DEPT = A.DEPT_NO'
       'Where A.DEPT_NO = :DEPT_NO'
+      'Group By A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO'
+      ''
     )
     SelectSQL.Strings = (
-      'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO From DEPARTMENT A'
+      'Select * From('
+      'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO,'
+      'count(B.DEPT_NO) as ChildCount'
+      'From DEPARTMENT A'
+      'Left Outer JOIN DEPARTMENT B On B.HEAD_DEPT = A.DEPT_NO'
+      'Group By A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO)'
       'Order by Department'
     )
     ModifySQL.Strings = (
       'Update DEPARTMENT A Set '#13#10'  A.BUDGET = :BUDGET,'#13#10'  A.DEPARTMENT = :DEPARTMENT,'#13#10'  A.HEAD_DEPT = :HEAD_DEPT,'#13#10'  A.LOCATION = :LOCATION,'#13#10'  A.MNGR_NO = :MNGR_NO,'#13#10'  A.PHONE_NO = :PHONE_NO'
       'Where A.DEPT_NO = :OLD_DEPT_NO'
     )
+    GeneratorField.Generator = 'EMP_NO_GEN'
+    GeneratorField.Field = 'DEPT_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
-    left = 554
-    top = 352
+    BeforeTransactionEnd = DepartmentsBeforeTransactionEnd
+    AfterTransactionEnd = DepartmentsAfterTransactionEnd
+    left = 64
+    top = 176
     object DepartmentsDEPT_NO: TIBStringField
       DisplayWidth = 3
       FieldKind = fkData
@@ -151,6 +376,7 @@ object Form1: TForm1
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = False
+      OnGetText = DepartmentsBUDGETGetText
       Precision = 18
       Currency = False
       MaxValue = 0
@@ -178,10 +404,231 @@ object Form1: TForm1
       ReadOnly = False
       Required = False
     end
+    object DepartmentsCHILDCOUNT: TIntegerField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'CHILDCOUNT'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
   end
   object DataSource1: TDataSource
     DataSet = Departments
-    left = 516
-    top = 351
+    left = 24
+    top = 176
+  end
+  object ApplicationProperties1: TApplicationProperties
+    OnIdle = ApplicationProperties1Idle
+    left = 24
+    top = 48
+  end
+  object Managers: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.EMP_NO, A.FULL_NAME From EMPLOYEE A'
+      'order by 2'
+    )
+    Params = <>
+    left = 64
+    top = 221
+  end
+  object DataSource2: TDataSource
+    DataSet = Managers
+    left = 24
+    top = 221
+  end
+  object Staff: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = DataSource1
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME From EMPLOYEE A'
+      'Where A.DEPT_NO =:DEPT_NO'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'DEPT_NO'
+        ParamType = ptInput
+      end>
+    left = 64
+    top = 264
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'DEPT_NO'
+        ParamType = ptInput
+      end>
+    object StaffEMP_NO: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'EMP_NO'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object StaffFIRST_NAME: TIBStringField
+      DisplayWidth = 15
+      FieldKind = fkData
+      FieldName = 'FIRST_NAME'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 15
+    end
+    object StaffLAST_NAME: TIBStringField
+      DisplayWidth = 20
+      FieldKind = fkData
+      FieldName = 'LAST_NAME'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object StaffPHONE_EXT: TIBStringField
+      DisplayWidth = 4
+      FieldKind = fkData
+      FieldName = 'PHONE_EXT'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 4
+    end
+    object StaffHIRE_DATE: TDateTimeField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'HIRE_DATE'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object StaffDEPT_NO: TIBStringField
+      DisplayWidth = 3
+      FieldKind = fkData
+      FieldName = 'DEPT_NO'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 3
+    end
+    object StaffJOB_CODE: TIBStringField
+      DisplayWidth = 5
+      FieldKind = fkData
+      FieldName = 'JOB_CODE'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 5
+    end
+    object StaffJOB_GRADE: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'JOB_GRADE'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object StaffJOB_COUNTRY: TIBStringField
+      DisplayWidth = 15
+      FieldKind = fkData
+      FieldName = 'JOB_COUNTRY'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 15
+    end
+    object StaffSALARY: TIBBCDField
+      DisplayWidth = 18
+      FieldKind = fkData
+      FieldName = 'SALARY'
+      Index = 9
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      OnGetText = DepartmentsBUDGETGetText
+      Precision = 18
+      Currency = False
+      MaxValue = 0
+      MinValue = 0
+      Size = 2
+    end
+    object StaffFULL_NAME: TIBStringField
+      DisplayWidth = 37
+      FieldKind = fkData
+      FieldName = 'FULL_NAME'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = True
+      Required = False
+      Size = 37
+    end
+  end
+  object DataSource3: TDataSource
+    DataSet = Staff
+    left = 24
+    top = 264
+  end
+  object ActionList1: TActionList
+    left = 24
+    top = 316
+    object DeleteNode: TAction
+      Caption = 'Delete'
+      OnExecute = DeleteNodeExecute
+      OnUpdate = DeleteNodeUpdate
+    end
+    object AddChild: TAction
+      Caption = 'Add Child Department'
+      OnExecute = AddChildExecute
+      OnUpdate = DeleteNodeUpdate
+    end
+    object AddSibling: TAction
+      Caption = 'Add Sibling'
+      OnExecute = AddSiblingExecute
+      OnUpdate = DeleteNodeUpdate
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    left = 64
+    top = 318
+    object MenuItem3: TMenuItem
+      Action = AddSibling
+    end
+    object MenuItem2: TMenuItem
+      Action = AddChild
+    end
+    object MenuItem1: TMenuItem
+      Action = DeleteNode
+    end
   end
 end
