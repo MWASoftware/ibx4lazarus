@@ -1115,4 +1115,4 @@ finalization
     _MonitorHook := nil;
     if assigned(CS) then CS.Free;
   end;
-end.
+end.

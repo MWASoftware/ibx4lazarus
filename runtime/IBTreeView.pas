@@ -1,3 +1,28 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2011 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*)
 unit IBTreeView;
 
 {$mode objfpc}{$H+}
@@ -9,6 +34,13 @@ uses
   DB, IBSQLParser;
 
 type
+  {
+    TIBTreeView is intended to be a data aware descendent of TCustomTreeView and used to display
+    hierarchically structured data in a natural manner. Nodes can be deleted, moved
+    and added to the tree and each change is reflected in the underlying dataset. The
+    Node text can similarly be edited.
+  }
+
   TVariantArray = array of variant;
 
   TIBTreeView = class;
@@ -51,6 +83,8 @@ type
     FUpdateNode: TIBTreeNode;
     FModifiedNode: TIBTreeNode;
     FUpdating: boolean;
+    FLocatingNode: boolean;
+    FLastSelected: TVariantArray;
     procedure ActiveChanged(Sender: TObject);
     procedure AddNodes;
     procedure DataSetChanged(Sender: TObject);
@@ -85,7 +119,7 @@ type
     destructor Destroy; override;
     function FindNode(KeyValuePath: array of variant; SelectNode: boolean): TIBTreeNode; overload;
     function FindNode(KeyValue: variant): TIBTreeNode; overload;
-    function GetSelectNodePath: TVariantArray;
+    function GetNodePath(Node: TTreeNode): TVariantArray;
     property DataSet: TDataSet read GetDataSet;
     property SelectedKeyValue: variant read GetSelectedKeyValue;
   published
@@ -176,6 +210,7 @@ type
     property OnMouseLeave;
     property OnMouseMove;
     property OnMouseUp;
+    property OnNodeChanged;
     property OnSelectionChanged;
     property OnShowHint;
     //property OnStartDock;
@@ -247,6 +282,7 @@ end;
 { TIBTreeView }
 
 procedure TIBTreeView.ActiveChanged(Sender: TObject);
+var AtTopLevel: boolean;
 begin
   if (csDesigning in ComponentState) then Exit;
   if assigned(DataSet) and not DataSet.Active then
@@ -256,9 +292,15 @@ begin
   end
   else
   begin
+    AtTopLevel := Items.TopLvlCount = 0;
     AddNodes;
-    if (Selected = nil) and (Items.TopLvlCount > 0) then
+    if not FLocatingNode and (Selected = nil) and (Items.TopLvlCount > 0) then
+    begin
+      if Length(FLastSelected) > 0 then
+         Selected := FindNode(FLastSelected,true)
+      else
         Selected := Items.TopLvlItems[0];
+    end
   end
 end;
 
@@ -434,7 +476,7 @@ begin
     else
       DataSet.FieldByName(ParentField).AsVariant := TIBTreeNode(FModifiedNode.Parent).KeyValue;
     FModifiedNode := nil
-  end;
+  end
 end;
 
 procedure TIBTreeView.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
@@ -480,6 +522,8 @@ begin
   begin
     DataSet.Append;
     TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
+    if (Node.Text = '') and not DataSet.FieldByName(ListField).IsNull then
+       Node.Text := DataSet.FieldByName(ListField).AsString;
     FModifiedNode := TIBTreeNode(Node);
     FDataLink.UpdateRecord
   end;
@@ -558,6 +602,7 @@ end;
 procedure TIBTreeView.Reinitialise;
 begin
   if [csDesigning,csLoading] * ComponentState <> [] then Exit;
+  FLastSelected := GetNodePath(Selected);
   Items.Clear;
 end;
 
@@ -579,12 +624,13 @@ var Node: TTreeNode;
     i,j: integer;
 begin
   Result := nil;
-  for j := 0 to Items.TopLvlCount - 1 do
-  begin
+  FLocatingNode := true;
+  try
+   for j := 0 to Items.TopLvlCount - 1 do
+   begin
     Node := Items.TopLvlItems[j];
     i := 0;
     Node.Expand(false);
-    Node := Node.GetFirstChild;
     while assigned(Node)  do
     begin
       if TIBTreeNode(Node).KeyValue = KeyValuePath[i] then
@@ -606,6 +652,9 @@ begin
       else
         Node := Node.GetNextSibling
     end
+   end
+  finally
+    FLocatingNode := false
   end
 end;
 
@@ -624,26 +673,25 @@ begin
       end;
 end;
 
-function TIBTreeView.GetSelectNodePath: TVariantArray;
-var Node: TTreeNode;
+function TIBTreeView.GetNodePath(Node: TTreeNode): TVariantArray;
+var aParent: TTreeNode;
     i: integer;
 begin
-  if not assigned(Selected) then
+  if not assigned(Node) or not (Node is TIBTreeNode) then
      SetLength(Result,0)
   else
   begin
     {Count length of Path}
     i := 1;
-    Node := Selected.Parent;
-    while (Node <> nil) and (Node.Data <> nil) do
+    aParent := Node.Parent;
+    while (aParent <> nil) do
     begin
         Inc(i);
-        Node := Node.Parent
+        aParent := aParent.Parent
     end;
 
     {Save Path}
     Setlength(Result,i);
-    Node := Selected;
     while i > 0 do
     begin
       Dec(i);

@@ -104,7 +104,7 @@ type
 
 implementation
 
-uses IBQuery, IBCustomDataSet, LCLType, Variants;
+uses IBQuery, IBCustomDataSet, LCLType, Variants, LCLProc;
 
 { TIBLookupComboDataLink }
 
@@ -169,12 +169,12 @@ begin
          ListSource.DataSet.Active :=  true;
          if Focused and (Text <> '')then
          begin
-           CurSelLength := length(Text);
+           CurSelLength := UTF8Length(Text);
            if ListSource.DataSet.Active and (ListSource.DataSet.RecordCount > 0) then
            begin
              Text := ListSource.DataSet.FieldByName(ListField).AsString;
              SelStart := CurSelLength ;
-             SelLength := Length(Text) - CurSelLength
+             SelLength := UTF8Length(Text) - CurSelLength
            end;
          end;
   end;

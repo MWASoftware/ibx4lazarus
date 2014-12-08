@@ -7,13 +7,14 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   StdCtrls, DbCtrls, ActnList, Menus, db, IBTreeView, IBDatabase,
-  IBCustomDataSet, IBLookupComboEditBox, IBQuery, IBDynamicGrid;
+  IBCustomDataSet, IBLookupComboEditBox, IBQuery, IBDynamicGrid, ComCtrls;
 
 type
 
   { TForm1 }
 
   TForm1 = class(TForm)
+    AddFirstChild: TAction;
     AddSibling: TAction;
     AddChild: TAction;
     DeleteNode: TAction;
@@ -28,9 +29,11 @@ type
     DepartmentsCHILDCOUNT: TIntegerField;
     IBDynamicGrid1: TIBDynamicGrid;
     IBLookupComboEditBox1: TIBLookupComboEditBox;
+    ImageList1: TImageList;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
     PopupMenu1: TPopupMenu;
     Staff: TIBQuery;
     Label7: TLabel;
@@ -71,6 +74,7 @@ type
     StaffPHONE_EXT: TIBStringField;
     StaffSALARY: TIBBCDField;
     procedure AddChildExecute(Sender: TObject);
+    procedure AddFirstChildExecute(Sender: TObject);
     procedure AddSiblingExecute(Sender: TObject);
     procedure ApplicationProperties1Idle(Sender: TObject; var Done: Boolean);
     procedure CancelBtnClick(Sender: TObject);
@@ -79,20 +83,23 @@ type
     procedure DepartmentsAfterDelete(DataSet: TDataSet);
     procedure DepartmentsAfterInsert(DataSet: TDataSet);
     procedure DepartmentsAfterTransactionEnd(Sender: TObject);
-    procedure DepartmentsBeforeClose(DataSet: TDataSet);
     procedure DepartmentsBeforeScroll(DataSet: TDataSet);
-    procedure DepartmentsBeforeTransactionEnd(Sender: TObject);
+    procedure DepartmentsBUDGETChange(Sender: TField);
     procedure DepartmentsBUDGETGetText(Sender: TField; var aText: string;
       DisplayText: Boolean);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure IBTreeView1Addition(Sender: TObject; Node: TTreeNode);
+    procedure IBTreeView1DragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure IBTreeView1DragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
     procedure SaveBtnClick(Sender: TObject);
   private
     { private declarations }
     FDirty: boolean;
     FClosing: boolean;
-    FNodePath: TVariantArray;
     procedure Reopen(Data: PtrInt);
+    procedure SetNodeImage(Node: TTreeNode);
   public
     { public declarations }
   end;
@@ -122,13 +129,21 @@ end;
 
 procedure TForm1.AddChildExecute(Sender: TObject);
 begin
-  IBTreeView1.Items.AddChild(IBTreeView1.Selected,'<a new department>');
-  IBTreeView1.Selected.Expand(true)
+  IBTreeView1.Selected.Expand(true);
+  IBTreeView1.Items.AddChild(IBTreeView1.Selected,'');
+  IBTreeView1.Selected.Expand(true);
+end;
+
+procedure TForm1.AddFirstChildExecute(Sender: TObject);
+begin
+  IBTreeView1.Selected.Expand(true);
+  IBTreeView1.Items.AddChildFirst(IBTreeView1.Selected,'');
+  IBTreeView1.Selected.Expand(true);
 end;
 
 procedure TForm1.AddSiblingExecute(Sender: TObject);
 begin
-  IBTreeView1.Items.Add(IBTreeView1.Selected,'<a new department>');
+  IBTreeView1.Items.Add(IBTreeView1.Selected,'');
 end;
 
 procedure TForm1.CancelBtnClick(Sender: TObject);
@@ -156,6 +171,7 @@ end;
 procedure TForm1.DepartmentsAfterInsert(DataSet: TDataSet);
 begin
   FDirty := true;
+  DataSet.FieldByName('Department').AsString := 'Dept ' + DataSet.FieldByName('DEPT_NO').AsString
 end;
 
 procedure TForm1.DepartmentsAfterTransactionEnd(Sender: TObject);
@@ -164,31 +180,22 @@ begin
     Application.QueueAsyncCall(@Reopen,0);
 end;
 
-procedure TForm1.DepartmentsBeforeClose(DataSet: TDataSet);
-begin
-  with DataSet do
-    try
-      if State in [dsInsert,dsEdit] then Post
-    except
-      Cancel;
-      raise
-    end;
-end;
-
 procedure TForm1.DepartmentsBeforeScroll(DataSet: TDataSet);
 begin
   with DataSet do
     try
       if State in [dsInsert,dsEdit] then Post
-    except
-      Cancel;
-      raise
+    except on E: Exception do
+      begin
+        Cancel;
+        MessageDlg(E.Message,mtError,[mbOK],0)
+      end
     end;
 end;
 
-procedure TForm1.DepartmentsBeforeTransactionEnd(Sender: TObject);
+procedure TForm1.DepartmentsBUDGETChange(Sender: TField);
 begin
-  FNodePath := IBTreeView1.GetSelectNodePath;
+  SetNodeImage(IBTreeView1.Selected)
 end;
 
 procedure TForm1.DepartmentsBUDGETGetText(Sender: TField; var aText: string;
@@ -202,12 +209,45 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  FDirty := false;
   IBDatabase1.Connected := true;
-  IBTransaction1.StartTransaction;
-  Managers.Active := true;
-  Departments.Active := true;
-  Staff.Active := true;
+  Reopen(0);
+end;
+
+procedure TForm1.IBTreeView1Addition(Sender: TObject; Node: TTreeNode);
+begin
+  SetNodeImage(Node)
+end;
+
+procedure TForm1.IBTreeView1DragDrop(Sender, Source: TObject; X, Y: Integer);
+var Node: TTreeNode;
+    tv: TTreeView;
+begin
+  if Source = Sender then {Dragging within Tree View}
+  begin
+    tv := TTreeView(Sender);;
+    Node := tv.GetNodeAt(X,Y); {Drop Point}
+    if assigned(tv.Selected) and (tv.Selected <> Node) then
+    begin
+      if Node = nil then
+        tv.Selected.MoveTo(nil,naAdd) {Move to Top Level}
+      else
+      begin
+        if ssCtrl in GetKeyShiftState then
+        begin
+          Node.Expand(false);
+          tv.Selected.MoveTo(Node,naAddChildFirst)
+        end
+        else
+          tv.Selected.MoveTo(Node,naInsertBehind)
+      end;
+    end;
+  end;
+end;
+
+procedure TForm1.IBTreeView1DragOver(Sender, Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
+begin
+  Accept := Source = Sender
 end;
 
 procedure TForm1.SaveBtnClick(Sender: TObject);
@@ -222,8 +262,17 @@ begin
   Managers.Active := true;
   Departments.Active := true;
   Staff.Active := true;
-  if Length(FNodePath) > 0 then
-    IBTreeView1.FindNode(FNodePath,true);
+end;
+
+procedure TForm1.SetNodeImage(Node: TTreeNode);
+begin
+  if Departments.FieldByName('Budget').AsFloat < 500000 then
+     Node.ImageIndex := 0
+  else
+  if Departments.FieldByName('Budget').AsFloat = 500000 then
+    Node.ImageIndex := 2
+  else
+    Node.ImageIndex := 1
 end;
 
 end.

@@ -512,7 +512,7 @@ begin
 end;
 
 initialization
-//  IsMultiThread := True;
+ // IsMultiThread := True;
   InitCriticalSection(IBCS);
   IBDataBaseErrorMessages := [ShowSQLMessage, ShowIBMessage];
 
