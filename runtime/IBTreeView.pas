@@ -112,6 +112,7 @@ type
      procedure Expand(Node: TTreeNode); override;
      procedure Loaded; override;
      procedure NodeChanged(Node: TTreeNode; ChangeEvent: TTreeNodeChangeEvent); override;
+     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
      procedure Reinitialise;
   public
     { Public declarations }
@@ -483,10 +484,9 @@ procedure TIBTreeView.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 begin
   DataSet.DisableControls;
   try
-    Parser.ResetWhereClause;
     if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
     begin
-      Parser.Add2WhereClause(FKeyField + ' = :IBX_KEY_VALUE');
+      Parser.Add2WhereClause('"' + FKeyField + '" = :IBX_KEY_VALUE');
       if (Sender as TDataLink).DataSet is TIBQuery then
         TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
           FUpdateNode.KeyValue
@@ -502,7 +502,7 @@ begin
     else
     if assigned(FExpandNode) then
     begin
-      Parser.Add2WhereClause(FParentField + ' = :IBX_PARENT_VALUE');
+      Parser.Add2WhereClause('"' + FParentField + '" = :IBX_PARENT_VALUE');
       if (Sender as TDataLink).DataSet is TIBQuery then
         TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
           TIBTreeNode(FExpandNode).KeyValue
@@ -597,6 +597,14 @@ begin
   ncParentChanged:
     NodeMoved(Node);
   end;
+end;
+
+procedure TIBTreeView.Notification(AComponent: TComponent; Operation: TOperation
+  );
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and
+     (FDataLink <> nil) and (AComponent = ListSource) then ListSource := nil;
 end;
 
 procedure TIBTreeView.Reinitialise;

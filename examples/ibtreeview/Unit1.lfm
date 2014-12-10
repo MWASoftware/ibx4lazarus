@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 743
+  Left = 673
   Height = 438
-  Top = 428
+  Top = 386
   Width = 722
   Caption = 'TIBTreeView Example'
   ClientHeight = 438
@@ -167,7 +167,7 @@ object Form1: TForm1
           ListSource = DataSource2
           LookupCache = False
           TabOrder = 4
-          CaseSensitiveMatch = False
+          AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         end
         object Label7: TLabel
           Left = 12
@@ -196,7 +196,6 @@ object Form1: TForm1
             FieldName = 'FULL_NAME'
             AutoSizeColumn = True
             InitialSortColumn = False
-            CaseSensitiveMatch = False
           end        
           item
             Title.Alignment = taCenter
@@ -205,7 +204,6 @@ object Form1: TForm1
             FieldName = 'JOB_CODE'
             AutoSizeColumn = False
             InitialSortColumn = False
-            CaseSensitiveMatch = False
           end        
           item
             Title.Alignment = taCenter
@@ -214,7 +212,6 @@ object Form1: TForm1
             FieldName = 'JOB_COUNTRY'
             AutoSizeColumn = False
             InitialSortColumn = False
-            CaseSensitiveMatch = False
           end        
           item
             Title.Alignment = taCenter
@@ -223,7 +220,6 @@ object Form1: TForm1
             FieldName = 'SALARY'
             AutoSizeColumn = False
             InitialSortColumn = False
-            CaseSensitiveMatch = False
           end>
         DataSource = DataSource3
         Scrollbars = ssAutoVertical

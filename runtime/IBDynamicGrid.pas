@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DBGrids, DB,
-  IBSqlParser, Grids, IBLookupComboEditBox, LMessages;
+  IBSqlParser, Grids, IBLookupComboEditBox, LMessages, StdCtrls;
 
 type
   {
@@ -87,8 +87,8 @@ type
   TIBDynamicGridColumn = class(TDBDynamicGridColumn)
   private
     FAutoComplete: boolean;
+    FAutoCompleteText: TComboBoxAutoCompleteText;
     FAutoInsert: boolean;
-    FCaseSensitiveMatch: boolean;
     FInitialSortColumn: boolean;
     FKeyPressInterval: integer;
     FListField: string;
@@ -103,7 +103,9 @@ type
     property ListField: string read FListField write FListField;
     property AutoInsert: boolean read FAutoInsert write FAutoInsert default true;
     property AutoComplete: boolean read FAutoComplete write FAutoComplete default true;
-    property CaseSensitiveMatch: boolean read FCaseSensitiveMatch write FCaseSensitiveMatch;
+    property AutoCompleteText: TComboBoxAutoCompleteText
+                           read FAutoCompleteText write FAutoCompleteText
+                           default DefaultComboBoxAutoCompleteText;
     property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
     property OnCustomInsert: TCustomInsert read FOnCustomInsert write FOnCustomInsert;
   end;
@@ -182,6 +184,7 @@ type
     procedure LinkActive(Value: Boolean); override;
     function  GetDefaultEditor(Column: Integer): TWinControl; override;
     procedure EditorTextChanged(const aCol,aRow: Integer; const aText:string); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
@@ -199,7 +202,7 @@ type
 
 implementation
 
-uses Math, IBQuery, IBCustomDataSet, StdCtrls, LCLType;
+uses Math, IBQuery, IBCustomDataSet, LCLType;
 
 { TDBDynamicGrid }
 
@@ -404,6 +407,7 @@ begin
   inherited Create(ACollection);
   FAutoInsert := true;
   FAutoComplete := true;
+  FAutoCompleteText := DefaultComboBoxAutoCompleteText;
   FKeyPressInterval := 500
 end;
 
@@ -628,7 +632,7 @@ begin
          FDBLookupCellEditor.ListSource := C.ListSource;
          FDBLookupCellEditor.AutoInsert := C.AutoInsert;
          FDBLookupCellEditor.AutoComplete := C.AutoComplete;
-         FDBLookupCellEditor.CaseSensitiveMatch := C.CaseSensitiveMatch;
+         FDBLookupCellEditor.AutoCompleteText := C.AutoCompleteText;
          FDBLookupCellEditor.KeyPressInterval := C.KeyPressInterval;
          FDBLookupCellEditor.OnCustomInsert := C.OnCustomInsert;
          Result := FDBLookupCellEditor;
@@ -643,6 +647,14 @@ procedure TIBDynamicGrid.EditorTextChanged(const aCol, aRow: Integer;
   const aText: string);
 begin
   inherited EditorTextChanged(aCol, aRow, aText);
+end;
+
+procedure TIBDynamicGrid.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and
+     (FDataLink <> nil) and (AComponent = DataSource) then DataSource := nil;
 end;
 
 constructor TIBDynamicGrid.Create(TheComponent: TComponent);
