@@ -93,7 +93,7 @@ type
     FKeyPressInterval: integer;
     FListField: string;
     FListSource: TDataSource;
-    FOnCustomInsert: TCustomInsert;
+    FOnAutoInsert: TAutoInsert;
     procedure SetInitialSortColumn(AValue: boolean);
   public
     constructor Create(ACollection: TCollection); override;
@@ -107,7 +107,7 @@ type
                            read FAutoCompleteText write FAutoCompleteText
                            default DefaultComboBoxAutoCompleteText;
     property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
-    property OnCustomInsert: TCustomInsert read FOnCustomInsert write FOnCustomInsert;
+    property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
   end;
 
   { TDBLookupCellEditor }
@@ -634,7 +634,7 @@ begin
          FDBLookupCellEditor.AutoComplete := C.AutoComplete;
          FDBLookupCellEditor.AutoCompleteText := C.AutoCompleteText;
          FDBLookupCellEditor.KeyPressInterval := C.KeyPressInterval;
-         FDBLookupCellEditor.OnCustomInsert := C.OnCustomInsert;
+         FDBLookupCellEditor.OnAutoInsert := C.OnAutoInsert;
          Result := FDBLookupCellEditor;
       end
       else

@@ -6,7 +6,7 @@
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
-        <OtherUnitFiles Value="runtime"/>
+        <OtherUnitFiles Value="runtime;ibcontrols"/>
         <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>
@@ -514,19 +514,23 @@
 
    Contributor(s): ______________________________________. "/>
     <Version Major="1" Minor="2"/>
-    <Files Count="3">
+    <Files Count="4">
       <Item1>
-        <Filename Value="runtime/IBLookupComboEditBox.pas"/>
+        <Filename Value="ibcontrols/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
       </Item1>
       <Item2>
-        <Filename Value="runtime/IBDynamicGrid.pas"/>
+        <Filename Value="ibcontrols/IBDynamicGrid.pas"/>
         <UnitName Value="IBDynamicGrid"/>
       </Item2>
       <Item3>
-        <Filename Value="runtime/IBTreeView.pas"/>
+        <Filename Value="ibcontrols/IBTreeView.pas"/>
         <UnitName Value="IBTreeView"/>
       </Item3>
+      <Item4>
+        <Filename Value="ibcontrols/IBDateEdit.pas"/>
+        <UnitName Value="IBDateEdit"/>
+      </Item4>
     </Files>
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">

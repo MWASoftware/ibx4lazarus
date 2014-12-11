@@ -44,7 +44,7 @@ uses
   unix,
 {$ENDIF}
  SysUtils, Graphics, Classes, Controls, Db,
-     IBHeader, IB, IBCustomDataSet, IBSQL;
+     IBHeader, IB, IBCustomDataSet, IBSQL, IBSQLParser;
 
 type
 
@@ -58,6 +58,7 @@ type
     FText: string;
     FRowsAffected: Integer;
     FCheckRowsAffected: Boolean;
+    FSQLUpdating: boolean;
     function GetRowsAffected: Integer;
     procedure PrepareSQL(Value: PChar);
     procedure QueryChanged(Sender: TObject);
@@ -80,6 +81,7 @@ type
     procedure PSSetParams(AParams: TParams); override;  *)
 
     procedure DefineProperties(Filer: TFiler); override;
+    function GetParser: TSelectSQLParser; override;
     procedure InitFieldDefs; override;
     procedure InternalOpen; override;
     procedure Disconnect; override;
@@ -216,6 +218,15 @@ begin
   if not (csReading in ComponentState) then
   begin
     Disconnect;
+    if assigned(FParser) and not FSQLUpdating then
+    begin
+      FSQLUpdating := true;
+      try
+        SQL.Text := FParser.SQLText;
+      finally
+        FSQLUpdating := false
+      end;
+    end;
     if ParamCheck or (csDesigning in ComponentState) then
     begin
       List := TParams.Create(Self);
@@ -259,6 +270,13 @@ procedure TIBQuery.DefineProperties(Filer: TFiler);
 begin
   inherited DefineProperties(Filer);
   Filer.DefineProperty('ParamData', ReadParamData, WriteParamData, WriteData); {do not localize}
+end;
+
+function TIBQuery.GetParser: TSelectSQLParser;
+begin
+  Result := inherited GetParser;
+  if assigned(Result) then
+     Result.OnSQLChanging := QueryChanged;
 end;
 
 procedure TIBQuery.ReadParamData(Reader: TReader);

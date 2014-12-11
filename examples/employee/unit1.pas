@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, DBGrids,
-  StdCtrls, ActnList, IBDatabase, IBQuery, IBCustomDataSet, IBUpdateSQL,
-  IBDynamicGrid, db;
+  StdCtrls, ActnList, EditBtn, IBDatabase, IBQuery, IBCustomDataSet,
+  IBUpdateSQL, IBDynamicGrid, db;
 
 type
 
@@ -17,10 +17,14 @@ type
     CancelChanges: TAction;
     CountrySource: TDataSource;
     Countries: TIBDataSet;
+    BeforeDate: TDateEdit;
+    AfterDate: TDateEdit;
     EmployeesDEPARTMENT: TIBStringField;
     IBDynamicGrid1: TIBDynamicGrid;
     EmployeesSALARY: TIBBCDField;
     IBUpdateSQL1: TIBUpdateSQL;
+    Label1: TLabel;
+    Label2: TLabel;
     SaveChanges: TAction;
     DeleteEmployee: TAction;
     EditEmployee: TAction;
@@ -46,6 +50,7 @@ type
     EmployeesPHONE_EXT: TIBStringField;
     IBTransaction1: TIBTransaction;
     procedure AddEmployeeExecute(Sender: TObject);
+    procedure BeforeDateChange(Sender: TObject);
     procedure CancelChangesExecute(Sender: TObject);
     procedure DeleteEmployeeExecute(Sender: TObject);
     procedure EditEmployeeExecute(Sender: TObject);
@@ -142,6 +147,12 @@ begin
   end;
 end;
 
+procedure TForm1.BeforeDateChange(Sender: TObject);
+begin
+  Employees.Active := false;
+  Employees.Active := true
+end;
+
 procedure TForm1.CancelChangesExecute(Sender: TObject);
 begin
   Employees.Transaction.Rollback
@@ -177,6 +188,15 @@ end;
 procedure TForm1.EmployeesBeforeOpen(DataSet: TDataSet);
 begin
   Countries.Active := true;
+  if BeforeDate.Date > 0 then
+     Employees.Parser.Add2WhereClause('HIRE_DATE < :BeforeDate');
+  if AfterDate.Date > 0 then
+     Employees.Parser.Add2WhereClause('HIRE_DATE > :AfterDate');
+  if BeforeDate.Date > 0 then
+     Employees.ParamByName('BeforeDate').AsDateTime := BeforeDate.Date;
+  if AfterDate.Date > 0 then
+   Employees.ParamByName('AfterDate').AsDateTime := AfterDate.Date;
+
 end;
 
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);

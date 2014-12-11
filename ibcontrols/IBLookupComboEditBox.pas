@@ -42,7 +42,8 @@ type
    newly typed entry to be added to the list dataset and included in the available
    list items.    }
 
-  TCustomInsert = procedure(Sender: TObject; aText: string; var KeyValue: variant) of object;
+  TAutoInsert = procedure(Sender: TObject; aText: string) of object;
+  TCanAutoInsert = procedure (Sender: TObject; aText: string; var Accept: boolean) of object;
 
   TIBLookupComboEditBox = class;
 
@@ -54,6 +55,8 @@ type
   protected
     procedure ActiveChanged; override;
     procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
+    procedure RecordChanged(Field: TField); override;
+    procedure UpdateData; override;
   public
     constructor Create(AOwner: TIBLookupComboEditBox);
   end;
@@ -63,31 +66,35 @@ type
 
   TIBLookupComboEditBox = class(TDBLookupComboBox)
   private
+    FCanAutoInsert: TCanAutoInsert;
     { Private declarations }
     FDataLink: TIBLookupComboDataLink;
     FAutoComplete: boolean;
     FAutoInsert: boolean;
     FKeyPressInterval: integer;
+    FOnCanAutoInsert: TCanAutoInsert;
     FTimer: TTimer;
     FFiltered: boolean;
-    FOnCustomInsert: TCustomInsert;
+    FOnAutoInsert: TAutoInsert;
     FOriginalTextValue: string;
     FUpdating: boolean;
+    FInserting: boolean;
+    FLastKeyValue: variant;
     procedure ActiveChanged(Sender: TObject);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
     function GetListSource: TDataSource;
     procedure HandleTimer(Sender: TObject);
     procedure ResetParser;
+    procedure RecordChanged(Sender: TObject; aField: TField);
     procedure SetAutoCompleteText(AValue: TComboBoxAutoCompleteText);
     procedure SetListSource(AValue: TDataSource);
     procedure UpdateList;
     procedure UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
     procedure HandleEnter(Data: PtrInt);
-    procedure ScrollDataSet(Data: PtrInt);
+    procedure UpdateData(Sender: TObject);
   protected
     { Protected declarations }
     procedure CheckAndInsert;
-    procedure DataChange(Sender: TObject); override;
     procedure DoEnter; override;
     procedure DoExit; override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
@@ -105,7 +112,8 @@ type
              write SetAutoCompleteText;
     property ListSource: TDataSource read GetListSource write SetListSource;
     property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
-    property OnCustomInsert: TCustomInsert read FOnCustomInsert write FOnCustomInsert;
+    property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
+    property OnCanAutoInsert: TCanAutoInsert read FOnCanAutoInsert write FOnCanAutoInsert;
   end;
 
 
@@ -134,6 +142,16 @@ begin
     inherited DataEvent(Event, Info);
 end;
 
+procedure TIBLookupComboDataLink.RecordChanged(Field: TField);
+begin
+  FOwner.RecordChanged(self,Field);
+end;
+
+procedure TIBLookupComboDataLink.UpdateData;
+begin
+  FOwner.UpdateData(self)
+end;
+
 constructor TIBLookupComboDataLink.Create(AOwner: TIBLookupComboEditBox);
 begin
   inherited Create;
@@ -158,8 +176,20 @@ end;
 procedure TIBLookupComboEditBox.ActiveChanged(Sender: TObject);
 begin
   if assigned(ListSource) and assigned(ListSource.DataSet) and ListSource.DataSet.Active
-     and not FUpdating then
-    Text := ListSource.DataSet.FieldByName(ListField).AsString
+     and (FInserting or not FUpdating)  then
+  begin
+    begin
+      if varIsNull(FLastKeyValue) and (ItemIndex = -1) then
+        Text := ListSource.DataSet.FieldByName(ListField).AsString
+      else
+      begin
+        KeyValue := FLastKeyValue;
+        inherited UpdateData(self); {Force auto scroll}
+        if varIsNull(KeyValue) then {Value not present}
+          Text := ListSource.DataSet.FieldByName(ListField).AsString
+      end;
+    end;
+  end;
 end;
 
 function TIBLookupComboEditBox.GetAutoCompleteText: TComboBoxAutoCompleteText;
@@ -175,7 +205,15 @@ begin
   begin
     FFiltered := false;
     UpdateList;
+    inherited UpdateData(self); {Force Scroll}
   end;
+end;
+
+procedure TIBLookupComboEditBox.RecordChanged(Sender: TObject; aField: TField);
+begin
+  {Make sure that we are in sync with other data controls}
+  if DataSource = nil then
+    KeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant
 end;
 
 procedure TIBLookupComboEditBox.SetAutoCompleteText(
@@ -196,7 +234,8 @@ end;
 
 procedure TIBLookupComboEditBox.UpdateList;
 { Note: Algorithm taken from TCustomComboBox.KeyUp but modified to use the
-  ListSource DataSet as the source for the autocomplete text
+  ListSource DataSet as the source for the autocomplete text. It also runs
+  after a delay rather than immediately on keyup
 }
 var
   iSelStart: Integer; // char position
@@ -247,9 +286,9 @@ begin
     else
       Parser.Add2WhereClause('Upper("' + ListField + '") Like Upper(''' + Text + '%'')');
 
-    if cbactSearchAscending in AutoCompleteText then
-       Parser.OrderByClause := '"' + ListField + '" ascending';
   end;
+  if cbactSearchAscending in AutoCompleteText then
+     Parser.OrderByClause := '"' + ListField + '" ascending';
 end;
 
 procedure TIBLookupComboEditBox.HandleEnter(Data: PtrInt);
@@ -257,63 +296,37 @@ begin
   SelectAll
 end;
 
-procedure TIBLookupComboEditBox.ScrollDataSet(Data: PtrInt);
+procedure TIBLookupComboEditBox.UpdateData(Sender: TObject);
 begin
-  if assigned(ListSource) and assigned(ListSource.DataSet)
-    and ListSource.DataSet.Active and not (csDesigning in ComponentState) then
-  begin
-    if cbactSearchCaseSensitive in AutoCompleteText then
-      ListSource.DataSet.Locate(ListField,Text,[])
-    else
-      ListSource.DataSet.Locate(ListField,Text,[loCaseInsensitive]);
-  end;
+  if FInserting then
+    ListSource.DataSet.FieldByName(ListField).AsString := Text
 end;
 
 procedure TIBLookupComboEditBox.CheckAndInsert;
-var newid: variant;
-    CurText: string;
+var Accept: boolean;
 begin
-  if AutoComplete and (Text <> '') and assigned(ListSource) and assigned(ListSource.DataSet)
+  if AutoInsert and (Text <> '') and assigned(ListSource) and assigned(ListSource.DataSet)
      and ListSource.DataSet.Active and (ListSource.DataSet.RecordCount = 0) then
   begin
-    {New Value}
-    CurText := Text;
-    if assigned(FOnCustomInsert) then
-    begin
-      newid := Null;
-      OnCustomInsert(self,Text,newid);
-      if varIsNull(newid) then
-         CurText := FOriginalTextValue
-    end
-    else
-    if AutoInsert then
-    begin
-      ListSource.DataSet.DisableControls;
-      try
-        ListSource.DataSet.Append;
-        try
-          ListSource.DataSet.FieldByName(ListField).AsString := CurText;
-          ListSource.DataSet.Post;
-       except
-          ListSource.DataSet.Cancel;
-          Text := FOriginalTextValue;
-          raise
-       end;
-      finally
-        ListSource.DataSet.EnableControls
-      end;
-    end;
-    ResetParser; {Closes ListSource DataSet}
-    ListSource.DataSet.Active := true;
-    Text := CurText;
-    UpdateData(nil);
-  end;
-end;
+    {Is it OK to insert a new list member?}
+    Accept := true;
+    if assigned(FOnCanAutoInsert) then
+       OnCanAutoInsert(self,Text,Accept);
+    if not Accept then Exit;
 
-procedure TIBLookupComboEditBox.DataChange(Sender: TObject);
-begin
-  inherited DataChange(Sender);
-  ResetParser;
+    FInserting := true;
+    try
+      {New Value}
+      if assigned(FOnAutoInsert) then
+        OnAutoInsert(self,Text)
+      else
+        ListSource.DataSet.Append;
+      FLastKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
+      UpdateList;
+    finally
+      FInserting := false
+    end
+  end;
 end;
 
 procedure TIBLookupComboEditBox.DoEnter;
@@ -354,8 +367,7 @@ end;
 procedure TIBLookupComboEditBox.SetItemIndex(const Val: integer);
 begin
   inherited SetItemIndex(Val);
-  if FUpdating or (ItemIndex = -1) then Exit;
-  Application.QueueAsyncCall(@ScrollDataSet,0)
+  FLastKeyValue := KeyValue;
 end;
 
 constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
@@ -367,6 +379,7 @@ begin
   FTimer := TTimer.Create(nil);
   FTimer.Interval := 0;
   FTimer.OnTimer := @HandleTimer;
+  FLastKeyValue := NULL;
 end;
 
 destructor TIBLookupComboEditBox.Destroy;

@@ -13,8 +13,8 @@ type
   { TAddEmployeeDlg }
 
   TAddEmployeeDlg = class(TEditEmployeeDlg)
+    procedure EmployeesAfterInsert(DataSet: TDataSet);
     procedure FormShow(Sender: TObject);
-    procedure IBDataSet1AfterInsert(DataSet: TDataSet);
   private
     { private declarations }
     FNewEmpNo: integer;
@@ -34,16 +34,16 @@ uses Unit1;
 
 { TAddEmployeeDlg }
 
-procedure TAddEmployeeDlg.FormShow(Sender: TObject);
-begin
-  inherited;
-  IBDataSet1.Append
-end;
-
-procedure TAddEmployeeDlg.IBDataSet1AfterInsert(DataSet: TDataSet);
+procedure TAddEmployeeDlg.EmployeesAfterInsert(DataSet: TDataSet);
 begin
   inherited;
   FNewEmpNo := DataSet.FieldByName('EMP_NO').AsInteger
+end;
+
+procedure TAddEmployeeDlg.FormShow(Sender: TObject);
+begin
+  inherited;
+  Employees.Append
 end;
 
 function TAddEmployeeDlg.ShowModal(var Emp_no: integer): TModalResult;
@@ -54,4 +54,4 @@ begin
 end;
 
 end.
-
+

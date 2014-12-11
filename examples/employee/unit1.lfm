@@ -12,7 +12,7 @@ object Form1: TForm1
   object Button1: TButton
     Left = 791
     Height = 25
-    Top = 24
+    Top = 48
     Width = 75
     Action = AddEmployee
     Anchors = [akTop, akRight]
@@ -21,7 +21,7 @@ object Form1: TForm1
   object Button2: TButton
     Left = 791
     Height = 25
-    Top = 62
+    Top = 86
     Width = 75
     Action = EditEmployee
     Anchors = [akTop, akRight]
@@ -30,7 +30,7 @@ object Form1: TForm1
   object Button3: TButton
     Left = 791
     Height = 25
-    Top = 101
+    Top = 125
     Width = 75
     Action = DeleteEmployee
     Anchors = [akTop, akRight]
@@ -56,8 +56,8 @@ object Form1: TForm1
   end
   object IBDynamicGrid1: TIBDynamicGrid
     Left = 17
-    Height = 384
-    Top = 24
+    Height = 360
+    Top = 48
     Width = 761
     Anchors = [akTop, akLeft, akRight, akBottom]
     Color = clWindow
@@ -88,7 +88,6 @@ object Form1: TForm1
         InitialSortColumn = False
       end    
       item
-        ButtonStyle = cbsPickList
         ReadOnly = True
         Title.Alignment = taCenter
         Title.Caption = 'Dept'
@@ -109,6 +108,7 @@ object Form1: TForm1
         ListSource = CountrySource
         ListField = 'COUNTRY'
         AutoInsert = False
+        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end    
       item
         Title.Alignment = taCenter
@@ -133,8 +133,56 @@ object Form1: TForm1
     EditorBorderStyle = bsSingle
     DefaultPositionAtEnd = False
   end
+  object Label1: TLabel
+    Left = 17
+    Height = 15
+    Top = 14
+    Width = 87
+    Caption = 'Started Before'
+    ParentColor = False
+  end
+  object BeforeDate: TDateEdit
+    Left = 112
+    Height = 25
+    Top = 8
+    Width = 80
+    CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
+    OKCaption = 'OK'
+    CancelCaption = 'Cancel'
+    DateOrder = doNone
+    ButtonWidth = 23
+    CharCase = ecNormal
+    NumGlyphs = 1
+    MaxLength = 0
+    OnChange = BeforeDateChange
+    TabOrder = 6
+  end
+  object Label2: TLabel
+    Left = 241
+    Height = 15
+    Top = 14
+    Width = 78
+    Caption = 'Started After'
+    ParentColor = False
+  end
+  object AfterDate: TDateEdit
+    Left = 333
+    Height = 25
+    Top = 8
+    Width = 80
+    CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
+    OKCaption = 'OK'
+    CancelCaption = 'Cancel'
+    DateOrder = doNone
+    ButtonWidth = 23
+    CharCase = ecNormal
+    NumGlyphs = 1
+    MaxLength = 0
+    OnChange = BeforeDateChange
+    TabOrder = 7
+  end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
     AllowStreamedConnected = False

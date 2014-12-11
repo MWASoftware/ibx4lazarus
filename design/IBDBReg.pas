@@ -361,7 +361,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
      IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
-     IBTreeView;
+     IBTreeView, IBDateEdit;
 
 
 
@@ -421,7 +421,7 @@ begin
 
 
   {Firebird Data Access Controls}
-  RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView]);
+  RegisterComponents(IBPalette3,[TIBDateEdit,TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView]);
   RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'KeyField', TDBDynamicGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'ListField', TDBDynamicGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBDynamicGrid, 'IndexFieldNames', TIBDynamicGridIndexNamesProperty);

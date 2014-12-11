@@ -254,10 +254,8 @@ type
     FAfterTransactionEnd,
     FTransactionFree: TNotifyEvent;
     FAliasNameMap: array of string;
-    FParser: TSelectSQLParser;
     FBaseSQLSelect: TStrings;
 
-    function GetParser: TSelectSQLParser;
     function GetSelectStmtHandle: TISC_STMT_HANDLE;
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
@@ -323,6 +321,7 @@ type
                        DoCheck: Boolean): TGetResult; virtual;
 
   protected
+    FParser: TSelectSQLParser;
     procedure ActivateConnection;
     function ActivateTransaction: Boolean;
     procedure DeactivateTransaction;
@@ -330,6 +329,7 @@ type
     procedure CheckDatasetOpen;
     procedure FieldDefsFromQuery(SourceQuery: TIBSQL);
     function GetActiveBuf: PChar;
+    function GetParser: TSelectSQLParser; virtual;
     procedure InternalBatchInput(InputObject: TIBBatchInput); virtual;
     procedure InternalBatchOutput(OutputObject: TIBBatchOutput); virtual;
     procedure InternalPrepare; virtual;
@@ -1917,7 +1917,7 @@ begin
     FBase.CheckTransaction;
     if assigned(FParser) and (FParser.SQLText <> FQSelect.SQL.Text) then
       FQSelect.SQL.Text := FParser.SQLText;
-//    writeln( FQSelect.SQL.Text);
+ //   writeln( FQSelect.SQL.Text);
     if FQSelect.SQL.Text <> '' then
     begin
       if not FQSelect.Prepared then

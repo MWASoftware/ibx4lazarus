@@ -224,7 +224,8 @@ begin
   else
     FWhereClause := Condition;
   if IncludeUnions and (Union <> nil) then
-    Union.Add2WhereClause(Condition,OrClause,IncludeUnions)
+    Union.Add2WhereClause(Condition,OrClause,IncludeUnions);
+  Changed;
 end;
 
 procedure TSelectSQLParser.Add2HavingClause(const Condition: string;
@@ -238,7 +239,8 @@ begin
   else
     FHavingClause := Condition;
   if IncludeUnions and (Union <> nil) then
-    Union.Add2HavingClause(Condition,OrClause,IncludeUnions)
+    Union.Add2HavingClause(Condition,OrClause,IncludeUnions);
+  Changed;
 end;
 
 procedure TSelectSQLParser.AnalyseLine(const Line: string);
