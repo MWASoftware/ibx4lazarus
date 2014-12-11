@@ -101,6 +101,7 @@ type
     procedure SetParentField(AValue: string);
     function ScrollToNode(Node: TIBTreeNode): boolean;
     procedure UpdateData(Sender: TObject);
+    procedure UpdateParams(Sender: TObject; Parser: TSelectSQLParser);
     procedure UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
    protected
     { Protected declarations }
@@ -480,40 +481,42 @@ begin
   end
 end;
 
+procedure TIBTreeView.UpdateParams(Sender: TObject; Parser: TSelectSQLParser);
+begin
+  if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
+   begin
+     if (Sender as TDataLink).DataSet is TIBQuery then
+       TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
+         FUpdateNode.KeyValue
+     else
+     if (Sender as TDataLink).DataSet is TIBDataSet then
+       TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
+         FUpdateNode.KeyValue
+   end
+  else
+  if assigned(FExpandNode) then
+  begin
+    if (Sender as TDataLink).DataSet is TIBQuery then
+      TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
+        TIBTreeNode(FExpandNode).KeyValue
+    else
+    if (Sender as TDataLink).DataSet is TIBDataSet then
+      TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
+        TIBTreeNode(FExpandNode).KeyValue
+  end;
+end;
+
 procedure TIBTreeView.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 begin
-  DataSet.DisableControls;
-  try
     if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
-    begin
-      Parser.Add2WhereClause('"' + FKeyField + '" = :IBX_KEY_VALUE');
-      if (Sender as TDataLink).DataSet is TIBQuery then
-        TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
-          FUpdateNode.KeyValue
-      else
-      if (Sender as TDataLink).DataSet is TIBDataSet then
-        TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
-          FUpdateNode.KeyValue
-    end
+      Parser.Add2WhereClause('"' + FKeyField + '" = :IBX_KEY_VALUE')
     else
     if (Items.Count = 0) then
       {Need to Load Root Nodes}
       Parser.Add2WhereClause(FParentField + ' is null')
     else
     if assigned(FExpandNode) then
-    begin
       Parser.Add2WhereClause('"' + FParentField + '" = :IBX_PARENT_VALUE');
-      if (Sender as TDataLink).DataSet is TIBQuery then
-        TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
-          TIBTreeNode(FExpandNode).KeyValue
-      else
-      if (Sender as TDataLink).DataSet is TIBDataSet then
-        TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
-          TIBTreeNode(FExpandNode).KeyValue
-    end;
-  finally
-    DataSet.EnableControls
- end
 end;
 
 procedure TIBTreeView.Added(Node: TTreeNode);
@@ -725,6 +728,15 @@ begin
     else
     if (DataSet is TIBQuery) then
       FOwner.UpdateSQL(self,TIBQuery(DataSet).Parser)
+  end
+  else
+  if (Event = deCheckBrowseMode) and (Info = 2) and not DataSet.Active then
+  begin
+    if (DataSet is TIBDataSet) then
+      FOwner.UpdateParams(self,TIBDataSet(DataSet).Parser)
+    else
+    if (DataSet is TIBQuery) then
+      FOwner.UpdateParams(self,TIBQuery(DataSet).Parser)
   end
   else
     inherited DataEvent(Event, Info);

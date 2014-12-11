@@ -80,8 +80,8 @@ type
     procedure PSSetCommandText(const CommandText: string); override;
     procedure PSSetParams(AParams: TParams); override;  *)
 
+    function CreateParser: TSelectSQLParser; override;
     procedure DefineProperties(Filer: TFiler); override;
-    function GetParser: TSelectSQLParser; override;
     procedure InitFieldDefs; override;
     procedure InternalOpen; override;
     procedure Disconnect; override;
@@ -218,11 +218,11 @@ begin
   if not (csReading in ComponentState) then
   begin
     Disconnect;
-    if assigned(FParser) and not FSQLUpdating then
+    if HasParser and not FSQLUpdating then
     begin
       FSQLUpdating := true;
       try
-        SQL.Text := FParser.SQLText;
+        SQL.Text := Parser.SQLText;
       finally
         FSQLUpdating := false
       end;
@@ -272,12 +272,6 @@ begin
   Filer.DefineProperty('ParamData', ReadParamData, WriteParamData, WriteData); {do not localize}
 end;
 
-function TIBQuery.GetParser: TSelectSQLParser;
-begin
-  Result := inherited GetParser;
-  if assigned(Result) then
-     Result.OnSQLChanging := QueryChanged;
-end;
 
 procedure TIBQuery.ReadParamData(Reader: TReader);
 begin
@@ -487,6 +481,12 @@ end;
 function TIBQuery.GetStmtHandle: TISC_STMT_HANDLE;
 begin
   Result := SelectStmtHandle;
+end;
+
+function TIBQuery.CreateParser: TSelectSQLParser;
+begin
+  Result := inherited CreateParser;
+  Result.OnSQLChanging := QueryChanged;
 end;
 
 function TIBQuery.GenerateQueryForLiveUpdate : Boolean;

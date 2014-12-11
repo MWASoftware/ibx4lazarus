@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="35">
+    <Units Count="38">
       <Unit0>
         <Filename Value="usingibtreeview.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -11,7 +11,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="35" Y="6"/>
-        <UsageCount Value="69"/>
+        <UsageCount Value="70"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -20,12 +20,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="57" Y="21"/>
-        <UsageCount Value="69"/>
+        <UsageCount Value="70"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -33,10 +32,12 @@
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="IBCustomDataSet"/>
+        <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="302"/>
-        <CursorPos X="3" Y="1920"/>
-        <UsageCount Value="63"/>
+        <TopLine Value="316"/>
+        <CursorPos X="46" Y="330"/>
+        <UsageCount Value="64"/>
+        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../design/IBDBReg.pas"/>
@@ -188,7 +189,7 @@
       <Unit22>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
         <UnitName Value="DbCtrls"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
         <TopLine Value="615"/>
         <CursorPos X="35" Y="630"/>
@@ -198,7 +199,7 @@
       <Unit23>
         <Filename Value="../../../../lcl/stdctrls.pp"/>
         <UnitName Value="StdCtrls"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="6"/>
         <WindowIndex Value="0"/>
         <TopLine Value="220"/>
         <CursorPos X="29" Y="232"/>
@@ -207,7 +208,7 @@
       </Unit23>
       <Unit24>
         <Filename Value="../../../../lcl/include/customcombobox.inc"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="7"/>
         <WindowIndex Value="0"/>
         <TopLine Value="920"/>
         <CursorPos X="34" Y="938"/>
@@ -290,11 +291,42 @@
         <CursorPos X="3" Y="722"/>
         <UsageCount Value="10"/>
       </Unit34>
+      <Unit35>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <UnitName Value="IBLookupComboEditBox"/>
+        <EditorIndex Value="1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="131"/>
+        <CursorPos X="3" Y="133"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit35>
+      <Unit36>
+        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
+        <UnitName Value="IBTreeView"/>
+        <EditorIndex Value="2"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="482"/>
+        <CursorPos X="3" Y="486"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit36>
+      <Unit37>
+        <Filename Value="../../runtime/IBQuery.pas"/>
+        <UnitName Value="IBQuery"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="4"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="205"/>
+        <CursorPos X="17" Y="221"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit37>
     </Units>
     <General>
       <ActiveWindowIndexAtStart Value="0"/>
     </General>
-    <JumpHistory Count="18" HistoryIndex="17">
+    <JumpHistory Count="25" HistoryIndex="24">
       <Position1>
         <Filename Value="../../../../lcl/stdctrls.pp"/>
         <Caret Line="228" Column="16" TopLine="221"/>
@@ -367,6 +399,34 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="22" Column="41" TopLine="1"/>
       </Position18>
+      <Position19>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="95" Column="71" TopLine="83"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="1920" Column="3" TopLine="1890"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="331" Column="54" TopLine="318"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="465" Column="33" TopLine="452"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../../runtime/IBQuery.pas"/>
+        <Caret Line="83" Column="55" TopLine="75"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../../runtime/IBQuery.pas"/>
+        <Caret Line="58" Column="37" TopLine="53"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../../runtime/IBQuery.pas"/>
+        <Caret Line="70" Column="50" TopLine="59"/>
+      </Position25>
     </JumpHistory>
   </ProjectSession>
   <EditorMacros Count="0"/>

@@ -1,11 +1,12 @@
 object Form1: TForm1
-  Left = 493
-  Height = 454
+  Left = 394
+  Height = 482
   Top = 322
   Width = 878
   Caption = 'Employee List'
-  ClientHeight = 454
+  ClientHeight = 482
   ClientWidth = 878
+  Color = clBackground
   OnClose = FormClose
   OnShow = FormShow
   LCLVersion = '1.2.6.0'
@@ -36,103 +37,6 @@ object Form1: TForm1
     Anchors = [akTop, akRight]
     TabOrder = 2
   end
-  object Button4: TButton
-    Left = 623
-    Height = 25
-    Top = 416
-    Width = 75
-    Action = SaveChanges
-    Anchors = [akRight, akBottom]
-    TabOrder = 3
-  end
-  object Button5: TButton
-    Left = 703
-    Height = 25
-    Top = 416
-    Width = 75
-    Action = CancelChanges
-    Anchors = [akRight, akBottom]
-    TabOrder = 4
-  end
-  object IBDynamicGrid1: TIBDynamicGrid
-    Left = 17
-    Height = 360
-    Top = 48
-    Width = 761
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    Color = clWindow
-    Columns = <    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'Last Name'
-        Width = 120
-        FieldName = 'LAST_NAME'
-        AutoSizeColumn = True
-        InitialSortColumn = False
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'First Name'
-        Width = 120
-        FieldName = 'FIRST_NAME'
-        AutoSizeColumn = True
-        InitialSortColumn = False
-      end    
-      item
-        Alignment = taCenter
-        Title.Alignment = taCenter
-        Title.Caption = 'Emp No.'
-        Width = 60
-        FieldName = 'EMP_NO'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-      end    
-      item
-        ReadOnly = True
-        Title.Alignment = taCenter
-        Title.Caption = 'Dept'
-        Width = 120
-        FieldName = 'DEPARTMENT'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        AutoInsert = False
-      end    
-      item
-        ButtonStyle = cbsPickList
-        Title.Alignment = taCenter
-        Title.Caption = 'Located'
-        Width = 100
-        FieldName = 'JOB_COUNTRY'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        ListSource = CountrySource
-        ListField = 'COUNTRY'
-        AutoInsert = False
-        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'Started'
-        Width = 80
-        FieldName = 'HIRE_DATE'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'Salary'
-        Width = 120
-        FieldName = 'SALARY'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-      end>
-    DataSource = EmplyeeSource
-    Scrollbars = ssAutoBoth
-    TabOrder = 5
-    Descending = False
-    EditorBorderStyle = bsSingle
-    DefaultPositionAtEnd = False
-  end
   object Label1: TLabel
     Left = 17
     Height = 15
@@ -155,7 +59,7 @@ object Form1: TForm1
     NumGlyphs = 1
     MaxLength = 0
     OnChange = BeforeDateChange
-    TabOrder = 6
+    TabOrder = 3
   end
   object Label2: TLabel
     Left = 241
@@ -179,10 +83,143 @@ object Form1: TForm1
     NumGlyphs = 1
     MaxLength = 0
     OnChange = BeforeDateChange
-    TabOrder = 7
+    TabOrder = 4
+  end
+  object Panel1: TPanel
+    Left = 12
+    Height = 434
+    Top = 42
+    Width = 756
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 434
+    ClientWidth = 756
+    Color = clBackground
+    ParentColor = False
+    TabOrder = 5
+    object IBDynamicGrid1: TIBDynamicGrid
+      Left = 0
+      Height = 384
+      Top = 0
+      Width = 756
+      Align = alClient
+      Color = clWindow
+      Columns = <      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Last Name'
+          Width = 120
+          FieldName = 'LAST_NAME'
+          AutoSizeColumn = True
+          InitialSortColumn = False
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'First Name'
+          Width = 120
+          FieldName = 'FIRST_NAME'
+          AutoSizeColumn = True
+          InitialSortColumn = False
+        end      
+        item
+          Alignment = taCenter
+          Title.Alignment = taCenter
+          Title.Caption = 'Emp No.'
+          Width = 60
+          FieldName = 'EMP_NO'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+        end      
+        item
+          ReadOnly = True
+          Title.Alignment = taCenter
+          Title.Caption = 'Dept'
+          Width = 120
+          FieldName = 'DEPARTMENT'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          AutoInsert = False
+        end      
+        item
+          ButtonStyle = cbsPickList
+          Title.Alignment = taCenter
+          Title.Caption = 'Located'
+          Width = 100
+          FieldName = 'JOB_COUNTRY'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          ListSource = CountrySource
+          ListField = 'COUNTRY'
+          AutoInsert = False
+          AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Started'
+          Width = 80
+          FieldName = 'HIRE_DATE'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Salary'
+          Width = 120
+          FieldName = 'SALARY'
+          ColumnTotalsControl = DBText1
+          AutoSizeColumn = False
+          InitialSortColumn = False
+        end>
+      DataSource = EmplyeeSource
+      Scrollbars = ssAutoBoth
+      TabOrder = 0
+      Descending = False
+      EditorBorderStyle = bsSingle
+      DefaultPositionAtEnd = False
+    end
+    object Panel2: TPanel
+      Left = 0
+      Height = 50
+      Top = 384
+      Width = 756
+      Align = alBottom
+      BevelOuter = bvNone
+      ClientHeight = 50
+      ClientWidth = 756
+      TabOrder = 1
+      object Button5: TButton
+        Left = 80
+        Height = 25
+        Top = 16
+        Width = 75
+        Action = CancelChanges
+        Anchors = [akLeft, akBottom]
+        TabOrder = 0
+      end
+      object Button4: TButton
+        Left = 1
+        Height = 25
+        Top = 16
+        Width = 75
+        Action = SaveChanges
+        Anchors = [akLeft, akBottom]
+        TabOrder = 1
+      end
+      object DBText1: TDBText
+        Left = 688
+        Height = 27
+        Top = 16
+        Width = 49
+        Alignment = taRightJustify
+        Anchors = [akTop, akLeft, akBottom]
+        DataField = 'TOTALSALARIES'
+        DataSource = TotalsSource
+        ParentColor = False
+      end
+    end
   end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
     AllowStreamedConnected = False
@@ -211,9 +248,10 @@ object Form1: TForm1
   object Employees: TIBQuery
     Database = IBDatabase1
     Transaction = IBTransaction1
-    AfterClose = EmployeesAfterClose
     AfterDelete = EmployeesAfterDelete
     AfterEdit = EmployeesAfterDelete
+    AfterOpen = EmployeesAfterOpen
+    BeforeClose = EmployeesBeforeClose
     BeforeOpen = EmployeesBeforeOpen
     OnDeleteError = EmployeesPostError
     OnPostError = EmployeesPostError
@@ -471,5 +509,42 @@ object Form1: TForm1
     DataSource = EmplyeeSource
     left = 830
     top = 263
+  end
+  object TotalsQuery: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BeforeOpen = EmployeesBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select sum(Salary) as TotalSalaries'
+      'From EMPLOYEE'
+    )
+    Params = <>
+    left = 832
+    top = 416
+    object TotalsQueryTOTALSALARIES: TIBBCDField
+      DisplayWidth = 18
+      FieldKind = fkData
+      FieldName = 'TOTALSALARIES'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = EmployeesSALARYGetText
+      Precision = 18
+      Currency = False
+      MaxValue = 0
+      MinValue = 0
+      Size = 2
+    end
+  end
+  object TotalsSource: TDataSource
+    DataSet = TotalsQuery
+    left = 792
+    top = 416
   end
 end

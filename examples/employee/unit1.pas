@@ -6,22 +6,30 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, DBGrids,
-  StdCtrls, ActnList, EditBtn, IBDatabase, IBQuery, IBCustomDataSet,
-  IBUpdateSQL, IBDynamicGrid, db;
+  StdCtrls, ActnList, EditBtn, DbCtrls, ExtCtrls, IBDatabase, IBQuery,
+  IBCustomDataSet, IBUpdateSQL, IBDynamicGrid, db;
 
 type
 
   { TForm1 }
 
   TForm1 = class(TForm)
+    Button4: TButton;
+    Button5: TButton;
     CancelChanges: TAction;
     CountrySource: TDataSource;
     Countries: TIBDataSet;
     BeforeDate: TDateEdit;
     AfterDate: TDateEdit;
-    EmployeesDEPARTMENT: TIBStringField;
+    DBText1: TDBText;
     IBDynamicGrid1: TIBDynamicGrid;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    TotalsQueryTOTALSALARIES: TIBBCDField;
+    TotalsSource: TDataSource;
+    EmployeesDEPARTMENT: TIBStringField;
     EmployeesSALARY: TIBBCDField;
+    TotalsQuery: TIBQuery;
     IBUpdateSQL1: TIBUpdateSQL;
     Label1: TLabel;
     Label2: TLabel;
@@ -33,8 +41,6 @@ type
     Button1: TButton;
     Button2: TButton;
     Button3: TButton;
-    Button4: TButton;
-    Button5: TButton;
     EmplyeeSource: TDatasource;
     IBDatabase1: TIBDatabase;
     Employees: TIBQuery;
@@ -55,7 +61,8 @@ type
     procedure DeleteEmployeeExecute(Sender: TObject);
     procedure EditEmployeeExecute(Sender: TObject);
     procedure EditEmployeeUpdate(Sender: TObject);
-    procedure EmployeesAfterClose(DataSet: TDataSet);
+    procedure EmployeesAfterOpen(DataSet: TDataSet);
+    procedure EmployeesBeforeClose(DataSet: TDataSet);
     procedure EmployeesBeforeOpen(DataSet: TDataSet);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
@@ -180,32 +187,38 @@ begin
   (Sender as TAction).Enabled := Employees.Active and (Employees.RecordCount > 0)
 end;
 
-procedure TForm1.EmployeesAfterClose(DataSet: TDataSet);
+procedure TForm1.EmployeesAfterOpen(DataSet: TDataSet);
 begin
-  Countries.Active := false;
+  TotalsQuery.Active := true
+end;
+
+procedure TForm1.EmployeesBeforeClose(DataSet: TDataSet);
+begin
+  TotalsQuery.Active := false
 end;
 
 procedure TForm1.EmployeesBeforeOpen(DataSet: TDataSet);
 begin
-  Countries.Active := true;
   if BeforeDate.Date > 0 then
-     Employees.Parser.Add2WhereClause('HIRE_DATE < :BeforeDate');
+     (DataSet as TIBQuery).Parser.Add2WhereClause('HIRE_DATE < :BeforeDate');
   if AfterDate.Date > 0 then
-     Employees.Parser.Add2WhereClause('HIRE_DATE > :AfterDate');
+     (DataSet as TIBQuery).Parser.Add2WhereClause('HIRE_DATE > :AfterDate');
   if BeforeDate.Date > 0 then
-     Employees.ParamByName('BeforeDate').AsDateTime := BeforeDate.Date;
+     (DataSet as TIBQuery).ParamByName('BeforeDate').AsDateTime := BeforeDate.Date;
   if AfterDate.Date > 0 then
-   Employees.ParamByName('AfterDate').AsDateTime := AfterDate.Date;
+   (DataSet as TIBQuery).ParamByName('AfterDate').AsDateTime := AfterDate.Date;
 
 end;
 
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-  FClosing := true
+  FClosing := true;
+  IBTransaction1.Commit;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
+  Countries.Active := true;
   Employees.Active := true
 end;
 

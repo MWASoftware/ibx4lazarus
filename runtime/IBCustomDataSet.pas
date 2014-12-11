@@ -255,7 +255,7 @@ type
     FTransactionFree: TNotifyEvent;
     FAliasNameMap: array of string;
     FBaseSQLSelect: TStrings;
-
+    FParser: TSelectSQLParser;
     function GetSelectStmtHandle: TISC_STMT_HANDLE;
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
@@ -288,6 +288,7 @@ type
     function GetModifySQL: TStrings;
     function GetTransaction: TIBTransaction;
     function GetTRHandle: PISC_TR_HANDLE;
+    function GetParser: TSelectSQLParser;
     procedure InternalDeleteRecord(Qry: TIBSQL; Buff: Pointer); virtual;
     function InternalLocate(const KeyFields: string; const KeyValues: Variant;
                             Options: TLocateOptions): Boolean; virtual;
@@ -321,15 +322,14 @@ type
                        DoCheck: Boolean): TGetResult; virtual;
 
   protected
-    FParser: TSelectSQLParser;
     procedure ActivateConnection;
     function ActivateTransaction: Boolean;
     procedure DeactivateTransaction;
     procedure CheckDatasetClosed;
     procedure CheckDatasetOpen;
+    function CreateParser: TSelectSQLParser; virtual;
     procedure FieldDefsFromQuery(SourceQuery: TIBSQL);
     function GetActiveBuf: PChar;
-    function GetParser: TSelectSQLParser; virtual;
     procedure InternalBatchInput(InputObject: TIBBatchInput); virtual;
     procedure InternalBatchOutput(OutputObject: TIBBatchOutput); virtual;
     procedure InternalPrepare; virtual;
@@ -462,6 +462,7 @@ type
     procedure RevertRecord;
     procedure Undelete;
     procedure ResetParser;
+    function HasParser: boolean;
 
     { TDataSet support methods }
     function BookmarkValid(Bookmark: TBookmark): Boolean; override;
@@ -1218,6 +1219,12 @@ procedure TIBCustomDataSet.CheckDatasetOpen;
 begin
   if not FOpen then
     IBError(ibxeDatasetClosed, [nil]);
+end;
+
+function TIBCustomDataSet.CreateParser: TSelectSQLParser;
+begin
+  Result := TSelectSQLParser.Create(FBaseSQLSelect);
+  Result.OnSQLChanging := SQLChanging
 end;
 
 procedure TIBCustomDataSet.CheckNotUniDirectional;
@@ -2524,6 +2531,7 @@ begin
      FParser.Reset;
   DataEvent(deCheckBrowseMode,1); {Conventional use to report getting ready to prepare}
   inherited DoBeforeOpen;
+  DataEvent(deCheckBrowseMode,2); {Conventional use to report the right time to set parameters}
 end;
 
 procedure TIBCustomDataSet.DoBeforePost;
@@ -3710,10 +3718,7 @@ end;
 function TIBCustomDataSet.GetParser: TSelectSQLParser;
 begin
   if not assigned(FParser) then
-  begin
-     FParser := TSelectSQLParser.Create(FBaseSQLSelect);
-     FParser.OnSQLChanging := SQLChanging
-  end;
+    FParser := CreateParser;
   Result := FParser
 end;
 
@@ -3725,6 +3730,11 @@ begin
     FParser := nil;
     SQLChanging(nil)
   end;
+end;
+
+function TIBCustomDataSet.HasParser: boolean;
+begin
+  Result := FParser <> nil
 end;
 
  procedure TIBCustomDataSet.SetGenerateParamNames(AValue: Boolean);
