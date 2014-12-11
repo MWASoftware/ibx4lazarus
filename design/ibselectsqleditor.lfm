@@ -70,9 +70,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   end
   object QuoteFields: TCheckBox
     Left = 24
-    Height = 22
+    Height = 24
     Top = 400
-    Width = 125
+    Width = 127
     Caption = '&Quote Identifiers'
     TabOrder = 5
   end
@@ -86,8 +86,8 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 6
     object SelectPage: TTabSheet
       Caption = 'Tables'
-      ClientHeight = 302
-      ClientWidth = 226
+      ClientHeight = 298
+      ClientWidth = 224
       OnShow = SelectPageShow
       object Label1: TLabel
         Left = 7
@@ -114,7 +114,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         ParentColor = False
       end
       object TableNamesCombo: TComboBox
-        Left = 7
+        Left = 6
         Height = 27
         Top = 20
         Width = 201
@@ -153,8 +153,8 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     end
     object ExecutePage: TTabSheet
       Caption = 'Procedures'
-      ClientHeight = 302
-      ClientWidth = 226
+      ClientHeight = 298
+      ClientWidth = 224
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
@@ -229,9 +229,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   end
   object GenerateParams: TCheckBox
     Left = 24
-    Height = 22
+    Height = 24
     Top = 376
-    Width = 171
+    Width = 173
     Caption = 'Allow DSQL Placeholders'
     TabOrder = 7
   end

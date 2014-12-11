@@ -8,7 +8,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
   ClientHeight = 438
   ClientWidth = 749
   OnShow = FormShow
-  LCLVersion = '1.2.2.0'
+  LCLVersion = '1.2.6.0'
   object Label1: TLabel
     Left = 16
     Height = 15
@@ -73,10 +73,12 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     TabOrder = 2
   end
   object TableNamesCombo: TComboBox
-    Left = 23
+    Left = 24
     Height = 27
     Top = 38
     Width = 201
+    AutoComplete = True
+    AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
     ItemHeight = 0
     OnCloseUp = TableNamesComboCloseUp
     TabOrder = 3

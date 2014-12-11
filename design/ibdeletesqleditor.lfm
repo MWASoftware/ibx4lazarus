@@ -1,5 +1,5 @@
 object IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
-  Left = 824
+  Left = 522
   Height = 439
   Top = 384
   Width = 750
@@ -8,7 +8,7 @@ object IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
   ClientHeight = 439
   ClientWidth = 750
   OnShow = FormShow
-  LCLVersion = '1.2.2.0'
+  LCLVersion = '1.2.6.0'
   object Label1: TLabel
     Left = 16
     Height = 15
@@ -69,6 +69,8 @@ object IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
     Height = 27
     Top = 38
     Width = 201
+    AutoComplete = True
+    AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
     ItemHeight = 0
     OnCloseUp = TableNamesComboCloseUp
     TabOrder = 3

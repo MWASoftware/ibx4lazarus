@@ -8,7 +8,7 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
   ClientHeight = 436
   ClientWidth = 748
   OnShow = FormShow
-  LCLVersion = '1.2.2.0'
+  LCLVersion = '1.2.6.0'
   object Label1: TLabel
     Left = 16
     Height = 15
@@ -69,6 +69,8 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     Height = 27
     Top = 38
     Width = 201
+    AutoComplete = True
+    AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
     ItemHeight = 0
     OnCloseUp = TableNamesComboCloseUp
     TabOrder = 3

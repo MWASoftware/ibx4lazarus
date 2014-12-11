@@ -11,7 +11,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
   ClientWidth = 662
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.2.2.0'
+  LCLVersion = '1.2.6.0'
   object PageControl: TPageControl
     Left = 7
     Height = 352
@@ -67,6 +67,8 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
           Height = 27
           Top = 35
           Width = 171
+          AutoComplete = True
+          AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           ItemHeight = 0
           OnCloseUp = TableNamesComboCloseUp
           TabOrder = 0

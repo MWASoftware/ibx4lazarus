@@ -44,7 +44,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="49">
+    <Units Count="60">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -52,7 +52,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="17" Y="10"/>
-        <UsageCount Value="67"/>
+        <UsageCount Value="68"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -61,11 +61,12 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <EditorIndex Value="4"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="195"/>
         <CursorPos X="21" Y="205"/>
-        <UsageCount Value="67"/>
+        <UsageCount Value="68"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -87,7 +88,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="131"/>
         <CursorPos X="3" Y="133"/>
-        <UsageCount Value="58"/>
+        <UsageCount Value="59"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit3.pas"/>
@@ -99,7 +100,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="28"/>
         <CursorPos X="1" Y="48"/>
-        <UsageCount Value="58"/>
+        <UsageCount Value="59"/>
       </Unit4>
       <Unit5>
         <Filename Value="../../runtime/IB.pas"/>
@@ -112,12 +113,10 @@
       <Unit6>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <UnitName Value="IBCustomDataSet"/>
-        <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="2519"/>
         <CursorPos X="63" Y="2527"/>
         <UsageCount Value="28"/>
-        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -134,7 +133,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="220"/>
         <CursorPos X="3" Y="218"/>
-        <UsageCount Value="24"/>
+        <UsageCount Value="25"/>
       </Unit8>
       <Unit9>
         <Filename Value="/usr/local/share/lazarus/lcl/include/dblookup.inc"/>
@@ -384,12 +383,10 @@
       <Unit40>
         <Filename Value="../../../../lcl/grids.pas"/>
         <UnitName Value="Grids"/>
-        <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
         <TopLine Value="10254"/>
         <CursorPos X="48" Y="10278"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit40>
       <Unit41>
         <Filename Value="../../../../lcl/include/winapih.inc"/>
@@ -401,12 +398,10 @@
       <Unit42>
         <Filename Value="../../../../lcl/comctrls.pp"/>
         <UnitName Value="ComCtrls"/>
-        <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
         <TopLine Value="2745"/>
         <CursorPos X="54" Y="2758"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit42>
       <Unit43>
         <Filename Value="../../../../lcl/include/treeview.inc"/>
@@ -426,146 +421,231 @@
       <Unit45>
         <Filename Value="../../runtime/IBSQLParser.pas"/>
         <UnitName Value="IBSQLParser"/>
-        <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
         <TopLine Value="604"/>
         <CursorPos X="1" Y="620"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit45>
       <Unit46>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="6"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="183"/>
-        <CursorPos X="15" Y="208"/>
+        <TopLine Value="177"/>
+        <CursorPos X="73" Y="207"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit46>
       <Unit47>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
         <UnitName Value="IBTreeView"/>
-        <EditorIndex Value="7"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="482"/>
+        <TopLine Value="490"/>
         <CursorPos X="1" Y="520"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit47>
       <Unit48>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <UnitName Value="IBDynamicGrid"/>
-        <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="226"/>
+        <TopLine Value="225"/>
         <CursorPos X="7" Y="225"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="11"/>
       </Unit48>
+      <Unit49>
+        <Filename Value="../../design/ibselectsqleditor.pas"/>
+        <ComponentName Value="IBSelectSQLEditorForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="ibselectsqleditor"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="1"/>
+        <UsageCount Value="11"/>
+      </Unit49>
+      <Unit50>
+        <Filename Value="../../design/IBEventsEditor.pas"/>
+        <ComponentName Value="IBEventsEditor"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="IBEventsEditor"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="1"/>
+        <UsageCount Value="10"/>
+      </Unit50>
+      <Unit51>
+        <Filename Value="../../design/ibdeletesqleditor.pas"/>
+        <ComponentName Value="IBDeleteSQLEditorForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="ibdeletesqleditor"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="60" Y="26"/>
+        <UsageCount Value="10"/>
+      </Unit51>
+      <Unit52>
+        <Filename Value="../../design/ibinsertsqleditor.pas"/>
+        <ComponentName Value="IBInsertSQLEditorForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="ibinsertsqleditor"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="48" Y="18"/>
+        <UsageCount Value="10"/>
+      </Unit52>
+      <Unit53>
+        <Filename Value="../../design/ibmodifysqleditor.pas"/>
+        <ComponentName Value="IBModifySQLEditorForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="ibmodifysqleditor"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="60" Y="23"/>
+        <UsageCount Value="10"/>
+      </Unit53>
+      <Unit54>
+        <Filename Value="../../design/ibupdatesqleditor.pas"/>
+        <ComponentName Value="IBUpdateSQLEditorForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="IBUpdateSQLEditor"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="15" Y="10"/>
+        <UsageCount Value="10"/>
+      </Unit54>
+      <Unit55>
+        <Filename Value="../../design/ibsqleditor.pas"/>
+        <ComponentName Value="IBSQLEditorForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="IBSQLEditor"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="240"/>
+        <CursorPos X="3" Y="240"/>
+        <UsageCount Value="10"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="../../design/ibdataseteditor.pas"/>
+        <ComponentName Value="IBDataSetEditorForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="IBDataSetEditor"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="46" Y="18"/>
+        <UsageCount Value="10"/>
+      </Unit56>
+      <Unit57>
+        <Filename Value="../../design/dbFieldLinkPropEditor.pas"/>
+        <ComponentName Value="FieldLinkEditor"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="dbFieldLinkPropEditor"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="60" Y="23"/>
+        <UsageCount Value="10"/>
+      </Unit57>
+      <Unit58>
+        <Filename Value="../../design/dbFieldListPropEditor.pas"/>
+        <ComponentName Value="FieldListEditor"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="dbFieldListPropEditor"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="48" Y="22"/>
+        <UsageCount Value="10"/>
+      </Unit58>
+      <Unit59>
+        <Filename Value="../../design/IBDatabaseEdit.pas"/>
+        <UnitName Value="IBDatabaseEdit"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="1"/>
+        <UsageCount Value="10"/>
+      </Unit59>
     </Units>
-    <JumpHistory Count="25" HistoryIndex="24">
+    <JumpHistory Count="19" HistoryIndex="18">
       <Position1>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="191" Column="25" TopLine="178"/>
       </Position1>
       <Position2>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="104" Column="27" TopLine="90"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="192" Column="25" TopLine="179"/>
       </Position2>
       <Position3>
         <Filename Value="unit1.pas"/>
-        <Caret Line="191" Column="25" TopLine="178"/>
+        <Caret Line="193" Column="25" TopLine="180"/>
       </Position3>
       <Position4>
         <Filename Value="unit1.pas"/>
-        <Caret Line="192" Column="25" TopLine="179"/>
+        <Caret Line="200" Column="25" TopLine="182"/>
       </Position4>
       <Position5>
         <Filename Value="unit1.pas"/>
-        <Caret Line="193" Column="25" TopLine="180"/>
+        <Caret Line="189" Column="29" TopLine="187"/>
       </Position5>
       <Position6>
         <Filename Value="unit1.pas"/>
-        <Caret Line="200" Column="25" TopLine="182"/>
+        <Caret Line="194" Column="30" TopLine="192"/>
       </Position6>
       <Position7>
         <Filename Value="unit1.pas"/>
-        <Caret Line="189" Column="29" TopLine="187"/>
+        <Caret Line="195" Column="30" TopLine="193"/>
       </Position7>
       <Position8>
         <Filename Value="unit1.pas"/>
         <Caret Line="194" Column="30" TopLine="192"/>
       </Position8>
       <Position9>
-        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <Caret Line="250" Column="13" TopLine="225"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="193" Column="30" TopLine="191"/>
       </Position9>
       <Position10>
         <Filename Value="unit1.pas"/>
-        <Caret Line="195" Column="30" TopLine="193"/>
+        <Caret Line="192" Column="30" TopLine="190"/>
       </Position10>
       <Position11>
         <Filename Value="unit1.pas"/>
-        <Caret Line="194" Column="30" TopLine="192"/>
+        <Caret Line="191" Column="30" TopLine="189"/>
       </Position11>
       <Position12>
         <Filename Value="unit1.pas"/>
-        <Caret Line="193" Column="30" TopLine="191"/>
+        <Caret Line="192" Column="30" TopLine="190"/>
       </Position12>
       <Position13>
         <Filename Value="unit1.pas"/>
-        <Caret Line="192" Column="30" TopLine="190"/>
+        <Caret Line="196" Column="30" TopLine="194"/>
       </Position13>
       <Position14>
         <Filename Value="unit1.pas"/>
-        <Caret Line="191" Column="30" TopLine="189"/>
+        <Caret Line="204" Column="21" TopLine="194"/>
       </Position14>
       <Position15>
         <Filename Value="unit1.pas"/>
-        <Caret Line="192" Column="30" TopLine="190"/>
+        <Caret Line="203" Column="21" TopLine="193"/>
       </Position15>
       <Position16>
         <Filename Value="unit1.pas"/>
-        <Caret Line="196" Column="30" TopLine="194"/>
+        <Caret Line="202" Column="21" TopLine="192"/>
       </Position16>
       <Position17>
         <Filename Value="unit1.pas"/>
-        <Caret Line="204" Column="21" TopLine="194"/>
+        <Caret Line="201" Column="21" TopLine="191"/>
       </Position17>
       <Position18>
         <Filename Value="unit1.pas"/>
-        <Caret Line="203" Column="21" TopLine="193"/>
+        <Caret Line="202" Column="21" TopLine="192"/>
       </Position18>
       <Position19>
         <Filename Value="unit1.pas"/>
-        <Caret Line="202" Column="21" TopLine="192"/>
-      </Position19>
-      <Position20>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="201" Column="21" TopLine="191"/>
-      </Position20>
-      <Position21>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="202" Column="21" TopLine="192"/>
-      </Position21>
-      <Position22>
-        <Filename Value="unit1.pas"/>
         <Caret Line="205" Column="21" TopLine="195"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="94" Column="15" TopLine="81"/>
-      </Position23>
-      <Position24>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="150" Column="44" TopLine="125"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="187" Column="19" TopLine="162"/>
-      </Position25>
+      </Position19>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
