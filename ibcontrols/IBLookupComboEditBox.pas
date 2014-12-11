@@ -91,7 +91,7 @@ type
     procedure UpdateList;
     procedure UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
     procedure HandleEnter(Data: PtrInt);
-    procedure UpdateData(Sender: TObject);
+    procedure UpdateLinkData(Sender: TObject);
   protected
     { Protected declarations }
     procedure CheckAndInsert;
@@ -149,7 +149,7 @@ end;
 
 procedure TIBLookupComboDataLink.UpdateData;
 begin
-  FOwner.UpdateData(self)
+  FOwner.UpdateLinkData(self)
 end;
 
 constructor TIBLookupComboDataLink.Create(AOwner: TIBLookupComboEditBox);
@@ -184,7 +184,7 @@ begin
       else
       begin
         KeyValue := FLastKeyValue;
-        inherited UpdateData(self); {Force auto scroll}
+        UpdateData(self); {Force auto scroll}
         if varIsNull(KeyValue) then {Value not present}
           Text := ListSource.DataSet.FieldByName(ListField).AsString
       end;
@@ -205,7 +205,7 @@ begin
   begin
     FFiltered := false;
     UpdateList;
-    inherited UpdateData(self); {Force Scroll}
+    UpdateData(self); {Force Scroll}
   end;
 end;
 
@@ -296,7 +296,7 @@ begin
   SelectAll
 end;
 
-procedure TIBLookupComboEditBox.UpdateData(Sender: TObject);
+procedure TIBLookupComboEditBox.UpdateLinkData(Sender: TObject);
 begin
   if FInserting then
     ListSource.DataSet.FieldByName(ListField).AsString := Text
