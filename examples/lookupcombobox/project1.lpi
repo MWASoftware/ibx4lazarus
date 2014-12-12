@@ -27,22 +27,19 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="5">
+    <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="cdcontrols"/>
+        <PackageName Value="ibcontrols"/>
       </Item1>
       <Item2>
-        <PackageName Value="ibcontrols"/>
+        <PackageName Value="FCL"/>
       </Item2>
       <Item3>
-        <PackageName Value="FCL"/>
+        <PackageName Value="ibexpress"/>
       </Item3>
       <Item4>
-        <PackageName Value="ibexpress"/>
-      </Item4>
-      <Item5>
         <PackageName Value="LCL"/>
-      </Item5>
+      </Item4>
     </RequiredPackages>
     <Units Count="2">
       <Unit0>

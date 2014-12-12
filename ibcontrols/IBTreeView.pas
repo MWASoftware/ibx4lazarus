@@ -80,6 +80,7 @@ type
     FParentField: string;
     FExpandNode: TTreeNode;
     FNoAddNodeToDataset: boolean;
+    FRelationName: string;
     FUpdateNode: TIBTreeNode;
     FModifiedNode: TIBTreeNode;
     FUpdating: boolean;
@@ -90,6 +91,7 @@ type
     procedure DataSetChanged(Sender: TObject);
     function GetDataSet: TDataSet;
     function GetListSource: TDataSource;
+    function GetRelationNameQualifier: string;
     function GetSelectedKeyValue: variant;
     procedure NodeMoved(Node: TTreeNode);
     procedure NodeUpdated(Node: TTreeNode);
@@ -161,6 +163,7 @@ type
     property ParentShowHint;
     property PopupMenu;
     property ReadOnly;
+    property RelationName: string read FRelationName write FRelationName;
     property RightClickSelect;
     property RowSelect;
     property ScrollBars;
@@ -348,6 +351,14 @@ begin
   Result := FDataLink.DataSource
 end;
 
+function TIBTreeView.GetRelationNameQualifier: string;
+begin
+  if FRelationName <> '' then
+     Result := FRelationName + '.'
+  else
+    Result := ''
+end;
+
 function TIBTreeView.GetSelectedKeyValue: variant;
 begin
   Result := NULL;
@@ -509,14 +520,14 @@ end;
 procedure TIBTreeView.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 begin
     if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
-      Parser.Add2WhereClause('"' + FKeyField + '" = :IBX_KEY_VALUE')
+      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + FKeyField + '" = :IBX_KEY_VALUE')
     else
     if (Items.Count = 0) then
       {Need to Load Root Nodes}
-      Parser.Add2WhereClause(FParentField + ' is null')
+      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + FParentField + '" is null')
     else
     if assigned(FExpandNode) then
-      Parser.Add2WhereClause('"' + FParentField + '" = :IBX_PARENT_VALUE');
+      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + FParentField + '" = :IBX_PARENT_VALUE');
 end;
 
 procedure TIBTreeView.Added(Node: TTreeNode);

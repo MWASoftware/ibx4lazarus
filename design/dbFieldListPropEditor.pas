@@ -133,8 +133,8 @@ end;
 procedure TFieldListEditor.ApplicationProperties1Idle(Sender: TObject;
   var Done: Boolean);
 begin
-  DeselectButton.Enabled :=  SelectedFields.ItemIndex > 0;
-  SelectButton.Enabled :=  AvailableFields.ItemIndex > 0;
+  DeselectButton.Enabled :=  SelectedFields.ItemIndex >= 0;
+  SelectButton.Enabled :=  AvailableFields.ItemIndex >= 0;
 end;
 
 procedure TFieldListEditor.DeselectButtonClick(Sender: TObject);

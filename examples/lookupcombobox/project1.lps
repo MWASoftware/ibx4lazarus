@@ -20,7 +20,7 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="182"/>
+        <TopLine Value="133"/>
         <CursorPos X="70" Y="185"/>
         <UsageCount Value="33"/>
         <Loaded Value="True"/>
@@ -29,58 +29,46 @@
       <Unit2>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
-        <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
         <TopLine Value="85"/>
         <CursorPos X="1" Y="98"/>
         <UsageCount Value="17"/>
-        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
         <UnitName Value="DbCtrls"/>
-        <EditorIndex Value="8"/>
         <WindowIndex Value="0"/>
         <TopLine Value="627"/>
         <CursorPos X="24" Y="655"/>
         <UsageCount Value="17"/>
-        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/include/dblookup.inc"/>
-        <EditorIndex Value="10"/>
         <WindowIndex Value="0"/>
         <TopLine Value="372"/>
         <CursorPos X="3" Y="378"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="../../../../lcl/include/control.inc"/>
-        <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
         <TopLine Value="3230"/>
         <CursorPos X="1" Y="3248"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <EditorIndex Value="13"/>
         <WindowIndex Value="0"/>
         <TopLine Value="131"/>
         <CursorPos X="8" Y="133"/>
         <UsageCount Value="17"/>
-        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="../../../../lcl/include/customdbcombobox.inc"/>
-        <EditorIndex Value="9"/>
         <WindowIndex Value="0"/>
         <TopLine Value="89"/>
         <CursorPos X="38" Y="113"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
@@ -93,22 +81,18 @@
       <Unit9>
         <Filename Value="../../../../lcl/stdctrls.pp"/>
         <UnitName Value="StdCtrls"/>
-        <EditorIndex Value="11"/>
         <WindowIndex Value="0"/>
         <TopLine Value="320"/>
         <CursorPos X="15" Y="332"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit9>
       <Unit10>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <UnitName Value="IBCustomDataSet"/>
-        <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
         <TopLine Value="372"/>
         <CursorPos X="15" Y="385"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit10>
       <Unit11>
         <Filename Value="../../../mycontrols/dbdateedit.pas"/>
@@ -121,12 +105,10 @@
       <Unit12>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <UnitName Value="IBDynamicGrid"/>
-        <EditorIndex Value="7"/>
         <WindowIndex Value="0"/>
         <TopLine Value="613"/>
         <CursorPos X="60" Y="637"/>
         <UsageCount Value="16"/>
-        <Loaded Value="True"/>
       </Unit12>
       <Unit13>
         <Filename Value="../../../../lcl/editbtn.pas"/>
@@ -139,21 +121,17 @@
       <Unit14>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <UnitName Value="db"/>
-        <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1690"/>
         <CursorPos X="44" Y="1706"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit14>
       <Unit15>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
         <TopLine Value="351"/>
         <CursorPos X="2" Y="354"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="../../ibcontrols/IBDateEdit.pas"/>
@@ -174,21 +152,17 @@
       <Unit18>
         <Filename Value="../../runtime/IB.pas"/>
         <UnitName Value="IB"/>
-        <EditorIndex Value="14"/>
         <WindowIndex Value="0"/>
         <TopLine Value="398"/>
         <CursorPos X="1" Y="412"/>
         <UsageCount Value="15"/>
-        <Loaded Value="True"/>
       </Unit18>
       <Unit19>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/datasource.inc"/>
-        <EditorIndex Value="6"/>
         <WindowIndex Value="0"/>
         <TopLine Value="206"/>
         <CursorPos X="1" Y="209"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit19>
       <Unit20>
         <Filename Value="../../../../lcl/maskedit.pp"/>
@@ -200,12 +174,10 @@
       </Unit20>
       <Unit21>
         <Filename Value="../../../../lcl/include/customcombobox.inc"/>
-        <EditorIndex Value="12"/>
         <WindowIndex Value="0"/>
         <TopLine Value="931"/>
         <CursorPos X="3" Y="940"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit21>
     </Units>
     <General>

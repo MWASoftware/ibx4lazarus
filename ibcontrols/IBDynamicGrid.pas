@@ -51,6 +51,7 @@ type
 
   TIBDynamicGrid = class;
 
+  TOnColumnHeaderClick = procedure(Sender: TObject; var ColIndex: integer) of object;
   TOnUpdateSortOrder = procedure (Sender: TObject; ColIndex: integer; var OrderBy: string) of Object;
 
   { TDynamicGridDataLink }
@@ -154,6 +155,7 @@ type
     { Private declarations }
     FAllowColumnSort: boolean;
     FDataLink: TDynamicGridDataLink;
+    FOnColumnHeaderClick: TOnColumnHeaderClick;
     FOnUpdateSortOrder: TOnUpdateSortOrder;
     FDefaultPositionAtEnd: boolean;
     FDescending: boolean;
@@ -189,6 +191,7 @@ type
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy; override;
+    property LastSortColumn: integer read FLastColIndex;
   published
     { Published declarations }
     property AllowColumnSort: boolean read FAllowColumnSort write FAllowColumnSort default true;
@@ -197,6 +200,7 @@ type
     property EditorBorderStyle: TBorderStyle read GetEditorBorderStyle write SetEditorBorderStyle;
     property DefaultPositionAtEnd: boolean read  FDefaultPositionAtEnd write FDefaultPositionAtEnd;
     property IndexFieldNames: string read FIndexFieldNames write SetIndexFieldNames;
+    property OnColumnHeaderClick: TOnColumnHeaderClick read FOnColumnHeaderClick write FOnColumnHeaderClick;
     property OnUpdateSortOrder: TOnUpdateSortOrder read FOnUpdateSortOrder write FOnUpdateSortOrder;
  end;
 
@@ -448,6 +452,10 @@ begin
   try
     if Index = FLastColIndex then
       FDescending := not FDescending;
+
+    if assigned(FOnColumnHeaderClick) then
+      OnColumnHeaderClick(self,Index);
+
     FLastColIndex := Index;
     if assigned(DataSource) and assigned(DataSource.DataSet) and DataSource.DataSet.Active then
     begin
@@ -512,13 +520,18 @@ end;
 
 procedure TIBDynamicGrid.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 var OrderBy: string;
+    FieldPosition: integer;
 begin
-    if Sender = TObject(FDataLink) then
+    if (Sender = TObject(FDataLink)) and assigned(DataSource) and assigned(DataSource.DataSet)
+      and (DataSource.DataSet is TIBCustomDataSet) then
     begin
+      FieldPosition := TIBCustomDataSet(DataSource.DataSet).GetFieldPosition(Columns[FLastColIndex].FieldName);
+      if FieldPosition = 0 then Exit;
+
       if Descending then
-        Parser.OrderByClause := '"' + Columns[FLastColIndex].FieldName + '" desc'
+        Parser.OrderByClause := IntToStr(FieldPosition) + ' desc'
       else
-        Parser.OrderByClause := '"' + Columns[FLastColIndex].FieldName + '" asc';
+        Parser.OrderByClause := IntToStr(FieldPosition) + ' asc';
 
       if assigned(FOnUpdateSortOrder) then
       begin

@@ -66,13 +66,21 @@ type
                 sqString,sqCommentStart,sqUnion,sqAll,sqColon,
                 sqCommentEnd,sqCommentLine,sqAsterisk,sqForwardSlash,
                 sqSelect,sqFrom,sqWhere,sqGroup,sqOrder,sqBy,sqOpenBracket,
-                sqCloseBracket,sqHaving,sqPlan,sqEOL,sqWith);
+                sqCloseBracket,sqHaving,sqPlan,sqEOL,sqWith,sqRecursive);
 
   TSQLStates =  (stInit, stError, stInSelect,stInFrom,stInWhere,stInGroupBy,
                  stInHaving,stInPlan, stNestedSelect,stInSingleQuotes, stInGroup,
                  stInDoubleQuotes, stInComment, stInCommentLine, stInOrder,
                  stNestedWhere,stNestedFrom,stInOrderBy,stDone,stUnion,
-                 stInParam,stNestedGroupBy,stCTE,stInCTE,stCTEClosed);
+                 stInParam,stNestedGroupBy,stCTE,stCTE1,stCTE2,stInCTE,
+                 stCTEClosed);
+
+  PCTEDef = ^TCTEDef;
+  TCTEDef = record
+    Recursive: boolean;
+    Name: string;
+    Text: string;
+  end;
 
   { TSelectSQLParser }
 
@@ -102,16 +110,19 @@ type
     FAllowUnionAll: boolean;
     FLiteral: string;
     FParamList: TStringList;
-    FCTEs: TStringList;
-    FCTE: string;
+    FCTEs: TList;
+    FCTE: TCTEDef;
     FNested: integer;
     procedure AddToSQL(const Word: string);
-    function GetCTE(Index: integer): string;
+    procedure CTEClear;
+    function GetCTE(Index: integer): PCTEDef;
     function GetCTECount: integer;
     function GetSQlText: string;
     function Check4ReservedWord(const Text: string): TSQLSymbol;
     procedure AnalyseLine(const Line: string);
     procedure AnalyseSQL(Lines: TStrings);
+    procedure InitCTE;
+    procedure AddCTE;
     function GetNextSymbol(C: char): TSQLSymbol;
     function GetSymbol(const Line: string; var index: integer): TSQLSymbol;
     function PopState: TSQLStates;
@@ -136,7 +147,7 @@ type
     procedure ResetHavingClause;
     procedure ResetOrderByClause;
     procedure Reset;
-    property CTEs[Index: integer]: string read GetCTE;
+    property CTEs[Index: integer]: PCTEDef read GetCTE;
     property CTECount: integer read GetCTECount;
     property SelectClause: string read FSelectClause write SetSelectClause;
     property FromClause: string read FFromClause write SetFromClause;
@@ -195,12 +206,22 @@ begin
   stInDoubleQuotes,
   stInSingleQuotes:
     FLiteral := FLiteral + Word;
-  stCTE,stInCTE:
-    FCTE := FCTE + Word;
+  stInCTE:
+    FCTE.Text := FCTE.Text + Word;
+  stCTE2:
+    FCTE.Name := Word;
   end;
 end;
 
-function TSelectSQLParser.GetCTE(Index: integer): string;
+procedure TSelectSQLParser.CTEClear;
+var i: integer;
+begin
+  for i := 0 to FCTEs.Count - 1 do
+    dispose(PCTEDef(FCTEs[i]));
+  FCTEs.Clear;
+end;
+
+function TSelectSQLParser.GetCTE(Index: integer): PCTEDef;
 begin
   if (Index < 0) or (index >= FCTEs.Count) then
      raise Exception.Create('CTE Index out of bounds');
@@ -308,21 +329,23 @@ begin
         stNestedGroupBy:
           SetState(stNestedGroupBy);
 
-        stCTE:
+        stCTE2:
           begin
             FState := stCTEClosed;
             SetState(stInCTE);
           end;
         end;
+        if (FNested > 0 ) or (FState <> stInCTE) then
+          AddToSQL('(');
         Inc(FNested);
-        AddToSQL('(')
       end;
 
     sqCloseBracket:
       if not (FState in [stInComment,stInCommentLine]) then
       begin
         Dec(FNested);
-        AddToSQL(')');
+        if (FNested > 0) or (FState <> stInCTE) then
+          AddToSQL(')');
         if FNested = 0 then
         begin
           if FState = stInCTE then
@@ -332,10 +355,7 @@ begin
             FState := PopState;
         end;
         if FState = stCTEClosed then
-        begin
-          FCTEs.Add(FCTE);
-          FCTE := ''
-        end
+          AddCTE;
       end;
 
     sqComma:
@@ -405,7 +425,10 @@ begin
         begin
           FState := PopState;
           ParamList.Add(FString)
-        end;
+        end
+        else
+        if FState in [stCTE, stCTE1] then
+          FState := stCTE2;
         AddToSQL(FString)
       end;
 
@@ -505,10 +528,19 @@ begin
         if FState = stInit then
         begin
           FState := stCTE;
-          FCTE := '';
+          InitCTE;
         end
         else
-        raise Exception.Create('Unexpected symbol "with"');
+          raise Exception.Create('Unexpected symbol "with"');
+
+      sqRecursive:
+        if FState = stCTE then
+        begin
+          FCTE.Recursive := true;
+          FState := stCTE1
+        end
+      else
+        raise Exception.Create('Unexpected symbol "recursive"');
 
     else
       raise Exception.Create(sBadSymbol);
@@ -519,6 +551,7 @@ end;
 procedure TSelectSQLParser.AnalyseSQL(Lines: TStrings);
 var I: integer;
 begin
+ try
   for I := FStartLine to Lines.Count - 1 do
   try
       AnalyseLine(Lines[I]);
@@ -541,9 +574,32 @@ begin
   except on E: Exception do
     raise Exception.CreateFmt(sBadSQL,[Lines[I],E.Message])
   end;
+ finally
   FOriginalWhereClause := WhereClause;
   FOriginalHavingClause := HavingClause;
   FOriginalOrderByClause := OrderByClause
+ end;
+end;
+
+procedure TSelectSQLParser.InitCTE;
+begin
+  with FCTE do
+  begin
+    Recursive := false;
+    Name := '';
+    Text := '';
+  end;
+end;
+
+procedure TSelectSQLParser.AddCTE;
+var cte: PCTEDef;
+begin
+  new(cte);
+  cte^.Name := FCTE.Name;
+  cte^.Recursive := FCTE.Recursive;
+  cte^.Text := FCTE.Text;
+  FCTEs.add(cte);
+  InitCTE;
 end;
 
 function TSelectSQLParser.Check4ReservedWord(const Text: string): TSQLSymbol;
@@ -581,6 +637,9 @@ begin
       else
       if CompareText(Text,'with') = 0 then
         Result := sqWith
+      else
+      if CompareText(Text,'recursive') = 0 then
+        Result := sqRecursive
 end;
 
 constructor TSelectSQLParser.Create(SQLText: TStrings);
@@ -605,7 +664,7 @@ constructor TSelectSQLParser.Create(SQLText: TStrings; StartLine,
 begin
   inherited Create;
   FParamList := TStringList.Create;
-  FCTEs := TStringList.Create;
+  FCTEs := TList.Create;
   FLastSymbol := sqNone;
   FState := stInit;
   FStartLine := StartLine;
@@ -726,11 +785,16 @@ begin
     for I := 0 to CTECount - 1 do
     begin
       if I = 0 then
-        SQL.Add('WITH ' + CTEs[I])
+      begin
+        if CTEs[I]^.Recursive then
+          SQL.Add('WITH RECURSIVE ' + CTEs[I]^.Name + ' (' + CTES[I]^.Text + ')')
+        else
+          SQL.Add('WITH ' + CTEs[I]^.Name + ' (' + CTES[I]^.Text +')')
+      end
       else
       begin
         SQL.Add(',');
-        SQL.Add(CTEs[I])
+        SQL.Add(CTEs[I]^.Name + ' (' + CTES[I]^.Text +')')
       end
     end;
     if CTECount > 0 then
@@ -856,7 +920,11 @@ destructor TSelectSQLParser.Destroy;
 begin
   DropUnion;
   if FParamList <> nil then FParamList.Free;
-  if FCTEs <> nil then FCTEs.Free;
+  if FCTEs <> nil then
+  begin
+    CTEClear;
+    FCTEs.Free;
+  end;
   inherited;
 end;
 

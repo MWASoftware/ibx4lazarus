@@ -2710,7 +2710,13 @@ begin
     on E: Exception do begin
       if (FHandle <> nil) then
         FreeHandle;
-      raise;
+      if E is EIBInterBaseError then
+        raise EIBInterBaseError.Create(EIBInterBaseError(E).SQLCode,
+                                       EIBInterBaseError(E).IBErrorCode,
+                                       EIBInterBaseError(E).Message +
+                                       ' When Executing: ' + FProcessedSQL.Text)
+      else
+        raise;
     end;
   end;
 end;

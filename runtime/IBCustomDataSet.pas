@@ -254,6 +254,7 @@ type
     FAfterTransactionEnd,
     FTransactionFree: TNotifyEvent;
     FAliasNameMap: array of string;
+    FAliasNameList: array of string;
     FBaseSQLSelect: TStrings;
     FParser: TSelectSQLParser;
     function GetSelectStmtHandle: TISC_STMT_HANDLE;
@@ -455,6 +456,7 @@ type
     procedure ApplyUpdates;
     function CachedUpdateStatus: TCachedUpdateStatus;
     procedure CancelUpdates;
+    function GetFieldPosition(AliasName: string): integer;
     procedure FetchAll;
     function LocateNext(const KeyFields: string; const KeyValues: Variant;
                         Options: TLocateOptions): Boolean;
@@ -1158,6 +1160,27 @@ begin
       FUpdatesPending := False;
       EnableControls;
     end;
+  end;
+end;
+
+function TIBCustomDataSet.GetFieldPosition(AliasName: string): integer;
+var i: integer;
+    Prepared: boolean;
+begin
+  Result := 0;
+  Prepared := FInternalPrepared;
+  if not Prepared then
+    InternalPrepare;
+  try
+    for i := 0 to Length(FAliasNameList) - 1 do
+      if FAliasNameList[i] = AliasName then
+      begin
+        Result := i + 1;
+        Exit
+      end;
+  finally
+    if not Prepared then
+      InternalUnPrepare;
   end;
 end;
 
@@ -1924,7 +1947,7 @@ begin
     FBase.CheckTransaction;
     if assigned(FParser) and (FParser.SQLText <> FQSelect.SQL.Text) then
       FQSelect.SQL.Text := FParser.SQLText;
- //   writeln( FQSelect.SQL.Text);
+//   writeln( FQSelect.SQL.Text);
     if FQSelect.SQL.Text <> '' then
     begin
       if not FQSelect.Prepared then
@@ -3081,6 +3104,7 @@ begin
     Query.SQL.Text := DefaultSQL;
     Query.Prepare;
     SetLength(FAliasNameMap, SourceQuery.Current.Count);
+    SetLength(FAliasNameList, SourceQuery.Current.Count);
     for i := 0 to SourceQuery.Current.Count - 1 do
       with SourceQuery.Current[i].Data^ do
       begin
@@ -3089,6 +3113,7 @@ begin
         SetString(DBAliasName, aliasname, aliasname_length);
         SetString(RelationName, relname, relname_length);
         SetString(FieldName, sqlname, sqlname_length);
+        FAliasNameList[i] := DBAliasName;
         FieldSize := 0;
         FieldPrecision := 0;
         FieldNullable := SourceQuery.Current[i].IsNullable;
@@ -3677,6 +3702,7 @@ begin
     FieldDefs.Clear;
     FieldDefs.Updated := false;
     FInternalPrepared := False;
+    Setlength(FAliasNameList,0);
   end;
 end;
 
