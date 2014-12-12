@@ -113,6 +113,7 @@ type
     FCTEs: TList;
     FCTE: TCTEDef;
     FNested: integer;
+    FDestroying: boolean;
     procedure AddToSQL(const Word: string);
     procedure CTEClear;
     function GetCTE(Index: integer): PCTEDef;
@@ -684,7 +685,7 @@ end;
 
 procedure TSelectSQLParser.Changed;
 begin
-  if assigned(FOnSQLChanging) then
+  if assigned(FOnSQLChanging) and not FDestroying then
      OnSQLChanging(self)
 end;
 
@@ -927,6 +928,7 @@ end;
 
 destructor TSelectSQLParser.Destroy;
 begin
+  FDestroying := true;
   DropUnion;
   if FParamList <> nil then FParamList.Free;
   if FCTEs <> nil then
