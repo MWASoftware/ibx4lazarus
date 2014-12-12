@@ -66,14 +66,14 @@ type
                 sqString,sqCommentStart,sqUnion,sqAll,sqColon,
                 sqCommentEnd,sqCommentLine,sqAsterisk,sqForwardSlash,
                 sqSelect,sqFrom,sqWhere,sqGroup,sqOrder,sqBy,sqOpenBracket,
-                sqCloseBracket,sqHaving,sqPlan,sqEOL,sqWith,sqRecursive);
+                sqCloseBracket,sqHaving,sqPlan,sqEOL,sqWith,sqRecursive,sqAs);
 
   TSQLStates =  (stInit, stError, stInSelect,stInFrom,stInWhere,stInGroupBy,
                  stInHaving,stInPlan, stNestedSelect,stInSingleQuotes, stInGroup,
                  stInDoubleQuotes, stInComment, stInCommentLine, stInOrder,
                  stNestedWhere,stNestedFrom,stInOrderBy,stDone,stUnion,
-                 stInParam,stNestedGroupBy,stCTE,stCTE1,stCTE2,stInCTE,
-                 stCTEClosed);
+                 stInParam,stNestedGroupBy,stCTE,stCTE1,stCTE2,stCTE3, stCTEquoted,
+                 stInCTE,stCTEClosed);
 
   PCTEDef = ^TCTEDef;
   TCTEDef = record
@@ -209,7 +209,7 @@ begin
   stInCTE:
     FCTE.Text := FCTE.Text + Word;
   stCTE2:
-    FCTE.Name := Word;
+    FCTE.Name := Trim(FCTE.Name + Word);
   end;
 end;
 
@@ -329,7 +329,7 @@ begin
         stNestedGroupBy:
           SetState(stNestedGroupBy);
 
-        stCTE2:
+        stCTE3:
           begin
             FState := stCTEClosed;
             SetState(stInCTE);
@@ -542,6 +542,12 @@ begin
       else
         raise Exception.Create('Unexpected symbol "recursive"');
 
+      sqAs:
+      if FState = stCTE2 then
+        FState := stCTE3
+      else
+        AddToSQL('as');
+
     else
       raise Exception.Create(sBadSymbol);
     end
@@ -640,6 +646,9 @@ begin
       else
       if CompareText(Text,'recursive') = 0 then
         Result := sqRecursive
+      else
+      if CompareText(Text,'as') = 0 then
+        Result := sqAs
 end;
 
 constructor TSelectSQLParser.Create(SQLText: TStrings);
@@ -787,14 +796,14 @@ begin
       if I = 0 then
       begin
         if CTEs[I]^.Recursive then
-          SQL.Add('WITH RECURSIVE ' + CTEs[I]^.Name + ' (' + CTES[I]^.Text + ')')
+          SQL.Add('WITH RECURSIVE ' + CTEs[I]^.Name + ' AS (' + CTES[I]^.Text + ')')
         else
-          SQL.Add('WITH ' + CTEs[I]^.Name + ' (' + CTES[I]^.Text +')')
+          SQL.Add('WITH ' + CTEs[I]^.Name + ' AS (' + CTES[I]^.Text +')')
       end
       else
       begin
         SQL.Add(',');
-        SQL.Add(CTEs[I]^.Name + ' (' + CTES[I]^.Text +')')
+        SQL.Add(CTEs[I]^.Name + ' AS (' + CTES[I]^.Text +')')
       end
     end;
     if CTECount > 0 then

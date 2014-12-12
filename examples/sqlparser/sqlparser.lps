@@ -7,11 +7,8 @@
       <Unit0>
         <Filename Value="sqlparser.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="sqlparser"/>
-        <EditorIndex Value="2"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="66" Y="18"/>
+        <EditorIndex Value="3"/>
+        <CursorPos Y="20"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -19,10 +16,9 @@
         <Filename Value="MainForm.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="MainForm"/>
-        <EditorIndex Value="0"/>
-        <WindowIndex Value="0"/>
         <TopLine Value="32"/>
         <CursorPos X="17" Y="41"/>
         <UsageCount Value="20"/>
@@ -32,17 +28,16 @@
       <Unit2>
         <Filename Value="../../runtime/IBSQLParser.pas"/>
         <UnitName Value="IBSQLParser"/>
-        <EditorIndex Value="3"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="28"/>
-        <CursorPos X="47" Y="37"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="786"/>
+        <CursorPos X="37" Y="806"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
         <EditorIndex Value="4"/>
-        <WindowIndex Value="0"/>
         <TopLine Value="670"/>
         <CursorPos X="3" Y="604"/>
         <UsageCount Value="10"/>
@@ -51,19 +46,14 @@
       <Unit4>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <UnitName Value="IBCustomDataSet"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <WindowIndex Value="0"/>
         <TopLine Value="2498"/>
         <CursorPos X="22" Y="2522"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit4>
     </Units>
-    <General>
-      <ActiveWindowIndexAtStart Value="0"/>
-    </General>
-    <JumpHistory Count="5" HistoryIndex="4">
+    <JumpHistory Count="10" HistoryIndex="9">
       <Position1>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <Caret Line="63" Column="39" TopLine="46"/>
@@ -84,7 +74,26 @@
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <Caret Line="1919" Column="35" TopLine="1895"/>
       </Position5>
+      <Position6>
+        <Filename Value="sqlparser.lpr"/>
+        <Caret Line="18" Column="66"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/IBSQLParser.pas"/>
+        <Caret Line="768" Column="28" TopLine="739"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/IBSQLParser.pas"/>
+        <Caret Line="332" Column="15" TopLine="322"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/IBSQLParser.pas"/>
+        <Caret Line="547" Column="17" TopLine="533"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/IBSQLParser.pas"/>
+        <Caret Line="159" Column="39" TopLine="131"/>
+      </Position10>
     </JumpHistory>
   </ProjectSession>
-  <EditorMacros Count="0"/>
 </CONFIG>
