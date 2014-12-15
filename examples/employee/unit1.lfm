@@ -2,16 +2,16 @@ object Form1: TForm1
   Left = 394
   Height = 482
   Top = 322
-  Width = 878
+  Width = 931
   Caption = 'Employee List'
   ClientHeight = 482
-  ClientWidth = 878
+  ClientWidth = 931
   Color = clBackground
   OnClose = FormClose
   OnShow = FormShow
   LCLVersion = '1.2.6.0'
   object Button1: TButton
-    Left = 791
+    Left = 844
     Height = 25
     Top = 48
     Width = 75
@@ -20,7 +20,7 @@ object Form1: TForm1
     TabOrder = 0
   end
   object Button2: TButton
-    Left = 791
+    Left = 844
     Height = 25
     Top = 86
     Width = 75
@@ -29,7 +29,7 @@ object Form1: TForm1
     TabOrder = 1
   end
   object Button3: TButton
-    Left = 791
+    Left = 844
     Height = 25
     Top = 125
     Width = 75
@@ -89,11 +89,11 @@ object Form1: TForm1
     Left = 12
     Height = 434
     Top = 42
-    Width = 756
+    Width = 809
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
     ClientHeight = 434
-    ClientWidth = 756
+    ClientWidth = 809
     Color = clBackground
     ParentColor = False
     TabOrder = 5
@@ -101,7 +101,7 @@ object Form1: TForm1
       Left = 0
       Height = 384
       Top = 0
-      Width = 756
+      Width = 809
       Align = alClient
       Color = clWindow
       Columns = <      
@@ -170,9 +170,11 @@ object Form1: TForm1
           AutoSizeColumn = False
           InitialSortColumn = False
         end>
-      DataSource = EmplyeeSource
+      DataSource = EmployeeSource
       Scrollbars = ssAutoBoth
       TabOrder = 0
+      EditorPanel = EmpoyeeEditorPanel
+      ExpandEditorPanelBelowRow = False
       Descending = False
       EditorBorderStyle = bsSingle
       DefaultPositionAtEnd = False
@@ -182,11 +184,11 @@ object Form1: TForm1
       Left = 0
       Height = 50
       Top = 384
-      Width = 756
+      Width = 809
       Align = alBottom
       BevelOuter = bvNone
       ClientHeight = 50
-      ClientWidth = 756
+      ClientWidth = 809
       TabOrder = 1
       object Button5: TButton
         Left = 80
@@ -218,9 +220,145 @@ object Form1: TForm1
         ParentColor = False
       end
     end
+    object EmpoyeeEditorPanel: TPanel
+      Left = 56
+      Height = 80
+      Top = 112
+      Width = 560
+      BevelOuter = bvNone
+      BorderWidth = 2
+      BorderStyle = bsSingle
+      ClientHeight = 78
+      ClientWidth = 558
+      Color = clWindow
+      ParentColor = False
+      TabOrder = 2
+      Visible = False
+      object Label3: TLabel
+        Left = 6
+        Height = 15
+        Top = 7
+        Width = 83
+        Caption = 'Employee No.'
+        ParentColor = False
+      end
+      object DBEdit1: TDBEdit
+        Left = 96
+        Height = 25
+        Top = 2
+        Width = 120
+        DataField = 'EMP_NO'
+        DataSource = EmployeeSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 0
+      end
+      object Label4: TLabel
+        Left = 18
+        Height = 15
+        Top = 32
+        Width = 64
+        Caption = 'First Name'
+        ParentColor = False
+      end
+      object DBEdit2: TDBEdit
+        Left = 96
+        Height = 25
+        Top = 24
+        Width = 120
+        DataField = 'FIRST_NAME'
+        DataSource = EmployeeSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 1
+      end
+      object Label5: TLabel
+        Left = 18
+        Height = 15
+        Top = 56
+        Width = 64
+        Caption = 'Last Name'
+        ParentColor = False
+      end
+      object DBEdit3: TDBEdit
+        Left = 96
+        Height = 25
+        Top = 46
+        Width = 120
+        DataField = 'LAST_NAME'
+        DataSource = EmployeeSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 2
+      end
+      object Label6: TLabel
+        Left = 236
+        Height = 15
+        Top = 7
+        Width = 77
+        Caption = 'Date Started'
+        ParentColor = False
+      end
+      object IBDateEdit1: TIBDateEdit
+        Left = 320
+        Height = 25
+        Top = 2
+        Width = 80
+        CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
+        OKCaption = 'OK'
+        CancelCaption = 'Cancel'
+        ReadOnly = False
+        DateOrder = doNone
+        ButtonWidth = 23
+        CharCase = ecNormal
+        NumGlyphs = 1
+        MaxLength = 0
+        TabOrder = 3
+        DataField = 'HIRE_DATE'
+        DataSource = EmployeeSource
+      end
+      object Label7: TLabel
+        Left = 272
+        Height = 15
+        Top = 54
+        Width = 37
+        Caption = 'Salary'
+        ParentColor = False
+      end
+      object DBEdit4: TDBEdit
+        Left = 320
+        Height = 25
+        Top = 46
+        Width = 104
+        DataField = 'SALARY'
+        DataSource = EmployeeSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 5
+      end
+      object Label8: TLabel
+        Left = 252
+        Height = 15
+        Top = 32
+        Width = 61
+        Caption = 'Phone Ext'
+        ParentColor = False
+      end
+      object DBEdit5: TDBEdit
+        Left = 320
+        Height = 25
+        Top = 24
+        Width = 104
+        DataField = 'PHONE_EXT'
+        DataSource = EmployeeSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 4
+      end
+    end
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
     AllowStreamedConnected = False
@@ -407,7 +545,7 @@ object Form1: TForm1
       Size = 25
     end
   end
-  object EmplyeeSource: TDataSource
+  object EmployeeSource: TDataSource
     DataSet = Employees
     left = 784
     top = 296
@@ -507,7 +645,7 @@ object Form1: TForm1
     )
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
-    DataSource = EmplyeeSource
+    DataSource = EmployeeSource
     left = 830
     top = 263
   end

@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DBGrids, DB,
-  IBSqlParser, Grids, IBLookupComboEditBox, LMessages, StdCtrls;
+  IBSqlParser, Grids, IBLookupComboEditBox, LMessages, StdCtrls, ExtCtrls;
 
 type
   {
@@ -135,17 +135,40 @@ type
   TDBDynamicGrid = class(TDBGrid)
   private
     { Private declarations }
+    FExpandEditorPanelBelowRow: boolean;
+    FEditorPanel: TCustomPanel;
+    FExpandedRow: integer;
     FResizing: boolean;
+    FWeHaveFocus: boolean;
+    FHidingEditorPanel: boolean;
+    procedure DoShowEditorPanel(Data: PtrInt);
     procedure PositionTotals;
+    procedure KeyDownHandler(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
+    procedure DoEnter; override;
+    procedure DoExit; override;
     procedure DoGridResize;
+    procedure DoEditorHide; override;
+    procedure DoEditorShow; override;
+    procedure DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; aText: String); override;
+    procedure IndicatorClicked(Button: TMouseButton; Shift:TShiftState); virtual;
     procedure Loaded; override;
     procedure DoOnResize; override;
     function CreateColumns: TGridColumns; override;
     procedure HeaderSized(IsColumn: Boolean; Index: Integer); override;
+    procedure MouseDown(Button: TMouseButton; Shift:TShiftState; X,Y:Integer); override;
+    procedure TopLeftChanged; override;
+    procedure UpdateActive; override;
+    procedure UpdateEditorPanel;
     procedure UpdateShowing; override;
   public
+    procedure HideEditorPanel;
+    procedure ShowEditorPanel;
     constructor Create(TheComponent: TComponent); override;
+    destructor Destroy ;override;
+  published
+    property EditorPanel: TCustomPanel read FEditorPanel write FEditorPanel;
+    property ExpandEditorPanelBelowRow: boolean read FExpandEditorPanelBelowRow write FExpandEditorPanelBelowRow;
  end;
 
   { TIBDynamicGrid }
@@ -251,10 +274,77 @@ begin
             end;
         end;
     end;
-    PositionTotals
+    PositionTotals;
+    UpdateEditorPanel;
   finally
     FResizing := false
   end;
+end;
+
+procedure TDBDynamicGrid.DoEditorHide;
+begin
+  inherited DoEditorHide;
+  if (FExpandedRow >= 0) and (FExpandedRow < RowCount) then
+    RowHeights[FExpandedRow] := DefaultRowHeight;
+  FExpandedRow := -1;
+  if CanFocus then SetFocus;
+end;
+
+procedure TDBDynamicGrid.DoEditorShow;
+begin
+  if Editor = FEditorPanel then
+  begin
+    if ExpandEditorPanelBelowRow then
+      RowHeights[Row] := FEditorPanel.Height + DefaultRowHeight
+   else
+      RowHeights[Row] := FEditorPanel.Height;
+    FExpandedRow := Row;
+    inherited DoEditorShow;
+    UpdateEditorPanel;  {Position Editor Panel over expanded Row}
+    FEditorPanel.PerformTab(true);  {Select First Control}
+  end
+  else
+    inherited DoEditorShow;
+end;
+
+procedure TDBDynamicGrid.DrawCellText(aCol, aRow: Integer; aRect: TRect;
+  aState: TGridDrawState; aText: String);
+var Style: TTextStyle;
+    OldStyle: TTextStyle;
+begin
+  if ExpandEditorPanelBelowRow and assigned(FEditorPanel) and FEditorPanel.Visible and (aRow = FExpandedRow) then
+  begin
+    {Draw the text at the top of the cell}
+    Style := Canvas.TextStyle;
+    OldStyle := Style;
+    try
+      Style.Layout := tlTop;
+      Canvas.TextStyle := Style;
+      inherited DrawCellText(aCol, aRow, aRect, aState, aText);
+    finally
+      Canvas.TextStyle := OldStyle;
+    end;
+
+  end
+  else
+    inherited DrawCellText(aCol, aRow, aRect, aState, aText);
+end;
+
+procedure TDBDynamicGrid.IndicatorClicked(Button: TMouseButton;
+  Shift: TShiftState);
+begin
+  if assigned(FEditorPanel) then
+  begin
+    if FEditorPanel.Visible then
+      HideEditorPanel
+    else
+      ShowEditorPanel;
+  end;
+end;
+
+procedure TDBDynamicGrid.DoShowEditorPanel(Data: PtrInt);
+begin
+  ShowEditorPanel;
 end;
 
 procedure TDBDynamicGrid.PositionTotals;
@@ -279,9 +369,42 @@ begin
   end;
 end;
 
+procedure TDBDynamicGrid.KeyDownHandler(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Visible and assigned(FEditorPanel) and FEditorPanel.Visible and FWeHaveFocus then
+  begin
+    {Allow Scrolling}
+    if Key in [VK_UP,VK_DOWN] then
+     KeyDown(Key,Shift)
+    else
+    {Cancel Editor}
+    if Key = VK_ESCAPE then
+    begin
+      KeyDown(Key,Shift);
+      if DataLink.DataSet.State in [dsInsert,dsEdit] then
+         DataLink.DataSet.Cancel
+    end
+  end
+end;
+
+procedure TDBDynamicGrid.DoEnter;
+begin
+  inherited DoEnter;
+  FWeHaveFocus := true;
+end;
+
+procedure TDBDynamicGrid.DoExit;
+begin
+  FWeHaveFocus := false;
+  inherited DoExit;
+end;
+
 procedure TDBDynamicGrid.Loaded;
 begin
   inherited Loaded;
+  if assigned(FEditorPanel) and not (csDesigning in ComponentState) then
+    FEditorPanel.Visible := false;
   DoGridResize
 end;
 
@@ -302,16 +425,79 @@ begin
   PositionTotals
 end;
 
+procedure TDBDynamicGrid.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
+  Y: Integer);
+var Coord: TGridCoord;
+begin
+  inherited MouseDown(Button, Shift, X, Y);
+
+  Coord := MouseCoord(X,Y);
+  if (Coord.X = 0) and (Coord.Y > 0) then
+     IndicatorClicked(Button,Shift);
+end;
+
+procedure TDBDynamicGrid.TopLeftChanged;
+begin
+  inherited TopLeftChanged;
+  UpdateEditorPanel;
+end;
+
+procedure TDBDynamicGrid.UpdateActive;
+begin
+  inherited UpdateActive;
+
+  if assigned(DataLink) and (DataLink.DataSet.State = dsInsert) then
+     Application.QueueAsyncCall(@DoShowEditorPanel,0);
+end;
+
+procedure TDBDynamicGrid.UpdateEditorPanel;
+var R: TRect;
+    Dummy: integer;
+begin
+  if assigned(FEditorPanel) and FEditorPanel.Visible and
+   (FExpandedRow >= 0) and (FExpandedRow < RowCount) then
+  begin
+    // Upper and Lower bounds for this row
+    ColRowToOffSet(False, True, FExpandedRow, R.Top, R.Bottom);
+    //Left Bound for visible Columns
+    ColRowToOffSet(True,True,1,R.Left,Dummy);
+    //Right Bound for visible columns
+    ColRowToOffSet(True,True,ColCount - 1,Dummy,R.Right);
+    if ExpandEditorPanelBelowRow then
+      R.Top := R.Top + DefaultRowHeight;
+    FEditorPanel.BoundsRect := R;
+  end;
+end;
+
 procedure TDBDynamicGrid.UpdateShowing;
 begin
   inherited UpdateShowing;
   DoGridResize
 end;
 
+procedure TDBDynamicGrid.HideEditorPanel;
+begin
+  if Editor = FEditorPanel then
+    EditorMode := false;
+end;
+
+procedure TDBDynamicGrid.ShowEditorPanel;
+begin
+  Editor := FEditorPanel;
+  EditorMode := true;
+end;
+
 constructor TDBDynamicGrid.Create(TheComponent: TComponent);
 begin
   inherited Create(TheComponent);
   ScrollBars := ssAutoVertical;
+  Application.AddOnKeyDownBeforeHandler(@KeyDownHandler,false);
+end;
+
+destructor TDBDynamicGrid.Destroy;
+begin
+  Application.RemoveOnKeyDownBeforeHandler(@KeyDownHandler);
+  inherited Destroy;
 end;
 
 { TDBDynamicGridColumn }

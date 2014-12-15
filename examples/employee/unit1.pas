@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, DBGrids,
   StdCtrls, ActnList, EditBtn, DbCtrls, ExtCtrls, IBDatabase, IBQuery,
-  IBCustomDataSet, IBUpdateSQL, IBDynamicGrid, db;
+  IBCustomDataSet, IBUpdateSQL, IBDynamicGrid, IBDateEdit, db;
 
 type
 
@@ -21,10 +21,23 @@ type
     Countries: TIBDataSet;
     BeforeDate: TDateEdit;
     AfterDate: TDateEdit;
+    DBEdit1: TDBEdit;
+    DBEdit2: TDBEdit;
+    DBEdit3: TDBEdit;
+    DBEdit4: TDBEdit;
+    DBEdit5: TDBEdit;
     DBText1: TDBText;
+    IBDateEdit1: TIBDateEdit;
     IBDynamicGrid1: TIBDynamicGrid;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
     Panel1: TPanel;
     Panel2: TPanel;
+    EmpoyeeEditorPanel: TPanel;
     TotalsQueryTOTALSALARIES: TIBBCDField;
     TotalsSource: TDataSource;
     EmployeesDEPARTMENT: TIBStringField;
@@ -41,7 +54,7 @@ type
     Button1: TButton;
     Button2: TButton;
     Button3: TButton;
-    EmplyeeSource: TDatasource;
+    EmployeeSource: TDataSource;
     IBDatabase1: TIBDatabase;
     Employees: TIBQuery;
     EmployeesDEPT_NO: TIBStringField;
@@ -219,7 +232,7 @@ end;
 procedure TForm1.FormShow(Sender: TObject);
 begin
   Countries.Active := true;
-  Employees.Active := true
+  Employees.Active := true;
 end;
 
 procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);
