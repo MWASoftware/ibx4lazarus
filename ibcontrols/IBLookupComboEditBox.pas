@@ -73,6 +73,7 @@ type
     FAutoInsert: boolean;
     FKeyPressInterval: integer;
     FOnCanAutoInsert: TCanAutoInsert;
+    FRelationName: string;
     FTimer: TTimer;
     FFiltered: boolean;
     FOnAutoInsert: TAutoInsert;
@@ -83,6 +84,7 @@ type
     procedure ActiveChanged(Sender: TObject);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
     function GetListSource: TDataSource;
+    function GetRelationNameQualifier: string;
     procedure HandleTimer(Sender: TObject);
     procedure ResetParser;
     procedure RecordChanged(Sender: TObject; aField: TField);
@@ -112,6 +114,7 @@ type
              write SetAutoCompleteText;
     property ListSource: TDataSource read GetListSource write SetListSource;
     property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
+    property RelationName: string read FRelationName write FRelationName;
     property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
     property OnCanAutoInsert: TCanAutoInsert read FOnCanAutoInsert write FOnCanAutoInsert;
   end;
@@ -171,6 +174,14 @@ end;
 function TIBLookupComboEditBox.GetListSource: TDataSource;
 begin
   Result := inherited ListSource;
+end;
+
+function TIBLookupComboEditBox.GetRelationNameQualifier: string;
+begin
+  if FRelationName <> '' then
+     Result := FRelationName + '.'
+  else
+    Result := ''
 end;
 
 procedure TIBLookupComboEditBox.ActiveChanged(Sender: TObject);
@@ -278,17 +289,23 @@ end;
 
 procedure TIBLookupComboEditBox.UpdateSQL(Sender: TObject;
   Parser: TSelectSQLParser);
+var FieldPosition: integer;
 begin
   if FFiltered then
   begin
     if cbactSearchCaseSensitive in AutoCompleteText then
-      Parser.Add2WhereClause('"' + ListField + '" Like ''' + Text + '%''')
+      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + ListField + '" Like ''' + Text + '%''')
     else
-      Parser.Add2WhereClause('Upper("' + ListField + '") Like Upper(''' + Text + '%'')');
+      Parser.Add2WhereClause(GetRelationNameQualifier + 'Upper("' + ListField + '") Like Upper(''' + Text + '%'')');
 
   end;
   if cbactSearchAscending in AutoCompleteText then
-     Parser.OrderByClause := '"' + ListField + '" ascending';
+  begin
+    FieldPosition := Parser.GetFieldPosition(ListField);
+    if FieldPosition = 0 then Exit;
+
+    Parser.OrderByClause := IntToStr(FieldPosition) + ' ascending';
+  end;
 end;
 
 procedure TIBLookupComboEditBox.HandleEnter(Data: PtrInt);

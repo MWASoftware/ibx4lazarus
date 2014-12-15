@@ -527,7 +527,12 @@ type
                                                    write FOnUpdateRecord;
   end;
 
-  TIBDataSet = class(TIBCustomDataSet)
+  TIBParserDataSet = class(TIBCustomDataSet)
+  public
+    property Parser;
+  end;
+
+  TIBDataSet = class(TIBParserDataSet)
   private
     function GetPrepared: Boolean;
 
@@ -552,7 +557,6 @@ type
     property QModify;
     property StatementType;
     property SelectStmtHandle;
-    property Parser;
     property BaseSQLSelect;
 
   published
@@ -1246,7 +1250,7 @@ end;
 
 function TIBCustomDataSet.CreateParser: TSelectSQLParser;
 begin
-  Result := TSelectSQLParser.Create(FBaseSQLSelect);
+  Result := TSelectSQLParser.Create(self,FBaseSQLSelect);
   Result.OnSQLChanging := SQLChanging
 end;
 

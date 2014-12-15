@@ -50,7 +50,7 @@ type
 
 { TIBQuery }
 
-  TIBQuery = class(TIBCustomDataSet)
+  TIBQuery = class(TIBParserDataSet)
   private
     FSQL: TStrings;
     FPrepared: Boolean;
@@ -106,7 +106,6 @@ type
     property Text: string read FText;
     property RowsAffected: Integer read GetRowsAffected;
  //   property Params: TParams read FParams write SetParamsList;
-    property Parser;
     property BaseSQLSelect;
 
   published

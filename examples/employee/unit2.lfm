@@ -1,0 +1,85 @@
+object Form2: TForm2
+  Left = 393
+  Height = 419
+  Top = 188
+  Width = 383
+  BorderStyle = bsDialog
+  Caption = 'Select Department'
+  ClientHeight = 419
+  ClientWidth = 383
+  OnClose = FormClose
+  OnShow = FormShow
+  LCLVersion = '1.2.6.0'
+  object Label1: TLabel
+    Left = 8
+    Height = 15
+    Top = 11
+    Width = 79
+    Caption = 'Departments'
+    ParentColor = False
+  end
+  object IBTreeView1: TIBTreeView
+    Left = 11
+    Height = 379
+    Top = 29
+    Width = 276
+    Anchors = [akTop, akLeft, akBottom]
+    DefaultItemHeight = 18
+    HasChildField = 'CHILDCOUNT'
+    KeyField = 'DEPT_NO'
+    ListField = 'DEPARTMENT'
+    ListSource = DataSource1
+    ParentField = 'HEAD_DEPT'
+    ReadOnly = True
+    RelationName = 'A'
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+    OnDblClick = IBTreeView1DblClick
+    Options = [tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+  end
+  object Button1: TButton
+    Left = 296
+    Height = 30
+    Top = 29
+    Width = 75
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 296
+    Height = 30
+    Top = 64
+    Width = 75
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 2
+  end
+  object Departments: TIBQuery
+    Database = Form1.IBDatabase1
+    Transaction = Form1.IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT,Count(B.DEPT_NO)'
+      'as ChildCount'
+      ' From DEPARTMENT A'
+      'Left Outer JOIN DEPARTMENT B'
+      'On A.DEPT_NO = B.HEAD_DEPT'
+      'Group by A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT'
+      'Order by Upper(A.DEPARTMENT)'
+    )
+    Params = <>
+    left = 336
+    top = 131
+  end
+  object DataSource1: TDataSource
+    DataSet = Departments
+    left = 296
+    top = 131
+  end
+end

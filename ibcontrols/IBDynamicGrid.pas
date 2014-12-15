@@ -210,6 +210,7 @@ type
     function  GetDefaultEditor(Column: Integer): TWinControl; override;
     procedure EditorTextChanged(const aCol,aRow: Integer; const aText:string); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure UpdateActive; override;
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
@@ -711,7 +712,7 @@ begin
     if (Sender = TObject(FDataLink)) and assigned(DataSource) and assigned(DataSource.DataSet)
       and (DataSource.DataSet is TIBCustomDataSet) then
     begin
-      FieldPosition := TIBCustomDataSet(DataSource.DataSet).GetFieldPosition(Columns[FLastColIndex].FieldName);
+      FieldPosition := Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
       if FieldPosition = 0 then Exit;
 
       if Descending then
@@ -854,6 +855,14 @@ begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and
      (FDataLink <> nil) and (AComponent = DataSource) then DataSource := nil;
+end;
+
+procedure TIBDynamicGrid.UpdateActive;
+begin
+  inherited UpdateActive;
+  if assigned(FDataLink) and assigned(FDataLink.DataSet) and
+     FDataLink.DataSet.Active and (FDataLink.DataSet.State = dsInsert) then
+    DataSetScrolled(nil);
 end;
 
 constructor TIBDynamicGrid.Create(TheComponent: TComponent);

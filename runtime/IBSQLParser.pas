@@ -29,7 +29,7 @@ unit IBSQLParser;
 
 interface
 
-uses Classes;
+uses Classes, DB;
 
 {
   The SQL Parser is a partial SQL Parser intended to parser a Firebird DML (Select)
@@ -86,6 +86,7 @@ type
 
   TSelectSQLParser = class
   private
+    FDataSet: TDataSet;
     FHavingClause: string;
     FOriginalHavingClause: string;
     FOnSQLChanging: TNotifyEvent;
@@ -136,20 +137,22 @@ type
     constructor Create(SQLText: TStrings; StartLine, StartIndex: integer); overload;
     procedure Changed;
   public
-    constructor Create(SQLText: TStrings); overload;
-    constructor Create(const SQLText: string); overload;
+    constructor Create(aDataSet: TDataSet; SQLText: TStrings); overload;
+    constructor Create(aDataSet: TDataSet; const SQLText: string); overload;
     destructor Destroy; override;
     procedure Add2WhereClause(const Condition: string; OrClause: boolean=false;
       IncludeUnions: boolean = false);
     procedure Add2HavingClause(const Condition: string; OrClause: boolean=false;
       IncludeUnions: boolean = false);
     procedure DropUnion;
+    function GetFieldPosition(AliasName: string): integer;
     procedure ResetWhereClause;
     procedure ResetHavingClause;
     procedure ResetOrderByClause;
     procedure Reset;
     property CTEs[Index: integer]: PCTEDef read GetCTE;
     property CTECount: integer read GetCTECount;
+    property DataSet: TDataSet read FDataSet;
     property SelectClause: string read FSelectClause write SetSelectClause;
     property FromClause: string read FFromClause write SetFromClause;
     property GroupClause: string read FGroupClause write SetGroupClause;
@@ -169,7 +172,7 @@ type
 
 implementation
 
-uses Sysutils;
+uses Sysutils, IBCustomDataSet;
 
 resourcestring
   sNoEndToThis    = 'Unterminated string';
@@ -652,18 +655,19 @@ begin
         Result := sqAs
 end;
 
-constructor TSelectSQLParser.Create(SQLText: TStrings);
+constructor TSelectSQLParser.Create(aDataSet: TDataSet; SQLText: TStrings);
 begin
+  FDataSet := aDataSet;
   Create(SQLText,0,1)
 end;
 
-constructor TSelectSQLParser.Create(const SQLText: string);
+constructor TSelectSQLParser.Create(aDataSet: TDataSet; const SQLText: string);
 var Lines: TStringList;
 begin
   Lines := TStringList.Create;
   try
     Lines.Text := SQLText;
-    Create(Lines)
+    Create(aDataSet,Lines)
   finally
     Lines.Free
   end
@@ -893,6 +897,14 @@ begin
     FUnion := nil;
     Changed
   end
+end;
+
+function TSelectSQLParser.GetFieldPosition(AliasName: string): integer;
+begin
+  if assigned(FDataSet) and (FDataSet is TIBCustomDataset) then
+    Result := TIBCustomDataset(FDataSet).GetFieldPosition(AliasName)
+  else
+    Result := 0;
 end;
 
 procedure TSelectSQLParser.ResetWhereClause;
