@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, DBGrids,
-  StdCtrls, ActnList, EditBtn, DbCtrls, ExtCtrls, IBDatabase, IBQuery,
+  StdCtrls, ActnList, EditBtn, DbCtrls, ExtCtrls, Buttons, IBDatabase, IBQuery,
   IBCustomDataSet, IBUpdateSQL, IBDynamicGrid, IBDateEdit, db;
 
 type
@@ -14,36 +14,62 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    DBEdit6: TDBEdit;
+    SelectDept: TAction;
     Button4: TButton;
     Button5: TButton;
     CancelChanges: TAction;
+    SalaryRange: TComboBox;
     CountrySource: TDataSource;
-    Countries: TIBDataSet;
     BeforeDate: TDateEdit;
     AfterDate: TDateEdit;
+    DeptsSource: TDataSource;
+    Depts: TIBQuery;
+    JobCodeSource: TDataSource;
     DBEdit1: TDBEdit;
     DBEdit2: TDBEdit;
     DBEdit3: TDBEdit;
     DBEdit4: TDBEdit;
     DBEdit5: TDBEdit;
+    CountryDBLookupCombo: TDBLookupComboBox;
     DBText1: TDBText;
+    Employees: TIBDataSet;
+    EmployeesDEPARTMENT: TIBStringField;
+    EmployeesDEPT_NO: TIBStringField;
+    EmployeesEMP_NO: TSmallintField;
+    EmployeesFIRST_NAME: TIBStringField;
+    EmployeesFULL_NAME: TIBStringField;
+    EmployeesHIRE_DATE: TDateTimeField;
+    EmployeesJOB_CODE: TIBStringField;
+    EmployeesJOB_COUNTRY: TIBStringField;
+    EmployeesJOB_GRADE: TSmallintField;
+    EmployeesLAST_NAME: TIBStringField;
+    EmployeesPHONE_EXT: TIBStringField;
+    EmployeesSALARY: TIBBCDField;
     IBDateEdit1: TIBDateEdit;
     IBDynamicGrid1: TIBDynamicGrid;
+    Countries: TIBQuery;
+    JobCodes: TIBQuery;
+    JobGradeDBComboBox: TDBComboBox;
+    JobTitleDBLookupComboBox: TDBLookupComboBox;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
+    Label9: TLabel;
     Panel1: TPanel;
     Panel2: TPanel;
     EmpoyeeEditorPanel: TPanel;
+    SpeedButton1: TSpeedButton;
     TotalsQueryTOTALSALARIES: TIBBCDField;
     TotalsSource: TDataSource;
-    EmployeesDEPARTMENT: TIBStringField;
-    EmployeesSALARY: TIBBCDField;
     TotalsQuery: TIBQuery;
-    IBUpdateSQL1: TIBUpdateSQL;
     Label1: TLabel;
     Label2: TLabel;
     SaveChanges: TAction;
@@ -56,37 +82,32 @@ type
     Button3: TButton;
     EmployeeSource: TDataSource;
     IBDatabase1: TIBDatabase;
-    Employees: TIBQuery;
-    EmployeesDEPT_NO: TIBStringField;
-    EmployeesEMP_NO: TSmallintField;
-    EmployeesFIRST_NAME: TIBStringField;
-    EmployeesFULL_NAME: TIBStringField;
-    EmployeesHIRE_DATE: TDateTimeField;
-    EmployeesJOB_CODE: TIBStringField;
-    EmployeesJOB_COUNTRY: TIBStringField;
-    EmployeesJOB_GRADE: TSmallintField;
-    EmployeesLAST_NAME: TIBStringField;
-    EmployeesPHONE_EXT: TIBStringField;
     IBTransaction1: TIBTransaction;
+    procedure EmployeesAfterPost(DataSet: TDataSet);
+    procedure SelectDeptExecute(Sender: TObject);
     procedure AddEmployeeExecute(Sender: TObject);
     procedure BeforeDateChange(Sender: TObject);
     procedure CancelChangesExecute(Sender: TObject);
+    procedure CountriesBeforeOpen(DataSet: TDataSet);
     procedure DeleteEmployeeExecute(Sender: TObject);
     procedure EditEmployeeExecute(Sender: TObject);
     procedure EditEmployeeUpdate(Sender: TObject);
+    procedure EmployeesAfterInsert(DataSet: TDataSet);
     procedure EmployeesAfterOpen(DataSet: TDataSet);
+    procedure EmployeesAfterScroll(DataSet: TDataSet);
     procedure EmployeesBeforeClose(DataSet: TDataSet);
     procedure EmployeesBeforeOpen(DataSet: TDataSet);
+    procedure EmployeesJOB_CODEChange(Sender: TField);
+    procedure EmployeesJOB_GRADEChange(Sender: TField);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
-    procedure IBDatabase1AfterConnect(Sender: TObject);
-    procedure IBDatabase1BeforeDisconnect(Sender: TObject);
     procedure EmployeesAfterDelete(DataSet: TDataSet);
     procedure EmployeesAfterTransactionEnd(Sender: TObject);
     procedure EmployeesPostError(DataSet: TDataSet; E: EDatabaseError;
       var DataAction: TDataAction);
     procedure EmployeesSALARYGetText(Sender: TField; var aText: string;
       DisplayText: Boolean);
+    procedure JobCodesBeforeOpen(DataSet: TDataSet);
     procedure SaveChangesExecute(Sender: TObject);
     procedure SaveChangesUpdate(Sender: TObject);
   private
@@ -105,7 +126,7 @@ implementation
 
 {$R *.lfm}
 
-uses Unit2, Unit3, IB;
+uses IB, Unit2;
 
 function ExtractDBException(msg: string): string;
 var Lines: TStringList;
@@ -138,6 +159,12 @@ begin
     aText := Sender.AsString
 end;
 
+procedure TForm1.JobCodesBeforeOpen(DataSet: TDataSet);
+begin
+  JobCodes.ParamByName('JOB_GRADE').AsInteger := EmployeesJOB_GRADE.AsInteger;
+  JobCodes.ParamByName('JOB_COUNTRY').AsString := EmployeesJOB_COUNTRY.AsString
+end;
+
 procedure TForm1.SaveChangesExecute(Sender: TObject);
 begin
   Employees.Transaction.Commit
@@ -152,19 +179,37 @@ procedure TForm1.Reopen(Data: PtrInt);
 begin
   with IBTransaction1 do
     if not InTransaction then StartTransaction;
-  Employees.Active := true
+  Countries.Active := true;
+  Employees.Active := true;
+  JobCodes.Active := true;
+  Depts.Active := true;
 end;
 
 procedure TForm1.AddEmployeeExecute(Sender: TObject);
-var NewEmpNo: integer;
 begin
-  if AddEmployeeDlg.ShowModal(NewEmpNo) = mrOK then
+  Employees.Append
+end;
+
+procedure TForm1.SelectDeptExecute(Sender: TObject);
+var Dept_No: string;
+begin
+  if Form2.ShowModal(Dept_No) = mrOK then
   begin
-    FDirty := true;
-    Employees.Active := false;
-    Employees.Active := true;
-    Employees.Locate('EMP_NO',NewEmpNo,[])
+    Employees.Edit;
+    EmployeesDEPT_NO.AsString := Dept_No;
+    try
+      Employees.Post;
+    except
+      Employees.Cancel;
+      raise;
+    end;
+    IBDynamicGrid1.ShowEditorPanel;
   end;
+end;
+
+procedure TForm1.EmployeesAfterPost(DataSet: TDataSet);
+begin
+  Employees.Refresh
 end;
 
 procedure TForm1.BeforeDateChange(Sender: TObject);
@@ -178,6 +223,12 @@ begin
   Employees.Transaction.Rollback
 end;
 
+procedure TForm1.CountriesBeforeOpen(DataSet: TDataSet);
+begin
+  Countries.ParamByName('JOB_GRADE').AsInteger := EmployeesJOB_GRADE.AsInteger;
+  Countries.ParamByName('JOB_CODE').AsString := EmployeesJOB_CODE.AsString
+end;
+
 procedure TForm1.DeleteEmployeeExecute(Sender: TObject);
 begin
   if MessageDlg(
@@ -188,11 +239,7 @@ end;
 
 procedure TForm1.EditEmployeeExecute(Sender: TObject);
 begin
-  if EditEmployeeDlg.ShowModal(Employees.FieldByName('Emp_No').AsInteger) = mrOK then
-  begin
-    FDirty := true;
-    Employees.Refresh
-  end;
+  IBDynamicGrid1.ShowEditorPanel;
 end;
 
 procedure TForm1.EditEmployeeUpdate(Sender: TObject);
@@ -200,50 +247,102 @@ begin
   (Sender as TAction).Enabled := Employees.Active and (Employees.RecordCount > 0)
 end;
 
+procedure TForm1.EmployeesAfterInsert(DataSet: TDataSet);
+begin
+  EmployeesJOB_COUNTRY.AsString := 'USA';
+  EmployeesJOB_CODE.AsString := 'SRep';
+  EmployeesJOB_GRADE.AsInteger := 4;
+  EmployeesSALARY.AsCurrency := 20000;
+  EmployeesFIRST_NAME.AsString := '<no name>';
+  EmployeesLAST_NAME.AsString := '<no name>';
+  EmployeesHIRE_DATE.AsDateTime := now;
+  EmployeesDEPT_NO.AsString := '000';
+  FDirty := true;
+end;
+
 procedure TForm1.EmployeesAfterOpen(DataSet: TDataSet);
 begin
   TotalsQuery.Active := true
 end;
 
+procedure TForm1.EmployeesAfterScroll(DataSet: TDataSet);
+begin
+  Countries.Active := false;
+  JobCodes.Active := false;
+  Countries.Active := true;
+  JobCodes.Active := true;
+end;
+
 procedure TForm1.EmployeesBeforeClose(DataSet: TDataSet);
 begin
+  with DataSet do
+    if State in [dsInsert,dsEdit] then Post;
   TotalsQuery.Active := false
 end;
 
 procedure TForm1.EmployeesBeforeOpen(DataSet: TDataSet);
 begin
   if BeforeDate.Date > 0 then
-     (DataSet as TIBQuery).Parser.Add2WhereClause('HIRE_DATE < :BeforeDate');
+     (DataSet as TIBParserDataSet).Parser.Add2WhereClause('HIRE_DATE < :BeforeDate');
   if AfterDate.Date > 0 then
-     (DataSet as TIBQuery).Parser.Add2WhereClause('HIRE_DATE > :AfterDate');
-  if BeforeDate.Date > 0 then
-     (DataSet as TIBQuery).ParamByName('BeforeDate').AsDateTime := BeforeDate.Date;
-  if AfterDate.Date > 0 then
-   (DataSet as TIBQuery).ParamByName('AfterDate').AsDateTime := AfterDate.Date;
+     (DataSet as TIBParserDataSet).Parser.Add2WhereClause('HIRE_DATE > :AfterDate');
 
+  case SalaryRange.ItemIndex of
+  1:
+    (DataSet as TIBParserDataSet).Parser.Add2WhereClause('Salary < 40000');
+  2:
+    (DataSet as TIBParserDataSet).Parser.Add2WhereClause('Salary >= 40000 and Salary < 100000');
+  3:
+    (DataSet as TIBParserDataSet).Parser.Add2WhereClause('Salary >= 100000');
+  end;
+
+
+
+  {Parameter value must be set after all SQL changes have been made}
+  if BeforeDate.Date > 0 then
+     (DataSet as TIBParserDataSet).ParamByName('BeforeDate').AsDateTime := BeforeDate.Date;
+  if AfterDate.Date > 0 then
+   (DataSet as TIBParserDataSet).ParamByName('AfterDate').AsDateTime := AfterDate.Date;
+
+end;
+
+procedure TForm1.EmployeesJOB_CODEChange(Sender: TField);
+begin
+  Countries.Active := false;
+  Countries.Active := true;
+end;
+
+procedure TForm1.EmployeesJOB_GRADEChange(Sender: TField);
+begin
+  Countries.Active := false;
+  JobCodes.Active := false;
+  Countries.Active := true;
+  JobCodes.Active := true;
 end;
 
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   FClosing := true;
-  IBTransaction1.Commit;
+  if IBTransaction1.InTransaction then
+    IBTransaction1.Commit;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  Countries.Active := true;
-  Employees.Active := true;
-end;
-
-procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);
-begin
-  with IBTransaction1 do
-    if not InTransaction then StartTransaction
-end;
-
-procedure TForm1.IBDatabase1BeforeDisconnect(Sender: TObject);
-begin
-  FClosing := true
+  repeat
+    try
+      IBDatabase1.Connected := true;
+    except
+     on E:EIBClientError do
+      begin
+        Close;
+        Exit
+      end;
+    On E:Exception do
+     MessageDlg(E.Message,mtError,[mbOK],0);
+    end;
+  until IBDatabase1.Connected;
+  Reopen(0);
 end;
 
 procedure TForm1.EmployeesAfterDelete(DataSet: TDataSet);

@@ -7,15 +7,14 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Unit1,  Unit2, Unit3, IBQuery;
+  Forms, Unit1, IBQuery, Unit2;
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.CreateForm(TForm1, Form1);
-  Application.CreateForm(TEditEmployeeDlg, EditEmployeeDlg);
-  Application.CreateForm(TAddEmployeeDlg, AddEmployeeDlg);
+  Application.CreateForm(TForm2, Form2);
   Application.Run;
 end.
 

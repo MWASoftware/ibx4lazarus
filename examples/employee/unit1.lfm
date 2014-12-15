@@ -118,7 +118,7 @@ object Form1: TForm1
           Title.Caption = 'First Name'
           Width = 120
           FieldName = 'FIRST_NAME'
-          AutoSizeColumn = True
+          AutoSizeColumn = False
           InitialSortColumn = False
         end      
         item
@@ -136,7 +136,7 @@ object Form1: TForm1
           Title.Caption = 'Dept'
           Width = 120
           FieldName = 'DEPARTMENT'
-          AutoSizeColumn = False
+          AutoSizeColumn = True
           InitialSortColumn = False
           AutoInsert = False
         end      
@@ -151,6 +151,7 @@ object Form1: TForm1
           ListSource = CountrySource
           ListField = 'COUNTRY'
           AutoInsert = False
+          AutoComplete = False
           AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         end      
         item
@@ -221,21 +222,21 @@ object Form1: TForm1
       end
     end
     object EmpoyeeEditorPanel: TPanel
-      Left = 56
+      Left = 8
       Height = 80
       Top = 112
-      Width = 560
+      Width = 760
       BevelOuter = bvNone
       BorderWidth = 2
       BorderStyle = bsSingle
       ClientHeight = 78
-      ClientWidth = 558
+      ClientWidth = 758
       Color = clWindow
       ParentColor = False
       TabOrder = 2
       Visible = False
       object Label3: TLabel
-        Left = 6
+        Left = 0
         Height = 15
         Top = 7
         Width = 83
@@ -243,7 +244,7 @@ object Form1: TForm1
         ParentColor = False
       end
       object DBEdit1: TDBEdit
-        Left = 96
+        Left = 90
         Height = 25
         Top = 2
         Width = 120
@@ -254,7 +255,7 @@ object Form1: TForm1
         TabOrder = 0
       end
       object Label4: TLabel
-        Left = 18
+        Left = 12
         Height = 15
         Top = 32
         Width = 64
@@ -262,7 +263,7 @@ object Form1: TForm1
         ParentColor = False
       end
       object DBEdit2: TDBEdit
-        Left = 96
+        Left = 90
         Height = 25
         Top = 24
         Width = 120
@@ -273,7 +274,7 @@ object Form1: TForm1
         TabOrder = 1
       end
       object Label5: TLabel
-        Left = 18
+        Left = 12
         Height = 15
         Top = 56
         Width = 64
@@ -281,7 +282,7 @@ object Form1: TForm1
         ParentColor = False
       end
       object DBEdit3: TDBEdit
-        Left = 96
+        Left = 90
         Height = 25
         Top = 46
         Width = 120
@@ -292,7 +293,7 @@ object Form1: TForm1
         TabOrder = 2
       end
       object Label6: TLabel
-        Left = 236
+        Left = 216
         Height = 15
         Top = 7
         Width = 77
@@ -300,7 +301,7 @@ object Form1: TForm1
         ParentColor = False
       end
       object IBDateEdit1: TIBDateEdit
-        Left = 320
+        Left = 300
         Height = 25
         Top = 2
         Width = 80
@@ -318,7 +319,7 @@ object Form1: TForm1
         DataSource = EmployeeSource
       end
       object Label7: TLabel
-        Left = 272
+        Left = 252
         Height = 15
         Top = 54
         Width = 37
@@ -326,7 +327,7 @@ object Form1: TForm1
         ParentColor = False
       end
       object DBEdit4: TDBEdit
-        Left = 320
+        Left = 300
         Height = 25
         Top = 46
         Width = 104
@@ -337,7 +338,7 @@ object Form1: TForm1
         TabOrder = 5
       end
       object Label8: TLabel
-        Left = 252
+        Left = 232
         Height = 15
         Top = 32
         Width = 61
@@ -345,7 +346,7 @@ object Form1: TForm1
         ParentColor = False
       end
       object DBEdit5: TDBEdit
-        Left = 320
+        Left = 300
         Height = 25
         Top = 24
         Width = 104
@@ -355,12 +356,140 @@ object Form1: TForm1
         MaxLength = 0
         TabOrder = 4
       end
+      object CountryDBLookupCombo: TDBLookupComboBox
+        Left = 658
+        Height = 25
+        Top = 0
+        Width = 100
+        AutoSize = False
+        DataField = 'JOB_COUNTRY'
+        DataSource = EmployeeSource
+        KeyField = 'COUNTRY'
+        ListField = 'COUNTRY'
+        ListFieldIndex = 0
+        ListSource = CountrySource
+        LookupCache = False
+        ScrollListDataset = True
+        Style = csDropDownList
+        TabOrder = 6
+      end
+      object Label9: TLabel
+        Left = 600
+        Height = 15
+        Top = 7
+        Width = 51
+        Caption = 'Location'
+        ParentColor = False
+      end
+      object Label10: TLabel
+        Left = 413
+        Height = 15
+        Top = 9
+        Width = 59
+        Caption = 'Job Grade'
+        ParentColor = False
+      end
+      object JobGradeDBComboBox: TDBComboBox
+        Left = 480
+        Height = 25
+        Top = 2
+        Width = 112
+        AutoSize = False
+        DataField = 'JOB_GRADE'
+        DataSource = EmployeeSource
+        ItemHeight = 0
+        Items.Strings = (
+          '1'
+          '2'
+          '3'
+          '4'
+          '5'
+        )
+        MaxLength = 0
+        Style = csDropDownList
+        TabOrder = 7
+      end
+      object Label11: TLabel
+        Left = 424
+        Height = 15
+        Top = 32
+        Width = 48
+        Caption = 'Job Title'
+        ParentColor = False
+      end
+      object JobTitleDBLookupComboBox: TDBLookupComboBox
+        Left = 480
+        Height = 25
+        Top = 24
+        Width = 278
+        AutoSize = False
+        DataField = 'JOB_CODE'
+        DataSource = EmployeeSource
+        KeyField = 'JOB_CODE'
+        ListField = 'JOB_TITLE'
+        ListFieldIndex = 0
+        ListSource = JobCodeSource
+        LookupCache = False
+        Style = csDropDownList
+        TabOrder = 8
+      end
+      object Label12: TLabel
+        Left = 439
+        Height = 15
+        Top = 54
+        Width = 33
+        Caption = 'Dept.'
+        ParentColor = False
+      end
+      object SpeedButton1: TSpeedButton
+        Left = 735
+        Height = 25
+        Top = 48
+        Width = 23
+        Action = SelectDept
+      end
+      object DBEdit6: TDBEdit
+        Left = 480
+        Height = 25
+        Top = 48
+        Width = 256
+        DataField = 'DEPARTMENT'
+        DataSource = EmployeeSource
+        ReadOnly = True
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 9
+      end
     end
   end
+  object Label13: TLabel
+    Left = 456
+    Height = 15
+    Top = 14
+    Width = 79
+    Caption = 'Salary Range'
+    ParentColor = False
+  end
+  object SalaryRange: TComboBox
+    Left = 544
+    Height = 25
+    Top = 8
+    Width = 272
+    ItemHeight = 0
+    ItemIndex = 0
+    Items.Strings = (
+      'None Specified'
+      'Before $40,000'
+      'Between $40,000 and $100,000'
+      'Above $100,000'
+    )
+    OnCloseUp = BeforeDateChange
+    Style = csDropDownList
+    TabOrder = 6
+    Text = 'None Specified'
+  end
   object IBDatabase1: TIBDatabase
-    Connected = False
-    AfterConnect = IBDatabase1AfterConnect
-    BeforeDisconnect = IBDatabase1BeforeDisconnect
+    Connected = True
     AllowStreamedConnected = False
     DatabaseName = 'employee'
     Params.Strings = (
@@ -370,8 +499,8 @@ object Form1: TForm1
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
-    left = 784
-    top = 224
+    left = 832
+    top = 168
   end
   object IBTransaction1: TIBTransaction
     Active = False
@@ -381,35 +510,131 @@ object Form1: TForm1
       'rec_version'
       'nowait'
     )
-    left = 784
-    top = 256
+    left = 872
+    top = 168
   end
-  object Employees: TIBQuery
+  object EmployeeSource: TDataSource
+    DataSet = Employees
+    left = 832
+    top = 336
+  end
+  object ActionList1: TActionList
+    left = 832
+    top = 416
+    object AddEmployee: TAction
+      Caption = 'Add'
+      OnExecute = AddEmployeeExecute
+    end
+    object EditEmployee: TAction
+      Caption = 'Edit'
+      OnExecute = EditEmployeeExecute
+      OnUpdate = EditEmployeeUpdate
+    end
+    object DeleteEmployee: TAction
+      Caption = 'Delete'
+      OnExecute = DeleteEmployeeExecute
+      OnUpdate = EditEmployeeUpdate
+    end
+    object SaveChanges: TAction
+      Caption = 'Save'
+      OnExecute = SaveChangesExecute
+      OnUpdate = SaveChangesUpdate
+    end
+    object CancelChanges: TAction
+      Caption = 'Cancel'
+      OnExecute = CancelChangesExecute
+      OnUpdate = SaveChangesUpdate
+    end
+    object SelectDept: TAction
+      Caption = '...'
+      OnExecute = SelectDeptExecute
+    end
+  end
+  object CountrySource: TDataSource
+    DataSet = Countries
+    left = 832
+    top = 296
+  end
+  object TotalsQuery: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BeforeOpen = EmployeesBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select sum(Salary) as TotalSalaries'
+      'From EMPLOYEE'
+    )
+    Params = <>
+    left = 872
+    top = 376
+    object TotalsQueryTOTALSALARIES: TIBBCDField
+      DisplayWidth = 18
+      FieldKind = fkData
+      FieldName = 'TOTALSALARIES'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = EmployeesSALARYGetText
+      Precision = 18
+      Currency = False
+      MaxValue = 0
+      MinValue = 0
+      Size = 2
+    end
+  end
+  object TotalsSource: TDataSource
+    DataSet = TotalsQuery
+    left = 832
+    top = 376
+  end
+  object Employees: TIBDataSet
     Database = IBDatabase1
     Transaction = IBTransaction1
     AfterDelete = EmployeesAfterDelete
     AfterEdit = EmployeesAfterDelete
+    AfterInsert = EmployeesAfterInsert
     AfterOpen = EmployeesAfterOpen
+    AfterPost = EmployeesAfterPost
+    AfterScroll = EmployeesAfterScroll
     BeforeClose = EmployeesBeforeClose
     BeforeOpen = EmployeesBeforeOpen
-    OnDeleteError = EmployeesPostError
-    OnPostError = EmployeesPostError
     BufferChunks = 1000
     CachedUpdates = False
-    GenerateParamNames = False
-    GeneratorField.Generator = 'EMP_NO_GEN'
-    GeneratorField.Field = 'EMP_NO'
-    GeneratorField.ApplyOnEvent = gaeOnNewRecord
-    SQL.Strings = (
+    DeleteSQL.Strings = (
+      'Delete From EMPLOYEE A'
+      'Where A.EMP_NO = :EMP_NO'
+    )
+    InsertSQL.Strings = (
+      'Insert Into EMPLOYEE(EMP_NO, FIRST_NAME, LAST_NAME, PHONE_EXT, HIRE_DATE, DEPT_NO, JOB_CODE, JOB_GRADE, JOB_COUNTRY, SALARY)'
+      'Values(:EMP_NO, :FIRST_NAME, :LAST_NAME, :PHONE_EXT, :HIRE_DATE, :DEPT_NO, :JOB_CODE, :JOB_GRADE, :JOB_COUNTRY, :SALARY)'
+    )
+    RefreshSQL.Strings = (
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPARTMENT'
+      ' From EMPLOYEE A'
+      'JOIN DEPARTMENT D On D.Dept_NO = A.DEPT_NO'
+      'Where A.EMP_NO = :EMP_NO'
+    )
+    SelectSQL.Strings = (
       'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPARTMENT'
       ' From EMPLOYEE A'
       'JOIN DEPARTMENT D On D.Dept_NO = A.DEPT_NO'
       'Order by LAST_NAME'
     )
-    Params = <>
-    UpdateObject = IBUpdateSQL1
+    ModifySQL.Strings = (
+      'Update EMPLOYEE A Set '#13#10'  A.DEPT_NO = :DEPT_NO,'#13#10'  A.FIRST_NAME = :FIRST_NAME,'#13#10'  A.HIRE_DATE = :HIRE_DATE,'#13#10'  A.JOB_CODE = :JOB_CODE,'#13#10'  A.JOB_COUNTRY = :JOB_COUNTRY,'#13#10'  A.JOB_GRADE = :JOB_GRADE,'#13#10'  A.LAST_NAME = :LAST_NAME,'#13#10'  A.PHONE_EXT = :PHONE_EXT,'#13#10'  A.SALARY = :SALARY'
+      'Where A.EMP_NO = :OLD_EMP_NO'
+    )
+    GeneratorField.Generator = 'EMP_NO_GEN'
+    GeneratorField.Field = 'EMP_NO'
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
     AfterTransactionEnd = EmployeesAfterTransactionEnd
-    left = 784
+    left = 872
     top = 336
     object EmployeesEMP_NO: TSmallintField
       DisplayWidth = 10
@@ -483,6 +708,7 @@ object Form1: TForm1
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = True
+      OnChange = EmployeesJOB_CODEChange
       Size = 5
     end
     object EmployeesJOB_GRADE: TSmallintField
@@ -494,6 +720,7 @@ object Form1: TForm1
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = True
+      OnChange = EmployeesJOB_GRADEChange
     end
     object EmployeesJOB_COUNTRY: TIBStringField
       DisplayWidth = 15
@@ -506,22 +733,11 @@ object Form1: TForm1
       Required = True
       Size = 15
     end
-    object EmployeesFULL_NAME: TIBStringField
-      DisplayWidth = 37
-      FieldKind = fkData
-      FieldName = 'FULL_NAME'
-      Index = 9
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = True
-      Required = False
-      Size = 37
-    end
     object EmployeesSALARY: TIBBCDField
       DisplayWidth = 18
       FieldKind = fkData
       FieldName = 'SALARY'
-      Index = 10
+      Index = 9
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -532,6 +748,17 @@ object Form1: TForm1
       MaxValue = 0
       MinValue = 0
       Size = 2
+    end
+    object EmployeesFULL_NAME: TIBStringField
+      DisplayWidth = 37
+      FieldKind = fkData
+      FieldName = 'FULL_NAME'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = True
+      Required = False
+      Size = 37
     end
     object EmployeesDEPARTMENT: TIBStringField
       DisplayWidth = 25
@@ -545,145 +772,107 @@ object Form1: TForm1
       Size = 25
     end
   end
-  object EmployeeSource: TDataSource
-    DataSet = Employees
-    left = 784
-    top = 296
-  end
-  object ActionList1: TActionList
-    left = 784
-    top = 376
-    object AddEmployee: TAction
-      Caption = 'Add'
-      OnExecute = AddEmployeeExecute
-    end
-    object EditEmployee: TAction
-      Caption = 'Edit'
-      OnExecute = EditEmployeeExecute
-      OnUpdate = EditEmployeeUpdate
-    end
-    object DeleteEmployee: TAction
-      Caption = 'Delete'
-      OnExecute = DeleteEmployeeExecute
-      OnUpdate = EditEmployeeUpdate
-    end
-    object SaveChanges: TAction
-      Caption = 'Save'
-      OnExecute = SaveChangesExecute
-      OnUpdate = SaveChangesUpdate
-    end
-    object CancelChanges: TAction
-      Caption = 'Cancel'
-      OnExecute = CancelChangesExecute
-      OnUpdate = SaveChangesUpdate
-    end
-  end
-  object IBUpdateSQL1: TIBUpdateSQL
-    RefreshSQL.Strings = (
-      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPARTMENT'
-      ' From EMPLOYEE A'
-      'JOIN DEPARTMENT D On D.Dept_NO = A.DEPT_NO'
-      'Where A.EMP_NO = :EMP_NO'
-    )
-    ModifySQL.Strings = (
-      'Update EMPLOYEE A Set '
-      '  A.DEPT_NO = :DEPT_NO,'
-      '  A.FIRST_NAME = :FIRST_NAME,'
-      '  A.HIRE_DATE = :HIRE_DATE,'
-      '  A.JOB_CODE = :JOB_CODE,'
-      '  A.JOB_COUNTRY = :JOB_COUNTRY,'
-      '  A.JOB_GRADE = :JOB_GRADE,'
-      '  A.LAST_NAME = :LAST_NAME,'
-      '  A.PHONE_EXT = :PHONE_EXT,'
-      '  A.SALARY = :SALARY'
-      'Where A.EMP_NO = :OLD_EMP_NO'
-    )
-    InsertSQL.Strings = (
-      'Insert Into EMPLOYEE(EMP_NO, FIRST_NAME, LAST_NAME, PHONE_EXT, HIRE_DATE, DEPT_NO, JOB_CODE, JOB_GRADE, JOB_COUNTRY, SALARY)'
-      'Values(:EMP_NO, :FIRST_NAME, :LAST_NAME, :PHONE_EXT, :HIRE_DATE, :DEPT_NO, :JOB_CODE, :JOB_GRADE, :JOB_COUNTRY, :SALARY)'
-    )
-    DeleteSQL.Strings = (
-      'Delete From EMPLOYEE A'
-      'Where A.EMP_NO = :EMP_NO'
-    )
-    left = 824
-    top = 336
-  end
-  object CountrySource: TDataSource
-    DataSet = Countries
-    left = 832
-    top = 224
-  end
-  object Countries: TIBDataSet
+  object Countries: TIBQuery
     Database = IBDatabase1
     Transaction = IBTransaction1
-    BufferChunks = 1000
-    CachedUpdates = False
-    DeleteSQL.Strings = (
-      'Delete From COUNTRY A'
-      'Where A.COUNTRY = :COUNTRY'
-    )
-    InsertSQL.Strings = (
-      'Insert Into COUNTRY(COUNTRY, CURRENCY)'
-      'Values(:COUNTRY, :CURRENCY)'
-    )
-    RefreshSQL.Strings = (
-      'Select A.COUNTRY, A.CURRENCY From COUNTRY A'
-      'Where A.COUNTRY = :COUNTRY'
-    )
-    SelectSQL.Strings = (
-      'Select A.COUNTRY, A.CURRENCY From COUNTRY A'
-      'JOIN JOB J On J.JOB_COUNTRY = A.COUNTRY'
-      'Where J.JOB_CODE = :JOB_CODE and J.JOB_GRADE = :JOB_GRADE'
-      'Order by 1'
-    )
-    ModifySQL.Strings = (
-      'Update COUNTRY A Set '
-      '  A.COUNTRY = :COUNTRY,'
-      '  A.CURRENCY = :CURRENCY'
-      'Where A.COUNTRY = :OLD_COUNTRY'
-    )
-    GeneratorField.ApplyOnEvent = gaeOnNewRecord
-    GenerateParamNames = False
-    DataSource = EmployeeSource
-    left = 830
-    top = 263
-  end
-  object TotalsQuery: TIBQuery
-    Database = IBDatabase1
-    Transaction = IBTransaction1
-    BeforeOpen = EmployeesBeforeOpen
+    BeforeOpen = CountriesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
-      'Select sum(Salary) as TotalSalaries'
-      'From EMPLOYEE'
+      'Select A.COUNTRY, A.CURRENCY From COUNTRY A'
+      'JOIN JOB J On J.JOB_COUNTRY = A.COUNTRY'
+      'Where J.JOB_CODE = :JOB_CODE and J.JOB_GRADE = :JOB_GRADE'
+      'Order by 1'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_CODE'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
+    left = 872
+    top = 296
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_CODE'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
+  end
+  object JobCodeSource: TDataSource
+    DataSet = JobCodes
+    left = 832
+    top = 256
+  end
+  object JobCodes: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BeforeOpen = JobCodesBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.JOB_CODE, A.JOB_TITLE From JOB A'
+      'Where JOB_COUNTRY = :JOB_COUNTRY and JOB_GRADE = :JOB_GRADE'
+      'Order by Upper(JOB_TITLE)'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_COUNTRY'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
+    left = 872
+    top = 256
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_COUNTRY'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
+  end
+  object Depts: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.DEPT_NO, A.DEPARTMENT From DEPARTMENT A'
+      ''
+      'Order by Upper(Department)'
     )
     Params = <>
-    left = 832
-    top = 416
-    object TotalsQueryTOTALSALARIES: TIBBCDField
-      DisplayWidth = 18
-      FieldKind = fkData
-      FieldName = 'TOTALSALARIES'
-      Index = 0
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      OnGetText = EmployeesSALARYGetText
-      Precision = 18
-      Currency = False
-      MaxValue = 0
-      MinValue = 0
-      Size = 2
-    end
+    left = 872
+    top = 210
   end
-  object TotalsSource: TDataSource
-    DataSet = TotalsQuery
-    left = 792
-    top = 416
+  object DeptsSource: TDataSource
+    DataSet = Depts
+    left = 832
+    top = 208
   end
 end
