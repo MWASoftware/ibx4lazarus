@@ -25,13 +25,13 @@ object Form1: TForm1
       Top = 0
       Width = 280
       Align = alLeft
+      DataField = 'DEPARTMENT'
+      DataSource = DataSource1
       DefaultItemHeight = 18
       DragMode = dmAutomatic
       Images = ImageList1
       HasChildField = 'CHILDCOUNT'
       KeyField = 'DEPT_NO'
-      ListField = 'DEPARTMENT'
-      ListSource = DataSource1
       ParentField = 'HEAD_DEPT'
       PopupMenu = PopupMenu1
       ScrollBars = ssAutoBoth
@@ -225,6 +225,7 @@ object Form1: TForm1
         DataSource = DataSource3
         Scrollbars = ssAutoVertical
         TabOrder = 1
+        ExpandEditorPanelBelowRow = False
         Descending = False
         EditorBorderStyle = bsSingle
         DefaultPositionAtEnd = False

@@ -426,7 +426,7 @@ begin
   RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'ListField', TDBDynamicGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBDynamicGrid, 'IndexFieldNames', TIBDynamicGridIndexNamesProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'KeyField', TIBTreeViewFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ListField', TIBTreeViewFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'DataField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ParentField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'HasChildField', TIBTreeViewFieldProperty);
 
@@ -459,7 +459,7 @@ end;
 procedure TIBTreeViewFieldProperty.FillValues(const Values: TStringList);
 var ListSource: TDataSource;
 begin
-  ListSource :=  TIBTreeView(GetComponent(0)).ListSource;
+  ListSource :=  TIBTreeView(GetComponent(0)).DataSource;
   LoadDataSourceFields(ListSource, Values);
 end;
 

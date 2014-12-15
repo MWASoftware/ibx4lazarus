@@ -24,11 +24,11 @@ object Form2: TForm2
     Top = 29
     Width = 276
     Anchors = [akTop, akLeft, akBottom]
+    DataField = 'DEPARTMENT'
+    DataSource = DataSource1
     DefaultItemHeight = 18
     HasChildField = 'CHILDCOUNT'
     KeyField = 'DEPT_NO'
-    ListField = 'DEPARTMENT'
-    ListSource = DataSource1
     ParentField = 'HEAD_DEPT'
     ReadOnly = True
     RelationName = 'A'
