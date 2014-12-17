@@ -447,7 +447,8 @@ procedure TDBDynamicGrid.UpdateActive;
 begin
   inherited UpdateActive;
 
-  if assigned(DataLink) and (DataLink.DataSet.State = dsInsert) then
+  if not (csLoading in ComponentState) and assigned(DataLink) and
+     assigned(DataLink.DataSet) and (DataLink.DataSet.State = dsInsert) then
      Application.QueueAsyncCall(@DoShowEditorPanel,0);
 end;
 
@@ -492,7 +493,8 @@ constructor TDBDynamicGrid.Create(TheComponent: TComponent);
 begin
   inherited Create(TheComponent);
   ScrollBars := ssAutoVertical;
-  Application.AddOnKeyDownBeforeHandler(@KeyDownHandler,false);
+  if not (csDesigning in ComponentState) then
+    Application.AddOnKeyDownBeforeHandler(@KeyDownHandler,false);
 end;
 
 destructor TDBDynamicGrid.Destroy;

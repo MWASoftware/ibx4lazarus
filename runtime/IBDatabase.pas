@@ -279,6 +279,8 @@ type
 
   TIBTransaction = class(TComponent)
   private
+    FAfterTransactionEnd: TNotifyEvent;
+    FBeforeTransactionEnd: TNotifyEvent;
     FIBLoaded: Boolean;
     FCanTimeout         : Boolean;
     FDatabases          : TList;
@@ -295,6 +297,8 @@ type
     FTRParams           : TStrings;
     FTRParamsChanged    : Boolean;
     FInEndTransaction   : boolean;
+    procedure DoBeforeTransactionEnd;
+    procedure DoAfterTransactionEnd;
     procedure EnsureNotInTransaction;
     procedure EndTransaction(Action: TTransactionAction; Force: Boolean);
     function GetDatabase(Index: Integer): TIBDatabase;
@@ -357,6 +361,10 @@ type
     property DefaultAction: TTransactionAction read FDefaultAction write SetDefaultAction default taCommit;
     property Params: TStrings read FTRParams write SetTRParams;
     property OnIdleTimer: TNotifyEvent read FOnIdleTimer write FOnIdleTimer;
+    property BeforeTransactionEnd: TNotifyEvent read FBeforeTransactionEnd
+                                             write FBeforeTransactionEnd;
+    property AfterTransactionEnd: TNotifyEvent read FAfterTransactionEnd
+                                            write FAfterTransactionEnd;
   end;
 
   { TIBBase }
@@ -1384,6 +1392,18 @@ begin
     IBError(ibxeNotInTransaction, [nil]);
 end;
 
+procedure TIBTransaction.DoBeforeTransactionEnd;
+begin
+  if Assigned(FBeforeTransactionEnd) then
+    FBeforeTransactionEnd(self);
+end;
+
+procedure TIBTransaction.DoAfterTransactionEnd;
+begin
+  if Assigned(FAfterTransactionEnd) then
+    FAfterTransactionEnd(self);
+end;
+
 procedure TIBTransaction.EnsureNotInTransaction;
 begin
   if csDesigning in ComponentState then
@@ -1470,6 +1490,7 @@ begin
         IBError(ibxeCantEndSharedTransaction, [nil]);
       for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
         SQLObjects[i].DoBeforeTransactionEnd;
+      DoBeforeTransactionEnd;
       if InTransaction then
       begin
         if HandleIsShared then
@@ -1492,6 +1513,7 @@ begin
             IBDataBaseError;
         for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
           SQLObjects[i].DoAfterTransactionEnd;
+        DoAfterTransactionEnd;
       end;
     end;
     TACommitRetaining:

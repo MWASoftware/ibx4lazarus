@@ -17,6 +17,7 @@ type
     { Private declarations }
     FDataLink: TFieldDataLink;
     FChanging: boolean;
+    FTextChangeByDataSet: boolean;
     function GetDataField: string;
     function GetDataSet: TDataSet;
     function GetDataSource: TDataSource;
@@ -114,6 +115,7 @@ end;
 procedure TIBDateEdit.HandleDataChange(Sender: TObject);
 begin
   if FChanging then Exit;
+  FTextChangeByDataSet := true;
   FChanging := true;
   try
     if (Field = nil) or Field.IsNull then
@@ -146,6 +148,12 @@ begin
   inherited TextChanged;
   if FDataLink.Active and not FChanging then
   begin
+    if FTextChangeByDataSet then
+    begin
+      FTextChangeByDataSet := false;
+      Exit;
+    end;
+
     FChanging := true;
     try
         FDataLink.Edit;
