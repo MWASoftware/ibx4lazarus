@@ -47,6 +47,9 @@ IBX Change Log  version                      (1.2-0) tba, 07 Jul 2014 14:01:07 +
 5. TIBQuery can now handle correctly queries which contain the same keyword parameter 
    repeated multiple times.
 
+6. TIBUpdateSQL will no longer return an error after a successful execution of
+   a Stored Procedure when used as an Update, Delete or Insert Statement.
+
 
 IBX Change Log  version                      (1.1-0) Mon, 07 Jul 2014 14:01:07 +0100
 

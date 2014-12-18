@@ -106,7 +106,7 @@ begin
   with Query[UpdateKind] do
   begin
     ExecQuery;
-    if RowsAffected <> 1 then IBError(ibxeUpdateFailed, [nil]);
+    if (SQLType <> SQLExecProcedure) and (RowsAffected <> 1) then IBError(ibxeUpdateFailed, [nil]);
   end;
 end;
 

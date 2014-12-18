@@ -186,8 +186,8 @@ end;
 
 procedure TIBLookupComboEditBox.ActiveChanged(Sender: TObject);
 begin
-  if assigned(ListSource) and assigned(ListSource.DataSet) and ListSource.DataSet.Active
-     and (FInserting or not FUpdating)  then
+  if (DataSource = nil) and assigned(ListSource) and assigned(ListSource.DataSet)
+     and ListSource.DataSet.Active and (FInserting or not FUpdating)  then
   begin
     begin
       if varIsNull(FLastKeyValue) and (ItemIndex = -1) then
