@@ -151,7 +151,9 @@ type
     procedure DoEditorHide; override;
     procedure DoEditorShow; override;
     procedure DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; aText: String); override;
+    Function  EditingAllowed(ACol : Integer = -1) : Boolean; override;
     procedure IndicatorClicked(Button: TMouseButton; Shift:TShiftState); virtual;
+    procedure KeyDown(var Key : Word; Shift : TShiftState); override;
     procedure Loaded; override;
     procedure DoOnResize; override;
     function CreateColumns: TGridColumns; override;
@@ -331,6 +333,11 @@ begin
     inherited DrawCellText(aCol, aRow, aRect, aState, aText);
 end;
 
+function TDBDynamicGrid.EditingAllowed(ACol: Integer): Boolean;
+begin
+  Result := (FEditorPanel <> nil) or inherited EditingAllowed(ACol);
+end;
+
 procedure TDBDynamicGrid.IndicatorClicked(Button: TMouseButton;
   Shift: TShiftState);
 begin
@@ -341,6 +348,17 @@ begin
     else
       ShowEditorPanel;
   end;
+end;
+
+procedure TDBDynamicGrid.KeyDown(var Key: Word; Shift: TShiftState);
+begin
+  if (Key = VK_F2) and (Shift = []) and assigned(FEditorPanel) then
+  begin
+    if not FEditorPanel.Visible then
+      ShowEditorPanel
+  end
+  else
+    inherited KeyDown(Key, Shift);
 end;
 
 procedure TDBDynamicGrid.DoShowEditorPanel(Data: PtrInt);

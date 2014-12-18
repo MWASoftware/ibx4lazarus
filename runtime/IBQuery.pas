@@ -392,45 +392,47 @@ procedure TIBQuery.SetParams;
 var
 i : integer;
 Buffer: Pointer;
+SQLParam: TIBXSQLVAR;
 
 begin
   for I := 0 to FParams.Count - 1 do
   begin
+    SQLParam :=  SQLParams.ByName(Params[i].Name);
     if Params[i].IsNull then
-      SQLParams[i].IsNull := True
+      SQLParam.IsNull := True
     else begin
-      SQLParams[i].IsNull := False;
+      SQLParam.IsNull := False;
       case Params[i].DataType of
         ftBytes:
         begin
           GetMem(Buffer,Params[i].GetDataSize);
           try
             Params[i].GetData(Buffer);
-            SQLParams[i].AsPointer := Buffer;
+            SQLParam.AsPointer := Buffer;
           finally
             FreeMem(Buffer);
           end;
         end;
         ftString:
-          SQLParams[i].AsString := Params[i].AsString;
+          SQLParam.AsString := Params[i].AsString;
         ftBoolean, ftSmallint, ftWord:
-          SQLParams[i].AsShort := Params[i].AsSmallInt;
+          SQLParam.AsShort := Params[i].AsSmallInt;
         ftInteger:
-          SQLParams[i].AsLong := Params[i].AsInteger;
+          SQLParam.AsLong := Params[i].AsInteger;
         ftLargeInt:
-          SQLParams[i].AsInt64 := Params[i].AsLargeInt;
+          SQLParam.AsInt64 := Params[i].AsLargeInt;
         ftFloat:
-         SQLParams[i].AsDouble := Params[i].AsFloat;
+         SQLParam.AsDouble := Params[i].AsFloat;
         ftBCD, ftCurrency:
-          SQLParams[i].AsCurrency := Params[i].AsCurrency;
+          SQLParam.AsCurrency := Params[i].AsCurrency;
         ftDate:
-          SQLParams[i].AsDate := Params[i].AsDateTime;
+          SQLParam.AsDate := Params[i].AsDateTime;
         ftTime:
-          SQLParams[i].AsTime := Params[i].AsDateTime;
+          SQLParam.AsTime := Params[i].AsDateTime;
         ftDateTime:
-          SQLParams[i].AsDateTime := Params[i].AsDateTime;
+          SQLParam.AsDateTime := Params[i].AsDateTime;
         ftBlob, ftMemo:
-          SQLParams[i].AsString := Params[i].AsString;
+          SQLParam.AsString := Params[i].AsString;
         else
           IBError(ibxeNotSupported, [nil]);
       end;

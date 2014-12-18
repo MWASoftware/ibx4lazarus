@@ -116,9 +116,7 @@ implementation
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   FClosing := true;
-  Staff.Active := false;
-  Departments.Active := false;
-  Managers.Active := false;
+  IBTransaction1.Commit;
 end;
 
 procedure TForm1.ApplicationProperties1Idle(Sender: TObject; var Done: Boolean);

@@ -1949,7 +1949,7 @@ begin
     DidActivate := ActivateTransaction;
     FBase.CheckDatabase;
     FBase.CheckTransaction;
-    if assigned(FParser) and (FParser.SQLText <> FQSelect.SQL.Text) then
+    if HasParser and (FParser.SQLText <> FQSelect.SQL.Text) then
       FQSelect.SQL.Text := FParser.SQLText;
 //   writeln( FQSelect.SQL.Text);
     if FQSelect.SQL.Text <> '' then
@@ -3764,7 +3764,7 @@ end;
 
 function TIBCustomDataSet.HasParser: boolean;
 begin
-  Result := FParser <> nil
+  Result := not (csDesigning in ComponentState) and (FParser <> nil)
 end;
 
  procedure TIBCustomDataSet.SetGenerateParamNames(AValue: Boolean);

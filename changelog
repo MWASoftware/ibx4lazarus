@@ -44,6 +44,9 @@ IBX Change Log  version                      (1.2-0) tba, 07 Jul 2014 14:01:07 +
 
 4. TIBTransaction now has events for Before and After Transaction End.
 
+5. TIBQuery can now handle correctly queries which contain the same keyword parameter 
+   repeated multiple times.
+
 
 IBX Change Log  version                      (1.1-0) Mon, 07 Jul 2014 14:01:07 +0100
 
