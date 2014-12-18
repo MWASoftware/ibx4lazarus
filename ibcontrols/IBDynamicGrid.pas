@@ -676,7 +676,10 @@ end;
 
 function TIBDynamicGrid.GetDataSource: TDataSource;
 begin
-  Result := inherited DataSource
+  if assigned(DataLink) then
+    Result := inherited DataSource
+  else
+    Result := nil;
 end;
 
 function TIBDynamicGrid.GetEditorBorderStyle: TBorderStyle;
