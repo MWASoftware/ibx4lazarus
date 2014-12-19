@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, DbCtrls, EditBtn, db, IBDatabase, IBCustomDataSet,
+  ExtCtrls, DbCtrls, EditBtn, Buttons, db, IBDatabase, IBCustomDataSet,
   IBLookupComboEditBox, IBDateEdit, IBQuery;
 
 type
@@ -15,18 +15,18 @@ type
 
   TForm1 = class(TForm)
     ApplicationProperties1: TApplicationProperties;
+    DBEdit5: TDBEdit;
     DeleteBtn: TButton;
-    DataSource2: TDataSource;
-    DataSource3: TDataSource;
-    DataSource4: TDataSource;
+    CountriesSource: TDataSource;
+    EmployeesDEPT_KEY_PATH: TIBStringField;
+    EmployeesDEPT_PATH: TIBStringField;
+    IBLookupComboEditBox2: TIBLookupComboEditBox;
+    IBLookupComboEditBox3: TIBLookupComboEditBox;
+    JobCodeSource: TDataSource;
     DBComboBox1: TDBComboBox;
     DBEdit4: TDBEdit;
-    JobCodesDBLookupComboBox: TDBLookupComboBox;
-    DBLookupComboBox2: TDBLookupComboBox;
-    LocationDBLookupComboBox: TDBLookupComboBox;
     IBDateEdit1: TIBDateEdit;
     Countries: TIBQuery;
-    Departments: TIBQuery;
     JobCodes: TIBQuery;
     Label10: TLabel;
     Label11: TLabel;
@@ -36,7 +36,7 @@ type
     Label9: TLabel;
     SaveBtn: TButton;
     CancelBtn: TButton;
-    DataSource1: TDataSource;
+    EmployeeSource: TDataSource;
     DBEdit1: TDBEdit;
     DBEdit2: TDBEdit;
     DBEdit3: TDBEdit;
@@ -61,11 +61,11 @@ type
     Label4: TLabel;
     Label5: TLabel;
     Panel1: TPanel;
+    SpeedButton1: TSpeedButton;
     procedure ApplicationProperties1Idle(Sender: TObject; var Done: Boolean);
     procedure CancelBtnClick(Sender: TObject);
-    procedure CountriesAfterOpen(DataSet: TDataSet);
     procedure CountriesBeforeOpen(DataSet: TDataSet);
-    procedure DataSource1DataChange(Sender: TObject; Field: TField);
+    procedure EmployeeSourceDataChange(Sender: TObject; Field: TField);
     procedure DBComboBox1CloseUp(Sender: TObject);
     procedure DeleteBtnClick(Sender: TObject);
     procedure EmployeesAfterDelete(DataSet: TDataSet);
@@ -82,9 +82,9 @@ type
     procedure FormShow(Sender: TObject);
     procedure IBLookupComboEditBox1CanAutoInsert(Sender: TObject;
       aText: string; var Accept: boolean);
-    procedure JobCodesAfterOpen(DataSet: TDataSet);
     procedure JobCodesBeforeOpen(DataSet: TDataSet);
     procedure SaveBtnClick(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
   private
     { private declarations }
     FDirty: boolean;
@@ -100,6 +100,8 @@ var
   Form1: TForm1;
 
 implementation
+
+uses Unit2;
 
 {$R *.lfm}
 
@@ -134,11 +136,6 @@ begin
               [aText]),mtConfirmation,[mbYes,mbNo],0) = mrYes
 end;
 
-procedure TForm1.JobCodesAfterOpen(DataSet: TDataSet);
-begin
-  JobCodesDBLookupComboBox.KeyValue := EmployeesJOB_CODE.AsString
-end;
-
 procedure TForm1.JobCodesBeforeOpen(DataSet: TDataSet);
 begin
   JobCodes.ParamByName('JOB_GRADE').AsInteger := EmployeesJOB_GRADE.AsInteger;
@@ -150,12 +147,27 @@ begin
   IBTransaction1.Commit
 end;
 
+procedure TForm1.SpeedButton1Click(Sender: TObject);
+var DeptNo: string;
+begin
+  if SelectDeptDlg.ShowModal(EmployeesDEPT_KEY_PATH.AsString,DeptNo) = mrOK then
+  begin
+    Employees.Edit;
+    EmployeesDEPT_NO.AsString := DeptNo;
+    try
+      Employees.Post;
+    except
+      Employees.Cancel;
+      raise;
+    end;
+  end;
+end;
+
 procedure TForm1.OpenDataSets(Data: PtrInt);
 begin
   FDirty := false;
   IBTransaction1.StartTransaction;
   JobCodes.Active := true;
-  Departments.Active := true;
   Countries.Active := true;
   Employees.Active := true;
 end;
@@ -174,11 +186,6 @@ begin
   IBTransaction1.Rollback
 end;
 
-procedure TForm1.CountriesAfterOpen(DataSet: TDataSet);
-begin
-  LocationDBLookupComboBox.KeyValue :=  EmployeesJOB_COUNTRY.AsString
-end;
-
 procedure TForm1.CountriesBeforeOpen(DataSet: TDataSet);
 begin
   Countries.ParamByName('JOB_GRADE').AsInteger := EmployeesJOB_GRADE.AsInteger;
@@ -187,7 +194,7 @@ begin
   FLastJobCode := EmployeesJOB_CODE.AsString;
 end;
 
-procedure TForm1.DataSource1DataChange(Sender: TObject; Field: TField);
+procedure TForm1.EmployeeSourceDataChange(Sender: TObject; Field: TField);
 begin
   if FLastJobGrade <>  EmployeesJOB_GRADE.AsInteger then
   begin

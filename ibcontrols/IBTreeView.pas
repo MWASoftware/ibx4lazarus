@@ -76,7 +76,7 @@ type
     FDataLink: TIBTreeViewDatalink;
     FHasChildField: string;
     FKeyField: string;
-    FDataField: string;
+    FTextField: string;
     FParentField: string;
     FExpandNode: TTreeNode;
     FNoAddNodeToDataset: boolean;
@@ -98,7 +98,7 @@ type
     procedure RecordChanged(Sender: TObject; Field: TField);
     procedure SetHasChildField(AValue: string);
     procedure SetKeyField(AValue: string);
-    procedure SetDataField(AValue: string);
+    procedure SetTextField(AValue: string);
     procedure SetDataSource(AValue: TDataSource);
     procedure SetParentField(AValue: string);
     function ScrollToNode(Node: TIBTreeNode): boolean;
@@ -138,7 +138,7 @@ type
     property BorderWidth;
     property Color;
     property Constraints;
-    property DataField: string read FDataField write SetDataField;
+    property TextField: string read FTextField write SetTextField;
     property DataSource: TDataSource read GetDataSource write SetDataSource;
     property DefaultItemHeight;
     property DragKind;
@@ -321,7 +321,7 @@ begin
       DataSet.First;
       while not DataSet.EOF do
       begin
-        Node := Items.AddChild(FExpandNode,DataSet.FieldByName(DataField).AsString);
+        Node := Items.AddChild(FExpandNode,DataSet.FieldByName(TextField).AsString);
         TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
         Node.HasChildren := (HasChildField = '') or (DataSet.FieldByName(HasChildField).AsInteger <> 0);
         Inc(ChildCount);
@@ -391,7 +391,7 @@ procedure TIBTreeView.RecordChanged(Sender: TObject; Field: TField);
 var Node: TIBTreeNode;
     Destination: TIBTreeNode;
 begin
-  if assigned(Field) and (Field.FieldName = DataField) then
+  if assigned(Field) and (Field.FieldName = TextField) then
   begin
     Node := FindNode(DataSet.FieldByName(KeyField).AsVariant);
     if assigned(Node) then
@@ -441,10 +441,10 @@ begin
   Reinitialise
 end;
 
-procedure TIBTreeView.SetDataField(AValue: string);
+procedure TIBTreeView.SetTextField(AValue: string);
 begin
-  if FDataField = AValue then Exit;
-  FDataField := AValue;
+  if FTextField = AValue then Exit;
+  FTextField := AValue;
   Reinitialise
 end;
 
@@ -483,7 +483,7 @@ procedure TIBTreeView.UpdateData(Sender: TObject);
 begin
   if assigned(FModifiedNode) then
   begin
-    DataSet.FieldByName(DataField).AsString := FModifiedNode.Text;
+    DataSet.FieldByName(TextField).AsString := FModifiedNode.Text;
     if FModifiedNode.Parent = nil then
       DataSet.FieldByName(ParentField).Clear
     else
@@ -536,8 +536,8 @@ begin
   begin
     DataSet.Append;
     TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
-    if (Node.Text = '') and not DataSet.FieldByName(DataField).IsNull then
-       Node.Text := DataSet.FieldByName(DataField).AsString;
+    if (Node.Text = '') and not DataSet.FieldByName(TextField).IsNull then
+       Node.Text := DataSet.FieldByName(TextField).AsString;
     FModifiedNode := TIBTreeNode(Node);
     FDataLink.UpdateRecord
   end;
@@ -578,7 +578,7 @@ end;
 function TIBTreeView.CanEdit(Node: TTreeNode): Boolean;
 begin
   Result := inherited CanEdit(Node)
-              and assigned(DataSet) and not DataSet.FieldByName(DataField).ReadOnly
+              and assigned(DataSet) and not DataSet.FieldByName(TextField).ReadOnly
 end;
 
 procedure TIBTreeView.Expand(Node: TTreeNode);

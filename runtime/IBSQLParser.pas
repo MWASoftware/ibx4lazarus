@@ -300,6 +300,10 @@ begin
             FState := stDone;
             Exit
           end;
+
+        stInSingleQuotes, stInDoubleQuotes:
+          AddToSQL(';');
+
          else
           raise Exception.Create('Unexpected ";"')
         end;

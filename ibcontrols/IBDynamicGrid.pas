@@ -779,6 +779,8 @@ end;
 
 procedure TIBDynamicGrid.RestorePosition(Data: PtrInt);
 begin
+  if AppDestroying in Application.Flags then Exit;
+
   if assigned(DataSource) and assigned(DataSource.DataSet) and DataSource.DataSet.Active then
   begin
     if Length(FBookmark) > 0 then

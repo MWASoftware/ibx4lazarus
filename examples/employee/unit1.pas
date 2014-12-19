@@ -7,7 +7,8 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, DBGrids,
   StdCtrls, ActnList, EditBtn, DbCtrls, ExtCtrls, Buttons, IBDatabase, IBQuery,
-  IBCustomDataSet, IBUpdateSQL, IBDynamicGrid, IBDateEdit, db;
+  IBCustomDataSet, IBUpdateSQL, IBDynamicGrid, IBDateEdit, IBLookupComboEditBox,
+  db;
 
 type
 
@@ -15,6 +16,10 @@ type
 
   TForm1 = class(TForm)
     DBEdit6: TDBEdit;
+    EmployeesDEPT_KEY_PATH: TIBStringField;
+    EmployeesDEPT_PATH: TIBStringField;
+    IBLookupComboEditBox1: TIBLookupComboEditBox;
+    IBLookupComboEditBox2: TIBLookupComboEditBox;
     SelectDept: TAction;
     Button4: TButton;
     Button5: TButton;
@@ -31,10 +36,8 @@ type
     DBEdit3: TDBEdit;
     DBEdit4: TDBEdit;
     DBEdit5: TDBEdit;
-    CountryDBLookupCombo: TDBLookupComboBox;
     DBText1: TDBText;
     Employees: TIBDataSet;
-    EmployeesDEPARTMENT: TIBStringField;
     EmployeesDEPT_NO: TIBStringField;
     EmployeesEMP_NO: TSmallintField;
     EmployeesFIRST_NAME: TIBStringField;
@@ -51,7 +54,6 @@ type
     Countries: TIBQuery;
     JobCodes: TIBQuery;
     JobGradeDBComboBox: TDBComboBox;
-    JobTitleDBLookupComboBox: TDBLookupComboBox;
     Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
@@ -84,6 +86,7 @@ type
     IBDatabase1: TIBDatabase;
     IBTransaction1: TIBTransaction;
     procedure EmployeesAfterPost(DataSet: TDataSet);
+    procedure JobGradeDBComboBoxCloseUp(Sender: TObject);
     procedure SelectDeptExecute(Sender: TObject);
     procedure AddEmployeeExecute(Sender: TObject);
     procedure BeforeDateChange(Sender: TObject);
@@ -193,7 +196,7 @@ end;
 procedure TForm1.SelectDeptExecute(Sender: TObject);
 var Dept_No: string;
 begin
-  if Form2.ShowModal(Dept_No) = mrOK then
+  if SelectDeptDlg.ShowModal(EmployeesDEPT_KEY_PATH.AsString,Dept_No) = mrOK then
   begin
     Employees.Edit;
     EmployeesDEPT_NO.AsString := Dept_No;
@@ -210,6 +213,11 @@ end;
 procedure TForm1.EmployeesAfterPost(DataSet: TDataSet);
 begin
   Employees.Refresh
+end;
+
+procedure TForm1.JobGradeDBComboBoxCloseUp(Sender: TObject);
+begin
+  JobGradeDBComboBox.EditingDone; //See http://bugs.freepascal.org/view.php?id=27186
 end;
 
 procedure TForm1.BeforeDateChange(Sender: TObject);
@@ -276,7 +284,13 @@ end;
 procedure TForm1.EmployeesBeforeClose(DataSet: TDataSet);
 begin
   with DataSet do
-    if State in [dsInsert,dsEdit] then Post;
+    if State in [dsInsert,dsEdit] then
+    try
+     Post;
+    except
+      Cancel;
+      raise;
+    end;
   TotalsQuery.Active := false
 end;
 

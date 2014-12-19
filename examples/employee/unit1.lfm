@@ -2,16 +2,16 @@ object Form1: TForm1
   Left = 394
   Height = 482
   Top = 322
-  Width = 931
+  Width = 963
   Caption = 'Employee List'
   ClientHeight = 482
-  ClientWidth = 931
+  ClientWidth = 963
   Color = clBackground
   OnClose = FormClose
   OnShow = FormShow
   LCLVersion = '1.2.6.0'
   object Button1: TButton
-    Left = 844
+    Left = 876
     Height = 25
     Top = 48
     Width = 75
@@ -20,7 +20,7 @@ object Form1: TForm1
     TabOrder = 0
   end
   object Button2: TButton
-    Left = 844
+    Left = 876
     Height = 25
     Top = 86
     Width = 75
@@ -29,7 +29,7 @@ object Form1: TForm1
     TabOrder = 1
   end
   object Button3: TButton
-    Left = 844
+    Left = 876
     Height = 25
     Top = 125
     Width = 75
@@ -89,11 +89,11 @@ object Form1: TForm1
     Left = 12
     Height = 434
     Top = 42
-    Width = 809
+    Width = 841
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
     ClientHeight = 434
-    ClientWidth = 809
+    ClientWidth = 841
     Color = clBackground
     ParentColor = False
     TabOrder = 5
@@ -101,22 +101,22 @@ object Form1: TForm1
       Left = 0
       Height = 384
       Top = 0
-      Width = 809
+      Width = 841
       Align = alClient
       Color = clWindow
       Columns = <      
         item
           Title.Alignment = taCenter
           Title.Caption = 'Last Name'
-          Width = 120
+          Width = 100
           FieldName = 'LAST_NAME'
-          AutoSizeColumn = True
+          AutoSizeColumn = False
           InitialSortColumn = False
         end      
         item
           Title.Alignment = taCenter
           Title.Caption = 'First Name'
-          Width = 120
+          Width = 100
           FieldName = 'FIRST_NAME'
           AutoSizeColumn = False
           InitialSortColumn = False
@@ -134,8 +134,8 @@ object Form1: TForm1
           ReadOnly = True
           Title.Alignment = taCenter
           Title.Caption = 'Dept'
-          Width = 120
-          FieldName = 'DEPARTMENT'
+          Width = 250
+          FieldName = 'DEPT_PATH'
           AutoSizeColumn = True
           InitialSortColumn = False
           AutoInsert = False
@@ -185,11 +185,11 @@ object Form1: TForm1
       Left = 0
       Height = 50
       Top = 384
-      Width = 809
+      Width = 841
       Align = alBottom
       BevelOuter = bvNone
       ClientHeight = 50
-      ClientWidth = 809
+      ClientWidth = 841
       TabOrder = 1
       object Button5: TButton
         Left = 80
@@ -225,12 +225,12 @@ object Form1: TForm1
       Left = 8
       Height = 80
       Top = 112
-      Width = 760
+      Width = 784
       BevelOuter = bvNone
       BorderWidth = 2
       BorderStyle = bsSingle
       ClientHeight = 78
-      ClientWidth = 758
+      ClientWidth = 782
       Color = clWindow
       ParentColor = False
       TabOrder = 2
@@ -321,7 +321,7 @@ object Form1: TForm1
       object Label7: TLabel
         Left = 252
         Height = 15
-        Top = 54
+        Top = 32
         Width = 37
         Caption = 'Salary'
         ParentColor = False
@@ -329,7 +329,7 @@ object Form1: TForm1
       object DBEdit4: TDBEdit
         Left = 300
         Height = 25
-        Top = 46
+        Top = 24
         Width = 104
         DataField = 'SALARY'
         DataSource = EmployeeSource
@@ -338,43 +338,28 @@ object Form1: TForm1
         TabOrder = 5
       end
       object Label8: TLabel
-        Left = 232
+        Left = 708
         Height = 15
-        Top = 32
-        Width = 61
-        Caption = 'Phone Ext'
+        Top = 54
+        Width = 24
+        Anchors = [akTop, akRight]
+        Caption = 'Ext.'
         ParentColor = False
       end
       object DBEdit5: TDBEdit
-        Left = 300
+        Left = 732
         Height = 25
-        Top = 24
-        Width = 104
+        Top = 48
+        Width = 40
         DataField = 'PHONE_EXT'
         DataSource = EmployeeSource
+        Anchors = [akTop, akRight]
         CharCase = ecNormal
         MaxLength = 0
         TabOrder = 4
       end
-      object CountryDBLookupCombo: TDBLookupComboBox
-        Left = 658
-        Height = 25
-        Top = 0
-        Width = 100
-        AutoSize = False
-        DataField = 'JOB_COUNTRY'
-        DataSource = EmployeeSource
-        KeyField = 'COUNTRY'
-        ListField = 'COUNTRY'
-        ListFieldIndex = 0
-        ListSource = CountrySource
-        LookupCache = False
-        ScrollListDataset = True
-        Style = csDropDownList
-        TabOrder = 6
-      end
       object Label9: TLabel
-        Left = 600
+        Left = 536
         Height = 15
         Top = 7
         Width = 51
@@ -393,7 +378,7 @@ object Form1: TForm1
         Left = 480
         Height = 25
         Top = 2
-        Width = 112
+        Width = 48
         AutoSize = False
         DataField = 'JOB_GRADE'
         DataSource = EmployeeSource
@@ -406,22 +391,53 @@ object Form1: TForm1
           '5'
         )
         MaxLength = 0
+        OnCloseUp = JobGradeDBComboBoxCloseUp
         Style = csDropDownList
-        TabOrder = 7
+        TabOrder = 6
       end
       object Label11: TLabel
-        Left = 424
+        Left = 536
         Height = 15
         Top = 32
         Width = 48
         Caption = 'Job Title'
         ParentColor = False
       end
-      object JobTitleDBLookupComboBox: TDBLookupComboBox
-        Left = 480
+      object Label12: TLabel
+        Left = 256
+        Height = 15
+        Top = 54
+        Width = 33
+        Caption = 'Dept.'
+        ParentColor = False
+      end
+      object SpeedButton1: TSpeedButton
+        Left = 680
+        Height = 25
+        Top = 48
+        Width = 23
+        Action = SelectDept
+        Anchors = [akTop, akRight]
+      end
+      object DBEdit6: TDBEdit
+        Left = 300
+        Height = 25
+        Top = 48
+        Width = 372
+        DataField = 'DEPT_PATH'
+        DataSource = EmployeeSource
+        ReadOnly = True
+        Anchors = [akTop, akLeft, akRight]
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 7
+      end
+      object IBLookupComboEditBox1: TIBLookupComboEditBox
+        Left = 600
         Height = 25
         Top = 24
-        Width = 278
+        Width = 172
+        Anchors = [akTop, akLeft, akRight]
         AutoSize = False
         DataField = 'JOB_CODE'
         DataSource = EmployeeSource
@@ -432,33 +448,27 @@ object Form1: TForm1
         LookupCache = False
         Style = csDropDownList
         TabOrder = 8
+        AutoInsert = False
+        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end
-      object Label12: TLabel
-        Left = 439
-        Height = 15
-        Top = 54
-        Width = 33
-        Caption = 'Dept.'
-        ParentColor = False
-      end
-      object SpeedButton1: TSpeedButton
-        Left = 735
+      object IBLookupComboEditBox2: TIBLookupComboEditBox
+        Left = 600
         Height = 25
-        Top = 48
-        Width = 23
-        Action = SelectDept
-      end
-      object DBEdit6: TDBEdit
-        Left = 480
-        Height = 25
-        Top = 48
-        Width = 256
-        DataField = 'DEPARTMENT'
+        Top = 0
+        Width = 172
+        Anchors = [akTop, akLeft, akRight]
+        AutoSize = False
+        DataField = 'JOB_COUNTRY'
         DataSource = EmployeeSource
-        ReadOnly = True
-        CharCase = ecNormal
-        MaxLength = 0
+        KeyField = 'COUNTRY'
+        ListField = 'COUNTRY'
+        ListFieldIndex = 0
+        ListSource = CountrySource
+        LookupCache = False
+        Style = csDropDownList
         TabOrder = 9
+        AutoInsert = False
+        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end
     end
   end
@@ -489,7 +499,7 @@ object Form1: TForm1
     Text = 'None Specified'
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AllowStreamedConnected = False
     DatabaseName = 'employee'
     Params.Strings = (
@@ -614,16 +624,39 @@ object Form1: TForm1
       'Values(:EMP_NO, :FIRST_NAME, :LAST_NAME, :PHONE_EXT, :HIRE_DATE, :DEPT_NO, :JOB_CODE, :JOB_GRADE, :JOB_COUNTRY, :SALARY)'
     )
     RefreshSQL.Strings = (
-      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPARTMENT'
-      ' From EMPLOYEE A'
-      'JOIN DEPARTMENT D On D.Dept_NO = A.DEPT_NO'
+      'with recursive Depts As ('
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,'
+      'cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH'
+      'From DEPARTMENT Where HEAD_DEPT is NULL '
+      'UNION ALL'
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || DEPARTMENT as DEPT_PATH,'
+      'Depts.DEPT_KEY_PATH || '';'' || DEPT_NO as DEPT_KEY_PATH'
+      'From DEPARTMENT  '
+      'JOIN Depts On HEAD_DEPT = Depts.DEPT_NO'
+      ')'
+      ''
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '
+      'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH'
+      'From EMPLOYEE A'
+      'JOIN Depts D On D.DEPT_NO = A.DEPT_NO'
       'Where A.EMP_NO = :EMP_NO'
     )
     SelectSQL.Strings = (
-      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPARTMENT'
-      ' From EMPLOYEE A'
-      'JOIN DEPARTMENT D On D.Dept_NO = A.DEPT_NO'
-      'Order by LAST_NAME'
+      'with recursive Depts As ('
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,'
+      'cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH'
+      'From DEPARTMENT Where HEAD_DEPT is NULL '
+      'UNION ALL'
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || DEPARTMENT as DEPT_PATH,'
+      'Depts.DEPT_KEY_PATH || '';'' || DEPT_NO as DEPT_KEY_PATH'
+      'From DEPARTMENT  '
+      'JOIN Depts On HEAD_DEPT = Depts.DEPT_NO'
+      ')'
+      ''
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '
+      'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH'
+      'From EMPLOYEE A'
+      'JOIN Depts D On D.DEPT_NO = A.DEPT_NO'
     )
     ModifySQL.Strings = (
       'Update EMPLOYEE A Set '#13#10'  A.DEPT_NO = :DEPT_NO,'#13#10'  A.FIRST_NAME = :FIRST_NAME,'#13#10'  A.HIRE_DATE = :HIRE_DATE,'#13#10'  A.JOB_CODE = :JOB_CODE,'#13#10'  A.JOB_COUNTRY = :JOB_COUNTRY,'#13#10'  A.JOB_GRADE = :JOB_GRADE,'#13#10'  A.LAST_NAME = :LAST_NAME,'#13#10'  A.PHONE_EXT = :PHONE_EXT,'#13#10'  A.SALARY = :SALARY'
@@ -668,6 +701,7 @@ object Form1: TForm1
       Required = True
     end
     object EmployeesPHONE_EXT: TIBStringField
+      Alignment = taRightJustify
       DisplayWidth = 4
       FieldKind = fkData
       FieldName = 'PHONE_EXT'
@@ -760,16 +794,27 @@ object Form1: TForm1
       Required = False
       Size = 37
     end
-    object EmployeesDEPARTMENT: TIBStringField
-      DisplayWidth = 25
+    object EmployeesDEPT_PATH: TIBStringField
+      DisplayWidth = 256
       FieldKind = fkData
-      FieldName = 'DEPARTMENT'
+      FieldName = 'DEPT_PATH'
       Index = 11
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = True
-      Size = 25
+      Size = 256
+    end
+    object EmployeesDEPT_KEY_PATH: TIBStringField
+      DisplayWidth = 64
+      FieldKind = fkData
+      FieldName = 'DEPT_KEY_PATH'
+      Index = 12
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 64
     end
   end
   object Countries: TIBQuery

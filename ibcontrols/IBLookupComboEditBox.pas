@@ -82,6 +82,7 @@ type
     FInserting: boolean;
     FLastKeyValue: variant;
     procedure ActiveChanged(Sender: TObject);
+    procedure DoActiveChanged(Data: PtrInt);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
     function GetListSource: TDataSource;
     function GetRelationNameQualifier: string;
@@ -186,12 +187,20 @@ end;
 
 procedure TIBLookupComboEditBox.ActiveChanged(Sender: TObject);
 begin
+  if not FInserting and not FUpdating then
+     Application.QueueAsyncCall(@DoActiveChanged,0);
+end;
+
+procedure TIBLookupComboEditBox.DoActiveChanged(Data: PtrInt);
+begin
+  if AppDestroying in Application.Flags then Exit;
+
   if (DataSource = nil) and assigned(ListSource) and assigned(ListSource.DataSet)
-     and ListSource.DataSet.Active and (FInserting or not FUpdating)  then
+     and ListSource.DataSet.Active   then
   begin
     begin
       if varIsNull(FLastKeyValue) and (ItemIndex = -1) then
-        Text := ListSource.DataSet.FieldByName(ListField).AsString
+        KeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant
       else
       begin
         KeyValue := FLastKeyValue;
@@ -200,7 +209,13 @@ begin
           Text := ListSource.DataSet.FieldByName(ListField).AsString
       end;
     end;
-  end;
+  end
+  else
+  if (DataSource <> nil) and (DataSource.DataSet.Active) then
+    KeyValue := Field.AsVariant
+  else
+    Text := '';
+  FOriginalTextValue := Text;
 end;
 
 function TIBLookupComboEditBox.GetAutoCompleteText: TComboBoxAutoCompleteText;
@@ -329,7 +344,13 @@ begin
     Accept := true;
     if assigned(FOnCanAutoInsert) then
        OnCanAutoInsert(self,Text,Accept);
-    if not Accept then Exit;
+    if not Accept then
+    begin
+      ResetParser;
+      Text := FOriginalTextValue;
+      SelectAll;
+      Exit;
+    end;
 
     FInserting := true;
     try
@@ -372,6 +393,7 @@ begin
   begin
     ResetParser;
     Text := FOriginalTextValue;
+    SelectAll;
   end
   else
   if IsEditableTextKey(Key)  and AutoComplete and (Style <> csDropDownList) and
