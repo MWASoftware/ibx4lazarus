@@ -360,6 +360,7 @@ begin
       else
         ListSource.DataSet.Append;
       FLastKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
+      FFiltered := false;
       UpdateList;
     finally
       FInserting := false

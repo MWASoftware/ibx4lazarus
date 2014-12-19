@@ -136,7 +136,7 @@ type
   private
     { Private declarations }
     FExpandEditorPanelBelowRow: boolean;
-    FEditorPanel: TCustomPanel;
+    FEditorPanel: TWinControl;
     FExpandedRow: integer;
     FResizing: boolean;
     FWeHaveFocus: boolean;
@@ -169,7 +169,7 @@ type
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy ;override;
   published
-    property EditorPanel: TCustomPanel read FEditorPanel write FEditorPanel;
+    property EditorPanel: TWinControl read FEditorPanel write FEditorPanel;
     property ExpandEditorPanelBelowRow: boolean read FExpandEditorPanelBelowRow write FExpandEditorPanelBelowRow;
  end;
 
@@ -335,7 +335,8 @@ end;
 
 function TDBDynamicGrid.EditingAllowed(ACol: Integer): Boolean;
 begin
-  Result := (FEditorPanel <> nil) or inherited EditingAllowed(ACol);
+  Result := ((FEditorPanel <> nil) and FEditorPanel.Visible)
+                                       or inherited EditingAllowed(ACol);
 end;
 
 procedure TDBDynamicGrid.IndicatorClicked(Button: TMouseButton;
