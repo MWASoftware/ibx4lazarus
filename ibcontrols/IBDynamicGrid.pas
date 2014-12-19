@@ -335,7 +335,7 @@ end;
 
 function TDBDynamicGrid.EditingAllowed(ACol: Integer): Boolean;
 begin
-  Result := ((FEditorPanel <> nil) and FEditorPanel.Visible)
+  Result := ((FEditorPanel <> nil) and (FEditorPanel = Editor))
                                        or inherited EditingAllowed(ACol);
 end;
 

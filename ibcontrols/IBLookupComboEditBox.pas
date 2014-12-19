@@ -336,6 +336,7 @@ end;
 
 procedure TIBLookupComboEditBox.CheckAndInsert;
 var Accept: boolean;
+    NewKeyValue: variant;
 begin
   if AutoInsert and (Text <> '') and assigned(ListSource) and assigned(ListSource.DataSet)
      and ListSource.DataSet.Active and (ListSource.DataSet.RecordCount = 0) then
@@ -356,15 +357,30 @@ begin
     try
       {New Value}
       if assigned(FOnAutoInsert) then
-        OnAutoInsert(self,Text)
+      begin
+        OnAutoInsert(self,Text);
+        NewKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
+      end
       else
+      begin
         ListSource.DataSet.Append;
-      FLastKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
+        if KeyField = ListField then {We have to set the key field from the current Text}
+          ListSource.DataSet.FieldByName(KeyField).AsVariant := Text;
+        {ListField is updated by UpdateLinkData method}
+        try
+          NewKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
+          ListSource.DataSet.Post;
+        except
+          ListSource.DataSet.Cancel;
+          raise;
+        end;
+      end;
       FFiltered := false;
       UpdateList;
     finally
       FInserting := false
-    end
+    end;
+    KeyValue := NewKeyValue;
   end;
 end;
 
