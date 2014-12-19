@@ -1,7 +1,7 @@
 object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
-  Left = 272
+  Left = 582
   Height = 437
-  Top = 457
+  Top = 460
   Width = 747
   ActiveControl = PageControl
   Caption = 'Select SQL Editor'
@@ -70,9 +70,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   end
   object QuoteFields: TCheckBox
     Left = 24
-    Height = 24
+    Height = 22
     Top = 400
-    Width = 127
+    Width = 125
     Caption = '&Quote Identifiers'
     TabOrder = 5
   end
@@ -81,13 +81,13 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Height = 335
     Top = 28
     Width = 232
-    ActivePage = SelectPage
-    TabIndex = 0
+    ActivePage = ExecutePage
+    TabIndex = 1
     TabOrder = 6
     object SelectPage: TTabSheet
       Caption = 'Tables'
-      ClientHeight = 298
-      ClientWidth = 224
+      ClientHeight = 302
+      ClientWidth = 226
       OnShow = SelectPageShow
       object Label1: TLabel
         Left = 7
@@ -153,8 +153,8 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     end
     object ExecutePage: TTabSheet
       Caption = 'Procedures'
-      ClientHeight = 298
-      ClientWidth = 224
+      ClientHeight = 302
+      ClientWidth = 226
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
@@ -215,7 +215,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       object SelectProcedure: TLabel
         Left = 7
         Height = 14
-        Top = 281
+        Top = 285
         Width = 126
         Anchors = [akLeft, akBottom]
         Caption = 'Is ''Select Procedure'''
@@ -229,9 +229,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   end
   object GenerateParams: TCheckBox
     Left = 24
-    Height = 24
+    Height = 22
     Top = 376
-    Width = 173
+    Width = 171
     Caption = 'Allow DSQL Placeholders'
     TabOrder = 7
   end

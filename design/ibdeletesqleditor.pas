@@ -32,7 +32,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, IBSystemTables, IBDatabase, IBCustomDataSet;
+  StdCtrls, ComCtrls, IBSystemTables, IBDatabase, IBCustomDataSet;
 
 type
 
@@ -41,18 +41,31 @@ type
   TIBDeleteSQLEditorForm = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    ExecuteOnlyIndicator: TLabel;
     GenerateBtn: TButton;
     GenerateParams: TCheckBox;
+    Label1: TLabel;
+    Label16: TLabel;
+    Label17: TLabel;
+    Label18: TLabel;
+    Label4: TLabel;
+    PageControl: TPageControl;
+    PrimaryKeyList: TListBox;
+    ProcedureNames: TComboBox;
+    ProcInputList: TListBox;
+    ProcOutputList: TListBox;
+    TableNamesCombo: TComboBox;
+    DeletePage: TTabSheet;
+    ExecutePage: TTabSheet;
     TestBtn: TButton;
     IBTransaction1: TIBTransaction;
-    Label1: TLabel;
     Label3: TLabel;
-    Label4: TLabel;
-    PrimaryKeyList: TListBox;
     QuoteFields: TCheckBox;
     SQLText: TMemo;
-    TableNamesCombo: TComboBox;
+    procedure DeletePageShow(Sender: TObject);
+    procedure ExecutePageShow(Sender: TObject);
     procedure GenerateBtnClick(Sender: TObject);
+    procedure ProcedureNamesCloseUp(Sender: TObject);
     procedure TestBtnClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure PrimaryKeyListDblClick(Sender: TObject);
@@ -73,6 +86,8 @@ var
 function EditSQL(DataSet: TIBCustomDataSet; SelectSQL: TStrings): boolean;
 
 implementation
+
+uses IBSQL;
 
 {$R *.lfm}
 
@@ -109,10 +124,50 @@ end;
 { TIBDeleteSQLEditorForm }
 
 procedure TIBDeleteSQLEditorForm.FormShow(Sender: TObject);
-var TableName: string;
+var IsProcedureName: boolean;
+    SQLType: TIBSQLTypes;
 begin
   GenerateBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
   TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
+  if Trim(SQLText.Text) <> '' then
+  begin
+    try
+      SQLType := FIBSystemTables.GetStatementType(SQLText.Text,IsProcedureName);
+    except  end;
+    if SQLType = SQLExecProcedure then
+      PageControl.ActivePage := ExecutePage
+    else
+      PageControl.ActivePage := DeletePage;
+  end
+  else
+    PageControl.ActivePage := DeletePage;
+end;
+
+procedure TIBDeleteSQLEditorForm.PrimaryKeyListDblClick(Sender: TObject);
+begin
+  SQLText.SelText := PrimaryKeyList.Items[PrimaryKeyList.ItemIndex];
+  SQLText.SetFocus
+end;
+
+procedure TIBDeleteSQLEditorForm.GenerateBtnClick(Sender: TObject);
+begin
+  if PageControl.ActivePage = ExecutePage then
+    FIBSystemTables.GenerateExecuteSQL(ProcedureNames.Text,QuoteFields.Checked,true,
+          ProcInputList.Items,ProcOutputList.Items,SQLText.Lines)
+  else
+    FIBSystemTables.GenerateDeleteSQL(TableNamesCombo.Text,QuoteFields.Checked,SQLText.Lines)
+end;
+
+procedure TIBDeleteSQLEditorForm.ProcedureNamesCloseUp(Sender: TObject);
+var ExecuteOnly: boolean;
+begin
+  FIBSystemTables.GetProcParams(ProcedureNames.Text,ExecuteOnly,ProcInputList.Items,ProcOutputList.Items);
+  ExecuteOnlyIndicator.Visible := ExecuteOnly;
+end;
+
+procedure TIBDeleteSQLEditorForm.DeletePageShow(Sender: TObject);
+var TableName: string;
+begin
   TableNamesCombo.Items.Clear;
   try
   FIBSystemTables.GetTableNames(TableNamesCombo.Items);
@@ -129,15 +184,22 @@ begin
   except {ignore} end;
 end;
 
-procedure TIBDeleteSQLEditorForm.PrimaryKeyListDblClick(Sender: TObject);
+procedure TIBDeleteSQLEditorForm.ExecutePageShow(Sender: TObject);
+var ProcName: string;
+    IsProcedureName: boolean;
 begin
-  SQLText.SelText := PrimaryKeyList.Items[PrimaryKeyList.ItemIndex];
-  SQLText.SetFocus
-end;
-
-procedure TIBDeleteSQLEditorForm.GenerateBtnClick(Sender: TObject);
-begin
-  FIBSystemTables.GenerateDeleteSQL(TableNamesCombo.Text,QuoteFields.Checked,SQLText.Lines)
+  FIBSystemTables.GetProcedureNames(ProcedureNames.Items,false);
+  if ProcedureNames.Items.Count > 0 then
+  begin
+    if (FIBSystemTables.GetStatementType(SQLText.Text,IsProcedureName) = SQLExecProcedure) or IsProcedureName then
+    begin
+      FIBSystemTables.GetTableAndColumns(SQLText.Text,ProcName,nil);
+      ProcedureNames.ItemIndex := ProcedureNames.Items.IndexOf(ProcName)
+    end
+    else
+      ProcedureNames.ItemIndex := 0;
+  end;
+  ProcedureNamesCloseUp(nil);
 end;
 
 procedure TIBDeleteSQLEditorForm.TestBtnClick(Sender: TObject);

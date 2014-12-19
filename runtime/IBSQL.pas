@@ -79,6 +79,9 @@ uses
   SysUtils, Classes, Forms, Controls, IBHeader,
   IBErrorCodes, IBExternals, DB, IB, IBDatabase, IBUtils, IBXConst;
 
+const
+   sSQLErrorSeparator = ' When Executing: ';
+
 type
   TIBSQL = class;
   TIBXSQLDA = class;
@@ -2714,7 +2717,7 @@ begin
         raise EIBInterBaseError.Create(EIBInterBaseError(E).SQLCode,
                                        EIBInterBaseError(E).IBErrorCode,
                                        EIBInterBaseError(E).Message +
-                                       ' When Executing: ' + FProcessedSQL.Text)
+                                       sSQLErrorSeparator + FProcessedSQL.Text)
       else
         raise;
     end;

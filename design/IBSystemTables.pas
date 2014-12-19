@@ -53,6 +53,7 @@ type
        UseOldValues: boolean = false);
     procedure GetProcParams(ProcName: string; ParamList: TStrings; InputParams: boolean); overload;
     function GetWord(S: string; WordNo: integer): string;
+    function RemoveSQLText(aMessage: string): string;
  public
     constructor Create;
     destructor Destroy; override;
@@ -259,6 +260,16 @@ begin
       end
     end
   end;
+end;
+
+function TIBSystemTables.RemoveSQLText(aMessage: string): string;
+var idx: integer;
+begin
+  idx := Pos(sSQLErrorSeparator,aMessage);
+  if idx > 0 then
+     Result := system.copy(aMessage,1,idx)
+  else
+    Result := aMessage;
 end;
 
 constructor TIBSystemTables.Create;
@@ -718,7 +729,7 @@ begin
     FTestSQL.Prepare;
     ShowMessage('SQL '+ GetSQLType(FTestSQL.SQLType) + ' Statement Looks OK');
   except on E:EIBError do
-      ShowMessage(E.Message);
+      ShowMessage(RemoveSQLText(E.Message));
   end;
 end;
 
