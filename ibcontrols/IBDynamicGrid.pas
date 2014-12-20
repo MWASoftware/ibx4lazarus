@@ -161,7 +161,7 @@ type
     procedure MouseDown(Button: TMouseButton; Shift:TShiftState; X,Y:Integer); override;
     procedure TopLeftChanged; override;
     procedure UpdateActive; override;
-    procedure UpdateEditorPanel;
+    procedure UpdateEditorPanelBounds;
     procedure UpdateShowing; override;
   public
     procedure HideEditorPanel;
@@ -210,13 +210,13 @@ type
     procedure MouseDown(Button: TMouseButton; Shift:TShiftState; X,Y:Integer); override;
     procedure LinkActive(Value: Boolean); override;
     function  GetDefaultEditor(Column: Integer): TWinControl; override;
-    procedure EditorTextChanged(const aCol,aRow: Integer; const aText:string); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure UpdateActive; override;
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy; override;
+    function  EditorByStyle(Style: TColumnButtonStyle): TWinControl; override;
     property LastSortColumn: integer read FLastColIndex;
   published
     { Published declarations }
@@ -278,7 +278,7 @@ begin
         end;
     end;
     PositionTotals;
-    UpdateEditorPanel;
+    UpdateEditorPanelBounds;
   finally
     FResizing := false
   end;
@@ -303,7 +303,7 @@ begin
       RowHeights[Row] := FEditorPanel.Height;
     FExpandedRow := Row;
     inherited DoEditorShow;
-    UpdateEditorPanel;  {Position Editor Panel over expanded Row}
+    UpdateEditorPanelBounds;  {Position Editor Panel over expanded Row}
     FEditorPanel.PerformTab(true);  {Select First Control}
   end
   else
@@ -459,7 +459,7 @@ end;
 procedure TDBDynamicGrid.TopLeftChanged;
 begin
   inherited TopLeftChanged;
-  UpdateEditorPanel;
+  UpdateEditorPanelBounds;
 end;
 
 procedure TDBDynamicGrid.UpdateActive;
@@ -471,7 +471,7 @@ begin
      Application.QueueAsyncCall(@DoShowEditorPanel,0);
 end;
 
-procedure TDBDynamicGrid.UpdateEditorPanel;
+procedure TDBDynamicGrid.UpdateEditorPanelBounds;
 var R: TRect;
     Dummy: integer;
 begin
@@ -518,7 +518,8 @@ end;
 
 destructor TDBDynamicGrid.Destroy;
 begin
-  Application.RemoveOnKeyDownBeforeHandler(@KeyDownHandler);
+  if not (csDesigning in ComponentState) then
+    Application.RemoveOnKeyDownBeforeHandler(@KeyDownHandler);
   inherited Destroy;
 end;
 
@@ -620,7 +621,8 @@ begin
   FAutoInsert := true;
   FAutoComplete := true;
   FAutoCompleteText := DefaultComboBoxAutoCompleteText;
-  FKeyPressInterval := 500
+  FKeyPressInterval := 500;
+  FListSource := nil;
 end;
 
 { TDynamicGridDataLink }
@@ -841,38 +843,22 @@ end;
 
 function TIBDynamicGrid.GetDefaultEditor(Column: Integer): TWinControl;
 var C: TIBDynamicGridColumn;
-    bs: TColumnButtonStyle;
 begin
-  result := nil;
-  if EditingAllowed(Col) then
+  Result := inherited GetDefaultEditor(Column);
+
+  if assigned(Result) and (Result = FDBLookupCellEditor) then
   begin
     C := ColumnFromGridColumn(Column) as TIBDynamicGridColumn;
-    if C <> nil then
-    begin
-      bs := C.ButtonStyle;
-      if (bs = cbsPickList) and assigned(C.ListSource) then
-      begin
-         FDBLookupCellEditor.ListSource := nil;
-         FDBLookupCellEditor.KeyField := C.ListField;
-         FDBLookupCellEditor.ListField := C.ListField;
-         FDBLookupCellEditor.ListSource := C.ListSource;
-         FDBLookupCellEditor.AutoInsert := C.AutoInsert;
-         FDBLookupCellEditor.AutoComplete := C.AutoComplete;
-         FDBLookupCellEditor.AutoCompleteText := C.AutoCompleteText;
-         FDBLookupCellEditor.KeyPressInterval := C.KeyPressInterval;
-         FDBLookupCellEditor.OnAutoInsert := C.OnAutoInsert;
-         Result := FDBLookupCellEditor;
-      end
-      else
-        Result := inherited GetDefaultEditor(Column);
-    end
+    FDBLookupCellEditor.ListSource := nil; {Allows change without causing an error}
+    FDBLookupCellEditor.KeyField := C.ListField;
+    FDBLookupCellEditor.ListField := C.ListField;
+    FDBLookupCellEditor.ListSource := C.ListSource;
+    FDBLookupCellEditor.AutoInsert := C.AutoInsert;
+    FDBLookupCellEditor.AutoComplete := C.AutoComplete;
+    FDBLookupCellEditor.AutoCompleteText := C.AutoCompleteText;
+    FDBLookupCellEditor.KeyPressInterval := C.KeyPressInterval;
+    FDBLookupCellEditor.OnAutoInsert := C.OnAutoInsert;
   end
-end;
-
-procedure TIBDynamicGrid.EditorTextChanged(const aCol, aRow: Integer;
-  const aText: string);
-begin
-  inherited EditorTextChanged(aCol, aRow, aText);
 end;
 
 procedure TIBDynamicGrid.Notification(AComponent: TComponent;
@@ -911,6 +897,23 @@ begin
   if assigned(FIndexFieldsList) then FIndexFieldsList.Free;
   if assigned(FDBLookupCellEditor) then FDBLookupCellEditor.Free;
   inherited Destroy;
+end;
+
+function TIBDynamicGrid.EditorByStyle(Style: TColumnButtonStyle): TWinControl;
+var C: TIBDynamicGridColumn;
+    bs: TColumnButtonStyle;
+begin
+  C := ColumnFromGridColumn(Col) as TIBDynamicGridColumn;
+  if C <> nil then
+  begin
+     bs := C.ButtonStyle;
+     if (bs in [cbsAuto,cbsPickList]) and assigned(C.ListSource) then
+     begin
+        Result := FDBLookupCellEditor;
+        Exit;
+     end;
+  end;
+  Result := inherited EditorByStyle(Style);
 end;
 
 end.

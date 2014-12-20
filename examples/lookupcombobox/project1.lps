@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="24">
+    <Units Count="25">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -17,7 +17,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="165"/>
@@ -33,7 +32,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
         <TopLine Value="42"/>
         <CursorPos X="52" Y="55"/>
@@ -44,10 +43,12 @@
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
+        <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="192"/>
-        <CursorPos X="1" Y="197"/>
+        <TopLine Value="349"/>
+        <CursorPos X="34" Y="369"/>
         <UsageCount Value="18"/>
+        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
@@ -120,10 +121,13 @@
       <Unit13>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <UnitName Value="IBDynamicGrid"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="191"/>
-        <CursorPos X="15" Y="204"/>
+        <TopLine Value="888"/>
+        <CursorPos X="37" Y="908"/>
         <UsageCount Value="17"/>
+        <Loaded Value="True"/>
       </Unit13>
       <Unit14>
         <Filename Value="../../../../lcl/editbtn.pas"/>
@@ -202,11 +206,21 @@
         <CursorPos X="9" Y="306"/>
         <UsageCount Value="11"/>
       </Unit23>
+      <Unit24>
+        <Filename Value="../../../../lcl/grids.pas"/>
+        <UnitName Value="Grids"/>
+        <EditorIndex Value="3"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="8185"/>
+        <CursorPos X="3" Y="8192"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit24>
     </Units>
     <General>
       <ActiveWindowIndexAtStart Value="0"/>
     </General>
-    <JumpHistory Count="20" HistoryIndex="19">
+    <JumpHistory Count="25" HistoryIndex="24">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="142" Column="18" TopLine="123"/>
@@ -287,6 +301,26 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="129" Column="8" TopLine="125"/>
       </Position20>
+      <Position21>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="867" Column="36" TopLine="841"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../../../lcl/grids.pas"/>
+        <Caret Line="8202" Column="21" TopLine="8185"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="220" Column="79" TopLine="198"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="213" Column="1" TopLine="200"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="867" Column="39" TopLine="841"/>
+      </Position25>
     </JumpHistory>
   </ProjectSession>
   <EditorMacros Count="0"/>

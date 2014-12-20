@@ -340,7 +340,7 @@ var Accept: boolean;
 begin
   if AutoInsert and (Text <> '') and assigned(ListSource) and assigned(ListSource.DataSet)
      and ListSource.DataSet.Active and (ListSource.DataSet.RecordCount = 0) then
-  begin
+  try
     {Is it OK to insert a new list member?}
     Accept := true;
     if assigned(FOnCanAutoInsert) then
@@ -357,16 +357,16 @@ begin
     try
       {New Value}
       if assigned(FOnAutoInsert) then
-      begin
-        OnAutoInsert(self,Text);
-        NewKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
-      end
+        {In an OnAutoInsert handler, the client is expected to insert the new
+         row into the List DataSet and to set the KeyValue property to the
+         value of the primary key of the new row.}
+        OnAutoInsert(self,Text)
       else
       begin
         ListSource.DataSet.Append;
-        if KeyField = ListField then {We have to set the key field from the current Text}
-          ListSource.DataSet.FieldByName(KeyField).AsVariant := Text;
-        {ListField is updated by UpdateLinkData method}
+        {The new KeyValue should be determined by an external generator or
+         in the "OnInsert" handler. If it is the same as the ListField, then
+         it will be set from the UpdateLinkData method}
         try
           NewKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
           ListSource.DataSet.Post;
@@ -377,10 +377,14 @@ begin
       end;
       FFiltered := false;
       UpdateList;
+      KeyValue := NewKeyValue;
     finally
       FInserting := false
     end;
-    KeyValue := NewKeyValue;
+  except
+    Text := FOriginalTextValue;
+    ResetParser;
+    raise;
   end;
 end;
 
