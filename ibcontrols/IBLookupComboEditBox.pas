@@ -113,11 +113,14 @@ type
     property AutoComplete: boolean read FAutoComplete write FAutoComplete default true;
     property AutoCompleteText: TComboBoxAutoCompleteText read GetAutoCompleteText
              write SetAutoCompleteText;
+    property ItemHeight;
+    property ItemWidth;
     property ListSource: TDataSource read GetListSource write SetListSource;
     property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
     property RelationName: string read FRelationName write FRelationName;
     property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
     property OnCanAutoInsert: TCanAutoInsert read FOnCanAutoInsert write FOnCanAutoInsert;
+    property OnMeasureItem;
   end;
 
 
@@ -356,6 +359,7 @@ begin
     FInserting := true;
     try
       {New Value}
+      FFiltered := false;
       if assigned(FOnAutoInsert) then
         {In an OnAutoInsert handler, the client is expected to insert the new
          row into the List DataSet and to set the KeyValue property to the
@@ -368,14 +372,13 @@ begin
          in the "OnInsert" handler. If it is the same as the ListField, then
          it will be set from the UpdateLinkData method}
         try
-          NewKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
           ListSource.DataSet.Post;
         except
           ListSource.DataSet.Cancel;
           raise;
         end;
+        NewKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
       end;
-      FFiltered := false;
       UpdateList;
       KeyValue := NewKeyValue;
     finally

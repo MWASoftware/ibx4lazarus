@@ -90,7 +90,9 @@ type
     FAutoComplete: boolean;
     FAutoCompleteText: TComboBoxAutoCompleteText;
     FAutoInsert: boolean;
+    FDataFieldName: string;
     FInitialSortColumn: boolean;
+    FKeyField: string;
     FKeyPressInterval: integer;
     FListField: string;
     FListSource: TDataSource;
@@ -99,7 +101,9 @@ type
   public
     constructor Create(ACollection: TCollection); override;
   published
+    property DataFieldName: string read FDataFieldName write FDataFieldName;
     property InitialSortColumn: boolean read FInitialSortColumn write SetInitialSortColumn;
+    property KeyField: string read FKeyField write FKeyField;
     property ListSource: TDataSource read FListSource write FListSource;
     property ListField: string read FListField write FListField;
     property AutoInsert: boolean read FAutoInsert write FAutoInsert default true;
@@ -138,6 +142,8 @@ type
     FExpandEditorPanelBelowRow: boolean;
     FEditorPanel: TWinControl;
     FExpandedRow: integer;
+    FOnEditorPanelHide: TNotifyEvent;
+    FOnEditorPanelShow: TNotifyEvent;
     FResizing: boolean;
     FWeHaveFocus: boolean;
     FHidingEditorPanel: boolean;
@@ -171,6 +177,8 @@ type
   published
     property EditorPanel: TWinControl read FEditorPanel write FEditorPanel;
     property ExpandEditorPanelBelowRow: boolean read FExpandEditorPanelBelowRow write FExpandEditorPanelBelowRow;
+    property OnEditorPanelShow: TNotifyEvent read FOnEditorPanelShow write FOnEditorPanelShow;
+    property OnEditorPanelHide: TNotifyEvent read FOnEditorPanelHide write FOnEditorPanelHide;
  end;
 
   { TIBDynamicGrid }
@@ -291,6 +299,8 @@ begin
     RowHeights[FExpandedRow] := DefaultRowHeight;
   FExpandedRow := -1;
   if CanFocus then SetFocus;
+  if assigned(FOnEditorPanelHide) then
+     OnEditorPanelHide(self);
 end;
 
 procedure TDBDynamicGrid.DoEditorShow;
@@ -305,6 +315,8 @@ begin
     inherited DoEditorShow;
     UpdateEditorPanelBounds;  {Position Editor Panel over expanded Row}
     FEditorPanel.PerformTab(true);  {Select First Control}
+    if assigned(FOnEditorPanelShow) then
+       OnEditorPanelShow(self);
   end
   else
     inherited DoEditorShow;
@@ -401,9 +413,9 @@ begin
     {Cancel Editor}
     if Key = VK_ESCAPE then
     begin
-      KeyDown(Key,Shift);
       if DataLink.DataSet.State in [dsInsert,dsEdit] then
-         DataLink.DataSet.Cancel
+         DataLink.DataSet.Cancel;
+      KeyDown(Key,Shift);
     end
   end
 end;
@@ -849,15 +861,27 @@ begin
   if assigned(Result) and (Result = FDBLookupCellEditor) then
   begin
     C := ColumnFromGridColumn(Column) as TIBDynamicGridColumn;
+    FDBLookupCellEditor.DataSource := nil;
     FDBLookupCellEditor.ListSource := nil; {Allows change without causing an error}
-    FDBLookupCellEditor.KeyField := C.ListField;
-    FDBLookupCellEditor.ListField := C.ListField;
-    FDBLookupCellEditor.ListSource := C.ListSource;
     FDBLookupCellEditor.AutoInsert := C.AutoInsert;
     FDBLookupCellEditor.AutoComplete := C.AutoComplete;
     FDBLookupCellEditor.AutoCompleteText := C.AutoCompleteText;
     FDBLookupCellEditor.KeyPressInterval := C.KeyPressInterval;
     FDBLookupCellEditor.OnAutoInsert := C.OnAutoInsert;
+    FDBLookupCellEditor.KeyValue := NULL;
+    if C.KeyField <> '' then
+      FDBLookupCellEditor.KeyField := C.KeyField
+    else
+      FDBLookupCellEditor.KeyField := C.ListField;
+    FDBLookupCellEditor.ListField := C.ListField;
+    FDBLookupCellEditor.DataField := C.DataFieldName;
+    FDBLookupCellEditor.ListSource := C.ListSource;
+    if C.DataFieldName <> '' then
+    begin
+      FDBLookupCellEditor.DataSource := DataSource;
+      if assigned(DataSource.DataSet) then
+        FDBLookupCellEditor.KeyValue := DataSource.DataSet.FieldByName(C.DataFieldName).AsVariant;
+    end;
   end
 end;
 
