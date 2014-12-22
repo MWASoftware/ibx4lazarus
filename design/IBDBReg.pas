@@ -422,10 +422,10 @@ begin
 
   {Firebird Data Access Controls}
   RegisterComponents(IBPalette3,[TIBDateEdit,TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView]);
-  RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'KeyField', TDBDynamicGridFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'ListField', TDBDynamicGridFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TDBLookupProperties, 'KeyField', TDBDynamicGridFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TDBLookupProperties, 'ListField', TDBDynamicGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBDynamicGrid, 'IndexFieldNames', TIBDynamicGridIndexNamesProperty);
-  RegisterPropertyEditor(TypeInfo(string), TDBDynamicGridColumn, 'DataFieldName', TDBGridFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TDBLookupProperties, 'DataFieldName', TDBGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'KeyField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'TextField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ParentField', TIBTreeViewFieldProperty);
@@ -494,11 +494,11 @@ end;
 
 procedure TDBDynamicGridFieldProperty.FillValues(const Values: TStringList);
 var
-  Column: TIBDynamicGridColumn;
+  P: TDBLookupProperties;
 begin
-  Column:=TIBDynamicGridColumn(GetComponent(0));
-  if not (Column is TIBDynamicGridColumn) then exit;
-  LoadDataSourceFields(Column.ListSource, Values);
+  P :=TDBLookupProperties(GetComponent(0));
+  if not (P is TDBLookupProperties) then exit;
+  LoadDataSourceFields(P.ListSource, Values);
 end;
 
 { TIBServiceEditor }
