@@ -357,7 +357,7 @@ implementation
 uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBIntf, IBSQL, IBSQLMonitor, IBDatabaseInfo, IBEvents,
      IBServices, IBDatabaseEdit, IBTransactionEdit,
-     IBBatchMove, DBLoginDlg, IBExtract,LResources, IBSelectSQLEditor,
+     IBBatchMove, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
      IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,

@@ -114,7 +114,7 @@ type
      function CanEdit(Node: TTreeNode): Boolean; override;
      procedure Expand(Node: TTreeNode); override;
      procedure Loaded; override;
-     procedure NodeChanged(Node: TTreeNode; ChangeEvent: TTreeNodeChangeEvent); override;
+     procedure NodeChanged(Node: TTreeNode; ChangeEvent: TTreeNodeChangeReason); override;
      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
      procedure Reinitialise;
   public
@@ -601,7 +601,7 @@ begin
 end;
 
 procedure TIBTreeView.NodeChanged(Node: TTreeNode;
-  ChangeEvent: TTreeNodeChangeEvent);
+  ChangeEvent: TTreeNodeChangeReason);
 begin
   inherited NodeChanged(Node, ChangeEvent);
   if not FNoAddNodeToDataset and not FUpdating then
