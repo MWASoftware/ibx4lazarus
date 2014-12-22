@@ -83,6 +83,8 @@ type
     property Width: integer read GetWidth write SetWidth;
   end;
 
+  TDBLookupCellEditor = class;
+
   { TIBDynamicGridColumn }
 
   TIBDynamicGridColumn = class(TDBDynamicGridColumn)
@@ -99,6 +101,7 @@ type
     FOnAutoInsert: TAutoInsert;
     procedure SetInitialSortColumn(AValue: boolean);
   public
+    procedure SetupEditor(Editor: TDBlookupCellEditor);
     constructor Create(ACollection: TCollection); override;
   published
     property DataFieldName: string read FDataFieldName write FDataFieldName;
@@ -627,6 +630,31 @@ begin
   (Grid as TIBDynamicGrid).UpdateSortColumn(self)
 end;
 
+procedure TIBDynamicGridColumn.SetupEditor(Editor: TDBlookupCellEditor);
+begin
+    Editor.DataSource := nil;
+    Editor.ListSource := nil; {Allows change without causing an error}
+    Editor.KeyValue := NULL;
+
+    {Setup Properties}
+    Editor.AutoInsert := AutoInsert;
+    Editor.AutoComplete := AutoComplete;
+    Editor.AutoCompleteText := AutoCompleteText;
+    Editor.KeyPressInterval := KeyPressInterval;
+    Editor.OnAutoInsert := OnAutoInsert;
+
+    {Setup Data Links}
+    if KeyField <> '' then
+      Editor.KeyField := KeyField
+    else
+      Editor.KeyField := ListField;
+    Editor.ListField := ListField;
+    Editor.DataField := DataFieldName;
+    if DataFieldName <> '' then
+      Editor.DataSource := TDBGrid(Grid).DataSource;
+    Editor.ListSource := ListSource;
+end;
+
 constructor TIBDynamicGridColumn.Create(ACollection: TCollection);
 begin
   inherited Create(ACollection);
@@ -861,28 +889,8 @@ begin
   if assigned(Result) and (Result = FDBLookupCellEditor) then
   begin
     C := ColumnFromGridColumn(Column) as TIBDynamicGridColumn;
-    FDBLookupCellEditor.DataSource := nil;
-    FDBLookupCellEditor.ListSource := nil; {Allows change without causing an error}
-    FDBLookupCellEditor.AutoInsert := C.AutoInsert;
-    FDBLookupCellEditor.AutoComplete := C.AutoComplete;
-    FDBLookupCellEditor.AutoCompleteText := C.AutoCompleteText;
-    FDBLookupCellEditor.KeyPressInterval := C.KeyPressInterval;
-    FDBLookupCellEditor.OnAutoInsert := C.OnAutoInsert;
-    FDBLookupCellEditor.KeyValue := NULL;
-    if C.KeyField <> '' then
-      FDBLookupCellEditor.KeyField := C.KeyField
-    else
-      FDBLookupCellEditor.KeyField := C.ListField;
-    FDBLookupCellEditor.ListField := C.ListField;
-    FDBLookupCellEditor.DataField := C.DataFieldName;
-    FDBLookupCellEditor.ListSource := C.ListSource;
-    if C.DataFieldName <> '' then
-    begin
-      FDBLookupCellEditor.DataSource := DataSource;
-      if assigned(DataSource.DataSet) then
-        FDBLookupCellEditor.KeyValue := DataSource.DataSet.FieldByName(C.DataFieldName).AsVariant;
-    end;
-  end
+    C.SetupEditor(FDBLookupCellEditor);
+  end;
 end;
 
 procedure TIBDynamicGrid.Notification(AComponent: TComponent;
