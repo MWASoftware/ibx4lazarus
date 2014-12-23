@@ -83,6 +83,8 @@ type
     property Width: integer read GetWidth write SetWidth;
   end;
 
+  TIBDynamicGridColumn = class;
+
   { TDBLookupProperties }
 
   TDBLookupProperties = class(TPersistent)
@@ -91,25 +93,41 @@ type
     FAutoCompleteText: TComboBoxAutoCompleteText;
     FAutoInsert: boolean;
     FDataFieldName: string;
+    FItemHeight: integer;
+    FItemWidth: integer;
     FKeyField: string;
     FKeyPressInterval: integer;
     FListField: string;
     FListSource: TDataSource;
     FOnAutoInsert: TAutoInsert;
+    FOnCanAutoInsert: TCanAutoInsert;
+    FOnDrawItem: TDrawItemEvent;
+    FOwner: TIBDynamicGridColumn;
+    FRelationName: string;
+    FStyle: TComboBoxStyle;
+    function GetAutoCompleteText: TComboBoxAutoCompleteText;
+    procedure SetAutoCompleteText(AValue: TComboBoxAutoCompleteText);
   public
-    constructor Create;
+    constructor Create(aOwner: TIBDynamicGridColumn);
+    property Owner: TIBDynamicGridColumn read FOwner;
   published
     property DataFieldName: string read FDataFieldName write FDataFieldName;
     property KeyField: string read FKeyField write FKeyField;
+    property ItemHeight: integer read FItemHeight write FItemHeight;
+    property ItemWidth: integer read FItemWidth write FItemWidth;
     property ListSource: TDataSource read FListSource write FListSource;
     property ListField: string read FListField write FListField;
     property AutoInsert: boolean read FAutoInsert write FAutoInsert default true;
     property AutoComplete: boolean read FAutoComplete write FAutoComplete default true;
     property AutoCompleteText: TComboBoxAutoCompleteText
-                           read FAutoCompleteText write FAutoCompleteText
+                           read GetAutoCompleteText write SetAutoCompleteText
                            default DefaultComboBoxAutoCompleteText;
     property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
+    property RelationName: string read FRelationName write FRelationName;
+    property Style: TComboBoxStyle read FStyle write FStyle default csDropDown;
     property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
+    property OnCanAutoInsert: TCanAutoInsert read FOnCanAutoInsert write FOnCanAutoInsert;
+    property OnDrawItem: TDrawItemEvent read FOnDrawItem write FOnDrawItem;
 end;
 
   TDBLookupCellEditor = class;
@@ -120,6 +138,8 @@ end;
   private
     FDBLookupProperties: TDBLookupProperties;
     FInitialSortColumn: boolean;
+    procedure DoSetupEditor(Data: PtrInt);
+    procedure DoSetDataSources(Data: PtrInt);
     procedure SetInitialSortColumn(AValue: boolean);
   public
     procedure SetupEditor(Editor: TDBlookupCellEditor);
@@ -127,7 +147,7 @@ end;
     destructor Destroy; override;
   published
     property InitialSortColumn: boolean read FInitialSortColumn write SetInitialSortColumn;
-    property DBLookupProperties: TDBLookupProperties read FDBLookupProperties;
+    property DBLookupProperties: TDBLookupProperties read FDBLookupProperties write FDBLookupProperties;
   end;
 
   { TDBLookupCellEditor }
@@ -138,8 +158,8 @@ end;
     FCol,FRow: Integer;
   protected
     procedure WndProc(var TheMessage : TLMessage); override;
-    procedure Select; override;
-    procedure Change; override;
+    procedure CloseUp; override;
+    procedure KeyDown(var Key : Word; Shift : TShiftState); override;
     procedure msg_GetValue(var Msg: TGridMessage); message GM_GETVALUE;
     procedure msg_SetGrid(var Msg: TGridMessage); message GM_SETGRID;
     procedure msg_SetValue(var Msg: TGridMessage); message GM_SETVALUE;
@@ -165,7 +185,9 @@ end;
     procedure DoShowEditorPanel(Data: PtrInt);
     procedure PositionTotals;
     procedure KeyDownHandler(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure SetEditorPanel(AValue: TWinControl);
   protected
+    procedure ChangeBounds(ALeft, ATop, AWidth, AHeight: integer; KeepBase: boolean); override;
     procedure DoEnter; override;
     procedure DoExit; override;
     procedure DoGridResize;
@@ -180,6 +202,7 @@ end;
     function CreateColumns: TGridColumns; override;
     procedure HeaderSized(IsColumn: Boolean; Index: Integer); override;
     procedure MouseDown(Button: TMouseButton; Shift:TShiftState; X,Y:Integer); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure TopLeftChanged; override;
     procedure UpdateActive; override;
     procedure UpdateEditorPanelBounds;
@@ -190,7 +213,7 @@ end;
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy ;override;
   published
-    property EditorPanel: TWinControl read FEditorPanel write FEditorPanel;
+    property EditorPanel: TWinControl read FEditorPanel write SetEditorPanel;
     property ExpandEditorPanelBelowRow: boolean read FExpandEditorPanelBelowRow write FExpandEditorPanelBelowRow;
     property OnEditorPanelShow: TNotifyEvent read FOnEditorPanelShow write FOnEditorPanelShow;
     property OnEditorPanelHide: TNotifyEvent read FOnEditorPanelHide write FOnEditorPanelHide;
@@ -259,14 +282,33 @@ uses Math, IBQuery, IBCustomDataSet, LCLType;
 
 { TDBLookupProperties }
 
-constructor TDBLookupProperties.Create;
+function TDBLookupProperties.GetAutoCompleteText: TComboBoxAutoCompleteText;
 begin
-  inherited;
+  Result := FAutoCompleteText;
+  if AutoComplete then
+     Result := Result + [cbactEnabled]
+end;
+
+procedure TDBLookupProperties.SetAutoCompleteText(
+  AValue: TComboBoxAutoCompleteText);
+begin
+  if AValue <> AutoCompleteText then
+  begin
+    FAutoComplete := cbactEnabled in AValue;
+    FAutoCompleteText := AValue - [cbactEnabled]
+  end;
+end;
+
+constructor TDBLookupProperties.Create(aOwner: TIBDynamicGridColumn);
+begin
+  inherited Create;
+  FOwner := aOwner;
   FAutoInsert := true;
   FAutoComplete := true;
   FAutoCompleteText := DefaultComboBoxAutoCompleteText;
   FKeyPressInterval := 500;
   FListSource := nil;
+  FStyle := csDropDown;
 end;
 
 { TDBDynamicGrid }
@@ -447,6 +489,23 @@ begin
   end
 end;
 
+procedure TDBDynamicGrid.SetEditorPanel(AValue: TWinControl);
+begin
+  if FEditorPanel = AValue then Exit;
+  if FEditorPanel <> nil then
+     RemoveFreeNotification(FEditorPanel);
+  FEditorPanel := AValue;
+  FreeNotification(FEditorPanel);
+end;
+
+procedure TDBDynamicGrid.ChangeBounds(ALeft, ATop, AWidth, AHeight: integer;
+  KeepBase: boolean);
+begin
+  if assigned(FEditorPanel) and FEditorPanel.Visible then
+    Application.QueueAsyncCall(@DoShowEditorPanel,0); {Restore afterwards if necessary}
+  inherited ChangeBounds(ALeft, ATop, AWidth, AHeight, KeepBase);
+end;
+
 procedure TDBDynamicGrid.DoEnter;
 begin
   inherited DoEnter;
@@ -493,6 +552,14 @@ begin
   Coord := MouseCoord(X,Y);
   if (Coord.X = 0) and (Coord.Y > 0) then
      IndicatorClicked(Button,Shift);
+end;
+
+procedure TDBDynamicGrid.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and
+     (AComponent = FEditorPanel) then FEditorPanel := nil;
 end;
 
 procedure TDBDynamicGrid.TopLeftChanged;
@@ -543,6 +610,7 @@ end;
 
 procedure TDBDynamicGrid.ShowEditorPanel;
 begin
+  if csDesigning in ComponentState then Exit;
   Editor := FEditorPanel;
   EditorMode := true;
 end;
@@ -592,18 +660,20 @@ begin
   inherited WndProc(TheMessage);
 end;
 
-procedure TDBLookupCellEditor.Select;
+procedure TDBLookupCellEditor.CloseUp;
 begin
+  UpdateData(nil); {Force Record Update}
   if FGrid<>nil then
     (FGrid as TIBDynamicGrid).EditorTextChanged(FCol, FRow, Text);
-  inherited Select;
+  inherited CloseUp;
 end;
 
-procedure TDBLookupCellEditor.Change;
+procedure TDBLookupCellEditor.KeyDown(var Key: Word; Shift: TShiftState);
 begin
-  if FGrid<>nil then
-    (FGrid as TIBDynamicGrid).EditorTextChanged(FCol, FRow, Text);
-  inherited Change;
+  if (Key = VK_TAB) and assigned(FGrid) then
+     TIBDynamicGrid(FGrid).KeyDown(Key,Shift)
+  else
+    inherited KeyDown(Key, Shift);
 end;
 
 procedure TDBLookupCellEditor.msg_GetValue(var Msg: TGridMessage);
@@ -626,8 +696,6 @@ begin
   FCol := Msg.Col;
   FRow := Msg.Row;
   Text := Msg.Value;
-  if (DataSource <> nil) and (DataField <> '') then
-     ActiveChanged(nil);
   SelStart := Length(Text);
 end;
 
@@ -652,6 +720,56 @@ end;
 
 { TIBDynamicGridColumn }
 
+procedure TIBDynamicGridColumn.DoSetupEditor(Data: PtrInt);
+var Editor: TDBlookupCellEditor;
+begin
+  if AppDestroying in Application.Flags then Exit;
+
+  Editor := TDBlookupCellEditor(Data);
+  Editor.DataSource := nil;
+  Editor.ListSource := nil; {Allows change without causing an error}
+  Editor.KeyValue := NULL;
+
+  with DBLookupProperties do
+  begin
+    {Setup Properties}
+    Editor.AutoInsert := AutoInsert;
+    Editor.AutoComplete := AutoComplete;
+    Editor.AutoCompleteText := AutoCompleteText;
+    Editor.KeyPressInterval := KeyPressInterval;
+    Editor.Style := Style;
+    Editor.ItemHeight := ItemHeight;
+    Editor.ItemWidth := ItemWidth;
+    Editor.RelationName := RelationName;
+    Editor.OnAutoInsert := OnAutoInsert;
+    Editor.OnCanAutoInsert := OnCanAutoInsert;
+    Editor.OnDrawItem := OnDrawItem;
+
+    {Setup Data Links}
+    if KeyField <> '' then
+      Editor.KeyField := KeyField
+    else
+      Editor.KeyField := ListField;
+    Editor.ListField := ListField;
+    Editor.DataField := DataFieldName;
+  end;
+  Application.QueueAsyncCall(@DoSetDataSources,PtrInt(Editor));
+end;
+
+procedure TIBDynamicGridColumn.DoSetDataSources(Data: PtrInt);
+var Editor: TDBlookupCellEditor;
+begin
+  if AppDestroying in Application.Flags then Exit;
+
+  Editor := TDBlookupCellEditor(Data);
+  with DBLookupProperties do
+  begin
+    Editor.ListSource := ListSource;
+    if DataFieldName <> '' then
+        Editor.DataSource := TDBGrid(Grid).DataSource;
+  end;
+end;
+
 procedure TIBDynamicGridColumn.SetInitialSortColumn(AValue: boolean);
 begin
   if FInitialSortColumn = AValue then Exit;
@@ -661,36 +779,13 @@ end;
 
 procedure TIBDynamicGridColumn.SetupEditor(Editor: TDBlookupCellEditor);
 begin
-    Editor.DataSource := nil;
-    Editor.ListSource := nil; {Allows change without causing an error}
-    Editor.KeyValue := NULL;
-
-    with DBLookupProperties do
-    begin
-      {Setup Properties}
-      Editor.AutoInsert := AutoInsert;
-      Editor.AutoComplete := AutoComplete;
-      Editor.AutoCompleteText := AutoCompleteText;
-      Editor.KeyPressInterval := KeyPressInterval;
-      Editor.OnAutoInsert := OnAutoInsert;
-
-      {Setup Data Links}
-      if KeyField <> '' then
-        Editor.KeyField := KeyField
-      else
-        Editor.KeyField := ListField;
-      Editor.ListField := ListField;
-      Editor.DataField := DataFieldName;
-      if DataFieldName <> '' then
-        Editor.DataSource := TDBGrid(Grid).DataSource;
-      Editor.ListSource := ListSource;
-    end;
+    Application.QueueAsyncCall(@DoSetupEditor,PtrInt(Editor));
 end;
 
 constructor TIBDynamicGridColumn.Create(ACollection: TCollection);
 begin
   inherited Create(ACollection);
-  FDBLookupProperties := TDBLookupProperties.Create;
+  FDBLookupProperties := TDBLookupProperties.Create(self);
 end;
 
 destructor TIBDynamicGridColumn.Destroy;
@@ -860,9 +955,9 @@ begin
 
   if assigned(DataSource) and assigned(DataSource.DataSet) and DataSource.DataSet.Active then
   begin
-    if Length(FBookmark) > 0 then
-      DataSource.DataSet.Locate(FIndexFieldNames,FBookmark,[])
-    else
+    if (Length(FBookmark) > 0) and
+      DataSource.DataSet.Locate(FIndexFieldNames,FBookmark,[]) then Exit;
+
     if FDefaultPositionAtEnd then
        DataSource.DataSet.Last
   end;

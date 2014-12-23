@@ -332,6 +332,13 @@ type
     procedure FillValues(const Values: TStringList); override;
   end;
 
+  { TDBLookupPropertiesGridFieldProperty }
+
+  TDBLookupPropertiesGridFieldProperty = class(TFieldProperty)
+  public
+    procedure FillValues(const Values: TStringList); override;
+  end;
+
   { TIBTreeViewFieldProperty }
 
   TIBTreeViewFieldProperty = class(TFieldProperty)
@@ -425,7 +432,7 @@ begin
   RegisterPropertyEditor(TypeInfo(string), TDBLookupProperties, 'KeyField', TDBDynamicGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TDBLookupProperties, 'ListField', TDBDynamicGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBDynamicGrid, 'IndexFieldNames', TIBDynamicGridIndexNamesProperty);
-  RegisterPropertyEditor(TypeInfo(string), TDBLookupProperties, 'DataFieldName', TDBGridFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TDBLookupProperties, 'DataFieldName', TDBLookupPropertiesGridFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'KeyField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'TextField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ParentField', TIBTreeViewFieldProperty);
@@ -453,6 +460,18 @@ begin
       end;
     end;
   end;
+end;
+
+{ TDBLookupPropertiesGridFieldProperty }
+
+procedure TDBLookupPropertiesGridFieldProperty.FillValues(
+  const Values: TStringList);
+var
+  P: TDBLookupProperties;
+begin
+  P :=TDBLookupProperties(GetComponent(0));
+  if not (P is TDBLookupProperties) then exit;
+  LoadDataSourceFields(TIBDynamicGrid(P.Owner.Grid).DataSource, Values);
 end;
 
 { TIBTreeViewFieldProperty }

@@ -81,7 +81,6 @@ type
     FUpdating: boolean;
     FInserting: boolean;
     FLastKeyValue: variant;
-    procedure ActiveChanged(Sender: TObject);
     procedure DoActiveChanged(Data: PtrInt);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
     function GetListSource: TDataSource;
@@ -97,6 +96,7 @@ type
     procedure UpdateLinkData(Sender: TObject);
   protected
     { Protected declarations }
+    procedure ActiveChanged(Sender: TObject);
     procedure CheckAndInsert;
     procedure DoEnter; override;
     procedure DoExit; override;
@@ -120,7 +120,6 @@ type
     property RelationName: string read FRelationName write FRelationName;
     property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
     property OnCanAutoInsert: TCanAutoInsert read FOnCanAutoInsert write FOnCanAutoInsert;
-    property OnMeasureItem;
   end;
 
 
@@ -214,8 +213,12 @@ begin
     end;
   end
   else
-  if (DataSource <> nil) and (DataSource.DataSet.Active) then
-    KeyValue := Field.AsVariant
+  if (DataSource <> nil) and  assigned(DataSource.DataSet) and
+                                          (DataSource.DataSet.Active) then
+  begin
+    ResetParser;
+    KeyValue := Field.AsVariant;
+  end
   else
     Text := '';
   FOriginalTextValue := Text;
