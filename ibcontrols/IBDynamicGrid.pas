@@ -177,6 +177,7 @@ end;
     FExpandEditorPanelBelowRow: boolean;
     FEditorPanel: TWinControl;
     FExpandedRow: integer;
+    FOnBeforeEditorHide: TNotifyEvent;
     FOnEditorPanelHide: TNotifyEvent;
     FOnEditorPanelShow: TNotifyEvent;
     FResizing: boolean;
@@ -195,6 +196,7 @@ end;
     procedure DoEditorShow; override;
     procedure DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; aText: String); override;
     Function  EditingAllowed(ACol : Integer = -1) : Boolean; override;
+    procedure EditorHide; override;
     procedure IndicatorClicked(Button: TMouseButton; Shift:TShiftState); virtual;
     procedure KeyDown(var Key : Word; Shift : TShiftState); override;
     procedure Loaded; override;
@@ -215,6 +217,7 @@ end;
   published
     property EditorPanel: TWinControl read FEditorPanel write SetEditorPanel;
     property ExpandEditorPanelBelowRow: boolean read FExpandEditorPanelBelowRow write FExpandEditorPanelBelowRow;
+    property OnBeforeEditorHide: TNotifyEvent read FOnBeforeEditorHide write FOnBeforeEditorHide;
     property OnEditorPanelShow: TNotifyEvent read FOnEditorPanelShow write FOnEditorPanelShow;
     property OnEditorPanelHide: TNotifyEvent read FOnEditorPanelHide write FOnEditorPanelHide;
  end;
@@ -418,6 +421,13 @@ function TDBDynamicGrid.EditingAllowed(ACol: Integer): Boolean;
 begin
   Result := ((FEditorPanel <> nil) and (FEditorPanel = Editor))
                                        or inherited EditingAllowed(ACol);
+end;
+
+procedure TDBDynamicGrid.EditorHide;
+begin
+  if assigned(FOnBeforeEditorHide) then
+    OnBeforeEditorHide(self);
+  inherited EditorHide;
 end;
 
 procedure TDBDynamicGrid.IndicatorClicked(Button: TMouseButton;
@@ -681,7 +691,7 @@ begin
   CheckAndInsert;
   Msg.Col := FCol;
   Msg.Row := FRow;
-  Msg.Value:=Text;
+  Msg.Value:= Trim(Text);
 end;
 
 procedure TDBLookupCellEditor.msg_SetGrid(var Msg: TGridMessage);

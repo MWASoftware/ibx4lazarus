@@ -2,7 +2,6 @@
 <CONFIG>
   <Package Version="4">
     <Name Value="ibexpress"/>
-    <AddToProjectUsesSection Value="True"/>
     <Author Value="Various"/>
     <CompilerOptions>
       <Version Value="11"/>
