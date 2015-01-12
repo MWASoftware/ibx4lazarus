@@ -455,6 +455,7 @@ end;
 
 procedure TDBDynamicGrid.DoShowEditorPanel(Data: PtrInt);
 begin
+  if AppDestroying in Application.Flags then Exit;
   ShowEditorPanel;
 end;
 

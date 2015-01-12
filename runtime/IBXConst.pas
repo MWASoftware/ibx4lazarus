@@ -183,8 +183,9 @@ resourcestring
   SSV5APIError = 'SV5 API API Error - %s';
   SThreadFailed = '%s Thread failed with Exception: %s';
   sFieldSizeError = 'Field %s is too small to receive the data';
+  STransactionNotEnding = 'Transaction is not being completed';
 
 implementation
 
 end.
- 
+ 

@@ -114,15 +114,10 @@ end;
 procedure TIBDateEdit.HandleDataChange(Sender: TObject);
 begin
   if FChanging then Exit;
-  FChanging := true;
-  try
     if (Field = nil) or Field.IsNull then
       Date := NullDate
     else
       Date := Field.AsDateTime
-  finally
-    FChanging := false
-  end;
 end;
 
 procedure TIBDateEdit.UpdateData(Sender: TObject);
@@ -144,7 +139,7 @@ end;
 procedure TIBDateEdit.TextChanged;
 begin
   inherited TextChanged;
-  if FDataLink.Active and not FChanging and (Date <> Field.AsDateTime) then
+  if FDataLink.Active and (Date <> Field.AsDateTime) then
   begin
     FChanging := true;
     try

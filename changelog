@@ -42,7 +42,8 @@ IBX Change Log  version                      (1.2-0) tba, 07 Jul 2014 14:01:07 +
 3. When getting a field value using FieldByName.AsVariant, an SQL_INT64 with a
    zero scale will no longer return an error. An Int64 will be returned instead.
 
-4. TIBTransaction now has events for Before and After Transaction End.
+4. TIBTransaction now has events for Before and After Transaction End and a new function
+   "GetEndAction" allowing the EndAction to be accessed by these event handlers.
 
 5. TIBQuery can now handle correctly queries which contain the same keyword parameter 
    repeated multiple times.

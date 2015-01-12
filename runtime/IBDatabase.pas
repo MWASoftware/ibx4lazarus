@@ -297,6 +297,7 @@ type
     FTRParams           : TStrings;
     FTRParamsChanged    : Boolean;
     FInEndTransaction   : boolean;
+    FEndAction          : TTransactionAction;
     procedure DoBeforeTransactionEnd;
     procedure DoAfterTransactionEnd;
     procedure EnsureNotInTransaction;
@@ -340,6 +341,7 @@ type
     function AddDatabase(db: TIBDatabase): Integer;
     function FindDatabase(db: TIBDatabase): Integer;
     function FindDefaultDatabase: TIBDatabase;
+    function GetEndAction: TTransactionAction;
     procedure RemoveDatabase(Idx: Integer);
     procedure RemoveDatabases;
     procedure CheckDatabasesInList;
@@ -1480,6 +1482,7 @@ begin
   CheckInTransaction;
   if FInEndTransaction then Exit;
   FInEndTransaction := true;
+  FEndAction := Action;
   try
   case Action of
     TARollback, TACommit:
@@ -1488,9 +1491,9 @@ begin
          (Action <> FDefaultAction) and
          (not Force) then
         IBError(ibxeCantEndSharedTransaction, [nil]);
+      DoBeforeTransactionEnd;
       for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
         SQLObjects[i].DoBeforeTransactionEnd;
-      DoBeforeTransactionEnd;
       if InTransaction then
       begin
         if HandleIsShared then
@@ -1602,6 +1605,14 @@ begin
         break;
       end;
   end;
+end;
+
+function TIBTransaction.GetEndAction: TTransactionAction;
+begin
+  if FInEndTransaction then
+     Result := FEndAction
+  else
+     IBError(ibxeIB60feature, [nil])
 end;
 
 

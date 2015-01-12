@@ -187,7 +187,8 @@ type
     ibxeTPBConstantUnknownEx,
     ibxeSV5APIError,
     ibxeThreadFailed,
-    ibxeFieldSizeError
+    ibxeFieldSizeError,
+    ibxTransactionNotEnding
     );
 
   TStatusVector              = array[0..19] of ISC_STATUS;
@@ -322,7 +323,8 @@ const
     STPBConstantUnknownEx,
     SSV5APIError,
     SThreadFailed,
-    SFieldSizeError
+    SFieldSizeError,
+    STransactionNotEnding
   );
 
 var
