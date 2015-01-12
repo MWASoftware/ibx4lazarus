@@ -214,7 +214,7 @@ begin
   end
   else
   if (DataSource <> nil) and  assigned(DataSource.DataSet) and
-                                          (DataSource.DataSet.Active) then
+                   (DataSource.DataSet.Active) and (DataField <> '') then
   begin
     ResetParser;
     KeyValue := Field.AsVariant;

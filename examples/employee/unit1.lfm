@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 394
+  Left = 427
   Height = 482
-  Top = 322
+  Top = 328
   Width = 963
   Caption = 'Employee List'
   ClientHeight = 482
@@ -112,6 +112,9 @@ object Form1: TForm1
           FieldName = 'LAST_NAME'
           AutoSizeColumn = False
           InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         end      
         item
           Title.Alignment = taCenter
@@ -120,6 +123,9 @@ object Form1: TForm1
           FieldName = 'FIRST_NAME'
           AutoSizeColumn = False
           InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         end      
         item
           Alignment = taCenter
@@ -129,6 +135,9 @@ object Form1: TForm1
           FieldName = 'EMP_NO'
           AutoSizeColumn = False
           InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         end      
         item
           ReadOnly = True
@@ -138,7 +147,9 @@ object Form1: TForm1
           FieldName = 'DEPT_PATH'
           AutoSizeColumn = True
           InitialSortColumn = False
-          AutoInsert = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         end      
         item
           ButtonStyle = cbsPickList
@@ -148,11 +159,12 @@ object Form1: TForm1
           FieldName = 'JOB_COUNTRY'
           AutoSizeColumn = False
           InitialSortColumn = False
-          ListSource = CountrySource
-          ListField = 'COUNTRY'
-          AutoInsert = False
-          AutoComplete = False
-          AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.ListSource = CountrySource
+          DBLookupProperties.ListField = 'COUNTRY'
+          DBLookupProperties.AutoInsert = False
+          DBLookupProperties.AutoComplete = False
         end      
         item
           Title.Alignment = taCenter
@@ -161,6 +173,9 @@ object Form1: TForm1
           FieldName = 'HIRE_DATE'
           AutoSizeColumn = False
           InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         end      
         item
           Title.Alignment = taCenter
@@ -170,6 +185,9 @@ object Form1: TForm1
           ColumnTotalsControl = DBText1
           AutoSizeColumn = False
           InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         end>
       DataSource = EmployeeSource
       Scrollbars = ssAutoBoth
@@ -450,6 +468,7 @@ object Form1: TForm1
         TabOrder = 8
         AutoInsert = False
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        ItemHeight = 0
       end
       object IBLookupComboEditBox2: TIBLookupComboEditBox
         Left = 600
@@ -469,6 +488,7 @@ object Form1: TForm1
         TabOrder = 9
         AutoInsert = False
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        ItemHeight = 0
       end
     end
   end
@@ -499,7 +519,7 @@ object Form1: TForm1
     Text = 'None Specified'
   end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AllowStreamedConnected = False
     DatabaseName = 'employee'
     Params.Strings = (

@@ -65,7 +65,7 @@
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="218"/>
-        <CursorPos X="26" Y="226"/>
+        <CursorPos X="13" Y="222"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -312,13 +312,13 @@
       <Unit32>
         <Filename Value="unit1.lfm"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="1" Y="1"/>
+        <TopLine Value="224"/>
+        <CursorPos X="30" Y="224"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <WindowIndex Value="0"/>
-          <TopLine Value="224"/>
-          <CursorPos X="30" Y="224"/>
+          <TopLine Value="172"/>
+          <CursorPos X="97" Y="141"/>
         </ExtraEditor1>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
@@ -443,12 +443,10 @@
       <Unit48>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <UnitName Value="IBDynamicGrid"/>
-        <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
         <TopLine Value="147"/>
         <CursorPos X="22" Y="160"/>
         <UsageCount Value="27"/>
-        <Loaded Value="True"/>
       </Unit48>
       <Unit49>
         <Filename Value="../../design/ibselectsqleditor.pas"/>
