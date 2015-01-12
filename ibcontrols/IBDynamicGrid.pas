@@ -497,6 +497,10 @@ begin
          DataLink.DataSet.Cancel;
       KeyDown(Key,Shift);
     end
+    {save}
+    else
+    if Key = VK_F2 then
+       HideEditorPanel;
   end
 end;
 
