@@ -183,6 +183,7 @@ end;
     FResizing: boolean;
     FWeHaveFocus: boolean;
     FHidingEditorPanel: boolean;
+    FAllowHide: boolean;
     procedure DoShowEditorPanel(Data: PtrInt);
     procedure PositionTotals;
     procedure KeyDownHandler(Sender: TObject; var Key: Word; Shift: TShiftState);
