@@ -53,6 +53,7 @@ type
 
   TOnColumnHeaderClick = procedure(Sender: TObject; var ColIndex: integer) of object;
   TOnUpdateSortOrder = procedure (Sender: TObject; ColIndex: integer; var OrderBy: string) of Object;
+  TKeyDownHandler = procedure (Sender: TObject; var Key: Word;  Shift: TShiftState; var Done: boolean) of object;
 
   { TDynamicGridDataLink }
 
@@ -180,6 +181,7 @@ end;
     FOnBeforeEditorHide: TNotifyEvent;
     FOnEditorPanelHide: TNotifyEvent;
     FOnEditorPanelShow: TNotifyEvent;
+    FOnKeyDownHander: TKeyDownHandler;
     FResizing: boolean;
     FWeHaveFocus: boolean;
     FHidingEditorPanel: boolean;
@@ -221,6 +223,7 @@ end;
     property OnBeforeEditorHide: TNotifyEvent read FOnBeforeEditorHide write FOnBeforeEditorHide;
     property OnEditorPanelShow: TNotifyEvent read FOnEditorPanelShow write FOnEditorPanelShow;
     property OnEditorPanelHide: TNotifyEvent read FOnEditorPanelHide write FOnEditorPanelHide;
+    property OnKeyDownHander: TKeyDownHandler read FOnKeyDownHander write FOnKeyDownHander;
  end;
 
   { TIBDynamicGrid }
@@ -484,9 +487,15 @@ end;
 
 procedure TDBDynamicGrid.KeyDownHandler(Sender: TObject; var Key: Word;
   Shift: TShiftState);
+var Done: boolean;
 begin
   if Visible and assigned(FEditorPanel) and FEditorPanel.Visible and FWeHaveFocus then
   begin
+    Done := false;
+    if assigned(FOnKeyDownHander) then
+      OnKeyDownHander(Sender,Key,Shift,Done);
+    if Done then Exit;
+
     {Allow Scrolling}
     if Key in [VK_UP,VK_DOWN] then
      KeyDown(Key,Shift)
