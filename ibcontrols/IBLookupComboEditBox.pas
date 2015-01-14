@@ -42,7 +42,7 @@ type
    newly typed entry to be added to the list dataset and included in the available
    list items.    }
 
-  TAutoInsert = procedure(Sender: TObject; aText: string) of object;
+  TAutoInsert = procedure(Sender: TObject; aText: string; var NewKeyValue: variant) of object;
   TCanAutoInsert = procedure (Sender: TObject; aText: string; var Accept: boolean) of object;
 
   TIBLookupComboEditBox = class;
@@ -80,6 +80,7 @@ type
     FOriginalTextValue: string;
     FUpdating: boolean;
     FInserting: boolean;
+    FExiting: boolean;
     FLastKeyValue: variant;
     procedure DoActiveChanged(Data: PtrInt);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
@@ -280,7 +281,7 @@ begin
     try
          ListSource.DataSet.Active := false;
          ListSource.DataSet.Active :=  true;
-         if Focused and (Text <> '')then
+         if not FExiting and Focused and (Text <> '')then
          begin
            if ListSource.DataSet.Active and (ListSource.DataSet.RecordCount > 0) then
            begin
@@ -364,10 +365,12 @@ begin
       {New Value}
       FFiltered := false;
       if assigned(FOnAutoInsert) then
+      begin
         {In an OnAutoInsert handler, the client is expected to insert the new
          row into the List DataSet and to set the KeyValue property to the
          value of the primary key of the new row.}
-        OnAutoInsert(self,Text)
+        OnAutoInsert(self,Text,NewKeyValue);
+      end
       else
       begin
         ListSource.DataSet.Append;
@@ -384,6 +387,7 @@ begin
       end;
       UpdateList;
       KeyValue := NewKeyValue;
+      UpdateData(nil); {Force sync with DataField}
     finally
       FInserting := false
     end;
@@ -404,10 +408,15 @@ end;
 
 procedure TIBLookupComboEditBox.DoExit;
 begin
+  FExiting := true;
+  try
+    CheckAndInsert;
+    ResetParser;
+    FTimer.Interval := 0;
+  finally
+    FExiting := false;
+  end;
   inherited DoExit;
-  CheckAndInsert;
-  ResetParser;
-  FTimer.Interval := 0;
 end;
 
 procedure TIBLookupComboEditBox.KeyUp(var Key: Word; Shift: TShiftState);
