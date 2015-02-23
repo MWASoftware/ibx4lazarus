@@ -49,11 +49,13 @@ IBX Change Log  version                      (1.2-0) tba, 07 Jul 2014 14:01:07 +
    repeated multiple times.
 
 6. TIBUpdateSQL will no longer return an error when "RowsAffected" is <> 1. This error
-   check just gets in the way of using Stored Procedures, and "Update or Insert"
+   check used to get in the way of using Stored Procedures, and "Update or Insert"
    statements.
 
 7. Insert, Modify and Delete property Editors now support Query Generation from
    Stored Procedures.
+
+8. Three new examples illustrate the use of the new IB Controls
 
 
 IBX Change Log  version                      (1.1-0) Mon, 07 Jul 2014 14:01:07 +0100
