@@ -6,7 +6,7 @@ object Form1: TForm1
   Caption = 'SQL Parser'
   ClientHeight = 619
   ClientWidth = 854
-  LCLVersion = '1.2.6.0'
+  LCLVersion = '1.4.0.1'
   object Label1: TLabel
     Left = 14
     Height = 15

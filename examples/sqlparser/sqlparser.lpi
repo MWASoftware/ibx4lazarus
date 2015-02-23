@@ -39,12 +39,12 @@
       <Unit0>
         <Filename Value="sqlparser.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="sqlparser"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainForm.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="MainForm"/>
       </Unit1>
@@ -66,12 +66,6 @@
         </Win32>
       </Options>
     </Linking>
-    <Other>
-      <CompilerMessages>
-        <MsgFileName Value=""/>
-      </CompilerMessages>
-      <CompilerPath Value="$(CompPath)"/>
-    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">

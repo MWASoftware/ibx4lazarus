@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 722
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.2.6.0'
+  LCLVersion = '1.4.0.1'
   object Panel1: TPanel
     Left = 11
     Height = 367
@@ -169,6 +169,7 @@ object Form1: TForm1
           TabOrder = 4
           AutoInsert = False
           AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          ItemHeight = 0
         end
         object Label7: TLabel
           Left = 12
@@ -197,6 +198,9 @@ object Form1: TForm1
             FieldName = 'FULL_NAME'
             AutoSizeColumn = True
             InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
             Title.Alignment = taCenter
@@ -205,6 +209,9 @@ object Form1: TForm1
             FieldName = 'JOB_CODE'
             AutoSizeColumn = False
             InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
             Title.Alignment = taCenter
@@ -213,6 +220,9 @@ object Form1: TForm1
             FieldName = 'JOB_COUNTRY'
             AutoSizeColumn = False
             InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
             Title.Alignment = taCenter
@@ -221,6 +231,9 @@ object Form1: TForm1
             FieldName = 'SALARY'
             AutoSizeColumn = False
             InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end>
         DataSource = DataSource3
         Scrollbars = ssAutoVertical

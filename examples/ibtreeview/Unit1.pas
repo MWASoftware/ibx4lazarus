@@ -111,6 +111,8 @@ implementation
 
 {$R *.lfm}
 
+uses IB;
+
 { TForm1 }
 
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -207,7 +209,19 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  IBDatabase1.Connected := true;
+  repeat
+    try
+      IBDatabase1.Connected := true;
+    except
+     on E:EIBClientError do
+      begin
+        Close;
+        Exit
+      end;
+    On E:Exception do
+     MessageDlg(E.Message,mtError,[mbOK],0);
+    end;
+  until IBDatabase1.Connected;
   Reopen(0);
 end;
 

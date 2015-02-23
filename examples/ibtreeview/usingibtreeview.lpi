@@ -45,7 +45,6 @@
       <Unit0>
         <Filename Value="usingibtreeview.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="usingibtreeview"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -58,7 +57,6 @@
       <Unit2>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="IBCustomDataSet"/>
       </Unit2>
     </Units>
   </ProjectOptions>
@@ -80,11 +78,7 @@
       </Options>
     </Linking>
     <Other>
-      <CompilerMessages>
-        <MsgFileName Value=""/>
-      </CompilerMessages>
       <CustomOptions Value="-dUseCThreads -dDEBUG"/>
-      <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>
   <Debugging>

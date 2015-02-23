@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls, DbCtrls, EditBtn, Buttons, db, IBDatabase, IBCustomDataSet,
-  IBLookupComboEditBox, IBDateEdit, IBQuery;
+  IBLookupComboEditBox, IBDateEdit, IBQuery, DBExtCtrls;
 
 type
 
@@ -25,7 +25,7 @@ type
     JobCodeSource: TDataSource;
     DBComboBox1: TDBComboBox;
     DBEdit4: TDBEdit;
-    IBDateEdit1: TIBDateEdit;
+    IBDateEdit1: TDBDateEdit;
     Countries: TIBQuery;
     JobCodes: TIBQuery;
     Label10: TLabel;
@@ -101,7 +101,7 @@ var
 
 implementation
 
-uses Unit2;
+uses Unit2, IB;
 
 {$R *.lfm}
 
@@ -125,7 +125,19 @@ end;
 procedure TForm1.FormShow(Sender: TObject);
 begin
   FClosing := false;
-  IBDataBase1.Connected := true;
+  repeat
+    try
+      IBDatabase1.Connected := true;
+    except
+     on E:EIBClientError do
+      begin
+        Close;
+        Exit
+      end;
+    On E:Exception do
+     MessageDlg(E.Message,mtError,[mbOK],0);
+    end;
+  until IBDatabase1.Connected;
   OpenDataSets(0)
 end;
 

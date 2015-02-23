@@ -3,11 +3,11 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="5">
+    <Units Count="7">
       <Unit0>
         <Filename Value="sqlparser.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <CursorPos Y="20"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
@@ -19,8 +19,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="MainForm"/>
-        <TopLine Value="32"/>
-        <CursorPos X="17" Y="41"/>
+        <TopLine Value="38"/>
+        <CursorPos X="43" Y="55"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -28,16 +28,15 @@
       <Unit2>
         <Filename Value="../../runtime/IBSQLParser.pas"/>
         <UnitName Value="IBSQLParser"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="786"/>
-        <CursorPos X="37" Y="806"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="116"/>
+        <CursorPos X="3" Y="87"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="670"/>
         <CursorPos X="3" Y="604"/>
         <UsageCount Value="10"/>
@@ -46,14 +45,32 @@
       <Unit4>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <UnitName Value="IBCustomDataSet"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="2498"/>
         <CursorPos X="22" Y="2522"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit4>
+      <Unit5>
+        <Filename Value="../../design/IBDBReg.pas"/>
+        <UnitName Value="IBDBReg"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="386"/>
+        <CursorPos X="34" Y="398"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="../../../../../1.2.6/thirdparty/ibx/design/IBDBReg.pas"/>
+        <UnitName Value="IBDBReg"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="410"/>
+        <CursorPos Y="432"/>
+        <UsageCount Value="10"/>
+      </Unit6>
     </Units>
-    <JumpHistory Count="10" HistoryIndex="9">
+    <JumpHistory Count="13" HistoryIndex="12">
       <Position1>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <Caret Line="63" Column="39" TopLine="46"/>
@@ -94,6 +111,18 @@
         <Filename Value="../../runtime/IBSQLParser.pas"/>
         <Caret Line="159" Column="39" TopLine="131"/>
       </Position10>
+      <Position11>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="41" Column="17" TopLine="32"/>
+      </Position11>
+      <Position12>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="52" Column="27" TopLine="38"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../design/IBDBReg.pas"/>
+        <Caret Line="371" Column="16" TopLine="349"/>
+      </Position13>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

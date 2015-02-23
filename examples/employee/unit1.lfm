@@ -9,7 +9,7 @@ object Form1: TForm1
   Color = clBackground
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.2.6.0'
+  LCLVersion = '1.4.0.1'
   object Button1: TButton
     Left = 876
     Height = 25
@@ -55,7 +55,6 @@ object Form1: TForm1
     CancelCaption = 'Cancel'
     DateOrder = doNone
     ButtonWidth = 23
-    CharCase = ecNormal
     NumGlyphs = 1
     MaxLength = 0
     OnChange = BeforeDateChange
@@ -79,7 +78,6 @@ object Form1: TForm1
     CancelCaption = 'Cancel'
     DateOrder = doNone
     ButtonWidth = 23
-    CharCase = ecNormal
     NumGlyphs = 1
     MaxLength = 0
     OnChange = BeforeDateChange
@@ -318,7 +316,7 @@ object Form1: TForm1
         Caption = 'Date Started'
         ParentColor = False
       end
-      object IBDateEdit1: TIBDateEdit
+      object IBDateEdit1: TDBDateEdit
         Left = 300
         Height = 25
         Top = 2
@@ -326,10 +324,8 @@ object Form1: TForm1
         CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
         OKCaption = 'OK'
         CancelCaption = 'Cancel'
-        ReadOnly = False
         DateOrder = doNone
         ButtonWidth = 23
-        CharCase = ecNormal
         NumGlyphs = 1
         MaxLength = 0
         TabOrder = 3
@@ -509,7 +505,7 @@ object Form1: TForm1
     ItemIndex = 0
     Items.Strings = (
       'None Specified'
-      'Before $40,000'
+      'Below $40,000'
       'Between $40,000 and $100,000'
       'Above $100,000'
     )
@@ -519,7 +515,7 @@ object Form1: TForm1
     Text = 'None Specified'
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AllowStreamedConnected = False
     DatabaseName = 'employee'
     Params.Strings = (

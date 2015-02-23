@@ -49,7 +49,7 @@ uses IBSQLParser;
 procedure TForm1.Button1Click(Sender: TObject);
 var Parser: TSelectSQLParser;
 begin
-  Parser := TSelectSQLParser.Create(OriginalSQL.Lines);
+  Parser := TSelectSQLParser.Create(nil,OriginalSQL.Lines);
   try
     if WhereCondition.Text <> '' then
       Parser.Add2WhereClause(WhereCondition.Text,WhereConditionType.ItemIndex <> 0,WhereAllUnions.Checked);

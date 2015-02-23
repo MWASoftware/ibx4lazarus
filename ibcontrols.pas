@@ -7,8 +7,7 @@ unit ibcontrols;
 interface
 
 uses
-  IBLookupComboEditBox, IBDynamicGrid, IBTreeView, IBDateEdit, 
-  LazarusPackageIntf;
+  IBLookupComboEditBox, IBDynamicGrid, IBTreeView, LazarusPackageIntf;
 
 implementation
 

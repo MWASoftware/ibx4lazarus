@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 658
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.2.6.0'
+  LCLVersion = '1.4.0.1'
   object Label1: TLabel
     Left = 16
     Height = 15
@@ -31,6 +31,7 @@ object Form1: TForm1
     TabOrder = 0
     AutoInsert = True
     AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+    ItemHeight = 0
     KeyPressInterval = 600
     OnCanAutoInsert = IBLookupComboEditBox1CanAutoInsert
   end
@@ -191,7 +192,7 @@ object Form1: TForm1
       Caption = 'Department'
       ParentColor = False
     end
-    object IBDateEdit1: TIBDateEdit
+    object IBDateEdit1: TDBDateEdit
       Left = 17
       Height = 25
       Top = 82
@@ -199,10 +200,8 @@ object Form1: TForm1
       CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
       OKCaption = 'OK'
       CancelCaption = 'Cancel'
-      ReadOnly = False
       DateOrder = doNone
       ButtonWidth = 23
-      CharCase = ecNormal
       NumGlyphs = 1
       MaxLength = 0
       TabOrder = 5
@@ -226,6 +225,7 @@ object Form1: TForm1
       TabOrder = 6
       AutoInsert = False
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      ItemHeight = 0
     end
     object IBLookupComboEditBox2: TIBLookupComboEditBox
       Left = 392
@@ -245,6 +245,7 @@ object Form1: TForm1
       TabOrder = 7
       AutoInsert = False
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      ItemHeight = 0
     end
     object DBEdit5: TDBEdit
       Left = 17

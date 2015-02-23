@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, DBGrids,
   StdCtrls, ActnList, EditBtn, DbCtrls, ExtCtrls, Buttons, IBDatabase, IBQuery,
   IBCustomDataSet, IBUpdateSQL, IBDynamicGrid, IBDateEdit, IBLookupComboEditBox,
-  db;
+  db, DBExtCtrls;
 
 type
 
@@ -49,7 +49,7 @@ type
     EmployeesLAST_NAME: TIBStringField;
     EmployeesPHONE_EXT: TIBStringField;
     EmployeesSALARY: TIBBCDField;
-    IBDateEdit1: TIBDateEdit;
+    IBDateEdit1: TDBDateEdit;
     IBDynamicGrid1: TIBDynamicGrid;
     Countries: TIBQuery;
     JobCodes: TIBQuery;

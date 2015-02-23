@@ -2,6 +2,7 @@
 <CONFIG>
   <Package Version="4">
     <Name Value="ibcontrols"/>
+    <Type Value="RunAndDesignTime"/>
     <Author Value="Tony Whyman"/>
     <CompilerOptions>
       <Version Value="11"/>
@@ -9,12 +10,6 @@
         <OtherUnitFiles Value="runtime;ibcontrols"/>
         <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
-      <Other>
-        <CompilerMessages>
-          <MsgFileName Value=""/>
-        </CompilerMessages>
-        <CompilerPath Value="$(CompPath)"/>
-      </Other>
     </CompilerOptions>
     <Description Value="Data and IBX Aware controls"/>
     <License Value="      Initial Developer's PUBLIC LICENSE
@@ -514,7 +509,7 @@
 
    Contributor(s): ______________________________________. "/>
     <Version Major="1" Minor="2"/>
-    <Files Count="4">
+    <Files Count="3">
       <Item1>
         <Filename Value="ibcontrols/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
@@ -527,12 +522,7 @@
         <Filename Value="ibcontrols/IBTreeView.pas"/>
         <UnitName Value="IBTreeView"/>
       </Item3>
-      <Item4>
-        <Filename Value="ibcontrols/IBDateEdit.pas"/>
-        <UnitName Value="IBDateEdit"/>
-      </Item4>
     </Files>
-    <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="2">
       <Item1>
         <PackageName Value="ibexpress"/>
