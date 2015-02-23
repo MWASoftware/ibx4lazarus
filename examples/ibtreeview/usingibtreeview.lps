@@ -8,7 +8,7 @@
         <Filename Value="usingibtreeview.lpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="14" Y="9"/>
-        <UsageCount Value="73"/>
+        <UsageCount Value="74"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -17,15 +17,15 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <TopLine Value="233"/>
-        <CursorPos X="3" Y="237"/>
-        <UsageCount Value="73"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="266"/>
+        <CursorPos X="3" Y="231"/>
+        <UsageCount Value="74"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <IsPartOfProject Value="True"/>
         <TopLine Value="316"/>
         <CursorPos X="46" Y="330"/>
         <UsageCount Value="67"/>
@@ -48,12 +48,10 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../runtime/IB.pas"/>
-        <UnitName Value="IB"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="402"/>
         <CursorPos Y="414"/>
         <UsageCount Value="22"/>
-        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
@@ -93,18 +91,18 @@
       </Unit12>
       <Unit13>
         <Filename Value="../../../../lcl/include/treeview.inc"/>
-        <TopLine Value="4148"/>
-        <CursorPos X="7" Y="4166"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3873"/>
+        <CursorPos X="3" Y="3878"/>
         <UsageCount Value="27"/>
       </Unit13>
       <Unit14>
         <Filename Value="../../../../lcl/comctrls.pp"/>
         <UnitName Value="ComCtrls"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="3324"/>
-        <CursorPos X="26" Y="3344"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3421"/>
+        <CursorPos X="20" Y="3439"/>
         <UsageCount Value="27"/>
-        <Loaded Value="True"/>
       </Unit14>
       <Unit15>
         <Filename Value="../../../../lcl/include/control.inc"/>
@@ -238,12 +236,10 @@
       <Unit36>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
         <UnitName Value="IBTreeView"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="55"/>
-        <CursorPos X="30" Y="73"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="682"/>
+        <CursorPos Y="699"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit36>
       <Unit37>
         <Filename Value="../../runtime/IBQuery.pas"/>
@@ -253,23 +249,20 @@
       </Unit37>
       <Unit38>
         <Filename Value="../../runtime/IBTable.pas"/>
-        <UnitName Value="IBTable"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="26"/>
         <CursorPos X="34" Y="40"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit38>
       <Unit39>
         <Filename Value="../../../../../1.2.6/thirdparty/ibx/design/IBDBReg.pas"/>
-        <UnitName Value="IBDBReg"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="371"/>
         <CursorPos X="28" Y="371"/>
         <UsageCount Value="10"/>
       </Unit39>
     </Units>
-    <JumpHistory Count="15" HistoryIndex="14">
+    <JumpHistory Count="17" HistoryIndex="16">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="201" Column="20" TopLine="196"/>
@@ -307,28 +300,37 @@
         <Caret Line="9" Column="47"/>
       </Position9>
       <Position10>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="73" Column="30" TopLine="55"/>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="9" Column="47"/>
       </Position10>
       <Position11>
-        <Filename Value="../../../../lcl/comctrls.pp"/>
-        <Caret Line="3295" Column="18" TopLine="3292"/>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="223" TopLine="208"/>
       </Position11>
       <Position12>
         <Filename Value="Unit1.pas"/>
-        <Caret Line="9" Column="47"/>
+        <Caret Line="114" Column="9" TopLine="93"/>
       </Position12>
       <Position13>
         <Filename Value="Unit1.pas"/>
-        <Caret Line="223" TopLine="208"/>
+        <Caret Line="237" Column="3" TopLine="233"/>
       </Position13>
       <Position14>
         <Filename Value="Unit1.pas"/>
-        <Caret Line="114" Column="9" TopLine="93"/>
+        <Caret Line="9" Column="46"/>
       </Position14>
       <Position15>
-        <Filename Value="../../runtime/IBTable.pas"/>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="10" Column="16"/>
       </Position15>
+      <Position16>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="238" Column="3" TopLine="234"/>
+      </Position16>
+      <Position17>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="252" Column="79" TopLine="266"/>
+      </Position17>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

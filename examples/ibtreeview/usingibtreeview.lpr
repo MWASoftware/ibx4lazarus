@@ -7,8 +7,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   ibexpress, Interfaces, // this includes the LCL widgetset
-  Forms, Unit1,  IBCustomDataSet
-  { you can add units after this };
+  Forms, Unit1;
 
 {$R *.res}
 

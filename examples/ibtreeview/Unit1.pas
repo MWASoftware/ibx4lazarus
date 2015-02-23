@@ -118,7 +118,8 @@ uses IB;
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   FClosing := true;
-  IBTransaction1.Commit;
+  if IBTransaction1.Intransaction then
+    IBTransaction1.Commit;
 end;
 
 procedure TForm1.ApplicationProperties1Idle(Sender: TObject; var Done: Boolean);

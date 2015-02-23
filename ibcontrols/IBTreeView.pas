@@ -688,11 +688,14 @@ begin
      Result := TIBTreeNode(Selected)
   else
   {Find it the hard way}
-  for i := 0 to Items.Count -1 do
+  begin
+    FullExpand;
+    for i := 0 to Items.Count -1 do
       if TIBTreeNode(Items[i]).KeyValue = KeyValue then
       begin
         Result := TIBTreeNode(Items[i])
       end;
+  end;
 end;
 
 function TIBTreeView.GetNodePath(Node: TTreeNode): TVariantArray;

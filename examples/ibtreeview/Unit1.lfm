@@ -34,6 +34,7 @@ object Form1: TForm1
       KeyField = 'DEPT_NO'
       ParentField = 'HEAD_DEPT'
       PopupMenu = PopupMenu1
+      RelationName = 'A'
       ScrollBars = ssAutoBoth
       TabOrder = 0
       OnAddition = IBTreeView1Addition
@@ -320,12 +321,11 @@ object Form1: TForm1
       ''
     )
     SelectSQL.Strings = (
-      'Select * From('
       'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO,'
       'count(B.DEPT_NO) as ChildCount'
       'From DEPARTMENT A'
       'Left Outer JOIN DEPARTMENT B On B.HEAD_DEPT = A.DEPT_NO'
-      'Group By A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO)'
+      'Group By A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO'
       'Order by Department'
     )
     ModifySQL.Strings = (

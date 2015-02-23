@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls, DbCtrls, EditBtn, Buttons, db, IBDatabase, IBCustomDataSet,
-  IBLookupComboEditBox, IBDateEdit, IBQuery, DBExtCtrls;
+  IBLookupComboEditBox,  IBQuery, DBExtCtrls;
 
 type
 
@@ -119,7 +119,8 @@ end;
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   FClosing := true;
-  IBTransaction1.Commit
+  if IBTransaction1.InTransaction then
+    IBTransaction1.Commit
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
