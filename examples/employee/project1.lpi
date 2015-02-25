@@ -48,7 +48,7 @@
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="55" Y="17"/>
-        <UsageCount Value="107"/>
+        <UsageCount Value="110"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -57,9 +57,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="55" Y="18"/>
-        <UsageCount Value="107"/>
+        <TopLine Value="77"/>
+        <CursorPos X="15" Y="89"/>
+        <UsageCount Value="110"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -78,7 +78,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="9"/>
         <CursorPos X="54" Y="26"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="99"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit3.pas"/>
@@ -91,8 +91,9 @@
       </Unit4>
       <Unit5>
         <Filename Value="../../runtime/IB.pas"/>
-        <TopLine Value="349"/>
-        <CursorPos Y="364"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="401"/>
+        <CursorPos Y="414"/>
         <UsageCount Value="29"/>
       </Unit5>
       <Unit6>
@@ -287,17 +288,20 @@
       </Unit36>
       <Unit37>
         <Filename Value="../../../../lcl/controls.pp"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="171"/>
-        <CursorPos X="25" Y="186"/>
+        <UnitName Value="Controls"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="1935"/>
+        <CursorPos X="15" Y="1947"/>
         <UsageCount Value="22"/>
+        <Loaded Value="True"/>
       </Unit37>
       <Unit38>
         <Filename Value="../../../../lcl/include/wincontrol.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="4293"/>
-        <CursorPos X="3" Y="4304"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="8131"/>
+        <CursorPos Y="8144"/>
         <UsageCount Value="14"/>
+        <Loaded Value="True"/>
       </Unit38>
       <Unit39>
         <Filename Value="../../../../lcl/dbgrids.pas"/>
@@ -307,10 +311,13 @@
       </Unit39>
       <Unit40>
         <Filename Value="../../../../lcl/grids.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="6239"/>
-        <CursorPos X="35" Y="6260"/>
+        <UnitName Value="Grids"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="6560"/>
+        <CursorPos Y="6571"/>
         <UsageCount Value="26"/>
+        <Loaded Value="True"/>
       </Unit40>
       <Unit41>
         <Filename Value="../../../../lcl/include/winapih.inc"/>
@@ -344,9 +351,12 @@
       </Unit45>
       <Unit46>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <TopLine Value="90"/>
-        <CursorPos X="15" Y="99"/>
-        <UsageCount Value="11"/>
+        <UnitName Value="IBLookupComboEditBox"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="87"/>
+        <CursorPos Y="101"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit46>
       <Unit47>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
@@ -356,10 +366,12 @@
       </Unit47>
       <Unit48>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1016"/>
-        <CursorPos X="46" Y="1034"/>
+        <UnitName Value="IBDynamicGrid"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="376"/>
+        <CursorPos X="20" Y="379"/>
         <UsageCount Value="28"/>
+        <Loaded Value="True"/>
       </Unit48>
       <Unit49>
         <Filename Value="../../design/ibselectsqleditor.pas"/>
@@ -459,9 +471,12 @@
       </Unit61>
       <Unit62>
         <Filename Value="../../../../lcl/extctrls.pp"/>
-        <TopLine Value="4"/>
-        <CursorPos X="13" Y="30"/>
+        <UnitName Value="ExtCtrls"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="982"/>
+        <CursorPos X="32" Y="992"/>
         <UsageCount Value="20"/>
+        <Loaded Value="True"/>
       </Unit62>
       <Unit63>
         <Filename Value="../../../../lcl/lcltype.pp"/>
@@ -513,9 +528,11 @@
       </Unit70>
       <Unit71>
         <Filename Value="../../../../lcl/include/control.inc"/>
-        <TopLine Value="557"/>
-        <CursorPos Y="573"/>
-        <UsageCount Value="10"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="2092"/>
+        <CursorPos Y="2113"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit71>
       <Unit72>
         <Filename Value="../../../../lcl/stdctrls.pp"/>
@@ -595,7 +612,128 @@
         <UsageCount Value="10"/>
       </Unit84>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="6189" TopLine="6173"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4304" TopLine="4292"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4306" TopLine="4292"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4316" TopLine="4295"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4325" TopLine="4312"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4327" TopLine="4312"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4340" TopLine="4327"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4341" TopLine="4327"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="6189" Column="14" TopLine="6176"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8144" Column="4" TopLine="8131"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../../../lcl/grids.pas"/>
+        <Caret Line="6571" TopLine="6560"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8144" TopLine="8131"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8145" TopLine="8131"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8147" TopLine="8131"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8148" TopLine="8131"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="6186" TopLine="6173"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="6189" TopLine="6173"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4304" TopLine="4292"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4306" TopLine="4292"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4316" TopLine="4304"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4325" TopLine="4304"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4327" TopLine="4306"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4340" TopLine="4327"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4283" TopLine="4269"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4284" TopLine="4269"/>
+      </Position25>
+      <Position26>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4285" TopLine="4269"/>
+      </Position26>
+      <Position27>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4286" TopLine="4269"/>
+      </Position27>
+      <Position28>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="4290" TopLine="4275"/>
+      </Position28>
+      <Position29>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8390" Column="14" TopLine="8376"/>
+      </Position29>
+      <Position30>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8192" Column="3" TopLine="8188"/>
+      </Position30>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

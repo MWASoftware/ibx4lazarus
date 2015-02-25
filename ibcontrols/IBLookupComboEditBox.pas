@@ -103,6 +103,7 @@ type
     procedure DoExit; override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure SetItemIndex(const Val: integer); override;
+    procedure UpdateShowing; override;
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
@@ -177,7 +178,7 @@ end;
 
 function TIBLookupComboEditBox.GetListSource: TDataSource;
 begin
-  Result := inherited ListSource;
+  Result := FDataLink.DataSource;
 end;
 
 function TIBLookupComboEditBox.GetRelationNameQualifier: string;
@@ -268,8 +269,9 @@ end;
 
 procedure TIBLookupComboEditBox.SetListSource(AValue: TDataSource);
 begin
-  inherited ListSource := AValue;
-  FDataLink.DataSource := AValue
+  FDataLink.DataSource := AValue;
+  if Showing then
+    inherited ListSource := AValue;
 end;
 
 procedure TIBLookupComboEditBox.UpdateList;
@@ -440,6 +442,7 @@ begin
   else
   if Key = VK_ESCAPE then
   begin
+    SelStart := UTF8Length(Text);      {Ensure end of line selection}
     ResetParser;
     Text := FOriginalTextValue;
     SelectAll;
@@ -457,6 +460,15 @@ procedure TIBLookupComboEditBox.SetItemIndex(const Val: integer);
 begin
   inherited SetItemIndex(Val);
   FLastKeyValue := KeyValue;
+end;
+
+procedure TIBLookupComboEditBox.UpdateShowing;
+begin
+  inherited UpdateShowing;
+  if Showing then
+    inherited ListSource := FDataLink.DataSource
+  else
+    inherited ListSource := nil;
 end;
 
 constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);

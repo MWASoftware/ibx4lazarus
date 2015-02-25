@@ -256,13 +256,13 @@ end;
     procedure DataSetScrolled(Sender: TObject);
     procedure RestorePosition(Data: PtrInt);
     procedure DoReOpen(Data: PtrInt);
+    procedure SetupEditor(aEditor: TDBLookupCellEditor; aCol: integer);
   protected
     { Protected declarations }
     procedure Loaded; override;
     function  CreateColumns: TGridColumns; override;
     procedure MouseDown(Button: TMouseButton; Shift:TShiftState; X,Y:Integer); override;
     procedure LinkActive(Value: Boolean); override;
-    function  GetDefaultEditor(Column: Integer): TWinControl; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure UpdateActive; override;
   public
@@ -383,6 +383,7 @@ begin
   if CanFocus then SetFocus;
   if assigned(FOnEditorPanelHide) then
      OnEditorPanelHide(self);
+  DoOnResize;
 end;
 
 procedure TDBDynamicGrid.DoEditorShow;
@@ -728,6 +729,7 @@ begin
   FRow := Msg.Row;
   Text := Msg.Value;
   SelStart := Length(Text);
+  TIBDynamicGrid(FGrid).SetupEditor(self,FCol);
 end;
 
 procedure TDBLookupCellEditor.msg_SetPos(var Msg: TGridMessage);
@@ -999,6 +1001,14 @@ begin
   DataSource.DataSet.Active := true;
 end;
 
+procedure TIBDynamicGrid.SetupEditor(aEditor: TDBLookupCellEditor; aCol: integer
+  );
+var C: TIBDynamicGridColumn;
+begin
+  C := ColumnFromGridColumn(aCol) as TIBDynamicGridColumn;
+  C.SetupEditor(aEditor);
+end;
+
 procedure TIBDynamicGrid.Loaded;
 begin
   inherited Loaded;
@@ -1046,18 +1056,6 @@ begin
   if (FActive <> Value) and Value then
     Application.QueueAsyncCall(@RestorePosition,0);
   FActive := Value
-end;
-
-function TIBDynamicGrid.GetDefaultEditor(Column: Integer): TWinControl;
-var C: TIBDynamicGridColumn;
-begin
-  Result := inherited GetDefaultEditor(Column);
-
-  if assigned(Result) and (Result = FDBLookupCellEditor) then
-  begin
-    C := ColumnFromGridColumn(Column) as TIBDynamicGridColumn;
-    C.SetupEditor(FDBLookupCellEditor);
-  end;
 end;
 
 procedure TIBDynamicGrid.Notification(AComponent: TComponent;

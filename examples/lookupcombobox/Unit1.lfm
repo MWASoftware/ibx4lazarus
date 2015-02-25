@@ -111,7 +111,7 @@ object Form1: TForm1
       Anchors = [akTop, akRight]
       CharCase = ecNormal
       MaxLength = 0
-      TabOrder = 5
+      TabOrder = 4
     end
     object Label6: TLabel
       Left = 16
@@ -138,7 +138,7 @@ object Form1: TForm1
       DataSource = EmployeeSource
       CharCase = ecNormal
       MaxLength = 0
-      TabOrder = 6
+      TabOrder = 5
     end
     object Label8: TLabel
       Left = 392
@@ -204,7 +204,7 @@ object Form1: TForm1
       ButtonWidth = 23
       NumGlyphs = 1
       MaxLength = 0
-      TabOrder = 4
+      TabOrder = 3
       DataField = 'HIRE_DATE'
       DataSource = EmployeeSource
     end
@@ -219,7 +219,7 @@ object Form1: TForm1
       Anchors = [akTop, akLeft, akRight]
       CharCase = ecNormal
       MaxLength = 0
-      TabOrder = 8
+      TabOrder = 6
     end
     object SpeedButton1: TSpeedButton
       Left = 516
@@ -230,11 +230,12 @@ object Form1: TForm1
       Caption = '...'
       OnClick = SpeedButton1Click
     end
-    object DBLookupComboBox1: TDBLookupComboBox
+    object IBLookupComboEditBox2: TIBLookupComboEditBox
       Left = 392
       Height = 25
       Top = 32
       Width = 203
+      Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       DataField = 'JOB_COUNTRY'
       DataSource = EmployeeSource
@@ -244,14 +245,17 @@ object Form1: TForm1
       ListSource = CountriesSource
       LookupCache = False
       Style = csDropDownList
-      TabOrder = 3
+      TabOrder = 7
+      AutoInsert = False
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      ItemHeight = 0
     end
-    object DBLookupComboBox2: TDBLookupComboBox
-      Left = 333
-      Height = 25
-      Top = 80
-      Width = 259
-      AutoSize = False
+    object IBLookupComboEditBox3: TIBLookupComboEditBox
+      Left = 331
+      Height = 29
+      Top = 82
+      Width = 264
+      Anchors = [akTop, akLeft, akRight]
       DataField = 'JOB_CODE'
       DataSource = EmployeeSource
       KeyField = 'JOB_CODE'
@@ -260,7 +264,10 @@ object Form1: TForm1
       ListSource = JobCodeSource
       LookupCache = False
       Style = csDropDownList
-      TabOrder = 7
+      TabOrder = 8
+      AutoInsert = False
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      ItemHeight = 0
     end
   end
   object CancelBtn: TButton
@@ -294,7 +301,7 @@ object Form1: TForm1
     TabOrder = 4
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AllowStreamedConnected = False
     DatabaseName = 'employee'
     Params.Strings = (
