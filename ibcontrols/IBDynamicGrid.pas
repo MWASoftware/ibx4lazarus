@@ -326,8 +326,14 @@ var ColSum: integer;
     I: integer;
     adjustment: integer;
     n: integer;
+    Coord: TGridCoord;
+    P: TPoint;
 begin
   if (csDesigning in ComponentState) or (Columns.Count = 0) then Exit;
+
+  P := ScreenToControl(Point(Mouse.CursorPos.X,Mouse.CursorPos.Y));
+  Coord := MouseCoord(P.X,P.Y);
+  if Coord.Y = 0 then Exit; {Ignore if column resizing}
 
   FResizing := true;
   try
@@ -1007,6 +1013,7 @@ end;
 procedure TIBDynamicGrid.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 var Coord: TGridCoord;
+    obe: boolean;
     function PtInRect(const Rect : TRect;const p : TPoint) : Boolean;
 
     begin
@@ -1020,11 +1027,17 @@ begin
              and not PtInRect(Editor.BoundsRect,Point(X,Y)) then
      Editor.Perform(CM_EXIT,0,0);  {Do insert new value if necessary}
   inherited MouseDown(Button, Shift, X, Y);
-  Coord := MouseCoord(X,Y);
-  if AllowColumnSort and
+  obe := AllowOutboundEvents;
+  AllowOutboundEvents := false;
+  try
+    Coord := MouseCoord(X,Y);
+  if AllowColumnSort and  (Coord.X <> -1) and
    (Coord.Y = 0) and (MouseCoord(X+5,Y).X = Coord.X) {not on boundary}
                    and (MouseCoord(X-5,Y).X = Coord.X) then
     ColumnHeaderClick(Coord.X-1);
+  finally
+    AllowOutboundEvents := obe
+  end;
 end;
 
 procedure TIBDynamicGrid.LinkActive(Value: Boolean);
