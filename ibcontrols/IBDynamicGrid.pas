@@ -259,6 +259,7 @@ end;
     procedure SetupEditor(aEditor: TDBLookupCellEditor; aCol: integer);
   protected
     { Protected declarations }
+    procedure DoEditorHide; override;
     procedure Loaded; override;
     function  CreateColumns: TGridColumns; override;
     procedure MouseDown(Button: TMouseButton; Shift:TShiftState; X,Y:Integer); override;
@@ -554,7 +555,7 @@ procedure TDBDynamicGrid.Loaded;
 begin
   inherited Loaded;
   if assigned(FEditorPanel) and not (csDesigning in ComponentState) then
-    FEditorPanel.Visible := false;
+    DoEditorHide;
   DoGridResize
 end;
 
@@ -1007,6 +1008,16 @@ var C: TIBDynamicGridColumn;
 begin
   C := ColumnFromGridColumn(aCol) as TIBDynamicGridColumn;
   C.SetupEditor(aEditor);
+end;
+
+procedure TIBDynamicGrid.DoEditorHide;
+var i: integer;
+begin
+  inherited DoEditorHide;
+  if assigned(EditorPanel) then
+  for i := 0 to EditorPanel.ControlCount - 1 do
+    if EditorPanel is TIBLookupComboEditBox then
+       EditorPanel.Perform(CM_VISIBLECHANGED, WParam(Ord(false)), 0);
 end;
 
 procedure TIBDynamicGrid.Loaded;
