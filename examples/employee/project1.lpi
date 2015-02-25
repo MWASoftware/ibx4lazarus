@@ -7,7 +7,6 @@
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <Icon Value="0"/>
-      <ActiveWindowIndexAtStart Value="0"/>
     </General>
     <i18n>
       <EnableI18N LFM="False"/>
@@ -44,12 +43,12 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="85">
+    <Units Count="88">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="55" Y="17"/>
-        <UsageCount Value="110"/>
+        <UsageCount Value="111"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -59,12 +58,11 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <EditorIndex Value="0"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="1"/>
-        <CursorPos X="7" Y="11"/>
-        <UsageCount Value="110"/>
+        <CursorPos X="39" Y="10"/>
+        <UsageCount Value="111"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="../../runtime/IBSQLMonitor.pas"/>
@@ -80,7 +78,7 @@
         <ResourceBaseClass Value="Form"/>
         <TopLine Value="9"/>
         <CursorPos X="54" Y="26"/>
-        <UsageCount Value="99"/>
+        <UsageCount Value="100"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit3.pas"/>
@@ -289,16 +287,17 @@
       <Unit37>
         <Filename Value="../../../../lcl/controls.pp"/>
         <UnitName Value="Controls"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="2084"/>
-        <CursorPos X="14" Y="2096"/>
+        <TopLine Value="1176"/>
+        <CursorPos X="15" Y="1186"/>
         <UsageCount Value="22"/>
       </Unit37>
       <Unit38>
         <Filename Value="../../../../lcl/include/wincontrol.inc"/>
         <WindowIndex Value="1"/>
         <TopLine Value="8131"/>
-        <CursorPos X="1" Y="8144"/>
+        <CursorPos Y="8144"/>
         <UsageCount Value="14"/>
       </Unit38>
       <Unit39>
@@ -310,9 +309,10 @@
       <Unit40>
         <Filename Value="../../../../lcl/grids.pas"/>
         <UnitName Value="Grids"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="6421"/>
-        <CursorPos X="3" Y="6427"/>
+        <TopLine Value="6558"/>
+        <CursorPos Y="6571"/>
         <UsageCount Value="26"/>
       </Unit40>
       <Unit41>
@@ -348,10 +348,11 @@
       <Unit46>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="62"/>
-        <CursorPos X="24" Y="67"/>
-        <UsageCount Value="12"/>
+        <TopLine Value="458"/>
+        <CursorPos X="23" Y="469"/>
+        <UsageCount Value="13"/>
       </Unit46>
       <Unit47>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
@@ -362,9 +363,10 @@
       <Unit48>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <UnitName Value="IBDynamicGrid"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="1007"/>
-        <CursorPos X="63" Y="1020"/>
+        <TopLine Value="1009"/>
+        <CursorPos X="69" Y="1020"/>
         <UsageCount Value="28"/>
       </Unit48>
       <Unit49>
@@ -465,7 +467,6 @@
       </Unit61>
       <Unit62>
         <Filename Value="../../../../lcl/extctrls.pp"/>
-        <UnitName Value="ExtCtrls"/>
         <WindowIndex Value="1"/>
         <TopLine Value="982"/>
         <CursorPos X="32" Y="992"/>
@@ -521,9 +522,10 @@
       </Unit70>
       <Unit71>
         <Filename Value="../../../../lcl/include/control.inc"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="4243"/>
-        <CursorPos X="59" Y="4257"/>
+        <TopLine Value="4262"/>
+        <CursorPos X="59" Y="4269"/>
         <UsageCount Value="11"/>
       </Unit71>
       <Unit72>
@@ -587,8 +589,11 @@
       </Unit81>
       <Unit82>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
-        <TopLine Value="627"/>
-        <CursorPos X="16" Y="639"/>
+        <UnitName Value="DbCtrls"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="122"/>
+        <CursorPos X="15" Y="132"/>
         <UsageCount Value="10"/>
       </Unit82>
       <Unit83>
@@ -603,20 +608,77 @@
         <CursorPos Y="237"/>
         <UsageCount Value="10"/>
       </Unit84>
+      <Unit85>
+        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="163"/>
+        <CursorPos X="18" Y="171"/>
+        <UsageCount Value="10"/>
+      </Unit85>
+      <Unit86>
+        <Filename Value="../../../../lcl/include/dblookup.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="281"/>
+        <CursorPos X="3" Y="289"/>
+        <UsageCount Value="10"/>
+      </Unit86>
+      <Unit87>
+        <Filename Value="/usr/share/fpcsrc/2.6.4/packages/fcl-db/src/base/db.pas"/>
+        <UnitName Value="db"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="1695"/>
+        <CursorPos X="3" Y="1673"/>
+        <UsageCount Value="10"/>
+      </Unit87>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="11" HistoryIndex="10">
       <Position1>
         <Filename Value="unit1.pas"/>
-        <Caret Line="89" Column="15" TopLine="77"/>
+        <Caret Line="2" Column="37"/>
       </Position1>
       <Position2>
         <Filename Value="unit1.pas"/>
-        <Caret Line="4" Column="2" TopLine="1"/>
+        <Caret Line="334" Column="28" TopLine="329"/>
       </Position2>
       <Position3>
         <Filename Value="unit1.pas"/>
-        <Caret Line="9" Column="60" TopLine="1"/>
+        <Caret Line="333" Column="11" TopLine="329"/>
       </Position3>
+      <Position4>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="222" Column="39" TopLine="219"/>
+      </Position4>
+      <Position5>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="221" Column="40" TopLine="211"/>
+      </Position5>
+      <Position6>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="87" Column="23" TopLine="80"/>
+      </Position6>
+      <Position7>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="88" Column="23" TopLine="81"/>
+      </Position7>
+      <Position8>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="89" Column="23" TopLine="82"/>
+      </Position8>
+      <Position9>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="229" Column="36" TopLine="221"/>
+      </Position9>
+      <Position10>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="10" Column="52"/>
+      </Position10>
+      <Position11>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="10" Column="39"/>
+      </Position11>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -637,7 +699,6 @@
     </Linking>
     <Other>
       <CustomOptions Value="-dUseCThreads"/>
-      <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>
   <Debugging>
@@ -653,5 +714,4 @@
       </Item3>
     </Exceptions>
   </Debugging>
-  <EditorMacros Count="0"/>
 </CONFIG>

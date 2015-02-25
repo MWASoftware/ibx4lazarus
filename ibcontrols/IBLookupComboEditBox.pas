@@ -138,6 +138,7 @@ end;
 
 procedure TIBLookupComboDataLink.DataEvent(Event: TDataEvent; Info: Ptrint);
 begin
+  if not FOwner.Showing then Exit;
   if (Event = deCheckBrowseMode) and (Info = 1) and not DataSet.Active then
   begin
     if (DataSet is TIBDataSet) then
@@ -178,7 +179,7 @@ end;
 
 function TIBLookupComboEditBox.GetListSource: TDataSource;
 begin
-  Result := FDataLink.DataSource;
+  Result := inherited ListSource;
 end;
 
 function TIBLookupComboEditBox.GetRelationNameQualifier: string;
@@ -270,8 +271,7 @@ end;
 procedure TIBLookupComboEditBox.SetListSource(AValue: TDataSource);
 begin
   FDataLink.DataSource := AValue;
-  if Showing then
-    inherited ListSource := AValue;
+  inherited ListSource := AValue;
 end;
 
 procedure TIBLookupComboEditBox.UpdateList;
@@ -466,9 +466,7 @@ procedure TIBLookupComboEditBox.UpdateShowing;
 begin
   inherited UpdateShowing;
   if Showing then
-    inherited ListSource := FDataLink.DataSource
-  else
-    inherited ListSource := nil;
+    ActiveChanged(nil);
 end;
 
 constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
