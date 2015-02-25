@@ -6,7 +6,6 @@ object Form1: TForm1
   Caption = 'Employee List'
   ClientHeight = 482
   ClientWidth = 963
-  Color = clBackground
   OnClose = FormClose
   OnShow = FormShow
   LCLVersion = '1.4.0.1'
