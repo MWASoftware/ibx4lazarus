@@ -7,7 +7,8 @@
       <Unit0>
         <Filename Value="usingibtreeview.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="14" Y="9"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="9"/>
         <UsageCount Value="74"/>
       </Unit0>
       <Unit1>
@@ -18,8 +19,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="266"/>
-        <CursorPos X="3" Y="231"/>
+        <TopLine Value="251"/>
+        <CursorPos X="38" Y="265"/>
         <UsageCount Value="74"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -98,7 +99,6 @@
       </Unit13>
       <Unit14>
         <Filename Value="../../../../lcl/comctrls.pp"/>
-        <UnitName Value="ComCtrls"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3421"/>
         <CursorPos X="20" Y="3439"/>
@@ -235,7 +235,6 @@
       </Unit35>
       <Unit36>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <UnitName Value="IBTreeView"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="682"/>
         <CursorPos Y="699"/>
@@ -262,7 +261,7 @@
         <UsageCount Value="10"/>
       </Unit39>
     </Units>
-    <JumpHistory Count="17" HistoryIndex="16">
+    <JumpHistory Count="22" HistoryIndex="21">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="201" Column="20" TopLine="196"/>
@@ -329,8 +328,27 @@
       </Position16>
       <Position17>
         <Filename Value="Unit1.pas"/>
-        <Caret Line="252" Column="79" TopLine="266"/>
+        <Caret Line="241" Column="17" TopLine="231"/>
       </Position17>
+      <Position18>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="221" Column="55" TopLine="205"/>
+      </Position18>
+      <Position19>
+        <Filename Value="Unit1.pas"/>
+      </Position19>
+      <Position20>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="275" Column="18" TopLine="253"/>
+      </Position20>
+      <Position21>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="276" Column="21" TopLine="254"/>
+      </Position21>
+      <Position22>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="282" TopLine="261"/>
+      </Position22>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
