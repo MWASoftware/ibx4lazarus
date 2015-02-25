@@ -246,7 +246,14 @@ procedure TIBLookupComboEditBox.RecordChanged(Sender: TObject; aField: TField);
 begin
   {Make sure that we are in sync with other data controls}
   if DataSource = nil then
-    KeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant
+  begin
+    KeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
+    if VarIsNull(KeyValue) then {Probable deletion}
+    begin
+      UpdateList;
+      KeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
+    end;
+  end;
 end;
 
 procedure TIBLookupComboEditBox.SetAutoCompleteText(
@@ -273,20 +280,26 @@ procedure TIBLookupComboEditBox.UpdateList;
 var
   iSelStart: Integer; // char position
   sCompleteText, sPrefixText, sResultText: string;
+  curText: string;
 begin
   if assigned(ListSource) and assigned(ListSource.DataSet) and (ListSource.DataSet is TIBCustomDataSet)
      and ListSource.DataSet.Active then
   begin
     FUpdating := true;
     try
+         iSelStart := SelStart;//Capture original cursor position
+         if ((iSelStart < UTF8Length(Text)) and
+           (cbactEndOfLineComplete in AutoCompleteText)) then
+                Exit;
+         curText := Text;
+         sPrefixText := UTF8Copy(Text, 1, iSelStart);
          ListSource.DataSet.Active := false;
          ListSource.DataSet.Active :=  true;
+         Text := curText;
          if not FExiting and Focused and (Text <> '')then
          begin
            if ListSource.DataSet.Active and (ListSource.DataSet.RecordCount > 0) then
            begin
-             iSelStart := SelStart;//Capture original cursor position
-             sPrefixText := UTF8Copy(Text, 1, iSelStart);
              sCompleteText := ListSource.DataSet.FieldByName(ListField).AsString;
              if (sCompleteText <> Text) then
              begin
@@ -432,7 +445,8 @@ begin
     SelectAll;
   end
   else
-  if IsEditableTextKey(Key)  and AutoComplete and (Style <> csDropDownList) and
+  if (IsEditableTextKey(Key) or (Key = VK_BACK))
+     and AutoComplete and (Style <> csDropDownList) and
      (not (cbactEndOfLineComplete in AutoCompleteText) or (SelStart = UTF8Length(Text))) then
     FTimer.Interval := FKeyPressInterval
   else

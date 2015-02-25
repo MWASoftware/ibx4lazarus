@@ -16,12 +16,12 @@ type
   TForm1 = class(TForm)
     ApplicationProperties1: TApplicationProperties;
     DBEdit5: TDBEdit;
+    DBLookupComboBox1: TDBLookupComboBox;
+    DBLookupComboBox2: TDBLookupComboBox;
     DeleteBtn: TButton;
     CountriesSource: TDataSource;
     EmployeesDEPT_KEY_PATH: TIBStringField;
     EmployeesDEPT_PATH: TIBStringField;
-    IBLookupComboEditBox2: TIBLookupComboEditBox;
-    IBLookupComboEditBox3: TIBLookupComboEditBox;
     JobCodeSource: TDataSource;
     DBComboBox1: TDBComboBox;
     DBEdit4: TDBEdit;
