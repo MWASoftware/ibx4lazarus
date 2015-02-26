@@ -270,8 +270,11 @@ end;
 
 procedure TIBLookupComboEditBox.SetListSource(AValue: TDataSource);
 begin
-  FDataLink.DataSource := AValue;
-  inherited ListSource := AValue;
+  if AValue <> inherited ListSource then
+  begin
+    FDataLink.DataSource := AValue;
+    inherited ListSource := AValue;
+  end;
 end;
 
 procedure TIBLookupComboEditBox.UpdateList;

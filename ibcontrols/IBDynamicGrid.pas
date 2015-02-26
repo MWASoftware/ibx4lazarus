@@ -157,6 +157,7 @@ end;
   private
     FGrid: TCustomGrid;
     FCol,FRow: Integer;
+    FEditText: string;
   protected
     procedure WndProc(var TheMessage : TLMessage); override;
     procedure CloseUp; override;
@@ -728,7 +729,7 @@ begin
   FGrid := Msg.Grid;
   FCol := Msg.Col;
   FRow := Msg.Row;
-  Text := Msg.Value;
+  FEditText := Msg.Value;
   SelStart := Length(Text);
   TIBDynamicGrid(FGrid).SetupEditor(self,FCol);
 end;
@@ -802,6 +803,7 @@ begin
     if DataFieldName <> '' then
         Editor.DataSource := TDBGrid(Grid).DataSource;
   end;
+  Editor.Text := Editor.FEditText;
 end;
 
 procedure TIBDynamicGridColumn.SetInitialSortColumn(AValue: boolean);
