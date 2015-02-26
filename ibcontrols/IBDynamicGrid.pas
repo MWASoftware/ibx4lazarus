@@ -329,14 +329,8 @@ var ColSum: integer;
     I: integer;
     adjustment: integer;
     n: integer;
-//    Coord: TGridCoord;
- //   P: TPoint;
 begin
   if (csDesigning in ComponentState) or (Columns.Count = 0) then Exit;
-
-//  P := ScreenToControl(Point(Mouse.CursorPos.X,Mouse.CursorPos.Y));
-//  Coord := MouseCoord(P.X,P.Y);
-//  if (Coord.Y = 0)  then Exit; {Ignore if column resizing}
 
   FResizing := true;
   try

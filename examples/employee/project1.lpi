@@ -59,7 +59,8 @@
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="45"/>
+        <TopLine Value="87"/>
+        <CursorPos X="34" Y="99"/>
         <UsageCount Value="112"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -345,7 +346,6 @@
       </Unit45>
       <Unit46>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <UnitName Value="IBLookupComboEditBox"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="469"/>
@@ -363,8 +363,8 @@
         <UnitName Value="IBDynamicGrid"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="794"/>
-        <CursorPos X="35" Y="806"/>
+        <TopLine Value="325"/>
+        <CursorPos Y="335"/>
         <UsageCount Value="28"/>
       </Unit48>
       <Unit49>
@@ -589,7 +589,6 @@
       </Unit81>
       <Unit82>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
-        <UnitName Value="DbCtrls"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="789"/>
@@ -633,11 +632,15 @@
         <UsageCount Value="10"/>
       </Unit87>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="10" Column="39"/>
       </Position1>
+      <Position2>
+        <Filename Value="unit1.pas"/>
+        <Caret Column="45"/>
+      </Position2>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

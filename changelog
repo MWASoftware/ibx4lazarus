@@ -1,4 +1,4 @@
-IBX Change Log  version                                     (1.2-0) Thu, 26 Feb 2015 09:59:57 +0000
+IBX Change Log  version                                      (1.2-0) Thu, 26 Feb 2015 10:34:04 +0000
 
 1. An internal select SQL Parser is now available for TIBCustomDataset descendents.
    This is typically used during an "OnBeforeOpen" event handler to manipulate the
