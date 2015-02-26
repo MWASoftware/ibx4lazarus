@@ -138,7 +138,9 @@ end;
 
 procedure TIBLookupComboDataLink.DataEvent(Event: TDataEvent; Info: Ptrint);
 begin
+  {If we are not visible then avoid unnecessary work}
   if not FOwner.Showing then Exit;
+
   if (Event = deCheckBrowseMode) and (Info = 1) and not DataSet.Active then
   begin
     if (DataSet is TIBDataSet) then
@@ -468,7 +470,7 @@ end;
 procedure TIBLookupComboEditBox.UpdateShowing;
 begin
   inherited UpdateShowing;
-  if Showing then
+  if Showing then {Ensure up-to-date as we were ignoring any changes}
     ActiveChanged(nil);
 end;
 

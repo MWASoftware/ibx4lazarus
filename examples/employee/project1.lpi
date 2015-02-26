@@ -57,7 +57,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <CursorPos X="45"/>
         <UsageCount Value="112"/>
@@ -346,10 +345,11 @@
       <Unit46>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="269"/>
-        <CursorPos Y="277"/>
+        <TopLine Value="469"/>
+        <CursorPos X="69" Y="473"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit46>
