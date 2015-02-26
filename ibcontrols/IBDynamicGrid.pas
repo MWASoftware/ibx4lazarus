@@ -218,6 +218,7 @@ end;
     procedure ShowEditorPanel;
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy ;override;
+    procedure ResizeColumns;
   published
     property EditorPanel: TWinControl read FEditorPanel write SetEditorPanel;
     property ExpandEditorPanelBelowRow: boolean read FExpandEditorPanelBelowRow write FExpandEditorPanelBelowRow;
@@ -328,14 +329,14 @@ var ColSum: integer;
     I: integer;
     adjustment: integer;
     n: integer;
-    Coord: TGridCoord;
-    P: TPoint;
+//    Coord: TGridCoord;
+ //   P: TPoint;
 begin
   if (csDesigning in ComponentState) or (Columns.Count = 0) then Exit;
 
-  P := ScreenToControl(Point(Mouse.CursorPos.X,Mouse.CursorPos.Y));
-  Coord := MouseCoord(P.X,P.Y);
-  if Coord.Y = 0 then Exit; {Ignore if column resizing}
+//  P := ScreenToControl(Point(Mouse.CursorPos.X,Mouse.CursorPos.Y));
+//  Coord := MouseCoord(P.X,P.Y);
+//  if (Coord.Y = 0)  then Exit; {Ignore if column resizing}
 
   FResizing := true;
   try
@@ -662,6 +663,11 @@ begin
   if not (csDesigning in ComponentState) then
     Application.RemoveOnKeyDownBeforeHandler(@KeyDownHandler);
   inherited Destroy;
+end;
+
+procedure TDBDynamicGrid.ResizeColumns;
+begin
+  DoGridResize;
 end;
 
 { TDBDynamicGridColumn }
