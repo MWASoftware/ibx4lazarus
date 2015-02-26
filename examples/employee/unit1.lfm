@@ -190,7 +190,7 @@ object Form1: TForm1
       Scrollbars = ssAutoBoth
       TabOrder = 0
       EditorPanel = EmpoyeeEditorPanel
-      ExpandEditorPanelBelowRow = True
+      ExpandEditorPanelBelowRow = False
       Descending = False
       EditorBorderStyle = bsSingle
       DefaultPositionAtEnd = False
