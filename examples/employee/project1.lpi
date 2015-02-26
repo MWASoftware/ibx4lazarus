@@ -57,6 +57,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
+        <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <CursorPos X="45"/>
         <UsageCount Value="112"/>
@@ -361,7 +362,6 @@
       <Unit48>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <UnitName Value="IBDynamicGrid"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="794"/>

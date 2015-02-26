@@ -67,7 +67,7 @@ type
     Label9: TLabel;
     Panel1: TPanel;
     Panel2: TPanel;
-    EmpoyeeEditorPanel: TPanel;
+    EmployeeEditorPanel: TPanel;
     SpeedButton1: TSpeedButton;
     TotalsQueryTOTALSALARIES: TIBBCDField;
     TotalsSource: TDataSource;

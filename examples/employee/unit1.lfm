@@ -189,7 +189,7 @@ object Form1: TForm1
       DataSource = EmployeeSource
       Scrollbars = ssAutoBoth
       TabOrder = 0
-      EditorPanel = EmpoyeeEditorPanel
+      EditorPanel = EmployeeEditorPanel
       ExpandEditorPanelBelowRow = False
       Descending = False
       EditorBorderStyle = bsSingle
@@ -237,7 +237,7 @@ object Form1: TForm1
         ParentColor = False
       end
     end
-    object EmpoyeeEditorPanel: TPanel
+    object EmployeeEditorPanel: TPanel
       Left = 8
       Height = 80
       Top = 112
