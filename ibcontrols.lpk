@@ -508,8 +508,8 @@
    All Rights Reserved.
 
    Contributor(s): ______________________________________. "/>
-    <Version Major="1" Minor="2" Release = "0" />
-    <Files Count="3">
+    <Version Major="1" Minor="2"/>
+    <Files Count="4">
       <Item1>
         <Filename Value="ibcontrols/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
@@ -522,6 +522,10 @@
         <Filename Value="ibcontrols/IBTreeView.pas"/>
         <UnitName Value="IBTreeView"/>
       </Item3>
+      <Item4>
+        <Filename Value="ibcontrols/DBControlGrid.pas"/>
+        <UnitName Value="DBControlGrid"/>
+      </Item4>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
