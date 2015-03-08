@@ -241,11 +241,8 @@ type
     property Enabled;
     property FixedColor;
     property FixedCols;
-    property FixedHotColor;
     property Flat;
     property Font;
-    property HeaderHotZones;
-    property HeaderPushZones;
     property Options: TPanelGridOptions read FOptions write SetOptions;
     property ParentBiDiMode;
     property ParentColor default false;
@@ -1152,6 +1149,8 @@ var
   end;
 
 begin
+  ACanvas.Brush.Color := FixedColor;
+  ACanvas.FillRect(R);
   dx := 6;
   dy := 6;
   case Opt of

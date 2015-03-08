@@ -28,24 +28,21 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="5">
+    <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="DBPanelGrid"/>
+        <PackageName Value="ibcontrols"/>
       </Item1>
       <Item2>
-        <PackageName Value="ibcontrols"/>
-      </Item2>
-      <Item3>
         <PackageName Value="FCL"/>
         <MinVersion Major="1" Valid="True"/>
-      </Item3>
-      <Item4>
+      </Item2>
+      <Item3>
         <PackageName Value="ibexpress"/>
         <MinVersion Minor="9" Valid="True"/>
-      </Item4>
-      <Item5>
+      </Item3>
+      <Item4>
         <PackageName Value="LCL"/>
-      </Item5>
+      </Item4>
     </RequiredPackages>
     <Units Count="119">
       <Unit0>
@@ -653,8 +650,8 @@
         <UnitName Value="DBControlGrid"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="1001"/>
-        <CursorPos Y="1014"/>
+        <TopLine Value="232"/>
+        <CursorPos Y="246"/>
         <UsageCount Value="40"/>
       </Unit88>
       <Unit89>
@@ -667,7 +664,6 @@
       </Unit89>
       <Unit90>
         <Filename Value="../../../../lcl/dbgrids.pas"/>
-        <UnitName Value="DBGrids"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="937"/>
@@ -731,7 +727,6 @@
       </Unit97>
       <Unit98>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <UnitName Value="IBCustomDataSet"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="178"/>
@@ -885,7 +880,6 @@
       </Unit116>
       <Unit117>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <UnitName Value="IBDatabase"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="1486"/>
@@ -894,7 +888,6 @@
       </Unit117>
       <Unit118>
         <Filename Value="../../runtime/IBTable.pas"/>
-        <UnitName Value="IBTable"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="128"/>
@@ -931,7 +924,7 @@
         <WatchScope Value="wpsLocal"/>
         <WatchKind Value="wpkWrite"/>
         <Source Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Line Value="1217"/>
+        <Line Value="1216"/>
       </Item1>
     </BreakPoints>
     <Exceptions Count="3">

@@ -28,24 +28,21 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="5">
+    <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="DBPanelGrid"/>
+        <PackageName Value="ibcontrols"/>
       </Item1>
       <Item2>
-        <PackageName Value="ibcontrols"/>
-      </Item2>
-      <Item3>
         <PackageName Value="FCL"/>
         <MinVersion Major="1" Valid="True"/>
-      </Item3>
-      <Item4>
+      </Item2>
+      <Item3>
         <PackageName Value="ibexpress"/>
         <MinVersion Minor="9" Valid="True"/>
-      </Item4>
-      <Item5>
+      </Item3>
+      <Item4>
         <PackageName Value="LCL"/>
-      </Item5>
+      </Item4>
     </RequiredPackages>
     <Units Count="119">
       <Unit0>
@@ -135,7 +132,7 @@
         <Filename Value="../../../../../projects/external/lazarus.0.9.30/lcl/include/control.inc"/>
         <TopLine Value="3168"/>
         <CursorPos Y="3189"/>
-        <UsageCount Value="0"/>
+        <UsageCount Value="10"/>
       </Unit11>
       <Unit12>
         <Filename Value="../../../runtime/IBIntf.pas"/>
@@ -650,10 +647,11 @@
       <Unit88>
         <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
         <UnitName Value="DBControlGrid"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="1001"/>
-        <CursorPos Y="1014"/>
+        <TopLine Value="232"/>
+        <CursorPos Y="246"/>
         <UsageCount Value="40"/>
         <Loaded Value="True"/>
       </Unit88>
@@ -667,13 +665,11 @@
       </Unit89>
       <Unit90>
         <Filename Value="../../../../lcl/dbgrids.pas"/>
-        <UnitName Value="DBGrids"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="937"/>
         <CursorPos X="3" Y="940"/>
         <UsageCount Value="39"/>
-        <Loaded Value="True"/>
       </Unit90>
       <Unit91>
         <Filename Value="../../../../lcl/grids.pas"/>
@@ -732,14 +728,11 @@
       </Unit97>
       <Unit98>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <UnitName Value="IBCustomDataSet"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="178"/>
         <CursorPos X="32" Y="190"/>
         <UsageCount Value="36"/>
-        <Loaded Value="True"/>
       </Unit98>
       <Unit99>
         <Filename Value="../../../../lcl/include/wincontrol.inc"/>
@@ -888,144 +881,26 @@
       </Unit116>
       <Unit117>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <UnitName Value="IBDatabase"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="1486"/>
         <CursorPos X="29" Y="1497"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit117>
       <Unit118>
         <Filename Value="../../runtime/IBTable.pas"/>
-        <UnitName Value="IBTable"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="128"/>
         <CursorPos Y="151"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit118>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="1">
       <Position1>
         <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1023" Column="15" TopLine="1017"/>
+        <Caret Line="1155" Column="32" TopLine="1143"/>
       </Position1>
-      <Position2>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2880" Column="28" TopLine="2874"/>
-      </Position2>
-      <Position3>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2595" TopLine="2590"/>
-      </Position3>
-      <Position4>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2596" TopLine="2590"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2878" TopLine="2866"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2879" TopLine="2866"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2884" TopLine="2866"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2597" TopLine="2585"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1196" TopLine="1185"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1208" TopLine="1188"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1232" Column="18" TopLine="1225"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1012" Column="3" TopLine="1008"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1013" TopLine="1008"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1014" TopLine="1008"/>
-      </Position14>
-      <Position15>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1013" TopLine="1008"/>
-      </Position15>
-      <Position16>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1014" TopLine="1008"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1235" TopLine="1224"/>
-      </Position17>
-      <Position18>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1194" TopLine="1182"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1196" TopLine="1182"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2595" TopLine="2585"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2596" TopLine="2585"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2597" TopLine="2585"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2596" Column="16" TopLine="2585"/>
-      </Position23>
-      <Position24>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2882" Column="13" TopLine="2874"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-      </Position25>
-      <Position26>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="280" Column="15" TopLine="270"/>
-      </Position26>
-      <Position27>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-      </Position27>
-      <Position28>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="217" Column="32" TopLine="209"/>
-      </Position28>
-      <Position29>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2545" Column="11" TopLine="2540"/>
-      </Position29>
-      <Position30>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2879" Column="51" TopLine="2874"/>
-      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -1055,7 +930,7 @@
         <WatchScope Value="wpsLocal"/>
         <WatchKind Value="wpkWrite"/>
         <Source Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Line Value="1217"/>
+        <Line Value="1216"/>
       </Item1>
     </BreakPoints>
     <Exceptions Count="3">
