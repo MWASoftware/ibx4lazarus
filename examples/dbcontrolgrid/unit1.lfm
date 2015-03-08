@@ -82,7 +82,6 @@ object Form1: TForm1
     BevelOuter = bvNone
     ClientHeight = 522
     ClientWidth = 904
-    Color = clBackground
     ParentColor = False
     TabOrder = 4
     object DBControlGrid1: TDBControlGrid
