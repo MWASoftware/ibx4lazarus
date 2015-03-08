@@ -87,12 +87,12 @@ object Form1: TForm1
     TabOrder = 4
     object DBControlGrid1: TDBControlGrid
       Left = 0
-      Height = 464
-      Top = 8
-      Width = 890
-      AlternateColor = clAqua
+      Height = 472
+      Top = 0
+      Width = 904
+      Align = alClient
+      AlternateColor = clSkyBlue
       AltColorStartNormal = True
-      Anchors = [akTop, akLeft, akRight, akBottom]
       AutoAdvance = aaRight
       Color = clWhite
       DataSource = EmployeeSource
@@ -102,19 +102,19 @@ object Form1: TForm1
       TabOrder = 1
       ColWidths = (
         12
-        876
+        890
       )
       object EmployeeEditorPanel: TPanel
         Left = 12
         Height = 80
         Top = 0
-        Width = 876
+        Width = 890
         Anchors = []
         BevelOuter = bvNone
         BorderWidth = 2
         BorderStyle = bsSingle
         ClientHeight = 78
-        ClientWidth = 874
+        ClientWidth = 888
         Color = clWhite
         ParentColor = False
         TabOrder = 0
@@ -220,7 +220,7 @@ object Form1: TForm1
           TabOrder = 5
         end
         object Label8: TLabel
-          Left = 800
+          Left = 814
           Height = 15
           Top = 54
           Width = 24
@@ -229,7 +229,7 @@ object Form1: TForm1
           ParentColor = False
         end
         object DBEdit5: TDBEdit
-          Left = 824
+          Left = 838
           Height = 25
           Top = 48
           Width = 40
@@ -294,7 +294,7 @@ object Form1: TForm1
           ParentColor = False
         end
         object SpeedButton1: TSpeedButton
-          Left = 772
+          Left = 786
           Height = 25
           Top = 48
           Width = 23
@@ -305,7 +305,7 @@ object Form1: TForm1
           Left = 300
           Height = 25
           Top = 48
-          Width = 464
+          Width = 478
           DataField = 'DEPT_PATH'
           DataSource = EmployeeSource
           ReadOnly = True
@@ -318,7 +318,7 @@ object Form1: TForm1
           Left = 600
           Height = 25
           Top = -1
-          Width = 264
+          Width = 278
           Anchors = [akTop, akLeft, akRight]
           AutoSize = False
           DataField = 'JOB_COUNTRY'
@@ -338,7 +338,7 @@ object Form1: TForm1
           Left = 600
           Height = 25
           Top = 24
-          Width = 264
+          Width = 278
           Anchors = [akTop, akLeft, akRight]
           AutoSize = False
           DataField = 'JOB_CODE'

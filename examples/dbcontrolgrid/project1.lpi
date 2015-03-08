@@ -647,7 +647,6 @@
       </Unit87>
       <Unit88>
         <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <UnitName Value="DBControlGrid"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="232"/>
