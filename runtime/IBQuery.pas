@@ -110,6 +110,7 @@ type
 
   published
     property Active;
+    property AutoCommit;
     property BufferChunks;
     property CachedUpdates;
     property DataSource read GetDataSource write SetDataSource;

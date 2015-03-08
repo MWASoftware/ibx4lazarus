@@ -187,6 +187,8 @@ type
     property ApplyOnEvent: TIBGeneratorApplyOnEvent read FApplyOnEvent write FApplyOnEvent;
   end;
 
+  TIBAutoCommit = (acDisabled, acCommitRetaining);
+
   { TIBCustomDataSet }
   TIBUpdateAction = (uaFail, uaAbort, uaSkip, uaRetry, uaApply, uaApplied);
 
@@ -200,6 +202,7 @@ type
 
   TIBCustomDataSet = class(TDataset)
   private
+    FAutoCommit: TIBAutoCommit;
     FGenerateParamNames: Boolean;
     FGeneratorField: TIBGenerator;
     FNeedsRefresh: Boolean;
@@ -362,11 +365,13 @@ type
     procedure ClearCalcFields(Buffer: PChar); override;
     function AllocRecordBuffer: PChar; override;
     procedure DoBeforeDelete; override;
+    procedure DoAfterDelete; override;
     procedure DoBeforeEdit; override;
     procedure DoBeforeInsert; override;
     procedure DoAfterInsert; override;
     procedure DoBeforeOpen; override;
     procedure DoBeforePost; override;
+    procedure DoAfterPost; override;
     procedure FreeRecordBuffer(var Buffer: PChar); override;
     procedure GetBookmarkData(Buffer: PChar; Data: Pointer); override;
     function GetBookmarkFlag(Buffer: PChar): TBookmarkFlag; override;
@@ -380,6 +385,7 @@ type
                        DoCheck: Boolean): TGetResult; override;
     function GetRecordCount: Integer; override;
     function GetRecordSize: Word; override;
+    procedure InternalAutoCommit;
     procedure InternalAddRecord(Buffer: Pointer; Append: Boolean); override;
     procedure InternalCancel; override;
     procedure InternalClose; override;
@@ -411,6 +417,7 @@ type
 
   protected
     {Likely to be made public by descendant classes}
+    property AutoCommit: TIBAutoCommit read FAutoCommit write FAutoCommit default acDisabled;
     property SQLParams: TIBXSQLDA read GetSQLParams;
     property Params: TIBXSQLDA read GetSQLParams;
     property InternalPrepared: Boolean read FInternalPrepared;
@@ -561,6 +568,7 @@ type
 
   published
     { TIBCustomDataSet }
+    property AutoCommit;
     property BufferChunks;
     property CachedUpdates;
     property DeleteSQL;
@@ -888,6 +896,7 @@ begin
   FParamCheck := True;
   FGenerateParamNames := False;
   FForcedRefresh := False;
+  FAutoCommit:= acDisabled;
   {Bookmark Size is Integer for IBX}
   BookmarkSize := SizeOf(Integer);
   FBase.BeforeDatabaseDisconnect := DoBeforeDatabaseDisconnect;
@@ -1817,7 +1826,10 @@ var
   ofs: DWORD;
   Qry: TIBSQL;
 begin
-  SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
+  if Assigned(Database) and not Database.SQLHourGlass then
+     SetCursor := False
+  else
+    SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
   try
@@ -1941,7 +1953,10 @@ begin
   if FInternalPrepared then
     Exit;
   DidActivate := False;
-  SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
+  if Assigned(Database) and not Database.SQLHourGlass then
+    SetCursor := False
+  else
+    SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
   try
@@ -2524,6 +2539,12 @@ begin
   inherited DoBeforeDelete;
 end;
 
+procedure TIBCustomDataSet.DoAfterDelete;
+begin
+  inherited DoAfterDelete;
+  InternalAutoCommit;
+end;
+
 procedure TIBCustomDataSet.DoBeforeEdit;
 var
   Buff: PRecordData;
@@ -2569,6 +2590,12 @@ begin
      GeneratorField.Apply
 end;
 
+procedure TIBCustomDataSet.DoAfterPost;
+begin
+  inherited DoAfterPost;
+  InternalAutoCommit;
+end;
+
 procedure TIBCustomDataSet.FetchAll;
 var
   SetCursor: Boolean;
@@ -2578,7 +2605,10 @@ var
   CurBookmark: string;
   {$ENDIF}
 begin
-  SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
+  if Assigned(Database) and not Database.SQLHourGlass then
+    SetCursor := False
+  else
+    SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
   try
@@ -2843,6 +2873,16 @@ begin
   result := FRecordBufferSize;
 end;
 
+procedure TIBCustomDataSet.InternalAutoCommit;
+begin
+  with Transaction do
+    if InTransaction and (FAutoCommit = acCommitRetaining) then
+    begin
+      if CachedUpdates then ApplyUpdates;
+      CommitRetaining;
+    end;
+end;
+
 procedure TIBCustomDataSet.InternalAddRecord(Buffer: Pointer; Append: Boolean);
 begin
   CheckEditState;
@@ -2922,7 +2962,10 @@ var
   Buff: PChar;
   SetCursor: Boolean;
 begin
-  SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
+  if Assigned(Database) and not Database.SQLHourGlass then
+    SetCursor := False
+  else
+    SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
   try
@@ -3353,7 +3396,10 @@ var
   end;
 
 begin
-  SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
+  if Assigned(Database) and not Database.SQLHourGlass then
+    SetCursor := False
+  else
+    SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
   try
@@ -3428,7 +3474,10 @@ var
   SetCursor: Boolean;
   bInserting: Boolean;
 begin
-  SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
+  if Assigned(Database) and not Database.SQLHourGlass then
+    SetCursor := False
+  else
+    SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
   try
@@ -3716,7 +3765,10 @@ var
   SetCursor: Boolean;
 begin
   DidActivate := False;
-  SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
+  if Assigned(Database) and not Database.SQLHourGlass then
+    SetCursor := False
+  else
+    SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
   try

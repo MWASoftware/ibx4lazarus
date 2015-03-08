@@ -147,6 +147,7 @@ type
     property TableNames: TStrings read GetTableNames;
 
   published
+    property AutoCommit;
     property Active;
     property BufferChunks;
     property CachedUpdates;

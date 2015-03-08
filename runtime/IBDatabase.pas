@@ -159,6 +159,7 @@ type
     FHiddenPassword: string;
     FIBLoaded: Boolean;
     FOnLogin: TIBDatabaseLoginEvent;
+    FSQLHourGlass: Boolean;
     FTraceFlags: TTraceFlags;
     FDBSQLDialect: Integer;
     FSQLDialect: Integer;
@@ -262,6 +263,7 @@ type
                                                  write SetDefaultTransaction;
     property IdleTimer: Integer read GetIdleTimer write SetIdleTimer;
     property SQLDialect : Integer read GetSQLDialect write SetSQLDialect default 3;
+    property SQLHourGlass: Boolean read FSQLHourGlass write FSQLHourGlass default true;
     property DBSQLDialect : Integer read FDBSQLDialect;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
     property AfterConnect;
@@ -450,6 +452,7 @@ begin
   FTransactions := TList.Create;
   FDBName := '';
   FDBParams := TStringList.Create;
+  FSQLHourGlass := true;
   {$ifdef UNIX}
   if csDesigning in ComponentState then
     FDBParams.Add('lc_ctype=UTF-8');

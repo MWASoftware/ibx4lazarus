@@ -360,11 +360,10 @@
       </Unit47>
       <Unit48>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <UnitName Value="IBDynamicGrid"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="325"/>
-        <CursorPos Y="335"/>
+        <TopLine Value="22"/>
+        <CursorPos X="23" Y="34"/>
         <UsageCount Value="28"/>
       </Unit48>
       <Unit49>
