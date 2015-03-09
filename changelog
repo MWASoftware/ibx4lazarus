@@ -3,19 +3,22 @@ IBX Change Log  version                                          (1.2-1) Sun, 08
 1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 
     rather than a clone for the Delphi TDBCrtlGrid. TDBControlGrid is a single column grid 
     that replicates a TWinControl - typically a TPanel or a TFrame in each row. Each row 
-    corresponding to the rows of the linked DataSource. Any data aware control on the 
+    correspondes to a row of the linked DataSource. Any data aware control on the 
     replicated (e.g.) TPanel will then appear to have the appropriate value for the row.
 
 2. As suggested by Julio Jiménez, a new property "SQLHourGlass" has been added to TIBDatabase.
-   When set to true (default false), the Hour Glass cursor is surpressed and no cursor change
+   When set to false (default true), the Hour Glass cursor is surpressed and no cursor change
    takes place during database access. This may be useful when there are performance issues with
-   the change of cursor.
+   the change of cursor. Setting the property to false suppresses the change of cursor.
 
 3. As suggested by Julio Jiménez, a new property "AutoCommit" has been added to TIBDataSet, TIBQuery
    and TIBTable. When set to acCommitRetaining (Default: acDisabled), a call is made to 
    Transaction.CommitRetaining immediately after every Post or Delete. This has the effect of
    making all changes permanent immediately rather than when the transaction is explicitly 
    committed.
+
+4. Experiental support for the Firebird 3 SQL_BOOLEAN type has been added while still
+   using the legacy Firebird API.
 
 IBX Change Log  version                                      (1.2-0) Thu, 26 Feb 2015 10:34:04 +0000
 
