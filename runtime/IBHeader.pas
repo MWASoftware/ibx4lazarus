@@ -2838,6 +2838,7 @@ const
   SQL_TYPE_TIME                  =        560;
   SQL_TYPE_DATE                  =        570;
   SQL_INT64                      =        580;
+  SQL_BOOLEAN                    =        32764;
   SQL_DATE                       =        SQL_TIMESTAMP;
 
 (*******************)

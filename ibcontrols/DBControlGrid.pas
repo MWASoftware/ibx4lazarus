@@ -118,7 +118,6 @@ type
     procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
   public
     property DisableControlEvents: boolean read FDisableControlEvents write FDisableControlEvents;
-    property FirstRecord;
     property CurrentRowIndex: integer read GetCurrentRowIndex;
     property OnCheckBrowseMode: TDataSetNotifyEvent read FOnCheckBrowseMode write FOnCheckBrowseMode;
   end;
@@ -538,12 +537,15 @@ end;
 
 function TDBControlGrid.GetRecordCount: Integer;
 begin
-  result := FDataLink.DataSet.RecordCount;
+  if assigned(FDataLink.DataSet) then
+    result := FDataLink.DataSet.RecordCount
+  else
+    result := 0;
 end;
 
 procedure TDBControlGrid.GetScrollbarParams(out aRange, aPage, aPos: Integer);
 begin
-  if (FDatalink<>nil) and FDatalink.Active then begin
+  if (FDatalink<>nil) and (FDataLink.DataSet <> nil) and FDatalink.Active then begin
     if FDatalink.dataset.IsSequenced then begin
       aRange := GetRecordCount + VisibleRowCount - 1;
       aPage := VisibleRowCount;
@@ -570,7 +572,7 @@ end;
 function TDBControlGrid.GridCanModify: boolean;
 begin
   result := not FDataLink.ReadOnly
-    and FDataLink.Active and FDatalink.DataSet.CanModify;
+    and ValidDataSet and FDatalink.DataSet.CanModify;
 end;
 
 
@@ -599,7 +601,8 @@ begin
   FCacheRefreshQueued := false;
   aRow := integer(Data);
   FInCacheRefresh := true;
-  FDatalink.DataSet.MoveBy(aRow - FDrawRow)
+  if assigned(FDataLink.DataSet) then
+    FDatalink.DataSet.MoveBy(aRow - FDrawRow)
 end;
 
 procedure TDBControlGrid.DoSetupDrawPanel(Data: PtrInt);
@@ -651,7 +654,8 @@ end;
 procedure TDBControlGrid.OnCheckBrowseMode(aDataSet: TDataSet);
 var RecNo: integer;
 begin
-  if (aDataSet.RecNo > 0) and (FModified or (FRowCache.IsEmpty(aDataSet.RecNo))) then
+  if assigned(FDrawPanel) and (aDataSet.RecNo > 0)
+      and (FModified or (FRowCache.IsEmpty(aDataSet.RecNo))) then
   begin
     RecNo := aDataSet.RecNo;
     Self.SetFocus;
@@ -664,7 +668,7 @@ end;
 
 procedure TDBControlGrid.OnDataSetChanged(aDataSet: TDataSet);
 begin
-  if not (FDataLink.DataSet.State in [dsEdit,dsInsert]) and (FLastRecordCount > GetRecordCount) then
+  if not (aDataSet.State in [dsEdit,dsInsert]) and (FLastRecordCount > GetRecordCount) then
   begin
     {must be delete}
     FRowCache.MarkAsDeleted(FSelectedRecNo);
@@ -672,7 +676,7 @@ begin
     LayoutChanged;
   end;
   FLastRecordCount := GetRecordCount;
-  if FDataLink.DataSet.State <> dsInsert then
+  if aDataSet.State <> dsInsert then
     UpdateActive;
 end;
 
@@ -765,17 +769,25 @@ begin
        theForm := theForm.Parent;
      FDrawPanel.Parent := theForm;
   end;
-  FDrawPanel := AValue;
-  if assigned(FDrawPanel) then
-  begin
-    DefaultRowHeight := FDrawPanel.Height;
-    if csDesigning in ComponentState then
-      UpdateDrawPanelBounds(0)
-    else
-     FDrawPanel.Visible := false;
-    AddHandlerOnResize(@OnDrawPanelResize);
-    FreeNotification(FDrawPanel);
-    FDrawPanel.Parent := self;
+  FRowCache.ClearCache;
+  try
+    FDrawPanel := AValue;
+    if assigned(FDrawPanel) then
+    begin
+      FDrawPanel.Parent := self;
+      DefaultRowHeight := FDrawPanel.Height;
+      if csDesigning in ComponentState then
+        UpdateDrawPanelBounds(0)
+      else
+       FDrawPanel.Visible := false;
+      FRowCache.Height := FDrawPanel.Height;
+      FRowCache.Width := FDrawPanel.Width;
+      AddHandlerOnResize(@OnDrawPanelResize);
+      FreeNotification(FDrawPanel);
+    end;
+  except
+    FDrawPanel := nil;
+    raise;
   end;
 end;
 
@@ -794,7 +806,7 @@ end;
 
 procedure TDBControlGrid.SetupDrawPanel(aRow: integer);
 begin
-  if FRowCache.AlternateColor[FDataLink.DataSet.RecNo] then
+  if ValidDataSet and FRowCache.AlternateColor[FDataLink.DataSet.RecNo] then
     FDrawPanel.Color := AlternateColor
   else
     FDrawPanel.Color := self.Color;
@@ -960,7 +972,7 @@ var
   end;
 
 begin
-  if not FDatalink.Active then exit;
+  if not FDatalink.Active or not assigned(FDataLink.DataSet) then exit;
 
   IsSeq := FDatalink.DataSet.IsSequenced and not FDataLink.DataSet.Filtered;
   case Message.ScrollCode of
@@ -995,8 +1007,7 @@ begin
 function TDBControlGrid.ISEOF: boolean;
 begin
   with FDatalink do
-    result :=
-      Active and DataSet.EOF;
+    result := ValidDataSet and DataSet.EOF;
 end;
 
 function TDBControlGrid.ValidDataSet: boolean;
@@ -1006,6 +1017,8 @@ end;
 
 function TDBControlGrid.InsertCancelable: boolean;
 begin
+  Result := ValidDataSet;
+  if Result then
   with FDatalink.DataSet do
     Result := (State=dsInsert) and not Modified ;
 end;
@@ -1054,7 +1067,7 @@ end;
 procedure TDBControlGrid.DrawAllRows;
 begin
   inherited DrawAllRows;
-  if  FDatalink.DataSet.Active and
+  if  ValidDataSet and FDatalink.DataSet.Active and
     (FDrawRow <> FSelectedRow) and not FCacheRefreshQueued and FInCacheRefresh then
   begin
     Application.QueueAsyncCall(@DoMoveRecord,FSelectedRow);
@@ -1076,7 +1089,7 @@ procedure TDBControlGrid.DrawCell(aCol, aRow: Integer; aRect: TRect;
 
 function GetDatasetState: TDataSetState;
 begin
-  if FDatalink.Active then
+  if ValidDataSet then
     result := FDataLink.DataSet.State
   else
     result := dsInactive;
@@ -1279,14 +1292,14 @@ begin
     VK_ESCAPE:
       begin
         doOnKeyDown;
-        if FDataLink.Active then
+        if ValidDataSet then
            doOperation(opCancel);
       end;
 
     VK_HOME:
       begin
         doOnKeyDown;
-        if Key<>0 then
+        if (Key<>0) and ValidDataSet then
         begin
             if ssCTRL in Shift then
             begin
@@ -1300,7 +1313,7 @@ begin
       begin
         doOnKeyDown;
         if Key<>0 then begin
-          if FDatalink.Active then
+          if ValidDataSet then
           begin
             if ssCTRL in shift then
             begin
@@ -1372,7 +1385,7 @@ var
     FDatalink.Dataset.cancel;
   end;
 begin
-  if (csDesigning in componentState) {or not GCache.ValidGrid }then begin
+  if (csDesigning in componentState) or not ValidDataSet then begin
     exit;
   end;
 

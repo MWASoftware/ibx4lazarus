@@ -112,6 +112,8 @@ type
     procedure JobCodesBeforeOpen(DataSet: TDataSet);
     procedure SaveChangesExecute(Sender: TObject);
     procedure SaveChangesUpdate(Sender: TObject);
+    procedure TotalsQueryTOTALSALARIESGetText(Sender: TField;
+      var aText: string; DisplayText: Boolean);
   private
     { private declarations }
     FDirty: boolean;
@@ -176,6 +178,21 @@ end;
 procedure TForm1.SaveChangesUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := FDirty
+end;
+
+procedure TForm1.TotalsQueryTOTALSALARIESGetText(Sender: TField;
+  var aText: string; DisplayText: Boolean);
+begin
+  if DisplayText then
+  begin
+    if Sender.IsNUll then
+      aText := ''
+    else
+      aText := FormatFloat('Total Salary Bill = $#,##0.00',Sender.AsFloat)
+  end
+  else
+    aText := Sender.AsString
+
 end;
 
 procedure TForm1.Reopen(Data: PtrInt);

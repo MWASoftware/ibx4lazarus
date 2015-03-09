@@ -100,6 +100,7 @@ type
     function AdjustScale(Value: Int64; Scale: Integer): Double;
     function AdjustScaleToInt64(Value: Int64; Scale: Integer): Int64;
     function AdjustScaleToCurrency(Value: Int64; Scale: Integer): Currency;
+    function GetAsBoolean: boolean;
     function GetAsCurrency: Currency;
     function GetAsInt64: Int64;
     function GetAsDateTime: TDateTime;
@@ -116,14 +117,15 @@ type
     function GetIsNullable: Boolean;
     function GetSize: Integer;
     function GetSQLType: Integer;
+    procedure SetAsBoolean(AValue: boolean);
     procedure SetAsCurrency(Value: Currency);
     procedure SetAsInt64(Value: Int64);
     procedure SetAsDate(Value: TDateTime);
+    procedure SetAsLong(Value: Long);
     procedure SetAsTime(Value: TDateTime);
     procedure SetAsDateTime(Value: TDateTime);
     procedure SetAsDouble(Value: Double);
     procedure SetAsFloat(Value: Float);
-    procedure SetAsLong(Value: Long);
     procedure SetAsPointer(Value: Pointer);
     procedure SetAsQuad(Value: TISC_QUAD);
     procedure SetAsShort(Value: Short);
@@ -132,6 +134,7 @@ type
     procedure SetAsXSQLVAR(Value: PXSQLVAR);
     procedure SetIsNull(Value: Boolean);
     procedure SetIsNullable(Value: Boolean);
+    procedure xSetAsBoolean(AValue: boolean);
     procedure xSetAsCurrency(Value: Currency);
     procedure xSetAsInt64(Value: Int64);
     procedure xSetAsDate(Value: TDateTime);
@@ -157,6 +160,7 @@ type
     procedure SaveToFile(const FileName: String);
     procedure SaveToStream(Stream: TStream);
     property AsDate: TDateTime read GetAsDateTime write SetAsDate;
+    property AsBoolean:boolean read GetAsBoolean write SetAsBoolean;
     property AsTime: TDateTime read GetAsDateTime write SetAsTime;
     property AsDateTime: TDateTime read GetAsDateTime write SetAsDateTime;
     property AsDouble: Double read GetAsDouble write SetAsDouble;
@@ -588,6 +592,18 @@ begin
       result := Value;
 end;
 
+function TIBXSQLVAR.GetAsBoolean: boolean;
+begin
+  result := false;
+  if not IsNull then
+  begin
+    if FXSQLVAR^.sqltype and (not 1) = SQL_BOOLEAN then
+      result := PByte(FXSQLVAR^.sqldata)^ = ISC_TRUE
+    else
+      IBError(ibxeInvalidDataConversion, [nil]);
+  end
+end;
+
 function TIBXSQLVAR.GetAsCurrency: Currency;
 begin
   result := 0;
@@ -992,6 +1008,18 @@ end;
 function TIBXSQLVAR.GetSQLType: Integer;
 begin
   result := FXSQLVAR^.sqltype and (not 1);
+end;
+
+procedure TIBXSQLVAR.SetAsBoolean(AValue: boolean);
+var
+  i: Integer;
+begin
+  if FUniqueName then
+     xSetAsBoolean(Value)
+  else
+  for i := 0 to FParent.FCount - 1 do
+    if FParent[i].FName = FName then
+       FParent[i].xSetAsBoolean(Value);
 end;
 
 procedure TIBXSQLVAR.xSetAsCurrency(Value: Currency);
@@ -1529,6 +1557,22 @@ begin
   for i := 0 to FParent.FCount - 1 do
     if FParent[i].FName = FName then
        FParent[i].xSetIsNullable(Value);
+end;
+
+procedure TIBXSQLVAR.xSetAsBoolean(AValue: boolean);
+begin
+  if IsNullable then
+    IsNull := False;
+
+  FXSQLVAR^.sqltype := SQL_BOOLEAN;
+  FXSQLVAR^.sqllen := 1;
+  FXSQLVAR^.sqlscale := 0;
+  IBAlloc(FXSQLVAR^.sqldata, 0, FXSQLVAR^.sqllen);
+  if AValue then
+    PByte(FXSQLVAR^.sqldata)^ := ISC_TRUE
+  else
+    PByte(FXSQLVAR^.sqldata)^ := ISC_FALSE;
+  FModified := True;
 end;
 
 procedure TIBXSQLVAR.Clear;

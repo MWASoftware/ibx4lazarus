@@ -27,7 +27,7 @@
 {    IBX For Lazarus (Firebird Express)                                  }
 {    Contributor: Tony Whyman, MWA Software http://www.mwasoftware.co.uk }
 {    Portions created by MWA Software are copyright McCallum Whyman      }
-{    Associates Ltd 2011                                                 }
+{    Associates Ltd 2011 - 2015                                                }
 {                                                                        }
 {************************************************************************}
 
@@ -1407,6 +1407,7 @@ var
   LocalData: Pointer;
   LocalDate, LocalDouble: Double;
   LocalInt: Integer;
+  LocalBool: Boolean;
   LocalInt64: Int64;
   LocalCurrency: Currency;
   FieldsLoaded: Integer;
@@ -1550,6 +1551,14 @@ begin
 (*              LocalData := @Qry.Current[i].Data^.sqldata[2];*)
             end;
           end;
+        end;
+        SQL_BOOLEAN:
+        begin
+          LocalBool:= False;
+          rdFields[j].fdDataSize := SizeOf(Boolean);
+          if RecordNumber >= 0 then
+            LocalBool := Qry.Current[i].AsBoolean;
+          LocalData := PChar(@LocalBool);
         end;
         else { SQL_TEXT, SQL_BLOB, SQL_ARRAY, SQL_QUAD }
         begin
@@ -2186,6 +2195,8 @@ begin
             SQL_TIMESTAMP:
               Qry.Params[i].AsDateTime :=
                        TimeStampToDateTime(MSecsToTimeStamp(trunc(PDouble(data)^)));
+            SQL_BOOLEAN:
+               Qry.Params[i].AsBoolean  :=(PShort(data)^ = ISC_TRUE)
           end;
         end;
       end;
@@ -3238,6 +3249,8 @@ begin
             FieldSize := sizeof (TISC_QUAD);
             FieldType := ftUnknown;
           end;
+          SQL_BOOLEAN:
+             FieldType:= ftBoolean;
           else
             FieldType := ftUnknown;
         end;
