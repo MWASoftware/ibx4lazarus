@@ -2196,7 +2196,7 @@ begin
               Qry.Params[i].AsDateTime :=
                        TimeStampToDateTime(MSecsToTimeStamp(trunc(PDouble(data)^)));
             SQL_BOOLEAN:
-               Qry.Params[i].AsBoolean  :=(PShort(data)^ = ISC_TRUE)
+               Qry.Params[i].AsBoolean  :=(PShort(data)^ <> 0)
           end;
         end;
       end;
@@ -4246,4 +4246,4 @@ begin
     Owner.FieldByName(FFieldName).AsInteger := GetNextValue(Owner.Database,Owner.Transaction);
 end;
 
-end.
+end.

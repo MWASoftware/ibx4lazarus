@@ -922,6 +922,8 @@ begin
           result := AsDouble;
       SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
         result := AsDouble;
+      SQL_BOOLEAN:
+        result := AsBoolean;
       else
         IBError(ibxeInvalidDataConversion, [nil]);
     end;
@@ -1015,11 +1017,11 @@ var
   i: Integer;
 begin
   if FUniqueName then
-     xSetAsBoolean(Value)
+     xSetAsBoolean(AValue)
   else
   for i := 0 to FParent.FCount - 1 do
     if FParent[i].FName = FName then
-       FParent[i].xSetAsBoolean(Value);
+       FParent[i].xSetAsBoolean(AValue);
 end;
 
 procedure TIBXSQLVAR.xSetAsCurrency(Value: Currency);
@@ -1768,7 +1770,7 @@ begin
 
         case sqltype and (not 1) of
           SQL_TEXT, SQL_TYPE_DATE, SQL_TYPE_TIME, SQL_TIMESTAMP,
-          SQL_BLOB, SQL_ARRAY, SQL_QUAD, SQL_SHORT,
+          SQL_BLOB, SQL_ARRAY, SQL_QUAD, SQL_SHORT, SQL_BOOLEAN,
           SQL_LONG, SQL_INT64, SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT: begin
             if (sqllen = 0) then
               { Make sure you get a valid pointer anyway
