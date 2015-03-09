@@ -195,7 +195,7 @@ type
     procedure DrawAllRows; override;
     procedure DrawRow(ARow: Integer); override;
     procedure DrawCell(aCol,aRow: Integer; aRect: TRect; aState:TGridDrawState); override;
-    procedure DrawIndicator(ACanvas: TCanvas; R: TRect; Opt: TDataSetState; MultiSel: boolean); virtual;
+    procedure DrawIndicator(ACanvas: TCanvas; aRow: integer; R: TRect; Opt: TDataSetState; MultiSel: boolean); virtual;
     procedure KeyDown(var Key : Word; Shift : TShiftState); override;
     procedure LinkActive(Value: Boolean); virtual;
     procedure LayoutChanged; virtual;
@@ -627,6 +627,7 @@ begin
 
     LCLSendMouseDownMsg(Control,P.X,P.Y,FLastMouseButton,FLastMouseShiftState);
     LCLSendMouseUpMsg(Control,P.X,P.Y, FLastMouseButton,FLastMouseShiftState);
+
   end;
   FLastMouse.X := 0;
 end;
@@ -658,7 +659,7 @@ begin
       and (FModified or (FRowCache.IsEmpty(aDataSet.RecNo))) then
   begin
     RecNo := aDataSet.RecNo;
-    Self.SetFocus;
+//    Self.SetFocus;
     Application.ProcessMessages;  {A couple of trips round the message loop seems to be necessary}
     Application.ProcessMessages;
     if RecNo = aDataSet.RecNo then   {Guard against sudden changes}
@@ -1101,7 +1102,7 @@ begin
   PrepareCanvas(aCol, aRow, aState);
 
   if aCol < FixedCols then
-     DrawIndicator(Canvas,aRect,GetDataSetState,false)
+     DrawIndicator(Canvas,aRow, aRect,GetDataSetState,false)
   else
   if not FDrawingActiveRecord and FDataLink.Active then
       DoDrawRow(aRow,aRect,aState);
@@ -1109,8 +1110,8 @@ begin
   DrawCellGrid(aCol, aRow, aRect, aState);
 end;
 
-procedure TDBControlGrid.DrawIndicator(ACanvas: TCanvas; R: TRect;
-  Opt: TDataSetState; MultiSel: boolean);
+procedure TDBControlGrid.DrawIndicator(ACanvas: TCanvas; aRow: integer;
+  R: TRect; Opt: TDataSetState; MultiSel: boolean);
 var
   dx,dy, x, y: Integer;
   procedure CenterY;
@@ -1164,6 +1165,8 @@ var
 begin
   ACanvas.Brush.Color := FixedColor;
   ACanvas.FillRect(R);
+  if aRow <> Row then Exit;
+
   dx := 6;
   dy := 6;
   case Opt of
@@ -1363,8 +1366,8 @@ var
   P: TPoint;
   procedure doMouseDown;
   begin
-    if not Focused then
-      SetFocus;
+//    if not Focused then
+//      SetFocus;
     if assigned(OnMouseDown) then
       OnMouseDown(Self, Button, Shift, X, Y);
   end;
