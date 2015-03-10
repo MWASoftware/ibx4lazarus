@@ -139,6 +139,7 @@ type
     FDrawRow: integer;
     FSelectedRow: integer;
     FSelectedRecNo: integer;
+    FRequiredRecNo: integer;
     FInCacheRefresh: boolean;
     FCacheRefreshQueued: boolean;
     FModified: boolean;
@@ -153,6 +154,7 @@ type
     function  GridCanModify: boolean;
     procedure DoDrawRow(aRow: integer; aRect: TRect; aState: TGridDrawState);
     procedure DoMoveRecord(Data: PtrInt);
+    procedure DoScrollDataSet(Data: PtrInt);
     procedure DoSetupDrawPanel(Data: PtrInt);
     procedure DoSendMouseClicks(Data: PtrInt);
     procedure KeyDownHandler(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -594,6 +596,7 @@ end;
 
 procedure TDBControlGrid.DoSetupDrawPanel(Data: PtrInt);
 begin
+  if AppDestroying in Application.Flags then Exit;
   SetupDrawPanel(FDrawRow);
 end;
 
@@ -601,6 +604,8 @@ procedure TDBControlGrid.DoSendMouseClicks(Data: PtrInt);
 var P: TPoint;
     Control: TControl;
 begin
+  if AppDestroying in Application.Flags then Exit;
+
   if assigned(FDrawPanel) and (FLastMouse.X <> 0) then
   begin
     P := ClientToScreen(FLastMouse);
@@ -663,8 +668,9 @@ begin
     LayoutChanged;
   end;
   FLastRecordCount := GetRecordCount;
-  if aDataSet.State <> dsInsert then
-    UpdateActive
+  if aDataSet.State = dsInsert then
+    FRequiredRecNo := aDataSet.RecNo + 1;
+  UpdateActive
 end;
 
 procedure TDBControlGrid.OnDataSetOpen(aDataSet: TDataSet);
@@ -1051,15 +1057,30 @@ begin
   DoGridResize;
 end;
 
+procedure TDBControlGrid.DoScrollDataSet(Data: PtrInt);
+begin
+  if AppDestroying in Application.Flags then Exit;
+  FDataLink.DataSet.MoveBy(integer(Data) - FDataLink.DataSet.RecNo);
+end;
+
 procedure TDBControlGrid.DrawAllRows;
 begin
   inherited DrawAllRows;
-  if  ValidDataSet and FDatalink.DataSet.Active and
-    (FDrawRow <> FSelectedRow) and not FCacheRefreshQueued and FInCacheRefresh then
+  if  ValidDataSet and FDatalink.DataSet.Active then
   begin
-    Application.QueueAsyncCall(@DoMoveRecord,FSelectedRow);
+    if FInCacheRefresh and not FCacheRefreshQueued then
+    begin
+      if (FRequiredRecNo > 0) and (FRequiredRecNo <> FDataLink.DataSet.RecNo) then
+      begin
+        Application.QueueAsyncCall(@DoScrollDataSet,FRequiredRecNo);
+        FRequiredRecNo := 0;
+      end
+      else
+      if FDrawRow <> FSelectedRow then
+        Application.QueueAsyncCall(@DoMoveRecord,FSelectedRow);
+    end;
+    FInCacheRefresh := false;
   end;
-  FInCacheRefresh := false;
 end;
 
 procedure TDBControlGrid.DrawRow(ARow: Integer);
@@ -1353,6 +1374,7 @@ begin
       FLastRecordCount := FDataLink.DataSet.RecordCount;
       if not FDefaultPositionAtEnd then
         FDataLink.DataSet.First;
+      FRequiredRecNo := FDataLink.DataSet.RecNo;
     finally
       FDataLink.DataSet.EnableControls;
     end;
