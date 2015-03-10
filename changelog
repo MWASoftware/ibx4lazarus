@@ -1,4 +1,4 @@
-IBX Change Log  version                                               (1.2-1) Tue, 10 Mar 2015 23:25:24 +0000
+IBX Change Log  version                                                (1.2-1) Tue, 10 Mar 2015 23:33:50 +0000
 
 1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 
     rather than a clone for the Delphi TDBCrtlGrid. TDBControlGrid is a single column grid 
