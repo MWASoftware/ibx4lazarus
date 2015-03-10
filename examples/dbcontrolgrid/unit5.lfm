@@ -9,6 +9,7 @@ object EditJobCode: TEditJobCode
   ClientWidth = 330
   OnClose = FormClose
   OnShow = FormShow
+  Position = poMainFormCenter
   LCLVersion = '1.4.0.2'
   object Bevel1: TBevel
     Left = 8

@@ -196,6 +196,7 @@ type
     procedure DrawRow(ARow: Integer); override;
     procedure DrawCell(aCol,aRow: Integer; aRect: TRect; aState:TGridDrawState); override;
     procedure DrawIndicator(ACanvas: TCanvas; aRow: integer; R: TRect; Opt: TDataSetState; MultiSel: boolean); virtual;
+    procedure GridMouseWheel(shift: TShiftState; Delta: Integer); override;
     procedure KeyDown(var Key : Word; Shift : TShiftState); override;
     procedure LinkActive(Value: Boolean); virtual;
     procedure LayoutChanged; virtual;
@@ -1192,6 +1193,13 @@ begin
     end;
   end;            end;
 
+procedure TDBControlGrid.GridMouseWheel(shift: TShiftState; Delta: Integer);
+begin
+  inherited GridMouseWheel(shift, Delta);
+  if ValidDataSet then
+    FDataLink.DataSet.MoveBy(Delta);
+end;
+
 procedure TDBControlGrid.KeyDown(var Key: Word; Shift: TShiftState);
 type
   TOperation=(opMoveBy,opCancel,opAppend,opInsert,opDelete);
@@ -1553,7 +1561,7 @@ begin
   FixedRows := 0;
   RowCount := 1;
   ColWidths[0] := 12;
-  Columns.Add; {Add Dummy Column for Panel}
+  Columns.Add.ReadOnly := true; {Add Dummy Column for Panel}
   DoGridResize;
   if not (csDesigning in ComponentState) then
     Application.AddOnKeyDownBeforeHandler(@KeyDownHandler,false);
