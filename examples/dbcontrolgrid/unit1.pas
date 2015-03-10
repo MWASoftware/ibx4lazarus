@@ -15,24 +15,23 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    EditLocationAction: TAction;
+    EditJobCodeAction: TAction;
     DBEdit6: TDBEdit;
     DBControlGrid1: TDBControlGrid;
+    DBEdit7: TDBEdit;
+    DBEdit8: TDBEdit;
     DBText1: TDBText;
     EmployeesDEPT_KEY_PATH: TIBStringField;
     EmployeesDEPT_PATH: TIBStringField;
-    IBLookupComboEditBox1: TIBLookupComboEditBox;
-    IBLookupComboEditBox2: TIBLookupComboEditBox;
+    EmployeesJOB_TITLE: TIBStringField;
     SelectDept: TAction;
     Button4: TButton;
     Button5: TButton;
     CancelChanges: TAction;
     SalaryRange: TComboBox;
-    CountrySource: TDataSource;
     BeforeDate: TDateEdit;
     AfterDate: TDateEdit;
-    DeptsSource: TDataSource;
-    Depts: TIBQuery;
-    JobCodeSource: TDataSource;
     DBEdit1: TDBEdit;
     DBEdit2: TDBEdit;
     DBEdit3: TDBEdit;
@@ -51,8 +50,6 @@ type
     EmployeesPHONE_EXT: TIBStringField;
     EmployeesSALARY: TIBBCDField;
     IBDateEdit1: TDBDateEdit;
-    Countries: TIBQuery;
-    JobCodes: TIBQuery;
     JobGradeDBComboBox: TDBComboBox;
     Label10: TLabel;
     Label11: TLabel;
@@ -69,6 +66,8 @@ type
     Panel2: TPanel;
     EmployeeEditorPanel: TPanel;
     SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
     TotalsQuery: TIBQuery;
     TotalsQueryTOTALSALARIES: TIBBCDField;
     Label1: TLabel;
@@ -84,23 +83,21 @@ type
     IBDatabase1: TIBDatabase;
     IBTransaction1: TIBTransaction;
     TotalsSource: TDataSource;
+    procedure EditJobCodeActionExecute(Sender: TObject);
+    procedure EditJobCodeActionUpdate(Sender: TObject);
+    procedure EditLocationActionExecute(Sender: TObject);
     procedure EmployeesAfterPost(DataSet: TDataSet);
-    procedure EmployeesBeforeScroll(DataSet: TDataSet);
     procedure JobGradeDBComboBoxCloseUp(Sender: TObject);
     procedure SelectDeptExecute(Sender: TObject);
     procedure AddEmployeeExecute(Sender: TObject);
     procedure BeforeDateChange(Sender: TObject);
     procedure CancelChangesExecute(Sender: TObject);
-    procedure CountriesBeforeOpen(DataSet: TDataSet);
     procedure DeleteEmployeeExecute(Sender: TObject);
     procedure EditEmployeeUpdate(Sender: TObject);
     procedure EmployeesAfterInsert(DataSet: TDataSet);
     procedure EmployeesAfterOpen(DataSet: TDataSet);
-    procedure EmployeesAfterScroll(DataSet: TDataSet);
     procedure EmployeesBeforeClose(DataSet: TDataSet);
     procedure EmployeesBeforeOpen(DataSet: TDataSet);
-    procedure EmployeesJOB_CODEChange(Sender: TField);
-    procedure EmployeesJOB_GRADEChange(Sender: TField);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure EmployeesAfterDelete(DataSet: TDataSet);
@@ -109,7 +106,6 @@ type
       var DataAction: TDataAction);
     procedure EmployeesSALARYGetText(Sender: TField; var aText: string;
       DisplayText: Boolean);
-    procedure JobCodesBeforeOpen(DataSet: TDataSet);
     procedure SaveChangesExecute(Sender: TObject);
     procedure SaveChangesUpdate(Sender: TObject);
     procedure TotalsQueryTOTALSALARIESGetText(Sender: TField;
@@ -119,7 +115,6 @@ type
     FDirty: boolean;
     FClosing: boolean;
     procedure Reopen(Data: PtrInt);
-    procedure DoDSOpen(Data: PtrInt);
   public
     { public declarations }
   end; 
@@ -131,7 +126,7 @@ implementation
 
 {$R *.lfm}
 
-uses IB, Unit2;
+uses IB, Unit2, Unit4, Unit5;
 
 function ExtractDBException(msg: string): string;
 var Lines: TStringList;
@@ -164,12 +159,6 @@ begin
     aText := Sender.AsString
 end;
 
-procedure TForm1.JobCodesBeforeOpen(DataSet: TDataSet);
-begin
-  JobCodes.ParamByName('JOB_GRADE').AsInteger := EmployeesJOB_GRADE.AsInteger;
-  JobCodes.ParamByName('JOB_COUNTRY').AsString := EmployeesJOB_COUNTRY.AsString
-end;
-
 procedure TForm1.SaveChangesExecute(Sender: TObject);
 begin
   Employees.Transaction.Commit
@@ -192,23 +181,13 @@ begin
   end
   else
     aText := Sender.AsString
-
 end;
 
 procedure TForm1.Reopen(Data: PtrInt);
 begin
   with IBTransaction1 do
     if not InTransaction then StartTransaction;
-  Countries.Active := true;
   Employees.Active := true;
-  JobCodes.Active := true;
-  Depts.Active := true;
-end;
-
-procedure TForm1.DoDSOpen(Data: PtrInt);
-begin
-  JobCodes.Active := true;
-  Countries.Active := true;
 end;
 
 procedure TForm1.AddEmployeeExecute(Sender: TObject);
@@ -237,10 +216,45 @@ begin
   Employees.Refresh
 end;
 
-procedure TForm1.EmployeesBeforeScroll(DataSet: TDataSet);
+procedure TForm1.EditJobCodeActionUpdate(Sender: TObject);
 begin
-  Countries.Active := false;
-  JobCodes.Active := false;
+  (Sender as TAction).Enabled := Employees.Active and (Employees.RecordCount > 0 )
+end;
+
+procedure TForm1.EditLocationActionExecute(Sender: TObject);
+var Country: string;
+begin
+  Country := EmployeesJOB_COUNTRY.AsString;
+  if EditLocation.ShowModal(EmployeesJOB_GRADE.AsInteger, EmployeesJOB_CODE.AsString,
+     Country) = mrOK then
+     begin
+       Employees.Edit;
+       try
+         EmployeesJOB_COUNTRY.AsString := Country;
+         Employees.Post;
+       except
+         Employees.Cancel;
+         raise
+       end;
+     end;
+end;
+
+procedure TForm1.EditJobCodeActionExecute(Sender: TObject);
+var JobCode: string;
+begin
+  JobCode := EmployeesJOB_CODE.AsString;
+  if EditJobCode.ShowModal(EmployeesJOB_GRADE.AsInteger,EmployeesJOB_COUNTRY.AsString,
+    JobCode) = mrOK then
+    begin
+      Employees.Edit;
+      try
+        EmployeesJOB_CODE.AsString := JobCode;
+        Employees.Post;
+      except
+        Employees.Cancel;
+        raise
+      end;
+    end;
 end;
 
 procedure TForm1.JobGradeDBComboBoxCloseUp(Sender: TObject);
@@ -257,12 +271,6 @@ end;
 procedure TForm1.CancelChangesExecute(Sender: TObject);
 begin
   Employees.Transaction.Rollback
-end;
-
-procedure TForm1.CountriesBeforeOpen(DataSet: TDataSet);
-begin
-  Countries.ParamByName('JOB_GRADE').AsInteger := EmployeesJOB_GRADE.AsInteger;
-  Countries.ParamByName('JOB_CODE').AsString := EmployeesJOB_CODE.AsString
 end;
 
 procedure TForm1.DeleteEmployeeExecute(Sender: TObject);
@@ -295,11 +303,6 @@ procedure TForm1.EmployeesAfterOpen(DataSet: TDataSet);
 begin
   TotalsQuery.Active := true;
   DBControlGrid1.SetFocus;
-end;
-
-procedure TForm1.EmployeesAfterScroll(DataSet: TDataSet);
-begin
-  Application.QueueAsyncCall(@DoDSOpen,0);
 end;
 
 procedure TForm1.EmployeesBeforeClose(DataSet: TDataSet);
@@ -339,20 +342,6 @@ begin
   if AfterDate.Date > 0 then
    (DataSet as TIBParserDataSet).ParamByName('AfterDate').AsDateTime := AfterDate.Date;
 
-end;
-
-procedure TForm1.EmployeesJOB_CODEChange(Sender: TField);
-begin
-  Countries.Active := false;
-  Countries.Active := true;
-end;
-
-procedure TForm1.EmployeesJOB_GRADEChange(Sender: TField);
-begin
-  Countries.Active := false;
-  JobCodes.Active := false;
-  JobCodes.Active := true;
-  Countries.Active := true;
 end;
 
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
