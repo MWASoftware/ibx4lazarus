@@ -192,7 +192,8 @@ end;
 
 procedure TForm1.AddEmployeeExecute(Sender: TObject);
 begin
-  Employees.Append
+  Employees.Append;
+  DBControlGrid1.SetFocus;
 end;
 
 procedure TForm1.SelectDeptExecute(Sender: TObject);
@@ -278,7 +279,8 @@ begin
   if MessageDlg(
     Format('Remove %s from Employee List?',[Employees.FieldByName('Full_Name').AsString]),
     mtConfirmation,[mbYes,mbNo],0) = mrYes then
-    Employees.Delete
+    Employees.Delete;
+    DBControlGrid1.SetFocus;
 end;
 
 procedure TForm1.EditEmployeeUpdate(Sender: TObject);

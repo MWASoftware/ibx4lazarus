@@ -110,15 +110,10 @@ type
 
   TDBControlGridDataLink = class(TComponentDataLink)
   private
-    FDisableControlEvents: boolean;
     FOnCheckBrowseMode: TDataSetNotifyEvent;
-    function GetCurrentRowIndex: integer;
   protected
     procedure CheckBrowseMode; override;
-    procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
   public
-    property DisableControlEvents: boolean read FDisableControlEvents write FDisableControlEvents;
-    property CurrentRowIndex: integer read GetCurrentRowIndex;
     property OnCheckBrowseMode: TDataSetNotifyEvent read FOnCheckBrowseMode write FOnCheckBrowseMode;
   end;
 
@@ -133,6 +128,7 @@ type
   private
     { Private declarations }
     FDataLink: TDBControlGridDataLink;
+    FDefaultPositionAtEnd: boolean;
     FDrawPanel: TWinControl;
     FDrawingActiveRecord: boolean;
     FOldPosition: Integer;
@@ -235,6 +231,7 @@ type
     property Constraints;
     property DataSource: TDataSource read GetDataSource write SetDataSource;
     property DefaultRowHeight;
+    property DefaultPositionAtEnd: boolean read  FDefaultPositionAtEnd write FDefaultPositionAtEnd;
     property DragCursor;
     property DragMode;
     property DrawPanel: TWinControl read FDrawPanel write SetDrawPanel;
@@ -286,22 +283,11 @@ uses LCLType, Math, LCLIntf, Forms, LCLMessageGlue;
 
 { TDBControlGridDataLink }
 
-function TDBControlGridDataLink.GetCurrentRowIndex: integer;
-begin
-  Result := DataSet.RecNo;
-end;
-
 procedure TDBControlGridDataLink.CheckBrowseMode;
 begin
   inherited CheckBrowseMode;
   if assigned(FOnCheckBrowseMode) then
     OnCheckBrowseMode(DataSet);
-end;
-
-procedure TDBControlGridDataLink.DataEvent(Event: DB.TDataEvent; Info: Ptrint);
-begin
-  if DisableControlEvents then Exit;
-  inherited DataEvent(Event, Info);
 end;
 
 { TRowCache }
@@ -660,7 +646,6 @@ begin
       and (FModified or (FRowCache.IsEmpty(aDataSet.RecNo))) then
   begin
     RecNo := aDataSet.RecNo;
-//    Self.SetFocus;
     Application.ProcessMessages;  {A couple of trips round the message loop seems to be necessary}
     Application.ProcessMessages;
     if RecNo = aDataSet.RecNo then   {Guard against sudden changes}
@@ -670,7 +655,7 @@ end;
 
 procedure TDBControlGrid.OnDataSetChanged(aDataSet: TDataSet);
 begin
-  if not (aDataSet.State in [dsEdit,dsInsert]) and (FLastRecordCount > GetRecordCount) then
+  if (aDataSet.State = dsBrowse) and (FLastRecordCount >  GetRecordCount) then
   begin
     {must be delete}
     FRowCache.MarkAsDeleted(FSelectedRecNo);
@@ -679,7 +664,7 @@ begin
   end;
   FLastRecordCount := GetRecordCount;
   if aDataSet.State <> dsInsert then
-    UpdateActive;
+    UpdateActive
 end;
 
 procedure TDBControlGrid.OnDataSetOpen(aDataSet: TDataSet);
@@ -1196,6 +1181,7 @@ begin
 procedure TDBControlGrid.GridMouseWheel(shift: TShiftState; Delta: Integer);
 begin
   inherited GridMouseWheel(shift, Delta);
+  self.SetFocus;
   if ValidDataSet then
     FDataLink.DataSet.MoveBy(Delta);
 end;
@@ -1214,6 +1200,7 @@ var
 
  procedure DoOperation(AOper: TOperation; Arg: Integer = 0);
   begin
+    self.SetFocus;
     case AOper of
       opMoveBy:
         FDatalink.DataSet.MoveBy(Arg);
@@ -1351,6 +1338,25 @@ begin
   FRowCache.AltColorStartNormal := AltColorStartNormal;
   FLastRecordCount := 0;
   LayoutChanged;
+  if Value then
+  begin
+    { The problem being solved here is that TDataSet does not readily tell us
+      when a record is deleted. We get a DataSetChanged event - but this can
+      occur for many reasons. Only by monitoring the record count accurately
+      can be determine when a record is deleted. To do this we need to scroll
+      the whole dataset to the end when the dataset is activated. Not desirable
+      with large datasets - but a fix to TDataSet is needed to avoid this.
+    }
+    FDataLink.DataSet.DisableControls;
+    try
+      FDataLink.DataSet.Last;
+      FLastRecordCount := FDataLink.DataSet.RecordCount;
+      if not FDefaultPositionAtEnd then
+        FDataLink.DataSet.First;
+    finally
+      FDataLink.DataSet.EnableControls;
+    end;
+  end;
 end;
 
 procedure TDBControlGrid.LayoutChanged;
@@ -1399,6 +1405,7 @@ begin
   if (csDesigning in componentState) or not ValidDataSet then begin
     exit;
   end;
+  self.SetFocus;
 
 {  if not MouseButtonAllowed(Button) then begin
     doInherited;
