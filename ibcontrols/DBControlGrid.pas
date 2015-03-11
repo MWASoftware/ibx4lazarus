@@ -12,7 +12,7 @@
  by Tony Whyman (tony@mwasoftware.co.uk) .Additional source code is
  Copyright (c) McCallum Whyman Associates Ltd (trading as MWA Software) 2015.
 
- This unit defines TDBControlGrid a lookalike rather than a clone for the Delphi
+ This unit defines TDBControlGrid: a lookalike rather than a clone for the Delphi
  TDBCrtlGrid. TDBControlGrid is a single column grid that replicates a TWinControl
  - typically a TPanel or a TFrame in each row. Each row corresponding to the rows
  of the linked DataSource. Any data aware control on the replicated (e.g.) TPanel
@@ -136,17 +136,21 @@ type
     FOptions: TPanelGridOptions;
     FWeHaveFocus: boolean;
     FRowCache: TRowCache;
-    FDrawRow: integer;
-    FSelectedRow: integer;
-    FSelectedRecNo: integer;
-    FRequiredRecNo: integer;
-    FInCacheRefresh: boolean;
-    FCacheRefreshQueued: boolean;
+    FDrawRow: integer;          {The current row in the draw panel}
+    FSelectedRow: integer;      {The row containing the current selection}
+    FSelectedRecNo: integer;    {The DataSet RecNo for the current row}
+    FRequiredRecNo: integer;    {Used after a big jump and is the dataset recno
+                                 that we want to end up with}
+    FInCacheRefresh: boolean;       {Cache refresh in progress during paint}
+    FCacheRefreshQueued: boolean;   {cache refresh requested during wmpaint}
     FModified: boolean;
     FLastRecordCount: integer;
+
+    {Used to pass mouse clicks to panel when focused row changes}
     FLastMouse: TPoint;
     FLastMouseButton: TMouseButton;
     FLastMouseShiftState: TShiftState;
+
     procedure EmptyGrid;
     function GetDataSource: TDataSource;
     function GetRecordCount: Integer;
@@ -568,6 +572,7 @@ procedure TDBControlGrid.DoDrawRow(aRow: integer; aRect: TRect;
 var CachedRow: TBitmap;
 begin
   CachedRow := FRowCache.GetRowImage(FSelectedRecNo,aRow-FDrawRow);
+  {if the row is in the cache then draw it - otherwise schedule a cache refresh cycle}
   if CachedRow = nil then
   begin
     if not FCacheRefreshQueued  then
@@ -1067,10 +1072,12 @@ begin
   if  ValidDataSet and FDatalink.DataSet.Active then
   begin
     if FInCacheRefresh and not FCacheRefreshQueued then
+    {We are at the end of a cache refresh cycle}
     begin
-      if (FRequiredRecNo > 0) and (FRequiredRecNo <> FDataLink.DataSet.RecNo) then
+      if FRequiredRecNo > 0  then
       begin
-        Application.QueueAsyncCall(@DoScrollDataSet,FRequiredRecNo);
+        if FRequiredRecNo <> FDataLink.DataSet.RecNo then
+          Application.QueueAsyncCall(@DoScrollDataSet,FRequiredRecNo);
         FRequiredRecNo := 0;
       end
       else
@@ -1111,6 +1118,8 @@ begin
   else
   if not FDrawingActiveRecord and FDataLink.Active then
       DoDrawRow(aRow,aRect,aState);
+  {if we are drawing the active record then this is rendered by the Draw Panel
+   i.e. a child control - so we need do nothing here}
 
   DrawCellGrid(aCol, aRow, aRect, aState);
 end;
