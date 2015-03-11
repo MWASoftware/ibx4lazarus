@@ -16,7 +16,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <CursorPos X="27" Y="5"/>
+        <TopLine Value="4"/>
+        <CursorPos X="16" Y="10"/>
         <UsageCount Value="42"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -33,10 +34,13 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="431"/>
-        <CursorPos Y="443"/>
+        <UnitName Value="IBLookupComboEditBox"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="391"/>
+        <CursorPos X="18" Y="408"/>
         <UsageCount Value="21"/>
+        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
@@ -99,11 +103,10 @@
       <Unit13>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <UnitName Value="IBDynamicGrid"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="626"/>
         <CursorPos Y="632"/>
         <UsageCount Value="17"/>
-        <Loaded Value="True"/>
       </Unit13>
       <Unit14>
         <Filename Value="../../../../lcl/editbtn.pas"/>
@@ -169,11 +172,10 @@
       <Unit24>
         <Filename Value="../../../../lcl/grids.pas"/>
         <UnitName Value="Grids"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="5644"/>
         <CursorPos X="3" Y="5656"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit24>
       <Unit25>
         <Filename Value="../../changelog"/>
@@ -207,63 +209,64 @@
       <Unit29>
         <Filename Value="../../../../lcl/dbgrids.pas"/>
         <UnitName Value="DBGrids"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1206"/>
         <CursorPos X="3" Y="1201"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit29>
       <Unit30>
         <Filename Value="../../../DBPanelGrid/dbpanelgridUnit.pas"/>
-        <UnitName Value="dbpanelgridUnit"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="695"/>
         <CursorPos Y="700"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit30>
     </Units>
-    <JumpHistory Count="10" HistoryIndex="9">
+    <JumpHistory Count="11" HistoryIndex="10">
       <Position1>
-        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <Caret Line="176" Column="30" TopLine="169"/>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="10" Column="16" TopLine="4"/>
       </Position1>
       <Position2>
-        <Filename Value="../../../../lcl/dbgrids.pas"/>
-        <Caret Line="506" Column="22" TopLine="493"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="416" Column="11" TopLine="394"/>
       </Position2>
       <Position3>
-        <Filename Value="../../../../lcl/dbgrids.pas"/>
-        <Caret Line="283" Column="29" TopLine="270"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="408" TopLine="387"/>
       </Position3>
       <Position4>
-        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <Caret Line="396" Column="21" TopLine="385"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="291" TopLine="277"/>
       </Position4>
       <Position5>
-        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <Caret Line="466" Column="3" TopLine="440"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="292" TopLine="277"/>
       </Position5>
       <Position6>
-        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <Caret Line="619" Column="12" TopLine="607"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="293" TopLine="277"/>
       </Position6>
       <Position7>
-        <Filename Value="../../../DBPanelGrid/dbpanelgridUnit.pas"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="295" TopLine="277"/>
       </Position7>
       <Position8>
-        <Filename Value="../../../DBPanelGrid/dbpanelgridUnit.pas"/>
-        <Caret Line="52" TopLine="33"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="296" TopLine="277"/>
       </Position8>
       <Position9>
-        <Filename Value="../../../DBPanelGrid/dbpanelgridUnit.pas"/>
-        <Caret Line="53" TopLine="39"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="297" TopLine="277"/>
       </Position9>
       <Position10>
-        <Filename Value="../../../DBPanelGrid/dbpanelgridUnit.pas"/>
-        <Caret Line="63" TopLine="41"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="298" TopLine="277"/>
       </Position10>
+      <Position11>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="299" TopLine="277"/>
+      </Position11>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

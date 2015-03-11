@@ -1,10 +1,10 @@
 object Form1: TForm1
-  Left = 248
-  Height = 581
-  Top = 391
+  Left = 270
+  Height = 575
+  Top = 397
   Width = 1026
   Caption = 'Employee List'
-  ClientHeight = 581
+  ClientHeight = 575
   ClientWidth = 1026
   OnClose = FormClose
   OnShow = FormShow
@@ -75,24 +75,23 @@ object Form1: TForm1
   end
   object Panel1: TPanel
     Left = 12
-    Height = 533
+    Height = 527
     Top = 42
     Width = 904
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
-    ClientHeight = 533
+    ClientHeight = 527
     ClientWidth = 904
     ParentColor = False
     TabOrder = 4
     object DBControlGrid1: TDBControlGrid
       Left = 0
-      Height = 483
+      Height = 477
       Top = 0
       Width = 904
       Align = alClient
       AlternateColor = clSkyBlue
       AltColorStartNormal = True
-      AutoAdvance = aaRight
       Color = clWhite
       DataSource = EmployeeSource
       DefaultRowHeight = 80
@@ -357,7 +356,7 @@ object Form1: TForm1
     object Panel2: TPanel
       Left = 0
       Height = 50
-      Top = 483
+      Top = 477
       Width = 904
       Align = alBottom
       BevelOuter = bvNone

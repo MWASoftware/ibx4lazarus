@@ -405,6 +405,7 @@ begin
         end;
         NewKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
       end;
+      Text := ''; {Ensure full list}
       UpdateList;
       KeyValue := NewKeyValue;
       UpdateData(nil); {Force sync with DataField}

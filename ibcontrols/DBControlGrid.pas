@@ -224,7 +224,6 @@ type
     property AlternateColor;
     property AltColorStartNormal;
     property Anchors;
-    property AutoAdvance default aaRightDown;
     property BiDiMode;
     property BorderSpacing;
     property BorderStyle;
@@ -249,7 +248,6 @@ type
     property PopupMenu;
     property Scrollbars default ssAutoVertical;
     property ShowHint;
-    property TabAdvance;
     property TabOrder;
     property TabStop;
     property UseXORFeatures;
