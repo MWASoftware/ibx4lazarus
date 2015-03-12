@@ -1407,7 +1407,7 @@ var
   LocalData: Pointer;
   LocalDate, LocalDouble: Double;
   LocalInt: Integer;
-  LocalBool: Boolean;
+  LocalBool: wordBool;
   LocalInt64: Int64;
   LocalCurrency: Currency;
   FieldsLoaded: Integer;
@@ -1554,8 +1554,8 @@ begin
         end;
         SQL_BOOLEAN:
         begin
-          LocalBool:= False;
-          rdFields[j].fdDataSize := SizeOf(Boolean);
+          LocalBool:= false;
+          rdFields[j].fdDataSize := SizeOf(wordBool);
           if RecordNumber >= 0 then
             LocalBool := Qry.Current[i].AsBoolean;
           LocalData := PChar(@LocalBool);
@@ -2196,7 +2196,7 @@ begin
               Qry.Params[i].AsDateTime :=
                        TimeStampToDateTime(MSecsToTimeStamp(trunc(PDouble(data)^)));
             SQL_BOOLEAN:
-               Qry.Params[i].AsBoolean  :=(PShort(data)^ <> 0)
+              Qry.Params[i].AsBoolean := PWordBool(data)^;
           end;
         end;
       end;
