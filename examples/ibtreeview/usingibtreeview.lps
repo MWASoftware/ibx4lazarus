@@ -151,7 +151,6 @@
       </Unit21>
       <Unit22>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
-        <UnitName Value="DbCtrls"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="664"/>
         <CursorPos X="15" Y="677"/>
@@ -232,7 +231,6 @@
       </Unit34>
       <Unit35>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <UnitName Value="IBLookupComboEditBox"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="277"/>
         <CursorPos X="21" Y="284"/>
@@ -267,7 +265,6 @@
       </Unit39>
       <Unit40>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <UnitName Value="IBDynamicGrid"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="793"/>
         <CursorPos Y="804"/>

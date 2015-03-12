@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 722
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.4.0.1'
+  LCLVersion = '1.4.0.2'
   object Panel1: TPanel
     Left = 11
     Height = 367
@@ -275,7 +275,7 @@ object Form1: TForm1
     TabOrder = 2
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AllowStreamedConnected = False
     DatabaseName = 'employee'
     Params.Strings = (
@@ -284,6 +284,7 @@ object Form1: TForm1
     )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
+    SQLHourGlass = False
     TraceFlags = []
     left = 24
     top = 96
