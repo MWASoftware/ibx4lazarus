@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="34">
+    <Units Count="35">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -90,8 +90,8 @@
         <UnitName Value="IBCustomDataSet"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1537"/>
-        <CursorPos X="26" Y="1560"/>
+        <TopLine Value="3329"/>
+        <CursorPos X="55" Y="3351"/>
         <UsageCount Value="14"/>
         <Loaded Value="True"/>
       </Unit11>
@@ -236,17 +236,53 @@
       <Unit33>
         <Filename Value="../../runtime/IBSQL.pas"/>
         <UnitName Value="IBSQL"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1554"/>
-        <CursorPos X="61" Y="1557"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="1329"/>
+        <CursorPos X="3" Y="1333"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit33>
+      <Unit34>
+        <Filename Value="../../runtime/IBQuery.pas"/>
+        <UnitName Value="IBQuery"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="398"/>
+        <CursorPos X="18" Y="419"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit34>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="8" HistoryIndex="7">
       <Position1>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <Caret Line="25" Column="45" TopLine="13"/>
       </Position1>
+      <Position2>
+        <Filename Value="../../runtime/IBQuery.pas"/>
+        <Caret Line="396" Column="16" TopLine="390"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/IBQuery.pas"/>
+        <Caret Line="420" Column="3" TopLine="400"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/IBQuery.pas"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="1560" Column="26" TopLine="1537"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="642" Column="36" TopLine="620"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="3253" Column="35" TopLine="3232"/>
+      </Position8>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

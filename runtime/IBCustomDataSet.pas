@@ -3347,7 +3347,9 @@ begin
         else case cur_field.DataType of
           ftString:
             cur_param.AsString := cur_field.AsString;
-          ftBoolean, ftSmallint, ftWord:
+          ftBoolean:
+            cur_param.AsBoolean := cur_field.AsBoolean;
+          ftSmallint, ftWord:
             cur_param.AsShort := cur_field.AsInteger;
           ftInteger:
             cur_param.AsLong := cur_field.AsInteger;

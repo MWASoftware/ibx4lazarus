@@ -416,7 +416,9 @@ begin
         end;
         ftString:
           SQLParam.AsString := Params[i].AsString;
-        ftBoolean, ftSmallint, ftWord:
+        ftBoolean:
+          SQLParam.AsBoolean := Params[i].AsBoolean;
+        ftSmallint, ftWord:
           SQLParam.AsShort := Params[i].AsSmallInt;
         ftInteger:
           SQLParam.AsLong := Params[i].AsInteger;
@@ -542,4 +544,4 @@ begin
 end;
  *)
 end.
-
+
