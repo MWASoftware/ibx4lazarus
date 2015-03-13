@@ -3059,7 +3059,7 @@ begin
               Line := Line + ', ';
           end;
           SQL_SHORT, SQL_LONG, SQL_INT64,
-          SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
+          SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT, SQL_BOOLEAN:
           begin
             Line := Line + qrySelect.Fields[i].AsString;
             if i <> (qrySelect.Current.Count - 1) then

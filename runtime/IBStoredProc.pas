@@ -235,6 +235,7 @@ var
   Query : TIBSQL;
   input : string;
 begin
+  input := '';
   if FProcName = '' then
      IBError(ibxeNoStoredProcName,[nil]);
   ActivateConnection;
@@ -302,6 +303,8 @@ begin
       else
         DataType := ftFloat;
     SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT: DataType := ftFloat;
+    SQL_BOOLEAN:
+      DataType := ftBoolean;
     SQL_TEXT: DataType := ftString;
     SQL_VARYING:
       if ((QSelect.Fields[i].AsXSQLVar)^.sqllen < 1024) then
@@ -336,6 +339,8 @@ begin
         DataType := ftBCD
       else DataType := ftFloat;
     SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT: DataType := ftFloat;
+    SQL_BOOLEAN:
+      DataType := ftBoolean;
     SQL_TEXT: DataType := ftString;
     SQL_VARYING:
       if ((QSelect.Params[i].AsXSQLVar)^.sqllen < 1024) then
@@ -467,8 +472,10 @@ begin
       case Params[j].DataType of
         ftString:
           SQLParams[i].AsString := Params[j].AsString;
-        ftBoolean, ftSmallint, ftWord:
+        ftSmallint, ftWord:
           SQLParams[i].AsShort := Params[j].AsSmallInt;
+        ftBoolean:
+           SQLParams[i].AsBoolean := Params[j].AsBoolean;
         ftInteger:
           SQLParams[i].AsLong := Params[j].AsInteger;
         ftLargeInt:
@@ -556,4 +563,4 @@ begin
   Reader.ReadCollection(Params);
 end;
 
-end.
+end.

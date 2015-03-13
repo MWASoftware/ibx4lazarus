@@ -38,7 +38,7 @@ unit IBTable;
 interface
 
 uses SysUtils, Classes, DB, IB,  IBCustomDataSet,
-     IBHeader, IBSQL, IBUtils;
+     IBSQL, IBUtils;
      
 type
 
@@ -714,7 +714,11 @@ var
             FieldList := FieldList +
               QuoteIdentifier(DataBase.SQLDialect, Name) +
               ' CHAR(' + IntToStr(Size) + ')'; {do not localize}
-          ftBoolean, ftSmallint, ftWord:
+          ftBoolean:
+            FieldList := FieldList +
+              QuoteIdentifier(DataBase.SQLDialect, Name) +
+              ' BOOLEAN'; {do not localize}
+          ftSmallint, ftWord:
             FieldList := FieldList +
               QuoteIdentifier(DataBase.SQLDialect, Name) +
               ' SMALLINT'; {do not localize}
@@ -1466,4 +1470,4 @@ begin
   end;
 end;
 
-end.
+end.
