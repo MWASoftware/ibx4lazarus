@@ -1431,10 +1431,7 @@ begin
     varCurrency:
       AsCurrency := Value;
     varBoolean:
-      if Value then
-        AsLong := ISC_TRUE
-      else
-        AsLong := ISC_FALSE;
+      AsBoolean := Value;
     varDate:
       AsDateTime := Value;
     varOleStr, varString:
