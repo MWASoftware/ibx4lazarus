@@ -184,8 +184,9 @@ resourcestring
   SThreadFailed = '%s Thread failed with Exception: %s';
   sFieldSizeError = 'Field %s is too small to receive the data';
   STransactionNotEnding = 'Transaction is not being completed';
+  SDscInfoTokenMissing = '%s token not found';
 
 implementation
 
 end.
- 
+ 

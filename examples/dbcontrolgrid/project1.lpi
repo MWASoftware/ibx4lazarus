@@ -646,7 +646,6 @@
       </Unit87>
       <Unit88>
         <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <UnitName Value="DBControlGrid"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="586"/>
@@ -893,18 +892,20 @@
       </Unit118>
       <Unit119>
         <Filename Value="../../runtime/IBHeader.pas"/>
+        <UnitName Value="IBHeader"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="32"/>
-        <CursorPos X="3" Y="45"/>
+        <TopLine Value="2040"/>
+        <CursorPos X="3" Y="2070"/>
         <UsageCount Value="10"/>
       </Unit119>
       <Unit120>
         <Filename Value="../../runtime/IBSQL.pas"/>
+        <UnitName Value="IBSQL"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="1752"/>
-        <CursorPos X="64" Y="1773"/>
+        <TopLine Value="2485"/>
+        <CursorPos X="75" Y="2497"/>
         <UsageCount Value="20"/>
       </Unit120>
       <Unit121>

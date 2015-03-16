@@ -188,12 +188,33 @@ type
     ibxeSV5APIError,
     ibxeThreadFailed,
     ibxeFieldSizeError,
-    ibxTransactionNotEnding
+    ibxTransactionNotEnding,
+    ibxeDscInfoTokenMissing
     );
 
   TStatusVector              = array[0..19] of ISC_STATUS;
   PStatusVector              = ^TStatusVector;
 
+  {TResultBuffer inspired by IBPP RB class - access a isc_dsql_sql_info result buffer}
+
+  TResultBuffer = class
+  private
+    mBuffer: PChar;
+    mSize: short;
+    function FindToken(token: char): PChar; overload;
+    function FindToken(token: char; subtoken: char): PChar; overload;
+  public
+    constructor Create(aSize: integer = 1024);
+    destructor Destroy; virtual;
+    function Size: short;
+    procedure Reset;
+    function GetValue(token: char): integer; overload;
+    function GetValue(token: char; subtoken: char): integer; overload;
+    function GetCountValue(token: char): integer;
+    function GetBool(token: char): boolean;
+    function GetString(token: char; var data: string): integer;
+    function buffer: PChar;
+  end;
 
 const
   IBPalette1 = 'Firebird'; {do not localize}
@@ -324,7 +345,8 @@ const
     SSV5APIError,
     SThreadFailed,
     SFieldSizeError,
-    STransactionNotEnding
+    STransactionNotEnding,
+    SDscInfoTokenMissing
   );
 
 var
@@ -346,7 +368,7 @@ function GetIBDataBaseErrorMessages: TIBDataBaseErrorMessages;
 implementation
 
 uses
-  IBIntf;
+  IBIntf, IBHeader;
 
 var
   IBDataBaseErrorMessages: TIBDataBaseErrorMessages;
@@ -478,6 +500,175 @@ begin
     end;
 end;
 
+{ TResultBuffer }
+
+constructor TResultBuffer.Create(aSize: integer);
+begin
+  inherited Create;
+  mSize := aSize;
+  GetMem(mBuffer,aSize);
+  FillChar(mBuffer^,mSize,255);
+end;
+
+destructor TResultBuffer.Destroy;
+begin
+  if mBuffer <> nil then FreeMem(mBuffer);
+  inherited;
+end;
+
+function TResultBuffer.buffer: PChar;
+begin
+  Result := mBuffer;
+end;
+
+function TResultBuffer.FindToken(token: char): PChar;
+var p: PChar;
+    len: integer;
+begin
+  Result := nil;
+  p := mBuffer;
+
+  while p^ <> char(isc_info_end) do
+  begin
+    if p^ = token then
+    begin
+      Result := p;
+      Exit;
+    end;
+    len := isc_vax_integer(p+1,2);
+    Inc(p,len+3);
+  end;
+end;
+
+function TResultBuffer.FindToken(token: char; subtoken: char): PChar;
+var p: PChar;
+    len, inlen: integer;
+begin
+  Result := nil;
+  p := mBuffer;
+
+  while p^ <> char(isc_info_end) do
+  begin
+    if p^ = token then
+    begin
+      {Found token, now find subtoken}
+      inlen := isc_vax_integer(p+1, 2);
+      Inc(p,3);
+      while inlen > 0 do
+      begin
+	if p^ = subtoken then
+        begin
+          Result := p;
+          Exit;
+        end;
+  	len := isc_vax_integer(p+1, 2);
+        Inc(p,len + 3);
+        Dec(inlen,len + 3);
+      end;
+      Exit;
+    end;
+    len := isc_vax_integer(p+1, 2);
+    inc(p,len+3);
+  end;
+end;
+
+function TResultBuffer.GetBool(token: char): boolean;
+var aValue: integer;
+    p: PChar;
+begin
+  p := FindToken(token);
+
+  if p = nil then
+    IBError(ibxeDscInfoTokenMissing,[token]);
+
+  aValue := isc_vax_integer(p+1, 4);
+  Result := aValue <> 0;
+end;
+
+function TResultBuffer.GetCountValue(token: char): integer;
+var len: integer;
+    p: PChar;
+begin
+  {Specifically used on tokens like isc_info_insert_count and the like
+   which return detailed counts per relation. We sum up the values.}
+
+  p := FindToken(token);
+
+  if p = nil then
+    Exit;
+
+  {len is the number of bytes in the following array}
+
+  len := isc_vax_integer(p+1, 2);
+  Inc(p,3);
+  Result := 0;
+  while len > 0 do
+  begin
+    {Each array item is 6 bytes : 2 bytes for the relation_id which
+     we skip, and 4 bytes for the count value which we sum up across
+     all tables.}
+
+     Inc(Result,isc_vax_integer(p+2, 4));
+     Inc(p,6);
+     Dec(len,6);
+  end;
+end;
+
+function TResultBuffer.GetString(token: char; var data: string): integer;
+var p: PChar;
+begin
+  Result := 0;
+  p := FindToken(token);
+
+  if p = nil then
+    Exit;
+
+  Result := isc_vax_integer(p+1, 2);
+  SetString(data,p+3,Result);
+end;
+
+function TResultBuffer.GetValue(token: char): integer;
+var len: integer;
+    p: PChar;
+begin
+  Result := 0;
+  p := FindToken(token);
+
+  if p = nil then
+    Exit;
+
+  len := isc_vax_integer(p+1, 2);
+  if (len <> 0) then
+    Result := isc_vax_integer(p+3, len);
+end;
+
+function TResultBuffer.GetValue(token: char; subtoken: char): integer;
+var len: integer;
+    p: PChar;
+begin
+  Result := 0;
+  p := FindToken(token, subtoken);
+
+  if p = nil then
+    Exit;
+
+  len := isc_vax_integer(p+1, 2);
+  if (len <> 0) then
+    Result := isc_vax_integer(p+3, len);
+end;
+
+function TResultBuffer.Size: short;
+begin
+  Result := mSize;
+end;
+
+procedure TResultBuffer.Reset;
+begin
+  if mBuffer <> nil then FreeMem(mBuffer);
+  GetMem(mBuffer,mSize);
+  FillChar(mBuffer^,mSize,255);
+end;
+
 
 { EIBError }
 constructor EIBError.Create(ASQLCode: Long; Msg: string);
@@ -521,4 +712,4 @@ initialization
 finalization
   DoneCriticalSection(IBCS);
 
-end.
+end.

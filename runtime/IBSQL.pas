@@ -2343,7 +2343,7 @@ begin
                            TRHandle,
                            @FHandle,
                            Database.SQLDialect,
-                           FSQLParams.AsXSQLDA), True)
+                           FSQLParams.AsXSQLDA), True);
   end;
   if not (csDesigning in ComponentState) then
     MonitorHook.SQLExecute(Self);
@@ -2478,25 +2478,34 @@ end;
 
  function TIBSQL.GetRowsAffected: Integer;
 var
-  result_buffer: array[0..1048] of Char;
   info_request: Char;
+  RB: TResultBuffer;
 begin
   if not Prepared then
     result := -1
   else begin
-    info_request := Char(isc_info_sql_records);
-    if isc_dsql_sql_info(StatusVector, @FHandle, 1, @info_request,
-                         SizeOf(result_buffer), result_buffer) > 0 then
-      IBDatabaseError;
-    if (result_buffer[0] <> Char(isc_info_sql_records)) then
-      result := -1
-    else
-    case SQLType of
-    SQLUpdate:   Result := isc_vax_integer(@result_buffer[6], 4);
-    SQLDelete:   Result := isc_vax_integer(@result_buffer[13], 4);
-    SQLInsert:   Result := isc_vax_integer(@result_buffer[27], 4);
-    else         Result := -1 ;
-    end ;
+    RB := TResultBuffer.Create;
+    try
+      info_request := Char(isc_info_sql_records);
+      if isc_dsql_sql_info(StatusVector, @FHandle, 1, @info_request,
+                         RB.Size, RB.buffer) > 0 then
+        IBDatabaseError;
+      case SQLType of
+      SQLInsert, SQLUpdate: {Covers Insert or Update as well as individual update}
+        Result := RB.GetValue(char(isc_info_sql_records), char(isc_info_req_insert_count))+
+         RB.GetValue(char(isc_info_sql_records), char(isc_info_req_update_count));
+      SQLDelete:
+        Result := RB.GetValue(char(isc_info_sql_records), char(isc_info_req_delete_count));
+      SQLExecProcedure:
+        Result :=  RB.GetValue(char(isc_info_sql_records), char(isc_info_req_insert_count)) +
+                   RB.GetValue(char(isc_info_sql_records), char(isc_info_req_update_count)) +
+                   RB.GetValue(char(isc_info_sql_records), char(isc_info_req_delete_count));
+      else
+        Result := 0;
+      end;
+    finally
+      RB.Free;
+    end;
   end;
 end;
 

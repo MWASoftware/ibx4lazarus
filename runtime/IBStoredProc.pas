@@ -419,6 +419,7 @@ end;
 
 function TIBStoredProc.ParamByName(const Value: string): TParam;
 begin
+  Prepare;
   Result := FParams.ParamByName(Value);
 end;
 
