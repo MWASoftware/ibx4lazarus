@@ -60,7 +60,7 @@ type
     FCheckRowsAffected: Boolean;
     FSQLUpdating: boolean;
     function GetRowsAffected: Integer;
-    procedure PrepareSQL(Value: PChar);
+    procedure PrepareSQL;
     procedure QueryChanged(Sender: TObject);
     procedure ReadParamData(Reader: TReader);
     procedure SetQuery(Value: TStrings);
@@ -123,6 +123,7 @@ type
     property UniDirectional default False;
     property UpdateObject;
     property Filtered;
+    property TransactionCommitAction;
 
     property BeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect;
@@ -294,7 +295,7 @@ begin
     begin
       FRowsAffected := -1;
       FCheckRowsAffected := True;
-      if Length(Text) > 1 then PrepareSQL(PChar(Text))
+      if Length(Text) > 1 then PrepareSQL
       else IBError(ibxeEmptySQLStatement, [nil]);
     end
     else
@@ -320,7 +321,7 @@ var
     for I := 0 to FParams.Count - 1 do
     with FParams[I] do
       if not Bound then
-        IBError(ibxeRequiredParamNotSet, [nil]);
+        IBError(ibxeRequiredParamNotSet, [FParams[I].Name]);
   end;
 
 begin
@@ -443,7 +444,7 @@ begin
   end;
 end;
 
-procedure TIBQuery.PrepareSQL(Value: PChar);
+procedure TIBQuery.PrepareSQL;
 begin
   QSelect.GenerateParamNames := GenerateParamNames;
   InternalPrepare;

@@ -3,6 +3,23 @@ IBX Change Log  version                                                    (1.2-
 1.  TIBStoredProc. Prepare now called by ParamByName to avoid need to always
     call Prepare before setting parameter values.
 
+2.  Error message on parambyname not found now includes name of missing parameter.
+
+3.  Code tidyup and more robust handling of sql information result vector.
+
+4.  Support for centralised handling of transaction status changes. TIBTransaction
+    has been given additional events "AfterEdit", "AfterInsert", "AfterDelete"
+    and "AfterExecQuery". The first three are called after the same event is called
+    for an IBCustomDataSet descendent using the Transaction. The fourth is called
+    after a call to TIBSQL.ExecQuery, again using this transaction. These new events
+    enable monitoring of transaction status changes for a given transaction to be
+    handled in a single place. For example, when a change to the dataset occurs
+    an indicator can be set that shows the user that in order to save changes,
+    the transaction should be committed.
+
+5.  Support has been added for automatic resolution of unsaved row changes when
+    a dataset is closed.
+
 IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
 
 1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 

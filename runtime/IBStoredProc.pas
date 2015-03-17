@@ -465,7 +465,7 @@ begin
     if (Params[j].ParamType <> ptInput) then
       continue;
     if not Params[j].Bound then
-      IBError(ibxeRequiredParamNotSet, [nil]);
+      IBError(ibxeRequiredParamNotSet, [Params[j].Name]);
     if Params[j].IsNull then
       SQLParams[i].IsNull := True
     else begin

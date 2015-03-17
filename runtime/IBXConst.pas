@@ -126,7 +126,7 @@ resourcestring
   SCircularDataLink = 'Circular DataLink Reference';
   SEmptySQLStatement = 'Empty SQL Statement';
   SIsASelectStatement = 'use Open for a Select Statement';
-  SRequiredParamNotSet = 'Required Param value not set';
+  SRequiredParamNotSet = 'Required parameter "%s" value not set';
   SNoStoredProcName = 'No Stored Procedure Name assigned';
   SIsAExecuteProcedure = 'use ExecProc for Procedure; use TQuery for Select procedures';
   SUpdateFailed = 'Update Failed';

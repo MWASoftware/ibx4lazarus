@@ -2057,19 +2057,19 @@ const
 (** Request information items **)
 (*******************************)
 
-  isc_info_number_messages       =          4;
-  isc_info_max_message           =          5;
-  isc_info_max_send              =          6;
-  isc_info_max_receive           =          7;
-  isc_info_state                 =          8;
-  isc_info_message_number        =          9;
-  isc_info_message_size          =         10;
-  isc_info_request_cost          =         11;
-  isc_info_access_path           =         12;
-  isc_info_req_select_count      =         13;
-  isc_info_req_insert_count      =         14;
-  isc_info_req_update_count      =         15;
-  isc_info_req_delete_count      =         16;
+  isc_info_number_messages       =          #4;
+  isc_info_max_message           =          #5;
+  isc_info_max_send              =          #6;
+  isc_info_max_receive           =          #7;
+  isc_info_state                 =          #8;
+  isc_info_message_number        =          #9;
+  isc_info_message_size          =         #10;
+  isc_info_request_cost          =         #11;
+  isc_info_access_path           =         #12;
+  isc_info_req_select_count      =         #13;
+  isc_info_req_insert_count      =         #14;
+  isc_info_req_update_count      =         #15;
+  isc_info_req_delete_count      =         #16;
 
 
 (***********************)
@@ -2361,45 +2361,45 @@ const
 (** SQL information items **)
 (***************************)
 
-  isc_info_sql_select            =          4;
-  isc_info_sql_bind              =          5;
-  isc_info_sql_num_variables     =          6;
-  isc_info_sql_describe_vars     =          7;
-  isc_info_sql_describe_end      =          8;
-  isc_info_sql_sqlda_seq         =          9;
-  isc_info_sql_message_seq       =         10;
-  isc_info_sql_type              =         11;
-  isc_info_sql_sub_type          =         12;
-  isc_info_sql_scale             =         13;
-  isc_info_sql_length            =         14;
-  isc_info_sql_null_ind          =         15;
-  isc_info_sql_field             =         16;
-  isc_info_sql_relation          =         17;
-  isc_info_sql_owner             =         18;
-  isc_info_sql_alias             =         19;
-  isc_info_sql_sqlda_start       =         20;
-  isc_info_sql_stmt_type         =         21;
-  isc_info_sql_get_plan          =         22;
-  isc_info_sql_records           =         23;
-  isc_info_sql_batch_fetch       =         24;
+  isc_info_sql_select            =          #4;
+  isc_info_sql_bind              =          #5;
+  isc_info_sql_num_variables     =          #6;
+  isc_info_sql_describe_vars     =          #7;
+  isc_info_sql_describe_end      =          #8;
+  isc_info_sql_sqlda_seq         =          #9;
+  isc_info_sql_message_seq       =         #10;
+  isc_info_sql_type              =         #11;
+  isc_info_sql_sub_type          =         #12;
+  isc_info_sql_scale             =         #13;
+  isc_info_sql_length            =         #14;
+  isc_info_sql_null_ind          =         #15;
+  isc_info_sql_field             =         #16;
+  isc_info_sql_relation          =         #17;
+  isc_info_sql_owner             =         #18;
+  isc_info_sql_alias             =         #19;
+  isc_info_sql_sqlda_start       =         #20;
+  isc_info_sql_stmt_type         =         #21;
+  isc_info_sql_get_plan          =         #22;
+  isc_info_sql_records           =         #23;
+  isc_info_sql_batch_fetch       =         #24;
 
 (***********************************)
 (** SQL information return values **)
 (***********************************)
 
-  isc_info_sql_stmt_select           =          1;
-  isc_info_sql_stmt_insert           =          2;
-  isc_info_sql_stmt_update           =          3;
-  isc_info_sql_stmt_delete           =          4;
-  isc_info_sql_stmt_ddl              =          5;
-  isc_info_sql_stmt_get_segment      =          6;
-  isc_info_sql_stmt_put_segment      =          7;
-  isc_info_sql_stmt_exec_procedure   =          8;
-  isc_info_sql_stmt_start_trans      =          9;
-  isc_info_sql_stmt_commit           =         10;
-  isc_info_sql_stmt_rollback         =         11;
-  isc_info_sql_stmt_select_for_upd   =         12;
-  isc_info_sql_stmt_set_generator    =         13;
+  isc_info_sql_stmt_select           =          #1;
+  isc_info_sql_stmt_insert           =          #2;
+  isc_info_sql_stmt_update           =          #3;
+  isc_info_sql_stmt_delete           =          #4;
+  isc_info_sql_stmt_ddl              =          #5;
+  isc_info_sql_stmt_get_segment      =          #6;
+  isc_info_sql_stmt_put_segment      =          #7;
+  isc_info_sql_stmt_exec_procedure   =          #8;
+  isc_info_sql_stmt_start_trans      =          #9;
+  isc_info_sql_stmt_commit           =         #10;
+  isc_info_sql_stmt_rollback         =         #11;
+  isc_info_sql_stmt_select_for_upd   =         #12;
+  isc_info_sql_stmt_set_generator    =         #13;
 
 
 (*************************************)
@@ -2998,4 +2998,4 @@ begin
 end;
 
 end.
-
+

@@ -200,6 +200,8 @@ type
 
   TIBUpdateRecordTypes = set of TCachedUpdateStatus;
 
+  TTransactionCommitAction = (tcNone, tcSaveChanges, tcDiscardChanges);
+
   TIBCustomDataSet = class(TDataset)
   private
     FAutoCommit: TIBAutoCommit;
@@ -239,6 +241,7 @@ type
     FRecordBufferSize: Integer;
     FRecordCount: Integer;
     FRecordSize: Integer;
+    FTransactionCommitAction: TTransactionCommitAction;
     FUniDirectional: Boolean;
     FUpdateMode: TUpdateMode;
     FUpdateObject: TIBDataSetUpdateObject;
@@ -260,6 +263,8 @@ type
     FAliasNameList: array of string;
     FBaseSQLSelect: TStrings;
     FParser: TSelectSQLParser;
+    FCloseAction: TTransactionAction;
+    FInTransactionEnd: boolean;
     function GetSelectStmtHandle: TISC_STMT_HANDLE;
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
@@ -276,7 +281,7 @@ type
     procedure DoBeforeDatabaseDisconnect(Sender: TObject);
     procedure DoAfterDatabaseDisconnect(Sender: TObject);
     procedure DoDatabaseFree(Sender: TObject);
-    procedure DoBeforeTransactionEnd(Sender: TObject);
+    procedure DoBeforeTransactionEnd(Sender: TObject; Action: TTransactionAction);
     procedure DoAfterTransactionEnd(Sender: TObject);
     procedure DoTransactionFree(Sender: TObject);
     procedure FetchCurrentRecordToBuffer(Qry: TIBSQL; RecordNumber: Integer;
@@ -324,6 +329,7 @@ type
     procedure WriteRecordCache(RecordNumber: Integer; Buffer: PChar);
     function InternalGetRecord(Buffer: PChar; GetMode: TGetMode;
                        DoCheck: Boolean): TGetResult; virtual;
+    procedure SyncBeforeClose;
 
   protected
     procedure ActivateConnection;
@@ -367,8 +373,10 @@ type
     procedure DoBeforeDelete; override;
     procedure DoAfterDelete; override;
     procedure DoBeforeEdit; override;
+    procedure DoAfterEdit; override;
     procedure DoBeforeInsert; override;
     procedure DoAfterInsert; override;
+    procedure DoBeforeClose; override;
     procedure DoBeforeOpen; override;
     procedure DoBeforePost; override;
     procedure DoAfterPost; override;
@@ -496,6 +504,8 @@ type
     property UpdatesPending: Boolean read FUpdatesPending;
     property UpdateRecordTypes: TIBUpdateRecordTypes read FUpdateRecordTypes
                                                       write SetUpdateRecordTypes;
+    property TransactionCommitAction: TTransactionCommitAction
+               read FTransactionCommitAction write FTransactionCommitAction;
 
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
@@ -581,6 +591,7 @@ type
     property ParamCheck;
     property UniDirectional;
     property Filtered;
+    property TransactionCommitAction;
 
     property BeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect;
@@ -1366,10 +1377,17 @@ begin
     FDatabaseFree(Sender);
 end;
 
-procedure TIBCustomDataSet.DoBeforeTransactionEnd(Sender: TObject);
+procedure TIBCustomDataSet.DoBeforeTransactionEnd(Sender: TObject;
+  Action: TTransactionAction);
 begin
-  if Active then
-    Active := False;
+  FCloseAction := Action;
+  FInTransactionEnd := true;
+  try
+    if Active then
+      Active := False;
+  finally
+    FInTransactionEnd := false;
+  end;
   if FQSelect <> nil then
     FQSelect.FreeHandle;
   if FQDelete <> nil then
@@ -2553,6 +2571,7 @@ end;
 procedure TIBCustomDataSet.DoAfterDelete;
 begin
   inherited DoAfterDelete;
+  FBase.DoAfterDelete(self);
   InternalAutoCommit;
 end;
 
@@ -2570,6 +2589,12 @@ begin
   inherited DoBeforeEdit;
 end;
 
+procedure TIBCustomDataSet.DoAfterEdit;
+begin
+  inherited DoAfterEdit;
+  FBase.DoAfterEdit(self);
+end;
+
 procedure TIBCustomDataSet.DoBeforeInsert;
 begin
   if not CanInsert then
@@ -2582,6 +2607,19 @@ begin
   if GeneratorField.ApplyOnEvent = gaeOnNewRecord then
     GeneratorField.Apply;
   inherited DoAfterInsert;
+  FBase.DoAfterInsert(self);
+end;
+
+procedure TIBCustomDataSet.DoBeforeClose;
+begin
+  inherited DoBeforeClose;
+  if FInTransactionEnd and (State in [dsInsert,dsEdit]) then
+  begin
+    case FCloseAction of
+    TARollback: Cancel;
+    TACommit:   SyncBeforeClose;
+    end;
+  end;
 end;
 
 procedure TIBCustomDataSet.DoBeforeOpen;
@@ -2872,6 +2910,20 @@ begin
     CopyRecordBuffer(FModelBuffer, Buffer);
     PRecordData(Buffer)^.rdBookmarkFlag := bfEOF;
   end;;
+end;
+
+procedure TIBCustomDataSet.SyncBeforeClose;
+begin
+  case TransactionCommitAction of
+  tcSaveChanges:
+    try
+      Post
+    except
+      Cancel;
+      raise;
+    end;
+  tcDiscardChanges:  Cancel;
+  end;
 end;
 
 function TIBCustomDataSet.GetRecordCount: Integer;

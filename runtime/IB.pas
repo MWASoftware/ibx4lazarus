@@ -188,7 +188,7 @@ type
     ibxeSV5APIError,
     ibxeThreadFailed,
     ibxeFieldSizeError,
-    ibxTransactionNotEnding,
+    ibxeTransactionNotEnding,
     ibxeDscInfoTokenMissing
     );
 
@@ -205,7 +205,7 @@ type
     function FindToken(token: char; subtoken: char): PChar; overload;
   public
     constructor Create(aSize: integer = 1024);
-    destructor Destroy; virtual;
+    destructor Destroy; override;
     function Size: short;
     procedure Reset;
     function GetValue(token: char): integer; overload;
@@ -595,7 +595,7 @@ begin
   p := FindToken(token);
 
   if p = nil then
-    Exit;
+    IBError(ibxeDscInfoTokenMissing,[token]);
 
   {len is the number of bytes in the following array}
 
@@ -621,7 +621,7 @@ begin
   p := FindToken(token);
 
   if p = nil then
-    Exit;
+    IBError(ibxeDscInfoTokenMissing,[token]);
 
   Result := isc_vax_integer(p+1, 2);
   SetString(data,p+3,Result);
@@ -635,7 +635,7 @@ begin
   p := FindToken(token);
 
   if p = nil then
-    Exit;
+    IBError(ibxeDscInfoTokenMissing,[token]);
 
   len := isc_vax_integer(p+1, 2);
   if (len <> 0) then
@@ -650,7 +650,7 @@ begin
   p := FindToken(token, subtoken);
 
   if p = nil then
-    Exit;
+    IBError(ibxeDscInfoTokenMissing,[token]);
 
   len := isc_vax_integer(p+1, 2);
   if (len <> 0) then

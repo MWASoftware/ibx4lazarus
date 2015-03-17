@@ -366,7 +366,7 @@ type
     procedure SetSQL(Value: TStrings);
     procedure SetTransaction(Value: TIBTransaction);
     procedure SQLChanging(Sender: TObject);
-    procedure BeforeTransactionEnd(Sender: TObject);
+    procedure BeforeTransactionEnd(Sender: TObject; Action: TTransactionAction);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -2347,6 +2347,8 @@ begin
   end;
   if not (csDesigning in ComponentState) then
     MonitorHook.SQLExecute(Self);
+  FBase.DoAfterExecQuery(self);
+//  writeln('Rows Affected = ',RowsAffected);
 end;
 
 function TIBSQL.GetEOF: Boolean;
@@ -2458,10 +2460,10 @@ begin
        SQLUpdate, SQLDelete])) then
     result := ''
   else begin
-    info_request := Char(isc_info_sql_get_plan);
+    info_request := isc_info_sql_get_plan;
     Call(isc_dsql_sql_info(StatusVector, @FHandle, 2, @info_request,
                            SizeOf(result_buffer), result_buffer), True);
-    if (result_buffer[0] <> Char(isc_info_sql_get_plan)) then
+    if (result_buffer[0] <> isc_info_sql_get_plan) then
       IBError(ibxeUnknownError, [nil]);
     result_length := isc_vax_integer(@result_buffer[1], 2);
     SetString(result, nil, result_length);
@@ -2486,20 +2488,20 @@ begin
   else begin
     RB := TResultBuffer.Create;
     try
-      info_request := Char(isc_info_sql_records);
+      info_request := isc_info_sql_records;
       if isc_dsql_sql_info(StatusVector, @FHandle, 1, @info_request,
                          RB.Size, RB.buffer) > 0 then
         IBDatabaseError;
       case SQLType of
       SQLInsert, SQLUpdate: {Covers Insert or Update as well as individual update}
-        Result := RB.GetValue(char(isc_info_sql_records), char(isc_info_req_insert_count))+
-         RB.GetValue(char(isc_info_sql_records), char(isc_info_req_update_count));
+        Result := RB.GetValue(isc_info_sql_records, isc_info_req_insert_count)+
+         RB.GetValue(isc_info_sql_records, isc_info_req_update_count);
       SQLDelete:
-        Result := RB.GetValue(char(isc_info_sql_records), char(isc_info_req_delete_count));
+        Result := RB.GetValue(isc_info_sql_records, isc_info_req_delete_count);
       SQLExecProcedure:
-        Result :=  RB.GetValue(char(isc_info_sql_records), char(isc_info_req_insert_count)) +
-                   RB.GetValue(char(isc_info_sql_records), char(isc_info_req_update_count)) +
-                   RB.GetValue(char(isc_info_sql_records), char(isc_info_req_delete_count));
+        Result :=  RB.GetValue(isc_info_sql_records, isc_info_req_insert_count) +
+                   RB.GetValue(isc_info_sql_records, isc_info_req_update_count) +
+                   RB.GetValue(isc_info_sql_records, isc_info_req_delete_count);
       else
         Result := 0;
       end;
@@ -2557,6 +2559,7 @@ const
   end;
 
 begin
+  sParamName := '';
   slNames := TStringList.Create;
   try
     { Do some initializations of variables }
@@ -2717,10 +2720,10 @@ begin
     { After preparing the statement, query the stmt type and possibly
       create a FSQLRecord "holder" }
     { Get the type of the statement }
-    type_item := Char(isc_info_sql_stmt_type);
+    type_item := isc_info_sql_stmt_type;
     Call(isc_dsql_sql_info(StatusVector, @FHandle, 1, @type_item,
                          SizeOf(res_buffer), res_buffer), True);
-    if (res_buffer[0] <> Char(isc_info_sql_stmt_type)) then
+    if (res_buffer[0] <> isc_info_sql_stmt_type) then
       IBError(ibxeUnknownError, [nil]);
     stmt_len := isc_vax_integer(@res_buffer[1], 2);
     FSQLType := TIBSQLTypes(isc_vax_integer(@res_buffer[3], stmt_len));
@@ -2809,7 +2812,8 @@ begin
   if FHandle <> nil then FreeHandle;
 end;
 
-procedure TIBSQL.BeforeTransactionEnd(Sender: TObject);
+procedure TIBSQL.BeforeTransactionEnd(Sender: TObject;
+  Action: TTransactionAction);
 begin
   if (FOpen) then
     Close;

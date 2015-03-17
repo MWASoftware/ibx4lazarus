@@ -281,11 +281,16 @@ type
 
   TIBTransaction = class(TComponent)
   private
+    FAfterDelete: TNotifyEvent;
+    FAfterEdit: TNotifyEvent;
+    FAfterExecQuery: TNotifyEvent;
+    FAfterInsert: TNotifyEvent;
     FAfterTransactionEnd: TNotifyEvent;
     FBeforeTransactionEnd: TNotifyEvent;
     FIBLoaded: Boolean;
     FCanTimeout         : Boolean;
     FDatabases          : TList;
+    FOnStartTransaction: TNotifyEvent;
     FSQLObjects         : TList;
     FDefaultDatabase    : TIBDatabase;
     FHandle             : TISC_TR_HANDLE;
@@ -302,6 +307,11 @@ type
     FEndAction          : TTransactionAction;
     procedure DoBeforeTransactionEnd;
     procedure DoAfterTransactionEnd;
+    procedure DoOnStartTransaction;
+    procedure DoAfterExecQuery(Sender: TObject);
+    procedure DoAfterEdit(Sender: TObject);
+    procedure DoAfterDelete(Sender: TObject);
+    procedure DoAfterInsert(Sender: TObject);
     procedure EnsureNotInTransaction;
     procedure EndTransaction(Action: TTransactionAction; Force: Boolean);
     function GetDatabase(Index: Integer): TIBDatabase;
@@ -369,7 +379,16 @@ type
                                              write FBeforeTransactionEnd;
     property AfterTransactionEnd: TNotifyEvent read FAfterTransactionEnd
                                             write FAfterTransactionEnd;
+    property OnStartTransaction: TNotifyEvent read FOnStartTransaction
+                                              write FOnStartTransaction;
+    property AfterExecQuery: TNotifyEvent read FAfterExecQuery
+                                              write FAfterExecQuery;
+    property AfterEdit: TNotifyEvent read FAfterEdit write FAfterEdit;
+    property AfterDelete: TNotifyEvent read FAfterDelete write FAfterDelete;
+    property AfterInsert: TNotifyEvent read FAfterInsert write FAfterInsert;
   end;
+
+  TTransactionEndEvent = procedure(Sender:TObject; Action: TTransactionAction) of object;
 
   { TIBBase }
 
@@ -387,7 +406,7 @@ type
     FAfterDatabaseDisconnect: TNotifyEvent;
     FAfterDatabaseConnect: TNotifyEvent;
     FOnDatabaseFree: TNotifyEvent;
-    FBeforeTransactionEnd: TNotifyEvent;
+    FBeforeTransactionEnd: TTransactionEndEvent;
     FAfterTransactionEnd: TNotifyEvent;
     FOnTransactionFree: TNotifyEvent;
 
@@ -395,7 +414,7 @@ type
     procedure DoBeforeDatabaseDisconnect; virtual;
     procedure DoAfterDatabaseDisconnect; virtual;
     procedure DoDatabaseFree; virtual;
-    procedure DoBeforeTransactionEnd; virtual;
+    procedure DoBeforeTransactionEnd(Action: TTransactionAction); virtual;
     procedure DoAfterTransactionEnd; virtual;
     procedure DoTransactionFree; virtual;
     function GetDBHandle: PISC_DB_HANDLE; virtual;
@@ -407,6 +426,10 @@ type
     destructor Destroy; override;
     procedure CheckDatabase; virtual;
     procedure CheckTransaction; virtual;
+    procedure DoAfterExecQuery(Sender: TObject); virtual;
+    procedure DoAfterEdit(Sender: TObject); virtual;
+    procedure DoAfterDelete(Sender: TObject); virtual;
+    procedure DoAfterInsert(Sender: TObject); virtual;
   public
     property AfterDatabaseConnect: TNotifyEvent read FAfterDatabaseConnect
                                                 write FAfterDatabaseConnect;
@@ -415,7 +438,7 @@ type
     property AfterDatabaseDisconnect: TNotifyEvent read FAfterDatabaseDisconnect
                                                   write FAfterDatabaseDisconnect;
     property OnDatabaseFree: TNotifyEvent read FOnDatabaseFree write FOnDatabaseFree;
-    property BeforeTransactionEnd: TNotifyEvent read FBeforeTransactionEnd write FBeforeTransactionEnd;
+    property BeforeTransactionEnd: TTransactionEndEvent read FBeforeTransactionEnd write FBeforeTransactionEnd;
     property AfterTransactionEnd: TNotifyEvent read FAfterTransactionEnd write FAfterTransactionEnd;
     property OnTransactionFree: TNotifyEvent read FOnTransactionFree write FOnTransactionFree;
     property Database: TIBDatabase read FDatabase
@@ -1409,6 +1432,36 @@ begin
     FAfterTransactionEnd(self);
 end;
 
+procedure TIBTransaction.DoOnStartTransaction;
+begin
+  if assigned(FOnStartTransaction) then
+    OnStartTransaction(self);
+end;
+
+procedure TIBTransaction.DoAfterExecQuery(Sender: TObject);
+begin
+  if assigned(FAfterExecQuery) then
+    AfterExecQuery(Sender);
+end;
+
+procedure TIBTransaction.DoAfterEdit(Sender: TObject);
+begin
+  if assigned(FAfterEdit) then
+    AfterEdit(Sender);
+end;
+
+procedure TIBTransaction.DoAfterDelete(Sender: TObject);
+begin
+  if assigned(FAfterDelete) then
+    AfterDelete(Sender);
+end;
+
+procedure TIBTransaction.DoAfterInsert(Sender: TObject);
+begin
+  if assigned(FAfterInsert) then
+    AfterInsert(Sender);
+end;
+
 procedure TIBTransaction.EnsureNotInTransaction;
 begin
   if csDesigning in ComponentState then
@@ -1496,7 +1549,7 @@ begin
         IBError(ibxeCantEndSharedTransaction, [nil]);
       DoBeforeTransactionEnd;
       for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
-        SQLObjects[i].DoBeforeTransactionEnd;
+        SQLObjects[i].DoBeforeTransactionEnd(Action);
       if InTransaction then
       begin
         if HandleIsShared then
@@ -1829,6 +1882,7 @@ begin
   finally
     FreeMem(pteb);
   end;
+  DoOnStartTransaction;
 end;
 
 procedure TIBTransaction.TimeoutTransaction(Sender: TObject);
@@ -1922,10 +1976,10 @@ begin
   SetTransaction(nil);
 end;
 
-procedure TIBBase.DoBeforeTransactionEnd;
+procedure TIBBase.DoBeforeTransactionEnd(Action: TTransactionAction);
 begin
   if Assigned(BeforeTransactionEnd) then
-    BeforeTransactionEnd(Self);
+    BeforeTransactionEnd(Self,Action);
 end;
 
 procedure TIBBase.DoAfterTransactionEnd;
@@ -1939,6 +1993,30 @@ begin
   if Assigned(OnTransactionFree) then
     OnTransactionFree(Self);
   FTransaction := nil;
+end;
+
+procedure TIBBase.DoAfterExecQuery(Sender: TObject);
+begin
+  if FTransaction <> nil then
+    FTransaction.DoAfterExecQuery(Sender);
+end;
+
+procedure TIBBase.DoAfterEdit(Sender: TObject);
+begin
+  if FTransaction <> nil then
+    FTransaction.DoAfterEdit(Sender);
+end;
+
+procedure TIBBase.DoAfterDelete(Sender: TObject);
+begin
+  if FTransaction <> nil then
+    FTransaction.DoAfterDelete(Sender);
+end;
+
+procedure TIBBase.DoAfterInsert(Sender: TObject);
+begin
+  if FTransaction <> nil then
+    FTransaction.DoAfterInsert(Sender);
 end;
 
 procedure TIBBase.SetDatabase(Value: TIBDatabase);
