@@ -123,7 +123,7 @@ type
     property UniDirectional default False;
     property UpdateObject;
     property Filtered;
-    property TransactionCommitAction;
+    property DataSetCloseAction;
 
     property BeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect;

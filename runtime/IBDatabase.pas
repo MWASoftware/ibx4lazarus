@@ -610,6 +610,7 @@ begin
   if Connected then
     InternalClose(False);
   FDBSQLDialect := 1;
+  SetLength(FCharSetSizes,0);
 end;
 
  procedure TIBDataBase.CreateDatabase;
