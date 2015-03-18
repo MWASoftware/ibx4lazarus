@@ -807,6 +807,7 @@ end;
 
 procedure TIBDataBase.LoadCharSetInfo;
 var Query: TIBSQL;
+    i: integer;
 begin
   if not FInternalTransaction.Active then
     FInternalTransaction.StartTransaction;
@@ -821,6 +822,7 @@ begin
     if not Query.EOF then
     begin
       SetLength(FCharSetSizes,Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger + 1);
+      for i := 0 to Length(FCharSetSizes) - 1 do FCharSetSizes[i] := 1;
       repeat
         FCharSetSizes[Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger] :=
                  Query.FieldByName('RDB$BYTES_PER_CHARACTER').AsInteger;
