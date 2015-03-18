@@ -291,6 +291,11 @@ object Form1: TForm1
   end
   object IBTransaction1: TIBTransaction
     Active = False
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait'
+    )
     left = 24
     top = 136
   end
@@ -300,8 +305,6 @@ object Form1: TForm1
     AfterDelete = DepartmentsAfterDelete
     AfterEdit = DepartmentsAfterDelete
     AfterInsert = DepartmentsAfterInsert
-    BeforeClose = DepartmentsBeforeScroll
-    BeforeScroll = DepartmentsBeforeScroll
     BufferChunks = 1000
     CachedUpdates = False
     DeleteSQL.Strings = (
@@ -337,6 +340,7 @@ object Form1: TForm1
     GeneratorField.Field = 'DEPT_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
+    DataSetCloseAction = dcSaveChanges
     AfterTransactionEnd = DepartmentsAfterTransactionEnd
     left = 64
     top = 176
@@ -454,6 +458,7 @@ object Form1: TForm1
       'order by 2'
     )
     Params = <>
+    DataSetCloseAction = dcDiscardChanges
     left = 64
     top = 221
   end
@@ -480,6 +485,7 @@ object Form1: TForm1
         Name = 'DEPT_NO'
         ParamType = ptInput
       end>
+    DataSetCloseAction = dcDiscardChanges
     left = 64
     top = 264
     ParamData = <    

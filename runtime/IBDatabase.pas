@@ -182,6 +182,7 @@ type
     FUserNames: TStringList;
     FDataSets: TList;
     FLoginCalled: boolean;
+    FCharSetSizes: array of integer;
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
     function GetSQLDialect: Integer;
@@ -196,6 +197,7 @@ type
     function GetTransaction(Index: Integer): TIBTransaction;
     function GetTransactionCount: Integer;
     function Login: Boolean;
+    procedure LoadCharSetInfo;
     procedure SetDatabaseName(const Value: TIBFileName);
     procedure SetDBParamByDPB(const Idx: Integer; Value: String);
     procedure SetDBParams(Value: TStrings);
@@ -430,6 +432,7 @@ type
     procedure DoAfterEdit(Sender: TObject); virtual;
     procedure DoAfterDelete(Sender: TObject); virtual;
     procedure DoAfterInsert(Sender: TObject); virtual;
+    function GetCharSetSize(CharSetID: integer): integer;
   public
     property AfterDatabaseConnect: TNotifyEvent read FAfterDatabaseConnect
                                                 write FAfterDatabaseConnect;
@@ -801,6 +804,34 @@ begin
       SQLObjects[i].DoAfterDatabaseDisconnect;
 end;
 
+procedure TIBDataBase.LoadCharSetInfo;
+var Query: TIBSQL;
+begin
+  if not FInternalTransaction.Active then
+    FInternalTransaction.StartTransaction;
+  Query := TIBSQL.Create(self);
+  try
+    Query.Database := Self;
+    Query.Transaction := FInternalTransaction;
+    Query.SQL.Text := 'Select RDB$CHARACTER_SET_ID, RDB$BYTES_PER_CHARACTER ' +
+                      'From RDB$CHARACTER_SETS Order by 1 DESC'; {do not localize}
+    Query.Prepare;
+    Query.ExecQuery;
+    if not Query.EOF then
+    begin
+      SetLength(FCharSetSizes,Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger + 1);
+      repeat
+        FCharSetSizes[Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger] :=
+                 Query.FieldByName('RDB$BYTES_PER_CHARACTER').AsInteger;
+        Query.Next;
+      until Query.EOF;
+    end;
+  finally
+    Query.free;
+    FInternalTransaction.Commit;
+  end;
+end;
+
 procedure TIBDataBase.CheckStreamConnect;
 var
   i: integer;
@@ -980,6 +1011,7 @@ begin
   end;
   if not (csDesigning in ComponentState) then
     MonitorHook.DBConnect(Self);
+  LoadCharSetInfo;
 end;
 
  procedure TIBDataBase.RemoveSQLObject(Idx: Integer);
@@ -1922,6 +1954,14 @@ begin
   SetDatabase(nil);
   SetTransaction(nil);
   inherited Destroy;
+end;
+
+function TIBBase.GetCharSetSize(CharSetID: integer): integer;
+begin
+  if (CharSetID >= 0) and (CharSetID < Length(Database.FCharSetSizes)) then
+    Result := Database.FCharSetSizes[CharSetID]
+  else
+    Result := 1; {Unknown character set}
 end;
 
 procedure TIBBase.CheckDatabase;

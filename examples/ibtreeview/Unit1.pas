@@ -83,7 +83,6 @@ type
     procedure DepartmentsAfterDelete(DataSet: TDataSet);
     procedure DepartmentsAfterInsert(DataSet: TDataSet);
     procedure DepartmentsAfterTransactionEnd(Sender: TObject);
-    procedure DepartmentsBeforeScroll(DataSet: TDataSet);
     procedure DepartmentsBUDGETChange(Sender: TField);
     procedure DepartmentsBUDGETGetText(Sender: TField; var aText: string;
       DisplayText: Boolean);
@@ -179,19 +178,6 @@ procedure TForm1.DepartmentsAfterTransactionEnd(Sender: TObject);
 begin
   if not FClosing then
     Application.QueueAsyncCall(@Reopen,0);
-end;
-
-procedure TForm1.DepartmentsBeforeScroll(DataSet: TDataSet);
-begin
-  with DataSet do
-    try
-      if State in [dsInsert,dsEdit] then Post
-    except on E: Exception do
-      begin
-        Cancel;
-        MessageDlg(E.Message,mtError,[mbOK],0)
-      end
-    end;
 end;
 
 procedure TForm1.DepartmentsBUDGETChange(Sender: TField);

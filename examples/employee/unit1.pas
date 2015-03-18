@@ -20,6 +20,17 @@ type
     EmployeesDEPT_PATH: TIBStringField;
     IBLookupComboEditBox1: TIBLookupComboEditBox;
     IBLookupComboEditBox2: TIBLookupComboEditBox;
+    IBQuery1DEPT_NO: TIBStringField;
+    IBQuery1EMP_NO: TSmallintField;
+    IBQuery1FIRST_NAME: TIBStringField;
+    IBQuery1FULL_NAME: TIBStringField;
+    IBQuery1HIRE_DATE: TDateTimeField;
+    IBQuery1JOB_CODE: TIBStringField;
+    IBQuery1JOB_COUNTRY: TIBStringField;
+    IBQuery1JOB_GRADE: TSmallintField;
+    IBQuery1LAST_NAME: TIBStringField;
+    IBQuery1PHONE_EXT: TIBStringField;
+    IBQuery1SALARY: TIBBCDField;
     SelectDept: TAction;
     Button4: TButton;
     Button5: TButton;
@@ -283,14 +294,6 @@ end;
 
 procedure TForm1.EmployeesBeforeClose(DataSet: TDataSet);
 begin
-  with DataSet do
-    if State in [dsInsert,dsEdit] then
-    try
-     Post;
-    except
-      Cancel;
-      raise;
-    end;
   TotalsQuery.Active := false
 end;
 
@@ -383,4 +386,4 @@ begin
 end;
 
 end.
-
+

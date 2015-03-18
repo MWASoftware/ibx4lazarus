@@ -327,8 +327,6 @@ object Form1: TForm1
     AfterEdit = EmployeesAfterDelete
     AfterInsert = EmployeesAfterInsert
     AfterPost = EmployeesAfterPost
-    BeforeClose = EmployeesBeforeScroll
-    BeforeScroll = EmployeesBeforeScroll
     BufferChunks = 1000
     CachedUpdates = False
     DeleteSQL.Strings = (
@@ -381,6 +379,7 @@ object Form1: TForm1
     GeneratorField.Field = 'EMP_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
+    DataSetCloseAction = dcSaveChanges
     AfterTransactionEnd = EmployeesAfterTransactionEnd
     left = 496
     top = 16
@@ -568,6 +567,7 @@ object Form1: TForm1
         Name = 'JOB_GRADE'
         ParamType = ptInput
       end>
+    DataSetCloseAction = dcDiscardChanges
     left = 425
     top = 56
     ParamData = <    
@@ -606,6 +606,7 @@ object Form1: TForm1
         Name = 'JOB_GRADE'
         ParamType = ptInput
       end>
+    DataSetCloseAction = dcDiscardChanges
     left = 425
     top = 18
     ParamData = <    

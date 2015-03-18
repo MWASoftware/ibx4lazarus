@@ -200,7 +200,7 @@ type
 
   TIBUpdateRecordTypes = set of TCachedUpdateStatus;
 
-  TTransactionCommitAction = (tcNone, tcSaveChanges, tcDiscardChanges);
+  TDataSetCloseAction = (dcDiscardChanges, dcSaveChanges);
 
   TIBCustomDataSet = class(TDataset)
   private
@@ -241,7 +241,7 @@ type
     FRecordBufferSize: Integer;
     FRecordCount: Integer;
     FRecordSize: Integer;
-    FTransactionCommitAction: TTransactionCommitAction;
+    FDataSetCloseAction: TDataSetCloseAction;
     FUniDirectional: Boolean;
     FUpdateMode: TUpdateMode;
     FUpdateObject: TIBDataSetUpdateObject;
@@ -329,7 +329,6 @@ type
     procedure WriteRecordCache(RecordNumber: Integer; Buffer: PChar);
     function InternalGetRecord(Buffer: PChar; GetMode: TGetMode;
                        DoCheck: Boolean): TGetResult; virtual;
-    procedure SyncBeforeClose;
 
   protected
     procedure ActivateConnection;
@@ -504,8 +503,8 @@ type
     property UpdatesPending: Boolean read FUpdatesPending;
     property UpdateRecordTypes: TIBUpdateRecordTypes read FUpdateRecordTypes
                                                       write SetUpdateRecordTypes;
-    property TransactionCommitAction: TTransactionCommitAction
-               read FTransactionCommitAction write FTransactionCommitAction;
+    property DataSetCloseAction: TDataSetCloseAction
+               read FDataSetCloseAction write FDataSetCloseAction;
 
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
@@ -591,7 +590,7 @@ type
     property ParamCheck;
     property UniDirectional;
     property Filtered;
-    property TransactionCommitAction;
+    property DataSetCloseAction;
 
     property BeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect;
@@ -908,6 +907,7 @@ begin
   FGenerateParamNames := False;
   FForcedRefresh := False;
   FAutoCommit:= acDisabled;
+  FDataSetCloseAction := dcDiscardChanges;
   {Bookmark Size is Integer for IBX}
   BookmarkSize := SizeOf(Integer);
   FBase.BeforeDatabaseDisconnect := DoBeforeDatabaseDisconnect;
@@ -2613,12 +2613,15 @@ end;
 procedure TIBCustomDataSet.DoBeforeClose;
 begin
   inherited DoBeforeClose;
-  if FInTransactionEnd and (State in [dsInsert,dsEdit]) then
+  if State in [dsInsert,dsEdit] then
   begin
-    case FCloseAction of
-    TARollback: Cancel;
-    TACommit:   SyncBeforeClose;
-    end;
+    if FInTransactionEnd and (FCloseAction = TARollback) then
+       Exit;
+
+    if DataSetCloseAction = dcSaveChanges then
+      Post;
+      {Note this can fail with an exception e.g. due to
+       database validation error. In which case the dataset remains open }
   end;
 end;
 
@@ -2910,20 +2913,6 @@ begin
     CopyRecordBuffer(FModelBuffer, Buffer);
     PRecordData(Buffer)^.rdBookmarkFlag := bfEOF;
   end;;
-end;
-
-procedure TIBCustomDataSet.SyncBeforeClose;
-begin
-  case TransactionCommitAction of
-  tcSaveChanges:
-    try
-      Post
-    except
-      Cancel;
-      raise;
-    end;
-  tcDiscardChanges:  Cancel;
-  end;
 end;
 
 function TIBCustomDataSet.GetRecordCount: Integer;
@@ -3232,7 +3221,7 @@ begin
            their values }
           SQL_VARYING, SQL_TEXT:
           begin
-            FieldSize := sqllen;
+            FieldSize := sqllen div FBase.GetCharSetSize(sqlsubtype and $FF);
             FieldType := ftString;
           end;
           { All Doubles/Floats should be cast to doubles }

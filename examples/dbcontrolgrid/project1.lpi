@@ -60,7 +60,8 @@
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="25" Y="11"/>
+        <TopLine Value="310"/>
+        <CursorPos Y="312"/>
         <UsageCount Value="191"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -725,7 +726,6 @@
       </Unit97>
       <Unit98>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <UnitName Value="IBCustomDataSet"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="3640"/>
@@ -895,7 +895,6 @@
       </Unit118>
       <Unit119>
         <Filename Value="../../runtime/IBHeader.pas"/>
-        <UnitName Value="IBHeader"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="1917"/>
@@ -904,7 +903,6 @@
       </Unit119>
       <Unit120>
         <Filename Value="../../runtime/IBSQL.pas"/>
-        <UnitName Value="IBSQL"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="471"/>
@@ -999,7 +997,6 @@
       </Unit130>
       <Unit131>
         <Filename Value="../../runtime/IBDatabaseInfo.pas"/>
-        <UnitName Value="IBDatabaseInfo"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="439"/>
@@ -1008,7 +1005,6 @@
       </Unit131>
       <Unit132>
         <Filename Value="../../runtime/IBServices.pas"/>
-        <UnitName Value="IBServices"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="977"/>
@@ -1017,7 +1013,6 @@
       </Unit132>
       <Unit133>
         <Filename Value="../../runtime/IBIntf.pas"/>
-        <UnitName Value="IBIntf"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="99"/>
@@ -1026,7 +1021,6 @@
       </Unit133>
       <Unit134>
         <Filename Value="../../runtime/IBBlob.pas"/>
-        <UnitName Value="IBBlob"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="273"/>

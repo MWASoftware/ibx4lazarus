@@ -3,9 +3,9 @@ IBX Change Log  version                                                    (1.2-
 1.  TIBStoredProc. Prepare now called by ParamByName to avoid need to always
     call Prepare before setting parameter values.
 
-2.  Error message on parambyname not found now includes name of missing parameter.
+2.  Error message on ParamByName (all cases) not found now includes name of missing parameter.
 
-3.  Code tidyup and more robust handling of sql information result vector.
+3.  Code tidyup and more robust handling of dsql information result vector.
 
 4.  Support for centralised handling of transaction status changes. TIBTransaction
     has been given additional events "AfterEdit", "AfterInsert", "AfterDelete"
@@ -15,10 +15,29 @@ IBX Change Log  version                                                    (1.2-
     enable monitoring of transaction status changes for a given transaction to be
     handled in a single place. For example, when a change to the dataset occurs
     an indicator can be set that shows the user that in order to save changes,
-    the transaction should be committed.
+    the transaction should be committed.  Rather than doing this per dataset, this
+    can now be done per transaction.
 
-5.  Support has been added for automatic resolution of unsaved row changes when
-    a dataset is closed.
+5.  TDataSet.CheckBrowseMode automatically posts changes to the current row when
+    the dataset is scrolled. However, any changes to the current row are, by default,
+    discarded. TIBDataSet, TIBQuery and TIBTable now have a new property "DataSetCloseAction"
+    that adds automatic posting of changes on dataset close. If this property is
+    set to dcDiscardChanges (default) then the behaviour is unchanged from previous
+    versions. if the value is set to dcSaveChanges then IBX will attempt to post
+    any unsaved changes before the dataset is closed (and after the BeforeClose event
+    handler is called). The exception is when the dataset is being closed as a result
+    of a transaction rollback. In this case, no action is taken and any unsaved
+    changes are discarded. This avoids both unnecessary overhead and the risk that
+    a validation error may occur in the Post raising an exception and thereby 
+    preventing a rollback.
+
+6.  String Field sizes should now be correct for multi-byte character sets. In earlier
+    versions the field size was set to the maximum byte width rather than the character
+    width. Field sizes are now corrected by dividing by the max byte width per character.
+    For UTF8 character sets, the byte width is four and hence the Field Size will be
+    the byte width divided by 4. The byte width of each character set is determined
+    dynamically when the database connection is estabished from the RDB$CHARACTER_SETS
+    system table.
 
 IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
 

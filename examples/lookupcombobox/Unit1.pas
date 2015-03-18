@@ -72,7 +72,6 @@ type
     procedure EmployeesAfterInsert(DataSet: TDataSet);
     procedure EmployeesAfterPost(DataSet: TDataSet);
     procedure EmployeesAfterTransactionEnd(Sender: TObject);
-    procedure EmployeesBeforeScroll(DataSet: TDataSet);
     procedure EmployeesFULL_NAMEChange(Sender: TField);
     procedure EmployeesJOB_CODEChange(Sender: TField);
     procedure EmployeesJOB_GRADEChange(Sender: TField);
@@ -264,20 +263,6 @@ procedure TForm1.EmployeesAfterTransactionEnd(Sender: TObject);
 begin
   if not FClosing then
     Application.QueueAsyncCall(@OpenDataSets,0)
-end;
-
-procedure TForm1.EmployeesBeforeScroll(DataSet: TDataSet);
-begin
-  with DataSet do
-    if State in [dsInsert,dsEdit] then
-    try
-      Post
-    except on E: Exception do
-      begin
-        Cancel;
-        MessageDlg(E.Message,mtError,[mbOK],0)
-      end;
-    end;
 end;
 
 procedure TForm1.EmployeesFULL_NAMEChange(Sender: TField);

@@ -506,6 +506,7 @@ object Form1: TForm1
       'From EMPLOYEE'
     )
     Params = <>
+    DataSetCloseAction = dcDiscardChanges
     left = 872
     top = 376
     object TotalsQueryTOTALSALARIES: TIBBCDField
@@ -596,6 +597,7 @@ object Form1: TForm1
     GeneratorField.Field = 'EMP_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
+    DataSetCloseAction = dcSaveChanges
     AfterTransactionEnd = EmployeesAfterTransactionEnd
     left = 872
     top = 336

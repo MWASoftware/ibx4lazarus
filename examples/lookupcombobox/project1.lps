@@ -17,8 +17,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="4"/>
-        <CursorPos X="26" Y="11"/>
+        <TopLine Value="267"/>
+        <CursorPos X="3" Y="271"/>
         <UsageCount Value="43"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -90,8 +90,8 @@
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <UnitName Value="IBCustomDataSet"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="3237"/>
-        <CursorPos X="32" Y="3187"/>
+        <TopLine Value="3202"/>
+        <CursorPos Y="3224"/>
         <UsageCount Value="14"/>
       </Unit11>
       <Unit12>
@@ -115,7 +115,6 @@
       </Unit14>
       <Unit15>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
-        <UnitName Value="db"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="660"/>
         <CursorPos X="15" Y="675"/>
@@ -222,9 +221,10 @@
       </Unit30>
       <Unit31>
         <Filename Value="../../runtime/IBDatabase.pas"/>
+        <UnitName Value="IBDatabase"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="753"/>
-        <CursorPos X="10" Y="774"/>
+        <TopLine Value="1943"/>
+        <CursorPos Y="1961"/>
         <UsageCount Value="10"/>
       </Unit31>
       <Unit32>
@@ -238,19 +238,17 @@
         <Filename Value="../../runtime/IBSQL.pas"/>
         <UnitName Value="IBSQL"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1768"/>
-        <CursorPos X="53" Y="1774"/>
+        <TopLine Value="190"/>
+        <CursorPos X="3" Y="195"/>
         <UsageCount Value="10"/>
       </Unit33>
       <Unit34>
         <Filename Value="../../runtime/IBQuery.pas"/>
-        <UnitName Value="IBQuery"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="10"/>
       </Unit34>
       <Unit35>
         <Filename Value="../../runtime/IBStoredProc.pas"/>
-        <UnitName Value="IBStoredProc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="325"/>
         <CursorPos X="36" Y="326"/>
@@ -265,7 +263,6 @@
       </Unit36>
       <Unit37>
         <Filename Value="../../runtime/IBExtract.pas"/>
-        <UnitName Value="IBExtract"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3045"/>
         <CursorPos X="58" Y="3062"/>
@@ -279,6 +276,11 @@
         <UsageCount Value="10"/>
       </Unit38>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="11" Column="26" TopLine="4"/>
+      </Position1>
+    </JumpHistory>
   </ProjectSession>
 </CONFIG>

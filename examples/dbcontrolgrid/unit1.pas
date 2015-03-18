@@ -309,14 +309,6 @@ end;
 
 procedure TForm1.EmployeesBeforeClose(DataSet: TDataSet);
 begin
-  with DataSet do
-    if State in [dsInsert,dsEdit] then
-    try
-     Post;
-    except
-      Cancel;
-      raise;
-    end;
   TotalsQuery.Active := false
 end;
 
