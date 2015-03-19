@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="8">
+    <Units Count="9">
       <Unit0>
         <Filename Value="sqlparser.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -18,19 +18,19 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="MainForm"/>
         <IsVisibleTab Value="True"/>
-        <EditorIndex Value="0"/>
-        <WindowIndex Value="0"/>
         <TopLine Value="22"/>
         <CursorPos X="11" Y="45"/>
         <UsageCount Value="27"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="../../runtime/IBSQLParser.pas"/>
         <UnitName Value="IBSQLParser"/>
-        <TopLine Value="146"/>
-        <CursorPos X="14" Y="148"/>
-        <UsageCount Value="9"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="271"/>
+        <CursorPos X="3" Y="292"/>
+        <UsageCount Value="10"/>
       </Unit2>
       <Unit3>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
@@ -40,14 +40,12 @@
       </Unit3>
       <Unit4>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <UnitName Value="IBCustomDataSet"/>
         <TopLine Value="2498"/>
         <CursorPos X="22" Y="2522"/>
         <UsageCount Value="9"/>
       </Unit4>
       <Unit5>
         <Filename Value="../../design/IBDBReg.pas"/>
-        <UnitName Value="IBDBReg"/>
         <TopLine Value="386"/>
         <CursorPos X="34" Y="398"/>
         <UsageCount Value="9"/>
@@ -60,16 +58,19 @@
       </Unit6>
       <Unit7>
         <Filename Value="../../../../lazarus/1.2.6/thirdparty/ibx/runtime/IBSQLParser.pas"/>
-        <UnitName Value="IBSQLParser"/>
-        <WindowIndex Value="0"/>
         <TopLine Value="141"/>
         <CursorPos X="29" Y="163"/>
         <UsageCount Value="9"/>
       </Unit7>
+      <Unit8>
+        <Filename Value="../../changelog"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="13"/>
+        <CursorPos X="89" Y="42"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit8>
     </Units>
-    <General>
-      <ActiveWindowIndexAtStart Value="0"/>
-    </General>
     <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
         <Filename Value="MainForm.pas"/>
@@ -85,5 +86,4 @@
       </Position3>
     </JumpHistory>
   </ProjectSession>
-  <EditorMacros Count="0"/>
 </CONFIG>

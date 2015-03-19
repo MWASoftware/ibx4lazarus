@@ -237,11 +237,15 @@ begin
 end;
 
 procedure TIBLookupComboEditBox.ResetParser;
+var curKeyValue: variant;
 begin
   if FFiltered then
   begin
     FFiltered := false;
+    curKeyValue := KeyValue;
+    Text := ''; {Ensure full list}
     UpdateList;
+    KeyValue := curKeyValue;
     UpdateData(self); {Force Scroll}
   end;
 end;

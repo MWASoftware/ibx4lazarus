@@ -288,7 +288,8 @@ begin
       if not (FState in [stInComment,stInCommentLine]) then
       begin
         AddToSQL(':');
-        SetState(stInParam);
+        if not (FState in [stInSingleQuotes,stInDoubleQuotes]) then
+          SetState(stInParam);
       end;
 
     sqSemiColon:

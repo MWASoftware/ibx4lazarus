@@ -39,6 +39,11 @@ IBX Change Log  version                                                     (1.2
     dynamically when the database connection is estabished from the RDB$CHARACTER_SETS
     system table.
 
+7.  SQLParser will now correctly parse SQL Text which contains ':' within quoted string.
+
+8.  IBLookupComboEditBox: List should now always be restored to full list when the
+    control loses focus.
+
 IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
 
 1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 

@@ -20,12 +20,12 @@ type
     CountriesSource: TDataSource;
     EmployeesDEPT_KEY_PATH: TIBStringField;
     EmployeesDEPT_PATH: TIBStringField;
+    IBDateEdit1: TDBDateEdit;
     IBLookupComboEditBox2: TIBLookupComboEditBox;
     IBLookupComboEditBox3: TIBLookupComboEditBox;
     JobCodeSource: TDataSource;
     DBComboBox1: TDBComboBox;
     DBEdit4: TDBEdit;
-    IBDateEdit1: TDBDateEdit;
     Countries: TIBQuery;
     JobCodes: TIBQuery;
     Label10: TLabel;
