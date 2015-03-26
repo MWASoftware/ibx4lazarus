@@ -750,6 +750,7 @@
       </Unit100>
       <Unit101>
         <Filename Value="../../runtime/IB.pas"/>
+        <UnitName Value="IB"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="397"/>
@@ -913,8 +914,9 @@
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="34" Y="21"/>
-        <UsageCount Value="9"/>
+        <TopLine Value="16"/>
+        <CursorPos X="50" Y="48"/>
+        <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit121>
       <Unit122>

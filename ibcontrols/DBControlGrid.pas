@@ -158,6 +158,7 @@ type
     function  GridCanModify: boolean;
     procedure DoDrawRow(aRow: integer; aRect: TRect; aState: TGridDrawState);
     procedure DoMoveRecord(Data: PtrInt);
+    procedure DoSelectNext(Data: PtrInt);
     procedure DoScrollDataSet(Data: PtrInt);
     procedure DoSetupDrawPanel(Data: PtrInt);
     procedure DoSendMouseClicks(Data: PtrInt);
@@ -672,7 +673,10 @@ begin
   end;
   FLastRecordCount := GetRecordCount;
   if aDataSet.State = dsInsert then
+  begin
     FRequiredRecNo := aDataSet.RecNo + 1;
+    Application.QueueAsyncCall(@DoSelectNext,0);
+  end;
   UpdateActive
 end;
 
@@ -1064,6 +1068,11 @@ procedure TDBControlGrid.DoScrollDataSet(Data: PtrInt);
 begin
   if AppDestroying in Application.Flags then Exit;
   FDataLink.DataSet.MoveBy(integer(Data) - FDataLink.DataSet.RecNo);
+end;
+
+procedure TDBControlGrid.DoSelectNext(Data: PtrInt);
+begin
+  FDataLink.DataSet.MoveBy(1);
 end;
 
 procedure TDBControlGrid.DrawAllRows;
