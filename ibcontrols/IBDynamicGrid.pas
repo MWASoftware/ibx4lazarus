@@ -219,6 +219,7 @@ end;
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy ;override;
     procedure ResizeColumns;
+    property VisibleRowCount;
   published
     property EditorPanel: TWinControl read FEditorPanel write SetEditorPanel;
     property ExpandEditorPanelBelowRow: boolean read FExpandEditorPanelBelowRow write FExpandEditorPanelBelowRow;
