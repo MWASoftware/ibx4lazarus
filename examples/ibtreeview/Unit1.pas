@@ -130,20 +130,23 @@ end;
 procedure TForm1.AddChildExecute(Sender: TObject);
 begin
   IBTreeView1.Selected.Expand(true);
-  IBTreeView1.Items.AddChild(IBTreeView1.Selected,'');
+  IBTreeView1.Selected := IBTreeView1.Items.AddChild(IBTreeView1.Selected,'');
   IBTreeView1.Selected.Expand(true);
+  IBTreeView1.Selected.EditText;
 end;
 
 procedure TForm1.AddFirstChildExecute(Sender: TObject);
 begin
   IBTreeView1.Selected.Expand(true);
-  IBTreeView1.Items.AddChildFirst(IBTreeView1.Selected,'');
+  IBTreeView1.Selected := IBTreeView1.Items.AddChildFirst(IBTreeView1.Selected,'');
   IBTreeView1.Selected.Expand(true);
+  IBTreeView1.Selected.EditText;
 end;
 
 procedure TForm1.AddSiblingExecute(Sender: TObject);
 begin
-  IBTreeView1.Items.Add(IBTreeView1.Selected,'');
+  IBTreeView1.Selected := IBTreeView1.Items.Add(IBTreeView1.Selected,'');
+  IBTreeView1.Selected.EditText;
 end;
 
 procedure TForm1.CancelBtnClick(Sender: TObject);

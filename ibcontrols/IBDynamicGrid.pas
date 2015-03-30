@@ -640,7 +640,10 @@ end;
 
 procedure TDBDynamicGrid.ShowEditorPanel;
 begin
-  if csDesigning in ComponentState then Exit;
+  if (csDesigning in ComponentState) or
+   (DataSource = nil) or (DataSource.DataSet = nil)
+     or ((DataSource.DataSet.RecordCount = 0) and (DataSource.DataSet.State <> dsInsert)) then
+     Exit;
   Editor := FEditorPanel;
   EditorMode := true;
 end;

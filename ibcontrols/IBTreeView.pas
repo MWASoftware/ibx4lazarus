@@ -391,6 +391,8 @@ procedure TIBTreeView.RecordChanged(Sender: TObject; Field: TField);
 var Node: TIBTreeNode;
     Destination: TIBTreeNode;
 begin
+  if DataSet.State = dsInsert then Exit;
+
   if assigned(Field) and (Field.FieldName = TextField) then
   begin
     Node := FindNode(DataSet.FieldByName(KeyField).AsVariant);

@@ -47,6 +47,12 @@ IBX Change Log  version                                                     (1.2
 9.  DBControlGrid: Ensure that selection is changed to newly appended row, even
     when dataset rows are less than visible rows.
 
+10. IBDynamicGrid: Editor Panel is not shown on indicator click if Datasource
+    does not exist or DataSet is empty.
+
+11. IBTreeView: improved handling of response to "Add Node". Avoid scrolling dataset
+    while dataset state is dsInsert. Avoids posting errors.
+
 IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
 
 1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 
