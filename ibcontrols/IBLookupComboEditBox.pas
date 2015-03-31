@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DbCtrls,
-  ExtCtrls, IBSQLParser, DB, StdCtrls;
+  ExtCtrls, IBSQLParser, DB, StdCtrls, IBCustomDataSet;
 
 type
 
@@ -54,9 +54,19 @@ type
     FOwner: TIBLookupComboEditBox;
   protected
     procedure ActiveChanged; override;
-    procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     procedure RecordChanged(Field: TField); override;
     procedure UpdateData; override;
+  public
+    constructor Create(AOwner: TIBLookupComboEditBox);
+  end;
+
+  { TIBLookupControlLink }
+
+  TIBLookupControlLink = class(TIBControlLink)
+  private
+    FOwner: TIBLookupComboEditBox;
+  protected
+    procedure UpdateSQL(Sender: TObject); override;
   public
     constructor Create(AOwner: TIBLookupComboEditBox);
   end;
@@ -69,6 +79,7 @@ type
     FCanAutoInsert: TCanAutoInsert;
     { Private declarations }
     FDataLink: TIBLookupComboDataLink;
+    FIBLookupControlLink: TIBLookupControlLink;
     FAutoComplete: boolean;
     FAutoInsert: boolean;
     FKeyPressInterval: integer;
@@ -87,6 +98,7 @@ type
     function GetListSource: TDataSource;
     function GetRelationNameQualifier: string;
     procedure HandleTimer(Sender: TObject);
+    procedure IBControlLinkChanged;
     procedure ResetParser;
     procedure RecordChanged(Sender: TObject; aField: TField);
     procedure SetAutoCompleteText(AValue: TComboBoxAutoCompleteText);
@@ -102,6 +114,7 @@ type
     procedure DoEnter; override;
     procedure DoExit; override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetItemIndex(const Val: integer); override;
     procedure UpdateShowing; override;
   public
@@ -127,30 +140,26 @@ type
 
 implementation
 
-uses IBQuery, IBCustomDataSet, LCLType, Variants, LCLProc;
+uses IBQuery, LCLType, Variants, LCLProc;
+
+{ TIBLookupControlLink }
+
+constructor TIBLookupControlLink.Create(AOwner: TIBLookupComboEditBox);
+begin
+  inherited Create;
+  FOwner := AOwner;
+end;
+
+procedure TIBLookupControlLink.UpdateSQL(Sender: TObject);
+begin
+  FOwner.UpdateSQL(self,TIBParserDataSet(Sender).Parser)
+end;
 
 { TIBLookupComboDataLink }
 
 procedure TIBLookupComboDataLink.ActiveChanged;
 begin
   FOwner.ActiveChanged(self)
-end;
-
-procedure TIBLookupComboDataLink.DataEvent(Event: TDataEvent; Info: Ptrint);
-begin
-  {If we are not visible then avoid unnecessary work}
-  if not FOwner.Showing then Exit;
-
-  if (Event = deCheckBrowseMode) and (Info = 1) and not DataSet.Active then
-  begin
-    if (DataSet is TIBDataSet) then
-      FOwner.UpdateSQL(self,TIBDataSet(DataSet).Parser)
-    else
-    if (DataSet is TIBQuery) then
-      FOwner.UpdateSQL(self,TIBQuery(DataSet).Parser)
-  end
-  else
-    inherited DataEvent(Event, Info);
 end;
 
 procedure TIBLookupComboDataLink.RecordChanged(Field: TField);
@@ -179,6 +188,14 @@ begin
   UpdateList
 end;
 
+procedure TIBLookupComboEditBox.IBControlLinkChanged;
+begin
+  if (ListSource <> nil) and (ListSource.DataSet <> nil) and (ListSource.DataSet is TIBParserDataSet) then
+    FIBLookupControlLink.IBDataSet := TIBCustomDataSet(ListSource.DataSet)
+  else
+    FIBLookupControlLink.IBDataSet := nil;
+end;
+
 function TIBLookupComboEditBox.GetListSource: TDataSource;
 begin
   Result := inherited ListSource;
@@ -196,6 +213,7 @@ procedure TIBLookupComboEditBox.ActiveChanged(Sender: TObject);
 begin
   if not FInserting and not FUpdating then
      Application.QueueAsyncCall(@DoActiveChanged,0);
+  IBControlLinkChanged;
 end;
 
 procedure TIBLookupComboEditBox.DoActiveChanged(Data: PtrInt);
@@ -280,6 +298,7 @@ begin
   begin
     FDataLink.DataSource := AValue;
     inherited ListSource := AValue;
+    IBControlLinkChanged;
   end;
 end;
 
@@ -466,6 +485,14 @@ begin
     FTimer.Interval := 0
 end;
 
+procedure TIBLookupComboEditBox.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = DataSource) then
+    ListSource := nil;
+end;
+
 procedure TIBLookupComboEditBox.SetItemIndex(const Val: integer);
 begin
   inherited SetItemIndex(Val);
@@ -483,6 +510,7 @@ constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
 begin
   inherited Create(TheComponent);
   FDataLink := TIBLookupComboDataLink.Create(self);
+  FIBLookupControlLink := TIBLookupControlLink.Create(self);
   FKeyPressInterval := 500;
   FAutoComplete := true;
   FTimer := TTimer.Create(nil);
@@ -494,6 +522,7 @@ end;
 destructor TIBLookupComboEditBox.Destroy;
 begin
   if assigned(FDataLink) then FDataLink.Free;
+  if assigned(FIBLookupControlLink) then FIBLookupControlLink.Free;
   if assigned(FTimer) then FTimer.Free;
   inherited Destroy;
 end;

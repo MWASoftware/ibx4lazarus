@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, ComCtrls,
-  DB, IBSQLParser;
+  DB, IBSQLParser, IBCustomDataSet;
 
 type
   {
@@ -52,10 +52,21 @@ type
     FOwner: TIBTreeView;
   protected
     procedure ActiveChanged; override;
-    procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     procedure DataSetChanged; override;
     procedure RecordChanged(Field: TField); override;
     procedure UpdateData; override;
+  public
+    constructor Create(AOwner: TIBTreeView);
+  end;
+
+  { TIBTreeViewControlLink }
+
+  TIBTreeViewControlLink = class(TIBControlLink)
+  private
+    FOwner: TIBTreeView;
+  protected
+    procedure UpdateSQL(Sender: TObject); override;
+    procedure UpdateParams(Sender: TObject); override;
   public
     constructor Create(AOwner: TIBTreeView);
   end;
@@ -74,6 +85,7 @@ type
   private
     { Private declarations }
     FDataLink: TIBTreeViewDatalink;
+    FIBTreeViewControlLink: TIBTreeViewControlLink;
     FHasChildField: string;
     FKeyField: string;
     FTextField: string;
@@ -93,6 +105,7 @@ type
     function GetDataSource: TDataSource;
     function GetRelationNameQualifier: string;
     function GetSelectedKeyValue: variant;
+    procedure IBControlLinkChanged;
     procedure NodeMoved(Node: TTreeNode);
     procedure NodeUpdated(Node: TTreeNode);
     procedure RecordChanged(Sender: TObject; Field: TField);
@@ -232,7 +245,7 @@ type
 
 implementation
 
-uses IBQuery,IBCustomDataSet, Variants;
+uses IBQuery,Variants;
 
 function StrIntListToVar(s: string): TVariantArray;
 var i, idx: integer;
@@ -268,6 +281,24 @@ begin
         raise Exception.Create('Ordinal Type Expected when converting to integer string');
 end;
 
+{ TIBTreeViewControlLink }
+
+constructor TIBTreeViewControlLink.Create(AOwner: TIBTreeView);
+begin
+  inherited Create;
+  FOwner := AOwner;
+end;
+
+procedure TIBTreeViewControlLink.UpdateParams(Sender: TObject);
+begin
+  FOwner.UpdateParams(self,TIBParserDataSet(Sender).Parser)
+end;
+
+procedure TIBTreeViewControlLink.UpdateSQL(Sender: TObject);
+begin
+  FOwner.UpdateSQL(self,TIBParserDataSet(Sender).Parser)
+end;
+
 { TIBTreeNode }
 
 procedure TIBTreeNode.DeleteAll;
@@ -290,6 +321,7 @@ procedure TIBTreeView.ActiveChanged(Sender: TObject);
 var AtTopLevel: boolean;
 begin
   if (csDesigning in ComponentState) then Exit;
+  IBControlLinkChanged;
   if assigned(DataSet) and not DataSet.Active then
   begin
     if not assigned(FExpandNode) and not assigned(FUpdateNode) then {must really be closing}
@@ -452,7 +484,8 @@ end;
 
 procedure TIBTreeView.SetDataSource(AValue: TDataSource);
 begin
-  FDataLink.DataSource := AValue
+  FDataLink.DataSource := AValue;
+  IBControlLinkChanged;
 end;
 
 procedure TIBTreeView.SetParentField(AValue: string);
@@ -498,23 +531,23 @@ procedure TIBTreeView.UpdateParams(Sender: TObject; Parser: TSelectSQLParser);
 begin
   if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
    begin
-     if (Sender as TDataLink).DataSet is TIBQuery then
-       TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
+     if DataSource.DataSet is TIBQuery then
+       TIBQuery(DataSource.DataSet).ParamByName('IBX_KEY_VALUE').Value :=
          FUpdateNode.KeyValue
      else
-     if (Sender as TDataLink).DataSet is TIBDataSet then
-       TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_KEY_VALUE').Value :=
+     if DataSource.DataSet is TIBDataSet then
+       TIBDataSet(DataSource.DataSet).ParamByName('IBX_KEY_VALUE').Value :=
          FUpdateNode.KeyValue
    end
   else
   if assigned(FExpandNode) then
   begin
-    if (Sender as TDataLink).DataSet is TIBQuery then
-      TIBQuery((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
+    if DataSource.DataSet is TIBQuery then
+      TIBQuery(DataSource.DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
         TIBTreeNode(FExpandNode).KeyValue
     else
-    if (Sender as TDataLink).DataSet is TIBDataSet then
-      TIBDataSet((Sender as TDataLink).DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
+    if DataSource.DataSet is TIBDataSet then
+      TIBDataSet(DataSource.DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
         TIBTreeNode(FExpandNode).KeyValue
   end;
 end;
@@ -596,6 +629,14 @@ begin
   end;
 end;
 
+procedure TIBTreeView.IBControlLinkChanged;
+begin
+  if assigned(DataSource) and (DataSource.DataSet <> nil) and (DataSource.DataSet is TIBParserDataset) then
+    FIBTreeViewControllink.IBDataSet := TIBCustomDataSet(DataSource.DataSet)
+  else
+    FIBTreeViewControllink.IBDataSet := nil;
+end;
+
 procedure TIBTreeView.Loaded;
 begin
   inherited Loaded;
@@ -620,7 +661,8 @@ procedure TIBTreeView.Notification(AComponent: TComponent; Operation: TOperation
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and
-     (FDataLink <> nil) and (AComponent = DataSource) then DataSource := nil;
+     (FDataLink <> nil) and (AComponent = DataSource) then
+     DataSource := nil;
 end;
 
 procedure TIBTreeView.Reinitialise;
@@ -634,11 +676,13 @@ constructor TIBTreeView.Create(TheComponent: TComponent);
 begin
   inherited Create(TheComponent);
   FDataLink := TIBTreeViewDatalink.Create(self);
+  FIBTreeViewControlLink := TIBTreeViewControlLink.Create(self);
 end;
 
 destructor TIBTreeView.Destroy;
 begin
   if assigned(FDataLink) then FDataLink.Free;
+  if assigned(FIBTreeViewControlLink) then FIBTreeViewControlLink.Free;
   inherited Destroy;
 end;
 
@@ -733,29 +777,6 @@ end;
 procedure TIBTreeViewDatalink.ActiveChanged;
 begin
   FOwner.ActiveChanged(self)
-end;
-
-procedure TIBTreeViewDatalink.DataEvent(Event: TDataEvent; Info: Ptrint);
-begin
-  if (Event = deCheckBrowseMode) and (Info = 1) and not DataSet.Active then
-  begin
-    if (DataSet is TIBDataSet) then
-      FOwner.UpdateSQL(self,TIBDataSet(DataSet).Parser)
-    else
-    if (DataSet is TIBQuery) then
-      FOwner.UpdateSQL(self,TIBQuery(DataSet).Parser)
-  end
-  else
-  if (Event = deCheckBrowseMode) and (Info = 2) and not DataSet.Active then
-  begin
-    if (DataSet is TIBDataSet) then
-      FOwner.UpdateParams(self,TIBDataSet(DataSet).Parser)
-    else
-    if (DataSet is TIBQuery) then
-      FOwner.UpdateParams(self,TIBQuery(DataSet).Parser)
-  end
-  else
-    inherited DataEvent(Event, Info);
 end;
 
 procedure TIBTreeViewDatalink.DataSetChanged;

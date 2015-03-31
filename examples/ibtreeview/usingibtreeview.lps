@@ -19,8 +19,7 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="130"/>
-        <CursorPos X="27" Y="148"/>
+        <CursorPos X="47" Y="9"/>
         <UsageCount Value="75"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -50,9 +49,10 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../runtime/IB.pas"/>
+        <UnitName Value="IB"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="402"/>
-        <CursorPos Y="414"/>
+        <TopLine Value="408"/>
+        <CursorPos X="30" Y="419"/>
         <UsageCount Value="22"/>
       </Unit6>
       <Unit7>
@@ -241,9 +241,10 @@
       </Unit35>
       <Unit36>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
+        <UnitName Value="IBTreeView"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="682"/>
-        <CursorPos Y="699"/>
+        <TopLine Value="728"/>
+        <CursorPos X="3" Y="732"/>
         <UsageCount Value="10"/>
       </Unit36>
       <Unit37>
@@ -289,7 +290,7 @@
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit42>
     </Units>
-    <JumpHistory Count="21" HistoryIndex="20">
+    <JumpHistory Count="23" HistoryIndex="22">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="154" Column="36" TopLine="130"/>
@@ -373,6 +374,14 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="17" Column="30"/>
       </Position21>
+      <Position22>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="148" Column="27" TopLine="130"/>
+      </Position22>
+      <Position23>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="9" Column="47"/>
+      </Position23>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

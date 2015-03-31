@@ -48,7 +48,8 @@ IBX Change Log  version                                                     (1.2
     when dataset rows are less than visible rows.
 
 10. IBDynamicGrid: Editor Panel is not shown on indicator click if Datasource
-    does not exist or DataSet is empty.
+    does not exist or DataSet is empty. More responsive on dataset open. New event
+    OnRestorePosition.
 
 11. IBTreeView: improved handling of response to "Add Node". Avoid scrolling dataset
     while dataset state is dsInsert. Avoids posting errors.

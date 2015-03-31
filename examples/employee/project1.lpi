@@ -98,7 +98,6 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <UnitName Value="IBCustomDataSet"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="3206"/>
@@ -107,7 +106,6 @@
       </Unit6>
       <Unit7>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <UnitName Value="IBDatabase"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="985"/>
@@ -146,7 +144,6 @@
       </Unit12>
       <Unit13>
         <Filename Value="../../runtime/IBSQL.pas"/>
-        <UnitName Value="IBSQL"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="2289"/>
@@ -359,10 +356,11 @@
       </Unit45>
       <Unit46>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <UnitName Value="IBLookupComboEditBox"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="469"/>
-        <CursorPos X="69" Y="473"/>
+        <TopLine Value="500"/>
+        <CursorPos X="36" Y="525"/>
         <UsageCount Value="13"/>
       </Unit46>
       <Unit47>
@@ -652,7 +650,6 @@
         <ComponentName Value="BaseFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <UnitName Value="BaseFrameUnit"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="41"/>
@@ -661,7 +658,6 @@
       </Unit88>
       <Unit89>
         <Filename Value="../../../mwaframework/source/BaseFormUnit.pas"/>
-        <UnitName Value="BaseFormUnit"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="64" Y="9"/>
@@ -669,7 +665,6 @@
       </Unit89>
       <Unit90>
         <Filename Value="../../../mwaframework/source/CustomDBUnit.pas"/>
-        <UnitName Value="CustomDBUnit"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="72"/>
@@ -678,7 +673,6 @@
       </Unit90>
       <Unit91>
         <Filename Value="../../../mwaframework/source/TopFormUnit.pas"/>
-        <UnitName Value="TopFormUnit"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="65" Y="13"/>
@@ -686,7 +680,6 @@
       </Unit91>
       <Unit92>
         <Filename Value="../../../mwaframework/source/dlg/DBFormUnit.pas"/>
-        <UnitName Value="DBFormUnit"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="27" Y="7"/>
@@ -697,7 +690,6 @@
         <ComponentName Value="ListFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <UnitName Value="ListFrameUnit"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="49" Y="10"/>

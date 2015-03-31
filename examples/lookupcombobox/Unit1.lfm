@@ -158,7 +158,7 @@ object Form1: TForm1
     end
     object DBComboBox1: TDBComboBox
       Left = 331
-      Height = 25
+      Height = 29
       Top = 32
       Width = 53
       DataField = 'JOB_GRADE'

@@ -187,6 +187,20 @@ type
     property ApplyOnEvent: TIBGeneratorApplyOnEvent read FApplyOnEvent write FApplyOnEvent;
   end;
 
+  {TIBControlLink - Allows IB Aware controls to react to dataset state changes}
+
+  TIBControlLink = class
+  private
+    FTIBDataSet: TIBCustomDataSet;
+    procedure SetIBDataSet(AValue: TIBCustomDataSet);
+  protected
+    procedure UpdateSQL(Sender: TObject); virtual;
+    procedure UpdateParams(Sender: TObject); virtual;
+  public
+    destructor Destroy; override;
+    property IBDataSet: TIBCustomDataSet read FTIBDataSet write SetIBDataSet;
+  end;
+
   TIBAutoCommit = (acDisabled, acCommitRetaining);
 
   { TIBCustomDataSet }
@@ -265,6 +279,7 @@ type
     FParser: TSelectSQLParser;
     FCloseAction: TTransactionAction;
     FInTransactionEnd: boolean;
+    FIBLinks: TList;
     function GetSelectStmtHandle: TISC_STMT_HANDLE;
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
@@ -277,6 +292,7 @@ type
     function CanRefresh: Boolean;
     procedure CheckEditState;
     procedure ClearBlobCache;
+    procedure ClearIBLinks;
     procedure CopyRecordBuffer(Source, Dest: Pointer);
     procedure DoBeforeDatabaseDisconnect(Sender: TObject);
     procedure DoAfterDatabaseDisconnect(Sender: TObject);
@@ -304,6 +320,8 @@ type
     procedure InternalPostRecord(Qry: TIBSQL; Buff: Pointer); virtual;
     procedure InternalRevertRecord(RecordNumber: Integer); virtual;
     function IsVisible(Buffer: PChar): Boolean;
+    procedure RegisterIBLink(Sender: TIBControlLink);
+    procedure UnRegisterIBLink(Sender: TIBControlLink);
     procedure SaveOldBuffer(Buffer: PChar);
     procedure SetBufferChunks(Value: Integer);
     procedure SetDatabase(Value: TIBDatabase);
@@ -723,6 +741,34 @@ type
     NextRelation : TRelationNode;
   end;
 
+{ TIBControlLink }
+
+destructor TIBControlLink.Destroy;
+begin
+  IBDataSet := nil;
+  inherited Destroy;
+end;
+
+procedure TIBControlLink.UpdateParams(Sender: TObject);
+begin
+
+end;
+
+procedure TIBControlLink.UpdateSQL(Sender: TObject);
+begin
+
+end;
+
+procedure TIBControlLink.SetIBDataSet(AValue: TIBCustomDataSet);
+begin
+  if FTIBDataSet = AValue then Exit;
+  if IBDataSet <> nil then
+    IBDataSet.UnRegisterIBLink(self);
+  FTIBDataSet := AValue;
+  if IBDataSet <> nil then
+    IBDataSet.RegisterIBLink(self);
+end;
+
 
 { TIBStringField}
 
@@ -880,6 +926,7 @@ begin
   CheckIBLoaded;
   FIBLoaded := True;
   FBase := TIBBase.Create(Self);
+  FIBLinks := TList.Create;
   FCurrentRecord := -1;
   FDeletedRecords := 0;
   FUniDirectional := False;
@@ -933,6 +980,8 @@ begin
     FDataLink.Free;
     FBase.Free;
     ClearBlobCache;
+    ClearIBLinks;
+    FIBLinks.Free;
     FBlobStreamList.Free;
     FreeMem(FBufferCache);
     FBufferCache := nil;
@@ -2301,6 +2350,12 @@ begin
   end;
 end;
 
+procedure TIBCustomDataSet.RegisterIBLink(Sender: TIBControlLink);
+begin
+  if FIBLinks.IndexOf(Sender) = -1 then
+    FIBLinks.Add(Sender);
+end;
+
 
 procedure TIBCustomDataSet.SQLChanging(Sender: TObject);
 begin
@@ -2337,6 +2392,11 @@ begin
     end;
     WriteRecordCache(rdRecordNumber, PChar(Buff));
   end;
+end;
+
+procedure TIBCustomDataSet.UnRegisterIBLink(Sender: TIBControlLink);
+begin
+  FIBLinks.Remove(Sender);
 end;
 
 function TIBCustomDataSet.UpdateStatus: TUpdateStatus;
@@ -2626,12 +2686,17 @@ begin
 end;
 
 procedure TIBCustomDataSet.DoBeforeOpen;
+var i: integer;
 begin
   if assigned(FParser) then
      FParser.Reset;
   DataEvent(deCheckBrowseMode,1); {Conventional use to report getting ready to prepare}
+  for i := 0 to FIBLinks.Count - 1 do
+    TIBControlLink(FIBLinks[i]).UpdateSQL(self);
   inherited DoBeforeOpen;
   DataEvent(deCheckBrowseMode,2); {Conventional use to report the right time to set parameters}
+  for i := 0 to FIBLinks.Count - 1 do
+    TIBControlLink(FIBLinks[i]).UpdateParams(self);
 end;
 
 procedure TIBCustomDataSet.DoBeforePost;
@@ -3800,6 +3865,13 @@ end;
 procedure TIBCustomDataSet.ClearCalcFields(Buffer: PChar);
 begin
  FillChar(Buffer[FRecordSize], CalcFieldsSize, 0);
+end;
+
+procedure TIBCustomDataSet.ClearIBLinks;
+var i: integer;
+begin
+  for i := FIBLinks.Count - 1 downto 0 do
+    TIBControlLink(FIBLinks[i]).IBDataSet := nil;
 end;
 
 
