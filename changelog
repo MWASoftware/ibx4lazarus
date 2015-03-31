@@ -54,6 +54,9 @@ IBX Change Log  version                                                     (1.2
 11. IBTreeView: improved handling of response to "Add Node". Avoid scrolling dataset
     while dataset state is dsInsert. Avoids posting errors.
 
+12. IBControls: New mechanism for distributing UpdateSQL and UpdateParams events. To
+    avoid conflict with DisableControls/EnableControls with Master/Detail linked tables.
+
 IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
 
 1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 

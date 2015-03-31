@@ -2690,11 +2690,9 @@ var i: integer;
 begin
   if assigned(FParser) then
      FParser.Reset;
-  DataEvent(deCheckBrowseMode,1); {Conventional use to report getting ready to prepare}
   for i := 0 to FIBLinks.Count - 1 do
     TIBControlLink(FIBLinks[i]).UpdateSQL(self);
   inherited DoBeforeOpen;
-  DataEvent(deCheckBrowseMode,2); {Conventional use to report the right time to set parameters}
   for i := 0 to FIBLinks.Count - 1 do
     TIBControlLink(FIBLinks[i]).UpdateParams(self);
 end;
