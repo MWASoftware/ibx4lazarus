@@ -120,6 +120,8 @@ type
   { TIBStringField allows us to have strings longer than 8196 }
 
   TIBStringField = class(TStringField)
+  protected
+    procedure SetSize(AValue: Integer); override;
   public
     constructor create(AOwner: TComponent); override;
     class procedure CheckTypeSize(Value: Integer); override;
@@ -772,7 +774,7 @@ end;
 
 { TIBStringField}
 
-constructor TIBStringField.Create(AOwner: TComponent);
+constructor TIBStringField.create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 end;
@@ -827,6 +829,15 @@ begin
   finally
     FreeMem(Buffer);
   end;
+end;
+
+procedure TIBStringField.SetSize(AValue: Integer);
+var FieldSize: integer;
+begin
+  {IBCustomDataSet encodes the CharWidth size in the size}
+  FieldSize := AValue div 4;
+  inherited SetSize(FieldSize);
+  DisplayWidth := FieldSize div ((AValue mod 4) + 1);
 end;
 
 { TIBBCDField }
@@ -3149,6 +3160,7 @@ const
 var
   FieldType: TFieldType;
   FieldSize: Word;
+  CharSetSize: integer;
   FieldNullable : Boolean;
   i, FieldPosition, FieldPrecision: Integer;
   FieldAliasName, DBAliasName: string;
@@ -3284,7 +3296,9 @@ begin
            their values }
           SQL_VARYING, SQL_TEXT:
           begin
-            FieldSize := sqllen div FBase.GetCharSetSize(sqlsubtype and $FF);
+            CharSetSize := FBase.GetCharSetSize(sqlsubtype and $FF);
+            {FieldSize is encoded for strings - see TIBStringField.SetSize for decode}
+            FieldSize := sqllen * 4 + (CharSetSize - 1);
             FieldType := ftString;
           end;
           { All Doubles/Floats should be cast to doubles }

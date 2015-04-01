@@ -31,10 +31,10 @@ IBX Change Log  version                                                     (1.2
     a validation error may occur in the Post raising an exception and thereby 
     preventing a rollback.
 
-6.  String Field sizes should now be correct for multi-byte character sets. In earlier
-    versions the field size was set to the maximum byte width rather than the character
-    width. Field sizes are now corrected by dividing by the max byte width per character.
-    For UTF8 character sets, the byte width is four and hence the Field Size will be
+6.  String Field sizes and Display Widths should now be correct for multi-byte character sets.
+    In earlier versions, the Display Width was set to the maximum byte width rather than the character
+    width. Display Widths are now corrected by dividing by the max byte width per character.
+    For UTF8 character sets, the byte width is four and hence the Display Width will be
     the byte width divided by 4. The byte width of each character set is determined
     dynamically when the database connection is estabished from the RDB$CHARACTER_SETS
     system table.
