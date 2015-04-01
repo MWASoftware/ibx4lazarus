@@ -836,6 +836,8 @@ end;
 procedure TIBStringField.SetSize(AValue: Integer);
 var FieldSize: integer;
 begin
+  if csLoading in ComponentState then
+    FInitialised := true;
   if FInitialised then
     inherited SetSize(AValue)
   else
