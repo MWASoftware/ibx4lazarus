@@ -120,6 +120,8 @@ type
   { TIBStringField allows us to have strings longer than 8196 }
 
   TIBStringField = class(TStringField)
+  private
+    FInitialised: boolean;
   protected
     procedure SetSize(AValue: Integer); override;
   public
@@ -834,10 +836,16 @@ end;
 procedure TIBStringField.SetSize(AValue: Integer);
 var FieldSize: integer;
 begin
-  {IBCustomDataSet encodes the CharWidth size in the size}
-  FieldSize := AValue div 4;
-  inherited SetSize(FieldSize);
-  DisplayWidth := FieldSize div ((AValue mod 4) + 1);
+  if FInitialised then
+    inherited SetSize(AValue)
+  else
+  begin
+    {IBCustomDataSet encodes the CharWidth size in the size}
+    FieldSize := AValue div 4;
+    inherited SetSize(FieldSize);
+    DisplayWidth := FieldSize div ((AValue mod 4) + 1);
+    FInitialised := true;
+  end;
 end;
 
 { TIBBCDField }

@@ -1,4 +1,4 @@
-IBX Change Log  version                                                     (1.2-3) Wed, 18 Mar 2015 12:07:31 +0000
+IBX Change Log  version                                                      (1.2-3) Wed, 01 Apr 2015 09:02:58 +0100
 
 1.  TIBStoredProc. Prepare now called by ParamByName to avoid need to always
     call Prepare before setting parameter values.
