@@ -2866,7 +2866,7 @@ begin
         Data := Buff + CurrentRecord^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdDataOfs;
         if (fdDataType = SQL_VARYING) or (fdDataType = SQL_TEXT) then
         begin
-          if fdDataLength <= Field.Size then
+          if fdDataLength <= Field.DataSize then
           begin
             Move(Data^, Buffer^, fdDataLength);
             PChar(Buffer)[fdDataLength] := #0;
