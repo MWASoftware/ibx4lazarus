@@ -116,6 +116,7 @@ type
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetItemIndex(const Val: integer); override;
+    function SQLSafe(aText: string): string;
     procedure UpdateShowing; override;
   public
     { Public declarations }
@@ -359,9 +360,11 @@ begin
   if FFiltered then
   begin
     if cbactSearchCaseSensitive in AutoCompleteText then
-      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + ListField + '" Like ''' + Text + '%''')
+      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + ListField + '" Like ''' +
+                                  SQLSafe(Text) + '%''')
     else
-      Parser.Add2WhereClause(GetRelationNameQualifier + 'Upper("' + ListField + '") Like Upper(''' + Text + '%'')');
+      Parser.Add2WhereClause(GetRelationNameQualifier + 'Upper("' + ListField + '") Like Upper(''' +
+                                  SQLSafe(Text) + '%'')');
 
   end;
   if cbactSearchAscending in AutoCompleteText then
@@ -497,6 +500,17 @@ procedure TIBLookupComboEditBox.SetItemIndex(const Val: integer);
 begin
   inherited SetItemIndex(Val);
   FLastKeyValue := KeyValue;
+end;
+
+function TIBLookupComboEditBox.SQLSafe(aText: string): string;
+var I: integer;
+begin
+  Result := '';
+  for I := 1 to length(aText) do
+    if aText[I] = '''' then
+      Result := Result + ''''''
+    else
+      Result := Result + aText[I];
 end;
 
 procedure TIBLookupComboEditBox.UpdateShowing;

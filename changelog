@@ -57,6 +57,8 @@ IBX Change Log  version                                                       (1
 12. IBControls: New mechanism for distributing UpdateSQL and UpdateParams events. To
     avoid conflict with DisableControls/EnableControls with Master/Detail linked tables.
 
+13. IBLookupComboEditBox: Avoid SQL Errors when combo box text contains single quotes.
+
 IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
 
 1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 
