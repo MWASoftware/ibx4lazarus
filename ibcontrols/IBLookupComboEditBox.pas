@@ -132,7 +132,7 @@ type
     property ItemHeight;
     property ItemWidth;
     property ListSource: TDataSource read GetListSource write SetListSource;
-    property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
+    property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 200;
     property RelationName: string read FRelationName write FRelationName;
     property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
     property OnCanAutoInsert: TCanAutoInsert read FOnCanAutoInsert write FOnCanAutoInsert;
@@ -525,7 +525,7 @@ begin
   inherited Create(TheComponent);
   FDataLink := TIBLookupComboDataLink.Create(self);
   FIBLookupControlLink := TIBLookupControlLink.Create(self);
-  FKeyPressInterval := 500;
+  FKeyPressInterval := 200;
   FAutoComplete := true;
   FTimer := TTimer.Create(nil);
   FTimer.Interval := 0;

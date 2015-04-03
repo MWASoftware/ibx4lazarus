@@ -42,7 +42,7 @@ IBX Change Log  version                                                       (1
 7.  SQLParser will now correctly parse SQL Text which contains ':' within quoted string.
 
 8.  IBLookupComboEditBox: List should now always be restored to full list when the
-    control loses focus.
+    control loses focus. Key press default interval reduced to 200ms.
 
 9.  DBControlGrid: Ensure that selection is changed to newly appended row, even
     when dataset rows are less than visible rows.
