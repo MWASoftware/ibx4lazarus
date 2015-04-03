@@ -940,6 +940,7 @@ begin
     if assigned(DataSource) and assigned(DataSource.DataSet)
       and (DataSource.DataSet is TIBCustomDataSet) then
     begin
+      if (FLastColIndex < 0) or (FLastColIndex >= Columns.Count) then Exit;
       FieldPosition := Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
       if FieldPosition = 0 then Exit;
 
@@ -1061,7 +1062,7 @@ begin
   AllowOutboundEvents := false;
   try
     Coord := MouseCoord(X,Y);
-  if AllowColumnSort and  (Coord.X <> -1) and
+  if AllowColumnSort and  (Coord.X <> -1) and (FixedRows > 0) and
    (Coord.Y = 0) and (MouseCoord(X+5,Y).X = Coord.X) {not on boundary}
                    and (MouseCoord(X-5,Y).X = Coord.X) then
     ColumnHeaderClick(Coord.X-1);
