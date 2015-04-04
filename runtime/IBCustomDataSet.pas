@@ -2729,6 +2729,7 @@ end;
 procedure TIBCustomDataSet.DoAfterPost;
 begin
   inherited DoAfterPost;
+  FBase.DoAfterPost(self);
   InternalAutoCommit;
 end;
 

@@ -287,6 +287,7 @@ type
     FAfterEdit: TNotifyEvent;
     FAfterExecQuery: TNotifyEvent;
     FAfterInsert: TNotifyEvent;
+    FAfterPost: TNotifyEvent;
     FAfterTransactionEnd: TNotifyEvent;
     FBeforeTransactionEnd: TNotifyEvent;
     FIBLoaded: Boolean;
@@ -314,6 +315,7 @@ type
     procedure DoAfterEdit(Sender: TObject);
     procedure DoAfterDelete(Sender: TObject);
     procedure DoAfterInsert(Sender: TObject);
+    procedure DoAfterPost(Sender: TObject);
     procedure EnsureNotInTransaction;
     procedure EndTransaction(Action: TTransactionAction; Force: Boolean);
     function GetDatabase(Index: Integer): TIBDatabase;
@@ -388,6 +390,7 @@ type
     property AfterEdit: TNotifyEvent read FAfterEdit write FAfterEdit;
     property AfterDelete: TNotifyEvent read FAfterDelete write FAfterDelete;
     property AfterInsert: TNotifyEvent read FAfterInsert write FAfterInsert;
+    property AfterPost: TNotifyEvent read FAfterPost write FAfterPost;
   end;
 
   TTransactionEndEvent = procedure(Sender:TObject; Action: TTransactionAction) of object;
@@ -432,6 +435,7 @@ type
     procedure DoAfterEdit(Sender: TObject); virtual;
     procedure DoAfterDelete(Sender: TObject); virtual;
     procedure DoAfterInsert(Sender: TObject); virtual;
+    procedure DoAfterPost(Sender: TObject); virtual;
     function GetCharSetSize(CharSetID: integer): integer;
   public
     property AfterDatabaseConnect: TNotifyEvent read FAfterDatabaseConnect
@@ -1497,6 +1501,12 @@ begin
     AfterInsert(Sender);
 end;
 
+procedure TIBTransaction.DoAfterPost(Sender: TObject);
+begin
+  if assigned(FAfterPost) then
+    AfterPost(Sender);
+end;
+
 procedure TIBTransaction.EnsureNotInTransaction;
 begin
   if csDesigning in ComponentState then
@@ -2060,6 +2070,12 @@ procedure TIBBase.DoAfterInsert(Sender: TObject);
 begin
   if FTransaction <> nil then
     FTransaction.DoAfterInsert(Sender);
+end;
+
+procedure TIBBase.DoAfterPost(Sender: TObject);
+begin
+  if FTransaction <> nil then
+    FTransaction.DoAfterPost(Sender);
 end;
 
 procedure TIBBase.SetDatabase(Value: TIBDatabase);
