@@ -132,6 +132,7 @@ type
     property AfterTransactionEnd;
     property TransactionFree;
     property OnFilterRecord;
+    property OnValidatePost;
 end;
 
 implementation

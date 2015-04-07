@@ -220,6 +220,8 @@ type
 
   TDataSetCloseAction = (dcDiscardChanges, dcSaveChanges);
 
+  TOnValidatePost = procedure (Sender: TObject; var CancelPost: boolean) of object;
+
   TIBCustomDataSet = class(TDataset)
   private
     FAutoCommit: TIBAutoCommit;
@@ -249,6 +251,7 @@ type
     FDeletedRecords: Long;
     FModelBuffer,
     FOldBuffer: PChar;
+    FOnValidatePost: TOnValidatePost;
     FOpen: Boolean;
     FInternalPrepared: Boolean;
     FQDelete,
@@ -485,6 +488,7 @@ type
                                             write FAfterTransactionEnd;
     property TransactionFree: TNotifyEvent read FTransactionFree
                                            write FTransactionFree;
+    property OnValidatePost: TOnValidatePost read FOnValidatePost write FOnValidatePost;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -518,6 +522,7 @@ type
                     const ResultFields: string): Variant; override;
     function UpdateStatus: TUpdateStatus; override;
     function IsSequenced: Boolean; override;
+    procedure Post; override;
     function ParamByName(ParamName: String): TIBXSQLVAR;
     property DBHandle: PISC_DB_HANDLE read GetDBHandle;
     property TRHandle: PISC_TR_HANDLE read GetTRHandle;
@@ -648,6 +653,7 @@ type
     property OnFilterRecord;
     property OnNewRecord;
     property OnPostError;
+    property OnValidatePost;
   end;
 
   { TIBDSBlobStream }
@@ -3687,6 +3693,18 @@ begin
   if assigned(FQSelect) then
     FBaseSQLSelect.assign(FQSelect.SQL);
   inherited Loaded;
+end;
+
+procedure TIBCustomDataSet.Post;
+var CancelPost: boolean;
+begin
+  CancelPost := false;
+  if assigned(FOnValidatePost) then
+    OnValidatePost(self,CancelPost);
+  if CancelPost then
+    Cancel
+  else
+   inherited Post;
 end;
 
 function TIBCustomDataSet.Locate(const KeyFields: string; const KeyValues: Variant;

@@ -59,6 +59,18 @@ IBX Change Log  version                                                       (1
 
 13. IBLookupComboEditBox: Avoid SQL Errors when combo box text contains single quotes.
 
+14. TIBDataSet and TIBQuery: new Event - OnValidatePost. This event has been introduced
+    to solve a specific problem. That is when the dataset cursor is moved (e.g. by
+    a grid mouse click and the current row is being edited or inserted, then the
+    current record is always "posted" regardless or whether it is appropriate to do
+    so and this happens before the "BeforeScroll" event fires due to the way the
+    "MoveBy" function is implemented by TDataSet. The OnValidatePost event is called
+    as the first action of the "Post" method and allows the handler to convert the Post
+    into a Cancel if that is the appropriate action on moving to a different row. This is
+    achieved by returning with CancelPost set to true. Note that an exception could be
+    raised here, but it may still be more appropriate to validate a post and signal
+    a problem in the "BeforePost" event handler.
+
 IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
 
 1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 

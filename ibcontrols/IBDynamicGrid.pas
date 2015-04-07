@@ -151,6 +151,7 @@ end;
     procedure WndProc(var TheMessage : TLMessage); override;
     procedure CloseUp; override;
     procedure KeyDown(var Key : Word; Shift : TShiftState); override;
+    procedure Loaded; override;
     procedure msg_GetValue(var Msg: TGridMessage); message GM_GETVALUE;
     procedure msg_SetGrid(var Msg: TGridMessage); message GM_SETGRID;
     procedure msg_SetValue(var Msg: TGridMessage); message GM_SETVALUE;
@@ -735,6 +736,12 @@ begin
     inherited KeyDown(Key, Shift);
 end;
 
+procedure TDBLookupCellEditor.Loaded;
+begin
+  inherited Loaded;
+  Text := '';
+end;
+
 procedure TDBLookupCellEditor.msg_GetValue(var Msg: TGridMessage);
 begin
   CheckAndInsert;
@@ -1017,7 +1024,8 @@ procedure TIBDynamicGrid.SetupEditor(aEditor: TDBLookupCellEditor; aCol: integer
 var C: TIBDynamicGridColumn;
 begin
   C := ColumnFromGridColumn(aCol) as TIBDynamicGridColumn;
-  C.SetupEditor(aEditor);
+  if (c <> nil) then
+    C.SetupEditor(aEditor);
 end;
 
 procedure TIBDynamicGrid.DoEditorHide;
