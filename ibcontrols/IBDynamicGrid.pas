@@ -397,13 +397,17 @@ end;
 procedure TDBDynamicGrid.DoEditorHide;
 begin
   inherited DoEditorHide;
-  if (FExpandedRow >= 0) and (FExpandedRow < RowCount) then
-    RowHeights[FExpandedRow] := DefaultRowHeight;
-  FExpandedRow := -1;
-  if CanFocus then SetFocus;
-  if assigned(FOnEditorPanelHide) then
-     OnEditorPanelHide(self);
-  DoOnResize;
+  if Editor = FEditorPanel then
+  begin
+    if (FExpandedRow >= 0) and (FExpandedRow < RowCount) then
+      RowHeights[FExpandedRow] := DefaultRowHeight;
+    FExpandedRow := -1;
+    if CanFocus then SetFocus;
+    if assigned(FOnEditorPanelHide) then
+       OnEditorPanelHide(self);
+    DoOnResize;
+    ResetSizes;
+  end;
 end;
 
 procedure TDBDynamicGrid.DoEditorShow;
@@ -724,7 +728,10 @@ procedure TDBLookupCellEditor.CloseUp;
 begin
   UpdateData(nil); {Force Record Update}
   if FGrid<>nil then
-    (FGrid as TIBDynamicGrid).EditorTextChanged(FCol, FRow, Text);
+  Begin
+    (FGrid as TIBDynamicGrid).EditorTextChanged(FCol, FRow, Trim(Text));
+    (FGrid as TIBDynamicGrid).UpdateData;
+  end;
   inherited CloseUp;
 end;
 

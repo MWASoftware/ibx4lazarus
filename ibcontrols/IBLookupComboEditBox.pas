@@ -378,7 +378,7 @@ end;
 
 procedure TIBLookupComboEditBox.HandleEnter(Data: PtrInt);
 begin
-  SelectAll
+   SelectAll
 end;
 
 procedure TIBLookupComboEditBox.UpdateLinkData(Sender: TObject);
