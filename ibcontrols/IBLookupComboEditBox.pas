@@ -118,6 +118,7 @@ type
     procedure SetItemIndex(const Val: integer); override;
     function SQLSafe(aText: string): string;
     procedure UpdateShowing; override;
+
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
