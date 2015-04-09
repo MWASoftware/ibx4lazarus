@@ -174,7 +174,7 @@ const
 
 implementation
 
-uses Sysutils, IB, Dynlibs
+uses Sysutils, IB, Dynlibs, Classes
 {$IFDEF WINDOWS}
 ,Forms, Registry
 {$ENDIF}
@@ -192,6 +192,26 @@ procedure LoadIBLibrary;
       raise Exception.Create('Unable to load Firebird Client Library');
   end;
 {$IFDEF UNIX }
+  function FindLibrary(LibNameList: string): TLibHandle;
+  var LibNames: TStringList;
+      i: integer;
+  begin
+    Result := NilHandle;
+    LibNames := TStringList.Create;
+    try
+      LibNames.Delimiter := ';';
+      LibNames.StrictDelimiter := true;
+      LibNames.DelimitedText := LibNameList; {Split list on semi-colon}
+      for i := 0 to LibNames.Count - 1 do
+      begin
+        Result := LoadLibrary(LibNames[i]);
+        if Result <> NilHandle then Exit;
+      end;
+    finally
+      LibNames.Free;
+    end;
+  end;
+
   function InternalLoadLibrary: TLibHandle;
   var LibName: string;
   begin
@@ -204,7 +224,7 @@ procedure LoadIBLibrary;
       else
         LibName := FIREBIRD_SO2;
     end;
-    Result := LoadLibrary(LibName);
+    Result := FindLibrary(LibName);
     {$IFDEF DARWIN}
     if Result = NilHandle then
     begin

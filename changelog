@@ -71,6 +71,12 @@ IBX Change Log  version                                                       (1
     raised here, but it may still be more appropriate to validate a post and signal
     a problem in the "BeforePost" event handler.
 
+15. On Unix derived systems, the Firebird library name can now be given as a semi-colon
+    separated list. Each library name on the list is tried in turn, in left to right
+    order with the first found being used as the firebird library. By default, on Linux,
+    the library name list is 'libfbembed.so.2.5;libfbclient.so.2'. This can be
+    overidden by the FBLIB environment variable or the OnGetLibraryName function.
+
 IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
 
 1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 
