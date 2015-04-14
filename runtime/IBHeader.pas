@@ -47,7 +47,7 @@ const
   DSQL_close = 1;
   DSQL_drop = 2;
   {$IFDEF LINUX}
-  FIREBIRD_SO2 = 'libfbembed.so.2.5;libfbclient.so.2';
+  FIREBIRD_SO2 = 'libfbembed.so.2.5;libfbembed.so.2.1;libfbclient.so.2';
   {$ENDIF}
   {$IFDEF DARWIN}
   FIREBIRD_SO2 = 'libfbclient.dylib';
