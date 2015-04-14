@@ -19,7 +19,7 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <CursorPos X="47" Y="9"/>
+        <CursorPos X="49" Y="17"/>
         <UsageCount Value="75"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -49,7 +49,6 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../runtime/IB.pas"/>
-        <UnitName Value="IB"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="408"/>
         <CursorPos X="30" Y="419"/>
@@ -241,7 +240,6 @@
       </Unit35>
       <Unit36>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <UnitName Value="IBTreeView"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="728"/>
         <CursorPos X="3" Y="732"/>

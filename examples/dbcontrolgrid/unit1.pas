@@ -128,6 +128,8 @@ implementation
 
 uses IB, Unit2, Unit4, Unit5;
 
+const sNoName = '<no name>';
+
 function ExtractDBException(msg: string): string;
 var Lines: TStringList;
 begin
@@ -294,8 +296,8 @@ begin
   EmployeesJOB_CODE.AsString := 'SRep';
   EmployeesJOB_GRADE.AsInteger := 4;
   EmployeesSALARY.AsCurrency := 20000;
-  EmployeesFIRST_NAME.AsString := '<no name>';
-  EmployeesLAST_NAME.AsString := '<no name>';
+  EmployeesFIRST_NAME.AsString := sNoName;
+  EmployeesLAST_NAME.AsString := sNoName;
   EmployeesHIRE_DATE.AsDateTime := now;
   EmployeesDEPT_NO.AsString := '000';
   FDirty := true;

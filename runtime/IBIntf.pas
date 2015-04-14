@@ -199,7 +199,7 @@ procedure LoadIBLibrary;
     Result := NilHandle;
     LibNames := TStringList.Create;
     try
-      LibNames.Delimiter := ';';
+      LibNames.Delimiter := ':';
       LibNames.StrictDelimiter := true;
       LibNames.DelimitedText := LibNameList; {Split list on semi-colon}
       for i := 0 to LibNames.Count - 1 do

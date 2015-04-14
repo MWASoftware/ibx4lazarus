@@ -18,15 +18,14 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="MainForm"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="22"/>
-        <CursorPos X="11" Y="45"/>
+        <TopLine Value="23"/>
+        <CursorPos X="35" Y="32"/>
         <UsageCount Value="27"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <UnitName Value="IBSQLParser"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="271"/>
         <CursorPos X="3" Y="292"/>

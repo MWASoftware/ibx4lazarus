@@ -1,12 +1,12 @@
 object Form1: TForm1
-  Left = 416
+  Left = 566
   Height = 619
-  Top = 236
+  Top = 241
   Width = 854
   Caption = 'SQL Parser'
   ClientHeight = 619
   ClientWidth = 854
-  LCLVersion = '1.4.0.1'
+  LCLVersion = '1.4.0.3'
   object Label1: TLabel
     Left = 14
     Height = 15

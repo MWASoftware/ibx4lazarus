@@ -211,7 +211,7 @@ type
   TIBUpdateAction = (uaFail, uaAbort, uaSkip, uaRetry, uaApply, uaApplied);
 
   TIBUpdateErrorEvent = procedure(DataSet: TDataSet; E: EDatabaseError;
-                                 UpdateKind: TUpdateKind; var UpdateAction: TIBUpdateAction)
+                                 UpdateKind: TUpdateKind; var TheUpdateAction: TIBUpdateAction)
                                  of object;
   TIBUpdateRecordEvent = procedure(DataSet: TDataSet; UpdateKind: TUpdateKind;
                                    var UpdateAction: TIBUpdateAction) of object;

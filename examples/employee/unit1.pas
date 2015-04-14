@@ -97,6 +97,7 @@ type
     IBDatabase1: TIBDatabase;
     IBTransaction1: TIBTransaction;
     procedure EmployeesAfterPost(DataSet: TDataSet);
+    procedure EmployeesValidatePost(Sender: TObject; var CancelPost: boolean);
     procedure JobGradeDBComboBoxCloseUp(Sender: TObject);
     procedure SelectDeptExecute(Sender: TObject);
     procedure AddEmployeeExecute(Sender: TObject);
@@ -141,6 +142,9 @@ implementation
 {$R *.lfm}
 
 uses IB, Unit2;
+
+const
+  sNoName = '<no name>';
 
 function ExtractDBException(msg: string): string;
 var Lines: TStringList;
@@ -226,6 +230,13 @@ begin
   Employees.Refresh
 end;
 
+procedure TForm1.EmployeesValidatePost(Sender: TObject; var CancelPost: boolean
+  );
+begin
+  {Cancel if no name entered}
+  CancelPost := (EmployeesLAST_NAME.AsString = sNoName) and  (EmployeesFIRST_NAME.AsString = sNoName);
+end;
+
 procedure TForm1.JobGradeDBComboBoxCloseUp(Sender: TObject);
 begin
   JobGradeDBComboBox.EditingDone; //See http://bugs.freepascal.org/view.php?id=27186
@@ -272,8 +283,8 @@ begin
   EmployeesJOB_CODE.AsString := 'SRep';
   EmployeesJOB_GRADE.AsInteger := 4;
   EmployeesSALARY.AsCurrency := 20000;
-  EmployeesFIRST_NAME.AsString := '<no name>';
-  EmployeesLAST_NAME.AsString := '<no name>';
+  EmployeesFIRST_NAME.AsString := sNoName;
+  EmployeesLAST_NAME.AsString := sNoName;
   EmployeesHIRE_DATE.AsDateTime := now;
   EmployeesDEPT_NO.AsString := '000';
   FDirty := true;
@@ -281,7 +292,8 @@ end;
 
 procedure TForm1.EmployeesAfterOpen(DataSet: TDataSet);
 begin
-  TotalsQuery.Active := true
+  TotalsQuery.Active := true;
+  IBDynamicGrid1.SetFocus;
 end;
 
 procedure TForm1.EmployeesAfterScroll(DataSet: TDataSet);

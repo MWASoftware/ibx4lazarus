@@ -18,7 +18,7 @@
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
         <TopLine Value="177"/>
-        <CursorPos X="25" Y="189"/>
+        <CursorPos X="31" Y="182"/>
         <UsageCount Value="43"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -35,7 +35,6 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <UnitName Value="IBLookupComboEditBox"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="189"/>
         <CursorPos X="66" Y="194"/>
