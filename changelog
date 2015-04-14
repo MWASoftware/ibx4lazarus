@@ -37,7 +37,7 @@ IBX Change Log  version                                                        (
     For UTF8 character sets, the byte width is four and hence the Display Width will be
     the byte width divided by 4. The byte width of each character set is determined
     dynamically when the database connection is estabished from the RDB$CHARACTER_SETS
-    system table.
+    system table. (see also http://bugs.freepascal.org/view.php?id=27766).
 
 7.  SQLParser will now correctly parse SQL Text which contains ':' within quoted string.
 
@@ -69,13 +69,19 @@ IBX Change Log  version                                                        (
     into a Cancel if that is the appropriate action on moving to a different row. This is
     achieved by returning with "CancelPost" argument set to true. Note that an exception could be
     raised here, but it may still be more appropriate to validate a post and signal
-    a problem in the "BeforePost" event handler.
+    a problem in the "BeforePost" event handler. See readme.automaticposts.xhtml)
 
-15. On Unix derived systems, the Firebird library name can now be given as a semi-colon
+15. On Unix derived systems, the Firebird library name can now be given as a colon
     separated list. Each library name on the list is tried in turn, in left to right
     order with the first found being used as the firebird library. By default, on Linux,
-    the library name list is 'libfbembed.so.2.5;libfbembed.so.2.1;libfbclient.so.2'. This can be
+    the library name list is 'libfbembed.so.2.5:libfbembed.so.2.1:libfbclient.so.2'. This can be
     overidden by the FBLIB environment variable or the OnGetLibraryName function.
+
+    Note: when using the libfbembed.so, if you prefix the database name with "localhost:"
+    then it will still attempt to access the database via the Firebird Server and will
+    require a username and password. If only the pathname is given, then the username
+    and password should be omitted and the unix file permissions are used to grant
+    access.
 
 IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
 
