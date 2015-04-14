@@ -1,4 +1,4 @@
-IBX Change Log  version                                                       (1.2-3) Wed, 01 Apr 2015 09:08:13 +0100
+IBX Change Log  version                                                       (1.2-3) tba, 01 Apr 2015 09:08:13 +0100
 
 1.  TIBStoredProc. Prepare now called by ParamByName to avoid need to always
     call Prepare before setting parameter values.
@@ -20,16 +20,16 @@ IBX Change Log  version                                                       (1
 
 5.  TDataSet.CheckBrowseMode automatically posts changes to the current row when
     the dataset is scrolled. However, any changes to the current row are, by default,
-    discarded. TIBDataSet, TIBQuery and TIBTable now have a new property "DataSetCloseAction"
-    that adds automatic posting of changes on dataset close. If this property is
-    set to dcDiscardChanges (default) then the behaviour is unchanged from previous
-    versions. if the value is set to dcSaveChanges then IBX will attempt to post
-    any unsaved changes before the dataset is closed (and after the BeforeClose event
-    handler is called). The exception is when the dataset is being closed as a result
-    of a transaction rollback. In this case, no action is taken and any unsaved
-    changes are discarded. This avoids both unnecessary overhead and the risk that
-    a validation error may occur in the Post raising an exception and thereby 
-    preventing a rollback.
+    discarded when the dataset is closed. TIBDataSet, TIBQuery and TIBTable now
+    have a new property "DataSetCloseAction" that adds automatic posting of changes
+    on dataset close. If this property is set to dcDiscardChanges (default) then the
+    behaviour is unchanged from previous versions. if the value is set to dcSaveChanges
+    then IBX will attempt to post any unsaved changes before the dataset is closed
+    (and after the BeforeClose event handler is called). The exception is when the
+    dataset is being closed as a result of a transaction rollback. In this case,
+    no action is taken and any unsaved  changes are discarded. This avoids both
+    unnecessary overhead and the risk that a validation error may occur in the Post
+    raising an exception and thereby preventing a rollback.
 
 6.  String Field sizes and Display Widths should now be correct for multi-byte character sets.
     In earlier versions, the Display Width was set to the maximum byte width rather than the character
@@ -42,7 +42,7 @@ IBX Change Log  version                                                       (1
 7.  SQLParser will now correctly parse SQL Text which contains ':' within quoted string.
 
 8.  IBLookupComboEditBox: List should now always be restored to full list when the
-    control loses focus. Key press default interval reduced to 200ms.
+    control loses focus. Default Key press default interval reduced to 200ms.
 
 9.  DBControlGrid: Ensure that selection is changed to newly appended row, even
     when dataset rows are less than visible rows.
@@ -54,27 +54,27 @@ IBX Change Log  version                                                       (1
 11. IBTreeView: improved handling of response to "Add Node". Avoid scrolling dataset
     while dataset state is dsInsert. Avoids posting errors.
 
-12. IBControls: New mechanism for distributing UpdateSQL and UpdateParams events. To
+12. IBControls: New mechanism for distributing UpdateSQL and UpdateParams events. This is to
     avoid conflict with DisableControls/EnableControls with Master/Detail linked tables.
 
-13. IBLookupComboEditBox: Avoid SQL Errors when combo box text contains single quotes.
+13. IBLookupComboEditBox: Now avoids SQL Errors when combo box text contains single quotes.
 
 14. TIBDataSet and TIBQuery: new Event - OnValidatePost. This event has been introduced
     to solve a specific problem. That is when the dataset cursor is moved (e.g. by
-    a grid mouse click and the current row is being edited or inserted, then the
-    current record is always "posted" regardless or whether it is appropriate to do
-    so and this happens before the "BeforeScroll" event fires due to the way the
+    a grid mouse click and the current row is being edited or inserted. In this case, TDataset
+    always "posts" the current record regardless or whether or not it may be more appropriate
+    to cancel any changes; the post occurs before the "BeforeScroll" event fires due to the way the
     "MoveBy" function is implemented by TDataSet. The OnValidatePost event is called
     as the first action of the "Post" method and allows the handler to convert the Post
     into a Cancel if that is the appropriate action on moving to a different row. This is
-    achieved by returning with CancelPost set to true. Note that an exception could be
+    achieved by returning with "CancelPost" argument set to true. Note that an exception could be
     raised here, but it may still be more appropriate to validate a post and signal
     a problem in the "BeforePost" event handler.
 
 15. On Unix derived systems, the Firebird library name can now be given as a semi-colon
     separated list. Each library name on the list is tried in turn, in left to right
     order with the first found being used as the firebird library. By default, on Linux,
-    the library name list is 'libfbembed.so.2.5;libfbclient.so.2'. This can be
+    the library name list is 'libfbembed.so.2.5;libfbembed.so.2.1;libfbclient.so.2'. This can be
     overidden by the FBLIB environment variable or the OnGetLibraryName function.
 
 IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
