@@ -401,6 +401,8 @@ type
     It is to more easily manage the database and transaction
     connections. }
   TIBBase = class(TObject)
+  private
+    FBeforeDatabaseConnect: TNotifyEvent;
   protected
     FDatabase: TIBDatabase;
     FIndexInDatabase: Integer;
@@ -415,6 +417,7 @@ type
     FAfterTransactionEnd: TNotifyEvent;
     FOnTransactionFree: TNotifyEvent;
 
+    procedure DoBeforeDatabaseConnect; virtual;
     procedure DoAfterDatabaseConnect; virtual;
     procedure DoBeforeDatabaseDisconnect; virtual;
     procedure DoAfterDatabaseDisconnect; virtual;
@@ -438,6 +441,8 @@ type
     procedure DoAfterPost(Sender: TObject); virtual;
     function GetCharSetSize(CharSetID: integer): integer;
   public
+    property BeforeDatabaseConnect: TNotifyEvent read FBeforeDatabaseConnect
+                                                 write FBeforeDatabaseConnect;
     property AfterDatabaseConnect: TNotifyEvent read FAfterDatabaseConnect
                                                 write FAfterDatabaseConnect;
     property BeforeDatabaseDisconnect: TNotifyEvent read FBeforeDatabaseDisconnect
@@ -1001,6 +1006,11 @@ begin
     end;
     IBAlloc(FDPB, 0, FDPBLength);
     Move(DPB[1], FDPB[0], FDPBLength);
+  end;
+  for i := 0 to FSQLObjects.Count - 1 do
+  begin
+      if FSQLObjects[i] <> nil then
+        SQLObjects[i].DoBeforeDatabaseConnect;
   end;
   if Call(isc_attach_database(StatusVector, Length(FDBName),
                          PChar(FDBName), @FHandle,
@@ -2001,6 +2011,12 @@ function TIBBase.GetTRHandle: PISC_TR_HANDLE;
 begin
   CheckTransaction;
   result := @FTransaction.Handle;
+end;
+
+procedure TIBBase.DoBeforeDatabaseConnect;
+begin
+  if assigned(FBeforeDatabaseConnect) then
+    BeforeDatabaseConnect(self);
 end;
 
 procedure TIBBase.DoAfterDatabaseConnect;

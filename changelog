@@ -1,3 +1,8 @@
+IBX Change Log  version                                                          (1.2-4) tba, 14 Apr 2015 14:11:17 +0100
+
+1.  Firebird Services: avoid List Index error when opening a service with an
+    empty Params property.
+
 IBX Change Log  version                                                          (1.2-3) Tue, 14 Apr 2015 14:11:17 +0100
 
 1.  TIBStoredProc. Prepare now called by ParamByName to avoid need to always

@@ -879,6 +879,7 @@ begin
   SPB := SPB + Char(isc_spb_current_version);
   { Iterate through the textual service parameters, constructing
    a SPB on-the-fly }
+  if sl.Count > 0 then
   for i := 0 to sl.Count - 1 do
   begin
    { Get the parameter's name and value from the list,
