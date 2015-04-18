@@ -990,6 +990,11 @@ begin
   { Generate a new DPB if necessary }
   if (FDBParamsChanged) then
   begin
+    for i := 0 to FSQLObjects.Count - 1 do
+    begin
+        if FSQLObjects[i] <> nil then
+          SQLObjects[i].DoBeforeDatabaseConnect;
+    end;
     FDBParamsChanged := False;
     if (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
       GenerateDPB(FDBParams, DPB, FDPBLength)
@@ -1006,11 +1011,6 @@ begin
     end;
     IBAlloc(FDPB, 0, FDPBLength);
     Move(DPB[1], FDPB[0], FDPBLength);
-  end;
-  for i := 0 to FSQLObjects.Count - 1 do
-  begin
-      if FSQLObjects[i] <> nil then
-        SQLObjects[i].DoBeforeDatabaseConnect;
   end;
   if Call(isc_attach_database(StatusVector, Length(FDBName),
                          PChar(FDBName), @FHandle,
