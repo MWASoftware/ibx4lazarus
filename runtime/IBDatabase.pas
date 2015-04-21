@@ -394,6 +394,8 @@ type
   end;
 
   TTransactionEndEvent = procedure(Sender:TObject; Action: TTransactionAction) of object;
+  TBeforeDatabaseConnectEvent = procedure (Sender: TObject; DBParams: TStrings;
+                              var DBName: string) of object;
 
   { TIBBase }
 
@@ -401,9 +403,8 @@ type
     It is to more easily manage the database and transaction
     connections. }
   TIBBase = class(TObject)
-  private
-    FBeforeDatabaseConnect: TNotifyEvent;
   protected
+    FBeforeDatabaseConnect: TBeforeDatabaseConnectEvent;
     FDatabase: TIBDatabase;
     FIndexInDatabase: Integer;
     FTransaction: TIBTransaction;
@@ -417,7 +418,8 @@ type
     FAfterTransactionEnd: TNotifyEvent;
     FOnTransactionFree: TNotifyEvent;
 
-    procedure DoBeforeDatabaseConnect; virtual;
+    procedure DoBeforeDatabaseConnect(DBParams: TStrings;
+                              var DBName: string); virtual;
     procedure DoAfterDatabaseConnect; virtual;
     procedure DoBeforeDatabaseDisconnect; virtual;
     procedure DoAfterDatabaseDisconnect; virtual;
@@ -441,7 +443,7 @@ type
     procedure DoAfterPost(Sender: TObject); virtual;
     function GetCharSetSize(CharSetID: integer): integer;
   public
-    property BeforeDatabaseConnect: TNotifyEvent read FBeforeDatabaseConnect
+    property BeforeDatabaseConnect: TBeforeDatabaseConnectEvent read FBeforeDatabaseConnect
                                                  write FBeforeDatabaseConnect;
     property AfterDatabaseConnect: TNotifyEvent read FAfterDatabaseConnect
                                                 write FAfterDatabaseConnect;
@@ -975,7 +977,7 @@ var
   DPB: String;
   TempDBParams: TStrings;
   I: integer;
-
+  aDBName: string;
 begin
   CheckInactive;
   CheckDatabaseName;
@@ -987,33 +989,37 @@ begin
   { Use builtin login prompt if requested }
   if (LoginPrompt or (csDesigning in ComponentState)) and not Login then
     IBError(ibxeOperationCancelled, [nil]);
-  { Generate a new DPB if necessary }
-  if (FDBParamsChanged) then
-  begin
-    for i := 0 to FSQLObjects.Count - 1 do
-    begin
-        if FSQLObjects[i] <> nil then
-          SQLObjects[i].DoBeforeDatabaseConnect;
-    end;
-    FDBParamsChanged := False;
-    if (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
-      GenerateDPB(FDBParams, DPB, FDPBLength)
-    else
-    begin
-      TempDBParams := TStringList.Create;
-      try
-       TempDBParams.Assign(FDBParams);
-       TempDBParams.Add('password=' + FHiddenPassword);
-       GenerateDPB(TempDBParams, DPB, FDPBLength);
-      finally
-       TempDBParams.Free;
-      end;
-    end;
-    IBAlloc(FDPB, 0, FDPBLength);
-    Move(DPB[1], FDPB[0], FDPBLength);
+
+  TempDBParams := TStringList.Create;
+  try
+   TempDBParams.Assign(FDBParams);
+   aDBName := FDBName;
+   {Opportuning to override defaults}
+   for i := 0 to FSQLObjects.Count - 1 do
+   begin
+       if FSQLObjects[i] <> nil then
+         SQLObjects[i].DoBeforeDatabaseConnect(TempDBParams,aDBName);
+   end;
+
+   { Generate a new DPB if necessary }
+   if (FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text)) then
+   begin
+     FDBParamsChanged := False;
+     if (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
+       GenerateDPB(TempDBParams, DPB, FDPBLength)
+     else
+     begin
+        TempDBParams.Add('password=' + FHiddenPassword);
+        GenerateDPB(TempDBParams, DPB, FDPBLength);
+     end;
+     IBAlloc(FDPB, 0, FDPBLength);
+     Move(DPB[1], FDPB[0], FDPBLength);
+   end;
+  finally
+   TempDBParams.Free;
   end;
-  if Call(isc_attach_database(StatusVector, Length(FDBName),
-                         PChar(FDBName), @FHandle,
+  if Call(isc_attach_database(StatusVector, Length(aDBName),
+                         PChar(aDBName), @FHandle,
                          FDPBLength, FDPB), False) > 0 then
   begin
     FHandle := nil;
@@ -2013,10 +2019,11 @@ begin
   result := @FTransaction.Handle;
 end;
 
-procedure TIBBase.DoBeforeDatabaseConnect;
+procedure TIBBase.DoBeforeDatabaseConnect(DBParams: TStrings; var DBName: string
+  );
 begin
   if assigned(FBeforeDatabaseConnect) then
-    BeforeDatabaseConnect(self);
+    BeforeDatabaseConnect(self,DBParams,DBName);
 end;
 
 procedure TIBBase.DoAfterDatabaseConnect;
