@@ -1025,6 +1025,8 @@ begin
     FHandle := nil;
     IBDataBaseError;
   end;
+  if not (csDesigning in ComponentState) then
+    FDBName := aDBName; {Synchronise at run time}
   FDBSQLDialect := GetDBSQLDialect;
   ValidateClientSQLDialect;
   for i := 0 to FSQLObjects.Count - 1 do
