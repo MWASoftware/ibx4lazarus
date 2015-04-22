@@ -640,6 +640,7 @@ end;
 procedure TIBTreeView.Loaded;
 begin
   inherited Loaded;
+  IBControlLinkChanged;
   Reinitialise
 end;
 

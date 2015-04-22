@@ -80,6 +80,8 @@ type
     Panel2: TPanel;
     EmployeeEditorPanel: TPanel;
     SpeedButton1: TSpeedButton;
+    JobGradeChangeTimer: TTimer;
+    JobCodeChangeTimer: TTimer;
     TotalsQueryTOTALSALARIES: TIBBCDField;
     TotalsSource: TDataSource;
     TotalsQuery: TIBQuery;
@@ -98,6 +100,8 @@ type
     IBTransaction1: TIBTransaction;
     procedure EmployeesAfterPost(DataSet: TDataSet);
     procedure EmployeesValidatePost(Sender: TObject; var CancelPost: boolean);
+    procedure JobCodeChangeTimerTimer(Sender: TObject);
+    procedure JobGradeChangeTimerTimer(Sender: TObject);
     procedure JobGradeDBComboBoxCloseUp(Sender: TObject);
     procedure SelectDeptExecute(Sender: TObject);
     procedure AddEmployeeExecute(Sender: TObject);
@@ -237,6 +241,22 @@ begin
   CancelPost := (EmployeesLAST_NAME.AsString = sNoName) and  (EmployeesFIRST_NAME.AsString = sNoName);
 end;
 
+procedure TForm1.JobCodeChangeTimerTimer(Sender: TObject);
+begin
+  Countries.Active := false;
+  Countries.Active := true;
+  JobCodeChangeTimer.Interval := 0;
+end;
+
+procedure TForm1.JobGradeChangeTimerTimer(Sender: TObject);
+begin
+  Countries.Active := false;
+  JobCodes.Active := false;
+  Countries.Active := true;
+  JobCodes.Active := true;
+  JobGradeChangeTimer.Interval := 0;
+end;
+
 procedure TForm1.JobGradeDBComboBoxCloseUp(Sender: TObject);
 begin
   JobGradeDBComboBox.EditingDone; //See http://bugs.freepascal.org/view.php?id=27186
@@ -298,10 +318,7 @@ end;
 
 procedure TForm1.EmployeesAfterScroll(DataSet: TDataSet);
 begin
-  Countries.Active := false;
-  JobCodes.Active := false;
-  Countries.Active := true;
-  JobCodes.Active := true;
+  JobGradeChangeTimer.Interval := 200;
 end;
 
 procedure TForm1.EmployeesBeforeClose(DataSet: TDataSet);
@@ -337,16 +354,12 @@ end;
 
 procedure TForm1.EmployeesJOB_CODEChange(Sender: TField);
 begin
-  Countries.Active := false;
-  Countries.Active := true;
+  JobCodeChangeTimer.Interval := 200;
 end;
 
 procedure TForm1.EmployeesJOB_GRADEChange(Sender: TField);
 begin
-  Countries.Active := false;
-  JobCodes.Active := false;
-  Countries.Active := true;
-  JobCodes.Active := true;
+  JobGradeChangeTimer.Interval := 200;
 end;
 
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);

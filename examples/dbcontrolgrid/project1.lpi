@@ -726,7 +726,6 @@
       </Unit97>
       <Unit98>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <UnitName Value="IBCustomDataSet"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="196"/>
@@ -914,8 +913,7 @@
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="16"/>
-        <CursorPos X="50" Y="48"/>
+        <CursorPos X="65" Y="10"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit121>

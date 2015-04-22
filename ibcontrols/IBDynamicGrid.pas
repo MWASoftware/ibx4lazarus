@@ -1049,6 +1049,7 @@ end;
 procedure TIBDynamicGrid.Loaded;
 begin
   inherited Loaded;
+  IBControlLinkChanged;
   ProcessColumns;
 end;
 

@@ -114,6 +114,7 @@ type
     procedure DoEnter; override;
     procedure DoExit; override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
+    procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetItemIndex(const Val: integer); override;
     function SQLSafe(aText: string): string;
@@ -487,6 +488,12 @@ begin
     FTimer.Interval := FKeyPressInterval
   else
     FTimer.Interval := 0
+end;
+
+procedure TIBLookupComboEditBox.Loaded;
+begin
+  inherited Loaded;
+  IBControlLinkChanged;
 end;
 
 procedure TIBLookupComboEditBox.Notification(AComponent: TComponent;

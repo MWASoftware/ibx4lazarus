@@ -3,6 +3,12 @@ IBX Change Log  version                                                         
 1.  Firebird Services: avoid List Index error when opening a service with an
     empty Params property.
 
+2.  IBControls: Fix problem with new link mechanism introduced in 1.2.3
+    Link now set up in Loaded method - avoids occasional failure to apply
+    SQL markup on initial open.
+
+3.  "Employees" example performance improvements when scrolling.
+
 IBX Change Log  version                                                          (1.2-3) Tue, 14 Apr 2015 14:11:17 +0100
 
 1.  TIBStoredProc. Prepare now called by ParamByName to avoid need to always
