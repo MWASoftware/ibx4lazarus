@@ -487,7 +487,7 @@ begin
      (not (cbactEndOfLineComplete in AutoCompleteText) or (SelStart = UTF8Length(Text))) then
     FTimer.Interval := FKeyPressInterval
   else
-    FTimer.Interval := 0
+    FTimer.Interval := 0;
 end;
 
 procedure TIBLookupComboEditBox.Loaded;
