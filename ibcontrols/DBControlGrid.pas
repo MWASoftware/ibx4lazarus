@@ -765,7 +765,8 @@ begin
      RemoveFreeNotification(FDrawPanel);
      FDrawPanel.RemoveAllHandlersOfObject(self);
      theForm := Parent;
-     while not (theForm is TCustomForm) and (theForm.Parent <> nil) do
+     while not ((theForm is TCustomForm) or (theForm is TCustomFrame))
+                           and (theForm.Parent <> nil) do
        theForm := theForm.Parent;
      FDrawPanel.Parent := theForm;
   end;
@@ -782,7 +783,7 @@ begin
        FDrawPanel.Visible := false;
       FRowCache.Height := FDrawPanel.Height;
       FRowCache.Width := FDrawPanel.Width;
-      AddHandlerOnResize(@OnDrawPanelResize);
+      FDrawPanel.AddHandlerOnResize(@OnDrawPanelResize);
       FreeNotification(FDrawPanel);
     end;
   except
