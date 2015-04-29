@@ -164,6 +164,7 @@ procedure isc_decode_timestamp_stub(ib_timestamp     : PISC_TIMESTAMP;
 
 
 var  IBServiceAPIPresent: boolean;
+     IBEmbeddedServer: boolean;
 
 type
   TOnGetLibraryName = procedure(var libname: string);
@@ -343,6 +344,8 @@ begin
     isc_add_user := GetProcAddr('isc_add_user'); {do not localize}
     isc_delete_user := GetProcAddr('isc_delete_user'); {do not localize}
     isc_modify_user := GetProcAddr('isc_modify_user'); {do not localize}
+
+    IBEmbeddedServer :=  GetProcAddr('server_main') <> nil; {do not localize}
 
     IBServiceAPIPresent := true;
     isc_rollback_retaining := GetProcAddress(IBLibrary, 'isc_rollback_retaining'); {do not localize}
