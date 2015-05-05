@@ -407,7 +407,7 @@ begin
        OnEditorPanelHide(self);
     DoOnResize;
     ResetSizes;
-    Invalidate;
+    DoOnChangeBounds;
   end;
 end;
 
