@@ -16,6 +16,8 @@ IBX Change Log  version                                                         
 
 6.  IBDynamicGrid: Redraws rows below on panel editor hide
 
+7.  DBControlGrid: always re-cache row after selected.
+
 IBX Change Log  version                                                          (1.2-3) Tue, 14 Apr 2015 14:11:17 +0100
 
 1.  TIBStoredProc. Prepare now called by ParamByName to avoid need to always

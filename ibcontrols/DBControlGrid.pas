@@ -97,6 +97,7 @@ type
     procedure ClearCache;
     function Add2Cache(RecNo: Longint; Control: TWinControl): TBitmap;
     function GetRowImage(RecNo, Offset: integer): TBitmap;
+    procedure InvalidateRowImage(RecNo: integer);
     function IsEmpty(RecNo: integer): boolean;
     procedure MarkAsDeleted(RecNo: integer);
     property AlternateColor[RecNo: integer]: boolean read GetAlternateColor;
@@ -465,6 +466,19 @@ begin
       Exit;
     end;
   until false;
+end;
+
+procedure TRowCache.InvalidateRowImage(RecNo: integer);
+begin
+  Dec(RecNo); {adjust to zero base}
+  if (RecNo < 0) or (RecNo >= Length(FList)) then
+    Exit;
+
+  if FList[RecNo].FState = rcPresent then
+  begin
+    FList[RecNo].FBitmap.Free;
+    FList[RecNo].FState := rcEmpty;
+  end;
 end;
 
 function TRowCache.IsEmpty(RecNo: integer): boolean;
@@ -1560,7 +1574,11 @@ begin
   PrevRow := Row;
   Row := FDrawRow;
   if not FInCacheRefresh then
+  begin
     FSelectedRow := FDrawRow;
+    if FDatalink.DataSet.State <> dsInsert then
+      FRowCache.InvalidateRowImage(FSelectedRecNo);
+  end;
   InvalidateRow(PrevRow);
   SetupDrawPanel(FDrawRow);
 end;
