@@ -61,7 +61,7 @@
         <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <TopLine Value="7"/>
-        <CursorPos X="25" Y="11"/>
+        <CursorPos X="21" Y="15"/>
         <UsageCount Value="192"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -647,19 +647,16 @@
       </Unit87>
       <Unit88>
         <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <UnitName Value="DBControlGrid"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="1123"/>
-        <CursorPos X="42" Y="1126"/>
+        <TopLine Value="226"/>
+        <CursorPos Y="240"/>
         <UsageCount Value="49"/>
       </Unit88>
       <Unit89>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="266"/>
-        <CursorPos Y="284"/>
         <UsageCount Value="37"/>
       </Unit89>
       <Unit90>
@@ -914,7 +911,7 @@
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="55" Y="19"/>
+        <CursorPos X="41" Y="22"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit121>
@@ -1029,7 +1026,7 @@
         <UsageCount Value="10"/>
       </Unit134>
     </Units>
-    <JumpHistory Count="8" HistoryIndex="7">
+    <JumpHistory Count="10" HistoryIndex="9">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="11" Column="25"/>
@@ -1062,6 +1059,14 @@
         <Filename Value="unit1.pas"/>
         <Caret Line="11" Column="25" TopLine="7"/>
       </Position8>
+      <Position9>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="10" Column="40" TopLine="7"/>
+      </Position9>
+      <Position10>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="11" Column="27" TopLine="7"/>
+      </Position10>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

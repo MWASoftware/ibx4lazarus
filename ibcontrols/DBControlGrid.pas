@@ -237,7 +237,6 @@ type
     property Color;
     property Constraints;
     property DataSource: TDataSource read GetDataSource write SetDataSource;
-    property DefaultRowHeight;
     property DefaultPositionAtEnd: boolean read  FDefaultPositionAtEnd write FDefaultPositionAtEnd;
     property DragCursor;
     property DragMode;

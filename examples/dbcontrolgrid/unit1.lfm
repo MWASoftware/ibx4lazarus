@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 248
+  Left = 310
   Height = 575
-  Top = 397
+  Top = 404
   Width = 1026
   Caption = 'Employee List'
   ClientHeight = 575
@@ -94,7 +94,6 @@ object Form1: TForm1
       AltColorStartNormal = True
       Color = clWhite
       DataSource = EmployeeSource
-      DefaultRowHeight = 80
       DefaultPositionAtEnd = False
       DrawPanel = EmployeeEditorPanel
       Options = [dgpIndicator]
