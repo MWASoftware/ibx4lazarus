@@ -18,6 +18,9 @@ IBX Change Log  version                                                         
 6.  IBDynamicGrid: Redraws rows below on panel editor hide - avoids blank space at end of grid   
     even when further rows exist.
 
+7.  DBControlGrid: DefaultRowHeight is no longer a published property as it should
+    always be derived from panel height.
+
 
 IBX Change Log  version                                                          (1.2-3) Tue, 14 Apr 2015 14:11:17 +0100
 
