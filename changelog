@@ -19,7 +19,10 @@ IBX Change Log  version                                                         
     even when further rows exist.
 
 7.  DBControlGrid: DefaultRowHeight is no longer a published property as it should
-    always be derived from panel height.
+    always be derived from panel height and setting this property can cause confusion.
+    Note for existing projects: to avoid a missing property error at run time,
+    each form using the DBControlGrid must be opened, updated and saved in the IDE
+    in order to remove the property value from the lfm.
 
 
 IBX Change Log  version                                                          (1.2-3) Tue, 14 Apr 2015 14:11:17 +0100
