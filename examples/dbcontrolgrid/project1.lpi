@@ -58,6 +58,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
+        <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <TopLine Value="7"/>
         <CursorPos X="25" Y="11"/>
@@ -647,13 +648,11 @@
       <Unit88>
         <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
         <UnitName Value="DBControlGrid"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="1562"/>
         <CursorPos X="26" Y="1579"/>
         <UsageCount Value="49"/>
-        <Loaded Value="True"/>
       </Unit88>
       <Unit89>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
@@ -673,7 +672,6 @@
       </Unit90>
       <Unit91>
         <Filename Value="../../../../lcl/grids.pas"/>
-        <UnitName Value="Grids"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="3976"/>
@@ -1031,7 +1029,7 @@
         <UsageCount Value="10"/>
       </Unit134>
     </Units>
-    <JumpHistory Count="10" HistoryIndex="9">
+    <JumpHistory Count="8" HistoryIndex="7">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="11" Column="25"/>
@@ -1064,13 +1062,6 @@
         <Filename Value="unit1.pas"/>
         <Caret Line="11" Column="25" TopLine="7"/>
       </Position8>
-      <Position9>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../ibcontrols/DBControlGrid.pas"/>
-        <Caret Line="1580" Column="3" TopLine="1562"/>
-      </Position10>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
