@@ -3,20 +3,21 @@ IBX Change Log  version                                                         
 1.  Firebird Services: avoid List Index error when opening a service with an
     empty Params property.
 
-2.  IBControls: Fix problem with new link mechanism introduced in 1.2.3
+2.  IBControls: Fix problem with new link mechanism introduced in 1.2.3.
     Link now set up in Loaded method - avoids occasional failure to apply
     SQL markup on initial open.
 
 3.  "Employees" example performance improvements when scrolling.
 
-4.  DBControlGrid: Correctly handle edit panel removal when child control of a
-    TFrame.
+4.  DBControlGrid: Correctly handle edit panel removal when panel is child control of a
+    TFrame. Force recaching of selected frame to avoid GTK race (results in a
+    random image cached).
 
 5.  DBControlGrid: Should now react to changes in panel height at run time.
 
-6.  IBDynamicGrid: Redraws rows below on panel editor hide
+6.  IBDynamicGrid: Redraws rows below on panel editor hide - avoids blank space at end of grid   
+    even when further rows exist.
 
-7.  DBControlGrid: always re-cache row after selected.
 
 IBX Change Log  version                                                          (1.2-3) Tue, 14 Apr 2015 14:11:17 +0100
 
