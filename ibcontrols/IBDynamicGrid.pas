@@ -91,6 +91,7 @@ type
     FListSource: TDataSource;
     FOnAutoInsert: TAutoInsert;
     FOnCanAutoInsert: TCanAutoInsert;
+    FOnCloseUp: TNotifyEvent;
     FOnDrawItem: TDrawItemEvent;
     FOwner: TIBDynamicGridColumn;
     FRelationName: string;
@@ -117,6 +118,7 @@ type
     property Style: TComboBoxStyle read FStyle write FStyle default csDropDown;
     property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
     property OnCanAutoInsert: TCanAutoInsert read FOnCanAutoInsert write FOnCanAutoInsert;
+    property OnCloseUp: TNotifyEvent read FOnCloseUp write FOnCloseUp;
     property OnDrawItem: TDrawItemEvent read FOnDrawItem write FOnDrawItem;
 end;
 
@@ -819,6 +821,7 @@ begin
     Editor.OnAutoInsert := OnAutoInsert;
     Editor.OnCanAutoInsert := OnCanAutoInsert;
     Editor.OnDrawItem := OnDrawItem;
+    Editor.OnCloseUp := OnCloseUp;
 
     {Setup Data Links}
     if KeyField <> '' then
