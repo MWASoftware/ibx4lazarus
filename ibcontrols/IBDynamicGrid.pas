@@ -405,11 +405,11 @@ begin
       RowHeights[FExpandedRow] := DefaultRowHeight;
     FExpandedRow := -1;
     if CanFocus then SetFocus;
-    if assigned(FOnEditorPanelHide) then
-       OnEditorPanelHide(self);
     DoOnResize;
     ResetSizes;
     DoOnChangeBounds;
+    if assigned(FOnEditorPanelHide) then
+       OnEditorPanelHide(self);
   end;
 end;
 

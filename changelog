@@ -2,6 +2,9 @@ IBX Change Log  version                                                         
 
 1.   OnCloseUp Event Handler added to TDBLookupProperties
 
+2.   IBDynamicGrid: Call to OnEditorPanelHide is now last editor hide action - avoids
+     problem with row size when exception is called.
+
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
 1.  Firebird Services: avoid List Index error when opening a service with an
