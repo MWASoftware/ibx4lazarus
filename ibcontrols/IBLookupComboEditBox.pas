@@ -457,6 +457,8 @@ end;
 
 procedure TIBLookupComboEditBox.DoExit;
 begin
+  if FTimer.Interval <> 0 then
+    HandleTimer(nil);
   FExiting := true;
   try
     CheckAndInsert;

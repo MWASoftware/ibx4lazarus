@@ -5,6 +5,8 @@ IBX Change Log  version                                                         
 2.   IBDynamicGrid: Call to OnEditorPanelHide is now last editor hide action - avoids
      problem with row size when exception is called.
 
+3.   Force pending autocomplete on combobox exit.
+
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
 1.  Firebird Services: avoid List Index error when opening a service with an
