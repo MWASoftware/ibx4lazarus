@@ -152,6 +152,7 @@ type
     FLastMouseButton: TMouseButton;
     FLastMouseShiftState: TShiftState;
 
+    function ActiveControl: TControl;
     procedure EmptyGrid;
     function GetDataSource: TDataSource;
     function GetRecordCount: Integer;
@@ -522,6 +523,17 @@ end;
 
 { TDBControlGrid }
 
+function TDBControlGrid.ActiveControl: TControl;
+var AParent: TWinControl;
+begin
+  Result := nil;
+  AParent := Parent;
+  while (AParent <> nil) and  not (AParent is TCustomForm) do
+    AParent := AParent.Parent;
+  if (AParent <> nil) and (AParent is TCustomForm)then
+      Result := TCustomForm(AParent).ActiveControl;
+end;
+
 procedure TDBControlGrid.EmptyGrid;
 var
   OldFixedRows: Integer;
@@ -644,9 +656,20 @@ end;
 procedure TDBControlGrid.KeyDownHandler(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var Done: boolean;
+    AControl: TControl;
 begin
   if Visible and assigned(FDrawPanel) and FDrawPanel.Visible and FWeHaveFocus then
   begin
+    AControl := ActiveControl;
+    if (AControl <> nil) and (AControl is TCustomComboBox)
+                         and ((Key in [VK_UP,VK_DOWN]) or
+                         (TCustomComboBox(AControl).DroppedDown and (Key = VK_RETURN)) or
+                         ((TCustomComboBox(AControl).Text <> '') and (Key =  VK_ESCAPE))) then
+      Exit; {ignore these keys if we are in a  combobox}
+
+    if (AControl <> nil) and (AControl is TCustomMemo)
+                         and (Key = VK_RETURN) then Exit; {Ignore Return in a CustomMemo}
+
     Done := false;
     if assigned(FOnKeyDownHander) then
       OnKeyDownHander(Sender,Key,Shift,Done);

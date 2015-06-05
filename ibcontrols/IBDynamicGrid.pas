@@ -179,6 +179,7 @@ end;
     FWeHaveFocus: boolean;
     FHidingEditorPanel: boolean;
     FAllowHide: boolean;
+    function ActiveControl: TControl;
     procedure DoShowEditorPanel(Data: PtrInt);
     procedure PositionTotals;
     procedure KeyDownHandler(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -491,6 +492,17 @@ begin
     inherited KeyDown(Key, Shift);
 end;
 
+function TDBDynamicGrid.ActiveControl: TControl;
+var AParent: TWinControl;
+begin
+  Result := nil;
+  AParent := Parent;
+  while (AParent <> nil) and  not (AParent is TCustomForm) do
+    AParent := AParent.Parent;
+  if (AParent <> nil) and (AParent is TCustomForm)then
+      Result := TCustomForm(AParent).ActiveControl;
+end;
+
 procedure TDBDynamicGrid.DoShowEditorPanel(Data: PtrInt);
 begin
   if AppDestroying in Application.Flags then Exit;
@@ -522,10 +534,20 @@ end;
 procedure TDBDynamicGrid.KeyDownHandler(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var Done: boolean;
+    AControl: TControl;
 begin
   if Visible and assigned(FEditorPanel) and FEditorPanel.Visible and FWeHaveFocus then
   begin
     Done := false;
+    AControl := ActiveControl;
+    if (AControl <> nil) and (AControl is TCustomComboBox)
+                         and ((Key in [VK_UP,VK_DOWN]) or
+                         (TCustomComboBox(AControl).DroppedDown and (Key = VK_RETURN)) or
+                         ((TCustomComboBox(AControl).Text <> '') and (Key =  VK_ESCAPE))) then
+      Exit; {ignore these keys if we are in a  combobox}
+
+    if (AControl <> nil) and (AControl is TCustomMemo)
+                         and (Key = VK_RETURN) then Exit; {Ignore Return in a CustomMemo}
     if assigned(FOnKeyDownHander) then
       OnKeyDownHander(Sender,Key,Shift,Done);
     if Done then Exit;

@@ -7,6 +7,9 @@ IBX Change Log  version                                                         
 
 3.   Force pending autocomplete on combobox exit.
 
+4.   IBDynamicGrid and DNControlGrid: Keyhandler now ignores up, down, escape and return keys if
+     in a TCustomComboBox and ignore return if in a TCustomMemo
+
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
 1.  Firebird Services: avoid List Index error when opening a service with an
