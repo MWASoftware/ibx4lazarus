@@ -76,7 +76,7 @@ uses
 {$ELSE}
   baseunix, unix,
 {$ENDIF}
-  SysUtils, Classes, Forms, Controls, IBHeader,
+  SysUtils, Classes, IBHeader,
   IBErrorCodes, IBExternals, DB, IB, IBDatabase, IBUtils, IBXConst;
 
 const

@@ -54,8 +54,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  Classes, Graphics, Controls,
-  Forms, Dialogs, IBHeader, IBExternals, IB, IBDatabase;
+  Classes, {$IFNDEF IBX_CONSOLE_MODE}Forms,{$ENDIF} IBHeader, IBExternals, IB, IBDatabase;
 
 const
   MaxEvents = 15;
@@ -106,7 +105,7 @@ type
 implementation
 
 uses
-  IBIntf, syncobjs;
+  IBIntf, syncobjs, SysUtils;
 
 type
 
@@ -254,7 +253,11 @@ begin
         if (Status[i] <> 0) and not CancelAlerts then
             FOwner.FOnEventAlert( self, FEvents[i], Status[i], CancelAlerts);
         except
-          Application.HandleException( nil);
+          {$IFDEF IBX_CONSOLE_MODE}
+            SysUtils.ShowException(ExceptObject,ExceptAddr)
+          {$ELSE}
+            Application.HandleException(Self)
+          {$ENDIF}
         end;
       end;
     end;

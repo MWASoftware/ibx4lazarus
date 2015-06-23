@@ -43,7 +43,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
- SysUtils, Graphics, Classes, Controls, Db,
+ SysUtils, Classes,  Db,
      IBHeader, IB, IBCustomDataSet, IBSQL, IBSQLParser;
 
 type

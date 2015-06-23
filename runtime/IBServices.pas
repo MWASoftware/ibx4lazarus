@@ -51,7 +51,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  SysUtils, Classes,  {$IFNDEF IBX_CONSOLE_MODE}Forms,{$ENDIF}
   IBDialogs, IBHeader, IB, IBExternals;
 
 const
@@ -562,7 +562,11 @@ begin
       Attach;
   except
     if csDesigning in ComponentState then
+    {$IFDEF IBX_CONSOLE_MODE}
+      SysUtils.ShowException(ExceptObject,ExceptAddr)
+    {$ELSE}
       Application.HandleException(Self)
+    {$ENDIF}
     else
       raise;
   end;

@@ -41,6 +41,10 @@ unit IBCustomDataSet;
 {$DEFINE TDBDFIELD_IS_BCD}
 {$ENDIF}
 
+{$IFDEF IBX_CONSOLE_MODE}
+{$DEFINE IBX_NO_CURSOR_MANAGEMENT}
+{$ENDIF}
+
 interface
 
 uses
@@ -49,8 +53,11 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, Forms, Controls, IBDatabase,
-  IBExternals, IB, IBHeader,  IBSQL, Db,
+  SysUtils, Classes,
+{$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
+  Forms, Controls,
+{$ENDIF}
+  IBDatabase, IBExternals, IB, IBHeader,  IBSQL, Db,
   IBUtils, IBBlob, IBSQLParser;
 
 const
@@ -1929,12 +1936,14 @@ var
   ofs: DWORD;
   Qry: TIBSQL;
 begin
+{$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
   if Assigned(Database) and not Database.SQLHourGlass then
      SetCursor := False
   else
     SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
+{$ENDIF}
   try
     Buff := GetActiveBuf;
     if CanRefresh then
@@ -1978,8 +1987,10 @@ begin
     else
       IBError(ibxeCannotRefresh, [nil]);
   finally
+{$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
     if SetCursor and (Screen.Cursor = crHourGlass) then
       Screen.Cursor := crDefault;
+{$ENDIF}
   end;
 end;
 
@@ -2056,12 +2067,14 @@ begin
   if FInternalPrepared then
     Exit;
   DidActivate := False;
+ {$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
   if Assigned(Database) and not Database.SQLHourGlass then
     SetCursor := False
   else
     SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
+ {$ENDIF}
   try
     ActivateConnection;
     DidActivate := ActivateTransaction;
@@ -2097,8 +2110,10 @@ begin
   finally
     if DidActivate then
       DeactivateTransaction;
+  {$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
     if SetCursor and (Screen.Cursor = crHourGlass) then
       Screen.Cursor := crDefault;
+  {$ENDIF}
   end;
 end;
 
@@ -2748,12 +2763,14 @@ var
   CurBookmark: string;
   {$ENDIF}
 begin
+{$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
   if Assigned(Database) and not Database.SQLHourGlass then
     SetCursor := False
   else
     SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
+{$ENDIF}
   try
     if FQSelect.EOF or not FQSelect.Open then
       exit;
@@ -2766,8 +2783,10 @@ begin
       EnableControls;
     end;
   finally
+  {$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
     if SetCursor and (Screen.Cursor = crHourGlass) then
       Screen.Cursor := crDefault;
+  {$ENDIF}
   end;
 end;
 
@@ -3105,12 +3124,14 @@ var
   Buff: PChar;
   SetCursor: Boolean;
 begin
+{$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
   if Assigned(Database) and not Database.SQLHourGlass then
     SetCursor := False
   else
     SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
+{$ENDIF}
   try
     Buff := GetActiveBuf;
     if CanDelete then
@@ -3135,8 +3156,10 @@ begin
     end else
       IBError(ibxeCannotDelete, [nil]);
   finally
+  {$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
     if SetCursor and (Screen.Cursor = crHourGlass) then
       Screen.Cursor := crDefault;
+  {$ENDIF}
   end;
 end;
 
@@ -3152,7 +3175,11 @@ end;
 
 procedure TIBCustomDataSet.InternalHandleException;
 begin
+{$IFDEF IBX_CONSOLE_MODE}
+  SysUtils.ShowException(ExceptObject,ExceptAddr)
+{$ELSE}
   Application.HandleException(Self)
+{$ENDIF}
 end;
 
 procedure TIBCustomDataSet.InternalInitFieldDefs;
@@ -3546,12 +3573,14 @@ var
   end;
 
 begin
+{$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
   if Assigned(Database) and not Database.SQLHourGlass then
     SetCursor := False
   else
     SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
+{$ENDIF}
   try
     ActivateConnection;
     ActivateTransaction;
@@ -3612,8 +3641,10 @@ begin
     else
       FQSelect.ExecQuery;
   finally
+    {$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
     if SetCursor and (Screen.Cursor = crHourGlass) then
       Screen.Cursor := crDefault;
+    {$ENDIF}
   end;
 end;
 
@@ -3624,12 +3655,14 @@ var
   SetCursor: Boolean;
   bInserting: Boolean;
 begin
+{$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
   if Assigned(Database) and not Database.SQLHourGlass then
     SetCursor := False
   else
     SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
+{$ENDIF}
   try
     Buff := GetActiveBuf;
     CheckEditState;
@@ -3667,8 +3700,10 @@ begin
     if bInserting then
       Inc(FRecordCount);
   finally
+    {$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
     if SetCursor and (Screen.Cursor = crHourGlass) then
       Screen.Cursor := crDefault;
+    {$ENDIF}
   end;
 end;
 
@@ -3934,12 +3969,14 @@ var
   SetCursor: Boolean;
 begin
   DidActivate := False;
+  {$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
   if Assigned(Database) and not Database.SQLHourGlass then
     SetCursor := False
   else
     SetCursor := (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault);
   if SetCursor then
     Screen.Cursor := crHourGlass;
+  {$ENDIF}
   try
     ActivateConnection;
     DidActivate := ActivateTransaction;
@@ -3956,8 +3993,10 @@ begin
   finally
     if DidActivate then
       DeactivateTransaction;
+    {$IFNDEF IBX_NO_CURSOR_MANAGEMENT}
     if SetCursor and (Screen.Cursor = crHourGlass) then
       Screen.Cursor := crDefault;
+    {$ENDIF}
   end;
 end;
 

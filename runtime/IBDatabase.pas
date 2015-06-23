@@ -43,8 +43,8 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  Dialogs, Controls, StdCtrls, SysUtils, Classes, Forms, ExtCtrls, IBHeader, IBExternals, DB,
-  IB, DBLoginDlg;
+  SysUtils, Classes, CustomTimer, IBHeader, IBExternals, DB,
+  IB {$IFNDEF IBX_CONSOLE_MODE},  Forms, DBLoginDlg {$ENDIF};
 
 const
   DPBPrefix = 'isc_dpb_';
@@ -178,7 +178,7 @@ type
     FDefaultTransaction: TIBTransaction;
     FInternalTransaction: TIBTransaction;
     FStreamedConnected: Boolean;
-    FTimer: TTimer;
+    FTimer: TCustomTimer;
     FUserNames: TStringList;
     FDataSets: TList;
     FLoginCalled: boolean;
@@ -302,7 +302,7 @@ type
     FStreamedActive     : Boolean;
     FTPB                : PChar;
     FTPBLength          : Short;
-    FTimer              : TTimer;
+    FTimer              : TCustomTimer;
     FDefaultAction      : TTransactionAction;
     FTRParams           : TStrings;
     FTRParamsChanged    : Boolean;
@@ -511,7 +511,7 @@ begin
   FUserNames := nil;
   FInternalTransaction := TIBTransaction.Create(self);
   FInternalTransaction.DefaultDatabase := Self;
-  FTimer := TTimer.Create(Self);
+  FTimer := TCustomTimer.Create(Self);
   FTimer.Enabled := False;
   FTimer.Interval := 0;
   FTimer.OnTimer := TimeoutConnection;
@@ -872,7 +872,11 @@ begin
     end;
   except
     if csDesigning in ComponentState then
+    {$IFDEF IBX_CONSOLE_MODE}
+      SysUtils.ShowException(ExceptObject,ExceptAddr)
+    {$ELSE}
       Application.HandleException(Self)
+    {$ENDIF}
     else
       raise;
   end;
@@ -934,6 +938,7 @@ begin
       LoginParams.Free;
     end;
   end
+  {$IFNDEF IBX_CONSOLE_MODE}
   else
   begin
     IndexOfUser := IndexOfDBConst(DPBConstantNames[isc_dpb_user_name]);
@@ -967,6 +972,7 @@ begin
       end;
     end;
   end;
+  {$ENDIF}
   finally
     FLoginCalled := false
   end;
@@ -1421,7 +1427,7 @@ begin
   FTRParamsChanged := True;
   TStringList(FTRParams).OnChange := TRParamsChange;
   TStringList(FTRParams).OnChanging := TRParamsChanging;
-  FTimer := TTimer.Create(Self);
+  FTimer := TCustomTimer.Create(Self);
   FTimer.Enabled := False;
   FTimer.Interval := 0;
   FTimer.OnTimer := TimeoutTransaction;

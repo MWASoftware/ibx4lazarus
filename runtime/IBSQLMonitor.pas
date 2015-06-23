@@ -44,7 +44,7 @@ unit IBSQLMonitor;
 interface
 
 uses
-  LMessages, LCLIntf, LCLType, LCLProc,  Forms, Controls, Dialogs,
+  LMessages, LCLIntf, LCLType, LCLProc,   {$IFNDEF IBX_CONSOLE_MODE} Forms,{$ENDIF}
   IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, IBXConst,SysUtils,
   Classes,
 {$IFDEF WINDOWS }
@@ -702,7 +702,11 @@ begin
  {$IFDEF DEBUG}writeln('Write SQL Data: '+Text);{$ENDIF}
   if not assigned(FGlobalInterface) then
     FGlobalInterface := TGlobalInterface.Create;
+ {$IFDEF IBX_CONSOLE_MODE}
+ Text := CRLF + '[Console Application: ' + ']' + CRLF + Text; {do not localize}
+ {$ELSE}
   Text := CRLF + '[Application: ' + Application.Title + ']' + CRLF + Text; {do not localize}
+ {$ENDIF}
   if not Assigned(FWriterThread) then
     FWriterThread := TWriterThread.Create(FGLobalInterface);
   FWriterThread.WriteSQLData(Text, DataType);
@@ -1115,4 +1119,4 @@ finalization
     _MonitorHook := nil;
     if assigned(CS) then CS.Free;
   end;
-end.
+end.
