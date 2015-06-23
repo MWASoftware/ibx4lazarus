@@ -1,4 +1,4 @@
-IBX Change Log  version                                                              (1.2-5) tba, 09 May 2015 12:38:29 +0100
+IBX Change Log  version                                                              (1.3-0) tba, 09 May 2015 12:38:29 +0100
 
 1.   OnCloseUp Event Handler added to TDBLookupProperties
 
@@ -9,6 +9,13 @@ IBX Change Log  version                                                         
 
 4.   IBDynamicGrid and DNControlGrid: Keyhandler now ignores up, down, escape and return keys if
      in a TCustomComboBox and ignore return if in a TCustomMemo
+
+5.   IBLookupComboEditBox: Ensure that KeyValue is set correctly when full text
+     keyed in i.e. when autocomplete not performed
+
+6.   Cleanup of "Uses" clauses and console mode support. If the IBX Runtime library
+     is compiled with the symbol IBX_CONSOLE_MODE defined then it should be possible
+     to link IBX with a console mode application.
 
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
