@@ -62,7 +62,7 @@ begin
        writeln;
        for i := 0 to FieldCount - 1 do
        begin
-         writeln(Fields[i].Name + ': ',Fields[i].AsString);
+         writeln(Fields[i].FieldName + ': ',Fields[i].AsString);
        end;
        writeln;
      end;
@@ -95,8 +95,8 @@ begin
   FIBDatabase := TIBDatabase.Create(self);
   FIBTransaction := TIBTransaction.Create(self);
   FIBDatabase.DatabaseName := 'localhost:employee';
-  FIBDatabase.Params.Add('user_name=SYSDBA');
-  FIBDatabase.Params.Add('password=masterkey');
+  FIBDatabase.Params.Add('user_name=SYSDBA'); {You may have to modify this!}
+  FIBDatabase.Params.Add('password=masterkey');  {You may have to modify this!}
   FIBDatabase.Params.Add('lc_ctype=UTF-8');
   FIBTransaction.DefaultDatabase := FIBDatabase;
   DoQuery;

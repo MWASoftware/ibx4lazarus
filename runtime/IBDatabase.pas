@@ -44,7 +44,7 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, CustomTimer, IBHeader, IBExternals, DB,
-  IB, CustApp {$IFNDEF IBX_CONSOLE_MODE},  Forms, DBLoginDlg {$ENDIF};
+  IB, CustApp;
 
 const
   DPBPrefix = 'isc_dpb_';
@@ -144,6 +144,10 @@ const
 
 type
 
+  TOnLoginDlg = function (const ADatabaseName: string;
+                var AUserName, APassword: string;
+                NameReadOnly: Boolean): Boolean;
+
   TIBDatabase = class;
   TIBTransaction = class;
   TIBBase = class;
@@ -183,9 +187,7 @@ type
     FDataSets: TList;
     FLoginCalled: boolean;
     FCharSetSizes: array of integer;
-    {$IFDEF IBX_CONSOLE_MODE}
     FApplication: TCustomApplication;
-    {$ENDIF}
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
     function GetSQLDialect: Integer;
@@ -420,9 +422,7 @@ type
     FBeforeTransactionEnd: TTransactionEndEvent;
     FAfterTransactionEnd: TNotifyEvent;
     FOnTransactionFree: TNotifyEvent;
-    {$IFDEF IBX_CONSOLE_MODE}
     FApplication: TCustomApplication;
-    {$ENDIF}
 
     procedure DoBeforeDatabaseConnect(DBParams: TStrings;
                               var DBName: string); virtual;
@@ -469,10 +469,11 @@ type
     property TRHandle: PISC_TR_HANDLE read GetTRHandle;
     property Transaction: TIBTransaction read FTransaction
                                           write SetTransaction;
-    {$IFDEF IBX_CONSOLE_MODE}
     property Application: TCustomApplication read FApplication write FApplication;
-    {$ENDIF}
   end;
+
+const
+  OnLoginDlg: TOnLoginDlg = nil;
 
 procedure GenerateDPB(sl: TStrings; var DPB: string; var DPBLength: Short);
 procedure GenerateTPB(sl: TStrings; var TPB: string; var TPBLength: Short);
@@ -500,10 +501,16 @@ begin
   FDBName := '';
   FDBParams := TStringList.Create;
   FSQLHourGlass := true;
-  {$IFDEF IBX_CONSOLE_MODE}
-  if AOwner is TCustomApplication then
-    FApplication := TCustomApplication(AOwner);
-  {$ENDIF}
+  if (AOwner <> nil) and
+     (AOwner is TCustomApplication) and
+     TCustomApplication(AOWner).ConsoleApplication then
+  begin
+    LoginPrompt := false;
+    FApplication := TCustomApplication(AOwner)
+  end
+  else
+  if assigned(IBXApplication) then
+    FApplication := IBXApplication; {Set by DBLoginDlg}
   {$ifdef UNIX}
   if csDesigning in ComponentState then
     FDBParams.Add('lc_ctype=UTF-8');
@@ -603,9 +610,7 @@ end;
  function TIBDataBase.AddSQLObject(ds: TIBBase): Integer;
 begin
   result := 0;
-  {$IFDEF IBX_CONSOLE_MODE}
   ds.Application := FApplication;
-  {$ENDIF}
   if (ds.Owner is TIBCustomDataSet) then
     FDataSets.Add(ds.Owner);
   while (result < FSQLObjects.Count) and (FSQLObjects[result] <> nil) do
@@ -889,11 +894,12 @@ begin
     end;
   except
     if csDesigning in ComponentState then
-    {$IFDEF IBX_CONSOLE_MODE}
-      SysUtils.ShowException(ExceptObject,ExceptAddr)
-    {$ELSE}
-      Application.HandleException(Self)
-    {$ENDIF}
+    begin
+      if assigned(FApplication) then
+         FApplication.HandleException(Self)
+      else
+        SysUtils.ShowException(ExceptObject,ExceptAddr)
+    end
     else
       raise;
   end;
@@ -955,8 +961,8 @@ begin
       LoginParams.Free;
     end;
   end
-  {$IFNDEF IBX_CONSOLE_MODE}
   else
+  if assigned(OnLoginDlg) then
   begin
     IndexOfUser := IndexOfDBConst(DPBConstantNames[isc_dpb_user_name]);
     if IndexOfUser <> -1 then
@@ -971,7 +977,7 @@ begin
                                          Length(Params[IndexOfPassword]));
       OldPassword := password;
     end;
-    result := LoginDialogEx(DatabaseName, Username, Password, False);
+    result := OnLoginDlg(DatabaseName, Username, Password, False);
     if result then
     begin
       if IndexOfUser = -1 then
@@ -988,8 +994,10 @@ begin
           HidePassword;
       end;
     end;
-  end;
-  {$ENDIF}
+  end
+  else
+  if LoginPrompt then
+     IBError(ibxeNoLoginDialog,[]);
   finally
     FLoginCalled := false
   end;

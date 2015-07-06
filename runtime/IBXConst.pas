@@ -185,6 +185,8 @@ resourcestring
   sFieldSizeError = 'Field %s is too small to receive the data';
   STransactionNotEnding = 'Transaction is not being completed';
   SDscInfoTokenMissing = '%s token not found';
+  SNoLoginDialog = 'Default Login Dlalog not found. Have you included ibexpress ' +
+                   'in your program uses list?';
 
 implementation
 

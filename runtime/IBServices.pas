@@ -51,8 +51,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes,  {$IFNDEF IBX_CONSOLE_MODE}Forms,IBDialogs,{$ENDIF}
-   IBHeader, IB, IBExternals;
+  SysUtils, Classes, IBHeader, IB, IBExternals, CustApp;
 
 const
   DefaultBufferSize = 32000;
@@ -97,6 +96,9 @@ type
   TLoginEvent = procedure(Database: TIBCustomService;
     LoginParams: TStrings) of object;
 
+  TOnServicesLoginDlg = function (const AServerName: string;
+                    var AUserName, APassword: string): Boolean;
+
   { TIBCustomService }
 
   TIBCustomService = class(TComponent)
@@ -118,9 +120,7 @@ type
     FOutputBufferOption: TOutputBufferOption;
     FProtocol: TProtocol;
     FParams: TStrings;
-    {$IFDEF IBX_CONSOLE_MODE}
-    FApplication: TCustomApplication
-    {$ENDIF}
+    FApplication: TCustomApplication;
     function GetActive: Boolean;
     function GetServiceParamBySPB(const Idx: Integer): String;
     procedure SetActive(const Value: Boolean);
@@ -512,6 +512,9 @@ type
     property Password : string read FPassword write setPassword;
   end;
 
+const
+  OnServicesLoginDlg: TOnServicesLoginDlg = nil;
+
 
 implementation
 
@@ -567,14 +570,13 @@ begin
       Attach;
   except
     if csDesigning in ComponentState then
-    {$IFDEF IBX_CONSOLE_MODE}
       if assigned(FApplication) then
         FApplication.HandleException(Self)
       else
+      if assigned(IBXApplication) then
+        IBXApplication.HandleException(Self)
+      else
         SysUtils.ShowException(ExceptObject,ExceptAddr)
-    {$ELSE}
-      Application.HandleException(Self)
-    {$ENDIF}
     else
       raise;
   end;
@@ -597,8 +599,9 @@ begin
       LoginParams.Free;
     end;
   end
-  {$IFNDEF IBX_CONSOLE_MODE}
-  else begin
+  else
+  if assigned(OnServicesLoginDlg)  then
+  begin
     IndexOfUser := IndexOfSPBConst(SPBConstantNames[isc_spb_user_name]);
     if IndexOfUser <> -1 then
       Username := Copy(Params[IndexOfUser],
@@ -609,7 +612,7 @@ begin
       Password := Copy(Params[IndexOfPassword],
                                          Pos('=', Params[IndexOfPassword]) + 1, {mbcs ok}
                                          Length(Params[IndexOfPassword]));
-    result := ServerLoginDialog(serverName, Username, Password);
+    result := OnServicesLoginDlg(serverName, Username, Password);
     if result then
     begin
       IndexOfPassword := IndexOfSPBConst(SPBConstantNames[isc_spb_password]);
@@ -623,9 +626,10 @@ begin
       else
         Params[IndexOfPassword] := SPBConstantNames[isc_spb_password] +
                                      '=' + Password;
-    end;
+    end
+    else
+      IBError(ibxeNoLoginDialog,[]);
   end;
-  {$ENDIF}
 end;
 
 procedure TIBCustomService.CheckActive;

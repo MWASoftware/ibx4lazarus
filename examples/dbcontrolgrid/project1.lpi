@@ -48,7 +48,9 @@
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="55" Y="17"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="47" Y="10"/>
         <UsageCount Value="192"/>
       </Unit0>
       <Unit1>
@@ -60,7 +62,6 @@
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="7"/>
         <CursorPos X="56" Y="17"/>
         <UsageCount Value="192"/>
         <Loaded Value="True"/>
@@ -1003,7 +1004,6 @@
       </Unit131>
       <Unit132>
         <Filename Value="../../runtime/IBServices.pas"/>
-        <UnitName Value="IBServices"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="597"/>

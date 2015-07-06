@@ -28,7 +28,7 @@
 
 unit IBDialogs;
 
-{$Mode Delphi}
+{$mode objfpc}{$H+}
 
 interface
 
@@ -45,6 +45,8 @@ function ServerLoginDialog(const AServerName: string;
   var AUserName, APassword: string): Boolean;
 
 implementation
+
+uses IBServices;
 
 function ServerLoginDialog(const AServerName: string;
   var AUserName, APassword: string): Boolean;
@@ -67,5 +69,8 @@ begin
     Free;
   end;
 end;
+
+initialization
+  OnServicesLoginDlg := @ServerLoginDialog;
 
 end.

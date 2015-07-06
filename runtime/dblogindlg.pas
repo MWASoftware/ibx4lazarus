@@ -59,7 +59,10 @@ function LoginDialogEx(const ADatabaseName: string;
 var
   IBXLoginDlg: TIBXLoginDlg;
 
+
 implementation
+
+uses IBDatabase;
 
 {$R *.lfm}
 
@@ -85,6 +88,11 @@ begin
     Free;
   end;
 end;
+
+
+initialization
+  OnLoginDlg := @LoginDialogEx;
+
 
 
 end.

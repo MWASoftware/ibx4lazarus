@@ -43,9 +43,11 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, IBExternals, IBUtils, DB, IBXConst;
+  SysUtils, Classes, IBExternals, IBUtils, DB, IBXConst, CustApp;
 
 type
+  TIBXApplication = function: TCustomApplication;
+
   TTraceFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
      tfTransact, tfBlob, tfService, tfMisc);
   TTraceFlags = set of TTraceFlag;
@@ -189,7 +191,8 @@ type
     ibxeThreadFailed,
     ibxeFieldSizeError,
     ibxeTransactionNotEnding,
-    ibxeDscInfoTokenMissing
+    ibxeDscInfoTokenMissing,
+    ibxeNoLoginDialog
     );
 
   TStatusVector              = array[0..19] of ISC_STATUS;
@@ -346,8 +349,12 @@ const
     SThreadFailed,
     SFieldSizeError,
     STransactionNotEnding,
-    SDscInfoTokenMissing
+    SDscInfoTokenMissing,
+    SNoLoginDialog
   );
+
+const
+  IBXApplication: TIBXApplication = nil;
 
 var
   IBCS: TRTLCriticalSection;

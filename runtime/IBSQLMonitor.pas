@@ -44,7 +44,7 @@ unit IBSQLMonitor;
 interface
 
 uses
-  LMessages, LCLIntf, LCLType, LCLProc,   {$IFNDEF IBX_CONSOLE_MODE} Forms,{$ENDIF}
+  LMessages, LCLIntf, LCLType, LCLProc,
   IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, IBXConst,SysUtils,
   Classes,
 {$IFDEF WINDOWS }
@@ -333,9 +333,8 @@ begin
         FOnSQLEvent(st.FMsg, st.FTimeStamp);
   st.Free;
   {$IFDEF WINDOWS}
-  {$IFNDEF IBX_CONSOLE_MODE}
-  Application.ProcessMessages
-  {$ENDIF}
+  if assigned(IBXApplication) then
+    IBXApplication.ProcessMessages
   {$ENDIF}
 end;
 
@@ -704,11 +703,10 @@ begin
  {$IFDEF DEBUG}writeln('Write SQL Data: '+Text);{$ENDIF}
   if not assigned(FGlobalInterface) then
     FGlobalInterface := TGlobalInterface.Create;
- {$IFDEF IBX_CONSOLE_MODE}
- Text := CRLF + '[Console Application: ' + ']' + CRLF + Text; {do not localize}
- {$ELSE}
-  Text := CRLF + '[Application: ' + Application.Title + ']' + CRLF + Text; {do not localize}
- {$ENDIF}
+ if assigned(IBXApplication) then
+   Text := CRLF + '[Application: ' + IBXApplication.Title + ']' + CRLF + Text {do not localize}
+ else
+   Text := CRLF + '[Unknown Application]' + CRLF + Text; {do not localize}
   if not Assigned(FWriterThread) then
     FWriterThread := TWriterThread.Create(FGLobalInterface);
   FWriterThread.WriteSQLData(Text, DataType);

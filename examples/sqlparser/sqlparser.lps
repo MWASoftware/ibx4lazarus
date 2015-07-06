@@ -7,7 +7,8 @@
       <Unit0>
         <Filename Value="sqlparser.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos Y="20"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="18" Y="10"/>
         <UsageCount Value="27"/>
       </Unit0>
       <Unit1>
@@ -17,7 +18,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="MainForm"/>
-        <TopLine Value="23"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="20"/>
         <CursorPos X="35" Y="32"/>
         <UsageCount Value="27"/>
         <Loaded Value="True"/>
@@ -26,11 +28,10 @@
       <Unit2>
         <Filename Value="../../runtime/IBSQLParser.pas"/>
         <UnitName Value="IBSQLParser"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="436"/>
         <CursorPos Y="454"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
@@ -64,15 +65,13 @@
       </Unit7>
       <Unit8>
         <Filename Value="../../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="65" Y="20"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit8>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
         <Filename Value="MainForm.pas"/>
         <Caret Line="41" Column="17" TopLine="32"/>
@@ -85,110 +84,6 @@
         <Filename Value="MainForm.pas"/>
         <Caret Line="45" Column="11" TopLine="22"/>
       </Position3>
-      <Position4>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="292" Column="3" TopLine="271"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="791" Column="53" TopLine="769"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="792" TopLine="765"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="801" TopLine="785"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="279" TopLine="262"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="282" TopLine="262"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="431" TopLine="415"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="429" Column="26" TopLine="418"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="439" TopLine="418"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="441" TopLine="418"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="190" TopLine="173"/>
-      </Position14>
-      <Position15>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="191" TopLine="173"/>
-      </Position15>
-      <Position16>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="212" TopLine="196"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="218" TopLine="196"/>
-      </Position17>
-      <Position18>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="276" TopLine="259"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="278" TopLine="259"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="792" TopLine="776"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="801" TopLine="770"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="279" TopLine="262"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="282" TopLine="262"/>
-      </Position23>
-      <Position24>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="792" Column="18" TopLine="770"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="794" Column="51" TopLine="770"/>
-      </Position25>
-      <Position26>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="795" Column="27" TopLine="770"/>
-      </Position26>
-      <Position27>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="69" Column="53" TopLine="52"/>
-      </Position27>
-      <Position28>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="447" Column="34" TopLine="426"/>
-      </Position28>
-      <Position29>
-        <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <Caret Line="453" TopLine="436"/>
-      </Position29>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

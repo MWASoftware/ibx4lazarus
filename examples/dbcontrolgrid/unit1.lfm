@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 310
+  Left = 248
   Height = 575
-  Top = 404
+  Top = 397
   Width = 1026
   Caption = 'Employee List'
   ClientHeight = 575
@@ -430,7 +430,6 @@ object Form1: TForm1
     )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
-    SQLHourGlass = False
     TraceFlags = []
     left = 832
     top = 168

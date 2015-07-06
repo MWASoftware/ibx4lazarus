@@ -10,7 +10,7 @@ uses
   IB, IBBatchMove, IBBlob, IBCustomDataSet, IBDatabase, IBDialogs, 
   IBErrorCodes, IBEvents, IBExternals, IBExtract, IBHeader, IBUtils, IBXConst, 
   IBIntf, IBQuery, IBServices, IBSQL, IBStoredProc, IBDatabaseInfo, 
-  IBUpdateSQL, dblogindlg, IBTable, IBSQLMonitor, IBSQLParser;
+  IBUpdateSQL, dblogindlg, IBTable, IBSQLMonitor, IBSQLParser, IBCursor, IBApp;
 
 implementation
 

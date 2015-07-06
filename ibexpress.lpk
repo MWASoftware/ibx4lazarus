@@ -16,7 +16,6 @@
       </Parsing>
       <Other>
         <CustomOptions Value="-dUseCThreads"/>
-        <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
     <Description Value="   Borland Delphi Visual Component Library  
@@ -151,8 +150,8 @@ II. Trademark Usage.
 II.1. Advertising Materials. All advertising materials mentioning features or use of the covered Code must display the following acknowledgement: &quot;This product includes software developed by Inprise Corporation. &quot;
 II.2. Endorsements. The names &quot;Inprise,&quot; &quot;InterBase,&quot; &quot;ISC,&quot; and &quot;IB&quot; must not be used to endorse or promote Contributor Versions or Larger Works without the prior written permission of Inprise.
 II.3. Product Names. Contributor Versions and Larger Works may not be called &quot;Inprise&quot; or &quot;InterBase&quot; nor may the words &quot;Inprise&quot; or &quot;InterBase&quot; appear in their names without the prior written permission of Inprise Corporation."/>
-    <Version Major="1" Minor="3" Release = "0" />
-    <Files Count="24">
+    <Version Major="1" Minor="3"/>
+    <Files Count="26">
       <Item1>
         <Filename Value="runtime/IB.pas"/>
         <UnitName Value="IB"/>
@@ -249,6 +248,14 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <Filename Value="runtime/IBSQLParser.pas"/>
         <UnitName Value="IBSQLParser"/>
       </Item24>
+      <Item25>
+        <Filename Value="runtime/IBCursor.pas"/>
+        <UnitName Value="IBCursor"/>
+      </Item25>
+      <Item26>
+        <Filename Value="runtime/IBApp.pas"/>
+        <UnitName Value="IBApp"/>
+      </Item26>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
