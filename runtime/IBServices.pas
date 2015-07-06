@@ -665,6 +665,16 @@ begin
   FTraceFlags := [];
   FOutputbuffer := nil;
   FProtocol := Local;
+  if (AOwner <> nil) and
+     (AOwner is TCustomApplication) and
+     TCustomApplication(AOwner).ConsoleApplication then
+  begin
+    LoginPrompt := false;
+    FApplication := TCustomApplication(AOwner)
+  end
+  else
+  if assigned(IBXApplication) then
+    FApplication := IBXApplication;
 end;
 
 destructor TIBCustomService.Destroy;

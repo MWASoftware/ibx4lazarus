@@ -510,7 +510,7 @@ begin
   end
   else
   if assigned(IBXApplication) then
-    FApplication := IBXApplication; {Set by DBLoginDlg}
+    FApplication := IBXApplication;
   {$ifdef UNIX}
   if csDesigning in ComponentState then
     FDBParams.Add('lc_ctype=UTF-8');
