@@ -17,6 +17,8 @@ IBX Change Log  version                                                         
      is compiled with the symbol IBX_CONSOLE_MODE defined then it should be possible
      to link IBX with a console mode application.
 
+7.   SQL Parser can now accept quoted strings included new lines
+
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
 1.  Firebird Services: avoid List Index error when opening a service with an

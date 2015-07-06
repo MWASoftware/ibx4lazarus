@@ -448,7 +448,10 @@ begin
           FState := PopState;
         stInDoubleQuotes,
         stInSingleQuotes:
-          raise Exception.Create(sNoEndToThis);
+          Begin
+            AddToSQL(FString + #$0A);
+            Exit;
+          End;
         end;
         AddToSQL(' ');
         Exit;
@@ -783,15 +786,17 @@ begin
     Inc(index)
   end;
 
-  if (Result = sqString)  and not (FState in [stInComment,stInCommentLine])then
+  if (Result = sqString)  and not (FState in [stInComment,stInCommentLine, stInSingleQuotes,stInDoubleQuotes])then
     Result := Check4ReservedWord(FString);
 
   if (index > Length(Line)) then
-    if Result = sqNone then
+  begin
+    if (FState in [stInSingleQuotes,stInDoubleQuotes]) or (Result = sqNone) then
       Result := sqEOL
     else
     if (FLastSymbol = sqNone) and (Result <> sqEOL) then
       FLastSymbol := sqEOL;
+  end;
 
 end;
 

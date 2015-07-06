@@ -176,7 +176,7 @@ implementation
 
 uses Sysutils, IB, Dynlibs, Classes
 {$IFDEF WINDOWS}
-,Forms, Registry
+, Registry
 {$ENDIF}
 ;
 
@@ -250,7 +250,7 @@ procedure LoadIBLibrary;
     end;
 
     //First look for Firebird Embedded Server in installation dir
-    InstallDir := ExtractFilePath(Application.ExeName);
+    InstallDir := ExtractFilePath(Paramstr(0));  {Using ParamStr(0) assumes windows conventions}
     if FileExists(InstallDir + FIREBIRD_EMBEDDED) then
     begin
          dllPathName := InstallDir + FIREBIRD_EMBEDDED;

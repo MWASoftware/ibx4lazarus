@@ -51,8 +51,8 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes,  {$IFNDEF IBX_CONSOLE_MODE}Forms,{$ENDIF}
-  IBDialogs, IBHeader, IB, IBExternals;
+  SysUtils, Classes,  {$IFNDEF IBX_CONSOLE_MODE}Forms,IBDialogs,{$ENDIF}
+   IBHeader, IB, IBExternals;
 
 const
   DefaultBufferSize = 32000;
@@ -97,6 +97,8 @@ type
   TLoginEvent = procedure(Database: TIBCustomService;
     LoginParams: TStrings) of object;
 
+  { TIBCustomService }
+
   TIBCustomService = class(TComponent)
   private
     FIBLoaded: Boolean;
@@ -116,6 +118,9 @@ type
     FOutputBufferOption: TOutputBufferOption;
     FProtocol: TProtocol;
     FParams: TStrings;
+    {$IFDEF IBX_CONSOLE_MODE}
+    FApplication: TCustomApplication
+    {$ENDIF}
     function GetActive: Boolean;
     function GetServiceParamBySPB(const Idx: Integer): String;
     procedure SetActive(const Value: Boolean);
@@ -563,7 +568,10 @@ begin
   except
     if csDesigning in ComponentState then
     {$IFDEF IBX_CONSOLE_MODE}
-      SysUtils.ShowException(ExceptObject,ExceptAddr)
+      if assigned(FApplication) then
+        FApplication.HandleException(Self)
+      else
+        SysUtils.ShowException(ExceptObject,ExceptAddr)
     {$ELSE}
       Application.HandleException(Self)
     {$ENDIF}
@@ -589,6 +597,7 @@ begin
       LoginParams.Free;
     end;
   end
+  {$IFNDEF IBX_CONSOLE_MODE}
   else begin
     IndexOfUser := IndexOfSPBConst(SPBConstantNames[isc_spb_user_name]);
     if IndexOfUser <> -1 then
@@ -616,6 +625,7 @@ begin
                                      '=' + Password;
     end;
   end;
+  {$ENDIF}
 end;
 
 procedure TIBCustomService.CheckActive;

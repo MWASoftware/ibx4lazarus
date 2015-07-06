@@ -333,7 +333,9 @@ begin
         FOnSQLEvent(st.FMsg, st.FTimeStamp);
   st.Free;
   {$IFDEF WINDOWS}
+  {$IFNDEF IBX_CONSOLE_MODE}
   Application.ProcessMessages
+  {$ENDIF}
   {$ENDIF}
 end;
 

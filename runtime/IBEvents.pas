@@ -54,7 +54,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  Classes, {$IFNDEF IBX_CONSOLE_MODE}Forms,{$ENDIF} IBHeader, IBExternals, IB, IBDatabase;
+  Classes, IBHeader, IBExternals, IB, IBDatabase;
 
 const
   MaxEvents = 15;
@@ -253,11 +253,7 @@ begin
         if (Status[i] <> 0) and not CancelAlerts then
             FOwner.FOnEventAlert( self, FEvents[i], Status[i], CancelAlerts);
         except
-          {$IFDEF IBX_CONSOLE_MODE}
-            SysUtils.ShowException(ExceptObject,ExceptAddr)
-          {$ELSE}
-            Application.HandleException(Self)
-          {$ENDIF}
+            FOwner.FBase.HandleException(Self)
         end;
       end;
     end;

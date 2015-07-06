@@ -44,7 +44,7 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, CustomTimer, IBHeader, IBExternals, DB,
-  IB {$IFNDEF IBX_CONSOLE_MODE},  Forms, DBLoginDlg {$ENDIF};
+  IB, CustApp {$IFNDEF IBX_CONSOLE_MODE},  Forms, DBLoginDlg {$ENDIF};
 
 const
   DPBPrefix = 'isc_dpb_';
@@ -183,6 +183,9 @@ type
     FDataSets: TList;
     FLoginCalled: boolean;
     FCharSetSizes: array of integer;
+    {$IFDEF IBX_CONSOLE_MODE}
+    FApplication: TCustomApplication;
+    {$ENDIF}
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
     function GetSQLDialect: Integer;
@@ -417,6 +420,9 @@ type
     FBeforeTransactionEnd: TTransactionEndEvent;
     FAfterTransactionEnd: TNotifyEvent;
     FOnTransactionFree: TNotifyEvent;
+    {$IFDEF IBX_CONSOLE_MODE}
+    FApplication: TCustomApplication;
+    {$ENDIF}
 
     procedure DoBeforeDatabaseConnect(DBParams: TStrings;
                               var DBName: string); virtual;
@@ -442,6 +448,7 @@ type
     procedure DoAfterInsert(Sender: TObject); virtual;
     procedure DoAfterPost(Sender: TObject); virtual;
     function GetCharSetSize(CharSetID: integer): integer;
+    procedure HandleException(Sender: TObject);
   public
     property BeforeDatabaseConnect: TBeforeDatabaseConnectEvent read FBeforeDatabaseConnect
                                                  write FBeforeDatabaseConnect;
@@ -462,6 +469,9 @@ type
     property TRHandle: PISC_TR_HANDLE read GetTRHandle;
     property Transaction: TIBTransaction read FTransaction
                                           write SetTransaction;
+    {$IFDEF IBX_CONSOLE_MODE}
+    property Application: TCustomApplication read FApplication write FApplication;
+    {$ENDIF}
   end;
 
 procedure GenerateDPB(sl: TStrings; var DPB: string; var DPBLength: Short);
@@ -490,6 +500,10 @@ begin
   FDBName := '';
   FDBParams := TStringList.Create;
   FSQLHourGlass := true;
+  {$IFDEF IBX_CONSOLE_MODE}
+  if AOwner is TCustomApplication then
+    FApplication := TCustomApplication(AOwner);
+  {$ENDIF}
   {$ifdef UNIX}
   if csDesigning in ComponentState then
     FDBParams.Add('lc_ctype=UTF-8');
@@ -589,6 +603,9 @@ end;
  function TIBDataBase.AddSQLObject(ds: TIBBase): Integer;
 begin
   result := 0;
+  {$IFDEF IBX_CONSOLE_MODE}
+  ds.Application := FApplication;
+  {$ENDIF}
   if (ds.Owner is TIBCustomDataSet) then
     FDataSets.Add(ds.Owner);
   while (result < FSQLObjects.Count) and (FSQLObjects[result] <> nil) do
@@ -1999,6 +2016,14 @@ begin
     Result := Database.FCharSetSizes[CharSetID]
   else
     Result := 1; {Unknown character set}
+end;
+
+procedure TIBBase.HandleException(Sender: TObject);
+begin
+  if assigned(Application) then
+     Application.HandleException(Sender)
+  else
+    SysUtils.ShowException(ExceptObject,ExceptAddr);
 end;
 
 procedure TIBBase.CheckDatabase;

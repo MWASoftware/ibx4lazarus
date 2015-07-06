@@ -2941,7 +2941,7 @@ begin
         if not Accept and (GetMode = gmCurrent) then
           GetMode := gmPrior;
       except
-//        Application.HandleException(Self);
+//        FBase.HandleException(Self);
       end;
     end;
     RestoreState(SaveState);
@@ -3175,11 +3175,7 @@ end;
 
 procedure TIBCustomDataSet.InternalHandleException;
 begin
-{$IFDEF IBX_CONSOLE_MODE}
-  SysUtils.ShowException(ExceptObject,ExceptAddr)
-{$ELSE}
-  Application.HandleException(Self)
-{$ENDIF}
+  FBase.HandleException(Self)
 end;
 
 procedure TIBCustomDataSet.InternalInitFieldDefs;
