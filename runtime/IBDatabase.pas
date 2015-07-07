@@ -144,10 +144,6 @@ const
 
 type
 
-  TOnLoginDlg = function (const ADatabaseName: string;
-                var AUserName, APassword: string;
-                NameReadOnly: Boolean): Boolean;
-
   TIBDatabase = class;
   TIBTransaction = class;
   TIBBase = class;
@@ -187,7 +183,6 @@ type
     FDataSets: TList;
     FLoginCalled: boolean;
     FCharSetSizes: array of integer;
-    FOwner: TComponent;
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
     function GetSQLDialect: Integer;
@@ -473,9 +468,6 @@ type
                                           write SetTransaction;
   end;
 
-const
-  OnLoginDlg: TOnLoginDlg = nil;
-
 procedure GenerateDPB(sl: TStrings; var DPB: string; var DPBLength: Short);
 procedure GenerateTPB(sl: TStrings; var TPB: string; var TPBLength: Short);
 
@@ -493,7 +485,6 @@ var acp: uint;
 {$endif}
 begin
   inherited Create(AOwner);
-  FOwner := AOwner;
   FIBLoaded := False;
   CheckIBLoaded;
   FIBLoaded := True;
@@ -896,14 +887,19 @@ begin
 end;
 
 procedure TIBDataBase.HandleException(Sender: TObject);
+var aParent: TComponent;
 begin
-  if assigned(IBGUIInterface) then
-    IBGUIInterface.HandleException(Sender)
-  else
-  if FOwner is TCustomApplication then
-     TCustomApplication(FOwner).HandleException(Sender)
-  else
-    SysUtils.ShowException(ExceptObject,ExceptAddr);
+  aParent := Owner;
+  while aParent <> nil do
+  begin
+    if aParent is TCustomApplication then
+    begin
+      TCustomApplication(aParent).HandleException(Sender);
+      Exit;
+    end;
+    aParent := aParent.Owner;
+  end;
+  SysUtils.ShowException(ExceptObject,ExceptAddr);
 end;
 
  procedure TIBDataBase.Notification(AComponent: TComponent;

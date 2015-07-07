@@ -449,7 +449,7 @@ begin
         stInDoubleQuotes,
         stInSingleQuotes:
           Begin
-            AddToSQL(FString + #$0A);
+            FLiteral := FLiteral + #$0A;
             Exit;
           End;
         end;
@@ -791,7 +791,7 @@ begin
 
   if (index > Length(Line)) then
   begin
-    if (FState in [stInSingleQuotes,stInDoubleQuotes]) or (Result = sqNone) then
+    if  (Result = sqNone) then
       Result := sqEOL
     else
     if (FLastSymbol = sqNone) and (Result <> sqEOL) then

@@ -52,7 +52,6 @@ type
     function LoginDialogEx(const ADatabaseName: string;
                                var AUserName, APassword: string;
                                NameReadOnly: Boolean): Boolean;
-    procedure HandleException(Sender: TObject);
     procedure ProcessMessages;
     procedure SetCursor;
     procedure RestoreCursor;

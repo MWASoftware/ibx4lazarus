@@ -117,7 +117,6 @@ type
     FOutputBufferOption: TOutputBufferOption;
     FProtocol: TProtocol;
     FParams: TStrings;
-    FOwner: TComponent;
     function GetActive: Boolean;
     function GetServiceParamBySPB(const Idx: Integer): String;
     procedure SetActive(const Value: Boolean);
@@ -636,20 +635,24 @@ begin
 end;
 
 procedure TIBCustomService.HandleException(Sender: TObject);
+var aParent: TComponent;
 begin
-  if assigned(IBGUIInterface) then
-    IBGUIInterface.HandleException(Sender)
-  else
-  if FOwner is TCustomApplication then
-     TCustomApplication(FOwner).HandleException(Sender)
-  else
-    SysUtils.ShowException(ExceptObject,ExceptAddr);
+  aParent := Owner;
+  while aParent <> nil do
+  begin
+    if aParent is TCustomApplication then
+    begin
+      TCustomApplication(aParent).HandleException(Sender);
+      Exit;
+    end;
+    aParent := aParent.Owner;
+  end;
+  SysUtils.ShowException(ExceptObject,ExceptAddr);
 end;
 
 constructor TIBCustomService.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FOwner := AOwner;
   FIBLoaded := False;
   CheckIBLoaded;
   FIBLoaded := True;

@@ -38,7 +38,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Messages, Classes, Graphics, Controls,
+  SysUtils, Classes, Graphics, Controls,
   Forms, StdCtrls, ExtCtrls, IB;
 
 type
@@ -54,7 +54,6 @@ type
     function LoginDialogEx(const ADatabaseName: string;
                                var AUserName, APassword: string;
                                NameReadOnly: Boolean): Boolean;
-    procedure HandleException(Sender: TObject);
     procedure ProcessMessages;
     procedure SetCursor;
     procedure RestoreCursor;
@@ -127,11 +126,6 @@ begin
   finally
     Free;
   end;
-end;
-
-procedure TIBLCLInterface.HandleException(Sender: TObject);
-begin
-  Application.HandleException(Sender);
 end;
 
 procedure TIBLCLInterface.ProcessMessages;
