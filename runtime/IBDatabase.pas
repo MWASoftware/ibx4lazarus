@@ -43,6 +43,9 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
+{$IFDEF LCL}
+  IBDialogs,
+{$ENDIF}
   SysUtils, Classes, CustomTimer, IBHeader, IBExternals, DB,
   IB, CustApp;
 

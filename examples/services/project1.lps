@@ -3,13 +3,14 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="4">
+    <Units Count="6">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="13" Y="10"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="3" Y="10"/>
         <UsageCount Value="20"/>
+        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -18,7 +19,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="20"/>
         <CursorPos X="8" Y="50"/>
         <UsageCount Value="20"/>
@@ -27,7 +27,6 @@
       </Unit1>
       <Unit2>
         <Filename Value="../../runtime/IBServices.pas"/>
-        <UnitName Value="IBServices"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="563"/>
         <CursorPos Y="580"/>
@@ -35,12 +34,30 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IB.pas"/>
-        <UnitName Value="IB"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="436"/>
         <CursorPos Y="455"/>
         <UsageCount Value="10"/>
       </Unit3>
+      <Unit4>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <UnitName Value="IBDatabase"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="25"/>
+        <CursorPos X="9" Y="48"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="../../changelog"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="4"/>
+        <CursorPos X="24" Y="29"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit5>
     </Units>
     <JumpHistory Count="8" HistoryIndex="7">
       <Position1>
