@@ -28,6 +28,9 @@ IBX Change Log  version                                                         
      ibexpressconsolemode package has been created to allow console mode programs
      to avoid adding LCL dependencies when using IBX.
 
+     You may find that in order for the IDE to recognise that ibexpressconsolemode
+     exists, you have to first open the package in the IDE and then close it.
+
 7.   SQL Parser can now accept quoted strings included new lines
 
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100

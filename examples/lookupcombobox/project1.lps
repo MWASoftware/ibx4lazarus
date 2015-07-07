@@ -17,7 +17,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="177"/>
         <CursorPos X="31" Y="182"/>
         <UsageCount Value="43"/>
@@ -180,10 +179,12 @@
       </Unit24>
       <Unit25>
         <Filename Value="../../changelog"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="7"/>
-        <CursorPos X="15" Y="21"/>
+        <CursorPos X="78" Y="32"/>
         <UsageCount Value="12"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit25>
       <Unit26>
@@ -223,7 +224,6 @@
       </Unit30>
       <Unit31>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <UnitName Value="IBDatabase"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="495"/>
         <CursorPos X="37" Y="513"/>
@@ -299,7 +299,6 @@
       </Unit41>
       <Unit42>
         <Filename Value="../../runtime/IBServices.pas"/>
-        <UnitName Value="IBServices"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="655"/>
         <CursorPos X="36" Y="677"/>
