@@ -96,9 +96,6 @@ type
   TLoginEvent = procedure(Database: TIBCustomService;
     LoginParams: TStrings) of object;
 
-  TOnServicesLoginDlg = function (const AServerName: string;
-                    var AUserName, APassword: string): Boolean;
-
   { TIBCustomService }
 
   TIBCustomService = class(TComponent)
@@ -120,7 +117,7 @@ type
     FOutputBufferOption: TOutputBufferOption;
     FProtocol: TProtocol;
     FParams: TStrings;
-    FApplication: TCustomApplication;
+    FOwner: TComponent;
     function GetActive: Boolean;
     function GetServiceParamBySPB(const Idx: Integer): String;
     procedure SetActive(const Value: Boolean);
@@ -144,6 +141,7 @@ type
     function Login: Boolean;
     procedure CheckActive;
     procedure CheckInactive;
+    procedure HandleException(Sender: TObject);
     property OutputBuffer : PChar read FOutputBuffer;
     property OutputBufferOption : TOutputBufferOption read FOutputBufferOption write FOutputBufferOption;
     property BufferSize : Integer read FBufferSize write SetBufferSize default DefaultBufferSize;
@@ -512,9 +510,6 @@ type
     property Password : string read FPassword write setPassword;
   end;
 
-const
-  OnServicesLoginDlg: TOnServicesLoginDlg = nil;
-
 
 implementation
 
@@ -570,13 +565,7 @@ begin
       Attach;
   except
     if csDesigning in ComponentState then
-      if assigned(FApplication) then
-        FApplication.HandleException(Self)
-      else
-      if assigned(IBXApplication) then
-        IBXApplication.HandleException(Self)
-      else
-        SysUtils.ShowException(ExceptObject,ExceptAddr)
+       HandleException(self)
     else
       raise;
   end;
@@ -600,7 +589,7 @@ begin
     end;
   end
   else
-  if assigned(OnServicesLoginDlg)  then
+  if assigned(IBGUIInterface)  then
   begin
     IndexOfUser := IndexOfSPBConst(SPBConstantNames[isc_spb_user_name]);
     if IndexOfUser <> -1 then
@@ -612,7 +601,7 @@ begin
       Password := Copy(Params[IndexOfPassword],
                                          Pos('=', Params[IndexOfPassword]) + 1, {mbcs ok}
                                          Length(Params[IndexOfPassword]));
-    result := OnServicesLoginDlg(serverName, Username, Password);
+    result := IBGUIInterface.ServerLoginDialog(serverName, Username, Password);
     if result then
     begin
       IndexOfPassword := IndexOfSPBConst(SPBConstantNames[isc_spb_password]);
@@ -646,9 +635,21 @@ begin
     IBError(ibxeServiceInActive, [nil]);
 end;
 
+procedure TIBCustomService.HandleException(Sender: TObject);
+begin
+  if assigned(IBGUIInterface) then
+    IBGUIInterface.HandleException(Sender)
+  else
+  if FOwner is TCustomApplication then
+     TCustomApplication(FOwner).HandleException(Sender)
+  else
+    SysUtils.ShowException(ExceptObject,ExceptAddr);
+end;
+
 constructor TIBCustomService.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FOwner := AOwner;
   FIBLoaded := False;
   CheckIBLoaded;
   FIBLoaded := True;
@@ -668,13 +669,7 @@ begin
   if (AOwner <> nil) and
      (AOwner is TCustomApplication) and
      TCustomApplication(AOwner).ConsoleApplication then
-  begin
     LoginPrompt := false;
-    FApplication := TCustomApplication(AOwner)
-  end
-  else
-  if assigned(IBXApplication) then
-    FApplication := IBXApplication;
 end;
 
 destructor TIBCustomService.Destroy;

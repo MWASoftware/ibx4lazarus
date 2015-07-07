@@ -187,7 +187,7 @@ type
     FDataSets: TList;
     FLoginCalled: boolean;
     FCharSetSizes: array of integer;
-    FApplication: TCustomApplication;
+    FOwner: TComponent;
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
     function GetSQLDialect: Integer;
@@ -220,6 +220,7 @@ type
     procedure DoDisconnect; override;
     function GetConnected: Boolean; override;
     procedure CheckStreamConnect;
+    procedure HandleException(Sender: TObject);
     procedure Notification( AComponent: TComponent; Operation: TOperation); override;
     function GetDataset(Index : longint) : TDataset; override;
     function GetDataSetCount : Longint; override;
@@ -422,7 +423,6 @@ type
     FBeforeTransactionEnd: TTransactionEndEvent;
     FAfterTransactionEnd: TNotifyEvent;
     FOnTransactionFree: TNotifyEvent;
-    FApplication: TCustomApplication;
 
     procedure DoBeforeDatabaseConnect(DBParams: TStrings;
                               var DBName: string); virtual;
@@ -449,6 +449,8 @@ type
     procedure DoAfterPost(Sender: TObject); virtual;
     function GetCharSetSize(CharSetID: integer): integer;
     procedure HandleException(Sender: TObject);
+    procedure SetCursor;
+    procedure RestoreCursor;
   public
     property BeforeDatabaseConnect: TBeforeDatabaseConnectEvent read FBeforeDatabaseConnect
                                                  write FBeforeDatabaseConnect;
@@ -469,7 +471,6 @@ type
     property TRHandle: PISC_TR_HANDLE read GetTRHandle;
     property Transaction: TIBTransaction read FTransaction
                                           write SetTransaction;
-    property Application: TCustomApplication read FApplication write FApplication;
   end;
 
 const
@@ -492,6 +493,7 @@ var acp: uint;
 {$endif}
 begin
   inherited Create(AOwner);
+  FOwner := AOwner;
   FIBLoaded := False;
   CheckIBLoaded;
   FIBLoaded := True;
@@ -504,13 +506,7 @@ begin
   if (AOwner <> nil) and
      (AOwner is TCustomApplication) and
      TCustomApplication(AOWner).ConsoleApplication then
-  begin
     LoginPrompt := false;
-    FApplication := TCustomApplication(AOwner)
-  end
-  else
-  if assigned(IBXApplication) then
-    FApplication := IBXApplication;
   {$ifdef UNIX}
   if csDesigning in ComponentState then
     FDBParams.Add('lc_ctype=UTF-8');
@@ -610,7 +606,6 @@ end;
  function TIBDataBase.AddSQLObject(ds: TIBBase): Integer;
 begin
   result := 0;
-  ds.Application := FApplication;
   if (ds.Owner is TIBCustomDataSet) then
     FDataSets.Add(ds.Owner);
   while (result < FSQLObjects.Count) and (FSQLObjects[result] <> nil) do
@@ -894,15 +889,21 @@ begin
     end;
   except
     if csDesigning in ComponentState then
-    begin
-      if assigned(FApplication) then
-         FApplication.HandleException(Self)
-      else
-        SysUtils.ShowException(ExceptObject,ExceptAddr)
-    end
+      HandleException(Self)
     else
       raise;
   end;
+end;
+
+procedure TIBDataBase.HandleException(Sender: TObject);
+begin
+  if assigned(IBGUIInterface) then
+    IBGUIInterface.HandleException(Sender)
+  else
+  if FOwner is TCustomApplication then
+     TCustomApplication(FOwner).HandleException(Sender)
+  else
+    SysUtils.ShowException(ExceptObject,ExceptAddr);
 end;
 
  procedure TIBDataBase.Notification(AComponent: TComponent;
@@ -962,7 +963,7 @@ begin
     end;
   end
   else
-  if assigned(OnLoginDlg) then
+  if assigned(IBGUIInterface) then
   begin
     IndexOfUser := IndexOfDBConst(DPBConstantNames[isc_dpb_user_name]);
     if IndexOfUser <> -1 then
@@ -977,7 +978,7 @@ begin
                                          Length(Params[IndexOfPassword]));
       OldPassword := password;
     end;
-    result := OnLoginDlg(DatabaseName, Username, Password, False);
+    result := IBGUIInterface.LoginDialogEx(DatabaseName, Username, Password, False);
     if result then
     begin
       if IndexOfUser = -1 then
@@ -2028,10 +2029,24 @@ end;
 
 procedure TIBBase.HandleException(Sender: TObject);
 begin
-  if assigned(Application) then
-     Application.HandleException(Sender)
-  else
-    SysUtils.ShowException(ExceptObject,ExceptAddr);
+  if assigned(Database) then
+     Database.HandleException(Sender);
+end;
+
+procedure TIBBase.SetCursor;
+begin
+  if Assigned(Database) and not Database.SQLHourGlass then
+     Exit;
+  if assigned(IBGUIInterface) then
+     IBGUIInterface.SetCursor;
+end;
+
+procedure TIBBase.RestoreCursor;
+begin
+  if Assigned(Database) and not Database.SQLHourGlass then
+     Exit;
+  if assigned(IBGUIInterface) then
+     IBGUIInterface.RestoreCursor;
 end;
 
 procedure TIBBase.CheckDatabase;

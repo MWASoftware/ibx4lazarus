@@ -46,7 +46,18 @@ uses
   SysUtils, Classes, IBExternals, IBUtils, DB, IBXConst, CustApp;
 
 type
-  TIBXApplication = function: TCustomApplication;
+  TIBGUIInterface = interface
+    function ServerLoginDialog(const AServerName: string;
+                               var AUserName, APassword: string): Boolean;
+    function LoginDialogEx(const ADatabaseName: string;
+                               var AUserName, APassword: string;
+                               NameReadOnly: Boolean): Boolean;
+    procedure HandleException(Sender: TObject);
+    procedure ProcessMessages;
+    procedure SetCursor;
+    procedure RestoreCursor;
+    function Title: string;
+  end;
 
   TTraceFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
      tfTransact, tfBlob, tfService, tfMisc);
@@ -354,7 +365,8 @@ const
   );
 
 const
-  IBXApplication: TIBXApplication = nil;
+  IBGUIInterface: TIBGUIInterface = nil;
+
 
 var
   IBCS: TRTLCriticalSection;

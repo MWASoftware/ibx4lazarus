@@ -43,7 +43,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="94">
+    <Units Count="95">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -59,10 +59,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <TopLine Value="343"/>
-        <CursorPos X="36" Y="362"/>
+        <CursorPos X="54" Y="355"/>
         <UsageCount Value="113"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -595,7 +594,14 @@
       </Unit79>
       <Unit80>
         <Filename Value="../../runtime/IBDialogs.pas"/>
-        <TopLine Value="33"/>
+        <ComponentName Value="IBXLoginDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="IBDialogs"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="49"/>
+        <CursorPos X="14" Y="66"/>
         <UsageCount Value="10"/>
       </Unit80>
       <Unit81>
@@ -698,6 +704,17 @@
         <CursorPos X="49" Y="10"/>
         <UsageCount Value="10"/>
       </Unit93>
+      <Unit94>
+        <Filename Value="../../runtime/dblogindlg.pas"/>
+        <UnitName Value="dblogindlg"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="40"/>
+        <CursorPos X="13" Y="67"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit94>
     </Units>
     <JumpHistory Count="29" HistoryIndex="28">
       <Position1>

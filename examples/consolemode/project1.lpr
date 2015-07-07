@@ -47,24 +47,25 @@ type
 { TMyApplication }
 
 procedure TMyApplication.DoQuery;
-var i, row: integer;
+var i, rowno: integer;
 begin
   with TIBQuery.Create(self) do
   try
      Database := FIBDatabase;
      SQL.Text := sqlExample;
      Active := true;
-     row := 1;
+     rowno := 1;
      while not EOF do
      begin
-       writeln('Record No. ',row);
-       Inc(row);
+       writeln('Record No. ',rowno);
+       Inc(rowno);
        writeln;
        for i := 0 to FieldCount - 1 do
        begin
          writeln(Fields[i].FieldName + ': ',Fields[i].AsString);
        end;
        writeln;
+       next;
      end;
   finally
     Free;

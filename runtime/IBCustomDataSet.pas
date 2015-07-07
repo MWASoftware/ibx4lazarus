@@ -57,8 +57,6 @@ const
   UniCache           =  2;     { Uni-directional cache is 2 records big }
 
 type
-  TSetCursor = procedure(Database: TIBDatabase);
-
   TIBCustomDataSet = class;
   TIBDataSet = class;
 
@@ -726,10 +724,6 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     TGuidField);        { ftGuid } *)
 (*var
   CreateProviderProc: function(DataSet: TIBCustomDataSet): IProvider = nil;*)
-
-const
-  OnSetCursor: TSetCursor = nil;
-  OnRestoreCursor: TSetCursor = nil;
 
 implementation
 
@@ -1930,11 +1924,10 @@ end;
 procedure TIBCustomDataSet.InternalRefreshRow;
 var
   Buff: PChar;
-  SetCursor: Boolean;
   ofs: DWORD;
   Qry: TIBSQL;
 begin
-  if assigned(OnSetCursor) then OnSetCursor(Database);
+  FBase.SetCursor;
   try
     Buff := GetActiveBuf;
     if CanRefresh then
@@ -1978,7 +1971,7 @@ begin
     else
       IBError(ibxeCannotRefresh, [nil]);
   finally
-    if assigned(OnRestoreCursor) then OnRestoreCursor(Database);
+    FBase.RestoreCursor;
   end;
 end;
 
@@ -2049,13 +2042,12 @@ end;
 
 procedure TIBCustomDataSet.InternalPrepare;
 var
-  SetCursor: Boolean;
   DidActivate: Boolean;
 begin
   if FInternalPrepared then
     Exit;
   DidActivate := False;
-  if assigned(OnSetCursor) then OnSetCursor(Database);
+  FBase.SetCursor;
   try
     ActivateConnection;
     DidActivate := ActivateTransaction;
@@ -2091,7 +2083,7 @@ begin
   finally
     if DidActivate then
       DeactivateTransaction;
-    if assigned(OnRestoreCursor) then OnRestoreCursor(Database);
+    FBase.RestoreCursor;
   end;
 end;
 
@@ -2734,14 +2726,13 @@ end;
 
 procedure TIBCustomDataSet.FetchAll;
 var
-  SetCursor: Boolean;
   {$IF FPC_FULLVERSION >= 20700 }
   CurBookmark: TBookmark;
   {$ELSE}
   CurBookmark: string;
   {$ENDIF}
 begin
-  if assigned(OnSetCursor) then OnSetCursor(Database);
+  FBase.SetCursor;
  try
     if FQSelect.EOF or not FQSelect.Open then
       exit;
@@ -2754,7 +2745,7 @@ begin
       EnableControls;
     end;
   finally
-    if assigned(OnRestoreCursor) then OnRestoreCursor(Database);
+    FBase.RestoreCursor;
   end;
 end;
 
@@ -3090,9 +3081,8 @@ end;
 procedure TIBCustomDataSet.InternalDelete;
 var
   Buff: PChar;
-  SetCursor: Boolean;
 begin
-  if assigned(OnSetCursor) then OnSetCursor(Database);
+  FBase.SetCursor;
   try
     Buff := GetActiveBuf;
     if CanDelete then
@@ -3117,7 +3107,7 @@ begin
     end else
       IBError(ibxeCannotDelete, [nil]);
   finally
-    if assigned(OnRestoreCursor) then OnRestoreCursor(Database);
+    FBase.RestoreCursor;
   end;
 end;
 
@@ -3518,8 +3508,6 @@ begin
 end;
 
 procedure TIBCustomDataSet.InternalOpen;
-var
-  SetCursor: Boolean;
 
   function RecordDataLength(n: Integer): Long;
   begin
@@ -3527,7 +3515,7 @@ var
   end;
 
 begin
-  if assigned(OnSetCursor) then OnSetCursor(Database);
+  FBase.SetCursor;
   try
     ActivateConnection;
     ActivateTransaction;
@@ -3588,7 +3576,7 @@ begin
     else
       FQSelect.ExecQuery;
   finally
-    if assigned(OnRestoreCursor) then OnRestoreCursor(Database);
+    FBase.RestoreCursor;
   end;
 end;
 
@@ -3596,10 +3584,9 @@ procedure TIBCustomDataSet.InternalPost;
 var
   Qry: TIBSQL;
   Buff: PChar;
-  SetCursor: Boolean;
   bInserting: Boolean;
 begin
-  if assigned(OnSetCursor) then OnSetCursor(Database);
+  FBase.SetCursor;
   try
     Buff := GetActiveBuf;
     CheckEditState;
@@ -3637,7 +3624,7 @@ begin
     if bInserting then
       Inc(FRecordCount);
   finally
-    if assigned(OnRestoreCursor) then OnRestoreCursor(Database);
+    FBase.RestoreCursor;
   end;
 end;
 
@@ -3900,10 +3887,9 @@ end;
 procedure TIBCustomDataSet.InternalExecQuery;
 var
   DidActivate: Boolean;
-  SetCursor: Boolean;
 begin
   DidActivate := False;
-  if assigned(OnSetCursor) then OnSetCursor(Database);
+  FBase.SetCursor;
   try
     ActivateConnection;
     DidActivate := ActivateTransaction;
@@ -3920,7 +3906,7 @@ begin
   finally
     if DidActivate then
       DeactivateTransaction;
-    if assigned(OnRestoreCursor) then OnRestoreCursor(Database);
+    FBase.RestoreCursor;
   end;
 end;
 

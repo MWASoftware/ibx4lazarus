@@ -333,8 +333,8 @@ begin
         FOnSQLEvent(st.FMsg, st.FTimeStamp);
   st.Free;
   {$IFDEF WINDOWS}
-  if assigned(IBXApplication) then
-    IBXApplication.ProcessMessages
+  if assigned(IBGUIInterface) then
+    IBGUIInterface.ProcessMessages
   {$ENDIF}
 end;
 
@@ -703,8 +703,8 @@ begin
  {$IFDEF DEBUG}writeln('Write SQL Data: '+Text);{$ENDIF}
   if not assigned(FGlobalInterface) then
     FGlobalInterface := TGlobalInterface.Create;
- if assigned(IBXApplication) then
-   Text := CRLF + '[Application: ' + IBXApplication.Title + ']' + CRLF + Text {do not localize}
+ if assigned(IBGUIInterface) then
+   Text := CRLF + '[Application: ' + IBGUIInterface.Title + ']' + CRLF + Text {do not localize}
  else
    Text := CRLF + '[Unknown Application]' + CRLF + Text; {do not localize}
   if not Assigned(FWriterThread) then

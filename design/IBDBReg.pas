@@ -57,7 +57,7 @@ interface
 uses SysUtils, Classes, Graphics, Dialogs, Controls, Forms, TypInfo,
      DB, IBTable, IBDatabase,  IBEventsEditor,  LazarusPackageIntf,
       IBUpdateSQL, IBXConst, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor,
-     dbFieldLinkPropEditor, dbFieldListPropEditor;
+     dbFieldLinkPropEditor, dbFieldListPropEditor, IBDialogs;
 
 type
 
@@ -1139,4 +1139,4 @@ end;
 
 initialization
   {$I IBDBReg.lrs}
-end.
+end.

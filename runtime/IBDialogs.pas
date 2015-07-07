@@ -39,17 +39,53 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Messages, Classes, Graphics, Controls,
-  Forms, StdCtrls, ExtCtrls, dblogindlg;
+  Forms, StdCtrls, ExtCtrls, IB;
 
-function ServerLoginDialog(const AServerName: string;
-  var AUserName, APassword: string): Boolean;
+type
+
+  { TIBLCLInterface }
+
+  TIBLCLInterface = class(TInterfacedObject,TIBGUIInterface)
+    private
+      FSetCursorDepth: integer;
+  public
+    function ServerLoginDialog(const AServerName: string;
+                               var AUserName, APassword: string): Boolean;
+    function LoginDialogEx(const ADatabaseName: string;
+                               var AUserName, APassword: string;
+                               NameReadOnly: Boolean): Boolean;
+    procedure HandleException(Sender: TObject);
+    procedure ProcessMessages;
+    procedure SetCursor;
+    procedure RestoreCursor;
+    function Title: string;
+  end;
 
 implementation
 
-uses IBServices;
+{$R IBDialogs.lfm}
 
-function ServerLoginDialog(const AServerName: string;
-  var AUserName, APassword: string): Boolean;
+type
+  { TIBXLoginDlg }
+
+  TIBXLoginDlg = class(TForm)
+    Bevel1: TBevel;
+    Button1: TButton;
+    Button2: TButton;
+    DatabaseName: TLabel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Password: TEdit;
+    UserName: TEdit;
+  private
+    { private declarations }
+  public
+    { public declarations }
+  end;
+
+function TIBLCLInterface.ServerLoginDialog(const AServerName: string;
+         var AUserName, APassword: string): Boolean;
 begin
   with TIBXLoginDlg.Create(nil) do
   try
@@ -70,7 +106,65 @@ begin
   end;
 end;
 
+function TIBLCLInterface.LoginDialogEx(const ADatabaseName: string;
+  var AUserName, APassword: string; NameReadOnly: Boolean): Boolean;
+begin
+  with TIBXLoginDlg.Create(Application) do
+  try
+    DatabaseName.Caption := ADatabaseName;
+    UserName.Text := AUserName;
+    Result := False;
+    if NameReadOnly then
+      UserName.Enabled := False
+    else
+      if AUserName = '' then ActiveControl := UserName;
+    if ShowModal = mrOk then
+    begin
+      AUserName := UserName.Text;
+      APassword := Password.Text;
+      Result := True;
+    end
+  finally
+    Free;
+  end;
+end;
+
+procedure TIBLCLInterface.HandleException(Sender: TObject);
+begin
+  Application.HandleException(Sender);
+end;
+
+procedure TIBLCLInterface.ProcessMessages;
+begin
+  Application.ProcessMessages;
+end;
+
+procedure TIBLCLInterface.SetCursor;
+begin
+  if (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault) then
+  begin
+    if FSetCursorDepth = 0 then
+      Screen.Cursor := crHourGlass;
+    Inc(FSetCursorDepth);
+  end;
+end;
+
+procedure TIBLCLInterface.RestoreCursor;
+begin
+  if FSetCursorDepth > 0 then
+  begin
+     Dec(FSetCursorDepth);
+     if FSetCursorDepth = 0 then
+       Screen.Cursor := crDefault
+  end;
+end;
+
+function TIBLCLInterface.Title: string;
+begin
+  Result := Application.Title;
+end;
+
 initialization
-  OnServicesLoginDlg := @ServerLoginDialog;
+  IBGUIInterface :=  TIBLCLInterface.Create;
 
 end.
