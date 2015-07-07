@@ -7,7 +7,8 @@
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="97"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="18"/>
         <CursorPos X="74" Y="18"/>
         <UsageCount Value="26"/>
         <Loaded Value="True"/>
@@ -19,7 +20,6 @@
       </Unit1>
       <Unit2>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <UnitName Value="IBCustomDataSet"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1964"/>
         <CursorPos X="24" Y="1974"/>
@@ -27,7 +27,6 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <UnitName Value="IBDatabase"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2025"/>
         <CursorPos X="21" Y="2041"/>
@@ -48,7 +47,6 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../runtime/IBServices.pas"/>
-        <UnitName Value="IBServices"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="614"/>
         <CursorPos Y="647"/>
@@ -56,7 +54,6 @@
       </Unit6>
       <Unit7>
         <Filename Value="../../runtime/IBSQLMonitor.pas"/>
-        <UnitName Value="IBSQLMonitor"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="689"/>
         <CursorPos X="52" Y="707"/>
@@ -92,7 +89,6 @@
       </Unit11>
       <Unit12>
         <Filename Value="../../runtime/IBDialogs.pas"/>
-        <UnitName Value="IBDialogs"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="135"/>
         <CursorPos Y="168"/>
@@ -119,7 +115,6 @@
       </Unit15>
       <Unit16>
         <Filename Value="../../runtime/IB.pas"/>
-        <UnitName Value="IB"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="43"/>
         <CursorPos X="29" Y="58"/>
@@ -155,7 +150,6 @@
       </Unit20>
       <Unit21>
         <Filename Value="../../design/IBDBReg.pas"/>
-        <UnitName Value="IBDBReg"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="31"/>
         <CursorPos X="61" Y="60"/>
@@ -163,11 +157,9 @@
       </Unit21>
       <Unit22>
         <Filename Value="../../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="26" Y="20"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit22>
     </Units>
