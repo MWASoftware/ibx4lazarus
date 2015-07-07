@@ -508,7 +508,7 @@
    All Rights Reserved.
 
    Contributor(s): ______________________________________. "/>
-    <Version Major="1" Minor="3" Release = "0" />
+    <Version Major="1" Minor="3"/>
     <Files Count="4">
       <Item1>
         <Filename Value="ibcontrols/IBLookupComboEditBox.pas"/>
@@ -527,13 +527,16 @@
         <UnitName Value="DBControlGrid"/>
       </Item4>
     </Files>
-    <RequiredPkgs Count="2">
+    <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="ibexpress"/>
+        <PackageName Value="LCL"/>
       </Item1>
       <Item2>
-        <PackageName Value="FCL"/>
+        <PackageName Value="ibexpress"/>
       </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

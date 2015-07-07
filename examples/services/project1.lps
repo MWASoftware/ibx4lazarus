@@ -7,10 +7,9 @@
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
-        <CursorPos X="3" Y="10"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="13" Y="10"/>
         <UsageCount Value="20"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -42,6 +41,7 @@
       <Unit4>
         <Filename Value="../../runtime/IBDatabase.pas"/>
         <UnitName Value="IBDatabase"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="25"/>
         <CursorPos X="9" Y="48"/>
@@ -50,12 +50,10 @@
       </Unit4>
       <Unit5>
         <Filename Value="../../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="4"/>
         <CursorPos X="24" Y="29"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit5>
     </Units>

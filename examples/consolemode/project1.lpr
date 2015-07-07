@@ -25,7 +25,7 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
-  Classes, SysUtils, CustApp, IBDatabase, IBQuery
+  ibexpressconsolemode, Classes, SysUtils, CustApp, IBDatabase, IBQuery
   { you can add units after this };
 
 const

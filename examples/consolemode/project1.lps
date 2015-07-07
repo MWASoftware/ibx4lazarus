@@ -3,14 +3,13 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="23">
+    <Units Count="25">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="18"/>
-        <CursorPos X="74" Y="18"/>
-        <UsageCount Value="26"/>
+        <TopLine Value="8"/>
+        <CursorPos X="25" Y="28"/>
+        <UsageCount Value="27"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -28,8 +27,8 @@
       <Unit3>
         <Filename Value="../../runtime/IBDatabase.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2025"/>
-        <CursorPos X="21" Y="2041"/>
+        <TopLine Value="1431"/>
+        <CursorPos X="21" Y="1459"/>
         <UsageCount Value="13"/>
       </Unit3>
       <Unit4>
@@ -55,8 +54,8 @@
       <Unit7>
         <Filename Value="../../runtime/IBSQLMonitor.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="689"/>
-        <CursorPos X="52" Y="707"/>
+        <TopLine Value="58"/>
+        <CursorPos Y="74"/>
         <UsageCount Value="10"/>
       </Unit7>
       <Unit8>
@@ -157,16 +156,36 @@
       </Unit21>
       <Unit22>
         <Filename Value="../../changelog"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="26" Y="20"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="54" Y="29"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit22>
+      <Unit23>
+        <Filename Value="../../../../lcl/graphtype.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="9"/>
+        <CursorPos X="3" Y="26"/>
+        <UsageCount Value="10"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="../../../../lcl/customtimer.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="28"/>
+        <UsageCount Value="10"/>
+      </Unit24>
     </Units>
     <CustomDefines Count="2">
       <Define0 Value="UseCThreads"/>
       <Define1 Value="IBX_CONSOLE_MODE"/>
     </CustomDefines>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="project1.lpr"/>
+        <Caret Line="18" Column="74" TopLine="18"/>
+      </Position1>
+    </JumpHistory>
   </ProjectSession>
 </CONFIG>

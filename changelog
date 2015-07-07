@@ -19,14 +19,14 @@ IBX Change Log  version                                                         
      should compile and link with a console mode program. See consolemode example
      for further guidence. DO NOT include the ibexpress package in a console mode
      application or the IDE will automatically assume that you application is
-     GUI based.
+     GUI based. Instead, you should include the ibexpressconsolemode package.
 
      IMPORTANT NOTE: IBDialogs must be included in GUI applications. IBDialogs is
-     included by default if "ibexpress" is in your project source "uses" clause. It
-     is also included by "IBDatabase" as long as "LCL" is a defined symbol when
-     the project is built. This should be the case for all projects created through
-     the IDE. This is why you do not want to add the ibexpress package to console
-     mode applications.
+     included by default if "ibexpress" is in your project source "uses" clause.
+     This should be the case for all projects created through the IDE. This is why
+     you do not want to add the ibexpress package to console mode applications. The
+     ibexpressconsolemode package has been created to allow console mode programs
+     to avoid adding LCL dependencies when using IBX.
 
 7.   SQL Parser can now accept quoted strings included new lines
 
