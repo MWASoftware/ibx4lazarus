@@ -8,14 +8,24 @@ IBX Change Log  version                                                         
 3.   Force pending autocomplete on combobox exit.
 
 4.   IBDynamicGrid and DNControlGrid: Keyhandler now ignores up, down, escape and return keys if
-     in a TCustomComboBox and ignore return if in a TCustomMemo
+     in a TCustomComboBox and ignores return key if in a TCustomMemo
 
 5.   IBLookupComboEditBox: Ensure that KeyValue is set correctly when full text
      keyed in i.e. when autocomplete not performed
 
-6.   Cleanup of "Uses" clauses and console mode support. If the IBX Runtime library
-     is compiled with the symbol IBX_CONSOLE_MODE defined then it should be possible
-     to link IBX with a console mode application.
+6.   Cleanup of "Uses" clauses and console mode support. IBX should now support
+     console mode applications with all LCL required functions centralised in the
+     IBDialogs unit. As long as "IBDialogs" is not included in your project, IBX
+     should compile and link with a console mode program. See consolemode example
+     for further guidence.
+
+     IMPORTANT NOTE: IBDialogs must be included in GUI applications. IBDialogs is
+     included by default if "ibexpress" is in your project source "uses" clause, and
+     this should have been added automatically by the IDE when an IBX component
+     is dropped on a form. An exception is raised with a hopefully informative
+     reason if you try and login to a database in an LCL application without IBDialogs
+     support. If you want the build to be as lean as possible, then it is OK to
+     replace "ibexpress" with "IBDialogs" in the project source "uses" clause.
 
 7.   SQL Parser can now accept quoted strings included new lines
 
