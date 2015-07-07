@@ -44,7 +44,6 @@ unit IBSQLMonitor;
 interface
 
 uses
-  LMessages, LCLIntf, LCLType, LCLProc,
   IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, IBXConst,SysUtils,
   Classes,
 {$IFDEF WINDOWS }
@@ -70,11 +69,6 @@ uses
 {$IFDEF LINUX}
 {$DEFINE HAS_SEMTIMEDOP}
 {$ENDIF}
-
-const
-  WM_MIN_IBSQL_MONITOR = WM_USER;
-  WM_MAX_IBSQL_MONITOR = WM_USER + 512;
-  WM_IBSQL_SQL_EVENT = WM_MIN_IBSQL_MONITOR + 1;
 
 type
   TIBCustomSQLMonitor = class;

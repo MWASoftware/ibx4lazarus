@@ -43,10 +43,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-{$IFDEF LCL}
-  IBDialogs,
-{$ENDIF}
-  SysUtils, Classes, CustomTimer, IBHeader, IBExternals, DB,
+  SysUtils, Classes, FPTimer, IBHeader, IBExternals, DB,
   IB, CustApp;
 
 const
@@ -185,7 +182,7 @@ type
     FDefaultTransaction: TIBTransaction;
     FInternalTransaction: TIBTransaction;
     FStreamedConnected: Boolean;
-    FTimer: TCustomTimer;
+    FTimer: TFPTimer;
     FUserNames: TStringList;
     FDataSets: TList;
     FLoginCalled: boolean;
@@ -311,7 +308,7 @@ type
     FStreamedActive     : Boolean;
     FTPB                : PChar;
     FTPBLength          : Short;
-    FTimer              : TCustomTimer;
+    FTimer              : TFPTimer;
     FDefaultAction      : TTransactionAction;
     FTRParams           : TStrings;
     FTRParamsChanged    : Boolean;
@@ -531,7 +528,7 @@ begin
   FUserNames := nil;
   FInternalTransaction := TIBTransaction.Create(self);
   FInternalTransaction.DefaultDatabase := Self;
-  FTimer := TCustomTimer.Create(Self);
+  FTimer := TFPTimer.Create(Self);
   FTimer.Enabled := False;
   FTimer.Interval := 0;
   FTimer.OnTimer := TimeoutConnection;
@@ -1456,7 +1453,7 @@ begin
   FTRParamsChanged := True;
   TStringList(FTRParams).OnChange := TRParamsChange;
   TStringList(FTRParams).OnChanging := TRParamsChanging;
-  FTimer := TCustomTimer.Create(Self);
+  FTimer := TFPTimer.Create(Self);
   FTimer.Enabled := False;
   FTimer.Interval := 0;
   FTimer.OnTimer := TimeoutTransaction;
