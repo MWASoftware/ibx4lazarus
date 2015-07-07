@@ -616,9 +616,9 @@ begin
         Params[IndexOfPassword] := SPBConstantNames[isc_spb_password] +
                                      '=' + Password;
     end
-    else
-      IBError(ibxeNoLoginDialog,[]);
-  end;
+  end
+  else
+    IBError(ibxeNoLoginDialog,[]);
 end;
 
 procedure TIBCustomService.CheckActive;
