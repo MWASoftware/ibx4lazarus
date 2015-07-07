@@ -17,6 +17,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="177"/>
         <CursorPos X="31" Y="182"/>
         <UsageCount Value="43"/>
@@ -179,12 +180,10 @@
       </Unit24>
       <Unit25>
         <Filename Value="../../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="7"/>
         <CursorPos X="78" Y="32"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit25>
       <Unit26>
