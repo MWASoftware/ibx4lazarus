@@ -54,10 +54,8 @@ type
     function LoginDialogEx(const ADatabaseName: string;
                                var AUserName, APassword: string;
                                NameReadOnly: Boolean): Boolean;
-    procedure ProcessMessages;
     procedure SetCursor;
     procedure RestoreCursor;
-    function Title: string;
   end;
 
 implementation
@@ -128,11 +126,6 @@ begin
   end;
 end;
 
-procedure TIBLCLInterface.ProcessMessages;
-begin
-  Application.ProcessMessages;
-end;
-
 procedure TIBLCLInterface.SetCursor;
 begin
   if (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault) then
@@ -151,11 +144,6 @@ begin
      if FSetCursorDepth = 0 then
        Screen.Cursor := crDefault
   end;
-end;
-
-function TIBLCLInterface.Title: string;
-begin
-  Result := Application.Title;
 end;
 
 initialization

@@ -142,7 +142,8 @@ function MonitoringEnabled: Boolean;
 implementation
 
 uses
-   contnrs, syncobjs
+   contnrs, syncobjs, CustApp
+   {$IFDEF WINDOWS}, Forms {$ENDIF}
    {$IFDEF USE_SV5_IPC}
    ,ipc, Errors, baseunix
    {$IF FPC_FULLVERSION <= 20402 } , initc {$ENDIF}
@@ -283,15 +284,29 @@ var
   _MonitorHook: TIBSQLMonitorHook;
   bDone: Boolean;
   CS : TCriticalSection;
+
+const
+  ApplicationTitle: string = 'Unknown';
   
 { TIBCustomSQLMonitor }
 
 constructor TIBCustomSQLMonitor.Create(AOwner: TComponent);
+var aParent: TComponent;
 begin
   inherited Create(AOwner);
   FTraceFlags := [tfqPrepare .. tfMisc];
   if not (csDesigning in ComponentState)  then
   begin
+    aParent := AOwner;
+    while aParent <> nil do
+    begin
+      if aParent is TCustomApplication then
+      begin
+        ApplicationTitle := TCustomApplication(aParent).Title;
+        break;
+      end;
+      aParent := aParent.Owner;
+    end;
     MonitorHook.RegisterMonitor(self);
   end;
   FEnabled := true;
@@ -327,8 +342,7 @@ begin
         FOnSQLEvent(st.FMsg, st.FTimeStamp);
   st.Free;
   {$IFDEF WINDOWS}
-  if assigned(IBGUIInterface) then
-    IBGUIInterface.ProcessMessages
+  Application.ProcessMessages
   {$ENDIF}
 end;
 
@@ -697,10 +711,7 @@ begin
  {$IFDEF DEBUG}writeln('Write SQL Data: '+Text);{$ENDIF}
   if not assigned(FGlobalInterface) then
     FGlobalInterface := TGlobalInterface.Create;
- if assigned(IBGUIInterface) then
-   Text := CRLF + '[Application: ' + IBGUIInterface.Title + ']' + CRLF + Text {do not localize}
- else
-   Text := CRLF + '[Unknown Application]' + CRLF + Text; {do not localize}
+  Text := CRLF + '[Application: ' + ApplicationTitle + ']' + CRLF + Text; {do not localize}
   if not Assigned(FWriterThread) then
     FWriterThread := TWriterThread.Create(FGLobalInterface);
   FWriterThread.WriteSQLData(Text, DataType);

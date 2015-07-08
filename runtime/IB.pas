@@ -52,10 +52,8 @@ type
     function LoginDialogEx(const ADatabaseName: string;
                                var AUserName, APassword: string;
                                NameReadOnly: Boolean): Boolean;
-    procedure ProcessMessages;
     procedure SetCursor;
     procedure RestoreCursor;
-    function Title: string;
   end;
 
   TTraceFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,

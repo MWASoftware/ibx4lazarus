@@ -31,6 +31,8 @@ IBX Change Log  version                                                         
      You may find that in order for the IDE to recognise that ibexpressconsolemode
      exists, you have to first open the package in the IDE and then close it.
 
+     Under Windows, ISQLMonitor can only be used in a GUI application.
+
 7.   SQL Parser can now accept quoted strings included new lines
 
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
