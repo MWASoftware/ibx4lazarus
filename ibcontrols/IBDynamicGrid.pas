@@ -794,7 +794,6 @@ begin
   FCol := Msg.Col;
   FRow := Msg.Row;
   FEditText := Msg.Value;
-  SelStart := Length(Text);
   TIBDynamicGrid(FGrid).SetupEditor(self,FCol);
 end;
 
@@ -869,6 +868,7 @@ begin
         Editor.DataSource := TDBGrid(Grid).DataSource;
   end;
   Editor.Text := Editor.FEditText;
+  Editor.SelStart := Length(Editor.Text);
 end;
 
 procedure TIBDynamicGridColumn.SetInitialSortColumn(AValue: boolean);

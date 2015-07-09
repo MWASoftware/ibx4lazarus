@@ -35,6 +35,10 @@ IBX Change Log  version                                                         
 
 7.   SQL Parser can now accept quoted strings included new lines
 
+8.   IBDynamicGrid: Lookup Cell Editor now positioned at end of text on start
+     of edit. This particularly useful when tabbing to a column and then
+     inserting text.
+
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
 1.  Firebird Services: avoid List Index error when opening a service with an
