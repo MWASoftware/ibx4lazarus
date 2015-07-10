@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="4">
+      <Unit0>
+        <Filename Value="RemoteMonitor.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="20"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="RemoteMonitorFormUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="RemoteMonitorFormUnit"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="10"/>
+        <CursorPos Y="41"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="MonitorFormUnit.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="16"/>
+        <CursorPos Y="41"/>
+        <UsageCount Value="10"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="../../runtime/IBSQLMonitor.pas"/>
+        <UnitName Value="IBSQLMonitor"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="969"/>
+        <CursorPos Y="990"/>
+        <UsageCount Value="10"/>
+      </Unit3>
+    </Units>
+    <JumpHistory Count="4" HistoryIndex="3">
+      <Position1>
+        <Filename Value="RemoteMonitorFormUnit.pas"/>
+      </Position1>
+      <Position2>
+        <Filename Value="RemoteMonitorFormUnit.pas"/>
+        <Caret Line="41" TopLine="10"/>
+      </Position2>
+      <Position3>
+        <Filename Value="RemoteMonitorFormUnit.pas"/>
+        <Caret Line="45" Column="20" TopLine="16"/>
+      </Position3>
+      <Position4>
+        <Filename Value="RemoteMonitorFormUnit.pas"/>
+        <Caret Line="41" TopLine="10"/>
+      </Position4>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

@@ -2026,7 +2026,9 @@ end;
 procedure TIBBase.HandleException(Sender: TObject);
 begin
   if assigned(Database) then
-     Database.HandleException(Sender);
+     Database.HandleException(Sender)
+  else
+     SysUtils.ShowException(ExceptObject,ExceptAddr);
 end;
 
 procedure TIBBase.SetCursor;

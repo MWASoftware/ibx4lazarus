@@ -143,7 +143,6 @@ implementation
 
 uses
    contnrs, syncobjs, CustApp
-   {$IFDEF WINDOWS}, Forms {$ENDIF}
    {$IFDEF USE_SV5_IPC}
    ,ipc, Errors, baseunix
    {$IF FPC_FULLVERSION <= 20402 } , initc {$ENDIF}
@@ -341,9 +340,6 @@ begin
          (st.FDataType in FTraceFlags) then
         FOnSQLEvent(st.FMsg, st.FTimeStamp);
   st.Free;
-  {$IFDEF WINDOWS}
-  Application.ProcessMessages
-  {$ENDIF}
 end;
 
 procedure TIBCustomSQLMonitor.SetEnabled(const Value: Boolean);
