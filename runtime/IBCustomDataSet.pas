@@ -4301,6 +4301,7 @@ begin
   TBlobField(FField).Modified := true;
   result := FBlobStream.Write(Buffer, Count);
   TIBCustomDataSet(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
+  FBlobStream.Seek(0,soFromEnd);
 end;
 
 { TIBGenerator }

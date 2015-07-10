@@ -43,6 +43,11 @@ IBX Change Log  version                                                         
 
 9.	 New Examples for Services and ISQLMonitor.
 
+10. Fix error when writing to blob streams that recorded only the last buffer
+    write in the blob stream. In most cases, this did not cause a problem as the
+    IB Blob Stream is written in a single write. However, with the TDBImage, write
+    of a graphic type prefix was lost.
+
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
 1.  Firebird Services: avoid List Index error when opening a service with an
