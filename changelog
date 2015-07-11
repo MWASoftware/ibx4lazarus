@@ -1,13 +1,13 @@
-IBX Change Log  version                                                                     (1.3-0) Tue, 07 Jul 2015 12:09:36 +0100
+IBX Change Log  version  (1.3-1) Sat, 11 Jul 2015 08:37:51 +0100
 
 1.   OnCloseUp Event Handler added to TDBLookupProperties
 
 2.   IBDynamicGrid: Call to OnEditorPanelHide is now last editor hide action - avoids
      problem with row size when exception is called.
 
-3.   Force pending autocomplete on combobox exit.
+3.   IBLookupComboEditBox: Force pending autocomplete on combobox exit.
 
-4.   IBDynamicGrid and DNControlGrid: Keyhandler now ignores up, down, escape and return keys if
+4.   IBDynamicGrid and DBControlGrid: Keyhandler now ignores up, down, escape and return keys if
      in a TCustomComboBox and ignores return key if in a TCustomMemo
 
 5.   IBLookupComboEditBox: Ensure that KeyValue is set correctly when full text
@@ -17,36 +17,40 @@ IBX Change Log  version                                                         
      console mode applications with all LCL required functions centralised in the
      IBDialogs unit. As long as "IBDialogs" is not included in your project, IBX
      should compile and link with a console mode program. See consolemode example
-     for further guidence. DO NOT include the ibexpress package in a console mode
+     for further guidence. DO NOT add the ibexpress package to a console mode
      application or the IDE will automatically assume that you application is
      GUI based. Instead, you should include the ibexpressconsolemode package.
 
-     IMPORTANT NOTE: IBDialogs must be included in GUI applications. IBDialogs is
+     IMPORTANT NOTE: IBDialogs must be included in GUI applications in order 
+	 to use the built in dialogs and cursor management. IBDialogs is
      included by default if "ibexpress" is in your project source "uses" clause.
      This should be the case for all projects created through the IDE. This is why
      you do not want to add the ibexpress package to console mode applications. The
      ibexpressconsolemode package has been created to allow console mode programs
-     to avoid adding LCL dependencies when using IBX.
+     to avoid adding LCL dependencies when using IBX, while still having the search
+	 paths set up correctly.
 
      You may find that in order for the IDE to recognise that ibexpressconsolemode
      exists, you have to first open the package in the IDE and then close it.
 
      Under Windows, the TISQLMonitor OnSQL Event Handler may require a new call to
 	 Application.ProcessMessages in order to display an event journal correctly. See
-	 example.
+	 example. This was previously called by TISQLMonitor itself but removed to avoid
+	 a GUI dependency.
 
-7.   SQL Parser can now accept quoted strings included new lines
+7.   SQL Parser can now accept quoted strings that include new lines
 
-8.   IBDynamicGrid: Lookup Cell Editor now positioned at end of text on start
-     of edit. This particularly useful when tabbing to a column and then
-     inserting text.
+8.   IBDynamicGrid: Lookup Cell Editor - the cursor is now positioned at end 
+	 of text on start of edit. This is particularly useful when tabbing to a 
+	 column and then inserting text.
 
-9.	 New Examples for Services and ISQLMonitor.
+9.	 New Examples provided for IB Services and ISQLMonitor.
 
 10. Fix error when writing to blob streams that recorded only the last buffer
     write in the blob stream. In most cases, this did not cause a problem as the
     IB Blob Stream is written in a single write. However, with the TDBImage, write
-    of a graphic type prefix was lost.
+    of a graphic type prefix was lost which caused a problem when the image could
+	not be automatically recognised.
 
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
