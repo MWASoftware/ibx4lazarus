@@ -27,7 +27,6 @@
       </Unit1>
       <Unit2>
         <Filename Value="../../runtime/IBSQLParser.pas"/>
-        <UnitName Value="IBSQLParser"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="254"/>
         <CursorPos Y="282"/>
@@ -66,8 +65,8 @@
       <Unit8>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="4"/>
-        <CursorPos X="65" Y="20"/>
+        <TopLine Value="28"/>
+        <CursorPos X="6" Y="49"/>
         <UsageCount Value="12"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit8>

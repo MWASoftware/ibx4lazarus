@@ -62,8 +62,8 @@
         <UnitName Value="MainForm"/>
         <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="210"/>
-        <CursorPos X="28" Y="227"/>
+        <TopLine Value="392"/>
+        <CursorPos X="3" Y="394"/>
         <UsageCount Value="113"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -71,12 +71,11 @@
       <Unit2>
         <Filename Value="../../runtime/IBSQLMonitor.pas"/>
         <UnitName Value="IBSQLMonitor"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="122"/>
         <CursorPos Y="146"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="SelectDeptDlgUnit.pas"/>
@@ -85,12 +84,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="SelectDeptDlgUnit"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="3" Y="35"/>
         <UsageCount Value="102"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit3.pas"/>
@@ -735,79 +732,58 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="MonitorFormUnit"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="19"/>
         <CursorPos Y="46"/>
         <UsageCount Value="20"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit96>
     </Units>
-    <JumpHistory Count="16" HistoryIndex="15">
+    <JumpHistory Count="11" HistoryIndex="10">
       <Position1>
-        <Filename Value="../../runtime/IBSQLMonitor.pas"/>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="362" Column="91" TopLine="343"/>
       </Position1>
       <Position2>
-        <Filename Value="../../runtime/IBSQLMonitor.pas"/>
-        <Caret Line="344" TopLine="321"/>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="137" Column="44" TopLine="109"/>
       </Position2>
       <Position3>
-        <Filename Value="../../runtime/IBSQLMonitor.pas"/>
-        <Caret Line="46" TopLine="46"/>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="137" Column="25" TopLine="124"/>
       </Position3>
       <Position4>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="362" Column="91" TopLine="343"/>
+        <Caret Line="213" Column="32" TopLine="209"/>
       </Position4>
       <Position5>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="137" Column="44" TopLine="109"/>
+        <Caret Line="224" Column="43" TopLine="198"/>
       </Position5>
       <Position6>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="137" Column="25" TopLine="124"/>
+        <Caret Line="213" TopLine="198"/>
       </Position6>
       <Position7>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="213" Column="32" TopLine="209"/>
+        <Caret Line="237" Column="19" TopLine="222"/>
       </Position7>
       <Position8>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="224" Column="43" TopLine="198"/>
+        <Caret Line="393" Column="8" TopLine="378"/>
       </Position8>
       <Position9>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="213" TopLine="198"/>
+        <Caret Line="149" Column="43" TopLine="134"/>
       </Position9>
       <Position10>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="237" Column="19" TopLine="222"/>
+        <Caret Line="394" Column="39" TopLine="378"/>
       </Position10>
       <Position11>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="393" Column="8" TopLine="378"/>
+        <Caret Line="227" Column="28" TopLine="210"/>
       </Position11>
-      <Position12>
-        <Filename Value="MainForm.pas"/>
-        <Caret Line="149" Column="43" TopLine="134"/>
-      </Position12>
-      <Position13>
-        <Filename Value="MonitorFormUnit.pas"/>
-        <Caret Line="22" Column="30" TopLine="11"/>
-      </Position13>
-      <Position14>
-        <Filename Value="MonitorFormUnit.pas"/>
-        <Caret Line="46" Column="16" TopLine="27"/>
-      </Position14>
-      <Position15>
-        <Filename Value="MonitorFormUnit.pas"/>
-        <Caret Line="22" Column="43" TopLine="19"/>
-      </Position15>
-      <Position16>
-        <Filename Value="MainForm.pas"/>
-        <Caret Line="394" Column="39" TopLine="378"/>
-      </Position16>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

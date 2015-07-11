@@ -1,4 +1,4 @@
-IBX Change Log  version  (1.3-1) Sat, 11 Jul 2015 08:37:51 +0100
+IBX Change Log  version   (1.3-1) Sat, 11 Jul 2015 10:18:17 +0100
 
 1.   OnCloseUp Event Handler added to TDBLookupProperties
 
@@ -22,16 +22,18 @@ IBX Change Log  version  (1.3-1) Sat, 11 Jul 2015 08:37:51 +0100
      GUI based. Instead, you should include the ibexpressconsolemode package.
 
      IMPORTANT NOTE: IBDialogs must be included in GUI applications in order 
-	 to use the built in dialogs and cursor management. IBDialogs is
+     to use the built in dialogs and cursor management. IBDialogs is
      included by default if "ibexpress" is in your project source "uses" clause.
      This should be the case for all projects created through the IDE. This is why
      you do not want to add the ibexpress package to console mode applications. The
      ibexpressconsolemode package has been created to allow console mode programs
-     to avoid adding LCL dependencies when using IBX, while still having the search
-	 paths set up correctly.
+     to avoid adding LCL dependencies when using IBX, while still having the
+     unit search paths set up correctly.
 
      You may find that in order for the IDE to recognise that ibexpressconsolemode
-     exists, you have to first open the package in the IDE and then close it.
+     exists, you have to first open the package in the IDE and then close it. This
+     adds it to the most recently accessed packages list. To make it permanently
+     available, add the package name to lazarus' staticpackages.inc file.
 
      Under Windows, the TISQLMonitor OnSQL Event Handler may require a new call to
 	 Application.ProcessMessages in order to display an event journal correctly. See
@@ -41,10 +43,10 @@ IBX Change Log  version  (1.3-1) Sat, 11 Jul 2015 08:37:51 +0100
 7.   SQL Parser can now accept quoted strings that include new lines
 
 8.   IBDynamicGrid: Lookup Cell Editor - the cursor is now positioned at end 
-	 of text on start of edit. This is particularly useful when tabbing to a 
-	 column and then inserting text.
+     of text on start of edit. This is particularly useful when tabbing to a
+     column and then inserting text.
 
-9.	 New Examples provided for IB Services and ISQLMonitor.
+9.   New Examples provided for IB Services and ISQLMonitor.
 
 10. Fix error when writing to blob streams that recorded only the last buffer
     write in the blob stream. In most cases, this did not cause a problem as the

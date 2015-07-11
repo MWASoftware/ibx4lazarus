@@ -14,8 +14,8 @@ program project1;
 
   2. The Database properties have to be set explicitly. This includes username
      and password. In the example, these are set from literals. You could update
-     this to (e.g.) parse the command line "ParamStr" set from command line
-     arguments. However, this is left as an exercise for the implementor.
+     this to (e.g.) parse the command line arguments from "ParamStr".
+     However, this is left as an exercise for the implementor.
 
   3. It's a good idea to have the application own the IBDatabase. This ensures that
      exceptions are routed through your application object's exception handler.
@@ -110,8 +110,8 @@ begin
     Exit;
   end;
 
-  { In console Mode the application must own the database
-    - ensures correct exception handling }
+  { In console Mode the application should own the database
+    - ensures centralised exception handling }
   FIBDatabase := TIBDatabase.Create(self);
   FIBTransaction := TIBTransaction.Create(self);
   FIBDatabase.DatabaseName := 'localhost:employee';
