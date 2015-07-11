@@ -4300,8 +4300,9 @@ begin
   TIBCustomDataSet(FField.DataSet).RecordModified(True);
   TBlobField(FField).Modified := true;
   result := FBlobStream.Write(Buffer, Count);
-  TIBCustomDataSet(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
-  FBlobStream.Seek(0,soFromEnd);
+{  TIBCustomDataSet(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
+  Removed as this caused a seek to beginning of the blob stream thus corrupting
+  the blob stream}
 end;
 
 { TIBGenerator }
