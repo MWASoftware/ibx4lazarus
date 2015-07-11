@@ -657,12 +657,15 @@ type
 
   { TIBDSBlobStream }
   TIBDSBlobStream = class(TStream)
+  private
+    FHasWritten: boolean;
   protected
     FField: TField;
     FBlobStream: TIBBlobStream;
   public
     constructor Create(AField: TField; ABlobStream: TIBBlobStream;
                        Mode: TBlobStreamMode);
+    destructor Destroy; override;
     function Read(var Buffer; Count: Longint): Longint; override;
     function Seek(Offset: Longint; Origin: Word): Longint; override;
     procedure SetSize(NewSize: Longint); override;
@@ -4278,6 +4281,13 @@ begin
     FBlobStream.Truncate;
 end;
 
+destructor TIBDSBlobStream.Destroy;
+begin
+  if FHasWritten then
+     TIBCustomDataSet(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
+  inherited Destroy;
+end;
+
 function TIBDSBlobStream.Read(var Buffer; Count: Longint): Longint;
 begin
   result := FBlobStream.Read(Buffer, Count);
@@ -4300,9 +4310,10 @@ begin
   TIBCustomDataSet(FField.DataSet).RecordModified(True);
   TBlobField(FField).Modified := true;
   result := FBlobStream.Write(Buffer, Count);
+  FHasWritten := true;
 {  TIBCustomDataSet(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
   Removed as this caused a seek to beginning of the blob stream thus corrupting
-  the blob stream}
+  the blob stream. Moved to the destructor i.e. called after blob written}
 end;
 
 { TIBGenerator }

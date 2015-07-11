@@ -381,6 +381,7 @@ end;
 
 procedure TIBLookupComboEditBox.HandleEnter(Data: PtrInt);
 begin
+  if AppDestroying in Application.Flags then Exit;
    SelectAll
 end;
 
