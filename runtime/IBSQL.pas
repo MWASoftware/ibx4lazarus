@@ -2159,7 +2159,7 @@ begin
   FSQLRecord := TIBXSQLDA.Create(self,daOutput);
   FSQLType := SQLUnknown;
   FParamCheck := True;
-  FCursor := Name + RandomString(8);
+  FCursor := HexStr(self); //Name + RandomString(8);
   if AOwner is TIBDatabase then
     Database := TIBDatabase(AOwner)
   else

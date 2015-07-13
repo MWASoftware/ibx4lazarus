@@ -54,6 +54,9 @@ IBX Change Log  version    (1.3-1) Sat, 11 Jul 2015 12:56:47 +0100
     of a graphic type prefix was lost which caused a problem when the image could
 	not be automatically recognised.
 
+11. Improve generation of random cursor names in TIBSQL - avoid risk of "cursor
+    already open" errors due to random numbers being identical.
+
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
 1.  Firebird Services: avoid List Index error when opening a service with an
