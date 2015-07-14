@@ -1,4 +1,4 @@
-IBX Change Log  version     (1.3-0) Tue, 14 Jul 2015 16:30:11 +0100
+IBX Change Log  version      (1.3-0) Tue, 14 Jul 2015 16:32:40 +0100
 
 1.   OnCloseUp Event Handler added to TDBLookupProperties
 
@@ -40,6 +40,8 @@ IBX Change Log  version     (1.3-0) Tue, 14 Jul 2015 16:30:11 +0100
 	 example. This was previously called by TISQLMonitor itself but removed to avoid
 	 a GUI dependency.
 
+	 Thansk to Julio Jiménez for suggesting support of console mode.
+
 7.   SQL Parser can now accept quoted strings that include new lines
 
 8.   IBDynamicGrid: Lookup Cell Editor - the cursor is now positioned at end 
@@ -59,7 +61,7 @@ IBX Change Log  version     (1.3-0) Tue, 14 Jul 2015 16:30:11 +0100
 
 12. IBTable: corrected error that could result in an "Index out of bounds" error
     when opening the table and the Primary Key is the last or only column in the
-    table.
+    table. Thanks to Rick Hoover for the fix.
 
 IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
