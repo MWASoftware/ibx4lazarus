@@ -34,7 +34,7 @@ implementation
 
 procedure TMonitorForm.IBSQLMonitor1SQL(EventText: String; EventTime: TDateTime);
 begin
-  Memo1.Lines.Add(DateTimeToStr(EventTime) + ': ' + EventText);
+  Memo1.Lines.Add(FormatDateTime('dd/mm/yyyy hh:nn:ss.zzzz',EventTime) + ': ' + EventText);
   {$IFDEF WINDOWS}
   Application.ProcessMessages;
   {$ENDIF}

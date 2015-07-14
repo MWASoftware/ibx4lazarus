@@ -4,7 +4,7 @@
     <Version Value="9"/>
     <General>
       <MainUnit Value="0"/>
-      <Title Value="IntegratedMonitoring"/>
+      <Title Value="Integrated Monitoring Example"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <Icon Value="0"/>
@@ -48,10 +48,12 @@
       <Unit0>
         <Filename Value="IntegratedMonitoring.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
         <WindowIndex Value="1"/>
         <CursorPos X="33" Y="10"/>
         <UsageCount Value="113"/>
+        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainForm.pas"/>
@@ -59,8 +61,6 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="MainForm"/>
-        <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <TopLine Value="392"/>
         <CursorPos X="3" Y="394"/>
@@ -70,7 +70,6 @@
       </Unit1>
       <Unit2>
         <Filename Value="../../runtime/IBSQLMonitor.pas"/>
-        <UnitName Value="IBSQLMonitor"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="122"/>
@@ -83,7 +82,6 @@
         <ComponentName Value="SelectDeptDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="SelectDeptDlgUnit"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="3" Y="35"/>
@@ -731,12 +729,13 @@
         <ComponentName Value="MonitorForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="MonitorFormUnit"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="19"/>
-        <CursorPos Y="46"/>
+        <TopLine Value="4"/>
+        <CursorPos X="59" Y="37"/>
         <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit96>
     </Units>
     <JumpHistory Count="11" HistoryIndex="10">

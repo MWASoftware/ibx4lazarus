@@ -11,7 +11,8 @@ uses
 
 {$R *.res}
 
-begin
+begin   Application.Title := 'Integrated Monitoring Example';
+
   Application.Initialize;
   Application.CreateForm(TForm1, Form1);
   Application.CreateForm(TSelectDeptDlg, SelectDeptDlg);
