@@ -51,8 +51,8 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="33" Y="10"/>
-        <UsageCount Value="113"/>
+        <CursorPos X="4" Y="20"/>
+        <UsageCount Value="114"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -62,9 +62,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="392"/>
+        <TopLine Value="390"/>
         <CursorPos X="3" Y="394"/>
-        <UsageCount Value="113"/>
+        <UsageCount Value="114"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -85,7 +85,7 @@
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="3" Y="35"/>
-        <UsageCount Value="102"/>
+        <UsageCount Value="103"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit3.pas"/>
@@ -152,11 +152,12 @@
       </Unit12>
       <Unit13>
         <Filename Value="../../runtime/IBSQL.pas"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="3"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="2289"/>
-        <CursorPos Y="2296"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="2324"/>
+        <CursorPos X="69" Y="2325"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit13>
       <Unit14>
         <Filename Value="/usr/share/fpcsrc/2.4.2/rtl/inc/systemh.inc"/>
@@ -733,7 +734,7 @@
         <WindowIndex Value="1"/>
         <TopLine Value="4"/>
         <CursorPos X="59" Y="37"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit96>
