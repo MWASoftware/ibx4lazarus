@@ -2809,7 +2809,7 @@ end;
    for i := 0 to Length(FAliasNameMap) - 1 do
        if FAliasNameMap[i] = aliasName then
        begin
-         Result := FieldDefs[i+1];
+         Result := FieldDefs[i];
          Exit
        end;
  end;
