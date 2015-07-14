@@ -2311,6 +2311,8 @@ begin
       FBOF := True;
       FEOF := False;
       FRecordCount := 0;
+      if not (csDesigning in ComponentState) then
+        MonitorHook.SQLExecute(Self);
       if FGoToFirstRecordOnExecute then
         Next;
     end;
@@ -2321,6 +2323,8 @@ begin
                             Database.SQLDialect,
                             FSQLParams.AsXSQLDA,
                             FSQLRecord.AsXSQLDA), True);
+      if not (csDesigning in ComponentState) then
+        MonitorHook.SQLExecute(Self);
 (*      if (fetch_res <> 0) and (fetch_res <> isc_deadlock) then
       begin
          { Sometimes a prepared stored procedure appears to get
@@ -2344,9 +2348,9 @@ begin
                            @FHandle,
                            Database.SQLDialect,
                            FSQLParams.AsXSQLDA), True);
+      if not (csDesigning in ComponentState) then
+        MonitorHook.SQLExecute(Self);
   end;
-  if not (csDesigning in ComponentState) then
-    MonitorHook.SQLExecute(Self);
   FBase.DoAfterExecQuery(self);
 //  writeln('Rows Affected = ',RowsAffected);
 end;
