@@ -44,16 +44,14 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="97">
+    <Units Count="99">
       <Unit0>
         <Filename Value="IntegratedMonitoring.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="4" Y="20"/>
-        <UsageCount Value="114"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="116"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainForm.pas"/>
@@ -61,10 +59,11 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <TopLine Value="390"/>
         <CursorPos X="3" Y="394"/>
-        <UsageCount Value="114"/>
+        <UsageCount Value="116"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -72,7 +71,7 @@
         <Filename Value="../../runtime/IBSQLMonitor.pas"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="122"/>
+        <TopLine Value="48"/>
         <CursorPos Y="146"/>
         <UsageCount Value="10"/>
       </Unit2>
@@ -85,7 +84,7 @@
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="3" Y="35"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="105"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit3.pas"/>
@@ -116,8 +115,8 @@
         <Filename Value="../../runtime/IBDatabase.pas"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="28"/>
-        <CursorPos X="9" Y="45"/>
+        <TopLine Value="821"/>
+        <CursorPos X="18" Y="828"/>
         <UsageCount Value="15"/>
       </Unit7>
       <Unit8>
@@ -152,12 +151,11 @@
       </Unit12>
       <Unit13>
         <Filename Value="../../runtime/IBSQL.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="2324"/>
-        <CursorPos X="69" Y="2325"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
+        <TopLine Value="310"/>
+        <CursorPos X="3" Y="328"/>
+        <UsageCount Value="12"/>
       </Unit13>
       <Unit14>
         <Filename Value="/usr/share/fpcsrc/2.4.2/rtl/inc/systemh.inc"/>
@@ -730,14 +728,26 @@
         <ComponentName Value="MonitorForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="4"/>
+        <TopLine Value="6"/>
         <CursorPos X="59" Y="37"/>
-        <UsageCount Value="21"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
+        <UsageCount Value="23"/>
       </Unit96>
+      <Unit97>
+        <Filename Value="../../runtime/IBXConst.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="28"/>
+        <UsageCount Value="10"/>
+      </Unit97>
+      <Unit98>
+        <Filename Value="../../runtime/winipc.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="13"/>
+        <UsageCount Value="10"/>
+      </Unit98>
     </Units>
     <JumpHistory Count="11" HistoryIndex="10">
       <Position1>
