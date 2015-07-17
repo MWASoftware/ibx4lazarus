@@ -500,7 +500,7 @@ begin
     LoginPrompt := false;
   {$ifdef UNIX}
   if csDesigning in ComponentState then
-    FDBParams.Add('lc_ctype=UTF-8');
+    FDBParams.Add('lc_ctype=UTF8');
   {$else}
   {$ifdef WINDOWS}
   if csDesigning in ComponentState then
