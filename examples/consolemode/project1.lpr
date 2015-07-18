@@ -117,7 +117,7 @@ begin
   FIBDatabase.DatabaseName := 'localhost:employee';
   FIBDatabase.Params.Add('user_name=SYSDBA'); {You may have to modify this!}
   FIBDatabase.Params.Add('password=masterkey');  {You may have to modify this!}
-  FIBDatabase.Params.Add('lc_ctype=UTF-8');
+  FIBDatabase.Params.Add('lc_ctype=UTF8');
   FIBTransaction.DefaultDatabase := FIBDatabase;
   DoQuery;
 
@@ -148,7 +148,9 @@ begin
   Application:=TMyApplication.Create(nil);
   Application.Title:='IBX In Console Mode';
   Application.Run;
-  Sleep(1000);
+  {$IFDEF WINDOWS}
+  Sleep(1000); {Gives a chance to see the program output}
+  {$ENDIF}
   Application.Free;
 end.
 

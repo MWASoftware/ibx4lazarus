@@ -17,7 +17,6 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
         <CursorPos X="49" Y="17"/>
         <UsageCount Value="75"/>
