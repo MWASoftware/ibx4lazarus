@@ -2,7 +2,7 @@
 <CONFIG>
   <Package Version="4">
     <Name Value="dclibx"/>
-    <AddToProjectUsesSection Value="True"/>
+    <Type Value="DesignTime"/>
     <Author Value="Various"/>
     <CompilerOptions>
       <Version Value="11"/>
@@ -17,9 +17,6 @@
           <UseAnsiStrings Value="False"/>
         </SyntaxOptions>
       </Parsing>
-      <Other>
-        <CompilerPath Value="$(CompPath)"/>
-      </Other>
     </CompilerOptions>
     <Description Value="   Borland Delphi Visual Component Library  
    InterBase Express core components
@@ -217,7 +214,6 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <UnitName Value="dbFieldListPropEditor"/>
       </Item15>
     </Files>
-    <Type Value="DesignTime"/>
     <RequiredPkgs Count="5">
       <Item1>
         <PackageName Value="ibcontrols"/>
