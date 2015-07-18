@@ -1,4 +1,4 @@
-IBX Change Log  version      (1.3-0) Tue, 14 Jul 2015 16:32:40 +0100
+IBX Change Log  version      (1.3-1) Tue, 14 Jul 2015 16:32:40 +0100
 
 1.   OnCloseUp Event Handler added to TDBLookupProperties
 
@@ -13,34 +13,32 @@ IBX Change Log  version      (1.3-0) Tue, 14 Jul 2015 16:32:40 +0100
 5.   IBLookupComboEditBox: Ensure that KeyValue is set correctly when full text
      keyed in i.e. when autocomplete not performed
 
-6.   Cleanup of "Uses" clauses and console mode support. IBX should now support
-     console mode applications with all LCL required functions centralised in the
-     IBDialogs unit. As long as "IBDialogs" is not included in your project, IBX
-     should compile and link with a console mode program. See consolemode example
-     for further guidence. DO NOT add the ibexpress package to a console mode
-     application or the IDE will automatically assume that you application is
-     GUI based. Instead, you should include the ibexpressconsolemode package.
+6.   Cleanup of "Uses" clauses and add console mode support. IBX should now support
+     console mode applications with all LCL required functions (builtin dialogs and
+     cursor management) centralised in the  IBDialogs unit. As long as "IBDialogs" is 
+     not included in your project, IBX should compile and link with a console mode program. 
+     See consolemode example and its "readme"for further guidence. DO NOT add the ibexpress package to a 
+     console mode application or the IDE will automatically assume that your 
+     application is GUI based. Instead, you should include the ibexpressconsolemode package.
 
      IMPORTANT NOTE: IBDialogs must be included in GUI applications in order 
      to use the built in dialogs and cursor management. IBDialogs is
-     included by default if "ibexpress" is in your project source "uses" clause.
+     included by default if "ibexpress" is in your project source's "uses" clause.
      This should be the case for all projects created through the IDE. This is why
      you do not want to add the ibexpress package to console mode applications. The
      ibexpressconsolemode package has been created to allow console mode programs
      to avoid adding LCL dependencies when using IBX, while still having the
      unit search paths set up correctly.
 
+     Existing users should check to ensure that the "ibexpress" unit is included in
+     each project's source file (*.lpr).
+
      You may find that in order for the IDE to recognise that ibexpressconsolemode
      exists, you have to first open the package in the IDE and then close it. This
      adds it to the most recently accessed packages list. To make it permanently
      available, add the package name to lazarus' staticpackages.inc file.
 
-     Under Windows, the TISQLMonitor OnSQL Event Handler may require a new call to
-	 Application.ProcessMessages in order to display an event journal correctly. See
-	 example. This was previously called by TISQLMonitor itself but removed to avoid
-	 a GUI dependency.
-
-	 Thansk to Julio Jiménez for suggesting support of console mode.
+	 Thanks to Julio Jiménez for suggesting support of console mode.
 
 7.   SQL Parser can now accept quoted strings that include new lines
 
@@ -57,7 +55,7 @@ IBX Change Log  version      (1.3-0) Tue, 14 Jul 2015 16:32:40 +0100
 	not be automatically recognised.
 
 11. Improve generation of random cursor names in TIBSQL - avoid risk of "cursor
-    already open" errors due to random numbers being identical.
+    already open" errors due to random numbers used for the cursor name being identical.
 
 12. IBTable: corrected error that could result in an "Index out of bounds" error
     when opening the table and the Primary Key is the last or only column in the
@@ -67,7 +65,7 @@ IBX Change Log  version      (1.3-0) Tue, 14 Jul 2015 16:32:40 +0100
     of "UTF-8", and update list of available database character sets. Existing
     users should check the current lc_ctype setting in their applications.
 
-IBX Change Log  version                                                              (1.2-4) Sat, 09 May 2015 12:38:29 +0100
+IBX Change Log  version  (1.2-4) Sat, 09 May 2015 12:38:29 +0100
 
 1.  Firebird Services: avoid List Index error when opening a service with an
     empty Params property.
@@ -94,7 +92,7 @@ IBX Change Log  version                                                         
     in order to remove the property value from the lfm.
 
 
-IBX Change Log  version                                                          (1.2-3) Tue, 14 Apr 2015 14:11:17 +0100
+IBX Change Log  version (1.2-3) Tue, 14 Apr 2015 14:11:17 +0100
 
 1.  TIBStoredProc. Prepare now called by ParamByName to avoid need to always
     call Prepare before setting parameter values.
@@ -179,7 +177,7 @@ IBX Change Log  version                                                         
     and password should be omitted and the unix file permissions are used to grant
     access.
 
-IBX Change Log  version                                                    (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
+IBX Change Log  version  (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
 
 1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 
     rather than a clone for the Delphi TDBCrtlGrid. TDBControlGrid is a single column grid 
@@ -201,11 +199,11 @@ IBX Change Log  version                                                    (1.2-
 4. Experimental support for the Firebird 3 SQL_BOOLEAN type has been added while still
    using the legacy Firebird API. Thanks to Gabor Boros for helping to test this feature.
 
-IBX Change Log  version                                                   (1.2-1) Fri, 13 Mar 2015 11:14:15 +0000
+IBX Change Log  version      (1.2-1) Fri, 13 Mar 2015 11:14:15 +0000
 
 Development version only.
 
-IBX Change Log  version                                      (1.2-0) Thu, 26 Feb 2015 10:34:04 +0000
+IBX Change Log  version   (1.2-0) Thu, 26 Feb 2015 10:34:04 +0000
 
 1. An internal select SQL Parser is now available for TIBCustomDataset descendents.
    This is typically used during an "OnBeforeOpen" event handler to manipulate the
@@ -265,7 +263,7 @@ IBX Change Log  version                                      (1.2-0) Thu, 26 Feb
 8. Three new examples illustrate the use of the new IB Controls
 
 
-IBX Change Log  version                      (1.1-0) Mon, 07 Jul 2014 14:01:07 +0100
+IBX Change Log  version  (1.1-0) Mon, 07 Jul 2014 14:01:07 +0100
 
 1. TIBXSQLVAR code clean up and optimisation to improve client side "prepare" and parameter
    setting performance. See "readme.field+param.names in the doc folder.(Thanks to
