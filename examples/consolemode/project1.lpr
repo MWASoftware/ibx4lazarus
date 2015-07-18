@@ -148,6 +148,7 @@ begin
   Application:=TMyApplication.Create(nil);
   Application.Title:='IBX In Console Mode';
   Application.Run;
+  Sleep(1000);
   Application.Free;
 end.
 
