@@ -547,7 +547,7 @@ begin
       Exit; {ignore these keys if we are in a  combobox}
 
     if (AControl <> nil) and (AControl is TCustomMemo)
-                         and (Key = VK_RETURN) then Exit; {Ignore Return in a CustomMemo}
+                         and (Key in [VK_RETURN,VK_UP,VK_DOWN]) then Exit; {Ignore Return in a CustomMemo}
     if assigned(FOnKeyDownHander) then
       OnKeyDownHander(Sender,Key,Shift,Done);
     if Done then Exit;
