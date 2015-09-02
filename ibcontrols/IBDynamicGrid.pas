@@ -94,6 +94,7 @@ type
     FOnCloseUp: TNotifyEvent;
     FOnDrawItem: TDrawItemEvent;
     FOwner: TIBDynamicGridColumn;
+    FOwnerDrawEditable: boolean;
     FRelationName: string;
     FStyle: TComboBoxStyle;
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
@@ -114,6 +115,7 @@ type
                            read GetAutoCompleteText write SetAutoCompleteText
                            default DefaultComboBoxAutoCompleteText;
     property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
+    property OwnerDrawEditable: boolean read FOwnerDrawEditable write FOwnerDrawEditable;
     property RelationName: string read FRelationName write FRelationName;
     property Style: TComboBoxStyle read FStyle write FStyle default csDropDown;
     property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
@@ -838,6 +840,7 @@ begin
     Editor.Style := Style;
     Editor.ItemHeight := ItemHeight;
     Editor.ItemWidth := ItemWidth;
+    Editor.OwnerDrawEditable := OwnerDrawEditable;
     Editor.RelationName := RelationName;
     Editor.OnAutoInsert := OnAutoInsert;
     Editor.OnCanAutoInsert := OnCanAutoInsert;
