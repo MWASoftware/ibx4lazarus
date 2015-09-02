@@ -2,7 +2,8 @@ IBX Change Log  version        (1.3-2) tba, 18 Jul 2015 13:30:50 +0100
 
 1. DBControlGrid,IBDynamicGrid: Ignore down arrow and up arrow in TCustomMemo
 
-2. IBLookupComboEditBox: Expose new LCL Property OwnerDrawEditable
+2. IBLookupComboEditBox: Expose new LCL Property OwnerDrawEditable.
+   Requires: http://bugs.freepascal.org/view.php?id=27807
 
 IBX Change Log  version        (1.3-1) Sat, 18 Jul 2015 13:30:50 +0100
 
