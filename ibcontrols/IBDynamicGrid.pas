@@ -363,34 +363,40 @@ begin
   FResizing := true;
   try
     ColSum := 0;
-    for I := 0 to  ColCount - 1 do
-       ColSum := ColSum + ColWidths[I];
 
-    if Colsum <> ClientWidth then
+    if (Columns.Count = 1) and TDBDynamicGridColumn(Columns[0]).AutoSizeColumn then
+      Columns[0].Width := ClientWidth
+    else
     begin
-      ResizeColCount := 0;
-      for I := 0 to Columns.Count -1 do
-        if TDBDynamicGridColumn(Columns[I]).AutoSizeColumn then
-        begin
-          Inc(ResizeColCount);
-          Colsum := Colsum + TDBDynamicGridColumn(Columns[I]).DesignWidth - Columns[I].Width;
-          Columns[I].Width := TDBDynamicGridColumn(Columns[I]).DesignWidth;
-        end;
+      for I := 0 to  ColCount - 1 do
+         ColSum := ColSum + ColWidths[I];
 
-        if (Colsum < ClientWidth) and (ResizeColCount > 0) then
-        begin
-          adjustment := (ClientWidth - ColSum) div ResizeColCount;
-          n := (ClientWidth - ColSum) mod ResizeColCount;
+      if Colsum <> ClientWidth then
+      begin
+        ResizeColCount := 0;
+        for I := 0 to Columns.Count -1 do
+          if TDBDynamicGridColumn(Columns[I]).AutoSizeColumn then
+          begin
+            Inc(ResizeColCount);
+            Colsum := Colsum + TDBDynamicGridColumn(Columns[I]).DesignWidth - Columns[I].Width;
+            Columns[I].Width := TDBDynamicGridColumn(Columns[I]).DesignWidth;
+          end;
 
-          for I := 0 to Columns.Count -1 do
-            if TDBDynamicGridColumn(Columns[I]).AutoSizeColumn then
-            begin
-              if I = 0 then
-                Columns[I].Width := Columns[I].Width + adjustment + n
-              else
-                Columns[I].Width := Columns[I].Width + adjustment;
-            end;
-        end;
+          if (Colsum < ClientWidth) and (ResizeColCount > 0) then
+          begin
+            adjustment := (ClientWidth - ColSum) div ResizeColCount;
+            n := (ClientWidth - ColSum) mod ResizeColCount;
+
+            for I := 0 to Columns.Count -1 do
+              if TDBDynamicGridColumn(Columns[I]).AutoSizeColumn then
+              begin
+                if I = 0 then
+                  Columns[I].Width := Columns[I].Width + adjustment + n
+                else
+                  Columns[I].Width := Columns[I].Width + adjustment;
+              end;
+          end;
+      end;
     end;
     PositionTotals;
     UpdateEditorPanelBounds;
@@ -606,7 +612,8 @@ begin
   inherited Loaded;
   if assigned(FEditorPanel) and not (csDesigning in ComponentState)then
     FEditorPanel.Visible := false;
-  DoGridResize
+  if Visible then
+    DoGridResize
 end;
 
 procedure TDBDynamicGrid.DoOnResize;
