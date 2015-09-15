@@ -487,12 +487,13 @@ begin
     SelectAll;
   end
   else
-  if (IsEditableTextKey(Key) or (Key = VK_BACK))
-     and AutoComplete and (Style <> csDropDownList) and
-     (not (cbactEndOfLineComplete in AutoCompleteText) or (SelStart = UTF8Length(Text))) then
-    FTimer.Interval := FKeyPressInterval
-  else
+  begin
     FTimer.Interval := 0;
+    if (IsEditableTextKey(Key) or (Key = VK_BACK))
+       and AutoComplete and (Style <> csDropDownList) and
+       (not (cbactEndOfLineComplete in AutoCompleteText) or (SelStart = UTF8Length(Text))) then
+      FTimer.Interval := FKeyPressInterval;
+  end;
 end;
 
 procedure TIBLookupComboEditBox.Loaded;
