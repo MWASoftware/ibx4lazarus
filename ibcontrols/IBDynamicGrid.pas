@@ -992,12 +992,13 @@ begin
     begin
       if (FLastColIndex < 0) or (FLastColIndex >= Columns.Count) then Exit;
       FieldPosition := Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
-      if FieldPosition = 0 then Exit;
-
-      if Descending then
-        Parser.OrderByClause := IntToStr(FieldPosition) + ' desc'
-      else
-        Parser.OrderByClause := IntToStr(FieldPosition) + ' asc';
+      if FieldPosition > 0 then
+      begin
+        if Descending then
+          Parser.OrderByClause := IntToStr(FieldPosition) + ' desc'
+        else
+          Parser.OrderByClause := IntToStr(FieldPosition) + ' asc';
+      end;
 
       if assigned(FOnUpdateSortOrder) then
       begin
