@@ -12,6 +12,13 @@ IBX Change Log  version        (1.3-2) tba, 18 Jul 2015 13:30:50 +0100
 5. IBDynamicGrid: Call event OnUpdateSortOrder even when aliasname not found in dataset
    i.e. when it is a calculated field
 
+6. IBDynamicGrid: Fix problem selecting a different row when expanded row at end of grid.
+   This problem was due to a race condition between recalculating row heights and
+   determining which row was selected by the mouse click. The row height calculation
+   is now deferred by an extra trip round the message loop allowing the row to
+   be always calculated on the current grid layout rather than risking it being
+   calculated on the grid layout after the expanded row has been shrunk.
+
 IBX Change Log  version        (1.3-1) Sat, 18 Jul 2015 13:30:50 +0100
 
 1.   OnCloseUp Event Handler added to TDBLookupProperties

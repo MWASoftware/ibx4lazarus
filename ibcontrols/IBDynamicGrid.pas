@@ -185,6 +185,7 @@ end;
     procedure DoShowEditorPanel(Data: PtrInt);
     procedure PositionTotals;
     procedure KeyDownHandler(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure PerformEditorHide(Data: PtrInt);
     procedure SetEditorPanel(AValue: TWinControl);
   protected
     procedure ChangeBounds(ALeft, ATop, AWidth, AHeight: integer; KeepBase: boolean); override;
@@ -410,15 +411,8 @@ begin
   inherited DoEditorHide;
   if Editor = FEditorPanel then
   begin
-    if (FExpandedRow >= 0) and (FExpandedRow < RowCount) then
-      RowHeights[FExpandedRow] := DefaultRowHeight;
+    Application.QueueAsyncCall(@PerformEditorHide,FExpandedRow);
     FExpandedRow := -1;
-    if CanFocus then SetFocus;
-    DoOnResize;
-    ResetSizes;
-    DoOnChangeBounds;
-    if assigned(FOnEditorPanelHide) then
-       OnEditorPanelHide(self);
   end;
 end;
 
@@ -576,6 +570,21 @@ begin
     if Key = VK_F2 then
        HideEditorPanel;
   end
+end;
+
+procedure TDBDynamicGrid.PerformEditorHide(Data: PtrInt);
+var ExpandedRow: integer;
+begin
+  if AppDestroying in Application.Flags then Exit;
+  ExpandedRow := integer(Data);
+  if (ExpandedRow >= 0) and (ExpandedRow < RowCount) then
+    RowHeights[ExpandedRow] := DefaultRowHeight;
+  if CanFocus then SetFocus;
+  DoOnResize;
+  ResetSizes;
+  DoOnChangeBounds;
+  if assigned(FOnEditorPanelHide) then
+     OnEditorPanelHide(self);
 end;
 
 procedure TDBDynamicGrid.SetEditorPanel(AValue: TWinControl);
