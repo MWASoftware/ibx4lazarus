@@ -181,6 +181,7 @@ end;
     FWeHaveFocus: boolean;
     FHidingEditorPanel: boolean;
     FAllowHide: boolean;
+    FMouseDown: boolean;
     function ActiveControl: TControl;
     procedure DoShowEditorPanel(Data: PtrInt);
     procedure PositionTotals;
@@ -411,7 +412,10 @@ begin
   inherited DoEditorHide;
   if Editor = FEditorPanel then
   begin
-    Application.QueueAsyncCall(@PerformEditorHide,FExpandedRow);
+    if FMouseDown then
+      Application.QueueAsyncCall(@PerformEditorHide,FExpandedRow)
+    else
+      PerformEditorHide(FExpandedRow);
     FExpandedRow := -1;
   end;
 end;
@@ -646,7 +650,12 @@ procedure TDBDynamicGrid.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 var Coord: TGridCoord;
 begin
-  inherited MouseDown(Button, Shift, X, Y);
+  FMouseDown := true;
+  try
+    inherited MouseDown(Button, Shift, X, Y);
+  finally
+    FMouseDown := false;
+  end;
 
   Coord := MouseCoord(X,Y);
   if (Coord.X = 0) and (Coord.Y > 0) then
