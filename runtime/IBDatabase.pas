@@ -1022,7 +1022,7 @@ begin
   try
    TempDBParams.Assign(FDBParams);
    aDBName := FDBName;
-   {Opportuning to override defaults}
+   {Opportunity to override defaults}
    for i := 0 to FSQLObjects.Count - 1 do
    begin
        if FSQLObjects[i] <> nil then
