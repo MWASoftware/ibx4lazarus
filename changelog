@@ -16,6 +16,9 @@ IBX Change Log  version        (1.3-2) tba, 18 Jul 2015 13:30:50 +0100
    be always calculated on the current grid layout rather than risking it being
    calculated on the grid layout after the expanded row has been shrunk.
 
+6. IBLookupComboEditBox: avoid race condition between cm_killfocus and cm_exit on
+   Windows.
+
 IBX Change Log  version        (1.3-1) Sat, 18 Jul 2015 13:30:50 +0100
 
 1.   OnCloseUp Event Handler added to TDBLookupProperties

@@ -92,6 +92,7 @@ type
     FUpdating: boolean;
     FInserting: boolean;
     FExiting: boolean;
+    FInCheckAndInsert: boolean;
     FLastKeyValue: variant;
     procedure DoActiveChanged(Data: PtrInt);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
@@ -395,57 +396,63 @@ procedure TIBLookupComboEditBox.CheckAndInsert;
 var Accept: boolean;
     NewKeyValue: variant;
 begin
-  if AutoInsert and (Text <> '') and assigned(ListSource) and assigned(ListSource.DataSet)
-     and ListSource.DataSet.Active and (ListSource.DataSet.RecordCount = 0) then
+  if FInCheckAndInsert then Exit;
+  FInCheckAndInsert := true;
   try
-    {Is it OK to insert a new list member?}
-    Accept := true;
-    if assigned(FOnCanAutoInsert) then
-       OnCanAutoInsert(self,Text,Accept);
-    if not Accept then
-    begin
-      ResetParser;
-      Text := FOriginalTextValue;
-      SelectAll;
-      Exit;
-    end;
+       if AutoInsert and (Text <> '') and assigned(ListSource) and assigned(ListSource.DataSet)
+          and ListSource.DataSet.Active and (ListSource.DataSet.RecordCount = 0) then
+       try
+         {Is it OK to insert a new list member?}
+         Accept := true;
+         if assigned(FOnCanAutoInsert) then
+            OnCanAutoInsert(self,Text,Accept);
+         if not Accept then
+         begin
+           ResetParser;
+           Text := FOriginalTextValue;
+           SelectAll;
+           Exit;
+         end;
 
-    FInserting := true;
-    try
-      {New Value}
-      FFiltered := false;
-      if assigned(FOnAutoInsert) then
-      begin
-        {In an OnAutoInsert handler, the client is expected to insert the new
-         row into the List DataSet and to set the KeyValue property to the
-         value of the primary key of the new row.}
-        OnAutoInsert(self,Text,NewKeyValue);
-      end
-      else
-      begin
-        ListSource.DataSet.Append;
-        {The new KeyValue should be determined by an external generator or
-         in the "OnInsert" handler. If it is the same as the ListField, then
-         it will be set from the UpdateLinkData method}
-        try
-          ListSource.DataSet.Post;
-        except
-          ListSource.DataSet.Cancel;
-          raise;
-        end;
-        NewKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
-      end;
-      Text := ''; {Ensure full list}
-      UpdateList;
-      KeyValue := NewKeyValue;
-      UpdateData(nil); {Force sync with DataField}
-    finally
-      FInserting := false
-    end;
-  except
-    Text := FOriginalTextValue;
-    ResetParser;
-    raise;
+         FInserting := true;
+         try
+           {New Value}
+           FFiltered := false;
+           if assigned(FOnAutoInsert) then
+           begin
+             {In an OnAutoInsert handler, the client is expected to insert the new
+              row into the List DataSet and to set the KeyValue property to the
+              value of the primary key of the new row.}
+             OnAutoInsert(self,Text,NewKeyValue);
+           end
+           else
+           begin
+             ListSource.DataSet.Append;
+             {The new KeyValue should be determined by an external generator or
+              in the "OnInsert" handler. If it is the same as the ListField, then
+              it will be set from the UpdateLinkData method}
+             try
+               ListSource.DataSet.Post;
+             except
+               ListSource.DataSet.Cancel;
+               raise;
+             end;
+             NewKeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
+           end;
+           Text := ''; {Ensure full list}
+           UpdateList;
+           KeyValue := NewKeyValue;
+           UpdateData(nil); {Force sync with DataField}
+         finally
+           FInserting := false
+         end;
+       except
+         Text := FOriginalTextValue;
+         ResetParser;
+         raise;
+       end;
+  finally
+    FInCheckAndInsert := false
   end;
 end;
 
