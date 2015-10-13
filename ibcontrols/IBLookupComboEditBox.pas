@@ -135,7 +135,6 @@ type
     property ItemWidth;
     property ListSource: TDataSource read GetListSource write SetListSource;
     property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 200;
-    property OwnerDrawEditable;
     property RelationName: string read FRelationName write FRelationName;
     property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
     property OnCanAutoInsert: TCanAutoInsert read FOnCanAutoInsert write FOnCanAutoInsert;
