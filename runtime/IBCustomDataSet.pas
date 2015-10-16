@@ -120,16 +120,19 @@ type
 
   TIBStringField = class(TStringField)
   private
-    FInitialised: boolean;
+    FCharacterSetName: string;
+    FCharacterSetSize: integer;
   protected
-    procedure SetSize(AValue: Integer); override;
+    function GetDefaultWidth: Longint; override;
   public
-    constructor create(AOwner: TComponent); override;
+    constructor Create(aOwner: TComponent); override;
     class procedure CheckTypeSize(Value: Integer); override;
     function GetAsString: string; override;
     function GetAsVariant: Variant; override;
     function GetValue(var Value: string): Boolean;
     procedure SetAsString(const Value: string); override;
+    property CharacterSetName: string read FCharacterSetName write FCharacterSetName;
+    property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
   end;
 
   { TIBBCDField }
@@ -158,6 +161,8 @@ type
 
    TIBMemoField = class(TMemoField)
    private
+     FCharacterSetName: string;
+     FCharacterSetSize: integer;
      FTruncatedDisplayText: boolean;
      function GetTruncatedText: string;
    protected
@@ -165,7 +170,9 @@ type
      procedure GetText(var AText: string; ADisplayText: Boolean); override;
    public
      constructor Create(AOwner: TComponent); override;
-   published
+     property CharacterSetName: string read FCharacterSetName write FCharacterSetName;
+     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
+  published
      property TruncatedDisplayText: boolean read FTruncatedDisplayText
                                             write FTruncatedDisplayText default true;
    end;
@@ -708,7 +715,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     TVarBytesField,     { ftVarBytes }
     TAutoIncField,      { ftAutoInc }
     TBlobField,         { ftBlob }
-    TMemoField,         { ftMemo }
+    TIBMemoField,       { ftMemo }
     TGraphicField,      { ftGraphic }
     TBlobField,         { ftFmtMemo }
     TBlobField,         { ftParadoxOle }
@@ -748,7 +755,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
 
 implementation
 
-uses IBIntf, Variants, FmtBCD;
+uses IBIntf, Variants, FmtBCD, LCLProc, LazUTF8;
 
 const FILE_BEGIN = 0;
       FILE_CURRENT = 1;
@@ -771,45 +778,41 @@ type
     NextRelation : TRelationNode;
   end;
 
+  {Extended Field Def for character set info}
+
+  { TIBFieldDef }
+
+  TIBFieldDef = class(TFieldDef)
+  private
+    FCharacterSetName: string;
+    FCharacterSetSize: integer;
+  published
+    property CharacterSetName: string read FCharacterSetName write FCharacterSetName;
+    property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
+  end;
+
 { TIBMemoField }
 
 function TIBMemoField.GetTruncatedText: string;
-var S: TStream;
-    Len: integer;
-    i: integer;
 begin
-   S := Dataset.CreateBlobStream(Self,bmRead);
-   if S <> nil then
-   try
-     Len := DisplayWidth + 1;
-     SetLength(Result, Len);
-     if Len > 0 then
-     begin
-       S.ReadBuffer(Result[1], Len+1);
-       if Length(Result) = Len + 1 then {Show truncation with elipses}
-       begin
-         system.Delete(Result,Len,1);
-         Result[Len] := '.';
-         Result[Len-1] := '.';
-         Result[Len-2] := '.';
+   Result := GetAsString;
+   if Result <> '' then
+   begin
+       case CharacterSetSize of
+       1:
+         if Length(Result) > DisplayWidth then {Show truncation with elipses}
+           Result := TextToSingleLine(system.copy(Result,1,DisplayWidth)) + '...';
+
+       2:
+         if Length(Result) > DisplayWidth*2  then {Show truncation with elipses}
+           Result := system.copy(Result,1,DisplayWidth*2)+ #$002E + #$002E+ #$002E;
+
+       3, {Assume UNICODE_FSS is really UTF8}
+       4:
+         if UTF8Length(Result) > DisplayWidth then {Show truncation with elipses}
+           Result := ValidUTF8String(TextToSingleLine(UTF8Copy(Result,1,DisplayWidth))) + '...';
        end;
-       {Replace Line Feeds}
-       repeat
-         i := Pos(#$0A,Result);
-         if i = 0 then break;
-         Result[i] := ' ';
-       until false;
-       {Replace Carriage Returns}
-       repeat
-         i := Pos(#$0D,Result);
-         if i = 0 then break;
-         Result[i] := ' ';
-       until false;
-     end;
-   finally
    end
-   else
-     Result := '';
 end;
 
 function TIBMemoField.GetDefaultWidth: Longint;
@@ -867,9 +870,15 @@ end;
 
 { TIBStringField}
 
-constructor TIBStringField.create(AOwner: TComponent);
+function TIBStringField.GetDefaultWidth: Longint;
 begin
-  inherited Create(AOwner);
+  Result := Size div CharacterSetSize;
+end;
+
+constructor TIBStringField.Create(aOwner: TComponent);
+begin
+  inherited Create(aOwner);
+  FCharacterSetSize := 1;
 end;
 
 class procedure TIBStringField.CheckTypeSize(Value: Integer);
@@ -924,22 +933,6 @@ begin
   end;
 end;
 
-procedure TIBStringField.SetSize(AValue: Integer);
-var FieldSize: integer;
-begin
-  if csLoading in ComponentState then
-    FInitialised := true;
-  if FInitialised then
-    inherited SetSize(AValue)
-  else
-  begin
-    {IBCustomDataSet encodes the CharWidth size in the size}
-    FieldSize := AValue div 4;
-    inherited SetSize(FieldSize);
-    DisplayWidth := FieldSize div ((AValue mod 4) + 1);
-    FInitialised := true;
-  end;
-end;
 
 { TIBBCDField }
 
@@ -3234,7 +3227,9 @@ const
 var
   FieldType: TFieldType;
   FieldSize: Word;
+  charSetID: short;
   CharSetSize: integer;
+  CharSetName: string;
   FieldNullable : Boolean;
   i, FieldPosition, FieldPrecision: Integer;
   FieldAliasName, DBAliasName: string;
@@ -3365,14 +3360,17 @@ begin
         FieldSize := 0;
         FieldPrecision := 0;
         FieldNullable := SourceQuery.Current[i].IsNullable;
+        CharSetSize := 0;
+        CharSetName := '';
         case sqltype and not 1 of
           { All VARCHAR's must be converted to strings before recording
            their values }
           SQL_VARYING, SQL_TEXT:
           begin
             CharSetSize := FBase.GetCharSetSize(sqlsubtype and $FF);
+            CharSetName := FBase.GetCharSetName(sqlsubtype and $FF);
             {FieldSize is encoded for strings - see TIBStringField.SetSize for decode}
-            FieldSize := sqllen * 4 + (CharSetSize - 1);
+            FieldSize := sqllen;
             FieldType := ftString;
           end;
           { All Doubles/Floats should be cast to doubles }
@@ -3432,7 +3430,13 @@ begin
           begin
             FieldSize := sizeof (TISC_QUAD);
             if (sqlsubtype = 1) then
-              FieldType := ftmemo
+            begin
+              FieldType := ftmemo;
+              charSetID := GetBlobCharSetID(Database.Handle,Database.InternalTransaction.Handle,
+                        @relname,@sqlname);
+              CharSetSize := FBase.GetCharSetSize(charSetID);
+              CharSetName := FBase.GetCharSetName(charSetID);
+            end
             else
               FieldType := ftBlob;
           end;
@@ -3451,7 +3455,7 @@ begin
         begin
           FMappedFieldPosition[FieldIndex] := FieldPosition;
           Inc(FieldIndex);
-          with FieldDefs.AddFieldDef do
+          with TIBFieldDef.Create(FieldDefs,'',ftUnknown,0,False,FieldDefs.Count+1) do
           begin
             Name := FieldAliasName;
             FAliasNameMap[FieldNo-1] := DBAliasName;
@@ -3460,6 +3464,8 @@ begin
             Precision := FieldPrecision;
             Required := not FieldNullable;
             InternalCalcField := False;
+            CharacterSetSize := CharSetSize;
+            CharacterSetName := CharSetName;
             if (FieldName <> '') and (RelationName <> '') then
             begin
               if Has_COMPUTED_BLR(RelationName, FieldName) then
@@ -3600,6 +3606,49 @@ procedure TIBCustomDataSet.InternalOpen;
     result := SizeOf(TRecordData) + ((n - 1) * SizeOf(TFieldData));
   end;
 
+  function GetFieldDef(aFieldNo: integer): TIBFieldDef;
+  var i: integer;
+  begin
+    Result := nil;
+    for i := 0 to FieldDefs.Count - 1 do
+      if FieldDefs[i].FieldNo = aFieldNo then
+      begin
+        Result := TIBFieldDef(FieldDefs[i]);
+        break;
+      end;
+  end;
+
+  procedure SetExtendedProperties;
+  var i: integer;
+      FieldDef: TIBFieldDef;
+  begin
+    for i := 0 to Fields.Count - 1 do
+      if Fields[i].FieldNo > 0 then
+      begin
+        if(Fields[i] is TIBStringField) then
+        with TIBStringField(Fields[i]) do
+        begin
+          FieldDef := GetFieldDef(FieldNo);
+          if FieldDef <> nil then
+          begin
+            CharacterSetSize := FieldDef.CharacterSetSize;
+            CharacterSetName := FieldDef.CharacterSetName;
+          end;
+        end
+        else
+        if(Fields[i] is TIBMemoField) then
+        with TIBMemoField(Fields[i]) do
+        begin
+          FieldDef := GetFieldDef(FieldNo);
+          if FieldDef <> nil then
+          begin
+            CharacterSetSize := FieldDef.CharacterSetSize;
+            CharacterSetName := FieldDef.CharacterSetName;
+          end;
+        end
+      end
+  end;
+
 begin
   FBase.SetCursor;
   try
@@ -3614,6 +3663,7 @@ begin
       if DefaultFields then
         CreateFields;
       BindFields(True);
+      SetExtendedProperties;
       FCurrentRecord := -1;
       FQSelect.ExecQuery;
       FOpen := FQSelect.Open;
@@ -4446,5 +4496,6 @@ begin
   if (FGeneratorName <> '') and (FFieldName <> '') and Owner.FieldByName(FFieldName).IsNull then
     Owner.FieldByName(FFieldName).AsInteger := GetNextValue(Owner.Database,Owner.Transaction);
 end;
+
 
 end.

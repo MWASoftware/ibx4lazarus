@@ -183,6 +183,7 @@ type
     FDataSets: TList;
     FLoginCalled: boolean;
     FCharSetSizes: array of integer;
+    FCharSetNames: array of string;
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
     function GetSQLDialect: Integer;
@@ -443,6 +444,7 @@ type
     procedure DoAfterInsert(Sender: TObject); virtual;
     procedure DoAfterPost(Sender: TObject); virtual;
     function GetCharSetSize(CharSetID: integer): integer;
+    function GetCharSetName(CharSetID: integer): string;
     procedure HandleException(Sender: TObject);
     procedure SetCursor;
     procedure RestoreCursor;
@@ -630,6 +632,7 @@ begin
     InternalClose(False);
   FDBSQLDialect := 1;
   SetLength(FCharSetSizes,0);
+  SetLength(FCharSetNames,0);
 end;
 
  procedure TIBDataBase.CreateDatabase;
@@ -834,17 +837,20 @@ begin
   try
     Query.Database := Self;
     Query.Transaction := FInternalTransaction;
-    Query.SQL.Text := 'Select RDB$CHARACTER_SET_ID, RDB$BYTES_PER_CHARACTER ' +
+    Query.SQL.Text := 'Select RDB$CHARACTER_SET_ID, RDB$BYTES_PER_CHARACTER, RDB$CHARACTER_SET_NAME ' +
                       'From RDB$CHARACTER_SETS Order by 1 DESC'; {do not localize}
     Query.Prepare;
     Query.ExecQuery;
     if not Query.EOF then
     begin
       SetLength(FCharSetSizes,Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger + 1);
+      SetLength(FCharSetNames,Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger + 1);
       for i := 0 to Length(FCharSetSizes) - 1 do FCharSetSizes[i] := 1;
       repeat
         FCharSetSizes[Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger] :=
                  Query.FieldByName('RDB$BYTES_PER_CHARACTER').AsInteger;
+        FCharSetNames[Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger] :=
+                 Query.FieldByName('RDB$CHARACTER_SET_NAME').AsString;
         Query.Next;
       until Query.EOF;
     end;
@@ -2021,6 +2027,14 @@ begin
     Result := Database.FCharSetSizes[CharSetID]
   else
     Result := 1; {Unknown character set}
+end;
+
+function TIBBase.GetCharSetName(CharSetID: integer): string;
+begin
+  if (CharSetID >= 0) and (CharSetID < Length(Database.FCharSetNames)) then
+    Result := Database.FCharSetNames[CharSetID]
+  else
+    Result := ''; {Unknown character set}
 end;
 
 procedure TIBBase.HandleException(Sender: TObject);

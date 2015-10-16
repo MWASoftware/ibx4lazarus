@@ -380,7 +380,7 @@ begin
     Exit;
   end;
 
-  RegisterNoIcon([TIBStringField, TIBBCDField]);
+  RegisterNoIcon([TIBStringField, TIBBCDField, TIBMemoField]);
   {$if lcl_fullversion < 01010000}
   {see http://bugs.freepascal.org/view.php?id=19035 }
   RegisterNoIcon([TIntegerField]);

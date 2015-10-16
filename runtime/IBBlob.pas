@@ -106,6 +106,8 @@ type
 
   procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments: Int64; var MaxSegmentSize,
                       TotalSize: Int64; var BlobType: Short);
+  function GetBlobCharSetID(hDB_Handle: TISC_DB_HANDLE; hTR_Handle: TISC_TR_HANDLE;
+                      tableName, columnName: PChar): short;
   procedure ReadBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);
   procedure WriteBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);
 
@@ -147,6 +149,18 @@ begin
     end;
     Inc(i, item_length);
   end;
+end;
+
+function GetBlobCharSetID(hDB_Handle: TISC_DB_HANDLE;
+  hTR_Handle: TISC_TR_HANDLE; tableName, columnName: PChar): short;
+var desc: TISC_BLOB_DESC;
+    uGlobal: array [0..31] of char;
+begin
+  if isc_blob_lookup_desc(StatusVector,@hDB_Handle,@hTR_Handle,
+                tableName,columnName,@desc,@uGlobal) > 0 then
+    IBDatabaseError;
+
+  Result := desc.blob_desc_charset;
 end;
 
 procedure ReadBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);

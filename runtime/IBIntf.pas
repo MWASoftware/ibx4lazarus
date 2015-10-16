@@ -54,6 +54,7 @@ var
   isc_vax_integer: Tisc_vax_integer;
   isc_portable_integer: Tisc_portable_integer;
   isc_blob_info: Tisc_blob_info;
+  isc_blob_lookup_desc: Tisc_blob_lookup_desc;
   isc_open_blob2: Tisc_open_blob2;
   isc_close_blob: Tisc_close_blob;
   isc_get_segment: Tisc_get_segment;
@@ -309,6 +310,7 @@ begin
     isc_vax_integer := GetProcAddr('isc_vax_integer'); {do not localize}
     isc_portable_integer := GetProcAddr('isc_portable_integer'); {do not localize}
     isc_blob_info := GetProcAddr('isc_blob_info'); {do not localize}
+    isc_blob_lookup_desc := GetProcAddr('isc_blob_lookup_desc');  {do not localize}
     isc_open_blob2 := GetProcAddr('isc_open_blob2'); {do not localize}
     isc_close_blob := GetProcAddr('isc_close_blob'); {do not localize}
     isc_get_segment := GetProcAddr('isc_get_segment'); {do not localize}
