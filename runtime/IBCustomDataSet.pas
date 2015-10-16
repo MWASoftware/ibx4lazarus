@@ -152,6 +152,24 @@ type
     property Size default 8;
   end;
 
+  {TIBMemoField}
+  {Allows us to show truncated text in DBGrids and anything else that uses
+   DisplayText}
+
+   TIBMemoField = class(TMemoField)
+   private
+     FTruncatedDisplayText: boolean;
+     function GetTruncatedText: string;
+   protected
+     function GetDefaultWidth: Longint; override;
+     procedure GetText(var AText: string; ADisplayText: Boolean); override;
+   public
+     constructor Create(AOwner: TComponent); override;
+   published
+     property TruncatedDisplayText: boolean read FTruncatedDisplayText
+                                            write FTruncatedDisplayText default true;
+   end;
+
   TIBDataLink = class(TDetailDataLink)
   private
     FDataSet: TIBCustomDataSet;
@@ -752,6 +770,71 @@ type
     FieldNodes : TFieldNode;
     NextRelation : TRelationNode;
   end;
+
+{ TIBMemoField }
+
+function TIBMemoField.GetTruncatedText: string;
+var S: TStream;
+    Len: integer;
+    i: integer;
+begin
+   S := Dataset.CreateBlobStream(Self,bmRead);
+   if S <> nil then
+   try
+     Len := DisplayWidth + 1;
+     SetLength(Result, Len);
+     if Len > 0 then
+     begin
+       S.ReadBuffer(Result[1], Len+1);
+       if Length(Result) = Len + 1 then {Show truncation with elipses}
+       begin
+         system.Delete(Result,Len,1);
+         Result[Len] := '.';
+         Result[Len-1] := '.';
+         Result[Len-2] := '.';
+       end;
+       {Replace Line Feeds}
+       repeat
+         i := Pos(#$0A,Result);
+         if i = 0 then break;
+         Result[i] := ' ';
+       until false;
+       {Replace Carriage Returns}
+       repeat
+         i := Pos(#$0D,Result);
+         if i = 0 then break;
+         Result[i] := ' ';
+       until false;
+     end;
+   finally
+   end
+   else
+     Result := '';
+end;
+
+function TIBMemoField.GetDefaultWidth: Longint;
+begin
+  Result := 128;
+end;
+
+procedure TIBMemoField.GetText(var AText: string; ADisplayText: Boolean);
+begin
+  if ADisplayText then
+  begin
+    if TruncatedDisplayText then
+      AText := GetTruncatedText
+    else
+      inherited GetText(AText, ADisplayText);
+  end
+  else
+    AText := GetAsString;
+end;
+
+constructor TIBMemoField.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FTruncatedDisplayText := true;
+end;
 
 { TIBControlLink }
 
