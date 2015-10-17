@@ -135,6 +135,17 @@ type
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
   end;
 
+  { TIBWideStringField }
+
+  TIBWideStringField = class(TWideStringField)
+  private
+    FCharacterSetName: string;
+    FCharacterSetSize: integer;
+  public
+    property CharacterSetName: string read FCharacterSetName write FCharacterSetName;
+    property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
+  end;
+
   { TIBBCDField }
   {  Actually, there is no BCD involved in this type,
      instead it deals with currency types.
@@ -163,7 +174,7 @@ type
    private
      FCharacterSetName: string;
      FCharacterSetSize: integer;
-     FTruncatedDisplayText: boolean;
+     FDisplayTextAsClassName: boolean;
      function GetTruncatedText: string;
    protected
      function GetDefaultWidth: Longint; override;
@@ -173,8 +184,28 @@ type
      property CharacterSetName: string read FCharacterSetName write FCharacterSetName;
      property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
   published
-     property TruncatedDisplayText: boolean read FTruncatedDisplayText
-                                            write FTruncatedDisplayText default true;
+     property DisplayTextAsClassName: boolean read FDisplayTextAsClassName
+                                            write FDisplayTextAsClassName;
+   end;
+
+   { TIBWideMemoField }
+
+   TIBWideMemoField = class(TWideMemoField)
+   private
+     FCharacterSetName: string;
+     FCharacterSetSize: integer;
+     FDisplayTextAsClassName: boolean;
+     function GetTruncatedText: string;
+   protected
+     function GetDefaultWidth: Longint; override;
+     procedure GetText(var AText: string; ADisplayText: Boolean); override;
+   public
+     constructor Create(AOwner: TComponent); override;
+     property CharacterSetName: string read FCharacterSetName write FCharacterSetName;
+     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
+   published
+      property DisplayTextAsClassName: boolean read FDisplayTextAsClassName
+                                             write FDisplayTextAsClassName;
    end;
 
   TIBDataLink = class(TDetailDataLink)
@@ -723,7 +754,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     TBlobField,         { ftTypedBinary }
     nil,                { ftCursor }
     TStringField,       { ftFixedChar }
-    TWideStringField,    { ftWideString }
+    TIBWideStringField,    { ftWideString }
     TLargeIntField,     { ftLargeInt }
     nil,          { ftADT }
     nil,        { ftArray }
@@ -738,7 +769,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     TDateTimeField,    {ftTimestamp}
     TIBBCDField,       {ftFMTBcd}
     nil,  {ftFixedWideChar}
-    TWideMemoField);   {ftWideMemo}
+    TIBWideMemoField);   {ftWideMemo}
 (*
     TADTField,          { ftADT }
     TArrayField,        { ftArray }
@@ -791,26 +822,69 @@ type
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
   end;
 
+{ TIBWideMemoField }
+
+function TIBWideMemoField.GetTruncatedText: string;
+begin
+  Result := GetAsString;
+
+  if Result <> '' then
+    if DisplayWidth = 0 then
+      Result := TextToSingleLine(Result)
+    else
+    if Length(Result) > DisplayWidth then {Show truncation with elipses}
+      Result := TextToSingleLine(system.copy(Result,1,DisplayWidth-3)) + '...';
+end;
+
+function TIBWideMemoField.GetDefaultWidth: Longint;
+begin
+  Result := 128;
+end;
+
+procedure TIBWideMemoField.GetText(var AText: string; ADisplayText: Boolean);
+begin
+  if ADisplayText then
+  begin
+    if not DisplayTextAsClassName then
+      AText := GetTruncatedText
+    else
+      inherited GetText(AText, ADisplayText);
+  end
+  else
+    AText := GetAsString;
+end;
+
+constructor TIBWideMemoField.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  BlobType := ftWideMemo;
+end;
+
 { TIBMemoField }
 
 function TIBMemoField.GetTruncatedText: string;
 begin
    Result := GetAsString;
+
    if Result <> '' then
    begin
        case CharacterSetSize of
        1:
+         if DisplayWidth = 0 then
+           Result := TextToSingleLine(Result)
+         else
          if Length(Result) > DisplayWidth then {Show truncation with elipses}
-           Result := TextToSingleLine(system.copy(Result,1,DisplayWidth)) + '...';
+           Result := TextToSingleLine(system.copy(Result,1,DisplayWidth-3)) + '...';
 
-       2:
-         if Length(Result) > DisplayWidth*2  then {Show truncation with elipses}
-           Result := system.copy(Result,1,DisplayWidth*2)+ #$002E + #$002E+ #$002E;
+       {2: case 2 ignored. This should be handled by TIBWideMemo}
 
        3, {Assume UNICODE_FSS is really UTF8}
-       4:
+       4: {Include GB18030 - assuming UTF8 routine work for this codeset}
+         if DisplayWidth = 0 then
+           Result := ValidUTF8String(TextToSingleLine(Result))
+         else
          if UTF8Length(Result) > DisplayWidth then {Show truncation with elipses}
-           Result := ValidUTF8String(TextToSingleLine(UTF8Copy(Result,1,DisplayWidth))) + '...';
+           Result := ValidUTF8String(TextToSingleLine(UTF8Copy(Result,1,DisplayWidth-3))) + '...';
        end;
    end
 end;
@@ -824,7 +898,7 @@ procedure TIBMemoField.GetText(var AText: string; ADisplayText: Boolean);
 begin
   if ADisplayText then
   begin
-    if TruncatedDisplayText then
+    if not DisplayTextAsClassName then
       AText := GetTruncatedText
     else
       inherited GetText(AText, ADisplayText);
@@ -836,7 +910,7 @@ end;
 constructor TIBMemoField.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FTruncatedDisplayText := true;
+  BlobType := ftMemo;
 end;
 
 { TIBControlLink }
@@ -3371,7 +3445,10 @@ begin
             CharSetName := FBase.GetCharSetName(sqlsubtype and $FF);
             {FieldSize is encoded for strings - see TIBStringField.SetSize for decode}
             FieldSize := sqllen;
-            FieldType := ftString;
+            if CharSetSize = 2 then
+              FieldType := ftWideString
+            else
+              FieldType := ftString;
           end;
           { All Doubles/Floats should be cast to doubles }
           SQL_DOUBLE, SQL_FLOAT:
@@ -3431,11 +3508,14 @@ begin
             FieldSize := sizeof (TISC_QUAD);
             if (sqlsubtype = 1) then
             begin
-              FieldType := ftmemo;
               charSetID := GetBlobCharSetID(Database.Handle,Database.InternalTransaction.Handle,
                         @relname,@sqlname);
               CharSetSize := FBase.GetCharSetSize(charSetID);
               CharSetName := FBase.GetCharSetName(charSetID);
+              if CharSetSize = 2 then
+                FieldType := ftWideMemo
+              else
+                FieldType := ftMemo;
             end
             else
               FieldType := ftBlob;
@@ -3455,11 +3535,10 @@ begin
         begin
           FMappedFieldPosition[FieldIndex] := FieldPosition;
           Inc(FieldIndex);
-          with TIBFieldDef.Create(FieldDefs,'',ftUnknown,0,False,FieldDefs.Count+1) do
+          with TIBFieldDef.Create(FieldDefs,'',FieldType,0,False,FieldDefs.Count+1) do
           begin
             Name := FieldAliasName;
             FAliasNameMap[FieldNo-1] := DBAliasName;
-            DataType := FieldType;
             Size := FieldSize;
             Precision := FieldPrecision;
             Required := not FieldNullable;
@@ -3636,8 +3715,30 @@ procedure TIBCustomDataSet.InternalOpen;
           end;
         end
         else
+        if(Fields[i] is TIBWideStringField) then
+        with TIBWideStringField(Fields[i]) do
+        begin
+          FieldDef := GetFieldDef(FieldNo);
+          if FieldDef <> nil then
+          begin
+            CharacterSetSize := FieldDef.CharacterSetSize;
+            CharacterSetName := FieldDef.CharacterSetName;
+          end;
+        end
+        else
         if(Fields[i] is TIBMemoField) then
         with TIBMemoField(Fields[i]) do
+        begin
+          FieldDef := GetFieldDef(FieldNo);
+          if FieldDef <> nil then
+          begin
+            CharacterSetSize := FieldDef.CharacterSetSize;
+            CharacterSetName := FieldDef.CharacterSetName;
+          end;
+        end
+        else
+        if(Fields[i] is TIBWideMemoField) then
+        with TIBWideMemoField(Fields[i]) do
         begin
           FieldDef := GetFieldDef(FieldNo);
           if FieldDef <> nil then
