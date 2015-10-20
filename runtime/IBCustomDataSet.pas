@@ -3508,10 +3508,10 @@ begin
             FieldSize := sizeof (TISC_QUAD);
             if (sqlsubtype = 1) then
             begin
-              if strpas(sqlname) = '' {Too complex!} then
+              if strpas(sqlname) = '' then {Complex SQL with no identifiable column - use connection default}
               begin
-                CharSetSize := 4;
-                CharSetName := 'Unknown';
+                CharSetSize := FBase.GetDefaultCharSetSize;
+                CharSetName := FBase.GetDefaultCharSetName;
               end
               else
               begin

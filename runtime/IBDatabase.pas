@@ -444,7 +444,9 @@ type
     procedure DoAfterInsert(Sender: TObject); virtual;
     procedure DoAfterPost(Sender: TObject); virtual;
     function GetCharSetSize(CharSetID: integer): integer;
+    function GetDefaultCharSetSize: integer;
     function GetCharSetName(CharSetID: integer): string;
+    function GetDefaultCharSetName: string;
     procedure HandleException(Sender: TObject);
     procedure SetCursor;
     procedure RestoreCursor;
@@ -2029,12 +2031,31 @@ begin
     Result := 1; {Unknown character set}
 end;
 
+function TIBBase.GetDefaultCharSetSize: integer;
+var DefaultCharSetName: string;
+    i: integer;
+begin
+  DefaultCharSetName := GetDefaultCharSetName;
+  Result := 4; {worse case}
+  for i := 0 to Length(Database.FCharSetSizes) - 1 do
+    if Database.FCharSetNames[i] = DefaultCharSetName then
+    begin
+      Result := Database.FCharSetSizes[i];
+      break;
+    end;
+end;
+
 function TIBBase.GetCharSetName(CharSetID: integer): string;
 begin
   if (CharSetID >= 0) and (CharSetID < Length(Database.FCharSetNames)) then
     Result := Database.FCharSetNames[CharSetID]
   else
     Result := ''; {Unknown character set}
+end;
+
+function TIBBase.GetDefaultCharSetName: string;
+begin
+  Result := AnsiUpperCase(Database.Params.Values['lc_ctype']);
 end;
 
 procedure TIBBase.HandleException(Sender: TObject);
