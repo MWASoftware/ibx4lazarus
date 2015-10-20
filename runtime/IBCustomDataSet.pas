@@ -3508,10 +3508,18 @@ begin
             FieldSize := sizeof (TISC_QUAD);
             if (sqlsubtype = 1) then
             begin
-              charSetID := GetBlobCharSetID(Database.Handle,Database.InternalTransaction.Handle,
+              if strpas(sqlname) = '' {Too complex!} then
+              begin
+                CharSetSize := 4;
+                CharSetName := 'Unknown';
+              end
+              else
+              begin
+                charSetID := GetBlobCharSetID(Database.Handle,Database.InternalTransaction.Handle,
                         @relname,@sqlname);
-              CharSetSize := FBase.GetCharSetSize(charSetID);
-              CharSetName := FBase.GetCharSetName(charSetID);
+                CharSetSize := FBase.GetCharSetSize(charSetID);
+                CharSetName := FBase.GetCharSetName(charSetID);
+              end;
               if CharSetSize = 2 then
                 FieldType := ftWideMemo
               else
@@ -3699,7 +3707,7 @@ procedure TIBCustomDataSet.InternalOpen;
 
   procedure SetExtendedProperties;
   var i: integer;
-      FieldDef: TIBFieldDef;
+      IBFieldDef: TIBFieldDef;
   begin
     for i := 0 to Fields.Count - 1 do
       if Fields[i].FieldNo > 0 then
@@ -3707,44 +3715,44 @@ procedure TIBCustomDataSet.InternalOpen;
         if(Fields[i] is TIBStringField) then
         with TIBStringField(Fields[i]) do
         begin
-          FieldDef := GetFieldDef(FieldNo);
-          if FieldDef <> nil then
+          IBFieldDef := GetFieldDef(FieldNo);
+          if IBFieldDef <> nil then
           begin
-            CharacterSetSize := FieldDef.CharacterSetSize;
-            CharacterSetName := FieldDef.CharacterSetName;
+            CharacterSetSize := IBFieldDef.CharacterSetSize;
+            CharacterSetName := IBFieldDef.CharacterSetName;
           end;
         end
         else
         if(Fields[i] is TIBWideStringField) then
         with TIBWideStringField(Fields[i]) do
         begin
-          FieldDef := GetFieldDef(FieldNo);
-          if FieldDef <> nil then
+          IBFieldDef := GetFieldDef(FieldNo);
+          if IBFieldDef <> nil then
           begin
-            CharacterSetSize := FieldDef.CharacterSetSize;
-            CharacterSetName := FieldDef.CharacterSetName;
+            CharacterSetSize := IBFieldDef.CharacterSetSize;
+            CharacterSetName := IBFieldDef.CharacterSetName;
           end;
         end
         else
         if(Fields[i] is TIBMemoField) then
         with TIBMemoField(Fields[i]) do
         begin
-          FieldDef := GetFieldDef(FieldNo);
-          if FieldDef <> nil then
+          IBFieldDef := GetFieldDef(FieldNo);
+          if IBFieldDef <> nil then
           begin
-            CharacterSetSize := FieldDef.CharacterSetSize;
-            CharacterSetName := FieldDef.CharacterSetName;
+            CharacterSetSize := IBFieldDef.CharacterSetSize;
+            CharacterSetName := IBFieldDef.CharacterSetName;
           end;
         end
         else
         if(Fields[i] is TIBWideMemoField) then
         with TIBWideMemoField(Fields[i]) do
         begin
-          FieldDef := GetFieldDef(FieldNo);
-          if FieldDef <> nil then
+          IBFieldDef := GetFieldDef(FieldNo);
+          if IBFieldDef <> nil then
           begin
-            CharacterSetSize := FieldDef.CharacterSetSize;
-            CharacterSetName := FieldDef.CharacterSetName;
+            CharacterSetSize := IBFieldDef.CharacterSetSize;
+            CharacterSetName := IBFieldDef.CharacterSetName;
           end;
         end
       end
