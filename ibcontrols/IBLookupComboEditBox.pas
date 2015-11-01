@@ -92,6 +92,7 @@ type
     FUpdating: boolean;
     FInserting: boolean;
     FExiting: boolean;
+    FForceAutoComplete: boolean;
     FInCheckAndInsert: boolean;
     FLastKeyValue: variant;
     procedure DoActiveChanged(Data: PtrInt);
@@ -330,7 +331,7 @@ begin
          ListSource.DataSet.Active := false;
          ListSource.DataSet.Active :=  true;
          Text := curText;
-         if not FExiting and Focused and (Text <> '')then
+         if not FExiting and (FForceAutoComplete or Focused) and (Text <> '')then
          begin
            if ListSource.DataSet.Active and (ListSource.DataSet.RecordCount > 0) then
            begin
@@ -563,6 +564,13 @@ end;
 
 procedure TIBLookupComboEditBox.EditingDone;
 begin
+  FForceAutoComplete := true;
+  try
+  if FTimer.Interval <> 0 then
+    HandleTimer(nil);
+  finally
+    FForceAutoComplete := false;
+  end;
   CheckAndInsert;
   inherited EditingDone;
 end;
