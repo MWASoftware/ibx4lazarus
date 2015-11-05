@@ -720,7 +720,7 @@ end;
 procedure TDBDynamicGrid.HideEditorPanel;
 begin
   if Editor = FEditorPanel then
-    EditorMode := false;
+      EditorMode := false;
 end;
 
 procedure TDBDynamicGrid.ShowEditorPanel;
