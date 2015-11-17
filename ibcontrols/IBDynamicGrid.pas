@@ -429,6 +429,9 @@ end;
 
 procedure TDBDynamicGrid.DoEditorShow;
 begin
+  if assigned(DataSource) and assigned(DataSource.DataSet) and
+             DataSource.DataSet.Active and (DataSource.DataSet.RecordCount = 0) then
+     DataSource.DataSet.Append;
   if Editor = FEditorPanel then
   begin
     if ExpandEditorPanelBelowRow then
