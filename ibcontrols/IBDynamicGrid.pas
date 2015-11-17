@@ -373,7 +373,7 @@ begin
   try
     ColSum := 0;
 
-    if (Columns.Count = 1) and TDBDynamicGridColumn(Columns[0]).AutoSizeColumn then
+    if (ColCount = 1) and TDBDynamicGridColumn(Columns[0]).AutoSizeColumn then
       Columns[0].Width := ClientWidth
     else
     begin
@@ -430,8 +430,13 @@ end;
 procedure TDBDynamicGrid.DoEditorShow;
 begin
   if assigned(DataSource) and assigned(DataSource.DataSet) and
-             DataSource.DataSet.Active and (DataSource.DataSet.RecordCount = 0) then
-     DataSource.DataSet.Append;
+             DataSource.DataSet.Active then
+  begin
+    if DataSource.DataSet.RecordCount = 0 then
+      DataSource.DataSet.Append
+    else
+      DataSource.DataSet.Edit;
+  end;
   if Editor = FEditorPanel then
   begin
     if ExpandEditorPanelBelowRow then
