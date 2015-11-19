@@ -36,7 +36,8 @@ IBX Change Log  version          (1.3-2) Sat, 17 Oct 2015 14:31:33 +0100
 
 10. IBLookupComboEditBox: Force autocomplete when EditingDone called and timer active.
 
-11. IBDynamicGrid: Call DataSet.Append when entering edit mode and dataset empty (avoids "Not in Edit Mode" error).
+11. IBDynamicGrid: Call DataSet.Append when entering edit mode and dataset empty and not in insert state
+   (avoids "Not in Edit Mode" error).
 
 12. IBDynamicGrid: Correctly resize grid when one column width plus indicator.
 
