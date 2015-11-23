@@ -434,9 +434,6 @@ begin
   begin
     if (DataSource.DataSet.RecordCount = 0) and (DataSource.DataSet.State <> dsInsert) then
       DataSource.DataSet.Append
-    else
-    if DataSource.DataSet.RecordCount > 0 then
-      DataSource.DataSet.Edit;
   end;
   if Editor = FEditorPanel then
   begin
