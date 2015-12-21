@@ -447,6 +447,8 @@ begin
     FEditorPanel.PerformTab(true);  {Select First Control}
     if assigned(FOnEditorPanelShow) then
        OnEditorPanelShow(self);
+    if assigned(Editor) and Editor.Visible then
+      Editor.SetFocus;
   end
   else
     inherited DoEditorShow;
