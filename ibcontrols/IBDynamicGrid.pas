@@ -569,6 +569,10 @@ begin
 
     if (AControl <> nil) and (AControl is TCustomMemo)
                          and (Key in [VK_RETURN,VK_UP,VK_DOWN]) then Exit; {Ignore Return in a CustomMemo}
+
+    if (AControl <> nil) and (AControl is TCustomGrid)
+                         and (Key in [VK_RETURN,VK_UP,VK_DOWN,VK_TAB]) then Exit; {Ignore Return in a CustomMemo}
+
     if assigned(FOnKeyDownHander) then
       OnKeyDownHander(Sender,Key,Shift,Done);
     if Done then Exit;
