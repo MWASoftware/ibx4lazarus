@@ -700,6 +700,7 @@ begin
   inherited UpdateActive;
 
   if not (csLoading in ComponentState) and assigned(DataLink) and
+     assigned(FEditorPanel) and not FEditorPanel.Visible and
      assigned(DataLink.DataSet) and (DataLink.DataSet.State = dsInsert) then
      Application.QueueAsyncCall(@DoShowEditorPanel,0);
 end;
