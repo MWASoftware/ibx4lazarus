@@ -413,6 +413,7 @@ end;
 procedure TRowCache.ClearCache;
 begin
   FreeImages(true);
+  SetLength(FList,0);
 end;
 
 function TRowCache.Add2Cache(RecNo: Longint; Control: TWinControl): TBitmap;
@@ -540,6 +541,7 @@ var
 begin
   OldFixedRows := FixedRows;
   Clear;
+  FRowCache.ClearCache;
   RowCount := OldFixedRows + 1;
   if dgpIndicator in FOptions then
     ColWidths[0]:=12;
@@ -620,7 +622,7 @@ begin
   aRow := integer(Data);
   FInCacheRefresh := true;
   if assigned(FDataLink.DataSet) then
-    FDatalink.DataSet.MoveBy(aRow - FDrawRow)
+    FDatalink.DataSet.MoveBy(aRow - FDrawRow);
 end;
 
 procedure TDBControlGrid.DoSetupDrawPanel(Data: PtrInt);
@@ -700,11 +702,21 @@ end;
 
 procedure TDBControlGrid.OnDataSetChanged(aDataSet: TDataSet);
 begin
-  if (aDataSet.State = dsBrowse) and (FLastRecordCount >  GetRecordCount) then
+  if aDataSet.State = dsBrowse then
   begin
-    {must be delete}
-    FRowCache.MarkAsDeleted(FSelectedRecNo);
-    Dec(FSelectedRow);
+    if GetRecordCount = 0 then
+    begin
+      {Must be closed/reopened}
+      FRowCache.ClearCache;
+      FSelectedRow := 0;
+    end
+    else
+    if FLastRecordCount >  GetRecordCount then
+    begin
+      {must be delete}
+      FRowCache.MarkAsDeleted(FSelectedRecNo);
+      Dec(FSelectedRow);
+    end;
     LayoutChanged;
   end;
   FLastRecordCount := GetRecordCount;
@@ -1409,6 +1421,10 @@ begin
     FInCacheRefresh := false;
     FCacheRefreshQueued := false;
     Row := FixedRows;
+    FDrawingActiveRecord := false;
+    FSelectedRecNo := 0;
+    FSelectedRow := 0;
+    FRequiredRecNo := 0;
   end;
   FRowCache.UseAlternateColors := AlternateColor <> Color;
   FRowCache.AltColorStartNormal := AltColorStartNormal;
