@@ -328,6 +328,7 @@ type
   TIBSQL = class(TComponent)
   private
     FIBLoaded: Boolean;
+    FOnSQLChanged: TNotifyEvent;
     FUniqueParamNames: Boolean;
     function GetFieldCount: integer;
     procedure SetUniqueParamNames(AValue: Boolean);
@@ -366,6 +367,7 @@ type
     procedure SetSQL(Value: TStrings);
     procedure SetTransaction(Value: TIBTransaction);
     procedure SQLChanging(Sender: TObject);
+    procedure SQLChanged(Sender: TObject);
     procedure BeforeTransactionEnd(Sender: TObject; Action: TTransactionAction);
   public
     constructor Create(AOwner: TComponent); override;
@@ -412,6 +414,7 @@ type
     property SQL: TStrings read FSQL write SetSQL;
     property Transaction: TIBTransaction read GetTransaction write SetTransaction;
     property OnSQLChanging: TNotifyEvent read FOnSQLChanging write FOnSQLChanging;
+    property OnSQLChanged: TNotifyEvent read FOnSQLChanged write FOnSQLChanged;
   end;
 
 implementation
@@ -2153,6 +2156,7 @@ begin
   FRecordCount := 0;
   FSQL := TStringList.Create;
   TStringList(FSQL).OnChanging := SQLChanging;
+  TStringList(FSQL).OnChange := SQLChanged;
   FProcessedSQL := TStringList.Create;
   FHandle := nil;
   FSQLParams := TIBXSQLDA.Create(self,daInput);
@@ -2814,6 +2818,12 @@ begin
   if Assigned(OnSQLChanging) then
     OnSQLChanging(Self);
   if FHandle <> nil then FreeHandle;
+end;
+
+procedure TIBSQL.SQLChanged(Sender: TObject);
+begin
+  if assigned(OnSQLChanged) then
+    OnSQLChanged(self);
 end;
 
 procedure TIBSQL.BeforeTransactionEnd(Sender: TObject;

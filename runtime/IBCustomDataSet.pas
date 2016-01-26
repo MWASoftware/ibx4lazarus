@@ -397,7 +397,6 @@ type
     procedure SetUpdateRecordTypes(Value: TIBUpdateRecordTypes);
     procedure SetUniDirectional(Value: Boolean);
     procedure RefreshParams;
-    procedure SQLChanging(Sender: TObject); virtual;
     function AdjustPosition(FCache: PChar; Offset: DWORD;
                             Origin: Integer): DWORD;
     procedure ReadCache(FCache: PChar; Offset: DWORD; Origin: Integer;
@@ -427,6 +426,8 @@ type
     procedure InternalRefreshRow; virtual;
     procedure InternalSetParamsFromCursor; virtual;
     procedure CheckNotUniDirectional;
+    procedure SQLChanging(Sender: TObject); virtual;
+    procedure SQLChanged(Sender: TObject); virtual;
 
 (*    { IProviderSupport }
     procedure PSEndTransaction(Commit: Boolean); override;
@@ -558,7 +559,7 @@ type
     procedure RecordModified(Value: Boolean);
     procedure RevertRecord;
     procedure Undelete;
-    procedure ResetParser;
+    procedure ResetParser; virtual;
     function HasParser: boolean;
 
     { TDataSet support methods }
@@ -1124,6 +1125,7 @@ begin
   FQRefresh.GoToFirstRecordOnExecute := False;
   FQSelect := TIBSQL.Create(Self);
   FQSelect.OnSQLChanging := SQLChanging;
+  FQSelect.OnSQLChanged := SQLChanged;
   FQSelect.GoToFirstRecordOnExecute := False;
   FQModify := TIBSQL.Create(Self);
   FQModify.OnSQLChanging := SQLChanging;
@@ -2207,7 +2209,14 @@ begin
     FBase.CheckDatabase;
     FBase.CheckTransaction;
     if HasParser and (FParser.SQLText <> FQSelect.SQL.Text) then
-      FQSelect.SQL.Text := FParser.SQLText;
+    begin
+      FQSelect.OnSQLChanged := nil; {Do not react to change}
+      try
+        FQSelect.SQL.Text := FParser.SQLText;
+      finally
+        FQSelect.OnSQLChanged := SQLChanged;
+      end;
+    end;
 //   writeln( FQSelect.SQL.Text);
     if FQSelect.SQL.Text <> '' then
     begin
@@ -2454,7 +2463,6 @@ begin
   begin
     Disconnect;
     FQSelect.SQL.Assign(Value);
-    FBaseSQLSelect.assign(Value);
   end;
 end;
 
@@ -2531,6 +2539,11 @@ begin
     InternalUnPrepare;
   FieldDefs.Clear;
   FieldDefs.Updated := false;
+end;
+
+procedure TIBCustomDataSet.SQLChanged(Sender: TObject);
+begin
+  FBaseSQLSelect.assign(FQSelect.SQL);
 end;
 
 { I can "undelete" uninserted records (make them "inserted" again).
@@ -3228,6 +3241,7 @@ begin
   FreeMem(FOldBufferCache);
   FOldBufferCache := nil;
   BindFields(False);
+  ResetParser;
   if DefaultFields then DestroyFields;
 end;
 
@@ -4173,7 +4187,12 @@ begin
   begin
     FParser.Free;
     FParser := nil;
-    SQLChanging(nil)
+    FQSelect.OnSQLChanged := nil; {Do not react to change}
+    try
+      FQSelect.SQL.Assign(FBaseSQLSelect);
+    finally
+      FQSelect.OnSQLChanged := SQLChanged;
+    end;
   end;
 end;
 

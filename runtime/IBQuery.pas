@@ -59,6 +59,7 @@ type
     FRowsAffected: Integer;
     FCheckRowsAffected: Boolean;
     FSQLUpdating: boolean;
+    FInQueryChanged: boolean;
     function GetRowsAffected: Integer;
     procedure PrepareSQL;
     procedure QueryChanged(Sender: TObject);
@@ -71,6 +72,7 @@ type
     procedure SetPrepare(Value: Boolean);
     procedure WriteParamData(Writer: TWriter);
     function GetStmtHandle: TISC_STMT_HANDLE;
+    procedure UpdateSQL;
 
   protected
     { IProviderSupport }
@@ -80,7 +82,6 @@ type
     procedure PSSetCommandText(const CommandText: string); override;
     procedure PSSetParams(AParams: TParams); override;  *)
 
-    function CreateParser: TSelectSQLParser; override;
     procedure DefineProperties(Filer: TFiler); override;
     procedure InitFieldDefs; override;
     procedure InternalOpen; override;
@@ -88,6 +89,8 @@ type
     function GetParamsCount: Word;
     function GenerateQueryForLiveUpdate : Boolean;
     procedure SetFiltered(Value: Boolean); override;
+    procedure SQLChanged(Sender: TObject); override;
+    procedure SQLChanging(Sender: TObject); override;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -99,6 +102,7 @@ type
     function ParamByName(const Value: string): TParam;
     procedure Prepare;
     procedure UnPrepare;
+    procedure ResetParser; override;
     property Prepared: Boolean read FPrepared write SetPrepare;
     property ParamCount: Word read GetParamsCount;
     property StmtHandle: TISC_STMT_HANDLE read GetStmtHandle;
@@ -199,6 +203,12 @@ begin
   SetPrepared(False);
 end;
 
+procedure TIBQuery.ResetParser;
+begin
+  inherited ResetParser;
+  UpdateSQL;
+end;
+
 procedure TIBQuery.SetQuery(Value: TStrings);
 begin
   if SQL.Text <> Value.Text then
@@ -214,38 +224,29 @@ begin
 end;
 
 procedure TIBQuery.QueryChanged(Sender: TObject);
-var
-  List: TParams;
 begin
-  if not (csReading in ComponentState) then
-  begin
-    Disconnect;
-    if HasParser and not FSQLUpdating then
+  if FInQueryChanged then Exit;
+  FInQueryChanged := true;
+  try
+    if not (csReading in ComponentState) then
     begin
-      FSQLUpdating := true;
-      try
-        SQL.Text := Parser.SQLText;
-      finally
-        FSQLUpdating := false
-      end;
-    end;
-    if ParamCheck or (csDesigning in ComponentState) then
-    begin
-      List := TParams.Create(Self);
-      try
-        FText := List.ParseSQL(SQL.Text, True);
-        List.AssignValues(FParams);
-        FParams.Clear;
-        FParams.Assign(List);
-      finally
-        List.Free;
-      end;
+      Disconnect;
+      if csDesigning in ComponentState then
+        FText := FParams.ParseSQL(SQL.Text, true)
+      else
+        FText := SQL.Text;
+      DataEvent(dePropertyChange, 0);
     end else
-      FText := SQL.Text;
-    DataEvent(dePropertyChange, 0);
-  end else
-    FText := FParams.ParseSQL(SQL.Text, true);
-  SelectSQL.Assign(SQL);
+      FText := FParams.ParseSQL(SQL.Text, true);
+
+    if not FSQLUpdating then
+    begin
+      Prepared := false;
+      SelectSQL.Assign(SQL);
+    end;
+  finally
+    FInQueryChanged := false;
+  end;
 end;
 
 procedure TIBQuery.SetParamsList(Value: TParams);
@@ -304,6 +305,7 @@ begin
       if FCheckRowsAffected then
         FRowsAffected := RowsAffected;
       InternalUnPrepare;
+      FParams.Clear;
     end;
     FPrepared := Value;
   end;
@@ -353,6 +355,8 @@ end;
 
 function TIBQuery.ParamByName(const Value: string): TParam;
 begin
+  if not Prepared then
+    Prepare;
   Result := FParams.ParamByName(Value);
 end;
 
@@ -446,9 +450,23 @@ begin
 end;
 
 procedure TIBQuery.PrepareSQL;
+var List: TParams;
 begin
   QSelect.GenerateParamNames := GenerateParamNames;
   InternalPrepare;
+  UpdateSQL;
+  if ParamCheck  then
+  begin
+    List := TParams.Create(Self);
+    try
+      FText := List.ParseSQL(SQL.Text, True);
+      List.AssignValues(FParams);
+      FParams.Clear;
+      FParams.Assign(List);
+    finally
+      List.Free;
+    end;
+  end;
 end;
 
 
@@ -489,10 +507,17 @@ begin
   Result := SelectStmtHandle;
 end;
 
-function TIBQuery.CreateParser: TSelectSQLParser;
+procedure TIBQuery.UpdateSQL;
 begin
-  Result := inherited CreateParser;
-  Result.OnSQLChanging := QueryChanged;
+  if not FSQLUpdating and not FInQueryChanged then
+  begin
+    FSQLUpdating := true;
+    try
+      SQL.Text := SelectSQL.Text;
+    finally
+      FSQLUpdating := false
+    end;
+  end;
 end;
 
 function TIBQuery.GenerateQueryForLiveUpdate : Boolean;
@@ -513,6 +538,18 @@ begin
   end
   else
     inherited SetFiltered(value);
+end;
+
+procedure TIBQuery.SQLChanged(Sender: TObject);
+begin
+  inherited SQLChanged(Sender);
+  UpdateSQL;
+end;
+
+procedure TIBQuery.SQLChanging(Sender: TObject);
+begin
+  inherited SQLChanging(Sender);
+  Prepared := false;
 end;
 
 { TIBQuery IProviderSupport }
