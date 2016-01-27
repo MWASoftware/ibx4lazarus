@@ -118,7 +118,6 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Height = 23
         Top = 20
         Width = 201
-        OwnerDrawEditable = False
         AutoComplete = True
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 15
@@ -184,7 +183,6 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Height = 23
         Top = 20
         Width = 201
-        OwnerDrawEditable = False
         ItemHeight = 15
         OnCloseUp = ProcedureNamesCloseUp
         ParentColor = True
