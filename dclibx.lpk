@@ -150,7 +150,7 @@ II. Trademark Usage.
 II.1. Advertising Materials. All advertising materials mentioning features or use of the covered Code must display the following acknowledgement: &quot;This product includes software developed by Inprise Corporation. &quot;
 II.2. Endorsements. The names &quot;Inprise,&quot; &quot;InterBase,&quot; &quot;ISC,&quot; and &quot;IB&quot; must not be used to endorse or promote Contributor Versions or Larger Works without the prior written permission of Inprise.
 II.3. Product Names. Contributor Versions and Larger Works may not be called &quot;Inprise&quot; or &quot;InterBase&quot; nor may the words &quot;Inprise&quot; or &quot;InterBase&quot; appear in their names without the prior written permission of Inprise Corporation."/>
-    <Version Major="1" Minor="3" Release = "2" />
+    <Version Major="1" Minor="3" Release="2"/>
     <Files Count="15">
       <Item1>
         <Filename Value="design/IBDBReg.pas"/>
@@ -214,23 +214,26 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <UnitName Value="dbFieldListPropEditor"/>
       </Item15>
     </Files>
-    <RequiredPkgs Count="5">
+    <RequiredPkgs Count="6">
       <Item1>
-        <PackageName Value="ibcontrols"/>
+        <PackageName Value="iblocaldb"/>
       </Item1>
       <Item2>
-        <PackageName Value="ibexpress"/>
+        <PackageName Value="ibcontrols"/>
       </Item2>
       <Item3>
-        <PackageName Value="IDEIntf"/>
+        <PackageName Value="ibexpress"/>
       </Item3>
       <Item4>
-        <PackageName Value="LCL"/>
+        <PackageName Value="IDEIntf"/>
       </Item4>
       <Item5>
+        <PackageName Value="LCL"/>
+      </Item5>
+      <Item6>
         <PackageName Value="FCL"/>
         <MinVersion Major="1" Valid="True"/>
-      </Item5>
+      </Item6>
     </RequiredPkgs>
     <UsageOptions>
       <CustomOptions Value="-dUseCThreads 

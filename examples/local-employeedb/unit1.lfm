@@ -1,0 +1,1026 @@
+object Form1: TForm1
+  Left = 439
+  Height = 482
+  Top = 350
+  Width = 1002
+  Caption = 'Employee List'
+  ClientHeight = 461
+  ClientWidth = 1002
+  Menu = MainMenu1
+  OnClose = FormClose
+  OnShow = FormShow
+  LCLVersion = '1.4.4.0'
+  object Button1: TButton
+    Left = 915
+    Height = 25
+    Top = 48
+    Width = 75
+    Action = AddEmployee
+    Anchors = [akTop, akRight]
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 915
+    Height = 25
+    Top = 86
+    Width = 75
+    Action = EditEmployee
+    Anchors = [akTop, akRight]
+    TabOrder = 1
+  end
+  object Button3: TButton
+    Left = 915
+    Height = 25
+    Top = 125
+    Width = 75
+    Action = DeleteEmployee
+    Anchors = [akTop, akRight]
+    TabOrder = 2
+  end
+  object Label1: TLabel
+    Left = 17
+    Height = 15
+    Top = 14
+    Width = 87
+    Caption = 'Started Before'
+    ParentColor = False
+  end
+  object BeforeDate: TDateEdit
+    Left = 112
+    Height = 25
+    Top = 8
+    Width = 80
+    CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
+    OKCaption = 'OK'
+    CancelCaption = 'Cancel'
+    DateOrder = doNone
+    ButtonWidth = 23
+    NumGlyphs = 1
+    MaxLength = 0
+    OnChange = BeforeDateChange
+    TabOrder = 3
+  end
+  object Label2: TLabel
+    Left = 241
+    Height = 15
+    Top = 14
+    Width = 78
+    Caption = 'Started After'
+    ParentColor = False
+  end
+  object AfterDate: TDateEdit
+    Left = 333
+    Height = 25
+    Top = 8
+    Width = 80
+    CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
+    OKCaption = 'OK'
+    CancelCaption = 'Cancel'
+    DateOrder = doNone
+    ButtonWidth = 23
+    NumGlyphs = 1
+    MaxLength = 0
+    OnChange = BeforeDateChange
+    TabOrder = 4
+  end
+  object Panel1: TPanel
+    Left = 12
+    Height = 413
+    Top = 42
+    Width = 880
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 413
+    ClientWidth = 880
+    Color = clBackground
+    ParentColor = False
+    TabOrder = 5
+    object IBDynamicGrid1: TIBDynamicGrid
+      Left = 0
+      Height = 363
+      Top = 0
+      Width = 880
+      Align = alClient
+      Color = clWindow
+      Columns = <      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Last Name'
+          Width = 100
+          FieldName = 'LAST_NAME'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          DBLookupProperties.OwnerDrawEditable = False
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'First Name'
+          Width = 100
+          FieldName = 'FIRST_NAME'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          DBLookupProperties.OwnerDrawEditable = False
+        end      
+        item
+          Alignment = taCenter
+          Title.Alignment = taCenter
+          Title.Caption = 'Emp No.'
+          Width = 60
+          FieldName = 'EMP_NO'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          DBLookupProperties.OwnerDrawEditable = False
+        end      
+        item
+          ReadOnly = True
+          Title.Alignment = taCenter
+          Title.Caption = 'Dept'
+          Width = 200
+          FieldName = 'DEPT_PATH'
+          AutoSizeColumn = True
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          DBLookupProperties.OwnerDrawEditable = False
+        end      
+        item
+          ButtonStyle = cbsPickList
+          Title.Alignment = taCenter
+          Title.Caption = 'Located'
+          Width = 100
+          FieldName = 'JOB_COUNTRY'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.ListSource = CountrySource
+          DBLookupProperties.ListField = 'COUNTRY'
+          DBLookupProperties.AutoInsert = False
+          DBLookupProperties.AutoComplete = False
+          DBLookupProperties.OwnerDrawEditable = False
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Started'
+          Width = 80
+          FieldName = 'HIRE_DATE'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          DBLookupProperties.OwnerDrawEditable = False
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Salary'
+          Width = 120
+          FieldName = 'SALARY'
+          ColumnTotalsControl = DBText1
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          DBLookupProperties.OwnerDrawEditable = False
+        end>
+      DataSource = EmployeeSource
+      Scrollbars = ssAutoBoth
+      TabOrder = 0
+      EditorPanel = EmployeeEditorPanel
+      ExpandEditorPanelBelowRow = False
+      Descending = False
+      EditorBorderStyle = bsSingle
+      DefaultPositionAtEnd = False
+      IndexFieldNames = 'EMP_NO'
+    end
+    object Panel2: TPanel
+      Left = 0
+      Height = 50
+      Top = 363
+      Width = 880
+      Align = alBottom
+      BevelOuter = bvNone
+      ClientHeight = 50
+      ClientWidth = 880
+      ParentColor = False
+      TabOrder = 1
+      object Button5: TButton
+        Left = 80
+        Height = 25
+        Top = 16
+        Width = 75
+        Action = CancelChanges
+        Anchors = [akLeft, akBottom]
+        TabOrder = 0
+      end
+      object Button4: TButton
+        Left = 1
+        Height = 25
+        Top = 16
+        Width = 75
+        Action = SaveChanges
+        Anchors = [akLeft, akBottom]
+        TabOrder = 1
+      end
+      object DBText1: TDBText
+        Left = 688
+        Height = 27
+        Top = 16
+        Width = 49
+        Alignment = taRightJustify
+        Anchors = [akTop, akLeft, akBottom]
+        DataField = 'TOTALSALARIES'
+        DataSource = TotalsSource
+        ParentColor = False
+      end
+    end
+    object EmployeeEditorPanel: TPanel
+      Left = 8
+      Height = 80
+      Top = 112
+      Width = 784
+      BevelOuter = bvNone
+      BorderWidth = 2
+      BorderStyle = bsSingle
+      ClientHeight = 78
+      ClientWidth = 782
+      Color = clWindow
+      ParentColor = False
+      TabOrder = 2
+      Visible = False
+      object Label3: TLabel
+        Left = 0
+        Height = 15
+        Top = 7
+        Width = 83
+        Caption = 'Employee No.'
+        ParentColor = False
+      end
+      object DBEdit1: TDBEdit
+        Left = 90
+        Height = 25
+        Top = 2
+        Width = 120
+        DataField = 'EMP_NO'
+        DataSource = EmployeeSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 0
+      end
+      object Label4: TLabel
+        Left = 12
+        Height = 15
+        Top = 32
+        Width = 64
+        Caption = 'First Name'
+        ParentColor = False
+      end
+      object DBEdit2: TDBEdit
+        Left = 90
+        Height = 25
+        Top = 24
+        Width = 120
+        DataField = 'FIRST_NAME'
+        DataSource = EmployeeSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 1
+      end
+      object Label5: TLabel
+        Left = 12
+        Height = 15
+        Top = 56
+        Width = 64
+        Caption = 'Last Name'
+        ParentColor = False
+      end
+      object DBEdit3: TDBEdit
+        Left = 90
+        Height = 25
+        Top = 46
+        Width = 120
+        DataField = 'LAST_NAME'
+        DataSource = EmployeeSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 2
+      end
+      object Label6: TLabel
+        Left = 216
+        Height = 15
+        Top = 7
+        Width = 77
+        Caption = 'Date Started'
+        ParentColor = False
+      end
+      object IBDateEdit1: TDBDateEdit
+        Left = 300
+        Height = 25
+        Top = 2
+        Width = 80
+        CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
+        OKCaption = 'OK'
+        CancelCaption = 'Cancel'
+        DateOrder = doNone
+        ButtonWidth = 23
+        AutoSelect = False
+        NumGlyphs = 1
+        MaxLength = 0
+        TabOrder = 3
+        DataField = 'HIRE_DATE'
+        DataSource = EmployeeSource
+      end
+      object Label7: TLabel
+        Left = 252
+        Height = 15
+        Top = 32
+        Width = 37
+        Caption = 'Salary'
+        ParentColor = False
+      end
+      object DBEdit4: TDBEdit
+        Left = 300
+        Height = 25
+        Top = 24
+        Width = 104
+        DataField = 'SALARY'
+        DataSource = EmployeeSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 5
+      end
+      object Label8: TLabel
+        Left = 708
+        Height = 15
+        Top = 54
+        Width = 24
+        Anchors = [akTop, akRight]
+        Caption = 'Ext.'
+        ParentColor = False
+      end
+      object DBEdit5: TDBEdit
+        Left = 732
+        Height = 25
+        Top = 48
+        Width = 40
+        DataField = 'PHONE_EXT'
+        DataSource = EmployeeSource
+        Anchors = [akTop, akRight]
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 4
+      end
+      object Label9: TLabel
+        Left = 536
+        Height = 15
+        Top = 7
+        Width = 51
+        Caption = 'Location'
+        ParentColor = False
+      end
+      object Label10: TLabel
+        Left = 413
+        Height = 15
+        Top = 9
+        Width = 59
+        Caption = 'Job Grade'
+        ParentColor = False
+      end
+      object JobGradeDBComboBox: TDBComboBox
+        Left = 480
+        Height = 25
+        Top = 2
+        Width = 48
+        OwnerDrawEditable = False
+        AutoSize = False
+        DataField = 'JOB_GRADE'
+        DataSource = EmployeeSource
+        ItemHeight = 0
+        Items.Strings = (
+          '1'
+          '2'
+          '3'
+          '4'
+          '5'
+        )
+        MaxLength = 0
+        OnCloseUp = JobGradeDBComboBoxCloseUp
+        Style = csDropDownList
+        TabOrder = 6
+      end
+      object Label11: TLabel
+        Left = 536
+        Height = 15
+        Top = 32
+        Width = 48
+        Caption = 'Job Title'
+        ParentColor = False
+      end
+      object Label12: TLabel
+        Left = 256
+        Height = 15
+        Top = 54
+        Width = 33
+        Caption = 'Dept.'
+        ParentColor = False
+      end
+      object SpeedButton1: TSpeedButton
+        Left = 680
+        Height = 25
+        Top = 48
+        Width = 23
+        Action = SelectDept
+        Anchors = [akTop, akRight]
+      end
+      object DBEdit6: TDBEdit
+        Left = 300
+        Height = 25
+        Top = 48
+        Width = 372
+        DataField = 'DEPT_PATH'
+        DataSource = EmployeeSource
+        ReadOnly = True
+        Anchors = [akTop, akLeft, akRight]
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 7
+      end
+      object IBLookupComboEditBox2: TIBLookupComboEditBox
+        Left = 600
+        Height = 25
+        Top = 0
+        Width = 172
+        OwnerDrawEditable = False
+        Anchors = [akTop, akLeft, akRight]
+        AutoSize = False
+        DataField = 'JOB_COUNTRY'
+        DataSource = EmployeeSource
+        KeyField = 'COUNTRY'
+        ListField = 'COUNTRY'
+        ListFieldIndex = 0
+        ListSource = CountrySource
+        LookupCache = False
+        Style = csDropDownList
+        TabOrder = 8
+        AutoInsert = False
+        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        ItemHeight = 0
+      end
+      object IBLookupComboEditBox1: TIBLookupComboEditBox
+        Left = 600
+        Height = 25
+        Top = 24
+        Width = 172
+        OwnerDrawEditable = False
+        Anchors = [akTop, akLeft, akRight]
+        AutoSize = False
+        DataField = 'JOB_CODE'
+        DataSource = EmployeeSource
+        KeyField = 'JOB_CODE'
+        ListField = 'JOB_TITLE'
+        ListFieldIndex = 0
+        ListSource = JobCodeSource
+        LookupCache = False
+        Style = csDropDownList
+        TabOrder = 9
+        AutoInsert = False
+        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        ItemHeight = 0
+      end
+    end
+  end
+  object Label13: TLabel
+    Left = 456
+    Height = 15
+    Top = 14
+    Width = 79
+    Caption = 'Salary Range'
+    ParentColor = False
+  end
+  object SalaryRange: TComboBox
+    Left = 544
+    Height = 25
+    Top = 8
+    Width = 272
+    OwnerDrawEditable = False
+    ItemHeight = 0
+    ItemIndex = 0
+    Items.Strings = (
+      'None Specified'
+      'Below $40,000'
+      'Between $40,000 and $100,000'
+      'Above $100,000'
+    )
+    OnCloseUp = BeforeDateChange
+    Style = csDropDownList
+    TabOrder = 6
+    Text = 'None Specified'
+  end
+  object IBDatabase1: TIBDatabase
+    Connected = False
+    LoginPrompt = False
+    AllowStreamedConnected = False
+    DatabaseName = 'localhost:employee'
+    Params.Strings = (
+      'user_name=SYSDBA'
+      'lc_ctype=UTF8'
+    )
+    DefaultTransaction = IBTransaction1
+    IdleTimer = 0
+    TraceFlags = []
+    left = 832
+    top = 168
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    DefaultDatabase = IBDatabase1
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait'
+    )
+    left = 872
+    top = 168
+  end
+  object EmployeeSource: TDataSource
+    DataSet = Employees
+    left = 832
+    top = 336
+  end
+  object ActionList1: TActionList
+    left = 832
+    top = 416
+    object AddEmployee: TAction
+      Caption = 'Add'
+      OnExecute = AddEmployeeExecute
+    end
+    object EditEmployee: TAction
+      Caption = 'Edit'
+      OnExecute = EditEmployeeExecute
+      OnUpdate = EditEmployeeUpdate
+    end
+    object DeleteEmployee: TAction
+      Caption = 'Delete'
+      OnExecute = DeleteEmployeeExecute
+      OnUpdate = EditEmployeeUpdate
+    end
+    object SaveChanges: TAction
+      Caption = 'Save'
+      OnExecute = SaveChangesExecute
+      OnUpdate = SaveChangesUpdate
+    end
+    object CancelChanges: TAction
+      Caption = 'Cancel'
+      OnExecute = CancelChangesExecute
+      OnUpdate = SaveChangesUpdate
+    end
+    object SelectDept: TAction
+      Caption = '...'
+      OnExecute = SelectDeptExecute
+    end
+    object NewDatabase: TAction
+      Category = 'LocalDB'
+      Caption = 'Reinitialise Database'
+      OnExecute = NewDatabaseExecute
+    end
+    object SaveDatabase: TAction
+      Category = 'LocalDB'
+      Caption = 'Save Database to Archive'
+      OnExecute = SaveDatabaseExecute
+    end
+    object RestoreDatabase: TAction
+      Category = 'LocalDB'
+      Caption = 'Restore Database From Archive'
+      OnExecute = RestoreDatabaseExecute
+    end
+    object Quit: TAction
+      Caption = 'Quit'
+      OnExecute = QuitExecute
+    end
+  end
+  object CountrySource: TDataSource
+    DataSet = Countries
+    left = 832
+    top = 296
+  end
+  object TotalsQuery: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BeforeOpen = EmployeesBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select sum(Salary) as TotalSalaries'
+      'From EMPLOYEE'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 872
+    top = 376
+    object TotalsQueryTOTALSALARIES: TIBBCDField
+      DisplayWidth = 18
+      FieldKind = fkData
+      FieldName = 'TOTALSALARIES'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = EmployeesSALARYGetText
+      Precision = 18
+      Currency = False
+      MaxValue = 0
+      MinValue = 0
+      Size = 2
+    end
+  end
+  object TotalsSource: TDataSource
+    DataSet = TotalsQuery
+    left = 832
+    top = 376
+  end
+  object Employees: TIBDataSet
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AfterDelete = EmployeesAfterDelete
+    AfterEdit = EmployeesAfterDelete
+    AfterInsert = EmployeesAfterInsert
+    AfterOpen = EmployeesAfterOpen
+    AfterPost = EmployeesAfterPost
+    AfterScroll = EmployeesAfterScroll
+    BeforeClose = EmployeesBeforeClose
+    BeforeOpen = EmployeesBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      'Delete From EMPLOYEE A'
+      'Where A.EMP_NO = :EMP_NO'
+    )
+    InsertSQL.Strings = (
+      'Insert Into EMPLOYEE(EMP_NO, FIRST_NAME, LAST_NAME, PHONE_EXT, HIRE_DATE, DEPT_NO, JOB_CODE, JOB_GRADE, JOB_COUNTRY, SALARY)'
+      'Values(:EMP_NO, :FIRST_NAME, :LAST_NAME, :PHONE_EXT, :HIRE_DATE, :DEPT_NO, :JOB_CODE, :JOB_GRADE, :JOB_COUNTRY, :SALARY)'
+    )
+    RefreshSQL.Strings = (
+      'with recursive Depts As ('
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,'
+      'cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH'
+      'From DEPARTMENT Where HEAD_DEPT is NULL '
+      'UNION ALL'
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || DEPARTMENT as DEPT_PATH,'
+      'Depts.DEPT_KEY_PATH || '';'' || DEPT_NO as DEPT_KEY_PATH'
+      'From DEPARTMENT  '
+      'JOIN Depts On HEAD_DEPT = Depts.DEPT_NO'
+      ')'
+      ''
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '
+      'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH'
+      'From EMPLOYEE A'
+      'JOIN Depts D On D.DEPT_NO = A.DEPT_NO'
+      'Where A.EMP_NO = :EMP_NO'
+    )
+    SelectSQL.Strings = (
+      'with recursive Depts As ('
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,'
+      'cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH'
+      'From DEPARTMENT Where HEAD_DEPT is NULL '
+      'UNION ALL'
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || DEPARTMENT as DEPT_PATH,'
+      'Depts.DEPT_KEY_PATH || '';'' || DEPT_NO as DEPT_KEY_PATH'
+      'From DEPARTMENT  '
+      'JOIN Depts On HEAD_DEPT = Depts.DEPT_NO'
+      ')'
+      ''
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '
+      'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH'
+      'From EMPLOYEE A'
+      'JOIN Depts D On D.DEPT_NO = A.DEPT_NO'
+    )
+    ModifySQL.Strings = (
+      'Update EMPLOYEE A Set '#13#10'  A.DEPT_NO = :DEPT_NO,'#13#10'  A.FIRST_NAME = :FIRST_NAME,'#13#10'  A.HIRE_DATE = :HIRE_DATE,'#13#10'  A.JOB_CODE = :JOB_CODE,'#13#10'  A.JOB_COUNTRY = :JOB_COUNTRY,'#13#10'  A.JOB_GRADE = :JOB_GRADE,'#13#10'  A.LAST_NAME = :LAST_NAME,'#13#10'  A.PHONE_EXT = :PHONE_EXT,'#13#10'  A.SALARY = :SALARY'
+      'Where A.EMP_NO = :OLD_EMP_NO'
+    )
+    GeneratorField.Generator = 'EMP_NO_GEN'
+    GeneratorField.Field = 'EMP_NO'
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
+    DataSetCloseAction = dcSaveChanges
+    AfterTransactionEnd = EmployeesAfterTransactionEnd
+    OnValidatePost = EmployeesValidatePost
+    left = 872
+    top = 336
+    object EmployeesEMP_NO: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'EMP_NO'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object EmployeesFIRST_NAME: TIBStringField
+      DisplayWidth = 15
+      FieldKind = fkData
+      FieldName = 'FIRST_NAME'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 15
+    end
+    object EmployeesLAST_NAME: TIBStringField
+      DisplayWidth = 20
+      FieldKind = fkData
+      FieldName = 'LAST_NAME'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object EmployeesPHONE_EXT: TIBStringField
+      Alignment = taRightJustify
+      DisplayWidth = 4
+      FieldKind = fkData
+      FieldName = 'PHONE_EXT'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 4
+    end
+    object EmployeesHIRE_DATE: TDateTimeField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'HIRE_DATE'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object EmployeesDEPT_NO: TIBStringField
+      DisplayWidth = 3
+      FieldKind = fkData
+      FieldName = 'DEPT_NO'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 3
+    end
+    object EmployeesJOB_CODE: TIBStringField
+      DisplayWidth = 5
+      FieldKind = fkData
+      FieldName = 'JOB_CODE'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      OnChange = EmployeesJOB_CODEChange
+      Size = 5
+    end
+    object EmployeesJOB_GRADE: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'JOB_GRADE'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      OnChange = EmployeesJOB_GRADEChange
+    end
+    object EmployeesJOB_COUNTRY: TIBStringField
+      DisplayWidth = 15
+      FieldKind = fkData
+      FieldName = 'JOB_COUNTRY'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 15
+    end
+    object EmployeesSALARY: TIBBCDField
+      DisplayWidth = 18
+      FieldKind = fkData
+      FieldName = 'SALARY'
+      Index = 9
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      OnGetText = EmployeesSALARYGetText
+      Precision = 18
+      Currency = False
+      MaxValue = 0
+      MinValue = 0
+      Size = 2
+    end
+    object EmployeesFULL_NAME: TIBStringField
+      DisplayWidth = 37
+      FieldKind = fkData
+      FieldName = 'FULL_NAME'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = True
+      Required = False
+      Size = 37
+    end
+    object EmployeesDEPT_PATH: TIBStringField
+      DisplayWidth = 256
+      FieldKind = fkData
+      FieldName = 'DEPT_PATH'
+      Index = 11
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 256
+    end
+    object EmployeesDEPT_KEY_PATH: TIBStringField
+      DisplayWidth = 64
+      FieldKind = fkData
+      FieldName = 'DEPT_KEY_PATH'
+      Index = 12
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 64
+    end
+  end
+  object Countries: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BeforeOpen = CountriesBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.COUNTRY, A.CURRENCY From COUNTRY A'
+      'JOIN JOB J On J.JOB_COUNTRY = A.COUNTRY'
+      'Where J.JOB_CODE = :JOB_CODE and J.JOB_GRADE = :JOB_GRADE'
+      'Order by 1'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_CODE'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
+    DataSetCloseAction = dcDiscardChanges
+    left = 872
+    top = 296
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_CODE'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
+  end
+  object JobCodeSource: TDataSource
+    DataSet = JobCodes
+    left = 832
+    top = 256
+  end
+  object JobCodes: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BeforeOpen = JobCodesBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.JOB_CODE, A.JOB_TITLE From JOB A'
+      'Where JOB_COUNTRY = :JOB_COUNTRY and JOB_GRADE = :JOB_GRADE'
+      'Order by Upper(JOB_TITLE)'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_COUNTRY'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
+    DataSetCloseAction = dcDiscardChanges
+    left = 872
+    top = 256
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_COUNTRY'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
+  end
+  object Depts: TIBQuery
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.DEPT_NO, A.DEPARTMENT From DEPARTMENT A'
+      ''
+      'Order by Upper(Department)'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 872
+    top = 210
+  end
+  object DeptsSource: TDataSource
+    DataSet = Depts
+    left = 832
+    top = 208
+  end
+  object JobGradeChangeTimer: TTimer
+    Interval = 0
+    OnTimer = JobGradeChangeTimerTimer
+    left = 928
+    top = 175
+  end
+  object JobCodeChangeTimer: TTimer
+    Interval = 0
+    OnTimer = JobCodeChangeTimerTimer
+    left = 927
+    top = 224
+  end
+  object IBLocalDBSupport1: TIBLocalDBSupport
+    Database = IBDatabase1
+    DatabaseName = 'employee.fdb'
+    EmptyDBArchive = 'employee.gbk'
+    PatchDirectory = 'patches'
+    RegistryRootKey = 'software\MWA Software\Database'
+    UpgradeConfFile = 'upgrade.conf'
+    VendorName = 'MWA Software'
+    left = 937
+    top = 264
+  end
+  object MainMenu1: TMainMenu
+    left = 937
+    top = 318
+    object MenuItem1: TMenuItem
+      Caption = 'File'
+      object MenuItem2: TMenuItem
+        Action = NewDatabase
+      end
+      object MenuItem3: TMenuItem
+        Caption = '-'
+      end
+      object MenuItem4: TMenuItem
+        Action = SaveDatabase
+      end
+      object MenuItem5: TMenuItem
+        Action = RestoreDatabase
+      end
+      object MenuItem6: TMenuItem
+        Caption = '-'
+      end
+      object MenuItem7: TMenuItem
+        Action = Quit
+      end
+    end
+  end
+end

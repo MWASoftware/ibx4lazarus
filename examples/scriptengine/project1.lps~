@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="7">
+      <Unit0>
+        <Filename Value="project1.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="23"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Unit1"/>
+        <TopLine Value="54"/>
+        <CursorPos Y="79"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="185"/>
+        <CursorPos Y="204"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="../../runtime/IBSQL.pas"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="250"/>
+        <CursorPos X="111" Y="2782"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="../../runtime/IB.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="438"/>
+        <CursorPos Y="452"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="../../runtime/IBSQLMonitor.pas"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="367"/>
+        <CursorPos X="3" Y="369"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="../../../ibxlocaldb/updatesqlunit.pas"/>
+        <UnitName Value="UpdateSQLUnit"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="13"/>
+        <CursorPos Y="40"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit6>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="364" Column="11" TopLine="353"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="362" TopLine="349"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="599" TopLine="584"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="601" TopLine="584"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="362" TopLine="347"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="112" Column="88" TopLine="101"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="111" Column="14" TopLine="92"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="574" Column="72" TopLine="564"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="143" Column="86" TopLine="141"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="406" TopLine="400"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="42" Column="38" TopLine="16"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="197" Column="18" TopLine="173"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="381" Column="10" TopLine="357"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="42" Column="45" TopLine="27"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="196" Column="30" TopLine="173"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="197" Column="18" TopLine="173"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="321" Column="31" TopLine="297"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="374" Column="20" TopLine="360"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="42" Column="40" TopLine="25"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="197" Column="18" TopLine="173"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="206" Column="39" TopLine="186"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="36" Column="39" TopLine="19"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="317" Column="13" TopLine="293"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="36" Column="34" TopLine="26"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="330" Column="34" TopLine="323"/>
+      </Position25>
+      <Position26>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+      </Position26>
+      <Position27>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="42" Column="42" TopLine="22"/>
+      </Position27>
+      <Position28>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="206" Column="23" TopLine="180"/>
+      </Position28>
+      <Position29>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="99" Column="27" TopLine="83"/>
+      </Position29>
+      <Position30>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="432" TopLine="413"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

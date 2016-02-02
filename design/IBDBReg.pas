@@ -368,7 +368,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
      IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
-     IBTreeView, DBControlGrid;
+     IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport;
 
 
 
@@ -388,7 +388,7 @@ begin
   RegisterComponents(IBPalette1, [ TIBQuery, TIBDataSet,
    TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBEvents,
      TIBSQL, TIBDatabaseInfo, TIBSQLMonitor,
-       TIBStoredProc,TIBBatchMove,  TIBTable,TIBExtract]);
+       TIBStoredProc,TIBBatchMove,  TIBTable,TIBExtract, TIBXScript, TIBLocalDBSupport]);
   if IBServiceAPIPresent  then
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
       TIBRestoreService, TIBValidationService, TIBStatisticalService,

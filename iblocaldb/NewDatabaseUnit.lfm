@@ -1,0 +1,67 @@
+object NewDatabase: TNewDatabase
+  Left = 607
+  Height = 118
+  Top = 384
+  Width = 266
+  BorderStyle = bsNone
+  Caption = 'NewDatabase'
+  ClientHeight = 118
+  ClientWidth = 266
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  OnShow = FormShow
+  Position = poMainFormCenter
+  LCLVersion = '1.4.4.0'
+  object Panel1: TPanel
+    Left = 0
+    Height = 118
+    Top = 0
+    Width = 266
+    Align = alClient
+    BevelInner = bvLowered
+    ClientHeight = 118
+    ClientWidth = 266
+    TabOrder = 0
+    object Status: TLabel
+      Left = 37
+      Height = 13
+      Top = 72
+      Width = 193
+      Alignment = taCenter
+      AutoSize = False
+      Caption = 'Status'
+      ParentColor = False
+    end
+    object Label1: TLabel
+      Left = 57
+      Height = 14
+      Top = 32
+      Width = 143
+      Caption = 'Creating New Database'
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object IBRestoreService1: TIBRestoreService
+    LoginPrompt = False
+    TraceFlags = []
+    Verbose = True
+    PageSize = 0
+    PageBuffers = 0
+    left = 64
+    top = 8
+  end
+  object OpenDialog1: TOpenDialog
+    DefaultExt = '.fdb'
+    Filter = 'Database Backups (*.gbk)|*.gbk|All Files (*.*)|*.*'
+    Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
+    left = 24
+    top = 8
+  end
+end
