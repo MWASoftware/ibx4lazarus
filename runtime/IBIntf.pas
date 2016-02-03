@@ -258,6 +258,7 @@ procedure LoadIBLibrary;
   end;
 
   function TryFBLoad(InstallDir: string): TLibHandle;
+  var dllPathName: string;
   begin
     //First look for Firebird Embedded Server in installation dir
     if FileExists(InstallDir + FIREBIRD_EMBEDDED) then
@@ -295,7 +296,7 @@ procedure LoadIBLibrary;
 
     {Then look in application installation directory}
     if Result = 0 then
-      Result := TryFBLoad(ExtractFilePath(Paramstr(0)); {Using ParamStr(0) assumes windows conventions}
+      Result := TryFBLoad(ExtractFilePath(Paramstr(0))); {Using ParamStr(0) assumes windows conventions}
 
     if Result = 0 then
     {Use Registry key if it exists to locate library}
