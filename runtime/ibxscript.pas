@@ -41,7 +41,7 @@ type
                  stInDoubleQuotes, stInComment, stInCommentLine,
                  stInDeclaration, stInCommit, stInReconnect);
 
-  TGetParamValue = procedure(Sender: TObject; Name: string; var BlobID: TISC_QUAD) of object;
+  TGetParamValue = procedure(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD) of object;
   TLogEvent = procedure(Sender: TObject; Msg: string) of Object;
 
   {
@@ -79,6 +79,7 @@ type
   TIBXScript = class(TComponent)
   private
     FDatabase: TIBDatabase;
+    FStopOnFirstError: boolean;
     FTransaction: TIBTransaction;
     FInternalTransaction: TIBTransaction;
     FState: TSQLStates;
@@ -119,6 +120,7 @@ type
   published
     property Database: TIBDatabase read FDatabase write SetDatabase;
     property Transaction: TIBTransaction read FTransaction write FTransaction;
+    property StopOnFirstError: boolean read FStopOnFirstError write FStopOnFirstError default true;
     property GetParamValue: TGetParamValue read FGetParamValue write FGetParamValue;
     property LogProc: TLogEvent read FLogProc write FLogProc;
   end;
@@ -209,6 +211,9 @@ begin
            DoReconnect;
            FState := stInit
          end;
+
+       stNested:
+         AddToSQL(FTerminator);
        end;
 
     sqSemiColon:
@@ -386,7 +391,10 @@ begin
       begin
         Add2Log(E.Message);
         Result := false;
-        Exit
+        if StopOnFirstError then Exit;
+        FSQLText := '';
+        FState := stInit;
+        FLastSymbol := sqNone;
       end
     end;
   end;
@@ -398,9 +406,10 @@ end;
 constructor TIBXScript.Create(aOwner: TComponent);
 begin
   inherited;
+  FStopOnFirstError := true;
   FState := stInit;
   FISQL := TIBSQL.Create(self);
-  FISQL.ParamCheck := false;
+  FISQL.ParamCheck := true;
   FInternalTransaction := TIBTransaction.Create(self);
   FInternalTransaction.Params.Clear;
   FInternalTransaction.Params.Add('concurrency');
@@ -443,24 +452,10 @@ begin
    FISQL.Transaction := GetTransaction;
    with FISQL.Transaction do
      if not InTransaction then StartTransaction;
-   try
-     FISQL.Prepare;
-   except
-      on E:EIBInterBaseError do
-          if E.IBErrorCode = 335544569 then //try again with ParamCheck true
-          begin
-            FISQL.ParamCheck := true;
-            try
-              FISQL.SQL.Text := '';
-              FISQL.SQL.Text := FSQLText;
-              FISQL.Prepare;
-              for I := 0 to FISQL.Params.Count - 1 do
-                SetParamValue(FISQL.Params[I]);
-            finally
-              FISQL.ParamCheck := false
-            end
-          end
-   end;
+   FISQL.Prepare;
+   for I := 0 to FISQL.Params.Count - 1 do
+     SetParamValue(FISQL.Params[I]);
+
    if FISQL.SQLType = SQLSelect then
      raise Exception.Create('Select SQL Statements are not supported');
    DDL := FISQL.SQLType = SQLDDL;
@@ -693,7 +688,7 @@ begin
     end;
 
     {Process AutoDDL}
-    RegexObj.Expression := 'SET +AUTODDL +(.) *\' + FTerminator;
+    RegexObj.Expression := 'SET +AUTODDL +([a-zA-Z]+) *\' + FTerminator;
     if RegexObj.Exec(AnsiUpperCase(Result)) then
     begin
       if  AnsiUpperCase(RegexObj.Match[1]) = 'ON' then
@@ -717,6 +712,7 @@ var BlobID: TISC_QUAD;
 begin
   if assigned(FGetParamValue) and (SQLVar.SQLType = SQL_BLOB) then
   begin
+    Add2Log('Resolving Query Parameter: ' + SQLVar.Name);
     GetParamValue(self,SQLVar.Name,BlobID);
     if (BlobID.gds_quad_high = 0) and (BlobID.gds_quad_low = 0) then
       SQLVar.Clear

@@ -1,4 +1,23 @@
+IBX Change Log  version           (1.4-0) Tue, 26 Jan 2016 14:39:54 +0000
+
+1. Unix: If Firebird Embedded Server shared object is loaded and a local database
+   path is given and database attach fails due to access permission issues on the
+   temp directory or security database, then the attach is retried with "localhost:"
+   prefixing the databasename. This should avoid problems when the database has to
+   be accessed by a local (e.g. classic) server and libfbembed is used.
+
+2. Windows: revised search order for Firebird DLL. If the FIREBIRD environment
+   variable is set then the directory this points to is tried first. The search
+   then continues with application directory, etc.
+
+3. New Component: TIBXScript. This is an ISQL compatible SQL script execution engine.
+
+4. New Component: TIBlocalDB. This is a TIBDatabase support component intended to
+   simplify the use of the embedded firebird server on both Linux and Windows platforms.
+
 IBX Change Log  version           (1.3-2) Tue, 26 Jan 2016 14:39:54 +0000
+
+1.3.2 was never formally released and only made available as beta copies.
 
 1. DBControlGrid,IBDynamicGrid: Ignore down arrow and up arrow in TCustomMemo
 

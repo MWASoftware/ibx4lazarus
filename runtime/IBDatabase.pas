@@ -1014,6 +1014,11 @@ var
   TempDBParams: TStrings;
   I: integer;
   aDBName: string;
+
+  {Call error analysis}
+  sqlcode: Long;
+  IBErrorCode: Long;
+  status_vector: PISC_STATUS;
 begin
   CheckInactive;
   CheckDatabaseName;
@@ -1054,13 +1059,32 @@ begin
   finally
    TempDBParams.Free;
   end;
-  if Call(isc_attach_database(StatusVector, Length(aDBName),
+  repeat
+    if Call(isc_attach_database(StatusVector, Length(aDBName),
                          PChar(aDBName), @FHandle,
                          FDPBLength, FDPB), False) > 0 then
-  begin
-    FHandle := nil;
-    IBDataBaseError;
-  end;
+    begin
+      {$IFDEF UNIX}
+      if IsEmbeddedServer and (Pos(':',aDBName) = 0) then
+      begin
+        status_vector := StatusVector;
+        IBErrorCode := StatusVectorArray[1];
+        sqlcode := isc_sqlcode(StatusVector);
+
+        if ((sqlcode = -901) and (IBErrorCode = 335544382)) {Access permissions on firebird temp}
+           or
+           ((sqlcode = -902) and (IBErrorCode = 335544373)) {Security DB Problem}
+           then
+           begin
+             aDBName := 'localhost:' + aDBName;
+             Continue;
+           end;
+      end;
+      {$ENDIF}
+      FHandle := nil;
+      IBDataBaseError;
+    end;
+  until FHandle <> nil;
   if not (csDesigning in ComponentState) then
     FDBName := aDBName; {Synchronise at run time}
   FDBSQLDialect := GetDBSQLDialect;

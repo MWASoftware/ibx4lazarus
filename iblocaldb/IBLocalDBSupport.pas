@@ -1,3 +1,28 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2014 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*)
 unit IBLocalDBSupport;
 
 {$mode objfpc}{$H+}
@@ -5,8 +30,7 @@ unit IBLocalDBSupport;
 interface
 
 uses
-  Classes, LResources, Forms, Controls,  Dialogs, IBDatabase,
-  Registry;
+  Classes, LResources, Forms, Controls,  Dialogs, IBDatabase;
 
 type
 
@@ -22,7 +46,6 @@ type
     * PatchDirectory: Path to directory holding SQL patch files. May either be
       absolute path or relative to application executeable.
     * Quiet: If true then no database overwrite warnings
-    * RegistryRootKey: Registry Hive used by this component to store path to database file
     * UpgradeConfFile: Path to upgrade configuration file. May either be
       absolute path or relative to application executeable.
     * VendorName: Used to construct path to Database Directory.
@@ -30,6 +53,9 @@ type
     Note: the location of the local database file is platform specific.
     Windows: "User Application Directory"\Vendor Name\Database FileName
     Unix: "User Home Directory"/."Vendor Name"/Database FileName
+
+    If the VendorName property is left empty then Sysutils.VendorName is used. If
+    this is empty then no VendorName component is present in the path.
 
     Note the use of a hidden directory under Unix.
 
@@ -51,37 +77,24 @@ type
     FOnNewDatabaseOpen: TNotifyEvent;
     FPatchDirectory: string;
     FQuiet: boolean;
-    FRegistry: TRegistry;
-    FRegistryRootKey: string;
     FUpgradeConfFile: string;
     FNewDBCreated: boolean;
     FVendorName: string;
     procedure CheckEnabled;
     procedure CreateDatabase(DBName: string; DBParams: TStrings; Overwrite: boolean);
     function GetDatabase: TIBDatabase;
-    function GetIntegerParameter(index: string): integer;
-    function GetStringParameter(index: string): string;
     procedure SetDatabase(AValue: TIBDatabase);
-    procedure SetIntegerParameter(index: string; AValue: integer);
-    procedure SetRegistryRootKey(AValue: string);
-    procedure SetStringParameter(index: string; AValue: string);
     procedure OnBeforeDatabaseConnect(Sender: TObject; DBParams: TStrings;
                               var DBName: string);
     procedure OnDatabaseConnect(Sender: TObject);
-    procedure NeedRegistry;
     procedure SetupFirebirdEnv;
   protected
     { Protected declarations }
     function GetDBNameAndPath: string;
-    function HasValue(index: string): boolean;
     procedure InitDatabaseParameters(DBParams: TStrings;
                               var DBName: string);
     procedure Loaded; override;
     procedure PrepareDBParams(DBParams: TStrings);
-    property StringParameter[index: string]: string read GetStringParameter
-                                             write SetStringParameter;
-    property IntegerParameter[index: string]: integer read GetIntegerParameter
-                                                      write SetIntegerParameter;
  public
     { Public declarations }
     constructor Create(aOwner: TComponent); override;
@@ -112,7 +125,6 @@ type
     property EmptyDBArchive: string read FEmptyDBArchive write FEmptyDBArchive;
     property FirebirdDir: string read FFirebirdDir write FFirebirdDir;
     property PatchDirectory: string  read FPatchDirectory write FPatchDirectory;
-    property RegistryRootKey: string read FRegistryRootKey write SetRegistryRootKey;
     property Quiet: boolean read FQuiet write FQuiet;
     property UpgradeConfFile: string read FUpgradeConfFile write FUpgradeConfFile;
     property VendorName: string read FVendorName write FVendorName;
@@ -121,13 +133,10 @@ type
 
 implementation
 
-uses UpdateDatabaseUnit, NewDatabaseUnit, SaveDatabaseUnit
+uses UpdateDatabaseUnit, NewDatabaseUnit, SaveDatabaseUnit, IBIntf
   {$IFDEF Unix} ,initc {$ENDIF}
   {$IFDEF WINDOWS} ,Windows {$ENDIF}
   ,SysUtils;
-
-const
-  rgDatabasePath = 'DatabasePath';
 
 { TIBLocalDBSupport }
 
@@ -167,50 +176,9 @@ begin
   Result := FIBBase.Database;
 end;
 
-function TIBLocalDBSupport.GetIntegerParameter(index: string): integer;
-begin
-  Result := 0;
-  NeedRegistry;
-  if FRegistry.OpenKey(FRegistryRootKey,false) and FRegistry.ValueExists(index) then
-     Result := FRegistry.ReadInteger(index);
-  FRegistry.CloseKey;
-end;
-
-function TIBLocalDBSupport.GetStringParameter(index: string): string;
-begin
-  Result := '';
-  NeedRegistry;
-  if FRegistry.OpenKey(FRegistryRootKey,false) and FRegistry.ValueExists(index) then
-     Result := FRegistry.ReadString(index);
-  FRegistry.CloseKey;
-end;
-
 procedure TIBLocalDBSupport.SetDatabase(AValue: TIBDatabase);
 begin
   FIBBase.Database := AValue;
-end;
-
-procedure TIBLocalDBSupport.SetIntegerParameter(index: string; AValue: integer);
-begin
-  NeedRegistry;
-  if FRegistry.OpenKey(FRegistryRootKey,true) then
-      FRegistry.WriteInteger(index,AValue);
-  FRegistry.CloseKey;
-end;
-
-procedure TIBLocalDBSupport.SetRegistryRootKey(AValue: string);
-begin
-  if FRegistryRootKey = AValue then Exit;
-  FRegistryRootKey := AValue;
-  if assigned(FRegistry) then FreeAndNil(FRegistry);
-end;
-
-procedure TIBLocalDBSupport.SetStringParameter(index: string; AValue: string);
-begin
-  NeedRegistry;
-  if FRegistry.OpenKey(FRegistryRootKey,true) then
-      FRegistry.WriteString(index,AValue);
-  FRegistry.CloseKey;
 end;
 
 {$IFDEF Unix}
@@ -237,6 +205,10 @@ procedure TIBLocalDBSupport.OnBeforeDatabaseConnect(Sender: TObject;
   DBParams: TStrings; var DBName: string);
 begin
   if not Enabled then Exit;
+
+  if not IsEmbeddedServer then
+     raise Exception.Create('Firebird Embedded Server is required but is not installed');
+
   InitDatabaseParameters(DBParams,DBName);
   SetupFirebirdEnv;
 end;
@@ -247,12 +219,6 @@ begin
   if FNewDBCreated and assigned(FOnNewDatabaseOpen) then
     OnNewDatabaseOpen(self);
   FNewDBCreated := false;
-end;
-
-procedure TIBLocalDBSupport.NeedRegistry;
-begin
-  if not assigned(FRegistry) then
-    FRegistry := TRegistry.Create;
 end;
 
 procedure TIBLocalDBSupport.SetupFirebirdEnv;
@@ -272,33 +238,30 @@ begin
       mkdir(tmpDir);
     SetEnvironmentVariable('FIREBIRD_LOCK',PChar(TmpDir));
   end;
-  if (FirebirdDir <> '') and FileExists(FirebirdDir + DirectorySeparator + 'firebird.conf') then
-    SetEnvironmentVariable('FIREBIRD',PChar(FirebirdDir))
-  else
-  if FileExists(Application.Location + 'firebird.conf') then
-    SetEnvironmentVariable('FIREBIRD',PChar(ExtractFileDir(Application.ExeName)));
+  if GetEnvironmentVariable('FIREBIRD') = '' then
+  begin
+    if (FirebirdDir <> '') and FileExists(FirebirdDir + DirectorySeparator + 'firebird.conf') then
+      SetEnvironmentVariable('FIREBIRD',PChar(FirebirdDir))
+    else
+    if FileExists(Application.Location + 'firebird.conf') then
+      SetEnvironmentVariable('FIREBIRD',PChar(ExtractFileDir(Application.ExeName)));
+  end;
 end;
 
 function TIBLocalDBSupport.GetDBNameAndPath: string;
 begin
-  if HasValue(rgDatabasePath) then
-    Result := StringParameter[rgDatabasePath]
+  Result := DatabaseName;
+  if VendorName <> '' then
+    Result := VendorName + DirectorySeparator + Result
   else
-  begin
-    Result := DatabaseName;
-    if VendorName <> '' then
-      Result := VendorName + DirectorySeparator + Result
-    else
-    if Sysutils.VendorName <> '' then
-      Result := SysUtils.VendorName + DirectorySeparator + Result;
-    {$IFDEF UNIX}
-    Result := GetUserDir + '.' + Result;
-    {$ENDIF}
-    {$IFDEF WINDOWS}
-    Result := GetUserDir + 'Application Data' + DirectorySeparator + Result;
-    {$ENDIF}
-    StringParameter[rgDatabasePath] := Result;
-  end;
+  if Sysutils.VendorName <> '' then
+    Result := SysUtils.VendorName + DirectorySeparator + Result;
+  {$IFDEF UNIX}
+  Result := GetUserDir + '.' + Result;
+  {$ENDIF}
+  {$IFDEF WINDOWS}
+  Result := GetUserDir + 'Application Data' + DirectorySeparator + Result;
+  {$ENDIF}
 end;
 
 procedure TIBLocalDBSupport.PrepareDBParams(DBParams: TStrings);
@@ -320,13 +283,6 @@ begin
     {$ENDIF}
 end;
 
-function TIBLocalDBSupport.HasValue(index: string): boolean;
-begin
-  NeedRegistry;
-  Result := FRegistry.OpenKey(FRegistryRootKey,false) and FRegistry.ValueExists(index);
-  FRegistry.CloseKey;
-end;
-
 constructor TIBLocalDBSupport.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
@@ -334,7 +290,6 @@ begin
   FIBBase := TIBBase.Create(self);
   FIBBase.AfterDatabaseConnect := @OnDatabaseConnect;
   FIBBase.BeforeDatabaseConnect := @OnBeforeDatabaseConnect;
-  FRegistryRootKey := 'software\MWA Software\Database';
   FPatchDirectory := 'patches';
   FUpgradeConfFile := 'upgrade.conf';
 end;
@@ -342,7 +297,6 @@ end;
 destructor TIBLocalDBSupport.Destroy;
 begin
   if assigned(FIBBase) then FreeAndNil(FIBBase);
-  if assigned(FRegistry) then FreeAndNil(FRegistry);
   inherited Destroy;
 end;
 
@@ -374,6 +328,7 @@ procedure TIBLocalDBSupport.ResolveDBVersionMismatch(VersionFound,
 var confFile: string;
     patchDir: string;
     DBParams: TStringList;
+    CurVersion: integer;
 begin
   Upgraded := false;
   if not Enabled then Exit;
@@ -381,6 +336,13 @@ begin
   if (confFile = '') then Exit;
   if confFile[1] <> DirectorySeparator then
     confFile := Application.Location + confFile;
+
+  CurVersion := GetCurrentVersion(confFile);
+  if CurVersion < VersionWanted then
+    raise Exception.CreateFmt('Database Upgrade Required, but the Upgrade File is out of Date. '+
+                              'Required Version = %d, Upgrade available for version %d',
+                              [VersionWanted,CurVersion]);
+
   patchDir := PatchDirectory;
   if patchDir = '' then Exit;
   if patchDir[1] <> DirectorySeparator then

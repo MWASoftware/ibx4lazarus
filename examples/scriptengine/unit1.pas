@@ -6,13 +6,15 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ComCtrls, ActnList, ibxscript, IBDatabase;
+  ComCtrls, ActnList, ibxscript, IBDatabase, IBHeader;
 
 type
 
   { TForm1 }
 
   TForm1 = class(TForm)
+    OpenBlobDialog: TOpenDialog;
+    StopOnError: TCheckBox;
     RunScript: TAction;
     LoadScript: TAction;
     ActionList1: TActionList;
@@ -30,12 +32,16 @@ type
     ProgressBar1: TProgressBar;
     ResultsLog: TMemo;
     procedure FormShow(Sender: TObject);
+    procedure IBXScript1GetParamValue(Sender: TObject; ParamName: string;
+      var BlobID: TISC_QUAD);
     procedure IBXScript1LogProc(Sender: TObject; Msg: string);
     procedure LoadScriptExecute(Sender: TObject);
     procedure RunScriptExecute(Sender: TObject);
     procedure RunScriptUpdate(Sender: TObject);
+    procedure StopOnErrorChange(Sender: TObject);
   private
     { private declarations }
+    procedure DoOpen(Data: PtrInt);
   public
     { public declarations }
   end;
@@ -44,6 +50,8 @@ var
   Form1: TForm1;
 
 implementation
+
+uses IBBlob, DB;
 
 {$R *.lfm}
 
@@ -54,7 +62,36 @@ begin
   ResultsLog.Lines.Clear;
   IBScript.Lines.Clear;
   DBName.Caption := IBDatabase1.DatabaseName;
-  IBDatabase1.Connected := true;
+  StopOnError.Checked := IBXScript1.StopOnFirstError;
+  Application.QueueAsyncCall(@DoOpen,0);
+end;
+
+procedure TForm1.IBXScript1GetParamValue(Sender: TObject; ParamName: string;
+  var BlobID: TISC_QUAD);
+var Blob: TIBBlobStream;
+    Source: TStream;
+begin
+  OpenBlobDialog.Title := 'Resolve Query Parameter: ''' + ParamName + '''';
+  if OpenBlobDialog.Execute then
+  begin
+    Blob := TIBBlobStream.Create;
+    try
+      Blob.Database := (Sender as TIBXScript).Database;
+      Blob.Mode := bmWrite;
+      Source := TFileStream.Create(OpenBlobDialog.FileName,fmOpenRead or fmShareDenyNone);
+      try
+        Blob.CopyFrom(Source,0)
+      finally
+        Source.Free;
+      end;
+      Blob.Finalize;
+      BlobID := Blob.BlobID;
+    finally
+      Blob.Free;
+    end;
+  end
+  else
+    raise Exception.Create('Unable to resolve statement parameter');
 end;
 
 procedure TForm1.IBXScript1LogProc(Sender: TObject; Msg: string);
@@ -85,6 +122,23 @@ end;
 procedure TForm1.RunScriptUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := IBScript.Lines.Text <> '';
+end;
+
+procedure TForm1.StopOnErrorChange(Sender: TObject);
+begin
+   IBXScript1.StopOnFirstError := StopOnError.Checked;
+end;
+
+procedure TForm1.DoOpen(Data: PtrInt);
+begin
+  try
+    IBDatabase1.Connected := true;
+  except on E: Exception do
+    begin
+      MessageDlg(E.Message,mtError,[mbOK],0);
+      Application.Terminate;
+    end;
+  end;
 end;
 
 end.

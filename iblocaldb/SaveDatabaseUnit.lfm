@@ -13,7 +13,7 @@ object SaveDatabase: TSaveDatabase
   Font.Name = 'Tahoma'
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.4.0.3'
+  LCLVersion = '1.4.4.0'
   object Panel1: TPanel
     Left = 0
     Height = 117

@@ -33,11 +33,12 @@ object Form1: TForm1
     Lines.Strings = (
       'IBScript'
     )
+    ScrollBars = ssAutoVertical
     TabOrder = 0
   end
   object Button1: TButton
     Left = 369
-    Height = 25
+    Height = 30
     Top = 192
     Width = 77
     Action = RunScript
@@ -62,6 +63,7 @@ object Form1: TForm1
     Lines.Strings = (
       'ResultsLog'
     )
+    ScrollBars = ssAutoVertical
     TabOrder = 2
   end
   object ProgressBar1: TProgressBar
@@ -74,9 +76,9 @@ object Form1: TForm1
   end
   object Button2: TButton
     Left = 14
-    Height = 25
+    Height = 30
     Top = 369
-    Width = 75
+    Width = 82
     Action = LoadScript
     Anchors = [akLeft, akBottom]
     TabOrder = 4
@@ -89,9 +91,19 @@ object Form1: TForm1
     Caption = 'DBName'
     ParentColor = False
   end
+  object StopOnError: TCheckBox
+    Left = 117
+    Height = 22
+    Top = 375
+    Width = 136
+    Caption = 'Stop On First Error'
+    OnChange = StopOnErrorChange
+    TabOrder = 5
+  end
   object IBXScript1: TIBXScript
     Database = IBDatabase1
     Transaction = IBTransaction1
+    GetParamValue = IBXScript1GetParamValue
     LogProc = IBXScript1LogProc
     left = 24
     top = 104
@@ -99,7 +111,7 @@ object Form1: TForm1
   object IBDatabase1: TIBDatabase
     Connected = False
     AllowStreamedConnected = False
-    DatabaseName = 'localhost:employee'
+    DatabaseName = 'employee'
     Params.Strings = (
       'lc_ctype=UTF8                           '
       'user_name=SYSDBA'
@@ -136,7 +148,14 @@ object Form1: TForm1
     Title = 'Load SQL Script'
     DefaultExt = '.sql'
     Filter = 'SQL FIles|*.sql|All Files|*.*'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
     left = 75
     top = 156
+  end
+  object OpenBlobDialog: TOpenDialog
+    Filter = 'All Files|*.*'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 75
+    top = 208
   end
 end

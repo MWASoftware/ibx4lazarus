@@ -7,14 +7,19 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, DBGrids,
   StdCtrls, ActnList, EditBtn, DbCtrls, ExtCtrls, Buttons, IBDatabase, IBQuery,
-  IBCustomDataSet, IBUpdateSQL, IBDynamicGrid, IBLookupComboEditBox,
+  IBCustomDataSet, IBUpdateSQL, IBSQL, IBDynamicGrid, IBLookupComboEditBox,
   IBLocalDBSupport, db, DBExtCtrls, Menus;
+
+const
+  RequiredVersionNo = 2;
 
 type
 
   { TForm1 }
 
   TForm1 = class(TForm)
+    CheckVersionTablePresent: TIBSQL;
+    GetDBVersionNoQuery: TIBSQL;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
     Quit: TAction;
@@ -113,6 +118,7 @@ type
     IBTransaction1: TIBTransaction;
     procedure EmployeesAfterPost(DataSet: TDataSet);
     procedure EmployeesValidatePost(Sender: TObject; var CancelPost: boolean);
+    procedure IBDatabase1AfterConnect(Sender: TObject);
     procedure JobCodeChangeTimerTimer(Sender: TObject);
     procedure JobGradeChangeTimerTimer(Sender: TObject);
     procedure JobGradeDBComboBoxCloseUp(Sender: TObject);
@@ -149,8 +155,11 @@ type
   private
     { private declarations }
     FDirty: boolean;
-    FClosing: boolean;
+    FNoAutoReopen: boolean;
+    FInUpgrade: boolean;
     procedure Reopen(Data: PtrInt);
+    function GetDBVersionNo: integer;
+    procedure DoTerminate(Data: PtrInt);
   public
     { public declarations }
   end; 
@@ -224,6 +233,43 @@ begin
   Depts.Active := true;
 end;
 
+function TForm1.GetDBVersionNo: integer;
+begin
+  Result := 0;
+  with IBTransaction1 do
+    if not InTransaction then StartTransaction;
+  FNoAutoReopen := true;
+  try
+    with CheckVersionTablePresent do
+    begin
+      ExecQuery;
+      try
+        if EOF then Exit;
+      finally
+        Close;
+      end;
+    end;
+
+    with GetDBVersionNoQuery do
+    begin
+      ExecQuery;
+      try
+        Result := FieldByName('VersionNo').AsInteger;
+      finally
+        Close;
+      end;
+    end;
+  finally
+    IBTransaction1.Commit;
+    FNoAutoReopen := false;
+  end;
+end;
+
+procedure TForm1.DoTerminate(Data: PtrInt);
+begin
+  Close;
+end;
+
 procedure TForm1.AddEmployeeExecute(Sender: TObject);
 begin
   Employees.Append
@@ -258,6 +304,40 @@ begin
   CancelPost := (EmployeesLAST_NAME.AsString = sNoName) and  (EmployeesFIRST_NAME.AsString = sNoName);
 end;
 
+procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);
+var CurrentDBVersionNo: integer;
+    Upgraded: boolean;
+begin
+  if FInUpgrade then Exit;  {Avoids problem if RECONNECT used in script}
+
+  CurrentDBVersionNo := GetDBVersionNo;
+  if CurrentDBVersionNo > RequiredVersionNo then
+    raise Exception.CreateFmt('Software Upgrade Required: Current DB Version No is %d. '+
+                              'Version %d supported',[CurrentDBVersionNo,RequiredVersionNo]);
+
+  Upgraded := false;
+  if CurrentDBVersionNo < RequiredVersionNo then
+  begin
+    try
+      FInUpgrade := true;
+      try
+        IBLocalDBSupport1.ResolveDBVersionMismatch(CurrentDBVersionNo,RequiredVersionNo,Upgraded);
+      finally
+        FInUpgrade := false;
+      end;
+    except On E:Exception do
+      MessageDlg(E.Message,mtError,[mbOK],0);
+    end;
+    if not Upgraded then
+    begin
+      FNoAutoReopen := true;
+      Application.QueueAsyncCall(@DoTerminate,0);
+      Exit;
+    end
+  end;
+  ReOpen(0);
+end;
+
 procedure TForm1.JobCodeChangeTimerTimer(Sender: TObject);
 begin
   Countries.Active := false;
@@ -281,16 +361,15 @@ end;
 
 procedure TForm1.NewDatabaseExecute(Sender: TObject);
 begin
-  FClosing := true;
+  FNoAutoReopen := true;
   try
     {Ensure Transaction End}
     if IBTransaction1.InTransaction then
       IBTransaction1.Rollback;
   finally
-    FClosing := false;
+    FNoAutoReopen := false;
   end;
   IBLocalDBSupport1.NewDatabase;
-  ReOpen(0);
 end;
 
 procedure TForm1.QuitExecute(Sender: TObject);
@@ -300,27 +379,26 @@ end;
 
 procedure TForm1.RestoreDatabaseExecute(Sender: TObject);
 begin
-  FClosing := true;
+  FNoAutoReopen := true;
   try
     {Ensure all changes saved}
     if IBTransaction1.InTransaction then
       IBTransaction1.Commit;
   finally
-    FClosing := false;
+    FNoAutoReopen := false;
   end;
   IBLocalDBSupport1.RestoreDatabase;
-  ReOpen(0);
 end;
 
 procedure TForm1.SaveDatabaseExecute(Sender: TObject);
 begin
-  FClosing := true;
+  FNoAutoReopen := true;
   try
     {Ensure all changes saved}
     if IBTransaction1.InTransaction then
       IBTransaction1.Commit;
   finally
-    FClosing := false;
+    FNoAutoReopen := false;
   end;
   IBLocalDBSupport1.SaveDatabase;
   {Start new Transaction and open dataset}
@@ -429,7 +507,7 @@ end;
 
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-  FClosing := true;
+  FNoAutoReopen := true;
   if IBTransaction1.InTransaction then
     IBTransaction1.Commit;
 end;
@@ -448,8 +526,7 @@ begin
     On E:Exception do
      MessageDlg(E.Message,mtError,[mbOK],0);
     end;
-  until IBDatabase1.Connected;
-  Reopen(0);
+  until FNoAutoReopen or IBDatabase1.Connected;
 end;
 
 procedure TForm1.EmployeesAfterDelete(DataSet: TDataSet);
@@ -460,7 +537,7 @@ end;
 procedure TForm1.EmployeesAfterTransactionEnd(Sender: TObject);
 begin
   FDirty := false;
-  if not FClosing then
+  if not FNoAutoReopen then
     Application.QueueAsyncCall(@Reopen,0)
 end;
 

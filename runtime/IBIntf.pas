@@ -101,12 +101,17 @@ var
   isc_delete_user: Tisc_delete_user;
   isc_modify_user: Tisc_modify_user;
 
+  FBLibraryName: string;
+
 
 { Library Initialization }
 procedure LoadIBLibrary;
 procedure FreeIBLibrary;
 function TryIBLoad: Boolean;
 procedure CheckIBLoaded;
+
+{Utility}
+function IsEmbeddedServer: boolean;
 
 { Stubs for 6.0 only functions }
 function isc_rollback_retaining_stub(status_vector   : PISC_STATUS;
@@ -206,7 +211,11 @@ procedure LoadIBLibrary;
       for i := 0 to LibNames.Count - 1 do
       begin
         Result := LoadLibrary(LibNames[i]);
-        if Result <> NilHandle then Exit;
+        if Result <> NilHandle then
+        begin
+          FBLibraryName := LibNames[i];
+          Exit;
+        end;
       end;
     finally
       LibNames.Free;
@@ -234,28 +243,27 @@ procedure LoadIBLibrary;
 
       LibName := '/Library/Frameworks/Firebird.framework/Firebird';
       Result := LoadLibrary(LibName);
+      if Result <> NilHandle then
+         FBLibraryName := ExtractFileName(LibName);
     end
     {$ENDIF}
   end;
 {$ENDIF}
 {$IFDEF WINDOWS}
-  function InternalLoadLibrary: TLibHandle;
-  var InstallDir: string;
-      dllPathName: string;
+  function DoLoadLibrary(LibName: string): TLibHandle;
   begin
-    if assigned(OnGetLibraryName) then
-    begin
-      OnGetLibraryName(dllPathName);
-      Result := LoadLibrary(dllPathName);
-      Exit
-    end;
+    Result := LoadLibrary(LibName);
+    if Result <> 0 then
+      FBLibraryName := ExtractFileName(LibName);
+  end;
 
+  function TryFBLoad(InstallDir: string): TLibHandle;
+  begin
     //First look for Firebird Embedded Server in installation dir
-    InstallDir := ExtractFilePath(Paramstr(0));  {Using ParamStr(0) assumes windows conventions}
     if FileExists(InstallDir + FIREBIRD_EMBEDDED) then
     begin
          dllPathName := InstallDir + FIREBIRD_EMBEDDED;
-         Result := LoadLibrary(dllPathName)
+         Result := DoLoadLibrary(dllPathName)
     end
     else
     //Otherwise look for Firebird Client in installation dir
@@ -264,10 +272,33 @@ procedure LoadIBLibrary;
       //assume firebird.conf and firebird.msg in same dir
       SetEnvironmentVariable('FIREBIRD',PChar(InstallDir));
       dllPathName := InstallDir +FIREBIRD_CLIENT;
-      Result := LoadLibrary(dllPathName)
-    end
-    else
-    //Use Registry key if it exists to locate library
+      Result := DoLoadLibrary(dllPathName)
+    end;
+  end;
+
+  function InternalLoadLibrary: TLibHandle;
+  var InstallDir: string;
+      dllPathName: string;
+  begin
+    {If OnGetLibraryName given then use this}
+    if assigned(OnGetLibraryName) then
+    begin
+      OnGetLibraryName(dllPathName);
+      Result := DoLoadLibrary(dllPathName);
+      Exit
+    end;
+
+    {If FIREBIRD environment variable available then use this first}
+    InstallDir := GetEnvironmentVariable('FIREBIRD');
+    if InstallDir <> '' then
+       Result := TryFBLoad(InstallDir);
+
+    {Then look in application installation directory}
+    if Result = 0 then
+      Result := TryFBLoad(ExtractFilePath(Paramstr(0)); {Using ParamStr(0) assumes windows conventions}
+
+    if Result = 0 then
+    {Use Registry key if it exists to locate library}
     begin
       with TRegistry.Create do
       try
@@ -279,7 +310,7 @@ procedure LoadIBLibrary;
             dllPathName := ReadString('DefaultInstance')  + 'bin' + DirectorySeparator + FIREBIRD_CLIENT;
             if FileExists(dllPathName) then
             begin
-              Result := LoadLibrary(dllPathName);
+              Result := DoLoadLibrary(dllPathName);
               Exit
             end
           end
@@ -290,10 +321,10 @@ procedure LoadIBLibrary;
 
       //Otherwise see if Firebird client is in path
       //and rely on registry for location of firebird.conf and firebird.msg
-      Result := LoadLibrary(FIREBIRD_CLIENT);
+      Result := DoLoadLibrary(FIREBIRD_CLIENT);
       if Result <= HINSTANCE_ERROR then
          //well maybe InterBase is present...
-         Result := LoadLibrary(IBASE_DLL);
+         Result := DoLoadLibrary(IBASE_DLL);
     end
   end;
 {$ENDIF}
@@ -403,6 +434,16 @@ begin
     IBError(ibxeInterBaseMissing, [nil]);
 end;
 
+function IsEmbeddedServer: boolean;
+begin
+  Result := false;
+  {$IFDEF UNIX}
+  Result := Pos('libfbembed',FBLibraryName) = 1;
+  {$ENDIF}
+  {$IFDEF WINDOWS}
+  Result := CompareText(FBLibraryName,FIREBIRD_EMBEDDED) = 0
+  {$ENDIF}
+end;
 
 function isc_rollback_retaining_stub(status_vector   : PISC_STATUS;
               tran_handle     : PISC_TR_HANDLE):
