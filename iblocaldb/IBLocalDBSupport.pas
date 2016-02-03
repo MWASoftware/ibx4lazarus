@@ -30,7 +30,7 @@ unit IBLocalDBSupport;
 interface
 
 uses
-  Classes, LResources, Forms, Controls,  Dialogs, IBDatabase;
+  Classes, LResources, Forms, Controls,  Dialogs, IBDatabase, SysUtils;
 
 type
 
@@ -131,12 +131,13 @@ type
     property OnNewDatabaseOpen: TNotifyEvent read FOnNewDatabaseOpen write FOnNewDatabaseOpen;
  end;
 
+  EIBLocalFatalError = class(Exception);
+
 implementation
 
 uses UpdateDatabaseUnit, NewDatabaseUnit, SaveDatabaseUnit, IBIntf
   {$IFDEF Unix} ,initc {$ENDIF}
-  {$IFDEF WINDOWS} ,Windows {$ENDIF}
-  ,SysUtils;
+  {$IFDEF WINDOWS} ,Windows {$ENDIF};
 
 { TIBLocalDBSupport }
 
@@ -155,7 +156,7 @@ begin
  begin
    if not Overwrite then Exit;
 
-   DeleteFile(DBName);
+   sysutils.DeleteFile(DBName);
  end;
  DBArchive := EmptyDBArchive;
  if DBArchive = '' then
@@ -207,7 +208,7 @@ begin
   if not Enabled then Exit;
 
   if not IsEmbeddedServer then
-     raise Exception.Create('Firebird Embedded Server is required but is not installed');
+     raise EIBLocalFatalError.Create('Firebird Embedded Server is required but is not installed');
 
   InitDatabaseParameters(DBParams,DBName);
   SetupFirebirdEnv;
@@ -225,20 +226,20 @@ procedure TIBLocalDBSupport.SetupFirebirdEnv;
 var TmpDir: string;
 begin
   TmpDir := GetTempDir +
-      DirectorySeparator + 'firebird_' + GetEnvironmentVariable('USER');
-  if GetEnvironmentVariable('FIREBIRD_TMP') = '' then
+      DirectorySeparator + 'firebird_' + sysutils.GetEnvironmentVariable('USER');
+  if sysutils.GetEnvironmentVariable('FIREBIRD_TMP') = '' then
   begin
     if not DirectoryExists(tmpDir) then
       mkdir(tmpDir);
     SetEnvironmentVariable('FIREBIRD_TMP',PChar(TmpDir));
   end;
-  if GetEnvironmentVariable('FIREBIRD_LOCK') = '' then
+  if sysutils.GetEnvironmentVariable('FIREBIRD_LOCK') = '' then
   begin
     if not DirectoryExists(tmpDir) then
       mkdir(tmpDir);
     SetEnvironmentVariable('FIREBIRD_LOCK',PChar(TmpDir));
   end;
-  if GetEnvironmentVariable('FIREBIRD') = '' then
+  if sysutils.GetEnvironmentVariable('FIREBIRD') = '' then
   begin
     if (FirebirdDir <> '') and FileExists(FirebirdDir + DirectorySeparator + 'firebird.conf') then
       SetEnvironmentVariable('FIREBIRD',PChar(FirebirdDir))

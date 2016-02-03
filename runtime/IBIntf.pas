@@ -182,7 +182,7 @@ implementation
 
 uses Sysutils, IB, Dynlibs, Classes
 {$IFDEF WINDOWS}
-, Registry
+, Registry, WinDirs
 {$ENDIF}
 ;
 
@@ -320,6 +320,16 @@ procedure LoadIBLibrary;
         end
       finally
         Free
+      end;
+
+      {Now try default install dir}
+      if Result = NilHandle then
+      begin
+        InstallDir := GetWindowsSpecialDir(CSIDL_PROGRAM_FILES) +
+          DirectorySeparator + 'Firebird' +
+          DirectorySeparator + 'Firebird_2_5' +
+          DirectorySeparator + 'bin' + DirectorySeparator;
+        Result := TryFBLoad(InstallDir);
       end;
 
       //Otherwise see if Firebird client is in path

@@ -523,8 +523,14 @@ begin
         Close;
         Exit
       end;
+    On E: EIBLocalFatalError do
+      begin
+        MessageDlg(E.Message,mtError,[mbOK],0);
+        Close;
+        Exit
+      end;
     On E:Exception do
-     MessageDlg(E.Message,mtError,[mbOK],0);
+       MessageDlg(E.Message,mtError,[mbOK],0);
     end;
   until FNoAutoReopen or IBDatabase1.Connected;
 end;
