@@ -310,12 +310,8 @@ procedure LoadIBLibrary;
         begin
           if ValueExists('DefaultInstance') then
           begin
-            dllPathName := ReadString('DefaultInstance')  + 'bin' + DirectorySeparator + FIREBIRD_CLIENT;
-            if FileExists(dllPathName) then
-            begin
-              Result := DoLoadLibrary(dllPathName);
-              Exit
-            end
+            InstallDir := ReadString('DefaultInstance')  + 'bin' + DirectorySeparator ;
+            Result := TryFBLoad(InstallDir);
           end
         end
       finally
@@ -334,10 +330,13 @@ procedure LoadIBLibrary;
 
       //Otherwise see if Firebird client is in path
       //and rely on registry for location of firebird.conf and firebird.msg
-      Result := DoLoadLibrary(FIREBIRD_CLIENT);
-      if Result <= HINSTANCE_ERROR then
+      if Result = NilHandle then
+      begin
+        Result := DoLoadLibrary(FIREBIRD_CLIENT);
+        if Result <= HINSTANCE_ERROR then
          //well maybe InterBase is present...
          Result := DoLoadLibrary(IBASE_DLL);
+      end;
     end
   end;
 {$ENDIF}
