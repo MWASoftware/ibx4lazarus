@@ -194,8 +194,8 @@ procedure LoadIBLibrary;
   function GetProcAddr(ProcName: PChar): Pointer;
   begin
     Result := GetProcAddress(IBLibrary, ProcName);
-    {if not Assigned(Result) then
-      raise Exception.Create('Unable to load Firebird Client Library');}
+    if not Assigned(Result) then
+      raise Exception.Create('Unable to load Firebird Client Library');
   end;
 {$IFDEF UNIX }
   function FindLibrary(LibNameList: string): TLibHandle;
@@ -253,13 +253,14 @@ procedure LoadIBLibrary;
   function DoLoadLibrary(LibName: string): TLibHandle;
   begin
     Result := LoadLibrary(LibName);
-    if Result <> 0 then
+    if Result <> NilHandle then
       FBLibraryName := ExtractFileName(LibName);
   end;
 
   function TryFBLoad(InstallDir: string): TLibHandle;
   var dllPathName: string;
   begin
+    Result := NilHandle;
     //First look for Firebird Embedded Server in installation dir
     if FileExists(InstallDir + FIREBIRD_EMBEDDED) then
     begin
@@ -281,6 +282,7 @@ procedure LoadIBLibrary;
   var InstallDir: string;
       dllPathName: string;
   begin
+    Result := NilHandle;
     {If OnGetLibraryName given then use this}
     if assigned(OnGetLibraryName) then
     begin
@@ -295,10 +297,10 @@ procedure LoadIBLibrary;
        Result := TryFBLoad(InstallDir);
 
     {Then look in application installation directory}
-    if Result = 0 then
+    if Result = NilHandle then
       Result := TryFBLoad(ExtractFilePath(Paramstr(0))); {Using ParamStr(0) assumes windows conventions}
 
-    if Result = 0 then
+    if Result = NilHandle then
     {Use Registry key if it exists to locate library}
     begin
       with TRegistry.Create do
