@@ -194,8 +194,8 @@ procedure LoadIBLibrary;
   function GetProcAddr(ProcName: PChar): Pointer;
   begin
     Result := GetProcAddress(IBLibrary, ProcName);
-    if not Assigned(Result) then
-      raise Exception.Create('Unable to load Firebird Client Library');
+    {if not Assigned(Result) then
+      raise Exception.Create('Unable to load Firebird Client Library');}
   end;
 {$IFDEF UNIX }
   function FindLibrary(LibNameList: string): TLibHandle;
