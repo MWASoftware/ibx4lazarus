@@ -29,7 +29,7 @@ unit ibxscript;
 
 interface
 
-uses Classes, IBDatabase,  IBSQL, IBHeader, ComCtrls;
+uses Classes, IBDatabase,  IBSQL, IBHeader;
 
 type
   TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes,
@@ -43,6 +43,8 @@ type
 
   TGetParamValue = procedure(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD) of object;
   TLogEvent = procedure(Sender: TObject; Msg: string) of Object;
+  TOnProgressEvent = procedure (Sender: TObject; Reset: boolean; value: integer) of object;
+  TOnSelectSQL = procedure (Sender: TObject; SQLText: string) of object;
 
   {
   TIBXScript: runs an SQL script in the specified file or stream. The text is parsed
@@ -65,20 +67,38 @@ type
     read binary data from a file, save it in a blob stream and return the blob id.
 
   An update log is generated and written using the LogProc Event handler.
+
+  Properties:
+
+  * Database: Link to TIBDatabase component
+  * Transaction: Link to Transaction. Defaults to internaltransaction (concurrency, wait)
+  * Echo: boolean. When true, all SQL statements are echoed to log
+  * StopOnFirstError: boolean. When true the script engine terminates on the first
+    SQL Error.
+
+
+  Events:
+
+  * GetParamValue: called when an SQL parameter is found (in PSQL :name format).
+    This is only called for blob fields. Handler should return the BlobID to be
+    used as the parameter value.  If not present an exception is raised when a
+    parameter is found.
+  * LogProc: Called to write messages to the log.
+  * OnProgressEvent: Progress bar support. If Reset is true the value is maximum
+    value of progress bar. Otherwise called to step progress bar.
+  * OnSelectSQL: handler for select SQL statements. If not present, select SQL
+    statements result in an exception.
   }
-
-  TProgressBarInterface = class
-  public
-    procedure Reset(Total: integer); virtual; abstract;
-    procedure Increment; virtual; abstract;
-  end;
-
 
   { TIBXScript }
 
   TIBXScript = class(TComponent)
   private
     FDatabase: TIBDatabase;
+    FEcho: boolean;
+    FOnErrorLog: TLogEvent;
+    FOnProgressEvent: TOnProgressEvent;
+    FOnSelectSQL: TOnSelectSQL;
     FStopOnFirstError: boolean;
     FTransaction: TIBTransaction;
     FInternalTransaction: TIBTransaction;
@@ -92,12 +112,12 @@ type
     FStack: array [0..16] of TSQLStates;
     FStackindex: integer;
     FGetParamValue: TGetParamValue;
-    FLogProc: TLogEvent;
+    FOnOutputLog: TLogEvent;
     FTerminator: char;
     FAutoDDL: boolean;
-    procedure Add2Log(const Msg: string);
+    procedure Add2Log(const Msg: string; IsError: boolean=true);
     procedure AddToSQL(const Symbol: string);
-    function AnalyseSQL(Lines: TStringList; ProgressBar: TProgressBarInterface): boolean;
+    function AnalyseSQL(Lines: TStringList): boolean;
     procedure AnalyseLine(const Line: string);
     procedure DoCommit;
     procedure DoReconnect;
@@ -113,58 +133,37 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
-    function PerformUpdate(const SQLFile: string; ProgressBar: TProgressBarInterface; AutoDDL: boolean): boolean; overload;
-    function PerformUpdate(const SQLStream: TStream; ProgressBar: TProgressBarInterface; AutoDDL: boolean): boolean; overload;
-    function PerformUpdate(const SQLFile: string; ProgressBar: TProgressBar; AutoDDL: boolean): boolean; overload;
-    function PerformUpdate(const SQLStream: TStream; ProgressBar: TProgressBar; AutoDDL: boolean): boolean; overload;
+    function PerformUpdate(const SQLFile: string;  AutoDDL: boolean): boolean; overload;
+    function PerformUpdate(const SQLStream: TStream;   AutoDDL: boolean): boolean; overload;
   published
     property Database: TIBDatabase read FDatabase write SetDatabase;
+    property Echo: boolean read FEcho write FEcho default true;  {Echo Input to Log}
     property Transaction: TIBTransaction read FTransaction write FTransaction;
     property StopOnFirstError: boolean read FStopOnFirstError write FStopOnFirstError default true;
-    property GetParamValue: TGetParamValue read FGetParamValue write FGetParamValue;
-    property LogProc: TLogEvent read FLogProc write FLogProc;
+    property GetParamValue: TGetParamValue read FGetParamValue write FGetParamValue; {resolve parameterized queries}
+    property OnOutputLog: TLogEvent read FOnOutputLog write FOnOutputLog; {Log handler}
+    property OnErrorLog: TLogEvent read FOnErrorLog write FOnErrorLog;
+    property OnProgressEvent: TOnProgressEvent read FOnProgressEvent write FOnProgressEvent; {Progress Bar Support}
+    property OnSelectSQL: TOnSelectSQL read FOnSelectSQL write FOnSelectSQL; {Handle Select SQL Statements}
   end;
-
-  { TThreadProgressBar }
-
-  TThreadProgressBar = class(TProgressBarInterface)
-  private
-    FProgressBar: TProgressBar;
-    FOwner: TThread;
-    FTotal: integer;
-    procedure InternalReset;
-    procedure InternalIncrement;
-  public
-    constructor Create(Owner: TThread; ProgressBar: TProgressBar);
-    procedure Reset(Total: integer); override;
-    procedure Increment; override;
-  end;
-
-  { TInlineProgressBar }
-
-  TInlineProgressBar = class(TProgressBarInterface)
-  private
-    FProgressBar: TProgressBar;
-  public
-    constructor Create(ProgressBar: TProgressBar);
-    destructor Destroy; override;
-    procedure Reset(Total: integer); override;
-    procedure Increment; override;
-  end;
-
 
 implementation
 
-uses Sysutils, IB, RegExpr, Forms;
+uses Sysutils, IB, RegExpr;
 
 resourcestring
   sFailed      = 'Update Failed - %s';
 
 { TIBXScript }
 
-procedure TIBXScript.Add2Log(const Msg: string);
+procedure TIBXScript.Add2Log(const Msg: string; IsError: boolean);
 begin
-  if assigned(FLogProc) then FLogProc(self,Msg)
+  if IsError then
+  begin
+    if assigned(OnErrorLog) then OnErrorLog(self,Msg)
+  end
+  else
+  if assigned(FOnOutputLog) then FOnOutputLog(self,Msg)
 end;
 
 procedure TIBXScript.AddToSQL(const Symbol: string);
@@ -373,8 +372,7 @@ begin
   end
 end;
 
-function TIBXScript.AnalyseSQL(Lines: TStringList;
-  ProgressBar: TProgressBarInterface): boolean;
+function TIBXScript.AnalyseSQL(Lines: TStringList): boolean;
 var I: integer;
 begin
   Result := true;
@@ -383,8 +381,9 @@ begin
   FLastSymbol := sqNone;
   for I := 0 to Lines.Count - 1 do
   begin
-    Add2Log(Lines[I]);
-    if ProgressBar <> nil then ProgressBar.Increment;
+    if Echo then Add2Log(Lines[I],false);
+    if assigned(OnProgressEvent) then
+      OnProgressEvent(self,false,1);
     try
       AnalyseLine(ProcessSetStatement(Lines[I]));
     except on E:Exception do
@@ -407,6 +406,7 @@ constructor TIBXScript.Create(aOwner: TComponent);
 begin
   inherited;
   FStopOnFirstError := true;
+  FEcho := true;
   FState := stInit;
   FISQL := TIBSQL.Create(self);
   FISQL.ParamCheck := true;
@@ -457,12 +457,20 @@ begin
      SetParamValue(FISQL.Params[I]);
 
    if FISQL.SQLType = SQLSelect then
-     raise Exception.Create('Select SQL Statements are not supported');
-   DDL := FISQL.SQLType = SQLDDL;
-   FISQL.ExecQuery;
-   if FAutoDDL and DDL then
-     FISQL.Transaction.Commit;
-   FISQL.Close;
+   begin
+     if assigned(OnSelectSQL) then
+       OnSelectSQL(self,FSQLText)
+     else
+       raise Exception.Create('Select SQL Statements are not supported');
+   end
+   else
+   begin
+     DDL := FISQL.SQLType = SQLDDL;
+     FISQL.ExecQuery;
+     if FAutoDDL and DDL then
+       FISQL.Transaction.Commit;
+     FISQL.Close;
+   end;
    FISQL.SQL.Clear;
    FSQLText := ''
  end
@@ -592,20 +600,18 @@ begin
 end;
 
 function TIBXScript.PerformUpdate(const SQLFile: string;
-                                     ProgressBar: TProgressBarInterface;
                                      AutoDDL: boolean): boolean;
 var F: TFileStream;
 begin
   F := TFileStream.Create(SQLFile,fmOpenRead or fmShareDenyNone);
   try
-    Result := PerformUpdate(F,ProgressBar,AutoDDL)
+    Result := PerformUpdate(F,AutoDDL)
   finally
     F.Free
   end;
 end;
 
-function TIBXScript.PerformUpdate(const SQLStream: TStream;
-  ProgressBar: TProgressBarInterface; AutoDDL: boolean): boolean;
+function TIBXScript.PerformUpdate(const SQLStream: TStream; AutoDDL: boolean): boolean;
 var Lines: TStringList;
     FNotConnected: boolean;
 begin
@@ -618,10 +624,10 @@ begin
     Lines := TStringList.Create;
     Lines.LoadFromStream(SQLStream);
     try
-      if assigned(ProgressBar) then
-        ProgressBar.Reset(Lines.Count);
+      if assigned(OnProgressEvent) then
+        OnProgressEvent(self,true,Lines.Count);
 
-      Result := AnalyseSQL(Lines,ProgressBar)
+      Result := AnalyseSQL(Lines)
     finally
       Lines.Free
     end;
@@ -629,7 +635,7 @@ begin
       Add2Log(DateTimeToStr(Now) + ' Update Completed')
   except on E:Exception do
     begin
-      Add2Log(DateTimeToStr(Now) + Format(sFailed,[E.Message]));
+      Add2Log(DateTimeToStr(Now) + ' ' + Format(sFailed,[E.Message]));
       with GetTransaction do
         if InTransaction then Rollback;
       Result := false
@@ -639,30 +645,6 @@ begin
     if InTransaction then Commit;
   if FNotConnected then
     Database.Connected := false;
-end;
-
-function TIBXScript.PerformUpdate(const SQLFile: string;
-  ProgressBar: TProgressBar; AutoDDL: boolean): boolean;
-var F: TFileStream;
-begin
-  F := TFileStream.Create(SQLFile,fmOpenRead or fmShareDenyNone);
-  try
-    Result := PerformUpdate(F,ProgressBar,AutoDDL)
-  finally
-    F.Free
-  end;
-end;
-
-function TIBXScript.PerformUpdate(const SQLStream: TStream;
-  ProgressBar: TProgressBar; AutoDDL: boolean): boolean;
-var PB: TInlineProgressBar;
-begin
-  PB := TInlineProgressBar.Create(ProgressBar);
-  try
-    Result := PerformUpdate(SQLStream,PB,AutoDDL);
-  finally
-    PB.Free;
-  end;
 end;
 
 function TIBXScript.PopState: TSQLStates;
@@ -719,6 +701,8 @@ begin
     else
       SQLVar.AsQuad := BlobID
   end
+  else
+    raise Exception.Create('Parameterised Queries are not supported');
 end;
 
 procedure TIBXScript.SetState(AState: TSQLStates);
@@ -729,64 +713,6 @@ begin
   Inc(FStackIndex);
   FState := AState
 end;
-
-{ TThreadProgressBar }
-
-procedure TThreadProgressBar.InternalReset;
-begin
-  FProgressBar.Position := 0;
-  FProgressBar.Max := FTotal
-end;
-
-procedure TThreadProgressBar.InternalIncrement;
-begin
-  FProgressBar.Stepit
-end;
-
-constructor TThreadProgressBar.Create(Owner: TThread; ProgressBar: TProgressBar);
-begin
-  inherited Create;
-  FOwner := Owner;
-  FProgressBar := ProgressBar
-end;
-
-procedure TThreadProgressBar.Reset(Total: integer);
-begin
-  FTotal := Total;
-  TThread.Synchronize(FOwner,@InternalReset);
-end;
-
-procedure TThreadProgressBar.Increment;
-begin
-  TThread.Synchronize(FOwner,@InternalIncrement)
-end;
-
-{ TInlineProgressBar }
-
-constructor TInlineProgressBar.Create(ProgressBar: TProgressBar);
-begin
-  inherited Create;
-  FProgressBar := ProgressBar
-end;
-
-destructor TInlineProgressBar.Destroy;
-begin
-  Reset(100);
-  inherited Destroy;
-end;
-
-procedure TInlineProgressBar.Reset(Total: integer);
-begin
-  FProgressBar.Position := 0;
-  FProgressBar.Max := Total;
-end;
-
-procedure TInlineProgressBar.Increment;
-begin
-  FProgressBar.Stepit;
-  Application.ProcessMessages;
-end;
-
 
 end.
 

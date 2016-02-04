@@ -787,7 +787,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
 
 implementation
 
-uses IBIntf, Variants, FmtBCD, LCLProc, LazUTF8;
+uses IBIntf, Variants, FmtBCD, LazUTF8;
 
 const FILE_BEGIN = 0;
       FILE_CURRENT = 1;
@@ -821,6 +821,48 @@ type
   published
     property CharacterSetName: string read FCharacterSetName write FCharacterSetName;
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
+  end;
+
+
+  {  Copied from LCLProc in order to avoid LCL dependency
+
+    Ensures the covenient look of multiline string
+    when displaying it in the single line
+    * Replaces CR and LF with spaces
+    * Removes duplicate spaces
+  }
+  function TextToSingleLine(const AText: string): string;
+  var
+    str: string;
+    i, wstart, wlen: Integer;
+  begin
+    str := Trim(AText);
+    wstart := 0;
+    wlen := 0;
+    i := 1;
+    while i < Length(str) - 1 do
+    begin
+      if (str[i] in [' ', #13, #10]) then
+      begin
+        if (wstart = 0) then
+        begin
+          wstart := i;
+          wlen := 1;
+        end else
+          Inc(wlen);
+      end else
+      begin
+        if wstart > 0 then
+        begin
+          str[wstart] := ' ';
+          Delete(str, wstart+1, wlen-1);
+          Dec(i, wlen-1);
+          wstart := 0;
+        end;
+      end;
+      Inc(i);
+    end;
+    Result := str;
   end;
 
 { TIBWideMemoField }

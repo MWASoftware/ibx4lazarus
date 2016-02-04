@@ -6,13 +6,14 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ComCtrls, ActnList, ibxscript, IBDatabase, IBHeader;
+  ComCtrls, ActnList, ExtCtrls, ibxscript, IBDatabase, IBHeader;
 
 type
 
   { TForm1 }
 
   TForm1 = class(TForm)
+    EchoInput: TCheckBox;
     OpenBlobDialog: TOpenDialog;
     StopOnError: TCheckBox;
     RunScript: TAction;
@@ -31,14 +32,19 @@ type
     OpenDialog1: TOpenDialog;
     ProgressBar1: TProgressBar;
     ResultsLog: TMemo;
+    Timer1: TTimer;
+    procedure EchoInputChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure IBXScript1GetParamValue(Sender: TObject; ParamName: string;
       var BlobID: TISC_QUAD);
     procedure IBXScript1LogProc(Sender: TObject; Msg: string);
+    procedure IBXScript1ProgressEvent(Sender: TObject; Reset: boolean;
+      value: integer);
     procedure LoadScriptExecute(Sender: TObject);
     procedure RunScriptExecute(Sender: TObject);
     procedure RunScriptUpdate(Sender: TObject);
     procedure StopOnErrorChange(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
   private
     { private declarations }
     procedure DoOpen(Data: PtrInt);
@@ -63,7 +69,13 @@ begin
   IBScript.Lines.Clear;
   DBName.Caption := IBDatabase1.DatabaseName;
   StopOnError.Checked := IBXScript1.StopOnFirstError;
+  EchoInput.Checked :=  IBXScript1.Echo;
   Application.QueueAsyncCall(@DoOpen,0);
+end;
+
+procedure TForm1.EchoInputChange(Sender: TObject);
+begin
+  IBXScript1.Echo :=  EchoInput.Checked;
 end;
 
 procedure TForm1.IBXScript1GetParamValue(Sender: TObject; ParamName: string;
@@ -99,6 +111,18 @@ begin
   ResultsLog.Lines.Add(Msg);
 end;
 
+procedure TForm1.IBXScript1ProgressEvent(Sender: TObject; Reset: boolean;
+  value: integer);
+begin
+  if Reset then
+  begin
+    ProgressBar1.Position :=  0;
+    ProgressBar1.Max := value;
+  end
+  else
+    ProgressBar1.StepIt;
+end;
+
 procedure TForm1.LoadScriptExecute(Sender: TObject);
 begin
   if OpenDialog1.Execute then
@@ -113,10 +137,11 @@ begin
   try
    IBScript.Lines.SaveToStream(S);
    S.Position := 0;
-   IBXScript1.PerformUpdate(S,ProgressBar1,true);
+   IBXScript1.PerformUpdate(S,true);
   finally
     S.Free;
   end;
+  Timer1.Interval := 1000;
 end;
 
 procedure TForm1.RunScriptUpdate(Sender: TObject);
@@ -127,6 +152,12 @@ end;
 procedure TForm1.StopOnErrorChange(Sender: TObject);
 begin
    IBXScript1.StopOnFirstError := StopOnError.Checked;
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+begin
+  Timer1.Interval := 0;
+  ProgressBar1.Position := 0;
 end;
 
 procedure TForm1.DoOpen(Data: PtrInt);

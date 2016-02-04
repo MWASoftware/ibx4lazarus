@@ -47,13 +47,16 @@ type
    FVersionWanted: integer;
    FOnCompletion: TNotifyEvent;
    FOwner: TUpdateDatabaseDlg;
+   FTotal: integer;
    procedure Add2Log(Sender: TObject; Msg: string);
    procedure HandleGetParamValue(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD);
+   procedure HandleProgessEvent(Sender: TObject; Reset: boolean; value: integer);
    procedure OutputLog;
    function RunUpdate(FileName: string): integer;
    procedure ReportCompletion;
+   procedure ResetProgressBar;
+   procedure StepProgressBar;
   protected
-    FProgressBar: TThreadProgressBar;
     FCurrentVersion: string;
     FPatchDir: string;
     function Check4Update(VersionNo: integer; var FileName, DynaUpdate,
@@ -67,10 +70,8 @@ type
   public
     constructor Create(aOwner: TUpdateDatabaseDlg;
                         PatchDir, ParamFile: string;
-                        ProgressBar: TProgressBar;
                         VersionFound,VersionWanted: integer;
                         OnCompletion: TNotifyEvent);
-    destructor Destroy; override;
     function SuccessfulCompletion: boolean;
     property ParamFile: string read FParamFile;
   end;
@@ -93,6 +94,8 @@ type
     procedure IBXScriptGetParamValue(Sender: TObject; ParamName: string;
       var BlobID: TISC_QUAD);
     procedure IBXScriptLogProc(Sender: TObject; Msg: string);
+    procedure IBXScriptProgressEvent(Sender: TObject; Reset: boolean;
+      value: integer);
   private
     { private declarations }
     FUpdater: TDBUpdateThread;
@@ -171,7 +174,7 @@ begin
   ProgressBar1.Position := 0;
   Status.Caption := '';
   FUpgradeLog.Clear;
-  FUpdater := TDBUpdateThread.Create(self,FPatchDir,FParamFile,ProgressBar1,
+  FUpdater := TDBUpdateThread.Create(self,FPatchDir,FParamFile,
                                 FVersionFound,FVersionWanted,@HandleCompletion) ;
   Application.QueueAsyncCall(@DoUpdate,0);
 end;
@@ -201,6 +204,14 @@ begin
   {Warning: called by separate thread to main window thread}
   if assigned(FUpdater) then
     FUpdater.Add2Log(Sender,Msg);
+end;
+
+procedure TUpdateDatabaseDlg.IBXScriptProgressEvent(Sender: TObject;
+  Reset: boolean; value: integer);
+begin
+  {Warning: called by separate thread to main window thread}
+  if assigned(FUpdater) then
+    FUpdater.HandleProgessEvent(Sender,Reset,value);
 end;
 
 procedure TUpdateDatabaseDlg.DoUpdate(Data: PtrInt);
@@ -259,12 +270,10 @@ begin
 end;
 
 constructor TDBUpdateThread.Create(aOwner: TUpdateDatabaseDlg; PatchDir,
-  ParamFile: string; ProgressBar: TProgressBar; VersionFound,
-  VersionWanted: integer; OnCompletion: TNotifyEvent);
+  ParamFile: string; VersionFound,  VersionWanted: integer; OnCompletion: TNotifyEvent);
 begin
   inherited Create(true);
   FOwner := aOwner;
-  FProgressBar := TThreadProgressBar.Create(self,ProgressBar);
   FOnCompletion := OnCompletion;
   FPatchDir := PatchDir;
   FParamFile := ParamFile;
@@ -321,6 +330,18 @@ begin
   end
 end;
 
+procedure TDBUpdateThread.HandleProgessEvent(Sender: TObject; Reset: boolean;
+  value: integer);
+begin
+  if Reset then
+  begin
+    FTotal := value;
+    Synchronize(@ResetProgressBar);
+  end
+  else
+    Synchronize(@StepProgressBar);
+end;
+
 function TDBUpdateThread.RunUpdate(FileName: string): integer;
 var
     Process: TProcess;
@@ -348,12 +369,6 @@ begin
     Process.Free
   end
 
-end;
-
-destructor TDBUpdateThread.Destroy;
-begin
-  if FProgressBar <> nil then FProgressBar.Free;
-  inherited;
 end;
 
 function TDBUpdateThread.SuccessfulCompletion: boolean;
@@ -399,6 +414,20 @@ begin
   if assigned(FOnCompletion) then FOnCompletion(self)
 end;
 
+procedure TDBUpdateThread.ResetProgressBar;
+begin
+  with FOwner.ProgressBar1 do
+  begin
+    Position := 0;
+    Max := FTotal;
+  end;
+end;
+
+procedure TDBUpdateThread.StepProgressBar;
+begin
+  FOwner.ProgressBar1.StepIt;
+end;
+
 function TDBUpdateThread.Check4Update(VersionNo: integer; var FileName, DynaUpdate,
   Message: string): boolean;
 var IniFile: TIniFile;
@@ -431,7 +460,7 @@ begin
      Add2Log(self,UserMessage);
      if UpdateAvailable then
      begin
-       if not FOwner.IBXScript.PerformUpdate(FPatchDir + DirectorySeparator + UpdateSQLFile,FProgressBar,true) then
+       if not FOwner.IBXScript.PerformUpdate(FPatchDir + DirectorySeparator + UpdateSQLFile,true) then
          begin
            Result := 1;
            break

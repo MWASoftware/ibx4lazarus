@@ -1,7 +1,7 @@
 object UpdateDatabaseDlg: TUpdateDatabaseDlg
-  Left = 469
+  Left = 528
   Height = 132
-  Top = 284
+  Top = 302
   Width = 324
   ActiveControl = Panel1
   BorderStyle = bsNone
@@ -63,7 +63,9 @@ object UpdateDatabaseDlg: TUpdateDatabaseDlg
     Database = UpdateDatabase
     Transaction = UpdateTransaction
     GetParamValue = IBXScriptGetParamValue
-    LogProc = IBXScriptLogProc
+    OnOutputLog = IBXScriptLogProc
+    OnErrorLog = IBXScriptLogProc
+    OnProgressEvent = IBXScriptProgressEvent
     left = 270
     top = 48
   end
