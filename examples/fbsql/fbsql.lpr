@@ -8,7 +8,16 @@ uses
   {$ENDIF}{$ENDIF}
   Classes, SysUtils, CustApp
   { you can add units after this }
-  ,IBDatabase, ibxscript, IBExtract;
+  ,IBDatabase, ibxscript, IBExtract, IBQuery, DB;
+
+resourcestring
+
+  sUnknownField = 'Unknown Field Type';
+  sBadGraphic   = 'Unable to generate CSV data for a Graphic Field';
+  sBadParadox   = 'Unable to generate CSV data for a Paradox OLE Field';
+  sBadDBase     = 'Unable to generate CSV data  for a DBase OLE Field';
+  sBadBinary    = 'Unable to generate CSV data  for a Binary Field';
+  sBadCursor    = 'Unable to generate CSV data  for a Cursor Field';
 
 type
 
@@ -20,9 +29,12 @@ type
     FIBTransaction: TIBTransaction;
     FIBXScript: TIBXScript;
     FExtract: TIBExtract;
+    FQuery: TIBQuery;
     FSQL: TStringStream;
     procedure LogHandler(Sender: TObject; Msg: string);
     procedure ErrorLogHandler(Sender: TObject; Msg: string);
+    procedure HandleSelectSQL(Sender: TObject; SQLText: string);
+    procedure WriteCSV;
   protected
     procedure DoRun; override;
     procedure ShowException(E: Exception); override;
@@ -42,6 +54,97 @@ end;
 procedure TFBSQL.ErrorLogHandler(Sender: TObject; Msg: string);
 begin
   writeln(stderr, Msg);
+end;
+
+procedure TFBSQL.HandleSelectSQL(Sender: TObject; SQLText: string);
+begin
+  FQuery.SQL.Text := SQLText;
+  FQuery.Active := true;
+  try
+    WriteCSV;
+  finally
+    FQuery.Active := false;
+  end;
+end;
+
+procedure TFBSQL.WriteCSV;
+
+  procedure WriteQuotedText(Text: string);
+  var Index: integer;
+  begin
+    Index := 1;
+    while Index <= Length(Text) do
+      if Text[Index] = '"' then
+      begin
+        Insert('"',Text,Index);
+        Inc(Index,2)
+      end
+      else
+        Inc(Index,1);
+    write('"' + Text + '"')
+  end;
+
+  procedure WriteFieldList(Fields: TFields);
+  var I: integer;
+  begin
+    for I := 0 to Fields.Count - 1 do
+    begin
+      if I > 0 then write(',');
+      write(Fields[I].FieldName)
+    end;
+    writeln;
+  end;
+
+  procedure WriteRecord;
+  var I: integer;
+  begin
+    with FQuery do
+    begin
+      for I := 0 to FieldCount - 1 do
+      begin
+        if I <> 0 then write(',');
+        case Fields[I].DataType of
+        ftUnknown:  raise Exception.Create(sUnknownField);
+        ftString:   WriteQuotedText(Fields[I].AsString);
+        ftSmallint,
+        ftInteger,
+        ftWord,
+        ftLargeInt,
+        ftBoolean:  write(Fields[I].DisplayText);
+        ftFloat,
+        ftCurrency,
+        ftFmtBCD,
+        ftBCD:      write(Fields[I].AsString);
+        ftDate,
+        ftTime:     write(DateTimeToStr(Fields[I].AsDateTime));
+        ftDateTime: WriteQuotedText(Fields[I].AsString);
+        ftBytes,
+        ftVarBytes,
+        ftBlob,
+        ftAutoInc:  write(Fields[I].AsString);
+        ftMemo:     WriteQuotedText(Fields[I].AsString);
+        ftGraphic:  raise Exception.Create(sBadGraphic);
+        ftFmtMemo:  WriteQuotedText(Fields[I].AsString);
+        ftParadoxOle: raise Exception.Create(sBadParadox);
+        ftDBaseOle:   raise Exception.Create(sBadDBase);
+        ftTypedBinary:raise Exception.Create(sBadBinary);
+        ftCursor:    raise Exception.Create(sBadCursor);
+       end
+      end;
+      writeln;
+    end;
+  end;
+begin
+  with FQuery do
+  begin
+    WriteFieldList(Fields);
+    First;
+    while not EOF do
+    begin
+      WriteRecord;
+      Next
+    end;
+  end
 end;
 
 procedure TFBSQL.DoRun;
@@ -81,9 +184,13 @@ begin
   FIBXScript.Transaction := FIBTransaction;
   FIBXScript.OnOutputLog := @LogHandler;
   FIBXScript.OnErrorLog := @ErrorLogHandler;
+  FIBXScript.OnSelectSQL := @HandleSelectSQL;
   FExtract := TIBExtract.Create(self);
   FExtract.Database := FIBDatabase;
   FExtract.Transaction := FIBTransaction;
+  FQuery := TIBQuery.Create(self);
+  FQuery.Database := FIBDatabase;
+  FQuery.Transaction := FIBTransaction;
 
   FIBTransaction.Params.Add('concurrency');
   FIBTransaction.Params.Add('wait');
