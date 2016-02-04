@@ -267,6 +267,7 @@ end;
     FBookmark: TLocationArray;
     FDBLookupCellEditor: TDBLookupCellEditor;
     FActive: boolean;
+    FFieldPosition: integer;
     procedure ColumnHeaderClick(Index: integer);
     function GetDataSource: TDataSource;
     function GetEditorBorderStyle: TBorderStyle;
@@ -959,8 +960,11 @@ begin
       OnColumnHeaderClick(self,Index);
 
     FLastColIndex := Index;
-    if assigned(DataSource) and assigned(DataSource.DataSet) and DataSource.DataSet.Active then
+    FFieldPosition := 0;
+    if assigned(DataSource) and assigned(DataSource.DataSet) and DataSource.DataSet.Active
+       and (DataSource.DataSet is TIBParserDataSet) then
     begin
+      FFieldPosition := TIBParserDataSet(DataSource.DataSet).Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
       DataSource.DataSet.Active := false;
       Application.QueueAsyncCall(@DoReopen,0)
     end;
@@ -1025,19 +1029,16 @@ end;
 
 procedure TIBDynamicGrid.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
 var OrderBy: string;
-    FieldPosition: integer;
 begin
     if assigned(DataSource) and assigned(DataSource.DataSet)
       and (DataSource.DataSet is TIBCustomDataSet) then
     begin
-      if (FLastColIndex < 0) or (FLastColIndex >= Columns.Count) then Exit;
-      FieldPosition := Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
-      if FieldPosition > 0 then
+      if FFieldPosition > 0 then
       begin
         if Descending then
-          Parser.OrderByClause := IntToStr(FieldPosition) + ' desc'
+          Parser.OrderByClause := IntToStr(FFieldPosition) + ' desc'
         else
-          Parser.OrderByClause := IntToStr(FieldPosition) + ' asc';
+          Parser.OrderByClause := IntToStr(FFieldPosition) + ' asc';
       end;
 
       if assigned(FOnUpdateSortOrder) then

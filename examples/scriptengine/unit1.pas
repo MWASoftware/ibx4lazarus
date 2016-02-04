@@ -40,6 +40,7 @@ type
     procedure IBXScript1LogProc(Sender: TObject; Msg: string);
     procedure IBXScript1ProgressEvent(Sender: TObject; Reset: boolean;
       value: integer);
+    procedure IBXScript1SelectSQL(Sender: TObject; SQLText: string);
     procedure LoadScriptExecute(Sender: TObject);
     procedure RunScriptExecute(Sender: TObject);
     procedure RunScriptUpdate(Sender: TObject);
@@ -57,7 +58,7 @@ var
 
 implementation
 
-uses IBBlob, DB;
+uses IBBlob, DB, Unit2;
 
 {$R *.lfm}
 
@@ -121,6 +122,12 @@ begin
   end
   else
     ProgressBar1.StepIt;
+end;
+
+procedure TForm1.IBXScript1SelectSQL(Sender: TObject; SQLText: string);
+begin
+  with TSelectSQLResults.Create(Application) do
+    Show(SQLText);
 end;
 
 procedure TForm1.LoadScriptExecute(Sender: TObject);
