@@ -3,26 +3,30 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="25">
+    <Units Count="27">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="119"/>
-        <CursorPos X="57" Y="152"/>
+        <TopLine Value="105"/>
+        <CursorPos X="10" Y="107"/>
         <UsageCount Value="27"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/custapp.pp"/>
-        <EditorIndex Value="-1"/>
+        <UnitName Value="CustApp"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="49"/>
+        <CursorPos X="14" Y="64"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1964"/>
-        <CursorPos X="24" Y="1974"/>
+        <TopLine Value="780"/>
+        <CursorPos X="30" Y="790"/>
         <UsageCount Value="11"/>
       </Unit2>
       <Unit3>
@@ -175,16 +179,36 @@
         <TopLine Value="28"/>
         <UsageCount Value="10"/>
       </Unit24>
+      <Unit25>
+        <Filename Value="../../../../lcl/lclproc.pas"/>
+        <UnitName Value="LCLProc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="10"/>
+        <CursorPos X="49" Y="2551"/>
+        <UsageCount Value="10"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="../../../../components/lazutils/lazutf8.pas"/>
+        <UnitName Value="LazUTF8"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="6"/>
+        <CursorPos X="10" Y="102"/>
+        <UsageCount Value="10"/>
+      </Unit26>
     </Units>
     <CustomDefines Count="2">
       <Define0 Value="UseCThreads"/>
       <Define1 Value="IBX_CONSOLE_MODE"/>
     </CustomDefines>
-    <JumpHistory Count="1">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="project1.lpr"/>
         <Caret Line="18" Column="74" TopLine="18"/>
       </Position1>
+      <Position2>
+        <Filename Value="project1.lpr"/>
+        <Caret Line="107" Column="10" TopLine="83"/>
+      </Position2>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

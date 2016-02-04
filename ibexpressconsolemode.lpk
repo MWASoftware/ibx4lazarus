@@ -152,7 +152,7 @@ II.1. Advertising Materials. All advertising materials mentioning features or us
 II.2. Endorsements. The names &quot;Inprise,&quot; &quot;InterBase,&quot; &quot;ISC,&quot; and &quot;IB&quot; must not be used to endorse or promote Contributor Versions or Larger Works without the prior written permission of Inprise.
 II.3. Product Names. Contributor Versions and Larger Works may not be called &quot;Inprise&quot; or &quot;InterBase&quot; nor may the words &quot;Inprise&quot; or &quot;InterBase&quot; appear in their names without the prior written permission of Inprise Corporation."/>
     <Version Major="1" Minor="3"/>
-    <Files Count="22">
+    <Files Count="23">
       <Item1>
         <Filename Value="runtime/IB.pas"/>
         <UnitName Value="IB"/>
@@ -241,12 +241,19 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <Filename Value="runtime/IBSQLParser.pas"/>
         <UnitName Value="IBSQLParser"/>
       </Item22>
+      <Item23>
+        <Filename Value="runtime/ibxscript.pas"/>
+        <UnitName Value="ibxscript"/>
+      </Item23>
     </Files>
-    <RequiredPkgs Count="1">
+    <RequiredPkgs Count="2">
       <Item1>
+        <PackageName Value="LazUtils"/>
+      </Item1>
+      <Item2>
         <PackageName Value="FCL"/>
         <MinVersion Major="1" Valid="True"/>
-      </Item1>
+      </Item2>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

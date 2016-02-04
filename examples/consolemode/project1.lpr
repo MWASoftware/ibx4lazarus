@@ -114,7 +114,7 @@ begin
     - ensures centralised exception handling }
   FIBDatabase := TIBDatabase.Create(self);
   FIBTransaction := TIBTransaction.Create(self);
-  FIBDatabase.DatabaseName := 'localhost:employee';
+  FIBDatabase.DatabaseName := 'employee';
   FIBDatabase.Params.Add('user_name=SYSDBA'); {You may have to modify this!}
   FIBDatabase.Params.Add('password=masterkey');  {You may have to modify this!}
   FIBDatabase.Params.Add('lc_ctype=UTF8');

@@ -6,9 +6,18 @@ IBX Change Log  version            (1.4-0) Thu, 04 Feb 2016 10:34:22 +0000
    prefixing the databasename. This should avoid problems when the database has to
    be accessed by a local (e.g. classic) server and libfbembed is used.
 
-2. Windows: revised search order for Firebird DLL. If the FIREBIRD environment
-   variable is set then the directory this points to is tried first. The search
-   then continues with application directory, etc.
+2. Windows: revised search order for Firebird DLL:
+     i.   The Firebird Embedded Server in the application Directory.
+     ii.  If the FIREBIRD environment variable is set then the directory this
+          points to is searched for the FB Client DLL and then then underlying
+          "bin" directory.
+     iii. Registry Key HKEY_LOCAL_MACHINE\SOFTWARE\Firebird Project\Firebird Server\Instances
+          is used to locate the Firebird installation directory and the underlying
+          "bin" directory is searched for the FB Client DLL.
+     iv.  The Default installation directories C:\Program Files\Firebird\Firebird_2_x
+          are searched for the FB Client DLL.
+     v.   The PATH Environment variable is used to search for the FB Client DLL.
+     vi.  Finally the  PATH Environment variable is used to search for IBASE.DLL.
 
 3. New Component: TIBXScript. This is an ISQL compatible SQL script execution engine.
 
