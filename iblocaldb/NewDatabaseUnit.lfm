@@ -36,9 +36,9 @@ object NewDatabase: TNewDatabase
     end
     object Label1: TLabel
       Left = 57
-      Height = 14
+      Height = 13
       Top = 32
-      Width = 143
+      Width = 131
       Caption = 'Creating New Database'
       Font.Color = clWindowText
       Font.Height = -11
@@ -49,6 +49,9 @@ object NewDatabase: TNewDatabase
     end
   end
   object IBRestoreService1: TIBRestoreService
+    Params.Strings = (
+      ''
+    )
     LoginPrompt = False
     TraceFlags = []
     Verbose = True

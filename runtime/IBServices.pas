@@ -1522,7 +1522,7 @@ begin
     if (Trim(FBackupFile[i]) = '') then continue;
     if (Pos('=', FBackupFile[i]) <> 0) then  {mbcs ok}
     begin 
-      ServiceStartAddParam(FBackupFile.Names[i], isc_spb_bkp_file);
+      ServiceStartAddParam(AnsiUpperCase(FBackupFile.Names[i]), isc_spb_bkp_file);
       value := Copy(FBackupFile[i], Pos('=', FBackupFile[i]) + 1, Length(FBackupFile.Names[i])); {mbcs ok}
       param := StrToInt(value);
       ServiceStartAddParam(param, isc_spb_bkp_length);

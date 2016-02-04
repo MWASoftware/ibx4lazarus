@@ -140,12 +140,17 @@ end;
 procedure TSaveDatabase.SetDBParams(DBParams: TStrings);
 var i: integer;
     j: integer;
+    k: integer;
+    ParamName: string;
 begin
   IBBackupService1.Params.Clear;
   for i := 0 to DBParams.Count - 1 do
   begin
+    ParamName := DBParams[i];
+    k := Pos('=',ParamName);
+    if k > 0 then system.Delete(ParamName,k,Length(ParamName)-k+1);
     for j := 1 to isc_spb_last_spb_constant do
-      if DBParams[i] = SPBConstantNames[j] then
+      if ParamName = SPBConstantNames[j] then
       begin
         IBBackupService1.Params.Add(DBParams[i]);
         break;
