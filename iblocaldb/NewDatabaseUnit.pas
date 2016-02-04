@@ -161,8 +161,7 @@ begin
   end
   else
     ModalResult := mrCancel
- except
-   ModalResult := mrCancel;
+ except on E:Exception do
    raise
  end;
  Sleep(500);

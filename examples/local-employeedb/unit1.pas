@@ -530,7 +530,10 @@ begin
         Exit
       end;
     On E:Exception do
+      begin
        MessageDlg(E.Message,mtError,[mbOK],0);
+       FNoAutoReopen := true;
+      end;
     end;
   until FNoAutoReopen or IBDatabase1.Connected;
 end;

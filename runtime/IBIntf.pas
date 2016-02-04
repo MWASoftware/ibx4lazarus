@@ -257,10 +257,22 @@ procedure LoadIBLibrary;
       FBLibraryName := ExtractFileName(LibName);
   end;
 
-  function TryFBLoad(InstallDir: string): TLibHandle;
-  var dllPathName: string;
+  function InternalLoadLibrary: TLibHandle;
+  var InstallDir: string;
+      dllPathName: string;
   begin
     Result := NilHandle;
+    {If OnGetLibraryName given then use this}
+    if assigned(OnGetLibraryName) then
+    begin
+      OnGetLibraryName(dllPathName);
+      Result := DoLoadLibrary(dllPathName);
+      Exit
+    end;
+
+    {Then look in application installation directory}
+    InstallDir := ExtractFilePath(Paramstr(0)); {Using ParamStr(0) assumes windows conventions}
+
     //First look for Firebird Embedded Server in installation dir
     if FileExists(InstallDir + FIREBIRD_EMBEDDED) then
     begin
@@ -276,29 +288,24 @@ procedure LoadIBLibrary;
       dllPathName := InstallDir +FIREBIRD_CLIENT;
       Result := DoLoadLibrary(dllPathName)
     end;
-  end;
 
-  function InternalLoadLibrary: TLibHandle;
-  var InstallDir: string;
-      dllPathName: string;
-  begin
-    Result := NilHandle;
-    {If OnGetLibraryName given then use this}
-    if assigned(OnGetLibraryName) then
-    begin
-      OnGetLibraryName(dllPathName);
-      Result := DoLoadLibrary(dllPathName);
-      Exit
-    end;
-
-    {If FIREBIRD environment variable available then use this first}
-    InstallDir := GetEnvironmentVariable('FIREBIRD');
-    if InstallDir <> '' then
-       Result := TryFBLoad(InstallDir);
-
-    {Then look in application installation directory}
+    {If FIREBIRD environment variable available then try this}
     if Result = NilHandle then
-      Result := TryFBLoad(ExtractFilePath(Paramstr(0))); {Using ParamStr(0) assumes windows conventions}
+    begin
+      InstallDir := GetEnvironmentVariable('FIREBIRD');
+      if (InstallDir <> '') and FileExists(InstallDir + FIREBIRD_CLIENT) then
+      begin
+        //assume firebird.conf and firebird.msg in same dir
+        dllPathName := InstallDir + FIREBIRD_CLIENT;
+        Result := DoLoadLibrary(dllPathName)
+      end
+      else
+      if (InstallDir <> '') and FileExists(InstallDir + 'bin' + DirectorySeparator + FIREBIRD_CLIENT) then
+      begin
+        dllPathName := InstallDir + FIREBIRD_CLIENT;
+        Result := DoLoadLibrary(dllPathName)
+      end
+    end;
 
     if Result = NilHandle then
     {Use Registry key if it exists to locate library}
@@ -311,7 +318,8 @@ procedure LoadIBLibrary;
           if ValueExists('DefaultInstance') then
           begin
             InstallDir := ReadString('DefaultInstance')  + 'bin' + DirectorySeparator ;
-            Result := TryFBLoad(InstallDir);
+            dllPathName := InstallDir + FIREBIRD_CLIENT;
+            Result := DoLoadLibrary(dllPathName)
           end
         end
       finally
@@ -325,7 +333,8 @@ procedure LoadIBLibrary;
           DirectorySeparator + 'Firebird' +
           DirectorySeparator + 'Firebird_2_5' +
           DirectorySeparator + 'bin' + DirectorySeparator;
-        Result := TryFBLoad(InstallDir);
+        dllPathName := InstallDir + FIREBIRD_CLIENT;
+        Result := DoLoadLibrary(dllPathName)
       end;
 
       //Otherwise see if Firebird client is in path
