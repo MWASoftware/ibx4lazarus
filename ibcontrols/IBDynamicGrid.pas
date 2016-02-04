@@ -1012,7 +1012,10 @@ begin
   for i := 0 to Columns.Count - 1 do
   begin
     if TIBDynamicGridColumn(columns[i]).InitialSortColumn then
+    begin
+      FFieldPosition := 0;
       FLastColIndex := i
+    end
   end
 end;
 
@@ -1033,6 +1036,9 @@ begin
     if assigned(DataSource) and assigned(DataSource.DataSet)
       and (DataSource.DataSet is TIBCustomDataSet) then
     begin
+      if FLastColIndex < 0  then Exit;
+      if (FFieldPosition = 0) and (FLastColIndex < Columns.Count) then
+        FFieldPosition := Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
       if FFieldPosition > 0 then
       begin
         if Descending then
