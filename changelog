@@ -24,6 +24,9 @@ IBX Change Log  version            (1.4-0) Thu, 04 Feb 2016 10:34:22 +0000
 4. New Component: TIBlocalDB. This is a TIBDatabase support component intended to
    simplify the use of the embedded firebird server on both Linux and Windows platforms.
 
+5. IBDynamicGrid: Reordering on column header click should now also work for
+   dynamic columns.
+
 IBX Change Log  version           (1.3-2) Tue, 26 Jan 2016 14:39:54 +0000
 
 1.3.2 was never formally released and only made available as beta copies.

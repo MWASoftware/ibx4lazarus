@@ -1,14 +1,15 @@
 object SelectSQLResults: TSelectSQLResults
-  Left = 388
+  Left = 429
   Height = 436
-  Top = 186
+  Top = 275
   Width = 693
+  Anchors = []
   Caption = 'Select SQL Results'
   ClientHeight = 436
   ClientWidth = 693
   OnClose = FormClose
   OnShow = FormShow
-  Position = poDefaultSizeOnly
+  Position = poDefaultPosOnly
   LCLVersion = '1.4.4.0'
   object IBDynamicGrid1: TIBDynamicGrid
     Left = 0

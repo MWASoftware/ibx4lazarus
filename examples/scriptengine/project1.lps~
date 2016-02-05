@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="20">
+    <Units Count="23">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -33,8 +33,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="6" Y="9"/>
+        <TopLine Value="5"/>
+        <CursorPos Y="24"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -117,12 +119,10 @@
       </Unit12>
       <Unit13>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1031"/>
         <CursorPos X="10" Y="1039"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit13>
       <Unit14>
         <Filename Value="../../../../lcl/dbgrids.pas"/>
@@ -167,16 +167,60 @@
         <CursorPos Y="1034"/>
         <UsageCount Value="10"/>
       </Unit19>
+      <Unit20>
+        <Filename Value="../../changelog"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="20" Y="28"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="readme.txt"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="17" Y="17"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="tests/SelectQuery.sql"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="26" Y="2"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="SQL"/>
+      </Unit22>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="7" HistoryIndex="6">
       <Position1>
         <Filename Value="unit2.pas"/>
         <Caret Line="9" Column="6"/>
       </Position1>
       <Position2>
-        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <Caret TopLine="7"/>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="24" Column="36" TopLine="15"/>
       </Position2>
+      <Position3>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="48" TopLine="34"/>
+      </Position3>
+      <Position4>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="49" TopLine="34"/>
+      </Position4>
+      <Position5>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="50" TopLine="34"/>
+      </Position5>
+      <Position6>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="48" TopLine="34"/>
+      </Position6>
+      <Position7>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="49" TopLine="34"/>
+      </Position7>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

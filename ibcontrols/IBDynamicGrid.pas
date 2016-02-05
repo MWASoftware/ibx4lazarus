@@ -964,7 +964,9 @@ begin
     if assigned(DataSource) and assigned(DataSource.DataSet) and DataSource.DataSet.Active
        and (DataSource.DataSet is TIBParserDataSet) then
     begin
-      FFieldPosition := TIBParserDataSet(DataSource.DataSet).Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
+      if FLastColIndex < Columns.Count then
+      {try and cache field position while dataset still open}
+        FFieldPosition := TIBParserDataSet(DataSource.DataSet).Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
       DataSource.DataSet.Active := false;
       Application.QueueAsyncCall(@DoReopen,0)
     end;
@@ -1036,8 +1038,9 @@ begin
     if assigned(DataSource) and assigned(DataSource.DataSet)
       and (DataSource.DataSet is TIBCustomDataSet) then
     begin
-      if FLastColIndex < 0  then Exit;
-      if (FFieldPosition = 0) and (FLastColIndex < Columns.Count) then
+      if (FFieldPosition = 0) and (FLastColIndex >= 0) and (FLastColIndex < Columns.Count) then
+        {Not cached - let's hope we can find it before the dataset is opened.
+         Won't work if dynamic columns}
         FFieldPosition := Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
       if FFieldPosition > 0 then
       begin

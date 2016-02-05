@@ -175,31 +175,18 @@ begin
   SQLFileName := '';
   DoExtract := false;
 
-  { Create Components }
-  FIBDatabase := TIBDatabase.Create(self);
-  FIBTransaction := TIBTransaction.Create(self);
-  FIBTransaction.DefaultDatabase := FIBDatabase;
-  FIBXScript := TIBXScript.Create(self);
-  FIBXScript.Database := FIBDatabase;
-  FIBXScript.Transaction := FIBTransaction;
-  FIBXScript.OnOutputLog := @LogHandler;
-  FIBXScript.OnErrorLog := @ErrorLogHandler;
-  FIBXScript.OnSelectSQL := @HandleSelectSQL;
-  FExtract := TIBExtract.Create(self);
-  FExtract.Database := FIBDatabase;
-  FExtract.Transaction := FIBTransaction;
-  FQuery := TIBQuery.Create(self);
-  FQuery.Database := FIBDatabase;
-  FQuery.Transaction := FIBTransaction;
+  {Initialise user_name and password from environment if available}
 
-  FIBTransaction.Params.Add('concurrency');
-  FIBTransaction.Params.Add('wait');
+  if GetEnvironmentVariable('ISC_USER') <> '' then
+    FIBDatabase.Params.Add('user_name=' + GetEnvironmentVariable('ISC_USER'));
 
+  if GetEnvironmentVariable('ISC_PASSWORD') <> '' then
+    FIBDatabase.Params.Add('password=' + GetEnvironmentVariable('ISC_PASSWORD'));
+
+  {Process Command line options}
 
   if HasOption('u','user') then
-    FIBDatabase.Params.Add('user_name=' + GetOptionValue('u','user'))
-  else
-    FIBDatabase.Params.Add('user_name=SYSDBA');
+    FIBDatabase.Params.Add('user_name=' + GetOptionValue('u','user'));
 
   if HasOption('p','pass') then
     FIBDatabase.Params.Add('password=' + GetOptionValue('p','pass'));
@@ -207,12 +194,7 @@ begin
   if HasOption('r','role') then
     FIBDatabase.Params.Add('sql_role_name=' + GetOptionValue('r','role'));
 
-  FIBDatabase.Params.Add('lc_ctype=UTF8');
-
-  if (ParamCount = 1) and (ParamStr(ParamCount)[1] <> '-') then
-    FIBDatabase.DatabaseName := ParamStr(1)
-  else
-  if (ParamCount > 1) and (ParamStr(ParamCount)[1] <> '-')  and (ParamStr(ParamCount - 1)[1] <> '-') then
+  if (ParamCount >= 1) and (ParamStr(ParamCount)[1] <> '-')  then
     FIBDatabase.DatabaseName := ParamStr(ParamCount)
   else
     raise Exception.Create('Database Name Missing');
@@ -235,6 +217,8 @@ begin
     FSQL.Position := 0;
   end;
 
+  {Validation}
+
   if not DoExtract then
   begin
     if (SQLFileName = '') and (FSQL.DataString = '') then
@@ -250,6 +234,8 @@ begin
 
   if DoExtract and ((SQLFileName <> '') or (FSQL.DataString <> '')) then
     raise Exception.Create('Extract and script execution cannot be simulateously requested');
+
+  {This is where it all happens}
 
   FIBDatabase.Connected := true;
   try
@@ -283,6 +269,28 @@ begin
   inherited Create(TheOwner);
   StopOnException:=True;
   FSQL := TStringStream.Create('');
+
+  { Create Components }
+  FIBDatabase := TIBDatabase.Create(self);
+  FIBTransaction := TIBTransaction.Create(self);
+  FIBTransaction.DefaultDatabase := FIBDatabase;
+  FIBXScript := TIBXScript.Create(self);
+  FIBXScript.Database := FIBDatabase;
+  FIBXScript.Transaction := FIBTransaction;
+  FIBXScript.OnOutputLog := @LogHandler;
+  FIBXScript.OnErrorLog := @ErrorLogHandler;
+  FIBXScript.OnSelectSQL := @HandleSelectSQL;
+  FExtract := TIBExtract.Create(self);
+  FExtract.Database := FIBDatabase;
+  FExtract.Transaction := FIBTransaction;
+  FQuery := TIBQuery.Create(self);
+  FQuery.Database := FIBDatabase;
+  FQuery.Transaction := FIBTransaction;
+
+  FIBTransaction.Params.Add('concurrency');
+  FIBTransaction.Params.Add('wait');
+  FIBDatabase.Params.Add('lc_ctype=UTF8');
+
 end;
 
 destructor TFBSQL.Destroy;
@@ -293,7 +301,6 @@ end;
 
 procedure TFBSQL.WriteHelp;
 begin
-  { add your help code here }
   writeln(stderr,'Usage: ',ExtractFileName(ExeName),' <options> <database name>');
   writeln(stderr,'Options:');
   writeln(stderr,'-a            write database metadata to stdout');
@@ -305,6 +312,10 @@ begin
   writeln(stderr,'-r <rolename> open database with this rolename');
   writeln(stderr,'-s <sql>      Execute SQL text');
   writeln(stderr,'-u <username> open database with this username (defaults to SYSDBA)');
+  writeln;
+  writeln(stderr,'Environment Variables:');
+  writeln(stderr,'ISC_USER      Login user Name');
+  writeln(stderr,'ISC_PASSWORD  Login password');
 end;
 
 var

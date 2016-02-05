@@ -3,14 +3,14 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="10">
+    <Units Count="12">
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="126"/>
-        <CursorPos Y="147"/>
-        <UsageCount Value="24"/>
+        <TopLine Value="191"/>
+        <CursorPos X="61" Y="197"/>
+        <UsageCount Value="25"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -31,8 +31,8 @@
         <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/custapp.pp"/>
         <UnitName Value="CustApp"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="55"/>
-        <CursorPos X="14" Y="69"/>
+        <TopLine Value="48"/>
+        <CursorPos X="14" Y="64"/>
         <UsageCount Value="11"/>
       </Unit3>
       <Unit4>
@@ -77,8 +77,24 @@
         <CursorPos X="3" Y="1076"/>
         <UsageCount Value="10"/>
       </Unit9>
+      <Unit10>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/osutilsh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="9"/>
+        <CursorPos X="10" Y="24"/>
+        <UsageCount Value="10"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="readme.txt"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="32" Y="23"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit11>
     </Units>
-    <JumpHistory Count="21" HistoryIndex="20">
+    <JumpHistory Count="23" HistoryIndex="22">
       <Position1>
         <Filename Value="fbsql.lpr"/>
         <Caret Line="25" Column="53" TopLine="13"/>
@@ -163,6 +179,14 @@
         <Filename Value="fbsql.lpr"/>
         <Caret Line="144" Column="9" TopLine="123"/>
       </Position21>
+      <Position22>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="198" Column="20" TopLine="178"/>
+      </Position22>
+      <Position23>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="191" Column="11" TopLine="191"/>
+      </Position23>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
