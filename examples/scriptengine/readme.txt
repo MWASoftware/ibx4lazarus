@@ -2,7 +2,7 @@ Script Engine Playground
 ========================
 
 This example application illustrates use of the TIBXScript SQL script engine. It works with
-the example employee database and with various test scripts to illustrate how it works.
+the example employee database and comes with various test scripts to illustrate how it works.
 These are all located in the "tests" directory.
 
 Compile and run the application after first ensuring that the example employee database is
@@ -16,7 +16,7 @@ window is non-modal and multiple query results can be shown simultaneously. The 
 is a TIBDynamicGrid and clicking on the column header will resort the grid using the
 selected column.
 
-The test scripts are loaded in the left hand text box bby clicking on the "Load Script"
+The test scripts are loaded in the left hand text box by clicking on the "Load Script"
 button. The scripts are:
 
 1. CreateCountriesTable.sql

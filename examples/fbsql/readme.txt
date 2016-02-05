@@ -25,6 +25,12 @@ ISC_PASSWORD  Login password
 Saving the username and/or password as environment variables avoids having to enter
 them on the command line and is a more secure means of provding the password.
 
+fbsql uses IBX in console mode. Before opening this project you should tell the Lazarus
+IDE about the ibexpressconsolemode package. All you need to do in the IDE is to select "Packages->Open Package File"
+and open ibexpressconsolemode.lpk which you can find in the ibx root directory. You should then close it again 
+immediately afterwards. There is no need to install or compile it. Opening the package is sufficient for Lazarus to
+remember it.
+
 To use, compile the program in the Lazarus IDE and run it from the command line. The
 above gives the command line parameters. For example:
 

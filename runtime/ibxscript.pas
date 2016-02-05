@@ -48,7 +48,7 @@ type
 
   {
   TIBXScript: runs an SQL script in the specified file or stream. The text is parsed
-  into SQL statements which are executed in turn. The intentions is to be ISQL
+  into SQL statements which are executed in turn. The intention is to be ISQL
   compatible but with extensions:
 
   * SET TERM and Set AutoDDL are both supported
@@ -56,8 +56,8 @@ type
   * New Command: RECONNECT. Performs a commit followed by disconnecting and
     reconnecting to the database.
 
-  * Procedure Bodies (BEGIN .. END blocks) are self-terminating and do not need
-    and extra terminator. If a terminator is present, this is treated as an
+  * Procedure Bodies (BEGIN .. END blocks) are self-delimiting and do not need
+    an extra terminator. If a terminator is present, this is treated as an
     empty statement. The result is ISQL compatible, but does not require the
     use of SET TERM.
 
@@ -66,7 +66,9 @@ type
     event. This returns the blobid to be used. A typical use of the event is to
     read binary data from a file, save it in a blob stream and return the blob id.
 
-  An update log is generated and written using the LogProc Event handler.
+  Select SQL statements are not directly supported but can be handled by an external
+  handler (OnSelectSQL event). If the handler is not present then an exception
+  is raised if a Select SQL statement is found.
 
   Properties:
 
@@ -83,12 +85,17 @@ type
     This is only called for blob fields. Handler should return the BlobID to be
     used as the parameter value.  If not present an exception is raised when a
     parameter is found.
-  * LogProc: Called to write messages to the log.
+  * OnOutputLog: Called to write SQL Statements to the log (stdout)
+  * OnErrorLog: Called to write all other messages to the log (stderr)
   * OnProgressEvent: Progress bar support. If Reset is true the value is maximum
     value of progress bar. Otherwise called to step progress bar.
   * OnSelectSQL: handler for select SQL statements. If not present, select SQL
     statements result in an exception.
+
+  The PerformUpdate function is used to execute an SQL Script and may be called
+  multiple times.
   }
+
 
   { TIBXScript }
 

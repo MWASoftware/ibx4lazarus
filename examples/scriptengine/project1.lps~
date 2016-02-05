@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="23">
+    <Units Count="24">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="27"/>
+        <UsageCount Value="30"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -20,9 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <TopLine Value="61"/>
-        <CursorPos X="47" Y="76"/>
-        <UsageCount Value="27"/>
+        <CursorPos X="37" Y="9"/>
+        <UsageCount Value="30"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -33,72 +32,77 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="5"/>
-        <CursorPos Y="24"/>
-        <UsageCount Value="21"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
+        <CursorPos X="32" Y="15"/>
+        <UsageCount Value="24"/>
       </Unit2>
       <Unit3>
-        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Filename Value="tests/SelectQuery.sql"/>
+        <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="719"/>
-        <CursorPos X="3" Y="718"/>
-        <UsageCount Value="13"/>
+        <CursorPos X="26" Y="2"/>
+        <UsageCount Value="23"/>
+        <DefaultSyntaxHighlighter Value="SQL"/>
       </Unit3>
       <Unit4>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="37"/>
+        <CursorPos X="63" Y="59"/>
+        <UsageCount Value="13"/>
+      </Unit4>
+      <Unit5>
         <Filename Value="../../runtime/IBSQL.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2765"/>
         <CursorPos Y="2780"/>
         <UsageCount Value="11"/>
-      </Unit4>
-      <Unit5>
+      </Unit5>
+      <Unit6>
         <Filename Value="../../runtime/IB.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="438"/>
         <CursorPos Y="452"/>
         <UsageCount Value="12"/>
-      </Unit5>
-      <Unit6>
+      </Unit6>
+      <Unit7>
         <Filename Value="../../runtime/IBSQLMonitor.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="367"/>
         <CursorPos X="3" Y="369"/>
         <UsageCount Value="12"/>
-      </Unit6>
-      <Unit7>
+      </Unit7>
+      <Unit8>
         <Filename Value="../../../ibxlocaldb/updatesqlunit.pas"/>
         <UnitName Value="UpdateSQLUnit"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="13"/>
         <CursorPos Y="40"/>
         <UsageCount Value="11"/>
-      </Unit7>
-      <Unit8>
+      </Unit8>
+      <Unit9>
         <Filename Value="../../runtime/IBIntf.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="380"/>
         <CursorPos X="30" Y="385"/>
         <UsageCount Value="11"/>
-      </Unit8>
-      <Unit9>
+      </Unit9>
+      <Unit10>
         <Filename Value="../../runtime/IBHeader.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="35"/>
         <CursorPos X="3" Y="50"/>
         <UsageCount Value="11"/>
-      </Unit9>
-      <Unit10>
+      </Unit10>
+      <Unit11>
         <Filename Value="../../runtime/IBDatabase.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="493"/>
         <CursorPos X="16" Y="493"/>
         <UsageCount Value="11"/>
-      </Unit10>
-      <Unit11>
+      </Unit11>
+      <Unit12>
         <Filename Value="../../iblocaldb/updatedatabaseunit.pas"/>
         <ComponentName Value="UpdateDatabaseDlg"/>
         <HasResources Value="True"/>
@@ -108,119 +112,94 @@
         <TopLine Value="419"/>
         <CursorPos X="26" Y="428"/>
         <UsageCount Value="10"/>
-      </Unit11>
-      <Unit12>
+      </Unit12>
+      <Unit13>
         <Filename Value="../../../../lcl/forms.pp"/>
         <UnitName Value="Forms"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="47"/>
-        <CursorPos X="41" Y="64"/>
+        <TopLine Value="267"/>
+        <CursorPos X="22" Y="578"/>
         <UsageCount Value="10"/>
-      </Unit12>
-      <Unit13>
+      </Unit13>
+      <Unit14>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1031"/>
         <CursorPos X="10" Y="1039"/>
         <UsageCount Value="10"/>
-      </Unit13>
-      <Unit14>
+      </Unit14>
+      <Unit15>
         <Filename Value="../../../../lcl/dbgrids.pas"/>
         <UnitName Value="DBGrids"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3735"/>
         <CursorPos X="43" Y="3760"/>
         <UsageCount Value="10"/>
-      </Unit14>
-      <Unit15>
+      </Unit15>
+      <Unit16>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="515"/>
         <CursorPos X="14" Y="529"/>
         <UsageCount Value="10"/>
-      </Unit15>
-      <Unit16>
+      </Unit16>
+      <Unit17>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/collect.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="153"/>
         <CursorPos X="3" Y="156"/>
         <UsageCount Value="10"/>
-      </Unit16>
-      <Unit17>
+      </Unit17>
+      <Unit18>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="612"/>
         <CursorPos X="19" Y="629"/>
         <UsageCount Value="10"/>
-      </Unit17>
-      <Unit18>
+      </Unit18>
+      <Unit19>
         <Filename Value="../../runtime/IBSQLParser.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="911"/>
         <CursorPos X="3" Y="914"/>
         <UsageCount Value="10"/>
-      </Unit18>
-      <Unit19>
+      </Unit19>
+      <Unit20>
         <Filename Value="../../../ibx.20160126/ibcontrols/IBDynamicGrid.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1024"/>
         <CursorPos Y="1034"/>
         <UsageCount Value="10"/>
-      </Unit19>
-      <Unit20>
+      </Unit20>
+      <Unit21>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="20" Y="28"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
-      </Unit20>
-      <Unit21>
-        <Filename Value="readme.txt"/>
-        <EditorIndex Value="2"/>
-        <CursorPos X="17" Y="17"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
-        <DefaultSyntaxHighlighter Value="None"/>
       </Unit21>
       <Unit22>
-        <Filename Value="tests/SelectQuery.sql"/>
-        <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
-        <CursorPos X="26" Y="2"/>
-        <UsageCount Value="20"/>
+        <Filename Value="readme.txt"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="56" Y="19"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
-        <DefaultSyntaxHighlighter Value="SQL"/>
+        <DefaultSyntaxHighlighter Value="None"/>
       </Unit22>
+      <Unit23>
+        <Filename Value="../../../../lcl/include/customform.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="197"/>
+        <CursorPos X="3" Y="1984"/>
+        <UsageCount Value="10"/>
+      </Unit23>
     </Units>
-    <JumpHistory Count="7" HistoryIndex="6">
+    <JumpHistory Count="1">
       <Position1>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="9" Column="6"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="9" Column="37"/>
       </Position1>
-      <Position2>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="24" Column="36" TopLine="15"/>
-      </Position2>
-      <Position3>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="48" TopLine="34"/>
-      </Position3>
-      <Position4>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="49" TopLine="34"/>
-      </Position4>
-      <Position5>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="50" TopLine="34"/>
-      </Position5>
-      <Position6>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="48" TopLine="34"/>
-      </Position6>
-      <Position7>
-        <Filename Value="unit2.pas"/>
-        <Caret Line="49" TopLine="34"/>
-      </Position7>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
