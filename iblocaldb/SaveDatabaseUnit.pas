@@ -31,7 +31,7 @@ interface
 
 uses
   LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, IBServices, StdCtrls, ExtCtrls, IBDatabase;
+  Dialogs, IBServices, StdCtrls, ExtCtrls;
 
 type
 
@@ -47,7 +47,6 @@ type
   private
     { Private declarations }
     procedure DoBackup(Data: PtrInt);
-    procedure SetDBParams(DBParams: TStrings);
   public
     { Public declarations }
   end;
@@ -55,52 +54,7 @@ type
 var
   SaveDatabase: TSaveDatabase;
 
-function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean;
-
 implementation
-
-uses Registry, IBHeader;
-
-{$IFDEF WINDOWS}
-const
-  rgShellFolders      = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders';
-  rgPersonal          = 'Personal';
-{$ENDIF}
-
-function SaveDatabaseToArchive(DBName: string; DBParams: TStrings;
-  aFilename: string): boolean;
-begin
-  Result := false;
-  with TSaveDatabase.Create(Application) do
-  try
-   if aFilename = ''  then
-   begin
-     SaveDialog1.InitialDir := GetUserDir;
-     {$IFDEF WINDOWS}
-     with TRegistry.Create do
-     try
-       if OpenKey(rgShellFolders,false) then
-       begin
-         SaveDialog1.InitialDir := ReadString(rgPersonal)
-       end;
-     finally
-       Free
-     end;
-     {$ENDIF}
-     if SaveDialog1.Execute then
-       aFilename := SaveDialog1.FileName
-     else
-       Exit;
-   end;
-   IBBackupService1.BackupFile.Clear;
-   IBBackupService1.DatabaseName := DBName;
-   SetDBParams(DBParams);
-   IBBackupService1.BackupFile.Add(aFilename);
-   Result := ShowModal = mrOK
-  finally
-    Free
-  end;
-end;
 
 {$R *.lfm}
 
@@ -135,27 +89,6 @@ begin
    raise
  end;
  Sleep(500)
-end;
-
-procedure TSaveDatabase.SetDBParams(DBParams: TStrings);
-var i: integer;
-    j: integer;
-    k: integer;
-    ParamName: string;
-begin
-  IBBackupService1.Params.Clear;
-  for i := 0 to DBParams.Count - 1 do
-  begin
-    ParamName := DBParams[i];
-    k := Pos('=',ParamName);
-    if k > 0 then system.Delete(ParamName,k,Length(ParamName)-k+1);
-    for j := 1 to isc_spb_last_spb_constant do
-      if ParamName = SPBConstantNames[j] then
-      begin
-        IBBackupService1.Params.Add(DBParams[i]);
-        break;
-      end;
-  end;
 end;
 
 end.

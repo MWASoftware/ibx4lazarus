@@ -31,7 +31,7 @@ interface
 
 uses
   LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, IBServices, StdCtrls, ExtCtrls, IBDatabase, DB;
+  Dialogs, IBServices, StdCtrls, ExtCtrls;
 
 type
 
@@ -47,7 +47,6 @@ type
   private
     { Private declarations }
     procedure DoRestore(Data: PtrInt);
-    procedure SetDBParams(DBParams: TStrings);
   public
     { Public declarations }
   end;
@@ -55,67 +54,7 @@ type
 var
   NewDatabase: TNewDatabase;
 
-function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean;
-function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean;
-
 implementation
-
-uses IBHeader;
-
-procedure CreateDir(DirName: string);
-var ParentDirName: string;
-begin
-  ParentDirName := ExtractFileDir(DirName);
-  if not DirectoryExists(ParentDirName) and (ParentDirName <> DirName) then
-    CreateDir(ParentDirName);
-  if not DirectoryExists(DirName) then
-    mkdir(DirName);
-end;
-
-function CreateNewDatabase(DBName: string;  DBParams: TStrings; DBArchive: string): boolean;
-begin
-  Result := false;
-  CreateDir(ExtractFileDir(DBName));
-  with TNewDatabase.Create(Application) do
-  try
-   SetDBParams(DBParams);
-   IBRestoreService1.BackupFile.Clear;
-   IBRestoreService1.DatabaseName.Clear;
-   IBRestoreService1.Options := [CreateNewDB];
-   IBRestoreService1.BackupFile.Add(DBArchive);
-   IBRestoreService1.DatabaseName.Add(DBName);
-   Result := ShowModal = mrOK;
-  finally
-    Free
-  end;
-end;
-
-function RestoreDatabaseFromArchive(DBName: string; DBParams: TStrings;
-  aFilename: string): boolean;
-begin
- Result := false;
-
- with TNewDatabase.Create(Application) do
- try
-   if (aFilename = '') or not FileExists(aFileName) then
-   begin
-    OpenDialog1.InitialDir := GetUserDir;
-    if OpenDialog1.Execute then
-      aFilename := OpenDialog1.FileName
-    else
-      Exit;
-   end;
-   SetDBParams(DBParams);
-   IBRestoreService1.BackupFile.Clear;
-   IBRestoreService1.DatabaseName.Clear;
-   IBRestoreService1.Options := [replace];
-   IBRestoreService1.BackupFile.Add(aFilename);
-   IBRestoreService1.DatabaseName.Add(DBName);
-   Result := ShowModal = mrOK;
- finally
-   Free
- end;
-end;
 
 {$R *.lfm}
 
@@ -123,27 +62,6 @@ procedure TNewDatabase.FormShow(Sender: TObject);
 begin
  Status.Caption := '';
  Application.QueueAsyncCall(@DoRestore,0)
-end;
-
-procedure TNewDatabase.SetDBParams(DBParams: TStrings);
-var i: integer;
-    j: integer;
-    k: integer;
-    ParamName: string;
-begin
-  IBRestoreService1.Params.Clear;
-  for i := 0 to DBParams.Count - 1 do
-  begin
-    ParamName := DBParams[i];
-    k := Pos('=',ParamName);
-    if k > 0 then system.Delete(ParamName,k,Length(ParamName)-k+1);
-    for j := 1 to isc_spb_last_spb_constant do
-      if ParamName = SPBConstantNames[j] then
-      begin
-        IBRestoreService1.Params.Add(DBParams[i]);
-        break;
-      end;
-  end;
 end;
 
 procedure TNewDatabase.DoRestore(Data: PtrInt);

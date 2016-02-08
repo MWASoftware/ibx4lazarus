@@ -31,9 +31,10 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls,  Dialogs, StdCtrls,
-  ComCtrls, ExtCtrls, IBDatabase, ibxscript,  IBHeader, IBLocalDBSupport;
+  ComCtrls, ExtCtrls, IBDatabase, ibxscript,  IBHeader;
 
 type
+  TSaveBackupEvent = procedure(Sender: TObject; DBArchive: string) of object;
 
   { TUpdateDatabaseDlg }
 
@@ -55,9 +56,10 @@ type
     procedure IBXScriptProgressEvent(Sender: TObject; Reset: boolean;
       value: integer);
   private
+    FActiveDatabasePathName: string;
     { private declarations }
-    FIBLocalSupport: TIBLocalDBSupport;
     FDBParams: TStrings;
+    FOnSave2Backup: TSaveBackupEvent;
     FParamFile: string;
     FPatchDir: string;
     FUpgradeLog: TStrings;
@@ -80,15 +82,15 @@ type
     constructor Create(theOwner: TComponent); override;
     destructor Destroy; override;
     function ShowModal(PatchDir, ParamFile: string; VersionFound,VersionWanted: integer): TModalResult;
+    property ActiveDatabasePathName: string read FActiveDatabasePathName write FActiveDatabasePathName;
+    property OnSave2Backup: TSaveBackupEvent read FOnSave2Backup write FOnSave2Backup;
   end; 
 
-  function GetCurrentVersion(ParamFile: string): integer;
+
 
 var
   UpdateDatabaseDlg: TUpdateDatabaseDlg;
 
-function RunUpgradeDatabase(Sender: TIBLocalDBSupport; Database: TIBDatabase; DBParams: TStrings;
-  PatchDir, ParamFile: string; VersionFound,VersionWanted: integer): boolean;
 
 implementation
 
@@ -100,42 +102,9 @@ resourcestring
   sNoInfo      = 'Database Version is %d - Unknown Version - No Information Found';
   sRanProgram  = 'Ran Dynamic Update Program "%s" - Exit Code = %d';
   sNotFound    = 'Dynamic Update Program "%s" not found';
-  sNoParamFile = 'Database needs to be upgraded but Upgrade Parameter File %s - not found';
 
 const
   sSectionheader      = 'Version.%.3d';
-
-function GetCurrentVersion(ParamFile: string): integer;
-begin
-  if not FileExists(ParamFile) then
-    raise Exception.CreateFmt(sNoParamFile,[ParamFile]);
-  with TIniFile.Create(ParamFile) do
-  try
-    try
-      Result := StrToInt(ReadString('Status','Current','0'))
-    except
-      Result := -1
-    end
-  finally
-    Free
-  end
-end;
-
-
-function RunUpgradeDatabase(Sender: TIBLocalDBSupport; Database: TIBDatabase;
-  DBParams: TStrings; PatchDir, ParamFile: string; VersionFound,
-  VersionWanted: integer): boolean;
-begin
-  with TUpdateDatabaseDlg.Create(Application) do
-  try
-    UpdateDatabase.DatabaseName := Database.DatabaseName;
-    UpdateDatabase.Params.Assign(DBParams);
-    FIBLocalSupport := Sender;
-    Result := ShowModal(PatchDir,ParamFile,VersionFound,VersionWanted) = mrOK;
-  finally
-    Free
-  end;
-end;
 
 { TUpdateDatabaseDlg }
 
@@ -242,9 +211,12 @@ end;
 procedure TUpdateDatabaseDlg.DoBackup;
 var DBArchive: string;
 begin
-  DBArchive := ChangeFileExt(FIBLocalSupport.ActiveDatabasePathName,'');
-  DBArchive := DBArchive + '.' + IntToStr(FVersionFound) + '.gbk';
-  FIBLocalSupport.SaveDatabase(DBArchive);
+  if assigned(OnSave2Backup) then
+  begin
+    DBArchive := ChangeFileExt(ActiveDatabasePathName,'');
+    DBArchive := DBArchive + '.' + IntToStr(FVersionFound) + '.gbk';
+    OnSave2Backup(self,DBArchive);
+  end;
 end;
 
 procedure TUpdateDatabaseDlg.DoUpdate(Data: PtrInt);

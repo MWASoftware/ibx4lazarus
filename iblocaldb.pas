@@ -7,8 +7,8 @@ unit iblocaldb;
 interface
 
 uses
-  IBLocalDBSupport, NewDatabaseUnit, SaveDatabaseUnit, UpdateDatabaseUnit, 
-  ViewLogDlgUnit, LazarusPackageIntf;
+  CustomIBLocalDBSupport, NewDatabaseUnit, SaveDatabaseUnit, 
+  UpdateDatabaseUnit, ViewLogDlgUnit, IBLocalDBSupport, LazarusPackageIntf;
 
 implementation
 

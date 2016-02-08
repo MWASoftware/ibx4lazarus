@@ -7,13 +7,13 @@
       <Version Value="11"/>
       <SearchPaths>
         <OtherUnitFiles Value="iblocaldb"/>
-        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)/"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="5">
+    <Files Count="6">
       <Item1>
-        <Filename Value="iblocaldb/IBLocalDBSupport.pas"/>
-        <UnitName Value="IBLocalDBSupport"/>
+        <Filename Value="iblocaldb/CustomIBLocalDBSupport.pas"/>
+        <UnitName Value="CustomIBLocalDBSupport"/>
       </Item1>
       <Item2>
         <Filename Value="iblocaldb/NewDatabaseUnit.pas"/>
@@ -31,6 +31,10 @@
         <Filename Value="iblocaldb/viewlogdlgunit.pas"/>
         <UnitName Value="ViewLogDlgUnit"/>
       </Item5>
+      <Item6>
+        <Filename Value="iblocaldb/IBLocalDBSupport.pas"/>
+        <UnitName Value="IBLocalDBSupport"/>
+      </Item6>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
