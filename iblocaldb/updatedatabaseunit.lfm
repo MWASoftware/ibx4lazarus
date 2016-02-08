@@ -8,7 +8,6 @@ object UpdateDatabaseDlg: TUpdateDatabaseDlg
   Caption = 'UpdateDatabaseDlg'
   ClientHeight = 132
   ClientWidth = 324
-  OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
   LCLVersion = '1.4.4.0'

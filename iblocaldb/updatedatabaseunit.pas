@@ -31,50 +31,9 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls,  Dialogs, StdCtrls,
-  ComCtrls, ExtCtrls, IBDatabase, ibxscript,  IBHeader;
+  ComCtrls, ExtCtrls, IBDatabase, ibxscript,  IBHeader, IBLocalDBSupport;
 
 type
-
-  TUpdateDatabaseDlg = class;
-
-  { TDBUpdateThread }
-
-  TDBUpdateThread = class(TThread)
-  private
-   FParamFile: string;
-   FLogMsg: string;
-   FVersionFound: integer;
-   FVersionWanted: integer;
-   FOnCompletion: TNotifyEvent;
-   FOwner: TUpdateDatabaseDlg;
-   FTotal: integer;
-   procedure Add2Log(Sender: TObject; Msg: string);
-   procedure HandleGetParamValue(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD);
-   procedure HandleProgessEvent(Sender: TObject; Reset: boolean; value: integer);
-   procedure OutputLog;
-   function RunUpdate(FileName: string): integer;
-   procedure ReportCompletion;
-   procedure ResetProgressBar;
-   procedure StepProgressBar;
-  protected
-    FCurrentVersion: string;
-    FPatchDir: string;
-    function Check4Update(VersionNo: integer; var FileName, DynaUpdate,
-      Message: string): boolean;
-    function GetSourceFile(Name: string; var FileName: string;
-                                 var Compressed: boolean): boolean;
-    function DoUpdate: integer;
-    function ParseFileInfo(Info:string; var FileName: string;
-                                 var Compressed: boolean): boolean;
-    procedure Execute; override;
-  public
-    constructor Create(aOwner: TUpdateDatabaseDlg;
-                        PatchDir, ParamFile: string;
-                        VersionFound,VersionWanted: integer;
-                        OnCompletion: TNotifyEvent);
-    function SuccessfulCompletion: boolean;
-    property ParamFile: string read FParamFile;
-  end;
 
   { TUpdateDatabaseDlg }
 
@@ -88,7 +47,6 @@ type
     FDatabase: TIBDatabase;
     Status: TLabel;
     Timer1: TTimer;
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure HandleCompletionEvent(Sender: TObject);
     procedure IBXScriptGetParamValue(Sender: TObject; ParamName: string;
@@ -98,16 +56,25 @@ type
       value: integer);
   private
     { private declarations }
-    FUpdater: TDBUpdateThread;
+    FIBLocalSupport: TIBLocalDBSupport;
     FDBParams: TStrings;
     FParamFile: string;
     FPatchDir: string;
     FUpgradeLog: TStrings;
     FVersionFound: integer;
     FVersionWanted: integer;
+    FSuccessfulCompletion: boolean;
+    FCurrentVersion: string;
+    procedure Add2Log(Sender: TObject; Msg: string);
+    function Check4Update(VersionNo: integer; var FileName, DynaUpdate,
+      Message: string; var BackupDB: boolean): boolean;
+    procedure DoBackup;
     procedure DoUpdate(Data: PtrInt);
-    procedure HandleCompletion(Sender: TObject);
-    procedure HandleLogEvent(Sender:TObject; LogMessage: string);
+    function GetSourceFile(aName: string; var FileName: string;
+                                 var Compressed: boolean): boolean;
+    function ParseFileInfo(Info:string; var FileName: string;
+                                 var Compressed: boolean): boolean;
+    function RunUpdate(FileName: string): integer;
   public
     { public declarations }
     constructor Create(theOwner: TComponent); override;
@@ -120,7 +87,7 @@ type
 var
   UpdateDatabaseDlg: TUpdateDatabaseDlg;
 
-function RunUpgradeDatabase(Database: TIBDatabase; DBParams: TStrings;
+function RunUpgradeDatabase(Sender: TIBLocalDBSupport; Database: TIBDatabase; DBParams: TStrings;
   PatchDir, ParamFile: string; VersionFound,VersionWanted: integer): boolean;
 
 implementation
@@ -133,6 +100,7 @@ resourcestring
   sNoInfo      = 'Database Version is %d - Unknown Version - No Information Found';
   sRanProgram  = 'Ran Dynamic Update Program "%s" - Exit Code = %d';
   sNotFound    = 'Dynamic Update Program "%s" not found';
+  sNoParamFile = 'Database needs to be upgraded but Upgrade Parameter File %s - not found';
 
 const
   sSectionheader      = 'Version.%.3d';
@@ -140,7 +108,7 @@ const
 function GetCurrentVersion(ParamFile: string): integer;
 begin
   if not FileExists(ParamFile) then
-    raise Exception.CreateFmt('Database needs to be upgraded but Upgrade Parameter File %s - not found',[ParamFile]);
+    raise Exception.CreateFmt(sNoParamFile,[ParamFile]);
   with TIniFile.Create(ParamFile) do
   try
     try
@@ -154,13 +122,15 @@ begin
 end;
 
 
-function RunUpgradeDatabase(Database: TIBDatabase; DBParams: TStrings;
-  PatchDir, ParamFile: string; VersionFound, VersionWanted: integer): boolean;
+function RunUpgradeDatabase(Sender: TIBLocalDBSupport; Database: TIBDatabase;
+  DBParams: TStrings; PatchDir, ParamFile: string; VersionFound,
+  VersionWanted: integer): boolean;
 begin
   with TUpdateDatabaseDlg.Create(Application) do
   try
     UpdateDatabase.DatabaseName := Database.DatabaseName;
     UpdateDatabase.Params.Assign(DBParams);
+    FIBLocalSupport := Sender;
     Result := ShowModal(PatchDir,ParamFile,VersionFound,VersionWanted) = mrOK;
   finally
     Free
@@ -174,15 +144,13 @@ begin
   ProgressBar1.Position := 0;
   Status.Caption := '';
   FUpgradeLog.Clear;
-  FUpdater := TDBUpdateThread.Create(self,FPatchDir,FParamFile,
-                                FVersionFound,FVersionWanted,@HandleCompletion) ;
   Application.QueueAsyncCall(@DoUpdate,0);
 end;
 
 procedure TUpdateDatabaseDlg.HandleCompletionEvent(Sender: TObject);
 begin
   Timer1.Enabled := false;
-  if not FUpdater.SuccessfulCompletion then
+  if not FSuccessfulCompletion then
   begin
     ShowViewLogDlg(FUpgradeLog);
     ModalResult := mrCancel
@@ -192,109 +160,6 @@ begin
 end;
 
 procedure TUpdateDatabaseDlg.IBXScriptGetParamValue(Sender: TObject;
-  ParamName: string; var BlobID: TISC_QUAD);
-begin
-  {Warning: called by separate thread to main window thread}
-  if assigned(FUpdater) then
-    FUpdater.HandleGetParamValue(Sender,ParamName,BlobID);
-end;
-
-procedure TUpdateDatabaseDlg.IBXScriptLogProc(Sender: TObject; Msg: string);
-begin
-  {Warning: called by separate thread to main window thread}
-  if assigned(FUpdater) then
-    FUpdater.Add2Log(Sender,Msg);
-end;
-
-procedure TUpdateDatabaseDlg.IBXScriptProgressEvent(Sender: TObject;
-  Reset: boolean; value: integer);
-begin
-  {Warning: called by separate thread to main window thread}
-  if assigned(FUpdater) then
-    FUpdater.HandleProgessEvent(Sender,Reset,value);
-end;
-
-procedure TUpdateDatabaseDlg.DoUpdate(Data: PtrInt);
-begin
-  if assigned(FUpdater) then
-    FUpdater.Start
-end;
-
-procedure TUpdateDatabaseDlg.FormClose(Sender: TObject;
-  var CloseAction: TCloseAction);
-begin
-  if assigned(FUpdater) then
-    FreeAndNil(FUpdater)
-end;
-
-procedure TUpdateDatabaseDlg.HandleCompletion(Sender: TObject);
-begin
-  Timer1.Enabled := true;
-  UpdateDatabase.Connected := false;
-end;
-
-procedure TUpdateDatabaseDlg.HandleLogEvent(Sender: TObject; LogMessage: string
-  );
-begin
-  Status.Caption := LogMessage;
-  Application.ProcessMessages
-end;
-
-constructor TUpdateDatabaseDlg.Create(theOwner: TComponent);
-begin
-  inherited Create(theOwner);
-  FUpgradeLog := TStringList.Create;
-  FDBParams := TStringList.Create;
-end;
-
-destructor TUpdateDatabaseDlg.Destroy;
-begin
-  if assigned(FUpgradeLog) then
-    FUpgradeLog.Free;
-  if assigned(FDBParams) then
-    FDBParams.Free;
-  inherited Destroy;
-end;
-
-function TUpdateDatabaseDlg.ShowModal(PatchDir, ParamFile: string;
-  VersionFound, VersionWanted: integer): TModalResult;
-begin
-  Result := mrCancel;
-  FPatchDir := PatchDir;
-  FVersionFound := VersionFound;
-  FVersionWanted := VersionWanted;
-  if not FileExists(ParamFile) then
-    raise Exception.CreateFmt('Database needs to be upgraded but Upgrade Parameter File %s - not found',[ParamFile]);
-  FParamFile := ParamFile;
-  Result := inherited ShowModal
-end;
-
-constructor TDBUpdateThread.Create(aOwner: TUpdateDatabaseDlg; PatchDir,
-  ParamFile: string; VersionFound,  VersionWanted: integer; OnCompletion: TNotifyEvent);
-begin
-  inherited Create(true);
-  FOwner := aOwner;
-  FOnCompletion := OnCompletion;
-  FPatchDir := PatchDir;
-  FParamFile := ParamFile;
-  FVersionFound := VersionFound;
-  FVersionWanted := VersionWanted;
-end;
-
-procedure TDBUpdateThread.Execute;
-begin
- try
-    ReturnValue := DoUpdate
-  except on E:Exception do
-    begin
-      Add2Log(self,E.Message);
-      ReturnValue := 1
-    end
-  end;
-  Synchronize(@ReportCompletion)
-end;
-
-procedure TDBUpdateThread.HandleGetParamValue(Sender: TObject;
   ParamName: string; var BlobID: TISC_QUAD);
 var Blob: TIBBlobStream;
     Source: TStream;
@@ -330,68 +195,137 @@ begin
   end
 end;
 
-procedure TDBUpdateThread.HandleProgessEvent(Sender: TObject; Reset: boolean;
-  value: integer);
+procedure TUpdateDatabaseDlg.IBXScriptLogProc(Sender: TObject; Msg: string);
+begin
+  Add2Log(Sender,Msg);
+end;
+
+procedure TUpdateDatabaseDlg.IBXScriptProgressEvent(Sender: TObject;
+  Reset: boolean; value: integer);
 begin
   if Reset then
   begin
-    FTotal := value;
-    Synchronize(@ResetProgressBar);
-  end
-  else
-    Synchronize(@StepProgressBar);
-end;
-
-function TDBUpdateThread.RunUpdate(FileName: string): integer;
-var
-    Process: TProcess;
-begin
-  if not FileExists(FileName) then
-  begin
-    Add2Log(self,Format(sNotFound,[FileName]));
-    Result := 1;
-    Exit
+    with ProgressBar1 do
+    begin
+      Position := 0;
+      Max := value;
+    end;
   end;
+  ProgressBar1.StepIt;
+  Application.ProcessMessages;
+end;
 
-  Process := TProcess.Create(nil);
+procedure TUpdateDatabaseDlg.Add2Log(Sender: TObject; Msg: string);
+begin
+  FUpgradeLog.Add(Msg);
+end;
+
+function TUpdateDatabaseDlg.Check4Update(VersionNo: integer; var FileName,
+  DynaUpdate, Message: string; var BackupDB: boolean): boolean;
+var IniFile: TIniFile;
+begin
+  Result := false;
+  IniFile := TIniFile.Create(FParamFile);
   try
-    Process.CommandLine := Format('"%s" "%s" "%s" "%s" "%s"',[
-                FileName, //Program Path
-                FOwner.UpdateDatabase.DatabaseName,                //Database Path
-                FOwner.UpdateDatabase.Params.Values['user_name'],  //Login as
-                FOwner.UpdateDatabase.Params.Values['password']    //use Password
-                ]);
-    Process.Options := [poWaitOnExit];
-    Process.Execute;
-    Add2Log(self,Format(sRanProgram,[FileName,Process.ExitStatus]));
-    Result := Process.ExitStatus
+   FCurrentVersion := Format(sSectionheader,[VersionNo]);
+   Message := IniFile.ReadString(FCurrentVersion,'Msg',
+                                Format(sNoInfo,[VersionNo]));
+   FileName := IniFile.ReadString(FCurrentVersion,'Upgrade','');
+   DynaUpdate := IniFile.ReadString(FCurrentVersion,'Exe','');
+   BackupDB := CompareText(IniFile.ReadString(FCurrentVersion,'BackupDatabase','no'),'yes') = 0;
+   Result := (FileName <> '') or (DynaUpdate <> '');
   finally
-    Process.Free
+   IniFile.Free
   end
-
 end;
 
-function TDBUpdateThread.SuccessfulCompletion: boolean;
+procedure TUpdateDatabaseDlg.DoBackup;
+var DBArchive: string;
 begin
-  Result := (WaitFor = 0) and (Returnvalue = 0)
+  DBArchive := ChangeFileExt(FIBLocalSupport.ActiveDatabasePathName,'');
+  DBArchive := DBArchive + '.' + IntToStr(FVersionFound) + '.gbk';
+  FIBLocalSupport.SaveDatabase(DBArchive);
 end;
 
-procedure TDBUpdateThread.Add2Log(Sender: TObject; Msg: string);
+procedure TUpdateDatabaseDlg.DoUpdate(Data: PtrInt);
+
+ function GetMessage(msg1,msg2: string): string;
+ begin
+   if msg1 <> '' then
+     Result := msg1
+   else
+     Result := msg2;
+ end;
+
+var UpdateAvailable: boolean;
+    UpdateSQLFile,
+    UserMessage: string;
+    DynaUpdate: string;
+    BackupDB: boolean;
 begin
-  FLogMsg := Msg;
-  {$IFDEF DEBUG}
-  writeln('Log: ' + Msg);
-  {$ENDIF}
-  Synchronize(@OutputLog)
+  FSuccessfulCompletion := true;
+  try
+   repeat
+    if FVersionFound >= FVersionWanted then break;
+
+     UpdateAvailable := Check4Update(FVersionFound+1,UpdateSQLFile, DynaUpdate, UserMessage, BackupDB);
+     Add2Log(self,UserMessage);
+     if UpdateAvailable then
+     begin
+       if BackupDB then
+         DoBackup;
+       Status.Caption := GetMessage(UserMessage,'Applying Update from ' + UpdateSQLFile);
+       Application.ProcessMessages;
+       if not IBXScript.PerformUpdate(FPatchDir + DirectorySeparator + UpdateSQLFile,true) then
+       begin
+         FSuccessfulCompletion := false;
+         break;
+       end;
+
+       try
+         if DynaUpdate <> '' then
+         begin
+           Status.Caption := GetMessage(UserMessage,'Running ' + DynaUpdate);
+           Application.ProcessMessages;
+           if  RunUpdate(FPatchDir + DirectorySeparator + DynaUpdate) <> 0 then
+           begin
+             FSuccessfulCompletion := false;
+             break;
+           end;
+         end;
+       except on E: Exception do
+         begin
+           Add2Log(self,E.Message);
+           FSuccessfulCompletion := false;
+           break
+         end
+       end;
+       Inc(FVersionFound);
+     end;
+   until not UpdateAvailable;
+  except on E:Exception do
+   begin
+    FSuccessfulCompletion := false;
+    Add2Log(self,E.Message);
+   end;
+  end;
+  Timer1.Enabled := true;
 end;
 
-procedure TDBUpdateThread.OutputLog;
+function TUpdateDatabaseDlg.GetSourceFile(aName: string; var FileName: string;
+  var Compressed: boolean): boolean;
+var IniFile: TIniFile;
 begin
-  if assigned(FOwner) then
-    FOwner.FUpgradeLog.Add(FLogMsg);
+  IniFile := TIniFile.Create(FParamFile);
+  try
+   Result := ParseFileInfo(IniFile.ReadString(FCurrentVersion,aName,''),FileName,Compressed);
+   FileName := FPatchDir + DirectorySeparator + FileName
+  finally
+   IniFile.Free
+  end
 end;
 
-function TDBUpdateThread.ParseFileInfo(Info: string; var FileName: string;
+function TUpdateDatabaseDlg.ParseFileInfo(Info: string; var FileName: string;
   var Compressed: boolean): boolean;
 var index: integer;
 begin
@@ -409,91 +343,61 @@ begin
   end;
 end;
 
-procedure TDBUpdateThread.ReportCompletion;
+function TUpdateDatabaseDlg.RunUpdate(FileName: string): integer;
+var
+    Process: TProcess;
 begin
-  if assigned(FOnCompletion) then FOnCompletion(self)
-end;
-
-procedure TDBUpdateThread.ResetProgressBar;
-begin
-  with FOwner.ProgressBar1 do
+  if not FileExists(FileName) then
   begin
-    Position := 0;
-    Max := FTotal;
+    Add2Log(self,Format(sNotFound,[FileName]));
+    Result := 1;
+    Exit
   end;
-end;
 
-procedure TDBUpdateThread.StepProgressBar;
-begin
-  FOwner.ProgressBar1.StepIt;
-end;
-
-function TDBUpdateThread.Check4Update(VersionNo: integer; var FileName, DynaUpdate,
-  Message: string): boolean;
-var IniFile: TIniFile;
-begin
-  Result := false;
-  IniFile := TIniFile.Create(ParamFile);
+  Process := TProcess.Create(nil);
   try
-   FCurrentVersion := Format(sSectionheader,[VersionNo]);
-   Message := IniFile.ReadString(FCurrentVersion,'Msg',
-                                Format(sNoInfo,[VersionNo]));
-   FileName := IniFile.ReadString(FCurrentVersion,'Upgrade','');
-   DynaUpdate := IniFile.ReadString(FCurrentVersion,'Exe','');
-   Result := (FileName <> '') or (DynaUpdate <> '');
+    Process.CommandLine := Format('"%s" "%s" "%s" "%s" "%s"',[
+                FileName, //Program Path
+                UpdateDatabase.DatabaseName,                //Database Path
+                UpdateDatabase.Params.Values['user_name'],  //Login as
+                UpdateDatabase.Params.Values['password']    //use Password
+                ]);
+    Process.Options := [poWaitOnExit];
+    Process.Execute;
+    Add2Log(self,Format(sRanProgram,[FileName,Process.ExitStatus]));
+    Result := Process.ExitStatus
   finally
-   IniFile.Free
+    Process.Free
   end
 end;
 
-function TDBUpdateThread.DoUpdate: integer;
-var UpdateAvailable: boolean;
-    UpdateSQLFile,
-    UserMessage: string;
-    DynaUpdate: string;
+constructor TUpdateDatabaseDlg.Create(theOwner: TComponent);
 begin
-  Result := 0;
-  repeat
-    if FVersionFound >= FVersionWanted then break;
-
-     UpdateAvailable := Check4Update(FVersionFound+1,UpdateSQLFile, DynaUpdate, UserMessage);
-     Add2Log(self,UserMessage);
-     if UpdateAvailable then
-     begin
-       if not FOwner.IBXScript.PerformUpdate(FPatchDir + DirectorySeparator + UpdateSQLFile,true) then
-         begin
-           Result := 1;
-           break
-         end
-         else
-           Result := 0;
-
-       try
-         if DynaUpdate <> '' then
-           ReturnValue := RunUpdate(FPatchDir + DirectorySeparator + DynaUpdate);
-       except on E: Exception do
-         begin
-           Add2Log(self,E.Message);
-           Result := 1;
-           break
-         end
-       end;
-       Inc(FVersionFound);
-     end;
-   until not UpdateAvailable;
+  inherited Create(theOwner);
+  FUpgradeLog := TStringList.Create;
+  FDBParams := TStringList.Create;
 end;
 
-function TDBUpdateThread.GetSourceFile(Name: string; var FileName: string;
-                                 var Compressed: boolean): boolean;
-var IniFile: TIniFile;
+destructor TUpdateDatabaseDlg.Destroy;
 begin
-  IniFile := TIniFile.Create(FParamFile);
-  try
-   Result := ParseFileInfo(IniFile.ReadString(FCurrentVersion,Name,''),FileName,Compressed);
-   FileName := FPatchDir + DirectorySeparator + FileName
-  finally
-   IniFile.Free
-  end
+  if assigned(FUpgradeLog) then
+    FUpgradeLog.Free;
+  if assigned(FDBParams) then
+    FDBParams.Free;
+  inherited Destroy;
+end;
+
+function TUpdateDatabaseDlg.ShowModal(PatchDir, ParamFile: string;
+  VersionFound, VersionWanted: integer): TModalResult;
+begin
+  Result := mrCancel;
+  FPatchDir := PatchDir;
+  FVersionFound := VersionFound;
+  FVersionWanted := VersionWanted;
+  if not FileExists(ParamFile) then
+    raise Exception.CreateFmt('Database needs to be upgraded but Upgrade Parameter File %s - not found',[ParamFile]);
+  FParamFile := ParamFile;
+  Result := inherited ShowModal
 end;
 
 end.

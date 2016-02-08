@@ -1,10 +1,10 @@
 object Form1: TForm1
-  Left = 487
+  Left = 491
   Height = 482
-  Top = 367
+  Top = 371
   Width = 1002
   Caption = 'Employee List'
-  ClientHeight = 462
+  ClientHeight = 461
   ClientWidth = 1002
   Menu = MainMenu1
   OnClose = FormClose
@@ -41,13 +41,13 @@ object Form1: TForm1
     Left = 17
     Height = 15
     Top = 14
-    Width = 74
+    Width = 87
     Caption = 'Started Before'
     ParentColor = False
   end
   object BeforeDate: TDateEdit
     Left = 112
-    Height = 23
+    Height = 25
     Top = 8
     Width = 80
     CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
@@ -64,13 +64,13 @@ object Form1: TForm1
     Left = 241
     Height = 15
     Top = 14
-    Width = 66
+    Width = 78
     Caption = 'Started After'
     ParentColor = False
   end
   object AfterDate: TDateEdit
     Left = 333
-    Height = 23
+    Height = 25
     Top = 8
     Width = 80
     CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
@@ -85,19 +85,19 @@ object Form1: TForm1
   end
   object Panel1: TPanel
     Left = 12
-    Height = 414
+    Height = 413
     Top = 42
     Width = 880
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
-    ClientHeight = 414
+    ClientHeight = 413
     ClientWidth = 880
     Color = clBackground
     ParentColor = False
     TabOrder = 5
     object IBDynamicGrid1: TIBDynamicGrid
       Left = 0
-      Height = 364
+      Height = 363
       Top = 0
       Width = 880
       Align = alClient
@@ -207,7 +207,7 @@ object Form1: TForm1
     object Panel2: TPanel
       Left = 0
       Height = 50
-      Top = 364
+      Top = 363
       Width = 880
       Align = alBottom
       BevelOuter = bvNone
@@ -237,7 +237,7 @@ object Form1: TForm1
         Left = 688
         Height = 27
         Top = 16
-        Width = 43
+        Width = 49
         Alignment = taRightJustify
         Anchors = [akTop, akLeft, akBottom]
         DataField = 'TOTALSALARIES'
@@ -253,8 +253,8 @@ object Form1: TForm1
       BevelOuter = bvNone
       BorderWidth = 2
       BorderStyle = bsSingle
-      ClientHeight = 76
-      ClientWidth = 780
+      ClientHeight = 78
+      ClientWidth = 782
       Color = clWindow
       ParentColor = False
       TabOrder = 2
@@ -263,13 +263,13 @@ object Form1: TForm1
         Left = 0
         Height = 15
         Top = 7
-        Width = 74
+        Width = 83
         Caption = 'Employee No.'
         ParentColor = False
       end
       object DBEdit1: TDBEdit
         Left = 90
-        Height = 23
+        Height = 25
         Top = 2
         Width = 120
         DataField = 'EMP_NO'
@@ -282,13 +282,13 @@ object Form1: TForm1
         Left = 12
         Height = 15
         Top = 32
-        Width = 57
+        Width = 64
         Caption = 'First Name'
         ParentColor = False
       end
       object DBEdit2: TDBEdit
         Left = 90
-        Height = 23
+        Height = 25
         Top = 24
         Width = 120
         DataField = 'FIRST_NAME'
@@ -301,13 +301,13 @@ object Form1: TForm1
         Left = 12
         Height = 15
         Top = 56
-        Width = 56
+        Width = 64
         Caption = 'Last Name'
         ParentColor = False
       end
       object DBEdit3: TDBEdit
         Left = 90
-        Height = 23
+        Height = 25
         Top = 46
         Width = 120
         DataField = 'LAST_NAME'
@@ -320,13 +320,13 @@ object Form1: TForm1
         Left = 216
         Height = 15
         Top = 7
-        Width = 64
+        Width = 77
         Caption = 'Date Started'
         ParentColor = False
       end
       object IBDateEdit1: TDBDateEdit
         Left = 300
-        Height = 23
+        Height = 25
         Top = 2
         Width = 80
         CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
@@ -345,13 +345,13 @@ object Form1: TForm1
         Left = 252
         Height = 15
         Top = 32
-        Width = 31
+        Width = 37
         Caption = 'Salary'
         ParentColor = False
       end
       object DBEdit4: TDBEdit
         Left = 300
-        Height = 23
+        Height = 25
         Top = 24
         Width = 104
         DataField = 'SALARY'
@@ -361,17 +361,17 @@ object Form1: TForm1
         TabOrder = 5
       end
       object Label8: TLabel
-        Left = 712
+        Left = 708
         Height = 15
         Top = 54
-        Width = 18
+        Width = 24
         Anchors = [akTop, akRight]
         Caption = 'Ext.'
         ParentColor = False
       end
       object DBEdit5: TDBEdit
-        Left = 730
-        Height = 23
+        Left = 732
+        Height = 25
         Top = 48
         Width = 40
         DataField = 'PHONE_EXT'
@@ -385,7 +385,7 @@ object Form1: TForm1
         Left = 536
         Height = 15
         Top = 7
-        Width = 46
+        Width = 51
         Caption = 'Location'
         ParentColor = False
       end
@@ -393,7 +393,7 @@ object Form1: TForm1
         Left = 413
         Height = 15
         Top = 9
-        Width = 52
+        Width = 59
         Caption = 'Job Grade'
         ParentColor = False
       end
@@ -406,7 +406,7 @@ object Form1: TForm1
         AutoSize = False
         DataField = 'JOB_GRADE'
         DataSource = EmployeeSource
-        ItemHeight = 15
+        ItemHeight = 0
         Items.Strings = (
           '1'
           '2'
@@ -423,7 +423,7 @@ object Form1: TForm1
         Left = 536
         Height = 15
         Top = 32
-        Width = 44
+        Width = 48
         Caption = 'Job Title'
         ParentColor = False
       end
@@ -431,12 +431,12 @@ object Form1: TForm1
         Left = 256
         Height = 15
         Top = 54
-        Width = 28
+        Width = 33
         Caption = 'Dept.'
         ParentColor = False
       end
       object SpeedButton1: TSpeedButton
-        Left = 678
+        Left = 680
         Height = 25
         Top = 48
         Width = 23
@@ -445,9 +445,9 @@ object Form1: TForm1
       end
       object DBEdit6: TDBEdit
         Left = 300
-        Height = 23
+        Height = 25
         Top = 48
-        Width = 370
+        Width = 372
         DataField = 'DEPT_PATH'
         DataSource = EmployeeSource
         ReadOnly = True
@@ -460,7 +460,7 @@ object Form1: TForm1
         Left = 600
         Height = 23
         Top = 0
-        Width = 170
+        Width = 172
         OwnerDrawEditable = False
         Anchors = [akTop, akLeft, akRight]
         AutoSize = False
@@ -475,13 +475,13 @@ object Form1: TForm1
         TabOrder = 8
         AutoInsert = False
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        ItemHeight = 15
+        ItemHeight = 0
       end
       object IBLookupComboEditBox1: TIBLookupComboEditBox
         Left = 600
         Height = 23
         Top = 24
-        Width = 170
+        Width = 172
         OwnerDrawEditable = False
         Anchors = [akTop, akLeft, akRight]
         AutoSize = False
@@ -496,7 +496,7 @@ object Form1: TForm1
         TabOrder = 9
         AutoInsert = False
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        ItemHeight = 15
+        ItemHeight = 0
       end
     end
   end
@@ -504,17 +504,17 @@ object Form1: TForm1
     Left = 456
     Height = 15
     Top = 14
-    Width = 67
+    Width = 79
     Caption = 'Salary Range'
     ParentColor = False
   end
   object SalaryRange: TComboBox
     Left = 544
-    Height = 23
+    Height = 25
     Top = 8
     Width = 272
     OwnerDrawEditable = False
-    ItemHeight = 15
+    ItemHeight = 0
     ItemIndex = 0
     Items.Strings = (
       'None Specified'
@@ -983,10 +983,12 @@ object Form1: TForm1
     Database = IBDatabase1
     DatabaseName = 'employee.fdb'
     EmptyDBArchive = 'employee.gbk'
+    Options = [iblAutoUpgrade, iblAllowDowngrade]
     PatchDirectory = 'patches'
-    Quiet = False
+    RequiredVersionNo = 2
     UpgradeConfFile = 'upgrade.conf'
     VendorName = 'MWA Software'
+    OnGetDBVersionNo = IBLocalDBSupport1GetDBVersionNo
     left = 937
     top = 264
   end

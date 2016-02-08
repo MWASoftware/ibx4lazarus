@@ -119,6 +119,8 @@ type
     procedure EmployeesAfterPost(DataSet: TDataSet);
     procedure EmployeesValidatePost(Sender: TObject; var CancelPost: boolean);
     procedure IBDatabase1AfterConnect(Sender: TObject);
+    procedure IBLocalDBSupport1GetDBVersionNo(Sender: TObject;
+      var VersionNo: integer);
     procedure JobCodeChangeTimerTimer(Sender: TObject);
     procedure JobGradeChangeTimerTimer(Sender: TObject);
     procedure JobGradeDBComboBoxCloseUp(Sender: TObject);
@@ -153,15 +155,15 @@ type
     procedure SaveChangesExecute(Sender: TObject);
     procedure SaveChangesUpdate(Sender: TObject);
   private
+    FCurrentDBVersion: integer;
     { private declarations }
     FDirty: boolean;
     FNoAutoReopen: boolean;
-    FInUpgrade: boolean;
     procedure Reopen(Data: PtrInt);
     function GetDBVersionNo: integer;
-    procedure DoTerminate(Data: PtrInt);
   public
     { public declarations }
+    property CurrentDBVersion: integer read FCurrentDBVersion;
   end; 
 
 var
@@ -235,40 +237,41 @@ end;
 
 function TForm1.GetDBVersionNo: integer;
 begin
+  FCurrentDBVersion := 0;
   Result := 0;
-  with IBTransaction1 do
-    if not InTransaction then StartTransaction;
   FNoAutoReopen := true;
   try
-    with CheckVersionTablePresent do
-    begin
-      ExecQuery;
-      try
-        if EOF then Exit;
-      finally
-        Close;
+    with IBTransaction1 do
+      if not InTransaction then StartTransaction;
+    try
+      with CheckVersionTablePresent do
+      begin
+        ExecQuery;
+        try
+          if EOF then Exit;
+        finally
+          Close;
+        end;
       end;
-    end;
 
-    with GetDBVersionNoQuery do
-    begin
-      ExecQuery;
-      try
-        Result := FieldByName('VersionNo').AsInteger;
-      finally
-        Close;
+      with GetDBVersionNoQuery do
+      begin
+        ExecQuery;
+        try
+          Result := FieldByName('VersionNo').AsInteger;
+          FCurrentDBVersion := Result;
+        finally
+          Close;
+        end;
       end;
+    finally
+      IBTransaction1.Commit;
     end;
   finally
-    IBTransaction1.Commit;
-    FNoAutoReopen := false;
+    FNoAutoReopen := false
   end;
 end;
 
-procedure TForm1.DoTerminate(Data: PtrInt);
-begin
-  Close;
-end;
 
 procedure TForm1.AddEmployeeExecute(Sender: TObject);
 begin
@@ -305,37 +308,16 @@ begin
 end;
 
 procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);
-var CurrentDBVersionNo: integer;
-    Upgraded: boolean;
 begin
-  if FInUpgrade then Exit;  {Avoids problem if RECONNECT used in script}
+  with IBLocalDBSupport1 do
+    if CurrentDBVersionNo = RequiredVersionNo  then
+      ReOpen(0);
+end;
 
-  CurrentDBVersionNo := GetDBVersionNo;
-  if CurrentDBVersionNo > RequiredVersionNo then
-    raise Exception.CreateFmt('Software Upgrade Required: Current DB Version No is %d. '+
-                              'Version %d supported',[CurrentDBVersionNo,RequiredVersionNo]);
-
-  Upgraded := false;
-  if CurrentDBVersionNo < RequiredVersionNo then
-  begin
-    try
-      FInUpgrade := true;
-      try
-        IBLocalDBSupport1.ResolveDBVersionMismatch(CurrentDBVersionNo,RequiredVersionNo,Upgraded);
-      finally
-        FInUpgrade := false;
-      end;
-    except On E:Exception do
-      MessageDlg(E.Message,mtError,[mbOK],0);
-    end;
-    if not Upgraded then
-    begin
-      FNoAutoReopen := true;
-      Application.QueueAsyncCall(@DoTerminate,0);
-      Exit;
-    end
-  end;
-  ReOpen(0);
+procedure TForm1.IBLocalDBSupport1GetDBVersionNo(Sender: TObject;
+  var VersionNo: integer);
+begin
+  VersionNo := GetDBVersionNo;
 end;
 
 procedure TForm1.JobCodeChangeTimerTimer(Sender: TObject);
@@ -514,28 +496,21 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  repeat
-    try
-      IBDatabase1.Connected := true;
-    except
-     on E:EIBClientError do
-      begin
-        Close;
-        Exit
-      end;
-    On E: EIBLocalFatalError do
-      begin
-        MessageDlg(E.Message,mtError,[mbOK],0);
-        Close;
-        Exit
-      end;
-    On E:Exception do
-      begin
-       MessageDlg(E.Message,mtError,[mbOK],0);
-       FNoAutoReopen := true;
-      end;
+  try
+    IBDatabase1.Connected := true;
+  except On E:Exception do
+    begin
+     MessageDlg(E.Message,mtError,[mbOK],0);
+     Close;
+     Exit
     end;
-  until FNoAutoReopen or IBDatabase1.Connected;
+  end;
+
+  {If upgrade failed or downgrade not pending then exit}
+  with IBLocalDBSupport1 do
+    if (CurrentDBVersionNo < RequiredVersionNo) or
+       ((CurrentDBVersionNo >  RequiredVersionNo) and not DowngradePending) then
+    Close;
 end;
 
 procedure TForm1.EmployeesAfterDelete(DataSet: TDataSet);
