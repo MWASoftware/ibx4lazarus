@@ -23,14 +23,14 @@
  *  Contributor(s): ______________________________________.
  *
 *)
-unit CustomIBLocalDBSupport;
+unit IBXCustomIBLocalDBSupport;
 
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  Classes,  IBDatabase, SysUtils, IBServices;
+  Classes,  IBDatabase, SysUtils, IBServices, IBXUpgradeConfFile, IBHeader, ibxscript;
 
 type
 
@@ -76,6 +76,7 @@ type
   TIBLocalOption = (iblAutoUpgrade, iblAllowDowngrade, iblQuiet);
   TIBLocalOptions = set of TIBLocalOption;
 
+
   { TCustomIBLocalDBSupport }
 
   TCustomIBLocalDBSupport = class(TComponent)
@@ -100,8 +101,7 @@ type
     FInUpgrade: boolean;
     FDownGradeArchive: string;
     FSharedDataDir: string;
-    function GetUpgradeAvailableToVersion: integer;
-    function GetUpgradeConfFile: string;
+    FUpgradeConf: TUpgradeConfFile;
     function IsAbsolutePath(aPath: string): boolean;
     procedure CheckEnabled;
     procedure CreateDatabase(DBName: string; DBParams: TStrings; Overwrite: boolean);
@@ -122,6 +122,7 @@ type
     function AllowRestore: boolean; virtual;
     procedure CreateDir(DirName: string);
     function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; virtual; abstract;
+    procedure HandleGetParamValue(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD);
     procedure Downgrade(DBArchive: string); virtual;
     procedure DowngradeDone;
     function GetDBNameAndPath: string;
@@ -130,12 +131,12 @@ type
     procedure Loaded; override;
     procedure PrepareDBParams(DBParams: TStrings);
     function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; virtual; abstract;
-    function RunUpgradeDatabase(DBParams: TStrings; PatchDir, ParamFile: string;
-                              VersionFound,VersionWanted: integer): boolean; virtual; abstract;
+    function RunUpgradeDatabase: boolean; virtual; abstract;
     function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean; virtual; abstract;
     procedure SetDBParams(aService: TIBCustomService; DBParams: TStrings);
     function UpdateVersionNo: boolean;
     property DownGradeArchive: string read FDownGradeArchive;
+    property UpgradeConf: TUpgradeConfFile read FUpgradeConf;
  public
     { Public declarations }
     constructor Create(aOwner: TComponent); override;
@@ -147,10 +148,6 @@ type
      archive. Overwrites existing data so use carefully.}
     procedure NewDatabase;
 
-    {ResolveDBVersionMismatch: request that the database schema is upgraded from
-     version "VersionFound" to "VersionWanted"}
-    function ResolveDBVersionMismatch(VersionFound, VersionWanted: integer): boolean;
-
     {RestoreDatabase: overwrites the existing local database with the specified
      gbak format archive. User is prompted to locate archive if filename empty.}
     procedure RestoreDatabase (filename: string = '');
@@ -161,7 +158,6 @@ type
 
     property ActiveDatabasePathName: string read FActiveDatabasePathName;
     property CurrentDBVersionNo: integer read FCurrentDBVersionNo;
-    property UpgradeAvailableToVersion: integer read GetUpgradeAvailableToVersion;
 
     { Likely to be Published declarations }
     property Database: TIBDatabase read GetDatabase write SetDatabase;
@@ -183,15 +179,12 @@ type
 
 implementation
 
-uses  IBIntf, IBHeader, IniFiles
+uses  IBIntf,  DB, IBBlob, ZStream
   {$IFDEF Unix} ,initc, regexpr {$ENDIF}
   {$IFDEF WINDOWS} ,Windirs {$ENDIF};
 
 resourcestring
   sSWUpgradeNeeded = 'Software Upgrade Required: Current DB Version No is %d. Version %d supported';
-
-  sUpgradeRequired = 'Database Upgrade Required, but the Upgrade File is out of Date. '+
-                              'Required Version = %d, Upgrade available for version %d';
 
   sLocalDBDisabled = 'Local Database Access Disabled';
 
@@ -201,7 +194,6 @@ resourcestring
 
   sNoEmbeddedServer = 'Firebird Embedded Server is required but is not installed';
 
-  sNoParamFile = 'Database needs to be upgraded but Upgrade Parameter File %s - not found';
 
 
 { TCustomIBLocalDBSupport }
@@ -218,28 +210,43 @@ begin
   {$ENDIF}
 end;
 
-function TCustomIBLocalDBSupport.GetUpgradeAvailableToVersion: integer;
-var ParamFile: string;
-begin
-  Result := 0;
-  ParamFile := GetUpgradeConfFile;
-  if (ParamFile = '') or not FileExists(ParamFile) then Exit;
 
-  with TIniFile.Create(ParamFile) do
+procedure TCustomIBLocalDBSupport.HandleGetParamValue(Sender: TObject;
+  ParamName: string; var BlobID: TISC_QUAD);
+var Blob: TIBBlobStream;
+    Source: TStream;
+    FileName: string;
+    Compressed: boolean;
+    Z: Tcustomzlibstream;
+begin
+  Blob := TIBBlobStream.Create;
   try
-      Result := StrToInt(ReadString('Status','Current','0'))
+    Blob.Database := (Sender as TIBXScript).Database;
+    Blob.Mode := bmWrite;
+    if not assigned(UpgradeConf) or
+       not UpgradeConf.GetSourceFile(ParamName,FileName,Compressed) then Exit;
+
+    Source := TFileStream.Create(FileName,fmOpenRead or fmShareDenyNone);
+    try
+      if Compressed then
+      begin
+        Z := Tcustomzlibstream.Create(Blob);
+        try
+          Z.CopyFrom(Source,0)
+        finally
+          Z.Free
+        end;
+      end
+      else
+        Blob.CopyFrom(Source,0)
+    finally
+      Source.Free
+    end;
+    Blob.Finalize;
+    BlobID := Blob.BlobID
   finally
-    Free
+    Blob.Free
   end
-end;
-
-function TCustomIBLocalDBSupport.GetUpgradeConfFile: string;
-begin
-  Result := UpgradeConfFile;
-  if Result = '' then Exit;
-
-  if not IsAbsolutePath(Result) then
-    Result := FSharedDataDir + Result;
 end;
 
 procedure TCustomIBLocalDBSupport.CheckEnabled;
@@ -345,7 +352,7 @@ begin
 
   UpgradeCheck;
 
-  if FNewDBCreated and assigned(FOnNewDatabaseOpen) then
+  if not DowngradePending and FNewDBCreated and assigned(FOnNewDatabaseOpen) then
     OnNewDatabaseOpen(self);
   FNewDBCreated := false;
 
@@ -403,6 +410,24 @@ begin
 end;
 
 procedure TCustomIBLocalDBSupport.UpgradeCheck;
+
+  function GetUpgradeConfFile: string;
+  begin
+    Result := UpgradeConfFile;
+    if Result = '' then Exit;
+
+    if not IsAbsolutePath(Result) then
+      Result := FSharedDataDir + Result;
+  end;
+
+  function GetPatchDir: string;
+  begin
+    Result := PatchDirectory;
+    if Result = '' then Exit;
+    if not IsAbsolutePath(Result) then
+      Result := FSharedDataDir + Result;
+  end;
+
 var DBArchive: string;
 begin
   if not UpdateVersionNo then
@@ -411,8 +436,8 @@ begin
   if CurrentDBVersionNo > RequiredVersionNo then
   begin
     {Possible recovery after failed upgrade}
-    DBArchive := ChangeFileExt(GetDBNameAndPath,'');
-    DBArchive := DBArchive + '.' + IntToStr(RequiredVersionNo) + '.gbk';
+    DBArchive := ChangeFileExt(ActiveDatabasePathName,'') +
+                     '.' + IntToStr(RequiredVersionNo) + '.gbk';
     if FileExists(DBArchive) and (iblAllowDowngrade in FOptions) then
       Downgrade(DBArchive)
     else
@@ -421,14 +446,18 @@ begin
   else
   if (CurrentDBVersionNo < RequiredVersionNo) and (iblAutoUpgrade in FOptions) then
   begin
+    FUpgradeConf := TUpgradeConfFile.Create(GetUpgradeConfFile,GetPatchDir);
+    try
+      FUpgradeConf.CheckUpgradeAvailable(RequiredVersionNo);
       FInUpgrade := true;
       try
-        if ResolveDBVersionMismatch(CurrentDBVersionNo,RequiredVersionNo) then
-         UpdateVersionNo;
-
+        RunUpgradeDatabase;
       finally
         FInUpgrade := false;
       end;
+    finally
+      FreeAndNil(FUpgradeConf);
+    end;
   end;
 end;
 
@@ -570,36 +599,6 @@ begin
     TempDBParams.Free;
   end;
   Database.Connected := true;
-end;
-
-function TCustomIBLocalDBSupport.ResolveDBVersionMismatch(VersionFound,
-  VersionWanted: integer): boolean;
-var patchDir: string;
-    DBParams: TStringList;
-    CurVersion: integer;
-begin
-  Result := false;
-  if not Enabled then Exit;
-
-  CurVersion := UpgradeAvailableToVersion;
-  if CurVersion < VersionWanted then
-    raise Exception.CreateFmt(sUpgradeRequired, [VersionWanted,CurVersion]);
-
-  if CurVersion >=  VersionWanted then
-  begin
-    patchDir := PatchDirectory;
-    if patchDir = '' then Exit;
-    if not IsAbsolutePath(patchDir) then
-      patchDir := FSharedDataDir + patchDir;
-    DBParams := TStringList.Create;
-    try
-      DBParams.Assign(Database.Params);
-      PrepareDBParams(DBParams);
-      Result := RunUpgradeDatabase(DBParams,patchDir,GetUpgradeConfFile,VersionFound,VersionWanted);
-    finally
-      DBParams.Free;
-    end;
-  end;
 end;
 
 procedure TCustomIBLocalDBSupport.InitDatabaseParameters(DBParams: TStrings;

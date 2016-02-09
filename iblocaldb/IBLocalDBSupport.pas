@@ -30,7 +30,7 @@ unit IBLocalDBSupport;
 interface
 
 uses
-  Classes, SysUtils, LResources, Forms, Controls,  Dialogs, CustomIBLocalDBSupport;
+  Classes, SysUtils, LResources, Forms, Controls,  Dialogs, IBXCustomIBLocalDBSupport;
 
 type
 
@@ -39,15 +39,14 @@ type
   TIBLocalDBSupport = class(TCustomIBLocalDBSupport)
   private
     procedure DoDowngrade(Data: PtrInt);
-    procedure HandleSave2Backup(Sender: TObject; DBArchive: string);
+    procedure HandleDoUpgrade(Sender: TObject);
   protected
     function AllowInitialisation: boolean; override;
     function AllowRestore: boolean; override;
     function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; override;
     procedure Downgrade(DBArchive: string); override;
     function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; override;
-    function RunUpgradeDatabase(DBParams: TStrings; PatchDir, ParamFile: string;
-                              VersionFound,VersionWanted: integer): boolean; override;
+    function RunUpgradeDatabase: boolean; override;
     function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean; override;
   published
     property Database;
@@ -68,7 +67,8 @@ type
 
 implementation
 
-uses Registry, UpdateDatabaseUnit, NewDatabaseUnit, SaveDatabaseUnit, IBServices;
+uses IBXUpgradeDatabaseDlg, IBXCreateDatabaseDlg, IBXSaveDatabaseDlg, IBServices,
+  IBXUpgradeConfFile;
 
 resourcestring
   sDowngradePrompt = 'Database Version %d found but %d expected. If you have '+
@@ -90,10 +90,48 @@ begin
    DowngradeDone;
 end;
 
-procedure TIBLocalDBSupport.HandleSave2Backup(Sender: TObject; DBArchive: string
-  );
+procedure TIBLocalDBSupport.HandleDoUpgrade(Sender: TObject);
+
+  function GetMessage(msg1,msg2: string): string;
+  begin
+    if msg1 <> '' then
+      Result := msg1
+    else
+      Result := msg2;
+  end;
+
+var UpdateAvailable: boolean;
+    UpgradeInfo: TUpgradeInfo;
+    DBArchive: string;
 begin
-  SaveDatabase(DBArchive);
+  with (Sender as TUpgradeDatabaseDlg) do
+  repeat
+   if CurrentDBVersionNo >= RequiredVersionNo then break;
+
+    UpdateAvailable := UpgradeConf.GetUpgradeInfo(CurrentDBVersionNo+1,UpgradeInfo);
+    if UpdateAvailable then
+    begin
+      if UpgradeInfo.BackupDB then
+      begin
+       DBArchive := ChangeFileExt(ActiveDatabasePathName,'');
+       DBArchive := DBArchive + '.' + IntToStr(CurrentDBVersionNo) + '.gbk';
+       SaveDatabase(DBArchive);
+      end;
+      Add2Log(UpgradeInfo.UserMessage);
+      if FileExists(UpgradeInfo.UpdateSQLFile) then
+      begin
+       Status.Caption := GetMessage(UpgradeInfo.UserMessage,'Applying Update from ' + UpgradeInfo.UpdateSQLFile);
+       Application.ProcessMessages;
+       Add2Log(Status.Caption);
+       if not IBXScript.PerformUpdate(UpgradeInfo.UpdateSQLFile,true) then
+       begin
+         SuccessfulCompletion := false;
+         break;
+       end;
+      end;
+      UpdateVersionNo;
+    end;
+  until not UpdateAvailable;
 end;
 
 function TIBLocalDBSupport.AllowInitialisation: boolean;
@@ -112,7 +150,7 @@ function TIBLocalDBSupport.CreateNewDatabase(DBName: string;
   DBParams: TStrings; DBArchive: string): boolean;
 begin
   CreateDir(ExtractFileDir(DBName));
-  with TNewDatabase.Create(Application) do
+  with TCreateDatabaseDlg.Create(Application) do
   try
    SetDBParams(IBRestoreService1,DBParams);
    IBRestoreService1.BackupFile.Clear;
@@ -120,7 +158,7 @@ begin
    IBRestoreService1.Options := [CreateNewDB];
    IBRestoreService1.BackupFile.Add(DBArchive);
    IBRestoreService1.DatabaseName.Add(DBName);
-   ShowModal;
+   Result := ShowModal = mrOK;
   finally
     Free
   end;
@@ -140,7 +178,7 @@ end;
 function TIBLocalDBSupport.RestoreDatabaseFromArchive(DBName: string;
   DBParams: TStrings; aFilename: string): boolean;
 begin
-  with TNewDatabase.Create(Application) do
+  with TCreateDatabaseDlg.Create(Application) do
   try
     if (aFilename = '') or not FileExists(aFileName) then
     begin
@@ -156,22 +194,20 @@ begin
     IBRestoreService1.Options := [replace];
     IBRestoreService1.BackupFile.Add(aFilename);
     IBRestoreService1.DatabaseName.Add(DBName);
-    ShowModal;
+    Result := ShowModal = mrOK;
   finally
     Free
   end;
 end;
 
-function TIBLocalDBSupport.RunUpgradeDatabase(DBParams: TStrings; PatchDir,
-  ParamFile: string; VersionFound, VersionWanted: integer): boolean;
+function TIBLocalDBSupport.RunUpgradeDatabase: boolean;
 begin
-  with TUpdateDatabaseDlg.Create(Application) do
+  with TUpgradeDatabaseDlg.Create(Application) do
   try
-    UpdateDatabase.DatabaseName := Database.DatabaseName;
-    UpdateDatabase.Params.Assign(DBParams);
-    ActiveDatabasePathName := self.ActiveDatabasePathName;
-    OnSave2Backup := @HandleSave2Backup;
-    Result := ShowModal(PatchDir,ParamFile,VersionFound,VersionWanted) = mrOK;
+    IBXScript.Database := Database;
+    OnDoUpgrade := @HandleDoUpgrade;
+    IBXScript.GetParamValue := @HandleGetParamValue;
+    Result := ShowModal = mrOK;
   finally
     Free
   end;
@@ -186,7 +222,7 @@ const
 function TIBLocalDBSupport.SaveDatabaseToArchive(DBName: string;
   DBParams: TStrings; aFilename: string): boolean;
 begin
-  with TSaveDatabase.Create(Application) do
+  with TSaveDatabaseDlg.Create(Application) do
   try
    if aFilename = ''  then
    begin

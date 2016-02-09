@@ -59,13 +59,11 @@ object UpdateDatabaseDlg: TUpdateDatabaseDlg
     top = 16
   end
   object IBXScript: TIBXScript
-    Database = UpdateDatabase
     Transaction = UpdateTransaction
-    GetParamValue = IBXScriptGetParamValue
     OnOutputLog = IBXScriptLogProc
     OnErrorLog = IBXScriptLogProc
     OnProgressEvent = IBXScriptProgressEvent
-    left = 270
+    left = 272
     top = 48
   end
   object UpdateTransaction: TIBTransaction
@@ -76,18 +74,5 @@ object UpdateDatabaseDlg: TUpdateDatabaseDlg
     )
     left = 232
     top = 48
-  end
-  object UpdateDatabase: TIBDatabase
-    Connected = False
-    LoginPrompt = False
-    AllowStreamedConnected = False
-    Params.Strings = (
-      'lc_ctype=UTF8'
-    )
-    DefaultTransaction = UpdateTransaction
-    IdleTimer = 0
-    TraceFlags = []
-    left = 272
-    top = 88
   end
 end

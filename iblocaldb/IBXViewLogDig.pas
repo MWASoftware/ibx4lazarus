@@ -23,7 +23,7 @@
  *  Contributor(s): ______________________________________.
  *
 *)
-unit ViewLogDlgUnit;
+unit IBXViewLogDig;
 
 {$mode objfpc}{$H+}
 

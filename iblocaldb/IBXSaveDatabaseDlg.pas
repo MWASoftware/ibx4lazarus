@@ -23,11 +23,11 @@
  *  Contributor(s): ______________________________________.
  *
 *)
-unit NewDatabaseUnit;
-
-{$mode objfpc}{$H+}
+unit IBXSaveDatabaseDlg;
 
 interface
+
+{$mode objfpc}{$H+}
 
 uses
   LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics, Controls, Forms,
@@ -35,59 +35,60 @@ uses
 
 type
 
-  { TNewDatabase }
+  { TSaveDatabaseDlg }
 
-  TNewDatabase = class(TForm)
-    IBRestoreService1: TIBRestoreService;
+  TSaveDatabaseDlg = class(TForm)
     Panel1: TPanel;
     Status: TLabel;
     Label1: TLabel;
-    OpenDialog1: TOpenDialog;
+    SaveDialog1: TSaveDialog;
+    IBBackupService1: TIBBackupService;
     procedure FormShow(Sender: TObject);
   private
     { Private declarations }
-    procedure DoRestore(Data: PtrInt);
+    procedure DoBackup(Data: PtrInt);
   public
     { Public declarations }
   end;
 
 var
-  NewDatabase: TNewDatabase;
+  SaveDatabase: TSaveDatabaseDlg;
 
 implementation
 
 {$R *.lfm}
 
-procedure TNewDatabase.FormShow(Sender: TObject);
+{ TSaveDatabaseDlg }
+
+procedure TSaveDatabaseDlg.FormShow(Sender: TObject);
 begin
  Status.Caption := '';
- Application.QueueAsyncCall(@DoRestore,0)
+ Application.QueueAsyncCall(@DoBackup,0);
 end;
 
-procedure TNewDatabase.DoRestore(Data: PtrInt);
+procedure TSaveDatabaseDlg.DoBackup(Data: PtrInt);
 begin
  try
-  IBRestoreService1.Active := true;
-  IBRestoreService1.ServiceStart;
+  IBBackupService1.Active := true;
+  IBBackupService1.ServiceStart;
   try
-    while not IBRestoreService1.Eof do
+    while not IBBackupService1.Eof do
     begin
-      Status.Caption := Trim(IBRestoreService1.GetNextLine);
+      Status.Caption := IBBackupService1.GetNextLine;
       Application.ProcessMessages
     end;
   finally
-    IBRestoreService1.Active := false
+    IBBackupService1.Active := false
   end;
-  if FileExists(IBRestoreService1.DatabaseName[0]) then
-  begin
+  if FileExists(IBBackupService1.BackupFile[0]) { *Converted from FileExists*  } then
     ModalResult := mrOK
-  end
   else
     ModalResult := mrCancel
- except on E:Exception do
+ except
+   ModalResult := mrCancel;
    raise
  end;
- Sleep(500);
+ Sleep(500)
 end;
 
 end.
