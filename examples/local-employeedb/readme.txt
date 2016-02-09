@@ -29,7 +29,7 @@ Running the application
 
 The example should just compile and run. An archive of the Firebird example employee
 database is provided with the example. This will be used to create the initial database.
-It should then be automatically upgraded to "version 2" using the scripts provided in the
+It should then be automatically upgraded to "version 2" using the sql scripts provided in the
 "patches" directory. (see also the file upgrade.conf).
 
 Note that you will not be prompted for a username/password. The embedded server
@@ -39,7 +39,7 @@ database as in the client/server version.
 The local database will be created in:
 
 Linux: $HOME/.MWA Software/employee.fdb
-Windows: <User Application Data Folder>\MWA Software\employee.fdb
+Windows: <User Local Application Data Folder>\MWA Software\employee.fdb
 
 The File menu provides actions to save the current database to a gbak format archive,
 restore it again (replacing the current database) or to restore the database to its initial state.

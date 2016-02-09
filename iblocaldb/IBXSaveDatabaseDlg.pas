@@ -43,7 +43,9 @@ type
     Label1: TLabel;
     SaveDialog1: TSaveDialog;
     IBBackupService1: TIBBackupService;
+    Timer1: TTimer;
     procedure FormShow(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
   private
     { Private declarations }
     procedure DoBackup(Data: PtrInt);
@@ -66,6 +68,15 @@ begin
  Application.QueueAsyncCall(@DoBackup,0);
 end;
 
+procedure TSaveDatabaseDlg.Timer1Timer(Sender: TObject);
+begin
+  Timer1.Interval := 0;
+  if FileExists(IBBackupService1.BackupFile[0])  then
+    ModalResult := mrOK
+  else
+    ModalResult := mrCancel
+end;
+
 procedure TSaveDatabaseDlg.DoBackup(Data: PtrInt);
 begin
  try
@@ -80,15 +91,11 @@ begin
   finally
     IBBackupService1.Active := false
   end;
-  if FileExists(IBBackupService1.BackupFile[0]) { *Converted from FileExists*  } then
-    ModalResult := mrOK
-  else
-    ModalResult := mrCancel
  except
    ModalResult := mrCancel;
    raise
  end;
- Sleep(500)
+ Timer1.Interval := 500;
 end;
 
 end.

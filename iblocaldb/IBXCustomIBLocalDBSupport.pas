@@ -184,7 +184,7 @@ implementation
 
 uses  IBIntf,  DB, IBBlob, ZStream
   {$IFDEF Unix} ,initc, regexpr {$ENDIF}
-  {$IFDEF WINDOWS} ,Windirs {$ENDIF};
+  {$IFDEF WINDOWS} ,Windows ,Windirs {$ENDIF};
 
 resourcestring
   sSWUpgradeNeeded = 'Software Upgrade Required: Current DB Version No is %d. Version %d supported';

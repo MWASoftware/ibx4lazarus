@@ -35,9 +35,9 @@ object SaveDatabaseDlg: TSaveDatabaseDlg
     end
     object Label1: TLabel
       Left = 65
-      Height = 14
+      Height = 13
       Top = 38
-      Width = 103
+      Width = 95
       Caption = 'Saving Database'
       Font.Color = clWindowText
       Font.Height = -11
@@ -64,6 +64,12 @@ object SaveDatabaseDlg: TSaveDatabaseDlg
     BlockingFactor = 0
     Options = []
     left = 120
+    top = 80
+  end
+  object Timer1: TTimer
+    Interval = 0
+    OnTimer = Timer1Timer
+    left = 208
     top = 80
   end
 end

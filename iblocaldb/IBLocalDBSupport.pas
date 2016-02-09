@@ -69,10 +69,10 @@ type
 implementation
 
 uses IBXUpgradeDatabaseDlg, IBXCreateDatabaseDlg, IBXSaveDatabaseDlg, IBServices,
-  IBXUpgradeConfFile;
+  IBXUpgradeConfFile, Registry;
 
 resourcestring
-  sDowngradePrompt = 'Database Version %d found but %d expected. If you have '+
+  sDowngradePrompt = 'Database Version %d found but Version %d expected. If you have '+
                      'reinstalled this application after a failed upgrade then '+
                      'it may be possible to restore a saved archive of the database '+
                      'taken immediately before the upgrade. Do you want to do this?';
@@ -115,7 +115,6 @@ begin
       begin
        Status.Caption := UpgradeInfo.UserMessage;
        Application.ProcessMessages;
-       Add2Log(UpgradeInfo.UserMessage);
        Add2Log(Format(sUpdateMsg,[UpgradeInfo.UpdateSQLFile]));
        if not IBXScript.PerformUpdate(UpgradeInfo.UpdateSQLFile,true) then
        begin

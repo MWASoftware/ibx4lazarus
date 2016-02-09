@@ -126,7 +126,6 @@ end;
 
 function TUpgradeConfFile.GetUpgradeInfo(VersionNo: integer;
   var UpgradeInfo: TUpgradeInfo): boolean;
-var IniFile: TIniFile;
 begin
    Result := false;
    FCurrentVersion := Format(sSectionheader,[VersionNo]);

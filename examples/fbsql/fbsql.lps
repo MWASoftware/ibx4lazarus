@@ -8,9 +8,15 @@
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
+<<<<<<< fbsql.lps
+        <TopLine Value="35"/>
+        <CursorPos X="3" Y="44"/>
+        <UsageCount Value="23"/>
+=======
         <TopLine Value="191"/>
         <CursorPos X="61" Y="197"/>
         <UsageCount Value="25"/>
+>>>>>>> 1.4
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -23,8 +29,13 @@
       <Unit2>
         <Filename Value="../../runtime/ibxscript.pas"/>
         <EditorIndex Value="-1"/>
+<<<<<<< fbsql.lps
+        <TopLine Value="677"/>
+        <CursorPos X="65" Y="681"/>
+=======
         <TopLine Value="25"/>
         <CursorPos X="62" Y="47"/>
+>>>>>>> 1.4
         <UsageCount Value="11"/>
       </Unit2>
       <Unit3>

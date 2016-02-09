@@ -43,7 +43,9 @@ type
     Status: TLabel;
     Label1: TLabel;
     OpenDialog1: TOpenDialog;
+    Timer1: TTimer;
     procedure FormShow(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
   private
     { Private declarations }
     procedure DoRestore(Data: PtrInt);
@@ -64,6 +66,17 @@ begin
  Application.QueueAsyncCall(@DoRestore,0)
 end;
 
+procedure TCreateDatabaseDlg.Timer1Timer(Sender: TObject);
+begin
+  Timer1.Interval := 0;
+  if FileExists(IBRestoreService1.DatabaseName[0]) then
+  begin
+    ModalResult := mrOK
+  end
+  else
+    ModalResult := mrCancel
+end;
+
 procedure TCreateDatabaseDlg.DoRestore(Data: PtrInt);
 begin
  try
@@ -78,16 +91,10 @@ begin
   finally
     IBRestoreService1.Active := false
   end;
-  if FileExists(IBRestoreService1.DatabaseName[0]) then
-  begin
-    ModalResult := mrOK
-  end
-  else
-    ModalResult := mrCancel
+  Timer1.Interval := 500;
  except on E:Exception do
    raise
  end;
- Sleep(500);
 end;
 
 end.
