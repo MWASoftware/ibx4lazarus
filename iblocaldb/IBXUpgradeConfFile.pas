@@ -69,10 +69,10 @@ const
   sSectionheader      = 'Version.%.3d';
 
 resourcestring
-  sInvalidConfFile = 'Upgrade Configuration File (%s) missing or not specified';
+  sInvalidConfFile = 'Database Upgrade Required, but the Upgrade File (%s) is missing or not specified';
   sUpgradeRequired = 'Database Upgrade Required, but the Upgrade File is out of Date. '+
                               'Required Version = %d, Upgrade available for version %d';
-  sNoInfo      = 'Database Version is %d - Unknown Version - No Information Found';
+  sNoInfo      = 'Upgrading Database Schema to Version %d';
 
 { TUpgradeConfFile }
 

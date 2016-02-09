@@ -77,10 +77,11 @@ resourcestring
                      'it may be possible to restore a saved archive of the database '+
                      'taken immediately before the upgrade. Do you want to do this?';
 
-  sReplaceBackup = 'This action will replace the current database with the backup. '+
+  sReplaceBackup =   'This action will replace the current database with the backup. '+
                               'All data in the current database will be lost!';
-  sReplaceInitial = 'This action will replace the current database with an initial database. '+
+  sReplaceInitial =   'This action will replace the current database with an initial database. '+
                               'All data in the current database will be lost!';
+  sUpdateMsg =       'Applying Update from %s';
 
 { TIBLocalDBSupport }
 
@@ -92,15 +93,6 @@ begin
 end;
 
 procedure TIBLocalDBSupport.HandleDoUpgrade(Sender: TObject);
-
-  function GetMessage(msg1,msg2: string): string;
-  begin
-    if msg1 <> '' then
-      Result := msg1
-    else
-      Result := msg2;
-  end;
-
 var UpdateAvailable: boolean;
     UpgradeInfo: TUpgradeInfo;
     DBArchive: string;
@@ -121,9 +113,10 @@ begin
       Add2Log(UpgradeInfo.UserMessage);
       if FileExists(UpgradeInfo.UpdateSQLFile) then
       begin
-       Status.Caption := GetMessage(UpgradeInfo.UserMessage,'Applying Update from ' + UpgradeInfo.UpdateSQLFile);
+       Status.Caption := UpgradeInfo.UserMessage;
        Application.ProcessMessages;
-       Add2Log(Status.Caption);
+       Add2Log(UpgradeInfo.UserMessage);
+       Add2Log(Format(sUpdateMsg,[UpgradeInfo.UpdateSQLFile]));
        if not IBXScript.PerformUpdate(UpgradeInfo.UpdateSQLFile,true) then
        begin
          SuccessfulCompletion := false;
