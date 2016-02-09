@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, DBGrids,
   StdCtrls, ActnList, EditBtn, DbCtrls, ExtCtrls, Buttons, IBDatabase, IBQuery,
-  IBCustomDataSet, IBUpdateSQL, IBSQL, IBDynamicGrid, IBLookupComboEditBox,
+  IBCustomDataSet, IBSQL, IBDynamicGrid, IBLookupComboEditBox,
   IBLocalDBSupport, db, DBExtCtrls, Menus;
 
 const

@@ -10,31 +10,35 @@
         <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="6">
+    <Files Count="7">
       <Item1>
-        <Filename Value="iblocaldb/CustomIBLocalDBSupport.pas"/>
-        <UnitName Value="CustomIBLocalDBSupport"/>
+        <Filename Value="iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
+        <UnitName Value="IBXCustomIBLocalDBSupport"/>
       </Item1>
       <Item2>
-        <Filename Value="iblocaldb/NewDatabaseUnit.pas"/>
-        <UnitName Value="NewDatabaseUnit"/>
+        <Filename Value="iblocaldb/IBXCreateDatabaseDlg.pas"/>
+        <UnitName Value="IBXCreateDatabaseDlg"/>
       </Item2>
       <Item3>
-        <Filename Value="iblocaldb/SaveDatabaseUnit.pas"/>
-        <UnitName Value="SaveDatabaseUnit"/>
+        <Filename Value="iblocaldb/IBXSaveDatabaseDlg.pas"/>
+        <UnitName Value="IBXSaveDatabaseDlg"/>
       </Item3>
       <Item4>
-        <Filename Value="iblocaldb/updatedatabaseunit.pas"/>
-        <UnitName Value="UpdateDatabaseUnit"/>
+        <Filename Value="iblocaldb/IBXUpgradeDatabaseDlg.pas"/>
+        <UnitName Value="IBXUpgradeDatabaseDlg"/>
       </Item4>
       <Item5>
-        <Filename Value="iblocaldb/viewlogdlgunit.pas"/>
-        <UnitName Value="ViewLogDlgUnit"/>
+        <Filename Value="iblocaldb/IBXViewLogDig.pas"/>
+        <UnitName Value="IBXViewLogDig"/>
       </Item5>
       <Item6>
         <Filename Value="iblocaldb/IBLocalDBSupport.pas"/>
         <UnitName Value="IBLocalDBSupport"/>
       </Item6>
+      <Item7>
+        <Filename Value="iblocaldb/IBXUpgradeConfFile.pas"/>
+        <UnitName Value="IBXUpgradeConfFile"/>
+      </Item7>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>

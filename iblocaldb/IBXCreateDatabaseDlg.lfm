@@ -1,7 +1,7 @@
-object NewDatabase: TNewDatabase
-  Left = 607
+object CreateDatabaseDlg: TCreateDatabaseDlg
+  Left = 623
   Height = 118
-  Top = 384
+  Top = 405
   Width = 266
   BorderStyle = bsNone
   Caption = 'NewDatabase'
@@ -36,9 +36,9 @@ object NewDatabase: TNewDatabase
     end
     object Label1: TLabel
       Left = 57
-      Height = 13
+      Height = 14
       Top = 32
-      Width = 131
+      Width = 143
       Caption = 'Creating New Database'
       Font.Color = clWindowText
       Font.Height = -11

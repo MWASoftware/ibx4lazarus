@@ -67,7 +67,7 @@ type
 
 
 var
-  UpdateDatabaseDlg: TUpgradeDatabaseDlg;
+  UpgradeDatabaseDlg: TUpgradeDatabaseDlg;
 
 
 implementation

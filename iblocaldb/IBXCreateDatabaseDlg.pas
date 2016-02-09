@@ -52,7 +52,7 @@ type
   end;
 
 var
-  NewDatabase: TCreateDatabaseDlg;
+  CreateDatabaseDlg: TCreateDatabaseDlg;
 
 implementation
 

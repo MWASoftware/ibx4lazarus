@@ -1,4 +1,4 @@
-object UpdateDatabaseDlg: TUpdateDatabaseDlg
+object UpgradeDatabaseDlg: TUpgradeDatabaseDlg
   Left = 528
   Height = 132
   Top = 302

@@ -62,6 +62,7 @@ type
     property OnGetDatabaseName;
     property OnGetDBVersionNo;
     property OnNewDatabaseOpen;
+    property OnGetSharedDataDir;
   end;
 
 
@@ -168,7 +169,7 @@ procedure TIBLocalDBSupport.Downgrade(DBArchive: string);
 begin
   if  (iblQuiet in Options) or
       (MessageDlg(Format(sDowngradePrompt, [CurrentDBVersionNo,RequiredVersionNo]),
-                     mtConfirmation,[mbYes,mbNo],0) = mrYes) then
+                     mtWarning,[mbYes,mbNo],0) = mrYes) then
   begin
     inherited Downgrade(DBArchive);
     Application.QueueAsyncCall(@DoDowngrade,0);
@@ -205,6 +206,7 @@ begin
   with TUpgradeDatabaseDlg.Create(Application) do
   try
     IBXScript.Database := Database;
+    UpdateTransaction.DefaultDatabase := Database;
     OnDoUpgrade := @HandleDoUpgrade;
     IBXScript.GetParamValue := @HandleGetParamValue;
     Result := ShowModal = mrOK;

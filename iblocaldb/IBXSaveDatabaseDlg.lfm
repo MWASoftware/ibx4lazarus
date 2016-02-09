@@ -1,4 +1,4 @@
-object SaveDatabase: TSaveDatabase
+object SaveDatabaseDlg: TSaveDatabaseDlg
   Left = 699
   Height = 117
   Top = 448

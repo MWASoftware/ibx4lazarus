@@ -52,7 +52,7 @@ type
   end;
 
 var
-  SaveDatabase: TSaveDatabaseDlg;
+  SaveDatabaseDlg: TSaveDatabaseDlg;
 
 implementation
 

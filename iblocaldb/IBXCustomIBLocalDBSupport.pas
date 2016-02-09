@@ -72,6 +72,7 @@ type
 
   TOnGetDatabaseName = procedure(Sender: TObject; var DBName: string) of object;
   TOnGetDBVersionNo = procedure (Sender: TObject; var VersionNo: integer) of object;
+  TOnGetSharedDataDir = procedure(Sender: TObject; var SharedDataDir: string) of object;
 
   TIBLocalOption = (iblAutoUpgrade, iblAllowDowngrade, iblQuiet);
   TIBLocalOptions = set of TIBLocalOption;
@@ -91,6 +92,7 @@ type
     FDatabaseName: string;
     FOnGetDatabaseName: TOnGetDatabaseName;
     FOnGetDBVersionNo: TOnGetDBVersionNo;
+    FOnGetSharedDataDir: TOnGetSharedDataDir;
     FOnNewDatabaseOpen: TNotifyEvent;
     FOptions: TIBLocalOptions;
     FPatchDirectory: string;
@@ -107,11 +109,15 @@ type
     procedure CreateDatabase(DBName: string; DBParams: TStrings; Overwrite: boolean);
     function GetDatabase: TIBDatabase;
     procedure SetDatabase(AValue: TIBDatabase);
+    function GetDBNameAndPath: string;
+    procedure InitDatabaseParameters(DBParams: TStrings;
+                              var DBName: string);
     function MapSharedDataDir(aDataDir: string): string;
     procedure OnBeforeDatabaseConnect(Sender: TObject; DBParams: TStrings;
                               var DBName: string);
     procedure OnDatabaseConnect(Sender: TObject);
     procedure OnAfterDatabaseDisconnect(Sender: TObject);
+    procedure PrepareDBParams(DBParams: TStrings);
     procedure SetFirebirdDirectory(AValue: string);
     procedure SetPatchDirectory(AValue: string);
     procedure SetupFirebirdEnv;
@@ -125,11 +131,7 @@ type
     procedure HandleGetParamValue(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD);
     procedure Downgrade(DBArchive: string); virtual;
     procedure DowngradeDone;
-    function GetDBNameAndPath: string;
-    procedure InitDatabaseParameters(DBParams: TStrings;
-                              var DBName: string);
     procedure Loaded; override;
-    procedure PrepareDBParams(DBParams: TStrings);
     function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; virtual; abstract;
     function RunUpgradeDatabase: boolean; virtual; abstract;
     function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean; virtual; abstract;
@@ -173,6 +175,7 @@ type
     property OnGetDatabaseName: TOnGetDatabaseName read FOnGetDatabaseName write FOnGetDatabaseName;
     property OnGetDBVersionNo: TOnGetDBVersionNo read FOnGetDBVersionNo write FOnGetDBVersionNo;
     property OnNewDatabaseOpen: TNotifyEvent read FOnNewDatabaseOpen write FOnNewDatabaseOpen;
+    property OnGetSharedDataDir: TOnGetSharedDataDir read FOnGetSharedDataDir write FOnGetSharedDataDir;
  end;
 
   EIBLocalFatalError = class(Exception);
@@ -185,16 +188,10 @@ uses  IBIntf,  DB, IBBlob, ZStream
 
 resourcestring
   sSWUpgradeNeeded = 'Software Upgrade Required: Current DB Version No is %d. Version %d supported';
-
   sLocalDBDisabled = 'Local Database Access Disabled';
-
   sEmptyDBArchiveMissing = 'Unable to create database - no empty DB archive specified';
-
   sEmptyDBArchiveNotFound = 'Unable to create database - empty DB archive file not found';
-
   sNoEmbeddedServer = 'Firebird Embedded Server is required but is not installed';
-
-
 
 { TCustomIBLocalDBSupport }
 
@@ -260,12 +257,6 @@ procedure TCustomIBLocalDBSupport.CreateDatabase(DBName: string; DBParams: TStri
 var DBArchive: string;
 begin
  CheckEnabled;
- if FileExists(DBName) then
- begin
-   if not Overwrite then Exit;
-
-   sysutils.DeleteFile(DBName);
- end;
  DBArchive := EmptyDBArchive;
  if DBArchive = '' then
    raise Exception.Create(sEmptyDBArchiveMissing);
@@ -275,6 +266,13 @@ begin
 
  if not FileExists(DBArchive) then
    raise Exception.Create(sEmptyDBArchiveNotFound);
+
+ if FileExists(DBName) then
+ begin
+   if not Overwrite then Exit;
+
+   sysutils.DeleteFile(DBName);
+ end;
 
  SetupFirebirdEnv;
  CreateNewDatabase(DBName,DBParams,DBArchive);
@@ -310,6 +308,8 @@ begin
     RegexObj.Free;
   end;
 {$ENDIF}
+  if assigned (OnGetSharedDataDir) then
+    OnGetSharedDataDir(self,Result);
 end;
 
 {$IFDEF Unix}
