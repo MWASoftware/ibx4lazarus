@@ -87,6 +87,7 @@ begin
   OpenBlobDialog.Title := 'Resolve Query Parameter: ''' + ParamName + '''';
   if OpenBlobDialog.Execute then
   begin
+    ResultsLog.Lines.Add('Loading ' + ParamName + ' from ' + OpenBlobDialog.FileName);
     Blob := TIBBlobStream.Create;
     try
       Blob.Database := (Sender as TIBXScript).Database;
