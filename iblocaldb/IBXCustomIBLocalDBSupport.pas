@@ -303,7 +303,7 @@ begin
   try
     RegexObj.Expression := '^/usr(/local|)/(s|)bin/.*$';
     if RegexObj.Exec(aDataDir) then
-      Result := '/usr' + RegexObj.Match[1] + '/shared/' + ApplicationName + '/';
+      Result := '/usr' + RegexObj.Match[1] + '/share/' + ApplicationName + '/';
   finally
     RegexObj.Free;
   end;
