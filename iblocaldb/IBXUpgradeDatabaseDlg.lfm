@@ -59,6 +59,7 @@ object UpgradeDatabaseDlg: TUpgradeDatabaseDlg
     top = 16
   end
   object IBXScript: TIBXScript
+    IgnoreGrants = True
     Transaction = UpdateTransaction
     OnOutputLog = IBXScriptLogProc
     OnErrorLog = IBXScriptLogProc

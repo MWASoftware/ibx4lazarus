@@ -12,7 +12,7 @@ object Form1: TForm1
     Left = 14
     Height = 15
     Top = 16
-    Width = 86
+    Width = 99
     Caption = 'Database Name:'
     ParentColor = False
   end
@@ -20,7 +20,7 @@ object Form1: TForm1
     Left = 14
     Height = 15
     Top = 56
-    Width = 30
+    Width = 36
     Caption = 'Script'
     ParentColor = False
   end
@@ -46,10 +46,10 @@ object Form1: TForm1
     TabOrder = 1
   end
   object Label3: TLabel
-    Left = 467
+    Left = 459
     Height = 15
     Top = 56
-    Width = 60
+    Width = 68
     Anchors = [akTop, akRight]
     Caption = 'Results Log'
     ParentColor = False
@@ -87,24 +87,24 @@ object Form1: TForm1
     Left = 119
     Height = 15
     Top = 16
-    Width = 47
+    Width = 52
     Caption = 'DBName'
     ParentColor = False
   end
   object StopOnError: TCheckBox
     Left = 104
-    Height = 19
+    Height = 22
     Top = 375
-    Width = 116
+    Width = 136
     Caption = 'Stop On First Error'
     OnChange = StopOnErrorChange
     TabOrder = 5
   end
   object EchoInput: TCheckBox
     Left = 248
-    Height = 19
+    Height = 22
     Top = 375
-    Width = 77
+    Width = 91
     Caption = 'Echo Input'
     OnChange = EchoInputChange
     TabOrder = 6

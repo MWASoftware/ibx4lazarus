@@ -103,6 +103,7 @@ type
   private
     FDatabase: TIBDatabase;
     FEcho: boolean;
+    FIgnoreGrants: boolean;
     FOnErrorLog: TLogEvent;
     FOnProgressEvent: TOnProgressEvent;
     FOnSelectSQL: TOnSelectSQL;
@@ -147,6 +148,7 @@ type
   published
     property Database: TIBDatabase read FDatabase write SetDatabase;
     property Echo: boolean read FEcho write FEcho default true;  {Echo Input to Log}
+    property IgnoreGrants: boolean read FIgnoreGrants write FIgnoreGrants;
     property Transaction: TIBTransaction read FTransaction write FTransaction;
     property StopOnFirstError: boolean read FStopOnFirstError write FStopOnFirstError default true;
     property GetParamValue: TGetParamValue read FGetParamValue write FGetParamValue; {resolve parameterized queries}
@@ -493,7 +495,8 @@ begin
    else
    begin
      DDL := FISQL.SQLType = SQLDDL;
-     FISQL.ExecQuery;
+     if not DDL or not FIgnoreGrants or (Pos('GRANT',AnsiUpperCase(Trim(FSQLText))) <> 1) then
+       FISQL.ExecQuery;
      if FAutoDDL and DDL then
        FISQL.Transaction.Commit;
      FISQL.Close;
