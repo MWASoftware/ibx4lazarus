@@ -110,16 +110,13 @@ begin
        SaveDatabase(DBArchive);
       end;
       Add2Log(UpgradeInfo.UserMessage);
-      if FileExists(UpgradeInfo.UpdateSQLFile) then
+      Status.Caption := UpgradeInfo.UserMessage;
+      Application.ProcessMessages;
+      Add2Log(Format(sUpdateMsg,[UpgradeInfo.UpdateSQLFile]));
+      if not IBXScript.PerformUpdate(UpgradeInfo.UpdateSQLFile,true) then
       begin
-       Status.Caption := UpgradeInfo.UserMessage;
-       Application.ProcessMessages;
-       Add2Log(Format(sUpdateMsg,[UpgradeInfo.UpdateSQLFile]));
-       if not IBXScript.PerformUpdate(UpgradeInfo.UpdateSQLFile,true) then
-       begin
-         SuccessfulCompletion := false;
-         break;
-       end;
+       SuccessfulCompletion := false;
+       break;
       end;
       UpdateVersionNo;
     end;

@@ -126,7 +126,7 @@ begin
    if not IsAbsolutePath(UpgradeInfo.UpdateSQLFile) then
      UpgradeInfo.UpdateSQLFile := ExtractFilePath(FConfFileName) + UpgradeInfo.UpdateSQLFile;
    UpgradeInfo.BackupDB := CompareText(FUpgradeInfo.ReadString(FCurrentVersion,'BackupDatabase','no'),'yes') = 0;
-   Result := (UpgradeInfo.UpdateSQLFile <> '');
+   Result := FileExists(UpgradeInfo.UpdateSQLFile);
 end;
 
 function TUpgradeConfFile.GetSourceFile(aName: string; var FileName: string
