@@ -122,11 +122,15 @@ begin
    UpgradeInfo.UserMessage := FUpgradeInfo.ReadString(FCurrentVersion,'Msg',
                                 Format(sNoInfo,[VersionNo]));
    UpgradeInfo.UpdateSQLFile := FUpgradeInfo.ReadString(FCurrentVersion,'Upgrade','');
-   DoDirSeparators(UpgradeInfo.UpdateSQLFile); {Resolve Platform dependencies}
-   if not IsAbsolutePath(UpgradeInfo.UpdateSQLFile) then
-     UpgradeInfo.UpdateSQLFile := ExtractFilePath(FConfFileName) + UpgradeInfo.UpdateSQLFile;
-   UpgradeInfo.BackupDB := CompareText(FUpgradeInfo.ReadString(FCurrentVersion,'BackupDatabase','no'),'yes') = 0;
-   Result := FileExists(UpgradeInfo.UpdateSQLFile);
+   Result := UpgradeInfo.UpdateSQLFile <> '';
+   if Result then
+   begin
+     DoDirSeparators(UpgradeInfo.UpdateSQLFile); {Resolve Platform dependencies}
+     if not IsAbsolutePath(UpgradeInfo.UpdateSQLFile) then
+       UpgradeInfo.UpdateSQLFile := ExtractFilePath(FConfFileName) + UpgradeInfo.UpdateSQLFile;
+     UpgradeInfo.BackupDB := CompareText(FUpgradeInfo.ReadString(FCurrentVersion,'BackupDatabase','no'),'yes') = 0;
+     Result := FileExists(UpgradeInfo.UpdateSQLFile);
+   end;
 end;
 
 function TUpgradeConfFile.GetSourceFile(aName: string; var FileName: string
