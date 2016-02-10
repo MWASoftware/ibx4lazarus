@@ -116,6 +116,7 @@ type
     FNested: integer;
     FLastChar: char;
     FSQLText: string;
+    FHasBegin: boolean;
     FStack: array [0..16] of TSQLStates;
     FStackindex: integer;
     FGetParamValue: TGetParamValue;
@@ -135,6 +136,7 @@ type
     procedure SetDatabase(AValue: TIBDatabase);
     procedure SetParamValue(SQLVar: TIBXSQLVAR);
     procedure SetState(AState: TSQLStates);
+    procedure ClearStatement;
     function PopState: TSQLStates;
     function ProcessSetStatement(stmt: string): boolean;
   public
@@ -319,6 +321,7 @@ begin
     sqBegin:
       if not (FState in [stInComment,stInCommentLine]) then
       begin
+        FHasBegin := true;
         AddToSQL('BEGIN');
         case FState of
         stInSingleQuotes,
@@ -389,8 +392,7 @@ function TIBXScript.AnalyseSQL(Lines: TStringList): boolean;
 var I: integer;
 begin
   Result := true;
-  FSQLText := '';
-  FState := stInit;
+  ClearStatement;
   FLastSymbol := sqNone;
   for I := 0 to Lines.Count - 1 do
   begin
@@ -404,8 +406,7 @@ begin
         Add2Log(E.Message);
         Result := false;
         if StopOnFirstError then Exit;
-        FSQLText := '';
-        FState := stInit;
+        ClearStatement;
         FLastSymbol := sqNone;
       end
     end;
@@ -443,6 +444,7 @@ begin
     if InTransaction then Commit;
   if not GetTransaction.InTransaction then
     GetTransaction.StartTransaction;
+  ClearStatement;
 end;
 
 procedure TIBXScript.DoReconnect;
@@ -453,6 +455,7 @@ begin
   Database.Connected := true;
   if not GetTransaction.InTransaction then
     GetTransaction.StartTransaction;
+  ClearStatement;
 end;
 
 procedure TIBXScript.ExecSQL;
@@ -463,7 +466,7 @@ begin
  begin
    if ProcessSetStatement(FSQLText) then {Handle Set Statement}
    begin
-     FSQLText := '';
+     ClearStatement;
      Exit;
    end;
 
@@ -471,11 +474,14 @@ begin
    FISQL.Transaction := GetTransaction;
    with FISQL.Transaction do
      if not InTransaction then StartTransaction;
-   FISQL.ParamCheck := true;
+   FISQL.ParamCheck := not FHasBegin; {Probably PSQL}
    FISQL.Prepare;
    if FISQL.SQLType in [SQLInsert, SQLUpdate, SQLDelete] then
+   begin
+     {Interpret parameters}
      for I := 0 to FISQL.Params.Count - 1 do
        SetParamValue(FISQL.Params[I]);
+   end;
 
    if FISQL.SQLType = SQLSelect then
    begin
@@ -487,19 +493,13 @@ begin
    else
    begin
      DDL := FISQL.SQLType = SQLDDL;
-     if DDL then
-     {must not interpret PSQL params}
-     begin
-       FISQL.FreeHandle;
-       FISQL.ParamCheck := false;
-     end;
      FISQL.ExecQuery;
      if FAutoDDL and DDL then
        FISQL.Transaction.Commit;
      FISQL.Close;
    end;
    FISQL.SQL.Clear;
-   FSQLText := ''
+   ClearStatement;
  end
 end;
 
@@ -740,6 +740,13 @@ begin
   FStack[FStackIndex] := FState;
   Inc(FStackIndex);
   FState := AState
+end;
+
+procedure TIBXScript.ClearStatement;
+begin
+  FSQLText := '';
+  FState := stInit;
+  FHasBegin := false;
 end;
 
 end.
