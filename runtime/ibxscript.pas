@@ -136,7 +136,7 @@ type
     procedure SetParamValue(SQLVar: TIBXSQLVAR);
     procedure SetState(AState: TSQLStates);
     function PopState: TSQLStates;
-    function ProcessSetStatement(Line: string): string;
+    function ProcessSetStatement(stmt: string): boolean;
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -392,7 +392,7 @@ begin
     if assigned(OnProgressEvent) then
       OnProgressEvent(self,false,1);
     try
-      AnalyseLine(ProcessSetStatement(Lines[I]));
+      AnalyseLine(Lines[I]);
     except on E:Exception do
       begin
         Add2Log(E.Message);
@@ -455,6 +455,12 @@ var DDL: boolean;
 begin
  if FSQLText <> '' then
  begin
+   if ProcessSetStatement(FSQLText) then {Handle Set Statement}
+   begin
+     FSQLText := '';
+     Exit;
+   end;
+
    FISQL.SQL.Text := FSQLText;
    FISQL.Transaction := GetTransaction;
    with FISQL.Transaction do
@@ -662,23 +668,24 @@ begin
   Result := FStack[FStackIndex]
 end;
 
-function TIBXScript.ProcessSetStatement(Line: string): string;
+function TIBXScript.ProcessSetStatement(stmt: string): boolean;
 var  RegexObj: TRegExpr;
 begin
-  Result := Line;
+  Result := false;
   RegexObj := TRegExpr.Create;
   try
     {Process Set Term}
-    RegexObj.Expression := 'SET +TERM +(.) *\' + FTerminator;
-    if RegexObj.Exec(AnsiUpperCase(Result)) then
+    RegexObj.Expression := 'SET +TERM +(.) *(\' + FTerminator + '|)';
+    if RegexObj.Exec(AnsiUpperCase(stmt)) then
     begin
        FTerminator := RegexObj.Match[1][1];
-       system.Delete(Result,RegexObj.MatchPos[0], RegexObj.MatchLen[0]);
+       Result := true;
+       Exit;
     end;
 
     {Process AutoDDL}
-    RegexObj.Expression := 'SET +AUTODDL +([a-zA-Z]+) *\' + FTerminator;
-    if RegexObj.Exec(AnsiUpperCase(Result)) then
+    RegexObj.Expression := 'SET +AUTODDL +([a-zA-Z]+) *(\' + FTerminator + '|)';
+    if RegexObj.Exec(AnsiUpperCase(stmt)) then
     begin
       if  AnsiUpperCase(RegexObj.Match[1]) = 'ON' then
         FAutoDDL := true
@@ -688,7 +695,7 @@ begin
       else
         raise Exception.CreateFmt('Invalid AUTODDL Statement - %s', [RegexObj.Match[0]]);
 
-      system.Delete(Result,RegexObj.MatchPos[0], RegexObj.MatchLen[0]);
+      Result := true;
     end;
   finally
     RegexObj.Free;

@@ -19,9 +19,12 @@ type
 
   TForm1 = class(TForm)
     CheckVersionTablePresent: TIBSQL;
+    DBImage1: TDBImage;
+    EmployeesPHOTO1: TBlobField;
     GetDBVersionNoQuery: TIBSQL;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
+    Panel3: TPanel;
     Quit: TAction;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
@@ -116,6 +119,8 @@ type
     EmployeeSource: TDataSource;
     IBDatabase1: TIBDatabase;
     IBTransaction1: TIBTransaction;
+    procedure DBImage1DBImageRead(Sender: TObject; S: TStream;
+      var GraphExt: string);
     procedure EmployeesAfterPost(DataSet: TDataSet);
     procedure EmployeesValidatePost(Sender: TObject; var CancelPost: boolean);
     procedure IBDatabase1AfterConnect(Sender: TObject);
@@ -298,6 +303,12 @@ end;
 procedure TForm1.EmployeesAfterPost(DataSet: TDataSet);
 begin
   Employees.Refresh
+end;
+
+procedure TForm1.DBImage1DBImageRead(Sender: TObject; S: TStream;
+  var GraphExt: string);
+begin
+  GraphExt := 'png';
 end;
 
 procedure TForm1.EmployeesValidatePost(Sender: TObject; var CancelPost: boolean

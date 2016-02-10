@@ -55,7 +55,6 @@ type
     property EmptyDBArchive;
     property FirebirdDirectory;
     property Options;
-    property PatchDirectory;
     property RequiredVersionNo;
     property UpgradeConfFile;
     property VendorName;

@@ -45,18 +45,15 @@ type
   private
     FConfFileName: string;
     FCurrentVersion: string;
-    FPatchDir: string;
     FUpgradeInfo: TIniFile;
     function GetUpgradeAvailableToVersion: integer;
-    function ParseFileInfo(Info:string; var FileName: string;
-                                var Compressed: boolean): boolean;
   public
-    constructor Create(aFileName: string; PatchDir: string);
+    constructor Create(aFileName: string);
     destructor Destroy; override;
+    class function IsAbsolutePath(aPath: string): boolean;
     function CheckUpgradeAvailable(RequiredVersionNo: integer): boolean;
     function GetUpgradeInfo(VersionNo: integer; var UpgradeInfo: TUpgradeInfo): boolean;
-    function GetSourceFile(aName: string; var FileName: string;
-                                 var Compressed: boolean): boolean;
+    function GetSourceFile(aName: string; var FileName: string): boolean;
     property UpgradeAvailableToVersion: integer read GetUpgradeAvailableToVersion;
   end;
 
@@ -81,29 +78,10 @@ begin
   Result := StrToInt(FUpgradeInfo.ReadString('Status','Current','0'))
 end;
 
-function TUpgradeConfFile.ParseFileInfo(Info: string; var FileName: string;
-  var Compressed: boolean): boolean;
-var index: integer;
-begin
-  Result := info <> '';
-  if Result then
-  begin
-    index := Pos(',',Info);
-    if index = 0 then
-      FileName := Info
-    else
-    begin
-      FileName := copy(Info,1,Index-1);
-      Compressed := copy(Info,Index+1,Length(Info)-Index) = 'compressed'
-    end;
-  end;
-end;
-
-constructor TUpgradeConfFile.Create(aFileName: string; PatchDir: string);
+constructor TUpgradeConfFile.Create(aFileName: string);
 begin
   inherited Create;
   FConfFileName := aFileName;
-  FPatchDir := PatchDir;
   if (FConfFileName = '') or not FileExists(FConfFileName) then
      raise EUpgradeConfFileError.CreateFmt(sInvalidConfFile,[FConfFileName]);
   FUpgradeInfo := TIniFile.Create(FConfFileName);
@@ -113,6 +91,18 @@ destructor TUpgradeConfFile.Destroy;
 begin
   if assigned(FUpgradeInfo) then FUpgradeInfo.Free;
   inherited Destroy;
+end;
+
+class function TUpgradeConfFile.IsAbsolutePath(aPath: string): boolean;
+begin
+  Result := false;
+  {$IFDEF WINDOWS}
+    Result := (ExtractFileDrive(aPath) <> '') or
+      ((Length(aPath) > 0) and (aPath[1] = DirectorySeparator));
+  {$ENDIF}
+  {$IFDEF UNIX}
+    Result := (Length(aPath) > 0) and (aPath[1] = DirectorySeparator);
+  {$ENDIF}
 end;
 
 function TUpgradeConfFile.CheckUpgradeAvailable(RequiredVersionNo: integer
@@ -131,16 +121,22 @@ begin
    FCurrentVersion := Format(sSectionheader,[VersionNo]);
    UpgradeInfo.UserMessage := FUpgradeInfo.ReadString(FCurrentVersion,'Msg',
                                 Format(sNoInfo,[VersionNo]));
-   UpgradeInfo.UpdateSQLFile := FPatchDir + DirectorySeparator + FUpgradeInfo.ReadString(FCurrentVersion,'Upgrade','');
+   UpgradeInfo.UpdateSQLFile := FUpgradeInfo.ReadString(FCurrentVersion,'Upgrade','');
+   DoDirSeparators(UpgradeInfo.UpdateSQLFile); {Resolve Platform dependencies}
+   if not IsAbsolutePath(UpgradeInfo.UpdateSQLFile) then
+     UpgradeInfo.UpdateSQLFile := ExtractFilePath(FConfFileName) + UpgradeInfo.UpdateSQLFile;
    UpgradeInfo.BackupDB := CompareText(FUpgradeInfo.ReadString(FCurrentVersion,'BackupDatabase','no'),'yes') = 0;
    Result := (UpgradeInfo.UpdateSQLFile <> '');
 end;
 
-function TUpgradeConfFile.GetSourceFile(aName: string; var FileName: string;
-  var Compressed: boolean): boolean;
+function TUpgradeConfFile.GetSourceFile(aName: string; var FileName: string
+  ): boolean;
 begin
-  Result := ParseFileInfo(FUpgradeInfo.ReadString(FCurrentVersion,aName,''),FileName,Compressed);
-  FileName := FPatchDir + DirectorySeparator + FileName
+  FileName := FUpgradeInfo.ReadString(FCurrentVersion,aName,'');
+  DoDirSeparators(FileName);
+  if not IsAbsolutePath(FileName) then
+    FileName := ExtractFilePath(FConfFileName) + FileName;
+  Result := FileExists(FileName);
 end;
 
 end.

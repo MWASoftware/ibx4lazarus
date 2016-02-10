@@ -44,8 +44,6 @@ type
       absolute path or relative to application executeable. If empty, defaults
       to application executeable directory.
     * Name: Component Name
-    * PatchDirectory: Path to directory holding SQL patch files. May either be
-      absolute path or relative to application executeable.
     * Quiet: If true then no database overwrite warnings
     * UpgradeConfFile: Path to upgrade configuration file. May either be
       absolute path or relative to application executeable.
@@ -95,7 +93,6 @@ type
     FOnGetSharedDataDir: TOnGetSharedDataDir;
     FOnNewDatabaseOpen: TNotifyEvent;
     FOptions: TIBLocalOptions;
-    FPatchDirectory: string;
     FRequiredVersionNo: integer;
     FUpgradeConfFile: string;
     FNewDBCreated: boolean;
@@ -104,7 +101,6 @@ type
     FDownGradeArchive: string;
     FSharedDataDir: string;
     FUpgradeConf: TUpgradeConfFile;
-    function IsAbsolutePath(aPath: string): boolean;
     procedure CheckEnabled;
     procedure CreateDatabase(DBName: string; DBParams: TStrings; Overwrite: boolean);
     function GetDatabase: TIBDatabase;
@@ -119,7 +115,6 @@ type
     procedure OnAfterDatabaseDisconnect(Sender: TObject);
     procedure PrepareDBParams(DBParams: TStrings);
     procedure SetFirebirdDirectory(AValue: string);
-    procedure SetPatchDirectory(AValue: string);
     procedure SetupFirebirdEnv;
     procedure UpgradeCheck;
   protected
@@ -168,7 +163,6 @@ type
     property EmptyDBArchive: string read FEmptyDBArchive write FEmptyDBArchive;
     property FirebirdDirectory: string read FFirebirdDirectory write SetFirebirdDirectory;
     property Options: TIBLocalOptions read FOptions write FOptions;
-    property PatchDirectory: string  read FPatchDirectory write SetPatchDirectory;
     property RequiredVersionNo: integer read FRequiredVersionNo write FRequiredVersionNo;
     property UpgradeConfFile: string read FUpgradeConfFile write FUpgradeConfFile;
     property VendorName: string read FVendorName write FVendorName;
@@ -195,47 +189,27 @@ resourcestring
 
 { TCustomIBLocalDBSupport }
 
-function TCustomIBLocalDBSupport.IsAbsolutePath(aPath: string): boolean;
-begin
-  Result := false;
-  {$IFDEF WINDOWS}
-    Result := (ExtractFileDrive(aPath) <> '') or
-      ((Length(aPath) > 0) and (aPath[1] = DirectorySeparator));
-  {$ENDIF}
-  {$IFDEF UNIX}
-    Result := (Length(aPath) > 0) and (aPath[1] = DirectorySeparator);
-  {$ENDIF}
-end;
-
 
 procedure TCustomIBLocalDBSupport.HandleGetParamValue(Sender: TObject;
   ParamName: string; var BlobID: TISC_QUAD);
 var Blob: TIBBlobStream;
     Source: TStream;
     FileName: string;
-    Compressed: boolean;
-    Z: Tcustomzlibstream;
 begin
   Blob := TIBBlobStream.Create;
   try
     Blob.Database := (Sender as TIBXScript).Database;
+    Blob.Transaction := (Sender as TIBXScript).Transaction;
     Blob.Mode := bmWrite;
     if not assigned(UpgradeConf) or
-       not UpgradeConf.GetSourceFile(ParamName,FileName,Compressed) then Exit;
+       not UpgradeConf.GetSourceFile(ParamName,FileName) then Exit;
 
-    Source := TFileStream.Create(FileName,fmOpenRead or fmShareDenyNone);
+    if CompareText(ExtractFileExt(FileName),'.gz') = 0 then  {gzip compressed file}
+      Source := TGZFileStream.Create(FileName,gzopenread)
+    else
+      Source := TFileStream.Create(FileName,fmOpenRead or fmShareDenyNone);
     try
-      if Compressed then
-      begin
-        Z := Tcustomzlibstream.Create(Blob);
-        try
-          Z.CopyFrom(Source,0)
-        finally
-          Z.Free
-        end;
-      end
-      else
-        Blob.CopyFrom(Source,0)
+      Blob.CopyFrom(Source,0)
     finally
       Source.Free
     end;
@@ -261,7 +235,7 @@ begin
  if DBArchive = '' then
    raise Exception.Create(sEmptyDBArchiveMissing);
 
- if not IsAbsolutePath(DBArchive) then
+ if not TUpgradeConfFile.IsAbsolutePath(DBArchive) then
    DBArchive := FSharedDataDir + DBArchive;
 
  if not FileExists(DBArchive) then
@@ -369,12 +343,6 @@ begin
   FFirebirdDirectory := ExcludeTrailingPathDelimiter(AValue);
 end;
 
-procedure TCustomIBLocalDBSupport.SetPatchDirectory(AValue: string);
-begin
-  if FPatchDirectory = AValue then Exit;
-  FPatchDirectory := ExcludeTrailingPathDelimiter(AValue);
-end;
-
 procedure TCustomIBLocalDBSupport.SetupFirebirdEnv;
 var TmpDir: string;
 begin
@@ -396,7 +364,7 @@ begin
   begin
     if FirebirdDirectory <> '' then
     begin
-      if not IsAbsolutePath(FirebirdDirectory) then
+      if not TUpgradeConfFile.IsAbsolutePath(FirebirdDirectory) then
         FirebirdDirectory := FSharedDataDir + FirebirdDirectory;
       if FileExists(FirebirdDirectory + DirectorySeparator + 'firebird.conf') then
       begin
@@ -416,15 +384,7 @@ procedure TCustomIBLocalDBSupport.UpgradeCheck;
     Result := UpgradeConfFile;
     if Result = '' then Exit;
 
-    if not IsAbsolutePath(Result) then
-      Result := FSharedDataDir + Result;
-  end;
-
-  function GetPatchDir: string;
-  begin
-    Result := PatchDirectory;
-    if Result = '' then Exit;
-    if not IsAbsolutePath(Result) then
+    if not TUpgradeConfFile.IsAbsolutePath(Result) then
       Result := FSharedDataDir + Result;
   end;
 
@@ -446,7 +406,7 @@ begin
   else
   if (CurrentDBVersionNo < RequiredVersionNo) and (iblAutoUpgrade in FOptions) then
   begin
-    FUpgradeConf := TUpgradeConfFile.Create(GetUpgradeConfFile,GetPatchDir);
+    FUpgradeConf := TUpgradeConfFile.Create(GetUpgradeConfFile);
     try
       FUpgradeConf.CheckUpgradeAvailable(RequiredVersionNo);
       FInUpgrade := true;
@@ -566,7 +526,6 @@ begin
   FIBBase.AfterDatabaseConnect := @OnDatabaseConnect;
   FIBBase.BeforeDatabaseConnect := @OnBeforeDatabaseConnect;
   FIBBase.AfterDatabaseDisconnect := @OnAfterDatabaseDisconnect;
-  FPatchDirectory := 'patches';
   FUpgradeConfFile := 'upgrade.conf';
   FOptions := [iblAutoUpgrade, iblAllowDowngrade];
   FSharedDataDir := MapSharedDataDir(ExtractFilePath(ParamStr(0)));
@@ -617,7 +576,6 @@ begin
     Database.DatabaseName := ' '; {Avoid CheckDatabaseName Error}
   DoDirSeparators(FEmptyDBArchive);
   DoDirSeparators(FFirebirdDirectory);
-  DoDirSeparators(FPatchDirectory);
   DoDirSeparators(FUpgradeConfFile);
 end;
 

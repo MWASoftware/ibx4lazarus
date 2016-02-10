@@ -30,7 +30,8 @@ Running the application
 The example should just compile and run. An archive of the Firebird example employee
 database is provided with the example. This will be used to create the initial database.
 It should then be automatically upgraded to "version 2" using the sql scripts provided in the
-"patches" directory. (see also the file upgrade.conf).
+"patches" directory. (see also the file upgrade.conf). Note that the upgrade adds
+a "photo" to employee number 2.
 
 Note that you will not be prompted for a username/password. The embedded server
 uses normal file permissions to control access. Otherwise you can edit the employee
