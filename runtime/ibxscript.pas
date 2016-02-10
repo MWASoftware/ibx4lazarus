@@ -220,6 +220,12 @@ begin
 
        stNested:
          AddToSQL(FTerminator);
+
+       stInDeclaration:
+         begin
+           FState := PopState;
+           AddToSQL(';');
+         end;
        end;
 
     sqSemiColon:
@@ -465,9 +471,11 @@ begin
    FISQL.Transaction := GetTransaction;
    with FISQL.Transaction do
      if not InTransaction then StartTransaction;
+   FISQL.ParamCheck := true;
    FISQL.Prepare;
-   for I := 0 to FISQL.Params.Count - 1 do
-     SetParamValue(FISQL.Params[I]);
+   if FISQL.SQLType in [SQLInsert, SQLUpdate, SQLDelete] then
+     for I := 0 to FISQL.Params.Count - 1 do
+       SetParamValue(FISQL.Params[I]);
 
    if FISQL.SQLType = SQLSelect then
    begin
@@ -479,6 +487,12 @@ begin
    else
    begin
      DDL := FISQL.SQLType = SQLDDL;
+     if DDL then
+     {must not interpret PSQL params}
+     begin
+       FISQL.FreeHandle;
+       FISQL.ParamCheck := false;
+     end;
      FISQL.ExecQuery;
      if FAutoDDL and DDL then
        FISQL.Transaction.Commit;
@@ -592,7 +606,7 @@ begin
         Result := sqCommit
       else
       if CompareText(FString,'reconnect') = 0 then
-        Result := sqReconnect
+        Result := sqReconnect;
   end
 end;
 
