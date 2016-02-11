@@ -95,11 +95,12 @@ procedure TIBLocalDBSupport.HandleDoUpgrade(Sender: TObject);
 var UpdateAvailable: boolean;
     UpgradeInfo: TUpgradeInfo;
     DBArchive: string;
+    LastVersionNo: integer;
 begin
   with (Sender as TUpgradeDatabaseDlg) do
   repeat
-   if CurrentDBVersionNo >= RequiredVersionNo then break;
-
+    if CurrentDBVersionNo >= RequiredVersionNo then break;
+    LastVersionNo := CurrentDBVersionNo;
     UpdateAvailable := UpgradeConf.GetUpgradeInfo(CurrentDBVersionNo+1,UpgradeInfo);
     if UpdateAvailable then
     begin
@@ -120,7 +121,7 @@ begin
       end;
       UpdateVersionNo;
     end;
-  until not UpdateAvailable;
+  until not UpdateAvailable or (LastVersionNo = CurrentDBVersionNo);
 end;
 
 function TIBLocalDBSupport.AllowInitialisation: boolean;
