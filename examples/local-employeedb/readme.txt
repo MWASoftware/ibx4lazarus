@@ -22,7 +22,9 @@ Under Windows:
 --------------
 
 Download the Firebird Embedded Server from http://www.firebirdsql.org/en/firebird-2-5-5/ and
-extract the contents of the archive into the example directory i.e. ibx\examples\local-employeedb
+extract the contents of the archive into the example directory i.e. ibx\examples\local-employeedb.
+You may replace the firebird.conf and firebird.msg files with those in the archive,
+while not replacing or renaming the readme.txt that comes with the archive.
 
 Running the application
 -----------------------
