@@ -20,9 +20,11 @@ IBX Change Log  version            (1.4-0) Thu, 04 Feb 2016 10:34:22 +0000
      vi.  Finally the  PATH Environment variable is used to search for IBASE.DLL.
 
 3. New Component: TIBXScript. This is an ISQL compatible SQL script execution engine.
+   See doc/readme.scriptengine and example applications.
 
 4. New Component: TIBlocalDB. This is a TIBDatabase support component intended to
    simplify the use of the embedded firebird server on both Linux and Windows platforms.
+   See dpc/readme.localdatabse and example application.
 
 5. IBDynamicGrid: Reordering on column header click should now also work for
    dynamic columns.
