@@ -37,36 +37,40 @@ type
   { TCustomIBLocalDBSupport Properties
 
     * Database: reference to the TIBDatabase component for the local database
-    * DatabaseName: filename (no path) to use for the Firebird Database file
-    * EmptyDBArchive: filename (optional path) holding the database initialisation archive
+    * DatabaseName: filename (no path) to use for the Firebird Database file.
+    * EmptyDBArchive: filename (optional path) holding the database initialisation archive.
+      May either be absolute path or relative to shared data directory.
     * Enabled: when false component does nothing
-    * FirebirdDirectory: Path to directory holding firebird.conf. May either be
-      absolute path or relative to application executeable. If empty, defaults
-      to application executeable directory.
+    * FirebirdDirectory: Full path to directory holding firebird.conf. May either be
+      absolute path or relative to the shared data directory. If empty, defaults to  shared data directory.
     * Name: Component Name
-    * Quiet: If true then no database overwrite warnings
-    * UpgradeConfFile: Path to upgrade configuration file. May either be
-      absolute path or relative to application executeable.
+    * Options:
+              iblAutoUpgrade: Automatically apply upgrade when database schema
+                              version is lower than required.
+              IblAllowDowngrade: Automatically apply downgrade when available to
+                                 schema version compatible with the required version.
+              iblQuiet:  true then no database overwrite warnings
+    * RequiredVersionNo: The schema version number required by the application.
+      TIBLocalDBSupport will normally try to upgrade/downgrade the schema to satisfy
+      this requirement.
+    * UpgradeConfFile: Path to upgrade configuration file. May either be absolute
+      path or relative to the shared data directory.
     * VendorName: Used to construct path to Database Directory.
-
-    Note: the location of the local database file is platform specific.
-    Windows: "User Application Directory"\Vendor Name\Database FileName
-    Unix: "User Home Directory"/."Vendor Name"/Database FileName.
 
     Note that at design time paths may use '/' or '\' as directory separator. At
     run time, they must be specified using the appropriate Directory Separator
     for the current platform.
 
-    If the VendorName property is left empty then Sysutils.VendorName is used. If
-    this is empty then no VendorName component is present in the path.
-
-    Note the use of a hidden directory under Unix.
-
     Events:
-    * OnGetDatabaseName: allows modification of the generated database name
-    * OnNewDatabaseOpen: called after the successful initialisation of an empty local
-      database.
-  }
+
+    * OnGetDatabaseName: The  database name is normally computed automatically.
+      However, this event allows an application to inspect and override the result.
+    * OnNewDatabaseOpen: called after the successful initialisation of an empty local  database.
+    * OnGetDBVersionNo: called to get the current database schema version number.
+      If this event is not handled then schema upgrade/downgrade is never performed.
+    * OnGetSharedDataDir: The shared data directory is normally computed automatically.
+      However, this event allows an application to inspect and override the result.
+      }
 
   TOnGetDatabaseName = procedure(Sender: TObject; var DBName: string) of object;
   TOnGetDBVersionNo = procedure (Sender: TObject; var VersionNo: integer) of object;
@@ -128,7 +132,7 @@ type
     procedure DowngradeDone;
     procedure Loaded; override;
     function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; virtual; abstract;
-    function RunUpgradeDatabase: boolean; virtual; abstract;
+    function RunUpgradeDatabase(TargetVersionNo: integer): boolean; virtual; abstract;
     function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean; virtual; abstract;
     procedure SetDBParams(aService: TIBCustomService; DBParams: TStrings);
     function UpdateVersionNo: boolean;
@@ -144,6 +148,14 @@ type
     {NewDatabase: called to reinitialise the local database using the initialisation
      archive. Overwrites existing data so use carefully.}
     procedure NewDatabase;
+
+    {Perform a downgrade to target version if backup archive available.
+     Note: normally called from UpgradeCheck if iblAllowDowngrade in Options}
+    procedure PerformDowngrade(TargetVersionNo: integer);
+
+    {Perform schema upgrade to target version if upgrade scripts available.
+     Note: normally called from UpgradeCheck if iblAllowUpgrade in Options}
+    procedure PerformUpgrade(TargetVersionNo: integer);
 
     {RestoreDatabase: overwrites the existing local database with the specified
      gbak format archive. User is prompted to locate archive if filename empty.}
@@ -181,7 +193,7 @@ uses  IBIntf,  DB, IBBlob, ZStream
   {$IFDEF WINDOWS} ,Windows ,Windirs {$ENDIF};
 
 resourcestring
-  sSWUpgradeNeeded = 'Software Upgrade Required: Current DB Version No is %d. Version %d supported';
+  sNoDowngrade = 'Database Schema is %d. Unable to downgrade to version %d';
   sLocalDBDisabled = 'Local Database Access Disabled';
   sEmptyDBArchiveMissing = 'Unable to create database - no empty DB archive specified';
   sEmptyDBArchiveNotFound = 'Unable to create database - empty DB archive file not found';
@@ -378,47 +390,16 @@ begin
 end;
 
 procedure TCustomIBLocalDBSupport.UpgradeCheck;
-
-  function GetUpgradeConfFile: string;
-  begin
-    Result := UpgradeConfFile;
-    if Result = '' then Exit;
-
-    if not TUpgradeConfFile.IsAbsolutePath(Result) then
-      Result := FSharedDataDir + Result;
-  end;
-
-var DBArchive: string;
 begin
   if not UpdateVersionNo then
     Exit;
 
-  if CurrentDBVersionNo > RequiredVersionNo then
-  begin
+  if (CurrentDBVersionNo > RequiredVersionNo) and (iblAllowDowngrade in FOptions)then
     {Possible recovery after failed upgrade}
-    DBArchive := ChangeFileExt(ActiveDatabasePathName,'') +
-                     '.' + IntToStr(RequiredVersionNo) + '.gbk';
-    if FileExists(DBArchive) and (iblAllowDowngrade in FOptions) then
-      Downgrade(DBArchive)
-    else
-      raise EIBLocalFatalError.CreateFmt(sSWUpgradeNeeded,[CurrentDBVersionNo,RequiredVersionNo]);
-  end
+    PerformDowngrade(RequiredVersionNo)
   else
   if (CurrentDBVersionNo < RequiredVersionNo) and (iblAutoUpgrade in FOptions) then
-  begin
-    FUpgradeConf := TUpgradeConfFile.Create(GetUpgradeConfFile);
-    try
-      FUpgradeConf.CheckUpgradeAvailable(RequiredVersionNo);
-      FInUpgrade := true;
-      try
-        RunUpgradeDatabase;
-      finally
-        FInUpgrade := false;
-      end;
-    finally
-      FreeAndNil(FUpgradeConf);
-    end;
-  end;
+    PerformUpgrade(RequiredVersionNo);
 end;
 
 function TCustomIBLocalDBSupport.AllowInitialisation: boolean;
@@ -558,6 +539,45 @@ begin
     TempDBParams.Free;
   end;
   Database.Connected := true;
+end;
+
+procedure TCustomIBLocalDBSupport.PerformDowngrade(TargetVersionNo: integer);
+var DBArchive: string;
+begin
+  DBArchive := ChangeFileExt(ActiveDatabasePathName,'') +
+                   '.' + IntToStr(TargetVersionNo) + '.gbk';
+  if FileExists(DBArchive) then
+    Downgrade(DBArchive)
+  else
+    raise EIBLocalFatalError.CreateFmt(sNoDowngrade,[CurrentDBVersionNo,TargetVersionNo]);
+end;
+
+procedure TCustomIBLocalDBSupport.PerformUpgrade(TargetVersionNo: integer);
+
+  function GetUpgradeConfFile: string;
+  begin
+    Result := UpgradeConfFile;
+    if Result = '' then Exit;
+
+    if not TUpgradeConfFile.IsAbsolutePath(Result) then
+      Result := FSharedDataDir + Result;
+  end;
+
+begin
+  if FInUpgrade then Exit;
+
+  FUpgradeConf := TUpgradeConfFile.Create(GetUpgradeConfFile);
+  try
+    FUpgradeConf.CheckUpgradeAvailable(TargetVersionNo);
+    FInUpgrade := true;
+    try
+      RunUpgradeDatabase(TargetVersionNo);
+    finally
+      FInUpgrade := false;
+    end;
+  finally
+    FreeAndNil(FUpgradeConf);
+  end;
 end;
 
 procedure TCustomIBLocalDBSupport.InitDatabaseParameters(DBParams: TStrings;

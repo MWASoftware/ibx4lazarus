@@ -27,6 +27,66 @@ unit IBXUpgradeConfFile;
 
 {$mode objfpc}{$H+}
 
+{
+       TUpgradeConfFile encapsulated a text file in “ini” file format with
+       the following sections:
+
+       [status]
+
+       This should have a single named value “current” giving the current database
+       schema number as in integer e.g.
+
+       current = 2
+
+       This should normally be set to the same value as the RequiredVersionNo property
+       and acts as a check to ensure that both are in sync.
+
+       [Version.nnn]
+
+       Where nnn is an integer with leaving zeroes. For example, “Version.002” is
+       the section read to upgrade the database schema from version 1 to version 2.
+       This section can contain the following named values:
+
+       Name         Type        Use
+
+       Upgrade      String      Name and optional path to SQL script used to perform
+                                the upgrade. May either be absolute path or relative
+                                to the upgrade configuration file. Either forwards or
+                                back slashes may be used as the path delimiter.
+
+       Msg          string      Text message displayed in progress dialog while script is
+                                active.  Defaults to “Upgrading Database Schema to Version nnn”.
+
+       BackupDatabase yes/no    If present and set to “yes” then a database backup in
+                                gbak format is made before the upgrade is performed. The backup file is
+                                located in the same directory as the database file and is given the same
+                                name as the database file with the extension replaced with “.nnn.gbak”.
+                                Where “nnn” is the current schema version number (i.e. prior to running
+                                the upgrade script).
+
+       <Parameter Name> string  Name and optional path to binary data file. May either be
+                                absolute path or relative to the upgrade configuration file.
+                                Either forwards or back slashes may be used as the path delimiter.
+
+
+       For example:
+
+       [Version.002]
+       Msg = Upgrading to Version 2
+       BackupDatabase = yes
+       Upgrade = patches/02-patch.sql
+       mugshot = images/man.png.gz
+
+       Note that in the above, “mugshot” is intended to be used to resolve an Update,
+       Insert or Delete query parameter in the 02-patch.sql file. E.g.
+
+       Update EMPLOYEE Set Photo =:MUGSHOT Where Emp_no = 2;
+
+       This is only applicable to BLOB columns and the above is interpreted as update
+       the EMPLOYEE table where the Emp_no is “2” and set the value of the Photo column
+       to the binary data contained in the file “images/man.png.gz”.
+}
+
 interface
 
 uses

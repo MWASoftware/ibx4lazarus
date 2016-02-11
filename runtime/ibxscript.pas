@@ -77,6 +77,8 @@ type
   * Echo: boolean. When true, all SQL statements are echoed to log
   * StopOnFirstError: boolean. When true the script engine terminates on the first
     SQL Error.
+  * IgnoreGrants: When true, grant statements are silently discarded. This can be
+    useful when applying a script using the Embedded Server.
 
 
   Events:

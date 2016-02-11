@@ -38,6 +38,7 @@ type
 
   TIBLocalDBSupport = class(TCustomIBLocalDBSupport)
   private
+    FTargetVersionNo: integer;
     procedure DoDowngrade(Data: PtrInt);
     procedure HandleDoUpgrade(Sender: TObject);
   protected
@@ -46,7 +47,7 @@ type
     function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; override;
     procedure Downgrade(DBArchive: string); override;
     function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; override;
-    function RunUpgradeDatabase: boolean; override;
+    function RunUpgradeDatabase(TargetVersionNo: integer): boolean; override;
     function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean; override;
   published
     property Database;
@@ -99,7 +100,7 @@ var UpdateAvailable: boolean;
 begin
   with (Sender as TUpgradeDatabaseDlg) do
   repeat
-    if CurrentDBVersionNo >= RequiredVersionNo then break;
+    if CurrentDBVersionNo >= FTargetVersionNo then break;
     LastVersionNo := CurrentDBVersionNo;
     UpdateAvailable := UpgradeConf.GetUpgradeInfo(CurrentDBVersionNo+1,UpgradeInfo);
     if UpdateAvailable then
@@ -190,8 +191,10 @@ begin
   end;
 end;
 
-function TIBLocalDBSupport.RunUpgradeDatabase: boolean;
+function TIBLocalDBSupport.RunUpgradeDatabase(TargetVersionNo: integer
+  ): boolean;
 begin
+  FTargetVersionNo := TargetVersionNo;
   with TUpgradeDatabaseDlg.Create(Application) do
   try
     IBXScript.Database := Database;
