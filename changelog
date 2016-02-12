@@ -1,4 +1,4 @@
-IBX Change Log  version                   (1.4-0) Fri, 12 Feb 2016 16:57:16 +0000
+IBX Change Log  version                    (1.4-0) Fri, 12 Feb 2016 19:16:11 +0000
 
 1. Unix: If Firebird Embedded Server shared object is loaded and a local database
    path is given and database attach fails due to access permission issues on the

@@ -110,6 +110,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Top = 19
         Width = 169
         OwnerDrawEditable = False
+        Anchors = [akTop, akLeft, akRight]
         AutoComplete = True
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
@@ -122,6 +123,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Hint = 'Select Fields to include in Select Statement or leave unselected to select all'
         Top = 69
         Width = 169
+        Anchors = [akTop, akLeft, akRight]
         ItemHeight = 0
         MultiSelect = True
         OnDblClick = SelectFieldsListDblClick
@@ -136,7 +138,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 77
         Top = 247
         Width = 169
-        Anchors = [akTop, akLeft, akBottom]
+        Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 0
         ScrollWidth = 167
         TabOrder = 2
@@ -170,6 +172,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Top = 19
         Width = 169
         OwnerDrawEditable = False
+        Anchors = [akTop, akLeft, akRight]
         AutoComplete = True
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
@@ -182,7 +185,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Hint = 'Select Fields to include in Insert  Statement or leave unselected to select all'
         Top = 69
         Width = 169
-        Anchors = [akTop, akLeft, akBottom]
+        Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 0
         MultiSelect = True
         OnDblClick = SelectFieldsListDblClick
@@ -228,6 +231,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Top = 19
         Width = 169
         OwnerDrawEditable = False
+        Anchors = [akTop, akLeft, akRight]
         AutoComplete = True
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
@@ -240,6 +244,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Hint = 'Select Fields to include in Update Statement or leave unselected to select all'
         Top = 69
         Width = 169
+        Anchors = [akTop, akLeft, akRight]
         ItemHeight = 0
         MultiSelect = True
         OnClick = SelectFieldsListDblClick
@@ -252,7 +257,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 77
         Top = 244
         Width = 169
-        Anchors = [akTop, akLeft, akBottom]
+        Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 0
         OnClick = SelectFieldsListDblClick
         ScrollWidth = 167
@@ -304,6 +309,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Top = 19
         Width = 169
         OwnerDrawEditable = False
+        Anchors = [akTop, akLeft, akRight]
         AutoComplete = True
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
@@ -315,6 +321,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 55
         Top = 82
         Width = 167
+        Anchors = [akTop, akLeft, akRight]
         ItemHeight = 0
         OnDblClick = SelectFieldsListDblClick
         ScrollWidth = 165
@@ -357,6 +364,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Top = 19
         Width = 169
         OwnerDrawEditable = False
+        Anchors = [akTop, akLeft, akRight]
         ItemHeight = 0
         OnCloseUp = ProcedureNamesCloseUp
         TabOrder = 0
@@ -366,6 +374,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 80
         Top = 82
         Width = 164
+        Anchors = [akTop, akLeft, akRight]
         IntegralHeight = True
         ItemHeight = 0
         ScrollWidth = 162
@@ -377,7 +386,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 97
         Top = 201
         Width = 160
-        Anchors = [akTop, akLeft, akBottom]
+        Anchors = [akTop, akLeft, akRight]
         IntegralHeight = True
         ItemHeight = 0
         ScrollWidth = 158
