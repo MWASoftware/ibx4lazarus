@@ -8,7 +8,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
   ClientHeight = 425
   ClientWidth = 716
   OnShow = FormShow
-  LCLVersion = '1.2.6.0'
+  LCLVersion = '1.4.4.0'
   object Label3: TLabel
     Left = 288
     Height = 15
@@ -49,9 +49,9 @@ object IBSQLEditorForm: TIBSQLEditorForm
   end
   object QuoteFields: TCheckBox
     Left = 16
-    Height = 24
+    Height = 22
     Top = 392
-    Width = 127
+    Width = 125
     Caption = '&Quote Identifiers'
     TabOrder = 3
   end
@@ -71,13 +71,14 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Height = 337
     Top = 27
     Width = 251
-    ActivePage = InsertPage
-    TabIndex = 1
+    ActivePage = SelectPage
+    TabIndex = 0
     TabOrder = 5
+    TabPosition = tpLeft
     object SelectPage: TTabSheet
       Caption = 'Select'
-      ClientHeight = 300
-      ClientWidth = 243
+      ClientHeight = 331
+      ClientWidth = 184
       OnShow = SelectPageShow
       object Label1: TLabel
         Left = 7
@@ -108,6 +109,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 27
         Top = 19
         Width = 169
+        OwnerDrawEditable = False
         AutoComplete = True
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
@@ -131,20 +133,20 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object SelectPrimaryKeys: TListBox
         Left = 7
-        Height = 46
+        Height = 77
         Top = 247
-        Width = 159
+        Width = 169
         Anchors = [akTop, akLeft, akBottom]
         ItemHeight = 0
-        ScrollWidth = 157
+        ScrollWidth = 167
         TabOrder = 2
         TopIndex = -1
       end
     end
     object InsertPage: TTabSheet
       Caption = 'Insert'
-      ClientHeight = 300
-      ClientWidth = 243
+      ClientHeight = 331
+      ClientWidth = 184
       OnShow = InsertPageShow
       object Label8: TLabel
         Left = 7
@@ -167,6 +169,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 27
         Top = 19
         Width = 169
+        OwnerDrawEditable = False
         AutoComplete = True
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
@@ -175,7 +178,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object InsertFieldsList: TListBox
         Left = 7
-        Height = 225
+        Height = 256
         Hint = 'Select Fields to include in Insert  Statement or leave unselected to select all'
         Top = 69
         Width = 169
@@ -192,8 +195,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object ModifyPage: TTabSheet
       Caption = 'Modify'
-      ClientHeight = 300
-      ClientWidth = 243
+      ClientHeight = 331
+      ClientWidth = 184
       OnShow = ModifyPageShow
       object Label10: TLabel
         Left = 7
@@ -224,6 +227,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 27
         Top = 19
         Width = 169
+        OwnerDrawEditable = False
         AutoComplete = True
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
@@ -245,21 +249,21 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object ModifyPrimaryKeys: TListBox
         Left = 7
-        Height = 46
+        Height = 77
         Top = 244
-        Width = 159
+        Width = 169
         Anchors = [akTop, akLeft, akBottom]
         ItemHeight = 0
         OnClick = SelectFieldsListDblClick
-        ScrollWidth = 157
+        ScrollWidth = 167
         TabOrder = 2
         TopIndex = -1
       end
       object IncludePrimaryKeys: TCheckBox
         Left = 5
-        Height = 24
+        Height = 22
         Top = 181
-        Width = 152
+        Width = 150
         Caption = 'Include Primary keys'
         OnClick = IncludePrimaryKeysClick
         TabOrder = 3
@@ -275,8 +279,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
     end
     object DeletePage: TTabSheet
       Caption = 'Delete'
-      ClientHeight = 300
-      ClientWidth = 243
+      ClientHeight = 331
+      ClientWidth = 184
       OnShow = DeletePageShow
       object Label14: TLabel
         Left = 7
@@ -299,6 +303,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 27
         Top = 19
         Width = 169
+        OwnerDrawEditable = False
         AutoComplete = True
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
@@ -309,18 +314,18 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Left = 7
         Height = 55
         Top = 82
-        Width = 159
+        Width = 167
         ItemHeight = 0
         OnDblClick = SelectFieldsListDblClick
-        ScrollWidth = 157
+        ScrollWidth = 165
         TabOrder = 1
         TopIndex = -1
       end
     end
     object ExecutePage: TTabSheet
       Caption = 'Execute'
-      ClientHeight = 300
-      ClientWidth = 243
+      ClientHeight = 331
+      ClientWidth = 184
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
@@ -351,6 +356,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 27
         Top = 19
         Width = 169
+        OwnerDrawEditable = False
         ItemHeight = 0
         OnCloseUp = ProcedureNamesCloseUp
         TabOrder = 0
@@ -368,7 +374,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object ProcOutputList: TListBox
         Left = 10
-        Height = 66
+        Height = 97
         Top = 201
         Width = 160
         Anchors = [akTop, akLeft, akBottom]
@@ -381,7 +387,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       object SelectProcedure: TLabel
         Left = 7
         Height = 14
-        Top = 279
+        Top = 310
         Width = 126
         Anchors = [akLeft, akBottom]
         Caption = 'Is ''Select Procedure'''
@@ -405,9 +411,9 @@ object IBSQLEditorForm: TIBSQLEditorForm
   end
   object GenerateParams: TCheckBox
     Left = 16
-    Height = 24
+    Height = 22
     Top = 368
-    Width = 173
+    Width = 171
     Caption = 'Allow DSQL Placeholders'
     TabOrder = 7
   end

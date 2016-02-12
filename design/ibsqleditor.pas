@@ -103,6 +103,8 @@ type
     FTableName: string;
     FIBSystemTables: TIBSystemTables;
     FExecuteOnly: boolean;
+  protected
+    procedure Loaded; override;
   public
     { public declarations }
     constructor Create(TheOwner: TComponent); override;
@@ -368,6 +370,15 @@ procedure TIBSQLEditorForm.InsertTableNamesCloseUp(Sender: TObject);
 begin
   FTableName := InsertTableNames.Text;
   FIBSystemTables.GetFieldNames(InsertTableNames.Text,InsertFieldsList.Items);
+end;
+
+procedure TIBSQLEditorForm.Loaded;
+begin
+  inherited Loaded;
+  {$IFDEF WINDOWS}
+  if assigned(PageControl) then
+    PageControl.TabPosition := tpTop;
+  {$ENDIF}
 end;
 
 constructor TIBSQLEditorForm.Create(TheOwner: TComponent);
