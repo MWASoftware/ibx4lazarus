@@ -82,6 +82,9 @@ resourcestring
   sReplaceInitial =   'This action will replace the current database with an initial database. '+
                               'All data in the current database will be lost!';
   sUpdateMsg =       'Applying Update from %s';
+  sUpdateStarted =   '%s Update Started';
+  sUpdateEnded =     '%s Update Completed';
+  sUpdateFailed    = 'Update Failed - %s';
 
 { TIBLocalDBSupport }
 
@@ -115,11 +118,14 @@ begin
       Status.Caption := UpgradeInfo.UserMessage;
       Application.ProcessMessages;
       Add2Log(Format(sUpdateMsg,[UpgradeInfo.UpdateSQLFile]));
+      Add2Log(Format(sUpdateStarted,[DateTimeToStr(Now)]));
       if not IBXScript.PerformUpdate(UpgradeInfo.UpdateSQLFile,true) then
       begin
+       Add2Log(Format(sUpdateFailed,[DateTimeToStr(Now)]));
        SuccessfulCompletion := false;
        break;
       end;
+      Add2Log(Format(sUpdateEnded,[DateTimeToStr(Now)]));
       UpdateVersionNo;
     end;
   until not UpdateAvailable or (LastVersionNo = CurrentDBVersionNo);

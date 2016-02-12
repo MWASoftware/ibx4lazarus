@@ -164,9 +164,6 @@ implementation
 
 uses Sysutils, IB, RegExpr;
 
-resourcestring
-  sFailed      = 'Update Failed - %s';
-
 { TIBXScript }
 
 procedure TIBXScript.Add2Log(const Msg: string; IsError: boolean);
@@ -651,7 +648,6 @@ begin
   FAutoDDL := AutoDDL;
   FNotConnected := not Database.Connected;
   Database.Connected := true;
-  Add2Log(DateTimeToStr(Now) + ' Update Started');
   try
     Lines := TStringList.Create;
     Lines.LoadFromStream(SQLStream);
@@ -663,11 +659,9 @@ begin
     finally
       Lines.Free
     end;
-    if Result then
-      Add2Log(DateTimeToStr(Now) + ' Update Completed')
   except on E:Exception do
     begin
-      Add2Log(DateTimeToStr(Now) + ' ' + Format(sFailed,[E.Message]));
+      Add2Log(E.Message);
       with GetTransaction do
         if InTransaction then Rollback;
       Result := false
