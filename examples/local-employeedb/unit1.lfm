@@ -557,7 +557,7 @@ object Form1: TForm1
     LoginPrompt = False
     AfterConnect = IBDatabase1AfterConnect
     AllowStreamedConnected = False
-    DatabaseName = ' '
+    DatabaseName = 'employee'
     Params.Strings = (
       'user_name=SYSDBA'
       'lc_ctype=UTF8'
@@ -982,7 +982,7 @@ object Form1: TForm1
     Params = <>
     DataSetCloseAction = dcDiscardChanges
     left = 872
-    top = 210
+    top = 208
   end
   object DeptsSource: TDataSource
     DataSet = Depts

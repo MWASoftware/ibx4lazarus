@@ -326,7 +326,7 @@ end;
 procedure TCustomIBLocalDBSupport.OnBeforeDatabaseConnect(Sender: TObject;
   DBParams: TStrings; var DBName: string);
 begin
-  if not Enabled then Exit;
+  if not Enabled or (csDesigning in ComponentState) then Exit;
 
   if not IsEmbeddedServer then
      raise EIBLocalFatalError.Create(sNoEmbeddedServer);
@@ -338,7 +338,7 @@ end;
 
 procedure TCustomIBLocalDBSupport.OnDatabaseConnect(Sender: TObject);
 begin
-  if not Enabled or
+  if not Enabled or (csDesigning in ComponentState) or
       FInUpgrade then Exit; {Avoids problem if RECONNECT used in script}
 
   UpgradeCheck;

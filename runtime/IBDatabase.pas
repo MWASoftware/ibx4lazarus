@@ -594,7 +594,7 @@ end;
 
  procedure TIBDataBase.CheckDatabaseName;
 begin
-  if (FDBName = '') then
+  if (Trim(FDBName) = '') then
     IBError(ibxeDatabaseNameMissing, [nil]);
 end;
 
