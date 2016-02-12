@@ -22,9 +22,9 @@ IBX Change Log  version             (1.4-0) Thu, 11 Feb 2016 15:38:51 +0000
 3. New Component: TIBXScript. This is an ISQL compatible SQL script execution engine.
    See doc/readme.scriptengine and example applications.
 
-4. New Component: TIBlocalDB. This is a TIBDatabase support component intended to
+4. New Component: TIBlocalDBSupport. This is a TIBDatabase support component intended to
    simplify the use of the embedded firebird server on both Linux and Windows platforms.
-   See dpc/readme.localdatabse and example application.
+   See dpc/readme.localdatabase and example applications.
 
 5. IBDynamicGrid: Reordering on column header click should now also work for
    dynamic columns.
@@ -54,14 +54,14 @@ IBX Change Log  version           (1.3-2) Tue, 26 Jan 2016 14:39:54 +0000
 
 7. TIBStringField: Now has two new public properties: CharacterSetName: string and CharacterSetSize: integer;
    These properties allow the (Firebird) character set name for the field and the max number of bytes per character
-   to be determined at runtime.
+   to be determined at runtime. See doc/readme.charactersets.html.
 
 8. TIBWideStringField: This is a new field type with the same additional public properties as above and subclassed from
-   TWideStringField. This field type is used with the character size reported by Firebird is two.
+   TWideStringField. This field type is used with the character size reported by Firebird is two. See doc/readme.charactersets.html.
 
 9. TIBMemoField and TIBWideMemoField: new field types with the same additional public properties as above and subclassed from
    TMemoField and TWideMemoField respectively. These field types are used with Blob subtype 1 and a characterset size of 
-   1, 3 or 4 (TIBMemoField) or 2 (TIBWideMemoField).
+   1, 3 or 4 (TIBMemoField) or 2 (TIBWideMemoField). See doc/readme.charactersets.html.
 
    Both also have a new published property "DisplayTextAsClassName". If false (default) the displaytext is generated
    from the blob text by truncating the string to the displaywidth (in characters not bytes). A displaywidth of zero
