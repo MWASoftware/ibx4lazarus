@@ -9,6 +9,8 @@ database from an archive in gbak format, plus save and restore of the local data
 It can also run SQL scripts to upgrade the database schema when a new software version
 is released.
 
+Both GUI and Console Examples are provided.
+
 Before compiling and running the example, the Firebird embedded server must be installed:
 
 Under Linux:

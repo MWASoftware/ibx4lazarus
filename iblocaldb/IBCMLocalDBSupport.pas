@@ -33,18 +33,23 @@ uses
   Classes, SysUtils, IBXCustomIBLocalDBSupport, ibxscript;
 
 type
+  TOnLogMessage = procedure(Sender: TObject; Msg: string) of object;
 
   { TIBCMLocalDBSupport }
 
   TIBCMLocalDBSupport = class(TCustomIBLocalDBSupport)
   private
+    FOnLogMessage: TOnLogMessage;
     procedure Add2Log(Sender: TObject; Msg: string);
     procedure DoUpgrade(IBXScript: TIBXScript; TargetVersionNo: integer);
+    procedure WriteLog(Msg: string);
   protected
     function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; override;
     function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; override;
     function RunUpgradeDatabase(TargetVersionNo: integer): boolean; override;
     function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean; override;
+  public
+    property OnLogMessage: TOnLogMessage read FOnLogMessage write FOnLogMessage;
   end;
 
 implementation
@@ -53,12 +58,13 @@ uses IBServices, IBXUpgradeConfFile, IBDatabase;
 
 resourcestring
   sUpdateMsg =       'Applying Update from %s';
+  sCreatingDatabase= 'Creating new Database';
 
 { TIBCMLocalDBSupport }
 
 procedure TIBCMLocalDBSupport.Add2Log(Sender: TObject; Msg: string);
 begin
-  writeln(stderr,Msg);
+  WriteLog(Msg);
 end;
 
 procedure TIBCMLocalDBSupport.DoUpgrade(IBXScript: TIBXScript;
@@ -89,6 +95,12 @@ begin
   until not UpdateAvailable or (LastVersionNo = CurrentDBVersionNo);
 end;
 
+procedure TIBCMLocalDBSupport.WriteLog(Msg: string);
+begin
+  if assigned(OnLogMessage) then
+    OnLogMessage(self,Msg);
+end;
+
 function TIBCMLocalDBSupport.CreateNewDatabase(DBName: string;
   DBParams: TStrings; DBArchive: string): boolean;
 var Service: TIBRestoreService;
@@ -98,16 +110,18 @@ begin
   with Service do
   try
    SetDBParams(Service,DBParams);
+   LoginPrompt := false;
    BackupFile.Clear;
    DatabaseName.Clear;
    Options := [CreateNewDB];
    BackupFile.Add(DBArchive);
    DatabaseName.Add(DBName);
    Active := true;
+   WriteLog(sCreatingDatabase);
    ServiceStart;
    try
      while not Eof do
-       writeln(Trim(GetNextLine));
+       WriteLog(Trim(GetNextLine));
    finally
      Active := false
    end;
@@ -125,6 +139,7 @@ begin
   with Service do
   try
     SetDBParams(Service,DBParams);
+    LoginPrompt := false;
     BackupFile.Clear;
     DatabaseName.Clear;
     Options := [replace];
@@ -134,7 +149,7 @@ begin
     ServiceStart;
     try
       while not Eof do
-        writeln(Trim(GetNextLine));
+        WriteLog(Trim(GetNextLine));
     finally
       Active := false
     end;
@@ -175,6 +190,7 @@ begin
   with Service do
   try
    SetDBParams(Service,DBParams);
+   LoginPrompt := false;
    BackupFile.Clear;
    DatabaseName := DBName;
    BackupFile.Add(aFilename);
@@ -182,7 +198,7 @@ begin
    ServiceStart;
    try
      while not Eof do
-       writeln(Trim(GetNextLine));
+       WriteLog(Trim(GetNextLine));
    finally
      Active := false
    end;

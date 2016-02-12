@@ -8,19 +8,18 @@
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="105"/>
-        <CursorPos X="10" Y="107"/>
+        <TopLine Value="126"/>
+        <CursorPos Y="156"/>
         <UsageCount Value="27"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/custapp.pp"/>
         <UnitName Value="CustApp"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="49"/>
         <CursorPos X="14" Y="64"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
@@ -200,7 +199,7 @@
       <Define0 Value="UseCThreads"/>
       <Define1 Value="IBX_CONSOLE_MODE"/>
     </CustomDefines>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
         <Filename Value="project1.lpr"/>
         <Caret Line="18" Column="74" TopLine="18"/>
@@ -209,6 +208,10 @@
         <Filename Value="project1.lpr"/>
         <Caret Line="107" Column="10" TopLine="83"/>
       </Position2>
+      <Position3>
+        <Filename Value="project1.lpr"/>
+        <Caret Line="17" Column="40"/>
+      </Position3>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
