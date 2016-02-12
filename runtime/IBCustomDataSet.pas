@@ -934,7 +934,10 @@ end;
 
 function TIBMemoField.GetDefaultWidth: Longint;
 begin
-  Result := 128;
+  if DisplayTextAsClassName then
+    Result := inherited
+  else
+    Result := 128;
 end;
 
 procedure TIBMemoField.GetText(var AText: string; ADisplayText: Boolean);

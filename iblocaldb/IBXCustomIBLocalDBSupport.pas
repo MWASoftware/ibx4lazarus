@@ -118,6 +118,7 @@ type
     procedure OnDatabaseConnect(Sender: TObject);
     procedure OnAfterDatabaseDisconnect(Sender: TObject);
     procedure PrepareDBParams(DBParams: TStrings);
+    procedure SetDatabaseName(AValue: string);
     procedure SetFirebirdDirectory(AValue: string);
     procedure SetupFirebirdEnv;
     procedure UpgradeCheck;
@@ -134,7 +135,6 @@ type
     function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; virtual; abstract;
     function RunUpgradeDatabase(TargetVersionNo: integer): boolean; virtual; abstract;
     function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean; virtual; abstract;
-    procedure SetDBParams(aService: TIBCustomService; DBParams: TStrings);
     function UpdateVersionNo: boolean;
     property DownGradeArchive: string read FDownGradeArchive;
     property UpgradeConf: TUpgradeConfFile read FUpgradeConf;
@@ -165,12 +165,17 @@ type
      is prompted for archive filename if filename empty.}
     procedure SaveDatabase(filename: string = '');
 
+    {Copies database parameters as give in the DBParams to the Service
+     omitting any parameters not appropriate for TIBService. Typically, the
+     DBParams are TIBDatabase.Params}
+    class procedure SetDBParams(aService: TIBCustomService; DBParams: TStrings);
+
     property ActiveDatabasePathName: string read FActiveDatabasePathName;
     property CurrentDBVersionNo: integer read FCurrentDBVersionNo;
 
     { Likely to be Published declarations }
     property Database: TIBDatabase read GetDatabase write SetDatabase;
-    property DatabaseName: string read FDatabaseName write FDatabaseName;
+    property DatabaseName: string read FDatabaseName write SetDatabaseName;
     property Enabled: boolean read FEnabled write FEnabled default true;
     property EmptyDBArchive: string read FEmptyDBArchive write FEmptyDBArchive;
     property FirebirdDirectory: string read FFirebirdDirectory write SetFirebirdDirectory;
@@ -470,7 +475,13 @@ begin
     {$ENDIF}
 end;
 
-procedure TCustomIBLocalDBSupport.SetDBParams(aService: TIBCustomService;
+procedure TCustomIBLocalDBSupport.SetDatabaseName(AValue: string);
+begin
+  if FDatabaseName = AValue then Exit;
+  FDatabaseName := ExtractFileName(AValue);
+end;
+
+class procedure TCustomIBLocalDBSupport.SetDBParams(aService: TIBCustomService;
   DBParams: TStrings);
 var i: integer;
     j: integer;
