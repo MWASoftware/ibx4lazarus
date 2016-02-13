@@ -166,6 +166,14 @@ uses Sysutils, IB, RegExpr;
 
 resourcestring
   sTerminatorUnknownState = 'Statement Terminator in unexpected state (%d)';
+  sUnterminatedString = 'Unterminated string';
+  sUnknownSymbol = 'Unknown Symbol %d';
+  sNoSelectSQL = 'Select SQL Statements are not supported';
+  sStackUnderflow = 'Stack Underflow';
+  sInvalidAutoDDL = 'Invalid AUTODDL Statement - %s';
+  sNoParamQueries =  'Parameterised Queries are not supported';
+  sStackOverFlow = 'Stack Overflow';
+  sResolveQueryParam =  'Resolving Query Parameter: %s';
 
 { TIBXScript }
 
@@ -298,7 +306,7 @@ begin
     sqEnd:
       if not (FState in [stInComment,stInCommentLine]) then
       begin
-        AddToSQL('END');
+        AddToSQL(FString);
         case FState of
         stInSingleQuotes,
         stInDoubleQuotes:
@@ -322,7 +330,7 @@ begin
       if not (FState in [stInComment,stInCommentLine]) then
       begin
         FHasBegin := true;
-        AddToSQL('BEGIN');
+        AddToSQL(FString);
         case FState of
         stInSingleQuotes,
         stInDoubleQuotes:
@@ -339,7 +347,7 @@ begin
     sqDeclare:
       if not (FState in [stInComment,stInCommentLine]) then
       begin
-        AddToSQL('DECLARE');
+        AddToSQL(FString);
         if FState in [stInit,stInSQL] then
           SetState(stInDeclaration)
       end;
@@ -377,13 +385,13 @@ begin
           FState := PopState;
         stInDoubleQuotes,
         stInSingleQuotes:
-          raise Exception.Create('Unterminated string');
+          raise Exception.Create(sUnterminatedString);
         end;
         if NonSpace then AddToSQL(#13#10);
         Exit;
       end;
     else
-      raise Exception.CreateFmt('Unknown Symbol %d',[Symbol]);
+      raise Exception.CreateFmt(sUnknownSymbol,[Symbol]);
     end
   end
 end;
@@ -488,7 +496,7 @@ begin
      if assigned(OnSelectSQL) then
        OnSelectSQL(self,FSQLText)
      else
-       raise Exception.Create('Select SQL Statements are not supported');
+       raise Exception.Create(sNoSelectSQL);
    end
    else
    begin
@@ -503,6 +511,8 @@ begin
    ClearStatement;
  end
 end;
+
+
 
 function TIBXScript.GetNextSymbol(C: char): TSQLSymbol;
 begin
@@ -675,7 +685,7 @@ end;
 function TIBXScript.PopState: TSQLStates;
 begin
   if FStackIndex = 0 then
-    raise Exception.Create('Stack Underflow');
+    raise Exception.Create(sStackUnderflow);
   Dec(FStackIndex);
   Result := FStack[FStackIndex]
 end;
@@ -705,22 +715,22 @@ begin
       if  AnsiUpperCase(RegexObj.Match[1]) = 'OFF' then
         FAutoDDL := false
       else
-        raise Exception.CreateFmt('Invalid AUTODDL Statement - %s', [RegexObj.Match[0]]);
+        raise Exception.CreateFmt(sInvalidAutoDDL, [RegexObj.Match[0]]);
 
       Result := true;
     end;
   finally
     RegexObj.Free;
   end;
-
 end;
+
 
 procedure TIBXScript.SetParamValue(SQLVar: TIBXSQLVAR);
 var BlobID: TISC_QUAD;
 begin
   if assigned(FGetParamValue) and (SQLVar.SQLType = SQL_BLOB) then
   begin
-    Add2Log('Resolving Query Parameter: ' + SQLVar.Name);
+    Add2Log(Format(sResolveQueryParam,[SQLVar.Name]));
     GetParamValue(self,SQLVar.Name,BlobID);
     if (BlobID.gds_quad_high = 0) and (BlobID.gds_quad_low = 0) then
       SQLVar.Clear
@@ -728,13 +738,13 @@ begin
       SQLVar.AsQuad := BlobID
   end
   else
-    raise Exception.Create('Parameterised Queries are not supported');
+    raise Exception.Create(sNoParamQueries);
 end;
 
 procedure TIBXScript.SetState(AState: TSQLStates);
 begin
   if FStackIndex > 16 then
-    raise Exception.Create('Stack Overflow');
+    raise Exception.Create(sStackOverFlow);
   FStack[FStackIndex] := FState;
   Inc(FStackIndex);
   FState := AState
