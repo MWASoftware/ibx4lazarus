@@ -164,6 +164,9 @@ implementation
 
 uses Sysutils, IB, RegExpr;
 
+resourcestring
+  sTerminatorUnknownState = 'Statement Terminator in unexpected state (%d)';
+
 { TIBXScript }
 
 procedure TIBXScript.Add2Log(const Msg: string; IsError: boolean);
@@ -203,40 +206,33 @@ begin
     sqTerminator:
       if not (FState in [stInComment,stInCommentLine]) then
         case FState of
+        stInit: {ignore empty statement};
+
         stInSQL:
-          begin
-            FState := stInit;
-            ExecSQL
-          end;
+            ExecSQL;
 
        stInCommit:
-          begin
             DoCommit;
-            FState := stInit
-          end;
 
        stInReconnect:
-         begin
            DoReconnect;
-           FState := stInit
-         end;
 
-       stNested:
+       stNested, stInSingleQuotes, stInDoubleQuotes:
          AddToSQL(FTerminator);
 
        stInDeclaration:
          begin
            FState := PopState;
-           AddToSQL(';');
+           AddToSQL(FTerminator);
          end;
 
-       stInSingleQuotes, stInDoubleQuotes:
-         AddToSQL(';');
+       else
+         raise Exception.CreateFmt(sTerminatorUnknownState,[FState]);
        end;
 
     sqSemiColon:
         begin
-          if FState in [stInDeclaration,stInSingleQuotes,stInDoubleQuotes] then
+          if FState = stInDeclaration then
             FState := PopState;
           AddToSQL(';');
         end;
