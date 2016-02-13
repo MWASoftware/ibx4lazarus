@@ -229,11 +229,14 @@ begin
            FState := PopState;
            AddToSQL(';');
          end;
+
+       stInSingleQuotes, stInDoubleQuotes:
+         AddToSQL(';');
        end;
 
     sqSemiColon:
         begin
-          if FState = stInDeclaration then
+          if FState in [stInDeclaration,stInSingleQuotes,stInDoubleQuotes] then
             FState := PopState;
           AddToSQL(';');
         end;
