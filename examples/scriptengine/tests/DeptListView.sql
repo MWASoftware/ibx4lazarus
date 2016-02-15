@@ -18,3 +18,5 @@ A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH
 From EMPLOYEE A
 JOIN Depts D On D.DEPT_NO = A.DEPT_NO;
 set autoddl on;
+Commit;
+select * from DeptList;
