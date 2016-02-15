@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 1026
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.4.2.0'
+  LCLVersion = '1.4.4.0'
   object Button1: TButton
     Left = 939
     Height = 25
@@ -39,7 +39,7 @@ object Form1: TForm1
     Left = 112
     Height = 25
     Top = 8
-    Width = 80
+    Width = 96
     CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
     OKCaption = 'OK'
     CancelCaption = 'Cancel'
@@ -62,7 +62,7 @@ object Form1: TForm1
     Left = 333
     Height = 25
     Top = 8
-    Width = 80
+    Width = 91
     CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
     OKCaption = 'OK'
     CancelCaption = 'Cancel'
@@ -186,7 +186,7 @@ object Form1: TForm1
           Left = 300
           Height = 25
           Top = 2
-          Width = 80
+          Width = 100
           CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
           OKCaption = 'OK'
           CancelCaption = 'Cancel'
@@ -260,6 +260,7 @@ object Form1: TForm1
           Height = 25
           Top = 2
           Width = 48
+          OwnerDrawEditable = False
           AutoSize = False
           DataField = 'JOB_GRADE'
           DataSource = EmployeeSource
@@ -407,6 +408,7 @@ object Form1: TForm1
     Height = 25
     Top = 8
     Width = 272
+    OwnerDrawEditable = False
     ItemHeight = 0
     ItemIndex = 0
     Items.Strings = (

@@ -21,7 +21,7 @@ type
   private
     function GetSa: PSecurityAttributes;
   protected
-    FInitialiser: boolean;  static;
+    class var FInitialiser: boolean;
     FSa : TSecurityAttributes;
   private
     Sd : TSecurityDescriptor;
@@ -143,7 +143,8 @@ type
     FOwner: TGlobalInterface;
     FEvent: THandle;
     FLockCount: PInteger;
-    function GetLockCount: integer;
+    FMutex: TMutex;
+   function GetLockCount: integer;
   public
     constructor Create(EventName: string; AOwner: TGlobalInterface);
     destructor Destroy; override;
@@ -340,6 +341,7 @@ begin
   inherited Create;
   FOwner := AOwner;
   FLockCount := PInteger(FOwner.SharedMemory.Allocate(sizeof(FLockCount)));
+  FMutex := TMutex.Create(EventName + '.Mutex');
   if FInitialiser then
   begin
     FEvent := CreateEvent(sa, true, true, PChar(EventName));
@@ -354,6 +356,7 @@ end;
 
 destructor TMultilockGate.Destroy;
 begin
+  if assigned(FMutex) then FMutex.Free;
   CloseHandle(FEvent);
   inherited Destroy;
 end;
@@ -365,19 +368,29 @@ end;
 
 procedure TMultilockGate.Lock;
 begin
-  InterlockedIncrement(FLockCount^);
-  ResetEvent(FEvent);
+  FMutex.Lock;
+  try
+    InterlockedIncrement(FLockCount^);
+    ResetEvent(FEvent);
+  finally
+    FMutex.Unlock;
+  end;
   //writeln('Lock '+IntToStr(FLockCount^));
 end;
 
 procedure TMultilockGate.Unlock;
 begin
   //writeln('Start UnLock '+IntToStr(FLockCount^));
-  InterlockedDecrement(FLockCount^);
-  if FLockCount^ <= 0 then
-  begin
-     SetEvent(FEvent);
-     FLockCount^ := 0
+  FMutex.Lock;
+  try
+    InterlockedDecrement(FLockCount^);
+    if FLockCount^ <= 0 then
+    begin
+       SetEvent(FEvent);
+       FLockCount^ := 0
+    end;
+  finally
+    FMutex.Unlock;
   end;
   //writeln('UnLock '+IntToStr(FLockCount^));
 end;

@@ -44,14 +44,14 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="100">
+    <Units Count="101">
       <Unit0>
         <Filename Value="IntegratedMonitoring.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="4" Y="20"/>
-        <UsageCount Value="116"/>
+        <UsageCount Value="117"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainForm.pas"/>
@@ -62,7 +62,7 @@
         <WindowIndex Value="1"/>
         <TopLine Value="390"/>
         <CursorPos X="13" Y="392"/>
-        <UsageCount Value="116"/>
+        <UsageCount Value="117"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -70,8 +70,7 @@
         <Filename Value="../../runtime/IBSQLMonitor.pas"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="48"/>
-        <CursorPos Y="146"/>
+        <TopLine Value="17"/>
         <UsageCount Value="10"/>
       </Unit2>
       <Unit3>
@@ -83,7 +82,7 @@
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="3" Y="35"/>
-        <UsageCount Value="105"/>
+        <UsageCount Value="106"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit3.pas"/>
@@ -174,9 +173,11 @@
       </Unit16>
       <Unit17>
         <Filename Value="../../runtime/sv5ipc.inc"/>
-        <TopLine Value="312"/>
-        <CursorPos X="6" Y="329"/>
-        <UsageCount Value="6"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="528"/>
+        <CursorPos X="5" Y="530"/>
+        <UsageCount Value="10"/>
       </Unit17>
       <Unit18>
         <Filename Value="/usr/share/fpcsrc/2.4.2/rtl/unix/ipc.pp"/>
@@ -727,13 +728,10 @@
         <ComponentName Value="MonitorForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="19"/>
-        <CursorPos Y="20"/>
-        <UsageCount Value="23"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
+        <CursorPos X="9" Y="9"/>
+        <UsageCount Value="24"/>
       </Unit96>
       <Unit97>
         <Filename Value="../../runtime/IBXConst.pas"/>
@@ -751,13 +749,22 @@
       </Unit98>
       <Unit99>
         <Filename Value="readme.txt"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit99>
+      <Unit100>
+        <Filename Value="../../changelog"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="78" Y="33"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit100>
     </Units>
     <JumpHistory Count="11" HistoryIndex="10">
       <Position1>

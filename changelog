@@ -1,4 +1,4 @@
-IBX Change Log  version                        (1.4-0) Mon, 15 Feb 2016 12:10:02 +0000
+IBX Change Log  version                         (1.4-0) Mon, 15 Feb 2016 14:14:12 +0000
 
 1. Unix: If Firebird Embedded Server shared object is loaded and a local database
    path is given and database attach fails due to access permission issues on the
@@ -28,6 +28,9 @@ IBX Change Log  version                        (1.4-0) Mon, 15 Feb 2016 12:10:02
 
 5. IBDynamicGrid: Reordering on column header click should now also work for
    dynamic columns.
+
+6. ISQLMonitor: (Windows only). Mutex added to TMultilockGate to avoid race condition
+   between incrementing/decrementing the lock count and signalling the event.
 
 IBX Change Log  version           (1.3-2) Tue, 26 Jan 2016 14:39:54 +0000
 
