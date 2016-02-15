@@ -269,7 +269,10 @@ begin
 
     sqCommentEnd:
       if FState = stInComment then
+      begin
+        AddToSQL('/* ' + Trim(FString) + ' */');
         FState := PopState
+      end
       else
         FState := stError;
 
@@ -384,7 +387,10 @@ begin
       begin
         case FState of
         stInCommentLine:
+        begin
+          AddToSQL('/* ' + Trim(FString) + ' */');
           FState := PopState;
+        end;
         stInDoubleQuotes,
         stInSingleQuotes:
           raise Exception.Create(sUnterminatedString);
