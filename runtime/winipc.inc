@@ -370,7 +370,7 @@ procedure TMultilockGate.Lock;
 begin
   FMutex.Lock;
   try
-    InterlockedIncrement(FLockCount^);
+    Inc(FLockCount^);
     ResetEvent(FEvent);
   finally
     FMutex.Unlock;
@@ -383,7 +383,7 @@ begin
   //writeln('Start UnLock '+IntToStr(FLockCount^));
   FMutex.Lock;
   try
-    InterlockedDecrement(FLockCount^);
+    Dec(FLockCount^);
     if FLockCount^ <= 0 then
     begin
        SetEvent(FEvent);

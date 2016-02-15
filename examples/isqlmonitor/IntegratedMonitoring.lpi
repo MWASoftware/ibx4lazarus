@@ -51,7 +51,7 @@
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="4" Y="20"/>
-        <UsageCount Value="117"/>
+        <UsageCount Value="118"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainForm.pas"/>
@@ -60,9 +60,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="390"/>
         <CursorPos X="13" Y="392"/>
-        <UsageCount Value="117"/>
+        <UsageCount Value="118"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -70,7 +69,6 @@
         <Filename Value="../../runtime/IBSQLMonitor.pas"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="17"/>
         <UsageCount Value="10"/>
       </Unit2>
       <Unit3>
@@ -82,7 +80,7 @@
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="3" Y="35"/>
-        <UsageCount Value="106"/>
+        <UsageCount Value="107"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit3.pas"/>
@@ -175,7 +173,7 @@
         <Filename Value="../../runtime/sv5ipc.inc"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="528"/>
+        <TopLine Value="537"/>
         <CursorPos X="5" Y="530"/>
         <UsageCount Value="10"/>
       </Unit17>
@@ -728,10 +726,11 @@
         <ComponentName Value="MonitorForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="9" Y="9"/>
-        <UsageCount Value="24"/>
+        <CursorPos X="12" Y="9"/>
+        <UsageCount Value="25"/>
+        <Loaded Value="True"/>
       </Unit96>
       <Unit97>
         <Filename Value="../../runtime/IBXConst.pas"/>
@@ -744,12 +743,14 @@
         <Filename Value="../../runtime/winipc.inc"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="13"/>
+        <TopLine Value="371"/>
+        <CursorPos X="8" Y="386"/>
         <UsageCount Value="10"/>
       </Unit98>
       <Unit99>
         <Filename Value="readme.txt"/>
-        <EditorIndex Value="1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
         <WindowIndex Value="1"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
@@ -757,16 +758,14 @@
       </Unit99>
       <Unit100>
         <Filename Value="../../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="78" Y="33"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit100>
     </Units>
-    <JumpHistory Count="11" HistoryIndex="10">
+    <JumpHistory Count="13" HistoryIndex="12">
       <Position1>
         <Filename Value="MainForm.pas"/>
         <Caret Line="362" Column="91" TopLine="343"/>
@@ -811,6 +810,14 @@
         <Filename Value="MainForm.pas"/>
         <Caret Line="227" Column="28" TopLine="210"/>
       </Position11>
+      <Position12>
+        <Filename Value="MonitorFormUnit.pas"/>
+        <Caret Line="9" Column="5"/>
+      </Position12>
+      <Position13>
+        <Filename Value="MonitorFormUnit.pas"/>
+        <Caret Line="9" Column="12"/>
+      </Position13>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
