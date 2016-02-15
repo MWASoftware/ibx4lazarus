@@ -174,6 +174,8 @@ resourcestring
   sNoParamQueries =  'Parameterised Queries are not supported';
   sStackOverFlow = 'Stack Overflow';
   sResolveQueryParam =  'Resolving Query Parameter: %s';
+  sNoCommit =  'Commit not allowed here';
+  sNoReconnect = 'Reconnect not allowed here';
 
 { TIBXScript }
 
@@ -358,7 +360,7 @@ begin
         if FState = stInit then
           FState := stInCommit
         else
-          raise Exception.Create('Commit not allowed here')
+          raise Exception.Create(sNoCommit)
       end;
 
     sqReconnect:
@@ -367,7 +369,7 @@ begin
         if FState = stInit then
           FState := stInReconnect
         else
-          raise Exception.Create('Reconnect not allowed here')
+          raise Exception.Create(sNoReconnect)
       end;
 
     sqString:
@@ -436,7 +438,7 @@ begin
   FInternalTransaction.Params.Clear;
   FInternalTransaction.Params.Add('concurrency');
   FInternalTransaction.Params.Add('wait');
-  FLastSymbol := sqNone;
+  ClearStatement;
 end;
 
 destructor TIBXScript.Destroy;
@@ -755,6 +757,8 @@ begin
   FSQLText := '';
   FState := stInit;
   FHasBegin := false;
+  FLastChar := ' ';
+  FLastSymbol := sqNone;
 end;
 
 end.
