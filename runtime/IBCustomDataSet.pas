@@ -3567,17 +3567,23 @@ begin
             FieldSize := sizeof (TISC_QUAD);
             if (sqlsubtype = 1) then
             begin
-              if strpas(sqlname) = '' then {Complex SQL with no identifiable column - use connection default}
+              if FBase.GetDefaultCharSetName <> '' then
               begin
                 CharSetSize := FBase.GetDefaultCharSetSize;
                 CharSetName := FBase.GetDefaultCharSetName;
               end
               else
+              if strpas(sqlname) <> '' then
               begin
                 charSetID := GetBlobCharSetID(Database.Handle,Database.InternalTransaction.Handle,
                         @relname,@sqlname);
                 CharSetSize := FBase.GetCharSetSize(charSetID);
                 CharSetName := FBase.GetCharSetName(charSetID);
+              end
+              else  {Complex SQL with no identifiable column and no connection default}
+              begin
+                CharSetName := '';
+                CharSetSize := 1;
               end;
               if CharSetSize = 2 then
                 FieldType := ftWideMemo
