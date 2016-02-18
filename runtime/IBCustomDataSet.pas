@@ -888,7 +888,7 @@ procedure TIBWideMemoField.GetText(var AText: string; ADisplayText: Boolean);
 begin
   if ADisplayText then
   begin
-    if not DisplayTextAsClassName then
+    if not DisplayTextAsClassName and (CharacterSetName<> '') then
       AText := GetTruncatedText
     else
       inherited GetText(AText, ADisplayText);
@@ -944,7 +944,7 @@ procedure TIBMemoField.GetText(var AText: string; ADisplayText: Boolean);
 begin
   if ADisplayText then
   begin
-    if not DisplayTextAsClassName then
+    if not DisplayTextAsClassName and (CharacterSetName <> '') then
       AText := GetTruncatedText
     else
       inherited GetText(AText, ADisplayText);
