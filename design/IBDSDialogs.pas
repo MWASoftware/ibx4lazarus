@@ -26,7 +26,7 @@
 {                                                                        }
 {************************************************************************}
 
-unit IBDialogs;
+unit IBDSDialogs;
 
 {$mode objfpc}{$H+}
 
@@ -39,63 +39,132 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, Graphics, Controls,
-  Forms, StdCtrls, ExtCtrls, IB;
+  Forms, StdCtrls, ExtCtrls, IB, IBDialogs;
 
 type
 
-  { TIBLCLInterface }
+  { TIBDSLCLInterface }
 
-  TIBLCLInterface = class(TInterfacedObject,TIBGUIInterface)
-    private
-      FSetCursorDepth: integer;
-  public
+  TIBDSLCLInterface = class(TIBLCLInterface)
+  private
+    FSetCursorDepth: integer;
+    function GetProjectName: string;
+    procedure GetDatabaseName(DefaultDBName, DefaultUserName: string; var DBName: string;
+      var UserName: string);
+    procedure GetServerName(DefaultServerName, DefaultUserName: string;
+              var ServerName, UserName: string);
+    procedure SaveDatabaseParams(DatabaseName, UserName: string);
+    procedure SaveServerParams(ServerName, UserName: string);
+ public
     function ServerLoginDialog(var AServerName: string;
-                               var AUserName, APassword: string): Boolean;  virtual;
+                               var AUserName, APassword: string): Boolean;  override;
     function LoginDialogEx(var ADatabaseName: string;
                                var AUserName, APassword: string;
-                               NameReadOnly: Boolean): Boolean; virtual;
-    procedure SetCursor;
-    procedure RestoreCursor;
+                               NameReadOnly: Boolean): Boolean; override;
   end;
 
 implementation
 
-{$R IBDialogs.lfm}
+{$R *.lfm}
+
+uses BaseIDEIntf, LazIDEIntf;
+
+const
+  ConfigFile = 'ibx.xml';
 
 type
-  { TIBXLoginDlg }
+  { TIBXDSLoginDlg }
 
-  TIBXLoginDlg = class(TForm)
+  TIBXDSLoginDlg = class(TForm)
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
-    DatabaseName: TLabel;
+    ProjectName: TLabel;
     TargetCaption: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Password: TEdit;
     UserName: TEdit;
+    DatabaseName: TEdit;
   private
     { private declarations }
   public
     { public declarations }
   end;
 
-function TIBLCLInterface.ServerLoginDialog(var AServerName: string;
+
+function TIBDSLCLInterface.GetProjectName: string;
+begin
+  Result := ChangeFileExt(ExtractFileName(LazarusIDE.ActiveProject.MainFile.FileName),'');
+end;
+
+procedure TIBDSLCLInterface.GetDatabaseName(DefaultDBName,
+  DefaultUserName: string; var DBName: string; var UserName: string);
+begin
+  With GetIDEConfigStorage(ConfigFile,True) do
+  try
+    DBName := GetValue(GetProjectName + '/Database',DefaultDBName);
+    UserName := GetValue(GetProjectName + '/UserName',DefaultUserName);
+  finally
+    Free
+  end;
+end;
+
+procedure TIBDSLCLInterface.GetServerName(DefaultServerName,
+  DefaultUserName: string; var ServerName, UserName: string);
+begin
+  With GetIDEConfigStorage(ConfigFile,True) do
+  try
+    ServerName := GetValue(GetProjectName + '/Server',DefaultServerName);
+    UserName := GetValue(GetProjectName + '/UserName',DefaultUserName);
+  finally
+    Free
+  end;
+end;
+
+procedure TIBDSLCLInterface.SaveDatabaseParams(DatabaseName, UserName: string);
+begin
+  With GetIDEConfigStorage(ConfigFile,True) do
+  try
+    SetValue(GetProjectName + '/Database',DatabaseName);
+    SetValue(GetProjectName + '/UserName',UserName);
+    WriteToDisk;
+  finally
+    Free
+  end;
+end;
+
+procedure TIBDSLCLInterface.SaveServerParams(ServerName, UserName: string);
+begin
+  With GetIDEConfigStorage(ConfigFile,True) do
+  try
+    SetValue(GetProjectName + '/Server',ServerName);
+    SetValue(GetProjectName + '/UserName',UserName);
+    WriteToDisk;
+  finally
+    Free
+  end;
+end;
+
+function TIBDSLCLInterface.ServerLoginDialog(var AServerName: string;
   var AUserName, APassword: string): Boolean;
 begin
-  with TIBXLoginDlg.Create(nil) do
+  with TIBXDSLoginDlg.Create(nil) do
   try
     Caption := 'Firebird Server Login';
     TargetCaption.Caption := 'Server Name: ';
-    DatabaseName.Caption := AServerName;
+    GetServerName(AServerName,AUserName,AServerName,AUserName);
+    ProjectName.Caption := GetProjectName;
+    DatabaseName.Text := AServerName;
     UserName.Text := AUserName;
     Result := False;
     if AUserName = '' then ActiveControl := UserName;
     if ShowModal = mrOk then
     begin
+      AServerName :=  DatabaseName.Text;
       AUserName := UserName.Text;
       APassword := Password.Text;
+      SaveServerParams(DatabaseName.Text,UserName.Text);
       Result := True;
     end;
   finally
@@ -103,12 +172,14 @@ begin
   end;
 end;
 
-function TIBLCLInterface.LoginDialogEx(var ADatabaseName: string;
+function TIBDSLCLInterface.LoginDialogEx(var ADatabaseName: string;
   var AUserName, APassword: string; NameReadOnly: Boolean): Boolean;
 begin
-  with TIBXLoginDlg.Create(Application) do
+  with TIBXDSLoginDlg.Create(Application) do
   try
-    DatabaseName.Caption := ADatabaseName;
+    ProjectName.Caption := GetProjectName;
+    GetDatabaseName(ADatabaseName, AUserName, ADatabaseName,AUserName);
+    DatabaseName.Text := ADatabaseName;
     UserName.Text := AUserName;
     Result := False;
     if NameReadOnly then
@@ -117,36 +188,15 @@ begin
       if AUserName = '' then ActiveControl := UserName;
     if ShowModal = mrOk then
     begin
+      ADatabaseName :=  DatabaseName.Text;
       AUserName := UserName.Text;
       APassword := Password.Text;
+      SaveDatabaseParams(DatabaseName.Text,UserName.Text);
       Result := True;
     end
   finally
     Free;
   end;
 end;
-
-procedure TIBLCLInterface.SetCursor;
-begin
-  if (GetCurrentThreadID = MainThreadID) and (Screen.Cursor = crDefault) then
-  begin
-    if FSetCursorDepth = 0 then
-      Screen.Cursor := crHourGlass;
-    Inc(FSetCursorDepth);
-  end;
-end;
-
-procedure TIBLCLInterface.RestoreCursor;
-begin
-  if FSetCursorDepth > 0 then
-  begin
-     Dec(FSetCursorDepth);
-     if FSetCursorDepth = 0 then
-       Screen.Cursor := crDefault
-  end;
-end;
-
-initialization
-  IBGUIInterface :=  TIBLCLInterface.Create;
 
 end.

@@ -197,7 +197,7 @@ type
     function GetIdleTimer: Integer;
     function GetTransaction(Index: Integer): TIBTransaction;
     function GetTransactionCount: Integer;
-    function Login: Boolean;
+    function Login(var aDatabaseName: string): Boolean;
     procedure LoadCharSetInfo;
     procedure SetDatabaseName(const Value: TIBFileName);
     procedure SetDBParamByDPB(const Idx: Integer; Value: String);
@@ -925,7 +925,7 @@ begin
   end;
 end;
 
- function TIBDataBase.Login: Boolean;
+  function TIBDataBase.Login(var aDatabaseName: string): Boolean;
 var
   IndexOfUser, IndexOfPassword: Integer;
   Username, Password, OldPassword: String;
@@ -961,6 +961,7 @@ begin
       LoginParams.Assign(Params);
       FOnLogin(Self, LoginParams);
       Params.Assign (LoginParams);
+      aDatabaseName := FDBName;
       HidePassword;
     finally
       LoginParams.Free;
@@ -982,7 +983,7 @@ begin
                                          Length(Params[IndexOfPassword]));
       OldPassword := password;
     end;
-    result := IBGUIInterface.LoginDialogEx(DatabaseName, Username, Password, False);
+    result := IBGUIInterface.LoginDialogEx(aDatabaseName, Username, Password, False);
     if result then
     begin
       if IndexOfUser = -1 then
@@ -1028,13 +1029,13 @@ begin
     FDBParamsChanged := True;
   end;
   { Use builtin login prompt if requested }
-  if (LoginPrompt or (csDesigning in ComponentState)) and not Login then
+  aDBName := FDBName;
+  if (LoginPrompt or (csDesigning in ComponentState)) and not Login(aDBName) then
     IBError(ibxeOperationCancelled, [nil]);
 
   TempDBParams := TStringList.Create;
   try
    TempDBParams.Assign(FDBParams);
-   aDBName := FDBName;
    {Opportunity to override defaults}
    for i := 0 to FSQLObjects.Count - 1 do
    begin

@@ -10,7 +10,7 @@ uses
   IBDBReg, IBEventsEditor, IBTransactionEdit, IBDatabaseEdit, IBSystemTables, 
   ibdeletesqleditor, IBGeneratorEditor, ibinsertsqleditor, ibmodifysqleditor, 
   ibselectsqleditor, IBUpdateSQLEditor, IBSQLEditor, IBDataSetEditor, 
-  dbFieldLinkPropEditor, dbFieldListPropEditor, LazarusPackageIntf;
+  dbFieldLinkPropEditor, dbFieldListPropEditor, IBDSDialogs, LazarusPackageIntf;
 
 implementation
 

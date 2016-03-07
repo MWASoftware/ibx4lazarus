@@ -368,7 +368,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
      IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
-     IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport;
+     IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport, IBDSDialogs;
 
 
 
@@ -438,6 +438,7 @@ begin
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ParentField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'HasChildField', TIBTreeViewFieldProperty);
 
+  IBGUIInterface :=  TIBDSLCLInterface.Create;
 end;
 
 procedure LoadDataSourceFields(DataSource: TDataSource; List: TStrings);

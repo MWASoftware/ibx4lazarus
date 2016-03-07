@@ -47,9 +47,9 @@ uses
 
 type
   TIBGUIInterface = interface
-    function ServerLoginDialog(const AServerName: string;
+    function ServerLoginDialog(var AServerName: string;
                                var AUserName, APassword: string): Boolean;
-    function LoginDialogEx(const ADatabaseName: string;
+    function LoginDialogEx(var ADatabaseName: string;
                                var AUserName, APassword: string;
                                NameReadOnly: Boolean): Boolean;
     procedure SetCursor;

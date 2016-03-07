@@ -7,7 +7,7 @@ object Form1: TForm1
   ClientHeight = 370
   ClientWidth = 453
   OnShow = FormShow
-  LCLVersion = '1.4.0.4'
+  LCLVersion = '1.6.0.4'
   object Memo1: TMemo
     Left = 8
     Height = 322
@@ -31,6 +31,7 @@ object Form1: TForm1
     Protocol = TCP
     Params.Strings = (
       'user_name=SYSDBA'
+      'password=Apples'
     )
     TraceFlags = []
     Options = []

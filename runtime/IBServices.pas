@@ -137,7 +137,7 @@ type
 
   protected
     procedure Loaded; override;
-    function Login: Boolean;
+    function Login(var aServerName: string): Boolean;
     procedure CheckActive;
     procedure CheckInactive;
     procedure HandleException(Sender: TObject);
@@ -521,11 +521,13 @@ procedure TIBCustomService.Attach;
 var
   SPB: String;
   ConnectString: String;
+  aServerName: string;
 begin
   CheckInactive;
   CheckServerName;
 
-  if FLoginPrompt and not Login then
+  aServerName := FServerName;
+  if FLoginPrompt and not Login(aServerName) then
     IBError(ibxeOperationCancelled, [nil]);
 
   { Generate a new SPB if necessary }
@@ -537,9 +539,9 @@ begin
     Move(SPB[1], FSPB[0], FSPBLength);
   end;
   case FProtocol of
-    TCP: ConnectString := FServerName + ':service_mgr'; {do not localize}
-    SPX: ConnectString := FServerName + '@service_mgr'; {do not localize}
-    NamedPipe: ConnectString := '\\' + FServerName + '\service_mgr'; {do not localize}
+    TCP: ConnectString := aServerName + ':service_mgr'; {do not localize}
+    SPX: ConnectString := aServerName + '@service_mgr'; {do not localize}
+    NamedPipe: ConnectString := '\\' + aServerName + '\service_mgr'; {do not localize}
     Local: ConnectString := 'service_mgr'; {do not localize}
   end;
   if call(isc_service_attach(StatusVector, Length(ConnectString),
@@ -570,7 +572,7 @@ begin
   end;
 end;
 
-function TIBCustomService.Login: Boolean;
+function TIBCustomService.Login(var aServerName: string): Boolean;
 var
   IndexOfUser, IndexOfPassword: Integer;
   Username, Password: String;
@@ -583,6 +585,7 @@ begin
       LoginParams.Assign(Params);
       FOnLogin(Self, LoginParams);
       Params.Assign (LoginParams);
+      aServerName := ServerName;
     finally
       LoginParams.Free;
     end;
@@ -600,7 +603,7 @@ begin
       Password := Copy(Params[IndexOfPassword],
                                          Pos('=', Params[IndexOfPassword]) + 1, {mbcs ok}
                                          Length(Params[IndexOfPassword]));
-    result := IBGUIInterface.ServerLoginDialog(serverName, Username, Password);
+    result := IBGUIInterface.ServerLoginDialog(aServerName, Username, Password);
     if result then
     begin
       IndexOfPassword := IndexOfSPBConst(SPBConstantNames[isc_spb_password]);

@@ -1,3 +1,17 @@
+IBX Change Log  version                          (1.4-1) tba, 15 Feb 2016 14:44:24 +0000
+
+1. No character set specified for connection: when a text blob is retrieved, the
+  character set is determined by looking up the native character set using then
+  Firebird API. Otherwise a text mode blob is assumed to have the same character
+  set as the connection.
+
+2. TIBGUIInterface: this is an internal interface. Minor type changes to allow
+   for Login Dialog returing a change to the database path.
+
+3. Design Time Database and Server login Dialogs now allow the Database Name/Server Name
+   to be changed from that given in the TIBDatabase/TIBServer component and for the
+   entered value to be saved on a project specific basis.
+
 IBX Change Log  version                          (1.4-0) Mon, 15 Feb 2016 14:44:24 +0000
 
 1. Unix: If Firebird Embedded Server shared object is loaded and a local database
