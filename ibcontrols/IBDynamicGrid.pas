@@ -158,6 +158,7 @@ end;
     FGrid: TCustomGrid;
     FCol,FRow: Integer;
     FEditText: string;
+    function EditingKeyField: boolean;
   protected
     procedure WndProc(var TheMessage : TLMessage); override;
     procedure CloseUp; override;
@@ -379,13 +380,14 @@ begin
     else
     begin
       for I := 0 to  ColCount - 1 do
+        if (I < FixedCols) or Columns[I - FixedCols].Visible then
          ColSum := ColSum + ColWidths[I];
 
       if Colsum <> ClientWidth then
       begin
         ResizeColCount := 0;
         for I := 0 to Columns.Count -1 do
-          if TDBDynamicGridColumn(Columns[I]).AutoSizeColumn then
+          if TDBDynamicGridColumn(Columns[I]).AutoSizeColumn and Columns[I].Visible then
           begin
             Inc(ResizeColCount);
             Colsum := Colsum + TDBDynamicGridColumn(Columns[I]).DesignWidth - Columns[I].Width;
@@ -398,7 +400,7 @@ begin
             n := (ClientWidth - ColSum) mod ResizeColCount;
 
             for I := 0 to Columns.Count -1 do
-              if TDBDynamicGridColumn(Columns[I]).AutoSizeColumn then
+              if TDBDynamicGridColumn(Columns[I]).AutoSizeColumn and Columns[I].Visible then
               begin
                 if I = 0 then
                   Columns[I].Width := Columns[I].Width + adjustment + n
@@ -782,7 +784,19 @@ begin
   Result := inherited Width
 end;
 
+type
+  THackedGrid = class(TIBDynamicGrid)
+  public
+    property FixedCols;
+  end;
+
 { TDBLookupCellEditor }
+
+function TDBLookupCellEditor.EditingKeyField: boolean;
+begin
+  with TIBDynamicGridColumn(TDBGrid(FGrid).Columns[FCol - THackedGrid(FGrid).FixedCols]) do
+    Result := CompareText(FieldName, DBLookupProperties.DataFieldName) = 0;
+end;
 
 procedure TDBLookupCellEditor.WndProc(var TheMessage: TLMessage);
 begin
@@ -802,7 +816,10 @@ begin
   UpdateData(nil); {Force Record Update}
   if FGrid<>nil then
   Begin
-    (FGrid as TIBDynamicGrid).EditorTextChanged(FCol, FRow, Trim(Text));
+    if EditingKeyField then
+     (FGrid as TIBDynamicGrid).EditorTextChanged(FCol, FRow, KeyValue)
+    else
+      (FGrid as TIBDynamicGrid).EditorTextChanged(FCol, FRow, Trim(Text));
     (FGrid as TIBDynamicGrid).UpdateData;
   end;
   inherited CloseUp;
@@ -827,7 +844,10 @@ begin
   CheckAndInsert;
   Msg.Col := FCol;
   Msg.Row := FRow;
-  Msg.Value:= Trim(Text);
+  if EditingKeyField then
+    Msg.Value:= KeyValue
+  else
+    Msg.Value:= Trim(Text);
 end;
 
 procedure TDBLookupCellEditor.msg_SetGrid(var Msg: TGridMessage);
@@ -918,7 +938,10 @@ begin
     if DataFieldName <> '' then
         Editor.DataSource := TDBGrid(Grid).DataSource;
   end;
-  Editor.Text := Editor.FEditText;
+  if Editor.EditingKeyField then
+    Editor.KeyValue := Editor.FEditText
+  else
+    Editor.Text := Editor.FEditText;
   Editor.SelStart := Length(Editor.Text);
 end;
 

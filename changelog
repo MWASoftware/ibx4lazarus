@@ -12,6 +12,13 @@ IBX Change Log  version                          (1.4-1) tba, 15 Feb 2016 14:44:
    to be changed from that given in the TIBDatabase/TIBServer component and for the
    entered value to be saved on a project specific basis.
 
+4. IBDynamicGrid: TDBLookupCellEditor now compares its DataFieldName with the
+   column fieldname. If they are the same then it is acts as a look up for the KeyValue
+   Otherwise, it sets the column text to the selected ListField Value.
+
+5. IBDynamicGrid: Only visible columns are now taken into account When recalculating
+   column width.
+
 IBX Change Log  version                          (1.4-0) Mon, 15 Feb 2016 14:44:24 +0000
 
 1. Unix: If Firebird Embedded Server shared object is loaded and a local database
