@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 722
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.4.2.0'
+  LCLVersion = '1.6.0.4'
   object Panel1: TPanel
     Left = 11
     Height = 367
@@ -160,6 +160,7 @@ object Form1: TForm1
           Height = 27
           Top = 136
           Width = 180
+          OwnerDrawEditable = False
           DataField = 'MNGR_NO'
           DataSource = DataSource1
           KeyField = 'EMP_NO'
@@ -202,6 +203,7 @@ object Form1: TForm1
             DBLookupProperties.ItemHeight = 0
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            DBLookupProperties.OwnerDrawEditable = False
           end        
           item
             Title.Alignment = taCenter
@@ -213,6 +215,7 @@ object Form1: TForm1
             DBLookupProperties.ItemHeight = 0
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            DBLookupProperties.OwnerDrawEditable = False
           end        
           item
             Title.Alignment = taCenter
@@ -224,6 +227,7 @@ object Form1: TForm1
             DBLookupProperties.ItemHeight = 0
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            DBLookupProperties.OwnerDrawEditable = False
           end        
           item
             Title.Alignment = taCenter
@@ -235,6 +239,7 @@ object Form1: TForm1
             DBLookupProperties.ItemHeight = 0
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            DBLookupProperties.OwnerDrawEditable = False
           end>
         DataSource = DataSource3
         Scrollbars = ssAutoVertical
