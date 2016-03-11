@@ -19,6 +19,9 @@ IBX Change Log  version                          (1.4-1) tba, 15 Feb 2016 14:44:
 5. IBDynamicGrid: Only visible columns are now taken into account When recalculating
    column width.
 
+6. IBLookupComboEditBox: Fix error with autocomplete query when a RelationName is given
+   and a case insensitive search is requested.
+
 IBX Change Log  version                          (1.4-0) Mon, 15 Feb 2016 14:44:24 +0000
 
 1. Unix: If Firebird Embedded Server shared object is loaded and a local database

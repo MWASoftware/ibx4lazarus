@@ -314,7 +314,7 @@ end;
 
 implementation
 
-uses Math, IBQuery, LCLType;
+uses Math, IBQuery, LCLType, Variants;
 
 { TIBGridControlLink }
 
@@ -817,7 +817,10 @@ begin
   if FGrid<>nil then
   Begin
     if EditingKeyField then
-     (FGrid as TIBDynamicGrid).EditorTextChanged(FCol, FRow, KeyValue)
+    begin
+      if not VarIsNull(KeyValue) then
+       (FGrid as TIBDynamicGrid).EditorTextChanged(FCol, FRow, KeyValue)
+    end
     else
       (FGrid as TIBDynamicGrid).EditorTextChanged(FCol, FRow, Trim(Text));
     (FGrid as TIBDynamicGrid).UpdateData;
@@ -845,7 +848,12 @@ begin
   Msg.Col := FCol;
   Msg.Row := FRow;
   if EditingKeyField then
-    Msg.Value:= KeyValue
+  begin
+    if not VarIsNull(KeyValue) then
+      Msg.Value:= KeyValue
+    else
+      Msg.Value:= ''
+  end
   else
     Msg.Value:= Trim(Text);
 end;
@@ -939,7 +947,10 @@ begin
         Editor.DataSource := TDBGrid(Grid).DataSource;
   end;
   if Editor.EditingKeyField then
-    Editor.KeyValue := Editor.FEditText
+  begin
+    if not Field.IsNull then
+      Editor.KeyValue := Editor.FEditText
+  end
   else
     Editor.Text := Editor.FEditText;
   Editor.SelStart := Length(Editor.Text);

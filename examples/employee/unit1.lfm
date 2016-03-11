@@ -2,15 +2,15 @@ object Form1: TForm1
   Left = 439
   Height = 482
   Top = 350
-  Width = 1002
+  Width = 932
   Caption = 'Employee List'
   ClientHeight = 482
-  ClientWidth = 1002
+  ClientWidth = 932
   OnClose = FormClose
   OnShow = FormShow
   LCLVersion = '1.6.0.4'
   object Button1: TButton
-    Left = 915
+    Left = 845
     Height = 25
     Top = 48
     Width = 75
@@ -19,7 +19,7 @@ object Form1: TForm1
     TabOrder = 0
   end
   object Button2: TButton
-    Left = 915
+    Left = 845
     Height = 25
     Top = 86
     Width = 75
@@ -28,7 +28,7 @@ object Form1: TForm1
     TabOrder = 1
   end
   object Button3: TButton
-    Left = 915
+    Left = 845
     Height = 25
     Top = 125
     Width = 75
@@ -86,11 +86,11 @@ object Form1: TForm1
     Left = 12
     Height = 434
     Top = 42
-    Width = 880
+    Width = 810
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
     ClientHeight = 434
-    ClientWidth = 880
+    ClientWidth = 810
     Color = clBackground
     ParentColor = False
     TabOrder = 5
@@ -98,7 +98,7 @@ object Form1: TForm1
       Left = 0
       Height = 384
       Top = 0
-      Width = 880
+      Width = 810
       Align = alClient
       Color = clWindow
       Columns = <      
@@ -207,11 +207,11 @@ object Form1: TForm1
       Left = 0
       Height = 50
       Top = 384
-      Width = 880
+      Width = 810
       Align = alBottom
       BevelOuter = bvNone
       ClientHeight = 50
-      ClientWidth = 880
+      ClientWidth = 810
       ParentColor = False
       TabOrder = 1
       object Button5: TButton
@@ -957,13 +957,13 @@ object Form1: TForm1
   object JobGradeChangeTimer: TTimer
     Interval = 0
     OnTimer = JobGradeChangeTimerTimer
-    left = 928
-    top = 175
+    left = 777
+    top = 304
   end
   object JobCodeChangeTimer: TTimer
     Interval = 0
     OnTimer = JobCodeChangeTimerTimer
-    left = 927
-    top = 224
+    left = 776
+    top = 353
   end
 end

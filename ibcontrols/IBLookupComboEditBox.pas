@@ -368,7 +368,7 @@ begin
       Parser.Add2WhereClause(GetRelationNameQualifier + '"' + ListField + '" Like ''' +
                                   SQLSafe(Text) + '%''')
     else
-      Parser.Add2WhereClause(GetRelationNameQualifier + 'Upper("' + ListField + '") Like Upper(''' +
+      Parser.Add2WhereClause('Upper(' + GetRelationNameQualifier + '"' +  ListField + '") Like Upper(''' +
                                   SQLSafe(Text) + '%'')');
 
   end;
