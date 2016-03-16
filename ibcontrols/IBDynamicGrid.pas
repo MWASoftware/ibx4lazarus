@@ -686,10 +686,21 @@ end;
 
 procedure TDBDynamicGrid.Notification(AComponent: TComponent;
   Operation: TOperation);
+var i: integer;
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and
-     (AComponent = FEditorPanel) then FEditorPanel := nil;
+  if (Operation = opRemove) then
+  begin
+    if AComponent = FEditorPanel then
+      FEditorPanel := nil
+    else
+    if AComponent is TControl then
+    begin
+      for i := 0 to Columns.Count - 1 do
+        if TDBDynamicGridColumn(Columns[I]).ColumnTotalsControl = AComponent then
+          TDBDynamicGridColumn(Columns[I]).ColumnTotalsControl := nil;
+    end;
+  end
 end;
 
 procedure TDBDynamicGrid.TopLeftChanged;
@@ -1225,10 +1236,21 @@ end;
 
 procedure TIBDynamicGrid.Notification(AComponent: TComponent;
   Operation: TOperation);
+var i: integer;
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and
-     (FIBControlLink <> nil) and (AComponent = DataSource) then FIBControlLink.IBDataSet := nil;
+  if (Operation = opRemove) then
+  begin
+    if (FIBControlLink <> nil) and (AComponent = DataSource) then
+      FIBControlLink.IBDataSet := nil
+    else
+    if AComponent is TDataSource then
+    begin
+      for i := 0 to Columns.Count - 1 do
+        if TIBDynamicGridColumn(Columns[I]).DBLookupProperties.ListSource = AComponent then
+          TIBDynamicGridColumn(Columns[I]).DBLookupProperties.ListSource := nil;
+    end
+  end
 end;
 
 procedure TIBDynamicGrid.UpdateActive;
