@@ -619,7 +619,8 @@ begin
   if FEditorPanel <> nil then
      RemoveFreeNotification(FEditorPanel);
   FEditorPanel := AValue;
-  FreeNotification(FEditorPanel);
+  if FEditorPanel <> nil then
+     FreeNotification(FEditorPanel);
 end;
 
 procedure TDBDynamicGrid.ChangeBounds(ALeft, ATop, AWidth, AHeight: integer;
@@ -689,7 +690,7 @@ procedure TDBDynamicGrid.Notification(AComponent: TComponent;
 var i: integer;
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) then
+  if (Operation = opRemove) and not (csDestroying in ComponentState) then
   begin
     if AComponent = FEditorPanel then
       FEditorPanel := nil
