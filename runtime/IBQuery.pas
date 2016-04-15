@@ -509,7 +509,7 @@ end;
 
 procedure TIBQuery.UpdateSQL;
 begin
-  if not FSQLUpdating and not FInQueryChanged then
+  if not FSQLUpdating and not FInQueryChanged and (SQL.Text <> SelectSQL.Text) then
   begin
     FSQLUpdating := true;
     try

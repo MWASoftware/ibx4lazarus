@@ -25,6 +25,12 @@ IBX Change Log  version                          (1.4-1) tba, 15 Feb 2016 14:44:
 7. IBDynamicGrid: No longer ignores notifications removing Column Totals controls
    or column ListSource.
 
+8. IBQuery: no longer performs unnecessary refresh of SQL Text (and hence avoids an
+   unprepare) when closing and the text has not changed.
+
+9. IBSQL: Base the cursor name on a GUID instead of a hexstr version of the class pointer.
+   Less likely to cause a cursor re-use error on Windows.
+
 IBX Change Log  version                          (1.4-0) Mon, 15 Feb 2016 14:44:24 +0000
 
 1. Unix: If Firebird Embedded Server shared object is loaded and a local database

@@ -2140,6 +2140,7 @@ end;
 
 { TIBSQL }
 constructor TIBSQL.Create(AOwner: TComponent);
+var  GUID : TGUID;
 begin
   inherited Create(AOwner);
   FIBLoaded := False;
@@ -2163,7 +2164,8 @@ begin
   FSQLRecord := TIBXSQLDA.Create(self,daOutput);
   FSQLType := SQLUnknown;
   FParamCheck := True;
-  FCursor := HexStr(self); //Name + RandomString(8);
+  CreateGuid(GUID);
+  FCursor := GUIDToString(GUID);
   if AOwner is TIBDatabase then
     Database := TIBDatabase(AOwner)
   else
