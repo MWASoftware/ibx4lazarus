@@ -256,12 +256,12 @@ begin
       F := fpOpen(IPCFileName, O_WrOnly or O_Creat or O_Excl);
       if F < 0 then
       begin
-        if fpgetErrno = 17 {EEXIST} then
+        if fpgetErrno = ESysEEXIST {EEXIST} then
         begin
           { looks like it already exists}
           Sleep(100);
           F := fpOpen(IPCFileName,O_RdOnly);
-          if (F < 0) and (fpgetErrno = 2 {ENOENT}) then
+          if (F < 0) and (fpgetErrno = ESysENOENT {ENOENT}) then
             {probably just got deleted }
           else
           if F < 0 then

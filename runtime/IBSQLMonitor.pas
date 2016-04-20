@@ -1102,7 +1102,7 @@ initialization
   if FpGetEnv('FBSQL_IPCFILENAME') <> nil then
     IPCFileName := strpas(FpGetEnv('FBSQL_IPCFILENAME'))
   else
-    IPCFileName := '/tmp/' + IPCFileName + '.' + strpas(FpGetEnv('USER'));
+    IPCFileName := GetTempDir(true) + IPCFileName + '.' + strpas(FpGetEnv('USER'));
 {$ENDIF}
 
 finalization
