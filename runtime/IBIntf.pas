@@ -243,6 +243,11 @@ procedure LoadIBLibrary;
 
       LibName := '/Library/Frameworks/Firebird.framework/Firebird';
       Result := LoadLibrary(LibName);
+      if Result = NilHandle then
+      begin
+        LibName := '/Library/Frameworks/Firebird.framework/Libraries/libfbclient.dylib';
+        Result := LoadLibrary(LibName);
+      end;
       if Result <> NilHandle then
          FBLibraryName := ExtractFileName(LibName);
     end

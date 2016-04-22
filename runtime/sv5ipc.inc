@@ -11,6 +11,19 @@ const
   cWriterBusyEventSemaphore = 8;
   cDefaultTimeout = 1; { 1 seconds }
 
+{$IF FPC_FULLVERSION = 30000 }
+{Fix regression in FPC 3.0.0 ipc.pp unit. Expected to be fixed in fpc 3.0.2}
+{$IF defined(darwin) }
+SEM_GETNCNT = 3;   { Return the value of sempid (READ)  }
+SEM_GETPID  = 4;   { Return the value of semval (READ)  }
+SEM_GETVAL  = 5;   { Return semvals into arg.array (READ)  }
+SEM_GETALL  = 6;   { Return the value of semzcnt (READ)  }
+SEM_GETZCNT = 7;   { Set the value of semval to arg.val (ALTER)  }
+SEM_SETVAL  = 8;   { Set semvals from arg.array (ALTER)  }
+SEM_SETALL  = 9;
+{$ENDIF}
+{$ENDIF}
+
 {
   The call to semctl in ipc is broken in FPC release 2.4.2 and earlier. Hence
   need to replace with a working libc call. semtimedop is not present in 2.4.2 and earlier.
