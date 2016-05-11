@@ -193,8 +193,8 @@ type
     {$IFDEF HAS_ANSISTRING_CODEPAGE}
     FCodePages: array of TSystemCodePage;
     FDefaultCodePage: TSystemCodePage;
-    FUseDefaultSystemCodePage: boolean;
     {$ENDIF}
+    FUseDefaultSystemCodePage: boolean;
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
     function GetSQLDialect: Integer;
@@ -281,10 +281,8 @@ type
     property SQLHourGlass: Boolean read FSQLHourGlass write FSQLHourGlass default true;
     property DBSQLDialect : Integer read FDBSQLDialect;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
     property UseDefaultSystemCodePage: boolean read FUseDefaultSystemCodePage
                                                write FUseDefaultSystemCodePage;
-    {$ENDIF}
     property AfterConnect;
     property AfterDisconnect;
     property BeforeConnect;
@@ -502,10 +500,7 @@ uses IBIntf, IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
 
 { TIBDatabase }
 
- constructor TIBDataBase.Create(AOwner: TComponent);
-{$ifdef WINDOWS}
-var acp: uint;
-{$endif}
+constructor TIBDataBase.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FIBLoaded := False;
@@ -521,19 +516,6 @@ begin
      (AOwner is TCustomApplication) and
      TCustomApplication(AOWner).ConsoleApplication then
     LoginPrompt := false;
-  {$ifdef UNIX}
-  if csDesigning in ComponentState then
-    FDBParams.Add('lc_ctype=UTF8');
-  {$else}
-  {$ifdef WINDOWS}
-  if csDesigning in ComponentState then
-  begin
-    acp := GetACP;
-    if (acp >= 1250) and (acp <= 1254) then
-      FDBParams.Values['lc_ctype'] := Format('WIN%d',[acp]);
-  end;
-  {$endif}
-  {$endif}
   {$IFDEF HAS_ANSISTRING_CODEPAGE}
   FDefaultCodePage := CP_NONE;
   {$ENDIF}
@@ -1053,6 +1035,9 @@ var
   sqlcode: Long;
   IBErrorCode: Long;
   status_vector: PISC_STATUS;
+  {$ifdef WINDOWS}
+  acp: uint;
+  {$endif}
 begin
   CheckInactive;
   CheckDatabaseName;
@@ -1073,6 +1058,16 @@ begin
    if UseDefaultSystemCodePage then
      TempDBParams.Values['lc_ctype'] := IBGetCharacterSetName(DefaultSystemCodePage);
    FDefaultCodePage := IBGetCodePage(AnsiUpperCase(TempDBParams.Values['lc_ctype']));
+   {$ELSE}
+   if UseDefaultSystemCodePage then
+   begin
+     TempDBParams.Values('lc_ctype') :='UTF8';
+     {$ifdef WINDOWS}
+     acp := GetACP;
+     if (acp >= 1250) and (acp <= 1258) then
+       TempDBParams.Values['lc_ctype'] := Format('WIN%d',[acp]);
+     {$endif}
+   end;
    {$ENDIF}
    {Opportunity to override defaults}
    for i := 0 to FSQLObjects.Count - 1 do
