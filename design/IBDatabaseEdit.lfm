@@ -13,7 +13,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
   OnCreate = FormCreate
   ParentFont = True
   Position = poScreenCenter
-  LCLVersion = '1.4.2.0'
+  LCLVersion = '1.6.0.4'
   object Panel1: TPanel
     Left = 5
     Height = 36
@@ -142,6 +142,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       Height = 27
       Top = 66
       Width = 120
+      OwnerDrawEditable = False
       Enabled = False
       ItemHeight = 0
       Items.Strings = (
@@ -255,65 +256,76 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       Height = 27
       Top = 195
       Width = 134
+      OwnerDrawEditable = False
       ItemHeight = 0
+      ItemIndex = 0
       Items.Strings = (
         'None'
-        'ASCII                          '
-        'BIG_5                          '
-        'CP943C                         '
-        'CYRL                           '
-        'DOS437                         '
-        'DOS737                         '
-        'DOS775                         '
-        'DOS850                         '
-        'DOS852                         '
-        'DOS857                         '
-        'DOS858                         '
-        'DOS860                         '
-        'DOS861                         '
-        'DOS862                         '
-        'DOS863                         '
-        'DOS864                         '
-        'DOS865                         '
-        'DOS866                         '
-        'DOS869                         '
-        'EUCJ_0208                      '
-        'GB18030                        '
-        'GBK                            '
-        'GB_2312                        '
-        'ISO8859_1                      '
-        'ISO8859_13                     '
-        'ISO8859_2                      '
-        'ISO8859_3                      '
-        'ISO8859_4                      '
-        'ISO8859_5                      '
-        'ISO8859_6                      '
-        'ISO8859_7                      '
-        'ISO8859_8                      '
-        'ISO8859_9                      '
-        'KOI8R                          '
-        'KOI8U                          '
-        'KSC_5601                       '
-        'NEXT                           '
-        'NONE                           '
-        'OCTETS                         '
-        'SJIS_0208                      '
-        'TIS620                         '
-        'UNICODE_FSS                    '
-        'UTF8                           '
-        'WIN1250                        '
-        'WIN1251                        '
-        'WIN1252                        '
-        'WIN1253                        '
-        'WIN1254                        '
-        'WIN1255                        '
-        'WIN1256                        '
-        'WIN1257                        '
-        'WIN1258                        '
+        'ASCII'
+        'BIG_5'
+        'CP943C'
+        'CYRL'
+        'DOS437'
+        'DOS737'
+        'DOS775'
+        'DOS850'
+        'DOS852'
+        'DOS857'
+        'DOS858'
+        'DOS860'
+        'DOS861'
+        'DOS862'
+        'DOS863'
+        'DOS864'
+        'DOS865'
+        'DOS866'
+        'DOS869'
+        'EUCJ_0208'
+        'GB18030'
+        'GBK'
+        'GB_2312'
+        'ISO8859_1'
+        'ISO8859_13'
+        'ISO8859_2'
+        'ISO8859_3'
+        'ISO8859_4'
+        'ISO8859_5'
+        'ISO8859_6'
+        'ISO8859_7'
+        'ISO8859_8'
+        'ISO8859_9'
+        'KOI8R'
+        'KOI8U'
+        'KSC_5601'
+        'NEXT'
+        'NONE'
+        'OCTETS'
+        'SJIS_0208'
+        'TIS620'
+        'UNICODE_FSS'
+        'UTF8'
+        'WIN1250'
+        'WIN1251'
+        'WIN1252'
+        'WIN1253'
+        'WIN1254'
+        'WIN1255'
+        'WIN1256'
+        'WIN1257'
+        'WIN1258'
       )
       OnChange = CharacterSetChange
       TabOrder = 3
       Text = 'None'
+    end
+    object UseSystemDefaultCS: TCheckBox
+      Left = 209
+      Height = 22
+      Top = 200
+      Width = 229
+      Caption = 'Use System Default Character Set'
+      OnChange = UseSystemDefaultCSChange
+      TabOrder = 6
     end
   end
 end

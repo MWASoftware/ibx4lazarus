@@ -45,6 +45,9 @@ unit IBDatabaseEdit;
 {$X+}                           (* Extended syntax: On *)
 {$Z1}                           (* Minimum Enumeration Size: 1 Byte *)
 
+{$IF FPC_FULLVERSION >= 20700 }
+{$DEFINE HAS_ANSISTRING_CODEPAGE}
+{$ENDIF}
 
 interface
 
@@ -57,6 +60,8 @@ type
   { TIBDatabaseEditForm }
 
   TIBDatabaseEditForm = class(TForm)
+    UseSystemDefaultCS: TCheckBox;
+    GroupBox2: TGroupBox;
     Panel1: TPanel;
     DatabaseName: TEdit;
     Label1: TLabel;
@@ -93,6 +98,7 @@ type
     procedure SQLRoleChange(Sender: TObject);
     procedure CharacterSetChange(Sender: TObject);
     procedure TestClick(Sender: TObject);
+    procedure UseSystemDefaultCSChange(Sender: TObject);
   private
     { Private declarations }
     Database: TIBDatabase;
@@ -100,6 +106,8 @@ type
     function GetParam(Name: string): string;
     procedure AddParam(Name, Value: string);
     procedure DeleteParam(Name: string);
+  protected
+    procedure Loaded; override;
   public
     { Public declarations }
   end;
@@ -180,6 +188,15 @@ begin
     end;
 end;
 
+procedure TIBDatabaseEditForm.Loaded;
+begin
+  inherited Loaded;
+  {$IFNDEF HAS_ANSISTRING_CODEPAGE}
+  if assigned(UseSystemDefaultCS) then
+    UseSystemDefaultCS.Visible := false;
+  {$ENDIF}
+end;
+
 function TIBDatabaseEditForm.Edit: Boolean;
 var
   st: string;
@@ -243,6 +260,12 @@ begin
   st := GetParam('lc_ctype');
   if (st <> '') then
     CharacterSet.ItemIndex := CharacterSet.Items.IndexOf(st);
+  {$ifdef HAS_ANSISTRING_CODEPAGE}
+  if Database.UseDefaultSystemCodePage then
+    UseSystemDefaultCS.Checked := true
+  else
+    UseSystemDefaultCS.Checked := false;
+  {$endif}
   Result := False;
   if ShowModal = mrOk then
   begin
@@ -257,6 +280,9 @@ begin
       end;
     Database.Params := DatabaseParams.Lines;
     Database.LoginPrompt := LoginPrompt.Checked;
+    {$ifdef HAS_ANSISTRING_CODEPAGE}
+    Database.UseDefaultSystemCodePage := UseSystemDefaultCS.Checked;
+    {$ENDIF}
     Result := True;
   end;
 end;
@@ -366,6 +392,16 @@ begin
     tempDB.Free;
     Test.Enabled := true;
   end;
+end;
+
+procedure TIBDatabaseEditForm.UseSystemDefaultCSChange(Sender: TObject);
+begin
+  CharacterSet.Enabled := not UseSystemDefaultCS.Checked;
+  if UseSystemDefaultCS.Checked then
+    DeleteParam('lc_ctype')
+  else
+  if (CharacterSet.Text <> 'None') then {do not localize}
+      AddParam('lc_ctype', CharacterSet.Text)
 end;
 
 

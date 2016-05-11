@@ -35,6 +35,11 @@ unit IBDatabase;
 
 {$Mode Delphi}
 
+{$IF FPC_FULLVERSION >= 20700 }
+{$codepage UTF8}
+{$DEFINE HAS_ANSISTRING_CODEPAGE}
+{$ENDIF}
+
 interface
 
 uses
@@ -183,7 +188,13 @@ type
     FDataSets: TList;
     FLoginCalled: boolean;
     FCharSetSizes: array of integer;
-    FCharSetNames: array of string;
+    FCharSetNames: array of RawByteString;
+    FDefaultCharSetName: RawByteString;
+    {$IFDEF HAS_ANSISTRING_CODEPAGE}
+    FCodePages: array of TSystemCodePage;
+    FDefaultCodePage: TSystemCodePage;
+    FUseDefaultSystemCodePage: boolean;
+    {$ENDIF}
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
     function GetSQLDialect: Integer;
@@ -270,6 +281,10 @@ type
     property SQLHourGlass: Boolean read FSQLHourGlass write FSQLHourGlass default true;
     property DBSQLDialect : Integer read FDBSQLDialect;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
+    {$IFDEF HAS_ANSISTRING_CODEPAGE}
+    property UseDefaultSystemCodePage: boolean read FUseDefaultSystemCodePage
+                                               write FUseDefaultSystemCodePage;
+    {$ENDIF}
     property AfterConnect;
     property AfterDisconnect;
     property BeforeConnect;
@@ -446,7 +461,11 @@ type
     function GetCharSetSize(CharSetID: integer): integer;
     function GetDefaultCharSetSize: integer;
     function GetCharSetName(CharSetID: integer): string;
-    function GetDefaultCharSetName: string;
+    function GetDefaultCharSetName: RawByteString;
+    {$IFDEF HAS_ANSISTRING_CODEPAGE}
+    function GetCodePage(CharSetID: integer): TSystemCodePage;
+    function GetDefaultCodePage: TSystemCodePage;
+    {$ENDIF}
     procedure HandleException(Sender: TObject);
     procedure SetCursor;
     procedure RestoreCursor;
@@ -479,7 +498,7 @@ procedure GenerateTPB(sl: TStrings; var TPB: string; var TPBLength: Short);
 implementation
 
 uses IBIntf, IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
-     typInfo;
+     typInfo, IBCodePage;
 
 { TIBDatabase }
 
@@ -515,6 +534,9 @@ begin
   end;
   {$endif}
   {$endif}
+  {$IFDEF HAS_ANSISTRING_CODEPAGE}
+  FDefaultCodePage := CP_NONE;
+  {$ENDIF}
   FDBParamsChanged := True;
   TStringList(FDBParams).OnChange := DBParamsChange;
   TStringList(FDBParams).OnChanging := DBParamsChanging;
@@ -635,6 +657,10 @@ begin
   FDBSQLDialect := 1;
   SetLength(FCharSetSizes,0);
   SetLength(FCharSetNames,0);
+  {$IFDEF HAS_ANSISTRING_CODEPAGE}
+  SetLength(FCodePages,0);
+  FDefaultCodePage := CP_NONE;
+  {$ENDIF}
 end;
 
  procedure TIBDataBase.CreateDatabase;
@@ -847,12 +873,19 @@ begin
     begin
       SetLength(FCharSetSizes,Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger + 1);
       SetLength(FCharSetNames,Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger + 1);
+      {$IFDEF HAS_ANSISTRING_CODEPAGE}
+      SetLength(FCodePages, Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger + 1);
+      {$ENDIF}
       for i := 0 to Length(FCharSetSizes) - 1 do FCharSetSizes[i] := 1;
       repeat
         FCharSetSizes[Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger] :=
                  Query.FieldByName('RDB$BYTES_PER_CHARACTER').AsInteger;
         FCharSetNames[Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger] :=
-                 Query.FieldByName('RDB$CHARACTER_SET_NAME').AsString;
+                 Trim(Query.FieldByName('RDB$CHARACTER_SET_NAME').AsString);
+        {$IFDEF HAS_ANSISTRING_CODEPAGE}
+        FCodePages[Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger] :=
+          IBGetCodePage(Trim(Query.FieldByName('RDB$CHARACTER_SET_NAME').AsString));
+        {$ENDIF}
         Query.Next;
       until Query.EOF;
     end;
@@ -1036,12 +1069,18 @@ begin
   TempDBParams := TStringList.Create;
   try
    TempDBParams.Assign(FDBParams);
+   {$IFDEF HAS_ANSISTRING_CODEPAGE}
+   if UseDefaultSystemCodePage then
+     TempDBParams.Values['lc_ctype'] := IBGetCharacterSetName(DefaultSystemCodePage);
+   FDefaultCodePage := IBGetCodePage(AnsiUpperCase(TempDBParams.Values['lc_ctype']));
+   {$ENDIF}
    {Opportunity to override defaults}
    for i := 0 to FSQLObjects.Count - 1 do
    begin
        if FSQLObjects[i] <> nil then
          SQLObjects[i].DoBeforeDatabaseConnect(TempDBParams,aDBName);
    end;
+   FDefaultCharSetName := AnsiUpperCase(TempDBParams.Values['lc_ctype']);
 
    { Generate a new DPB if necessary }
    if (FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text)) then
@@ -2078,10 +2117,26 @@ begin
     Result := ''; {Unknown character set}
 end;
 
-function TIBBase.GetDefaultCharSetName: string;
+function TIBBase.GetDefaultCharSetName: RawByteString;
 begin
-  Result := AnsiUpperCase(Database.Params.Values['lc_ctype']);
+  Result := Database.FDefaultCharSetName;
 end;
+
+{$IFDEF HAS_ANSISTRING_CODEPAGE}
+function TIBBase.GetCodePage(CharSetID: integer): TSystemCodePage;
+begin
+  if (CharSetID >= 0) and (CharSetID < Length(Database.FCodePages)) then
+    Result := Database.FCodePages[CharSetID]
+  else
+    Result := CP_NONE; {Unknown character set}
+end;
+
+function TIBBase.GetDefaultCodePage: TSystemCodePage;
+begin
+  Result := Database.FDefaultCodePage;
+end;
+
+{$ENDIF}
 
 procedure TIBBase.HandleException(Sender: TObject);
 begin

@@ -34,6 +34,17 @@ IBX Change Log  version                          (1.4-1) tba, 15 Feb 2016 14:44:
 10.SV5IPC: include workaround for OSX. FPC 3.0.0 has broken ipc module for darwin.
    Expected to be fixed in 3.0.2. Hence workaround only applies to 3.0.0.
 
+11. TIBTreeView: Guard against nil destination on record changed
+
+12. AnsiString Code page support: TIBStringField and TIBMemoField now return a
+    string type with the code page set to reflect the returned field encoding after
+    Firebird driver transliteration, if any.  FPC 3.0.0 onwards only
+
+13. IBDatabase: new property UseDefaultSystemCodePage. When set any lc_ctype parameter
+    is ignored and the lc_ctype value, when the database is opened, is set according to
+    the DefaultSystemCodePage. Normally, this is what you want and should ensure
+    platform independence.
+
 IBX Change Log  version                          (1.4-0) Mon, 15 Feb 2016 14:44:24 +0000
 
 1. Unix: If Firebird Embedded Server shared object is loaded and a local database

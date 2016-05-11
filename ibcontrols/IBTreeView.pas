@@ -449,7 +449,7 @@ begin
       else
         Destination := FindNode(DataSet.FieldByName(ParentField).AsVariant);
 
-      if Destination = Node.Parent then Exit;
+      if (Destination = nil) or (Destination = Node.Parent) then Exit;
 
       FUpdating := true;
       try
