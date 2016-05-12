@@ -35,6 +35,10 @@ unit IBSQL;
 
 {$Mode Delphi}
 
+{$IF FPC_FULLVERSION >= 20700 }
+{$codepage UTF8}
+{$ENDIF}
+
 { IBSQL param names in dialect 3 quoted format (e.g. :"MyParam") are by default disabled.
 
  Dialect 3 quoted format parameter names represent a significant overhead and are of
