@@ -1055,21 +1055,21 @@ begin
   TempDBParams := TStringList.Create;
   try
    TempDBParams.Assign(FDBParams);
-   {$IFDEF HAS_ANSISTRING_CODEPAGE}
-   if UseDefaultSystemCodePage then
-     TempDBParams.Values['lc_ctype'] := IBGetCharacterSetName(DefaultSystemCodePage);
-   FDefaultCodePage := IBGetCodePage(AnsiUpperCase(TempDBParams.Values['lc_ctype']));
-   {$ELSE}
    if UseDefaultSystemCodePage then
    begin
-     TempDBParams.Values('lc_ctype') :='UTF8';
      {$ifdef WINDOWS}
      acp := GetACP;
      if (acp >= 1250) and (acp <= 1258) then
-       TempDBParams.Values['lc_ctype'] := Format('WIN%d',[acp]);
+       TempDBParams.Values['lc_ctype'] := Format('WIN%d',[acp])
+     else
      {$endif}
+     {$IFDEF HAS_ANSISTRING_CODEPAGE}
+     TempDBParams.Values['lc_ctype'] := IBGetCharacterSetName(DefaultSystemCodePage);
+     FDefaultCodePage := IBGetCodePage(AnsiUpperCase(TempDBParams.Values['lc_ctype']));
+     {$ELSE}
+       TempDBParams.Values['lc_ctype'] :='UTF8';
+     {$ENDIF}
    end;
-   {$ENDIF}
    {Opportunity to override defaults}
    for i := 0 to FSQLObjects.Count - 1 do
    begin
