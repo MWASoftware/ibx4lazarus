@@ -266,6 +266,7 @@ type
     property TransactionCount: Integer read GetTransactionCount;
     property Transactions[Index: Integer]: TIBTransaction read GetTransaction;
     property InternalTransaction: TIBTransaction read FInternalTransaction;
+    property DefaultCharSetName: RawByteString read FDefaultCharSetName;
 
   published
     property Connected;
