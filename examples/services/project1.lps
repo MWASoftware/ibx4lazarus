@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="16">
+    <Units Count="17">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -17,8 +17,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="15"/>
+        <TopLine Value="23"/>
         <CursorPos X="8" Y="50"/>
         <UsageCount Value="27"/>
         <Loaded Value="True"/>
@@ -33,10 +32,12 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IB.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="336"/>
-        <CursorPos X="17" Y="365"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="41"/>
+        <CursorPos X="16" Y="60"/>
         <UsageCount Value="13"/>
+        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -134,7 +135,19 @@
         <CursorPos X="3" Y="418"/>
         <UsageCount Value="11"/>
       </Unit15>
+      <Unit16>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="124"/>
+        <CursorPos X="37" Y="129"/>
+        <UsageCount Value="10"/>
+      </Unit16>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="../../runtime/IB.pas"/>
+        <Caret Line="365" Column="17" TopLine="336"/>
+      </Position1>
+    </JumpHistory>
   </ProjectSession>
 </CONFIG>

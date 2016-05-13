@@ -55,6 +55,10 @@ type
     procedure SetCursor;
     procedure RestoreCursor;
   end;
+  
+  {$IF FPC_FULLVERSION < 20700 }
+  RawByteString = AnsiString; {Needed for backwards compatibility}
+  {$ENDIF}
 
   TTraceFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
      tfTransact, tfBlob, tfService, tfMisc);
