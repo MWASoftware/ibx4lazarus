@@ -10,7 +10,7 @@ IBX Change Log  version                          (1.4-1) tba, 15 Feb 2016 14:44:
 
 3. Design Time Database and Server login Dialogs now allow the Database Name/Server Name
    to be changed from that given in the TIBDatabase/TIBServer component and for the
-   entered value to be saved on a project specific basis.
+   entered value to be saved on a project specific basis (design time only).
 
 4. IBDynamicGrid: TDBLookupCellEditor now compares its DataFieldName with the
    column fieldname. If they are the same then it is acts as a look up for the KeyValue
@@ -36,14 +36,21 @@ IBX Change Log  version                          (1.4-1) tba, 15 Feb 2016 14:44:
 
 11. TIBTreeView: Guard against nil destination on record changed
 
-12. AnsiString Code page support: TIBStringField and TIBMemoField now return a
+12. AnsiString Code page support: TIBStringField.AsString and TIBMemoField.AsString now return a
     string type with the code page set to reflect the returned field encoding after
-    Firebird driver transliteration, if any.  FPC 3.0.0 onwards only
+    Firebird driver transliteration, if any.  FPC 3.0.0 onwards only. Behaviour unchanged for 
+    earlier versions.
 
-13. IBDatabase: new property UseDefaultSystemCodePage. When set any lc_ctype parameter
-    is ignored and the lc_ctype value, when the database is opened, is set according to
-    the DefaultSystemCodePage. Normally, this is what you want and should ensure
-    platform independence.
+13. AnsiString Code page support: Assigning to TIBStringField.AsString and TIBMemoField.AsString
+    will now result in transliteration to the code page specified for the Firebird driver
+    if the assigned string has a different code page. FPC 3.0.0 onwards only.
+
+14. IBDatabase: new property UseDefaultSystemCodePage. When set any lc_ctype parameter
+    is ignored and the lc_ctype value, when the database is opened, is set to align with
+    the DefaultSystemCodePage (FPC 3.0.0 onwards). Normally, this is what you want and should ensure
+    platform independence. Note: this applies to FPC 3.0.0 and earlier versions. Pre FPC
+    3.0.0, when this property is true, the lc_ctype is UTF8 except under windows when
+    the GETACP is used to determine the Windows code page.
 
 IBX Change Log  version                          (1.4-0) Mon, 15 Feb 2016 14:44:24 +0000
 
