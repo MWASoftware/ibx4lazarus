@@ -179,7 +179,7 @@ resourcestring
   SInvalidOnErrorResult = 'Unexpected onError return value';
   SInvalidOnStatusResult = 'Unexpected onStatus return value';
 
-  SInterbaseExpressVersion = 'Firebird Express for Lazarus 1.4.0';
+  SInterbaseExpressVersion = 'Firebird Express for Lazarus 1.4.1';
   SEditSQL = 'Edit SQL';
   SIBSQLEditor = 'IBSQL Editor';
   SIBServiceEditor = 'Edit IB Service';

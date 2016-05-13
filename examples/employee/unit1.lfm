@@ -537,6 +537,7 @@ object Form1: TForm1
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
+    UseDefaultSystemCodePage = True
     left = 832
     top = 168
   end

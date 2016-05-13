@@ -1,4 +1,4 @@
-IBX Change Log  version                          (1.4-1) tba, 15 Feb 2016 14:44:24 +0000
+IBX Change Log  version                           (1.4-1) Fri, 13 May 2016 16:07:15 +0100
 
 1. No character set specified for connection: when a text blob is retrieved, the
   character set is determined by looking up the native character set using then
