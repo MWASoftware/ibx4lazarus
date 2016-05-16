@@ -1,4 +1,4 @@
-IBX Change Log  version                             (1.4-1) Fri, 13 May 2016 16:32:48 +0100
+IBX Change Log  version                              (1.4-1) Mon, 16 May 2016 15:17:21 +0100
 
 1. No character set specified for connection: when a text blob is retrieved, the
   character set is determined by looking up the native character set using then
@@ -45,12 +45,19 @@ IBX Change Log  version                             (1.4-1) Fri, 13 May 2016 16:
     will now result in transliteration to the code page specified for the Firebird driver
     if the assigned string has a different code page. FPC 3.0.0 onwards only.
 
-14. IBDatabase: new property UseDefaultSystemCodePage. When set any lc_ctype parameter
+14. TIBDatabase: new property UseDefaultSystemCodePage. When set any lc_ctype parameter
     is ignored and the lc_ctype value, when the database is opened, is set to align with
     the DefaultSystemCodePage (FPC 3.0.0 onwards). Normally, this is what you want and should ensure
     platform independence. Note: this applies to FPC 3.0.0 and earlier versions. Pre FPC
     3.0.0, when this property is true, the lc_ctype is UTF8 except under windows when
     the GETACP is used to determine the Windows code page.
+
+15. TIBDatabase: new property DefaultCharSetName. This is the Firebird character set
+    name used as the lc_ctype when the database was opened. Only valid while the
+    Database is connected.
+
+16. TIBDatabase: new property DefaultCodePage (FPC >=3.0.0 only). This is the codepage
+    id that corresponds to the DefaultCharSetName.
 
 IBX Change Log  version                          (1.4-0) Mon, 15 Feb 2016 14:44:24 +0000
 

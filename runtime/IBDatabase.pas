@@ -267,6 +267,9 @@ type
     property Transactions[Index: Integer]: TIBTransaction read GetTransaction;
     property InternalTransaction: TIBTransaction read FInternalTransaction;
     property DefaultCharSetName: RawByteString read FDefaultCharSetName;
+    {$IFDEF HAS_ANSISTRING_CODEPAGE}
+    property DefaultCodePage: TSystemCodePage read FDefaultCodePage;
+    {$ENDIF}
 
   published
     property Connected;
@@ -640,6 +643,7 @@ begin
   FDBSQLDialect := 1;
   SetLength(FCharSetSizes,0);
   SetLength(FCharSetNames,0);
+  FDefaultCharSetName := '';
   {$IFDEF HAS_ANSISTRING_CODEPAGE}
   SetLength(FCodePages,0);
   FDefaultCodePage := CP_NONE;
@@ -1059,16 +1063,23 @@ begin
    begin
      {$ifdef WINDOWS}
      acp := GetACP;
+     {$IFDEF HAS_ANSISTRING_CODEPAGE}
+     TempDBParams.Values['lc_ctype'] := IBGetCharacterSetName(acp);
+     FDefaultCodePage := IBGetCodePage(AnsiUpperCase(TempDBParams.Values['lc_ctype']));
+     {$ELSE}
      if (acp >= 1250) and (acp <= 1258) then
        TempDBParams.Values['lc_ctype'] := Format('WIN%d',[acp])
      else
-     {$endif}
+       TempDBParams.Values['lc_ctype'] :='UTF8';
+     {$ENDIF}
+     {$else}
      {$IFDEF HAS_ANSISTRING_CODEPAGE}
      TempDBParams.Values['lc_ctype'] := IBGetCharacterSetName(DefaultSystemCodePage);
      FDefaultCodePage := IBGetCodePage(AnsiUpperCase(TempDBParams.Values['lc_ctype']));
      {$ELSE}
-       TempDBParams.Values['lc_ctype'] :='UTF8';
+     TempDBParams.Values['lc_ctype'] :='UTF8';
      {$ENDIF}
+     {$endif}
    end;
    {Opportunity to override defaults}
    for i := 0 to FSQLObjects.Count - 1 do
