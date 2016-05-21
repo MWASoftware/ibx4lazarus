@@ -740,6 +740,7 @@ type
   protected
     FField: TField;
     FBlobStream: TIBBlobStream;
+    function  GetSize: Int64; override;
   public
     constructor Create(AField: TField; ABlobStream: TIBBlobStream;
                        Mode: TBlobStreamMode);
@@ -4675,6 +4676,11 @@ procedure TIBDataSetUpdateObject.InternalSetParams(Query: TIBSQL; buff: PChar);
 begin
   if not Assigned(DataSet) then Exit;
   DataSet.SetInternalSQLParams(Query, buff);
+end;
+
+function TIBDSBlobStream.GetSize: Int64;
+begin
+  Result := FBlobStream.BlobSize;
 end;
 
 { TIBDSBlobStream }

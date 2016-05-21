@@ -59,11 +59,14 @@ type
     FMode: TBlobStreamMode;
     FModified: Boolean;
     FPosition: Int64;
+    FLoaded: boolean;
   protected
     procedure CloseBlob;
     procedure CreateBlob;
     procedure EnsureBlobInitialized;
+    procedure EnsureLoaded;
     procedure GetBlobInfo;
+    function  GetSize: Int64; override;
     function GetDatabase: TIBDatabase;
     function GetDBHandle: PISC_DB_HANDLE;
     function GetTransaction: TIBTransaction;
@@ -94,7 +97,7 @@ type
     property BlobID: TISC_QUAD read FBlobID write SetBlobID;
     property BlobMaxSegmentSize: Int64 read FBlobMaxSegmentSize;
     property BlobNumSegments: Int64 read FBlobNumSegments;
-    property BlobSize: Int64 read FBlobSize;
+    property BlobSize: Int64 read GetSize;
     property BlobType: Short read FBlobType;
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property DBHandle: PISC_DB_HANDLE read GetDBHandle;
@@ -279,6 +282,17 @@ begin
   FBlobInitialized := True;
 end;
 
+procedure TIBBlobStream.EnsureLoaded;
+begin
+  if not FLoaded then
+  begin
+    EnsureBlobInitialized;
+    SetSize(FBlobSize);
+    IBBlob.ReadBlob(@FHandle, FBuffer, FBlobSize);
+  end;
+  FLoaded := true;
+end;
+
 procedure TIBBlobStream.Finalize;
 begin
   if (not FBlobInitialized) or (FMode = bmRead) or (not FModified) then
@@ -298,6 +312,12 @@ begin
   IBBlob.GetBlobInfo(@FHandle, FBlobNumSegments, FBlobMaxSegmentSize,
     iBlobSize, FBlobType);
   SetSize(iBlobSize);
+end;
+
+function TIBBlobStream.GetSize: Int64;
+begin
+  EnsureBlobInitialized;
+  Result := FBlobSize;
 end;
 
 function TIBBlobStream.GetDatabase: TIBDatabase;
@@ -350,19 +370,20 @@ begin
                      @FBlobID, 0, nil), True);
   try
     GetBlobInfo;
-    SetSize(FBlobSize);
-    IBBlob.ReadBlob(@FHandle, FBuffer, FBlobSize);
+    {Defer reading in blob until read method called}
+//    SetSize(FBlobSize);
+//    IBBlob.ReadBlob(@FHandle, FBuffer, FBlobSize);
   except
     Call(isc_close_blob(StatusVector, @FHandle), False);
     raise;
   end;
-  Call(isc_close_blob(StatusVector, @FHandle), True);
+//  Call(isc_close_blob(StatusVector, @FHandle), True);
 end;
 
 function TIBBlobStream.Read(var Buffer; Count: Longint): Longint;
 begin
   CheckReadable;
-  EnsureBlobInitialized;
+  EnsureLoaded;
   if (Count <= 0) then
   begin
     result := 0;
@@ -391,7 +412,7 @@ end;
 procedure TIBBlobStream.SaveToStream(Stream: TStream);
 begin
   CheckReadable;
-  EnsureBlobInitialized;
+  EnsureLoaded;
   if FBlobSize <> 0 then
   begin
     Seek(0, soFromBeginning);
@@ -414,18 +435,21 @@ procedure TIBBlobStream.SetBlobID(Value: TISC_QUAD);
 begin
   System.Move(Value, FBlobID, SizeOf(TISC_QUAD));
   FBlobInitialized := False;
+  FLoaded := false;
 end;
 
 procedure TIBBlobStream.SetDatabase(Value: TIBDatabase);
 begin
   FBase.Database := Value;
   FBlobInitialized := False;
+  FLoaded := false;
 end;
 
 procedure TIBBlobStream.SetMode(Value: TBlobStreamMode);
 begin
   FMode := Value;
   FBlobInitialized := False;
+  FLoaded := false;
 end;
 
 procedure TIBBlobStream.SetSize(const NewSize: Int64);
@@ -448,6 +472,7 @@ procedure TIBBlobStream.SetTransaction(Value: TIBTransaction);
 begin
   FBase.Transaction := Value;
   FBlobInitialized := False;
+  FLoaded := false;
 end;
 
 procedure TIBBlobStream.Truncate;
