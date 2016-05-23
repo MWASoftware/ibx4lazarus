@@ -32,7 +32,7 @@
 
 unit IBBlob;
 
-{$Mode Delphi}
+{$mode Delphi}
 
 interface
 
@@ -41,9 +41,11 @@ uses
 
 
 const
-  DefaultBlobSegmentSize = 16 * 1024; 
+  DefaultBlobSegmentSize = 16 * 1024;
 
 type
+  TIBBlobStates = (bsUninitialised, bsDataPending, bsData, bsModified);
+
   { TIBBlobStream }
   TIBBlobStream = class(TStream)
   private
@@ -54,12 +56,11 @@ type
     FBlobSize: Int64;
     FBlobType: Short;  { 0 = segmented, 1 = streamed }
     FBuffer: PChar;
-    FBlobInitialized: Boolean;
     FHandle: TISC_BLOB_HANDLE;
     FMode: TBlobStreamMode;
-    FModified: Boolean;
     FPosition: Int64;
-    FLoaded: boolean;
+    FBlobState: TIBBlobStates;
+    function GetModified: Boolean;
   protected
     procedure CloseBlob;
     procedure CreateBlob;
@@ -75,6 +76,7 @@ type
     procedure SetBlobID(Value: TISC_QUAD);
     procedure SetDatabase(Value: TIBDatabase);
     procedure SetMode(Value: TBlobStreamMode);
+    procedure SetState(aValue: TIBBlobStates);
     procedure SetTransaction(Value: TIBTransaction);
   public
     constructor Create;
@@ -102,7 +104,7 @@ type
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property DBHandle: PISC_DB_HANDLE read GetDBHandle;
     property Mode: TBlobStreamMode read FMode write SetMode;
-    property Modified: Boolean read FModified;
+    property Modified: Boolean read GetModified;
     property Transaction: TIBTransaction read GetTransaction write SetTransaction;
     property TRHandle: PISC_TR_HANDLE read GetTRHandle;
   end;
@@ -216,13 +218,12 @@ begin
   FBase := TIBBase.Create(Self);
   FBuffer := nil;
   FBlobSize := 0;
+  FBlobState := bsUninitialised;
 end;
 
 destructor TIBBlobStream.Destroy;
 begin
-  if (FHandle <> nil) and
-     (Call(isc_close_blob(StatusVector, @FHandle), False) > 0) then
-    IBDataBaseError;
+  SetState(bsUninitialised);
   FBase.Free;
   SetSize(0);
   inherited Destroy;
@@ -247,12 +248,15 @@ begin
   if FMode = bmRead then IBError(ibxeBlobCannotBeWritten, [nil]);
 end;
 
+function TIBBlobStream.GetModified: Boolean;
+begin
+  Result := FBlobState = bsModified;
+end;
+
 procedure TIBBlobStream.CloseBlob;
 begin
   Finalize;
-  if (FHandle <> nil) and
-     (Call(isc_close_blob(StatusVector, @FHandle), False) > 0) then
-    IBDataBaseError;
+  SetState(bsUninitialised);
 end;
 
 procedure TIBBlobStream.CreateBlob;
@@ -260,12 +264,13 @@ begin
   CheckWritable;
   FBlobID.gds_quad_high := 0;
   FBlobID.gds_quad_low := 0;
-  Truncate;
+  SetState(bsData);
+  SetSize(0);
 end;
 
 procedure TIBBlobStream.EnsureBlobInitialized;
 begin
-  if not FBlobInitialized then
+  if FBlobState = bsUninitialised then
     case FMode of
       bmWrite:
         CreateBlob;
@@ -279,14 +284,12 @@ begin
       else
         OpenBlob;
     end;
-  FBlobInitialized := True;
 end;
 
 procedure TIBBlobStream.EnsureLoaded;
 begin
-  if FModified then Exit;
   EnsureBlobInitialized;
-  if not FLoaded and (Mode <> bmWrite) then
+  if FBlobState = bsDataPending then
   begin
     SetSize(FBlobSize);
     try
@@ -295,14 +298,13 @@ begin
       Call(isc_close_blob(StatusVector, @FHandle), False);
       raise;
     end;
-    Call(isc_close_blob(StatusVector, @FHandle), True);
+    SetState(bsData);
   end;
-  FLoaded := true;
 end;
 
 procedure TIBBlobStream.Finalize;
 begin
-  if (not FBlobInitialized) or (FMode = bmRead) or (not FModified) then
+  if FBlobState <> bsModified then
     exit;
   if FBlobSize > 0 then
   begin
@@ -317,8 +319,7 @@ begin
     FBlobID.gds_quad_high := 0;
     FBlobID.gds_quad_low := 0;
   end;
-  FModified := False;
-  FLoaded := true;
+  SetState(bsData);
 end;
 
 procedure TIBBlobStream.GetBlobInfo;
@@ -376,7 +377,7 @@ begin
   SetSize(Stream.Size);
   if FBlobSize <> 0 then
     Stream.ReadBuffer(FBuffer^, FBlobSize);
-  FModified := True;
+  SetState(bsModified);
 end;
 
 procedure TIBBlobStream.OpenBlob;
@@ -387,13 +388,11 @@ begin
   try
     GetBlobInfo;
     {Defer reading in blob until read method called}
-//    SetSize(FBlobSize);
-//    IBBlob.ReadBlob(@FHandle, FBuffer, FBlobSize);
   except
     Call(isc_close_blob(StatusVector, @FHandle), False);
     raise;
   end;
-//  Call(isc_close_blob(StatusVector, @FHandle), True);
+  SetState(bsDataPending);
 end;
 
 function TIBBlobStream.Read(var Buffer; Count: Longint): Longint;
@@ -450,22 +449,29 @@ end;
 procedure TIBBlobStream.SetBlobID(Value: TISC_QUAD);
 begin
   System.Move(Value, FBlobID, SizeOf(TISC_QUAD));
-  FBlobInitialized := False;
-  FLoaded := false;
+  SetState(bsUninitialised);
 end;
 
 procedure TIBBlobStream.SetDatabase(Value: TIBDatabase);
 begin
   FBase.Database := Value;
-  FBlobInitialized := False;
-  FLoaded := false;
+  SetState(bsUninitialised);
 end;
 
 procedure TIBBlobStream.SetMode(Value: TBlobStreamMode);
 begin
   FMode := Value;
-  FBlobInitialized := False;
-  FLoaded := false;
+  SetState(bsUninitialised);
+end;
+
+procedure TIBBlobStream.SetState(aValue: TIBBlobStates);
+begin
+  if FBlobState = aValue then Exit;
+
+  if FBlobState = bsDataPending then
+    Call(isc_close_blob(StatusVector, @FHandle), True);
+
+  FBlobState := aValue;
 end;
 
 procedure TIBBlobStream.SetSize(const NewSize: Int64);
@@ -487,24 +493,19 @@ end;
 procedure TIBBlobStream.SetTransaction(Value: TIBTransaction);
 begin
   FBase.Transaction := Value;
-  FBlobInitialized := False;
-  FLoaded := false;
+  SetState(bsUninitialised);
 end;
 
 procedure TIBBlobStream.Truncate;
 begin
   SetSize(0);
-  if FHandle <> nil then
-    Call(isc_close_blob(StatusVector, @FHandle), False);
-  FModified := true;
+  SetState(bsModified);
 end;
 
 function TIBBlobStream.Write(const Buffer; Count: Longint): Longint;
 begin
   CheckWritable;
   EnsureLoaded;  {Could be an untruncated bmReadWrite Blob}
-  if FHandle <> nil then
-    Call(isc_close_blob(StatusVector, @FHandle), False);
   result := Count;
   if Count <= 0 then
     exit;
@@ -512,7 +513,7 @@ begin
     SetSize(FPosition + Count);
   Move(Buffer, FBuffer[FPosition], Count);
   Inc(FPosition, Count);
-  FModified := True;
+  SetState(bsModified);
 end;
 
 end.
