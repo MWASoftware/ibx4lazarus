@@ -4691,7 +4691,11 @@ begin
   FBlobStream := ABlobStream;
   FBlobStream.Seek(0, soFromBeginning);
   if (Mode = bmWrite) then
+  begin
     FBlobStream.Truncate;
+    TBlobField(FField).Modified := true;
+    FHasWritten := true;
+  end;
 end;
 
 destructor TIBDSBlobStream.Destroy;

@@ -284,11 +284,18 @@ end;
 
 procedure TIBBlobStream.EnsureLoaded;
 begin
-  if not FLoaded then
+  if FModified then Exit;
+  EnsureBlobInitialized;
+  if not FLoaded and (Mode <> bmWrite) then
   begin
-    EnsureBlobInitialized;
     SetSize(FBlobSize);
-    IBBlob.ReadBlob(@FHandle, FBuffer, FBlobSize);
+    try
+      IBBlob.ReadBlob(@FHandle, FBuffer, FBlobSize);
+    except
+      Call(isc_close_blob(StatusVector, @FHandle), False);
+      raise;
+    end;
+    Call(isc_close_blob(StatusVector, @FHandle), True);
   end;
   FLoaded := true;
 end;
@@ -297,12 +304,21 @@ procedure TIBBlobStream.Finalize;
 begin
   if (not FBlobInitialized) or (FMode = bmRead) or (not FModified) then
     exit;
-  { need to start writing to a blob, create one }
-  Call(isc_create_blob2(StatusVector, DBHandle, TRHandle, @FHandle, @FBlobID,
-                       0, nil), True);
-  IBBlob.WriteBlob(@FHandle, FBuffer, FBlobSize);
-  Call(isc_close_blob(StatusVector, @FHandle), True);
+  if FBlobSize > 0 then
+  begin
+    { need to start writing to a blob, create one }
+    Call(isc_create_blob2(StatusVector, DBHandle, TRHandle, @FHandle, @FBlobID,
+                         0, nil), True);
+    IBBlob.WriteBlob(@FHandle, FBuffer, FBlobSize);
+    Call(isc_close_blob(StatusVector, @FHandle), True);
+  end
+  else
+  begin
+    FBlobID.gds_quad_high := 0;
+    FBlobID.gds_quad_low := 0;
+  end;
   FModified := False;
+  FLoaded := true;
 end;
 
 procedure TIBBlobStream.GetBlobInfo;
@@ -478,12 +494,17 @@ end;
 procedure TIBBlobStream.Truncate;
 begin
   SetSize(0);
+  if FHandle <> nil then
+    Call(isc_close_blob(StatusVector, @FHandle), False);
+  FModified := true;
 end;
 
 function TIBBlobStream.Write(const Buffer; Count: Longint): Longint;
 begin
   CheckWritable;
-  EnsureBlobInitialized;
+  EnsureLoaded;  {Could be an untruncated bmReadWrite Blob}
+  if FHandle <> nil then
+    Call(isc_close_blob(StatusVector, @FHandle), False);
   result := Count;
   if Count <= 0 then
     exit;
