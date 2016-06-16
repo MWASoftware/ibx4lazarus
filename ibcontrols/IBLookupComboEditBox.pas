@@ -371,13 +371,13 @@ begin
       Parser.Add2WhereClause('Upper(' + GetRelationNameQualifier + '"' +  ListField + '") Like Upper(''' +
                                   SQLSafe(Text) + '%'')');
 
-  end;
-  if cbactSearchAscending in AutoCompleteText then
-  begin
-    FieldPosition := Parser.GetFieldPosition(ListField);
-    if FieldPosition = 0 then Exit;
+    if cbactSearchAscending in AutoCompleteText then
+    begin
+      FieldPosition := Parser.GetFieldPosition(ListField);
+      if FieldPosition = 0 then Exit;
 
-    Parser.OrderByClause := IntToStr(FieldPosition) + ' ascending';
+      Parser.OrderByClause := IntToStr(FieldPosition) + ' ascending';
+    end;
   end;
 end;
 

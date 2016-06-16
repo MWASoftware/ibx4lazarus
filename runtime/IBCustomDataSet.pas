@@ -4693,6 +4693,7 @@ begin
   if (Mode = bmWrite) then
   begin
     FBlobStream.Truncate;
+    TIBCustomDataSet(FField.DataSet).RecordModified(True);
     TBlobField(FField).Modified := true;
     FHasWritten := true;
   end;

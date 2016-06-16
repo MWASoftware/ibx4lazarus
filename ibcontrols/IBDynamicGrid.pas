@@ -175,6 +175,8 @@ end;
     property OnEditingDone;
   end;
 
+  TOnSelectPanelEditor = procedure(Sender: TObject; var aEditorPanel: TWinControl) of object;
+
   TDBDynamicGrid = class(TDBGrid)
   private
     { Private declarations }
@@ -185,6 +187,7 @@ end;
     FOnEditorPanelHide: TNotifyEvent;
     FOnEditorPanelShow: TNotifyEvent;
     FOnKeyDownHander: TKeyDownHandler;
+    FOnSelectPanelEditor: TOnSelectPanelEditor;
     FResizing: boolean;
     FWeHaveFocus: boolean;
     FHidingEditorPanel: boolean;
@@ -232,6 +235,8 @@ end;
     property OnEditorPanelShow: TNotifyEvent read FOnEditorPanelShow write FOnEditorPanelShow;
     property OnEditorPanelHide: TNotifyEvent read FOnEditorPanelHide write FOnEditorPanelHide;
     property OnKeyDownHander: TKeyDownHandler read FOnKeyDownHander write FOnKeyDownHander;
+    property OnSelectPanelEditor: TOnSelectPanelEditor read FOnSelectPanelEditor
+                                                       write FOnSelectPanelEditor;
  end;
 
   {TIBGridControlLink}
@@ -752,12 +757,18 @@ begin
 end;
 
 procedure TDBDynamicGrid.ShowEditorPanel;
+var aEditor: TWinControl;
 begin
   if (csDesigning in ComponentState) or
    (DataSource = nil) or (DataSource.DataSet = nil)
      or ((DataSource.DataSet.RecordCount = 0) and (DataSource.DataSet.State <> dsInsert)) then
      Exit;
-  Editor := FEditorPanel;
+  aEditor := FEditorPanel;
+  if assigned(FOnSelectPanelEditor) then
+    OnSelectPanelEditor(self,aEditor);
+  if FEditorPanel <> aEditor then
+    SetEditorPanel(aEditor);
+  Editor := aEditor;
   EditorMode := true;
 end;
 

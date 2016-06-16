@@ -1,8 +1,16 @@
-IBX Change Log  version                                 (1.4-2) Tue, 17 May 2016 09:14:51 +0100
+IBX Change Log  version                                 (1.4-2) tba, 17 May 2016 09:14:51 +0100
 
 1. IBBlob: Defer reading of blob until read method called. This avoids having to
    read in an entire blob just to get the size of the blob. General performance
    improvement when opening datasets containing blobs.
+
+2. Clearing a  Blob now sets the corresponding field's modified flag.
+
+3. IBLookupCombo: When not performing auto-complete, original query sort order
+   is now used.
+
+4. IBDynamicGrid: Add OnSelectEditor event. Allows editor panel to be dynamically
+   determined.
 
 IBX Change Log  version                                 (1.4-1) Tue, 17 May 2016 09:14:51 +0100
 
