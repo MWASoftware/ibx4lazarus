@@ -12,6 +12,8 @@ IBX Change Log  version                                 (1.4-2) tba, 17 May 2016
 4. IBDynamicGrid: Add OnSelectEditor event. Allows editor panel to be dynamically
    determined.
 
+5. IBDynamicGrid: Recompute column widths after dataset closed and re-opened.
+
 IBX Change Log  version                                 (1.4-1) Tue, 17 May 2016 09:14:51 +0100
 
 1. No character set specified for connection: when a text blob is retrieved, the
