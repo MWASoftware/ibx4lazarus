@@ -145,7 +145,7 @@ type
 
 implementation
 
-uses IBQuery, LCLType, Variants, LCLProc;
+uses IBQuery, LCLType, Variants, LCLProc, LazUTF8;
 
 { TIBLookupControlLink }
 
