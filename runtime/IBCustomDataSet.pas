@@ -997,7 +997,7 @@ begin
   s := AValue;
   {$IFDEF HAS_ANSISTRING_CODEPAGE}
   if StringCodePage(Value) <> CodePage then
-    SetCodePage(s,CodePage,CodePage<>CP_NONE);
+    SetCodePage(s,CodePage,true);
   {$ENDIF}
   inherited SetAsString(s);
 end;
@@ -1111,7 +1111,7 @@ begin
     s := Value;
     {$IFDEF HAS_ANSISTRING_CODEPAGE}
     if StringCodePage(s) <> CodePage then
-      SetCodePage(s,CodePage,CodePage<>CP_NONE);
+      SetCodePage(s,CodePage,true);
     {$ENDIF}
     StrLCopy(Buffer, PChar(s), Size);
     if Transliterate then
@@ -3664,8 +3664,8 @@ begin
                 FieldCodePage := FBase.GetCodePage(charSetID);
                 {$ENDIF}
              end
-             else  {Complex SQL with no identifiable column }
-             begin
+              else  {Complex SQL with no identifiable column and no connection default}
+              begin
                 CharSetName := '';
                 CharSetSize := 1;
                 {$IFDEF HAS_ANSISTRING_CODEPAGE}

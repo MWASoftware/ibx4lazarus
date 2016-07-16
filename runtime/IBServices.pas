@@ -317,7 +317,7 @@ type
   published
   end;
 
-  TStatOption = (DataPages, {DbLog,} HeaderPages, IndexPages, SystemRelations);
+  TStatOption = (DataPages, DbLog, HeaderPages, IndexPages, SystemRelations);
   TStatOptions = set of TStatOption;
 
   TIBStatisticalService = class(TIBControlAndQueryService)
@@ -1415,8 +1415,8 @@ begin
   param := 0;
   if (DataPages in Options) then
     param := param or isc_spb_sts_data_pages;
-{  if (DbLog in Options) then
-    param := param or isc_spb_sts_db_log; -- removed from Firebird 2}
+  if (DbLog in Options) then
+    param := param or isc_spb_sts_db_log;
   if (HeaderPages in Options) then
     param := param or isc_spb_sts_hdr_pages;
   if (IndexPages in Options) then
