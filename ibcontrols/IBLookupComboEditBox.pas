@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DbCtrls,
-  ExtCtrls, IBSQLParser, DB, StdCtrls, IBCustomDataSet;
+  ExtCtrls, IBSQLParser, DB, StdCtrls, IBCustomDataSet, LCLVersion;
 
 type
 
