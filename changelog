@@ -17,6 +17,9 @@ IBX Change Log  version                                    (1.4-2) Sat, 16 Jul 2
 6. IBLookupCombo: LazUTF8 added to uses clause to avoid compilation problems post
    lazarus 1.6.0
 
+7. IBControls. Removed "runtime" from list of paths to avoid "multiple packages"
+   compilation error.
+
 IBX Change Log  version                                 (1.4-1) Tue, 17 May 2016 09:14:51 +0100
 
 1. No character set specified for connection: when a text blob is retrieved, the
