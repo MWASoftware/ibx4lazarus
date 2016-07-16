@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 1026
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.4.4.0'
+  LCLVersion = '1.6.0.4'
   object Button1: TButton
     Left = 939
     Height = 25
@@ -258,7 +258,7 @@ object Form1: TForm1
         object JobGradeDBComboBox: TDBComboBox
           Left = 480
           Height = 25
-          Top = 2
+          Top = 0
           Width = 48
           OwnerDrawEditable = False
           AutoSize = False
@@ -433,6 +433,7 @@ object Form1: TForm1
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
+    UseDefaultSystemCodePage = False
     left = 832
     top = 168
   end

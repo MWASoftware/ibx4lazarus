@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 658
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.4.2.0'
+  LCLVersion = '1.6.0.4'
   object Label1: TLabel
     Left = 16
     Height = 15
@@ -22,6 +22,7 @@ object Form1: TForm1
     Height = 27
     Top = 32
     Width = 224
+    OwnerDrawEditable = False
     KeyField = 'EMP_NO'
     ListField = 'FULL_NAME'
     ListFieldIndex = 0
@@ -161,6 +162,7 @@ object Form1: TForm1
       Height = 29
       Top = 32
       Width = 53
+      OwnerDrawEditable = False
       DataField = 'JOB_GRADE'
       DataSource = EmployeeSource
       ItemHeight = 0
@@ -219,6 +221,7 @@ object Form1: TForm1
       Height = 25
       Top = 32
       Width = 203
+      OwnerDrawEditable = False
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       DataField = 'JOB_COUNTRY'
@@ -239,6 +242,7 @@ object Form1: TForm1
       Height = 29
       Top = 82
       Width = 264
+      OwnerDrawEditable = False
       Anchors = [akTop, akLeft, akRight]
       DataField = 'JOB_CODE'
       DataSource = EmployeeSource
@@ -302,7 +306,7 @@ object Form1: TForm1
     TabOrder = 4
   end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AllowStreamedConnected = False
     DatabaseName = 'localhost:employee'
     Params.Strings = (
@@ -312,6 +316,7 @@ object Form1: TForm1
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
+    UseDefaultSystemCodePage = False
     left = 328
     top = 24
   end
@@ -371,6 +376,7 @@ object Form1: TForm1
       'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH'
       'From EMPLOYEE A'
       'JOIN Depts D On D.DEPT_NO = A.DEPT_NO'
+      'Order by 3 asc'
     )
     ModifySQL.Strings = (
       'Update EMPLOYEE A Set '#13#10'  A.EMP_NO = :EMP_NO,'#13#10'  A.FIRST_NAME = :FIRST_NAME,'#13#10'  A.LAST_NAME = :LAST_NAME,'#13#10'  A.PHONE_EXT = :PHONE_EXT,'#13#10'  A.HIRE_DATE = :HIRE_DATE,'#13#10'  A.DEPT_NO = :DEPT_NO,'#13#10'  A.JOB_CODE = :JOB_CODE,'#13#10'  A.JOB_GRADE = :JOB_GRADE,'#13#10'  A.JOB_COUNTRY = :JOB_COUNTRY,'#13#10'  A.SALARY = :SALARY'

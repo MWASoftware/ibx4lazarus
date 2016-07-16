@@ -1,4 +1,4 @@
-IBX Change Log  version                                   (1.4-2) Sat, 16 Jul 2016 12:25:26 +0100
+IBX Change Log  version                                    (1.4-2) Sat, 16 Jul 2016 12:31:20 +0100
 
 1. IBBlob: Defer reading of blob until read method called. This avoids having to
    read in an entire blob just to get the size of the blob. General performance
