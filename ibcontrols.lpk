@@ -7,7 +7,7 @@
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
-        <OtherUnitFiles Value="runtime;ibcontrols"/>
+        <OtherUnitFiles Value="ibcontrols"/>
         <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
@@ -508,7 +508,7 @@
    All Rights Reserved.
 
    Contributor(s): ______________________________________. "/>
-    <Version Major="1" Minor="4" Release = "2" />
+    <Version Major="1" Minor="4" Release="2"/>
     <Files Count="4">
       <Item1>
         <Filename Value="ibcontrols/IBLookupComboEditBox.pas"/>
