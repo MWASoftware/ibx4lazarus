@@ -3645,6 +3645,15 @@ begin
             FieldSize := sizeof (TISC_QUAD);
             if (sqlsubtype = 1) then
             begin
+              if FBase.GetDefaultCharSetName <> '' then
+              begin
+                CharSetSize := FBase.GetDefaultCharSetSize;
+                CharSetName := FBase.GetDefaultCharSetName;
+                {$IFDEF HAS_ANSISTRING_CODEPAGE}
+                FieldCodePage := FBase.GetDefaultCodePage;
+                {$ENDIF}
+              end
+              else
               if strpas(sqlname) <> '' then
               begin
                 charSetID := GetBlobCharSetID(Database.Handle,Database.InternalTransaction.Handle,
