@@ -1,4 +1,4 @@
-IBX Change Log  version                                     (1.4-2) tba, 16 Jul 2016 13:25:48 +0100
+IBX Change Log  version                                      (1.4-2) Thu, 11 Aug 2016 16:04:30 +0100
 
 1. IBCustomDataset: When calling SetCodePage, no longer request transliteration
    when target codepage is CP_NONE.
