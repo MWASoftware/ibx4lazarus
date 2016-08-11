@@ -3,6 +3,9 @@ IBX Change Log  version                                     (1.4-2) tba, 16 Jul 
 1. IBCustomDataset: When calling SetCodePage, no longer request transliteration
    when target codepage is CP_NONE.
 
+2. DBLog option removed from TIBStatisticalService - not supported by server
+   since Firebird 1.5.
+
 IBX Change Log  version                                     (1.4-2) Sat, 16 Jul 2016 13:25:48 +0100
 
 1. IBBlob: Defer reading of blob until read method called. This avoids having to
