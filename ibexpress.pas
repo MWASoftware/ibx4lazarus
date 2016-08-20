@@ -7,8 +7,7 @@ unit ibexpress;
 interface
 
 uses
-  IB, IBBatchMove, IBBlob, IBCustomDataSet, IBDatabase, IBErrorCodes, 
-  IBEvents, IBExternals, IBExtract, IBHeader, IBUtils, IBXConst, IBIntf, 
+  IBBatchMove, IBBlob, IBCustomDataSet, IBDatabase, IBEvents, IBExtract, 
   IBQuery, IBServices, IBSQL, IBStoredProc, IBDatabaseInfo, IBUpdateSQL, 
   IBTable, IBSQLMonitor, IBSQLParser, IBDialogs, ibxscript, IBCodePage;
 

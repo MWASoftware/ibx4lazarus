@@ -109,9 +109,7 @@ function EditFieldLink(aMaster: TDataSet; aIndexDefs: TIndexDefs;
 
 implementation
 
-uses IBCustomDataSet;
-
-  function EditFieldLink(aMaster: TDataSet; aIndexDefs: TIndexDefs;
+function EditFieldLink(aMaster: TDataSet; aIndexDefs: TIndexDefs;
    var aDetailIndexFieldNames: string; var aMasterIndexFieldNames: string
    ): boolean;
 begin
@@ -270,8 +268,6 @@ end;
  end;
 
  procedure TFieldLinkEditor.LoadMasterFields;
- var FieldNames: string;
-     idx: integer;
  begin
    MasterFieldListBox.Clear;
    if assigned(Master) then

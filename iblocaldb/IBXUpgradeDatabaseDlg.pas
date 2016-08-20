@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls,  Dialogs, StdCtrls,
-  ComCtrls, ExtCtrls, IBDatabase, ibxscript,  IBHeader;
+  ComCtrls, ExtCtrls, IBDatabase, ibxscript;
 
 type
   { TUpgradeDatabaseDlg }

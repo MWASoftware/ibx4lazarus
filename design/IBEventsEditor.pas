@@ -33,7 +33,7 @@ unit IBEventsEditor;
 interface
 
 uses
-  SysUtils, {Windows,} Messages, Classes, Graphics, Controls,
+  SysUtils, {Windows,}  Classes, Graphics, Controls,
   Forms, Dialogs, ExtCtrls, StdCtrls, Grids, IBEvents, LResources;
 
 type

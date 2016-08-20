@@ -47,7 +47,6 @@ type
 
   TIBDSLCLInterface = class(TIBLCLInterface)
   private
-    FSetCursorDepth: integer;
     function GetProjectName: string;
     procedure GetDatabaseName(DefaultDBName, DefaultUserName: string; var DBName: string;
       var UserName: string);

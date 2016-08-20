@@ -30,7 +30,8 @@ unit IBXCustomIBLocalDBSupport;
 interface
 
 uses
-  Classes,  IBDatabase, SysUtils, IBServices, IBXUpgradeConfFile, IBHeader, ibxscript;
+  Classes,  IBDatabase, SysUtils, IBServices, IBXUpgradeConfFile, ibxscript,
+  IB;
 
 type
 
@@ -193,7 +194,7 @@ type
 
 implementation
 
-uses  IBIntf,  DB, IBBlob, ZStream
+uses  DB, IBBlob, ZStream
   {$IFDEF Unix} ,initc, regexpr {$ENDIF}
   {$IFDEF WINDOWS} ,Windows ,Windirs {$ENDIF};
 
@@ -328,7 +329,7 @@ procedure TCustomIBLocalDBSupport.OnBeforeDatabaseConnect(Sender: TObject;
 begin
   if not Enabled or (csDesigning in ComponentState) then Exit;
 
-  if not IsEmbeddedServer then
+  if not FirebirdAPI.IsEmbeddedServer then
      raise EIBLocalFatalError.Create(sNoEmbeddedServer);
 
   InitDatabaseParameters(DBParams,DBName);

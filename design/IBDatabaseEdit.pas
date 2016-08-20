@@ -32,7 +32,7 @@ unit IBDatabaseEdit;
 
 {$A+}                           (* Aligned records: On *)
 {$B-}                           (* Short circuit boolean expressions: Off *)
-{$G+}                           (* Imported data: On *)
+{ $G+}                           (* Imported data: On *)
 {$H+}                           (* Huge Strings: On *)
 {$J-}                           (* Modification of Typed Constants: Off *)
 {$M+}                           (* Generate run-time type information: On *)
@@ -40,7 +40,7 @@ unit IBDatabaseEdit;
 {$Q-}                           (* Overflow checks: Off *)
 {$R-}                           (* Range checks: Off *)
 {$T+}                           (* Typed address: On *)
-{$U+}                           (* Pentim-safe FDIVs: On *)
+{ $U+}                           (* Pentim-safe FDIVs: On *)
 {$W-}                           (* Always generate stack frames: Off *)
 {$X+}                           (* Extended syntax: On *)
 {$Z1}                           (* Minimum Enumeration Size: 1 Byte *)
@@ -48,7 +48,7 @@ unit IBDatabaseEdit;
 interface
 
 uses
-  Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, IBDataBase, IB,  LResources;
 
 type

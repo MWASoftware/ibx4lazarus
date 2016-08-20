@@ -246,7 +246,7 @@ type
     procedure CloseDataSets;
     procedure CheckActive;
     procedure CheckInactive;
-    procedure CreateDatabase(CreateParams: string);
+    procedure CreateDatabase;
     procedure DropDatabase;
     procedure ForceClose;
     procedure GetFieldNames(const TableName: string; List: TStrings);
@@ -621,11 +621,11 @@ begin
   {$ENDIF}
 end;
 
- procedure TIBDataBase.CreateDatabase(CreateParams: string);
+  procedure TIBDataBase.CreateDatabase;
 begin
   CheckInactive;
   CheckDatabaseName;
-  FAttachment := FirebirdAPI.CreateDatabase(FDBName,SQLDialect,CreateParams,nil);
+  FAttachment := FirebirdAPI.CreateDatabase(FDBName,GenerateDPB(FDBParams));
 end;
 
  procedure TIBDataBase.DropDatabase;

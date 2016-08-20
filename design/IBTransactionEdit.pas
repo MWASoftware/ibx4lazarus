@@ -33,7 +33,7 @@ unit IBTransactionEdit;
 interface
 
 uses
-  {Windows,} Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  {Windows,} SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, IBDataBase, IB, ExtCtrls, LResources;
 
 type

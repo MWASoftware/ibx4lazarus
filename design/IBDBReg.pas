@@ -773,8 +773,6 @@ end;
 { TIBDataSetEditor }
 
 procedure TIBDataSetEditor.ExecuteVerb(Index: Integer);
-var
-  IBDataset: TIBDataset;
 begin
   if Index < inherited GetVerbCount then
     inherited ExecuteVerb(Index) else
@@ -1029,7 +1027,6 @@ end;
 procedure TIBRefreshSQLProperty.Edit;
 var
   IBDataset: TIBDataset;
-  aDatabase: TIBDatabase;
 begin
   IBDataset := GetComponent(0) as TIBDataset;
   if IBRefreshSQLEditor.EditSQL(IBDataSet,IBDataSet.RefreshSQL) then Modified;

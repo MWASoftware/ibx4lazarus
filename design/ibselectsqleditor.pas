@@ -89,8 +89,6 @@ function EditSQL(DataSet: TIBCustomDataSet;  SelectSQL: TStrings): boolean;
 
 implementation
 
-uses IBSQL;
-
 {$R *.lfm}
 
 function EditSQL(DataSet: TIBCustomDataSet; SelectSQL: TStrings): boolean;
