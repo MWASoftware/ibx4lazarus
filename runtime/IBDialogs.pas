@@ -39,7 +39,7 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, Graphics, Controls,
-  Forms, StdCtrls, ExtCtrls, IB;
+  Forms, StdCtrls, ExtCtrls, IB, IBTypes;
 
 type
 

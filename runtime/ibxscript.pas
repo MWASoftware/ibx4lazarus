@@ -33,7 +33,7 @@ unit ibxscript;
 
 interface
 
-uses Classes, IBDatabase,  IBSQL, IBHeader;
+uses Classes, IBDatabase,  IBSQL, IB;
 
 type
   TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes,
@@ -141,7 +141,7 @@ type
     function GetSymbol(const Line: string; var index: integer): TSQLSymbol;
     function GetTransaction: TIBTransaction;
     procedure SetDatabase(AValue: TIBDatabase);
-    procedure SetParamValue(SQLVar: TIBXSQLVAR);
+    procedure SetParamValue(SQLVar: ISQLParam);
     procedure SetState(AState: TSQLStates);
     procedure ClearStatement;
     function PopState: TSQLStates;
@@ -166,7 +166,7 @@ type
 
 implementation
 
-uses Sysutils, IB, RegExpr;
+uses Sysutils, RegExpr;
 
 resourcestring
   sTerminatorUnknownState = 'Statement Terminator in unexpected state (%d)';
@@ -737,7 +737,7 @@ begin
 end;
 
 
-procedure TIBXScript.SetParamValue(SQLVar: TIBXSQLVAR);
+procedure TIBXScript.SetParamValue(SQLVar: ISQLParam);
 var BlobID: TISC_QUAD;
 begin
   if assigned(FGetParamValue) and (SQLVar.SQLType = SQL_BLOB) then

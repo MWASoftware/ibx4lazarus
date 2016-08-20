@@ -49,7 +49,7 @@ interface
 
 uses
   Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, IBDataBase, IB, IBXConst, LResources;
+  StdCtrls, ExtCtrls, IBDataBase, IB,  LResources;
 
 type
 
@@ -115,7 +115,7 @@ implementation
 
 {$R *.lfm}
 
-uses TypInfo;
+uses TypInfo, FBMessages;
 
 function EditIBDatabase(ADatabase: TIBDatabase): Boolean;
 begin

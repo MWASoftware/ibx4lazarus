@@ -49,8 +49,7 @@ type
 
   TIBStoredProc = class(TIBCustomDataSet)
   private
-    FIBLoaded: Boolean;
-    FStmtHandle: TISC_STMT_HANDLE;
+    FStmtHandle: IStatement;
     FProcName: string;
     FParams: TParams;
     FPrepared: Boolean;
@@ -88,7 +87,7 @@ type
     procedure Prepare;
     procedure UnPrepare;
     property ParamCount: Word read GetParamsCount;
-    property StmtHandle: TISC_STMT_HANDLE read FStmtHandle;
+    property StmtHandle: IStatement read FStmtHandle;
     property Prepared: Boolean read FPrepared write SetPrepare;
     property StoredProcedureNames: TStrings read GetStoredProcedureNames;
 
@@ -108,30 +107,23 @@ type
 
 implementation
 
- uses
-   IBIntf;
+ uses  FBMessages;
 
 { TIBStoredProc }
 
 constructor TIBStoredProc.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FIBLoaded := False;
-  CheckIBLoaded;
-  FIBLoaded := True;
   FParams := TParams.Create (self);
   FNameList := TStringList.Create;
 end;
 
 destructor TIBStoredProc.Destroy;
 begin
-  if FIBLoaded then
-  begin
-    Destroying;
-    Disconnect;
-    FParams.Free;
-    FNameList.Destroy;
-  end;
+  Destroying;
+  Disconnect;
+  if assigned (FParams) then FParams.Free;
+  if assigned(FNameList) then FNameList.Destroy;
   inherited Destroy;
 end;
 
@@ -257,8 +249,8 @@ begin
     Query.Prepare;
     Query.GoToFirstRecordOnExecute := False;
     Query.ExecQuery;
-    while (not Query.EOF) and (Query.Next <> nil) do begin
-      if (Query.Current.ByName('RDB$PARAMETER_TYPE').AsInteger = 0) then begin {do not localize}
+    while (not Query.EOF) and Query.Next do begin
+      if (Query.FieldByName('RDB$PARAMETER_TYPE').AsInteger = 0) then begin {do not localize}
         if (input <> '') then
           input := input + ', :' +
             FormatParameter(Database.SQLDialect, Query.Current.ByName('RDB$PARAMETER_NAME').AsString) else {do not localize}
@@ -288,21 +280,21 @@ begin
     SQL_TYPE_TIME: DataType := ftTime;
     SQL_TIMESTAMP: DataType := ftDateTime;
     SQL_SHORT:
-      if ((QSelect.Fields[i].AsXSQLVar)^.sqlscale = 0) then
+      if QSelect.Fields[i].getScale = 0 then
         DataType := ftSmallInt
       else
         DataType := ftBCD;
     SQL_LONG:
-      if ((QSelect.Fields[i].AsXSQLVar)^.sqlscale = 0) then
+      if QSelect.Fields[i].getScale = 0 then
         DataType := ftInteger
-      else if ((QSelect.Fields[i].AsXSQLVar)^.sqlscale >= (-4)) then
+      else if QSelect.Fields[i].getScale >= -4 then
         DataType := ftBCD
       else
         DataType := ftFloat;
     SQL_INT64:
-      if ((QSelect.Fields[i].AsXSQLVar)^.sqlscale = 0) then
+      if QSelect.Fields[i].getScale = 0 then
         DataType := ftLargeInt
-      else if ((QSelect.Fields[i].AsXSQLVar)^.sqlscale >= (-4)) then
+      else if QSelect.Fields[i].getScale >= -4 then
         DataType := ftBCD
       else
         DataType := ftFloat;
@@ -311,7 +303,7 @@ begin
       DataType := ftBoolean;
     SQL_TEXT: DataType := ftString;
     SQL_VARYING:
-      if ((QSelect.Fields[i].AsXSQLVar)^.sqllen < 1024) then
+      if QSelect.Fields[i].GetSize < 1024 then
         DataType := ftString
       else DataType := ftBlob;
     SQL_BLOB, SQL_ARRAY, SQL_QUAD: DataType := ftBlob;
@@ -321,25 +313,25 @@ begin
 
   DataType := ftUnknown;
   for i := 0 to QSelect.Params.Count - 1 do begin
-  case QSelect.Params[i].SQLtype of
+  case QSelect.Params[i].GetSQLtype of
     SQL_TYPE_DATE: DataType := ftDate;
     SQL_TYPE_TIME: DataType := ftTime;
     SQL_TIMESTAMP: DataType := ftDateTime;
     SQL_SHORT:
-      if ((QSelect.Params[i].AsXSQLVar)^.sqlscale = 0) then
+      if QSelect.Params[i].getScale = 0 then
         DataType := ftSmallInt
       else
         DataType := ftBCD;
     SQL_LONG:
-      if ((QSelect.Params[i].AsXSQLVar)^.sqlscale = 0) then
+      if QSelect.Params[i].getScale = 0 then
         DataType := ftInteger
-      else if ((QSelect.Params[i].AsXSQLVar)^.sqlscale >= (-4)) then
+      else if QSelect.Params[i].getScale >= -4 then
         DataType := ftBCD
       else DataType := ftFloat;
     SQL_INT64:
-      if ((QSelect.Params[i].AsXSQLVar)^.sqlscale = 0) then
+      if QSelect.Params[i].getScale = 0 then
         DataType := ftLargeInt
-      else if ((QSelect.Params[i].AsXSQLVar)^.sqlscale >= (-4)) then
+      else if QSelect.Params[i].getScale >= -4 then
         DataType := ftBCD
       else DataType := ftFloat;
     SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT: DataType := ftFloat;
@@ -347,7 +339,7 @@ begin
       DataType := ftBoolean;
     SQL_TEXT: DataType := ftString;
     SQL_VARYING:
-      if ((QSelect.Params[i].AsXSQLVar)^.sqllen < 1024) then
+      if QSelect.Params[i].GetSize < 1024 then
         DataType := ftString
       else DataType := ftBlob;
     SQL_BLOB, SQL_ARRAY, SQL_QUAD: DataType := ftBlob;
@@ -449,7 +441,7 @@ begin
       Query.SQL.Text := 'Select RDB$PROCEDURE_NAME from RDB$PROCEDURES'; {do not localize}
       Query.Prepare;
       Query.ExecQuery;
-      while (not Query.EOF) and (Query.Next <> nil) do
+      while (not Query.EOF) and Query.Next do
         FNameList.Add(TrimRight(Query.Current.ByName('RDB$PROCEDURE_NAME').AsString)); {do not localize}
     finally
       Query.Free;

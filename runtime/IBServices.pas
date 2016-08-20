@@ -54,12 +54,13 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, IBHeader, IB, IBExternals, CustApp;
+  SysUtils, Classes, IBHeader, IB, IBExternals, CustApp, IBTypes, IBSQL;
 
 const
   DefaultBufferSize = 32000;
 
   SPBPrefix = 'isc_spb_';
+  isc_spb_last_spb_constant = 12;
   SPBConstantNames: array[1..isc_spb_last_spb_constant] of String = (
     'user_name',
     'sys_user_name',
@@ -76,22 +77,21 @@ const
   );
 
   SPBConstantValues: array[1..isc_spb_last_spb_constant] of Integer = (
-    isc_spb_user_name_mapped_to_server,
-    isc_spb_sys_user_name_mapped_to_server,
-    isc_spb_sys_user_name_enc_mapped_to_server,
-    isc_spb_password_mapped_to_server,
-    isc_spb_password_enc_mapped_to_server,
-    isc_spb_command_line_mapped_to_server,
-    isc_spb_dbname_mapped_to_server,
-    isc_spb_verbose_mapped_to_server,
-    isc_spb_options_mapped_to_server,
-    isc_spb_connect_timeout_mapped_to_server,
-    isc_spb_dummy_packet_interval_mapped_to_server,
-    isc_spb_sql_role_name_mapped_to_server
+    isc_spb_user_name,
+    isc_spb_sys_user_name,
+    isc_spb_sys_user_name_enc,
+    isc_spb_password,
+    isc_spb_password_enc,
+    isc_spb_command_line,
+    isc_spb_dbname,
+    isc_spb_verbose,
+    isc_spb_options,
+    isc_spb_connect_timeout,
+    isc_spb_dummy_packet_interval,
+    isc_spb_sql_role_name
   );
 
 type
-  TProtocol = (TCP, SPX, NamedPipe, Local);
   TOutputBufferOption = (ByLine, ByChunk);
 
   TIBCustomService = class;
@@ -103,40 +103,36 @@ type
 
   TIBCustomService = class(TComponent)
   private
-    FIBLoaded: Boolean;
     FParamsChanged : Boolean;
-    FSPB, FQuerySPB : PChar;
-    FSPBLength, FQuerySPBLength : Short;
+    FQueryParams: String;
+    FSPB : ISPB;
+    FSRB: ISRB;
     FTraceFlags: TTraceFlags;
     FOnLogin: TLoginEvent;
     FLoginPrompt: Boolean;
-    FBufferSize: Integer;
-    FOutputBuffer: PChar;
-    FQueryParams: String;
     FServerName: string;
-    FHandle: TISC_SVC_HANDLE;
+    FService: IServiceManager;
     FStreamedActive  : Boolean;
     FOnAttach: TNotifyEvent;
     FOutputBufferOption: TOutputBufferOption;
     FProtocol: TProtocol;
     FParams: TStrings;
+    FServiceQueryResults: IServiceQueryResults;
     function GetActive: Boolean;
     function GetServiceParamBySPB(const Idx: Integer): String;
+    function GetSRB: ISRB;
     procedure SetActive(const Value: Boolean);
-    procedure SetBufferSize(const Value: Integer);
     procedure SetParams(const Value: TStrings);
     procedure SetServerName(const Value: string);
     procedure SetProtocol(const Value: TProtocol);
     procedure SetServiceParamBySPB(const Idx: Integer;
       const Value: String);
-    function IndexOfSPBConst(st: String): Integer;
+    function IndexOfSPBConst(action: byte): Integer;
+    function GetSPBConstName(action: byte): string;
     procedure ParamsChange(Sender: TObject);
     procedure ParamsChanging(Sender: TObject);
     procedure CheckServerName;
-    function Call(ErrCode: ISC_STATUS; RaiseError: Boolean): ISC_STATUS;
-    function ParseString(var RunLen: Integer): string;
-    function ParseInteger(var RunLen: Integer): Integer;
-    procedure GenerateSPB(sl: TStrings; var SPB: String; var SPBLength: Short);
+    function GenerateSPB(sl: TStrings): ISPB;
 
   protected
     procedure Loaded; override;
@@ -144,18 +140,16 @@ type
     procedure CheckActive;
     procedure CheckInactive;
     procedure HandleException(Sender: TObject);
-    property OutputBuffer : PChar read FOutputBuffer;
-    property OutputBufferOption : TOutputBufferOption read FOutputBufferOption write FOutputBufferOption;
-    property BufferSize : Integer read FBufferSize write SetBufferSize default DefaultBufferSize;
     procedure InternalServiceQuery;
-    property ServiceQueryParams: String read FQueryParams write FQueryParams;
+    property SRB: ISRB read GetSRB;
+    property ServiceQueryResults: IServiceQueryResults read FServiceQueryResults;
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Attach;
     procedure Detach;
-    property Handle: TISC_SVC_HANDLE read FHandle;
+    property ServiceIntf: IServiceManager read FService;
     property ServiceParamBySPB[const Idx: Integer]: String read GetServiceParamBySPB
                                                       write SetServiceParamBySPB;
   published
@@ -231,7 +225,6 @@ type
     FLicenseMaskInfo: TLicenseMaskInfo;
     FVersionInfo: TVersionInfo;
     FConfigParams: TConfigParams;
-    procedure ParseConfigFileData(var RunLen: Integer);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -250,18 +243,14 @@ type
     property Options : TPropertyOptions read FOptions write FOptions;
   end;
 
+  { TIBControlService }
+
   TIBControlService = class (TIBCustomService)
   private
-    FStartParams: String;
-    FStartSPB: PChar;
-    FStartSPBLength: Integer;
     function GetIsServiceRunning: Boolean;
   protected
-    property ServiceStartParams: String read FStartParams write FStartParams;
-    procedure SetServiceStartOptions; virtual;
-    procedure ServiceStartAddParam (Value: string; param: Integer); overload;
-    procedure ServiceStartAddParam (Value: Integer; param: Integer); overload;
     procedure InternalServiceStart;
+    procedure SetServiceStartOptions; virtual;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -281,8 +270,6 @@ type
     function GetNextLine : String;
     function GetNextChunk : String;
     property Eof: boolean read FEof;
-  published
-    property BufferSize;
   end;
 
   TShutdownMode = (Forced, DenyTransaction, DenyAttachment);
@@ -516,20 +503,18 @@ type
 implementation
 
 uses
-  IBIntf , IBSQLMonitor, Math;
+  IBSQLMonitor, Math, FBMessages;
 
 { TIBCustomService }
 
 procedure TIBCustomService.Attach;
-var
-  SPB: String;
-  ConnectString: String;
-  aServerName: string;
+var aServerName: string;
 begin
   CheckInactive;
   CheckServerName;
 
   aServerName := FServerName;
+
   if FLoginPrompt and not Login(aServerName) then
     IBError(ibxeOperationCancelled, [nil]);
 
@@ -537,23 +522,10 @@ begin
   if FParamsChanged then
   begin
     FParamsChanged := False;
-    GenerateSPB(FParams, SPB, FSPBLength);
-    IBAlloc(FSPB, 0, FsPBLength);
-    Move(SPB[1], FSPB[0], FSPBLength);
+    FSPB := GenerateSPB(FParams);
   end;
-  case FProtocol of
-    TCP: ConnectString := aServerName + ':service_mgr'; {do not localize}
-    SPX: ConnectString := aServerName + '@service_mgr'; {do not localize}
-    NamedPipe: ConnectString := '\\' + aServerName + '\service_mgr'; {do not localize}
-    Local: ConnectString := 'service_mgr'; {do not localize}
-  end;
-  if call(isc_service_attach(StatusVector, Length(ConnectString),
-                         PChar(ConnectString), @FHandle,
-                         FSPBLength, FSPB), False) > 0 then
-  begin
-    FHandle := nil;
-    IBDataBaseError;
-  end;
+
+  FService := FirebirdAPI.GetServiceManager(aServerName,FProtocol,FSPB);
 
   if Assigned(FOnAttach) then
     FOnAttach(Self);
@@ -596,12 +568,12 @@ begin
   else
   if assigned(IBGUIInterface)  then
   begin
-    IndexOfUser := IndexOfSPBConst(SPBConstantNames[isc_spb_user_name]);
+    IndexOfUser := IndexOfSPBConst(isc_spb_user_name);
     if IndexOfUser <> -1 then
       Username := Copy(Params[IndexOfUser],
                                          Pos('=', Params[IndexOfUser]) + 1, {mbcs ok}
                                          Length(Params[IndexOfUser]));
-    IndexOfPassword := IndexOfSPBConst(SPBConstantNames[isc_spb_password]);
+    IndexOfPassword := IndexOfSPBConst(isc_spb_password);
     if IndexOfPassword <> -1 then
       Password := Copy(Params[IndexOfPassword],
                                          Pos('=', Params[IndexOfPassword]) + 1, {mbcs ok}
@@ -609,16 +581,16 @@ begin
     result := IBGUIInterface.ServerLoginDialog(aServerName, Username, Password);
     if result then
     begin
-      IndexOfPassword := IndexOfSPBConst(SPBConstantNames[isc_spb_password]);
+      IndexOfPassword := IndexOfSPBConst(isc_spb_password);
       if IndexOfUser = -1 then
-        Params.Add(SPBConstantNames[isc_spb_user_name] + '=' + Username)
+        Params.Add(GetSPBConstName(isc_spb_user_name) + '=' + Username)
       else
-        Params[IndexOfUser] := SPBConstantNames[isc_spb_user_name] +
+        Params[IndexOfUser] := GetSPBConstName(isc_spb_user_name) +
                                  '=' + Username;
       if IndexOfPassword = -1 then
-        Params.Add(SPBConstantNames[isc_spb_password] + '=' + Password)
+        Params.Add(GetSPBConstName(isc_spb_password) + '=' + Password)
       else
-        Params[IndexOfPassword] := SPBConstantNames[isc_spb_password] +
+        Params[IndexOfPassword] := GetSPBConstName(isc_spb_password) +
                                      '=' + Password;
     end
   end
@@ -630,13 +602,13 @@ procedure TIBCustomService.CheckActive;
 begin
   if FStreamedActive and (not Active) then
     Loaded;
-  if FHandle = nil then
+  if FService = nil then
     IBError(ibxeServiceActive, [nil]);
 end;
 
 procedure TIBCustomService.CheckInactive;
 begin
-  if FHandle <> nil then
+  if FService <> nil then
     IBError(ibxeServiceInActive, [nil]);
 end;
 
@@ -659,21 +631,17 @@ end;
 constructor TIBCustomService.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FIBLoaded := False;
-  CheckIBLoaded;
-  FIBLoaded := True;
   FserverName := '';
   FParams := TStringList.Create;
   FParamsChanged := True;
   TStringList(FParams).OnChange := ParamsChange;
   TStringList(FParams).OnChanging := ParamsChanging;
-  FSPB := nil;
-  FQuerySPB := nil;
-  FBufferSize := DefaultBufferSize;
-  FHandle := nil;
   FLoginPrompt := True;
   FTraceFlags := [];
-  FOutputbuffer := nil;
+  FService := nil;
+  FSRB := nil;
+  FSPB := nil;
+  FServiceQueryResults := nil;
   FProtocol := Local;
   if (AOwner <> nil) and
      (AOwner is TCustomApplication) and
@@ -683,34 +651,25 @@ end;
 
 destructor TIBCustomService.Destroy;
 begin
-  if FIBLoaded then
-  begin
-    if FHandle <> nil then
+  if FService <> nil then
       Detach;
-    FreeMem(FSPB);
-    FSPB := nil;
-    FParams.Free;
-  end;
-  ReallocMem(FOutputBuffer, 0);
+  FSRB := nil;
+  FSPB := nil;
+  FServiceQueryResults := nil;
   inherited Destroy;
 end;
 
 procedure TIBCustomService.Detach;
 begin
   CheckActive;
-  if (Call(isc_service_detach(StatusVector, @FHandle), False) > 0) then
-  begin
-    FHandle := nil;
-    IBDataBaseError;
-  end
-  else
-    FHandle := nil;
+  FService.Detach;
+  FService := nil;
   MonitorHook.ServiceDetach(Self);
 end;
 
 function TIBCustomService.GetActive: Boolean;
 begin
-  result := FHandle <> nil;
+  result := FService <> nil;
 end;
 
 function TIBCustomService.GetServiceParamBySPB(const Idx: Integer): String;
@@ -719,7 +678,7 @@ var
 begin
   if (Idx > 0) and (Idx <= isc_spb_last_spb_constant) then
   begin
-    ConstIdx := IndexOfSPBConst(SPBConstantNames[Idx]);
+    ConstIdx := IndexOfSPBConst(Idx);
     if ConstIdx = -1 then
       result := ''
     else
@@ -736,29 +695,18 @@ begin
     result := '';
 end;
 
+function TIBCustomService.GetSRB: ISRB;
+begin
+  CheckActive;
+  if FSRB = nil then
+    FSRB := FService.AllocateRequestBuffer;
+  Result := FSRB;
+end;
+
 procedure TIBCustomService.InternalServiceQuery;
 begin
-  FQuerySPBLength := Length(FQueryParams);
-  if FQuerySPBLength = 0 then
-    IBError(ibxeQueryParamsError, [nil]);
-  IBAlloc(FQuerySPB, 0, FQuerySPBLength);
-  Move(FQueryParams[1], FQuerySPB[0], FQuerySPBLength);
-  if (FOutputBuffer = nil) then
-    IBAlloc(FOutputBuffer, 0, FBufferSize);
-  try
-    if call(isc_service_query(StatusVector, @FHandle, nil, 0, nil,
-                           FQuerySPBLength, FQuerySPB,
-                           FBufferSize, FOutputBuffer), False) > 0 then
-    begin
-      FHandle := nil;
-      IBDataBaseError;
-    end;
-  finally
-    FreeMem(FQuerySPB);
-    FQuerySPB := nil;
-    FQuerySPBLength := 0;
-    FQueryParams := '';
-  end;
+  FServiceQueryResults := FService.Query(FSRB);
+  FSRB := nil;
   MonitorHook.ServiceQuery(Self);
 end;
 
@@ -772,12 +720,6 @@ begin
         Attach
       else
         Detach;
-end;
-
-procedure TIBCustomService.SetBufferSize(const Value: Integer);
-begin
-  if (FOutputBuffer <> nil) and (Value <> FBufferSize) then
-    IBAlloc(FOutputBuffer, 0, FBufferSize);
 end;
 
 procedure TIBCustomService.SetParams(const Value: TStrings);
@@ -810,7 +752,7 @@ procedure TIBCustomService.SetServiceParamBySPB(const Idx: Integer;
 var
   ConstIdx: Integer;
 begin
-  ConstIdx := IndexOfSPBConst(SPBConstantNames[Idx]);
+  ConstIdx := IndexOfSPBConst(Idx);
   if (Value = '') then
   begin
     if ConstIdx <> -1 then
@@ -819,17 +761,20 @@ begin
   else
   begin
     if (ConstIdx = -1) then
-      Params.Add(SPBConstantNames[Idx] + '=' + Value)
+      Params.Add(GetSPBConstName(Idx) + '=' + Value)
     else
-      Params[ConstIdx] := SPBConstantNames[Idx] + '=' + Value;
+      Params[ConstIdx] := GetSPBConstName(Idx) + '=' + Value;
   end;
 end;
 
-function TIBCustomService.IndexOfSPBConst(st: String): Integer;
+function TIBCustomService.IndexOfSPBConst(action: byte): Integer;
 var
-  i, pos_of_str: Integer;
+  i,  pos_of_str: Integer;
+  st: string;
 begin
   result := -1;
+  st := GetSPBConstName(action);
+  if st <> '' then
   for i := 0 to Params.Count - 1 do
   begin
     pos_of_str := Pos(st, Params[i]); {mbcs ok}
@@ -839,6 +784,18 @@ begin
       break;
     end;
   end;
+end;
+
+function TIBCustomService.GetSPBConstName(action: byte): string;
+var i: integer;
+begin
+  Result := '';
+  for i := 0 to High(SPBConstantValues) do
+    if SPBConstantValues[i] = action then
+    begin
+      Result := SPBConstantNames[i];
+      break;
+    end;
 end;
 
 procedure TIBCustomService.ParamsChange(Sender: TObject);
@@ -857,48 +814,13 @@ begin
     IBError(ibxeServerNameMissing, [nil]);
 end;
 
-function TIBCustomService.Call(ErrCode: ISC_STATUS;
-  RaiseError: Boolean): ISC_STATUS;
-begin
-  result := ErrCode;
-  if RaiseError and (ErrCode > 0) then
-    IBDataBaseError;
-end;
-
-function TIBCustomService.ParseString(var RunLen: Integer): string;
-var
-  Len: UShort;
-  tmp: Char;
-begin
-  Len := isc_vax_integer(OutputBuffer + RunLen, 2);
-  RunLen := RunLen + 2;
-  if (Len <> 0) then
-  begin
-    tmp := OutputBuffer[RunLen + Len];
-    OutputBuffer[RunLen + Len] := #0;
-    result := String(PChar(@OutputBuffer[RunLen]));
-    OutputBuffer[RunLen + Len] := tmp;
-    RunLen := RunLen + Len;
-  end
-  else
-    result := '';
-end;
-
-function TIBCustomService.ParseInteger(var RunLen: Integer): Integer;
-begin
-  result := isc_vax_integer(OutputBuffer + RunLen, 4);
-  RunLen := RunLen + 4;
-end;
-
 {
  * GenerateSPB -
  *  Given a string containing a textual representation
  *  of the Service parameters, generate a service
- *  parameter buffer, and return it and its length
- *  in SPB and SPBLength, respectively.
+ *  parameter buffer, and return it .
 }
-procedure TIBCustomService.GenerateSPB(sl: TStrings; var SPB: String;
-  var SPBLength: Short);
+function TIBCustomService.GenerateSPB(sl: TStrings): ISPB;
 var
   i, j, SPBVal, SPBServerVal: UShort;
   param_name, param_value: String;
@@ -906,9 +828,8 @@ begin
   { The SPB is initially empty, with the exception that
    the SPB version must be the first byte of the string.
   }
-  SPBLength := 2;
-  SPB := Char(isc_spb_version);
-  SPB := SPB + Char(isc_spb_current_version);
+  Result := FirebirdAPI.AllocateSPB;
+
   { Iterate through the textual service parameters, constructing
    a SPB on-the-fly }
   if sl.Count > 0 then
@@ -935,23 +856,16 @@ begin
         SPBServerVal := SPBConstantValues[j];
         break;
       end;
-    case SPBVal of
+    case SPBServerVal of
       isc_spb_user_name, isc_spb_password:
-      begin
-        SPB := SPB +
-               Char(SPBServerVal) +
-               Char(Length(param_value)) +
-               param_value;
-        Inc(SPBLength, 2 + Length(param_value));
-      end;
+        Result.Add(SPBServerVal).AsString := param_value;
       else
       begin
-        if (SPBVal > 0) and
-           (SPBVal <= isc_dpb_last_dpb_constant) then
+        if GetSPBConstName(SPBServerVal) <> '' then
           IBError(ibxeSPBConstantNotSupported,
-                   [SPBConstantNames[SPBVal]])
+                   [GetSPBConstName(SPBServerVal)])
         else
-          IBError(ibxeSPBConstantUnknown, [SPBVal]);
+          IBError(ibxeSPBConstantUnknown, [SPBServerVal]);
       end;
     end;
   end;
@@ -978,19 +892,6 @@ begin
   inherited Destroy;
 end;
 
-procedure TIBServerProperties.ParseConfigFileData(var RunLen: Integer);
-begin
-  Inc(RunLen);
-  with FConfigParams.ConfigFileData do
-  begin
-    SetLength (ConfigFileValue, Length(ConfigFileValue)+1);
-    SetLength (ConfigFileKey, Length(ConfigFileKey)+1);
-
-    ConfigFileKey[High(ConfigFileKey)] := Integer(OutputBuffer[RunLen-1]);
-    ConfigFileValue[High(ConfigFileValue)] := ParseInteger(RunLen);
-  end;
-end;
-
 procedure TIBServerProperties.Fetch;
 begin
   if (Database in Options) then
@@ -1007,54 +908,45 @@ end;
 
 procedure TIBServerProperties.FetchConfigParams;
 var
-  RunLen: Integer;
+  i, j: Integer;
 
 begin
-  ServiceQueryParams := Char(isc_info_svc_get_config) +
-                        Char(isc_info_svc_get_env) +
-                        Char(isc_info_svc_get_env_lock) +
-                        Char(isc_info_svc_get_env_msg) +
-                        Char(isc_info_svc_user_dbpath);
+  SRB.Add(isc_info_svc_get_config);
+  SRB.Add(isc_info_svc_get_env);
+  SRB.Add(isc_info_svc_get_env_lock);
+  SRB.Add(isc_info_svc_get_env_msg);
+  SRB.Add(isc_info_svc_user_dbpath);
 
   InternalServiceQuery;
-  RunLen := 0;
-  While (not (Integer(OutputBuffer[RunLen]) = isc_info_end)) do
+
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
   begin
-    case Integer(OutputBuffer[RunLen]) of
+    case getItemType of
       isc_info_svc_get_config:
       begin
-        FConfigParams.ConfigFileData.ConfigFileKey := nil;
-        FConfigParams.ConfigFileData.ConfigFileValue := nil;
-        Inc (RunLen);
-        while (not (Integer(OutputBuffer[RunLen]) = isc_info_flag_end)) do
-          ParseConfigFileData (RunLen);
-        if (Integer(OutputBuffer[RunLen]) = isc_info_flag_end) then
-          Inc (RunLen);
+        SetLength (FConfigParams.ConfigFileData.ConfigFileValue, Count);
+        SetLength (FConfigParams.ConfigFileData.ConfigFileKey, Count);
+
+        for j := 0 to Count - 1 do
+        begin
+          FConfigParams.ConfigFileData.ConfigFileKey[j] := getItemType;
+          FConfigParams.ConfigFileData.ConfigFileValue[j] := AsInteger;
+        end;
       end;
 
       isc_info_svc_get_env:
-      begin
-        Inc (RunLen);
-        FConfigParams.BaseLocation := ParseString(RunLen);
-      end;
+        FConfigParams.BaseLocation := AsString;
 
       isc_info_svc_get_env_lock:
-      begin
-        Inc (RunLen);
-        FConfigParams.LockFileLocation := ParseString(RunLen);
-      end;
+        FConfigParams.LockFileLocation := AsString;
 
       isc_info_svc_get_env_msg:
-      begin
-        Inc (RunLen);
-        FConfigParams.MessageFileLocation := ParseString(RunLen);
-      end;
+        FConfigParams.MessageFileLocation := AsString;
 
       isc_info_svc_user_dbpath:
-      begin
-        Inc (RunLen);
-        FConfigParams.SecurityDatabaseLocation := ParseString(RunLen);
-      end;
+        FConfigParams.SecurityDatabaseLocation := AsString;
+
       else
         IBError(ibxeOutputParsingError, [nil]);
     end;
@@ -1063,87 +955,71 @@ end;
 
 procedure TIBServerProperties.FetchDatabaseInfo;
 var
-  i, RunLen: Integer;
+  i: Integer;
 begin
-  ServiceQueryParams := Char(isc_info_svc_svr_db_info);
+  SRB.Add(isc_info_svc_svr_db_info);
   InternalServiceQuery;
-  if (OutputBuffer[0] <> Char(isc_info_svc_svr_db_info)) then
-      IBError(ibxeOutputParsingError, [nil]);
-  RunLen := 1;
-  if (OutputBuffer[RunLen] <> Char(isc_spb_num_att)) then
-      IBError(ibxeOutputParsingError, [nil]);
-  Inc(RunLen);
-  FDatabaseInfo.NoOfAttachments := ParseInteger(RunLen);
-  if (OutputBuffer[RunLen] <> Char(isc_spb_num_db)) then
-      IBError(ibxeOutputParsingError, [nil]);
-  Inc(RunLen);
-  FDatabaseInfo.NoOfDatabases := ParseInteger(RunLen);
-  FDatabaseInfo.DbName := nil;
-  SetLength(FDatabaseInfo.DbName, FDatabaseInfo.NoOfDatabases);
-  i := 0;
-  while (OutputBuffer[RunLen] <> Char(isc_info_flag_end)) do
+
+  SetLength(FDatabaseInfo.DbName,0);
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
   begin
-    if (OutputBuffer[RunLen] <> Char(SPBConstantValues[isc_spb_dbname])) then
-      IBError(ibxeOutputParsingError, [nil]);
-    Inc(RunLen);
-    FDatabaseInfo.DbName[i] := ParseString(RunLen);
-    Inc (i);
-  end;
+    case getItemType of
+      isc_spb_num_att:
+        FDatabaseInfo.NoOfAttachments := AsInteger;
+
+      isc_spb_num_db:
+        FDatabaseInfo.NoOfDatabases := AsInteger;
+
+      isc_spb_dbname:
+        begin
+          SetLength(FDatabaseInfo.DbName,length(FDatabaseInfo.DbName)+1);
+          FDatabaseInfo.DbName[length(FDatabaseInfo.DbName)-1] := AsString;
+        end;
+
+      else
+        IBError(ibxeOutputParsingError, [nil]);
+    end;
+ end;
 end;
 
 procedure TIBServerProperties.FetchLicenseInfo;
 var
-  i, RunLen: Integer;
-  done: Integer;
+  i,j : Integer;
 begin
-  ServiceQueryParams := Char(isc_info_svc_get_license) +
-                        Char(isc_info_svc_get_licensed_users);
+  SRB.Add(isc_info_svc_get_license);
+  SRB.Add(isc_info_svc_get_licensed_users);
   InternalServiceQuery;
-  RunLen := 0;
-  done := 0;
-  i := 0;
-  FLicenseInfo.key := nil;
-  FLicenseInfo.id := nil;
-  FLicenseInfo.desc := nil;
 
-  While done < 2 do begin
-    Inc(Done);
-    Inc(RunLen);
-    case Integer(OutputBuffer[RunLen-1]) of
+  SetLength(FLicenseInfo.key, 0);
+  SetLength(FLicenseInfo.id, 0);
+  SetLength(FLicenseInfo.desc, 0);
+
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
+  begin
+    case getItemType of
       isc_info_svc_get_license:
-      begin
-        while (OutputBuffer[RunLen] <> Char(isc_info_flag_end)) do
         begin
-          if (i >= Length(FLicenseInfo.key)) then
-          begin
-            SetLength(FLicenseInfo.key, i + 10);
-            SetLength(FLicenseInfo.id, i + 10);
-            SetLength(FLicenseInfo.desc, i + 10);
+          SetLength(FLicenseInfo.key, Count);
+          SetLength(FLicenseInfo.id, Count);
+          SetLength(FLicenseInfo.desc, Count);
+
+          for j := 0 to Count -1 do
+          with Items[j] do
+          case getItemType of
+             isc_spb_lic_id:
+                FLicenseInfo.id[j] := AsString;
+
+             isc_spb_lic_key:
+                FLicenseInfo.key[j] := AsString;
+
+             isc_spb_lic_desc:
+               FLicenseInfo.desc[j] := AsString;
+          else
+            IBError(ibxeOutputParsingError, [nil]);
           end;
-          if (OutputBuffer[RunLen] <> Char(isc_spb_lic_id)) then
-              IBError(ibxeOutputParsingError, [nil]);
-          Inc(RunLen);
-          FLicenseInfo.id[i] := ParseString(RunLen);
-          if (OutputBuffer[RunLen] <> Char(isc_spb_lic_key)) then
-              IBError(ibxeOutputParsingError, [nil]);
-          Inc(RunLen);
-          FLicenseInfo.key[i] := ParseString(RunLen);
-          if (OutputBuffer[RunLen] <> Char(7)) then
-              IBError(ibxeOutputParsingError, [nil]);
-          Inc(RunLen);
-          FLicenseInfo.desc[i] := ParseString(RunLen);
-          Inc(i);
         end;
-        Inc(RunLen);
-        if (Length(FLicenseInfo.key) > i) then
-        begin
-          SetLength(FLicenseInfo.key, i);
-          SetLength(FLicenseInfo.id, i);
-          SetLength(FLicenseInfo.desc, i);
-        end;
-      end;
-      isc_info_svc_get_licensed_users:
-        FLicenseInfo.LicensedUsers := ParseInteger(RunLen);
       else
         IBError(ibxeOutputParsingError, [nil]);
     end;
@@ -1152,22 +1028,20 @@ end;
 
 procedure TIBServerProperties.FetchLicenseMaskInfo();
 var
-  done,RunLen:integer;
+  i : Integer;
 begin
-  ServiceQueryParams := Char(isc_info_svc_get_license_mask) +
-                        Char(isc_info_svc_capabilities);
+  SRB.Add(isc_info_svc_get_license_mask);
+  SRB.Add(isc_info_svc_capabilities);
   InternalServiceQuery;
-  RunLen := 0;
-  done := 0;
-  While done <= 1 do
+
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
   begin
-    Inc(done);
-    Inc(RunLen);
-    case Integer(OutputBuffer[RunLen-1]) of
+    case getItemType of
       isc_info_svc_get_license_mask:
-        FLicenseMaskInfo.LicenseMask := ParseInteger(RunLen);
+        FLicenseMaskInfo.LicenseMask := AsInteger;
       isc_info_svc_capabilities:
-        FLicenseMaskInfo.CapabilityMask := ParseInteger(RunLen);
+        FLicenseMaskInfo.CapabilityMask := AsInteger;
       else
         IBError(ibxeOutputParsingError, [nil]);
     end;
@@ -1177,27 +1051,23 @@ end;
 
 procedure TIBServerProperties.FetchVersionInfo;
 var
-  RunLen: Integer;
-  done: Integer;
+  i : Integer;
 begin
-  ServiceQueryParams := Char(isc_info_svc_version) +
-                        Char(isc_info_svc_server_version) +
-                        Char(isc_info_svc_implementation);
+  SRB.Add(isc_info_svc_version);
+  SRB.Add(isc_info_svc_server_version);
+  SRB.Add(isc_info_svc_implementation);
   InternalServiceQuery;
-  RunLen := 0;
-  done := 0;
 
-  While done <= 2 do
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
   begin
-    Inc(done);
-    Inc(RunLen);
-    case Integer(OutputBuffer[RunLen-1]) of
+    case getItemType of
       isc_info_svc_version:
-        FVersionInfo.ServiceVersion := ParseInteger(RunLen);
+        FVersionInfo.ServiceVersion := AsInteger;
       isc_info_svc_server_version:
-        FVersionInfo.ServerVersion := ParseString(RunLen);
+        FVersionInfo.ServerVersion := AsString;
       isc_info_svc_implementation:
-        FVersionInfo.ServerImplementation := ParseString(RunLen);
+        FVersionInfo.ServerImplementation := AsString;
       else
         IBError(ibxeOutputParsingError, [nil]);
     end;
@@ -1205,79 +1075,38 @@ begin
 end;
 
 { TIBControlService }
+
 procedure TIBControlService.SetServiceStartOptions;
 begin
 
 end;
 
 function TIBControlService.GetIsServiceRunning: Boolean;
-var
-  RunLen: Integer;
 begin
-  ServiceQueryParams := Char(isc_info_svc_running);
+  SRB.Add(isc_info_svc_running);
   InternalServiceQuery;
-  if (OutputBuffer[0] <> Char(isc_info_svc_running)) then
-    IBError(ibxeOutputParsingError, [nil]);
-  RunLen := 1;
-  if (ParseInteger(RunLen) = 1) then
-    result := True
-  else
-    result := False;
+
+  Result := (FServiceQueryResults.Count > 0) and
+             (FServiceQueryResults[0].getItemType = isc_info_svc_running) and
+              (FServiceQueryResults[0].AsInteger = 1);
 end;
 
-procedure TIBControlService.ServiceStartAddParam (Value: string; param: Integer);
-var
-  Len: UShort;
-begin
-  Len := Length(Value);
-  if Len > 0 then
-  begin
-    FStartParams  := FStartParams +
-                     Char(Param) +
-                     PChar(@Len)[0] +
-                     PChar(@Len)[1] +
-                     Value;
-  end;
-end;
 
-procedure TIBControlService.ServiceStartAddParam (Value: Integer; param: Integer);
-begin
-  FStartParams  := FStartParams +
-                   Char(Param) +
-                   PChar(@Value)[0] +
-                   PChar(@Value)[1] +
-                   PChar(@Value)[2] +
-                   PChar(@Value)[3];
-end;
 
 constructor TIBControlService.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
-  FStartParams := '';
-  FStartSPB := nil;
-  FStartSPBLength := 0;
+  FSRB := nil;
+  FSPB := nil;
 end;
 
 procedure TIBControlService.InternalServiceStart;
 begin
-  FStartSPBLength := Length(FStartParams);
-  if FStartSPBLength = 0 then
+  if SRB = nil then
     IBError(ibxeStartParamsError, [nil]);
-  IBAlloc(FStartSPB, 0, FStartSPBLength);
-  Move(FStartParams[1], FStartSPB[0], FstartSPBLength);
-  try
-    if call(isc_service_start(StatusVector, @FHandle, nil,
-                           FStartSPBLength, FStartSPB), False) > 0 then
-    begin
-      FHandle := nil;
-      IBDataBaseError;
-    end;
-  finally
-    FreeMem(FStartSPB);
-    FStartSPB := nil;
-    FStartSPBLength := 0;
-    FStartParams := '';
-  end;
+
+  FService.Start(SRB);
+  FSRB := nil;
   MonitorHook.ServiceStart(Self);
 end;
 
@@ -1297,32 +1126,29 @@ end;
 
 procedure TIBConfigService.ActivateShadow;
 begin
-  ServiceStartParams  := Char(isc_action_svc_properties);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
-  ServiceStartAddParam (isc_spb_prp_activate, SPBConstantValues[isc_spb_options]);
+  SRB.Add(isc_action_svc_properties);
+  SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
+  SRB.Add(isc_spb_options).AsInteger := isc_spb_prp_activate;
   InternalServiceStart;
 end;
 
 procedure TIBConfigService.BringDatabaseOnline;
 begin
-  ServiceStartParams  := Char(isc_action_svc_properties);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
-  ServiceStartAddParam (isc_spb_prp_db_online, SPBConstantValues[isc_spb_options]);
+  SRB.Add(isc_action_svc_properties);
+  SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
+  SRB.Add(isc_spb_options).AsInteger := isc_spb_prp_db_online;
   InternalServiceStart;
 end;
 
 procedure TIBConfigService.SetAsyncMode(Value: Boolean);
 begin
-  ServiceStartParams  := Char(isc_action_svc_properties);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
-  ServiceStartParams := ServiceStartParams +
-                        Char(isc_spb_prp_write_mode);
+  SRB.Add(isc_action_svc_properties);
+  SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
+  with SRB.Add(isc_spb_prp_write_mode) do
   if Value then
-    ServiceStartParams  := ServiceStartParams +
-                           Char(isc_spb_prp_wm_async)
+    AsInteger := isc_spb_prp_wm_async
   else
-    ServiceStartParams  := ServiceStartParams +
-                           Char(isc_spb_prp_wm_sync);
+    AsInteger := isc_spb_prp_wm_sync;
   InternalServiceStart;
 end;
 
@@ -1333,71 +1159,66 @@ end;
 
 procedure TIBConfigService.SetPageBuffers(Value: Integer);
 begin
-  ServiceStartParams  := Char(isc_action_svc_properties);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
-  ServiceStartAddParam (Value, isc_spb_prp_page_buffers);
+  SRB.Add(isc_action_svc_properties);
+  SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
+  SRB.Add(isc_spb_prp_page_buffers).AsInteger := Value;
   InternalServiceStart;
 end;
 
 procedure TIBConfigService.SetReadOnly(Value: Boolean);
 begin
-  ServiceStartParams  := Char(isc_action_svc_properties);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
-  ServiceStartParams := ServiceStartParams +
-                         Char(isc_spb_prp_access_mode);
+  SRB.Add(isc_action_svc_properties);
+  SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
+  with SRB.Add(isc_spb_prp_access_mode) do
   if Value then
-    ServiceStartParams  := ServiceStartParams +
-                           Char(isc_spb_prp_am_readonly)
+    AsInteger := isc_spb_prp_am_readonly
   else
-    ServiceStartParams  := ServiceStartParams +
-                           Char(isc_spb_prp_am_readwrite);
+    AsInteger := isc_spb_prp_am_readwrite;
   InternalServiceStart;
 end;
 
 procedure TIBConfigService.SetReserveSpace(Value: Boolean);
 begin
-  ServiceStartParams  := Char(isc_action_svc_properties);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
-  ServiceStartParams := ServiceStartParams +
-                        Char(isc_spb_prp_reserve_space);
+  SRB.Add(isc_action_svc_properties);
+  SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
+  with SRB.Add(isc_spb_prp_reserve_space) do
   if Value then
-    ServiceStartParams  := ServiceStartParams +
-                           Char(isc_spb_prp_res)
+    AsInteger := isc_spb_prp_res
   else
-    ServiceStartParams  := ServiceStartParams +
-                           Char(isc_spb_prp_res_use_full);
+    AsInteger := isc_spb_prp_res_use_full;
   InternalServiceStart;
 end;
 
 procedure TIBConfigService.SetSweepInterval(Value: Integer);
 begin
-  ServiceStartParams  := Char(isc_action_svc_properties);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
-  ServiceStartAddParam (Value, isc_spb_prp_sweep_interval);
+  SRB.Add(isc_action_svc_properties);
+  SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
+  SRB.Add(isc_spb_prp_sweep_interval).AsInteger := Value;
   InternalServiceStart;
 end;
 
 procedure TIBConfigService.SetDBSqlDialect(Value: Integer);
 begin
-  ServiceStartParams  := Char(isc_action_svc_properties);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
-  ServiceStartAddParam (Value, isc_spb_prp_set_sql_dialect);
+  SRB.Add(isc_action_svc_properties);
+  SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
+  SRB.Add(isc_spb_prp_set_sql_dialect).AsInteger := Value;
   InternalServiceStart;
 end;
 
 procedure TIBConfigService.ShutdownDatabase(Options: TShutdownMode;
   Wait: Integer);
 begin
-  ServiceStartParams  := Char(isc_action_svc_properties);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
+  SRB.Add(isc_action_svc_properties);
+  SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
   if (Options = Forced) then
-    ServiceStartAddParam (Wait, isc_spb_prp_shutdown_db)
+  SRB.Add(isc_spb_prp_shutdown_db).AsInteger := Wait
   else if (Options = DenyTransaction) then
-    ServiceStartAddParam (Wait, isc_spb_prp_deny_new_transactions)
+    SRB.Add(isc_spb_prp_deny_new_transactions).AsInteger := Wait
   else
-    ServiceStartAddParam (Wait, isc_spb_prp_deny_new_attachments);
+    SRB.Add(isc_spb_prp_deny_new_attachments).AsInteger := Wait;
   InternalServiceStart;
 end;
+
 
 { TIBStatisticalService }
 
@@ -1407,12 +1228,11 @@ begin
 end;
 
 procedure TIBStatisticalService.SetServiceStartOptions;
-var
-  param: Integer;
+var param: integer;
 begin
   if FDatabaseName = '' then
     IBError(ibxeStartParamsError, [nil]);
-  param := 0;
+
   if (DataPages in Options) then
     param := param or isc_spb_sts_data_pages;
 {  if (DbLog in Options) then
@@ -1424,9 +1244,9 @@ begin
   if (SystemRelations in Options) then
     param := param or isc_spb_sts_sys_relations;
   Action := isc_action_svc_db_stats;
-  ServiceStartParams  := Char(isc_action_svc_db_stats);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
-  ServiceStartAddParam (param, SPBConstantValues[isc_spb_options]);
+  SRB.Add(isc_action_svc_db_stats);
+  SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
+  SRB.Add(isc_spb_options).AsInteger := param;
 end;
 
 { TIBBackupService }
@@ -1453,26 +1273,25 @@ begin
   if (ConvertExtTables in Options) then
     param := param or isc_spb_bkp_convert;
   Action := isc_action_svc_backup;
-  ServiceStartParams  := Char(isc_action_svc_backup);
-  ServiceStartAddParam(FDatabaseName, SPBConstantValues[isc_spb_dbname]);
-  ServiceStartAddParam(param, SPBConstantValues[isc_spb_options]);
+  SRB.Add(isc_action_svc_backup);
+  SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
+  SRB.Add(isc_spb_options).AsInteger := param;
   if Verbose then
-    ServiceStartParams := ServiceStartParams + Char(SPBConstantValues[isc_spb_verbose]);
+    SRB.Add(isc_spb_verbose);
   if FBlockingFactor > 0 then
-    ServiceStartAddParam(FBlockingFactor, isc_spb_bkp_factor);
+    SRB.Add(isc_spb_bkp_factor).AsInteger := FBlockingFactor;
   for i := 0 to FBackupFile.Count - 1 do
   begin
     if (Trim(FBackupFile[i]) = '') then
       continue;
     if (Pos('=', FBackupFile[i]) <> 0) then
     begin {mbcs ok}
-      ServiceStartAddParam(FBackupFile.Names[i], isc_spb_bkp_file);
+      SRB.Add(isc_spb_bkp_file).AsString := FBackupFile.Names[i];
       value := Copy(FBackupFile[i], Pos('=', FBackupFile[i]) + 1, Length(FBackupFile.Names[i])); {mbcs ok}
-      param := StrToInt(value);
-      ServiceStartAddParam(param, isc_spb_bkp_length);
+      SRB.Add(isc_spb_bkp_length).AsInteger := StrToInt(value);;
     end
     else
-      ServiceStartAddParam(FBackupFile[i], isc_spb_bkp_file);
+      SRB.Add(isc_spb_bkp_file).AsString := FBackupFile.Names[i];
   end;
 end;
 
@@ -1516,38 +1335,37 @@ begin
   if (UseAllSpace in Options) then
     param := param or isc_spb_res_use_all_space;
   Action := isc_action_svc_restore;
-  ServiceStartParams  := Char(isc_action_svc_restore);
-  ServiceStartAddParam(param, SPBConstantValues[isc_spb_options]);
-  if Verbose then ServiceStartParams := ServiceStartParams + Char(SPBConstantValues[isc_spb_verbose]);
+  SRB.Add(isc_action_svc_restore);
+  SRB.Add(isc_spb_options).AsInteger := param;
+  if Verbose then
+    SRB.Add(isc_spb_verbose);
   if FPageSize > 0 then
-    ServiceStartAddParam(FPageSize, isc_spb_res_page_size);
+    SRB.Add(isc_spb_res_page_size).AsInteger := FPageSize;
   if FPageBuffers > 0 then
-    ServiceStartAddParam(FPageBuffers, isc_spb_res_buffers);
+    SRB.Add(isc_spb_res_buffers).AsInteger := FPageBuffers;
   for i := 0 to FBackupFile.Count - 1 do
   begin
     if (Trim(FBackupFile[i]) = '') then continue;
     if (Pos('=', FBackupFile[i]) <> 0) then  {mbcs ok}
     begin 
-      ServiceStartAddParam(AnsiUpperCase(FBackupFile.Names[i]), isc_spb_bkp_file);
+      SRB.Add(isc_spb_bkp_file).AsString := FBackupFile.Names[i];
       value := Copy(FBackupFile[i], Pos('=', FBackupFile[i]) + 1, Length(FBackupFile.Names[i])); {mbcs ok}
-      param := StrToInt(value);
-      ServiceStartAddParam(param, isc_spb_bkp_length);
+      SRB.Add(isc_spb_bkp_length).AsInteger := StrToInt(value);;
     end
     else
-      ServiceStartAddParam(FBackupFile[i], isc_spb_bkp_file);
+      SRB.Add(isc_spb_bkp_file).AsString := FBackupFile.Names[i];
   end;
   for i := 0 to FDatabaseName.Count - 1 do
   begin
     if (Trim(FDatabaseName[i]) = '') then continue;
     if (Pos('=', FDatabaseName[i]) <> 0) then {mbcs ok}
-    begin 
-      ServiceStartAddParam(FDatabaseName.Names[i], SPBConstantValues[isc_spb_dbname]);
+    begin
+      SRB.Add(isc_spb_dbname).AsString := FDatabaseName.Names[i];
       value := Copy(FDatabaseName[i], Pos('=', FDatabaseName[i]) + 1, Length(FDatabaseName[i])); {mbcs ok}
-      param := StrToInt(value);
-      ServiceStartAddParam(param, isc_spb_res_length);
+      SRB.Add(isc_spb_res_length).AsInteger :=  StrToInt(value);
     end
     else
-      ServiceStartAddParam(FDatabaseName[i], SPBConstantValues[isc_spb_dbname]);
+      SRB.Add(isc_spb_dbname).AsString := FDatabaseName.Names[i];
   end;
 end;
 
@@ -1594,98 +1412,106 @@ end;
 
 procedure TIBValidationService.FetchLimboTransactionInfo;
 var
-  i, RunLen: Integer;
+  i: Integer;
   Value: Char;
 begin
-  ServiceQueryParams := Char(isc_info_svc_limbo_trans);
+  SRB.Add(isc_info_svc_limbo_trans);
   InternalServiceQuery;
-  RunLen := 0;
-  if (OutputBuffer[RunLen] <> Char(isc_info_svc_limbo_trans)) then
-    IBError(ibxeOutputParsingError, [nil]);
-  Inc(RunLen, 3);
-  for i := 0 to High(FLimboTransactionInfo) do
-    FLimboTransactionInfo[i].Free;
-  FLimboTransactionInfo := nil;
-  i := 0;
-  while (OutputBuffer[RunLen] <> Char(isc_info_end)) do
+
+  if (FServiceQueryResults.Count = 0) or
+             (FServiceQueryResults[0].getItemType <> isc_info_svc_limbo_trans) then
+   IBError(ibxeOutputParsingError, [nil]);
+
+  with FServiceQueryResults[0] do
   begin
-    if (i >= Length(FLimboTransactionInfo)) then
-      SetLength(FLimboTransactionInfo, i + 10);
-    if FLimboTransactionInfo[i] = nil then
-      FLimboTransactionInfo[i] := TLimboTransactionInfo.Create;
-    with FLimboTransactionInfo[i] do
+    for i := 0 to High(FLimboTransactionInfo) do
+      FLimboTransactionInfo[i].Free;
+    SetLength(FLimboTransactionInfo,0);
+    SetLength(FLimboTransactionInfo, FServiceQueryResults.Count);
+
+    for i := 0 to FServiceQueryResults.Count - 1 do
+    with FServiceQueryResults[i] do
     begin
-      if (OutputBuffer[RunLen] = Char(isc_spb_single_tra_id)) then
+      if FLimboTransactionInfo[i] = nil then
+        FLimboTransactionInfo[i] := TLimboTransactionInfo.Create;
+
+      with FLimboTransactionInfo[i] do
       begin
-        Inc(RunLen);
-        MultiDatabase := False;
-        ID := ParseInteger(RunLen);
-      end
-      else
-      begin
-        Inc(RunLen);
-        MultiDatabase := True;
-        ID := ParseInteger(RunLen);
-        HostSite := ParseString(RunLen);
-        if (OutputBuffer[RunLen] <> Char(isc_spb_tra_state)) then
-          IBError(ibxeOutputParsingError, [nil]);
-        Inc(RunLen);
-        Value := OutputBuffer[RunLen];
-        Inc(RunLen);
-        if (Value = Char(isc_spb_tra_state_limbo)) then
-          State := LimboState
-        else
-          if (Value = Char(isc_spb_tra_state_commit)) then
-            State := CommitState
-          else
-            if (Value = Char(isc_spb_tra_state_rollback)) then
-              State := RollbackState
-            else
-              State := UnknownState;
-        RemoteSite := ParseString(RunLen);
-        RemoteDatabasePath := ParseString(RunLen);
-        Value := OutputBuffer[RunLen];
-        Inc(RunLen);
-        if (Value = Char(isc_spb_tra_advise_commit)) then
-        begin
-          Advise := CommitAdvise;
-          Action:= CommitAction;
-        end
-        else
-          if (Value = Char(isc_spb_tra_advise_rollback)) then
+        { if no advice commit as default }
+        Advise := UnknownAdvise;
+        Action:= CommitAction;
+
+        case getItemType of
+          isc_spb_single_tra_id:
+          begin
+            MultiDatabase := False;
+            ID := AsInteger;
+          end;
+
+          isc_spb_multi_tra_id:
+          begin
+            MultiDatabase := True;
+            ID := AsInteger;
+          end;
+
+          isc_spb_tra_host_site:
+            HostSite := AsString;
+
+          isc_spb_tra_state:
+            case AsByte of
+              isc_spb_tra_state_limbo:
+                State := LimboState;
+
+              isc_spb_tra_state_commit:
+                State := CommitState;
+
+              isc_spb_tra_state_rollback:
+                State := RollbackState
+              else
+                State := UnknownState;
+            end;
+
+          isc_spb_tra_remote_site:
+            RemoteSite := AsString;
+
+          isc_spb_tra_db_path:
+            RemoteDatabasePath := AsString;
+
+          isc_spb_tra_advise_commit:
+          begin
+            Advise := CommitAdvise;
+            Action:= CommitAction;
+          end;
+
+          isc_spb_tra_advise_rollback:
           begin
             Advise := RollbackAdvise;
             Action := RollbackAction;
-          end
-          else
-          begin
-            { if no advice commit as default }
-            Advise := UnknownAdvise;
-            Action:= CommitAction;
           end;
+
+          else
+            IBError(ibxeOutputParsingError, [nil]);
+        end;
       end;
-      Inc (i);
     end;
   end;
-  if (i > 0) then
-    SetLength(FLimboTransactionInfo, i+1);
 end;
 
 procedure TIBValidationService.FixLimboTransactionErrors;
 var
   i: Integer;
 begin
-  ServiceStartParams  := Char(isc_action_svc_repair);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
+  SRB.Add(isc_action_svc_repair);
+  SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
   if (FGlobalAction = NoGlobalAction) then
   begin
     i := 0;
     while (FLimboTransactionInfo[i].ID <> 0) do
     begin
       if (FLimboTransactionInfo[i].Action = CommitAction) then
-        ServiceStartAddParam (FLimboTransactionInfo[i].ID, isc_spb_rpr_commit_trans)
+        SRB.Add(isc_spb_rpr_commit_trans).AsInteger :=  FLimboTransactionInfo[i].ID
       else
-        ServiceStartAddParam (FLimboTransactionInfo[i].ID, isc_spb_rpr_rollback_trans);                              
+        SRB.Add(isc_spb_rpr_rollback_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
       Inc(i);
     end;
   end
@@ -1695,13 +1521,13 @@ begin
     if (FGlobalAction = CommitGlobal) then
       while (FLimboTransactionInfo[i].ID <> 0) do
       begin
-        ServiceStartAddParam (FLimboTransactionInfo[i].ID, isc_spb_rpr_commit_trans);
+        SRB.Add(isc_spb_rpr_commit_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
         Inc(i);
       end
     else
       while (FLimboTransactionInfo[i].ID <> 0) do
       begin
-        ServiceStartAddParam (FLimboTransactionInfo[i].ID, isc_spb_rpr_rollback_trans);
+        SRB.Add(isc_spb_rpr_rollback_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
         Inc(i);
       end;
   end;
@@ -1738,10 +1564,11 @@ begin
     param := param or isc_spb_rpr_sweep_db;
   if (ValidateDB in Options) then
     param := param or isc_spb_rpr_validate_db;
-  ServiceStartParams  := Char(isc_action_svc_repair);
-  ServiceStartAddParam (FDatabaseName, SPBConstantValues[isc_spb_dbname]);
+
+  SRB.Add(isc_action_svc_repair);
+  SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
   if param > 0 then
-    ServiceStartAddParam (param, SPBConstantValues[isc_spb_options]);
+    SRB.Add(isc_spb_options).AsInteger := param;
   param := 0;
   if (LimboTransactions in Options) then
     param := param or isc_spb_rpr_list_limbo_trans;
@@ -1760,7 +1587,7 @@ begin
        param := param or isc_spb_rpr_validate_db;
   end;
   if param > 0 then
-    ServiceStartAddParam (param, SPBConstantValues[isc_spb_options]);
+   SRB.Add(isc_spb_options).AsInteger := param;
 end;
 
 { TIBSecurityService }
@@ -1782,55 +1609,40 @@ end;
 
 procedure TIBSecurityService.FetchUserInfo;
 var
-  i, RunLen: Integer;
+  i: Integer;
 begin
-  ServiceQueryParams := Char(isc_info_svc_get_users);
+  SRB.Add(isc_info_svc_get_users);
   InternalServiceQuery;
-  RunLen := 0;
-  if (OutputBuffer[RunLen] <> Char(isc_info_svc_get_users)) then
-    IBError(ibxeOutputParsingError, [nil]);
-  Inc(RunLen);
+
   for i := 0 to High(FUserInfo) do
     FUserInfo[i].Free;
-  FUserInfo := nil;
-  i := 0;
-  { Don't have any use for the combined length
-   so increment past by 2 }
-  Inc(RunLen, 2);
-  while (OutputBuffer[RunLen] <> Char(isc_info_end)) do
+  SetLength(FUserInfo,0);
+  SetLength(FUserInfo,FServiceQueryResults.Count);
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
   begin
-    if (i >= Length(FUSerInfo)) then
-      SetLength(FUserInfo, i + 10);
-    if (OutputBuffer[RunLen] <> Char(isc_spb_sec_username)) then
-      IBError(ibxeOutputParsingError, [nil]);
-    Inc(RunLen);
     if FUserInfo[i] = nil then
       FUserInfo[i] := TUserInfo.Create;
-    FUserInfo[i].UserName := ParseString(RunLen);
-    if (OutputBuffer[RunLen] <> Char(isc_spb_sec_firstname)) then
-      IBError(ibxeOutputParsingError, [nil]);
-    Inc(RunLen);
-    FUserInfo[i].FirstName := ParseString(RunLen);
-    if (OutputBuffer[RunLen] <> Char(isc_spb_sec_middlename)) then
-      IBError(ibxeOutputParsingError, [nil]);
-    Inc(RunLen);
-    FUserInfo[i].MiddleName := ParseString(RunLen);
-    if (OutputBuffer[RunLen] <> Char(isc_spb_sec_lastname)) then
-      IBError(ibxeOutputParsingError, [nil]);
-    Inc(RunLen);
-    FUserInfo[i].LastName := ParseString(RunLen);
-    if (OutputBuffer[RunLen] <> Char(isc_spb_sec_userId)) then
-      IBError(ibxeOutputParsingError, [nil]);
-    Inc(RunLen);
-    FUserInfo[i].UserId := ParseInteger(RunLen);
-    if (OutputBuffer[RunLen] <> Char(isc_spb_sec_groupid)) then
-      IBError(ibxeOutputParsingError, [nil]);
-    Inc(RunLen);
-    FUserInfo[i].GroupID := ParseInteger(RunLen);
-    Inc (i);
+    case getItemType of
+    isc_spb_sec_username:
+      FUserInfo[i].UserName := AsString;
+
+    isc_spb_sec_firstname:
+      FUserInfo[i].FirstName := AsString;
+
+    isc_spb_sec_middlename:
+      FUserInfo[i].MiddleName := AsString;
+
+    isc_spb_sec_lastname:
+      FUserInfo[i].LastName := AsString;
+
+    isc_spb_sec_userId:
+      FUserInfo[i].UserId := AsInteger;
+
+    isc_spb_sec_groupid:
+      FUserInfo[i].GroupID := AsInteger;
+    end;
   end;
-  if (i > 0) then
-    SetLength(FUserInfo, i+1);
 end;
 
 function TIBSecurityService.GetUserInfo(Index: Integer): TUserInfo;
@@ -1861,7 +1673,7 @@ end;
 procedure TIBSecurityService.DisplayUsers;
 begin
   SecurityAction := ActionDisplayUser;
-  ServiceStartParams  := Char(isc_action_svc_display_user);
+  SRB.Add(isc_action_svc_display_user);
   InternalServiceStart;
   FetchUserInfo;
 end;
@@ -1869,8 +1681,8 @@ end;
 procedure TIBSecurityService.DisplayUser(UserName: String);
 begin
   SecurityAction := ActionDisplayUser;
-  ServiceStartParams  := Char(isc_action_svc_display_user);
-  ServiceStartAddParam (UserName, isc_spb_sec_username);
+  SRB.Add(isc_action_svc_display_user);
+  SRB.Add(isc_spb_sec_username).AsString := UserName;
   InternalServiceStart;
   FetchUserInfo;
 end;
@@ -1955,15 +1767,15 @@ begin
       Len := Length(FUserName);
       if (Len = 0) then
         IBError(ibxeStartParamsError, [nil]);
-      ServiceStartParams  := Char(isc_action_svc_add_user);
-      ServiceStartAddParam (FSQLRole, SPBConstantValues[isc_spb_sql_role_name]);
-      ServiceStartAddParam (FUserName, isc_spb_sec_username);
-      ServiceStartAddParam (FUserID, isc_spb_sec_userid);
-      ServiceStartAddParam (FGroupID, isc_spb_sec_groupid);
-      ServiceStartAddParam (FPassword, isc_spb_sec_password);
-      ServiceStartAddParam (FFirstName, isc_spb_sec_firstname);
-      ServiceStartAddParam (FMiddleName, isc_spb_sec_middlename);
-      ServiceStartAddParam (FLastName, isc_spb_sec_lastname);
+      SRB.Add(isc_action_svc_add_user);
+      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
+      SRB.Add(isc_spb_sec_username).AsString := FUserName;
+      SRB.Add(isc_spb_sec_userid).AsInteger := FUserID;
+      SRB.Add(isc_spb_sec_groupid).AsInteger := FGroupID;
+      SRB.Add(isc_spb_sec_password).AsString := FPassword;
+      SRB.Add(isc_spb_sec_firstname).AsString := FFirstName;
+      SRB.Add(isc_spb_sec_middlename).AsString := FMiddleName;
+      SRB.Add(isc_spb_sec_lastname).AsString := FLastName;
     end;
     ActionDeleteUser:
     begin
@@ -1971,9 +1783,9 @@ begin
       Len := Length(FUserName);
       if (Len = 0) then
         IBError(ibxeStartParamsError, [nil]);
-      ServiceStartParams  := Char(isc_action_svc_delete_user);
-      ServiceStartAddParam (FSQLRole, SPBConstantValues[isc_spb_sql_role_name]);
-      ServiceStartAddParam (FUserName, isc_spb_sec_username);
+      SRB.Add(isc_action_svc_delete_user);
+      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
+      SRB.Add(isc_spb_sec_username).AsString := FUserName;
     end;
     ActionModifyUser:
     begin
@@ -1981,21 +1793,21 @@ begin
       Len := Length(FUserName);
       if (Len = 0) then
         IBError(ibxeStartParamsError, [nil]);
-      ServiceStartParams  := Char(isc_action_svc_modify_user);
-      ServiceStartAddParam (FSQLRole, SPBConstantValues[isc_spb_sql_role_name]);
-      ServiceStartAddParam (FUserName, isc_spb_sec_username);
+      SRB.Add(isc_action_svc_modify_user);
+      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
+      SRB.Add(isc_spb_sec_username).AsString := FUserName;
       if (ModifyUserId in FModifyParams) then
-        ServiceStartAddParam (FUserID, isc_spb_sec_userid);
+        SRB.Add(isc_spb_sec_userid).AsInteger := FUserID;
       if (ModifyGroupId in FModifyParams) then
-        ServiceStartAddParam (FGroupID, isc_spb_sec_groupid);
+        SRB.Add(isc_spb_sec_groupid).AsInteger := FGroupID;
       if (ModifyPassword in FModifyParams) then
-        ServiceStartAddParam (FPassword, isc_spb_sec_password);
+        SRB.Add(isc_spb_sec_password).AsString := FPassword;
       if (ModifyFirstName in FModifyParams) then
-        ServiceStartAddParam (FFirstName, isc_spb_sec_firstname);
+        SRB.Add(isc_spb_sec_firstname).AsString := FFirstName;
       if (ModifyMiddleName in FModifyParams) then
-        ServiceStartAddParam (FMiddleName, isc_spb_sec_middlename);
+        SRB.Add(isc_spb_sec_middlename).AsString := FMiddleName;
       if (ModifyLastName in FModifyParams) then
-        ServiceStartAddParam (FLastName, isc_spb_sec_lastname);
+        SRB.Add(isc_spb_sec_lastname).AsString := FLastName;
     end;
   end;
   ClearParams;
@@ -2018,7 +1830,7 @@ end;
 
 function TIBControlAndQueryService.GetNextChunk: String;
 var
-  Length: Integer;
+  i: Integer;
 begin
   if (FEof = True) then
   begin
@@ -2027,50 +1839,51 @@ begin
   end;
   if (FAction = 0) then
     IBError(ibxeQueryParamsError, [nil]);
-  ServiceQueryParams := Char(isc_info_svc_to_eof);
+
+  SRB.Add(isc_info_svc_line);
   InternalServiceQuery;
-  if (OutputBuffer[0] <> Char(isc_info_svc_to_eof)) then
-    IBError(ibxeOutputParsingError, [nil]);
-  Length := isc_vax_integer(OutputBuffer + 1, 2);
-  if (OutputBuffer[3 + Length] = Char(isc_info_truncated)) then
-    FEof := False
-  else
-    if (OutputBuffer[3 + Length] = Char(isc_info_end)) then
-      FEof := True
+
+  FEof := True;
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
+  begin
+    case getItemType of
+      isc_info_svc_to_eof:
+        Result := AsString;
+
+      isc_info_truncated:
+        FEof := False;
     else
       IBError(ibxeOutputParsingError, [nil]);
-  OutputBuffer[3 + Length] := #0;
-  result := String(PChar(@OutputBuffer[3]));
+    end;
+  end;
 end;
 
 function TIBControlAndQueryService.GetNextLine: String;
 var
-  Length: Integer;
+  i: Integer;
 begin
+  Result := '';
   if (FEof = True) then
-  begin
-    result := '';
     exit;
-  end;
+
   if (FAction = 0) then
     IBError(ibxeQueryParamsError, [nil]);
-  ServiceQueryParams := Char(isc_info_svc_line);
+
+  SRB.Add(isc_info_svc_line);
   InternalServiceQuery;
-  if (OutputBuffer[0] <> Char(isc_info_svc_line)) then
-    IBError(ibxeOutputParsingError, [nil]);
-  Length := isc_vax_integer(OutputBuffer + 1, 2);
-  if (OutputBuffer[3 + Length] <> Char(isc_info_end)) then
-    IBError(ibxeOutputParsingError, [nil]);
-  if (length <> 0) then
-    FEof := False
-  else
+
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
   begin
-    result := '';
-    FEof := True;
-    exit;
+    case getItemType of
+      isc_info_svc_line:
+         Result := AsString;
+    else
+      IBError(ibxeOutputParsingError, [nil]);
+    end;
   end;
-  OutputBuffer[3 + Length] := #0;
-  result := String(PChar(@OutputBuffer[3]));
+  FEOF := REsult = '';
 end;
 
 { TIBLogService }
@@ -2078,7 +1891,7 @@ end;
 procedure TIBLogService.SetServiceStartOptions;
 begin
   Action := isc_action_svc_get_ib_log;
-  ServiceStartParams  := Char(isc_action_svc_get_ib_log);
+  SRB.Add(isc_action_svc_get_ib_log);
 end;
 
 { TDatabaseInfo }

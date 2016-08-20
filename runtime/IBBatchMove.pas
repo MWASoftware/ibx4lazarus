@@ -53,7 +53,6 @@ type
 
   TIBBatchMove = class(TComponent)
   private
-    FIBLoaded: Boolean;
     FDestination: TIBTable;
     FSource: TIBCustomDataSet;
     FMode: TBatchMode;
@@ -105,16 +104,13 @@ type
 
 implementation
 
-uses IBIntf;
+uses FBMessages;
 
 { TIBBatchMove }
 
 constructor TIBBatchMove.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FIBLoaded := False;
-  CheckIBLoaded;
-  FIBLoaded := True;
   FAbortOnKeyViol := True;
   FAbortOnProblem := True;
   FTransliterate := True;
@@ -123,8 +119,8 @@ end;
 
 destructor TIBBatchMove.Destroy;
 begin
-  if FIBLoaded then
-  FMappings.Free;
+  if FMappings <> nil then
+    FMappings.Free;
   inherited Destroy;
 end;
 

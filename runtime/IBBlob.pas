@@ -37,7 +37,7 @@ unit IBBlob;
 interface
 
 uses
-  SysUtils, Classes, IBHeader, IBErrorCodes, IBExternals, DB, IB, IBDatabase;
+  SysUtils, Classes, IBExternals, DB, IB, IBDatabase;
 
 
 const
@@ -50,28 +50,26 @@ type
   TIBBlobStream = class(TStream)
   private
     FBase: TIBBase;
-    FBlobID: TISC_QUAD;
+    FBlob: IBlob;
     FBlobMaxSegmentSize: Int64;
     FBlobNumSegments: Int64;
     FBlobSize: Int64;
-    FBlobType: Short;  { 0 = segmented, 1 = streamed }
+    FBlobType: TBlobType;
     FBuffer: PChar;
-    FHandle: TISC_BLOB_HANDLE;
     FMode: TBlobStreamMode;
     FPosition: Int64;
     FBlobState: TIBBlobStates;
+    function GetBlobID: TISC_QUAD;
     function GetModified: Boolean;
+    procedure CheckActive;
   protected
     procedure CloseBlob;
-    procedure CreateBlob;
     procedure EnsureBlobInitialized;
     procedure EnsureLoaded;
     procedure GetBlobInfo;
     function  GetSize: Int64; override;
     function GetDatabase: TIBDatabase;
-    function GetDBHandle: PISC_DB_HANDLE;
     function GetTransaction: TIBTransaction;
-    function GetTRHandle: PISC_TR_HANDLE;
     procedure OpenBlob;
     procedure SetBlobID(Value: TISC_QUAD);
     procedure SetDatabase(Value: TIBDatabase);
@@ -81,7 +79,6 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function Call(ErrCode: ISC_STATUS; RaiseError: Boolean): ISC_STATUS;
     procedure CheckReadable;
     procedure CheckWritable;
     procedure Finalize;
@@ -95,121 +92,21 @@ type
     procedure SetSize(NewSize: Longint); override;
     procedure Truncate;
     function Write(const Buffer; Count: Longint): Longint; override;
-    property Handle: TISC_BLOB_HANDLE read FHandle;
-    property BlobID: TISC_QUAD read FBlobID write SetBlobID;
+    property BlobID: TISC_QUAD read GetBlobID write SetBlobID;
+    property Blob: IBlob read FBlob;
     property BlobMaxSegmentSize: Int64 read FBlobMaxSegmentSize;
     property BlobNumSegments: Int64 read FBlobNumSegments;
     property BlobSize: Int64 read GetSize;
-    property BlobType: Short read FBlobType;
+    property BlobType: TBlobType read FBlobType;
     property Database: TIBDatabase read GetDatabase write SetDatabase;
-    property DBHandle: PISC_DB_HANDLE read GetDBHandle;
     property Mode: TBlobStreamMode read FMode write SetMode;
     property Modified: Boolean read GetModified;
     property Transaction: TIBTransaction read GetTransaction write SetTransaction;
-    property TRHandle: PISC_TR_HANDLE read GetTRHandle;
   end;
-
-  procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments: Int64; var MaxSegmentSize,
-                      TotalSize: Int64; var BlobType: Short);
-  function GetBlobCharSetID(hDB_Handle: TISC_DB_HANDLE; hTR_Handle: TISC_TR_HANDLE;
-                      tableName, columnName: PChar): short;
-  procedure ReadBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);
-  procedure WriteBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);
 
 implementation
 
-uses IBIntf;
-
-procedure GetBlobInfo(hBlobHandle: PISC_BLOB_HANDLE; var NumSegments: Int64; var MaxSegmentSize,
-                      TotalSize: Int64; var BlobType: Short);
-var
-  items: array[0..3] of Char;
-  results: array[0..99] of Char;
-  i, item_length: Integer;
-  item: Integer;
-begin
-  items[0] := Char(isc_info_blob_num_segments);
-  items[1] := Char(isc_info_blob_max_segment);
-  items[2] := Char(isc_info_blob_total_length);
-  items[3] := Char(isc_info_blob_type);
-
-  if isc_blob_info(StatusVector, hBlobHandle, 4, @items[0], SizeOf(results),
-                    @results[0]) > 0 then
-    IBDatabaseError;
-
-  i := 0;
-  while (i < SizeOf(results)) and (results[i] <> Char(isc_info_end)) do
-  begin
-    item := Integer(results[i]); Inc(i);
-    item_length := isc_vax_integer(@results[i], 2); Inc(i, 2);
-    case item of
-      isc_info_blob_num_segments:
-        NumSegments := isc_portable_integer(@results[i], item_length);
-      isc_info_blob_max_segment:
-        MaxSegmentSize := isc_portable_integer(@results[i], item_length);
-      isc_info_blob_total_length:
-        TotalSize := isc_portable_integer(@results[i], item_length);
-      isc_info_blob_type:
-        BlobType := isc_portable_integer(@results[i], item_length);
-    end;
-    Inc(i, item_length);
-  end;
-end;
-
-function GetBlobCharSetID(hDB_Handle: TISC_DB_HANDLE;
-  hTR_Handle: TISC_TR_HANDLE; tableName, columnName: PChar): short;
-var desc: TISC_BLOB_DESC;
-    uGlobal: array [0..31] of char;
-begin
-  if isc_blob_lookup_desc(StatusVector,@hDB_Handle,@hTR_Handle,
-                tableName,columnName,@desc,@uGlobal) > 0 then
-    IBDatabaseError;
-
-  Result := desc.blob_desc_charset;
-end;
-
-procedure ReadBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar; BlobSize: Int64);
-var
-  CurPos: Int64;
-  BytesRead, SegLen: UShort;
-  LocalBuffer: PChar;
-begin
-  CurPos := 0;
-  LocalBuffer := Buffer;
-  SegLen := UShort(DefaultBlobSegmentSize);
-  while (CurPos < BlobSize) do
-  begin
-    if (CurPos + SegLen > BlobSize) then
-      SegLen := BlobSize - CurPos;
-    if not ((isc_get_segment(StatusVector, hBlobHandle, @BytesRead, SegLen,
-                             LocalBuffer) = 0) or
-            (StatusVectorArray[1] = isc_segment)) then
-      IBDatabaseError;
-    Inc(LocalBuffer, BytesRead);
-    Inc(CurPos, BytesRead);
-    BytesRead := 0;
-  end;
-end;
-
-procedure WriteBlob(hBlobHandle: PISC_BLOB_HANDLE; Buffer: PChar;
-  BlobSize: Int64);
-var
-  CurPos: Int64;
-  SegLen: Long;
-begin
-  CurPos := 0;
-  SegLen := DefaultBlobSegmentSize;
-  while (CurPos < BlobSize) do
-  begin
-    if (CurPos + SegLen > BlobSize) then
-      SegLen := BlobSize - CurPos;
-    if isc_put_segment(StatusVector, hBlobHandle, SegLen,
-         PChar(@Buffer[CurPos])) > 0 then
-      IBDatabaseError;
-    Inc(CurPos, SegLen);
-  end;
-end;
-
+uses FBMessages;
 
 { TIBBlobStream }
 constructor TIBBlobStream.Create;
@@ -219,23 +116,16 @@ begin
   FBuffer := nil;
   FBlobSize := 0;
   FBlobState := bsUninitialised;
+  FBlob := nil;
 end;
 
 destructor TIBBlobStream.Destroy;
 begin
   SetState(bsUninitialised);
+  FBlob := nil;
   FBase.Free;
   SetSize(0);
   inherited Destroy;
-end;
-
-function TIBBlobStream.Call(ErrCode: ISC_STATUS; RaiseError: Boolean): ISC_STATUS;
-begin
-  result := 0;
-  if Transaction <> nil then
-    result := Transaction.Call(ErrCode, RaiseError)
-  else if RaiseError and (ErrCode > 0) then
-    IBDataBaseError;
 end;
 
 procedure TIBBlobStream.CheckReadable;
@@ -253,37 +143,60 @@ begin
   Result := FBlobState = bsModified;
 end;
 
+procedure TIBBlobStream.CheckActive;
+begin
+  if Database = nil then
+    IBError(ibxeDatabaseNotAssigned,[nil]);
+
+  if (Database.Attachment = nil) or
+                     not Database.Attachment.IsConnected then
+    IBError(ibxeDatabaseClosed,[nil]);
+
+  if Transaction = nil then
+    IBError(ibxeTransactionNotAssigned,[nil]);
+
+  if (Transaction.TransactionIntf = nil) or
+      not Transaction.TransactionIntf.InTransaction then
+    IBError(ibxeNotInTransaction,[nil]);
+end;
+
+function TIBBlobStream.GetBlobID: TISC_QUAD;
+begin
+  if FBlob = nil then
+  begin
+    Result.gds_quad_high := 0;
+    Result.gds_quad_low := 0;
+  end
+  else
+    Result := FBlob.GetBlobID;
+end;
+
 procedure TIBBlobStream.CloseBlob;
 begin
   Finalize;
+  FBlob := nil;
   SetState(bsUninitialised);
-end;
-
-procedure TIBBlobStream.CreateBlob;
-begin
-  CheckWritable;
-  FBlobID.gds_quad_high := 0;
-  FBlobID.gds_quad_low := 0;
-  SetState(bsData);
-  SetSize(0);
 end;
 
 procedure TIBBlobStream.EnsureBlobInitialized;
 begin
-  if FBlobState = bsUninitialised then
-    case FMode of
-      bmWrite:
-        CreateBlob;
-      bmReadWrite: begin
-        if (FBlobID.gds_quad_high = 0) and
-           (FBlobID.gds_quad_low = 0) then
-          CreateBlob
-        else
-          OpenBlob;
-      end;
-      else
-        OpenBlob;
+  if FBlobState <> bsUninitialised then Exit;
+
+  if FMode = bmWrite then
+    SetState(bsData)
+  else
+  begin
+    CheckReadable;
+    if FBlob = nil then Exit;
+    try
+      GetBlobInfo;
+      {Defer reading in blob until read method called}
+    except
+      FBlob := nil;
+      raise;
     end;
+    SetState(bsDataPending);
+  end;
 end;
 
 procedure TIBBlobStream.EnsureLoaded;
@@ -292,12 +205,7 @@ begin
   if FBlobState = bsDataPending then
   begin
     SetSize(FBlobSize);
-    try
-      IBBlob.ReadBlob(@FHandle, FBuffer, FBlobSize);
-    except
-      Call(isc_close_blob(StatusVector, @FHandle), False);
-      raise;
-    end;
+    FBlob.Read(FBuffer^, FBlobSize);
     SetState(bsData);
   end;
 end;
@@ -306,18 +214,13 @@ procedure TIBBlobStream.Finalize;
 begin
   if FBlobState <> bsModified then
     exit;
+  CheckWritable;
   if FBlobSize > 0 then
   begin
     { need to start writing to a blob, create one }
-    Call(isc_create_blob2(StatusVector, DBHandle, TRHandle, @FHandle, @FBlobID,
-                         0, nil), True);
-    IBBlob.WriteBlob(@FHandle, FBuffer, FBlobSize);
-    Call(isc_close_blob(StatusVector, @FHandle), True);
-  end
-  else
-  begin
-    FBlobID.gds_quad_high := 0;
-    FBlobID.gds_quad_low := 0;
+    FBlob := Database.Attachment.CreateBlob(Transaction.TransactionIntf);
+    FBlob.Write(FBuffer^, FBlobSize);
+    FBlob.Close;
   end;
   SetState(bsData);
 end;
@@ -326,8 +229,9 @@ procedure TIBBlobStream.GetBlobInfo;
 var
   iBlobSize: Int64;
 begin
-  IBBlob.GetBlobInfo(@FHandle, FBlobNumSegments, FBlobMaxSegmentSize,
-    iBlobSize, FBlobType);
+  if FBlob = nil then Exit;
+
+  FBlob.GetInfo(FBlobNumSegments, FBlobMaxSegmentSize, iBlobSize, FBlobType);
   SetSize(iBlobSize);
 end;
 
@@ -342,19 +246,9 @@ begin
   result := FBase.Database;
 end;
 
-function TIBBlobStream.GetDBHandle: PISC_DB_HANDLE;
-begin
-  result := FBase.DBHandle;
-end;
-
 function TIBBlobStream.GetTransaction: TIBTransaction;
 begin
   result := FBase.Transaction;
-end;
-
-function TIBBlobStream.GetTRHandle: PISC_TR_HANDLE;
-begin
-  result := FBase.TRHandle;
 end;
 
 procedure TIBBlobStream.LoadFromFile(Filename: string);
@@ -383,13 +277,11 @@ end;
 procedure TIBBlobStream.OpenBlob;
 begin
   CheckReadable;
-  Call(isc_open_blob2(StatusVector, DBHandle, TRHandle, @FHandle,
-                     @FBlobID, 0, nil), True);
   try
     GetBlobInfo;
     {Defer reading in blob until read method called}
   except
-    Call(isc_close_blob(StatusVector, @FHandle), False);
+    FBlob.Close;
     raise;
   end;
   SetState(bsDataPending);
@@ -448,8 +340,10 @@ end;
 
 procedure TIBBlobStream.SetBlobID(Value: TISC_QUAD);
 begin
-  System.Move(Value, FBlobID, SizeOf(TISC_QUAD));
-  SetState(bsUninitialised);
+  CheckActive;
+  FBlob := Database.Attachment.OpenBlob(Transaction.TransactionIntf,Value);
+  if FBlobState <> bsData then
+    SetState(bsUninitialised);
 end;
 
 procedure TIBBlobStream.SetDatabase(Value: TIBDatabase);
@@ -469,7 +363,7 @@ begin
   if FBlobState = aValue then Exit;
 
   if FBlobState = bsDataPending then
-    Call(isc_close_blob(StatusVector, @FHandle), True);
+    FBlob.Close;
 
   FBlobState := aValue;
 end;

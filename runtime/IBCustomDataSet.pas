@@ -122,6 +122,18 @@ type
   end;
   PRecordData = ^TRecordData;
 
+  { TIBArrayField }
+
+  TIBArrayField = class(TField)
+  private
+    FRelationName: string;
+    function GetArrayIntf: IArray;
+    procedure SetArrayIntf(AValue: IArray);
+  public
+    constructor Create(AOwner: TComponent); override;
+    property ArrayIntf: IArray read GetArrayIntf write SetArrayIntf;
+  end;
+
   { TIBStringField allows us to have strings longer than 8196 }
 
   TIBStringField = class(TStringField)
@@ -306,7 +318,6 @@ type
     FNeedsRefresh: Boolean;
     FForcedRefresh: Boolean;
     FDidActivate: Boolean;
-    FIBLoaded: Boolean;
     FBase: TIBBase;
     FBlobCacheOffset: Integer;
     FBlobStreamList: TList;
@@ -363,7 +374,7 @@ type
     FCloseAction: TTransactionAction;
     FInTransactionEnd: boolean;
     FIBLinks: TList;
-    function GetSelectStmtHandle: TISC_STMT_HANDLE;
+    function GetSelectStmtIntf: IStatement;
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
 
@@ -386,16 +397,14 @@ type
     procedure FetchCurrentRecordToBuffer(Qry: TIBSQL; RecordNumber: Integer;
                                          Buffer: PChar);
     function GetDatabase: TIBDatabase;
-    function GetDBHandle: PISC_DB_HANDLE;
     function GetDeleteSQL: TStrings;
     function GetInsertSQL: TStrings;
-    function GetSQLParams: TIBXSQLDA;
+    function GetSQLParams: ISQLParams;
     function GetRefreshSQL: TStrings;
     function GetSelectSQL: TStrings;
     function GetStatementType: TIBSQLTypes;
     function GetModifySQL: TStrings;
     function GetTransaction: TIBTransaction;
-    function GetTRHandle: PISC_TR_HANDLE;
     function GetParser: TSelectSQLParser;
     procedure InternalDeleteRecord(Qry: TIBSQL; Buff: Pointer); virtual;
     function InternalLocate(const KeyFields: string; const KeyValues: Variant;
@@ -527,8 +536,8 @@ type
   protected
     {Likely to be made public by descendant classes}
     property AutoCommit: TIBAutoCommit read FAutoCommit write FAutoCommit default acDisabled;
-    property SQLParams: TIBXSQLDA read GetSQLParams;
-    property Params: TIBXSQLDA read GetSQLParams;
+    property SQLParams: ISQLParams read GetSQLParams;
+    property Params: ISQLParams read GetSQLParams;
     property InternalPrepared: Boolean read FInternalPrepared;
     property QDelete: TIBSQL read FQDelete;
     property QInsert: TIBSQL read FQInsert;
@@ -536,7 +545,7 @@ type
     property QSelect: TIBSQL read FQSelect;
     property QModify: TIBSQL read FQModify;
     property StatementType: TIBSQLTypes read GetStatementType;
-    property SelectStmtHandle: TISC_STMT_HANDLE read GetSelectStmtHandle;
+    property SelectStmtHandle: IStatement read GetSelectStmtIntf;
 
     {Likely to be made published by descendant classes}
     property BufferChunks: Integer read FBufferChunks write SetBufferChunks;
@@ -587,6 +596,7 @@ type
     function BookmarkValid(Bookmark: TBookmark): Boolean; override;
     function CompareBookmarks(Bookmark1, Bookmark2: TBookmark): Integer; override;
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
+    function CreateArray(Field: TIBArrayField): IArray;
     function GetCurrentRecord(Buffer: PChar): Boolean; override;
     function GetFieldData(Field : TField; Buffer : Pointer) : Boolean; overload; override;
     function GetFieldData(FieldNo: Integer; Buffer: Pointer): Boolean; overload; (*override;*)
@@ -600,9 +610,7 @@ type
     function UpdateStatus: TUpdateStatus; override;
     function IsSequenced: Boolean; override;
     procedure Post; override;
-    function ParamByName(ParamName: String): TIBXSQLVAR;
-    property DBHandle: PISC_DB_HANDLE read GetDBHandle;
-    property TRHandle: PISC_TR_HANDLE read GetTRHandle;
+    function ParamByName(ParamName: String): ISQLParam;
     property UpdateObject: TIBDataSetUpdateObject read FUpdateObject write SetUpdateObject;
     property UpdatesPending: Boolean read FUpdatesPending;
     property UpdateRecordTypes: TIBUpdateRecordTypes read FUpdateRecordTypes
@@ -780,7 +788,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     TIBWideStringField,    { ftWideString }
     TLargeIntField,     { ftLargeInt }
     nil,          { ftADT }
-    nil,        { ftArray }
+    TIBArrayField,        { ftArray }
     nil,    { ftReference }
     nil,     { ftDataSet }
     TBlobField,         { ftOraBlob }
@@ -809,7 +817,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
 
 implementation
 
-uses IBIntf, Variants, FmtBCD, LazUTF8;
+uses Variants, FmtBCD, LazUTF8, FBMessages;
 
 const FILE_BEGIN = 0;
       FILE_CURRENT = 1;
@@ -842,6 +850,7 @@ type
     FCharacterSetSize: integer;
     {$IFDEF HAS_ANSISTRING_CODEPAGE}
     FCodePage: TSystemCodePage;
+    FRelationName: string;
     {$ENDIF}
   published
     property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
@@ -892,6 +901,29 @@ type
     end;
     Result := str;
   end;
+
+{ TIBArrayField }
+
+function TIBArrayField.GetArrayIntf: IArray;
+var ArrayID: PISC_QUAD;
+begin
+   if GetData(ArrayID) then
+   with DataSet as TIBCustomDataSet do
+     Result := Database.Attachment.OpenArray(Transaction.TransactionIntf,FRelationName,FieldName,ArrayID^);
+end;
+
+procedure TIBArrayField.SetArrayIntf(AValue: IArray);
+var ArrayID: TISC_QUAD;
+begin
+  ArrayID := AValue.GetArrayID;
+  SetData(@ArrayID);
+end;
+
+constructor TIBArrayField.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  SetDataType(ftArray);
+end;
 
 { TIBWideMemoField }
 
@@ -1216,9 +1248,6 @@ end;
 constructor TIBCustomDataSet.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FIBLoaded := False;
-  CheckIBLoaded;
-  FIBLoaded := True;
   FBase := TIBBase.Create(Self);
   FIBLinks := TList.Create;
   FCurrentRecord := -1;
@@ -1269,23 +1298,20 @@ end;
 destructor TIBCustomDataSet.Destroy;
 begin
   if Active then Active := false;
-  if FIBLoaded then
-  begin
-    if assigned(FGeneratorField) then FGeneratorField.Free;
-    FDataLink.Free;
-    FBase.Free;
-    ClearBlobCache;
-    ClearIBLinks;
-    FIBLinks.Free;
-    FBlobStreamList.Free;
-    FreeMem(FBufferCache);
-    FBufferCache := nil;
-    FreeMem(FOldBufferCache);
-    FOldBufferCache := nil;
-    FCacheSize := 0;
-    FOldCacheSize := 0;
-    FMappedFieldPosition := nil;
-  end;
+  if assigned(FGeneratorField) then FGeneratorField.Free;
+  FDataLink.Free;
+  FBase.Free;
+  ClearBlobCache;
+  ClearIBLinks;
+  FIBLinks.Free;
+  FBlobStreamList.Free;
+  FreeMem(FBufferCache);
+  FBufferCache := nil;
+  FreeMem(FOldBufferCache);
+  FOldBufferCache := nil;
+  FCacheSize := 0;
+  FOldCacheSize := 0;
+  FMappedFieldPosition := nil;
   if assigned(FBaseSQLSelect) then FBaseSQLSelect.Free;
   if assigned(FParser) then FParser.Free;
   inherited Destroy;
@@ -1310,7 +1336,7 @@ begin
       Inc(FCurrentRecord);
       if (FCurrentRecord = FRecordCount) then
       begin
-        if (not FQSelect.EOF) and (FQSelect.Next <> nil) then
+        if (not FQSelect.EOF) and FQSelect.Next  then
         begin
           FetchCurrentRecordToBuffer(FQSelect, FCurrentRecord, Buffer);
           Inc(FRecordCount);
@@ -1768,12 +1794,12 @@ var
   i, j: Integer;
   LocalData: Pointer;
   LocalDate, LocalDouble: Double;
+  LocalString: string;
   LocalInt: Integer;
   LocalBool: wordBool;
   LocalInt64: Int64;
   LocalCurrency: Currency;
   FieldsLoaded: Integer;
-  temp: TIBXSQLVAR;
 begin
   p := PRecordData(Buffer);
   { Make sure blob cache is empty }
@@ -1783,66 +1809,66 @@ begin
       pbd^[i] := nil;
   { Get record information }
   p^.rdBookmarkFlag := bfCurrent;
-  p^.rdFieldCount := Qry.Current.Count;
+  p^.rdFieldCount := Qry.FieldCount;
   p^.rdRecordNumber := RecordNumber;
   p^.rdUpdateStatus := usUnmodified;
   p^.rdCachedUpdateStatus := cusUnmodified;
   p^.rdSavedOffset := $FFFFFFFF;
 
   { Load up the fields }
-  FieldsLoaded := FQSelect.Current.Count;
+  FieldsLoaded := FQSelect.MetaData.Count;
   j := 1;
-  for i := 0 to Qry.Current.Count - 1 do
+  for i := 0 to Qry.MetaData.Count - 1 do
   begin
     if (Qry = FQSelect) then
       j := i + 1
-    else begin
+    else
+    begin
       if FieldsLoaded = 0 then
         break;
-      j := FQSelect.FieldIndex[Qry.Current[i].Name] + 1;
+      j := FQSelect.FieldIndex[Qry[i].Name] + 1;
       if j < 1 then
         continue
       else
         Dec(FieldsLoaded);
     end;
-    with FQSelect.Current[j - 1].Data^ do
-      if aliasname = 'IBX_INTERNAL_DBKEY' then {do not localize}
+    with FQSelect.MetaData[j - 1] do
+      if GetAliasname = 'IBX_INTERNAL_DBKEY' then {do not localize}
       begin
-        if sqllen <= 8 then
-          p^.rdDBKey := PIBDBKEY(Qry.Current[i].AsPointer)^;
+        if (GetSize <= 8) and (RecordNumber >= 0) then
+          p^.rdDBKey := PIBDBKEY(Qry[i].AsPointer)^;
         continue;
       end;
     if j > 0 then with p^ do
     begin
-      rdFields[j].fdDataType :=
-        Qry.Current[i].Data^.sqltype and (not 1);
-      rdFields[j].fdDataScale :=
-        Qry.Current[i].Data^.sqlscale;
-      rdFields[j].fdNullable :=
-        (Qry.Current[i].Data^.sqltype and 1 = 1);
-      rdFields[j].fdIsNull :=
-        (rdFields[j].fdNullable and (Qry.Current[i].Data^.sqlind^ = -1));
-      LocalData := Qry.Current[i].Data^.sqldata;
+      rdFields[j].fdDataType := Qry.MetaData[i].GetSqltype ;
+      rdFields[j].fdDataScale :=  Qry.MetaData[i].Getscale;
+      rdFields[j].fdNullable :=  Qry.MetaData[i].IsNullable;
+      if RecordNumber >= 0 then
+      begin
+        rdFields[j].fdIsNull :=  rdFields[j].fdNullable and Qry[i].IsNull;
+        LocalData := Qry[i].GetAsPointer;
+      end;
       case rdFields[j].fdDataType of
         SQL_TIMESTAMP:
         begin
           rdFields[j].fdDataSize := SizeOf(TDateTime);
           if RecordNumber >= 0 then
-            LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(Qry.Current[i].AsDateTime));
+            LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(Qry[i].AsDateTime));
           LocalData := PChar(@LocalDate);
         end;
         SQL_TYPE_DATE:
         begin
           rdFields[j].fdDataSize := SizeOf(TDateTime);
           if RecordNumber >= 0 then
-            LocalInt := DateTimeToTimeStamp(Qry.Current[i].AsDateTime).Date;
+            LocalInt := DateTimeToTimeStamp(Qry[i].AsDateTime).Date;
           LocalData := PChar(@LocalInt);
         end;
         SQL_TYPE_TIME:
         begin
           rdFields[j].fdDataSize := SizeOf(TDateTime);
           if RecordNumber >= 0 then
-            LocalInt := DateTimeToTimeStamp(Qry.Current[i].AsDateTime).Time;
+            LocalInt := DateTimeToTimeStamp(Qry[i].AsDateTime).Time;
           LocalData := PChar(@LocalInt);
         end;
         SQL_SHORT, SQL_LONG:
@@ -1851,20 +1877,20 @@ begin
           begin
             rdFields[j].fdDataSize := SizeOf(Integer);
             if RecordNumber >= 0 then
-              LocalInt := Qry.Current[i].AsLong;
+              LocalInt := Qry[i].AsLong;
             LocalData := PChar(@LocalInt);
           end
           else if (rdFields[j].fdDataScale >= (-4)) then
                begin
                  rdFields[j].fdDataSize := SizeOf(Currency);
                  if RecordNumber >= 0 then
-                   LocalCurrency := Qry.Current[i].AsCurrency;
+                   LocalCurrency := Qry[i].AsCurrency;
                  LocalData := PChar(@LocalCurrency);
                end
                else begin
                  rdFields[j].fdDataSize := SizeOf(Double);
                  if RecordNumber >= 0 then
-                   LocalDouble := Qry.Current[i].AsDouble;
+                   LocalDouble := Qry[i].AsDouble;
                 LocalData := PChar(@LocalDouble);
               end;
         end;
@@ -1874,20 +1900,20 @@ begin
           begin
             rdFields[j].fdDataSize := SizeOf(Int64);
             if RecordNumber >= 0 then
-              LocalInt64 := Qry.Current[i].AsInt64;
+              LocalInt64 := Qry[i].AsInt64;
             LocalData := PChar(@LocalInt64);
           end
           else if (rdFields[j].fdDataScale >= (-4)) then
                begin
                  rdFields[j].fdDataSize := SizeOf(Currency);
                  if RecordNumber >= 0 then
-                   LocalCurrency := Qry.Current[i].AsCurrency;
+                   LocalCurrency := Qry[i].AsCurrency;
                    LocalData := PChar(@LocalCurrency);
                end
                else begin
                   rdFields[j].fdDataSize := SizeOf(Double);
                   if RecordNumber >= 0 then
-                    LocalDouble := Qry.Current[i].AsDouble;
+                    LocalDouble := Qry[i].AsDouble;
                   LocalData := PChar(@LocalDouble);
                end
         end;
@@ -1895,36 +1921,33 @@ begin
         begin
           rdFields[j].fdDataSize := SizeOf(Double);
           if RecordNumber >= 0 then
-            LocalDouble := Qry.Current[i].AsDouble;
+            LocalDouble := Qry[i].AsDouble;
           LocalData := PChar(@LocalDouble);
         end;
         SQL_VARYING:
         begin
-          rdFields[j].fdDataSize := Qry.Current[i].Data^.sqllen;
-          rdFields[j].fdDataLength := isc_vax_integer(Qry.Current[i].Data^.sqldata, 2);
           if RecordNumber >= 0 then
-          begin
-            if (rdFields[j].fdDataLength = 0) then
-              LocalData := nil
-            else
-            begin
-              temp :=  Qry.Current[i];
-              LocalData := @temp.Data^.sqldata[2];
-(*              LocalData := @Qry.Current[i].Data^.sqldata[2];*)
-            end;
-          end;
+            LocalString := Qry[i].AsString
+          else
+            LocalString := '';
+          rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
+          rdFields[j].fdDataLength := Length(LocalString);
+          if (rdFields[j].fdDataLength = 0) then
+            LocalData := nil
+          else
+            LocalData := PChar(LocalString);
         end;
         SQL_BOOLEAN:
         begin
           LocalBool:= false;
           rdFields[j].fdDataSize := SizeOf(wordBool);
           if RecordNumber >= 0 then
-            LocalBool := Qry.Current[i].AsBoolean;
+            LocalBool := Qry[i].AsBoolean;
           LocalData := PChar(@LocalBool);
         end;
         else { SQL_TEXT, SQL_BLOB, SQL_ARRAY, SQL_QUAD }
         begin
-          rdFields[j].fdDataSize := Qry.Current[i].Data^.sqllen;
+          rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
           if (rdFields[j].fdDataType = SQL_TEXT) then
             rdFields[j].fdDataLength := rdFields[j].fdDataSize;
         end;
@@ -1935,12 +1958,11 @@ begin
         rdFields[j].fdDataOfs := FRecordSize;
         Inc(FRecordSize, rdFields[j].fdDataSize);
       end
-      else begin
+      else
+      if LocalData <> nil then
+      begin
         if rdFields[j].fdDataType = SQL_VARYING then
-        begin
-          if LocalData <> nil then
-            Move(LocalData^, Buffer[rdFields[j].fdDataOfs], rdFields[j].fdDataLength)
-        end
+          Move(LocalData^, Buffer[rdFields[j].fdDataOfs], rdFields[j].fdDataLength)
         else
           Move(LocalData^, Buffer[rdFields[j].fdDataOfs], rdFields[j].fdDataSize)
       end;
@@ -1991,11 +2013,6 @@ begin
   result := FBase.Database;
 end;
 
-function TIBCustomDataSet.GetDBHandle: PISC_DB_HANDLE;
-begin
-  result := FBase.DBHandle;
-end;
-
 function TIBCustomDataSet.GetDeleteSQL: TStrings;
 begin
   result := FQDelete.SQL;
@@ -2006,7 +2023,7 @@ begin
   result := FQInsert.SQL;
 end;
 
-function TIBCustomDataSet.GetSQLParams: TIBXSQLDA;
+function TIBCustomDataSet.GetSQLParams: ISQLParams;
 begin
   if not FInternalPrepared then
     InternalPrepare;
@@ -2036,11 +2053,6 @@ end;
 function TIBCustomDataSet.GetTransaction: TIBTransaction;
 begin
   result := FBase.Transaction;
-end;
-
-function TIBCustomDataSet.GetTRHandle: PISC_TR_HANDLE;
-begin
-  result := FBase.TRHandle;
 end;
 
 procedure TIBCustomDataSet.InternalDeleteRecord(Qry: TIBSQL; Buff: Pointer);
@@ -2216,8 +2228,7 @@ begin
         SetInternalSQLParams(Qry, Buff);
         Qry.ExecQuery;
         try
-          if (Qry.SQLType = SQLExecProcedure) or
-             (Qry.Next <> nil) then
+          if (Qry.SQLType = SQLExecProcedure) or Qry.Next then
           begin
             ofs := PRecordData(Buff)^.rdSavedOffset;
             FetchCurrentRecordToBuffer(Qry,
@@ -2471,7 +2482,7 @@ begin
     InternalPrepare;
   OldBuffer := nil;
   try
-    for i := 0 to Qry.Params.Count - 1 do
+    for i := 0 to Qry.Params.GetCount - 1 do
     begin
       fn := Qry.Params[i].Name;
       if (Pos('OLD_', fn) = 1) then {mbcs ok}
@@ -2707,7 +2718,7 @@ begin
   Result := Assigned( FQSelect ) and FQSelect.EOF;
 end;
 
-function TIBCustomDataSet.ParamByName(ParamName: String): TIBXSQLVAR;
+function TIBCustomDataSet.ParamByName(ParamName: String): ISQLParam;
 begin
   ActivateConnection;
   ActivateTransaction;
@@ -2849,6 +2860,8 @@ begin
   begin
     fs := TIBBlobStream.Create;
     fs.Mode := bmReadWrite;
+    fs.Database := Database;
+    fs.Transaction := Transaction;
     FBlobStreamList.Add(Pointer(fs));
     result := TIBDSBlobStream.Create(Field, fs, Mode);
     exit;
@@ -2883,6 +2896,12 @@ begin
   end else
     fs := pb^[Field.Offset];
   result := TIBDSBlobStream.Create(Field, fs, Mode);
+end;
+
+function TIBCustomDataSet.CreateArray(Field: TIBArrayField): IArray;
+begin
+  Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,
+                   Field.FRelationName,Field.FieldName);
 end;
 
 function TIBCustomDataSet.CompareBookmarks(Bookmark1, Bookmark2: TBookmark): Integer;
@@ -3199,8 +3218,7 @@ begin
         if FCurrentRecord < FRecordCount then
           ReadRecordCache(FCurrentRecord, Buffer, False)
         else begin
-          while (not FQSelect.EOF) and
-                (FQSelect.Next <> nil) and
+          while (not FQSelect.EOF) and FQSelect.Next  and
                 (FCurrentRecord >= FRecordCount) do begin
             FetchCurrentRecordToBuffer(FQSelect, FRecordCount, Buffer);
             Inc(FRecordCount);
@@ -3539,7 +3557,8 @@ var
 begin
   FRelationNodes := TRelationNode.Create;
   FNeedsRefresh := False;
-  Database.InternalTransaction.StartTransaction;
+  if not Database.InternalTransaction.InTransaction then
+    Database.InternalTransaction.StartTransaction;
   Query := TIBSQL.Create(self);
   try
     Query.Database := DataBase;
@@ -3547,41 +3566,41 @@ begin
     FieldDefs.BeginUpdate;
     FieldDefs.Clear;
     FieldIndex := 0;
-    if (Length(FMappedFieldPosition) < SourceQuery.Current.Count) then
-      SetLength(FMappedFieldPosition, SourceQuery.Current.Count);
+    if (Length(FMappedFieldPosition) < SourceQuery.MetaData.Count) then
+      SetLength(FMappedFieldPosition, SourceQuery.MetaData.Count);
     Query.SQL.Text := DefaultSQL;
     Query.Prepare;
-    SetLength(FAliasNameMap, SourceQuery.Current.Count);
-    SetLength(FAliasNameList, SourceQuery.Current.Count);
-    for i := 0 to SourceQuery.Current.Count - 1 do
-      with SourceQuery.Current[i].Data^ do
+    SetLength(FAliasNameMap, SourceQuery.MetaData.Count);
+    SetLength(FAliasNameList, SourceQuery.MetaData.Count);
+    for i := 0 to SourceQuery.MetaData.GetCount - 1 do
+      with SourceQuery.MetaData[i] do
       begin
         { Get the field name }
-        FieldAliasName := SourceQuery.Current[i].Name;
-        SetString(DBAliasName, aliasname, aliasname_length);
-        SetString(RelationName, relname, relname_length);
-        SetString(FieldName, sqlname, sqlname_length);
+        FieldAliasName := GetName;
+        DBAliasName := GetAliasname;
+        RelationName := getRelationName;
+        FieldName := getSQLName;
         FAliasNameList[i] := DBAliasName;
         FieldSize := 0;
         FieldPrecision := 0;
-        FieldNullable := SourceQuery.Current[i].IsNullable;
+        FieldNullable := IsNullable;
         CharSetSize := 0;
         CharSetName := '';
         {$IFDEF HAS_ANSISTRING_CODEPAGE}
         FieldCodePage := CP_NONE;
         {$ENDIF}
-        case sqltype and not 1 of
+        case SQLType of
           { All VARCHAR's must be converted to strings before recording
            their values }
           SQL_VARYING, SQL_TEXT:
           begin
-            CharSetSize := FBase.GetCharSetSize(sqlsubtype and $FF);
-            CharSetName := FBase.GetCharSetName(sqlsubtype and $FF);
+            CharSetSize := FBase.GetCharSetSize(getCharSetID);
+            CharSetName := FBase.GetCharSetName(getCharSetID);
             {$IFDEF HAS_ANSISTRING_CODEPAGE}
-            FieldCodePage := FBase.GetCodePage(sqlsubtype and $FF);
+            FieldCodePage := FBase.GetCodePage(getCharSetID);
             {$ENDIF}
             {FieldSize is encoded for strings - see TIBStringField.SetSize for decode}
-            FieldSize := sqllen;
+            FieldSize := GetSize;
             if CharSetSize = 2 then
               FieldType := ftWideString
             else
@@ -3592,23 +3611,23 @@ begin
             FieldType := ftFloat;
           SQL_SHORT:
           begin
-            if (sqlscale = 0) then
+            if (getScale = 0) then
               FieldType := ftSmallInt
             else begin
               FieldType := ftBCD;
               FieldPrecision := 4;
-              FieldSize := -sqlscale;
+              FieldSize := -getScale;
             end;
           end;
           SQL_LONG:
           begin
-            if (sqlscale = 0) then
+            if (getScale = 0) then
               FieldType := ftInteger
-            else if (sqlscale >= (-4)) then
+            else if (getScale >= (-4)) then
             begin
               FieldType := ftBCD;
               FieldPrecision := 9;
-              FieldSize := -sqlscale;
+              FieldSize := -getScale;
             end
             else
             if Database.SQLDialect = 1 then
@@ -3620,19 +3639,19 @@ begin
             begin
               FieldType := ftFMTBCD;
               FieldPrecision := 9;
-              FieldSize := -sqlscale;
+              FieldSize := -getScale;
             end;
           end;
 
           SQL_INT64:
           begin
-            if (sqlscale = 0) then
+            if (getScale = 0) then
               FieldType := ftLargeInt
-            else if (sqlscale >= (-4)) then
+            else if (getScale >= (-4)) then
             begin
               FieldType := ftBCD;
               FieldPrecision := 18;
-              FieldSize := -sqlscale;
+              FieldSize := -getScale;
             end
             else
               FieldType := ftFloat
@@ -3643,7 +3662,7 @@ begin
           SQL_BLOB:
           begin
             FieldSize := sizeof (TISC_QUAD);
-            if (sqlsubtype = 1) then
+            if (getSubtype = 1) then
             begin
               if FBase.GetDefaultCharSetName <> '' then
               begin
@@ -3654,10 +3673,9 @@ begin
                 {$ENDIF}
               end
               else
-              if strpas(sqlname) <> '' then
+              if getSQLName <> '' then
               begin
-                charSetID := GetBlobCharSetID(Database.Handle,Database.InternalTransaction.Handle,
-                        @relname,@sqlname);
+                charSetID := GetBlobMetaData.GetCharSetID;
                 CharSetSize := FBase.GetCharSetSize(charSetID);
                 CharSetName := FBase.GetCharSetName(charSetID);
                 {$IFDEF HAS_ANSISTRING_CODEPAGE}
@@ -3683,7 +3701,7 @@ begin
           SQL_ARRAY:
           begin
             FieldSize := sizeof (TISC_QUAD);
-            FieldType := ftUnknown;
+            FieldType := ftArray;
           end;
           SQL_BOOLEAN:
              FieldType:= ftBoolean;
@@ -3702,6 +3720,7 @@ begin
             Size := FieldSize;
             Precision := FieldPrecision;
             Required := not FieldNullable;
+            FRelationName := RelationName;
             InternalCalcField := False;
             CharacterSetSize := CharSetSize;
             CharacterSetName := CharSetName;
@@ -3752,7 +3771,7 @@ begin
   else begin
     Buffer := AllocRecordBuffer;
     try
-      while FQSelect.Next <> nil do
+      while FQSelect.Next do
       begin
         FetchCurrentRecordToBuffer(FQSelect, FRecordCount, Buffer);
         Inc(FRecordCount);
@@ -3767,7 +3786,7 @@ end;
 procedure TIBCustomDataSet.InternalSetParamsFromCursor;
 var
   i: Integer;
-  cur_param: TIBXSQLVAR;
+  cur_param: ISQLParam;
   cur_field: TField;
   s: TStream;
 begin
@@ -3775,9 +3794,9 @@ begin
     IBError(ibxeEmptyQuery, [nil]);
   if not FInternalPrepared then
     InternalPrepare;
-  if (SQLParams.Count > 0) and (DataSource <> nil) and (DataSource.DataSet <> nil) then
+  if (SQLParams.GetCount > 0) and (DataSource <> nil) and (DataSource.DataSet <> nil) then
   begin
-    for i := 0 to SQLParams.Count - 1 do
+    for i := 0 to SQLParams.GetCount - 1 do
     begin
       cur_field := DataSource.DataSet.FindField(SQLParams[i].Name);
       cur_param := SQLParams[i];
@@ -3811,11 +3830,13 @@ begin
             try
               s := DataSource.DataSet.
                      CreateBlobStream(cur_field, bmRead);
-              cur_param.LoadFromStream(s);
+              cur_param.AsBlob := TIBDSBlobStream(s).FBlobStream.Blob;
             finally
               s.free;
             end;
           end;
+          ftArray:
+            cur_param.AsArray := TIBArrayField(cur_field).ArrayIntf;
           else
             IBError(ibxeNotSupported, [nil]);
         end;
@@ -3916,6 +3937,10 @@ procedure TIBCustomDataSet.InternalOpen;
             CharacterSetName := IBFieldDef.CharacterSetName;
           end;
         end
+        else
+        if(Fields[i] is TIBArrayField) then
+        with TIBArrayField(Fields[i]) do
+          FRelationName := IBFieldDef.FRelationName;
       end
   end;
 
@@ -3951,7 +3976,7 @@ begin
         7. Finally, calls to AllocRecordBuffer will work!.
        }
       {Step 1}
-      FRecordSize := RecordDataLength(FQSelect.Current.Count);
+      FRecordSize := RecordDataLength(FQSelect.FieldCount);
       {Step 2, 3}
       IBAlloc(FModelBuffer, 0, FRecordSize);
       FetchCurrentRecordToBuffer(FQSelect, -1, FModelBuffer);
@@ -3974,7 +3999,7 @@ begin
       FCacheSize := FBufferChunkSize;
       FOldCacheSize := FBufferChunkSize;
       {Step 6}
-      IBAlloc(FModelBuffer, RecordDataLength(FQSelect.Current.Count),
+      IBAlloc(FModelBuffer, RecordDataLength(FQSelect.FieldCount),
                              FRecordBufferSize);
       {Step 7}
       FOldBuffer := AllocRecordBuffer;
@@ -4316,9 +4341,9 @@ begin
   end;
 end;
 
-function TIBCustomDataSet.GetSelectStmtHandle: TISC_STMT_HANDLE;
+function TIBCustomDataSet.GetSelectStmtIntf: IStatement;
 begin
-  Result := FQSelect.Handle;
+  Result := FQSelect.Statement;
 end;
 
 function TIBCustomDataSet.GetParser: TSelectSQLParser;

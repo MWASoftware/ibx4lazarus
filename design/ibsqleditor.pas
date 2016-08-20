@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil,  Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ExtCtrls, ComCtrls, IBSystemTables, IBSQL, IBDatabase;
+  StdCtrls, ExtCtrls, ComCtrls, IBSystemTables, IBSQL, IBDatabase, IB;
 
 type
 

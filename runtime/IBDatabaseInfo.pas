@@ -36,7 +36,7 @@ unit IBDatabaseInfo;
 interface
 
 uses
-  SysUtils, Classes, IBHeader, IBExternals, IB, IBDatabase;
+  SysUtils, Classes, IB, IBExternals, IBDatabase;
 
 type
 
@@ -89,7 +89,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function Call(ErrCode: ISC_STATUS; RaiseError: Boolean): ISC_STATUS;
     function GetLongDatabaseInfo(DatabaseInfoCommand: Integer): Long;
     property Allocation: Long read GetAllocation;
     property BaseLevel: Long read GetBaseLevel;
@@ -129,7 +128,7 @@ type
 implementation
 
 uses
-  IBIntf;
+  FBMessages;
 
 { TIBDatabaseInfo }
 
@@ -168,76 +167,72 @@ begin
 end;
 
 
-function TIBDatabaseInfo.Call(ErrCode: ISC_STATUS;
-  RaiseError: Boolean): ISC_STATUS;
-begin
-  result := ErrCode;
-  if RaiseError and (ErrCode > 0) then
-    IBDataBaseError;
-end;
 function TIBDatabaseInfo.GetAllocation: Long;
 begin
   result := GetLongDatabaseInfo(isc_info_allocation);
 end;
 
 function TIBDatabaseInfo.GetBaseLevel: Long;
-var
-  local_buffer: array[0..IBLocalBufferLength - 1] of Char;
-  DatabaseInfoCommand: Char;
+var Response: TByteArray;
 begin
-  DatabaseInfoCommand := Char(isc_info_base_level);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @DatabaseInfoCommand,
-                         IBLocalBufferLength, local_buffer), True);
-  result := isc_vax_integer(@local_buffer[4], 1);
+  with Database.Attachment.GetDBInformation([isc_info_base_level]) do
+    if (Count > 0) and (Items[0].GetItemType = isc_info_base_level) then
+    begin
+      Response := Items[0].GetAsBytes;
+      Result := Response[1];
+    end
+  else
+     IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
 function TIBDatabaseInfo.GetDBFileName: String;
 var
-  local_buffer: array[0..IBLocalBufferLength - 1] of Char;
-  DatabaseInfoCommand: Char;
+  ConnectionType: integer;
+  SiteName: string;
 begin
-  DatabaseInfoCommand := Char(isc_info_db_id);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @DatabaseInfoCommand,
-                         IBLocalBufferLength, local_buffer), True);
-  local_buffer[5 + Int(local_buffer[4])] := #0;
-  result := String(PChar(@local_buffer[5]));
+  with Database.Attachment.GetDBInformation([isc_info_db_id]) do
+    if (Count > 0) and (Items[0].GetItemType = isc_info_db_id) then
+      Items[0].DecodeIDCluster(ConnectionType,Result,SiteName)
+    else
+       IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
 function TIBDatabaseInfo.GetDBSiteName: String;
 var
-  local_buffer: array[0..IBBigLocalBufferLength - 1] of Char;
-  p: PChar;
-  DatabaseInfoCommand: Char;
+  ConnectionType: integer;
+  FileName: string;
 begin
-  DatabaseInfoCommand := Char(isc_info_db_id);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @DatabaseInfoCommand,
-                        IBLocalBufferLength, local_buffer), True);
-  p := @local_buffer[5 + Int(local_buffer[4])]; { DBSiteName Length }
-  p := p + Int(p^) + 1;                         { End of DBSiteName }
-  p^ := #0;                                     { Null it }
-  result := String(PChar(@local_buffer[6 + Int(local_buffer[4])]));
+  with Database.Attachment.GetDBInformation([isc_info_db_id]) do
+    if (Count > 0) and (Items[0].GetItemType = isc_info_db_id) then
+      Items[0].DecodeIDCluster(ConnectionType,FileName,Result)
+    else
+       IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
 function TIBDatabaseInfo.GetDBImplementationNo: Long;
-var
-  local_buffer: array[0..IBLocalBufferLength - 1] of Char;
-  DatabaseInfoCommand: Char;
+var Response: TByteArray;
 begin
-  DatabaseInfoCommand := Char(isc_info_implementation);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @DatabaseInfoCommand,
-                        IBLocalBufferLength, local_buffer), True);
-  result := isc_vax_integer(@local_buffer[3], 1);
+  with Database.Attachment.GetDBInformation([isc_info_implementation]) do
+    if (Count > 0) and (Items[0].GetItemType = isc_info_implementation) then
+    begin
+      Response := Items[0].GetAsBytes;
+      Result := Response[1];
+    end
+  else
+     IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
 function TIBDatabaseInfo.GetDBImplementationClass: Long;
-var
-  local_buffer: array[0..IBLocalBufferLength - 1] of Char;
-  DatabaseInfoCommand: Char;
+var Response: TByteArray;
 begin
-  DatabaseInfoCommand := Char(isc_info_implementation);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @DatabaseInfoCommand,
-                         IBLocalBufferLength, local_buffer), True);
-  result := isc_vax_integer(@local_buffer[4], 1);
+  with Database.Attachment.GetDBInformation([isc_info_implementation]) do
+    if (Count > 0) and (Items[0].GetItemType = isc_info_implementation) then
+    begin
+      Response := Items[0].GetAsBytes;
+      Result := Response[2];
+    end
+  else
+     IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
 function TIBDatabaseInfo.GetNoReserve: Long;
@@ -261,15 +256,13 @@ begin
 end;
 
 function TIBDatabaseInfo.GetVersion: String;
-var
-  local_buffer: array[0..IBBigLocalBufferLength - 1] of Char;
-  DatabaseInfoCommand: Char;
+var Version: byte;
 begin
-  DatabaseInfoCommand := Char(isc_info_version);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @DatabaseInfoCommand,
-                        IBBigLocalBufferLength, local_buffer), True);
-  local_buffer[5 + Int(local_buffer[4])] := #0;
-  result := String(PChar(@local_buffer[5]));
+  with Database.Attachment.GetDBInformation([isc_info_version]) do
+    if (Count > 0) and (Items[0].GetItemType = isc_info_version) then
+      Items[0].DecodeVersionString(Version,Result)
+  else
+     IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
 function TIBDatabaseInfo.GetCurrentMemory: Long;
@@ -298,28 +291,14 @@ begin
 end;
 
 function TIBDatabaseInfo.GetUserNames: TStringList;
-var
-  local_buffer: array[0..IBHugeLocalBufferLength - 1] of Char;
-  temp_buffer: array[0..IBLocalBufferLength - 2] of Char;
-  DatabaseInfoCommand: Char;
-  i, user_length: Integer;
 begin
-  result := FUserNames;
-  DatabaseInfoCommand := Char(isc_info_user_names);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @DatabaseInfoCommand,
-                        IBHugeLocalBufferLength, local_buffer), True);
+  Result := FUserNames;
   FUserNames.Clear;
-  i := 0;
-  while local_buffer[i] = Char(isc_info_user_names) do
-  begin
-    Inc(i, 3); { skip "isc_info_user_names byte" & two unknown bytes of structure (see below) }
-    user_length := Long(local_buffer[i]);
-    Inc(i,1);
-    Move(local_buffer[i], temp_buffer[0], user_length);
-    Inc(i, user_length);
-    temp_buffer[user_length] := #0;
-    FUserNames.Add(String(temp_buffer));
-  end;
+  with Database.Attachment.GetDBInformation([isc_info_user_names]) do
+    if (Count > 0) and (Items[0].GetItemType = isc_info_user_names) then
+      Items[0].DecodeUserNames(Result)
+  else
+     IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
 function TIBDatabaseInfo.GetFetches: Long;
@@ -343,32 +322,18 @@ begin
 end;
 
 function TIBDatabaseInfo.GetOperationCounts(DBInfoCommand: Integer; FOperation: TStringList): TStringList;
-var
-  local_buffer: array[0..IBHugeLocalBufferLength - 1] of Char;
-  DatabaseInfoCommand: Char;
-  i, qtd_tables, id_table, qtd_operations: Integer;
+var opCounts: TDBOperationCounts;
+    i: integer;
 begin
   if FOperation = nil then FOperation := TStringList.Create;
   result := FOperation;
-  DatabaseInfoCommand := Char(DBInfoCommand);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @DatabaseInfoCommand,
-                         IBHugeLocalBufferLength, local_buffer), True);
-  FOperation.Clear;
-  { 1. 1 byte specifying the item type requested (e.g., isc_info_insert_count).
-    2. 2 bytes telling how many bytes compose the subsequent value pairs.
-    3. A pair of values for each table in the database on wich the requested
-      type of operation has occurred since the database was last attached.
-    Each pair consists of:
-    1. 2 bytes specifying the table ID.
-    2. 4 bytes listing the number of operations (e.g., inserts) done on that table.
-  }
-  qtd_tables := trunc(isc_vax_integer(@local_buffer[1],2)/6);
-  for i := 0 to qtd_tables - 1 do
-  begin
-    id_table := isc_vax_integer(@local_buffer[3+(i*6)],2);
-    qtd_operations := isc_vax_integer(@local_buffer[5+(i*6)],4);
-    FOperation.Add(IntToStr(id_table)+'='+IntToStr(qtd_operations));
-  end;
+  with Database.Attachment.GetDBInformation([DBInfoCommand]) do
+    if (Count > 0) and (Items[0].GetItemType = DBInfoCommand) then
+      opCounts := Items[0].getOperationCounts
+  else
+     IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
+  for i := 0 to Length(opCounts) - 1 do
+    FOperation.Add(IntToStr(opCounts[i].TableID) +'='+IntToStr(opCounts[i].Count));
 end;
 
 function TIBDatabaseInfo.GetBackoutCount: TStringList;
@@ -417,46 +382,31 @@ begin
 end;
 
 function TIBDatabaseInfo.GetLongDatabaseInfo(DatabaseInfoCommand: Integer): Long;
-var
-  local_buffer: array[0..IBLocalBufferLength - 1] of Char;
-  length: Integer;
-  _DatabaseInfoCommand: Char;
 begin
-  _DatabaseInfoCommand := Char(DatabaseInfoCommand);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @_DatabaseInfoCommand,
-                         IBLocalBufferLength, local_buffer), True);
-  length := isc_vax_integer(@local_buffer[1], 2);
-  result := isc_vax_integer(@local_buffer[3], length);
+  with Database.Attachment.GetDBInformation([DatabaseInfoCommand]) do
+    if (Count > 0) and (Items[0].GetItemType = DatabaseInfoCommand) then
+      Result := Items[0].AsInteger
+    else
+      IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
 function TIBDatabaseInfo.GetStringDatabaseInfo(DatabaseInfoCommand: Integer): String;
-var
-  local_buffer: array[0..IBBigLocalBufferLength - 1] of Char;
-  _DatabaseInfoCommand: Char;
 begin
-  _DatabaseInfoCommand := Char(DatabaseInfoCommand);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @_DatabaseInfoCommand,
-                         IBBigLocalBufferLength, local_buffer), True);
-  local_buffer[4 + Int(local_buffer[3])] := #0;
-  result := String(PChar(@local_buffer[4]));
+  with Database.Attachment.GetDBInformation([DatabaseInfoCommand]) do
+    if (Count > 0) and (Items[0].GetItemType = DatabaseInfoCommand) then
+      Result := Items[0].AsString
+    else
+      IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
 
 function TIBDatabaseInfo.GetDBSQLDialect: Integer;
-var
-  local_buffer: array[0..IBLocalBufferLength - 1] of Char;
-  length: Integer;
-  DatabaseInfoCommand: Char;
 begin
-  DatabaseInfoCommand := Char(isc_info_db_SQL_Dialect);
-  Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @DatabaseInfoCommand,
-                       IBLocalBufferLength, local_buffer), True);
-  if (local_buffer[0] <> Char(isc_info_db_SQL_dialect)) then
-    result := 1
-  else begin
-    length := isc_vax_integer(@local_buffer[1], 2);
-    result := isc_vax_integer(@local_buffer[3], length);
-  end;
+  with Database.Attachment.GetDBInformation([isc_info_db_SQL_Dialect]) do
+    if (Count > 0) and (Items[0].GetItemType = isc_info_db_SQL_Dialect) then
+      Result := Items[0].AsInteger
+    else
+      Result := 1;
 end;
 
 

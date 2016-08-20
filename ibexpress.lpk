@@ -151,117 +151,92 @@ II. Trademark Usage.
 II.1. Advertising Materials. All advertising materials mentioning features or use of the covered Code must display the following acknowledgement: &quot;This product includes software developed by Inprise Corporation. &quot;
 II.2. Endorsements. The names &quot;Inprise,&quot; &quot;InterBase,&quot; &quot;ISC,&quot; and &quot;IB&quot; must not be used to endorse or promote Contributor Versions or Larger Works without the prior written permission of Inprise.
 II.3. Product Names. Contributor Versions and Larger Works may not be called &quot;Inprise&quot; or &quot;InterBase&quot; nor may the words &quot;Inprise&quot; or &quot;InterBase&quot; appear in their names without the prior written permission of Inprise Corporation."/>
-    <Version Major="1" Minor="4" Release = "2" />
-    <Files Count="25">
+    <Version Major="1" Minor="4" Release="2"/>
+    <Files Count="18">
       <Item1>
-        <Filename Value="runtime/IB.pas"/>
-        <UnitName Value="IB"/>
-      </Item1>
-      <Item2>
         <Filename Value="runtime/IBBatchMove.pas"/>
         <UnitName Value="IBBatchMove"/>
-      </Item2>
-      <Item3>
-        <Filename Value="runtime/IBBlob.pas"/>
-        <UnitName Value="IBBlob"/>
-      </Item3>
-      <Item4>
-        <Filename Value="runtime/IBCustomDataSet.pas"/>
-        <UnitName Value="IBCustomDataSet"/>
-      </Item4>
-      <Item5>
-        <Filename Value="runtime/IBDatabase.pas"/>
-        <UnitName Value="IBDatabase"/>
-      </Item5>
-      <Item6>
-        <Filename Value="runtime/IBErrorCodes.pas"/>
-        <UnitName Value="IBErrorCodes"/>
-      </Item6>
-      <Item7>
-        <Filename Value="runtime/IBEvents.pas"/>
-        <UnitName Value="IBEvents"/>
-      </Item7>
-      <Item8>
-        <Filename Value="runtime/IBExternals.pas"/>
-        <UnitName Value="IBExternals"/>
-      </Item8>
-      <Item9>
-        <Filename Value="runtime/IBExtract.pas"/>
-        <UnitName Value="IBExtract"/>
-      </Item9>
-      <Item10>
-        <Filename Value="runtime/IBHeader.pas"/>
-        <UnitName Value="IBHeader"/>
-      </Item10>
-      <Item11>
-        <Filename Value="runtime/IBUtils.pas"/>
-        <UnitName Value="IBUtils"/>
-      </Item11>
-      <Item12>
-        <Filename Value="runtime/IBXConst.pas"/>
-        <UnitName Value="IBXConst"/>
-      </Item12>
-      <Item13>
-        <Filename Value="runtime/IBIntf.pas"/>
-        <UnitName Value="IBIntf"/>
-      </Item13>
-      <Item14>
-        <Filename Value="runtime/IBQuery.pas"/>
-        <UnitName Value="IBQuery"/>
-      </Item14>
-      <Item15>
-        <Filename Value="runtime/IBServices.pas"/>
-        <UnitName Value="IBServices"/>
-      </Item15>
-      <Item16>
-        <Filename Value="runtime/IBSQL.pas"/>
-        <UnitName Value="IBSQL"/>
-      </Item16>
-      <Item17>
-        <Filename Value="runtime/IBStoredProc.pas"/>
-        <UnitName Value="IBStoredProc"/>
-      </Item17>
-      <Item18>
-        <Filename Value="runtime/IBDatabaseInfo.pas"/>
-        <UnitName Value="IBDatabaseInfo"/>
-      </Item18>
-      <Item19>
-        <Filename Value="runtime/IBUpdateSQL.pas"/>
-        <UnitName Value="IBUpdateSQL"/>
-      </Item19>
-      <Item20>
-        <Filename Value="runtime/IBTable.pas"/>
-        <UnitName Value="IBTable"/>
-      </Item20>
-      <Item21>
-        <Filename Value="runtime/IBSQLMonitor.pas"/>
-        <UnitName Value="IBSQLMonitor"/>
-      </Item21>
-      <Item22>
-        <Filename Value="runtime/IBSQLParser.pas"/>
-        <UnitName Value="IBSQLParser"/>
-      </Item22>
-      <Item23>
-        <Filename Value="runtime/IBDialogs.pas"/>
-        <UnitName Value="IBDialogs"/>
-      </Item23>
-      <Item24>
-        <Filename Value="runtime/ibxscript.pas"/>
-        <UnitName Value="ibxscript"/>
-      </Item24>
-      <Item25>
-        <Filename Value="runtime/IBCodePage.pas"/>
-        <UnitName Value="IBCodePage"/>
-      </Item25>
-    </Files>
-    <RequiredPkgs Count="2">
-      <Item1>
-        <PackageName Value="LCL"/>
       </Item1>
       <Item2>
+        <Filename Value="runtime/IBBlob.pas"/>
+        <UnitName Value="IBBlob"/>
+      </Item2>
+      <Item3>
+        <Filename Value="runtime/IBCustomDataSet.pas"/>
+        <UnitName Value="IBCustomDataSet"/>
+      </Item3>
+      <Item4>
+        <Filename Value="runtime/IBDatabase.pas"/>
+        <UnitName Value="IBDatabase"/>
+      </Item4>
+      <Item5>
+        <Filename Value="runtime/IBEvents.pas"/>
+        <UnitName Value="IBEvents"/>
+      </Item5>
+      <Item6>
+        <Filename Value="runtime/IBExtract.pas"/>
+        <UnitName Value="IBExtract"/>
+      </Item6>
+      <Item7>
+        <Filename Value="runtime/IBQuery.pas"/>
+        <UnitName Value="IBQuery"/>
+      </Item7>
+      <Item8>
+        <Filename Value="runtime/IBServices.pas"/>
+        <UnitName Value="IBServices"/>
+      </Item8>
+      <Item9>
+        <Filename Value="runtime/IBSQL.pas"/>
+        <UnitName Value="IBSQL"/>
+      </Item9>
+      <Item10>
+        <Filename Value="runtime/IBStoredProc.pas"/>
+        <UnitName Value="IBStoredProc"/>
+      </Item10>
+      <Item11>
+        <Filename Value="runtime/IBDatabaseInfo.pas"/>
+        <UnitName Value="IBDatabaseInfo"/>
+      </Item11>
+      <Item12>
+        <Filename Value="runtime/IBUpdateSQL.pas"/>
+        <UnitName Value="IBUpdateSQL"/>
+      </Item12>
+      <Item13>
+        <Filename Value="runtime/IBTable.pas"/>
+        <UnitName Value="IBTable"/>
+      </Item13>
+      <Item14>
+        <Filename Value="runtime/IBSQLMonitor.pas"/>
+        <UnitName Value="IBSQLMonitor"/>
+      </Item14>
+      <Item15>
+        <Filename Value="runtime/IBSQLParser.pas"/>
+        <UnitName Value="IBSQLParser"/>
+      </Item15>
+      <Item16>
+        <Filename Value="runtime/IBDialogs.pas"/>
+        <UnitName Value="IBDialogs"/>
+      </Item16>
+      <Item17>
+        <Filename Value="runtime/ibxscript.pas"/>
+        <UnitName Value="ibxscript"/>
+      </Item17>
+      <Item18>
+        <Filename Value="runtime/IBCodePage.pas"/>
+        <UnitName Value="IBCodePage"/>
+      </Item18>
+    </Files>
+    <RequiredPkgs Count="3">
+      <Item1>
+        <PackageName Value="fbintf"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="LCL"/>
+      </Item2>
+      <Item3>
         <PackageName Value="FCL"/>
         <MinVersion Major="1" Valid="True"/>
-      </Item2>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

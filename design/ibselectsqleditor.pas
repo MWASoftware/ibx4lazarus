@@ -32,7 +32,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil,  Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, IBSystemTables, IBDatabase, IBCustomDataSet;
+  StdCtrls, ComCtrls, IBSystemTables, IBDatabase, IBCustomDataSet, IB;
 
 type
 

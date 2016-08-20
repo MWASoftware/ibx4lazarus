@@ -31,7 +31,7 @@ unit IBSystemTables;
 interface
 
 uses
-  Classes, SysUtils, IBSQL, IBDatabase, StdCtrls;
+  Classes, SysUtils, IBSQL, IBDatabase, StdCtrls, IB;
 
 type
 
@@ -82,7 +82,7 @@ type
 
 implementation
 
-uses IB, Dialogs, IBUtils;
+uses Dialogs, IBUtils, FBMessages;
 
 { TIBSystemTables }
 
@@ -424,15 +424,15 @@ begin
     case FTableAndColumnSQL.SQLType of
     SQLSelect:
       begin
-        if FTableAndColumnSQL.Current.Count > 0 then
-          FirstTableName := strpas(FTableAndColumnSQL.Current.Vars[0].Data^.relname)
+        if FTableAndColumnSQL.MetaData.Count > 0 then
+          FirstTableName := FTableAndColumnSQL.MetaData[0].GetRelationName
         else
           FirstTableName := '';
         if assigned(Columns) then
         begin
           Columns.Clear;
-          for I := 0 to FTableAndColumnSQL.Current.Count - 1 do
-              Columns.Add(FTableAndColumnSQL.Current.Vars[I].Name)
+          for I := 0 to FTableAndColumnSQL.MetaData.Count - 1 do
+              Columns.Add(FTableAndColumnSQL.MetaData[I].Name)
         end;
       end;
     { If not a select statement then return table or procedure name
@@ -682,9 +682,9 @@ begin
   except on E:EIBError do
 //      ShowMessage(E.Message);
   end;
-  if (Result = SQLSelect) and (FTestSQL.Current.Count > 0)  then
+  if (Result = SQLSelect) and (FTestSQL.MetaData.Count > 0)  then
   begin
-    TableName := strpas(FTestSQL.Current.Vars[0].Data^.relname);
+    TableName := FTestSQL.MetaData[0].GetRelationName;
     FTestSQL.SQL.Text := sqlCheckProcedureNames;
     FTestSQL.Prepare;
     FTestSQL.ParamByName('ProcName').AsString := TableName;

@@ -48,7 +48,7 @@ unit IBSQLMonitor;
 interface
 
 uses
-  IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, IBXConst,SysUtils,
+  IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, IBTypes ,SysUtils,
   Classes,
 {$IFDEF WINDOWS }
   Windows
@@ -146,7 +146,7 @@ function MonitoringEnabled: Boolean;
 implementation
 
 uses
-   contnrs, syncobjs, CustApp
+   contnrs, syncobjs, CustApp, FBMessages
    {$IFDEF USE_SV5_IPC}
    ,ipc, Errors, baseunix
    {$IF FPC_FULLVERSION <= 20402 } , initc {$ENDIF}
@@ -534,8 +534,8 @@ begin
     else
       st := qry.Name;
     st := st + ': [Execute] ' + qry.SQL.Text; {do not localize}
-    if qry.Params.Count > 0 then begin
-      for i := 0 to qry.Params.Count - 1 do begin
+    if qry.Params.GetCount > 0 then begin
+      for i := 0 to qry.Params.GetCount - 1 do begin
         st := st + CRLF + '  ' + qry.Params[i].Name + ' = '; 
         try
           if qry.Params[i].IsNull then

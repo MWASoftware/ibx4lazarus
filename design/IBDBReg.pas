@@ -56,7 +56,7 @@ interface
 
 uses SysUtils, Classes, Graphics, Dialogs, Controls, Forms, TypInfo,
      DB, IBTable, IBDatabase,  IBEventsEditor,  LazarusPackageIntf,
-      IBUpdateSQL, IBXConst, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor,
+      IBUpdateSQL, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor,
      dbFieldLinkPropEditor, dbFieldListPropEditor, IBDialogs;
 
 type
@@ -361,8 +361,8 @@ procedure Register;
 
 implementation
 
-uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
-     IBIntf, IBSQL, IBSQLMonitor, IBDatabaseInfo, IBEvents,
+uses IB, IBQuery, IBStoredProc, IBCustomDataSet, FBMessages,
+     IBSQL, IBSQLMonitor, IBDatabaseInfo, IBEvents, IBTypes,
      IBServices, IBDatabaseEdit, IBTransactionEdit,
      IBBatchMove, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
@@ -370,6 +370,10 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet,
      IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
      IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport, IBDSDialogs;
 
+const
+  IBPalette1 = 'Firebird'; {do not localize}
+  IBPalette2 = 'Firebird Admin'; {do not localize}
+  IBPalette3 = 'Firebird Data Controls';   {do not localize}
 
 
 procedure Register;
@@ -389,7 +393,7 @@ begin
    TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBEvents,
      TIBSQL, TIBDatabaseInfo, TIBSQLMonitor,
        TIBStoredProc,TIBBatchMove,  TIBTable,TIBExtract, TIBXScript, TIBLocalDBSupport]);
-  if IBServiceAPIPresent  then
+  if FirebirdAPI.HasServiceAPI  then
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
       TIBRestoreService, TIBValidationService, TIBStatisticalService,
       TIBLogService, TIBSecurityService, TIBServerProperties]);

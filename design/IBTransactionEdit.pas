@@ -34,7 +34,7 @@ interface
 
 uses
   {Windows,} Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, IBDataBase, IB, ExtCtrls, IBXConst, LResources;
+  StdCtrls, IBDataBase, IB, ExtCtrls, LResources;
 
 type
 
@@ -80,6 +80,8 @@ var
   function EditIBtransaction(Atransaction: TIBtransaction): Boolean;
 
 implementation
+
+uses FBMessages;
 
 {$R *.lfm}
 

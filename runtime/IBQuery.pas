@@ -71,7 +71,7 @@ type
     procedure SetPrepared(Value: Boolean);
     procedure SetPrepare(Value: Boolean);
     procedure WriteParamData(Writer: TWriter);
-    function GetStmtHandle: TISC_STMT_HANDLE;
+    function GetStmtHandle: IStatement;
     procedure UpdateSQL;
 
   protected
@@ -105,7 +105,7 @@ type
     procedure ResetParser; override;
     property Prepared: Boolean read FPrepared write SetPrepare;
     property ParamCount: Word read GetParamsCount;
-    property StmtHandle: TISC_STMT_HANDLE read GetStmtHandle;
+    property StmtHandle: IStatement read GetStmtHandle;
     property StatementType;
     property Text: string read FText;
     property RowsAffected: Integer read GetRowsAffected;
@@ -140,6 +140,8 @@ type
 end;
 
 implementation
+
+uses FBMessages;
 
 { TIBQuery }
 
@@ -399,7 +401,7 @@ procedure TIBQuery.SetParams;
 var
 i : integer;
 Buffer: Pointer;
-SQLParam: TIBXSQLVAR;
+SQLParam: ISQLParam;
 
 begin
   for I := 0 to FParams.Count - 1 do
@@ -502,7 +504,7 @@ begin
         AddFieldToList(Params[i].Name, Self, DetailFields);
 end;
 
-function TIBQuery.GetStmtHandle: TISC_STMT_HANDLE;
+function TIBQuery.GetStmtHandle: IStatement;
 begin
   Result := SelectStmtHandle;
 end;

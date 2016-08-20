@@ -39,7 +39,7 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBDatabaseInfo,
-  IBSQL, IBUtils, IBHeader, IB, IBIntf;
+  IBSQL, IBUtils, IBHeader, IB;
 
 type
   TExtractObjectTypes =
@@ -229,6 +229,8 @@ const
   obj_sql_role = 13;
 
 implementation
+
+uses FBMessages;
 
 const
   NEWLINE = #13#10;
@@ -1260,20 +1262,16 @@ var
   FileFlags, FileLength, FileSequence, FileStart : Integer;
 
   function GetLongDatabaseInfo(DatabaseInfoCommand: Integer): LongInt;
-  var
-    local_buffer: array[0..IBLocalBufferLength - 1] of Char;
-    length: Integer;
-    _DatabaseInfoCommand: Char;
   begin
-    _DatabaseInfoCommand := Char(DatabaseInfoCommand);
-    FDatabaseInfo.Call(isc_database_info(StatusVector, @FDatabase.Handle, 1, @_DatabaseInfoCommand,
-                           IBLocalBufferLength, local_buffer), True);
-    length := isc_vax_integer(@local_buffer[1], 2);
-    result := isc_vax_integer(@local_buffer[3], length);
+    with Database.Attachment.GetDBInformation([DatabaseInfoCommand]) do
+      if (Count > 0) and (Items[0].GetItemType = DatabaseInfoCommand) then
+        Result := Items[0].AsInteger
+      else
+        IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
   end;
 
 begin
-	NoDb := FALSE;
+  NoDb := FALSE;
   First := TRUE;
   FirstFile := TRUE;
   HasWal := FALSE;
@@ -3033,23 +3031,23 @@ begin
     while not qrySelect.Eof do
     begin
       Line := 'INSERT INTO ' + QuoteIdentifier(FDatabase.SQLDialect, ObjectName) + ' (';
-      for i := 0 to qrySelect.Current.Count - 1 do
+      for i := 0 to qrySelect.FieldCount - 1 do
         if (qrySelect.Fields[i].SQLType <> SQL_ARRAY) and
            (qrySelect.Fields[i].SQLType <> SQL_BLOB) then
         begin
           Line := Line + QuoteIdentifier(FDatabase.SQLDialect, qrySelect.Fields[i].Name);
-          if i <> (qrySelect.Current.Count - 1) then
+          if i <> (qrySelect.FieldCount - 1) then
             Line := Line + ', ';
         end;
       Line := Line + ') VALUES (';
-      for i := 0 to qrySelect.Current.Count - 1 do
+      for i := 0 to qrySelect.FieldCount - 1 do
       begin
         if qrySelect.Fields[i].IsNull and
            (qrySelect.Fields[i].SQLType <> SQL_ARRAY) and
            (qrySelect.Fields[i].SQLType <> SQL_BLOB) then
         begin
           Line := Line + 'NULL';
-          if i <> (qrySelect.Current.Count - 1) then
+          if i <> (qrySelect.FieldCount - 1) then
             Line := Line + ', ';
         end
         else
@@ -3058,14 +3056,14 @@ begin
           SQL_TYPE_TIME, SQL_TIMESTAMP :
           begin
             Line := Line + QuotedStr(qrySelect.Fields[i].AsString);
-            if i <> (qrySelect.Current.Count - 1) then
+            if i <> (qrySelect.FieldCount - 1) then
               Line := Line + ', ';
           end;
           SQL_SHORT, SQL_LONG, SQL_INT64,
           SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT, SQL_BOOLEAN:
           begin
             Line := Line + qrySelect.Fields[i].AsString;
-            if i <> (qrySelect.Current.Count - 1) then
+            if i <> (qrySelect.FieldCount - 1) then
               Line := Line + ', ';
           end;
           SQL_ARRAY, SQL_BLOB : ;

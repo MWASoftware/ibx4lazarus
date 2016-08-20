@@ -184,6 +184,8 @@ type
 
 implementation
 
+uses FBMessages;
+
 { TIBTable }
 
 constructor TIBTable.Create(AOwner: TComponent);
@@ -330,9 +332,9 @@ begin
               end;
          end;
          Query.Prepare;
+         FieldDefsFromQuery(Query);
          if DidActivate then
             Query.Transaction.Rollback;
-         FieldDefsFromQuery(Query);
     finally
          Query.Free;
     end;
@@ -483,7 +485,7 @@ var
         Query.SQL.Text := 'Alter Table ' +  {do not localize}
           QuoteIdentifier(DataBase.SQLDialect, FTableName) +
           ' Drop Constraint ' +
-          QuoteIdentifier(DataBase.SQLDialect, Query.Current.ByName('RDB$CONSTRAINT_NAME').AsString);
+          QuoteIdentifier(DataBase.SQLDialect, Query.FieldByName('RDB$CONSTRAINT_NAME').AsString);
         Query.Prepare;
         Query.ExecQuery;
         IndexDefs.Updated := False;
@@ -591,19 +593,19 @@ begin
        QuoteIdentifier(DataBase.SQLDialect, FTableName)) + '''';
     Query.Prepare;
     Query.ExecQuery;
-    while (not Query.EOF) and (Query.Next <> nil) do
+    while (not Query.EOF) and Query.Next do
     begin
       with IndexDefs.AddIndexDef do
       begin
-        Name := TrimRight(Query.Current.ByName('RDB$INDEX_NAME').AsString); {do not localize}
+        Name := TrimRight(Query.FieldByName('RDB$INDEX_NAME').AsString); {do not localize}
         Opts := [];
         if Pos ('RDB$PRIMARY', Name) = 1 then Include(Opts, ixPrimary); {do not localize} {mbcs ok}
-        if Query.Current.ByName('RDB$UNIQUE_FLAG').AsInteger = 1 then Include(Opts, ixUnique); {do not localize}
-        if Query.Current.ByName('RDB$INDEX_TYPE').AsInteger = 2  then Include(Opts, ixDescending); {do not localize}
+        if Query.FieldByName('RDB$UNIQUE_FLAG').AsInteger = 1 then Include(Opts, ixUnique); {do not localize}
+        if Query.FieldByName('RDB$INDEX_TYPE').AsInteger = 2  then Include(Opts, ixDescending); {do not localize}
         Options := Opts;
-        if (Query.Current.ByName('RDB$SEGMENT_COUNT').AsInteger = 1) then {do not localize}
+        if (Query.FieldByName('RDB$SEGMENT_COUNT').AsInteger = 1) then {do not localize}
         begin
-          fn := Trim(Query.Current.ByName('RDB$FIELD_NAME').AsString); {do not localize}
+          fn := Trim(Query.FieldByName('RDB$FIELD_NAME').AsString); {do not localize}
           aField := GetFieldDefFromAlias(fn);
           if assigned(aField) then
              Fields := aField.Name
@@ -625,9 +627,9 @@ begin
           SubQuery.Prepare;
           SubQuery.ExecQuery;
           Flds := '';
-          while (not SubQuery.EOF) and (SubQuery.Next <> nil) do
+          while (not SubQuery.EOF) and SubQuery.Next do
           begin
-            fn := TrimRight(SubQuery.Current.ByName('RDB$FIELD_NAME').AsString); {do not localize}
+            fn := TrimRight(SubQuery.FieldByName('RDB$FIELD_NAME').AsString); {do not localize}
             aField := GetFieldDefFromAlias(fn);
             if assigned(aField) then
                fn := aField.Name;
@@ -921,8 +923,8 @@ begin
                       QuoteIdentifier(DataBase.SQLDialect, FTableName)) + '''';
     Query.Prepare;
     Query.ExecQuery;
-    if (Query.Current[0].AsInteger <> 0) or
-       (Query.Current[1].AsInteger <> 8) then
+    if (Query.Fields[0].AsInteger <> 0) or
+       (Query.Fields[1].AsInteger <> 8) then
       Result := False
     else
       Result := True;
@@ -1205,8 +1207,8 @@ begin
                           ' where RDB$VIEW_BLR is NULL and RDB$SYSTEM_FLAG = 0'; {do not localize}
       Query.Prepare;
       Query.ExecQuery;
-      while (not Query.EOF) and (Query.Next <> nil) do
-        FNameList.Add (TrimRight(Query.Current[0].AsString));
+      while (not Query.EOF) and Query.Next  do
+        FNameList.Add (TrimRight(Query.Fields[0].AsString));
     finally
       Query.Free;
       Database.InternalTransaction.Commit;
