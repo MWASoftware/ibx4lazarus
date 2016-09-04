@@ -367,7 +367,7 @@ begin
         if FState = stInit then
           FState := stInCommit
         else
-          raise Exception.Create(sNoCommit)
+          AddToSQL(FString);
       end;
 
     sqReconnect:
