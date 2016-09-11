@@ -194,13 +194,6 @@ type
     FUserNames: TStringList;
     FDataSets: TList;
     FLoginCalled: boolean;
-    FCharSetSizes: array of integer;
-    FCharSetNames: array of RawByteString;
-    FDefaultCharSetName: RawByteString;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
-    FCodePages: array of TSystemCodePage;
-    FDefaultCodePage: TSystemCodePage;
-    {$ENDIF}
     FUseDefaultSystemCodePage: boolean;
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
@@ -215,7 +208,6 @@ type
     function GetTransaction(Index: Integer): TIBTransaction;
     function GetTransactionCount: Integer;
     function Login(var aDatabaseName: string): Boolean;
-    procedure LoadCharSetInfo;
     procedure SetDatabaseName(const Value: TIBFileName);
     procedure SetDBParamByDPB(const Idx: Integer; Value: String);
     procedure SetDBParams(Value: TStrings);
@@ -267,10 +259,6 @@ type
     property TransactionCount: Integer read GetTransactionCount;
     property Transactions[Index: Integer]: TIBTransaction read GetTransaction;
     property InternalTransaction: TIBTransaction read FInternalTransaction;
-    property DefaultCharSetName: RawByteString read FDefaultCharSetName;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
-    property DefaultCodePage: TSystemCodePage read FDefaultCodePage;
-    {$ENDIF}
 
   published
     property Connected;
@@ -450,14 +438,6 @@ type
     procedure DoAfterDelete(Sender: TObject); virtual;
     procedure DoAfterInsert(Sender: TObject); virtual;
     procedure DoAfterPost(Sender: TObject); virtual;
-    function GetCharSetSize(CharSetID: integer): integer;
-    function GetDefaultCharSetSize: integer;
-    function GetCharSetName(CharSetID: integer): string;
-    function GetDefaultCharSetName: RawByteString;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
-    function GetCodePage(CharSetID: integer): TSystemCodePage;
-    function GetDefaultCodePage: TSystemCodePage;
-    {$ENDIF}
     procedure HandleException(Sender: TObject);
     procedure SetCursor;
     procedure RestoreCursor;
@@ -488,7 +468,7 @@ function GenerateTPB(sl: TStrings): ITPB;
 implementation
 
 uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
-     typInfo, IBCodePage, FBMessages;
+     typInfo, FBMessages;
 
 { TIBDatabase }
 
@@ -505,9 +485,6 @@ begin
      (AOwner is TCustomApplication) and
      TCustomApplication(AOWner).ConsoleApplication then
     LoginPrompt := false;
-  {$IFDEF HAS_ANSISTRING_CODEPAGE}
-  FDefaultCodePage := CP_NONE;
-  {$ENDIF}
   FDBParamsChanged := True;
   TStringList(FDBParams).OnChange := DBParamsChange;
   TStringList(FDBParams).OnChanging := DBParamsChanging;
@@ -612,13 +589,6 @@ begin
   if Connected then
     InternalClose(False);
   FDBSQLDialect := 1;
-  SetLength(FCharSetSizes,0);
-  SetLength(FCharSetNames,0);
-  FDefaultCharSetName := '';
-  {$IFDEF HAS_ANSISTRING_CODEPAGE}
-  SetLength(FCodePages,0);
-  FDefaultCodePage := CP_NONE;
-  {$ENDIF}
 end;
 
   procedure TIBDataBase.CreateDatabase;
@@ -778,46 +748,6 @@ begin
       SQLObjects[i].DoAfterDatabaseDisconnect;
 end;
 
-procedure TIBDataBase.LoadCharSetInfo;
-var Query: TIBSQL;
-    i: integer;
-begin
-  if not FInternalTransaction.Active then
-    FInternalTransaction.StartTransaction;
-  Query := TIBSQL.Create(self);
-  try
-    Query.Database := Self;
-    Query.Transaction := FInternalTransaction;
-    Query.SQL.Text := 'Select RDB$CHARACTER_SET_ID, RDB$BYTES_PER_CHARACTER, RDB$CHARACTER_SET_NAME ' +
-                      'From RDB$CHARACTER_SETS Order by 1 DESC'; {do not localize}
-    Query.Prepare;
-    Query.ExecQuery;
-    if not Query.EOF then
-    begin
-      SetLength(FCharSetSizes,Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger + 1);
-      SetLength(FCharSetNames,Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger + 1);
-      {$IFDEF HAS_ANSISTRING_CODEPAGE}
-      SetLength(FCodePages, Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger + 1);
-      {$ENDIF}
-      for i := 0 to Length(FCharSetSizes) - 1 do FCharSetSizes[i] := 1;
-      repeat
-        FCharSetSizes[Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger] :=
-                 Query.FieldByName('RDB$BYTES_PER_CHARACTER').AsInteger;
-        FCharSetNames[Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger] :=
-                 Trim(Query.FieldByName('RDB$CHARACTER_SET_NAME').AsString);
-        {$IFDEF HAS_ANSISTRING_CODEPAGE}
-        FCodePages[Query.FieldByName('RDB$CHARACTER_SET_ID').AsInteger] :=
-          IBGetCodePage(Trim(Query.FieldByName('RDB$CHARACTER_SET_NAME').AsString));
-        {$ENDIF}
-        Query.Next;
-      until Query.EOF;
-    end;
-  finally
-    Query.free;
-    FInternalTransaction.Commit;
-  end;
-end;
-
 procedure TIBDataBase.CheckStreamConnect;
 var
   i: integer;
@@ -972,6 +902,7 @@ var
   I: integer;
   aDBName: string;
   Status: IStatus;
+  CharSetID: integer;
 
   {Call error analysis}
   {$ifdef WINDOWS}
@@ -1008,8 +939,8 @@ begin
      {$ENDIF}
      {$else}
      {$IFDEF HAS_ANSISTRING_CODEPAGE}
-     TempDBParams.Values['lc_ctype'] := IBGetCharacterSetName(DefaultSystemCodePage);
-     FDefaultCodePage := IBGetCodePage(AnsiUpperCase(TempDBParams.Values['lc_ctype']));
+     if FIrebirdAPI.CodePage2CharSetID(DefaultSystemCodePage,CharSetID) then
+       TempDBParams.Values['lc_ctype'] := FirebirdAPI.GetCharsetName(CharSetID);
      {$ELSE}
      TempDBParams.Values['lc_ctype'] :='UTF8';
      {$ENDIF}
@@ -1021,7 +952,6 @@ begin
        if FSQLObjects[i] <> nil then
          SQLObjects[i].DoBeforeDatabaseConnect(TempDBParams,aDBName);
    end;
-   FDefaultCharSetName := AnsiUpperCase(TempDBParams.Values['lc_ctype']);
 
    { Generate a new DPB if necessary }
    if (FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text)) then
@@ -1070,7 +1000,6 @@ begin
   end;
   if not (csDesigning in ComponentState) then
     MonitorHook.DBConnect(Self);
-  LoadCharSetInfo;
 end;
 
  procedure TIBDataBase.RemoveSQLObject(Idx: Integer);
@@ -1971,57 +1900,6 @@ begin
   SetTransaction(nil);
   inherited Destroy;
 end;
-
-function TIBBase.GetCharSetSize(CharSetID: integer): integer;
-begin
-  if (CharSetID >= 0) and (CharSetID < Length(Database.FCharSetSizes)) then
-    Result := Database.FCharSetSizes[CharSetID]
-  else
-    Result := 1; {Unknown character set}
-end;
-
-function TIBBase.GetDefaultCharSetSize: integer;
-var DefaultCharSetName: string;
-    i: integer;
-begin
-  DefaultCharSetName := GetDefaultCharSetName;
-  Result := 4; {worse case}
-  for i := 0 to Length(Database.FCharSetSizes) - 1 do
-    if Database.FCharSetNames[i] = DefaultCharSetName then
-    begin
-      Result := Database.FCharSetSizes[i];
-      break;
-    end;
-end;
-
-function TIBBase.GetCharSetName(CharSetID: integer): string;
-begin
-  if (CharSetID >= 0) and (CharSetID < Length(Database.FCharSetNames)) then
-    Result := Database.FCharSetNames[CharSetID]
-  else
-    Result := ''; {Unknown character set}
-end;
-
-function TIBBase.GetDefaultCharSetName: RawByteString;
-begin
-  Result := Database.FDefaultCharSetName;
-end;
-
-{$IFDEF HAS_ANSISTRING_CODEPAGE}
-function TIBBase.GetCodePage(CharSetID: integer): TSystemCodePage;
-begin
-  if (CharSetID >= 0) and (CharSetID < Length(Database.FCodePages)) then
-    Result := Database.FCodePages[CharSetID]
-  else
-    Result := CP_NONE; {Unknown character set}
-end;
-
-function TIBBase.GetDefaultCodePage: TSystemCodePage;
-begin
-  Result := Database.FDefaultCodePage;
-end;
-
-{$ENDIF}
 
 procedure TIBBase.HandleException(Sender: TObject);
 begin

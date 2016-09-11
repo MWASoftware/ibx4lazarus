@@ -159,7 +159,7 @@ type
     function GetFieldCount: integer;
     function GetOpen: Boolean;
     function GetPrepared: Boolean;
-    function GetSQLType: TIBSQLTypes;
+    function GetSQLStatementType: TIBSQLStatementTypes;
     procedure SetUniqueParamNames(AValue: Boolean);
   protected
     FBase: TIBBase;
@@ -215,7 +215,7 @@ type
     property Prepared: Boolean read GetPrepared;
     property RecordCount: Integer read GetRecordCount;
     property RowsAffected: Integer read GetRowsAffected;
-    property SQLType: TIBSQLTypes read GetSQLType;
+    property SQLStatementType: TIBSQLStatementTypes read GetSQLStatementType;
     property UniqueRelationName: String read GetUniqueRelationName;
     property Statement: IStatement read FStatement;
     property MetaData: IMetaData read FMetaData;
@@ -589,7 +589,7 @@ begin
     Prepare;
   InputObject.FParams := Self.GetSQLParams;
   InputObject.ReadyFile;
-  if GetSQLType in [SQLInsert, SQLUpdate, SQLDelete, SQLExecProcedure] then
+  if GetSQLStatementType in [SQLInsert, SQLUpdate, SQLDelete, SQLExecProcedure] then
     while InputObject.ReadParameters do
       ExecQuery;
 end;
@@ -599,7 +599,7 @@ begin
   CheckClosed;
   if not Prepared then
     Prepare;
-  if GetSQLType = SQLSelect then begin
+  if GetSQLStatementType = SQLSelect then begin
     try
       ExecQuery;
       OutputObject.FColumns := Self.FResults;
@@ -661,12 +661,12 @@ begin
   Result := (FStatement <> nil) and FStatement.IsPrepared;
 end;
 
-function TIBSQL.GetSQLType: TIBSQLTypes;
+function TIBSQL.GetSQLStatementType: TIBSQLStatementTypes;
 begin
   if FStatement = nil then
     Result := SQLUnknown
   else
-    Result := FStatement.GetSQLType;
+    Result := FStatement.GetSQLStatementType;
 end;
 
  procedure TIBSQL.SetUniqueParamNames(AValue: Boolean);
@@ -688,7 +688,7 @@ begin
   CheckClosed;
   if not Prepared then Prepare;
   CheckValidStatement;
-  if SQLType = SQLSelect then
+  if SQLStatementType = SQLSelect then
   begin
     FResultSet := FStatement.OpenCursor;
     FResults := FResultSet;
@@ -797,7 +797,7 @@ end;
 function TIBSQL.GetPlan: String;
 begin
   if (not Prepared) or
-     (not (GetSQLType in [SQLSelect, SQLSelectForUpdate,
+     (not (GetSQLStatementType in [SQLSelect, SQLSelectForUpdate,
        {TODO: SQLExecProcedure, }
        SQLUpdate, SQLDelete])) then
     result := ''
@@ -869,7 +869,7 @@ end;
 
 function TIBSQL.GetUniqueRelationName: String;
 begin
-  if Prepared and (GetSQLType = SQLSelect) then
+  if Prepared and (GetSQLStatementType = SQLSelect) then
     result := FMetaData.GetUniqueRelationName
   else
     result := '';

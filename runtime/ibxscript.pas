@@ -496,14 +496,14 @@ begin
      if not InTransaction then StartTransaction;
    FISQL.ParamCheck := not FHasBegin; {Probably PSQL}
    FISQL.Prepare;
-   if FISQL.SQLType in [SQLInsert, SQLUpdate, SQLDelete] then
+   if FISQL.SQLStatementType in [SQLInsert, SQLUpdate, SQLDelete] then
    begin
      {Interpret parameters}
      for I := 0 to FISQL.Params.Count - 1 do
        SetParamValue(FISQL.Params[I]);
    end;
 
-   if FISQL.SQLType = SQLSelect then
+   if FISQL.SQLStatementType = SQLSelect then
    begin
      if assigned(OnSelectSQL) then
        OnSelectSQL(self,FSQLText)
@@ -512,7 +512,7 @@ begin
    end
    else
    begin
-     DDL := FISQL.SQLType = SQLDDL;
+     DDL := FISQL.SQLStatementType = SQLDDL;
      if not DDL or not FIgnoreGrants or (Pos('GRANT',AnsiUpperCase(Trim(FSQLText))) <> 1) then
        FISQL.ExecQuery;
      if FAutoDDL and DDL then

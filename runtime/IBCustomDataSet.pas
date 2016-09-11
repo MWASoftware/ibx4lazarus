@@ -402,7 +402,7 @@ type
     function GetSQLParams: ISQLParams;
     function GetRefreshSQL: TStrings;
     function GetSelectSQL: TStrings;
-    function GetStatementType: TIBSQLTypes;
+    function GetStatementType: TIBSQLStatementTypes;
     function GetModifySQL: TStrings;
     function GetTransaction: TIBTransaction;
     function GetParser: TSelectSQLParser;
@@ -544,7 +544,7 @@ type
     property QRefresh: TIBSQL read FQRefresh;
     property QSelect: TIBSQL read FQSelect;
     property QModify: TIBSQL read FQModify;
-    property StatementType: TIBSQLTypes read GetStatementType;
+    property StatementType: TIBSQLStatementTypes read GetStatementType;
     property SelectStmtHandle: IStatement read GetSelectStmtIntf;
 
     {Likely to be made published by descendant classes}
@@ -2040,9 +2040,9 @@ begin
   result := FQSelect.SQL;
 end;
 
-function TIBCustomDataSet.GetStatementType: TIBSQLTypes;
+function TIBCustomDataSet.GetStatementType: TIBSQLStatementTypes;
 begin
-  result := FQSelect.SQLType;
+  result := FQSelect.SQLStatementType;
 end;
 
 function TIBCustomDataSet.GetModifySQL: TStrings;
@@ -2228,7 +2228,7 @@ begin
         SetInternalSQLParams(Qry, Buff);
         Qry.ExecQuery;
         try
-          if (Qry.SQLType = SQLExecProcedure) or Qry.Next then
+          if (Qry.SQLStatementType = SQLExecProcedure) or Qry.Next then
           begin
             ofs := PRecordData(Buff)^.rdSavedOffset;
             FetchCurrentRecordToBuffer(Qry,
@@ -3594,12 +3594,11 @@ begin
            their values }
           SQL_VARYING, SQL_TEXT:
           begin
-            CharSetSize := FBase.GetCharSetSize(getCharSetID);
-            CharSetName := FBase.GetCharSetName(getCharSetID);
+            FirebirdAPI.CharSetWidth(getCharSetID,CharSetSize);
+            CharSetName := FirebirdAPI.GetCharsetName(getCharSetID);
             {$IFDEF HAS_ANSISTRING_CODEPAGE}
-            FieldCodePage := FBase.GetCodePage(getCharSetID);
+            FirebirdAPI.CharSetID2CodePage(getCharSetID,FieldCodePage);
             {$ENDIF}
-            {FieldSize is encoded for strings - see TIBStringField.SetSize for decode}
             FieldSize := GetSize;
             if CharSetSize = 2 then
               FieldType := ftWideString
@@ -3664,32 +3663,11 @@ begin
             FieldSize := sizeof (TISC_QUAD);
             if (getSubtype = 1) then
             begin
-              if FBase.GetDefaultCharSetName <> '' then
-              begin
-                CharSetSize := FBase.GetDefaultCharSetSize;
-                CharSetName := FBase.GetDefaultCharSetName;
-                {$IFDEF HAS_ANSISTRING_CODEPAGE}
-                FieldCodePage := FBase.GetDefaultCodePage;
-                {$ENDIF}
-              end
-              else
-              if getSQLName <> '' then
-              begin
-                charSetID := GetBlobMetaData.GetCharSetID;
-                CharSetSize := FBase.GetCharSetSize(charSetID);
-                CharSetName := FBase.GetCharSetName(charSetID);
-                {$IFDEF HAS_ANSISTRING_CODEPAGE}
-                FieldCodePage := FBase.GetCodePage(charSetID);
-                {$ENDIF}
-             end
-             else  {Complex SQL with no identifiable column }
-             begin
-                CharSetName := '';
-                CharSetSize := 1;
-                {$IFDEF HAS_ANSISTRING_CODEPAGE}
-                FieldCodePage := CP_NONE;
-                {$ENDIF}
-              end;
+              FirebirdAPI.CharSetWidth(getCharSetID,CharSetSize);
+              CharSetName := FirebirdAPI.GetCharsetName(getCharSetID);
+              {$IFDEF HAS_ANSISTRING_CODEPAGE}
+              FirebirdAPI.CharSetID2CodePage(getCharSetID,FieldCodePage);
+              {$ENDIF}
               if CharSetSize = 2 then
                 FieldType := ftWideMemo
               else
@@ -3953,7 +3931,7 @@ begin
       IBError(ibxeEmptyQuery, [nil]);
     if not FInternalPrepared then
       InternalPrepare;
-   if FQSelect.SQLType = SQLSelect then
+   if FQSelect.SQLStatementType = SQLSelect then
    begin
       if DefaultFields then
         CreateFields;
@@ -4328,7 +4306,7 @@ begin
       IBError(ibxeEmptyQuery, [nil]);
     if not FInternalPrepared then
       InternalPrepare;
-    if FQSelect.SQLType = SQLSelect then
+    if FQSelect.SQLStatementType = SQLSelect then
     begin
       IBError(ibxeIsASelectStatement, [nil]);
     end
