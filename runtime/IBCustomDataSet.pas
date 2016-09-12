@@ -159,17 +159,6 @@ type
     {$ENDIF}
   end;
 
-  { TIBWideStringField }
-
-  TIBWideStringField = class(TWideStringField)
-  private
-    FCharacterSetName: RawByteString;
-    FCharacterSetSize: integer;
-  public
-    property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
-    property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
-  end;
-
   { TIBBCDField }
   {  Actually, there is no BCD involved in this type,
      instead it deals with currency types.
@@ -219,26 +208,6 @@ type
    public
      property CodePage: TSystemCodePage read FFCodePage write FFCodePage;
    {$ENDIF}
-   end;
-
-   { TIBWideMemoField }
-
-   TIBWideMemoField = class(TWideMemoField)
-   private
-     FCharacterSetName: RawByteString;
-     FCharacterSetSize: integer;
-     FDisplayTextAsClassName: boolean;
-     function GetTruncatedText: string;
-   protected
-     function GetDefaultWidth: Longint; override;
-     procedure GetText(var AText: string; ADisplayText: Boolean); override;
-   public
-     constructor Create(AOwner: TComponent); override;
-     property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
-     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
-   published
-      property DisplayTextAsClassName: boolean read FDisplayTextAsClassName
-                                             write FDisplayTextAsClassName;
    end;
 
   TIBDataLink = class(TDetailDataLink)
@@ -785,7 +754,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     TBlobField,         { ftTypedBinary }
     nil,                { ftCursor }
     TStringField,       { ftFixedChar }
-    TIBWideStringField,    { ftWideString }
+    nil,    { ftWideString }
     TLargeIntField,     { ftLargeInt }
     nil,          { ftADT }
     TIBArrayField,        { ftArray }
@@ -800,7 +769,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     TDateTimeField,    {ftTimestamp}
     TIBBCDField,       {ftFMTBcd}
     nil,  {ftFixedWideChar}
-    TIBWideMemoField);   {ftWideMemo}
+    nil);   {ftWideMemo}
 (*
     TADTField,          { ftADT }
     TArrayField,        { ftArray }
@@ -923,44 +892,6 @@ constructor TIBArrayField.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   SetDataType(ftArray);
-end;
-
-{ TIBWideMemoField }
-
-function TIBWideMemoField.GetTruncatedText: string;
-begin
-  Result := GetAsString;
-
-  if Result <> '' then
-    if DisplayWidth = 0 then
-      Result := TextToSingleLine(Result)
-    else
-    if Length(Result) > DisplayWidth then {Show truncation with elipses}
-      Result := TextToSingleLine(system.copy(Result,1,DisplayWidth-3)) + '...';
-end;
-
-function TIBWideMemoField.GetDefaultWidth: Longint;
-begin
-  Result := 128;
-end;
-
-procedure TIBWideMemoField.GetText(var AText: string; ADisplayText: Boolean);
-begin
-  if ADisplayText then
-  begin
-    if not DisplayTextAsClassName and (CharacterSetName<> '') then
-      AText := GetTruncatedText
-    else
-      inherited GetText(AText, ADisplayText);
-  end
-  else
-    AText := GetAsString;
-end;
-
-constructor TIBWideMemoField.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  BlobType := ftWideMemo;
 end;
 
 { TIBMemoField }
@@ -3600,10 +3531,7 @@ begin
             FirebirdAPI.CharSetID2CodePage(getCharSetID,FieldCodePage);
             {$ENDIF}
             FieldSize := GetSize;
-            if CharSetSize = 2 then
-              FieldType := ftWideString
-            else
-              FieldType := ftString;
+            FieldType := ftString;
           end;
           { All Doubles/Floats should be cast to doubles }
           SQL_DOUBLE, SQL_FLOAT:
@@ -3668,10 +3596,7 @@ begin
               {$IFDEF HAS_ANSISTRING_CODEPAGE}
               FirebirdAPI.CharSetID2CodePage(getCharSetID,FieldCodePage);
               {$ENDIF}
-              if CharSetSize = 2 then
-                FieldType := ftWideMemo
-              else
-                FieldType := ftMemo;
+              FieldType := ftMemo;
             end
             else
               FieldType := ftBlob;
@@ -3880,17 +3805,6 @@ procedure TIBCustomDataSet.InternalOpen;
           end;
         end
         else
-        if(Fields[i] is TIBWideStringField) then
-        with TIBWideStringField(Fields[i]) do
-        begin
-          IBFieldDef := GetFieldDef(FieldNo);
-          if IBFieldDef <> nil then
-          begin
-            CharacterSetSize := IBFieldDef.CharacterSetSize;
-            CharacterSetName := IBFieldDef.CharacterSetName;
-          end;
-        end
-        else
         if(Fields[i] is TIBMemoField) then
         with TIBMemoField(Fields[i]) do
         begin
@@ -3902,17 +3816,6 @@ procedure TIBCustomDataSet.InternalOpen;
             {$IFDEF HAS_ANSISTRING_CODEPAGE}
             CodePage := IBFieldDef.CodePage;
             {$ENDIF}
-          end;
-        end
-        else
-        if(Fields[i] is TIBWideMemoField) then
-        with TIBWideMemoField(Fields[i]) do
-        begin
-          IBFieldDef := GetFieldDef(FieldNo);
-          if IBFieldDef <> nil then
-          begin
-            CharacterSetSize := IBFieldDef.CharacterSetSize;
-            CharacterSetName := IBFieldDef.CharacterSetName;
           end;
         end
         else
