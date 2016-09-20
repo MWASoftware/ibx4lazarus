@@ -98,6 +98,9 @@ type
     fdDataSize: Short;
     fdDataLength: Short;
     fdDataOfs: Integer;
+    {$IFDEF HAS_ANSISTRING_CODEPAGE}
+    fdCodePage: TSystemCodePage;
+    {$ENDIF}
   end;
   PFieldData = ^TFieldData;
 
@@ -929,6 +932,8 @@ begin
   s := inherited GetAsString;
   {$IFDEF HAS_ANSISTRING_CODEPAGE}
   SetCodePage(s,CodePage,false);
+  if CodePage <> CP_NONE then
+    SetCodePage(s,CP_UTF8,true);  {LCL only accepts UTF8}
   {$ENDIF}
   Result := s;
 end;
@@ -1050,6 +1055,8 @@ begin
       {$IFDEF HAS_ANSISTRING_CODEPAGE}
       s := string(Buffer);
       SetCodePage(s,CodePage,false);
+      if CodePage <> CP_NONE then
+        SetCodePage(s,CP_UTF8,true);  {LCL only accepts UTF8}
       Value := s;
 //      writeln(FieldName,': ', StringCodePage(Value),', ',Value);
       {$ELSE}
@@ -1725,7 +1732,7 @@ var
   i, j: Integer;
   LocalData: Pointer;
   LocalDate, LocalDouble: Double;
-  LocalString: string;
+  LocalString: RawByteString;
   LocalInt: Integer;
   LocalBool: wordBool;
   LocalInt64: Int64;
@@ -1775,6 +1782,9 @@ begin
       rdFields[j].fdDataType := Qry.MetaData[i].GetSqltype ;
       rdFields[j].fdDataScale :=  Qry.MetaData[i].Getscale;
       rdFields[j].fdNullable :=  Qry.MetaData[i].IsNullable;
+      {$IFDEF HAS_ANSISTRING_CODEPAGE}
+      rdFields[j].fdCodePage := Qry.MetaData[i].getCodePage;
+      {$ENDIF}
       if RecordNumber >= 0 then
       begin
         rdFields[j].fdIsNull :=  rdFields[j].fdNullable and Qry[i].IsNull;
@@ -1855,6 +1865,7 @@ begin
             LocalDouble := Qry[i].AsDouble;
           LocalData := PChar(@LocalDouble);
         end;
+        SQL_TEXT,
         SQL_VARYING:
         begin
           if RecordNumber >= 0 then
@@ -1876,7 +1887,7 @@ begin
             LocalBool := Qry[i].AsBoolean;
           LocalData := PChar(@LocalBool);
         end;
-        else { SQL_TEXT, SQL_BLOB, SQL_ARRAY, SQL_QUAD }
+        else { SQL_BLOB, SQL_ARRAY, SQL_QUAD }
         begin
           rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
           if (rdFields[j].fdDataType = SQL_TEXT) then
@@ -2403,7 +2414,8 @@ procedure TIBCustomDataSet.SetInternalSQLParams(Qry: TIBSQL; Buffer: Pointer);
 var
   i, j: Integer;
   cr, data: PChar;
-  fn, st: string;
+  fn: string;
+  st: RawByteString;
   OldBuffer: Pointer;
   ts: TTimeStamp;
 begin
@@ -2451,6 +2463,9 @@ begin
               SQL_TEXT, SQL_VARYING:
               begin
                 SetString(st, data, rdFields[j].fdDataLength);
+                {$IFDEF HAS_ANSISTRING_CODEPAGE}
+                SetCodePage(st,rdFields[j].fdCodePage,false);
+                {$ENDIF}
                 Qry.Params[i].AsString := st;
               end;
             SQL_FLOAT, SQL_DOUBLE, SQL_D_FLOAT:

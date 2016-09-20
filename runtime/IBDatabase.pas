@@ -903,11 +903,6 @@ var
   aDBName: string;
   Status: IStatus;
   CharSetID: integer;
-
-  {Call error analysis}
-  {$ifdef WINDOWS}
-  acp: uint;
-  {$endif}
 begin
   CheckInactive;
   CheckDatabaseName;
@@ -927,24 +922,17 @@ begin
    if UseDefaultSystemCodePage then
    begin
      {$ifdef WINDOWS}
-     acp := GetACP;
-     {$IFDEF HAS_ANSISTRING_CODEPAGE}
-     TempDBParams.Values['lc_ctype'] := IBGetCharacterSetName(acp);
-     FDefaultCodePage := IBGetCodePage(AnsiUpperCase(TempDBParams.Values['lc_ctype']));
-     {$ELSE}
-     if (acp >= 1250) and (acp <= 1258) then
-       TempDBParams.Values['lc_ctype'] := Format('WIN%d',[acp])
+     if FirebirdAPI.CodePage2CharSetID(GetACP,CharSetID) then
+       TempDBParams.Values['lc_ctype'] := FirebirdAPI.GetCharsetName(CharSetID)
      else
-       TempDBParams.Values['lc_ctype'] :='UTF8';
-     {$ENDIF}
      {$else}
      {$IFDEF HAS_ANSISTRING_CODEPAGE}
-     if FIrebirdAPI.CodePage2CharSetID(DefaultSystemCodePage,CharSetID) then
-       TempDBParams.Values['lc_ctype'] := FirebirdAPI.GetCharsetName(CharSetID);
-     {$ELSE}
-     TempDBParams.Values['lc_ctype'] :='UTF8';
+     if FirebirdAPI.CodePage2CharSetID(DefaultSystemCodePage,CharSetID) then
+       TempDBParams.Values['lc_ctype'] := FirebirdAPI.GetCharsetName(CharSetID)
+     else
      {$ENDIF}
      {$endif}
+     TempDBParams.Values['lc_ctype'] :='UTF8';
    end;
    {Opportunity to override defaults}
    for i := 0 to FSQLObjects.Count - 1 do
