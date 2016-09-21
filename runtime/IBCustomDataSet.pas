@@ -932,7 +932,7 @@ begin
   s := inherited GetAsString;
   {$IFDEF HAS_ANSISTRING_CODEPAGE}
   SetCodePage(s,CodePage,false);
-  if CodePage <> CP_NONE then
+  if (CodePage <> CP_NONE) and (CodePage <> CP_UTF8) then
     SetCodePage(s,CP_UTF8,true);  {LCL only accepts UTF8}
   {$ENDIF}
   Result := s;
@@ -1055,7 +1055,7 @@ begin
       {$IFDEF HAS_ANSISTRING_CODEPAGE}
       s := string(Buffer);
       SetCodePage(s,CodePage,false);
-      if CodePage <> CP_NONE then
+      if (CodePage <> CP_NONE) and (CodePage <> CP_UTF8) then
         SetCodePage(s,CP_UTF8,true);  {LCL only accepts UTF8}
       Value := s;
 //      writeln(FieldName,': ', StringCodePage(Value),', ',Value);
