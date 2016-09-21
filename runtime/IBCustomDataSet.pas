@@ -1865,7 +1865,6 @@ begin
             LocalDouble := Qry[i].AsDouble;
           LocalData := PChar(@LocalDouble);
         end;
-        SQL_TEXT,
         SQL_VARYING:
         begin
           if RecordNumber >= 0 then
@@ -1887,6 +1886,15 @@ begin
             LocalBool := Qry[i].AsBoolean;
           LocalData := PChar(@LocalBool);
         end;
+        SQL_TEXT:
+        begin
+          rdFields[j].fdDataSize := Qry.Current[i].Data^.sqllen;
+          rdFields[j].fdDataLength := rdFields[j].fdDataSize;
+           {$IFDEF HAS_ANSISTRING_CODEPAGE}
+          TFirebirdCharacterSets.CharSetID2CodePage(Qry.Current[i].Data^.sqlsubtype and $FF,
+                                                    rdFields[j].fdCodePage);
+          {$ENDIF}
+       end;
         else { SQL_BLOB, SQL_ARRAY, SQL_QUAD }
         begin
           rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
