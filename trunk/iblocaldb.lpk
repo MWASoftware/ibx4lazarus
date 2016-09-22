@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <Name Value="iblocaldb"/>
+    <Type Value="RunAndDesignTime"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="iblocaldb"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Files Count="7">
+      <Item1>
+        <Filename Value="iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
+        <UnitName Value="IBXCustomIBLocalDBSupport"/>
+      </Item1>
+      <Item2>
+        <Filename Value="iblocaldb/IBXCreateDatabaseDlg.pas"/>
+        <UnitName Value="IBXCreateDatabaseDlg"/>
+      </Item2>
+      <Item3>
+        <Filename Value="iblocaldb/IBXSaveDatabaseDlg.pas"/>
+        <UnitName Value="IBXSaveDatabaseDlg"/>
+      </Item3>
+      <Item4>
+        <Filename Value="iblocaldb/IBXUpgradeDatabaseDlg.pas"/>
+        <UnitName Value="IBXUpgradeDatabaseDlg"/>
+      </Item4>
+      <Item5>
+        <Filename Value="iblocaldb/IBXViewLogDig.pas"/>
+        <UnitName Value="IBXViewLogDig"/>
+      </Item5>
+      <Item6>
+        <Filename Value="iblocaldb/IBLocalDBSupport.pas"/>
+        <UnitName Value="IBLocalDBSupport"/>
+      </Item6>
+      <Item7>
+        <Filename Value="iblocaldb/IBXUpgradeConfFile.pas"/>
+        <UnitName Value="IBXUpgradeConfFile"/>
+      </Item7>
+    </Files>
+    <RequiredPkgs Count="2">
+      <Item1>
+        <PackageName Value="ibexpress"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="FCL"/>
+      </Item2>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

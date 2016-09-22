@@ -1,0 +1,25 @@
+object Form1: TForm1
+  Left = 311
+  Height = 484
+  Top = 186
+  Width = 618
+  Caption = 'Remote Monitor'
+  ClientHeight = 484
+  ClientWidth = 618
+  LCLVersion = '1.4.4.0'
+  object Memo1: TMemo
+    Left = 7
+    Height = 461
+    Top = 12
+    Width = 598
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+  end
+  object IBSQLMonitor1: TIBSQLMonitor
+    OnSQL = IBSQLMonitor1SQL
+    TraceFlags = [tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect, tfTransact, tfBlob, tfService, tfMisc]
+    left = 376
+    top = 55
+  end
+end

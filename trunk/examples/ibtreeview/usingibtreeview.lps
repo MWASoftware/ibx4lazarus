@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="44">
+      <Unit0>
+        <Filename Value="usingibtreeview.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="9"/>
+        <UsageCount Value="77"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="Unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="3"/>
+        <CursorPos X="36" Y="17"/>
+        <UsageCount Value="77"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="1968"/>
+        <CursorPos Y="1982"/>
+        <UsageCount Value="68"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="../../design/IBDBReg.pas"/>
+        <UsageCount Value="5"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="../../runtime/IBTreeView.pas"/>
+        <TopLine Value="482"/>
+        <CursorPos Y="486"/>
+        <UsageCount Value="32"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="Unit1.lfm"/>
+        <TopLine Value="158"/>
+        <UsageCount Value="6"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="../../runtime/IB.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="408"/>
+        <CursorPos X="30" Y="419"/>
+        <UsageCount Value="22"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="195"/>
+        <CursorPos X="3" Y="198"/>
+        <UsageCount Value="10"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1416"/>
+        <CursorPos X="15" Y="1434"/>
+        <UsageCount Value="10"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/database.inc"/>
+        <TopLine Value="283"/>
+        <CursorPos X="15" Y="288"/>
+        <UsageCount Value="9"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="../../runtime/IBSQL.pas"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="814"/>
+        <CursorPos Y="831"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
+        <TopLine Value="94"/>
+        <CursorPos X="44" Y="103"/>
+        <UsageCount Value="9"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/compon.inc"/>
+        <TopLine Value="254"/>
+        <CursorPos X="28" Y="278"/>
+        <UsageCount Value="8"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="../../../../lcl/include/treeview.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3873"/>
+        <CursorPos X="3" Y="3878"/>
+        <UsageCount Value="27"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="../../../../lcl/comctrls.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3421"/>
+        <CursorPos X="20" Y="3439"/>
+        <UsageCount Value="27"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="../../../../lcl/include/control.inc"/>
+        <TopLine Value="1417"/>
+        <CursorPos X="30" Y="1428"/>
+        <UsageCount Value="12"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/datasource.inc"/>
+        <TopLine Value="93"/>
+        <CursorPos X="3" Y="97"/>
+        <UsageCount Value="7"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="../../../../lcl/controls.pp"/>
+        <TopLine Value="2573"/>
+        <CursorPos X="31" Y="2588"/>
+        <UsageCount Value="12"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="../../../../lcl/include/dragmanager.inc"/>
+        <TopLine Value="727"/>
+        <CursorPos X="3" Y="729"/>
+        <UsageCount Value="9"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="../../runtime/IBLookupComboEditBox.pas"/>
+        <TopLine Value="313"/>
+        <CursorPos X="16" Y="330"/>
+        <UsageCount Value="19"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="../../../../debugger/processdebugger.pp"/>
+        <TopLine Value="107"/>
+        <CursorPos X="14" Y="121"/>
+        <UsageCount Value="16"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="../../design/ibselectsqleditor.pas"/>
+        <ComponentName Value="IBSelectSQLEditorForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="146"/>
+        <CursorPos X="26" Y="163"/>
+        <UsageCount Value="16"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="../../../../lcl/dbctrls.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="664"/>
+        <CursorPos X="15" Y="677"/>
+        <UsageCount Value="19"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="../../../../lcl/stdctrls.pp"/>
+        <TopLine Value="220"/>
+        <CursorPos X="29" Y="232"/>
+        <UsageCount Value="19"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="../../../../lcl/include/customcombobox.inc"/>
+        <TopLine Value="920"/>
+        <CursorPos X="34" Y="938"/>
+        <UsageCount Value="19"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="../../../../lcl/lclproc.pas"/>
+        <TopLine Value="321"/>
+        <CursorPos X="10" Y="335"/>
+        <UsageCount Value="16"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="47"/>
+        <CursorPos X="3" Y="51"/>
+        <UsageCount Value="16"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="../../design/IBSystemTables.pas"/>
+        <TopLine Value="295"/>
+        <CursorPos X="3" Y="324"/>
+        <UsageCount Value="15"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="../../runtime/IBSQLMonitor.pas"/>
+        <TopLine Value="1063"/>
+        <CursorPos Y="1092"/>
+        <UsageCount Value="15"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <TopLine Value="925"/>
+        <CursorPos X="16" Y="946"/>
+        <UsageCount Value="15"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="/usr/share/fpcsrc/rtl/inc/threadh.inc"/>
+        <TopLine Value="134"/>
+        <CursorPos X="11" Y="149"/>
+        <UsageCount Value="15"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="/usr/share/fpcsrc/rtl/inc/thread.inc"/>
+        <TopLine Value="190"/>
+        <CursorPos X="3" Y="193"/>
+        <UsageCount Value="15"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="/usr/share/fpcsrc/rtl/inc/systemh.inc"/>
+        <TopLine Value="1196"/>
+        <CursorPos X="3" Y="478"/>
+        <UsageCount Value="15"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="../../runtime/IBDynamicGrid.pas"/>
+        <TopLine Value="403"/>
+        <CursorPos Y="410"/>
+        <UsageCount Value="10"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="../../runtime/IBSQLParser.pas"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="154"/>
+        <CursorPos X="21" Y="167"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit34>
+      <Unit35>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="277"/>
+        <CursorPos X="21" Y="284"/>
+        <UsageCount Value="10"/>
+      </Unit35>
+      <Unit36>
+        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="530"/>
+        <CursorPos X="42" Y="546"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit36>
+      <Unit37>
+        <Filename Value="../../runtime/IBQuery.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="358"/>
+        <CursorPos X="3" Y="360"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit37>
+      <Unit38>
+        <Filename Value="../../runtime/IBTable.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="137"/>
+        <CursorPos X="33" Y="154"/>
+        <UsageCount Value="10"/>
+      </Unit38>
+      <Unit39>
+        <Filename Value="../../../../../1.2.6/thirdparty/ibx/design/IBDBReg.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="371"/>
+        <CursorPos X="28" Y="371"/>
+        <UsageCount Value="10"/>
+      </Unit39>
+      <Unit40>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="793"/>
+        <CursorPos Y="804"/>
+        <UsageCount Value="10"/>
+      </Unit40>
+      <Unit41>
+        <Filename Value="../../../../lcl/include/customdbcombobox.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="51"/>
+        <CursorPos X="3" Y="53"/>
+        <UsageCount Value="10"/>
+      </Unit41>
+      <Unit42>
+        <Filename Value="../../changelog"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="13" Y="19"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit42>
+      <Unit43>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="1400"/>
+        <CursorPos X="30" Y="1492"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit43>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="2683" Column="17" TopLine="2677"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="512" Column="39" TopLine="498"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="1982" Column="18" TopLine="1977"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="314" Column="26" TopLine="305"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="1983" Column="23" TopLine="1967"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="1982" TopLine="1967"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/IBSQL.pas"/>
+        <Caret Line="828" TopLine="814"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/IBSQL.pas"/>
+        <Caret Line="830" TopLine="814"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/IBSQL.pas"/>
+        <Caret Line="831" TopLine="814"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="1983" TopLine="1967"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="1990" TopLine="1986"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="2004" Column="98" TopLine="1986"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="2174" TopLine="2169"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="2175" TopLine="2169"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="1491" TopLine="1477"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="1492" TopLine="1477"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="1493" TopLine="1477"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="1495" TopLine="1477"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="1512" TopLine="1499"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="1488" TopLine="1474"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="2174" TopLine="2160"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="2175" Column="21" TopLine="2170"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="160" Column="16" TopLine="148"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="2175" Column="20" TopLine="2170"/>
+      </Position25>
+      <Position26>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="1513" TopLine="1494"/>
+      </Position26>
+      <Position27>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="348" Column="25" TopLine="344"/>
+      </Position27>
+      <Position28>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="335" Column="29" TopLine="321"/>
+      </Position28>
+      <Position29>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="291" Column="32" TopLine="277"/>
+      </Position29>
+      <Position30>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Caret Line="116" Column="60" TopLine="93"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

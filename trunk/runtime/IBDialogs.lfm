@@ -1,0 +1,88 @@
+object IBXLoginDlg: TIBXLoginDlg
+  Left = 954
+  Height = 230
+  Top = 351
+  Width = 385
+  ActiveControl = Password
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'Database Login'
+  ClientHeight = 230
+  ClientWidth = 385
+  Position = poScreenCenter
+  LCLVersion = '1.6.0.4'
+  object DatabaseName: TLabel
+    Left = 144
+    Height = 15
+    Top = 40
+    Width = 35
+    Caption = 'Name'
+    ParentColor = False
+  end
+  object TargetCaption: TLabel
+    Left = 32
+    Height = 15
+    Top = 40
+    Width = 60
+    Caption = 'Database:'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 34
+    Height = 15
+    Top = 87
+    Width = 74
+    Caption = 'User  Name:'
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 35
+    Height = 15
+    Top = 135
+    Width = 59
+    Caption = 'Password:'
+    ParentColor = False
+  end
+  object Bevel1: TBevel
+    Left = 15
+    Height = 169
+    Top = 15
+    Width = 356
+  end
+  object Button1: TButton
+    Left = 297
+    Height = 25
+    Top = 192
+    Width = 75
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 216
+    Height = 25
+    Top = 192
+    Width = 75
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 1
+  end
+  object UserName: TEdit
+    Left = 144
+    Height = 25
+    Top = 87
+    Width = 195
+    TabOrder = 2
+  end
+  object Password: TEdit
+    Left = 144
+    Height = 25
+    Top = 129
+    Width = 190
+    EchoMode = emPassword
+    PasswordChar = '*'
+    TabOrder = 3
+  end
+end
