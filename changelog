@@ -1,4 +1,4 @@
-IBX Change Log  version                                      (1.4-3) tba, 11 Aug 2016 16:04:30 +0100
+IBX Change Log  version                                      (2.0.0) tba, 11 Aug 2016 16:04:30 +0100
 
 1. IBCustomDataset: When calling SetCodePage, no longer request transliteration
    when target codepage is CP_NONE.
@@ -8,6 +8,11 @@ IBX Change Log  version                                      (1.4-3) tba, 11 Aug
 
 3. ibxscript: An error is no longer generated for "on commit preserve rows" or
    similar.
+
+4. Strings received from the database are now always transliterated into UTF8
+   regardless of the database character set or connection character set. This
+   is for compatibility with the LCL.
+
 
 IBX Change Log  version                                     (1.4-2) Sat, 16 Jul 2016 13:25:48 +0100
 
