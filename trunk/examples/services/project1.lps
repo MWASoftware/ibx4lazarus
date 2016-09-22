@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="17">
+      <Unit0>
+        <Filename Value="project1.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="13" Y="10"/>
+        <UsageCount Value="28"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="Unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="23"/>
+        <CursorPos X="15" Y="41"/>
+        <UsageCount Value="28"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1178"/>
+        <CursorPos Y="1186"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="../../runtime/IB.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="41"/>
+        <CursorPos X="16" Y="60"/>
+        <UsageCount Value="13"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1056"/>
+        <CursorPos Y="1068"/>
+        <UsageCount Value="10"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="../../changelog"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="58" Y="13"/>
+        <UsageCount Value="13"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="../../runtime/IBDialogs.pas"/>
+        <ComponentName Value="IBXLoginDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="88"/>
+        <CursorPos X="36" Y="95"/>
+        <UsageCount Value="13"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="../../runtime/IBDialogs.lfm"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="16"/>
+        <CursorPos X="16" Y="38"/>
+        <UsageCount Value="12"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="../../../../lcl/include/control.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3253"/>
+        <CursorPos Y="3271"/>
+        <UsageCount Value="11"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="../../design/IBDSDialogs.pas"/>
+        <ComponentName Value="IBXDSLoginDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="140"/>
+        <CursorPos X="38" Y="145"/>
+        <UsageCount Value="11"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="../../design/IBDBReg.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="414"/>
+        <CursorPos Y="441"/>
+        <UsageCount Value="11"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="../../../../components/projecttemplates/idetemplateproject.pp"/>
+        <UnitName Value="IDETemplateProject"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="67"/>
+        <CursorPos X="19" Y="85"/>
+        <UsageCount Value="11"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="../../../../components/ideintf/baseideintf.pas"/>
+        <UnitName Value="BaseIDEIntf"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="46" Y="23"/>
+        <UsageCount Value="11"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="../../../../components/lazutils/lazconfigstorage.pas"/>
+        <UnitName Value="LazConfigStorage"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="640"/>
+        <CursorPos X="3" Y="642"/>
+        <UsageCount Value="11"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="../../../../components/ideintf/lazideintf.pas"/>
+        <UnitName Value="LazIDEIntf"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="323"/>
+        <CursorPos X="36" Y="346"/>
+        <UsageCount Value="11"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="../../../../components/ideintf/projectintf.pas"/>
+        <UnitName Value="ProjectIntf"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="470"/>
+        <CursorPos X="3" Y="418"/>
+        <UsageCount Value="11"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3842"/>
+        <CursorPos X="55" Y="3850"/>
+        <UsageCount Value="10"/>
+      </Unit16>
+    </Units>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="41" Column="15" TopLine="23"/>
+      </Position1>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

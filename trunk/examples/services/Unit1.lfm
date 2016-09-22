@@ -1,0 +1,41 @@
+object Form1: TForm1
+  Left = 1062
+  Height = 370
+  Top = 405
+  Width = 453
+  Caption = 'Server Properties'
+  ClientHeight = 370
+  ClientWidth = 453
+  OnShow = FormShow
+  LCLVersion = '1.6.0.4'
+  object Memo1: TMemo
+    Left = 8
+    Height = 322
+    Top = 9
+    Width = 434
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    TabOrder = 0
+  end
+  object Button1: TButton
+    Left = 366
+    Height = 25
+    Top = 340
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Close'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+  object IBServerProperties1: TIBServerProperties
+    ServerName = 'localhost'
+    Protocol = TCP
+    Params.Strings = (
+      'user_name=SYSDBA'
+      ''
+    )
+    TraceFlags = []
+    Options = []
+    left = 320
+    top = 24
+  end
+end
