@@ -172,6 +172,9 @@ type
   TIBDataBase = class(TCustomConnection)
   private
     FAttachment: IAttachment;
+    FDefaultCharSetID: integer;
+    FDefaultCharSetName: RawByteString;
+    FDefaultCodePage: TSystemCodePage;
     FDPB: IDPB;
     FAllowStreamedConnected: boolean;
     FHiddenPassword: string;
@@ -259,6 +262,11 @@ type
     property TransactionCount: Integer read GetTransactionCount;
     property Transactions[Index: Integer]: TIBTransaction read GetTransaction;
     property InternalTransaction: TIBTransaction read FInternalTransaction;
+    property DefaultCharSetName: RawByteString read FDefaultCharSetName;
+    property DefaultCharSetID: integer read FDefaultCharSetID;
+    {$IFDEF HAS_ANSISTRING_CODEPAGE}
+    property DefaultCodePage: TSystemCodePage read FDefaultCodePage;
+    {$ENDIF}
 
   published
     property Connected;
@@ -589,6 +597,11 @@ begin
   if Connected then
     InternalClose(False);
   FDBSQLDialect := 1;
+  FDefaultCharSetName := '';
+  FDefaultCharSetID := 0;
+  {$IFDEF HAS_ANSISTRING_CODEPAGE}
+  FDefaultCodePage := CP_NONE;
+  {$ENDIF}
 end;
 
   procedure TIBDataBase.CreateDatabase;
@@ -941,6 +954,12 @@ begin
          SQLObjects[i].DoBeforeDatabaseConnect(TempDBParams,aDBName);
    end;
 
+   FDefaultCharSetName := AnsiUpperCase(TempDBParams.Values['lc_ctype']);
+   if FDefaultCharSetName <> '' then
+     FirebirdAPI.CharSetName2CharSetID(FDefaultCharSetName,FDefaultCharSetID);
+   {$IFDEF HAS_ANSISTRING_CODEPAGE}
+   FirebirdAPI.CharSetID2CodePage(FDefaultCharSetID,FDefaultCodePage);
+   {$ENDIF}
    { Generate a new DPB if necessary }
    if (FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text)) then
    begin

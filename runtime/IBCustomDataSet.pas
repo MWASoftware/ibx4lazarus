@@ -1873,6 +1873,9 @@ begin
             LocalString := '';
           rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
           rdFields[j].fdDataLength := Length(LocalString);
+          {$IFDEF HAS_ANSISTRING_CODEPAGE}
+          rdFields[j].fdCodePage := Qry.MetaData[i].GetCodePage;
+         {$ENDIF}
           if (rdFields[j].fdDataLength = 0) then
             LocalData := nil
           else
@@ -1888,11 +1891,10 @@ begin
         end;
         SQL_TEXT:
         begin
-          rdFields[j].fdDataSize := Qry.Current[i].Data^.sqllen;
+          rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
           rdFields[j].fdDataLength := rdFields[j].fdDataSize;
            {$IFDEF HAS_ANSISTRING_CODEPAGE}
-          TFirebirdCharacterSets.CharSetID2CodePage(Qry.Current[i].Data^.sqlsubtype and $FF,
-                                                    rdFields[j].fdCodePage);
+           rdFields[j].fdCodePage := Qry.MetaData[i].GetCodePage;
           {$ENDIF}
        end;
         else { SQL_BLOB, SQL_ARRAY, SQL_QUAD }

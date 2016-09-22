@@ -48,7 +48,7 @@ type
     FGetProcedures: TIBSQL;
     FGetProcedureParams: TIBSQL;
     FGetProcedureInfo: TIBSQL;
-    function GetSQLType(SQLType: TIBSQLTypes): string;
+    function GetSQLType(SQLType: TIBSQLStatementTypes): string;
     procedure AddWhereClause(TableName: string; QuotedStrings: boolean; SQL: TStrings;
        UseOldValues: boolean = false);
     procedure GetProcParams(ProcName: string; ParamList: TStrings; InputParams: boolean); overload;
@@ -75,7 +75,7 @@ type
     procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);
     procedure GenerateExecuteSQL(ProcName: string; QuotedStrings: boolean; ExecuteOnly: boolean;
               InputParams, OutputParams, ExecuteSQL: TStrings);
-    function GetStatementType(SQL: string; var IsStoredProcedure: boolean): TIBSQLTypes;
+    function GetStatementType(SQL: string; var IsStoredProcedure: boolean): TIBSQLStatementTypes;
     function GetFieldNames(FieldList: TListBox): TStrings;
     procedure TestSQL(SQL: string; GenerateParamNames: boolean = false);
   end;
@@ -136,7 +136,7 @@ const
 
   sqlGETPROCEDUREINFO = 'Select RDB$PROCEDURE_TYPE From RDB$PROCEDURES Where Upper(Trim(RDB$PROCEDURE_NAME)) = Upper(:ProcName)';
 
-function TIBSystemTables.GetSQLType(SQLType: TIBSQLTypes): string;
+function TIBSystemTables.GetSQLType(SQLType: TIBSQLStatementTypes): string;
 begin
   case SQLType of
   SQLUnknown:              Result := 'Unknown';
@@ -421,7 +421,7 @@ begin
   FTableAndColumnSQL.SQL.Text := SelectSQL;
   try
     FTableAndColumnSQL.Prepare;
-    case FTableAndColumnSQL.SQLType of
+    case FTableAndColumnSQL.SQLStatementType of
     SQLSelect:
       begin
         if FTableAndColumnSQL.MetaData.Count > 0 then
@@ -666,7 +666,8 @@ begin
   ExecuteSQL.Text := SQL
 end;
 
-function TIBSystemTables.GetStatementType(SQL: string; var IsStoredProcedure: boolean): TIBSQLTypes;
+function TIBSystemTables.GetStatementType(SQL: string;
+  var IsStoredProcedure: boolean): TIBSQLStatementTypes;
 var TableName: string;
 begin
   Result := sqlUnknown;
@@ -678,7 +679,7 @@ begin
   FTestSQL.GenerateParamNames := true; {permissive}
   try
     FTestSQL.Prepare;
-    Result := FTestSQL.SQLType
+    Result := FTestSQL.SQLStatementType
   except on E:EIBError do
 //      ShowMessage(E.Message);
   end;
@@ -727,7 +728,7 @@ begin
   FTestSQL.SQL.Text := SQL;
   try
     FTestSQL.Prepare;
-    ShowMessage('SQL '+ GetSQLType(FTestSQL.SQLType) + ' Statement Looks OK');
+    ShowMessage('SQL '+ GetSQLType(FTestSQL.SQLStatementType) + ' Statement Looks OK');
   except on E:EIBError do
       ShowMessage(RemoveSQLText(E.Message));
   end;

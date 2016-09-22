@@ -125,7 +125,7 @@ end;
 
 procedure TIBDeleteSQLEditorForm.FormShow(Sender: TObject);
 var IsProcedureName: boolean;
-    SQLType: TIBSQLTypes;
+    SQLType: TIBSQLStatementTypes;
 begin
   GenerateBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
   TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
