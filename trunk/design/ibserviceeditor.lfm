@@ -1,0 +1,162 @@
+object IBServiceEditorForm: TIBServiceEditorForm
+  Left = 416
+  Height = 345
+  Top = 533
+  Width = 438
+  Caption = 'Service Editor'
+  ClientHeight = 345
+  ClientWidth = 438
+  LCLVersion = '1.2.2.0'
+  object Bevel1: TBevel
+    Left = 21
+    Height = 274
+    Top = 22
+    Width = 395
+  end
+  object LocalRbtn: TRadioButton
+    Left = 32
+    Height = 24
+    Top = 32
+    Width = 57
+    Caption = '&Local'
+    Checked = True
+    OnClick = LocalRbtnClick
+    TabOrder = 0
+    TabStop = True
+  end
+  object RemoteRbtn: TRadioButton
+    Left = 97
+    Height = 24
+    Top = 32
+    Width = 71
+    Caption = '&Remote'
+    OnClick = RemoteRbtnClick
+    TabOrder = 1
+  end
+  object Label7: TLabel
+    Left = 32
+    Height = 15
+    Top = 71
+    Width = 43
+    Caption = '&Server:'
+    Enabled = False
+    ParentColor = False
+  end
+  object ServerName: TEdit
+    Left = 32
+    Height = 25
+    Top = 89
+    Width = 144
+    Enabled = False
+    TabOrder = 2
+  end
+  object Label8: TLabel
+    Left = 217
+    Height = 15
+    Top = 71
+    Width = 52
+    Caption = '&Protocol:'
+    Enabled = False
+    ParentColor = False
+  end
+  object Protocol: TComboBox
+    Left = 217
+    Height = 27
+    Top = 89
+    Width = 120
+    Enabled = False
+    ItemHeight = 0
+    Items.Strings = (
+      'TCP'
+      'NamedPipe'
+      'SPX'
+    )
+    TabOrder = 3
+  end
+  object Label2: TLabel
+    Left = 32
+    Height = 15
+    Top = 136
+    Width = 70
+    Caption = '&User Name:'
+    ParentColor = False
+  end
+  object UserName: TEdit
+    Left = 32
+    Height = 25
+    Top = 154
+    Width = 137
+    OnChange = UserNameChange
+    TabOrder = 4
+  end
+  object Label3: TLabel
+    Left = 32
+    Height = 15
+    Top = 192
+    Width = 59
+    Caption = 'Pass&word:'
+    ParentColor = False
+  end
+  object Password: TEdit
+    Left = 32
+    Height = 25
+    Top = 210
+    Width = 137
+    OnChange = PasswordChange
+    TabOrder = 5
+  end
+  object LoginPrompt: TCheckBox
+    Left = 32
+    Height = 24
+    Top = 256
+    Width = 107
+    Caption = 'Lo&gin Prompt'
+    TabOrder = 6
+  end
+  object ServiceParams: TMemo
+    Left = 217
+    Height = 124
+    Top = 154
+    Width = 183
+    ScrollBars = ssAutoVertical
+    TabOrder = 7
+  end
+  object Label5: TLabel
+    Left = 217
+    Height = 15
+    Top = 136
+    Width = 54
+    Caption = 'Se&ttings:'
+    FocusControl = ServiceParams
+    ParentColor = False
+  end
+  object OKBtn: TButton
+    Left = 88
+    Height = 30
+    Top = 305
+    Width = 75
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 8
+  end
+  object CancelBtn: TButton
+    Left = 169
+    Height = 30
+    Top = 305
+    Width = 74
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 9
+  end
+  object Test: TButton
+    Left = 249
+    Height = 30
+    Top = 304
+    Width = 75
+    Caption = '&Test'
+    OnClick = TestClick
+    TabOrder = 10
+  end
+end
