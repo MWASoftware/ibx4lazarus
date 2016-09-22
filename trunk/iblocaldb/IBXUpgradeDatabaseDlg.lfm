@@ -1,0 +1,79 @@
+object UpgradeDatabaseDlg: TUpgradeDatabaseDlg
+  Left = 528
+  Height = 132
+  Top = 302
+  Width = 324
+  ActiveControl = Panel1
+  BorderStyle = bsNone
+  Caption = 'UpdateDatabaseDlg'
+  ClientHeight = 132
+  ClientWidth = 324
+  OnShow = FormShow
+  Position = poMainFormCenter
+  LCLVersion = '1.4.4.0'
+  object Panel1: TPanel
+    Left = 0
+    Height = 132
+    Top = 0
+    Width = 324
+    Align = alClient
+    BorderStyle = bsSingle
+    ClientHeight = 130
+    ClientWidth = 322
+    TabOrder = 1
+    object Label1: TLabel
+      Left = 58
+      Height = 15
+      Top = 16
+      Width = 190
+      Caption = 'Updating Database Schema'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object Status: TLabel
+      Left = 23
+      Height = 34
+      Top = 48
+      Width = 279
+      Alignment = taCenter
+      AutoSize = False
+      Caption = 'Status'
+      ParentColor = False
+      WordWrap = True
+    end
+  end
+  object ProgressBar1: TProgressBar
+    Left = 23
+    Height = 20
+    Top = 96
+    Width = 279
+    Smooth = True
+    TabOrder = 0
+  end
+  object Timer1: TTimer
+    Enabled = False
+    Interval = 200
+    OnTimer = HandleCompletionEvent
+    left = 270
+    top = 16
+  end
+  object IBXScript: TIBXScript
+    IgnoreGrants = True
+    Transaction = UpdateTransaction
+    OnOutputLog = IBXScriptLogProc
+    OnErrorLog = IBXScriptLogProc
+    OnProgressEvent = IBXScriptProgressEvent
+    left = 272
+    top = 48
+  end
+  object UpdateTransaction: TIBTransaction
+    Active = False
+    Params.Strings = (
+      'concurrency'
+      'wait'
+    )
+    left = 232
+    top = 48
+  end
+end
