@@ -56,9 +56,11 @@ type
     FBlobSize: Int64;
     FBlobType: TBlobType;
     FBuffer: PChar;
+    FColumnName: string;
     FMode: TBlobStreamMode;
     FPosition: Int64;
     FBlobState: TIBBlobStates;
+    FRelationName: string;
     function GetBlobID: TISC_QUAD;
     function GetModified: Boolean;
     procedure CheckActive;
@@ -102,6 +104,8 @@ type
     property Mode: TBlobStreamMode read FMode write SetMode;
     property Modified: Boolean read GetModified;
     property Transaction: TIBTransaction read GetTransaction write SetTransaction;
+    property RelationName: string read FRelationName write FRelationName;
+    property ColumnName: string read FColumnName write FColumnName;
   end;
 
 implementation
@@ -218,7 +222,7 @@ begin
   if FBlobSize > 0 then
   begin
     { need to start writing to a blob, create one }
-    FBlob := Database.Attachment.CreateBlob(Transaction.TransactionIntf);
+    FBlob := Database.Attachment.CreateBlob(Transaction.TransactionIntf,RelationName,ColumnName);
     FBlob.Write(FBuffer^, FBlobSize);
     FBlob.Close;
   end;
@@ -341,7 +345,7 @@ end;
 procedure TIBBlobStream.SetBlobID(Value: TISC_QUAD);
 begin
   CheckActive;
-  FBlob := Database.Attachment.OpenBlob(Transaction.TransactionIntf,Value);
+  FBlob := Database.Attachment.OpenBlob(Transaction.TransactionIntf,RelationName,ColumnName,Value);
   if FBlobState <> bsData then
     SetState(bsUninitialised);
 end;

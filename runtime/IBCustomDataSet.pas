@@ -829,6 +829,7 @@ type
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
     {$IFDEF HAS_ANSISTRING_CODEPAGE}
     property CodePage: TSystemCodePage read FCodePage write FCodePage;
+    property RelationName: string read FRelationName write FRelationName;
     {$ENDIF}
   end;
 
@@ -4620,6 +4621,8 @@ constructor TIBDSBlobStream.Create(AField: TField; ABlobStream: TIBBlobStream;
 begin
   FField := AField;
   FBlobStream := ABlobStream;
+  FBlobStream.RelationName := (FField.FieldDef as TIBFieldDef).RelationName;
+  FBlobStream.ColumnName := FField.FieldName;;
   FBlobStream.Seek(0, soFromBeginning);
   if (Mode = bmWrite) then
   begin
