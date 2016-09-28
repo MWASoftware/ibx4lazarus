@@ -1669,7 +1669,7 @@ procedure TIBCustomDataSet.DoBeforeDatabaseDisconnect(Sender: TObject);
 begin
   if Active then
     Active := False;
-  FInternalPrepared := False;
+  InternalUnPrepare;
   if Assigned(FBeforeDatabaseDisconnect) then
     FBeforeDatabaseDisconnect(Sender);
 end;
@@ -2321,8 +2321,8 @@ begin
     end else
       IBError(ibxeEmptyQuery, [nil]);
   finally
-    if DidActivate then
-      DeactivateTransaction;
+ //   if DidActivate then
+   //   DeactivateTransaction;
     FBase.RestoreCursor;
   end;
 end;
@@ -4215,6 +4215,8 @@ begin
   if FInternalPrepared then
   begin
     CheckDatasetClosed;
+    if FDidActivate then
+      DeactivateTransaction;
     FieldDefs.Clear;
     FieldDefs.Updated := false;
     FInternalPrepared := False;
