@@ -731,6 +731,27 @@ type
     function Write(const Buffer; Count: Longint): Longint; override;
   end;
 
+  {Extended Field Def for character set info}
+
+  { TIBFieldDef }
+
+  TIBFieldDef = class(TFieldDef)
+  private
+    FCharacterSetName: RawByteString;
+    FCharacterSetSize: integer;
+    {$IFDEF HAS_ANSISTRING_CODEPAGE}
+    FCodePage: TSystemCodePage;
+    FRelationName: string;
+    {$ENDIF}
+  published
+    property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
+    property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
+    {$IFDEF HAS_ANSISTRING_CODEPAGE}
+    property CodePage: TSystemCodePage read FCodePage write FCodePage;
+    property RelationName: string read FRelationName write FRelationName;
+    {$ENDIF}
+  end;
+
 const
 DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     nil,                { ftUnknown }
@@ -810,27 +831,6 @@ type
     RelationName : String;
     FieldNodes : TFieldNode;
     NextRelation : TRelationNode;
-  end;
-
-  {Extended Field Def for character set info}
-
-  { TIBFieldDef }
-
-  TIBFieldDef = class(TFieldDef)
-  private
-    FCharacterSetName: RawByteString;
-    FCharacterSetSize: integer;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
-    FCodePage: TSystemCodePage;
-    FRelationName: string;
-    {$ENDIF}
-  published
-    property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
-    property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
-    property CodePage: TSystemCodePage read FCodePage write FCodePage;
-    property RelationName: string read FRelationName write FRelationName;
-    {$ENDIF}
   end;
 
 
@@ -2321,8 +2321,6 @@ begin
     end else
       IBError(ibxeEmptyQuery, [nil]);
   finally
- //   if DidActivate then
-   //   DeactivateTransaction;
     FBase.RestoreCursor;
   end;
 end;
@@ -2819,6 +2817,7 @@ begin
     fs.Mode := bmReadWrite;
     fs.Database := Database;
     fs.Transaction := Transaction;
+    fs.SetField(Field);
     FBlobStreamList.Add(Pointer(fs));
     result := TIBDSBlobStream.Create(Field, fs, Mode);
     exit;
@@ -2833,6 +2832,7 @@ begin
     fs.Mode := bmReadWrite;
     fs.Database := Database;
     fs.Transaction := Transaction;
+    fs.SetField(Field);
     fs.BlobID :=
       PISC_QUAD(@Buff[PRecordData(Buff)^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdDataOfs])^;
     if (CachedUpdates) then
@@ -3413,7 +3413,7 @@ var
   FieldNullable : Boolean;
   i, FieldPosition, FieldPrecision: Integer;
   FieldAliasName, DBAliasName: string;
-  RelationName, FieldName: string;
+  aRelationName, FieldName: string;
   Query : TIBSQL;
   FieldIndex: Integer;
   FRelationNodes : TRelationNode;
@@ -3535,7 +3535,7 @@ begin
         { Get the field name }
         FieldAliasName := GetName;
         DBAliasName := GetAliasname;
-        RelationName := getRelationName;
+        aRelationName := getRelationName;
         FieldName := getSQLName;
         FAliasNameList[i] := DBAliasName;
         FieldSize := 0;
@@ -3649,7 +3649,7 @@ begin
             Size := FieldSize;
             Precision := FieldPrecision;
             Required := not FieldNullable;
-            FRelationName := RelationName;
+            RelationName := aRelationName;
             InternalCalcField := False;
             CharacterSetSize := CharSetSize;
             CharacterSetName := CharSetName;
@@ -4623,8 +4623,6 @@ constructor TIBDSBlobStream.Create(AField: TField; ABlobStream: TIBBlobStream;
 begin
   FField := AField;
   FBlobStream := ABlobStream;
-  FBlobStream.RelationName := (FField.FieldDef as TIBFieldDef).RelationName;
-  FBlobStream.ColumnName := FField.FieldName;;
   FBlobStream.Seek(0, soFromBeginning);
   if (Mode = bmWrite) then
   begin

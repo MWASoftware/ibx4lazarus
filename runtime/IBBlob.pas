@@ -90,6 +90,7 @@ type
     procedure SaveToFile(Filename: string);
     procedure SaveToStream(Stream: TStream);
     function Seek(const Offset: Int64; Origin: TSeekOrigin): Int64; override;
+    procedure SetField(aField: TField);
     procedure SetSize(const NewSize: Int64); override;
     procedure SetSize(NewSize: Longint); override;
     procedure Truncate;
@@ -104,13 +105,13 @@ type
     property Mode: TBlobStreamMode read FMode write SetMode;
     property Modified: Boolean read GetModified;
     property Transaction: TIBTransaction read GetTransaction write SetTransaction;
-    property RelationName: string read FRelationName write FRelationName;
-    property ColumnName: string read FColumnName write FColumnName;
+    property RelationName: string read FRelationName;
+    property ColumnName: string read FColumnName;
   end;
 
 implementation
 
-uses FBMessages;
+uses FBMessages, IBCustomDataSet;
 
 { TIBBlobStream }
 constructor TIBBlobStream.Create;
@@ -340,6 +341,12 @@ begin
     soEnd           : FPosition := FBlobSize + Offset;
   end;
   result := FPosition;
+end;
+
+procedure TIBBlobStream.SetField(aField: TField);
+begin
+  FRelationName := (aField.FieldDef as TIBFieldDef).RelationName;
+  FColumnName := aField.FieldName;;
 end;
 
 procedure TIBBlobStream.SetBlobID(Value: TISC_QUAD);
