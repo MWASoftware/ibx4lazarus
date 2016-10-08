@@ -149,6 +149,7 @@ var EventCounts: TEventCounts;
     CancelAlerts: Boolean;
     i: integer;
 begin
+  if (csDestroying in ComponentState) or (FEventIntf = nil) then Exit;
   EventCounts := FEventIntf.ExtractEventCounts;
   if assigned(FOnEventAlert) then
   begin
