@@ -296,7 +296,7 @@ function TIBBlobStream.Read(var Buffer; Count: Longint): Longint;
 begin
   CheckReadable;
   EnsureLoaded;
-  if (Count <= 0) then
+  if (FBlob = nil) or (Count <= 0) then
   begin
     result := 0;
     exit;
@@ -345,6 +345,7 @@ end;
 
 procedure TIBBlobStream.SetField(aField: TField);
 begin
+  FRelationName := '';
   FRelationName := (aField.FieldDef as TIBFieldDef).RelationName;
   FColumnName := aField.FieldName;;
 end;
@@ -352,6 +353,9 @@ end;
 procedure TIBBlobStream.SetBlobID(Value: TISC_QUAD);
 begin
   CheckActive;
+  FBlob := nil;
+  if (Value.gds_quad_high = 0) and (Value.gds_quad_low = 0) then
+    Exit;
   FBlob := Database.Attachment.OpenBlob(Transaction.TransactionIntf,RelationName,ColumnName,Value);
   if FBlobState <> bsData then
     SetState(bsUninitialised);
@@ -411,6 +415,11 @@ function TIBBlobStream.Write(const Buffer; Count: Longint): Longint;
 begin
   CheckWritable;
   EnsureLoaded;  {Could be an untruncated bmReadWrite Blob}
+  if FBlob = nil then
+  begin
+    Result := 0;
+    Exit;
+  end;
   result := Count;
   if Count <= 0 then
     exit;

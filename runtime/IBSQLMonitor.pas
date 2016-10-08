@@ -41,9 +41,7 @@ unit IBSQLMonitor;
 
 {$Mode Delphi}
 
-{$IF FPC_FULLVERSION >= 20700 }
 {$codepage UTF8}
-{$ENDIF}
 
 interface
 
@@ -149,10 +147,8 @@ uses
    contnrs, syncobjs, CustApp, FBMessages
    {$IFDEF USE_SV5_IPC}
    ,ipc, Errors, baseunix
-   {$IF FPC_FULLVERSION <= 20402 } , initc {$ENDIF}
    {$ENDIF};
 
-   {$IF FPC_FULLVERSION < 20600 }{$STATIC ON} {$ENDIF}
 
 const
   cMonitorHookSize = 1024;

@@ -33,11 +33,7 @@
 
 unit IBCustomDataSet;
 
-{$IF FPC_FULLVERSION >= 20700 }
 {$codepage UTF8}
-{$DEFINE HAS_ANSISTRING_CODEPAGE}
-{$DEFINE NEW_TBOOKMARK}
-{$ENDIF}
 
 {$R-}
 
@@ -98,9 +94,7 @@ type
     fdDataSize: Short;
     fdDataLength: Short;
     fdDataOfs: Integer;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
     fdCodePage: TSystemCodePage;
-    {$ENDIF}
   end;
   PFieldData = ^TFieldData;
 
@@ -154,12 +148,10 @@ type
     procedure SetAsString(const Value: string); override;
     property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
     private
       FCodePage: TSystemCodePage;
     public
       property CodePage: TSystemCodePage read FCodePage write FCodePage;
-    {$ENDIF}
   end;
 
   { TIBBCDField }
@@ -204,13 +196,11 @@ type
    published
      property DisplayTextAsClassName: boolean read FDisplayTextAsClassName
                                             write FDisplayTextAsClassName;
-   {$IFDEF HAS_ANSISTRING_CODEPAGE}
    private
      FCodePage: TSystemCodePage;
      FFCodePage: TSystemCodePage;
    public
      property CodePage: TSystemCodePage read FFCodePage write FFCodePage;
-   {$ENDIF}
    end;
 
   TIBDataLink = class(TDetailDataLink)
@@ -739,17 +729,13 @@ type
   private
     FCharacterSetName: RawByteString;
     FCharacterSetSize: integer;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
     FCodePage: TSystemCodePage;
     FRelationName: string;
-    {$ENDIF}
   published
     property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
     property CodePage: TSystemCodePage read FCodePage write FCodePage;
     property RelationName: string read FRelationName write FRelationName;
-    {$ENDIF}
   end;
 
 const
@@ -931,11 +917,9 @@ function TIBMemoField.GetAsString: string;
 var s: RawByteString;
 begin
   s := inherited GetAsString;
-  {$IFDEF HAS_ANSISTRING_CODEPAGE}
   SetCodePage(s,CodePage,false);
   if (CodePage <> CP_NONE) and (CodePage <> CP_UTF8) then
     SetCodePage(s,CP_UTF8,true);  {LCL only accepts UTF8}
-  {$ENDIF}
   Result := s;
 end;
 
@@ -964,10 +948,8 @@ procedure TIBMemoField.SetAsString(const AValue: string);
 var s: RawByteString;
 begin
   s := AValue;
-  {$IFDEF HAS_ANSISTRING_CODEPAGE}
   if StringCodePage(Value) <> CodePage then
     SetCodePage(s,CodePage,CodePage<>CP_NONE);
-  {$ENDIF}
   inherited SetAsString(s);
 end;
 
@@ -975,9 +957,7 @@ constructor TIBMemoField.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   BlobType := ftMemo;
-  {$IFDEF HAS_ANSISTRING_CODEPAGE}
   FCodePage := CP_NONE;
-  {$ENDIF}
 end;
 
 { TIBControlLink }
@@ -1020,9 +1000,7 @@ constructor TIBStringField.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
   FCharacterSetSize := 1;
-  {$IFDEF HAS_ANSISTRING_CODEPAGE}
   FCodePage := CP_NONE;
-  {$ENDIF}
 end;
 
 class procedure TIBStringField.CheckTypeSize(Value: Integer);
@@ -1053,16 +1031,12 @@ begin
     Result := GetData(Buffer);
     if Result then
     begin
-      {$IFDEF HAS_ANSISTRING_CODEPAGE}
       s := string(Buffer);
       SetCodePage(s,CodePage,false);
       if (CodePage <> CP_NONE) and (CodePage <> CP_UTF8) then
         SetCodePage(s,CP_UTF8,true);  {LCL only accepts UTF8}
       Value := s;
 //      writeln(FieldName,': ', StringCodePage(Value),', ',Value);
-      {$ELSE}
-      Value := string(Buffer);
-      {$ENDIF}
       if Transliterate and (Value <> '') then
         DataSet.Translate(PChar(Value), PChar(Value), False);
     end
@@ -1080,10 +1054,8 @@ begin
   IBAlloc(Buffer, 0, Size + 1);
   try
     s := Value;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
     if StringCodePage(s) <> CodePage then
       SetCodePage(s,CodePage,CodePage<>CP_NONE);
-    {$ENDIF}
     StrLCopy(Buffer, PChar(s), Size);
     if Transliterate then
       DataSet.Translate(Buffer, Buffer, True);
@@ -1294,11 +1266,7 @@ end;
 
 procedure TIBCustomDataSet.ApplyUpdates;
 var
-  {$IFDEF NEW_TBOOKMARK }
   CurBookmark: TBookmark;
-  {$ELSE}
-  CurBookmark: string;
-  {$ENDIF}
   Buffer: PRecordData;
   CurUpdateTypes: TIBUpdateRecordTypes;
   UpdateAction: TIBUpdateAction;
@@ -1783,9 +1751,7 @@ begin
       rdFields[j].fdDataType := Qry.MetaData[i].GetSqltype ;
       rdFields[j].fdDataScale :=  Qry.MetaData[i].Getscale;
       rdFields[j].fdNullable :=  Qry.MetaData[i].IsNullable;
-      {$IFDEF HAS_ANSISTRING_CODEPAGE}
       rdFields[j].fdCodePage := Qry.MetaData[i].getCodePage;
-      {$ENDIF}
       if RecordNumber >= 0 then
       begin
         rdFields[j].fdIsNull :=  rdFields[j].fdNullable and Qry[i].IsNull;
@@ -1874,9 +1840,7 @@ begin
             LocalString := '';
           rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
           rdFields[j].fdDataLength := Length(LocalString);
-          {$IFDEF HAS_ANSISTRING_CODEPAGE}
           rdFields[j].fdCodePage := Qry.MetaData[i].GetCodePage;
-         {$ENDIF}
           if (rdFields[j].fdDataLength = 0) then
             LocalData := nil
           else
@@ -1894,9 +1858,7 @@ begin
         begin
           rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
           rdFields[j].fdDataLength := rdFields[j].fdDataSize;
-           {$IFDEF HAS_ANSISTRING_CODEPAGE}
-           rdFields[j].fdCodePage := Qry.MetaData[i].GetCodePage;
-          {$ENDIF}
+          rdFields[j].fdCodePage := Qry.MetaData[i].GetCodePage;
        end;
         else { SQL_BLOB, SQL_ARRAY, SQL_QUAD }
         begin
@@ -2029,11 +1991,7 @@ function TIBCustomDataSet.InternalLocate(const KeyFields: string;
   const KeyValues: Variant; Options: TLocateOptions): Boolean;
 var
   keyFieldList: TList;
-  {$IFDEF NEW_TBOOKMARK }
   CurBookmark: TBookmark;
-  {$ELSE}
-  CurBookmark: string;
-  {$ENDIF}
   fieldValue: Variant;
   lookupValues: array of variant;
   i, fieldCount: Integer;
@@ -2472,9 +2430,7 @@ begin
               SQL_TEXT, SQL_VARYING:
               begin
                 SetString(st, data, rdFields[j].fdDataLength);
-                {$IFDEF HAS_ANSISTRING_CODEPAGE}
                 SetCodePage(st,rdFields[j].fdCodePage,false);
-                {$ENDIF}
                 Qry.Params[i].AsString := st;
               end;
             SQL_FLOAT, SQL_DOUBLE, SQL_D_FLOAT:
@@ -2982,11 +2938,7 @@ end;
 
 procedure TIBCustomDataSet.FetchAll;
 var
-  {$IFDEF NEW_TBOOKMARK }
   CurBookmark: TBookmark;
-  {$ELSE}
-  CurBookmark: string;
-  {$ENDIF}
 begin
   FBase.SetCursor;
  try
@@ -3407,9 +3359,7 @@ var
   charSetID: short;
   CharSetSize: integer;
   CharSetName: RawByteString;
-  {$IFDEF HAS_ANSISTRING_CODEPAGE}
   FieldCodePage: TSystemCodePage;
-  {$ENDIF}
   FieldNullable : Boolean;
   i, FieldPosition, FieldPrecision: Integer;
   FieldAliasName, DBAliasName: string;
@@ -3543,9 +3493,7 @@ begin
         FieldNullable := IsNullable;
         CharSetSize := 0;
         CharSetName := '';
-        {$IFDEF HAS_ANSISTRING_CODEPAGE}
         FieldCodePage := CP_NONE;
-        {$ENDIF}
         case SQLType of
           { All VARCHAR's must be converted to strings before recording
            their values }
@@ -3553,9 +3501,7 @@ begin
           begin
             FirebirdAPI.CharSetWidth(getCharSetID,CharSetSize);
             CharSetName := FirebirdAPI.GetCharsetName(getCharSetID);
-            {$IFDEF HAS_ANSISTRING_CODEPAGE}
             FirebirdAPI.CharSetID2CodePage(getCharSetID,FieldCodePage);
-            {$ENDIF}
             FieldSize := GetSize;
             FieldType := ftString;
           end;
@@ -3619,9 +3565,7 @@ begin
             begin
               FirebirdAPI.CharSetWidth(getCharSetID,CharSetSize);
               CharSetName := FirebirdAPI.GetCharsetName(getCharSetID);
-              {$IFDEF HAS_ANSISTRING_CODEPAGE}
               FirebirdAPI.CharSetID2CodePage(getCharSetID,FieldCodePage);
-              {$ENDIF}
               FieldType := ftMemo;
             end
             else
@@ -3653,9 +3597,7 @@ begin
             InternalCalcField := False;
             CharacterSetSize := CharSetSize;
             CharacterSetName := CharSetName;
-            {$IFDEF HAS_ANSISTRING_CODEPAGE}
             CodePage := FieldCodePage;
-            {$ENDIF}
             if (FieldName <> '') and (RelationName <> '') then
             begin
               if Has_COMPUTED_BLR(RelationName, FieldName) then
@@ -3683,6 +3625,7 @@ begin
     FreeNodes;
     Database.InternalTransaction.Commit;
     FieldDefs.EndUpdate;
+    FieldDefs.Updated := true;
   end;
 end;
 
@@ -3798,18 +3741,6 @@ procedure TIBCustomDataSet.InternalOpen;
     result := SizeOf(TRecordData) + ((n - 1) * SizeOf(TFieldData));
   end;
 
-  function GetFieldDef(aFieldNo: integer): TIBFieldDef;
-  var i: integer;
-  begin
-    Result := nil;
-    for i := 0 to FieldDefs.Count - 1 do
-      if FieldDefs[i].FieldNo = aFieldNo then
-      begin
-        Result := TIBFieldDef(FieldDefs[i]);
-        break;
-      end;
-  end;
-
   procedure SetExtendedProperties;
   var i: integer;
       IBFieldDef: TIBFieldDef;
@@ -3817,37 +3748,29 @@ procedure TIBCustomDataSet.InternalOpen;
     for i := 0 to Fields.Count - 1 do
       if Fields[i].FieldNo > 0 then
       begin
-        if(Fields[i] is TIBStringField) then
-        with TIBStringField(Fields[i]) do
+        IBFieldDef := Fields[i].FieldDef as TIBFieldDef;
+        if IBFieldDef <> nil then
         begin
-          IBFieldDef := GetFieldDef(FieldNo);
-          if IBFieldDef <> nil then
+          if (Fields[i] is TIBStringField) then
+          with TIBStringField(Fields[i]) do
           begin
-            CharacterSetSize := IBFieldDef.CharacterSetSize;
-            CharacterSetName := IBFieldDef.CharacterSetName;
-            {$IFDEF HAS_ANSISTRING_CODEPAGE}
-            CodePage := IBFieldDef.CodePage;
-            {$ENDIF}
-          end;
-        end
-        else
-        if(Fields[i] is TIBMemoField) then
-        with TIBMemoField(Fields[i]) do
-        begin
-          IBFieldDef := GetFieldDef(FieldNo);
-          if IBFieldDef <> nil then
+              CharacterSetSize := IBFieldDef.CharacterSetSize;
+              CharacterSetName := IBFieldDef.CharacterSetName;
+              CodePage := IBFieldDef.CodePage;
+          end
+          else
+          if(Fields[i] is TIBMemoField) then
+          with TIBMemoField(Fields[i]) do
           begin
-            CharacterSetSize := IBFieldDef.CharacterSetSize;
-            CharacterSetName := IBFieldDef.CharacterSetName;
-            {$IFDEF HAS_ANSISTRING_CODEPAGE}
-            CodePage := IBFieldDef.CodePage;
-            {$ENDIF}
-          end;
-        end
-        else
-        if(Fields[i] is TIBArrayField) then
-        with TIBArrayField(Fields[i]) do
-          FRelationName := IBFieldDef.FRelationName;
+              CharacterSetSize := IBFieldDef.CharacterSetSize;
+              CharacterSetName := IBFieldDef.CharacterSetName;
+              CodePage := IBFieldDef.CodePage;
+          end
+          else
+          if(Fields[i] is TIBArrayField) then
+          with TIBArrayField(Fields[i]) do
+            FRelationName := IBFieldDef.FRelationName;
+         end
       end
   end;
 
@@ -4004,11 +3927,7 @@ end;
 function TIBCustomDataSet.Locate(const KeyFields: string; const KeyValues: Variant;
                                  Options: TLocateOptions): Boolean;
 var
-  {$IFDEF NEW_TBOOKMARK }
   CurBookmark: TBookmark;
-  {$ELSE}
-  CurBookmark: string;
-  {$ENDIF}
 begin
   DisableControls;
   try
@@ -4026,11 +3945,7 @@ function TIBCustomDataSet.Lookup(const KeyFields: string; const KeyValues: Varia
                                  const ResultFields: string): Variant;
 var
   fl: TList;
-  {$IFDEF NEW_TBOOKMARK }
   CurBookmark: TBookmark;
-  {$ELSE}
-  CurBookmark: string;
-  {$ENDIF}
 begin
   DisableControls;
   fl := TList.Create;

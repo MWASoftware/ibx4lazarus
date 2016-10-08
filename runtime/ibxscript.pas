@@ -27,9 +27,7 @@ unit ibxscript;
 
 {$mode objfpc}{$H+}
 
-{$IF FPC_FULLVERSION >= 20700 }
 {$codepage UTF8}
-{$ENDIF}
 
 interface
 
