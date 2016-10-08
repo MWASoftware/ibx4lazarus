@@ -13,13 +13,13 @@ object Form1: TForm1
     Left = 16
     Height = 15
     Top = 16
-    Width = 98
+    Width = 87
     Caption = 'Employee Name'
     ParentColor = False
   end
   object IBLookupComboEditBox1: TIBLookupComboEditBox
     Left = 16
-    Height = 27
+    Height = 23
     Top = 32
     Width = 224
     OwnerDrawEditable = False
@@ -32,7 +32,7 @@ object Form1: TForm1
     TabOrder = 0
     AutoInsert = True
     AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactRetainPrefixCase, cbactSearchAscending]
-    ItemHeight = 0
+    ItemHeight = 15
     KeyPressInterval = 600
     OnCanAutoInsert = IBLookupComboEditBox1CanAutoInsert
   end
@@ -40,7 +40,7 @@ object Form1: TForm1
     Left = 16
     Height = 15
     Top = 79
-    Width = 103
+    Width = 90
     Caption = 'Employee Details'
     ParentColor = False
   end
@@ -59,13 +59,13 @@ object Form1: TForm1
       Left = 14
       Height = 15
       Top = 18
-      Width = 64
+      Width = 57
       Caption = 'First Name'
       ParentColor = False
     end
     object DBEdit1: TDBEdit
       Left = 14
-      Height = 25
+      Height = 23
       Top = 32
       Width = 136
       DataField = 'FIRST_NAME'
@@ -78,13 +78,13 @@ object Form1: TForm1
       Left = 168
       Height = 15
       Top = 18
-      Width = 64
+      Width = 56
       Caption = 'Last Name'
       ParentColor = False
     end
     object DBEdit2: TDBEdit
       Left = 168
-      Height = 25
+      Height = 23
       Top = 32
       Width = 144
       DataField = 'LAST_NAME'
@@ -94,17 +94,17 @@ object Form1: TForm1
       TabOrder = 1
     end
     object Label5: TLabel
-      Left = 547
+      Left = 553
       Height = 15
       Top = 120
-      Width = 24
+      Width = 18
       Anchors = [akTop, akRight]
       Caption = 'Ext.'
       ParentColor = False
     end
     object DBEdit3: TDBEdit
       Left = 547
-      Height = 25
+      Height = 23
       Top = 136
       Width = 48
       DataField = 'PHONE_EXT'
@@ -118,7 +118,7 @@ object Form1: TForm1
       Left = 16
       Height = 15
       Top = 65
-      Width = 56
+      Width = 49
       Caption = 'Hire Date'
       ParentColor = False
     end
@@ -126,13 +126,13 @@ object Form1: TForm1
       Left = 172
       Height = 15
       Top = 65
-      Width = 37
+      Width = 31
       Caption = 'Salary'
       ParentColor = False
     end
     object DBEdit4: TDBEdit
       Left = 168
-      Height = 25
+      Height = 23
       Top = 80
       Width = 144
       DataField = 'SALARY'
@@ -145,7 +145,7 @@ object Form1: TForm1
       Left = 392
       Height = 15
       Top = 16
-      Width = 51
+      Width = 46
       Caption = 'Location'
       ParentColor = False
     end
@@ -153,19 +153,19 @@ object Form1: TForm1
       Left = 331
       Height = 15
       Top = 16
-      Width = 36
+      Width = 31
       Caption = 'Grade'
       ParentColor = False
     end
     object DBComboBox1: TDBComboBox
       Left = 331
-      Height = 29
+      Height = 23
       Top = 32
       Width = 53
       OwnerDrawEditable = False
       DataField = 'JOB_GRADE'
       DataSource = EmployeeSource
-      ItemHeight = 0
+      ItemHeight = 15
       Items.Strings = (
         '1'
         '2'
@@ -182,7 +182,7 @@ object Form1: TForm1
       Left = 333
       Height = 15
       Top = 65
-      Width = 48
+      Width = 44
       Caption = 'Job Title'
       ParentColor = False
     end
@@ -190,13 +190,13 @@ object Form1: TForm1
       Left = 17
       Height = 15
       Top = 122
-      Width = 73
+      Width = 63
       Caption = 'Department'
       ParentColor = False
     end
     object DBEdit5: TDBEdit
       Left = 17
-      Height = 25
+      Height = 23
       Top = 136
       Width = 495
       DataField = 'DEPT_PATH'
@@ -218,7 +218,7 @@ object Form1: TForm1
     end
     object IBLookupComboEditBox2: TIBLookupComboEditBox
       Left = 392
-      Height = 25
+      Height = 23
       Top = 32
       Width = 203
       OwnerDrawEditable = False
@@ -235,11 +235,11 @@ object Form1: TForm1
       TabOrder = 6
       AutoInsert = False
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      ItemHeight = 0
+      ItemHeight = 15
     end
     object IBLookupComboEditBox3: TIBLookupComboEditBox
       Left = 331
-      Height = 29
+      Height = 23
       Top = 82
       Width = 264
       OwnerDrawEditable = False
@@ -255,11 +255,11 @@ object Form1: TForm1
       TabOrder = 7
       AutoInsert = False
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      ItemHeight = 0
+      ItemHeight = 15
     end
     object IBDateEdit1: TDBDateEdit
       Left = 17
-      Height = 25
+      Height = 23
       Top = 82
       Width = 112
       CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
@@ -312,6 +312,7 @@ object Form1: TForm1
     Params.Strings = (
       'lc_ctype=UTF8'
       'user_name=SYSDBA'
+      'user_name=SYSDBA'
     )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
@@ -344,20 +345,25 @@ object Form1: TForm1
     )
     RefreshSQL.Strings = (
       'with recursive Depts As ('
-      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,'
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar'
+      '(256)) as DEPT_PATH,'
       'cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH'
       'From DEPARTMENT Where HEAD_DEPT is NULL '
       'UNION ALL'
-      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || DEPARTMENT as DEPT_PATH,'
-      'Depts.DEPT_KEY_PATH || '';'' || DEPT_NO as DEPT_KEY_PATH'
-      'From DEPARTMENT  '
-      'JOIN Depts On HEAD_DEPT = Depts.DEPT_NO'
+      'Select D.DEPT_NO, D.DEPARTMENT,D. HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' '
+      '|| D.DEPARTMENT as DEPT_PATH,'
+      'Depts.DEPT_KEY_PATH || '';'' || D.DEPT_NO as DEPT_KEY_PATH'
+      'From DEPARTMENT  D'
+      'JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO'
       ')'
       ''
-      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '
-      'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH'
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, '
+      'A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '
+      'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, '
+      'D.DEPT_KEY_PATH'
       'From EMPLOYEE A'
       'JOIN Depts D On D.DEPT_NO = A.DEPT_NO'
+      ''
       'Where A.EMP_NO = :EMP_NO'
     )
     SelectSQL.Strings = (
@@ -366,10 +372,10 @@ object Form1: TForm1
       'cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH'
       'From DEPARTMENT Where HEAD_DEPT is NULL '
       'UNION ALL'
-      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || DEPARTMENT as DEPT_PATH,'
-      'Depts.DEPT_KEY_PATH || '';'' || DEPT_NO as DEPT_KEY_PATH'
-      'From DEPARTMENT  '
-      'JOIN Depts On HEAD_DEPT = Depts.DEPT_NO'
+      'Select D.DEPT_NO, D.DEPARTMENT,D. HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || D.DEPARTMENT as DEPT_PATH,'
+      'Depts.DEPT_KEY_PATH || '';'' || D.DEPT_NO as DEPT_KEY_PATH'
+      'From DEPARTMENT  D'
+      'JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO'
       ')'
       ''
       'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '

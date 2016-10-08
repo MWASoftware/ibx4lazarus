@@ -42,9 +42,7 @@
 unit IBServices;
 
 {$Mode Delphi}
-{$IF FPC_FULLVERSION >= 20700 }
 {$codepage UTF8}
-{$ENDIF}
 
 interface
 
@@ -790,7 +788,7 @@ function TIBCustomService.GetSPBConstName(action: byte): string;
 var i: integer;
 begin
   Result := '';
-  for i := 0 to High(SPBConstantValues) do
+  for i := Low(SPBConstantValues) to High(SPBConstantValues) do
     if SPBConstantValues[i] = action then
     begin
       Result := SPBConstantNames[i];

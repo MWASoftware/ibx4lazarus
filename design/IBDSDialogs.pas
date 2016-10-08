@@ -38,7 +38,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, Graphics, Controls,
+  SysUtils, Classes, Graphics, Controls, Dialogs,
   Forms, StdCtrls, ExtCtrls, IB, IBDialogs;
 
 type
@@ -174,6 +174,7 @@ end;
 function TIBDSLCLInterface.LoginDialogEx(var ADatabaseName: string;
   var AUserName, APassword: string; NameReadOnly: Boolean): Boolean;
 begin
+ try
   with TIBXDSLoginDlg.Create(Application) do
   try
     ProjectName.Caption := GetProjectName;
@@ -196,6 +197,9 @@ begin
   finally
     Free;
   end;
+ except On E:Exception do
+   MessageDlg('Unable to Load Login Dialog ' + E.Message,mtError,[mbOK],0);
+ end;
 end;
 
 end.

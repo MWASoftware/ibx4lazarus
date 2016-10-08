@@ -29,30 +29,10 @@ SEM_SETALL  = 9;
   need to replace with a working libc call. semtimedop is not present in 2.4.2 and earlier.
 }
 
-{$IF FPC_FULLVERSION <= 20402 }
-Function real_semctl(semid:cint; semnum:cint; cmd:cint): cint; cdecl; varargs; external clib name 'semctl';
-
-Function semctl(semid:cint; semnum:cint; cmd:cint; var arg: tsemun): cint;
-  begin
-    semctl := real_semctl(semid,semnum,cmd,pointer(arg));
-  end;
-{$IFDEF HAS_SEMTIMEDOP}
-Function semtimedop(semid:cint; sops: psembuf; nsops: cuint; timeOut: ptimespec): cint; cdecl; external clib name 'semtimedop';
-{$ENDIF}
-Function semget(key:Tkey; nsems:cint; semflg:cint): cint; cdecl; external clib name 'semget';
-Function semop(semid:cint; sops: psembuf; nsops: cuint): cint; cdecl; external clib name 'semop';
-
-function GetLastErrno: cint;
-begin
-  Result := fpgetCerrno
-end;
-{$ELSE}
 function GetLastErrno: cint;
 begin
   Result := fpgetErrno
 end;
-
-{$ENDIF}
 
 type
   TGlobalInterface = class;

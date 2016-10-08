@@ -35,10 +35,7 @@ unit IBDatabase;
 
 {$Mode Delphi}
 
-{$IF FPC_FULLVERSION >= 20700 }
 {$codepage UTF8}
-{$DEFINE HAS_ANSISTRING_CODEPAGE}
-{$ENDIF}
 
 interface
 
@@ -264,9 +261,7 @@ type
     property InternalTransaction: TIBTransaction read FInternalTransaction;
     property DefaultCharSetName: RawByteString read FDefaultCharSetName;
     property DefaultCharSetID: integer read FDefaultCharSetID;
-    {$IFDEF HAS_ANSISTRING_CODEPAGE}
     property DefaultCodePage: TSystemCodePage read FDefaultCodePage;
-    {$ENDIF}
 
   published
     property Connected;
@@ -599,9 +594,7 @@ begin
   FDBSQLDialect := 1;
   FDefaultCharSetName := '';
   FDefaultCharSetID := 0;
-  {$IFDEF HAS_ANSISTRING_CODEPAGE}
   FDefaultCodePage := CP_NONE;
-  {$ENDIF}
 end;
 
   procedure TIBDataBase.CreateDatabase;
@@ -937,15 +930,12 @@ begin
      {$ifdef WINDOWS}
      if FirebirdAPI.CodePage2CharSetID(GetACP,CharSetID) then
        TempDBParams.Values['lc_ctype'] := FirebirdAPI.GetCharsetName(CharSetID)
-     else
      {$else}
-     {$IFDEF HAS_ANSISTRING_CODEPAGE}
      if FirebirdAPI.CodePage2CharSetID(DefaultSystemCodePage,CharSetID) then
        TempDBParams.Values['lc_ctype'] := FirebirdAPI.GetCharsetName(CharSetID)
-     else
-     {$ENDIF}
      {$endif}
-     TempDBParams.Values['lc_ctype'] :='UTF8';
+     else
+       TempDBParams.Values['lc_ctype'] :='UTF8';
    end;
    {Opportunity to override defaults}
    for i := 0 to FSQLObjects.Count - 1 do
@@ -957,9 +947,7 @@ begin
    FDefaultCharSetName := AnsiUpperCase(TempDBParams.Values['lc_ctype']);
    if FDefaultCharSetName <> '' then
      FirebirdAPI.CharSetName2CharSetID(FDefaultCharSetName,FDefaultCharSetID);
-   {$IFDEF HAS_ANSISTRING_CODEPAGE}
    FirebirdAPI.CharSetID2CodePage(FDefaultCharSetID,FDefaultCodePage);
-   {$ENDIF}
    { Generate a new DPB if necessary }
    if (FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text)) then
    begin

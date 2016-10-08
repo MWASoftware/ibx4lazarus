@@ -3,12 +3,13 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="27">
+    <Units Count="29">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <CursorPos X="3" Y="28"/>
+        <TopLine Value="20"/>
+        <CursorPos X="36" Y="39"/>
         <UsageCount Value="27"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -193,12 +194,26 @@
         <CursorPos X="10" Y="102"/>
         <UsageCount Value="10"/>
       </Unit26>
+      <Unit27>
+        <Filename Value="../../ibexpressconsolemode.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="10"/>
+        <UsageCount Value="10"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="275"/>
+        <CursorPos Y="289"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit28>
     </Units>
-    <CustomDefines Count="2">
+    <OtherDefines Count="2">
       <Define0 Value="UseCThreads"/>
       <Define1 Value="IBX_CONSOLE_MODE"/>
-    </CustomDefines>
-    <JumpHistory Count="3" HistoryIndex="2">
+    </OtherDefines>
+    <JumpHistory Count="4" HistoryIndex="3">
       <Position1>
         <Filename Value="project1.lpr"/>
         <Caret Line="18" Column="74" TopLine="18"/>
@@ -211,6 +226,10 @@
         <Filename Value="project1.lpr"/>
         <Caret Line="17" Column="40"/>
       </Position3>
+      <Position4>
+        <Filename Value="project1.lpr"/>
+        <Caret Line="41" Column="18" TopLine="20"/>
+      </Position4>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

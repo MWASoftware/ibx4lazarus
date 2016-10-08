@@ -31,13 +31,13 @@ object Form1: TForm1
     Left = 17
     Height = 15
     Top = 14
-    Width = 87
+    Width = 74
     Caption = 'Started Before'
     ParentColor = False
   end
   object BeforeDate: TDateEdit
     Left = 112
-    Height = 25
+    Height = 23
     Top = 8
     Width = 96
     CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
@@ -54,13 +54,13 @@ object Form1: TForm1
     Left = 241
     Height = 15
     Top = 14
-    Width = 78
+    Width = 66
     Caption = 'Started After'
     ParentColor = False
   end
   object AfterDate: TDateEdit
     Left = 333
-    Height = 25
+    Height = 23
     Top = 8
     Width = 91
     CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
@@ -100,19 +100,19 @@ object Form1: TForm1
       TabOrder = 1
       ColWidths = (
         12
-        890
+        871
       )
       object EmployeeEditorPanel: TPanel
         Left = 12
         Height = 80
         Top = 0
-        Width = 890
+        Width = 871
         Anchors = []
         BevelOuter = bvNone
         BorderWidth = 2
         BorderStyle = bsSingle
-        ClientHeight = 78
-        ClientWidth = 888
+        ClientHeight = 76
+        ClientWidth = 867
         Color = clWhite
         ParentColor = False
         TabOrder = 0
@@ -121,13 +121,13 @@ object Form1: TForm1
           Left = 0
           Height = 15
           Top = 7
-          Width = 83
+          Width = 74
           Caption = 'Employee No.'
           ParentColor = False
         end
         object DBEdit1: TDBEdit
           Left = 90
-          Height = 25
+          Height = 23
           Top = 2
           Width = 120
           DataField = 'EMP_NO'
@@ -140,13 +140,13 @@ object Form1: TForm1
           Left = 12
           Height = 15
           Top = 32
-          Width = 64
+          Width = 57
           Caption = 'First Name'
           ParentColor = False
         end
         object DBEdit2: TDBEdit
           Left = 90
-          Height = 25
+          Height = 23
           Top = 24
           Width = 120
           DataField = 'FIRST_NAME'
@@ -159,13 +159,13 @@ object Form1: TForm1
           Left = 12
           Height = 15
           Top = 56
-          Width = 64
+          Width = 56
           Caption = 'Last Name'
           ParentColor = False
         end
         object DBEdit3: TDBEdit
           Left = 90
-          Height = 25
+          Height = 23
           Top = 46
           Width = 120
           DataField = 'LAST_NAME'
@@ -178,13 +178,13 @@ object Form1: TForm1
           Left = 216
           Height = 15
           Top = 7
-          Width = 77
+          Width = 64
           Caption = 'Date Started'
           ParentColor = False
         end
         object IBDateEdit1: TDBDateEdit
           Left = 300
-          Height = 25
+          Height = 23
           Top = 2
           Width = 100
           CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
@@ -203,13 +203,13 @@ object Form1: TForm1
           Left = 252
           Height = 15
           Top = 32
-          Width = 37
+          Width = 31
           Caption = 'Salary'
           ParentColor = False
         end
         object DBEdit4: TDBEdit
           Left = 300
-          Height = 25
+          Height = 23
           Top = 24
           Width = 104
           DataField = 'SALARY'
@@ -219,17 +219,17 @@ object Form1: TForm1
           TabOrder = 5
         end
         object Label8: TLabel
-          Left = 814
+          Left = 799
           Height = 15
           Top = 54
-          Width = 24
+          Width = 18
           Anchors = [akTop, akRight]
           Caption = 'Ext.'
           ParentColor = False
         end
         object DBEdit5: TDBEdit
-          Left = 838
-          Height = 25
+          Left = 817
+          Height = 23
           Top = 48
           Width = 40
           DataField = 'PHONE_EXT'
@@ -243,7 +243,7 @@ object Form1: TForm1
           Left = 536
           Height = 15
           Top = 7
-          Width = 51
+          Width = 46
           Caption = 'Location'
           ParentColor = False
         end
@@ -251,20 +251,20 @@ object Form1: TForm1
           Left = 413
           Height = 15
           Top = 9
-          Width = 59
+          Width = 52
           Caption = 'Job Grade'
           ParentColor = False
         end
         object JobGradeDBComboBox: TDBComboBox
           Left = 480
-          Height = 25
+          Height = 23
           Top = 0
           Width = 48
           OwnerDrawEditable = False
           AutoSize = False
           DataField = 'JOB_GRADE'
           DataSource = EmployeeSource
-          ItemHeight = 0
+          ItemHeight = 15
           Items.Strings = (
             '1'
             '2'
@@ -281,7 +281,7 @@ object Form1: TForm1
           Left = 536
           Height = 15
           Top = 32
-          Width = 48
+          Width = 44
           Caption = 'Job Title'
           ParentColor = False
         end
@@ -289,12 +289,12 @@ object Form1: TForm1
           Left = 256
           Height = 15
           Top = 54
-          Width = 33
+          Width = 28
           Caption = 'Dept.'
           ParentColor = False
         end
         object SpeedButton1: TSpeedButton
-          Left = 786
+          Left = 765
           Height = 25
           Top = 48
           Width = 23
@@ -303,9 +303,9 @@ object Form1: TForm1
         end
         object DBEdit6: TDBEdit
           Left = 300
-          Height = 25
+          Height = 23
           Top = 48
-          Width = 478
+          Width = 457
           DataField = 'DEPT_PATH'
           DataSource = EmployeeSource
           ReadOnly = True
@@ -316,7 +316,7 @@ object Form1: TForm1
         end
         object DBEdit7: TDBEdit
           Left = 592
-          Height = 25
+          Height = 23
           Top = 0
           Width = 246
           DataField = 'JOB_COUNTRY'
@@ -328,7 +328,7 @@ object Form1: TForm1
         end
         object DBEdit8: TDBEdit
           Left = 592
-          Height = 25
+          Height = 23
           Top = 24
           Width = 246
           DataField = 'JOB_TITLE'
@@ -383,10 +383,10 @@ object Form1: TForm1
         TabOrder = 1
       end
       object DBText1: TDBText
-        Left = 832
+        Left = 838
         Height = 27
         Top = 16
-        Width = 49
+        Width = 43
         Alignment = taRightJustify
         Anchors = [akTop, akRight, akBottom]
         DataField = 'TOTALSALARIES'
@@ -399,17 +399,17 @@ object Form1: TForm1
     Left = 456
     Height = 15
     Top = 14
-    Width = 79
+    Width = 67
     Caption = 'Salary Range'
     ParentColor = False
   end
   object SalaryRange: TComboBox
     Left = 544
-    Height = 25
+    Height = 23
     Top = 8
     Width = 272
     OwnerDrawEditable = False
-    ItemHeight = 0
+    ItemHeight = 15
     ItemIndex = 0
     Items.Strings = (
       'None Specified'
@@ -423,12 +423,14 @@ object Form1: TForm1
     Text = 'None Specified'
   end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AllowStreamedConnected = False
     DatabaseName = 'localhost:employee'
     Params.Strings = (
       'user_name=SYSDBA'
       'lc_ctype=UTF8'
+      'user_name=SYSDBA'
+      'user_name=SYSDBA'
     )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
@@ -554,40 +556,50 @@ object Form1: TForm1
     )
     RefreshSQL.Strings = (
       'with recursive Depts As ('
-      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,'
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as '
+      'VarChar(256)) as DEPT_PATH,'
       'cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH'
       'From DEPARTMENT Where HEAD_DEPT is NULL '
       'UNION ALL'
-      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || DEPARTMENT as DEPT_PATH,'
-      'Depts.DEPT_KEY_PATH || '';'' || DEPT_NO as DEPT_KEY_PATH'
-      'From DEPARTMENT  '
-      'JOIN Depts On HEAD_DEPT = Depts.DEPT_NO'
+      'Select D.DEPT_NO, D.DEPARTMENT,D. HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' '
+      '|| D.DEPARTMENT as DEPT_PATH,'
+      'Depts.DEPT_KEY_PATH || '';'' || D.DEPT_NO as DEPT_KEY_PATH'
+      'From DEPARTMENT  D'
+      'JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO'
       ')'
       ''
-      'Select distinct A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '
-      'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH, J.JOB_TITLE'
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, '
+      'A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '
+      'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, '
+      'D.DEPT_KEY_PATH, J.JOB_TITLE'
       'From EMPLOYEE A'
       'JOIN Depts D On D.DEPT_NO = A.DEPT_NO'
       'JOIN JOB J on J.JOB_CODE = A.JOB_CODE'
+      ''
       'Where A.EMP_NO = :EMP_NO'
     )
     SelectSQL.Strings = (
       'with recursive Depts As ('
-      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,'
+      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as '
+      'VarChar(256)) as DEPT_PATH,'
       'cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH'
       'From DEPARTMENT Where HEAD_DEPT is NULL '
       'UNION ALL'
-      'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || DEPARTMENT as DEPT_PATH,'
-      'Depts.DEPT_KEY_PATH || '';'' || DEPT_NO as DEPT_KEY_PATH'
-      'From DEPARTMENT  '
-      'JOIN Depts On HEAD_DEPT = Depts.DEPT_NO'
+      'Select D.DEPT_NO, D.DEPARTMENT,D. HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' '
+      '|| D.DEPARTMENT as DEPT_PATH,'
+      'Depts.DEPT_KEY_PATH || '';'' || D.DEPT_NO as DEPT_KEY_PATH'
+      'From DEPARTMENT  D'
+      'JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO'
       ')'
       ''
-      'Select distinct A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '
-      'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH, J.JOB_TITLE'
+      'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, '
+      'A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, '
+      'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, '
+      'D.DEPT_KEY_PATH, J.JOB_TITLE'
       'From EMPLOYEE A'
       'JOIN Depts D On D.DEPT_NO = A.DEPT_NO'
       'JOIN JOB J on J.JOB_CODE = A.JOB_CODE'
+      ''
       'Order by A.LAST_NAME'
     )
     ModifySQL.Strings = (

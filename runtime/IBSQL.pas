@@ -35,9 +35,7 @@ unit IBSQL;
 
 {$Mode Delphi}
 
-{$IF FPC_FULLVERSION >= 20700 }
 {$codepage UTF8}
-{$ENDIF}
 
 interface
 

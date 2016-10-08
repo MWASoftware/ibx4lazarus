@@ -35,9 +35,7 @@ unit IBStoredProc;
 
 {$Mode Delphi}
 
-{$IF FPC_FULLVERSION >= 20700 }
 {$codepage UTF8}
-{$ENDIF}
 
 interface
 
@@ -274,27 +272,27 @@ var
   DataType : TFieldType;
 begin
   DataType := ftUnknown;
-  for i := 0 to QSelect.Current.Count - 1 do begin
-  case QSelect.Fields[i].SQLtype of
+  for i := 0 to QSelect.MetaData.Count - 1 do begin
+  case QSelect.MetaData[i].SQLtype of
     SQL_TYPE_DATE: DataType := ftDate;
     SQL_TYPE_TIME: DataType := ftTime;
     SQL_TIMESTAMP: DataType := ftDateTime;
     SQL_SHORT:
-      if QSelect.Fields[i].getScale = 0 then
+      if QSelect.MetaData[i].getScale = 0 then
         DataType := ftSmallInt
       else
         DataType := ftBCD;
     SQL_LONG:
-      if QSelect.Fields[i].getScale = 0 then
+      if QSelect.MetaData[i].getScale = 0 then
         DataType := ftInteger
-      else if QSelect.Fields[i].getScale >= -4 then
+      else if QSelect.MetaData[i].getScale >= -4 then
         DataType := ftBCD
       else
         DataType := ftFloat;
     SQL_INT64:
-      if QSelect.Fields[i].getScale = 0 then
+      if QSelect.MetaData[i].getScale = 0 then
         DataType := ftLargeInt
-      else if QSelect.Fields[i].getScale >= -4 then
+      else if QSelect.MetaData[i].getScale >= -4 then
         DataType := ftBCD
       else
         DataType := ftFloat;
@@ -303,12 +301,12 @@ begin
       DataType := ftBoolean;
     SQL_TEXT: DataType := ftString;
     SQL_VARYING:
-      if QSelect.Fields[i].GetSize < 1024 then
+      if QSelect.MetaData[i].GetSize < 1024 then
         DataType := ftString
       else DataType := ftBlob;
     SQL_BLOB, SQL_ARRAY, SQL_QUAD: DataType := ftBlob;
     end;
-    FParams.CreateParam(DataType, Trim(QSelect.Fields[i].Name), ptOutput);
+    FParams.CreateParam(DataType, Trim(QSelect.MetaData[i].Name), ptOutput);
   end;
 
   DataType := ftUnknown;

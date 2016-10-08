@@ -17,6 +17,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="177"/>
         <CursorPos X="19" Y="183"/>
         <UsageCount Value="48"/>
@@ -88,9 +89,8 @@
       </Unit10>
       <Unit11>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="3686"/>
+        <TopLine Value="3685"/>
         <CursorPos X="52" Y="3671"/>
         <UsageCount Value="15"/>
         <Loaded Value="True"/>
@@ -202,7 +202,7 @@
         <UsageCount Value="10"/>
       </Unit27>
       <Unit28>
-        <Filename Value="../../../../../../projects/DBPanelGrid/dbpanelgrid.pas"/>
+        <Filename Value="../../../../../projects/DBPanelGrid/dbpanelgrid.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="304"/>
         <CursorPos X="83" Y="314"/>
@@ -364,7 +364,7 @@
       </Unit50>
       <Unit51>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="859"/>
         <CursorPos X="32" Y="876"/>
         <UsageCount Value="11"/>
@@ -372,7 +372,7 @@
       </Unit51>
       <Unit52>
         <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="227"/>
         <CursorPos X="3" Y="230"/>
         <UsageCount Value="11"/>
@@ -380,7 +380,7 @@
       </Unit52>
       <Unit53>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="74"/>
         <CursorPos Y="89"/>
         <UsageCount Value="11"/>
@@ -388,11 +388,10 @@
       </Unit53>
       <Unit54>
         <Filename Value="../../runtime/IBCodePage.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="3"/>
         <CursorPos X="10" Y="16"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit54>
     </Units>
     <JumpHistory Count="29" HistoryIndex="28">
