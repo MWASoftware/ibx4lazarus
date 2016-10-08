@@ -128,6 +128,7 @@ type
     procedure SetArrayIntf(AValue: IArray);
   public
     constructor Create(AOwner: TComponent); override;
+    function CreateArray: IArray;
     property ArrayIntf: IArray read GetArrayIntf write SetArrayIntf;
   end;
 
@@ -882,6 +883,12 @@ constructor TIBArrayField.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   SetDataType(ftArray);
+end;
+
+function TIBArrayField.CreateArray: IArray;
+begin
+with DataSet as TIBCustomDataSet do
+  Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,FRelationName,FieldName);
 end;
 
 { TIBMemoField }
