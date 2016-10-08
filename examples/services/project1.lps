@@ -27,8 +27,8 @@
         <Filename Value="../../runtime/IBServices.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1178"/>
-        <CursorPos Y="1186"/>
+        <TopLine Value="778"/>
+        <CursorPos X="34" Y="791"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -143,11 +143,23 @@
         <UsageCount Value="10"/>
       </Unit16>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="4" HistoryIndex="2">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="41" Column="15" TopLine="23"/>
       </Position1>
+      <Position2>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="1186" TopLine="1178"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="792" Column="21" TopLine="778"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="77" Column="3" TopLine="63"/>
+      </Position4>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

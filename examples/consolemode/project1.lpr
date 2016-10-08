@@ -35,10 +35,10 @@ const
 'cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH '+
 'From DEPARTMENT Where HEAD_DEPT is NULL '+
 'UNION ALL '+
-'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || DEPARTMENT as DEPT_PATH,'+
-'Depts.DEPT_KEY_PATH || '';'' || DEPT_NO as DEPT_KEY_PATH '+
-'From DEPARTMENT '+
-'JOIN Depts On HEAD_DEPT = Depts.DEPT_NO '+
+'Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || D.DEPARTMENT as DEPT_PATH,'+
+'Depts.DEPT_KEY_PATH || '';'' || D.DEPT_NO as DEPT_KEY_PATH '+
+'From DEPARTMENT D '+
+'JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO '+
 ')'+
 
 'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,'+
@@ -149,7 +149,7 @@ begin
   Application.Title:='IBX In Console Mode';
   Application.Run;
   {$IFDEF WINDOWS}
-  Sleep(1000); {Gives a chance to see the program output}
+  Readln; {Gives a chance to see the program output}
   {$ENDIF}
   Application.Free;
 end.

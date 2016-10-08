@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ComCtrls, ActnList, ExtCtrls, ibxscript, IBDatabase, IBHeader;
+  ComCtrls, ActnList, ExtCtrls, ibxscript, IBDatabase, IB;
 
 type
 
