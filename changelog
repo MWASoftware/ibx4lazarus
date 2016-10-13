@@ -1,5 +1,5 @@
 
-IBX Change Log  version                                                        (2.0-0) Sat, 08 Oct 2016 16:26:47 +0100
+IBX Change Log  version   (2.0-0) Thu, 13 Oct 2016 16:48:47 +0100
 
 1. IBCustomDataset: When calling SetCodePage, no longer request transliteration
    when target codepage is CP_NONE.
@@ -14,8 +14,19 @@ IBX Change Log  version                                                        (
    regardless of the database character set or connection character set. This
    is for compatibility with the LCL.
 
+5. Size property of TIBStringField is now the width in characters of the field
+   and not the byte length. This applies only to multi-byte character sets such
+   as UTF8. The original approach aligned with TStringField. However, the TStringField
+   code is not recognised as a bug and hence this change to align the behaviour.
+   The TStringField change is expected in fpc 3.2.0.
 
-IBX Change Log  version                                       (1.4-2) Thu, 22 Sep 2016 15:25:27 +0100
+6. A new property AutoFieldSize: boolean has been added to TIBStringField. When
+   true (default) then Size property value saved in the lfm is ignored. Size is
+   always set from the dynamic information read from the database. It is unclear
+   why anyone would want to override this and set Size to false.
+
+
+IBX Change Log  version  (1.4-2) Thu, 22 Sep 2016 15:25:27 +0100
 
 1. IBBlob: Defer reading of blob until read method called. This avoids having to
    read in an entire blob just to get the size of the blob. General performance

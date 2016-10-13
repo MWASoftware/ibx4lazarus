@@ -138,8 +138,10 @@ type
   private
     FCharacterSetName: RawByteString;
     FCharacterSetSize: integer;
+    FAutoFieldSize: boolean;
+    FCodePage: TSystemCodePage;
   protected
-    function GetDefaultWidth: Longint; override;
+    function GetDataSize: Integer; override;
   public
     constructor Create(aOwner: TComponent); override;
     class procedure CheckTypeSize(Value: Integer); override;
@@ -149,10 +151,9 @@ type
     procedure SetAsString(const Value: string); override;
     property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
-    private
-      FCodePage: TSystemCodePage;
-    public
-      property CodePage: TSystemCodePage read FCodePage write FCodePage;
+    property CodePage: TSystemCodePage read FCodePage write FCodePage;
+  published
+    property AutoFieldSize: boolean read FAutoFieldSize write FAutoFieldSize default true;
   end;
 
   { TIBBCDField }
@@ -998,9 +999,9 @@ end;
 
 { TIBStringField}
 
-function TIBStringField.GetDefaultWidth: Longint;
+function TIBStringField.GetDataSize: Integer;
 begin
-  Result := Size div CharacterSetSize;
+  Result := Size * CharacterSetSize + 1;
 end;
 
 constructor TIBStringField.Create(aOwner: TComponent);
@@ -1008,6 +1009,7 @@ begin
   inherited Create(aOwner);
   FCharacterSetSize := 1;
   FCodePage := CP_NONE;
+  FAutoFieldSize := true;
 end;
 
 class procedure TIBStringField.CheckTypeSize(Value: Integer);
@@ -1033,7 +1035,7 @@ var
   s: RawByteString;
 begin
   Buffer := nil;
-  IBAlloc(Buffer, 0, Size + 1);
+  IBAlloc(Buffer, 0, DataSize);
   try
     Result := GetData(Buffer);
     if Result then
@@ -3509,7 +3511,7 @@ begin
             FirebirdAPI.CharSetWidth(getCharSetID,CharSetSize);
             CharSetName := FirebirdAPI.GetCharsetName(getCharSetID);
             FirebirdAPI.CharSetID2CodePage(getCharSetID,FieldCodePage);
-            FieldSize := GetSize;
+            FieldSize := GetSize div CharSetSize;
             FieldType := ftString;
           end;
           { All Doubles/Floats should be cast to doubles }
@@ -3763,6 +3765,8 @@ procedure TIBCustomDataSet.InternalOpen;
           begin
               CharacterSetSize := IBFieldDef.CharacterSetSize;
               CharacterSetName := IBFieldDef.CharacterSetName;
+              if AutoFieldSize then
+                Size := IBFieldDef.Size;
               CodePage := IBFieldDef.CodePage;
           end
           else
