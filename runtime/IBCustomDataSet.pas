@@ -51,7 +51,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, IBDatabase, IBExternals, IB, IBHeader,  IBSQL, Db,
+  SysUtils, Classes, IBDatabase, IBExternals, IB,  IBSQL, Db,
   IBUtils, IBBlob, IBSQLParser;
 
 const

@@ -37,7 +37,7 @@ unit IBBlob;
 interface
 
 uses
-  SysUtils, Classes, IBExternals, DB, IB, IBDatabase;
+  SysUtils, Classes, DB, IB, IBDatabase;
 
 
 const

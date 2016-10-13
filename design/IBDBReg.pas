@@ -374,6 +374,17 @@ const
   IBPalette1 = 'Firebird'; {do not localize}
   IBPalette2 = 'Firebird Admin'; {do not localize}
   IBPalette3 = 'Firebird Data Controls';   {do not localize}
+  
+ resourcestring
+   SInterbaseExpressVersion = 'Firebird Express for Lazarus 1.4.2';
+   SEditSQL = 'Edit SQL';
+   SIBSQLEditor = 'IBSQL Editor';
+   SIBServiceEditor = 'Edit IB Service';
+   SIBUpdateSQLEditor = '&UpdateSQL Editor...';
+   SIBDataSetEditor = '&Dataset Editor...';
+   SExecute = 'E&xecute';
+   SIBDatabaseEditor = 'Da&tabase Editor...';
+   SIBTransactionEditor = '&Transaction Editor...';
 
 
 procedure Register;
