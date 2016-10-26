@@ -206,7 +206,7 @@ end;
 procedure TIBBlobStream.EnsureLoaded;
 begin
   EnsureBlobInitialized;
-  if FBlobState = bsDataPending then
+  if (FBlobState = bsDataPending) and (FBlob <> nil) then
   begin
     SetSize(FBlobSize);
     FBlob.Read(FBuffer^, FBlobSize);
@@ -376,7 +376,7 @@ procedure TIBBlobStream.SetState(aValue: TIBBlobStates);
 begin
   if FBlobState = aValue then Exit;
 
-  if FBlobState = bsDataPending then
+  if (FBlobState = bsDataPending) and (FBlob <> nil) then
     FBlob.Close;
 
   FBlobState := aValue;
