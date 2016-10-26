@@ -126,8 +126,7 @@ end;
 
 destructor TIBBlobStream.Destroy;
 begin
-  SetState(bsUninitialised);
-  FBlob := nil;
+  CloseBlob;
   FBase.Free;
   SetSize(0);
   inherited Destroy;
@@ -415,11 +414,6 @@ function TIBBlobStream.Write(const Buffer; Count: Longint): Longint;
 begin
   CheckWritable;
   EnsureLoaded;  {Could be an untruncated bmReadWrite Blob}
-  if FBlob = nil then
-  begin
-    Result := 0;
-    Exit;
-  end;
   result := Count;
   if Count <= 0 then
     exit;
