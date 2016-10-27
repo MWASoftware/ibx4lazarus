@@ -126,6 +126,8 @@ type
     FRelationName: string;
     function GetArrayIntf: IArray;
     procedure SetArrayIntf(AValue: IArray);
+  protected
+    procedure Bind(Binding: Boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     function CreateArray: IArray;
@@ -141,6 +143,7 @@ type
     FAutoFieldSize: boolean;
     FCodePage: TSystemCodePage;
   protected
+    procedure Bind(Binding: Boolean); override;
     function GetDataSize: Integer; override;
   public
     constructor Create(aOwner: TComponent); override;
@@ -187,6 +190,7 @@ type
      FDisplayTextAsClassName: boolean;
      function GetTruncatedText: string;
    protected
+     procedure Bind(Binding: Boolean); override;
      function GetAsString: string; override;
      function GetDefaultWidth: Longint; override;
      procedure GetText(var AText: string; ADisplayText: Boolean); override;
@@ -870,14 +874,27 @@ var ArrayID: PISC_QUAD;
 begin
    if GetData(ArrayID) then
    with DataSet as TIBCustomDataSet do
-     Result := Database.Attachment.OpenArray(Transaction.TransactionIntf,FRelationName,FieldName,ArrayID^);
+     Result := Database.Attachment.OpenArray(Transaction.TransactionIntf,FRelationName,FieldName,ArrayID^)
+   else
+     Result := nil;
 end;
 
 procedure TIBArrayField.SetArrayIntf(AValue: IArray);
 var ArrayID: TISC_QUAD;
 begin
   ArrayID := AValue.GetArrayID;
-  SetData(@ArrayID);
+  if (ArrayID.gds_quad_high = 0) and (ArrayID.gds_quad_low = 0) then
+    Clear
+  else
+    SetData(@ArrayID);
+  DataChanged;
+end;
+
+procedure TIBArrayField.Bind(Binding: Boolean);
+begin
+  inherited Bind(Binding);
+  if Binding and (FieldDef <> nil) then
+    FRelationName := TIBFieldDef(FieldDef).FRelationName;
 end;
 
 constructor TIBArrayField.Create(AOwner: TComponent);
@@ -919,6 +936,19 @@ begin
            Result := ValidUTF8String(TextToSingleLine(UTF8Copy(Result,1,DisplayWidth-3))) + '...';
        end;
    end
+end;
+
+procedure TIBMemoField.Bind(Binding: Boolean);
+var IBFieldDef: TIBFieldDef;
+begin
+  inherited Bind(Binding);
+  if Binding and (FieldDef <> nil) then
+  begin
+    IBFieldDef := FieldDef as TIBFieldDef;
+    CharacterSetSize := IBFieldDef.CharacterSetSize;
+    CharacterSetName := IBFieldDef.CharacterSetName;
+    CodePage := IBFieldDef.CodePage;
+  end;
 end;
 
 function TIBMemoField.GetAsString: string;
@@ -998,6 +1028,21 @@ end;
 
 
 { TIBStringField}
+
+procedure TIBStringField.Bind(Binding: Boolean);
+var IBFieldDef: TIBFieldDef;
+begin
+  inherited Bind(Binding);
+  if Binding and (FieldDef <> nil) then
+  begin
+    IBFieldDef := FieldDef as TIBFieldDef;
+    CharacterSetSize := IBFieldDef.CharacterSetSize;
+    CharacterSetName := IBFieldDef.CharacterSetName;
+    if AutoFieldSize then
+      Size := IBFieldDef.Size;
+    CodePage := IBFieldDef.CodePage;
+  end;
+end;
 
 function TIBStringField.GetDataSize: Integer;
 begin
@@ -3750,41 +3795,6 @@ procedure TIBCustomDataSet.InternalOpen;
     result := SizeOf(TRecordData) + ((n - 1) * SizeOf(TFieldData));
   end;
 
-  procedure SetExtendedProperties;
-  var i: integer;
-      IBFieldDef: TIBFieldDef;
-  begin
-    for i := 0 to Fields.Count - 1 do
-      if Fields[i].FieldNo > 0 then
-      begin
-        IBFieldDef := Fields[i].FieldDef as TIBFieldDef;
-        if IBFieldDef <> nil then
-        begin
-          if (Fields[i] is TIBStringField) then
-          with TIBStringField(Fields[i]) do
-          begin
-              CharacterSetSize := IBFieldDef.CharacterSetSize;
-              CharacterSetName := IBFieldDef.CharacterSetName;
-              if AutoFieldSize then
-                Size := IBFieldDef.Size;
-              CodePage := IBFieldDef.CodePage;
-          end
-          else
-          if(Fields[i] is TIBMemoField) then
-          with TIBMemoField(Fields[i]) do
-          begin
-              CharacterSetSize := IBFieldDef.CharacterSetSize;
-              CharacterSetName := IBFieldDef.CharacterSetName;
-              CodePage := IBFieldDef.CodePage;
-          end
-          else
-          if(Fields[i] is TIBArrayField) then
-          with TIBArrayField(Fields[i]) do
-            FRelationName := IBFieldDef.FRelationName;
-         end
-      end
-  end;
-
 begin
   FBase.SetCursor;
   try
@@ -3799,7 +3809,6 @@ begin
       if DefaultFields then
         CreateFields;
       BindFields(True);
-      SetExtendedProperties;
       FCurrentRecord := -1;
       FQSelect.ExecQuery;
       FOpen := FQSelect.Open;
