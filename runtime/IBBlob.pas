@@ -166,7 +166,7 @@ end;
 
 function TIBBlobStream.GetBlobID: TISC_QUAD;
 begin
-  if FBlob = nil then
+  if (FBlob = nil) or (FBlobSize = 0) then
   begin
     Result.gds_quad_high := 0;
     Result.gds_quad_low := 0;
@@ -295,7 +295,7 @@ function TIBBlobStream.Read(var Buffer; Count: Longint): Longint;
 begin
   CheckReadable;
   EnsureLoaded;
-  if (FBlob = nil) or (Count <= 0) then
+  if Count <= 0 then
   begin
     result := 0;
     exit;
