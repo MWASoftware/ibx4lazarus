@@ -558,7 +558,7 @@ begin
     Dec(Index, inherited GetVerbCount);
     case Index of
       0: Result := SIBServiceEditor;
-      1 : Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+      1 : Result := SInterbaseExpressVersion;
     end;
   end;
 end;
@@ -772,7 +772,7 @@ function TIBUpdateSQLEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
     0 : Result := SIBUpdateSQLEditor;
-    1: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+    1: Result := SInterbaseExpressVersion;
   end;
 end;
 
@@ -807,7 +807,7 @@ begin
     case Index of
       0: Result := SIBDataSetEditor;
       1: Result := SExecute;
-      2: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+      2: Result := SInterbaseExpressVersion;
     end;
   end;
 end;
@@ -864,7 +864,7 @@ begin
     Dec(Index, inherited GetVerbCount);
     case Index of
       0: Result := SIBDatabaseEditor;
-      1 : Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+      1 : Result := SInterbaseExpressVersion ;
     end;
   end;
 end;
@@ -887,7 +887,7 @@ function TIBTransactionEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
     0: Result := SIBTransactionEditor;
-    1: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+    1: Result := SInterbaseExpressVersion;
   end;
 end;
 
@@ -923,7 +923,7 @@ begin
     case Index of
       0: Result := SExecute;
       1: Result := SEditSQL;
-      2: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+      2: Result := SInterbaseExpressVersion;
     end;
   end;
 end;
@@ -953,7 +953,7 @@ begin
     Dec(Index, inherited GetVerbCount);
     case Index of
       0: Result := SExecute;
-      1: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+      1: Result := SInterbaseExpressVersion;
     end;
   end;
 end;
@@ -1131,7 +1131,7 @@ function TIBSQLEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
     0 : Result := SIBSQLEditor;
-    1: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+    1: Result := SInterbaseExpressVersion;
   end;
 end;
 
