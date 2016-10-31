@@ -37,9 +37,9 @@ type
   TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes,
                 sqEnd,sqBegin,sqCommit,sqRollback,sqString,sqCommentStart,
                 sqCommentEnd,sqCommentLine,sqAsterisk,sqForwardSlash,
-                sqDeclare,sqEOL,sqTerminator, sqReconnect);
+                sqDeclare,sqEOL,sqTerminator, sqReconnect,sqCase);
 
-  TSQLStates =  (stInit, stError, stInSQL, stNested,stInSingleQuotes,
+  TSQLStates =  (stInit, stError, stInSQL, stNested, stInSingleQuotes,
                  stInDoubleQuotes, stInComment, stInCommentLine,
                  stInDeclaration, stInCommit, stInReconnect);
 
@@ -122,6 +122,7 @@ type
     FLastChar: char;
     FSQLText: string;
     FHasBegin: boolean;
+    FInCase: boolean;
     FStack: array [0..16] of TSQLStates;
     FStackindex: integer;
     FGetParamValue: TGetParamValue;
@@ -323,8 +324,13 @@ begin
             if FNested = 0 then
             begin
               PopState;
-              FState := stInit;
-              ExecSQL
+              if not FInCase then
+              begin
+                FState := stInit;
+                ExecSQL
+              end
+              else
+                FInCase := false;
             end
            else
               Dec(FNested)
@@ -350,6 +356,24 @@ begin
           SetState(stNested);
         end
       end;
+
+    sqCase:
+    if not (FState in [stInComment,stInCommentLine]) then
+    begin
+      FInCase := true;
+      AddToSQL(FString);
+      case FState of
+      stInSingleQuotes,
+      stInDoubleQuotes:
+        {Ignore};
+      stNested:
+        Inc(FNested);
+
+      stInSQL,
+      stInit:
+        SetState(stNested);
+      end
+    end;
 
     sqDeclare:
       if not (FState in [stInComment,stInCommentLine]) then
@@ -627,7 +651,10 @@ begin
         Result := sqCommit
       else
       if CompareText(FString,'reconnect') = 0 then
-        Result := sqReconnect;
+        Result := sqReconnect
+    else
+    if CompareText(FString,'case') = 0 then
+      Result := sqCase;
   end
 end;
 
