@@ -323,7 +323,7 @@ begin
           begin
             if FNested = 0 then
             begin
-              PopState;
+              FState := PopState;
               if not FInCase then
               begin
                 FState := stInit;
@@ -360,7 +360,6 @@ begin
     sqCase:
     if not (FState in [stInComment,stInCommentLine]) then
     begin
-      FInCase := true;
       AddToSQL(FString);
       case FState of
       stInSingleQuotes,
@@ -371,7 +370,10 @@ begin
 
       stInSQL,
       stInit:
-        SetState(stNested);
+        begin
+          FInCase := true;
+          SetState(stNested);
+        end;
       end
     end;
 
