@@ -126,8 +126,7 @@ end;
 
 destructor TIBBlobStream.Destroy;
 begin
-  SetState(bsUninitialised);
-  FBlob := nil;
+  CloseBlob;
   FBase.Free;
   SetSize(0);
   inherited Destroy;
@@ -167,7 +166,7 @@ end;
 
 function TIBBlobStream.GetBlobID: TISC_QUAD;
 begin
-  if FBlob = nil then
+  if (FBlob = nil) or (FBlobSize = 0) then
   begin
     Result.gds_quad_high := 0;
     Result.gds_quad_low := 0;
@@ -207,7 +206,7 @@ end;
 procedure TIBBlobStream.EnsureLoaded;
 begin
   EnsureBlobInitialized;
-  if FBlobState = bsDataPending then
+  if (FBlobState = bsDataPending) and (FBlob <> nil) then
   begin
     SetSize(FBlobSize);
     FBlob.Read(FBuffer^, FBlobSize);
@@ -296,7 +295,7 @@ function TIBBlobStream.Read(var Buffer; Count: Longint): Longint;
 begin
   CheckReadable;
   EnsureLoaded;
-  if (FBlob = nil) or (Count <= 0) then
+  if Count <= 0 then
   begin
     result := 0;
     exit;
@@ -377,7 +376,7 @@ procedure TIBBlobStream.SetState(aValue: TIBBlobStates);
 begin
   if FBlobState = aValue then Exit;
 
-  if FBlobState = bsDataPending then
+  if (FBlobState = bsDataPending) and (FBlob <> nil) then
     FBlob.Close;
 
   FBlobState := aValue;
@@ -415,11 +414,6 @@ function TIBBlobStream.Write(const Buffer; Count: Longint): Longint;
 begin
   CheckWritable;
   EnsureLoaded;  {Could be an untruncated bmReadWrite Blob}
-  if FBlob = nil then
-  begin
-    Result := 0;
-    Exit;
-  end;
   result := Count;
   if Count <= 0 then
     exit;

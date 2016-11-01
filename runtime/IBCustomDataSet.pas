@@ -85,6 +85,9 @@ type
   TBlobDataArray = array[0..0] of TIBBlobStream;
   PBlobDataArray = ^TBlobDataArray;
 
+  TArrayDataArray = array [0..0] of IArray;
+  PArrayDataArray = ^TArrayDataArray;
+
   { TIBCustomDataSet }
   TFieldData = record
     fdDataType: Short;
@@ -124,11 +127,16 @@ type
   TIBArrayField = class(TField)
   private
     FRelationName: string;
+    FCacheOffset: word;
+    function GetArrayID: TISC_QUAD;
     function GetArrayIntf: IArray;
     procedure SetArrayIntf(AValue: IArray);
+  protected
+    procedure Bind(Binding: Boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     function CreateArray: IArray;
+    property ArrayID: TISC_QUAD read GetArrayID;
     property ArrayIntf: IArray read GetArrayIntf write SetArrayIntf;
   end;
 
@@ -141,6 +149,7 @@ type
     FAutoFieldSize: boolean;
     FCodePage: TSystemCodePage;
   protected
+    procedure Bind(Binding: Boolean); override;
     function GetDataSize: Integer; override;
   public
     constructor Create(aOwner: TComponent); override;
@@ -187,6 +196,7 @@ type
      FDisplayTextAsClassName: boolean;
      function GetTruncatedText: string;
    protected
+     procedure Bind(Binding: Boolean); override;
      function GetAsString: string; override;
      function GetDefaultWidth: Longint; override;
      procedure GetText(var AText: string; ADisplayText: Boolean); override;
@@ -276,6 +286,8 @@ type
 
   TIBCustomDataSet = class(TDataset)
   private
+    FArrayFieldCount: integer;
+    FArrayCacheOffset: integer;
     FAutoCommit: TIBAutoCommit;
     FGenerateParamNames: Boolean;
     FGeneratorField: TIBGenerator;
@@ -560,7 +572,8 @@ type
     function BookmarkValid(Bookmark: TBookmark): Boolean; override;
     function CompareBookmarks(Bookmark1, Bookmark2: TBookmark): Integer; override;
     function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
-    function CreateArray(Field: TIBArrayField): IArray;
+    function GetArray(Field: TIBArrayField): IArray;
+    procedure SetArrayIntf(AnArray: IArray; Field: TIBArrayField);
     function GetCurrentRecord(Buffer: PChar): Boolean; override;
     function GetFieldData(Field : TField; Buffer : Pointer) : Boolean; overload; override;
     function GetFieldData(FieldNo: Integer; Buffer: Pointer): Boolean; overload; (*override;*)
@@ -575,6 +588,7 @@ type
     function IsSequenced: Boolean; override;
     procedure Post; override;
     function ParamByName(ParamName: String): ISQLParam;
+    property ArrayFieldCount: integer read FArrayFieldCount;
     property UpdateObject: TIBDataSetUpdateObject read FUpdateObject write SetUpdateObject;
     property UpdatesPending: Boolean read FUpdatesPending;
     property UpdateRecordTypes: TIBUpdateRecordTypes read FUpdateRecordTypes
@@ -866,18 +880,33 @@ type
 { TIBArrayField }
 
 function TIBArrayField.GetArrayIntf: IArray;
+begin
+  Result := TIBCustomDataSet(DataSet).GetArray(self);
+end;
+
+function TIBArrayField.GetArrayID: TISC_QUAD;
 var ArrayID: PISC_QUAD;
 begin
-   if GetData(ArrayID) then
-   with DataSet as TIBCustomDataSet do
-     Result := Database.Attachment.OpenArray(Transaction.TransactionIntf,FRelationName,FieldName,ArrayID^);
+  GetData(ArrayID);
+  Result := ArrayID^;
 end;
 
 procedure TIBArrayField.SetArrayIntf(AValue: IArray);
-var ArrayID: TISC_QUAD;
 begin
-  ArrayID := AValue.GetArrayID;
-  SetData(@ArrayID);
+  TIBCustomDataSet(DataSet).SetArrayIntf(AValue,self);
+  DataChanged;
+end;
+
+procedure TIBArrayField.Bind(Binding: Boolean);
+begin
+  inherited Bind(Binding);
+  if Binding then
+  begin
+    FCacheOffset := TIBCustomDataSet(DataSet).ArrayFieldCount;
+    Inc(TIBCustomDataSet(DataSet).FArrayFieldCount);
+    if FieldDef <> nil then
+      FRelationName := TIBFieldDef(FieldDef).FRelationName;
+  end;
 end;
 
 constructor TIBArrayField.Create(AOwner: TComponent);
@@ -919,6 +948,19 @@ begin
            Result := ValidUTF8String(TextToSingleLine(UTF8Copy(Result,1,DisplayWidth-3))) + '...';
        end;
    end
+end;
+
+procedure TIBMemoField.Bind(Binding: Boolean);
+var IBFieldDef: TIBFieldDef;
+begin
+  inherited Bind(Binding);
+  if Binding and (FieldDef <> nil) then
+  begin
+    IBFieldDef := FieldDef as TIBFieldDef;
+    CharacterSetSize := IBFieldDef.CharacterSetSize;
+    CharacterSetName := IBFieldDef.CharacterSetName;
+    CodePage := IBFieldDef.CodePage;
+  end;
 end;
 
 function TIBMemoField.GetAsString: string;
@@ -998,6 +1040,21 @@ end;
 
 
 { TIBStringField}
+
+procedure TIBStringField.Bind(Binding: Boolean);
+var IBFieldDef: TIBFieldDef;
+begin
+  inherited Bind(Binding);
+  if Binding and (FieldDef <> nil) then
+  begin
+    IBFieldDef := FieldDef as TIBFieldDef;
+    CharacterSetSize := IBFieldDef.CharacterSetSize;
+    CharacterSetName := IBFieldDef.CharacterSetName;
+    if AutoFieldSize then
+      Size := IBFieldDef.Size;
+    CodePage := IBFieldDef.CodePage;
+  end;
+end;
 
 function TIBStringField.GetDataSize: Integer;
 begin
@@ -1707,6 +1764,7 @@ procedure TIBCustomDataSet.FetchCurrentRecordToBuffer(Qry: TIBSQL;
 var
   p: PRecordData;
   pbd: PBlobDataArray;
+  pda: PArrayDataArray;
   i, j: Integer;
   LocalData: Pointer;
   LocalDate, LocalDouble: Double;
@@ -1720,9 +1778,14 @@ begin
   p := PRecordData(Buffer);
   { Make sure blob cache is empty }
   pbd := PBlobDataArray(Buffer + FBlobCacheOffset);
+  pda := PArrayDataArray(Buffer + FArrayCacheOffset);
   if RecordNumber > -1 then
+  begin
     for i := 0 to BlobFieldCount - 1 do
       pbd^[i] := nil;
+    for i := 0 to ArrayFieldCount - 1 do
+      pda^[i] := nil;
+  end;
   { Get record information }
   p^.rdBookmarkFlag := bfCurrent;
   p^.rdFieldCount := Qry.FieldCount;
@@ -2082,17 +2145,19 @@ end;
 
 procedure TIBCustomDataSet.InternalPostRecord(Qry: TIBSQL; Buff: Pointer);
 var
-  i, j, k: Integer;
+  i, j, k, arr: Integer;
   pbd: PBlobDataArray;
+  pda: PArrayDataArray;
 begin
   pbd := PBlobDataArray(PChar(Buff) + FBlobCacheOffset);
-  j := 0;
+  pda := PArrayDataArray(PChar(Buff) + FArrayCacheOffset);
+  j := 0; arr := 0;
   for i := 0 to FieldCount - 1 do
     if Fields[i].IsBlob then
     begin
-      k := FMappedFieldPosition[Fields[i].FieldNo -1];
       if pbd^[j] <> nil then
       begin
+        k := FMappedFieldPosition[Fields[i].FieldNo -1];
         pbd^[j].Finalize;
         PISC_QUAD(
           PChar(Buff) + PRecordData(Buff)^.rdFields[k].fdDataOfs)^ :=
@@ -2100,6 +2165,18 @@ begin
         PRecordData(Buff)^.rdFields[k].fdIsNull := pbd^[j].Size = 0;
       end;
       Inc(j);
+    end
+    else
+    if Fields[i] is TIBArrayField then
+    begin
+      if pda^[arr] <> nil then
+      begin
+        k := FMappedFieldPosition[Fields[i].FieldNo -1];
+        PISC_QUAD(
+          PChar(Buff) + PRecordData(Buff)^.rdFields[k].fdDataOfs)^ :=  pda^[arr].GetArrayID;
+        PRecordData(Buff)^.rdFields[k].fdIsNull := pda^[arr].IsEmpty;
+      end;
+      Inc(arr);
     end;
   if Assigned(FUpdateObject) then
   begin
@@ -2317,7 +2394,8 @@ var
   begin
     CopyRecordBuffer(Buffer, OldBuffer);
     if BlobFieldCount > 0 then
-      FillChar(PChar(OldBuffer)[FBlobCacheOffset], BlobFieldCount * SizeOf(TIBBlobStream),
+      FillChar(PChar(OldBuffer)[FBlobCacheOffset],
+               BlobFieldCount * SizeOf(TIBBlobStream) + ArrayFieldCount * SizeOf(IArray),
                0);
   end;
 
@@ -2775,6 +2853,8 @@ var
   Buff: PChar;
   bTr, bDB: Boolean;
 begin
+  if (Field = nil) or (Field.DataSet <> self) then
+    IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
   Buff := GetActiveBuf;
   if Buff = nil then
   begin
@@ -2820,10 +2900,61 @@ begin
   result := TIBDSBlobStream.Create(Field, fs, Mode);
 end;
 
-function TIBCustomDataSet.CreateArray(Field: TIBArrayField): IArray;
+function TIBCustomDataSet.GetArray(Field: TIBArrayField): IArray;
+var Buff: PChar;
+    pda: PArrayDataArray;
+    bTr, bDB: Boolean;
 begin
-  Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,
-                   Field.FRelationName,Field.FieldName);
+  if (Field = nil) or (Field.DataSet <> self) then
+    IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
+  Buff := GetActiveBuf;
+  if Buff = nil then
+    Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,
+                   Field.FRelationName,Field.FieldName)
+  else
+  begin
+    pda := PArrayDataArray(Buff + FArrayCacheOffset);
+    if pda^[Field.FCacheOffset] = nil then
+    begin
+      AdjustRecordOnInsert(Buff);
+      Result := Database.Attachment.OpenArray(Transaction.TransactionIntf,
+                   Field.FRelationName,Field.FieldName,Field.ArrayID);
+      pda^[Field.FCacheOffset] := Result;
+      if (CachedUpdates) then
+      begin
+        bTr := not Transaction.InTransaction;
+        bDB := not Database.Connected;
+        if bDB then
+          Database.Open;
+        if bTr then
+          Transaction.StartTransaction;
+         pda^[Field.FCacheOffset].PreLoad;
+        if bTr then
+          Transaction.Commit;
+        if bDB then
+          Database.Close;
+      end;
+      WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
+    end
+    else
+      Result := pda^[Field.FCacheOffset];
+  end;
+end;
+
+procedure TIBCustomDataSet.SetArrayIntf(AnArray: IArray; Field: TIBArrayField);
+var Buff: PChar;
+    pda: PArrayDataArray;
+begin
+  if (Field = nil) or (Field.DataSet <> self) then
+    IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
+  Buff := GetActiveBuf;
+  if Buff <> nil then
+  begin
+    AdjustRecordOnInsert(Buff);
+    pda := PArrayDataArray(Buff + FArrayCacheOffset);
+    pda^[Field.FCacheOffset] := AnArray;
+    WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
+  end;
 end;
 
 function TIBCustomDataSet.CompareBookmarks(Bookmark1, Bookmark2: TBookmark): Integer;
@@ -2967,7 +3098,12 @@ begin
 end;
 
 procedure TIBCustomDataSet.FreeRecordBuffer(var Buffer: PChar);
+var i: integer;
+    pda: PArrayDataArray;
 begin
+  pda := PArrayDataArray(Buffer + FArrayCacheOffset);
+  for i := 0 to ArrayFieldCount - 1 do
+    pda^[i] := nil;  {Free References}
   FreeMem(Buffer);
   Buffer := nil;
 end;
@@ -3750,41 +3886,6 @@ procedure TIBCustomDataSet.InternalOpen;
     result := SizeOf(TRecordData) + ((n - 1) * SizeOf(TFieldData));
   end;
 
-  procedure SetExtendedProperties;
-  var i: integer;
-      IBFieldDef: TIBFieldDef;
-  begin
-    for i := 0 to Fields.Count - 1 do
-      if Fields[i].FieldNo > 0 then
-      begin
-        IBFieldDef := Fields[i].FieldDef as TIBFieldDef;
-        if IBFieldDef <> nil then
-        begin
-          if (Fields[i] is TIBStringField) then
-          with TIBStringField(Fields[i]) do
-          begin
-              CharacterSetSize := IBFieldDef.CharacterSetSize;
-              CharacterSetName := IBFieldDef.CharacterSetName;
-              if AutoFieldSize then
-                Size := IBFieldDef.Size;
-              CodePage := IBFieldDef.CodePage;
-          end
-          else
-          if(Fields[i] is TIBMemoField) then
-          with TIBMemoField(Fields[i]) do
-          begin
-              CharacterSetSize := IBFieldDef.CharacterSetSize;
-              CharacterSetName := IBFieldDef.CharacterSetName;
-              CodePage := IBFieldDef.CodePage;
-          end
-          else
-          if(Fields[i] is TIBArrayField) then
-          with TIBArrayField(Fields[i]) do
-            FRelationName := IBFieldDef.FRelationName;
-         end
-      end
-  end;
-
 begin
   FBase.SetCursor;
   try
@@ -3798,8 +3899,8 @@ begin
    begin
       if DefaultFields then
         CreateFields;
+      FArrayFieldCount := 0;
       BindFields(True);
-      SetExtendedProperties;
       FCurrentRecord := -1;
       FQSelect.ExecQuery;
       FOpen := FQSelect.Open;
@@ -3810,7 +3911,7 @@ begin
         3. After the dummy fetch, FRecordSize will be appropriately
            adjusted to reflect the additional "weight" of the field
            data.
-        4. Set up the FCalcFieldsOffset, FBlobCacheOffset and FRecordBufferSize.
+        4. Set up the FCalcFieldsOffset, FBlobCacheOffset, FArrayCacheOffset and FRecordBufferSize.
         5. Now, with the BufferSize available, allocate memory for chunks of records
         6. Re-allocate the model buffer, accounting for the new
            FRecordBufferSize.
@@ -3824,7 +3925,8 @@ begin
       {Step 4}
       FCalcFieldsOffset := FRecordSize;
       FBlobCacheOffset := FCalcFieldsOffset + CalcFieldsSize;
-      FRecordBufferSize := (FBlobCacheOffset + (BlobFieldCount * SizeOf(TIBBlobStream)));
+      FArrayCacheOffset := (FBlobCacheOffset + (BlobFieldCount * SizeOf(TIBBlobStream)));
+      FRecordBufferSize := FArrayCacheOffset + (ArrayFieldCount * sizeof(IArray));
       {Step 5}
       if UniDirectional then
         FBufferChunkSize := FRecordBufferSize * UniCache

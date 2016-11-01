@@ -1,5 +1,5 @@
 
-IBX Change Log  version      (2.0-0) Thu, 13 Oct 2016 17:01:20 +0100
+IBX Change Log  version       (2.0-0) Tue, 01 Nov 2016 13:55:42 +0000
 
 1. IBCustomDataset: When calling SetCodePage, no longer request transliteration
    when target codepage is CP_NONE.
@@ -24,6 +24,9 @@ IBX Change Log  version      (2.0-0) Thu, 13 Oct 2016 17:01:20 +0100
    true (default) then Size property value saved in the lfm is ignored. Size is
    always set from the dynamic information read from the database. It is unclear
    why anyone would want to override this and set Size to false.
+
+7. ibxscript: should now handle correctly a Case..End statement within a procedure
+   block.
 
 
 IBX Change Log  version  (1.4-2) Thu, 22 Sep 2016 15:25:27 +0100
