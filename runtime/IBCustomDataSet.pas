@@ -2155,14 +2155,23 @@ begin
   for i := 0 to FieldCount - 1 do
     if Fields[i].IsBlob then
     begin
+      k := FMappedFieldPosition[Fields[i].FieldNo -1];
       if pbd^[j] <> nil then
       begin
-        k := FMappedFieldPosition[Fields[i].FieldNo -1];
         pbd^[j].Finalize;
         PISC_QUAD(
           PChar(Buff) + PRecordData(Buff)^.rdFields[k].fdDataOfs)^ :=
           pbd^[j].BlobID;
         PRecordData(Buff)^.rdFields[k].fdIsNull := pbd^[j].Size = 0;
+      end
+      else
+      begin
+        PRecordData(Buff)^.rdFields[k].fdIsNull := true;
+        with PISC_QUAD(PChar(Buff) + PRecordData(Buff)^.rdFields[k].fdDataOfs)^ do
+        begin
+          gds_quad_high := 0;
+          gds_quad_low := 0;
+        end;
       end;
       Inc(j);
     end
@@ -2855,6 +2864,11 @@ var
 begin
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
+  if Field.IsNull then
+  begin
+    Result := nil;
+    Exit;
+  end;
   Buff := GetActiveBuf;
   if Buff = nil then
   begin
