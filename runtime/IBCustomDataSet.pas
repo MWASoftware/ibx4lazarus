@@ -1776,6 +1776,7 @@ var
   FieldsLoaded: Integer;
 begin
   p := PRecordData(Buffer);
+  LocalData := nil;
   { Make sure blob cache is empty }
   pbd := PBlobDataArray(Buffer + FBlobCacheOffset);
   pda := PArrayDataArray(Buffer + FArrayCacheOffset);
@@ -1952,7 +1953,12 @@ begin
           Move(LocalData^, Buffer[rdFields[j].fdDataOfs], rdFields[j].fdDataLength)
         else
           Move(LocalData^, Buffer[rdFields[j].fdDataOfs], rdFields[j].fdDataSize)
-      end;
+      end
+      else
+      if rdFields[j].fdDataType = SQL_VARYING then
+        FillChar(Buffer[rdFields[j].fdDataOfs],rdFields[j].fdDataLength,0)
+      else
+        FillChar(Buffer[rdFields[j].fdDataOfs],rdFields[j].fdDataSize,0);
     end;
   end;
   WriteRecordCache(RecordNumber, PChar(p));
@@ -2864,11 +2870,6 @@ var
 begin
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
-  if Field.IsNull then
-  begin
-    Result := nil;
-    Exit;
-  end;
   Buff := GetActiveBuf;
   if Buff = nil then
   begin

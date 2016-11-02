@@ -345,7 +345,8 @@ end;
 procedure TIBBlobStream.SetField(aField: TField);
 begin
   FRelationName := '';
-  FRelationName := (aField.FieldDef as TIBFieldDef).RelationName;
+  if aField.FieldDef <> nil then
+    FRelationName := (aField.FieldDef as TIBFieldDef).RelationName;
   FColumnName := aField.FieldName;;
 end;
 
