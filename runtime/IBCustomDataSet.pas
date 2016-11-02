@@ -33,11 +33,12 @@
 
 unit IBCustomDataSet;
 
-{$codepage UTF8}
-
 {$R-}
 
+{$IFDEF FPC}
 {$Mode Delphi}
+{$codepage UTF8}
+{$ENDIF}
 
 {$IFDEF DELPHI}
 {$DEFINE TDBDFIELD_IS_BCD}
@@ -84,8 +85,25 @@ type
 
   TBlobDataArray = array[0..0] of TIBBlobStream;
   PBlobDataArray = ^TBlobDataArray;
+  TIBArrayField = class;
 
-  TArrayDataArray = array [0..0] of IArray;
+  { TIBArray }
+
+  {Wrapper class to support array cache in TIBCustomDataset and event handling}
+
+  TIBArray = class
+  private
+    FArray: IArray;
+    FRecNo: integer;
+    FField: TIBArrayField;
+    procedure EventHandler(Sender: IArray; Reason: TArrayEventReason);
+  public
+    constructor Create(aField: TIBArrayField; anArray: IArray);
+    destructor Destroy; override;
+    property ArrayIntf: IArray read FArray;
+  end;
+
+  TArrayDataArray = array [0..0] of TIBArray;
   PArrayDataArray = ^TArrayDataArray;
 
   { TIBCustomDataSet }
@@ -876,6 +894,35 @@ type
     end;
     Result := str;
   end;
+
+{ TIBArray }
+
+procedure TIBArray.EventHandler(Sender: IArray; Reason: TArrayEventReason);
+begin
+  case Reason of
+  arChanging:
+    if FRecNo <> FField.Dataset.RecNo then
+      IBError(ibxeNotCurrentArray,[nil]);
+
+  arChanged:
+    FField.DataChanged;
+  end;
+end;
+
+constructor TIBArray.Create(aField: TIBArrayField; anArray: IArray);
+begin
+  inherited Create;
+  FField := aField;
+  FArray := anArray;
+  FRecNo := FField.Dataset.RecNo;
+  FArray.AddEventHandler(EventHandler);
+end;
+
+destructor TIBArray.Destroy;
+begin
+  FArray.RemoveEventHandler(EventHandler);
+  inherited Destroy;
+end;
 
 { TIBArrayField }
 
@@ -2188,8 +2235,8 @@ begin
       begin
         k := FMappedFieldPosition[Fields[i].FieldNo -1];
         PISC_QUAD(
-          PChar(Buff) + PRecordData(Buff)^.rdFields[k].fdDataOfs)^ :=  pda^[arr].GetArrayID;
-        PRecordData(Buff)^.rdFields[k].fdIsNull := pda^[arr].IsEmpty;
+          PChar(Buff) + PRecordData(Buff)^.rdFields[k].fdDataOfs)^ :=  pda^[arr].ArrayIntf.GetArrayID;
+        PRecordData(Buff)^.rdFields[k].fdIsNull := pda^[arr].ArrayIntf.IsEmpty;
       end;
       Inc(arr);
     end;
@@ -2925,7 +2972,7 @@ begin
   Buff := GetActiveBuf;
   if Buff = nil then
     Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,
-                   Field.FRelationName,Field.FieldName)
+                              Field.FRelationName,Field.FieldName)
   else
   begin
     pda := PArrayDataArray(Buff + FArrayCacheOffset);
@@ -2933,8 +2980,8 @@ begin
     begin
       AdjustRecordOnInsert(Buff);
       Result := Database.Attachment.OpenArray(Transaction.TransactionIntf,
-                   Field.FRelationName,Field.FieldName,Field.ArrayID);
-      pda^[Field.FCacheOffset] := Result;
+                            Field.FRelationName,Field.FieldName,Field.ArrayID);
+      pda^[Field.FCacheOffset] := TIBArray.Create(Field,Result);
       if (CachedUpdates) then
       begin
         bTr := not Transaction.InTransaction;
@@ -2943,7 +2990,7 @@ begin
           Database.Open;
         if bTr then
           Transaction.StartTransaction;
-         pda^[Field.FCacheOffset].PreLoad;
+         pda^[Field.FCacheOffset].ArrayIntf.PreLoad;
         if bTr then
           Transaction.Commit;
         if bDB then
@@ -2952,7 +2999,7 @@ begin
       WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
     end
     else
-      Result := pda^[Field.FCacheOffset];
+      Result := pda^[Field.FCacheOffset].ArrayIntf;
   end;
 end;
 
@@ -2967,7 +3014,7 @@ begin
   begin
     AdjustRecordOnInsert(Buff);
     pda := PArrayDataArray(Buff + FArrayCacheOffset);
-    pda^[Field.FCacheOffset] := AnArray;
+    pda^[Field.FCacheOffset].FArray := AnArray;
     WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
   end;
 end;
@@ -3118,7 +3165,10 @@ var i: integer;
 begin
   pda := PArrayDataArray(Buffer + FArrayCacheOffset);
   for i := 0 to ArrayFieldCount - 1 do
+  begin
+    pda^[i].Free;
     pda^[i] := nil;  {Free References}
+  end;
   FreeMem(Buffer);
   Buffer := nil;
 end;
