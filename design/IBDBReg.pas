@@ -39,7 +39,6 @@ unit IBDBReg;
  *)
 {$A+}                           (* Aligned records: On *)
 {$B-}                           (* Short circuit boolean expressions: Off *)
-{$G+}                           (* Imported data: On *)
 {$H+}                           (* Huge Strings: On *)
 {$J-}                           (* Modification of Typed Constants: Off *)
 {$M+}                           (* Generate run-time type information: On *)
@@ -47,7 +46,6 @@ unit IBDBReg;
 {$Q-}                           (* Overflow checks: Off *)
 {$R-}                           (* Range checks: Off *)
 {$T+}                           (* Typed address: On *)
-{$U+}                           (* Pentim-safe FDIVs: On *)
 {$W-}                           (* Always generate stack frames: Off *)
 {$X+}                           (* Extended syntax: On *)
 {$Z1}                           (* Minimum Enumeration Size: 1 Byte *)
@@ -368,7 +366,8 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet, FBMessages,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
      IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
-     IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport, IBDSDialogs;
+     IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport, IBDSDialogs,
+     IBArrayGrid;
 
 const
   IBPalette1 = 'Firebird'; {do not localize}
@@ -395,7 +394,7 @@ begin
     Exit;
   end;
 
-  RegisterNoIcon([TIBStringField, TIBBCDField, TIBMemoField]);
+  RegisterNoIcon([TIBStringField, TIBBCDField, TIBMemoField, TIBArrayField]);
   {$if lcl_fullversion < 01010000}
   {see http://bugs.freepascal.org/view.php?id=19035 }
   RegisterNoIcon([TIntegerField]);
@@ -410,7 +409,7 @@ begin
       TIBLogService, TIBSecurityService, TIBServerProperties]);
 
 
-  RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView,TDBControlGrid]);
+  RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView,TDBControlGrid, TIBArrayGrid]);
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'DatabaseName', TIBFileNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'StoredProcName', TIBStoredProcNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TParams), TIBStoredProc, 'Params', TIBStoredProcParamsProperty);
@@ -558,7 +557,7 @@ begin
     Dec(Index, inherited GetVerbCount);
     case Index of
       0: Result := SIBServiceEditor;
-      1 : Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+      1 : Result := SInterbaseExpressVersion;
     end;
   end;
 end;
@@ -772,7 +771,7 @@ function TIBUpdateSQLEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
     0 : Result := SIBUpdateSQLEditor;
-    1: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+    1: Result := SInterbaseExpressVersion;
   end;
 end;
 
@@ -807,7 +806,7 @@ begin
     case Index of
       0: Result := SIBDataSetEditor;
       1: Result := SExecute;
-      2: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+      2: Result := SInterbaseExpressVersion;
     end;
   end;
 end;
@@ -864,7 +863,7 @@ begin
     Dec(Index, inherited GetVerbCount);
     case Index of
       0: Result := SIBDatabaseEditor;
-      1 : Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+      1 : Result := SInterbaseExpressVersion;
     end;
   end;
 end;
@@ -887,7 +886,7 @@ function TIBTransactionEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
     0: Result := SIBTransactionEditor;
-    1: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+    1: Result := SInterbaseExpressVersion;
   end;
 end;
 
@@ -923,7 +922,7 @@ begin
     case Index of
       0: Result := SExecute;
       1: Result := SEditSQL;
-      2: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+      2: Result := SInterbaseExpressVersion;
     end;
   end;
 end;
@@ -953,7 +952,7 @@ begin
     Dec(Index, inherited GetVerbCount);
     case Index of
       0: Result := SExecute;
-      1: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+      1: Result := SInterbaseExpressVersion;
     end;
   end;
 end;
@@ -1131,7 +1130,7 @@ function TIBSQLEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
     0 : Result := SIBSQLEditor;
-    1: Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+    1: Result := SInterbaseExpressVersion;
   end;
 end;
 

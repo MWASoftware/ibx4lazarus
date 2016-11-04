@@ -144,18 +144,24 @@ type
 
   TIBArrayField = class(TField)
   private
+    FArrayBounds: TArrayBounds;
+    FArrayDimensions: integer;
     FRelationName: string;
     FCacheOffset: word;
     function GetArrayID: TISC_QUAD;
     function GetArrayIntf: IArray;
     procedure SetArrayIntf(AValue: IArray);
   protected
+    class procedure CheckTypeSize(AValue: Longint); override;
+    function GetDataSize: Integer; override;
     procedure Bind(Binding: Boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     function CreateArray: IArray;
     property ArrayID: TISC_QUAD read GetArrayID;
     property ArrayIntf: IArray read GetArrayIntf write SetArrayIntf;
+    property ArrayDimensions: integer read FArrayDimensions write FArrayDimensions;
+    property ArrayBounds: TArrayBounds read FArrayBounds write FArrayBounds;
   end;
 
   { TIBStringField allows us to have strings longer than 8196 }
@@ -761,6 +767,8 @@ type
 
   TIBFieldDef = class(TFieldDef)
   private
+    FArrayBounds: TArrayBounds;
+    FArrayDimensions: integer;
     FCharacterSetName: RawByteString;
     FCharacterSetSize: integer;
     FCodePage: TSystemCodePage;
@@ -770,6 +778,8 @@ type
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
     property CodePage: TSystemCodePage read FCodePage write FCodePage;
     property RelationName: string read FRelationName write FRelationName;
+    property ArrayDimensions: integer read FArrayDimensions write FArrayDimensions;
+    property ArrayBounds: TArrayBounds read FArrayBounds write FArrayBounds;
   end;
 
 const
@@ -932,16 +942,24 @@ begin
 end;
 
 function TIBArrayField.GetArrayID: TISC_QUAD;
-var ArrayID: PISC_QUAD;
 begin
-  GetData(ArrayID);
-  Result := ArrayID^;
+  GetData(@Result);
 end;
 
 procedure TIBArrayField.SetArrayIntf(AValue: IArray);
 begin
   TIBCustomDataSet(DataSet).SetArrayIntf(AValue,self);
   DataChanged;
+end;
+
+class procedure TIBArrayField.CheckTypeSize(AValue: Longint);
+begin
+  //Ignore
+end;
+
+function TIBArrayField.GetDataSize: Integer;
+begin
+  Result := sizeof(TISC_QUAD);
 end;
 
 procedure TIBArrayField.Bind(Binding: Boolean);
@@ -952,7 +970,11 @@ begin
     FCacheOffset := TIBCustomDataSet(DataSet).ArrayFieldCount;
     Inc(TIBCustomDataSet(DataSet).FArrayFieldCount);
     if FieldDef <> nil then
+    begin
       FRelationName := TIBFieldDef(FieldDef).FRelationName;
+      FArrayDimensions := TIBFieldDef(FieldDef).ArrayDimensions;
+      FArrayBounds :=  TIBFieldDef(FieldDef).ArrayBounds;
+    end;
   end;
 end;
 
@@ -3577,6 +3599,9 @@ var
   Query : TIBSQL;
   FieldIndex: Integer;
   FRelationNodes : TRelationNode;
+  aArrayDimensions: integer;
+  aArrayBounds: TArrayBounds;
+  ArrayMetaData: IArrayMetaData;
 
   function Add_Node(Relation, Field : String) : TRelationNode;
   var
@@ -3704,6 +3729,8 @@ begin
         CharSetSize := 0;
         CharSetName := '';
         FieldCodePage := CP_NONE;
+        aArrayDimensions := 0;
+        SetLength(aArrayBounds,0);
         case SQLType of
           { All VARCHAR's must be converted to strings before recording
            their values }
@@ -3785,6 +3812,12 @@ begin
           begin
             FieldSize := sizeof (TISC_QUAD);
             FieldType := ftArray;
+            ArrayMetaData := GetArrayMetaData;
+            if ArrayMetaData <> nil then
+            begin
+              aArrayDimensions := ArrayMetaData.GetDimensions;
+              aArrayBounds := ArrayMetaData.GetBounds;
+            end;
           end;
           SQL_BOOLEAN:
              FieldType:= ftBoolean;
@@ -3808,6 +3841,8 @@ begin
             CharacterSetSize := CharSetSize;
             CharacterSetName := CharSetName;
             CodePage := FieldCodePage;
+            ArrayDimensions := aArrayDimensions;
+            ArrayBounds := aArrayBounds;
             if (FieldName <> '') and (RelationName <> '') then
             begin
               if Has_COMPUTED_BLR(RelationName, FieldName) then
