@@ -321,6 +321,7 @@ type
     FBase: TIBBase;
     FBlobCacheOffset: Integer;
     FBlobStreamList: TList;
+    FArrayList: TList;
     FBufferChunks: Integer;
     FBufferCache,
     FOldBufferCache: PChar;
@@ -386,6 +387,7 @@ type
     function CanRefresh: Boolean;
     procedure CheckEditState;
     procedure ClearBlobCache;
+    procedure ClearArrayCache;
     procedure ClearIBLinks;
     procedure CopyRecordBuffer(Source, Dest: Pointer);
     procedure DoBeforeDatabaseDisconnect(Sender: TObject);
@@ -1301,6 +1303,7 @@ begin
   FUniDirectional := False;
   FBufferChunks := BufferCacheSize;
   FBlobStreamList := TList.Create;
+  FArrayList := TList.Create;
   FGeneratorField := TIBGenerator.Create(self);
   FDataLink := TIBDataLink.Create(Self);
   FQDelete := TIBSQL.Create(Self);
@@ -1351,6 +1354,7 @@ begin
   ClearIBLinks;
   FIBLinks.Free;
   FBlobStreamList.Free;
+  FArrayList.Free;
   FreeMem(FBufferCache);
   FBufferCache := nil;
   FreeMem(FOldBufferCache);
@@ -1761,6 +1765,18 @@ begin
     FBlobStreamList[i] := nil;
   end;
   FBlobStreamList.Pack;
+end;
+
+procedure TIBCustomDataSet.ClearArrayCache;
+var
+  i: Integer;
+begin
+  for i := 0 to FArrayList.Count - 1 do
+  begin
+    TIBArray(FArrayList[i]).Free;
+    FArrayList[i] := nil;
+  end;
+  FArrayList.Pack;
 end;
 
 procedure TIBCustomDataSet.CopyRecordBuffer(Source, Dest: Pointer);
@@ -3001,9 +3017,14 @@ begin
     if pda^[Field.FCacheOffset] = nil then
     begin
       AdjustRecordOnInsert(Buff);
-      Result := Database.Attachment.OpenArray(Transaction.TransactionIntf,
+      if Field.IsNull then
+        Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,
+                                Field.FRelationName,Field.FieldName)
+      else
+        Result := Database.Attachment.OpenArray(Transaction.TransactionIntf,
                             Field.FRelationName,Field.FieldName,Field.ArrayID);
       pda^[Field.FCacheOffset] := TIBArray.Create(Field,Result);
+      FArrayList.Add(pda^[Field.FCacheOffset]);
       if (CachedUpdates) then
       begin
         bTr := not Transaction.InTransaction;
@@ -3182,15 +3203,7 @@ begin
 end;
 
 procedure TIBCustomDataSet.FreeRecordBuffer(var Buffer: PChar);
-var i: integer;
-    pda: PArrayDataArray;
 begin
-  pda := PArrayDataArray(Buffer + FArrayCacheOffset);
-  for i := 0 to ArrayFieldCount - 1 do
-  begin
-    pda^[i].Free;
-    pda^[i] := nil;  {Free References}
-  end;
   FreeMem(Buffer);
   Buffer := nil;
 end;
@@ -3470,10 +3483,16 @@ procedure TIBCustomDataSet.InternalCancel;
 var
   Buff: PChar;
   CurRec: Integer;
+  pda: PArrayDataArray;
+  i: integer;
 begin
   inherited InternalCancel;
   Buff := GetActiveBuf;
-  if Buff <> nil then begin
+  if Buff <> nil then
+  begin
+    pda := PArrayDataArray(Buff + FArrayCacheOffset);
+    for i := 0 to ArrayFieldCount - 1 do
+      pda^[i].ArrayIntf.CancelChanges;
     CurRec := FCurrentRecord;
     AdjustRecordOnInsert(Buff);
     if (State = dsEdit) then begin
@@ -3496,6 +3515,7 @@ begin
     DeactivateTransaction;
   FQSelect.Close;
   ClearBlobCache;
+  ClearArrayCache;
   FreeRecordBuffer(FModelBuffer);
   FreeRecordBuffer(FOldBuffer);
   FCurrentRecord := -1;

@@ -165,18 +165,24 @@ resourcestring
 
 procedure TIBArrayGrid.ActiveChange(Sender: TObject);
 begin
-  if (DataSet <> nil) and DataSet.Active then
-  begin
-    FActive := Field is TIBArrayField;
-    if not FActive then
-      raise Exception.CreateFmt(sNotAnArrayField,[Field.Name]);
-    DataChange(Sender);
-  end
-  else
-  begin
+  try
+    if (DataSet <> nil) and DataSet.Active then
+    begin
+      FActive := true;
+      if not (Field is TIBArrayField) then
+        raise Exception.CreateFmt(sNotAnArrayField,[Field.Name]);
+      UpdateLayout;
+      DataChange(Sender);
+    end
+    else
+    begin
+      FActive := false;
+      FArray := nil;
+      Clean;
+    end;
+  except
     FActive := false;
-    FArray := nil;
-    Clean;
+    raise;
   end;
 end;
 
@@ -284,11 +290,11 @@ procedure TIBArrayGrid.UpdateLayout;
 var i: integer;
 begin
   if csLoading in ComponentState then Exit;
-  if (DataSource <> nil) and (DataField <> '') then
-  begin
+  if (DataSource <> nil) and (DataSet <> nil) and (DataField <> '') then
+  try
     for i := 0 to DataSet.FieldDefs.Count - 1 do
-    if (DataSet.FieldDefs[i].Name = DataField) and (DataSet.FieldDefs[i] <> nil)
-       and (DataSet.FieldDefs[i] is TIBFieldDef) then
+    if (DataSet.FieldDefs[i] <> nil) and (DataSet.FieldDefs[i].Name = DataField)
+       and (DataSet.FieldDefs[i] is TIBFieldDef) and (DataSet.FieldDefs[i].DataType = ftArray) then
     with TIBFieldDef(DataSet.FieldDefs[i]) do
     begin
       case ArrayDimensions of
@@ -306,12 +312,10 @@ begin
         ColCount := UpperBound - LowerBound + 1 + FixedCols;
       Exit;
     end;
-
-    try
-      raise Exception.CreateFmt(sNotAnArrayField,[DataField]);
-    finally
-      DataField := '';
-    end;
+    raise Exception.CreateFmt(sNotAnArrayField,[DataField]);
+  except
+    DataField := '';
+    raise;
   end;
 end;
 
@@ -356,12 +360,12 @@ begin
     if FArray = nil then Exit;
     with TIBArrayField(Field) do
     begin
-      k := aCol - ArrayBounds[0].LowerBound;
+      k := aCol + ArrayBounds[0].LowerBound - FixedCols;
       if ArrayDimensions = 1 then
         FArray.SetAsString([k],aValue)
       else
       begin
-        l := aRow - ArrayBounds[1].LowerBound;
+        l := aRow + ArrayBounds[1].LowerBound - FixedRows;
         FArray.SetAsString([k,l],aValue);
       end;
     end;
