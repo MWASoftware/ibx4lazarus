@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="14">
+      <Unit0>
+        <Filename Value="project1.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="23"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="Unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="129"/>
+        <CursorPos Y="124"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="../2Darray/Unit1.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="76"/>
+        <CursorPos Y="90"/>
+        <UsageCount Value="10"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="../../../../fbintf/testsuite/Test7.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="34"/>
+        <UsageCount Value="10"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="../../../design/IBDSDialogs.pas"/>
+        <ComponentName Value="IBXDSLoginDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="83"/>
+        <CursorPos X="43" Y="102"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/finah.inc"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="8"/>
+        <CursorPos X="24" Y="27"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="526"/>
+        <CursorPos Y="545"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="731"/>
+        <CursorPos Y="735"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="../../../../../lcl/grids.pas"/>
+        <UnitName Value="Grids"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="6106"/>
+        <CursorPos Y="6121"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="../../../../fbintf/client/FBArray.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="355"/>
+        <CursorPos X="20" Y="366"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="../../../../../lcl/controls.pp"/>
+        <UnitName Value="Controls"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="2202"/>
+        <CursorPos X="15" Y="2217"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="../../../../../lcl/include/wincontrol.inc"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="5021"/>
+        <CursorPos X="3" Y="5023"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="../../../../../lcl/graphics.pp"/>
+        <UnitName Value="Graphics"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="1453"/>
+        <CursorPos X="15" Y="1468"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="../../../../../lcl/include/custombitmap.inc"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="42"/>
+        <CursorPos X="3" Y="44"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit13>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
+        <Caret Line="633" Column="11" TopLine="608"/>
+      </Position1>
+      <Position2>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="135" Column="42" TopLine="120"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="137" Column="42" TopLine="122"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="161" Column="21" TopLine="140"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="163" Column="21" TopLine="142"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../../../fbintf/client/FBArray.pas"/>
+        <Caret Line="375" Column="7" TopLine="359"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="1458" Column="36" TopLine="1433"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="419" Column="24" TopLine="419"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="699" Column="26" TopLine="674"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="98" Column="23" TopLine="84"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="419" Column="29" TopLine="394"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="699" Column="23" TopLine="677"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="425" Column="31" TopLine="419"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="98" Column="19" TopLine="74"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="419" Column="29" TopLine="394"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="689" Column="36" TopLine="674"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="1660" Column="52" TopLine="1635"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="734" Column="6" TopLine="731"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="1617" Column="17" TopLine="1604"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="145" Column="20" TopLine="132"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="623" Column="18" TopLine="598"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="781" Column="27" TopLine="756"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="1133" Column="23" TopLine="1108"/>
+      </Position23>
+      <Position24>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="169" Column="23" TopLine="147"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="733" Column="10" TopLine="731"/>
+      </Position25>
+      <Position26>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="215" Column="15" TopLine="177"/>
+      </Position26>
+      <Position27>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="308" Column="17" TopLine="293"/>
+      </Position27>
+      <Position28>
+        <Filename Value="../../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="5029" Column="8" TopLine="5027"/>
+      </Position28>
+      <Position29>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="305" Column="27" TopLine="293"/>
+      </Position29>
+      <Position30>
+        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
+        <Caret Line="427" TopLine="416"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

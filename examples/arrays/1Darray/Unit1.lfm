@@ -1,0 +1,223 @@
+object Form1: TForm1
+  Left = 401
+  Height = 620
+  Top = 193
+  Width = 882
+  Caption = '1D Array Example'
+  ClientHeight = 620
+  ClientWidth = 882
+  OnShow = FormShow
+  LCLVersion = '1.6.0.4'
+  object DBControlGrid1: TDBControlGrid
+    Left = 20
+    Height = 543
+    Top = 32
+    Width = 833
+    AltColorStartNormal = True
+    Color = clWindow
+    DataSource = DataSource1
+    DefaultPositionAtEnd = False
+    DrawPanel = Panel1
+    Options = [dgpIndicator]
+    TabOrder = 0
+    ColWidths = (
+      12
+      819
+    )
+    object Panel1: TPanel
+      Left = 12
+      Height = 96
+      Top = 0
+      Width = 819
+      ClientHeight = 96
+      ClientWidth = 819
+      TabOrder = 0
+      object DBEdit1: TDBEdit
+        Left = 8
+        Height = 25
+        Top = 32
+        Width = 264
+        DataField = 'TITLE'
+        DataSource = DataSource1
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 0
+      end
+      object Label1: TLabel
+        Left = 8
+        Height = 15
+        Top = 16
+        Width = 73
+        Caption = 'Department'
+        ParentColor = False
+      end
+      object IBArrayGrid1: TIBArrayGrid
+        Left = 296
+        Height = 46
+        Top = 32
+        Width = 512
+        DataField = 'MYARRAY'
+        DataSource = DataSource1
+        ColumnLabels.Strings = (
+          'Jan'
+          'Feb'
+          'Mar'
+          'Apr'
+          'May'
+          'Jun'
+          'Jul'
+          'Aug'
+          'Sep'
+          'Oct'
+          'Nov'
+          'Dec'
+        )
+        ColumnLabelFont.Height = -13
+        ColumnLabelFont.Name = 'Sans'
+        ColumnLabelFont.Style = [fsBold]
+        RowLabelColumnWidth = 64
+        TextAlignment = taRightJustify
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        AutoFillColumns = True
+        FixedColor = clHighlightText
+        Options = [goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+        ScrollBars = ssNone
+        TabOrder = 1
+        ColCount = 12
+        RowCount = 2
+        ColWidths = (
+          42
+          42
+          42
+          42
+          42
+          42
+          42
+          42
+          42
+          42
+          42
+          48
+        )
+      end
+      object Label2: TLabel
+        Left = 296
+        Height = 15
+        Top = 16
+        Width = 67
+        Caption = 'Sales Value'
+        ParentColor = False
+      end
+    end
+  end
+  object SaveBtn: TButton
+    Left = 776
+    Height = 30
+    Top = 584
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Save'
+    OnClick = SaveBtnClick
+    TabOrder = 1
+  end
+  object CancelBtn: TButton
+    Left = 696
+    Height = 30
+    Top = 584
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Cancel'
+    OnClick = CancelBtnClick
+    TabOrder = 2
+  end
+  object Button1: TButton
+    Left = 21
+    Height = 30
+    Top = 584
+    Width = 75
+    Anchors = [akLeft, akBottom]
+    Caption = 'Insert'
+    OnClick = Button1Click
+    TabOrder = 3
+  end
+  object Button2: TButton
+    Left = 104
+    Height = 30
+    Top = 584
+    Width = 75
+    Anchors = [akLeft, akBottom]
+    Caption = 'Delete'
+    OnClick = Button2Click
+    TabOrder = 4
+  end
+  object IBDatabase1: TIBDatabase
+    Connected = True
+    AfterConnect = IBDatabase1AfterConnect
+    CreateIfNotExists = True
+    AllowStreamedConnected = False
+    DatabaseName = '/tmp/test1.fdb'
+    Params.Strings = (
+      'user_name=SYSDBA'
+      'lc_ctype=UTF8'
+    )
+    DefaultTransaction = IBTransaction1
+    IdleTimer = 0
+    TraceFlags = []
+    UseDefaultSystemCodePage = False
+    OnCreateDatabase = IBDatabase1CreateDatabase
+    left = 283
+    top = 244
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    DefaultDatabase = IBDatabase1
+    AfterTransactionEnd = IBTransaction1AfterTransactionEnd
+    left = 327
+    top = 244
+  end
+  object IBDataSet1: TIBDataSet
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AfterDelete = IBDataSet1AfterEdit
+    AfterEdit = IBDataSet1AfterEdit
+    AfterInsert = IBDataSet1AfterEdit
+    AfterOpen = IBDataSet1AfterOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      'Delete From TESTDATA A'
+      'Where A.ROWID = :ROWID'
+    )
+    InsertSQL.Strings = (
+      'Insert Into TESTDATA(ROWID, TITLE, MYARRAY)'
+      'Values(:ROWID, :TITLE, :MYARRAY)'
+    )
+    RefreshSQL.Strings = (
+      'Select A.ROWID, A.TITLE, A.MYARRAY From TESTDATA A'
+      'Where A.ROWID = :ROWID'
+    )
+    SelectSQL.Strings = (
+      'Select A.ROWID, A.TITLE, A.MYARRAY From TESTDATA A'
+      'order by 1 asc'
+    )
+    ModifySQL.Strings = (
+      'Update TESTDATA A Set '
+      '  A.ROWID = :ROWID,'
+      '  A.TITLE = :TITLE,'
+      '  A.MYARRAY = :MYARRAY'
+      'Where A.ROWID = :OLD_ROWID'
+    )
+    GeneratorField.Generator = 'ROWNUMBER'
+    GeneratorField.Field = 'ROWID'
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
+    DataSetCloseAction = dcSaveChanges
+    left = 408
+    top = 244
+  end
+  object DataSource1: TDataSource
+    DataSet = IBDataSet1
+    left = 368
+    top = 244
+  end
+end
