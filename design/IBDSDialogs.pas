@@ -39,10 +39,9 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, Graphics, Controls, Dialogs,
-  Forms, StdCtrls, ExtCtrls, IB, IBDialogs;
+  Forms, StdCtrls, ExtCtrls, Buttons, IB, IBDialogs;
 
 type
-
   { TIBDSLCLInterface }
 
   TIBDSLCLInterface = class(TIBLCLInterface)
@@ -78,18 +77,32 @@ type
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
+    Label1: TLabel;
+    OpenDialog1: TOpenDialog;
     ProjectName: TLabel;
+    SpeedButton1: TSpeedButton;
     TargetCaption: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Password: TEdit;
     UserName: TEdit;
     DatabaseName: TEdit;
+    procedure SpeedButton1Click(Sender: TObject);
   private
     { private declarations }
   public
     { public declarations }
   end;
+
+
+{ TIBXDSLoginDlg }
+
+procedure TIBXDSLoginDlg.SpeedButton1Click(Sender: TObject);
+begin
+  OpenDialog1.InitialDir := ExtractFileDir(DatabaseName.Text);
+  if OpenDialog1.Execute then
+    DatabaseName.Text := OpenDialog1.FileName;
+end;
 
 
 function TIBDSLCLInterface.GetProjectName: string;

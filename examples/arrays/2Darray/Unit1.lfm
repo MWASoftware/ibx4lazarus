@@ -45,29 +45,30 @@ object Form1: TForm1
     DefaultColWidth = 40
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
     TabOrder = 0
-    ColCount = 20
-    RowCount = 12
+    ColCount = 21
+    RowCount = 13
     ColWidths = (
       80
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      45
-      53
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      43
+      46
     )
   end
   object DBEdit1: TDBEdit
@@ -166,7 +167,7 @@ object Form1: TForm1
     GeneratorField.Field = 'ROWID'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
-    DataSetCloseAction = dcDiscardChanges
+    DataSetCloseAction = dcSaveChanges
     left = 624
     top = 144
   end

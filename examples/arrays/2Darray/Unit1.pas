@@ -162,7 +162,7 @@ begin
         Statement.Execute;
       end;
     end;
-    ExecImmediate([isc_tpb_write,isc_tpb_wait,isc_tpb_consistency],sqlSetGenerator + '4'); {Create the table}
+    ExecImmediate([isc_tpb_write,isc_tpb_wait,isc_tpb_consistency],sqlSetGenerator + '4'); {update the generator}
   end;
 end;
 

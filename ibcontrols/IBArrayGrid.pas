@@ -290,6 +290,8 @@ begin
     if (DataSet <> nil) and DataSet.Active then
     begin
       FActive := true;
+      if Field = nil then
+        raise Exception.CreateFmt(sNotAnArrayField,['Unknown']);
       if not (Field is TIBArrayField) then
         raise Exception.CreateFmt(sNotAnArrayField,[Field.Name]);
       UpdateLayout;
@@ -366,13 +368,13 @@ begin
   case ArrayDimensions of
   1:
     begin
-      if RowCount <> 1 then
+      if RowCount - FixedRows  <> 1 then
          raise Exception.CreateFmt(sArrayDimensionsOutofRange,[ArrayDimensions]);
 
       with ArrayBounds[0] do
       for i := LowerBound to UpperBound do
         if (i - LowerBound >= 0) and (i - LowerBound < ColCount) then
-          Cells[i - LowerBound,0] := FArray.GetAsString([i]);
+          Cells[i - LowerBound,FixedRows] := FArray.GetAsString([i]);
     end;
 
   2:
@@ -539,6 +541,7 @@ begin
       end;
       with ArrayBounds[0] do
         ColCount := UpperBound - LowerBound + 1 + FixedCols;
+      UpdateLabels;
       Exit;
     end;
     raise Exception.CreateFmt(sNotAnArrayField,[DataField]);
@@ -692,6 +695,7 @@ begin
   FRowLabelFont := TFont.Create;
   FColumnLabelFont := TFont.Create;
   FRowLabelColumnWidth := DefaultColWidth;
+  Options := Options + [goEditing];
 end;
 
 destructor TIBArrayGrid.Destroy;

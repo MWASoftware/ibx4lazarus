@@ -153,6 +153,7 @@ type
     procedure SetArrayIntf(AValue: IArray);
   protected
     class procedure CheckTypeSize(AValue: Longint); override;
+    function GetAsString: string; override;
     function GetDataSize: Integer; override;
     procedure Bind(Binding: Boolean); override;
   public
@@ -957,6 +958,11 @@ end;
 class procedure TIBArrayField.CheckTypeSize(AValue: Longint);
 begin
   //Ignore
+end;
+
+function TIBArrayField.GetAsString: string;
+begin
+  Result := '(Array)';
 end;
 
 function TIBArrayField.GetDataSize: Integer;

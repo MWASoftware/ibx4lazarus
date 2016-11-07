@@ -855,6 +855,7 @@ end;
 
 procedure TDBControlGrid.SetupDrawPanel(aRow: integer);
 begin
+  if FDrawPanel = nil then Exit;
   if ValidDataSet and FRowCache.AlternateColor[FDataLink.DataSet.RecNo] then
     FDrawPanel.Color := AlternateColor
   else
