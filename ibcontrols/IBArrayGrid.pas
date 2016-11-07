@@ -1,3 +1,28 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2015 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*)
 unit IBArrayGrid;
 
 {$mode objfpc} {$H+}
@@ -15,10 +40,19 @@ type
   TIBArrayGrid = class(TCustomStringGrid)
   private
     { Private declarations }
+    FColumnLabelAlignment: TAlignment;
+    FColumnLabelFont: TFont;
     FDataLink: TFieldDataLink;
     FArray: IArray;
     FActive: boolean;
+    FRowLabelAlignment: TAlignment;
+    FRowLabelColumnWidth: integer;
+    FRowLabelFont: TFont;
+    FRowLabels: TStrings;
+    FColumnLabels: TStrings;
+    FTextAlignment: TAlignment;
     procedure ActiveChange(Sender: TObject);
+    procedure ColumnLabelChanged(Sender: TObject);
     procedure DataChange(Sender: TObject);
     function GetDataField: string;
     function GetDataSet: TDataSet;
@@ -26,19 +60,37 @@ type
     function GetField: TField;
     function GetReadOnly: Boolean;
     procedure LoadGridData(ArrayDimensions: integer; ArrayBounds: TArrayBounds);
+    procedure ReadColCount(Reader: TReader);
+    procedure ReadRowCount(Reader: TReader);
+    procedure RowLabelChanged(Sender: TObject);
+    procedure SetColumnLabelAlignment(AValue: TAlignment);
+    procedure SetColumnLabelFont(AValue: TFont);
+    procedure SetColumnLabels(AValue: TStrings);
     procedure SetDataField(AValue: string);
     procedure SetDataSource(AValue: TDataSource);
     procedure SetReadOnly(AValue: Boolean);
-    procedure UpdateLayout;
+    procedure SetRowLabelAlignment(AValue: TAlignment);
+    procedure SetRowLabelColumnWidth(AValue: integer);
+    procedure SetRowLabelFont(AValue: TFont);
+    procedure SetRowLabels(AValue: TStrings);
+    procedure UpdateLabels;
+    procedure WriteColCount(Writer: TWriter);
+    procedure WriteRowCount(Writer: TWriter);
   protected
     { Protected declarations }
+    procedure DefineProperties(Filer: TFiler); override;
+    procedure DefineCellsProperty(Filer: TFiler); override;
+    procedure DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; aText: String); override;
     function  EditorIsReadOnly: boolean; override;
+    procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure ResetDefaultColWidths; override;
     procedure SetEditText(aCol, aRow: Longint; const aValue: string); override;
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure UpdateLayout;
     property ArrayIntf: IArray read FArray;
     property DataSet: TDataSet read GetDataSet;
     property Field: TField read GetField;
@@ -47,6 +99,17 @@ type
     property DataField: string read GetDataField write SetDataField;
     property DataSource: TDataSource read GetDataSource write SetDataSource;
     property ReadOnly: Boolean read GetReadOnly write SetReadOnly default False;
+    property ColumnLabelAlignment: TAlignment read FColumnLabelAlignment
+                        write SetColumnLabelAlignment default taCenter;
+    property ColumnLabels: TStrings read FColumnLabels write SetColumnLabels;
+    property ColumnLabelFont: TFont read FColumnLabelFont write SetColumnLabelFont;
+    property RowLabels: TStrings read FRowLabels write SetRowLabels;
+    property RowLabelAlignment: TAlignment read FRowLabelAlignment
+                                      write SetRowLabelAlignment default taLeftJustify;
+    property RowLabelFont: TFont read FRowLabelFont write SetRowLabelFont;
+    property RowLabelColumnWidth: integer read FRowLabelColumnWidth write SetRowLabelColumnWidth;
+    property TextAlignment:TAlignment read FTextAlignment
+                                      write FTextAlignment default taLeftJustify;
     property Align;
     property AlternateColor;
     property Anchors;
@@ -57,7 +120,6 @@ type
     property BorderSpacing;
     property BorderStyle;
     property CellHintPriority;
-    property ColCount;
     property Color;
     property ColumnClickSorts;
     property Constraints;
@@ -70,8 +132,6 @@ type
     property Enabled;
     property ExtendedSelect;
     property FixedColor;
-    property FixedCols;
-    property FixedRows;
     property Flat;
     property Font;
     property GridLineWidth;
@@ -85,7 +145,6 @@ type
     property ParentShowHint;
     property PopupMenu;
     property RangeSelectMode;
-    property RowCount;
     property ScrollBars;
     property ShowHint;
     property TabAdvance;
@@ -103,10 +162,6 @@ type
     property OnChangeBounds;
     property OnCheckboxToggled;
     property OnClick;
-    property OnColRowDeleted;
-    property OnColRowExchanged;
-    property OnColRowInserted;
-    property OnColRowMoved;
     property OnCompareCells;
     property OnContextPopup;
     property OnDragDrop;
@@ -186,6 +241,22 @@ begin
   end;
 end;
 
+procedure TIBArrayGrid.ColumnLabelChanged(Sender: TObject);
+begin
+  if csLoading in ComponentState then Exit;
+  if FColumnLabels.Count > 0 then
+  begin
+    FixedRows := 1;
+    RowCount := RowCount + FixedRows;
+  end
+  else
+  begin
+    RowCount := RowCount - FixedRows;
+    FixedRows := 0;
+  end;
+  UpdateLabels;
+end;
+
 procedure TIBArrayGrid.DataChange(Sender: TObject);
 begin
   if (DataSet <> nil) and DataSet.Active and FActive then
@@ -225,7 +296,7 @@ procedure TIBArrayGrid.LoadGridData(ArrayDimensions: integer;
   ArrayBounds: TArrayBounds);
 var i, j, k, l: integer;
 begin
-  if FArray = nil then Exit;
+  if (FArray = nil) or FDataLink.Editing then Exit;
   case ArrayDimensions of
   1:
     begin
@@ -262,6 +333,53 @@ begin
   end;
 end;
 
+procedure TIBArrayGrid.ReadColCount(Reader: TReader);
+begin
+  ColCount := Reader.ReadInteger;
+end;
+
+procedure TIBArrayGrid.ReadRowCount(Reader: TReader);
+begin
+  RowCount := Reader.ReadInteger;
+end;
+
+procedure TIBArrayGrid.RowLabelChanged(Sender: TObject);
+begin
+  if csLoading in ComponentState then Exit;
+  if FRowLabels.Count > 0 then
+  begin
+    FixedCols := 1;
+    ColCount := ColCount + FixedCols;
+  end
+  else
+  begin
+    if ColCount >= FixedCols then
+      ColCount := ColCount - FixedCols;
+    FixedCols := 0;
+  end;
+  UpdateLabels;
+end;
+
+procedure TIBArrayGrid.SetColumnLabelAlignment(AValue: TAlignment);
+begin
+  if FColumnLabelAlignment = AValue then Exit;
+  FColumnLabelAlignment := AValue;
+  UpdateLabels;
+end;
+
+procedure TIBArrayGrid.SetColumnLabelFont(AValue: TFont);
+begin
+  if FColumnLabelFont = AValue then Exit;
+  FColumnLabelFont.Assign(AValue);
+  Invalidate;
+end;
+
+procedure TIBArrayGrid.SetColumnLabels(AValue: TStrings);
+begin
+  if FColumnLabels <> AValue then
+    FColumnLabels.Assign(AValue);
+end;
+
 procedure TIBArrayGrid.SetDataField(AValue: string);
 begin
   FDataLink.FieldName := AValue;
@@ -286,12 +404,57 @@ begin
   FDataLink.ReadOnly := AValue;
 end;
 
+procedure TIBArrayGrid.SetRowLabelAlignment(AValue: TAlignment);
+begin
+  if FRowLabelAlignment = AValue then Exit;
+  FRowLabelAlignment := AValue;
+  UpdateLabels;
+end;
+
+procedure TIBArrayGrid.SetRowLabelColumnWidth(AValue: integer);
+begin
+  if FRowLabelColumnWidth = AValue then Exit;
+  FRowLabelColumnWidth := AValue;
+  if (csLoading in ComponentState) or (FixedCols = 0) then Exit;
+  ColWidths[0] := AValue;
+  Invalidate;
+end;
+
+procedure TIBArrayGrid.SetRowLabelFont(AValue: TFont);
+begin
+  if FRowLabelFont = AValue then Exit;
+  FRowLabelFont.Assign(AValue);
+  Invalidate;
+end;
+
+procedure TIBArrayGrid.SetRowLabels(AValue: TStrings);
+begin
+  if FRowLabels <> AValue then
+    FRowLabels.Assign(AValue);
+end;
+
+procedure TIBArrayGrid.UpdateLabels;
+var i: integer;
+begin
+  Clean;
+  for i := 0 to FColumnLabels.Count - 1 do
+    if i < ColCount - FixedCols then
+      Cells[i+FixedCols,0] := FColumnLabels[i];
+
+  for i := 0 to FRowLabels.Count - 1 do
+    if i < RowCount - FixedRows then
+      Cells[0,i+FixedRows] := FRowLabels[i];
+end;
+
 procedure TIBArrayGrid.UpdateLayout;
 var i: integer;
 begin
   if csLoading in ComponentState then Exit;
   if (DataSource <> nil) and (DataSet <> nil) and (DataField <> '') then
   try
+    ResetDefaultColWidths;
+    DataSet.FieldDefs.Update;
+    if DataSet.FieldDefs.Count > 0 then
     for i := 0 to DataSet.FieldDefs.Count - 1 do
     if (DataSet.FieldDefs[i] <> nil) and (DataSet.FieldDefs[i].Name = DataField)
        and (DataSet.FieldDefs[i] is TIBFieldDef) and (DataSet.FieldDefs[i].DataType = ftArray) then
@@ -319,6 +482,60 @@ begin
   end;
 end;
 
+procedure TIBArrayGrid.WriteColCount(Writer: TWriter);
+begin
+  Writer.WriteInteger(ColCount);
+end;
+
+procedure TIBArrayGrid.WriteRowCount(Writer: TWriter);
+begin
+  Writer.WriteInteger(RowCount);
+end;
+
+procedure TIBArrayGrid.DefineProperties(Filer: TFiler);
+begin
+  with Filer do
+  begin
+    DefineProperty('ColCount',  @ReadColCount,  @WriteColCount,  true);
+    DefineProperty('RowCount',  @ReadRowCount,  @WriteRowCount,  true);
+  end;
+  inherited DefineProperties(Filer);
+end;
+
+procedure TIBArrayGrid.DefineCellsProperty(Filer: TFiler);
+begin
+  //Do Nothing
+end;
+
+procedure TIBArrayGrid.DrawCellText(aCol, aRow: Integer; aRect: TRect;
+  aState: TGridDrawState; aText: String);
+var Style: TTextStyle;
+    oldAlignment: TAlignment;
+begin
+  Style := Canvas.TextStyle;
+  oldAlignment := Style.Alignment;
+  if (aRow < FixedRows) then
+  begin
+    Style.Alignment := ColumnLabelAlignment;
+    Canvas.Font.Assign(ColumnLabelFont);
+  end
+  else
+  if aCol < FixedCols then
+  begin
+    Style.Alignment := RowLabelAlignment;
+    Canvas.Font.Assign(RowLabelFont);
+  end
+  else
+    Style.Alignment := TextAlignment;
+  Canvas.TextStyle := Style;
+  try
+    inherited DrawCellText(aCol, aRow, aRect, aState, aText);
+  finally
+    Style.Alignment := oldAlignment;
+    Canvas.TextStyle := Style;
+  end;
+end;
+
 function TIBArrayGrid.EditorIsReadOnly: boolean;
 begin
   Result := FActive and inherited EditorIsReadOnly;
@@ -339,6 +556,14 @@ begin
   end;
 end;
 
+procedure TIBArrayGrid.Loaded;
+begin
+  inherited Loaded;
+  RowLabelChanged(nil);
+  ColumnLabelChanged(nil);
+  UpdateLabels;
+end;
+
 procedure TIBArrayGrid.Notification(AComponent: TComponent;
   Operation: TOperation);
 begin
@@ -347,6 +572,16 @@ begin
   begin
     if (FDataLink <> nil) and (AComponent = DataSource) then
       DataSource:=nil;
+  end;
+end;
+
+procedure TIBArrayGrid.ResetDefaultColWidths;
+begin
+  inherited ResetDefaultColWidths;
+  if FixedCols > 0 then
+  begin
+    ColWidths[0] := RowLabelColumnWidth;
+    VisualChange;
   end;
 end;
 
@@ -379,10 +614,26 @@ begin
   FDataLink.Control := Self;
   FDataLink.OnDataChange := @DataChange;
   FDataLink.OnActiveChange := @ActiveChange;
+  FRowLabels := TStringList.Create;
+  TStringList(FRowLabels).OnChange := @RowLabelChanged;
+  FColumnLabels := TStringList.Create;
+  TStringList(FColumnLabels).OnChange := @ColumnLabelChanged;
+  FixedRows := 0;
+  FixedCols := 0;
+  FColumnLabelAlignment := taCenter;
+  FTextAlignment := taLeftJustify;
+  FRowLabelAlignment := taLeftJustify;
+  FRowLabelFont := TFont.Create;
+  FColumnLabelFont := TFont.Create;
+  FRowLabelColumnWidth := DefaultColWidth;
 end;
 
 destructor TIBArrayGrid.Destroy;
 begin
+  if assigned(FColumnLabelFont) then FColumnLabelFont.Free;
+  if assigned(FRowLabelFont) then FRowLabelFont.Free;
+  if assigned(FColumnLabels) then FColumnLabels.Free;
+  if assigned(FRowLabels) then FRowLabels.Free;
   if assigned(FDataLink) then FDataLink.Free;
   inherited Destroy;
 end;

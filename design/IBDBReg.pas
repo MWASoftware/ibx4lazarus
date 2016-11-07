@@ -132,6 +132,15 @@ type
     function GetVerbCount: Integer; override;
   end;
 
+  { TIBArrayGridEditor }
+
+  TIBArrayGridEditor = class(TComponentEditor)
+  public
+    procedure ExecuteVerb(Index: Integer); override;
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
 { TIBQueryEditor }
 
   TIBQueryEditor = class(TFieldsComponentEditor)
@@ -384,7 +393,7 @@ const
    SExecute = 'E&xecute';
    SIBDatabaseEditor = 'Da&tabase Editor...';
    SIBTransactionEditor = '&Transaction Editor...';
-
+   SIBUpdateLayout = 'Update Layout';
 
 procedure Register;
 begin
@@ -440,6 +449,7 @@ begin
   RegisterComponentEditor(TIBStoredProc, TIBStoredProcEditor);
   RegisterComponentEditor(TIBSQL, TIBSQLEditor);
   RegisterComponentEditor(TIBCustomService, TIBServiceEditor);
+  RegisterComponentEditor(TIBArrayGrid, TIBArrayGridEditor);
 
 
   {Firebird Data Access Controls}
@@ -475,6 +485,36 @@ begin
       end;
     end;
   end;
+end;
+
+{ TIBArrayGridEditor }
+
+procedure TIBArrayGridEditor.ExecuteVerb(Index: Integer);
+begin
+  if Index < inherited GetVerbCount then
+    inherited ExecuteVerb(Index)
+  else
+  case Index of
+    0: TIBArrayGrid(Component).UpdateLayout;
+  end;
+end;
+
+function TIBArrayGridEditor.GetVerb(Index: Integer): string;
+begin
+  if Index < inherited GetVerbCount then
+    Result := inherited GetVerb(Index) else
+  begin
+    Dec(Index, inherited GetVerbCount);
+    case Index of
+      0: Result := SIBUpdateLayout;
+      1 : Result := SInterbaseExpressVersion;
+    end;
+  end;
+end;
+
+function TIBArrayGridEditor.GetVerbCount: Integer;
+begin
+  Result := 2;
 end;
 
 { TDBLookupPropertiesGridFieldProperty }

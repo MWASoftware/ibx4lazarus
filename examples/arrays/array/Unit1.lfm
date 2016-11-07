@@ -1,0 +1,171 @@
+object Form1: TForm1
+  Left = 600
+  Height = 406
+  Top = 351
+  Width = 854
+  Caption = '2D Array Example'
+  ClientHeight = 406
+  ClientWidth = 854
+  OnCreate = FormCreate
+  OnShow = FormShow
+  LCLVersion = '1.6.0.4'
+  object IBArrayGrid1: TIBArrayGrid
+    Left = 24
+    Height = 309
+    Top = 56
+    Width = 805
+    DataField = 'MYARRAY'
+    DataSource = DataSource1
+    ColumnLabels.Strings = (
+      'Col1'
+      'Col2'
+      'Col3'
+      'Col4'
+      'Col5'
+      'Col6'
+      'Col7'
+      'Col8'
+    )
+    ColumnLabelFont.Height = -13
+    ColumnLabelFont.Name = 'Sans'
+    ColumnLabelFont.Style = [fsBold]
+    RowLabels.Strings = (
+      'Row 1'
+      'Row 2'
+      'Row 3'
+    )
+    RowLabelAlignment = taRightJustify
+    RowLabelFont.Height = -13
+    RowLabelFont.Name = 'Sans'
+    RowLabelFont.Style = [fsBold]
+    RowLabelColumnWidth = 80
+    TextAlignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoFillColumns = True
+    DefaultColWidth = 40
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+    TabOrder = 0
+    ColCount = 18
+    RowCount = 10
+    ColWidths = (
+      80
+      42
+      42
+      42
+      42
+      42
+      42
+      42
+      42
+      42
+      42
+      42
+      42
+      42
+      42
+      42
+      42
+      51
+    )
+  end
+  object DBEdit1: TDBEdit
+    Left = 24
+    Height = 25
+    Top = 16
+    Width = 232
+    DataField = 'TITLE'
+    DataSource = DataSource1
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 1
+  end
+  object DBNavigator1: TDBNavigator
+    Left = 24
+    Height = 25
+    Top = 374
+    Width = 241
+    Anchors = [akLeft, akBottom]
+    BevelOuter = bvNone
+    ChildSizing.EnlargeHorizontal = crsScaleChilds
+    ChildSizing.EnlargeVertical = crsScaleChilds
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 100
+    ClientHeight = 25
+    ClientWidth = 241
+    DataSource = DataSource1
+    Options = []
+    TabOrder = 2
+  end
+  object IBDatabase1: TIBDatabase
+    Connected = True
+    AfterConnect = IBDatabase1AfterConnect
+    CreateIfNotExists = True
+    AllowStreamedConnected = False
+    DatabaseName = '/home/tony/lazarus/1.6.0/thirdparty/ibx/examples/array/test1.fdb'
+    Params.Strings = (
+      'lc_ctype=UTF8'
+      'user_name=SYSDBA'
+    )
+    DefaultTransaction = IBTransaction1
+    IdleTimer = 0
+    TraceFlags = []
+    UseDefaultSystemCodePage = False
+    OnCreateDatabase = IBDatabase1CreateDatabase
+    left = 624
+    top = 24
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    DefaultDatabase = IBDatabase1
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait'
+    )
+    left = 624
+    top = 86
+  end
+  object DataSource1: TDataSource
+    DataSet = IBDataSet1
+    left = 624
+    top = 184
+  end
+  object IBDataSet1: TIBDataSet
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      'Delete From TESTDATA A'
+      'Where A.ROWID = :ROWID'
+    )
+    InsertSQL.Strings = (
+      'Insert Into TESTDATA(ROWID, TITLE, MYARRAY)'
+      'Values(:ROWID, :TITLE, :MYARRAY)'
+    )
+    RefreshSQL.Strings = (
+      'Select A.ROWID, A.TITLE, A.MYARRAY From TESTDATA A'
+      'Where A.ROWID = :ROWID'
+    )
+    SelectSQL.Strings = (
+      'Select A.ROWID, A.TITLE, A.MYARRAY From TESTDATA A'
+      'order by 1 asc'
+    )
+    ModifySQL.Strings = (
+      'Update TESTDATA A Set '
+      '  A.ROWID = :ROWID,'
+      '  A.TITLE = :TITLE,'
+      '  A.MYARRAY = :MYARRAY'
+      'Where A.ROWID = :OLD_ROWID'
+    )
+    GeneratorField.Generator = 'ROWNUMBER'
+    GeneratorField.Field = 'ROWID'
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
+    DataSetCloseAction = dcDiscardChanges
+    left = 624
+    top = 144
+  end
+end

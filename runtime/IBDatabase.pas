@@ -886,10 +886,16 @@ begin
     if result then
     begin
       if Username <> '' then
-        Params.Add(DPBConstantNames[isc_dpb_user_name] + '=' + Username)
-      else
-        Params[IndexOfUser] := DPBConstantNames[isc_dpb_user_name] +
+      begin
+        if IndexOfUser = -1 then
+          Params.Add(DPBConstantNames[isc_dpb_user_name] + '=' + Username)
+        else
+          Params[IndexOfUser] := DPBConstantNames[isc_dpb_user_name] +
                                  '=' + Username;
+      end
+      else
+      if IndexOfUser <> -1 then
+        Params.Delete(IndexOfUser);
       if (Password = OldPassword) then
         FHiddenPassword := ''
       else
