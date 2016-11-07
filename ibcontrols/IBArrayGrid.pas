@@ -35,6 +35,72 @@ uses
 
 type
 
+(*
+ This is a data aware control derived from TCustomStringGrid and which may be used
+ to display/edit the contents of a one or two dimensional Firebird array.
+
+ Firebird Arrays are defined in the same way as any other database column e.g.
+
+  Alter Table MyData (
+    ...
+    MyArray VarChar(16) [0:16, -1:7] Character Set UTF8
+  );
+
+  The array may has a different set of values for each row. In the above example,
+  a two dimensional array of strings is defined. The first index may vary from
+  0 to 16 and the second from -1 to 7.
+
+  IBX defines the TField descendent 'TIBArrayField' and this may be used to access
+  the array element in each row of a query/table when using TQuery, TIBDataSet or
+  TIBTable. The SQL used to select/update/insert tables with array data is the
+  same as for any other SQL type. In any given row, the array field may be null or
+  have a set of values. Note that individual array elements cannot themselves be null.
+
+  TIBArrayGrid is a visual control that can by linked to a TIBArrayField and used
+  to display/edit the contents of a one or two dimensional Firebird array.
+
+  To use a TIBArrayGrid, simply drop it onto a form and set the DataSource property
+  to the source dataset and the DataField property to the name of an array field.
+  The grid should be automatically sized to match the dimensions of the array.
+  Note that the array bounds can be refreshed at any time in the IDE, by right clicking
+  on the control and selecting "Update Layout" from the pop up menu.
+
+  At runtime, the TIBArrayGrid will always display/edit the value of the array element
+  in the current row. If this element is null then the array is empty. However,
+  data can be inserted into the array. When the row is posted, the field will be
+  set to the new/updated array.
+
+  Properties
+  ==========
+
+  Most TIBArrayGrid properties are the same as for TStringGrid. The following
+  are specific to TIBArrayGrid. Note that you cannot set the Row or column counts
+  directly as these are always set to match the array field.
+
+  Public:
+    ArrayIntf:                 Provides direct access to the array itself.
+    DataSet:                   The DataSet provided by the DataSource (read only).
+    Field:                     The source field
+
+  Published:
+    DataField:                 name of array column.
+    DataSource:                The data source providing the source table.
+    ReadOnly:                  Set to true to prevent editing
+    ColumnLabels:              A string list that provides the labels for each
+                               column in the grid. Provide one line per column.
+                               If non empty then a column label row is created.
+    ColumnLabelAlignment:      Sets the text alignment for column Labels
+    ColumnLabelFont:           Sets the font used for column labels
+    RowLabels:                 A string list that provides the labels for each
+                               row in the grid. Provide one line per row.
+                               If non empty then a row label row is created.
+    RowLabelAlignment:         Sets the text alignment for row Labels
+    RowLabelFont:              Sets the font used for row labels
+    RowLabelColumnWidth:       Width of the Fixed Column used for row labels.
+    TextAlignment:             Alignment of all cells other that those containing
+                               labels.
+ *)
+
   { TIBArrayGrid }
 
   TIBArrayGrid = class(TCustomStringGrid)
@@ -84,7 +150,7 @@ type
     function  EditorIsReadOnly: boolean; override;
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    procedure ResetDefaultColWidths; override;
+    procedure ResetSizes; override;
     procedure SetEditText(aCol, aRow: Longint; const aValue: string); override;
   public
     { Public declarations }
@@ -575,9 +641,9 @@ begin
   end;
 end;
 
-procedure TIBArrayGrid.ResetDefaultColWidths;
+procedure TIBArrayGrid.ResetSizes;
 begin
-  inherited ResetDefaultColWidths;
+  inherited ResetSizes;
   if FixedCols > 0 then
   begin
     ColWidths[0] := RowLabelColumnWidth;

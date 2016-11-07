@@ -1,19 +1,19 @@
 object Form1: TForm1
   Left = 600
-  Height = 406
+  Height = 432
   Top = 351
-  Width = 854
+  Width = 994
   Caption = '2D Array Example'
-  ClientHeight = 406
-  ClientWidth = 854
+  ClientHeight = 432
+  ClientWidth = 994
   OnCreate = FormCreate
   OnShow = FormShow
   LCLVersion = '1.6.0.4'
   object IBArrayGrid1: TIBArrayGrid
     Left = 24
-    Height = 309
+    Height = 335
     Top = 56
-    Width = 805
+    Width = 945
     DataField = 'MYARRAY'
     DataSource = DataSource1
     ColumnLabels.Strings = (
@@ -45,27 +45,29 @@ object Form1: TForm1
     DefaultColWidth = 40
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
     TabOrder = 0
-    ColCount = 18
-    RowCount = 10
+    ColCount = 20
+    RowCount = 12
     ColWidths = (
       80
-      42
-      42
-      42
-      42
-      42
-      42
-      42
-      42
-      42
-      42
-      42
-      42
-      42
-      42
-      42
-      42
-      51
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      45
+      53
     )
   end
   object DBEdit1: TDBEdit
@@ -82,7 +84,7 @@ object Form1: TForm1
   object DBNavigator1: TDBNavigator
     Left = 24
     Height = 25
-    Top = 374
+    Top = 400
     Width = 241
     Anchors = [akLeft, akBottom]
     BevelOuter = bvNone
@@ -99,11 +101,11 @@ object Form1: TForm1
     TabOrder = 2
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = True
     AllowStreamedConnected = False
-    DatabaseName = '/home/tony/lazarus/1.6.0/thirdparty/ibx/examples/array/test1.fdb'
+    DatabaseName = '/tmp/test.fdb'
     Params.Strings = (
       'lc_ctype=UTF8'
       'user_name=SYSDBA'

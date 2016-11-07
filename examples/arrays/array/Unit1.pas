@@ -108,7 +108,7 @@ const
     'Create Table TestData ('+
     'RowID Integer not null,'+
     'Title VarChar(32) Character Set UTF8,'+
-    'MyArray VarChar(16) [0:16, -1:7] Character Set ISO8859_2,'+
+    'MyArray VarChar(16) [0:16, -1:7] Character Set UTF8,'+
     'Primary Key(RowID)'+
     ')';
 
