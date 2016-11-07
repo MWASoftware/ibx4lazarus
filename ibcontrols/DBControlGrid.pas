@@ -594,7 +594,6 @@ begin
     and ValidDataSet and FDatalink.DataSet.CanModify;
 end;
 
-
 procedure TDBControlGrid.DoDrawRow(aRow: integer; aRect: TRect;
   aState: TGridDrawState);
 var CachedRow: TBitmap;
@@ -693,8 +692,6 @@ begin
       and (FModified or (FRowCache.IsEmpty(aDataSet.RecNo))) then
   begin
     RecNo := aDataSet.RecNo;
-    Application.ProcessMessages;  {A couple of trips round the message loop seems to be necessary}
-    Application.ProcessMessages;
     if RecNo = aDataSet.RecNo then   {Guard against sudden changes}
       FRowCache.Add2Cache(aDataSet.RecNo,FDrawPanel);
   end;

@@ -40,6 +40,7 @@ type
     procedure SaveBtnClick(Sender: TObject);
   private
     { private declarations }
+    procedure DoConnectDatabase(Data: PtrInt);
     procedure ReOpen(Data: PtrInt);
   public
     { public declarations }
@@ -134,6 +135,18 @@ begin
     if InTransaction then Commit;
 end;
 
+procedure TForm1.DoConnectDatabase(Data: PtrInt);
+begin
+  try
+    IBDatabase1.Connected := true;
+  except on E: Exception do
+    begin
+      ShowMessage(E.Message);
+      Close;
+    end;
+  end;
+end;
+
 procedure TForm1.ReOpen(Data: PtrInt);
 begin
   if not (csDestroying in ComponentState) then
@@ -142,14 +155,7 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
-    try
-    IBDatabase1.Connected := true;
-  except on E: Exception do
-    begin
-      ShowMessage(E.Message);
-      Close;
-    end;
-  end;
+  Application.QueueAsyncCall(@DoConnectDatabase,0);
 end;
 
 procedure TForm1.CancelBtnClick(Sender: TObject);

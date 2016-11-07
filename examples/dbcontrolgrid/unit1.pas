@@ -362,7 +362,8 @@ begin
      MessageDlg(E.Message,mtError,[mbOK],0);
     end;
   until IBDatabase1.Connected;
-  Reopen(0);
+//  ReOpen(0);
+  Application.QueueAsyncCall(@Reopen,0);
 end;
 
 procedure TForm1.EmployeesAfterDelete(DataSet: TDataSet);
