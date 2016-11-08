@@ -46,7 +46,7 @@ type
     MyArray VarChar(16) [0:16, -1:7] Character Set UTF8
   );
 
-  The array may has a different set of values for each row. In the above example,
+  An array may have a different set of values for each row. In the above example,
   a two dimensional array of strings is defined. The first index may vary from
   0 to 16 and the second from -1 to 7.
 
@@ -56,12 +56,13 @@ type
   same as for any other SQL type. In any given row, the array field may be null or
   have a set of values. Note that individual array elements cannot themselves be null.
 
-  TIBArrayGrid is a visual control that can by linked to a TIBArrayField and used
-  to display/edit the contents of a one or two dimensional Firebird array.
+  TIBArrayGrid is a visual control that can be linked to a TIBArrayField and used
+  to display/edit the contents of a one or two dimensional Firebird array.  It may be
+  found in the “Firebird Data Controls” palette.
 
   To use a TIBArrayGrid, simply drop it onto a form and set the DataSource property
   to the source dataset and the DataField property to the name of an array field.
-  The grid should be automatically sized to match the dimensions of the array.
+  The grid should then be automatically sized to match the dimensions of the array.
   Note that the array bounds can be refreshed at any time in the IDE, by right clicking
   on the control and selecting "Update Layout" from the pop up menu.
 

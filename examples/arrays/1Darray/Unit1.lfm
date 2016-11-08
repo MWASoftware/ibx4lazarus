@@ -16,6 +16,7 @@ object Form1: TForm1
     Width = 833
     AlternateColor = 16640469
     AltColorStartNormal = True
+    Anchors = [akTop, akLeft, akRight, akBottom]
     Color = clWindow
     DataSource = DataSource1
     DefaultPositionAtEnd = False
@@ -86,7 +87,7 @@ object Form1: TForm1
         ScrollBars = ssNone
         TabOrder = 1
         ColCount = 12
-        RowCount = 5
+        RowCount = 6
         ColWidths = (
           42
           42
@@ -153,7 +154,7 @@ object Form1: TForm1
     TabOrder = 4
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = True
     AllowStreamedConnected = False
