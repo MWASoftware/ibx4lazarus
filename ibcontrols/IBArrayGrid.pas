@@ -365,7 +365,7 @@ procedure TIBArrayGrid.LoadGridData(ArrayDimensions: integer;
   ArrayBounds: TArrayBounds);
 var i, j, k, l: integer;
 begin
-  if (FArray = nil) or (FDataLink.Editing and not FArray.IsEmpty) //(DataSet.State = dsInsert))
+  if (FArray = nil) or (FDataLink.Editing and not FArray.IsEmpty)
      then Exit;
   case ArrayDimensions of
   1:

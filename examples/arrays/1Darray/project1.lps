@@ -60,10 +60,9 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="658"/>
-        <CursorPos X="24" Y="669"/>
+        <TopLine Value="364"/>
+        <CursorPos X="67" Y="368"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit6>
@@ -84,9 +83,10 @@
       </Unit8>
       <Unit9>
         <Filename Value="../../../../fbintf/client/FBArray.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="874"/>
-        <CursorPos Y="887"/>
+        <TopLine Value="352"/>
+        <CursorPos X="3" Y="335"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit9>
@@ -144,7 +144,7 @@
         <Loaded Value="True"/>
       </Unit16>
     </Units>
-    <JumpHistory Count="18" HistoryIndex="17">
+    <JumpHistory Count="19" HistoryIndex="18">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="169" Column="23" TopLine="147"/>
@@ -215,6 +215,10 @@
         <Filename Value="../../../../fbintf/client/FBArray.pas"/>
         <Caret Line="887" TopLine="874"/>
       </Position18>
+      <Position19>
+        <Filename Value="../../../../fbintf/client/FBArray.pas"/>
+        <Caret Line="893" Column="18" TopLine="874"/>
+      </Position19>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
