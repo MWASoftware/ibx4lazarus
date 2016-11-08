@@ -45,37 +45,38 @@ object Form1: TForm1
     DefaultColWidth = 40
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
     TabOrder = 0
-    ColCount = 23
-    RowCount = 15
+    ColCount = 24
+    RowCount = 16
     ColWidths = (
       80
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      39
-      44
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      36
+      57
     )
   end
   object DBEdit1: TDBEdit
     Left = 24
-    Height = 25
+    Height = 27
     Top = 16
     Width = 232
     DataField = 'TITLE'

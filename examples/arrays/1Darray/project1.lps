@@ -60,9 +60,10 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="658"/>
-        <CursorPos X="3" Y="661"/>
+        <CursorPos X="24" Y="669"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit6>
@@ -83,10 +84,11 @@
       </Unit8>
       <Unit9>
         <Filename Value="../../../../fbintf/client/FBArray.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="355"/>
-        <CursorPos X="20" Y="366"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="874"/>
+        <CursorPos Y="887"/>
         <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit9>
       <Unit10>
         <Filename Value="../../../../../lcl/controls.pp"/>
@@ -127,23 +129,22 @@
       </Unit14>
       <Unit15>
         <Filename Value="../../../runtime/IBDatabase.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="978"/>
+        <TopLine Value="986"/>
         <CursorPos Y="1010"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="../../../../fbintf/IB.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="968"/>
         <CursorPos X="3" Y="980"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit16>
     </Units>
-    <JumpHistory Count="15" HistoryIndex="14">
+    <JumpHistory Count="18" HistoryIndex="17">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="169" Column="23" TopLine="147"/>
@@ -202,6 +203,18 @@
       <Position15>
         <Filename Value="../../../../fbintf/IB.pas"/>
       </Position15>
+      <Position16>
+        <Filename Value="../../../runtime/IBDatabase.pas"/>
+        <Caret Line="1010" TopLine="986"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../../../fbintf/client/FBArray.pas"/>
+        <Caret Line="370" TopLine="355"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../../../fbintf/client/FBArray.pas"/>
+        <Caret Line="887" TopLine="874"/>
+      </Position18>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

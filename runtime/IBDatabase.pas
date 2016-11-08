@@ -990,11 +990,13 @@ begin
     begin
       Status := FirebirdAPI.GetStatus;
       {$IFDEF UNIX}
-      if FirebirdAPI.IsEmbeddedServer and (Pos(':',aDBName) = 0) then
+      if Pos(':',aDBName) = 0 then
       begin
           if ((Status.GetSQLCode = -901) and (Status.GetIBErrorCode = isc_random)) {Access permissions on firebird temp}
              or
              ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_sys_request)) {Security DB Problem}
+             or
+             ((Status.GetSQLCode = -904) and (Status.GetIBErrorCode = isc_lock_dir_access)) {Lock File Problem}
              then
              begin
                aDBName := 'localhost:' + aDBName;
@@ -1002,7 +1004,7 @@ begin
             end
       end;
       {$ENDIF}
-      if (Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_io_error) {Database not found}
+      if ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_io_error)) {Database not found}
                        and CreateIfNotExists and not (csDesigning in ComponentState) then
         FCreateDatabase := true
       else
