@@ -6,6 +6,7 @@ object Form1: TForm1
   Caption = '1D Array Example'
   ClientHeight = 620
   ClientWidth = 882
+  OnCreate = FormCreate
   OnShow = FormShow
   LCLVersion = '1.6.0.4'
   object DBControlGrid1: TDBControlGrid
@@ -85,7 +86,7 @@ object Form1: TForm1
         ScrollBars = ssNone
         TabOrder = 1
         ColCount = 12
-        RowCount = 3
+        RowCount = 5
         ColWidths = (
           42
           42
@@ -152,11 +153,11 @@ object Form1: TForm1
     TabOrder = 4
   end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = True
     AllowStreamedConnected = False
-    DatabaseName = '/tmp/test1.fdb'
+    DatabaseName = '/tmp/1Dtest.fdb'
     Params.Strings = (
       'user_name=SYSDBA'
       'lc_ctype=UTF8'
@@ -215,6 +216,34 @@ object Form1: TForm1
     DataSetCloseAction = dcSaveChanges
     left = 408
     top = 244
+    object IBDataSet1ROWID: TIntegerField
+      FieldKind = fkData
+      FieldName = 'ROWID'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object IBDataSet1TITLE: TIBStringField
+      FieldKind = fkData
+      FieldName = 'TITLE'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object IBDataSet1MYARRAY: TIBArrayField
+      FieldKind = fkData
+      FieldName = 'MYARRAY'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
   end
   object DataSource1: TDataSource
     DataSet = IBDataSet1

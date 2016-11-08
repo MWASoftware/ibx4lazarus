@@ -362,7 +362,6 @@ begin
      MessageDlg(E.Message,mtError,[mbOK],0);
     end;
   until IBDatabase1.Connected;
-//  ReOpen(0);
   Application.QueueAsyncCall(@Reopen,0);
 end;
 

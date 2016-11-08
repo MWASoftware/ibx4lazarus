@@ -1,3 +1,28 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2015 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*)
 unit Unit1;
 
 {$mode objfpc}{$H+}
@@ -6,8 +31,20 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  DbCtrls, StdCtrls, db, DBControlGrid, IBArrayGrid, IBTable, IBDatabase,
+  DbCtrls, StdCtrls, db, DBControlGrid, IBArrayGrid,  IBDatabase,
   IBCustomDataSet, IB;
+
+{$DEFINE LOCALDATABASE}
+
+const
+  sDatabaseName = '1Dtest.fdb'; {If LOCALDATABASE defined then prepended with
+                               path to temp folder}
+
+  {If you want to explicitly define the test database location then undefine
+  LOCALDATABASE and set explicit path e.g.
+
+  sDatabaseName = 'myserver:/databases/test.fdb';
+  }
 
 type
 
@@ -16,6 +53,9 @@ type
   TForm1 = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    IBDataSet1MYARRAY: TIBArrayField;
+    IBDataSet1ROWID: TIntegerField;
+    IBDataSet1TITLE: TIBStringField;
     SaveBtn: TButton;
     CancelBtn: TButton;
     DataSource1: TDataSource;
@@ -31,6 +71,7 @@ type
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure CancelBtnClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure IBDatabase1AfterConnect(Sender: TObject);
     procedure IBDatabase1CreateDatabase(Sender: TObject);
@@ -137,14 +178,19 @@ end;
 
 procedure TForm1.DoConnectDatabase(Data: PtrInt);
 begin
-  try
-    IBDatabase1.Connected := true;
-  except on E: Exception do
-    begin
-      ShowMessage(E.Message);
-      Close;
+  repeat
+    try
+      IBDatabase1.Connected := true;
+    except
+     on E:EIBClientError do
+      begin
+        Close;
+        Exit
+      end;
+    On E:Exception do
+     MessageDlg(E.Message,mtError,[mbOK],0);
     end;
-  end;
+  until IBDatabase1.Connected;
 end;
 
 procedure TForm1.ReOpen(Data: PtrInt);
@@ -162,6 +208,15 @@ procedure TForm1.CancelBtnClick(Sender: TObject);
 begin
   with IBTransaction1 do
     if InTransaction then Rollback;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  {$IFDEF LOCALDATABASE}
+  IBDatabase1.DatabaseName := GetTempDir + sDatabaseName
+  {$else}
+  IBDatabase1.DatabaseName := sDatabaseName
+  {$ENDIF}
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);

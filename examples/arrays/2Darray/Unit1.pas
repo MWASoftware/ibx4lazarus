@@ -37,7 +37,7 @@ uses
 {$DEFINE LOCALDATABASE}
 
 const
-  sDatabaseName = 'test.fdb'; {If LOCALDATABASE defined then prepended with
+  sDatabaseName = '2Dtest.fdb'; {If LOCALDATABASE defined then prepended with
                                path to temp folder}
 
   {If you want to explicitly define the test database location then undefine
@@ -79,14 +79,19 @@ implementation
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  try
-    IBDatabase1.Connected := true;
-  except on E: Exception do
-    begin
-      ShowMessage(E.Message);
-      Close;
+  repeat
+    try
+      IBDatabase1.Connected := true;
+    except
+     on E:EIBClientError do
+      begin
+        Close;
+        Exit
+      end;
+    On E:Exception do
+     MessageDlg(E.Message,mtError,[mbOK],0);
     end;
-  end;
+  until IBDatabase1.Connected;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);

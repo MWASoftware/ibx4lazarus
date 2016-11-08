@@ -692,8 +692,9 @@ begin
       and (FModified or (FRowCache.IsEmpty(aDataSet.RecNo))) then
   begin
     RecNo := aDataSet.RecNo;
+    Application.ProcessMessages;
     if RecNo = aDataSet.RecNo then   {Guard against sudden changes}
-      FRowCache.Add2Cache(aDataSet.RecNo,FDrawPanel);
+      FRowCache.Add2Cache(RecNo,FDrawPanel);
   end;
 end;
 
