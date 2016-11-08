@@ -1173,8 +1173,9 @@ begin
   if aCol < FixedCols then
      DrawIndicator(Canvas,aRow, aRect,GetDataSetState,false)
   else
-  if FDrawPanel = nil then
-    DrawFillRect(Canvas,aRect)    else
+  if (FDrawPanel = nil) or not FDataLink.Active then
+    DrawFillRect(Canvas,aRect)
+  else
   if not FDrawingActiveRecord and FDataLink.Active then
       DoDrawRow(aRow,aRect,aState);
   {if we are drawing the active record then this is rendered by the Draw Panel
