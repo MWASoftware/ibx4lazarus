@@ -43,6 +43,11 @@ example allows both the Departname Name and monthly sales values
 to be updated and changes saved. New rows can be inserted and 
 existing rows deleted.
 
+Note: there is an LCL bug (http://bugs.freepascal.org/view.php?id=30892) which 
+will cause the 1D array example to render incorrectly. That is only the 
+focused row will show the array. The bug report includes an LCL 
+patch to fix this problem.
+
 2D Array Example
 ----------------
 
