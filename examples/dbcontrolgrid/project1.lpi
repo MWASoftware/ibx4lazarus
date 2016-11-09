@@ -44,7 +44,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="137">
+    <Units Count="138">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -755,10 +755,9 @@
       <Unit101>
         <Filename Value="../../design/IBDBReg.pas"/>
         <EditorIndex Value="-1"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="391"/>
-        <CursorPos X="97" Y="398"/>
-        <UsageCount Value="7"/>
+        <TopLine Value="595"/>
+        <CursorPos X="45" Y="600"/>
+        <UsageCount Value="10"/>
       </Unit101>
       <Unit102>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -1039,6 +1038,11 @@
         <CursorPos X="3" Y="2290"/>
         <UsageCount Value="10"/>
       </Unit136>
+      <Unit137>
+        <Filename Value="../../runtime/IBTypes.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit137>
     </Units>
     <JumpHistory HistoryIndex="-1"/>
   </ProjectOptions>
