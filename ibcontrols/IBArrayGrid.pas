@@ -118,6 +118,7 @@ type
     FRowLabels: TStrings;
     FColumnLabels: TStrings;
     FTextAlignment: TAlignment;
+    FTextChanged: boolean;
     procedure ActiveChange(Sender: TObject);
     procedure ColumnLabelChanged(Sender: TObject);
     procedure DataChange(Sender: TObject);
@@ -141,6 +142,7 @@ type
     procedure SetRowLabelFont(AValue: TFont);
     procedure SetRowLabels(AValue: TStrings);
     procedure UpdateLabels;
+    procedure UpdateData(Sender: TObject);
     procedure WriteColCount(Writer: TWriter);
     procedure WriteRowCount(Writer: TWriter);
   protected
@@ -148,6 +150,7 @@ type
     procedure DefineProperties(Filer: TFiler); override;
     procedure DefineCellsProperty(Filer: TFiler); override;
     procedure DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; aText: String); override;
+    procedure EditorHide; override;
     function  EditorIsReadOnly: boolean; override;
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -516,6 +519,11 @@ begin
       Cells[0,i+FixedRows] := FRowLabels[i];
 end;
 
+procedure TIBArrayGrid.UpdateData(Sender: TObject);
+begin
+  EditorHide;
+end;
+
 procedure TIBArrayGrid.UpdateLayout;
 var i: integer;
 begin
@@ -607,6 +615,37 @@ begin
   end;
 end;
 
+procedure TIBArrayGrid.EditorHide;
+var k, l: integer;
+begin
+  inherited EditorHide;
+  try
+    if not FTextChanged or (FArray = nil) then Exit;
+
+    with TIBArrayField(Field) do
+    begin
+      k := Col + ArrayBounds[0].LowerBound - FixedCols;
+      if ArrayDimensions = 1 then
+      try
+        FArray.SetAsString([k],Cells[Col,Row])
+      except
+        Cells[Col,Row] := FArray.GetAsString([k]);
+        raise;
+      end
+      else
+      try
+        l := Row + ArrayBounds[1].LowerBound - FixedRows;
+        FArray.SetAsString([k,l],Cells[Col,Row]);
+      except
+        Cells[Col,Row] := FArray.GetAsString([k,l]);
+        raise;
+      end;
+  end;
+  finally
+    FTextChanged := false;
+  end;
+end;
+
 function TIBArrayGrid.EditorIsReadOnly: boolean;
 begin
   Result := FActive and inherited EditorIsReadOnly;
@@ -657,24 +696,12 @@ begin
 end;
 
 procedure TIBArrayGrid.SetEditText(aCol, aRow: Longint; const aValue: string);
-var k, l: integer;
 begin
   inherited SetEditText(aCol, aRow, aValue);
   if not EditorIsReadOnly then
   begin
     FDataLink.Modified;
-    if FArray = nil then Exit;
-    with TIBArrayField(Field) do
-    begin
-      k := aCol + ArrayBounds[0].LowerBound - FixedCols;
-      if ArrayDimensions = 1 then
-        FArray.SetAsString([k],aValue)
-      else
-      begin
-        l := aRow + ArrayBounds[1].LowerBound - FixedRows;
-        FArray.SetAsString([k,l],aValue);
-      end;
-    end;
+    FTextChanged := true;
   end;
 end;
 
@@ -685,6 +712,7 @@ begin
   FDataLink.Control := Self;
   FDataLink.OnDataChange := @DataChange;
   FDataLink.OnActiveChange := @ActiveChange;
+  FDataLink.OnUpdateData := @UpdateData;
   FRowLabels := TStringList.Create;
   TStringList(FRowLabels).OnChange := @RowLabelChanged;
   FColumnLabels := TStringList.Create;
