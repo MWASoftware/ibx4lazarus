@@ -25,19 +25,19 @@ object Form1: TForm1
     TabOrder = 0
     ColWidths = (
       12
-      819
+      800
     )
     object Panel1: TPanel
       Left = 12
       Height = 96
       Top = 0
-      Width = 819
+      Width = 800
       ClientHeight = 96
-      ClientWidth = 819
+      ClientWidth = 800
       TabOrder = 0
       object DBEdit1: TDBEdit
         Left = 8
-        Height = 25
+        Height = 23
         Top = 32
         Width = 264
         DataField = 'TITLE'
@@ -50,15 +50,23 @@ object Form1: TForm1
         Left = 8
         Height = 15
         Top = 16
-        Width = 73
+        Width = 63
         Caption = 'Department'
+        ParentColor = False
+      end
+      object Label2: TLabel
+        Left = 296
+        Height = 15
+        Top = 16
+        Width = 58
+        Caption = 'Sales Value'
         ParentColor = False
       end
       object IBArrayGrid1: TIBArrayGrid
         Left = 296
         Height = 46
         Top = 32
-        Width = 512
+        Width = 493
         DataField = 'MYARRAY'
         DataSource = DataSource1
         ColumnLabels.Strings = (
@@ -87,29 +95,21 @@ object Form1: TForm1
         ScrollBars = ssNone
         TabOrder = 1
         ColCount = 12
-        RowCount = 6
+        RowCount = 11
         ColWidths = (
-          42
-          42
-          42
-          42
-          42
-          42
-          42
-          42
-          42
-          42
-          42
-          48
+          40
+          40
+          40
+          40
+          40
+          40
+          40
+          40
+          40
+          40
+          40
+          49
         )
-      end
-      object Label2: TLabel
-        Left = 296
-        Height = 15
-        Top = 16
-        Width = 67
-        Caption = 'Sales Value'
-        ParentColor = False
       end
     end
   end

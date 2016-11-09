@@ -53,6 +53,7 @@ type
   TForm1 = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    IBArrayGrid1: TIBArrayGrid;
     IBDataSet1MYARRAY: TIBArrayField;
     IBDataSet1ROWID: TIntegerField;
     IBDataSet1TITLE: TIBStringField;
@@ -61,7 +62,6 @@ type
     DataSource1: TDataSource;
     DBControlGrid1: TDBControlGrid;
     DBEdit1: TDBEdit;
-    IBArrayGrid1: TIBArrayGrid;
     IBDatabase1: TIBDatabase;
     IBDataSet1: TIBDataSet;
     IBTransaction1: TIBTransaction;
