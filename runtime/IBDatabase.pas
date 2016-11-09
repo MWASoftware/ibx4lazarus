@@ -169,12 +169,15 @@ type
   TIBDataBase = class(TCustomConnection)
   private
     FAttachment: IAttachment;
+    FCreateDatabase: boolean;
+    FCreateIfNotExists: boolean;
     FDefaultCharSetID: integer;
     FDefaultCharSetName: RawByteString;
     FDefaultCodePage: TSystemCodePage;
     FDPB: IDPB;
     FAllowStreamedConnected: boolean;
     FHiddenPassword: string;
+    FOnCreateDatabase: TNotifyEvent;
     FOnLogin: TIBDatabaseLoginEvent;
     FSQLHourGlass: Boolean;
     FTraceFlags: TTraceFlags;
@@ -265,6 +268,7 @@ type
 
   published
     property Connected;
+    property CreateIfNotExists: boolean read FCreateIfNotExists write FCreateIfNotExists;
     property AllowStreamedConnected: boolean read FAllowStreamedConnected
              write FAllowStreamedConnected;
     property DatabaseName: TIBFileName read FDBName write SetDatabaseName;
@@ -283,6 +287,7 @@ type
     property AfterDisconnect;
     property BeforeConnect;
     property BeforeDisconnect;
+    property OnCreateDatabase: TNotifyEvent read FOnCreateDatabase write FOnCreateDatabase;
     property OnLogin: TIBDatabaseLoginEvent read FOnLogin write FOnLogin;
     property OnIdleTimer: TNotifyEvent read FOnIdleTimer write FOnIdleTimer;
     property OnDialectDowngradeWarning: TNotifyEvent read FOnDialectDowngradeWarning write FOnDialectDowngradeWarning;
@@ -471,7 +476,7 @@ function GenerateTPB(sl: TStrings): ITPB;
 implementation
 
 uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
-     typInfo, FBMessages;
+     typInfo, FBMessages, IBErrorCodes;
 
 { TIBDatabase }
 
@@ -601,7 +606,8 @@ end;
 begin
   CheckInactive;
   CheckDatabaseName;
-  FAttachment := FirebirdAPI.CreateDatabase(FDBName,GenerateDPB(FDBParams));
+  FCreateDatabase := true;
+  Connected := true;
 end;
 
  procedure TIBDataBase.DropDatabase;
@@ -880,10 +886,16 @@ begin
     if result then
     begin
       if Username <> '' then
-        Params.Add(DPBConstantNames[isc_dpb_user_name] + '=' + Username)
-      else
-        Params[IndexOfUser] := DPBConstantNames[isc_dpb_user_name] +
+      begin
+        if IndexOfUser = -1 then
+          Params.Add(DPBConstantNames[isc_dpb_user_name] + '=' + Username)
+        else
+          Params[IndexOfUser] := DPBConstantNames[isc_dpb_user_name] +
                                  '=' + Username;
+      end
+      else
+      if IndexOfUser <> -1 then
+        Params.Delete(IndexOfUser);
       if (Password = OldPassword) then
         FHiddenPassword := ''
       else
@@ -963,25 +975,40 @@ begin
   finally
    TempDBParams.Free;
   end;
+
   repeat
-    FAttachment := FirebirdAPI.OpenDatabase(aDBName,FDPB,false);
+    if FCreateDatabase then
+    begin
+      FCreateDatabase := false;
+      FAttachment := FirebirdAPI.CreateDatabase(aDBName,FDPB, false);
+      if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
+        OnCreateDatabase(self);
+    end
+    else
+      FAttachment := FirebirdAPI.OpenDatabase(aDBName,FDPB,false);
     if FAttachment = nil then
     begin
       Status := FirebirdAPI.GetStatus;
       {$IFDEF UNIX}
-      if FirebirdAPI.IsEmbeddedServer and (Pos(':',aDBName) = 0) then
+      if Pos(':',aDBName) = 0 then
       begin
-        if ((Status.GetSQLCode = -901) and (Status.GetIBErrorCode = 335544382)) {Access permissions on firebird temp}
-           or
-           ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = 335544373)) {Security DB Problem}
-           then
-           begin
-             aDBName := 'localhost:' + aDBName;
-             Continue;
-           end;
+          if ((Status.GetSQLCode = -901) and (Status.GetIBErrorCode = isc_random)) {Access permissions on firebird temp}
+             or
+             ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_sys_request)) {Security DB Problem}
+             or
+             ((Status.GetSQLCode = -904) and (Status.GetIBErrorCode = isc_lock_dir_access)) {Lock File Problem}
+             then
+             begin
+               aDBName := 'localhost:' + aDBName;
+               Continue;
+            end
       end;
       {$ENDIF}
-      raise EIBInterBaseError.Create(Status);
+      if ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_io_error)) {Database not found}
+                       and CreateIfNotExists and not (csDesigning in ComponentState) then
+        FCreateDatabase := true
+      else
+        raise EIBInterBaseError.Create(Status);
     end;
   until FAttachment <> nil;
   if not (csDesigning in ComponentState) then

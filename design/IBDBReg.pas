@@ -39,7 +39,6 @@ unit IBDBReg;
  *)
 {$A+}                           (* Aligned records: On *)
 {$B-}                           (* Short circuit boolean expressions: Off *)
-{$G+}                           (* Imported data: On *)
 {$H+}                           (* Huge Strings: On *)
 {$J-}                           (* Modification of Typed Constants: Off *)
 {$M+}                           (* Generate run-time type information: On *)
@@ -47,7 +46,6 @@ unit IBDBReg;
 {$Q-}                           (* Overflow checks: Off *)
 {$R-}                           (* Range checks: Off *)
 {$T+}                           (* Typed address: On *)
-{$U+}                           (* Pentim-safe FDIVs: On *)
 {$W-}                           (* Always generate stack frames: Off *)
 {$X+}                           (* Extended syntax: On *)
 {$Z1}                           (* Minimum Enumeration Size: 1 Byte *)
@@ -128,6 +126,15 @@ type
 { TIBTransactionEditor }
 
   TIBTransactionEditor = class(TComponentEditor)
+  public
+    procedure ExecuteVerb(Index: Integer); override;
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
+  { TIBArrayGridEditor }
+
+  TIBArrayGridEditor = class(TComponentEditor)
   public
     procedure ExecuteVerb(Index: Integer); override;
     function GetVerb(Index: Integer): string; override;
@@ -368,7 +375,8 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet, FBMessages,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
      IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
-     IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport, IBDSDialogs;
+     IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport, IBDSDialogs,
+     IBArrayGrid;
 
 const
   IBPalette1 = 'Firebird'; {do not localize}
@@ -385,7 +393,7 @@ const
    SExecute = 'E&xecute';
    SIBDatabaseEditor = 'Da&tabase Editor...';
    SIBTransactionEditor = '&Transaction Editor...';
-
+   SIBUpdateLayout = 'Update Layout';
 
 procedure Register;
 begin
@@ -395,7 +403,7 @@ begin
     Exit;
   end;
 
-  RegisterNoIcon([TIBStringField, TIBBCDField, TIBMemoField]);
+  RegisterNoIcon([TIBStringField, TIBBCDField, TIBMemoField, TIBArrayField]);
   {$if lcl_fullversion < 01010000}
   {see http://bugs.freepascal.org/view.php?id=19035 }
   RegisterNoIcon([TIntegerField]);
@@ -410,7 +418,7 @@ begin
       TIBLogService, TIBSecurityService, TIBServerProperties]);
 
 
-  RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView,TDBControlGrid]);
+  RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView,TDBControlGrid, TIBArrayGrid]);
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'DatabaseName', TIBFileNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'StoredProcName', TIBStoredProcNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TParams), TIBStoredProc, 'Params', TIBStoredProcParamsProperty);
@@ -441,6 +449,7 @@ begin
   RegisterComponentEditor(TIBStoredProc, TIBStoredProcEditor);
   RegisterComponentEditor(TIBSQL, TIBSQLEditor);
   RegisterComponentEditor(TIBCustomService, TIBServiceEditor);
+  RegisterComponentEditor(TIBArrayGrid, TIBArrayGridEditor);
 
 
   {Firebird Data Access Controls}
@@ -476,6 +485,36 @@ begin
       end;
     end;
   end;
+end;
+
+{ TIBArrayGridEditor }
+
+procedure TIBArrayGridEditor.ExecuteVerb(Index: Integer);
+begin
+  if Index < inherited GetVerbCount then
+    inherited ExecuteVerb(Index)
+  else
+  case Index of
+    0: TIBArrayGrid(Component).UpdateLayout;
+  end;
+end;
+
+function TIBArrayGridEditor.GetVerb(Index: Integer): string;
+begin
+  if Index < inherited GetVerbCount then
+    Result := inherited GetVerb(Index) else
+  begin
+    Dec(Index, inherited GetVerbCount);
+    case Index of
+      0: Result := SIBUpdateLayout;
+      1 : Result := SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+    end;
+  end;
+end;
+
+function TIBArrayGridEditor.GetVerbCount: Integer;
+begin
+  Result := 2;
 end;
 
 { TDBLookupPropertiesGridFieldProperty }

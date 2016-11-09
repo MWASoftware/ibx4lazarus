@@ -285,7 +285,7 @@ end;
 
 implementation
 
-uses LCLType, Math, LCLIntf, Forms, LCLMessageGlue;
+uses LCLType, Math, LCLIntf, Forms, LCLMessageGlue, EditBtn, MaskEdit;
 
 { TDBControlGridDataLink }
 
@@ -300,7 +300,6 @@ end;
 
 function TRowCache.Render(Control: TWinControl): TBitmap;
 var Container: TBitmap;
-     Msg: TLMPaint;
 begin
   Container := TBitmap.Create;
   try
@@ -594,7 +593,6 @@ begin
     and ValidDataSet and FDatalink.DataSet.CanModify;
 end;
 
-
 procedure TDBControlGrid.DoDrawRow(aRow: integer; aRect: TRect;
   aState: TGridDrawState);
 var CachedRow: TBitmap;
@@ -672,6 +670,12 @@ begin
     if (AControl <> nil) and (AControl is TCustomMemo)
                          and (Key in [VK_RETURN,VK_UP,VK_DOWN]) then Exit; {Ignore Return in a CustomMemo}
 
+    if (AControl <> nil) and (AControl is TCustomGrid)
+                         and (Key in [VK_RETURN,VK_UP,VK_DOWN,VK_TAB]) then Exit; {Ignore Return in a CustomMemo}
+
+    if (AControl <> nil) and ((AControl is TDateEdit) or (AControl is TCustomMaskedit))
+                         and (Key in [VK_RETURN,VK_UP,VK_DOWN,
+                               VK_ESCAPE,VK_LEFT,VK_RIGHT]) then Exit; {Ignore Return in a CustomMemo}
     Done := false;
     if assigned(FOnKeyDownHander) then
       OnKeyDownHander(Sender,Key,Shift,Done);
@@ -693,10 +697,9 @@ begin
       and (FModified or (FRowCache.IsEmpty(aDataSet.RecNo))) then
   begin
     RecNo := aDataSet.RecNo;
-    Application.ProcessMessages;  {A couple of trips round the message loop seems to be necessary}
     Application.ProcessMessages;
     if RecNo = aDataSet.RecNo then   {Guard against sudden changes}
-      FRowCache.Add2Cache(aDataSet.RecNo,FDrawPanel);
+      FRowCache.Add2Cache(RecNo,FDrawPanel);
   end;
 end;
 
@@ -855,6 +858,7 @@ end;
 
 procedure TDBControlGrid.SetupDrawPanel(aRow: integer);
 begin
+  if FDrawPanel = nil then Exit;
   if ValidDataSet and FRowCache.AlternateColor[FDataLink.DataSet.RecNo] then
     FDrawPanel.Color := AlternateColor
   else
@@ -1174,8 +1178,9 @@ begin
   if aCol < FixedCols then
      DrawIndicator(Canvas,aRow, aRect,GetDataSetState,false)
   else
-  if FDrawPanel = nil then
-    DrawFillRect(Canvas,aRect)    else
+  if (FDrawPanel = nil) or not FDataLink.Active then
+    DrawFillRect(Canvas,aRect)
+  else
   if not FDrawingActiveRecord and FDataLink.Active then
       DoDrawRow(aRow,aRect,aState);
   {if we are drawing the active record then this is rendered by the Draw Panel

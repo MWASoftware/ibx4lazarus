@@ -40,7 +40,7 @@ unit IBStoredProc;
 interface
 
 uses SysUtils, Classes, DB, IB, IBDatabase, IBCustomDataSet,
-     IBHeader, IBSQL, IBUtils;
+     IBSQL, IBUtils;
      
 { TIBStoredProc }
 type
