@@ -44,13 +44,12 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="132">
+    <Units Count="137">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <WindowIndex Value="1"/>
-        <CursorPos X="34" Y="17"/>
+        <CursorPos Y="15"/>
         <UsageCount Value="207"/>
       </Unit0>
       <Unit1>
@@ -83,7 +82,7 @@
         <WindowIndex Value="1"/>
         <TopLine Value="9"/>
         <CursorPos X="54" Y="26"/>
-        <UsageCount Value="199"/>
+        <UsageCount Value="200"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../DBPanelGrid/example/unit3.pas"/>
@@ -617,9 +616,8 @@
       <Unit83>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="196"/>
-        <CursorPos X="16" Y="200"/>
+        <TopLine Value="2436"/>
+        <CursorPos X="39" Y="2461"/>
         <UsageCount Value="45"/>
       </Unit83>
       <Unit84>
@@ -709,9 +707,8 @@
       <Unit95>
         <Filename Value="../../runtime/IBQuery.pas"/>
         <EditorIndex Value="-1"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="56"/>
-        <CursorPos X="15" Y="67"/>
+        <TopLine Value="152"/>
+        <CursorPos X="13" Y="177"/>
         <UsageCount Value="16"/>
       </Unit95>
       <Unit96>
@@ -790,9 +787,8 @@
       <Unit105>
         <Filename Value="../../runtime/IBSQL.pas"/>
         <EditorIndex Value="-1"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="471"/>
-        <CursorPos X="20" Y="482"/>
+        <TopLine Value="781"/>
+        <CursorPos X="3" Y="783"/>
         <UsageCount Value="19"/>
       </Unit105>
       <Unit106>
@@ -827,7 +823,7 @@
         <WindowIndex Value="1"/>
         <TopLine Value="37"/>
         <CursorPos X="14" Y="59"/>
-        <UsageCount Value="55"/>
+        <UsageCount Value="56"/>
       </Unit109>
       <Unit110>
         <Filename Value="unit5.pas"/>
@@ -839,7 +835,7 @@
         <WindowIndex Value="1"/>
         <TopLine Value="54"/>
         <CursorPos X="24" Y="70"/>
-        <UsageCount Value="55"/>
+        <UsageCount Value="56"/>
       </Unit110>
       <Unit111>
         <Filename Value="/usr/share/fpcsrc/2.6.4/packages/fcl-db/src/base/dataset.inc"/>
@@ -1008,13 +1004,43 @@
         <CursorPos X="3" Y="168"/>
         <UsageCount Value="10"/>
       </Unit131>
+      <Unit132>
+        <Filename Value="../../../cvs.old.versions/ibx/runtime/IBQuery.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="345"/>
+        <CursorPos X="48" Y="365"/>
+        <UsageCount Value="10"/>
+      </Unit132>
+      <Unit133>
+        <Filename Value="../../../cvs.old.versions/ibx/runtime/IBCustomDataSet.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2292"/>
+        <CursorPos Y="2319"/>
+        <UsageCount Value="10"/>
+      </Unit133>
+      <Unit134>
+        <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1092"/>
+        <CursorPos X="3" Y="1094"/>
+        <UsageCount Value="10"/>
+      </Unit134>
+      <Unit135>
+        <Filename Value="../../../fbintf/client/3.0/firebird/Firebird.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1267"/>
+        <CursorPos X="27" Y="1290"/>
+        <UsageCount Value="10"/>
+      </Unit135>
+      <Unit136>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2288"/>
+        <CursorPos X="3" Y="2290"/>
+        <UsageCount Value="10"/>
+      </Unit136>
     </Units>
-    <JumpHistory Count="1">
-      <Position1>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="52" Column="23" TopLine="32"/>
-      </Position1>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
