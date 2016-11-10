@@ -2424,16 +2424,13 @@ begin
 end;
 
 procedure TIBCustomDataSet.InternalPrepare;
-var
-  DidActivate: Boolean;
 begin
   if FInternalPrepared then
     Exit;
-  DidActivate := False;
   FBase.SetCursor;
   try
     ActivateConnection;
-    DidActivate := ActivateTransaction;
+    ActivateTransaction;
     FBase.CheckDatabase;
     FBase.CheckTransaction;
     if HasParser and (FParser.SQLText <> FQSelect.SQL.Text) then

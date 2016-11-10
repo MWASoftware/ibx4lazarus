@@ -61,7 +61,7 @@
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
         <TopLine Value="32"/>
-        <CursorPos X="30" Y="37"/>
+        <CursorPos X="20" Y="38"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -616,8 +616,8 @@
       <Unit83>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2436"/>
-        <CursorPos X="39" Y="2461"/>
+        <TopLine Value="1790"/>
+        <CursorPos Y="1814"/>
         <UsageCount Value="45"/>
       </Unit83>
       <Unit84>
@@ -762,9 +762,8 @@
       <Unit102>
         <Filename Value="../../runtime/IBDatabase.pas"/>
         <EditorIndex Value="-1"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="1486"/>
-        <CursorPos X="29" Y="1497"/>
+        <TopLine Value="1495"/>
+        <CursorPos X="3" Y="1497"/>
         <UsageCount Value="12"/>
       </Unit102>
       <Unit103>
@@ -822,7 +821,7 @@
         <WindowIndex Value="1"/>
         <TopLine Value="37"/>
         <CursorPos X="14" Y="59"/>
-        <UsageCount Value="56"/>
+        <UsageCount Value="57"/>
       </Unit109>
       <Unit110>
         <Filename Value="unit5.pas"/>
@@ -834,7 +833,7 @@
         <WindowIndex Value="1"/>
         <TopLine Value="54"/>
         <CursorPos X="24" Y="70"/>
-        <UsageCount Value="56"/>
+        <UsageCount Value="57"/>
       </Unit110>
       <Unit111>
         <Filename Value="/usr/share/fpcsrc/2.6.4/packages/fcl-db/src/base/dataset.inc"/>

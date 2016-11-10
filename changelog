@@ -1,8 +1,46 @@
 
 IBX Change Log  version          (2.0-0) Wed, 09 Nov 2016 15:05:54 +0000
 
+1. Size property of TIBStringField is now the width in characters of the field
+   and not the byte length. This applies only to multi-byte character sets such
+   as UTF8. The original approach aligned with TStringField. However, the TStringField
+   code is not recognised as a bug and hence this change to align the behaviour.
+   The TStringField change is expected in fpc 3.2.0.
+
+2. A new property AutoFieldSize: boolean has been added to TIBStringField. When
+   true (default) then Size property value saved in the lfm is ignored. Size is
+   always set from the dynamic information read from the database. It is unclear
+   why anyone would want to override this and set Size to false.
+
+3. ibxscript: should now handle correctly a Case..End statement within a procedure
+   block.
+
+4. IBDatabase: new property - CreateIfNotExists. If true and database does not
+   exist when an attempt is made to connect to it (run time only) then an attempt
+   is made to create the database.
+
+5. IBDatabase: new event - OnCreateDatabase. This event is called after a database
+   has been successfully created as a result of a call to CreateDatabase or when
+   creating a database after it was found not to exist.
+
+6.  DBControlGrid: a race condition could result in the wrong row image being
+    written to the cache. This has been avoided by a trip round the message
+    loop before rendering the row image.
+
+7.  DBControlGrid: It is strongly recommended not to open the source DataSet for
+    a DBControlGrid during a Form's "OnShow" event handler. Under GTK2 this is
+    known to risk corrupt rendering of row images when the control is first
+    displayed. If necessary use "Application.QueueAsyncCall" to delay opening
+    of the dataset (see DBControlGrid examples) until the Form''s Window has been created.
+
+8.  DBControlGrid & IBDynamicGrid: Navigation keys should now work correctly with
+    a TDateEdit control located on an editor panel.
+
+IBX Change Log  version                                           (1.4-3) Thu, 22 Sep 2016 18:10:15 +0100
+
 1. IBCustomDataset: When calling SetCodePage, no longer request transliteration
-   when target codepage is CP_NONE.
+   when target codepage is CP_NONE. This is a workaround for
+   http://bugs.freepascal.org/view.php?id=30622.
 
 2. DBLog option removed from TIBStatisticalService - not supported by server
    since Firebird 1.5.
@@ -10,44 +48,14 @@ IBX Change Log  version          (2.0-0) Wed, 09 Nov 2016 15:05:54 +0000
 3. ibxscript: An error is no longer generated for "on commit preserve rows" or
    similar.
 
-4. Strings received from the database are now always transliterated into UTF8
+4. IBCodePage: updated mapping between codepages and character id.
+
+5. ftWideString and ftWideMemo withdrawn. There is no UTF16 character set in
+   Firebird. Character sets with a char width of two are not UTF16.
+
+6. Strings received from the database are now always transliterated into UTF8
    regardless of the database character set or connection character set. This
    is for compatibility with the LCL.
-
-5. Size property of TIBStringField is now the width in characters of the field
-   and not the byte length. This applies only to multi-byte character sets such
-   as UTF8. The original approach aligned with TStringField. However, the TStringField
-   code is not recognised as a bug and hence this change to align the behaviour.
-   The TStringField change is expected in fpc 3.2.0.
-
-6. A new property AutoFieldSize: boolean has been added to TIBStringField. When
-   true (default) then Size property value saved in the lfm is ignored. Size is
-   always set from the dynamic information read from the database. It is unclear
-   why anyone would want to override this and set Size to false.
-
-7. ibxscript: should now handle correctly a Case..End statement within a procedure
-   block.
-
-8. IBDatabase: new property - CreateIfNotExists. If true and database does not
-   exist when an attempt is made to connect to it (run time only) then an attempt
-   is made to create the database.
-
-9. IBDatabase: new event - OnCreateDatabase. This event is called after a database
-   has been successfully created as a result of a call to CreateDatabase or when
-   creating a database after it was found not to exist.
-
-10. DBControlGrid: a race condition could result in the wrong row image being
-    written to the cache. This has been avoided by a trip round the message
-    loop before rendering the row image.
-
-11. DBControlGrid: It is strongly recommended not to open the source DataSet for
-    a DBControlGrid during a Form's "OnShow" event handler. Under GTK2 this is
-    known to risk corrupt rendering of row images when the control is first
-    displayed. If necessary use "Application.QueueAsyncCall" to delay opening
-    of the dataset (see DBControlGrid examples) until the Form''s Window has been created.
-
-12. DBControlGrid & IBDynamicGrid: Navigation keys should now work correctly with
-    a TDateEdit control located on an editor panel.
 
 IBX Change Log  version  (1.4-2) Thu, 22 Sep 2016 15:25:27 +0100
 

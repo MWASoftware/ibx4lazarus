@@ -1289,7 +1289,7 @@ begin
       SRB.Add(isc_spb_bkp_length).AsInteger := StrToInt(value);;
     end
     else
-      SRB.Add(isc_spb_bkp_file).AsString := FBackupFile.Names[i];
+      SRB.Add(isc_spb_bkp_file).AsString := FBackupFile[i];
   end;
 end;
 
@@ -1351,7 +1351,7 @@ begin
       SRB.Add(isc_spb_bkp_length).AsInteger := StrToInt(value);;
     end
     else
-      SRB.Add(isc_spb_bkp_file).AsString := FBackupFile.Names[i];
+      SRB.Add(isc_spb_bkp_file).AsString := FBackupFile[i];
   end;
   for i := 0 to FDatabaseName.Count - 1 do
   begin
@@ -1363,7 +1363,7 @@ begin
       SRB.Add(isc_spb_res_length).AsInteger :=  StrToInt(value);
     end
     else
-      SRB.Add(isc_spb_dbname).AsString := FDatabaseName.Names[i];
+      SRB.Add(isc_spb_dbname).AsString := FDatabaseName[i];
   end;
 end;
 
