@@ -1642,6 +1642,7 @@ end;
 function TIBCustomDataSet.ActivateTransaction: Boolean;
 begin
   Result := False;
+  if not (csDesigning in ComponentState) then Exit;
   if not Assigned(Transaction) then
     IBError(ibxeTransactionNotAssigned, [nil]);
   if not Transaction.Active then
@@ -2424,16 +2425,13 @@ begin
 end;
 
 procedure TIBCustomDataSet.InternalPrepare;
-var
-  DidActivate: Boolean;
 begin
   if FInternalPrepared then
     Exit;
-  DidActivate := False;
   FBase.SetCursor;
   try
     ActivateConnection;
-    DidActivate := ActivateTransaction;
+    ActivateTransaction;
     FBase.CheckDatabase;
     FBase.CheckTransaction;
     if HasParser and (FParser.SQLText <> FQSelect.SQL.Text) then
