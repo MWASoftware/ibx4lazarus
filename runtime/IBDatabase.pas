@@ -410,8 +410,6 @@ type
     It is to more easily manage the database and transaction
     connections. }
   TIBBase = class(TObject)
-  private
-    FAfterTransactionStart: TNotifyEvent;
   protected
     FBeforeDatabaseConnect: TBeforeDatabaseConnectEvent;
     FDatabase: TIBDatabase;
@@ -433,7 +431,6 @@ type
     procedure DoBeforeDatabaseDisconnect; virtual;
     procedure DoAfterDatabaseDisconnect; virtual;
     procedure DoDatabaseFree; virtual;
-    procedure DoAfterTransactionStart; virtual;
     procedure DoBeforeTransactionEnd(Action: TTransactionAction); virtual;
     procedure DoAfterTransactionEnd; virtual;
     procedure DoTransactionFree; virtual;
@@ -462,7 +459,6 @@ type
     property AfterDatabaseDisconnect: TNotifyEvent read FAfterDatabaseDisconnect
                                                   write FAfterDatabaseDisconnect;
     property OnDatabaseFree: TNotifyEvent read FOnDatabaseFree write FOnDatabaseFree;
-    property AfterTransactionStart: TNotifyEvent read FAfterTransactionStart write FAfterTransactionStart;
     property BeforeTransactionEnd: TTransactionEndEvent read FBeforeTransactionEnd write FBeforeTransactionEnd;
     property AfterTransactionEnd: TNotifyEvent read FAfterTransactionEnd write FAfterTransactionEnd;
     property OnTransactionFree: TNotifyEvent read FOnTransactionFree write FOnTransactionFree;
@@ -1444,11 +1440,7 @@ begin
 end;
 
 procedure TIBTransaction.DoOnStartTransaction;
-var i: integer;
 begin
-  for i := 0 to SQLObjectCount - 1 do
-    SQLObjects[i].DoAfterTransactionStart;
-
   if assigned(FOnStartTransaction) then
     OnStartTransaction(self);
 end;
@@ -2000,12 +1992,6 @@ begin
     OnDatabaseFree(Self);
   SetDatabase(nil);
   SetTransaction(nil);
-end;
-
-procedure TIBBase.DoAfterTransactionStart;
-begin
-  if assigned(FAfterTransactionStart) then
-    AfterTransactionStart(self);
 end;
 
 procedure TIBBase.DoBeforeTransactionEnd(Action: TTransactionAction);

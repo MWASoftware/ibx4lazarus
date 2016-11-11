@@ -1642,6 +1642,7 @@ end;
 function TIBCustomDataSet.ActivateTransaction: Boolean;
 begin
   Result := False;
+  if not (csDesigning in ComponentState) then Exit;
   if not Assigned(Transaction) then
     IBError(ibxeTransactionNotAssigned, [nil]);
   if not Transaction.Active then
