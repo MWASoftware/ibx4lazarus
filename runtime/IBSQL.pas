@@ -858,8 +858,7 @@ begin
     FStatement := Database.Attachment.PrepareWithNamedParameters(
                      Transaction.TransactionIntf,
                      SQL.Text,
-                     GenerateParamNames,
-                     UniqueParamNames);
+                     GenerateParamNames);
   FMetaData := FStatement.GetMetaData;
   if not (csDesigning in ComponentState) then
       MonitorHook.SQLPrepare(Self);
