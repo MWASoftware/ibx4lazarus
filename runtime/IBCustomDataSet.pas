@@ -311,6 +311,7 @@ type
 
   TIBCustomDataSet = class(TDataset)
   private
+    FAllowAutoActivateTransaction: Boolean;
     FArrayFieldCount: integer;
     FArrayCacheOffset: integer;
     FAutoCommit: TIBAutoCommit;
@@ -624,6 +625,8 @@ type
                read FDataSetCloseAction write FDataSetCloseAction;
 
   published
+    property AllowAutoActivateTransaction: Boolean read FAllowAutoActivateTransaction
+                 write FAllowAutoActivateTransaction;
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Transaction: TIBTransaction read GetTransaction
                                           write SetTransaction;
@@ -1642,14 +1645,16 @@ end;
 function TIBCustomDataSet.ActivateTransaction: Boolean;
 begin
   Result := False;
-  if not (csDesigning in ComponentState) then Exit;
-  if not Assigned(Transaction) then
-    IBError(ibxeTransactionNotAssigned, [nil]);
-  if not Transaction.Active then
+  if AllowAutoActivateTransaction or (csDesigning in ComponentState) then
   begin
-    Result := True;
-    Transaction.StartTransaction;
-    FDidActivate := True;
+    if not Assigned(Transaction) then
+      IBError(ibxeTransactionNotAssigned, [nil]);
+    if not Transaction.Active then
+    begin
+      Result := True;
+      Transaction.StartTransaction;
+      FDidActivate := True;
+    end;
   end;
 end;
 
