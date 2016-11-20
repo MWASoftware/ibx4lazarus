@@ -697,7 +697,7 @@ function TIBCustomService.GetSRB: ISRB;
 begin
   CheckActive;
   if FSRB = nil then
-    FSRB := FService.AllocateRequestBuffer;
+    FSRB := FService.AllocateSRB;
   Result := FSRB;
 end;
 
