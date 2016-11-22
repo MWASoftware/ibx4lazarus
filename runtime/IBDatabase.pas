@@ -996,6 +996,8 @@ begin
              or
              ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_sys_request)) {Security DB Problem}
              or
+             ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_psw_attach)) {Security DB Problem}
+             or
              ((Status.GetSQLCode = -904) and (Status.GetIBErrorCode = isc_lock_dir_access)) {Lock File Problem}
              then
              begin
