@@ -311,6 +311,7 @@ type
 
   TIBCustomDataSet = class(TDataset)
   private
+    FAllowAutoActivateTransaction: Boolean;
     FArrayFieldCount: integer;
     FArrayCacheOffset: integer;
     FAutoCommit: TIBAutoCommit;
@@ -624,6 +625,8 @@ type
                read FDataSetCloseAction write FDataSetCloseAction;
 
   published
+    property AllowAutoActivateTransaction: Boolean read FAllowAutoActivateTransaction
+                 write FAllowAutoActivateTransaction;
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Transaction: TIBTransaction read GetTransaction
                                           write SetTransaction;
@@ -1174,7 +1177,7 @@ begin
     Result := GetData(Buffer);
     if Result then
     begin
-      s := string(Buffer);
+      s := strpas(Buffer);
       SetCodePage(s,CodePage,false);
       if (CodePage <> CP_NONE) and (CodePage <> CP_UTF8) then
         SetCodePage(s,CP_UTF8,true);  {LCL only accepts UTF8}
@@ -1642,14 +1645,16 @@ end;
 function TIBCustomDataSet.ActivateTransaction: Boolean;
 begin
   Result := False;
-  if not (csDesigning in ComponentState) then Exit;
-  if not Assigned(Transaction) then
-    IBError(ibxeTransactionNotAssigned, [nil]);
-  if not Transaction.Active then
+  if AllowAutoActivateTransaction or (csDesigning in ComponentState) then
   begin
-    Result := True;
-    Transaction.StartTransaction;
-    FDidActivate := True;
+    if not Assigned(Transaction) then
+      IBError(ibxeTransactionNotAssigned, [nil]);
+    if not Transaction.Active then
+    begin
+      Result := True;
+      Transaction.StartTransaction;
+      FDidActivate := True;
+    end;
   end;
 end;
 
@@ -1860,7 +1865,6 @@ var
   i, j: Integer;
   LocalData: Pointer;
   LocalDate, LocalDouble: Double;
-  LocalString: RawByteString;
   LocalInt: Integer;
   LocalBool: wordBool;
   LocalInt64: Int64;
@@ -1999,17 +2003,18 @@ begin
         end;
         SQL_VARYING:
         begin
-          if RecordNumber >= 0 then
-            LocalString := Qry[i].AsString
-          else
-            LocalString := '';
           rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
-          rdFields[j].fdDataLength := Length(LocalString);
+          rdFields[j].fdDataLength := 0;
           rdFields[j].fdCodePage := Qry.MetaData[i].GetCodePage;
-          if (rdFields[j].fdDataLength = 0) then
-            LocalData := nil
-          else
-            LocalData := PChar(LocalString);
+          if RecordNumber >= 0 then
+          begin
+            if LocalData <> nil then
+              rdFields[j].fdDataLength := byte(LocalData^) + byte((LocalData+1)^) shl 8;
+            if (rdFields[j].fdDataLength = 0) then
+              LocalData := nil
+            else
+              Inc(LocalData,2);
+          end;
         end;
         SQL_BOOLEAN:
         begin

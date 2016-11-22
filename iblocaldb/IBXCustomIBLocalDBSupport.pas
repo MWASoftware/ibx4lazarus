@@ -362,22 +362,7 @@ begin
 end;
 
 procedure TCustomIBLocalDBSupport.SetupFirebirdEnv;
-var TmpDir: string;
 begin
-  TmpDir := GetTempDir +
-      DirectorySeparator + 'firebird_' + sysutils.GetEnvironmentVariable('USER');
-  if sysutils.GetEnvironmentVariable('FIREBIRD_TMP') = '' then
-  begin
-    if not DirectoryExists(tmpDir) then
-      mkdir(tmpDir);
-    SetEnvironmentVariable('FIREBIRD_TMP',PChar(TmpDir));
-  end;
-  if sysutils.GetEnvironmentVariable('FIREBIRD_LOCK') = '' then
-  begin
-    if not DirectoryExists(tmpDir) then
-      mkdir(tmpDir);
-    SetEnvironmentVariable('FIREBIRD_LOCK',PChar(TmpDir));
-  end;
   if sysutils.GetEnvironmentVariable('FIREBIRD') = '' then
   begin
     if FirebirdDirectory <> '' then
