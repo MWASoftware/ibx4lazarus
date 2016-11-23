@@ -1858,6 +1858,8 @@ end;
   Then write the buffer to in memory cache }
 procedure TIBCustomDataSet.FetchCurrentRecordToBuffer(Qry: TIBSQL;
   RecordNumber: Integer; Buffer: PChar);
+type
+  PFieldData = ^TFieldData;
 var
   p: PRecordData;
   pbd: PBlobDataArray;
@@ -1870,6 +1872,9 @@ var
   LocalInt64: Int64;
   LocalCurrency: Currency;
   FieldsLoaded: Integer;
+  ColMetaData: IColumnMetaData;
+  ColData: ISQLData;
+  rdFieldPtr: PFieldData;
 begin
   p := PRecordData(Buffer);
   LocalData := nil;
@@ -1896,6 +1901,7 @@ begin
   j := 1;
   for i := 0 to Qry.MetaData.Count - 1 do
   begin
+    ColMetaData := Qry.MetaData[i];
     if (Qry = FQSelect) then
       j := i + 1
     else
@@ -1917,100 +1923,102 @@ begin
       end;
     if j > 0 then with p^ do
     begin
-      rdFields[j].fdDataType := Qry.MetaData[i].GetSqltype ;
-      rdFields[j].fdDataScale :=  Qry.MetaData[i].Getscale;
-      rdFields[j].fdNullable :=  Qry.MetaData[i].IsNullable;
-      rdFields[j].fdCodePage := Qry.MetaData[i].getCodePage;
+      rdFieldPtr := @(rdFields[j]);
+      rdFieldPtr^.fdDataType := ColMetaData.GetSqltype ;
+      rdFieldPtr^.fdDataScale :=  ColMetaData.Getscale;
+      rdFieldPtr^.fdNullable :=  ColMetaData.IsNullable;
+      rdFieldPtr^.fdCodePage := ColMetaData.getCodePage;
       if RecordNumber >= 0 then
       begin
-        rdFields[j].fdIsNull :=  rdFields[j].fdNullable and Qry[i].IsNull;
-        LocalData := Qry[i].GetAsPointer;
+        ColData := Qry[i];
+        rdFieldPtr^.fdIsNull :=  rdFieldPtr^.fdNullable and ColData.IsNull;
+        LocalData := ColData.GetAsPointer;
       end;
-      case rdFields[j].fdDataType of
+      case rdFieldPtr^.fdDataType of
         SQL_TIMESTAMP:
         begin
-          rdFields[j].fdDataSize := SizeOf(TDateTime);
+          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
           if RecordNumber >= 0 then
-            LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(Qry[i].AsDateTime));
+            LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(ColData.AsDateTime));
           LocalData := PChar(@LocalDate);
         end;
         SQL_TYPE_DATE:
         begin
-          rdFields[j].fdDataSize := SizeOf(TDateTime);
+          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
           if RecordNumber >= 0 then
-            LocalInt := DateTimeToTimeStamp(Qry[i].AsDateTime).Date;
+            LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Date;
           LocalData := PChar(@LocalInt);
         end;
         SQL_TYPE_TIME:
         begin
-          rdFields[j].fdDataSize := SizeOf(TDateTime);
+          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
           if RecordNumber >= 0 then
-            LocalInt := DateTimeToTimeStamp(Qry[i].AsDateTime).Time;
+            LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Time;
           LocalData := PChar(@LocalInt);
         end;
         SQL_SHORT, SQL_LONG:
         begin
-          if (rdFields[j].fdDataScale = 0) then
+          if (rdFieldPtr^.fdDataScale = 0) then
           begin
-            rdFields[j].fdDataSize := SizeOf(Integer);
+            rdFieldPtr^.fdDataSize := SizeOf(Integer);
             if RecordNumber >= 0 then
-              LocalInt := Qry[i].AsLong;
+              LocalInt := ColData.AsLong;
             LocalData := PChar(@LocalInt);
           end
-          else if (rdFields[j].fdDataScale >= (-4)) then
+          else if (rdFieldPtr^.fdDataScale >= (-4)) then
                begin
-                 rdFields[j].fdDataSize := SizeOf(Currency);
+                 rdFieldPtr^.fdDataSize := SizeOf(Currency);
                  if RecordNumber >= 0 then
-                   LocalCurrency := Qry[i].AsCurrency;
+                   LocalCurrency := ColData.AsCurrency;
                  LocalData := PChar(@LocalCurrency);
                end
                else begin
-                 rdFields[j].fdDataSize := SizeOf(Double);
+                 rdFieldPtr^.fdDataSize := SizeOf(Double);
                  if RecordNumber >= 0 then
-                   LocalDouble := Qry[i].AsDouble;
+                   LocalDouble := ColData.AsDouble;
                 LocalData := PChar(@LocalDouble);
               end;
         end;
         SQL_INT64:
         begin
-          if (rdFields[j].fdDataScale = 0) then
+          if (rdFieldPtr^.fdDataScale = 0) then
           begin
-            rdFields[j].fdDataSize := SizeOf(Int64);
+            rdFieldPtr^.fdDataSize := SizeOf(Int64);
             if RecordNumber >= 0 then
-              LocalInt64 := Qry[i].AsInt64;
+              LocalInt64 := ColData.AsInt64;
             LocalData := PChar(@LocalInt64);
           end
-          else if (rdFields[j].fdDataScale >= (-4)) then
+          else if (rdFieldPtr^.fdDataScale >= (-4)) then
                begin
-                 rdFields[j].fdDataSize := SizeOf(Currency);
+                 rdFieldPtr^.fdDataSize := SizeOf(Currency);
                  if RecordNumber >= 0 then
-                   LocalCurrency := Qry[i].AsCurrency;
+                   LocalCurrency := ColData.AsCurrency;
                    LocalData := PChar(@LocalCurrency);
                end
                else begin
-                  rdFields[j].fdDataSize := SizeOf(Double);
+                  rdFieldPtr^.fdDataSize := SizeOf(Double);
                   if RecordNumber >= 0 then
-                    LocalDouble := Qry[i].AsDouble;
+                    LocalDouble := ColData.AsDouble;
                   LocalData := PChar(@LocalDouble);
                end
         end;
         SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
         begin
-          rdFields[j].fdDataSize := SizeOf(Double);
+          rdFieldPtr^.fdDataSize := SizeOf(Double);
           if RecordNumber >= 0 then
-            LocalDouble := Qry[i].AsDouble;
+            LocalDouble := ColData.AsDouble;
           LocalData := PChar(@LocalDouble);
         end;
         SQL_VARYING:
         begin
-          rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
-          rdFields[j].fdDataLength := 0;
-          rdFields[j].fdCodePage := Qry.MetaData[i].GetCodePage;
+          rdFieldPtr^.fdDataSize := ColMetaData.GetSize;
+          rdFieldPtr^.fdDataLength := 0;
+          rdFieldPtr^.fdCodePage := ColMetaData.GetCodePage;
           if RecordNumber >= 0 then
           begin
             if LocalData <> nil then
-              rdFields[j].fdDataLength := byte(LocalData^) + byte((LocalData+1)^) shl 8;
-            if (rdFields[j].fdDataLength = 0) then
+              rdFieldPtr^.fdDataLength := byte(LocalData^) + byte((LocalData+1)^) shl 8;
+            if (rdFieldPtr^.fdDataLength = 0) then
               LocalData := nil
             else
               Inc(LocalData,2);
@@ -2019,43 +2027,43 @@ begin
         SQL_BOOLEAN:
         begin
           LocalBool:= false;
-          rdFields[j].fdDataSize := SizeOf(wordBool);
+          rdFieldPtr^.fdDataSize := SizeOf(wordBool);
           if RecordNumber >= 0 then
-            LocalBool := Qry[i].AsBoolean;
+            LocalBool := ColData.AsBoolean;
           LocalData := PChar(@LocalBool);
         end;
         SQL_TEXT:
         begin
-          rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
-          rdFields[j].fdDataLength := rdFields[j].fdDataSize;
-          rdFields[j].fdCodePage := Qry.MetaData[i].GetCodePage;
+          rdFieldPtr^.fdDataSize := ColMetaData.GetSize;
+          rdFieldPtr^.fdDataLength := rdFieldPtr^.fdDataSize;
+          rdFieldPtr^.fdCodePage := ColMetaData.GetCodePage;
        end;
         else { SQL_BLOB, SQL_ARRAY, SQL_QUAD }
         begin
-          rdFields[j].fdDataSize := Qry.MetaData[i].GetSize;
-          if (rdFields[j].fdDataType = SQL_TEXT) then
-            rdFields[j].fdDataLength := rdFields[j].fdDataSize;
+          rdFieldPtr^.fdDataSize := ColMetaData.GetSize;
+          if (rdFieldPtr^.fdDataType = SQL_TEXT) then
+            rdFieldPtr^.fdDataLength := rdFieldPtr^.fdDataSize;
         end;
       end;
       if RecordNumber < 0 then
       begin
-        rdFields[j].fdIsNull := True;
-        rdFields[j].fdDataOfs := FRecordSize;
-        Inc(FRecordSize, rdFields[j].fdDataSize);
+        rdFieldPtr^.fdIsNull := True;
+        rdFieldPtr^.fdDataOfs := FRecordSize;
+        Inc(FRecordSize, rdFieldPtr^.fdDataSize);
       end
       else
       if LocalData <> nil then
       begin
-        if rdFields[j].fdDataType = SQL_VARYING then
-          Move(LocalData^, Buffer[rdFields[j].fdDataOfs], rdFields[j].fdDataLength)
+        if rdFieldPtr^.fdDataType = SQL_VARYING then
+          Move(LocalData^, Buffer[rdFieldPtr^.fdDataOfs], rdFieldPtr^.fdDataLength)
         else
-          Move(LocalData^, Buffer[rdFields[j].fdDataOfs], rdFields[j].fdDataSize)
+          Move(LocalData^, Buffer[rdFieldPtr^.fdDataOfs], rdFieldPtr^.fdDataSize)
       end
       else
-      if rdFields[j].fdDataType = SQL_VARYING then
-        FillChar(Buffer[rdFields[j].fdDataOfs],rdFields[j].fdDataLength,0)
+      if rdFieldPtr^.fdDataType = SQL_VARYING then
+        FillChar(Buffer[rdFieldPtr^.fdDataOfs],rdFieldPtr^.fdDataLength,0)
       else
-        FillChar(Buffer[rdFields[j].fdDataOfs],rdFields[j].fdDataSize,0);
+        FillChar(Buffer[rdFieldPtr^.fdDataOfs],rdFieldPtr^.fdDataSize,0);
     end;
   end;
   WriteRecordCache(RecordNumber, PChar(p));
