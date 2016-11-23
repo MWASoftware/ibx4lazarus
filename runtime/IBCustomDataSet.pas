@@ -1987,7 +1987,7 @@ begin
       ColData := Qry[i];
       rdFieldPtr := @(rdFields[j]);
       Qry.Current.GetColumnData(i,rdFieldPtr);
-      LocalData := ColData.GetAsPointer;
+      LocalData := nil;
       case rdFieldPtr^.fdDataType of
         SQL_TIMESTAMP:
         begin
@@ -2059,10 +2059,8 @@ begin
         end;
         SQL_VARYING:
         begin
-          if (rdFieldPtr^.fdDataLength = 0) then
-            LocalData := nil
-          else
-            Inc(LocalData,2);
+          if (rdFieldPtr^.fdDataLength > 0) then
+            LocalData := ColData.GetAsPointer + 2;
         end;
         SQL_BOOLEAN:
         begin
@@ -2071,8 +2069,10 @@ begin
           LocalBool := ColData.AsBoolean;
           LocalData := PChar(@LocalBool);
         end;
+        else
+          LocalData := ColData.GetAsPointer;
       end;
-      if LocalData <> nil then
+      if (LocalData <> nil) and not rdFieldPtr^.fdIsNull then
       begin
         if rdFieldPtr^.fdDataType = SQL_VARYING then
           Move(LocalData^, Buffer[rdFieldPtr^.fdDataOfs], rdFieldPtr^.fdDataLength)
@@ -2099,215 +2099,6 @@ begin
     FetchTemplateBuffer(Qry,RecordNumber,Buffer);
   WriteRecordCache(RecordNumber, Buffer);
 end;
-
-(*var
-  p: PRecordData;
-  pbd: PBlobDataArray;
-  pda: PArrayDataArray;
-  i, j: Integer;
-  LocalData: Pointer;
-  LocalDate, LocalDouble: Double;
-  LocalInt: Integer;
-  LocalBool: wordBool;
-  LocalInt64: Int64;
-  LocalCurrency: Currency;
-  FieldsLoaded: Integer;
-  ColMetaData: IColumnMetaData;
-  ColData: ISQLData;
-  rdFieldPtr: PFieldData;
-begin
-  p := PRecordData(Buffer);
-  LocalData := nil;
-  { Make sure blob cache is empty }
-  pbd := PBlobDataArray(Buffer + FBlobCacheOffset);
-  pda := PArrayDataArray(Buffer + FArrayCacheOffset);
-  if RecordNumber > -1 then
-  begin
-    for i := 0 to BlobFieldCount - 1 do
-      pbd^[i] := nil;
-    for i := 0 to ArrayFieldCount - 1 do
-      pda^[i] := nil;
-  end;
-  { Get record information }
-  p^.rdBookmarkFlag := bfCurrent;
-  p^.rdFieldCount := Qry.FieldCount;
-  p^.rdRecordNumber := RecordNumber;
-  p^.rdUpdateStatus := usUnmodified;
-  p^.rdCachedUpdateStatus := cusUnmodified;
-  p^.rdSavedOffset := $FFFFFFFF;
-
-  { Load up the fields }
-  FieldsLoaded := FQSelect.MetaData.Count;
-  j := 1;
-  for i := 0 to Qry.MetaData.Count - 1 do
-  begin
-    ColMetaData := Qry.MetaData[i];
-    if (Qry = FQSelect) then
-      j := i + 1
-    else
-    begin
-      if FieldsLoaded = 0 then
-        break;
-      j := FQSelect.FieldIndex[Qry[i].Name] + 1;
-      if j < 1 then
-        continue
-      else
-        Dec(FieldsLoaded);
-    end;
-    with FQSelect.MetaData[j - 1] do
-      if GetAliasname = 'IBX_INTERNAL_DBKEY' then {do not localize}
-      begin
-        if (GetSize <= 8) and (RecordNumber >= 0) then
-          p^.rdDBKey := PIBDBKEY(Qry[i].AsPointer)^;
-        continue;
-      end;
-    if j > 0 then with p^ do
-    begin
-      rdFieldPtr := @(rdFields[j]);
-      rdFieldPtr^.fdDataType := ColMetaData.GetSqltype ;
-      rdFieldPtr^.fdDataScale :=  ColMetaData.Getscale;
-      rdFieldPtr^.fdNullable :=  ColMetaData.IsNullable;
-      rdFieldPtr^.fdCodePage := ColMetaData.getCodePage;
-      if RecordNumber >= 0 then
-      begin
-        ColData := Qry[i];
-        rdFieldPtr^.fdIsNull :=  rdFieldPtr^.fdNullable and ColData.IsNull;
-        LocalData := ColData.GetAsPointer;
-      end;
-      case rdFieldPtr^.fdDataType of
-        SQL_TIMESTAMP:
-        begin
-          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
-          if RecordNumber >= 0 then
-            LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(ColData.AsDateTime));
-          LocalData := PChar(@LocalDate);
-        end;
-        SQL_TYPE_DATE:
-        begin
-          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
-          if RecordNumber >= 0 then
-            LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Date;
-          LocalData := PChar(@LocalInt);
-        end;
-        SQL_TYPE_TIME:
-        begin
-          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
-          if RecordNumber >= 0 then
-            LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Time;
-          LocalData := PChar(@LocalInt);
-        end;
-        SQL_SHORT, SQL_LONG:
-        begin
-          if (rdFieldPtr^.fdDataScale = 0) then
-          begin
-            rdFieldPtr^.fdDataSize := SizeOf(Integer);
-            if RecordNumber >= 0 then
-              LocalInt := ColData.AsLong;
-            LocalData := PChar(@LocalInt);
-          end
-          else if (rdFieldPtr^.fdDataScale >= (-4)) then
-               begin
-                 rdFieldPtr^.fdDataSize := SizeOf(Currency);
-                 if RecordNumber >= 0 then
-                   LocalCurrency := ColData.AsCurrency;
-                 LocalData := PChar(@LocalCurrency);
-               end
-               else begin
-                 rdFieldPtr^.fdDataSize := SizeOf(Double);
-                 if RecordNumber >= 0 then
-                   LocalDouble := ColData.AsDouble;
-                LocalData := PChar(@LocalDouble);
-              end;
-        end;
-        SQL_INT64:
-        begin
-          if (rdFieldPtr^.fdDataScale = 0) then
-          begin
-            rdFieldPtr^.fdDataSize := SizeOf(Int64);
-            if RecordNumber >= 0 then
-              LocalInt64 := ColData.AsInt64;
-            LocalData := PChar(@LocalInt64);
-          end
-          else if (rdFieldPtr^.fdDataScale >= (-4)) then
-               begin
-                 rdFieldPtr^.fdDataSize := SizeOf(Currency);
-                 if RecordNumber >= 0 then
-                   LocalCurrency := ColData.AsCurrency;
-                   LocalData := PChar(@LocalCurrency);
-               end
-               else begin
-                  rdFieldPtr^.fdDataSize := SizeOf(Double);
-                  if RecordNumber >= 0 then
-                    LocalDouble := ColData.AsDouble;
-                  LocalData := PChar(@LocalDouble);
-               end
-        end;
-        SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
-        begin
-          rdFieldPtr^.fdDataSize := SizeOf(Double);
-          if RecordNumber >= 0 then
-            LocalDouble := ColData.AsDouble;
-          LocalData := PChar(@LocalDouble);
-        end;
-        SQL_VARYING:
-        begin
-          rdFieldPtr^.fdDataSize := ColMetaData.GetSize;
-          rdFieldPtr^.fdDataLength := 0;
-          rdFieldPtr^.fdCodePage := ColMetaData.GetCodePage;
-          if RecordNumber >= 0 then
-          begin
-            if LocalData <> nil then
-              rdFieldPtr^.fdDataLength := byte(LocalData^) + byte((LocalData+1)^) shl 8;
-            if (rdFieldPtr^.fdDataLength = 0) then
-              LocalData := nil
-            else
-              Inc(LocalData,2);
-          end;
-        end;
-        SQL_BOOLEAN:
-        begin
-          LocalBool:= false;
-          rdFieldPtr^.fdDataSize := SizeOf(wordBool);
-          if RecordNumber >= 0 then
-            LocalBool := ColData.AsBoolean;
-          LocalData := PChar(@LocalBool);
-        end;
-        SQL_TEXT:
-        begin
-          rdFieldPtr^.fdDataSize := ColMetaData.GetSize;
-          rdFieldPtr^.fdDataLength := rdFieldPtr^.fdDataSize;
-          rdFieldPtr^.fdCodePage := ColMetaData.GetCodePage;
-       end;
-        else { SQL_BLOB, SQL_ARRAY, SQL_QUAD }
-        begin
-          rdFieldPtr^.fdDataSize := ColMetaData.GetSize;
-          if (rdFieldPtr^.fdDataType = SQL_TEXT) then
-            rdFieldPtr^.fdDataLength := rdFieldPtr^.fdDataSize;
-        end;
-      end;
-      if RecordNumber < 0 then
-      begin
-        rdFieldPtr^.fdIsNull := True;
-        rdFieldPtr^.fdDataOfs := FRecordSize;
-        Inc(FRecordSize, rdFieldPtr^.fdDataSize);
-      end
-      else
-      if LocalData <> nil then
-      begin
-        if rdFieldPtr^.fdDataType = SQL_VARYING then
-          Move(LocalData^, Buffer[rdFieldPtr^.fdDataOfs], rdFieldPtr^.fdDataLength)
-        else
-          Move(LocalData^, Buffer[rdFieldPtr^.fdDataOfs], rdFieldPtr^.fdDataSize)
-      end
-      else
-      if rdFieldPtr^.fdDataType = SQL_VARYING then
-        FillChar(Buffer[rdFieldPtr^.fdDataOfs],rdFieldPtr^.fdDataLength,0)
-      else
-        FillChar(Buffer[rdFieldPtr^.fdDataOfs],rdFieldPtr^.fdDataSize,0);
-    end;
-  end;
-  WriteRecordCache(RecordNumber, PChar(p));
-end;*)
 
 function TIBCustomDataSet.GetActiveBuf: PChar;
 begin
