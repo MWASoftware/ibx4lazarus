@@ -149,6 +149,7 @@ type
   TIBSQL = class(TComponent)
   private
     FMetaData: IMetaData;
+    FSQLParams: ISQLParams;
     FStatement: IStatement;
     FOnSQLChanged: TNotifyEvent;
     FUniqueParamNames: Boolean;
@@ -575,7 +576,7 @@ end;
 
 destructor TIBSQL.Destroy;
 begin
-  Close;
+  FreeHandle;
   FSQL.Free;
   FBase.Free;
   inherited Destroy;
@@ -631,6 +632,8 @@ end;
 
 procedure TIBSQL.Close;
 begin
+  if FResults <> nil then
+    FResults.SetRetainInterfaces(false);
   FResultSet := nil;
   FResults := nil;
   FBOF := false;
@@ -690,6 +693,7 @@ begin
   begin
     FResultSet := FStatement.OpenCursor;
     FResults := FResultSet;
+    FResults.SetRetainInterfaces(true);
     FBOF := True;
     FEOF := False;
     FRecordCount := 0;
@@ -780,11 +784,14 @@ end;
 
 procedure TIBSQL.FreeHandle;
 begin
+  if FStatement <> nil then
+    FStatement.SetRetainInterfaces(false);
   Close;
   FStatement := nil;
   FResults := nil;
   FResultSet := nil;
   FMetaData := nil;
+  FSQLParams := nil;
 end;
 
 function TIBSQL.GetDatabase: TIBDatabase;
@@ -860,6 +867,8 @@ begin
                      SQL.Text,
                      GenerateParamNames);
   FMetaData := FStatement.GetMetaData;
+  FSQLParams := FStatement.GetSQLParams;
+  FStatement.SetRetainInterfaces(true);
   if not (csDesigning in ComponentState) then
       MonitorHook.SQLPrepare(Self);
 end;
