@@ -107,17 +107,6 @@ type
   PArrayDataArray = ^TArrayDataArray;
 
   { TIBCustomDataSet }
-  TFieldData = record
-    fdDataType: Short;
-    fdDataScale: Short;
-    fdNullable: Boolean;
-    fdIsNull: Boolean;
-    fdDataSize: Short;
-    fdDataLength: Short;
-    fdDataOfs: Integer;
-    fdCodePage: TSystemCodePage;
-  end;
-  PFieldData = ^TFieldData;
 
   TCachedUpdateStatus = (
                          cusUnmodified, cusModified, cusInserted,
@@ -377,6 +366,8 @@ type
     FCloseAction: TTransactionAction;
     FInTransactionEnd: boolean;
     FIBLinks: TList;
+    procedure FetchCursorPositionToBuffer(Qry: TIBSQL; RecordNumber: Integer; Buffer: PChar);
+    procedure FetchTemplateBuffer(Qry: TIBSQL; RecordNumber: Integer; Buffer: PChar);
     function GetSelectStmtIntf: IStatement;
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
@@ -1854,13 +1845,262 @@ begin
     FTransactionFree(Sender);
 end;
 
+procedure TIBCustomDataSet.FetchTemplateBuffer(Qry: TIBSQL;
+  RecordNumber: Integer; Buffer: PChar);
+var i, j: Integer;
+    rdFieldPtr: PFieldData;
+    FieldsLoaded: integer;
+    p: PRecordData;
+    SQLSubtype: integer;
+    CharSetID: cardinal;
+begin
+  p := PRecordData(Buffer);
+  { Get record information }
+  p^.rdBookmarkFlag := bfCurrent;
+  p^.rdFieldCount := Qry.FieldCount;
+  p^.rdRecordNumber := RecordNumber;
+  p^.rdUpdateStatus := usUnmodified;
+  p^.rdCachedUpdateStatus := cusUnmodified;
+  p^.rdSavedOffset := $FFFFFFFF;
+
+  { Load up the fields }
+  FieldsLoaded := FQSelect.MetaData.Count;
+  j := 1;
+  for i := 0 to Qry.MetaData.Count - 1 do
+  begin
+    if (Qry = FQSelect) then
+      j := i + 1
+    else
+    begin
+      if FieldsLoaded = 0 then
+        break;
+      j := FQSelect.FieldIndex[Qry[i].Name] + 1;
+      if j < 1 then
+        continue
+      else
+        Dec(FieldsLoaded);
+    end;
+    if j > 0 then
+    with p^ do
+    begin
+      rdFieldPtr := @(rdFields[j]);
+      Qry.MetaData.GetColumnData(i,rdFieldPtr);
+
+      case rdFieldPtr^.fdDataType of
+        SQL_TIMESTAMP,
+        SQL_TYPE_DATE,
+        SQL_TYPE_TIME:
+          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
+        SQL_SHORT, SQL_LONG:
+        begin
+          if (rdFieldPtr^.fdDataScale = 0) then
+            rdFieldPtr^.fdDataSize := SizeOf(Integer)
+          else
+          if (rdFieldPtr^.fdDataScale >= (-4)) then
+            rdFieldPtr^.fdDataSize := SizeOf(Currency)
+          else
+            rdFieldPtr^.fdDataSize := SizeOf(Double);
+        end;
+        SQL_INT64:
+        begin
+          if (rdFieldPtr^.fdDataScale = 0) then
+            rdFieldPtr^.fdDataSize := SizeOf(Int64)
+          else
+          if (rdFieldPtr^.fdDataScale >= (-4)) then
+            rdFieldPtr^.fdDataSize := SizeOf(Currency)
+          else
+            rdFieldPtr^.fdDataSize := SizeOf(Double);
+        end;
+        SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
+          rdFieldPtr^.fdDataSize := SizeOf(Double);
+        SQL_BOOLEAN:
+          rdFieldPtr^.fdDataSize := SizeOf(wordBool);
+        end;
+      end;
+      rdFieldPtr^.fdDataOfs := FRecordSize;
+      Inc(FRecordSize, rdFieldPtr^.fdDataSize);
+    end;
+end;
+
+procedure TIBCustomDataSet.FetchCursorPositionToBuffer(Qry: TIBSQL;
+  RecordNumber: Integer; Buffer: PChar);
+var
+  pbd: PBlobDataArray;
+  pda: PArrayDataArray;
+  i, j: Integer;
+  LocalData: Pointer;
+  LocalDate, LocalDouble: Double;
+  LocalInt: Integer;
+  LocalBool: wordBool;
+  LocalInt64: Int64;
+  LocalCurrency: Currency;
+  FieldsLoaded: Integer;
+  ColData: ISQLData;
+  rdFieldPtr: PFieldData;
+  p: PRecordData;
+begin
+  p := PRecordData(Buffer);
+  LocalData := nil;
+  { Make sure blob cache is empty }
+  pbd := PBlobDataArray(PChar(p) + FBlobCacheOffset);
+  pda := PArrayDataArray(PChar(p) + FArrayCacheOffset);
+  for i := 0 to BlobFieldCount - 1 do
+    pbd^[i] := nil;
+  for i := 0 to ArrayFieldCount - 1 do
+    pda^[i] := nil;
+
+  { Get record information }
+  p^.rdBookmarkFlag := bfCurrent;
+  p^.rdFieldCount := Qry.FieldCount;
+  p^.rdRecordNumber := RecordNumber;
+  p^.rdUpdateStatus := usUnmodified;
+  p^.rdCachedUpdateStatus := cusUnmodified;
+  p^.rdSavedOffset := $FFFFFFFF;
+
+  { Load up the fields }
+  FieldsLoaded := FQSelect.MetaData.Count;
+  j := 1;
+  for i := 0 to Qry.FieldCount - 1 do
+  begin
+    if (Qry = FQSelect) then
+      j := i + 1
+    else
+    begin
+      if FieldsLoaded = 0 then
+        break;
+      j := FQSelect.FieldIndex[Qry[i].Name] + 1;
+      if j < 1 then
+        continue
+      else
+        Dec(FieldsLoaded);
+    end;
+    with FQSelect.MetaData[j - 1] do
+      if GetAliasname = 'IBX_INTERNAL_DBKEY' then {do not localize}
+      begin
+        if (GetSize <= 8) then
+          p^.rdDBKey := PIBDBKEY(Qry[i].AsPointer)^;
+        continue;
+      end;
+    if j > 0 then
+    with p^ do
+    begin
+      ColData := Qry[i];
+      rdFieldPtr := @(rdFields[j]);
+      Qry.Current.GetColumnData(i,rdFieldPtr);
+      LocalData := ColData.GetAsPointer;
+      case rdFieldPtr^.fdDataType of
+        SQL_TIMESTAMP:
+        begin
+          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
+          LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(ColData.AsDateTime));
+          LocalData := PChar(@LocalDate);
+        end;
+        SQL_TYPE_DATE:
+        begin
+          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
+          LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Date;
+          LocalData := PChar(@LocalInt);
+        end;
+        SQL_TYPE_TIME:
+        begin
+          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
+          LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Time;
+          LocalData := PChar(@LocalInt);
+        end;
+        SQL_SHORT, SQL_LONG:
+        begin
+          if (rdFieldPtr^.fdDataScale = 0) then
+          begin
+            rdFieldPtr^.fdDataSize := SizeOf(Integer);
+            LocalInt := ColData.AsLong;
+            LocalData := PChar(@LocalInt);
+          end
+          else
+          if (rdFieldPtr^.fdDataScale >= (-4)) then
+          begin
+            rdFieldPtr^.fdDataSize := SizeOf(Currency);
+            LocalCurrency := ColData.AsCurrency;
+            LocalData := PChar(@LocalCurrency);
+          end
+          else
+          begin
+           rdFieldPtr^.fdDataSize := SizeOf(Double);
+           LocalDouble := ColData.AsDouble;
+           LocalData := PChar(@LocalDouble);
+          end;
+        end;
+        SQL_INT64:
+        begin
+          if (rdFieldPtr^.fdDataScale = 0) then
+          begin
+            rdFieldPtr^.fdDataSize := SizeOf(Int64);
+            LocalInt64 := ColData.AsInt64;
+            LocalData := PChar(@LocalInt64);
+          end
+          else
+          if (rdFieldPtr^.fdDataScale >= (-4)) then
+          begin
+            rdFieldPtr^.fdDataSize := SizeOf(Currency);
+            LocalCurrency := ColData.AsCurrency;
+            LocalData := PChar(@LocalCurrency);
+            end
+            else
+            begin
+              rdFieldPtr^.fdDataSize := SizeOf(Double);
+              LocalDouble := ColData.AsDouble;
+              LocalData := PChar(@LocalDouble);
+            end
+        end;
+        SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
+        begin
+          rdFieldPtr^.fdDataSize := SizeOf(Double);
+          LocalDouble := ColData.AsDouble;
+          LocalData := PChar(@LocalDouble);
+        end;
+        SQL_VARYING:
+        begin
+          if (rdFieldPtr^.fdDataLength = 0) then
+            LocalData := nil
+          else
+            Inc(LocalData,2);
+        end;
+        SQL_BOOLEAN:
+        begin
+          LocalBool:= false;
+          rdFieldPtr^.fdDataSize := SizeOf(wordBool);
+          LocalBool := ColData.AsBoolean;
+          LocalData := PChar(@LocalBool);
+        end;
+      end;
+      if LocalData <> nil then
+      begin
+        if rdFieldPtr^.fdDataType = SQL_VARYING then
+          Move(LocalData^, Buffer[rdFieldPtr^.fdDataOfs], rdFieldPtr^.fdDataLength)
+        else
+          Move(LocalData^, Buffer[rdFieldPtr^.fdDataOfs], rdFieldPtr^.fdDataSize)
+      end
+      else
+      if rdFieldPtr^.fdDataType = SQL_VARYING then
+        FillChar(Buffer[rdFieldPtr^.fdDataOfs],rdFieldPtr^.fdDataLength,0)
+      else
+        FillChar(Buffer[rdFieldPtr^.fdDataOfs],rdFieldPtr^.fdDataSize,0);
+    end;
+  end;
+end;
+
 { Read the record from FQSelect.Current into the record buffer
   Then write the buffer to in memory cache }
 procedure TIBCustomDataSet.FetchCurrentRecordToBuffer(Qry: TIBSQL;
   RecordNumber: Integer; Buffer: PChar);
-type
-  PFieldData = ^TFieldData;
-var
+begin
+  if RecordNumber > -1 then
+    FetchCursorPositionToBuffer(Qry,RecordNumber,Buffer)
+  else
+    FetchTemplateBuffer(Qry,RecordNumber,Buffer);
+  WriteRecordCache(RecordNumber, Buffer);
+end;
+
+(*var
   p: PRecordData;
   pbd: PBlobDataArray;
   pda: PArrayDataArray;
@@ -2067,7 +2307,7 @@ begin
     end;
   end;
   WriteRecordCache(RecordNumber, PChar(p));
-end;
+end;*)
 
 function TIBCustomDataSet.GetActiveBuf: PChar;
 begin
