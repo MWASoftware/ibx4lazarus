@@ -117,6 +117,18 @@ type
   end;
   PIBDBKey = ^TIBDBKey;
 
+  PFieldData = ^TFieldData;
+  TFieldData = record
+   fdDataType: Short;
+   fdDataScale: Short;
+   fdNullable: Boolean;
+   fdIsNull: Boolean;
+   fdDataSize: Short;
+   fdDataLength: Short;
+   fdDataOfs: Integer;
+   fdCodePage: TSystemCodePage;
+ end;
+
   TRecordData = record
     rdBookmarkFlag: TBookmarkFlag;
     rdFieldCount: Short;
@@ -284,6 +296,7 @@ type
   TIBAutoCommit = (acDisabled, acCommitRetaining);
 
   { TIBCustomDataSet }
+
   TIBUpdateAction = (uaFail, uaAbort, uaSkip, uaRetry, uaApply, uaApplied);
 
   TIBUpdateErrorEvent = procedure(DataSet: TDataSet; E: EDatabaseError;
@@ -1853,6 +1866,7 @@ var i, j: Integer;
     p: PRecordData;
     SQLSubtype: integer;
     CharSetID: cardinal;
+    colMetadata: IColumnMetaData;
 begin
   p := PRecordData(Buffer);
   { Get record information }
@@ -1883,8 +1897,21 @@ begin
     if j > 0 then
     with p^ do
     begin
+      colMetadata := Qry.MetaData[i];
       rdFieldPtr := @(rdFields[j]);
-      Qry.MetaData.GetColumnData(i,rdFieldPtr);
+      with rdFieldPtr^ do
+      begin
+        fdDataType := colMetadata.GetSQLType;
+        if fdDataType = SQL_BLOB then
+          fdDataScale := 0
+        else
+          fdDataScale := colMetadata.getScale;
+        fdNullable := colMetadata.getIsNullable;
+        fdIsNull := true;
+        fdDataSize := colMetadata.GetSize;
+        fdDataLength := 0;
+        fdCodePage := CP_NONE;
+      end;
 
       case rdFieldPtr^.fdDataType of
         SQL_TIMESTAMP,
@@ -1915,6 +1942,10 @@ begin
           rdFieldPtr^.fdDataSize := SizeOf(Double);
         SQL_BOOLEAN:
           rdFieldPtr^.fdDataSize := SizeOf(wordBool);
+        SQL_VARYING,
+        SQL_TEXT,
+        SQL_BLOB:
+          rdFieldPtr^.fdCodePage := Qry.Metadata[i].getCodePage;
         end;
       end;
       rdFieldPtr^.fdDataOfs := FRecordSize;
@@ -1928,19 +1959,17 @@ var
   pbd: PBlobDataArray;
   pda: PArrayDataArray;
   i, j: Integer;
-  LocalData: Pointer;
+  LocalData: PChar;
   LocalDate, LocalDouble: Double;
   LocalInt: Integer;
   LocalBool: wordBool;
   LocalInt64: Int64;
   LocalCurrency: Currency;
   FieldsLoaded: Integer;
-  ColData: ISQLData;
   rdFieldPtr: PFieldData;
   p: PRecordData;
 begin
   p := PRecordData(Buffer);
-  LocalData := nil;
   { Make sure blob cache is empty }
   pbd := PBlobDataArray(PChar(p) + FBlobCacheOffset);
   pda := PArrayDataArray(PChar(p) + FArrayCacheOffset);
@@ -1984,48 +2013,42 @@ begin
     if j > 0 then
     with p^ do
     begin
-      ColData := Qry[i];
       rdFieldPtr := @(rdFields[j]);
-      Qry.Current.GetColumnData(i,rdFieldPtr);
       LocalData := nil;
+      with rdFieldPtr^ do
+        Qry.Current.GetData(i,fdIsNull,fdDataLength,LocalData);
       case rdFieldPtr^.fdDataType of
         SQL_TIMESTAMP:
         begin
-          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
-          LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(ColData.AsDateTime));
+          LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(Qry[i].AsDateTime));
           LocalData := PChar(@LocalDate);
         end;
         SQL_TYPE_DATE:
         begin
-          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
-          LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Date;
+          LocalInt := DateTimeToTimeStamp(Qry[i].AsDateTime).Date;
           LocalData := PChar(@LocalInt);
         end;
         SQL_TYPE_TIME:
         begin
-          rdFieldPtr^.fdDataSize := SizeOf(TDateTime);
-          LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Time;
+          LocalInt := DateTimeToTimeStamp(Qry[i].AsDateTime).Time;
           LocalData := PChar(@LocalInt);
         end;
         SQL_SHORT, SQL_LONG:
         begin
           if (rdFieldPtr^.fdDataScale = 0) then
           begin
-            rdFieldPtr^.fdDataSize := SizeOf(Integer);
-            LocalInt := ColData.AsLong;
+            LocalInt := Qry[i].AsLong;
             LocalData := PChar(@LocalInt);
           end
           else
           if (rdFieldPtr^.fdDataScale >= (-4)) then
           begin
-            rdFieldPtr^.fdDataSize := SizeOf(Currency);
-            LocalCurrency := ColData.AsCurrency;
+            LocalCurrency := Qry[i].AsCurrency;
             LocalData := PChar(@LocalCurrency);
           end
           else
           begin
-           rdFieldPtr^.fdDataSize := SizeOf(Double);
-           LocalDouble := ColData.AsDouble;
+           LocalDouble := Qry[i].AsDouble;
            LocalData := PChar(@LocalDouble);
           end;
         end;
@@ -2033,44 +2056,32 @@ begin
         begin
           if (rdFieldPtr^.fdDataScale = 0) then
           begin
-            rdFieldPtr^.fdDataSize := SizeOf(Int64);
-            LocalInt64 := ColData.AsInt64;
+            LocalInt64 := Qry[i].AsInt64;
             LocalData := PChar(@LocalInt64);
           end
           else
           if (rdFieldPtr^.fdDataScale >= (-4)) then
           begin
-            rdFieldPtr^.fdDataSize := SizeOf(Currency);
-            LocalCurrency := ColData.AsCurrency;
+            LocalCurrency := Qry[i].AsCurrency;
             LocalData := PChar(@LocalCurrency);
             end
             else
             begin
-              rdFieldPtr^.fdDataSize := SizeOf(Double);
-              LocalDouble := ColData.AsDouble;
+              LocalDouble := Qry[i].AsDouble;
               LocalData := PChar(@LocalDouble);
             end
         end;
         SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
         begin
-          rdFieldPtr^.fdDataSize := SizeOf(Double);
-          LocalDouble := ColData.AsDouble;
+          LocalDouble := Qry[i].AsDouble;
           LocalData := PChar(@LocalDouble);
-        end;
-        SQL_VARYING:
-        begin
-          if (rdFieldPtr^.fdDataLength > 0) then
-            LocalData := ColData.GetAsPointer + 2;
         end;
         SQL_BOOLEAN:
         begin
           LocalBool:= false;
-          rdFieldPtr^.fdDataSize := SizeOf(wordBool);
-          LocalBool := ColData.AsBoolean;
+          LocalBool := Qry[i].AsBoolean;
           LocalData := PChar(@LocalBool);
         end;
-        else
-          LocalData := ColData.GetAsPointer;
       end;
       if (LocalData <> nil) and not rdFieldPtr^.fdIsNull then
       begin
