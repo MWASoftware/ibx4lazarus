@@ -2620,6 +2620,7 @@ var
   st: RawByteString;
   OldBuffer: Pointer;
   ts: TTimeStamp;
+  Param: ISQLParam;
 begin
   if (Buffer = nil) then
     IBError(ibxeBufferNotSet, [nil]);
@@ -2629,7 +2630,8 @@ begin
   try
     for i := 0 to Qry.Params.GetCount - 1 do
     begin
-      fn := Qry.Params[i].Name;
+      Param := Qry.Params[i];
+      fn := Param.Name;
       if (Pos('OLD_', fn) = 1) then {mbcs ok}
       begin
         fn := Copy(fn, 5, Length(fn));
@@ -2649,66 +2651,66 @@ begin
              cr := Buffer;
       j := FQSelect.FieldIndex[fn] + 1;
       if (j > 0) then
-        with PRecordData(cr)^ do
+        with PRecordData(cr)^,rdFields[j] do
         begin
-          if Qry.Params[i].name = 'IBX_INTERNAL_DBKEY' then {do not localize}
+          if Param.name = 'IBX_INTERNAL_DBKEY' then {do not localize}
           begin
-            PIBDBKey(Qry.Params[i].AsPointer)^ := rdDBKey;
+            PIBDBKey(Param.AsPointer)^ := rdDBKey;
             continue;
           end;
-          if rdFields[j].fdIsNull then
-            Qry.Params[i].IsNull := True
+          if fdIsNull then
+            Param.IsNull := True
           else begin
-            Qry.Params[i].IsNull := False;
-            data := cr + rdFields[j].fdDataOfs;
-            case rdFields[j].fdDataType of
+            Param.IsNull := False;
+            data := cr + fdDataOfs;
+            case fdDataType of
               SQL_TEXT, SQL_VARYING:
               begin
-                SetString(st, data, rdFields[j].fdDataLength);
-                SetCodePage(st,rdFields[j].fdCodePage,false);
-                Qry.Params[i].AsString := st;
+                SetString(st, data, fdDataLength);
+                SetCodePage(st,fdCodePage,false);
+                Param.AsString := st;
               end;
             SQL_FLOAT, SQL_DOUBLE, SQL_D_FLOAT:
-              Qry.Params[i].AsDouble := PDouble(data)^;
+              Param.AsDouble := PDouble(data)^;
             SQL_SHORT, SQL_LONG:
             begin
-              if rdFields[j].fdDataScale = 0 then
-                Qry.Params[i].AsLong := PLong(data)^
-              else if rdFields[j].fdDataScale >= (-4) then
-                Qry.Params[i].AsCurrency := PCurrency(data)^
+              if fdDataScale = 0 then
+                Param.AsLong := PLong(data)^
               else
-                Qry.Params[i].AsDouble := PDouble(data)^;
+              if fdDataScale >= (-4) then
+                Param.AsCurrency := PCurrency(data)^
+              else
+                Param.AsDouble := PDouble(data)^;
             end;
             SQL_INT64:
             begin
-              if rdFields[j].fdDataScale = 0 then
-                Qry.Params[i].AsInt64 := PInt64(data)^
-              else if rdFields[j].fdDataScale >= (-4) then
-                Qry.Params[i].AsCurrency := PCurrency(data)^
+              if fdDataScale = 0 then
+                Param.AsInt64 := PInt64(data)^
               else
-                Qry.Params[i].AsDouble := PDouble(data)^;
+              if fdDataScale >= (-4) then
+                Param.AsCurrency := PCurrency(data)^
+              else
+                Param.AsDouble := PDouble(data)^;
             end;
             SQL_BLOB, SQL_ARRAY, SQL_QUAD:
-              Qry.Params[i].AsQuad := PISC_QUAD(data)^;
+              Param.AsQuad := PISC_QUAD(data)^;
             SQL_TYPE_DATE:
             begin
               ts.Date := PInt(data)^;
               ts.Time := 0;
-              Qry.Params[i].AsDate :=
-                TimeStampToDateTime(ts);
+              Param.AsDate := TimeStampToDateTime(ts);
             end;
             SQL_TYPE_TIME:
             begin
               ts.Date := 0;
               ts.Time := PInt(data)^;
-              Qry.Params[i].AsTime :=
-                TimeStampToDateTime(ts);
+              Param.AsTime := TimeStampToDateTime(ts);
             end;
             SQL_TIMESTAMP:
-              Qry.Params[i].AsDateTime :=
+              Param.AsDateTime :=
                        TimeStampToDateTime(MSecsToTimeStamp(trunc(PDouble(data)^)));
             SQL_BOOLEAN:
-              Qry.Params[i].AsBoolean := PWordBool(data)^;
+              Param.AsBoolean := PWordBool(data)^;
           end;
         end;
       end;
