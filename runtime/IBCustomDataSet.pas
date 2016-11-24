@@ -56,7 +56,7 @@ uses
   IBUtils, IBBlob, IBSQLParser;
 
 const
-  BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
+  BufferCacheSize    =  5000;  { Allocate cache in this many record chunks}
   UniCache           =  2;     { Uni-directional cache is 2 records big }
 
 type
@@ -379,8 +379,7 @@ type
     FCloseAction: TTransactionAction;
     FInTransactionEnd: boolean;
     FIBLinks: TList;
-    procedure FetchCursorPositionToBuffer(Qry: TIBSQL; RecordNumber: Integer; Buffer: PChar);
-    procedure FetchTemplateBuffer(Qry: TIBSQL; RecordNumber: Integer; Buffer: PChar);
+    procedure FetchTemplateBuffer(Qry: TIBSQL; Buffer: PChar);
     function GetSelectStmtIntf: IStatement;
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
@@ -1858,8 +1857,7 @@ begin
     FTransactionFree(Sender);
 end;
 
-procedure TIBCustomDataSet.FetchTemplateBuffer(Qry: TIBSQL;
-  RecordNumber: Integer; Buffer: PChar);
+procedure TIBCustomDataSet.FetchTemplateBuffer(Qry: TIBSQL; Buffer: PChar);
 var i, j: Integer;
     rdFieldPtr: PFieldData;
     FieldsLoaded: integer;
@@ -1872,7 +1870,7 @@ begin
   { Get record information }
   p^.rdBookmarkFlag := bfCurrent;
   p^.rdFieldCount := Qry.FieldCount;
-  p^.rdRecordNumber := RecordNumber;
+  p^.rdRecordNumber := -1;
   p^.rdUpdateStatus := usUnmodified;
   p^.rdCachedUpdateStatus := cusUnmodified;
   p^.rdSavedOffset := $FFFFFFFF;
@@ -1951,9 +1949,12 @@ begin
       rdFieldPtr^.fdDataOfs := FRecordSize;
       Inc(FRecordSize, rdFieldPtr^.fdDataSize);
     end;
+  WriteRecordCache(-1, Buffer);
 end;
 
-procedure TIBCustomDataSet.FetchCursorPositionToBuffer(Qry: TIBSQL;
+{ Read the record from FQSelect.Current into the record buffer
+  Then write the buffer to in memory cache }
+procedure TIBCustomDataSet.FetchCurrentRecordToBuffer(Qry: TIBSQL;
   RecordNumber: Integer; Buffer: PChar);
 var
   pbd: PBlobDataArray;
@@ -1969,6 +1970,11 @@ var
   rdFieldPtr: PFieldData;
   p: PRecordData;
 begin
+  if RecordNumber = -1 then
+  begin
+    FetchTemplateBuffer(Qry,Buffer);
+    Exit;
+  end;
   p := PRecordData(Buffer);
   { Make sure blob cache is empty }
   pbd := PBlobDataArray(PChar(p) + FBlobCacheOffset);
@@ -2097,17 +2103,6 @@ begin
         FillChar(Buffer[rdFieldPtr^.fdDataOfs],rdFieldPtr^.fdDataSize,0);
     end;
   end;
-end;
-
-{ Read the record from FQSelect.Current into the record buffer
-  Then write the buffer to in memory cache }
-procedure TIBCustomDataSet.FetchCurrentRecordToBuffer(Qry: TIBSQL;
-  RecordNumber: Integer; Buffer: PChar);
-begin
-  if RecordNumber > -1 then
-    FetchCursorPositionToBuffer(Qry,RecordNumber,Buffer)
-  else
-    FetchTemplateBuffer(Qry,RecordNumber,Buffer);
   WriteRecordCache(RecordNumber, Buffer);
 end;
 
@@ -4100,7 +4095,7 @@ begin
       FRecordSize := RecordDataLength(FQSelect.FieldCount);
       {Step 2, 3}
       IBAlloc(FModelBuffer, 0, FRecordSize);
-      FetchCurrentRecordToBuffer(FQSelect, -1, FModelBuffer);
+      FetchTemplateBuffer(FQSelect, FModelBuffer);
       {Step 4}
       FCalcFieldsOffset := FRecordSize;
       FBlobCacheOffset := FCalcFieldsOffset + CalcFieldsSize;
