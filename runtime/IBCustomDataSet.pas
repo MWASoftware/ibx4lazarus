@@ -3342,14 +3342,15 @@ begin
     if result and (Buffer <> nil) then
       Move(Buff[1], Buffer^, Field.DataSize);
   end
-  else if (FMappedFieldPosition[Field.FieldNo - 1] > 0) and
+  else
+  if (FMappedFieldPosition[Field.FieldNo - 1] > 0) and
      (FMappedFieldPosition[Field.FieldNo - 1] <= CurrentRecord^.rdFieldCount) then
+  with CurrentRecord^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]] do
   begin
-    result := not CurrentRecord^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdIsNull;
+    result := not fdIsNull;
     if result and (Buffer <> nil) then
-      with CurrentRecord^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]] do
       begin
-        Data := Buff + CurrentRecord^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdDataOfs;
+        Data := Buff + fdDataOfs;
         if (fdDataType = SQL_VARYING) or (fdDataType = SQL_TEXT) then
         begin
           if fdDataLength < Field.DataSize then
@@ -4299,18 +4300,18 @@ begin
       MappedFieldPos := FMappedFieldPosition[Field.FieldNo - 1];
       if (MappedFieldPos > 0) and
          (MappedFieldPos <= rdFieldCount) then
+      with rdFields[MappedFieldPos] do
       begin
         Field.Validate(Buffer);
         if (Buffer = nil) or
            (Field is TIBStringField) and (PChar(Buffer)[0] = #0) then
-          rdFields[MappedFieldPos].fdIsNull := True
-        else begin
-          Move(Buffer^, Buff[rdFields[MappedFieldPos].fdDataOfs],
-                 rdFields[MappedFieldPos].fdDataSize);
-          if (rdFields[MappedFieldPos].fdDataType = SQL_TEXT) or
-             (rdFields[MappedFieldPos].fdDataType = SQL_VARYING) then
-            rdFields[MappedFieldPos].fdDataLength := StrLen(PChar(Buffer));
-          rdFields[MappedFieldPos].fdIsNull := False;
+          fdIsNull := True
+        else
+        begin
+          Move(Buffer^, Buff[fdDataOfs],fdDataSize);
+          if (fdDataType = SQL_TEXT) or (fdDataType = SQL_VARYING) then
+            fdDataLength := StrLen(PChar(Buffer));
+          fdIsNull := False;
           if rdUpdateStatus = usUnmodified then
           begin
             if CachedUpdates then
