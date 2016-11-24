@@ -379,7 +379,7 @@ type
     FCloseAction: TTransactionAction;
     FInTransactionEnd: boolean;
     FIBLinks: TList;
-    procedure FetchTemplateBuffer(Qry: TIBSQL; Buffer: PChar);
+    procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
     function GetSelectStmtIntf: IStatement;
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
@@ -1857,7 +1857,7 @@ begin
     FTransactionFree(Sender);
 end;
 
-procedure TIBCustomDataSet.FetchTemplateBuffer(Qry: TIBSQL; Buffer: PChar);
+procedure TIBCustomDataSet.InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
 var i, j: Integer;
     FieldsLoaded: integer;
     p: PRecordData;
@@ -1944,7 +1944,6 @@ begin
       end;
     end;
   end;
-  WriteRecordCache(-1, Buffer);
 end;
 
 { Read the record from FQSelect.Current into the record buffer
@@ -1966,7 +1965,7 @@ var
 begin
   if RecordNumber = -1 then
   begin
-    FetchTemplateBuffer(Qry,Buffer);
+    InitModelBuffer(Qry,Buffer);
     Exit;
   end;
   p := PRecordData(Buffer);
@@ -4092,7 +4091,7 @@ begin
       FRecordSize := RecordDataLength(FQSelect.FieldCount);
       {Step 2, 3}
       IBAlloc(FModelBuffer, 0, FRecordSize);
-      FetchTemplateBuffer(FQSelect, FModelBuffer);
+      InitModelBuffer(FQSelect, FModelBuffer);
       {Step 4}
       FCalcFieldsOffset := FRecordSize;
       FBlobCacheOffset := FCalcFieldsOffset + CalcFieldsSize;
