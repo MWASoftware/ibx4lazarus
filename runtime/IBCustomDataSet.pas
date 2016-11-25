@@ -56,7 +56,7 @@ uses
   IBUtils, IBBlob, IBSQLParser;
 
 const
-  BufferCacheSize    =  5000;  { Allocate cache in this many record chunks}
+  BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
   UniCache           =  2;     { Uni-directional cache is 2 records big }
 
 type
@@ -466,7 +466,7 @@ type
     procedure SQLChanging(Sender: TObject); virtual;
     procedure SQLChanged(Sender: TObject); virtual;
 
-(*    { IProviderSupport }
+    { IProviderSupport }
     procedure PSEndTransaction(Commit: Boolean); override;
     function PSExecuteStatement(const ASQL: string; AParams: TParams;
       ResultSet: Pointer = nil): Integer; override;
@@ -479,7 +479,7 @@ type
     procedure PSStartTransaction; override;
     procedure PSReset; override;
     function PSUpdateRecord(UpdateKind: TUpdateKind; Delta: TDataSet): Boolean; override;
-*)
+
     { TDataSet support }
     procedure InternalInsert; override;
     procedure InitRecord(Buffer: PChar); override;
@@ -849,7 +849,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
 
 implementation
 
-uses Variants, FmtBCD, LazUTF8, FBMessages;
+uses Variants, FmtBCD, LazUTF8, FBMessages, IBQuery;
 
 const FILE_BEGIN = 0;
       FILE_CURRENT = 1;
@@ -4505,7 +4505,7 @@ end;
 
 { TIBDataSet IProviderSupport }
 
-(*procedure TIBCustomDataSet.PSEndTransaction(Commit: Boolean);
+procedure TIBCustomDataSet.PSEndTransaction(Commit: Boolean);
 begin
   if Commit then
     Transaction.Commit else
@@ -4668,7 +4668,7 @@ begin
   if not FQSelect.Prepared then
     FQSelect.Prepare;
   Result := FQSelect.UniqueRelationName;
-end;*)
+end;
 
 procedure TIBDataSet.BatchInput(InputObject: TIBBatchInput);
 begin
