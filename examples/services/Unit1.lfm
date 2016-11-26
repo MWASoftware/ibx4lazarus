@@ -14,6 +14,7 @@ object Form1: TForm1
     Top = 9
     Width = 434
     Anchors = [akTop, akLeft, akRight, akBottom]
+    ScrollBars = ssAutoVertical
     TabOrder = 0
   end
   object Button1: TButton
@@ -25,6 +26,26 @@ object Form1: TForm1
     Caption = 'Close'
     OnClick = Button1Click
     TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 8
+    Height = 25
+    Top = 340
+    Width = 75
+    Anchors = [akLeft, akBottom]
+    Caption = 'Backup'
+    OnClick = Button2Click
+    TabOrder = 2
+  end
+  object Button3: TButton
+    Left = 96
+    Height = 25
+    Top = 340
+    Width = 75
+    Anchors = [akLeft, akBottom]
+    Caption = 'Restore'
+    OnClick = Button3Click
+    TabOrder = 3
   end
   object IBServerProperties1: TIBServerProperties
     ServerName = 'localhost'
