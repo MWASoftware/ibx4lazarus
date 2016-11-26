@@ -1,0 +1,73 @@
+object ListUsersForm: TListUsersForm
+  Left = 452
+  Height = 404
+  Top = 200
+  Width = 861
+  Caption = 'Display Users'
+  ClientHeight = 404
+  ClientWidth = 861
+  OnShow = FormShow
+  LCLVersion = '1.6.0.4'
+  object Label1: TLabel
+    Left = 8
+    Height = 15
+    Top = 14
+    Width = 100
+    Caption = 'Registered Users'
+    ParentColor = False
+  end
+  object StringGrid1: TStringGrid
+    Left = 8
+    Height = 360
+    Top = 32
+    Width = 824
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoFillColumns = True
+    ColCount = 6
+    DefaultColWidth = 120
+    FixedCols = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+    OnEditingDone = StringGrid1EditingDone
+    ColWidths = (
+      137
+      137
+      137
+      137
+      137
+      137
+    )
+    Cells = (
+      6
+      0
+      0
+      'User ID'
+      1
+      0
+      'Group ID'
+      2
+      0
+      'User Name'
+      3
+      0
+      'First Name'
+      4
+      0
+      'Middle Name'
+      5
+      0
+      'Last Name'
+    )
+  end
+  object IBSecurityService1: TIBSecurityService
+    ServerName = 'localhost'
+    Protocol = TCP
+    TraceFlags = []
+    SecurityAction = ActionAddUser
+    UserID = 0
+    GroupID = 0
+    left = 768
+    top = 288
+  end
+end

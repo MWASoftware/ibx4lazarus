@@ -1,24 +1,24 @@
 object Form1: TForm1
-  Left = 1062
+  Left = 938
   Height = 370
-  Top = 405
-  Width = 453
+  Top = 409
+  Width = 530
   Caption = 'Server Properties'
   ClientHeight = 370
-  ClientWidth = 453
+  ClientWidth = 530
   OnShow = FormShow
   LCLVersion = '1.6.0.4'
   object Memo1: TMemo
     Left = 8
     Height = 322
     Top = 9
-    Width = 434
+    Width = 511
     Anchors = [akTop, akLeft, akRight, akBottom]
     ScrollBars = ssAutoVertical
     TabOrder = 0
   end
   object Button1: TButton
-    Left = 366
+    Left = 443
     Height = 25
     Top = 340
     Width = 75
@@ -38,7 +38,7 @@ object Form1: TForm1
     TabOrder = 2
   end
   object Button3: TButton
-    Left = 96
+    Left = 88
     Height = 25
     Top = 340
     Width = 75
@@ -46,6 +46,34 @@ object Form1: TForm1
     Caption = 'Restore'
     OnClick = Button3Click
     TabOrder = 3
+  end
+  object Button4: TButton
+    Left = 168
+    Height = 25
+    Top = 340
+    Width = 75
+    Anchors = [akLeft, akBottom]
+    Caption = 'Server Log'
+    OnClick = Button4Click
+    TabOrder = 4
+  end
+  object Button5: TButton
+    Left = 248
+    Height = 25
+    Top = 340
+    Width = 75
+    Caption = 'Statistics'
+    OnClick = Button5Click
+    TabOrder = 5
+  end
+  object Button6: TButton
+    Left = 328
+    Height = 25
+    Top = 340
+    Width = 75
+    Caption = 'Users'
+    OnClick = Button6Click
+    TabOrder = 6
   end
   object IBServerProperties1: TIBServerProperties
     ServerName = 'localhost'
@@ -58,5 +86,21 @@ object Form1: TForm1
     Options = []
     left = 320
     top = 24
+  end
+  object IBLogService1: TIBLogService
+    ServerName = 'localhost'
+    Protocol = TCP
+    TraceFlags = []
+    left = 320
+    top = 72
+  end
+  object IBStatisticalService1: TIBStatisticalService
+    ServerName = 'localhost'
+    Protocol = TCP
+    TraceFlags = []
+    DatabaseName = 'employee'
+    Options = [HeaderPages]
+    left = 320
+    top = 112
   end
 end

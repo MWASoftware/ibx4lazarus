@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  IBServices, Unit2, Unit3;
+  IBServices, IB, Unit2, Unit3,  ListUsersUnit;
 
 type
 
@@ -16,11 +16,19 @@ type
     Button1: TButton;
     Button2: TButton;
     Button3: TButton;
+    Button4: TButton;
+    Button5: TButton;
+    Button6: TButton;
+    IBLogService1: TIBLogService;
     IBServerProperties1: TIBServerProperties;
+    IBStatisticalService1: TIBStatisticalService;
     Memo1: TMemo;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
     { private declarations }
@@ -40,16 +48,38 @@ implementation
 { TForm1 }
 
 procedure TForm1.FormShow(Sender: TObject);
+var i: integer;
 begin
   Form3.IBRestoreService1.DatabaseName.Clear;
   Form3.IBRestoreService1.DatabaseName.Add(GetTempDir + 'mytest.fdb');
   with IBServerProperties1 do
   begin
-    Active := true;
+    repeat
+      try
+        Active := true;
+      except
+       on E:EIBClientError do
+        begin
+          Close;
+          Exit
+        end;
+       On E:Exception do
+         MessageDlg(E.Message,mtError,[mbOK],0);
+      end;
+    until Active; {Loop until logged in or user cancels}
     FetchVersionInfo;
     Memo1.Lines.Add('Server Version = ' + VersionInfo.ServerVersion);
     Memo1.Lines.Add('Server Implementation = ' + VersionInfo.ServerImplementation);
     Memo1.Lines.Add('Service Version = ' + IntToStr(VersionInfo.ServiceVersion));
+    FetchDatabaseInfo;
+    Memo1.Lines.Add('No. of attachments = ' + IntToStr(DatabaseInfo.NoOfAttachments));
+    Memo1.Lines.Add('No. of databases = ' + IntToStr(DatabaseInfo.NoOfDatabases));
+    for i := 0 to DatabaseInfo.NoOfDatabases - 1 do
+      Memo1.Lines.Add('DB Name = ' + DatabaseInfo.DbName[i]);
+    FetchConfigParams;
+    Memo1.Lines.Add('Base Location = ' + ConfigParams.BaseLocation);
+    Memo1.Lines.Add('Lock File Location = ' + ConfigParams.LockFileLocation);
+    Memo1.Lines.Add('Security Database Location = ' + ConfigParams.SecurityDatabaseLocation);
   end;
 end;
 
@@ -139,6 +169,51 @@ begin
   Form3.IBRestoreService1.ServerName := IBServerProperties1.ServerName;
   if Form3.ShowModal = mrOK then
     Application.QueueAsyncCall(@DoRestore,0);
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+begin
+  Memo1.Lines.Add('Server Log');
+  IBLogService1.ServiceIntf := IBServerProperties1.ServiceIntf;
+  with IBLogService1 do
+  begin
+    Active := true;
+    ServiceStart;
+    while not Eof do
+    begin
+      Memo1.Lines.Add(GetNextLine);
+      Application.ProcessMessages;
+    end;
+  end;
+end;
+
+procedure TForm1.Button5Click(Sender: TObject);
+var DBName: string;
+begin
+  DBName := IBStatisticalService1.DatabaseName;
+  if InputQuery('Select Database','Enter Database Name on ' + IBStatisticalService1.ServerName,
+         DBName) then
+  begin
+    IBStatisticalService1.DatabaseName := DBName;
+    Memo1.Lines.Add('Database Statistics for ' + IBStatisticalService1.DatabaseName);
+    IBStatisticalService1.ServiceIntf := IBServerProperties1.ServiceIntf;
+    with IBStatisticalService1 do
+    begin
+      Active := true;
+      ServiceStart;
+      while not Eof do
+      begin
+        Memo1.Lines.Add(GetNextLine);
+        Application.ProcessMessages;
+      end;
+    end;
+  end;
+end;
+
+procedure TForm1.Button6Click(Sender: TObject);
+begin
+  ListUsersForm.IBSecurityService1.ServiceIntf := IBServerProperties1.ServiceIntf;
+  ListUsersForm.ShowModal;
 end;
 
 end.

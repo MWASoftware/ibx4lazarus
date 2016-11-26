@@ -995,14 +995,14 @@ begin
         FConfigParams.SecurityDatabaseLocation := AsString;
 
       else
-        IBError(ibxeOutputParsingError, [nil]);
+        IBError(ibxeOutputParsingError, [getItemType]);
     end;
   end;
 end;
 
 procedure TIBServerProperties.FetchDatabaseInfo;
 var
-  i: Integer;
+  i,j: Integer;
 begin
   SRB.Add(isc_info_svc_svr_db_info);
   InternalServiceQuery;
@@ -1012,20 +1012,26 @@ begin
   with FServiceQueryResults[i] do
   begin
     case getItemType of
-      isc_spb_num_att:
-        FDatabaseInfo.NoOfAttachments := AsInteger;
+      isc_info_svc_svr_db_info:
+        for j := 0 to FServiceQueryResults[i].Count - 1 do
+        with FServiceQueryResults[i][j] do
+        case getItemType of
+        isc_spb_num_att:
+          FDatabaseInfo.NoOfAttachments := AsInteger;
 
-      isc_spb_num_db:
-        FDatabaseInfo.NoOfDatabases := AsInteger;
+        isc_spb_num_db:
+          FDatabaseInfo.NoOfDatabases := AsInteger;
 
-      isc_spb_dbname:
-        begin
-          SetLength(FDatabaseInfo.DbName,length(FDatabaseInfo.DbName)+1);
-          FDatabaseInfo.DbName[length(FDatabaseInfo.DbName)-1] := AsString;
+        isc_spb_dbname:
+          begin
+            SetLength(FDatabaseInfo.DbName,length(FDatabaseInfo.DbName)+1);
+            FDatabaseInfo.DbName[length(FDatabaseInfo.DbName)-1] := AsString;
+          end;
+        else
+          IBError(ibxeOutputParsingError, [getItemType]);
         end;
-
       else
-        IBError(ibxeOutputParsingError, [nil]);
+        IBError(ibxeOutputParsingError, [getItemType]);
     end;
  end;
 end;
@@ -1064,11 +1070,11 @@ begin
              isc_spb_lic_desc:
                FLicenseInfo.desc[j] := AsString;
           else
-            IBError(ibxeOutputParsingError, [nil]);
+            IBError(ibxeOutputParsingError, [getItemType]);
           end;
         end;
       else
-        IBError(ibxeOutputParsingError, [nil]);
+        IBError(ibxeOutputParsingError, [getItemType]);
     end;
   end;
 end;
@@ -1090,7 +1096,7 @@ begin
       isc_info_svc_capabilities:
         FLicenseMaskInfo.CapabilityMask := AsInteger;
       else
-        IBError(ibxeOutputParsingError, [nil]);
+        IBError(ibxeOutputParsingError, [getItemType]);
     end;
   end;
 end;
@@ -1116,7 +1122,7 @@ begin
       isc_info_svc_implementation:
         FVersionInfo.ServerImplementation := AsString;
       else
-        IBError(ibxeOutputParsingError, [nil]);
+        IBError(ibxeOutputParsingError, [getItemType]);
     end;
   end;
 end;
@@ -1280,6 +1286,7 @@ begin
   if FDatabaseName = '' then
     IBError(ibxeStartParamsError, [nil]);
 
+  param := 0;
   if (DataPages in Options) then
     param := param or isc_spb_sts_data_pages;
 {  if (DbLog in Options) then
@@ -1515,7 +1522,7 @@ begin
 
   if (FServiceQueryResults.Count = 0) or
              (FServiceQueryResults[0].getItemType <> isc_info_svc_limbo_trans) then
-   IBError(ibxeOutputParsingError, [nil]);
+   IBError(ibxeOutputParsingError, [FServiceQueryResults[0].getItemType]);
 
   with FServiceQueryResults[0] do
   begin
@@ -1585,7 +1592,7 @@ begin
           end;
 
           else
-            IBError(ibxeOutputParsingError, [nil]);
+            IBError(ibxeOutputParsingError, [getItemType]);
         end;
       end;
     end;
@@ -1704,38 +1711,57 @@ end;
 
 procedure TIBSecurityService.FetchUserInfo;
 var
-  i: Integer;
+  i, j, k: Integer;
 begin
   SRB.Add(isc_info_svc_get_users);
   InternalServiceQuery;
 
   for i := 0 to High(FUserInfo) do
     FUserInfo[i].Free;
-  SetLength(FUserInfo,0);
-  SetLength(FUserInfo,FServiceQueryResults.Count);
   for i := 0 to FServiceQueryResults.Count - 1 do
   with FServiceQueryResults[i] do
   begin
-    if FUserInfo[i] = nil then
-      FUserInfo[i] := TUserInfo.Create;
     case getItemType of
-    isc_spb_sec_username:
-      FUserInfo[i].UserName := AsString;
+    isc_info_svc_get_users:
+      begin
+        SetLength(FUserInfo,0);
+        k := -1;
+        for j := 0 to FServiceQueryResults[i].Count - 1 do
+        begin
+          if j mod 6 = 0 then
+          begin
+            Inc(k);
+            SetLength(FUserInfo,k+1);
+            if FUserInfo[k] = nil then
+              FUserInfo[k] := TUserInfo.Create;
+          end;
+          with FServiceQueryResults[i][j] do
+          case getItemType of
+          isc_spb_sec_username:
+            FUserInfo[k].UserName := AsString;
 
-    isc_spb_sec_firstname:
-      FUserInfo[i].FirstName := AsString;
+          isc_spb_sec_firstname:
+            FUserInfo[k].FirstName := AsString;
 
-    isc_spb_sec_middlename:
-      FUserInfo[i].MiddleName := AsString;
+          isc_spb_sec_middlename:
+            FUserInfo[k].MiddleName := AsString;
 
-    isc_spb_sec_lastname:
-      FUserInfo[i].LastName := AsString;
+          isc_spb_sec_lastname:
+            FUserInfo[k].LastName := AsString;
 
-    isc_spb_sec_userId:
-      FUserInfo[i].UserId := AsInteger;
+          isc_spb_sec_userId:
+            FUserInfo[k].UserId := AsInteger;
 
-    isc_spb_sec_groupid:
-      FUserInfo[i].GroupID := AsInteger;
+          isc_spb_sec_groupid:
+            FUserInfo[k].GroupID := AsInteger;
+
+          else
+            IBError(ibxeOutputParsingError, [getItemType]);
+          end;
+        end;
+      end;
+    else
+      IBError(ibxeOutputParsingError, [getItemType]);
     end;
   end;
 end;
@@ -1949,7 +1975,7 @@ begin
       isc_info_truncated:
         FEof := False;
     else
-      IBError(ibxeOutputParsingError, [nil]);
+      IBError(ibxeOutputParsingError, [getItemType]);
     end;
   end;
 end;
@@ -1985,7 +2011,7 @@ begin
       isc_info_svc_timeout:
         {ignore};
     else
-      IBError(ibxeOutputParsingError, [nil]);
+      IBError(ibxeOutputParsingError, [getItemType]);
     end;
   end;
 end;
@@ -2011,7 +2037,7 @@ begin
       isc_info_svc_line:
          Result := AsString;
     else
-      IBError(ibxeOutputParsingError, [nil]);
+      IBError(ibxeOutputParsingError, [getItemType]);
     end;
   end;
   FEOF := Result = '';
