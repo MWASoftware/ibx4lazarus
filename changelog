@@ -34,7 +34,7 @@ upgrading to IBX2.
     a DBControlGrid during a Form's "OnShow" event handler. Under GTK2 this is
     known to risk corrupt rendering of row images when the control is first
     displayed. If necessary use "Application.QueueAsyncCall" to delay opening
-    of the dataset (see DBControlGrid examples) until the Form''s Window has been created.
+    of the dataset (see DBControlGrid examples) until the Form's Window has been created.
 
 8.  DBControlGrid & IBDynamicGrid: Navigation keys should now work correctly with
     a TDateEdit control located on an editor panel.

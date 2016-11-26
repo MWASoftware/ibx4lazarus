@@ -530,7 +530,7 @@ object Form1: TForm1
     Connected = False
     CreateIfNotExists = False
     AllowStreamedConnected = False
-    DatabaseName = 'employee'
+    DatabaseName = 'localhost:employee'
     Params.Strings = (
       'user_name=SYSDBA'
       'lc_ctype=UTF8'

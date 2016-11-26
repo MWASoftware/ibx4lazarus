@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 406
+  Left = 453
   Height = 482
-  Top = 314
+  Top = 355
   Width = 1043
   Caption = 'Employee List'
   ClientHeight = 461
@@ -9,7 +9,7 @@ object Form1: TForm1
   Menu = MainMenu1
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.4.4.0'
+  LCLVersion = '1.6.0.4'
   object Button1: TButton
     Left = 956
     Height = 25
@@ -113,7 +113,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           Title.Alignment = taCenter
@@ -125,7 +124,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           Alignment = taCenter
@@ -138,7 +136,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           ReadOnly = True
@@ -151,7 +148,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           ButtonStyle = cbsPickList
@@ -167,7 +163,6 @@ object Form1: TForm1
           DBLookupProperties.ListField = 'COUNTRY'
           DBLookupProperties.AutoInsert = False
           DBLookupProperties.AutoComplete = False
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           Title.Alignment = taCenter
@@ -179,7 +174,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           Title.Alignment = taCenter
@@ -192,7 +186,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end>
       DataSource = EmployeeSource
       Scrollbars = ssAutoBoth
@@ -553,9 +546,10 @@ object Form1: TForm1
     Text = 'None Specified'
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     LoginPrompt = False
     AfterConnect = IBDatabase1AfterConnect
+    CreateIfNotExists = False
     AllowStreamedConnected = False
     DatabaseName = 'employee'
     Params.Strings = (
@@ -565,6 +559,7 @@ object Form1: TForm1
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
+    UseDefaultSystemCodePage = False
     left = 832
     top = 168
   end
@@ -641,6 +636,7 @@ object Form1: TForm1
     top = 296
   end
   object TotalsQuery: TIBQuery
+    AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
     BeforeOpen = EmployeesBeforeOpen
@@ -679,6 +675,7 @@ object Form1: TForm1
     top = 376
   end
   object Employees: TIBDataSet
+    AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
     AfterDelete = EmployeesAfterDelete
@@ -880,10 +877,10 @@ object Form1: TForm1
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = False
-      BlobType = ftBlob
     end
   end
   object Countries: TIBQuery
+    AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
     BeforeOpen = CountriesBeforeOpen
@@ -929,6 +926,7 @@ object Form1: TForm1
     top = 256
   end
   object JobCodes: TIBQuery
+    AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
     BeforeOpen = JobCodesBeforeOpen
@@ -968,6 +966,7 @@ object Form1: TForm1
       end>
   end
   object Depts: TIBQuery
+    AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
     BufferChunks = 1000

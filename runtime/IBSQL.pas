@@ -45,7 +45,7 @@ uses
 {$ELSE}
   baseunix, unix,
 {$ENDIF}
-  SysUtils, Classes, IBExternals, DB, IB, IBDatabase, IBUtils;
+  SysUtils, Classes, IBExternals, IB, IBDatabase, IBUtils;
 
 type
   { TIBBatch }
@@ -237,7 +237,7 @@ procedure IBAlloc(var P; OldSize, NewSize: Integer);
 implementation
 
 uses
-   IBBlob, Variants, IBSQLMonitor, FBMessages, IBCustomDataSet;
+   Variants, IBSQLMonitor, FBMessages, IBCustomDataSet;
 
 procedure IBAlloc(var P; OldSize, NewSize: Integer);
 var

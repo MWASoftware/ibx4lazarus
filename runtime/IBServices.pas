@@ -105,6 +105,7 @@ type
     FQueryParams: String;
     FSPB : ISPB;
     FSRB: ISRB;
+    FSQPB: ISQPB;
     FTraceFlags: TTraceFlags;
     FOnLogin: TLoginEvent;
     FLoginPrompt: Boolean;
@@ -118,11 +119,13 @@ type
     FServiceQueryResults: IServiceQueryResults;
     function GetActive: Boolean;
     function GetServiceParamBySPB(const Idx: Integer): String;
+    function GetSQPB: ISQPB;
     function GetSRB: ISRB;
     procedure SetActive(const Value: Boolean);
     procedure SetParams(const Value: TStrings);
     procedure SetServerName(const Value: string);
     procedure SetProtocol(const Value: TProtocol);
+    procedure SetService(AValue: IServiceManager);
     procedure SetServiceParamBySPB(const Idx: Integer;
       const Value: String);
     function IndexOfSPBConst(action: byte): Integer;
@@ -140,6 +143,7 @@ type
     procedure HandleException(Sender: TObject);
     procedure InternalServiceQuery;
     property SRB: ISRB read GetSRB;
+    property SQPB: ISQPB read GetSQPB;
     property ServiceQueryResults: IServiceQueryResults read FServiceQueryResults;
 
   public
@@ -147,7 +151,7 @@ type
     destructor Destroy; override;
     procedure Attach;
     procedure Detach;
-    property ServiceIntf: IServiceManager read FService;
+    property ServiceIntf: IServiceManager read FService write SetService;
     property ServiceParamBySPB[const Idx: Integer]: String read GetServiceParamBySPB
                                                       write SetServiceParamBySPB;
   published
@@ -256,6 +260,8 @@ type
     property IsServiceRunning : Boolean read GetIsServiceRunning;
   end;
 
+  { TIBControlAndQueryService }
+
   TIBControlAndQueryService = class (TIBControlService)
   private
     FEof: Boolean;
@@ -267,6 +273,7 @@ type
     constructor create (AOwner: TComponent); override;
     function GetNextLine : String;
     function GetNextChunk : String;
+    function WriteNextChunk(stream: TStream): integer;
     property Eof: boolean read FEof;
   end;
 
@@ -318,14 +325,21 @@ type
     property Options :  TStatOptions read FOptions write FOptions;
   end;
 
+  TBackupLocation = (flServerSide,flClientSide);
+
+  { TIBBackupRestoreService }
 
   TIBBackupRestoreService = class(TIBControlAndQueryService)
   private
+    FBackupFileLocation: TBackupLocation;
     FVerbose: Boolean;
   protected
   public
+    constructor Create(AOwner: TComponent); override;
   published
     property Verbose : Boolean read FVerbose write FVerbose default False;
+    property BackupFileLocation: TBackupLocation read FBackupFileLocation
+                                                      write FBackupFileLocation default flServerSide;
   end;
 
   TBackupOption = (IgnoreChecksums, IgnoreLimbo, MetadataOnly, NoGarbageCollection,
@@ -357,6 +371,9 @@ type
     Replace, CreateNewDB, UseAllSpace);
 
   TRestoreOptions = set of TRestoreOption;
+
+  { TIBRestoreService }
+
   TIBRestoreService = class (TIBBackupRestoreService)
   private
     FDatabaseName: TStrings;
@@ -364,6 +381,7 @@ type
     FOptions: TRestoreOptions;
     FPageSize: Integer;
     FPageBuffers: Integer;
+    FSendBytes: integer;
     procedure SetBackupFile(const Value: TStrings);
     procedure SetDatabaseName(const Value: TStrings);
   protected
@@ -371,6 +389,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function SendNextChunk(stream: TStream; var line: String): integer;
   published
     { a name=value pair of filename and length }
     property DatabaseName: TStrings read FDatabaseName write SetDatabaseName;
@@ -502,6 +521,14 @@ implementation
 
 uses
   IBSQLMonitor, Math, FBMessages;
+
+{ TIBBackupRestoreService }
+
+constructor TIBBackupRestoreService.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FBackupFileLocation := flServerSide;
+end;
 
 { TIBCustomService }
 
@@ -693,6 +720,14 @@ begin
     result := '';
 end;
 
+function TIBCustomService.GetSQPB: ISQPB;
+begin
+  CheckActive;
+  if FSQPB = nil then
+    FSQPB := FService.AllocateSQPB;
+  Result := FSQPB;
+end;
+
 function TIBCustomService.GetSRB: ISRB;
 begin
   CheckActive;
@@ -703,7 +738,8 @@ end;
 
 procedure TIBCustomService.InternalServiceQuery;
 begin
-  FServiceQueryResults := FService.Query(FSRB);
+  FServiceQueryResults := FService.Query(FSQPB,FSRB);
+  FSQPB := nil;
   FSRB := nil;
   MonitorHook.ServiceQuery(Self);
 end;
@@ -713,11 +749,18 @@ begin
   if csReading in ComponentState then
     FStreamedActive := Value
   else
-    if Value <> Active then   
+    if Value <> Active then
+    begin
       if Value then
         Attach
       else
         Detach;
+    end
+   else if Value then
+   begin
+     FService.Detach;
+     FService.Attach;
+   end;
 end;
 
 procedure TIBCustomService.SetParams(const Value: TStrings);
@@ -743,6 +786,12 @@ begin
     if (Value = Local) then
       FServerName := '';
   end;
+end;
+
+procedure TIBCustomService.SetService(AValue: IServiceManager);
+begin
+  if FService = AValue then Exit;
+  FService := AValue;
 end;
 
 procedure TIBCustomService.SetServiceParamBySPB(const Idx: Integer;
@@ -1274,10 +1323,11 @@ begin
   SRB.Add(isc_action_svc_backup);
   SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
   SRB.Add(isc_spb_options).AsInteger := param;
-  if Verbose then
+  if Verbose  and (BackupFileLocation = flServerSide) then
     SRB.Add(isc_spb_verbose);
   if FBlockingFactor > 0 then
     SRB.Add(isc_spb_bkp_factor).AsInteger := FBlockingFactor;
+  if BackupFileLocation = flServerSide then
   for i := 0 to FBackupFile.Count - 1 do
   begin
     if (Trim(FBackupFile[i]) = '') then
@@ -1290,7 +1340,9 @@ begin
     end
     else
       SRB.Add(isc_spb_bkp_file).AsString := FBackupFile[i];
-  end;
+  end
+  else
+  SRB.Add(isc_spb_bkp_file).AsString := 'stdout';
 end;
 
 constructor TIBBackupService.Create(AOwner: TComponent);
@@ -1341,6 +1393,7 @@ begin
     SRB.Add(isc_spb_res_page_size).AsInteger := FPageSize;
   if FPageBuffers > 0 then
     SRB.Add(isc_spb_res_buffers).AsInteger := FPageBuffers;
+  if BackupFileLocation = flServerSide then
   for i := 0 to FBackupFile.Count - 1 do
   begin
     if (Trim(FBackupFile[i]) = '') then continue;
@@ -1352,7 +1405,10 @@ begin
     end
     else
       SRB.Add(isc_spb_bkp_file).AsString := FBackupFile[i];
-  end;
+  end
+  else
+    SRB.Add(isc_spb_bkp_file).AsString := 'stdin';
+
   for i := 0 to FDatabaseName.Count - 1 do
   begin
     if (Trim(FDatabaseName[i]) = '') then continue;
@@ -1380,6 +1436,47 @@ begin
   FDatabaseName.Free;
   FBackupFile.Free;
   inherited Destroy;
+end;
+
+function TIBRestoreService.SendNextChunk(stream: TStream; var line: String
+  ): integer;
+var
+  i: Integer;
+begin
+  Result := 0;
+  line := '';
+  if (FEof = True) then
+    exit;
+
+  if (FAction = 0) then
+    IBError(ibxeQueryParamsError, [nil]);
+
+  SRB.Add(isc_info_svc_line);
+  SRB.Add(isc_info_svc_stdin);
+
+  SQPB.Add(isc_info_svc_timeout).AsInteger := 1;
+  if FSendBytes > 0 then
+    Result := SQPB.Add(isc_info_svc_line).CopyFrom(stream,FSendBytes);
+  InternalServiceQuery;
+
+  FSendBytes := 0;
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
+  begin
+    case getItemType of
+      isc_info_svc_line:
+         line := AsString;
+
+      isc_info_svc_stdin:
+        FSendBytes := AsInteger;
+
+      isc_info_data_not_ready:
+        {ignore};
+    else
+      IBError(ibxeOutputParsingError, [getItemType]);
+    end;
+  end;
+  FEOF := (FSendBytes = 0) and (line = '');
 end;
 
 procedure TIBRestoreService.SetBackupFile(const Value: TStrings);
@@ -1812,7 +1909,7 @@ begin
 end;
 
 { TIBUnStructuredService }
-constructor TIBControlAndQueryService.Create(AOwner: TComponent);
+constructor TIBControlAndQueryService.create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FEof := False;
@@ -1838,7 +1935,7 @@ begin
   if (FAction = 0) then
     IBError(ibxeQueryParamsError, [nil]);
 
-  SRB.Add(isc_info_svc_line);
+  SRB.Add(isc_info_svc_to_eof);
   InternalServiceQuery;
 
   FEof := True;
@@ -1851,6 +1948,42 @@ begin
 
       isc_info_truncated:
         FEof := False;
+    else
+      IBError(ibxeOutputParsingError, [nil]);
+    end;
+  end;
+end;
+
+function TIBControlAndQueryService.WriteNextChunk(stream: TStream): integer;
+var
+  i: Integer;
+begin
+  result := 0;
+  if (FEof = True) then
+    exit;
+  if (FAction = 0) then
+    IBError(ibxeQueryParamsError, [nil]);
+
+  SQPB.Add(isc_info_svc_timeout).AsInteger := 1;
+  SRB.Add(isc_info_svc_to_eof);
+  InternalServiceQuery;
+
+  FEof := True;
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
+  begin
+    case getItemType of
+      isc_info_svc_to_eof:
+      begin
+        Result := CopyTo(stream,0);
+        FEof := Result = 0;
+      end;
+
+      isc_info_truncated:
+        FEof := False;
+
+      isc_info_svc_timeout:
+        {ignore};
     else
       IBError(ibxeOutputParsingError, [nil]);
     end;
@@ -1881,7 +2014,7 @@ begin
       IBError(ibxeOutputParsingError, [nil]);
     end;
   end;
-  FEOF := REsult = '';
+  FEOF := Result = '';
 end;
 
 { TIBLogService }
