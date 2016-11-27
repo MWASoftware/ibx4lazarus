@@ -13,14 +13,22 @@ type
   { TListUsersForm }
 
   TListUsersForm = class(TForm)
+    Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
     IBSecurityService1: TIBSecurityService;
     Label1: TLabel;
     StringGrid1: TStringGrid;
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure StringGrid1EditingDone(Sender: TObject);
   private
     { private declarations }
+    FAddRow: integer;
     procedure DoRefresh(Data: PtrInt);
+    procedure UpdateUser(row: integer);
   public
     { public declarations }
   end;
@@ -39,9 +47,48 @@ begin
   Application.QueueAsyncCall(@DoRefresh,0);
 end;
 
+procedure TListUsersForm.Button1Click(Sender: TObject);
+begin
+  if MessageDlg(Format('Do you really want delete user %s',[StringGrid1.Cells[2,StringGrid1.row]]),
+        mtConfirmation,[mbYes,mbNo],0) = mrYes then
+  if FAddRow = 0 then
+  with IBSecurityService1 do
+  begin
+    UserName := StringGrid1.Cells[2,StringGrid1.row];
+    DeleteUser;
+    Application.QueueAsyncCall(@DoRefresh,0);
+  end
+  else
+  begin
+    StringGrid1.RowCount := FAddRow;
+    FAddRow := 0;
+  end;
+end;
+
+procedure TListUsersForm.Button2Click(Sender: TObject);
+begin
+  if FAddRow > 0 then Exit;
+  FAddRow := StringGrid1.RowCount;
+  StringGrid1.RowCount := FAddRow + 1;
+  StringGrid1.Cells[0,FAddRow] := '0';
+  StringGrid1.Cells[1,FAddRow] := '0';
+end;
+
+procedure TListUsersForm.Button3Click(Sender: TObject);
+var NewPassword: string;
+begin
+  NewPassword := '';
+  if InputQuery('Change Password for user ' + StringGrid1.Cells[2,StringGrid1.row],
+           'Enter new password',true,NewPassword) then
+  begin
+    IBSecurityService1.Password := NewPassword;
+    UpdateUser(StringGrid1.row);
+  end;
+end;
+
 procedure TListUsersForm.StringGrid1EditingDone(Sender: TObject);
 begin
-  writeln('Editing Done ', StringGrid1.row);
+  UpdateUser(StringGrid1.row);
 end;
 
 procedure TListUsersForm.DoRefresh(Data: PtrInt);
@@ -61,6 +108,27 @@ begin
       StringGrid1.Cells[3,i+1] := FirstName;
       StringGrid1.Cells[4,i+1] := MiddleName;
       StringGrid1.Cells[5,i+1] := LastName;
+    end;
+  end;
+end;
+
+procedure TListUsersForm.UpdateUser(row: integer);
+begin
+  if (FAddRow > 0) and (StringGrid1.Cells[2,row] = '') then Exit;
+  with IBSecurityService1 do
+  begin
+    UserID := StrToInt(StringGrid1.Cells[0,row]);
+    GroupID := StrToInt(StringGrid1.Cells[1,row]);
+    UserName := StringGrid1.Cells[2,row];
+    FirstName := StringGrid1.Cells[3,row];
+    MiddleName := StringGrid1.Cells[4,row];
+    LastName := StringGrid1.Cells[5,row];
+    if FAddRow = 0 then
+      ModifyUser
+    else
+    begin
+      AddUser;
+      FAddRow := 0;
     end;
   end;
 end;

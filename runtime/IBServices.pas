@@ -1724,21 +1724,25 @@ begin
     case getItemType of
     isc_info_svc_get_users:
       begin
-        SetLength(FUserInfo,0);
-        k := -1;
+        SetLength(FUserInfo,1);
+        k := 0;
+        FUserInfo[0] := TUserInfo.Create;
+        FUserInfo[0].UserName := '';
         for j := 0 to FServiceQueryResults[i].Count - 1 do
         begin
-          if j mod 6 = 0 then
-          begin
-            Inc(k);
-            SetLength(FUserInfo,k+1);
-            if FUserInfo[k] = nil then
-              FUserInfo[k] := TUserInfo.Create;
-          end;
           with FServiceQueryResults[i][j] do
           case getItemType of
           isc_spb_sec_username:
-            FUserInfo[k].UserName := AsString;
+            begin
+              if FUserInfo[k].UserName <> '' then
+              begin
+                Inc(k);
+                SetLength(FUserInfo,k+1);
+                if FUserInfo[k] = nil then
+                  FUserInfo[k] := TUserInfo.Create;
+              end;
+              FUserInfo[k].UserName := AsString;
+            end;
 
           isc_spb_sec_firstname:
             FUserInfo[k].FirstName := AsString;
@@ -1889,8 +1893,8 @@ begin
       if (Len = 0) then
         IBError(ibxeStartParamsError, [nil]);
       SRB.Add(isc_action_svc_add_user);
-      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
       SRB.Add(isc_spb_sec_username).AsString := FUserName;
+      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
       SRB.Add(isc_spb_sec_userid).AsInteger := FUserID;
       SRB.Add(isc_spb_sec_groupid).AsInteger := FGroupID;
       SRB.Add(isc_spb_sec_password).AsString := FPassword;
@@ -1905,8 +1909,8 @@ begin
       if (Len = 0) then
         IBError(ibxeStartParamsError, [nil]);
       SRB.Add(isc_action_svc_delete_user);
-      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
       SRB.Add(isc_spb_sec_username).AsString := FUserName;
+      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
     end;
     ActionModifyUser:
     begin
@@ -1915,8 +1919,8 @@ begin
       if (Len = 0) then
         IBError(ibxeStartParamsError, [nil]);
       SRB.Add(isc_action_svc_modify_user);
-      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
       SRB.Add(isc_spb_sec_username).AsString := FUserName;
+      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
       if (ModifyUserId in FModifyParams) then
         SRB.Add(isc_spb_sec_userid).AsInteger := FUserID;
       if (ModifyGroupId in FModifyParams) then

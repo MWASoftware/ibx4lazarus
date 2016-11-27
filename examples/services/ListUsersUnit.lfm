@@ -18,7 +18,7 @@ object ListUsersForm: TListUsersForm
   end
   object StringGrid1: TStringGrid
     Left = 8
-    Height = 360
+    Height = 336
     Top = 32
     Width = 824
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -26,7 +26,7 @@ object ListUsersForm: TListUsersForm
     ColCount = 6
     DefaultColWidth = 120
     FixedCols = 0
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected, goEditing, goSmoothScroll]
     ScrollBars = ssAutoVertical
     TabOrder = 0
     OnEditingDone = StringGrid1EditingDone
@@ -59,6 +59,36 @@ object ListUsersForm: TListUsersForm
       0
       'Last Name'
     )
+  end
+  object Button1: TButton
+    Left = 757
+    Height = 25
+    Top = 373
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Delete'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 8
+    Height = 25
+    Top = 373
+    Width = 75
+    Anchors = [akLeft, akBottom]
+    Caption = 'Add'
+    OnClick = Button2Click
+    TabOrder = 2
+  end
+  object Button3: TButton
+    Left = 88
+    Height = 25
+    Top = 373
+    Width = 120
+    Anchors = [akLeft, akBottom]
+    Caption = 'Change Password'
+    OnClick = Button3Click
+    TabOrder = 3
   end
   object IBSecurityService1: TIBSecurityService
     ServerName = 'localhost'
