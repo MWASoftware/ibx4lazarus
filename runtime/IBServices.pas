@@ -1513,89 +1513,110 @@ begin
 end;
 
 procedure TIBValidationService.FetchLimboTransactionInfo;
+
+  procedure NextLimboTransaction(index: integer);
+  begin
+    SetLength(FLimboTransactionInfo, index+1);
+    FLimboTransactionInfo[index] := TLimboTransactionInfo.Create;
+    { if no advice commit as default }
+    FLimboTransactionInfo[index].Advise := UnknownAdvise;
+    FLimboTransactionInfo[index].Action:= CommitAction;
+  end;
+
 var
-  i: Integer;
+  i,j, k: Integer;
   Value: Char;
 begin
+  for i := 0 to High(FLimboTransactionInfo) do
+    FLimboTransactionInfo[i].Free;
+  SetLength(FLimboTransactionInfo,0);
+
   SRB.Add(isc_info_svc_limbo_trans);
   InternalServiceQuery;
 
-  if (FServiceQueryResults.Count = 0) or
-             (FServiceQueryResults[0].getItemType <> isc_info_svc_limbo_trans) then
-   IBError(ibxeOutputParsingError, [FServiceQueryResults[0].getItemType]);
-
-  with FServiceQueryResults[0] do
-  begin
-    for i := 0 to High(FLimboTransactionInfo) do
-      FLimboTransactionInfo[i].Free;
-    SetLength(FLimboTransactionInfo,0);
-    SetLength(FLimboTransactionInfo, FServiceQueryResults.Count);
-
-    for i := 0 to FServiceQueryResults.Count - 1 do
-    with FServiceQueryResults[i] do
+  k := -1;
+  NextLimboTransaction(0);
+  for i := 0 to FServiceQueryResults.Count - 1 do
+  with FServiceQueryResults[i] do
+  case getItemType of
+  isc_info_svc_limbo_trans:
     begin
-      if FLimboTransactionInfo[i] = nil then
-        FLimboTransactionInfo[i] := TLimboTransactionInfo.Create;
-
-      with FLimboTransactionInfo[i] do
+      for j := 0 to FServiceQueryResults[i].Count - 1 do
       begin
-        { if no advice commit as default }
-        Advise := UnknownAdvise;
-        Action:= CommitAction;
-
-        case getItemType of
-          isc_spb_single_tra_id:
-          begin
-            MultiDatabase := False;
-            ID := AsInteger;
-          end;
-
-          isc_spb_multi_tra_id:
-          begin
-            MultiDatabase := True;
-            ID := AsInteger;
-          end;
-
-          isc_spb_tra_host_site:
-            HostSite := AsString;
-
-          isc_spb_tra_state:
-            case AsByte of
-              isc_spb_tra_state_limbo:
-                State := LimboState;
-
-              isc_spb_tra_state_commit:
-                State := CommitState;
-
-              isc_spb_tra_state_rollback:
-                State := RollbackState
-              else
-                State := UnknownState;
+        with FServiceQueryResults[i][j] do
+        begin
+          case getItemType of
+            isc_spb_single_tra_id:
+            begin
+              Inc(k);
+              if k > 0 then
+                NextLimboTransaction(k);
+              FLimboTransactionInfo[k].MultiDatabase := False;
+              FLimboTransactionInfo[k].ID := AsInteger;
             end;
 
-          isc_spb_tra_remote_site:
-            RemoteSite := AsString;
+            isc_spb_multi_tra_id:
+            begin
+              Inc(k);
+              if k > 0 then
+                NextLimboTransaction(k);
+              FLimboTransactionInfo[k].MultiDatabase := True;
+              FLimboTransactionInfo[k].ID := AsInteger;
+            end;
 
-          isc_spb_tra_db_path:
-            RemoteDatabasePath := AsString;
+            isc_spb_tra_host_site:
+              FLimboTransactionInfo[k].HostSite := AsString;
 
-          isc_spb_tra_advise_commit:
-          begin
-            Advise := CommitAdvise;
-            Action:= CommitAction;
+            isc_spb_tra_state:
+              case AsByte of
+                isc_spb_tra_state_limbo:
+                  FLimboTransactionInfo[k].State := LimboState;
+
+                isc_spb_tra_state_commit:
+                  FLimboTransactionInfo[k].State := CommitState;
+
+                isc_spb_tra_state_rollback:
+                  FLimboTransactionInfo[k].State := RollbackState;
+
+                else
+                  FLimboTransactionInfo[k].State := UnknownState;
+              end;
+
+            isc_spb_tra_remote_site:
+              FLimboTransactionInfo[k].RemoteSite := AsString;
+
+            isc_spb_tra_db_path:
+              FLimboTransactionInfo[k].RemoteDatabasePath := AsString;
+
+            isc_spb_tra_advise:
+            with FLimboTransactionInfo[k] do
+            begin
+              case (AsByte) of
+              isc_spb_tra_advise_commit:
+              begin
+                Advise := CommitAdvise;
+                Action:= CommitAction;
+              end;
+
+              isc_spb_tra_advise_rollback:
+              begin
+                Advise := RollbackAdvise;
+                Action := RollbackAction;
+              end;
+
+              else
+                Advise := UnknownAdvise;
+              end;
+            end;
+
+            else
+              IBError(ibxeOutputParsingError, [getItemType]);
           end;
-
-          isc_spb_tra_advise_rollback:
-          begin
-            Advise := RollbackAdvise;
-            Action := RollbackAction;
-          end;
-
-          else
-            IBError(ibxeOutputParsingError, [getItemType]);
         end;
       end;
     end;
+  else
+    IBError(ibxeOutputParsingError, [getItemType]);
   end;
 end;
 

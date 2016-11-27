@@ -19,9 +19,11 @@ type
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
+    Button7: TButton;
     IBLogService1: TIBLogService;
     IBServerProperties1: TIBServerProperties;
     IBStatisticalService1: TIBStatisticalService;
+    IBValidationService1: TIBValidationService;
     Memo1: TMemo;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -29,6 +31,7 @@ type
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
+    procedure Button7Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
     { private declarations }
@@ -214,6 +217,31 @@ procedure TForm1.Button6Click(Sender: TObject);
 begin
   ListUsersForm.IBSecurityService1.ServiceIntf := IBServerProperties1.ServiceIntf;
   ListUsersForm.ShowModal;
+end;
+
+procedure TForm1.Button7Click(Sender: TObject);
+var DBName: string;
+begin
+  DBName := IBValidationService1.DatabaseName;
+  if InputQuery('Select Database','Enter Database Name on ' + IBValidationService1.ServerName,
+         DBName) then
+  begin
+    IBValidationService1.DatabaseName := DBName;
+    Memo1.Lines.Add('Database Validation for ' + IBValidationService1.DatabaseName);
+    IBValidationService1.ServiceIntf := IBServerProperties1.ServiceIntf;
+    with IBValidationService1 do
+    begin
+      Active := true;
+      ServiceStart;
+      while not Eof do
+      begin
+        Memo1.Lines.Add(GetNextLine);
+        Application.ProcessMessages;
+      end;
+    end;
+    Memo1.Lines.Add('Validation Completed');
+    MessageDlg('Validation Completed',mtInformation,[mbOK],0);
+  end;
 end;
 
 end.

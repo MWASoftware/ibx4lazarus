@@ -2,23 +2,23 @@ object Form1: TForm1
   Left = 938
   Height = 370
   Top = 409
-  Width = 530
+  Width = 622
   Caption = 'Server Properties'
   ClientHeight = 370
-  ClientWidth = 530
+  ClientWidth = 622
   OnShow = FormShow
   LCLVersion = '1.6.0.4'
   object Memo1: TMemo
     Left = 8
     Height = 322
     Top = 9
-    Width = 511
+    Width = 603
     Anchors = [akTop, akLeft, akRight, akBottom]
     ScrollBars = ssAutoVertical
     TabOrder = 0
   end
   object Button1: TButton
-    Left = 443
+    Left = 535
     Height = 25
     Top = 340
     Width = 75
@@ -75,6 +75,15 @@ object Form1: TForm1
     OnClick = Button6Click
     TabOrder = 6
   end
+  object Button7: TButton
+    Left = 408
+    Height = 25
+    Top = 340
+    Width = 75
+    Caption = 'Validate'
+    OnClick = Button7Click
+    TabOrder = 7
+  end
   object IBServerProperties1: TIBServerProperties
     ServerName = 'localhost'
     Protocol = TCP
@@ -102,5 +111,15 @@ object Form1: TForm1
     Options = [HeaderPages]
     left = 320
     top = 112
+  end
+  object IBValidationService1: TIBValidationService
+    ServerName = 'localhost'
+    Protocol = TCP
+    TraceFlags = []
+    DatabaseName = 'employee'
+    Options = [SweepDB]
+    GlobalAction = CommitGlobal
+    left = 320
+    top = 160
   end
 end
