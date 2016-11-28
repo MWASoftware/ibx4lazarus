@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  IBServices, IB, Unit2, Unit3,  ListUsersUnit;
+  IBServices, IB, Unit2, Unit3,  ListUsersUnit, LimboTransactionsUnit;
 
 type
 
@@ -20,6 +20,7 @@ type
     Button5: TButton;
     Button6: TButton;
     Button7: TButton;
+    Button8: TButton;
     IBLogService1: TIBLogService;
     IBServerProperties1: TIBServerProperties;
     IBStatisticalService1: TIBStatisticalService;
@@ -32,6 +33,7 @@ type
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
+    procedure Button8Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
     { private declarations }
@@ -162,14 +164,12 @@ end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
-  Form2.IBBackupService1.ServerName := IBServerProperties1.ServerName;
   if Form2.ShowModal = mrOK then
     Application.QueueAsyncCall(@DoBackup,0);
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 begin
-  Form3.IBRestoreService1.ServerName := IBServerProperties1.ServerName;
   if Form3.ShowModal = mrOK then
     Application.QueueAsyncCall(@DoRestore,0);
 end;
@@ -228,7 +228,9 @@ begin
   begin
     IBValidationService1.DatabaseName := DBName;
     Memo1.Lines.Add('Database Validation for ' + IBValidationService1.DatabaseName);
+    Memo1.Lines.Add('Running...');
     IBValidationService1.ServiceIntf := IBServerProperties1.ServiceIntf;
+    Application.ProcessMessages;
     with IBValidationService1 do
     begin
       Active := true;
@@ -241,6 +243,22 @@ begin
     end;
     Memo1.Lines.Add('Validation Completed');
     MessageDlg('Validation Completed',mtInformation,[mbOK],0);
+  end;
+end;
+
+procedure TForm1.Button8Click(Sender: TObject);
+var DBName: string;
+begin
+  with LimboTransactionsForm do
+  begin
+    DBName := IBValidationService1.DatabaseName;
+    if InputQuery('Select Database','Enter Database Name on ' + IBValidationService1.ServerName,
+           DBName) then
+    begin
+      IBValidationService1.ServiceIntf := IBServerProperties1.ServiceIntf;
+      IBValidationService1.DatabaseName := DBName;
+      ShowModal;
+    end;
   end;
 end;
 

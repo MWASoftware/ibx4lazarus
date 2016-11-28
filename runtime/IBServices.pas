@@ -792,6 +792,8 @@ procedure TIBCustomService.SetService(AValue: IServiceManager);
 begin
   if FService = AValue then Exit;
   FService := AValue;
+  if AValue <> nil then
+    FServerName := FService.getServerName;
 end;
 
 procedure TIBCustomService.SetServiceParamBySPB(const Idx: Integer;
@@ -1535,12 +1537,13 @@ begin
   InternalServiceQuery;
 
   k := -1;
-  NextLimboTransaction(0);
   for i := 0 to FServiceQueryResults.Count - 1 do
   with FServiceQueryResults[i] do
   case getItemType of
   isc_info_svc_limbo_trans:
     begin
+      if FServiceQueryResults[i].Count = 0 then continue;
+      NextLimboTransaction(0);
       for j := 0 to FServiceQueryResults[i].Count - 1 do
       begin
         with FServiceQueryResults[i][j] do
@@ -1626,33 +1629,35 @@ var
 begin
   SRB.Add(isc_action_svc_repair);
   SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
-  if (FGlobalAction = NoGlobalAction) then
-  begin
-    i := 0;
-    while (FLimboTransactionInfo[i].ID <> 0) do
+  case FGlobalAction of
+  NoGlobalAction:
     begin
-      if (FLimboTransactionInfo[i].Action = CommitAction) then
-        SRB.Add(isc_spb_rpr_commit_trans).AsInteger :=  FLimboTransactionInfo[i].ID
-      else
-        SRB.Add(isc_spb_rpr_rollback_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
-      Inc(i);
-    end;
-  end
-  else
-  begin
-    i := 0;
-    if (FGlobalAction = CommitGlobal) then
-      while (FLimboTransactionInfo[i].ID <> 0) do
+      for i := 0 to LimboTransactionInfoCount - 1 do
       begin
-        SRB.Add(isc_spb_rpr_commit_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
-        Inc(i);
-      end
-    else
-      while (FLimboTransactionInfo[i].ID <> 0) do
-      begin
-        SRB.Add(isc_spb_rpr_rollback_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
-        Inc(i);
+        if (FLimboTransactionInfo[i].Action = CommitAction) then
+          SRB.Add(isc_spb_rpr_commit_trans).AsInteger :=  FLimboTransactionInfo[i].ID
+        else
+          SRB.Add(isc_spb_rpr_rollback_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
       end;
+    end;
+
+  CommitGlobal:
+    begin
+      for i := 0 to LimboTransactionInfoCount - 1 do
+        SRB.Add(isc_spb_rpr_commit_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
+    end;
+
+    RollbackGlobal:
+      begin
+        for i := 0 to LimboTransactionInfoCount - 1 do
+          SRB.Add(isc_spb_rpr_rollback_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
+      end;
+
+    RecoverTwoPhaseGlobal:
+    begin
+      for i := 0 to LimboTransactionInfoCount - 1 do
+        SRB.Add(isc_spb_rpr_recover_two_phase).AsInteger :=  FLimboTransactionInfo[i].ID;
+    end;
   end;
   InternalServiceStart;
 end;
@@ -1667,7 +1672,7 @@ end;
 
 function TIBValidationService.GetLimboTransactionInfoCount: integer;
 begin
-  Result := High(FLimboTransactionInfo);
+  Result := Length(FLimboTransactionInfo);
 end;
 
 procedure TIBValidationService.SetDatabaseName(const Value: string);
@@ -1682,17 +1687,14 @@ begin
   Action := isc_action_svc_repair;
   if FDatabaseName = '' then
     IBError(ibxeStartParamsError, [nil]);
+  SRB.Add(isc_action_svc_repair);
+  SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
   param := 0;
   if (SweepDB in Options) then
     param := param or isc_spb_rpr_sweep_db;
   if (ValidateDB in Options) then
     param := param or isc_spb_rpr_validate_db;
 
-  SRB.Add(isc_action_svc_repair);
-  SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
-  if param > 0 then
-    SRB.Add(isc_spb_options).AsInteger := param;
-  param := 0;
   if (LimboTransactions in Options) then
     param := param or isc_spb_rpr_list_limbo_trans;
   if (CheckDB in Options) then

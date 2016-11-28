@@ -192,7 +192,6 @@ type
     FOnIdleTimer: TNotifyEvent;
     FDefaultTransaction: TIBTransaction;
     FInternalTransaction: TIBTransaction;
-    FStreamedConnected: Boolean;
     FTimer: TFPTimer;
     FUserNames: TStringList;
     FDataSets: TList;
@@ -782,7 +781,7 @@ begin
          (FDefaultTransaction.FStreamedActive) and
          (not FDefaultTransaction.InTransaction) then
         FDefaultTransaction.StartTransaction;
-      FStreamedConnected := False;
+      StreamedConnected := False;
     end;
   except
     if csDesigning in ComponentState then
@@ -1852,10 +1851,10 @@ begin
    begin
      with TIBDatabase(FDatabases[i]) do
      if not Connected then
-       if FStreamedConnected then
+       if StreamedConnected then
        begin
          Open;
-         FStreamedConnected := False;
+         StreamedConnected := False;
        end
        else
          IBError(ibxeDatabaseClosed, [nil]);
