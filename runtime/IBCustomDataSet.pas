@@ -126,7 +126,6 @@ type
    fdDataSize: Short;
    fdDataLength: Short;
    fdDataOfs: Integer;
-   fdCodePage: TSystemCodePage;
  end;
 
   TRecordData = record
@@ -379,6 +378,7 @@ type
     FCloseAction: TTransactionAction;
     FInTransactionEnd: boolean;
     FIBLinks: TList;
+    fdCodePage: array of TSystemCodePage; {Code page by rdField number}
     procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
     function GetSelectStmtIntf: IStatement;
     procedure SetUpdateMode(const Value: TUpdateMode);
@@ -1875,6 +1875,7 @@ begin
   { Load up the fields }
   FieldsLoaded := FQSelect.MetaData.Count;
   j := 1;
+  SetLength(fdCodePage,FieldsLoaded);
   for i := 0 to Qry.MetaData.Count - 1 do
   begin
     if (Qry = FQSelect) then
@@ -1903,7 +1904,7 @@ begin
         fdIsNull := true;
         fdDataSize := colMetadata.GetSize;
         fdDataLength := 0;
-        fdCodePage := CP_NONE;
+        fdCodePage[j-1] := CP_NONE;
 
         case fdDataType of
         SQL_TIMESTAMP,
@@ -1937,7 +1938,7 @@ begin
         SQL_VARYING,
         SQL_TEXT,
         SQL_BLOB:
-          fdCodePage := Qry.Metadata[i].getCodePage;
+          fdCodePage[j-1] := Qry.Metadata[i].getCodePage;
         end;
         fdDataOfs := FRecordSize;
         Inc(FRecordSize, fdDataSize);
@@ -2666,7 +2667,7 @@ begin
               SQL_TEXT, SQL_VARYING:
               begin
                 SetString(st, data, fdDataLength);
-                SetCodePage(st,fdCodePage,false);
+                SetCodePage(st,fdCodePage[j-1],false);
                 Param.AsString := st;
               end;
             SQL_FLOAT, SQL_DOUBLE, SQL_D_FLOAT:
