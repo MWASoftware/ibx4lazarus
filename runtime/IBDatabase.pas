@@ -255,6 +255,7 @@ type
     procedure RemoveTransactions;
 
     property Attachment: IAttachment read FAttachment;
+    property DBSQLDialect : Integer read FDBSQLDialect;
     property IsReadOnly: Boolean read GetIsReadOnly;
     property SQLObjectCount: Integer read GetSQLObjectCount;
     property SQLObjects[Index: Integer]: TIBBase read GetSQLObject;
@@ -278,7 +279,6 @@ type
     property IdleTimer: Integer read GetIdleTimer write SetIdleTimer;
     property SQLDialect : Integer read GetSQLDialect write SetSQLDialect default 3;
     property SQLHourGlass: Boolean read FSQLHourGlass write FSQLHourGlass default true;
-    property DBSQLDialect : Integer read FDBSQLDialect;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
     property UseDefaultSystemCodePage: boolean read FUseDefaultSystemCodePage
                                                write FUseDefaultSystemCodePage;
