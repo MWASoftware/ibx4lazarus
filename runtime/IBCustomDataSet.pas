@@ -3199,16 +3199,17 @@ end;
 procedure TIBCustomDataSet.DoBeforeClose;
 begin
   inherited DoBeforeClose;
+  if FInTransactionEnd and (FCloseAction = TARollback) then
+     Exit;
   if State in [dsInsert,dsEdit] then
   begin
-    if FInTransactionEnd and (FCloseAction = TARollback) then
-       Exit;
-
     if DataSetCloseAction = dcSaveChanges then
       Post;
       {Note this can fail with an exception e.g. due to
        database validation error. In which case the dataset remains open }
   end;
+  if FCachedUpdates and FUpdatesPending and (DataSetCloseAction = dcSaveChanges) then
+    ApplyUpdates;
 end;
 
 procedure TIBCustomDataSet.DoBeforeOpen;

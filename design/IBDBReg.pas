@@ -362,6 +362,19 @@ type
     procedure SetIndexFieldNames(const Value: string); override;
   end;
 
+  { TIBFieldDefsProperty }
+
+  TIBFieldDefsProperty = class(TCollectionPropertyEditor)
+  public
+    procedure Edit; override;
+  end;
+
+  { TIBIndexDefsProperty }
+
+  TIBIndexDefsProperty = class(TCollectionPropertyEditor)
+  public
+    procedure Edit; override;
+  end;
 
 
 procedure Register;
@@ -426,6 +439,8 @@ begin
   RegisterPropertyEditor(TypeInfo(string), TIBTable, 'IndexName', TIBIndexNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBTable, 'IndexFieldNames', TIBIndexFieldNamesProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBTable, 'MasterFields', TIBTableFieldLinkProperty); {do not localize}
+  RegisterPropertyEditor(TypeInfo(TFieldDefs), TIBTable, 'FieldDefs', TIBFieldDefsProperty); {do not localize}
+  RegisterPropertyEditor(TypeInfo(TIndexDefs), TIBTable, 'IndexDefs', TIBIndexDefsProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBQuery, 'SQL', TIBQuerySQLProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBDataSet, 'SelectSQL', TIBDatasetSQLProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBDataSet, 'ModifySQL', TIBUpdateSQLProperty); {do not localize}
@@ -485,6 +500,28 @@ begin
       end;
     end;
   end;
+end;
+
+{ TIBIndexDefsProperty }
+
+procedure TIBIndexDefsProperty.Edit;
+var IndexDefs: TIndexDefs;
+begin
+  IndexDefs := TIndexDefs(GetObjectValue);
+  if IndexDefs <> nil then
+    IndexDefs.Update;
+  inherited Edit;
+end;
+
+{ TIBFieldDefsProperty }
+
+procedure TIBFieldDefsProperty.Edit;
+var FieldDefs: TFieldDefs;
+begin
+  FieldDefs := TFieldDefs(GetObjectValue);
+  if FieldDefs <> nil then
+    FieldDefs.Update;
+  inherited Edit;
 end;
 
 { TIBArrayGridEditor }
