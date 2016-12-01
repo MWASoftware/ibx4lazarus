@@ -23,6 +23,16 @@
 {                                                                        }
 {************************************************************************}
 
+{ Syntax Enhancements Supported:
+
+Multi-action triggers (1.5)
+CREATE SEQUENCE (2.0)
+Database Triggers (2.1)
+Global Temporary Tables (2.1)
+Boolean Type (3.0)
+Identity Column Type (3.0)
+}
+
 unit IBExtract;
 
 {$Mode Delphi}
@@ -51,6 +61,8 @@ type
 
   TExtractTypes = Set of TExtractType;
 
+  { TIBExtract }
+
   TIBExtract = class(TComponent)
   private
     FDatabase : TIBDatabase;
@@ -62,6 +74,7 @@ type
     function GetDatabase: TIBDatabase;
     function GetIndexSegments ( indexname : String) : String;
     function GetTransaction: TIBTransaction;
+    function GetTriggerType(TypeID: integer): string;
     procedure SetDatabase(const Value: TIBDatabase);
     procedure SetTransaction(const Value: TIBTransaction);
     function PrintValidation(ToValidate : String;	flag : Boolean) : String;
@@ -70,14 +83,14 @@ type
     procedure GetProcedureArgs(Proc : String);
   protected
     function ExtractDDL(Flag : Boolean; TableName : String) : Boolean;
-    function ExtractListTable(RelationName, NewName : String; DomainFlag : Boolean) : Boolean;
+    function ExtractListTable(RelationName, NewName : String; DomainFlag : Boolean; TableType: integer) : Boolean;
     procedure ExtractListView (ViewName : String);
     procedure ListData(ObjectName : String);
     procedure ListRoles(ObjectName : String = '');
     procedure ListGrants;
     procedure ListProcs(ProcedureName : String = '');
     procedure ListAllTables(flag : Boolean);
-    procedure ListTriggers(ObjectName : String = ''; ExtractType : TExtractType = etTrigger);
+    procedure ListTriggers(AlterTrigger, IncludeBody: boolean; ObjectName : String = ''; ExtractType : TExtractType = etTrigger);
     procedure ListCheck(ObjectName : String = ''; ExtractType : TExtractType = etCheck);
     function PrintSet(var Used : Boolean) : String;
     procedure ListCreateDb(TargetDb : String = '');
@@ -122,7 +135,7 @@ type
     PrivString : String;
   end;
 
-  TSQLTypes = Array[0..13] of TSQLType;
+  TSQLTypes = Array[0..14] of TSQLType;
 
 const
 
@@ -156,7 +169,8 @@ const
     (SqlType : blr_sql_time; TypeName : 'TIME'),		{ NTX: keyword }
     (SqlType : blr_sql_date; TypeName : 'DATE'),		{ NTX: keyword }
     (SqlType : blr_timestamp; TypeName : 'TIMESTAMP'),		{ NTX: keyword }
-    (SqlType : blr_int64; TypeName : 'INT64'));
+    (SqlType : blr_int64; TypeName : 'INT64'),
+    (SqlType : blr_bool; TypeName : 'BOOLEAN'));
 
   SubTypes : Array[0..8] of String = (
     'UNKNOWN',			{ NTX: keyword }
@@ -168,15 +182,6 @@ const
     'FORMAT',			{ NTX: keyword }
     'TRANSACTION_DESCRIPTION',	{ NTX: keyword }
     'EXTERNAL_FILE_DESCRIPTION');	{ NTX: keyword }
-
-  TriggerTypes : Array[0..6] of String = (
-    '',
-    'BEFORE INSERT',			{ NTX: keyword }
-    'AFTER INSERT',				{ NTX: keyword }
-    'BEFORE UPDATE',			{ NTX: keyword }
-    'AFTER UPDATE',				{ NTX: keyword }
-    'BEFORE DELETE',			{ NTX: keyword }
-    'AFTER DELETE');			{ NTX: keyword }
 
   IntegralSubtypes : Array[0..2] of String = (
     'UNKNOWN',			{ Defined type, NTX: keyword }
@@ -317,6 +322,7 @@ function TIBExtract.ExtractDDL(Flag: Boolean; TableName: String) : Boolean;
 var
 	DidConnect : Boolean;
 	DidStart : Boolean;
+        TypeID: integer;
 begin
   Result := true;
   DidConnect := false;
@@ -339,7 +345,9 @@ begin
 
   if TableName <> '' then
   begin
-    if not ExtractListTable(TableName, '', true) then
+    TypeID := FDatabase.Attachment.OpenCursorAtStart(FDatabase.DefaultTransaction.TransactionIntf,
+                'Select RDB$RELATION_TYPE FROM RDB$RELATIONS WHERE RDB$RELATION_NAME = ''' + TableName + '''')[0].AsInteger;
+    if not ExtractListTable(TableName, '', true,TypeID) then
       Result := false;
   end
   else
@@ -355,8 +363,9 @@ begin
     ListViews;
     ListCheck;
     ListException;
+    ListTriggers(false,false);
     ListProcs;
-    ListTriggers;
+    ListTriggers(true,true);
     ListGrants;
   end;
 
@@ -378,7 +387,7 @@ end;
   	domain_flag -- extract needed domains before the table }
 
 function TIBExtract.ExtractListTable(RelationName, NewName: String;
-  DomainFlag: Boolean) : Boolean;
+  DomainFlag: Boolean; TableType: integer): Boolean;
 const
   TableListSQL =
     'SELECT * FROM RDB$RELATIONS REL JOIN RDB$RELATION_FIELDS RFR ON ' + {Do Not Localize}
@@ -414,6 +423,7 @@ var
   qryTables, qryPrecision, qryConstraints, qryRelConstraints : TIBSQL;
   PrecisionKnown, ValidRelation : Boolean;
   FieldScale, FieldType : Integer;
+  CreateTable: string;
 begin
   Result := true;
   ColList := '';
@@ -441,10 +451,14 @@ begin
         FMetaData.Add(Format('%s/* Table: %s, Owner: %s */%s',
           [NEWLINE, RelationName,
            qryTables.FieldByName('RDB$OWNER_NAME').AsString, NEWLINE]));
-      if NewName <> '' then
-        FMetaData.Add(Format('CREATE TABLE %s ', [QuoteIdentifier(FDatabase.SQLDialect,NewName)]))
+      if TableType > 3 then
+       CreateTable := 'CREATE GLOBAL TEMPORARY TABLE'
       else
-        FMetaData.Add(Format('CREATE TABLE %s ', [QuoteIdentifier(FDatabase.SQLDialect,RelationName)]));
+        CreateTable := 'CREATE TABLE';
+      if NewName <> '' then
+        FMetaData.Add(Format('%s %s ', [CreateTable,QuoteIdentifier(FDatabase.SQLDialect,NewName)]))
+      else
+        FMetaData.Add(Format('%s %s ', [CreateTable,QuoteIdentifier(FDatabase.SQLDialect,RelationName)]));
       if not qryTables.FieldByName('RDB$EXTERNAL_FILE').IsNull then
         FMetaData.Add(Format('EXTERNAL FILE %s ',
           [QuotedStr(qryTables.FieldByName('RDB$EXTERNAL_FILE').AsString)]));
@@ -664,7 +678,12 @@ begin
       qryRelConstraints.Next;
     end;
     if ValidRelation then
-      FMetaData.Add(')' + Term);
+    begin
+      FMetaData.Add(') ');
+      if TableType = 4 then
+      FMetaData.Add('ON COMMIT PRESERVE ROWS ');
+      FMetaData.Add(Term);
+    end;
   finally
     qryTables.Free;
     qryPrecision.Free;
@@ -799,7 +818,7 @@ end;
    Functional description
   	returns the list of columns in an index. }
 
-function TIBExtract.GetIndexSegments(IndexName: String): String;
+function TIBExtract.GetIndexSegments(indexname: String): String;
 const
   IndexNamesSQL =
     'SELECT * FROM RDB$INDEX_SEGMENTS SEG ' +
@@ -834,6 +853,51 @@ end;
 function TIBExtract.GetTransaction: TIBTransaction;
 begin
   Result := FTransaction;
+end;
+
+function TIBExtract.GetTriggerType(TypeID: integer): string;
+var separator: string;
+begin
+  if TypeID and $2000 <> 0 then
+  {database trigger}
+  begin
+    Result := 'ON ';
+    case TypeID of
+    $2000:
+      Result += 'CONNECT ';
+    $2001:
+      Result += 'DISCONNECT ';
+    $2002:
+      Result +='TRANSACTION START ';
+    $2003:
+      Result += 'TRANSACTION COMMIT ';
+    $2004:
+      Result += 'TRANSACTION ROLLBACK ';
+    end;
+  end
+  else
+  begin
+    Inc(TypeID);
+    if TypeID and $01 <> 0 then
+      Result := 'AFTER '
+    else
+      Result := 'BEFORE ';
+    TypeID := TypeID shr 1;
+    separator := '';
+    repeat
+      Result += separator;
+      separator := ' or ';
+      case TypeID and $03 of
+      1:
+        Result += 'INSERT';
+      2:
+        Result += 'UPDATE';
+      3:
+        Result += 'DELETE';
+      end;
+      TypeID := TypeID shr 2;
+    until TypeID = 0;
+  end;
 end;
 
 {	   ListAllGrants
@@ -1026,7 +1090,7 @@ begin
          continue;
        if flag or (Pos('SQL$', qryTables.FieldByName('RDB$SECURITY_CLASS').AsString) <> 1) then
 	       ExtractListTable(qryTables.FieldByName('RDB$RELATION_NAME').AsString,
-           '', false);
+           '', false,qryTables.FieldByName('RDB$RELATION_TYPE').AsInteger);
 
        qryTables.Next;
      end;
@@ -1040,7 +1104,8 @@ end;
   	Lists triggers in general on non-system
   	tables with sql source only. }
 
-procedure TIBExtract.ListTriggers(ObjectName : String; ExtractType : TExtractType);
+procedure TIBExtract.ListTriggers(AlterTrigger, IncludeBody: boolean;
+  ObjectName: String; ExtractType: TExtractType);
 const
 { Query gets the trigger info for non-system triggers with
    source that are not part of an SQL constraint }
@@ -1126,13 +1191,16 @@ begin
       if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
         SList.Add('/* ');
 
-      SList.Add(Format('CREATE TRIGGER %s FOR %s %s%s %s POSITION %d',
+      if AlterTrigger then
+        SList.Add(Format('Alter TRIGGER %s ',[QuoteIdentifier(FDatabase.SQLDialect, TriggerName)]))
+    else
+        SList.Add(Format('CREATE TRIGGER %s FOR %s %s%s %s POSITION %d',
 	        [QuoteIdentifier(FDatabase.SQLDialect, TriggerName),
            QuoteIdentifier(FDatabase.SQLDialect, RelationName),
            NEWLINE, InActive,
-           TriggerTypes[qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInteger],
+           GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInteger),
            qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
-      if not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
+      if IncludeBody and not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
         SList.Text := SList.Text +
               qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString;
       SList.Add(' ' + ProcTerm + NEWLINE);
@@ -1243,7 +1311,7 @@ const
   CharInfoSQL =
     'SELECT * FROM RDB$DATABASE DBP ' +
     'WHERE NOT DBP.RDB$CHARACTER_SET_NAME IS NULL ' +
-    '  AND DBP.RDB$CHARACTER_SET_NAME != '' ''';
+    '  AND DBP.RDB$CHARACTER_SET_NAME <> '' ''';
 
   FilesSQL =
     'select * from RDB$FILES ' +
@@ -1291,8 +1359,9 @@ begin
     qryDB.SQL.Text := CharInfoSQL;
     qryDB.ExecQuery;
 
-    Buffer := Format(' DEFAULT CHARACTER SET %s',
-      [qryDB.FieldByName('RDB$CHARACTER_SET_NAME').AsString]);
+    if not qryDB.EOF then
+      Buffer := Format(' DEFAULT CHARACTER SET %s',
+        [qryDB.FieldByName('RDB$CHARACTER_SET_NAME').AsString]);
     if NoDB then
       Buffer := Buffer + ' */'
     else
@@ -2131,7 +2200,7 @@ begin
         qryGenerator.Next;
         continue;
       end;
-      FMetaData.Add(Format('CREATE GENERATOR %s%s',
+      FMetaData.Add(Format('CREATE SEQUENCE %s%s',
         [QuoteIdentifier(FDatabase.SQLDialect, GenName),
          Term]));
       qryGenerator.Next;
@@ -2436,7 +2505,9 @@ begin
       begin
         if etDomain in ExtractTypes then
           ListDomains(ObjectName, etTable);
-        ExtractListTable(ObjectName, '', false);
+        ExtractListTable(ObjectName, '', false,
+              FDatabase.Attachment.OpenCursorAtStart(FDatabase.DefaultTransaction.TransactionIntf,
+                'Select RDB$RELATION_TYPE FROM RDB$RELATIONS WHERE RDB$RELATION_NAME = ''' + ObjectName + '''')[0].AsInteger);
         if etIndex in ExtractTypes then
           ListIndex(ObjectName, etTable);
         if etForeign in ExtractTypes then
@@ -2444,7 +2515,7 @@ begin
         if etCheck in ExtractTypes then
           ListCheck(ObjectName, etTable);
         if etTrigger in ExtractTypes then
-          ListTriggers(ObjectName, etTable);
+          ListTriggers(false,true,ObjectName, etTable);
         if etGrant in ExtractTypes then
           ShowGrants(ObjectName, Term);
         if etData in ExtractTypes then
@@ -2462,9 +2533,9 @@ begin
     eoRole : ListRoles(ObjectName);
     eoTrigger : 
       if etTable in ExtractTypes then
-        ListTriggers(ObjectName, etTable)
+        ListTriggers(false,true,ObjectName, etTable)
       else
-        ListTriggers(ObjectName);
+        ListTriggers(false,true,ObjectName);
     eoForeign :
       if etTable in ExtractTypes then
         ListForeign(ObjectName, etTable)
@@ -2552,7 +2623,7 @@ end;
    Grant various privilegs to procedures.
    All privileges may have the with_grant option set. }
 
-procedure TIBExtract.ShowGrants(MetaObject, Terminator: String);
+procedure TIBExtract.ShowGrants(MetaObject: String; Terminator: String);
 const
   { This query only finds tables, eliminating owner privileges }
   OwnerPrivSQL =
