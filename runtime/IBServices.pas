@@ -1803,7 +1803,7 @@ end;
 
 function TIBSecurityService.GetUserInfoCount: Integer;
 begin
-  Result := Max(High(FUSerInfo),0);
+  Result := Length(FUserInfo);
 end;
 
 procedure TIBSecurityService.AddUser;

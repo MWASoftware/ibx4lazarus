@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="6">
+    <Units Count="10">
       <Unit0>
         <Filename Value="ibtablestest.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="24"/>
+        <UsageCount Value="28"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -20,8 +20,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <CursorPos X="24" Y="7"/>
-        <UsageCount Value="24"/>
+        <TopLine Value="70"/>
+        <CursorPos X="10" Y="74"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -56,6 +57,32 @@
         <CursorPos X="3" Y="1764"/>
         <UsageCount Value="10"/>
       </Unit5>
+      <Unit6>
+        <Filename Value="../../runtime/IBUpdateSQL.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="22"/>
+        <CursorPos X="15" Y="45"/>
+        <UsageCount Value="10"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="32"/>
+        <CursorPos X="3" Y="46"/>
+        <UsageCount Value="10"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="../../runtime/IBSQLMonitor.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="73"/>
+        <UsageCount Value="10"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="../../runtime/IBDatabaseInfo.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="85"/>
+        <UsageCount Value="10"/>
+      </Unit9>
     </Units>
     <JumpHistory Count="10" HistoryIndex="9">
       <Position1>
