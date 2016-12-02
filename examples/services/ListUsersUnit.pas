@@ -89,8 +89,7 @@ end;
 
 procedure TListUsersForm.StringGrid1EditingDone(Sender: TObject);
 begin
-  if StringGrid1.RowCount > 1 then
-    UpdateUser(StringGrid1.row);
+  UpdateUser(StringGrid1.row);
 end;
 
 procedure TListUsersForm.DoRefresh(Data: PtrInt);
