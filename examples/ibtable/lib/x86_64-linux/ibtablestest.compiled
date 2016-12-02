@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CONFIG>
-  <Compiler Value="/usr/local/bin/fpc" Date="1455812558"/>
-  <Params Value=" -MObjFPC -Scghi -Cg -O1 -g -gl -l -vewnhibq -Fi/home/tony/lazarus/1.6.0/thirdparty/ibx/examples/ibtable/lib/x86_64-linux -Fl/opt/gnome/lib -Fu/home/tony/lazarus/1.6.0/thirdparty/ibx/lib/x86_64-linux -Fu/home/tony/lazarus/1.6.0/lcl/units/x86_64-linux/gtk2 -Fu/home/tony/lazarus/1.6.0/lcl/units/x86_64-linux -Fu/home/tony/lazarus/1.6.0/components/lazutils/lib/x86_64-linux -Fu/home/tony/lazarus/1.6.0/thirdparty/fbintf/lib/x86_64-linux -Fu/home/tony/lazarus/1.6.0/packager/units/x86_64-linux -Fu/home/tony/lazarus/1.6.0/thirdparty/ibx/examples/ibtable/ -FU/home/tony/lazarus/1.6.0/thirdparty/ibx/examples/ibtable/lib/x86_64-linux/ -dLCL -dLCLgtk2 ibtablestest.lpr"/>
-</CONFIG>
