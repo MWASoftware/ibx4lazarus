@@ -196,6 +196,7 @@ type
     procedure CheckValidStatement;   { raise error if statement is invalid.}
     procedure Close;
     procedure ExecQuery;
+    function HasField(FieldName: String): boolean;
     function FieldByName(FieldName: String): ISQLData;
     function ParamByName(ParamName: String): ISQLParam;
     procedure FreeHandle;
@@ -709,6 +710,14 @@ begin
       MonitorHook.SQLExecute(Self);
   end;
   FBase.DoAfterExecQuery(self);
+end;
+
+function TIBSQL.HasField(FieldName: String): boolean;
+begin
+  if FResults = nil then
+    IBError(ibxeNoFieldAccess,[nil]);
+
+  Result := FResults.ByName(FieldName) <> nil;
 end;
 
 function TIBSQL.GetEOF: Boolean;
