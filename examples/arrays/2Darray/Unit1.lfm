@@ -45,38 +45,39 @@ object Form1: TForm1
     DefaultColWidth = 40
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
     TabOrder = 0
-    ColCount = 24
-    RowCount = 16
+    ColCount = 25
+    RowCount = 17
     ColWidths = (
       80
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      36
-      57
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      35
+      44
     )
   end
   object DBEdit1: TDBEdit
     Left = 24
-    Height = 27
+    Height = 25
     Top = 16
     Width = 232
     DataField = 'TITLE'
@@ -139,6 +140,7 @@ object Form1: TForm1
     top = 184
   end
   object IBDataSet1: TIBDataSet
+    AllowAutoActivateTransaction = True
     Database = IBDatabase1
     Transaction = IBTransaction1
     BufferChunks = 1000

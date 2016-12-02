@@ -119,15 +119,22 @@ type
 
   PFieldData = ^TFieldData;
   TFieldData = record
-   fdDataType: Short;
-   fdDataScale: Short;
-   fdNullable: Boolean;
    fdIsNull: Boolean;
-   fdDataSize: Short;
    fdDataLength: Short;
-   fdDataOfs: Integer;
-   fdCodePage: TSystemCodePage;
  end;
+
+ PColumnData = ^TColumnData;
+ TColumnData = record
+  fdDataType: Short;
+  fdDataScale: Short;
+  fdNullable: Boolean;
+  fdDataSize: Short;
+  fdDataOfs: Integer;
+  fdCodePage: TSystemCodePage;
+ end;
+
+ PFieldColumns = ^TFieldColumns;
+ TFieldColumns =  array[1..1] of TColumnData;
 
   TRecordData = record
     rdBookmarkFlag: TBookmarkFlag;
@@ -379,6 +386,7 @@ type
     FCloseAction: TTransactionAction;
     FInTransactionEnd: boolean;
     FIBLinks: TList;
+    FFieldColumns: PFieldColumns;
     procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
     function GetSelectStmtIntf: IStatement;
     procedure SetUpdateMode(const Value: TUpdateMode);
@@ -1892,7 +1900,7 @@ begin
     if j > 0 then
     begin
       colMetadata := Qry.MetaData[i];
-      with p^.rdFields[j] do
+      with p^.rdFields[j], FFieldColumns^[j] do
       begin
         fdDataType := colMetadata.GetSQLType;
         if fdDataType = SQL_BLOB then
@@ -2012,7 +2020,7 @@ begin
     if j > 0 then
     begin
       LocalData := nil;
-      with p^.rdFields[j] do
+      with p^.rdFields[j], FFieldColumns^[j] do
       begin
         Qry.Current.GetData(i,fdIsNull,fdDataLength,LocalData);
         if not fdIsNull then
@@ -2301,14 +2309,14 @@ begin
       begin
         pbd^[j].Finalize;
         PISC_QUAD(
-          PChar(Buff) + PRecordData(Buff)^.rdFields[k].fdDataOfs)^ :=
+          PChar(Buff) + FFieldColumns^[k].fdDataOfs)^ :=
           pbd^[j].BlobID;
         PRecordData(Buff)^.rdFields[k].fdIsNull := pbd^[j].Size = 0;
       end
       else
       begin
         PRecordData(Buff)^.rdFields[k].fdIsNull := true;
-        with PISC_QUAD(PChar(Buff) + PRecordData(Buff)^.rdFields[k].fdDataOfs)^ do
+        with PISC_QUAD(PChar(Buff) + FFieldColumns^[k].fdDataOfs)^ do
         begin
           gds_quad_high := 0;
           gds_quad_low := 0;
@@ -2323,7 +2331,7 @@ begin
       begin
         k := FMappedFieldPosition[Fields[i].FieldNo -1];
         PISC_QUAD(
-          PChar(Buff) + PRecordData(Buff)^.rdFields[k].fdDataOfs)^ :=  pda^[arr].ArrayIntf.GetArrayID;
+          PChar(Buff) + FFieldColumns^[k].fdDataOfs)^ :=  pda^[arr].ArrayIntf.GetArrayID;
         PRecordData(Buff)^.rdFields[k].fdIsNull := pda^[arr].ArrayIntf.IsEmpty;
       end;
       Inc(arr);
@@ -2650,7 +2658,7 @@ begin
              cr := Buffer;
       j := FQSelect.FieldIndex[fn] + 1;
       if (j > 0) then
-        with PRecordData(cr)^,rdFields[j] do
+        with PRecordData(cr)^,rdFields[j], FFieldColumns^[j] do
         begin
           if Param.name = 'IBX_INTERNAL_DBKEY' then {do not localize}
           begin
@@ -3028,7 +3036,7 @@ begin
     fs.Transaction := Transaction;
     fs.SetField(Field);
     fs.BlobID :=
-      PISC_QUAD(@Buff[PRecordData(Buff)^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]].fdDataOfs])^;
+      PISC_QUAD(@Buff[FFieldColumns^[FMappedFieldPosition[Field.FieldNo - 1]].fdDataOfs])^;
     if (CachedUpdates) then
     begin
       bTr := not Transaction.InTransaction;
@@ -3191,16 +3199,17 @@ end;
 procedure TIBCustomDataSet.DoBeforeClose;
 begin
   inherited DoBeforeClose;
+  if FInTransactionEnd and (FCloseAction = TARollback) then
+     Exit;
   if State in [dsInsert,dsEdit] then
   begin
-    if FInTransactionEnd and (FCloseAction = TARollback) then
-       Exit;
-
     if DataSetCloseAction = dcSaveChanges then
       Post;
       {Note this can fail with an exception e.g. due to
        database validation error. In which case the dataset remains open }
   end;
+  if FCachedUpdates and FUpdatesPending and (DataSetCloseAction = dcSaveChanges) then
+    ApplyUpdates;
 end;
 
 procedure TIBCustomDataSet.DoBeforeOpen;
@@ -3346,7 +3355,8 @@ begin
   else
   if (FMappedFieldPosition[Field.FieldNo - 1] > 0) and
      (FMappedFieldPosition[Field.FieldNo - 1] <= CurrentRecord^.rdFieldCount) then
-  with CurrentRecord^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]] do
+  with CurrentRecord^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]],
+                         FFieldColumns^[FMappedFieldPosition[Field.FieldNo - 1]] do
   begin
     result := not fdIsNull;
     if result and (Buffer <> nil) then
@@ -3581,6 +3591,8 @@ begin
   FOBEnd := 0;
   FreeMem(FBufferCache);
   FBufferCache := nil;
+  FreeMem(FFieldColumns);
+  FFieldColumns := nil;
   FreeMem(FOldBufferCache);
   FOldBufferCache := nil;
   BindFields(False);
@@ -4090,6 +4102,7 @@ begin
       {Step 1}
       FRecordSize := RecordDataLength(FQSelect.FieldCount);
       {Step 2, 3}
+      GetMem(FFieldColumns,sizeof(TFieldColumns) * (FQSelect.FieldCount));
       IBAlloc(FModelBuffer, 0, FRecordSize);
       InitModelBuffer(FQSelect, FModelBuffer);
       {Step 4}
@@ -4301,7 +4314,7 @@ begin
       MappedFieldPos := FMappedFieldPosition[Field.FieldNo - 1];
       if (MappedFieldPos > 0) and
          (MappedFieldPos <= rdFieldCount) then
-      with rdFields[MappedFieldPos] do
+      with rdFields[MappedFieldPos], FFieldColumns^[MappedFieldPos] do
       begin
         Field.Validate(Buffer);
         if (Buffer = nil) or

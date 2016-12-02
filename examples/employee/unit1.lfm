@@ -112,7 +112,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           Title.Alignment = taCenter
@@ -124,7 +123,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           Alignment = taCenter
@@ -137,7 +135,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           ReadOnly = True
@@ -150,7 +147,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           ButtonStyle = cbsPickList
@@ -166,7 +162,6 @@ object Form1: TForm1
           DBLookupProperties.ListField = 'COUNTRY'
           DBLookupProperties.AutoInsert = False
           DBLookupProperties.AutoComplete = False
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           Title.Alignment = taCenter
@@ -178,7 +173,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end      
         item
           Title.Alignment = taCenter
@@ -191,7 +185,6 @@ object Form1: TForm1
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          DBLookupProperties.OwnerDrawEditable = False
         end>
       DataSource = EmployeeSource
       Scrollbars = ssAutoBoth
@@ -530,16 +523,15 @@ object Form1: TForm1
     Connected = False
     CreateIfNotExists = False
     AllowStreamedConnected = False
-    DatabaseName = 'employee'
+    DatabaseName = 'localhost:employee'
     Params.Strings = (
       'user_name=SYSDBA'
       'lc_ctype=UTF8'
-      'user_name=SYSDBA'
     )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
-    UseDefaultSystemCodePage = True
+    UseDefaultSystemCodePage = False
     left = 832
     top = 168
   end

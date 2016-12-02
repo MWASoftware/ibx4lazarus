@@ -192,7 +192,6 @@ type
     FOnIdleTimer: TNotifyEvent;
     FDefaultTransaction: TIBTransaction;
     FInternalTransaction: TIBTransaction;
-    FStreamedConnected: Boolean;
     FTimer: TFPTimer;
     FUserNames: TStringList;
     FDataSets: TList;
@@ -256,6 +255,7 @@ type
     procedure RemoveTransactions;
 
     property Attachment: IAttachment read FAttachment;
+    property DBSQLDialect : Integer read FDBSQLDialect;
     property IsReadOnly: Boolean read GetIsReadOnly;
     property SQLObjectCount: Integer read GetSQLObjectCount;
     property SQLObjects[Index: Integer]: TIBBase read GetSQLObject;
@@ -279,7 +279,6 @@ type
     property IdleTimer: Integer read GetIdleTimer write SetIdleTimer;
     property SQLDialect : Integer read GetSQLDialect write SetSQLDialect default 3;
     property SQLHourGlass: Boolean read FSQLHourGlass write FSQLHourGlass default true;
-    property DBSQLDialect : Integer read FDBSQLDialect;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
     property UseDefaultSystemCodePage: boolean read FUseDefaultSystemCodePage
                                                write FUseDefaultSystemCodePage;
@@ -782,7 +781,7 @@ begin
          (FDefaultTransaction.FStreamedActive) and
          (not FDefaultTransaction.InTransaction) then
         FDefaultTransaction.StartTransaction;
-      FStreamedConnected := False;
+      StreamedConnected := False;
     end;
   except
     if csDesigning in ComponentState then
@@ -1852,10 +1851,10 @@ begin
    begin
      with TIBDatabase(FDatabases[i]) do
      if not Connected then
-       if FStreamedConnected then
+       if StreamedConnected then
        begin
          Open;
-         FStreamedConnected := False;
+         StreamedConnected := False;
        end
        else
          IBError(ibxeDatabaseClosed, [nil]);

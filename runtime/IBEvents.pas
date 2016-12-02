@@ -93,10 +93,10 @@ type
     procedure RegisterEvents;
     procedure UnRegisterEvents;
     property DeferredRegister: boolean read FDeferredRegister write FDeferredRegister;
+    property EventIntf: IEvents read FEventIntf;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Events: TStrings read FEvents write SetEvents;
-    property EventIntf: IEvents read FEventIntf;
     property Registered: Boolean read FRegistered write SetRegistered;
     property OnEventAlert: TEventAlert read FOnEventAlert write FOnEventAlert;
   end;

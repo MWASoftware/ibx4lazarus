@@ -1,4 +1,4 @@
-program project1;
+program ibtablestest;
 
 {$mode objfpc}{$H+}
 
@@ -7,7 +7,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  ibexpress,Forms, Unit1, Unit2, Unit3, ListUsersUnit, LimboTransactionsUnit
+  Forms, Unit1, ibexpress
   { you can add units after this };
 
 {$R *.res}
@@ -16,10 +16,6 @@ begin
   RequireDerivedFormResource := True;
   Application.Initialize;
   Application.CreateForm(TForm1, Form1);
-  Application.CreateForm(TForm2, Form2);
-  Application.CreateForm(TForm3, Form3);
-  Application.CreateForm(TListUsersForm, ListUsersForm);
-  Application.CreateForm(TLimboTransactionsForm, LimboTransactionsForm);
   Application.Run;
 end.
 

@@ -45,7 +45,7 @@ uses
 {$ELSE}
   baseunix, unix,
 {$ENDIF}
-  SysUtils, Classes, IBExternals, DB, IB, IBDatabase, IBUtils;
+  SysUtils, Classes, IBExternals, IB, IBDatabase, IBUtils;
 
 type
   { TIBBatch }
@@ -196,6 +196,7 @@ type
     procedure CheckValidStatement;   { raise error if statement is invalid.}
     procedure Close;
     procedure ExecQuery;
+    function HasField(FieldName: String): boolean;
     function FieldByName(FieldName: String): ISQLData;
     function ParamByName(ParamName: String): ISQLParam;
     procedure FreeHandle;
@@ -237,7 +238,7 @@ procedure IBAlloc(var P; OldSize, NewSize: Integer);
 implementation
 
 uses
-   IBBlob, Variants, IBSQLMonitor, FBMessages, IBCustomDataSet;
+   Variants, IBSQLMonitor, FBMessages, IBCustomDataSet;
 
 procedure IBAlloc(var P; OldSize, NewSize: Integer);
 var
@@ -709,6 +710,14 @@ begin
       MonitorHook.SQLExecute(Self);
   end;
   FBase.DoAfterExecQuery(self);
+end;
+
+function TIBSQL.HasField(FieldName: String): boolean;
+begin
+  if FResults = nil then
+    IBError(ibxeNoFieldAccess,[nil]);
+
+  Result := FResults.ByName(FieldName) <> nil;
 end;
 
 function TIBSQL.GetEOF: Boolean;

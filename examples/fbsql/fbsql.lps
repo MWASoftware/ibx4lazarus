@@ -4,21 +4,132 @@
     <PathDelim Value="\"/>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="2">
+    <Units Count="16">
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="4"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="254"/>
+        <CursorPos X="30" Y="269"/>
+        <UsageCount Value="29"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="readme.txt"/>
         <IsPartOfProject Value="True"/>
-        <UsageCount Value="20"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <UsageCount Value="29"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="None"/>
       </Unit1>
+      <Unit2>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2527"/>
+        <CursorPos Y="2548"/>
+        <UsageCount Value="14"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\..\fbintf\IB.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1107"/>
+        <CursorPos Y="1129"/>
+        <UsageCount Value="12"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\..\..\fbintf\client\FBSQLData.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2450"/>
+        <CursorPos Y="2469"/>
+        <UsageCount Value="13"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\..\fbintf\client\FBBlob.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="129"/>
+        <CursorPos X="35" Y="138"/>
+        <UsageCount Value="12"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\..\..\fbintf\client\2.5\FB25Blob.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="336"/>
+        <CursorPos X="20" Y="374"/>
+        <UsageCount Value="12"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\..\..\fbintf\client\2.5\FB25Statement.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="582"/>
+        <CursorPos X="18" Y="609"/>
+        <UsageCount Value="12"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\runtime\IBSQL.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="710"/>
+        <CursorPos Y="720"/>
+        <UsageCount Value="13"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\..\fbintf\client\3.0\FB30Statement.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="544"/>
+        <CursorPos X="22" Y="559"/>
+        <UsageCount Value="12"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\..\..\fbintf\client\3.0\FB30Blob.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="324"/>
+        <CursorPos X="20" Y="349"/>
+        <UsageCount Value="12"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="..\..\..\fbintf\client\3.0\FB30Array.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="75"/>
+        <CursorPos Y="91"/>
+        <UsageCount Value="12"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="..\..\..\fbintf\client\FBClientAPI.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="304"/>
+        <CursorPos Y="320"/>
+        <UsageCount Value="12"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="..\..\..\fbintf\client\FBStatement.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="240"/>
+        <CursorPos Y="247"/>
+        <UsageCount Value="12"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="..\..\runtime\IBDatabaseInfo.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="234"/>
+        <CursorPos Y="251"/>
+        <UsageCount Value="11"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="..\..\..\fbintf\client\2.5\FB25Transaction.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="95"/>
+        <CursorPos Y="112"/>
+        <UsageCount Value="10"/>
+      </Unit15>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="2" HistoryIndex="1">
+      <Position1>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="269" Column="49" TopLine="254"/>
+      </Position1>
+      <Position2>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="269" Column="67" TopLine="254"/>
+      </Position2>
+    </JumpHistory>
   </ProjectSession>
 </CONFIG>

@@ -121,7 +121,7 @@ type
                            default DefaultComboBoxAutoCompleteText;
     property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
     {$IFDEF HasOwnerDrawEditable}
-    property OwnerDrawEditable: boolean read FOwnerDrawEditable write FOwnerDrawEditable;
+    property OwnerDrawEditable: boolean read FOwnerDrawEditable write FOwnerDrawEditable default false;
     {$ENDIF}
     property RelationName: string read FRelationName write FRelationName;
     property Style: TComboBoxStyle read FStyle write FStyle default csDropDown;

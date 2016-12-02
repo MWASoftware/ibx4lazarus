@@ -42,7 +42,6 @@ type
 
   TIBTransactionEditForm = class(TForm)
     GroupBox1: TGroupBox;
-    HelpBtn: TButton;
     Cancelbtn: TButton;
     OKBtn: TButton;
     rbOtherButton: TRadioButton;

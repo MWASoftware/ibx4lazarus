@@ -1,0 +1,406 @@
+object Form1: TForm1
+  Left = 811
+  Height = 453
+  Top = 397
+  Width = 817
+  Caption = 'IB Tables Example'
+  ClientHeight = 453
+  ClientWidth = 817
+  OnShow = FormShow
+  LCLVersion = '1.6.0.4'
+  object Panel1: TPanel
+    Left = 0
+    Height = 453
+    Top = 0
+    Width = 817
+    Align = alClient
+    ClientHeight = 453
+    ClientWidth = 817
+    TabOrder = 0
+    object Panel2: TPanel
+      Left = 1
+      Height = 451
+      Top = 1
+      Width = 170
+      Align = alLeft
+      BevelInner = bvLowered
+      ClientHeight = 451
+      ClientWidth = 170
+      TabOrder = 0
+      object IBDynamicGrid1: TIBDynamicGrid
+        Left = 2
+        Height = 447
+        Top = 2
+        Width = 166
+        Align = alClient
+        Color = clWindow
+        Columns = <        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Dept'
+            Width = 80
+            FieldName = 'DEPARTMENT'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
+        DataSource = DataSource2
+        Scrollbars = ssAutoVertical
+        TabOrder = 0
+        ExpandEditorPanelBelowRow = False
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
+      end
+    end
+    object Splitter1: TSplitter
+      Left = 171
+      Height = 451
+      Top = 1
+      Width = 5
+    end
+    object IBDynamicGrid2: TIBDynamicGrid
+      Left = 176
+      Height = 451
+      Top = 1
+      Width = 640
+      Align = alClient
+      Color = clWindow
+      Columns = <      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Last Name'
+          Width = 150
+          FieldName = 'LAST_NAME'
+          AutoSizeColumn = True
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'First Name'
+          Width = 150
+          FieldName = 'FIRST_NAME'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Emp No.'
+          Width = 80
+          FieldName = 'EMP_NO'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Hire Date'
+          Width = 120
+          FieldName = 'HIRE_DATE'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Salary'
+          Width = 100
+          FieldName = 'SALARY'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end>
+      DataSource = Datasource1
+      Scrollbars = ssAutoVertical
+      TabOrder = 2
+      ExpandEditorPanelBelowRow = False
+      Descending = False
+      EditorBorderStyle = bsSingle
+      DefaultPositionAtEnd = False
+    end
+  end
+  object IBDatabase1: TIBDatabase
+    Connected = False
+    AfterConnect = IBDatabase1AfterConnect
+    CreateIfNotExists = False
+    AllowStreamedConnected = False
+    DatabaseName = 'employee'
+    Params.Strings = (
+      'user_name=SYSDBA'
+      'lc_ctype=UTF-8'
+    )
+    DefaultTransaction = IBTransaction1
+    IdleTimer = 0
+    TraceFlags = []
+    UseDefaultSystemCodePage = False
+    left = 184
+    top = 24
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    DefaultDatabase = IBDatabase1
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait'
+    )
+    left = 232
+    top = 24
+  end
+  object Depts: TIBTable
+    AllowAutoActivateTransaction = True
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AutoCalcFields = False
+    AfterOpen = DeptsAfterOpen
+    AutoCommit = acCommitRetaining
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSetCloseAction = dcSaveChanges
+    IndexFieldNames = 'DEPT_NO'
+    ReadOnly = True
+    TableName = 'DEPARTMENT'
+    left = 314
+    top = 24
+    object DeptsDEPT_NO: TIBStringField
+      DisplayWidth = 3
+      FieldKind = fkData
+      FieldName = 'DEPT_NO'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 3
+    end
+    object DeptsDEPARTMENT: TIBStringField
+      DisplayWidth = 25
+      FieldKind = fkData
+      FieldName = 'DEPARTMENT'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 25
+    end
+    object DeptsHEAD_DEPT: TIBStringField
+      DisplayWidth = 3
+      FieldKind = fkData
+      FieldName = 'HEAD_DEPT'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 3
+    end
+    object DeptsMNGR_NO: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'MNGR_NO'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DeptsBUDGET: TIBBCDField
+      DisplayWidth = 18
+      FieldKind = fkData
+      FieldName = 'BUDGET'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Precision = 18
+      Currency = False
+      MaxValue = 0
+      MinValue = 0
+      Size = 2
+    end
+    object DeptsLOCATION: TIBStringField
+      DisplayWidth = 15
+      FieldKind = fkData
+      FieldName = 'LOCATION'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 15
+    end
+    object DeptsPHONE_NO: TIBStringField
+      DisplayWidth = 20
+      FieldKind = fkData
+      FieldName = 'PHONE_NO'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+  end
+  object DataSource2: TDataSource
+    DataSet = Depts
+    left = 272
+    top = 24
+  end
+  object Datasource1: TDataSource
+    DataSet = Employees
+    left = 368
+    top = 24
+  end
+  object Employees: TIBTable
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AutoCommit = acCommitRetaining
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSetCloseAction = dcSaveChanges
+    IndexFieldNames = 'DEPT_NO'
+    MasterFields = 'DEPT_NO'
+    MasterSource = DataSource2
+    TableName = 'EMPLOYEE'
+    left = 416
+    top = 24
+    object EmployeesEMP_NO: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'EMP_NO'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object EmployeesFIRST_NAME: TIBStringField
+      DisplayWidth = 15
+      FieldKind = fkData
+      FieldName = 'FIRST_NAME'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 15
+    end
+    object EmployeesLAST_NAME: TIBStringField
+      DisplayWidth = 20
+      FieldKind = fkData
+      FieldName = 'LAST_NAME'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object EmployeesPHONE_EXT: TIBStringField
+      DisplayWidth = 4
+      FieldKind = fkData
+      FieldName = 'PHONE_EXT'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 4
+    end
+    object EmployeesHIRE_DATE: TDateTimeField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'HIRE_DATE'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object EmployeesDEPT_NO: TIBStringField
+      DisplayWidth = 3
+      FieldKind = fkData
+      FieldName = 'DEPT_NO'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 3
+    end
+    object EmployeesJOB_CODE: TIBStringField
+      DisplayWidth = 5
+      FieldKind = fkData
+      FieldName = 'JOB_CODE'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 5
+    end
+    object EmployeesJOB_GRADE: TSmallintField
+      DisplayWidth = 10
+      FieldKind = fkData
+      FieldName = 'JOB_GRADE'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object EmployeesJOB_COUNTRY: TIBStringField
+      DisplayWidth = 15
+      FieldKind = fkData
+      FieldName = 'JOB_COUNTRY'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 15
+    end
+    object EmployeesSALARY: TIBBCDField
+      DisplayWidth = 18
+      FieldKind = fkData
+      FieldName = 'SALARY'
+      Index = 9
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      OnGetText = EmployeesSALARYGetText
+      Precision = 18
+      Currency = False
+      MaxValue = 0
+      MinValue = 0
+      Size = 2
+    end
+    object EmployeesFULL_NAME: TIBStringField
+      DisplayWidth = 37
+      FieldKind = fkData
+      FieldName = 'FULL_NAME'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = True
+      Required = False
+      Size = 37
+    end
+  end
+end

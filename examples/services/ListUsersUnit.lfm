@@ -1,0 +1,120 @@
+object ListUsersForm: TListUsersForm
+  Left = 452
+  Height = 404
+  Top = 200
+  Width = 861
+  Caption = 'Display Users'
+  ClientHeight = 404
+  ClientWidth = 861
+  OnShow = FormShow
+  LCLVersion = '1.6.0.4'
+  object Label1: TLabel
+    Left = 8
+    Height = 15
+    Top = 14
+    Width = 100
+    Caption = 'Registered Users'
+    ParentColor = False
+  end
+  object StringGrid1: TStringGrid
+    Left = 8
+    Height = 336
+    Top = 32
+    Width = 824
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoFillColumns = True
+    ColCount = 6
+    Columns = <    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'User ID'
+        Width = 137
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Group ID'
+        Width = 137
+      end    
+      item
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'User Name'
+        Width = 137
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'First Name'
+        Width = 137
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Middle Name'
+        Width = 137
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Last Name'
+        Width = 137
+      end>
+    DefaultColWidth = 120
+    FixedCols = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected, goEditing, goSmoothScroll]
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+    OnEditingDone = StringGrid1EditingDone
+    ColWidths = (
+      137
+      137
+      137
+      137
+      137
+      137
+    )
+    Cells = (
+      1
+      0
+      0
+      'User ID'
+    )
+  end
+  object Button1: TButton
+    Left = 757
+    Height = 25
+    Top = 373
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Delete'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 8
+    Height = 25
+    Top = 373
+    Width = 75
+    Anchors = [akLeft, akBottom]
+    Caption = 'Add'
+    OnClick = Button2Click
+    TabOrder = 2
+  end
+  object Button3: TButton
+    Left = 88
+    Height = 25
+    Top = 373
+    Width = 120
+    Anchors = [akLeft, akBottom]
+    Caption = 'Change Password'
+    OnClick = Button3Click
+    TabOrder = 3
+  end
+  object IBSecurityService1: TIBSecurityService
+    ServerName = 'localhost'
+    Protocol = TCP
+    TraceFlags = []
+    SecurityAction = ActionAddUser
+    UserID = 0
+    GroupID = 0
+    left = 768
+    top = 288
+  end
+end

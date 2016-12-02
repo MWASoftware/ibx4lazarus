@@ -19,6 +19,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="88"/>
         <CursorPos X="31" Y="100"/>
         <UsageCount Value="68"/>
@@ -303,10 +304,9 @@
       </Unit39>
       <Unit40>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="130"/>
-        <CursorPos X="41" Y="145"/>
+        <CursorPos X="22" Y="134"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
