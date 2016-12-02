@@ -24,7 +24,7 @@
  *
 *)
 
-{$DEFINE HasOwnerDrawEditable}
+{ $DEFINE HasOwnerDrawEditable}
 
 unit IBDynamicGrid;
 
