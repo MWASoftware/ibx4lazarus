@@ -304,26 +304,24 @@
       </Unit39>
       <Unit40>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="130"/>
-        <CursorPos X="22" Y="134"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="44"/>
+        <CursorPos X="124" Y="68"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="44"/>
-          <CursorPos X="124" Y="68"/>
+          <TopLine Value="130"/>
+          <CursorPos X="22" Y="134"/>
         </ExtraEditor1>
         <UsageCount Value="16"/>
-        <Loaded Value="True"/>
       </Unit40>
       <Unit41>
         <Filename Value="../../../../../lcl/grids.pas"/>
         <UnitName Value="Grids"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="6612"/>
         <CursorPos X="3" Y="6616"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit41>
       <Unit42>
         <Filename Value="../../../runtime/IBTable.pas"/>
@@ -354,39 +352,35 @@
       </Unit45>
       <Unit46>
         <Filename Value="../../../runtime/IBDatabase.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="976"/>
         <CursorPos X="30" Y="993"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit46>
       <Unit47>
         <Filename Value="../../../../fbintf/client/FBClientAPI.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="403"/>
         <CursorPos Y="418"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit47>
       <Unit48>
         <Filename Value="../../../../fbintf/IBErrorCodes.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="694"/>
         <CursorPos X="22" Y="710"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit48>
       <Unit49>
         <Filename Value="../../../../../lcl/dbctrls.pp"/>
         <UnitName Value="DbCtrls"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="76"/>
         <CursorPos X="26" Y="93"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit49>
     </Units>
-    <JumpHistory Count="23" HistoryIndex="22">
+    <JumpHistory Count="4" HistoryIndex="3">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="48" Column="51" TopLine="31"/>
@@ -403,82 +397,6 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="100" Column="31" TopLine="88"/>
       </Position4>
-      <Position5>
-        <Filename Value="../../../runtime/IBDatabase.pas"/>
-        <Caret Line="991" TopLine="979"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../../runtime/IBDatabase.pas"/>
-        <Caret Line="993" TopLine="979"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../../runtime/IBDatabase.pas"/>
-        <Caret Line="1005" TopLine="993"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../../../fbintf/client/FBClientAPI.pas"/>
-        <Caret Line="412" TopLine="403"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../../runtime/IBDatabase.pas"/>
-        <Caret Line="991" TopLine="979"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../../../fbintf/client/FBClientAPI.pas"/>
-        <Caret Line="418" TopLine="403"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../../../fbintf/client/FBClientAPI.pas"/>
-        <Caret Line="419" TopLine="403"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../../../fbintf/client/FBClientAPI.pas"/>
-        <Caret Line="418" TopLine="403"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../../../../fbintf/client/FBClientAPI.pas"/>
-        <Caret Line="419" TopLine="403"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../../../../fbintf/client/FBClientAPI.pas"/>
-        <Caret Line="418" TopLine="403"/>
-      </Position14>
-      <Position15>
-        <Filename Value="../../../../fbintf/client/FBClientAPI.pas"/>
-        <Caret Line="412" TopLine="403"/>
-      </Position15>
-      <Position16>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="368" Column="68" TopLine="355"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="151" Column="20" TopLine="142"/>
-      </Position17>
-      <Position18>
-        <Filename Value="../../../../../lcl/grids.pas"/>
-        <Caret Line="7749" Column="13" TopLine="7736"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="112" Column="22" TopLine="101"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="145" Column="50" TopLine="121"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="715" Column="45" TopLine="708"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="145" Column="25" TopLine="133"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="715" Column="34" TopLine="701"/>
-      </Position23>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

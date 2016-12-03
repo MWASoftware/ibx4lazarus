@@ -278,23 +278,27 @@ var
   qryArray : TIBSQL;
 begin
   qryArray := TIBSQL.Create(FDatabase);
-  Result := '[';
+  Result := '';
   qryArray.SQL.Add(ArraySQL);
   qryArray.Params.ByName('FieldName').AsString := FieldName;
   qryArray.ExecQuery;
 
     {  Format is [lower:upper, lower:upper,..]  }
 
-  while not qryArray.Eof do
+  if not qryArray.Eof then
   begin
-    if (qryArray.FieldByName('RDB$DIMENSION').AsInteger > 0) then
-      Result := Result + ', ';
-    Result := Result + qryArray.FieldByName('RDB$LOWER_BOUND').AsString + ':' +
-           qryArray.FieldByName('RDB$UPPER_BOUND').AsString;
-    qryArray.Next;
+    Result := '[';
+    while not qryArray.Eof do
+    begin
+      if (qryArray.FieldByName('RDB$DIMENSION').AsInteger > 0) then
+        Result := Result + ', ';
+      Result := Result + qryArray.FieldByName('RDB$LOWER_BOUND').AsString + ':' +
+             qryArray.FieldByName('RDB$UPPER_BOUND').AsString;
+      qryArray.Next;
+    end;
+    Result := Result + '] ';
   end;
 
-  Result := Result + '] ';
   qryArray.Free;
   
 end;
@@ -334,6 +338,7 @@ begin
   end;
 
   FMetaData.Add(Format('SET SQL DIALECT %d;', [FDatabase.SQLDialect]));
+  FMetaData.Add('SET AUTODDL ON;');
   FMetaData.Add('');
 
   if not FTransaction.Active then
@@ -564,8 +569,8 @@ begin
 
           { Catch arrays after printing the type  }
 
-          if not qryTables.FieldByName('RDB$DIMENSIONS').IsNull then
-            Column := column + GetArrayField(qryTables.FieldByName('RDB$FIELD_NAME').AsString);
+          if not qryTables.FieldByName('RDB$DIMENSIONS').IsNull and (qryTables.FieldByName('RDB$DIMENSIONS').AsInteger > 0) then
+            Column := column + GetArrayField(qryTables.FieldByName('RDB$FIELD_SOURCE').AsString);
 
           if FieldType = blr_blob then
           begin
@@ -780,6 +785,7 @@ var
   CharSetSQL : TIBSQL;
   DidActivate : Boolean;
 begin
+  Result := '';
   if not FTransaction.Active then
   begin
     FTransaction.StartTransaction;
@@ -1383,7 +1389,7 @@ begin
       Buffer := Format(' DEFAULT CHARACTER SET %s',
         [qryDB.FieldByName('RDB$CHARACTER_SET_NAME').AsString]);
     if NoDB then
-      Buffer := Buffer + ' */'
+      Buffer := Buffer + Term + ' */'
     else
       Buffer := Buffer + Term;
     FMetaData.Add(Buffer);
@@ -1655,7 +1661,7 @@ var
       Result := Result + GetCharacterSets(qryDomains.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
          0, FALSE);
     if not qryDomains.FieldByName('RDB$DIMENSIONS').IsNull then
-      Result := GetArrayField(FieldName);
+      Result := GetArrayField(qryDomains.FieldByName('RDB$FIELD_SOURCE').AsString);
 
     if not qryDomains.FieldByName('RDB$DEFAULT_SOURCE').IsNull then
       Result := Result + Format('%s%s %s', [NEWLINE, TAB,
@@ -1982,7 +1988,7 @@ end;
 procedure TIBExtract.ListFunctions(FunctionName : String = '');
 const
   FunctionSQL =
-    'SELECT * FROM RDB$FUNCTIONS ' +
+    'SELECT * FROM RDB$FUNCTIONS WHERE RDB$SYSTEM_FLAG = 0 ' +
     'ORDER BY RDB$FUNCTION_NAME';
 
   FunctionNameSQL =
@@ -2699,6 +2705,7 @@ var
   var
     i : Integer;
   begin
+    Result := '';
     for i := Low(PrivTypes) to High(PrivTypes) do
     begin
       if (cflags and PrivTypes[i].PrivFlag) <> 0 then
@@ -3178,7 +3185,7 @@ end;
 procedure TIBExtract.ListRoles(ObjectName: String);
 const
   RolesSQL =
-    'select * from RDB$ROLES ' +
+    'select * from RDB$ROLES WHERE RDB$SYSTEM_FLAG = 0 ' +
     'order by RDB$ROLE_NAME';
 
   RolesByNameSQL =

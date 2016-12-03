@@ -202,11 +202,10 @@
       </Unit27>
       <Unit28>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="275"/>
         <CursorPos Y="289"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit28>
     </Units>
     <OtherDefines Count="2">
