@@ -319,7 +319,7 @@ end;
 
 implementation
 
-uses Math, IBQuery, LCLType, Variants, EditBtn, MaskEdit;
+uses LCLType, Variants, EditBtn;
 
 { TIBGridControlLink }
 
@@ -579,11 +579,11 @@ begin
                          and (Key in [VK_RETURN,VK_UP,VK_DOWN]) then Exit; {Ignore Return in a CustomMemo}
 
     if (AControl <> nil) and (AControl is TCustomGrid)
-                         and (Key in [VK_RETURN,VK_UP,VK_DOWN,VK_TAB]) then Exit; {Ignore Return in a CustomMemo}
+                         and (Key in [VK_RETURN,VK_UP,VK_DOWN,VK_TAB]) then Exit; {Ignore Return in a Custom Grid}
 
-    if (AControl <> nil) and ((AControl is TDateEdit) or (AControl is TCustomMaskedit))
+    if (AControl <> nil) and ((AControl is TDateEdit) or (AControl is TEBEdit))
                          and (Key in [VK_RETURN,VK_UP,VK_DOWN,
-                               VK_ESCAPE,VK_LEFT,VK_RIGHT]) then Exit; {Ignore Return in a CustomMemo}
+                               VK_ESCAPE,VK_LEFT,VK_RIGHT]) then Exit; {Ignore Return in a Data edit}
 
     if assigned(FOnKeyDownHander) then
       OnKeyDownHander(Sender,Key,Shift,Done);
