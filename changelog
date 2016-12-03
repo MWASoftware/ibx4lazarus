@@ -39,6 +39,8 @@ upgrading to IBX2.
 8.  DBControlGrid & IBDynamicGrid: Navigation keys should now work correctly with
     a TDateEdit control located on an editor panel.
 
+9.  TIBExtract: brought up-to-date plus many bug fixes.
+
 IBX Change Log  version                                           (1.4-3) Thu, 22 Sep 2016 18:10:15 +0100
 
 1. IBCustomDataset: When calling SetCodePage, no longer request transliteration

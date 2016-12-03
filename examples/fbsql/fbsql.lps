@@ -4,13 +4,13 @@
     <PathDelim Value="\"/>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="16">
+    <Units Count="17">
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <TopLine Value="254"/>
         <CursorPos X="30" Y="269"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="31"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -18,16 +18,16 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="31"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit1>
       <Unit2>
         <Filename Value="..\..\runtime\IBExtract.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2527"/>
-        <CursorPos Y="2548"/>
-        <UsageCount Value="14"/>
+        <TopLine Value="2697"/>
+        <CursorPos X="18" Y="2708"/>
+        <UsageCount Value="15"/>
       </Unit2>
       <Unit3>
         <Filename Value="..\..\..\fbintf\IB.pas"/>
@@ -67,9 +67,9 @@
       <Unit8>
         <Filename Value="..\..\runtime\IBSQL.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="710"/>
-        <CursorPos Y="720"/>
-        <UsageCount Value="13"/>
+        <TopLine Value="712"/>
+        <CursorPos Y="737"/>
+        <UsageCount Value="14"/>
       </Unit8>
       <Unit9>
         <Filename Value="..\..\..\fbintf\client\3.0\FB30Statement.pas"/>
@@ -120,16 +120,22 @@
         <CursorPos Y="112"/>
         <UsageCount Value="10"/>
       </Unit15>
+      <Unit16>
+        <Filename Value="..\..\changelog"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="22"/>
+        <CursorPos X="56" Y="42"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit16>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
-      <Position1>
-        <Filename Value="fbsql.lpr"/>
-        <Caret Line="269" Column="49" TopLine="254"/>
-      </Position1>
-      <Position2>
-        <Filename Value="fbsql.lpr"/>
-        <Caret Line="269" Column="67" TopLine="254"/>
-      </Position2>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectSession>
+  <Debugging>
+    <Watches Count="1">
+      <Item1>
+        <Expression Value="Column"/>
+      </Item1>
+    </Watches>
+  </Debugging>
 </CONFIG>
