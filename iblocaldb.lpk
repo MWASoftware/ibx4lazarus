@@ -3,6 +3,7 @@
   <Package Version="4">
     <Name Value="iblocaldb"/>
     <Type Value="RunAndDesignTime"/>
+    <Author Value="MWA Software"/>
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
@@ -10,6 +11,32 @@
         <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
+    <Description Value="This package provides additional support for Personal Databases."/>
+    <License Value=" *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the &quot;License&quot;); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&amp;id=idpl
+ *
+ *  Software distributed under the License is distributed on an &quot;AS
+ *  IS&quot; basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2014 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+"/>
+    <Version Major="1"/>
     <Files Count="7">
       <Item1>
         <Filename Value="iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
