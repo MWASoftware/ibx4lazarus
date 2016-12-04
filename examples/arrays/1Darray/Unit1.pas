@@ -57,6 +57,7 @@ type
     IBDataSet1MYARRAY: TIBArrayField;
     IBDataSet1ROWID: TIntegerField;
     IBDataSet1TITLE: TIBStringField;
+    Panel2: TPanel;
     SaveBtn: TButton;
     CancelBtn: TButton;
     DataSource1: TDataSource;
