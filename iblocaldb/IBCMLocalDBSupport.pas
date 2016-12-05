@@ -177,7 +177,8 @@ begin
     IBXScript.GetParamValue := @HandleGetParamValue;
     DoUpgrade(IBXScript, TargetVersionNo);
   finally
-    Free
+    IBXScript.Free;
+    IBTransaction.Free;
   end;
 
 end;
