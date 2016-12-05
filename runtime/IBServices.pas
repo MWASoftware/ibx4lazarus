@@ -1161,8 +1161,11 @@ begin
   if SRB = nil then
     IBError(ibxeStartParamsError, [nil]);
 
-  FService.Start(SRB);
-  FSRB := nil;
+  try
+    FService.Start(SRB);
+  finally
+    FSRB := nil;
+  end;
   MonitorHook.ServiceStart(Self);
 end;
 
