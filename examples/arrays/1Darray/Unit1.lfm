@@ -68,7 +68,7 @@ object Form1: TForm1
         Top = 30
         Width = 496
         BevelOuter = bvNone
-        Caption = 'See http://bugs.freepascal.org/view.php?id=30892'
+        Caption = 'If you can see this, goto http://bugs.freepascal.org/view.php?id=30892'
         ClientHeight = 44
         ClientWidth = 496
         TabOrder = 1
@@ -105,7 +105,7 @@ object Form1: TForm1
           ScrollBars = ssNone
           TabOrder = 0
           ColCount = 12
-          RowCount = 15
+          RowCount = 16
           ColWidths = (
             41
             41
