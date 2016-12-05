@@ -309,6 +309,7 @@ begin
   FExtract.Database := FIBDatabase;
   FExtract.Transaction := FIBTransaction;
   FQuery := TIBQuery.Create(self);
+  FQuery.AllowAutoActivateTransaction := true;
   FQuery.Database := FIBDatabase;
   FQuery.Transaction := FIBTransaction;
 

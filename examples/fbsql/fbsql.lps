@@ -8,16 +8,17 @@
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="254"/>
-        <CursorPos X="30" Y="269"/>
-        <UsageCount Value="36"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="288"/>
+        <CursorPos X="47" Y="312"/>
+        <UsageCount Value="38"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="readme.txt"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <UsageCount Value="36"/>
+        <UsageCount Value="38"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit1>
@@ -26,16 +27,15 @@
         <EditorIndex Value="2"/>
         <TopLine Value="1146"/>
         <CursorPos X="3" Y="1175"/>
-        <UsageCount Value="17"/>
+        <UsageCount Value="18"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="..\..\..\fbintf\IB.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="799"/>
         <CursorPos X="14" Y="813"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="14"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -131,7 +131,7 @@
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
     </Units>
-    <JumpHistory Count="6" HistoryIndex="5">
+    <JumpHistory Count="12" HistoryIndex="11">
       <Position1>
         <Filename Value="..\..\runtime\IBExtract.pas"/>
         <Caret Line="947" Column="9" TopLine="932"/>
@@ -156,6 +156,30 @@
         <Filename Value="..\..\..\fbintf\IB.pas"/>
         <Caret Line="1129" Column="144" TopLine="1107"/>
       </Position6>
+      <Position7>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="57" Column="9" TopLine="49"/>
+      </Position7>
+      <Position8>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="86" Column="9" TopLine="61"/>
+      </Position8>
+      <Position9>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="87" Column="9" TopLine="62"/>
+      </Position9>
+      <Position10>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="91" Column="11" TopLine="66"/>
+      </Position10>
+      <Position11>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="126" Column="16" TopLine="102"/>
+      </Position11>
+      <Position12>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="163" Column="14" TopLine="139"/>
+      </Position12>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
