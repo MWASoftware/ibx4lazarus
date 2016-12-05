@@ -70,6 +70,7 @@ var i, rowno: integer;
 begin
   with TIBQuery.Create(self) do
   try
+     AllowAutoActivateTransaction := true;
      Database := FIBDatabase;
      SQL.Text := sqlExample;
      Active := true;

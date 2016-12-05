@@ -66,6 +66,7 @@ begin
   with TIBQuery.Create(self) do
   try
      Database := FIBDatabase;
+     AllowAutoActivateTransaction := true;
      SQL.Text := sqlExample;
      Active := true;
      rowno := 1;
@@ -90,8 +91,7 @@ procedure TMyApplication.HandleGetDBVersionNo(Sender: TObject;
   var VersionNo: integer);
 begin
   VersionNo := 0;
-  with FIBTransaction do
-    if not InTransaction then StartTransaction;
+  FIBTransaction.Active := true;
   try
     with TIBSQL.Create(nil) do
     try
