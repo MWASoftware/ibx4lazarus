@@ -365,6 +365,7 @@ begin
     for i := StartIndex to Length(FList) - 1 do
     begin
       FList[i].FState := rcEmpty;
+      FList[i].FBitmap := nil;
       FList[i].FAlternateColor := altColor;
       if UseAlternateColors then
         altColor := not altColor;
@@ -421,6 +422,8 @@ begin
   Dec(RecNo); {Adust to zero base}
   ExtendCache(RecNo + 1);
   FList[RecNo].FState := rcPresent;
+  if FList[RecNo].FBitmap <> nil then
+    FList[RecNo].FBitmap.Free;
   FList[RecNo].FBitmap := Render(Control);
   Result := FList[RecNo].FBitmap;
 end;
@@ -477,6 +480,7 @@ begin
   if FList[RecNo].FState = rcPresent then
   begin
     FList[RecNo].FBitmap.Free;
+    FList[RecNo].FBitmap := nil;
     FList[RecNo].FState := rcEmpty;
   end;
 end;
@@ -1723,3 +1727,4 @@ begin
 end;
 
 end.
+
