@@ -680,6 +680,7 @@ begin
       Detach;
   FSRB := nil;
   FSPB := nil;
+  FParams.Free;
   FServiceQueryResults := nil;
   inherited Destroy;
 end;
