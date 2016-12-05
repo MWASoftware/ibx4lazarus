@@ -2652,7 +2652,7 @@ end;
      It must extract granted privileges on tables/views to users,
      - these may be compound, so put them on the same line.
    Grant execute privilege on procedures to users
-   Grant various privilegs to procedures.
+   Grant various privileges to procedures.
    All privileges may have the with_grant option set. }
 
 procedure TIBExtract.ShowGrants(MetaObject: String; Terminator: String);
