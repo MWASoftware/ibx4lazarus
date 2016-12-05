@@ -10,24 +10,25 @@
         <IsPartOfProject Value="True"/>
         <TopLine Value="254"/>
         <CursorPos X="30" Y="269"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="33"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="readme.txt"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="33"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit1>
       <Unit2>
         <Filename Value="..\..\runtime\IBExtract.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2697"/>
-        <CursorPos X="18" Y="2708"/>
-        <UsageCount Value="15"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1130"/>
+        <CursorPos X="3" Y="1175"/>
+        <UsageCount Value="16"/>
+        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="..\..\..\fbintf\IB.pas"/>
@@ -129,7 +130,28 @@
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="5" HistoryIndex="4">
+      <Position1>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <Caret Line="947" Column="9" TopLine="932"/>
+      </Position1>
+      <Position2>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <Caret Line="963" Column="17" TopLine="952"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <Caret Line="2658" Column="29" TopLine="2643"/>
+      </Position3>
+      <Position4>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <Caret Line="116" Column="25" TopLine="99"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <Caret Line="2544" Column="17" TopLine="2519"/>
+      </Position5>
+    </JumpHistory>
   </ProjectSession>
   <Debugging>
     <Watches Count="1">

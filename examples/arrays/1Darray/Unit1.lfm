@@ -62,54 +62,65 @@ object Form1: TForm1
         Caption = 'Sales Value'
         ParentColor = False
       end
-      object IBArrayGrid1: TIBArrayGrid
-        Left = 296
-        Height = 46
-        Top = 32
-        Width = 512
-        DataField = 'MYARRAY'
-        DataSource = DataSource1
-        ColumnLabels.Strings = (
-          'Jan'
-          'Feb'
-          'Mar'
-          'Apr'
-          'May'
-          'Jun'
-          'Jul'
-          'Aug'
-          'Sep'
-          'Oct'
-          'Nov'
-          'Dec'
-        )
-        ColumnLabelFont.Height = -13
-        ColumnLabelFont.Name = 'Sans'
-        ColumnLabelFont.Style = [fsBold]
-        RowLabelColumnWidth = 64
-        TextAlignment = taRightJustify
-        Anchors = [akTop, akLeft, akRight, akBottom]
-        AutoFillColumns = True
-        FixedColor = clHighlightText
-        Options = [goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
-        ScrollBars = ssNone
+      object Panel2: TPanel
+        Left = 297
+        Height = 44
+        Top = 30
+        Width = 496
+        BevelOuter = bvNone
+        Caption = 'See http://bugs.freepascal.org/view.php?id=30892'
+        ClientHeight = 44
+        ClientWidth = 496
         TabOrder = 1
-        ColCount = 12
-        RowCount = 12
-        ColWidths = (
-          42
-          42
-          42
-          42
-          42
-          42
-          42
-          42
-          42
-          42
-          42
-          48
-        )
+        object IBArrayGrid1: TIBArrayGrid
+          Left = 0
+          Height = 44
+          Top = 0
+          Width = 496
+          DataField = 'MYARRAY'
+          DataSource = DataSource1
+          ColumnLabels.Strings = (
+            'Jan'
+            'Feb'
+            'Mar'
+            'Apr'
+            'May'
+            'Jun'
+            'Jul'
+            'Aug'
+            'Sep'
+            'Oct'
+            'Nov'
+            'Dec'
+          )
+          ColumnLabelFont.Height = -13
+          ColumnLabelFont.Name = 'Sans'
+          ColumnLabelFont.Style = [fsBold]
+          RowLabelColumnWidth = 64
+          TextAlignment = taRightJustify
+          Align = alClient
+          AutoFillColumns = True
+          FixedColor = clHighlightText
+          Options = [goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+          ScrollBars = ssNone
+          TabOrder = 0
+          ColCount = 12
+          RowCount = 15
+          ColWidths = (
+            41
+            41
+            41
+            41
+            41
+            41
+            41
+            41
+            41
+            41
+            41
+            43
+          )
+        end
       end
     end
   end
