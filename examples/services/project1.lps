@@ -17,9 +17,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="21"/>
-        <CursorPos X="91" Y="28"/>
+        <TopLine Value="33"/>
+        <CursorPos X="53" Y="60"/>
         <UsageCount Value="91"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -68,10 +67,12 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../runtime/IBServices.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1735"/>
-        <CursorPos Y="1760"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="656"/>
+        <CursorPos X="16" Y="683"/>
         <UsageCount Value="33"/>
+        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="../../runtime/IB.pas"/>
@@ -199,10 +200,11 @@
       </Unit22>
       <Unit23>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="855"/>
-        <CursorPos X="3" Y="840"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1797"/>
+        <CursorPos X="16" Y="1811"/>
         <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit23>
       <Unit24>
         <Filename Value="../../runtime/IBSQL.pas"/>
@@ -329,7 +331,7 @@
         <UsageCount Value="10"/>
       </Unit40>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="10" HistoryIndex="9">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="67" Column="34" TopLine="55"/>
@@ -338,6 +340,38 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="196" Column="34" TopLine="186"/>
       </Position2>
+      <Position3>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="1749" Column="65" TopLine="1735"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="1153" TopLine="1138"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="1497" Column="32" TopLine="1489"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="616" Column="12" TopLine="597"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="150" Column="17" TopLine="146"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="151" Column="16" TopLine="137"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="941" Column="16" TopLine="934"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="684" Column="18" TopLine="677"/>
+      </Position10>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
