@@ -51,8 +51,17 @@
       <OtherUnitFiles Value="../../runtime"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
+    <Linking>
+      <Debugging>
+        <UseHeaptrc Value="True"/>
+      </Debugging>
+    </Linking>
     <Other>
       <CustomOptions Value="-dUseCThreads"/>
+      <OtherDefines Count="2">
+        <Define0 Value="UseCThreads"/>
+        <Define1 Value="IBX_CONSOLE_MODE"/>
+      </OtherDefines>
     </Other>
   </CompilerOptions>
   <Debugging>
