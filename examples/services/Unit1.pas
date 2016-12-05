@@ -129,6 +129,8 @@ begin
   begin
     IBRestoreService1.ServiceIntf := IBServerProperties1.ServiceIntf;
     IBRestoreService1.Active := true;
+    if IBRestoreService1.IsServiceRunning then
+      Exception.Create('A Service is still running');
     IBRestoreService1.ServiceStart;
     Memo1.Lines.Add('Restore Started');
     try

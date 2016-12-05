@@ -251,6 +251,7 @@ type
   private
     function GetIsServiceRunning: Boolean;
   protected
+    procedure CheckServiceNotRunning;
     procedure InternalServiceStart;
     procedure SetServiceStartOptions; virtual;
 
@@ -1147,7 +1148,11 @@ begin
               (FServiceQueryResults[0].AsInteger = 1);
 end;
 
-
+procedure TIBControlService.CheckServiceNotRunning;
+begin
+  if IsServiceRunning then
+    IBError(ibxeServiceRunning,[nil]);
+end;
 
 constructor TIBControlService.Create(AOwner: TComponent);
 begin
@@ -1172,6 +1177,7 @@ end;
 procedure TIBControlService.ServiceStart;
 begin
   CheckActive;
+  CheckServiceNotRunning;
   SetServiceStartOptions;
   InternalServiceStart;
 end;
@@ -1483,6 +1489,7 @@ begin
       isc_info_svc_stdin:
         FSendBytes := AsInteger;
 
+      isc_info_svc_timeout,
       isc_info_data_not_ready:
         {ignore};
     else
