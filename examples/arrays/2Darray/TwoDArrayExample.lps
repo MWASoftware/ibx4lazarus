@@ -5,7 +5,7 @@
     <BuildModes Active="Default"/>
     <Units Count="50">
       <Unit0>
-        <Filename Value="project1.lpr"/>
+        <Filename Value="TwoDArrayExample.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="-1"/>
