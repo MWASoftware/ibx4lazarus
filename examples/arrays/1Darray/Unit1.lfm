@@ -105,7 +105,7 @@ object Form1: TForm1
           ScrollBars = ssNone
           TabOrder = 0
           ColCount = 12
-          RowCount = 16
+          RowCount = 17
           ColWidths = (
             41
             41

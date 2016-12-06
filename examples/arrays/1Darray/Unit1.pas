@@ -168,7 +168,8 @@ end;
 
 procedure TForm1.IBTransaction1AfterTransactionEnd(Sender: TObject);
 begin
-  Application.QueueAsyncCall(@ReOpen,0);
+  if not (csDestroying in ComponentState) then
+    Application.QueueAsyncCall(@ReOpen,0);
 end;
 
 procedure TForm1.SaveBtnClick(Sender: TObject);
