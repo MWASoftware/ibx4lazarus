@@ -5,7 +5,7 @@
     <General>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
-      <Title Value="Arrays"/>
+      <Title Value="OneDArrayExample"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <Icon Value="0"/>
@@ -29,13 +29,13 @@
     </RunParams>
     <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="ibcontrols"/>
+        <PackageName Value="FCL"/>
       </Item1>
       <Item2>
-        <PackageName Value="FCL"/>
+        <PackageName Value="ibexpress"/>
       </Item2>
       <Item3>
-        <PackageName Value="ibexpress"/>
+        <PackageName Value="ibcontrols"/>
       </Item3>
       <Item4>
         <PackageName Value="LCL"/>
@@ -43,7 +43,7 @@
     </RequiredPackages>
     <Units Count="2">
       <Unit0>
-        <Filename Value="project1.lpr"/>
+        <Filename Value="OneDArrayExample.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
@@ -58,16 +58,13 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="project1"/>
+      <Filename Value="OneDArrayExample"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
-      <Debugging>
-        <UseHeaptrc Value="True"/>
-      </Debugging>
       <Options>
         <Win32>
           <GraphicApplication Value="True"/>

@@ -130,7 +130,7 @@ object LimboTransactionsForm: TLimboTransactionsForm
     Protocol = TCP
     TraceFlags = []
     DatabaseName = 'employee'
-    Options = []
+    Options = [LimboTransactions]
     GlobalAction = CommitGlobal
     left = 726
     top = 302

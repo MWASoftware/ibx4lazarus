@@ -8,8 +8,7 @@
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="288"/>
+        <TopLine Value="325"/>
         <CursorPos X="47" Y="312"/>
         <UsageCount Value="38"/>
         <Loaded Value="True"/>
@@ -17,6 +16,7 @@
       <Unit1>
         <Filename Value="readme.txt"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <UsageCount Value="38"/>
         <Loaded Value="True"/>

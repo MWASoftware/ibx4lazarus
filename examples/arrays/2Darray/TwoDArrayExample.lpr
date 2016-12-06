@@ -1,4 +1,4 @@
-program project1;
+program TwoDArrayExample;
 
 {$mode objfpc}{$H+}
 
@@ -13,6 +13,7 @@ uses
 {$R *.res}
 
 begin
+  Application.Title := 'Arrays';
   RequireDerivedFormResource := True;
   Application.Initialize;
   Application.CreateForm(TForm1, Form1);

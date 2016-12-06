@@ -1,4 +1,4 @@
-program project1;
+program LocalDBExample;
 
 {$mode objfpc}{$H+}
 
@@ -7,16 +7,14 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Unit1, ibexpress
-  { you can add units after this };
+  Forms, Unit1, Unit2, ibexpress;
 
 {$R *.res}
 
 begin
-  Application.Title := 'Arrays';
-  RequireDerivedFormResource := True;
   Application.Initialize;
   Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TSelectDeptDlg, SelectDeptDlg);
   Application.Run;
 end.
 
