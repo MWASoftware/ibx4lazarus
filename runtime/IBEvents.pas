@@ -74,6 +74,7 @@ type
     FOnEventAlert: TEventAlert;
     FRegistered: boolean;
     FDeferredRegister: boolean;
+    FStartEvent: boolean;
     procedure EventHandler(Sender: IEvents);
     procedure ProcessEvents;
     procedure EventChange(sender: TObject);
@@ -123,6 +124,7 @@ begin
   FBase.BeforeDatabaseDisconnect := @DoBeforeDatabaseDisconnect;
   FBase.AfterDatabaseConnect := @DoAfterDatabaseConnect;
   FEvents := TStringList.Create;
+  FStartEvent := true;
   with TStringList( FEvents) do
   begin
     OnChange := @EventChange;
@@ -150,7 +152,11 @@ var EventCounts: TEventCounts;
     i: integer;
 begin
   if (csDestroying in ComponentState) or (FEventIntf = nil) then Exit;
+  CancelAlerts := false;
   EventCounts := FEventIntf.ExtractEventCounts;
+  if FStartEvent then
+    FStartEvent := false {ignore the first one}
+  else
   if assigned(FOnEventAlert) then
   begin
     CancelAlerts := false;
