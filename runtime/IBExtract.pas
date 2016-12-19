@@ -2712,7 +2712,11 @@ const
   'When 2 then ''TRIGGER'' '+
   'When 8 then ''USER'' '+
   'When 13 then ''ROLE'' '+
-  'ELSE NULL END as USER_TYPE_NAME '+
+  'ELSE NULL END as USER_TYPE_NAME, '+
+  'case '+
+  'When coalesce(RDB$GRANT_OPTION,0) <> 0 and RDB$USER_TYPE = 13 then '' WITH ADMIN OPTION'' '+
+  'When coalesce(RDB$GRANT_OPTION,0) <> 0 and RDB$USER_TYPE <> 13 then '' WITH GRANT OPTION'' '+
+  'ELSE '''' End as GRANTOPTION '+
   'From (  '+
   'Select PR.RDB$USER,PR.RDB$RELATION_NAME as METAOBJECTNAME, LIST(DISTINCT Trim(Case PR.RDB$PRIVILEGE  '+
   'When ''X'' then ''EXECUTE''  '+
@@ -2738,8 +2742,7 @@ const
   'Group By RDB$USER,RDB$GRANT_OPTION,  RDB$USER_TYPE, RDB$OBJECT_TYPE,METAOBJECTNAME '+
   'ORDER BY RDB$USER';
 
-var WithOption: string;
-    qryOwnerPriv : TIBSQL;
+var qryOwnerPriv : TIBSQL;
 
 begin
   if MetaObject = '' then
@@ -2752,23 +2755,14 @@ begin
     qryOwnerPriv.ExecQuery;
     while not qryOwnerPriv.Eof do
     begin
-      if qryOwnerPriv.FieldByName('RDB$GRANT_OPTION').AsInteger <> 0 then
-      begin
-        if qryOwnerPriv.FieldByName('RDB$USER_TYPE').AsInteger = 13 then
-          WithOption := ' WITH ADMIN OPTION'
-        else
-          WithOption := ' WITH GRANT OPTION'
-      end
-      else
-        WithOption := '';
-
-      FMetaData.Add(Format('GRANT %s ON %s "%s" TO %s "%s"%s%s', [
+      FMetaData.Add(Format('GRANT %s ON %s "%s" TO %s "%s" %s%s', [
                             qryOwnerPriv.FieldByName('Privileges').AsString,
                             qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
                             qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString,
                             qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString,
                             qryOwnerPriv.FieldByName('RDB$USER').AsString,
-                            WithOption, Terminator]));
+                            qryOwnerPriv.FieldByName('GRANTOPTION').AsString,
+                            Terminator]));
       qryOwnerPriv.Next;
     end;
     qryOwnerPriv.Close;
