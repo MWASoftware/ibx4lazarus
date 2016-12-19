@@ -31,7 +31,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil,  Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ExtCtrls, ComCtrls, IBSystemTables, IBSQL, IBDatabase, IB;
+  StdCtrls, ExtCtrls, ComCtrls, IBSystemTables, IBSQL, IBDatabase, IB,
+  LCLVersion;
 
 type
 
@@ -121,7 +122,8 @@ implementation
 
 {$R *.lfm}
 
-uses InterfaceBase;
+uses InterfaceBase
+  {$if lcl_fullversion >= 01070000}, LCLPlatformDef {$ENDIF};
 
 function EditIBSQL(DataSet: TIBSQL): boolean;
 begin

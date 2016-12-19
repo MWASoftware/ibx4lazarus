@@ -61,6 +61,8 @@ type
 
   TExtractTypes = Set of TExtractType;
 
+  TProcDDLType = (pdBoth,pdCreateOnly,pdAlterProc);
+
   { TIBExtract }
 
   TIBExtract = class(TComponent)
@@ -88,7 +90,7 @@ type
     procedure ListData(ObjectName : String);
     procedure ListRoles(ObjectName : String = '');
     procedure ListGrants;
-    procedure ListProcs(ProcedureName : String = '');
+    procedure ListProcs(ProcDDLType: TProcDDLType = pdBoth; ProcedureName : String = '');
     procedure ListAllTables(flag : Boolean);
     procedure ListTriggers(AlterTrigger, IncludeBody: boolean; ObjectName : String = ''; ExtractType : TExtractType = etTrigger);
     procedure ListCheck(ObjectName : String = ''; ExtractType : TExtractType = etCheck);
@@ -146,14 +148,16 @@ const
   priv_DELETE = 16;
   priv_EXECUTE = 32;
   priv_REFERENCES = 64;
+  priv_USAGE = 128;
 
- PrivTypes : Array[0..5] of TPrivTypes = (
+ PrivTypes : Array[0..6] of TPrivTypes = (
   (PrivFlag : priv_DELETE; PrivString : 'DELETE' ),
   (PrivFlag : priv_EXECUTE; PrivString : 'EXECUTE' ),
   (PrivFlag : priv_INSERT; PrivString : 'INSERT' ),
   (PrivFlag : priv_SELECT; PrivString : 'SELECT' ),
   (PrivFlag : priv_UPDATE; PrivString : 'UPDATE' ),
-  (PrivFlag : priv_REFERENCES; PrivString : 'REFERENCES'));
+  (PrivFlag : priv_REFERENCES; PrivString : 'REFERENCES'),
+  (PrivFlag : priv_USAGE; PrivString : 'USAGE' ));
 
  	ColumnTypes : TSQLTypes = (
     (SqlType : blr_short; TypeName :	'SMALLINT'),		{ NTX: keyword }
@@ -365,9 +369,9 @@ begin
     ListViews;
     ListCheck;
     ListException;
-    ListTriggers(false,false);
-    ListProcs;
-    ListTriggers(true,true);
+    ListProcs(pdCreateOnly);
+    ListTriggers(false,true);
+    ListProcs(pdAlterProc);
     ListGrants;
   end;
 
@@ -940,6 +944,9 @@ const
   ProcedureSQL = 'select * from RDB$PROCEDURES ' +
                  'Order BY RDB$PROCEDURE_NAME';
 
+  ExceptionSQL = 'select * from RDB$EXCEPTIONS ' +
+                 'Order BY RDB$EXCEPTION_NAME';
+
 var
   qryRoles : TIBSQL;
   RelationName : String;
@@ -969,6 +976,18 @@ begin
 
     ShowGrantRoles(Term);
 
+    qryRoles.SQL.Text := ExceptionSQL;
+    qryRoles.ExecQuery;
+    try
+      while not qryRoles.Eof do
+      begin
+        ShowGrants(Trim(qryRoles.FieldByName('RDB$EXCEPTION_NAME').AsString), Term);
+        qryRoles.Next;
+      end;
+    finally
+      qryRoles.Close;
+    end;
+
     qryRoles.SQL.Text := ProcedureSQL;
     qryRoles.ExecQuery;
     try
@@ -996,7 +1015,8 @@ end;
 
  	 procname -- Name of procedure to investigate }
 
-procedure TIBExtract.ListProcs(ProcedureName : String);
+procedure TIBExtract.ListProcs(ProcDDLType: TProcDDLType; ProcedureName: String
+  );
 const
   CreateProcedureStr1 = 'CREATE PROCEDURE %s ';
   CreateProcedureStr2 = 'BEGIN EXIT; END %s%s';
@@ -1029,40 +1049,46 @@ begin
       qryProcedures.SQL.Text := ProcedureNameSQL;
       qryProcedures.Params.ByName('ProcedureName').AsString := ProcedureName;
     end;
-    qryProcedures.ExecQuery;
-    while not qryProcedures.Eof do
+    if ProcDDLType <> pdAlterProc then
     begin
-      if Header then
+      qryProcedures.ExecQuery;
+      while not qryProcedures.Eof do
       begin
-        FMetaData.Add('COMMIT WORK;');
-        FMetaData.Add('SET AUTODDL OFF;');
-        FMetaData.Add(Format('SET TERM %s %s', [ProcTerm, Term]));
-        FMetaData.Add(Format('%s/* Stored procedures */%s', [NEWLINE, NEWLINE]));
-        Header := false;
+        if Header then
+        begin
+          FMetaData.Add('COMMIT WORK;');
+          FMetaData.Add('SET AUTODDL OFF;');
+          FMetaData.Add(Format('SET TERM %s %s', [ProcTerm, Term]));
+          FMetaData.Add(Format('%s/* Stored procedures */%s', [NEWLINE, NEWLINE]));
+          Header := false;
+        end;
+        ProcName := Trim(qryProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString);
+        FMetaData.Add(Format(CreateProcedureStr1, [QuoteIdentifier(FDatabase.SQLDialect,
+           ProcName)]));
+        GetProcedureArgs(ProcName);
+        FMetaData.Add(Format(CreateProcedureStr2, [ProcTerm, NEWLINE]));
+        qryProcedures.Next;
       end;
-      ProcName := Trim(qryProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString);
-      FMetaData.Add(Format(CreateProcedureStr1, [QuoteIdentifier(FDatabase.SQLDialect,
-         ProcName)]));
-      GetProcedureArgs(ProcName);
-      FMetaData.Add(Format(CreateProcedureStr2, [ProcTerm, NEWLINE]));
-      qryProcedures.Next;
+      qryProcedures.Close;
     end;
 
-    qryProcedures.Close;
-    qryProcedures.ExecQuery;
-    while not qryProcedures.Eof do
+    if ProcDDLType <> pdCreateOnly then
     begin
-      SList.Clear;
-      ProcName := Trim(qryProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString);
-      FMetaData.Add(Format('%sALTER PROCEDURE %s ', [NEWLINE,
-         QuoteIdentifier(FDatabase.SQLDialect, ProcName)]));
-      GetProcedureArgs(ProcName);
+      qryProcedures.ExecQuery;
+      while not qryProcedures.Eof do
+      begin
+        SList.Clear;
+        ProcName := Trim(qryProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString);
+        FMetaData.Add(Format('%sALTER PROCEDURE %s ', [NEWLINE,
+           QuoteIdentifier(FDatabase.SQLDialect, ProcName)]));
+        GetProcedureArgs(ProcName);
 
-      if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
-        SList.Text := SList.Text + qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
-      SList.Add(Format(' %s%s', [ProcTerm, NEWLINE]));
-      FMetaData.AddStrings(SList);
-      qryProcedures.Next;
+        if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
+          SList.Text := SList.Text + qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
+        SList.Add(Format(' %s%s', [ProcTerm, NEWLINE]));
+        FMetaData.AddStrings(SList);
+        qryProcedures.Next;
+      end;
     end;
 
 { This query gets the procedure name and the source.  We then nest a query
@@ -2557,7 +2583,7 @@ begin
            ListTriggers(false,true,ObjectName, etTable);
        end;
      end;
-    eoProcedure : ListProcs(ObjectName);
+    eoProcedure : ListProcs(pdBoth,ObjectName);
     eoFunction : ListFunctions(ObjectName);
     eoGenerator : ListGenerators(ObjectName);
     eoException : ListException(ObjectName);
@@ -2657,246 +2683,93 @@ end;
 
 procedure TIBExtract.ShowGrants(MetaObject: String; Terminator: String);
 const
-  { This query only finds tables, eliminating owner privileges }
-  OwnerPrivSQL =
-    'SELECT PRV.RDB$USER, PRV.RDB$GRANT_OPTION, PRV.RDB$FIELD_NAME, ' +
-    '       PRV.RDB$USER_TYPE, PRV.RDB$PRIVILEGE ' +
-    'FROM RDB$USER_PRIVILEGES PRV, RDB$RELATIONS REL ' +
-    'WHERE ' +
-    '  PRV.RDB$RELATION_NAME = :METAOBJECT AND ' +
-    '  REL.RDB$RELATION_NAME = :METAOBJECT AND ' +
-    '  PRV.RDB$PRIVILEGE <> ''M'' AND ' +
-    '  REL.RDB$OWNER_NAME <> PRV.RDB$USER ' +
-    'ORDER BY  PRV.RDB$USER, PRV.RDB$FIELD_NAME, PRV.RDB$GRANT_OPTION';
+  GrantsSQL =
+  'with ObjectOwners As ( '+
+  'Select RDB$RELATION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 0 as ObjectType '+
+  'From RDB$RELATIONS '+
+  'UNION '+
+  'Select RDB$PROCEDURE_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 5 as ObjectType '+
+  'From RDB$PROCEDURES '+
+  'UNION '+
+  'Select RDB$EXCEPTION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 7 as ObjectType '+
+  'From RDB$EXCEPTIONS '+
+  'UNION '+
+  'Select RDB$CHARACTER_SET_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 11 as ObjectType '+
+  'From RDB$CHARACTER_SETS '+
+  ') '+
+  ' '+
+  'Select Trim(RDB$USER) as RDB$USER,List("Privileges") as Privileges, '+
+  'coalesce(RDB$GRANT_OPTION,0) as RDB$GRANT_OPTION,METAOBJECTNAME, '+
+  'RDB$USER_TYPE, RDB$OBJECT_TYPE, '+
+  'case  RDB$OBJECT_TYPE '+
+  'When 0 then ''TABLE'' '+
+  'When 5 then ''PROCEDURE'' '+
+  'When 7 then ''EXCEPTION'' '+
+  'When 11 then ''CHARACTER SET'' '+
+  'ELSE NULL END as OBJECT_TYPE_NAME, '+
+  'case RDB$USER_TYPE '+
+  'When 5 then ''PROCEDURE'' '+
+  'When 2 then ''TRIGGER'' '+
+  'When 8 then ''USER'' '+
+  'When 13 then ''ROLE'' '+
+  'ELSE NULL END as USER_TYPE_NAME '+
+  'From (  '+
+  'Select PR.RDB$USER,PR.RDB$RELATION_NAME as METAOBJECTNAME, LIST(DISTINCT Trim(Case PR.RDB$PRIVILEGE  '+
+  'When ''X'' then ''EXECUTE''  '+
+  'When ''S'' then ''SELECT''  '+
+  'When ''U'' then ''UPDATE''   '+
+  'When ''D'' then ''DELETE''  '+
+  'When ''R'' then ''REFERENCES''  '+
+  'When ''G'' then ''USAGE''  '+
+  'When ''I'' then ''INSERT'' end )) as "Privileges",  '+
+  'PR.RDB$GRANT_OPTION,  PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE,OW.RDB$OWNER_NAME  '+
+  'FROM RDB$USER_PRIVILEGES PR  '+
+  'JOIN ObjectOwners OW On OW.METAOBJECTNAME = PR.RDB$RELATION_NAME and OW.ObjectType = PR.RDB$OBJECT_TYPE '+
+  'Where PR.RDB$PRIVILEGE <> ''M'' and (PR.RDB$PRIVILEGE <> ''U'' or PR.RDB$FIELD_NAME is null)  '+
+  'Group By PR.RDB$USER,PR.RDB$RELATION_NAME,PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE,OW.RDB$OWNER_NAME  '+
+  'UNION  '+
+  'Select PR.RDB$USER,PR.RDB$RELATION_NAME, ''Update('' || List(Trim(PR.RDB$FIELD_NAME)) || '')'',  '+
+  'PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE, OW.RDB$OWNER_NAME   '+
+  'FROM RDB$USER_PRIVILEGES PR  '+
+  'JOIN ObjectOwners OW On OW.METAOBJECTNAME = PR.RDB$RELATION_NAME and OW.ObjectType = PR.RDB$OBJECT_TYPE '+
+  'Where PR.RDB$PRIVILEGE = ''U'' and PR.RDB$FIELD_NAME is not null   '+
+  'Group By PR.RDB$USER,PR.RDB$RELATION_NAME,PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE, OW.RDB$OWNER_NAME)  '+
+  'Where METAOBJECTNAME = :METAOBJECTNAME and RDB$USER <> RDB$OWNER_NAME  '+
+  'Group By RDB$USER,RDB$GRANT_OPTION,  RDB$USER_TYPE, RDB$OBJECT_TYPE,METAOBJECTNAME '+
+  'ORDER BY RDB$USER';
 
-  ProcPrivSQL =
-    'SELECT PRV.RDB$USER, PRV.RDB$GRANT_OPTION, PRV.RDB$FIELD_NAME, ' +
-    '       PRV.RDB$USER_TYPE, PRV.RDB$PRIVILEGE, PRV.RDB$RELATION_NAME ' +
-    'FROM RDB$USER_PRIVILEGES PRV, RDB$PROCEDURES PRC ' +
-    'where ' +
-    '  PRV.RDB$OBJECT_TYPE = 5 AND ' +
-    '  PRV.RDB$RELATION_NAME = :METAOBJECT AND ' +
-    '  PRC.RDB$PROCEDURE_NAME = :METAOBJECT AND ' +
-    '  PRV.RDB$PRIVILEGE = ''X'' AND ' +
-    '  PRC.RDB$OWNER_NAME <> PRV.RDB$USER ' +
-    'ORDER BY PRV.RDB$USER, PRV.RDB$FIELD_NAME, PRV.RDB$GRANT_OPTION';
-
-  RolePrivSQL =
-    'SELECT * FROM RDB$USER_PRIVILEGES ' +
-    'WHERE ' +
-    '  RDB$OBJECT_TYPE = 13 AND ' +
-    '  RDB$USER_TYPE = 8  AND ' +
-    '  RDB$RELATION_NAME = :METAOBJECT AND ' +
-    '  RDB$PRIVILEGE = ''M'' ' +
-    'ORDER BY RDB$USER';
-
-var
-  PrevUser, PrevField,  WithOption,
-  PrivString, ColString, UserString,
-  FieldName, User : String;
-  c : Char;
-  PrevOption, PrivFlags, GrantOption : Integer;
-  First, PrevFieldNull : Boolean;
-  qryOwnerPriv : TIBSQL;
-
-    {  Given a bit-vector of privileges, turn it into a
-       string list. }
-  function MakePrivString(cflags : Integer) : String;
-  var
-    i : Integer;
-  begin
-    Result := '';
-    for i := Low(PrivTypes) to High(PrivTypes) do
-    begin
-      if (cflags and PrivTypes[i].PrivFlag) <> 0 then
-      begin
-        if Result <> '' then
-          Result := Result + ', ';
-        Result := Result + PrivTypes[i].PrivString;
-      end; //end_if
-    end; //end_for
-  end; //end_fcn MakePrivDtring
+var WithOption: string;
+    qryOwnerPriv : TIBSQL;
 
 begin
   if MetaObject = '' then
     exit;
 
-  First := true;
-  PrevOption := -1;
-  PrevUser := '';
-  PrivString := '';
-  ColString := '';
-  WithOption := '';
-  PrivFlags := 0;
-  PrevFieldNull := false;
-  PrevField := '';
-
   qryOwnerPriv := TIBSQL.Create(FDatabase);
   try
-    qryOwnerPriv.SQL.Text := OwnerPrivSQL;
-    qryOwnerPriv.Params.ByName('metaobject').AsString := MetaObject;
+    qryOwnerPriv.SQL.Text := GrantsSQL;
+    qryOwnerPriv.Params.ByName('METAOBJECTNAME').AsString := MetaObject;
     qryOwnerPriv.ExecQuery;
     while not qryOwnerPriv.Eof do
     begin
-      { Sometimes grant options are null, sometimes 0.  Both same }
-      if qryOwnerPriv.FieldByName('RDB$GRANT_OPTION').IsNull then
-        GrantOption := 0
-      else
-        GrantOption := qryOwnerPriv.FieldByName('RDB$GRANT_OPTION').AsInteger;
-
-      if qryOwnerPriv.FieldByName('RDB$FIELD_NAME').IsNull then
-        FieldName := ''
-      else
-        FieldName := qryOwnerPriv.FieldByName('RDB$FIELD_NAME').AsString;
-
-      User := Trim(qryOwnerPriv.FieldByName('RDB$USER').AsString);
-      { Print a new grant statement for each new user or change of option }
-
-      if ((PrevUser <> '') and (PrevUser <> User)) or
-          ((Not First) and
-            (PrevFieldNull <> qryOwnerPriv.FieldByName('RDB$FIELD_NAME').IsNull)) or
-          ((not PrevFieldNull) and (PrevField <> FieldName)) or
-          ((PrevOption <> -1) and (PrevOption <> GrantOption)) then
+      if qryOwnerPriv.FieldByName('RDB$GRANT_OPTION').AsInteger <> 0 then
       begin
-        PrivString := MakePrivString(PrivFlags);
-
-        First := false;
-        FMetaData.Add(Format('GRANT %s%s ON %s TO %s%s%s', [PrivString,
-          ColString, QuoteIdentifier(FDatabase.SQLDialect, MetaObject),
-          UserString, WithOption, Terminator]));
-        { re-initialize strings }
-
-        PrivString := '';
-        WithOption := '';
-        ColString := '';
-        PrivFlags := 0;
-      end; //end_if
-
-      PrevUser := User;
-      PrevOption := GrantOption;
-      PrevFieldNull := qryOwnerPriv.FieldByName('RDB$FIELD_NAME').IsNull;
-      PrevField := FieldName;
-
-      case qryOwnerPriv.FieldByName('RDB$USER_TYPE').AsInteger of
-        obj_relation,
-        obj_view,
-        obj_trigger,
-        obj_procedure,
-        obj_sql_role:
-          UserString := QuoteIdentifier(FDatabase.SQLDialect, User);
-        else
-          UserString := User;
-      end; //end_case
-
-      case qryOwnerPriv.FieldByName('RDB$USER_TYPE').AsInteger of
-        obj_view :
-          UserString := 'VIEW ' + UserString;
-        obj_trigger :
-          UserString := 'TRIGGER '+ UserString;
-        obj_procedure :
-          UserString := 'PROCEDURE ' + UserString;
-      end; //end_case
-
-      c := qryOwnerPriv.FieldByName('RDB$PRIVILEGE').AsString[1];
-
-      case c of
-        'S' : PrivFlags := PrivFlags or priv_SELECT;
-        'I' : PrivFlags := PrivFlags or priv_INSERT;
-        'U' : PrivFlags := PrivFlags or priv_UPDATE;
-        'D' : PrivFlags := PrivFlags or priv_DELETE;
-        'R' : PrivFlags := PrivFlags or priv_REFERENCES;
-        'X' : ;
-          { Execute should not be here -- special handling below }
-        else
-          PrivFlags := PrivFlags or priv_UNKNOWN;
-      end; //end_switch
-
-      { Column level privileges for update only }
-
-      if FieldName = '' then
-        ColString := ''
-      else
-        ColString := Format(' (%s)', [QuoteIdentifier(FDatabase.SQLDialect, FieldName)]);
-
-      if GrantOption <> 0 then
-        WithOption := ' WITH GRANT OPTION';
-
-      qryOwnerPriv.Next;
-    end;
-    { Print last case if there was anything to print }
-    if PrevOption <> -1 then
-    begin
-      PrivString := MakePrivString(PrivFlags);
-      First := false;
-      FMetaData.Add(Format('GRANT %s%s ON %s TO %s%s%s', [PrivString,
-        ColString, QuoteIdentifier(FDatabase.SQLDialect, MetaObject),
-        UserString, WithOption, Terminator]));
-      { re-initialize strings }
-    end; //end_if
-    qryOwnerPriv.Close;
-
-    if First then
-    begin
-     { Part two is for stored procedures only }
-      qryOwnerPriv.SQL.Text := ProcPrivSQL;
-      qryOwnerPriv.Params.ByName('metaobject').AsString := MetaObject;
-      qryOwnerPriv.ExecQuery;
-      while not qryOwnerPriv.Eof do
-      begin
-        First := false;
-        User := Trim(qryOwnerPriv.FieldByName('RDB$USER').AsString);
-
-        case qryOwnerPriv.FieldByName('RDB$USER_TYPE').AsInteger of
-          obj_relation,
-          obj_view,
-          obj_trigger,
-          obj_procedure,
-          obj_sql_role:
-            UserString := QuoteIdentifier(FDatabase.SQLDialect, User);
-          else
-            UserString := User;
-        end; //end_case
-        case qryOwnerPriv.FieldByName('RDB$USER_TYPE').AsInteger of
-          obj_view :
-            UserString := 'VIEW ' + UserString;
-          obj_trigger :
-            UserString := 'TRIGGER '+ UserString;
-          obj_procedure :
-            UserString := 'PROCEDURE ' + UserString;
-        end; //end_case
-
-        if qryOwnerPriv.FieldByName('RDB$GRANT_OPTION').AsInteger = 1 then
-          WithOption := ' WITH GRANT OPTION'
-        else
-          WithOption := '';
-
-        FMetaData.Add(Format('GRANT EXECUTE ON PROCEDURE %s TO %s%s%s',
-          [QuoteIdentifier(FDatabase.SQLDialect, MetaObject), UserString,
-           WithOption, terminator]));
-
-        qryOwnerPriv.Next;
-      end;
-      qryOwnerPriv.Close;
-    end;
-    if First then
-    begin
-      qryOwnerPriv.SQL.Text := RolePrivSQL;
-      qryOwnerPriv.Params.ByName('metaobject').AsString := MetaObject;
-      qryOwnerPriv.ExecQuery;
-      while not qryOwnerPriv.Eof do
-      begin
-        if qryOwnerPriv.FieldByName('RDB$GRANT_OPTION').AsInteger = 1 then
+        if qryOwnerPriv.FieldByName('RDB$USER_TYPE').AsInteger = 13 then
           WithOption := ' WITH ADMIN OPTION'
         else
-          WithOption := '';
+          WithOption := ' WITH GRANT OPTION'
+      end
+      else
+        WithOption := '';
 
-        FMetaData.Add(Format('GRANT %s TO %s%s%s',
-          [QuoteIdentifier(FDatabase.SQLDialect, qryOwnerPriv.FieldByName('RDB$RELATION_NAME').AsString),
-           qryOwnerPriv.FieldByName('RDB$USER_NAME').AsString,
-           WithOption, terminator]));
-
-        qryOwnerPriv.Next;
-      end;
+      FMetaData.Add(Format('GRANT %s ON %s "%s" TO %s "%s"%s%s', [
+                            qryOwnerPriv.FieldByName('Privileges').AsString,
+                            qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
+                            qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString,
+                            qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString,
+                            qryOwnerPriv.FieldByName('RDB$USER').AsString,
+                            WithOption, Terminator]));
+      qryOwnerPriv.Next;
     end;
     qryOwnerPriv.Close;
   finally
