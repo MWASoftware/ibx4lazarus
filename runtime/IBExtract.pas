@@ -84,7 +84,8 @@ type
     procedure ShowGrantRoles(Terminator : String);
     procedure GetProcedureArgs(Proc : String);
   protected
-    function ExtractDDL(Flag : Boolean; TableName : String) : Boolean;
+    function ExtractDDL(Flag: Boolean; TableName: String; IncludeData: boolean =
+      false): Boolean;
     function ExtractListTable(RelationName, NewName: String; DomainFlag: Boolean): Boolean;
     procedure ExtractListView (ViewName : String);
     procedure ListData(ObjectName : String);
@@ -237,7 +238,7 @@ const
 
 implementation
 
-uses FBMessages;
+uses FBMessages, IBDataOutput;
 
 const
   NEWLINE = #13#10;
@@ -326,7 +327,7 @@ begin
   inherited;
 end;
 
-function TIBExtract.ExtractDDL(Flag: Boolean; TableName: String) : Boolean;
+function TIBExtract.ExtractDDL(Flag: Boolean; TableName: String; IncludeData: boolean = false) : Boolean;
 var
 	DidConnect : Boolean;
 	DidStart : Boolean;
@@ -363,6 +364,8 @@ begin
     ListFunctions;
     ListDomains;
     ListAllTables(flag);
+    if IncludeData then
+      ListData('');
     ListIndex;
     ListForeign;
     ListGenerators;
@@ -2545,7 +2548,7 @@ begin
   end;
   FMetaData.Clear;
   case ObjectType of
-    eoDatabase : ExtractDDL(true, '');
+    eoDatabase : ExtractDDL(true, '', etData in ExtractTypes);
     eoDomain :
       if etTable in ExtractTypes then
         ListDomains(ObjectName, etTable)
@@ -2987,6 +2990,41 @@ end;
 procedure TIBExtract.ListData(ObjectName: String);
 const
   SelectSQL = 'SELECT * FROM %s';
+
+  TableSQL =
+    'SELECT * FROM RDB$RELATIONS ' +
+    'WHERE ' +
+    '  (RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL) AND ' +
+    '  RDB$VIEW_BLR IS NULL ' +
+    'ORDER BY RDB$RELATION_NAME';
+begin
+  if ObjectName = '' then {List all}
+  begin
+    with TIBSQL.Create(self) do
+    try
+      Database := FDatabase;
+      SQL.Text := TableSQL;
+      ExecQuery;
+      while not EOF do
+      begin
+        ListData(FieldByName('RDB$RELATION_NAME').AsString);
+        Next;
+      end;
+    finally
+      Free;
+    end;
+  end
+  else
+  with TIBInsertStmtsOut.Create(self) do
+  try
+    Database := FDatabase;
+    DataOut(Format(SelectSQL,[QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]),FMetaData);
+  finally
+    Free
+  end;
+end;
+
+(*
 var
   qrySelect : TIBSQL;
   Line : String;
@@ -3047,7 +3085,7 @@ begin
   finally
     qrySelect.Free;
   end;
-end;
+end; *)
 
 procedure TIBExtract.ListRoles(ObjectName: String);
 const

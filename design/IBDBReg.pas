@@ -389,7 +389,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet, FBMessages,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
      IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
      IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport, IBDSDialogs,
-     IBArrayGrid;
+     IBArrayGrid, IBVersion;
 
 const
   IBPalette1 = 'Firebird'; {do not localize}
@@ -397,7 +397,7 @@ const
   IBPalette3 = 'Firebird Data Controls';   {do not localize}
   
  resourcestring
-   SInterbaseExpressVersion = 'Firebird Express for Lazarus 2.0.0';
+   SInterbaseExpressVersion = 'Firebird Express for Lazarus ' + IBX_VERSION;
    SEditSQL = 'Edit SQL';
    SIBSQLEditor = 'IBSQL Editor';
    SIBServiceEditor = 'Edit IB Service';

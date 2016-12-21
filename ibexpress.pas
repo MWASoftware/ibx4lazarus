@@ -9,7 +9,8 @@ interface
 uses
   IBBatchMove, IBBlob, IBCustomDataSet, IBDatabase, IBEvents, IBExtract, 
   IBQuery, IBServices, IBSQL, IBStoredProc, IBDatabaseInfo, IBUpdateSQL, 
-  IBTable, IBSQLMonitor, IBSQLParser, IBDialogs, ibxscript;
+  IBTable, IBSQLMonitor, IBSQLParser, IBDialogs, ibxscript, IBDataOutput, 
+  IBVersion;
 
 implementation
 

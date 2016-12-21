@@ -33,7 +33,8 @@ uses
   {$ENDIF}{$ENDIF}
   Classes, SysUtils, CustApp
   { you can add units after this }
-  ,IBDatabase, ibxscript, IBExtract, IBQuery, DB;
+  ,IBDatabase, ibxscript, IBExtract, IBQuery, DB, IBVersion,
+  IBDataOutput;
 
 resourcestring
 
@@ -54,12 +55,11 @@ type
     FIBTransaction: TIBTransaction;
     FIBXScript: TIBXScript;
     FExtract: TIBExtract;
-    FQuery: TIBQuery;
     FSQL: TStringStream;
+    FUseCSVFormat: boolean;
     procedure LogHandler(Sender: TObject; Msg: string);
     procedure ErrorLogHandler(Sender: TObject; Msg: string);
     procedure HandleSelectSQL(Sender: TObject; SQLText: string);
-    procedure WriteCSV;
   protected
     procedure DoRun; override;
     procedure ShowException(E: Exception); override;
@@ -82,94 +82,24 @@ begin
 end;
 
 procedure TFBSQL.HandleSelectSQL(Sender: TObject; SQLText: string);
+var DBOutput: TIBCustomDataOutput;
+    Results: TStrings;
+    i: integer;
 begin
-  FQuery.SQL.Text := SQLText;
-  FQuery.Active := true;
+  Results := TStringList.Create;
+  if FUseCSVFormat then
+    DBOutput := TIBCSVDataOut.Create(self)
+  else
+    DBOutput := TIBBlockFormatOut.Create(self);
   try
-    WriteCSV;
+    DBOutput.Database := FIBDatabase;
+    DBOutput.DataOut(SQLText,Results);
+    for i := 0 to Results.Count - 1 do
+      writeln(Results[i]);
   finally
-    FQuery.Active := false;
+    DBOutput.Free;
+    Results.Free;
   end;
-end;
-
-procedure TFBSQL.WriteCSV;
-
-  procedure WriteQuotedText(Text: string);
-  var Index: integer;
-  begin
-    Index := 1;
-    while Index <= Length(Text) do
-      if Text[Index] = '"' then
-      begin
-        Insert('"',Text,Index);
-        Inc(Index,2)
-      end
-      else
-        Inc(Index,1);
-    write('"' + Text + '"')
-  end;
-
-  procedure WriteFieldList(Fields: TFields);
-  var I: integer;
-  begin
-    for I := 0 to Fields.Count - 1 do
-    begin
-      if I > 0 then write(',');
-      write(Fields[I].FieldName)
-    end;
-    writeln;
-  end;
-
-  procedure WriteRecord;
-  var I: integer;
-  begin
-    with FQuery do
-    begin
-      for I := 0 to FieldCount - 1 do
-      begin
-        if I <> 0 then write(',');
-        case Fields[I].DataType of
-        ftUnknown:  raise Exception.Create(sUnknownField);
-        ftString:   WriteQuotedText(Fields[I].AsString);
-        ftSmallint,
-        ftInteger,
-        ftWord,
-        ftLargeInt,
-        ftBoolean:  write(Fields[I].DisplayText);
-        ftFloat,
-        ftCurrency,
-        ftFmtBCD,
-        ftBCD:      write(Fields[I].AsString);
-        ftDate,
-        ftTime:     write(DateTimeToStr(Fields[I].AsDateTime));
-        ftDateTime: WriteQuotedText(Fields[I].AsString);
-        ftBytes,
-        ftVarBytes,
-        ftBlob,
-        ftAutoInc:  write(Fields[I].AsString);
-        ftMemo:     WriteQuotedText(Fields[I].AsString);
-        ftGraphic:  raise Exception.Create(sBadGraphic);
-        ftFmtMemo:  WriteQuotedText(Fields[I].AsString);
-        ftParadoxOle: raise Exception.Create(sBadParadox);
-        ftDBaseOle:   raise Exception.Create(sBadDBase);
-        ftTypedBinary:raise Exception.Create(sBadBinary);
-        ftCursor:    raise Exception.Create(sBadCursor);
-       end
-      end;
-      writeln;
-    end;
-  end;
-begin
-  with FQuery do
-  begin
-    WriteFieldList(Fields);
-    First;
-    while not EOF do
-    begin
-      WriteRecord;
-      Next
-    end;
-  end
 end;
 
 procedure TFBSQL.DoRun;
@@ -177,12 +107,14 @@ var
   ErrorMsg: String;
   SQLFileName: string;
   DoExtract: boolean;
+  DoFullExtract: boolean;
   i: integer;
 begin
   writeln(stderr,'fbsql: a non-interactive SQL interpreter for Firebird');
+  writeln(stderr,'Built using IBX ' + IBX_VERSION);
   writeln(stderr,'Copyright (c) MWA Software 2016');
   // quick check parameters
-  ErrorMsg:=CheckOptions('ahbeufprs',['help','user','pass','role']);
+  ErrorMsg:=CheckOptions('aAhbceufprs',['help','user','pass','role']);
   if ErrorMsg<>'' then begin
     ShowException(Exception.Create(ErrorMsg));
     Terminate;
@@ -199,6 +131,7 @@ begin
 
   SQLFileName := '';
   DoExtract := false;
+  DoFullExtract := false;
 
   {Initialise user_name and password from environment if available}
 
@@ -233,6 +166,12 @@ begin
   if HasOption('a') then
     DoExtract := true;
 
+  if HasOption('A') then
+    DoFullExtract := true;
+
+  if HasOption('c') then
+    FUseCSVFormat := true;
+
   if HasOption('f') then
     SQLFileName := GetOptionValue('f');
 
@@ -244,26 +183,33 @@ begin
 
   {Validation}
 
-  if not DoExtract then
+  if not DoExtract and not DoFullExtract then
   begin
     if (SQLFileName = '') and (FSQL.DataString = '') then
       raise Exception.Create('An SQL File must be provided');
 
     if (FSQL.DataString <> '') and (SQLFileName <> '') then
-       raise Exception.Create('An SQL Script File and text cannot be simulateously requested');
+       raise Exception.Create('An SQL Script File and text cannot be simultaneously requested');
 
     if (FSQL.DataString = '') and not FileExists(SQLFileName) then
       raise Exception.CreateFmt('SQL File "%s" not found!',[SQLFileName]);
 
   end;
 
-  if DoExtract and ((SQLFileName <> '') or (FSQL.DataString <> '')) then
+  if (DoExtract or DoFullExtract) and ((SQLFileName <> '') or (FSQL.DataString <> '')) then
     raise Exception.Create('Extract and script execution cannot be simulateously requested');
 
   {This is where it all happens}
 
   FIBDatabase.Connected := true;
   try
+    if DoFullExtract then
+    begin
+      FExtract.ExtractObject(eoDatabase,'',[etData]);
+      for i := 0 to FExtract.Items.Count - 1 do
+        writeln(FExtract.Items[i]);
+    end
+    else
     if DoExtract then
     begin
       FExtract.ExtractObject(eoDatabase);
@@ -308,10 +254,6 @@ begin
   FExtract := TIBExtract.Create(self);
   FExtract.Database := FIBDatabase;
   FExtract.Transaction := FIBTransaction;
-  FQuery := TIBQuery.Create(self);
-  FQuery.AllowAutoActivateTransaction := true;
-  FQuery.Database := FIBDatabase;
-  FQuery.Transaction := FIBTransaction;
 
   FIBTransaction.Params.Add('concurrency');
   FIBTransaction.Params.Add('wait');
@@ -330,7 +272,9 @@ begin
   writeln(stderr,'Usage: ',ExtractFileName(ExeName),' <options> <database name>');
   writeln(stderr,'Options:');
   writeln(stderr,'-a            write database metadata to stdout');
+  writeln(stderr,'-A            write database metadata and table data to stdout');
   writeln(stderr,'-b            stop on first error');
+  writeln(stderr,'-c            use csv format for select query results');
   writeln(stderr,'-e            echo sql statements to stdout');
   writeln(stderr,'-f <filename> execute SQL script from file');
   writeln(stderr,'-h            show this information');
