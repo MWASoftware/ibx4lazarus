@@ -51,7 +51,7 @@ type
     procedure HeaderOut(var Data: TStrings); virtual;
     procedure FormattedDataOut(var Data: TStrings); virtual; abstract;
     procedure TrailerOut(var Data: TStrings); virtual;
-    property IncludeHeader: Boolean read FIncludeHeader write FIncludeHeader;
+    property IncludeHeader: Boolean read FIncludeHeader write FIncludeHeader default true;
   public
     constructor Create(aOwner: TComponent); override;
     procedure DataOut(SelectQuery: string; var Data: TStrings);
@@ -265,10 +265,10 @@ procedure TIBInsertStmtsOut.FormatBlob(Field: ISQLData; var Data: TStrings);
 
   function ToHex(aValue: byte): string;
   const
-    HexChars = '0123456789ABCDEF';
+    HexChars: array [0..15] of char = '0123456789ABCDEF';
   begin
-    Result := HexChars[(aValue and $F0) shr 8] +
-              HexChars[(aValue and $0F)];
+    Result := HexChars[aValue shr 4] +
+               HexChars[(aValue and $0F)];
   end;
 
 var blob: string;
@@ -314,7 +314,7 @@ var index: array of integer;
           Data.Add('</elt>');
         end
         else
-          Data.Add(Format('%s<elt id="%d">%s</elt>',[indent,i,ar.GetAsString(index)]));
+          Data.Add(Format('%s<elt ix="%d">%s</elt>',[indent,i,ar.GetAsString(index)]));
       end;
     end;
 
@@ -325,7 +325,7 @@ begin
                               [ar.GetDimensions,ar.GetSQLType,ar.GetSize]);
   case ar.GetSQLType of
   SQL_DOUBLE, SQL_FLOAT, SQL_LONG, SQL_SHORT, SQL_D_FLOAT, SQL_INT64:
-     s += Format('" scale = "%d"',[ ar.GetScale]);
+     s += Format(' scale = "%d"',[ ar.GetScale]);
   SQL_TEXT,
   SQL_VARYING:
     s += Format(' charset = "%s"',[FirebirdAPI.GetCharsetName(ar.GetCharSetID)]);
@@ -389,7 +389,7 @@ begin
       case Current[i].SQLType of
       SQL_BLOB:
         if Current[i].SQLSubType = 1 then
-          s += QuoteChar + Current[i].AsString + QuoteChar
+          s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar
         else
         begin
           Data.Add(s);
@@ -404,12 +404,23 @@ begin
            s += 'NULL'
           else
           begin
-            writeln('Col = ',ar.GetColumnName);
             Data.Add(s);
             s := '';
             FormatArray(ar,Data);
           end;
         end;
+
+      SQL_TEXT, SQL_VARYING:
+        s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar;
+
+      SQL_TIMESTAMP:
+        s += QuoteChar + FormatDateTime('yyyy.mm.dd hh:nn:ss.zzz',Current[i].AsDateTime) + QuoteChar;
+
+      SQL_TYPE_DATE:
+        s += QuoteChar + FormatDateTime('yyyy.mm.dd',Current[i].AsDateTime) + QuoteChar;
+
+      SQL_TYPE_TIME:
+        s += QuoteChar + FormatDateTime('hh:nn:ss.zzz',Current[i].AsDateTime) + QuoteChar;
 
       else
         s += Current[i].AsString;
@@ -507,6 +518,7 @@ constructor TIBCustomDataOutput.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
   FIBSQL := TIBSQL.Create(self);
+  FIncludeHeader := true;
 end;
 
 procedure TIBCustomDataOutput.DataOut(SelectQuery: string; var Data: TStrings);
