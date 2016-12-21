@@ -35,6 +35,10 @@ uses
 const
   MaxBlobText = 80;
 
+  sTimeStampFormat = 'yyyy.mm.dd hh:nn:ss.zzz';
+  sDateFormat      = 'yyyy.mm.dd';
+  sTimeFormat      =  'hh:nn:ss.zzz';
+
 type
 
   { TIBCustomDataOutput }
@@ -135,9 +139,9 @@ begin
   taLeft:
     Move(s[1],Result[1],Length(s));
   taCentre:
-    Move(s[1],Result[(ColWidth - Length(s)) div 2],Length(s));
+    Move(s[1],Result[(ColWidth - Length(s)) div 2 + 1],Length(s));
   taRight:
-    Move(s[1],Result[ColWidth - Length(s)],Length(s));
+    Move(s[1],Result[ColWidth - Length(s) + 1],Length(s));
   end;
 end;
 
@@ -151,8 +155,8 @@ begin
     SetLength(FColWidths,MetaData.Count);
     FRowWidth := 1; {assume leading '|'}
     for i := 0 to MetaData.Count - 1 do
+    with MetaData[i] do
     begin
-      with MetaData[i] do
       case SQLType of
       SQL_VARYING, SQL_TEXT:
         FColWidths[i] := GetSize;
@@ -228,28 +232,38 @@ begin
   s := '|';
   for i := 0 to FIBSQL.Current.Count - 1 do
   with FIBSQL.Current[i] do
-  if IsNull then
-    s += TextAlign('NULL',FColWidths[i],taCentre)
-  else
-  case SQLType of
-  SQL_VARYING, SQL_TEXT,
-  SQL_TIMESTAMP,SQL_TYPE_DATE, SQL_TYPE_TIME:
-    s += TextAlign(AsString,FColWidths[i],taLeft);
-
-  SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT,
-  SQL_LONG, SQL_SHORT, SQL_INT64:
-    s += TextAlign(AsString,FColWidths[i],taRight);
-
-  SQL_BOOLEAN, SQL_ARRAY:
-    s += TextAlign(AsString,FColWidths[i],taCentre);
-
-  SQL_BLOB:
-    if SQLSubType = 1 then
-      s += TextAlign(TruncateTextBlob(AsString),FColWidths[i],taLeft)
+  begin
+    if IsNull then
+      s += TextAlign('NULL',FColWidths[i],taCentre)
     else
-      s += TextAlign(sBlob,FColWidths[i],taCentre);
+    case SQLType of
+    SQL_VARYING, SQL_TEXT:
+      s += TextAlign(AsString,FColWidths[i],taLeft);
+
+    SQL_TIMESTAMP:
+      s += TextAlign(FormatDateTime(sTimeStampFormat,AsDateTime),FColWidths[i],taLeft);
+
+    SQL_TYPE_DATE:
+      s += TextAlign(FormatDateTime(sDateFormat,AsDateTime),FColWidths[i],taLeft);
+
+    SQL_TYPE_TIME:
+      s += TextAlign(FormatDateTime(sTimeFormat,AsDateTime),FColWidths[i],taLeft);
+
+    SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT,
+    SQL_LONG, SQL_SHORT, SQL_INT64:
+      s += TextAlign(AsString,FColWidths[i],taRight);
+
+    SQL_BOOLEAN, SQL_ARRAY:
+      s += TextAlign(AsString,FColWidths[i],taCentre);
+
+    SQL_BLOB:
+      if SQLSubType = 1 then
+        s += TextAlign(TruncateTextBlob(AsString),FColWidths[i],taLeft)
+      else
+        s += TextAlign(sBlob,FColWidths[i],taCentre);
+    end;
+    s += '|';
   end;
-  s += '|';
   Data.Add(s);
   Data.Add(DashedLine);
 end;
@@ -414,13 +428,13 @@ begin
         s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar;
 
       SQL_TIMESTAMP:
-        s += QuoteChar + FormatDateTime('yyyy.mm.dd hh:nn:ss.zzz',Current[i].AsDateTime) + QuoteChar;
+        s += QuoteChar + FormatDateTime(sTimeStampFormat,Current[i].AsDateTime) + QuoteChar;
 
       SQL_TYPE_DATE:
-        s += QuoteChar + FormatDateTime('yyyy.mm.dd',Current[i].AsDateTime) + QuoteChar;
+        s += QuoteChar + FormatDateTime(sDateFormat,Current[i].AsDateTime) + QuoteChar;
 
       SQL_TYPE_TIME:
-        s += QuoteChar + FormatDateTime('hh:nn:ss.zzz',Current[i].AsDateTime) + QuoteChar;
+        s += QuoteChar + FormatDateTime(sTimeFormat,Current[i].AsDateTime) + QuoteChar;
 
       else
         s += Current[i].AsString;
@@ -461,16 +475,23 @@ begin
   with FIBSQL do
   begin
     for i := 0 to Current.Count - 1 do
+    with Current[i] do
     begin
       if i <> 0 then s += ',';
-      if (Current[i].SQLType = SQL_BLOB) and (Current[i].SQLSubType <> 1) then
-        s += sBlob
+      case SQLType of
+      SQL_BLOB:
+        if SQLSubType <> 1 then
+          s += sBlob
+        else
+          s += QuoteChar + Current[i].AsString + QuoteChar;
+
+      SQL_VARYING,SQL_TEXT,
+      SQL_TIMESTAMP,SQL_TYPE_DATE,SQL_TYPE_TIME:
+        s += QuoteChar + Current[i].AsString + QuoteChar;
+
       else
-      if (Current[i].SQLType = SQL_VARYING) or (Current[i].SQLType = SQL_TEXT) or
-          ((Current[i].SQLType = SQL_BLOB) and (Current[i].SQLSubType = 1)) then
-        s += QuoteChar + Current[i].AsString + QuoteChar
-      else
-      s += Current[i].AsString;
+        s += Current[i].AsString;
+      end;
     end;
   end;
   Data.Add(s);

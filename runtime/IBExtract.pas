@@ -2989,7 +2989,11 @@ end;
 
 procedure TIBExtract.ListData(ObjectName: String);
 const
-  SelectSQL = 'SELECT * FROM %s';
+  SelectFieldListSQL = 'Select List(RDB$FIELD_NAME) From ( '+
+    'Select RF.RDB$FIELD_NAME From RDB$RELATION_FIELDS RF '+
+    'JOIN RDB$FIELDS F On F.RDB$FIELD_NAME = RF.RDB$FIELD_SOURCE '+
+    'Where F.RDB$COMPUTED_BLR is NULL and RF.RDB$RELATION_NAME = Upper(:Relation) '+
+    'Order by RF.RDB$FIELD_POSITION asc)';
 
   TableSQL =
     'SELECT * FROM RDB$RELATIONS ' +
@@ -2997,6 +3001,9 @@ const
     '  (RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL) AND ' +
     '  RDB$VIEW_BLR IS NULL ' +
     'ORDER BY RDB$RELATION_NAME';
+
+var FieldList: string;
+
 begin
   if ObjectName = '' then {List all}
   begin
@@ -3015,12 +3022,31 @@ begin
     end;
   end
   else
-  with TIBInsertStmtsOut.Create(self) do
-  try
-    Database := FDatabase;
-    DataOut(Format(SelectSQL,[QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]),FMetaData);
-  finally
-    Free
+  begin
+    FieldList := '*';
+    with TIBSQL.Create(self) do
+    try
+      Database := FDatabase;
+      SQL.Text := SelectFieldListSQL;
+      Params[0].AsString := ObjectName;
+      ExecQuery;
+      try
+        if not EOF then
+          FieldList := Fields[0].AsString;
+      finally
+        Close;
+      end;
+    finally
+      Free
+    end;
+
+    with TIBInsertStmtsOut.Create(self) do
+    try
+      Database := FDatabase;
+      DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]),FMetaData);
+    finally
+      Free
+    end;
   end;
 end;
 
