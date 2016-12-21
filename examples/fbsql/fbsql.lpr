@@ -57,6 +57,7 @@ type
     FExtract: TIBExtract;
     FSQL: TStringStream;
     FUseCSVFormat: boolean;
+    FOutputFile: TStream;
     procedure LogHandler(Sender: TObject; Msg: string);
     procedure ErrorLogHandler(Sender: TObject; Msg: string);
     procedure HandleSelectSQL(Sender: TObject; SQLText: string);
@@ -73,7 +74,10 @@ type
 
 procedure TFBSQL.LogHandler(Sender: TObject; Msg: string);
 begin
-  writeln( Msg);
+  if FOutputFile <> nil then
+    FOutputFile.WriteAnsiString(Msg + LineEnding)
+  else
+    writeln( Msg);
 end;
 
 procedure TFBSQL.ErrorLogHandler(Sender: TObject; Msg: string);
@@ -94,6 +98,9 @@ begin
   try
     DBOutput.Database := FIBDatabase;
     DBOutput.DataOut(SQLText,Results);
+    if FOutputFile <> nil then
+      Results.SaveToStream(FOutputFile)
+    else
     for i := 0 to Results.Count - 1 do
       writeln(Results[i]);
   finally
@@ -107,14 +114,15 @@ var
   ErrorMsg: String;
   SQLFileName: string;
   DoExtract: boolean;
-  DoFullExtract: boolean;
+  OutputFileName: string;
   i: integer;
+  ExtractTypes: TExtractTypes;
 begin
   writeln(stderr,'fbsql: a non-interactive SQL interpreter for Firebird');
   writeln(stderr,'Built using IBX ' + IBX_VERSION);
   writeln(stderr,'Copyright (c) MWA Software 2016');
   // quick check parameters
-  ErrorMsg:=CheckOptions('aAhbceufprs',['help','user','pass','role']);
+  ErrorMsg:=CheckOptions('aAhbceuioprs',['help','user','pass','role']);
   if ErrorMsg<>'' then begin
     ShowException(Exception.Create(ErrorMsg));
     Terminate;
@@ -130,8 +138,9 @@ begin
   end;
 
   SQLFileName := '';
+  OutputFileName := '';
   DoExtract := false;
-  DoFullExtract := false;
+  ExtractTypes := [];
 
   {Initialise user_name and password from environment if available}
 
@@ -167,13 +176,19 @@ begin
     DoExtract := true;
 
   if HasOption('A') then
-    DoFullExtract := true;
+  begin
+    DoExtract := true;
+    ExtractTypes := [etData];
+  end;
 
   if HasOption('c') then
     FUseCSVFormat := true;
 
-  if HasOption('f') then
-    SQLFileName := GetOptionValue('f');
+  if HasOption('i') then
+    SQLFileName := GetOptionValue('i');
+
+  if HasOption('o') then
+    OutputFileName := GetOptionValue('o');
 
   if HasOption('s') then
   begin
@@ -183,7 +198,7 @@ begin
 
   {Validation}
 
-  if not DoExtract and not DoFullExtract then
+  if not DoExtract then
   begin
     if (SQLFileName = '') and (FSQL.DataString = '') then
       raise Exception.Create('An SQL File must be provided');
@@ -196,23 +211,22 @@ begin
 
   end;
 
-  if (DoExtract or DoFullExtract) and ((SQLFileName <> '') or (FSQL.DataString <> '')) then
+  if DoExtract and ((SQLFileName <> '') or (FSQL.DataString <> '')) then
     raise Exception.Create('Extract and script execution cannot be simulateously requested');
 
   {This is where it all happens}
 
+  if OutputFileName <> '' then
+    FOutputFile := TFileStream.Create(OutputFileName,fmCreate);
+
   FIBDatabase.Connected := true;
   try
-    if DoFullExtract then
-    begin
-      FExtract.ExtractObject(eoDatabase,'',[etData]);
-      for i := 0 to FExtract.Items.Count - 1 do
-        writeln(FExtract.Items[i]);
-    end
-    else
     if DoExtract then
     begin
-      FExtract.ExtractObject(eoDatabase);
+      FExtract.ExtractObject(eoDatabase,'',ExtractTypes);
+      if FOutputFile <> nil then
+        FExtract.Items.SaveToStream(FOutputFile)
+      else
       for i := 0 to FExtract.Items.Count - 1 do
         writeln(FExtract.Items[i]);
     end
@@ -223,6 +237,8 @@ begin
       FIBXScript.PerformUpdate(FSQL,true);
   finally
     FIBDatabase.Connected := false;
+    if FOutputFile <> nil then
+      FOutputFile.Free;
   end;
 
 
@@ -276,8 +292,9 @@ begin
   writeln(stderr,'-b            stop on first error');
   writeln(stderr,'-c            use csv format for select query results');
   writeln(stderr,'-e            echo sql statements to stdout');
-  writeln(stderr,'-f <filename> execute SQL script from file');
+  writeln(stderr,'-i <filename> execute SQL script from file');
   writeln(stderr,'-h            show this information');
+  writeln(stderr,'-o <filename> output to this file instead of stdout');
   writeln(stderr,'-p <password> provide password on command line (insecure)');
   writeln(stderr,'-r <rolename> open database with this rolename');
   writeln(stderr,'-s <sql>      Execute SQL text');

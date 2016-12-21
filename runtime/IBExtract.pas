@@ -365,7 +365,10 @@ begin
     ListDomains;
     ListAllTables(flag);
     if IncludeData then
+    begin
       ListData('');
+      FMetaData.Add('COMMIT;');
+    end;
     ListIndex;
     ListForeign;
     ListGenerators;

@@ -183,10 +183,13 @@ begin
           FColWidths[i] := 21; {leave room for the decimal point}
 
       SQL_TIMESTAMP:
-        FColWidths[i] := 21;
+        FColWidths[i] := 23;
 
-      SQL_TYPE_DATE, SQL_TYPE_TIME:
-        FColWidths[i] := 8;
+      SQL_TYPE_DATE:
+        FColWidths[i] := 10;
+
+      SQL_TYPE_TIME:
+        FColWidths[i] := 12;
 
       SQL_BLOB:
         if SQLSubType = 1 then
@@ -289,7 +292,7 @@ var blob: string;
     i, j: integer;
     s: string;
 begin
-  Data.Add('<binary>');
+  Data.Add(Format('<binary subtype="%d">',[Field.getSubtype]);
   blob := Field.AsString; {get Blob as untyped string }
   i := 0;
   while i < Length(blob) do

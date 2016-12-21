@@ -516,8 +516,7 @@ begin
 
    FISQL.SQL.Text := FSQLText;
    FISQL.Transaction := GetTransaction;
-   with FISQL.Transaction do
-     if not InTransaction then StartTransaction;
+   FISQL.Transaction.Active := true;
    FISQL.ParamCheck := not FHasBegin; {Probably PSQL}
    FISQL.Prepare;
    if FISQL.SQLStatementType in [SQLInsert, SQLUpdate, SQLDelete] then
