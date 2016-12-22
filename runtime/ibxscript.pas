@@ -33,15 +33,25 @@ interface
 
 uses Classes, IBDatabase,  IBSQL, IB;
 
+const
+  ibx_blob = ':IBX_BLOB';
+  ibx_array = ':IBX_ARRAY';
+
 type
   TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes,
                 sqEnd,sqBegin,sqCommit,sqRollback,sqString,sqCommentStart,
                 sqCommentEnd,sqCommentLine,sqAsterisk,sqForwardSlash,
-                sqDeclare,sqEOL,sqTerminator, sqReconnect,sqCase);
+                sqDeclare,sqEOL,sqTerminator, sqReconnect,sqCase,
+                sqEquals,sqGT,sqTag,sqEndTag);
 
   TSQLStates =  (stInit, stError, stInSQL, stNested, stInSingleQuotes,
                  stInDoubleQuotes, stInComment, stInCommentLine,
-                 stInDeclaration, stInCommit, stInReconnect);
+                 stInDeclaration, stInCommit, stInReconnect,
+                 {XML Analysis states}
+                 stInTag,stAttribute,stAttributeValue,stQuotedAttributeValue,
+                 stTagged,stEndTag);
+
+  TXMLTag    =   (xtNone,xtBinary,xtArray,xtElt);
 
   TGetParamValue = procedure(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD) of object;
   TLogEvent = procedure(Sender: TObject; Msg: string) of Object;
@@ -100,6 +110,23 @@ type
   multiple times.
   }
 
+  TBlobData = record
+    BlobIntf: IBlob;
+    SubType: cardinal;
+  end;
+
+  TArrayData = record
+    ArrayIntf: IArray;
+    SQLType: cardinal;
+    dim: cardinal;
+    Size: cardinal;
+    Scale: integer;
+    CharSet: string;
+    bounds: TArrayBounds;
+    CurrentRow: integer;
+    Index: array of integer;
+  end;
+
 
   { TIBXScript }
 
@@ -129,6 +156,17 @@ type
     FOnOutputLog: TLogEvent;
     FTerminator: char;
     FAutoDDL: boolean;
+    {XML Control variables}
+    FXMLTag: TXMLTag;
+    FXMLTagStack: array [1..20] of TXMLTag;
+    FXMLTagIndex: integer;
+    FAttributeName: string;
+    FXMLString: string;
+    FBlobData: array of TBlobData;
+    FCurrentBlob: integer;
+    FArrayData: array of TArrayData;
+    FCurrentArray: integer;
+    FBlobBuffer: PChar;
     procedure Add2Log(const Msg: string; IsError: boolean=true);
     procedure AddToSQL(const Symbol: string);
     function AnalyseSQL(Lines: TStringList): boolean;
@@ -145,6 +183,13 @@ type
     procedure ClearStatement;
     function PopState: TSQLStates;
     function ProcessSetStatement(stmt: string): boolean;
+    {XML Handling}
+    procedure EndXMLTag(xmltag: TXMLTag);
+    procedure EnterTag;
+    procedure ProcessTagValue(tagValue: string);
+    procedure StartXMLTag(xmltag: TXMLTag);
+    procedure ProcessAttributeValue(attrValue: string);
+    procedure ProcessBoundsList(boundsList: string);
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -179,6 +224,14 @@ resourcestring
   sResolveQueryParam =  'Resolving Query Parameter: %s';
   sNoCommit =  'Commit not allowed here';
   sNoReconnect = 'Reconnect not allowed here';
+  sXMLStackUnderflow = 'XML Stack Underflow';
+  sInvalidEndTag = 'XML End Tag Mismatch - %s';
+  sXMLStackOverFlow = 'XML Stack Overflow';
+  sErrorState = 'Entered Error State';
+  sXMLError = 'Invalid XML on Line "%s"';
+  sXMLAttributeError = 'Unexpected attribute - "%s"';
+  sInvalidBoundsList = 'Invalid array bounds list - "%s"';
+  sBlobBlobMustbeEven = 'Binary block must have an even number of characters';
 
 { TIBXScript }
 
@@ -207,14 +260,201 @@ begin
   while true do
   begin
     if FState = stError then
-      raise Exception.Create('Entered Error State');
+      raise Exception.Create(sErrorState);
     Symbol := GetSymbol(Line,index);
     if not (Symbol in [sqSpace,sqEOL]) then
       NonSpace := true;
+
+    if FState in [stInTag..stEndTag] then
+    {XML State Processing}
+    case Symbol of
+    sqSpace:
+      case FState of
+      stQuotedAttributeValue,
+      stTagged:
+         FXMLString += ' ';
+      end;
+
+    sqCommentStart,
+    sqCommentEnd,sqCommentLine,
+    sqEnd,sqBegin,sqCommit,sqRollback,
+    sqDeclare,sqReconnect,sqCase:
+      case FState of
+      stQuotedAttributeValue,
+      stTagged:
+         FXMLString += FString;
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+      end;
+
+    sqSemiColon:
+      case FState of
+      stQuotedAttributeValue,
+      stTagged:
+         FXMLString += ';';
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+      end;
+
+    sqSingleQuotes:
+      case FState of
+      stQuotedAttributeValue,
+      stTagged:
+         FXMLString += '''';
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+      end;
+
+    sqAsterisk:
+      case FState of
+      stQuotedAttributeValue,
+      stTagged:
+         FXMLString += '*';
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+      end;
+
+    sqForwardSlash:
+      case FState of
+      stQuotedAttributeValue,
+      stTagged:
+         FXMLString += '/';
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+      end;
+
+    sqGT:
+      case FState of
+      stEndTag:
+        begin
+          case FXMLTag of
+          xtBinary:
+            AddToSQL(Format(ibx_blob+'%d',[FCurrentBlob]));
+          xtArray:
+            AddToSQL(Format(ibx_array+'%d',[FCurrentArray]));
+          end;
+          PopState;
+        end;
+
+      stInTag:
+        begin
+          FXMLString := '';
+          FState := stTagged;
+          EnterTag;
+        end;
+
+      stQuotedAttributeValue,
+      stTagged:
+        FXMLString += '>';
+
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+      end;
+
+    sqTag:
+      if FState = stTagged then
+      begin
+        StartXMLTag(FXMLTag);
+        SetState(stInTag)
+      end
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+
+    sqEndTag:
+      if FState = stTagged then
+      begin
+        ProcessTagValue(FXMLString);
+        EndXMLTag(FXMLTag);
+        FState := stEndTag;
+      end
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+
+    sqEquals:
+      case FState of
+      stAttribute:
+        FState := stAttributeValue;
+
+      stQuotedAttributeValue,
+      stTagged:
+        FXMLString += '=';
+
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+      end;
+
+    sqDoubleQuotes:
+      case FState of
+      stAttributeValue:
+        begin
+          FXMLString := '';
+          FState := stQuotedAttributeValue;
+        end;
+
+      stQuotedAttributeValue:
+        begin
+          ProcessAttributeValue(FXMLString);
+          FState := stInTag;
+        end;
+
+      stTagged:
+        FXMLString += '"';
+
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+      end;
+
+    sqString:
+      case FState of
+      stInTag: {attribute name}
+        begin
+          FAttributeName := FString;
+          FState := stAttribute;
+        end;
+
+      stAttributeValue:
+        begin
+          ProcessAttributeValue(FString);
+          FState := stInTag;
+        end;
+
+      stQuotedAttributeValue:
+         FXMLString += FString;
+
+      stTagged:
+          FXMLString += FString;
+
+      else
+        raise Exception.CreateFmt(sXMLError,[Line]);
+      end;
+
+    end
+    else
+    {SQL State Processing}
     case Symbol of
     sqSpace:
       if not (FState in [stInComment,stInCommentLine]) then
         AddToSQL(' ');
+
+    sqEquals:
+      if not (FState in [stInComment,stInCommentLine]) then
+        AddToSQL('=');
+
+    sqGT:
+      if not (FState in [stInComment,stInCommentLine]) then
+        AddToSQL('>');
+
+    sqTag:
+      if not (FState in [stInComment,stInCommentLine]) then
+      begin
+        if FState in [stInSQL,stNested] then
+        begin
+          StartXMLTag(FXMLTag);
+          SetState(stInTag);
+        end
+        else
+          raise Exception.CreateFmt(sXMLError,[Line]);
+      end;
 
     sqTerminator:
       if not (FState in [stInComment,stInCommentLine]) then
@@ -423,7 +663,7 @@ begin
         stInSingleQuotes:
           raise Exception.Create(sUnterminatedString);
         end;
-        if NonSpace then AddToSQL(#13#10);
+        if NonSpace then AddToSQL(LineEnding);
         Exit;
       end;
     else
@@ -478,6 +718,7 @@ end;
 destructor TIBXScript.Destroy;
 begin
   if FISQL <> nil then FISQL.Free;
+  FreeMem(FBlobBuffer);
   if FInternalTransaction <> nil then FInternalTransaction.Free;
   inherited;
 end;
@@ -500,6 +741,101 @@ begin
   if not GetTransaction.InTransaction then
     GetTransaction.StartTransaction;
   ClearStatement;
+end;
+
+procedure TIBXScript.EndXMLTag(xmltag: TXMLTag);
+begin
+  if FXMLTagIndex = 0 then
+    raise Exception.Create(sXMLStackUnderflow);
+  if xmltag <> FXMLTagStack[FXMLTagIndex] then
+    raise Exception.CreateFmt(sInvalidEndTag,[FString]);
+
+  case FXMLTagStack[FXMLTagIndex] of
+  xtBinary:
+    FBlobData[FCurrentBlob].BlobIntf.Close;
+
+  xtArray:
+    FArrayData[FCurrentArray].ArrayIntf.SaveChanges;
+  end;
+  Dec(FXMLTagIndex);
+end;
+
+procedure TIBXScript.EnterTag;
+var aCharSetID: integer;
+begin
+  case FXMLTagStack[FXMLTagIndex] of
+  xtBinary:
+    FBlobData[FCurrentBlob].BlobIntf := Database.Attachment.CreateBlob(
+      Transaction.TransactionIntf,FBlobData[FCurrentBlob].SubType);
+
+  xtArray:
+    with FArrayData[FCurrentArray] do
+    begin
+      FirebirdAPI.CharSetName2CharSetID(CharSet,aCharSetID);
+      ArrayIntf := Database.Attachment.CreateArray(
+                     Transaction.TransactionIntf,
+                     Database.Attachment.CreateArrayMetaData(SQLType,Scale,Size,
+                     aCharSetID,dim,bounds)
+                     );
+    end;
+
+  xtElt:
+    Inc(FArrayData[FCurrentArray].CurrentRow);
+  end;
+end;
+
+procedure TIBXScript.ProcessTagValue(tagValue: string);
+
+  function nibble(hex: char): byte;
+  begin
+    case hex of
+    '0': Result := 0;
+    '1': Result := 1;
+    '2': Result := 2;
+    '3': Result := 3;
+    '4': Result := 4;
+    '5': Result := 5;
+    '6': Result := 6;
+    '7': Result := 7;
+    '8': Result := 8;
+    '9': Result := 9;
+    'a','A': Result := 10;
+    'b','B': Result := 11;
+    'c','C': Result := 12;
+    'd','D': Result := 13;
+    'e','E': Result := 14;
+    'f','F': Result := 15;
+    end;
+  end;
+
+  procedure WriteToBlob(hexData: string);
+  var i,j : integer;
+      blength: integer;
+  begin
+    if odd(length(hexData)) then
+      raise Exception.Create(sBlobBlobMustbeEven);
+    blength := Length(hexData) div 2;
+    IBAlloc(FBlobBuffer,0,blength);
+    j := 1;
+    for i := 1 to blength do
+    begin
+      FBlobBuffer^ := char((nibble(hexData[j]) shl 4) or nibble(hexdata[j+1]));
+      Inc(j,2);
+    end;
+    FBlobData[FCurrentBlob].BlobIntf.Write(FBlobBuffer^,blength);
+  end;
+
+begin
+  if tagValue = '' then Exit;
+  case FXMLTagStack[FXMLTagIndex] of
+  xtBinary:
+      WriteToBlob(tagValue);
+
+  xtElt:
+    with FArrayData[FCurrentArray] do
+      ArrayIntf.SetAsString(index,tagValue);
+
+  end;
 end;
 
 procedure TIBXScript.ExecSQL;
@@ -567,6 +903,10 @@ begin
       Result := sqForwardSlash;
     '*':
       Result := sqAsterisk;
+    '=':
+      Result := sqEquals;
+    '>':
+      Result := sqGT;
     else
       begin
         Result := sqString;
@@ -603,11 +943,13 @@ begin
       if FLastSymbol = sqAsterisk then
       begin
         Result := sqCommentStart;
+        FString := '/*';
         FLastSymbol := sqNone
       end
       else
       if FLastSymbol = sqForwardSlash then
       begin
+        FString := '//';
         Result := sqCommentLine;
         FLastSymbol := sqNone
       end;
@@ -615,6 +957,7 @@ begin
     sqAsterisk:
       if FLastSymbol = sqForwardSlash then
       begin
+        FString := '*/';
         Result := sqCommentEnd;
         FLastSymbol := sqNone
       end;
@@ -653,9 +996,45 @@ begin
       else
       if CompareText(FString,'reconnect') = 0 then
         Result := sqReconnect
-    else
-    if CompareText(FString,'case') = 0 then
-      Result := sqCase;
+      else
+      if CompareText(FString,'case') = 0 then
+        Result := sqCase
+      else
+      if CompareText(FString,'<binary') = 0 then
+      begin
+        FXMLTag := xtBinary;
+        Result := sqTag
+      end
+      else
+      if CompareText(FString,'<array') = 0 then
+      begin
+        FXMLTag := xtArray;
+        Result := sqTag
+      end
+      else
+      if CompareText(FString,'<elt') = 0 then
+      begin
+        FXMLTag := xtElt;
+        Result := sqTag
+      end
+      else
+      if CompareText(FString,'</binary') = 0 then
+      begin
+        FXMLTag := xtBinary;
+        Result := sqEndTag
+      end
+      else
+      if CompareText(FString,'</array') = 0 then
+      begin
+        FXMLTag := xtArray;
+        Result := sqEndTag
+      end
+      else
+      if CompareText(FString,'</elt') = 0 then
+      begin
+        FXMLTag := xtElt;
+        Result := sqEndTag
+      end
   end
 end;
 
@@ -765,7 +1144,22 @@ end;
 
 procedure TIBXScript.SetParamValue(SQLVar: ISQLParam);
 var BlobID: TISC_QUAD;
+    ix: integer;
 begin
+  if (SQLVar.SQLType = SQL_BLOB) and (Pos(ibx_blob,SQLVar.Name) = 1) then
+  begin
+    ix := StrToInt(system.copy(SQLVar.Name,length(ibx_blob)+1,length(SQLVar.Name)-length(ibx_blob)));
+    SQLVar.AsBlob := FBlobData[ix].BlobIntf;
+    Exit;
+  end;
+
+  if (SQLVar.SQLType = SQL_ARRAY) and (Pos(ibx_array,SQLVar.Name) = 1) then
+  begin
+    ix := StrToInt(system.copy(SQLVar.Name,length(ibx_array)+1,length(SQLVar.Name)-length(ibx_array)));
+    SQLVar.AsArray := FArrayData[ix].ArrayIntf;
+    Exit;
+  end;
+
   if assigned(FGetParamValue) and (SQLVar.SQLType = SQL_BLOB) then
   begin
     Add2Log(Format(sResolveQueryParam,[SQLVar.Name]));
@@ -788,6 +1182,109 @@ begin
   FState := AState
 end;
 
+procedure TIBXScript.StartXMLTag(xmltag: TXMLTag);
+begin
+  if FXMLTagIndex > 19 then
+    raise Exception.Create(sXMLStackOverFlow);
+  Inc(FXMLTagIndex);
+  FXMLTagStack[FXMLTagIndex] := xmltag;
+  case xmltag of
+  xtBinary:
+    begin
+      Inc(FCurrentBlob);
+      SetLength(FBlobData,FCurrentBlob+1);
+      FBlobData[FCurrentBlob].BlobIntf := nil;
+      FBlobData[FCurrentBlob].SubType := 0;
+    end;
+
+  xtArray:
+    begin
+      Inc(FCurrentArray);
+      SetLength(FArrayData,FCurrentArray+1);
+      with FArrayData[FCurrentArray] do
+      begin
+        ArrayIntf := nil;
+        SQLType := 0;
+        dim := 0;
+        Size := 0;
+        Scale := 0;
+        CharSet := 'NONE';
+        SetLength(Index,0);
+        CurrentRow := -1;
+      end;
+    end;
+
+  xtElt:
+      Inc(FArrayData[FCurrentArray].CurrentRow);
+  end;
+end;
+
+procedure TIBXScript.ProcessAttributeValue(attrValue: string);
+begin
+  case FXMLTagStack[FXMLTagIndex] of
+  xtBinary:
+    if FAttributeName = 'subtype' then
+      FBlobData[FCurrentBlob].SubType := StrToInt(attrValue)
+    else
+      raise Exception.CreateFmt(sXMLAttributeError,[attrValue]);
+
+  xtArray:
+    if FAttributeName = 'sqltype' then
+      FArrayData[FCurrentArray].SQLType := StrToInt(attrValue)
+    else
+    if FAttributeName = 'dim' then
+      FArrayData[FCurrentArray].Dim := StrToInt(attrValue)
+    else
+    if FAttributeName = 'length' then
+      FArrayData[FCurrentArray].Size := StrToInt(attrValue)
+    else
+    if FAttributeName = 'scale' then
+      FArrayData[FCurrentArray].Scale := StrToInt(attrValue)
+    else
+    if FAttributeName = 'charset' then
+      FArrayData[FCurrentArray].CharSet := attrValue
+    else
+    if FAttributeName = 'bounds' then
+      ProcessBoundsList(attrValue)
+    else
+      raise Exception.CreateFmt(sXMLAttributeError,[attrValue]);
+
+  xtElt:
+    if FAttributeName = 'ix' then
+      with FArrayData[FCurrentArray] do
+        Index[CurrentRow] :=  StrToInt(attrValue)
+     else
+        raise Exception.CreateFmt(sXMLAttributeError,[attrValue]);
+  end;
+end;
+
+procedure TIBXScript.ProcessBoundsList(boundsList: string);
+var list: TStringList;
+    i,j: integer;
+begin
+  list := TStringList.Create;
+  try
+    list.Delimiter := ',';
+    list.DelimitedText := boundsList;
+    with FArrayData[FCurrentArray] do
+    begin
+      if dim <> list.Count then
+        raise Exception.CreateFmt(sInvalidBoundsList,[boundsList]);
+      SetLength(bounds,dim);
+      for i := 0 to list.Count - 1 do
+      begin
+        j := Pos(':',list[i]);
+        if j = 0 then
+          raise Exception.CreateFmt(sInvalidBoundsList,[boundsList]);
+        bounds[i].LowerBound := StrToInt(system.copy(list[i],1,j-1));
+        bounds[i].UpperBound := StrToInt(system.copy(list[i],j+1,length(list[i])-j));
+      end;
+    end;
+  finally
+    list.Free;
+  end;
+end;
+
 procedure TIBXScript.ClearStatement;
 begin
   FSQLText := '';
@@ -795,6 +1292,12 @@ begin
   FHasBegin := false;
   FLastChar := ' ';
   FLastSymbol := sqNone;
+  FXMLTag := xtNone;
+  FXMLTagIndex := 0;
+  SetLength(FBlobData,0);
+  FCurrentBlob := -1;
+  SetLength(FArrayData,0);
+  FCurrentArray := -1;
 end;
 
 end.

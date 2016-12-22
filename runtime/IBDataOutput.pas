@@ -292,7 +292,7 @@ var blob: string;
     i, j: integer;
     s: string;
 begin
-  Data.Add(Format('<binary subtype="%d">',[Field.getSubtype]);
+  Data.Add(Format('<binary subtype="%d">',[Field.getSubtype]));
   blob := Field.AsString; {get Blob as untyped string }
   i := 0;
   while i < Length(blob) do
@@ -337,6 +337,9 @@ var index: array of integer;
 
 var
     s: string;
+    bounds: TArrayBounds;
+    i: integer;
+    boundsList: string;
 begin
   s := Format('<array dim = "%d" sqltype = "%d" length = "%d"',
                               [ar.GetDimensions,ar.GetSQLType,ar.GetSize]);
@@ -347,6 +350,14 @@ begin
   SQL_VARYING:
     s += Format(' charset = "%s"',[FirebirdAPI.GetCharsetName(ar.GetCharSetID)]);
   end;
+  bounds := ar.GetBounds;
+  boundsList := '';
+  for i := 0 to length(bounds) - 1 do
+  begin
+    if i <> 0 then boundsList += ',';
+    boundsList += Format('%d:%d',[bounds[i].LowerBound,bounds[i].UpperBound]);
+  end;
+  s += Format(' bounds="%s"',[boundsList]);
   s += '>';
   Data.Add(s);
 
