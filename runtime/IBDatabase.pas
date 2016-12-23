@@ -240,7 +240,8 @@ type
     procedure CloseDataSets;
     procedure CheckActive;
     procedure CheckInactive;
-    procedure CreateDatabase;
+    procedure CreateDatabase; overload;
+    procedure CreateDatabase(createDatabaseSQL: string); overload;
     procedure DropDatabase;
     procedure ForceClose;
     procedure GetFieldNames(const TableName: string; List: TStrings);
@@ -607,6 +608,19 @@ begin
   CheckDatabaseName;
   FCreateDatabase := true;
   Connected := true;
+end;
+
+procedure TIBDataBase.CreateDatabase(createDatabaseSQL: string);
+var info: IDBInformation;
+    ConnectionType: integer;
+    SiteName: string;
+begin
+  CheckInactive;
+  FAttachment := FirebirdAPI.CreateDatabase(createDatabaseSQL,FSQLDialect);
+  info := FAttachment.GetDBInformation(isc_info_db_id);
+  info[0].DecodeIDCluster(ConnectionType,FDBName,SiteName);
+  if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
+    OnCreateDatabase(self);
 end;
 
  procedure TIBDataBase.DropDatabase;
