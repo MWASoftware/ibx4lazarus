@@ -58,9 +58,13 @@ type
     FSQL: TStringStream;
     FUseCSVFormat: boolean;
     FOutputFile: TStream;
+    FIncludeHeader: boolean;
+    FRowCount: integer;
+    FPlanOptions: TPlanOptions;
     procedure LogHandler(Sender: TObject; Msg: string);
     procedure ErrorLogHandler(Sender: TObject; Msg: string);
     procedure HandleSelectSQL(Sender: TObject; SQLText: string);
+    procedure HandleSetStatement(Sender: TObject; command, aValue, stmt: string; var Done: boolean);
   protected
     procedure DoRun; override;
     procedure ShowException(E: Exception); override;
@@ -97,7 +101,12 @@ begin
     DBOutput := TIBBlockFormatOut.Create(self);
   try
     DBOutput.Database := FIBDatabase;
-    DBOutput.DataOut(SQLText,Results);
+    DBOutput.RowCount := FRowCount;
+    if FUseCSVFormat then
+      TIBCSVDataOut(DBOutput).IncludeHeader := FIncludeHeader
+    else
+      TIBBlockFormatOut(DBOutput).IncludeHeader := FIncludeHeader;
+    DBOutput.DataOut(SQLText,FPlanOptions,Results);
     if FOutputFile <> nil then
       Results.SaveToStream(FOutputFile)
     else
@@ -107,6 +116,49 @@ begin
     DBOutput.Free;
     Results.Free;
   end;
+end;
+
+procedure TFBSQL.HandleSetStatement(Sender: TObject; command, aValue,
+  stmt: string; var Done: boolean);
+
+  function Toggle(aValue: string): boolean;
+  begin
+    aValue := AnsiUpperCase(aValue);
+    if aValue = 'ON' then
+      Result := true
+    else
+    if aValue = 'OFF' then
+      Result := false
+    else
+      raise Exception.CreateFmt(sInvalidSetStatement, [command,stmt]);
+  end;
+
+begin
+  done := true;
+  if command = 'HEADING' then
+    FIncludeHeader := Toggle(aValue)
+  else
+  if command = 'ROWCOUNT' then
+    FRowCount := StrToInt(aValue)
+  else
+  if command = 'PLAN' then
+  begin
+    if Toggle(aValue) then
+      FPlanOptions := poIncludePlan
+    else
+      FPlanOptions := poNoPlan;
+  end
+  else
+  if command = 'PLANONLY' then
+  begin
+    if Toggle(aValue) then
+      FPlanOptions := poPlanOnly
+    else
+    if FPlanOptions <> poIncludePlan then
+      FPlanOptions := poNoPlan;
+  end
+  else
+    done := false;
 end;
 
 procedure TFBSQL.DoRun;
@@ -255,6 +307,8 @@ constructor TFBSQL.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
   StopOnException:=True;
+  FIncludeHeader := true;
+  FPlanOptions := poNoPlan;
   FSQL := TStringStream.Create('');
 
   { Create Components }
@@ -267,6 +321,7 @@ begin
   FIBXScript.OnOutputLog := @LogHandler;
   FIBXScript.OnErrorLog := @ErrorLogHandler;
   FIBXScript.OnSelectSQL := @HandleSelectSQL;
+  FIBXScript.OnSetStatement := @HandleSetStatement;
   FExtract := TIBExtract.Create(self);
   FExtract.Database := FIBDatabase;
   FExtract.Transaction := FIBTransaction;

@@ -3046,7 +3046,8 @@ begin
     with TIBInsertStmtsOut.Create(self) do
     try
       Database := FDatabase;
-      DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]),FMetaData);
+      DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]),
+                poNoPlan,FMetaData);
     finally
       Free
     end;

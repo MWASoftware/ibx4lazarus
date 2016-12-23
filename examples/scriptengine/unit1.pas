@@ -35,6 +35,7 @@ type
     Timer1: TTimer;
     procedure EchoInputChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure IBDatabase1BeforeConnect(Sender: TObject);
     procedure IBXScript1GetParamValue(Sender: TObject; ParamName: string;
       var BlobID: TISC_QUAD);
     procedure IBXScript1LogProc(Sender: TObject; Msg: string);
@@ -71,7 +72,16 @@ begin
   DBName.Caption := IBDatabase1.DatabaseName;
   StopOnError.Checked := IBXScript1.StopOnFirstError;
   EchoInput.Checked :=  IBXScript1.Echo;
-  Application.QueueAsyncCall(@DoOpen,0);
+//  Application.QueueAsyncCall(@DoOpen,0);
+end;
+
+procedure TForm1.IBDatabase1BeforeConnect(Sender: TObject);
+begin
+  with (Sender as TIBDatabase) do
+  begin
+    LoginPrompt := (Params.IndexOfName('user_name') = -1) or
+                   (Params.IndexOfName('password') = -1);
+  end;
 end;
 
 procedure TForm1.EchoInputChange(Sender: TObject);
@@ -145,7 +155,7 @@ begin
   try
    IBScript.Lines.SaveToStream(S);
    S.Position := 0;
-   IBXScript1.PerformUpdate(S,true);
+   IBXScript1.RunScript(S,true);
   finally
     S.Free;
   end;

@@ -40,6 +40,7 @@ const
   sTimeFormat      =  'hh:nn:ss.zzz';
 
 type
+  TPlanOptions = (poNoPlan,poIncludePlan, poPlanOnly);
 
   { TIBCustomDataOutput }
 
@@ -47,6 +48,7 @@ type
   private
     FIBSQL: TIBSQL;
     FIncludeHeader: Boolean;
+    FRowCount: integer;
     function GetDatabase: TIBDatabase;
     function GetTransaction: TIBTransaction;
     procedure SetDatabase(AValue: TIBDatabase);
@@ -58,10 +60,11 @@ type
     property IncludeHeader: Boolean read FIncludeHeader write FIncludeHeader default true;
   public
     constructor Create(aOwner: TComponent); override;
-    procedure DataOut(SelectQuery: string; var Data: TStrings);
+    procedure DataOut(SelectQuery: string; PlanOptions: TPlanOptions; var Data: TStrings);
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Transaction: TIBTransaction read GetTransaction write SetTransaction;
+    property RowCount: integer read FRowCount write FRowCount;
   end;
 
   { TIBCSVDataOut }
@@ -112,6 +115,8 @@ type
     procedure HeaderOut(var Data: TStrings); override;
     procedure FormattedDataOut(var Data: TStrings); override;
     procedure TrailerOut(var Data: TStrings); override;
+  published
+    property IncludeHeader;
   end;
 
 implementation
@@ -556,18 +561,27 @@ begin
   FIncludeHeader := true;
 end;
 
-procedure TIBCustomDataOutput.DataOut(SelectQuery: string; var Data: TStrings);
+procedure TIBCustomDataOutput.DataOut(SelectQuery: string;
+  PlanOptions: TPlanOptions; var Data: TStrings);
+var Count: integer;
 begin
   FIBSQL.SQL.Text := SelectQuery;
   FIBSQL.Prepare;
+  if PlanOptions <> poNoPlan then
+    Data.Add(FIBSQL.Plan);
+  if PlanOptions = poPlanOnly then
+    Exit;
+
   if IncludeHeader then
     HeaderOut(Data);
+  Count := 0;
   FIBSQL.ExecQuery;
   try
-    while not FIBSQL.EOF do
+    while (not FIBSQL.EOF) and ((FRowCount = 0) or (Count < FRowCount)) do
     begin
       FormattedDataOut(Data);
       FIBSQL.Next;
+      Inc(Count);
     end;
   finally
     FIBSQL.Close;

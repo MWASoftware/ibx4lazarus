@@ -127,6 +127,8 @@ type
     Index: array of integer;
   end;
 
+  TOnSetStatement = procedure(Sender: TObject; command, aValue, stmt: string; var Done: boolean) of object;
+
 
   { TIBXScript }
 
@@ -138,6 +140,8 @@ type
     FOnErrorLog: TLogEvent;
     FOnProgressEvent: TOnProgressEvent;
     FOnSelectSQL: TOnSelectSQL;
+    FOnSetStatement: TOnSetStatement;
+    FShowAffectedRows: boolean;
     FStopOnFirstError: boolean;
     FTransaction: TIBTransaction;
     FInternalTransaction: TIBTransaction;
@@ -182,7 +186,7 @@ type
     procedure SetState(AState: TSQLStates);
     procedure ClearStatement;
     function PopState: TSQLStates;
-    function ProcessSetStatement(stmt: string): boolean;
+    function ProcessStatement(stmt: string): boolean;
     {XML Handling}
     procedure EndXMLTag(xmltag: TXMLTag);
     procedure EnterTag;
@@ -193,20 +197,29 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
-    function PerformUpdate(const SQLFile: string;  AutoDDL: boolean): boolean; overload;
-    function PerformUpdate(const SQLStream: TStream;   AutoDDL: boolean): boolean; overload;
+    {use RunScript instead of PerformUpdate}
+    function PerformUpdate(const SQLFile: string;  AutoDDL: boolean): boolean; overload; deprecated;
+    function PerformUpdate(const SQLStream: TStream;   AutoDDL: boolean): boolean; overload; deprecated;
+    function RunScript(const SQLFile: string;  AutoDDL: boolean): boolean; overload;
+    function RunScript(const SQLStream: TStream;   AutoDDL: boolean): boolean; overload;
   published
     property Database: TIBDatabase read FDatabase write SetDatabase;
+    property AutoDDL: boolean read FAutoDDL write FAutoDDL;
     property Echo: boolean read FEcho write FEcho default true;  {Echo Input to Log}
     property IgnoreGrants: boolean read FIgnoreGrants write FIgnoreGrants;
     property Transaction: TIBTransaction read FTransaction write FTransaction;
+    property ShowAffectedRows: boolean read FShowAffectedRows write FShowAffectedRows;
     property StopOnFirstError: boolean read FStopOnFirstError write FStopOnFirstError default true;
     property GetParamValue: TGetParamValue read FGetParamValue write FGetParamValue; {resolve parameterized queries}
     property OnOutputLog: TLogEvent read FOnOutputLog write FOnOutputLog; {Log handler}
     property OnErrorLog: TLogEvent read FOnErrorLog write FOnErrorLog;
     property OnProgressEvent: TOnProgressEvent read FOnProgressEvent write FOnProgressEvent; {Progress Bar Support}
     property OnSelectSQL: TOnSelectSQL read FOnSelectSQL write FOnSelectSQL; {Handle Select SQL Statements}
+    property OnSetStatement: TOnSetStatement read FOnSetStatement write FOnSetStatement;
   end;
+
+resourcestring
+  sInvalidSetStatement = 'Invalid %s Statement - %s';
 
 implementation
 
@@ -218,7 +231,6 @@ resourcestring
   sUnknownSymbol = 'Unknown Symbol %d';
   sNoSelectSQL = 'Select SQL Statements are not supported';
   sStackUnderflow = 'Stack Underflow';
-  sInvalidAutoDDL = 'Invalid AUTODDL Statement - %s';
   sNoParamQueries =  'Parameterised Queries are not supported';
   sStackOverFlow = 'Stack Overflow';
   sResolveQueryParam =  'Resolving Query Parameter: %s';
@@ -232,6 +244,7 @@ resourcestring
   sXMLAttributeError = 'Unexpected attribute - "%s"';
   sInvalidBoundsList = 'Invalid array bounds list - "%s"';
   sBlobBlobMustbeEven = 'Binary block must have an even number of characters';
+  sInvalidCharacterSet = 'Unrecognised character set name - "%s"';
 
 { TIBXScript }
 
@@ -662,6 +675,8 @@ begin
         stInDoubleQuotes,
         stInSingleQuotes:
           raise Exception.Create(sUnterminatedString);
+        stInit:
+          Exit;
         end;
         if NonSpace then AddToSQL(LineEnding);
         Exit;
@@ -721,6 +736,18 @@ begin
   FreeMem(FBlobBuffer);
   if FInternalTransaction <> nil then FInternalTransaction.Free;
   inherited;
+end;
+
+function TIBXScript.PerformUpdate(const SQLFile: string; AutoDDL: boolean
+  ): boolean;
+begin
+  Result := RunScript( SQLFile,AutoDDL);
+end;
+
+function TIBXScript.PerformUpdate(const SQLStream: TStream; AutoDDL: boolean
+  ): boolean;
+begin
+  Result := RunScript(SQLStream,AutoDDL);
 end;
 
 procedure TIBXScript.DoCommit;
@@ -844,12 +871,13 @@ var DDL: boolean;
 begin
  if FSQLText <> '' then
  begin
-   if ProcessSetStatement(FSQLText) then {Handle Set Statement}
+   if ProcessStatement(FSQLText) then {Handle Set Statement}
    begin
      ClearStatement;
      Exit;
    end;
 
+   Database.Connected := true;
    FISQL.SQL.Text := FSQLText;
    FISQL.Transaction := GetTransaction;
    FISQL.Transaction.Active := true;
@@ -873,7 +901,12 @@ begin
    begin
      DDL := FISQL.SQLStatementType = SQLDDL;
      if not DDL or not FIgnoreGrants or (Pos('GRANT',AnsiUpperCase(Trim(FSQLText))) <> 1) then
+     begin
        FISQL.ExecQuery;
+       if ShowAffectedRows and not DDL then
+         Add2Log('Rows Affected: ' + IntToStr(FISQL.RowsAffected));
+     end;
+
      if FAutoDDL and DDL then
        FISQL.Transaction.Commit;
      FISQL.Close;
@@ -891,7 +924,7 @@ begin
       Result := sqTerminator
     else
     case C of
-    ' ',#9:
+    ' ',#9,#10,#13:
       Result := sqSpace;
     ';':
       Result := sqSemiColon;
@@ -1054,26 +1087,26 @@ begin
   FInternalTransaction.DefaultDatabase := AValue;
 end;
 
-function TIBXScript.PerformUpdate(const SQLFile: string;
+function TIBXScript.RunScript(const SQLFile: string;
                                      AutoDDL: boolean): boolean;
 var F: TFileStream;
 begin
   F := TFileStream.Create(SQLFile,fmOpenRead or fmShareDenyNone);
   try
-    Result := PerformUpdate(F,AutoDDL)
+    Result := RunScript(F,AutoDDL)
   finally
     F.Free
   end;
 end;
 
-function TIBXScript.PerformUpdate(const SQLStream: TStream; AutoDDL: boolean): boolean;
+function TIBXScript.RunScript(const SQLStream: TStream; AutoDDL: boolean): boolean;
 var Lines: TStringList;
     FNotConnected: boolean;
 begin
   FTerminator := ';';
   FAutoDDL := AutoDDL;
-  FNotConnected := not Database.Connected;
-  Database.Connected := true;
+//  FNotConnected := not Database.Connected;
+//  Database.Connected := true;
   try
     Lines := TStringList.Create;
     Lines.LoadFromStream(SQLStream);
@@ -1095,8 +1128,8 @@ begin
   end;
   with GetTransaction do
     if InTransaction then Commit;
-  if FNotConnected then
-    Database.Connected := false;
+//  if FNotConnected then
+//    Database.Connected := false;
 end;
 
 function TIBXScript.PopState: TSQLStates;
@@ -1107,35 +1140,207 @@ begin
   Result := FStack[FStackIndex]
 end;
 
-function TIBXScript.ProcessSetStatement(stmt: string): boolean;
+function TIBXScript.ProcessStatement(stmt: string): boolean;
+var command: string;
+    ucStmt: string;
+
+  function Toggle(aValue: string): boolean;
+  begin
+    aValue := AnsiUpperCase(aValue);
+    if aValue = 'ON' then
+      Result := true
+    else
+    if aValue = 'OFF' then
+      Result := false
+    else
+      raise Exception.CreateFmt(sInvalidSetStatement, [command,stmt]);
+  end;
+
+  procedure ExtractUserInfo;
+  var  RegexObj: TRegExpr;
+  begin
+    RegexObj := TRegExpr.Create;
+    try
+      RegexObj.ModifierG := false; {turn off greedy matches}
+      RegexObj.Expression := ' +USER +''(.+)''';
+      if RegexObj.Exec(ucStmt) then
+        FDatabase.Params.Values['user_name'] := RegexObj.Match[1];
+
+      RegexObj.Expression := ' +PASSWORD +''(.+)''';
+      if RegexObj.Exec(ucStmt) then
+        FDatabase.Params.Values['password'] :=
+                    system.copy(stmt,RegexObj.MatchPos[1],RegexObj.MatchLen[1]);
+    finally
+      RegexObj.Free;
+    end;
+  end;
+
+  procedure ExtractConnectInfo;
+  var  RegexObj: TRegExpr;
+  begin
+    ExtractUserInfo;
+    RegexObj := TRegExpr.Create;
+    try
+      RegexObj.ModifierG := false; {turn off greedy matches}
+      RegexObj.Expression := '^ *CONNECT +''(.*)''';
+      if RegexObj.Exec(ucStmt) then
+      begin
+        FDatabase.DatabaseName := RegexObj.Match[1];
+      end;
+
+      RegexObj.Expression := ' +ROLE +''(.+)''';
+      if RegexObj.Exec(ucStmt) then
+        FDatabase.Params.Values['sql_role_name'] := RegexObj.Match[1]
+      else
+      with FDatabase.Params do
+      if IndexOfName('sql_role_name') <> -1 then
+        Delete(IndexOfName('sql_role_name'));
+
+      RegexObj.Expression := ' +CACHE +([0-9]+)';
+      if RegexObj.Exec(ucStmt) then
+        FDatabase.Params.Values['cache_manager'] := RegexObj.Match[1]
+      else
+      with FDatabase.Params do
+      if IndexOfName('cache_manager') <> -1 then
+        Delete(IndexOfName('cache_manager'));
+    finally
+      RegexObj.Free;
+    end;
+  end;
+
+  procedure UpdateUserPassword;
+  var  RegexObj: TRegExpr;
+  begin
+    RegexObj := TRegExpr.Create;
+    try
+      RegexObj.ModifierG := false; {turn off greedy matches}
+      RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +(''.*'') +USER +''(.+)''';
+      if not RegexObj.Exec(ucStmt) and (FDatabase.Params.IndexOfName('user_name') <> -1) then
+      begin
+        RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +(''.*'')';
+        if RegexObj.Exec(ucStmt) then
+        begin
+          system.Insert(' USER ''' + FDatabase.Params.Values['user_name'] +'''',stmt,
+                 RegexObj.MatchPos[2] + RegexObj.MatchLen[2]);
+          ucStmt := AnsiUpperCase(stmt);
+        end;
+      end;
+
+      RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +USER +''.+'' PASSWORD +''(.+)''';
+      if not RegexObj.Exec(ucStmt) and (FDatabase.Params.IndexOfName('password') <> -1) then
+      begin
+        RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +(USER +''.+'')';
+        if RegexObj.Exec(ucStmt) then
+        begin
+          system.Insert(' PASSWORD ''' + FDatabase.Params.Values['password'] +'''',stmt,
+                 RegexObj.MatchPos[2] + RegexObj.MatchLen[2]);
+          ucStmt := AnsiUpperCase(stmt);
+        end;
+      end;
+    finally
+      RegexObj.Free;
+    end;
+  end;
+
 var  RegexObj: TRegExpr;
+     n: integer;
+     charset: string;
+     charsetid: integer;
 begin
   Result := false;
+  ucStmt := AnsiUpperCase(stmt);
   RegexObj := TRegExpr.Create;
   try
+    {process create database}
+    RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +(.*) *(\' + FTerminator + '|)';
+    if RegexObj.Exec(ucStmt) then
+    begin
+      UpdateUserPassword;
+      FDatabase.Connected := false;
+      FDatabase.CreateDatabase(stmt);
+      FDatabase.Connected := false;
+      ExtractUserInfo;
+      DoReconnect;
+      Result := true;
+      Exit;
+    end;
+
+    {process connect statement}
+    RegexObj.Expression := '^ *CONNECT +(.*) *(\' + FTerminator + '|)';
+    if RegexObj.Exec(ucStmt) then
+    begin
+      ExtractConnectInfo;
+      DoReconnect;
+      Result := true;
+      Exit;
+    end;
+
+
     {Process Set Term}
-    RegexObj.Expression := 'SET +TERM +(.) *(\' + FTerminator + '|)';
-    if RegexObj.Exec(AnsiUpperCase(stmt)) then
+    RegexObj.Expression := '^ *SET +TERM +(.) *(\' + FTerminator + '|)';
+    if RegexObj.Exec(ucStmt) then
     begin
        FTerminator := RegexObj.Match[1][1];
        Result := true;
        Exit;
     end;
 
-    {Process AutoDDL}
-    RegexObj.Expression := 'SET +AUTODDL +([a-zA-Z]+) *(\' + FTerminator + '|)';
-    if RegexObj.Exec(AnsiUpperCase(stmt)) then
+    {process Set SQL Dialect}
+    RegexObj.Expression := '^ *SET +SQL +DIALECT +([0-9]) *(\' + FTerminator + '|)';
+    if RegexObj.Exec(ucStmt) then
     begin
-      if  AnsiUpperCase(RegexObj.Match[1]) = 'ON' then
-        FAutoDDL := true
-      else
-      if  AnsiUpperCase(RegexObj.Match[1]) = 'OFF' then
-        FAutoDDL := false
-      else
-        raise Exception.CreateFmt(sInvalidAutoDDL, [RegexObj.Match[0]]);
-
+      n := StrToInt(RegexObj.Match[1]);
+      if Database.SQLDialect <> n then
+      begin
+        Database.SQLDialect := n;
+        if Database.Connected then
+          DoReconnect;
+      end;
       Result := true;
+      Exit;
     end;
+
+    {Process Remaining Set statements}
+    RegexObj.Expression := '^ *SET +([A-Z]+) +([A-Z0-9]+) *(\' + FTerminator + '|)';
+    if RegexObj.Exec(ucStmt) then
+    begin
+      command := AnsiUpperCase(RegexObj.Match[1]);
+      if command = 'AUTODDL' then
+        AutoDDL := Toggle(RegexObj.Match[2])
+      else
+      if command = 'BAIL' then
+        StopOnFirstError := Toggle(RegexObj.Match[2])
+      else
+      if command = 'ECHO' then
+        Echo := Toggle(RegexObj.Match[2])
+      else
+      if command = 'COUNT' then
+        ShowAffectedRows := Toggle(RegexObj.Match[2])
+      else
+      if command = 'NAMES' then
+      begin
+        charset := RegexObj.Match[2];
+        if FirebirdAPI.CharSetName2CharSetID(charset,charsetid) then
+        begin
+          Database.Params.Values['lc_ctype'] := charset;
+          if Database.Connected then
+            DoReconnect;
+        end
+        else
+          raise Exception.CreateFmt(sInvalidCharacterSet, [charset,stmt]);
+      end
+      else
+      if assigned(OnSetStatement) then
+      begin
+        OnSetStatement(self,command,RegexObj.Match[2],stmt,Result);
+        Exit;
+      end
+      else
+        raise Exception.CreateFmt(sInvalidSetStatement, [command,stmt]);
+      Result := true;
+      Exit;
+    end;
+
   finally
     RegexObj.Free;
   end;
