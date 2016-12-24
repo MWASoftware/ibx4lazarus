@@ -142,6 +142,7 @@ type
     FOnSelectSQL: TOnSelectSQL;
     FOnSetStatement: TOnSetStatement;
     FShowAffectedRows: boolean;
+    FShowPerformanceStats: boolean;
     FStopOnFirstError: boolean;
     FTransaction: TIBTransaction;
     FInternalTransaction: TIBTransaction;
@@ -209,6 +210,7 @@ type
     property IgnoreGrants: boolean read FIgnoreGrants write FIgnoreGrants;
     property Transaction: TIBTransaction read FTransaction write FTransaction;
     property ShowAffectedRows: boolean read FShowAffectedRows write FShowAffectedRows;
+    property ShowPerformanceStats: boolean read FShowPerformanceStats write FShowPerformanceStats;
     property StopOnFirstError: boolean read FStopOnFirstError write FStopOnFirstError default true;
     property GetParamValue: TGetParamValue read FGetParamValue write FGetParamValue; {resolve parameterized queries}
     property OnOutputLog: TLogEvent read FOnOutputLog write FOnOutputLog; {Log handler}
@@ -868,6 +870,7 @@ end;
 procedure TIBXScript.ExecSQL;
 var DDL: boolean;
     I: integer;
+    stats: TPerfCounters;
 begin
  if FSQLText <> '' then
  begin
@@ -883,6 +886,8 @@ begin
    FISQL.Transaction.Active := true;
    FISQL.ParamCheck := not FHasBegin; {Probably PSQL}
    FISQL.Prepare;
+   FISQL.Statement.EnableStatistics(ShowPerformanceStats);
+
    if FISQL.SQLStatementType in [SQLInsert, SQLUpdate, SQLDelete] then
    begin
      {Interpret parameters}
@@ -905,6 +910,18 @@ begin
        FISQL.ExecQuery;
        if ShowAffectedRows and not DDL then
          Add2Log('Rows Affected: ' + IntToStr(FISQL.RowsAffected));
+       if not DDL and FISQL.Statement.GetPerfStatistics(stats) then
+       begin
+         Add2Log(Format('Current memory = %d',[stats[psCurrentMemory]]));
+         Add2Log(Format('Delta memory = %d',[stats[psDeltaMemory]]));
+         Add2Log(Format('Max memory = %d',[stats[psMaxMemory]]));
+         Add2Log('Elapsed time= ' + FormatFloat('#0.000',stats[psRealTime]/1000) +' sec');
+         Add2Log('Cpu = ' + FormatFloat('#0.000',stats[psUserTime]/1000) + ' sec');
+         Add2Log(Format('Buffers = %d',[stats[psBuffers]]));
+         Add2Log(Format('Reads = %d',[stats[psReads]]));
+         Add2Log(Format('Writes = %d',[stats[psWrites]]));
+         Add2Log(Format('Fetches = %d',[stats[psFetches]]));
+      end;
      end;
 
      if FAutoDDL and DDL then
@@ -1101,12 +1118,11 @@ end;
 
 function TIBXScript.RunScript(const SQLStream: TStream; AutoDDL: boolean): boolean;
 var Lines: TStringList;
-    FNotConnected: boolean;
 begin
   FTerminator := ';';
+  FLastChar := ' ';
+  FLastSymbol := sqNone;
   FAutoDDL := AutoDDL;
-//  FNotConnected := not Database.Connected;
-//  Database.Connected := true;
   try
     Lines := TStringList.Create;
     Lines.LoadFromStream(SQLStream);
@@ -1128,8 +1144,6 @@ begin
   end;
   with GetTransaction do
     if InTransaction then Commit;
-//  if FNotConnected then
-//    Database.Connected := false;
 end;
 
 function TIBXScript.PopState: TSQLStates;
@@ -1185,7 +1199,7 @@ var command: string;
       RegexObj.Expression := '^ *CONNECT +''(.*)''';
       if RegexObj.Exec(ucStmt) then
       begin
-        FDatabase.DatabaseName := RegexObj.Match[1];
+        FDatabase.DatabaseName := system.copy(stmt,RegexObj.MatchPos[1],RegexObj.MatchLen[1]);
       end;
 
       RegexObj.Expression := ' +ROLE +''(.+)''';
@@ -1244,8 +1258,8 @@ var command: string;
 
 var  RegexObj: TRegExpr;
      n: integer;
-     charset: string;
      charsetid: integer;
+     param: string;
 begin
   Result := false;
   ucStmt := AnsiUpperCase(stmt);
@@ -1301,38 +1315,46 @@ begin
     end;
 
     {Process Remaining Set statements}
-    RegexObj.Expression := '^ *SET +([A-Z]+) +([A-Z0-9]+) *(\' + FTerminator + '|)';
+    RegexObj.Expression := '^ *SET +([A-Z]+)( +[A-Z0-9]+|) *(\' + FTerminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
       command := AnsiUpperCase(RegexObj.Match[1]);
+      param := trim(RegexObj.Match[2]);
       if command = 'AUTODDL' then
-        AutoDDL := Toggle(RegexObj.Match[2])
+        AutoDDL := ((RegexObj.MatchLen[2] = 0) and not AutoDDL) or
+                   (RegexObj.MatchLen[2] > 0) and Toggle(param)
       else
       if command = 'BAIL' then
-        StopOnFirstError := Toggle(RegexObj.Match[2])
+        StopOnFirstError := ((RegexObj.MatchLen[2] = 0) and not StopOnFirstError) or
+                   (RegexObj.MatchLen[2] > 0) and Toggle(param)
       else
       if command = 'ECHO' then
-        Echo := Toggle(RegexObj.Match[2])
+        Echo := ((RegexObj.MatchLen[2] = 0) and not Echo) or
+                   (RegexObj.MatchLen[2] > 0) and Toggle(param)
       else
       if command = 'COUNT' then
-        ShowAffectedRows := Toggle(RegexObj.Match[2])
+        ShowAffectedRows := ((RegexObj.MatchLen[2] = 0) and not ShowAffectedRows) or
+                   (RegexObj.MatchLen[2] > 0) and Toggle(param)
+      else
+      if command = 'STATS' then
+        ShowPerformanceStats := ((RegexObj.MatchLen[2] = 0) and not FShowPerformanceStats) or
+                   (RegexObj.MatchLen[2] > 0) and Toggle(param)
       else
       if command = 'NAMES' then
       begin
-        charset := RegexObj.Match[2];
-        if FirebirdAPI.CharSetName2CharSetID(charset,charsetid) then
+        if FirebirdAPI.CharSetName2CharSetID(param,charsetid) then
         begin
-          Database.Params.Values['lc_ctype'] := charset;
+          Database.Params.Values['lc_ctype'] := param;
           if Database.Connected then
             DoReconnect;
         end
         else
-          raise Exception.CreateFmt(sInvalidCharacterSet, [charset,stmt]);
+          raise Exception.CreateFmt(sInvalidCharacterSet, [param,stmt]);
       end
       else
       if assigned(OnSetStatement) then
       begin
-        OnSetStatement(self,command,RegexObj.Match[2],stmt,Result);
+        OnSetStatement(self,command,param,stmt,Result);
         Exit;
       end
       else
@@ -1495,8 +1517,6 @@ begin
   FSQLText := '';
   FState := stInit;
   FHasBegin := false;
-  FLastChar := ' ';
-  FLastSymbol := sqNone;
   FXMLTag := xtNone;
   FXMLTagIndex := 0;
   SetLength(FBlobData,0);

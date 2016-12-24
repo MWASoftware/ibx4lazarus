@@ -49,6 +49,8 @@ type
     FIBSQL: TIBSQL;
     FIncludeHeader: Boolean;
     FRowCount: integer;
+    FShowAffectedRows: boolean;
+    FShowPerformanceStats: boolean;
     function GetDatabase: TIBDatabase;
     function GetTransaction: TIBTransaction;
     procedure SetDatabase(AValue: TIBDatabase);
@@ -65,7 +67,9 @@ type
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Transaction: TIBTransaction read GetTransaction write SetTransaction;
     property RowCount: integer read FRowCount write FRowCount;
-  end;
+    property ShowAffectedRows: boolean read FShowAffectedRows write FShowAffectedRows;
+    property ShowPerformanceStats: boolean read FShowPerformanceStats write FShowPerformanceStats;
+ end;
 
   { TIBCSVDataOut }
 
@@ -564,9 +568,11 @@ end;
 procedure TIBCustomDataOutput.DataOut(SelectQuery: string;
   PlanOptions: TPlanOptions; var Data: TStrings);
 var Count: integer;
+    stats: TPerfCounters;
 begin
   FIBSQL.SQL.Text := SelectQuery;
   FIBSQL.Prepare;
+  FIBSQL.Statement.EnableStatistics(ShowPerformanceStats);
   if PlanOptions <> poNoPlan then
     Data.Add(FIBSQL.Plan);
   if PlanOptions = poPlanOnly then
@@ -583,6 +589,20 @@ begin
       FIBSQL.Next;
       Inc(Count);
     end;
+    if ShowAffectedRows then
+      Data.Add('Rows Affected: ' + IntToStr(FIBSQL.RowsAffected));
+    if FIBSQL.Statement.GetPerfStatistics(stats) then
+    begin
+      Data.Add(Format('Current memory = %d',[stats[psCurrentMemory]]));
+      Data.Add(Format('Delta memory = %d',[stats[psDeltaMemory]]));
+      Data.Add(Format('Max memory = %d',[stats[psMaxMemory]]));
+      Data.Add('Elapsed time= ' + FormatFloat('#0.000',stats[psRealTime]/1000) +' sec');
+      Data.Add('Cpu = ' + FormatFloat('#0.000',stats[psUserTime]/1000) + ' sec');
+      Data.Add(Format('Buffers = %d',[stats[psBuffers]]));
+      Data.Add(Format('Reads = %d',[stats[psReads]]));
+      Data.Add(Format('Writes = %d',[stats[psWrites]]));
+      Data.Add(Format('Fetches = %d',[stats[psFetches]]));
+   end;
   finally
     FIBSQL.Close;
   end;

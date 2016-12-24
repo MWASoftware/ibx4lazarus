@@ -102,6 +102,8 @@ begin
   try
     DBOutput.Database := FIBDatabase;
     DBOutput.RowCount := FRowCount;
+    DBOutput.ShowPerformanceStats := FIBXScript.ShowPerformanceStats;
+    DBOutput.ShowAffectedRows := FIBXScript.ShowAffectedRows;
     if FUseCSVFormat then
       TIBCSVDataOut(DBOutput).IncludeHeader := FIncludeHeader
     else
@@ -136,13 +138,22 @@ procedure TFBSQL.HandleSetStatement(Sender: TObject; command, aValue,
 begin
   done := true;
   if command = 'HEADING' then
-    FIncludeHeader := Toggle(aValue)
+    FIncludeHeader := ((aValue = '') and not FIncludeHeader) or
+                      ((aValue <> '') and Toggle(aValue))
   else
   if command = 'ROWCOUNT' then
     FRowCount := StrToInt(aValue)
   else
   if command = 'PLAN' then
   begin
+    if aValue = '' then
+    begin
+      if FPlanOptions <>  poIncludePlan then
+        FPlanOptions := poIncludePlan
+      else
+        FPlanOptions := poNoPlan;
+    end
+    else
     if Toggle(aValue) then
       FPlanOptions := poIncludePlan
     else
@@ -151,6 +162,14 @@ begin
   else
   if command = 'PLANONLY' then
   begin
+    if aValue = '' then
+    begin
+      if FPlanOptions <>  poPlanOnly then
+        FPlanOptions := poPlanOnly
+      else
+        FPlanOptions := poNoPlan;
+    end
+    else
     if Toggle(aValue) then
       FPlanOptions := poPlanOnly
     else
@@ -284,9 +303,9 @@ begin
     end
     else
     if FSQL.DataString = '' then
-      FIBXScript.PerformUpdate(SQLFileName,true)
+      FIBXScript.RunScript(SQLFileName,true)
     else
-      FIBXScript.PerformUpdate(FSQL,true);
+      FIBXScript.RunScript(FSQL,true);
   finally
     FIBDatabase.Connected := false;
     if FOutputFile <> nil then

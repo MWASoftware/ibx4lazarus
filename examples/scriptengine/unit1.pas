@@ -160,6 +160,9 @@ begin
     S.Free;
   end;
   Timer1.Interval := 1000;
+  EchoInput.Checked := IBXScript1.Echo;
+  StopOnError.Checked := IBXScript1.StopOnFirstError;
+  DBName.Caption := IBDatabase1.DatabaseName;
 end;
 
 procedure TForm1.RunScriptUpdate(Sender: TObject);
