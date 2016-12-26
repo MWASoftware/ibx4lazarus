@@ -201,6 +201,7 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
+    procedure DefaultSelectSQLHandler(aSQLText: string);
     {use RunScript instead of PerformUpdate}
     function PerformUpdate(const SQLFile: string;  AutoDDL: boolean): boolean; overload; deprecated;
     function PerformUpdate(const SQLStream: TStream;   AutoDDL: boolean): boolean; overload; deprecated;
@@ -745,6 +746,12 @@ begin
   inherited;
 end;
 
+procedure TIBXScript.DefaultSelectSQLHandler(aSQLText: string);
+begin
+  if assigned(DataOutputFormatter) then
+    DataOutputFormatter.DataOut(aSQLText,@Add2Log)
+end;
+
 function TIBXScript.PerformUpdate(const SQLFile: string; AutoDDL: boolean
   ): boolean;
 begin
@@ -902,11 +909,11 @@ begin
 
    if FISQL.SQLStatementType = SQLSelect then
    begin
-     if assigned(DataOutputFormatter) then
-       DataOutputFormatter.DataOut(FSQLText,@Add2Log)
-     else
      if assigned(OnSelectSQL) then
        OnSelectSQL(self,FSQLText)
+     else
+     if assigned(DataOutputFormatter) then
+       DefaultSelectSQLHandler(FSQLText)
      else
        raise Exception.Create(sNoSelectSQL);
    end
