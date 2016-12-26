@@ -73,6 +73,7 @@ type
     FDatabaseInfo: TIBDatabaseInfo;
     FShowSystem: Boolean;
     { Private declarations }
+    procedure Add2MetaData(const Msg: string; IsError: boolean=true);
     function GetDatabase: TIBDatabase;
     function GetIndexSegments ( indexname : String) : String;
     function GetTransaction: TIBTransaction;
@@ -841,6 +842,11 @@ begin
   end;
   if DidActivate then
     FTransaction.Commit;
+end;
+
+procedure TIBExtract.Add2MetaData(const Msg: string; IsError: boolean);
+begin
+  FMetaData.Add(Msg);
 end;
 
 function TIBExtract.GetDatabase: TIBDatabase;
@@ -3047,7 +3053,7 @@ begin
     try
       Database := FDatabase;
       DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]),
-                poNoPlan,FMetaData);
+                Add2MetaData);
     finally
       Free
     end;

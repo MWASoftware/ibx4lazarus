@@ -56,15 +56,10 @@ type
     FIBXScript: TIBXScript;
     FExtract: TIBExtract;
     FSQL: TStringStream;
-    FUseCSVFormat: boolean;
     FOutputFile: TStream;
-    FIncludeHeader: boolean;
-    FRowCount: integer;
-    FPlanOptions: TPlanOptions;
+    FDataOutputFormatter: TDataOutputFormatter;
     procedure LogHandler(Sender: TObject; Msg: string);
     procedure ErrorLogHandler(Sender: TObject; Msg: string);
-    procedure HandleSelectSQL(Sender: TObject; SQLText: string);
-    procedure HandleSetStatement(Sender: TObject; command, aValue, stmt: string; var Done: boolean);
   protected
     procedure DoRun; override;
     procedure ShowException(E: Exception); override;
@@ -87,97 +82,6 @@ end;
 procedure TFBSQL.ErrorLogHandler(Sender: TObject; Msg: string);
 begin
   writeln(stderr, Msg);
-end;
-
-procedure TFBSQL.HandleSelectSQL(Sender: TObject; SQLText: string);
-var DBOutput: TIBCustomDataOutput;
-    Results: TStrings;
-    i: integer;
-begin
-  Results := TStringList.Create;
-  if FUseCSVFormat then
-    DBOutput := TIBCSVDataOut.Create(self)
-  else
-    DBOutput := TIBBlockFormatOut.Create(self);
-  try
-    DBOutput.Database := FIBDatabase;
-    DBOutput.RowCount := FRowCount;
-    DBOutput.ShowPerformanceStats := FIBXScript.ShowPerformanceStats;
-    DBOutput.ShowAffectedRows := FIBXScript.ShowAffectedRows;
-    if FUseCSVFormat then
-      TIBCSVDataOut(DBOutput).IncludeHeader := FIncludeHeader
-    else
-      TIBBlockFormatOut(DBOutput).IncludeHeader := FIncludeHeader;
-    DBOutput.DataOut(SQLText,FPlanOptions,Results);
-    if FOutputFile <> nil then
-      Results.SaveToStream(FOutputFile)
-    else
-    for i := 0 to Results.Count - 1 do
-      writeln(Results[i]);
-  finally
-    DBOutput.Free;
-    Results.Free;
-  end;
-end;
-
-procedure TFBSQL.HandleSetStatement(Sender: TObject; command, aValue,
-  stmt: string; var Done: boolean);
-
-  function Toggle(aValue: string): boolean;
-  begin
-    aValue := AnsiUpperCase(aValue);
-    if aValue = 'ON' then
-      Result := true
-    else
-    if aValue = 'OFF' then
-      Result := false
-    else
-      raise Exception.CreateFmt(sInvalidSetStatement, [command,stmt]);
-  end;
-
-begin
-  done := true;
-  if command = 'HEADING' then
-    FIncludeHeader := ((aValue = '') and not FIncludeHeader) or
-                      ((aValue <> '') and Toggle(aValue))
-  else
-  if command = 'ROWCOUNT' then
-    FRowCount := StrToInt(aValue)
-  else
-  if command = 'PLAN' then
-  begin
-    if aValue = '' then
-    begin
-      if FPlanOptions <>  poIncludePlan then
-        FPlanOptions := poIncludePlan
-      else
-        FPlanOptions := poNoPlan;
-    end
-    else
-    if Toggle(aValue) then
-      FPlanOptions := poIncludePlan
-    else
-      FPlanOptions := poNoPlan;
-  end
-  else
-  if command = 'PLANONLY' then
-  begin
-    if aValue = '' then
-    begin
-      if FPlanOptions <>  poPlanOnly then
-        FPlanOptions := poPlanOnly
-      else
-        FPlanOptions := poNoPlan;
-    end
-    else
-    if Toggle(aValue) then
-      FPlanOptions := poPlanOnly
-    else
-    if FPlanOptions <> poIncludePlan then
-      FPlanOptions := poNoPlan;
-  end
-  else
-    done := false;
 end;
 
 procedure TFBSQL.DoRun;
@@ -212,6 +116,7 @@ begin
   OutputFileName := '';
   DoExtract := false;
   ExtractTypes := [];
+  FDataOutputFormatter := TIBBlockFormatOut;
 
   {Initialise user_name and password from environment if available}
 
@@ -253,7 +158,7 @@ begin
   end;
 
   if HasOption('c') then
-    FUseCSVFormat := true;
+    FDataOutputFormatter := TIBCSVDataOut;
 
   if HasOption('i') then
     SQLFileName := GetOptionValue('i');
@@ -286,6 +191,8 @@ begin
     raise Exception.Create('Extract and script execution cannot be simulateously requested');
 
   {This is where it all happens}
+
+  FIBXScript.DataOutputFormatter := FDataOutputFormatter.Create(self);
 
   if OutputFileName <> '' then
     FOutputFile := TFileStream.Create(OutputFileName,fmCreate);
@@ -326,8 +233,6 @@ constructor TFBSQL.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
   StopOnException:=True;
-  FIncludeHeader := true;
-  FPlanOptions := poNoPlan;
   FSQL := TStringStream.Create('');
 
   { Create Components }
@@ -339,8 +244,6 @@ begin
   FIBXScript.Transaction := FIBTransaction;
   FIBXScript.OnOutputLog := @LogHandler;
   FIBXScript.OnErrorLog := @ErrorLogHandler;
-  FIBXScript.OnSelectSQL := @HandleSelectSQL;
-  FIBXScript.OnSetStatement := @HandleSetStatement;
   FExtract := TIBExtract.Create(self);
   FExtract.Database := FIBDatabase;
   FExtract.Transaction := FIBTransaction;

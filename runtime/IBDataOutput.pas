@@ -42,34 +42,41 @@ const
 type
   TPlanOptions = (poNoPlan,poIncludePlan, poPlanOnly);
 
+  TAdd2Log = procedure(const Msg: string; IsError: boolean=true) of object;
+
   { TIBCustomDataOutput }
 
   TIBCustomDataOutput = class(TComponent)
   private
     FIBSQL: TIBSQL;
     FIncludeHeader: Boolean;
+    FPlanOptions: TPlanOptions;
     FRowCount: integer;
-    FShowAffectedRows: boolean;
     FShowPerformanceStats: boolean;
     function GetDatabase: TIBDatabase;
     function GetTransaction: TIBTransaction;
     procedure SetDatabase(AValue: TIBDatabase);
     procedure SetTransaction(AValue: TIBTransaction);
   protected
-    procedure HeaderOut(var Data: TStrings); virtual;
-    procedure FormattedDataOut(var Data: TStrings); virtual; abstract;
-    procedure TrailerOut(var Data: TStrings); virtual;
+    procedure HeaderOut(Add2Log: TAdd2Log); virtual;
+    procedure FormattedDataOut(Add2Log: TAdd2Log); virtual; abstract;
+    procedure TrailerOut(Add2Log: TAdd2Log); virtual;
     property IncludeHeader: Boolean read FIncludeHeader write FIncludeHeader default true;
   public
     constructor Create(aOwner: TComponent); override;
-    procedure DataOut(SelectQuery: string; PlanOptions: TPlanOptions; var Data: TStrings);
+    procedure Assign(Source: TPersistent); override;
+    procedure DataOut(SelectQuery: string; Add2Log: TAdd2Log);
+    procedure SetCommand(command, aValue, stmt: string; var Done: boolean);
+    class procedure ShowPerfStats(Statement: IStatement; Add2Log: TAdd2Log);
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Transaction: TIBTransaction read GetTransaction write SetTransaction;
+    property PlanOptions: TPlanOptions read FPlanOptions write FPlanOptions;
     property RowCount: integer read FRowCount write FRowCount;
-    property ShowAffectedRows: boolean read FShowAffectedRows write FShowAffectedRows;
     property ShowPerformanceStats: boolean read FShowPerformanceStats write FShowPerformanceStats;
  end;
+
+  TDataOutputFormatter = class of TIBCustomDataOutput;
 
   { TIBCSVDataOut }
 
@@ -77,8 +84,8 @@ type
   private
     FQuoteChar: char;
   protected
-    procedure HeaderOut(var Data: TStrings); override;
-    procedure FormattedDataOut(var Data: TStrings); override;
+    procedure HeaderOut(Add2Log: TAdd2Log); override;
+    procedure FormattedDataOut(Add2Log: TAdd2Log); override;
   public
     constructor Create(aOwner: TComponent); override;
   published
@@ -92,11 +99,11 @@ type
   private
     FIncludeBlobsAndArrays: boolean;
     FInsertHeader: string;
-    procedure FormatBlob(Field: ISQLData; var Data: TStrings);
-    procedure FormatArray(ar: IArray; var Data: TStrings);
+    procedure FormatBlob(Field: ISQLData; Add2Log: TAdd2Log);
+    procedure FormatArray(ar: IArray; Add2Log: TAdd2Log);
   protected
-    procedure HeaderOut(var Data: TStrings); override;
-    procedure FormattedDataOut(var Data: TStrings); override;
+    procedure HeaderOut(Add2Log: TAdd2Log); override;
+    procedure FormattedDataOut(Add2Log: TAdd2Log); override;
   public
     constructor Create(aOwner: TComponent); override;
   published
@@ -116,16 +123,16 @@ type
     function TextAlign(s: string; ColWidth: integer; alignment: TAlignments
       ): string;
   protected
-    procedure HeaderOut(var Data: TStrings); override;
-    procedure FormattedDataOut(var Data: TStrings); override;
-    procedure TrailerOut(var Data: TStrings); override;
+    procedure HeaderOut(Add2Log: TAdd2Log); override;
+    procedure FormattedDataOut(Add2Log: TAdd2Log); override;
+    procedure TrailerOut(Add2Log: TAdd2Log); override;
   published
     property IncludeHeader;
   end;
 
 implementation
 
-uses IBUtils, FBMessages, Math;
+uses IBUtils, FBMessages, Math, IBXScript;
 
 { TIBBlockFormatOut }
 
@@ -154,7 +161,7 @@ begin
   end;
 end;
 
-procedure TIBBlockFormatOut.HeaderOut(var Data: TStrings);
+procedure TIBBlockFormatOut.HeaderOut(Add2Log: TAdd2Log);
 var i: integer;
     s: string;
 begin
@@ -219,16 +226,16 @@ begin
 
     {Now output the header}
 
-    Data.Add(DashedLine);
+    Add2Log(DashedLine);
     s := '|';
     for i := 0 to MetaData.Count - 1 do
       s += TextAlign(MetaData[i].Name,FColWidths[i],taCentre) + '|';
-    Data.Add(s);
-    Data.Add(DashedLine);
+    Add2Log(s);
+    Add2Log(DashedLine);
   end;
 end;
 
-procedure TIBBlockFormatOut.FormattedDataOut(var Data: TStrings);
+procedure TIBBlockFormatOut.FormattedDataOut(Add2Log: TAdd2Log);
 
   function TruncateTextBlob(textStr: string): string;
   begin
@@ -276,18 +283,18 @@ begin
     end;
     s += '|';
   end;
-  Data.Add(s);
-  Data.Add(DashedLine);
+  Add2Log(s);
+  Add2Log(DashedLine);
 end;
 
-procedure TIBBlockFormatOut.TrailerOut(var Data: TStrings);
+procedure TIBBlockFormatOut.TrailerOut(Add2Log: TAdd2Log);
 begin
-  Data.Add(DashedLine);
+  Add2Log(DashedLine);
 end;
 
 { TIBInsertStmtsOut }
 
-procedure TIBInsertStmtsOut.FormatBlob(Field: ISQLData; var Data: TStrings);
+procedure TIBInsertStmtsOut.FormatBlob(Field: ISQLData; Add2Log: TAdd2Log);
 
   function ToHex(aValue: byte): string;
   const
@@ -301,7 +308,7 @@ var blob: string;
     i, j: integer;
     s: string;
 begin
-  Data.Add(Format('<binary subtype="%d">',[Field.getSubtype]));
+  Add2Log(Format('<binary subtype="%d">',[Field.getSubtype]));
   blob := Field.AsString; {get Blob as untyped string }
   i := 0;
   while i < Length(blob) do
@@ -315,12 +322,12 @@ begin
         s += ToHex(byte(blob[i]));
       inc(i);
     end;
-    Data.Add(s);
+    Add2Log(s);
   end;
-  Data.Add('</binary>');
+  Add2Log('</binary>');
 end;
 
-procedure TIBInsertStmtsOut.FormatArray(ar: IArray; var Data: TStrings);
+procedure TIBInsertStmtsOut.FormatArray(ar: IArray; Add2Log: TAdd2Log);
 var index: array of integer;
 
     procedure AddElements(dim: integer; indent:string = ' ');
@@ -335,12 +342,12 @@ var index: array of integer;
         index[dim] := i;
         if recurse then
         begin
-          Data.Add(Format('%s<elt id="%d">',[indent,i]));
+          Add2Log(Format('%s<elt id="%d">',[indent,i]));
           AddElements(dim+1,indent + ' ');
-          Data.Add('</elt>');
+          Add2Log('</elt>');
         end
         else
-          Data.Add(Format('%s<elt ix="%d">%s</elt>',[indent,i,ar.GetAsString(index)]));
+          Add2Log(Format('%s<elt ix="%d">%s</elt>',[indent,i,ar.GetAsString(index)]));
       end;
     end;
 
@@ -368,14 +375,14 @@ begin
   end;
   s += Format(' bounds="%s"',[boundsList]);
   s += '>';
-  Data.Add(s);
+  Add2Log(s);
 
   SetLength(index,0);
   AddElements(0);
-  Data.Add('</array>');
+  Add2Log('</array>');
 end;
 
-procedure TIBInsertStmtsOut.HeaderOut(var Data: TStrings);
+procedure TIBInsertStmtsOut.HeaderOut(Add2Log: TAdd2Log);
 var TableName: string;
     i,j: integer;
 begin
@@ -383,9 +390,9 @@ begin
   if TableName = '' then
     IBError(ibxeUniqueRelationReqd,[nil]);
 
-  Data.Add('');
-  Data.Add('/* Inserting data into Table: ' + TableName + ' */');
-  Data.Add('');
+  Add2Log('');
+  Add2Log('/* Inserting data into Table: ' + TableName + ' */');
+  Add2Log('');
 
   FInsertHeader := 'INSERT INTO ' + QuoteIdentifier(Database.SQLDialect, TableName) + ' (';
   with FIBSQL do
@@ -403,7 +410,7 @@ begin
   FInsertHeader += ') VALUES(';
 end;
 
-procedure TIBInsertStmtsOut.FormattedDataOut(var Data: TStrings);
+procedure TIBInsertStmtsOut.FormattedDataOut(Add2Log: TAdd2Log);
 const
   QuoteChar = '''';
 
@@ -429,9 +436,9 @@ begin
           s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar
         else
         begin
-          Data.Add(s);
+          Add2Log(s);
           s := '';
-          FormatBlob(Current[i],Data);
+          FormatBlob(Current[i],Add2Log);
         end;
 
       SQL_ARRAY:
@@ -441,9 +448,9 @@ begin
            s += 'NULL'
           else
           begin
-            Data.Add(s);
+            Add2Log(s);
             s := '';
-            FormatArray(ar,Data);
+            FormatArray(ar,Add2Log);
           end;
         end;
 
@@ -466,7 +473,7 @@ begin
     end;
   end;
   s += ');';
-  Data.Add(s);
+  Add2Log(s);
 end;
 
 constructor TIBInsertStmtsOut.Create(aOwner: TComponent);
@@ -477,7 +484,7 @@ end;
 
 { TIBCSVDataOut }
 
-procedure TIBCSVDataOut.HeaderOut(var Data: TStrings);
+procedure TIBCSVDataOut.HeaderOut(Add2Log: TAdd2Log);
 var i: integer;
     s: string;
 begin
@@ -487,10 +494,10 @@ begin
     if i <> 0 then s += ',';
     s += FIBSQL.MetaData[i].getAliasName;
   end;
-  Data.Add(s);
+  Add2Log(s);
 end;
 
-procedure TIBCSVDataOut.FormattedDataOut(var Data: TStrings);
+procedure TIBCSVDataOut.FormattedDataOut(Add2Log: TAdd2Log);
 var i: integer;
     s: string;
 begin
@@ -517,7 +524,7 @@ begin
       end;
     end;
   end;
-  Data.Add(s);
+  Add2Log(s);
 end;
 
 constructor TIBCSVDataOut.Create(aOwner: TComponent);
@@ -548,12 +555,12 @@ begin
   FIBSQL.Transaction := AValue;
 end;
 
-procedure TIBCustomDataOutput.HeaderOut(var Data: TStrings);
+procedure TIBCustomDataOutput.HeaderOut(Add2Log: TAdd2Log);
 begin
   //stub
 end;
 
-procedure TIBCustomDataOutput.TrailerOut(var Data: TStrings);
+procedure TIBCustomDataOutput.TrailerOut(Add2Log: TAdd2Log);
 begin
   //stub
 end;
@@ -565,47 +572,121 @@ begin
   FIncludeHeader := true;
 end;
 
-procedure TIBCustomDataOutput.DataOut(SelectQuery: string;
-  PlanOptions: TPlanOptions; var Data: TStrings);
+procedure TIBCustomDataOutput.Assign(Source: TPersistent);
+begin
+  if Source is TIBCustomDataOutput then
+  begin
+    IncludeHeader := TIBCustomDataOutput(Source).IncludeHeader;
+    RowCount := TIBCustomDataOutput(Source).RowCount;
+    ShowPerformanceStats := TIBCustomDataOutput(Source).ShowPerformanceStats;
+    PlanOptions := TIBCustomDataOutput(Source).PlanOptions;
+  end;
+end;
+
+procedure TIBCustomDataOutput.DataOut(SelectQuery: string; Add2Log: TAdd2Log);
 var Count: integer;
-    stats: TPerfCounters;
 begin
   FIBSQL.SQL.Text := SelectQuery;
   FIBSQL.Prepare;
   FIBSQL.Statement.EnableStatistics(ShowPerformanceStats);
   if PlanOptions <> poNoPlan then
-    Data.Add(FIBSQL.Plan);
+    Add2Log(FIBSQL.Plan);
   if PlanOptions = poPlanOnly then
     Exit;
 
   if IncludeHeader then
-    HeaderOut(Data);
+    HeaderOut(Add2Log);
   Count := 0;
   FIBSQL.ExecQuery;
   try
     while (not FIBSQL.EOF) and ((FRowCount = 0) or (Count < FRowCount)) do
     begin
-      FormattedDataOut(Data);
+      FormattedDataOut(Add2Log);
       FIBSQL.Next;
       Inc(Count);
     end;
-    if ShowAffectedRows then
-      Data.Add('Rows Affected: ' + IntToStr(FIBSQL.RowsAffected));
-    if FIBSQL.Statement.GetPerfStatistics(stats) then
-    begin
-      Data.Add(Format('Current memory = %d',[stats[psCurrentMemory]]));
-      Data.Add(Format('Delta memory = %d',[stats[psDeltaMemory]]));
-      Data.Add(Format('Max memory = %d',[stats[psMaxMemory]]));
-      Data.Add('Elapsed time= ' + FormatFloat('#0.000',stats[psRealTime]/1000) +' sec');
-      Data.Add('Cpu = ' + FormatFloat('#0.000',stats[psUserTime]/1000) + ' sec');
-      Data.Add(Format('Buffers = %d',[stats[psBuffers]]));
-      Data.Add(Format('Reads = %d',[stats[psReads]]));
-      Data.Add(Format('Writes = %d',[stats[psWrites]]));
-      Data.Add(Format('Fetches = %d',[stats[psFetches]]));
-   end;
+    ShowPerfStats(FIBSQL.Statement,Add2Log);
   finally
     FIBSQL.Close;
   end;
+end;
+
+procedure TIBCustomDataOutput.SetCommand(command, aValue, stmt: string;
+  var Done: boolean);
+
+  function Toggle(aValue: string): boolean;
+  begin
+    aValue := AnsiUpperCase(aValue);
+    if aValue = 'ON' then
+      Result := true
+    else
+    if aValue = 'OFF' then
+      Result := false
+    else
+      raise Exception.CreateFmt(sInvalidSetStatement, [command,stmt]);
+  end;
+
+begin
+  done := true;
+  if command = 'HEADING' then
+    FIncludeHeader := ((aValue = '') and not FIncludeHeader) or
+                      ((aValue <> '') and Toggle(aValue))
+  else
+  if command = 'ROWCOUNT' then
+    FRowCount := StrToInt(aValue)
+  else
+  if command = 'PLAN' then
+  begin
+    if aValue = '' then
+    begin
+      if FPlanOptions <>  poIncludePlan then
+        FPlanOptions := poIncludePlan
+      else
+        FPlanOptions := poNoPlan;
+    end
+    else
+    if Toggle(aValue) then
+      FPlanOptions := poIncludePlan
+    else
+      FPlanOptions := poNoPlan;
+  end
+  else
+  if command = 'PLANONLY' then
+  begin
+    if aValue = '' then
+    begin
+      if FPlanOptions <>  poPlanOnly then
+        FPlanOptions := poPlanOnly
+      else
+        FPlanOptions := poNoPlan;
+    end
+    else
+    if Toggle(aValue) then
+      FPlanOptions := poPlanOnly
+    else
+    if FPlanOptions <> poIncludePlan then
+      FPlanOptions := poNoPlan;
+  end
+  else
+    done := false;
+end;
+
+class procedure TIBCustomDataOutput.ShowPerfStats(Statement: IStatement;
+  Add2Log: TAdd2Log);
+var stats: TPerfCounters;
+begin
+  if Statement.GetPerfStatistics(stats) then
+  begin
+    Add2Log(Format('Current memory = %d',[stats[psCurrentMemory]]));
+    Add2Log(Format('Delta memory = %d',[stats[psDeltaMemory]]));
+    Add2Log(Format('Max memory = %d',[stats[psMaxMemory]]));
+    Add2Log('Elapsed time= ' + FormatFloat('#0.000',stats[psRealTime]/1000) +' sec');
+    Add2Log('Cpu = ' + FormatFloat('#0.000',stats[psUserTime]/1000) + ' sec');
+    Add2Log(Format('Buffers = %d',[stats[psBuffers]]));
+    Add2Log(Format('Reads = %d',[stats[psReads]]));
+    Add2Log(Format('Writes = %d',[stats[psWrites]]));
+    Add2Log(Format('Fetches = %d',[stats[psFetches]]));
+ end;
 end;
 
 end.

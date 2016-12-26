@@ -31,7 +31,7 @@ unit ibxscript;
 
 interface
 
-uses Classes, IBDatabase,  IBSQL, IB;
+uses Classes, IBDatabase,  IBSQL, IB, IBDataOutput;
 
 const
   ibx_blob = ':IBX_BLOB';
@@ -135,6 +135,7 @@ type
   TIBXScript = class(TComponent)
   private
     FDatabase: TIBDatabase;
+    FDataOutputFormatter: TIBCustomDataOutput;
     FEcho: boolean;
     FIgnoreGrants: boolean;
     FOnErrorLog: TLogEvent;
@@ -183,7 +184,9 @@ type
     function GetSymbol(const Line: string; var index: integer): TSQLSymbol;
     function GetTransaction: TIBTransaction;
     procedure SetDatabase(AValue: TIBDatabase);
+    procedure SetDataOutputFormatter(AValue: TIBCustomDataOutput);
     procedure SetParamValue(SQLVar: ISQLParam);
+    procedure SetShowPerformanceStats(AValue: boolean);
     procedure SetState(AState: TSQLStates);
     procedure ClearStatement;
     function PopState: TSQLStates;
@@ -205,12 +208,14 @@ type
     function RunScript(const SQLStream: TStream;   AutoDDL: boolean): boolean; overload;
   published
     property Database: TIBDatabase read FDatabase write SetDatabase;
+    property DataOutputFormatter: TIBCustomDataOutput read FDataOutputFormatter
+                                  write SetDataOutputFormatter;
     property AutoDDL: boolean read FAutoDDL write FAutoDDL;
     property Echo: boolean read FEcho write FEcho default true;  {Echo Input to Log}
     property IgnoreGrants: boolean read FIgnoreGrants write FIgnoreGrants;
     property Transaction: TIBTransaction read FTransaction write FTransaction;
     property ShowAffectedRows: boolean read FShowAffectedRows write FShowAffectedRows;
-    property ShowPerformanceStats: boolean read FShowPerformanceStats write FShowPerformanceStats;
+    property ShowPerformanceStats: boolean read FShowPerformanceStats write SetShowPerformanceStats;
     property StopOnFirstError: boolean read FStopOnFirstError write FStopOnFirstError default true;
     property GetParamValue: TGetParamValue read FGetParamValue write FGetParamValue; {resolve parameterized queries}
     property OnOutputLog: TLogEvent read FOnOutputLog write FOnOutputLog; {Log handler}
@@ -897,6 +902,9 @@ begin
 
    if FISQL.SQLStatementType = SQLSelect then
    begin
+     if assigned(DataOutputFormatter) then
+       DataOutputFormatter.DataOut(FSQLText,@Add2Log)
+     else
      if assigned(OnSelectSQL) then
        OnSelectSQL(self,FSQLText)
      else
@@ -910,18 +918,8 @@ begin
        FISQL.ExecQuery;
        if ShowAffectedRows and not DDL then
          Add2Log('Rows Affected: ' + IntToStr(FISQL.RowsAffected));
-       if not DDL and FISQL.Statement.GetPerfStatistics(stats) then
-       begin
-         Add2Log(Format('Current memory = %d',[stats[psCurrentMemory]]));
-         Add2Log(Format('Delta memory = %d',[stats[psDeltaMemory]]));
-         Add2Log(Format('Max memory = %d',[stats[psMaxMemory]]));
-         Add2Log('Elapsed time= ' + FormatFloat('#0.000',stats[psRealTime]/1000) +' sec');
-         Add2Log('Cpu = ' + FormatFloat('#0.000',stats[psUserTime]/1000) + ' sec');
-         Add2Log(Format('Buffers = %d',[stats[psBuffers]]));
-         Add2Log(Format('Reads = %d',[stats[psReads]]));
-         Add2Log(Format('Writes = %d',[stats[psWrites]]));
-         Add2Log(Format('Fetches = %d',[stats[psFetches]]));
-      end;
+       if not DDL then
+         TIBCustomDataOutput.ShowPerfStats(FISQL.Statement,@Add2Log);
      end;
 
      if FAutoDDL and DDL then
@@ -1102,6 +1100,16 @@ begin
   FDatabase := AValue;
   FISQL.Database := AValue;
   FInternalTransaction.DefaultDatabase := AValue;
+end;
+
+procedure TIBXScript.SetDataOutputFormatter(AValue: TIBCustomDataOutput);
+begin
+  if FDataOutputFormatter = AValue then Exit;
+  if (FDataOutputFormatter <> nil) and (AValue <> nil) then
+    AValue.Assign(FDataOutputFormatter);
+  FDataOutputFormatter := AValue;
+  if FDataOutputFormatter <> nil then
+    FDataOutputFormatter.Database := Database;
 end;
 
 function TIBXScript.RunScript(const SQLFile: string;
@@ -1352,13 +1360,15 @@ begin
           raise Exception.CreateFmt(sInvalidCharacterSet, [param,stmt]);
       end
       else
-      if assigned(OnSetStatement) then
       begin
-        OnSetStatement(self,command,param,stmt,Result);
+        if assigned(DataOutputFormatter) then
+          DataOutputFormatter.SetCommand(command,param,stmt,Result);
+        if not Result and assigned(OnSetStatement) then
+          OnSetStatement(self,command,param,stmt,Result)
+        else
+          raise Exception.CreateFmt(sInvalidSetStatement, [command,stmt]);
         Exit;
-      end
-      else
-        raise Exception.CreateFmt(sInvalidSetStatement, [command,stmt]);
+      end;
       Result := true;
       Exit;
     end;
@@ -1398,6 +1408,14 @@ begin
   end
   else
     raise Exception.Create(sNoParamQueries);
+end;
+
+procedure TIBXScript.SetShowPerformanceStats(AValue: boolean);
+begin
+  if FShowPerformanceStats = AValue then Exit;
+  FShowPerformanceStats := AValue;
+  if assigned(DataOutputFormatter) then
+    DataOutputFormatter.ShowPerformanceStats := AValue;
 end;
 
 procedure TIBXScript.SetState(AState: TSQLStates);
