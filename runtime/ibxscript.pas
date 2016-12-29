@@ -36,6 +36,7 @@ uses Classes, IBDatabase,  IBSQL, IB, IBDataOutput;
 const
   ibx_blob = ':IBX_BLOB';
   ibx_array = ':IBX_ARRAY';
+  ibx_octets = ':IBX_OCTETS';
 
 type
   TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes,
@@ -49,10 +50,25 @@ type
   TXMLStates =  (stInTag,stAttribute,stAttributeValue,stQuotedAttributeValue,
                  stTagged,stEndTag);
 
-  TXMLTag    =   (xtNone,xtBinary,xtArray,xtElt);
+  TXMLTag    =   (xtNone,xtBlob,xtOctets,xtArray,xtElt);
 
   TOnNextLine = procedure(Sender: TObject; Line: string) of object;
   TOnProgressEvent = procedure (Sender: TObject; Reset: boolean; value: integer) of object;
+
+  TXMLTagDef = record
+    XMLTag: TXMLTag;
+    TagValue: string;
+  end;
+
+const
+  XMLTagDefs: array [0..3] of TXMLTagDef = (
+    (XMLTag: xtBlob;   TagValue: 'blob'),
+    (XMLTag: xtOctets; TagValue: 'octets'),
+    (XMLTag: xtArray;  TagValue: 'array'),
+    (XMLTag: xtElt;    TagValue: 'elt')
+    );
+
+type
 
   { TSymbolStream }
 
@@ -72,6 +88,7 @@ type
     FNextStatement: boolean;
     function GetErrorPrefix: string; virtual; abstract;
     function GetNextSymbol(C: char): TSQLSymbol;
+    function FindTag(tag: string; var xmlTag: TXMLTag): boolean;
     function GetNextLine(var Line: string):boolean; virtual; abstract;
   public
     constructor Create;
@@ -147,6 +164,8 @@ type
     FCurrentBlob: integer;
     FArrayData: array of TArrayData;
     FCurrentArray: integer;
+    FOctetsData: array of TArrayData;
+    FCurrentOctets: integer;
     FBlobBuffer: PChar;
     procedure EndXMLTag(xmltag: TXMLTag);
     procedure EnterTag;
@@ -158,11 +177,15 @@ type
     procedure StartXMLTag(xmltag: TXMLTag);
     procedure ProcessAttributeValue(attrValue: string);
     procedure ProcessBoundsList(boundsList: string);
+    class procedure HexBlock(octetString: string; TextOut: TStrings);
   public
     constructor Create;
     destructor Destroy; override;
     function AnalyseXML(SymbolStream: TSymbolStream): string;
     procedure NextStatement;
+    class function FormatBlob(Field: ISQLData): string;
+    class function FormatOctets(Field: ISQLData): string;
+    class function FormatArray(ar: IArray): string;
     property BlobData[index: integer]: TBlobData read GetBlobData;
     property BlobDataCount: integer read GetBlobDataCount;
     property ArrayData[index: integer]: TArrayData read GetArrayData;
@@ -1114,7 +1137,7 @@ begin
     FSymbolStream.ShowError(sInvalidEndTag,[FSymbolStream.SymbolValue]);
 
   case FXMLTagStack[FXMLTagIndex] of
-  xtBinary:
+  xtBlob:
     FBlobData[FCurrentBlob].BlobIntf.Close;
 
   xtArray:
@@ -1127,7 +1150,7 @@ procedure TIBXMLProcessor.EnterTag;
 var aCharSetID: integer;
 begin
   case FXMLTagStack[FXMLTagIndex] of
-  xtBinary:
+  xtBlob:
     FBlobData[FCurrentBlob].BlobIntf := Database.Attachment.CreateBlob(
       Transaction.TransactionIntf,FBlobData[FCurrentBlob].SubType);
 
@@ -1215,7 +1238,7 @@ procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
 begin
   if tagValue = '' then Exit;
   case FXMLTagStack[FXMLTagIndex] of
-  xtBinary:
+  xtBlob:
       WriteToBlob(tagValue);
 
   xtElt:
@@ -1232,7 +1255,8 @@ begin
   Inc(FXMLTagIndex);
   FXMLTagStack[FXMLTagIndex] := xmltag;
   case xmltag of
-  xtBinary:
+  xtOctets:
+  xtBlob:
     begin
       Inc(FCurrentBlob);
       SetLength(FBlobData,FCurrentBlob+1);
@@ -1265,7 +1289,7 @@ end;
 procedure TIBXMLProcessor.ProcessAttributeValue(attrValue: string);
 begin
   case FXMLTagStack[FXMLTagIndex] of
-  xtBinary:
+  xtBlob:
     if FAttributeName = 'subtype' then
       FBlobData[FCurrentBlob].SubType := StrToInt(attrValue)
     else
@@ -1325,6 +1349,36 @@ begin
     end;
   finally
     list.Free;
+  end;
+end;
+
+class procedure TIBXMLProcessor.HexBlock(octetString: string;
+  TextOut: TStrings);
+
+  function ToHex(aValue: byte): string;
+  const
+    HexChars: array [0..15] of char = '0123456789ABCDEF';
+  begin
+    Result := HexChars[aValue shr 4] +
+               HexChars[(aValue and $0F)];
+  end;
+
+var i, j: integer;
+    s: string;
+begin
+  i := 0;
+  while i < Length(octetString) do
+  begin
+    s := '';
+    for j := 1 to 40 do
+    begin
+      if i = Length(octetString) then
+        break
+      else
+        s += ToHex(byte(octetString[i]));
+      inc(i);
+    end;
+    TextOut.Add(s);
   end;
 end;
 
@@ -1406,7 +1460,7 @@ begin
         stEndTag:
           begin
             case XMLTag of
-            xtBinary:
+            xtBlob:
               begin
                 Result := Format(ibx_blob+'%d',[FCurrentBlob]);
                 Done := true;
@@ -1416,6 +1470,11 @@ begin
                 Result := Format(ibx_array+'%d',[FCurrentArray]);
                 Done := true;
               end;
+            xtOctets:
+            end;
+            begin
+              Result := Format(ibx_octets+'%d',[FCurrentOctets]);
+              Done := true;
             end;
           end;
 
@@ -1519,6 +1578,96 @@ begin
   FCurrentBlob := -1;
   SetLength(FArrayData,0);
   FCurrentArray := -1;
+end;
+
+class function TIBXMLProcessor.FormatBlob(Field: ISQLData): string;
+var TextOut: TStrings;
+begin
+  TextOut := TStringList.Create;
+  try
+    TextOut.Add(Format('<blob subtype="%d">',[Field.getSubtype]));
+    HexBlock(Field.AsString,TextOut);
+    TextOut.Add('</blob>');
+    Result := TextOut.Text;
+  finally
+    TextOut.Free;
+  end;
+end;
+
+class function TIBXMLProcessor.FormatOctets(Field: ISQLData): string;
+var TextOut: TStrings;
+begin
+  TextOut := TStringList.Create;
+  try
+    TextOut.Add(Format('<octets>',[Field.getSubtype]));
+    HexBlock(Field.AsString,TextOut);
+    TextOut.Add('</octets>');
+    Result := TextOut.Text;
+  finally
+    TextOut.Free;
+  end;
+end;
+
+class function TIBXMLProcessor.FormatArray(ar: IArray): string;
+var index: array of integer;
+    TextOut: TStrings;
+
+    procedure AddElements(dim: integer; indent:string = ' ');
+    var i: integer;
+        recurse: boolean;
+    begin
+      SetLength(index,dim+1);
+      recurse := dim < ar.GetDimensions - 1;
+      with ar.GetBounds[dim] do
+      for i := LowerBound to UpperBound do
+      begin
+        index[dim] := i;
+        if recurse then
+        begin
+          TextOut.Add(Format('%s<elt id="%d">',[indent,i]));
+          AddElements(dim+1,indent + ' ');
+          TextOut.Add('</elt>');
+        end
+        else
+          TextOut.Add(Format('%s<elt ix="%d">%s</elt>',[indent,i,ar.GetAsString(index)]));
+      end;
+    end;
+
+var
+    s: string;
+    bounds: TArrayBounds;
+    i: integer;
+    boundsList: string;
+begin
+  TextOut := TStringList.Create;
+  try
+    s := Format('<array dim = "%d" sqltype = "%d" length = "%d"',
+                                [ar.GetDimensions,ar.GetSQLType,ar.GetSize]);
+    case ar.GetSQLType of
+    SQL_DOUBLE, SQL_FLOAT, SQL_LONG, SQL_SHORT, SQL_D_FLOAT, SQL_INT64:
+       s += Format(' scale = "%d"',[ ar.GetScale]);
+    SQL_TEXT,
+    SQL_VARYING:
+      s += Format(' charset = "%s"',[FirebirdAPI.GetCharsetName(ar.GetCharSetID)]);
+    end;
+    bounds := ar.GetBounds;
+    boundsList := '';
+    for i := 0 to length(bounds) - 1 do
+    begin
+      if i <> 0 then boundsList += ',';
+      boundsList += Format('%d:%d',[bounds[i].LowerBound,bounds[i].UpperBound]);
+    end;
+    s += Format(' bounds="%s"',[boundsList]);
+    s += '>';
+    TextOut.Add(s);
+
+    SetLength(index,0);
+    AddElements(0);
+    TextOut.Add('</array>');
+    Result := TextOut.Text;
+  finally
+    TextOut.Free;
+  end;
 end;
 
 { TInteractiveSymbolStream }
@@ -1631,6 +1780,19 @@ begin
       FLastChar := C
     end
   end;
+end;
+
+function TSymbolStream.FindTag(tag: string; var xmlTag: TXMLTag): boolean;
+var i: integer;
+begin
+  Result := false;
+  for i := 0 to Length(XMLTagDefs) - 1 do
+    if XMLTagDefs[i].TagValue = tag then
+    begin
+      xmlTag := XMLTagDefs[i].XMLTag;
+      Result := true;
+      break;
+    end;
 end;
 
 constructor TSymbolStream.Create;
@@ -1754,6 +1916,12 @@ begin
 
   if (Result = sqString) and (FString <> '') then
   begin
+    if (FString[1] = '<') and FindTag(system.copy(FString,1,Length(FString) - 1),FXMLTag) then
+    begin
+      Inc(FXMLMode);
+      Result := sqTag
+    end
+    else
     if FXMLMode = 0 then
     begin
        if InComment then
@@ -1775,56 +1943,16 @@ begin
          Result := sqCase
     end
     else
-    if FString[1] = '<' then
+    if (Pos('</',FString) = 1) and FindTag(system.copy(FString,2,Length(FString) - 2 ),FXMLTag) then
     begin
-      if CompareText(FString,'<binary') = 0 then
-      begin
-        FXMLTag := xtBinary;
-        Inc(FXMLMode);
-        Result := sqTag
-      end
-      else
-      if CompareText(FString,'<array') = 0 then
-      begin
-        FXMLTag := xtArray;
-        Inc(FXMLMode);
-        Result := sqTag
-      end
-      else
-      if CompareText(FString,'<elt') = 0 then
-      begin
-        FXMLTag := xtElt;
-        Inc(FXMLMode);
-        Result := sqTag
-      end
-      else
-      if CompareText(FString,'</binary') = 0 then
-      begin
-        FXMLTag := xtBinary;
-        Dec(FXMLMode);
-        Result := sqEndTag
-      end
-      else
-      if CompareText(FString,'</array') = 0 then
-      begin
-        FXMLTag := xtArray;
-        Dec(FXMLMode);
-        Result := sqEndTag
-      end
-      else
-      if CompareText(FString,'</elt') = 0 then
-      begin
-        FXMLTag := xtElt;
-        Dec(FXMLMode);
-        Result := sqEndTag
-      end
+      Dec(FXMLMode);
+      Result := sqEndTag
     end;
   end;
 end;
 
 procedure TSymbolStream.NextStatement;
 begin
-//  FNextSymbol := sqNone;
   FXMLTag := xtNone;
   FNextStatement := true;
 end;

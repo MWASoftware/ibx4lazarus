@@ -99,8 +99,6 @@ type
   private
     FIncludeBlobsAndArrays: boolean;
     FInsertHeader: string;
-    procedure FormatBlob(Field: ISQLData; Add2Log: TAdd2Log);
-    procedure FormatArray(ar: IArray; Add2Log: TAdd2Log);
   protected
     procedure HeaderOut(Add2Log: TAdd2Log); override;
     procedure FormattedDataOut(Add2Log: TAdd2Log); override;
@@ -294,94 +292,6 @@ end;
 
 { TIBInsertStmtsOut }
 
-procedure TIBInsertStmtsOut.FormatBlob(Field: ISQLData; Add2Log: TAdd2Log);
-
-  function ToHex(aValue: byte): string;
-  const
-    HexChars: array [0..15] of char = '0123456789ABCDEF';
-  begin
-    Result := HexChars[aValue shr 4] +
-               HexChars[(aValue and $0F)];
-  end;
-
-var blob: string;
-    i, j: integer;
-    s: string;
-begin
-  Add2Log(Format('<binary subtype="%d">',[Field.getSubtype]));
-  blob := Field.AsString; {get Blob as untyped string }
-  i := 0;
-  while i < Length(blob) do
-  begin
-    s := '';
-    for j := 1 to 40 do
-    begin
-      if i = Length(blob) then
-        break
-      else
-        s += ToHex(byte(blob[i]));
-      inc(i);
-    end;
-    Add2Log(s);
-  end;
-  Add2Log('</binary>');
-end;
-
-procedure TIBInsertStmtsOut.FormatArray(ar: IArray; Add2Log: TAdd2Log);
-var index: array of integer;
-
-    procedure AddElements(dim: integer; indent:string = ' ');
-    var i: integer;
-        recurse: boolean;
-    begin
-      SetLength(index,dim+1);
-      recurse := dim < ar.GetDimensions - 1;
-      with ar.GetBounds[dim] do
-      for i := LowerBound to UpperBound do
-      begin
-        index[dim] := i;
-        if recurse then
-        begin
-          Add2Log(Format('%s<elt id="%d">',[indent,i]));
-          AddElements(dim+1,indent + ' ');
-          Add2Log('</elt>');
-        end
-        else
-          Add2Log(Format('%s<elt ix="%d">%s</elt>',[indent,i,ar.GetAsString(index)]));
-      end;
-    end;
-
-var
-    s: string;
-    bounds: TArrayBounds;
-    i: integer;
-    boundsList: string;
-begin
-  s := Format('<array dim = "%d" sqltype = "%d" length = "%d"',
-                              [ar.GetDimensions,ar.GetSQLType,ar.GetSize]);
-  case ar.GetSQLType of
-  SQL_DOUBLE, SQL_FLOAT, SQL_LONG, SQL_SHORT, SQL_D_FLOAT, SQL_INT64:
-     s += Format(' scale = "%d"',[ ar.GetScale]);
-  SQL_TEXT,
-  SQL_VARYING:
-    s += Format(' charset = "%s"',[FirebirdAPI.GetCharsetName(ar.GetCharSetID)]);
-  end;
-  bounds := ar.GetBounds;
-  boundsList := '';
-  for i := 0 to length(bounds) - 1 do
-  begin
-    if i <> 0 then boundsList += ',';
-    boundsList += Format('%d:%d',[bounds[i].LowerBound,bounds[i].UpperBound]);
-  end;
-  s += Format(' bounds="%s"',[boundsList]);
-  s += '>';
-  Add2Log(s);
-
-  SetLength(index,0);
-  AddElements(0);
-  Add2Log('</array>');
-end;
-
 procedure TIBInsertStmtsOut.HeaderOut(Add2Log: TAdd2Log);
 var TableName: string;
     i,j: integer;
@@ -433,29 +343,29 @@ begin
       case Current[i].SQLType of
       SQL_BLOB:
         if Current[i].SQLSubType = 1 then
-          s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar
-        else
         begin
-          Add2Log(s);
-          s := '';
-          FormatBlob(Current[i],Add2Log);
-        end;
+          if Current[i].getCharSetID = 1 {octets} then
+            s += TIBXMLProcessor.FormatOctets(Current[i])
+          else
+            s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar
+        end
+        else
+          s += TIBXMLProcessor.FormatBlob(Current[i]);
 
       SQL_ARRAY:
         begin
           ar := Current[i].AsArray;
           if ar = nil then
-           s += 'NULL'
+            s += 'NULL'
           else
-          begin
-            Add2Log(s);
-            s := '';
-            FormatArray(ar,Add2Log);
-          end;
+            s += TIBXMLProcessor.FormatArray(ar);
         end;
 
       SQL_TEXT, SQL_VARYING:
-        s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar;
+        if Current[i].getCharSetID = 1 {octets} then
+          s += TIBXMLProcessor.FormatOctets(Current[i])
+        else
+          s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar;
 
       SQL_TIMESTAMP:
         s += QuoteChar + FormatDateTime(sTimeStampFormat,Current[i].AsDateTime) + QuoteChar;

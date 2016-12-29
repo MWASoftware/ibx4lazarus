@@ -3060,69 +3060,6 @@ begin
   end;
 end;
 
-(*
-var
-  qrySelect : TIBSQL;
-  Line : String;
-  i : Integer;
-begin
-  qrySelect := TIBSQL.Create(FDatabase);
-  try
-    qrySelect.SQL.Text := Format(SelectSQL,
-      [QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]);
-    qrySelect.ExecQuery;
-    while not qrySelect.Eof do
-    begin
-      Line := 'INSERT INTO ' + QuoteIdentifier(FDatabase.SQLDialect, ObjectName) + ' (';
-      for i := 0 to qrySelect.FieldCount - 1 do
-        if (qrySelect.Fields[i].SQLType <> SQL_ARRAY) and
-           (qrySelect.Fields[i].SQLType <> SQL_BLOB) then
-        begin
-          Line := Line + QuoteIdentifier(FDatabase.SQLDialect, qrySelect.Fields[i].Name);
-          if i <> (qrySelect.FieldCount - 1) then
-            Line := Line + ', ';
-        end;
-      Line := Line + ') VALUES (';
-      for i := 0 to qrySelect.FieldCount - 1 do
-      begin
-        if qrySelect.Fields[i].IsNull and
-           (qrySelect.Fields[i].SQLType <> SQL_ARRAY) and
-           (qrySelect.Fields[i].SQLType <> SQL_BLOB) then
-        begin
-          Line := Line + 'NULL';
-          if i <> (qrySelect.FieldCount - 1) then
-            Line := Line + ', ';
-        end
-        else
-        case qrySelect.Fields[i].SQLType of
-          SQL_TEXT, SQL_VARYING, SQL_TYPE_DATE,
-          SQL_TYPE_TIME, SQL_TIMESTAMP :
-          begin
-            Line := Line + QuotedStr(qrySelect.Fields[i].AsString);
-            if i <> (qrySelect.FieldCount - 1) then
-              Line := Line + ', ';
-          end;
-          SQL_SHORT, SQL_LONG, SQL_INT64,
-          SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT, SQL_BOOLEAN:
-          begin
-            Line := Line + qrySelect.Fields[i].AsString;
-            if i <> (qrySelect.FieldCount - 1) then
-              Line := Line + ', ';
-          end;
-          SQL_ARRAY, SQL_BLOB : ;
-          else
-            IBError(ibxeInvalidDataConversion, [nil]);
-        end;
-      end;
-      Line := Line + ')' + Term;
-      FMetaData.Add(Line);
-      qrySelect.Next;
-    end;
-  finally
-    qrySelect.Free;
-  end;
-end; *)
-
 procedure TIBExtract.ListRoles(ObjectName: String);
 const
   RolesSQL =
