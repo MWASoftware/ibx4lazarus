@@ -66,7 +66,7 @@ type
     constructor Create(aOwner: TComponent); override;
     procedure Assign(Source: TPersistent); override;
     procedure DataOut(SelectQuery: string; Add2Log: TAdd2Log);
-    procedure SetCommand(command, aValue, stmt: string; var Done: boolean);
+    procedure SetCommand(command, aValue, stmt: string; var Done: boolean); virtual;
     class procedure ShowPerfStats(Statement: IStatement; Add2Log: TAdd2Log);
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;

@@ -39,24 +39,240 @@ const
 
 type
   TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes,
-                sqEnd,sqBegin,sqCommit,sqRollback,sqString,sqCommentStart,
-                sqCommentEnd,sqCommentLine,sqAsterisk,sqForwardSlash,
-                sqDeclare,sqEOL,sqTerminator, sqReconnect,sqCase,
-                sqEquals,sqGT,sqTag,sqEndTag);
+                sqEnd,sqBegin,sqString,sqComment,sqCase, sqDeclare,
+                sqCommentLine,sqAsterisk,sqForwardSlash,
+                sqEOL,sqTerminator, sqEOF, sqEquals,sqGT,sqTag,sqEndTag);
 
   TSQLStates =  (stInit, stError, stInSQL, stNested, stInSingleQuotes,
-                 stInDoubleQuotes, stInComment, stInCommentLine,
-                 stInDeclaration, stInCommit, stInReconnect,
-                 {XML Analysis states}
-                 stInTag,stAttribute,stAttributeValue,stQuotedAttributeValue,
+                 stInDoubleQuotes, stInDeclaration, stInCommit, stInReconnect);
+
+  TXMLStates =  (stInTag,stAttribute,stAttributeValue,stQuotedAttributeValue,
                  stTagged,stEndTag);
 
   TXMLTag    =   (xtNone,xtBinary,xtArray,xtElt);
 
+  TOnNextLine = procedure(Sender: TObject; Line: string) of object;
+  TOnProgressEvent = procedure (Sender: TObject; Reset: boolean; value: integer) of object;
+
+  { TSymbolStream }
+
+  TSymbolStream = class
+  private
+    FNextSymbol: TSQLSymbol;
+    FOnNextLine: TOnNextLine;
+    FOnProgressEvent: TOnProgressEvent;
+    FTerminator: char;
+    FLastChar: char;
+    FIndex: integer;
+    FLine: string;
+    FString: string;
+    FXMLTag: TXMLTag;
+    FXMLMode: integer;
+  protected
+    FNextStatement: boolean;
+    function GetErrorPrefix: string; virtual; abstract;
+    function GetNextSymbol(C: char): TSQLSymbol;
+    function GetNextLine(var Line: string):boolean; virtual; abstract;
+  public
+    constructor Create;
+    procedure ShowError(msg: string; params: array of const);
+    function GetSymbol: TSQLSymbol;
+    procedure NextStatement;
+    property SymbolValue: string read FString;
+    property Terminator: char read FTerminator write FTerminator;
+    property XMLTag: TXMLTag read FXMLTag;
+    property OnNextLine: TOnNextLine read FOnNextLine write FOnNextLine;
+    property OnProgressEvent: TOnProgressEvent read FOnProgressEvent write FOnProgressEvent; {Progress Bar Support}
+  end;
+
+  { TBatchSymbolStream }
+
+  TBatchSymbolStream = class(TSymbolStream)
+  private
+    FLines: TStrings;
+    FLineIndex: integer;
+  protected
+    function GetErrorPrefix: string; override;
+    function GetNextLine(var Line: string):boolean; override;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure SetStreamSource(Lines: TStrings); overload;
+    procedure SetStreamSource(S: TStream); overload;
+    procedure SetStreamSource(FileName: string); overload;
+  end;
+
+  { TInteractiveSymbolStream }
+
+  TInteractiveSymbolStream = class(TSymbolStream)
+  private
+    FPrompt: string;
+    FContinuePrompt: string;
+  protected
+    function GetErrorPrefix: string; override;
+    function GetNextLine(var Line: string):boolean; override;
+  public
+    constructor Create(aPrompt: string='SQL>'; aContinue: string = 'CON>');
+  end;
+
+  TBlobData = record
+    BlobIntf: IBlob;
+    SubType: cardinal;
+  end;
+
+  TArrayData = record
+    ArrayIntf: IArray;
+    SQLType: cardinal;
+    dim: cardinal;
+    Size: cardinal;
+    Scale: integer;
+    CharSet: string;
+    bounds: TArrayBounds;
+    CurrentRow: integer;
+    Index: array of integer;
+  end;
+
+  { TIBXMLProcessor }
+
+  TIBXMLProcessor = class
+  private
+    FDatabase: TIBDatabase;
+    FSymbolStream: TSymbolStream;
+    FState: TXMLStates;
+    FTransaction: TIBTransaction;
+    FXMLTagStack: array [1..20] of TXMLTag;
+    FXMLTagIndex: integer;
+    FAttributeName: string;
+    FBlobData: array of TBlobData;
+    FCurrentBlob: integer;
+    FArrayData: array of TArrayData;
+    FCurrentArray: integer;
+    FBlobBuffer: PChar;
+    procedure EndXMLTag(xmltag: TXMLTag);
+    procedure EnterTag;
+    function GetArrayData(index: integer): TArrayData;
+    function GetArrayDataCount: integer;
+    function GetBlobData(index: integer): TBlobData;
+    function GetBlobDataCount: integer;
+    procedure ProcessTagValue(tagValue: string);
+    procedure StartXMLTag(xmltag: TXMLTag);
+    procedure ProcessAttributeValue(attrValue: string);
+    procedure ProcessBoundsList(boundsList: string);
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function AnalyseXML(SymbolStream: TSymbolStream): string;
+    procedure NextStatement;
+    property BlobData[index: integer]: TBlobData read GetBlobData;
+    property BlobDataCount: integer read GetBlobDataCount;
+    property ArrayData[index: integer]: TArrayData read GetArrayData;
+    property ArrayDataCount: integer read GetArrayDataCount;
+    property Database: TIBDatabase read FDatabase write FDatabase;
+    property Transaction: TIBTransaction read FTransaction write FTransaction;
+  end;
+
+  { TIBSQLProcessor }
+
+  TIBSQLProcessor = class
+  private
+    FSQLText: string;
+    FState: TSQLStates;
+    FStack: array [0..16] of TSQLStates;
+    FStackindex: integer;
+    FHasBegin: boolean;
+    FInCase: boolean;
+    FNested: integer;
+    FXMLProcessor: TIBXMLProcessor;
+    FSymbolStream: TSymbolStream;
+    procedure AddToSQL(const Symbol: string);
+    procedure SetState(AState: TSQLStates);
+    function PopState: TSQLStates;
+  public
+    constructor Create(XMLProcessor: TIBXMLProcessor);
+    function GetNextStatement(SymbolStream: TSymbolStream; var stmt: string) : boolean;
+    property HasBegin: boolean read FHasBegin;
+  end;
+
   TGetParamValue = procedure(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD) of object;
   TLogEvent = procedure(Sender: TObject; Msg: string) of Object;
-  TOnProgressEvent = procedure (Sender: TObject; Reset: boolean; value: integer) of object;
   TOnSelectSQL = procedure (Sender: TObject; SQLText: string) of object;
+  TOnSetStatement = procedure(Sender: TObject; command, aValue, stmt: string; var Done: boolean) of object;
+
+  { TCustomIBXScript }
+
+  TCustomIBXScript = class(TComponent)
+  private
+    FEcho: boolean;
+    FIBXMLProcessor: TIBXMLProcessor;
+    FIBSQLProcessor: TIBSQLProcessor;
+    FDatabase: TIBDatabase;
+    FDataOutputFormatter: TIBCustomDataOutput;
+    FIgnoreGrants: boolean;
+    FOnErrorLog: TLogEvent;
+    FOnSelectSQL: TOnSelectSQL;
+    FOnSetStatement: TOnSetStatement;
+    FShowAffectedRows: boolean;
+    FShowPerformanceStats: boolean;
+    FStopOnFirstError: boolean;
+    FTransaction: TIBTransaction;
+    FInternalTransaction: TIBTransaction;
+    FISQL: TIBSQL;
+    FGetParamValue: TGetParamValue;
+    FOnOutputLog: TLogEvent;
+    FAutoDDL: boolean;
+    procedure DoCommit;
+    procedure DoReconnect;
+    procedure ExecSQL(stmt: string);
+    function GetOnProgressEvent: TOnProgressEvent;
+    function GetTransaction: TIBTransaction;
+    procedure SetDatabase(AValue: TIBDatabase);
+    procedure SetDataOutputFormatter(AValue: TIBCustomDataOutput);
+    procedure SetOnProgressEvent(AValue: TOnProgressEvent);
+    procedure SetParamValue(SQLVar: ISQLParam);
+    procedure SetShowPerformanceStats(AValue: boolean);
+    function ProcessStatement(stmt: string): boolean;
+    procedure SetTransaction(AValue: TIBTransaction);
+  protected
+    FSymbolStream: TSymbolStream;
+    procedure Add2Log(const Msg: string; IsError: boolean=true); virtual;
+    procedure EchoNextLine(Sender: TObject; Line: string);
+    procedure ProcessStream;
+  public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure DefaultSelectSQLHandler(aSQLText: string);
+  published
+    property Database: TIBDatabase read FDatabase write SetDatabase;
+    property DataOutputFormatter: TIBCustomDataOutput read FDataOutputFormatter
+                                  write SetDataOutputFormatter;
+    property AutoDDL: boolean read FAutoDDL write FAutoDDL;
+    property Echo: boolean read FEcho write FEcho default true;  {Echo Input to Log}
+    property IgnoreGrants: boolean read FIgnoreGrants write FIgnoreGrants;
+    property Transaction: TIBTransaction read FTransaction write SetTransaction;
+    property ShowAffectedRows: boolean read FShowAffectedRows write FShowAffectedRows;
+    property ShowPerformanceStats: boolean read FShowPerformanceStats write SetShowPerformanceStats;
+    property StopOnFirstError: boolean read FStopOnFirstError write FStopOnFirstError default true;
+    property GetParamValue: TGetParamValue read FGetParamValue write FGetParamValue; {resolve parameterized queries}
+    property OnOutputLog: TLogEvent read FOnOutputLog write FOnOutputLog; {Log handler}
+    property OnErrorLog: TLogEvent read FOnErrorLog write FOnErrorLog;
+    property OnProgressEvent: TOnProgressEvent read GetOnProgressEvent write SetOnProgressEvent; {Progress Bar Support}
+    property OnSelectSQL: TOnSelectSQL read FOnSelectSQL write FOnSelectSQL; {Handle Select SQL Statements}
+    property OnSetStatement: TOnSetStatement read FOnSetStatement write FOnSetStatement;
+  end;
+
+  { TIBXScript }
+
+  TIBXScript = class(TCustomIBXScript)
+  public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
+    {use RunScript instead of PerformUpdate}
+    function PerformUpdate(SQLFile: string; aAutoDDL: boolean): boolean; overload; deprecated;
+    function PerformUpdate(SQLStream: TStream;   aAutoDDL: boolean): boolean; overload; deprecated;
+    function RunScript(SQLFile: string;  aAutoDDL: boolean): boolean; overload;
+    function RunScript(SQLStream: TStream;   aAutoDDL: boolean): boolean; overload;
+    function RunScript(SQLLines: TStrings; aAutoDDL: boolean): boolean; overload;
+  end;
 
   {
   TIBXScript: runs an SQL script in the specified file or stream. The text is parsed
@@ -110,122 +326,6 @@ type
   multiple times.
   }
 
-  TBlobData = record
-    BlobIntf: IBlob;
-    SubType: cardinal;
-  end;
-
-  TArrayData = record
-    ArrayIntf: IArray;
-    SQLType: cardinal;
-    dim: cardinal;
-    Size: cardinal;
-    Scale: integer;
-    CharSet: string;
-    bounds: TArrayBounds;
-    CurrentRow: integer;
-    Index: array of integer;
-  end;
-
-  TOnSetStatement = procedure(Sender: TObject; command, aValue, stmt: string; var Done: boolean) of object;
-
-
-  { TIBXScript }
-
-  TIBXScript = class(TComponent)
-  private
-    FDatabase: TIBDatabase;
-    FDataOutputFormatter: TIBCustomDataOutput;
-    FEcho: boolean;
-    FIgnoreGrants: boolean;
-    FOnErrorLog: TLogEvent;
-    FOnProgressEvent: TOnProgressEvent;
-    FOnSelectSQL: TOnSelectSQL;
-    FOnSetStatement: TOnSetStatement;
-    FShowAffectedRows: boolean;
-    FShowPerformanceStats: boolean;
-    FStopOnFirstError: boolean;
-    FTransaction: TIBTransaction;
-    FInternalTransaction: TIBTransaction;
-    FState: TSQLStates;
-    FString: string;
-    FISQL: TIBSQL;
-    FLastSymbol: TSQLSymbol;
-    FNested: integer;
-    FLastChar: char;
-    FSQLText: string;
-    FHasBegin: boolean;
-    FInCase: boolean;
-    FStack: array [0..16] of TSQLStates;
-    FStackindex: integer;
-    FGetParamValue: TGetParamValue;
-    FOnOutputLog: TLogEvent;
-    FTerminator: char;
-    FAutoDDL: boolean;
-    {XML Control variables}
-    FXMLTag: TXMLTag;
-    FXMLTagStack: array [1..20] of TXMLTag;
-    FXMLTagIndex: integer;
-    FAttributeName: string;
-    FXMLString: string;
-    FBlobData: array of TBlobData;
-    FCurrentBlob: integer;
-    FArrayData: array of TArrayData;
-    FCurrentArray: integer;
-    FBlobBuffer: PChar;
-    procedure Add2Log(const Msg: string; IsError: boolean=true);
-    procedure AddToSQL(const Symbol: string);
-    function AnalyseSQL(Lines: TStringList): boolean;
-    procedure AnalyseLine(const Line: string);
-    procedure DoCommit;
-    procedure DoReconnect;
-    procedure ExecSQL;
-    function GetNextSymbol(C: char): TSQLSymbol;
-    function GetSymbol(const Line: string; var index: integer): TSQLSymbol;
-    function GetTransaction: TIBTransaction;
-    procedure SetDatabase(AValue: TIBDatabase);
-    procedure SetDataOutputFormatter(AValue: TIBCustomDataOutput);
-    procedure SetParamValue(SQLVar: ISQLParam);
-    procedure SetShowPerformanceStats(AValue: boolean);
-    procedure SetState(AState: TSQLStates);
-    procedure ClearStatement;
-    function PopState: TSQLStates;
-    function ProcessStatement(stmt: string): boolean;
-    {XML Handling}
-    procedure EndXMLTag(xmltag: TXMLTag);
-    procedure EnterTag;
-    procedure ProcessTagValue(tagValue: string);
-    procedure StartXMLTag(xmltag: TXMLTag);
-    procedure ProcessAttributeValue(attrValue: string);
-    procedure ProcessBoundsList(boundsList: string);
-  public
-    constructor Create(aOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure DefaultSelectSQLHandler(aSQLText: string);
-    {use RunScript instead of PerformUpdate}
-    function PerformUpdate(const SQLFile: string;  AutoDDL: boolean): boolean; overload; deprecated;
-    function PerformUpdate(const SQLStream: TStream;   AutoDDL: boolean): boolean; overload; deprecated;
-    function RunScript(const SQLFile: string;  AutoDDL: boolean): boolean; overload;
-    function RunScript(const SQLStream: TStream;   AutoDDL: boolean): boolean; overload;
-  published
-    property Database: TIBDatabase read FDatabase write SetDatabase;
-    property DataOutputFormatter: TIBCustomDataOutput read FDataOutputFormatter
-                                  write SetDataOutputFormatter;
-    property AutoDDL: boolean read FAutoDDL write FAutoDDL;
-    property Echo: boolean read FEcho write FEcho default true;  {Echo Input to Log}
-    property IgnoreGrants: boolean read FIgnoreGrants write FIgnoreGrants;
-    property Transaction: TIBTransaction read FTransaction write FTransaction;
-    property ShowAffectedRows: boolean read FShowAffectedRows write FShowAffectedRows;
-    property ShowPerformanceStats: boolean read FShowPerformanceStats write SetShowPerformanceStats;
-    property StopOnFirstError: boolean read FStopOnFirstError write FStopOnFirstError default true;
-    property GetParamValue: TGetParamValue read FGetParamValue write FGetParamValue; {resolve parameterized queries}
-    property OnOutputLog: TLogEvent read FOnOutputLog write FOnOutputLog; {Log handler}
-    property OnErrorLog: TLogEvent read FOnErrorLog write FOnErrorLog;
-    property OnProgressEvent: TOnProgressEvent read FOnProgressEvent write FOnProgressEvent; {Progress Bar Support}
-    property OnSelectSQL: TOnSelectSQL read FOnSelectSQL write FOnSelectSQL; {Handle Select SQL Statements}
-    property OnSetStatement: TOnSetStatement read FOnSetStatement write FOnSetStatement;
-  end;
-
 resourcestring
   sInvalidSetStatement = 'Invalid %s Statement - %s';
 
@@ -248,15 +348,65 @@ resourcestring
   sInvalidEndTag = 'XML End Tag Mismatch - %s';
   sXMLStackOverFlow = 'XML Stack Overflow';
   sErrorState = 'Entered Error State';
-  sXMLError = 'Invalid XML on Line "%s"';
+  sXMLError = 'Invalid XML';
   sXMLAttributeError = 'Unexpected attribute - "%s"';
   sInvalidBoundsList = 'Invalid array bounds list - "%s"';
   sBlobBlobMustbeEven = 'Binary block must have an even number of characters';
   sInvalidCharacterSet = 'Unrecognised character set name - "%s"';
+  sOnLineError = 'On Line %d Character %d: ';
+  sArrayIndexError = 'Array Index Error (%d)';
+  sBlobIndexError = 'Blob Index Error (%d)';
 
 { TIBXScript }
 
-procedure TIBXScript.Add2Log(const Msg: string; IsError: boolean);
+constructor TIBXScript.Create(aOwner: TComponent);
+begin
+  inherited Create(aOwner);
+  FSymbolStream := TBatchSymbolStream.Create;
+  FSymbolStream.OnNextLine := @EchoNextLine;
+end;
+
+destructor TIBXScript.Destroy;
+begin
+  if FSymbolStream <> nil then FSymbolStream.Free;
+  inherited Destroy;
+end;
+
+function TIBXScript.PerformUpdate(SQLFile: string; aAutoDDL: boolean): boolean;
+begin
+  Result := RunScript( SQLFile,aAutoDDL);
+end;
+
+function TIBXScript.PerformUpdate(SQLStream: TStream; aAutoDDL: boolean
+  ): boolean;
+begin
+  Result := RunScript(SQLStream,aAutoDDL);
+end;
+
+function TIBXScript.RunScript(SQLFile: string; aAutoDDL: boolean): boolean;
+begin
+  TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLFile);
+  FAutoDDL := aAutoDDL;
+  ProcessStream;
+end;
+
+function TIBXScript.RunScript(SQLStream: TStream; aAutoDDL: boolean): boolean;
+begin
+  TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLStream);
+  FAutoDDL := aAutoDDL;
+  ProcessStream;
+end;
+
+function TIBXScript.RunScript(SQLLines: TStrings; aAutoDDL: boolean): boolean;
+begin
+  TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLLines);
+  FAutoDDL := aAutoDDL;
+  ProcessStream;
+end;
+
+{ TCustomIBXScript }
+
+procedure TCustomIBXScript.Add2Log(const Msg: string; IsError: boolean);
 begin
   if IsError then
   begin
@@ -266,637 +416,32 @@ begin
   if assigned(FOnOutputLog) then FOnOutputLog(self,Msg)
 end;
 
-procedure TIBXScript.AddToSQL(const Symbol: string);
-begin
-  FSQLText := FSQLText +  Symbol
-end;
-
-procedure TIBXScript.AnalyseLine(const Line: string);
-var index: integer;
-    Symbol: TSQLSymbol;
-    NonSpace: boolean;
-begin
-  index := 1;
-  NonSpace := false;
-  while true do
-  begin
-    if FState = stError then
-      raise Exception.Create(sErrorState);
-    Symbol := GetSymbol(Line,index);
-    if not (Symbol in [sqSpace,sqEOL]) then
-      NonSpace := true;
-
-    if FState in [stInTag..stEndTag] then
-    {XML State Processing}
-    case Symbol of
-    sqSpace:
-      case FState of
-      stQuotedAttributeValue,
-      stTagged:
-         FXMLString += ' ';
-      end;
-
-    sqCommentStart,
-    sqCommentEnd,sqCommentLine,
-    sqEnd,sqBegin,sqCommit,sqRollback,
-    sqDeclare,sqReconnect,sqCase:
-      case FState of
-      stQuotedAttributeValue,
-      stTagged:
-         FXMLString += FString;
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-      end;
-
-    sqSemiColon:
-      case FState of
-      stQuotedAttributeValue,
-      stTagged:
-         FXMLString += ';';
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-      end;
-
-    sqSingleQuotes:
-      case FState of
-      stQuotedAttributeValue,
-      stTagged:
-         FXMLString += '''';
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-      end;
-
-    sqAsterisk:
-      case FState of
-      stQuotedAttributeValue,
-      stTagged:
-         FXMLString += '*';
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-      end;
-
-    sqForwardSlash:
-      case FState of
-      stQuotedAttributeValue,
-      stTagged:
-         FXMLString += '/';
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-      end;
-
-    sqGT:
-      case FState of
-      stEndTag:
-        begin
-          case FXMLTag of
-          xtBinary:
-            AddToSQL(Format(ibx_blob+'%d',[FCurrentBlob]));
-          xtArray:
-            AddToSQL(Format(ibx_array+'%d',[FCurrentArray]));
-          end;
-          PopState;
-        end;
-
-      stInTag:
-        begin
-          FXMLString := '';
-          FState := stTagged;
-          EnterTag;
-        end;
-
-      stQuotedAttributeValue,
-      stTagged:
-        FXMLString += '>';
-
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-      end;
-
-    sqTag:
-      if FState = stTagged then
-      begin
-        StartXMLTag(FXMLTag);
-        SetState(stInTag)
-      end
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-
-    sqEndTag:
-      if FState = stTagged then
-      begin
-        ProcessTagValue(FXMLString);
-        EndXMLTag(FXMLTag);
-        FState := stEndTag;
-      end
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-
-    sqEquals:
-      case FState of
-      stAttribute:
-        FState := stAttributeValue;
-
-      stQuotedAttributeValue,
-      stTagged:
-        FXMLString += '=';
-
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-      end;
-
-    sqDoubleQuotes:
-      case FState of
-      stAttributeValue:
-        begin
-          FXMLString := '';
-          FState := stQuotedAttributeValue;
-        end;
-
-      stQuotedAttributeValue:
-        begin
-          ProcessAttributeValue(FXMLString);
-          FState := stInTag;
-        end;
-
-      stTagged:
-        FXMLString += '"';
-
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-      end;
-
-    sqString:
-      case FState of
-      stInTag: {attribute name}
-        begin
-          FAttributeName := FString;
-          FState := stAttribute;
-        end;
-
-      stAttributeValue:
-        begin
-          ProcessAttributeValue(FString);
-          FState := stInTag;
-        end;
-
-      stQuotedAttributeValue:
-         FXMLString += FString;
-
-      stTagged:
-          FXMLString += FString;
-
-      else
-        raise Exception.CreateFmt(sXMLError,[Line]);
-      end;
-
-    end
-    else
-    {SQL State Processing}
-    case Symbol of
-    sqSpace:
-      if not (FState in [stInComment,stInCommentLine]) then
-        AddToSQL(' ');
-
-    sqEquals:
-      if not (FState in [stInComment,stInCommentLine]) then
-        AddToSQL('=');
-
-    sqGT:
-      if not (FState in [stInComment,stInCommentLine]) then
-        AddToSQL('>');
-
-    sqTag:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        if FState in [stInSQL,stNested] then
-        begin
-          StartXMLTag(FXMLTag);
-          SetState(stInTag);
-        end
-        else
-          raise Exception.CreateFmt(sXMLError,[Line]);
-      end;
-
-    sqTerminator:
-      if not (FState in [stInComment,stInCommentLine]) then
-        case FState of
-        stInit: {ignore empty statement};
-
-        stInSQL:
-            ExecSQL;
-
-       stInCommit:
-            DoCommit;
-
-       stInReconnect:
-           DoReconnect;
-
-       stNested, stInSingleQuotes, stInDoubleQuotes:
-         AddToSQL(FTerminator);
-
-       stInDeclaration:
-         begin
-           FState := PopState;
-           AddToSQL(FTerminator);
-         end;
-
-       else
-         raise Exception.CreateFmt(sTerminatorUnknownState,[FState]);
-       end;
-
-    sqSemiColon:
-        begin
-          if FState = stInDeclaration then
-            FState := PopState;
-          AddToSQL(';');
-        end;
-
-    sqAsterisk:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-       AddToSQL('*');
-       if FState =  stInit then
-          FState := stInSQL
-      end;
-
-    sqForwardSlash:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-       AddToSQL('/');
-       if FState =  stInit then
-          FState := stInSQL
-      end;
-
-    sqCommentStart:
-      if not (FState in [stInComment,stInCommentLine]) then
-        SetState(stInComment);
-
-    sqCommentEnd:
-      if FState = stInComment then
-      begin
-        AddToSQL('/* ' + Trim(FString) + ' */');
-        FState := PopState
-      end
-      else
-        FState := stError;
-
-    sqCommentLine:
-      if not (FState in [stInComment,stInCommentLine]) then
-        SetState(stInCommentLine);
-
-    sqSingleQuotes:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        case FState of
-        stInSingleQuotes:
-          FState := PopState;
-        stInDoubleQuotes:
-          {Ignore};
-        else
-          SetState(stInSingleQuotes)
-        end;
-        AddToSQL('''')
-      end;
-
-    sqDoubleQuotes:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        case FState of
-        stInSingleQuotes:
-          {Ignore};
-        stInDoubleQuotes:
-          FState := PopState;
-        else
-          SetState(stInDoubleQuotes)
-        end;
-        AddToSQL('"')
-      end;
-
-    sqEnd:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        AddToSQL(FString);
-        case FState of
-        stInSingleQuotes,
-        stInDoubleQuotes:
-          {Ignore};
-        stNested:
-          begin
-            if FNested = 0 then
-            begin
-              FState := PopState;
-              if not FInCase then
-              begin
-                FState := stInit;
-                ExecSQL
-              end
-              else
-                FInCase := false;
-            end
-           else
-              Dec(FNested)
-          end;
-          {Otherwise ignore}
-        end
-      end;
-
-    sqBegin:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        FHasBegin := true;
-        AddToSQL(FString);
-        case FState of
-        stInSingleQuotes,
-        stInDoubleQuotes:
-          {Ignore};
-        stNested:
-          Inc(FNested);
-
-        stInSQL,
-        stInit:
-          SetState(stNested);
-        end
-      end;
-
-    sqCase:
-    if not (FState in [stInComment,stInCommentLine]) then
-    begin
-      AddToSQL(FString);
-      case FState of
-      stInSingleQuotes,
-      stInDoubleQuotes:
-        {Ignore};
-      stNested:
-        Inc(FNested);
-
-      stInSQL,
-      stInit:
-        begin
-          FInCase := true;
-          SetState(stNested);
-        end;
-      end
-    end;
-
-    sqDeclare:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        AddToSQL(FString);
-        if FState in [stInit,stInSQL] then
-          SetState(stInDeclaration)
-      end;
-
-    sqCommit:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        if FState = stInit then
-          FState := stInCommit
-        else
-          AddToSQL(FString);
-      end;
-
-    sqReconnect:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        if FState = stInit then
-          FState := stInReconnect
-        else
-          raise Exception.Create(sNoReconnect)
-      end;
-
-    sqString:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        AddToSQL(FString);
-        if FState = stInit then
-          FState := stInSQL
-      end;
-
-    sqEOL:
-      begin
-        case FState of
-        stInCommentLine:
-        begin
-          AddToSQL('/* ' + Trim(FString) + ' */');
-          FState := PopState;
-        end;
-        stInDoubleQuotes,
-        stInSingleQuotes:
-          raise Exception.Create(sUnterminatedString);
-        stInit:
-          Exit;
-        end;
-        if NonSpace then AddToSQL(LineEnding);
-        Exit;
-      end;
-    else
-      raise Exception.CreateFmt(sUnknownSymbol,[Symbol]);
-    end
-  end
-end;
-
-function TIBXScript.AnalyseSQL(Lines: TStringList): boolean;
-var I: integer;
-begin
-  Result := true;
-  ClearStatement;
-  FLastSymbol := sqNone;
-  for I := 0 to Lines.Count - 1 do
-  begin
-    if Echo then Add2Log(Lines[I],false);
-    if assigned(OnProgressEvent) then
-      OnProgressEvent(self,false,1);
-    try
-      AnalyseLine(Lines[I]);
-    except on E:Exception do
-      begin
-        Add2Log(E.Message);
-        Result := false;
-        if StopOnFirstError then Exit;
-        ClearStatement;
-        FLastSymbol := sqNone;
-      end
-    end;
-  end;
-  if FState <> stInit then
-    AnalyseLine(';');
-  Result := (FStackIndex = 0) and (FState = stInit)
-end;
-
-constructor TIBXScript.Create(aOwner: TComponent);
-begin
-  inherited;
-  FStopOnFirstError := true;
-  FEcho := true;
-  FState := stInit;
-  FISQL := TIBSQL.Create(self);
-  FISQL.ParamCheck := true;
-  FInternalTransaction := TIBTransaction.Create(self);
-  FInternalTransaction.Params.Clear;
-  FInternalTransaction.Params.Add('concurrency');
-  FInternalTransaction.Params.Add('wait');
-  ClearStatement;
-end;
-
-destructor TIBXScript.Destroy;
-begin
-  if FISQL <> nil then FISQL.Free;
-  FreeMem(FBlobBuffer);
-  if FInternalTransaction <> nil then FInternalTransaction.Free;
-  inherited;
-end;
-
-procedure TIBXScript.DefaultSelectSQLHandler(aSQLText: string);
-begin
-  if assigned(DataOutputFormatter) then
-    DataOutputFormatter.DataOut(aSQLText,@Add2Log)
-end;
-
-function TIBXScript.PerformUpdate(const SQLFile: string; AutoDDL: boolean
-  ): boolean;
-begin
-  Result := RunScript( SQLFile,AutoDDL);
-end;
-
-function TIBXScript.PerformUpdate(const SQLStream: TStream; AutoDDL: boolean
-  ): boolean;
-begin
-  Result := RunScript(SQLStream,AutoDDL);
-end;
-
-procedure TIBXScript.DoCommit;
+procedure TCustomIBXScript.DoCommit;
 begin
   with GetTransaction do
     if InTransaction then Commit;
-  if not GetTransaction.InTransaction then
-    GetTransaction.StartTransaction;
-  ClearStatement;
+  GetTransaction.Active := true;
 end;
 
-procedure TIBXScript.DoReconnect;
+procedure TCustomIBXScript.DoReconnect;
 begin
   with GetTransaction do
     if InTransaction then Commit;
   Database.Connected := false;
   Database.Connected := true;
-  if not GetTransaction.InTransaction then
-    GetTransaction.StartTransaction;
-  ClearStatement;
+  GetTransaction.Active := true;
 end;
 
-procedure TIBXScript.EndXMLTag(xmltag: TXMLTag);
-begin
-  if FXMLTagIndex = 0 then
-    raise Exception.Create(sXMLStackUnderflow);
-  if xmltag <> FXMLTagStack[FXMLTagIndex] then
-    raise Exception.CreateFmt(sInvalidEndTag,[FString]);
-
-  case FXMLTagStack[FXMLTagIndex] of
-  xtBinary:
-    FBlobData[FCurrentBlob].BlobIntf.Close;
-
-  xtArray:
-    FArrayData[FCurrentArray].ArrayIntf.SaveChanges;
-  end;
-  Dec(FXMLTagIndex);
-end;
-
-procedure TIBXScript.EnterTag;
-var aCharSetID: integer;
-begin
-  case FXMLTagStack[FXMLTagIndex] of
-  xtBinary:
-    FBlobData[FCurrentBlob].BlobIntf := Database.Attachment.CreateBlob(
-      Transaction.TransactionIntf,FBlobData[FCurrentBlob].SubType);
-
-  xtArray:
-    with FArrayData[FCurrentArray] do
-    begin
-      FirebirdAPI.CharSetName2CharSetID(CharSet,aCharSetID);
-      ArrayIntf := Database.Attachment.CreateArray(
-                     Transaction.TransactionIntf,
-                     Database.Attachment.CreateArrayMetaData(SQLType,Scale,Size,
-                     aCharSetID,dim,bounds)
-                     );
-    end;
-
-  xtElt:
-    Inc(FArrayData[FCurrentArray].CurrentRow);
-  end;
-end;
-
-procedure TIBXScript.ProcessTagValue(tagValue: string);
-
-  function nibble(hex: char): byte;
-  begin
-    case hex of
-    '0': Result := 0;
-    '1': Result := 1;
-    '2': Result := 2;
-    '3': Result := 3;
-    '4': Result := 4;
-    '5': Result := 5;
-    '6': Result := 6;
-    '7': Result := 7;
-    '8': Result := 8;
-    '9': Result := 9;
-    'a','A': Result := 10;
-    'b','B': Result := 11;
-    'c','C': Result := 12;
-    'd','D': Result := 13;
-    'e','E': Result := 14;
-    'f','F': Result := 15;
-    end;
-  end;
-
-  procedure WriteToBlob(hexData: string);
-  var i,j : integer;
-      blength: integer;
-  begin
-    if odd(length(hexData)) then
-      raise Exception.Create(sBlobBlobMustbeEven);
-    blength := Length(hexData) div 2;
-    IBAlloc(FBlobBuffer,0,blength);
-    j := 1;
-    for i := 1 to blength do
-    begin
-      FBlobBuffer^ := char((nibble(hexData[j]) shl 4) or nibble(hexdata[j+1]));
-      Inc(j,2);
-    end;
-    FBlobData[FCurrentBlob].BlobIntf.Write(FBlobBuffer^,blength);
-  end;
-
-begin
-  if tagValue = '' then Exit;
-  case FXMLTagStack[FXMLTagIndex] of
-  xtBinary:
-      WriteToBlob(tagValue);
-
-  xtElt:
-    with FArrayData[FCurrentArray] do
-      ArrayIntf.SetAsString(index,tagValue);
-
-  end;
-end;
-
-procedure TIBXScript.ExecSQL;
+procedure TCustomIBXScript.ExecSQL(stmt: string);
 var DDL: boolean;
     I: integer;
     stats: TPerfCounters;
 begin
- if FSQLText <> '' then
- begin
-   if ProcessStatement(FSQLText) then {Handle Set Statement}
-   begin
-     ClearStatement;
-     Exit;
-   end;
-
    Database.Connected := true;
-   FISQL.SQL.Text := FSQLText;
+   FISQL.SQL.Text := stmt;
    FISQL.Transaction := GetTransaction;
    FISQL.Transaction.Active := true;
-   FISQL.ParamCheck := not FHasBegin; {Probably PSQL}
+   FISQL.ParamCheck := not FIBSQLProcessor.HasBegin; {Probably PSQL}
    FISQL.Prepare;
    FISQL.Statement.EnableStatistics(ShowPerformanceStats);
 
@@ -910,17 +455,17 @@ begin
    if FISQL.SQLStatementType = SQLSelect then
    begin
      if assigned(OnSelectSQL) then
-       OnSelectSQL(self,FSQLText)
+       OnSelectSQL(self,stmt)
      else
      if assigned(DataOutputFormatter) then
-       DefaultSelectSQLHandler(FSQLText)
+       DefaultSelectSQLHandler(stmt)
      else
        raise Exception.Create(sNoSelectSQL);
    end
    else
    begin
      DDL := FISQL.SQLStatementType = SQLDDL;
-     if not DDL or not FIgnoreGrants or (Pos('GRANT',AnsiUpperCase(Trim(FSQLText))) <> 1) then
+     if not DDL or not FIgnoreGrants or (Pos('GRANT',AnsiUpperCase(Trim(stmt))) <> 1) then
      begin
        FISQL.ExecQuery;
        if ShowAffectedRows and not DDL then
@@ -934,242 +479,108 @@ begin
      FISQL.Close;
    end;
    FISQL.SQL.Clear;
-   ClearStatement;
- end
 end;
 
-
-
-function TIBXScript.GetNextSymbol(C: char): TSQLSymbol;
+function TCustomIBXScript.GetOnProgressEvent: TOnProgressEvent;
 begin
-    if C = FTerminator then
-      Result := sqTerminator
-    else
-    case C of
-    ' ',#9,#10,#13:
-      Result := sqSpace;
-    ';':
-      Result := sqSemiColon;
-    '"':
-      Result := sqDoubleQuotes;
-    '''':
-      Result := sqSingleQuotes;
-    '/':
-      Result := sqForwardSlash;
-    '*':
-      Result := sqAsterisk;
-    '=':
-      Result := sqEquals;
-    '>':
-      Result := sqGT;
-    else
-      begin
-        Result := sqString;
-        FLastChar := C
-      end
-    end;
+  Result := FSymbolStream.OnProgressEvent;
 end;
 
-function TIBXScript.GetSymbol(const Line: string; var index: integer): TSQLSymbol;
+function TCustomIBXScript.GetTransaction: TIBTransaction;
 begin
-  Result := sqNone;
-  if FLastSymbol <> sqNone then
+ if FTransaction = nil then
+   Result := FInternalTransaction
+ else
+   Result := FTransaction;
+end;
+
+procedure TCustomIBXScript.EchoNextLine(Sender: TObject; Line: string);
+begin
+  if Echo then Add2Log(Line);
+end;
+
+procedure TCustomIBXScript.SetDatabase(AValue: TIBDatabase);
+begin
+ if FDatabase = AValue then Exit;
+ FDatabase := AValue;
+ FISQL.Database := AValue;
+ FIBXMLProcessor.Database := AValue;
+ FInternalTransaction.DefaultDatabase := AValue;
+end;
+
+procedure TCustomIBXScript.SetDataOutputFormatter(AValue: TIBCustomDataOutput);
+begin
+ if FDataOutputFormatter = AValue then Exit;
+ if (FDataOutputFormatter <> nil) and (AValue <> nil) then
+   AValue.Assign(FDataOutputFormatter);
+ FDataOutputFormatter := AValue;
+ if FDataOutputFormatter <> nil then
+   FDataOutputFormatter.Database := Database;
+end;
+
+procedure TCustomIBXScript.SetOnProgressEvent(AValue: TOnProgressEvent);
+begin
+  FSymbolStream.OnProgressEvent := AValue;
+end;
+
+procedure TCustomIBXScript.SetParamValue(SQLVar: ISQLParam);
+var BlobID: TISC_QUAD;
+    ix: integer;
+begin
+  if (SQLVar.SQLType = SQL_BLOB) and (Pos(ibx_blob,SQLVar.Name) = 1) then
   begin
-    Result := FLastSymbol;
-    if Result = sqString then
-      FString := FLastChar;
-    FLastSymbol := sqNone
+    ix := StrToInt(system.copy(SQLVar.Name,length(ibx_blob)+1,length(SQLVar.Name)-length(ibx_blob)));
+    SQLVar.AsBlob := FIBXMLProcessor.BlobData[ix].BlobIntf;
+    Exit;
   end;
 
-  while (index <= Length(Line)) and (FLastSymbol = sqNone) do
+  if (SQLVar.SQLType = SQL_ARRAY) and (Pos(ibx_array,SQLVar.Name) = 1) then
   begin
-    FLastSymbol := GetNextSymbol(Line[index]);
-    {combine if possible}
-    case Result of
-    sqNone:
-      begin
-        Result := FLastSymbol;
-        if FLastSymbol = sqString then
-          FString := FLastChar;
-        FLastSymbol := sqNone
-      end;
-
-    sqForwardSlash:
-      if FLastSymbol = sqAsterisk then
-      begin
-        Result := sqCommentStart;
-        FString := '/*';
-        FLastSymbol := sqNone
-      end
-      else
-      if FLastSymbol = sqForwardSlash then
-      begin
-        FString := '//';
-        Result := sqCommentLine;
-        FLastSymbol := sqNone
-      end;
-
-    sqAsterisk:
-      if FLastSymbol = sqForwardSlash then
-      begin
-        FString := '*/';
-        Result := sqCommentEnd;
-        FLastSymbol := sqNone
-      end;
-
-    sqString:
-      if FLastSymbol = sqString then
-      begin
-        FString := FString + FLastChar;
-        FLastSymbol := sqNone
-      end;
-    end;
-    Inc(index)
+    ix := StrToInt(system.copy(SQLVar.Name,length(ibx_array)+1,length(SQLVar.Name)-length(ibx_array)));
+    SQLVar.AsArray := FIBXMLProcessor.ArrayData[ix].ArrayIntf;
+    Exit;
   end;
 
-  if (index > Length(Line)) then
-    if Result = sqNone then
-      Result := sqEOL
+  if assigned(FGetParamValue) and (SQLVar.SQLType = SQL_BLOB) then
+  begin
+    Add2Log(Format(sResolveQueryParam,[SQLVar.Name]));
+    GetParamValue(self,SQLVar.Name,BlobID);
+    if (BlobID.gds_quad_high = 0) and (BlobID.gds_quad_low = 0) then
+      SQLVar.Clear
     else
-    if (FLastSymbol = sqNone) and (Result <> sqEOL) then
-      FLastSymbol := sqEOL;
-
-  if Result = sqString then
-  begin
-    if FString <> '' then
-      if CompareText(FString,'begin') = 0 then
-        Result := sqBegin
-      else
-      if CompareText(FString,'end') = 0 then
-        Result := sqEnd
-      else
-      if CompareText(FString,'declare') = 0 then
-        Result := sqDeclare
-      else
-      if CompareText(FString,'commit') = 0 then
-        Result := sqCommit
-      else
-      if CompareText(FString,'reconnect') = 0 then
-        Result := sqReconnect
-      else
-      if CompareText(FString,'case') = 0 then
-        Result := sqCase
-      else
-      if CompareText(FString,'<binary') = 0 then
-      begin
-        FXMLTag := xtBinary;
-        Result := sqTag
-      end
-      else
-      if CompareText(FString,'<array') = 0 then
-      begin
-        FXMLTag := xtArray;
-        Result := sqTag
-      end
-      else
-      if CompareText(FString,'<elt') = 0 then
-      begin
-        FXMLTag := xtElt;
-        Result := sqTag
-      end
-      else
-      if CompareText(FString,'</binary') = 0 then
-      begin
-        FXMLTag := xtBinary;
-        Result := sqEndTag
-      end
-      else
-      if CompareText(FString,'</array') = 0 then
-      begin
-        FXMLTag := xtArray;
-        Result := sqEndTag
-      end
-      else
-      if CompareText(FString,'</elt') = 0 then
-      begin
-        FXMLTag := xtElt;
-        Result := sqEndTag
-      end
+      SQLVar.AsQuad := BlobID
   end
-end;
-
-function TIBXScript.GetTransaction: TIBTransaction;
-begin
-  if FTransaction = nil then
-    Result := FInternalTransaction
   else
-    Result := FTransaction;
+    raise Exception.Create(sNoParamQueries);
 end;
 
-procedure TIBXScript.SetDatabase(AValue: TIBDatabase);
+procedure TCustomIBXScript.SetShowPerformanceStats(AValue: boolean);
 begin
-  if FDatabase = AValue then Exit;
-  FDatabase := AValue;
-  FISQL.Database := AValue;
-  FInternalTransaction.DefaultDatabase := AValue;
+  if FShowPerformanceStats = AValue then Exit;
+  FShowPerformanceStats := AValue;
+  if assigned(DataOutputFormatter) then
+    DataOutputFormatter.ShowPerformanceStats := AValue;
 end;
 
-procedure TIBXScript.SetDataOutputFormatter(AValue: TIBCustomDataOutput);
+procedure TCustomIBXScript.ProcessStream;
+var stmt: string;
 begin
-  if FDataOutputFormatter = AValue then Exit;
-  if (FDataOutputFormatter <> nil) and (AValue <> nil) then
-    AValue.Assign(FDataOutputFormatter);
-  FDataOutputFormatter := AValue;
-  if FDataOutputFormatter <> nil then
-    FDataOutputFormatter.Database := Database;
-end;
-
-function TIBXScript.RunScript(const SQLFile: string;
-                                     AutoDDL: boolean): boolean;
-var F: TFileStream;
-begin
-  F := TFileStream.Create(SQLFile,fmOpenRead or fmShareDenyNone);
+  while FIBSQLProcessor.GetNextStatement(FSymbolStream,stmt) do
   try
-    Result := RunScript(F,AutoDDL)
-  finally
-    F.Free
-  end;
-end;
+//    writeln('stmt = ',stmt);
+    if trim(stmt) = '' then continue;
+    if not ProcessStatement(stmt) then
+      ExecSQL(stmt);
 
-function TIBXScript.RunScript(const SQLStream: TStream; AutoDDL: boolean): boolean;
-var Lines: TStringList;
-begin
-  FTerminator := ';';
-  FLastChar := ' ';
-  FLastSymbol := sqNone;
-  FAutoDDL := AutoDDL;
-  try
-    Lines := TStringList.Create;
-    Lines.LoadFromStream(SQLStream);
-    try
-      if assigned(OnProgressEvent) then
-        OnProgressEvent(self,true,Lines.Count);
-
-      Result := AnalyseSQL(Lines)
-    finally
-      Lines.Free
-    end;
   except on E:Exception do
-    begin
-      Add2Log(E.Message);
-      with GetTransaction do
-        if InTransaction then Rollback;
-      Result := false
-    end
+      begin
+        Add2Log(E.Message);
+        if StopOnFirstError then Exit;
+      end
   end;
-  with GetTransaction do
-    if InTransaction then Commit;
 end;
 
-function TIBXScript.PopState: TSQLStates;
-begin
-  if FStackIndex = 0 then
-    raise Exception.Create(sStackUnderflow);
-  Dec(FStackIndex);
-  Result := FStack[FStackIndex]
-end;
-
-function TIBXScript.ProcessStatement(stmt: string): boolean;
+function TCustomIBXScript.ProcessStatement(stmt: string): boolean;
 var command: string;
     ucStmt: string;
 
@@ -1275,13 +686,15 @@ var  RegexObj: TRegExpr;
      n: integer;
      charsetid: integer;
      param: string;
+     Terminator: char;
 begin
   Result := false;
   ucStmt := AnsiUpperCase(stmt);
+  Terminator := FSymbolStream.Terminator;
   RegexObj := TRegExpr.Create;
   try
     {process create database}
-    RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +(.*) *(\' + FTerminator + '|)';
+    RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +(.*) *(\' + Terminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
       UpdateUserPassword;
@@ -1295,7 +708,7 @@ begin
     end;
 
     {process connect statement}
-    RegexObj.Expression := '^ *CONNECT +(.*) *(\' + FTerminator + '|)';
+    RegexObj.Expression := '^ *CONNECT +(.*) *(\' + Terminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
       ExtractConnectInfo;
@@ -1304,18 +717,36 @@ begin
       Exit;
     end;
 
-
-    {Process Set Term}
-    RegexObj.Expression := '^ *SET +TERM +(.) *(\' + FTerminator + '|)';
+    {process commit statement}
+    RegexObj.Expression := '^ *COMMIT *(\' + Terminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
-       FTerminator := RegexObj.Match[1][1];
+      DoCommit;
+      Result := true;
+      Exit;
+    end;
+
+    {process Reconnect statement}
+    RegexObj.Expression := '^ *RECONNECT *(\' + Terminator + '|)';
+    if RegexObj.Exec(ucStmt) then
+    begin
+      DoReconnect;
+      Result := true;
+      Exit;
+    end;
+
+
+    {Process Set Term}
+    RegexObj.Expression := '^ *SET +TERM +(.) *(\' + Terminator + '|)';
+    if RegexObj.Exec(ucStmt) then
+    begin
+       FSymbolStream.Terminator := RegexObj.Match[1][1];
        Result := true;
        Exit;
     end;
 
     {process Set SQL Dialect}
-    RegexObj.Expression := '^ *SET +SQL +DIALECT +([0-9]) *(\' + FTerminator + '|)';
+    RegexObj.Expression := '^ *SET +SQL +DIALECT +([0-9]) *(\' + Terminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
       n := StrToInt(RegexObj.Match[1]);
@@ -1330,7 +761,7 @@ begin
     end;
 
     {Process Remaining Set statements}
-    RegexObj.Expression := '^ *SET +([A-Z]+)( +[A-Z0-9]+|) *(\' + FTerminator + '|)';
+    RegexObj.Expression := '^ *SET +([A-Z]+)( +[A-Z0-9]+|) *(\' + Terminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
       command := AnsiUpperCase(RegexObj.Match[1]);
@@ -1385,59 +816,419 @@ begin
   end;
 end;
 
-
-procedure TIBXScript.SetParamValue(SQLVar: ISQLParam);
-var BlobID: TISC_QUAD;
-    ix: integer;
+procedure TCustomIBXScript.SetTransaction(AValue: TIBTransaction);
 begin
-  if (SQLVar.SQLType = SQL_BLOB) and (Pos(ibx_blob,SQLVar.Name) = 1) then
-  begin
-    ix := StrToInt(system.copy(SQLVar.Name,length(ibx_blob)+1,length(SQLVar.Name)-length(ibx_blob)));
-    SQLVar.AsBlob := FBlobData[ix].BlobIntf;
-    Exit;
-  end;
-
-  if (SQLVar.SQLType = SQL_ARRAY) and (Pos(ibx_array,SQLVar.Name) = 1) then
-  begin
-    ix := StrToInt(system.copy(SQLVar.Name,length(ibx_array)+1,length(SQLVar.Name)-length(ibx_array)));
-    SQLVar.AsArray := FArrayData[ix].ArrayIntf;
-    Exit;
-  end;
-
-  if assigned(FGetParamValue) and (SQLVar.SQLType = SQL_BLOB) then
-  begin
-    Add2Log(Format(sResolveQueryParam,[SQLVar.Name]));
-    GetParamValue(self,SQLVar.Name,BlobID);
-    if (BlobID.gds_quad_high = 0) and (BlobID.gds_quad_low = 0) then
-      SQLVar.Clear
-    else
-      SQLVar.AsQuad := BlobID
-  end
-  else
-    raise Exception.Create(sNoParamQueries);
+  if FTransaction = AValue then Exit;
+  FTransaction := AValue;
+  FIBXMLProcessor.Transaction := AValue;
 end;
 
-procedure TIBXScript.SetShowPerformanceStats(AValue: boolean);
+constructor TCustomIBXScript.Create(aOwner: TComponent);
 begin
-  if FShowPerformanceStats = AValue then Exit;
-  FShowPerformanceStats := AValue;
+  inherited Create(aOwner);
+  FStopOnFirstError := true;
+  FEcho := true;
+  FISQL := TIBSQL.Create(self);
+  FISQL.ParamCheck := true;
+  FIBXMLProcessor := TIBXMLProcessor.Create;
+  FIBSQLProcessor := TIBSQLProcessor.Create(FIBXMLProcessor);
+  FInternalTransaction := TIBTransaction.Create(self);
+  FInternalTransaction.Params.Clear;
+  FInternalTransaction.Params.Add('concurrency');
+  FInternalTransaction.Params.Add('wait');
+end;
+
+destructor TCustomIBXScript.Destroy;
+begin
+  if FIBSQLProcessor <> nil then FIBSQLProcessor.Free;
+  if FIBXMLProcessor <> nil then FIBXMLProcessor.Free;
+  if FISQL <> nil then FISQL.Free;
+  if FInternalTransaction <> nil then FInternalTransaction.Free;
+  inherited Destroy;
+end;
+
+procedure TCustomIBXScript.DefaultSelectSQLHandler(aSQLText: string);
+begin
   if assigned(DataOutputFormatter) then
-    DataOutputFormatter.ShowPerformanceStats := AValue;
+    DataOutputFormatter.DataOut(aSQLText,@Add2Log)
 end;
 
-procedure TIBXScript.SetState(AState: TSQLStates);
+{ TIBSQLProcessor }
+
+procedure TIBSQLProcessor.AddToSQL(const Symbol: string);
+begin
+  FSQLText := FSQLText +  Symbol;
+//  writeln('SQL = ',FSQLText);
+end;
+
+procedure TIBSQLProcessor.SetState(AState: TSQLStates);
 begin
   if FStackIndex > 16 then
-    raise Exception.Create(sStackOverFlow);
+    FSymbolStream.ShowError(sStackOverFlow,[nil]);
   FStack[FStackIndex] := FState;
   Inc(FStackIndex);
   FState := AState
 end;
 
-procedure TIBXScript.StartXMLTag(xmltag: TXMLTag);
+function TIBSQLProcessor.PopState: TSQLStates;
+begin
+  if FStackIndex = 0 then
+    FSymbolStream.ShowError(sStackUnderflow,[nil]);
+  Dec(FStackIndex);
+  Result := FStack[FStackIndex]
+end;
+
+constructor TIBSQLProcessor.Create(XMLProcessor: TIBXMLProcessor);
+begin
+  inherited Create;
+  FXMLProcessor := XMLProcessor;
+end;
+
+function TIBSQLProcessor.GetNextStatement(SymbolStream: TSymbolStream;
+  var stmt: string): boolean;
+var Symbol: TSQLSymbol;
+    NonSpace: boolean;
+    Done: boolean;
+begin
+  FSQLText := '';
+  FState := stInit;
+  FHasBegin := false;
+  FSymbolStream := SymbolStream;
+  FXMLProcessor.NextStatement;
+  SymbolStream.NextStatement;
+
+  Result := true;
+  Done := false;
+  NonSpace := false;
+  while not Done do
+  with SymbolStream do
+  begin
+    if FState = stError then
+      ShowError(sErrorState,[nil]);
+    Symbol := GetSymbol;
+//    writeln('Symbol = ',Symbol,' Value = ',SymbolValue);
+    if not (Symbol in [sqSpace,sqEOL]) then
+      NonSpace := true;
+
+    case Symbol of
+    sqSpace:
+      AddToSQL(' ');
+
+    sqEquals:
+      AddToSQL('=');
+
+    sqGT:
+      AddToSQL('>');
+
+    sqTag:
+      begin
+        if FState in [stInSQL,stNested] then
+          AddToSQL(FXMLProcessor.AnalyseXML(SymbolStream));
+      end;
+
+    sqTerminator:
+        case FState of
+        stInit: {ignore empty statement};
+
+        stInSQL:
+            Done := true;
+
+       stNested, stInSingleQuotes, stInDoubleQuotes:
+         AddToSQL(Terminator);
+
+       stInDeclaration:
+         begin
+           FState := PopState;
+           AddToSQL(Terminator);
+         end;
+
+       else
+         ShowError(sTerminatorUnknownState,[FState]);
+       end;
+
+    sqSemiColon:
+        begin
+          if FState = stInDeclaration then
+            FState := PopState;
+          AddToSQL(';');
+        end;
+
+    sqAsterisk:
+      begin
+       AddToSQL('*');
+       if FState =  stInit then
+          FState := stInSQL
+      end;
+
+    sqForwardSlash:
+      begin
+       AddToSQL('/');
+       if FState =  stInit then
+          FState := stInSQL
+      end;
+
+    sqComment:
+      if FState <> stInit then
+        AddToSQL(SymbolValue);
+
+    sqCommentLine:
+      if FState <> stInit then
+      AddToSQL(SymbolValue + LineEnding);
+
+    sqSingleQuotes:
+      begin
+        case FState of
+        stInSingleQuotes:
+          FState := PopState;
+        stInDoubleQuotes:
+          {Ignore};
+        else
+          SetState(stInSingleQuotes)
+        end;
+        AddToSQL('''')
+      end;
+
+    sqDoubleQuotes:
+      begin
+        case FState of
+        stInSingleQuotes:
+          {Ignore};
+        stInDoubleQuotes:
+          FState := PopState;
+        else
+          SetState(stInDoubleQuotes)
+        end;
+        AddToSQL('"')
+      end;
+
+    sqEnd:
+      begin
+        AddToSQL(SymbolValue);
+        case FState of
+        stInSingleQuotes,
+        stInDoubleQuotes:
+          {Ignore};
+        stNested:
+          begin
+            if FNested = 0 then
+            begin
+              FState := PopState;
+              if not FInCase then
+              begin
+                FState := stInit;
+                Done := true;
+              end
+              else
+                FInCase := false;
+            end
+           else
+              Dec(FNested)
+          end;
+          {Otherwise ignore}
+        end
+      end;
+
+    sqBegin:
+      begin
+        FHasBegin := true;
+        AddToSQL(SymbolValue);
+        case FState of
+        stInSingleQuotes,
+        stInDoubleQuotes:
+          {Ignore};
+        stNested:
+          Inc(FNested);
+
+        stInSQL,
+        stInit:
+          SetState(stNested);
+        end
+      end;
+
+    sqCase:
+    begin
+      AddToSQL(SymbolValue);
+      case FState of
+      stInSingleQuotes,
+      stInDoubleQuotes:
+        {Ignore};
+      stNested:
+        Inc(FNested);
+
+      stInSQL,
+      stInit:
+        begin
+          FInCase := true;
+          SetState(stNested);
+        end;
+      end
+    end;
+
+    sqDeclare:
+      begin
+        AddToSQL(SymbolValue);
+        if FState in [stInit,stInSQL] then
+          SetState(stInDeclaration)
+      end;
+
+    sqString:
+      begin
+        AddToSQL(SymbolValue);
+        if FState = stInit then
+          FState := stInSQL
+      end;
+
+    sqEOL:
+      begin
+        case FState of
+        stInDoubleQuotes,
+        stInSingleQuotes:
+          ShowError(sUnterminatedString,[nil]);
+        stInit:
+          {Do nothing};
+        else
+          if NonSpace then AddToSQL(LineEnding);
+        end;
+      end;
+
+    sqEOF:
+      begin
+        Done := true;
+        Result := trim(FSQLText) <> '';
+      end
+    else
+      ShowError(sUnknownSymbol,[Symbol]);
+    end
+  end;
+  stmt := FSQLText;
+//  writeln('stmt = ',stmt);
+end;
+
+{ TIBXMLProcessor }
+
+procedure TIBXMLProcessor.EndXMLTag(xmltag: TXMLTag);
+begin
+  if FXMLTagIndex = 0 then
+    FSymbolStream.ShowError(sXMLStackUnderflow,[nil]);
+  if xmltag <> FXMLTagStack[FXMLTagIndex] then
+    FSymbolStream.ShowError(sInvalidEndTag,[FSymbolStream.SymbolValue]);
+
+  case FXMLTagStack[FXMLTagIndex] of
+  xtBinary:
+    FBlobData[FCurrentBlob].BlobIntf.Close;
+
+  xtArray:
+    FArrayData[FCurrentArray].ArrayIntf.SaveChanges;
+  end;
+  Dec(FXMLTagIndex);
+end;
+
+procedure TIBXMLProcessor.EnterTag;
+var aCharSetID: integer;
+begin
+  case FXMLTagStack[FXMLTagIndex] of
+  xtBinary:
+    FBlobData[FCurrentBlob].BlobIntf := Database.Attachment.CreateBlob(
+      Transaction.TransactionIntf,FBlobData[FCurrentBlob].SubType);
+
+  xtArray:
+    with FArrayData[FCurrentArray] do
+    begin
+      FirebirdAPI.CharSetName2CharSetID(CharSet,aCharSetID);
+      ArrayIntf := Database.Attachment.CreateArray(
+                     Transaction.TransactionIntf,
+                     Database.Attachment.CreateArrayMetaData(SQLType,Scale,Size,
+                     aCharSetID,dim,bounds)
+                     );
+    end;
+
+  xtElt:
+    Inc(FArrayData[FCurrentArray].CurrentRow);
+  end;
+end;
+
+function TIBXMLProcessor.GetArrayData(index: integer): TArrayData;
+begin
+  if (index < 0) or (index > ArrayDataCount) then
+    FSymbolStream.ShowError(sArrayIndexError,[index]);
+  Result := FArrayData[index];
+end;
+
+function TIBXMLProcessor.GetArrayDataCount: integer;
+begin
+  Result := Length(FArrayData);
+end;
+
+function TIBXMLProcessor.GetBlobData(index: integer): TBlobData;
+begin
+  if (index < 0) or (index > BlobDataCount) then
+    FSymbolStream.ShowError(sBlobIndexError,[index]);
+  Result := FBlobData[index];
+end;
+
+function TIBXMLProcessor.GetBlobDataCount: integer;
+begin
+  Result := Length(FBlobData);
+end;
+
+procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
+
+  function nibble(hex: char): byte;
+  begin
+    case hex of
+    '0': Result := 0;
+    '1': Result := 1;
+    '2': Result := 2;
+    '3': Result := 3;
+    '4': Result := 4;
+    '5': Result := 5;
+    '6': Result := 6;
+    '7': Result := 7;
+    '8': Result := 8;
+    '9': Result := 9;
+    'a','A': Result := 10;
+    'b','B': Result := 11;
+    'c','C': Result := 12;
+    'd','D': Result := 13;
+    'e','E': Result := 14;
+    'f','F': Result := 15;
+    end;
+  end;
+
+  procedure WriteToBlob(hexData: string);
+  var i,j : integer;
+      blength: integer;
+  begin
+    if odd(length(hexData)) then
+      FSymbolStream.ShowError(sBlobBlobMustbeEven,[nil]);
+    blength := Length(hexData) div 2;
+    IBAlloc(FBlobBuffer,0,blength);
+    j := 1;
+    for i := 1 to blength do
+    begin
+      FBlobBuffer^ := char((nibble(hexData[j]) shl 4) or nibble(hexdata[j+1]));
+      Inc(j,2);
+    end;
+    FBlobData[FCurrentBlob].BlobIntf.Write(FBlobBuffer^,blength);
+  end;
+
+begin
+  if tagValue = '' then Exit;
+  case FXMLTagStack[FXMLTagIndex] of
+  xtBinary:
+      WriteToBlob(tagValue);
+
+  xtElt:
+    with FArrayData[FCurrentArray] do
+      ArrayIntf.SetAsString(index,tagValue);
+
+  end;
+end;
+
+procedure TIBXMLProcessor.StartXMLTag(xmltag: TXMLTag);
 begin
   if FXMLTagIndex > 19 then
-    raise Exception.Create(sXMLStackOverFlow);
+    FSymbolStream.ShowError(sXMLStackOverFlow,[nil]);
   Inc(FXMLTagIndex);
   FXMLTagStack[FXMLTagIndex] := xmltag;
   case xmltag of
@@ -1471,14 +1262,14 @@ begin
   end;
 end;
 
-procedure TIBXScript.ProcessAttributeValue(attrValue: string);
+procedure TIBXMLProcessor.ProcessAttributeValue(attrValue: string);
 begin
   case FXMLTagStack[FXMLTagIndex] of
   xtBinary:
     if FAttributeName = 'subtype' then
       FBlobData[FCurrentBlob].SubType := StrToInt(attrValue)
     else
-      raise Exception.CreateFmt(sXMLAttributeError,[attrValue]);
+      FSymbolStream.ShowError(sXMLAttributeError,[attrValue]);
 
   xtArray:
     if FAttributeName = 'sqltype' then
@@ -1499,18 +1290,18 @@ begin
     if FAttributeName = 'bounds' then
       ProcessBoundsList(attrValue)
     else
-      raise Exception.CreateFmt(sXMLAttributeError,[attrValue]);
+      FSymbolStream.ShowError(sXMLAttributeError,[attrValue]);
 
   xtElt:
     if FAttributeName = 'ix' then
       with FArrayData[FCurrentArray] do
         Index[CurrentRow] :=  StrToInt(attrValue)
      else
-        raise Exception.CreateFmt(sXMLAttributeError,[attrValue]);
+        FSymbolStream.ShowError(sXMLAttributeError,[attrValue]);
   end;
 end;
 
-procedure TIBXScript.ProcessBoundsList(boundsList: string);
+procedure TIBXMLProcessor.ProcessBoundsList(boundsList: string);
 var list: TStringList;
     i,j: integer;
 begin
@@ -1521,7 +1312,7 @@ begin
     with FArrayData[FCurrentArray] do
     begin
       if dim <> list.Count then
-        raise Exception.CreateFmt(sInvalidBoundsList,[boundsList]);
+        FSymbolStream.ShowError(sInvalidBoundsList,[boundsList]);
       SetLength(bounds,dim);
       for i := 0 to list.Count - 1 do
       begin
@@ -1537,17 +1328,505 @@ begin
   end;
 end;
 
-procedure TIBXScript.ClearStatement;
+constructor TIBXMLProcessor.Create;
 begin
-  FSQLText := '';
-  FState := stInit;
-  FHasBegin := false;
-  FXMLTag := xtNone;
+  inherited Create;
+  NextStatement;
+end;
+
+destructor TIBXMLProcessor.Destroy;
+begin
+  FreeMem(FBlobBuffer);
+  inherited Destroy;
+end;
+
+function TIBXMLProcessor.AnalyseXML(SymbolStream: TSymbolStream): string;
+var Symbol: TSQLSymbol;
+    Done: boolean;
+    XMLString: string;
+begin
+  Result := '';
+  XMLString := '';
+  Done := false;
+  FSymbolStream := SymbolStream;
+  with SymbolStream do
+  begin
+    StartXMLTag(XMLTag);
+    while not Done do
+    with SymbolStream do
+    begin
+      Symbol := GetSymbol;
+
+      case Symbol of
+      sqSpace:
+        case FState of
+        stQuotedAttributeValue,
+        stTagged:
+           XMLString += ' ';
+        end;
+
+      sqSemiColon:
+        case FState of
+        stQuotedAttributeValue,
+        stTagged:
+           XMLString += ';';
+        else
+          ShowError(sXMLError,[nil]);
+        end;
+
+      sqSingleQuotes:
+        case FState of
+        stQuotedAttributeValue,
+        stTagged:
+           XMLString += '''';
+        else
+          ShowError(sXMLError,[nil]);
+        end;
+
+      sqAsterisk:
+        case FState of
+        stQuotedAttributeValue,
+        stTagged:
+           XMLString += '*';
+        else
+          ShowError(sXMLError,[nil]);
+        end;
+
+      sqForwardSlash:
+        case FState of
+        stQuotedAttributeValue,
+        stTagged:
+           XMLString += '/';
+        else
+          ShowError(sXMLError,[nil]);
+        end;
+
+      sqGT:
+        case FState of
+        stEndTag:
+          begin
+            case XMLTag of
+            xtBinary:
+              begin
+                Result := Format(ibx_blob+'%d',[FCurrentBlob]);
+                Done := true;
+              end;
+            xtArray:
+              begin
+                Result := Format(ibx_array+'%d',[FCurrentArray]);
+                Done := true;
+              end;
+            end;
+          end;
+
+        stInTag:
+          begin
+            XMLString := '';
+            FState := stTagged;
+            EnterTag;
+          end;
+
+        stQuotedAttributeValue,
+        stTagged:
+          XMLString += '>';
+
+        else
+          ShowError(sXMLError,[nil]);
+        end;
+
+      sqTag:
+        if FState = stTagged then
+          StartXMLTag(XMLTag)
+        else
+          ShowError(sXMLError,[nil]);
+
+      sqEndTag:
+        if FState = stTagged then
+        begin
+          ProcessTagValue(XMLString);
+          EndXMLTag(XMLTag);
+          FState := stEndTag;
+        end
+        else
+          ShowError(sXMLError,[nil]);
+
+      sqEquals:
+        case FState of
+        stAttribute:
+          FState := stAttributeValue;
+
+        stQuotedAttributeValue,
+        stTagged:
+          XMLString += '=';
+
+        else
+          ShowError(sXMLError,[nil]);
+        end;
+
+      sqDoubleQuotes:
+        case FState of
+        stAttributeValue:
+          begin
+            XMLString := '';
+            FState := stQuotedAttributeValue;
+          end;
+
+        stQuotedAttributeValue:
+          begin
+            ProcessAttributeValue(XMLString);
+            FState := stInTag;
+          end;
+
+        stTagged:
+          XMLString += '"';
+
+        else
+          ShowError(sXMLError,[nil]);
+        end;
+
+      sqString:
+        case FState of
+        stInTag: {attribute name}
+          begin
+            FAttributeName := SymbolValue;
+            FState := stAttribute;
+          end;
+
+        stAttributeValue:
+          begin
+            ProcessAttributeValue(FString);
+            FState := stInTag;
+          end;
+
+        stQuotedAttributeValue,
+        stTagged:
+           XMLString += SymbolValue;
+
+        else
+          ShowError(sXMLError,[nil]);
+        end;
+      else
+        ShowError(sXMLError,[nil]);
+      end
+    end;
+  end;
+end;
+
+procedure TIBXMLProcessor.NextStatement;
+begin
   FXMLTagIndex := 0;
   SetLength(FBlobData,0);
   FCurrentBlob := -1;
   SetLength(FArrayData,0);
   FCurrentArray := -1;
+end;
+
+{ TInteractiveSymbolStream }
+
+function TInteractiveSymbolStream.GetErrorPrefix: string;
+begin
+  Result := '';
+end;
+
+function TInteractiveSymbolStream.GetNextLine(var Line: string): boolean;
+begin
+  if FNextStatement then
+    write(FPrompt)
+  else
+    write(FContinuePrompt);
+  readln(Line);
+end;
+
+constructor TInteractiveSymbolStream.Create(aPrompt: string; aContinue: string);
+begin
+  inherited Create;
+  FPrompt := aPrompt;
+  FContinuePrompt := aContinue;
+end;
+
+{ TBatchSymbolStream }
+
+function TBatchSymbolStream.GetErrorPrefix: string;
+begin
+  Result := Format(sOnLineError,[FLineIndex,FIndex]);
+end;
+
+function TBatchSymbolStream.GetNextLine(var Line: string): boolean;
+begin
+  Result := FLineIndex < FLines.Count;
+  if Result then
+  begin
+    Line := FLines[FLineIndex];
+//    writeln('Next Line = ',Line);
+    Inc(FLineIndex);
+    if assigned(OnProgressEvent) then
+      OnProgressEvent(self,false,1);
+  end;
+end;
+
+constructor TBatchSymbolStream.Create;
+begin
+  inherited Create;
+  FLines := TStringList.Create;
+end;
+
+destructor TBatchSymbolStream.Destroy;
+begin
+  if assigned(FLines) then FLines.Free;
+  inherited Destroy;
+end;
+
+procedure TBatchSymbolStream.SetStreamSource(Lines: TStrings);
+begin
+  FLineIndex := 0;
+  FLines.Assign(Lines);
+  if assigned(OnProgressEvent) then
+    OnProgressEvent(self,true,FLines.Count);
+end;
+
+procedure TBatchSymbolStream.SetStreamSource(S: TStream);
+begin
+  FLineIndex := 0;
+  FLines.LoadFromStream(S);
+  if assigned(OnProgressEvent) then
+    OnProgressEvent(self,true,FLines.Count);
+end;
+
+procedure TBatchSymbolStream.SetStreamSource(FileName: string);
+begin
+  FLineIndex := 0;
+  FLines.LoadFromFile(FileName);
+  if assigned(OnProgressEvent) then
+    OnProgressEvent(self,true,FLines.Count);
+end;
+
+{ TSymbolStream }
+
+function TSymbolStream.GetNextSymbol(C: char): TSQLSymbol;
+begin
+  Result := sqNone;
+  if C = FTerminator then
+    Result := sqTerminator
+  else
+  case C of
+  ' ',#9,#10,#13:
+    Result := sqSpace;
+  ';':
+    Result := sqSemiColon;
+  '"':
+    Result := sqDoubleQuotes;
+  '''':
+    Result := sqSingleQuotes;
+  '/':
+    Result := sqForwardSlash;
+  '*':
+    Result := sqAsterisk;
+  '=':
+    Result := sqEquals;
+  '>':
+    Result := sqGT;
+  else
+    begin
+      Result := sqString;
+      FLastChar := C
+    end
+  end;
+end;
+
+constructor TSymbolStream.Create;
+begin
+  inherited;
+  FTerminator := ';';
+  NextStatement;
+end;
+
+procedure TSymbolStream.ShowError(msg: string; params: array of const);
+begin
+  raise EIBClientError.CreateFmt(GetErrorPrefix + msg,params);
+end;
+
+function TSymbolStream.GetSymbol: TSQLSymbol;
+var InComment: boolean;
+    Comment: string;
+begin
+  Result := sqNone;
+  InComment := false;
+  Comment := '';
+  if FNextSymbol <> sqNone then
+  begin
+    Result := FNextSymbol;
+    if Result = sqString then
+      FString := FLastChar
+    else
+      FString := '';
+    FNextSymbol := sqNone
+  end;
+
+  while FNextSymbol = sqNone do {find the next symbol}
+  begin
+    if FIndex > Length(FLine) then
+    begin
+      FNextSymbol := sqEOL;
+      FIndex := 0;
+    end
+    else
+    begin
+      if FIndex = 0 then
+      begin
+        if not GetNextLine(FLine) then
+        begin
+          Result := sqEOF;
+          FNextSymbol := sqNone;
+          Exit;
+        end;
+        FIndex := 1;
+        FNextStatement := false;
+        if assigned(OnNextLine) then
+          OnNextLine(self,FLine);
+        if InComment then
+          Comment += LineEnding;
+        if Length(FLine) = 0 then
+          continue;
+      end;
+      if InComment then
+        Comment += FLine[FIndex];
+      FNextSymbol := GetNextSymbol(FLine[FIndex]);
+      Inc(FIndex);
+    end;
+
+    {combine if possible}
+    case Result of
+    sqNone:
+      begin
+        Result := FNextSymbol;
+        if FNextSymbol = sqString then
+          FString := FLastChar;
+        FNextSymbol := sqNone
+      end;
+
+    sqForwardSlash:
+      if FXMLMode > 0 then
+        break
+      else
+      if FNextSymbol = sqAsterisk then
+      begin
+        InComment := true;
+        Comment := '/*';
+        Result := sqNone;
+        FNextSymbol := sqNone
+      end
+      else
+      if FNextSymbol = sqForwardSlash then
+      begin
+        FString := '/*' + system.copy(FLine,FIndex,length(FLine)- FIndex + 1) + ' */';
+        Result := sqCommentLine;
+        FIndex := 0;
+        FNextSymbol := sqNone
+      end;
+
+    sqAsterisk:
+      if FXMLMode > 0 then
+        break
+      else
+      if FNextSymbol = sqForwardSlash then
+      begin
+        InComment := false;
+        FString := Comment;
+        Result := sqComment;
+        FNextSymbol := sqNone
+      end;
+
+    sqString:
+      if FNextSymbol = sqString then
+      begin
+        FString := FString + FLastChar;
+        FNextSymbol := sqNone
+      end;
+
+    end;
+
+    if InComment and (FNextSymbol <> sqNone) then
+    begin
+      Result := FNextSymbol;
+      FNextSymbol := sqNone;
+    end;
+  end;
+
+  if (Result = sqString) and (FString <> '') then
+  begin
+    if FXMLMode = 0 then
+    begin
+       if InComment then
+       begin
+         Comment += FString;
+         FNextSymbol := sqNone;
+       end
+       else
+       if CompareText(FString,'begin') = 0 then
+         Result := sqBegin
+       else
+       if CompareText(FString,'end') = 0 then
+         Result := sqEnd
+       else
+       if CompareText(FString,'declare') = 0 then
+         Result := sqDeclare
+       else
+       if CompareText(FString,'case') = 0 then
+         Result := sqCase
+    end
+    else
+    if FString[1] = '<' then
+    begin
+      if CompareText(FString,'<binary') = 0 then
+      begin
+        FXMLTag := xtBinary;
+        Inc(FXMLMode);
+        Result := sqTag
+      end
+      else
+      if CompareText(FString,'<array') = 0 then
+      begin
+        FXMLTag := xtArray;
+        Inc(FXMLMode);
+        Result := sqTag
+      end
+      else
+      if CompareText(FString,'<elt') = 0 then
+      begin
+        FXMLTag := xtElt;
+        Inc(FXMLMode);
+        Result := sqTag
+      end
+      else
+      if CompareText(FString,'</binary') = 0 then
+      begin
+        FXMLTag := xtBinary;
+        Dec(FXMLMode);
+        Result := sqEndTag
+      end
+      else
+      if CompareText(FString,'</array') = 0 then
+      begin
+        FXMLTag := xtArray;
+        Dec(FXMLMode);
+        Result := sqEndTag
+      end
+      else
+      if CompareText(FString,'</elt') = 0 then
+      begin
+        FXMLTag := xtElt;
+        Dec(FXMLMode);
+        Result := sqEndTag
+      end
+    end;
+  end;
+end;
+
+procedure TSymbolStream.NextStatement;
+begin
+//  FNextSymbol := sqNone;
+  FXMLTag := xtNone;
+  FNextStatement := true;
 end;
 
 end.

@@ -148,17 +148,9 @@ begin
 end;
 
 procedure TForm1.RunScriptExecute(Sender: TObject);
-var S: TMemoryStream;
 begin
   ResultsLog.Lines.Clear;
-  S := TMemoryStream.Create;
-  try
-   IBScript.Lines.SaveToStream(S);
-   S.Position := 0;
-   IBXScript1.RunScript(S,true);
-  finally
-    S.Free;
-  end;
+  IBXScript1.RunScript(IBScript.Lines,true);
   Timer1.Interval := 1000;
   EchoInput.Checked := IBXScript1.Echo;
   StopOnError.Checked := IBXScript1.StopOnFirstError;
