@@ -92,12 +92,25 @@ var
   OutputFileName: string;
   i: integer;
   ExtractTypes: TExtractTypes;
+  Opts,NonOpts: TStrings;
 begin
   writeln(stderr,'fbsql: a non-interactive SQL interpreter for Firebird');
   writeln(stderr,'Built using IBX ' + IBX_VERSION);
   writeln(stderr,'Copyright (c) MWA Software 2016');
+
   // quick check parameters
-  ErrorMsg:=CheckOptions('aAhbceuioprs',['help','user','pass','role']);
+  Opts := TStringList.Create;
+  NonOpts := TStringList.Create;
+  try
+    ErrorMsg := CheckOptions('aAhbceuioprs',['help','user','pass','role'],Opts,NonOpts);
+    {Database name is last parameter if given and not an option}
+    if (NonOpts.Count > 0) and ((Opts.Count = 0) or
+             (Opts.ValueFromIndex[Opts.Count-1] <> NonOpts[NonOpts.Count-1])) then
+      FIBDatabase.DatabaseName := NonOpts[NonOpts.Count-1];
+  finally
+    Opts.Free;
+    NonOpts.Free;
+  end;
   if ErrorMsg<>'' then begin
     ShowException(Exception.Create(ErrorMsg));
     Terminate;
@@ -136,11 +149,6 @@ begin
 
   if HasOption('r','role') then
     FIBDatabase.Params.Add('sql_role_name=' + GetOptionValue('r','role'));
-
-  if (ParamCount >= 1) and (ParamStr(ParamCount)[1] <> '-')  then
-    FIBDatabase.DatabaseName := ParamStr(ParamCount)
-  else
-    raise Exception.Create('Database Name Missing');
 
   if not HasOption('b') then
     FIBXScript.StopOnFirstError := false;
@@ -197,7 +205,7 @@ begin
   if OutputFileName <> '' then
     FOutputFile := TFileStream.Create(OutputFileName,fmCreate);
 
-  FIBDatabase.Connected := true;
+  FIBDatabase.Connected := FIBDatabase.DatabaseName <> '';
   try
     if DoExtract then
     begin

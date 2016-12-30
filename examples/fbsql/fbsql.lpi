@@ -27,7 +27,7 @@
     <RunParams>
       <local>
         <FormatVersion Value="1"/>
-        <CommandLineParams Value="-s &quot;set stats;set count;Select * From EMPLOYEE&quot; -u SYSDBA -p masterkey employee"/>
+        <CommandLineParams Value="-b -e -u SYSDBA -p masterkey -i /tmp/test.sql"/>
       </local>
     </RunParams>
     <RequiredPackages Count="1">

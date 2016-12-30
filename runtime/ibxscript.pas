@@ -34,15 +34,32 @@ interface
 uses Classes, IBDatabase,  IBSQL, IB, IBDataOutput;
 
 const
-  ibx_blob = ':IBX_BLOB';
-  ibx_array = ':IBX_ARRAY';
-  ibx_octets = ':IBX_OCTETS';
+  ibx_blob = 'IBX_BLOB';
+  ibx_array = 'IBX_ARRAY';
+  ibx_octets = 'IBX_OCTETS';
+
+  {Non-character symbols}
+  sqNone         = #0;
+  sqEnd          = #1;
+  sqBegin        = #2;
+  sqString       = #3;
+  sqComment      = #4;
+  sqCase         = #5;
+  sqDeclare      = #6;
+  sqCommentLine  = #7;
+  sqEOL          = #8;
+  sqTerminator   = #9;
+  sqEOF          = #10;
+  sqTag          = #11;
+  sqEndTag       = #12;
 
 type
-  TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes,
+{  TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes,
                 sqEnd,sqBegin,sqString,sqComment,sqCase, sqDeclare,
-                sqCommentLine,sqAsterisk,sqForwardSlash,
-                sqEOL,sqTerminator, sqEOF, sqEquals,sqGT,sqTag,sqEndTag);
+                sqCommentLine,sqAsterisk,sqForwardSlash, sqComma,
+                sqEOL,sqTerminator, sqEOF, sqEquals,sqGT,sqTag,sqEndTag); }
+
+  TSQLSymbol = char;
 
   TSQLStates =  (stInit, stError, stInSQL, stNested, stInSingleQuotes,
                  stInDoubleQuotes, stInDeclaration, stInCommit, stInReconnect);
@@ -164,7 +181,7 @@ type
     FCurrentBlob: integer;
     FArrayData: array of TArrayData;
     FCurrentArray: integer;
-    FOctetsData: array of TArrayData;
+    FOctetString: array of rawbytestring;
     FCurrentOctets: integer;
     FBlobBuffer: PChar;
     procedure EndXMLTag(xmltag: TXMLTag);
@@ -173,6 +190,8 @@ type
     function GetArrayDataCount: integer;
     function GetBlobData(index: integer): TBlobData;
     function GetBlobDataCount: integer;
+    function GetOctetString(index: integer): rawbytestring;
+    function GetOctetStringCount: integer;
     procedure ProcessTagValue(tagValue: string);
     procedure StartXMLTag(xmltag: TXMLTag);
     procedure ProcessAttributeValue(attrValue: string);
@@ -186,6 +205,8 @@ type
     class function FormatBlob(Field: ISQLData): string;
     class function FormatOctets(Field: ISQLData): string;
     class function FormatArray(ar: IArray): string;
+    property OctetString[index: integer]: rawbytestring read GetOctetString;
+    property OctetStringCount: integer read GetOctetStringCount;
     property BlobData[index: integer]: TBlobData read GetBlobData;
     property BlobDataCount: integer read GetBlobDataCount;
     property ArrayData[index: integer]: TArrayData read GetArrayData;
@@ -283,20 +304,6 @@ type
     property OnSetStatement: TOnSetStatement read FOnSetStatement write FOnSetStatement;
   end;
 
-  { TIBXScript }
-
-  TIBXScript = class(TCustomIBXScript)
-  public
-    constructor Create(aOwner: TComponent); override;
-    destructor Destroy; override;
-    {use RunScript instead of PerformUpdate}
-    function PerformUpdate(SQLFile: string; aAutoDDL: boolean): boolean; overload; deprecated;
-    function PerformUpdate(SQLStream: TStream;   aAutoDDL: boolean): boolean; overload; deprecated;
-    function RunScript(SQLFile: string;  aAutoDDL: boolean): boolean; overload;
-    function RunScript(SQLStream: TStream;   aAutoDDL: boolean): boolean; overload;
-    function RunScript(SQLLines: TStrings; aAutoDDL: boolean): boolean; overload;
-  end;
-
   {
   TIBXScript: runs an SQL script in the specified file or stream. The text is parsed
   into SQL statements which are executed in turn. The intention is to be ISQL
@@ -349,6 +356,20 @@ type
   multiple times.
   }
 
+  { TIBXScript }
+
+  TIBXScript = class(TCustomIBXScript)
+  public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
+    {use RunScript instead of PerformUpdate}
+    function PerformUpdate(SQLFile: string; aAutoDDL: boolean): boolean; overload; deprecated;
+    function PerformUpdate(SQLStream: TStream;   aAutoDDL: boolean): boolean; overload; deprecated;
+    function RunScript(SQLFile: string;  aAutoDDL: boolean): boolean; overload;
+    function RunScript(SQLStream: TStream;   aAutoDDL: boolean): boolean; overload;
+    function RunScript(SQLLines: TStrings; aAutoDDL: boolean): boolean; overload;
+  end;
+
 resourcestring
   sInvalidSetStatement = 'Invalid %s Statement - %s';
 
@@ -371,14 +392,15 @@ resourcestring
   sInvalidEndTag = 'XML End Tag Mismatch - %s';
   sXMLStackOverFlow = 'XML Stack Overflow';
   sErrorState = 'Entered Error State';
-  sXMLError = 'Invalid XML';
+  sXMLError = 'Invalid XML (%c)';
   sXMLAttributeError = 'Unexpected attribute - "%s"';
   sInvalidBoundsList = 'Invalid array bounds list - "%s"';
-  sBlobBlobMustbeEven = 'Binary block must have an even number of characters';
+  sBinaryBlockMustbeEven = 'Binary block must have an even number of characters';
   sInvalidCharacterSet = 'Unrecognised character set name - "%s"';
   sOnLineError = 'On Line %d Character %d: ';
   sArrayIndexError = 'Array Index Error (%d)';
   sBlobIndexError = 'Blob Index Error (%d)';
+  sOctetsIndexError = 'Octetstring Index Error (%d)';
 
 { TIBXScript }
 
@@ -550,13 +572,20 @@ procedure TCustomIBXScript.SetParamValue(SQLVar: ISQLParam);
 var BlobID: TISC_QUAD;
     ix: integer;
 begin
+  if ((SQLVar.SQLType = SQL_VARYING) or (SQLVar.SQLType = SQL_TEXT)) and
+    (Pos(ibx_octets,SQLVar.Name) = 1) then
+  begin
+    ix := StrToInt(system.copy(SQLVar.Name,length(ibx_octets)+1,length(SQLVar.Name)-length(ibx_octets)));
+    SQLVar.AsString := FIBXMLProcessor.OctetString[ix];
+  end
+  else
   if (SQLVar.SQLType = SQL_BLOB) and (Pos(ibx_blob,SQLVar.Name) = 1) then
   begin
     ix := StrToInt(system.copy(SQLVar.Name,length(ibx_blob)+1,length(SQLVar.Name)-length(ibx_blob)));
     SQLVar.AsBlob := FIBXMLProcessor.BlobData[ix].BlobIntf;
     Exit;
-  end;
-
+  end
+  else
   if (SQLVar.SQLType = SQL_ARRAY) and (Pos(ibx_array,SQLVar.Name) = 1) then
   begin
     ix := StrToInt(system.copy(SQLVar.Name,length(ibx_array)+1,length(SQLVar.Name)-length(ibx_array)));
@@ -930,19 +959,10 @@ begin
       ShowError(sErrorState,[nil]);
     Symbol := GetSymbol;
 //    writeln('Symbol = ',Symbol,' Value = ',SymbolValue);
-    if not (Symbol in [sqSpace,sqEOL]) then
+    if not (Symbol in [' ',sqEOL]) then
       NonSpace := true;
 
     case Symbol of
-    sqSpace:
-      AddToSQL(' ');
-
-    sqEquals:
-      AddToSQL('=');
-
-    sqGT:
-      AddToSQL('>');
-
     sqTag:
       begin
         if FState in [stInSQL,stNested] then
@@ -969,21 +989,21 @@ begin
          ShowError(sTerminatorUnknownState,[FState]);
        end;
 
-    sqSemiColon:
+    ';':
         begin
           if FState = stInDeclaration then
             FState := PopState;
           AddToSQL(';');
         end;
 
-    sqAsterisk:
+    '*':
       begin
        AddToSQL('*');
        if FState =  stInit then
           FState := stInSQL
       end;
 
-    sqForwardSlash:
+    '/':
       begin
        AddToSQL('/');
        if FState =  stInit then
@@ -998,7 +1018,7 @@ begin
       if FState <> stInit then
       AddToSQL(SymbolValue + LineEnding);
 
-    sqSingleQuotes:
+    '''':
       begin
         case FState of
         stInSingleQuotes:
@@ -1011,7 +1031,7 @@ begin
         AddToSQL('''')
       end;
 
-    sqDoubleQuotes:
+    '"':
       begin
         case FState of
         stInSingleQuotes:
@@ -1120,7 +1140,7 @@ begin
         Result := trim(FSQLText) <> '';
       end
     else
-      ShowError(sUnknownSymbol,[Symbol]);
+      AddToSQL(Symbol);
     end
   end;
   stmt := FSQLText;
@@ -1142,6 +1162,9 @@ begin
 
   xtArray:
     FArrayData[FCurrentArray].ArrayIntf.SaveChanges;
+
+  xtElt:
+    Dec(FArrayData[FCurrentArray].CurrentRow);
   end;
   Dec(FXMLTagIndex);
 end;
@@ -1151,12 +1174,18 @@ var aCharSetID: integer;
 begin
   case FXMLTagStack[FXMLTagIndex] of
   xtBlob:
-    FBlobData[FCurrentBlob].BlobIntf := Database.Attachment.CreateBlob(
-      Transaction.TransactionIntf,FBlobData[FCurrentBlob].SubType);
+    begin
+      Database.Connected := true;
+      Transaction.Active := true;
+      FBlobData[FCurrentBlob].BlobIntf := Database.Attachment.CreateBlob(
+        Transaction.TransactionIntf,FBlobData[FCurrentBlob].SubType);
+    end;
 
   xtArray:
     with FArrayData[FCurrentArray] do
     begin
+      Database.Connected := true;
+      Transaction.Active := true;
       FirebirdAPI.CharSetName2CharSetID(CharSet,aCharSetID);
       ArrayIntf := Database.Attachment.CreateArray(
                      Transaction.TransactionIntf,
@@ -1164,9 +1193,6 @@ begin
                      aCharSetID,dim,bounds)
                      );
     end;
-
-  xtElt:
-    Inc(FArrayData[FCurrentArray].CurrentRow);
   end;
 end;
 
@@ -1194,6 +1220,18 @@ begin
   Result := Length(FBlobData);
 end;
 
+function TIBXMLProcessor.GetOctetString(index: integer): rawbytestring;
+begin
+  if (index < 0) or (index > OctetStringCount) then
+    FSymbolStream.ShowError(sOctetsIndexError,[index]);
+  Result := FOctetString[index];
+end;
+
+function TIBXMLProcessor.GetOctetStringCount: integer;
+begin
+  Result := Length(FOctetString);
+end;
+
 procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
 
   function nibble(hex: char): byte;
@@ -1218,19 +1256,40 @@ procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
     end;
   end;
 
+  procedure AddOctets(hexData: string);
+  var i,j : integer;
+      blength: integer;
+      curLength: integer;
+  begin
+    if odd(length(hexData)) then
+      FSymbolStream.ShowError(sBinaryBlockMustbeEven,[nil]);
+    blength := Length(hexData) div 2;
+    curLength := Length(FOctetString[FCurrentOctets]);
+    SetLength(FOctetString[FCurrentOctets],curLength + blength);
+    j := 1;
+    for i := curLength + 1 to curLength + blength do
+    begin
+      FOctetString[FCurrentOctets][i] := char((nibble(hexData[j]) shl 4) or nibble(hexdata[j+1]));
+      Inc(j,2);
+    end;
+  end;
+
   procedure WriteToBlob(hexData: string);
   var i,j : integer;
       blength: integer;
+      P: PChar;
   begin
     if odd(length(hexData)) then
-      FSymbolStream.ShowError(sBlobBlobMustbeEven,[nil]);
+      FSymbolStream.ShowError(sBinaryBlockMustbeEven,[nil]);
     blength := Length(hexData) div 2;
     IBAlloc(FBlobBuffer,0,blength);
     j := 1;
+    P := FBlobBuffer;
     for i := 1 to blength do
     begin
-      FBlobBuffer^ := char((nibble(hexData[j]) shl 4) or nibble(hexdata[j+1]));
+      P^ := char((nibble(hexData[j]) shl 4) or nibble(hexdata[j+1]));
       Inc(j,2);
+      Inc(P);
     end;
     FBlobData[FCurrentBlob].BlobIntf.Write(FBlobBuffer^,blength);
   end;
@@ -1238,8 +1297,11 @@ procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
 begin
   if tagValue = '' then Exit;
   case FXMLTagStack[FXMLTagIndex] of
+  xtOctets:
+    AddOctets(tagValue);
+
   xtBlob:
-      WriteToBlob(tagValue);
+    WriteToBlob(tagValue);
 
   xtElt:
     with FArrayData[FCurrentArray] do
@@ -1256,6 +1318,12 @@ begin
   FXMLTagStack[FXMLTagIndex] := xmltag;
   case xmltag of
   xtOctets:
+    begin
+      Inc(FCurrentOctets);
+      SetLength(FOctetString, FCurrentOctets+1);
+      FOctetString[FCurrentOctets] := '';
+    end;
+
   xtBlob:
     begin
       Inc(FCurrentBlob);
@@ -1282,7 +1350,12 @@ begin
     end;
 
   xtElt:
-      Inc(FArrayData[FCurrentArray].CurrentRow);
+    with FArrayData[FCurrentArray] do
+    begin
+      Inc(CurrentRow);
+      SetLength(index,CurrentRow+1);
+    end;
+
   end;
 end;
 
@@ -1402,6 +1475,7 @@ begin
   Result := '';
   XMLString := '';
   Done := false;
+  FState := stInTag;
   FSymbolStream := SymbolStream;
   with SymbolStream do
   begin
@@ -1412,70 +1486,71 @@ begin
       Symbol := GetSymbol;
 
       case Symbol of
-      sqSpace:
+      sqEOL,
+      ' ':
         case FState of
         stQuotedAttributeValue,
         stTagged:
            XMLString += ' ';
         end;
 
-      sqSemiColon:
+      ';':
         case FState of
         stQuotedAttributeValue,
         stTagged:
            XMLString += ';';
         else
-          ShowError(sXMLError,[nil]);
+          ShowError(sXMLError,[Symbol]);
         end;
 
-      sqSingleQuotes:
+      '''':
         case FState of
         stQuotedAttributeValue,
         stTagged:
            XMLString += '''';
         else
-          ShowError(sXMLError,[nil]);
+          ShowError(sXMLError,[Symbol]);
         end;
 
-      sqAsterisk:
+      '*':
         case FState of
         stQuotedAttributeValue,
         stTagged:
            XMLString += '*';
         else
-          ShowError(sXMLError,[nil]);
+          ShowError(sXMLError,[Symbol]);
         end;
 
-      sqForwardSlash:
+      '/':
         case FState of
         stQuotedAttributeValue,
         stTagged:
            XMLString += '/';
         else
-          ShowError(sXMLError,[nil]);
+          ShowError(sXMLError,[Symbol]);
         end;
 
-      sqGT:
+      '>':
         case FState of
         stEndTag:
-          begin
             case XMLTag of
             xtBlob:
               begin
-                Result := Format(ibx_blob+'%d',[FCurrentBlob]);
+                Result := ':' + Format(ibx_blob+'%d',[FCurrentBlob]);
                 Done := true;
               end;
             xtArray:
               begin
-                Result := Format(ibx_array+'%d',[FCurrentArray]);
+                Result := ':' + Format(ibx_array+'%d',[FCurrentArray]);
                 Done := true;
               end;
             xtOctets:
-            end;
             begin
-              Result := Format(ibx_octets+'%d',[FCurrentOctets]);
+              Result := ':' + Format(ibx_octets+'%d',[FCurrentOctets]);
               Done := true;
             end;
+            else
+              FState := stTagged;
           end;
 
         stInTag:
@@ -1490,14 +1565,17 @@ begin
           XMLString += '>';
 
         else
-          ShowError(sXMLError,[nil]);
+          ShowError(sXMLError,[Symbol]);
         end;
 
       sqTag:
         if FState = stTagged then
+        begin
+          FState := stInTag;
           StartXMLTag(XMLTag)
+        end
         else
-          ShowError(sXMLError,[nil]);
+          ShowError(sXMLError,[Symbol]);
 
       sqEndTag:
         if FState = stTagged then
@@ -1507,9 +1585,9 @@ begin
           FState := stEndTag;
         end
         else
-          ShowError(sXMLError,[nil]);
+          ShowError(sXMLError,[Symbol]);
 
-      sqEquals:
+      '=':
         case FState of
         stAttribute:
           FState := stAttributeValue;
@@ -1519,10 +1597,10 @@ begin
           XMLString += '=';
 
         else
-          ShowError(sXMLError,[nil]);
+          ShowError(sXMLError,[Symbol]);
         end;
 
-      sqDoubleQuotes:
+      '"':
         case FState of
         stAttributeValue:
           begin
@@ -1540,7 +1618,7 @@ begin
           XMLString += '"';
 
         else
-          ShowError(sXMLError,[nil]);
+          ShowError(sXMLError,[Symbol]);
         end;
 
       sqString:
@@ -1562,10 +1640,10 @@ begin
            XMLString += SymbolValue;
 
         else
-          ShowError(sXMLError,[nil]);
+          ShowError(sXMLError,[Symbol]);
         end;
       else
-        ShowError(sXMLError,[nil]);
+        ShowError(sXMLError,[Symbol]);
       end
     end;
   end;
@@ -1578,6 +1656,8 @@ begin
   FCurrentBlob := -1;
   SetLength(FArrayData,0);
   FCurrentArray := -1;
+  SetLength(FOctetString,0);
+  FCurrentOctets := -1;
 end;
 
 class function TIBXMLProcessor.FormatBlob(Field: ISQLData): string;
@@ -1758,22 +1838,12 @@ begin
     Result := sqTerminator
   else
   case C of
-  ' ',#9,#10,#13:
-    Result := sqSpace;
-  ';':
-    Result := sqSemiColon;
-  '"':
-    Result := sqDoubleQuotes;
-  '''':
-    Result := sqSingleQuotes;
-  '/':
-    Result := sqForwardSlash;
-  '*':
-    Result := sqAsterisk;
-  '=':
-    Result := sqEquals;
-  '>':
-    Result := sqGT;
+  #0..#31,' ':
+    Result := ' ';
+
+  ';','"','''','/',
+  '*','=','>','<',',':
+    Result := C;
   else
     begin
       Result := sqString;
@@ -1866,11 +1936,11 @@ begin
         FNextSymbol := sqNone
       end;
 
-    sqForwardSlash:
+    '/':
       if FXMLMode > 0 then
         break
       else
-      if FNextSymbol = sqAsterisk then
+      if FNextSymbol = '*' then
       begin
         InComment := true;
         Comment := '/*';
@@ -1878,7 +1948,7 @@ begin
         FNextSymbol := sqNone
       end
       else
-      if FNextSymbol = sqForwardSlash then
+      if FNextSymbol = '/' then
       begin
         FString := '/*' + system.copy(FLine,FIndex,length(FLine)- FIndex + 1) + ' */';
         Result := sqCommentLine;
@@ -1886,11 +1956,11 @@ begin
         FNextSymbol := sqNone
       end;
 
-    sqAsterisk:
+    '*':
       if FXMLMode > 0 then
         break
       else
-      if FNextSymbol = sqForwardSlash then
+      if FNextSymbol = '/' then
       begin
         InComment := false;
         FString := Comment;
@@ -1898,6 +1968,23 @@ begin
         FNextSymbol := sqNone
       end;
 
+    '<':
+      if (FXMLMode > 0) and (FNextSymbol = '/') then
+      begin
+        Result := sqEndTag;
+        FString := '';
+        FNextSymbol := sqNone
+      end
+      else
+      if FNextSymbol = sqString then
+      begin
+        Result := sqTag;
+        FString := FLastChar;
+        FNextSymbol := sqNone
+      end;
+
+    sqTag,
+    sqEndTag,
     sqString:
       if FNextSymbol = sqString then
       begin
@@ -1914,16 +2001,24 @@ begin
     end;
   end;
 
-  if (Result = sqString) and (FString <> '') then
+  if (Result = sqTag) and (FNextSymbol <> sqNone) then
   begin
-    if (FString[1] = '<') and FindTag(system.copy(FString,1,Length(FString) - 1),FXMLTag) then
-    begin
-      Inc(FXMLMode);
-      Result := sqTag
-    end
+    if FindTag(FString,FXMLTag) then
+      Inc(FXMLMode)
     else
-    if FXMLMode = 0 then
-    begin
+      Result := sqString;
+  end
+  else
+  if (Result = sqEndTag) and (FNextSymbol <> sqNone) then
+  begin
+    if FindTag(FString,FXMLTag) then
+      Dec(FXMLMode)
+    else
+      Result := sqString;
+  end;
+
+  if (FXMLMode = 0) and (Result = sqString) and (FString <> '') then
+  begin
        if InComment then
        begin
          Comment += FString;
@@ -1941,13 +2036,6 @@ begin
        else
        if CompareText(FString,'case') = 0 then
          Result := sqCase
-    end
-    else
-    if (Pos('</',FString) = 1) and FindTag(system.copy(FString,2,Length(FString) - 2 ),FXMLTag) then
-    begin
-      Dec(FXMLMode);
-      Result := sqEndTag
-    end;
   end;
 end;
 
