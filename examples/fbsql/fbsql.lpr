@@ -33,17 +33,8 @@ uses
   {$ENDIF}{$ENDIF}
   Classes, SysUtils, CustApp
   { you can add units after this }
-  ,IBDatabase, ibxscript, IBExtract, IBQuery, DB, IBVersion,
+  ,IBDatabase, ibxscript, IBExtract, DB, IBVersion,
   IBDataOutput;
-
-resourcestring
-
-  sUnknownField = 'Unknown Field Type';
-  sBadGraphic   = 'Unable to generate CSV data for a Graphic Field';
-  sBadParadox   = 'Unable to generate CSV data for a Paradox OLE Field';
-  sBadDBase     = 'Unable to generate CSV data  for a DBase OLE Field';
-  sBadBinary    = 'Unable to generate CSV data  for a Binary Field';
-  sBadCursor    = 'Unable to generate CSV data  for a Cursor Field';
 
 type
 
@@ -294,7 +285,6 @@ var
   Application: TFBSQL;
 begin
   Application:=TFBSQL.Create(nil);
-  Application.Title:='fbsql';
   Application.Run;
   Application.Free;
 end.

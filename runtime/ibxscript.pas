@@ -1265,7 +1265,8 @@ procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
       case hexData[i] of
       ' ',#9,#10,#13:
         begin
-          Move(hexData[i+1],hexData[i],Length(hexData)-i);
+          if i < Length(hexData) then
+            Move(hexData[i+1],hexData[i],Length(hexData)-i);
           SetLength(hexData,Length(hexData)-1);
         end;
       end;
