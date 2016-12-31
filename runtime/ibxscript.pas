@@ -623,7 +623,7 @@ begin
 
   except on E:Exception do
       begin
-        FSymbolStream.ShowError(E.Message,[nil]);
+        Add2Log(FSymbolStream.GetErrorPrefix+E.Message,true);
         if StopOnFirstError then Exit;
       end
   end;
