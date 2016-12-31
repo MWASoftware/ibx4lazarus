@@ -425,7 +425,7 @@ const
     '  (RELC.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' OR ' +
     '  RELC.RDB$CONSTRAINT_TYPE = ''UNIQUE'') AND ' +
     '  RELC.RDB$RELATION_NAME = :RELATIONNAME ' +
-    'ORDER BY RELC.RDB$CONSTRAINT_NAME';
+    'ORDER BY RELC.RDB$CONSTRAINT_TYPE desc, RELC.RDB$CONSTRAINT_NAME';
 
   GetGeneratorSQL =
     'SELECT * FROM RDB$GENERATORS WHERE RDB$GENERATOR_NAME = :GENERATOR';
@@ -1032,9 +1032,20 @@ procedure TIBExtract.ListProcs(ProcDDLType: TProcDDLType; ProcedureName: String
 const
   CreateProcedureStr1 = 'CREATE PROCEDURE %s ';
   CreateProcedureStr2 = 'BEGIN EXIT; END %s%s';
-  ProcedureSQL =
-    'SELECT * FROM RDB$PROCEDURES ' +
-    'ORDER BY RDB$PROCEDURE_NAME';
+  ProcedureSQL =  {Order procedures by dependency order and then procedure name}
+                  'with recursive Procs as ( ' +
+                  'Select RDB$PROCEDURE_NAME, 1 as ProcLevel from RDB$PROCEDURES ' +
+                  'UNION ALL ' +
+                  'Select D.RDB$DEPENDED_ON_NAME, ProcLevel + 1 From RDB$DEPENDENCIES D ' +
+                  'JOIN Procs on Procs.RDB$PROCEDURE_NAME = D.RDB$DEPENDENT_NAME ' +
+                  '  and Procs.RDB$PROCEDURE_NAME <> D.RDB$DEPENDED_ON_NAME ' +
+                  'JOIN RDB$PROCEDURES P On P.RDB$PROCEDURE_NAME = D.RDB$DEPENDED_ON_NAME ' +
+                  '  ) ' +
+                  'SELECT * FROM RDB$PROCEDURES P ' +
+                  'JOIN ( ' +
+                  'Select RDB$PROCEDURE_NAME, max(ProcLevel) as ProcLevel From Procs ' +
+                  'Group By RDB$PROCEDURE_NAME) A On A.RDB$PROCEDURE_NAME = P.RDB$PROCEDURE_NAME ' +
+                  'Order by A.ProcLevel desc, P.RDB$PROCEDURE_NAME asc';
 
   ProcedureNameSQL =
     'SELECT * FROM RDB$PROCEDURES ' +
@@ -1089,6 +1100,14 @@ begin
       qryProcedures.ExecQuery;
       while not qryProcedures.Eof do
       begin
+        if Header then
+        begin
+          FMetaData.Add('COMMIT WORK;');
+          FMetaData.Add('SET AUTODDL OFF;');
+          FMetaData.Add(Format('SET TERM %s %s', [ProcTerm, Term]));
+          FMetaData.Add(Format('%s/* Stored procedures */%s', [NEWLINE, NEWLINE]));
+          Header := false;
+        end;
         SList.Clear;
         ProcName := Trim(qryProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString);
         FMetaData.Add(Format('%sALTER PROCEDURE %s ', [NEWLINE,

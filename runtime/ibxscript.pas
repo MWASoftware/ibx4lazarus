@@ -48,17 +48,13 @@ const
   sqDeclare      = #6;
   sqCommentLine  = #7;
   sqEOL          = #8;
-  sqTerminator   = #9;
-  sqEOF          = #10;
-  sqTag          = #11;
-  sqEndTag       = #12;
+  sqTab          = #9;
+  sqTerminator   = #10;
+  sqEOF          = #11;
+  sqTag          = #12;
+  sqEndTag       = #13;
 
 type
-{  TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes,
-                sqEnd,sqBegin,sqString,sqComment,sqCase, sqDeclare,
-                sqCommentLine,sqAsterisk,sqForwardSlash, sqComma,
-                sqEOL,sqTerminator, sqEOF, sqEquals,sqGT,sqTag,sqEndTag); }
-
   TSQLSymbol = char;
 
   TSQLStates =  (stInit, stError, stInSQL, stNested, stInSingleQuotes,
@@ -157,6 +153,8 @@ type
   TArrayData = record
     ArrayIntf: IArray;
     SQLType: cardinal;
+    relationName: string;
+    columnName: string;
     dim: cardinal;
     Size: cardinal;
     Scale: integer;
@@ -196,7 +194,6 @@ type
     procedure StartXMLTag(xmltag: TXMLTag);
     procedure ProcessAttributeValue(attrValue: string);
     procedure ProcessBoundsList(boundsList: string);
-    class procedure HexBlock(octetString: string; TextOut: TStrings);
   public
     constructor Create;
     destructor Destroy; override;
@@ -393,7 +390,7 @@ resourcestring
   sXMLStackOverFlow = 'XML Stack Overflow';
   sErrorState = 'Entered Error State';
   sXMLError = 'Invalid XML (%c)';
-  sXMLAttributeError = 'Unexpected attribute - "%s"';
+  sXMLAttributeError = 'Unexpected attribute - "%s" = "%s"';
   sInvalidBoundsList = 'Invalid array bounds list - "%s"';
   sBinaryBlockMustbeEven = 'Binary block must have an even number of characters';
   sInvalidCharacterSet = 'Unrecognised character set name - "%s"';
@@ -505,7 +502,7 @@ begin
      if assigned(DataOutputFormatter) then
        DefaultSelectSQLHandler(stmt)
      else
-       raise Exception.Create(sNoSelectSQL);
+       FSymbolStream.ShowError(sNoSelectSQL,[nil]);
    end
    else
    begin
@@ -626,7 +623,7 @@ begin
 
   except on E:Exception do
       begin
-        Add2Log(E.Message);
+        FSymbolStream.ShowError(E.Message,[nil]);
         if StopOnFirstError then Exit;
       end
   end;
@@ -1124,8 +1121,7 @@ begin
     sqEOL:
       begin
         case FState of
-        stInDoubleQuotes,
-        stInSingleQuotes:
+        stInDoubleQuotes:
           ShowError(sUnterminatedString,[nil]);
         stInit:
           {Do nothing};
@@ -1140,6 +1136,7 @@ begin
         Result := trim(FSQLText) <> '';
       end
     else
+    if FState <> stInit then
       AddToSQL(Symbol);
     end
   end;
@@ -1187,10 +1184,12 @@ begin
       Database.Connected := true;
       Transaction.Active := true;
       FirebirdAPI.CharSetName2CharSetID(CharSet,aCharSetID);
+      SetLength(Index,dim);
       ArrayIntf := Database.Attachment.CreateArray(
                      Transaction.TransactionIntf,
-                     Database.Attachment.CreateArrayMetaData(SQLType,Scale,Size,
-                     aCharSetID,dim,bounds)
+                     Database.Attachment.CreateArrayMetaData(SQLType,
+                       relationName,columnName,Scale,Size,
+                       aCharSetID,dim,bounds)
                      );
     end;
   end;
@@ -1256,11 +1255,30 @@ procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
     end;
   end;
 
+  procedure RemoveWhiteSpace(var hexData: string);
+  var i: integer;
+  begin
+    {Remove White Space}
+    i := 1;
+    while i <= length(hexData) do
+    begin
+      case hexData[i] of
+      ' ',#9,#10,#13:
+        begin
+          Move(hexData[i+1],hexData[i],Length(hexData)-i);
+          SetLength(hexData,Length(hexData)-1);
+        end;
+      end;
+      Inc(i);
+    end;
+  end;
+
   procedure AddOctets(hexData: string);
   var i,j : integer;
       blength: integer;
       curLength: integer;
   begin
+    RemoveWhiteSpace(hexData);
     if odd(length(hexData)) then
       FSymbolStream.ShowError(sBinaryBlockMustbeEven,[nil]);
     blength := Length(hexData) div 2;
@@ -1279,6 +1297,7 @@ procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
       blength: integer;
       P: PChar;
   begin
+    RemoveWhiteSpace(hexData);
     if odd(length(hexData)) then
       FSymbolStream.ShowError(sBinaryBlockMustbeEven,[nil]);
     blength := Length(hexData) div 2;
@@ -1351,10 +1370,7 @@ begin
 
   xtElt:
     with FArrayData[FCurrentArray] do
-    begin
       Inc(CurrentRow);
-      SetLength(index,CurrentRow+1);
-    end;
 
   end;
 end;
@@ -1366,11 +1382,17 @@ begin
     if FAttributeName = 'subtype' then
       FBlobData[FCurrentBlob].SubType := StrToInt(attrValue)
     else
-      FSymbolStream.ShowError(sXMLAttributeError,[attrValue]);
+      FSymbolStream.ShowError(sXMLAttributeError,[FAttributeName,attrValue]);
 
   xtArray:
     if FAttributeName = 'sqltype' then
       FArrayData[FCurrentArray].SQLType := StrToInt(attrValue)
+    else
+    if FAttributeName = 'relation_name' then
+      FArrayData[FCurrentArray].relationName := attrValue
+    else
+    if FAttributeName = 'column_name' then
+      FArrayData[FCurrentArray].columnName := attrValue
     else
     if FAttributeName = 'dim' then
       FArrayData[FCurrentArray].Dim := StrToInt(attrValue)
@@ -1387,14 +1409,14 @@ begin
     if FAttributeName = 'bounds' then
       ProcessBoundsList(attrValue)
     else
-      FSymbolStream.ShowError(sXMLAttributeError,[attrValue]);
+      FSymbolStream.ShowError(sXMLAttributeError,[FAttributeName,attrValue]);
 
   xtElt:
     if FAttributeName = 'ix' then
       with FArrayData[FCurrentArray] do
         Index[CurrentRow] :=  StrToInt(attrValue)
      else
-        FSymbolStream.ShowError(sXMLAttributeError,[attrValue]);
+        FSymbolStream.ShowError(sXMLAttributeError,[FAttributeName,attrValue]);
   end;
 end;
 
@@ -1425,7 +1447,7 @@ begin
   end;
 end;
 
-class procedure TIBXMLProcessor.HexBlock(octetString: string;
+procedure HexBlock(octetString: string;
   TextOut: TStrings);
 
   function ToHex(aValue: byte): string;
@@ -1439,13 +1461,13 @@ class procedure TIBXMLProcessor.HexBlock(octetString: string;
 var i, j: integer;
     s: string;
 begin
-  i := 0;
+  i := 1;
   while i < Length(octetString) do
   begin
     s := '';
     for j := 1 to 40 do
     begin
-      if i = Length(octetString) then
+      if i > Length(octetString) then
         break
       else
         s += ToHex(byte(octetString[i]));
@@ -1486,8 +1508,14 @@ begin
       Symbol := GetSymbol;
 
       case Symbol of
-      sqEOL,
-      ' ':
+      sqEOL:
+      case FState of
+      stQuotedAttributeValue,
+      stTagged:
+         XMLString += LineEnding;
+      end;
+
+      ' ',sqTab:
         case FState of
         stQuotedAttributeValue,
         stTagged:
@@ -1721,8 +1749,9 @@ var
 begin
   TextOut := TStringList.Create;
   try
-    s := Format('<array dim = "%d" sqltype = "%d" length = "%d"',
-                                [ar.GetDimensions,ar.GetSQLType,ar.GetSize]);
+    s := Format('<array dim = "%d" sqltype = "%d" length = "%d" relation_name = "%s" column_name = "%s"',
+                                [ar.GetDimensions,ar.GetSQLType,ar.GetSize,
+                                 ar.GetTableName,ar.GetColumnName]);
     case ar.GetSQLType of
     SQL_DOUBLE, SQL_FLOAT, SQL_LONG, SQL_SHORT, SQL_D_FLOAT, SQL_INT64:
        s += Format(' scale = "%d"',[ ar.GetScale]);
@@ -1838,10 +1867,10 @@ begin
     Result := sqTerminator
   else
   case C of
-  #0..#31,' ':
+  #0..#8,#10..#31,' ':
     Result := ' ';
 
-  ';','"','''','/',
+  #9,';','"','''','/',
   '*','=','>','<',',':
     Result := C;
   else
