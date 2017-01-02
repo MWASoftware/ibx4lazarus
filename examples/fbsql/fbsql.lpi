@@ -27,7 +27,7 @@
     <RunParams>
       <local>
         <FormatVersion Value="1"/>
-        <CommandLineParams Value="-b -e -u SYSDBA -p masterkey -i /tmp/test.sql"/>
+        <CommandLineParams Value="-a -u SYSDBA -p masterkey -o /tmp/test.sql employee"/>
       </local>
     </RunParams>
     <RequiredPackages Count="1">

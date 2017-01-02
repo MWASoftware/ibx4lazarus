@@ -23,7 +23,7 @@
 {                                                                        }
 {************************************************************************}
 
-{ Syntax Enhancements Supported:
+{ Syntax Enhancements Supported (by Firebird Version no.):
 
 Multi-action triggers (1.5)
 CREATE SEQUENCE (2.0)
@@ -61,7 +61,7 @@ type
 
   TExtractTypes = Set of TExtractType;
 
-  TProcDDLType = (pdBoth,pdCreateOnly,pdAlterProc);
+  TProcDDLType = (pdCreateProc,pdCreateStub,pdAlterProc);
 
   { TIBExtract }
 
@@ -82,6 +82,8 @@ type
     procedure SetTransaction(const Value: TIBTransaction);
     function PrintValidation(ToValidate : String;	flag : Boolean) : String;
     procedure ShowGrants(MetaObject: String; Terminator : String);
+    procedure ShowGrantsTo(MetaObject: String; ObjectType: integer;
+      Terminator: String);
     procedure ShowGrantRoles(Terminator : String);
     procedure GetProcedureArgs(Proc : String);
   protected
@@ -92,9 +94,10 @@ type
     procedure ListData(ObjectName : String);
     procedure ListRoles(ObjectName : String = '');
     procedure ListGrants;
-    procedure ListProcs(ProcDDLType: TProcDDLType = pdBoth; ProcedureName : String = '');
+    procedure ListProcs(ProcDDLType: TProcDDLType = pdCreateProc; ProcedureName : String = '';
+      IncludeGrants:boolean=false);
     procedure ListAllTables(flag : Boolean);
-    procedure ListTriggers(AlterTrigger, IncludeBody: boolean; ObjectName : String = ''; ExtractType : TExtractType = etTrigger);
+    procedure ListTriggers(ObjectName: String=''; ExtractTypes: TExtractTypes = [etTrigger]);
     procedure ListCheck(ObjectName : String = ''; ExtractType : TExtractType = etCheck);
     function PrintSet(var Used : Boolean) : String;
     procedure ListCreateDb(TargetDb : String = '');
@@ -242,7 +245,6 @@ implementation
 uses FBMessages, IBDataOutput;
 
 const
-  NEWLINE = #13#10;
   TERM = ';';
   ProcTerm = '^';
 
@@ -376,8 +378,8 @@ begin
     ListViews;
     ListCheck;
     ListException;
-    ListProcs(pdCreateOnly);
-    ListTriggers(false,true);
+    ListProcs(pdCreateStub);
+    ListTriggers;
     ListProcs(pdAlterProc);
     ListGrants;
   end;
@@ -469,8 +471,8 @@ begin
       if (not qryTables.FieldByName('RDB$OWNER_NAME').IsNull) and
          (Trim(qryTables.FieldByName('RDB$OWNER_NAME').AsString) <> '') then
         FMetaData.Add(Format('%s/* Table: %s, Owner: %s */%s',
-          [NEWLINE, RelationName,
-           qryTables.FieldByName('RDB$OWNER_NAME').AsString, NEWLINE]));
+          [LineEnding, RelationName,
+           qryTables.FieldByName('RDB$OWNER_NAME').AsString, LineEnding]));
       if TableType > 3 then
        CreateTable := 'CREATE GLOBAL TEMPORARY TABLE'
       else
@@ -712,10 +714,10 @@ begin
     end;
     if ValidRelation then
     begin
-      FMetaData.Add(') ');
       if TableType = 4 then
-      FMetaData.Add('ON COMMIT PRESERVE ROWS ');
-      FMetaData.Add(Term);
+        FMetaData.Add(' ) ON COMMIT PRESERVE ROWS ' + TERM)
+      else
+       FMetaData.Add(')' + TERM);
     end;
   finally
     qryTables.Free;
@@ -1027,8 +1029,8 @@ end;
 
  	 procname -- Name of procedure to investigate }
 
-procedure TIBExtract.ListProcs(ProcDDLType: TProcDDLType; ProcedureName: String
-  );
+procedure TIBExtract.ListProcs(ProcDDLType: TProcDDLType;
+  ProcedureName: String; IncludeGrants: boolean);
 const
   CreateProcedureStr1 = 'CREATE PROCEDURE %s ';
   CreateProcedureStr2 = 'BEGIN EXIT; END %s%s';
@@ -1057,14 +1059,13 @@ var
   ProcName : String;
   SList : TStrings;
   Header : Boolean;
+
 begin
 
   Header := true;
   qryProcedures := TIBSQL.Create(FDatabase);
   SList := TStringList.Create;
   try
-{  First the dummy procedures
-    create the procedures with their parameters }
     if ProcedureName = '' then
       qryProcedures.SQL.Text := ProcedureSQL
     else
@@ -1072,59 +1073,65 @@ begin
       qryProcedures.SQL.Text := ProcedureNameSQL;
       qryProcedures.Params.ByName('ProcedureName').AsString := ProcedureName;
     end;
-    if ProcDDLType <> pdAlterProc then
+
+    qryProcedures.ExecQuery;
+    while not qryProcedures.Eof do
     begin
-      qryProcedures.ExecQuery;
-      while not qryProcedures.Eof do
+      if Header then
       begin
-        if Header then
+        FMetaData.Add('COMMIT WORK;');
+        FMetaData.Add('SET AUTODDL OFF;');
+        FMetaData.Add(Format('SET TERM %s %s', [ProcTerm, Term]));
+        FMetaData.Add(Format('%s/* Stored procedures */%s', [LineEnding, LineEnding]));
+        Header := false;
+      end;
+      ProcName := Trim(qryProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString);
+
+      case ProcDDLType of
+      pdCreateStub:
         begin
-          FMetaData.Add('COMMIT WORK;');
-          FMetaData.Add('SET AUTODDL OFF;');
-          FMetaData.Add(Format('SET TERM %s %s', [ProcTerm, Term]));
-          FMetaData.Add(Format('%s/* Stored procedures */%s', [NEWLINE, NEWLINE]));
-          Header := false;
+          FMetaData.Add(Format(CreateProcedureStr1, [QuoteIdentifier(FDatabase.SQLDialect,
+             ProcName)]));
+          GetProcedureArgs(ProcName);
+          FMetaData.Add(Format(CreateProcedureStr2, [ProcTerm, LineEnding]));
         end;
-        ProcName := Trim(qryProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString);
+
+      pdCreateProc:
+      begin
         FMetaData.Add(Format(CreateProcedureStr1, [QuoteIdentifier(FDatabase.SQLDialect,
            ProcName)]));
         GetProcedureArgs(ProcName);
-        FMetaData.Add(Format(CreateProcedureStr2, [ProcTerm, NEWLINE]));
-        qryProcedures.Next;
-      end;
-      qryProcedures.Close;
-    end;
-
-    if ProcDDLType <> pdCreateOnly then
-    begin
-      qryProcedures.ExecQuery;
-      while not qryProcedures.Eof do
-      begin
-        if Header then
-        begin
-          FMetaData.Add('COMMIT WORK;');
-          FMetaData.Add('SET AUTODDL OFF;');
-          FMetaData.Add(Format('SET TERM %s %s', [ProcTerm, Term]));
-          FMetaData.Add(Format('%s/* Stored procedures */%s', [NEWLINE, NEWLINE]));
-          Header := false;
-        end;
-        SList.Clear;
-        ProcName := Trim(qryProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString);
-        FMetaData.Add(Format('%sALTER PROCEDURE %s ', [NEWLINE,
-           QuoteIdentifier(FDatabase.SQLDialect, ProcName)]));
-        GetProcedureArgs(ProcName);
-
         if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
-          SList.Text := SList.Text + qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
-        SList.Add(Format(' %s%s', [ProcTerm, NEWLINE]));
-        FMetaData.AddStrings(SList);
-        qryProcedures.Next;
+        begin
+          SList.Text := qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
+          SList.Add(Format(' %s%s', [ProcTerm, LineEnding]));
+          FMetaData.AddStrings(SList);
+        end
+        else
+          FMetaData.Add(Format(CreateProcedureStr2, [ProcTerm, LineEnding]));
       end;
-    end;
 
-{ This query gets the procedure name and the source.  We then nest a query
-   to retrieve the parameters. Alter is used, because the procedures are
-   already there}
+      pdAlterProc:
+       begin
+         FMetaData.Add(Format('%sALTER PROCEDURE %s ', [LineEnding,
+            QuoteIdentifier(FDatabase.SQLDialect, ProcName)]));
+         GetProcedureArgs(ProcName);
+
+         if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
+         begin
+           SList.Text := qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
+           SList.Add(Format(' %s%s', [ProcTerm, LineEnding]));
+           FMetaData.AddStrings(SList);
+         end
+         else
+           FMetaData.Add(Format(CreateProcedureStr2, [ProcTerm, LineEnding]));
+       end;
+      end;
+      if IncludeGrants then
+        ShowGrantsTo(ProcName,obj_procedure,ProcTerm);
+      qryProcedures.Next;
+    end;
+    qryProcedures.Close;
 
     if not Header then
     begin
@@ -1185,8 +1192,8 @@ end;
   	Lists triggers in general on non-system
   	tables with sql source only. }
 
-procedure TIBExtract.ListTriggers(AlterTrigger, IncludeBody: boolean;
-  ObjectName: String; ExtractType: TExtractType);
+procedure TIBExtract.ListTriggers(ObjectName: String; ExtractTypes: TExtractTypes
+  );
 const
 { Query gets the trigger info for non-system triggers with
    source that are not part of an SQL constraint }
@@ -1237,7 +1244,7 @@ begin
       qryTriggers.SQL.Text := TriggerSQL
     else
     begin
-      if ExtractType = etTable then
+      if etTable in ExtractTypes  then
       begin
         qryTriggers.SQL.Text := TriggerNameSQL;
         qryTriggers.Params.ByName('TableName').AsString := ObjectName;
@@ -1254,9 +1261,9 @@ begin
       SList.Clear;
       if Header then
       begin
-        FMetaData.Add(Format('SET TERM %s %s%s', [Procterm, Term, NEWLINE]));
+        FMetaData.Add(Format('SET TERM %s %s%s', [Procterm, Term, LineEnding]));
         FMetaData.Add(Format('%s/* Triggers only will work for SQL triggers */%s',
-		       [NEWLINE, NEWLINE]));
+		       [LineEnding, LineEnding]));
         Header := false;
       end;
       TriggerName := qryTriggers.FieldByName('RDB$TRIGGER_NAME').AsString;
@@ -1272,24 +1279,23 @@ begin
       if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
         SList.Add('/* ');
 
-      if AlterTrigger then
-        SList.Add(Format('Alter TRIGGER %s ',[QuoteIdentifier(FDatabase.SQLDialect, TriggerName)]))
-    else
-        SList.Add(Format('CREATE TRIGGER %s FOR %s %s%s %s POSITION %d',
+      SList.Add(Format('CREATE TRIGGER %s FOR %s %s%s %s POSITION %d',
 	        [QuoteIdentifier(FDatabase.SQLDialect, TriggerName),
            QuoteIdentifier(FDatabase.SQLDialect, RelationName),
-           NEWLINE, InActive,
+           LineEnding, InActive,
            GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInteger),
            qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
-      if IncludeBody and not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
+      if not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
         SList.Text := SList.Text +
               qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString
       else
         SList.Text := SList.Text + 'AS BEGIN EXIT; END';
-      SList.Add(' ' + ProcTerm + NEWLINE);
+      SList.Add(' ' + ProcTerm);
       if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
         SList.Add(' */');
       FMetaData.AddStrings(SList);
+      if etGrant in ExtractTypes then
+        ShowGrantsTo(TriggerName,obj_trigger,ProcTerm);
       qryTriggers.Next;
     end;
     if not Header then
@@ -1374,7 +1380,7 @@ begin
       if not qryChecks.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
         SList.Text := SList.Text + qryChecks.FieldByName('RDB$TRIGGER_SOURCE').AsString;
 
-      SList.Strings[SList.Count - 1] := SList.Strings[SList.Count - 1] + (Term) + NEWLINE;
+      SList.Strings[SList.Count - 1] := SList.Strings[SList.Count - 1] + (Term) + LineEnding;
       FMetaData.AddStrings(SList);
       qryChecks.Next;
     end;
@@ -1433,7 +1439,7 @@ begin
     NoDb := true;
   end;
   Buffer := Buffer + 'CREATE DATABASE ' + QuotedStr(TargetDb) + ' PAGE_SIZE ' +
-    IntToStr(FDatabaseInfo.PageSize) + NEWLINE;
+    IntToStr(FDatabaseInfo.PageSize) + LineEnding;
   FMetaData.Add(Buffer);
   Buffer := '';
 
@@ -1459,7 +1465,7 @@ begin
     begin
       if First then
       begin
-        FMetaData.Add(NEWLINE + '/* Add secondary files in comments ');
+        FMetaData.Add(LineEnding + '/* Add secondary files in comments ');
         First := false;
       end; //end_if
 
@@ -1484,7 +1490,7 @@ begin
       if FileFlags = 0 then
       begin
         Buffer := Format('%sALTER DATABASE ADD FILE ''%s''',
-          [NEWLINE, qryDB.FieldByName('RDB$FILE_NAME').AsString]);
+          [LineEnding, qryDB.FieldByName('RDB$FILE_NAME').AsString]);
         if FileStart <> 0 then
           Buffer := Buffer + Format(' STARTING %d', [FileStart]);
         if FileLength <> 0 then
@@ -1493,7 +1499,7 @@ begin
       end; //end_if
       if (FileFlags and FILE_cache) <> 0 then
         FMetaData.Add(Format('%sALTER DATABASE ADD CACHE ''%s'' LENGTH %d',
-          [NEWLINE, qryDB.FieldByName('RDB$FILE_NAME').AsString, FileLength]));
+          [LineEnding, qryDB.FieldByName('RDB$FILE_NAME').AsString, FileLength]));
 
       Buffer := '';
       if (FileFlags and FILE_shadow) <> 0 then
@@ -1504,7 +1510,7 @@ begin
         else
         begin
           Buffer := Format('%sCREATE SHADOW %d ''%s'' ',
-            [NEWLINE, qryDB.FieldByName('RDB$SHADOW_NUMBER').AsInteger,
+            [LineEnding, qryDB.FieldByName('RDB$SHADOW_NUMBER').AsInteger,
              qryDB.FieldByName('RDB$FILE_NAME').AsString]);
           if (FileFlags and FILE_inactive) <> 0 then
             Buffer := Buffer + 'INACTIVE ';
@@ -1545,7 +1551,7 @@ begin
       begin
         if NoDB then
           Buffer := '/* ';
-        Buffer := Buffer + NEWLINE + 'ALTER DATABASE ADD ';
+        Buffer := Buffer + LineEnding + 'ALTER DATABASE ADD ';
         First := false;
       end; //end_if
       if FirstFile then
@@ -1555,11 +1561,11 @@ begin
       begin
         if (FileFlags and LOG_overflow) <> 0 then
           Buffer := Buffer + Format(')%s   OVERFLOW ''%s''',
-            [NEWLINE, qryDB.FieldByName('RDB$FILE_NAME').AsString])
+            [LineEnding, qryDB.FieldByName('RDB$FILE_NAME').AsString])
         else
           if (FileFlags and LOG_serial) <> 0 then
             Buffer := Buffer + Format('%s  BASE_NAME ''%s''',
-              [NEWLINE, qryDB.FieldByName('RDB$FILE_NAME').AsString])
+              [LineEnding, qryDB.FieldByName('RDB$FILE_NAME').AsString])
           { Since we are fetching order by FILE_FLAGS, the LOG_0verflow will
              be last.  It will only appear if there were named round robin,
              so we must close the parens first }
@@ -1570,7 +1576,7 @@ begin
             if FirstFile then
               Buffer := Buffer + '('
             else
-              Buffer := Buffer + Format(',%s  ', [NEWLINE]);
+              Buffer := Buffer + Format(',%s  ', [LineEnding]);
             FirstFile := false;
 
             Buffer := Buffer + Format('''%s''', [qryDB.FieldByName('RDB$FILE_NAME').AsString]);
@@ -1604,9 +1610,9 @@ begin
     if not First then
     begin
       if NoDB then
-        FMetaData.Add(Format('%s */%s', [NEWLINE, NEWLINE]))
+        FMetaData.Add(Format('%s */%s', [LineEnding, LineEnding]))
       else
-        FMetaData.Add(Format('%s%s%s', [Term, NEWLINE, NEWLINE]));
+        FMetaData.Add(Format('%s%s%s', [Term, LineEnding, LineEnding]));
     end;
   finally
     qryDB.Free;
@@ -1721,15 +1727,15 @@ var
       Result := GetArrayField(qryDomains.FieldByName('RDB$FIELD_SOURCE').AsString);
 
     if not qryDomains.FieldByName('RDB$DEFAULT_SOURCE').IsNull then
-      Result := Result + Format('%s%s %s', [NEWLINE, TAB,
+      Result := Result + Format('%s%s %s', [LineEnding, TAB,
          qryDomains.FieldByName('RDB$DEFAULT_SOURCE').AsString]);
 
     if not qryDomains.FieldByName('RDB$VALIDATION_SOURCE').IsNull then
       if Pos('CHECK', AnsiUpperCase(qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString)) = 1 then
-        Result := Result + Format('%s%s %s', [NEWLINE, TAB,
+        Result := Result + Format('%s%s %s', [LineEnding, TAB,
            qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString])
       else
-        Result := Result + Format('%s%s /* %s */', [NEWLINE, TAB,
+        Result := Result + Format('%s%s /* %s */', [LineEnding, TAB,
            qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString]);
 
     if qryDomains.FieldByName('RDB$NULL_FLAG').AsInteger = 1 then
@@ -2098,7 +2104,7 @@ begin
       if First then
       begin
         FMEtaData.Add(Format('%s/*  External Function declarations */%s',
-          [NEWLINE, NEWLINE]));
+          [LineEnding, LineEnding]));
         First := false;
       end; //end_if
       { Start new function declaration }
@@ -2225,7 +2231,7 @@ begin
       FMetaData.Add(Format('ENTRY_POINT ''%s'' MODULE_NAME ''%s''%s%s%s',
         [qryFunctions.FieldByName('RDB$ENTRYPOINT').AsString,
          qryFunctions.FieldByName('RDB$MODULE_NAME').AsString,
-         Term, NEWLINE, NEWLINE]));
+         Term, LineEnding, LineEnding]));
 
       qryFunctions.Next;
     end;
@@ -2363,9 +2369,9 @@ begin
       if First then
       begin
         if ObjectName = '' then
-          FMetaData.Add(NEWLINE + '/*  Index definitions for all user tables */' + NEWLINE)
+          FMetaData.Add(LineEnding + '/*  Index definitions for all user tables */' + LineEnding)
         else
-          FMetaData.Add(NEWLINE + '/*  Index definitions for ' + ObjectName + ' */' + NEWLINE);
+          FMetaData.Add(LineEnding + '/*  Index definitions for ' + ObjectName + ' */' + LineEnding);
         First := false;
       end; //end_if
 
@@ -2449,8 +2455,8 @@ begin
     while not qryView.Eof do
     begin
       SList.Add(Format('%s/* View: %s, Owner: %s */%s',
-         [NEWLINE, qryView.FieldByName('RDB$RELATION_NAME').AsString,
-          qryView.FieldByName('RDB$OWNER_NAME').AsString, NEWLINE]));
+         [LineEnding, qryView.FieldByName('RDB$RELATION_NAME').AsString,
+          qryView.FieldByName('RDB$OWNER_NAME').AsString, LineEnding]));
 
       SList.Add(Format('CREATE VIEW %s (', [QuoteIdentifier(FDatabase.SQLDialect,
         qryView.FieldByName('RDB$RELATION_NAME').AsString)]));
@@ -2467,10 +2473,10 @@ begin
           SList.Strings[SList.Count - 1] := SList.Strings[SList.Count - 1] + ', ';
       end;
       qryColumns.Close;
-      SList.Text := SList.Text + Format(') AS%s', [NEWLINE]);
+      SList.Text := SList.Text + Format(') AS%s', [LineEnding]);
       if not qryView.FieldByName('RDB$VIEW_SOURCE').IsNull then
         SList.Text := SList.Text + qryView.FieldByName('RDB$VIEW_SOURCE').AsString;
-      SList.Text := SList.Text + Format('%s%s', [Term, NEWLINE]);
+      SList.Text := SList.Text + Format('%s%s', [Term, LineEnding]);
       FMetaData.AddStrings(SList);
       SList.Clear;
       qryView.Next;
@@ -2499,7 +2505,7 @@ begin
     Used := true;
   end
   else
-    Result := Format(', %s      ', [NEWLINE]);
+    Result := Format(', %s      ', [LineEnding]);
 end;
 
 {
@@ -2596,7 +2602,12 @@ begin
         if etCheck in ExtractTypes then
           ListCheck(ObjectName, etTable);
         if etTrigger in ExtractTypes then
-          ListTriggers(false,true,ObjectName, etTable);
+        begin
+          if etGrant in ExtractTypes then
+            ListTriggers(ObjectName, [etTable,etGrant])
+          else
+            ListTriggers(ObjectName, [etTable]);
+        end;
         if etGrant in ExtractTypes then
           ShowGrants(ObjectName, Term);
         if etData in ExtractTypes then
@@ -2611,10 +2622,22 @@ begin
        if ObjectName <> '' then
        begin
          if etTrigger in ExtractTypes then
-           ListTriggers(false,true,ObjectName, etTable);
+         begin
+           if etGrant in ExtractTypes then
+             ListTriggers(ObjectName, [etTable,etGrant])
+           else
+             ListTriggers(ObjectName, [etTable]);
+         end;
+         if etGrant in ExtractTypes then
+           ShowGrants(ObjectName, Term);
        end;
      end;
-    eoProcedure : ListProcs(pdBoth,ObjectName);
+    eoProcedure :
+     begin
+       ListProcs(pdCreateProc,ObjectName,etGrant in ExtractTypes);
+       if (ObjectName <> '' ) and (etGrant in ExtractTypes) then
+         ShowGrants(ObjectName, Term);
+     end;
     eoFunction : ListFunctions(ObjectName);
     eoGenerator : ListGenerators(ObjectName);
     eoException : ListException(ObjectName);
@@ -2622,9 +2645,17 @@ begin
     eoRole : ListRoles(ObjectName);
     eoTrigger : 
       if etTable in ExtractTypes then
-        ListTriggers(false,true,ObjectName, etTable)
+      begin
+        if etGrant in ExtractTypes then
+          ListTriggers(ObjectName, [etTable,etGrant])
+        else
+          ListTriggers(ObjectName, [etTable])
+      end
       else
-        ListTriggers(false,true,ObjectName);
+      if etGrant in ExtractTypes then
+        ListTriggers(ObjectName,[etTrigger,etGrant])
+      else
+        ListTriggers(ObjectName);
     eoForeign :
       if etTable in ExtractTypes then
         ListForeign(ObjectName, etTable)
@@ -2802,6 +2833,82 @@ begin
   end;
 end;
 
+procedure TIBExtract.ShowGrantsTo(MetaObject: String; ObjectType: integer; Terminator: String);
+const
+  GrantsSQL =
+  'Select Trim(RDB$USER) as RDB$USER,List("Privileges") as Privileges, '+
+  'coalesce(RDB$GRANT_OPTION,0) as RDB$GRANT_OPTION,METAOBJECTNAME, '+
+  'RDB$USER_TYPE, RDB$OBJECT_TYPE, '+
+  'case  RDB$OBJECT_TYPE '+
+  'When 0 then ''TABLE'' '+
+  'When 5 then ''PROCEDURE'' '+
+  'When 7 then ''EXCEPTION'' '+
+  'When 11 then ''CHARACTER SET'' '+
+  'ELSE NULL END as OBJECT_TYPE_NAME, '+
+  'case RDB$USER_TYPE '+
+  'When 5 then ''PROCEDURE'' '+
+  'When 2 then ''TRIGGER'' '+
+  'When 8 then ''USER'' '+
+  'When 13 then ''ROLE'' '+
+  'ELSE NULL END as USER_TYPE_NAME, '+
+  'case '+
+  'When coalesce(RDB$GRANT_OPTION,0) <> 0 and RDB$USER_TYPE = 13 then '' WITH ADMIN OPTION'' '+
+  'When coalesce(RDB$GRANT_OPTION,0) <> 0 and RDB$USER_TYPE <> 13 then '' WITH GRANT OPTION'' '+
+  'ELSE '''' End as GRANTOPTION '+
+  'From (  '+
+  'Select PR.RDB$USER,PR.RDB$RELATION_NAME as METAOBJECTNAME, LIST(DISTINCT Trim(Case PR.RDB$PRIVILEGE  '+
+  'When ''X'' then ''EXECUTE''  '+
+  'When ''S'' then ''SELECT''  '+
+  'When ''U'' then ''UPDATE''   '+
+  'When ''D'' then ''DELETE''  '+
+  'When ''R'' then ''REFERENCES''  '+
+  'When ''G'' then ''USAGE''  '+
+  'When ''I'' then ''INSERT'' end )) as "Privileges",  '+
+  'PR.RDB$GRANT_OPTION,  PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE  '+
+  'FROM RDB$USER_PRIVILEGES PR  '+
+  'Where PR.RDB$PRIVILEGE <> ''M'' and (PR.RDB$PRIVILEGE <> ''U'' or PR.RDB$FIELD_NAME is null)  '+
+  'Group By PR.RDB$USER,PR.RDB$RELATION_NAME,PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE  '+
+  'UNION  '+
+  'Select PR.RDB$USER,PR.RDB$RELATION_NAME, ''Update('' || List(Trim(PR.RDB$FIELD_NAME)) || '')'',  '+
+  'PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE   '+
+  'FROM RDB$USER_PRIVILEGES PR  '+
+  'Where PR.RDB$PRIVILEGE = ''U'' and PR.RDB$FIELD_NAME is not null   '+
+  'Group By PR.RDB$USER,PR.RDB$RELATION_NAME,PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE)  '+
+  'Where RDB$USER = :METAOBJECTNAME and RDB$USER_TYPE = :USERTYPE '+
+  'Group By RDB$USER,RDB$GRANT_OPTION,  RDB$USER_TYPE, RDB$OBJECT_TYPE, METAOBJECTNAME '+
+  'ORDER BY METAOBJECTNAME';
+
+var qryOwnerPriv : TIBSQL;
+
+begin
+  if MetaObject = '' then
+    exit;
+
+  qryOwnerPriv := TIBSQL.Create(FDatabase);
+  try
+    qryOwnerPriv.SQL.Text := GrantsSQL;
+    qryOwnerPriv.Params.ByName('METAOBJECTNAME').AsString := MetaObject;
+    qryOwnerPriv.Params.ByName('USERTYPE').AsInteger := ObjectType;
+    qryOwnerPriv.ExecQuery;
+    while not qryOwnerPriv.Eof do
+    begin
+      FMetaData.Add(Format('GRANT %s ON %s "%s" TO %s "%s" %s%s', [
+                            qryOwnerPriv.FieldByName('Privileges').AsString,
+                            qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
+                            qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString,
+                            qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString,
+                            qryOwnerPriv.FieldByName('RDB$USER').AsString,
+                            qryOwnerPriv.FieldByName('GRANTOPTION').AsString,
+                            Terminator]));
+      qryOwnerPriv.Next;
+    end;
+    qryOwnerPriv.Close;
+  finally
+    qryOwnerPriv.Free;
+  end;
+  FMetaData.Add('');
+end;
+
 {	  ShowGrantRoles
   Functional description
    	Show grants for given role name
@@ -2839,7 +2946,7 @@ begin
         WithOption := '';
       FMetaData.Add(Format('GRANT %s TO %s%s%s%s',
         [ QuoteIdentifier(FDatabase.SQLDialect, qryRole.FieldByName('RDB$RELATION_NAME').AsString),
-         UserString, WithOption, Terminator, NEWLINE]));
+         UserString, WithOption, Terminator, LineEnding]));
 
       qryRole.Next;
     end;
@@ -2982,7 +3089,7 @@ begin
       if FirstTime then
       begin
         FirstTime := false;
-        FMetaData.Add('RETURNS' + NEWLINE + '(');
+        FMetaData.Add('RETURNS' + LineEnding + '(');
       end;
 
       Line := FormatParamStr;
