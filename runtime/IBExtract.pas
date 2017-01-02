@@ -458,6 +458,7 @@ begin
   qryGenerators := TIBSQL.Create(FDatabase);
   try
     qryTables.SQL.Add(TableListSQL);
+    RelationName := trim(RelationName);
     qryTables.Params.ByName('RelationName').AsString := RelationName;
     qryTables.ExecQuery;
     qryPrecision.SQL.Add(PrecisionSQL);
@@ -510,7 +511,7 @@ begin
           (qryTables.FieldByName('RDB$FIELD_NAME1').AsString[5] in ['0'..'9'])) and
           (qryTables.FieldByName('RDB$SYSTEM_FLAG').AsInteger <> 1) then
         begin
-          Column := Column + QuoteIdentifier(FDatabase.SQLDialect, qryTables.FieldByName('RDB$FIELD_NAME1').AsString);
+          Column := Column + QuoteIdentifier(FDatabase.SQLDialect, trim(qryTables.FieldByName('RDB$FIELD_NAME1').AsString));
           { International character sets }
           if (qryTables.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying])
               and (not qryTables.FieldByName('RDB$COLLATION_ID').IsNull)
@@ -1450,7 +1451,7 @@ begin
 
     if not qryDB.EOF then
       Buffer := Format(' DEFAULT CHARACTER SET %s',
-        [qryDB.FieldByName('RDB$CHARACTER_SET_NAME').AsString]);
+        [trim(qryDB.FieldByName('RDB$CHARACTER_SET_NAME').AsString)]);
     if NoDB then
       Buffer := Buffer + Term + ' */'
     else
@@ -3149,7 +3150,7 @@ begin
       ExecQuery;
       while not EOF do
       begin
-        ListData(FieldByName('RDB$RELATION_NAME').AsString);
+        ListData(Trim(FieldByName('RDB$RELATION_NAME').AsString));
         Next;
       end;
     finally

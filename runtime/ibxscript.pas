@@ -200,7 +200,6 @@ type
     function AnalyseXML(SymbolStream: TSymbolStream): string;
     procedure NextStatement;
     class function FormatBlob(Field: ISQLData): string;
-    class function FormatOctets(Field: ISQLData): string;
     class function FormatArray(ar: IArray): string;
     property OctetString[index: integer]: rawbytestring read GetOctetString;
     property OctetStringCount: integer read GetOctetStringCount;
@@ -367,6 +366,10 @@ type
     function RunScript(SQLLines: TStrings; aAutoDDL: boolean): boolean; overload;
   end;
 
+function StringToHex(octetString: string): string; overload;
+procedure StringToHex(octetString: string; TextOut: TStrings); overload;
+
+
 resourcestring
   sInvalidSetStatement = 'Invalid %s Statement - %s';
 
@@ -398,6 +401,40 @@ resourcestring
   sArrayIndexError = 'Array Index Error (%d)';
   sBlobIndexError = 'Blob Index Error (%d)';
   sOctetsIndexError = 'Octetstring Index Error (%d)';
+
+function StringToHex(octetString: string): string; overload;
+
+  function ToHex(aValue: byte): string;
+  const
+    HexChars: array [0..15] of char = '0123456789ABCDEF';
+  begin
+    Result := HexChars[aValue shr 4] +
+               HexChars[(aValue and $0F)];
+  end;
+
+var i, j: integer;
+begin
+  i := 1;
+  Result := '';
+  while i < Length(octetString) do
+  begin
+    for j := 1 to 40 do
+    begin
+      if i > Length(octetString) then
+        break
+      else
+        Result += ToHex(byte(octetString[i]));
+      inc(i);
+    end;
+  end;
+end;
+
+procedure StringToHex(octetString: string; TextOut: TStrings); overload;
+begin
+    TextOut.Add(StringToHex(octetString));
+end;
+
+
 
 { TIBXScript }
 
@@ -1448,36 +1485,6 @@ begin
   end;
 end;
 
-procedure HexBlock(octetString: string;
-  TextOut: TStrings);
-
-  function ToHex(aValue: byte): string;
-  const
-    HexChars: array [0..15] of char = '0123456789ABCDEF';
-  begin
-    Result := HexChars[aValue shr 4] +
-               HexChars[(aValue and $0F)];
-  end;
-
-var i, j: integer;
-    s: string;
-begin
-  i := 1;
-  while i < Length(octetString) do
-  begin
-    s := '';
-    for j := 1 to 40 do
-    begin
-      if i > Length(octetString) then
-        break
-      else
-        s += ToHex(byte(octetString[i]));
-      inc(i);
-    end;
-    TextOut.Add(s);
-  end;
-end;
-
 constructor TIBXMLProcessor.Create;
 begin
   inherited Create;
@@ -1695,22 +1702,8 @@ begin
   TextOut := TStringList.Create;
   try
     TextOut.Add(Format('<blob subtype="%d">',[Field.getSubtype]));
-    HexBlock(Field.AsString,TextOut);
+    StringToHex(Field.AsString,TextOut);
     TextOut.Add('</blob>');
-    Result := TextOut.Text;
-  finally
-    TextOut.Free;
-  end;
-end;
-
-class function TIBXMLProcessor.FormatOctets(Field: ISQLData): string;
-var TextOut: TStrings;
-begin
-  TextOut := TStringList.Create;
-  try
-    TextOut.Add(Format('<octets>',[Field.getSubtype]));
-    HexBlock(Field.AsString,TextOut);
-    TextOut.Add('</octets>');
     Result := TextOut.Text;
   finally
     TextOut.Free;

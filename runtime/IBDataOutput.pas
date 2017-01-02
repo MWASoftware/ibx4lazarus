@@ -313,7 +313,7 @@ begin
        ((MetaData[i].SQLTYPE <> SQL_BLOB) and (MetaData[i].SQLType <> SQL_ARRAY)) then
     begin
       if j <> 0 then FInsertHeader += ',';
-      FInsertHeader += QuoteIdentifierIfNeeded(Database.SQLDialect,MetaData[i].getAliasName);
+      FInsertHeader += QuoteIdentifierIfNeeded(Database.SQLDialect,Trim(MetaData[i].getAliasName));
       Inc(j);
     end;
   end;
@@ -345,7 +345,7 @@ begin
         if Current[i].SQLSubType = 1 then
         begin
           if Current[i].getCharSetID = 1 {octets} then
-            s += TIBXMLProcessor.FormatOctets(Current[i])
+            s += Format('x''%s''',[StringToHex(Current[i].AsString)])
           else
             s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar
         end
@@ -363,7 +363,7 @@ begin
 
       SQL_TEXT, SQL_VARYING:
         if Current[i].getCharSetID = 1 {octets} then
-          s += TIBXMLProcessor.FormatOctets(Current[i])
+          s += Format('x''%s''',[StringToHex(Current[i].AsString)])
         else
           s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar;
 
