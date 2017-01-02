@@ -36,7 +36,6 @@ uses Classes, IBDatabase,  IBSQL, IB, IBDataOutput;
 const
   ibx_blob = 'IBX_BLOB';
   ibx_array = 'IBX_ARRAY';
-  ibx_octets = 'IBX_OCTETS';
 
   {Non-character symbols}
   sqNone         = #0;
@@ -63,7 +62,7 @@ type
   TXMLStates =  (stInTag,stAttribute,stAttributeValue,stQuotedAttributeValue,
                  stTagged,stEndTag);
 
-  TXMLTag    =   (xtNone,xtBlob,xtOctets,xtArray,xtElt);
+  TXMLTag    =   (xtNone,xtBlob,xtArray,xtElt);
 
   TOnNextLine = procedure(Sender: TObject; Line: string) of object;
   TOnProgressEvent = procedure (Sender: TObject; Reset: boolean; value: integer) of object;
@@ -74,9 +73,8 @@ type
   end;
 
 const
-  XMLTagDefs: array [0..3] of TXMLTagDef = (
+  XMLTagDefs: array [0..2] of TXMLTagDef = (
     (XMLTag: xtBlob;   TagValue: 'blob'),
-    (XMLTag: xtOctets; TagValue: 'octets'),
     (XMLTag: xtArray;  TagValue: 'array'),
     (XMLTag: xtElt;    TagValue: 'elt')
     );
@@ -179,8 +177,6 @@ type
     FCurrentBlob: integer;
     FArrayData: array of TArrayData;
     FCurrentArray: integer;
-    FOctetString: array of rawbytestring;
-    FCurrentOctets: integer;
     FBlobBuffer: PChar;
     procedure EndXMLTag(xmltag: TXMLTag);
     procedure EnterTag;
@@ -188,8 +184,6 @@ type
     function GetArrayDataCount: integer;
     function GetBlobData(index: integer): TBlobData;
     function GetBlobDataCount: integer;
-    function GetOctetString(index: integer): rawbytestring;
-    function GetOctetStringCount: integer;
     procedure ProcessTagValue(tagValue: string);
     procedure StartXMLTag(xmltag: TXMLTag);
     procedure ProcessAttributeValue(attrValue: string);
@@ -201,8 +195,6 @@ type
     procedure NextStatement;
     class function FormatBlob(Field: ISQLData): string;
     class function FormatArray(ar: IArray): string;
-    property OctetString[index: integer]: rawbytestring read GetOctetString;
-    property OctetStringCount: integer read GetOctetStringCount;
     property BlobData[index: integer]: TBlobData read GetBlobData;
     property BlobDataCount: integer read GetBlobDataCount;
     property ArrayData[index: integer]: TArrayData read GetArrayData;
@@ -348,7 +340,7 @@ type
   * OnSelectSQL: handler for select SQL statements. If not present, select SQL
     statements result in an exception.
 
-  The PerformUpdate function is used to execute an SQL Script and may be called
+  The RunScript function is used to execute an SQL Script and may be called
   multiple times.
   }
 
@@ -400,7 +392,6 @@ resourcestring
   sOnLineError = 'On Line %d Character %d: ';
   sArrayIndexError = 'Array Index Error (%d)';
   sBlobIndexError = 'Blob Index Error (%d)';
-  sOctetsIndexError = 'Octetstring Index Error (%d)';
 
 function StringToHex(octetString: string): string; overload;
 
@@ -606,13 +597,6 @@ procedure TCustomIBXScript.SetParamValue(SQLVar: ISQLParam);
 var BlobID: TISC_QUAD;
     ix: integer;
 begin
-  if ((SQLVar.SQLType = SQL_VARYING) or (SQLVar.SQLType = SQL_TEXT)) and
-    (Pos(ibx_octets,SQLVar.Name) = 1) then
-  begin
-    ix := StrToInt(system.copy(SQLVar.Name,length(ibx_octets)+1,length(SQLVar.Name)-length(ibx_octets)));
-    SQLVar.AsString := FIBXMLProcessor.OctetString[ix];
-  end
-  else
   if (SQLVar.SQLType = SQL_BLOB) and (Pos(ibx_blob,SQLVar.Name) = 1) then
   begin
     ix := StrToInt(system.copy(SQLVar.Name,length(ibx_blob)+1,length(SQLVar.Name)-length(ibx_blob)));
@@ -1256,18 +1240,6 @@ begin
   Result := Length(FBlobData);
 end;
 
-function TIBXMLProcessor.GetOctetString(index: integer): rawbytestring;
-begin
-  if (index < 0) or (index > OctetStringCount) then
-    FSymbolStream.ShowError(sOctetsIndexError,[index]);
-  Result := FOctetString[index];
-end;
-
-function TIBXMLProcessor.GetOctetStringCount: integer;
-begin
-  Result := Length(FOctetString);
-end;
-
 procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
 
   function nibble(hex: char): byte;
@@ -1311,25 +1283,6 @@ procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
     end;
   end;
 
-  procedure AddOctets(hexData: string);
-  var i,j : integer;
-      blength: integer;
-      curLength: integer;
-  begin
-    RemoveWhiteSpace(hexData);
-    if odd(length(hexData)) then
-      FSymbolStream.ShowError(sBinaryBlockMustbeEven,[nil]);
-    blength := Length(hexData) div 2;
-    curLength := Length(FOctetString[FCurrentOctets]);
-    SetLength(FOctetString[FCurrentOctets],curLength + blength);
-    j := 1;
-    for i := curLength + 1 to curLength + blength do
-    begin
-      FOctetString[FCurrentOctets][i] := char((nibble(hexData[j]) shl 4) or nibble(hexdata[j+1]));
-      Inc(j,2);
-    end;
-  end;
-
   procedure WriteToBlob(hexData: string);
   var i,j : integer;
       blength: integer;
@@ -1354,9 +1307,6 @@ procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
 begin
   if tagValue = '' then Exit;
   case FXMLTagStack[FXMLTagIndex] of
-  xtOctets:
-    AddOctets(tagValue);
-
   xtBlob:
     WriteToBlob(tagValue);
 
@@ -1374,13 +1324,6 @@ begin
   Inc(FXMLTagIndex);
   FXMLTagStack[FXMLTagIndex] := xmltag;
   case xmltag of
-  xtOctets:
-    begin
-      Inc(FCurrentOctets);
-      SetLength(FOctetString, FCurrentOctets+1);
-      FOctetString[FCurrentOctets] := '';
-    end;
-
   xtBlob:
     begin
       Inc(FCurrentBlob);
@@ -1580,11 +1523,6 @@ begin
                 Result := ':' + Format(ibx_array+'%d',[FCurrentArray]);
                 Done := true;
               end;
-            xtOctets:
-            begin
-              Result := ':' + Format(ibx_octets+'%d',[FCurrentOctets]);
-              Done := true;
-            end;
             else
               FState := stTagged;
           end;
@@ -1692,8 +1630,6 @@ begin
   FCurrentBlob := -1;
   SetLength(FArrayData,0);
   FCurrentArray := -1;
-  SetLength(FOctetString,0);
-  FCurrentOctets := -1;
 end;
 
 class function TIBXMLProcessor.FormatBlob(Field: ISQLData): string;
