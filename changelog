@@ -1,6 +1,6 @@
 IBX Change Log  version      (2.0-1) Tue, 03 Jan 2017 11:44:59 +0000
 
-1. IBEvents: Fix uninitialised variable that culd result in lost events.
+1. IBEvents: Fix uninitialised variable that could result in lost events.
 
 2. IBExtract: Added support for FB3 "USAGE" privilege.
 

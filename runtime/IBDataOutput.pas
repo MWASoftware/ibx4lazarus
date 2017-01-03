@@ -15,7 +15,7 @@
  *
  *  The Initial Developer of the Original Code is Tony Whyman.
  *
- *  The Original Code is (C) 2011 Tony Whyman, MWA Software
+ *  The Original Code is (C) 2017 Tony Whyman, MWA Software
  *  (http://www.mwasoftware.co.uk).
  *
  *  All Rights Reserved.
@@ -26,6 +26,7 @@
 unit IBDataOutput;
 
 {$mode objfpc}{$H+}
+{$codepage UTF8}
 
 interface
 

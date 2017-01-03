@@ -15,7 +15,7 @@
  *
  *  The Initial Developer of the Original Code is Tony Whyman.
  *
- *  The Original Code is (C) 2014 Tony Whyman, MWA Software
+ *  The Original Code is (C) 2014-2017 Tony Whyman, MWA Software
  *  (http://www.mwasoftware.co.uk).
  *
  *  All Rights Reserved.
@@ -274,7 +274,7 @@ type
     procedure EchoNextLine(Sender: TObject; Line: string);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function ProcessStatement(stmt: string): boolean; virtual;
-    procedure ProcessStream;
+    function ProcessStream: boolean;
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -361,6 +361,7 @@ type
     function RunScript(SQLFile: string): boolean; overload;
     function RunScript(SQLStream: TStream): boolean; overload;
     function RunScript(SQLLines: TStrings): boolean; overload;
+    function ExecSQLScript(sql: string): boolean;
   end;
 
 function StringToHex(octetString: string; MaxLineLength: integer=0): string; overload;
@@ -465,19 +466,32 @@ end;
 function TIBXScript.RunScript(SQLFile: string): boolean;
 begin
   TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLFile);
-  ProcessStream;
+  Result := ProcessStream;
 end;
 
 function TIBXScript.RunScript(SQLStream: TStream): boolean;
 begin
   TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLStream);
-  ProcessStream;
+  Result := ProcessStream;
 end;
 
 function TIBXScript.RunScript(SQLLines: TStrings): boolean;
 begin
   TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLLines);
-  ProcessStream;
+  Result := ProcessStream;
+end;
+
+function TIBXScript.ExecSQLScript(sql: string): boolean;
+var s: TStringList;
+begin
+  s := TStringList.Create;
+  try
+    s.Text := sql;
+    TBatchSymbolStream(FSymbolStream).SetStreamSource(s);
+    Result := ProcessStream;
+  finally
+    s.Free;
+  end;
 end;
 
 { TCustomIBXScript }
@@ -533,10 +547,7 @@ begin
      if assigned(OnSelectSQL) then
        OnSelectSQL(self,stmt)
      else
-     if assigned(DataOutputFormatter) then
-       DefaultSelectSQLHandler(stmt)
-     else
-       FSymbolStream.ShowError(sNoSelectSQL,[nil]);
+       DefaultSelectSQLHandler(stmt);
    end
    else
    begin
@@ -650,9 +661,10 @@ begin
     DataOutputFormatter.ShowPerformanceStats := AValue;
 end;
 
-procedure TCustomIBXScript.ProcessStream;
+function TCustomIBXScript.ProcessStream: boolean;
 var stmt: string;
 begin
+  Result := false;
   while FIBSQLProcessor.GetNextStatement(FSymbolStream,stmt) do
   try
 //    writeln('stmt = ',stmt);
@@ -666,6 +678,7 @@ begin
         if StopOnFirstError then Exit;
       end
   end;
+  Result := true;
 end;
 
 function TCustomIBXScript.ProcessStatement(stmt: string): boolean;
@@ -950,6 +963,8 @@ procedure TCustomIBXScript.DefaultSelectSQLHandler(aSQLText: string);
 begin
   if assigned(DataOutputFormatter) then
     DataOutputFormatter.DataOut(aSQLText,@Add2Log)
+  else
+    FSymbolStream.ShowError(sNoSelectSQL,[nil]);
 end;
 
 { TIBSQLProcessor }

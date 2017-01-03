@@ -52,7 +52,6 @@ type
     FIBXScript: TIBXScript;
     FISQLProcessor: TInteractiveSQLProcessor;
     FExtract: TIBExtract;
-    FSQL: TStringStream;
     FOutputFile: TStream;
     FDataOutputFormatter: TDataOutputFormatter;
     procedure LogHandler(Sender: TObject; Msg: string);
@@ -63,11 +62,14 @@ type
     procedure ShowException(E: Exception); override;
   public
     constructor Create(TheOwner: TComponent); override;
-    destructor Destroy; override;
     procedure WriteHelp; virtual;
   end;
 
   { TInteractiveSQLProcessor }
+
+  {This is a TCustomIBXScript descendent that uses the console for input/output.
+   It additionally suported QUIT/EXIT Commands. The log file can either be redirected
+   to the console or sent to a separate file.}
 
   TInteractiveSQLProcessor = class(TCustomIBXScript)
   private
@@ -216,6 +218,7 @@ var
   ExtractTypes: TExtractTypes;
   Opts,NonOpts: TStrings;
   OutputFormat: string;
+  SQLStatement: string;
 begin
   writeln(stderr,'fbsql: an SQL interpreter for Firebird');
   writeln(stderr,'Built using IBX ' + IBX_VERSION);
@@ -253,6 +256,7 @@ begin
   DoExtract := false;
   ExtractTypes := [];
   FDataOutputFormatter := TIBBlockFormatOut;
+  SQLStatement := '';
 
   {Initialise user_name and password from environment if available}
 
@@ -264,16 +268,14 @@ begin
 
   {Process Command line options}
 
-  if HasOption('u','user') then
-    FIBDatabase.Params.Add('user_name=' + GetOptionValue('u','user'));
+  if HasOption('a') then
+    DoExtract := true;
 
-  if HasOption('p','pass') then
-    FIBDatabase.Params.Add('password=' + GetOptionValue('p','pass'));
-
-  FIBDatabase.LoginPrompt := FIBDatabase.Params.Values['password'] = '';
-
-  if HasOption('r','role') then
-    FIBDatabase.Params.Add('sql_role_name=' + GetOptionValue('r','role'));
+  if HasOption('A') then
+  begin
+    DoExtract := true;
+    ExtractTypes := [etData];
+  end;
 
   if not HasOption('b') then
   begin
@@ -284,14 +286,25 @@ begin
   if not HasOption('e') then
     FIBXScript.Echo := false;
 
-  if HasOption('a') then
-    DoExtract := true;
+  if HasOption('i') then
+    SQLFileName := GetOptionValue('i');
 
-  if HasOption('A') then
+  if HasOption('o') then
   begin
-    DoExtract := true;
-    ExtractTypes := [etData];
+    OutputFileName := GetOptionValue('o');
+    FISQLProcessor.UseLogFile := true;
   end;
+
+  if HasOption('p','pass') then
+    FIBDatabase.Params.Add('password=' + GetOptionValue('p','pass'));
+
+  FIBDatabase.LoginPrompt := FIBDatabase.Params.Values['password'] = '';
+
+  if HasOption('r','role') then
+    FIBDatabase.Params.Add('sql_role_name=' + GetOptionValue('r','role'));
+
+  if HasOption('s') then
+    SQLStatement := GetOptionValue('s');
 
   if HasOption('t') then
   begin
@@ -308,34 +321,22 @@ begin
       raise Exception.CreateFmt('Unrecognised data output format "%s"',[OutputFormat]);
   end;
 
-  if HasOption('i') then
-    SQLFileName := GetOptionValue('i');
-
-  if HasOption('o') then
-  begin
-    OutputFileName := GetOptionValue('o');
-    FISQLProcessor.UseLogFile := true;
-  end;
-
-  if HasOption('s') then
-  begin
-    FSQL.WriteString(GetOptionValue('s'));
-    FSQL.Position := 0;
-  end;
+  if HasOption('u','user') then
+    FIBDatabase.Params.Add('user_name=' + GetOptionValue('u','user'));
 
   {Validation}
 
   if not DoExtract then
   begin
-    if (FSQL.DataString <> '') and (SQLFileName <> '') then
+    if (SQLStatement <> '') and (SQLFileName <> '') then
        raise Exception.Create('An SQL Script File and text cannot be simultaneously requested');
 
-    if (FSQL.DataString = '') and (SQLFileName <> '')  and not FileExists(SQLFileName) then
+    if (SQLStatement = '') and (SQLFileName <> '')  and not FileExists(SQLFileName) then
       raise Exception.CreateFmt('SQL File "%s" not found!',[SQLFileName]);
 
   end;
 
-  if DoExtract and ((SQLFileName <> '') or (FSQL.DataString <> '')) then
+  if DoExtract and ((SQLFileName <> '') or (SQLStatement <> '')) then
     raise Exception.Create('Extract and script execution cannot be simulateously requested');
 
   {This is where it all happens}
@@ -361,8 +362,8 @@ begin
     if SQLFileName <> '' then
       FIBXScript.RunScript(SQLFileName)
     else
-    if FSQL.DataString <> '' then
-      FIBXScript.RunScript(FSQL)
+    if SQLStatement <> '' then
+      FIBXScript.ExecSQLScript(SQLStatement)
     else
       FISQLProcessor.Run;
   finally
@@ -385,7 +386,6 @@ constructor TFBSQL.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
   StopOnException:=True;
-  FSQL := TStringStream.Create('');
 
   { Create Components }
   FIBDatabase := TIBDatabase.Create(self);
@@ -410,12 +410,6 @@ begin
   FIBTransaction.Params.Add('wait');
   FIBDatabase.Params.Add('lc_ctype=UTF8');
 
-end;
-
-destructor TFBSQL.Destroy;
-begin
-  if assigned(FSQL) then FSQL.Free;
-  inherited Destroy;
 end;
 
 procedure TFBSQL.WriteHelp;
