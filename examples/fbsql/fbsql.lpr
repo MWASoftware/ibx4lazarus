@@ -34,9 +34,13 @@ uses
   Classes, SysUtils, CustApp
   { you can add units after this }
   ,IBDatabase, ibxscript, IBExtract, DB, IBVersion,
-  IBDataOutput;
+  IBDataOutput, RegExpr
+  {$IFDEF UNIX} ,TermIO, IOStream {$ENDIF}
+  {$IFDEF WINDOWS} ,Windows {$ENDIF}
+  ;
 
 type
+  TInteractiveSQLProcessor = class;
 
   { TFBSQL }
 
@@ -45,12 +49,14 @@ type
     FIBDatabase: TIBDatabase;
     FIBTransaction: TIBTransaction;
     FIBXScript: TIBXScript;
+    FISQLProcessor: TInteractiveSQLProcessor;
     FExtract: TIBExtract;
     FSQL: TStringStream;
     FOutputFile: TStream;
     FDataOutputFormatter: TDataOutputFormatter;
     procedure LogHandler(Sender: TObject; Msg: string);
     procedure ErrorLogHandler(Sender: TObject; Msg: string);
+    procedure loginPrompt(Database: TIBDatabase; LoginParams: TStrings);
   protected
     procedure DoRun; override;
     procedure ShowException(E: Exception); override;
@@ -59,6 +65,121 @@ type
     destructor Destroy; override;
     procedure WriteHelp; virtual;
   end;
+
+  { TInteractiveSQLProcessor }
+
+  TInteractiveSQLProcessor = class(TCustomIBXScript)
+  private
+    FUseLogFile: boolean;
+  protected
+    procedure Add2Log(const Msg: string; IsError: boolean=true); override;
+    function ProcessStatement(stmt: string): boolean; override;
+  public
+    constructor Create(aOwner: TComponent); override;
+    procedure Run;
+    property UseLogFile: boolean read FUseLogFile write FUseLogFile;
+  end;
+
+{$IFDEF UNIX}
+function getpassword: string;
+var oldattr, newattr: termios;
+    stdinStream: TIOStream;
+    c: char;
+begin
+  Result := '';
+  stdinStream := TIOStream.Create(iosInput);
+  try
+    TCGetAttr(stdinStream.Handle, oldattr);
+    newattr := oldattr;
+    newattr.c_lflag := newattr.c_lflag and not (ICANON or ECHO);
+    tcsetattr( stdinStream.Handle, TCSANOW, newattr );
+    try
+      repeat
+        read(c);
+        if (c = #10) or (c = #13) then break;
+        write('*');
+        Result += c;
+      until false;
+      writeln;
+    finally
+      tcsetattr( stdinStream.Handle, TCSANOW, oldattr );
+    end;
+  finally
+    stdinStream.Free;
+  end;
+end;
+{$ENDIF}
+{$IFDEF WINDOWS}
+function getpassword: string;
+var oldmode, newmode: integer;
+    c: char;
+begin
+  Result := '';
+  GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), oldmode);
+  newmode := oldmode - ENABLE_ECHO_INPUT;
+  SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),newmode);
+  try
+    repeat
+      read(c);
+      if (c = #10) or (c = #13) then break;
+      write('*');
+      Result += c;
+    until false;
+    writeln;
+  finally
+    SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),oldmode);
+  end
+end;
+{$ENDIF}
+
+{ TInteractiveSQLProcessor }
+
+procedure TInteractiveSQLProcessor.Add2Log(const Msg: string; IsError: boolean);
+begin
+  if UseLogFile then
+    inherited Add2Log(Msg,IsError)
+  else
+  if IsError then
+    writeln(stderr,msg)
+  else
+    writeln(msg);
+end;
+
+function TInteractiveSQLProcessor.ProcessStatement(stmt: string): boolean;
+var  RegexObj: TRegExpr;
+     Terminator: char;
+     ucStmt: string;
+begin
+  Result := inherited ProcessStatement(stmt);
+  if not Result then
+  begin
+    Terminator := FSymbolStream.Terminator;
+    ucStmt := AnsiUpperCase(stmt);
+    RegexObj := TRegExpr.Create;
+    try
+      RegexObj.Expression := '^ *(QUIT|EXIT) *(\' + Terminator + '|)';
+      if RegexObj.Exec(ucStmt) then
+      begin
+         TInteractiveSymbolStream(FSymbolStream).Terminated := true;
+         Result := true;
+      end;
+    finally
+      RegexObj.Free;
+    end;
+  end;
+end;
+
+constructor TInteractiveSQLProcessor.Create(aOwner: TComponent);
+begin
+  inherited Create(aOwner);
+  FSymbolStream := TInteractiveSymbolStream.Create;
+  FSymbolStream.OnNextLine := @EchoNextLine;
+end;
+
+procedure TInteractiveSQLProcessor.Run;
+begin
+  ProcessStream;
+end;
 
 { TFBSQL }
 
@@ -75,6 +196,15 @@ begin
   writeln(stderr, Msg);
 end;
 
+procedure TFBSQL.loginPrompt(Database: TIBDatabase; LoginParams: TStrings);
+var password: string;
+begin
+  write(LoginParams.Values['user_name'] + '''s Password:');
+  password := getpassword;
+  if password <> '' then
+    LoginParams.Values['password'] := password;
+end;
+
 procedure TFBSQL.DoRun;
 var
   ErrorMsg: String;
@@ -85,9 +215,9 @@ var
   ExtractTypes: TExtractTypes;
   Opts,NonOpts: TStrings;
 begin
-  writeln(stderr,'fbsql: a non-interactive SQL interpreter for Firebird');
+  writeln(stderr,'fbsql: an SQL interpreter for Firebird');
   writeln(stderr,'Built using IBX ' + IBX_VERSION);
-  writeln(stderr,'Copyright (c) MWA Software 2016');
+  writeln(stderr,'Copyright (c) MWA Software 2017');
 
   // quick check parameters
   Opts := TStringList.Create;
@@ -138,11 +268,16 @@ begin
   if HasOption('p','pass') then
     FIBDatabase.Params.Add('password=' + GetOptionValue('p','pass'));
 
+  FIBDatabase.LoginPrompt := FIBDatabase.Params.Values['password'] = '';
+
   if HasOption('r','role') then
     FIBDatabase.Params.Add('sql_role_name=' + GetOptionValue('r','role'));
 
   if not HasOption('b') then
+  begin
     FIBXScript.StopOnFirstError := false;
+    FISQLProcessor.StopOnFirstError := false;
+  end;
 
   if not HasOption('e') then
     FIBXScript.Echo := false;
@@ -163,7 +298,10 @@ begin
     SQLFileName := GetOptionValue('i');
 
   if HasOption('o') then
+  begin
     OutputFileName := GetOptionValue('o');
+    FISQLProcessor.UseLogFile := true;
+  end;
 
   if HasOption('s') then
   begin
@@ -175,13 +313,10 @@ begin
 
   if not DoExtract then
   begin
-    if (SQLFileName = '') and (FSQL.DataString = '') then
-      raise Exception.Create('An SQL File must be provided');
-
     if (FSQL.DataString <> '') and (SQLFileName <> '') then
        raise Exception.Create('An SQL Script File and text cannot be simultaneously requested');
 
-    if (FSQL.DataString = '') and not FileExists(SQLFileName) then
+    if (FSQL.DataString = '') and (SQLFileName <> '')  and not FileExists(SQLFileName) then
       raise Exception.CreateFmt('SQL File "%s" not found!',[SQLFileName]);
 
   end;
@@ -192,6 +327,7 @@ begin
   {This is where it all happens}
 
   FIBXScript.DataOutputFormatter := FDataOutputFormatter.Create(self);
+  FISQLProcessor.DataOutputFormatter := FDataOutputFormatter.Create(self);
 
   if OutputFileName <> '' then
     FOutputFile := TFileStream.Create(OutputFileName,fmCreate);
@@ -208,10 +344,13 @@ begin
         writeln(FExtract.Items[i]);
     end
     else
-    if FSQL.DataString = '' then
-      FIBXScript.RunScript(SQLFileName,true)
+    if SQLFileName <> '' then
+      FIBXScript.RunScript(SQLFileName)
     else
-      FIBXScript.RunScript(FSQL,true);
+    if FSQL.DataString <> '' then
+      FIBXScript.RunScript(FSQL)
+    else
+      FISQLProcessor.Run;
   finally
     FIBDatabase.Connected := false;
     if FOutputFile <> nil then
@@ -236,6 +375,7 @@ begin
 
   { Create Components }
   FIBDatabase := TIBDatabase.Create(self);
+  FIBDatabase.OnLogin := @loginPrompt;
   FIBTransaction := TIBTransaction.Create(self);
   FIBTransaction.DefaultDatabase := FIBDatabase;
   FIBXScript := TIBXScript.Create(self);
@@ -243,6 +383,11 @@ begin
   FIBXScript.Transaction := FIBTransaction;
   FIBXScript.OnOutputLog := @LogHandler;
   FIBXScript.OnErrorLog := @ErrorLogHandler;
+  FISQLProcessor := TInteractiveSQLProcessor.Create(self);
+  FISQLProcessor.Database := FIBDatabase;
+  FISQLProcessor.Transaction := FIBTransaction;
+  FISQLProcessor.OnOutputLog := @LogHandler;
+  FISQLProcessor.OnErrorLog := @ErrorLogHandler;
   FExtract := TIBExtract.Create(self);
   FExtract.Database := FIBDatabase;
   FExtract.Transaction := FIBTransaction;

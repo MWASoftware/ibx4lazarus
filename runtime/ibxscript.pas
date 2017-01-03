@@ -104,7 +104,7 @@ type
   public
     constructor Create;
     procedure ShowError(msg: string; params: array of const);
-    function GetSymbol: TSQLSymbol;
+    function GetSymbol: TSQLSymbol; virtual;
     procedure NextStatement;
     property SymbolValue: string read FString;
     property Terminator: char read FTerminator write FTerminator;
@@ -136,11 +136,14 @@ type
   private
     FPrompt: string;
     FContinuePrompt: string;
+    FTerminated: boolean;
   protected
     function GetErrorPrefix: string; override;
     function GetNextLine(var Line: string):boolean; override;
   public
     constructor Create(aPrompt: string='SQL>'; aContinue: string = 'CON>');
+    function GetSymbol: TSQLSymbol; override;
+    property Terminated: boolean read FTerminated write FTerminated;
   end;
 
   TBlobData = record
@@ -262,12 +265,13 @@ type
     procedure SetOnProgressEvent(AValue: TOnProgressEvent);
     procedure SetParamValue(SQLVar: ISQLParam);
     procedure SetShowPerformanceStats(AValue: boolean);
-    function ProcessStatement(stmt: string): boolean;
     procedure SetTransaction(AValue: TIBTransaction);
   protected
     FSymbolStream: TSymbolStream;
     procedure Add2Log(const Msg: string; IsError: boolean=true); virtual;
     procedure EchoNextLine(Sender: TObject; Line: string);
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function ProcessStatement(stmt: string): boolean; virtual;
     procedure ProcessStream;
   public
     constructor Create(aOwner: TComponent); override;
@@ -277,7 +281,7 @@ type
     property Database: TIBDatabase read FDatabase write SetDatabase;
     property DataOutputFormatter: TIBCustomDataOutput read FDataOutputFormatter
                                   write SetDataOutputFormatter;
-    property AutoDDL: boolean read FAutoDDL write FAutoDDL;
+    property AutoDDL: boolean read FAutoDDL write FAutoDDL default true;
     property Echo: boolean read FEcho write FEcho default true;  {Echo Input to Log}
     property IgnoreGrants: boolean read FIgnoreGrants write FIgnoreGrants;
     property Transaction: TIBTransaction read FTransaction write SetTransaction;
@@ -349,13 +353,12 @@ type
   TIBXScript = class(TCustomIBXScript)
   public
     constructor Create(aOwner: TComponent); override;
-    destructor Destroy; override;
     {use RunScript instead of PerformUpdate}
     function PerformUpdate(SQLFile: string; aAutoDDL: boolean): boolean; overload; deprecated;
     function PerformUpdate(SQLStream: TStream;   aAutoDDL: boolean): boolean; overload; deprecated;
-    function RunScript(SQLFile: string;  aAutoDDL: boolean): boolean; overload;
-    function RunScript(SQLStream: TStream;   aAutoDDL: boolean): boolean; overload;
-    function RunScript(SQLLines: TStrings; aAutoDDL: boolean): boolean; overload;
+    function RunScript(SQLFile: string): boolean; overload;
+    function RunScript(SQLStream: TStream): boolean; overload;
+    function RunScript(SQLLines: TStrings): boolean; overload;
   end;
 
 function StringToHex(octetString: string): string; overload;
@@ -436,41 +439,34 @@ begin
   FSymbolStream.OnNextLine := @EchoNextLine;
 end;
 
-destructor TIBXScript.Destroy;
-begin
-  if FSymbolStream <> nil then FSymbolStream.Free;
-  inherited Destroy;
-end;
-
 function TIBXScript.PerformUpdate(SQLFile: string; aAutoDDL: boolean): boolean;
 begin
-  Result := RunScript( SQLFile,aAutoDDL);
+  FAutoDDL := aAutoDDL;
+  Result := RunScript( SQLFile);
 end;
 
 function TIBXScript.PerformUpdate(SQLStream: TStream; aAutoDDL: boolean
   ): boolean;
 begin
-  Result := RunScript(SQLStream,aAutoDDL);
+  FAutoDDL := aAutoDDL;
+  Result := RunScript(SQLStream);
 end;
 
-function TIBXScript.RunScript(SQLFile: string; aAutoDDL: boolean): boolean;
+function TIBXScript.RunScript(SQLFile: string): boolean;
 begin
   TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLFile);
-  FAutoDDL := aAutoDDL;
   ProcessStream;
 end;
 
-function TIBXScript.RunScript(SQLStream: TStream; aAutoDDL: boolean): boolean;
+function TIBXScript.RunScript(SQLStream: TStream): boolean;
 begin
   TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLStream);
-  FAutoDDL := aAutoDDL;
   ProcessStream;
 end;
 
-function TIBXScript.RunScript(SQLLines: TStrings; aAutoDDL: boolean): boolean;
+function TIBXScript.RunScript(SQLLines: TStrings): boolean;
 begin
   TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLLines);
-  FAutoDDL := aAutoDDL;
   ProcessStream;
 end;
 
@@ -567,6 +563,18 @@ end;
 procedure TCustomIBXScript.EchoNextLine(Sender: TObject; Line: string);
 begin
   if Echo then Add2Log(Line);
+end;
+
+procedure TCustomIBXScript.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (AComponent = FDatabase) and (Operation = opRemove) then
+    FDatabase := nil;
+  if (AComponent = FTransaction) and (Operation = opRemove) then
+    FTransaction := nil;
+  if (AComponent = DataOutputFormatter) and (Operation = opRemove) then
+    FDataOutputFormatter := nil;
 end;
 
 procedure TCustomIBXScript.SetDatabase(AValue: TIBDatabase);
@@ -898,6 +906,7 @@ begin
   inherited Create(aOwner);
   FStopOnFirstError := true;
   FEcho := true;
+  FAutoDDL := true;
   FISQL := TIBSQL.Create(self);
   FISQL.ParamCheck := true;
   FIBXMLProcessor := TIBXMLProcessor.Create;
@@ -912,6 +921,7 @@ destructor TCustomIBXScript.Destroy;
 begin
   if FIBSQLProcessor <> nil then FIBSQLProcessor.Free;
   if FIBXMLProcessor <> nil then FIBXMLProcessor.Free;
+  if FSymbolStream <> nil then FSymbolStream.Free;
   if FISQL <> nil then FISQL.Free;
   if FInternalTransaction <> nil then FInternalTransaction.Free;
   inherited Destroy;
@@ -1730,6 +1740,14 @@ begin
   inherited Create;
   FPrompt := aPrompt;
   FContinuePrompt := aContinue;
+end;
+
+function TInteractiveSymbolStream.GetSymbol: TSQLSymbol;
+begin
+  if Terminated then
+    Result := sqEOF
+  else
+    Result := inherited GetSymbol;
 end;
 
 { TBatchSymbolStream }

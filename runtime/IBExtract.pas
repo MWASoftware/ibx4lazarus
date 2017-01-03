@@ -109,6 +109,7 @@ type
     procedure ListGenerators(GeneratorName : String = '');
     procedure ListIndex(ObjectName : String = ''; ExtractType : TExtractType = etIndex);
     procedure ListViews(ViewName : String = '');
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
     { Protected declarations }
   public
@@ -119,7 +120,6 @@ type
     function GetFieldType(FieldType, FieldSubType, FieldScale, FieldSize,
       FieldPrec, FieldLen : Integer) : String;
     function GetCharacterSets(CharSetId, Collation : integer;	CollateOnly : Boolean) : String;
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure ExtractObject(ObjectType : TExtractObjectTypes; ObjectName : String = '';
       ExtractTypes : TExtractTypes = []);
     property DatabaseInfo : TIBDatabaseInfo read FDatabaseInfo;
