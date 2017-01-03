@@ -37,6 +37,8 @@ const
   ibx_blob = 'IBX_BLOB';
   ibx_array = 'IBX_ARRAY';
 
+  BlobLineLength = 40;
+
   {Non-character symbols}
   sqNone         = #0;
   sqEnd          = #1;
@@ -361,8 +363,8 @@ type
     function RunScript(SQLLines: TStrings): boolean; overload;
   end;
 
-function StringToHex(octetString: string): string; overload;
-procedure StringToHex(octetString: string; TextOut: TStrings); overload;
+function StringToHex(octetString: string; MaxLineLength: integer=0): string; overload;
+procedure StringToHex(octetString: string; TextOut: TStrings; MaxLineLength: integer=0); overload;
 
 
 resourcestring
@@ -396,7 +398,7 @@ resourcestring
   sArrayIndexError = 'Array Index Error (%d)';
   sBlobIndexError = 'Blob Index Error (%d)';
 
-function StringToHex(octetString: string): string; overload;
+function StringToHex(octetString: string; MaxLineLength: integer): string; overload;
 
   function ToHex(aValue: byte): string;
   const
@@ -410,22 +412,30 @@ var i, j: integer;
 begin
   i := 1;
   Result := '';
-  while i < Length(octetString) do
+  if MaxLineLength = 0 then
+  while i <= Length(octetString) do
   begin
-    for j := 1 to 40 do
-    begin
-      if i > Length(octetString) then
-        break
-      else
-        Result += ToHex(byte(octetString[i]));
-      inc(i);
-    end;
+    Result += ToHex(byte(octetString[i]));
+    Inc(i);
+  end
+  else
+  while i <= Length(octetString) do
+  begin
+      for j := 1 to MaxLineLength do
+      begin
+        if i > Length(octetString) then
+          Exit
+        else
+          Result += ToHex(byte(octetString[i]));
+        inc(i);
+      end;
+      Result += LineEnding;
   end;
 end;
 
-procedure StringToHex(octetString: string; TextOut: TStrings); overload;
+procedure StringToHex(octetString: string; TextOut: TStrings; MaxLineLength: integer); overload;
 begin
-    TextOut.Add(StringToHex(octetString));
+    TextOut.Add(StringToHex(octetString,MaxLineLength));
 end;
 
 
@@ -791,6 +801,15 @@ begin
     begin
       ExtractConnectInfo;
       DoReconnect;
+      Result := true;
+      Exit;
+    end;
+
+    {Process Drop Database}
+    RegexObj.Expression := '^ *DROP +DATABASE + *(\' + Terminator + '|)';
+    if RegexObj.Exec(ucStmt) then
+    begin
+      FDatabase.DropDatabase;
       Result := true;
       Exit;
     end;
@@ -1648,7 +1667,7 @@ begin
   TextOut := TStringList.Create;
   try
     TextOut.Add(Format('<blob subtype="%d">',[Field.getSubtype]));
-    StringToHex(Field.AsString,TextOut);
+    StringToHex(Field.AsString,TextOut,BlobLineLength);
     TextOut.Add('</blob>');
     Result := TextOut.Text;
   finally
@@ -1676,6 +1695,10 @@ var index: array of integer;
           AddElements(dim+1,indent + ' ');
           TextOut.Add('</elt>');
         end
+        else
+        if ((ar.GetSQLType = SQL_TEXT) or (ar.GetSQLType = SQL_VARYING)) and
+           (ar.GetCharSetID = 1) then
+           TextOut.Add(Format('%s<elt ix="%d">%s</elt>',[indent,i,StringToHex(ar.GetAsString(index))]))
         else
           TextOut.Add(Format('%s<elt ix="%d">%s</elt>',[indent,i,ar.GetAsString(index)]));
       end;

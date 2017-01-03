@@ -31,12 +31,13 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
+  {$IFDEF WINDOWS} Windows, {$ENDIF}
   Classes, SysUtils, CustApp
   { you can add units after this }
   ,IBDatabase, ibxscript, IBExtract, DB, IBVersion,
   IBDataOutput, RegExpr
   {$IFDEF UNIX} ,TermIO, IOStream {$ENDIF}
-  {$IFDEF WINDOWS} ,Windows {$ENDIF}
+
   ;
 
 type
@@ -92,17 +93,17 @@ begin
     TCGetAttr(stdinStream.Handle, oldattr);
     newattr := oldattr;
     newattr.c_lflag := newattr.c_lflag and not (ICANON or ECHO);
-    tcsetattr( stdinStream.Handle, TCSANOW, newattr );
+    TCSetAttr( stdinStream.Handle, TCSANOW, newattr );
     try
       repeat
         read(c);
-        if (c = #10) or (c = #13) then break;
+        if c = #10 then break;
         write('*');
         Result += c;
       until false;
       writeln;
     finally
-      tcsetattr( stdinStream.Handle, TCSANOW, oldattr );
+      TCSetAttr( stdinStream.Handle, TCSANOW, oldattr );
     end;
   finally
     stdinStream.Free;
@@ -111,17 +112,17 @@ end;
 {$ENDIF}
 {$IFDEF WINDOWS}
 function getpassword: string;
-var oldmode, newmode: integer;
+var oldmode, newmode: DWORD;
     c: char;
 begin
   Result := '';
   GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), oldmode);
-  newmode := oldmode - ENABLE_ECHO_INPUT;
+  newmode := oldmode - ENABLE_ECHO_INPUT - ENABLE_LINE_INPUT;
   SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),newmode);
   try
     repeat
       read(c);
-      if (c = #10) or (c = #13) then break;
+      if c = #13 then break;
       write('*');
       Result += c;
     until false;
@@ -214,6 +215,7 @@ var
   i: integer;
   ExtractTypes: TExtractTypes;
   Opts,NonOpts: TStrings;
+  OutputFormat: string;
 begin
   writeln(stderr,'fbsql: an SQL interpreter for Firebird');
   writeln(stderr,'Built using IBX ' + IBX_VERSION);
@@ -223,7 +225,7 @@ begin
   Opts := TStringList.Create;
   NonOpts := TStringList.Create;
   try
-    ErrorMsg := CheckOptions('aAhbceuioprs',['help','user','pass','role'],Opts,NonOpts);
+    ErrorMsg := CheckOptions('aAhbeuioprst',['help','user','pass','role'],Opts,NonOpts);
     {Database name is last parameter if given and not an option}
     if (NonOpts.Count > 0) and ((Opts.Count = 0) or
              (Opts.ValueFromIndex[Opts.Count-1] <> NonOpts[NonOpts.Count-1])) then
@@ -291,8 +293,20 @@ begin
     ExtractTypes := [etData];
   end;
 
-  if HasOption('c') then
-    FDataOutputFormatter := TIBCSVDataOut;
+  if HasOption('t') then
+  begin
+    OutputFormat := GetOptionValue('t');
+    if OutputFormat = 'CSV' then
+      FDataOutputFormatter := TIBCSVDataOut
+    else
+    if OutputFormat = 'INS' then
+      FDataOutputFormatter := TIBInsertStmtsOut
+    else
+    if OutputFormat = 'BLK' then
+      FDataOutputFormatter := TIBBlockFormatOut
+    else
+      raise Exception.CreateFmt('Unrecognised data output format "%s"',[OutputFormat]);
+  end;
 
   if HasOption('i') then
     SQLFileName := GetOptionValue('i');
@@ -411,7 +425,6 @@ begin
   writeln(stderr,'-a            write database metadata to stdout');
   writeln(stderr,'-A            write database metadata and table data to stdout');
   writeln(stderr,'-b            stop on first error');
-  writeln(stderr,'-c            use csv format for select query results');
   writeln(stderr,'-e            echo sql statements to stdout');
   writeln(stderr,'-i <filename> execute SQL script from file');
   writeln(stderr,'-h            show this information');
@@ -419,6 +432,10 @@ begin
   writeln(stderr,'-p <password> provide password on command line (insecure)');
   writeln(stderr,'-r <rolename> open database with this rolename');
   writeln(stderr,'-s <sql>      Execute SQL text');
+  writeln(stderr,'-t            specify output format for SQL Statements');
+  writeln(stderr,'              BLK (default) for block format');
+  writeln(stderr,'              CSV (default) for CSV format');
+  writeln(stderr,'              INS (default) for Insert Statement format');
   writeln(stderr,'-u <username> open database with this username (defaults to SYSDBA)');
   writeln;
   writeln(stderr,'Environment Variables:');
