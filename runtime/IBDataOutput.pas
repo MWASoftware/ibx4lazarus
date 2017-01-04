@@ -15,7 +15,7 @@
  *
  *  The Initial Developer of the Original Code is Tony Whyman.
  *
- *  The Original Code is (C) 2011 Tony Whyman, MWA Software
+ *  The Original Code is (C) 2017 Tony Whyman, MWA Software
  *  (http://www.mwasoftware.co.uk).
  *
  *  All Rights Reserved.
@@ -26,7 +26,18 @@
 unit IBDataOutput;
 
 {$mode objfpc}{$H+}
+{$codepage UTF8}
 
+(*
+     These are helper components, primarily for use with TIBXScript, but which are
+     also used by TIBExtact (for formatting data as SQL Insert statements). Their
+     purpose is to execute SQL SELECT statements and to format the results of the
+     query. Data Output Formatters are currently available for:
+
+     Block Format Output 	(TIBBlockFormatOut)
+     CSV Format 	        (TIBCSVDataOut)
+     SQL Insert Statements 	(TIBInsertStmtsOut).
+  *)
 interface
 
 uses

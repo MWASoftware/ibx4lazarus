@@ -31,12 +31,13 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
+  {$IFDEF WINDOWS} Windows, {$ENDIF}
   Classes, SysUtils, CustApp
   { you can add units after this }
   ,IBDatabase, ibxscript, IBExtract, DB, IBVersion,
   IBDataOutput, RegExpr
   {$IFDEF UNIX} ,TermIO, IOStream {$ENDIF}
-  {$IFDEF WINDOWS} ,Windows {$ENDIF}
+
   ;
 
 type
@@ -51,7 +52,6 @@ type
     FIBXScript: TIBXScript;
     FISQLProcessor: TInteractiveSQLProcessor;
     FExtract: TIBExtract;
-    FSQL: TStringStream;
     FOutputFile: TStream;
     FDataOutputFormatter: TDataOutputFormatter;
     procedure LogHandler(Sender: TObject; Msg: string);
@@ -62,11 +62,14 @@ type
     procedure ShowException(E: Exception); override;
   public
     constructor Create(TheOwner: TComponent); override;
-    destructor Destroy; override;
     procedure WriteHelp; virtual;
   end;
 
   { TInteractiveSQLProcessor }
+
+  {This is a TCustomIBXScript descendent that uses the console for input/output.
+   It additionally suported QUIT/EXIT Commands. The log file can either be redirected
+   to the console or sent to a separate file.}
 
   TInteractiveSQLProcessor = class(TCustomIBXScript)
   private
@@ -92,17 +95,17 @@ begin
     TCGetAttr(stdinStream.Handle, oldattr);
     newattr := oldattr;
     newattr.c_lflag := newattr.c_lflag and not (ICANON or ECHO);
-    tcsetattr( stdinStream.Handle, TCSANOW, newattr );
+    TCSetAttr( stdinStream.Handle, TCSANOW, newattr );
     try
       repeat
         read(c);
-        if (c = #10) or (c = #13) then break;
+        if c = #10 then break;
         write('*');
         Result += c;
       until false;
       writeln;
     finally
-      tcsetattr( stdinStream.Handle, TCSANOW, oldattr );
+      TCSetAttr( stdinStream.Handle, TCSANOW, oldattr );
     end;
   finally
     stdinStream.Free;
@@ -111,17 +114,17 @@ end;
 {$ENDIF}
 {$IFDEF WINDOWS}
 function getpassword: string;
-var oldmode, newmode: integer;
+var oldmode, newmode: DWORD;
     c: char;
 begin
   Result := '';
   GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), oldmode);
-  newmode := oldmode - ENABLE_ECHO_INPUT;
+  newmode := oldmode - ENABLE_ECHO_INPUT - ENABLE_LINE_INPUT;
   SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),newmode);
   try
     repeat
       read(c);
-      if (c = #10) or (c = #13) then break;
+      if c = #13 then break;
       write('*');
       Result += c;
     until false;
@@ -214,6 +217,8 @@ var
   i: integer;
   ExtractTypes: TExtractTypes;
   Opts,NonOpts: TStrings;
+  OutputFormat: string;
+  SQLStatement: string;
 begin
   writeln(stderr,'fbsql: an SQL interpreter for Firebird');
   writeln(stderr,'Built using IBX ' + IBX_VERSION);
@@ -223,7 +228,7 @@ begin
   Opts := TStringList.Create;
   NonOpts := TStringList.Create;
   try
-    ErrorMsg := CheckOptions('aAhbceuioprs',['help','user','pass','role'],Opts,NonOpts);
+    ErrorMsg := CheckOptions('aAhbeuioprst',['help','user','pass','role'],Opts,NonOpts);
     {Database name is last parameter if given and not an option}
     if (NonOpts.Count > 0) and ((Opts.Count = 0) or
              (Opts.ValueFromIndex[Opts.Count-1] <> NonOpts[NonOpts.Count-1])) then
@@ -251,6 +256,7 @@ begin
   DoExtract := false;
   ExtractTypes := [];
   FDataOutputFormatter := TIBBlockFormatOut;
+  SQLStatement := '';
 
   {Initialise user_name and password from environment if available}
 
@@ -262,16 +268,14 @@ begin
 
   {Process Command line options}
 
-  if HasOption('u','user') then
-    FIBDatabase.Params.Add('user_name=' + GetOptionValue('u','user'));
+  if HasOption('a') then
+    DoExtract := true;
 
-  if HasOption('p','pass') then
-    FIBDatabase.Params.Add('password=' + GetOptionValue('p','pass'));
-
-  FIBDatabase.LoginPrompt := FIBDatabase.Params.Values['password'] = '';
-
-  if HasOption('r','role') then
-    FIBDatabase.Params.Add('sql_role_name=' + GetOptionValue('r','role'));
+  if HasOption('A') then
+  begin
+    DoExtract := true;
+    ExtractTypes := [etData];
+  end;
 
   if not HasOption('b') then
   begin
@@ -282,18 +286,6 @@ begin
   if not HasOption('e') then
     FIBXScript.Echo := false;
 
-  if HasOption('a') then
-    DoExtract := true;
-
-  if HasOption('A') then
-  begin
-    DoExtract := true;
-    ExtractTypes := [etData];
-  end;
-
-  if HasOption('c') then
-    FDataOutputFormatter := TIBCSVDataOut;
-
   if HasOption('i') then
     SQLFileName := GetOptionValue('i');
 
@@ -303,25 +295,48 @@ begin
     FISQLProcessor.UseLogFile := true;
   end;
 
+  if HasOption('p','pass') then
+    FIBDatabase.Params.Add('password=' + GetOptionValue('p','pass'));
+
+  FIBDatabase.LoginPrompt := FIBDatabase.Params.Values['password'] = '';
+
+  if HasOption('r','role') then
+    FIBDatabase.Params.Add('sql_role_name=' + GetOptionValue('r','role'));
+
   if HasOption('s') then
+    SQLStatement := GetOptionValue('s');
+
+  if HasOption('t') then
   begin
-    FSQL.WriteString(GetOptionValue('s'));
-    FSQL.Position := 0;
+    OutputFormat := GetOptionValue('t');
+    if OutputFormat = 'CSV' then
+      FDataOutputFormatter := TIBCSVDataOut
+    else
+    if OutputFormat = 'INS' then
+      FDataOutputFormatter := TIBInsertStmtsOut
+    else
+    if OutputFormat = 'BLK' then
+      FDataOutputFormatter := TIBBlockFormatOut
+    else
+      raise Exception.CreateFmt('Unrecognised data output format "%s"',[OutputFormat]);
   end;
+
+  if HasOption('u','user') then
+    FIBDatabase.Params.Add('user_name=' + GetOptionValue('u','user'));
 
   {Validation}
 
   if not DoExtract then
   begin
-    if (FSQL.DataString <> '') and (SQLFileName <> '') then
+    if (SQLStatement <> '') and (SQLFileName <> '') then
        raise Exception.Create('An SQL Script File and text cannot be simultaneously requested');
 
-    if (FSQL.DataString = '') and (SQLFileName <> '')  and not FileExists(SQLFileName) then
+    if (SQLStatement = '') and (SQLFileName <> '')  and not FileExists(SQLFileName) then
       raise Exception.CreateFmt('SQL File "%s" not found!',[SQLFileName]);
 
   end;
 
-  if DoExtract and ((SQLFileName <> '') or (FSQL.DataString <> '')) then
+  if DoExtract and ((SQLFileName <> '') or (SQLStatement <> '')) then
     raise Exception.Create('Extract and script execution cannot be simulateously requested');
 
   {This is where it all happens}
@@ -347,8 +362,8 @@ begin
     if SQLFileName <> '' then
       FIBXScript.RunScript(SQLFileName)
     else
-    if FSQL.DataString <> '' then
-      FIBXScript.RunScript(FSQL)
+    if SQLStatement <> '' then
+      FIBXScript.ExecSQLScript(SQLStatement)
     else
       FISQLProcessor.Run;
   finally
@@ -371,7 +386,6 @@ constructor TFBSQL.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
   StopOnException:=True;
-  FSQL := TStringStream.Create('');
 
   { Create Components }
   FIBDatabase := TIBDatabase.Create(self);
@@ -398,12 +412,6 @@ begin
 
 end;
 
-destructor TFBSQL.Destroy;
-begin
-  if assigned(FSQL) then FSQL.Free;
-  inherited Destroy;
-end;
-
 procedure TFBSQL.WriteHelp;
 begin
   writeln(stderr,'Usage: ',ExtractFileName(ExeName),' <options> <database name>');
@@ -411,7 +419,6 @@ begin
   writeln(stderr,'-a            write database metadata to stdout');
   writeln(stderr,'-A            write database metadata and table data to stdout');
   writeln(stderr,'-b            stop on first error');
-  writeln(stderr,'-c            use csv format for select query results');
   writeln(stderr,'-e            echo sql statements to stdout');
   writeln(stderr,'-i <filename> execute SQL script from file');
   writeln(stderr,'-h            show this information');
@@ -419,6 +426,10 @@ begin
   writeln(stderr,'-p <password> provide password on command line (insecure)');
   writeln(stderr,'-r <rolename> open database with this rolename');
   writeln(stderr,'-s <sql>      Execute SQL text');
+  writeln(stderr,'-t            specify output format for SQL Statements');
+  writeln(stderr,'              BLK (default) for block format');
+  writeln(stderr,'              CSV (default) for CSV format');
+  writeln(stderr,'              INS (default) for Insert Statement format');
   writeln(stderr,'-u <username> open database with this username (defaults to SYSDBA)');
   writeln;
   writeln(stderr,'Environment Variables:');

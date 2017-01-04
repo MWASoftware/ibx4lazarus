@@ -1,11 +1,35 @@
-IBX Change Log  version      (2.0-1) Tue, 03 Jan 2017 11:44:59 +0000
+IBX Change Log  version       (2.0-1) Wed, 04 Jan 2017 16:22:53 +0000
 
-1. IBEvents: Fix uninitialised variable that culd result in lost events.
+1. TIBEvents: Fix uninitialised variable that could result in lost events.
 
-2. IBExtract: Added support for FB3 "USAGE" privilege.
+2. TIBExtract: Added support for FB3 "USAGE" privilege.
 
-3. IBExtract: data formatted as Charset set "octets" is now output using
+3. TIBExtract: data formatted as Charset set "octets" is now output using
    hexadecimal notation.
+
+4. TIBExtract: Binary Blobs and array data can now be embedded in INSERT statements
+   using a simple XML format.
+
+5. TIBExtract: extract of individual Triggers and Stored Procedures can now include
+   grants to these objects.
+
+6. TIBXScript: This component has been restructured to allow for the processing of
+   embedded XML in INSERT statements and to support interactive sources in addition
+   to non-interactive data sources such as files.
+
+7. TIBXScript: CREATE DATABASE, DROP DATABASE, CONNECT statements are now supported.
+
+8. TIBXScript: ISQL compatiable Set statements are now supported:
+   SET SQL DIALECT
+   SET TERM
+   SET AUTODDL
+   SET BAIL
+   SET ECHO
+   SET COUNT
+   SET STATS
+   SET NAMES <character set>
+
+9. IBVersion unit added to hold current IBX Version Number information.
 
 IBX Change Log  version     (2.0-0) Tue, 06 Dec 2016 10:33:44 +0000
 

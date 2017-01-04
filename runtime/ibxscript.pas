@@ -15,7 +15,7 @@
  *
  *  The Initial Developer of the Original Code is Tony Whyman.
  *
- *  The Original Code is (C) 2014 Tony Whyman, MWA Software
+ *  The Original Code is (C) 2014-2017 Tony Whyman, MWA Software
  *  (http://www.mwasoftware.co.uk).
  *
  *  All Rights Reserved.
@@ -36,6 +36,8 @@ uses Classes, IBDatabase,  IBSQL, IB, IBDataOutput;
 const
   ibx_blob = 'IBX_BLOB';
   ibx_array = 'IBX_ARRAY';
+
+  BlobLineLength = 40;
 
   {Non-character symbols}
   sqNone         = #0;
@@ -83,6 +85,9 @@ type
 
   { TSymbolStream }
 
+  {A simple lookahead one parser to process a text stream as a stream of symbols.
+   This is an abstract object, subclassed for different sources.}
+
   TSymbolStream = class
   private
     FNextSymbol: TSQLSymbol;
@@ -115,6 +120,9 @@ type
 
   { TBatchSymbolStream }
 
+  {This symbol stream supports non-interactive parsing of a text file, stream or
+   lines of text.}
+
   TBatchSymbolStream = class(TSymbolStream)
   private
     FLines: TStrings;
@@ -131,6 +139,9 @@ type
   end;
 
   { TInteractiveSymbolStream }
+
+  {This symbol stream supports interactive parsing of commands and
+   SQL statements entered at a console}
 
   TInteractiveSymbolStream = class(TSymbolStream)
   private
@@ -166,6 +177,11 @@ type
   end;
 
   { TIBXMLProcessor }
+
+  {This is a simple XML parser that parses the output of a symbol stream as XML
+   structured data, recognising tags, attributes and data. The tags are given in
+   the table XMLTagDefs. The BlobData and ArrayData properties return blob and
+   array data decoded from the XML stream.}
 
   TIBXMLProcessor = class
   private
@@ -208,6 +224,10 @@ type
 
   { TIBSQLProcessor }
 
+  {This parses a symbol stream into SQL statements. If embedded XML is found then
+   this is processed by the supplied XMLProcessor. The HasBegin property provides
+   a simple way to recognised stored procedure DDL, and "Execute As" statements.}
+
   TIBSQLProcessor = class
   private
     FSQLText: string;
@@ -234,6 +254,16 @@ type
   TOnSetStatement = procedure(Sender: TObject; command, aValue, stmt: string; var Done: boolean) of object;
 
   { TCustomIBXScript }
+
+  {This is the main script processing engine and can be customised by subclassing
+   and defining the symbol stream appropriate for use.
+
+   The RunScript function is used to invoke the processing of a symbol stream. Each
+   SQL statement is extracted one by one. If it is recognised as a built in command
+   by "ProcessStatement" then it is actioned directly. Otherwise, it is executed
+   using the TIBSQL component. Note that SQL validation by this class is only partial
+   and is sufficient only to parse the SQL into statements. The Firebird engine does
+   the rest when the statement is executed.}
 
   TCustomIBXScript = class(TComponent)
   private
@@ -272,7 +302,7 @@ type
     procedure EchoNextLine(Sender: TObject; Line: string);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function ProcessStatement(stmt: string): boolean; virtual;
-    procedure ProcessStream;
+    function ProcessStream: boolean;
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -301,7 +331,19 @@ type
   into SQL statements which are executed in turn. The intention is to be ISQL
   compatible but with extensions:
 
-  * SET TERM and Set AutoDDL are both supported
+  * All DML and DDL Statements are supported.
+
+  * CREATE DATABASE, DROP DATABASE, CONNECT and COMMIT are supported.
+
+  * The following SET statements are supported:
+    SET SQL DIALECT
+    SET TERM
+    SET AUTODDL
+    SET BAIL
+    SET ECHO
+    SET COUNT
+    SET STATS
+    SET NAMES <character set>
 
   * New Command: RECONNECT. Performs a commit followed by disconnecting and
     reconnecting to the database.
@@ -324,11 +366,16 @@ type
 
   * Database: Link to TIBDatabase component
   * Transaction: Link to Transaction. Defaults to internaltransaction (concurrency, wait)
+  * AutoDDL: When true DDL statements are automatically committed after execution
   * Echo: boolean. When true, all SQL statements are echoed to log
   * StopOnFirstError: boolean. When true the script engine terminates on the first
     SQL Error.
   * IgnoreGrants: When true, grant statements are silently discarded. This can be
     useful when applying a script using the Embedded Server.
+  * ShowPerformanceStats: When true, performance statistics (in ISQL format) are
+    written to the log after a DML statement is executed
+  * DataOutputFormatter: Identifies a Data Output Formatter component used to format
+    the results of executing a Select Statement
 
 
   Events:
@@ -343,6 +390,8 @@ type
     value of progress bar. Otherwise called to step progress bar.
   * OnSelectSQL: handler for select SQL statements. If not present, select SQL
     statements result in an exception.
+  * OnSetStatement: called to process a SET command that has not already been
+    handled by TIBXScript.
 
   The RunScript function is used to execute an SQL Script and may be called
   multiple times.
@@ -359,10 +408,11 @@ type
     function RunScript(SQLFile: string): boolean; overload;
     function RunScript(SQLStream: TStream): boolean; overload;
     function RunScript(SQLLines: TStrings): boolean; overload;
+    function ExecSQLScript(sql: string): boolean;
   end;
 
-function StringToHex(octetString: string): string; overload;
-procedure StringToHex(octetString: string; TextOut: TStrings); overload;
+function StringToHex(octetString: string; MaxLineLength: integer=0): string; overload;
+procedure StringToHex(octetString: string; TextOut: TStrings; MaxLineLength: integer=0); overload;
 
 
 resourcestring
@@ -396,7 +446,7 @@ resourcestring
   sArrayIndexError = 'Array Index Error (%d)';
   sBlobIndexError = 'Blob Index Error (%d)';
 
-function StringToHex(octetString: string): string; overload;
+function StringToHex(octetString: string; MaxLineLength: integer): string; overload;
 
   function ToHex(aValue: byte): string;
   const
@@ -410,22 +460,30 @@ var i, j: integer;
 begin
   i := 1;
   Result := '';
-  while i < Length(octetString) do
+  if MaxLineLength = 0 then
+  while i <= Length(octetString) do
   begin
-    for j := 1 to 40 do
-    begin
-      if i > Length(octetString) then
-        break
-      else
-        Result += ToHex(byte(octetString[i]));
-      inc(i);
-    end;
+    Result += ToHex(byte(octetString[i]));
+    Inc(i);
+  end
+  else
+  while i <= Length(octetString) do
+  begin
+      for j := 1 to MaxLineLength do
+      begin
+        if i > Length(octetString) then
+          Exit
+        else
+          Result += ToHex(byte(octetString[i]));
+        inc(i);
+      end;
+      Result += LineEnding;
   end;
 end;
 
-procedure StringToHex(octetString: string; TextOut: TStrings); overload;
+procedure StringToHex(octetString: string; TextOut: TStrings; MaxLineLength: integer); overload;
 begin
-    TextOut.Add(StringToHex(octetString));
+    TextOut.Add(StringToHex(octetString,MaxLineLength));
 end;
 
 
@@ -455,19 +513,32 @@ end;
 function TIBXScript.RunScript(SQLFile: string): boolean;
 begin
   TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLFile);
-  ProcessStream;
+  Result := ProcessStream;
 end;
 
 function TIBXScript.RunScript(SQLStream: TStream): boolean;
 begin
   TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLStream);
-  ProcessStream;
+  Result := ProcessStream;
 end;
 
 function TIBXScript.RunScript(SQLLines: TStrings): boolean;
 begin
   TBatchSymbolStream(FSymbolStream).SetStreamSource(SQLLines);
-  ProcessStream;
+  Result := ProcessStream;
+end;
+
+function TIBXScript.ExecSQLScript(sql: string): boolean;
+var s: TStringList;
+begin
+  s := TStringList.Create;
+  try
+    s.Text := sql;
+    TBatchSymbolStream(FSymbolStream).SetStreamSource(s);
+    Result := ProcessStream;
+  finally
+    s.Free;
+  end;
 end;
 
 { TCustomIBXScript }
@@ -523,10 +594,7 @@ begin
      if assigned(OnSelectSQL) then
        OnSelectSQL(self,stmt)
      else
-     if assigned(DataOutputFormatter) then
-       DefaultSelectSQLHandler(stmt)
-     else
-       FSymbolStream.ShowError(sNoSelectSQL,[nil]);
+       DefaultSelectSQLHandler(stmt);
    end
    else
    begin
@@ -640,9 +708,10 @@ begin
     DataOutputFormatter.ShowPerformanceStats := AValue;
 end;
 
-procedure TCustomIBXScript.ProcessStream;
+function TCustomIBXScript.ProcessStream: boolean;
 var stmt: string;
 begin
+  Result := false;
   while FIBSQLProcessor.GetNextStatement(FSymbolStream,stmt) do
   try
 //    writeln('stmt = ',stmt);
@@ -656,6 +725,7 @@ begin
         if StopOnFirstError then Exit;
       end
   end;
+  Result := true;
 end;
 
 function TCustomIBXScript.ProcessStatement(stmt: string): boolean;
@@ -791,6 +861,15 @@ begin
     begin
       ExtractConnectInfo;
       DoReconnect;
+      Result := true;
+      Exit;
+    end;
+
+    {Process Drop Database}
+    RegexObj.Expression := '^ *DROP +DATABASE + *(\' + Terminator + '|)';
+    if RegexObj.Exec(ucStmt) then
+    begin
+      FDatabase.DropDatabase;
       Result := true;
       Exit;
     end;
@@ -931,6 +1010,8 @@ procedure TCustomIBXScript.DefaultSelectSQLHandler(aSQLText: string);
 begin
   if assigned(DataOutputFormatter) then
     DataOutputFormatter.DataOut(aSQLText,@Add2Log)
+  else
+    FSymbolStream.ShowError(sNoSelectSQL,[nil]);
 end;
 
 { TIBSQLProcessor }
@@ -1648,7 +1729,7 @@ begin
   TextOut := TStringList.Create;
   try
     TextOut.Add(Format('<blob subtype="%d">',[Field.getSubtype]));
-    StringToHex(Field.AsString,TextOut);
+    StringToHex(Field.AsString,TextOut,BlobLineLength);
     TextOut.Add('</blob>');
     Result := TextOut.Text;
   finally
@@ -1676,6 +1757,10 @@ var index: array of integer;
           AddElements(dim+1,indent + ' ');
           TextOut.Add('</elt>');
         end
+        else
+        if ((ar.GetSQLType = SQL_TEXT) or (ar.GetSQLType = SQL_VARYING)) and
+           (ar.GetCharSetID = 1) then
+           TextOut.Add(Format('%s<elt ix="%d">%s</elt>',[indent,i,StringToHex(ar.GetAsString(index))]))
         else
           TextOut.Add(Format('%s<elt ix="%d">%s</elt>',[indent,i,ar.GetAsString(index)]));
       end;
