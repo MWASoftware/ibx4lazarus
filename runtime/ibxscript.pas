@@ -85,6 +85,9 @@ type
 
   { TSymbolStream }
 
+  {A simple lookahead one parser to process a text stream as a stream of symbols.
+   This is an abstract object, subclassed for different sources.}
+
   TSymbolStream = class
   private
     FNextSymbol: TSQLSymbol;
@@ -117,6 +120,9 @@ type
 
   { TBatchSymbolStream }
 
+  {This symbol stream supports non-interactive parsing of a text file, stream or
+   lines of text.}
+
   TBatchSymbolStream = class(TSymbolStream)
   private
     FLines: TStrings;
@@ -133,6 +139,9 @@ type
   end;
 
   { TInteractiveSymbolStream }
+
+  {This symbol stream supports interactive parsing of commands and
+   SQL statements entered at a console}
 
   TInteractiveSymbolStream = class(TSymbolStream)
   private
@@ -168,6 +177,11 @@ type
   end;
 
   { TIBXMLProcessor }
+
+  {This is a simple XML parser that parses the output of a symbol stream as XML
+   structured data, recognising tags, attributes and data. The tags are given in
+   the table XMLTagDefs. The BlobData and ArrayData properties return blob and
+   array data decoded from the XML stream.}
 
   TIBXMLProcessor = class
   private
@@ -210,6 +224,10 @@ type
 
   { TIBSQLProcessor }
 
+  {This parses a symbol stream into SQL statements. If embedded XML is found then
+   this is processed by the supplied XMLProcessor. The HasBegin property provides
+   a simple way to recognised stored procedure DDL, and "Execute As" statements.}
+
   TIBSQLProcessor = class
   private
     FSQLText: string;
@@ -236,6 +254,16 @@ type
   TOnSetStatement = procedure(Sender: TObject; command, aValue, stmt: string; var Done: boolean) of object;
 
   { TCustomIBXScript }
+
+  {This is the main script processing engine and can be customised by subclassing
+   and defining the symbol stream appropriate for use.
+
+   The RunScript function is used to invoke the processing of a symbol stream. Each
+   SQL statement is extracted one by one. If it is recognised as a built in command
+   by "ProcessStatement" then it is actioned directly. Otherwise, it is executed
+   using the TIBSQL component. Note that SQL validation by this class is only partial
+   and is sufficient only to parse the SQL into statements. The Firebird engine does
+   the rest when the statement is executed.}
 
   TCustomIBXScript = class(TComponent)
   private
@@ -303,7 +331,19 @@ type
   into SQL statements which are executed in turn. The intention is to be ISQL
   compatible but with extensions:
 
-  * SET TERM and Set AutoDDL are both supported
+  * All DML and DDL Statements are supported.
+
+  * CREATE DATABASE, DROP DATABASE, CONNECT and COMMIT are supported.
+
+  * The following SET statements are supported:
+    SET SQL DIALECT
+    SET TERM
+    SET AUTODDL
+    SET BAIL
+    SET ECHO
+    SET COUNT
+    SET STATS
+    SET NAMES <character set>
 
   * New Command: RECONNECT. Performs a commit followed by disconnecting and
     reconnecting to the database.
@@ -326,11 +366,16 @@ type
 
   * Database: Link to TIBDatabase component
   * Transaction: Link to Transaction. Defaults to internaltransaction (concurrency, wait)
+  * AutoDDL: When true DDL statements are automatically committed after execution
   * Echo: boolean. When true, all SQL statements are echoed to log
   * StopOnFirstError: boolean. When true the script engine terminates on the first
     SQL Error.
   * IgnoreGrants: When true, grant statements are silently discarded. This can be
     useful when applying a script using the Embedded Server.
+  * ShowPerformanceStats: When true, performance statistics (in ISQL format) are
+    written to the log after a DML statement is executed
+  * DataOutputFormatter: Identifies a Data Output Formatter component used to format
+    the results of executing a Select Statement
 
 
   Events:
@@ -345,6 +390,8 @@ type
     value of progress bar. Otherwise called to step progress bar.
   * OnSelectSQL: handler for select SQL statements. If not present, select SQL
     statements result in an exception.
+  * OnSetStatement: called to process a SET command that has not already been
+    handled by TIBXScript.
 
   The RunScript function is used to execute an SQL Script and may be called
   multiple times.
