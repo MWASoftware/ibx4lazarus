@@ -113,6 +113,8 @@ object Form1: TForm1
     Database = IBDatabase1
     IgnoreGrants = False
     Transaction = IBTransaction1
+    ShowAffectedRows = False
+    ShowPerformanceStats = False
     GetParamValue = IBXScript1GetParamValue
     OnOutputLog = IBXScript1LogProc
     OnErrorLog = IBXScript1LogProc

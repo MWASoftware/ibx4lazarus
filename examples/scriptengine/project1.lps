@@ -20,8 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <TopLine Value="121"/>
-        <CursorPos X="13" Y="125"/>
+        <TopLine Value="133"/>
+        <CursorPos X="38" Y="153"/>
         <UsageCount Value="72"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -50,9 +50,10 @@
       </Unit3>
       <Unit4>
         <Filename Value="../../runtime/ibxscript.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="186"/>
-        <CursorPos Y="203"/>
+        <TopLine Value="2012"/>
+        <CursorPos X="30" Y="2036"/>
         <UsageCount Value="32"/>
         <Loaded Value="True"/>
       </Unit4>
@@ -227,10 +228,11 @@
       </Unit27>
       <Unit28>
         <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2232"/>
-        <CursorPos X="40" Y="2235"/>
-        <UsageCount Value="8"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="520"/>
+        <CursorPos Y="709"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit28>
       <Unit29>
         <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
@@ -249,8 +251,8 @@
       <Unit31>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="1019"/>
-        <CursorPos X="12" Y="1033"/>
+        <TopLine Value="1119"/>
+        <CursorPos Y="1149"/>
         <UsageCount Value="25"/>
         <Loaded Value="True"/>
       </Unit31>
@@ -380,7 +382,6 @@
       </Unit48>
       <Unit49>
         <Filename Value="../../runtime/IBDataOutput.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="329"/>
         <CursorPos X="66" Y="366"/>
@@ -388,7 +389,7 @@
         <Loaded Value="True"/>
       </Unit49>
     </Units>
-    <JumpHistory Count="8" HistoryIndex="7">
+    <JumpHistory Count="13" HistoryIndex="12">
       <Position1>
         <Filename Value="../../runtime/IBExtract.pas"/>
         <Caret Line="3181" Column="10" TopLine="3156"/>
@@ -421,6 +422,37 @@
         <Filename Value="../../runtime/IBDataOutput.pas"/>
         <Caret Line="348" Column="3" TopLine="339"/>
       </Position8>
+      <Position9>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="125" Column="13" TopLine="121"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="2119" Column="30" TopLine="2090"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="2021" Column="51" TopLine="2003"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../runtime/ibxscript.pas"/>
+        <Caret Line="2040" TopLine="2009"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../../fbintf/IB.pas"/>
+        <Caret Line="1149" TopLine="1119"/>
+      </Position13>
     </JumpHistory>
   </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="../../../fbintf/client/FBSQLData.pas"/>
+        <Line Value="709"/>
+      </Item1>
+    </BreakPoints>
+  </Debugging>
 </CONFIG>

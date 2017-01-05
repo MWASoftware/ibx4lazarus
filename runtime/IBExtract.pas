@@ -368,10 +368,7 @@ begin
     ListDomains;
     ListAllTables(flag);
     if IncludeData then
-    begin
       ListData('');
-      FMetaData.Add('COMMIT;');
-    end;
     ListIndex;
     ListForeign;
     ListGenerators;
@@ -907,15 +904,15 @@ begin
     Result := 'ON ';
     case TypeID of
     $2000:
-      Result += 'CONNECT ';
+      Result += 'CONNECT';
     $2001:
-      Result += 'DISCONNECT ';
+      Result += 'DISCONNECT';
     $2002:
-      Result +='TRANSACTION START ';
+      Result +='TRANSACTION START';
     $2003:
-      Result += 'TRANSACTION COMMIT ';
+      Result += 'TRANSACTION COMMIT';
     $2004:
-      Result += 'TRANSACTION ROLLBACK ';
+      Result += 'TRANSACTION ROLLBACK';
     end;
   end
   else
@@ -1200,7 +1197,7 @@ const
    source that are not part of an SQL constraint }
 
   TriggerSQL =
-    'SELECT * FROM RDB$TRIGGERS TRG JOIN RDB$RELATIONS REL ON ' +
+    'SELECT * FROM RDB$TRIGGERS TRG Left Outer JOIN RDB$RELATIONS REL ON ' +
     '  TRG.RDB$RELATION_NAME = REL.RDB$RELATION_NAME ' +
     'WHERE ' +
     ' (REL.RDB$SYSTEM_FLAG <> 1 OR REL.RDB$SYSTEM_FLAG IS NULL) AND ' +
@@ -1221,7 +1218,7 @@ const
     '    TRG.RDB$TRIGGER_SEQUENCE, TRG.RDB$TRIGGER_NAME';
 
   TriggerByNameSQL =
-    'SELECT * FROM RDB$TRIGGERS TRG JOIN RDB$RELATIONS REL ON ' +
+    'SELECT * FROM RDB$TRIGGERS TRG Left Outer JOIN RDB$RELATIONS REL ON ' +
     '  TRG.RDB$RELATION_NAME = REL.RDB$RELATION_NAME ' +
     'WHERE ' +
     ' TRG.RDB$TRIGGER_NAME = :TriggerName AND ' +
@@ -1280,17 +1277,20 @@ begin
       if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
         SList.Add('/* ');
 
-      SList.Add(Format('CREATE TRIGGER %s FOR %s %s%s %s POSITION %d',
-	        [QuoteIdentifier(FDatabase.SQLDialect, TriggerName),
-           QuoteIdentifier(FDatabase.SQLDialect, RelationName),
-           LineEnding, InActive,
-           GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInteger),
-           qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
+      {Database or Transaction trigger}
+      SList.Add(Format('CREATE TRIGGER %s%s%s %s POSITION %d',
+                [QuoteIdentifier(FDatabase.SQLDialect, TriggerName),
+                LineEnding, InActive,
+                GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInteger),
+                qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
+
+      if RelationName <> '' then
+        SList.Add('ON ' + QuoteIdentifier(FDatabase.SQLDialect, RelationName));
+
       if not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
-        SList.Text := SList.Text +
-              qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString
+        SList.Add(qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString)
       else
-        SList.Text := SList.Text + 'AS BEGIN EXIT; END';
+        SList.Add('AS BEGIN EXIT; END');
       SList.Add(' ' + ProcTerm);
       if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
         SList.Add(' */');
@@ -1715,9 +1715,13 @@ var
       Result := Result + Format(' SEGMENT SIZE %d', [qryDomains.FieldByName('RDB$SEGMENT_LENGTH').AsInteger]);
     end //end_if
     else
-    if (qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying]) and
-       (not qryDomains.FieldByName('RDB$CHARACTER_LENGTH').IsNull) then
-      Result := Result + Format('(%d)', [qryDomains.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
+    if (qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying]) then
+    begin
+       if not qryDomains.FieldByName('RDB$CHARACTER_LENGTH').IsNull then
+         Result := Result + Format('(%d)', [qryDomains.FieldByName('RDB$CHARACTER_LENGTH').AsInteger])
+       else
+         Result := Result + Format('(%d)', [qryDomains.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
+    end;
 
     { since the character set is part of the field type, display that
      information now. }
@@ -2412,13 +2416,30 @@ end;
 procedure TIBExtract.ListViews(ViewName : String);
 const
   ViewSQL =
+    'with recursive Views as ( ' +
+    '  Select RDB$RELATION_NAME, 1 as ViewLevel from RDB$RELATIONS ' +
+    '    Where RDB$RELATION_TYPE = 1 and RDB$SYSTEM_FLAG = 0 '+
+    '  UNION ALL ' +
+    '  Select D.RDB$DEPENDED_ON_NAME, ViewLevel + 1 From RDB$DEPENDENCIES D ' +
+    '  JOIN Views on Views.RDB$RELATION_NAME = D.RDB$DEPENDENT_NAME ' +
+    '     and Views.RDB$RELATION_NAME <> D.RDB$DEPENDED_ON_NAME ' +
+    '  JOIN RDB$RELATIONS R On R.RDB$RELATION_NAME = D.RDB$DEPENDED_ON_NAME ' +
+    ')' +
+    'SELECT R.RDB$RELATION_NAME, R.RDB$OWNER_NAME, R.RDB$VIEW_SOURCE FROM RDB$RELATIONS R ' +
+    'JOIN ( ' +
+    'Select RDB$RELATION_NAME, max(ViewLevel) as ViewLevel From Views ' +
+    'Group By RDB$RELATION_NAME) A On A.RDB$RELATION_NAME = R.RDB$RELATION_NAME ' +
+    'Where R.RDB$RELATION_TYPE = 1 and R.RDB$SYSTEM_FLAG = 0 '+
+    'Order by A.ViewLevel desc, R.RDB$RELATION_NAME asc';
+
+{
     'SELECT RDB$RELATION_NAME, RDB$OWNER_NAME, RDB$VIEW_SOURCE ' +
     'FROM RDB$RELATIONS ' +
     'WHERE ' +
     '  (RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL) AND ' +
     '  NOT RDB$VIEW_BLR IS NULL AND ' +
     '  RDB$FLAGS = 1 ' +
-    'ORDER BY RDB$RELATION_ID';
+    'ORDER BY RDB$RELATION_ID'; }
 
   ViewNameSQL =
     'SELECT RDB$RELATION_NAME, RDB$OWNER_NAME, RDB$VIEW_SOURCE ' +
@@ -3027,9 +3048,13 @@ var
         end;
         break;
       end;
-    if (qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying]) and
-       (not qryHeader.FieldByName('RDB$CHARACTER_LENGTH').IsNull) then
-      Result := Result + Format('(%d)', [qryHeader.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
+    if (qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying]) then
+    begin
+       if not qryHeader.FieldByName('RDB$CHARACTER_LENGTH').IsNull then
+         Result := Result + Format('(%d)', [qryHeader.FieldByName('RDB$CHARACTER_LENGTH').AsInteger])
+       else
+         Result := Result + Format('(%d)', [qryHeader.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
+    end;
 
     { Show international character sets and collations }
 
@@ -3181,6 +3206,7 @@ begin
       Database := FDatabase;
       DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]),
                 Add2MetaData);
+      FMetaData.Add('COMMIT;');
     finally
       Free
     end;
