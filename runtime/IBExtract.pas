@@ -106,7 +106,7 @@ type
     procedure ListFilters(FilterName : String = '');
     procedure ListForeign(ObjectName : String = ''; ExtractType : TExtractType = etForeign);
     procedure ListFunctions(FunctionName : String = '');
-    procedure ListGenerators(GeneratorName : String = '');
+    procedure ListGenerators(GeneratorName : String = ''; ExtractTypes: TExtractTypes=[]);
     procedure ListIndex(ObjectName : String = ''; ExtractType : TExtractType = etIndex);
     procedure ListViews(ViewName : String = '');
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -371,7 +371,10 @@ begin
       ListData('');
     ListIndex;
     ListForeign;
-    ListGenerators;
+    if IncludeData then
+      ListGenerators('',[etData])
+    else
+      ListGenerators;
     ListViews;
     ListCheck;
     ListException;
@@ -959,6 +962,9 @@ const
   ExceptionSQL = 'select * from RDB$EXCEPTIONS ' +
                  'Order BY RDB$EXCEPTION_NAME';
 
+  GeneratorSQL = 'select * from RDB$GENERATORS ' +
+                 'Order BY RDB$GENERATOR_NAME';
+
 var
   qryRoles : TIBSQL;
   RelationName : String;
@@ -994,6 +1000,18 @@ begin
       while not qryRoles.Eof do
       begin
         ShowGrants(Trim(qryRoles.FieldByName('RDB$EXCEPTION_NAME').AsString), Term);
+        qryRoles.Next;
+      end;
+    finally
+      qryRoles.Close;
+    end;
+
+    qryRoles.SQL.Text := GeneratorSQL;
+    qryRoles.ExecQuery;
+    try
+      while not qryRoles.Eof do
+      begin
+        ShowGrants(Trim(qryRoles.FieldByName('RDB$GENERATOR_NAME').AsString), Term);
         qryRoles.Next;
       end;
     finally
@@ -2252,7 +2270,8 @@ end;
  Functional description
    Re create all non-system generators }
 
-procedure TIBExtract.ListGenerators(GeneratorName : String = '');
+procedure TIBExtract.ListGenerators(GeneratorName: String;
+  ExtractTypes: TExtractTypes);
 const
   GeneratorSQL =
     'SELECT RDB$GENERATOR_NAME ' +
@@ -2268,11 +2287,16 @@ const
     '  (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG <> 1) ' +
     'ORDER BY RDB$GENERATOR_NAME';
 
+  GeneratorValueSQL =
+    'SELECT GEN_ID(%s,0) as GENERATORVALUE From RDB$Database';
+
 var
   qryGenerator : TIBSQL;
+  qryValue: TIBSQL;
   GenName : String;
 begin
   qryGenerator := TIBSQL.Create(FDatabase);
+  qryValue := TIBSQL.Create(FDatabase);
   try
     if GeneratorName = '' then
       qryGenerator.SQL.Text := GeneratorSQL
@@ -2297,10 +2321,24 @@ begin
       FMetaData.Add(Format('CREATE SEQUENCE %s%s',
         [QuoteIdentifier(FDatabase.SQLDialect, GenName),
          Term]));
+      if etData in ExtractTypes then
+      begin
+        qryValue.SQL.Text := Format(GeneratorValueSQL,[GenName]);
+        qryValue.ExecQuery;
+        try
+          if not qryValue.EOF then
+            FMetaData.Add(Format('ALTER SEQUENCE %s RESTART WITH %d;',
+                 [QuoteIdentifier(FDatabase.SQLDialect, GenName),
+                  qryValue.FieldByName('GENERATORVALUE').AsInteger]));
+        finally
+          qryValue.Close;
+        end;
+      end;
       qryGenerator.Next;
     end;
   finally
     qryGenerator.Free;
+    qryValue.Free;
   end;
 end;
 
@@ -2661,7 +2699,7 @@ begin
          ShowGrants(ObjectName, Term);
      end;
     eoFunction : ListFunctions(ObjectName);
-    eoGenerator : ListGenerators(ObjectName);
+    eoGenerator : ListGenerators(ObjectName,ExtractTypes);
     eoException : ListException(ObjectName);
     eoBLOBFilter : ListFilters(ObjectName);
     eoRole : ListRoles(ObjectName);
@@ -2778,6 +2816,9 @@ const
   'Select RDB$EXCEPTION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 7 as ObjectType '+
   'From RDB$EXCEPTIONS '+
   'UNION '+
+  'Select RDB$GENERATOR_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 14 as ObjectType '+
+  'From RDB$GENERATORS '+
+  'UNION '+
   'Select RDB$CHARACTER_SET_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 11 as ObjectType '+
   'From RDB$CHARACTER_SETS '+
   ') '+
@@ -2790,6 +2831,7 @@ const
   'When 5 then ''PROCEDURE'' '+
   'When 7 then ''EXCEPTION'' '+
   'When 11 then ''CHARACTER SET'' '+
+  'When 14 then ''GENERATOR'' '+
   'ELSE NULL END as OBJECT_TYPE_NAME, '+
   'case RDB$USER_TYPE '+
   'When 5 then ''PROCEDURE'' '+
@@ -2824,7 +2866,7 @@ const
   'Group By PR.RDB$USER,PR.RDB$RELATION_NAME,PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE, OW.RDB$OWNER_NAME)  '+
   'Where METAOBJECTNAME = :METAOBJECTNAME and RDB$USER <> RDB$OWNER_NAME  '+
   'Group By RDB$USER,RDB$GRANT_OPTION,  RDB$USER_TYPE, RDB$OBJECT_TYPE,METAOBJECTNAME '+
-  'ORDER BY RDB$USER';
+  'ORDER BY RDB$USER, RDB$OBJECT_TYPE';
 
 var qryOwnerPriv : TIBSQL;
 
