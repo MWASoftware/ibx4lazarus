@@ -204,6 +204,7 @@ const
   ODS_VERSION10 = 10; { V6.0 features. SQL delimited idetifier,
                                         SQLDATE, and 64-bit exact numeric
                                         type }
+  ODS_VERSION12 = 12; {Firebird 3}
 
   { flags for RDB$FILE_FLAGS }
   FILE_shadow = 1;
@@ -2808,24 +2809,7 @@ end;
 
 procedure TIBExtract.ShowGrants(MetaObject: String; Terminator: String);
 const
-  GrantsSQL =
-  'with ObjectOwners As ( '+
-  'Select RDB$RELATION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 0 as ObjectType '+
-  'From RDB$RELATIONS '+
-  'UNION '+
-  'Select RDB$PROCEDURE_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 5 as ObjectType '+
-  'From RDB$PROCEDURES '+
-  'UNION '+
-  'Select RDB$EXCEPTION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 7 as ObjectType '+
-  'From RDB$EXCEPTIONS '+
-  'UNION '+
-  'Select RDB$GENERATOR_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 14 as ObjectType '+
-  'From RDB$GENERATORS '+
-  'UNION '+
-  'Select RDB$CHARACTER_SET_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 11 as ObjectType '+
-  'From RDB$CHARACTER_SETS '+
-  ') '+
-  ' '+
+  GrantsBaseSelect =
   'Select Trim(RDB$USER) as RDB$USER,List("Privileges") as Privileges, '+
   'coalesce(RDB$GRANT_OPTION,0) as RDB$GRANT_OPTION,METAOBJECTNAME, '+
   'RDB$USER_TYPE, RDB$OBJECT_TYPE, '+
@@ -2871,6 +2855,42 @@ const
   'Group By RDB$USER,RDB$GRANT_OPTION,  RDB$USER_TYPE, RDB$OBJECT_TYPE,METAOBJECTNAME '+
   'ORDER BY RDB$USER, RDB$OBJECT_TYPE';
 
+  GrantsSQL12 =
+  'with ObjectOwners As ( '+
+  'Select RDB$RELATION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 0 as ObjectType '+
+  'From RDB$RELATIONS '+
+  'UNION '+
+  'Select RDB$PROCEDURE_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 5 as ObjectType '+
+  'From RDB$PROCEDURES '+
+  'UNION '+
+  'Select RDB$EXCEPTION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 7 as ObjectType '+
+  'From RDB$EXCEPTIONS '+
+  'UNION '+
+  'Select RDB$GENERATOR_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 14 as ObjectType '+
+  'From RDB$GENERATORS '+
+  'UNION '+
+  'Select RDB$CHARACTER_SET_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 11 as ObjectType '+
+  'From RDB$CHARACTER_SETS '+
+  ') '+ GrantsBaseSelect;
+
+  GrantsSQL =
+  'with ObjectOwners As ( '+
+  'Select RDB$RELATION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 0 as ObjectType '+
+  'From RDB$RELATIONS '+
+  'UNION '+
+  'Select RDB$PROCEDURE_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 5 as ObjectType '+
+  'From RDB$PROCEDURES '+
+  'UNION '+
+  'Select RDB$EXCEPTION_NAME as METAOBJECTNAME, ''SYSDBA'', 7 as ObjectType '+
+  'From RDB$EXCEPTIONS '+
+  'UNION '+
+  'Select RDB$GENERATOR_NAME as METAOBJECTNAME, ''SYSDBA'', 14 as ObjectType '+
+  'From RDB$GENERATORS '+
+  'UNION '+
+  'Select RDB$CHARACTER_SET_NAME as METAOBJECTNAME, ''SYSDBA'', 11 as ObjectType '+
+  'From RDB$CHARACTER_SETS '+
+  ') '+ GrantsBaseSelect;
+
 var qryOwnerPriv : TIBSQL;
 
 begin
@@ -2879,6 +2899,9 @@ begin
 
   qryOwnerPriv := TIBSQL.Create(FDatabase);
   try
+    if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
+      qryOwnerPriv.SQL.Text := GrantsSQL12
+    else
     qryOwnerPriv.SQL.Text := GrantsSQL;
     qryOwnerPriv.Params.ByName('METAOBJECTNAME').AsString := MetaObject;
     qryOwnerPriv.ExecQuery;
