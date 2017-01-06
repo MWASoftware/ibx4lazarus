@@ -956,13 +956,16 @@ const
                 '  RDB$SECURITY_CLASS STARTING WITH ''SQL$'' ' +
                 'ORDER BY RDB$RELATION_NAME';
 
-  ProcedureSQL = 'select * from RDB$PROCEDURES ' +
+  ProcedureSQL = 'select * from RDB$PROCEDURES '+
+                 'Where RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL ' +
                  'Order BY RDB$PROCEDURE_NAME';
 
-  ExceptionSQL = 'select * from RDB$EXCEPTIONS ' +
+  ExceptionSQL = 'select * from RDB$EXCEPTIONS '+
+                 'Where RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL ' +
                  'Order BY RDB$EXCEPTION_NAME';
 
-  GeneratorSQL = 'select * from RDB$GENERATORS ' +
+  GeneratorSQL = 'select * from RDB$GENERATORS '+
+                 'Where RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL ' +
                  'Order BY RDB$GENERATOR_NAME';
 
 var

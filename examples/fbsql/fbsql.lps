@@ -27,8 +27,8 @@
         <Filename Value="..\..\runtime\IBExtract.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="351"/>
-        <CursorPos X="3" Y="338"/>
+        <TopLine Value="948"/>
+        <CursorPos X="19" Y="968"/>
         <UsageCount Value="85"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -258,15 +258,16 @@
       </Unit33>
       <Unit34>
         <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <IsVisibleTab Value="True"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="41"/>
-        <CursorPos X="17" Y="57"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="2014"/>
+        <CursorPos Y="2017"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
-          <EditorIndex Value="4"/>
-          <TopLine Value="2014"/>
-          <CursorPos Y="2017"/>
+          <IsVisibleTab Value="True"/>
+          <EditorIndex Value="-1"/>
+          <WindowIndex Value="1"/>
+          <TopLine Value="41"/>
+          <CursorPos X="17" Y="57"/>
         </ExtraEditor1>
         <UsageCount Value="61"/>
         <Loaded Value="True"/>
@@ -427,7 +428,7 @@
         <UsageCount Value="7"/>
       </Unit56>
     </Units>
-    <JumpHistory Count="11" HistoryIndex="10">
+    <JumpHistory Count="12" HistoryIndex="11">
       <Position1>
         <Filename Value="..\..\runtime\ibxscript.pas"/>
         <Caret Line="1139" TopLine="1123"/>
@@ -472,6 +473,10 @@
         <Filename Value="..\..\runtime\IBExtract.pas"/>
         <Caret Line="988" Column="15" TopLine="967"/>
       </Position11>
+      <Position12>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <Caret Line="375" Column="17" TopLine="351"/>
+      </Position12>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
