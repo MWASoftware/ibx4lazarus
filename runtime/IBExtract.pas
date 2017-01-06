@@ -106,7 +106,7 @@ type
     procedure ListFilters(FilterName : String = '');
     procedure ListForeign(ObjectName : String = ''; ExtractType : TExtractType = etForeign);
     procedure ListFunctions(FunctionName : String = '');
-    procedure ListGenerators(GeneratorName : String = '');
+    procedure ListGenerators(GeneratorName : String = ''; ExtractTypes: TExtractTypes=[]);
     procedure ListIndex(ObjectName : String = ''; ExtractType : TExtractType = etIndex);
     procedure ListViews(ViewName : String = '');
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -368,13 +368,13 @@ begin
     ListDomains;
     ListAllTables(flag);
     if IncludeData then
-    begin
       ListData('');
-      FMetaData.Add('COMMIT;');
-    end;
     ListIndex;
     ListForeign;
-    ListGenerators;
+    if IncludeData then
+      ListGenerators('',[etData])
+    else
+      ListGenerators;
     ListViews;
     ListCheck;
     ListException;
@@ -907,15 +907,15 @@ begin
     Result := 'ON ';
     case TypeID of
     $2000:
-      Result += 'CONNECT ';
+      Result += 'CONNECT';
     $2001:
-      Result += 'DISCONNECT ';
+      Result += 'DISCONNECT';
     $2002:
-      Result +='TRANSACTION START ';
+      Result +='TRANSACTION START';
     $2003:
-      Result += 'TRANSACTION COMMIT ';
+      Result += 'TRANSACTION COMMIT';
     $2004:
-      Result += 'TRANSACTION ROLLBACK ';
+      Result += 'TRANSACTION ROLLBACK';
     end;
   end
   else
@@ -956,11 +956,17 @@ const
                 '  RDB$SECURITY_CLASS STARTING WITH ''SQL$'' ' +
                 'ORDER BY RDB$RELATION_NAME';
 
-  ProcedureSQL = 'select * from RDB$PROCEDURES ' +
+  ProcedureSQL = 'select * from RDB$PROCEDURES '+
+                 'Where RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL ' +
                  'Order BY RDB$PROCEDURE_NAME';
 
-  ExceptionSQL = 'select * from RDB$EXCEPTIONS ' +
+  ExceptionSQL = 'select * from RDB$EXCEPTIONS '+
+                 'Where RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL ' +
                  'Order BY RDB$EXCEPTION_NAME';
+
+  GeneratorSQL = 'select * from RDB$GENERATORS '+
+                 'Where RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL ' +
+                 'Order BY RDB$GENERATOR_NAME';
 
 var
   qryRoles : TIBSQL;
@@ -997,6 +1003,18 @@ begin
       while not qryRoles.Eof do
       begin
         ShowGrants(Trim(qryRoles.FieldByName('RDB$EXCEPTION_NAME').AsString), Term);
+        qryRoles.Next;
+      end;
+    finally
+      qryRoles.Close;
+    end;
+
+    qryRoles.SQL.Text := GeneratorSQL;
+    qryRoles.ExecQuery;
+    try
+      while not qryRoles.Eof do
+      begin
+        ShowGrants(Trim(qryRoles.FieldByName('RDB$GENERATOR_NAME').AsString), Term);
         qryRoles.Next;
       end;
     finally
@@ -1200,7 +1218,7 @@ const
    source that are not part of an SQL constraint }
 
   TriggerSQL =
-    'SELECT * FROM RDB$TRIGGERS TRG JOIN RDB$RELATIONS REL ON ' +
+    'SELECT * FROM RDB$TRIGGERS TRG Left Outer JOIN RDB$RELATIONS REL ON ' +
     '  TRG.RDB$RELATION_NAME = REL.RDB$RELATION_NAME ' +
     'WHERE ' +
     ' (REL.RDB$SYSTEM_FLAG <> 1 OR REL.RDB$SYSTEM_FLAG IS NULL) AND ' +
@@ -1221,7 +1239,7 @@ const
     '    TRG.RDB$TRIGGER_SEQUENCE, TRG.RDB$TRIGGER_NAME';
 
   TriggerByNameSQL =
-    'SELECT * FROM RDB$TRIGGERS TRG JOIN RDB$RELATIONS REL ON ' +
+    'SELECT * FROM RDB$TRIGGERS TRG Left Outer JOIN RDB$RELATIONS REL ON ' +
     '  TRG.RDB$RELATION_NAME = REL.RDB$RELATION_NAME ' +
     'WHERE ' +
     ' TRG.RDB$TRIGGER_NAME = :TriggerName AND ' +
@@ -1280,17 +1298,20 @@ begin
       if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
         SList.Add('/* ');
 
-      SList.Add(Format('CREATE TRIGGER %s FOR %s %s%s %s POSITION %d',
-	        [QuoteIdentifier(FDatabase.SQLDialect, TriggerName),
-           QuoteIdentifier(FDatabase.SQLDialect, RelationName),
-           LineEnding, InActive,
-           GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInteger),
-           qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
+      {Database or Transaction trigger}
+      SList.Add(Format('CREATE TRIGGER %s%s%s %s POSITION %d',
+                [QuoteIdentifier(FDatabase.SQLDialect, TriggerName),
+                LineEnding, InActive,
+                GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInteger),
+                qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
+
+      if RelationName <> '' then
+        SList.Add('ON ' + QuoteIdentifier(FDatabase.SQLDialect, RelationName));
+
       if not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
-        SList.Text := SList.Text +
-              qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString
+        SList.Add(qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString)
       else
-        SList.Text := SList.Text + 'AS BEGIN EXIT; END';
+        SList.Add('AS BEGIN EXIT; END');
       SList.Add(' ' + ProcTerm);
       if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
         SList.Add(' */');
@@ -1715,9 +1736,13 @@ var
       Result := Result + Format(' SEGMENT SIZE %d', [qryDomains.FieldByName('RDB$SEGMENT_LENGTH').AsInteger]);
     end //end_if
     else
-    if (qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying]) and
-       (not qryDomains.FieldByName('RDB$CHARACTER_LENGTH').IsNull) then
-      Result := Result + Format('(%d)', [qryDomains.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
+    if (qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying]) then
+    begin
+       if not qryDomains.FieldByName('RDB$CHARACTER_LENGTH').IsNull then
+         Result := Result + Format('(%d)', [qryDomains.FieldByName('RDB$CHARACTER_LENGTH').AsInteger])
+       else
+         Result := Result + Format('(%d)', [qryDomains.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
+    end;
 
     { since the character set is part of the field type, display that
      information now. }
@@ -2248,7 +2273,8 @@ end;
  Functional description
    Re create all non-system generators }
 
-procedure TIBExtract.ListGenerators(GeneratorName : String = '');
+procedure TIBExtract.ListGenerators(GeneratorName: String;
+  ExtractTypes: TExtractTypes);
 const
   GeneratorSQL =
     'SELECT RDB$GENERATOR_NAME ' +
@@ -2264,11 +2290,16 @@ const
     '  (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG <> 1) ' +
     'ORDER BY RDB$GENERATOR_NAME';
 
+  GeneratorValueSQL =
+    'SELECT GEN_ID(%s,0) as GENERATORVALUE From RDB$Database';
+
 var
   qryGenerator : TIBSQL;
+  qryValue: TIBSQL;
   GenName : String;
 begin
   qryGenerator := TIBSQL.Create(FDatabase);
+  qryValue := TIBSQL.Create(FDatabase);
   try
     if GeneratorName = '' then
       qryGenerator.SQL.Text := GeneratorSQL
@@ -2293,10 +2324,24 @@ begin
       FMetaData.Add(Format('CREATE SEQUENCE %s%s',
         [QuoteIdentifier(FDatabase.SQLDialect, GenName),
          Term]));
+      if etData in ExtractTypes then
+      begin
+        qryValue.SQL.Text := Format(GeneratorValueSQL,[GenName]);
+        qryValue.ExecQuery;
+        try
+          if not qryValue.EOF then
+            FMetaData.Add(Format('ALTER SEQUENCE %s RESTART WITH %d;',
+                 [QuoteIdentifier(FDatabase.SQLDialect, GenName),
+                  qryValue.FieldByName('GENERATORVALUE').AsInteger]));
+        finally
+          qryValue.Close;
+        end;
+      end;
       qryGenerator.Next;
     end;
   finally
     qryGenerator.Free;
+    qryValue.Free;
   end;
 end;
 
@@ -2412,13 +2457,30 @@ end;
 procedure TIBExtract.ListViews(ViewName : String);
 const
   ViewSQL =
+    'with recursive Views as ( ' +
+    '  Select RDB$RELATION_NAME, 1 as ViewLevel from RDB$RELATIONS ' +
+    '    Where RDB$RELATION_TYPE = 1 and RDB$SYSTEM_FLAG = 0 '+
+    '  UNION ALL ' +
+    '  Select D.RDB$DEPENDED_ON_NAME, ViewLevel + 1 From RDB$DEPENDENCIES D ' +
+    '  JOIN Views on Views.RDB$RELATION_NAME = D.RDB$DEPENDENT_NAME ' +
+    '     and Views.RDB$RELATION_NAME <> D.RDB$DEPENDED_ON_NAME ' +
+    '  JOIN RDB$RELATIONS R On R.RDB$RELATION_NAME = D.RDB$DEPENDED_ON_NAME ' +
+    ')' +
+    'SELECT R.RDB$RELATION_NAME, R.RDB$OWNER_NAME, R.RDB$VIEW_SOURCE FROM RDB$RELATIONS R ' +
+    'JOIN ( ' +
+    'Select RDB$RELATION_NAME, max(ViewLevel) as ViewLevel From Views ' +
+    'Group By RDB$RELATION_NAME) A On A.RDB$RELATION_NAME = R.RDB$RELATION_NAME ' +
+    'Where R.RDB$RELATION_TYPE = 1 and R.RDB$SYSTEM_FLAG = 0 '+
+    'Order by A.ViewLevel desc, R.RDB$RELATION_NAME asc';
+
+{
     'SELECT RDB$RELATION_NAME, RDB$OWNER_NAME, RDB$VIEW_SOURCE ' +
     'FROM RDB$RELATIONS ' +
     'WHERE ' +
     '  (RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL) AND ' +
     '  NOT RDB$VIEW_BLR IS NULL AND ' +
     '  RDB$FLAGS = 1 ' +
-    'ORDER BY RDB$RELATION_ID';
+    'ORDER BY RDB$RELATION_ID'; }
 
   ViewNameSQL =
     'SELECT RDB$RELATION_NAME, RDB$OWNER_NAME, RDB$VIEW_SOURCE ' +
@@ -2640,7 +2702,7 @@ begin
          ShowGrants(ObjectName, Term);
      end;
     eoFunction : ListFunctions(ObjectName);
-    eoGenerator : ListGenerators(ObjectName);
+    eoGenerator : ListGenerators(ObjectName,ExtractTypes);
     eoException : ListException(ObjectName);
     eoBLOBFilter : ListFilters(ObjectName);
     eoRole : ListRoles(ObjectName);
@@ -2757,6 +2819,9 @@ const
   'Select RDB$EXCEPTION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 7 as ObjectType '+
   'From RDB$EXCEPTIONS '+
   'UNION '+
+  'Select RDB$GENERATOR_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 14 as ObjectType '+
+  'From RDB$GENERATORS '+
+  'UNION '+
   'Select RDB$CHARACTER_SET_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 11 as ObjectType '+
   'From RDB$CHARACTER_SETS '+
   ') '+
@@ -2769,6 +2834,7 @@ const
   'When 5 then ''PROCEDURE'' '+
   'When 7 then ''EXCEPTION'' '+
   'When 11 then ''CHARACTER SET'' '+
+  'When 14 then ''GENERATOR'' '+
   'ELSE NULL END as OBJECT_TYPE_NAME, '+
   'case RDB$USER_TYPE '+
   'When 5 then ''PROCEDURE'' '+
@@ -2803,7 +2869,7 @@ const
   'Group By PR.RDB$USER,PR.RDB$RELATION_NAME,PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE, OW.RDB$OWNER_NAME)  '+
   'Where METAOBJECTNAME = :METAOBJECTNAME and RDB$USER <> RDB$OWNER_NAME  '+
   'Group By RDB$USER,RDB$GRANT_OPTION,  RDB$USER_TYPE, RDB$OBJECT_TYPE,METAOBJECTNAME '+
-  'ORDER BY RDB$USER';
+  'ORDER BY RDB$USER, RDB$OBJECT_TYPE';
 
 var qryOwnerPriv : TIBSQL;
 
@@ -3027,9 +3093,13 @@ var
         end;
         break;
       end;
-    if (qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying]) and
-       (not qryHeader.FieldByName('RDB$CHARACTER_LENGTH').IsNull) then
-      Result := Result + Format('(%d)', [qryHeader.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
+    if (qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying]) then
+    begin
+       if not qryHeader.FieldByName('RDB$CHARACTER_LENGTH').IsNull then
+         Result := Result + Format('(%d)', [qryHeader.FieldByName('RDB$CHARACTER_LENGTH').AsInteger])
+       else
+         Result := Result + Format('(%d)', [qryHeader.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
+    end;
 
     { Show international character sets and collations }
 
@@ -3181,6 +3251,7 @@ begin
       Database := FDatabase;
       DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]),
                 Add2MetaData);
+      FMetaData.Add('COMMIT;');
     finally
       Free
     end;

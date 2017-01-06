@@ -40,26 +40,27 @@ const
   BlobLineLength = 40;
 
   {Non-character symbols}
-  sqNone         = #0;
-  sqEnd          = #1;
-  sqBegin        = #2;
-  sqString       = #3;
-  sqComment      = #4;
-  sqCase         = #5;
-  sqDeclare      = #6;
-  sqCommentLine  = #7;
-  sqEOL          = #8;
-  sqTab          = #9;
-  sqTerminator   = #10;
-  sqEOF          = #11;
-  sqTag          = #12;
-  sqEndTag       = #13;
+  sqNone                 = #0;
+  sqEnd                  = #1;
+  sqBegin                = #2;
+  sqString               = #3;
+  sqComment              = #4;
+  sqCase                 = #5;
+  sqDeclare              = #6;
+  sqCommentLine          = #7;
+  sqEOL                  = #8;
+  sqTab                  = #9;
+  sqTerminator           = #10;
+  sqEOF                  = #11;
+  sqTag                  = #12;
+  sqEndTag               = #13;
+  sqQuotedString         = #14;
+  sqDoubleQuotedString   = #15;
 
 type
   TSQLSymbol = char;
 
-  TSQLStates =  (stInit, stError, stInSQL, stNested, stInSingleQuotes,
-                 stInDoubleQuotes, stInDeclaration, stInCommit, stInReconnect);
+  TSQLStates =  (stInit, stError, stInSQL, stNested,  stInDeclaration);
 
   TXMLStates =  (stInTag,stAttribute,stAttributeValue,stQuotedAttributeValue,
                  stTagged,stEndTag);
@@ -445,6 +446,7 @@ resourcestring
   sOnLineError = 'On Line %d Character %d: ';
   sArrayIndexError = 'Array Index Error (%d)';
   sBlobIndexError = 'Blob Index Error (%d)';
+  sStatementError = 'Error processing SQL statement: %s %s - for statement "%s"';
 
 function StringToHex(octetString: string; MaxLineLength: integer): string; overload;
 
@@ -721,7 +723,8 @@ begin
 
   except on E:Exception do
       begin
-        Add2Log(FSymbolStream.GetErrorPrefix+E.Message,true);
+        Add2Log(Format(sStatementError,[FSymbolStream.GetErrorPrefix,
+                           E.Message,stmt]),true);
         if StopOnFirstError then Exit;
       end
   end;
@@ -1085,7 +1088,7 @@ begin
         stInSQL:
             Done := true;
 
-       stNested, stInSingleQuotes, stInDoubleQuotes:
+       stNested:
          AddToSQL(Terminator);
 
        stInDeclaration:
@@ -1119,7 +1122,9 @@ begin
           FState := stInSQL
       end;
 
-    sqComment:
+    sqComment,
+    sqQuotedString,
+    sqDoubleQuotedString:
       if FState <> stInit then
         AddToSQL(SymbolValue);
 
@@ -1127,39 +1132,10 @@ begin
       if FState <> stInit then
       AddToSQL(SymbolValue + LineEnding);
 
-    '''':
-      begin
-        case FState of
-        stInSingleQuotes:
-          FState := PopState;
-        stInDoubleQuotes:
-          {Ignore};
-        else
-          SetState(stInSingleQuotes)
-        end;
-        AddToSQL('''')
-      end;
-
-    '"':
-      begin
-        case FState of
-        stInSingleQuotes:
-          {Ignore};
-        stInDoubleQuotes:
-          FState := PopState;
-        else
-          SetState(stInDoubleQuotes)
-        end;
-        AddToSQL('"')
-      end;
-
     sqEnd:
       begin
         AddToSQL(SymbolValue);
         case FState of
-        stInSingleQuotes,
-        stInDoubleQuotes:
-          {Ignore};
         stNested:
           begin
             if FNested = 0 then
@@ -1185,9 +1161,6 @@ begin
         FHasBegin := true;
         AddToSQL(SymbolValue);
         case FState of
-        stInSingleQuotes,
-        stInDoubleQuotes:
-          {Ignore};
         stNested:
           Inc(FNested);
 
@@ -1201,9 +1174,6 @@ begin
     begin
       AddToSQL(SymbolValue);
       case FState of
-      stInSingleQuotes,
-      stInDoubleQuotes:
-        {Ignore};
       stNested:
         Inc(FNested);
 
@@ -1233,8 +1203,6 @@ begin
     sqEOL:
       begin
         case FState of
-        stInDoubleQuotes:
-          ShowError(sUnterminatedString,[nil]);
         stInit:
           {Do nothing};
         else
@@ -1940,12 +1908,13 @@ begin
 end;
 
 function TSymbolStream.GetSymbol: TSQLSymbol;
-var InComment: boolean;
-    Comment: string;
+var
+    DelimitedText: string;
+    CurState: (gsNone,gsInComment,gsInSingleQuotes,gsInDoubleQuotes);
 begin
   Result := sqNone;
-  InComment := false;
-  Comment := '';
+  CurState := gsNone;
+  DelimitedText := '';
   if FNextSymbol <> sqNone then
   begin
     Result := FNextSymbol;
@@ -1977,86 +1946,148 @@ begin
         FNextStatement := false;
         if assigned(OnNextLine) then
           OnNextLine(self,FLine);
-        if InComment then
-          Comment += LineEnding;
+        if CurState <> gsNone then
+          DelimitedText += LineEnding;
         if Length(FLine) = 0 then
           continue;
       end;
-      if InComment then
-        Comment += FLine[FIndex];
+      if CurState <> gsNone then
+        DelimitedText += FLine[FIndex];
       FNextSymbol := GetNextSymbol(FLine[FIndex]);
       Inc(FIndex);
     end;
 
-    {combine if possible}
-    case Result of
-    sqNone:
+    case CurState of
+    gsNone:
       begin
-        Result := FNextSymbol;
-        if FNextSymbol = sqString then
-          FString := FLastChar;
-        FNextSymbol := sqNone
+        {combine if possible}
+        case Result of
+        sqNone:
+          begin
+            Result := FNextSymbol;
+            if FNextSymbol = sqString then
+              FString := FLastChar;
+            FNextSymbol := sqNone
+          end;
+
+        '/':
+          if FXMLMode > 0 then
+            break
+          else
+          if FNextSymbol = '*' then
+          begin
+            CurState := gsInComment;
+            DelimitedText := '/*';
+            Result := sqNone;
+            FNextSymbol := sqNone
+          end
+          else
+          if FNextSymbol = '/' then
+          begin
+            FString := '/*' + system.copy(FLine,FIndex,length(FLine)- FIndex + 1) + ' */';
+            Result := sqCommentLine;
+            FIndex := 0;
+            FNextSymbol := sqNone
+          end;
+
+        '<':
+          if (FXMLMode > 0) and (FNextSymbol = '/') then
+          begin
+            Result := sqEndTag;
+            FString := '';
+            FNextSymbol := sqNone
+          end
+          else
+          if FNextSymbol = sqString then
+          begin
+            Result := sqTag;
+            FString := FLastChar;
+            FNextSymbol := sqNone
+          end;
+
+        '''':
+        if FXMLMode > 0 then
+          break
+        else
+        if FNextSymbol = '''' then
+        begin
+          Result := sqQuotedString;
+          FString := '''''';
+          FNextSymbol := sqNone
+        end
+        else
+        begin
+          CurState := gsInSingleQuotes;
+          DelimitedText := '''';
+          if FNextSymbol = sqEOL then
+            DelimitedText += LineEnding
+          else
+            DelimitedText += FLine[FIndex-1];
+          Result := sqNone;
+          FNextSymbol := sqNone
+        end;
+
+        '"':
+        if FXMLMode > 0 then
+          break
+        else
+        begin
+          CurState := gsInDoubleQuotes;
+          DelimitedText := '"';
+          if FNextSymbol = sqEOL then
+            DelimitedText += LineEnding
+          else
+            DelimitedText += FLine[FIndex-1];
+          Result := sqNone;
+          FNextSymbol := sqNone
+        end;
+
+        sqTag,
+        sqEndTag,
+        sqString:
+          if FNextSymbol = sqString then
+          begin
+            FString := FString + FLastChar;
+            FNextSymbol := sqNone
+          end;
+        end
       end;
 
-    '/':
-      if FXMLMode > 0 then
-        break
-      else
-      if FNextSymbol = '*' then
+    {Check for state exit condition}
+    gsInSingleQuotes:
+      if Result = '''' then
       begin
-        InComment := true;
-        Comment := '/*';
-        Result := sqNone;
-        FNextSymbol := sqNone
-      end
-      else
-      if FNextSymbol = '/' then
-      begin
-        FString := '/*' + system.copy(FLine,FIndex,length(FLine)- FIndex + 1) + ' */';
-        Result := sqCommentLine;
-        FIndex := 0;
-        FNextSymbol := sqNone
-      end;
+         CurState := gsNone;
+         if FNextSymbol = sqEOL then
+           FString := DelimitedText
+         else
+           FString := system.copy(DelimitedText,1,Length(DelimitedText)-1);
+         Result := sqQuotedString;
+       end;
 
-    '*':
-      if FXMLMode > 0 then
-        break
-      else
-      if FNextSymbol = '/' then
+    gsInDoubleQuotes:
+      if Result = '"' then
       begin
-        InComment := false;
-        FString := Comment;
+         CurState := gsNone;
+         if FNextSymbol = sqEOL then
+           FString := DelimitedText
+         else
+           FString := system.copy(DelimitedText,1,Length(DelimitedText)-1);
+         Result := sqDoubleQuotedString;
+       end;
+
+    gsInComment:
+    if (Result = '*') and (FNextSymbol = '/') then
+      begin
+        CurState := gsNone;
+        FString := DelimitedText;
         Result := sqComment;
-        FNextSymbol := sqNone
-      end;
-
-    '<':
-      if (FXMLMode > 0) and (FNextSymbol = '/') then
-      begin
-        Result := sqEndTag;
-        FString := '';
-        FNextSymbol := sqNone
-      end
-      else
-      if FNextSymbol = sqString then
-      begin
-        Result := sqTag;
-        FString := FLastChar;
-        FNextSymbol := sqNone
-      end;
-
-    sqTag,
-    sqEndTag,
-    sqString:
-      if FNextSymbol = sqString then
-      begin
-        FString := FString + FLastChar;
         FNextSymbol := sqNone
       end;
 
     end;
 
-    if InComment and (FNextSymbol <> sqNone) then
+    if (CurState <> gsNone) and (FNextSymbol <> sqNone) then
     begin
       Result := FNextSymbol;
       FNextSymbol := sqNone;
@@ -2081,12 +2112,6 @@ begin
 
   if (FXMLMode = 0) and (Result = sqString) and (FString <> '') then
   begin
-       if InComment then
-       begin
-         Comment += FString;
-         FNextSymbol := sqNone;
-       end
-       else
        if CompareText(FString,'begin') = 0 then
          Result := sqBegin
        else
@@ -2099,6 +2124,7 @@ begin
        if CompareText(FString,'case') = 0 then
          Result := sqCase
   end;
+//  writeln(Result,',',FString);
 end;
 
 procedure TSymbolStream.NextStatement;

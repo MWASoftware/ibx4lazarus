@@ -1,0 +1,16 @@
+[requires]
+packages=fcl-res
+libc=y
+
+[compiler]
+options= -MObjFPC -Scghi -Cg -Cr -O3 -l -vewnhibq -dUseCThreads
+
+unittargetdir=buildlib/$(CPU_TARGET)-$(OS_TARGET)
+includedir=$(FBINTFDIR)/client/3.0/firebird $(FBINTFDIR)/client/include $(FBINTFDIR)/include ../../runtime
+unitdir=$(FBINTFDIR)/client $(FBINTFDIR)/client/3.0/firebird $(FBINTFDIR)/client/2.5 . $(FBINTFDIR)/client/3.0 $(FBINTFDIR) ../../runtime $(LAZUTILS)
+
+[target]
+programs=fbsql 
+
+
+

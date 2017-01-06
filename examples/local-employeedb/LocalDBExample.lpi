@@ -64,8 +64,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="294"/>
-        <CursorPos X="10" Y="298"/>
+        <TopLine Value="283"/>
+        <CursorPos X="63" Y="297"/>
         <UsageCount Value="157"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -771,8 +771,8 @@
       <Unit100>
         <Filename Value="../../iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="565"/>
-        <CursorPos X="3" Y="578"/>
+        <TopLine Value="118"/>
+        <CursorPos X="14" Y="137"/>
         <UsageCount Value="26"/>
       </Unit100>
       <Unit101>
@@ -822,8 +822,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="89"/>
-        <CursorPos X="3" Y="91"/>
         <UsageCount Value="22"/>
       </Unit106>
       <Unit107>
@@ -897,8 +895,8 @@
       <Unit116>
         <Filename Value="../../iblocaldb/IBLocalDBSupport.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="109"/>
-        <CursorPos X="57" Y="128"/>
+        <TopLine Value="103"/>
+        <CursorPos X="37" Y="122"/>
         <UsageCount Value="15"/>
       </Unit116>
       <Unit117>

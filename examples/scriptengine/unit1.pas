@@ -150,7 +150,7 @@ end;
 procedure TForm1.RunScriptExecute(Sender: TObject);
 begin
   ResultsLog.Lines.Clear;
-  IBXScript1.RunScript(IBScript.Lines,true);
+  IBXScript1.RunScript(IBScript.Lines);
   Timer1.Interval := 1000;
   EchoInput.Checked := IBXScript1.Echo;
   StopOnError.Checked := IBXScript1.StopOnFirstError;
