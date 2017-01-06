@@ -8,8 +8,9 @@
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="20"/>
-        <CursorPos X="34" Y="39"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="385"/>
+        <CursorPos Y="412"/>
         <UsageCount Value="185"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -86,10 +87,9 @@
       </Unit9>
       <Unit10>
         <Filename Value="..\..\..\fbintf\client\3.0\FB30Blob.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
         <TopLine Value="103"/>
-        <CursorPos X="44" Y="105"/>
+        <CursorPos X="55" Y="121"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit10>
