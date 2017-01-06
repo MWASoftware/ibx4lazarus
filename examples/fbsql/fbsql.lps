@@ -4,7 +4,7 @@
     <PathDelim Value="\"/>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="57">
+    <Units Count="58">
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -27,8 +27,8 @@
         <Filename Value="..\..\runtime\IBExtract.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="948"/>
-        <CursorPos X="19" Y="968"/>
+        <TopLine Value="2887"/>
+        <CursorPos X="40" Y="2905"/>
         <UsageCount Value="85"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -263,9 +263,8 @@
         <CursorPos Y="2017"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
-          <IsVisibleTab Value="True"/>
           <EditorIndex Value="-1"/>
-          <WindowIndex Value="1"/>
+          <WindowIndex Value="-1"/>
           <TopLine Value="41"/>
           <CursorPos X="17" Y="57"/>
         </ExtraEditor1>
@@ -427,8 +426,14 @@
         <CursorPos X="10" Y="169"/>
         <UsageCount Value="7"/>
       </Unit56>
+      <Unit57>
+        <Filename Value="..\..\..\fbintf\testsuite\reference.log"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit57>
     </Units>
-    <JumpHistory Count="12" HistoryIndex="11">
+    <JumpHistory Count="17" HistoryIndex="16">
       <Position1>
         <Filename Value="..\..\runtime\ibxscript.pas"/>
         <Caret Line="1139" TopLine="1123"/>
@@ -477,6 +482,25 @@
         <Filename Value="..\..\runtime\IBExtract.pas"/>
         <Caret Line="375" Column="17" TopLine="351"/>
       </Position12>
+      <Position13>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <Caret Line="2828" Column="42" TopLine="2802"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+      </Position14>
+      <Position15>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <Caret Line="207" Column="34" TopLine="180"/>
+      </Position15>
+      <Position16>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <Caret Line="2892" Column="26" TopLine="2884"/>
+      </Position16>
+      <Position17>
+        <Filename Value="..\..\runtime\IBExtract.pas"/>
+        <Caret Line="207" Column="22" TopLine="191"/>
+      </Position17>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
