@@ -1337,8 +1337,9 @@ procedure TIBXMLProcessor.ProcessTagValue(tagValue: string);
             Move(hexData[i+1],hexData[i],Length(hexData)-i);
           SetLength(hexData,Length(hexData)-1);
         end;
+      else
+        Inc(i);
       end;
-      Inc(i);
     end;
   end;
 
