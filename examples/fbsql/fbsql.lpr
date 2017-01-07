@@ -390,6 +390,7 @@ begin
   { Create Components }
   FIBDatabase := TIBDatabase.Create(self);
   FIBDatabase.OnLogin := @loginPrompt;
+  FIBDatabase.Params.Values['lc_ctype'] := 'UTF8';
   FIBTransaction := TIBTransaction.Create(self);
   FIBTransaction.DefaultDatabase := FIBDatabase;
   FIBXScript := TIBXScript.Create(self);
@@ -408,7 +409,6 @@ begin
 
   FIBTransaction.Params.Add('concurrency');
   FIBTransaction.Params.Add('wait');
-  FIBDatabase.Params.Add('lc_ctype=UTF8');
 
 end;
 

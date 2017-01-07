@@ -817,10 +817,10 @@ var command: string;
         end;
       end;
 
-      RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +USER +''.+'' PASSWORD +''(.+)''';
+      RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +''.*'' +USER +''.+'' PASSWORD +''(.+)''';
       if not RegexObj.Exec(ucStmt) and (FDatabase.Params.IndexOfName('password') <> -1) then
       begin
-        RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +(USER +''.+'')';
+        RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +''.*'' +(USER +''.+'')';
         if RegexObj.Exec(ucStmt) then
         begin
           system.Insert(' PASSWORD ''' + FDatabase.Params.Values['password'] +'''',stmt,

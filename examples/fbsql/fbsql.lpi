@@ -30,10 +30,13 @@
         <CommandLineParams Value="-A -u SYSDBA -p masterkey -o /tmp/test1.sql employee"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="1">
+    <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="ibexpressconsolemode"/>
+        <PackageName Value="LCL"/>
       </Item1>
+      <Item2>
+        <PackageName Value="ibexpressconsolemode"/>
+      </Item2>
     </RequiredPackages>
     <Units Count="2">
       <Unit0>
