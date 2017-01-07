@@ -10,7 +10,7 @@
         <IsPartOfProject Value="True"/>
         <TopLine Value="385"/>
         <CursorPos X="61" Y="389"/>
-        <UsageCount Value="185"/>
+        <UsageCount Value="186"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -19,7 +19,7 @@
         <EditorIndex Value="3"/>
         <TopLine Value="62"/>
         <CursorPos X="25" Y="70"/>
-        <UsageCount Value="185"/>
+        <UsageCount Value="186"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit1>
@@ -50,8 +50,8 @@
       <Unit5>
         <Filename Value="..\..\..\fbintf\client\FBBlob.pas"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="382"/>
-        <CursorPos X="26" Y="388"/>
+        <TopLine Value="373"/>
+        <CursorPos X="37" Y="393"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit5>
@@ -59,7 +59,7 @@
         <Filename Value="..\..\..\fbintf\client\2.5\FB25Blob.pas"/>
         <EditorIndex Value="11"/>
         <TopLine Value="128"/>
-        <CursorPos X="19" Y="135"/>
+        <CursorPos X="30" Y="148"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit6>
@@ -80,7 +80,6 @@
       </Unit8>
       <Unit9>
         <Filename Value="..\..\..\fbintf\client\3.0\FB30Statement.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="13"/>
         <TopLine Value="384"/>
         <CursorPos X="3" Y="386"/>
@@ -89,9 +88,10 @@
       </Unit9>
       <Unit10>
         <Filename Value="..\..\..\fbintf\client\3.0\FB30Blob.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="103"/>
-        <CursorPos X="19" Y="105"/>
+        <TopLine Value="99"/>
+        <CursorPos X="13" Y="106"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit10>
