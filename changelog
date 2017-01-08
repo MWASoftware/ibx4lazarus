@@ -1,4 +1,4 @@
-IBX Change Log  version            (2.0-1) Sat, 07 Jan 2017 15:18:29 +0000
+IBX Change Log  version             (2.0-1) Sun, 08 Jan 2017 16:09:51 +0000
 
 1. TIBEvents: Fix uninitialised variable that could result in lost events.
 
@@ -41,6 +41,8 @@ IBX Change Log  version            (2.0-1) Sat, 07 Jan 2017 15:18:29 +0000
     fully supported.
 
 13. TIBExtract: when a database dump includes data, the generator values are now also set.
+
+14: IBSQLEdit: Unit LCLPlatformDef added to uses clauses for lazarus 1.7 and later.
 
 IBX Change Log  version     (2.0-0) Tue, 06 Dec 2016 10:33:44 +0000
 
