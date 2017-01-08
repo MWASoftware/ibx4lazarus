@@ -9,8 +9,8 @@
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="385"/>
-        <CursorPos X="61" Y="389"/>
+        <TopLine Value="289"/>
+        <CursorPos X="30" Y="302"/>
         <UsageCount Value="190"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -214,10 +214,11 @@
       </Unit27>
       <Unit28>
         <Filename Value="..\..\..\..\..\..\..\..\usr\share\fpcsrc\rtl\objpas\classes\classesh.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="598"/>
-        <CursorPos X="14" Y="616"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="661"/>
+        <CursorPos X="25" Y="677"/>
         <UsageCount Value="30"/>
+        <Loaded Value="True"/>
       </Unit28>
       <Unit29>
         <Filename Value="..\..\..\fbintf\client\2.5\IBHeader.pas"/>
@@ -284,10 +285,11 @@
       </Unit36>
       <Unit37>
         <Filename Value="..\..\runtime\IBDatabase.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="626"/>
-        <CursorPos X="3" Y="628"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="258"/>
+        <CursorPos X="27" Y="276"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit37>
       <Unit38>
         <Filename Value="..\..\..\..\..\..\..\..\usr\share\fpcsrc\packages\fcl-db\src\base\db.pas"/>
@@ -429,7 +431,28 @@
         <UsageCount Value="10"/>
       </Unit57>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="5" HistoryIndex="4">
+      <Position1>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="271" Column="43" TopLine="263"/>
+      </Position1>
+      <Position2>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="327" Column="45" TopLine="308"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\..\runtime\IBDatabase.pas"/>
+        <Caret Line="276" Column="27" TopLine="258"/>
+      </Position3>
+      <Position4>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="327" Column="61" TopLine="308"/>
+      </Position4>
+      <Position5>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="323" Column="73" TopLine="290"/>
+      </Position5>
+    </JumpHistory>
   </ProjectSession>
   <Debugging>
     <Watches Count="1">

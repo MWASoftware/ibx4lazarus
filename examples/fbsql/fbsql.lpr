@@ -296,12 +296,10 @@ begin
   end;
 
   if HasOption('p','pass') then
-    FIBDatabase.Params.Add('password=' + GetOptionValue('p','pass'));
-
-  FIBDatabase.LoginPrompt := FIBDatabase.Params.Values['password'] = '';
+    FIBDatabase.Params.Values['password'] := GetOptionValue('p','pass');
 
   if HasOption('r','role') then
-    FIBDatabase.Params.Add('sql_role_name=' + GetOptionValue('r','role'));
+    FIBDatabase.Params.Values['sql_role_name'] := GetOptionValue('r','role');
 
   if HasOption('s') then
     SQLStatement := GetOptionValue('s');
@@ -322,9 +320,12 @@ begin
   end;
 
   if HasOption('u','user') then
-    FIBDatabase.Params.Add('user_name=' + GetOptionValue('u','user'));
+    FIBDatabase.Params.Values['user_name'] := GetOptionValue('u','user');
 
   {Validation}
+
+  FIBDatabase.LoginPrompt := (FIBDatabase.Params.IndexOfName('user_name') <> -1) and
+                              (FIBDatabase.Params.Values['password'] = '');
 
   if not DoExtract then
   begin
@@ -390,6 +391,7 @@ begin
   { Create Components }
   FIBDatabase := TIBDatabase.Create(self);
   FIBDatabase.OnLogin := @loginPrompt;
+  FIBDatabase.Params.Clear;
   FIBDatabase.Params.Values['lc_ctype'] := 'UTF8';
   FIBTransaction := TIBTransaction.Create(self);
   FIBTransaction.DefaultDatabase := FIBDatabase;
