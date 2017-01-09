@@ -179,7 +179,6 @@ constructor TInteractiveSQLProcessor.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
   FSymbolStream := TInteractiveSymbolStream.Create;
-  FSymbolStream.OnNextLine := @EchoNextLine;
 end;
 
 procedure TInteractiveSQLProcessor.Run;
