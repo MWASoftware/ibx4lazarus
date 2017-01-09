@@ -869,7 +869,7 @@ begin
     end;
 
     {Process Drop Database}
-    RegexObj.Expression := '^ *DROP +DATABASE + *(\' + Terminator + '|)';
+    RegexObj.Expression := '^ *DROP +DATABASE *(\' + Terminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
       FDatabase.DropDatabase;
@@ -1786,7 +1786,9 @@ begin
     write(FPrompt)
   else
     write(FContinuePrompt);
-  readln(Line);
+  Result := not EOF;
+  if Result then
+    readln(Line);
 end;
 
 constructor TInteractiveSymbolStream.Create(aPrompt: string; aContinue: string);
