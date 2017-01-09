@@ -231,11 +231,12 @@ begin
   Opts := TStringList.Create;
   NonOpts := TStringList.Create;
   try
-    ErrorMsg := CheckOptions('aAhbeuioprst',['help','user','pass','role'],Opts,NonOpts);
+    ErrorMsg := CheckOptions('aAhbeu:i:o:p:r:s:t:',['help','user','pass','role'],Opts,NonOpts);
     {Database name is last parameter if given and not an option}
     if (NonOpts.Count > 0) and ((Opts.Count = 0) or
-             (Opts.ValueFromIndex[Opts.Count-1] <> NonOpts[NonOpts.Count-1])) then
-      FIBDatabase.DatabaseName := NonOpts[NonOpts.Count-1];
+             ((Opts.ValueFromIndex[Opts.Count-1] <> NonOpts[NonOpts.Count-1])) or
+             (ParamCount = 1) or (ParamStr(ParamCount-1)[2] in ['!','A','h','b','e']))then
+      FIBDatabase.DatabaseName := ParamStr(ParamCount);
   finally
     Opts.Free;
     NonOpts.Free;
