@@ -40,6 +40,9 @@ uses
 
   ;
 
+const
+  FExceptionTrapped: boolean = false;
+
 type
   TInteractiveSQLProcessor = class;
 
@@ -244,7 +247,7 @@ begin
   end;
 
   // parse parameters
-  if HasOption('h','help') or (ParamCount = 0) then
+  if HasOption('h','help') then
   begin
     WriteHelp;
     Terminate;
@@ -380,6 +383,7 @@ end;
 
 procedure TFBSQL.ShowException(E: Exception);
 begin
+  FExceptionTrapped := true;
   writeln(stderr,'Error: ' + E.Message);
 end;
 
@@ -445,5 +449,7 @@ begin
   Application:=TFBSQL.Create(nil);
   Application.Run;
   Application.Free;
+  if FExceptionTrapped then
+    Halt(1);
 end.
 
