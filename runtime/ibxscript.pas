@@ -859,7 +859,7 @@ begin
     end;
 
     {process connect statement}
-    RegexObj.Expression := '^ *CONNECT +(.*) *(\' + Terminator + '|)';
+    RegexObj.Expression := '^ *CONNECT +.*(\' + Terminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
       ExtractConnectInfo;
