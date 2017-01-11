@@ -845,7 +845,7 @@ begin
   RegexObj := TRegExpr.Create;
   try
     {process create database}
-    RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +(.*) *(\' + Terminator + '|)';
+    RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +.*(\' + Terminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
       UpdateUserPassword;
