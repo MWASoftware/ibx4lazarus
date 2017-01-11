@@ -629,10 +629,7 @@ begin
      RemoveFreeNotification(FEditorPanel);
   FEditorPanel := AValue;
   if FEditorPanel <> nil then
-  begin
      FreeNotification(FEditorPanel);
-     FEditorPanel.DoubleBuffered := true;
-  end;
 end;
 
 procedure TDBDynamicGrid.ChangeBounds(ALeft, ATop, AWidth, AHeight: integer;
