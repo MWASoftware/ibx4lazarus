@@ -76,7 +76,7 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     procedure Assign(Source: TPersistent); override;
-    procedure DataOut(SelectQuery: string; Add2Log: TAdd2Log);
+    function DataOut(SelectQuery: string; Add2Log: TAdd2Log): boolean;
     procedure SetCommand(command, aValue, stmt: string; var Done: boolean); virtual;
     class procedure ShowPerfStats(Statement: IStatement; Add2Log: TAdd2Log);
   published
@@ -504,7 +504,8 @@ begin
   end;
 end;
 
-procedure TIBCustomDataOutput.DataOut(SelectQuery: string; Add2Log: TAdd2Log);
+function TIBCustomDataOutput.DataOut(SelectQuery: string; Add2Log: TAdd2Log
+  ): boolean;
 var Count: integer;
 begin
   FIBSQL.SQL.Text := SelectQuery;
@@ -515,11 +516,11 @@ begin
   if PlanOptions = poPlanOnly then
     Exit;
 
-  if IncludeHeader then
-    HeaderOut(Add2Log);
   Count := 0;
   FIBSQL.ExecQuery;
   try
+    if IncludeHeader and not FIBSQL.EOF then
+      HeaderOut(Add2Log);
     while (not FIBSQL.EOF) and ((FRowCount = 0) or (Count < FRowCount)) do
     begin
       FormattedDataOut(Add2Log);
@@ -530,6 +531,7 @@ begin
   finally
     FIBSQL.Close;
   end;
+  Result := Count > 0;
 end;
 
 procedure TIBCustomDataOutput.SetCommand(command, aValue, stmt: string;

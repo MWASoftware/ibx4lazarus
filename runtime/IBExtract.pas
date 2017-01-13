@@ -3241,11 +3241,13 @@ begin
       Database := FDatabase;
       SQL.Text := TableSQL;
       ExecQuery;
+      FMetaData.Add('/* Data Starts */');
       while not EOF do
       begin
         ListData(Trim(FieldByName('RDB$RELATION_NAME').AsString));
         Next;
       end;
+      FMetaData.Add('/* Data Ends */');
     finally
       Free;
     end;
@@ -3272,9 +3274,9 @@ begin
     with TIBInsertStmtsOut.Create(self) do
     try
       Database := FDatabase;
-      DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]),
-                Add2MetaData);
-      FMetaData.Add('COMMIT;');
+      if DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier(FDatabase.SQLDialect, ObjectName)]),
+                Add2MetaData) then
+        FMetaData.Add('COMMIT;');
     finally
       Free
     end;
