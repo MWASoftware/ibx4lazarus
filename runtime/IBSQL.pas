@@ -37,6 +37,16 @@ unit IBSQL;
 
 {$codepage UTF8}
 
+(* Define IBXQUERYSTATS to write to stdout a summary of query execution
+   statistics each time a query is executed
+
+   Define IBXQUERYTIME to write to stdout The local execution time for each
+   query
+   *)
+
+{ $DEFINE IBXQUERYSTATS}
+{ $DEFINE IBXQUERYTIME}
+
 interface
 
 uses
@@ -686,10 +696,19 @@ end;
 procedure TIBSQL.ExecQuery;
 var
   fetch_res: ISC_STATUS;
+  {$IFDEF IBXQUERYSTATS}
+  stats: TPerfCounters;
+  {$ENDIF}
+  {$IFDEF IBXQUERYTIME}
+  tmsecs: comp;
+  {$ENDIF}
 begin
   CheckClosed;
   if not Prepared then Prepare;
   CheckValidStatement;
+  {$IFDEF IBXQUERYTIME}
+  tmsecs := TimeStampToMSecs(DateTimeToTimeStamp(Now));
+  {$ENDIF}
   if SQLStatementType = SQLSelect then
   begin
     FResultSet := FStatement.OpenCursor;
@@ -709,6 +728,15 @@ begin
     if not (csDesigning in ComponentState) then
       MonitorHook.SQLExecute(Self);
   end;
+  {$IFDEF IBXQUERYTIME}
+  writeln('Executing ',FStatement.GetSQLText,
+    ' Response time= ',Format('%f msecs',[TimeStampToMSecs(DateTimeToTimeStamp(Now)) - tmsecs]));
+  {$ENDIF}
+  {$IFDEF IBXQUERYSTATS}
+  if FStatement.GetPerfStatistics(stats) then
+    writeln('Executing ',FStatement.GetSQLText,
+    ' Elapsed time= ', FormatFloat('#0.000',stats[psRealTime]/1000),' sec');
+  {$ENDIF}
   FBase.DoAfterExecQuery(self);
 end;
 
@@ -875,6 +903,9 @@ begin
                      Transaction.TransactionIntf,
                      SQL.Text,
                      GenerateParamNames);
+  {$IFDEF IBXQUERYSTATS}
+  FStatement.EnableStatistics(true);
+  {$ENDIF}
   FMetaData := FStatement.GetMetaData;
   FSQLParams := FStatement.GetSQLParams;
   FStatement.SetRetainInterfaces(true);
