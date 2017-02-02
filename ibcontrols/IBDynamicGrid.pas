@@ -576,14 +576,17 @@ begin
       Exit; {ignore these keys if we are in a  combobox}
 
     if (AControl <> nil) and (AControl is TCustomMemo)
-                         and (Key in [VK_RETURN,VK_UP,VK_DOWN]) then Exit; {Ignore Return in a CustomMemo}
+                         and (Key in [VK_RETURN,VK_UP,VK_DOWN]) then Exit; {Ignore keys in a CustomMemo}
 
     if (AControl <> nil) and (AControl is TCustomGrid)
-                         and (Key in [VK_RETURN,VK_UP,VK_DOWN,VK_TAB]) then Exit; {Ignore Return in a Custom Grid}
+                         and (Key in [VK_RETURN,VK_UP,VK_DOWN,VK_TAB]) then Exit; {Ignore keys in a Custom Grid}
 
-    if (AControl <> nil) and ((AControl is TDateEdit) or (AControl is TEBEdit))
-                         and (Key in [VK_RETURN,VK_UP,VK_DOWN,
-                               VK_ESCAPE,VK_LEFT,VK_RIGHT]) then Exit; {Ignore Return in a Data edit}
+    if (AControl <> nil) and (AControl is TEBEdit) and (AControl.Owner is TDateEdit) then
+    begin
+      if (Key in [VK_LEFT,VK_RIGHT]) then Exit; {Ignore navigation keys}
+      if TDateEdit(AControl.Owner).DroppedDown and
+        (Key in [VK_RETURN,VK_UP,VK_DOWN,VK_ESCAPE]) then Exit; {Ignore TCalender navigation keys in a Data edit}
+    end;
 
     if assigned(FOnKeyDownHander) then
       OnKeyDownHander(Sender,Key,Shift,Done);

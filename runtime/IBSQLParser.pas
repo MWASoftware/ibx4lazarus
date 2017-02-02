@@ -117,6 +117,7 @@ type
     FCTE: TCTEDef;
     FNested: integer;
     FDestroying: boolean;
+    FOwner: TSelectSQLParser;
     procedure AddToSQL(const Word: string);
     procedure CTEClear;
     function GetCTE(Index: integer): PCTEDef;
@@ -136,7 +137,7 @@ type
     procedure SetGroupClause(const Value: string);
     procedure SetFromClause(const Value: string);
   protected
-    constructor Create(SQLText: TStrings; StartLine, StartIndex: integer); overload;
+    constructor Create(aOwner: TSelectSQLParser; SQLText: TStrings; StartLine, StartIndex: integer); overload;
     procedure Changed;
   public
     constructor Create(aDataSet: TDataSet; SQLText: TStrings); overload;
@@ -582,11 +583,11 @@ begin
         begin
           if FIndex > length(Lines[I]) then
             if I+1 < Lines.Count then
-              FUnion := TSelectSQLParser.Create(Lines,I+1,1)
+              FUnion := TSelectSQLParser.Create(self,Lines,I+1,1)
             else
               raise Exception.Create(sIncomplete)
           else
-            FUnion := TSelectSQLParser.Create(Lines,I,FIndex);
+            FUnion := TSelectSQLParser.Create(self,Lines,I,FIndex);
           Exit
         end;
       end;
@@ -668,7 +669,7 @@ end;
 constructor TSelectSQLParser.Create(aDataSet: TDataSet; SQLText: TStrings);
 begin
   FDataSet := aDataSet;
-  Create(SQLText,0,1)
+  Create(nil,SQLText,0,1)
 end;
 
 constructor TSelectSQLParser.Create(aDataSet: TDataSet; const SQLText: string);
@@ -683,10 +684,11 @@ begin
   end
 end;
 
-constructor TSelectSQLParser.Create(SQLText: TStrings; StartLine,
-  StartIndex: integer);
+constructor TSelectSQLParser.Create(aOwner: TSelectSQLParser;
+  SQLText: TStrings; StartLine, StartIndex: integer);
 begin
   inherited Create;
+  FOwner := aOwner;
   FParamList := TStringList.Create;
   FCTEs := TList.Create;
   FLastSymbol := sqNone;
@@ -699,6 +701,9 @@ end;
 
 procedure TSelectSQLParser.Changed;
 begin
+  if FOwner <> nil then
+    FOwner.Changed
+  else
   if assigned(FOnSQLChanging) and not FDestroying then
      OnSQLChanging(self)
 end;
@@ -869,27 +874,29 @@ end;
 
 procedure TSelectSQLParser.SetSelectClause(const Value: string);
 begin
-  if Union <> nil then Union.SelectClause := Value;
-  FSelectClause := Value;
-  Changed
+  if FSelectClause <> Value then
+  begin
+    FSelectClause := Value;
+    Changed
+  end;
 end;
 
 procedure TSelectSQLParser.SetFromClause(const Value: string);
 begin
-  if Union <> nil then
-    Union.FromClause := Value
-  else
-  FFromClause := Value;
-  Changed
+  if FFromClause <> Value then
+  begin
+    FFromClause := Value;
+    Changed
+  end;
 end;
 
 procedure TSelectSQLParser.SetGroupClause(const Value: string);
 begin
-  if Union <> nil then
-    Union.GroupClause := Value
-  else
-  FGroupClause := Value;
-  Changed
+  if FGroupClause <> Value then
+  begin
+    FGroupClause := Value;
+    Changed
+  end;
 end;
 
 procedure TSelectSQLParser.SetOrderByClause(const Value: string);
@@ -897,8 +904,11 @@ begin
   if Union <> nil then
     Union.OrderByClause := Value
   else
+  if FOrderByClause <> Value then
+  begin
     FOrderByClause := Value;
-  Changed
+    Changed
+  end;
 end;
 
 procedure TSelectSQLParser.DropUnion;
