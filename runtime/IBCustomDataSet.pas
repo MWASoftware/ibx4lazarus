@@ -1849,7 +1849,6 @@ begin
     FQModify.FreeHandle;
   if FQRefresh <> nil then
     FQRefresh.FreeHandle;
-  FieldDefs.Clear;
   if Assigned(FBeforeTransactionEnd) then
     FBeforeTransactionEnd(Sender);
 end;
@@ -3780,8 +3779,6 @@ var
   end;
 
 begin
-  if (FieldDefs.Count > 0) and not (csDesigning in ComponentState) then
-    Exit; {do not regenerate until transaction end}
   FRelationNodes := TRelationNode.Create;
   FNeedsRefresh := False;
   if not Database.InternalTransaction.InTransaction then
