@@ -1849,6 +1849,7 @@ begin
     FQModify.FreeHandle;
   if FQRefresh <> nil then
     FQRefresh.FreeHandle;
+  InternalUnPrepare;
   if Assigned(FBeforeTransactionEnd) then
     FBeforeTransactionEnd(Sender);
 end;
