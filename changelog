@@ -1,6 +1,6 @@
-IBX Change Log  version                  (2.0-2) tba, 09 Jan 2017 15:31:49 +0000
+IBX Change Log  version                   (2.0-2) Fri, 24 Feb 2017 12:17:53 +0000
 
-1. TIBDatabase.CreateDatabase: extract full DB Name using reg ex in order to
+1. TIBDatabase.CreateDatabase: extract full DB Name from SQL using reg ex in order to
    include remote system name.
 
 2. TIBExtract: No longer include comment header and COMMIT statement for empty
