@@ -1963,7 +1963,7 @@ var
   pbd: PBlobDataArray;
   pda: PArrayDataArray;
   i, j: Integer;
-  LocalData: PChar;
+  LocalData: PByte;
   LocalDate, LocalDouble: Double;
   LocalInt: Integer;
   LocalBool: wordBool;
@@ -2030,35 +2030,35 @@ begin
             SQL_TIMESTAMP:
             begin
               LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(Qry[i].AsDateTime));
-              LocalData := PChar(@LocalDate);
+              LocalData := PByte(@LocalDate);
             end;
             SQL_TYPE_DATE:
             begin
               LocalInt := DateTimeToTimeStamp(Qry[i].AsDateTime).Date;
-              LocalData := PChar(@LocalInt);
+              LocalData := PByte(@LocalInt);
             end;
             SQL_TYPE_TIME:
             begin
               LocalInt := DateTimeToTimeStamp(Qry[i].AsDateTime).Time;
-              LocalData := PChar(@LocalInt);
+              LocalData := PByte(@LocalInt);
             end;
             SQL_SHORT, SQL_LONG:
             begin
               if (fdDataScale = 0) then
               begin
                 LocalInt := Qry[i].AsLong;
-                LocalData := PChar(@LocalInt);
+                LocalData := PByte(@LocalInt);
               end
               else
               if (fdDataScale >= (-4)) then
               begin
                 LocalCurrency := Qry[i].AsCurrency;
-                LocalData := PChar(@LocalCurrency);
+                LocalData := PByte(@LocalCurrency);
               end
               else
               begin
                LocalDouble := Qry[i].AsDouble;
-               LocalData := PChar(@LocalDouble);
+               LocalData := PByte(@LocalDouble);
               end;
             end;
             SQL_INT64:
@@ -2066,29 +2066,29 @@ begin
               if (fdDataScale = 0) then
               begin
                 LocalInt64 := Qry[i].AsInt64;
-                LocalData := PChar(@LocalInt64);
+                LocalData := PByte(@LocalInt64);
               end
               else
               if (fdDataScale >= (-4)) then
               begin
                 LocalCurrency := Qry[i].AsCurrency;
-                LocalData := PChar(@LocalCurrency);
+                LocalData := PByte(@LocalCurrency);
                 end
                 else
                 begin
                   LocalDouble := Qry[i].AsDouble;
-                  LocalData := PChar(@LocalDouble);
+                  LocalData := PByte(@LocalDouble);
                 end
             end;
             SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
             begin
               LocalDouble := Qry[i].AsDouble;
-              LocalData := PChar(@LocalDouble);
+              LocalData := PByte(@LocalDouble);
             end;
             SQL_BOOLEAN:
             begin
               LocalBool := Qry[i].AsBoolean;
-              LocalData := PChar(@LocalBool);
+              LocalData := PByte(@LocalBool);
             end;
           end;
 
