@@ -1089,7 +1089,7 @@ procedure TIBMemoField.SetAsString(const AValue: string);
 var s: RawByteString;
 begin
   s := AValue;
-  if StringCodePage(Value) <> CodePage then
+  if StringCodePage(s) <> CodePage then
     SetCodePage(s,CodePage,CodePage<>CP_NONE);
   inherited SetAsString(s);
 end;
