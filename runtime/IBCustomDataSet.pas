@@ -1208,12 +1208,12 @@ var
   s: RawByteString;
 begin
   Buffer := nil;
-  IBAlloc(Buffer, 0, Size + 1);
+  IBAlloc(Buffer, 0, DataSize);
   try
     s := Value;
     if StringCodePage(s) <> CodePage then
       SetCodePage(s,CodePage,CodePage<>CP_NONE);
-    StrLCopy(Buffer, PChar(s), Size);
+    StrLCopy(Buffer, PChar(s), DataSize);
     if Transliterate then
       DataSet.Translate(Buffer, Buffer, True);
     SetData(Buffer);
