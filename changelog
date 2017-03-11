@@ -3,8 +3,8 @@ IBX Change Log  version                   (2.0.3) tba, 24 Feb 2017 12:17:53 +000
 1. IBCustomDataset: Minor change of PChar to PByte for compatibility with fbintf
    changes.
 
-2. IBCustomDataset: incorrect datasize used in TIBStringField.SetAsString. Bug
-   could result in truncated multi-byte character set values.
+2. IBCustomDataset: Fixed use of incorrect datasize in TIBStringField.SetAsString.
+   Bug could result in truncated multi-byte character set values.
 
 IBX Change Log  version                   (2.0-2) Fri, 24 Feb 2017 12:17:53 +0000
 
