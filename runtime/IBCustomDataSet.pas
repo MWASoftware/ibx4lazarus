@@ -1213,7 +1213,7 @@ begin
     s := Value;
     if StringCodePage(s) <> CodePage then
       SetCodePage(s,CodePage,CodePage<>CP_NONE);
-    StrLCopy(Buffer, PChar(s), DataSize);
+    StrLCopy(Buffer, PChar(s), DataSize-1);
     if Transliterate then
       DataSet.Translate(Buffer, Buffer, True);
     SetData(Buffer);
