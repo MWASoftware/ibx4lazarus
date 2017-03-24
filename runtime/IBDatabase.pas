@@ -959,11 +959,11 @@ begin
    if UseDefaultSystemCodePage then
    begin
      {$ifdef WINDOWS}
-     if FirebirdAPI.CodePage2CharSetID(GetACP,CharSetID) then
+     if Attachment.CodePage2CharSetID(GetACP,CharSetID) then
        TempDBParams.Values['lc_ctype'] := FirebirdAPI.GetCharsetName(CharSetID)
      {$else}
-     if FirebirdAPI.CodePage2CharSetID(DefaultSystemCodePage,CharSetID) then
-       TempDBParams.Values['lc_ctype'] := FirebirdAPI.GetCharsetName(CharSetID)
+     if Attachment.CodePage2CharSetID(DefaultSystemCodePage,CharSetID) then
+       TempDBParams.Values['lc_ctype'] := Attachment.GetCharsetName(CharSetID)
      {$endif}
      else
        TempDBParams.Values['lc_ctype'] :='UTF8';
@@ -976,9 +976,6 @@ begin
    end;
 
    FDefaultCharSetName := AnsiUpperCase(TempDBParams.Values['lc_ctype']);
-   if FDefaultCharSetName <> '' then
-     FirebirdAPI.CharSetName2CharSetID(FDefaultCharSetName,FDefaultCharSetID);
-   FirebirdAPI.CharSetID2CodePage(FDefaultCharSetID,FDefaultCodePage);
    { Generate a new DPB if necessary }
    if (FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text)) then
    begin
@@ -1032,6 +1029,11 @@ begin
         raise EIBInterBaseError.Create(Status);
     end;
   until FAttachment <> nil;
+
+  if FDefaultCharSetName <> '' then
+    Attachment.CharSetName2CharSetID(FDefaultCharSetName,FDefaultCharSetID);
+  Attachment.CharSetID2CodePage(FDefaultCharSetID,FDefaultCodePage);
+
   if not (csDesigning in ComponentState) then
     FDBName := aDBName; {Synchronise at run time}
   FDBSQLDialect := GetDBSQLDialect;

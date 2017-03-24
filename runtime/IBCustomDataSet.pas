@@ -3819,9 +3819,9 @@ begin
            their values }
           SQL_VARYING, SQL_TEXT:
           begin
-            FirebirdAPI.CharSetWidth(getCharSetID,CharSetSize);
-            CharSetName := FirebirdAPI.GetCharsetName(getCharSetID);
-            FirebirdAPI.CharSetID2CodePage(getCharSetID,FieldCodePage);
+            Database.Attachment.CharSetWidth(getCharSetID,CharSetSize);
+            CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
+            Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
             FieldSize := GetSize div CharSetSize;
             FieldType := ftString;
           end;
@@ -3883,9 +3883,9 @@ begin
             FieldSize := sizeof (TISC_QUAD);
             if (getSubtype = 1) then
             begin
-              FirebirdAPI.CharSetWidth(getCharSetID,CharSetSize);
-              CharSetName := FirebirdAPI.GetCharsetName(getCharSetID);
-              FirebirdAPI.CharSetID2CodePage(getCharSetID,FieldCodePage);
+              Database.Attachment.CharSetWidth(getCharSetID,CharSetSize);
+              CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
+              Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
               FieldType := ftMemo;
             end
             else

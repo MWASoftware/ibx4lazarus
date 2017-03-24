@@ -369,7 +369,7 @@ begin
           if ar = nil then
             s += 'NULL'
           else
-            s += TIBXMLProcessor.FormatArray(ar);
+            s += TIBXMLProcessor.FormatArray(Database,ar);
         end;
 
       SQL_TEXT, SQL_VARYING:

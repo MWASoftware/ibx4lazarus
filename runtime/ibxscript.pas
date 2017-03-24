@@ -214,7 +214,7 @@ type
     function AnalyseXML(SymbolStream: TSymbolStream): string;
     procedure NextStatement;
     class function FormatBlob(Field: ISQLData): string;
-    class function FormatArray(ar: IArray): string;
+    class function FormatArray(Database: TIBDatabase; ar: IArray): string;
     property BlobData[index: integer]: TBlobData read GetBlobData;
     property BlobDataCount: integer read GetBlobDataCount;
     property ArrayData[index: integer]: TArrayData read GetArrayData;
@@ -948,7 +948,7 @@ begin
       else
       if command = 'NAMES' then
       begin
-        if FirebirdAPI.CharSetName2CharSetID(param,charsetid) then
+        if Database.Attachment.CharSetName2CharSetID(param,charsetid) then
         begin
           Database.Params.Values['lc_ctype'] := param;
           if Database.Connected then
@@ -1263,7 +1263,7 @@ begin
     begin
       Database.Connected := true;
       Transaction.Active := true;
-      FirebirdAPI.CharSetName2CharSetID(CharSet,aCharSetID);
+      Database.Attachment.CharSetName2CharSetID(CharSet,aCharSetID);
       SetLength(Index,dim);
       ArrayIntf := Database.Attachment.CreateArray(
                      Transaction.TransactionIntf,
@@ -1706,7 +1706,8 @@ begin
   end;
 end;
 
-class function TIBXMLProcessor.FormatArray(ar: IArray): string;
+class function TIBXMLProcessor.FormatArray(Database: TIBDatabase; ar: IArray
+  ): string;
 var index: array of integer;
     TextOut: TStrings;
 
@@ -1751,7 +1752,7 @@ begin
        s += Format(' scale = "%d"',[ ar.GetScale]);
     SQL_TEXT,
     SQL_VARYING:
-      s += Format(' charset = "%s"',[FirebirdAPI.GetCharsetName(ar.GetCharSetID)]);
+      s += Format(' charset = "%s"',[Database.Attachment.GetCharsetName(ar.GetCharSetID)]);
     end;
     bounds := ar.GetBounds;
     boundsList := '';
