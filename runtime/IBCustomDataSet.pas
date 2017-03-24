@@ -3819,7 +3819,8 @@ begin
            their values }
           SQL_VARYING, SQL_TEXT:
           begin
-            Database.Attachment.CharSetWidth(getCharSetID,CharSetSize);
+            if not Database.Attachment.CharSetWidth(getCharSetID,CharSetSize) then
+              CharSetSize := 1;
             CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
             Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
             FieldSize := GetSize div CharSetSize;
@@ -3883,7 +3884,8 @@ begin
             FieldSize := sizeof (TISC_QUAD);
             if (getSubtype = 1) then
             begin
-              Database.Attachment.CharSetWidth(getCharSetID,CharSetSize);
+              if not Database.Attachment.CharSetWidth(getCharSetID,CharSetSize) then
+                CharSetSize := 1;
               CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
               Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
               FieldType := ftMemo;
