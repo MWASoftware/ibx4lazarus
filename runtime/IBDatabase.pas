@@ -960,7 +960,7 @@ begin
    begin
      {$ifdef WINDOWS}
      if Attachment.CodePage2CharSetID(GetACP,CharSetID) then
-       TempDBParams.Values['lc_ctype'] := FirebirdAPI.GetCharsetName(CharSetID)
+       TempDBParams.Values['lc_ctype'] := Attachment.GetCharsetName(CharSetID)
      {$else}
      if Attachment.CodePage2CharSetID(DefaultSystemCodePage,CharSetID) then
        TempDBParams.Values['lc_ctype'] := Attachment.GetCharsetName(CharSetID)
