@@ -956,18 +956,11 @@ begin
   TempDBParams := TStringList.Create;
   try
    TempDBParams.Assign(FDBParams);
+   {$ifdef UNIX}
+   {See below for WINDOWS UseDefaultSystemCodePage}
    if UseDefaultSystemCodePage then
-   begin
-     {$ifdef WINDOWS}
-     if Attachment.CodePage2CharSetID(GetACP,CharSetID) then
-       TempDBParams.Values['lc_ctype'] := Attachment.GetCharsetName(CharSetID)
-     {$else}
-     if Attachment.CodePage2CharSetID(DefaultSystemCodePage,CharSetID) then
-       TempDBParams.Values['lc_ctype'] := Attachment.GetCharsetName(CharSetID)
-     {$endif}
-     else
-       TempDBParams.Values['lc_ctype'] :='UTF8';
-   end;
+     TempDBParams.Values['lc_ctype'] :='UTF8';
+   {$endif}
    {Opportunity to override defaults}
    for i := 0 to FSQLObjects.Count - 1 do
    begin
@@ -975,7 +968,6 @@ begin
          SQLObjects[i].DoBeforeDatabaseConnect(TempDBParams,aDBName);
    end;
 
-   FDefaultCharSetName := AnsiUpperCase(TempDBParams.Values['lc_ctype']);
    { Generate a new DPB if necessary }
    if (FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text)) then
    begin
@@ -988,48 +980,69 @@ begin
         FDPB := GenerateDPB(TempDBParams);
      end;
    end;
+
+   repeat
+     if FCreateDatabase then
+     begin
+       FCreateDatabase := false;
+       FAttachment := FirebirdAPI.CreateDatabase(aDBName,FDPB, false);
+       if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
+         OnCreateDatabase(self);
+     end
+     else
+       FAttachment := FirebirdAPI.OpenDatabase(aDBName,FDPB,false);
+     if FAttachment = nil then
+     begin
+       Status := FirebirdAPI.GetStatus;
+       {$IFDEF UNIX}
+       if Pos(':',aDBName) = 0 then
+       begin
+           if ((Status.GetSQLCode = -901) and (Status.GetIBErrorCode = isc_random)) {Access permissions on firebird temp}
+              or
+              ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_sys_request)) {Security DB Problem}
+              or
+              ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_psw_attach)) {Security DB Problem}
+              or
+              ((Status.GetSQLCode = -904) and (Status.GetIBErrorCode = isc_lock_dir_access)) {Lock File Problem}
+              then
+              begin
+                aDBName := 'localhost:' + aDBName;
+                Continue;
+             end
+       end;
+       {$ENDIF}
+       if ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_io_error)) {Database not found}
+                        and CreateIfNotExists and not (csDesigning in ComponentState) then
+         FCreateDatabase := true
+       else
+         raise EIBInterBaseError.Create(Status);
+     end;
+
+     if UseDefaultSystemCodePage and (FAttachment <> nil) then
+     {Only now can we check the codepage in use by the Attachment.
+      If not that required then re-open with required LCLType.}
+     begin
+       {$ifdef WINDOWS}
+       if Attachment.CodePage2CharSetID(GetACP,CharSetID) then
+       {$else}
+       if Attachment.CodePage2CharSetID(DefaultSystemCodePage,CharSetID) then
+       {$endif}
+       begin
+         FDefaultCharSetName := Attachment.GetCharsetName(CharSetID);
+         if FDefaultCharSetName <> TempDBParams.Values['lc_ctype'] then
+         begin
+           TempDBParams.Values['lc_ctype'] := FDefaultCharSetName;
+           FAttachment := nil;
+         end
+       end
+     end;
+
+   until FAttachment <> nil;
+
+   FDefaultCharSetName := AnsiUpperCase(TempDBParams.Values['lc_ctype']);
   finally
    TempDBParams.Free;
   end;
-
-  repeat
-    if FCreateDatabase then
-    begin
-      FCreateDatabase := false;
-      FAttachment := FirebirdAPI.CreateDatabase(aDBName,FDPB, false);
-      if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
-        OnCreateDatabase(self);
-    end
-    else
-      FAttachment := FirebirdAPI.OpenDatabase(aDBName,FDPB,false);
-    if FAttachment = nil then
-    begin
-      Status := FirebirdAPI.GetStatus;
-      {$IFDEF UNIX}
-      if Pos(':',aDBName) = 0 then
-      begin
-          if ((Status.GetSQLCode = -901) and (Status.GetIBErrorCode = isc_random)) {Access permissions on firebird temp}
-             or
-             ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_sys_request)) {Security DB Problem}
-             or
-             ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_psw_attach)) {Security DB Problem}
-             or
-             ((Status.GetSQLCode = -904) and (Status.GetIBErrorCode = isc_lock_dir_access)) {Lock File Problem}
-             then
-             begin
-               aDBName := 'localhost:' + aDBName;
-               Continue;
-            end
-      end;
-      {$ENDIF}
-      if ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_io_error)) {Database not found}
-                       and CreateIfNotExists and not (csDesigning in ComponentState) then
-        FCreateDatabase := true
-      else
-        raise EIBInterBaseError.Create(Status);
-    end;
-  until FAttachment <> nil;
-
   if FDefaultCharSetName <> '' then
     Attachment.CharSetName2CharSetID(FDefaultCharSetName,FDefaultCharSetID);
   Attachment.CharSetID2CodePage(FDefaultCharSetID,FDefaultCodePage);
