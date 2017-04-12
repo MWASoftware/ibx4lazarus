@@ -968,20 +968,20 @@ begin
          SQLObjects[i].DoBeforeDatabaseConnect(TempDBParams,aDBName);
    end;
 
-   { Generate a new DPB if necessary }
-   if (FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text)) then
-   begin
-     FDBParamsChanged := False;
-     if (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
-       FDPB := GenerateDPB(TempDBParams)
-     else
-     begin
-        TempDBParams.Add('password=' + FHiddenPassword);
-        FDPB := GenerateDPB(TempDBParams);
-     end;
-   end;
-
    repeat
+     { Generate a new DPB if necessary }
+     if (FDPB = nil) or FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text) then
+     begin
+       FDBParamsChanged := False;
+       if (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
+         FDPB := GenerateDPB(TempDBParams)
+       else
+       begin
+          TempDBParams.Values['password'] := FHiddenPassword;
+          FDPB := GenerateDPB(TempDBParams);
+       end;
+     end;
+
      if FCreateDatabase then
      begin
        FCreateDatabase := false;
@@ -991,6 +991,7 @@ begin
      end
      else
        FAttachment := FirebirdAPI.OpenDatabase(aDBName,FDPB,false);
+
      if FAttachment = nil then
      begin
        Status := FirebirdAPI.GetStatus;
@@ -1029,9 +1030,10 @@ begin
        {$endif}
        begin
          FDefaultCharSetName := Attachment.GetCharsetName(CharSetID);
-         if FDefaultCharSetName <> TempDBParams.Values['lc_ctype'] then
+         if FDefaultCharSetName <> AnsiUpperCase(TempDBParams.Values['lc_ctype']) then
          begin
            TempDBParams.Values['lc_ctype'] := FDefaultCharSetName;
+           FDBParamsChanged := True;
            FAttachment := nil;
          end
        end
