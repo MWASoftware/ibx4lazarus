@@ -95,6 +95,7 @@ type
     FForceAutoComplete: boolean;
     FInCheckAndInsert: boolean;
     FLastKeyValue: variant;
+    FCurText: string;
     procedure DoActiveChanged(Data: PtrInt);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
     function GetListSource: TDataSource;
@@ -315,22 +316,21 @@ procedure TIBLookupComboEditBox.UpdateList;
 var
   iSelStart: Integer; // char position
   sCompleteText, sPrefixText, sResultText: string;
-  curText: string;
 begin
   if assigned(ListSource) and assigned(ListSource.DataSet) and (ListSource.DataSet is TIBCustomDataSet)
      and ListSource.DataSet.Active then
   begin
+    FCurText := Text;
     FUpdating := true;
     try
          iSelStart := SelStart;//Capture original cursor position
          if ((iSelStart < UTF8Length(Text)) and
            (cbactEndOfLineComplete in AutoCompleteText)) then
                 Exit;
-         curText := Text;
          sPrefixText := UTF8Copy(Text, 1, iSelStart);
          ListSource.DataSet.Active := false;
          ListSource.DataSet.Active :=  true;
-         Text := curText;
+         Text := FCurText;
          if not FExiting and (FForceAutoComplete or Focused) and (Text <> '')then
          begin
            if ListSource.DataSet.Active and (ListSource.DataSet.RecordCount > 0) then
@@ -361,15 +361,20 @@ end;
 procedure TIBLookupComboEditBox.UpdateSQL(Sender: TObject;
   Parser: TSelectSQLParser);
 var FieldPosition: integer;
+    FilterText: string;
 begin
   if FFiltered then
   begin
+    if FUpdating then
+      FilterText := FCurText
+    else
+      FilterText := Text;
     if cbactSearchCaseSensitive in AutoCompleteText then
       Parser.Add2WhereClause(GetRelationNameQualifier + '"' + ListField + '" Like ''' +
-                                  SQLSafe(Text) + '%''')
+                                  SQLSafe(FilterText) + '%''')
     else
       Parser.Add2WhereClause('Upper(' + GetRelationNameQualifier + '"' +  ListField + '") Like Upper(''' +
-                                  SQLSafe(Text) + '%'')');
+                                  SQLSafe(FilterText) + '%'')');
 
     if cbactSearchAscending in AutoCompleteText then
     begin

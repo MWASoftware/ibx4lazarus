@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="9"/>
+    <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="55">
+    <Units Count="57">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -17,9 +17,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="177"/>
-        <CursorPos X="19" Y="183"/>
+        <CursorPos X="17" Y="10"/>
         <UsageCount Value="48"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -36,10 +34,11 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="189"/>
-        <CursorPos X="66" Y="194"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="10"/>
+        <CursorPos X="26" Y="26"/>
         <UsageCount Value="21"/>
+        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
@@ -57,16 +56,18 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../../../lcl/include/control.inc"/>
-        <TopLine Value="3230"/>
-        <CursorPos Y="3248"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="3479"/>
+        <CursorPos Y="3497"/>
         <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="84"/>
-        <CursorPos Y="103"/>
+        <EditorIndex Value="6"/>
+        <CursorPos X="86" Y="93"/>
         <UsageCount Value="17"/>
+        <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="../../../../lcl/include/customdbcombobox.inc"/>
@@ -89,7 +90,7 @@
       </Unit10>
       <Unit11>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="3685"/>
         <CursorPos X="52" Y="3671"/>
         <UsageCount Value="15"/>
@@ -181,10 +182,11 @@
       </Unit24>
       <Unit25>
         <Filename Value="../../changelog"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="7"/>
-        <CursorPos X="78" Y="32"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="47" Y="15"/>
         <UsageCount Value="12"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit25>
       <Unit26>
@@ -224,7 +226,7 @@
       </Unit30>
       <Unit31>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="456"/>
         <CursorPos X="15" Y="471"/>
         <UsageCount Value="12"/>
@@ -293,10 +295,11 @@
       </Unit40>
       <Unit41>
         <Filename Value="../../../../lcl/include/wincontrol.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="5602"/>
-        <CursorPos X="3" Y="5607"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="8202"/>
+        <CursorPos Y="8233"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit41>
       <Unit42>
         <Filename Value="../../runtime/IBServices.pas"/>
@@ -364,7 +367,7 @@
       </Unit50>
       <Unit51>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="10"/>
         <TopLine Value="859"/>
         <CursorPos X="32" Y="876"/>
         <UsageCount Value="11"/>
@@ -372,7 +375,7 @@
       </Unit51>
       <Unit52>
         <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="12"/>
         <TopLine Value="227"/>
         <CursorPos X="3" Y="230"/>
         <UsageCount Value="11"/>
@@ -380,7 +383,7 @@
       </Unit52>
       <Unit53>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="74"/>
         <CursorPos Y="89"/>
         <UsageCount Value="11"/>
@@ -393,122 +396,145 @@
         <CursorPos X="10" Y="16"/>
         <UsageCount Value="11"/>
       </Unit54>
+      <Unit55>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
+        <UnitName Value="Gtk2WSStdCtrls"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="1836"/>
+        <CursorPos Y="1868"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="../../../../lcl/include/dbcombobox.inc"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="42"/>
+        <CursorPos X="102" Y="56"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit56>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
-        <Caret Line="8" TopLine="7"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="214" TopLine="192"/>
       </Position1>
       <Position2>
-        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
-        <Caret Line="329" Column="3" TopLine="314"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="215" TopLine="192"/>
       </Position2>
       <Position3>
-        <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="258" TopLine="238"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="372" TopLine="353"/>
       </Position3>
       <Position4>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="1122" Column="53" TopLine="1108"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="371" TopLine="353"/>
       </Position4>
       <Position5>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="372" TopLine="353"/>
       </Position5>
       <Position6>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="845" Column="16" TopLine="820"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="371" TopLine="353"/>
       </Position6>
       <Position7>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="847" Column="14" TopLine="822"/>
+        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
+        <Caret Line="109" TopLine="84"/>
       </Position7>
       <Position8>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="3671" TopLine="3593"/>
+        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
+        <Caret Line="110" TopLine="84"/>
       </Position8>
       <Position9>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="3600" Column="65" TopLine="3585"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="372" TopLine="353"/>
       </Position9>
       <Position10>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="3587" Column="16" TopLine="3570"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="371" TopLine="353"/>
       </Position10>
       <Position11>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="3454" Column="16" TopLine="3436"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="372" TopLine="353"/>
       </Position11>
       <Position12>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="886" Column="84" TopLine="876"/>
+        <Filename Value="../../../../lcl/include/control.inc"/>
+        <Caret Line="3476" TopLine="3457"/>
       </Position12>
       <Position13>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="453" TopLine="441"/>
+        <Filename Value="../../../../lcl/include/control.inc"/>
+        <Caret Line="3479" TopLine="3457"/>
       </Position13>
       <Position14>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="197" Column="15" TopLine="180"/>
+        <Filename Value="../../../../lcl/include/control.inc"/>
+        <Caret Line="3480" TopLine="3457"/>
       </Position14>
       <Position15>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="607" Column="26" TopLine="582"/>
+        <Filename Value="../../../../lcl/include/control.inc"/>
+        <Caret Line="3481" TopLine="3457"/>
       </Position15>
       <Position16>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="773" Column="38" TopLine="764"/>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8211" TopLine="8192"/>
       </Position16>
       <Position17>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8212" TopLine="8192"/>
       </Position17>
       <Position18>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="218" TopLine="194"/>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8228" TopLine="8196"/>
       </Position18>
       <Position19>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="772" TopLine="743"/>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8229" TopLine="8197"/>
       </Position19>
       <Position20>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="261" TopLine="248"/>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8230" TopLine="8198"/>
       </Position20>
       <Position21>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="276" TopLine="262"/>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
+        <Caret Line="1854" TopLine="1835"/>
       </Position21>
       <Position22>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="485" TopLine="471"/>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
+        <Caret Line="1855" TopLine="1835"/>
       </Position22>
       <Position23>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="589" TopLine="574"/>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
+        <Caret Line="1856" TopLine="1835"/>
       </Position23>
       <Position24>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="262" TopLine="259"/>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
+        <Caret Line="1859" TopLine="1835"/>
       </Position24>
       <Position25>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="488" TopLine="475"/>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
+        <Caret Line="1860" TopLine="1835"/>
       </Position25>
       <Position26>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="592" TopLine="577"/>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
+        <Caret Line="1861" TopLine="1835"/>
       </Position26>
       <Position27>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="942" TopLine="927"/>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
+        <Caret Line="1862" TopLine="1835"/>
       </Position27>
       <Position28>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="941" Column="52" TopLine="929"/>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
+        <Caret Line="1868" TopLine="1836"/>
       </Position28>
       <Position29>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="905" Column="23" TopLine="895"/>
+        <Filename Value="../../../../lcl/include/wincontrol.inc"/>
+        <Caret Line="8233" TopLine="8202"/>
       </Position29>
+      <Position30>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="10" Column="17"/>
+      </Position30>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

@@ -11,6 +11,9 @@ IBX Change Log  version                   (2.0.3) tba, 24 Feb 2017 12:17:53 +000
 
 4. Avoid "Object is nil" error when opening a database with DefaultSystemCodePage = true
 
+5. IBLookupComboEditBox: avoid race condition (Lazarus 1.8.0 onwards) when autocompleting
+   text due to change in inherited dbcombobox.
+
 IBX Change Log  version                   (2.0-2) Fri, 24 Feb 2017 12:17:53 +0000
 
 1. TIBDatabase.CreateDatabase: extract full DB Name from SQL using reg ex in order to
