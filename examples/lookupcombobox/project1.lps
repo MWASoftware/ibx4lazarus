@@ -17,7 +17,6 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos X="17" Y="10"/>
         <UsageCount Value="48"/>
         <Loaded Value="True"/>
@@ -180,7 +179,7 @@
       <Unit25>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="61" Y="13"/>
+        <CursorPos X="42" Y="18"/>
         <UsageCount Value="12"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit25>
@@ -374,10 +373,12 @@
       </Unit52>
       <Unit53>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="74"/>
-        <CursorPos Y="89"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="235"/>
+        <CursorPos Y="254"/>
         <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit53>
       <Unit54>
         <Filename Value="../../runtime/IBCodePage.pas"/>

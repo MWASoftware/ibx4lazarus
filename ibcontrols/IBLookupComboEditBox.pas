@@ -350,6 +350,11 @@ begin
                SelLength := UTF8Length(Text);
              end;
              KeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
+           end
+           else
+           begin
+             SelStart := iSelStart;
+             SelLength := 0;
            end;
          end;
     finally
