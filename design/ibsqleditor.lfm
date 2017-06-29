@@ -7,11 +7,12 @@ object IBSQLEditorForm: TIBSQLEditorForm
   Caption = 'IBSQL Editor'
   ClientHeight = 425
   ClientWidth = 716
+  DesignTimePPI = 92
   OnShow = FormShow
-  LCLVersion = '1.4.4.0'
+  LCLVersion = '1.8.0.2'
   object Label3: TLabel
     Left = 288
-    Height = 15
+    Height = 14
     Top = 8
     Width = 24
     Caption = 'SQL'
@@ -70,7 +71,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Left = 16
     Height = 337
     Top = 27
-    Width = 251
+    Width = 256
     ActivePage = SelectPage
     TabIndex = 0
     TabOrder = 5
@@ -78,11 +79,11 @@ object IBSQLEditorForm: TIBSQLEditorForm
     object SelectPage: TTabSheet
       Caption = 'Select'
       ClientHeight = 331
-      ClientWidth = 184
+      ClientWidth = 189
       OnShow = SelectPageShow
       object Label1: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 3
         Width = 69
         Caption = 'Table Name'
@@ -90,7 +91,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object Label2: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 53
         Width = 33
         Caption = 'Fields'
@@ -98,7 +99,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object Label4: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 231
         Width = 77
         Caption = 'Primary Keys'
@@ -108,7 +109,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Left = 7
         Height = 27
         Top = 19
-        Width = 169
+        Width = 174
         OwnerDrawEditable = False
         Anchors = [akTop, akLeft, akRight]
         AutoComplete = True
@@ -122,13 +123,13 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Height = 136
         Hint = 'Select Fields to include in Select Statement or leave unselected to select all'
         Top = 69
-        Width = 169
+        Width = 174
         Anchors = [akTop, akLeft, akRight]
         ItemHeight = 0
         MultiSelect = True
         OnDblClick = SelectFieldsListDblClick
         ParentShowHint = False
-        ScrollWidth = 167
+        ScrollWidth = 172
         ShowHint = True
         TabOrder = 1
         TopIndex = -1
@@ -137,10 +138,10 @@ object IBSQLEditorForm: TIBSQLEditorForm
         Left = 7
         Height = 77
         Top = 247
-        Width = 169
+        Width = 174
         Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 0
-        ScrollWidth = 167
+        ScrollWidth = 172
         TabOrder = 2
         TopIndex = -1
       end
@@ -148,7 +149,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     object InsertPage: TTabSheet
       Caption = 'Insert'
       ClientHeight = 331
-      ClientWidth = 184
+      ClientWidth = 189
       OnShow = InsertPageShow
       object Label8: TLabel
         Left = 7
@@ -199,7 +200,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     object ModifyPage: TTabSheet
       Caption = 'Modify'
       ClientHeight = 331
-      ClientWidth = 184
+      ClientWidth = 189
       OnShow = ModifyPageShow
       object Label10: TLabel
         Left = 7
@@ -285,7 +286,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     object DeletePage: TTabSheet
       Caption = 'Delete'
       ClientHeight = 331
-      ClientWidth = 184
+      ClientWidth = 189
       OnShow = DeletePageShow
       object Label14: TLabel
         Left = 7
@@ -332,7 +333,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     object ExecutePage: TTabSheet
       Caption = 'Execute'
       ClientHeight = 331
-      ClientWidth = 184
+      ClientWidth = 189
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
