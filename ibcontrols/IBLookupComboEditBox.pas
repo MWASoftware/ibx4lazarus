@@ -331,12 +331,12 @@ begin
          ListSource.DataSet.Active := false;
          ListSource.DataSet.Active :=  true;
          Text := FCurText;
-         if not FExiting and (FForceAutoComplete or Focused) and (Text <> '')then
+         if not FExiting and (FForceAutoComplete or Focused) and (FCurText <> '')then
          begin
            if ListSource.DataSet.Active and (ListSource.DataSet.RecordCount > 0) then
            begin
              sCompleteText := ListSource.DataSet.FieldByName(ListField).AsString;
-             if (sCompleteText <> Text) then
+             if (sCompleteText <> FCurText) then
              begin
                sResultText := sCompleteText;
                if ((cbactEndOfLineComplete in AutoCompleteText) and
