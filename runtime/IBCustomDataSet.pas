@@ -181,6 +181,7 @@ type
     FCharacterSetSize: integer;
     FAutoFieldSize: boolean;
     FCodePage: TSystemCodePage;
+    FDataSize: integer;
   protected
     procedure Bind(Binding: Boolean); override;
     function GetDataSize: Integer; override;
@@ -1141,15 +1142,16 @@ begin
     IBFieldDef := FieldDef as TIBFieldDef;
     CharacterSetSize := IBFieldDef.CharacterSetSize;
     CharacterSetName := IBFieldDef.CharacterSetName;
+    FDataSize := IBFieldDef.Size + 1;
     if AutoFieldSize then
-      Size := IBFieldDef.Size;
+      Size := IBFieldDef.Size div CharacterSetSize;
     CodePage := IBFieldDef.CodePage;
   end;
 end;
 
 function TIBStringField.GetDataSize: Integer;
 begin
-  Result := Size * CharacterSetSize + 1;
+  Result := FDataSize;
 end;
 
 constructor TIBStringField.Create(aOwner: TComponent);
@@ -3823,7 +3825,7 @@ begin
               CharSetSize := 1;
             CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
             Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
-            FieldSize := GetSize div CharSetSize;
+            FieldSize := GetSize;
             FieldType := ftString;
           end;
           { All Doubles/Floats should be cast to doubles }

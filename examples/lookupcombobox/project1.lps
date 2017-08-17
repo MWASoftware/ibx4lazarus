@@ -178,9 +178,11 @@
       </Unit24>
       <Unit25>
         <Filename Value="../../changelog"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="42" Y="18"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="79" Y="17"/>
         <UsageCount Value="12"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit25>
       <Unit26>
@@ -373,10 +375,9 @@
       </Unit52>
       <Unit53>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="235"/>
-        <CursorPos Y="254"/>
+        <CursorPos X="56" Y="241"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit53>

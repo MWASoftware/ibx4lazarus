@@ -2,15 +2,15 @@
 <CONFIG>
   <ProjectSession>
     <PathDelim Value="\"/>
-    <Version Value="9"/>
+    <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="58">
+    <Units Count="60">
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <TopLine Value="152"/>
         <CursorPos Y="182"/>
-        <UsageCount Value="192"/>
+        <UsageCount Value="194"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -19,15 +19,15 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="62"/>
         <CursorPos X="25" Y="70"/>
-        <UsageCount Value="192"/>
+        <UsageCount Value="194"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit1>
       <Unit2>
         <Filename Value="..\..\runtime\IBExtract.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="3253"/>
         <CursorPos X="3" Y="3279"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -67,10 +67,11 @@
       </Unit7>
       <Unit8>
         <Filename Value="..\..\runtime\IBSQL.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="149"/>
-        <CursorPos X="3" Y="247"/>
-        <UsageCount Value="29"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="213"/>
+        <CursorPos X="35" Y="241"/>
+        <UsageCount Value="30"/>
+        <Loaded Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="..\..\..\fbintf\client\3.0\FB30Statement.pas"/>
@@ -123,9 +124,9 @@
       </Unit15>
       <Unit16>
         <Filename Value="..\..\changelog"/>
-        <EditorIndex Value="6"/>
-        <CursorPos X="40" Y="7"/>
-        <UsageCount Value="22"/>
+        <EditorIndex Value="10"/>
+        <CursorPos X="75" Y="12"/>
+        <UsageCount Value="23"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
@@ -166,17 +167,16 @@
       </Unit21>
       <Unit22>
         <Filename Value="..\..\runtime\IBDataOutput.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="503"/>
-        <CursorPos X="36" Y="522"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="41"/>
+        <CursorPos X="3" Y="60"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
           <TopLine Value="88"/>
           <CursorPos X="15" Y="80"/>
         </ExtraEditor1>
-        <UsageCount Value="60"/>
+        <UsageCount Value="61"/>
         <Loaded Value="True"/>
       </Unit22>
       <Unit23>
@@ -259,15 +259,15 @@
       <Unit34>
         <Filename Value="..\..\runtime\ibxscript.pas"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="800"/>
-        <CursorPos Y="808"/>
+        <TopLine Value="254"/>
+        <CursorPos X="15" Y="285"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
           <TopLine Value="1324"/>
           <CursorPos X="3" Y="1341"/>
         </ExtraEditor1>
-        <UsageCount Value="69"/>
+        <UsageCount Value="70"/>
         <Loaded Value="True"/>
       </Unit34>
       <Unit35>
@@ -286,10 +286,10 @@
       </Unit36>
       <Unit37>
         <Filename Value="..\..\runtime\IBDatabase.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="595"/>
-        <CursorPos Y="622"/>
-        <UsageCount Value="10"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="238"/>
+        <CursorPos X="14" Y="258"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit37>
       <Unit38>
@@ -341,15 +341,17 @@
         <EditorIndex Value="1"/>
         <TopLine Value="427"/>
         <CursorPos X="20" Y="482"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit44>
       <Unit45>
         <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="841"/>
-        <CursorPos X="27" Y="860"/>
-        <UsageCount Value="8"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="1896"/>
+        <CursorPos X="3" Y="1875"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit45>
       <Unit46>
         <Filename Value="..\..\..\..\components\lazutils\lazutf8.pas"/>
@@ -432,127 +434,142 @@
         <EditorIndex Value="-1"/>
         <UsageCount Value="10"/>
       </Unit57>
+      <Unit58>
+        <Filename Value="..\..\runtime\IBBlob.pas"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="196"/>
+        <CursorPos X="3" Y="193"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit58>
+      <Unit59>
+        <Filename Value="..\..\..\..\..\..\..\..\usr\share\fpcsrc\packages\fcl-db\src\base\fields.inc"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="38"/>
+        <CursorPos Y="42"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit59>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="..\..\runtime\IBDatabase.pas"/>
-        <Caret Line="629" TopLine="597"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="513" Column="36" TopLine="484"/>
       </Position1>
       <Position2>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="854" TopLine="839"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="618" Column="34" TopLine="588"/>
       </Position2>
       <Position3>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="855" TopLine="839"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="2308" Column="50" TopLine="2277"/>
       </Position3>
       <Position4>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="752" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="2333" Column="52" TopLine="2303"/>
       </Position4>
       <Position5>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="753" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3040" Column="72" TopLine="3010"/>
       </Position5>
       <Position6>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="754" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3308" Column="50" TopLine="3277"/>
       </Position6>
       <Position7>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="755" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3310" Column="34" TopLine="3279"/>
       </Position7>
       <Position8>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="756" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3331" Column="47" TopLine="3300"/>
       </Position8>
       <Position9>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="757" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3333" Column="47" TopLine="3302"/>
       </Position9>
       <Position10>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="758" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3349" Column="20" TopLine="3318"/>
       </Position10>
       <Position11>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="760" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3357" Column="41" TopLine="3326"/>
       </Position11>
       <Position12>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="761" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3358" Column="41" TopLine="3327"/>
       </Position12>
       <Position13>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="763" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3359" Column="66" TopLine="3328"/>
       </Position13>
       <Position14>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="762" TopLine="732"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3360" Column="75" TopLine="3329"/>
       </Position14>
       <Position15>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="765" TopLine="733"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3920" Column="34" TopLine="3890"/>
       </Position15>
       <Position16>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="767" TopLine="736"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3917" Column="32" TopLine="3891"/>
       </Position16>
       <Position17>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="856" TopLine="837"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="536" Column="15" TopLine="520"/>
       </Position17>
       <Position18>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="567" TopLine="547"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="4303" Column="19" TopLine="4297"/>
       </Position18>
       <Position19>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="568" TopLine="547"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
       </Position19>
       <Position20>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="569" TopLine="547"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="513" Column="36" TopLine="484"/>
       </Position20>
       <Position21>
-        <Filename Value="..\..\runtime\ibxscript.pas"/>
-        <Caret Line="570" TopLine="547"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="618" Column="34" TopLine="588"/>
       </Position21>
       <Position22>
-        <Filename Value="..\..\runtime\IBDatabase.pas"/>
-        <Caret Line="1019" Column="23" TopLine="1013"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="2308" Column="50" TopLine="2277"/>
       </Position22>
       <Position23>
-        <Filename Value="..\..\runtime\IBDatabase.pas"/>
-        <Caret Line="621" Column="5" TopLine="595"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="2333" Column="52" TopLine="2303"/>
       </Position23>
       <Position24>
-        <Filename Value="..\..\runtime\IBDatabase.pas"/>
-        <Caret Line="622" TopLine="595"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3040" Column="72" TopLine="3010"/>
       </Position24>
       <Position25>
-        <Filename Value="..\..\runtime\IBDatabase.pas"/>
-        <Caret Line="623" TopLine="595"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3308" Column="50" TopLine="3277"/>
       </Position25>
       <Position26>
-        <Filename Value="..\..\runtime\IBDatabase.pas"/>
-        <Caret Line="624" TopLine="595"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3310" Column="34" TopLine="3279"/>
       </Position26>
       <Position27>
-        <Filename Value="..\..\runtime\IBExtract.pas"/>
-        <Caret Line="3277" Column="9" TopLine="3253"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3331" Column="47" TopLine="3300"/>
       </Position27>
       <Position28>
-        <Filename Value="..\..\runtime\IBDataOutput.pas"/>
-        <Caret Line="79" Column="71" TopLine="60"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3333" Column="47" TopLine="3302"/>
       </Position28>
       <Position29>
-        <Filename Value="..\..\runtime\IBDataOutput.pas"/>
-        <Caret Line="522" Column="26" TopLine="504"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="3349" Column="20" TopLine="3318"/>
       </Position29>
       <Position30>
-        <Filename Value="..\..\changelog"/>
-        <Caret Line="32" Column="40" TopLine="19"/>
+        <Filename Value="..\..\runtime\IBCustomDataSet.pas"/>
+        <Caret Line="390" Column="15" TopLine="373"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>

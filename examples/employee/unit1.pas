@@ -18,6 +18,7 @@ type
     DBEdit6: TDBEdit;
     EmployeesDEPT_KEY_PATH: TIBStringField;
     EmployeesDEPT_PATH: TIBStringField;
+    EmployeesTEst: TStringField;
     IBLookupComboEditBox1: TIBLookupComboEditBox;
     IBLookupComboEditBox2: TIBLookupComboEditBox;
     IBQuery1DEPT_NO: TIBStringField;
