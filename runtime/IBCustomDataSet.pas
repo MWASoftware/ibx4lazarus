@@ -791,10 +791,12 @@ type
     FCharacterSetSize: integer;
     FCodePage: TSystemCodePage;
     FRelationName: string;
+    FDataSize: integer;
   published
     property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
     property CodePage: TSystemCodePage read FCodePage write FCodePage;
+    property DataSize: integer read FDataSize write FDataSize;
     property RelationName: string read FRelationName write FRelationName;
     property ArrayDimensions: integer read FArrayDimensions write FArrayDimensions;
     property ArrayBounds: TArrayBounds read FArrayBounds write FArrayBounds;
@@ -1142,9 +1144,9 @@ begin
     IBFieldDef := FieldDef as TIBFieldDef;
     CharacterSetSize := IBFieldDef.CharacterSetSize;
     CharacterSetName := IBFieldDef.CharacterSetName;
-    FDataSize := IBFieldDef.Size + 1;
+    FDataSize := IBFieldDef.DataSize + 1;
     if AutoFieldSize then
-      Size := IBFieldDef.Size div CharacterSetSize;
+      Size := IBFieldDef.Size;
     CodePage := IBFieldDef.CodePage;
   end;
 end;
@@ -3673,6 +3675,7 @@ const
 var
   FieldType: TFieldType;
   FieldSize: Word;
+  FieldDataSize: integer;
   charSetID: short;
   CharSetSize: integer;
   CharSetName: RawByteString;
@@ -3809,6 +3812,7 @@ begin
         FieldName := getSQLName;
         FAliasNameList[i] := DBAliasName;
         FieldSize := 0;
+        FieldDataSize := 0;
         FieldPrecision := 0;
         FieldNullable := IsNullable;
         CharSetSize := 0;
@@ -3825,7 +3829,8 @@ begin
               CharSetSize := 1;
             CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
             Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
-            FieldSize := GetSize;
+            FieldDataSize := GetSize;
+            FieldSize := FieldDataSize div CharSetSize;
             FieldType := ftString;
           end;
           { All Doubles/Floats should be cast to doubles }
@@ -3839,6 +3844,7 @@ begin
               FieldType := ftBCD;
               FieldPrecision := 4;
               FieldSize := -getScale;
+              FieldDataSize := FieldSize;
             end;
           end;
           SQL_LONG:
@@ -3863,6 +3869,7 @@ begin
               FieldPrecision := 9;
               FieldSize := -getScale;
             end;
+            FieldDataSize := FieldSize;
           end;
 
           SQL_INT64:
@@ -3876,7 +3883,8 @@ begin
               FieldSize := -getScale;
             end
             else
-              FieldType := ftFloat
+              FieldType := ftFloat;
+            FieldDataSize := FieldSize;
           end;
           SQL_TIMESTAMP: FieldType := ftDateTime;
           SQL_TYPE_TIME: FieldType := ftTime;
@@ -3894,10 +3902,12 @@ begin
             end
             else
               FieldType := ftBlob;
+            FieldDataSize := FieldSize;
           end;
           SQL_ARRAY:
           begin
             FieldSize := sizeof (TISC_QUAD);
+            FieldDataSize := FieldSize;
             FieldType := ftArray;
             ArrayMetaData := GetArrayMetaData;
             if ArrayMetaData <> nil then
@@ -3921,6 +3931,7 @@ begin
             Name := FieldAliasName;
             FAliasNameMap[FieldNo-1] := DBAliasName;
             Size := FieldSize;
+            DataSize := FieldDataSize;
             Precision := FieldPrecision;
             Required := not FieldNullable;
             RelationName := aRelationName;
