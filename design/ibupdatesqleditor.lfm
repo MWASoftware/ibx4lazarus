@@ -11,7 +11,8 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
   ClientWidth = 662
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.2.6.0'
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
   object PageControl: TPageControl
     Left = 7
     Height = 352
@@ -23,21 +24,21 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
     TabOrder = 0
     object FieldsPage: TTabSheet
       Caption = 'Options'
-      ClientHeight = 319
+      ClientHeight = 320
       ClientWidth = 635
       object GroupBox1: TGroupBox
         Left = 8
-        Height = 314
+        Height = 315
         Top = 4
         Width = 617
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = ' SQL Generation '
-        ClientHeight = 298
+        ClientHeight = 300
         ClientWidth = 615
         TabOrder = 0
         object Label1: TLabel
           Left = 9
-          Height = 15
+          Height = 14
           Top = 16
           Width = 73
           Caption = 'Table &Name:'
@@ -46,7 +47,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         end
         object Label3: TLabel
           Left = 300
-          Height = 15
+          Height = 14
           Top = 18
           Width = 62
           Caption = '&Key Fields:'
@@ -55,7 +56,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         end
         object Label4: TLabel
           Left = 443
-          Height = 15
+          Height = 14
           Top = 18
           Width = 85
           Caption = 'Update &Fields:'
@@ -67,6 +68,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
           Height = 27
           Top = 35
           Width = 171
+          OwnerDrawEditable = False
           AutoComplete = True
           AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           ItemHeight = 0
@@ -75,7 +77,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         end
         object PrimaryKeyList: TListBox
           Left = 300
-          Height = 237
+          Height = 239
           Top = 36
           Width = 136
           Anchors = [akTop, akLeft, akBottom]
@@ -87,7 +89,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         end
         object FieldList: TListBox
           Left = 443
-          Height = 237
+          Height = 239
           Hint = 'Select Fields to include in Update Statements, or leave unselected to select all'
           Top = 35
           Width = 136
@@ -140,7 +142,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
     end
     object SQLPage: TTabSheet
       Caption = 'SQL'
-      ClientHeight = 319
+      ClientHeight = 320
       ClientWidth = 635
       OnShow = SQLPageShow
       object Label2: TLabel
@@ -178,7 +180,7 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 4
-        ClientHeight = 37
+        ClientHeight = 38
         ClientWidth = 274
         Columns = 4
         ItemIndex = 0

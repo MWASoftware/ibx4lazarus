@@ -160,7 +160,9 @@ end;
 
 function TIBDSLCLInterface.ServerLoginDialog(var AServerName: string;
   var AUserName, APassword: string): Boolean;
+var ActiveForm: TCustomForm;
 begin
+  ActiveForm := Screen.ActiveCustomForm;
   with TIBXDSLoginDlg.Create(nil) do
   try
     Caption := 'Firebird Server Login';
@@ -182,12 +184,19 @@ begin
   finally
     Free;
   end;
+  if ActiveForm <> nil then
+  begin
+    ActiveForm.SetFocus;
+    Application.ProcessMessages;
+  end;
 end;
 
 function TIBDSLCLInterface.LoginDialogEx(var ADatabaseName: string;
   var AUserName, APassword: string; NameReadOnly: Boolean): Boolean;
+var ActiveForm: TCustomForm;
 begin
  try
+  ActiveForm := Screen.ActiveCustomForm;
   with TIBXDSLoginDlg.Create(Application) do
   try
     ProjectName.Caption := GetProjectName;
@@ -209,6 +218,11 @@ begin
     end
   finally
     Free;
+  end;
+  if ActiveForm <> nil then
+  begin
+    ActiveForm.SetFocus;
+    Application.ProcessMessages;
   end;
  except On E:Exception do
    MessageDlg('Unable to Load Login Dialog ' + E.Message,mtError,[mbOK],0);

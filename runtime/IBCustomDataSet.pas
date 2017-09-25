@@ -3812,7 +3812,7 @@ begin
         FieldName := getSQLName;
         FAliasNameList[i] := DBAliasName;
         FieldSize := 0;
-        FieldDataSize := 0;
+        FieldDataSize := GetSize;
         FieldPrecision := 0;
         FieldNullable := IsNullable;
         CharSetSize := 0;
@@ -3829,7 +3829,6 @@ begin
               CharSetSize := 1;
             CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
             Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
-            FieldDataSize := GetSize;
             FieldSize := FieldDataSize div CharSetSize;
             FieldType := ftString;
           end;
@@ -3844,7 +3843,6 @@ begin
               FieldType := ftBCD;
               FieldPrecision := 4;
               FieldSize := -getScale;
-              FieldDataSize := FieldSize;
             end;
           end;
           SQL_LONG:
@@ -3869,7 +3867,6 @@ begin
               FieldPrecision := 9;
               FieldSize := -getScale;
             end;
-            FieldDataSize := FieldSize;
           end;
 
           SQL_INT64:
@@ -3884,7 +3881,6 @@ begin
             end
             else
               FieldType := ftFloat;
-            FieldDataSize := FieldSize;
           end;
           SQL_TIMESTAMP: FieldType := ftDateTime;
           SQL_TYPE_TIME: FieldType := ftTime;
@@ -3902,12 +3898,10 @@ begin
             end
             else
               FieldType := ftBlob;
-            FieldDataSize := FieldSize;
           end;
           SQL_ARRAY:
           begin
             FieldSize := sizeof (TISC_QUAD);
-            FieldDataSize := FieldSize;
             FieldType := ftArray;
             ArrayMetaData := GetArrayMetaData;
             if ArrayMetaData <> nil then

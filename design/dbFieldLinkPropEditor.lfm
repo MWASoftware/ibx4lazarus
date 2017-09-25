@@ -8,7 +8,8 @@ object FieldLinkEditor: TFieldLinkEditor
   ClientHeight = 374
   ClientWidth = 633
   OnShow = FormShow
-  LCLVersion = '1.2.2.0'
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
   object Bevel1: TBevel
     Left = 8
     Height = 316
@@ -40,7 +41,7 @@ object FieldLinkEditor: TFieldLinkEditor
   end
   object Label2: TLabel
     Left = 20
-    Height = 15
+    Height = 14
     Top = 28
     Width = 109
     Caption = 'Detail Index Fields'
@@ -59,7 +60,7 @@ object FieldLinkEditor: TFieldLinkEditor
   end
   object Label3: TLabel
     Left = 435
-    Height = 15
+    Height = 14
     Top = 31
     Width = 77
     Anchors = [akTop, akRight]
@@ -89,7 +90,7 @@ object FieldLinkEditor: TFieldLinkEditor
   end
   object Label4: TLabel
     Left = 20
-    Height = 15
+    Height = 14
     Top = 216
     Width = 74
     Caption = 'Joined Fields'
@@ -118,7 +119,7 @@ object FieldLinkEditor: TFieldLinkEditor
   end
   object JoinHint: TLabel
     Left = 20
-    Height = 15
+    Height = 14
     Top = 187
     Width = 54
     Caption = 'JoinHint'

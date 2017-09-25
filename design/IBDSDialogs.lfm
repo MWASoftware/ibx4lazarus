@@ -1,7 +1,7 @@
 object IBXDSLoginDlg: TIBXDSLoginDlg
-  Left = 989
+  Left = 1794
   Height = 257
-  Top = 374
+  Top = 408
   Width = 385
   ActiveControl = Password
   BorderIcons = [biSystemMenu]
@@ -10,7 +10,7 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
   ClientHeight = 257
   ClientWidth = 385
   Position = poScreenCenter
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.8.0.4'
   object Bevel1: TBevel
     Left = 15
     Height = 202
@@ -20,7 +20,7 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
   end
   object ProjectName: TLabel
     Left = 144
-    Height = 15
+    Height = 14
     Top = 40
     Width = 35
     Caption = 'Name'
@@ -28,7 +28,7 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
   end
   object TargetCaption: TLabel
     Left = 33
-    Height = 15
+    Height = 14
     Top = 84
     Width = 60
     Caption = 'Database:'
@@ -36,7 +36,7 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
   end
   object Label2: TLabel
     Left = 32
-    Height = 15
+    Height = 14
     Top = 128
     Width = 74
     Caption = 'User  Name:'
@@ -44,7 +44,7 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
   end
   object Label3: TLabel
     Left = 33
-    Height = 15
+    Height = 14
     Top = 176
     Width = 59
     Caption = 'Password:'
@@ -74,21 +74,21 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
   end
   object DatabaseName: TEdit
     Left = 142
-    Height = 25
+    Height = 24
     Top = 80
     Width = 192
     TabOrder = 4
   end
   object UserName: TEdit
     Left = 142
-    Height = 25
+    Height = 24
     Top = 124
     Width = 192
     TabOrder = 2
   end
   object Password: TEdit
     Left = 142
-    Height = 25
+    Height = 24
     Top = 170
     Width = 192
     EchoMode = emPassword
@@ -97,7 +97,7 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
   end
   object Label1: TLabel
     Left = 33
-    Height = 15
+    Height = 14
     Top = 40
     Width = 80
     Caption = 'Project Name'

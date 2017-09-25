@@ -83,7 +83,9 @@ type
 
 function TIBLCLInterface.ServerLoginDialog(var AServerName: string;
   var AUserName, APassword: string): Boolean;
+var ActiveForm: TCustomForm;
 begin
+  ActiveForm := Screen.ActiveCustomForm;
   with TIBXLoginDlg.Create(nil) do
   try
     Caption := 'Firebird Server Login';
@@ -101,11 +103,18 @@ begin
   finally
     Free;
   end;
+  if ActiveForm <> nil then
+  begin
+    ActiveForm.SetFocus;
+    Application.ProcessMessages;
+  end;
 end;
 
 function TIBLCLInterface.LoginDialogEx(var ADatabaseName: string;
   var AUserName, APassword: string; NameReadOnly: Boolean): Boolean;
+var ActiveForm: TCustomForm;
 begin
+  ActiveForm := Screen.ActiveCustomForm;
   with TIBXLoginDlg.Create(Application) do
   try
     DatabaseName.Caption := ADatabaseName;
@@ -123,6 +132,11 @@ begin
     end
   finally
     Free;
+  end;
+  if ActiveForm <> nil then
+  begin
+    ActiveForm.SetFocus;
+    Application.ProcessMessages;
   end;
 end;
 

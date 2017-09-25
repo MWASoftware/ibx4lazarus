@@ -7,10 +7,11 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
   ClientHeight = 438
   ClientWidth = 749
   OnShow = FormShow
-  LCLVersion = '1.2.6.0'
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
   object Label3: TLabel
     Left = 279
-    Height = 15
+    Height = 14
     Top = 16
     Width = 24
     Caption = 'SQL'
@@ -93,7 +94,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     TabOrder = 7
     object ModifyPage: TTabSheet
       Caption = 'Update'
-      ClientHeight = 313
+      ClientHeight = 314
       ClientWidth = 232
       OnShow = ModifyPageShow
       object Label1: TLabel
@@ -109,6 +110,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
         Height = 27
         Top = 22
         Width = 201
+        OwnerDrawEditable = False
         AutoComplete = True
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
@@ -171,12 +173,12 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     end
     object ExecutePage: TTabSheet
       Caption = 'Execute'
-      ClientHeight = 313
+      ClientHeight = 314
       ClientWidth = 232
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 8
         Width = 100
         Caption = 'Procedure Name'
@@ -187,6 +189,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
         Height = 27
         Top = 24
         Width = 201
+        OwnerDrawEditable = False
         ItemHeight = 0
         OnCloseUp = ProcedureNamesCloseUp
         ParentColor = True
@@ -194,7 +197,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
       end
       object Label17: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 56
         Width = 104
         Caption = 'Input Parameters'
@@ -224,7 +227,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
       end
       object Label18: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 184
         Width = 114
         Caption = 'Output Parameters'
@@ -232,7 +235,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
       end
       object ExecuteOnlyIndicator: TLabel
         Left = 10
-        Height = 15
+        Height = 14
         Top = 293
         Width = 89
         Caption = 'Execute Only'

@@ -6,7 +6,8 @@ object IBServiceEditorForm: TIBServiceEditorForm
   Caption = 'Service Editor'
   ClientHeight = 345
   ClientWidth = 438
-  LCLVersion = '1.2.2.0'
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
   object Bevel1: TBevel
     Left = 21
     Height = 274
@@ -15,9 +16,9 @@ object IBServiceEditorForm: TIBServiceEditorForm
   end
   object LocalRbtn: TRadioButton
     Left = 32
-    Height = 24
+    Height = 22
     Top = 32
-    Width = 57
+    Width = 55
     Caption = '&Local'
     Checked = True
     OnClick = LocalRbtnClick
@@ -26,16 +27,16 @@ object IBServiceEditorForm: TIBServiceEditorForm
   end
   object RemoteRbtn: TRadioButton
     Left = 97
-    Height = 24
+    Height = 22
     Top = 32
-    Width = 71
+    Width = 69
     Caption = '&Remote'
     OnClick = RemoteRbtnClick
     TabOrder = 1
   end
   object Label7: TLabel
     Left = 32
-    Height = 15
+    Height = 14
     Top = 71
     Width = 43
     Caption = '&Server:'
@@ -44,7 +45,7 @@ object IBServiceEditorForm: TIBServiceEditorForm
   end
   object ServerName: TEdit
     Left = 32
-    Height = 25
+    Height = 24
     Top = 89
     Width = 144
     Enabled = False
@@ -52,7 +53,7 @@ object IBServiceEditorForm: TIBServiceEditorForm
   end
   object Label8: TLabel
     Left = 217
-    Height = 15
+    Height = 14
     Top = 71
     Width = 52
     Caption = '&Protocol:'
@@ -64,6 +65,7 @@ object IBServiceEditorForm: TIBServiceEditorForm
     Height = 27
     Top = 89
     Width = 120
+    OwnerDrawEditable = False
     Enabled = False
     ItemHeight = 0
     Items.Strings = (
@@ -75,7 +77,7 @@ object IBServiceEditorForm: TIBServiceEditorForm
   end
   object Label2: TLabel
     Left = 32
-    Height = 15
+    Height = 14
     Top = 136
     Width = 70
     Caption = '&User Name:'
@@ -83,7 +85,7 @@ object IBServiceEditorForm: TIBServiceEditorForm
   end
   object UserName: TEdit
     Left = 32
-    Height = 25
+    Height = 24
     Top = 154
     Width = 137
     OnChange = UserNameChange
@@ -91,7 +93,7 @@ object IBServiceEditorForm: TIBServiceEditorForm
   end
   object Label3: TLabel
     Left = 32
-    Height = 15
+    Height = 14
     Top = 192
     Width = 59
     Caption = 'Pass&word:'
@@ -99,7 +101,7 @@ object IBServiceEditorForm: TIBServiceEditorForm
   end
   object Password: TEdit
     Left = 32
-    Height = 25
+    Height = 24
     Top = 210
     Width = 137
     OnChange = PasswordChange
@@ -107,9 +109,9 @@ object IBServiceEditorForm: TIBServiceEditorForm
   end
   object LoginPrompt: TCheckBox
     Left = 32
-    Height = 24
+    Height = 22
     Top = 256
-    Width = 107
+    Width = 105
     Caption = 'Lo&gin Prompt'
     TabOrder = 6
   end
@@ -123,7 +125,7 @@ object IBServiceEditorForm: TIBServiceEditorForm
   end
   object Label5: TLabel
     Left = 217
-    Height = 15
+    Height = 14
     Top = 136
     Width = 54
     Caption = 'Se&ttings:'

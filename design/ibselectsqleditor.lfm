@@ -1,5 +1,5 @@
 object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
-  Left = 582
+  Left = 527
   Height = 437
   Top = 460
   Width = 747
@@ -8,10 +8,11 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   ClientHeight = 437
   ClientWidth = 747
   OnShow = FormShow
-  LCLVersion = '1.4.4.0'
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
   object Label3: TLabel
     Left = 279
-    Height = 15
+    Height = 14
     Top = 16
     Width = 24
     Caption = 'SQL'
@@ -86,12 +87,12 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 6
     object SelectPage: TTabSheet
       Caption = 'Tables'
-      ClientHeight = 302
+      ClientHeight = 303
       ClientWidth = 226
       OnShow = SelectPageShow
       object Label1: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 4
         Width = 69
         Caption = 'Table Name'
@@ -99,7 +100,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       end
       object Label2: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 56
         Width = 33
         Caption = 'Fields'
@@ -107,7 +108,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       end
       object Label4: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 208
         Width = 77
         Caption = 'Primary Keys'
@@ -154,7 +155,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     end
     object ExecutePage: TTabSheet
       Caption = 'Procedures'
-      ClientHeight = 302
+      ClientHeight = 303
       ClientWidth = 226
       OnShow = ExecutePageShow
       object Label16: TLabel

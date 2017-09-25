@@ -9,7 +9,8 @@ object GeneratorEditor: TGeneratorEditor
   ClientWidth = 478
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '0.9.30'
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
   object Bevel1: TBevel
     Left = 16
     Height = 336
@@ -18,25 +19,25 @@ object GeneratorEditor: TGeneratorEditor
   end
   object Label1: TLabel
     Left = 32
-    Height = 18
+    Height = 14
     Top = 40
-    Width = 109
+    Width = 99
     Caption = 'Generator Name'
     ParentColor = False
   end
   object Label2: TLabel
     Left = 32
-    Height = 18
+    Height = 14
     Top = 192
-    Width = 75
+    Width = 66
     Caption = 'Field Name'
     ParentColor = False
   end
   object Label3: TLabel
     Left = 35
-    Height = 18
+    Height = 14
     Top = 269
-    Width = 88
+    Width = 82
     Caption = 'Increment By'
     ParentColor = False
   end
@@ -62,9 +63,10 @@ object GeneratorEditor: TGeneratorEditor
   end
   object GeneratorNames: TComboBox
     Left = 32
-    Height = 29
+    Height = 27
     Top = 58
     Width = 312
+    OwnerDrawEditable = False
     ItemHeight = 0
     TabOrder = 2
   end
@@ -72,7 +74,7 @@ object GeneratorEditor: TGeneratorEditor
     Left = 38
     Height = 22
     Top = 112
-    Width = 123
+    Width = 116
     Caption = 'On New Record'
     Checked = True
     TabOrder = 3
@@ -82,22 +84,23 @@ object GeneratorEditor: TGeneratorEditor
     Left = 38
     Height = 22
     Top = 144
-    Width = 74
+    Width = 70
     Caption = 'On Post'
     TabOrder = 4
   end
   object FieldNames: TComboBox
     Left = 32
-    Height = 29
+    Height = 27
     Top = 213
     Width = 308
+    OwnerDrawEditable = False
     ItemHeight = 0
     Sorted = True
     TabOrder = 5
   end
   object IncrementBy: TEdit
     Left = 39
-    Height = 27
+    Height = 24
     Top = 292
     Width = 52
     TabOrder = 6
@@ -105,7 +108,7 @@ object GeneratorEditor: TGeneratorEditor
   end
   object UpDown1: TUpDown
     Left = 91
-    Height = 27
+    Height = 24
     Top = 292
     Width = 17
     Associate = IncrementBy

@@ -13,7 +13,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
   OnCreate = FormCreate
   ParentFont = True
   Position = poScreenCenter
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.8.0.4'
   object Panel1: TPanel
     Left = 5
     Height = 36
@@ -61,12 +61,12 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     Width = 452
     Align = alTop
     Caption = 'Connection'
-    ClientHeight = 163
+    ClientHeight = 164
     ClientWidth = 450
     TabOrder = 0
     object Label1: TLabel
       Left = 24
-      Height = 15
+      Height = 14
       Top = 98
       Width = 60
       Caption = '&Database:'
@@ -75,7 +75,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object Label7: TLabel
       Left = 24
-      Height = 15
+      Height = 14
       Top = 48
       Width = 43
       Caption = '&Server:'
@@ -85,7 +85,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object Label8: TLabel
       Left = 209
-      Height = 15
+      Height = 14
       Top = 48
       Width = 52
       Caption = '&Protocol:'
@@ -95,7 +95,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object DatabaseName: TEdit
       Left = 24
-      Height = 25
+      Height = 24
       Top = 116
       Width = 414
       TabOrder = 5
@@ -131,7 +131,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object ServerName: TEdit
       Left = 24
-      Height = 25
+      Height = 24
       Top = 66
       Width = 144
       Enabled = False
@@ -160,12 +160,12 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     Width = 452
     Align = alClient
     Caption = 'Database Parameters'
-    ClientHeight = 276
+    ClientHeight = 277
     ClientWidth = 450
     TabOrder = 1
     object Label2: TLabel
       Left = 24
-      Height = 15
+      Height = 14
       Top = 9
       Width = 70
       Caption = '&User Name:'
@@ -174,7 +174,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object Label3: TLabel
       Left = 24
-      Height = 15
+      Height = 14
       Top = 65
       Width = 59
       Caption = 'Pass&word:'
@@ -183,7 +183,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object Label4: TLabel
       Left = 24
-      Height = 15
+      Height = 14
       Top = 121
       Width = 52
       Caption = 'S&QLRole:'
@@ -192,7 +192,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object Label5: TLabel
       Left = 249
-      Height = 15
+      Height = 14
       Top = 9
       Width = 54
       Caption = 'Se&ttings:'
@@ -201,7 +201,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object Label6: TLabel
       Left = 24
-      Height = 15
+      Height = 14
       Top = 177
       Width = 87
       Caption = '&Character Set:'
@@ -210,7 +210,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object UserName: TEdit
       Left = 24
-      Height = 25
+      Height = 24
       Top = 27
       Width = 137
       OnChange = UserNameChange
@@ -219,7 +219,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object Password: TEdit
       Left = 24
-      Height = 25
+      Height = 24
       Top = 83
       Width = 137
       OnChange = PasswordChange
@@ -228,7 +228,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object SQLRole: TEdit
       Left = 24
-      Height = 25
+      Height = 24
       Top = 139
       Width = 134
       OnChange = SQLRoleChange

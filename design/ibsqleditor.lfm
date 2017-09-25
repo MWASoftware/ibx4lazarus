@@ -1,15 +1,15 @@
 object IBSQLEditorForm: TIBSQLEditorForm
-  Left = 402
+  Left = 2090
   Height = 425
-  Top = 369
+  Top = 382
   Width = 716
   ActiveControl = PageControl
   Caption = 'IBSQL Editor'
   ClientHeight = 425
   ClientWidth = 716
-  DesignTimePPI = 92
   OnShow = FormShow
-  LCLVersion = '1.8.0.2'
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
   object Label3: TLabel
     Left = 288
     Height = 14
