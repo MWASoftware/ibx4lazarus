@@ -36,7 +36,7 @@
  *  Contributor(s): ______________________________________.
  *
 "/>
-    <Version Major="1"/>
+    <Version Major="2" Minor="0" Release = "3" />
     <Files Count="7">
       <Item1>
         <Filename Value="iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
