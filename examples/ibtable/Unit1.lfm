@@ -1,13 +1,15 @@
 object Form1: TForm1
-  Left = 811
+  Left = 457
   Height = 453
   Top = 397
   Width = 817
   Caption = 'IB Tables Example'
   ClientHeight = 453
   ClientWidth = 817
+  DefaultMonitor = dmPrimary
   OnShow = FormShow
-  LCLVersion = '1.6.0.4'
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
   object Panel1: TPanel
     Left = 0
     Height = 453

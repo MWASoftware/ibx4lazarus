@@ -1,14 +1,15 @@
 object Form1: TForm1
-  Left = 401
+  Left = 1767
   Height = 620
-  Top = 193
+  Top = 267
   Width = 882
   Caption = '1D Array Example'
   ClientHeight = 620
   ClientWidth = 882
+  DefaultMonitor = dmPrimary
   OnCreate = FormCreate
   OnShow = FormShow
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.8.0.4'
   object DBControlGrid1: TDBControlGrid
     Left = 20
     Height = 543
@@ -37,7 +38,7 @@ object Form1: TForm1
       TabOrder = 0
       object DBEdit1: TDBEdit
         Left = 8
-        Height = 25
+        Height = 24
         Top = 32
         Width = 264
         DataField = 'TITLE'
@@ -48,7 +49,7 @@ object Form1: TForm1
       end
       object Label1: TLabel
         Left = 8
-        Height = 15
+        Height = 14
         Top = 16
         Width = 73
         Caption = 'Department'
@@ -56,7 +57,7 @@ object Form1: TForm1
       end
       object Label2: TLabel
         Left = 296
-        Height = 15
+        Height = 14
         Top = 16
         Width = 67
         Caption = 'Sales Value'
@@ -105,7 +106,7 @@ object Form1: TForm1
           ScrollBars = ssNone
           TabOrder = 0
           ColCount = 12
-          RowCount = 17
+          RowCount = 18
           ColWidths = (
             41
             41

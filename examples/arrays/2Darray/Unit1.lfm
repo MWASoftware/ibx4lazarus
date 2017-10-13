@@ -1,14 +1,16 @@
 object Form1: TForm1
-  Left = 600
+  Left = 397
   Height = 432
-  Top = 351
+  Top = 360
   Width = 994
   Caption = '2D Array Example'
   ClientHeight = 432
   ClientWidth = 994
+  DefaultMonitor = dmPrimary
   OnCreate = FormCreate
   OnShow = FormShow
-  LCLVersion = '1.6.0.4'
+  Position = poDefaultSizeOnly
+  LCLVersion = '1.8.0.4'
   object IBArrayGrid1: TIBArrayGrid
     Left = 24
     Height = 335
@@ -45,39 +47,41 @@ object Form1: TForm1
     DefaultColWidth = 40
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
     TabOrder = 0
-    ColCount = 25
-    RowCount = 17
+    ColCount = 27
+    RowCount = 19
     ColWidths = (
       80
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      35
-      44
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      32
+      49
     )
   end
   object DBEdit1: TDBEdit
     Left = 24
-    Height = 25
+    Height = 24
     Top = 16
     Width = 232
     DataField = 'TITLE'

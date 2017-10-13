@@ -1,15 +1,17 @@
 object Form1: TForm1
-  Left = 566
+  Left = 420
   Height = 619
   Top = 241
   Width = 854
   Caption = 'SQL Parser'
   ClientHeight = 619
   ClientWidth = 854
-  LCLVersion = '1.4.0.3'
+  DefaultMonitor = dmPrimary
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
   object Label1: TLabel
     Left = 14
-    Height = 15
+    Height = 14
     Top = 24
     Width = 74
     Caption = 'Original SQL'
@@ -25,7 +27,7 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 16
-    Height = 15
+    Height = 14
     Top = 208
     Width = 126
     Caption = 'Add to Where Clause'
@@ -33,7 +35,7 @@ object Form1: TForm1
   end
   object WhereCondition: TEdit
     Left = 17
-    Height = 25
+    Height = 24
     Top = 224
     Width = 400
     TabOrder = 1
@@ -71,7 +73,7 @@ object Form1: TForm1
   end
   object Label3: TLabel
     Left = 440
-    Height = 15
+    Height = 14
     Top = 24
     Width = 91
     Caption = 'Generated SQL'
@@ -96,7 +98,7 @@ object Form1: TForm1
   end
   object Label4: TLabel
     Left = 14
-    Height = 15
+    Height = 14
     Top = 360
     Width = 129
     Caption = 'Add to Having Clause'
@@ -104,7 +106,7 @@ object Form1: TForm1
   end
   object HavingCondition: TEdit
     Left = 15
-    Height = 25
+    Height = 24
     Top = 376
     Width = 400
     TabOrder = 6
@@ -141,7 +143,7 @@ object Form1: TForm1
   end
   object Label5: TLabel
     Left = 15
-    Height = 15
+    Height = 14
     Top = 520
     Width = 178
     Caption = 'Replacement Order By Clause'
@@ -149,7 +151,7 @@ object Form1: TForm1
   end
   object OrderBy: TEdit
     Left = 16
-    Height = 25
+    Height = 24
     Top = 536
     Width = 398
     TabOrder = 9

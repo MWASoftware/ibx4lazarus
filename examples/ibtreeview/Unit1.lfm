@@ -1,14 +1,16 @@
 object Form1: TForm1
-  Left = 636
+  Left = 552
   Height = 438
   Top = 437
   Width = 722
   Caption = 'TIBTreeView Example'
   ClientHeight = 438
   ClientWidth = 722
+  DefaultMonitor = dmPrimary
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.6.0.4'
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
   object Panel1: TPanel
     Left = 11
     Height = 367
@@ -27,7 +29,6 @@ object Form1: TForm1
       Align = alLeft
       TextField = 'DEPARTMENT'
       DataSource = DataSource1
-      DefaultItemHeight = 18
       DragMode = dmAutomatic
       Images = ImageList1
       HasChildField = 'CHILDCOUNT'
@@ -70,7 +71,7 @@ object Form1: TForm1
         TabOrder = 0
         object Label2: TLabel
           Left = 11
-          Height = 15
+          Height = 14
           Top = 16
           Width = 25
           Caption = 'Title'
@@ -78,7 +79,7 @@ object Form1: TForm1
         end
         object DBEdit1: TDBEdit
           Left = 11
-          Height = 25
+          Height = 24
           Top = 31
           Width = 373
           DataField = 'DEPARTMENT'
@@ -90,7 +91,7 @@ object Form1: TForm1
         end
         object Label3: TLabel
           Left = 13
-          Height = 15
+          Height = 14
           Top = 71
           Width = 51
           Caption = 'Location'
@@ -98,7 +99,7 @@ object Form1: TForm1
         end
         object DBEdit4: TDBEdit
           Left = 13
-          Height = 25
+          Height = 24
           Top = 86
           Width = 179
           DataField = 'LOCATION'
@@ -109,7 +110,7 @@ object Form1: TForm1
         end
         object Label4: TLabel
           Left = 219
-          Height = 15
+          Height = 14
           Top = 71
           Width = 44
           Caption = 'Budget'
@@ -117,7 +118,7 @@ object Form1: TForm1
         end
         object DBEdit2: TDBEdit
           Left = 219
-          Height = 25
+          Height = 24
           Top = 86
           Width = 165
           DataField = 'BUDGET'
@@ -129,7 +130,7 @@ object Form1: TForm1
         end
         object Label5: TLabel
           Left = 219
-          Height = 15
+          Height = 14
           Top = 121
           Width = 61
           Caption = 'Phone No.'
@@ -137,7 +138,7 @@ object Form1: TForm1
         end
         object DBEdit3: TDBEdit
           Left = 219
-          Height = 25
+          Height = 24
           Top = 136
           Width = 165
           DataField = 'PHONE_NO'
@@ -149,7 +150,7 @@ object Form1: TForm1
         end
         object Label6: TLabel
           Left = 12
-          Height = 15
+          Height = 14
           Top = 121
           Width = 52
           Caption = 'Manager'
@@ -175,7 +176,7 @@ object Form1: TForm1
         end
         object Label7: TLabel
           Left = 12
-          Height = 15
+          Height = 14
           Top = 172
           Width = 115
           Caption = 'Departmental Staff'
@@ -203,7 +204,6 @@ object Form1: TForm1
             DBLookupProperties.ItemHeight = 0
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-            DBLookupProperties.OwnerDrawEditable = False
           end        
           item
             Title.Alignment = taCenter
@@ -215,7 +215,6 @@ object Form1: TForm1
             DBLookupProperties.ItemHeight = 0
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-            DBLookupProperties.OwnerDrawEditable = False
           end        
           item
             Title.Alignment = taCenter
@@ -227,7 +226,6 @@ object Form1: TForm1
             DBLookupProperties.ItemHeight = 0
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-            DBLookupProperties.OwnerDrawEditable = False
           end        
           item
             Title.Alignment = taCenter
@@ -239,7 +237,6 @@ object Form1: TForm1
             DBLookupProperties.ItemHeight = 0
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-            DBLookupProperties.OwnerDrawEditable = False
           end>
         DataSource = DataSource3
         Scrollbars = ssAutoVertical
@@ -253,7 +250,7 @@ object Form1: TForm1
   end
   object Label1: TLabel
     Left = 11
-    Height = 15
+    Height = 14
     Top = 17
     Width = 79
     Caption = 'Departments'
@@ -281,6 +278,7 @@ object Form1: TForm1
   end
   object IBDatabase1: TIBDatabase
     Connected = False
+    CreateIfNotExists = False
     AllowStreamedConnected = False
     DatabaseName = 'localhost:employee'
     Params.Strings = (
@@ -306,6 +304,7 @@ object Form1: TForm1
     top = 136
   end
   object Departments: TIBDataSet
+    AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
     AfterDelete = DepartmentsAfterDelete
@@ -453,6 +452,7 @@ object Form1: TForm1
     top = 48
   end
   object Managers: TIBQuery
+    AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
     BufferChunks = 1000
@@ -474,6 +474,7 @@ object Form1: TForm1
     top = 221
   end
   object Staff: TIBQuery
+    AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
     BufferChunks = 1000
