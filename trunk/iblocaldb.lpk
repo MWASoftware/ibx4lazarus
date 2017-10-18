@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <Name Value="iblocaldb"/>
+    <Type Value="RunAndDesignTime"/>
+    <Author Value="MWA Software"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="iblocaldb"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Description Value="This package provides additional support for Personal Databases."/>
+    <License Value=" *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the &quot;License&quot;); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&amp;id=idpl
+ *
+ *  Software distributed under the License is distributed on an &quot;AS
+ *  IS&quot; basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2014 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+"/>
+    <Version Major="2" Minor="0" Release = "3" />
+    <Files Count="7">
+      <Item1>
+        <Filename Value="iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
+        <UnitName Value="IBXCustomIBLocalDBSupport"/>
+      </Item1>
+      <Item2>
+        <Filename Value="iblocaldb/IBXCreateDatabaseDlg.pas"/>
+        <UnitName Value="IBXCreateDatabaseDlg"/>
+      </Item2>
+      <Item3>
+        <Filename Value="iblocaldb/IBXSaveDatabaseDlg.pas"/>
+        <UnitName Value="IBXSaveDatabaseDlg"/>
+      </Item3>
+      <Item4>
+        <Filename Value="iblocaldb/IBXUpgradeDatabaseDlg.pas"/>
+        <UnitName Value="IBXUpgradeDatabaseDlg"/>
+      </Item4>
+      <Item5>
+        <Filename Value="iblocaldb/IBXViewLogDig.pas"/>
+        <UnitName Value="IBXViewLogDig"/>
+      </Item5>
+      <Item6>
+        <Filename Value="iblocaldb/IBLocalDBSupport.pas"/>
+        <UnitName Value="IBLocalDBSupport"/>
+      </Item6>
+      <Item7>
+        <Filename Value="iblocaldb/IBXUpgradeConfFile.pas"/>
+        <UnitName Value="IBXUpgradeConfFile"/>
+      </Item7>
+    </Files>
+    <RequiredPkgs Count="2">
+      <Item1>
+        <PackageName Value="ibexpress"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="FCL"/>
+      </Item2>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

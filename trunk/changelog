@@ -1,0 +1,689 @@
+IBX Change Log  version                       (2.0-3) Mon, 25 Sep 2017 16:41:08 +0100
+
+1. IBCustomDataset: Minor change of PChar to PByte for compatibility with fbintf
+   changes.
+
+2. IBCustomDataset: Fixed use of incorrect datasize in TIBStringField.SetAsString.
+   Bug could result in truncated multi-byte character set values.
+
+3. Changes consequential on moving fbintf character set utility functions from
+   IFirebirdAPI to IAttachment.
+
+4. Avoid "Object is nil" error when opening a database with DefaultSystemCodePage = true
+
+5. IBLookupComboEditBox: avoid race condition when autocompleting text that occasionally
+   results in autocomplete ignoring prefix text.
+
+6. IBLookupComboEditBox: Ensure that cursor is not reset to start of text when
+   entering a new name into the text box.
+
+7. IBCustomDataset: ensure that TIBStringField uses the field size reported by
+   Firebird rather than recomputing it.
+
+8. Property Editor positioning tidy up: All IBX Property editors should now be
+   screen centre. Previously some were "poDesigned" which may be inappropriate
+   for multi monitor desktops.
+
+IBX Change Log  version                   (2.0-2) Fri, 24 Feb 2017 12:17:53 +0000
+
+1. TIBDatabase.CreateDatabase: extract full DB Name from SQL using reg ex in order to
+   include remote system name.
+
+2. TIBExtract: No longer include comment header and COMMIT statement for empty
+   tables when data included in output.
+
+3. Profiling: IBSQL now has conditional compilation flags to enable query performance
+   and timing information to be written to stdout. This may be used to locate
+   performance bottlenecks.
+
+4. SQLParser: only call "OnChanging" event handler when value is different.
+
+5. IBDynamicGrid: Update handling of navigation keys for a TDateEdit
+
+6. IBCustomDataset: Set internalunprepared flag when transaction ends. This ensures
+   that BindFields is called when the query is next activated. Avoids FieldName
+   not found error.
+
+IBX Change Log  version                  (2.0-1) Mon, 09 Jan 2017 15:31:49 +0000
+
+1. TIBEvents: Fix uninitialised variable that could result in lost events.
+
+2. TIBExtract: Added support for FB3 "USAGE" privilege.
+
+3. TIBExtract: data formatted as Charset set "octets" is now output using
+   hexadecimal notation.
+
+4. TIBExtract: Binary Blobs and array data can now be embedded in INSERT statements
+   using a simple XML format.
+
+5. TIBExtract: extract of individual Triggers and Stored Procedures can now include
+   grants to these objects.
+
+6. TIBExtract: Stored Procedures and Views output in dependency order to avoid
+   dependency problems restoring complex databases.
+
+7. TIBXScript: This component has been restructured to allow for the processing of
+   embedded XML in INSERT statements and to support interactive sources in addition
+   to non-interactive data sources such as files.
+
+8. TIBXScript: CREATE DATABASE, DROP DATABASE, CONNECT statements are now supported.
+
+9. TIBXScript: ISQL compatiable Set statements are now supported:
+   SET SQL DIALECT
+   SET TERM
+   SET AUTODDL
+   SET BAIL
+   SET ECHO
+   SET COUNT
+   SET STATS
+   SET NAMES <character set>
+
+10. IBVersion unit added to hold current IBX Version Number information.
+
+11. TIBExtract: Use character rather than byte length for VarChar procedure arguments.,
+    and domain definitions.
+
+12. TIBExtract: Triggers now use SQL2003 syntax and database and transaction triggers
+    fully supported.
+
+13. TIBExtract: when a database dump includes data, the generator values are now also set.
+
+14: IBSQLEdit: Unit LCLPlatformDef added to uses clauses for lazarus 1.7 and later.
+
+IBX Change Log  version     (2.0-0) Tue, 06 Dec 2016 10:33:44 +0000
+
+See also doc/IBX4LazarusGuide.pdf for important information on
+upgrading to IBX2.
+
+1. Size property of TIBStringField is now the width in characters of the field
+   and not the byte length. This applies only to multi-byte character sets such
+   as UTF8. The original approach aligned with TStringField. However, the TStringField
+   code is not recognised as a bug and hence this change to align the behaviour.
+   The TStringField change is expected in fpc 3.2.0.
+
+2. A new property AutoFieldSize: boolean has been added to TIBStringField. When
+   true (default) then Size property value saved in the lfm is ignored. Size is
+   always set from the dynamic information read from the database. It is unclear
+   why anyone would want to override this and set Size to false.
+
+3. ibxscript: should now handle correctly a Case..End statement within a procedure
+   block.
+
+4. IBDatabase: new property - CreateIfNotExists. If true and database does not
+   exist when an attempt is made to connect to it (run time only) then an attempt
+   is made to create the database.
+
+5. IBDatabase: new event - OnCreateDatabase. This event is called after a database
+   has been successfully created as a result of a call to CreateDatabase or when
+   creating a database after it was found not to exist.
+
+6.  DBControlGrid: a race condition could result in the wrong row image being
+    written to the cache. This has been avoided by a trip round the message
+    loop before rendering the row image.
+
+7.  DBControlGrid: It is strongly recommended not to open the source DataSet for
+    a DBControlGrid during a Form's "OnShow" event handler. Under GTK2 this is
+    known to risk corrupt rendering of row images when the control is first
+    displayed. If necessary use "Application.QueueAsyncCall" to delay opening
+    of the dataset (see DBControlGrid examples) until the Form's Window has been created.
+
+8.  DBControlGrid & IBDynamicGrid: Navigation keys should now work correctly with
+    a TDateEdit control located on an editor panel.
+
+9.  TIBExtract: brought up-to-date plus many bug fixes.
+
+10. DBControlGrid: Removed memory leak when updating rows.
+
+11. TIBCMLocalDBSupport: fixed invalid free on upgrade.
+
+IBX Change Log  version                                           (1.4-3) Thu, 22 Sep 2016 18:10:15 +0100
+
+1. IBCustomDataset: When calling SetCodePage, no longer request transliteration
+   when target codepage is CP_NONE. This is a workaround for
+   http://bugs.freepascal.org/view.php?id=30622.
+
+2. DBLog option removed from TIBStatisticalService - not supported by server
+   since Firebird 1.5.
+
+3. ibxscript: An error is no longer generated for "on commit preserve rows" or
+   similar.
+
+4. IBCodePage: updated mapping between codepages and character id.
+
+5. ftWideString and ftWideMemo withdrawn. There is no UTF16 character set in
+   Firebird. Character sets with a char width of two are not UTF16.
+
+6. Strings received from the database are now always transliterated into UTF8
+   regardless of the database character set or connection character set. This
+   is for compatibility with the LCL.
+
+IBX Change Log  version  (1.4-2) Thu, 22 Sep 2016 15:25:27 +0100
+
+1. IBBlob: Defer reading of blob until read method called. This avoids having to
+   read in an entire blob just to get the size of the blob. General performance
+   improvement when opening datasets containing blobs.
+
+2. Clearing a  Blob now sets the corresponding field's modified flag.
+
+3. IBLookupCombo: When not performing auto-complete, original query sort order
+   is now used.
+
+4. IBDynamicGrid: Add OnSelectEditor event. Allows editor panel to be dynamically
+   determined.
+
+5. IBDynamicGrid: Recompute column widths after dataset closed and re-opened.
+
+6. IBLookupCombo: LazUTF8 added to uses clause to avoid compilation problems post
+   lazarus 1.6.0
+
+7. IBControls. Removed "runtime" from list of paths to avoid "multiple packages"
+   compilation error.
+
+IBX Change Log  version                                 (1.4-1) Tue, 17 May 2016 09:14:51 +0100
+
+1. No character set specified for connection: when a text blob is retrieved, the
+  character set is determined by looking up the native character set using then
+  Firebird API. Otherwise a text mode blob is assumed to have the same character
+  set as the connection.
+
+2. TIBGUIInterface: this is an internal interface. Minor type changes to allow
+   for Login Dialog returing a change to the database path.
+
+3. Design Time Database and Server login Dialogs now allow the Database Name/Server Name
+   to be changed from that given in the TIBDatabase/TIBServer component and for the
+   entered value to be saved on a project specific basis (design time only).
+
+4. IBDynamicGrid: TDBLookupCellEditor now compares its DataFieldName with the
+   column fieldname. If they are the same then it is acts as a look up for the KeyValue
+   Otherwise, it sets the column text to the selected ListField Value.
+
+5. IBDynamicGrid: Only visible columns are now taken into account When recalculating
+   column width.
+
+6. IBLookupComboEditBox: Fix error with autocomplete query when a RelationName is given
+   and a case insensitive search is requested.
+
+7. IBDynamicGrid: No longer ignores notifications removing Column Totals controls
+   or column ListSource.
+
+8. IBQuery: no longer performs unnecessary refresh of SQL Text (and hence avoids an
+   unprepare) when closing and the text has not changed.
+
+9. IBSQL: Base the cursor name on a GUID instead of a hexstr version of the class pointer.
+   Less likely to cause a cursor re-use error on Windows.
+
+10.SV5IPC: include workaround for OSX. FPC 3.0.0 has broken ipc module for darwin.
+   Expected to be fixed in 3.0.2. Hence workaround only applies to 3.0.0.
+
+11. TIBTreeView: Guard against nil destination on record changed
+
+12. AnsiString Code page support: TIBStringField.AsString and TIBMemoField.AsString now return a
+    string type with the code page set to reflect the returned field encoding after
+    Firebird driver transliteration, if any.  FPC 3.0.0 onwards only. Behaviour unchanged for 
+    earlier versions.
+
+13. AnsiString Code page support: Assigning to TIBStringField.AsString and TIBMemoField.AsString
+    will now result in transliteration to the code page specified for the Firebird driver
+    if the assigned string has a different code page. FPC 3.0.0 onwards only.
+
+14. TIBDatabase: new property UseDefaultSystemCodePage. When set any lc_ctype parameter
+    is ignored and the lc_ctype value, when the database is opened, is set to align with
+    the DefaultSystemCodePage (FPC 3.0.0 onwards). Normally, this is what you want and should ensure
+    platform independence. Note: this applies to FPC 3.0.0 and earlier versions. Pre FPC
+    3.0.0, when this property is true, the lc_ctype is UTF8 except under windows when
+    the GETACP is used to determine the Windows code page.
+
+15. TIBDatabase: new property DefaultCharSetName. This is the Firebird character set
+    name used as the lc_ctype when the database was opened. Only valid while the
+    Database is connected.
+
+16. TIBDatabase: new property DefaultCodePage (FPC >=3.0.0 only). This is the codepage
+    id that corresponds to the DefaultCharSetName.
+
+IBX Change Log  version                          (1.4-0) Mon, 15 Feb 2016 14:44:24 +0000
+
+1. Unix: If Firebird Embedded Server shared object is loaded and a local database
+   path is given and database attach fails due to access permission issues on the
+   temp directory or security database, then the attach is retried with "localhost:"
+   prefixing the databasename. This should avoid problems when the database has to
+   be accessed by a local (e.g. classic) server and libfbembed is used.
+
+2. Windows: revised search order for Firebird DLL:
+     i.   The Firebird Embedded Server in the application Directory.
+     ii.  If the FIREBIRD environment variable is set then the directory this
+          points to is searched for the FB Client DLL and then then underlying
+          "bin" directory.
+     iii. Registry Key HKEY_LOCAL_MACHINE\SOFTWARE\Firebird Project\Firebird Server\Instances
+          is used to locate the Firebird installation directory and the underlying
+          "bin" directory is searched for the FB Client DLL.
+     iv.  The Default installation directories C:\Program Files\Firebird\Firebird_2_x
+          are searched for the FB Client DLL.
+     v.   The PATH Environment variable is used to search for the FB Client DLL.
+     vi.  Finally the  PATH Environment variable is used to search for IBASE.DLL.
+
+3. New Component: TIBXScript. This is an ISQL compatible SQL script execution engine.
+   See doc/readme.scriptengine and example applications.
+
+4. New Component: TIBlocalDBSupport. This is a TIBDatabase support component intended to
+   simplify the use of the embedded firebird server on both Linux and Windows platforms.
+   See dpc/readme.localdatabase and example applications.
+
+5. IBDynamicGrid: Reordering on column header click should now also work for
+   dynamic columns.
+
+6. ISQLMonitor: (Windows only). Mutex added to TMultilockGate to avoid race condition
+   between incrementing/decrementing the lock count and signalling the event.
+
+IBX Change Log  version           (1.3-2) Tue, 26 Jan 2016 14:39:54 +0000
+
+1.3.2 was never formally released and only made available as beta copies.
+
+1. DBControlGrid,IBDynamicGrid: Ignore down arrow and up arrow in TCustomMemo
+
+2. IBDynamicGrid: Now deals correctly with a single column grid which has no indicator and autosize column
+
+3. IBLookupComboEditBox: reset timer on each key press - avoids timer going off too early
+
+4. IBDynamicGrid: Call event OnUpdateSortOrder even when aliasname not found in dataset
+   i.e. when it is a calculated field
+
+5. IBDynamicGrid: Fix problem selecting a different row when expanded row at end of grid.
+   This problem was due to a race condition between recalculating row heights and
+   determining which row was selected by the mouse click. The row height calculation
+   is now deferred by an extra trip round the message loop allowing the row to
+   be always calculated on the current grid layout rather than risking it being
+   calculated on the grid layout after the expanded row has been shrunk.
+
+6. IBLookupComboEditBox: avoid race condition between cm_killfocus and cm_exit on
+   Windows.
+
+7. TIBStringField: Now has two new public properties: CharacterSetName: string and CharacterSetSize: integer;
+   These properties allow the (Firebird) character set name for the field and the max number of bytes per character
+   to be determined at runtime. See doc/readme.charactersets.html.
+
+8. TIBWideStringField: This is a new field type with the same additional public properties as above and subclassed from
+   TWideStringField. This field type is used with the character size reported by Firebird is two. See doc/readme.charactersets.html.
+
+9. TIBMemoField and TIBWideMemoField: new field types with the same additional public properties as above and subclassed from
+   TMemoField and TWideMemoField respectively. These field types are used with Blob subtype 1 and a characterset size of 
+   1, 3 or 4 (TIBMemoField) or 2 (TIBWideMemoField). See doc/readme.charactersets.html.
+
+   Both also have a new published property "DisplayTextAsClassName". If false (default) the displaytext is generated
+   from the blob text by truncating the string to the displaywidth (in characters not bytes). A displaywidth of zero
+   implies no truncation.
+
+10. IBLookupComboEditBox: Force autocomplete when EditingDone called and timer active.
+
+11. IBDynamicGrid: Call DataSet.Append when entering edit mode and dataset empty and not in insert state
+   (avoids "Not in Edit Mode" error).
+
+12. IBDynamicGrid: Correctly resize grid when one column width plus indicator.
+
+13. IBDynamicGrid: Ensure Editor Panel has focus when shown - avoids Windows API calling
+    DBGrid.DoExit on subsequent mouse click (e.g. on child control such as a tabbed page control.
+
+14. IBDynamicGrid: ignore up, down tab and return when editorpanel open and focus in a TCustomGrid descendent.
+
+15. DBControlGrid: Stop flashing grid when dataset closed and then re-opened while DisabledControls
+
+16. IBQuery: Bug fixed that prevented SQL being set programmatically once the Parser had been invoked.
+
+17. IBCustomDataSet: On close, parser is now freed and Select SQL reverts to value before DataSet Opened.
+
+IBX Change Log  version        (1.3-1) Sat, 18 Jul 2015 13:30:50 +0100
+
+1.   OnCloseUp Event Handler added to TDBLookupProperties
+
+2.   IBDynamicGrid: Call to OnEditorPanelHide is now last editor hide action - avoids
+     problem with row size when exception is called.
+
+3.   IBLookupComboEditBox: Force pending autocomplete on combobox exit.
+
+4.   IBDynamicGrid and DBControlGrid: Keyhandler now ignores up, down, escape and return keys if
+     in a TCustomComboBox and ignores return key if in a TCustomMemo
+
+5.   IBLookupComboEditBox: Ensure that KeyValue is set correctly when full text
+     keyed in i.e. when autocomplete not performed
+
+6.   Cleanup of "Uses" clauses and add console mode support. IBX should now support
+     console mode applications with all LCL required functions (builtin dialogs and
+     cursor management) centralised in the  IBDialogs unit. As long as "IBDialogs" is 
+     not included in your project, IBX should compile and link with a console mode program. 
+     See consolemode example and its "readme"for further guidence. DO NOT add the ibexpress package to a 
+     console mode application or the IDE will automatically assume that your 
+     application is GUI based. Instead, you should include the ibexpressconsolemode package.
+
+     IMPORTANT NOTE: IBDialogs must be included in GUI applications in order 
+     to use the built in dialogs and cursor management. IBDialogs is
+     included by default if "ibexpress" is in your project source's "uses" clause.
+     This should be the case for all projects created through the IDE. This is why
+     you do not want to add the ibexpress package to console mode applications. The
+     ibexpressconsolemode package has been created to allow console mode programs
+     to avoid adding LCL dependencies when using IBX, while still having the
+     unit search paths set up correctly.
+
+     Existing users should check to ensure that the "ibexpress" unit is included in
+     each project's source file (*.lpr).
+
+     You may find that in order for the IDE to recognise that ibexpressconsolemode
+     exists, you have to first open the package in the IDE and then close it. This
+     adds it to the most recently accessed packages list. To make it permanently
+     available, add the package name to lazarus' staticpackages.inc file.
+
+	 Thanks to Julio Jiménez for suggesting support of console mode.
+
+7.   SQL Parser can now accept quoted strings that include new lines
+
+8.   IBDynamicGrid: Lookup Cell Editor - the cursor is now positioned at end 
+     of text on start of edit. This is particularly useful when tabbing to a
+     column and then inserting text.
+
+9.   New Examples provided for IB Services and ISQLMonitor.
+
+10. Fix error when writing to blob streams that recorded only the last buffer
+    write in the blob stream. In most cases, this did not cause a problem as the
+    IB Blob Stream is written in a single write. However, with the TDBImage, write
+    of a graphic type prefix was lost which caused a problem when the image could
+	not be automatically recognised.
+
+11. Improve generation of random cursor names in TIBSQL - avoid risk of "cursor
+    already open" errors due to random numbers used for the cursor name being identical.
+
+12. IBTable: corrected error that could result in an "Index out of bounds" error
+    when opening the table and the Primary Key is the last or only column in the
+    table. Thanks to Rick Hoover for the fix.
+
+13. Fix TIBDatabase initialisation of lc_ctype under unix. Set to "UTF8" instead
+    of "UTF-8", and update list of available database character sets. Existing
+    users should check the current lc_ctype setting in their applications.
+
+IBX Change Log  version  (1.2-4) Sat, 09 May 2015 12:38:29 +0100
+
+1.  Firebird Services: avoid List Index error when opening a service with an
+    empty Params property.
+
+2.  IBControls: Fix problem with new link mechanism introduced in 1.2.3.
+    Link now set up in Loaded method - avoids occasional failure to apply
+    SQL markup on initial open.
+
+3.  "Employees" example performance improvements when scrolling.
+
+4.  DBControlGrid: Correctly handle edit panel removal when panel is child control of a
+    TFrame. Force recaching of selected frame to avoid GTK race (results in a
+    random image cached).
+
+5.  DBControlGrid: Should now react to changes in panel height at run time.
+
+6.  IBDynamicGrid: Redraws rows below on panel editor hide - avoids blank space at end of grid   
+    even when further rows exist.
+
+7.  DBControlGrid: DefaultRowHeight is no longer a published property as it should
+    always be derived from panel height and setting this property can cause confusion.
+    Note for existing projects: to avoid a missing property error at run time,
+    each form using the DBControlGrid must be opened, updated and saved in the IDE
+    in order to remove the property value from the lfm.
+
+
+IBX Change Log  version (1.2-3) Tue, 14 Apr 2015 14:11:17 +0100
+
+1.  TIBStoredProc. Prepare now called by ParamByName to avoid need to always
+    call Prepare before setting parameter values.
+
+2.  Error message on ParamByName (all cases) not found now includes name of missing parameter.
+
+3.  Code tidyup and more robust handling of dsql information result vector.
+
+4.  Support for centralised handling of transaction status changes. TIBTransaction
+    has been given additional events "AfterEdit", "AfterInsert", "AfterDelete", "AfterPost"
+    and "AfterExecQuery". The first three are called after the same event is called
+    for an IBCustomDataSet descendent using the Transaction. The fourth is called
+    after a call to TIBSQL.ExecQuery, again using this transaction. These new events
+    enable monitoring of transaction status changes for a given transaction to be
+    handled in a single place. For example, when a change to the dataset occurs
+    an indicator can be set that shows the user that in order to save changes,
+    the transaction should be committed.  Rather than doing this per dataset, this
+    can now be done per transaction.
+
+5.  TDataSet.CheckBrowseMode automatically posts changes to the current row when
+    the dataset is scrolled. However, any changes to the current row are, by default,
+    discarded when the dataset is closed. TIBDataSet, TIBQuery and TIBTable now
+    have a new property "DataSetCloseAction" that adds automatic posting of changes
+    on dataset close. If this property is set to dcDiscardChanges (default) then the
+    behaviour is unchanged from previous versions. if the value is set to dcSaveChanges
+    then IBX will attempt to post any unsaved changes before the dataset is closed
+    (and after the BeforeClose event handler is called). The exception is when the
+    dataset is being closed as a result of a transaction rollback. In this case,
+    no action is taken and any unsaved  changes are discarded. This avoids both
+    unnecessary overhead and the risk that a validation error may occur in the Post
+    raising an exception and thereby preventing a rollback.
+
+6.  String Field sizes and Display Widths should now be correct for multi-byte character sets.
+    In earlier versions, the Display Width was set to the maximum byte width rather than the character
+    width. Display Widths are now corrected by dividing by the max byte width per character.
+    For UTF8 character sets, the byte width is four and hence the Display Width will be
+    the byte width divided by 4. The byte width of each character set is determined
+    dynamically when the database connection is estabished from the RDB$CHARACTER_SETS
+    system table. (see also http://bugs.freepascal.org/view.php?id=27766).
+
+7.  SQLParser will now correctly parse SQL Text which contains ':' within quoted string.
+
+8.  IBLookupComboEditBox: List should now always be restored to full list when the
+    control loses focus. Default Key press default interval reduced to 200ms.
+
+9.  DBControlGrid: Ensure that selection is changed to newly appended row, even
+    when dataset rows are less than visible rows.
+
+10. IBDynamicGrid: Editor Panel is not shown on indicator click if Datasource
+    does not exist or DataSet is empty. More responsive on dataset open. New event
+    OnRestorePosition. Column sort disabled if no header row.
+
+11. IBTreeView: improved handling of response to "Add Node". Avoid scrolling dataset
+    while dataset state is dsInsert. Avoids posting errors.
+
+12. IBControls: New mechanism for distributing UpdateSQL and UpdateParams events. This is to
+    avoid conflict with DisableControls/EnableControls with Master/Detail linked tables.
+
+13. IBLookupComboEditBox: Now avoids SQL Errors when combo box text contains single quotes.
+
+14. TIBDataSet and TIBQuery: new Event - OnValidatePost. This event has been introduced
+    to solve a specific problem. That is when the dataset cursor is moved (e.g. by
+    a grid mouse click and the current row is being edited or inserted. In this case, TDataset
+    always "posts" the current record regardless or whether or not it may be more appropriate
+    to cancel any changes; the post occurs before the "BeforeScroll" event fires due to the way the
+    "MoveBy" function is implemented by TDataSet. The OnValidatePost event is called
+    as the first action of the "Post" method and allows the handler to convert the Post
+    into a Cancel if that is the appropriate action on moving to a different row. This is
+    achieved by returning with "CancelPost" argument set to true. Note that an exception could be
+    raised here, but it may still be more appropriate to validate a post and signal
+    a problem in the "BeforePost" event handler. See readme.automaticposts.xhtml)
+
+15. On Unix derived systems, the Firebird library name can now be given as a colon
+    separated list. Each library name on the list is tried in turn, in left to right
+    order with the first found being used as the firebird library. By default, on Linux,
+    the library name list is 'libfbembed.so.2.5:libfbembed.so.2.1:libfbclient.so.2'. This can be
+    overidden by the FBLIB environment variable or the OnGetLibraryName function.
+
+    Note: when using the libfbembed.so, if you prefix the database name with "localhost:"
+    then it will still attempt to access the database via the Firebird Server and will
+    require a username and password. If only the pathname is given, then the username
+    and password should be omitted and the unix file permissions are used to grant
+    access.
+
+IBX Change Log  version  (1.2-2) Sat, 14 Mar 2015 11:35:04 +0000
+
+1.  A new IBControl - TDBControlGrid has been added. TDBControlGrid a lookalike 
+    rather than a clone for the Delphi TDBCrtlGrid. TDBControlGrid is a single column grid 
+    that replicates a TWinControl - typically a TPanel or a TFrame in each row. Each row 
+    corresponds to a row of the linked DataSource. Any data aware control on the 
+    replicated (e.g.) TPanel will then appear to have the appropriate value for the row.
+
+2. As suggested by Julio Jiménez, a new property "SQLHourGlass" has been added to TIBDatabase.
+   When set to false (default true), the Hour Glass cursor is supcpressed and no cursor change
+   takes place during database access. This may be useful when there are performance issues with
+   the change of cursor. Setting the property to false suppresses the change of cursor.
+
+3. As suggested by Julio Jiménez, a new property "AutoCommit" has been added to TIBDataSet, TIBQuery
+   and TIBTable. When set to acCommitRetaining (Default: acDisabled), a call is made to 
+   Transaction.CommitRetaining immediately after every Post or Delete. This has the effect of
+   making all changes permanent immediately rather than when the transaction is explicitly 
+   committed.
+
+4. Experimental support for the Firebird 3 SQL_BOOLEAN type has been added while still
+   using the legacy Firebird API. Thanks to Gabor Boros for helping to test this feature.
+
+IBX Change Log  version      (1.2-1) Fri, 13 Mar 2015 11:14:15 +0000
+
+Development version only.
+
+IBX Change Log  version   (1.2-0) Thu, 26 Feb 2015 10:34:04 +0000
+
+1. An internal select SQL Parser is now available for TIBCustomDataset descendents.
+   This is typically used during an "OnBeforeOpen" event handler to manipulate the
+   "Where" and "Having" clauses to implement user specified filters of arbitrary
+   complexity.
+
+2. A new Component Palette entry "Firebird Data Controls" is now available. This has
+   three new data aware controls dependent on IBX and which make use of the SQL Parser.
+   These are:
+
+   - TIBLookupComboEditBox
+   - TIBDynamicGrid
+   - TIBTreeview
+
+   TIBLookupComboEditBox is a TDBLookupComboBox descendent that implements "autocomplete"
+   of typed in text and "autoinsert" of new entries. Autocomplete uses SQL manipulation
+   to revise the available list and restrict it to items that are prefixed by the
+   typed text (either case sensitive or case insensitive). Autoinsert allows a
+   newly typed entry to be added to the list dataset and included in the available
+   list items.
+
+   TIBDynamicGrid is a TDBGrid descendent that provides for:
+   - automatic resizing of selected columns to fill the available row length
+   - automatic positioning and sizing of a "totals" control, typically at the
+     column footer, on a per column basis.
+   - DataSet resorting on header row click, sorting the dataset by the selected column.
+     A second click on the same header cell reversed the sort order.
+   - Support for a "Panel Editor". That is on clicking the indicator column, the row
+     is automatically expanded and a panel superimposed on it. The panel can have any
+     number of child controls, typically data aware controls with the same datasource
+     as the grid allowing for editing of additional fields and more complex editors.
+   - Reselection of the same row following resorting.
+   - A new cell editor that provides the same functionality as TIBLookupComboEditBox.
+     Its properties are specified on a per column basis and allows for one or more
+     columns to have their values selected from a list provided by a dataset.
+     Autocomplete and autoinsert are also available. The existing picklist editor
+     is unaffected by the extension.
+
+   TIBTreeView is a data aware TCustomTreeView.
+
+3. When getting a field value using FieldByName.AsVariant, an SQL_INT64 with a
+   zero scale will no longer return an error. An Int64 will be returned instead.
+
+4. TIBTransaction now has events for Before and After Transaction End and a new function
+   "GetEndAction" allowing the EndAction to be accessed by these event handlers.
+
+5. TIBQuery can now handle correctly queries which contain the same keyword parameter 
+   repeated multiple times.
+
+6. TIBUpdateSQL will no longer return an error when "RowsAffected" is <> 1. This error
+   check used to get in the way of using Stored Procedures, and "Update or Insert"
+   statements.
+
+7. Insert, Modify and Delete property Editors now support Query Generation from
+   Stored Procedures.
+
+8. Three new examples illustrate the use of the new IB Controls
+
+
+IBX Change Log  version  (1.1-0) Mon, 07 Jul 2014 14:01:07 +0100
+
+1. TIBXSQLVAR code clean up and optimisation to improve client side "prepare" and parameter
+   setting performance. See "readme.field+param.names in the doc folder.(Thanks to
+   Gabor Boros for reporting this problem and for testing the improvements).
+
+2. IBX can now support dialect 3 quoted column names that contain spaces and which differ only in their case.
+   See readme.field+param.names in the doc folder.
+
+3. IBX SQL Editors will now automatically add double quotes around column names when the database
+   dialect is "3" and the column name contains spaces or is a Firebird 2.5 SQL Reserved Word.
+
+4. Param Type LargeInt now supported in TIBQuery and TIBStoredProc
+
+5. TIBSQL.ExecQuery retry on failure removed to avoid problems with "at most once"
+   actions.
+
+6. TIBTransaction.SetDefaultDatabase uses SetObjectProp instead of mis-using SetOrdProp (with
+   thanks to Yuriy Kopnin for pointing this out).
+
+7. GenerateParamName is now a published property of TIBSQL, TIBQuery and TIBDataSet.
+
+8. varWord, varShortInt and varInt64 added to TIBXSQLVAR.SetAsVariant and hence now available as variant types
+   for both fields and parameter setting.
+
+9. Changes to the Select SQL in an IBCustomDataset descendent should now be
+   visible in the Fields Editor immediately afterwards - rather than only after cycling the "active" property.
+
+10. TIBSQL SQL editor will operate correctly and not report an SQL syntax error on SQL test,
+    when DSQL ('?') parameter placeholders are used and the TIBSQL.GenerateParamNames property is set to true.
+
+11. TIBTable now has a property editor for "MasterFields"
+
+12. SQL Property Editors now include a checkbox "Allow DSQL Placeholder". This corresponds to the
+    GenerateParamNames property and should be set when using DSQL (i.e. '?') style parameters.
+
+13. The IBTransaction editor now has a radio button ("Unspecified") which is set when the combination
+    of settings is unrecognised. Selecting this radio button has no effect on the settings.
+   
+
+IBX Change Log  version                 (1.0-5) Sat, 28 Dec 2013 19:22:23 +0000
+
+1. TBookmark change conditional compile changed to >= 2.7.0 to match revised availability of change.
+
+IBX Change Log  version          (1.0-4) Thu, 28 Feb 2013 16:56:13 +0000
+
+1. In a TIBCustomDataset descendent, a generator now only sets the value when
+   it is null. This allows for alternative user defined setting of the generator
+
+   Many thanks to Julio Jiménez for this fix
+
+2. An Error Dialog is now displayed in the Lazarus IDE if IBX cannot find the Firebird Library
+   and suggests that the user may have forgotten to install it.
+
+IBX Change Log  version         (1.0-3) Thu, 22 Nov 2012 22:53:39 +0000
+
+1. Conditional compilation used to limit registration of TIntegerField to
+   Lazarus versions less than 1.1
+
+2. When a database connection is created, character set is now by default set
+   to UTF8 (Unix) or to the current Windows code page (Windows) if in the range
+   1250 to 1254.
+
+
+IBX Change Log  version     (1.0-2) Tue, 09 Oct 2012 09:10:30 +0100
+
+1. TBookmark change conditional compile changed to > 2.6.2 to match expected availability of change.
+
+
+IBX Change Log  version    (1.0-1) Sun, 05 Aug 2012 20:00:04 +0100
+
+1. In IBCustomDataset. Changed CurBookmark from string to TBookmark for compiler versions > 2.6.0
+   Necessary because of TBookmark type and TDataSet.Bookmark property change in fpc 2.7.1
+
+2. IBX now registers TIntegerField as a "No Icon" component. This may be removed if the fpc DB
+   package is changed to do this (which it should do).
+
+IBX Change Log  version (1.0-0)  Sat, 28 Apr 2012 16:43:00 +0100
+
+1. Add "if active then active := false" to TIBCustomDataset destructor. (Avoid error on database close).
+
+2. Make use of $STATIC conditional in IBSQLMonitor (Needed for FPC 2.6.0 compliance)
+
+3. Database Property Editor: Character Set drop down box now uses "OnChange" rather than "OnCloseUp" to react to changes
+
+4. Property editors should now correctly resize.
+
+5. In IBDatabaseEdit.TestClick, the LoginPrompt is now set to the state of the LoginPrompt Checkbox
+   (restored original functionality)
+
+6. Under OSX, if IBX fails to load libfbclient.dylib, it will now try and load the firebird
+   library using the absolute path /Library/Frameworks/Firebird.framework/Firebird.

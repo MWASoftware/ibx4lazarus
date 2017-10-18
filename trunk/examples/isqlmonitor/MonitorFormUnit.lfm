@@ -1,0 +1,27 @@
+object MonitorForm: TMonitorForm
+  Left = 716
+  Height = 440
+  Top = 321
+  Width = 541
+  Caption = 'SQL Monitor'
+  ClientHeight = 440
+  ClientWidth = 541
+  OnShow = FormShow
+  Position = poDefault
+  LCLVersion = '1.8.0.4'
+  object Memo1: TMemo
+    Left = 13
+    Height = 408
+    Top = 19
+    Width = 515
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+  end
+  object IBSQLMonitor1: TIBSQLMonitor
+    OnSQL = IBSQLMonitor1SQL
+    TraceFlags = [tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect, tfTransact, tfBlob, tfService, tfMisc]
+    left = 34
+    top = 37
+  end
+end

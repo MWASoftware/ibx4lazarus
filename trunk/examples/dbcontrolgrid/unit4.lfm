@@ -1,0 +1,103 @@
+object EditLocation: TEditLocation
+  Left = 248
+  Height = 102
+  Top = 170
+  Width = 336
+  BorderStyle = bsDialog
+  Caption = 'Edit Location'
+  ClientHeight = 102
+  ClientWidth = 336
+  OnClose = FormClose
+  OnShow = FormShow
+  Position = poMainFormCenter
+  LCLVersion = '1.4.0.2'
+  object Bevel1: TBevel
+    Left = 8
+    Height = 70
+    Top = 11
+    Width = 227
+  end
+  object IBLookupComboEditBox2: TIBLookupComboEditBox
+    Left = 24
+    Height = 25
+    Top = 24
+    Width = 192
+    Anchors = [akTop, akLeft, akRight]
+    AutoSize = False
+    KeyField = 'COUNTRY'
+    ListField = 'COUNTRY'
+    ListFieldIndex = 0
+    ListSource = CountrySource
+    LookupCache = False
+    Style = csDropDownList
+    TabOrder = 0
+    AutoInsert = False
+    AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+    ItemHeight = 0
+  end
+  object Button1: TButton
+    Left = 248
+    Height = 25
+    Top = 8
+    Width = 75
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 248
+    Height = 25
+    Top = 40
+    Width = 75
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 2
+  end
+  object Countries: TIBQuery
+    Database = Form1.IBDatabase1
+    Transaction = Form1.IBTransaction1
+    AfterOpen = CountriesAfterOpen
+    BeforeOpen = CountriesBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.COUNTRY, A.CURRENCY From COUNTRY A'
+      'JOIN JOB J On J.JOB_COUNTRY = A.COUNTRY'
+      'Where J.JOB_CODE = :JOB_CODE and J.JOB_GRADE = :JOB_GRADE'
+      'Order by 1'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_CODE'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
+    left = 288
+    top = 72
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_CODE'
+        ParamType = ptInput
+      end    
+      item
+        DataType = ftUnknown
+        Name = 'JOB_GRADE'
+        ParamType = ptInput
+      end>
+  end
+  object CountrySource: TDataSource
+    DataSet = Countries
+    left = 248
+    top = 74
+  end
+end

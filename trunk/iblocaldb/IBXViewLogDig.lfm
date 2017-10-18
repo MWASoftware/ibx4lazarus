@@ -1,0 +1,45 @@
+object ViewLogDlg: TViewLogDlg
+  Left = 410
+  Height = 402
+  Top = 254
+  Width = 522
+  Caption = 'Upgrade Log'
+  ClientHeight = 402
+  ClientWidth = 522
+  Position = poDesktopCenter
+  LCLVersion = '0.9.30'
+  object Label1: TLabel
+    Left = 24
+    Height = 38
+    Top = 26
+    Width = 465
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoSize = False
+    Caption = 'The Database Upgrade has failed. Please refer to the message log below'#10'to determine the error.'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Memo1: TMemo
+    Left = 25
+    Height = 263
+    Top = 80
+    Width = 470
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Lines.Strings = (
+      'Memo1'
+    )
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+  end
+  object Button1: TButton
+    Left = 420
+    Height = 25
+    Top = 360
+    Width = 75
+    Caption = 'Close'
+    Default = True
+    ModalResult = 1
+    TabOrder = 1
+  end
+end

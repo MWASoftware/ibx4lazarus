@@ -1,0 +1,138 @@
+object LimboTransactionsForm: TLimboTransactionsForm
+  Left = 632
+  Height = 386
+  Top = 339
+  Width = 798
+  Caption = 'Limbo Transactions'
+  ClientHeight = 386
+  ClientWidth = 798
+  OnShow = FormShow
+  LCLVersion = '1.6.0.4'
+  object Label1: TLabel
+    Left = 14
+    Height = 15
+    Top = 12
+    Width = 74
+    Caption = 'Transactions'
+    ParentColor = False
+  end
+  object StringGrid1: TStringGrid
+    Left = 16
+    Height = 316
+    Top = 28
+    Width = 764
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoFillColumns = True
+    ColCount = 8
+    Columns = <    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Transaction ID'
+        Width = 95
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Type'
+        Width = 95
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Host Site'
+        Width = 95
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Remote Site'
+        Width = 95
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Database Path'
+        Width = 95
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'State'
+        Width = 95
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Rec. Action'
+        Width = 95
+      end    
+      item
+        PickList.Strings = (
+          'Commit'
+          'Rollback'
+        )
+        Title.Alignment = taCenter
+        Title.Caption = 'Action'
+        Width = 97
+      end>
+    FixedCols = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+    OnEditingDone = StringGrid1EditingDone
+    ColWidths = (
+      95
+      95
+      95
+      95
+      95
+      95
+      95
+      97
+    )
+  end
+  object Button1: TButton
+    Left = 16
+    Height = 25
+    Top = 352
+    Width = 100
+    Anchors = [akLeft, akBottom]
+    Caption = 'Commit All'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 128
+    Height = 25
+    Top = 352
+    Width = 100
+    Anchors = [akLeft, akBottom]
+    Caption = 'Rollback All'
+    OnClick = Button2Click
+    TabOrder = 2
+  end
+  object Button3: TButton
+    Left = 368
+    Height = 25
+    Top = 352
+    Width = 144
+    Anchors = [akLeft, akBottom]
+    Caption = 'Apply Selected Action'
+    OnClick = Button3Click
+    TabOrder = 3
+  end
+  object Button4: TButton
+    Left = 233
+    Height = 25
+    Top = 352
+    Width = 127
+    Anchors = [akLeft, akBottom]
+    Caption = 'Commit 2 Phase All'
+    OnClick = Button4Click
+    TabOrder = 4
+  end
+  object IBValidationService1: TIBValidationService
+    ServerName = 'localhost'
+    Protocol = TCP
+    TraceFlags = []
+    DatabaseName = 'employee'
+    Options = [LimboTransactions]
+    GlobalAction = CommitGlobal
+    left = 726
+    top = 302
+  end
+end

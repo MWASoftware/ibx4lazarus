@@ -1,0 +1,187 @@
+object Form1: TForm1
+  Left = 413
+  Height = 402
+  Top = 367
+  Width = 773
+  Caption = 'IBX Script Example'
+  ClientHeight = 402
+  ClientWidth = 773
+  DefaultMonitor = dmPrimary
+  OnShow = FormShow
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.4'
+  object Label1: TLabel
+    Left = 14
+    Height = 14
+    Top = 16
+    Width = 99
+    Caption = 'Database Name:'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 14
+    Height = 14
+    Top = 56
+    Width = 36
+    Caption = 'Script'
+    ParentColor = False
+  end
+  object IBScript: TMemo
+    Left = 14
+    Height = 287
+    Top = 72
+    Width = 341
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Lines.Strings = (
+      'IBScript'
+    )
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+  end
+  object Button1: TButton
+    Left = 369
+    Height = 30
+    Top = 192
+    Width = 77
+    Action = RunScript
+    Anchors = [akTop, akRight]
+    TabOrder = 1
+  end
+  object Label3: TLabel
+    Left = 459
+    Height = 14
+    Top = 56
+    Width = 68
+    Anchors = [akTop, akRight]
+    Caption = 'Results Log'
+    ParentColor = False
+  end
+  object ResultsLog: TMemo
+    Left = 460
+    Height = 287
+    Top = 72
+    Width = 296
+    Anchors = [akTop, akRight, akBottom]
+    Lines.Strings = (
+      'ResultsLog'
+    )
+    ScrollBars = ssAutoVertical
+    TabOrder = 2
+  end
+  object ProgressBar1: TProgressBar
+    Left = 460
+    Height = 20
+    Top = 369
+    Width = 296
+    Anchors = [akRight, akBottom]
+    TabOrder = 3
+  end
+  object Button2: TButton
+    Left = 14
+    Height = 30
+    Top = 369
+    Width = 82
+    Action = LoadScript
+    Anchors = [akLeft, akBottom]
+    TabOrder = 4
+  end
+  object DBName: TLabel
+    Left = 119
+    Height = 14
+    Top = 16
+    Width = 52
+    Caption = 'DBName'
+    ParentColor = False
+  end
+  object StopOnError: TCheckBox
+    Left = 104
+    Height = 22
+    Top = 375
+    Width = 136
+    Caption = 'Stop On First Error'
+    OnChange = StopOnErrorChange
+    TabOrder = 5
+  end
+  object EchoInput: TCheckBox
+    Left = 248
+    Height = 22
+    Top = 375
+    Width = 91
+    Caption = 'Echo Input'
+    OnChange = EchoInputChange
+    TabOrder = 6
+  end
+  object IBXScript1: TIBXScript
+    Database = IBDatabase1
+    IgnoreGrants = False
+    Transaction = IBTransaction1
+    ShowAffectedRows = False
+    ShowPerformanceStats = False
+    GetParamValue = IBXScript1GetParamValue
+    OnOutputLog = IBXScript1LogProc
+    OnErrorLog = IBXScript1LogProc
+    OnProgressEvent = IBXScript1ProgressEvent
+    OnSelectSQL = IBXScript1SelectSQL
+    left = 24
+    top = 104
+  end
+  object IBDatabase1: TIBDatabase
+    Connected = False
+    BeforeConnect = IBDatabase1BeforeConnect
+    CreateIfNotExists = False
+    AllowStreamedConnected = False
+    DatabaseName = 'employee'
+    Params.Strings = (
+      'lc_ctype=UTF8                           '
+      'user_name=SYSDBA'
+    )
+    IdleTimer = 0
+    TraceFlags = []
+    UseDefaultSystemCodePage = False
+    left = 24
+    top = 156
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    DefaultDatabase = IBDatabase1
+    Params.Strings = (
+      'concurrency'
+      'nowait'
+    )
+    left = 24
+    top = 208
+  end
+  object ActionList1: TActionList
+    left = 75
+    top = 104
+    object LoadScript: TAction
+      Caption = 'Load Script'
+      OnExecute = LoadScriptExecute
+    end
+    object RunScript: TAction
+      Caption = 'Execute'
+      OnExecute = RunScriptExecute
+      OnUpdate = RunScriptUpdate
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    Title = 'Load SQL Script'
+    DefaultExt = '.sql'
+    Filter = 'SQL FIles|*.sql|All Files|*.*'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 75
+    top = 156
+  end
+  object OpenBlobDialog: TOpenDialog
+    Filter = 'All Files|*.*'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 75
+    top = 208
+  end
+  object Timer1: TTimer
+    Interval = 0
+    OnTimer = Timer1Timer
+    left = 127
+    top = 112
+  end
+end
