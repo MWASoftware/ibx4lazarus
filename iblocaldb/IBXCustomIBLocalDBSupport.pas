@@ -202,7 +202,7 @@ resourcestring
   sNoDowngrade = 'Database Schema is %d. Unable to downgrade to version %d';
   sLocalDBDisabled = 'Local Database Access Disabled';
   sEmptyDBArchiveMissing = 'Unable to create database - no empty DB archive specified';
-  sEmptyDBArchiveNotFound = 'Unable to create database - empty DB archive file not found';
+  sEmptyDBArchiveNotFound = 'Unable to create database - empty DB archive file (%s) not found';
   sNoEmbeddedServer = 'Firebird Embedded Server is required but is not installed';
 
 { TCustomIBLocalDBSupport }
@@ -257,7 +257,7 @@ begin
    DBArchive := FSharedDataDir + DBArchive;
 
  if not FileExists(DBArchive) then
-   raise Exception.Create(sEmptyDBArchiveNotFound);
+   raise Exception.CreateFmt(sEmptyDBArchiveNotFound,[DBArchive]);
 
  if FileExists(DBName) then
  begin
