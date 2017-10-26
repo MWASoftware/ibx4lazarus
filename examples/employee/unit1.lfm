@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 1736
+  Left = 4112
   Height = 482
-  Top = 445
+  Top = 536
   Width = 932
   Caption = 'Employee List'
   ClientHeight = 482
@@ -9,7 +9,7 @@ object Form1: TForm1
   DefaultMonitor = dmPrimary
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.0.5'
   object Button1: TButton
     Left = 845
     Height = 25
