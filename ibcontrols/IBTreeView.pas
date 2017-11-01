@@ -693,6 +693,8 @@ var Node: TTreeNode;
     i,j: integer;
 begin
   Result := nil;
+  if Length(KeyValuePath) = 0 then Exit;
+
   FLocatingNode := true;
   try
    for j := 0 to Items.TopLvlCount - 1 do
@@ -702,7 +704,8 @@ begin
     Node.Expand(false);
     while assigned(Node)  do
     begin
-      if TIBTreeNode(Node).KeyValue = KeyValuePath[i] then
+      if not VarIsNull(TIBTreeNode(Node).KeyValue) and
+                        (TIBTreeNode(Node).KeyValue = KeyValuePath[i]) then
       begin
         Inc(i);
         if i = Length(KeyValuePath) then
