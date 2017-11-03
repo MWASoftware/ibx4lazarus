@@ -236,14 +236,17 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <UnitName Value="IBVersion"/>
       </Item19>
     </Files>
-    <RequiredPkgs Count="2">
+    <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="fbintf"/>
+        <PackageName Value="LCL"/>
       </Item1>
       <Item2>
+        <PackageName Value="fbintf"/>
+      </Item2>
+      <Item3>
         <PackageName Value="FCL"/>
         <MinVersion Major="1" Valid="True"/>
-      </Item2>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
