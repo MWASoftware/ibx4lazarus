@@ -38,7 +38,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, Graphics, Controls,
+  SysUtils, Classes,  Controls,
   Forms, StdCtrls, ExtCtrls, IB, IBTypes;
 
 type
