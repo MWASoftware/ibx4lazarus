@@ -8,7 +8,7 @@
       <Version Value="11"/>
       <SearchPaths>
         <OtherUnitFiles Value="iblocaldb"/>
-        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="iblocaldb/lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
     <Description Value="This package provides additional support for Personal Databases."/>
