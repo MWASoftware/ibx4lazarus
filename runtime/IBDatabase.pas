@@ -1599,11 +1599,19 @@ begin
     begin
       try
         DoBeforeTransactionEnd;
-        for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
-          SQLObjects[i].DoBeforeTransactionEnd(Action);
-        except on E: EIBInterBaseError do
-          begin
-            if not Force then
+      except on E: EIBInterBaseError do
+        begin
+          if not Force then
+            raise;
+        end;
+      end;
+
+      for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
+      try
+        SQLObjects[i].DoBeforeTransactionEnd(Action);
+      except on E: EIBInterBaseError do
+        begin
+          if not Force then
               raise;
           end;
       end;
@@ -1624,9 +1632,16 @@ begin
           end;
         end;
 
-        try
           for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
+          try
             SQLObjects[i].DoAfterTransactionEnd;
+          except on E: EIBInterBaseError do
+            begin
+              if not Force then
+                raise;
+            end;
+          end;
+        try
           DoAfterTransactionEnd;
         except on E: EIBInterBaseError do
           begin
