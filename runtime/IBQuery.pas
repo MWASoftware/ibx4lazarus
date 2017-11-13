@@ -56,8 +56,6 @@ type
     FPrepared: Boolean;
     FParams: TParams;
     FText: string;
-    FRowsAffected: Integer;
-    FCheckRowsAffected: Boolean;
     FSQLUpdating: boolean;
     FInQueryChanged: boolean;
     function GetRowsAffected: Integer;
@@ -152,7 +150,6 @@ begin
   TStringList(SQL).OnChange := QueryChanged;
   FParams := TParams.Create(Self);
   ParamCheck := True;
-  FRowsAffected := -1;
 end;
 
 destructor TIBQuery.Destroy;
@@ -297,15 +294,11 @@ begin
   begin
     if Value then
     begin
-      FRowsAffected := -1;
-      FCheckRowsAffected := True;
       if Length(Text) > 1 then PrepareSQL
       else IBError(ibxeEmptySQLStatement, [nil]);
     end
     else
     begin
-      if FCheckRowsAffected then
-        FRowsAffected := RowsAffected;
       InternalUnPrepare;
       FParams.Clear;
     end;
@@ -378,10 +371,8 @@ var
 begin
   CheckInActive;
   if SQL.Count <= 0 then
-  begin
-    FCheckRowsAffected := False;
     IBError(ibxeEmptySQLStatement, [nil]);
-  end;
+
   ActivateConnection();
   DidActivate := ActivateTransaction;
   try
@@ -392,7 +383,6 @@ begin
   finally
     if DidActivate then
       DeactivateTransaction;
-    FCheckRowsAffected := True;
   end;
 end;
 
