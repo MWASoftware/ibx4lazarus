@@ -69,7 +69,7 @@ type
 implementation
 
 uses IBXUpgradeDatabaseDlg, IBXCreateDatabaseDlg, IBXSaveDatabaseDlg, IBServices,
-  IBXUpgradeConfFile, Registry;
+  IBXUpgradeConfFile, Registry, IBXCreateDatabaseFromSQLDlgUnit;
 
 resourcestring
   sDowngradePrompt = 'Database Version %d found but Version %d expected. If you have '+
@@ -145,8 +145,11 @@ end;
 
 function TIBLocalDBSupport.CreateNewDatabase(DBName: string;
   DBParams: TStrings; DBArchive: string): boolean;
+var Ext: string;
 begin
   CreateDir(ExtractFileDir(DBName));
+  Ext := AnsiUpperCase(ExtractFileExt(DBArchive));
+  if Ext = '.GBK' then
   with TCreateDatabaseDlg.Create(Application) do
   try
    SetDBParams(IBRestoreService1,DBParams);
@@ -158,7 +161,20 @@ begin
    Result := ShowModal = mrOK;
   finally
     Free
-  end;
+  end
+  else
+  if Ext = '.SQL' then
+  with TIBXCreateDatabaseFromSQLDlg.Create(Application) do
+  try
+    FileName := DBArchive;
+    IBXScript.Database := self.Database;
+    DatabasePath := DBName;
+    Result := ShowModal = mrOK;
+  finally
+    Free
+  end
+  else
+    raise Exception.CreateFmt('Archive file (%s) has an unknown extension',[DBArchive]);
 end;
 
 procedure TIBLocalDBSupport.Downgrade(DBArchive: string);

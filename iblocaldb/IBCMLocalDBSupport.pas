@@ -40,9 +40,11 @@ type
   TIBCMLocalDBSupport = class(TCustomIBLocalDBSupport)
   private
     FOnLogMessage: TOnLogMessage;
+    FDatabasePath: string;
     procedure Add2Log(Sender: TObject; Msg: string);
     procedure DoUpgrade(IBXScript: TIBXScript; TargetVersionNo: integer);
     procedure WriteLog(Msg: string);
+    procedure HandleCreateDatabase(Sender: TObject; var DatabaseFileName: string);
   protected
     function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; override;
     function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; override;
@@ -101,40 +103,66 @@ begin
     OnLogMessage(self,Msg);
 end;
 
+procedure TIBCMLocalDBSupport.HandleCreateDatabase(Sender: TObject;
+  var DatabaseFileName: string);
+begin
+  DatabaseFileName := FDatabasePath;
+end;
+
 function TIBCMLocalDBSupport.CreateNewDatabase(DBName: string;
   DBParams: TStrings; DBArchive: string): boolean;
 var Service: TIBRestoreService;
+    Ext: string;
 begin
+  Result := true;
   CreateDir(ExtractFileDir(DBName));
-  Service := TIBRestoreService.Create(self);
-  with Service do
+  Ext := AnsiUpperCase(ExtractFileExt(DBArchive));
+  if Ext = '.GBK' then
+  begin
+    Service := TIBRestoreService.Create(self);
+    with Service do
+    try
+     SetDBParams(Service,DBParams);
+     LoginPrompt := false;
+     BackupFile.Clear;
+     DatabaseName.Clear;
+     Options := [CreateNewDB];
+     BackupFile.Add(DBArchive);
+     DatabaseName.Add(DBName);
+     Active := true;
+     WriteLog(sCreatingDatabase);
+     ServiceStart;
+     try
+       while not Eof do
+         WriteLog(Trim(GetNextLine));
+     finally
+       Active := false
+     end;
+    finally
+      Free
+    end;
+  end
+  else
+  if Ext = '.SQL' then
+  with TIBXScript.Create(self) do
   try
-   SetDBParams(Service,DBParams);
-   LoginPrompt := false;
-   BackupFile.Clear;
-   DatabaseName.Clear;
-   Options := [CreateNewDB];
-   BackupFile.Add(DBArchive);
-   DatabaseName.Add(DBName);
-   Active := true;
-   WriteLog(sCreatingDatabase);
-   ServiceStart;
-   try
-     while not Eof do
-       WriteLog(Trim(GetNextLine));
-   finally
-     Active := false
-   end;
+    Database := self.Database;
+    FDatabasePath := DBName;
+    OnCreateDatabase := @HandleCreateDatabase;
+    WriteLog(sCreatingDatabase);
+    Result := RunScript(DBArchive);
   finally
     Free
-  end;
-
+  end
+  else
+    raise Exception.CreateFmt('Archive file (%s) has an unknown extension',[DBArchive]);
 end;
 
 function TIBCMLocalDBSupport.RestoreDatabaseFromArchive(DBName: string;
   DBParams: TStrings; aFilename: string): boolean;
 var Service: TIBRestoreService;
 begin
+  Result := true;
   Service := TIBRestoreService.Create(self);
   with Service do
   try
@@ -163,6 +191,7 @@ function TIBCMLocalDBSupport.RunUpgradeDatabase(TargetVersionNo: integer
 var IBXScript: TIBXScript;
     IBTransaction: TIBTransaction;
 begin
+  Result := true;
   IBXScript := TIBXScript.Create(self);
   IBTransaction := TIBTransaction.Create(self);
   try
@@ -187,6 +216,7 @@ function TIBCMLocalDBSupport.SaveDatabaseToArchive(DBName: string;
   DBParams: TStrings; aFilename: string): boolean;
 var Service: TIBBackupService;
 begin
+  Result := true;
   Service := TIBBackupService.Create(self);
   with Service do
   try

@@ -4,12 +4,13 @@
 
 unit iblocaldb;
 
+{$warn 5023 off : no warning about unused units}
 interface
 
 uses
   IBXCustomIBLocalDBSupport, IBXCreateDatabaseDlg, IBXSaveDatabaseDlg, 
   IBXUpgradeDatabaseDlg, IBXViewLogDig, IBLocalDBSupport, IBXUpgradeConfFile, 
-  LazarusPackageIntf;
+  IBXCreateDatabaseFromSQLDlgUnit, LazarusPackageIntf;
 
 implementation
 
