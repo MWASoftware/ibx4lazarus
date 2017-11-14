@@ -80,6 +80,8 @@ type
   TIBLocalOption = (iblAutoUpgrade, iblAllowDowngrade, iblQuiet);
   TIBLocalOptions = set of TIBLocalOption;
 
+  EIBLocalException = class(Exception);
+
 
   { TCustomIBLocalDBSupport }
 
@@ -206,6 +208,7 @@ resourcestring
   sEmptyDBArchiveMissing = 'Unable to create database - no empty DB archive specified';
   sEmptyDBArchiveNotFound = 'Unable to create database - empty DB archive file (%s) not found';
   sNoEmbeddedServer = 'Firebird Embedded Server is required but is not installed';
+  sCreateFailed = 'Unable to Create Personal Database';
 
 { TCustomIBLocalDBSupport }
 
@@ -243,7 +246,7 @@ end;
 procedure TCustomIBLocalDBSupport.CheckEnabled;
 begin
   if not Enabled then
-    raise Exception.Create(sLocalDBDisabled);
+    raise EIBLocalException.Create(sLocalDBDisabled);
 end;
 
 procedure TCustomIBLocalDBSupport.CreateDatabase(DBName: string; DBParams: TStrings;
@@ -253,13 +256,13 @@ begin
  CheckEnabled;
  DBArchive := EmptyDBArchive;
  if DBArchive = '' then
-   raise Exception.Create(sEmptyDBArchiveMissing);
+   raise EIBLocalException.Create(sEmptyDBArchiveMissing);
 
  if not TUpgradeConfFile.IsAbsolutePath(DBArchive) then
    DBArchive := SharedDataDir + DBArchive;
 
  if not FileExists(DBArchive) then
-   raise Exception.CreateFmt(sEmptyDBArchiveNotFound,[DBArchive]);
+   raise EIBLocalException.CreateFmt(sEmptyDBArchiveNotFound,[DBArchive]);
 
  if FileExists(DBName) then
  begin
@@ -270,7 +273,10 @@ begin
 
  SetupFirebirdEnv;
  if not CreateNewDatabase(DBName,DBParams,DBArchive) then
-   Database.DropDatabase
+ begin
+   Database.DropDatabase;
+   raise EIBLocalException.Create(sCreateFailed);
+ end
  else
    FNewDBCreated := true;
 end;

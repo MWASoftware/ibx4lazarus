@@ -726,6 +726,8 @@ begin
 
   except on E:Exception do
       begin
+        if FInternalTransaction.InTransaction then
+          FInternalTransaction.Rollback;
         if assigned(OnErrorLog) then
         begin
           Add2Log(Format(sStatementError,[FSymbolStream.GetErrorPrefix,
