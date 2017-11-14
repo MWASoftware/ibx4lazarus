@@ -126,9 +126,10 @@
         <ComponentName Value="IBXCreateDatabaseFromSQLDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
         <TopLine Value="37"/>
-        <CursorPos X="75" Y="48"/>
+        <CursorPos X="31" Y="50"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -140,7 +141,6 @@
       </Unit9>
       <Unit10>
         <Filename Value="../../iblocaldb/IBCMLocalDBSupport.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
         <TopLine Value="195"/>
         <CursorPos X="18" Y="219"/>

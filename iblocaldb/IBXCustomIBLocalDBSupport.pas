@@ -109,6 +109,7 @@ type
     procedure CheckEnabled;
     procedure CreateDatabase(DBName: string; DBParams: TStrings; Overwrite: boolean);
     function GetDatabase: TIBDatabase;
+    function GetSharedDataDir: string;
     procedure SetDatabase(AValue: TIBDatabase);
     function GetDBNameAndPath: string;
     procedure InitDatabaseParameters(DBParams: TStrings;
@@ -173,6 +174,7 @@ type
 
     property ActiveDatabasePathName: string read FActiveDatabasePathName;
     property CurrentDBVersionNo: integer read FCurrentDBVersionNo;
+    property SharedDataDir: string read GetSharedDataDir;
 
     { Likely to be Published declarations }
     property Database: TIBDatabase read GetDatabase write SetDatabase;
@@ -254,7 +256,7 @@ begin
    raise Exception.Create(sEmptyDBArchiveMissing);
 
  if not TUpgradeConfFile.IsAbsolutePath(DBArchive) then
-   DBArchive := FSharedDataDir + DBArchive;
+   DBArchive := SharedDataDir + DBArchive;
 
  if not FileExists(DBArchive) then
    raise Exception.CreateFmt(sEmptyDBArchiveNotFound,[DBArchive]);
@@ -267,13 +269,22 @@ begin
  end;
 
  SetupFirebirdEnv;
- CreateNewDatabase(DBName,DBParams,DBArchive);
- FNewDBCreated := true;
+ if not CreateNewDatabase(DBName,DBParams,DBArchive) then
+   Database.DropDatabase
+ else
+   FNewDBCreated := true;
 end;
 
 function TCustomIBLocalDBSupport.GetDatabase: TIBDatabase;
 begin
   Result := FIBBase.Database;
+end;
+
+function TCustomIBLocalDBSupport.GetSharedDataDir: string;
+begin
+  if FSharedDataDir = '' then
+    FSharedDataDir := MapSharedDataDir(ExtractFilePath(ParamStr(0)));
+  Result := FSharedDataDir;
 end;
 
 procedure TCustomIBLocalDBSupport.SetDatabase(AValue: TIBDatabase);
@@ -300,8 +311,11 @@ begin
     RegexObj.Free;
   end;
 {$ENDIF}
-  if assigned (OnGetSharedDataDir) then
+  if assigned (FOnGetSharedDataDir) then
     OnGetSharedDataDir(self,Result);
+ {Ensure a trailing separator}
+  if (Length(Result) > 0) and (Result[Length(Result)] <> DirectorySeparator) then
+    Result := Result + DirectorySeparator;
 end;
 
 {$IFDEF Unix}
@@ -362,21 +376,25 @@ begin
 end;
 
 procedure TCustomIBLocalDBSupport.SetupFirebirdEnv;
+var sdd: string;
 begin
   if sysutils.GetEnvironmentVariable('FIREBIRD') = '' then
   begin
     if FirebirdDirectory <> '' then
     begin
       if not TUpgradeConfFile.IsAbsolutePath(FirebirdDirectory) then
-        FirebirdDirectory := FSharedDataDir + FirebirdDirectory;
+        FirebirdDirectory := SharedDataDir + FirebirdDirectory;
       if FileExists(FirebirdDirectory + DirectorySeparator + 'firebird.conf') then
       begin
         SetEnvironmentVariable('FIREBIRD',PChar(FirebirdDirectory));
         Exit;
       end;
     end;
-    if FileExists(FSharedDataDir + 'firebird.conf') then
-      SetEnvironmentVariable('FIREBIRD',PChar(FSharedDataDir));
+    if FileExists(SharedDataDir + 'firebird.conf') then
+    begin
+      sdd := SharedDataDir;
+      SetEnvironmentVariable('FIREBIRD',PChar(sdd));
+    end;
   end;
 end;
 
@@ -506,7 +524,6 @@ begin
   FIBBase.AfterDatabaseDisconnect := @OnAfterDatabaseDisconnect;
   FUpgradeConfFile := 'upgrade.conf';
   FOptions := [iblAutoUpgrade, iblAllowDowngrade];
-  FSharedDataDir := MapSharedDataDir(ExtractFilePath(ParamStr(0)));
 end;
 
 destructor TCustomIBLocalDBSupport.Destroy;
@@ -557,7 +574,7 @@ procedure TCustomIBLocalDBSupport.PerformUpgrade(TargetVersionNo: integer);
     if Result = '' then Exit;
 
     if not TUpgradeConfFile.IsAbsolutePath(Result) then
-      Result := FSharedDataDir + Result;
+      Result := SharedDataDir + Result;
   end;
 
 begin

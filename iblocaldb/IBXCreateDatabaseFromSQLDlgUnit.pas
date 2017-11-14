@@ -47,6 +47,7 @@ begin
     ProgressBar.Max := value
   else
     ProgressBar.StepIt;
+  Application.ProcessMessages;
 end;
 
 procedure TIBXCreateDatabaseFromSQLDlg.DoRunScript(Data: PtrInt);

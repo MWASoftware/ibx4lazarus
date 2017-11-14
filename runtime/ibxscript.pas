@@ -726,9 +726,14 @@ begin
 
   except on E:Exception do
       begin
-        Add2Log(Format(sStatementError,[FSymbolStream.GetErrorPrefix,
-                           E.Message,stmt]),true);
-        if StopOnFirstError then Exit;
+        if assigned(OnErrorLog) then
+        begin
+          Add2Log(Format(sStatementError,[FSymbolStream.GetErrorPrefix,
+                             E.Message,stmt]),true);
+                             if StopOnFirstError then Exit;
+        end
+        else
+          raise;
       end
   end;
   Result := true;
@@ -856,6 +861,7 @@ begin
       if assigned(FOnCreateDatabase) then
         OnCreateDatabase(self,FileName);
       stmt := 'CREATE DATABASE ''' + FileName + '''' + system.copy(stmt,RegexObj.MatchPos[3], RegexObj.MatchLen[3]);
+      ucStmt := AnsiUpperCase(stmt);
       UpdateUserPassword;
       FDatabase.Connected := false;
       FDatabase.CreateDatabase(stmt);
