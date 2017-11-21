@@ -321,7 +321,6 @@ procedure TIBTreeView.ActiveChanged(Sender: TObject);
 var AtTopLevel: boolean;
 begin
   if (csDesigning in ComponentState) then Exit;
-  writeln('Active Changed ', DataSet.Active);
   IBControlLinkChanged;
   if assigned(DataSet) and not DataSet.Active then
   begin
