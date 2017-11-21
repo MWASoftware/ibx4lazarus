@@ -1,5 +1,5 @@
 object ListUsersForm: TListUsersForm
-  Left = 452
+  Left = 413
   Height = 404
   Top = 200
   Width = 861
@@ -7,10 +7,11 @@ object ListUsersForm: TListUsersForm
   ClientHeight = 404
   ClientWidth = 861
   OnShow = FormShow
-  LCLVersion = '1.6.0.4'
+  Position = poScreenCenter
+  LCLVersion = '1.8.0.5'
   object Label1: TLabel
     Left = 8
-    Height = 15
+    Height = 14
     Top = 14
     Width = 100
     Caption = 'Registered Users'

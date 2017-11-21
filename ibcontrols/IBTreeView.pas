@@ -321,6 +321,7 @@ procedure TIBTreeView.ActiveChanged(Sender: TObject);
 var AtTopLevel: boolean;
 begin
   if (csDesigning in ComponentState) then Exit;
+  writeln('Active Changed ', DataSet.Active);
   IBControlLinkChanged;
   if assigned(DataSet) and not DataSet.Active then
   begin
@@ -501,7 +502,7 @@ begin
   if Result then
   begin
     if DataSet.Active and (DataSet.RecordCount > 0)
-         and (Node.KeyValue = DataSet.FieldByName(KeyField).AsVariant) then Exit;
+         and DataSet.Locate(KeyField,Node.KeyValue,[]) then Exit;
 
     FUpdateNode := Node;
     try
