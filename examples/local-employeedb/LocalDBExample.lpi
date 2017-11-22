@@ -44,7 +44,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="11">
+    <Units Count="12">
       <Unit0>
         <Filename Value="LocalDBExample.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -101,13 +101,13 @@
         <Filename Value="../../iblocaldb/IBLocalDBSupport.pas"/>
         <EditorIndex Value="4"/>
         <TopLine Value="143"/>
-        <CursorPos Y="178"/>
+        <CursorPos Y="167"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="613"/>
         <CursorPos X="3" Y="616"/>
         <UsageCount Value="11"/>
@@ -115,7 +115,7 @@
       </Unit6>
       <Unit7>
         <Filename Value="../../runtime/ibxscript.pas"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="302"/>
         <CursorPos X="30" Y="330"/>
         <UsageCount Value="11"/>
@@ -126,7 +126,6 @@
         <ComponentName Value="IBXCreateDatabaseFromSQLDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
         <TopLine Value="37"/>
         <CursorPos X="31" Y="50"/>
@@ -141,12 +140,20 @@
       </Unit9>
       <Unit10>
         <Filename Value="../../iblocaldb/IBCMLocalDBSupport.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="7"/>
         <TopLine Value="195"/>
         <CursorPos X="18" Y="219"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit10>
+      <Unit11>
+        <Filename Value="patches/02-patch.sql"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="6"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="SQL"/>
+      </Unit11>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>

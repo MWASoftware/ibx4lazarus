@@ -108,6 +108,7 @@ type
     FDownGradeArchive: string;
     FSharedDataDir: string;
     FUpgradeConf: TUpgradeConfFile;
+    FInCreateNew: boolean;
     procedure CheckEnabled;
     procedure CreateDatabase(DBName: string; DBParams: TStrings; Overwrite: boolean);
     function GetDatabase: TIBDatabase;
@@ -131,8 +132,8 @@ type
     function AllowInitialisation: boolean; virtual;
     function AllowRestore: boolean; virtual;
     procedure CreateDir(DirName: string);
-    function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; virtual; abstract;
-    procedure HandleGetParamValue(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD);
+    function InternalCreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; virtual; abstract;
+    function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean;
     procedure Downgrade(DBArchive: string); virtual;
     procedure DowngradeDone;
     procedure Loaded; override;
@@ -169,11 +170,6 @@ type
      is prompted for archive filename if filename empty.}
     procedure SaveDatabase(filename: string = '');
 
-    {Copies database parameters as give in the DBParams to the Service
-     omitting any parameters not appropriate for TIBService. Typically, the
-     DBParams are TIBDatabase.Params}
-    class procedure SetDBParams(aService: TIBCustomService; DBParams: TStrings);
-
     property ActiveDatabasePathName: string read FActiveDatabasePathName;
     property CurrentDBVersionNo: integer read FCurrentDBVersionNo;
     property SharedDataDir: string read GetSharedDataDir;
@@ -198,9 +194,8 @@ type
 
 implementation
 
-uses  DB, IBBlob, ZStream
-  {$IFDEF Unix} ,initc, regexpr {$ENDIF}
-  {$IFDEF WINDOWS} ,Windows ,Windirs {$ENDIF};
+{$IFDEF Unix} uses initc, regexpr {$ENDIF}
+{$IFDEF WINDOWS} uses Windows ,Windirs {$ENDIF};
 
 resourcestring
   sNoDowngrade = 'Database Schema is %d. Unable to downgrade to version %d';
@@ -212,36 +207,6 @@ resourcestring
 
 { TCustomIBLocalDBSupport }
 
-
-procedure TCustomIBLocalDBSupport.HandleGetParamValue(Sender: TObject;
-  ParamName: string; var BlobID: TISC_QUAD);
-var Blob: TIBBlobStream;
-    Source: TStream;
-    FileName: string;
-begin
-  Blob := TIBBlobStream.Create;
-  try
-    Blob.Database := (Sender as TIBXScript).Database;
-    Blob.Transaction := (Sender as TIBXScript).Transaction;
-    Blob.Mode := bmWrite;
-    if not assigned(UpgradeConf) or
-       not UpgradeConf.GetSourceFile(ParamName,FileName) then Exit;
-
-    if CompareText(ExtractFileExt(FileName),'.gz') = 0 then  {gzip compressed file}
-      Source := TGZFileStream.Create(FileName,gzopenread)
-    else
-      Source := TFileStream.Create(FileName,fmOpenRead or fmShareDenyNone);
-    try
-      Blob.CopyFrom(Source,0)
-    finally
-      Source.Free
-    end;
-    Blob.Finalize;
-    BlobID := Blob.BlobID
-  finally
-    Blob.Free
-  end
-end;
 
 procedure TCustomIBLocalDBSupport.CheckEnabled;
 begin
@@ -274,6 +239,7 @@ begin
  SetupFirebirdEnv;
  if not CreateNewDatabase(DBName,DBParams,DBArchive) then
  begin
+   Database.Connected := true;
    Database.DropDatabase;
    raise EIBLocalException.Create(sCreateFailed);
  end
@@ -347,7 +313,7 @@ end;
 procedure TCustomIBLocalDBSupport.OnBeforeDatabaseConnect(Sender: TObject;
   DBParams: TStrings; var DBName: string);
 begin
-  if not Enabled or (csDesigning in ComponentState) then Exit;
+  if FInCreateNew or not Enabled or (csDesigning in ComponentState) then Exit;
 
   if not FirebirdAPI.IsEmbeddedServer then
      raise EIBLocalFatalError.Create(sNoEmbeddedServer);
@@ -437,6 +403,19 @@ begin
     mkdir(DirName);
 end;
 
+function TCustomIBLocalDBSupport.CreateNewDatabase(DBName: string;
+  DBParams: TStrings; DBArchive: string): boolean;
+begin
+  Result := false;
+  if FInCreateNew then Exit;
+  FInCreateNew := true;
+  try
+    Result := InternalCreateNewDatabase(DBName,DBParams,DBArchive);
+  finally
+    FInCreateNew := false;
+  end;
+end;
+
 procedure TCustomIBLocalDBSupport.Downgrade(DBArchive: string);
 begin
   FDownGradeArchive := DBArchive;
@@ -489,28 +468,6 @@ procedure TCustomIBLocalDBSupport.SetDatabaseName(AValue: string);
 begin
   if FDatabaseName = AValue then Exit;
   FDatabaseName := ExtractFileName(AValue);
-end;
-
-class procedure TCustomIBLocalDBSupport.SetDBParams(aService: TIBCustomService;
-  DBParams: TStrings);
-var i: integer;
-    j: integer;
-    k: integer;
-    ParamName: string;
-begin
-  aService.Params.Clear;
-  for i := 0 to DBParams.Count - 1 do
-  begin
-    ParamName := DBParams[i];
-    k := Pos('=',ParamName);
-    if k > 0 then system.Delete(ParamName,k,Length(ParamName)-k+1);
-    for j := 1 to isc_spb_last_spb_constant do
-      if ParamName = SPBConstantNames[j] then
-      begin
-        aService.Params.Add(DBParams[i]);
-        break;
-      end;
-  end;
 end;
 
 function TCustomIBLocalDBSupport.UpdateVersionNo: boolean;

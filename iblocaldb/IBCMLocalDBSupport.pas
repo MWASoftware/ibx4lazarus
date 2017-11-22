@@ -122,7 +122,7 @@ begin
     Service := TIBRestoreService.Create(self);
     with Service do
     try
-     SetDBParams(Service,DBParams);
+     SetDBParams(DBParams);
      LoginPrompt := false;
      BackupFile.Clear;
      DatabaseName.Clear;
@@ -166,7 +166,7 @@ begin
   Service := TIBRestoreService.Create(self);
   with Service do
   try
-    SetDBParams(Service,DBParams);
+    SetDBParams(DBParams);
     LoginPrompt := false;
     BackupFile.Clear;
     DatabaseName.Clear;
@@ -203,7 +203,8 @@ begin
     IBTransaction.Params.Clear;
     IBTransaction.Params.Add('concurrency');
     IBTransaction.Params.Add('wait');
-    IBXScript.GetParamValue := @HandleGetParamValue;
+    if assigned(UpgradeConf) then
+      IBXScript.GetParamValue := @UpgradeConf.GetParamValue;
     DoUpgrade(IBXScript, TargetVersionNo);
   finally
     IBXScript.Free;
@@ -220,7 +221,7 @@ begin
   Service := TIBBackupService.Create(self);
   with Service do
   try
-   SetDBParams(Service,DBParams);
+   SetDBParams(DBParams);
    LoginPrompt := false;
    BackupFile.Clear;
    DatabaseName := DBName;

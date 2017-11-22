@@ -90,7 +90,7 @@ unit IBXUpgradeConfFile;
 interface
 
 uses
-  Classes, SysUtils, IniFiles;
+  Classes, SysUtils, IniFiles, IB, DB;
 
 type
   TUpgradeInfo = record
@@ -114,6 +114,7 @@ type
     function CheckUpgradeAvailable(RequiredVersionNo: integer): boolean;
     function GetUpgradeInfo(VersionNo: integer; var UpgradeInfo: TUpgradeInfo): boolean;
     function GetSourceFile(aName: string; var FileName: string): boolean;
+    procedure GetParamValue(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD);
     property UpgradeAvailableToVersion: integer read GetUpgradeAvailableToVersion;
   end;
 
@@ -121,6 +122,8 @@ type
 
 
 implementation
+
+uses ZStream, IBBlob, ibxscript;
 
 const
   sSectionheader      = 'Version.%.3d';
@@ -201,6 +204,35 @@ begin
   if not IsAbsolutePath(FileName) then
     FileName := ExtractFilePath(FConfFileName) + FileName;
   Result := FileExists(FileName);
+end;
+
+procedure TUpgradeConfFile.GetParamValue(Sender: TObject; ParamName: string;
+  var BlobID: TISC_QUAD);
+var Blob: TIBBlobStream;
+    Source: TStream;
+    FileName: string;
+begin
+  Blob := TIBBlobStream.Create;
+  try
+    Blob.Database := (Sender as TIBXScript).Database;
+    Blob.Transaction := (Sender as TIBXScript).Transaction;
+    Blob.Mode := bmWrite;
+    if not GetSourceFile(ParamName,FileName) then Exit;
+
+    if CompareText(ExtractFileExt(FileName),'.gz') = 0 then  {gzip compressed file}
+      Source := TGZFileStream.Create(FileName,gzopenread)
+    else
+      Source := TFileStream.Create(FileName,fmOpenRead or fmShareDenyNone);
+    try
+      Blob.CopyFrom(Source,0)
+    finally
+      Source.Free
+    end;
+    Blob.Finalize;
+    BlobID := Blob.BlobID
+  finally
+    Blob.Free
+  end
 end;
 
 end.

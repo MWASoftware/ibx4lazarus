@@ -31,9 +31,11 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls,  Dialogs, StdCtrls,
-  ComCtrls, ExtCtrls, IBDatabase, ibxscript;
+  ComCtrls, ExtCtrls, IBDatabase, ibxscript, IBXUpgradeConfFile;
 
 type
+  TGetDatabaseVersionNo = procedure (Sender: TObject; var VersionNo: integer) of object;
+
   { TUpgradeDatabaseDlg }
 
   TUpgradeDatabaseDlg = class(TForm)
@@ -42,7 +44,6 @@ type
     Label1: TLabel;
     Panel1: TPanel;
     ProgressBar1: TProgressBar;
-    FDatabase: TIBDatabase;
     Status: TLabel;
     Timer1: TTimer;
     procedure FormShow(Sender: TObject);
@@ -51,30 +52,74 @@ type
     procedure IBXScriptProgressEvent(Sender: TObject; Reset: boolean;
       value: integer);
   private
-    FOnDoUpgrade: TNotifyEvent;
+    FOnGetDatabaseVersionNo: TGetDatabaseVersionNo;
+    FOnUpgradeStepCompleted: TNotifyEvent;
     { private declarations }
     FUpgradeLog: TStrings;
+    FTargetVersionNo: integer;
+    FUpgradeConf: TUpgradeConfFile;
+    FArchiveStub: string;
     procedure DoUpdate(Data: PtrInt);
+    function CurrentDBVersionNo: integer;
   public
     { public declarations }
     SuccessfulCompletion: boolean;
     constructor Create(theOwner: TComponent); override;
     destructor Destroy; override;
     procedure Add2Log(Msg: string);
-    property OnDoUpgrade: TNotifyEvent read FOnDoUpgrade write FOnDoUpgrade;
+    property OnGetDatabaseVersionNo: TGetDatabaseVersionNo read FOnGetDatabaseVersionNo
+             write FOnGetDatabaseVersionNo;
+    property OnUpgradeStepCompleted: TNotifyEvent read FOnUpgradeStepCompleted write FOnUpgradeStepCompleted;
   end; 
-
 
 
 var
   UpgradeDatabaseDlg: TUpgradeDatabaseDlg;
+
+function RunUpgradeDatabase(aDatabase: TIBDatabase;
+                            UpgradeConf: TUpgradeConfFile;
+                            ArchiveStub: string;
+                            TargetVersionNo: integer;
+                            aOnGetDatabaseVersionNo: TGetDatabaseVersionNo;
+                            aOnUpgradeStepCompleted: TNotifyEvent): boolean;
 
 
 implementation
 
 {$R *.lfm}
 
-uses  IBXViewLogDig;
+uses  IBXViewLogDig, IBXSaveDatabaseDlg;
+
+resourcestring
+  sNoUpgradeConf = 'An Upgrade Conf file must be provided';
+  sUpdateMsg =       'Applying Update from %s';
+  sUpdateStarted =   '%s Update Started';
+  sUpdateEnded =     '%s Update Completed';
+  sUpdateFailed    = 'Update Failed - %s';
+
+function RunUpgradeDatabase(aDatabase: TIBDatabase;
+  UpgradeConf: TUpgradeConfFile; ArchiveStub: string; TargetVersionNo: integer;
+  aOnGetDatabaseVersionNo: TGetDatabaseVersionNo;
+  aOnUpgradeStepCompleted: TNotifyEvent): boolean;
+begin
+  if not assigned(UpgradeConf) then
+    raise Exception.Create(sNoUpgradeConf);
+
+  with TUpgradeDatabaseDlg.Create(Application) do
+  try
+    FTargetVersionNo := TargetVersionNo;
+    FUpgradeConf := UpgradeConf;
+    FArchiveStub := ArchiveStub;
+    IBXScript.Database := aDatabase;
+    UpdateTransaction.DefaultDatabase := aDatabase;
+    IBXScript.GetParamValue := @UpgradeConf.GetParamValue;
+    OnGetDatabaseVersionNo := aOnGetDatabaseVersionNo;
+    OnUpgradeStepCompleted := aOnUpgradeStepCompleted;
+    Result := ShowModal = mrOK;
+  finally
+    Free
+  end;
+end;
 
 { TUpgradeDatabaseDlg }
 
@@ -124,12 +169,42 @@ begin
 end;
 
 procedure TUpgradeDatabaseDlg.DoUpdate(Data: PtrInt);
-
+var UpdateAvailable: boolean;
+    UpgradeInfo: TUpgradeInfo;
+    DBArchive: string;
+    LastVersionNo: integer;
 begin
   SuccessfulCompletion := true;
   try
-    if assigned(OnDoUpgrade) then
-      OnDoUpgrade(self);
+    repeat
+      if CurrentDBVersionNo >= FTargetVersionNo then break;
+      LastVersionNo := CurrentDBVersionNo;
+      UpdateAvailable := FUpgradeConf.GetUpgradeInfo(CurrentDBVersionNo+1,UpgradeInfo);
+      if UpdateAvailable then
+      begin
+        if UpgradeInfo.BackupDB then
+        begin
+          CreateDir(ExtractFileDir(FArchiveStub));
+          DBArchive := FArchiveStub + '.' + IntToStr(CurrentDBVersionNo) + '.gbk';
+          with IBXScript.Database do
+            SaveDatabaseToArchive(DatabaseName,Params,DBArchive);
+        end;
+        Add2Log(UpgradeInfo.UserMessage);
+        Status.Caption := UpgradeInfo.UserMessage;
+        Application.ProcessMessages;
+        Add2Log(Format(sUpdateMsg,[UpgradeInfo.UpdateSQLFile]));
+        Add2Log(Format(sUpdateStarted,[DateTimeToStr(Now)]));
+        if not IBXScript.PerformUpdate(UpgradeInfo.UpdateSQLFile,true) then
+        begin
+         Add2Log(Format(sUpdateFailed,[DateTimeToStr(Now)]));
+         SuccessfulCompletion := false;
+         break;
+        end;
+        Add2Log(Format(sUpdateEnded,[DateTimeToStr(Now)]));
+        if assigned(FOnUpgradeStepCompleted) then
+          OnUpgradeStepCompleted(self);
+      end;
+    until not UpdateAvailable or (LastVersionNo = CurrentDBVersionNo);
   except on E:Exception do
    begin
     SuccessfulCompletion := false;
@@ -137,6 +212,14 @@ begin
    end;
   end;
   Timer1.Enabled := true;
+end;
+
+function TUpgradeDatabaseDlg.CurrentDBVersionNo: integer;
+begin
+  if assigned(FOnGetDatabaseVersionNo) then
+    OnGetDatabaseVersionNo(self,Result)
+  else
+    Result := 0;
 end;
 
 

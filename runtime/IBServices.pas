@@ -151,6 +151,12 @@ type
     destructor Destroy; override;
     procedure Attach;
     procedure Detach;
+
+    {Copies database parameters as give in the DBParams to the Service
+      omitting any parameters not appropriate for TIBService. Typically, the
+      DBParams are TIBDatabase.Params}
+    procedure SetDBParams(DBParams: TStrings);
+
     property ServiceIntf: IServiceManager read FService write SetService;
     property ServiceParamBySPB[const Idx: Integer]: String read GetServiceParamBySPB
                                                       write SetServiceParamBySPB;
@@ -692,6 +698,27 @@ begin
   FService.Detach;
   FService := nil;
   MonitorHook.ServiceDetach(Self);
+end;
+
+procedure TIBCustomService.SetDBParams(DBParams: TStrings);
+var i: integer;
+    j: integer;
+    k: integer;
+    ParamName: string;
+begin
+  Params.Clear;
+  for i := 0 to DBParams.Count - 1 do
+  begin
+    ParamName := DBParams[i];
+    k := Pos('=',ParamName);
+    if k > 0 then system.Delete(ParamName,k,Length(ParamName)-k+1);
+    for j := 1 to isc_spb_last_spb_constant do
+      if ParamName = SPBConstantNames[j] then
+      begin
+        Params.Add(DBParams[i]);
+        break;
+      end;
+  end;
 end;
 
 function TIBCustomService.GetActive: Boolean;
