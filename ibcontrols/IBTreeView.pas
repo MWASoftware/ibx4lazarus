@@ -77,6 +77,7 @@ type
   private
     FKeyValue: variant;
   public
+    constructor Create(AnOwner: TTreeNodes); override;
     procedure DeleteAll;
     property KeyValue: variant read FKeyValue;
   end;
@@ -300,6 +301,12 @@ begin
 end;
 
 { TIBTreeNode }
+
+constructor TIBTreeNode.Create(AnOwner: TTreeNodes);
+begin
+  inherited Create(AnOwner);
+  FKeyValue := NULL;
+end;
 
 procedure TIBTreeNode.DeleteAll;
 var Node, NextNode: TTreeNode;
