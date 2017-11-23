@@ -1238,9 +1238,9 @@ begin
   SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
   with SRB.Add(isc_spb_prp_write_mode) do
   if Value then
-    AsInteger := isc_spb_prp_wm_async
+    AsByte := isc_spb_prp_wm_async
   else
-    AsInteger := isc_spb_prp_wm_sync;
+    AsByte := isc_spb_prp_wm_sync;
   InternalServiceStart;
 end;
 
