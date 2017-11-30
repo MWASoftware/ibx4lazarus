@@ -158,7 +158,7 @@ II.1. Advertising Materials. All advertising materials mentioning features or us
 II.2. Endorsements. The names &quot;Inprise,&quot; &quot;InterBase,&quot; &quot;ISC,&quot; and &quot;IB&quot; must not be used to endorse or promote Contributor Versions or Larger Works without the prior written permission of Inprise.
 II.3. Product Names. Contributor Versions and Larger Works may not be called &quot;Inprise&quot; or &quot;InterBase&quot; nor may the words &quot;Inprise&quot; or &quot;InterBase&quot; appear in their names without the prior written permission of Inprise Corporation."/>
     <Version Major="2" Release="3"/>
-    <Files Count="19">
+    <Files Count="20">
       <Item1>
         <Filename Value="runtime/IBBatchMove.pas"/>
         <UnitName Value="IBBatchMove"/>
@@ -235,6 +235,10 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <Filename Value="runtime/IBVersion.pas"/>
         <UnitName Value="IBVersion"/>
       </Item19>
+      <Item20>
+        <Filename Value="runtime/IBUpdate.pas"/>
+        <UnitName Value="IBUpdate"/>
+      </Item20>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>

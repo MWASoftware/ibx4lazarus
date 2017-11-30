@@ -4,13 +4,14 @@
 
 unit ibexpress;
 
+{$warn 5023 off : no warning about unused units}
 interface
 
 uses
   IBBatchMove, IBBlob, IBCustomDataSet, IBDatabase, IBEvents, IBExtract, 
   IBQuery, IBServices, IBSQL, IBStoredProc, IBDatabaseInfo, IBUpdateSQL, 
   IBTable, IBSQLMonitor, IBSQLParser, IBDialogs, ibxscript, IBDataOutput, 
-  IBVersion;
+  IBVersion, IBUpdate;
 
 implementation
 

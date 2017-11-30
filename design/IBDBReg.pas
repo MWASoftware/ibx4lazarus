@@ -54,7 +54,7 @@ interface
 
 uses SysUtils, Classes, Graphics, Dialogs, Controls, Forms, TypInfo,
      DB, IBTable, IBDatabase,  IBEventsEditor,  LazarusPackageIntf,
-      IBUpdateSQL, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor,
+      IBUpdateSQL, IBUpdate, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor,
      dbFieldLinkPropEditor, dbFieldListPropEditor, IBDialogs;
 
 type
@@ -422,7 +422,7 @@ begin
   RegisterNoIcon([TIntegerField]);
   {$endif}
   RegisterComponents(IBPalette1, [ TIBQuery, TIBDataSet,
-   TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBEvents,
+   TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBUpdate, TIBEvents,
      TIBSQL, TIBDatabaseInfo, TIBSQLMonitor,
        TIBStoredProc,TIBBatchMove,  TIBTable,TIBExtract, TIBXScript, TIBLocalDBSupport,
        TIBBlockFormatOut,TIBCSVDataOut,TIBInsertStmtsOut]);
