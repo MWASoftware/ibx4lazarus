@@ -879,7 +879,9 @@ end;
 
 procedure TIBSQL.SetDatabase(Value: TIBDatabase);
 begin
+  if Value = FBase.Database then Exit;
   FBase.Database := Value;
+  FreeHandle;
 end;
 
 procedure TIBSQL.Prepare;

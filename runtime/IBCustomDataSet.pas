@@ -2598,6 +2598,7 @@ begin
   if (FBase.Database <> Value) then
   begin
     CheckDatasetClosed;
+    InternalUnPrepare;
     FBase.Database := Value;
     FQDelete.Database := Value;
     FQInsert.Database := Value;

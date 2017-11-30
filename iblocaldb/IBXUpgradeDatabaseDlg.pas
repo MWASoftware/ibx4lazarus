@@ -173,13 +173,15 @@ var UpdateAvailable: boolean;
     UpgradeInfo: TUpgradeInfo;
     DBArchive: string;
     LastVersionNo: integer;
+    CurVersionNo: integer;
 begin
   SuccessfulCompletion := true;
   try
+    CurVersionNo := CurrentDBVersionNo;
     repeat
-      if CurrentDBVersionNo >= FTargetVersionNo then break;
-      LastVersionNo := CurrentDBVersionNo;
-      UpdateAvailable := FUpgradeConf.GetUpgradeInfo(CurrentDBVersionNo+1,UpgradeInfo);
+      if CurVersionNo >= FTargetVersionNo then break;
+      LastVersionNo := CurVersionNo;
+      UpdateAvailable := FUpgradeConf.GetUpgradeInfo(CurVersionNo+1,UpgradeInfo);
       if UpdateAvailable then
       begin
         if UpgradeInfo.BackupDB then
@@ -198,13 +200,16 @@ begin
         begin
          Add2Log(Format(sUpdateFailed,[DateTimeToStr(Now)]));
          SuccessfulCompletion := false;
+         UpdateTransaction.Rollback;
          break;
         end;
+        UpdateTransaction.Commit;
         Add2Log(Format(sUpdateEnded,[DateTimeToStr(Now)]));
         if assigned(FOnUpgradeStepCompleted) then
           OnUpgradeStepCompleted(self);
       end;
-    until not UpdateAvailable or (LastVersionNo = CurrentDBVersionNo);
+      CurVersionNo := CurrentDBVersionNo;
+    until not UpdateAvailable or (LastVersionNo = CurVersionNo);
   except on E:Exception do
    begin
     SuccessfulCompletion := false;
