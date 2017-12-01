@@ -1263,9 +1263,9 @@ begin
   SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
   with SRB.Add(isc_spb_prp_access_mode) do
   if Value then
-    AsInteger := isc_spb_prp_am_readonly
+    AsByte := isc_spb_prp_am_readonly
   else
-    AsInteger := isc_spb_prp_am_readwrite;
+    AsByte := isc_spb_prp_am_readwrite;
   InternalServiceStart;
 end;
 
@@ -1275,9 +1275,9 @@ begin
   SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
   with SRB.Add(isc_spb_prp_reserve_space) do
   if Value then
-    AsInteger := isc_spb_prp_res
+    AsByte := isc_spb_prp_res
   else
-    AsInteger := isc_spb_prp_res_use_full;
+    AsByte := isc_spb_prp_res_use_full;
   InternalServiceStart;
 end;
 

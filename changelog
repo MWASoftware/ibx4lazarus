@@ -50,7 +50,7 @@ IBX Change Log  version                          (2.0-3) Mon, 25 Sep 2017 16:41:
     behaviour due to uninitialised variable.
 
 20. IBServices: Correct encoding of isc_spb_prp_write_mode in TIBConfigService from
-    integer to byte.
+    integer to byte. Ditto isc_spb_prp_reserve_space and isc_spb_prp_access_mode.
 
 21. IBSQL: When Database changed ensure that all resources are freed.
 
