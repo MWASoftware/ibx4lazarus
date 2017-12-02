@@ -102,7 +102,6 @@ type
   TIBCustomService = class(TComponent)
   private
     FParamsChanged : Boolean;
-    FQueryParams: String;
     FSPB : ISPB;
     FSRB: ISRB;
     FSQPB: ISQPB;
@@ -113,7 +112,6 @@ type
     FService: IServiceManager;
     FStreamedActive  : Boolean;
     FOnAttach: TNotifyEvent;
-    FOutputBufferOption: TOutputBufferOption;
     FProtocol: TProtocol;
     FParams: TStrings;
     FServiceQueryResults: IServiceQueryResults;
@@ -767,6 +765,7 @@ end;
 
 procedure TIBCustomService.InternalServiceQuery;
 begin
+  CheckActive;
   FServiceQueryResults := FService.Query(FSQPB,FSRB);
   FSQPB := nil;
   FSRB := nil;
