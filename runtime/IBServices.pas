@@ -1007,8 +1007,8 @@ begin
 
         for j := 0 to Count - 1 do
         begin
-          FConfigParams.ConfigFileData.ConfigFileKey[j] := getItemType;
-          FConfigParams.ConfigFileData.ConfigFileValue[j] := AsInteger;
+          FConfigParams.ConfigFileData.ConfigFileKey[j] := Items[j].getItemType;
+          FConfigParams.ConfigFileData.ConfigFileValue[j] := Items[j].AsInteger;
         end;
       end;
 
