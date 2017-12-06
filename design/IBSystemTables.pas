@@ -592,17 +592,19 @@ var UpdateSQL: string;
     I: integer;
 begin
   SQL.Clear;
-  Separator := #$0d#$0a'  A.';
+  Separator := '  A.';
   UpdateSQL := 'Update ' + TableName + ' A Set ';
+  SQL.Add(UpdateSQL);
   for I := 0 to FieldNames.Count - 1 do
     begin
       if QuotedStrings then
-        UpdateSQL := UpdateSQL + Separator + '"' + FieldNames[I] + '" = :' + AnsiUpperCase(FieldNames[I])
+        UpdateSQL := Separator + '"' + FieldNames[I] + '" = :' + AnsiUpperCase(FieldNames[I])
       else
-        UpdateSQL := UpdateSQL + Separator + QuoteIdentifierIfNeeded(FGetFieldNames.Database.SQLDialect,FieldNames[I]) + ' = :' + AnsiUpperCase(FieldNames[I]);
-      Separator := ','#$0d#$0a'  A.';
+        UpdateSQL := Separator + QuoteIdentifierIfNeeded(FGetFieldNames.Database.SQLDialect,FieldNames[I]) + ' = :' + AnsiUpperCase(FieldNames[I]);
+      if I < FieldNames.Count - 1 then
+        UpdateSQL := UpdateSQL + ',';
+      SQL.Add(UpdateSQL);
     end;
-  SQL.Add(UpdateSQL);
   AddWhereClause(TableName,QuotedStrings,SQL,true)
 end;
 

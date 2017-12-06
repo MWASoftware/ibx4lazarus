@@ -1,7 +1,7 @@
 object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
-  Left = 527
+  Left = 397
   Height = 437
-  Top = 460
+  Top = 197
   Width = 747
   ActiveControl = PageControl
   Caption = 'Select SQL Editor'
@@ -9,7 +9,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   ClientWidth = 747
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object Label3: TLabel
     Left = 279
     Height = 14
@@ -17,15 +17,6 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Width = 24
     Caption = 'SQL'
     ParentColor = False
-  end
-  object SQLText: TMemo
-    Left = 279
-    Height = 327
-    Top = 36
-    Width = 437
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    ScrollBars = ssAutoBoth
-    TabOrder = 0
   end
   object Button1: TButton
     Left = 550
@@ -36,7 +27,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 0
   end
   object Button2: TButton
     Left = 638
@@ -47,7 +38,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
   object GenerateBtn: TButton
     Left = 278
@@ -57,7 +48,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
     OnClick = GenerateBtnClick
-    TabOrder = 3
+    TabOrder = 2
   end
   object TestBtn: TButton
     Left = 414
@@ -67,7 +58,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'Test'
     OnClick = TestBtnClick
-    TabOrder = 4
+    TabOrder = 3
   end
   object QuoteFields: TCheckBox
     Left = 24
@@ -75,7 +66,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Top = 400
     Width = 125
     Caption = '&Quote Identifiers'
-    TabOrder = 5
+    TabOrder = 4
   end
   object PageControl: TPageControl
     Left = 24
@@ -84,7 +75,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Width = 232
     ActivePage = SelectPage
     TabIndex = 0
-    TabOrder = 6
+    TabOrder = 5
     object SelectPage: TTabSheet
       Caption = 'Tables'
       ClientHeight = 303
@@ -236,7 +227,21 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Top = 376
     Width = 171
     Caption = 'Allow DSQL Placeholders'
+    TabOrder = 6
+  end
+  inline IBSQLEditFrame1: TIBSQLEditFrame
+    Left = 282
+    Height = 331
+    Top = 32
+    Width = 448
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 331
+    ClientWidth = 448
     TabOrder = 7
+    inherited SQLText: TSynEdit
+      Height = 331
+      Width = 448
+    end
   end
   object IBTransaction1: TIBTransaction
     Active = False

@@ -30,8 +30,8 @@ unit IBUpdateSQLEditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  ComCtrls, StdCtrls, ExtCtrls, IBSystemTables, IBUpdateSQL, IBDatabase;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ComCtrls,
+  StdCtrls, ExtCtrls, IBSystemTables, IBSQLEditFrame, IBUpdateSQL, IBDatabase;
 
 type
 
@@ -39,6 +39,7 @@ type
 
   TIBUpdateSQLEditorForm = class(TForm)
     GenerateParams: TCheckBox;
+    IBSQLEditFrame1: TIBSQLEditFrame;
     TestBtn: TButton;
     CancelButton: TButton;
     FieldsPage: TTabSheet;
@@ -54,7 +55,6 @@ type
     OkButton: TButton;
     PageControl: TPageControl;
     QuoteFields: TCheckBox;
-    SQLMemo: TMemo;
     SQLPage: TTabSheet;
     StatementType: TRadioGroup;
     FieldList: TListBox;
@@ -165,8 +165,8 @@ end;
 
 procedure TIBUpdateSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
-  if SQLMemo.Lines.Text <> '' then
-    FIBSystemTables.TestSQL(SQLMemo.Lines.Text,GenerateParams.Checked);
+  if IBSQLEditFrame1.SQLText.Lines.Text <> '' then
+    FIBSystemTables.TestSQL(IBSQLEditFrame1.SQLText.Lines.Text,GenerateParams.Checked);
 end;
 
 procedure TIBUpdateSQLEditorForm.GenerateBtnClick(Sender: TObject);
@@ -231,24 +231,24 @@ begin
   if FDirty then
     case FCurrentStatement of
     0: //Modify
-        FModifySQL.Assign(SQLMemo.Lines);
+        FModifySQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     1: //Insert
-        FInsertSQL.Assign(SQLMemo.Lines);
+        FInsertSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     2: // Delete
-        FDeleteSQL.Assign(SQLMemo.Lines);
+        FDeleteSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     3: //Refresh
-        FRefreshSQL.Assign(SQLMemo.Lines);
+        FRefreshSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     end;
   FDirty := false;
   case StatementType.ItemIndex of
   0: // Modify
-    SQLMemo.Lines.Assign(FModifySQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FModifySQL)  ;
   1: //Insert
-    SQLMemo.Lines.Assign(FInsertSQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FInsertSQL)  ;
   2: // Delete
-    SQLMemo.Lines.Assign(FDeleteSQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FDeleteSQL)  ;
   3: //Refresh
-    SQLMemo.Lines.Assign(FRefreshSQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FRefreshSQL)  ;
   end;
   FCurrentStatement := StatementType.ItemIndex;
 end;

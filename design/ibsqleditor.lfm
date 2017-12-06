@@ -1,7 +1,7 @@
 object IBSQLEditorForm: TIBSQLEditorForm
-  Left = 2090
+  Left = 448
   Height = 425
-  Top = 382
+  Top = 188
   Width = 716
   ActiveControl = PageControl
   Caption = 'IBSQL Editor'
@@ -9,7 +9,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
   ClientWidth = 716
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object Label3: TLabel
     Left = 288
     Height = 14
@@ -17,15 +17,6 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Width = 24
     Caption = 'SQL'
     ParentColor = False
-  end
-  object SQLText: TMemo
-    Left = 288
-    Height = 335
-    Top = 27
-    Width = 418
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    ScrollBars = ssAutoBoth
-    TabOrder = 0
   end
   object GenerateBtn: TButton
     Left = 267
@@ -35,7 +26,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
     OnClick = GenerateBtnClick
-    TabOrder = 1
+    TabOrder = 0
   end
   object Button2: TButton
     Left = 627
@@ -46,7 +37,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
   object QuoteFields: TCheckBox
     Left = 16
@@ -54,7 +45,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Top = 392
     Width = 125
     Caption = '&Quote Identifiers'
-    TabOrder = 3
+    TabOrder = 2
   end
   object Button1: TButton
     Left = 539
@@ -65,7 +56,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 4
+    TabOrder = 3
   end
   object PageControl: TPageControl
     Left = 16
@@ -74,7 +65,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Width = 256
     ActivePage = SelectPage
     TabIndex = 0
-    TabOrder = 5
+    TabOrder = 4
     TabPosition = tpLeft
     object SelectPage: TTabSheet
       Caption = 'Select'
@@ -417,7 +408,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'Test'
     OnClick = TestBtnClick
-    TabOrder = 6
+    TabOrder = 5
   end
   object GenerateParams: TCheckBox
     Left = 16
@@ -425,7 +416,21 @@ object IBSQLEditorForm: TIBSQLEditorForm
     Top = 368
     Width = 171
     Caption = 'Allow DSQL Placeholders'
+    TabOrder = 6
+  end
+  inline IBSQLEditFrame1: TIBSQLEditFrame
+    Left = 289
+    Height = 340
+    Top = 24
+    Width = 407
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 340
+    ClientWidth = 407
     TabOrder = 7
+    inherited SQLText: TSynEdit
+      Height = 340
+      Width = 407
+    end
   end
   object IBTransaction1: TIBTransaction
     Active = False

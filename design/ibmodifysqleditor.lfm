@@ -1,14 +1,14 @@
 object IBModifySQLEditorForm: TIBModifySQLEditorForm
-  Left = 508
+  Left = 328
   Height = 438
-  Top = 250
+  Top = 305
   Width = 749
   Caption = 'Modify SQL Editor'
   ClientHeight = 438
   ClientWidth = 749
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object Label3: TLabel
     Left = 279
     Height = 14
@@ -17,17 +17,8 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Caption = 'SQL'
     ParentColor = False
   end
-  object SQLText: TMemo
-    Left = 279
-    Height = 328
-    Top = 36
-    Width = 439
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    ScrollBars = ssAutoBoth
-    TabOrder = 0
-  end
   object Button1: TButton
-    Left = 552
+    Left = 576
     Height = 30
     Top = 379
     Width = 72
@@ -35,10 +26,10 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 0
   end
   object Button2: TButton
-    Left = 640
+    Left = 664
     Height = 30
     Top = 380
     Width = 72
@@ -46,7 +37,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
   object GenerateBtn: TButton
     Left = 280
@@ -56,7 +47,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
     OnClick = GenerateBtnClick
-    TabOrder = 3
+    TabOrder = 2
   end
   object TestBtn: TButton
     Left = 416
@@ -66,7 +57,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'Test'
     OnClick = TestBtnClick
-    TabOrder = 4
+    TabOrder = 3
   end
   object QuoteFields: TCheckBox
     Left = 16
@@ -74,7 +65,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Top = 400
     Width = 125
     Caption = '&Quote Identifiers'
-    TabOrder = 5
+    TabOrder = 4
   end
   object GenerateParams: TCheckBox
     Left = 16
@@ -82,7 +73,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Top = 376
     Width = 171
     Caption = 'Allow DSQL Placeholders'
-    TabOrder = 6
+    TabOrder = 5
   end
   object PageControl: TPageControl
     Left = 18
@@ -91,7 +82,7 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
     Width = 238
     ActivePage = ExecutePage
     TabIndex = 1
-    TabOrder = 7
+    TabOrder = 6
     object ModifyPage: TTabSheet
       Caption = 'Update'
       ClientHeight = 314
@@ -244,6 +235,20 @@ object IBModifySQLEditorForm: TIBModifySQLEditorForm
         ParentFont = False
         Visible = False
       end
+    end
+  end
+  inline IBSQLEditFrame1: TIBSQLEditFrame
+    Left = 281
+    Height = 331
+    Top = 31
+    Width = 453
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 331
+    ClientWidth = 453
+    TabOrder = 7
+    inherited SQLText: TSynEdit
+      Height = 331
+      Width = 453
     end
   end
   object IBTransaction1: TIBTransaction

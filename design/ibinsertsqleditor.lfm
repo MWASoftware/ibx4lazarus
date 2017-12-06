@@ -1,14 +1,14 @@
 object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
-  Left = 2288
+  Left = 308
   Height = 436
-  Top = 468
+  Top = 328
   Width = 748
   Caption = 'Insert SQL Editor'
   ClientHeight = 436
   ClientWidth = 748
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object Label3: TLabel
     Left = 279
     Height = 14
@@ -17,17 +17,8 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     Caption = 'SQL'
     ParentColor = False
   end
-  object SQLText: TMemo
-    Left = 279
-    Height = 326
-    Top = 36
-    Width = 438
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    ScrollBars = ssAutoBoth
-    TabOrder = 0
-  end
   object Button1: TButton
-    Left = 551
+    Left = 568
     Height = 30
     Top = 378
     Width = 72
@@ -35,10 +26,10 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 0
   end
   object Button2: TButton
-    Left = 639
+    Left = 656
     Height = 30
     Top = 378
     Width = 72
@@ -46,7 +37,7 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
   object GenerateBtn: TButton
     Left = 279
@@ -56,7 +47,7 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
     OnClick = GenerateBtnClick
-    TabOrder = 3
+    TabOrder = 2
   end
   object TestBtn: TButton
     Left = 415
@@ -66,7 +57,7 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'Test'
     OnClick = TestBtnClick
-    TabOrder = 4
+    TabOrder = 3
   end
   object QuoteFields: TCheckBox
     Left = 16
@@ -74,7 +65,7 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     Top = 392
     Width = 125
     Caption = '&Quote Identifiers'
-    TabOrder = 5
+    TabOrder = 4
   end
   object GenerateParams: TCheckBox
     Left = 16
@@ -82,7 +73,7 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     Top = 368
     Width = 171
     Caption = 'Allow DSQL Placeholders'
-    TabOrder = 6
+    TabOrder = 5
   end
   object PageControl: TPageControl
     Left = 16
@@ -91,7 +82,7 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     Width = 233
     ActivePage = ExecutePage
     TabIndex = 1
-    TabOrder = 7
+    TabOrder = 6
     object InsertPage: TTabSheet
       Caption = 'Insert'
       ClientHeight = 317
@@ -214,6 +205,20 @@ object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
         ParentFont = False
         Visible = False
       end
+    end
+  end
+  inline IBSQLEditFrame1: TIBSQLEditFrame
+    Left = 280
+    Height = 330
+    Top = 30
+    Width = 451
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 330
+    ClientWidth = 451
+    TabOrder = 7
+    inherited SQLText: TSynEdit
+      Height = 330
+      Width = 451
     end
   end
   object IBTransaction1: TIBTransaction

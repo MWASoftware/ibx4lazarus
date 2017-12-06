@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, IBSystemTables, IBDatabase, IBCustomDataSet;
+  StdCtrls, IBSystemTables, IBSQLEditFrame, IBDatabase, IBCustomDataSet;
 
 type
 
@@ -17,6 +17,7 @@ type
     Button2: TButton;
     GenerateBtn: TButton;
     GenerateParams: TCheckBox;
+    IBSQLEditFrame1: TIBSQLEditFrame;
     TestBtn: TButton;
     FieldList: TListBox;
     IBTransaction1: TIBTransaction;
@@ -26,7 +27,6 @@ type
     Label4: TLabel;
     PrimaryKeyList: TListBox;
     QuoteFields: TCheckBox;
-    SQLText: TMemo;
     TableNamesCombo: TComboBox;
     procedure GenerateBtnClick(Sender: TObject);
     procedure TestBtnClick(Sender: TObject);
@@ -70,11 +70,11 @@ begin
         SetDatabase(DataSet.Database);
         GenerateParams.Checked := DataSet.GenerateParamNames;
     end;
-    SQLText.Lines.Assign(SelectSQL);
+    IBSQLEditFrame1.SQLText.Lines.Assign(SelectSQL);
     Result := ShowModal = mrOK;
     if Result then
     begin
-     SelectSQL.Assign(SQLText.Lines);
+     SelectSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
      if assigned(DataSet) then
           DataSet.GenerateParamNames := GenerateParams.Checked
     end;
@@ -95,9 +95,9 @@ begin
   if TableNamesCombo.Items.Count > 0 then
   begin
     TableNamesCombo.ItemIndex := 0;
-    if Trim(SQLText.Text) <> '' then
+    if Trim(IBSQLEditFrame1.SQLText.Text) <> '' then
     begin
-      FIBSystemTables.GetTableAndColumns(SQLText.Text,TableName,nil);
+      FIBSystemTables.GetTableAndColumns(IBSQLEditFrame1.SQLText.Text,TableName,nil);
       TableNamesCombo.ItemIndex := TableNamesCombo.Items.IndexOf(TableName)
     end;
     FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items);
@@ -107,14 +107,14 @@ end;
 
 procedure TIBRefreshSQLEditorForm.PrimaryKeyListDblClick(Sender: TObject);
 begin
-  SQLText.SelText := PrimaryKeyList.Items[PrimaryKeyList.ItemIndex];
-  SQLText.SetFocus
+  IBSQLEditFrame1.SQLText.SelText := PrimaryKeyList.Items[PrimaryKeyList.ItemIndex];
+  IBSQLEditFrame1.SQLText.SetFocus
 end;
 
 procedure TIBRefreshSQLEditorForm.FieldListDblClick(Sender: TObject);
 begin
-  SQLText.SelText := FieldList.Items[FieldList.ItemIndex];
-  SQLText.SetFocus
+  IBSQLEditFrame1.SQLText.SelText := FieldList.Items[FieldList.ItemIndex];
+  IBSQLEditFrame1.SQLText.SetFocus
 end;
 
 procedure TIBRefreshSQLEditorForm.GenerateBtnClick(Sender: TObject);
@@ -122,7 +122,8 @@ var FieldNames: TStrings;
 begin
   FieldNames :=  FIBSystemTables.GetFieldNames(FieldList);
   try
-    FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,SQLText.Lines)
+    FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,IBSQLEditFrame1.SQLText.Lines);
+    IBSQLEditFrame1.DoWrapText;
   finally
     FieldNames.Free
   end;
@@ -130,7 +131,7 @@ end;
 
 procedure TIBRefreshSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
-  FIBSystemTables.TestSQL(SQLText.Lines.Text,GenerateParams.Checked)
+  FIBSystemTables.TestSQL(IBSQLEditFrame1.SQLText.Lines.Text,GenerateParams.Checked)
 end;
 
 procedure TIBRefreshSQLEditorForm.TableNamesComboCloseUp(Sender: TObject);
