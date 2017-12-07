@@ -217,12 +217,14 @@ begin
   begin
     FieldNames := FIBSystemTables.GetFieldNames(SelectFieldsList);
     FIBSystemTables.GenerateSelectSQL(SelectTableNames.Text,QuoteFields.Checked,FieldNames,IBSQLEditFrame1.SQLText.Lines);
+    IBSQLEditFrame1.DoWrapText;
   end
   else
   if PageControl.ActivePage = InsertPage then
   begin
     FieldNames := FIBSystemTables.GetFieldNames(InsertFieldsList);
     FIBSystemTables.GenerateInsertSQL(InsertTableNames.Text,QuoteFields.Checked,FieldNames,IBSQLEditFrame1.SQLText.Lines);
+    IBSQLEditFrame1.DoWrapText;
   end
   else
   if PageControl.ActivePage = ModifyPage then
@@ -235,12 +237,14 @@ begin
      FIBSystemTables.GenerateDeleteSQL(DeleteTableNames.Text,QuoteFields.Checked,IBSQLEditFrame1.SQLText.Lines)
   else
   if PageControl.ActivePage = ExecutePage then
+  begin
      FIBSystemTables.GenerateExecuteSQL(ProcedureNames.Text,QuoteFields.Checked, FExecuteOnly,
              ProcInputList.Items,ProcOutputList.Items,IBSQLEditFrame1.SQLText.Lines);
+     IBSQLEditFrame1.DoWrapText;
+  end;
 
   if FieldNames <> nil then
     FieldNames.Free;
-  IBSQLEditFrame1.DoWrapText;
 end;
 
 procedure TIBSQLEditorForm.TestBtnClick(Sender: TObject);
@@ -290,7 +294,7 @@ begin
     FIBSystemTables.GetTableAndColumns(IBSQLEditFrame1.SQLText.Text,TableName,nil);
     InsertTableNames.ItemIndex := InsertTableNames.Items.IndexOf(TableName);
   end;
-  FIBSystemTables.GetFieldNames(InsertTableNames.Text,InsertFieldsList.Items);
+  FIBSystemTables.GetFieldNames(InsertTableNames.Text,InsertFieldsList.Items,true,false);
 
 end;
 

@@ -600,15 +600,15 @@ var stats: TPerfCounters;
 begin
   if Statement.GetPerfStatistics(stats) then
   begin
-    Add2Log(Format('Current memory = %d',[stats[psCurrentMemory]]));
-    Add2Log(Format('Delta memory = %d',[stats[psDeltaMemory]]));
-    Add2Log(Format('Max memory = %d',[stats[psMaxMemory]]));
+    Add2Log(Format('Current memory = %f',[stats[psCurrentMemory]]));
+    Add2Log(Format('Delta memory = %f',[stats[psDeltaMemory]]));
+    Add2Log(Format('Max memory = %f',[stats[psMaxMemory]]));
     Add2Log('Elapsed time= ' + FormatFloat('#0.000',stats[psRealTime]/1000) +' sec');
     Add2Log('Cpu = ' + FormatFloat('#0.000',stats[psUserTime]/1000) + ' sec');
-    Add2Log(Format('Buffers = %d',[stats[psBuffers]]));
-    Add2Log(Format('Reads = %d',[stats[psReads]]));
-    Add2Log(Format('Writes = %d',[stats[psWrites]]));
-    Add2Log(Format('Fetches = %d',[stats[psFetches]]));
+    Add2Log(Format('Buffers = %f',[stats[psBuffers]]));
+    Add2Log(Format('Reads = %f',[stats[psReads]]));
+    Add2Log(Format('Writes = %f',[stats[psWrites]]));
+    Add2Log(Format('Fetches = %f',[stats[psFetches]]));
  end;
 end;
 
