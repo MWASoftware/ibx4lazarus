@@ -144,7 +144,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       OnShow = InsertPageShow
       object Label8: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 3
         Width = 69
         Caption = 'Table Name'
@@ -152,7 +152,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object Label9: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 53
         Width = 33
         Caption = 'Fields'
@@ -195,7 +195,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       OnShow = ModifyPageShow
       object Label10: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 3
         Width = 69
         Caption = 'Table Name'
@@ -203,7 +203,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object Label11: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 53
         Width = 33
         Caption = 'Fields'
@@ -211,7 +211,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object Label12: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 228
         Width = 77
         Caption = 'Primary Keys'
@@ -267,7 +267,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object Label5: TLabel
         Left = 27
-        Height = 15
+        Height = 14
         Top = 202
         Width = 67
         Caption = 'in Field List'
@@ -281,7 +281,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       OnShow = DeletePageShow
       object Label14: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 3
         Width = 69
         Caption = 'Table Name'
@@ -289,7 +289,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object Label15: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 66
         Width = 77
         Caption = 'Primary Keys'
@@ -328,7 +328,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 3
         Width = 100
         Caption = 'Procedure Name'
@@ -336,7 +336,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object Label17: TLabel
         Left = 10
-        Height = 15
+        Height = 14
         Top = 61
         Width = 104
         Caption = 'Input Parameters'
@@ -344,7 +344,7 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object Label18: TLabel
         Left = 11
-        Height = 15
+        Height = 14
         Top = 181
         Width = 114
         Caption = 'Output Parameters'
@@ -387,8 +387,8 @@ object IBSQLEditorForm: TIBSQLEditorForm
       end
       object SelectProcedure: TLabel
         Left = 7
-        Height = 14
-        Top = 310
+        Height = 13
+        Top = 311
         Width = 126
         Anchors = [akLeft, akBottom]
         Caption = 'Is ''Select Procedure'''
@@ -428,8 +428,17 @@ object IBSQLEditorForm: TIBSQLEditorForm
     ClientWidth = 407
     TabOrder = 7
     inherited SQLText: TSynEdit
-      Height = 340
+      Height = 314
       Width = 407
+    end
+    inherited ToolBar1: TToolBar
+      Width = 407
+      inherited ToolButton3: TToolButton
+        Height = 22
+      end
+      inherited ToolButton7: TToolButton
+        Height = 22
+      end
     end
   end
   object IBTransaction1: TIBTransaction
