@@ -109,6 +109,10 @@ type
     FSharedDataDir: string;
     FUpgradeConf: TUpgradeConfFile;
     FInCreateNew: boolean;
+    FSavedAfterConnect: TNotifyEvent;
+    FSavedAfterDisconnect: TNotifyEvent;
+    FSavedBeforeConnect: TNotifyEvent;
+    FSavedBeforeDisconnect: TNotifyEvent;
     procedure CheckEnabled;
     procedure CreateDatabase(DBName: string; DBParams: TStrings; Overwrite: boolean);
     function GetDatabase: TIBDatabase;
@@ -127,6 +131,8 @@ type
     procedure SetFirebirdDirectory(AValue: string);
     procedure SetupFirebirdEnv;
     procedure UpgradeCheck;
+    procedure SaveEvents;
+    procedure RestoreEvents;
   protected
     { Protected declarations }
     function AllowInitialisation: boolean; virtual;
@@ -237,14 +243,19 @@ begin
  end;
 
  SetupFirebirdEnv;
- if not CreateNewDatabase(DBName,DBParams,DBArchive) then
- begin
-   Database.Connected := true;
-   Database.DropDatabase;
-   raise EIBLocalException.Create(sCreateFailed);
- end
- else
-   FNewDBCreated := true;
+ SaveEvents;
+ try
+   if not CreateNewDatabase(DBName,DBParams,DBArchive) then
+   begin
+     Database.Connected := true;
+     Database.DropDatabase;
+     raise EIBLocalException.Create(sCreateFailed);
+   end
+   else
+     FNewDBCreated := true;
+ finally
+   RestoreEvents;
+ end;
 end;
 
 function TCustomIBLocalDBSupport.GetDatabase: TIBDatabase;
@@ -381,6 +392,26 @@ begin
   else
   if (CurrentDBVersionNo < RequiredVersionNo) and (iblAutoUpgrade in FOptions) then
     PerformUpgrade(RequiredVersionNo);
+end;
+
+procedure TCustomIBLocalDBSupport.SaveEvents;
+begin
+  FSavedAfterConnect := Database.AfterConnect;
+  Database.AfterConnect := nil;
+  FSavedAfterDisconnect := Database.AfterDisconnect;
+  Database.AfterDisconnect := nil;
+  FSavedBeforeConnect := Database.BeforeConnect;
+  Database.BeforeConnect := nil;
+  FSavedBeforeDisconnect := Database.BeforeDisconnect;
+  Database.BeforeDisconnect := nil;
+end;
+
+procedure TCustomIBLocalDBSupport.RestoreEvents;
+begin
+  Database.AfterConnect := FSavedAfterConnect;
+  Database.AfterDisconnect := FSavedAfterDisconnect;
+  Database.BeforeConnect := FSavedBeforeConnect;
+  Database.BeforeDisconnect := FSavedBeforeDisconnect;
 end;
 
 function TCustomIBLocalDBSupport.AllowInitialisation: boolean;

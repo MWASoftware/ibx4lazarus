@@ -5,7 +5,6 @@ object IBSQLEditFrame: TIBSQLEditFrame
   Width = 587
   ClientHeight = 336
   ClientWidth = 587
-  LCLVersion = '1.8.1.0'
   TabOrder = 0
   DesignLeft = 2016
   DesignTop = 319
@@ -534,7 +533,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     end
     object ToolButton3: TToolButton
       Left = 49
-      Height = 8
+      Height = 22
       Top = 2
       Caption = 'ToolButton3'
       Style = tbsSeparator
@@ -556,7 +555,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     end
     object ToolButton7: TToolButton
       Left = 126
-      Height = 8
+      Height = 22
       Top = 2
       Caption = 'ToolButton7'
       Style = tbsSeparator
@@ -587,7 +586,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     Enabled = False
     KeyAttri.Foreground = clBlue
     NumberAttri.Foreground = clRed
-    SQLDialect = sqlSybase
+    SQLDialect = sqlInterbase6
     left = 195
     top = 141
   end

@@ -47,6 +47,7 @@ begin
   try
     FileName := DBArchive;
     IBXScript.Database := aDatabase;
+    IBXScript.Transaction := aDatabase.DefaultTransaction;
     DatabasePath := aDatabase.DatabaseName;
     Result := ShowModal = mrOK;
   finally
@@ -93,6 +94,8 @@ begin
       end;
       end;
     until false;
+    with IBXScript.Transaction do
+      if InTransaction then Commit;
     IBXScript.Database.Connected := false;
   except on E:Exception do
     begin
