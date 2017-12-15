@@ -135,7 +135,7 @@ type
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy; override;
-    function FindNode(KeyValuePath: array of variant; SelectNode: boolean): TIBTreeNode; overload;
+    function FindNode(KeyValuePath: TVariantArray; SelectNode: boolean): TIBTreeNode; overload;
     function FindNode(KeyValue: variant): TIBTreeNode; overload;
     function GetNodePath(Node: TTreeNode): TVariantArray;
     property DataSet: TDataSet read GetDataSet;
@@ -694,8 +694,8 @@ begin
   inherited Destroy;
 end;
 
-function TIBTreeView.FindNode(KeyValuePath: array of variant;
-  SelectNode: boolean): TIBTreeNode;
+function TIBTreeView.FindNode(KeyValuePath: TVariantArray; SelectNode: boolean
+  ): TIBTreeNode;
 var Node: TTreeNode;
     i,j: integer;
 begin
