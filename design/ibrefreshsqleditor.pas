@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, IBSystemTables, IBSQLEditFrame, IBDatabase, IBCustomDataSet;
+  StdCtrls, IBSQLEditFrame, IBDatabase, IBCustomDataSet,
+  IBLookupComboEditBox, IBDynamicGrid;
 
 type
 
@@ -15,33 +16,35 @@ type
   TIBRefreshSQLEditorForm = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    FieldNamesGrid: TIBDynamicGrid;
     GenerateBtn: TButton;
     GenerateParams: TCheckBox;
     IBSQLEditFrame1: TIBSQLEditFrame;
+    IncludeSysTables: TCheckBox;
+    PrimaryKeysGrid: TIBDynamicGrid;
+    SelectSelectAll: TCheckBox;
+    SelectTableNames: TIBLookupComboEditBox;
     TestBtn: TButton;
-    FieldList: TListBox;
-    IBTransaction1: TIBTransaction;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
-    PrimaryKeyList: TListBox;
     QuoteFields: TCheckBox;
-    TableNamesCombo: TComboBox;
     procedure GenerateBtnClick(Sender: TObject);
+    procedure IncludeSysTablesChange(Sender: TObject);
+    procedure SelectSelectAllChange(Sender: TObject);
+    procedure SelectTableNamesDblClick(Sender: TObject);
     procedure TestBtnClick(Sender: TObject);
     procedure FieldListDblClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure PrimaryKeyListDblClick(Sender: TObject);
-    procedure TableNamesComboCloseUp(Sender: TObject);
   private
     { private declarations }
-    FIBSystemTables: TIBSystemTables;
+      procedure HandleUserTablesOpened(Sender: TObject);
+  protected
+    procedure Loaded; override;
   public
     { public declarations }
-    constructor Create(TheOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure SetDatabase(Database: TIBDatabase);
   end; 
 
 var
@@ -67,8 +70,8 @@ begin
   try
     if assigned(DataSet) then
     begin
-        SetDatabase(DataSet.Database);
-        GenerateParams.Checked := DataSet.GenerateParamNames;
+      IBSQLEditFrame1.Database := DataSet.Database;
+      GenerateParams.Checked := DataSet.GenerateParamNames;
     end;
     IBSQLEditFrame1.SQLText.Lines.Assign(SelectSQL);
     Result := ShowModal = mrOK;
@@ -86,76 +89,66 @@ end;
 { TIBRefreshSQLEditorForm }
 
 procedure TIBRefreshSQLEditorForm.FormShow(Sender: TObject);
-var TableName: string;
 begin
-  GenerateBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
-  TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
-  TableNamesCombo.Items.Clear;
-  FIBSystemTables.GetTableNames(TableNamesCombo.Items);
-  if TableNamesCombo.Items.Count > 0 then
-  begin
-    TableNamesCombo.ItemIndex := 0;
-    if Trim(IBSQLEditFrame1.SQLText.Text) <> '' then
-    begin
-      FIBSystemTables.GetTableAndColumns(IBSQLEditFrame1.SQLText.Text,TableName,nil);
-      TableNamesCombo.ItemIndex := TableNamesCombo.Items.IndexOf(TableName)
-    end;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items);
-    FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
-  end;
+  GenerateBtn.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
+  TestBtn.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
+  if TestBtn.Enabled then;
+    IBSQLEditFrame1.UserTables.Active := true;
 end;
 
 procedure TIBRefreshSQLEditorForm.PrimaryKeyListDblClick(Sender: TObject);
 begin
-  IBSQLEditFrame1.SQLText.SelText := PrimaryKeyList.Items[PrimaryKeyList.ItemIndex];
-  IBSQLEditFrame1.SQLText.SetFocus
+  IBSQLEditFrame1.InsertSelectedPrimaryKey;
 end;
 
 procedure TIBRefreshSQLEditorForm.FieldListDblClick(Sender: TObject);
 begin
-  IBSQLEditFrame1.SQLText.SelText := FieldList.Items[FieldList.ItemIndex];
-  IBSQLEditFrame1.SQLText.SetFocus
+  IBSQLEditFrame1.InsertSelectedFieldName;
 end;
 
 procedure TIBRefreshSQLEditorForm.GenerateBtnClick(Sender: TObject);
-var FieldNames: TStrings;
 begin
-  FieldNames :=  FIBSystemTables.GetFieldNames(FieldList);
-  try
-    FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,IBSQLEditFrame1.SQLText.Lines);
-    IBSQLEditFrame1.DoWrapText;
-  finally
-    FieldNames.Free
-  end;
+  IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked);
+end;
+
+procedure TIBRefreshSQLEditorForm.IncludeSysTablesChange(Sender: TObject);
+begin
+  IBSQLEditFrame1.IncludeSystemTables := IncludeSysTables.Checked;
+end;
+
+procedure TIBRefreshSQLEditorForm.SelectSelectAllChange(Sender: TObject);
+begin
+  IBSQLEditFrame1.SelectAllFields(SelectSelectAll.Checked);
+end;
+
+procedure TIBRefreshSQLEditorForm.SelectTableNamesDblClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.InsertTableName;
 end;
 
 procedure TIBRefreshSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
-  FIBSystemTables.TestSQL(IBSQLEditFrame1.SQLText.Lines.Text,GenerateParams.Checked)
+  IBSQLEditFrame1.TestSQL(GenerateParams.Checked)
 end;
 
-procedure TIBRefreshSQLEditorForm.TableNamesComboCloseUp(Sender: TObject);
+procedure TIBRefreshSQLEditorForm.HandleUserTablesOpened(Sender: TObject);
 begin
-  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items);
-  FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
+  SelectSelectAll.Checked := true;
 end;
 
-constructor TIBRefreshSQLEditorForm.Create(TheOwner: TComponent);
+procedure TIBRefreshSQLEditorForm.Loaded;
 begin
-  inherited Create(TheOwner);
-  FIBSystemTables := TIBSystemTables.Create;
-end;
-
-destructor TIBRefreshSQLEditorForm.Destroy;
-begin
-  if assigned(FIBSystemTables) then FIBSystemTables.Free;
-  inherited Destroy;
-end;
-
-procedure TIBRefreshSQLEditorForm.SetDatabase(Database: TIBDatabase);
-begin
-  IBTransaction1.DefaultDatabase := Database;
-  FIBSystemTables.SelectDatabase(Database,IBTransaction1)
+  inherited Loaded;
+  if IBSQLEditFrame1 <> nil then
+  begin
+    IBSQLEditFrame1.OnUserTablesOpened := @HandleUserTablesOpened;
+    if SelectTableNames <> nil then
+      SelectTableNames.ListSource :=  IBSQLEditFrame1.UserTableSource;
+    if FieldNamesGrid <> nil then
+      FieldNamesGrid.DataSource := IBSQLEditFrame1.FieldsSource;
+    if PrimaryKeysGrid <> nil then
+      PrimaryKeysGrid.DataSource := IBSQLEditFrame1.PrimaryKeySource;
+  end;
 end;
 
 end.

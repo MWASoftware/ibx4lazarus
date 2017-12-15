@@ -31,13 +31,29 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, LResources, Forms,
-  Controls, ActnList, Menus, Dialogs, ComCtrls, LazSynTextArea;
+  Controls, ActnList, Menus, Dialogs, ComCtrls, ExtCtrls, StdCtrls, IBQuery,
+  IBSQL, IBDatabase, IBUpdate, IBLookupComboEditBox, IBCustomDataset, db,
+  LazSynTextArea, IB;
 
 type
 
   { TIBSQLEditFrame }
 
   TIBSQLEditFrame = class(TFrame)
+    FieldNameList: TIBQuery;
+    FieldsSource: TDataSource;
+    IBUpdate1: TIBUpdate;
+    IBUpdate2: TIBUpdate;
+    IBUpdate3: TIBUpdate;
+    IBUpdate4: TIBUpdate;
+    SQLTransaction: TIBTransaction;
+    IdentifyStatementSQL: TIBSQL;
+    PrimaryKeys: TIBQuery;
+    PrimaryKeySource: TDataSource;
+    ProcInputParams: TIBQuery;
+    ProcInputSource: TDataSource;
+    ProcOutputParams: TIBQuery;
+    ProcOutputSource: TDataSource;
     Redo: TAction;
     ToolButton10: TToolButton;
     ToolButton11: TToolButton;
@@ -59,6 +75,10 @@ type
     ToolButton7: TToolButton;
     ToolButton8: TToolButton;
     ToolButton9: TToolButton;
+    UserProcedures: TIBQuery;
+    UserProcSource: TDataSource;
+    UserTables: TIBQuery;
+    UserTableSource: TDataSource;
     WrapText: TAction;
     Clear: TAction;
     MenuItem1: TMenuItem;
@@ -80,6 +100,9 @@ type
     procedure CopyTextExecute(Sender: TObject);
     procedure CutExecute(Sender: TObject);
     procedure CutUpdate(Sender: TObject);
+    procedure FieldNameListBeforeOpen(DataSet: TDataSet);
+    procedure IBUpdate1ApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
+      Params: ISQLParams);
     procedure LoadFromFileExecute(Sender: TObject);
     procedure PasteExecute(Sender: TObject);
     procedure PasteUpdate(Sender: TObject);
@@ -90,25 +113,93 @@ type
     procedure SelectAllUpdate(Sender: TObject);
     procedure UndoExecute(Sender: TObject);
     procedure UndoUpdate(Sender: TObject);
+    procedure UserProceduresAfterOpen(DataSet: TDataSet);
+    procedure UserProceduresBeforeClose(DataSet: TDataSet);
+    procedure UserProceduresBeforeOpen(DataSet: TDataSet);
+    procedure UserTablesAfterOpen(DataSet: TDataSet);
+    procedure UserTablesBeforeClose(DataSet: TDataSet);
+    procedure UserTablesBeforeOpen(DataSet: TDataSet);
     procedure WrapTextExecute(Sender: TObject);
     procedure WrapTextUpdate(Sender: TObject);
   private
+    FDatabase: TIBDatabase;
+    FExecuteOnlyProcs: boolean;
+    FIncludePrimaryKeys: boolean;
+    FIncludeReadOnlyFields: boolean;
+    FIncludeSystemTables: boolean;
+    FOnUserTablesOpened: TNotifyEvent;
+    FOpening: boolean;
+    procedure AddWhereClause(QuotedStrings: boolean; SQL: TStrings;
+      UseOldValues: boolean);
+    function GetSQLType(SQLType: TIBSQLStatementTypes): string;
+    procedure GetFieldNames(Dataset: TDataset; var FieldNames: TStrings);
+    procedure GenerateSelectSQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings); overload;
+    procedure GenerateExecuteSQL(ProcName: string; QuotedStrings: boolean; ExecuteOnly: boolean;
+              InputParams, OutputParams, ExecuteSQL: TStrings); overload;
+    procedure SetDatabase(AValue: TIBDatabase);
+    procedure SetExecuteOnlyProcs(AValue: boolean);
+    procedure SetIncludePrimaryKeys(AValue: boolean);
+    procedure SetIncludeReadOnlyFields(AValue: boolean);
+    procedure SetIncludeSystemTables(AValue: boolean);
 
   public
     procedure DoWrapText;
     procedure UnWrapText;
+    procedure RefreshAll;
+    procedure SelectAllFields(Checked: boolean);
+    procedure GenerateSelectSQL(QuotedStrings: boolean); overload;
+    procedure GenerateRefreshSQL(QuotedStrings: boolean);
+    procedure GenerateExecuteSQL(QuotedStrings: boolean); overload;
+    procedure GenerateInsertSQL(TableName: string; QuotedStrings: boolean; FieldNames, SQL: TStrings);
+    procedure GenerateModifySQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
+    procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);
+    function GetStatementType(var IsStoredProcedure: boolean): TIBSQLStatementTypes;
+    procedure InsertSelectedPrimaryKey;
+    procedure InsertSelectedFieldName;
+    procedure InsertTableName;
+    procedure InsertProcName;
+    procedure InsertSelectedInputParam;
+    procedure InsertSelectedOutputParam;
+    function SyncQueryBuilder: TIBSQLStatementTypes;
+    procedure TestSQL(GenerateParamNames: boolean);
+    property Database: TIBDatabase read FDatabase write SetDatabase;
+    property IncludeReadOnlyFields: boolean read FIncludeReadOnlyFields write SetIncludeReadOnlyFields;
+    property IncludePrimaryKeys: boolean read FIncludePrimaryKeys write SetIncludePrimaryKeys;
+    property IncludeSystemTables: boolean read FIncludeSystemTables write SetIncludeSystemTables;
+    property ExecuteOnlyProcs: boolean read FExecuteOnlyProcs write SetExecuteOnlyProcs;
+    property OnUserTablesOpened: TNotifyEvent read FOnUserTablesOpened write FOnUserTablesOpened;
   end;
 
 implementation
 
+Uses IBUtils, FBMessages;
+
 {$R *.lfm}
 
+const
+  sNoPrimaryKeys = 'RF.RDB$FIELD_NAME not in ' +
+                    '(Select RDB$FIELD_NAME FROM RDB$INDEX_SEGMENTS S JOIN RDB$RELATION_CONSTRAINTS C On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME '+
+                     'Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' and C.RDB$RELATION_NAME = RF.RDB$RELATION_NAME)';
 
 { TIBSQLEditFrame }
 
 procedure TIBSQLEditFrame.CutUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := SQLText.SelText <> '';
+end;
+
+procedure TIBSQLEditFrame.FieldNameListBeforeOpen(DataSet: TDataSet);
+begin
+  if not IncludeReadOnlyFields then
+    (DataSet as TIBQuery).Parser.Add2WhereClause('B.RDB$COMPUTED_SOURCE is NULL');
+  if not IncludePrimaryKeys then
+    (DataSet as TIBQuery).Parser.Add2WhereClause(sNoPrimaryKeys);
+end;
+
+procedure TIBSQLEditFrame.IBUpdate1ApplyUpdates(Sender: TObject;
+  UpdateKind: TUpdateKind; Params: ISQLParams);
+begin
+  //do nothing - dummy to allow edits without database update
 end;
 
 procedure TIBSQLEditFrame.LoadFromFileExecute(Sender: TObject);
@@ -163,6 +254,51 @@ begin
   (Sender as TAction).Enabled := SQLText.CanUndo;
 end;
 
+procedure TIBSQLEditFrame.UserProceduresAfterOpen(DataSet: TDataSet);
+begin
+  ProcInputParams.Active := true;
+  ProcOutputParams.Active := true;
+end;
+
+procedure TIBSQLEditFrame.UserProceduresBeforeClose(DataSet: TDataSet);
+begin
+  ProcInputParams.Active := false;
+  ProcOutputParams.Active := false;
+end;
+
+procedure TIBSQLEditFrame.UserProceduresBeforeOpen(DataSet: TDataSet);
+begin
+  if ExecuteOnlyProcs then
+    (DataSet as TIBQuery).Add2WhereClause('RDB$PROCEDURE_TYPE = 2')
+  else
+    (DataSet as TIBQuery).Add2WhereClause('RDB$PROCEDURE_TYPE <= 2')
+end;
+
+procedure TIBSQLEditFrame.UserTablesAfterOpen(DataSet: TDataSet);
+begin
+  FieldNameList.Active := true;
+  PrimaryKeys.Active := true;
+  FOpening := true;
+  try
+    if assigned(FOnUserTablesOpened) then
+      OnUserTablesOpened(self);
+  finally
+    FOpening := false;
+  end;
+end;
+
+procedure TIBSQLEditFrame.UserTablesBeforeClose(DataSet: TDataSet);
+begin
+  FieldNameList.Active := false;
+  PrimaryKeys.Active := false;
+end;
+
+procedure TIBSQLEditFrame.UserTablesBeforeOpen(DataSet: TDataSet);
+begin
+  if not IncludeSystemTables then
+    (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$SYSTEM_FLAG = 0');
+end;
+
 procedure TIBSQLEditFrame.WrapTextExecute(Sender: TObject);
 begin
   UnWrapText;
@@ -172,6 +308,50 @@ end;
 procedure TIBSQLEditFrame.WrapTextUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := SQLText.Lines.Count > 0;
+end;
+
+procedure TIBSQLEditFrame.SetDatabase(AValue: TIBDatabase);
+var i: integer;
+begin
+  if FDatabase = AValue then Exit;
+  FDatabase := AValue;
+  FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
+  SQLTransaction.DefaultDatabase := FDatabase;
+  for i := 0 to ComponentCount - 1 do
+    if Components[i] is TIBCustomDataset then
+      TIBCustomDataset(Components[i]).Database := FDatabase
+    else
+    if Components[i] is TIBSQL then
+      TIBSQL(Components[i]).Database := FDatabase;
+  SQLTransaction.Active := true;
+end;
+
+procedure TIBSQLEditFrame.SetExecuteOnlyProcs(AValue: boolean);
+begin
+  if FExecuteOnlyProcs = AValue then Exit;
+  FExecuteOnlyProcs := AValue;
+  RefreshAll;
+end;
+
+procedure TIBSQLEditFrame.SetIncludePrimaryKeys(AValue: boolean);
+begin
+  if FIncludePrimaryKeys = AValue then Exit;
+  FIncludePrimaryKeys := AValue;
+  RefreshAll;
+end;
+
+procedure TIBSQLEditFrame.SetIncludeReadOnlyFields(AValue: boolean);
+begin
+  if FIncludeReadOnlyFields = AValue then Exit;
+  FIncludeReadOnlyFields := AValue;
+  RefreshAll;
+end;
+
+procedure TIBSQLEditFrame.SetIncludeSystemTables(AValue: boolean);
+begin
+  if FIncludeSystemTables = AValue then Exit;
+  FIncludeSystemTables := AValue;
+  RefreshAll;
 end;
 
 type
@@ -264,6 +444,88 @@ begin
   end;
 end;
 
+procedure TIBSQLEditFrame.RefreshAll;
+begin
+  if UserTables.Active then
+  begin
+    UserTables.Active := false;
+    UserTables.Active := true;
+  end;
+  if UserProcedures.Active then
+  begin
+    UserProcedures.Active := false;
+    UserProcedures.Active := true;
+  end;
+end;
+
+procedure TIBSQLEditFrame.SelectAllFields(Checked: boolean);
+
+  procedure DoSelectAllFields(aValue: boolean);
+  begin
+    with FieldNameList do
+    begin
+      DisableControls;
+      try
+        First;
+        while not Eof do
+        begin
+          Edit;
+          FieldByName('Selected').AsInteger := ord(aValue);
+          Post;
+          Next;
+        end;
+        First;
+      finally
+        EnableControls;
+      end;
+    end;
+  end;
+
+begin
+  if FOpening then Exit;
+   DoSelectAllFields(Checked);
+end;
+
+procedure TIBSQLEditFrame.GenerateSelectSQL(QuotedStrings: boolean);
+var FieldNames: TStrings;
+begin
+  SQLText.Lines.Clear;
+  FieldNames := TStringList.Create;
+  try
+    GetFieldNames(FieldNameList,FieldNames);
+    GenerateSelectSQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,FieldNames,SQLText.Lines);
+  finally
+    FieldNames.Free;
+  end;
+  DoWrapText;
+end;
+
+procedure TIBSQLEditFrame.GenerateRefreshSQL(QuotedStrings: boolean);
+begin
+  GenerateSelectSQL(QuotedStrings);
+  AddWhereClause(QuotedStrings,SQLText.Lines,false);
+end;
+
+procedure TIBSQLEditFrame.GenerateExecuteSQL(QuotedStrings: boolean);
+var InputParams: TStrings;
+    OutputParams: TStrings;
+begin
+  SQLText.Lines.Clear;
+
+  InputParams := TStringList.Create;
+  OutputParams := TStringList.Create;
+  try
+    GetFieldNames(ProcInputParams,InputParams);
+    GetFieldNames(ProcOutputParams,OutputParams);
+    GenerateExecuteSQL(UserProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString,
+      QuotedStrings, UserProcedures.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 2,
+      InputParams,OutputParams,SQLText.Lines);
+  finally
+    InputParams.Free;
+    OutputParams.Free;
+  end;
+end;
+
 procedure TIBSQLEditFrame.CutExecute(Sender: TObject);
 begin
   SQLText.CutToClipboard;
@@ -278,6 +540,432 @@ procedure TIBSQLEditFrame.ClearExecute(Sender: TObject);
 begin
   SQLText.Lines.Clear;
 end;
+
+procedure TIBSQLEditFrame.AddWhereClause(
+  QuotedStrings: boolean; SQL: TStrings; UseOldValues: boolean);
+var WhereClause: string;
+    Separator: string;
+    Count: integer;
+    Prefix: string;
+    ColumnName: string;
+begin
+  Count := 0;
+  WhereClause := 'Where';
+  Separator := ' A.';
+  if UseOldValues then
+    Prefix := ':OLD_'
+  else
+    Prefix := ':';
+  with PrimaryKeys do
+  begin
+    DisableControls;
+    try
+      if State = dsEdit then Post;
+      First;
+      while not EOF do
+      begin
+        Inc(Count);
+        if FieldByName('Selected').AsInteger <> 0 then
+        begin
+          ColumnName := FieldByName('ColumnName').AsString;
+          if QuotedStrings then
+            WhereClause := WhereClause + Separator + '"' + ColumnName +
+                   '" = ' + Prefix+ AnsiUpperCase(ColumnName)
+          else
+            WhereClause := WhereClause + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,ColumnName) +
+                   ' = ' + Prefix + AnsiUpperCase(ColumnName);
+          Separator := ' AND A.';
+        end;
+        Next;
+      end;
+    finally
+      EnableControls
+    end;
+  end;
+  if Count > 0 then
+    SQL.Add(WhereClause);
+end;
+
+function TIBSQLEditFrame.GetSQLType(SQLType: TIBSQLStatementTypes): string;
+begin
+  case SQLType of
+  SQLUnknown:              Result := 'Unknown';
+  SQLSelect:               Result := 'Select';
+  SQLInsert:               Result := 'Insert';
+  SQLUpdate:               Result := 'Update';
+  SQLDelete:               Result := 'Delete';
+  SQLDDL:                  Result := 'DDL';
+  SQLGetSegment:           Result := 'GetSegment';
+  SQLPutSegment:           Result := 'PutSegment';
+  SQLExecProcedure:        Result := 'Execute Procedure';
+  SQLStartTransaction:     Result := 'StartTransaction';
+  SQLCommit:               Result := 'Commit';
+  SQLRollback:             Result := 'Rollback';
+  SQLSelectForUpdate:      Result := 'Select for Update';
+  SQLSetGenerator:         Result := 'Set Generator';
+  end;
+end;
+
+procedure TIBSQLEditFrame.GetFieldNames(Dataset: TDataset;
+  var FieldNames: TStrings);
+begin
+  with DataSet do
+  begin
+    DisableControls;
+    try
+      if State = dsEdit then Post;
+      First;
+      while not EOF do
+      begin
+        if FieldByName('Selected').AsInteger <> 0 then
+          FieldNames.Add(FieldByName('ColumnName').AsString);
+        Next;
+      end;
+    finally
+      EnableControls
+    end;
+  end;
+end;
+
+procedure TIBSQLEditFrame.GenerateSelectSQL(TableName: string;
+  QuotedStrings: boolean; FieldNames, SQL: TStrings);
+var SelectSQL: string;
+    Separator : string;
+    I: integer;
+    Lines: TStrings;
+begin
+  SelectSQL := 'Select';
+  Separator := ' A.';
+  for I := 0 to FieldNames.Count - 1 do
+  begin
+    if QuotedStrings then
+      SelectSQL := SelectSQL + Separator + '"' + FieldNames[I] + '"'
+    else
+      SelectSQL := SelectSQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,FieldNames[I]);
+    Separator := ', A.';
+  end;
+  SelectSQL := SelectSQL + ' From ' + TableName + ' A';
+  Lines := TStringList.Create;
+  try
+    Lines.Text := SelectSQL;
+    SQL.AddStrings(Lines);
+  finally
+    Lines.Free;
+  end;
+end;
+
+procedure TIBSQLEditFrame.GenerateInsertSQL(TableName: string;
+  QuotedStrings: boolean; FieldNames, SQL: TStrings);
+var InsertSQL: string;
+    Separator: string;
+    Lines: TStrings;
+    I: integer;
+begin
+  Lines := TStringList.Create;
+  try
+    InsertSQL := 'Insert Into ' + TableName + '(';
+    Separator := '';
+    for I := 0 to FieldNames.Count - 1 do
+      begin
+        if QuotedStrings then
+           InsertSQL := InsertSQL + Separator + '"' + FieldNames[I] + '"'
+        else
+           InsertSQL := InsertSQL + Separator +  QuoteIdentifierIfNeeded(Database.SQLDialect,FieldNames[I]) ;
+        Separator := ', ';
+      end;
+    InsertSQL := InsertSQL + ')';
+    Lines.Add(InsertSQL);
+    InsertSQL := 'Values(';
+    Separator := ':';
+    for I := 0 to FieldNames.Count - 1 do
+      begin
+         InsertSQL := InsertSQL + Separator +  AnsiUpperCase(FieldNames[I]) ;
+         Separator := ', :';
+      end;
+    InsertSQL := InsertSQL + ')';
+    Lines.Add(InsertSQL);
+    SQL.AddStrings(Lines);
+  finally
+    Lines.Free;
+  end;
+end;
+
+procedure TIBSQLEditFrame.GenerateModifySQL(TableName: string;
+  QuotedStrings: boolean; FieldNames, SQL: TStrings);
+var UpdateSQL: string;
+    Separator: string;
+    I: integer;
+begin
+  Separator := '  A.';
+  UpdateSQL := 'Update ' + TableName + ' A Set ';
+  SQL.Add(UpdateSQL);
+  for I := 0 to FieldNames.Count - 1 do
+    begin
+      if QuotedStrings then
+        UpdateSQL := Separator + '"' + FieldNames[I] + '" = :' + AnsiUpperCase(FieldNames[I])
+      else
+        UpdateSQL := Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,FieldNames[I]) + ' = :' + AnsiUpperCase(FieldNames[I]);
+      if I < FieldNames.Count - 1 then
+        UpdateSQL := UpdateSQL + ',';
+      SQL.Add(UpdateSQL);
+    end;
+  AddWhereClause(QuotedStrings,SQL,true);
+end;
+
+procedure TIBSQLEditFrame.GenerateDeleteSQL(TableName: string;
+  QuotedStrings: boolean; SQL: TStrings);
+begin
+  SQL.Add('Delete From ' + TableName + ' A');
+  AddWhereClause(QuotedStrings,SQL,true)
+end;
+
+const
+  sqlCheckProcedureNames = 'Select * From RDB$PROCEDURES Where Upper(Trim(RDB$PROCEDURE_NAME)) = Upper(:ProcName)';
+
+function TIBSQLEditFrame.GetStatementType(var IsStoredProcedure: boolean
+  ): TIBSQLStatementTypes;
+var TableName: string;
+begin
+  Result := sqlUnknown;
+  if not assigned(Database) or not Database.Connected or (Trim(SQLText.Lines.Text) = '') then
+    Exit;
+  IsStoredProcedure := false;
+  with TIBSQL.Create(nil) do
+  try
+    Database := self.Database;
+    Transaction := SQLTransaction;
+    SQL.Assign(SQLText.Lines);
+    GenerateParamNames := true; {permissive}
+    try
+      Prepare;
+      Result := SQLStatementType
+    except on E:EIBError do
+  //      ShowMessage(E.Message);
+    end;
+    if (Result = SQLSelect) and (MetaData.Count > 0)  then
+    begin
+      TableName := MetaData[0].GetRelationName;
+      SQL.Text := sqlCheckProcedureNames;
+      Prepare;
+      ParamByName('ProcName').AsString := TableName;
+      ExecQuery;
+      try
+        IsStoredProcedure := not EOF;
+      finally
+        Close
+      end;
+    end;
+  finally
+    Free
+  end;
+end;
+
+procedure TIBSQLEditFrame.GenerateExecuteSQL(ProcName: string;
+  QuotedStrings: boolean; ExecuteOnly: boolean; InputParams, OutputParams,
+  ExecuteSQL: TStrings);
+var SQL: string;
+    I: integer;
+    Separator: string;
+    Lines: TStrings;
+begin
+  Lines := TStringList.Create;
+  try
+    Separator := '';
+    if not ExecuteOnly and (OutputParams.Count > 0) then //Select Query
+    begin
+      SQL := 'Select ';
+      for I := 0 to OutputParams.Count - 1 do
+      begin
+        if QuotedStrings then
+          SQL := SQL + Separator + '"' + OutputParams[I] + '"'
+        else
+          SQL := SQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,OutputParams[I]);
+        Separator := ', ';
+      end;
+      SQL := SQL + ' From ' + ProcName;
+      if InputParams.Count > 0 then
+      begin
+        Separator := '(:';
+        for I := 0 to InputParams.Count - 1 do
+        begin
+          SQL := SQL + Separator + AnsiUpperCase(InputParams[I]);
+          Separator := ', :';
+        end;
+        SQL := SQL + ')'
+      end
+    end
+    else // Execute Procedure
+    begin
+      if QuotedStrings then
+        SQL := 'Execute Procedure "' + ProcName + '"'
+      else
+        SQL := 'Execute Procedure ' + QuoteIdentifierIfNeeded(Database.SQLDialect,ProcName);
+      if InputParams.Count > 0 then
+      begin
+        Separator := ' :';
+        for I := 0 to InputParams.Count - 1 do
+        begin
+          if QuotedStrings then
+            SQL := SQL + Separator + '"' + InputParams[I] + '"'
+          else
+            SQL := SQL + Separator + AnsiUpperCase(InputParams[I]);
+          Separator := ', :';
+        end;
+      end
+    end;
+    Lines.Add(SQL + ';');
+    ExecuteSQL.AddStrings(Lines);
+  finally
+    Lines.Free
+  end
+end;
+
+procedure TIBSQLEditFrame.InsertSelectedPrimaryKey;
+begin
+  SQLText.SelText := PrimaryKeys.FieldByName('ColumnName').AsString;
+  SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.InsertSelectedFieldName;
+begin
+  SQLText.SelText := FieldNameList.FieldByName('ColumnName').AsString;
+  SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.InsertTableName;
+begin
+  SQLText.SelText := UserTables.FieldByName('RDB$RELATION_NAME').AsString;
+  SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.InsertProcName;
+begin
+  SQLText.SelText := UserProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString;
+  SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.InsertSelectedInputParam;
+begin
+  SQLText.SelText := ProcInputParams.FieldByName('ColumnName').AsString;
+  SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.InsertSelectedOutputParam;
+begin
+  SQLText.SelText := ProcOutputParams.FieldByName('ColumnName').AsString;
+  SQLText.SetFocus
+end;
+
+function GetWord(S: string; WordNo: integer): string;
+const
+    SpaceChars = [' ',#$0a,#$0d,#$09,'('];
+var I: integer;
+    StartIdx: integer;
+    InWhiteSpace: boolean;
+begin
+  Result := '';
+  StartIdx := 1;
+  InWhiteSpace := true;
+  for I := 1 to Length(S) do
+  begin
+    if InWhiteSpace then
+    begin
+      if not (S[I] in SpaceChars) then
+      begin
+        StartIdx := I;
+        InWhiteSpace := false
+      end
+    end
+    else
+    begin
+      if S[I] in SpaceChars then
+      begin
+        Dec(WordNo);
+        if WordNo = 0 then
+        begin
+          Result := System.copy(S,StartIdx,I - StartIdx);
+          Exit
+        end;
+        InWhiteSpace := true
+      end
+    end
+  end;
+end;
+
+function TIBSQLEditFrame.SyncQueryBuilder: TIBSQLStatementTypes;
+var TableName: string;
+begin
+  Result := SQLUnknown;
+  TableName := '';
+  IdentifyStatementSQL.Transaction.Active := true;
+  IdentifyStatementSQL.SQL.Assign(SQLText.Lines);
+  try
+    IdentifyStatementSQL.Prepare;
+    Result := IdentifyStatementSQL.SQLStatementType;
+    case Result  of
+    SQLSelect:
+      begin
+        if IdentifyStatementSQL.MetaData.Count > 0 then
+          TableName := IdentifyStatementSQL.MetaData[0].GetRelationName
+        else
+          Exit;
+        UserTables.Locate('RDB$RELATION_NAME',TableName,[loCaseInsensitive]);
+      end;
+    { If not a select statement then return table or procedure name
+      as First Table Name }
+    SQLUpdate:
+      begin
+        TableName := GetWord(IdentifyStatementSQL.SQL.Text,2);
+        UserTables.Locate('RDB$RELATION_NAME',TableName,[loCaseInsensitive]);
+      end;
+
+    SQLInsert:
+      begin
+        TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
+        UserTables.Locate('RDB$RELATION_NAME',TableName,[loCaseInsensitive]);
+      end;
+
+    SQLDelete:
+      begin
+        TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
+        UserTables.Locate('RDB$RELATION_NAME',TableName,[loCaseInsensitive]);
+      end;
+
+    SQLExecProcedure:
+      begin
+        TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
+        UserProcedures.Locate('RDB$PROCEDURE_NAME',TableName,[loCaseInsensitive]);
+      end;
+    end
+  except on E:EIBError do
+//      ShowMessage(E.Message);
+  end;
+end;
+
+procedure TIBSQLEditFrame.TestSQL(GenerateParamNames: boolean);
+begin
+  if not assigned(Database) or not Database.Connected then
+  begin
+    Messagedlg('No Database Connected',mtError,[mbOK],0);
+    Exit;
+  end;
+  with TIBSQL.Create(nil) do
+  try
+    Database := self.Database;
+    Transaction := SQLTransaction;
+    GenerateParamNames := GenerateParamNames;
+    SQL.Assign(SQLText.Lines);
+    try
+      Prepare;
+      ShowMessage('SQL '+ GetSQLType(SQLStatementType) + ' Statement Looks OK');
+    except on E:EIBError do
+      ShowMessage(E.Message);
+    end;
+  finally
+    Free
+  end;
+end;
+
 
 end.
 

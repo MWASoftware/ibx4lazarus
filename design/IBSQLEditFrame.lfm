@@ -1,18 +1,18 @@
 object IBSQLEditFrame: TIBSQLEditFrame
   Left = 0
-  Height = 336
+  Height = 585
   Top = 0
-  Width = 587
-  ClientHeight = 336
-  ClientWidth = 587
+  Width = 789
+  ClientHeight = 585
+  ClientWidth = 789
   TabOrder = 0
-  DesignLeft = 2016
-  DesignTop = 319
+  DesignLeft = 1974
+  DesignTop = 200
   inline SQLText: TSynEdit
     Left = 0
-    Height = 310
+    Height = 559
     Top = 26
-    Width = 587
+    Width = 789
     Align = alClient
     Font.Height = -12
     Font.Name = 'DejaVu Sans Mono'
@@ -514,7 +514,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     Left = 0
     Height = 26
     Top = 0
-    Width = 587
+    Width = 789
     Caption = 'ToolBar1'
     EdgeBorders = [ebLeft, ebTop, ebRight]
     Images = BtnImages
@@ -587,13 +587,13 @@ object IBSQLEditFrame: TIBSQLEditFrame
     KeyAttri.Foreground = clBlue
     NumberAttri.Foreground = clRed
     SQLDialect = sqlInterbase6
-    left = 195
-    top = 141
+    left = 40
+    top = 120
   end
   object ActionList1: TActionList
     Images = BtnImages
-    left = 330
-    top = 119
+    left = 128
+    top = 64
     object Cut: TAction
       Caption = 'Cut'
       Hint = 'Cut'
@@ -665,8 +665,8 @@ object IBSQLEditFrame: TIBSQLEditFrame
     end
   end
   object PopupMenu1: TPopupMenu
-    left = 162
-    top = 73
+    left = 40
+    top = 64
     object MenuItem1: TMenuItem
       Action = Cut
     end
@@ -696,8 +696,8 @@ object IBSQLEditFrame: TIBSQLEditFrame
     end
   end
   object BtnImages: TImageList
-    left = 193
-    top = 258
+    left = 32
+    top = 176
     Bitmap = {
       4C690A0000001000000010000000000000000000000000000000000000000000
       0000000000008D9190FF8D918FFF8D918FFF8C908FFF8B8F8DFF898E8CFF888C
@@ -1026,14 +1026,262 @@ object IBSQLEditFrame: TIBSQLEditFrame
     DefaultExt = '.sql'
     Filter = 'SQL Files (*.sql)|*.sql|All Files|*.*'
     Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
-    left = 196
-    top = 198
+    left = 128
+    top = 124
   end
   object SaveDialog1: TSaveDialog
     DefaultExt = '.sql'
     Filter = 'SQL Files (*.sql)|*.sql|All Files|*.*'
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    left = 287
-    top = 203
+    left = 128
+    top = 184
+  end
+  object UserTableSource: TDataSource
+    DataSet = UserTables
+    left = 241
+    top = 56
+  end
+  object UserTables: TIBQuery
+    AllowAutoActivateTransaction = False
+    Transaction = SQLTransaction
+    AfterOpen = UserTablesAfterOpen
+    BeforeClose = UserTablesBeforeClose
+    BeforeOpen = UserTablesBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select trim(RDB$RELATION_NAME) as RDB$RELATION_NAME,'
+      'RDB$RELATION_ID  From RDB$RELATIONS'
+      ''
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 346
+    top = 60
+  end
+  object FieldsSource: TDataSource
+    DataSet = FieldNameList
+    left = 241
+    top = 122
+  end
+  object FieldNameList: TIBQuery
+    AllowAutoActivateTransaction = False
+    Transaction = SQLTransaction
+    BeforeOpen = FieldNameListBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = UserTableSource
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select Trim(RF.RDB$FIELD_NAME) as ColumnName,'
+      '1 as Selected'
+      ' FROM RDB$RELATION_FIELDS RF'
+      'JOIN RDB$FIELDS B On B.RDB$FIELD_NAME = RF.RDB$FIELD_SOURCE'
+      'Where RF.RDB$RELATION_NAME = :RDB$RELATION_NAME'
+      'order by RF.RDB$FIELD_POSITION asc'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'RDB$RELATION_NAME'
+        ParamType = ptInput
+      end>
+    UpdateObject = IBUpdate1
+    DataSetCloseAction = dcDiscardChanges
+    left = 346
+    top = 124
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'RDB$RELATION_NAME'
+        ParamType = ptInput
+      end>
+  end
+  object PrimaryKeySource: TDataSource
+    DataSet = PrimaryKeys
+    left = 232
+    top = 200
+  end
+  object PrimaryKeys: TIBQuery
+    AllowAutoActivateTransaction = False
+    Transaction = SQLTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = UserTableSource
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select Trim(S.RDB$FIELD_NAME) as ColumnName,'
+      '1 as Selected From'
+      '(Select RDB$INDEX_NAME,RDB$FIELD_NAME FROM RDB$INDEX_SEGMENTS Order by RDB$FIELD_POSITION ASC) S'
+      'JOIN RDB$RELATION_CONSTRAINTS C On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME'
+      'Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' and RDB$RELATION_NAME = :RDB$RELATION_NAME'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'RDB$RELATION_NAME'
+        ParamType = ptInput
+      end>
+    UpdateObject = IBUpdate2
+    DataSetCloseAction = dcDiscardChanges
+    left = 337
+    top = 200
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'RDB$RELATION_NAME'
+        ParamType = ptInput
+      end>
+  end
+  object UserProcSource: TDataSource
+    DataSet = UserProcedures
+    left = 241
+    top = 264
+  end
+  object UserProcedures: TIBQuery
+    AllowAutoActivateTransaction = False
+    Transaction = SQLTransaction
+    AfterOpen = UserProceduresAfterOpen
+    BeforeClose = UserProceduresBeforeClose
+    BeforeOpen = UserProceduresBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select Trim(RDB$PROCEDURE_NAME) as '
+      'RDB$PROCEDURE_NAME, RDB$PROCEDURE_INPUTS,'
+      'RDB$PROCEDURE_OUTPUTS,RDB$PROCEDURE_TYPE From '
+      'RDB$PROCEDURES Where RDB$SYSTEM_FLAG = 0  Order by 1 asc'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 354
+    top = 268
+  end
+  object ProcInputSource: TDataSource
+    DataSet = ProcInputParams
+    left = 241
+    top = 336
+  end
+  object ProcInputParams: TIBQuery
+    AllowAutoActivateTransaction = False
+    Transaction = SQLTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = UserProcSource
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select Trim(P.RDB$PARAMETER_NAME) as ColumnName,'
+      '1 as Selected From'
+      'RDB$PROCEDURE_PARAMETERS P'
+      'JOIN RDB$FIELDS F On'
+      'F.RDB$FIELD_NAME = P.RDB$FIELD_SOURCE'
+      'Where'
+      'P.RDB$SYSTEM_FLAG = 0 and P.RDB$PROCEDURE_NAME = '
+      ':RDB$PROCEDURE_NAME and P.RDB$PARAMETER_TYPE = 0'
+      'Order by'
+      'P.RDB$PARAMETER_NUMBER asc'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'RDB$PROCEDURE_NAME'
+        ParamType = ptInput
+      end>
+    UpdateObject = IBUpdate3
+    DataSetCloseAction = dcDiscardChanges
+    left = 354
+    top = 336
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'RDB$PROCEDURE_NAME'
+        ParamType = ptInput
+      end>
+  end
+  object ProcOutputSource: TDataSource
+    DataSet = ProcOutputParams
+    left = 222
+    top = 400
+  end
+  object IdentifyStatementSQL: TIBSQL
+    GenerateParamNames = False
+    UniqueParamNames = False
+    ParamCheck = True
+    Transaction = SQLTransaction
+    left = 24
+    top = 256
+  end
+  object ProcOutputParams: TIBQuery
+    AllowAutoActivateTransaction = False
+    Transaction = SQLTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = UserProcSource
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select Trim(P.RDB$PARAMETER_NAME) as ColumnName,'
+      '1 as Selected From'
+      'RDB$PROCEDURE_PARAMETERS P'
+      'JOIN RDB$FIELDS F On'
+      'F.RDB$FIELD_NAME = P.RDB$FIELD_SOURCE'
+      'Where'
+      'P.RDB$SYSTEM_FLAG = 0 and P.RDB$PROCEDURE_NAME = '
+      ':RDB$PROCEDURE_NAME and P.RDB$PARAMETER_TYPE = 1'
+      'Order by'
+      'P.RDB$PARAMETER_NUMBER asc'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'RDB$PROCEDURE_NAME'
+        ParamType = ptInput
+      end>
+    UpdateObject = IBUpdate4
+    DataSetCloseAction = dcDiscardChanges
+    left = 343
+    top = 400
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'RDB$PROCEDURE_NAME'
+        ParamType = ptInput
+      end>
+  end
+  object SQLTransaction: TIBTransaction
+    Active = False
+    Params.Strings = (
+      'read'
+      'consistency'
+    )
+    left = 137
+    top = 248
+  end
+  object IBUpdate1: TIBUpdate
+    OnApplyUpdates = IBUpdate1ApplyUpdates
+    left = 448
+    top = 128
+  end
+  object IBUpdate2: TIBUpdate
+    OnApplyUpdates = IBUpdate1ApplyUpdates
+    left = 432
+    top = 208
+  end
+  object IBUpdate3: TIBUpdate
+    OnApplyUpdates = IBUpdate1ApplyUpdates
+    left = 456
+    top = 336
+  end
+  object IBUpdate4: TIBUpdate
+    OnApplyUpdates = IBUpdate1ApplyUpdates
+    left = 456
+    top = 408
   end
 end

@@ -1689,6 +1689,7 @@ begin
     FDataLink.Free;
   end;
   if assigned(FRowCache) then FRowCache.Free;
+  Application.RemoveAsyncCalls(self);
   inherited Destroy;
 end;
 
