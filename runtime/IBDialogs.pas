@@ -133,7 +133,7 @@ begin
   finally
     Free;
   end;
-  if ActiveForm <> nil then
+  if (ActiveForm <> nil) and ActiveForm.CanFocus then
   begin
     ActiveForm.SetFocus;
     Application.ProcessMessages;

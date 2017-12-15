@@ -284,7 +284,7 @@ begin
 {$IFDEF UNIX}
 
   {Under Unix transform application exe paths that are in installed locations
-   e.g. /usr/local/bin to corresponding shared data locations ee.g. /usr/local/shared}
+   e.g. /usr/local/bin to corresponding shared data locations e.g. /usr/local/shared}
   RegexObj := TRegExpr.Create;
   try
     RegexObj.Expression := '^/usr(/local|)/(s|)bin/.*$';

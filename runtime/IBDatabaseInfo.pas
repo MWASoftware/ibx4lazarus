@@ -40,9 +40,10 @@ uses
 
 type
 
+  { TIBDatabaseInfo }
+
   TIBDatabaseInfo = class(TComponent)
   protected
-    FIBLoaded: Boolean;
     FDatabase: TIBDatabase;
     FUserNames   : TStringList;
     FBackoutCount: TStringList;
@@ -53,6 +54,7 @@ type
     FReadIdxCount: TStringList;
     FReadSeqCount: TStringList;
     FUpdateCount: TStringList;
+    procedure CheckDatabase;
     function GetAllocation: Long;
     function GetBaseLevel: Long;
     function GetDBFileName: String;
@@ -135,9 +137,6 @@ uses
 constructor TIBDatabaseInfo.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FIBLoaded := False;
-  CheckIBLoaded;
-  FIBLoaded := True;
   FUserNames := TStringList.Create;
   FBackoutCount                        := nil;
   FDeleteCount                         := nil;
@@ -151,21 +150,25 @@ end;
 
 destructor TIBDatabaseInfo.Destroy;
 begin
-  if FIBLoaded then
-  begin
-    FUserNames.Free;
-    FBackoutCount.Free;
-    FDeleteCount.Free;
-    FExpungeCount.Free;
-    FInsertCount.Free;
-    FPurgeCount.Free;
-    FReadIdxCount.Free;
-    FReadSeqCount.Free;
-    FUpdateCount.Free;
-  end;
+  if assigned(FUserNames) then FUserNames.Free;
+  if assigned(FBackoutCount) then FBackoutCount.Free;
+  if assigned(FDeleteCount) then FDeleteCount.Free;
+  if assigned(FExpungeCount) then FExpungeCount.Free;
+  if assigned(FInsertCount) then FInsertCount.Free;
+  if assigned(FPurgeCount) then FPurgeCount.Free;
+  if assigned(FReadIdxCount) then FReadIdxCount.Free;
+  if assigned(FReadSeqCount) then FReadSeqCount.Free;
+  if assigned(FUpdateCount) then FUpdateCount.Free;
   inherited Destroy;
 end;
 
+procedure TIBDatabaseInfo.CheckDatabase;
+begin
+  if Database = nil then
+    IBError(ibxeDatabaseNotAssigned,[]);
+  if Database.Attachment = nil then
+    IBError(ibxeDatabaseClosed,[]);
+end;
 
 function TIBDatabaseInfo.GetAllocation: Long;
 begin
@@ -175,6 +178,7 @@ end;
 function TIBDatabaseInfo.GetBaseLevel: Long;
 var Response: TByteArray;
 begin
+  CheckDatabase;
   with Database.Attachment.GetDBInformation([isc_info_base_level]) do
     if (Count > 0) and (Items[0].GetItemType = isc_info_base_level) then
     begin
@@ -190,6 +194,7 @@ var
   ConnectionType: integer;
   SiteName: string;
 begin
+  CheckDatabase;
   with Database.Attachment.GetDBInformation([isc_info_db_id]) do
     if (Count > 0) and (Items[0].GetItemType = isc_info_db_id) then
       Items[0].DecodeIDCluster(ConnectionType,Result,SiteName)
@@ -202,6 +207,7 @@ var
   ConnectionType: integer;
   FileName: string;
 begin
+  CheckDatabase;
   with Database.Attachment.GetDBInformation([isc_info_db_id]) do
     if (Count > 0) and (Items[0].GetItemType = isc_info_db_id) then
       Items[0].DecodeIDCluster(ConnectionType,FileName,Result)
@@ -212,6 +218,7 @@ end;
 function TIBDatabaseInfo.GetDBImplementationNo: Long;
 var Response: TByteArray;
 begin
+  CheckDatabase;
   with Database.Attachment.GetDBInformation([isc_info_implementation]) do
     if (Count > 0) and (Items[0].GetItemType = isc_info_implementation) then
     begin
@@ -225,6 +232,7 @@ end;
 function TIBDatabaseInfo.GetDBImplementationClass: Long;
 var Response: TByteArray;
 begin
+  CheckDatabase;
   with Database.Attachment.GetDBInformation([isc_info_implementation]) do
     if (Count > 0) and (Items[0].GetItemType = isc_info_implementation) then
     begin
@@ -258,6 +266,7 @@ end;
 function TIBDatabaseInfo.GetVersion: String;
 var Version: byte;
 begin
+  CheckDatabase;
   with Database.Attachment.GetDBInformation([isc_info_version]) do
     if (Count > 0) and (Items[0].GetItemType = isc_info_version) then
       Items[0].DecodeVersionString(Version,Result)
@@ -292,6 +301,7 @@ end;
 
 function TIBDatabaseInfo.GetUserNames: TStringList;
 begin
+  CheckDatabase;
   Result := FUserNames;
   FUserNames.Clear;
   with Database.Attachment.GetDBInformation([isc_info_user_names]) do
@@ -325,6 +335,7 @@ function TIBDatabaseInfo.GetOperationCounts(DBInfoCommand: Integer; FOperation: 
 var opCounts: TDBOperationCounts;
     i: integer;
 begin
+  CheckDatabase;
   if FOperation = nil then FOperation := TStringList.Create;
   result := FOperation;
   with Database.Attachment.GetDBInformation([DBInfoCommand]) do
@@ -383,6 +394,7 @@ end;
 
 function TIBDatabaseInfo.GetLongDatabaseInfo(DatabaseInfoCommand: Integer): Long;
 begin
+  CheckDatabase;
   with Database.Attachment.GetDBInformation([DatabaseInfoCommand]) do
     if (Count > 0) and (Items[0].GetItemType = DatabaseInfoCommand) then
       Result := Items[0].AsInteger
@@ -392,6 +404,7 @@ end;
 
 function TIBDatabaseInfo.GetStringDatabaseInfo(DatabaseInfoCommand: Integer): String;
 begin
+  CheckDatabase;
   with Database.Attachment.GetDBInformation([DatabaseInfoCommand]) do
     if (Count > 0) and (Items[0].GetItemType = DatabaseInfoCommand) then
       Result := Items[0].AsString
@@ -400,8 +413,9 @@ begin
 end;
 
 
-function TIBDatabaseInfo.GetDBSQLDialect: Integer;
+function TIBDatabaseInfo.GetDBSQLDialect: Long;
 begin
+  CheckDatabase;
   with Database.Attachment.GetDBInformation([isc_info_db_SQL_Dialect]) do
     if (Count > 0) and (Items[0].GetItemType = isc_info_db_SQL_Dialect) then
       Result := Items[0].AsInteger
