@@ -1,7 +1,7 @@
 object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
-  Left = 344
+  Left = 354
   Height = 437
-  Top = 259
+  Top = 244
   Width = 747
   ActiveControl = PageControl
   Caption = 'Select SQL Editor'
@@ -372,6 +372,8 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     ClientHeight = 339
     ClientWidth = 448
     TabOrder = 7
+    DesignLeft = 1974
+    DesignTop = 200
     inherited SQLText: TSynEdit
       Height = 313
       Width = 448

@@ -132,10 +132,14 @@ type
     procedure AddWhereClause(QuotedStrings: boolean; SQL: TStrings;
       UseOldValues: boolean);
     function GetSQLType(SQLType: TIBSQLStatementTypes): string;
-    procedure GetFieldNames(Dataset: TDataset; var FieldNames: TStrings);
+    procedure GetFieldNames(Dataset: TDataset; var FieldNames: TStrings;
+      aIncludeReadOnly: boolean = true);
     procedure GenerateSelectSQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings); overload;
+    procedure GenerateInsertSQL(TableName: string; QuotedStrings: boolean; FieldNames, SQL: TStrings); overload;
+    procedure GenerateModifySQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings); overload;
     procedure GenerateExecuteSQL(ProcName: string; QuotedStrings: boolean; ExecuteOnly: boolean;
               InputParams, OutputParams, ExecuteSQL: TStrings); overload;
+    procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings); overload;
     procedure SetDatabase(AValue: TIBDatabase);
     procedure SetExecuteOnlyProcs(AValue: boolean);
     procedure SetIncludePrimaryKeys(AValue: boolean);
@@ -143,16 +147,23 @@ type
     procedure SetIncludeSystemTables(AValue: boolean);
 
   public
-    procedure DoWrapText;
+    constructor Create(aOwner: TComponent); override;
+    procedure DoWrapText(Lines: TStrings); overload;
+    procedure DoWrapText; overload;
     procedure UnWrapText;
     procedure RefreshAll;
     procedure SelectAllFields(Checked: boolean);
     procedure GenerateSelectSQL(QuotedStrings: boolean); overload;
+    procedure GenerateSelectSQL(QuotedStrings: boolean; SQL: TStrings); overload;
     procedure GenerateRefreshSQL(QuotedStrings: boolean);
+    procedure GenerateRefreshSQL(QuotedStrings: boolean; SQL: TStrings);
     procedure GenerateExecuteSQL(QuotedStrings: boolean); overload;
-    procedure GenerateInsertSQL(TableName: string; QuotedStrings: boolean; FieldNames, SQL: TStrings);
-    procedure GenerateModifySQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings);
-    procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings);
+    procedure GenerateInsertSQL(QuotedStrings: boolean); overload;
+    procedure GenerateInsertSQL(QuotedStrings: boolean; SQL: TStrings); overload;
+    procedure GenerateModifySQL(QuotedStrings: boolean; RemovePrimaryKeys: boolean = false); overload;
+    procedure GenerateModifySQL(QuotedStrings: boolean; SQL: TStrings; RemovePrimaryKeys: boolean = false); overload;
+    procedure GenerateDeleteSQL(QuotedStrings: boolean); overload;
+    procedure GenerateDeleteSQL(QuotedStrings: boolean; SQL: TStrings); overload;
     function GetStatementType(var IsStoredProcedure: boolean): TIBSQLStatementTypes;
     procedure InsertSelectedPrimaryKey;
     procedure InsertSelectedFieldName;
@@ -160,7 +171,8 @@ type
     procedure InsertProcName;
     procedure InsertSelectedInputParam;
     procedure InsertSelectedOutputParam;
-    function SyncQueryBuilder: TIBSQLStatementTypes;
+    function SyncQueryBuilder: TIBSQLStatementTypes; overload;
+    function SyncQueryBuilder(SQL: TStrings): TIBSQLStatementTypes; overload;
     procedure TestSQL(GenerateParamNames: boolean);
     property Database: TIBDatabase read FDatabase write SetDatabase;
     property IncludeReadOnlyFields: boolean read FIncludeReadOnlyFields write SetIncludeReadOnlyFields;
@@ -269,9 +281,9 @@ end;
 procedure TIBSQLEditFrame.UserProceduresBeforeOpen(DataSet: TDataSet);
 begin
   if ExecuteOnlyProcs then
-    (DataSet as TIBQuery).Add2WhereClause('RDB$PROCEDURE_TYPE = 2')
+    (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PROCEDURE_TYPE = 2')
   else
-    (DataSet as TIBQuery).Add2WhereClause('RDB$PROCEDURE_TYPE <= 2')
+    (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PROCEDURE_TYPE <= 2')
 end;
 
 procedure TIBSQLEditFrame.UserTablesAfterOpen(DataSet: TDataSet);
@@ -354,6 +366,20 @@ begin
   RefreshAll;
 end;
 
+constructor TIBSQLEditFrame.Create(aOwner: TComponent);
+begin
+  inherited Create(aOwner);
+  FIncludePrimaryKeys := true;
+  FIncludeReadOnlyFields := true;
+end;
+
+procedure TIBSQLEditFrame.DoWrapText;
+begin
+  DoWrapText(SQLText.Lines);
+  if assigned(SQLText.OnChange) then
+    SQLText.OnChange(self);
+end;
+
 type
   THackedSynEdit = class(TSynEdit)
   public
@@ -363,7 +389,7 @@ type
 const
   WhiteSpace = [' ',#$09];
 
-procedure TIBSQLEditFrame.DoWrapText;
+procedure TIBSQLEditFrame.DoWrapText(Lines: TStrings);
 
 var NewLines: TStringList;
     i: integer;
@@ -372,7 +398,6 @@ var NewLines: TStringList;
     Line: string;
 begin
   NewLines := TStringList.Create;
-  with SQLText do
   try
     with THackedSynEdit(SQLText).TextArea do
       MaxWidth := Right - Left;
@@ -417,8 +442,6 @@ begin
       until Length(Line) = 0;
     end;
     Lines.Assign(NewLines);
-    if assigned(OnChange) then
-      OnChange(self);
   finally
     NewLines.Free;
   end;
@@ -487,23 +510,34 @@ begin
 end;
 
 procedure TIBSQLEditFrame.GenerateSelectSQL(QuotedStrings: boolean);
-var FieldNames: TStrings;
 begin
-  SQLText.Lines.Clear;
-  FieldNames := TStringList.Create;
-  try
-    GetFieldNames(FieldNameList,FieldNames);
-    GenerateSelectSQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,FieldNames,SQLText.Lines);
-  finally
-    FieldNames.Free;
-  end;
-  DoWrapText;
+  GenerateSelectSQL(QuotedStrings,SQLText.Lines);
 end;
 
 procedure TIBSQLEditFrame.GenerateRefreshSQL(QuotedStrings: boolean);
 begin
-  GenerateSelectSQL(QuotedStrings);
-  AddWhereClause(QuotedStrings,SQLText.Lines,false);
+  GenerateRefreshSQL(QuotedStrings,SQLText.Lines);
+end;
+
+procedure TIBSQLEditFrame.GenerateSelectSQL(QuotedStrings: boolean; SQL: TStrings);
+var FieldNames: TStrings;
+begin
+  SQL.Clear;
+  FieldNames := TStringList.Create;
+  try
+    GetFieldNames(FieldNameList,FieldNames);
+    GenerateSelectSQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,FieldNames,SQL);
+  finally
+    FieldNames.Free;
+  end;
+  DoWrapText(SQL);
+end;
+
+procedure TIBSQLEditFrame.GenerateRefreshSQL(QuotedStrings: boolean; SQL: TStrings);
+begin
+  SQL.Clear;
+  GenerateSelectSQL(QuotedStrings,SQL);
+  AddWhereClause(QuotedStrings,SQL,false);
 end;
 
 procedure TIBSQLEditFrame.GenerateExecuteSQL(QuotedStrings: boolean);
@@ -524,6 +558,74 @@ begin
     InputParams.Free;
     OutputParams.Free;
   end;
+end;
+
+procedure TIBSQLEditFrame.GenerateInsertSQL(QuotedStrings: boolean);
+begin
+  GenerateInsertSQL(QuotedStrings,SQLText.Lines);
+end;
+
+procedure TIBSQLEditFrame.GenerateModifySQL(QuotedStrings: boolean;
+  RemovePrimaryKeys: boolean);
+begin
+  GenerateModifySQL(QuotedStrings,SQLText.Lines,RemovePrimaryKeys);
+end;
+
+procedure TIBSQLEditFrame.GenerateDeleteSQL(QuotedStrings: boolean);
+begin
+  GenerateDeleteSQL(QuotedStrings,SQLText.Lines);
+end;
+
+procedure TIBSQLEditFrame.GenerateInsertSQL(QuotedStrings: boolean; SQL: TStrings);
+var FieldNames: TStrings;
+begin
+  SQL.Clear;
+  FieldNames := TStringList.Create;
+  try
+    GetFieldNames(FieldNameList,FieldNames,false);
+    GenerateInsertSQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,FieldNames,SQL);
+  finally
+    FieldNames.Free;
+  end;
+  DoWrapText(SQL);
+end;
+
+procedure TIBSQLEditFrame.GenerateModifySQL(QuotedStrings: boolean; SQL: TStrings;
+  RemovePrimaryKeys: boolean);
+var FieldNames: TStrings;
+    KeyFields: TStrings;
+    i, index: integer;
+begin
+  SQL.Clear;
+  FieldNames := TStringList.Create;
+  try
+    GetFieldNames(FieldNameList,FieldNames,false);
+    if IncludePrimaryKeys and RemovePrimaryKeys then
+    begin
+      KeyFields := TStringList.Create;
+      try
+        GetFieldNames(PrimaryKeys,KeyFields);
+        for i := 0 to KeyFields.Count - 1 do
+        begin
+          index := FieldNames.IndexOf(KeyFields[i]);
+          if index <> - 1 then
+            FieldNames.Delete(index);
+        end;
+
+      finally
+        KeyFields.Free;
+      end;
+    end;
+    GenerateModifySQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,FieldNames,SQL);
+  finally
+    FieldNames.Free;
+  end;
+end;
+
+procedure TIBSQLEditFrame.GenerateDeleteSQL(QuotedStrings: boolean; SQL: TStrings);
+begin
+  SQL.Clear;
+  GenerateDeleteSQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,SQL)
 end;
 
 procedure TIBSQLEditFrame.CutExecute(Sender: TObject);
@@ -607,7 +709,7 @@ begin
 end;
 
 procedure TIBSQLEditFrame.GetFieldNames(Dataset: TDataset;
-  var FieldNames: TStrings);
+  var FieldNames: TStrings; aIncludeReadOnly: boolean);
 begin
   with DataSet do
   begin
@@ -617,7 +719,7 @@ begin
       First;
       while not EOF do
       begin
-        if FieldByName('Selected').AsInteger <> 0 then
+        if (FieldByName('Selected').AsInteger <> 0) and (aIncludeReadOnly or (FieldByName('ReadOnly').AsInteger = 0)) then
           FieldNames.Add(FieldByName('ColumnName').AsString);
         Next;
       end;
@@ -893,12 +995,17 @@ begin
 end;
 
 function TIBSQLEditFrame.SyncQueryBuilder: TIBSQLStatementTypes;
+begin
+  Result := SyncQueryBuilder(SQLText.Lines);
+end;
+
+function TIBSQLEditFrame.SyncQueryBuilder(SQL: TStrings): TIBSQLStatementTypes;
 var TableName: string;
 begin
   Result := SQLUnknown;
   TableName := '';
   IdentifyStatementSQL.Transaction.Active := true;
-  IdentifyStatementSQL.SQL.Assign(SQLText.Lines);
+  IdentifyStatementSQL.SQL.Assign(SQL);
   try
     IdentifyStatementSQL.Prepare;
     Result := IdentifyStatementSQL.SQLStatementType;

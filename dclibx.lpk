@@ -202,8 +202,8 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <UnitName Value="IBSQLEditor"/>
       </Item12>
       <Item13>
-        <Filename Value="design/ibdataseteditor.pas"/>
-        <UnitName Value="IBDataSetEditor"/>
+        <Filename Value="design/ibupdatesqleditor.pas"/>
+        <UnitName Value="ibupdatesqleditor"/>
       </Item13>
       <Item14>
         <Filename Value="design/dbFieldLinkPropEditor.pas"/>

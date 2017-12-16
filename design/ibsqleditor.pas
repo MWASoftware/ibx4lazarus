@@ -23,387 +23,151 @@
  *  Contributor(s): ______________________________________.
  *
 *)
-unit IBSQLEditor;
+
+unit ibsqleditor;
 
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, ComCtrls, IBSystemTables, IBSQLEditFrame, IBSQL, IBDatabase, IB,
-  LCLVersion;
+  Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
+  StdCtrls, ComCtrls, ibselectsqleditor, IBSQLEditFrame, IBLookupComboEditBox,
+  IBDynamicGrid, IBDatabase, IBSQL, IB;
 
 type
 
   { TIBSQLEditorForm }
 
-  TIBSQLEditorForm = class(TForm)
-    Button1: TButton;
-    Button2: TButton;
-    GenerateParams: TCheckBox;
-    GenerateBtn: TButton;
-    IBSQLEditFrame1: TIBSQLEditFrame;
-    IBTransaction1: TIBTransaction;
-    Label5: TLabel;
-    SelectProcedure: TLabel;
-    TestBtn: TButton;
+  TIBSQLEditorForm = class(TIBSelectSQLEditorForm)
     IncludePrimaryKeys: TCheckBox;
-    Label1: TLabel;
-    Label10: TLabel;
-    Label11: TLabel;
-    Label12: TLabel;
-    Label14: TLabel;
-    Label15: TLabel;
-    Label16: TLabel;
-    Label17: TLabel;
-    Label18: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label8: TLabel;
-    Label9: TLabel;
-    SelectFieldsList: TListBox;
-    ProcOutputList: TListBox;
-    SelectPrimaryKeys: TListBox;
-    InsertFieldsList: TListBox;
-    ModifyFieldsList: TListBox;
-    ModifyPrimaryKeys: TListBox;
-    DeletePrimaryKeys: TListBox;
-    ProcInputList: TListBox;
-    PageControl: TPageControl;
-    QuoteFields: TCheckBox;
-    SelectPage: TTabSheet;
-    InsertPage: TTabSheet;
-    ModifyPage: TTabSheet;
-    DeletePage: TTabSheet;
-    ExecutePage: TTabSheet;
-    SelectTableNames: TComboBox;
-    InsertTableNames: TComboBox;
-    ModifyTableNames: TComboBox;
-    DeleteTableNames: TComboBox;
-    ProcedureNames: TComboBox;
-    procedure GenerateBtnClick(Sender: TObject);
-    procedure TestBtnClick(Sender: TObject);
-    procedure DeletePageShow(Sender: TObject);
-    procedure DeleteTableNamesCloseUp(Sender: TObject);
-    procedure ExecutePageShow(Sender: TObject);
+    TabControl1: TTabControl;
     procedure FormShow(Sender: TObject);
-    procedure IncludePrimaryKeysClick(Sender: TObject);
-    procedure InsertPageShow(Sender: TObject);
-    procedure Label13Click(Sender: TObject);
-    procedure ModifyPageShow(Sender: TObject);
-    procedure ModifyTableNamesCloseUp(Sender: TObject);
-    procedure ProcedureNamesCloseUp(Sender: TObject);
-    procedure SelectFieldsListDblClick(Sender: TObject);
-    procedure SelectPageShow(Sender: TObject);
-    procedure SelectTableNamesCloseUp(Sender: TObject);
-    procedure InsertTableNamesCloseUp(Sender: TObject);
+    procedure GenerateBtnClick(Sender: TObject);
+    procedure IncludePrimaryKeysChange(Sender: TObject);
+    procedure TabControl1Change(Sender: TObject);
   private
-    { private declarations }
-    FTableName: string;
-    FIBSystemTables: TIBSystemTables;
-    FExecuteOnly: boolean;
+    procedure SetupFlags;
   protected
-    procedure Loaded; override;
+    procedure SetSQLStatementType(aType: TIBSQLStatementTypes); override;
   public
-    { public declarations }
-    constructor Create(TheOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure SetDatabase(Database: TIBDatabase);
+
   end;
+
+function EditSQL(aIBSQL: TIBSQL): boolean;
 
 var
   IBSQLEditorForm: TIBSQLEditorForm;
-
-function EditIBSQL(DataSet: TIBSQL): boolean;
 
 implementation
 
 {$R *.lfm}
 
-uses InterfaceBase
-  {$if lcl_fullversion >= 01070000}, LCLPlatformDef {$ENDIF};
-
-function EditIBSQL(DataSet: TIBSQL): boolean;
+function EditSQL(aIBSQL: TIBSQL): boolean;
 begin
   Result := false;
-  if assigned(DataSet.Database)  then
+  if assigned(aIBSQL) and assigned(aIBSQL.Database) then
     try
-      DataSet.Database.Connected := true;
+      aIBSQL.Database.Connected := true;
     except on E: Exception do
       ShowMessage(E.Message)
     end;
 
   with TIBSQLEditorForm.Create(Application) do
   try
-    SetDatabase(DataSet.Database);
-    IBSQLEditFrame1.SQLText.Lines.Assign(DataSet.SQL);
-    GenerateParams.Checked := DataSet.GenerateParamNames;
+    if assigned(aIBSQL) then
+    begin
+        IBSQLEditFrame1.Database := aIBSQL.Database;
+        GenerateParams.Checked := aIBSQL.GenerateParamNames;
+    end;
+    with IBSQLEditFrame1 do
+    begin
+      IncludePrimaryKeys := true;
+      IncludeReadOnlyFields := true;
+      ExecuteOnlyProcs := false;
+      SQLText.Lines.Assign(aIBSQL.SQL);
+    end;
+    IncludePrimaryKeys.Checked := false;
     Result := ShowModal = mrOK;
     if Result then
-      begin
-            DataSet.SQL.Assign(IBSQLEditFrame1.SQLText.Lines);
-            DataSet.GenerateParamNames := GenerateParams.Checked
-      end;
+    begin
+     aIBSQL.SQL.Assign(IBSQLEditFrame1.SQLText.Lines);
+     if assigned(aIBSQL) then
+          aIBSQL.GenerateParamNames := GenerateParams.Checked
+    end;
   finally
     Free
   end;
-
 end;
 
 { TIBSQLEditorForm }
 
+procedure TIBSQLEditorForm.TabControl1Change(Sender: TObject);
+begin
+  case TabControl1.TabIndex of
+  4:
+    PageControl.ActivePage := ExecutePage;
+  else
+    PageControl.ActivePage := SelectPage;
+  end;
+  SetupFlags;
+end;
+
 procedure TIBSQLEditorForm.FormShow(Sender: TObject);
-var IsProcedureName: boolean;
 begin
-  if WidgetSet.LCLPlatform = lpGtk2 then
-    PageControl.TabPosition := tpLeft
-  else
-  PageControl.TabPosition := tpTop;
-  GenerateBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
-  TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
-  if Trim(IBSQLEditFrame1.SQLText.Text) <> '' then
-  begin
-    case FIBSystemTables.GetStatementType(IBSQLEditFrame1.SQLText.Text,IsProcedureName) of
-    SQLSelect:
-      if IsProcedureName then
-        PageControl.ActivePage := ExecutePage
-      else
-        PageControl.ActivePage := SelectPage;
-    SQLInsert:  PageControl.ActivePage := InsertPage;
-    SQLUpdate:  PageControl.ActivePage := ModifyPage;
-    SQLDelete:  PageControl.ActivePage := DeletePage;
-    SQLExecProcedure: PageControl.ActivePage := ExecutePage;
-    else
-      PageControl.ActivePage := SelectPage;
-    end;
-    FIBSystemTables.GetTableAndColumns(IBSQLEditFrame1.SQLText.Text,FTableName,nil)
-  end;
-end;
-
-procedure TIBSQLEditorForm.IncludePrimaryKeysClick(Sender: TObject);
-begin
-  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked);
-  FIBSystemTables.GetPrimaryKeys(ModifyTableNames.Text,ModifyPrimaryKeys.Items);
-end;
-
-procedure TIBSQLEditorForm.DeletePageShow(Sender: TObject);
-var TableName: string;
-begin
-  FIBSystemTables.GetTableNames(DeleteTableNames.Items);
-  if Trim(IBSQLEditFrame1.SQLText.Text) = '' then
-  begin
-    if FTableName <> '' then
-      DeleteTableNames.ItemIndex := DeleteTableNames.Items.IndexOf(FTableName)
-    else
-    if DeleteTableNames.Items.Count > 0 then
-      DeleteTableNames.ItemIndex := 0
-  end
-  else
-  begin
-    FIBSystemTables.GetTableAndColumns(IBSQLEditFrame1.SQLText.Text,TableName,nil);
-    DeleteTableNames.ItemIndex := DeleteTableNames.Items.IndexOf(TableName);
-  end;
-  FIBSystemTables.GetPrimaryKeys(DeleteTableNames.Text,DeletePrimaryKeys.Items);
-
+  inherited;
+  SetupFlags;
 end;
 
 procedure TIBSQLEditorForm.GenerateBtnClick(Sender: TObject);
-var FieldNames: TStrings;
 begin
-  FieldNames := nil;
-  if PageControl.ActivePage = SelectPage then
-  begin
-    FieldNames := FIBSystemTables.GetFieldNames(SelectFieldsList);
-    FIBSystemTables.GenerateSelectSQL(SelectTableNames.Text,QuoteFields.Checked,FieldNames,IBSQLEditFrame1.SQLText.Lines);
-    IBSQLEditFrame1.DoWrapText;
-  end
-  else
-  if PageControl.ActivePage = InsertPage then
-  begin
-    FieldNames := FIBSystemTables.GetFieldNames(InsertFieldsList);
-    FIBSystemTables.GenerateInsertSQL(InsertTableNames.Text,QuoteFields.Checked,FieldNames,IBSQLEditFrame1.SQLText.Lines);
-    IBSQLEditFrame1.DoWrapText;
-  end
-  else
-  if PageControl.ActivePage = ModifyPage then
-  begin
-    FieldNames := FIBSystemTables.GetFieldNames(ModifyFieldsList);
-    FIBSystemTables.GenerateModifySQL(ModifyTableNames.Text,QuoteFields.Checked,FieldNames,IBSQLEditFrame1.SQLText.Lines);
-  end
-  else
-  if PageControl.ActivePage = DeletePage then
-     FIBSystemTables.GenerateDeleteSQL(DeleteTableNames.Text,QuoteFields.Checked,IBSQLEditFrame1.SQLText.Lines)
-  else
-  if PageControl.ActivePage = ExecutePage then
-  begin
-     FIBSystemTables.GenerateExecuteSQL(ProcedureNames.Text,QuoteFields.Checked, FExecuteOnly,
-             ProcInputList.Items,ProcOutputList.Items,IBSQLEditFrame1.SQLText.Lines);
-     IBSQLEditFrame1.DoWrapText;
+  case TabControl1.TabIndex of
+  0:
+    IBSQLEditFrame1.GenerateSelectSQL(QuoteFields.Checked);
+  1:
+    IBSQLEditFrame1.GenerateInsertSQL(QuoteFields.Checked);
+  2:
+    IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked);
+  3:
+    IBSQLEditFrame1.GenerateDeleteSQL(QuoteFields.Checked);
+  4:
+    IBSQLEditFrame1.GenerateExecuteSQL(QuoteFields.Checked);
   end;
-
-  if FieldNames <> nil then
-    FieldNames.Free;
 end;
 
-procedure TIBSQLEditorForm.TestBtnClick(Sender: TObject);
+procedure TIBSQLEditorForm.IncludePrimaryKeysChange(Sender: TObject);
 begin
-  FIBSystemTables.TestSQL(IBSQLEditFrame1.SQLText.Text,GenerateParams.Checked);
+  IBSQLEditFrame1.IncludePrimaryKeys := IncludePrimaryKeys.Checked;
 end;
 
-procedure TIBSQLEditorForm.DeleteTableNamesCloseUp(Sender: TObject);
+procedure TIBSQLEditorForm.SetupFlags;
 begin
-  FTableName := DeleteTableNames.Text;
-  FIBSystemTables.GetPrimaryKeys(DeleteTableNames.Text,DeletePrimaryKeys.Items);
+  IBSQLEditFrame1.IncludePrimaryKeys := (TabControl1.TabIndex <= 1) or ((TabControl1.TabIndex = 2) and IncludePrimaryKeys.Checked);
+  IBSQLEditFrame1.IncludeReadOnlyFields := (TabControl1.TabIndex = 0);
+  IncludePrimaryKeys.Visible := TabControl1.TabIndex = 2;
+  FieldNamesGrid.Visible := TabControl1.TabIndex <> 3;
+  Label2.Visible := TabControl1.TabIndex <> 3;
+  PrimaryKeysGrid.Visible := TabControl1.TabIndex <> 1;
+  Label4.Visible := TabControl1.TabIndex <> 1;
+  SelectSelectAll.Visible := TabControl1.TabIndex <> 3;
 end;
 
-procedure TIBSQLEditorForm.ExecutePageShow(Sender: TObject);
-var ProcName: string;
-    IsProcedureName: boolean;
+procedure TIBSQLEditorForm.SetSQLStatementType(aType: TIBSQLStatementTypes);
 begin
-  FIBSystemTables.GetProcedureNames(ProcedureNames.Items);
-  if ProcedureNames.Items.Count > 0 then
-  begin
-    if (FIBSystemTables.GetStatementType(IBSQLEditFrame1.SQLText.Text,IsProcedureName) = SQLExecProcedure) or IsProcedureName then
-    begin
-      FIBSystemTables.GetTableAndColumns(IBSQLEditFrame1.SQLText.Text,ProcName,nil);
-      ProcedureNames.ItemIndex := ProcedureNames.Items.IndexOf(ProcName)
-    end
-    else
-      ProcedureNames.ItemIndex := 0;
-  end;
-  FIBSystemTables.GetProcParams(ProcedureNames.Text,FExecuteOnly,ProcInputList.Items,ProcOutputList.Items);
-  SelectProcedure.Visible :=  not FExecuteOnly;
-end;
-
-procedure TIBSQLEditorForm.InsertPageShow(Sender: TObject);
-var TableName: string;
-begin
-  FIBSystemTables.GetTableNames(InsertTableNames.Items);
-  if Trim(IBSQLEditFrame1.SQLText.Text) = '' then
-  begin
-    if FTableName <> '' then
-      InsertTableNames.ItemIndex := InsertTableNames.Items.IndexOf(FTableName)
-    else
-    if InsertTableNames.Items.Count > 0 then
-      InsertTableNames.ItemIndex := 0
-  end
+  inherited SetSQLStatementType(aType);
+  case aType of
+  SQLSelect:
+    TabControl1.TabIndex := 0;
+  SQLInsert:
+    TabControl1.TabIndex := 1;
+  SQLUpdate:
+    TabControl1.TabIndex := 2;
+  SQLDelete:
+    TabControl1.TabIndex := 3;
   else
-  begin
-    FIBSystemTables.GetTableAndColumns(IBSQLEditFrame1.SQLText.Text,TableName,nil);
-    InsertTableNames.ItemIndex := InsertTableNames.Items.IndexOf(TableName);
+    TabControl1.TabIndex := 4;
   end;
-  FIBSystemTables.GetFieldNames(InsertTableNames.Text,InsertFieldsList.Items,true,false);
-
-end;
-
-procedure TIBSQLEditorForm.Label13Click(Sender: TObject);
-begin
-  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked);
-  FIBSystemTables.GetPrimaryKeys(ModifyTableNames.Text,ModifyPrimaryKeys.Items);
-end;
-
-procedure TIBSQLEditorForm.ModifyPageShow(Sender: TObject);
-var TableName: string;
-begin
-   FIBSystemTables.GetTableNames(ModifyTableNames.Items);
-  if Trim(IBSQLEditFrame1.SQLText.Text) = '' then
-  begin
-    if FTableName <> '' then
-      ModifyTableNames.ItemIndex := ModifyTableNames.Items.IndexOf(FTableName)
-    else
-    if ModifyTableNames.Items.Count > 0 then
-      ModifyTableNames.ItemIndex := 0;
-  end
-  else
-  begin
-    FIBSystemTables.GetTableAndColumns(IBSQLEditFrame1.SQLText.Text,TableName,nil);
-    ModifyTableNames.ItemIndex := ModifyTableNames.Items.IndexOf(TableName);
-  end;
-  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked,false);
-  FIBSystemTables.GetPrimaryKeys(ModifyTableNames.Text,ModifyPrimaryKeys.Items);
-end;
-
-procedure TIBSQLEditorForm.ModifyTableNamesCloseUp(Sender: TObject);
-begin
-  FTableName := ModifyTableNames.Text;
-  FIBSystemTables.GetFieldNames(ModifyTableNames.Text,ModifyFieldsList.Items,IncludePrimaryKeys.checked,false);
-  FIBSystemTables.GetPrimaryKeys(ModifyTableNames.Text,ModifyPrimaryKeys.Items);
-end;
-
-procedure TIBSQLEditorForm.ProcedureNamesCloseUp(Sender: TObject);
-begin
-    FIBSystemTables.GetProcParams(ProcedureNames.Text,FExecuteOnly,ProcInputList.Items,ProcOutputList.Items);
-    SelectProcedure.Visible := not FExecuteOnly
-end;
-
-procedure TIBSQLEditorForm.SelectFieldsListDblClick(Sender: TObject);
-begin
-  IBSQLEditFrame1.SQLText.SelText:= (Sender as TListBox).Items[(Sender as TListBox).ItemIndex];
-end;
-
-procedure TIBSQLEditorForm.SelectPageShow(Sender: TObject);
-var TableName: string;
-begin
-  FIBSystemTables.GetTableNames(SelectTableNames.Items);
-  if Trim(IBSQLEditFrame1.SQLText.Text) = '' then
-  begin
-    if FTableName <> '' then
-      SelectTableNames.ItemIndex := SelectTableNames.Items.IndexOf(FTableName)
-    else
-    if SelectTableNames.Items.Count > 0 then
-      SelectTableNames.ItemIndex := 0;
-  end
-  else
-  begin
-    FIBSystemTables.GetTableAndColumns(IBSQLEditFrame1.SQLText.Text,TableName,nil);
-    SelectTableNames.ItemIndex := SelectTableNames.Items.IndexOf(TableName);
-  end;
-  FIBSystemTables.GetFieldNames(SelectTableNames.Text,SelectFieldsList.Items);
-  FIBSystemTables.GetPrimaryKeys(SelectTableNames.Text,SelectPrimaryKeys.Items);
-end;
-
-procedure TIBSQLEditorForm.SelectTableNamesCloseUp(Sender: TObject);
-begin
-  FTableName := SelectTableNames.Text;
-  try
-  FIBSystemTables.GetFieldNames(SelectTableNames.Text,SelectFieldsList.Items);
-  FIBSystemTables.GetPrimaryKeys(SelectTableNames.Text,SelectPrimaryKeys.Items);
-  except {ignore}  end;
-end;
-
-procedure TIBSQLEditorForm.InsertTableNamesCloseUp(Sender: TObject);
-begin
-  FTableName := InsertTableNames.Text;
-  FIBSystemTables.GetFieldNames(InsertTableNames.Text,InsertFieldsList.Items);
-end;
-
-procedure TIBSQLEditorForm.Loaded;
-begin
-  inherited Loaded;
-  {$IFDEF WINDOWS}
-  if assigned(PageControl) then
-    PageControl.TabPosition := tpTop;
-  {$ENDIF}
-end;
-
-constructor TIBSQLEditorForm.Create(TheOwner: TComponent);
-begin
-  inherited Create(TheOwner);
-  FIBSystemTables := TIBSystemTables.Create;
-end;
-
-destructor TIBSQLEditorForm.Destroy;
-begin
-  if assigned(FIBSystemTables) then FIBSystemTables.Free;
-  inherited Destroy;
-end;
-
-procedure TIBSQLEditorForm.SetDatabase(Database: TIBDatabase);
-begin
-  IBTransaction1.DefaultDatabase := Database;
-  FIBSystemTables.SelectDatabase(Database,IBTransaction1)
 end;
 
 end.
+

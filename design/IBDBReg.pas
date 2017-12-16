@@ -835,7 +835,7 @@ var
   IBSQL: TIBSQL;
 begin
   IBSQL := GetComponent(0) as TIBSQL;
-  if IBSQLEditor.EditIBSQL(IBSQL) then Modified;
+  if IBSQLEditor.EditSQL(IBSQL) then Modified;
 end;
 
 { TIBUpdateSQLEditor }

@@ -1,3 +1,29 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2011 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*)
+
 unit ibrefreshsqleditor;
 
 {$mode objfpc}{$H+}
@@ -5,47 +31,20 @@ unit ibrefreshsqleditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, IBSQLEditFrame, IBDatabase, IBCustomDataSet,
-  IBLookupComboEditBox, IBDynamicGrid;
+  Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs, 
+    ibselectsqleditor, IBDatabase, IBCustomDataset;
 
 type
 
   { TIBRefreshSQLEditorForm }
 
-  TIBRefreshSQLEditorForm = class(TForm)
-    Button1: TButton;
-    Button2: TButton;
-    FieldNamesGrid: TIBDynamicGrid;
-    GenerateBtn: TButton;
-    GenerateParams: TCheckBox;
-    IBSQLEditFrame1: TIBSQLEditFrame;
-    IncludeSysTables: TCheckBox;
-    PrimaryKeysGrid: TIBDynamicGrid;
-    SelectSelectAll: TCheckBox;
-    SelectTableNames: TIBLookupComboEditBox;
-    TestBtn: TButton;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    QuoteFields: TCheckBox;
+  TIBRefreshSQLEditorForm = class(TIBSelectSQLEditorForm)
     procedure GenerateBtnClick(Sender: TObject);
-    procedure IncludeSysTablesChange(Sender: TObject);
-    procedure SelectSelectAllChange(Sender: TObject);
-    procedure SelectTableNamesDblClick(Sender: TObject);
-    procedure TestBtnClick(Sender: TObject);
-    procedure FieldListDblClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-    procedure PrimaryKeyListDblClick(Sender: TObject);
   private
-    { private declarations }
-      procedure HandleUserTablesOpened(Sender: TObject);
-  protected
-    procedure Loaded; override;
+
   public
-    { public declarations }
-  end; 
+
+  end;
 
 var
   IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm;
@@ -88,67 +87,11 @@ end;
 
 { TIBRefreshSQLEditorForm }
 
-procedure TIBRefreshSQLEditorForm.FormShow(Sender: TObject);
-begin
-  GenerateBtn.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
-  TestBtn.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
-  if TestBtn.Enabled then;
-    IBSQLEditFrame1.UserTables.Active := true;
-end;
-
-procedure TIBRefreshSQLEditorForm.PrimaryKeyListDblClick(Sender: TObject);
-begin
-  IBSQLEditFrame1.InsertSelectedPrimaryKey;
-end;
-
-procedure TIBRefreshSQLEditorForm.FieldListDblClick(Sender: TObject);
-begin
-  IBSQLEditFrame1.InsertSelectedFieldName;
-end;
-
 procedure TIBRefreshSQLEditorForm.GenerateBtnClick(Sender: TObject);
 begin
   IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked);
 end;
 
-procedure TIBRefreshSQLEditorForm.IncludeSysTablesChange(Sender: TObject);
-begin
-  IBSQLEditFrame1.IncludeSystemTables := IncludeSysTables.Checked;
-end;
-
-procedure TIBRefreshSQLEditorForm.SelectSelectAllChange(Sender: TObject);
-begin
-  IBSQLEditFrame1.SelectAllFields(SelectSelectAll.Checked);
-end;
-
-procedure TIBRefreshSQLEditorForm.SelectTableNamesDblClick(Sender: TObject);
-begin
-  IBSQLEditFrame1.InsertTableName;
-end;
-
-procedure TIBRefreshSQLEditorForm.TestBtnClick(Sender: TObject);
-begin
-  IBSQLEditFrame1.TestSQL(GenerateParams.Checked)
-end;
-
-procedure TIBRefreshSQLEditorForm.HandleUserTablesOpened(Sender: TObject);
-begin
-  SelectSelectAll.Checked := true;
-end;
-
-procedure TIBRefreshSQLEditorForm.Loaded;
-begin
-  inherited Loaded;
-  if IBSQLEditFrame1 <> nil then
-  begin
-    IBSQLEditFrame1.OnUserTablesOpened := @HandleUserTablesOpened;
-    if SelectTableNames <> nil then
-      SelectTableNames.ListSource :=  IBSQLEditFrame1.UserTableSource;
-    if FieldNamesGrid <> nil then
-      FieldNamesGrid.DataSource := IBSQLEditFrame1.FieldsSource;
-    if PrimaryKeysGrid <> nil then
-      PrimaryKeysGrid.DataSource := IBSQLEditFrame1.PrimaryKeySource;
-  end;
-end;
 
 end.
+

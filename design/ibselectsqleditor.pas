@@ -87,6 +87,7 @@ type
     procedure HandleUserTablesOpened(Sender: TObject);
   protected
     procedure Loaded; override;
+    procedure SetSQLStatementType(aType: TIBSQLStatementTypes); virtual;
   public
     { public declarations }
   end;
@@ -138,12 +139,7 @@ begin
   if Trim(IBSQLEditFrame1.SQLText.Text) <> '' then
   begin
     try
-      case IBSQLEditFrame1.SyncQueryBuilder of
-      SQLSelect:
-        PageControl.ActivePage := SelectPage;
-      SQLExecProcedure:
-        PageControl.ActivePage := ExecutePage;
-      end;
+      SetSQLStatementType(IBSQLEditFrame1.SyncQueryBuilder);
     except  end;
   end;
 end;
@@ -160,7 +156,7 @@ end;
 
 procedure TIBSelectSQLEditorForm.UserProceduresAfterScroll(DataSet: TDataSet);
 begin
-  SelectProcedure.Visible := DataSet.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 1;
+  SelectProcedure.Visible := DataSet.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 2;
 end;
 
 procedure TIBSelectSQLEditorForm.FieldListDblClick(Sender: TObject);
@@ -229,6 +225,7 @@ end;
 procedure TIBSelectSQLEditorForm.HandleUserTablesOpened(Sender: TObject);
 begin
   SelectSelectAll.Checked := true;
+  SelectProcedure.Visible := false;
 end;
 
 procedure TIBSelectSQLEditorForm.Loaded;
@@ -249,6 +246,17 @@ begin
       InputProcGrid.DataSource := IBSQLEditFrame1.ProcInputSource;
     if OutputProcGrid <> nil then
       OutputProcGrid.DataSource := IBSQLEditFrame1.ProcOutputSource;
+  end;
+end;
+
+procedure TIBSelectSQLEditorForm.SetSQLStatementType(aType: TIBSQLStatementTypes
+  );
+begin
+  case aType of
+  SQLExecProcedure:
+    PageControl.ActivePage := ExecutePage;
+  else
+    PageControl.ActivePage := SelectPage;
   end;
 end;
 

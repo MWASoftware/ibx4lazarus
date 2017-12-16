@@ -6,8 +6,8 @@ object IBSQLEditFrame: TIBSQLEditFrame
   ClientHeight = 585
   ClientWidth = 789
   TabOrder = 0
-  DesignLeft = 1974
-  DesignTop = 200
+  DesignLeft = 1893
+  DesignTop = 313
   inline SQLText: TSynEdit
     Left = 0
     Height = 559
@@ -1077,7 +1077,8 @@ object IBSQLEditFrame: TIBSQLEditFrame
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
       'Select Trim(RF.RDB$FIELD_NAME) as ColumnName,'
-      '1 as Selected'
+      '1 as Selected,'
+      'case When B.RDB$COMPUTED_SOURCE is NULL then 0 else 1 end as ReadOnly'
       ' FROM RDB$RELATION_FIELDS RF'
       'JOIN RDB$FIELDS B On B.RDB$FIELD_NAME = RF.RDB$FIELD_SOURCE'
       'Where RF.RDB$RELATION_NAME = :RDB$RELATION_NAME'
