@@ -151,7 +151,7 @@ II.1. Advertising Materials. All advertising materials mentioning features or us
 II.2. Endorsements. The names &quot;Inprise,&quot; &quot;InterBase,&quot; &quot;ISC,&quot; and &quot;IB&quot; must not be used to endorse or promote Contributor Versions or Larger Works without the prior written permission of Inprise.
 II.3. Product Names. Contributor Versions and Larger Works may not be called &quot;Inprise&quot; or &quot;InterBase&quot; nor may the words &quot;Inprise&quot; or &quot;InterBase&quot; appear in their names without the prior written permission of Inprise Corporation."/>
     <Version Major="2" Release="3"/>
-    <Files Count="16">
+    <Files Count="15">
       <Item1>
         <Filename Value="design/IBDBReg.pas"/>
         <HasRegisterProc Value="True"/>
@@ -170,53 +170,49 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <UnitName Value="IBDatabaseEdit"/>
       </Item4>
       <Item5>
-        <Filename Value="design/IBSystemTables.pas"/>
-        <UnitName Value="IBSystemTables"/>
-      </Item5>
-      <Item6>
         <Filename Value="design/ibdeletesqleditor.pas"/>
         <UnitName Value="ibdeletesqleditor"/>
-      </Item6>
-      <Item7>
+      </Item5>
+      <Item6>
         <Filename Value="design/ibgeneratoreditor.pas"/>
         <UnitName Value="IBGeneratorEditor"/>
-      </Item7>
-      <Item8>
+      </Item6>
+      <Item7>
         <Filename Value="design/ibinsertsqleditor.pas"/>
         <UnitName Value="ibinsertsqleditor"/>
-      </Item8>
-      <Item9>
+      </Item7>
+      <Item8>
         <Filename Value="design/ibmodifysqleditor.pas"/>
         <UnitName Value="ibmodifysqleditor"/>
-      </Item9>
-      <Item10>
+      </Item8>
+      <Item9>
         <Filename Value="design/ibselectsqleditor.pas"/>
         <UnitName Value="ibselectsqleditor"/>
-      </Item10>
-      <Item11>
-        <Filename Value="design/ibupdatesqleditor.pas"/>
-        <UnitName Value="IBUpdateSQLEditor"/>
-      </Item11>
-      <Item12>
-        <Filename Value="design/ibsqleditor.pas"/>
-        <UnitName Value="IBSQLEditor"/>
-      </Item12>
-      <Item13>
+      </Item9>
+      <Item10>
         <Filename Value="design/ibupdatesqleditor.pas"/>
         <UnitName Value="ibupdatesqleditor"/>
-      </Item13>
-      <Item14>
+      </Item10>
+      <Item11>
+        <Filename Value="design/ibsqleditor.pas"/>
+        <UnitName Value="ibsqleditor"/>
+      </Item11>
+      <Item12>
+        <Filename Value="design/ibupdatesqleditor.pas"/>
+        <UnitName Value="ibupdatesqleditor"/>
+      </Item12>
+      <Item13>
         <Filename Value="design/dbFieldLinkPropEditor.pas"/>
         <UnitName Value="dbFieldLinkPropEditor"/>
-      </Item14>
-      <Item15>
+      </Item13>
+      <Item14>
         <Filename Value="design/dbFieldListPropEditor.pas"/>
         <UnitName Value="dbFieldListPropEditor"/>
-      </Item15>
-      <Item16>
+      </Item14>
+      <Item15>
         <Filename Value="design/IBDSDialogs.pas"/>
         <UnitName Value="IBDSDialogs"/>
-      </Item16>
+      </Item15>
     </Files>
     <RequiredPkgs Count="7">
       <Item1>

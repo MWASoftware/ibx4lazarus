@@ -1201,7 +1201,7 @@ end;
 
 procedure TIBSQLEditor.ExecuteVerb(Index: Integer);
 begin
-  if IBSQLEditor.EditIBSQL(TIBSQL(Component)) then Modified;
+  if IBSQLEditor.EditSQL(TIBSQL(Component)) then Modified;
 end;
 
 function TIBSQLEditor.GetVerb(Index: Integer): string;
@@ -1224,7 +1224,7 @@ var
   IBSQL: TIBSQL;
 begin
   IBSQL := GetComponent(0) as TIBSQL;
-  if IBSQLEditor.EditIBSQL(IBSQL) then Modified;
+  if IBSQLEditor.EditSQL(IBSQL) then Modified;
 end;
 
 initialization

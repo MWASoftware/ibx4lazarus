@@ -4,13 +4,14 @@
 
 unit dclibx;
 
+{$warn 5023 off : no warning about unused units}
 interface
 
 uses
-  IBDBReg, IBEventsEditor, IBTransactionEdit, IBDatabaseEdit, IBSystemTables, 
+  IBDBReg, IBEventsEditor, IBTransactionEdit, IBDatabaseEdit, 
   ibdeletesqleditor, IBGeneratorEditor, ibinsertsqleditor, ibmodifysqleditor, 
-  ibselectsqleditor, IBUpdateSQLEditor, IBSQLEditor, IBDataSetEditor, 
-  dbFieldLinkPropEditor, dbFieldListPropEditor, IBDSDialogs, LazarusPackageIntf;
+  ibselectsqleditor, ibupdatesqleditor, ibsqleditor, dbFieldLinkPropEditor, 
+  dbFieldListPropEditor, IBDSDialogs, LazarusPackageIntf;
 
 implementation
 

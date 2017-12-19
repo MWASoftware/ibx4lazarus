@@ -15,7 +15,7 @@
  *
  *  The Initial Developer of the Original Code is Tony Whyman.
  *
- *  The Original Code is (C) 2011 Tony Whyman, MWA Software
+ *  The Original Code is (C) 2011-17 Tony Whyman, MWA Software
  *  (http://www.mwasoftware.co.uk).
  *
  *  All Rights Reserved.
@@ -386,9 +386,6 @@ type
     property TextArea: TLazSynTextArea read FTextArea;
   end;
 
-const
-  WhiteSpace = [' ',#$09];
-
 procedure TIBSQLEditFrame.DoWrapText(Lines: TStrings);
 
 var NewLines: TStringList;
@@ -396,56 +393,61 @@ var NewLines: TStringList;
     MaxWidth: integer;
     MaxChars: integer;
     Line: string;
+    Tokeniser: TSynSQLSyn;
+    SplitAt: integer;
+    SQLParam: boolean;
 begin
   NewLines := TStringList.Create;
+  Tokeniser := TSynSQLSyn.Create(nil); {use the highligher as a tokeniser}
   try
+    Tokeniser.SQLDialect := sqlInterbase6;
+    SQlText.Canvas.Font := SQLText.Font;
     with THackedSynEdit(SQLText).TextArea do
       MaxWidth := Right - Left;
     for i := 0 to Lines.Count - 1 do
     begin
       Line := Lines[i];
       repeat
-        if (Length(Line) = 0) or (Canvas.TextWidth(Line) <= MaxWidth) then
+        if (Length(Line) = 0) or (SQlText.Canvas.TextWidth(Line) <= MaxWidth) then
         begin
           NewLines.Add(Line);
           break; {next line}
         end
         else
         begin
-          MaxChars := Canvas.TextFitInfo(Line,MaxWidth);
-          if Line[MaxChars] in WhiteSpace then {consume whitespace}
+          {Need to split the line at the last complete SQL token}
+          MaxChars := SQlText.Canvas.TextFitInfo(Line,MaxWidth);
+          SQLParam := false;
+          Tokeniser.ResetRange;
+          Tokeniser.SetLine(Line,i);
+          SplitAt := 0;
+          while (Tokeniser.GetTokenPos < MaxChars) and not Tokeniser.GetEol do
           begin
-            while (MaxChars < Length(Line)) and (Line[MaxChars] in WhiteSpace) do
-               Inc(MaxChars);
-            if MaxChars = Length(Line) then
-            begin
-               NewLines.Add(Line);
-               break; {next line}
-            end;
-            Dec(MaxChars); {Now at last white space char}
-          end
-          else
-          begin
-            {Find start of word}
-            while (MaxChars > 0) and not (Line[MaxChars] in WhiteSpace) do
-              Dec(MaxChars);
-            if MaxChars = 0 then
-            begin
-              NewLines.Add(Line); {has to overflow}
-              break; {next line}
-            end;
-            {otherwise at last white space char}
+            if not SQLParam then
+              SplitAt := Tokeniser.GetTokenPos; {combine param indicator with param}
+            SQLParam := Tokeniser.GetToken =  ':';
+            Tokeniser.Next;
           end;
-          NewLines.Add(system.copy(Line,1,MaxChars));
-          system.Delete(Line,1,MaxChars);
+
+          if SplitAt <= 0 then {token overflows line}
+          begin
+            NewLines.Add(Line);
+            break; {next line}
+          end;
+          NewLines.Add(system.copy(Line,1,SplitAt));
+          system.Delete(Line,1,SplitAt);
         end;
       until Length(Line) = 0;
     end;
     Lines.Assign(NewLines);
   finally
     NewLines.Free;
+    Tokeniser.Free;
   end;
 end;
+
+const
+  Separators = [' ',#$09,',','.',':'];
 
 procedure TIBSQLEditFrame.UnWrapText;
 var Line: string;
@@ -456,7 +458,7 @@ begin
   begin
     for i := 0 to Lines.Count - 1 do
     begin
-      if (Length(Line) > 0) and not (Line[Length(Line)] in WhiteSpace) then
+      if (Length(Line) > 0) and not (Line[Length(Line)] in Separators) then
         Line := Line + ' ';
      Line := Line + Lines[i];
     end;
