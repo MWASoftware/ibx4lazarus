@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  IB, IBDatabase, IBDatabaseInfo, IBExternals;
+  IB, IBDatabase, IBDatabaseInfo, IBQuery, IBExternals;
 
 type
 
@@ -15,10 +15,13 @@ type
   TForm1 = class(TForm)
     IBDatabase1: TIBDatabase;
     IBDatabaseInfo1: TIBDatabaseInfo;
+    IBTransaction1: TIBTransaction;
     Memo1: TMemo;
+    TableNameLookup: TIBQuery;
     procedure FormShow(Sender: TObject);
     procedure IBDatabase1AfterConnect(Sender: TObject);
   private
+    procedure AddPerfStats(Heading: string; stats: TStrings);
     { private declarations }
     procedure ShowBoolValue(aValue: Long; WhenTrue, WhenFalse: string);
     procedure ShowStrings(aCaption: string; List: TStrings);
@@ -55,6 +58,8 @@ end;
 
 procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);
 begin
+  IBTransaction1.Active := true;
+  TableNameLookup.Active := true;
   with IBDatabaseInfo1 do
   begin
     Memo1.Lines.Add('Allocation = ' + IntToStr(Allocation));
@@ -78,14 +83,15 @@ begin
     Memo1.Lines.Add('Marks = ' + IntToStr(Marks));
     Memo1.Lines.Add('Reads = ' + IntToStr(Reads));
     Memo1.Lines.Add('Writes = ' + IntToStr(Writes));
-    ShowStrings('Backout Count',BackoutCount);
-    ShowStrings('Delete Count',DeleteCount);
-    ShowStrings('Expunge Count',ExpungeCount);
-    ShowStrings('Insert Count',InsertCount);
-    ShowStrings('Purge Count',PurgeCount);
-    ShowStrings('Read Idx Count',ReadIdxCount);
-    ShowStrings('Read Seq Count',ReadSeqCount);
-    ShowStrings('Update Count',UpdateCount);
+    AddPerfStats('Backout Count',BackoutCount);
+    AddPerfStats('Delete Count',DeleteCount);
+    AddPerfStats('Expunge Count',ExpungeCount);
+    AddPerfStats('Insert Count',InsertCount);
+    AddPerfStats('Purge Count',PurgeCount);
+    AddPerfStats('Read Idx Count',ReadIdxCount);
+    AddPerfStats('Read Seq Count',ReadSeqCount);
+    AddPerfStats('Update Count',UpdateCount);
+    Memo1.Lines.Add('');
     Memo1.Lines.Add('DB SQLDialect = ' + IntToStr(DBSQLDialect));
     ShowBoolValue(ReadOnly,'Database is Read Only','Database is Read/Write');
   end;
@@ -112,6 +118,24 @@ begin
   end;
   Memo1.Lines.Add(s);
 end;
+
+procedure TForm1.AddPerfStats(Heading: string;
+  stats: TStrings);
+var i: integer;
+begin
+  with Memo1.Lines do
+  begin
+    if stats.count = 0 then exit;
+    Add('');
+    Add(Heading);
+    for i := 0 to stats.Count - 1 do
+    begin
+      if TableNameLookup.Locate('RDB$RELATION_ID',stats.Names[i],[]) then
+        Add('  ' + TableNameLookup.FieldByName('RDB$RELATION_NAME').AsString + ' = ' + stats.ValueFromIndex[i]);
+    end;
+  end;
+end;
+
 
 end.
 
