@@ -109,6 +109,8 @@ function EditFieldLink(aMaster: TDataSet; aIndexDefs: TIndexDefs;
 
 implementation
 
+uses IBCustomDataSet;
+
 function EditFieldLink(aMaster: TDataSet; aIndexDefs: TIndexDefs;
    var aDetailIndexFieldNames: string; var aMasterIndexFieldNames: string
    ): boolean;
@@ -249,6 +251,9 @@ end;
      I: integer;
  begin
   DetailedFieldListBox.Clear;
+  if Master is TIBCustomDataset then
+   with TIBCustomDataSet(Master) do
+     if (Database = nil) or not Database.Connected then Exit;
   IndexDefs.Update;
   for I := 0 to IndexDefs.Count - 1 do
     with IndexDefs[I] do

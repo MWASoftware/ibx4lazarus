@@ -111,6 +111,7 @@ end;
 
 procedure TGeneratorEditor.FormShow(Sender: TObject);
 begin
+  if (PrimaryKeys.Database = nil) or not PrimaryKeys.Database.Connected then Exit;
   SQLTransaction.Active := true;
   PrimaryKeys.Active := true;
   GeneratorQuery.Active := true;

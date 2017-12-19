@@ -17,7 +17,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <CursorPos X="35" Y="27"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="23" Y="10"/>
         <UsageCount Value="110"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -398,7 +399,6 @@
       <Unit49>
         <Filename Value="../../../../components/codetools/codecompletiontool.pas"/>
         <UnitName Value="CodeCompletionTool"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="7077"/>
         <CursorPos X="14" Y="7094"/>
@@ -424,7 +424,7 @@
         <Loaded Value="True"/>
       </Unit51>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="27">
+    <JumpHistory Count="29" HistoryIndex="26">
       <Position1>
         <Filename Value="../../runtime/IBServices.pas"/>
         <Caret Line="442" Column="29" TopLine="424"/>
@@ -518,33 +518,29 @@
         <Caret Line="181" TopLine="161"/>
       </Position23>
       <Position24>
-        <Filename Value="../../runtime/IBServices.pas"/>
-        <Caret Line="1741" Column="31" TopLine="1766"/>
-      </Position24>
-      <Position25>
         <Filename Value="../../../../components/codetools/codecompletiontool.pas"/>
         <Caret Line="7094" Column="13" TopLine="7074"/>
-      </Position25>
-      <Position26>
+      </Position24>
+      <Position25>
         <Filename Value="../../../../components/codetools/customcodetool.pas"/>
         <Caret Line="156" Column="20" TopLine="138"/>
-      </Position26>
-      <Position27>
+      </Position25>
+      <Position26>
         <Filename Value="../../../../components/codetools/codeatom.pas"/>
         <Caret Line="91" Column="27" TopLine="72"/>
-      </Position27>
-      <Position28>
+      </Position26>
+      <Position27>
         <Filename Value="../../../../components/codetools/codecompletiontool.pas"/>
         <Caret Line="7094" Column="14" TopLine="7076"/>
+      </Position27>
+      <Position28>
+        <Filename Value="../../../../components/codetools/customcodetool.pas"/>
+        <Caret Line="156" Column="23" TopLine="137"/>
       </Position28>
       <Position29>
         <Filename Value="../../../../components/codetools/customcodetool.pas"/>
-        <Caret Line="156" Column="23" TopLine="137"/>
-      </Position29>
-      <Position30>
-        <Filename Value="../../../../components/codetools/customcodetool.pas"/>
         <Caret Line="157" Column="44" TopLine="137"/>
-      </Position30>
+      </Position29>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

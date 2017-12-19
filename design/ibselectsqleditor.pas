@@ -113,8 +113,8 @@ begin
   try
     if assigned(DataSet) then
     begin
-        IBSQLEditFrame1.Database := DataSet.Database;
-        GenerateParams.Checked := DataSet.GenerateParamNames;
+      IBSQLEditFrame1.Database := DataSet.Database;
+      GenerateParams.Checked := DataSet.GenerateParamNames;
     end;
     IBSQLEditFrame1.SQLText.Lines.Assign(SelectSQL);
     Result := ShowModal = mrOK;
@@ -151,7 +151,8 @@ end;
 
 procedure TIBSelectSQLEditorForm.SelectPageShow(Sender: TObject);
 begin
-  IBSQLEditFrame1.UserTables.Active := true;
+  if (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected then
+    IBSQLEditFrame1.UserTables.Active := true;
 end;
 
 procedure TIBSelectSQLEditorForm.UserProceduresAfterScroll(DataSet: TDataSet);
@@ -219,7 +220,8 @@ end;
 
 procedure TIBSelectSQLEditorForm.ExecutePageShow(Sender: TObject);
 begin
-  IBSQLEditFrame1.UserProcedures.Active := true;
+  if (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected then
+    IBSQLEditFrame1.UserProcedures.Active := true;
 end;
 
 procedure TIBSelectSQLEditorForm.HandleUserTablesOpened(Sender: TObject);

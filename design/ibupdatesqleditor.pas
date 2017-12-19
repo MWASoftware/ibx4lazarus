@@ -139,8 +139,11 @@ begin
   GenerateButton.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
   TestBtn.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
   FCurrentStatement := -1;
-  IBSQLEditFrame1.UserTables.Active := true;
-  IBSQLEditFrame1.SyncQueryBuilder(FRefreshSQL);
+  if (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected then
+  begin
+    IBSQLEditFrame1.UserTables.Active := true;
+    IBSQLEditFrame1.SyncQueryBuilder(FRefreshSQL);
+  end;
 end;
 
 procedure TIBUpdateSQLEditorForm.FormClose(Sender: TObject;

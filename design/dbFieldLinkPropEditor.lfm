@@ -9,7 +9,7 @@ object FieldLinkEditor: TFieldLinkEditor
   ClientWidth = 633
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object Bevel1: TBevel
     Left = 8
     Height = 316

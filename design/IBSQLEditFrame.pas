@@ -335,7 +335,8 @@ begin
     else
     if Components[i] is TIBSQL then
       TIBSQL(Components[i]).Database := FDatabase;
-  SQLTransaction.Active := true;
+  if (FDatabase <> nil) and FDatabase.Connected then
+    SQLTransaction.Active := true;
 end;
 
 procedure TIBSQLEditFrame.SetExecuteOnlyProcs(AValue: boolean);
@@ -507,7 +508,7 @@ procedure TIBSQLEditFrame.SelectAllFields(Checked: boolean);
   end;
 
 begin
-  if FOpening then Exit;
+  if FOpening or (Database = nil) or not Database.Connected then Exit;
    DoSelectAllFields(Checked);
 end;
 
@@ -1004,11 +1005,13 @@ end;
 function TIBSQLEditFrame.SyncQueryBuilder(SQL: TStrings): TIBSQLStatementTypes;
 var TableName: string;
 begin
+  if (Database = nil) or not Database.Connected then Exit;
+
   Result := SQLUnknown;
   TableName := '';
-  IdentifyStatementSQL.Transaction.Active := true;
-  IdentifyStatementSQL.SQL.Assign(SQL);
   try
+    IdentifyStatementSQL.Transaction.Active := true;
+    IdentifyStatementSQL.SQL.Assign(SQL);
     IdentifyStatementSQL.Prepare;
     Result := IdentifyStatementSQL.SQLStatementType;
     case Result  of
