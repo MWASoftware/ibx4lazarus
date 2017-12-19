@@ -80,6 +80,8 @@ type
   TIBLocalOption = (iblAutoUpgrade, iblAllowDowngrade, iblQuiet);
   TIBLocalOptions = set of TIBLocalOption;
 
+  EIBLocalException = class(Exception);
+
 
   { TCustomIBLocalDBSupport }
 
@@ -106,9 +108,15 @@ type
     FDownGradeArchive: string;
     FSharedDataDir: string;
     FUpgradeConf: TUpgradeConfFile;
+    FInCreateNew: boolean;
+    FSavedAfterConnect: TNotifyEvent;
+    FSavedAfterDisconnect: TNotifyEvent;
+    FSavedBeforeConnect: TNotifyEvent;
+    FSavedBeforeDisconnect: TNotifyEvent;
     procedure CheckEnabled;
     procedure CreateDatabase(DBName: string; DBParams: TStrings; Overwrite: boolean);
     function GetDatabase: TIBDatabase;
+    function GetSharedDataDir: string;
     procedure SetDatabase(AValue: TIBDatabase);
     function GetDBNameAndPath: string;
     procedure InitDatabaseParameters(DBParams: TStrings;
@@ -123,13 +131,15 @@ type
     procedure SetFirebirdDirectory(AValue: string);
     procedure SetupFirebirdEnv;
     procedure UpgradeCheck;
+    procedure SaveEvents;
+    procedure RestoreEvents;
   protected
     { Protected declarations }
     function AllowInitialisation: boolean; virtual;
     function AllowRestore: boolean; virtual;
     procedure CreateDir(DirName: string);
-    function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; virtual; abstract;
-    procedure HandleGetParamValue(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD);
+    function InternalCreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; virtual; abstract;
+    function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean;
     procedure Downgrade(DBArchive: string); virtual;
     procedure DowngradeDone;
     procedure Loaded; override;
@@ -166,13 +176,9 @@ type
      is prompted for archive filename if filename empty.}
     procedure SaveDatabase(filename: string = '');
 
-    {Copies database parameters as give in the DBParams to the Service
-     omitting any parameters not appropriate for TIBService. Typically, the
-     DBParams are TIBDatabase.Params}
-    class procedure SetDBParams(aService: TIBCustomService; DBParams: TStrings);
-
     property ActiveDatabasePathName: string read FActiveDatabasePathName;
     property CurrentDBVersionNo: integer read FCurrentDBVersionNo;
+    property SharedDataDir: string read GetSharedDataDir;
 
     { Likely to be Published declarations }
     property Database: TIBDatabase read GetDatabase write SetDatabase;
@@ -194,9 +200,8 @@ type
 
 implementation
 
-uses  DB, IBBlob, ZStream
-  {$IFDEF Unix} ,initc, regexpr {$ENDIF}
-  {$IFDEF WINDOWS} ,Windows ,Windirs {$ENDIF};
+{$IFDEF Unix} uses initc, regexpr {$ENDIF}
+{$IFDEF WINDOWS} uses Windows ,Windirs {$ENDIF};
 
 resourcestring
   sNoDowngrade = 'Database Schema is %d. Unable to downgrade to version %d';
@@ -204,44 +209,15 @@ resourcestring
   sEmptyDBArchiveMissing = 'Unable to create database - no empty DB archive specified';
   sEmptyDBArchiveNotFound = 'Unable to create database - empty DB archive file (%s) not found';
   sNoEmbeddedServer = 'Firebird Embedded Server is required but is not installed';
+  sCreateFailed = 'Unable to Create Personal Database';
 
 { TCustomIBLocalDBSupport }
 
 
-procedure TCustomIBLocalDBSupport.HandleGetParamValue(Sender: TObject;
-  ParamName: string; var BlobID: TISC_QUAD);
-var Blob: TIBBlobStream;
-    Source: TStream;
-    FileName: string;
-begin
-  Blob := TIBBlobStream.Create;
-  try
-    Blob.Database := (Sender as TIBXScript).Database;
-    Blob.Transaction := (Sender as TIBXScript).Transaction;
-    Blob.Mode := bmWrite;
-    if not assigned(UpgradeConf) or
-       not UpgradeConf.GetSourceFile(ParamName,FileName) then Exit;
-
-    if CompareText(ExtractFileExt(FileName),'.gz') = 0 then  {gzip compressed file}
-      Source := TGZFileStream.Create(FileName,gzopenread)
-    else
-      Source := TFileStream.Create(FileName,fmOpenRead or fmShareDenyNone);
-    try
-      Blob.CopyFrom(Source,0)
-    finally
-      Source.Free
-    end;
-    Blob.Finalize;
-    BlobID := Blob.BlobID
-  finally
-    Blob.Free
-  end
-end;
-
 procedure TCustomIBLocalDBSupport.CheckEnabled;
 begin
   if not Enabled then
-    raise Exception.Create(sLocalDBDisabled);
+    raise EIBLocalException.Create(sLocalDBDisabled);
 end;
 
 procedure TCustomIBLocalDBSupport.CreateDatabase(DBName: string; DBParams: TStrings;
@@ -251,13 +227,13 @@ begin
  CheckEnabled;
  DBArchive := EmptyDBArchive;
  if DBArchive = '' then
-   raise Exception.Create(sEmptyDBArchiveMissing);
+   raise EIBLocalException.Create(sEmptyDBArchiveMissing);
 
  if not TUpgradeConfFile.IsAbsolutePath(DBArchive) then
-   DBArchive := FSharedDataDir + DBArchive;
+   DBArchive := SharedDataDir + DBArchive;
 
  if not FileExists(DBArchive) then
-   raise Exception.CreateFmt(sEmptyDBArchiveNotFound,[DBArchive]);
+   raise EIBLocalException.CreateFmt(sEmptyDBArchiveNotFound,[DBArchive]);
 
  if FileExists(DBName) then
  begin
@@ -267,13 +243,31 @@ begin
  end;
 
  SetupFirebirdEnv;
- CreateNewDatabase(DBName,DBParams,DBArchive);
- FNewDBCreated := true;
+ SaveEvents;
+ try
+   if not CreateNewDatabase(DBName,DBParams,DBArchive) then
+   begin
+     Database.Connected := true;
+     Database.DropDatabase;
+     raise EIBLocalException.Create(sCreateFailed);
+   end
+   else
+     FNewDBCreated := true;
+ finally
+   RestoreEvents;
+ end;
 end;
 
 function TCustomIBLocalDBSupport.GetDatabase: TIBDatabase;
 begin
   Result := FIBBase.Database;
+end;
+
+function TCustomIBLocalDBSupport.GetSharedDataDir: string;
+begin
+  if FSharedDataDir = '' then
+    FSharedDataDir := MapSharedDataDir(ExtractFilePath(ParamStr(0)));
+  Result := FSharedDataDir;
 end;
 
 procedure TCustomIBLocalDBSupport.SetDatabase(AValue: TIBDatabase);
@@ -290,7 +284,7 @@ begin
 {$IFDEF UNIX}
 
   {Under Unix transform application exe paths that are in installed locations
-   e.g. /usr/local/bin to corresponding shared data locations ee.g. /usr/local/shared}
+   e.g. /usr/local/bin to corresponding shared data locations e.g. /usr/local/shared}
   RegexObj := TRegExpr.Create;
   try
     RegexObj.Expression := '^/usr(/local|)/(s|)bin/.*$';
@@ -300,8 +294,11 @@ begin
     RegexObj.Free;
   end;
 {$ENDIF}
-  if assigned (OnGetSharedDataDir) then
+  if assigned (FOnGetSharedDataDir) then
     OnGetSharedDataDir(self,Result);
+ {Ensure a trailing separator}
+  if (Length(Result) > 0) and (Result[Length(Result)] <> DirectorySeparator) then
+    Result := Result + DirectorySeparator;
 end;
 
 {$IFDEF Unix}
@@ -327,7 +324,7 @@ end;
 procedure TCustomIBLocalDBSupport.OnBeforeDatabaseConnect(Sender: TObject;
   DBParams: TStrings; var DBName: string);
 begin
-  if not Enabled or (csDesigning in ComponentState) then Exit;
+  if FInCreateNew or not Enabled or (csDesigning in ComponentState) then Exit;
 
   if not FirebirdAPI.IsEmbeddedServer then
      raise EIBLocalFatalError.Create(sNoEmbeddedServer);
@@ -362,21 +359,25 @@ begin
 end;
 
 procedure TCustomIBLocalDBSupport.SetupFirebirdEnv;
+var sdd: string;
 begin
   if sysutils.GetEnvironmentVariable('FIREBIRD') = '' then
   begin
     if FirebirdDirectory <> '' then
     begin
       if not TUpgradeConfFile.IsAbsolutePath(FirebirdDirectory) then
-        FirebirdDirectory := FSharedDataDir + FirebirdDirectory;
+        FirebirdDirectory := SharedDataDir + FirebirdDirectory;
       if FileExists(FirebirdDirectory + DirectorySeparator + 'firebird.conf') then
       begin
         SetEnvironmentVariable('FIREBIRD',PChar(FirebirdDirectory));
         Exit;
       end;
     end;
-    if FileExists(FSharedDataDir + 'firebird.conf') then
-      SetEnvironmentVariable('FIREBIRD',PChar(FSharedDataDir));
+    if FileExists(SharedDataDir + 'firebird.conf') then
+    begin
+      sdd := SharedDataDir;
+      SetEnvironmentVariable('FIREBIRD',PChar(sdd));
+    end;
   end;
 end;
 
@@ -391,6 +392,26 @@ begin
   else
   if (CurrentDBVersionNo < RequiredVersionNo) and (iblAutoUpgrade in FOptions) then
     PerformUpgrade(RequiredVersionNo);
+end;
+
+procedure TCustomIBLocalDBSupport.SaveEvents;
+begin
+  FSavedAfterConnect := Database.AfterConnect;
+  Database.AfterConnect := nil;
+  FSavedAfterDisconnect := Database.AfterDisconnect;
+  Database.AfterDisconnect := nil;
+  FSavedBeforeConnect := Database.BeforeConnect;
+  Database.BeforeConnect := nil;
+  FSavedBeforeDisconnect := Database.BeforeDisconnect;
+  Database.BeforeDisconnect := nil;
+end;
+
+procedure TCustomIBLocalDBSupport.RestoreEvents;
+begin
+  Database.AfterConnect := FSavedAfterConnect;
+  Database.AfterDisconnect := FSavedAfterDisconnect;
+  Database.BeforeConnect := FSavedBeforeConnect;
+  Database.BeforeDisconnect := FSavedBeforeDisconnect;
 end;
 
 function TCustomIBLocalDBSupport.AllowInitialisation: boolean;
@@ -411,6 +432,19 @@ begin
     CreateDir(ParentDirName);
   if not DirectoryExists(DirName) then
     mkdir(DirName);
+end;
+
+function TCustomIBLocalDBSupport.CreateNewDatabase(DBName: string;
+  DBParams: TStrings; DBArchive: string): boolean;
+begin
+  Result := false;
+  if FInCreateNew then Exit;
+  FInCreateNew := true;
+  try
+    Result := InternalCreateNewDatabase(DBName,DBParams,DBArchive);
+  finally
+    FInCreateNew := false;
+  end;
 end;
 
 procedure TCustomIBLocalDBSupport.Downgrade(DBArchive: string);
@@ -467,28 +501,6 @@ begin
   FDatabaseName := ExtractFileName(AValue);
 end;
 
-class procedure TCustomIBLocalDBSupport.SetDBParams(aService: TIBCustomService;
-  DBParams: TStrings);
-var i: integer;
-    j: integer;
-    k: integer;
-    ParamName: string;
-begin
-  aService.Params.Clear;
-  for i := 0 to DBParams.Count - 1 do
-  begin
-    ParamName := DBParams[i];
-    k := Pos('=',ParamName);
-    if k > 0 then system.Delete(ParamName,k,Length(ParamName)-k+1);
-    for j := 1 to isc_spb_last_spb_constant do
-      if ParamName = SPBConstantNames[j] then
-      begin
-        aService.Params.Add(DBParams[i]);
-        break;
-      end;
-  end;
-end;
-
 function TCustomIBLocalDBSupport.UpdateVersionNo: boolean;
 begin
   Result := assigned(OnGetDBVersionNo);
@@ -506,7 +518,6 @@ begin
   FIBBase.AfterDatabaseDisconnect := @OnAfterDatabaseDisconnect;
   FUpgradeConfFile := 'upgrade.conf';
   FOptions := [iblAutoUpgrade, iblAllowDowngrade];
-  FSharedDataDir := MapSharedDataDir(ExtractFilePath(ParamStr(0)));
 end;
 
 destructor TCustomIBLocalDBSupport.Destroy;
@@ -557,7 +568,7 @@ procedure TCustomIBLocalDBSupport.PerformUpgrade(TargetVersionNo: integer);
     if Result = '' then Exit;
 
     if not TUpgradeConfFile.IsAbsolutePath(Result) then
-      Result := FSharedDataDir + Result;
+      Result := SharedDataDir + Result;
   end;
 
 begin

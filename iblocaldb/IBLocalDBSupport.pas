@@ -38,13 +38,14 @@ type
 
   TIBLocalDBSupport = class(TCustomIBLocalDBSupport)
   private
-    FTargetVersionNo: integer;
     procedure DoDowngrade(Data: PtrInt);
-    procedure HandleDoUpgrade(Sender: TObject);
+    procedure HandleGetDBVersionNo(Sender: TObject; var VersionNo: integer);
+    procedure HandleUpgradeStepCompleted(Sender: TObject);
   protected
     function AllowInitialisation: boolean; override;
     function AllowRestore: boolean; override;
-    function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; override;
+    function InternalCreateNewDatabase(DBName: string; DBParams: TStrings;
+      DBArchive: string): boolean; override;
     procedure Downgrade(DBArchive: string); override;
     function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; override;
     function RunUpgradeDatabase(TargetVersionNo: integer): boolean; override;
@@ -69,7 +70,7 @@ type
 implementation
 
 uses IBXUpgradeDatabaseDlg, IBXCreateDatabaseDlg, IBXSaveDatabaseDlg, IBServices,
-  IBXUpgradeConfFile, Registry;
+  Registry, IBXCreateDatabaseFromSQLDlgUnit;
 
 resourcestring
   sDowngradePrompt = 'Database Version %d found but Version %d expected. If you have '+
@@ -81,10 +82,6 @@ resourcestring
                               'All data in the current database will be lost!';
   sReplaceInitial =   'This action will replace the current database with an initial database. '+
                               'All data in the current database will be lost!';
-  sUpdateMsg =       'Applying Update from %s';
-  sUpdateStarted =   '%s Update Started';
-  sUpdateEnded =     '%s Update Completed';
-  sUpdateFailed    = 'Update Failed - %s';
 
 { TIBLocalDBSupport }
 
@@ -95,40 +92,15 @@ begin
    DowngradeDone;
 end;
 
-procedure TIBLocalDBSupport.HandleDoUpgrade(Sender: TObject);
-var UpdateAvailable: boolean;
-    UpgradeInfo: TUpgradeInfo;
-    DBArchive: string;
-    LastVersionNo: integer;
+procedure TIBLocalDBSupport.HandleGetDBVersionNo(Sender: TObject;
+  var VersionNo: integer);
 begin
-  with (Sender as TUpgradeDatabaseDlg) do
-  repeat
-    if CurrentDBVersionNo >= FTargetVersionNo then break;
-    LastVersionNo := CurrentDBVersionNo;
-    UpdateAvailable := UpgradeConf.GetUpgradeInfo(CurrentDBVersionNo+1,UpgradeInfo);
-    if UpdateAvailable then
-    begin
-      if UpgradeInfo.BackupDB then
-      begin
-       DBArchive := ChangeFileExt(ActiveDatabasePathName,'');
-       DBArchive := DBArchive + '.' + IntToStr(CurrentDBVersionNo) + '.gbk';
-       SaveDatabase(DBArchive);
-      end;
-      Add2Log(UpgradeInfo.UserMessage);
-      Status.Caption := UpgradeInfo.UserMessage;
-      Application.ProcessMessages;
-      Add2Log(Format(sUpdateMsg,[UpgradeInfo.UpdateSQLFile]));
-      Add2Log(Format(sUpdateStarted,[DateTimeToStr(Now)]));
-      if not IBXScript.PerformUpdate(UpgradeInfo.UpdateSQLFile,true) then
-      begin
-       Add2Log(Format(sUpdateFailed,[DateTimeToStr(Now)]));
-       SuccessfulCompletion := false;
-       break;
-      end;
-      Add2Log(Format(sUpdateEnded,[DateTimeToStr(Now)]));
-      UpdateVersionNo;
-    end;
-  until not UpdateAvailable or (LastVersionNo = CurrentDBVersionNo);
+  VersionNo := CurrentDBVersionNo;
+end;
+
+procedure TIBLocalDBSupport.HandleUpgradeStepCompleted(Sender: TObject);
+begin
+  UpdateVersionNo;
 end;
 
 function TIBLocalDBSupport.AllowInitialisation: boolean;
@@ -143,22 +115,22 @@ begin
             (MessageDlg(sReplaceBackup,mtWarning,[mbOK,mbCancel],0) = mrOK);
 end;
 
-function TIBLocalDBSupport.CreateNewDatabase(DBName: string;
+function TIBLocalDBSupport.InternalCreateNewDatabase(DBName: string;
   DBParams: TStrings; DBArchive: string): boolean;
+var Ext: string;
 begin
   CreateDir(ExtractFileDir(DBName));
-  with TCreateDatabaseDlg.Create(Application) do
-  try
-   SetDBParams(IBRestoreService1,DBParams);
-   IBRestoreService1.BackupFile.Clear;
-   IBRestoreService1.DatabaseName.Clear;
-   IBRestoreService1.Options := [CreateNewDB];
-   IBRestoreService1.BackupFile.Add(DBArchive);
-   IBRestoreService1.DatabaseName.Add(DBName);
-   Result := ShowModal = mrOK;
-  finally
-    Free
-  end;
+  Ext := AnsiUpperCase(ExtractFileExt(DBArchive));
+  if Ext = '.GBK' then
+    Result := IBXCreateDatabaseDlg.CreateNewDatabase(DBName,DBParams,DBArchive)
+  else
+  if Ext = '.SQL' then
+  begin
+    Database.DatabaseName := DBName;
+    Result := IBXCreateDatabaseFromSQLDlgUnit.CreateNewDatabase(Database,DBArchive)
+  end
+  else
+    raise Exception.CreateFmt('Archive file (%s) has an unknown extension',[DBArchive]);
 end;
 
 procedure TIBLocalDBSupport.Downgrade(DBArchive: string);
@@ -175,82 +147,21 @@ end;
 function TIBLocalDBSupport.RestoreDatabaseFromArchive(DBName: string;
   DBParams: TStrings; aFilename: string): boolean;
 begin
-  with TCreateDatabaseDlg.Create(Application) do
-  try
-    if (aFilename = '') or not FileExists(aFileName) then
-    begin
-     OpenDialog1.InitialDir := GetUserDir;
-     if OpenDialog1.Execute then
-       aFilename := OpenDialog1.FileName
-     else
-       Exit;
-    end;
-    SetDBParams(IBRestoreService1,DBParams);
-    IBRestoreService1.BackupFile.Clear;
-    IBRestoreService1.DatabaseName.Clear;
-    IBRestoreService1.Options := [replace];
-    IBRestoreService1.BackupFile.Add(aFilename);
-    IBRestoreService1.DatabaseName.Add(DBName);
-    Result := ShowModal = mrOK;
-  finally
-    Free
-  end;
+  Result := IBXCreateDatabaseDlg.RestoreDatabaseFromArchive(DBName,DBParams,aFileName);
 end;
 
 function TIBLocalDBSupport.RunUpgradeDatabase(TargetVersionNo: integer
   ): boolean;
 begin
-  FTargetVersionNo := TargetVersionNo;
-  with TUpgradeDatabaseDlg.Create(Application) do
-  try
-    IBXScript.Database := Database;
-    UpdateTransaction.DefaultDatabase := Database;
-    OnDoUpgrade := @HandleDoUpgrade;
-    IBXScript.GetParamValue := @HandleGetParamValue;
-    Result := ShowModal = mrOK;
-  finally
-    Free
-  end;
+  Result := IBXUpgradeDatabaseDlg.RunUpgradeDatabase(Database,UpgradeConf,
+                  ChangeFileExt(ActiveDatabasePathName,''),
+                  TargetVersionNo,@HandleGetDBVersionNo, @HandleUpgradeStepCompleted);
 end;
-
-{$IFDEF WINDOWS}
-const
-  rgShellFolders      = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders';
-  rgPersonal          = 'Personal';
-{$ENDIF}
 
 function TIBLocalDBSupport.SaveDatabaseToArchive(DBName: string;
   DBParams: TStrings; aFilename: string): boolean;
 begin
-  with TSaveDatabaseDlg.Create(Application) do
-  try
-   if aFilename = ''  then
-   begin
-     SaveDialog1.InitialDir := GetUserDir;
-     {$IFDEF WINDOWS}
-     with TRegistry.Create do
-     try
-       if OpenKey(rgShellFolders,false) then
-       begin
-         SaveDialog1.InitialDir := ReadString(rgPersonal)
-       end;
-     finally
-       Free
-     end;
-     {$ENDIF}
-     if SaveDialog1.Execute then
-       aFilename := SaveDialog1.FileName
-     else
-       Exit;
-   end;
-   SetDBParams(IBBackupService1,DBParams);
-   IBBackupService1.BackupFile.Clear;
-   IBBackupService1.DatabaseName := DBName;
-   IBBackupService1.BackupFile.Add(aFilename);
-   Result := ShowModal = mrOK
-  finally
-    Free
-  end;
+  Result := IBXSaveDatabaseDlg.SaveDatabaseToArchive(DBName,DBParams,aFileName);
 end;
 
 end.

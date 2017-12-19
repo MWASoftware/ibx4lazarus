@@ -1011,6 +1011,7 @@ end;
 destructor TIBDynamicGridColumn.Destroy;
 begin
   if assigned(FDBLookupProperties) then FDBLookupProperties.Free;
+  Application.RemoveAsyncCalls(self);
   inherited Destroy;
 end;
 
@@ -1303,6 +1304,7 @@ begin
   if assigned(FIBControlLink) then FIBControlLink.Free;
   if assigned(FIndexFieldsList) then FIndexFieldsList.Free;
   if assigned(FDBLookupCellEditor) then FDBLookupCellEditor.Free;
+  Application.RemoveAsyncCalls(self);
   inherited Destroy;
 end;
 

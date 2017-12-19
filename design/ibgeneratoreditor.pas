@@ -15,7 +15,7 @@
  *
  *  The Initial Developer of the Original Code is Tony Whyman.
  *
- *  The Original Code is (C) 2011 Tony Whyman, MWA Software
+ *  The Original Code is (C) 2011-17 Tony Whyman, MWA Software
  *  (http://www.mwasoftware.co.uk).
  *
  *  All Rights Reserved.
@@ -31,8 +31,9 @@ unit IBGeneratorEditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  ExtCtrls, StdCtrls, ComCtrls, IBDatabase, IBCustomDataSet, IBSystemTables;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
+  StdCtrls, ComCtrls, db, IBDatabase, IBCustomDataSet, IBQuery, IBSQL,
+  IBLookupComboEditBox, IB;
 
 type
 
@@ -42,32 +43,32 @@ type
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
-    GeneratorNames: TComboBox;
-    FieldNames: TComboBox;
-    IBTransaction1: TIBTransaction;
+    GeneratorSource: TDataSource;
+    GeneratorQuery: TIBQuery;
+    GeneratorNames: TIBLookupComboEditBox;
+    FieldNames: TIBLookupComboEditBox;
+    IdentifyStatementSQL: TIBSQL;
     IncrementBy: TEdit;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     OnNewRecord: TRadioButton;
     OnPost: TRadioButton;
+    PrimaryKeys: TIBQuery;
+    PrimaryKeySource: TDataSource;
+    SQLTransaction: TIBTransaction;
     UpDown1: TUpDown;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure PrimaryKeysBeforeOpen(DataSet: TDataSet);
   private
     FGenerator: TIBGenerator;
-    FTableName: string;
-    FIBSystemTables: TIBSystemTables;
     { private declarations }
-    procedure LoadGenerators;
-    procedure LoadFieldNames;
-    function GetPrimaryKey: string;
+    function GetTableName: string;
     procedure SetGenerator(const AValue: TIBGenerator);
-    procedure SetDatabase(ADatabase: TIBDatabase; ATransaction: TIBTransaction);
+    procedure SetDatabase(aDatabase: TIBDatabase);
   public
     { public declarations }
-    constructor Create(TheOwner: TComponent); override;
-    destructor Destroy; override;
     property Generator: TIBGenerator read FGenerator write SetGenerator;
   end; 
 
@@ -75,7 +76,6 @@ function EditGenerator(AGenerator: TIBGenerator): boolean;
 
 implementation
 
-uses IBQuery;
 
 {$R *.lfm}
 
@@ -111,23 +111,44 @@ end;
 
 procedure TGeneratorEditor.FormShow(Sender: TObject);
 begin
-  LoadGenerators;
-  LoadFieldNames;
+  SQLTransaction.Active := true;
+  PrimaryKeys.Active := true;
+  GeneratorQuery.Active := true;
   if Generator.Generator <> '' then
-    GeneratorNames.ItemIndex := GeneratorNames.Items.IndexOf(Generator.Generator);
+    GeneratorQuery.Locate('RDB$GENERATOR_NAME',Generator.Generator,[]);
   if Generator.Field <> '' then
-    FieldNames.ItemIndex := FieldNames.Items.IndexOf(UpperCase(Generator.Field))
-  else
-    FieldNames.ItemIndex := FieldNames.Items.IndexOf(GetPrimaryKey);
-
-  if FieldNames.ItemIndex = -1 then
-    FieldNames.Text := Generator.Field;
+    PrimaryKeys.Locate('ColumnName',UpperCase(Generator.Field),[]);
 
   if Generator.ApplyOnEvent = gaeOnNewRecord then
     OnNewRecord.Checked := true
   else
     OnPost.Checked := true;
   IncrementBy.Text := IntToStr(Generator.Increment);
+end;
+
+procedure TGeneratorEditor.PrimaryKeysBeforeOpen(DataSet: TDataSet);
+begin
+  PrimaryKeys.ParamByName('RDB$RELATION_NAME').AsString := GetTableName;
+end;
+
+function TGeneratorEditor.GetTableName: string;
+begin
+  Result := '';
+  with IdentifyStatementSQL do
+  begin
+    Transaction.Active := true;
+    if FGenerator.Owner is TIBQuery then
+      SQL.Assign((FGenerator.Owner as TIBQuery).SQL)
+    else
+      SQL.Assign((FGenerator.Owner as TIBDataset).SelectSQL);
+    try
+      Prepare;
+      if (SQLStatementType = SQLSelect) and (MetaData.Count > 0) then
+        Result := MetaData[0].GetRelationName;
+    except on E:EIBError do
+  //      ShowMessage(E.Message);
+    end;
+  end;
 end;
 
 procedure TGeneratorEditor.FormClose(Sender: TObject;
@@ -146,64 +167,20 @@ begin
   end;
 end;
 
-procedure TGeneratorEditor.LoadGenerators;
-begin
-  FIBSystemTables.GetGenerators(GeneratorNames.Items);
-  if GeneratorNames.Items.Count > 0 then
-    GeneratorNames.ItemIndex := 0
-end;
-
-procedure TGeneratorEditor.LoadFieldNames;
-begin
-  if FGenerator.Owner is TIBDataSet then
-    FIBSystemTables.GetTableAndColumns((FGenerator.Owner as TIBDataSet).SelectSQL.Text,FTableName,FieldNames.Items)
-  else
-  if FGenerator.Owner is TIBQuery then
-    FIBSystemTables.GetTableAndColumns((FGenerator.Owner as TIBQuery).SQL.Text,FTableName,FieldNames.Items)
-  else
-    raise Exception.CreateFmt('Don''t know how to edit a %s',[FGenerator.Owner.ClassName])
-end;
-
-function TGeneratorEditor.GetPrimaryKey: string;
-var Keys: TStringList;
-begin
-  Result := '';
-  Keys := TStringList.Create;
-  try
-    FIBSystemTables.GetPrimaryKeys(FTableName,Keys);
-    if Keys.Count > 0 then
-      Result := Keys[0];
-  finally
-    Keys.Free
-  end;
-end;
-
 procedure TGeneratorEditor.SetGenerator(const AValue: TIBGenerator);
 begin
   FGenerator := AValue;
-  IBTransaction1.DefaultDatabase := Generator.Owner.Database;
-  SetDatabase(Generator.Owner.Database,IBTransaction1);
+  SetDatabase(Generator.Owner.Database);
 end;
 
-procedure TGeneratorEditor.SetDatabase(ADatabase: TIBDatabase; ATransaction: TIBTransaction);
+procedure TGeneratorEditor.SetDatabase(aDatabase: TIBDatabase);
 begin
   if not assigned(ADatabase) then
     raise Exception.Create('A Database must be assigned');
-  if not assigned(ATransaction) then
-    raise Exception.Create('A Transaction must be assigned');
-  FIBSystemTables.SelectDatabase( ADatabase,ATransaction)
-end;
-
-constructor TGeneratorEditor.Create(TheOwner: TComponent);
-begin
-  inherited Create(TheOwner);
-  FIBSystemTables := TIBSystemTables.Create
-end;
-
-destructor TGeneratorEditor.Destroy;
-begin
-  if assigned(FIBSystemTables) then FIBSystemTables.Free;
-  inherited Destroy;
+  PrimaryKeys.Database := aDatabase;
+  GeneratorQuery.Database := aDatabase;
+  IdentifyStatementSQL.Database := aDatabase;
+  SQLTransaction.DefaultDatabase := aDatabase;
 end;
 
 end.

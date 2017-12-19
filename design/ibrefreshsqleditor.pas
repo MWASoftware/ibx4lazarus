@@ -1,3 +1,29 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2011 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*)
+
 unit ibrefreshsqleditor;
 
 {$mode objfpc}{$H+}
@@ -5,44 +31,20 @@ unit ibrefreshsqleditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, IBSystemTables, IBDatabase, IBCustomDataSet;
+  Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs, 
+    ibselectsqleditor, IBDatabase, IBCustomDataset;
 
 type
 
   { TIBRefreshSQLEditorForm }
 
-  TIBRefreshSQLEditorForm = class(TForm)
-    Button1: TButton;
-    Button2: TButton;
-    GenerateBtn: TButton;
-    GenerateParams: TCheckBox;
-    TestBtn: TButton;
-    FieldList: TListBox;
-    IBTransaction1: TIBTransaction;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    PrimaryKeyList: TListBox;
-    QuoteFields: TCheckBox;
-    SQLText: TMemo;
-    TableNamesCombo: TComboBox;
+  TIBRefreshSQLEditorForm = class(TIBSelectSQLEditorForm)
     procedure GenerateBtnClick(Sender: TObject);
-    procedure TestBtnClick(Sender: TObject);
-    procedure FieldListDblClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-    procedure PrimaryKeyListDblClick(Sender: TObject);
-    procedure TableNamesComboCloseUp(Sender: TObject);
   private
-    { private declarations }
-    FIBSystemTables: TIBSystemTables;
+
   public
-    { public declarations }
-    constructor Create(TheOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure SetDatabase(Database: TIBDatabase);
-  end; 
+
+  end;
 
 var
   IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm;
@@ -67,14 +69,14 @@ begin
   try
     if assigned(DataSet) then
     begin
-        SetDatabase(DataSet.Database);
-        GenerateParams.Checked := DataSet.GenerateParamNames;
+      IBSQLEditFrame1.Database := DataSet.Database;
+      GenerateParams.Checked := DataSet.GenerateParamNames;
     end;
-    SQLText.Lines.Assign(SelectSQL);
+    IBSQLEditFrame1.SQLText.Lines.Assign(SelectSQL);
     Result := ShowModal = mrOK;
     if Result then
     begin
-     SelectSQL.Assign(SQLText.Lines);
+     SelectSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
      if assigned(DataSet) then
           DataSet.GenerateParamNames := GenerateParams.Checked
     end;
@@ -85,76 +87,11 @@ end;
 
 { TIBRefreshSQLEditorForm }
 
-procedure TIBRefreshSQLEditorForm.FormShow(Sender: TObject);
-var TableName: string;
-begin
-  GenerateBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
-  TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
-  TableNamesCombo.Items.Clear;
-  FIBSystemTables.GetTableNames(TableNamesCombo.Items);
-  if TableNamesCombo.Items.Count > 0 then
-  begin
-    TableNamesCombo.ItemIndex := 0;
-    if Trim(SQLText.Text) <> '' then
-    begin
-      FIBSystemTables.GetTableAndColumns(SQLText.Text,TableName,nil);
-      TableNamesCombo.ItemIndex := TableNamesCombo.Items.IndexOf(TableName)
-    end;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items);
-    FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
-  end;
-end;
-
-procedure TIBRefreshSQLEditorForm.PrimaryKeyListDblClick(Sender: TObject);
-begin
-  SQLText.SelText := PrimaryKeyList.Items[PrimaryKeyList.ItemIndex];
-  SQLText.SetFocus
-end;
-
-procedure TIBRefreshSQLEditorForm.FieldListDblClick(Sender: TObject);
-begin
-  SQLText.SelText := FieldList.Items[FieldList.ItemIndex];
-  SQLText.SetFocus
-end;
-
 procedure TIBRefreshSQLEditorForm.GenerateBtnClick(Sender: TObject);
-var FieldNames: TStrings;
 begin
-  FieldNames :=  FIBSystemTables.GetFieldNames(FieldList);
-  try
-    FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,SQLText.Lines)
-  finally
-    FieldNames.Free
-  end;
+  IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked);
 end;
 
-procedure TIBRefreshSQLEditorForm.TestBtnClick(Sender: TObject);
-begin
-  FIBSystemTables.TestSQL(SQLText.Lines.Text,GenerateParams.Checked)
-end;
-
-procedure TIBRefreshSQLEditorForm.TableNamesComboCloseUp(Sender: TObject);
-begin
-  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items);
-  FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
-end;
-
-constructor TIBRefreshSQLEditorForm.Create(TheOwner: TComponent);
-begin
-  inherited Create(TheOwner);
-  FIBSystemTables := TIBSystemTables.Create;
-end;
-
-destructor TIBRefreshSQLEditorForm.Destroy;
-begin
-  if assigned(FIBSystemTables) then FIBSystemTables.Free;
-  inherited Destroy;
-end;
-
-procedure TIBRefreshSQLEditorForm.SetDatabase(Database: TIBDatabase);
-begin
-  IBTransaction1.DefaultDatabase := Database;
-  FIBSystemTables.SelectDatabase(Database,IBTransaction1)
-end;
 
 end.
+

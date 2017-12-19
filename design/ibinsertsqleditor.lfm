@@ -1,224 +1,90 @@
-object IBInsertSQLEditorForm: TIBInsertSQLEditorForm
-  Left = 2288
-  Height = 436
-  Top = 468
-  Width = 748
+inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
   Caption = 'Insert SQL Editor'
-  ClientHeight = 436
-  ClientWidth = 748
-  OnShow = FormShow
-  Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
-  object Label3: TLabel
-    Left = 279
-    Height = 14
-    Top = 16
-    Width = 24
-    Caption = 'SQL'
-    ParentColor = False
-  end
-  object SQLText: TMemo
-    Left = 279
-    Height = 326
-    Top = 36
-    Width = 438
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    ScrollBars = ssAutoBoth
-    TabOrder = 0
-  end
-  object Button1: TButton
-    Left = 551
-    Height = 30
-    Top = 378
-    Width = 72
-    Anchors = [akRight, akBottom]
-    Caption = 'OK'
-    Default = True
-    ModalResult = 1
-    TabOrder = 1
-  end
-  object Button2: TButton
-    Left = 639
-    Height = 30
-    Top = 378
-    Width = 72
-    Anchors = [akRight, akBottom]
-    Cancel = True
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 2
-  end
-  object GenerateBtn: TButton
-    Left = 279
-    Height = 30
-    Top = 378
-    Width = 101
-    Anchors = [akRight, akBottom]
-    Caption = 'Generate SQL'
+  inherited GenerateBtn: TButton
     OnClick = GenerateBtnClick
-    TabOrder = 3
   end
-  object TestBtn: TButton
-    Left = 415
-    Height = 30
-    Top = 378
-    Width = 66
-    Anchors = [akRight, akBottom]
-    Caption = 'Test'
-    OnClick = TestBtnClick
-    TabOrder = 4
-  end
-  object QuoteFields: TCheckBox
-    Left = 16
-    Height = 22
-    Top = 392
-    Width = 125
-    Caption = '&Quote Identifiers'
-    TabOrder = 5
-  end
-  object GenerateParams: TCheckBox
-    Left = 16
-    Height = 22
-    Top = 368
-    Width = 171
-    Caption = 'Allow DSQL Placeholders'
-    TabOrder = 6
-  end
-  object PageControl: TPageControl
-    Left = 16
-    Height = 349
-    Top = 13
-    Width = 233
+  inherited PageControl: TPageControl
     ActivePage = ExecutePage
     TabIndex = 1
-    TabOrder = 7
-    object InsertPage: TTabSheet
-      Caption = 'Insert'
-      ClientHeight = 317
-      ClientWidth = 227
-      OnShow = InsertPageShow
-      object Label1: TLabel
-        Left = 8
-        Height = 15
-        Top = 8
-        Width = 69
-        Caption = 'Table Name'
-        ParentColor = False
+    inherited SelectPage: TTabSheet
+      inherited FieldNamesGrid: TIBDynamicGrid
+        Height = 208
       end
-      object TableNamesCombo: TComboBox
-        Left = 8
-        Height = 27
-        Top = 24
-        Width = 201
-        OwnerDrawEditable = False
-        AutoComplete = True
-        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        ItemHeight = 0
-        OnCloseUp = TableNamesComboCloseUp
-        TabOrder = 0
+      inherited PrimaryKeysGrid: TIBDynamicGrid
+        Visible = False
       end
-      object Label2: TLabel
-        Left = 8
-        Height = 15
-        Top = 56
-        Width = 33
-        Caption = 'Fields'
-        ParentColor = False
-      end
-      object FieldList: TListBox
-        Left = 8
-        Height = 236
-        Hint = 'Select Fields to include in Insert Statement, or leave unselected to select all'
-        Top = 72
-        Width = 204
-        ItemHeight = 0
-        MultiSelect = True
-        OnDblClick = FieldListDblClick
-        ParentShowHint = False
-        ScrollWidth = 202
-        ShowHint = True
-        TabOrder = 1
-        TopIndex = -1
+      inherited SelectSelectAll: TCheckBox
+        Top = 296
       end
     end
-    object ExecutePage: TTabSheet
-      Caption = 'Execute'
-      ClientHeight = 317
-      ClientWidth = 227
-      OnShow = ExecutePageShow
-      object Label16: TLabel
-        Left = 7
-        Height = 14
-        Top = 8
-        Width = 100
-        Caption = 'Procedure Name'
-        ParentColor = False
+    inherited ExecutePage: TTabSheet
+      inherited Label18: TLabel
+        Visible = False
       end
-      object ProcedureNames: TComboBox
-        Left = 7
-        Height = 27
-        Top = 24
-        Width = 201
-        OwnerDrawEditable = False
-        ItemHeight = 0
-        OnCloseUp = ProcedureNamesCloseUp
-        ParentColor = True
-        TabOrder = 0
+      inherited SelectProcedure: TLabel
+        Visible = True
       end
-      object Label17: TLabel
-        Left = 7
-        Height = 14
-        Top = 56
-        Width = 104
-        Caption = 'Input Parameters'
-        ParentColor = False
+      inherited InputProcGrid: TIBDynamicGrid
+        Height = 224
       end
-      object ProcInputList: TListBox
-        Left = 8
-        Height = 103
-        Top = 72
-        Width = 198
-        IntegralHeight = True
-        ItemHeight = 0
-        ScrollWidth = 196
-        TabOrder = 1
-        TopIndex = -1
-      end
-      object Label18: TLabel
-        Left = 7
-        Height = 14
-        Top = 184
-        Width = 114
-        Caption = 'Output Parameters'
-        ParentColor = False
-      end
-      object ProcOutputList: TListBox
-        Left = 7
-        Height = 80
-        Top = 200
-        Width = 198
-        IntegralHeight = True
-        ItemHeight = 0
-        ScrollWidth = 196
-        TabOrder = 2
-        TopIndex = -1
-      end
-      object ExecuteOnlyIndicator: TLabel
-        Left = 10
-        Height = 14
-        Top = 293
-        Width = 89
-        Caption = 'Execute Only'
-        Font.Style = [fsBold]
-        ParentColor = False
-        ParentFont = False
+      inherited OutputProcGrid: TIBDynamicGrid
         Visible = False
       end
     end
   end
-  object IBTransaction1: TIBTransaction
-    Active = False
-    left = 200
-    top = 388
+  inherited IBSQLEditFrame1: TIBSQLEditFrame
+    Left = 282
+    Height = 339
+    Top = 24
+    Width = 448
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 339
+    ClientWidth = 448
+    TabOrder = 7
+    inherited SQLText: TSynEdit
+      Height = 313
+      Width = 448
+    end
+    inherited ToolBar1: TToolBar
+      Width = 448
+    end
+    inherited FieldNameList: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited PrimaryKeys: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited UserProcedures: TIBQuery
+      AfterScroll = UserProceduresAfterScroll
+    end
+    inherited ProcInputParams: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$PROCEDURE_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited ProcOutputParams: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$PROCEDURE_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited SQLTransaction: TIBTransaction
+      Params.Strings = (      )
+    end
   end
 end

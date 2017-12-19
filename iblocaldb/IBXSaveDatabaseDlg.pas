@@ -56,7 +56,51 @@ type
 var
   SaveDatabaseDlg: TSaveDatabaseDlg;
 
+function SaveDatabaseToArchive(DBName: string;  DBParams: TStrings; aFilename: string): boolean;
+
 implementation
+
+uses Registry;
+
+{$IFDEF WINDOWS}
+const
+  rgShellFolders      = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders';
+  rgPersonal          = 'Personal';
+{$ENDIF}
+
+function SaveDatabaseToArchive(DBName: string; DBParams: TStrings;
+  aFilename: string): boolean;
+begin
+ with TSaveDatabaseDlg.Create(Application) do
+ try
+  if aFilename = ''  then
+  begin
+    SaveDialog1.InitialDir := GetUserDir;
+    {$IFDEF WINDOWS}
+    with TRegistry.Create do
+    try
+      if OpenKey(rgShellFolders,false) then
+      begin
+        SaveDialog1.InitialDir := ReadString(rgPersonal)
+      end;
+    finally
+      Free
+    end;
+    {$ENDIF}
+    if SaveDialog1.Execute then
+      aFilename := SaveDialog1.FileName
+    else
+      Exit;
+  end;
+  IBBackupService1.SetDBParams(DBParams);
+  IBBackupService1.BackupFile.Clear;
+  IBBackupService1.DatabaseName := DBName;
+  IBBackupService1.BackupFile.Add(aFilename);
+  Result := ShowModal = mrOK
+ finally
+   Free
+ end;
+end;
 
 {$R *.lfm}
 

@@ -569,6 +569,7 @@ begin
   if assigned(FDataLink) then FDataLink.Free;
   if assigned(FIBLookupControlLink) then FIBLookupControlLink.Free;
   if assigned(FTimer) then FTimer.Free;
+  Application.RemoveAsyncCalls(self);
   inherited Destroy;
 end;
 

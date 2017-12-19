@@ -1,16 +1,16 @@
 object LimboTransactionsForm: TLimboTransactionsForm
-  Left = 632
+  Left = 3303
   Height = 386
-  Top = 339
+  Top = 324
   Width = 798
   Caption = 'Limbo Transactions'
   ClientHeight = 386
   ClientWidth = 798
   OnShow = FormShow
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.8.0.5'
   object Label1: TLabel
     Left = 14
-    Height = 15
+    Height = 14
     Top = 12
     Width = 74
     Caption = 'Transactions'

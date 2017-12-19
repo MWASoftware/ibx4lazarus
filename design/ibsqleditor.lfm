@@ -1,435 +1,139 @@
-object IBSQLEditorForm: TIBSQLEditorForm
-  Left = 2090
-  Height = 425
-  Top = 382
-  Width = 716
-  ActiveControl = PageControl
+inherited IBSQLEditorForm: TIBSQLEditorForm
+  Left = 315
+  Width = 776
   Caption = 'IBSQL Editor'
-  ClientHeight = 425
-  ClientWidth = 716
+  ClientWidth = 776
   OnShow = FormShow
-  Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
-  object Label3: TLabel
-    Left = 288
-    Height = 14
-    Top = 8
-    Width = 24
-    Caption = 'SQL'
-    ParentColor = False
+  inherited Label3: TLabel
+    Left = 312
   end
-  object SQLText: TMemo
-    Left = 288
-    Height = 335
-    Top = 27
-    Width = 418
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    ScrollBars = ssAutoBoth
-    TabOrder = 0
+  inherited Button1: TButton
+    Left = 579
   end
-  object GenerateBtn: TButton
-    Left = 267
-    Height = 30
-    Top = 374
-    Width = 104
-    Anchors = [akRight, akBottom]
-    Caption = 'Generate SQL'
+  inherited Button2: TButton
+    Left = 667
+  end
+  inherited GenerateBtn: TButton
+    Left = 307
     OnClick = GenerateBtnClick
-    TabOrder = 1
   end
-  object Button2: TButton
-    Left = 627
-    Height = 30
-    Top = 374
-    Width = 72
-    Anchors = [akRight, akBottom]
-    Cancel = True
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 2
+  inherited TestBtn: TButton
+    Left = 443
   end
-  object QuoteFields: TCheckBox
-    Left = 16
-    Height = 22
-    Top = 392
-    Width = 125
-    Caption = '&Quote Identifiers'
-    TabOrder = 3
+  inherited QuoteFields: TCheckBox
+    Left = 68
   end
-  object Button1: TButton
-    Left = 539
-    Height = 30
-    Top = 373
-    Width = 72
-    Anchors = [akRight, akBottom]
-    Caption = 'OK'
-    Default = True
-    ModalResult = 1
-    TabOrder = 4
-  end
-  object PageControl: TPageControl
-    Left = 16
-    Height = 337
-    Top = 27
-    Width = 256
+  inherited PageControl: TPageControl
+    Left = 68
     ActivePage = SelectPage
+    ShowTabs = False
     TabIndex = 0
-    TabOrder = 5
-    TabPosition = tpLeft
-    object SelectPage: TTabSheet
-      Caption = 'Select'
-      ClientHeight = 331
-      ClientWidth = 189
-      OnShow = SelectPageShow
-      object Label1: TLabel
-        Left = 7
-        Height = 14
-        Top = 3
-        Width = 69
-        Caption = 'Table Name'
-        ParentColor = False
+    inherited SelectPage: TTabSheet
+      ClientHeight = 349
+      inherited Label4: TLabel
+        Top = 256
       end
-      object Label2: TLabel
-        Left = 7
-        Height = 14
-        Top = 53
-        Width = 33
-        Caption = 'Fields'
-        ParentColor = False
-      end
-      object Label4: TLabel
-        Left = 7
-        Height = 14
-        Top = 231
-        Width = 77
-        Caption = 'Primary Keys'
-        ParentColor = False
-      end
-      object SelectTableNames: TComboBox
-        Left = 7
-        Height = 27
-        Top = 19
-        Width = 174
-        OwnerDrawEditable = False
-        Anchors = [akTop, akLeft, akRight]
-        AutoComplete = True
-        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        ItemHeight = 0
-        OnCloseUp = SelectTableNamesCloseUp
-        TabOrder = 0
-      end
-      object SelectFieldsList: TListBox
-        Left = 7
+      inherited FieldNamesGrid: TIBDynamicGrid
         Height = 136
-        Hint = 'Select Fields to include in Select Statement or leave unselected to select all'
-        Top = 69
-        Width = 174
-        Anchors = [akTop, akLeft, akRight]
-        ItemHeight = 0
-        MultiSelect = True
-        OnDblClick = SelectFieldsListDblClick
-        ParentShowHint = False
-        ScrollWidth = 172
-        ShowHint = True
-        TabOrder = 1
-        TopIndex = -1
       end
-      object SelectPrimaryKeys: TListBox
-        Left = 7
-        Height = 77
-        Top = 247
-        Width = 174
-        Anchors = [akTop, akLeft, akRight, akBottom]
-        ItemHeight = 0
-        ScrollWidth = 172
-        TabOrder = 2
-        TopIndex = -1
+      inherited PrimaryKeysGrid: TIBDynamicGrid
+        Top = 272
       end
-    end
-    object InsertPage: TTabSheet
-      Caption = 'Insert'
-      ClientHeight = 331
-      ClientWidth = 189
-      OnShow = InsertPageShow
-      object Label8: TLabel
-        Left = 7
-        Height = 15
-        Top = 3
-        Width = 69
-        Caption = 'Table Name'
-        ParentColor = False
+      inherited SelectSelectAll: TCheckBox
+        Left = 8
+        Top = 224
       end
-      object Label9: TLabel
-        Left = 7
-        Height = 15
-        Top = 53
-        Width = 33
-        Caption = 'Fields'
-        ParentColor = False
-      end
-      object InsertTableNames: TComboBox
-        Left = 7
-        Height = 27
-        Top = 19
-        Width = 169
-        OwnerDrawEditable = False
-        Anchors = [akTop, akLeft, akRight]
-        AutoComplete = True
-        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        ItemHeight = 0
-        OnCloseUp = InsertTableNamesCloseUp
-        TabOrder = 0
-      end
-      object InsertFieldsList: TListBox
-        Left = 7
-        Height = 256
-        Hint = 'Select Fields to include in Insert  Statement or leave unselected to select all'
-        Top = 69
-        Width = 169
-        Anchors = [akTop, akLeft, akRight, akBottom]
-        ItemHeight = 0
-        MultiSelect = True
-        OnDblClick = SelectFieldsListDblClick
-        ParentShowHint = False
-        ScrollWidth = 167
-        ShowHint = True
-        TabOrder = 1
-        TopIndex = -1
-      end
-    end
-    object ModifyPage: TTabSheet
-      Caption = 'Modify'
-      ClientHeight = 331
-      ClientWidth = 189
-      OnShow = ModifyPageShow
-      object Label10: TLabel
-        Left = 7
-        Height = 15
-        Top = 3
-        Width = 69
-        Caption = 'Table Name'
-        ParentColor = False
-      end
-      object Label11: TLabel
-        Left = 7
-        Height = 15
-        Top = 53
-        Width = 33
-        Caption = 'Fields'
-        ParentColor = False
-      end
-      object Label12: TLabel
-        Left = 7
-        Height = 15
-        Top = 228
-        Width = 77
-        Caption = 'Primary Keys'
-        ParentColor = False
-      end
-      object ModifyTableNames: TComboBox
-        Left = 7
-        Height = 27
-        Top = 19
-        Width = 169
-        OwnerDrawEditable = False
-        Anchors = [akTop, akLeft, akRight]
-        AutoComplete = True
-        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        ItemHeight = 0
-        OnCloseUp = ModifyTableNamesCloseUp
-        TabOrder = 0
-      end
-      object ModifyFieldsList: TListBox
-        Left = 7
-        Height = 104
-        Hint = 'Select Fields to include in Update Statement or leave unselected to select all'
-        Top = 69
-        Width = 169
-        Anchors = [akTop, akLeft, akRight]
-        ItemHeight = 0
-        MultiSelect = True
-        OnClick = SelectFieldsListDblClick
-        ScrollWidth = 167
-        TabOrder = 1
-        TopIndex = -1
-      end
-      object ModifyPrimaryKeys: TListBox
-        Left = 7
-        Height = 77
-        Top = 244
-        Width = 169
-        Anchors = [akTop, akLeft, akRight, akBottom]
-        ItemHeight = 0
-        OnClick = SelectFieldsListDblClick
-        ScrollWidth = 167
-        TabOrder = 2
-        TopIndex = -1
-      end
-      object IncludePrimaryKeys: TCheckBox
+      object IncludePrimaryKeys: TCheckBox[8]
         Left = 5
         Height = 22
-        Top = 181
-        Width = 150
-        Caption = 'Include Primary keys'
-        OnClick = IncludePrimaryKeysClick
-        TabOrder = 3
-      end
-      object Label5: TLabel
-        Left = 27
-        Height = 15
-        Top = 202
-        Width = 67
-        Caption = 'in Field List'
-        ParentColor = False
+        Top = 328
+        Width = 221
+        Caption = 'Include Primary keys in Field List'
+        Checked = True
+        OnChange = IncludePrimaryKeysChange
+        State = cbChecked
+        TabOrder = 5
       end
     end
-    object DeletePage: TTabSheet
-      Caption = 'Delete'
-      ClientHeight = 331
-      ClientWidth = 189
-      OnShow = DeletePageShow
-      object Label14: TLabel
-        Left = 7
-        Height = 15
-        Top = 3
-        Width = 69
-        Caption = 'Table Name'
-        ParentColor = False
-      end
-      object Label15: TLabel
-        Left = 7
-        Height = 15
-        Top = 66
-        Width = 77
-        Caption = 'Primary Keys'
-        ParentColor = False
-      end
-      object DeleteTableNames: TComboBox
-        Left = 7
-        Height = 27
-        Top = 19
-        Width = 169
-        OwnerDrawEditable = False
-        Anchors = [akTop, akLeft, akRight]
-        AutoComplete = True
-        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        ItemHeight = 0
-        OnCloseUp = DeleteTableNamesCloseUp
-        TabOrder = 0
-      end
-      object DeletePrimaryKeys: TListBox
-        Left = 7
-        Height = 55
-        Top = 82
-        Width = 167
-        Anchors = [akTop, akLeft, akRight]
-        ItemHeight = 0
-        OnDblClick = SelectFieldsListDblClick
-        ScrollWidth = 165
-        TabOrder = 1
-        TopIndex = -1
-      end
-    end
-    object ExecutePage: TTabSheet
-      Caption = 'Execute'
-      ClientHeight = 331
-      ClientWidth = 189
-      OnShow = ExecutePageShow
-      object Label16: TLabel
-        Left = 7
-        Height = 15
-        Top = 3
-        Width = 100
-        Caption = 'Procedure Name'
-        ParentColor = False
-      end
-      object Label17: TLabel
-        Left = 10
-        Height = 15
-        Top = 61
-        Width = 104
-        Caption = 'Input Parameters'
-        ParentColor = False
-      end
-      object Label18: TLabel
-        Left = 11
-        Height = 15
-        Top = 181
-        Width = 114
-        Caption = 'Output Parameters'
-        ParentColor = False
-      end
-      object ProcedureNames: TComboBox
-        Left = 7
-        Height = 27
-        Top = 19
-        Width = 169
-        OwnerDrawEditable = False
-        Anchors = [akTop, akLeft, akRight]
-        ItemHeight = 0
-        OnCloseUp = ProcedureNamesCloseUp
-        TabOrder = 0
-      end
-      object ProcInputList: TListBox
-        Left = 6
-        Height = 80
-        Top = 82
-        Width = 164
-        Anchors = [akTop, akLeft, akRight]
-        IntegralHeight = True
-        ItemHeight = 0
-        ScrollWidth = 162
-        TabOrder = 1
-        TopIndex = -1
-      end
-      object ProcOutputList: TListBox
-        Left = 10
-        Height = 97
-        Top = 201
-        Width = 160
-        Anchors = [akTop, akLeft, akRight]
-        IntegralHeight = True
-        ItemHeight = 0
-        ScrollWidth = 158
-        TabOrder = 2
-        TopIndex = -1
-      end
-      object SelectProcedure: TLabel
-        Left = 7
-        Height = 14
-        Top = 310
-        Width = 126
-        Anchors = [akLeft, akBottom]
-        Caption = 'Is ''Select Procedure'''
-        Font.Height = -11
-        Font.Style = [fsBold]
-        ParentColor = False
-        ParentFont = False
-        Visible = False
-      end
+    inherited ExecutePage: TTabSheet
+      ClientHeight = 349
     end
   end
-  object TestBtn: TButton
-    Left = 403
-    Height = 30
-    Top = 374
-    Width = 66
-    Anchors = [akRight, akBottom]
-    Caption = 'Test'
-    OnClick = TestBtnClick
-    TabOrder = 6
+  inherited GenerateParams: TCheckBox
+    Left = 68
   end
-  object GenerateParams: TCheckBox
-    Left = 16
-    Height = 22
-    Top = 368
-    Width = 171
-    Caption = 'Allow DSQL Placeholders'
+  inherited IBSQLEditFrame1: TIBSQLEditFrame
+    Left = 312
+    Height = 339
+    Top = 24
+    Width = 447
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 339
+    ClientWidth = 447
     TabOrder = 7
+    DesignLeft = 1974
+    DesignTop = 200
+    inherited SQLText: TSynEdit
+      Height = 313
+      Width = 447
+    end
+    inherited ToolBar1: TToolBar
+      Width = 447
+    end
+    inherited FieldNameList: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited PrimaryKeys: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited UserProcedures: TIBQuery
+      AfterScroll = UserProceduresAfterScroll
+    end
+    inherited ProcInputParams: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$PROCEDURE_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited ProcOutputParams: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$PROCEDURE_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited SQLTransaction: TIBTransaction
+      Params.Strings = (      )
+    end
   end
-  object IBTransaction1: TIBTransaction
-    Active = False
-    left = 200
-    top = 391
+  object TabControl1: TTabControl[9]
+    Left = 11
+    Height = 312
+    Top = 8
+    Width = 59
+    OnChange = TabControl1Change
+    TabPosition = tpLeft
+    TabIndex = 0
+    Tabs.Strings = (
+      'Select'
+      'Insert'
+      'Modify'
+      'Delete'
+      'Execute'
+    )
+    TabOrder = 8
   end
 end

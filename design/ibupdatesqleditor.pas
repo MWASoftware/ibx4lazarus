@@ -15,7 +15,7 @@
  *
  *  The Initial Developer of the Original Code is Tony Whyman.
  *
- *  The Original Code is (C) 2011 Tony Whyman, MWA Software
+ *  The Original Code is (C) 2011-17 Tony Whyman, MWA Software
  *  (http://www.mwasoftware.co.uk).
  *
  *  All Rights Reserved.
@@ -23,30 +23,36 @@
  *  Contributor(s): ______________________________________.
  *
 *)
-unit IBUpdateSQLEditor;
+
+unit ibupdatesqleditor;
 
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  ComCtrls, StdCtrls, ExtCtrls, IBSystemTables, IBUpdateSQL, IBDatabase;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ComCtrls,
+  StdCtrls, ExtCtrls,  IBSQLEditFrame, IBCustomDataSet,
+  IBDatabase, IBLookupComboEditBox, IBDynamicGrid, Types, IBUpdateSQL;
 
 type
 
   { TIBUpdateSQLEditorForm }
 
   TIBUpdateSQLEditorForm = class(TForm)
+    FieldNamesGrid: TIBDynamicGrid;
     GenerateParams: TCheckBox;
+    IBSQLEditFrame1: TIBSQLEditFrame;
+    IncludeSysTables: TCheckBox;
+    PrimaryKeysGrid: TIBDynamicGrid;
+    SelectSelectAll: TCheckBox;
+    SelectTableNames: TIBLookupComboEditBox;
     TestBtn: TButton;
     CancelButton: TButton;
     FieldsPage: TTabSheet;
-    GenerateBtn: TButton;
+    GenerateButton: TButton;
     GroupBox1: TGroupBox;
-    IBTransaction1: TIBTransaction;
     IncludePrimaryKeys: TCheckBox;
-    PrimaryKeyList: TListBox;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
@@ -54,23 +60,20 @@ type
     OkButton: TButton;
     PageControl: TPageControl;
     QuoteFields: TCheckBox;
-    SQLMemo: TMemo;
     SQLPage: TTabSheet;
     StatementType: TRadioGroup;
-    FieldList: TListBox;
-    TableNamesCombo: TComboBox;
+    procedure IncludeSysTablesChange(Sender: TObject);
+    procedure SelectSelectAllClick(Sender: TObject);
     procedure TestBtnClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
-    procedure GenerateBtnClick(Sender: TObject);
+    procedure GenerateButtonClick(Sender: TObject);
     procedure SQLMemoChange(Sender: TObject);
     procedure SQLPageShow(Sender: TObject);
     procedure StatementTypeClick(Sender: TObject);
-    procedure TableNamesComboCloseUp(Sender: TObject);
   private
     { private declarations }
     FUpdateObject: TIBUpdateSQL;
-    FIBSystemTables: TIBSystemTables;
     FDirty: boolean;
     FCurrentStatement: integer;
     FModifySQL: TStringList;
@@ -78,41 +81,44 @@ type
     FDeleteSQL: TStringList;
     FRefreshSQL: TStringList;
     procedure UpdateSQLMemo;
+    procedure HandleUserTablesOpened(Sender: TObject);
+  protected
+    procedure Loaded; override;
   public
     { public declarations }
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
-    procedure SetUpdateObject(AObject: TIBUpdateSQL);
   end;
 
 var
   IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm;
 
-function EditIBUpdateSQL(UpdateObject: TIBUpdateSQL): boolean;
+  function EditIBUpdateSQL(UpdateObject: TIBUpdateSQL): boolean;
 
 implementation
-
-uses IBQuery;
 
 {$R *.lfm}
 
 function EditIBUpdateSQL(UpdateObject: TIBUpdateSQL): boolean;
 begin
   Result := false;
-  if assigned(UpdateObject.DataSet) and assigned(UpdateObject.DataSet.Database) then
-    try
-      UpdateObject.DataSet.Database.Connected := true;
-    except on E: Exception do
-      ShowMessage(E.Message)
-    end;
+  if assigned(UpdateObject) and assigned(UpdateObject.DataSet) and assigned(UpdateObject.DataSet.Database) then
+  try
+    UpdateObject.DataSet.Database.Connected := true;
+  except on E: Exception do
+    ShowMessage(E.Message)
+  end;
 
   with TIBUpdateSQLEditorForm.Create(Application) do
   try
-    SetUpdateObject(UpdateObject);
-    if assigned(UpdateObject.DataSet) then
+    if assigned(UpdateObject) and assigned(UpdateObject.DataSet) then
+    begin
+      IBSQLEditFrame1.Database := UpdateObject.DataSet.Database;
       GenerateParams.Checked := UpdateObject.DataSet.GenerateParamNames;
+    end;
+    FUpdateObject := UpdateObject;
     Result := ShowModal = mrOK;
-    if Result and assigned(UpdateObject.DataSet) then
+    if Result then
       UpdateObject.DataSet.GenerateParamNames := GenerateParams.Checked
   finally
     Free
@@ -125,29 +131,16 @@ end;
 procedure TIBUpdateSQLEditorForm.FormShow(Sender: TObject);
 var TableName: string;
 begin
-  GenerateBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
-  TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
   PageControl.ActivePage := FieldsPage;
   FModifySQL.Assign(FUpdateObject.ModifySQL);
   FInsertSQL.Assign(FUpdateObject.InsertSQL);
   FDeleteSQL.Assign(FUpdateObject.DeleteSQL);
   FRefreshSQL.Assign(FUpdateObject.RefreshSQL);
+  GenerateButton.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
+  TestBtn.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
   FCurrentStatement := -1;
-  TableNamesCombo.Items.Clear;
-  FIBSystemTables.GetTableNames(TableNamesCombo.Items);
-  if TableNamesCombo.Items.Count > 0 then
-  begin
-    TableNamesCombo.ItemIndex := 0;
-    if assigned(FUpdateObject.DataSet) and (FUpdateObject.DataSet is TIBQuery) and
-       ((FUpdateObject.DataSet as TIBQuery).SQL.Text <> '') then
-    try
-       FIBSystemTables.GetTableAndColumns((FUpdateObject.DataSet as TIBQuery).SQL.Text,TableName,nil);
-       TableNamesCombo.ItemIndex := TableNamesCombo.Items.IndexOf(TableName);
-    except  //ignore
-    end;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,IncludePrimaryKeys.checked,false);
-    FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
-  end;
+  IBSQLEditFrame1.UserTables.Active := true;
+  IBSQLEditFrame1.SyncQueryBuilder(FRefreshSQL);
 end;
 
 procedure TIBUpdateSQLEditorForm.FormClose(Sender: TObject;
@@ -165,44 +158,27 @@ end;
 
 procedure TIBUpdateSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
-  if SQLMemo.Lines.Text <> '' then
-    FIBSystemTables.TestSQL(SQLMemo.Lines.Text,GenerateParams.Checked);
+  IBSQLEditFrame1.TestSQL(GenerateParams.Checked);
 end;
 
-procedure TIBUpdateSQLEditorForm.GenerateBtnClick(Sender: TObject);
-var FieldNames: TStringList;
-    I: integer;
+procedure TIBUpdateSQLEditorForm.IncludeSysTablesChange(Sender: TObject);
 begin
-  FieldNames := TStringList.Create;
-  try
-    FUpdateObject.RefreshSQL.Clear;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldNames);
-    FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,FRefreshSQL);
-    FIBSystemTables.GenerateDeleteSQL(TableNamesCombo.Text,QuoteFields.Checked,FDeleteSQL);
-    FieldNames.Clear;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldNames,true,false);
-    FIBSystemTables.GenerateInsertSQL(TableNamesCombo.Text,QuoteFields.Checked,
-        FieldNames,FInsertSQL);
-    if FieldList.SelCount = 0 then
-    begin
-      FIBSystemTables.GenerateModifySQL(TableNamesCombo.Text,QuoteFields.Checked,
-        FieldList.Items,FModifySQL);
+  IBSQLEditFrame1.IncludeSystemTables := IncludeSysTables.Checked;
+end;
 
-    end
-    else
-    begin
-      FieldNames.Clear;
-      for I := 0 to FieldList.Items.Count - 1 do
-          if FieldList.Selected[I] then
-               FieldNames.Add(FieldList.Items[I]);
-      FIBSystemTables.GenerateModifySQL(TableNamesCombo.Text,QuoteFields.Checked,
-           FieldNames,FModifySQL);
-    end;
-    FDirty := false;
-    PageControl.ActivePage := SQLPage;
-  finally
-    FieldNames.Free
-  end;
+procedure TIBUpdateSQLEditorForm.SelectSelectAllClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.SelectAllFields(SelectSelectAll.Checked);
+end;
+
+procedure TIBUpdateSQLEditorForm.GenerateButtonClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked,FRefreshSQL);
+  IBSQLEditFrame1.GenerateDeleteSQL(QuoteFields.Checked,FDeleteSQL);
+  IBSQLEditFrame1.GenerateInsertSQL(QuoteFields.Checked,FInsertSQL);
+  IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked,FModifySQL, not IncludePrimaryKeys.Checked);
+  FDirty := false;
+  PageControl.ActivePage := SQLPage;
 end;
 
 procedure TIBUpdateSQLEditorForm.SQLMemoChange(Sender: TObject);
@@ -220,43 +196,56 @@ begin
   UpdateSQLMemo
 end;
 
-procedure TIBUpdateSQLEditorForm.TableNamesComboCloseUp(Sender: TObject);
-begin
-  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,IncludePrimaryKeys.checked,false);
-  FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
-end;
-
 procedure TIBUpdateSQLEditorForm.UpdateSQLMemo;
 begin
   if FDirty then
     case FCurrentStatement of
     0: //Modify
-        FModifySQL.Assign(SQLMemo.Lines);
+        FModifySQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     1: //Insert
-        FInsertSQL.Assign(SQLMemo.Lines);
+        FInsertSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     2: // Delete
-        FDeleteSQL.Assign(SQLMemo.Lines);
+        FDeleteSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     3: //Refresh
-        FRefreshSQL.Assign(SQLMemo.Lines);
+        FRefreshSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     end;
   FDirty := false;
   case StatementType.ItemIndex of
   0: // Modify
-    SQLMemo.Lines.Assign(FModifySQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FModifySQL)  ;
   1: //Insert
-    SQLMemo.Lines.Assign(FInsertSQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FInsertSQL)  ;
   2: // Delete
-    SQLMemo.Lines.Assign(FDeleteSQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FDeleteSQL)  ;
   3: //Refresh
-    SQLMemo.Lines.Assign(FRefreshSQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FRefreshSQL)  ;
   end;
   FCurrentStatement := StatementType.ItemIndex;
+end;
+
+procedure TIBUpdateSQLEditorForm.HandleUserTablesOpened(Sender: TObject);
+begin
+  SelectSelectAll.Checked := true;
+end;
+
+procedure TIBUpdateSQLEditorForm.Loaded;
+begin
+  inherited Loaded;
+  if IBSQLEditFrame1 <> nil then
+  begin
+    IBSQLEditFrame1.OnUserTablesOpened := @HandleUserTablesOpened;
+    if SelectTableNames <> nil then
+      SelectTableNames.ListSource :=  IBSQLEditFrame1.UserTableSource;
+    if FieldNamesGrid <> nil then
+      FieldNamesGrid.DataSource := IBSQLEditFrame1.FieldsSource;
+    if PrimaryKeysGrid <> nil then
+      PrimaryKeysGrid.DataSource := IBSQLEditFrame1.PrimaryKeySource;
+  end;
 end;
 
 constructor TIBUpdateSQLEditorForm.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
-  FIBSystemTables := TIBSystemTables.Create;
   FModifySQL := TStringList.Create;
   FInsertSQL := TStringList.Create;
   FDeleteSQL := TStringList.Create;
@@ -265,23 +254,11 @@ end;
 
 destructor TIBUpdateSQLEditorForm.Destroy;
 begin
-  if assigned(FIBSystemTables) then FIBSystemTables.Free;
   if assigned(FModifySQL) then FModifySQL.Free;
   if assigned(FInsertSQL) then FInsertSQL.Free;
   if assigned(FDeleteSQL) then FDeleteSQL.Free;
   if assigned(FRefreshSQL) then FRefreshSQL.Free;
   inherited Destroy;
 end;
-
-procedure TIBUpdateSQLEditorForm.SetUpdateObject(AObject: TIBUpdateSQL);
-begin
-  FUpdateObject := AObject;
-  if assigned(FUpdateObject.DataSet) then
-  begin
-    IBTransaction1.DefaultDatabase := FUpdateObject.DataSet.Database;
-    FIBSystemTables.SelectDatabase(FUpdateObject.DataSet.Database,IBTransaction1);
-  end;
-end;
-
 
 end.

@@ -253,6 +253,7 @@ type
   TLogEvent = procedure(Sender: TObject; Msg: string) of Object;
   TOnSelectSQL = procedure (Sender: TObject; SQLText: string) of object;
   TOnSetStatement = procedure(Sender: TObject; command, aValue, stmt: string; var Done: boolean) of object;
+  TOnCreateDatabase = procedure (Sender: TObject; var DatabaseFileName: string) of object;
 
   { TCustomIBXScript }
 
@@ -274,6 +275,7 @@ type
     FDatabase: TIBDatabase;
     FDataOutputFormatter: TIBCustomDataOutput;
     FIgnoreGrants: boolean;
+    FOnCreateDatabase: TOnCreateDatabase;
     FOnErrorLog: TLogEvent;
     FOnSelectSQL: TOnSelectSQL;
     FOnSetStatement: TOnSetStatement;
@@ -325,6 +327,7 @@ type
     property OnProgressEvent: TOnProgressEvent read GetOnProgressEvent write SetOnProgressEvent; {Progress Bar Support}
     property OnSelectSQL: TOnSelectSQL read FOnSelectSQL write FOnSelectSQL; {Handle Select SQL Statements}
     property OnSetStatement: TOnSetStatement read FOnSetStatement write FOnSetStatement;
+    property OnCreateDatabase: TOnCreateDatabase read FOnCreateDatabase write FOnCreateDatabase;
   end;
 
   {
@@ -723,9 +726,16 @@ begin
 
   except on E:Exception do
       begin
-        Add2Log(Format(sStatementError,[FSymbolStream.GetErrorPrefix,
-                           E.Message,stmt]),true);
-        if StopOnFirstError then Exit;
+        if FInternalTransaction.InTransaction then
+          FInternalTransaction.Rollback;
+        if assigned(OnErrorLog) then
+        begin
+          Add2Log(Format(sStatementError,[FSymbolStream.GetErrorPrefix,
+                             E.Message,stmt]),true);
+                             if StopOnFirstError then Exit;
+        end
+        else
+          raise;
       end
   end;
   Result := true;
@@ -838,6 +848,7 @@ var  RegexObj: TRegExpr;
      charsetid: integer;
      param: string;
      Terminator: char;
+     FileName: string;
 begin
   Result := false;
   ucStmt := AnsiUpperCase(stmt);
@@ -845,9 +856,14 @@ begin
   RegexObj := TRegExpr.Create;
   try
     {process create database}
-    RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +.*(\' + Terminator + '|)';
+    RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +''(.*)''(.*)(\' + Terminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
+      FileName := system.copy(stmt,RegexObj.MatchPos[2], RegexObj.MatchLen[2]);
+      if assigned(FOnCreateDatabase) then
+        OnCreateDatabase(self,FileName);
+      stmt := 'CREATE DATABASE ''' + FileName + '''' + system.copy(stmt,RegexObj.MatchPos[3], RegexObj.MatchLen[3]);
+      ucStmt := AnsiUpperCase(stmt);
       UpdateUserPassword;
       FDatabase.Connected := false;
       FDatabase.CreateDatabase(stmt);

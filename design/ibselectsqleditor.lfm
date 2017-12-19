@@ -1,7 +1,7 @@
 object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
-  Left = 527
+  Left = 354
   Height = 437
-  Top = 460
+  Top = 244
   Width = 747
   ActiveControl = PageControl
   Caption = 'Select SQL Editor'
@@ -9,23 +9,14 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   ClientWidth = 747
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object Label3: TLabel
-    Left = 279
+    Left = 278
     Height = 14
-    Top = 16
+    Top = 8
     Width = 24
     Caption = 'SQL'
     ParentColor = False
-  end
-  object SQLText: TMemo
-    Left = 279
-    Height = 327
-    Top = 36
-    Width = 437
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    ScrollBars = ssAutoBoth
-    TabOrder = 0
   end
   object Button1: TButton
     Left = 550
@@ -36,7 +27,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 0
   end
   object Button2: TButton
     Left = 638
@@ -47,7 +38,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 1
   end
   object GenerateBtn: TButton
     Left = 278
@@ -57,7 +48,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
     OnClick = GenerateBtnClick
-    TabOrder = 3
+    TabOrder = 2
   end
   object TestBtn: TButton
     Left = 414
@@ -67,7 +58,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'Test'
     OnClick = TestBtnClick
-    TabOrder = 4
+    TabOrder = 3
   end
   object QuoteFields: TCheckBox
     Left = 24
@@ -75,19 +66,19 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Top = 400
     Width = 125
     Caption = '&Quote Identifiers'
-    TabOrder = 5
+    TabOrder = 4
   end
   object PageControl: TPageControl
     Left = 24
-    Height = 335
-    Top = 28
+    Height = 355
+    Top = 8
     Width = 232
     ActivePage = SelectPage
     TabIndex = 0
-    TabOrder = 6
+    TabOrder = 5
     object SelectPage: TTabSheet
       Caption = 'Tables'
-      ClientHeight = 303
+      ClientHeight = 323
       ClientWidth = 226
       OnShow = SelectPageShow
       object Label1: TLabel
@@ -99,9 +90,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         ParentColor = False
       end
       object Label2: TLabel
-        Left = 7
+        Left = 8
         Height = 14
-        Top = 56
+        Top = 74
         Width = 33
         Caption = 'Fields'
         ParentColor = False
@@ -109,58 +100,132 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       object Label4: TLabel
         Left = 7
         Height = 14
-        Top = 208
+        Top = 224
         Width = 77
         Caption = 'Primary Keys'
         ParentColor = False
       end
-      object TableNamesCombo: TComboBox
-        Left = 6
+      object SelectTableNames: TIBLookupComboEditBox
+        Left = 7
         Height = 27
-        Top = 20
-        Width = 201
+        Top = 21
+        Width = 209
         OwnerDrawEditable = False
-        AutoComplete = True
+        KeyField = 'RDB$RELATION_ID'
+        ListField = 'RDB$RELATION_NAME'
+        ListFieldIndex = 0
+        LookupCache = False
+        OnDblClick = SelectTableNamesDblClick
+        ScrollListDataset = True
+        TabOrder = 0
+        AutoInsert = False
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
-        OnCloseUp = TableNamesComboCloseUp
-        TabOrder = 0
       end
-      object FieldList: TListBox
+      object FieldNamesGrid: TIBDynamicGrid
         Left = 7
-        Height = 123
-        Hint = 'Select Fields to include in Select Statements, or leave unselected to select all'
-        Top = 77
-        Width = 204
-        ItemHeight = 0
-        MultiSelect = True
-        OnDblClick = FieldListDblClick
-        ParentShowHint = False
-        ScrollWidth = 202
-        ShowHint = True
+        Height = 104
+        Top = 88
+        Width = 209
+        Color = clWindow
+        Columns = <        
+          item
+            ButtonStyle = cbsCheckboxColumn
+            Title.Caption = 'SELECTED'
+            Width = 30
+            FieldName = 'SELECTED'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Caption = 'COLUMNNAME'
+            Width = 64
+            FieldName = 'COLUMNNAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
+        DataSource = IBSQLEditFrame.FieldsSource
+        FixedCols = 0
+        Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+        Scrollbars = ssAutoVertical
         TabOrder = 1
-        TopIndex = -1
+        OnDblClick = FieldNamesGridDblClick
+        ExpandEditorPanelBelowRow = False
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
       end
-      object PrimaryKeyList: TListBox
+      object PrimaryKeysGrid: TIBDynamicGrid
         Left = 7
-        Height = 64
-        Top = 224
-        Width = 200
-        ItemHeight = 0
-        OnDblClick = PrimaryKeyListDblClick
-        ScrollWidth = 198
+        Height = 56
+        Top = 240
+        Width = 209
+        Color = clWindow
+        Columns = <        
+          item
+            ButtonStyle = cbsCheckboxColumn
+            Title.Caption = 'SELECTED'
+            Width = 30
+            FieldName = 'SELECTED'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Caption = 'COLUMNNAME'
+            Width = 64
+            FieldName = 'COLUMNNAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
+        FixedCols = 0
+        Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+        Scrollbars = ssAutoVertical
         TabOrder = 2
-        TopIndex = -1
+        OnDblClick = PrimaryKeysGridDblClick
+        ExpandEditorPanelBelowRow = False
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
+      end
+      object SelectSelectAll: TCheckBox
+        Left = 7
+        Height = 22
+        Top = 192
+        Width = 134
+        Caption = 'Select/Deselect All'
+        OnChange = SelectSelectAllChange
+        TabOrder = 3
+      end
+      object IncludeSysTables: TCheckBox
+        Left = 8
+        Height = 22
+        Top = 48
+        Width = 158
+        Caption = 'Include System Tables'
+        OnChange = IncludeSysTablesChange
+        TabOrder = 4
       end
     end
     object ExecutePage: TTabSheet
       Caption = 'Procedures'
-      ClientHeight = 303
+      ClientHeight = 323
       ClientWidth = 226
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 7
-        Height = 15
+        Height = 14
         Top = 3
         Width = 100
         Caption = 'Procedure Name'
@@ -168,57 +233,24 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       end
       object Label17: TLabel
         Left = 7
-        Height = 15
-        Top = 60
+        Height = 14
+        Top = 58
         Width = 104
         Caption = 'Input Parameters'
         ParentColor = False
       end
       object Label18: TLabel
         Left = 8
-        Height = 15
-        Top = 172
+        Height = 14
+        Top = 176
         Width = 114
         Caption = 'Output Parameters'
         ParentColor = False
       end
-      object ProcedureNames: TComboBox
-        Left = 7
-        Height = 27
-        Top = 20
-        Width = 201
-        OwnerDrawEditable = False
-        ItemHeight = 0
-        OnCloseUp = ProcedureNamesCloseUp
-        ParentColor = True
-        TabOrder = 0
-      end
-      object ProcInputList: TListBox
-        Left = 7
-        Height = 80
-        Top = 81
-        Width = 198
-        IntegralHeight = True
-        ItemHeight = 0
-        ScrollWidth = 196
-        TabOrder = 1
-        TopIndex = -1
-      end
-      object ProcOutputList: TListBox
-        Left = 7
-        Height = 80
-        Top = 192
-        Width = 198
-        IntegralHeight = True
-        ItemHeight = 0
-        ScrollWidth = 196
-        TabOrder = 2
-        TopIndex = -1
-      end
       object SelectProcedure: TLabel
         Left = 7
-        Height = 14
-        Top = 285
+        Height = 13
+        Top = 306
         Width = 126
         Anchors = [akLeft, akBottom]
         Caption = 'Is ''Select Procedure'''
@@ -228,6 +260,99 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         ParentFont = False
         Visible = False
       end
+      object ProcedureNames: TIBLookupComboEditBox
+        Left = 7
+        Height = 27
+        Top = 17
+        Width = 201
+        OwnerDrawEditable = False
+        KeyField = 'RDB$PROCEDURE_NAME'
+        ListField = 'RDB$PROCEDURE_NAME'
+        ListFieldIndex = 0
+        LookupCache = False
+        OnDblClick = ProcedureNamesDblClick
+        ScrollListDataset = True
+        TabOrder = 0
+        AutoInsert = False
+        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        ItemHeight = 0
+      end
+      object InputProcGrid: TIBDynamicGrid
+        Left = 7
+        Height = 96
+        Top = 72
+        Width = 201
+        Color = clWindow
+        Columns = <        
+          item
+            ButtonStyle = cbsCheckboxColumn
+            Title.Caption = 'SELECTED'
+            Width = 30
+            FieldName = 'SELECTED'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Caption = 'COLUMNNAME'
+            Width = 64
+            FieldName = 'COLUMNNAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
+        FixedCols = 0
+        Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+        Scrollbars = ssAutoVertical
+        TabOrder = 1
+        OnDblClick = InputProcGridDblClick
+        ExpandEditorPanelBelowRow = False
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
+      end
+      object OutputProcGrid: TIBDynamicGrid
+        Left = 7
+        Height = 104
+        Top = 192
+        Width = 201
+        Color = clWindow
+        Columns = <        
+          item
+            ButtonStyle = cbsCheckboxColumn
+            Title.Caption = 'SELECTED'
+            Width = 30
+            FieldName = 'SELECTED'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Caption = 'COLUMNNAME'
+            Width = 64
+            FieldName = 'COLUMNNAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
+        FixedCols = 0
+        Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+        Scrollbars = ssAutoVertical
+        TabOrder = 2
+        OnDblClick = OutputProcGridDblClick
+        ExpandEditorPanelBelowRow = False
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
+      end
     end
   end
   object GenerateParams: TCheckBox
@@ -236,11 +361,63 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Top = 376
     Width = 171
     Caption = 'Allow DSQL Placeholders'
-    TabOrder = 7
+    TabOrder = 6
   end
-  object IBTransaction1: TIBTransaction
-    Active = False
-    left = 212
-    top = 390
+  inline IBSQLEditFrame1: TIBSQLEditFrame
+    Left = 282
+    Height = 339
+    Top = 24
+    Width = 448
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 339
+    ClientWidth = 448
+    TabOrder = 7
+    DesignLeft = 1974
+    DesignTop = 200
+    inherited SQLText: TSynEdit
+      Height = 313
+      Width = 448
+    end
+    inherited ToolBar1: TToolBar
+      Width = 448
+    end
+    inherited FieldNameList: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited PrimaryKeys: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited UserProcedures: TIBQuery
+      AfterScroll = UserProceduresAfterScroll
+    end
+    inherited ProcInputParams: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$PROCEDURE_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited ProcOutputParams: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$PROCEDURE_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited SQLTransaction: TIBTransaction
+      Params.Strings = (      )
+    end
   end
 end

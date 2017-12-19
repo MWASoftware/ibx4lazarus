@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 652
+  Left = 475
   Height = 371
-  Top = 409
+  Top = 425
   Width = 622
   Caption = 'Server Properties'
   ClientHeight = 371
@@ -9,7 +9,7 @@ object Form1: TForm1
   DefaultMonitor = dmPrimary
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.0.5'
   object Memo1: TMemo
     Left = 8
     Height = 295
@@ -121,7 +121,7 @@ object Form1: TForm1
     Protocol = TCP
     TraceFlags = []
     DatabaseName = 'employee'
-    Options = [HeaderPages]
+    Options = [DataPages]
     left = 320
     top = 112
   end

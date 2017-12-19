@@ -31,8 +31,9 @@ unit ibselectsqleditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil,  Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, IBSystemTables, IBDatabase, IBCustomDataSet, IB;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  ComCtrls, db, IBSQLEditFrame, IBDatabase, IBCustomDataSet,
+  IBLookupComboEditBox, IBDynamicGrid, IB;
 
 type
 
@@ -41,12 +42,19 @@ type
   TIBSelectSQLEditorForm = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    InputProcGrid: TIBDynamicGrid;
+    OutputProcGrid: TIBDynamicGrid;
+    IncludeSysTables: TCheckBox;
     GenerateBtn: TButton;
     GenerateParams: TCheckBox;
+    FieldNamesGrid: TIBDynamicGrid;
+    PrimaryKeysGrid: TIBDynamicGrid;
+    IBSQLEditFrame1: TIBSQLEditFrame;
+    ProcedureNames: TIBLookupComboEditBox;
     SelectProcedure: TLabel;
+    SelectSelectAll: TCheckBox;
+    SelectTableNames: TIBLookupComboEditBox;
     TestBtn: TButton;
-    FieldList: TListBox;
-    IBTransaction1: TIBTransaction;
     Label1: TLabel;
     Label16: TLabel;
     Label17: TLabel;
@@ -55,34 +63,34 @@ type
     Label3: TLabel;
     Label4: TLabel;
     PageControl: TPageControl;
-    PrimaryKeyList: TListBox;
-    ProcedureNames: TComboBox;
-    ProcInputList: TListBox;
-    ProcOutputList: TListBox;
     QuoteFields: TCheckBox;
-    SQLText: TMemo;
-    TableNamesCombo: TComboBox;
     SelectPage: TTabSheet;
     ExecutePage: TTabSheet;
+    procedure FieldNamesGridDblClick(Sender: TObject);
     procedure GenerateBtnClick(Sender: TObject);
+    procedure IncludeSysTablesChange(Sender: TObject);
+    procedure InputProcGridDblClick(Sender: TObject);
+    procedure OutputProcGridDblClick(Sender: TObject);
+    procedure PrimaryKeysGridDblClick(Sender: TObject);
+    procedure ProcedureNamesDblClick(Sender: TObject);
+    procedure SelectSelectAllChange(Sender: TObject);
+    procedure SelectTableNamesDblClick(Sender: TObject);
     procedure TestBtnClick(Sender: TObject);
     procedure ExecutePageShow(Sender: TObject);
     procedure FieldListDblClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure PrimaryKeyListDblClick(Sender: TObject);
-    procedure ProcedureNamesCloseUp(Sender: TObject);
     procedure SelectPageShow(Sender: TObject);
-    procedure TableNamesComboCloseUp(Sender: TObject);
+    procedure UserProceduresAfterScroll(DataSet: TDataSet);
   private
     { private declarations }
-    FIBSystemTables: TIBSystemTables;
-    FExecuteOnly: boolean;
+    procedure HandleUserTablesOpened(Sender: TObject);
+  protected
+    procedure Loaded; override;
+    procedure SetSQLStatementType(aType: TIBSQLStatementTypes); virtual;
   public
     { public declarations }
-    constructor Create(TheOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure SetDatabase(Database: TIBDatabase);
-  end; 
+  end;
 
 
 function EditSQL(DataSet: TIBCustomDataSet;  SelectSQL: TStrings): boolean;
@@ -105,14 +113,14 @@ begin
   try
     if assigned(DataSet) then
     begin
-        SetDatabase(DataSet.Database);
+        IBSQLEditFrame1.Database := DataSet.Database;
         GenerateParams.Checked := DataSet.GenerateParamNames;
     end;
-    SQLText.Lines.Assign(SelectSQL);
+    IBSQLEditFrame1.SQLText.Lines.Assign(SelectSQL);
     Result := ShowModal = mrOK;
     if Result then
     begin
-     SelectSQL.Assign(SQLText.Lines);
+     SelectSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
      if assigned(DataSet) then
           DataSet.GenerateParamNames := GenerateParams.Checked
     end;
@@ -124,123 +132,132 @@ end;
 { TIBSelectSQLEditorForm }
 
 procedure TIBSelectSQLEditorForm.FormShow(Sender: TObject);
-var IsProcedureName: boolean;
 begin
-  GenerateBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
-  TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
-  if Trim(SQLText.Text) <> '' then
+  GenerateBtn.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
+  TestBtn.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
+  PageControl.ActivePage := SelectPage;
+  if Trim(IBSQLEditFrame1.SQLText.Text) <> '' then
   begin
     try
-      FIBSystemTables.GetStatementType(SQLText.Text,IsProcedureName);
+      SetSQLStatementType(IBSQLEditFrame1.SyncQueryBuilder);
     except  end;
-    if IsProcedureName then
-      PageControl.ActivePage := ExecutePage
-    else
-      PageControl.ActivePage := SelectPage;
-  end
-  else
-    PageControl.ActivePage := SelectPage;
+  end;
 end;
 
 procedure TIBSelectSQLEditorForm.PrimaryKeyListDblClick(Sender: TObject);
 begin
-  SQLText.SelText := PrimaryKeyList.Items[PrimaryKeyList.ItemIndex];
-  SQLText.SetFocus
-end;
-
-procedure TIBSelectSQLEditorForm.ProcedureNamesCloseUp(Sender: TObject);
-begin
-  FIBSystemTables.GetProcParams(ProcedureNames.Text,FExecuteOnly,ProcInputList.Items,ProcOutputList.Items);
-  SelectProcedure.Visible := not FExecuteOnly
+  IBSQLEditFrame1.InsertSelectedPrimaryKey;
 end;
 
 procedure TIBSelectSQLEditorForm.SelectPageShow(Sender: TObject);
-var TableName: string;
 begin
-  TableNamesCombo.Items.Clear;
-  FIBSystemTables.GetTableNames(TableNamesCombo.Items);
-  if TableNamesCombo.Items.Count > 0 then
-  begin
-    TableNamesCombo.ItemIndex := 0;
-    if Trim(SQLText.Text) <> '' then
-    begin
-      FIBSystemTables.GetTableAndColumns(SQLText.Text,TableName,nil);
-      TableNamesCombo.ItemIndex := TableNamesCombo.Items.IndexOf(TableName)
-    end;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items);
-    FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
-  end;
+  IBSQLEditFrame1.UserTables.Active := true;
+end;
+
+procedure TIBSelectSQLEditorForm.UserProceduresAfterScroll(DataSet: TDataSet);
+begin
+  SelectProcedure.Visible := DataSet.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 2;
 end;
 
 procedure TIBSelectSQLEditorForm.FieldListDblClick(Sender: TObject);
 begin
-  SQLText.SelText := FieldList.Items[FieldList.ItemIndex];
-  SQLText.SetFocus
+  IBSQLEditFrame1.InsertSelectedFieldName;
 end;
 
 procedure TIBSelectSQLEditorForm.GenerateBtnClick(Sender: TObject);
-var FieldNames: TStrings;
 begin
   if PageControl.ActivePage = ExecutePage then
-    FIBSystemTables.GenerateExecuteSQL(ProcedureNames.Text,QuoteFields.Checked,FExecuteOnly,
-          ProcInputList.Items,ProcOutputList.Items,SQLText.Lines)
+    IBSQLEditFrame1.GenerateExecuteSQL(QuoteFields.Checked)
   else
-  begin
-    FieldNames :=  FIBSystemTables.GetFieldNames(FieldList);
-    try
-      FIBSystemTables.GenerateSelectSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,SQLText.Lines)
-    finally
-      FieldNames.Free
-    end;
-  end;
+    IBSQLEditFrame1.GenerateSelectSQL(QuoteFields.Checked);
+end;
+
+procedure TIBSelectSQLEditorForm.FieldNamesGridDblClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.InsertSelectedFieldName;
+end;
+
+procedure TIBSelectSQLEditorForm.IncludeSysTablesChange(Sender: TObject);
+begin
+  IBSQLEditFrame1.IncludeSystemTables := IncludeSysTables.Checked;
+end;
+
+procedure TIBSelectSQLEditorForm.InputProcGridDblClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.InsertSelectedInputParam;
+end;
+
+procedure TIBSelectSQLEditorForm.OutputProcGridDblClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.InsertSelectedOutputParam;
+end;
+
+procedure TIBSelectSQLEditorForm.PrimaryKeysGridDblClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.InsertSelectedPrimaryKey;
+end;
+
+procedure TIBSelectSQLEditorForm.ProcedureNamesDblClick(Sender: TObject);
+begin
+    IBSQLEditFrame1.InsertProcName;
+end;
+
+procedure TIBSelectSQLEditorForm.SelectSelectAllChange(Sender: TObject);
+begin
+  IBSQLEditFrame1.SelectAllFields(SelectSelectAll.Checked);
+end;
+
+procedure TIBSelectSQLEditorForm.SelectTableNamesDblClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.InsertTableName;
 end;
 
 procedure TIBSelectSQLEditorForm.TestBtnClick(Sender: TObject);
 begin
-  FIBSystemTables.TestSQL(SQLText.Lines.Text,GenerateParams.Checked)
+  IBSQLEditFrame1.TestSQL(GenerateParams.Checked)
 end;
 
 procedure TIBSelectSQLEditorForm.ExecutePageShow(Sender: TObject);
-var ProcName: string;
-    IsProcedureName: boolean;
 begin
-  FIBSystemTables.GetProcedureNames(ProcedureNames.Items,true);
-  if ProcedureNames.Items.Count > 0 then
+  IBSQLEditFrame1.UserProcedures.Active := true;
+end;
+
+procedure TIBSelectSQLEditorForm.HandleUserTablesOpened(Sender: TObject);
+begin
+  SelectSelectAll.Checked := true;
+  SelectProcedure.Visible := false;
+end;
+
+procedure TIBSelectSQLEditorForm.Loaded;
+begin
+  inherited Loaded;
+  if IBSQLEditFrame1 <> nil then
   begin
-    if (FIBSystemTables.GetStatementType(SQLText.Text,IsProcedureName) = SQLExecProcedure) or IsProcedureName then
-    begin
-      FIBSystemTables.GetTableAndColumns(SQLText.Text,ProcName,nil);
-      ProcedureNames.ItemIndex := ProcedureNames.Items.IndexOf(ProcName)
-    end
-    else
-      ProcedureNames.ItemIndex := 0;
+    IBSQLEditFrame1.OnUserTablesOpened := @HandleUserTablesOpened;
+    if SelectTableNames <> nil then
+      SelectTableNames.ListSource :=  IBSQLEditFrame1.UserTableSource;
+    if FieldNamesGrid <> nil then
+      FieldNamesGrid.DataSource := IBSQLEditFrame1.FieldsSource;
+    if PrimaryKeysGrid <> nil then
+      PrimaryKeysGrid.DataSource := IBSQLEditFrame1.PrimaryKeySource;
+    if ProcedureNames <> nil then
+      ProcedureNames.ListSource := IBSQLEditFrame1.UserProcSource;
+    if InputProcGrid <> nil then
+      InputProcGrid.DataSource := IBSQLEditFrame1.ProcInputSource;
+    if OutputProcGrid <> nil then
+      OutputProcGrid.DataSource := IBSQLEditFrame1.ProcOutputSource;
   end;
-  FIBSystemTables.GetProcParams(ProcedureNames.Text,FExecuteOnly,ProcInputList.Items,ProcOutputList.Items);
-  SelectProcedure.Visible := not FExecuteOnly
 end;
 
-procedure TIBSelectSQLEditorForm.TableNamesComboCloseUp(Sender: TObject);
+procedure TIBSelectSQLEditorForm.SetSQLStatementType(aType: TIBSQLStatementTypes
+  );
 begin
-  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items);
-  FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
-end;
-
-constructor TIBSelectSQLEditorForm.Create(TheOwner: TComponent);
-begin
-  inherited Create(TheOwner);
-  FIBSystemTables := TIBSystemTables.Create;
-end;
-
-destructor TIBSelectSQLEditorForm.Destroy;
-begin
-  if assigned(FIBSystemTables) then FIBSystemTables.Free;
-  inherited Destroy;
-end;
-
-procedure TIBSelectSQLEditorForm.SetDatabase(Database: TIBDatabase);
-begin
-  IBTransaction1.DefaultDatabase := Database;
-  FIBSystemTables.SelectDatabase(Database,IBTransaction1)
+  case aType of
+  SQLExecProcedure:
+    PageControl.ActivePage := ExecutePage;
+  else
+    PageControl.ActivePage := SelectPage;
+  end;
 end;
 
 end.

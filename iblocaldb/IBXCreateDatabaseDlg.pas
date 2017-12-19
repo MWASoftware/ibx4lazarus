@@ -56,7 +56,53 @@ type
 var
   CreateDatabaseDlg: TCreateDatabaseDlg;
 
+function RestoreDatabaseFromArchive(DBName: string; DBParams: TStrings; aFilename: string): boolean;
+
+function CreateNewDatabase(DBName: string; DBParams: TStrings; DBArchive: string): boolean;
+
 implementation
+
+function RestoreDatabaseFromArchive(DBName: string; DBParams: TStrings;
+  aFilename: string): boolean;
+begin
+ with TCreateDatabaseDlg.Create(Application) do
+ try
+   if (aFilename = '') or not FileExists(aFileName) then
+   begin
+    OpenDialog1.InitialDir := GetUserDir;
+    if OpenDialog1.Execute then
+      aFilename := OpenDialog1.FileName
+    else
+      Exit;
+   end;
+   IBRestoreService1.SetDBParams(DBParams);
+   IBRestoreService1.BackupFile.Clear;
+   IBRestoreService1.DatabaseName.Clear;
+   IBRestoreService1.Options := [replace];
+   IBRestoreService1.BackupFile.Add(aFilename);
+   IBRestoreService1.DatabaseName.Add(DBName);
+   Result := ShowModal = mrOK;
+ finally
+   Free
+ end;
+end;
+
+function CreateNewDatabase(DBName: string; DBParams: TStrings; DBArchive: string
+  ): boolean;
+begin
+ with TCreateDatabaseDlg.Create(Application) do
+ try
+  IBRestoreService1.SetDBParams(DBParams);
+  IBRestoreService1.BackupFile.Clear;
+  IBRestoreService1.DatabaseName.Clear;
+  IBRestoreService1.Options := [CreateNewDB];
+  IBRestoreService1.BackupFile.Add(DBArchive);
+  IBRestoreService1.DatabaseName.Add(DBName);
+  Result := ShowModal = mrOK;
+ finally
+   Free
+ end
+end;
 
 {$R *.lfm}
 

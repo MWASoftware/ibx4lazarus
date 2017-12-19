@@ -9,9 +9,9 @@
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="152"/>
+        <TopLine Value="281"/>
         <CursorPos Y="182"/>
-        <UsageCount Value="194"/>
+        <UsageCount Value="195"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -20,7 +20,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="62"/>
         <CursorPos X="25" Y="70"/>
-        <UsageCount Value="194"/>
+        <UsageCount Value="195"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit1>
       <Unit2>
@@ -96,8 +96,8 @@
       <Unit12>
         <Filename Value="..\..\..\fbintf\client\FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="173"/>
-        <CursorPos X="70" Y="194"/>
+        <TopLine Value="234"/>
+        <CursorPos Y="254"/>
         <UsageCount Value="12"/>
       </Unit12>
       <Unit13>
@@ -123,9 +123,11 @@
       </Unit15>
       <Unit16>
         <Filename Value="..\..\changelog"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="75" Y="12"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="87" Y="34"/>
         <UsageCount Value="23"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
       <Unit17>
@@ -256,13 +258,13 @@
       <Unit34>
         <Filename Value="..\..\runtime\ibxscript.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1324"/>
-        <CursorPos X="3" Y="1341"/>
+        <TopLine Value="254"/>
+        <CursorPos X="15" Y="285"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="254"/>
-          <CursorPos X="15" Y="285"/>
+          <TopLine Value="845"/>
+          <CursorPos X="41" Y="857"/>
         </ExtraEditor1>
         <UsageCount Value="70"/>
       </Unit34>
@@ -305,9 +307,9 @@
         <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\packages\regexpr\src\regexpr.pas"/>
         <UnitName Value="RegExpr"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="411"/>
-        <CursorPos X="41" Y="432"/>
-        <UsageCount Value="2"/>
+        <TopLine Value="532"/>
+        <CursorPos X="14" Y="551"/>
+        <UsageCount Value="10"/>
       </Unit40>
       <Unit41>
         <Filename Value="..\..\..\fbintf\testsuite\TestManager.pas"/>

@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 552
+  Left = 306
   Height = 438
-  Top = 437
+  Top = 192
   Width = 722
   Caption = 'TIBTreeView Example'
   ClientHeight = 438
@@ -10,7 +10,7 @@ object Form1: TForm1
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object Panel1: TPanel
     Left = 11
     Height = 367
@@ -347,7 +347,7 @@ object Form1: TForm1
     GenerateParamNames = False
     DataSetCloseAction = dcSaveChanges
     AfterTransactionEnd = DepartmentsAfterTransactionEnd
-    left = 64
+    left = 144
     top = 176
     object DepartmentsDEPT_NO: TIBStringField
       DisplayWidth = 3
@@ -465,8 +465,8 @@ object Form1: TForm1
     )
     Params = <>
     DataSetCloseAction = dcDiscardChanges
-    left = 64
-    top = 221
+    left = 144
+    top = 224
   end
   object DataSource2: TDataSource
     DataSet = Managers
@@ -493,8 +493,8 @@ object Form1: TForm1
         ParamType = ptInput
       end>
     DataSetCloseAction = dcDiscardChanges
-    left = 64
-    top = 264
+    left = 144
+    top = 272
     ParamData = <    
       item
         DataType = ftUnknown

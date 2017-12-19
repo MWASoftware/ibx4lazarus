@@ -10,7 +10,7 @@ object Form1: TForm1
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object Label1: TLabel
     Left = 16
     Height = 14
@@ -161,7 +161,7 @@ object Form1: TForm1
     end
     object DBComboBox1: TDBComboBox
       Left = 331
-      Height = 25
+      Height = 28
       Top = 32
       Width = 53
       OwnerDrawEditable = False
@@ -319,14 +319,14 @@ object Form1: TForm1
     IdleTimer = 0
     TraceFlags = []
     UseDefaultSystemCodePage = False
-    left = 328
-    top = 24
+    left = 224
+    top = 18
   end
   object IBTransaction1: TIBTransaction
     Active = False
     DefaultDatabase = IBDatabase1
-    left = 296
-    top = 24
+    left = 136
+    top = 18
   end
   object Employees: TIBDataSet
     AllowAutoActivateTransaction = False
@@ -396,8 +396,8 @@ object Form1: TForm1
     GenerateParamNames = False
     DataSetCloseAction = dcSaveChanges
     AfterTransactionEnd = EmployeesAfterTransactionEnd
-    left = 496
-    top = 16
+    left = 376
+    top = 264
     object EmployeesEMP_NO: TSmallintField
       DisplayWidth = 10
       FieldKind = fkData
@@ -550,13 +550,13 @@ object Form1: TForm1
   object EmployeeSource: TDataSource
     DataSet = Employees
     OnDataChange = EmployeeSourceDataChange
-    left = 462
-    top = 16
+    left = 272
+    top = 264
   end
   object ApplicationProperties1: TApplicationProperties
     OnIdle = ApplicationProperties1Idle
-    left = 328
-    top = 56
+    left = 152
+    top = 280
   end
   object Countries: TIBQuery
     AllowAutoActivateTransaction = False
@@ -584,8 +584,8 @@ object Form1: TForm1
         ParamType = ptInput
       end>
     DataSetCloseAction = dcDiscardChanges
-    left = 425
-    top = 56
+    left = 616
+    top = 16
     ParamData = <    
       item
         DataType = ftUnknown
@@ -600,8 +600,8 @@ object Form1: TForm1
   end
   object CountriesSource: TDataSource
     DataSet = Countries
-    left = 392
-    top = 58
+    left = 528
+    top = 18
   end
   object JobCodes: TIBQuery
     AllowAutoActivateTransaction = False
@@ -624,7 +624,7 @@ object Form1: TForm1
         ParamType = ptInput
       end>
     DataSetCloseAction = dcDiscardChanges
-    left = 425
+    left = 416
     top = 18
     ParamData = <    
       item
@@ -635,7 +635,7 @@ object Form1: TForm1
   end
   object JobCodeSource: TDataSource
     DataSet = JobCodes
-    left = 392
+    left = 328
     top = 18
   end
 end

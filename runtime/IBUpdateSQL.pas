@@ -183,7 +183,7 @@ procedure TIBUpdateSQL.Apply(UpdateKind: TUpdateKind; buff: PChar);
 begin
   if not Assigned(FDataSet) then Exit;
   InternalPrepare(UpdateKind);
-  InternalSetParams(Query[UpdateKind],buff);
+  InternalSetParams(Query[UpdateKind].Params,buff);
   ExecSQL(UpdateKind);
 end;
 

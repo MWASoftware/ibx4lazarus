@@ -77,6 +77,7 @@ type
   private
     FKeyValue: variant;
   public
+    constructor Create(AnOwner: TTreeNodes); override;
     procedure DeleteAll;
     property KeyValue: variant read FKeyValue;
   end;
@@ -134,7 +135,7 @@ type
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy; override;
-    function FindNode(KeyValuePath: array of variant; SelectNode: boolean): TIBTreeNode; overload;
+    function FindNode(KeyValuePath: TVariantArray; SelectNode: boolean): TIBTreeNode; overload;
     function FindNode(KeyValue: variant): TIBTreeNode; overload;
     function GetNodePath(Node: TTreeNode): TVariantArray;
     property DataSet: TDataSet read GetDataSet;
@@ -300,6 +301,12 @@ begin
 end;
 
 { TIBTreeNode }
+
+constructor TIBTreeNode.Create(AnOwner: TTreeNodes);
+begin
+  inherited Create(AnOwner);
+  FKeyValue := NULL;
+end;
 
 procedure TIBTreeNode.DeleteAll;
 var Node, NextNode: TTreeNode;
@@ -501,7 +508,7 @@ begin
   if Result then
   begin
     if DataSet.Active and (DataSet.RecordCount > 0)
-         and (Node.KeyValue = DataSet.FieldByName(KeyField).AsVariant) then Exit;
+         and DataSet.Locate(KeyField,Node.KeyValue,[]) then Exit;
 
     FUpdateNode := Node;
     try
@@ -687,12 +694,14 @@ begin
   inherited Destroy;
 end;
 
-function TIBTreeView.FindNode(KeyValuePath: array of variant;
-  SelectNode: boolean): TIBTreeNode;
+function TIBTreeView.FindNode(KeyValuePath: TVariantArray; SelectNode: boolean
+  ): TIBTreeNode;
 var Node: TTreeNode;
     i,j: integer;
 begin
   Result := nil;
+  if Length(KeyValuePath) = 0 then Exit;
+
   FLocatingNode := true;
   try
    for j := 0 to Items.TopLvlCount - 1 do
@@ -702,7 +711,8 @@ begin
     Node.Expand(false);
     while assigned(Node)  do
     begin
-      if TIBTreeNode(Node).KeyValue = KeyValuePath[i] then
+      if not VarIsNull(TIBTreeNode(Node).KeyValue) and
+                        (TIBTreeNode(Node).KeyValue = KeyValuePath[i]) then
       begin
         Inc(i);
         if i = Length(KeyValuePath) then

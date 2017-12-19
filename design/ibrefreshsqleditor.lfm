@@ -1,153 +1,74 @@
-object IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm
-  Left = 492
-  Height = 438
-  Top = 340
-  Width = 749
-  ActiveControl = TableNamesCombo
+inherited IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm
   Caption = 'Refresh SQL Editor'
-  ClientHeight = 438
-  ClientWidth = 749
-  OnShow = FormShow
-  Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
-  object Label1: TLabel
-    Left = 16
-    Height = 14
-    Top = 16
-    Width = 69
-    Caption = 'Table Name'
-    ParentColor = False
-  end
-  object Label2: TLabel
-    Left = 19
-    Height = 14
-    Top = 84
-    Width = 33
-    Caption = 'Fields'
-    ParentColor = False
-  end
-  object Label3: TLabel
-    Left = 279
-    Height = 14
-    Top = 16
-    Width = 24
-    Caption = 'SQL'
-    ParentColor = False
-  end
-  object Label4: TLabel
-    Left = 23
-    Height = 14
-    Top = 285
-    Width = 77
-    Caption = 'Primary Keys'
-    ParentColor = False
-  end
-  object SQLText: TMemo
-    Left = 279
-    Height = 328
-    Top = 36
-    Width = 439
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    ScrollBars = ssAutoBoth
-    TabOrder = 0
-  end
-  object Button1: TButton
-    Left = 552
-    Height = 30
-    Top = 380
-    Width = 72
-    Anchors = [akRight, akBottom]
-    Caption = 'OK'
-    Default = True
-    ModalResult = 1
-    TabOrder = 1
-  end
-  object Button2: TButton
-    Left = 640
-    Height = 30
-    Top = 380
-    Width = 72
-    Anchors = [akRight, akBottom]
-    Cancel = True
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 2
-  end
-  object TableNamesCombo: TComboBox
-    Left = 23
-    Height = 27
-    Top = 38
-    Width = 201
-    OwnerDrawEditable = False
-    ItemHeight = 0
-    OnCloseUp = TableNamesComboCloseUp
-    TabOrder = 3
-  end
-  object FieldList: TListBox
-    Left = 21
-    Height = 170
-    Hint = 'Select Fields to include in Refresh Statements, or leave unselected to select all'
-    Top = 102
-    Width = 204
-    ItemHeight = 0
-    MultiSelect = True
-    OnDblClick = FieldListDblClick
-    ParentShowHint = False
-    ScrollWidth = 202
-    ShowHint = True
-    TabOrder = 4
-    TopIndex = -1
-  end
-  object GenerateBtn: TButton
-    Left = 279
-    Height = 30
-    Top = 380
-    Width = 101
-    Anchors = [akRight, akBottom]
-    Caption = 'Generate SQL'
+  inherited GenerateBtn: TButton
     OnClick = GenerateBtnClick
-    TabOrder = 5
   end
-  object TestBtn: TButton
-    Left = 416
-    Height = 30
-    Top = 380
-    Width = 66
-    Anchors = [akRight, akBottom]
-    Caption = 'Test'
-    OnClick = TestBtnClick
-    TabOrder = 6
+  inherited PageControl: TPageControl
+    ActivePage = SelectPage
+    ShowTabs = False
+    TabIndex = 0
+    inherited SelectPage: TTabSheet
+      ClientHeight = 349
+    end
+    inherited ExecutePage: TTabSheet
+      ClientHeight = 349
+    end
   end
-  object QuoteFields: TCheckBox
-    Left = 16
-    Height = 22
-    Top = 400
-    Width = 125
-    Caption = '&Quote Identifiers'
+  inherited IBSQLEditFrame1: TIBSQLEditFrame
+    Left = 282
+    Height = 339
+    Top = 24
+    Width = 448
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 339
+    ClientWidth = 448
     TabOrder = 7
-  end
-  object PrimaryKeyList: TListBox
-    Left = 23
-    Height = 59
-    Top = 304
-    Width = 200
-    ItemHeight = 0
-    OnDblClick = PrimaryKeyListDblClick
-    ScrollWidth = 198
-    TabOrder = 8
-    TopIndex = -1
-  end
-  object GenerateParams: TCheckBox
-    Left = 16
-    Height = 22
-    Top = 376
-    Width = 171
-    Caption = 'Allow DSQL Placeholders'
-    TabOrder = 9
-  end
-  object IBTransaction1: TIBTransaction
-    Active = False
-    left = 205
-    top = 386
+    DesignLeft = 1974
+    DesignTop = 200
+    inherited SQLText: TSynEdit
+      Height = 313
+      Width = 448
+    end
+    inherited ToolBar1: TToolBar
+      Width = 448
+    end
+    inherited FieldNameList: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited PrimaryKeys: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited UserProcedures: TIBQuery
+      AfterScroll = UserProceduresAfterScroll
+    end
+    inherited ProcInputParams: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$PROCEDURE_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited ProcOutputParams: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$PROCEDURE_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited SQLTransaction: TIBTransaction
+      Params.Strings = (      )
+    end
   end
 end

@@ -31,23 +31,28 @@ unit IBDataSetEditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  ComCtrls, StdCtrls, ExtCtrls, IBSystemTables, IBCustomDataSet, IBDatabase;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ComCtrls,
+  StdCtrls, ExtCtrls, IBSQLEditFrame, IBCustomDataSet,
+  IBDatabase, IBLookupComboEditBox, IBDynamicGrid, Types;
 
 type
 
   { TIBDataSetEditorForm }
 
   TIBDataSetEditorForm = class(TForm)
+    FieldNamesGrid: TIBDynamicGrid;
     GenerateParams: TCheckBox;
+    IBSQLEditFrame1: TIBSQLEditFrame;
+    IncludeSysTables: TCheckBox;
+    PrimaryKeysGrid: TIBDynamicGrid;
+    SelectSelectAll: TCheckBox;
+    SelectTableNames: TIBLookupComboEditBox;
     TestBtn: TButton;
     CancelButton: TButton;
     FieldsPage: TTabSheet;
     GenerateButton: TButton;
     GroupBox1: TGroupBox;
-    IBTransaction1: TIBTransaction;
     IncludePrimaryKeys: TCheckBox;
-    PrimaryKeyList: TListBox;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
@@ -55,11 +60,10 @@ type
     OkButton: TButton;
     PageControl: TPageControl;
     QuoteFields: TCheckBox;
-    SQLMemo: TMemo;
     SQLPage: TTabSheet;
     StatementType: TRadioGroup;
-    FieldList: TListBox;
-    TableNamesCombo: TComboBox;
+    procedure IncludeSysTablesChange(Sender: TObject);
+    procedure SelectSelectAllClick(Sender: TObject);
     procedure TestBtnClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
@@ -67,11 +71,9 @@ type
     procedure SQLMemoChange(Sender: TObject);
     procedure SQLPageShow(Sender: TObject);
     procedure StatementTypeClick(Sender: TObject);
-    procedure TableNamesComboCloseUp(Sender: TObject);
   private
     { private declarations }
     FDataSet: TIBDataSet;
-    FIBSystemTables: TIBSystemTables;
     FDirty: boolean;
     FCurrentStatement: integer;
     FSelectSQL: TStringList;
@@ -80,11 +82,13 @@ type
     FDeleteSQL: TStringList;
     FRefreshSQL: TStringList;
     procedure UpdateSQLMemo;
+    procedure HandleUserTablesOpened(Sender: TObject);
+  protected
+    procedure Loaded; override;
   public
     { public declarations }
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
-    procedure SetDataSet(AObject: TIBDataSet);
   end;
 
 var
@@ -108,9 +112,12 @@ begin
 
   with TIBDataSetEditorForm.Create(Application) do
   try
-    SetDataSet(DataSet);
     if assigned(DataSet) then
-        GenerateParams.Checked := DataSet.GenerateParamNames;
+    begin
+      IBSQLEditFrame1.Database := DataSet.Database;
+      GenerateParams.Checked := DataSet.GenerateParamNames;
+    end;
+    FDataSet := DataSet;
     Result := ShowModal = mrOK;
     if Result and assigned(DataSet) then
       DataSet.GenerateParamNames := GenerateParams.Checked
@@ -131,22 +138,11 @@ begin
   FDeleteSQL.Assign(FDataSet.DeleteSQL);
   FRefreshSQL.Assign(FDataSet.RefreshSQL);
   FSelectSQL.Assign(FDataSet.SelectSQL);
-  GenerateButton.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
-  TestBtn.Enabled := (IBTransaction1.DefaultDatabase <> nil) and IBTransaction1.DefaultDatabase.Connected;
+  GenerateButton.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
+  TestBtn.Enabled := (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected;
   FCurrentStatement := -1;
-  TableNamesCombo.Items.Clear;
-  FIBSystemTables.GetTableNames(TableNamesCombo.Items);
-  if TableNamesCombo.Items.Count > 0 then
-  begin
-    TableNamesCombo.ItemIndex := 0;
-    if FSelectSQL.Text <> '' then
-    try
-       FIBSystemTables.GetTableAndColumns(FSelectSQL.Text,TableName,nil);
-       TableNamesCombo.ItemIndex := TableNamesCombo.Items.IndexOf(TableName);
-    except end;//ignore
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,IncludePrimaryKeys.checked,false);
-    FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
-  end;
+  IBSQLEditFrame1.UserTables.Active := true;
+  IBSQLEditFrame1.SyncQueryBuilder(FSelectSQL);
 end;
 
 procedure TIBDataSetEditorForm.FormClose(Sender: TObject;
@@ -165,46 +161,28 @@ end;
 
 procedure TIBDataSetEditorForm.TestBtnClick(Sender: TObject);
 begin
-  if SQLMemo.Lines.Text <> '' then
-    FIBSystemTables.TestSQL(SQLMemo.Lines.Text,GenerateParams.Checked);
+  IBSQLEditFrame1.TestSQL(GenerateParams.Checked);
+end;
+
+procedure TIBDataSetEditorForm.IncludeSysTablesChange(Sender: TObject);
+begin
+  IBSQLEditFrame1.IncludeSystemTables := IncludeSysTables.Checked;
+end;
+
+procedure TIBDataSetEditorForm.SelectSelectAllClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.SelectAllFields(SelectSelectAll.Checked);
 end;
 
 procedure TIBDataSetEditorForm.GenerateButtonClick(Sender: TObject);
-var FieldNames: TStringList;
-    I: integer;
 begin
-  FieldNames := TStringList.Create;
-  try
-    FRefreshSQL.Clear;
-    FSelectSQL.Clear;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldNames);
-    FIBSystemTables.GenerateSelectSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,FSelectSQL);
-    FIBSystemTables.GenerateRefreshSQL(TableNamesCombo.Text,QuoteFields.Checked,FieldNames,FRefreshSQL);
-    FIBSystemTables.GenerateDeleteSQL(TableNamesCombo.Text,QuoteFields.Checked,FDeleteSQL);
-    FieldNames.Clear;
-    FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldNames,true,false);
-    FIBSystemTables.GenerateInsertSQL(TableNamesCombo.Text,QuoteFields.Checked,
-        FieldNames,FInsertSQL);
-    if FieldList.SelCount = 0 then
-    begin
-      FIBSystemTables.GenerateModifySQL(TableNamesCombo.Text,QuoteFields.Checked,
-        FieldList.Items,FModifySQL);
-
-    end
-    else
-    begin
-      FieldNames.Clear;
-      for I := 0 to FieldList.Items.Count - 1 do
-        if FieldList.Selected[I] then
-          FieldNames.Add(FieldList.Items[I]);
-      FIBSystemTables.GenerateModifySQL(TableNamesCombo.Text,QuoteFields.Checked,
-        FieldNames,FModifySQL);
-    end;
-    FDirty := false;
-    PageControl.ActivePage := SQLPage;
-  finally
-    FieldNames.Free
-  end;
+  IBSQLEditFrame1.GenerateSelectSQL(QuoteFields.Checked,FSelectSQL);
+  IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked,FRefreshSQL);
+  IBSQLEditFrame1.GenerateDeleteSQL(QuoteFields.Checked,FDeleteSQL);
+  IBSQLEditFrame1.GenerateInsertSQL(QuoteFields.Checked,FInsertSQL);
+  IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked,FModifySQL, not IncludePrimaryKeys.Checked);
+  FDirty := false;
+  PageControl.ActivePage := SQLPage;
 end;
 
 procedure TIBDataSetEditorForm.SQLMemoChange(Sender: TObject);
@@ -222,47 +200,60 @@ begin
   UpdateSQLMemo
 end;
 
-procedure TIBDataSetEditorForm.TableNamesComboCloseUp(Sender: TObject);
-begin
-  FIBSystemTables.GetFieldNames(TableNamesCombo.Text,FieldList.Items,IncludePrimaryKeys.checked,false);
-  FIBSystemTables.GetPrimaryKeys(TableNamesCombo.Text,PrimaryKeyList.Items);
-end;
-
 procedure TIBDataSetEditorForm.UpdateSQLMemo;
 begin
   if FDirty then
     case FCurrentStatement of
     0: // Select
-        FSelectSQL.Assign(SQLMemo.Lines);
+        FSelectSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     1: //Modify
-        FModifySQL.Assign(SQLMemo.Lines);
+        FModifySQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     2: //Insert
-        FInsertSQL.Assign(SQLMemo.Lines);
+        FInsertSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     3: // Delete
-        FDeleteSQL.Assign(SQLMemo.Lines);
+        FDeleteSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     4: //Refresh
-        FRefreshSQL.Assign(SQLMemo.Lines);
+        FRefreshSQL.Assign(IBSQLEditFrame1.SQLText.Lines);
     end;
   FDirty := false;
   case StatementType.ItemIndex of
   0: //Select
-     SQLMemo.Lines.Assign(FSelectSQL);
+     IBSQLEditFrame1.SQLText.Lines.Assign(FSelectSQL);
   1: // Modify
-    SQLMemo.Lines.Assign(FModifySQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FModifySQL)  ;
   2: //Insert
-    SQLMemo.Lines.Assign(FInsertSQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FInsertSQL)  ;
   3: // Delete
-    SQLMemo.Lines.Assign(FDeleteSQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FDeleteSQL)  ;
   4: //Refresh
-    SQLMemo.Lines.Assign(FRefreshSQL)  ;
+    IBSQLEditFrame1.SQLText.Lines.Assign(FRefreshSQL)  ;
   end;
   FCurrentStatement := StatementType.ItemIndex;
+end;
+
+procedure TIBDataSetEditorForm.HandleUserTablesOpened(Sender: TObject);
+begin
+  SelectSelectAll.Checked := true;
+end;
+
+procedure TIBDataSetEditorForm.Loaded;
+begin
+  inherited Loaded;
+  if IBSQLEditFrame1 <> nil then
+  begin
+    IBSQLEditFrame1.OnUserTablesOpened := @HandleUserTablesOpened;
+    if SelectTableNames <> nil then
+      SelectTableNames.ListSource :=  IBSQLEditFrame1.UserTableSource;
+    if FieldNamesGrid <> nil then
+      FieldNamesGrid.DataSource := IBSQLEditFrame1.FieldsSource;
+    if PrimaryKeysGrid <> nil then
+      PrimaryKeysGrid.DataSource := IBSQLEditFrame1.PrimaryKeySource;
+  end;
 end;
 
 constructor TIBDataSetEditorForm.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
-  FIBSystemTables := TIBSystemTables.Create;
   FModifySQL := TStringList.Create;
   FInsertSQL := TStringList.Create;
   FDeleteSQL := TStringList.Create;
@@ -272,21 +263,12 @@ end;
 
 destructor TIBDataSetEditorForm.Destroy;
 begin
-  if assigned(FIBSystemTables) then FIBSystemTables.Free;
   if assigned(FModifySQL) then FModifySQL.Free;
   if assigned(FInsertSQL) then FInsertSQL.Free;
   if assigned(FDeleteSQL) then FDeleteSQL.Free;
   if assigned(FRefreshSQL) then FRefreshSQL.Free;
- if assigned(FSelectSQL) then FSelectSQL.Free;
+  if assigned(FSelectSQL) then FSelectSQL.Free;
   inherited Destroy;
-end;
-
-procedure TIBDataSetEditorForm.SetDataSet(AObject: TIBDataSet);
-begin
-  FDataSet := AObject;
-  IBTransaction1.DefaultDatabase := FDataSet.Database;
-  if assigned(FDataSet) then
-    FIBSystemTables.SelectDatabase(FDataSet.Database,IBTransaction1);
 end;
 
 end.

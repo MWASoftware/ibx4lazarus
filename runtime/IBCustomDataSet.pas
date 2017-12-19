@@ -74,7 +74,8 @@ type
     procedure SetDataSet(ADataSet: TIBCustomDataSet); virtual; abstract;
     procedure Apply(UpdateKind: TUpdateKind; buff: PChar); virtual; abstract;
     function GetSQL(UpdateKind: TUpdateKind): TStrings; virtual; abstract;
-    procedure InternalSetParams(Query: TIBSQL; buff: PChar);
+    procedure InternalSetParams(Params: ISQLParams; buff: PChar); overload;
+    procedure InternalSetParams(Query: TIBSQL; buff: PChar); overload;
     property DataSet: TIBCustomDataSet read GetDataSet write SetDataSet;
   public
     constructor Create(AOwner: TComponent); override;
@@ -435,7 +436,7 @@ type
     procedure SetDatabase(Value: TIBDatabase);
     procedure SetDeleteSQL(Value: TStrings);
     procedure SetInsertSQL(Value: TStrings);
-    procedure SetInternalSQLParams(Qry: TIBSQL; Buffer: Pointer);
+    procedure SetInternalSQLParams(Params: ISQLParams; Buffer: Pointer);
     procedure SetRefreshSQL(Value: TStrings);
     procedure SetSelectSQL(Value: TStrings);
     procedure SetModifySQL(Value: TStrings);
@@ -2202,7 +2203,7 @@ begin
     FUpdateObject.Apply(ukDelete,Buff)
   else
   begin
-    SetInternalSQLParams(FQDelete, Buff);
+    SetInternalSQLParams(FQDelete.Params, Buff);
     FQDelete.ExecQuery;
   end;
   with PRecordData(Buff)^ do
@@ -2351,7 +2352,7 @@ begin
       FUpdateObject.Apply(ukModify,Buff);
   end
   else begin
-    SetInternalSQLParams(Qry, Buff);
+    SetInternalSQLParams(Qry.Params, Buff);
     Qry.ExecQuery;
   end;
   PRecordData(Buff)^.rdUpdateStatus := usUnmodified;
@@ -2385,7 +2386,7 @@ begin
         end
         else
           Qry := FQRefresh;
-        SetInternalSQLParams(Qry, Buff);
+        SetInternalSQLParams(Qry.Params, Buff);
         Qry.ExecQuery;
         try
           if (Qry.SQLStatementType = SQLExecProcedure) or Qry.Next then
@@ -2597,6 +2598,7 @@ begin
   if (FBase.Database <> Value) then
   begin
     CheckDatasetClosed;
+    InternalUnPrepare;
     FBase.Database := Value;
     FQDelete.Database := Value;
     FQInsert.Database := Value;
@@ -2624,7 +2626,7 @@ begin
   end;
 end;
 
-procedure TIBCustomDataSet.SetInternalSQLParams(Qry: TIBSQL; Buffer: Pointer);
+procedure TIBCustomDataSet.SetInternalSQLParams(Params: ISQLParams; Buffer: Pointer);
 var
   i, j: Integer;
   cr, data: PChar;
@@ -2640,9 +2642,9 @@ begin
     InternalPrepare;
   OldBuffer := nil;
   try
-    for i := 0 to Qry.Params.GetCount - 1 do
+    for i := 0 to Params.GetCount - 1 do
     begin
-      Param := Qry.Params[i];
+      Param := Params[i];
       fn := Param.Name;
       if (Pos('OLD_', fn) = 1) then {mbcs ok}
       begin
@@ -4681,7 +4683,7 @@ begin
   Transaction.StartTransaction;
 end;
 
-function TIBCustomDataSet.PSGetTableName: string;
+function TIBCustomDataSet.PsGetTableName: string;
 begin
 //  if not FInternalPrepared then
 //    InternalPrepare;
@@ -4822,15 +4824,21 @@ begin
   inherited Destroy;
 end;
 
-procedure TIBDataSetUpdateObject.SetRefreshSQL(Value: TStrings);
+procedure TIBDataSetUpdateObject.SetRefreshSQL(value: TStrings);
 begin
   FRefreshSQL.Assign(Value);
 end;
 
-procedure TIBDataSetUpdateObject.InternalSetParams(Query: TIBSQL; buff: PChar);
+procedure TIBDataSetUpdateObject.InternalSetParams(Params: ISQLParams;
+  buff: PChar);
 begin
   if not Assigned(DataSet) then Exit;
-  DataSet.SetInternalSQLParams(Query, buff);
+  DataSet.SetInternalSQLParams(Params, buff);
+end;
+
+procedure TIBDataSetUpdateObject.InternalSetParams(Query: TIBSQL; buff: PChar);
+begin
+  InternalSetParams(Query.Params,buff);
 end;
 
 function TIBDSBlobStream.GetSize: Int64;

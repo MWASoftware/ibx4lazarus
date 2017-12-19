@@ -1597,9 +1597,25 @@ begin
   case Action of
     TARollback, TACommit:
     begin
-      DoBeforeTransactionEnd;
+      try
+        DoBeforeTransactionEnd;
+      except on E: EIBInterBaseError do
+        begin
+          if not Force then
+            raise;
+        end;
+      end;
+
       for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
+      try
         SQLObjects[i].DoBeforeTransactionEnd(Action);
+      except on E: EIBInterBaseError do
+        begin
+          if not Force then
+              raise;
+          end;
+      end;
+
       if InTransaction then
       begin
         if (Action = TARollback) then
@@ -1616,9 +1632,23 @@ begin
           end;
         end;
 
-        for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
-          SQLObjects[i].DoAfterTransactionEnd;
-        DoAfterTransactionEnd;
+          for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
+          try
+            SQLObjects[i].DoAfterTransactionEnd;
+          except on E: EIBInterBaseError do
+            begin
+              if not Force then
+                raise;
+            end;
+          end;
+        try
+          DoAfterTransactionEnd;
+        except on E: EIBInterBaseError do
+          begin
+            if not Force then
+              raise;
+          end;
+        end;
       end;
     end;
     TACommitRetaining:

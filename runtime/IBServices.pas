@@ -102,7 +102,6 @@ type
   TIBCustomService = class(TComponent)
   private
     FParamsChanged : Boolean;
-    FQueryParams: String;
     FSPB : ISPB;
     FSRB: ISRB;
     FSQPB: ISQPB;
@@ -113,7 +112,6 @@ type
     FService: IServiceManager;
     FStreamedActive  : Boolean;
     FOnAttach: TNotifyEvent;
-    FOutputBufferOption: TOutputBufferOption;
     FProtocol: TProtocol;
     FParams: TStrings;
     FServiceQueryResults: IServiceQueryResults;
@@ -151,6 +149,12 @@ type
     destructor Destroy; override;
     procedure Attach;
     procedure Detach;
+
+    {Copies database parameters as give in the DBParams to the Service
+      omitting any parameters not appropriate for TIBService. Typically, the
+      DBParams are TIBDatabase.Params}
+    procedure SetDBParams(DBParams: TStrings);
+
     property ServiceIntf: IServiceManager read FService write SetService;
     property ServiceParamBySPB[const Idx: Integer]: String read GetServiceParamBySPB
                                                       write SetServiceParamBySPB;
@@ -694,6 +698,27 @@ begin
   MonitorHook.ServiceDetach(Self);
 end;
 
+procedure TIBCustomService.SetDBParams(DBParams: TStrings);
+var i: integer;
+    j: integer;
+    k: integer;
+    ParamName: string;
+begin
+  Params.Clear;
+  for i := 0 to DBParams.Count - 1 do
+  begin
+    ParamName := DBParams[i];
+    k := Pos('=',ParamName);
+    if k > 0 then system.Delete(ParamName,k,Length(ParamName)-k+1);
+    for j := 1 to isc_spb_last_spb_constant do
+      if ParamName = SPBConstantNames[j] then
+      begin
+        Params.Add(DBParams[i]);
+        break;
+      end;
+  end;
+end;
+
 function TIBCustomService.GetActive: Boolean;
 begin
   result := FService <> nil;
@@ -740,6 +765,7 @@ end;
 
 procedure TIBCustomService.InternalServiceQuery;
 begin
+  CheckActive;
   FServiceQueryResults := FService.Query(FSQPB,FSRB);
   FSQPB := nil;
   FSRB := nil;
@@ -981,8 +1007,8 @@ begin
 
         for j := 0 to Count - 1 do
         begin
-          FConfigParams.ConfigFileData.ConfigFileKey[j] := getItemType;
-          FConfigParams.ConfigFileData.ConfigFileValue[j] := AsInteger;
+          FConfigParams.ConfigFileData.ConfigFileKey[j] := Items[j].getItemType;
+          FConfigParams.ConfigFileData.ConfigFileValue[j] := Items[j].AsInteger;
         end;
       end;
 
@@ -1211,9 +1237,9 @@ begin
   SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
   with SRB.Add(isc_spb_prp_write_mode) do
   if Value then
-    AsInteger := isc_spb_prp_wm_async
+    AsByte := isc_spb_prp_wm_async
   else
-    AsInteger := isc_spb_prp_wm_sync;
+    AsByte := isc_spb_prp_wm_sync;
   InternalServiceStart;
 end;
 
@@ -1236,9 +1262,9 @@ begin
   SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
   with SRB.Add(isc_spb_prp_access_mode) do
   if Value then
-    AsInteger := isc_spb_prp_am_readonly
+    AsByte := isc_spb_prp_am_readonly
   else
-    AsInteger := isc_spb_prp_am_readwrite;
+    AsByte := isc_spb_prp_am_readwrite;
   InternalServiceStart;
 end;
 
@@ -1248,9 +1274,9 @@ begin
   SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
   with SRB.Add(isc_spb_prp_reserve_space) do
   if Value then
-    AsInteger := isc_spb_prp_res
+    AsByte := isc_spb_prp_res
   else
-    AsInteger := isc_spb_prp_res_use_full;
+    AsByte := isc_spb_prp_res_use_full;
   InternalServiceStart;
 end;
 

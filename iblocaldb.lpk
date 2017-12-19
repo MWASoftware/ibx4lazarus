@@ -8,7 +8,7 @@
       <Version Value="11"/>
       <SearchPaths>
         <OtherUnitFiles Value="iblocaldb"/>
-        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="iblocaldb/lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
     <Description Value="This package provides additional support for Personal Databases."/>
@@ -37,7 +37,7 @@
  *
 "/>
     <Version Major="2" Minor="0" Release = "3" />
-    <Files Count="7">
+    <Files Count="8">
       <Item1>
         <Filename Value="iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
         <UnitName Value="IBXCustomIBLocalDBSupport"/>
@@ -66,6 +66,10 @@
         <Filename Value="iblocaldb/IBXUpgradeConfFile.pas"/>
         <UnitName Value="IBXUpgradeConfFile"/>
       </Item7>
+      <Item8>
+        <Filename Value="iblocaldb/IBXCreateDatabaseFromSQLDlgUnit.pas"/>
+        <UnitName Value="IBXCreateDatabaseFromSQLDlgUnit"/>
+      </Item8>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
