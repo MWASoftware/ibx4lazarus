@@ -84,7 +84,7 @@ type
     function GetReadIdxCount: TStringList;
     function GetReadSeqCount: TStringList;
     function GetUpdateCount: TStringList;
-    function GetOperationCounts(DBInfoCommand: Integer; FOperation: TStringList): TStringList;
+    function GetOperationCounts(DBInfoCommand: Integer; var FOperation: TStringList): TStringList;
     function GetReadOnly: Long;
     function GetStringDatabaseInfo(DatabaseInfoCommand: Integer): String;
     function GetDBSQLDialect: Long;
@@ -331,7 +331,8 @@ begin
   result := GetLongDatabaseInfo(isc_info_writes);
 end;
 
-function TIBDatabaseInfo.GetOperationCounts(DBInfoCommand: Integer; FOperation: TStringList): TStringList;
+function TIBDatabaseInfo.GetOperationCounts(DBInfoCommand: Integer;
+  var FOperation: TStringList): TStringList;
 var opCounts: TDBOperationCounts;
     i: integer;
 begin
