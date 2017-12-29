@@ -56,7 +56,10 @@ IBX Change Log  version                           (2.1-0) Fri, 15 Dec 2017 12:20
 
 22. IBCustomDataset: When database changed ensure that queries an unprepared.
 
-23. SQL Property Editors now use SynEdit with SQL Highlighter.
+23. SQL Property Editors now use SynEdit with SQL Highlighter. New features include:
+    * Line Wrap on SQL Token boundaries (on user command)
+    * auto-complete table names in drop down list of table names
+    * Double click on tablename or field name adds to SQL text
 
 24. IBDataOutput: print statistics using float (%f) format instead of decimal (%d).
 
