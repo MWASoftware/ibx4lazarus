@@ -46,7 +46,7 @@ type
     procedure WriteLog(Msg: string);
     procedure HandleCreateDatabase(Sender: TObject; var DatabaseFileName: string);
   protected
-    function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; override;
+    function InternalCreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; override;
     function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; override;
     function RunUpgradeDatabase(TargetVersionNo: integer): boolean; override;
     function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean; override;
@@ -109,7 +109,7 @@ begin
   DatabaseFileName := FDatabasePath;
 end;
 
-function TIBCMLocalDBSupport.CreateNewDatabase(DBName: string;
+function TIBCMLocalDBSupport.InternalCreateNewDatabase(DBName: string;
   DBParams: TStrings; DBArchive: string): boolean;
 var Service: TIBRestoreService;
     Ext: string;
