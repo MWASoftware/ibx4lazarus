@@ -1,13 +1,14 @@
 object LimboTransactionsForm: TLimboTransactionsForm
-  Left = 3303
+  Left = 236
   Height = 386
-  Top = 324
+  Top = 485
   Width = 798
   Caption = 'Limbo Transactions'
   ClientHeight = 386
   ClientWidth = 798
   OnShow = FormShow
-  LCLVersion = '1.8.0.5'
+  Position = poMainFormCenter
+  LCLVersion = '1.8.1.0'
   object Label1: TLabel
     Left = 14
     Height = 14

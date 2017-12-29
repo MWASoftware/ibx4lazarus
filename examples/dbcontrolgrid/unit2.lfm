@@ -9,10 +9,11 @@ object SelectDeptDlg: TSelectDeptDlg
   ClientWidth = 485
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.2.6.0'
+  Position = poMainFormCenter
+  LCLVersion = '1.8.1.0'
   object Label1: TLabel
     Left = 16
-    Height = 15
+    Height = 14
     Top = 16
     Width = 79
     Caption = 'Departments'
@@ -25,7 +26,6 @@ object SelectDeptDlg: TSelectDeptDlg
     Width = 359
     TextField = 'DEPARTMENT'
     DataSource = DataSource1
-    DefaultItemHeight = 18
     HasChildField = 'CHILDCOUNT'
     KeyField = 'DEPT_NO'
     ParentField = 'HEAD_DEPT'
@@ -56,6 +56,7 @@ object SelectDeptDlg: TSelectDeptDlg
     TabOrder = 2
   end
   object Depts: TIBQuery
+    AllowAutoActivateTransaction = False
     Database = Form1.IBDatabase1
     Transaction = Form1.IBTransaction1
     BufferChunks = 1000
@@ -71,6 +72,7 @@ object SelectDeptDlg: TSelectDeptDlg
       'Group By A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT'
     )
     Params = <>
+    DataSetCloseAction = dcDiscardChanges
     left = 432
     top = 125
   end

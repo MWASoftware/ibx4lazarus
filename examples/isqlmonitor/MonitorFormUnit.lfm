@@ -6,9 +6,10 @@ object MonitorForm: TMonitorForm
   Caption = 'SQL Monitor'
   ClientHeight = 440
   ClientWidth = 541
+  DefaultMonitor = dmPrimary
   OnShow = FormShow
   Position = poDefault
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object Memo1: TMemo
     Left = 13
     Height = 408

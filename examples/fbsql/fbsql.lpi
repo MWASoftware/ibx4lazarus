@@ -24,7 +24,6 @@
     <RunParams>
       <local>
         <FormatVersion Value="1"/>
-        <CommandLineParams Value="-u SYSDBA -p celebr8 -s &quot;CREATE DATABASE 'olympus:/home/firebird/test1.fdb' PAGE_SIZE 4096 default character set UTF8;&quot;"/>
       </local>
     </RunParams>
     <RequiredPackages Count="2">
