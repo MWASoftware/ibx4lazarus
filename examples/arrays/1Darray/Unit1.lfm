@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 1767
+  Left = 222
   Height = 620
-  Top = 267
+  Top = 246
   Width = 882
   Caption = '1D Array Example'
   ClientHeight = 620
@@ -9,7 +9,8 @@ object Form1: TForm1
   DefaultMonitor = dmPrimary
   OnCreate = FormCreate
   OnShow = FormShow
-  LCLVersion = '1.8.0.4'
+  Position = poScreenCenter
+  LCLVersion = '1.8.1.0'
   object DBControlGrid1: TDBControlGrid
     Left = 20
     Height = 543
@@ -106,7 +107,7 @@ object Form1: TForm1
           ScrollBars = ssNone
           TabOrder = 0
           ColCount = 12
-          RowCount = 18
+          RowCount = 19
           ColWidths = (
             41
             41

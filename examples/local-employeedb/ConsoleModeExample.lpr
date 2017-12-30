@@ -197,6 +197,9 @@ begin
   Application:=TMyApplication.Create(nil);
   Application.Title:='Console Mode and TIBLocalSupport';
   Application.Run;
+  {$IFDEF WINDOWS}
+  Readln; {Gives a chance to see the program output}
+  {$ENDIF}
   Application.Free;
 end.
 
