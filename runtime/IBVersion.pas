@@ -40,9 +40,9 @@ uses
 
 const
   IBX_MAJOR = 2;
-  IBX_MINOR = 0;
-  IBX_RELEASE = 3;
-  IBX_VERSION = '2.0.3';
+  IBX_MINOR = 1;
+  IBX_RELEASE = 0;
+  IBX_VERSION = '2.1.0';
 
 implementation
 
