@@ -8,7 +8,7 @@
       <Version Value="11"/>
       <SearchPaths>
         <OtherUnitFiles Value="iblocaldb"/>
-        <UnitOutputDirectory Value="iblocaldb/lib/$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
     <Description Value="This package provides additional support for Personal Databases."/>
@@ -36,7 +36,7 @@
  *  Contributor(s): ______________________________________.
  *
 "/>
-    <Version Major="2" Minor="0" Release = "3" />
+    <Version Major="2" Release="3"/>
     <Files Count="8">
       <Item1>
         <Filename Value="iblocaldb/IBXCustomIBLocalDBSupport.pas"/>

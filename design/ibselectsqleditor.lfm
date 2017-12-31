@@ -110,7 +110,6 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Height = 27
         Top = 21
         Width = 209
-        OwnerDrawEditable = False
         KeyField = 'RDB$RELATION_ID'
         ListField = 'RDB$RELATION_NAME'
         ListFieldIndex = 0
@@ -265,7 +264,6 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Height = 27
         Top = 17
         Width = 201
-        OwnerDrawEditable = False
         KeyField = 'RDB$PROCEDURE_NAME'
         ListField = 'RDB$PROCEDURE_NAME'
         ListFieldIndex = 0

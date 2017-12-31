@@ -142,7 +142,6 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       Height = 27
       Top = 66
       Width = 120
-      OwnerDrawEditable = False
       Enabled = False
       ItemHeight = 0
       Items.Strings = (
@@ -256,7 +255,6 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       Height = 27
       Top = 195
       Width = 134
-      OwnerDrawEditable = False
       ItemHeight = 0
       ItemIndex = 0
       Items.Strings = (

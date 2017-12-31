@@ -98,7 +98,6 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
           Height = 27
           Top = 32
           Width = 209
-          OwnerDrawEditable = False
           KeyField = 'RDB$RELATION_ID'
           ListField = 'RDB$RELATION_NAME'
           ListFieldIndex = 0

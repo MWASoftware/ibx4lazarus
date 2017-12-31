@@ -65,7 +65,6 @@ object IBServiceEditorForm: TIBServiceEditorForm
     Height = 27
     Top = 89
     Width = 120
-    OwnerDrawEditable = False
     Enabled = False
     ItemHeight = 0
     Items.Strings = (
