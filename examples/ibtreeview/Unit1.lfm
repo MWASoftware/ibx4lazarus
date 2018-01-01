@@ -161,7 +161,6 @@ object Form1: TForm1
           Height = 27
           Top = 136
           Width = 180
-          OwnerDrawEditable = False
           DataField = 'MNGR_NO'
           DataSource = DataSource1
           KeyField = 'EMP_NO'

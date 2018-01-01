@@ -24,8 +24,6 @@
  *
 *)
 
-{$DEFINE HasOwnerDrawEditable}
-
 unit IBDynamicGrid;
 
 {$mode objfpc}{$H+}
@@ -97,9 +95,6 @@ type
     FOnCloseUp: TNotifyEvent;
     FOnDrawItem: TDrawItemEvent;
     FOwner: TIBDynamicGridColumn;
-    {$IFDEF HasOwnerDrawEditable}
-    FOwnerDrawEditable: boolean;
-    {$ENDIF}
     FRelationName: string;
     FStyle: TComboBoxStyle;
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
@@ -120,9 +115,6 @@ type
                            read GetAutoCompleteText write SetAutoCompleteText
                            default DefaultComboBoxAutoCompleteText;
     property KeyPressInterval: integer read FKeyPressInterval write FKeyPressInterval default 500;
-    {$IFDEF HasOwnerDrawEditable}
-    property OwnerDrawEditable: boolean read FOwnerDrawEditable write FOwnerDrawEditable default false;
-    {$ENDIF}
     property RelationName: string read FRelationName write FRelationName;
     property Style: TComboBoxStyle read FStyle write FStyle default csDropDown;
     property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
@@ -948,9 +940,6 @@ begin
     Editor.Style := Style;
     Editor.ItemHeight := ItemHeight;
     Editor.ItemWidth := ItemWidth;
-    {$IFDEF HasOwnerDrawEditable}
-    Editor.OwnerDrawEditable := OwnerDrawEditable;
-    {$ENDIF}
     Editor.RelationName := RelationName;
     Editor.OnAutoInsert := OnAutoInsert;
     Editor.OnCanAutoInsert := OnCanAutoInsert;

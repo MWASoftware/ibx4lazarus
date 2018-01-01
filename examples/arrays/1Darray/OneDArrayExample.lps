@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="20">
+    <Units Count="23">
       <Unit0>
         <Filename Value="OneDArrayExample.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -21,7 +21,7 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <TopLine Value="164"/>
-        <CursorPos X="44" Y="176"/>
+        <CursorPos X="40" Y="176"/>
         <UsageCount Value="35"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -160,6 +160,26 @@
         <CursorPos X="55" Y="409"/>
         <UsageCount Value="14"/>
       </Unit19>
+      <Unit20>
+        <Filename Value="../../../design/IBDBReg.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="380"/>
+        <CursorPos X="70" Y="400"/>
+        <UsageCount Value="10"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="../../../runtime/IBVersion.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="16" Y="43"/>
+        <UsageCount Value="10"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="../../../update-revision.sh"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Bash"/>
+      </Unit22>
     </Units>
     <JumpHistory Count="4" HistoryIndex="3">
       <Position1>

@@ -391,7 +391,6 @@ object Form1: TForm1
         Height = 23
         Top = 2
         Width = 48
-        OwnerDrawEditable = False
         AutoSize = False
         DataField = 'JOB_GRADE'
         DataSource = EmployeeSource
@@ -450,7 +449,6 @@ object Form1: TForm1
         Height = 23
         Top = 0
         Width = 160
-        OwnerDrawEditable = False
         Anchors = [akTop, akLeft, akRight]
         AutoSize = False
         DataField = 'JOB_COUNTRY'
@@ -471,7 +469,6 @@ object Form1: TForm1
         Height = 23
         Top = 24
         Width = 160
-        OwnerDrawEditable = False
         Anchors = [akTop, akLeft, akRight]
         AutoSize = False
         DataField = 'JOB_CODE'
@@ -527,7 +524,6 @@ object Form1: TForm1
     Height = 25
     Top = 8
     Width = 272
-    OwnerDrawEditable = False
     ItemHeight = 0
     ItemIndex = 0
     Items.Strings = (

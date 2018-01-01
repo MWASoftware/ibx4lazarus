@@ -24,7 +24,6 @@ object Form1: TForm1
     Height = 27
     Top = 32
     Width = 224
-    OwnerDrawEditable = False
     KeyField = 'EMP_NO'
     ListField = 'FULL_NAME'
     ListFieldIndex = 0
@@ -164,7 +163,6 @@ object Form1: TForm1
       Height = 28
       Top = 32
       Width = 53
-      OwnerDrawEditable = False
       DataField = 'JOB_GRADE'
       DataSource = EmployeeSource
       ItemHeight = 0
@@ -223,7 +221,6 @@ object Form1: TForm1
       Height = 23
       Top = 32
       Width = 203
-      OwnerDrawEditable = False
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
       DataField = 'JOB_COUNTRY'
@@ -244,7 +241,6 @@ object Form1: TForm1
       Height = 28
       Top = 82
       Width = 264
-      OwnerDrawEditable = False
       Anchors = [akTop, akLeft, akRight]
       DataField = 'JOB_CODE'
       DataSource = EmployeeSource
