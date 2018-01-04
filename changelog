@@ -1,6 +1,16 @@
-IBX Change Log  version                            (2.1-1) Fri, 15 Dec 2017 12:20:11 +0000
+IBX Change Log  version                             (2.1-1) Fri, 15 Dec 2017 12:20:11 +0000
 
 1. IBExtract: Identity columns - add addition check for null column for generator name.
+
+2. IBCustomDataSet: Insert and Modify (Update) queries now recognise and process SQL RETURNING clauses.
+   The main use for this is for Firebird 3 Identity columns (see IBXDocumentation 6.6.8 for further
+   information). Values returned as a result of executing an Insert or Update statement
+   replace existing values in the current row for each corresponding column.
+
+3. The InsertSQL property editor now shows Firebird 3 Identity columns separate from the Field List.
+   When InsertSQL is generated, the Identity columns are not included in the list of values to
+   be inserted. A RETURNING clause is added to the insert statement to return the value of
+   each Identity column after the insert is executed.
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

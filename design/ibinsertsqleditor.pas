@@ -41,6 +41,9 @@ type
     procedure GenerateBtnClick(Sender: TObject);
   private
 
+  protected
+    procedure Loaded; override;
+
   public
 
   end;
@@ -99,6 +102,16 @@ begin
     IBSQLEditFrame1.GenerateExecuteSQL(QuoteFields.Checked)
   else
     IBSQLEditFrame1.GenerateInsertSQL(QuoteFields.Checked);
+end;
+
+procedure TIBInsertSQLEditorForm.Loaded;
+begin
+  inherited Loaded;
+  if IBSQLEditFrame1 <> nil then
+  begin
+    if PrimaryKeysGrid <> nil then
+      PrimaryKeysGrid.DataSource := IBSQLEditFrame1.IdentityColsSource;
+  end;
 end;
 
 

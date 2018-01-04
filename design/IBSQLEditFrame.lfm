@@ -1291,7 +1291,6 @@ object IBSQLEditFrame: TIBSQLEditFrame
   end
   object IdentityCols: TIBQuery
     AllowAutoActivateTransaction = False
-    Database = Form1.IBDatabase1
     Transaction = SQLTransaction
     BufferChunks = 1000
     CachedUpdates = False
@@ -1299,9 +1298,12 @@ object IBSQLEditFrame: TIBSQLEditFrame
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
-      'Select RDB$FIELD_NAME From RDB$RELATION_FIELDS'
-      'Where RDB$RELATION_NAME = :RDB$RELATION_NAME and'
-      'RDB$IDENTITY_TYPE is not null'
+      'Select Trim(RDB$FIELD_NAME) as ColumnName,1 as'
+      'Selected From RDB$RELATION_FIELDS'
+      'Where'
+      'RDB$RELATION_NAME = :RDB$RELATION_NAME and '
+      'RDB$IDENTITY_TYPE is not null order by '
+      'RDB$FIELD_POSITION asc'
     )
     Params = <    
       item
@@ -1309,6 +1311,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
         Name = 'RDB$RELATION_NAME'
         ParamType = ptInput
       end>
+    UpdateObject = IBUpdate5
     DataSetCloseAction = dcDiscardChanges
     left = 541
     top = 64
@@ -1318,5 +1321,14 @@ object IBSQLEditFrame: TIBSQLEditFrame
         Name = 'RDB$RELATION_NAME'
         ParamType = ptInput
       end>
+  end
+  object IdentityColsSource: TDataSource
+    DataSet = IdentityCols
+    left = 541
+    top = 136
+  end
+  object IBUpdate5: TIBUpdate
+    left = 538
+    top = 407
   end
 end

@@ -40,6 +40,8 @@ type
   { TIBSQLEditFrame }
 
   TIBSQLEditFrame = class(TFrame)
+    IBUpdate5: TIBUpdate;
+    IdentityColsSource: TDataSource;
     FieldNameList: TIBQuery;
     FieldsSource: TDataSource;
     DatabaseInfo: TIBDatabaseInfo;
@@ -297,6 +299,7 @@ procedure TIBSQLEditFrame.UserTablesAfterOpen(DataSet: TDataSet);
 begin
   FieldNameList.Active := true;
   PrimaryKeys.Active := true;
+  IdentityCols.Active := DatabaseInfo.ODSMajorVersion >= 12;
   FOpening := true;
   try
     if assigned(FOnUserTablesOpened) then
@@ -310,6 +313,7 @@ procedure TIBSQLEditFrame.UserTablesBeforeClose(DataSet: TDataSet);
 begin
   FieldNameList.Active := false;
   PrimaryKeys.Active := false;
+  IdentityCols.Active := false;
 end;
 
 procedure TIBSQLEditFrame.UserTablesBeforeOpen(DataSet: TDataSet);
@@ -784,12 +788,13 @@ var InsertSQL: string;
     I: integer;
 begin
   Lines := TStringList.Create;
-  IdentityCols.Active := DatabaseInfo.ODSMajorVersion >= 12;
   try
     InsertSQL := 'Insert Into ' + TableName + '(';
     Separator := '';
+    for I := 0 to IdentityCols.Fields.Count - 1 do
+      writeln(IdentityCols.Fields[i].FieldName);
     for I := 0 to FieldNames.Count - 1 do
-      if not IdentityCols.Active or not IdentityCols.Locate('RDB$FIELD_NAME',FieldNames[I],[]) then
+      if not IdentityCols.Active or not IdentityCols.Locate('ColumnName',FieldNames[I],[loCaseInsensitive]) then
       begin
         if QuotedStrings then
            InsertSQL := InsertSQL + Separator + '"' + FieldNames[I] + '"'
@@ -802,6 +807,7 @@ begin
     InsertSQL := 'Values(';
     Separator := ':';
     for I := 0 to FieldNames.Count - 1 do
+      if not IdentityCols.Active or not IdentityCols.Locate('ColumnName',FieldNames[I],[loCaseInsensitive]) then
       begin
          InsertSQL := InsertSQL + Separator +  AnsiUpperCase(FieldNames[I]) ;
          Separator := ', :';
@@ -809,13 +815,15 @@ begin
     InsertSQL := InsertSQL + ')';
     if IdentityCols.Active and (IdentityCols.RecordCount > 0) then
     begin
-      Separator := ' ';
-      InsertSQL := InsertSQL + ' RETURNING';
+      Separator := ' RETURNING ';
       IdentityCols.First;
       while not IdentityCols.Eof do
       begin
-        InsertSQL := InsertSQL + IdentityCols.FieldByName('RDB$FIELD_NAME').AsString;
-        Separator := ', ';
+        if IdentityCols.FieldByName('Selected').AsInteger <> 0 then
+        begin
+          InsertSQL := InsertSQL + Separator + IdentityCols.FieldByName('ColumnName').AsString;
+          Separator := ', ';
+        end;
         IdentityCols.Next;
       end;
     end;
@@ -823,7 +831,6 @@ begin
     SQL.AddStrings(Lines);
   finally
     Lines.Free;
-    IdentityCols.Active := false;
   end;
 end;
 
