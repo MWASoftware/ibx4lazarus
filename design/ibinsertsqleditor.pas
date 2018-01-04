@@ -76,6 +76,7 @@ begin
       IncludePrimaryKeys := true;
       IncludeReadOnlyFields := false;
       ExecuteOnlyProcs := true;
+      ExcludeIdentityColumns := true;
       SQLText.Lines.Assign(SelectSQL);
     end;
     Result := ShowModal = mrOK;

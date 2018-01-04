@@ -58,7 +58,7 @@ type
     procedure SetDataSet(ADataSet: TIBCustomDataSet); override;
     procedure SQLChanged(Sender: TObject);
     procedure Apply(UpdateKind: TUpdateKind; buff: PChar); override;
-    procedure ExecSQL(UpdateKind: TUpdateKind);
+    procedure ExecSQL(UpdateKind: TUpdateKind; buff: PChar);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -100,7 +100,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TIBUpdateSQL.ExecSQL(UpdateKind: TUpdateKind);
+procedure TIBUpdateSQL.ExecSQL(UpdateKind: TUpdateKind; buff: PChar);
 begin
   InternalPrepare(UpdateKind);
   with Query[UpdateKind] do
@@ -108,6 +108,8 @@ begin
     ExecQuery;
 //    if RowsAffected <> 1 then IBError(ibxeUpdateFailed, [nil]);
 // Commented out in release 1.2
+    if FieldCount > 0 then  {Has RETURNING Clause}
+      UpdateRecordFromQuery(Current,Buff);
   end;
 end;
 
@@ -184,7 +186,7 @@ begin
   if not Assigned(FDataSet) then Exit;
   InternalPrepare(UpdateKind);
   InternalSetParams(Query[UpdateKind].Params,buff);
-  ExecSQL(UpdateKind);
+  ExecSQL(UpdateKind,buff);
 end;
 
 end.

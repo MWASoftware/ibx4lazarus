@@ -617,7 +617,7 @@ begin
         end;
 
         {Firebird 3 introduces IDENTITY columns. We need to check for them here}
-        if qryTables.HasField('RDB$GENERATOR_NAME') then
+        if qryTables.HasField('RDB$GENERATOR_NAME') and not qryTables.FieldByName('RDB$GENERATOR_NAME').IsNull then
         begin
           qryGenerators.ParamByName('GENERATOR').AsString :=  qryTables.FieldByName('RDB$GENERATOR_NAME').AsString;
           qryGenerators.ExecQuery;

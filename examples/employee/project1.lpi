@@ -40,13 +40,13 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="4">
+    <Units Count="14">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="33" Y="10"/>
-        <UsageCount Value="183"/>
+        <UsageCount Value="185"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -55,9 +55,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="53" Y="15"/>
-        <UsageCount Value="183"/>
+        <CursorPos X="11" Y="10"/>
+        <UsageCount Value="185"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -70,7 +69,7 @@
         <UnitName Value="Unit2"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="39" Y="9"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="22"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -79,8 +78,211 @@
         <CursorPos X="78" Y="1003"/>
         <UsageCount Value="10"/>
       </Unit3>
+      <Unit4>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="3995"/>
+        <CursorPos X="21" Y="4019"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="../../runtime/IBSQL.pas"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="199"/>
+        <CursorPos X="14" Y="218"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="../../../fbintf/IB.pas"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="392"/>
+        <CursorPos X="3" Y="502"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="../../runtime/IBUpdateSQL.pas"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="103"/>
+        <CursorPos X="3" Y="105"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="../../runtime/IBUpdate.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="464"/>
+        <CursorPos X="3" Y="483"/>
+        <UsageCount Value="10"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="../../runtime/IBDatabaseInfo.pas"/>
+        <EditorIndex Value="6"/>
+        <CursorPos X="20" Y="32"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="160"/>
+        <CursorPos X="3" Y="165"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <ComponentName Value="IBSQLEditFrame"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="187"/>
+        <CursorPos X="30" Y="200"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="../../design/ibinsertsqleditor.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="52"/>
+        <CursorPos X="38" Y="79"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="../../design/ibupdatesqleditor.pas"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="177"/>
+        <CursorPos X="3" Y="179"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit13>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="364" Column="35" TopLine="333"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="602" Column="14" TopLine="581"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="1330" Column="49" TopLine="1323"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="440" Column="44" TopLine="420"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="2642" Column="37" TopLine="2630"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="537" Column="2" TopLine="519"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="3848" Column="40" TopLine="3903"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="3742" Column="20" TopLine="3735"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="3780" Column="28" TopLine="3748"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="3737" Column="27" TopLine="3717"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
+        <Caret Line="4019" Column="21" TopLine="3995"/>
+      </Position11>
+      <Position12>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
+        <Caret Line="192" Column="35" TopLine="174"/>
+      </Position12>
+      <Position13>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
+        <Caret Line="130" Column="3" TopLine="111"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="162" Column="15" TopLine="143"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="585" Column="3" TopLine="564"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="161" Column="15" TopLine="143"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="589" Column="11" TopLine="566"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="35" Column="69" TopLine="15"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="138" Column="28" TopLine="134"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="183" Column="107" TopLine="151"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="349" Column="14" TopLine="336"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="35" Column="69" TopLine="15"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="97" Column="49" TopLine="89"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="145" Column="17" TopLine="141"/>
+      </Position25>
+      <Position26>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="358" Column="10" TopLine="347"/>
+      </Position26>
+      <Position27>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="36" Column="18" TopLine="16"/>
+      </Position27>
+      <Position28>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="213" Column="75" TopLine="186"/>
+      </Position28>
+      <Position29>
+        <Filename Value="../../design/ibupdatesqleditor.pas"/>
+        <Caret Line="70" Column="28" TopLine="53"/>
+      </Position29>
+      <Position30>
+        <Filename Value="../../design/IBSQLEditFrame.pas"/>
+        <Caret Line="199" Column="30" TopLine="186"/>
+      </Position30>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

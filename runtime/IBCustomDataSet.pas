@@ -53,7 +53,7 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IB,  IBSQL, Db,
-  IBUtils, IBBlob, IBSQLParser;
+  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo;
 
 const
   BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
@@ -76,6 +76,7 @@ type
     function GetSQL(UpdateKind: TUpdateKind): TStrings; virtual; abstract;
     procedure InternalSetParams(Params: ISQLParams; buff: PChar); overload;
     procedure InternalSetParams(Query: TIBSQL; buff: PChar); overload;
+    procedure UpdateRecordFromQuery(QryResults: IResults; Buffer: PChar);
     property DataSet: TIBCustomDataSet read GetDataSet write SetDataSet;
   public
     constructor Create(AOwner: TComponent); override;
@@ -360,6 +361,7 @@ type
     FQRefresh,
     FQSelect,
     FQModify: TIBSQL;
+    FDatabaseInfo: TIBDatabaseInfo;
     FRecordBufferSize: Integer;
     FRecordCount: Integer;
     FRecordSize: Integer;
@@ -389,6 +391,8 @@ type
     FInTransactionEnd: boolean;
     FIBLinks: TList;
     FFieldColumns: PFieldColumns;
+    procedure ColumnDataToBuffer(QryResults: IResults; ColumnIndex,
+      FieldIndex: integer; Buffer: PChar);
     procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
     function GetSelectStmtIntf: IStatement;
     procedure SetUpdateMode(const Value: TUpdateMode);
@@ -443,6 +447,7 @@ type
     procedure SetTransaction(Value: TIBTransaction);
     procedure SetUpdateRecordTypes(Value: TIBUpdateRecordTypes);
     procedure SetUniDirectional(Value: Boolean);
+    procedure UpdateRecordFromQuery(QryResults: IResults; Buffer: PChar);
     procedure RefreshParams;
     function AdjustPosition(FCache: PChar; Offset: DWORD;
                             Origin: Integer): DWORD;
@@ -791,6 +796,7 @@ type
     FCharacterSetName: RawByteString;
     FCharacterSetSize: integer;
     FCodePage: TSystemCodePage;
+    FIdentityColumn: boolean;
     FRelationName: string;
     FDataSize: integer;
   published
@@ -801,6 +807,7 @@ type
     property RelationName: string read FRelationName write FRelationName;
     property ArrayDimensions: integer read FArrayDimensions write FArrayDimensions;
     property ArrayBounds: TArrayBounds read FArrayBounds write FArrayBounds;
+    property IdentityColumn: boolean read FIdentityColumn write FIdentityColumn default false;
   end;
 
 const
@@ -874,6 +881,7 @@ type
     FieldName : String;
     COMPUTED_BLR : Boolean;
     DEFAULT_VALUE : boolean;
+    IDENTITY_COLUMN : boolean;
     NextField : TFieldNode;
   end;
 
@@ -1322,6 +1330,7 @@ constructor TIBCustomDataSet.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FBase := TIBBase.Create(Self);
+  FDatabaseInfo := TIBDatabaseInfo.Create(self);
   FIBLinks := TList.Create;
   FCurrentRecord := -1;
   FDeletedRecords := 0;
@@ -1960,6 +1969,122 @@ begin
   end;
 end;
 
+{Update Buffer Fields from Query Results}
+
+procedure TIBCustomDataSet.UpdateRecordFromQuery(QryResults: IResults;
+  Buffer: PChar);
+var i, j: integer;
+begin
+  for i := 0 to QryResults.Count - 1 do
+  begin
+    j := GetFieldPosition(QryResults[i].GetAliasName);
+    if j > 0 then
+      ColumnDataToBuffer(QryResults,i,j,Buffer);
+  end;
+end;
+
+
+{Move column data returned from query to row buffer}
+
+procedure TIBCustomDataSet.ColumnDataToBuffer(QryResults: IResults;
+               ColumnIndex, FieldIndex: integer; Buffer: PChar);
+var
+  LocalData: PByte;
+  LocalDate, LocalDouble: Double;
+  LocalInt: Integer;
+  LocalBool: wordBool;
+  LocalInt64: Int64;
+  LocalCurrency: Currency;
+  p: PRecordData;
+  ColData: ISQLData;
+begin
+  p := PRecordData(Buffer);
+  LocalData := nil;
+  with p^.rdFields[FieldIndex], FFieldColumns^[FieldIndex] do
+  begin
+    QryResults.GetData(ColumnIndex,fdIsNull,fdDataLength,LocalData);
+    if not fdIsNull then
+    begin
+      ColData := QryResults[ColumnIndex];
+      case fdDataType of  {Get Formatted data for column types that need formatting}
+        SQL_TIMESTAMP:
+        begin
+          LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(ColData.AsDateTime));
+          LocalData := PByte(@LocalDate);
+        end;
+        SQL_TYPE_DATE:
+        begin
+          LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Date;
+          LocalData := PByte(@LocalInt);
+        end;
+        SQL_TYPE_TIME:
+        begin
+          LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Time;
+          LocalData := PByte(@LocalInt);
+        end;
+        SQL_SHORT, SQL_LONG:
+        begin
+          if (fdDataScale = 0) then
+          begin
+            LocalInt := ColData.AsLong;
+            LocalData := PByte(@LocalInt);
+          end
+          else
+          if (fdDataScale >= (-4)) then
+          begin
+            LocalCurrency := ColData.AsCurrency;
+            LocalData := PByte(@LocalCurrency);
+          end
+          else
+          begin
+           LocalDouble := ColData.AsDouble;
+           LocalData := PByte(@LocalDouble);
+          end;
+        end;
+        SQL_INT64:
+        begin
+          if (fdDataScale = 0) then
+          begin
+            LocalInt64 := ColData.AsInt64;
+            LocalData := PByte(@LocalInt64);
+          end
+          else
+          if (fdDataScale >= (-4)) then
+          begin
+            LocalCurrency := ColData.AsCurrency;
+            LocalData := PByte(@LocalCurrency);
+            end
+            else
+            begin
+              LocalDouble := ColData.AsDouble;
+              LocalData := PByte(@LocalDouble);
+            end
+        end;
+        SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
+        begin
+          LocalDouble := ColData.AsDouble;
+          LocalData := PByte(@LocalDouble);
+        end;
+        SQL_BOOLEAN:
+        begin
+          LocalBool := ColData.AsBoolean;
+          LocalData := PByte(@LocalBool);
+        end;
+      end;
+
+      if fdDataType = SQL_VARYING then
+        Move(LocalData^, Buffer[fdDataOfs], fdDataLength)
+      else
+        Move(LocalData^, Buffer[fdDataOfs], fdDataSize)
+    end
+    else {Null column}
+    if fdDataType = SQL_VARYING then
+      FillChar(Buffer[fdDataOfs],fdDataLength,0)
+    else
+      FillChar(Buffer[fdDataOfs],fdDataSize,0);
+  end;
+end;
+
 { Read the record from FQSelect.Current into the record buffer
   Then write the buffer to in memory cache }
 procedure TIBCustomDataSet.FetchCurrentRecordToBuffer(Qry: TIBSQL;
@@ -1968,12 +2093,6 @@ var
   pbd: PBlobDataArray;
   pda: PArrayDataArray;
   i, j: Integer;
-  LocalData: PByte;
-  LocalDate, LocalDouble: Double;
-  LocalInt: Integer;
-  LocalBool: wordBool;
-  LocalInt64: Int64;
-  LocalCurrency: Currency;
   FieldsLoaded: Integer;
   p: PRecordData;
 begin
@@ -2024,91 +2143,7 @@ begin
         continue;
       end;
     if j > 0 then
-    begin
-      LocalData := nil;
-      with p^.rdFields[j], FFieldColumns^[j] do
-      begin
-        Qry.Current.GetData(i,fdIsNull,fdDataLength,LocalData);
-        if not fdIsNull then
-        begin
-          case fdDataType of  {Get Formatted data for column types that need formatting}
-            SQL_TIMESTAMP:
-            begin
-              LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(Qry[i].AsDateTime));
-              LocalData := PByte(@LocalDate);
-            end;
-            SQL_TYPE_DATE:
-            begin
-              LocalInt := DateTimeToTimeStamp(Qry[i].AsDateTime).Date;
-              LocalData := PByte(@LocalInt);
-            end;
-            SQL_TYPE_TIME:
-            begin
-              LocalInt := DateTimeToTimeStamp(Qry[i].AsDateTime).Time;
-              LocalData := PByte(@LocalInt);
-            end;
-            SQL_SHORT, SQL_LONG:
-            begin
-              if (fdDataScale = 0) then
-              begin
-                LocalInt := Qry[i].AsLong;
-                LocalData := PByte(@LocalInt);
-              end
-              else
-              if (fdDataScale >= (-4)) then
-              begin
-                LocalCurrency := Qry[i].AsCurrency;
-                LocalData := PByte(@LocalCurrency);
-              end
-              else
-              begin
-               LocalDouble := Qry[i].AsDouble;
-               LocalData := PByte(@LocalDouble);
-              end;
-            end;
-            SQL_INT64:
-            begin
-              if (fdDataScale = 0) then
-              begin
-                LocalInt64 := Qry[i].AsInt64;
-                LocalData := PByte(@LocalInt64);
-              end
-              else
-              if (fdDataScale >= (-4)) then
-              begin
-                LocalCurrency := Qry[i].AsCurrency;
-                LocalData := PByte(@LocalCurrency);
-                end
-                else
-                begin
-                  LocalDouble := Qry[i].AsDouble;
-                  LocalData := PByte(@LocalDouble);
-                end
-            end;
-            SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
-            begin
-              LocalDouble := Qry[i].AsDouble;
-              LocalData := PByte(@LocalDouble);
-            end;
-            SQL_BOOLEAN:
-            begin
-              LocalBool := Qry[i].AsBoolean;
-              LocalData := PByte(@LocalBool);
-            end;
-          end;
-
-          if fdDataType = SQL_VARYING then
-            Move(LocalData^, Buffer[fdDataOfs], fdDataLength)
-          else
-            Move(LocalData^, Buffer[fdDataOfs], fdDataSize)
-        end
-        else {Null column}
-        if fdDataType = SQL_VARYING then
-          FillChar(Buffer[fdDataOfs],fdDataLength,0)
-        else
-          FillChar(Buffer[fdDataOfs],fdDataSize,0);
-      end;
-    end;
+      ColumnDataToBuffer(Qry.Current,i,j,Buffer);
   end;
   WriteRecordCache(RecordNumber, Buffer);
 end;
@@ -2355,6 +2390,8 @@ begin
     SetInternalSQLParams(Qry.Params, Buff);
     Qry.ExecQuery;
   end;
+  if Qry.FieldCount > 0 then {Has RETURNING Clause}
+    UpdateRecordFromQuery(Qry.Current,Buff);
   PRecordData(Buff)^.rdUpdateStatus := usUnmodified;
   PRecordData(Buff)^.rdCachedUpdateStatus := cusUnmodified;
   SetModified(False);
@@ -2605,6 +2642,7 @@ begin
     FQRefresh.Database := Value;
     FQSelect.Database := Value;
     FQModify.Database := Value;
+    FDatabaseInfo.Database := Value;
   end;
 end;
 
@@ -3674,6 +3712,15 @@ const
                'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '+ {do not localize}
                'and ((not F.RDB$COMPUTED_BLR is NULL) or ' + {do not localize}
                '     (not F.RDB$DEFAULT_VALUE is NULL)) '; {do not localize}
+
+  DefaultSQLODS12 = 'Select F.RDB$COMPUTED_BLR, ' + {do not localize}
+               'F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE ' + {do not localize}
+               'from RDB$RELATION_FIELDS R, RDB$FIELDS F ' + {do not localize}
+               'where R.RDB$RELATION_NAME = :RELATION ' +  {do not localize}
+               'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '+ {do not localize}
+               'and ((not F.RDB$COMPUTED_BLR is NULL) or ' + {do not localize}
+               '     (not F.RDB$DEFAULT_VALUE is NULL)) '; {do not localize}
+
 var
   FieldType: TFieldType;
   FieldSize: Word;
@@ -3714,6 +3761,7 @@ var
       FField.FieldName := Query.Fields[2].AsString;
       FField.DEFAULT_VALUE := not Query.Fields[1].IsNull;
       FField.COMPUTED_BLR := not Query.Fields[0].IsNull;
+      FField.IDENTITY_COLUMN := (Query.FieldCount > 3) and not Query.Fields[3].IsNull;
       FField.NextField := Result.FieldNodes;
       Result.FieldNodes := FField;
       Query.Next;
@@ -3767,6 +3815,29 @@ var
         FField := Ffield.NextField;
   end;
 
+  function Is_IDENTITY_COLUMN(Relation, Field : String) : Boolean;
+  var
+    FRelation : TRelationNode;
+    FField : TFieldNode;
+  begin
+    FRelation := FRelationNodes;
+    while Assigned(FRelation) and
+         (FRelation.RelationName <> Relation) do
+      FRelation := FRelation.NextRelation;
+    if not Assigned(FRelation) then
+      FRelation := Add_Node(Relation, Field);
+    Result := false;
+    FField := FRelation.FieldNodes;
+    while Assigned(FField) do
+      if FField.FieldName = Field then
+      begin
+        Result := Ffield.IDENTITY_COLUMN;
+        Exit;
+      end
+      else
+        FField := Ffield.NextField;
+  end;
+
   Procedure FreeNodes;
   var
     FRelation : TRelationNode;
@@ -3800,7 +3871,10 @@ begin
     FieldIndex := 0;
     if (Length(FMappedFieldPosition) < SourceQuery.MetaData.Count) then
       SetLength(FMappedFieldPosition, SourceQuery.MetaData.Count);
-    Query.SQL.Text := DefaultSQL;
+    if FDatabaseInfo.ODSMajorVersion >= 12 then
+      Query.SQL.Text := DefaultSQLODS12
+    else
+      Query.SQL.Text := DefaultSQL;
     Query.Prepare;
     SetLength(FAliasNameMap, SourceQuery.MetaData.Count);
     SetLength(FAliasNameList, SourceQuery.MetaData.Count);
@@ -3939,6 +4013,7 @@ begin
             ArrayBounds := aArrayBounds;
             if (FieldName <> '') and (RelationName <> '') then
             begin
+              IdentityColumn := Is_IDENTITY_COLUMN(RelationName, FieldName);
               if Has_COMPUTED_BLR(RelationName, FieldName) then
               begin
                 Attributes := [faReadOnly];
@@ -4839,6 +4914,13 @@ end;
 procedure TIBDataSetUpdateObject.InternalSetParams(Query: TIBSQL; buff: PChar);
 begin
   InternalSetParams(Query.Params,buff);
+end;
+
+procedure TIBDataSetUpdateObject.UpdateRecordFromQuery(QryResults: IResults;
+  Buffer: PChar);
+begin
+  if not Assigned(DataSet) then Exit;
+  DataSet.UpdateRecordFromQuery(QryResults, Buffer);
 end;
 
 function TIBDSBlobStream.GetSize: Int64;

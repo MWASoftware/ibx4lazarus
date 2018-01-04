@@ -32,8 +32,8 @@ interface
 uses
   Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, LResources, Forms,
   Controls, ActnList, Menus, Dialogs, ComCtrls, ExtCtrls, StdCtrls, IBQuery,
-  IBSQL, IBDatabase, IBUpdate, IBLookupComboEditBox, IBCustomDataset, db,
-  LazSynTextArea, IB;
+  IBSQL, IBDatabase, IBUpdate, IBDatabaseInfo, IBLookupComboEditBox,
+  IBCustomDataset, db, LazSynTextArea, IB;
 
 type
 
@@ -42,6 +42,8 @@ type
   TIBSQLEditFrame = class(TFrame)
     FieldNameList: TIBQuery;
     FieldsSource: TDataSource;
+    DatabaseInfo: TIBDatabaseInfo;
+    IdentityCols: TIBQuery;
     IBUpdate1: TIBUpdate;
     IBUpdate2: TIBUpdate;
     IBUpdate3: TIBUpdate;
@@ -123,6 +125,7 @@ type
     procedure WrapTextUpdate(Sender: TObject);
   private
     FDatabase: TIBDatabase;
+    FExcludeIdentityColumns: boolean;
     FExecuteOnlyProcs: boolean;
     FIncludePrimaryKeys: boolean;
     FIncludeReadOnlyFields: boolean;
@@ -141,6 +144,7 @@ type
               InputParams, OutputParams, ExecuteSQL: TStrings); overload;
     procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings); overload;
     procedure SetDatabase(AValue: TIBDatabase);
+    procedure SetExcludeIdentityColumns(AValue: boolean);
     procedure SetExecuteOnlyProcs(AValue: boolean);
     procedure SetIncludePrimaryKeys(AValue: boolean);
     procedure SetIncludeReadOnlyFields(AValue: boolean);
@@ -178,6 +182,7 @@ type
     property IncludeReadOnlyFields: boolean read FIncludeReadOnlyFields write SetIncludeReadOnlyFields;
     property IncludePrimaryKeys: boolean read FIncludePrimaryKeys write SetIncludePrimaryKeys;
     property IncludeSystemTables: boolean read FIncludeSystemTables write SetIncludeSystemTables;
+    property ExcludeIdentityColumns: boolean read FExcludeIdentityColumns write SetExcludeIdentityColumns;
     property ExecuteOnlyProcs: boolean read FExecuteOnlyProcs write SetExecuteOnlyProcs;
     property OnUserTablesOpened: TNotifyEvent read FOnUserTablesOpened write FOnUserTablesOpened;
   end;
@@ -206,6 +211,8 @@ begin
     (DataSet as TIBQuery).Parser.Add2WhereClause('B.RDB$COMPUTED_SOURCE is NULL');
   if not IncludePrimaryKeys then
     (DataSet as TIBQuery).Parser.Add2WhereClause(sNoPrimaryKeys);
+  if ExcludeIdentityColumns and (DatabaseInfo.ODSMajorVersion >= 12) then
+    (DataSet as TIBQuery).Parser.Add2WhereClause('RF.RDB$IDENTITY_TYPE is NULL');
 end;
 
 procedure TIBSQLEditFrame.IBUpdate1ApplyUpdates(Sender: TObject;
@@ -334,9 +341,19 @@ begin
       TIBCustomDataset(Components[i]).Database := FDatabase
     else
     if Components[i] is TIBSQL then
-      TIBSQL(Components[i]).Database := FDatabase;
+      TIBSQL(Components[i]).Database := FDatabase
+    else
+    if Components[i] is TIBDatabaseInfo then
+      TIBDatabaseInfo(Components[i]).Database := FDatabase;
   if (FDatabase <> nil) and FDatabase.Connected then
     SQLTransaction.Active := true;
+end;
+
+procedure TIBSQLEditFrame.SetExcludeIdentityColumns(AValue: boolean);
+begin
+  if FExcludeIdentityColumns = AValue then Exit;
+  FExcludeIdentityColumns := AValue;
+  RefreshAll;
 end;
 
 procedure TIBSQLEditFrame.SetExecuteOnlyProcs(AValue: boolean);
@@ -767,10 +784,12 @@ var InsertSQL: string;
     I: integer;
 begin
   Lines := TStringList.Create;
+  IdentityCols.Active := DatabaseInfo.ODSMajorVersion >= 12;
   try
     InsertSQL := 'Insert Into ' + TableName + '(';
     Separator := '';
     for I := 0 to FieldNames.Count - 1 do
+      if not IdentityCols.Active or not IdentityCols.Locate('RDB$FIELD_NAME',FieldNames[I],[]) then
       begin
         if QuotedStrings then
            InsertSQL := InsertSQL + Separator + '"' + FieldNames[I] + '"'
@@ -788,10 +807,23 @@ begin
          Separator := ', :';
       end;
     InsertSQL := InsertSQL + ')';
+    if IdentityCols.Active and (IdentityCols.RecordCount > 0) then
+    begin
+      Separator := ' ';
+      InsertSQL := InsertSQL + ' RETURNING';
+      IdentityCols.First;
+      while not IdentityCols.Eof do
+      begin
+        InsertSQL := InsertSQL + IdentityCols.FieldByName('RDB$FIELD_NAME').AsString;
+        Separator := ', ';
+        IdentityCols.Next;
+      end;
+    end;
     Lines.Add(InsertSQL);
     SQL.AddStrings(Lines);
   finally
     Lines.Free;
+    IdentityCols.Active := false;
   end;
 end;
 
