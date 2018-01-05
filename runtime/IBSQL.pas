@@ -938,6 +938,8 @@ end;
 
 procedure TIBSQL.SetTransaction(Value: TIBTransaction);
 begin
+  if FBase.Transaction = Value then Exit;
+  FreeHandle;
   FBase.Transaction := Value;
 end;
 

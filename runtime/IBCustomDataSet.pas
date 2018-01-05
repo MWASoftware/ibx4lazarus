@@ -315,15 +315,25 @@ type
     FFieldName: string;
     FGeneratorName: string;
     FIncrement: integer;
+    FQuery: TIBSQL;
+    function GetDatabase: TIBDatabase;
+    function GetTransaction: TIBTransaction;
+    procedure SetDatabase(AValue: TIBDatabase);
+    procedure SetGeneratorName(AValue: string);
     procedure SetIncrement(const AValue: integer);
+    procedure SetTransaction(AValue: TIBTransaction);
+    procedure SetQuerySQL;
   protected
-    function GetNextValue(ADatabase: TIBDatabase; ATransaction: TIBTransaction): integer;
+    function GetNextValue: integer;
   public
     constructor Create(Owner: TIBCustomDataSet);
+    destructor Destroy; override;
     procedure Apply;
     property Owner: TIBCustomDataSet read FOwner;
+    property Database: TIBDatabase read GetDatabase write SetDatabase;
+    property Transaction: TIBTransaction read GetTransaction write SetTransaction;
   published
-    property Generator: string read FGeneratorName write FGeneratorName;
+    property Generator: string read FGeneratorName write SetGeneratorName;
     property Field: string read FFieldName write FFieldName;
     property Increment: integer read FIncrement write SetIncrement default 1;
     property ApplyOnEvent: TIBGeneratorApplyOnEvent read FApplyOnEvent write FApplyOnEvent;
@@ -2717,6 +2727,7 @@ begin
     FQSelect.Database := Value;
     FQModify.Database := Value;
     FDatabaseInfo.Database := Value;
+    FGeneratorField.Database := Value;
   end;
 end;
 
@@ -2885,6 +2896,7 @@ begin
     FQRefresh.Transaction := Value;
     FQSelect.Transaction := Value;
     FQModify.Transaction := Value;
+    FGeneratorField.Transaction := Value;
   end;
 end;
 
@@ -5058,34 +5070,56 @@ end;
 
 procedure TIBGenerator.SetIncrement(const AValue: integer);
 begin
+  if FIncrement = AValue then Exit;
   if AValue < 0 then
-     raise Exception.Create('A Generator Increment cannot be negative');
-  FIncrement := AValue
+    IBError(ibxeNegativeGenerator,[]);
+  FIncrement := AValue;
+  SetQuerySQL;
 end;
 
-function TIBGenerator.GetNextValue(ADatabase: TIBDatabase;
-  ATransaction: TIBTransaction): integer;
+procedure TIBGenerator.SetTransaction(AValue: TIBTransaction);
 begin
-  with TIBSQL.Create(nil) do
-  try
-    Database := ADatabase;
-    Transaction := ATransaction;
-    if not assigned(Database) then
-       IBError(ibxeCannotSetDatabase,[]);
-    if not assigned(Transaction) then
-       IBError(ibxeCannotSetTransaction,[]);
-    with Transaction do
-      if not InTransaction then StartTransaction;
-    SQL.Text := Format('Select Gen_ID(%s,%d) as ID From RDB$Database',[FGeneratorName,Increment]);
-    Prepare;
+  FQuery.Transaction := AValue;
+end;
+
+procedure TIBGenerator.SetQuerySQL;
+begin
+  FQuery.SQL.Text := Format('Select Gen_ID(%s,%d) From RDB$Database',[FGeneratorName,Increment]);
+end;
+
+function TIBGenerator.GetDatabase: TIBDatabase;
+begin
+  Result := FQuery.Database;
+end;
+
+function TIBGenerator.GetTransaction: TIBTransaction;
+begin
+  Result := FQuery.Transaction;
+end;
+
+procedure TIBGenerator.SetDatabase(AValue: TIBDatabase);
+begin
+  FQuery.Database := AValue;
+end;
+
+procedure TIBGenerator.SetGeneratorName(AValue: string);
+begin
+  if FGeneratorName = AValue then Exit;
+  FGeneratorName := AValue;
+  SetQuerySQL;
+end;
+
+function TIBGenerator.GetNextValue: integer;
+begin
+  with FQuery do
+  begin
+    Transaction.Active := true;
     ExecQuery;
     try
-      Result := FieldByName('ID').AsInteger
+      Result := Fields[0].AsInteger
     finally
       Close
     end;
-  finally
-    Free
   end;
 end;
 
@@ -5093,13 +5127,21 @@ constructor TIBGenerator.Create(Owner: TIBCustomDataSet);
 begin
   FOwner := Owner;
   FIncrement := 1;
+  FQuery := TIBSQL.Create(nil);
+end;
+
+destructor TIBGenerator.Destroy;
+begin
+  if assigned(FQuery) then FQuery.Free;
+  inherited Destroy;
 end;
 
 
 procedure TIBGenerator.Apply;
 begin
-  if (FGeneratorName <> '') and (FFieldName <> '') and Owner.FieldByName(FFieldName).IsNull then
-    Owner.FieldByName(FFieldName).AsInteger := GetNextValue(Owner.Database,Owner.Transaction);
+  if assigned(Database) and assigned(Transaction) and
+       (FGeneratorName <> '') and (FFieldName <> '') and Owner.FieldByName(FFieldName).IsNull then
+    Owner.FieldByName(FFieldName).AsInteger := GetNextValue;
 end;
 
 

@@ -40,13 +40,13 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="14">
+    <Units Count="18">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="33" Y="10"/>
-        <UsageCount Value="186"/>
+        <UsageCount Value="187"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -56,8 +56,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <CursorPos X="11" Y="10"/>
-        <UsageCount Value="186"/>
+        <CursorPos X="10" Y="10"/>
+        <UsageCount Value="187"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -70,7 +70,7 @@
         <UnitName Value="Unit2"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="39" Y="9"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="24"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -82,15 +82,15 @@
       <Unit4>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="3995"/>
-        <CursorPos X="21" Y="4019"/>
+        <TopLine Value="301"/>
+        <CursorPos X="3" Y="311"/>
         <UsageCount Value="11"/>
       </Unit4>
       <Unit5>
         <Filename Value="../../runtime/IBSQL.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="199"/>
-        <CursorPos X="14" Y="218"/>
+        <TopLine Value="700"/>
+        <CursorPos X="3" Y="706"/>
         <UsageCount Value="11"/>
       </Unit5>
       <Unit6>
@@ -151,6 +151,34 @@
         <CursorPos X="3" Y="179"/>
         <UsageCount Value="10"/>
       </Unit13>
+      <Unit14>
+        <Filename Value="../../../fbintf/client/FBMessages.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="585"/>
+        <CursorPos X="23" Y="616"/>
+        <UsageCount Value="10"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="../../../../../fpcsrc/3.0.4/packages/fcl-db/src/base/dataset.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1725"/>
+        <CursorPos Y="1748"/>
+        <UsageCount Value="10"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="../../../../../fpcsrc/3.0.4/packages/fcl-db/src/base/fields.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="679"/>
+        <CursorPos Y="700"/>
+        <UsageCount Value="10"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="../../changelog"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="52" Y="18"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit17>
     </Units>
     <JumpHistory HistoryIndex="-1"/>
   </ProjectOptions>
@@ -164,6 +192,9 @@
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
+      <Debugging>
+        <UseHeaptrc Value="True"/>
+      </Debugging>
       <Options>
         <Win32>
           <GraphicApplication Value="True"/>
