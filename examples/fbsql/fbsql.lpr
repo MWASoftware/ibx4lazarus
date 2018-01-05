@@ -71,7 +71,7 @@ type
   { TInteractiveSQLProcessor }
 
   {This is a TCustomIBXScript descendent that uses the console for input/output.
-   It additionally suported QUIT/EXIT Commands. The log file can either be redirected
+   It additionally supports QUIT/EXIT Commands. The log file can either be redirected
    to the console or sent to a separate file.}
 
   TInteractiveSQLProcessor = class(TCustomIBXScript)
