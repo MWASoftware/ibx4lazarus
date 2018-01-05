@@ -9,9 +9,9 @@
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="119"/>
-        <CursorPos Y="182"/>
-        <UsageCount Value="195"/>
+        <TopLine Value="172"/>
+        <CursorPos X="29" Y="181"/>
+        <UsageCount Value="196"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -20,7 +20,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="62"/>
         <CursorPos X="25" Y="70"/>
-        <UsageCount Value="195"/>
+        <UsageCount Value="196"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit1>
       <Unit2>
@@ -123,11 +123,10 @@
       </Unit15>
       <Unit16>
         <Filename Value="..\..\changelog"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="4"/>
         <CursorPos X="87" Y="34"/>
         <UsageCount Value="23"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
       <Unit17>
@@ -258,13 +257,13 @@
       <Unit34>
         <Filename Value="..\..\runtime\ibxscript.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="254"/>
-        <CursorPos X="15" Y="285"/>
+        <TopLine Value="1800"/>
+        <CursorPos X="3" Y="1802"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="845"/>
-          <CursorPos X="41" Y="857"/>
+          <TopLine Value="283"/>
+          <CursorPos X="5" Y="303"/>
         </ExtraEditor1>
         <UsageCount Value="70"/>
       </Unit34>
@@ -443,7 +442,52 @@
         <UsageCount Value="11"/>
       </Unit59>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="11" HistoryIndex="10">
+      <Position1>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="82" Column="20" TopLine="59"/>
+      </Position1>
+      <Position2>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="159" Column="3" TopLine="154"/>
+      </Position2>
+      <Position3>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="85" Column="14" TopLine="62"/>
+      </Position3>
+      <Position4>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="186" Column="3" TopLine="184"/>
+      </Position4>
+      <Position5>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="372" Column="23" TopLine="348"/>
+      </Position5>
+      <Position6>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="85" Column="15" TopLine="66"/>
+      </Position6>
+      <Position7>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="186" Column="10" TopLine="184"/>
+      </Position7>
+      <Position8>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="186" Column="10" TopLine="9"/>
+      </Position8>
+      <Position9>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="84" Column="21" TopLine="62"/>
+      </Position9>
+      <Position10>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="181" Column="30" TopLine="178"/>
+      </Position10>
+      <Position11>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="181" Column="29" TopLine="172"/>
+      </Position11>
+    </JumpHistory>
   </ProjectSession>
   <Debugging>
     <Watches Count="1">
