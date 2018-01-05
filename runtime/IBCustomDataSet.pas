@@ -209,7 +209,10 @@ type
      Note: y > 4 will default to Floats
   }
   TIBBCDField = class(TBCDField)
+  private
+    FIdentityColumn: boolean;
   protected
+    procedure Bind(Binding: Boolean); override;
     class procedure CheckTypeSize(Value: Integer); override;
     function GetAsCurrency: Currency; override;
     function GetAsString: string; override;
@@ -217,8 +220,45 @@ type
     function GetDataSize: Integer; override;
   public
     constructor Create(AOwner: TComponent); override;
+    property IdentityColumn: boolean read FIdentityColumn;
   published
     property Size default 8;
+  end;
+
+  {The following integer field types extend the built in versions to enable IBX appplications
+   to check for an Identity column}
+
+  { TIBSmallintField }
+
+  TIBSmallintField = class(TSmallintField)
+  private
+    FIdentityColumn: boolean;
+  protected
+    procedure Bind(Binding: Boolean); override;
+  public
+    property IdentityColumn: boolean read FIdentityColumn;
+  end;
+
+  { TIBIntegerField }
+
+  TIBIntegerField = class(TIntegerField)
+  private
+    FIdentityColumn: boolean;
+  protected
+    procedure Bind(Binding: Boolean); override;
+  public
+    property IdentityColumn: boolean read FIdentityColumn;
+  end;
+
+  { TIBLargeIntField }
+
+  TIBLargeIntField = class(TLargeIntField)
+  private
+    FIdentityColumn: boolean;
+  protected
+    procedure Bind(Binding: Boolean); override;
+  public
+    property IdentityColumn: boolean read FIdentityColumn;
   end;
 
   {TIBMemoField}
@@ -814,8 +854,8 @@ const
 DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     nil,                { ftUnknown }
     TIBStringField,     { ftString }
-    TSmallintField,     { ftSmallint }
-    TIntegerField,      { ftInteger }
+    TIBSmallintField,   { ftSmallint }
+    TIBIntegerField,      { ftInteger }
     TWordField,         { ftWord }
     TBooleanField,      { ftBoolean }
     TFloatField,        { ftFloat }
@@ -837,7 +877,7 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     nil,                { ftCursor }
     TStringField,       { ftFixedChar }
     nil,    { ftWideString }
-    TLargeIntField,     { ftLargeInt }
+    TIBLargeIntField,     { ftLargeInt }
     nil,          { ftADT }
     TIBArrayField,        { ftArray }
     nil,    { ftReference }
@@ -933,6 +973,33 @@ type
     end;
     Result := str;
   end;
+
+{ TIBLargeIntField }
+
+procedure TIBLargeIntField.Bind(Binding: Boolean);
+begin
+  inherited Bind(Binding);
+  if Binding and (FieldDef <> nil) then
+     FIdentityColumn := (FieldDef as TIBFieldDef).IdentityColumn;
+end;
+
+{ TIBIntegerField }
+
+procedure TIBIntegerField.Bind(Binding: Boolean);
+begin
+  inherited Bind(Binding);
+  if Binding and (FieldDef <> nil) then
+     FIdentityColumn := (FieldDef as TIBFieldDef).IdentityColumn;
+end;
+
+{ TIBSmallintField }
+
+procedure TIBSmallintField.Bind(Binding: Boolean);
+begin
+  inherited Bind(Binding);
+  if Binding and (FieldDef <> nil) then
+     FIdentityColumn := (FieldDef as TIBFieldDef).IdentityColumn;
+end;
 
 { TIBArray }
 
@@ -1043,7 +1110,7 @@ begin
        {2: case 2 ignored. This should be handled by TIBWideMemo}
 
        3, {Assume UNICODE_FSS is really UTF8}
-       4: {Include GB18030 - assuming UTF8 routine work for this codeset}
+       4: {Include GB18030 - assuming UTF8 routines work for this codeset}
          if DisplayWidth = 0 then
            Result := ValidUTF8String(TextToSingleLine(Result))
          else
@@ -1243,6 +1310,13 @@ begin
   inherited Create(AOwner);
   SetDataType(ftBCD);
   Size := 8;
+end;
+
+procedure TIBBCDField.Bind(Binding: Boolean);
+begin
+  inherited Bind(Binding);
+  if Binding and (FieldDef <> nil) then
+     FIdentityColumn := (FieldDef as TIBFieldDef).IdentityColumn;
 end;
 
 class procedure TIBBCDField.CheckTypeSize(Value: Integer);
@@ -3719,7 +3793,8 @@ const
                'where R.RDB$RELATION_NAME = :RELATION ' +  {do not localize}
                'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '+ {do not localize}
                'and ((not F.RDB$COMPUTED_BLR is NULL) or ' + {do not localize}
-               '     (not F.RDB$DEFAULT_VALUE is NULL)) '; {do not localize}
+               '     (not F.RDB$DEFAULT_VALUE is NULL) or ' + {do not localize}
+               '     ( not R.RDB$IDENTITY_TYPE is NULL))' ; {do not localize}
 
 var
   FieldType: TFieldType;
