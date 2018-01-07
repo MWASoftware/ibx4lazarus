@@ -56,8 +56,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <TopLine Value="201"/>
-        <CursorPos X="3" Y="204"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="350"/>
+        <CursorPos X="11" Y="358"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -69,10 +70,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <CursorPos X="49" Y="13"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit2>
@@ -85,7 +85,7 @@
         <UnitName Value="Unit4"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="40" Y="18"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="21"/>
       </Unit3>
       <Unit4>
         <Filename Value="unit5.pas"/>
@@ -96,7 +96,7 @@
         <UnitName Value="Unit5"/>
         <EditorIndex Value="2"/>
         <CursorPos X="29" Y="9"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit4>
@@ -106,11 +106,15 @@
         <UsageCount Value="10"/>
       </Unit5>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="20" Column="84" TopLine="4"/>
       </Position1>
+      <Position2>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="209" Column="25" TopLine="201"/>
+      </Position2>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
