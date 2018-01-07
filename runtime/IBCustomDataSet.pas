@@ -2079,12 +2079,10 @@ var
   LocalBool: wordBool;
   LocalInt64: Int64;
   LocalCurrency: Currency;
-  p: PRecordData;
   ColData: ISQLData;
 begin
-  p := PRecordData(Buffer);
   LocalData := nil;
-  with p^.rdFields[FieldIndex], FFieldColumns^[FieldIndex] do
+  with PRecordData(Buffer)^.rdFields[FieldIndex], FFieldColumns^[FieldIndex] do
   begin
     QryResults.GetData(ColumnIndex,fdIsNull,fdDataLength,LocalData);
     if not fdIsNull then
