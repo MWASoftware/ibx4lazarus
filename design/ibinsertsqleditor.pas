@@ -30,14 +30,17 @@ unit ibinsertsqleditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs, 
-    ibselectsqleditor, IBSQLEditFrame, IBDatabase, IBCustomDataset;
+  Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
+  StdCtrls, ComCtrls, ibselectsqleditor, IBSQLEditFrame, IBDatabase,
+  IBLookupComboEditBox, IBDynamicGrid, IBCustomDataset;
 
 type
 
   { TIBInsertSQLEditorForm }
 
   TIBInsertSQLEditorForm = class(TIBSelectSQLEditorForm)
+    Label5: TLabel;
+    ReadOnlyGrid: TIBDynamicGrid;
     procedure GenerateBtnClick(Sender: TObject);
   private
 
@@ -111,6 +114,8 @@ begin
   begin
     if PrimaryKeysGrid <> nil then
       PrimaryKeysGrid.DataSource := IBSQLEditFrame1.IdentityColsSource;
+    if ReadOnlyGrid <> nil then
+      ReadOnlyGrid.DataSource := IBSQLEditFrame1.ReadOnlyFieldsSource;
   end;
 end;
 

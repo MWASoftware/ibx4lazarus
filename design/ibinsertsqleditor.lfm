@@ -1,6 +1,6 @@
 inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
-  Left = 307
-  Top = 274
+  Left = 399
+  Top = 367
   Caption = 'Insert SQL Editor'
   inherited GenerateBtn: TButton
     OnClick = GenerateBtnClick
@@ -9,7 +9,7 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     inherited SelectPage: TTabSheet
       inherited Label4: TLabel
         Left = 8
-        Top = 240
+        Top = 296
         Width = 103
         Caption = 'Identity Columns'
       end
@@ -18,11 +18,56 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
       end
       inherited PrimaryKeysGrid: TIBDynamicGrid
         Left = 8
-        Top = 256
+        Top = 312
         DataSource = IBSQLEditFrame.IdentityColsSource
       end
       inherited SelectSelectAll: TCheckBox
         Top = 200
+      end
+      object Label5: TLabel[8]
+        Left = 7
+        Height = 14
+        Top = 226
+        Width = 138
+        Caption = 'Computed By Columns'
+        ParentColor = False
+      end
+      object ReadOnlyGrid: TIBDynamicGrid[9]
+        Left = 8
+        Height = 48
+        Top = 241
+        Width = 209
+        Color = clWindow
+        Columns = <        
+          item
+            ButtonStyle = cbsCheckboxColumn
+            Title.Caption = 'SELECTED'
+            Width = 30
+            FieldName = 'SELECTED'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Caption = 'COLUMNNAME'
+            Width = 64
+            FieldName = 'COLUMNNAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
+        FixedCols = 0
+        Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+        Scrollbars = ssAutoVertical
+        TabOrder = 5
+        ExpandEditorPanelBelowRow = False
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
       end
     end
     inherited ExecutePage: TTabSheet
@@ -97,6 +142,14 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
       Params.Strings = (      )
     end
     inherited IdentityCols: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited ReadOnlyFields: TIBQuery
       ParamData = <      
         item
           DataType = ftUnknown

@@ -44,7 +44,11 @@ type
     GenerateParams: TCheckBox;
     IBSQLEditFrame1: TIBSQLEditFrame;
     IncludeSysTables: TCheckBox;
+    Label5: TLabel;
+    Label6: TLabel;
     PrimaryKeysGrid: TIBDynamicGrid;
+    IdentityGrid: TIBDynamicGrid;
+    ReadOnlyGrid: TIBDynamicGrid;
     SelectSelectAll: TCheckBox;
     SelectTableNames: TIBLookupComboEditBox;
     TestBtn: TButton;
@@ -118,6 +122,11 @@ begin
       GenerateParams.Checked := DataSet.GenerateParamNames;
     end;
     FDataSet := DataSet;
+    with IBSQLEditFrame1 do
+    begin
+      IncludePrimaryKeys := false;
+      IncludeReadOnlyFields := false;
+    end;
     Result := ShowModal = mrOK;
     if Result and assigned(DataSet) then
       DataSet.GenerateParamNames := GenerateParams.Checked
@@ -251,6 +260,10 @@ begin
       FieldNamesGrid.DataSource := IBSQLEditFrame1.FieldsSource;
     if PrimaryKeysGrid <> nil then
       PrimaryKeysGrid.DataSource := IBSQLEditFrame1.PrimaryKeySource;
+    if IdentityGrid <> nil then
+      IdentityGrid.DataSource := IBSQLEditFrame1.IdentityColsSource;
+    if ReadOnlyGrid <> nil then
+      ReadOnlyGrid.DataSource := IBSQLEditFrame1.ReadOnlyFieldsSource;
   end;
 end;
 

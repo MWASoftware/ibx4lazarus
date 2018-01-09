@@ -1,22 +1,83 @@
 inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
+  Left = 949
+  Top = 264
   Caption = 'Modify SQL Editor'
   inherited GenerateBtn: TButton
     OnClick = GenerateBtnClick
   end
   inherited PageControl: TPageControl
-    ActivePage = SelectPage
-    TabIndex = 0
     inherited SelectPage: TTabSheet
+      inherited Label2: TLabel
+        Width = 106
+        Caption = 'Updateable Fields'
+      end
+      inherited Label4: TLabel
+        Top = 290
+      end
+      inherited FieldNamesGrid: TIBDynamicGrid
+        Height = 112
+      end
+      inherited PrimaryKeysGrid: TIBDynamicGrid
+        Height = 48
+      end
+      inherited SelectSelectAll: TCheckBox
+        Top = 200
+      end
       object IncludePrimaryKeys: TCheckBox[8]
-        Left = 5
+        Left = 7
         Height = 22
-        Top = 300
+        Top = 352
         Width = 221
         Caption = 'Include Primary keys in Field List'
         Checked = True
         OnChange = IncludePrimaryKeysChange
         State = cbChecked
         TabOrder = 5
+      end
+      object Label5: TLabel[9]
+        Left = 7
+        Height = 14
+        Top = 226
+        Width = 138
+        Caption = 'Computed By Columns'
+        ParentColor = False
+      end
+      object ReadOnlyGrid: TIBDynamicGrid[10]
+        Left = 8
+        Height = 48
+        Top = 241
+        Width = 209
+        Color = clWindow
+        Columns = <        
+          item
+            ButtonStyle = cbsCheckboxColumn
+            Title.Caption = 'SELECTED'
+            Width = 30
+            FieldName = 'SELECTED'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Caption = 'COLUMNNAME'
+            Width = 64
+            FieldName = 'COLUMNNAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
+        FixedCols = 0
+        Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+        Scrollbars = ssAutoVertical
+        TabOrder = 6
+        ExpandEditorPanelBelowRow = False
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
       end
     end
     inherited ExecutePage: TTabSheet
@@ -44,6 +105,8 @@ inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
     ClientHeight = 339
     ClientWidth = 448
     TabOrder = 7
+    DesignLeft = 1974
+    DesignTop = 200
     inherited SQLText: TSynEdit
       Height = 313
       Width = 448
@@ -88,6 +151,26 @@ inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
     end
     inherited SQLTransaction: TIBTransaction
       Params.Strings = (      )
+    end
+    inherited IdentityCols: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited ReadOnlyFields: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited ReadOnlyFieldsSource: TDataSource
+      left = 436
+      top = 203
     end
   end
 end

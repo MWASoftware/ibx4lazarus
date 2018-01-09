@@ -1,7 +1,7 @@
 object IBDataSetEditorForm: TIBDataSetEditorForm
-  Left = 442
+  Left = 701
   Height = 410
-  Top = 421
+  Top = 533
   Width = 662
   ActiveControl = PageControl
   BorderIcons = [biSystemMenu]
@@ -45,9 +45,9 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
           ParentColor = False
         end
         object Label3: TLabel
-          Left = 288
+          Left = 289
           Height = 14
-          Top = 16
+          Top = 18
           Width = 62
           Caption = '&Key Fields:'
           ParentColor = False
@@ -56,8 +56,8 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
           Left = 458
           Height = 14
           Top = 18
-          Width = 85
-          Caption = 'Update &Fields:'
+          Width = 110
+          Caption = 'Updateable &Fields:'
           ParentColor = False
         end
         object GenerateButton: TButton
@@ -119,7 +119,7 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         end
         object PrimaryKeysGrid: TIBDynamicGrid
           Left = 288
-          Height = 181
+          Height = 61
           Top = 35
           Width = 144
           Color = clWindow
@@ -156,7 +156,7 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         end
         object FieldNamesGrid: TIBDynamicGrid
           Left = 458
-          Height = 184
+          Height = 216
           Top = 32
           Width = 144
           Color = clWindow
@@ -195,11 +195,102 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         object SelectSelectAll: TCheckBox
           Left = 456
           Height = 22
-          Top = 216
+          Top = 256
           Width = 134
           Caption = 'Select/Deselect All'
           OnClick = SelectSelectAllClick
           TabOrder = 8
+        end
+        object Label5: TLabel
+          Left = 288
+          Height = 14
+          Top = 104
+          Width = 138
+          Caption = '&Computed By Columns'
+          ParentColor = False
+        end
+        object ReadOnlyGrid: TIBDynamicGrid
+          Left = 289
+          Height = 48
+          Top = 119
+          Width = 143
+          Color = clWindow
+          Columns = <          
+            item
+              ButtonStyle = cbsCheckboxColumn
+              Title.Caption = 'SELECTED'
+              Width = 30
+              FieldName = 'SELECTED'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Title.Caption = 'COLUMNNAME'
+              Width = 64
+              FieldName = 'COLUMNNAME'
+              AutoSizeColumn = True
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end>
+          FixedCols = 0
+          Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+          Scrollbars = ssAutoVertical
+          TabOrder = 9
+          ExpandEditorPanelBelowRow = False
+          Descending = False
+          EditorBorderStyle = bsSingle
+          DefaultPositionAtEnd = False
+        end
+        object Label6: TLabel
+          Left = 289
+          Height = 14
+          Top = 176
+          Width = 103
+          Caption = '&Identity Columns'
+          ParentColor = False
+        end
+        object IdentityGrid: TIBDynamicGrid
+          Left = 288
+          Height = 56
+          Top = 192
+          Width = 143
+          Color = clWindow
+          Columns = <          
+            item
+              ButtonStyle = cbsCheckboxColumn
+              Title.Caption = 'SELECTED'
+              Width = 30
+              FieldName = 'SELECTED'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Title.Caption = 'COLUMNNAME'
+              Width = 64
+              FieldName = 'COLUMNNAME'
+              AutoSizeColumn = True
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end>
+          DataSource = IBSQLEditFrame.IdentityColsSource
+          FixedCols = 0
+          Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+          Scrollbars = ssAutoVertical
+          TabOrder = 10
+          ExpandEditorPanelBelowRow = False
+          Descending = False
+          EditorBorderStyle = bsSingle
+          DefaultPositionAtEnd = False
         end
       end
     end
@@ -272,6 +363,12 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
         end
         inherited ToolBar1: TToolBar
           Width = 616
+          inherited ToolButton3: TToolButton
+            Height = 8
+          end
+          inherited ToolButton7: TToolButton
+            Height = 8
+          end
         end
         inherited FieldNameList: TIBQuery
           ParamData = <          
@@ -302,6 +399,22 @@ object IBDataSetEditorForm: TIBDataSetEditorForm
             item
               DataType = ftUnknown
               Name = 'RDB$PROCEDURE_NAME'
+              ParamType = ptInput
+            end>
+        end
+        inherited IdentityCols: TIBQuery
+          ParamData = <          
+            item
+              DataType = ftUnknown
+              Name = 'RDB$RELATION_NAME'
+              ParamType = ptInput
+            end>
+        end
+        inherited ReadOnlyFields: TIBQuery
+          ParamData = <          
+            item
+              DataType = ftUnknown
+              Name = 'RDB$RELATION_NAME'
               ParamType = ptInput
             end>
         end

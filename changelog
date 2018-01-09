@@ -17,6 +17,13 @@ IBX Change Log  version                                  (2.1-1) Sun, 07 Jan 201
 
 5. TIBSQL: Free resources when transaction changed.
 
+6. Property editor will now sync table name to a System Table when "Include System
+   Tables" is selected and the query is for a System Table.
+
+7. Modify Property Editor now generates Update SQL with Computed By fields in Update..Returning clause.
+   Similarly Insert Property Editor now generates Insert SQL with Computed By fields in
+   Insert..Returning clause
+
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 
 1. IBCustomDataset: Minor change of PChar to PByte for compatibility with fbintf

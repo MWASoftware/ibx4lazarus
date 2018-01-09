@@ -43,8 +43,12 @@ type
     FieldNamesGrid: TIBDynamicGrid;
     GenerateParams: TCheckBox;
     IBSQLEditFrame1: TIBSQLEditFrame;
+    IdentityGrid: TIBDynamicGrid;
     IncludeSysTables: TCheckBox;
+    Label5: TLabel;
+    Label6: TLabel;
     PrimaryKeysGrid: TIBDynamicGrid;
+    ReadOnlyGrid: TIBDynamicGrid;
     SelectSelectAll: TCheckBox;
     SelectTableNames: TIBLookupComboEditBox;
     TestBtn: TButton;
@@ -243,6 +247,10 @@ begin
       FieldNamesGrid.DataSource := IBSQLEditFrame1.FieldsSource;
     if PrimaryKeysGrid <> nil then
       PrimaryKeysGrid.DataSource := IBSQLEditFrame1.PrimaryKeySource;
+    if IdentityGrid <> nil then
+      IdentityGrid.DataSource := IBSQLEditFrame1.IdentityColsSource;
+    if ReadOnlyGrid <> nil then
+      ReadOnlyGrid.DataSource := IBSQLEditFrame1.ReadOnlyFieldsSource;
   end;
 end;
 

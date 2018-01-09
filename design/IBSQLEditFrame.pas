@@ -40,6 +40,9 @@ type
   { TIBSQLEditFrame }
 
   TIBSQLEditFrame = class(TFrame)
+    ReadOnlyFieldsSource: TDataSource;
+    IBUpdate6: TIBUpdate;
+    ReadOnlyFields: TIBQuery;
     IBUpdate5: TIBUpdate;
     IdentityColsSource: TDataSource;
     FieldNameList: TIBQuery;
@@ -140,8 +143,10 @@ type
     procedure GetFieldNames(Dataset: TDataset; var FieldNames: TStrings;
       aIncludeReadOnly: boolean = true);
     procedure GenerateSelectSQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings); overload;
-    procedure GenerateInsertSQL(TableName: string; QuotedStrings: boolean; FieldNames, SQL: TStrings); overload;
-    procedure GenerateModifySQL(TableName: string; QuotedStrings: boolean; FieldNames,SQL: TStrings); overload;
+    procedure GenerateInsertSQL(TableName: string; QuotedStrings: boolean;
+      FieldNames, ReadOnlyFieldNames, SQL: TStrings); overload;
+    procedure GenerateModifySQL(TableName: string; QuotedStrings: boolean;
+      FieldNames, ReadOnlyFieldNames, SQL: TStrings); overload;
     procedure GenerateExecuteSQL(ProcName: string; QuotedStrings: boolean; ExecuteOnly: boolean;
               InputParams, OutputParams, ExecuteSQL: TStrings); overload;
     procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings); overload;
@@ -300,6 +305,7 @@ begin
   FieldNameList.Active := true;
   PrimaryKeys.Active := true;
   IdentityCols.Active := DatabaseInfo.ODSMajorVersion >= 12;
+  ReadOnlyFields.Active := true;
   FOpening := true;
   try
     if assigned(FOnUserTablesOpened) then
@@ -314,6 +320,7 @@ begin
   FieldNameList.Active := false;
   PrimaryKeys.Active := false;
   IdentityCols.Active := false;
+  ReadOnlyFields.Active := false;
 end;
 
 procedure TIBSQLEditFrame.UserTablesBeforeOpen(DataSet: TDataSet);
@@ -386,6 +393,7 @@ begin
   if FIncludeSystemTables = AValue then Exit;
   FIncludeSystemTables := AValue;
   RefreshAll;
+  SyncQueryBuilder;
 end;
 
 constructor TIBSQLEditFrame.Create(aOwner: TComponent);
@@ -602,14 +610,18 @@ end;
 
 procedure TIBSQLEditFrame.GenerateInsertSQL(QuotedStrings: boolean; SQL: TStrings);
 var FieldNames: TStrings;
+    ReadOnlyFieldNames: TStrings;
 begin
   SQL.Clear;
   FieldNames := TStringList.Create;
+  ReadOnlyFieldNames := TStringList.Create;
   try
     GetFieldNames(FieldNameList,FieldNames,false);
-    GenerateInsertSQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,FieldNames,SQL);
+    GetFieldNames(ReadOnlyFields,ReadOnlyFieldNames,true);
+    GenerateInsertSQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,FieldNames,ReadOnlyFieldNames,SQL);
   finally
     FieldNames.Free;
+    ReadOnlyFieldNames.Free;
   end;
   DoWrapText(SQL);
 end;
@@ -617,32 +629,39 @@ end;
 procedure TIBSQLEditFrame.GenerateModifySQL(QuotedStrings: boolean; SQL: TStrings;
   RemovePrimaryKeys: boolean);
 var FieldNames: TStrings;
-    KeyFields: TStrings;
+    ReadOnlyFieldNames: TStrings;
+    PrimaryKeyFields: TStrings;
     i, index: integer;
 begin
   SQL.Clear;
   FieldNames := TStringList.Create;
+  ReadOnlyFieldNames := TStringList.Create;
+  PrimaryKeyFields := TStringList.Create;
   try
     GetFieldNames(FieldNameList,FieldNames,false);
+    GetFieldNames(ReadOnlyFields,ReadOnlyFieldNames,true);
     if IncludePrimaryKeys and RemovePrimaryKeys then
     begin
-      KeyFields := TStringList.Create;
-      try
-        GetFieldNames(PrimaryKeys,KeyFields);
-        for i := 0 to KeyFields.Count - 1 do
+        GetFieldNames(PrimaryKeys,PrimaryKeyFields);
+        for i := 0 to PrimaryKeyFields.Count - 1 do
         begin
-          index := FieldNames.IndexOf(KeyFields[i]);
+          index := FieldNames.IndexOf(PrimaryKeyFields[i]);
           if index <> - 1 then
             FieldNames.Delete(index);
         end;
-
-      finally
-        KeyFields.Free;
-      end;
+    end
+    else
+    if not IncludePrimaryKeys and not RemovePrimaryKeys then
+    begin
+      GetFieldNames(PrimaryKeys,PrimaryKeyFields);
+      FieldNames.AddStrings(PrimaryKeyFields);
     end;
-    GenerateModifySQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,FieldNames,SQL);
+    GenerateModifySQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,
+           QuotedStrings,FieldNames,ReadOnlyFieldNames,SQL);
   finally
     FieldNames.Free;
+    ReadOnlyFieldNames.Free;
+    PrimaryKeyFields.Free;
   end;
 end;
 
@@ -781,16 +800,31 @@ begin
 end;
 
 procedure TIBSQLEditFrame.GenerateInsertSQL(TableName: string;
-  QuotedStrings: boolean; FieldNames, SQL: TStrings);
+  QuotedStrings: boolean; FieldNames, ReadOnlyFieldNames, SQL: TStrings);
 var InsertSQL: string;
     Separator: string;
     Lines: TStrings;
     I: integer;
+    PrimaryKeyNames: TStrings;
 begin
   Lines := TStringList.Create;
+  PrimaryKeyNames := TStringList.Create;
   try
     InsertSQL := 'Insert Into ' + TableName + '(';
     Separator := '';
+    if not IncludePrimaryKeys then
+    begin
+      {Insert must include primary keys}
+        GetFieldNames(PrimaryKeys,PrimaryKeyNames,true);
+        for I := 0 to PrimaryKeyNames.Count - 1 do
+        begin
+          if QuotedStrings then
+             InsertSQL := InsertSQL + Separator + '"' + PrimaryKeyNames[I] + '"'
+          else
+             InsertSQL := InsertSQL + Separator +  QuoteIdentifierIfNeeded(Database.SQLDialect,PrimaryKeyNames[I]) ;
+          Separator := ', ';
+        end;
+    end;
     for I := 0 to FieldNames.Count - 1 do
       if not IdentityCols.Active or not IdentityCols.Locate('ColumnName',FieldNames[I],[loCaseInsensitive]) then
       begin
@@ -804,6 +838,18 @@ begin
     Lines.Add(InsertSQL);
     InsertSQL := 'Values(';
     Separator := ':';
+    if not IncludePrimaryKeys then
+    begin
+      {Insert must include primary keys}
+        for I := 0 to PrimaryKeyNames.Count - 1 do
+        begin
+          if QuotedStrings then
+             InsertSQL := InsertSQL + Separator + '"' + PrimaryKeyNames[I] + '"'
+          else
+             InsertSQL := InsertSQL + Separator +  QuoteIdentifierIfNeeded(Database.SQLDialect,PrimaryKeyNames[I]) ;
+          Separator := ', :';
+        end;
+    end;
     for I := 0 to FieldNames.Count - 1 do
       if not IdentityCols.Active or not IdentityCols.Locate('ColumnName',FieldNames[I],[loCaseInsensitive]) then
       begin
@@ -811,9 +857,11 @@ begin
          Separator := ', :';
       end;
     InsertSQL := InsertSQL + ')';
+    Lines.Add(InsertSQL);
+    InsertSQL := '';
+    Separator := ' RETURNING ';
     if IdentityCols.Active and (IdentityCols.RecordCount > 0) then
     begin
-      Separator := ' RETURNING ';
       IdentityCols.First;
       while not IdentityCols.Eof do
       begin
@@ -825,15 +873,24 @@ begin
         IdentityCols.Next;
       end;
     end;
+    for I := 0 to ReadOnlyFieldNames.Count - 1 do
+      begin
+        if QuotedStrings then
+          InsertSQL := InsertSQL + Separator + '"' + ReadOnlyFieldNames[I] + '"'
+        else
+          InsertSQL := InsertSQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,ReadOnlyFieldNames[I]);
+        Separator := ', ';
+      end;
     Lines.Add(InsertSQL);
     SQL.AddStrings(Lines);
   finally
     Lines.Free;
+    PrimaryKeyNames.Free;
   end;
 end;
 
 procedure TIBSQLEditFrame.GenerateModifySQL(TableName: string;
-  QuotedStrings: boolean; FieldNames, SQL: TStrings);
+  QuotedStrings: boolean; FieldNames, ReadOnlyFieldNames, SQL: TStrings);
 var UpdateSQL: string;
     Separator: string;
     I: integer;
@@ -852,6 +909,17 @@ begin
       SQL.Add(UpdateSQL);
     end;
   AddWhereClause(QuotedStrings,SQL,true);
+  Separator := ' RETURNING A.';
+  UpdateSQL := '';
+  for I := 0 to ReadOnlyFieldNames.Count - 1 do
+    begin
+      if QuotedStrings then
+        UpdateSQL := UpdateSQL + Separator + '"' + ReadOnlyFieldNames[I] + '"'
+      else
+        UpdateSQL := UpdateSQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,ReadOnlyFieldNames[I]);
+      Separator := ', A.';
+    end;
+  SQL.Add(UpdateSQL);
 end;
 
 procedure TIBSQLEditFrame.GenerateDeleteSQL(TableName: string;
