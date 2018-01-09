@@ -40,7 +40,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="21">
+    <Units Count="22">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -80,7 +80,6 @@
       </Unit3>
       <Unit4>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="2081"/>
         <CursorPos Y="2084"/>
@@ -183,7 +182,7 @@
       </Unit17>
       <Unit18>
         <Filename Value="/usr/share/fpcsrc/rtl/inc/systemh.inc"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="424"/>
         <CursorPos X="3" Y="443"/>
         <UsageCount Value="10"/>
@@ -191,7 +190,7 @@
       </Unit18>
       <Unit19>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/datih.inc"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="85"/>
         <CursorPos X="4" Y="105"/>
         <UsageCount Value="10"/>
@@ -199,12 +198,24 @@
       </Unit19>
       <Unit20>
         <Filename Value="../../../fbintf/IBExternals.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="50"/>
         <CursorPos X="3" Y="57"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit20>
+      <Unit21>
+        <Filename Value="../../../ibxflazreports/IBXFPrintPreviewDlgUnit.pas"/>
+        <ComponentName Value="IBXFPrintPreviewDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="28" Y="7"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit21>
     </Units>
     <JumpHistory Count="13" HistoryIndex="12">
       <Position1>

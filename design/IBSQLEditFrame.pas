@@ -791,8 +791,6 @@ begin
   try
     InsertSQL := 'Insert Into ' + TableName + '(';
     Separator := '';
-    for I := 0 to IdentityCols.Fields.Count - 1 do
-      writeln(IdentityCols.Fields[i].FieldName);
     for I := 0 to FieldNames.Count - 1 do
       if not IdentityCols.Active or not IdentityCols.Locate('ColumnName',FieldNames[I],[loCaseInsensitive]) then
       begin

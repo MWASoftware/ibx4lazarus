@@ -6,7 +6,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
   ClientHeight = 585
   ClientWidth = 789
   TabOrder = 0
-  DesignLeft = 1893
+  DesignLeft = 1920
   DesignTop = 313
   inline SQLText: TSynEdit
     Left = 0
