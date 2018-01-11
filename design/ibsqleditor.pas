@@ -31,20 +31,19 @@ unit ibsqleditor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, ibselectsqleditor, IBSQLEditFrame, IBLookupComboEditBox,
-  IBDynamicGrid, IBDatabase, IBSQL, IB;
+  Classes, SysUtils, FileUtil, SynEdit, LResources, Forms, Controls, Graphics,
+  Dialogs, StdCtrls, ComCtrls, ibinsertsqleditor, IBSQLEditFrame,
+  IBLookupComboEditBox, IBDynamicGrid, IBDatabase, IBSQL, IBQuery, IB;
 
 type
 
   { TIBSQLEditorForm }
 
-  TIBSQLEditorForm = class(TIBSelectSQLEditorForm)
+  TIBSQLEditorForm = class(TIBInsertSQLEditorForm)
     IncludePrimaryKeys: TCheckBox;
     TabControl1: TTabControl;
     procedure FormShow(Sender: TObject);
     procedure GenerateBtnClick(Sender: TObject);
-    procedure IncludePrimaryKeysChange(Sender: TObject);
     procedure TabControl1Change(Sender: TObject);
   private
     procedure SetupFlags;
@@ -82,7 +81,6 @@ begin
     end;
     with IBSQLEditFrame1 do
     begin
-      IncludePrimaryKeys := true;
       IncludeReadOnlyFields := true;
       ExecuteOnlyProcs := false;
       SQLText.Lines.Assign(aIBSQL.SQL);
@@ -127,7 +125,7 @@ begin
   1:
     IBSQLEditFrame1.GenerateInsertSQL(QuoteFields.Checked);
   2:
-    IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked);
+    IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked,IncludePrimaryKeys.Checked);
   3:
     IBSQLEditFrame1.GenerateDeleteSQL(QuoteFields.Checked);
   4:
@@ -135,20 +133,16 @@ begin
   end;
 end;
 
-procedure TIBSQLEditorForm.IncludePrimaryKeysChange(Sender: TObject);
-begin
-  IBSQLEditFrame1.IncludePrimaryKeys := IncludePrimaryKeys.Checked;
-end;
-
 procedure TIBSQLEditorForm.SetupFlags;
 begin
-  IBSQLEditFrame1.IncludePrimaryKeys := (TabControl1.TabIndex <= 1) or ((TabControl1.TabIndex = 2) and IncludePrimaryKeys.Checked);
   IBSQLEditFrame1.IncludeReadOnlyFields := (TabControl1.TabIndex = 0);
   IncludePrimaryKeys.Visible := TabControl1.TabIndex = 2;
   FieldNamesGrid.Visible := TabControl1.TabIndex <> 3;
   Label2.Visible := TabControl1.TabIndex <> 3;
-  PrimaryKeysGrid.Visible := TabControl1.TabIndex <> 1;
-  Label4.Visible := TabControl1.TabIndex <> 1;
+  IdentityGrid.Visible := TabControl1.TabIndex <> 3;
+  Label6.Visible := TabControl1.TabIndex <> 3;
+  ReadOnlyGrid.Visible := TabControl1.TabIndex <> 3;
+  Label5.Visible := TabControl1.TabIndex <> 3;
   SelectSelectAll.Visible := TabControl1.TabIndex <> 3;
 end;
 

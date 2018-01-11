@@ -39,7 +39,9 @@ type
   { TIBInsertSQLEditorForm }
 
   TIBInsertSQLEditorForm = class(TIBSelectSQLEditorForm)
+    IdentityGrid: TIBDynamicGrid;
     Label5: TLabel;
+    Label6: TLabel;
     ReadOnlyGrid: TIBDynamicGrid;
     procedure GenerateBtnClick(Sender: TObject);
   private
@@ -79,7 +81,6 @@ begin
     end;
     with IBSQLEditFrame1 do
     begin
-      IncludePrimaryKeys := true;
       IncludeReadOnlyFields := false;
       ExecuteOnlyProcs := true;
       ExcludeIdentityColumns := true;
@@ -112,8 +113,10 @@ begin
   inherited Loaded;
   if IBSQLEditFrame1 <> nil then
   begin
-    if PrimaryKeysGrid <> nil then
-      PrimaryKeysGrid.DataSource := IBSQLEditFrame1.IdentityColsSource;
+   if PrimaryKeysGrid <> nil then
+     PrimaryKeysGrid.DataSource := IBSQLEditFrame1.PrimaryKeySource;
+   if IdentityGrid <> nil then
+     IdentityGrid.DataSource := IBSQLEditFrame1.IdentityColsSource;
     if ReadOnlyGrid <> nil then
       ReadOnlyGrid.DataSource := IBSQLEditFrame1.ReadOnlyFieldsSource;
   end;

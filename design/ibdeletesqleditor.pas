@@ -73,7 +73,6 @@ begin
     end;
     with IBSQLEditFrame1 do
     begin
-      IncludePrimaryKeys := true;
       IncludeReadOnlyFields := false;
       ExecuteOnlyProcs := true;
       SQLText.Lines.Assign(SelectSQL);

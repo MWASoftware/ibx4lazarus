@@ -11,7 +11,7 @@ uses
   IBDBReg, IBEventsEditor, IBTransactionEdit, IBDatabaseEdit, 
   ibdeletesqleditor, IBGeneratorEditor, ibinsertsqleditor, ibmodifysqleditor, 
   ibselectsqleditor, ibupdatesqleditor, ibsqleditor, dbFieldLinkPropEditor, 
-  dbFieldListPropEditor, IBDSDialogs, LazarusPackageIntf;
+  dbFieldListPropEditor, IBDSDialogs, IBSQLEditFrame, LazarusPackageIntf;
 
 implementation
 

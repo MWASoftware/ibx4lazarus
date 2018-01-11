@@ -123,10 +123,7 @@ begin
     end;
     FDataSet := DataSet;
     with IBSQLEditFrame1 do
-    begin
-      IncludePrimaryKeys := false;
       IncludeReadOnlyFields := false;
-    end;
     Result := ShowModal = mrOK;
     if Result and assigned(DataSet) then
       DataSet.GenerateParamNames := GenerateParams.Checked
@@ -188,11 +185,11 @@ end;
 
 procedure TIBDataSetEditorForm.GenerateButtonClick(Sender: TObject);
 begin
-  IBSQLEditFrame1.GenerateSelectSQL(QuoteFields.Checked,FSelectSQL);
-  IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked,FRefreshSQL);
+  IBSQLEditFrame1.GenerateSelectSQL(QuoteFields.Checked,FSelectSQL,true);
+  IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked,FRefreshSQL,true);
   IBSQLEditFrame1.GenerateDeleteSQL(QuoteFields.Checked,FDeleteSQL);
   IBSQLEditFrame1.GenerateInsertSQL(QuoteFields.Checked,FInsertSQL);
-  IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked,FModifySQL, not IncludePrimaryKeys.Checked);
+  IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked,FModifySQL, IncludePrimaryKeys.Checked);
   FDirty := false;
   PageControl.ActivePage := SQLPage;
 end;

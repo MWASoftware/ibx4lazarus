@@ -44,7 +44,6 @@ type
     Label5: TLabel;
     ReadOnlyGrid: TIBDynamicGrid;
     procedure GenerateBtnClick(Sender: TObject);
-    procedure IncludePrimaryKeysChange(Sender: TObject);
   private
 
   protected
@@ -82,7 +81,6 @@ begin
     end;
     with IBSQLEditFrame1 do
     begin
-      IncludePrimaryKeys := false;
       IncludeReadOnlyFields := false;
       ExecuteOnlyProcs := true;
       SQLText.Lines.Assign(SelectSQL);
@@ -102,11 +100,6 @@ end;
 
 { TIBModifySQLEditorForm }
 
-procedure TIBModifySQLEditorForm.IncludePrimaryKeysChange(Sender: TObject);
-begin
-  IBSQLEditFrame1.IncludePrimaryKeys := IncludePrimaryKeys.Checked;
-end;
-
 procedure TIBModifySQLEditorForm.Loaded;
 begin
   inherited Loaded;
@@ -122,7 +115,7 @@ begin
   if PageControl.ActivePage = ExecutePage then
     IBSQLEditFrame1.GenerateExecuteSQL(QuoteFields.Checked)
   else
-    IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked,not IncludePrimaryKeys.Checked);
+    IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked,IncludePrimaryKeys.Checked);
 end;
 
 

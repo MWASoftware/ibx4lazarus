@@ -362,6 +362,12 @@ object IBUpdateSQLEditorForm: TIBUpdateSQLEditorForm
         end
         inherited ToolBar1: TToolBar
           Width = 616
+          inherited ToolButton3: TToolButton
+            Height = 8
+          end
+          inherited ToolButton7: TToolButton
+            Height = 8
+          end
         end
         inherited FieldNameList: TIBQuery
           ParamData = <          

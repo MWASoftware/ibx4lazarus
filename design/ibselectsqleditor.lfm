@@ -1,7 +1,7 @@
 object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
-  Left = 784
+  Left = 678
   Height = 487
-  Top = 248
+  Top = 264
   Width = 747
   ActiveControl = PageControl
   Caption = 'Select SQL Editor'
@@ -92,15 +92,15 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       object Label2: TLabel
         Left = 8
         Height = 14
-        Top = 74
+        Top = 160
         Width = 33
         Caption = 'Fields'
         ParentColor = False
       end
       object Label4: TLabel
-        Left = 7
+        Left = 8
         Height = 14
-        Top = 288
+        Top = 80
         Width = 77
         Caption = 'Primary Keys'
         ParentColor = False
@@ -124,7 +124,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       object FieldNamesGrid: TIBDynamicGrid
         Left = 7
         Height = 168
-        Top = 88
+        Top = 174
         Width = 209
         Color = clWindow
         Columns = <        
@@ -161,9 +161,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         DefaultPositionAtEnd = False
       end
       object PrimaryKeysGrid: TIBDynamicGrid
-        Left = 7
+        Left = 8
         Height = 56
-        Top = 304
+        Top = 96
         Width = 209
         Color = clWindow
         Columns = <        
@@ -201,14 +201,14 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       object SelectSelectAll: TCheckBox
         Left = 7
         Height = 22
-        Top = 256
+        Top = 342
         Width = 134
         Caption = 'Select/Deselect All'
         OnChange = SelectSelectAllChange
         TabOrder = 3
       end
       object IncludeSysTables: TCheckBox
-        Left = 8
+        Left = 7
         Height = 22
         Top = 48
         Width = 158
@@ -418,6 +418,14 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       Params.Strings = (      )
     end
     inherited IdentityCols: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited ReadOnlyFields: TIBQuery
       ParamData = <      
         item
           DataType = ftUnknown
