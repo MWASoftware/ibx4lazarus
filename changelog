@@ -22,7 +22,11 @@ IBX Change Log  version                                  (2.1-1) Sun, 07 Jan 201
 
 7. Modify Property Editor now generates Update SQL with Computed By fields in Update..Returning clause.
    Similarly Insert Property Editor now generates Insert SQL with Computed By fields in
-   Insert..Returning clause
+   Insert..Returning clause.
+
+8. Minor Performance improvement to handling of Date/Time types in IBX datasets. Field
+   values are no longer converted to milliseconds from TDateTime and then back again
+   the TDateTime (the TDataset approach).
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

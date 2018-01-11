@@ -2096,19 +2096,8 @@ begin
         begin
           {This is an IBX native format and not the TDataset approach. See also GetFieldData}
           LocalDate := ColData.AsDateTime;
-//          LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(ColData.AsDateTime));
           LocalData := PByte(@LocalDate);
         end;
-{        SQL_TYPE_DATE:
-        begin
-          LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Date;
-          LocalData := PByte(@LocalInt);
-        end;
-        SQL_TYPE_TIME:
-        begin
-          LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Time;
-          LocalData := PByte(@LocalInt);
-        end; }
         SQL_SHORT, SQL_LONG:
         begin
           if (fdDataScale = 0) then
@@ -2834,24 +2823,11 @@ begin
             end;
             SQL_BLOB, SQL_ARRAY, SQL_QUAD:
               Param.AsQuad := PISC_QUAD(data)^;
-{            SQL_TYPE_DATE:
-            begin
-              ts.Date := PInt(data)^;
-              ts.Time := 0;
-              Param.AsDate := TimeStampToDateTime(ts);
-            end;
-            SQL_TYPE_TIME:
-            begin
-              ts.Date := 0;
-              ts.Time := PInt(data)^;
-              Param.AsTime := TimeStampToDateTime(ts);
-            end;  }
             SQL_TYPE_DATE,
             SQL_TYPE_TIME,
             SQL_TIMESTAMP:
             {This is an IBX native format and not the TDataset approach. See also SetFieldData}
               Param.AsDateTime := PDateTime(data)^;
-//                       TimeStampToDateTime(MSecsToTimeStamp(trunc(PDouble(data)^)));
             SQL_BOOLEAN:
               Param.AsBoolean := PWordBool(data)^;
           end;
@@ -4178,11 +4154,13 @@ begin
     for i := 0 to SQLParams.GetCount - 1 do
     begin
       cur_field := DataSource.DataSet.FindField(SQLParams[i].Name);
-      cur_param := SQLParams[i];
-      if (cur_field <> nil) then begin
+      if (cur_field <> nil) then
+      begin
+        cur_param := SQLParams[i];
         if (cur_field.IsNull) then
           cur_param.IsNull := True
-        else case cur_field.DataType of
+        else
+        case cur_field.DataType of
           ftString:
             cur_param.AsString := cur_field.AsString;
           ftBoolean:
@@ -4192,7 +4170,7 @@ begin
           ftInteger:
             cur_param.AsLong := cur_field.AsInteger;
           ftLargeInt:
-            cur_param.AsInt64 := TLargeIntField(cur_field).AsLargeInt;
+            cur_param.AsInt64 := cur_field.AsLargeInt;
           ftFloat, ftCurrency:
            cur_param.AsDouble := cur_field.AsFloat;
           ftBCD:
