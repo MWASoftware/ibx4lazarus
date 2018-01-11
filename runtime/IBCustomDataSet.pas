@@ -2074,7 +2074,8 @@ procedure TIBCustomDataSet.ColumnDataToBuffer(QryResults: IResults;
                ColumnIndex, FieldIndex: integer; Buffer: PChar);
 var
   LocalData: PByte;
-  LocalDate, LocalDouble: Double;
+  LocalDate: TDateTime;
+  LocalDouble: Double;
   LocalInt: Integer;
   LocalBool: wordBool;
   LocalInt64: Int64;
@@ -2089,12 +2090,16 @@ begin
     begin
       ColData := QryResults[ColumnIndex];
       case fdDataType of  {Get Formatted data for column types that need formatting}
+        SQL_TYPE_DATE,
+        SQL_TYPE_TIME,
         SQL_TIMESTAMP:
         begin
-          LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(ColData.AsDateTime));
+          {This is an IBX native format and not the TDataset approach. See also GetFieldData}
+          LocalDate := ColData.AsDateTime;
+//          LocalDate := TimeStampToMSecs(DateTimeToTimeStamp(ColData.AsDateTime));
           LocalData := PByte(@LocalDate);
         end;
-        SQL_TYPE_DATE:
+{        SQL_TYPE_DATE:
         begin
           LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Date;
           LocalData := PByte(@LocalInt);
@@ -2103,7 +2108,7 @@ begin
         begin
           LocalInt := DateTimeToTimeStamp(ColData.AsDateTime).Time;
           LocalData := PByte(@LocalInt);
-        end;
+        end; }
         SQL_SHORT, SQL_LONG:
         begin
           if (fdDataScale = 0) then
@@ -2829,7 +2834,7 @@ begin
             end;
             SQL_BLOB, SQL_ARRAY, SQL_QUAD:
               Param.AsQuad := PISC_QUAD(data)^;
-            SQL_TYPE_DATE:
+{            SQL_TYPE_DATE:
             begin
               ts.Date := PInt(data)^;
               ts.Time := 0;
@@ -2840,10 +2845,13 @@ begin
               ts.Date := 0;
               ts.Time := PInt(data)^;
               Param.AsTime := TimeStampToDateTime(ts);
-            end;
+            end;  }
+            SQL_TYPE_DATE,
+            SQL_TYPE_TIME,
             SQL_TIMESTAMP:
-              Param.AsDateTime :=
-                       TimeStampToDateTime(MSecsToTimeStamp(trunc(PDouble(data)^)));
+            {This is an IBX native format and not the TDataset approach. See also SetFieldData}
+              Param.AsDateTime := PDateTime(data)^;
+//                       TimeStampToDateTime(MSecsToTimeStamp(trunc(PDouble(data)^)));
             SQL_BOOLEAN:
               Param.AsBoolean := PWordBool(data)^;
           end;
@@ -4938,7 +4946,8 @@ end;
 function TIBCustomDataSet.GetFieldData(Field: TField; Buffer: Pointer;
   NativeFormat: Boolean): Boolean;
 begin
-  if (Field.DataType = ftBCD) and not NativeFormat then
+  {These datatypes use IBX conventions and not TDataset conventions}
+  if (Field.DataType in [ftBCD,ftDateTime,ftDate,ftTime]) and not NativeFormat then
     Result := InternalGetFieldData(Field, Buffer)
   else
     Result := inherited GetFieldData(Field, Buffer, NativeFormat);
@@ -4964,7 +4973,8 @@ end;
 procedure TIBCustomDataSet.SetFieldData(Field: TField; Buffer: Pointer;
   NativeFormat: Boolean);
 begin
-  if (not NativeFormat) and (Field.DataType = ftBCD) then
+  {These datatypes use IBX conventions and not TDataset conventions}
+  if (not NativeFormat) and (Field.DataType in [ftBCD,ftDateTime,ftDate,ftTime]) then
     InternalSetfieldData(Field, Buffer)
   else
     inherited SetFieldData(Field, buffer, NativeFormat);

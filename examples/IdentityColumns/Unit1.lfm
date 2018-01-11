@@ -73,7 +73,7 @@ object Form1: TForm1
   end
   object PostBtn: TButton
     Left = 753
-    Height = 25
+    Height = 28
     Top = 43
     Width = 75
     Caption = 'Post'
