@@ -1,7 +1,7 @@
 inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
-  Left = 399
+  Left = 459
   Height = 534
-  Top = 367
+  Top = 284
   Caption = 'Insert SQL Editor'
   ClientHeight = 534
   inherited Button1: TButton
@@ -140,16 +140,14 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     inherited ExecutePage: TTabSheet
       ClientHeight = 424
       inherited Label18: TLabel
-        Visible = False
-      end
-      inherited SelectProcedure: TLabel
-        Visible = True
+        Top = 224
       end
       inherited InputProcGrid: TIBDynamicGrid
-        Height = 224
+        Height = 144
       end
       inherited OutputProcGrid: TIBDynamicGrid
-        Visible = False
+        Height = 176
+        Top = 240
       end
     end
   end
@@ -189,9 +187,6 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
           Name = 'RDB$RELATION_NAME'
           ParamType = ptInput
         end>
-    end
-    inherited UserProcedures: TIBQuery
-      AfterScroll = UserProceduresAfterScroll
     end
     inherited ProcInputParams: TIBQuery
       ParamData = <      

@@ -1,6 +1,7 @@
 inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
-  Left = 949
+  Left = 1041
   Height = 512
+  Top = 330
   Caption = 'Modify SQL Editor'
   ClientHeight = 512
   inherited Button1: TButton
@@ -85,17 +86,14 @@ inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
     end
     inherited ExecutePage: TTabSheet
       inherited Label18: TLabel
-        Visible = False
-      end
-      inherited SelectProcedure: TLabel
-        Width = 81
-        Caption = 'Execute Only'
+        Top = 216
       end
       inherited InputProcGrid: TIBDynamicGrid
-        Height = 224
+        Height = 136
       end
       inherited OutputProcGrid: TIBDynamicGrid
-        Visible = False
+        Height = 128
+        Top = 232
       end
     end
   end
@@ -132,9 +130,6 @@ inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
           Name = 'RDB$RELATION_NAME'
           ParamType = ptInput
         end>
-    end
-    inherited UserProcedures: TIBQuery
-      AfterScroll = UserProceduresAfterScroll
     end
     inherited ProcInputParams: TIBQuery
       ParamData = <      

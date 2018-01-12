@@ -1,31 +1,28 @@
 inherited IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm
-  Left = 573
-  Top = 406
+  Left = 521
+  Top = 366
   Caption = 'Refresh SQL Editor'
   inherited GenerateBtn: TButton
     OnClick = GenerateBtnClick
   end
   inherited PageControl: TPageControl
-    ShowTabs = False
+    ActivePage = SelectPage
+    TabIndex = 0
     inherited SelectPage: TTabSheet
-      ClientHeight = 399
       inherited Label4: TLabel
         Left = 7
         Top = 72
       end
       inherited FieldNamesGrid: TIBDynamicGrid
-        Height = 194
+        Height = 170
       end
       inherited PrimaryKeysGrid: TIBDynamicGrid
         Left = 7
         Top = 88
       end
       inherited SelectSelectAll: TCheckBox
-        Top = 368
+        Top = 344
       end
-    end
-    inherited ExecutePage: TTabSheet
-      ClientHeight = 399
     end
   end
   inherited IBSQLEditFrame1: TIBSQLEditFrame
@@ -61,9 +58,6 @@ inherited IBRefreshSQLEditorForm: TIBRefreshSQLEditorForm
           Name = 'RDB$RELATION_NAME'
           ParamType = ptInput
         end>
-    end
-    inherited UserProcedures: TIBQuery
-      AfterScroll = UserProceduresAfterScroll
     end
     inherited ProcInputParams: TIBQuery
       ParamData = <      

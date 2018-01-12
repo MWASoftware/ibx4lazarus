@@ -33,7 +33,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, SynEdit, LResources, Forms, Controls, Graphics,
   Dialogs, StdCtrls, ComCtrls, ibinsertsqleditor, IBSQLEditFrame,
-  IBLookupComboEditBox, IBDynamicGrid, IBDatabase, IBSQL, IBQuery, IB;
+  IBLookupComboEditBox, IBDynamicGrid, IBDatabase, IBSQL, IBQuery, IB, Types, db;
 
 type
 
@@ -41,10 +41,12 @@ type
 
   TIBSQLEditorForm = class(TIBInsertSQLEditorForm)
     IncludePrimaryKeys: TCheckBox;
+    SelectProcedure: TLabel;
     TabControl1: TTabControl;
     procedure FormShow(Sender: TObject);
     procedure GenerateBtnClick(Sender: TObject);
     procedure TabControl1Change(Sender: TObject);
+    procedure UserProceduresAfterScroll(DataSet: TDataSet);
   private
     procedure SetupFlags;
   protected
@@ -82,7 +84,8 @@ begin
     with IBSQLEditFrame1 do
     begin
       IncludeReadOnlyFields := true;
-      ExecuteOnlyProcs := false;
+      ExecuteOnlyProcs := true;
+      SelectProcs := true;
       SQLText.Lines.Assign(aIBSQL.SQL);
     end;
     IncludePrimaryKeys.Checked := false;
@@ -109,6 +112,11 @@ begin
     PageControl.ActivePage := SelectPage;
   end;
   SetupFlags;
+end;
+
+procedure TIBSQLEditorForm.UserProceduresAfterScroll(DataSet: TDataSet);
+begin
+    SelectProcedure.Visible := DataSet.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 1;
 end;
 
 procedure TIBSQLEditorForm.FormShow(Sender: TObject);

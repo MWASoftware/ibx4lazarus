@@ -1,11 +1,11 @@
 object Form1: TForm1
   Left = 414
-  Height = 446
+  Height = 468
   Top = 150
   Width = 830
   BorderStyle = bsSingle
   Caption = 'Identity Column Demo'
-  ClientHeight = 446
+  ClientHeight = 468
   ClientWidth = 830
   DefaultMonitor = dmPrimary
   OnCreate = FormCreate
@@ -82,7 +82,7 @@ object Form1: TForm1
   end
   object Label1: TLabel
     Left = 19
-    Height = 108
+    Height = 132
     Top = 324
     Width = 725
     AutoSize = False

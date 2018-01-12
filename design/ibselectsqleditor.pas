@@ -51,7 +51,6 @@ type
     PrimaryKeysGrid: TIBDynamicGrid;
     IBSQLEditFrame1: TIBSQLEditFrame;
     ProcedureNames: TIBLookupComboEditBox;
-    SelectProcedure: TLabel;
     SelectSelectAll: TCheckBox;
     SelectTableNames: TIBLookupComboEditBox;
     TestBtn: TButton;
@@ -81,7 +80,6 @@ type
     procedure FormShow(Sender: TObject);
     procedure PrimaryKeyListDblClick(Sender: TObject);
     procedure SelectPageShow(Sender: TObject);
-    procedure UserProceduresAfterScroll(DataSet: TDataSet);
   private
     { private declarations }
     procedure HandleUserTablesOpened(Sender: TObject);
@@ -117,6 +115,7 @@ begin
       GenerateParams.Checked := DataSet.GenerateParamNames;
     end;
     IBSQLEditFrame1.SQLText.Lines.Assign(SelectSQL);
+    IBSQLEditFrame1.SelectProcs := true;
     Result := ShowModal = mrOK;
     if Result then
     begin
@@ -153,11 +152,6 @@ procedure TIBSelectSQLEditorForm.SelectPageShow(Sender: TObject);
 begin
   if (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected then
     IBSQLEditFrame1.UserTables.Active := true;
-end;
-
-procedure TIBSelectSQLEditorForm.UserProceduresAfterScroll(DataSet: TDataSet);
-begin
-  SelectProcedure.Visible := DataSet.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 2;
 end;
 
 procedure TIBSelectSQLEditorForm.FieldListDblClick(Sender: TObject);
@@ -227,7 +221,6 @@ end;
 procedure TIBSelectSQLEditorForm.HandleUserTablesOpened(Sender: TObject);
 begin
   SelectSelectAll.Checked := true;
-  SelectProcedure.Visible := false;
 end;
 
 procedure TIBSelectSQLEditorForm.Loaded;

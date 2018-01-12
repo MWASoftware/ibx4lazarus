@@ -98,9 +98,8 @@ procedure TForm1.IBDatabase1CreateDatabase(Sender: TObject);
 begin
   if IBDatabaseInfo1.ODSMajorVersion < 12 then
   begin
-    MessageDlg('This example requires Firebird 3',mtError,[mbOK],0);
     IBDatabase1.DropDatabase;
-    Close;
+    raise EIBClientError.Create(0,'This example requires Firebird 3');
   end
   else
   with IBDatabase1.Attachment do

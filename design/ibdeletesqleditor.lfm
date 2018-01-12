@@ -1,11 +1,11 @@
 inherited IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
+  Left = 642
+  Top = 246
   Caption = 'Delete SQL Editor'
   inherited GenerateBtn: TButton
     OnClick = GenerateBtnClick
   end
   inherited PageControl: TPageControl
-    ActivePage = SelectPage
-    TabIndex = 0
     inherited SelectPage: TTabSheet
       inherited Label2: TLabel
         Visible = False
@@ -35,6 +35,8 @@ inherited IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
     ClientHeight = 339
     ClientWidth = 448
     TabOrder = 7
+    DesignLeft = 1974
+    DesignTop = 200
     inherited SQLText: TSynEdit
       Height = 313
       Width = 448
@@ -58,9 +60,6 @@ inherited IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
           ParamType = ptInput
         end>
     end
-    inherited UserProcedures: TIBQuery
-      AfterScroll = UserProceduresAfterScroll
-    end
     inherited ProcInputParams: TIBQuery
       ParamData = <      
         item
@@ -79,6 +78,22 @@ inherited IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
     end
     inherited SQLTransaction: TIBTransaction
       Params.Strings = (      )
+    end
+    inherited IdentityCols: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
+    end
+    inherited ReadOnlyFields: TIBQuery
+      ParamData = <      
+        item
+          DataType = ftUnknown
+          Name = 'RDB$RELATION_NAME'
+          ParamType = ptInput
+        end>
     end
   end
 end

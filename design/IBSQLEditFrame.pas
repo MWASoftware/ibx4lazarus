@@ -136,6 +136,7 @@ type
     FIncludeSystemTables: boolean;
     FOnUserTablesOpened: TNotifyEvent;
     FOpening: boolean;
+    FSelectProcs: boolean;
     procedure AddWhereClause(QuotedStrings: boolean; SQL: TStrings;
       UseOldValues: boolean);
     function GetSQLType(SQLType: TIBSQLStatementTypes): string;
@@ -154,6 +155,7 @@ type
     procedure SetExecuteOnlyProcs(AValue: boolean);
     procedure SetIncludeReadOnlyFields(AValue: boolean);
     procedure SetIncludeSystemTables(AValue: boolean);
+    procedure SetSelectProcs(AValue: boolean);
 
   public
     constructor Create(aOwner: TComponent); override;
@@ -188,6 +190,7 @@ type
     property IncludeSystemTables: boolean read FIncludeSystemTables write SetIncludeSystemTables;
     property ExcludeIdentityColumns: boolean read FExcludeIdentityColumns write SetExcludeIdentityColumns;
     property ExecuteOnlyProcs: boolean read FExecuteOnlyProcs write SetExecuteOnlyProcs;
+    property SelectProcs: boolean read FSelectProcs write SetSelectProcs;
     property OnUserTablesOpened: TNotifyEvent read FOnUserTablesOpened write FOnUserTablesOpened;
   end;
 
@@ -290,10 +293,11 @@ end;
 
 procedure TIBSQLEditFrame.UserProceduresBeforeOpen(DataSet: TDataSet);
 begin
+  if ExecuteOnlyProcs and SelectProcs then Exit;
   if ExecuteOnlyProcs then
-    (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PROCEDURE_TYPE = 2')
-  else
-    (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PROCEDURE_TYPE <= 2')
+    (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PROCEDURE_TYPE = 2');
+  if SelectProcs then
+    (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PROCEDURE_TYPE = 1 AND RDB$PROCEDURE_OUTPUTS > 0');
 end;
 
 procedure TIBSQLEditFrame.UserTablesAfterOpen(DataSet: TDataSet);
@@ -383,6 +387,13 @@ begin
   FIncludeSystemTables := AValue;
   RefreshAll;
   SyncQueryBuilder;
+end;
+
+procedure TIBSQLEditFrame.SetSelectProcs(AValue: boolean);
+begin
+  if FSelectProcs = AValue then Exit;
+  FSelectProcs := AValue;
+  RefreshAll;
 end;
 
 constructor TIBSQLEditFrame.Create(aOwner: TComponent);

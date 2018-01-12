@@ -123,7 +123,9 @@ begin
     end;
     FDataSet := DataSet;
     with IBSQLEditFrame1 do
+    begin
       IncludeReadOnlyFields := false;
+    end;
     Result := ShowModal = mrOK;
     if Result and assigned(DataSet) then
       DataSet.GenerateParamNames := GenerateParams.Checked

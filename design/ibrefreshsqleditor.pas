@@ -73,6 +73,7 @@ begin
       GenerateParams.Checked := DataSet.GenerateParamNames;
     end;
     IBSQLEditFrame1.SQLText.Lines.Assign(SelectSQL);
+    IBSQLEditFrame1.SelectProcs := true;
     Result := ShowModal = mrOK;
     if Result then
     begin
@@ -89,7 +90,10 @@ end;
 
 procedure TIBRefreshSQLEditorForm.GenerateBtnClick(Sender: TObject);
 begin
-  IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked);
+  if PageControl.ActivePage = ExecutePage then
+    IBSQLEditFrame1.GenerateExecuteSQL(QuoteFields.Checked)
+  else
+    IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked);
 end;
 
 
