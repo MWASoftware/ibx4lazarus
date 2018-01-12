@@ -1,0 +1,170 @@
+object Form1: TForm1
+  Left = 414
+  Height = 446
+  Top = 150
+  Width = 830
+  BorderStyle = bsSingle
+  Caption = 'Identity Column Demo'
+  ClientHeight = 446
+  ClientWidth = 830
+  DefaultMonitor = dmPrimary
+  OnCreate = FormCreate
+  OnShow = FormShow
+  Position = poDefaultSizeOnly
+  LCLVersion = '1.8.1.0'
+  object IBDynamicGrid1: TIBDynamicGrid
+    Left = 10
+    Height = 301
+    Top = 9
+    Width = 734
+    Color = clWindow
+    Columns = <    
+      item
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'KEY'
+        Width = 60
+        FieldName = 'KEY'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'SOMETEXT'
+        Width = 200
+        FieldName = 'SOMETEXT'
+        AutoSizeColumn = True
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'COMPTEXT'
+        Width = 200
+        FieldName = 'COMPTEXT'
+        AutoSizeColumn = True
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end>
+    DataSource = DataSource1
+    Scrollbars = ssAutoVertical
+    TabOrder = 0
+    ExpandEditorPanelBelowRow = False
+    Descending = False
+    EditorBorderStyle = bsSingle
+    DefaultPositionAtEnd = False
+  end
+  object Button1: TButton
+    Left = 752
+    Height = 28
+    Top = 8
+    Width = 75
+    Caption = 'Add'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+  object PostBtn: TButton
+    Left = 753
+    Height = 28
+    Top = 43
+    Width = 75
+    Caption = 'Post'
+    OnClick = PostBtnClick
+    TabOrder = 2
+  end
+  object Label1: TLabel
+    Left = 19
+    Height = 108
+    Top = 324
+    Width = 725
+    AutoSize = False
+    Caption = 'This test requires Firebird 3 or later. It demonstrates the handling of Identity columns and how INSERT RETURNING (or Update Returning) can also be used to efficiently update COMPUTED BY columns on insert/update. '#10#10'The Application will create a simple database in a temporary location using a local Firebird Server when it is first run.'#10#10'Click on "Add" to insert a new row and on "Post" to insert the row into the database - or just move the cursor to a new column. Rows can be edited in situ. Note the only the "SOMETEXT" column is editable.'
+    ParentColor = False
+    WordWrap = True
+  end
+  object IBDatabase1: TIBDatabase
+    Connected = False
+    AfterConnect = IBDatabase1AfterConnect
+    CreateIfNotExists = True
+    AllowStreamedConnected = False
+    DatabaseName = 'localhost:/tmp/IDTest.fdb'
+    Params.Strings = (
+      'user_name=SYSDBA'
+      'lc_ctype=UTF8'
+    )
+    DefaultTransaction = IBTransaction1
+    IdleTimer = 0
+    TraceFlags = []
+    UseDefaultSystemCodePage = False
+    OnCreateDatabase = IBDatabase1CreateDatabase
+    left = 149
+    top = 46
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    DefaultDatabase = IBDatabase1
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait'
+    )
+    left = 240
+    top = 46
+  end
+  object IBDataSet1: TIBDataSet
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      'Delete From IDTEST A'
+      'Where A.KEY = :OLD_KEY'
+    )
+    InsertSQL.Strings = (
+      'Insert Into IDTEST(SOMETEXT)'
+      'Values(:SOMETEXT) RETURNING KEY, COMPTEXT'
+    )
+    RefreshSQL.Strings = (
+      'Select A.COMPTEXT, A.KEY, A.SOMETEXT From IDTEST A'
+      'Where A.KEY = :KEY'
+    )
+    SelectSQL.Strings = (
+      'Select A.COMPTEXT, A.KEY, A.SOMETEXT From IDTEST A'
+    )
+    ModifySQL.Strings = (
+      'Update IDTEST A Set '
+      '  A.SOMETEXT = :SOMETEXT'
+      'Where A.KEY = :OLD_KEY'
+      'RETURNING COMPTEXT'
+    )
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
+    DataSetCloseAction = dcSaveChanges
+    left = 400
+    top = 46
+  end
+  object DataSource1: TDataSource
+    DataSet = IBDataSet1
+    left = 326
+    top = 46
+  end
+  object ApplicationProperties1: TApplicationProperties
+    OnIdle = ApplicationProperties1Idle
+    left = 520
+    top = 48
+  end
+  object IBDatabaseInfo1: TIBDatabaseInfo
+    Database = IBDatabase1
+    left = 155
+    top = 114
+  end
+end

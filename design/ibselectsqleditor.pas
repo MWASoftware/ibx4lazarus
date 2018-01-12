@@ -235,6 +235,8 @@ begin
   inherited Loaded;
   if IBSQLEditFrame1 <> nil then
   begin
+    if PageControl <> nil then
+      PageControl.ActivePage := SelectPage;
     IBSQLEditFrame1.OnUserTablesOpened := @HandleUserTablesOpened;
     if SelectTableNames <> nil then
       SelectTableNames.ListSource :=  IBSQLEditFrame1.UserTableSource;

@@ -41,9 +41,13 @@ type
 
   TIBModifySQLEditorForm = class(TIBSelectSQLEditorForm)
     IncludePrimaryKeys: TCheckBox;
+    Label5: TLabel;
+    ReadOnlyGrid: TIBDynamicGrid;
     procedure GenerateBtnClick(Sender: TObject);
-    procedure IncludePrimaryKeysChange(Sender: TObject);
   private
+
+  protected
+    procedure Loaded; override;
 
   public
 
@@ -77,7 +81,6 @@ begin
     end;
     with IBSQLEditFrame1 do
     begin
-      IncludePrimaryKeys := false;
       IncludeReadOnlyFields := false;
       ExecuteOnlyProcs := true;
       SQLText.Lines.Assign(SelectSQL);
@@ -97,9 +100,14 @@ end;
 
 { TIBModifySQLEditorForm }
 
-procedure TIBModifySQLEditorForm.IncludePrimaryKeysChange(Sender: TObject);
+procedure TIBModifySQLEditorForm.Loaded;
 begin
-  IBSQLEditFrame1.IncludePrimaryKeys := IncludePrimaryKeys.Checked;
+  inherited Loaded;
+  if IBSQLEditFrame1 <> nil then
+  begin
+   if ReadOnlyGrid <> nil then
+     ReadOnlyGrid.DataSource := IBSQLEditFrame1.ReadOnlyFieldsSource;
+  end;
 end;
 
 procedure TIBModifySQLEditorForm.GenerateBtnClick(Sender: TObject);
@@ -107,7 +115,7 @@ begin
   if PageControl.ActivePage = ExecutePage then
     IBSQLEditFrame1.GenerateExecuteSQL(QuoteFields.Checked)
   else
-    IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked);
+    IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked,IncludePrimaryKeys.Checked);
 end;
 
 

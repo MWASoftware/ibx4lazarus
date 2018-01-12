@@ -6,7 +6,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
   ClientHeight = 585
   ClientWidth = 789
   TabOrder = 0
-  DesignLeft = 1893
+  DesignLeft = 1920
   DesignTop = 313
   inline SQLText: TSynEdit
     Left = 0
@@ -1267,23 +1267,23 @@ object IBSQLEditFrame: TIBSQLEditFrame
   end
   object IBUpdate1: TIBUpdate
     OnApplyUpdates = IBUpdate1ApplyUpdates
-    left = 448
-    top = 128
+    left = 72
+    top = 336
   end
   object IBUpdate2: TIBUpdate
     OnApplyUpdates = IBUpdate1ApplyUpdates
-    left = 432
-    top = 208
+    left = 88
+    top = 336
   end
   object IBUpdate3: TIBUpdate
     OnApplyUpdates = IBUpdate1ApplyUpdates
-    left = 456
+    left = 104
     top = 336
   end
   object IBUpdate4: TIBUpdate
     OnApplyUpdates = IBUpdate1ApplyUpdates
-    left = 456
-    top = 408
+    left = 120
+    top = 336
   end
   object DatabaseInfo: TIBDatabaseInfo
     left = 449
@@ -1313,8 +1313,8 @@ object IBSQLEditFrame: TIBSQLEditFrame
       end>
     UpdateObject = IBUpdate5
     DataSetCloseAction = dcDiscardChanges
-    left = 541
-    top = 64
+    left = 536
+    top = 128
     ParamData = <    
       item
         DataType = ftUnknown
@@ -1324,11 +1324,54 @@ object IBSQLEditFrame: TIBSQLEditFrame
   end
   object IdentityColsSource: TDataSource
     DataSet = IdentityCols
-    left = 541
-    top = 136
+    left = 440
+    top = 128
   end
   object IBUpdate5: TIBUpdate
-    left = 538
-    top = 407
+    left = 137
+    top = 336
+  end
+  object ReadOnlyFields: TIBQuery
+    AllowAutoActivateTransaction = False
+    Transaction = SQLTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = UserTableSource
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select Trim(RF.RDB$FIELD_NAME) as ColumnName,'
+      '1 as Selected'
+      ' FROM RDB$RELATION_FIELDS RF'
+      'JOIN RDB$FIELDS B On B.RDB$FIELD_NAME = RF.RDB$FIELD_SOURCE'
+      'Where RF.RDB$RELATION_NAME = :RDB$RELATION_NAME'
+      '  and B.RDB$COMPUTED_SOURCE is not NULL'
+      'order by RF.RDB$FIELD_POSITION asc'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'RDB$RELATION_NAME'
+        ParamType = ptInput
+      end>
+    UpdateObject = IBUpdate6
+    DataSetCloseAction = dcDiscardChanges
+    left = 544
+    top = 203
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'RDB$RELATION_NAME'
+        ParamType = ptInput
+      end>
+  end
+  object IBUpdate6: TIBUpdate
+    left = 151
+    top = 336
+  end
+  object ReadOnlyFieldsSource: TDataSource
+    DataSet = ReadOnlyFields
+    left = 432
+    top = 208
   end
 end

@@ -43,8 +43,12 @@ type
     FieldNamesGrid: TIBDynamicGrid;
     GenerateParams: TCheckBox;
     IBSQLEditFrame1: TIBSQLEditFrame;
+    IdentityGrid: TIBDynamicGrid;
     IncludeSysTables: TCheckBox;
+    Label5: TLabel;
+    Label6: TLabel;
     PrimaryKeysGrid: TIBDynamicGrid;
+    ReadOnlyGrid: TIBDynamicGrid;
     SelectSelectAll: TCheckBox;
     SelectTableNames: TIBLookupComboEditBox;
     TestBtn: TButton;
@@ -116,6 +120,8 @@ begin
       IBSQLEditFrame1.Database := UpdateObject.DataSet.Database;
       GenerateParams.Checked := UpdateObject.DataSet.GenerateParamNames;
     end;
+    with IBSQLEditFrame1 do
+      IncludeReadOnlyFields := false;
     FUpdateObject := UpdateObject;
     Result := ShowModal = mrOK;
     if Result then
@@ -176,10 +182,10 @@ end;
 
 procedure TIBUpdateSQLEditorForm.GenerateButtonClick(Sender: TObject);
 begin
-  IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked,FRefreshSQL);
+  IBSQLEditFrame1.GenerateRefreshSQL(QuoteFields.Checked,FRefreshSQL,true);
   IBSQLEditFrame1.GenerateDeleteSQL(QuoteFields.Checked,FDeleteSQL);
   IBSQLEditFrame1.GenerateInsertSQL(QuoteFields.Checked,FInsertSQL);
-  IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked,FModifySQL, not IncludePrimaryKeys.Checked);
+  IBSQLEditFrame1.GenerateModifySQL(QuoteFields.Checked,FModifySQL, IncludePrimaryKeys.Checked);
   FDirty := false;
   PageControl.ActivePage := SQLPage;
 end;
@@ -243,6 +249,10 @@ begin
       FieldNamesGrid.DataSource := IBSQLEditFrame1.FieldsSource;
     if PrimaryKeysGrid <> nil then
       PrimaryKeysGrid.DataSource := IBSQLEditFrame1.PrimaryKeySource;
+    if IdentityGrid <> nil then
+      IdentityGrid.DataSource := IBSQLEditFrame1.IdentityColsSource;
+    if ReadOnlyGrid <> nil then
+      ReadOnlyGrid.DataSource := IBSQLEditFrame1.ReadOnlyFieldsSource;
   end;
 end;
 
