@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls, db,
-  IBDynamicGrid, IBDatabase, IBCustomDataSet, IB;
+  IBDynamicGrid, IBDatabase, IBCustomDataSet, IBDatabaseInfo, IB;
 
 {$DEFINE LOCALDATABASE}
 
@@ -27,6 +27,7 @@ type
   TForm1 = class(TForm)
     ApplicationProperties1: TApplicationProperties;
     Button1: TButton;
+    IBDatabaseInfo1: TIBDatabaseInfo;
     Label1: TLabel;
     PostBtn: TButton;
     DataSource1: TDataSource;
@@ -95,6 +96,13 @@ end;
 
 procedure TForm1.IBDatabase1CreateDatabase(Sender: TObject);
 begin
+  if IBDatabaseInfo1.ODSMajorVersion < 12 then
+  begin
+    MessageDlg('This example requires Firebird 3',mtError,[mbOK],0);
+    IBDatabase1.DropDatabase;
+    Close;
+  end
+  else
   with IBDatabase1.Attachment do
     ExecImmediate([isc_tpb_write,isc_tpb_wait,isc_tpb_consistency],sqlCreateTable); {Create the table}
 end;

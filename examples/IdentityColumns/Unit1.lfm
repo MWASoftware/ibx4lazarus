@@ -86,7 +86,7 @@ object Form1: TForm1
     Top = 324
     Width = 725
     AutoSize = False
-    Caption = 'This test demonstrates the handling of Identity columns and how INSERT RETURNING (or Update Returning) can be used to efficiently update COMPUTED BY columns on insert/update. '#10#10'The Application will create a simple database in a temporary location using a local Firebird Server when it is first run.'#10#10'Click on "Add" to insert a new row and on "Post" to insert the row into the database - or just move the cursor to a new column. Rows can be edited in situ. Note the only the "SOMETEXT" column is editable.'
+    Caption = 'This test requires Firebird 3 or later. It demonstrates the handling of Identity columns and how INSERT RETURNING (or Update Returning) can also be used to efficiently update COMPUTED BY columns on insert/update. '#10#10'The Application will create a simple database in a temporary location using a local Firebird Server when it is first run.'#10#10'Click on "Add" to insert a new row and on "Post" to insert the row into the database - or just move the cursor to a new column. Rows can be edited in situ. Note the only the "SOMETEXT" column is editable.'
     ParentColor = False
     WordWrap = True
   end
@@ -161,5 +161,10 @@ object Form1: TForm1
     OnIdle = ApplicationProperties1Idle
     left = 520
     top = 48
+  end
+  object IBDatabaseInfo1: TIBDatabaseInfo
+    Database = IBDatabase1
+    left = 155
+    top = 114
   end
 end
