@@ -86,14 +86,15 @@ inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
     end
     inherited ExecutePage: TTabSheet
       inherited Label18: TLabel
-        Top = 216
+        Top = 240
       end
       inherited InputProcGrid: TIBDynamicGrid
-        Height = 136
+        Height = 107
       end
       inherited OutputProcGrid: TIBDynamicGrid
-        Height = 128
-        Top = 232
+        Left = 10
+        Height = 112
+        Top = 256
       end
     end
   end
@@ -169,6 +170,9 @@ inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
     inherited ReadOnlyFieldsSource: TDataSource
       left = 436
       top = 203
+    end
+    inherited PackageNames: TIBQuery
+      BeforeClose = nil
     end
   end
   object IncludePrimaryKeys: TCheckBox[9]

@@ -42,7 +42,9 @@ type
   TIBSelectSQLEditorForm = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    PackageNames: TIBLookupComboEditBox;
     InputProcGrid: TIBDynamicGrid;
+    PackageNameLabel: TLabel;
     OutputProcGrid: TIBDynamicGrid;
     IncludeSysTables: TCheckBox;
     GenerateBtn: TButton;
@@ -215,7 +217,7 @@ end;
 procedure TIBSelectSQLEditorForm.ExecutePageShow(Sender: TObject);
 begin
   if (IBSQLEditFrame1.Database <> nil) and IBSQLEditFrame1.Database.Connected then
-    IBSQLEditFrame1.UserProcedures.Active := true;
+    IBSQLEditFrame1.OpenUserProcedures;
 end;
 
 procedure TIBSelectSQLEditorForm.HandleUserTablesOpened(Sender: TObject);
@@ -237,6 +239,8 @@ begin
       FieldNamesGrid.DataSource := IBSQLEditFrame1.FieldsSource;
     if PrimaryKeysGrid <> nil then
       PrimaryKeysGrid.DataSource := IBSQLEditFrame1.PrimaryKeySource;
+    if PackageNames <> nil then
+      PackageNames.ListSource := IBSQLEditFrame1.PackageNameSource;
     if ProcedureNames <> nil then
       ProcedureNames.ListSource := IBSQLEditFrame1.UserProcSource;
     if InputProcGrid <> nil then

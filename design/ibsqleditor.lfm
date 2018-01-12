@@ -33,7 +33,9 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
   end
   inherited PageControl: TPageControl
     Left = 68
+    ActivePage = ExecutePage
     ShowTabs = False
+    TabIndex = 1
     inherited SelectPage: TTabSheet
       ClientHeight = 450
       inherited FieldNamesGrid: TIBDynamicGrid
@@ -48,27 +50,31 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
     end
     inherited ExecutePage: TTabSheet
       ClientHeight = 450
+      inherited Label16: TLabel
+        Left = 10
+      end
       inherited Label17: TLabel
-        Top = 72
+        Top = 128
       end
       inherited Label18: TLabel
         Top = 280
-        Visible = True
+      end
+      inherited ProcedureNames: TIBLookupComboEditBox
+        Left = 10
+        Top = 72
       end
       inherited InputProcGrid: TIBDynamicGrid
         Left = 8
-        Height = 178
-        Top = 88
+        Height = 122
+        Top = 144
       end
       inherited OutputProcGrid: TIBDynamicGrid
-        Height = 144
         Top = 296
-        Visible = True
       end
-      object SelectProcedure: TLabel[6]
-        Left = 8
+      object SelectProcedure: TLabel[8]
+        Left = 10
         Height = 13
-        Top = 48
+        Top = 104
         Width = 168
         Anchors = [akLeft, akBottom]
         Caption = 'This is a ''Select Procedure'''
@@ -160,6 +166,9 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
       left = 436
       top = 203
     end
+    inherited PackageNames: TIBQuery
+      BeforeClose = nil
+    end
   end
   object TabControl1: TTabControl[9]
     Left = 11
@@ -168,7 +177,7 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
     Width = 59
     OnChange = TabControl1Change
     TabPosition = tpLeft
-    TabIndex = 0
+    TabIndex = 4
     Tabs.Strings = (
       'Select'
       'Insert'

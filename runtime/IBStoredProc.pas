@@ -47,11 +47,16 @@ type
 
   TIBStoredProc = class(TIBCustomDataSet)
   private
+    FPackageName: string;
     FStmtHandle: IStatement;
     FProcName: string;
     FParams: TParams;
     FPrepared: Boolean;
     FNameList: TStrings;
+    FPackageNameList: TStrings;
+    function GetPackageNames: TStrings;
+    procedure GetPackageNamesFromServer;
+    procedure SetPackageName(AValue: string);
     procedure SetParamsList(Value: TParams);
     procedure FreeStatement;
     function GetStoredProcedureNames: TStrings;
@@ -63,7 +68,7 @@ type
     procedure FetchDataIntoOutputParams;
     procedure ReadParamData(Reader: TReader);
     procedure WriteParamData(Writer: TWriter);
-
+    procedure UpdateQuery;
   protected
 
     procedure DefineProperties(Filer: TFiler); override;
@@ -88,8 +93,10 @@ type
     property StmtHandle: IStatement read FStmtHandle;
     property Prepared: Boolean read FPrepared write SetPrepare;
     property StoredProcedureNames: TStrings read GetStoredProcedureNames;
+    property PackageNames: TStrings read GetPackageNames;
 
   published
+    property PackageName: string read FPackageName write SetPackageName;
     property StoredProcName: string read FProcName write SetProcName;
     property Params: TParams read FParams write SetParamsList;
     property Filtered;
@@ -114,6 +121,7 @@ begin
   inherited Create(AOwner);
   FParams := TParams.Create (self);
   FNameList := TStringList.Create;
+  FPackageNameList := TStringList.Create;
 end;
 
 destructor TIBStoredProc.Destroy;
@@ -121,7 +129,8 @@ begin
   Destroying;
   Disconnect;
   if assigned (FParams) then FParams.Free;
-  if assigned(FNameList) then FNameList.Destroy;
+  if assigned(FNameList) then FNameList.Free;
+  if assigned(FPackageNameList) then FPackageNameList.Free;
   inherited Destroy;
 end;
 
@@ -154,24 +163,10 @@ end;
 
 procedure TIBStoredProc.SetProcName(Value: string);
 begin
-  if not (csReading in ComponentState) then
-  begin
-    CheckInactive;
-    if Value <> FProcName then
-    begin
-      FProcName := Value;
-      FreeStatement;
-      FParams.Clear;
-      if (Value <> '') and
-        (Database <> nil) then
-        GenerateSQL;
-    end;
-  end else begin
-    FProcName := Value;
-  if (Value <> '') and
-    (Database <> nil) then
-    GenerateSQL;
-  end;
+  if Value = FProcName then Exit;
+  CheckInactive;
+  FProcName := Value;
+  UpdateQuery;
 end;
 
 function TIBStoredProc.GetParamsCount: Word;
@@ -196,7 +191,7 @@ end;
 
  procedure TIBStoredProc.InitFieldDefs;
 begin
-  if SelectSQL.Text = '' then
+  if (SelectSQL.Text = '') and (FProcName <> '') and (Database <> nil) then
      GenerateSQL;
   inherited InitFieldDefs;
 end;
@@ -225,6 +220,16 @@ var Params: TStringList;
     end;
   end;
 
+  {Trim and make uppercase unless not an SQL Identifier when leave as it is}
+  function FormatProcName(Dialect: Integer; Value: String): String;
+  begin
+    Value := Trim(Value);
+    if (Dialect = 1) or IsSQLIdentifier(Value) then
+       Result := AnsiUpperCase(Value)
+    else
+      Result := SQLSafeString(Value);
+  end;
+
 var
   Query : TIBSQL;
   input : string;
@@ -239,11 +244,28 @@ begin
   try
     Query.Database := DataBase;
     Query.Transaction := Database.InternalTransaction;
-    Query.SQL.Text := 'SELECT RDB$PARAMETER_NAME,  RDB$PARAMETER_TYPE ' + {do not localize}
-                       'FROM RDB$PROCEDURE_PARAMETERS ' + {do not localize}
-                       'WHERE RDB$PROCEDURE_NAME = ' + {do not localize}
-                       '''' + FormatIdentifierValue(Database.SQLDialect, FProcName) + '''' +
-                       ' ORDER BY RDB$PARAMETER_NUMBER'; {do not localize}
+    if DatabaseInfo.ODSMajorVersion < 12 then
+      Query.SQL.Text := 'SELECT RDB$PARAMETER_NAME,  RDB$PARAMETER_TYPE ' + {do not localize}
+                        'FROM RDB$PROCEDURE_PARAMETERS ' + {do not localize}
+                        'WHERE RDB$PROCEDURE_NAME = ' + {do not localize}
+                        '''' + FormatProcName(Database.SQLDialect, FProcName) + '''' +
+                        ' ORDER BY RDB$PARAMETER_NUMBER' {do not localize}
+    else
+    if FPackageName = '' then
+      Query.SQL.Text := 'SELECT RDB$PARAMETER_NAME,  RDB$PARAMETER_TYPE ' + {do not localize}
+                        'FROM RDB$PROCEDURE_PARAMETERS ' + {do not localize}
+                        'WHERE RDB$PROCEDURE_NAME = ' + {do not localize}
+                        '''' + FormatProcName(Database.SQLDialect, FProcName) + '''' +
+                        'AND RDB$PACKAGE_NAME IS NULL' + {do not localize}
+                        ' ORDER BY RDB$PARAMETER_NUMBER' {do not localize}
+    else
+      Query.SQL.Text := 'SELECT RDB$PARAMETER_NAME,  RDB$PARAMETER_TYPE ' + {do not localize}
+                        'FROM RDB$PROCEDURE_PARAMETERS ' + {do not localize}
+                        'WHERE RDB$PROCEDURE_NAME = ' + {do not localize}
+                        '''' + FormatProcName(Database.SQLDialect, FProcName) + '''' +
+                        'AND RDB$PACKAGE_NAME = ' + {do not localize}
+                        '''' + FormatProcName(Database.SQLDialect, FPackageName) + '''' +
+                        ' ORDER BY RDB$PARAMETER_NUMBER'; {do not localize}
     Query.Prepare;
     Query.GoToFirstRecordOnExecute := False;
     Query.ExecQuery;
@@ -256,9 +278,14 @@ begin
             FormatParameter(Database.SQLDialect, Query.Current.ByName('RDB$PARAMETER_NAME').AsString); {do not localize}
       end
     end;
-    SelectSQL.Text := 'Execute Procedure ' + {do not localize}
-                FormatParameter(Database.SQLDialect, FProcName) + ' ' + input;
- {   writeln(SelectSQL.Text);}
+    if FPackageName = '' then
+      SelectSQL.Text := 'Execute Procedure ' + {do not localize}
+                        QuoteIdentifierIfNeeded(Database.SQLDialect, FProcName) + ' ' + input
+    else
+      SelectSQL.Text := 'Execute Procedure ' + {do not localize}
+                        QuoteIdentifierIfNeeded(Database.SQLDialect,FPackageName) + '.' +
+                        QuoteIdentifierIfNeeded(Database.SQLDialect, FProcName) + ' ' + input;
+//    writeln(SelectSQL.Text);
   finally
     Query.Free;
     Params.Free;
@@ -411,6 +438,45 @@ begin
     FParams.Assign(Value);
 end;
 
+procedure TIBStoredProc.SetPackageName(AValue: string);
+begin
+  if FPackageName = AValue then Exit;
+  CheckInactive;
+  FPackageName := AValue;
+  FProcName := '';
+  UpdateQuery;
+end;
+
+procedure TIBStoredProc.GetPackageNamesFromServer;
+var
+  Query : TIBSQL;
+begin
+  ActivateConnection;
+  if (csReading in ComponentState) or (DatabaseInfo.ODSMajorVersion < 12) then Exit;
+  Database.InternalTransaction.StartTransaction;
+  Query := TIBSQL.Create(self);
+  try
+    Query.GoToFirstRecordOnExecute := False;
+    Query.Database := DataBase;
+    Query.Transaction := Database.InternalTransaction;
+    Query.SQL.Text := 'Select distinct RDB$PACKAGE_NAME from RDB$PROCEDURES Where RDB$PACKAGE_NAME is not null'; {do not localize}
+    Query.Prepare;
+    Query.ExecQuery;
+    while (not Query.EOF) and Query.Next do
+      FPackageNameList.Add(TrimRight(Query.Current.ByName('RDB$PACKAGE_NAME').AsString)); {do not localize}
+  finally
+    Query.Free;
+    Database.InternalTransaction.Commit;
+  end;
+end;
+
+function TIBStoredProc.GetPackageNames: TStrings;
+begin
+  FPackageNameList.Clear;
+  GetPackageNamesFromServer;
+  Result := FPackageNameList;
+end;
+
 function TIBStoredProc.ParamByName(const Value: string): TParam;
 begin
   Prepare;
@@ -436,7 +502,14 @@ begin
       Query.GoToFirstRecordOnExecute := False;
       Query.Database := DataBase;
       Query.Transaction := Database.InternalTransaction;
-      Query.SQL.Text := 'Select RDB$PROCEDURE_NAME from RDB$PROCEDURES'; {do not localize}
+      if DatabaseInfo.ODSMajorVersion < 12 then
+        Query.SQL.Text := 'Select RDB$PROCEDURE_NAME from RDB$PROCEDURES' {do not localize}
+      else
+      if FPackageName = '' then
+        Query.SQL.Text := 'Select RDB$PROCEDURE_NAME from RDB$PROCEDURES Where RDB$PACKAGE_NAME is NULL' {do not localize}
+      else
+        Query.SQL.Text := 'Select RDB$PROCEDURE_NAME from RDB$PROCEDURES Where RDB$PACKAGE_NAME = ''' + {do not localize}
+                          SQLSafeString(FPackageName) + '''';
       Query.Prepare;
       Query.ExecQuery;
       while (not Query.EOF) and Query.Next do
@@ -550,6 +623,29 @@ end;
 procedure TIBStoredProc.WriteParamData(Writer: TWriter);
 begin
   Writer.WriteCollection(Params);
+end;
+
+procedure TIBStoredProc.UpdateQuery;
+begin
+  if not (csReading in ComponentState) then
+  begin
+      FreeStatement;
+      FParams.Clear;
+      if (FProcName <> '') and (Database <> nil) then
+      begin
+        GenerateSQL;
+        if csDesigning in ComponentState then
+        begin
+          Prepare;  {Fills the Params collection}
+          UnPrepare;
+        end;
+      end;
+  end
+  else
+  begin
+    if (FProcName <> '') and (Database <> nil) then
+    GenerateSQL;
+  end;
 end;
 
 procedure TIBStoredProc.ReadParamData(Reader: TReader);

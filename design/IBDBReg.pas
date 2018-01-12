@@ -83,6 +83,14 @@ type
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
+  { TIBPackageNameProperty
+    Editor for the TIBStoredProc.PackageName property.  Displays a drop-down list of all
+    the StoredProcedures in the Database.}
+  TIBPackageNameProperty = class(TIBNameProperty)
+  public
+    procedure GetValues(Proc: TGetStrProc); override;
+  end;
+
   { TIBTableNameProperty
     Editor for the TIBTable.TableName property.  Displays a drop-down list of all
     the Tables in the Database.}
@@ -196,8 +204,6 @@ type
   end;
 
   TIBStoredProcParamsProperty = class(TCollectionPropertyEditor)
-  public
-    procedure Edit; override;
   end;
 
   { TIBTableFieldLinkProperty }
@@ -436,6 +442,7 @@ begin
   RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView,TDBControlGrid, TIBArrayGrid]);
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'DatabaseName', TIBFileNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'StoredProcName', TIBStoredProcNameProperty); {do not localize}
+  RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'PackageName', TIBPackageNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TParams), TIBStoredProc, 'Params', TIBStoredProcParamsProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTable, 'TableName', TIBTableNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBTable, 'IndexName', TIBIndexNameProperty); {do not localize}
@@ -502,6 +509,26 @@ begin
       end;
     end;
   end;
+end;
+
+{ TIBPackageNameProperty }
+
+procedure TIBPackageNameProperty.GetValues(Proc: TGetStrProc);
+var
+   StoredProc : TIBStoredProc;
+   i : integer;
+begin
+    StoredProc := GetComponent(0) as TIBStoredProc;
+    if StoredProc.Database = nil then
+      Exit;
+
+    with StoredProc do
+    try
+      for I := 0 to PackageNames.Count - 1 do
+        Proc (PackageNames[i]);
+    except on E: Exception do
+      MessageDlg(E.Message,mtError,[mbOK],0)
+    end;
 end;
 
 { TIBIndexDefsProperty }
@@ -1039,23 +1066,6 @@ end;
 function TIBStoredProcEditor.GetVerbCount: Integer;
 begin
   Result := inherited GetVerbCount + 2;
-end;
-
-{ TIBStoredProcParamsProperty }
-
-procedure TIBStoredProcParamsProperty.Edit;
-var
-  StoredProc: TIBStoredProc;
-  Params: TParams;
-begin
-  StoredProc := (GetComponent(0) as TIBStoredProc);
-  Params := TParams.Create(nil);
-  try
-    StoredProc.CopyParams(Params);
-  finally
-    Params.Free;
-  end;
-  inherited Edit;
 end;
 
 { TIBTableFieldLinkProperty }

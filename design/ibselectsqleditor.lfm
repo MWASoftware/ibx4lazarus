@@ -223,33 +223,33 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       ClientWidth = 226
       OnShow = ExecutePageShow
       object Label16: TLabel
-        Left = 7
+        Left = 9
         Height = 14
-        Top = 3
+        Top = 56
         Width = 100
         Caption = 'Procedure Name'
         ParentColor = False
       end
       object Label17: TLabel
-        Left = 7
+        Left = 9
         Height = 14
-        Top = 58
+        Top = 111
         Width = 104
         Caption = 'Input Parameters'
         ParentColor = False
       end
       object Label18: TLabel
-        Left = 8
+        Left = 10
         Height = 14
-        Top = 176
+        Top = 229
         Width = 114
         Caption = 'Output Parameters'
         ParentColor = False
       end
       object ProcedureNames: TIBLookupComboEditBox
-        Left = 7
+        Left = 9
         Height = 27
-        Top = 17
+        Top = 70
         Width = 201
         KeyField = 'RDB$PROCEDURE_NAME'
         ListField = 'RDB$PROCEDURE_NAME'
@@ -263,9 +263,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         ItemHeight = 0
       end
       object InputProcGrid: TIBDynamicGrid
-        Left = 7
+        Left = 9
         Height = 96
-        Top = 72
+        Top = 125
         Width = 201
         Color = clWindow
         Columns = <        
@@ -301,9 +301,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         DefaultPositionAtEnd = False
       end
       object OutputProcGrid: TIBDynamicGrid
-        Left = 7
+        Left = 9
         Height = 104
-        Top = 192
+        Top = 245
         Width = 201
         Color = clWindow
         Columns = <        
@@ -337,6 +337,29 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Descending = False
         EditorBorderStyle = bsSingle
         DefaultPositionAtEnd = False
+      end
+      object PackageNameLabel: TLabel
+        Left = 10
+        Height = 14
+        Top = 8
+        Width = 88
+        Caption = 'Package Name'
+        ParentColor = False
+      end
+      object PackageNames: TIBLookupComboEditBox
+        Left = 9
+        Height = 27
+        Top = 22
+        Width = 200
+        KeyField = 'RDB$PACKAGE_NAME'
+        ListField = 'RDB$PACKAGE_NAME'
+        ListFieldIndex = 0
+        LookupCache = False
+        ScrollListDataset = True
+        TabOrder = 3
+        AutoInsert = False
+        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        ItemHeight = 0
       end
     end
   end
@@ -416,6 +439,10 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
           Name = 'RDB$RELATION_NAME'
           ParamType = ptInput
         end>
+    end
+    inherited PackageNames: TIBQuery
+      AfterOpen = nil
+      BeforeClose = nil
     end
   end
 end

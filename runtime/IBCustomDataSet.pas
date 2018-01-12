@@ -685,6 +685,7 @@ type
     procedure Post; override;
     function ParamByName(ParamName: String): ISQLParam;
     property ArrayFieldCount: integer read FArrayFieldCount;
+    property DatabaseInfo: TIBDatabaseInfo read FDatabaseInfo;
     property UpdateObject: TIBDataSetUpdateObject read FUpdateObject write SetUpdateObject;
     property UpdatesPending: Boolean read FUpdatesPending;
     property UpdateRecordTypes: TIBUpdateRecordTypes read FUpdateRecordTypes

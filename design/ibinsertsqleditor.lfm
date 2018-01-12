@@ -22,6 +22,8 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
   end
   inherited PageControl: TPageControl
     Height = 456
+    ActivePage = SelectPage
+    TabIndex = 0
     inherited SelectPage: TTabSheet
       ClientHeight = 424
       inherited Label2: TLabel
@@ -140,14 +142,14 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
     inherited ExecutePage: TTabSheet
       ClientHeight = 424
       inherited Label18: TLabel
-        Top = 224
+        Top = 256
       end
       inherited InputProcGrid: TIBDynamicGrid
-        Height = 144
+        Height = 123
       end
       inherited OutputProcGrid: TIBDynamicGrid
-        Height = 176
-        Top = 240
+        Height = 144
+        Top = 272
       end
     end
   end
@@ -222,6 +224,9 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
           Name = 'RDB$RELATION_NAME'
           ParamType = ptInput
         end>
+    end
+    inherited PackageNames: TIBQuery
+      BeforeClose = nil
     end
   end
 end

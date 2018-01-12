@@ -40,6 +40,8 @@ type
   { TIBSQLEditFrame }
 
   TIBSQLEditFrame = class(TFrame)
+    PackageNameSource: TDataSource;
+    PackageNames: TIBQuery;
     ReadOnlyFieldsSource: TDataSource;
     IBUpdate6: TIBUpdate;
     ReadOnlyFields: TIBQuery;
@@ -111,6 +113,8 @@ type
     procedure IBUpdate1ApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
     procedure LoadFromFileExecute(Sender: TObject);
+    procedure PackageNamesAfterScroll(DataSet: TDataSet);
+    procedure PackageNamesBeforeClose(DataSet: TDataSet);
     procedure PasteExecute(Sender: TObject);
     procedure PasteUpdate(Sender: TObject);
     procedure RedoExecute(Sender: TObject);
@@ -182,6 +186,7 @@ type
     procedure InsertProcName;
     procedure InsertSelectedInputParam;
     procedure InsertSelectedOutputParam;
+    procedure OpenUserProcedures;
     function SyncQueryBuilder: TIBSQLStatementTypes; overload;
     function SyncQueryBuilder(SQL: TStrings): TIBSQLStatementTypes; overload;
     procedure TestSQL(GenerateParamNames: boolean);
@@ -231,6 +236,17 @@ procedure TIBSQLEditFrame.LoadFromFileExecute(Sender: TObject);
 begin
   if OpenDialog1.Execute then
     SQLText.Lines.LoadFromFile(OpenDialog1.FileName);
+end;
+
+procedure TIBSQLEditFrame.PackageNamesAfterScroll(DataSet: TDataSet);
+begin
+  UserProcedures.Active := false;
+  UserProcedures.Active := true;
+end;
+
+procedure TIBSQLEditFrame.PackageNamesBeforeClose(DataSet: TDataSet);
+begin
+  UserProcedures.Active := false;
 end;
 
 procedure TIBSQLEditFrame.PasteExecute(Sender: TObject);
@@ -293,11 +309,22 @@ end;
 
 procedure TIBSQLEditFrame.UserProceduresBeforeOpen(DataSet: TDataSet);
 begin
-  if ExecuteOnlyProcs and SelectProcs then Exit;
-  if ExecuteOnlyProcs then
-    (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PROCEDURE_TYPE = 2');
-  if SelectProcs then
-    (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PROCEDURE_TYPE = 1 AND RDB$PROCEDURE_OUTPUTS > 0');
+  if not (ExecuteOnlyProcs and SelectProcs) then
+  begin
+    if ExecuteOnlyProcs then
+      (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PROCEDURE_TYPE = 2');
+    if SelectProcs then
+      (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PROCEDURE_TYPE = 1 AND RDB$PROCEDURE_OUTPUTS > 0');
+  end;
+  if PackageNames.Active then
+  begin
+    if PackageNames.FieldByName('PACKAGE_NAME_TYPE').AsInteger = 0 then {global procedures}
+      (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PACKAGE_NAME is NULL')
+    else
+      (DataSet as TIBQuery).Parser.Add2WhereClause('RDB$PACKAGE_NAME = ''' +
+           PackageNames.FieldByName('RDB$PACKAGE_NAME').AsString + '''');
+  end;
+//  writeln((DataSet as TIBQuery).Parser.SQLText);
 end;
 
 procedure TIBSQLEditFrame.UserTablesAfterOpen(DataSet: TDataSet);
@@ -505,10 +532,16 @@ begin
     UserTables.Active := false;
     UserTables.Active := true;
   end;
+  if PackageNames.Active then
+  begin
+    PackageNames.Active := false;
+    OpenUserProcedures;
+  end
+  else
   if UserProcedures.Active then
   begin
     UserProcedures.Active := false;
-    UserProcedures.Active := true;
+    OpenUserProcedures;
   end;
 end;
 
@@ -1057,6 +1090,14 @@ procedure TIBSQLEditFrame.InsertSelectedOutputParam;
 begin
   SQLText.SelText := ProcOutputParams.FieldByName('ColumnName').AsString;
   SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.OpenUserProcedures;
+begin
+  if DatabaseInfo.ODSMajorVersion < 12 then
+    UserProcedures.Active := true
+  else
+    PackageNames.Active := true;
 end;
 
 function GetWord(S: string; WordNo: integer): string;

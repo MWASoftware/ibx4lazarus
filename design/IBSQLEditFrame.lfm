@@ -6,8 +6,8 @@ object IBSQLEditFrame: TIBSQLEditFrame
   ClientHeight = 585
   ClientWidth = 789
   TabOrder = 0
-  DesignLeft = 1920
-  DesignTop = 313
+  DesignLeft = 1025
+  DesignTop = 371
   inline SQLText: TSynEdit
     Left = 0
     Height = 559
@@ -1373,5 +1373,32 @@ object IBSQLEditFrame: TIBSQLEditFrame
     DataSet = ReadOnlyFields
     left = 432
     top = 208
+  end
+  object PackageNames: TIBQuery
+    AllowAutoActivateTransaction = False
+    Transaction = SQLTransaction
+    AfterScroll = PackageNamesAfterScroll
+    BeforeClose = PackageNamesBeforeClose
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select distinct Trim(RDB$PACKAGE_NAME) as '
+      'RDB$PACKAGE_NAME,  1 as PACKAGE_NAME_TYPE from RDB$PROCEDURES Where'
+      'RDB$PACKAGE_NAME is not null'
+      'UNION'
+      'Select ''<no package>'',0 From RDB$DATABASE'
+      'order by 2 asc, 1 asc'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 551
+    top = 274
+  end
+  object PackageNameSource: TDataSource
+    DataSet = PackageNames
+    left = 459
+    top = 276
   end
 end
