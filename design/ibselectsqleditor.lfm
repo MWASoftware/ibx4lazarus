@@ -351,14 +351,16 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Height = 27
         Top = 22
         Width = 200
+        AutoComplete = False
         KeyField = 'RDB$PACKAGE_NAME'
         ListField = 'RDB$PACKAGE_NAME'
         ListFieldIndex = 0
         LookupCache = False
+        OnDblClick = PackageNamesDblClick
         ScrollListDataset = True
         TabOrder = 3
         AutoInsert = False
-        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        AutoCompleteText = [cbactEndOfLineComplete, cbactSearchAscending]
         ItemHeight = 0
       end
     end
@@ -441,7 +443,6 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         end>
     end
     inherited PackageNames: TIBQuery
-      AfterOpen = nil
       BeforeClose = nil
     end
   end

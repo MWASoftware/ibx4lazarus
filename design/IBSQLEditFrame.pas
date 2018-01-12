@@ -151,8 +151,9 @@ type
       FieldNames, ReadOnlyFieldNames,  SQL: TStrings); overload;
     procedure GenerateModifySQL(TableName: string; QuotedStrings: boolean;
       FieldNames, ReadOnlyFieldNames, SQL: TStrings); overload;
-    procedure GenerateExecuteSQL(ProcName: string; QuotedStrings: boolean; ExecuteOnly: boolean;
-              InputParams, OutputParams, ExecuteSQL: TStrings); overload;
+    procedure GenerateExecuteSQL(PackageName, ProcName: string;
+      QuotedStrings: boolean; ExecuteOnly: boolean; InputParams, OutputParams,
+  ExecuteSQL: TStrings); overload;
     procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings); overload;
     procedure SetDatabase(AValue: TIBDatabase);
     procedure SetExcludeIdentityColumns(AValue: boolean);
@@ -184,6 +185,7 @@ type
     procedure InsertSelectedFieldName;
     procedure InsertTableName;
     procedure InsertProcName;
+    procedure InsertPackageName;
     procedure InsertSelectedInputParam;
     procedure InsertSelectedOutputParam;
     procedure OpenUserProcedures;
@@ -625,15 +627,20 @@ end;
 procedure TIBSQLEditFrame.GenerateExecuteSQL(QuotedStrings: boolean);
 var InputParams: TStrings;
     OutputParams: TStrings;
+    PackageName: string;
 begin
   SQLText.Lines.Clear;
 
   InputParams := TStringList.Create;
   OutputParams := TStringList.Create;
   try
+    if PackageNames.Active and (PackageNames.FieldByName('Package_Name_Type').AsInteger = 1) then
+      PackageName := PackageNames.FieldByName('RDB$PACKAGE_NAME').AsString
+    else
+      PackageName := '';
     GetFieldNames(ProcInputParams,InputParams);
     GetFieldNames(ProcOutputParams,OutputParams);
-    GenerateExecuteSQL(UserProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString,
+    GenerateExecuteSQL(PackageName,UserProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString,
       QuotedStrings, UserProcedures.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 2,
       InputParams,OutputParams,SQLText.Lines);
   finally
@@ -996,9 +1003,28 @@ begin
   end;
 end;
 
-procedure TIBSQLEditFrame.GenerateExecuteSQL(ProcName: string;
+procedure TIBSQLEditFrame.GenerateExecuteSQL(PackageName,ProcName: string;
   QuotedStrings: boolean; ExecuteOnly: boolean; InputParams, OutputParams,
   ExecuteSQL: TStrings);
+
+  function GetProcName: string;
+  begin
+    if QuotedStrings then
+    begin
+      if PackageName = '' then
+        Result := QuoteIdentifier(Database.SQLDialect,ProcName)
+      else
+        Result := QuoteIdentifier(Database.SQLDialect,PackageName) + '.' +
+                  QuoteIdentifier(Database.SQLDialect,ProcName);
+    end
+    else
+    if PackageName = '' then
+      Result := QuoteIdentifierIfNeeded(Database.SQLDialect,ProcName)
+    else
+      Result := QuoteIdentifierIfNeeded(Database.SQLDialect,PackageName) + '.' +
+                QuoteIdentifierIfNeeded(Database.SQLDialect,ProcName);
+  end;
+
 var SQL: string;
     I: integer;
     Separator: string;
@@ -1018,7 +1044,7 @@ begin
           SQL := SQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,OutputParams[I]);
         Separator := ', ';
       end;
-      SQL := SQL + ' From ' + ProcName;
+      SQL := SQL + ' From ' + GetProcName;
       if InputParams.Count > 0 then
       begin
         Separator := '(:';
@@ -1032,19 +1058,13 @@ begin
     end
     else // Execute Procedure
     begin
-      if QuotedStrings then
-        SQL := 'Execute Procedure "' + ProcName + '"'
-      else
-        SQL := 'Execute Procedure ' + QuoteIdentifierIfNeeded(Database.SQLDialect,ProcName);
+      SQL := 'Execute Procedure ' + GetProcName;
       if InputParams.Count > 0 then
       begin
         Separator := ' :';
         for I := 0 to InputParams.Count - 1 do
         begin
-          if QuotedStrings then
-            SQL := SQL + Separator + '"' + InputParams[I] + '"'
-          else
-            SQL := SQL + Separator + AnsiUpperCase(InputParams[I]);
+          SQL := SQL + Separator + AnsiUpperCase(InputParams[I]);
           Separator := ', :';
         end;
       end
@@ -1078,6 +1098,15 @@ procedure TIBSQLEditFrame.InsertProcName;
 begin
   SQLText.SelText := UserProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString;
   SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.InsertPackageName;
+begin
+  if PackageNames.Active and (PackageNames.FieldByName('PACKAGE_NAME_TYPE').AsInteger = 1) then
+  begin
+    SQLText.SelText := PackageNames.FieldByName('RDB$PACKAGE_NAME').AsString;
+    SQLText.SetFocus
+  end;
 end;
 
 procedure TIBSQLEditFrame.InsertSelectedInputParam;

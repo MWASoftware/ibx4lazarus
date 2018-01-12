@@ -1388,7 +1388,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
       'RDB$PACKAGE_NAME,  1 as PACKAGE_NAME_TYPE from RDB$PROCEDURES Where'
       'RDB$PACKAGE_NAME is not null'
       'UNION'
-      'Select ''<no package>'',0 From RDB$DATABASE'
+      'Select ''(no package)'',0 From RDB$DATABASE'
       'order by 2 asc, 1 asc'
     )
     Params = <>

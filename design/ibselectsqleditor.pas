@@ -72,6 +72,7 @@ type
     procedure IncludeSysTablesChange(Sender: TObject);
     procedure InputProcGridDblClick(Sender: TObject);
     procedure OutputProcGridDblClick(Sender: TObject);
+    procedure PackageNamesDblClick(Sender: TObject);
     procedure PrimaryKeysGridDblClick(Sender: TObject);
     procedure ProcedureNamesDblClick(Sender: TObject);
     procedure SelectSelectAllChange(Sender: TObject);
@@ -187,6 +188,11 @@ end;
 procedure TIBSelectSQLEditorForm.OutputProcGridDblClick(Sender: TObject);
 begin
   IBSQLEditFrame1.InsertSelectedOutputParam;
+end;
+
+procedure TIBSelectSQLEditorForm.PackageNamesDblClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.InsertPackageName;
 end;
 
 procedure TIBSelectSQLEditorForm.PrimaryKeysGridDblClick(Sender: TObject);
