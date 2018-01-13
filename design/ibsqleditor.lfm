@@ -1,7 +1,7 @@
 inherited IBSQLEditorForm: TIBSQLEditorForm
-  Left = 582
+  Left = 506
   Height = 555
-  Top = 415
+  Top = 383
   Width = 776
   Caption = 'IBSQL Editor'
   ClientHeight = 555
@@ -33,9 +33,7 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
   end
   inherited PageControl: TPageControl
     Left = 68
-    ActivePage = ExecutePage
     ShowTabs = False
-    TabIndex = 1
     inherited SelectPage: TTabSheet
       ClientHeight = 450
       inherited FieldNamesGrid: TIBDynamicGrid
@@ -70,6 +68,30 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
       end
       inherited OutputProcGrid: TIBDynamicGrid
         Top = 296
+        Columns = <        
+          item
+            ButtonStyle = cbsCheckboxColumn
+            PickList.Strings = (            )
+            Title.Caption = 'SELECTED'
+            Width = 30
+            FieldName = 'SELECTED'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            PickList.Strings = (            )
+            Title.Caption = 'COLUMNNAME'
+            Width = 64
+            FieldName = 'COLUMNNAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
       end
       object SelectProcedure: TLabel[8]
         Left = 10

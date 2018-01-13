@@ -116,7 +116,12 @@ end;
 
 procedure TIBSQLEditorForm.UserProceduresAfterScroll(DataSet: TDataSet);
 begin
-    SelectProcedure.Visible := DataSet.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 1;
+    SelectProcedure.Visible := (DataSet.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 1)
+      and (Dataset.FieldByName('RDB$PROCEDURE_OUTPUTS').AsInteger > 0);
+    if SelectProcedure.Visible then
+      OutputProcGrid.Columns[0].Width := 30
+    else
+      OutputProcGrid.Columns[0].Width := 0;
 end;
 
 procedure TIBSQLEditorForm.FormShow(Sender: TObject);

@@ -22,8 +22,6 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
   end
   inherited PageControl: TPageControl
     Height = 456
-    ActivePage = SelectPage
-    TabIndex = 0
     inherited SelectPage: TTabSheet
       ClientHeight = 424
       inherited Label2: TLabel
@@ -150,6 +148,30 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
       inherited OutputProcGrid: TIBDynamicGrid
         Height = 144
         Top = 272
+        Columns = <        
+          item
+            ButtonStyle = cbsCheckboxColumn
+            PickList.Strings = (            )
+            Title.Caption = 'SELECTED'
+            Width = 0
+            FieldName = 'SELECTED'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            PickList.Strings = (            )
+            Title.Caption = 'COLUMNNAME'
+            Width = 64
+            FieldName = 'COLUMNNAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
       end
     end
   end

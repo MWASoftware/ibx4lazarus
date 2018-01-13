@@ -22,6 +22,31 @@ inherited IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
         Visible = False
       end
       inherited OutputProcGrid: TIBDynamicGrid
+        Columns = <        
+          item
+            ButtonStyle = cbsCheckboxColumn
+            PickList.Strings = (            )
+            Title.Caption = 'SELECTED'
+            Width = 0
+            Visible = False
+            FieldName = 'SELECTED'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            PickList.Strings = (            )
+            Title.Caption = 'COLUMNNAME'
+            Width = 64
+            FieldName = 'COLUMNNAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
         Visible = False
       end
     end
@@ -94,6 +119,9 @@ inherited IBDeleteSQLEditorForm: TIBDeleteSQLEditorForm
           Name = 'RDB$RELATION_NAME'
           ParamType = ptInput
         end>
+    end
+    inherited PackageNames: TIBQuery
+      BeforeClose = nil
     end
   end
 end

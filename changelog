@@ -15,7 +15,7 @@ IBX Change Log  version                                   (2.1-1) Fri, 12 Jan 20
 4. TIBGenerator: small performance improvement by not preparing query each time
    a new number is generated.
 
-5. TIBSQL: Free resources when transaction changed.
+5. TIBSQL: Free resources when transaction changed - ensures new transaction is used.
 
 6. Property editor will now sync table name to a System Table when "Include System
    Tables" is selected and the query is for a System Table.
@@ -26,7 +26,7 @@ IBX Change Log  version                                   (2.1-1) Fri, 12 Jan 20
 
 8. Minor Performance improvement to handling of Date/Time types in IBX datasets. Field
    values are no longer converted to milliseconds from TDateTime and then back again
-   the TDateTime (the TDataset approach).
+   to TDateTime (the TDataset approach).
 
 9. Property Editors handling of Stored Procedures.
    * Select and Refresh: only show a list of stored procedures that return multiple rows (proc type 1) and
@@ -37,6 +37,11 @@ IBX Change Log  version                                   (2.1-1) Fri, 12 Jan 20
     can be used to select a package. If non-empty, the stored procedure name is
     expected to be a stored procedure defined in the specified package and the
     generated SQL will be as required for a stored procedure located in a package.
+
+11. Select, Refresh, Insert, Modify, Delete and TIBSQL SQL Property Editors now include
+    a "Package Name" drop down box to allow selection of a Firebird 3 Package from
+    which a stored procedure can be selected. With no package name selected, non-package
+    stored procedures are listed.
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

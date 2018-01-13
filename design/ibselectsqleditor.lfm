@@ -270,17 +270,6 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Color = clWindow
         Columns = <        
           item
-            ButtonStyle = cbsCheckboxColumn
-            Title.Caption = 'SELECTED'
-            Width = 30
-            FieldName = 'SELECTED'
-            AutoSizeColumn = False
-            InitialSortColumn = False
-            DBLookupProperties.ItemHeight = 0
-            DBLookupProperties.ItemWidth = 0
-            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          end        
-          item
             Title.Caption = 'COLUMNNAME'
             Width = 64
             FieldName = 'COLUMNNAME'

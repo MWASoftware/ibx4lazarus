@@ -154,7 +154,7 @@ type
     procedure GenerateExecuteSQL(PackageName, ProcName: string;
       QuotedStrings: boolean; ExecuteOnly: boolean; InputParams, OutputParams,
   ExecuteSQL: TStrings); overload;
-    procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; SQL: TStrings); overload;
+    procedure GenerateDeleteSQL(TableName: string; QuotedStrings: boolean; ReadOnlyFieldNames, SQL: TStrings); overload;
     procedure SetDatabase(AValue: TIBDatabase);
     procedure SetExcludeIdentityColumns(AValue: boolean);
     procedure SetExecuteOnlyProcs(AValue: boolean);
@@ -718,10 +718,18 @@ begin
   end;
 end;
 
-procedure TIBSQLEditFrame.GenerateDeleteSQL(QuotedStrings: boolean; SQL: TStrings);
+procedure TIBSQLEditFrame.GenerateDeleteSQL(QuotedStrings: boolean;
+  SQL: TStrings);
+var ReadOnlyFieldNames: TStrings;
 begin
   SQL.Clear;
-  GenerateDeleteSQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,SQL)
+  ReadOnlyFieldNames := TStringList.Create;
+  try
+    GetFieldNames(ReadOnlyFields,ReadOnlyFieldNames,true);
+    GenerateDeleteSQL(UserTables.FieldByName('RDB$RELATION_NAME').AsString,QuotedStrings,ReadOnlyFieldNames,SQL)
+  finally
+    ReadOnlyFieldNames.Free;
+  end;
 end;
 
 procedure TIBSQLEditFrame.CutExecute(Sender: TObject);
@@ -956,10 +964,23 @@ begin
 end;
 
 procedure TIBSQLEditFrame.GenerateDeleteSQL(TableName: string;
-  QuotedStrings: boolean; SQL: TStrings);
+  QuotedStrings: boolean; ReadOnlyFieldNames, SQL: TStrings);
+{var ReturningText, Separator: string;
+    I: integer;   }
 begin
   SQL.Add('Delete From ' + TableName + ' A');
-  AddWhereClause(QuotedStrings,SQL,true)
+  AddWhereClause(QuotedStrings,SQL,true);
+{  Separator := ' RETURNING A.';
+  ReturningText := '';
+  for I := 0 to ReadOnlyFieldNames.Count - 1 do
+    begin
+      if QuotedStrings then
+        ReturningText := ReturningText + Separator + '"' + ReadOnlyFieldNames[I] + '"'
+      else
+        ReturningText := ReturningText + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,ReadOnlyFieldNames[I]);
+      Separator := ', A.';
+    end;
+  SQL.Add(ReturningText);}
 end;
 
 const
@@ -1129,35 +1150,51 @@ begin
     PackageNames.Active := true;
 end;
 
+
 function GetWord(S: string; WordNo: integer): string;
-const
-    SpaceChars = [' ',#$0a,#$0d,#$09,'('];
 var I: integer;
     StartIdx: integer;
     InWhiteSpace: boolean;
+    Quoted: boolean;
+const
+    Separators = [' ',#$0a,#$0d,#$09,'(','.',';'];
 begin
   Result := '';
   StartIdx := 1;
   InWhiteSpace := true;
+  Quoted := false;
   for I := 1 to Length(S) do
   begin
     if InWhiteSpace then
     begin
-      if not (S[I] in SpaceChars) then
+      if not (S[I] in Separators) then
       begin
         StartIdx := I;
+        Quoted := S[I] = '"';
         InWhiteSpace := false
       end
     end
     else
     begin
-      if S[I] in SpaceChars then
+      if (Quoted and (S[I] = '"')) or (not Quoted and (S[I] in Separators)) then
       begin
         Dec(WordNo);
         if WordNo = 0 then
         begin
-          Result := System.copy(S,StartIdx,I - StartIdx);
+          if Quoted and (S[I] = '"')then
+            Result := system.copy(S,StartIdx+1,I - StartIdx - 1)
+          else
+            Result := AnsiUpperCase(System.copy(S,StartIdx,I - StartIdx));
           Exit
+        end;
+        if (not Quoted and (S[I] = '.')) or (Quoted and (Length(S) > I) and (S[I+1] = '.')) then {special case}
+        begin
+          Dec(WordNo);
+          if WordNo = 0 then
+          begin
+            Result := '.';
+            Exit
+          end;
         end;
         InWhiteSpace := true
       end
@@ -1172,6 +1209,7 @@ end;
 
 function TIBSQLEditFrame.SyncQueryBuilder(SQL: TStrings): TIBSQLStatementTypes;
 var TableName: string;
+    FirstWord: string;
 begin
   if (Database = nil) or not Database.Connected then Exit;
 
@@ -1189,32 +1227,75 @@ begin
           TableName := IdentifyStatementSQL.MetaData[0].GetRelationName
         else
           Exit;
-        UserTables.Locate('RDB$RELATION_NAME',TableName,[loCaseInsensitive]);
+        if not UserTables.Locate('RDB$RELATION_NAME',TableName,[]) then
+        begin
+          UserProcedures.Active := true;
+          if UserProcedures.Locate('RDB$PROCEDURE_NAME',TableName,[]) then
+          Result := SQLExecProcedure;
+        end;
       end;
     { If not a select statement then return table or procedure name
       as First Table Name }
     SQLUpdate:
       begin
         TableName := GetWord(IdentifyStatementSQL.SQL.Text,2);
-        UserTables.Locate('RDB$RELATION_NAME',TableName,[loCaseInsensitive]);
+        UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
       end;
 
     SQLInsert:
       begin
         TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
-        UserTables.Locate('RDB$RELATION_NAME',TableName,[loCaseInsensitive]);
+        UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
       end;
 
     SQLDelete:
       begin
         TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
-        UserTables.Locate('RDB$RELATION_NAME',TableName,[loCaseInsensitive]);
+        UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
       end;
 
     SQLExecProcedure:
       begin
-        TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
-        UserProcedures.Locate('RDB$PROCEDURE_NAME',TableName,[loCaseInsensitive]);
+        FirstWord := GetWord(IdentifyStatementSQL.SQL.Text,1);
+        if FirstWord = 'INSERT' then {INSERT...RETURNING}
+        begin
+          TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
+          UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
+          Result := SQLInsert;
+        end
+        else
+        if FirstWord = 'UPDATE' then {UPDATE...RETURNING}
+        begin
+          TableName := GetWord(IdentifyStatementSQL.SQL.Text,2);
+          UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
+          Result := SQLUpdate;
+        end
+        else
+        if FirstWord = 'DELETE' then {DELETE...RETURNING}
+        begin
+          TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
+          UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
+          Result := SQLDelete;
+        end
+        else
+        begin
+          TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
+          if DatabaseInfo.ODSMajorVersion < 12  then
+          begin
+            UserProcedures.Active := true;
+            UserProcedures.Locate('RDB$PROCEDURE_NAME',TableName,[]);
+          end
+          else
+          begin
+            PackageNames.Active := true;
+            if (GetWord(IdentifyStatementSQL.SQL.Text,4) = '.') and
+                 PackageNames.Locate('RDB$PACKAGE_NAME',TableName,[]) then
+            begin
+              TableName := GetWord(IdentifyStatementSQL.SQL.Text,5);
+            end;
+            UserProcedures.Locate('RDB$PROCEDURE_NAME',TableName,[]);
+          end;
+        end;
       end;
     end
   except on E:EIBError do
