@@ -56,7 +56,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <CursorPos X="10" Y="10"/>
+        <TopLine Value="231"/>
+        <CursorPos Y="231"/>
         <UsageCount Value="193"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -82,8 +83,8 @@
       <Unit4>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2279"/>
-        <CursorPos X="3" Y="2281"/>
+        <TopLine Value="2462"/>
+        <CursorPos Y="2491"/>
         <UsageCount Value="13"/>
       </Unit4>
       <Unit5>
@@ -259,7 +260,16 @@
         <UsageCount Value="10"/>
       </Unit28>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="2" HistoryIndex="1">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="10" Column="14"/>
+      </Position1>
+      <Position2>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="10" Column="14"/>
+      </Position2>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

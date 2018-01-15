@@ -36,11 +36,10 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="4069"/>
-        <CursorPos X="3" Y="4101"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2488"/>
+        <CursorPos Y="2494"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
@@ -59,8 +58,8 @@
       <Unit6>
         <Filename Value="../../runtime/IBUpdateSQL.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="22"/>
-        <CursorPos X="15" Y="45"/>
+        <TopLine Value="103"/>
+        <CursorPos X="23" Y="112"/>
         <UsageCount Value="10"/>
       </Unit6>
       <Unit7>
@@ -93,8 +92,8 @@
         <Filename Value="../../runtime/IBTable.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="291"/>
-        <CursorPos Y="293"/>
+        <TopLine Value="1283"/>
+        <CursorPos X="3" Y="1377"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit11>
@@ -196,106 +195,15 @@
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit25>
     </Units>
-    <JumpHistory Count="25" HistoryIndex="24">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
-        <Filename Value="Unit1.pas"/>
-        <Caret Line="9" Column="32"/>
+        <Filename Value="../../runtime/IBTable.pas"/>
+        <Caret Line="314" Column="41" TopLine="291"/>
       </Position1>
       <Position2>
         <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="86" Column="28" TopLine="75"/>
+        <Caret Line="86" Column="30" TopLine="82"/>
       </Position2>
-      <Position3>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="1392" Column="69" TopLine="1371"/>
-      </Position3>
-      <Position4>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="131" Column="15" TopLine="113"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="293" Column="3" TopLine="291"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="121" Column="22" TopLine="112"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="892" Column="3" TopLine="890"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="86" Column="26" TopLine="76"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="127" Column="19" TopLine="116"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="265" Column="34" TopLine="243"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="131" Column="28" TopLine="109"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="314" Column="21" TopLine="291"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="86" Column="29" TopLine="76"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="1381" TopLine="1368"/>
-      </Position14>
-      <Position15>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="293" TopLine="273"/>
-      </Position15>
-      <Position16>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="294" Column="24" TopLine="273"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2476" Column="33" TopLine="2457"/>
-      </Position17>
-      <Position18>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="382" Column="18" TopLine="363"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2476" Column="38" TopLine="2444"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="382" Column="18" TopLine="350"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="2476" Column="38" TopLine="2444"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="3932" Column="16" TopLine="3900"/>
-      </Position23>
-      <Position24>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="4091" Column="30" TopLine="4068"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../runtime/IBTable.pas"/>
-        <Caret Line="131" Column="23" TopLine="101"/>
-      </Position25>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

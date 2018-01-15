@@ -27,7 +27,7 @@
 {    IBX For Lazarus (Firebird Express)                                  }
 {    Contributor: Tony Whyman, MWA Software http://www.mwasoftware.co.uk }
 {    Portions created by MWA Software are copyright McCallum Whyman      }
-{    Associates Ltd 2011 - 2015                                                }
+{    Associates Ltd 2011 - 2015                                          }
 {                                                                        }
 {************************************************************************}
 
@@ -441,6 +441,7 @@ type
     FInTransactionEnd: boolean;
     FIBLinks: TList;
     FFieldColumns: PFieldColumns;
+    FBufferUpdatedOnQryReturn: boolean;
     procedure ColumnDataToBuffer(QryResults: IResults; ColumnIndex,
       FieldIndex: integer; Buffer: PChar);
     procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
@@ -2064,7 +2065,10 @@ begin
   begin
     j := GetFieldPosition(QryResults[i].GetAliasName);
     if j > 0 then
+    begin
       ColumnDataToBuffer(QryResults,i,j,Buffer);
+      FBufferUpdatedOnQryReturn := true;
+    end;
   end;
 end;
 
@@ -2454,6 +2458,7 @@ begin
       end;
       Inc(arr);
     end;
+  FBufferUpdatedOnQryReturn := false;
   if Assigned(FUpdateObject) then
   begin
     if (Qry = FQDelete) then
@@ -2466,14 +2471,14 @@ begin
   else begin
     SetInternalSQLParams(Qry.Params, Buff);
     Qry.ExecQuery;
+    if Qry.FieldCount > 0 then {Has RETURNING Clause}
+      UpdateRecordFromQuery(Qry.Current,Buff);
   end;
-  if Qry.FieldCount > 0 then {Has RETURNING Clause}
-    UpdateRecordFromQuery(Qry.Current,Buff);
   PRecordData(Buff)^.rdUpdateStatus := usUnmodified;
   PRecordData(Buff)^.rdCachedUpdateStatus := cusUnmodified;
   SetModified(False);
   WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Buff);
-  if (FForcedRefresh or FNeedsRefresh) and CanRefresh then
+  if (FForcedRefresh or (FNeedsRefresh and not FBufferUpdatedOnQryReturn)) and CanRefresh then
     InternalRefreshRow;
 end;
 
@@ -4088,7 +4093,7 @@ begin
               begin
                 Attributes := [faReadOnly];
                 InternalCalcField := True;
-//                FNeedsRefresh := True;
+                FNeedsRefresh := True;
               end
               else
               begin
@@ -4098,7 +4103,7 @@ begin
                     Attributes := [faRequired];
                 end
                 else
-//                  FNeedsRefresh := True;
+                  FNeedsRefresh := True;
               end;
             end;
           end;

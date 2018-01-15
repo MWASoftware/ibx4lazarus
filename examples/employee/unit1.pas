@@ -99,7 +99,6 @@ type
     EmployeeSource: TDataSource;
     IBDatabase1: TIBDatabase;
     IBTransaction1: TIBTransaction;
-    procedure EmployeesAfterPost(DataSet: TDataSet);
     procedure EmployeesValidatePost(Sender: TObject; var CancelPost: boolean);
     procedure JobCodeChangeTimerTimer(Sender: TObject);
     procedure JobGradeChangeTimerTimer(Sender: TObject);
@@ -228,11 +227,6 @@ begin
     end;
     IBDynamicGrid1.ShowEditorPanel;
   end;
-end;
-
-procedure TForm1.EmployeesAfterPost(DataSet: TDataSet);
-begin
-  Employees.Refresh
 end;
 
 procedure TForm1.EmployeesValidatePost(Sender: TObject; var CancelPost: boolean

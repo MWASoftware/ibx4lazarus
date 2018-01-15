@@ -121,7 +121,6 @@ type
     IBTransaction1: TIBTransaction;
     procedure DBImage1DBImageRead(Sender: TObject; S: TStream;
       var GraphExt: string);
-    procedure EmployeesAfterPost(DataSet: TDataSet);
     procedure EmployeesValidatePost(Sender: TObject; var CancelPost: boolean);
     procedure IBDatabase1AfterConnect(Sender: TObject);
     procedure IBLocalDBSupport1GetDBVersionNo(Sender: TObject;
@@ -298,11 +297,6 @@ begin
     end;
     IBDynamicGrid1.ShowEditorPanel;
   end;
-end;
-
-procedure TForm1.EmployeesAfterPost(DataSet: TDataSet);
-begin
-  Employees.Refresh
 end;
 
 procedure TForm1.DBImage1DBImageRead(Sender: TObject; S: TStream;
