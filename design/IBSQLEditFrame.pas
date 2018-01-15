@@ -1179,7 +1179,7 @@ begin
           Dec(MaxSymbols);
           Token := Tokeniser.GetToken;
           if (Length(Token) > 1) and (Token[1] = '"') and (Token[Length(Token)] = '"') then
-            WordList.Add(system.copy(Token,2,Length(Token)-2))
+            WordList.AddObject(system.copy(Token,2,Length(Token)-2),WordList) {note convention to indicate quoted}
           else
             WordList.Add(AnsiUpperCase(Token));
 //          writeln(WordList[WordList.Count-1]);
@@ -1246,10 +1246,14 @@ begin
           Exit;
         if not UserTables.Locate('RDB$RELATION_NAME',TableName,[]) then
         begin
+          {We don't know if the stored procedure is in a package because
+           the relationname is always the procedure name regardless of
+           whether it is a non-package procedure or in a package. Hence,
+           we have to look for the From keyword to find the full procedure name}
           GetSymbols(IdentifyStatementSQL.SQL,Symbols,-1); {Get All Symbols}
           for i := 0 to Symbols.Count - 1 do
           begin
-            if Symbols[i] = 'FROM' then
+            if (Symbols[i] = 'FROM') and (Symbols.Objects[i] = nil) then
             begin
               if FindProcedure(i+1) then
                 Result := SQLExecProcedure;
@@ -1305,22 +1309,6 @@ begin
         end
         else
           FindProcedure(2);
-(*        begin
-          if DatabaseInfo.ODSMajorVersion < 12  then {No packages}
-          begin
-            UserProcedures.Active := true;
-            UserProcedures.Locate('RDB$PROCEDURE_NAME',Symbols[2],[]);
-          end
-          else
-          begin
-            PackageNames.Active := true;
-            if (Symbols[3] = '.') and
-                 PackageNames.Locate('RDB$PACKAGE_NAME',Symbols[2],[]) then
-              UserProcedures.Locate('RDB$PROCEDURE_NAME',Symbols[4],[])
-            else
-              UserProcedures.Locate('RDB$PROCEDURE_NAME',Symbols[2],[]);
-          end;
-        end; *)
       end;
     end
    except on E:EIBError do
