@@ -858,7 +858,10 @@ begin
       SelectSQL := SelectSQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,FieldNames[I]);
     Separator := ', A.';
   end;
-  SelectSQL := SelectSQL + ' From ' + TableName + ' A';
+  if QuotedStrings then
+    SelectSQL := SelectSQL + ' From "' + TableName + '" A'
+  else
+    SelectSQL := SelectSQL + ' From ' + QuoteIdentifierIfNeeded(Database.SQLDialect,TableName) + ' A';
   Lines := TStringList.Create;
   try
     Lines.Text := SelectSQL;
@@ -877,7 +880,10 @@ var InsertSQL: string;
 begin
   Lines := TStringList.Create;
   try
-    InsertSQL := 'Insert Into ' + TableName + '(';
+    if QuotedStrings then
+      InsertSQL := 'Insert Into "' + TableName + '" ('
+    else
+      InsertSQL := 'Insert Into ' + QuoteIdentifierIfNeeded(Database.SQLDialect,TableName) + ' (';
     Separator := '';
     for I := 0 to FieldNames.Count - 1 do
       begin
@@ -937,7 +943,10 @@ var UpdateSQL: string;
     I: integer;
 begin
   Separator := '  A.';
-  UpdateSQL := 'Update ' + TableName + ' A Set ';
+  if QuotedStrings then
+    UpdateSQL := 'Update "' + TableName + '" A Set '
+  else
+    UpdateSQL := 'Update ' + QuoteIdentifierIfNeeded(Database.SQLDialect,TableName) + ' A Set ';
   SQL.Add(UpdateSQL);
   for I := 0 to FieldNames.Count - 1 do
     begin
@@ -968,7 +977,10 @@ procedure TIBSQLEditFrame.GenerateDeleteSQL(TableName: string;
 {var ReturningText, Separator: string;
     I: integer;   }
 begin
-  SQL.Add('Delete From ' + TableName + ' A');
+  if QuotedStrings then
+    SQL.Add('Delete From "' + TableName + '" A')
+  else
+    SQL.Add('Delete From ' + QuoteIdentifierIfNeeded(Database.SQLDialect,TableName) + ' A');
   AddWhereClause(QuotedStrings,SQL,true);
 {  Separator := ' RETURNING A.';
   ReturningText := '';
@@ -1150,55 +1162,35 @@ begin
     PackageNames.Active := true;
 end;
 
-
-function GetWord(S: string; WordNo: integer): string;
-var I: integer;
-    StartIdx: integer;
-    InWhiteSpace: boolean;
-    Quoted: boolean;
-const
-    Separators = [' ',#$0a,#$0d,#$09,'(','.',';'];
+procedure GetSymbols(Lines: TStrings; var WordList: TStrings; MaxSymbols: integer = 3);
+var Tokeniser: TSynSQLSyn;
+    i: integer;
+    Token: string;
 begin
-  Result := '';
-  StartIdx := 1;
-  InWhiteSpace := true;
-  Quoted := false;
-  for I := 1 to Length(S) do
-  begin
-    if InWhiteSpace then
+  Tokeniser := TSynSQLSyn.Create(nil); {use the highligher as a tokeniser}
+  try
+    Tokeniser.SQLDialect := sqlInterbase6;
+    for i := 0 to Lines.Count - 1 do
     begin
-      if not (S[I] in Separators) then
-      begin
-        StartIdx := I;
-        Quoted := S[I] = '"';
-        InWhiteSpace := false
-      end
-    end
-    else
-    begin
-      if (Quoted and (S[I] = '"')) or (not Quoted and (S[I] in Separators)) then
-      begin
-        Dec(WordNo);
-        if WordNo = 0 then
+      Tokeniser.SetLine(Lines[i],i);
+      repeat
+        if not (Tokeniser.GetTokenID in [tkComment,tkSpace,tkUnknown]) then
         begin
-          if Quoted and (S[I] = '"')then
-            Result := system.copy(S,StartIdx+1,I - StartIdx - 1)
+          Dec(MaxSymbols);
+          Token := Tokeniser.GetToken;
+          if (Length(Token) > 1) and (Token[1] = '"') and (Token[Length(Token)] = '"') then
+            WordList.Add(system.copy(Token,2,Length(Token)-2))
           else
-            Result := AnsiUpperCase(System.copy(S,StartIdx,I - StartIdx));
-          Exit
+            WordList.Add(AnsiUpperCase(Token));
+//          writeln(WordList[WordList.Count-1]);
         end;
-        if (not Quoted and (S[I] = '.')) or (Quoted and (Length(S) > I) and (S[I+1] = '.')) then {special case}
-        begin
-          Dec(WordNo);
-          if WordNo = 0 then
-          begin
-            Result := '.';
-            Exit
-          end;
-        end;
-        InWhiteSpace := true
-      end
-    end
+        if MaxSymbols = 0 then
+          Exit;
+        Tokeniser.Next;
+      until Tokeniser.GetEol;
+    end;
+  finally
+    Tokeniser.Free;
   end;
 end;
 
@@ -1210,12 +1202,37 @@ end;
 function TIBSQLEditFrame.SyncQueryBuilder(SQL: TStrings): TIBSQLStatementTypes;
 var TableName: string;
     FirstWord: string;
+    Symbols: TStrings;
+    i: integer;
+
+  function FindProcedure(StartIndex: integer): boolean;
+  begin
+    if StartIndex >= Symbols.Count then Exit;
+
+    if DatabaseInfo.ODSMajorVersion < 12  then {No packages}
+    begin
+      UserProcedures.Active := true;
+      Result := UserProcedures.Locate('RDB$PROCEDURE_NAME',Symbols[StartIndex],[]);
+    end
+    else
+    begin
+      PackageNames.Active := true;
+      if (StartIndex < Symbols.Count - 2) and (Symbols[StartIndex+1] = '.') and
+           PackageNames.Locate('RDB$PACKAGE_NAME',Symbols[StartIndex],[]) then
+        Result := UserProcedures.Locate('RDB$PROCEDURE_NAME',Symbols[StartIndex+2],[])
+      else
+        Result := UserProcedures.Locate('RDB$PROCEDURE_NAME',Symbols[StartIndex],[]);
+    end;
+  end;
+
 begin
   if (Database = nil) or not Database.Connected then Exit;
 
   Result := SQLUnknown;
   TableName := '';
+  Symbols := TStringList.Create;
   try
+   try
     IdentifyStatementSQL.Transaction.Active := true;
     IdentifyStatementSQL.SQL.Assign(SQL);
     IdentifyStatementSQL.Prepare;
@@ -1229,6 +1246,17 @@ begin
           Exit;
         if not UserTables.Locate('RDB$RELATION_NAME',TableName,[]) then
         begin
+          GetSymbols(IdentifyStatementSQL.SQL,Symbols,-1); {Get All Symbols}
+          for i := 0 to Symbols.Count - 1 do
+          begin
+            if Symbols[i] = 'FROM' then
+            begin
+              if FindProcedure(i+1) then
+                Result := SQLExecProcedure;
+              Exit;
+            end;
+          end;
+          {Should have found it - try relationname in hope rather than expectation}
           UserProcedures.Active := true;
           if UserProcedures.Locate('RDB$PROCEDURE_NAME',TableName,[]) then
           Result := SQLExecProcedure;
@@ -1238,68 +1266,68 @@ begin
       as First Table Name }
     SQLUpdate:
       begin
-        TableName := GetWord(IdentifyStatementSQL.SQL.Text,2);
-        UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
+        GetSymbols(IdentifyStatementSQL.SQL,Symbols,2);
+        UserTables.Locate('RDB$RELATION_NAME',Symbols[1],[]);
       end;
 
     SQLInsert:
       begin
-        TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
-        UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
+        GetSymbols(IdentifyStatementSQL.SQL,Symbols,3);
+        UserTables.Locate('RDB$RELATION_NAME',Symbols[2],[]);
       end;
 
     SQLDelete:
       begin
-        TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
-        UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
+        GetSymbols(IdentifyStatementSQL.SQL,Symbols,3);
+        UserTables.Locate('RDB$RELATION_NAME',Symbols[2],[]);
       end;
 
     SQLExecProcedure:
       begin
-        FirstWord := GetWord(IdentifyStatementSQL.SQL.Text,1);
+        GetSymbols(IdentifyStatementSQL.SQL,Symbols,5);
+        FirstWord := Symbols[0];
         if FirstWord = 'INSERT' then {INSERT...RETURNING}
         begin
-          TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
-          UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
+          UserTables.Locate('RDB$RELATION_NAME',Symbols[2],[]);
           Result := SQLInsert;
         end
         else
         if FirstWord = 'UPDATE' then {UPDATE...RETURNING}
         begin
-          TableName := GetWord(IdentifyStatementSQL.SQL.Text,2);
-          UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
+          UserTables.Locate('RDB$RELATION_NAME',Symbols[1],[]);
           Result := SQLUpdate;
         end
         else
         if FirstWord = 'DELETE' then {DELETE...RETURNING}
         begin
-          TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
-          UserTables.Locate('RDB$RELATION_NAME',TableName,[]);
+          UserTables.Locate('RDB$RELATION_NAME',Symbols[2],[]);
           Result := SQLDelete;
         end
         else
-        begin
-          TableName := GetWord(IdentifyStatementSQL.SQL.Text,3);
-          if DatabaseInfo.ODSMajorVersion < 12  then
+          FindProcedure(2);
+(*        begin
+          if DatabaseInfo.ODSMajorVersion < 12  then {No packages}
           begin
             UserProcedures.Active := true;
-            UserProcedures.Locate('RDB$PROCEDURE_NAME',TableName,[]);
+            UserProcedures.Locate('RDB$PROCEDURE_NAME',Symbols[2],[]);
           end
           else
           begin
             PackageNames.Active := true;
-            if (GetWord(IdentifyStatementSQL.SQL.Text,4) = '.') and
-                 PackageNames.Locate('RDB$PACKAGE_NAME',TableName,[]) then
-            begin
-              TableName := GetWord(IdentifyStatementSQL.SQL.Text,5);
-            end;
-            UserProcedures.Locate('RDB$PROCEDURE_NAME',TableName,[]);
+            if (Symbols[3] = '.') and
+                 PackageNames.Locate('RDB$PACKAGE_NAME',Symbols[2],[]) then
+              UserProcedures.Locate('RDB$PROCEDURE_NAME',Symbols[4],[])
+            else
+              UserProcedures.Locate('RDB$PROCEDURE_NAME',Symbols[2],[]);
           end;
-        end;
+        end; *)
       end;
     end
-  except on E:EIBError do
-//      ShowMessage(E.Message);
+   except on E:EIBError do
+//       ShowMessage(E.Message);
+   end;
+  finally
+    Symbols.Free;
   end;
 end;
 
