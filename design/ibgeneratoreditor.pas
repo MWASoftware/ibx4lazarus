@@ -33,7 +33,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   StdCtrls, ComCtrls, db, IBDatabase, IBCustomDataSet, IBQuery, IBSQL,
-  IBLookupComboEditBox, IB;
+  IBLookupComboEditBox, IB, IBTable;
 
 type
 
@@ -83,8 +83,9 @@ function EditGenerator(AGenerator: TIBGenerator): boolean;
 var Database: TIBDatabase;
 begin
   Result := false;
-  if (AGenerator.Owner is TIBQuery and ((AGenerator.Owner as TIBQuery).SQL.Text = '')) or
-   (AGenerator.Owner is TIBDataSet and ((AGenerator.Owner as TIBDataSet).SelectSQL.Text = '')) then
+  if not (AGenerator.Owner is TIBTable) and
+   ((AGenerator.Owner is TIBQuery and ((AGenerator.Owner as TIBQuery).SQL.Text = '')) or
+   (AGenerator.Owner is TIBDataSet and ((AGenerator.Owner as TIBDataSet).SelectSQL.Text = ''))) then
   begin
     ShowMessage('No Select SQL Found!');
     Exit
@@ -138,6 +139,11 @@ begin
   with IdentifyStatementSQL do
   begin
     Transaction.Active := true;
+    if FGenerator.Owner is TIBTable then
+    begin
+      Result :=  TIBTable(FGenerator.Owner).TableName;
+      Exit;
+    end;
     if FGenerator.Owner is TIBQuery then
       SQL.Assign((FGenerator.Owner as TIBQuery).SQL)
     else

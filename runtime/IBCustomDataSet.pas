@@ -4088,7 +4088,7 @@ begin
               begin
                 Attributes := [faReadOnly];
                 InternalCalcField := True;
-                FNeedsRefresh := True;
+//                FNeedsRefresh := True;
               end
               else
               begin
@@ -4098,7 +4098,7 @@ begin
                     Attributes := [faRequired];
                 end
                 else
-                  FNeedsRefresh := True;
+//                  FNeedsRefresh := True;
               end;
             end;
           end;

@@ -159,6 +159,7 @@ type
     property FieldDefs stored FieldDefsStored;
     property Filter;
     property Filtered;
+    property GeneratorField;
     property IndexDefs: TIndexDefs read FIndexDefs write SetIndexDefs stored IndexDefsStored;
     property IndexFieldNames: string read GetIndexFieldNames write SetIndexFieldNames;
     property IndexName: string read GetIndexName write SetIndexName;
@@ -1301,26 +1302,39 @@ end;
 procedure TIBTable.GenerateUpdateSQL;
 var
   InsertFieldList, InsertParamList, UpdateFieldList: string;
-  WherePrimaryFieldList, WhereAllFieldList: string;
+  WherePrimaryFieldList, WhereAllFieldList,
+    ReturningFieldList: string;
 
   procedure GenerateFieldLists;
   var
     I: Integer;
   begin
     for I := 0 to FieldDefs.Count - 1 do begin
-      with FieldDefs[I] do begin
+      with TIBFieldDef(FieldDefs[I]) do begin
+        if (faReadOnly in Attributes) or IdentityColumn then
+        begin
+          if ReturningFieldList <> '' then
+            ReturningFieldList := ReturningFieldList + ', ' +
+                     QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo))
+          else
+            ReturningFieldList := ' RETURNING ' +
+              QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo))
+        end;
         if not (InternalCalcField or (faReadOnly in Attributes) or
-          (DataType = ftUnknown)) then
+           (DataType = ftUnknown)) then
         begin
           if ( InsertFieldList <> '' ) then begin
             InsertFieldList := InsertFieldList + ', ';
             InsertParamList := InsertParamList + ', ';
+          end;
+          if (UpdateFieldList <> '') then begin
             UpdateFieldList := UpdateFieldList + ', ';
             if (DataType <> ftBlob) and (DataType <>ftMemo) then
               WhereAllFieldList := WhereAllFieldList + ' AND ';
           end;
-          InsertFieldList := InsertFieldList +
-            QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo));
+          if not IdentityColumn then
+            InsertFieldList := InsertFieldList +
+              QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo));
           InsertParamList := InsertParamList + ':' +  Name;
           UpdateFieldList := UpdateFieldList +
             QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo)) +
@@ -1371,16 +1385,16 @@ begin
     InsertSQL.Text := 'insert into ' + {do not localize}
       QuoteIdentifier(DataBase.SQLDialect, FTableName) +
     ' (' + InsertFieldList + {do not localize}
-      ') values (' + InsertParamList + ')'; {do not localize}
+      ') values (' + InsertParamList + ')' + ReturningFieldList; {do not localize}
     ModifySQL.Text := 'update ' +
       QuoteIdentifier(DataBase.SQLDialect, FTableName) +
       ' set ' + UpdateFieldList + {do not localize}
-      ' where RDB$DB_KEY = :IBX_INTERNAL_DBKEY'; {do not localize}
+      ' where RDB$DB_KEY = :IBX_INTERNAL_DBKEY' + ReturningFieldList; {do not localize}
     WhereAllRefreshSQL.Text := 'select ' +  {do not localize}
       QuoteIdentifier(DataBase.SQLDialect, FTableName) + '.*, '
       + 'RDB$DB_KEY as IBX_INTERNAL_DBKEY from ' {do not localize}
       + QuoteIdentifier(DataBase.SQLDialect, FTableName) +
-      ' where ' + WhereAllFieldList; {do not localize}
+      ' where ' + WhereAllFieldList ; {do not localize}
     if FPrimaryIndexFields <> '' then
     begin
       GenerateWherePrimaryFieldList;

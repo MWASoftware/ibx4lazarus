@@ -2,22 +2,22 @@ object Form1: TForm1
   Left = 457
   Height = 453
   Top = 397
-  Width = 817
+  Width = 943
   Caption = 'IB Tables Example'
   ClientHeight = 453
-  ClientWidth = 817
+  ClientWidth = 943
   DefaultMonitor = dmPrimary
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object Panel1: TPanel
     Left = 0
     Height = 453
     Top = 0
-    Width = 817
+    Width = 943
     Align = alClient
     ClientHeight = 453
-    ClientWidth = 817
+    ClientWidth = 943
     TabOrder = 0
     object Panel2: TPanel
       Left = 1
@@ -67,7 +67,7 @@ object Form1: TForm1
       Left = 176
       Height = 451
       Top = 1
-      Width = 640
+      Width = 766
       Align = alClient
       Color = clWindow
       Columns = <      
@@ -88,6 +88,18 @@ object Form1: TForm1
           Width = 150
           FieldName = 'FIRST_NAME'
           AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          ReadOnly = True
+          Title.Alignment = taCenter
+          Title.Caption = 'Full Name'
+          Width = 120
+          FieldName = 'FULL_NAME'
+          AutoSizeColumn = True
           InitialSortColumn = False
           DBLookupProperties.ItemHeight = 0
           DBLookupProperties.ItemWidth = 0
@@ -173,6 +185,7 @@ object Form1: TForm1
     BufferChunks = 1000
     CachedUpdates = False
     DataSetCloseAction = dcSaveChanges
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
     IndexFieldNames = 'DEPT_NO'
     ReadOnly = True
     TableName = 'DEPARTMENT'
@@ -276,6 +289,9 @@ object Form1: TForm1
     BufferChunks = 1000
     CachedUpdates = False
     DataSetCloseAction = dcSaveChanges
+    GeneratorField.Generator = 'CUST_NO_GEN                                                                                                                 '
+    GeneratorField.Field = 'EMP_NO'
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
     IndexFieldNames = 'DEPT_NO'
     MasterFields = 'DEPT_NO'
     MasterSource = DataSource2
