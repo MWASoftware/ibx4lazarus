@@ -1303,39 +1303,57 @@ procedure TIBTable.GenerateUpdateSQL;
 var
   InsertFieldList, InsertParamList, UpdateFieldList: string;
   WherePrimaryFieldList, WhereAllFieldList,
-    ReturningFieldList: string;
+    InsertReturningFieldList, UpdateReturningFieldList: string;
 
   procedure GenerateFieldLists;
   var
     I: Integer;
+    AllowReturningClause: boolean;
   begin
+     {Is database Firebird 2.1 or later?}
+    AllowReturningClause := (DatabaseInfo.ODSMajorVersion > 11) or
+        ((DatabaseInfo.ODSMajorVersion = 11) and (DatabaseInfo.ODSMinorVersion >= 1));
     for I := 0 to FieldDefs.Count - 1 do begin
       with TIBFieldDef(FieldDefs[I]) do begin
-        if (faReadOnly in Attributes) or IdentityColumn then
+        if AllowReturningClause then
         begin
-          if ReturningFieldList <> '' then
-            ReturningFieldList := ReturningFieldList + ', ' +
-                     QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo))
-          else
-            ReturningFieldList := ' RETURNING ' +
-              QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo))
+          if (faReadOnly in Attributes) or IdentityColumn then
+          begin
+            if InsertReturningFieldList <> '' then
+              InsertReturningFieldList := InsertReturningFieldList + ', ' +
+                       QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo))
+            else
+              InsertReturningFieldList := ' RETURNING ' +
+                QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo))
+          end;
+          if (faReadOnly in Attributes)  then
+          begin
+            if UpdateReturningFieldList <> '' then
+              UpdateReturningFieldList := UpdateReturningFieldList + ', ' +
+                       QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo))
+            else
+              UpdateReturningFieldList := ' RETURNING ' +
+                QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo))
+          end;
         end;
         if not (InternalCalcField or (faReadOnly in Attributes) or
            (DataType = ftUnknown)) then
         begin
-          if ( InsertFieldList <> '' ) then begin
-            InsertFieldList := InsertFieldList + ', ';
-            InsertParamList := InsertParamList + ', ';
+          if not IdentityColumn then
+          begin
+            if ( InsertFieldList <> '' ) then begin
+              InsertFieldList := InsertFieldList + ', ';
+              InsertParamList := InsertParamList + ', ';
+            end;
+            InsertFieldList := InsertFieldList +
+              QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo));
+            InsertParamList := InsertParamList + ':' +  Name;
           end;
           if (UpdateFieldList <> '') then begin
             UpdateFieldList := UpdateFieldList + ', ';
             if (DataType <> ftBlob) and (DataType <>ftMemo) then
               WhereAllFieldList := WhereAllFieldList + ' AND ';
           end;
-          if not IdentityColumn then
-            InsertFieldList := InsertFieldList +
-              QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo));
-          InsertParamList := InsertParamList + ':' +  Name;
           UpdateFieldList := UpdateFieldList +
             QuoteIdentifier(DataBase.SQLDialect, GetDBAliasName(FieldNo)) +
             ' = :' + Name;
@@ -1385,11 +1403,11 @@ begin
     InsertSQL.Text := 'insert into ' + {do not localize}
       QuoteIdentifier(DataBase.SQLDialect, FTableName) +
     ' (' + InsertFieldList + {do not localize}
-      ') values (' + InsertParamList + ')' + ReturningFieldList; {do not localize}
+      ') values (' + InsertParamList + ')' + InsertReturningFieldList; {do not localize}
     ModifySQL.Text := 'update ' +
       QuoteIdentifier(DataBase.SQLDialect, FTableName) +
       ' set ' + UpdateFieldList + {do not localize}
-      ' where RDB$DB_KEY = :IBX_INTERNAL_DBKEY' + ReturningFieldList; {do not localize}
+      ' where RDB$DB_KEY = :IBX_INTERNAL_DBKEY' + UpdateReturningFieldList; {do not localize}
     WhereAllRefreshSQL.Text := 'select ' +  {do not localize}
       QuoteIdentifier(DataBase.SQLDialect, FTableName) + '.*, '
       + 'RDB$DB_KEY as IBX_INTERNAL_DBKEY from ' {do not localize}

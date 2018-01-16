@@ -904,32 +904,38 @@ begin
       end;
     InsertSQL := InsertSQL + ')';
     Lines.Add(InsertSQL);
-    InsertSQL := '';
-    Separator := ' RETURNING ';
-    if IdentityCols.Active and (IdentityCols.RecordCount > 0) then
+
+    {Is database Firebird 2.1 or later?}
+    if (DatabaseInfo.ODSMajorVersion > 11) or
+        ((DatabaseInfo.ODSMajorVersion = 11) and (DatabaseInfo.ODSMinorVersion >= 1)) then
     begin
-      IdentityCols.First;
-      while not IdentityCols.Eof do
+      InsertSQL := '';
+      Separator := ' RETURNING ';
+      if IdentityCols.Active and (IdentityCols.RecordCount > 0) then
       begin
-        if (IdentityCols.FieldByName('Selected').AsInteger <> 0) and
-           (not PrimaryKeys.Active or not PrimaryKeys.Locate('columnName;Selected',
-                VarArrayOf([IdentityCols.FieldByName('ColumnName').AsString,0]),[loCaseInsensitive])) then
+        IdentityCols.First;
+        while not IdentityCols.Eof do
         begin
-          InsertSQL := InsertSQL + Separator + IdentityCols.FieldByName('ColumnName').AsString;
+          if (IdentityCols.FieldByName('Selected').AsInteger <> 0) and
+             (not PrimaryKeys.Active or not PrimaryKeys.Locate('columnName;Selected',
+                  VarArrayOf([IdentityCols.FieldByName('ColumnName').AsString,0]),[loCaseInsensitive])) then
+          begin
+            InsertSQL := InsertSQL + Separator + IdentityCols.FieldByName('ColumnName').AsString;
+            Separator := ', ';
+          end;
+          IdentityCols.Next;
+        end;
+      end;
+      for I := 0 to ReadOnlyFieldNames.Count - 1 do
+        begin
+          if QuotedStrings then
+            InsertSQL := InsertSQL + Separator + '"' + ReadOnlyFieldNames[I] + '"'
+          else
+            InsertSQL := InsertSQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,ReadOnlyFieldNames[I]);
           Separator := ', ';
         end;
-        IdentityCols.Next;
-      end;
+      Lines.Add(InsertSQL);
     end;
-    for I := 0 to ReadOnlyFieldNames.Count - 1 do
-      begin
-        if QuotedStrings then
-          InsertSQL := InsertSQL + Separator + '"' + ReadOnlyFieldNames[I] + '"'
-        else
-          InsertSQL := InsertSQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,ReadOnlyFieldNames[I]);
-        Separator := ', ';
-      end;
-    Lines.Add(InsertSQL);
     SQL.AddStrings(Lines);
   finally
     Lines.Free;
@@ -959,17 +965,23 @@ begin
       SQL.Add(UpdateSQL);
     end;
   AddWhereClause(QuotedStrings,SQL,true);
-  Separator := ' RETURNING A.';
-  UpdateSQL := '';
-  for I := 0 to ReadOnlyFieldNames.Count - 1 do
-    begin
-      if QuotedStrings then
-        UpdateSQL := UpdateSQL + Separator + '"' + ReadOnlyFieldNames[I] + '"'
-      else
-        UpdateSQL := UpdateSQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,ReadOnlyFieldNames[I]);
-      Separator := ', A.';
-    end;
-  SQL.Add(UpdateSQL);
+
+  {Is database Firebird 2.1 or later?}
+  if (DatabaseInfo.ODSMajorVersion > 11) or
+      ((DatabaseInfo.ODSMajorVersion = 11) and (DatabaseInfo.ODSMinorVersion >= 1)) then
+  begin
+    Separator := ' RETURNING A.';
+    UpdateSQL := '';
+    for I := 0 to ReadOnlyFieldNames.Count - 1 do
+      begin
+        if QuotedStrings then
+          UpdateSQL := UpdateSQL + Separator + '"' + ReadOnlyFieldNames[I] + '"'
+        else
+          UpdateSQL := UpdateSQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,ReadOnlyFieldNames[I]);
+        Separator := ', A.';
+      end;
+    SQL.Add(UpdateSQL);
+  end;
 end;
 
 procedure TIBSQLEditFrame.GenerateDeleteSQL(TableName: string;

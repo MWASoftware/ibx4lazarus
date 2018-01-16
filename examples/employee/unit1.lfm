@@ -623,6 +623,7 @@ object Form1: TForm1
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
+    ForcedRefresh = True
     AfterDelete = EmployeesAfterDelete
     AfterEdit = EmployeesAfterDelete
     AfterInsert = EmployeesAfterInsert
