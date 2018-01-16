@@ -2714,7 +2714,7 @@ end;
 
 procedure TIBCustomDataSet.SetDatabase(Value: TIBDatabase);
 begin
-  if (FBase.Database <> Value) then
+  if (csLoading in ComponentState) or (FBase.Database <> Value) then
   begin
     CheckDatasetClosed;
     InternalUnPrepare;

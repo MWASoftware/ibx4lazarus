@@ -652,7 +652,7 @@ end;
 
 procedure TCustomIBXScript.SetDatabase(AValue: TIBDatabase);
 begin
- if FDatabase = AValue then Exit;
+ if not (csLoading in ComponentState) and (FDatabase = AValue) then Exit;
  FDatabase := AValue;
  FISQL.Database := AValue;
  FIBXMLProcessor.Database := AValue;
