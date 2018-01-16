@@ -63,6 +63,9 @@ IBX Change Log  version                                    (2.2-0) Mon, 15 Jan 2
     which a stored procedure can be selected. With no package name selected, non-package
     stored procedures are listed.
 
+14. TIBXScript: turn off database login prompt when reconnecting - this avoids prompting
+    for password on reconnect.
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

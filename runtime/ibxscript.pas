@@ -566,11 +566,15 @@ begin
 end;
 
 procedure TCustomIBXScript.DoReconnect;
+var LoginPrompt: boolean;
 begin
   with GetTransaction do
     if InTransaction then Commit;
+  LoginPrompt := Database.LoginPrompt;
+  Database.LoginPrompt := false;
   Database.Connected := false;
   Database.Connected := true;
+  Database.LoginPrompt := LoginPrompt;
   GetTransaction.Active := true;
 end;
 
@@ -849,6 +853,8 @@ var  RegexObj: TRegExpr;
      param: string;
      Terminator: char;
      FileName: string;
+     DBConnected: boolean;
+     LoginPrompt: boolean;
 begin
   Result := false;
   ucStmt := AnsiUpperCase(stmt);
@@ -966,9 +972,13 @@ begin
       begin
         if Database.Attachment.CharSetName2CharSetID(param,charsetid) then
         begin
+          DBConnected := Database.Connected;
+          LoginPrompt := Database.LoginPrompt;
+          Database.LoginPrompt := false;
+          Database.Connected := false;
           Database.Params.Values['lc_ctype'] := param;
-          if Database.Connected then
-            DoReconnect;
+          Database.Connected := DBConnected;
+          Database.LoginPrompt := LoginPrompt;
         end
         else
           raise Exception.CreateFmt(sInvalidCharacterSet, [param,stmt]);
