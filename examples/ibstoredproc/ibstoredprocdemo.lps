@@ -30,13 +30,10 @@
         <ComponentName Value="DBCreateForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="49"/>
         <CursorPos X="8" Y="58"/>
         <UsageCount Value="20"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/ibxscript.pas"/>
@@ -57,10 +54,12 @@
       </Unit4>
       <Unit5>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="897"/>
-        <CursorPos Y="919"/>
+        <CursorPos X="31" Y="917"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="../../runtime/IBDatabase.pas"/>
