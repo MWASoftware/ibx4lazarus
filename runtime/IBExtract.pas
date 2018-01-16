@@ -2614,7 +2614,7 @@ end;
 
 procedure TIBExtract.SetDatabase(const Value: TIBDatabase);
 begin
-  if FDatabase <> Value then
+  if (csLoading in ComponentState) or (FDatabase <> Value) then
   begin
     FDatabase := Value;
     if (not Assigned(FTransaction)) and (FDatabase <> nil) then

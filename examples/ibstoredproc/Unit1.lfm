@@ -1,0 +1,194 @@
+object Form1: TForm1
+  Left = 777
+  Height = 534
+  Top = 253
+  Width = 656
+  Caption = 'IBStoredProc Demo'
+  ClientHeight = 534
+  ClientWidth = 656
+  DefaultMonitor = dmPrimary
+  OnCreate = FormCreate
+  OnShow = FormShow
+  Position = poDefaultSizeOnly
+  LCLVersion = '1.8.1.0'
+  object Label1: TLabel
+    Left = 26
+    Height = 14
+    Top = 8
+    Width = 77
+    Caption = 'Output Table'
+    ParentColor = False
+  end
+  object IBDynamicGrid1: TIBDynamicGrid
+    Left = 26
+    Height = 145
+    Top = 26
+    Width = 606
+    Anchors = [akTop, akLeft, akRight]
+    Color = clWindow
+    Columns = <    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Line No.'
+        Width = 100
+        FieldName = 'LINE_NUM'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Content'
+        Width = 150
+        FieldName = 'CONTENT'
+        AutoSizeColumn = True
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end>
+    DataSource = DataSource1
+    Scrollbars = ssAutoVertical
+    TabOrder = 0
+    ExpandEditorPanelBelowRow = False
+    Descending = False
+    EditorBorderStyle = bsSingle
+    DefaultPositionAtEnd = False
+  end
+  object Label2: TLabel
+    Left = 26
+    Height = 14
+    Top = 176
+    Width = 31
+    Caption = 'Lines'
+    ParentColor = False
+  end
+  object Memo1: TMemo
+    Left = 26
+    Height = 124
+    Top = 188
+    Width = 598
+    Anchors = [akTop, akLeft, akRight]
+    Lines.Strings = (
+      'Memo1'
+    )
+    ScrollBars = ssAutoBoth
+    TabOrder = 1
+  end
+  object Button1: TButton
+    Left = 520
+    Height = 28
+    Top = 351
+    Width = 107
+    Anchors = [akTop, akRight]
+    Caption = 'Populate Table'
+    OnClick = Button1Click
+    TabOrder = 2
+  end
+  object GetLinesBtn: TButton
+    Left = 520
+    Height = 28
+    Top = 390
+    Width = 107
+    Anchors = [akTop, akRight]
+    Caption = 'Get Lines'
+    OnClick = GetLinesBtnClick
+    TabOrder = 3
+  end
+  object Label3: TLabel
+    Left = 35
+    Height = 209
+    Top = 319
+    Width = 477
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoSize = False
+    Caption = 'This demonstrates the use of TIBStoredProc with the Firebird 3 packages example. A database is created in a temporary location when the application is first run. Once this completes, click on "Populate" now. This uses IBStoredProc2 to call the global stored procedure "test", which populates the temporary table displayed above.'#10#10'Now click on Get Lines. This uses IBStoredProc1 to call the GET_LINES procedure in the FB$OUT package. It returns a text blob which is then shown in the TMemo control.'#10#10'After the database has been created you can inspect the TIBStoredProc properties. However, note that under Windows you will have to first change the TIBDatabase.DatabaseName property to your user specific temporary file location.'
+    ParentColor = False
+    WordWrap = True
+  end
+  object IBDatabase1: TIBDatabase
+    Connected = False
+    CreateIfNotExists = True
+    AllowStreamedConnected = False
+    DatabaseName = '/tmp/sptest.fdb'
+    Params.Strings = (
+      'user_name=SYSDBA'
+    )
+    DefaultTransaction = IBTransaction1
+    IdleTimer = 0
+    TraceFlags = []
+    UseDefaultSystemCodePage = False
+    OnCreateDatabase = IBDatabase1CreateDatabase
+    left = 130
+    top = 65
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    DefaultDatabase = IBDatabase1
+    left = 240
+    top = 65
+  end
+  object IBStoredProc1: TIBStoredProc
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    PackageName = 'FB$OUT'
+    StoredProcName = 'GET_LINES'
+    Params = <    
+      item
+        DataType = ftBlob
+        Name = 'LINES'
+        ParamType = ptOutput
+      end>
+    left = 454
+    top = 68
+    ParamData = <    
+      item
+        DataType = ftBlob
+        Name = 'LINES'
+        ParamType = ptOutput
+      end>
+  end
+  object IBStoredProc2: TIBStoredProc
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    StoredProcName = 'TEST'
+    Params = <>
+    left = 551
+    top = 70
+  end
+  object IBQuery1: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.LINE_NUM, A.CONTENT From FB$OUT_TABLE A'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 133
+    top = 128
+  end
+  object DataSource1: TDataSource
+    DataSet = IBQuery1
+    left = 56
+    top = 129
+  end
+  object ApplicationProperties1: TApplicationProperties
+    OnIdle = ApplicationProperties1Idle
+    left = 239
+    top = 131
+  end
+  object IBDatabaseInfo1: TIBDatabaseInfo
+    Database = IBDatabase1
+    left = 368
+    top = 130
+  end
+end

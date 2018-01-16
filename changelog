@@ -1,4 +1,4 @@
-IBX Change Log  version                                    (2.2-0) Mon, 15 Jan 2018 23:43:19 +0000
+IBX Change Log  version                                     (2.2-0) Tue, 16 Jan 2018 16:49:07 +0000
 
 1. IBExtract: Identity columns - add additional check for null column for generator name.
 
@@ -62,6 +62,9 @@ IBX Change Log  version                                    (2.2-0) Mon, 15 Jan 2
     a "Package Name" drop down box to allow selection of a Firebird 3 Package from
     which a stored procedure can be selected. With no package name selected, non-package
     stored procedures are listed.
+
+14. TIBXScript: turn off database login prompt when reconnecting - this avoids prompting
+    for password on reconnect.
 
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000

@@ -1,0 +1,42 @@
+object DBCreateForm: TDBCreateForm
+  Left = 1002
+  Height = 96
+  Top = 415
+  Width = 320
+  Caption = 'Please Wait'
+  ClientHeight = 96
+  ClientWidth = 320
+  FormStyle = fsSystemStayOnTop
+  OnShow = FormShow
+  Position = poScreenCenter
+  LCLVersion = '1.8.1.0'
+  object Panel1: TPanel
+    Left = 0
+    Height = 96
+    Top = 0
+    Width = 320
+    Align = alClient
+    BevelInner = bvLowered
+    Caption = 'Creating Database'
+    ClientHeight = 96
+    ClientWidth = 320
+    TabOrder = 0
+    object ProgressBar1: TProgressBar
+      Left = 40
+      Height = 20
+      Top = 64
+      Width = 232
+      Style = pbstMarquee
+      TabOrder = 0
+    end
+  end
+  object IBXScript1: TIBXScript
+    Database = Form1.IBDatabase1
+    IgnoreGrants = False
+    Transaction = Form1.IBTransaction1
+    ShowAffectedRows = False
+    ShowPerformanceStats = False
+    left = 264
+    top = 8
+  end
+end
