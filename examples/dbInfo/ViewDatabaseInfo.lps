@@ -19,6 +19,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="71"/>
         <CursorPos X="13" Y="86"/>
         <UsageCount Value="25"/>
@@ -195,12 +196,10 @@
       </Unit24>
       <Unit25>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="2715"/>
         <CursorPos X="39" Y="2717"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit25>
       <Unit26>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
@@ -210,7 +209,7 @@
         <UsageCount Value="10"/>
       </Unit26>
     </Units>
-    <JumpHistory Count="17" HistoryIndex="16">
+    <JumpHistory Count="15" HistoryIndex="14">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="9" Column="7"/>
@@ -271,14 +270,6 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="60" TopLine="57"/>
       </Position15>
-      <Position16>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="5024" Column="3" TopLine="5022"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <Caret Line="491" Column="15" TopLine="474"/>
-      </Position17>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
