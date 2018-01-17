@@ -19,6 +19,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <CursorPos X="30" Y="9"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
@@ -54,12 +55,10 @@
       </Unit4>
       <Unit5>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="897"/>
         <CursorPos X="31" Y="917"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -121,8 +120,8 @@
       <Unit14>
         <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="481"/>
-        <CursorPos X="24" Y="488"/>
+        <TopLine Value="98"/>
+        <CursorPos X="12" Y="117"/>
         <UsageCount Value="10"/>
       </Unit14>
       <Unit15>
@@ -141,7 +140,7 @@
       <Unit17>
         <Filename Value="../../../fbintf/client/3.0/FB30Attachment.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="189"/>
+        <TopLine Value="62"/>
         <CursorPos X="70" Y="207"/>
         <UsageCount Value="10"/>
       </Unit17>
