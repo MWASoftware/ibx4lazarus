@@ -430,12 +430,12 @@ var
       Query.SQL.Text := 'Select ''foo'' from RDB$RELATION_CONSTRAINTS ' +
         'where RDB$RELATION_NAME = ' +
         '''' +
-        FormatIdentifierValue(Database.SQLDialect,
+        ExtractIdentifier(Database.SQLDialect,
           QuoteIdentifier(DataBase.SQLDialect, FTableName)) +
         ''' ' +
         ' AND RDB$CONSTRAINT_NAME = ' +
         '''' +
-        FormatIdentifierValue(Database.SQLDialect,
+        ExtractIdentifier(Database.SQLDialect,
           QuoteIdentifier(DataBase.SQLDialect, Name)) +
         ''' ' +
         'AND RDB$CONSTRAINT_TYPE = ''PRIMARY KEY''';
@@ -467,12 +467,12 @@ var
       Query.SQL.Text := 'Select RDB$CONSTRAINT_NAME from RDB$RELATION_CONSTRAINTS ' +
         'where RDB$RELATION_NAME = ' +
         '''' +
-        FormatIdentifierValue(Database.SQLDialect,
+        ExtractIdentifier(Database.SQLDialect,
           QuoteIdentifier(DataBase.SQLDialect, FTableName)) +
         ''' ' +
         'AND RDB$INDEX_NAME = ' +
         '''' +
-        FormatIdentifierValue(Database.SQLDialect,
+        ExtractIdentifier(Database.SQLDialect,
           QuoteIdentifier(DataBase.SQLDialect, Name)) +
         ''' ' +
         'AND RDB$CONSTRAINT_TYPE = ''PRIMARY KEY''';
@@ -588,7 +588,7 @@ begin
     'I.RDB$SEGMENT_COUNT, S.RDB$FIELD_NAME from RDB$INDICES I, ' + {do not localize}
     'RDB$INDEX_SEGMENTS S where I.RDB$INDEX_NAME = S.RDB$INDEX_NAME '+ {do not localize}
     'and I.RDB$RELATION_NAME = ' + '''' + {do not localize}
-     FormatIdentifierValue(Database.SQLDialect,
+     ExtractIdentifier(Database.SQLDialect,
        QuoteIdentifier(DataBase.SQLDialect, FTableName)) + '''';
     Query.Prepare;
     Query.ExecQuery;
@@ -620,7 +620,7 @@ begin
           SubQuery.SQL.Text :=
          'Select RDB$FIELD_NAME from RDB$INDEX_SEGMENTS where RDB$INDEX_NAME = ' + {do not localize}
           '''' +
-          FormatIdentifierValue(Database.SQLDialect,
+          ExtractIdentifier(Database.SQLDialect,
             QuoteIdentifier(DataBase.SQLDialect, Name)) +
           '''' + 'ORDER BY RDB$FIELD_POSITION'; {do not localize}
           SubQuery.Prepare;
@@ -671,7 +671,7 @@ begin
     Query.SQL.Text :=
     'Select USER from RDB$RELATIONS where RDB$RELATION_NAME = ' + {do not localize}
     '''' +
-    FormatIdentifierValue(Database.SQLDialect,
+    ExtractIdentifier(Database.SQLDialect,
       QuoteIdentifier(DataBase.SQLDialect, FTableName)) + '''';
     Query.Prepare;
     Query.ExecQuery;
@@ -918,7 +918,7 @@ begin
     Query.SQL.Text := 'Select RDB$SYSTEM_FLAG, RDB$DBKEY_LENGTH ' + {do not localize}
                     'from RDB$RELATIONS where RDB$RELATION_NAME = ' + {do not localize}
                     '''' +
-                    FormatIdentifierValue(Database.SQLDialect,
+                    ExtractIdentifier(Database.SQLDialect,
                       QuoteIdentifier(DataBase.SQLDialect, FTableName)) + '''';
     Query.Prepare;
     Query.ExecQuery;

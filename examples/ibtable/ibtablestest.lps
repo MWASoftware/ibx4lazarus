@@ -20,8 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="63"/>
-        <CursorPos Y="94"/>
+        <TopLine Value="62"/>
+        <CursorPos X="41" Y="79"/>
         <UsageCount Value="31"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -93,8 +93,8 @@
       <Unit11>
         <Filename Value="../../runtime/IBTable.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="212"/>
-        <CursorPos X="11" Y="244"/>
+        <TopLine Value="1304"/>
+        <CursorPos X="18" Y="1317"/>
         <UsageCount Value="10"/>
       </Unit11>
       <Unit12>

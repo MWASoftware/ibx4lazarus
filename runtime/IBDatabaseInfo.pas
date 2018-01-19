@@ -250,12 +250,14 @@ end;
 
 function TIBDatabaseInfo.GetODSMinorVersion: Long;
 begin
-  result := GetLongDatabaseInfo(isc_info_ods_minor_version);
+  CheckDatabase;
+  Result := Database.Attachment.GetODSMinorVersion;
 end;
 
 function TIBDatabaseInfo.GetODSMajorVersion: Long;
 begin
-  result := GetLongDatabaseInfo(isc_info_ods_version);
+  CheckDatabase;
+  Result := Database.Attachment.GetODSMajorVersion;
 end;
 
 function TIBDatabaseInfo.GetPageSize: Long;
