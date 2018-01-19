@@ -43,11 +43,6 @@ type
   { TIBDatabaseInfo }
 
   TIBDatabaseInfo = class(TComponent)
-  private
-    FODSMajorVersion: Long;
-    FODSMinorVersion: Long;
-    procedure GetODSVersionInfo;
-    procedure SetDatabase(AValue: TIBDatabase);
   protected
     FDatabase: TIBDatabase;
     FUserNames   : TStringList;
@@ -129,7 +124,7 @@ type
     property DBSQLDialect : Long read GetDBSQLDialect;
     property ReadOnly: Long read GetReadOnly;
   published
-    property Database: TIBDatabase read FDatabase write SetDatabase;
+    property Database: TIBDatabase read FDatabase write FDatabase;
   end;
 
 implementation
@@ -151,8 +146,6 @@ begin
   FReadIdxCount                        := nil;
   FReadSeqCount                        := nil;
   FUpdateCount                         := nil;
-  FODSMajorVersion := -1;
-  FODSMinorVersion := -1;
 end;
 
 destructor TIBDatabaseInfo.Destroy;
@@ -167,30 +160,6 @@ begin
   if assigned(FReadSeqCount) then FReadSeqCount.Free;
   if assigned(FUpdateCount) then FUpdateCount.Free;
   inherited Destroy;
-end;
-
-procedure TIBDatabaseInfo.GetODSVersionInfo;
-var DBInfo: IDBInformation;
-    i: integer;
-begin
-  CheckDatabase;
-  DBInfo := Database.Attachment.GetDBInformation([isc_info_db_id,isc_info_ods_version,isc_info_ods_minor_version]);
-  for i := 0 to DBInfo.GetCount - 1 do
-    with DBInfo[i] do
-      case getItemType of
-      isc_info_ods_minor_version:
-        FODSMinorVersion := getAsInteger;
-      isc_info_ods_version:
-        FODSMajorVersion := getAsInteger;
-      end;
-end;
-
-procedure TIBDatabaseInfo.SetDatabase(AValue: TIBDatabase);
-begin
-  if FDatabase = AValue then Exit;
-  FDatabase := AValue;
-  FODSMajorVersion := -1;
-  FODSMinorVersion := -1;
 end;
 
 procedure TIBDatabaseInfo.CheckDatabase;
@@ -281,16 +250,14 @@ end;
 
 function TIBDatabaseInfo.GetODSMinorVersion: Long;
 begin
-   if FODSMinorVersion = -1 then
-     GetODSVersionInfo;
-   Result := FODSMinorVersion;
+  CheckDatabase;
+  Result := Database.Attachment.GetODSMinorVersion;
 end;
 
 function TIBDatabaseInfo.GetODSMajorVersion: Long;
 begin
-  if FODSMajorVersion = -1 then
-    GetODSVersionInfo;
-  Result := FODSMajorVersion;
+  CheckDatabase;
+  Result := Database.Attachment.GetODSMajorVersion;
 end;
 
 function TIBDatabaseInfo.GetPageSize: Long;
