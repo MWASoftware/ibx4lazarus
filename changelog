@@ -66,6 +66,9 @@ IBX Change Log  version                                     (2.2-0) Tue, 16 Jan 
 14. TIBXScript: turn off database login prompt when reconnecting - this avoids prompting
     for password on reconnect.
 
+15. IBDatabase: use IAttachment for connection default character set id, code page
+    and character set name.
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

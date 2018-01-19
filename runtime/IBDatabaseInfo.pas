@@ -43,6 +43,11 @@ type
   { TIBDatabaseInfo }
 
   TIBDatabaseInfo = class(TComponent)
+  private
+    FODSMajorVersion: integer;
+    FODSMinorVersion: integer;
+    procedure GetODSVersionInfo;
+    procedure SetDatabase(AValue: TIBDatabase);
   protected
     FDatabase: TIBDatabase;
     FUserNames   : TStringList;
@@ -62,8 +67,8 @@ type
     function GetDBImplementationNo: Long;
     function GetDBImplementationClass: Long;
     function GetNoReserve: Long;
-    function GetODSMinorVersion: Long;
-    function GetODSMajorVersion: Long;
+    function GetODSMinorVersion: integer;
+    function GetODSMajorVersion: integer;
     function GetPageSize: Long;
     function GetVersion: String;
     function GetCurrentMemory: Long;
@@ -99,8 +104,8 @@ type
     property DBImplementationNo: Long read GetDBImplementationNo;
     property DBImplementationClass: Long read GetDBImplementationClass;
     property NoReserve: Long read GetNoReserve;
-    property ODSMinorVersion: Long read GetODSMinorVersion;
-    property ODSMajorVersion: Long read GetODSMajorVersion;
+    property ODSMinorVersion: integer read GetODSMinorVersion;
+    property ODSMajorVersion: integer read GetODSMajorVersion;
     property PageSize: Long read GetPageSize;
     property Version: String read GetVersion;
     property CurrentMemory: Long read GetCurrentMemory;
@@ -124,7 +129,7 @@ type
     property DBSQLDialect : Long read GetDBSQLDialect;
     property ReadOnly: Long read GetReadOnly;
   published
-    property Database: TIBDatabase read FDatabase write FDatabase;
+    property Database: TIBDatabase read FDatabase write SetDatabase;
   end;
 
 implementation
@@ -146,6 +151,8 @@ begin
   FReadIdxCount                        := nil;
   FReadSeqCount                        := nil;
   FUpdateCount                         := nil;
+  FODSMajorVersion := -1;
+  FODSMinorVersion := -1;
 end;
 
 destructor TIBDatabaseInfo.Destroy;
@@ -160,6 +167,30 @@ begin
   if assigned(FReadSeqCount) then FReadSeqCount.Free;
   if assigned(FUpdateCount) then FUpdateCount.Free;
   inherited Destroy;
+end;
+
+procedure TIBDatabaseInfo.GetODSVersionInfo;
+var DBInfo: IDBInformation;
+    i: integer;
+begin
+  CheckDatabase;
+  DBInfo := Database.Attachment.GetDBInformation([isc_info_db_id,isc_info_ods_version,isc_info_ods_minor_version]);
+  for i := 0 to DBInfo.GetCount - 1 do
+    with DBInfo[i] do
+      case getItemType of
+      isc_info_ods_minor_version:
+        FODSMinorVersion := getAsInteger;
+      isc_info_ods_version:
+        FODSMajorVersion := getAsInteger;
+      end;
+end;
+
+procedure TIBDatabaseInfo.SetDatabase(AValue: TIBDatabase);
+begin
+  if FDatabase = AValue then Exit;
+  FDatabase := AValue;
+  FODSMajorVersion := -1;
+  FODSMinorVersion := -1;
 end;
 
 procedure TIBDatabaseInfo.CheckDatabase;
@@ -248,14 +279,18 @@ begin
   result := GetLongDatabaseInfo(isc_info_no_reserve);
 end;
 
-function TIBDatabaseInfo.GetODSMinorVersion: Long;
+function TIBDatabaseInfo.GetODSMinorVersion: integer;
 begin
-  result := GetLongDatabaseInfo(isc_info_ods_minor_version);
+   if FODSMinorVersion = -1 then
+     GetODSVersionInfo;
+   Result := FODSMinorVersion;
 end;
 
-function TIBDatabaseInfo.GetODSMajorVersion: Long;
+function TIBDatabaseInfo.GetODSMajorVersion: integer;
 begin
-  result := GetLongDatabaseInfo(isc_info_ods_version);
+  if FODSMajorVersion = -1 then
+    GetODSVersionInfo;
+  Result := FODSMajorVersion;
 end;
 
 function TIBDatabaseInfo.GetPageSize: Long;

@@ -171,9 +171,6 @@ type
     FAttachment: IAttachment;
     FCreateDatabase: boolean;
     FCreateIfNotExists: boolean;
-    FDefaultCharSetID: integer;
-    FDefaultCharSetName: RawByteString;
-    FDefaultCodePage: TSystemCodePage;
     FDPB: IDPB;
     FAllowStreamedConnected: boolean;
     FHiddenPassword: string;
@@ -199,6 +196,9 @@ type
     FUseDefaultSystemCodePage: boolean;
     procedure EnsureInactive;
     function GetDBSQLDialect: Integer;
+    function GetDefaultCharSetID: integer;
+    function GetDefaultCharSetName: AnsiString;
+    function GetDefaultCodePage: TSystemCodePage;
     function GetSQLDialect: Integer;
     procedure SetSQLDialect(const Value: Integer);
     procedure ValidateClientSQLDialect;
@@ -263,9 +263,9 @@ type
     property TransactionCount: Integer read GetTransactionCount;
     property Transactions[Index: Integer]: TIBTransaction read GetTransaction;
     property InternalTransaction: TIBTransaction read FInternalTransaction;
-    property DefaultCharSetName: RawByteString read FDefaultCharSetName;
-    property DefaultCharSetID: integer read FDefaultCharSetID;
-    property DefaultCodePage: TSystemCodePage read FDefaultCodePage;
+    property DefaultCharSetName: AnsiString read GetDefaultCharSetName;
+    property DefaultCharSetID: integer read GetDefaultCharSetID;
+    property DefaultCodePage: TSystemCodePage read GetDefaultCodePage;
 
   published
     property Connected;
@@ -597,9 +597,6 @@ begin
   if Connected then
     InternalClose(False);
   FDBSQLDialect := 1;
-  FDefaultCharSetName := '';
-  FDefaultCharSetID := 0;
-  FDefaultCodePage := CP_NONE;
 end;
 
   procedure TIBDataBase.CreateDatabase;
@@ -660,7 +657,7 @@ begin
     end;
 end;
 
- function TIBDataBase.FindDefaultTransaction: TIBTransaction;
+  function TIBDataBase.FindDefaultTransaction(): TIBTransaction;
 var
   i: Integer;
 begin
@@ -940,6 +937,7 @@ var
   aDBName: string;
   Status: IStatus;
   CharSetID: integer;
+  CharSetName: AnsiString;
 begin
   CheckInactive;
   CheckDatabaseName;
@@ -1029,10 +1027,10 @@ begin
        if Attachment.CodePage2CharSetID(DefaultSystemCodePage,CharSetID) then
        {$endif}
        begin
-         FDefaultCharSetName := Attachment.GetCharsetName(CharSetID);
-         if FDefaultCharSetName <> AnsiUpperCase(TempDBParams.Values['lc_ctype']) then
+         CharSetName := Attachment.GetCharsetName(CharSetID);
+         if CharSetName <> AnsiUpperCase(TempDBParams.Values['lc_ctype']) then
          begin
-           TempDBParams.Values['lc_ctype'] := FDefaultCharSetName;
+           TempDBParams.Values['lc_ctype'] := CharSetName;
            FDBParamsChanged := True;
            FAttachment := nil;
          end
@@ -1041,13 +1039,9 @@ begin
 
    until FAttachment <> nil;
 
-   FDefaultCharSetName := AnsiUpperCase(TempDBParams.Values['lc_ctype']);
   finally
    TempDBParams.Free;
   end;
-  if FDefaultCharSetName <> '' then
-    Attachment.CharSetName2CharSetID(FDefaultCharSetName,FDefaultCharSetID);
-  Attachment.CharSetID2CodePage(FDefaultCharSetID,FDefaultCodePage);
 
   if not (csDesigning in ComponentState) then
     FDBName := aDBName; {Synchronise at run time}
@@ -1258,6 +1252,30 @@ begin
   DatabaseInfo.Free;
 end;
 
+function TIBDataBase.GetDefaultCharSetID: integer;
+begin
+  if (Attachment <> nil) and Attachment.HasDefaultCharSet then
+    Result := Attachment.GetDefaultCharSetID
+  else
+    Result := 0;
+end;
+
+function TIBDataBase.GetDefaultCharSetName: AnsiString;
+begin
+  if Attachment <> nil then
+    Result := Attachment.GetCharsetName(DefaultCharSetID)
+  else
+    Result := '';
+end;
+
+function TIBDataBase.GetDefaultCodePage: TSystemCodePage;
+begin
+  if Attachment <> nil then
+    Attachment.CharSetID2CodePage(DefaultCharSetID,Result)
+  else
+    Result := CP_NONE;
+end;
+
  procedure TIBDataBase.ValidateClientSQLDialect;
 begin
   if (FDBSQLDialect < FSQLDialect) then
@@ -1348,12 +1366,10 @@ begin
     Query.Database := Self;
     Query.Transaction := FInternalTransaction;
     Query.SQL.Text := 'Select R.RDB$FIELD_NAME ' + {do not localize}
-      'from RDB$RELATION_FIELDS R, RDB$FIELDS F ' + {do not localize}
+      'from RDB$RELATION_FIELDS R ' + {do not localize}
       'where R.RDB$RELATION_NAME = ' + {do not localize}
-      '''' +
-      ExtractIdentifier(SQLDialect, TableName) +
-      ''' ' +
-      'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '; {do not localize}
+      '''' + ExtractIdentifier(SQLDialect, TableName) +
+      ''' and Exists(Select * From RDB$FIELDS F Where R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME)' ; {do not localize}
     Query.Prepare;
     Query.ExecQuery;
     with List do
