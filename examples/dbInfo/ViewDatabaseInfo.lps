@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="29">
+    <Units Count="31">
       <Unit0>
         <Filename Value="ViewDatabaseInfo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -19,7 +19,6 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="62"/>
         <CursorPos X="13" Y="86"/>
         <UsageCount Value="25"/>
@@ -40,8 +39,8 @@
       <Unit3>
         <Filename Value="../../runtime/IBDatabaseInfo.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="158"/>
-        <CursorPos X="7" Y="177"/>
+        <TopLine Value="172"/>
+        <CursorPos X="3" Y="176"/>
         <UsageCount Value="11"/>
       </Unit3>
       <Unit4>
@@ -222,6 +221,23 @@
         <CursorPos Y="528"/>
         <UsageCount Value="10"/>
       </Unit28>
+      <Unit29>
+        <Filename Value="../../../fbintf/IBExternals.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="38"/>
+        <CursorPos X="3" Y="57"/>
+        <UsageCount Value="10"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="../../changelog"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="34"/>
+        <CursorPos X="13" Y="73"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit30>
     </Units>
     <JumpHistory Count="10" HistoryIndex="9">
       <Position1>

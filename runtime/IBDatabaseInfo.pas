@@ -44,8 +44,8 @@ type
 
   TIBDatabaseInfo = class(TComponent)
   private
-    FODSMajorVersion: integer;
-    FODSMinorVersion: integer;
+    FODSMajorVersion: Long;
+    FODSMinorVersion: Long;
     procedure GetODSVersionInfo;
     procedure SetDatabase(AValue: TIBDatabase);
   protected
@@ -67,8 +67,8 @@ type
     function GetDBImplementationNo: Long;
     function GetDBImplementationClass: Long;
     function GetNoReserve: Long;
-    function GetODSMinorVersion: integer;
-    function GetODSMajorVersion: integer;
+    function GetODSMinorVersion: Long;
+    function GetODSMajorVersion: Long;
     function GetPageSize: Long;
     function GetVersion: String;
     function GetCurrentMemory: Long;
@@ -104,8 +104,8 @@ type
     property DBImplementationNo: Long read GetDBImplementationNo;
     property DBImplementationClass: Long read GetDBImplementationClass;
     property NoReserve: Long read GetNoReserve;
-    property ODSMinorVersion: integer read GetODSMinorVersion;
-    property ODSMajorVersion: integer read GetODSMajorVersion;
+    property ODSMinorVersion: Long read GetODSMinorVersion;
+    property ODSMajorVersion: Long read GetODSMajorVersion;
     property PageSize: Long read GetPageSize;
     property Version: String read GetVersion;
     property CurrentMemory: Long read GetCurrentMemory;
@@ -279,14 +279,14 @@ begin
   result := GetLongDatabaseInfo(isc_info_no_reserve);
 end;
 
-function TIBDatabaseInfo.GetODSMinorVersion: integer;
+function TIBDatabaseInfo.GetODSMinorVersion: Long;
 begin
    if FODSMinorVersion = -1 then
      GetODSVersionInfo;
    Result := FODSMinorVersion;
 end;
 
-function TIBDatabaseInfo.GetODSMajorVersion: integer;
+function TIBDatabaseInfo.GetODSMajorVersion: Long;
 begin
   if FODSMajorVersion = -1 then
     GetODSVersionInfo;
