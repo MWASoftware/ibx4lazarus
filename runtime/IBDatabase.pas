@@ -1351,7 +1351,7 @@ begin
       'from RDB$RELATION_FIELDS R, RDB$FIELDS F ' + {do not localize}
       'where R.RDB$RELATION_NAME = ' + {do not localize}
       '''' +
-      FormatIdentifierValue(SQLDialect, TableName) +
+      ExtractIdentifier(SQLDialect, TableName) +
       ''' ' +
       'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '; {do not localize}
     Query.Prepare;

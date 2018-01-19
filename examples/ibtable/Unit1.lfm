@@ -148,7 +148,7 @@ object Form1: TForm1
     end
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = False
     AllowStreamedConnected = False
@@ -172,7 +172,7 @@ object Form1: TForm1
       'rec_version'
       'nowait'
     )
-    left = 232
+    left = 272
     top = 24
   end
   object Depts: TIBTable
@@ -189,7 +189,7 @@ object Form1: TForm1
     IndexFieldNames = 'DEPT_NO'
     ReadOnly = True
     TableName = 'DEPARTMENT'
-    left = 314
+    left = 424
     top = 24
     object DeptsDEPT_NO: TIBStringField
       DisplayWidth = 3
@@ -273,12 +273,12 @@ object Form1: TForm1
   end
   object DataSource2: TDataSource
     DataSet = Depts
-    left = 272
+    left = 360
     top = 24
   end
   object Datasource1: TDataSource
     DataSet = Employees
-    left = 368
+    left = 496
     top = 24
   end
   object Employees: TIBTable
@@ -296,7 +296,7 @@ object Form1: TForm1
     MasterFields = 'DEPT_NO'
     MasterSource = DataSource2
     TableName = 'EMPLOYEE'
-    left = 416
+    left = 576
     top = 24
     object EmployeesEMP_NO: TSmallintField
       DisplayWidth = 10
