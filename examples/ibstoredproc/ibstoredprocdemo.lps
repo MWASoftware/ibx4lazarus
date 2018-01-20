@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="22">
+    <Units Count="23">
       <Unit0>
         <Filename Value="ibstoredprocdemo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -172,6 +172,13 @@
         <CursorPos X="40" Y="225"/>
         <UsageCount Value="10"/>
       </Unit21>
+      <Unit22>
+        <Filename Value="fbout-header.sql"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="SQL"/>
+      </Unit22>
     </Units>
     <JumpHistory Count="5" HistoryIndex="4">
       <Position1>
