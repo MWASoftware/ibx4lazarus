@@ -951,14 +951,14 @@ var separator: string;
     Result := '';
     case Phase of
     tpCreate:
-     Result := 'CREATE ' + ObjectName;
+     Result := separator + 'CREATE ' + ObjectName;
     tpAlter:
-     Result := 'ALTER ' + ObjectName;
+     Result := separator + 'ALTER ' + ObjectName;
     tpDrop:
-     Result := 'Drop ' + ObjectName;
+     Result := separator + 'Drop ' + ObjectName;
     end;
     if Result <> '' then
-      separator := ' or ';
+      separator := ' OR ';
   end;
 
 begin
@@ -988,6 +988,7 @@ begin
     else
       Result := 'BEFORE ';
     TypeID := TypeID shr 1;
+    separator := '';
     i := 0;
     if TypeID = AllDDLTriggers then
       Result += 'ANY DDL STATEMENT'
