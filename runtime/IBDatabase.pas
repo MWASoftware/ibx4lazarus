@@ -476,7 +476,7 @@ function GenerateTPB(sl: TStrings): ITPB;
 implementation
 
 uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
-     typInfo, FBMessages, IBErrorCodes, RegExpr;
+     typInfo, FBMessages, IBErrorCodes;
 
 { TIBDatabase }
 
@@ -608,20 +608,10 @@ begin
 end;
 
 procedure TIBDataBase.CreateDatabase(createDatabaseSQL: string);
-var RegexObj: TRegExpr;
 begin
   CheckInactive;
   FAttachment := FirebirdAPI.CreateDatabase(createDatabaseSQL,FSQLDialect);
-  RegexObj := TRegExpr.Create;
-  try
-    {extact database file spec}
-    RegexObj.ModifierG := false; {turn off greedy matches}
-    RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +''(.*)''';
-    if RegexObj.Exec(AnsiUpperCase(createDatabaseSQL)) then
-      FDBName := system.copy(createDatabaseSQL,RegexObj.MatchPos[2],RegexObj.MatchLen[2]);
-  finally
-    RegexObj.Free;
-  end;
+  FDBName := Attachment.GetConnectString;
   if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
     OnCreateDatabase(self);
 end;

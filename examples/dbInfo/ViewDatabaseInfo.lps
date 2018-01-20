@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="31">
+    <Units Count="33">
       <Unit0>
         <Filename Value="ViewDatabaseInfo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -20,8 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="62"/>
-        <CursorPos X="13" Y="86"/>
+        <TopLine Value="58"/>
+        <CursorPos X="61" Y="72"/>
         <UsageCount Value="25"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -40,15 +40,15 @@
       <Unit3>
         <Filename Value="../../runtime/IBDatabaseInfo.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="130"/>
-        <CursorPos Y="149"/>
+        <TopLine Value="192"/>
+        <CursorPos X="51" Y="198"/>
         <UsageCount Value="11"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="898"/>
-        <CursorPos X="14" Y="913"/>
+        <TopLine Value="109"/>
+        <CursorPos X="18" Y="137"/>
         <UsageCount Value="11"/>
       </Unit4>
       <Unit5>
@@ -237,8 +237,21 @@
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit30>
+      <Unit31>
+        <Filename Value="../../../fbintf/include/consts_pub.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="178"/>
+        <UsageCount Value="10"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="../../../fbintf/include/inf_pub.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="25"/>
+        <CursorPos X="9" Y="42"/>
+        <UsageCount Value="10"/>
+      </Unit32>
     </Units>
-    <JumpHistory Count="10" HistoryIndex="9">
+    <JumpHistory Count="11" HistoryIndex="10">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="65" Column="71" TopLine="53"/>
@@ -279,6 +292,10 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="60" TopLine="57"/>
       </Position10>
+      <Position11>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="72" Column="61" TopLine="58"/>
+      </Position11>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

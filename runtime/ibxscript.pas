@@ -566,15 +566,14 @@ begin
 end;
 
 procedure TCustomIBXScript.DoReconnect;
-var LoginPrompt: boolean;
 begin
   with GetTransaction do
     if InTransaction then Commit;
-  LoginPrompt := Database.LoginPrompt;
-  Database.LoginPrompt := false;
-  Database.Connected := false;
-  Database.Connected := true;
-  Database.LoginPrompt := LoginPrompt;
+  if (Database <> nil) and (Database.Attachment <> nil) then
+  begin
+    Database.Attachment.Disconnect;
+    Database.Attachment.Connect;
+  end;
   GetTransaction.Active := true;
 end;
 
