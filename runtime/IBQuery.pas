@@ -135,6 +135,7 @@ type
     property TransactionFree;
     property OnFilterRecord;
     property OnValidatePost;
+    property OnDeleteReturning;
 end;
 
 implementation

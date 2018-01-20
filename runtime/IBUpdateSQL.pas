@@ -109,7 +109,7 @@ begin
 //    if RowsAffected <> 1 then IBError(ibxeUpdateFailed, [nil]);
 // Commented out in release 1.2
     if FieldCount > 0 then  {Has RETURNING Clause}
-      UpdateRecordFromQuery(Current,Buff);
+      UpdateRecordFromQuery(UpdateKind,Current,Buff);
   end;
 end;
 

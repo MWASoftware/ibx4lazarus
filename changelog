@@ -20,56 +20,65 @@ IBX Change Log  version                                       (2.2-0) Sat, 20 Ja
    This behaviour change is intended to be backwards compatible and there should be no need to change 
    existing programs, other than to improve performance by using the new capability.
 
-3. TIBTable: generated Insert and Update SQL now include a RETURNING clause for
+3. IBCustomDataSet: DELETE...RETURNING queries are now also recognised. However, as
+   they are called when the dataset row is being deleted, there is no value in
+   updating the current record from the query result. Instead, a new event handler
+   "OnDeleteReturning" is provided. If a DELETE...RETURNING query is execute and
+   an OnDeleteReturning event handler is provided then it is called with the IResults returned
+   by the query. The event handler can then interrogate the query results and
+   perform whatever action is necessary. For example to confirm, to the user,
+   the deletion of a row with the returned values.
+
+4. TIBTable: generated Insert and Update SQL now include a RETURNING clause for
    any Computed By or Identity Columns. The IBTables example has been updated to
    illustrate the computation of the employee Full Name on update.
 
-4. TIBTable: The GeneratorField property is now published.
+5. TIBTable: The GeneratorField property is now published.
 
-5. The InsertSQL property editor now shows Firebird 3 Identity columns separate from the Field List.
+6. The InsertSQL property editor now shows Firebird 3 Identity columns separate from the Field List.
    When InsertSQL is generated, the Identity columns are not included in the list of values to
    be inserted. A RETURNING clause is added to the insert statement to return the value of
    each Identity column after the insert is executed.
 
-6. The Modify Property Editor now generates Update SQL with Computed By fields in Update..Returning clause.
+7. The Modify Property Editor now generates Update SQL with Computed By fields in Update..Returning clause.
    Similarly Insert Property Editor now generates Insert SQL with Computed By fields in
    Insert..Returning clause.
 
-7. TIBGenerator: small performance improvement by not preparing query each time
+8. TIBGenerator: small performance improvement by not preparing query each time
    a new value is generated.
 
-8. TIBSQL: Free resources when transaction changed - ensures new transaction is used.
+9. TIBSQL: Free resources when transaction changed - ensures new transaction is used.
 
-9. Property editors will now sync table name to a System Table when "Include System
-   Tables" is selected and the query is for a System Table.
+10. Property editors will now sync table name to a System Table when "Include System
+    Tables" is selected and the query is for a System Table.
 
-10. Minor Performance improvement to handling of Date/Time types in IBX datasets. Field
+11. Minor Performance improvement to handling of Date/Time types in IBX datasets. Field
     values are no longer converted to milliseconds from TDateTime and then back again
     to TDateTime (the conversion to milliseconds is the default TDataset approach).
 
-11. Property Editors handling of Stored Procedures.
+12. Property Editors handling of Stored Procedures.
     * Select and Refresh: only show a list of stored procedures that return multiple rows (proc type 1) and
       which have a non-empty list of output parameters (i.e. stored procedures that may be used in a select
       query).
     * Modify and Insert: only show a list of stored procedures that return at most a singleton row (proc type 2).
 
-12. IBStoredProc: Now supports Firebird 3 Package Names. A new published property PackageName
+13. IBStoredProc: Now supports Firebird 3 Package Names. A new published property PackageName
     can be used to select a package. If non-empty, the stored procedure name is
     expected to be a stored procedure defined in the specified package and the
     generated SQL will be as required for a stored procedure located in a package.
 
-13. Select, Refresh, Insert, Modify, Delete and TIBSQL SQL Property Editors now include
+14. Select, Refresh, Insert, Modify, Delete and TIBSQL SQL Property Editors now include
     a "Package Name" drop down box to allow selection of a Firebird 3 Package from
     which a stored procedure can be selected. With no package name selected, non-package
     stored procedures are listed.
 
-14. TIBXScript: turn off database login prompt when reconnecting - this avoids prompting
+15. TIBXScript: turn off database login prompt when reconnecting - this avoids prompting
     for password on reconnect.
 
-15. IBDatabase: use IAttachment for connection default character set id, code page
+16. IBDatabase: use IAttachment for connection default character set id, code page
     and character set name.
 
-16. TIBDatabaseInfo: cache ODS Version information on first request in order to minimise
+17. TIBDatabaseInfo: cache ODS Version information on first request in order to minimise
     DB info lookups"
 
 

@@ -76,7 +76,7 @@ type
     function GetSQL(UpdateKind: TUpdateKind): TStrings; virtual; abstract;
     procedure InternalSetParams(Params: ISQLParams; buff: PChar); overload;
     procedure InternalSetParams(Query: TIBSQL; buff: PChar); overload;
-    procedure UpdateRecordFromQuery(QryResults: IResults; Buffer: PChar);
+    procedure UpdateRecordFromQuery(UpdateKind: TUpdateKind; QryResults: IResults; Buffer: PChar);
     property DataSet: TIBCustomDataSet read GetDataSet write SetDataSet;
   public
     constructor Create(AOwner: TComponent); override;
@@ -371,6 +371,8 @@ type
 
   TOnValidatePost = procedure (Sender: TObject; var CancelPost: boolean) of object;
 
+  TOnDeleteReturning = procedure (Sender: TObject; QryResults: IResults) of object;
+
   TIBCustomDataSet = class(TDataset)
   private
     FAllowAutoActivateTransaction: Boolean;
@@ -403,6 +405,7 @@ type
     FDeletedRecords: Long;
     FModelBuffer,
     FOldBuffer: PChar;
+    FOnDeleteReturning: TOnDeleteReturning;
     FOnValidatePost: TOnValidatePost;
     FOpen: Boolean;
     FInternalPrepared: Boolean;
@@ -466,6 +469,7 @@ type
     procedure DoBeforeTransactionEnd(Sender: TObject; Action: TTransactionAction);
     procedure DoAfterTransactionEnd(Sender: TObject);
     procedure DoTransactionFree(Sender: TObject);
+    procedure DoDeleteReturning(QryResults: IResults);
     procedure FetchCurrentRecordToBuffer(Qry: TIBSQL; RecordNumber: Integer;
                                          Buffer: PChar);
     function GetDatabase: TIBDatabase;
@@ -731,6 +735,8 @@ type
                                                  write FOnUpdateError;
     property OnUpdateRecord: TIBUpdateRecordEvent read FOnUpdateRecord
                                                    write FOnUpdateRecord;
+    property OnDeleteReturning: TOnDeleteReturning read FOnDeleteReturning
+                                                   write FOnDeleteReturning;
   end;
 
   TIBParserDataSet = class(TIBCustomDataSet)
@@ -817,6 +823,7 @@ type
     property OnNewRecord;
     property OnPostError;
     property OnValidatePost;
+    property OnDeleteReturning;
   end;
 
   { TIBDSBlobStream }
@@ -1966,6 +1973,12 @@ begin
     FTransactionFree(Sender);
 end;
 
+procedure TIBCustomDataSet.DoDeleteReturning(QryResults: IResults);
+begin
+  if assigned(FOnDeleteReturning) then
+     OnDeleteReturning(self,QryResults);
+end;
+
 procedure TIBCustomDataSet.InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
 var i, j: Integer;
     FieldsLoaded: integer;
@@ -2321,6 +2334,8 @@ begin
   begin
     SetInternalSQLParams(FQDelete.Params, Buff);
     FQDelete.ExecQuery;
+    if (FQDelete.FieldCount > 0)  then
+      DoDeleteReturning(FQDelete.Current);
   end;
   with PRecordData(Buff)^ do
   begin
@@ -4995,11 +5010,16 @@ begin
   InternalSetParams(Query.Params,buff);
 end;
 
-procedure TIBDataSetUpdateObject.UpdateRecordFromQuery(QryResults: IResults;
-  Buffer: PChar);
+procedure TIBDataSetUpdateObject.UpdateRecordFromQuery(UpdateKind: TUpdateKind;
+  QryResults: IResults; Buffer: PChar);
 begin
   if not Assigned(DataSet) then Exit;
-  DataSet.UpdateRecordFromQuery(QryResults, Buffer);
+  case UpdateKind of
+  ukModify, ukInsert:
+    DataSet.UpdateRecordFromQuery(QryResults, Buffer);
+  ukDelete:
+    DataSet.DoDeleteReturning(QryResults);
+  end;
 end;
 
 function TIBDSBlobStream.GetSize: Int64;
