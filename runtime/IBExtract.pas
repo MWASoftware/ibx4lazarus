@@ -31,6 +31,7 @@ Database Triggers (2.1)
 Global Temporary Tables (2.1)
 Boolean Type (3.0)
 Identity Column Type (3.0)
+DDL Triggers (3.0)
 }
 
 unit IBExtract;

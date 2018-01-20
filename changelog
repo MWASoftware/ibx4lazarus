@@ -81,6 +81,8 @@ IBX Change Log  version                                        (2.2-0) Sat, 20 J
 17. TIBDatabaseInfo: cache ODS Version information on first request in order to minimise
     DB info lookups"
 
+18. IBExtract: now supports DDL Triggers.
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 
