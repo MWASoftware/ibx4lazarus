@@ -31,6 +31,7 @@ Database Triggers (2.1)
 Global Temporary Tables (2.1)
 Boolean Type (3.0)
 Identity Column Type (3.0)
+DDL Triggers (3.0)
 }
 
 unit IBExtract;
@@ -77,7 +78,7 @@ type
     function GetDatabase: TIBDatabase;
     function GetIndexSegments ( indexname : String) : String;
     function GetTransaction: TIBTransaction;
-    function GetTriggerType(TypeID: integer): string;
+    function GetTriggerType(TypeID: Int64): string;
     procedure SetDatabase(const Value: TIBDatabase);
     procedure SetTransaction(const Value: TIBTransaction);
     function PrintValidation(ToValidate : String;	flag : Boolean) : String;
@@ -273,6 +274,37 @@ const
     'WHERE ' +
     '  FDIM.RDB$FIELD_NAME = :FIELDNAME ' +
     'ORDER BY FDIM.RDB$DIMENSION';
+
+type
+  TTriggerPhase = (tpNone,tpCreate,tpAlter,tpDrop);
+
+  TDDLTriggerMap = record
+    ObjectName: string;
+    Bits: integer;
+    Bit1: TTriggerPhase;
+    Bit2: TTriggerPhase;
+    Bit3: TTriggerPhase;
+  end;
+
+const
+  DDLTriggers : array [0..15] of TDDLTriggerMap = (
+  (ObjectName: 'TABLE'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'PROCEDURE'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'FUNCTION'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'TRIGGER'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'Empty slot'; Bits: 3; Bit1: tpNone; Bit2: tpNone; Bit3: tpNone),
+  (ObjectName: 'EXCEPTION'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'VIEW'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'DOMAIN'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'ROLE'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'INDEX'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'SEQUENCE'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'USER'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'COLLATION'; Bits: 2; Bit1: tpCreate; Bit2: tpDrop; Bit3: tpNone),
+  (ObjectName: 'CHARACTER SET'; Bits: 1; Bit1: tpAlter; Bit2: tpNone; Bit3: tpNone),
+  (ObjectName: 'PACKAGE'; Bits: 3; Bit1: tpCreate; Bit2: tpAlter; Bit3: tpDrop),
+  (ObjectName: 'PACKAGE BODY'; Bits: 2; Bit1: tpCreate; Bit2: tpDrop; Bit3: tpNone)
+);
 
 { TIBExtract }
 
@@ -899,8 +931,36 @@ begin
   Result := FTransaction;
 end;
 
-function TIBExtract.GetTriggerType(TypeID: integer): string;
+function TIBExtract.GetTriggerType(TypeID: Int64): string;
+const
+  AllDDLTriggers = $7FFFFFFFFFFFDFFF shr 1;
 var separator: string;
+    i: integer;
+
+  function GetMask(Bits: integer): byte;
+  begin
+    case Bits of
+      1: Result := $01;
+      2: Result := $03;
+      3: Result := $07;
+    end;
+  end;
+
+  function GetDDLEvent(Phase: TTriggerPhase; ObjectName: string): string;
+  begin
+    Result := '';
+    case Phase of
+    tpCreate:
+     Result := separator + 'CREATE ' + ObjectName;
+    tpAlter:
+     Result := separator + 'ALTER ' + ObjectName;
+    tpDrop:
+     Result := separator + 'Drop ' + ObjectName;
+    end;
+    if Result <> '' then
+      separator := ' OR ';
+  end;
+
 begin
   if TypeID and $2000 <> 0 then
   {database trigger}
@@ -920,6 +980,37 @@ begin
     end;
   end
   else
+  if TypeID and $4000 <> 0 then
+  {DDL Trigger}
+  begin
+    if TypeID and $01 <> 0 then
+      Result := 'AFTER '
+    else
+      Result := 'BEFORE ';
+    TypeID := TypeID shr 1;
+    separator := '';
+    i := 0;
+    if TypeID = AllDDLTriggers then
+      Result += 'ANY DDL STATEMENT'
+    else
+      repeat
+        if TypeID and GetMask(DDLTriggers[i].Bits) <> 0 then
+        begin
+          if (DDLTriggers[i].Bits > 0) and (TypeID and $01 <> 0) then
+           Result += GetDDLEvent(DDLTriggers[i].Bit1,DDLTriggers[i].ObjectName);
+
+          if (DDLTriggers[i].Bits > 1) and (TypeID and $02 <> 0) then
+            Result += GetDDLEvent(DDLTriggers[i].Bit2,DDLTriggers[i].ObjectName);
+
+          if (DDLTriggers[i].Bits > 2) and (TypeID and $04 <> 0) then
+            Result += GetDDLEvent(DDLTriggers[i].Bit3,DDLTriggers[i].ObjectName);
+        end;
+        TypeID := TypeID shr DDLTriggers[i].Bits;
+        Inc(i);
+      until TypeID = 0;
+  end
+  else
+  {Normal Trigger}
   begin
     Inc(TypeID);
     if TypeID and $01 <> 0 then
@@ -940,8 +1031,8 @@ begin
         Result += 'DELETE';
       end;
       TypeID := TypeID shr 2;
-    until TypeID = 0;
-  end;
+    until TypeID = 0
+  end
 end;
 
 {	   ListAllGrants
@@ -1303,7 +1394,7 @@ begin
       SList.Add(Format('CREATE TRIGGER %s%s%s %s POSITION %d',
                 [QuoteIdentifier(FDatabase.SQLDialect, TriggerName),
                 LineEnding, InActive,
-                GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInteger),
+                GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInt64),
                 qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
 
       if RelationName <> '' then
