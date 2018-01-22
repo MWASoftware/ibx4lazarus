@@ -1,4 +1,4 @@
-IBX Change Log  version                                         (2.2-0) Sat, 20 Jan 2018 23:31:37 +0000
+IBX Change Log  version                                          (2.2-0) Mon, 22 Jan 2018 14:19:18 +0000
 
 1. IBExtract: Identity columns - add additional check for null column for generator name.
 
