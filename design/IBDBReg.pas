@@ -322,6 +322,18 @@ type
     procedure Edit; override;
   end;
 
+  { TIBUpdateRefreshSQLProperty }
+
+  TIBUpdateRefreshSQLProperty = class(TSQLPropertyEditor)
+  protected
+    FIBUpdate: TIBUpdate;
+    FDatabase: TIBDatabase;
+    function GetObjects: boolean;
+  public
+    procedure Edit; override;
+  end;
+
+
 { TIBEventListProperty }
 
   TIBEventListProperty = class(TClassProperty)
@@ -461,6 +473,7 @@ begin
   RegisterPropertyEditor(TypeInfo(TStrings), TIBUpdateSQL, 'ModifySQL', TIBUpdateSQLUpdateProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBUpdateSQL, 'InsertSQL', TIBUpdateSQLInsertSQLProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBUpdateSQL, 'DeleteSQL', TIBUpdateSQLDeleteProperty); {do not localize}
+  RegisterPropertyEditor(TypeInfo(TStrings), TIBUpdate, 'RefreshSQL', TIBUpdateRefreshSQLProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TStrings), TIBEvents, 'Events', TIBEventListProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TPersistent), TIBDataSet, 'GeneratorField', TIBGeneratorProperty);  {do not localize}
   RegisterPropertyEditor(TypeInfo(TPersistent), TIBQuery, 'GeneratorField', TIBGeneratorProperty);  {do not localize}
@@ -510,6 +523,28 @@ begin
       end;
     end;
   end;
+end;
+
+{ TIBUpdateRefreshSQLProperty }
+
+function TIBUpdateRefreshSQLProperty.GetObjects: boolean;
+begin
+  Result := false;
+  FIBUpdate := GetComponent(0) as TIBUpdate;
+  if not assigned(FIBUpdate) or not assigned(FIBUpdate.DataSet) then
+    Exit;
+  FDatabase := nil;
+  if FIBUpdate.DataSet is TIBQuery then
+  begin
+    FDatabase := (FIBUpdate.DataSet as TIBQuery).Database;
+    Result := true
+  end;
+end;
+
+procedure TIBUpdateRefreshSQLProperty.Edit;
+begin
+  GetObjects;
+  if IBRefreshSQLEditor.EditSQL(FIBUpdate.DataSet,FIBUpdate.RefreshSQL) then Modified;
 end;
 
 { TIBPackageNameProperty }
