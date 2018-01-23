@@ -85,6 +85,10 @@ IBX Change Log  version                                            (2.2-0) Mon, 
 
 19. Add a property Editor for TIBUpdate.RefreshSQL.
 
+20. IBUpdate: Ignore non-data (e.g. calculated) fields when assembling list of input
+    parameters. This stops an exception being raised when the field cannot be
+    located in the record buffer.
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

@@ -413,6 +413,7 @@ begin
   j := 0;
   {set up both current and "OLD" parameters from Field Names}
   for i := 0 to aFields.Count - 1 do
+  if aFields[i].FieldKind = fkData then
   begin
     FParams[j].Name := aFields[i].FieldName;
     FParams[j].Value := NULL;
@@ -423,6 +424,7 @@ begin
     FParams[j].Modified := false;
     Inc(j);
   end;
+  SetLength(FParams,j);
 end;
 
 destructor TParamListIntf.Destroy;
