@@ -428,15 +428,11 @@ uses Sysutils, RegExpr;
 
 resourcestring
   sTerminatorUnknownState = 'Statement Terminator in unexpected state (%d)';
-  sUnterminatedString = 'Unterminated string';
-  sUnknownSymbol = 'Unknown Symbol %d';
   sNoSelectSQL = 'Select SQL Statements are not supported';
   sStackUnderflow = 'Stack Underflow';
   sNoParamQueries =  'Parameterised Queries are not supported';
   sStackOverFlow = 'Stack Overflow';
   sResolveQueryParam =  'Resolving Query Parameter: %s';
-  sNoCommit =  'Commit not allowed here';
-  sNoReconnect = 'Reconnect not allowed here';
   sXMLStackUnderflow = 'XML Stack Underflow';
   sInvalidEndTag = 'XML End Tag Mismatch - %s';
   sXMLStackOverFlow = 'XML Stack Overflow';
@@ -581,7 +577,6 @@ end;
 procedure TCustomIBXScript.ExecSQL(stmt: string);
 var DDL: boolean;
     I: integer;
-    stats: TPerfCounters;
 begin
    Database.Connected := true;
    FISQL.SQL.Text := stmt;

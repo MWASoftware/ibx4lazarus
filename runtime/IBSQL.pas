@@ -694,12 +694,12 @@ begin
 end;
 
 procedure TIBSQL.ExecQuery;
-var
-  fetch_res: ISC_STATUS;
   {$IFDEF IBXQUERYSTATS}
+var
   stats: TPerfCounters;
   {$ENDIF}
   {$IFDEF IBXQUERYTIME}
+var
   tmsecs: comp;
   {$ENDIF}
 begin

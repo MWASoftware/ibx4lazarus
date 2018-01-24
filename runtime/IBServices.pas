@@ -52,7 +52,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, IBHeader, IB, IBExternals, CustApp, IBTypes, IBSQL;
+  SysUtils, Classes, IB, IBExternals, CustApp, IBTypes;
 
 const
   DefaultBufferSize = 32000;
@@ -525,7 +525,7 @@ type
 implementation
 
 uses
-  IBSQLMonitor, Math, FBMessages;
+  IBSQLMonitor, FBMessages;
 
 { TIBBackupRestoreService }
 
@@ -1564,7 +1564,6 @@ procedure TIBValidationService.FetchLimboTransactionInfo;
 
 var
   i,j, k: Integer;
-  Value: Char;
 begin
   for i := 0 to High(FLimboTransactionInfo) do
     FLimboTransactionInfo[i].Free;
