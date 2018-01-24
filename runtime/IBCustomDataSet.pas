@@ -1131,10 +1131,10 @@ begin
        3, {Assume UNICODE_FSS is really UTF8}
        4: {Include GB18030 - assuming UTF8 routines work for this codeset}
          if DisplayWidth = 0 then
-           Result := ValidUTF8String(TextToSingleLine(Result))
+           Result := Utf8EscapeControlChars(TextToSingleLine(Result))
          else
          if UTF8Length(Result) > DisplayWidth then {Show truncation with elipses}
-           Result := ValidUTF8String(TextToSingleLine(UTF8Copy(Result,1,DisplayWidth-3))) + '...';
+           Result := Utf8EscapeControlChars(TextToSingleLine(UTF8Copy(Result,1,DisplayWidth-3))) + '...';
        end;
    end
 end;
@@ -2769,7 +2769,6 @@ var
   fn: string;
   st: RawByteString;
   OldBuffer: Pointer;
-  ts: TTimeStamp;
   Param: ISQLParam;
 begin
   if (Buffer = nil) then
@@ -3815,7 +3814,6 @@ var
   FieldType: TFieldType;
   FieldSize: Word;
   FieldDataSize: integer;
-  charSetID: short;
   CharSetSize: integer;
   CharSetName: RawByteString;
   FieldCodePage: TSystemCodePage;

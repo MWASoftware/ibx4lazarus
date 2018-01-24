@@ -178,7 +178,6 @@ implementation
 uses Sysutils, IBCustomDataSet;
 
 resourcestring
-  sNoEndToThis    = 'Unterminated string';
   sBadBy          = 'Unexpected symbol "BY" in: %s';
   sBadSymbol      = 'Unknown Symbol';
   sIncomplete     = 'Incomplete Union';

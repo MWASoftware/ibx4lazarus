@@ -1,4 +1,4 @@
-IBX Change Log  version                                            (2.2-0) Mon, 22 Jan 2018 14:21:12 +0000
+IBX Change Log  version                                             (2.2-0) Tue, 23 Jan 2018 11:23:09 +0000
 
 1. IBExtract: Identity columns - add additional check for null column for generator name.
 
@@ -82,6 +82,12 @@ IBX Change Log  version                                            (2.2-0) Mon, 
     DB info lookups"
 
 18. IBExtract: now supports DDL Triggers.
+
+19. Add a property Editor for TIBUpdate.RefreshSQL.
+
+20. IBUpdate: Ignore non-data (e.g. calculated) fields when assembling list of input
+    parameters. This stops an exception being raised when the field cannot be
+    located in the record buffer.
 
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000

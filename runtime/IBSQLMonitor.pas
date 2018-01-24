@@ -724,7 +724,7 @@ begin
   FMsgs := TObjectList.Create(true);
   FCriticalSection := TCriticalSection.Create;
   FMsgAvailable := TEventObject.Create(FGlobalInterface.Sa,true,false,cWriteMessageAvailable);
-  Resume;
+  Start;
 end;
 
 destructor TWriterThread.Destroy;
@@ -981,7 +981,7 @@ begin
   FCriticalSection := TCriticalSection.Create;
   {$IFDEF DEBUG}writeln('Reader Thread Created');{$ENDIF}
   FGlobalInterface.ReadReadyEvent.Lock;           { Initialise Read Ready}
-  Resume;
+  Start;
 end;
 
 destructor TReaderThread.Destroy;
@@ -1099,10 +1099,10 @@ initialization
   FReaderThread := nil;
   bDone := False;
 {$IFDEF USE_SV5_IPC}
-  if FpGetEnv('FBSQL_IPCFILENAME') <> nil then
-    IPCFileName := strpas(FpGetEnv('FBSQL_IPCFILENAME'))
+  if GetEnvironmentVariable('FBSQL_IPCFILENAME') <> '' then
+    IPCFileName := GetEnvironmentVariable('FBSQL_IPCFILENAME')
   else
-    IPCFileName := GetTempDir(true) + IPCFileName + '.' + strpas(FpGetEnv('USER'));
+    IPCFileName := GetTempDir(true) + IPCFileName + '.' + GetEnvironmentVariable('USER');
 {$ENDIF}
 
 finalization

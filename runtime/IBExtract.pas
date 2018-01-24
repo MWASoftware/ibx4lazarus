@@ -468,7 +468,7 @@ const
 var
   Collation, CharSetId : integer;
 	i : integer;
-  ColList, Column, Constraint : String;
+  Column, Constraint : String;
   SubType : integer;
   IntChar : integer;
   qryTables, qryPrecision, qryConstraints, qryRelConstraints, qryGenerators : TIBSQL;
@@ -478,7 +478,6 @@ var
   TableType: integer;
 begin
   Result := true;
-  ColList := '';
   IntChar := 0;
   ValidRelation := false;
 
@@ -787,6 +786,7 @@ var
   qryViews, qryColumns : TIBSQL;
   RelationName, ColList : String;
 begin
+  ColList := '';
   qryViews := TIBSQL.Create(FDatabase);
   qryColumns := TIBSQL.Create(FDatabase);
   try
