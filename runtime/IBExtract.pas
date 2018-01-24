@@ -937,15 +937,6 @@ const
 var separator: string;
     i: integer;
 
-  function GetMask(Bits: integer): byte;
-  begin
-    case Bits of
-      1: Result := $01;
-      2: Result := $03;
-      3: Result := $07;
-    end;
-  end;
-
   function GetDDLEvent(Phase: TTriggerPhase; ObjectName: string): string;
   begin
     Result := '';
@@ -994,17 +985,14 @@ begin
       Result += 'ANY DDL STATEMENT'
     else
       repeat
-        if TypeID and GetMask(DDLTriggers[i].Bits) <> 0 then
-        begin
-          if (DDLTriggers[i].Bits > 0) and (TypeID and $01 <> 0) then
-           Result += GetDDLEvent(DDLTriggers[i].Bit1,DDLTriggers[i].ObjectName);
+        if (DDLTriggers[i].Bits > 0) and (TypeID and $01 <> 0) then
+         Result += GetDDLEvent(DDLTriggers[i].Bit1,DDLTriggers[i].ObjectName);
 
-          if (DDLTriggers[i].Bits > 1) and (TypeID and $02 <> 0) then
-            Result += GetDDLEvent(DDLTriggers[i].Bit2,DDLTriggers[i].ObjectName);
+        if (DDLTriggers[i].Bits > 1) and (TypeID and $02 <> 0) then
+          Result += GetDDLEvent(DDLTriggers[i].Bit2,DDLTriggers[i].ObjectName);
 
-          if (DDLTriggers[i].Bits > 2) and (TypeID and $04 <> 0) then
-            Result += GetDDLEvent(DDLTriggers[i].Bit3,DDLTriggers[i].ObjectName);
-        end;
+        if (DDLTriggers[i].Bits > 2) and (TypeID and $04 <> 0) then
+          Result += GetDDLEvent(DDLTriggers[i].Bit3,DDLTriggers[i].ObjectName);
         TypeID := TypeID shr DDLTriggers[i].Bits;
         Inc(i);
       until TypeID = 0;
