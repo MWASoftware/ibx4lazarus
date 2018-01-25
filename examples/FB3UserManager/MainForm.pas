@@ -227,16 +227,12 @@ procedure TForm1.UpdateUserRolesApplyUpdates(Sender: TObject;
   end;
 
 begin
-  case UpdateKind of
-  ukModify:
+  if UpdateKind = ukModify then
+  begin
     if Params.ByName('GRANTED').AsInteger = 0 then
       Revoke(Params)
     else
       Grant(Params);
-  ukInsert:
-    Grant(Params);
-  ukDelete:
-    Revoke(Params);
   end;
 end;
 

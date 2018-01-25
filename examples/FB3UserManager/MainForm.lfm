@@ -209,7 +209,7 @@ object Form1: TForm1
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         end>
       DataSource = RoleSource
-      Options = [dgEditing, dgIndicator, dgColumnResize, dgColumnMove, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
+      Options = [dgEditing, dgIndicator, dgColumnResize, dgColumnMove, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
       Scrollbars = ssAutoVertical
       TabOrder = 0
       ExpandEditorPanelBelowRow = False
@@ -795,7 +795,7 @@ object Form1: TForm1
     )
     OnApplyUpdates = UpdateUserRolesApplyUpdates
     left = 1024
-    top = 144
+    top = 176
   end
   object IBTransaction1: TIBTransaction
     Active = False

@@ -1,4 +1,4 @@
-IBX Change Log  version                                             (2.2-0) Tue, 23 Jan 2018 11:23:09 +0000
+IBX Change Log  version                                              (2.2-0) Thu, 25 Jan 2018 13:56:39 +0000
 
 1. IBExtract: Identity columns - add additional check for null column for generator name.
 
@@ -88,6 +88,12 @@ IBX Change Log  version                                             (2.2-0) Tue,
 20. IBUpdate: Ignore non-data (e.g. calculated) fields when assembling list of input
     parameters. This stops an exception being raised when the field cannot be
     located in the record buffer.
+
+21. Property Editors now automatically include System Tables when opened and when the query table
+    is a System Table.
+
+22. FB3UserManager example added to illustrate use if IBX for managing user logins, passwords
+    and connections using IBX and with single or multiple security databases.
 
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
