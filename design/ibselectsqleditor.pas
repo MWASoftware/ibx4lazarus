@@ -142,6 +142,7 @@ begin
   begin
     try
       SetSQLStatementType(IBSQLEditFrame1.SyncQueryBuilder);
+      IncludeSysTables.Checked := IBSQLEditFrame1.IncludeSystemTables;
     except  end;
   end;
 end;

@@ -141,6 +141,7 @@ type
     FOnUserTablesOpened: TNotifyEvent;
     FOpening: boolean;
     FSelectProcs: boolean;
+    FQuerySync: boolean;
     procedure AddWhereClause(QuotedStrings: boolean; SQL: TStrings;
       UseOldValues: boolean);
     function GetSQLType(SQLType: TIBSQLStatementTypes): string;
@@ -1238,8 +1239,9 @@ var TableName: string;
   end;
 
 begin
-  if (Database = nil) or not Database.Connected then Exit;
+  if (Database = nil) or not Database.Connected or FQuerySync then Exit;
 
+  FQuerySync := true;
   Result := SQLUnknown;
   TableName := '';
   Symbols := TStringList.Create;
@@ -1256,6 +1258,9 @@ begin
           TableName := IdentifyStatementSQL.MetaData[0].GetRelationName
         else
           Exit;
+        if (Pos('MON$',TableName) > 0) or (Pos('RDB$',TableName) > 0) or (Pos('SEC$',TableName) > 0) then
+          IncludeSystemTables := true;
+
         if not UserTables.Locate('RDB$RELATION_NAME',TableName,[]) then
         begin
           {We don't know if the stored procedure is in a package because
@@ -1328,6 +1333,7 @@ begin
    end;
   finally
     Symbols.Free;
+    FQuerySync := false;
   end;
 end;
 
