@@ -199,7 +199,7 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
     Width = 59
     OnChange = TabControl1Change
     TabPosition = tpLeft
-    TabIndex = 4
+    TabIndex = 0
     Tabs.Strings = (
       'Select'
       'Insert'

@@ -655,6 +655,7 @@ begin
  FDatabase := AValue;
  FISQL.Database := AValue;
  FIBXMLProcessor.Database := AValue;
+ FInternalTransaction.Active := false;
  FInternalTransaction.DefaultDatabase := AValue;
 end;
 

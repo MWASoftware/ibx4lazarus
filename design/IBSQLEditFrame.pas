@@ -170,7 +170,7 @@ type
     procedure UnWrapText;
     procedure RefreshAll;
     procedure SelectAllFields(Checked: boolean);
-    procedure GenerateSelectSQL(QuotedStrings: boolean); overload;
+    procedure GenerateSelectSQL(QuotedStrings: boolean; AddReadOnlyFields: boolean = false); overload;
     procedure GenerateSelectSQL(QuotedStrings: boolean; SQL: TStrings; AddReadOnlyFields: boolean = false); overload;
     procedure GenerateRefreshSQL(QuotedStrings: boolean);
     procedure GenerateRefreshSQL(QuotedStrings: boolean; SQL: TStrings; AddReadOnlyFields: boolean = false);
@@ -376,6 +376,7 @@ begin
   if FDatabase = AValue then Exit;
   FDatabase := AValue;
   FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
+  SQLTransaction.Active := false;
   SQLTransaction.DefaultDatabase := FDatabase;
   for i := 0 to ComponentCount - 1 do
     if Components[i] is TIBCustomDataset then
@@ -580,9 +581,10 @@ begin
   DoSelectAllFields(ReadOnlyFields,Checked);
 end;
 
-procedure TIBSQLEditFrame.GenerateSelectSQL(QuotedStrings: boolean);
+procedure TIBSQLEditFrame.GenerateSelectSQL(QuotedStrings: boolean;
+  AddReadOnlyFields: boolean);
 begin
-  GenerateSelectSQL(QuotedStrings,SQLText.Lines);
+  GenerateSelectSQL(QuotedStrings,SQLText.Lines,AddReadOnlyFields);
 end;
 
 procedure TIBSQLEditFrame.GenerateRefreshSQL(QuotedStrings: boolean);
