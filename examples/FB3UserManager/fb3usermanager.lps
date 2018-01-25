@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="10"/>
+    <BuildModes Active="Default"/>
+    <Units Count="13">
+      <Unit0>
+        <Filename Value="fb3usermanager.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="4"/>
+        <CursorPos X="82" Y="10"/>
+        <UsageCount Value="24"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="MainForm.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="342"/>
+        <CursorPos Y="349"/>
+        <UsageCount Value="24"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="../../../ibxframework/examples/FirebirdDBA/UserManagement/UserRolesFrameUnit.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="17"/>
+        <UsageCount Value="10"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="../../../ibxframework/examples/FirebirdDBA/UserManagement/DBUsersFrameUnit.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="202"/>
+        <CursorPos Y="223"/>
+        <UsageCount Value="10"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="ChgPasswordDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ChgPasswordDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="46" Y="9"/>
+        <UsageCount Value="23"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="NewUserDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="NewUserDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="7"/>
+        <CursorPos Y="40"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="DBLoginDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DBLoginDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="60"/>
+        <CursorPos Y="74"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="../employee/unit1.pas"/>
+        <UnitName Value="Unit1"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="361"/>
+        <CursorPos Y="382"/>
+        <UsageCount Value="10"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="../../../fbintf/IB.pas"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="1196"/>
+        <CursorPos Y="1226"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="933"/>
+        <CursorPos X="44" Y="942"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="../../runtime/IBSQL.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="687"/>
+        <CursorPos X="37" Y="699"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="../../../../lcl/forms.pp"/>
+        <UnitName Value="Forms"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1436"/>
+        <CursorPos X="31" Y="1456"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="../ibstoredproc/Unit1.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="79"/>
+        <CursorPos Y="109"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit12>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="281" Column="8" TopLine="278"/>
+      </Position1>
+      <Position2>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="95" Column="16" TopLine="75"/>
+      </Position2>
+      <Position3>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="190" TopLine="183"/>
+      </Position3>
+      <Position4>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="185" Column="24" TopLine="165"/>
+      </Position4>
+      <Position5>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="95" Column="2" TopLine="76"/>
+      </Position5>
+      <Position6>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="317" Column="20" TopLine="282"/>
+      </Position6>
+      <Position7>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="323" Column="20" TopLine="288"/>
+      </Position7>
+      <Position8>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="268" Column="38" TopLine="266"/>
+      </Position8>
+      <Position9>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="269" Column="38" TopLine="267"/>
+      </Position9>
+      <Position10>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="271" Column="38" TopLine="269"/>
+      </Position10>
+      <Position11>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="338" Column="70" TopLine="299"/>
+      </Position11>
+      <Position12>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="332" Column="25" TopLine="303"/>
+      </Position12>
+      <Position13>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="328" Column="3" TopLine="303"/>
+      </Position13>
+      <Position14>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="191" TopLine="126"/>
+      </Position14>
+      <Position15>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="333" TopLine="310"/>
+      </Position15>
+      <Position16>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="273" Column="34" TopLine="271"/>
+      </Position16>
+      <Position17>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="280" Column="34" TopLine="278"/>
+      </Position17>
+      <Position18>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="283" Column="102" TopLine="279"/>
+      </Position18>
+      <Position19>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="276" Column="3" TopLine="274"/>
+      </Position19>
+      <Position20>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="281" Column="24" TopLine="275"/>
+      </Position20>
+      <Position21>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="278" Column="50" TopLine="267"/>
+      </Position21>
+      <Position22>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="279" Column="4" TopLine="253"/>
+      </Position22>
+      <Position23>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="280" Column="4" TopLine="254"/>
+      </Position23>
+      <Position24>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="281" Column="4" TopLine="255"/>
+      </Position24>
+      <Position25>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="280" Column="4" TopLine="254"/>
+      </Position25>
+      <Position26>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="281" Column="4" TopLine="255"/>
+      </Position26>
+      <Position27>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="283" Column="4" TopLine="257"/>
+      </Position27>
+      <Position28>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="348" TopLine="341"/>
+      </Position28>
+      <Position29>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="349" TopLine="342"/>
+      </Position29>
+      <Position30>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="348" TopLine="341"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

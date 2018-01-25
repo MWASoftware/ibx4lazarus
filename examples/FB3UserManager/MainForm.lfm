@@ -1,0 +1,855 @@
+object Form1: TForm1
+  Left = 414
+  Height = 526
+  Top = 150
+  Width = 1093
+  Caption = 'FB3 User Manager'
+  ClientHeight = 526
+  ClientWidth = 1093
+  OnClose = FormClose
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  Position = poScreenCenter
+  LCLVersion = '1.8.1.0'
+  object IBDynamicGrid1: TIBDynamicGrid
+    Left = 0
+    Height = 526
+    Top = 0
+    Width = 927
+    Align = alLeft
+    Color = clWindow
+    Columns = <    
+      item
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'User Name'
+        Width = 120
+        FieldName = 'USERNAME'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'First Name'
+        Width = 80
+        FieldName = 'SEC$FIRST_NAME'
+        AutoSizeColumn = True
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Middle Name'
+        Width = 85
+        FieldName = 'SEC$MIDDLE_NAME'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Last Name'
+        Width = 80
+        FieldName = 'SEC$LAST_NAME'
+        AutoSizeColumn = True
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Alignment = taCenter
+        Title.Alignment = taCenter
+        Title.Caption = 'Active'
+        Width = 55
+        FieldName = 'SEC$ACTIVE'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Alignment = taCenter
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'Admin'
+        Width = 55
+        FieldName = 'SEC$ADMIN'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Alignment = taCenter
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'Logged In'
+        Width = 70
+        FieldName = 'LOGGEDIN'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Alignment = taCenter
+        Title.Alignment = taCenter
+        Title.Caption = 'Att. ID'
+        Width = 50
+        FieldName = 'MON$ATTACHMENT_ID'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Alignment = taCenter
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'With Role Name'
+        Width = 100
+        FieldName = 'ROLENAME'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Alignment = taCenter
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'Remote Host'
+        Width = 100
+        FieldName = 'MON$REMOTE_HOST'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'User Manager'
+        Width = 100
+        FieldName = 'SEC$PLUGIN'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end>
+    DataSource = UserListSource
+    PopupMenu = PopupMenu1
+    Scrollbars = ssAutoVertical
+    TabOrder = 0
+    ExpandEditorPanelBelowRow = False
+    Descending = False
+    EditorBorderStyle = bsSingle
+    DefaultPositionAtEnd = False
+    IndexFieldNames = 'USERNAME'
+  end
+  object Splitter1: TSplitter
+    Left = 927
+    Height = 526
+    Top = 0
+    Width = 5
+  end
+  object Panel1: TPanel
+    Left = 932
+    Height = 526
+    Top = 0
+    Width = 161
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 526
+    ClientWidth = 161
+    TabOrder = 2
+    object IBDynamicGrid2: TIBDynamicGrid
+      Left = 0
+      Height = 195
+      Top = 50
+      Width = 161
+      Align = alTop
+      Color = clWindow
+      Columns = <      
+        item
+          ButtonStyle = cbsCheckboxColumn
+          Title.Caption = ''
+          Width = 30
+          FieldName = 'GRANTED'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Role'
+          Width = 70
+          FieldName = 'RDB$ROLE_NAME'
+          AutoSizeColumn = True
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end>
+      DataSource = RoleSource
+      Options = [dgEditing, dgIndicator, dgColumnResize, dgColumnMove, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
+      Scrollbars = ssAutoVertical
+      TabOrder = 0
+      ExpandEditorPanelBelowRow = False
+      Descending = False
+      EditorBorderStyle = bsSingle
+      DefaultPositionAtEnd = False
+    end
+    object Panel2: TPanel
+      Left = 0
+      Height = 276
+      Top = 250
+      Width = 161
+      Align = alClient
+      BevelInner = bvLowered
+      BevelOuter = bvLowered
+      ClientHeight = 276
+      ClientWidth = 161
+      TabOrder = 1
+      object Label2: TLabel
+        Left = 13
+        Height = 14
+        Top = 99
+        Width = 110
+        Caption = 'Security Database'
+        ParentColor = False
+      end
+      object DBEdit1: TDBEdit
+        Left = 13
+        Height = 24
+        Top = 114
+        Width = 139
+        DataField = 'MON$SEC_DATABASE'
+        DataSource = DBQuerySource
+        Anchors = [akTop, akLeft, akRight]
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 0
+      end
+      object Label3: TLabel
+        Left = 13
+        Height = 14
+        Top = 56
+        Width = 99
+        Caption = 'Database Owner'
+        ParentColor = False
+      end
+      object DBEdit2: TDBEdit
+        Left = 13
+        Height = 24
+        Top = 71
+        Width = 139
+        DataField = 'MON$OWNER'
+        DataSource = DBQuerySource
+        Anchors = [akTop, akLeft, akRight]
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 1
+      end
+      object Label4: TLabel
+        Left = 15
+        Height = 14
+        Top = 142
+        Width = 79
+        Caption = 'Date Created'
+        ParentColor = False
+      end
+      object DBEdit3: TDBEdit
+        Left = 13
+        Height = 24
+        Top = 157
+        Width = 139
+        DataField = 'MON$CREATION_DATE'
+        DataSource = DBQuerySource
+        Anchors = [akTop, akLeft, akRight]
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 2
+      end
+      object Label5: TLabel
+        Left = 15
+        Height = 14
+        Top = 185
+        Width = 73
+        Caption = 'ODS Version'
+        ParentColor = False
+      end
+      object DBEdit4: TDBEdit
+        Left = 15
+        Height = 24
+        Top = 200
+        Width = 137
+        DataField = 'OSDVERSION'
+        DataSource = DBQuerySource
+        Anchors = [akTop, akLeft, akRight]
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 3
+      end
+      object Button1: TButton
+        Left = 16
+        Height = 28
+        Top = 235
+        Width = 134
+        Action = SaveChanges
+        Anchors = [akTop, akLeft, akRight]
+        TabOrder = 4
+      end
+      object Label6: TLabel
+        Left = 12
+        Height = 14
+        Top = 13
+        Width = 95
+        Caption = 'Database Name'
+        ParentColor = False
+      end
+      object DBEdit5: TDBEdit
+        Left = 13
+        Height = 24
+        Top = 28
+        Width = 139
+        DataField = 'MON$DATABASE_NAME'
+        DataSource = DBQuerySource
+        Anchors = [akTop, akLeft, akRight]
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 5
+      end
+    end
+    object Panel3: TPanel
+      Left = 0
+      Height = 50
+      Top = 0
+      Width = 161
+      Align = alTop
+      BevelInner = bvLowered
+      BevelOuter = bvLowered
+      ClientHeight = 50
+      ClientWidth = 161
+      TabOrder = 2
+      object DBText1: TDBText
+        Left = 10
+        Height = 14
+        Top = 30
+        Width = 49
+        DataField = 'USERNAME'
+        DataSource = UserListSource
+        ParentColor = False
+      end
+      object Label1: TLabel
+        Left = 10
+        Height = 14
+        Top = 10
+        Width = 104
+        Caption = 'Roles Assigned to'
+        ParentColor = False
+      end
+    end
+    object Splitter2: TSplitter
+      Cursor = crVSplit
+      Left = 0
+      Height = 5
+      Top = 245
+      Width = 161
+      Align = alTop
+      ResizeAnchor = akTop
+    end
+  end
+  object IBDatabase1: TIBDatabase
+    Connected = True
+    AfterConnect = IBDatabase1AfterConnect
+    AfterDisconnect = IBDatabase1AfterDisconnect
+    BeforeDisconnect = IBDatabase1BeforeDisconnect
+    OnLogin = IBDatabase1Login
+    CreateIfNotExists = False
+    AllowStreamedConnected = False
+    DatabaseName = 'employee'
+    Params.Strings = (
+      'user_name=SYSDBA'
+    )
+    DefaultTransaction = IBTransaction1
+    IdleTimer = 0
+    TraceFlags = []
+    UseDefaultSystemCodePage = False
+    OnCreateDatabase = IBDatabase1CreateDatabase
+    left = 49
+    top = 32
+  end
+  object UserListSource: TDataSource
+    DataSet = UserList
+    left = 387
+    top = 217
+  end
+  object UserList: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AfterDelete = UserListAfterPost
+    AfterInsert = UserListAfterInsert
+    AfterOpen = UserListAfterOpen
+    AfterPost = UserListAfterPost
+    BeforeClose = UserListBeforeClose
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
+      'A.SEC$ACTIVE, A.SEC$USER_NAME as UserName, A.SEC$MIDDLE_NAME,'
+      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME, B.MON$ATTACHMENT_ID,'
+      'Trim(B.MON$ROLE) as RoleName, B.MON$REMOTE_HOST,'
+      'cast(NULL as VarChar(32)) as USERPASSWORD, CURRENT_CONNECTION,'
+      'case when B.MON$ATTACHMENT_ID is not null then true else false end as LoggedIn'
+      'From SEC$USERS A'
+      'Left Outer Join MON$ATTACHMENTS B'
+      'On A.SEC$USER_NAME = B.MON$USER'
+    )
+    Params = <>
+    UpdateObject = UpdateUsers
+    DataSetCloseAction = dcSaveChanges
+    left = 387
+    top = 284
+    object UserListSECDESCRIPTION: TIBMemoField
+      FieldKind = fkData
+      FieldName = 'SEC$DESCRIPTION'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      BlobType = ftMemo
+      Size = 8
+      Transliterate = False
+      DisplayTextAsClassName = False
+    end
+    object UserListSECPLUGIN: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SEC$PLUGIN'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object UserListSECADMIN: TBooleanField
+      FieldKind = fkData
+      FieldName = 'SEC$ADMIN'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = True
+      Required = False
+      DisplayValues = 'True;False'
+    end
+    object UserListSECACTIVE: TBooleanField
+      FieldKind = fkData
+      FieldName = 'SEC$ACTIVE'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      DisplayValues = 'True;False'
+    end
+    object UserListSECMIDDLE_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SEC$MIDDLE_NAME'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object UserListSECFIRST_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SEC$FIRST_NAME'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object UserListSECLAST_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SEC$LAST_NAME'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object UserListMONREMOTE_HOST: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$REMOTE_HOST'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = True
+      Required = False
+      Size = 255
+    end
+    object UserListMONATTACHMENT_ID: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$ATTACHMENT_ID'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = True
+      Required = False
+    end
+    object UserListUSERPASSWORD: TIBStringField
+      FieldKind = fkData
+      FieldName = 'USERPASSWORD'
+      Index = 9
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object UserListUSERNAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'USERNAME'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object UserListLOGGEDIN: TBooleanField
+      FieldKind = fkData
+      FieldName = 'LOGGEDIN'
+      Index = 11
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      DisplayValues = 'True;False'
+    end
+    object UserListROLENAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'ROLENAME'
+      Index = 12
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object UserListCURRENT_CONNECTION: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'CURRENT_CONNECTION'
+      Index = 13
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+  end
+  object UpdateUsers: TIBUpdate
+    RefreshSQL.Strings = (
+      'Select A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
+      'A.SEC$ACTIVE, A.SEC$USER_NAME as UserName, A.SEC$MIDDLE_NAME,'
+      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME, B.MON$ATTACHMENT_ID,'
+      'Trim(B.MON$ROLE) as RoleName, B.MON$REMOTE_HOST,'
+      'cast(NULL as VarChar(32)) as USERPASSWORD,CURRENT_CONNECTION,'
+      'case when B.MON$ATTACHMENT_ID is not null then true else false end as LoggedIn'
+      'From SEC$USERS A'
+      'Left Outer Join MON$ATTACHMENTS B'
+      'On A.SEC$USER_NAME = B.MON$USER'
+      'Where  A.SEC$USER_NAME = :UserName'
+    )
+    OnApplyUpdates = UpdateUsersApplyUpdates
+    left = 476
+    top = 284
+  end
+  object ApplyUserChange: TIBSQL
+    Database = IBDatabase1
+    GenerateParamNames = False
+    UniqueParamNames = False
+    ParamCheck = True
+    Transaction = IBTransaction1
+    left = 479
+    top = 358
+  end
+  object ActionList1: TActionList
+    left = 560
+    top = 224
+    object AddUser: TAction
+      Caption = 'Add'
+      OnExecute = AddUserExecute
+    end
+    object ChgPassword: TAction
+      Caption = 'Change Password'
+      OnExecute = ChgPasswordExecute
+      OnUpdate = ChgPasswordUpdate
+    end
+    object DeleteUser: TAction
+      Caption = 'Delete'
+      OnExecute = DeleteUserExecute
+      OnUpdate = ChgPasswordUpdate
+    end
+    object SaveChanges: TAction
+      Caption = 'Save Changes'
+      OnExecute = SaveChangesExecute
+      OnUpdate = SaveChangesUpdate
+    end
+    object DisconnectUser: TAction
+      Caption = 'Disconnect User'
+      OnExecute = DisconnectUserExecute
+      OnUpdate = DisconnectUserUpdate
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    left = 156
+    top = 176
+    object MenuItem1: TMenuItem
+      Action = AddUser
+    end
+    object MenuItem2: TMenuItem
+      Action = ChgPassword
+    end
+    object MenuItem3: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem4: TMenuItem
+      Action = DeleteUser
+    end
+    object MenuItem5: TMenuItem
+      Action = DisconnectUser
+    end
+  end
+  object RoleSource: TDataSource
+    DataSet = RoleNameList
+    left = 960
+    top = 88
+  end
+  object RoleNameList: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AfterDelete = UserListAfterPost
+    AfterPost = UserListAfterPost
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = UserListSource
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
+      'P.RDB$USER,RDB$PRIVILEGE,   r.RDB$SECURITY_CLASS, cast(:USERNAME as VARCHAR(32)) as USERNAME,'
+      'Case When RDB$PRIVILEGE is null then 0 else 1 End as GRANTED'
+      'FROM RDB$ROLES r'
+      'Left Outer JOIN ('
+      'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
+      'Where RDB$USER = :USERNAME and RDB$PRIVILEGE = ''M'''
+      ') P  On P.RDB$RELATION_NAME = r.RDB$ROLE_NAME '
+      'Where r.RDB$SYSTEM_FLAG = 0'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'USERNAME'
+        ParamType = ptInput
+      end>
+    UpdateObject = UpdateUserRoles
+    DataSetCloseAction = dcSaveChanges
+    left = 960
+    top = 147
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'USERNAME'
+        ParamType = ptInput
+      end>
+    object RoleNameListRDBROLE_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$ROLE_NAME'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object RoleNameListRDBOWNER_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$OWNER_NAME'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object RoleNameListRDBDESCRIPTION: TIBMemoField
+      FieldKind = fkData
+      FieldName = 'RDB$DESCRIPTION'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      BlobType = ftMemo
+      Size = 8
+      Transliterate = False
+      DisplayTextAsClassName = False
+    end
+    object RoleNameListRDBSYSTEM_FLAG: TSmallintField
+      FieldKind = fkData
+      FieldName = 'RDB$SYSTEM_FLAG'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object RoleNameListRDBUSER: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$USER'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object RoleNameListRDBSECURITY_CLASS: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$SECURITY_CLASS'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object RoleNameListRDBPRIVILEGE: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$PRIVILEGE'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 6
+    end
+    object RoleNameListGRANTED: TIntegerField
+      FieldKind = fkData
+      FieldName = 'GRANTED'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object RoleNameListUSERNAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'USERNAME'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+  end
+  object UpdateUserRoles: TIBUpdate
+    RefreshSQL.Strings = (
+      'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
+      'P.RDB$USER,RDB$PRIVILEGE,   r.RDB$SECURITY_CLASS, cast(:USERNAME as VARCHAR(32)) as USERNAME,'
+      'Case When RDB$PRIVILEGE is null then 0 else 1 End as GRANTED'
+      'FROM RDB$ROLES r'
+      'Left Outer JOIN ('
+      'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
+      'Where RDB$USER = :USERNAME and RDB$PRIVILEGE = ''M'''
+      ') P  On P.RDB$RELATION_NAME = r.RDB$ROLE_NAME '
+      'Where r.RDB$SYSTEM_FLAG = 0 and  r.RDB$ROLE_NAME = :RDB$ROLE_NAME'
+    )
+    OnApplyUpdates = UpdateUserRolesApplyUpdates
+    left = 1024
+    top = 144
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    DefaultDatabase = IBDatabase1
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait'
+    )
+    AfterTransactionEnd = IBTransaction1AfterTransactionEnd
+    left = 144
+    top = 32
+  end
+  object DatabaseQuery: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.MON$DATABASE_NAME, A.MON$CREATION_DATE, A.'
+      'MON$OWNER, A.MON$ODS_MAJOR, A.MON$ODS_MINOR,'
+      'A.MON$SEC_DATABASE,'
+      'A.MON$ODS_MAJOR || ''.'' || A.MON$ODS_MINOR as OSDVERSION'
+      'From MON$DATABASE A'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 344
+    top = 32
+  end
+  object DBQuerySource: TDataSource
+    DataSet = DatabaseQuery
+    left = 240
+    top = 32
+  end
+  object DropConnection: TIBSQL
+    Database = IBDatabase1
+    GenerateParamNames = False
+    UniqueParamNames = False
+    ParamCheck = True
+    SQL.Strings = (
+      'Delete From MON$ATTACHMENTS A'
+      'Where MON$ATTACHMENT_ID = :ID'
+    )
+    Transaction = IBTransaction1
+    left = 267
+    top = 349
+  end
+  object IBDatabaseInfo: TIBDatabaseInfo
+    Database = IBDatabase1
+    left = 451
+    top = 36
+  end
+end

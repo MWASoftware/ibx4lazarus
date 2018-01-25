@@ -73,8 +73,8 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Height = 405
     Top = 8
     Width = 232
-    ActivePage = ExecutePage
-    TabIndex = 1
+    ActivePage = SelectPage
+    TabIndex = 0
     TabOrder = 5
     object SelectPage: TTabSheet
       Caption = 'Tables'
@@ -116,6 +116,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         LookupCache = False
         OnDblClick = SelectTableNamesDblClick
         ScrollListDataset = True
+        Sorted = True
         TabOrder = 0
         AutoInsert = False
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
@@ -257,6 +258,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         LookupCache = False
         OnDblClick = ProcedureNamesDblClick
         ScrollListDataset = True
+        Sorted = True
         TabOrder = 0
         AutoInsert = False
         AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
@@ -347,6 +349,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         LookupCache = False
         OnDblClick = PackageNamesDblClick
         ScrollListDataset = True
+        Sorted = True
         TabOrder = 3
         AutoInsert = False
         AutoCompleteText = [cbactEndOfLineComplete, cbactSearchAscending]
