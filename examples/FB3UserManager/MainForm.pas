@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ActnList,
-  Menus, ExtCtrls, DbCtrls, StdCtrls, db, IBDatabase, IBQuery, IBCustomDataSet,
-  IBUpdate, IBSQL, IBDatabaseInfo, IBDynamicGrid, IB;
+  Menus, ExtCtrls, DbCtrls, StdCtrls, ComCtrls, db, IBDatabase, IBQuery,
+  IBCustomDataSet, IBUpdate, IBSQL, IBDatabaseInfo, IBDynamicGrid, IB;
 
 type
 
@@ -49,6 +49,7 @@ type
     Panel2: TPanel;
     Panel3: TPanel;
     Splitter2: TSplitter;
+    StatusBar1: TStatusBar;
     UpdateUsers: TIBUpdate;
     UpdateUserRoles: TIBUpdate;
     MenuItem2: TMenuItem;
@@ -306,6 +307,10 @@ begin
   FIsAdmin := DatabaseQuery.FieldByName('SEC$ADMIN').AsBoolean;
   IBDynamicGrid1.Columns[4].ReadOnly := not FIsAdmin;
   IBDynamicGrid1.Columns[5].ReadOnly := not FIsAdmin;
+  StatusBar1.SimpleText := 'Logged in to ' + IBDatabase1.DatabaseName + ' as user ' +
+       DatabaseQuery.FieldByName('UserName').AsString;
+  if FIsAdmin then
+    StatusBar1.SimpleText := StatusBar1.SimpleText + ' with Administrator Privileges';
 end;
 
 procedure TForm1.DeleteUserExecute(Sender: TObject);

@@ -1,10 +1,10 @@
 object Form1: TForm1
   Left = 414
-  Height = 526
+  Height = 546
   Top = 150
   Width = 1093
   Caption = 'FB3 User Manager'
-  ClientHeight = 526
+  ClientHeight = 546
   ClientWidth = 1093
   OnClose = FormClose
   OnDestroy = FormDestroy
@@ -13,7 +13,7 @@ object Form1: TForm1
   LCLVersion = '1.8.1.0'
   object IBDynamicGrid1: TIBDynamicGrid
     Left = 0
-    Height = 526
+    Height = 524
     Top = 0
     Width = 927
     Align = alLeft
@@ -78,7 +78,6 @@ object Form1: TForm1
       end    
       item
         Alignment = taCenter
-        ReadOnly = False
         Title.Alignment = taCenter
         Title.Caption = 'Admin'
         Width = 55
@@ -164,18 +163,18 @@ object Form1: TForm1
   end
   object Splitter1: TSplitter
     Left = 927
-    Height = 526
+    Height = 524
     Top = 0
     Width = 5
   end
   object Panel1: TPanel
     Left = 932
-    Height = 526
+    Height = 524
     Top = 0
     Width = 161
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 526
+    ClientHeight = 524
     ClientWidth = 161
     TabOrder = 2
     object IBDynamicGrid2: TIBDynamicGrid
@@ -218,13 +217,13 @@ object Form1: TForm1
     end
     object Panel2: TPanel
       Left = 0
-      Height = 276
+      Height = 274
       Top = 250
       Width = 161
       Align = alClient
       BevelInner = bvLowered
       BevelOuter = bvLowered
-      ClientHeight = 276
+      ClientHeight = 274
       ClientWidth = 161
       TabOrder = 1
       object Label2: TLabel
@@ -376,8 +375,17 @@ object Form1: TForm1
       ResizeAnchor = akTop
     end
   end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 22
+    Top = 524
+    Width = 1093
+    BorderWidth = 1
+    Panels = <>
+    SimpleText = 'DatabaseName'
+  end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -826,7 +834,7 @@ object Form1: TForm1
       'MON$OWNER, A.MON$ODS_MAJOR, A.MON$ODS_MINOR,'
       'A.MON$SEC_DATABASE,'
       'A.MON$ODS_MAJOR || ''.'' || A.MON$ODS_MINOR as OSDVERSION,'
-      'S.SEC$ADMIN'
+      'S.SEC$ADMIN,CURRENT_USER as UserName'
       'From MON$DATABASE A'
       'JOIN SEC$USERS S On S.SEC$USER_NAME = CURRENT_USER'
     )
