@@ -20,6 +20,7 @@ type
     IBDatabaseInfo: TIBDatabaseInfo;
     Label6: TLabel;
     MenuItem5: TMenuItem;
+    RoleNameListGRANTED: TBooleanField;
     SaveChanges: TAction;
     ActionList1: TActionList;
     AddUser: TAction;
@@ -55,7 +56,6 @@ type
     Panel1: TPanel;
     PopupMenu1: TPopupMenu;
     RoleNameList: TIBQuery;
-    RoleNameListGRANTED: TIntegerField;
     RoleNameListRDBDESCRIPTION: TIBMemoField;
     RoleNameListRDBOWNER_NAME: TIBStringField;
     RoleNameListRDBPRIVILEGE: TIBStringField;
@@ -211,19 +211,15 @@ procedure TForm1.UpdateUserRolesApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 
   procedure Grant(Params: ISQLParams);
-  var sql: string;
   begin
-    sql := 'Grant ' + trim(Params.ByName('RDB$ROLE_NAME').AsString) + ' to ' + Params.ByName('USERNAME').AsString;
-    with Sender as TIBUpdate do
-    (DataSet.Database as TIBDatabase).Attachment.ExecImmediate(DataSet.Transaction.TransactionIntf,sql);
+    ApplyUserChange.SQL.Text := 'Grant ' + trim(Params.ByName('RDB$ROLE_NAME').AsString) + ' to ' + Params.ByName('USERNAME').AsString;
+    ApplyUserChange.ExecQuery;
   end;
 
   procedure Revoke(Params: ISQLParams);
-  var sql: string;
   begin
-    sql := 'Revoke ' + trim(Params.ByName('RDB$ROLE_NAME').AsString) + ' from ' + Params.ByName('USERNAME').AsString;
-    with Sender as TIBUpdate do
-    (DataSet.Database as TIBDatabase).Attachment.ExecImmediate(DataSet.Transaction.TransactionIntf,sql);
+    ApplyUserChange.SQL.Text := 'Revoke ' + trim(Params.ByName('RDB$ROLE_NAME').AsString) + ' from ' + Params.ByName('USERNAME').AsString;
+    ApplyUserChange.ExecQuery;
   end;
 
 begin
@@ -305,6 +301,8 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
+  {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
+  FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
   repeat
     try
       IBDatabase1.Connected := true;

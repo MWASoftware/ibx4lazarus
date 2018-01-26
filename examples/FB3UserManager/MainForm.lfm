@@ -187,7 +187,6 @@ object Form1: TForm1
       Color = clWindow
       Columns = <      
         item
-          ButtonStyle = cbsCheckboxColumn
           Title.Caption = ''
           Width = 30
           FieldName = 'GRANTED'
@@ -665,7 +664,7 @@ object Form1: TForm1
     SQL.Strings = (
       'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
       'P.RDB$USER,RDB$PRIVILEGE,   r.RDB$SECURITY_CLASS, cast(:USERNAME as VARCHAR(32)) as USERNAME,'
-      'Case When RDB$PRIVILEGE is null then 0 else 1 End as GRANTED'
+      'Case When RDB$PRIVILEGE is null then false else true End as GRANTED'
       'FROM RDB$ROLES r'
       'Left Outer JOIN ('
       'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
@@ -761,31 +760,32 @@ object Form1: TForm1
       Required = False
       Size = 6
     end
-    object RoleNameListGRANTED: TIntegerField
-      FieldKind = fkData
-      FieldName = 'GRANTED'
-      Index = 7
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = True
-    end
     object RoleNameListUSERNAME: TIBStringField
       FieldKind = fkData
       FieldName = 'USERNAME'
-      Index = 8
+      Index = 7
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = False
       Size = 32
     end
+    object RoleNameListGRANTED: TBooleanField
+      FieldKind = fkData
+      FieldName = 'GRANTED'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      DisplayValues = 'True;False'
+    end
   end
   object UpdateUserRoles: TIBUpdate
     RefreshSQL.Strings = (
       'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
       'P.RDB$USER,RDB$PRIVILEGE,   r.RDB$SECURITY_CLASS, cast(:USERNAME as VARCHAR(32)) as USERNAME,'
-      'Case When RDB$PRIVILEGE is null then 0 else 1 End as GRANTED'
+      'Case When RDB$PRIVILEGE is null then false else true End as GRANTED'
       'FROM RDB$ROLES r'
       'Left Outer JOIN ('
       'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '

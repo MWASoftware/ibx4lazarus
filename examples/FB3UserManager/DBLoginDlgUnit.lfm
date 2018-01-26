@@ -69,14 +69,14 @@ object DBLoginDlg: TDBLoginDlg
     Height = 24
     Top = 24
     Width = 192
-    TabOrder = 4
+    TabOrder = 2
   end
   object UserName: TEdit
     Left = 142
     Height = 24
     Top = 68
     Width = 192
-    TabOrder = 2
+    TabOrder = 3
   end
   object Password: TEdit
     Left = 142
@@ -85,7 +85,7 @@ object DBLoginDlg: TDBLoginDlg
     Width = 192
     EchoMode = emPassword
     PasswordChar = '*'
-    TabOrder = 3
+    TabOrder = 4
   end
   object SpeedButton1: TSpeedButton
     Left = 338
