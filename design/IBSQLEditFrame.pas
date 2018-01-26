@@ -189,6 +189,8 @@ type
     procedure InsertPackageName;
     procedure InsertSelectedInputParam;
     procedure InsertSelectedOutputParam;
+    procedure InsertSelectedIdentityCol;
+    procedure InsertSelectedReadOnlyField;
     procedure OpenUserProcedures;
     function SyncQueryBuilder: TIBSQLStatementTypes; overload;
     function SyncQueryBuilder(SQL: TStrings): TIBSQLStatementTypes; overload;
@@ -1166,6 +1168,18 @@ end;
 procedure TIBSQLEditFrame.InsertSelectedOutputParam;
 begin
   SQLText.SelText := ProcOutputParams.FieldByName('ColumnName').AsString;
+  SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.InsertSelectedIdentityCol;
+begin
+  SQLText.SelText := IdentityCols.FieldByName('ColumnName').AsString;
+  SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.InsertSelectedReadOnlyField;
+begin
+  SQLText.SelText := ReadOnlyFields.FieldByName('ColumnName').AsString;
   SQLText.SetFocus
 end;
 

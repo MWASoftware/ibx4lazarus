@@ -141,6 +141,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Caption = 'COLUMNNAME'
             Width = 64
             FieldName = 'COLUMNNAME'
@@ -180,6 +181,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Caption = 'COLUMNNAME'
             Width = 64
             FieldName = 'COLUMNNAME'
@@ -272,6 +274,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
         Color = clWindow
         Columns = <        
           item
+            ReadOnly = True
             Title.Caption = 'COLUMNNAME'
             Width = 64
             FieldName = 'COLUMNNAME'
@@ -310,6 +313,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Caption = 'COLUMNNAME'
             Width = 64
             FieldName = 'COLUMNNAME'
