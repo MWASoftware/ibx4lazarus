@@ -78,7 +78,7 @@ object Form1: TForm1
       end    
       item
         Alignment = taCenter
-        ReadOnly = True
+        ReadOnly = False
         Title.Alignment = taCenter
         Title.Caption = 'Admin'
         Width = 55
@@ -377,7 +377,7 @@ object Form1: TForm1
     end
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -387,6 +387,8 @@ object Form1: TForm1
     DatabaseName = 'employee'
     Params.Strings = (
       'user_name=SYSDBA'
+      'sql_role_name=RDB$ADMIN'
+      'lc_ctype=UTF8'
     )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
@@ -459,7 +461,7 @@ object Form1: TForm1
       Index = 2
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = True
+      ReadOnly = False
       Required = False
       DisplayValues = 'True;False'
     end
@@ -604,6 +606,7 @@ object Form1: TForm1
     object AddUser: TAction
       Caption = 'Add'
       OnExecute = AddUserExecute
+      OnUpdate = AddUserUpdate
     end
     object ChgPassword: TAction
       Caption = 'Change Password'
@@ -670,7 +673,7 @@ object Form1: TForm1
       'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
       'Where RDB$USER = :USERNAME and RDB$PRIVILEGE = ''M'''
       ') P  On P.RDB$RELATION_NAME = r.RDB$ROLE_NAME '
-      'Where r.RDB$SYSTEM_FLAG = 0'
+      ''
     )
     Params = <    
       item
@@ -791,7 +794,7 @@ object Form1: TForm1
       'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
       'Where RDB$USER = :USERNAME and RDB$PRIVILEGE = ''M'''
       ') P  On P.RDB$RELATION_NAME = r.RDB$ROLE_NAME '
-      'Where r.RDB$SYSTEM_FLAG = 0 and  r.RDB$ROLE_NAME = :RDB$ROLE_NAME'
+      'Where  r.RDB$ROLE_NAME = :RDB$ROLE_NAME'
     )
     OnApplyUpdates = UpdateUserRolesApplyUpdates
     left = 1024
@@ -813,6 +816,7 @@ object Form1: TForm1
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
+    AfterOpen = DatabaseQueryAfterOpen
     BufferChunks = 1000
     CachedUpdates = False
     GenerateParamNames = False
@@ -821,8 +825,10 @@ object Form1: TForm1
       'Select A.MON$DATABASE_NAME, A.MON$CREATION_DATE, A.'
       'MON$OWNER, A.MON$ODS_MAJOR, A.MON$ODS_MINOR,'
       'A.MON$SEC_DATABASE,'
-      'A.MON$ODS_MAJOR || ''.'' || A.MON$ODS_MINOR as OSDVERSION'
+      'A.MON$ODS_MAJOR || ''.'' || A.MON$ODS_MINOR as OSDVERSION,'
+      'S.SEC$ADMIN'
       'From MON$DATABASE A'
+      'JOIN SEC$USERS S On S.SEC$USER_NAME = CURRENT_USER'
     )
     Params = <>
     DataSetCloseAction = dcDiscardChanges
@@ -850,6 +856,11 @@ object Form1: TForm1
   object IBDatabaseInfo: TIBDatabaseInfo
     Database = IBDatabase1
     left = 451
+    top = 36
+  end
+  object ApplicationProperties1: TApplicationProperties
+    OnException = ApplicationProperties1Exception
+    left = 584
     top = 36
   end
 end

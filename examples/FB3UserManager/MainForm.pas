@@ -14,6 +14,7 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    ApplicationProperties1: TApplicationProperties;
     DBEdit5: TDBEdit;
     DisconnectUser: TAction;
     DropConnection: TIBSQL;
@@ -83,8 +84,11 @@ type
     UserListUSERNAME: TIBStringField;
     UserListUSERPASSWORD: TIBStringField;
     procedure AddUserExecute(Sender: TObject);
+    procedure AddUserUpdate(Sender: TObject);
+    procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
     procedure ChgPasswordExecute(Sender: TObject);
     procedure ChgPasswordUpdate(Sender: TObject);
+    procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
     procedure DeleteUserExecute(Sender: TObject);
     procedure DisconnectUserExecute(Sender: TObject);
     procedure DisconnectUserUpdate(Sender: TObject);
@@ -108,6 +112,7 @@ type
     procedure UserListAfterPost(DataSet: TDataSet);
     procedure UserListBeforeClose(DataSet: TDataSet);
   private
+      FIsAdmin: boolean;
      FDisconnecting: boolean;
      procedure DoReopen(Data: PtrInt);
   public
@@ -168,11 +173,26 @@ begin
     ukInsert:
       ApplyUserChange.SQL.Text := 'CREATE USER ' + FormatStmtOptions;
     ukModify:
-      ApplyUserChange.SQL.Text := 'ALTER USER ' + FormatStmtOptions;
+        ApplyUserChange.SQL.Text := 'ALTER USER ' + FormatStmtOptions;
     ukDelete:
       ApplyUserChange.SQL.Text := 'DROP USER ' + Trim(Params.ByName('UserName').AsString);
     end;
     ApplyUserChange.ExecQuery;
+  end;
+  if UpdateKind = ukModify then
+  {Update Admin Role if allowed}
+  begin
+    if Params.ByName('SEC$ADMIN').AsBoolean and not Params.ByName('OLD_SEC$ADMIN').AsBoolean then
+    begin
+      ApplyUserChange.SQL.Text := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) + ' GRANT ADMIN ROLE';
+      ApplyUserChange.ExecQuery;
+    end
+    else
+    if not Params.ByName('SEC$ADMIN').AsBoolean and Params.ByName('OLD_SEC$ADMIN').AsBoolean then
+    begin
+      ApplyUserChange.SQL.Text := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) + ' REVOKE ADMIN ROLE';
+      ApplyUserChange.ExecQuery;
+    end
   end;
 end;
 
@@ -246,6 +266,24 @@ begin
   end;
 end;
 
+procedure TForm1.AddUserUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := FIsAdmin;
+end;
+
+procedure TForm1.ApplicationProperties1Exception(Sender: TObject; E: Exception);
+begin
+  if E is EIBInterBaseError then
+  begin
+    if RoleNameList.State in [dsInsert,dsEdit] then
+      RoleNameList.Cancel;
+    if UserList.State in [dsInsert,dsEdit] then
+      UserList.Cancel;
+  end;
+  MessageDlg(E.Message,mtError,[mbOK],0);
+  Application.QueueAsyncCall(@DoReopen,0);
+end;
+
 procedure TForm1.ChgPasswordExecute(Sender: TObject);
 var NewPassword: string;
 begin
@@ -260,7 +298,14 @@ end;
 
 procedure TForm1.ChgPasswordUpdate(Sender: TObject);
 begin
-  (Sender as TAction).Enabled := UserList.Active and (UserList.RecordCount > 0);
+  (Sender as TAction).Enabled := FIsAdmin and UserList.Active and (UserList.RecordCount > 0);
+end;
+
+procedure TForm1.DatabaseQueryAfterOpen(DataSet: TDataSet);
+begin
+  FIsAdmin := DatabaseQuery.FieldByName('SEC$ADMIN').AsBoolean;
+  IBDynamicGrid1.Columns[4].ReadOnly := not FIsAdmin;
+  IBDynamicGrid1.Columns[5].ReadOnly := not FIsAdmin;
 end;
 
 procedure TForm1.DeleteUserExecute(Sender: TObject);
@@ -291,7 +336,7 @@ end;
 
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-  IBDatabase1.Connected := false;
+  IBDatabase1.ForceClose;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
