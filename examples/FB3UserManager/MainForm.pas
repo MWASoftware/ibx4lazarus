@@ -70,6 +70,7 @@ type
     Splitter1: TSplitter;
     UserList: TIBQuery;
     UserListCURRENT_CONNECTION: TIBLargeIntField;
+    UserListDBCREATOR: TBooleanField;
     UserListLOGGEDIN: TBooleanField;
     UserListMONATTACHMENT_ID: TIBLargeIntField;
     UserListMONREMOTE_HOST: TIBStringField;
@@ -195,6 +196,18 @@ begin
       ApplyUserChange.ExecQuery;
     end
   end;
+  {Update DB Creator Role}
+  if Params.ByName('DBCreator').AsBoolean and not Params.ByName('OLD_DBCreator').AsBoolean then
+  begin
+    ApplyUserChange.SQL.Text := 'GRANT CREATE DATABASE TO USER ' + Trim(Params.ByName('UserName').AsString);
+    ApplyUserChange.ExecQuery;
+  end
+  else
+  if not Params.ByName('DBCreator').AsBoolean and Params.ByName('OLD_DBCreator').AsBoolean then
+  begin
+    ApplyUserChange.SQL.Text := 'REVOKE CREATE DATABASE FROM USER ' + Trim(Params.ByName('UserName').AsString);
+    ApplyUserChange.ExecQuery;
+  end
 end;
 
 procedure TForm1.UserListAfterInsert(DataSet: TDataSet);
@@ -305,8 +318,12 @@ end;
 procedure TForm1.DatabaseQueryAfterOpen(DataSet: TDataSet);
 begin
   FIsAdmin := DatabaseQuery.FieldByName('SEC$ADMIN').AsBoolean;
+  IBDynamicGrid1.Columns[1].ReadOnly := not FIsAdmin;
+  IBDynamicGrid1.Columns[2].ReadOnly := not FIsAdmin;
+  IBDynamicGrid1.Columns[3].ReadOnly := not FIsAdmin;
   IBDynamicGrid1.Columns[4].ReadOnly := not FIsAdmin;
   IBDynamicGrid1.Columns[5].ReadOnly := not FIsAdmin;
+  IBDynamicGrid1.Columns[6].ReadOnly := not FIsAdmin;
   StatusBar1.SimpleText := 'Logged in to ' + IBDatabase1.DatabaseName + ' as user ' +
        DatabaseQuery.FieldByName('UserName').AsString;
   if FIsAdmin then
