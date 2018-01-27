@@ -181,6 +181,7 @@ begin
     end;
     ApplyUserChange.ExecQuery;
   end;
+
   if UpdateKind = ukModify then
   {Update Admin Role if allowed}
   begin
@@ -196,6 +197,7 @@ begin
       ApplyUserChange.ExecQuery;
     end
   end;
+
   {Update DB Creator Role}
   if Params.ByName('DBCreator').AsBoolean and not Params.ByName('OLD_DBCreator').AsBoolean then
   begin
@@ -214,6 +216,7 @@ procedure TForm1.UserListAfterInsert(DataSet: TDataSet);
 begin
   UserList.FieldByName('SEC$ADMIN').AsBoolean := false;
   UserList.FieldByName('SEC$ACTIVE').AsBoolean := false;
+  UserList.FieldByName('DBCreator').AsBoolean := false;
 end;
 
 procedure TForm1.UserListAfterOpen(DataSet: TDataSet);
