@@ -1,4 +1,4 @@
-IBX Change Log  version                                              (2.2-0) Thu, 25 Jan 2018 13:56:39 +0000
+IBX Change Log  version                                               (2.2-0) Mon, 29 Jan 2018 15:00:15 +0000
 
 1. IBExtract: Identity columns - add additional check for null column for generator name.
 
@@ -97,6 +97,15 @@ IBX Change Log  version                                              (2.2-0) Thu
 
 23. IBServices: SQRB and SRB buffers are now reset when service query throws and exception.
     This avoids errors due to a stale SQRB or SRB being used for the next query.
+
+24. IBServices: Service attach parameters now include "expected_db". This is used to
+    add the SPB item isc_spb_expected_db. This names a database using
+    an alternative Security Database (FB3 onwards) and allows (e.g. backup/restore) using such a
+    database. examples/services re-written to illustrate use of "expected_db".
+
+25. IBServices: TIBControlAndQueryService.WriteNextChunk no longer ignores isc_info_svc_timeout.
+    This avoids truncated backups when the server returns a timeout (busy) response.
+
 
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
