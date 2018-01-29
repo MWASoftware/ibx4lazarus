@@ -37,7 +37,7 @@ type
     procedure FormShow(Sender: TObject);
   private
     { private declarations }
-    procedure DoBackup(Data: PtrInt);
+    procedure DoBackup(BackupAction: PtrInt);
     procedure DoRestore(Data: PtrInt);
   public
     { public declarations }
@@ -49,6 +49,12 @@ var
 implementation
 
 {$R *.lfm}
+
+uses IBErrorCodes;
+
+resourcestring
+  sLoginAgain = 'This database appears to use an alternative security database. '+
+                'You must now log into the alternative security database';
 
 { TForm1 }
 
@@ -88,35 +94,74 @@ begin
   end;
 end;
 
-procedure TForm1.DoBackup(Data: PtrInt);
+procedure TForm1.DoBackup(BackupAction: PtrInt);
 var bakfile: TFileStream;
+    index: integer;
+    ErrorCode: integer;
 begin
   bakfile := nil;
+  ErrorCode := 0;
   with Form2 do
-  begin
-    IBBackupService1.ServiceIntf := IBServerProperties1.ServiceIntf;
-    IBBackupService1.Active := true;
+  try
+    IBBackupService1.Params.Assign(IBServerProperties1.Params);
+    index := IBBackupService1.Params.IndexOfName('password');
+    if BackupAction = 1 then
+    begin
+      IBBackupService1.LoginPrompt := true;
+      IBBackupService1.Params.Add('expected_db='+IBBackupService1.DatabaseName);
+      IBBackupService1.Params.Delete(index);
+    end
+    else
+      IBBackupService1.LoginPrompt := index = -1;
+    with IBBackupService1 do
+    repeat
+      try
+        Active := true;
+      except
+       on E:EIBClientError do
+        begin
+          Close;
+          Exit
+        end;
+       On E:Exception do
+         MessageDlg(E.Message,mtError,[mbOK],0);
+      end;
+    until Active; {Loop until logged in or user cancels}
+
     Memo1.Lines.Add('Starting Backup');
     IBBackupService1.ServiceStart;
     try
       if IBBackupService1.BackupFileLocation = flClientSide then
         bakfile := TFileStream.Create(IBBackupService1.BackupFile[0],fmCreate);
       while not IBBackupService1.Eof do
-      begin
+      try
         case IBBackupService1.BackupFileLocation of
         flServerSide:
           Memo1.Lines.Add(IBBackupService1.GetNextLine);
         flClientSide:
           IBBackupService1.WriteNextChunk(bakfile);
         end;
-        Application.ProcessMessages
+        Application.ProcessMessages;
+      except
+       on E: EIBInterBaseError do
+       begin
+         ErrorCode := E.IBErrorCode;
+         Exit;
+       end;
       end;
+      Memo1.Lines.Add('Backup Completed');
+      MessageDlg('Backup Completed',mtInformation,[mbOK],0);
     finally
       if bakfile <> nil then
         bakfile.Free;
     end;
-    Memo1.Lines.Add('Backup Completed');
-    MessageDlg('Backup Completed',mtInformation,[mbOK],0);
+  finally
+    IBBackupService1.Active := false;
+    if (ErrorCode = isc_sec_context) and (BackupAction = 0) then {Need expected_db}
+    begin
+      MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
+      Application.QueueAsyncCall(@DoBackup,1);
+    end;
   end;
 end;
 
@@ -166,12 +211,14 @@ end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
+  Form2.IBBackupService1.ServerName := IBServerProperties1.ServerName;
   if Form2.ShowModal = mrOK then
     Application.QueueAsyncCall(@DoBackup,0);
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 begin
+  Form3.IBRestoreService1.ServerName := IBServerProperties1.ServerName;
   if Form3.ShowModal = mrOK then
     Application.QueueAsyncCall(@DoRestore,0);
 end;
