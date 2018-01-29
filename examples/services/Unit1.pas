@@ -37,7 +37,6 @@ type
     procedure FormShow(Sender: TObject);
   private
     { private declarations }
-    FAltDBName: string;
     procedure DoBackup(secDB: PtrInt);
     procedure DoRestore(secDB: PtrInt);
     procedure DoShowStatistics(secDB: PtrInt);
@@ -69,10 +68,6 @@ resourcestring
                 'You must now log into the alternative security database using ' +
                 'login credentials for the alternative security database';
 
-  sSecDatabaseLogin = 'Firebird 3 or later: if you want select an alternative Security Database '+ LineEnding+
-                      'then enter the name of a Database that uses this Security Database. '+ LineEnding+
-                      'otherwise leave blank for the default security database';
-
 { TForm1 }
 
 procedure TForm1.FormShow(Sender: TObject);
@@ -103,6 +98,7 @@ end;
 procedure TForm1.DoBackup(secDB: PtrInt);
 var bakfile: TFileStream;
     NeedsExpectedDB: boolean;
+    BackupCount: integer;
 begin
   bakfile := nil;
   with Form2 do
@@ -126,12 +122,13 @@ begin
           end;
           Application.ProcessMessages;
         end;
+        BackupCount := bakfile.Size;
       finally
         if bakfile <> nil then
           bakfile.Free;
       end;
-      Memo1.Lines.Add('Backup Completed');
-      MessageDlg('Backup Completed',mtInformation,[mbOK],0);
+      Memo1.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
+      MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
     except
      on E: EIBInterBaseError do
        if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
@@ -304,30 +301,13 @@ begin
 end;
 
 procedure TForm1.DoListUsers(secDB: PtrInt);
-var NeedsExpectedDB: boolean;
 begin
   with ListUsersForm do
   try
-    AttachService(IBSecurityService1,SecDB,FAltDBName);
-    try
-      {test access credentials}
-      IBSecurityService1.DisplayUsers;
-    except
-       on E: EIBInterBaseError do
-         if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
-         begin
-           NeedsExpectedDB := true;
-           Exit;
-         end;
-    end;
+    AttachService(IBSecurityService1,SecDB,'');
     ShowModal;
   finally
     IBSecurityService1.Active := false;
-    if NeedsExpectedDB then {Need expected_db}
-    begin
-      MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
-      Application.QueueAsyncCall(@DoListUsers,use_alt_sec_db_login);
-    end;
   end;
 end;
 
@@ -361,7 +341,7 @@ begin
     if secDB = use_alt_sec_db_login then
     begin
       LoginPrompt := true;
-//      Params.Add('expected_db='+aDatabaseName);
+      Params.Add('expected_db='+aDatabaseName);
       Params.Delete(index);
     end
     else
@@ -419,11 +399,7 @@ end;
 
 procedure TForm1.Button6Click(Sender: TObject);
 begin
-  FAltDBName := '';
-  if InputQuery('Select Database',sSecDatabaseLogin,FAltDBName) and (FAltDBName <> '') then
-    Application.QueueAsyncCall(@DoListUsers,use_alt_sec_db_login)
-  else
-    Application.QueueAsyncCall(@DoListUsers,use_global_login);
+  Application.QueueAsyncCall(@DoListUsers,use_global_login);
 end;
 
 procedure TForm1.Button7Click(Sender: TObject);

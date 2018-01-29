@@ -280,6 +280,7 @@ type
     constructor create (AOwner: TComponent); override;
     function GetNextLine : String;
     function GetNextChunk : String;
+    procedure ServiceStart; override;
     function WriteNextChunk(stream: TStream): integer;
     property Eof: boolean read FEof;
   end;
@@ -2055,11 +2056,19 @@ begin
   end;
 end;
 
+procedure TIBControlAndQueryService.ServiceStart;
+begin
+  FEof := false;
+  inherited ServiceStart;
+end;
+
 function TIBControlAndQueryService.WriteNextChunk(stream: TStream): integer;
 var
   i: Integer;
+  TimeOut: boolean;
 begin
   result := 0;
+  TimeOut := false;
   if (FEof = True) then
     exit;
   if (FAction = 0) then
@@ -2077,14 +2086,18 @@ begin
       isc_info_svc_to_eof:
       begin
         Result := CopyTo(stream,0);
-        FEof := Result = 0;
+        FEof := (Result = 0) and not TimeOut;
       end;
 
       isc_info_truncated:
         FEof := False;
 
       isc_info_svc_timeout:
-        {ignore};
+        begin
+          FEof := False;
+          TimeOut := true;
+        end
+
     else
       IBError(ibxeOutputParsingError, [getItemType]);
     end;
