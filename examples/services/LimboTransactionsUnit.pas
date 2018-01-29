@@ -16,13 +16,14 @@ type
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
-    IBValidationService1: TIBValidationService;
+    LimboTransactionValidation: TIBValidationService;
     Label1: TLabel;
     StringGrid1: TStringGrid;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure StringGrid1EditingDone(Sender: TObject);
   private
@@ -54,31 +55,37 @@ end;
 
 procedure TLimboTransactionsForm.Button1Click(Sender: TObject);
 begin
-  IBValidationService1.GlobalAction := CommitGlobal;
+  LimboTransactionValidation.GlobalAction := CommitGlobal;
   RunGFix;
 end;
 
 procedure TLimboTransactionsForm.Button2Click(Sender: TObject);
 begin
-  IBValidationService1.GlobalAction := RollbackGlobal;
+  LimboTransactionValidation.GlobalAction := RollbackGlobal;
   RunGFix;
 end;
 
 procedure TLimboTransactionsForm.Button3Click(Sender: TObject);
 begin
-  IBValidationService1.GlobalAction := NoGlobalAction;
+  LimboTransactionValidation.GlobalAction := NoGlobalAction;
   RunGFix;
 end;
 
 procedure TLimboTransactionsForm.Button4Click(Sender: TObject);
 begin
-  IBValidationService1.GlobalAction := RecoverTwoPhaseGlobal;
+  LimboTransactionValidation.GlobalAction := RecoverTwoPhaseGlobal;
   RunGFix;
+end;
+
+procedure TLimboTransactionsForm.FormClose(Sender: TObject;
+  var CloseAction: TCloseAction);
+begin
+  LimboTransactionValidation.Active := false;
 end;
 
 procedure TLimboTransactionsForm.StringGrid1EditingDone(Sender: TObject);
 begin
-  with StringGrid1, IBValidationService1 do
+  with StringGrid1, LimboTransactionValidation do
   if col = 7 then
   begin
     if Cells[7,row] = 'Commit' then
@@ -92,7 +99,7 @@ end;
 procedure TLimboTransactionsForm.DoRefresh(Data: PtrInt);
 var i: integer;
 begin
-  with IBValidationService1 do
+  with LimboTransactionValidation do
   begin
     Active := true;
     ServiceStart;
@@ -155,7 +162,7 @@ end;
 
 procedure TLimboTransactionsForm.RunGFix;
 begin
-  with IBValidationService1 do
+  with LimboTransactionValidation do
   begin
     Form1.Memo1.Lines.Add('Starting Limbo transaction resolution');
     FixLimboTransactionErrors;

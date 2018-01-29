@@ -37,8 +37,15 @@ type
     procedure FormShow(Sender: TObject);
   private
     { private declarations }
-    procedure DoBackup(Data: PtrInt);
-    procedure DoRestore(Data: PtrInt);
+    procedure DoBackup(secDB: PtrInt);
+    procedure DoRestore(secDB: PtrInt);
+    procedure DoShowStatistics(secDB: PtrInt);
+    procedure DoValidation(secDB: PtrInt);
+    procedure DoLimboTransactions(secDB: PtrInt);
+    procedure DoListUsers(secDB: PtrInt);
+    procedure AttachService(aService: TIBCustomService); overload;
+    procedure AttachService(aService: TIBCustomService; secDB: integer;
+      aDatabaseName: string); overload;
   public
     { public declarations }
   end;
@@ -50,6 +57,17 @@ implementation
 
 {$R *.lfm}
 
+uses IBErrorCodes;
+
+const
+  use_global_login     = 0; {Login to backup/restore with global sec db}
+  use_alt_sec_db_login = 1; {Login to backup/restore with alt sec db}
+
+resourcestring
+  sLoginAgain = 'This database appears to use an alternative security database. '+
+                'You must now log into the alternative security database using ' +
+                'login credentials for the alternative security database';
+
 { TForm1 }
 
 procedure TForm1.FormShow(Sender: TObject);
@@ -57,21 +75,9 @@ var i: integer;
 begin
   Form3.IBRestoreService1.DatabaseName.Clear;
   Form3.IBRestoreService1.DatabaseName.Add(GetTempDir + 'mytest.fdb');
+  AttachService(IBServerProperties1);
   with IBServerProperties1 do
   begin
-    repeat
-      try
-        Active := true;
-      except
-       on E:EIBClientError do
-        begin
-          Close;
-          Exit
-        end;
-       On E:Exception do
-         MessageDlg(E.Message,mtError,[mbOK],0);
-      end;
-    until Active; {Loop until logged in or user cancels}
     FetchVersionInfo;
     Memo1.Lines.Add('Server Version = ' + VersionInfo.ServerVersion);
     Memo1.Lines.Add('Server Implementation = ' + VersionInfo.ServerImplementation);
@@ -85,78 +91,263 @@ begin
     Memo1.Lines.Add('Base Location = ' + ConfigParams.BaseLocation);
     Memo1.Lines.Add('Lock File Location = ' + ConfigParams.LockFileLocation);
     Memo1.Lines.Add('Security Database Location = ' + ConfigParams.SecurityDatabaseLocation);
+    Active := false;
   end;
 end;
 
-procedure TForm1.DoBackup(Data: PtrInt);
+procedure TForm1.DoBackup(secDB: PtrInt);
 var bakfile: TFileStream;
+    NeedsExpectedDB: boolean;
+    BackupCount: integer;
 begin
   bakfile := nil;
   with Form2 do
-  begin
-    IBBackupService1.ServiceIntf := IBServerProperties1.ServiceIntf;
-    IBBackupService1.Active := true;
-    Memo1.Lines.Add('Starting Backup');
-    IBBackupService1.ServiceStart;
+  try
+    AttachService(IBBackupService1,secDB,IBBackupService1.DatabaseName);
+
+    NeedsExpectedDB := false;
     try
-      if IBBackupService1.BackupFileLocation = flClientSide then
-        bakfile := TFileStream.Create(IBBackupService1.BackupFile[0],fmCreate);
-      while not IBBackupService1.Eof do
-      begin
-        case IBBackupService1.BackupFileLocation of
-        flServerSide:
-          Memo1.Lines.Add(IBBackupService1.GetNextLine);
-        flClientSide:
-          IBBackupService1.WriteNextChunk(bakfile);
+      Memo1.Lines.Add('Starting Backup');
+      IBBackupService1.ServiceStart;
+      try
+        if IBBackupService1.BackupFileLocation = flClientSide then
+          bakfile := TFileStream.Create(IBBackupService1.BackupFile[0],fmCreate);
+        while not IBBackupService1.Eof do
+        begin
+          case IBBackupService1.BackupFileLocation of
+          flServerSide:
+            Memo1.Lines.Add(IBBackupService1.GetNextLine);
+          flClientSide:
+            IBBackupService1.WriteNextChunk(bakfile);
+          end;
+          Application.ProcessMessages;
         end;
-        Application.ProcessMessages
+        BackupCount := bakfile.Size;
+      finally
+        if bakfile <> nil then
+          bakfile.Free;
       end;
-    finally
-      if bakfile <> nil then
-        bakfile.Free;
+      Memo1.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
+      MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
+    except
+     on E: EIBInterBaseError do
+       if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
+         NeedsExpectedDB := true
+       else
+         raise;
     end;
-    Memo1.Lines.Add('Backup Completed');
-    MessageDlg('Backup Completed',mtInformation,[mbOK],0);
+  finally
+    IBBackupService1.Active := false;
+    if NeedsExpectedDB then {Need expected_db}
+    begin
+      MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
+      Application.QueueAsyncCall(@DoBackup,use_alt_sec_db_login);
+    end;
   end;
 end;
 
-procedure TForm1.DoRestore(Data: PtrInt);
+procedure TForm1.DoRestore(secDB: PtrInt);
 var bakfile: TFileStream;
     line: string;
+    NeedsExpectedDB: boolean;
 begin
   bakfile := nil;
   with Form3 do
-  begin
-    IBRestoreService1.ServiceIntf := IBServerProperties1.ServiceIntf;
-    IBRestoreService1.Active := true;
-    if IBRestoreService1.IsServiceRunning then
-      Exception.Create('A Service is still running');
-    IBRestoreService1.ServiceStart;
-    Memo1.Lines.Add('Restore Started');
+  try
+    AttachService(IBRestoreService1,secDB,IBRestoreService1.DatabaseName[0]);
+
+    NeedsExpectedDB := false;
     try
+      IBRestoreService1.ServiceStart;
+      Memo1.Lines.Add('Restore Started');
       if IBRestoreService1.BackupFileLocation = flClientSide then
         bakfile := TFileStream.Create(IBRestoreService1.BackupFile[0],fmOpenRead);
-      while not IBRestoreService1.Eof do
-      begin
-        case IBRestoreService1.BackupFileLocation of
-        flServerSide:
-          Memo1.Lines.Add(Trim(IBRestoreService1.GetNextLine));
-        flClientSide:
-          begin
-            IBRestoreService1.SendNextChunk(bakfile,line);
-            if line <> '' then
-              Memo1.Lines.Add(line);
+      try
+        while not IBRestoreService1.Eof do
+        begin
+          case IBRestoreService1.BackupFileLocation of
+          flServerSide:
+            Memo1.Lines.Add(Trim(IBRestoreService1.GetNextLine));
+          flClientSide:
+            begin
+              IBRestoreService1.SendNextChunk(bakfile,line);
+              if line <> '' then
+                Memo1.Lines.Add(line);
+            end;
           end;
+          Application.ProcessMessages
         end;
-        Application.ProcessMessages
+      finally
+        if bakfile <> nil then
+          bakfile.Free;
       end;
-    finally
-      if bakfile <> nil then
-        bakfile.Free;
+      Memo1.Lines.Add('Restore Completed');
+      MessageDlg('Restore Completed',mtInformation,[mbOK],0);
+    except
+         on E: EIBInterBaseError do
+           if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
+             NeedsExpectedDB := true
+           else
+             raise;
+      end;
+  finally
+    IBRestoreService1.Active := false;
+    if NeedsExpectedDB then {Need expected_db}
+    begin
+      MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
+      Application.QueueAsyncCall(@DoRestore,use_alt_sec_db_login);
     end;
-    Memo1.Lines.Add('Restore Completed');
-    MessageDlg('Restore Completed',mtInformation,[mbOK],0);
   end;
+
+end;
+
+procedure TForm1.DoShowStatistics(secDB: PtrInt);
+var NeedsExpectedDB: boolean;
+begin
+  AttachService(IBStatisticalService1,secDB,IBStatisticalService1.DatabaseName);
+  NeedsExpectedDB := false;
+  with IBStatisticalService1 do
+  try
+    try
+      ServiceStart;
+      Memo1.Lines.Add('Database Statistics for ' + IBStatisticalService1.DatabaseName);
+      while not Eof do
+      begin
+        Memo1.Lines.Add(GetNextLine);
+        Application.ProcessMessages;
+      end;
+    except
+       on E: EIBInterBaseError do
+         if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
+         begin
+           NeedsExpectedDB := true;
+           Exit;
+         end;
+    end;
+  finally
+    Active := false;
+    if NeedsExpectedDB then {Need expected_db}
+    begin
+      MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
+      Application.QueueAsyncCall(@DoShowStatistics,use_alt_sec_db_login);
+    end;
+  end;
+end;
+
+procedure TForm1.DoValidation(secDB: PtrInt);
+var NeedsExpectedDB: boolean;
+begin
+  NeedsExpectedDB := false;
+  AttachService(IBValidationService1,secDB,IBValidationService1.DatabaseName);
+  Application.ProcessMessages;
+  with IBValidationService1 do
+  try
+    Active := true;
+    try
+      ServiceStart;
+      Memo1.Lines.Add('Running...');
+      while not Eof do
+      begin
+        Memo1.Lines.Add(GetNextLine);
+        Application.ProcessMessages;
+      end;
+    except
+       on E: EIBInterBaseError do
+         if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
+         begin
+           NeedsExpectedDB := true;
+           Exit;
+         end;
+    end;
+    Memo1.Lines.Add('Validation Completed');
+    MessageDlg('Validation Completed',mtInformation,[mbOK],0);
+  finally
+    Active := false;
+    if NeedsExpectedDB then {Need expected_db}
+    begin
+      MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
+      Application.QueueAsyncCall(@DoValidation,use_alt_sec_db_login);
+    end;
+  end;
+end;
+
+procedure TForm1.DoLimboTransactions(secDB: PtrInt);
+var NeedsExpectedDB: boolean;
+begin
+  with LimboTransactionsForm do
+  try
+    AttachService(LimboTransactionValidation,secDB,LimboTransactionValidation.DatabaseName);
+    try
+      {test access credentials}
+      LimboTransactionValidation.ServiceStart;
+      LimboTransactionValidation.FetchLimboTransactionInfo;
+    except
+       on E: EIBInterBaseError do
+         if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
+         begin
+           NeedsExpectedDB := true;
+           Exit;
+         end;
+    end;
+    ShowModal;
+  finally
+    LimboTransactionValidation.Active := false;
+    if NeedsExpectedDB then {Need expected_db}
+    begin
+      MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
+      Application.QueueAsyncCall(@DoLimboTransactions,use_alt_sec_db_login);
+    end;
+  end;
+end;
+
+procedure TForm1.DoListUsers(secDB: PtrInt);
+begin
+  with ListUsersForm do
+  try
+    AttachService(IBSecurityService1,SecDB,'');
+    ShowModal;
+  finally
+    IBSecurityService1.Active := false;
+  end;
+end;
+
+procedure TForm1.AttachService(aService: TIBCustomService);
+begin
+  with aService do
+  repeat
+    try
+      Active := true;
+    except
+     on E:EIBClientError do
+      begin
+        Close;
+        Exit
+      end;
+     On E:Exception do
+       MessageDlg(E.Message,mtError,[mbOK],0);
+    end;
+  until Active; {Loop until logged in or user cancels}
+end;
+
+procedure TForm1.AttachService(aService: TIBCustomService; secDB: integer; aDatabaseName: string
+  );
+var index: integer;
+begin
+  with aService do
+  begin
+    ServerName := IBServerProperties1.ServerName;
+    Params.Assign(IBServerProperties1.Params);
+    index := Params.IndexOfName('password');
+    if secDB = use_alt_sec_db_login then
+    begin
+      LoginPrompt := true;
+      Params.Add('expected_db='+aDatabaseName);
+      Params.Delete(index);
+    end
+    else
+      LoginPrompt := index = -1;
+  end;
+  AttachService(aService);
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -166,14 +357,16 @@ end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
+  Form2.IBBackupService1.ServerName := IBServerProperties1.ServerName;
   if Form2.ShowModal = mrOK then
-    Application.QueueAsyncCall(@DoBackup,0);
+    Application.QueueAsyncCall(@DoBackup,use_global_login);
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 begin
+  Form3.IBRestoreService1.ServerName := IBServerProperties1.ServerName;
   if Form3.ShowModal = mrOK then
-    Application.QueueAsyncCall(@DoRestore,0);
+    Application.QueueAsyncCall(@DoRestore,use_global_login);
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
@@ -196,55 +389,29 @@ procedure TForm1.Button5Click(Sender: TObject);
 var DBName: string;
 begin
   DBName := IBStatisticalService1.DatabaseName;
-  if InputQuery('Select Database','Enter Database Name on ' + IBStatisticalService1.ServerName,
+  if InputQuery('Select Database','Enter Database Name on ' + IBServerProperties1.ServerName,
          DBName) then
   begin
     IBStatisticalService1.DatabaseName := DBName;
-    Memo1.Lines.Add('Database Statistics for ' + IBStatisticalService1.DatabaseName);
-    IBStatisticalService1.ServiceIntf := IBServerProperties1.ServiceIntf;
-    with IBStatisticalService1 do
-    begin
-      Active := true;
-      ServiceStart;
-      while not Eof do
-      begin
-        Memo1.Lines.Add(GetNextLine);
-        Application.ProcessMessages;
-      end;
-    end;
+    Application.QueueAsyncCall(@DoShowStatistics,use_global_login);
   end;
 end;
 
 procedure TForm1.Button6Click(Sender: TObject);
 begin
-  ListUsersForm.IBSecurityService1.ServiceIntf := IBServerProperties1.ServiceIntf;
-  ListUsersForm.ShowModal;
+  Application.QueueAsyncCall(@DoListUsers,use_global_login);
 end;
 
 procedure TForm1.Button7Click(Sender: TObject);
 var DBName: string;
 begin
   DBName := IBValidationService1.DatabaseName;
-  if InputQuery('Select Database','Enter Database Name on ' + IBValidationService1.ServerName,
+  if InputQuery('Select Database','Enter Database Name on ' + IBServerProperties1.ServerName,
          DBName) then
   begin
     IBValidationService1.DatabaseName := DBName;
     Memo1.Lines.Add('Database Validation for ' + IBValidationService1.DatabaseName);
-    Memo1.Lines.Add('Running...');
-    IBValidationService1.ServiceIntf := IBServerProperties1.ServiceIntf;
-    Application.ProcessMessages;
-    with IBValidationService1 do
-    begin
-      Active := true;
-      ServiceStart;
-      while not Eof do
-      begin
-        Memo1.Lines.Add(GetNextLine);
-        Application.ProcessMessages;
-      end;
-    end;
-    Memo1.Lines.Add('Validation Completed');
-    MessageDlg('Validation Completed',mtInformation,[mbOK],0);
+    Application.QueueAsyncCall(@DoValidation,use_global_login);
   end;
 end;
 
@@ -253,13 +420,12 @@ var DBName: string;
 begin
   with LimboTransactionsForm do
   begin
-    DBName := IBValidationService1.DatabaseName;
-    if InputQuery('Select Database','Enter Database Name on ' + IBValidationService1.ServerName,
+    DBName := LimboTransactionValidation.DatabaseName;
+    if InputQuery('Select Database','Enter Database Name on ' + IBServerProperties1.ServerName,
            DBName) then
     begin
-      IBValidationService1.ServiceIntf := IBServerProperties1.ServiceIntf;
-      IBValidationService1.DatabaseName := DBName;
-      ShowModal;
+      LimboTransactionValidation.DatabaseName := DBName;
+      Application.QueueAsyncCall(@DoLimboTransactions,use_global_login);
     end;
   end;
 end;

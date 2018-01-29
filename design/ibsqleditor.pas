@@ -83,7 +83,7 @@ begin
     end;
     with IBSQLEditFrame1 do
     begin
-      IncludeReadOnlyFields := true;
+      IncludeReadOnlyFields := false;
       ExecuteOnlyProcs := true;
       SelectProcs := true;
       SQLText.Lines.Assign(aIBSQL.SQL);
@@ -134,7 +134,7 @@ procedure TIBSQLEditorForm.GenerateBtnClick(Sender: TObject);
 begin
   case TabControl1.TabIndex of
   0:
-    IBSQLEditFrame1.GenerateSelectSQL(QuoteFields.Checked);
+    IBSQLEditFrame1.GenerateSelectSQL(QuoteFields.Checked,true);
   1:
     IBSQLEditFrame1.GenerateInsertSQL(QuoteFields.Checked);
   2:
@@ -148,7 +148,6 @@ end;
 
 procedure TIBSQLEditorForm.SetupFlags;
 begin
-  IBSQLEditFrame1.IncludeReadOnlyFields := (TabControl1.TabIndex = 0);
   IncludePrimaryKeys.Visible := TabControl1.TabIndex = 2;
   FieldNamesGrid.Visible := TabControl1.TabIndex <> 3;
   Label2.Visible := TabControl1.TabIndex <> 3;

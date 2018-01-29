@@ -170,7 +170,7 @@ type
     procedure UnWrapText;
     procedure RefreshAll;
     procedure SelectAllFields(Checked: boolean);
-    procedure GenerateSelectSQL(QuotedStrings: boolean); overload;
+    procedure GenerateSelectSQL(QuotedStrings: boolean; AddReadOnlyFields: boolean = false); overload;
     procedure GenerateSelectSQL(QuotedStrings: boolean; SQL: TStrings; AddReadOnlyFields: boolean = false); overload;
     procedure GenerateRefreshSQL(QuotedStrings: boolean);
     procedure GenerateRefreshSQL(QuotedStrings: boolean; SQL: TStrings; AddReadOnlyFields: boolean = false);
@@ -189,6 +189,8 @@ type
     procedure InsertPackageName;
     procedure InsertSelectedInputParam;
     procedure InsertSelectedOutputParam;
+    procedure InsertSelectedIdentityCol;
+    procedure InsertSelectedReadOnlyField;
     procedure OpenUserProcedures;
     function SyncQueryBuilder: TIBSQLStatementTypes; overload;
     function SyncQueryBuilder(SQL: TStrings): TIBSQLStatementTypes; overload;
@@ -376,6 +378,7 @@ begin
   if FDatabase = AValue then Exit;
   FDatabase := AValue;
   FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
+  SQLTransaction.Active := false;
   SQLTransaction.DefaultDatabase := FDatabase;
   for i := 0 to ComponentCount - 1 do
     if Components[i] is TIBCustomDataset then
@@ -580,9 +583,10 @@ begin
   DoSelectAllFields(ReadOnlyFields,Checked);
 end;
 
-procedure TIBSQLEditFrame.GenerateSelectSQL(QuotedStrings: boolean);
+procedure TIBSQLEditFrame.GenerateSelectSQL(QuotedStrings: boolean;
+  AddReadOnlyFields: boolean);
 begin
-  GenerateSelectSQL(QuotedStrings,SQLText.Lines);
+  GenerateSelectSQL(QuotedStrings,SQLText.Lines,AddReadOnlyFields);
 end;
 
 procedure TIBSQLEditFrame.GenerateRefreshSQL(QuotedStrings: boolean);
@@ -1164,6 +1168,18 @@ end;
 procedure TIBSQLEditFrame.InsertSelectedOutputParam;
 begin
   SQLText.SelText := ProcOutputParams.FieldByName('ColumnName').AsString;
+  SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.InsertSelectedIdentityCol;
+begin
+  SQLText.SelText := IdentityCols.FieldByName('ColumnName').AsString;
+  SQLText.SetFocus
+end;
+
+procedure TIBSQLEditFrame.InsertSelectedReadOnlyField;
+begin
+  SQLText.SelText := ReadOnlyFields.FieldByName('ColumnName').AsString;
   SQLText.SetFocus
 end;
 

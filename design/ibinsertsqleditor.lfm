@@ -72,6 +72,7 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Caption = 'COLUMNNAME'
             Width = 64
             FieldName = 'COLUMNNAME'
@@ -86,6 +87,7 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
         Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
         Scrollbars = ssAutoVertical
         TabOrder = 5
+        OnDblClick = IdentityGridDblClick
         ExpandEditorPanelBelowRow = False
         Descending = False
         EditorBorderStyle = bsSingle
@@ -118,6 +120,7 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Caption = 'COLUMNNAME'
             Width = 64
             FieldName = 'COLUMNNAME'
@@ -131,6 +134,7 @@ inherited IBInsertSQLEditorForm: TIBInsertSQLEditorForm
         Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
         Scrollbars = ssAutoVertical
         TabOrder = 6
+        OnDblClick = ReadOnlyGridDblClick
         ExpandEditorPanelBelowRow = False
         Descending = False
         EditorBorderStyle = bsSingle

@@ -1,11 +1,11 @@
 object Form1: TForm1
   Left = 414
-  Height = 526
+  Height = 546
   Top = 150
-  Width = 1093
+  Width = 1165
   Caption = 'FB3 User Manager'
-  ClientHeight = 526
-  ClientWidth = 1093
+  ClientHeight = 546
+  ClientWidth = 1165
   OnClose = FormClose
   OnDestroy = FormDestroy
   OnShow = FormShow
@@ -13,9 +13,9 @@ object Form1: TForm1
   LCLVersion = '1.8.1.0'
   object IBDynamicGrid1: TIBDynamicGrid
     Left = 0
-    Height = 526
+    Height = 524
     Top = 0
-    Width = 927
+    Width = 987
     Align = alLeft
     Color = clWindow
     Columns = <    
@@ -78,11 +78,21 @@ object Form1: TForm1
       end    
       item
         Alignment = taCenter
-        ReadOnly = True
         Title.Alignment = taCenter
         Title.Caption = 'Admin'
         Width = 55
         FieldName = 'SEC$ADMIN'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'DB Creator'
+        Width = 70
+        FieldName = 'DBCREATOR'
         AutoSizeColumn = False
         InitialSortColumn = False
         DBLookupProperties.ItemHeight = 0
@@ -163,31 +173,30 @@ object Form1: TForm1
     IndexFieldNames = 'USERNAME'
   end
   object Splitter1: TSplitter
-    Left = 927
-    Height = 526
+    Left = 987
+    Height = 524
     Top = 0
     Width = 5
   end
   object Panel1: TPanel
-    Left = 932
-    Height = 526
+    Left = 992
+    Height = 524
     Top = 0
-    Width = 161
+    Width = 173
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 526
-    ClientWidth = 161
+    ClientHeight = 524
+    ClientWidth = 173
     TabOrder = 2
     object IBDynamicGrid2: TIBDynamicGrid
       Left = 0
       Height = 195
       Top = 50
-      Width = 161
+      Width = 173
       Align = alTop
       Color = clWindow
       Columns = <      
         item
-          ButtonStyle = cbsCheckboxColumn
           Title.Caption = ''
           Width = 30
           FieldName = 'GRANTED'
@@ -219,14 +228,14 @@ object Form1: TForm1
     end
     object Panel2: TPanel
       Left = 0
-      Height = 276
+      Height = 274
       Top = 250
-      Width = 161
+      Width = 173
       Align = alClient
       BevelInner = bvLowered
       BevelOuter = bvLowered
-      ClientHeight = 276
-      ClientWidth = 161
+      ClientHeight = 274
+      ClientWidth = 173
       TabOrder = 1
       object Label2: TLabel
         Left = 13
@@ -240,7 +249,7 @@ object Form1: TForm1
         Left = 13
         Height = 24
         Top = 114
-        Width = 139
+        Width = 151
         DataField = 'MON$SEC_DATABASE'
         DataSource = DBQuerySource
         Anchors = [akTop, akLeft, akRight]
@@ -260,7 +269,7 @@ object Form1: TForm1
         Left = 13
         Height = 24
         Top = 71
-        Width = 139
+        Width = 151
         DataField = 'MON$OWNER'
         DataSource = DBQuerySource
         Anchors = [akTop, akLeft, akRight]
@@ -280,7 +289,7 @@ object Form1: TForm1
         Left = 13
         Height = 24
         Top = 157
-        Width = 139
+        Width = 151
         DataField = 'MON$CREATION_DATE'
         DataSource = DBQuerySource
         Anchors = [akTop, akLeft, akRight]
@@ -300,7 +309,7 @@ object Form1: TForm1
         Left = 15
         Height = 24
         Top = 200
-        Width = 137
+        Width = 149
         DataField = 'OSDVERSION'
         DataSource = DBQuerySource
         Anchors = [akTop, akLeft, akRight]
@@ -312,7 +321,7 @@ object Form1: TForm1
         Left = 16
         Height = 28
         Top = 235
-        Width = 134
+        Width = 146
         Action = SaveChanges
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 4
@@ -329,7 +338,7 @@ object Form1: TForm1
         Left = 13
         Height = 24
         Top = 28
-        Width = 139
+        Width = 151
         DataField = 'MON$DATABASE_NAME'
         DataSource = DBQuerySource
         Anchors = [akTop, akLeft, akRight]
@@ -342,12 +351,12 @@ object Form1: TForm1
       Left = 0
       Height = 50
       Top = 0
-      Width = 161
+      Width = 173
       Align = alTop
       BevelInner = bvLowered
       BevelOuter = bvLowered
       ClientHeight = 50
-      ClientWidth = 161
+      ClientWidth = 173
       TabOrder = 2
       object DBText1: TDBText
         Left = 10
@@ -372,10 +381,19 @@ object Form1: TForm1
       Left = 0
       Height = 5
       Top = 245
-      Width = 161
+      Width = 173
       Align = alTop
       ResizeAnchor = akTop
     end
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 22
+    Top = 524
+    Width = 1165
+    BorderWidth = 1
+    Panels = <>
+    SimpleText = 'DatabaseName'
   end
   object IBDatabase1: TIBDatabase
     Connected = True
@@ -388,6 +406,8 @@ object Form1: TForm1
     DatabaseName = 'employee'
     Params.Strings = (
       'user_name=SYSDBA'
+      'sql_role_name=RDB$ADMIN'
+      'lc_ctype=UTF8'
     )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
@@ -421,10 +441,12 @@ object Form1: TForm1
       'A.SEC$FIRST_NAME, A.SEC$LAST_NAME, B.MON$ATTACHMENT_ID,'
       'Trim(B.MON$ROLE) as RoleName, B.MON$REMOTE_HOST,'
       'cast(NULL as VarChar(32)) as USERPASSWORD, CURRENT_CONNECTION,'
-      'case when B.MON$ATTACHMENT_ID is not null then true else false end as LoggedIn'
+      'case when B.MON$ATTACHMENT_ID is not null then true else false end as LoggedIn,'
+      'case When C.SEC$USER is not null then true else false end as DBCreator'
       'From SEC$USERS A'
       'Left Outer Join MON$ATTACHMENTS B'
       'On A.SEC$USER_NAME = B.MON$USER'
+      'Left Outer Join SEC$DB_CREATORS  C on C.SEC$USER = A.SEC$USER_NAME'
     )
     Params = <>
     UpdateObject = UpdateUsers
@@ -460,7 +482,7 @@ object Form1: TForm1
       Index = 2
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = True
+      ReadOnly = False
       Required = False
       DisplayValues = 'True;False'
     end
@@ -572,6 +594,16 @@ object Form1: TForm1
       ReadOnly = False
       Required = True
     end
+    object UserListDBCREATOR: TBooleanField
+      FieldKind = fkData
+      FieldName = 'DBCREATOR'
+      Index = 14
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      DisplayValues = 'True;False'
+    end
   end
   object UpdateUsers: TIBUpdate
     RefreshSQL.Strings = (
@@ -579,11 +611,13 @@ object Form1: TForm1
       'A.SEC$ACTIVE, A.SEC$USER_NAME as UserName, A.SEC$MIDDLE_NAME,'
       'A.SEC$FIRST_NAME, A.SEC$LAST_NAME, B.MON$ATTACHMENT_ID,'
       'Trim(B.MON$ROLE) as RoleName, B.MON$REMOTE_HOST,'
-      'cast(NULL as VarChar(32)) as USERPASSWORD,CURRENT_CONNECTION,'
-      'case when B.MON$ATTACHMENT_ID is not null then true else false end as LoggedIn'
+      'cast(NULL as VarChar(32)) as USERPASSWORD, CURRENT_CONNECTION,'
+      'case when B.MON$ATTACHMENT_ID is not null then true else false end as LoggedIn,'
+      'case When C.SEC$USER is not null then true else false end as DBCreator'
       'From SEC$USERS A'
       'Left Outer Join MON$ATTACHMENTS B'
       'On A.SEC$USER_NAME = B.MON$USER'
+      'Left Outer Join SEC$DB_CREATORS  C on C.SEC$USER = A.SEC$USER_NAME'
       'Where  A.SEC$USER_NAME = :UserName'
     )
     OnApplyUpdates = UpdateUsersApplyUpdates
@@ -605,6 +639,7 @@ object Form1: TForm1
     object AddUser: TAction
       Caption = 'Add'
       OnExecute = AddUserExecute
+      OnUpdate = AddUserUpdate
     end
     object ChgPassword: TAction
       Caption = 'Change Password'
@@ -665,13 +700,13 @@ object Form1: TForm1
     SQL.Strings = (
       'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
       'P.RDB$USER,RDB$PRIVILEGE,   r.RDB$SECURITY_CLASS, cast(:USERNAME as VARCHAR(32)) as USERNAME,'
-      'Case When RDB$PRIVILEGE is null then 0 else 1 End as GRANTED'
+      'Case When RDB$PRIVILEGE is null then false else true End as GRANTED'
       'FROM RDB$ROLES r'
       'Left Outer JOIN ('
       'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
       'Where RDB$USER = :USERNAME and RDB$PRIVILEGE = ''M'''
       ') P  On P.RDB$RELATION_NAME = r.RDB$ROLE_NAME '
-      'Where r.RDB$SYSTEM_FLAG = 0'
+      ''
     )
     Params = <    
       item
@@ -761,37 +796,38 @@ object Form1: TForm1
       Required = False
       Size = 6
     end
-    object RoleNameListGRANTED: TIntegerField
-      FieldKind = fkData
-      FieldName = 'GRANTED'
-      Index = 7
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = True
-    end
     object RoleNameListUSERNAME: TIBStringField
       FieldKind = fkData
       FieldName = 'USERNAME'
-      Index = 8
+      Index = 7
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = False
       Size = 32
     end
+    object RoleNameListGRANTED: TBooleanField
+      FieldKind = fkData
+      FieldName = 'GRANTED'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      DisplayValues = 'True;False'
+    end
   end
   object UpdateUserRoles: TIBUpdate
     RefreshSQL.Strings = (
       'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
       'P.RDB$USER,RDB$PRIVILEGE,   r.RDB$SECURITY_CLASS, cast(:USERNAME as VARCHAR(32)) as USERNAME,'
-      'Case When RDB$PRIVILEGE is null then 0 else 1 End as GRANTED'
+      'Case When RDB$PRIVILEGE is null then false else true End as GRANTED'
       'FROM RDB$ROLES r'
       'Left Outer JOIN ('
       'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
       'Where RDB$USER = :USERNAME and RDB$PRIVILEGE = ''M'''
       ') P  On P.RDB$RELATION_NAME = r.RDB$ROLE_NAME '
-      'Where r.RDB$SYSTEM_FLAG = 0 and  r.RDB$ROLE_NAME = :RDB$ROLE_NAME'
+      'Where  r.RDB$ROLE_NAME = :RDB$ROLE_NAME'
     )
     OnApplyUpdates = UpdateUserRolesApplyUpdates
     left = 1024
@@ -813,6 +849,7 @@ object Form1: TForm1
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
+    AfterOpen = DatabaseQueryAfterOpen
     BufferChunks = 1000
     CachedUpdates = False
     GenerateParamNames = False
@@ -821,8 +858,10 @@ object Form1: TForm1
       'Select A.MON$DATABASE_NAME, A.MON$CREATION_DATE, A.'
       'MON$OWNER, A.MON$ODS_MAJOR, A.MON$ODS_MINOR,'
       'A.MON$SEC_DATABASE,'
-      'A.MON$ODS_MAJOR || ''.'' || A.MON$ODS_MINOR as OSDVERSION'
+      'A.MON$ODS_MAJOR || ''.'' || A.MON$ODS_MINOR as OSDVERSION,'
+      'S.SEC$ADMIN,CURRENT_USER as UserName'
       'From MON$DATABASE A'
+      'JOIN SEC$USERS S On S.SEC$USER_NAME = CURRENT_USER'
     )
     Params = <>
     DataSetCloseAction = dcDiscardChanges
@@ -850,6 +889,11 @@ object Form1: TForm1
   object IBDatabaseInfo: TIBDatabaseInfo
     Database = IBDatabase1
     left = 451
+    top = 36
+  end
+  object ApplicationProperties1: TApplicationProperties
+    OnException = ApplicationProperties1Exception
+    left = 584
     top = 36
   end
 end

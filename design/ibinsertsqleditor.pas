@@ -44,6 +44,8 @@ type
     Label6: TLabel;
     ReadOnlyGrid: TIBDynamicGrid;
     procedure GenerateBtnClick(Sender: TObject);
+    procedure IdentityGridDblClick(Sender: TObject);
+    procedure ReadOnlyGridDblClick(Sender: TObject);
   private
 
   protected
@@ -106,6 +108,16 @@ begin
     IBSQLEditFrame1.GenerateExecuteSQL(QuoteFields.Checked)
   else
     IBSQLEditFrame1.GenerateInsertSQL(QuoteFields.Checked);
+end;
+
+procedure TIBInsertSQLEditorForm.IdentityGridDblClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.InsertSelectedIdentityCol;
+end;
+
+procedure TIBInsertSQLEditorForm.ReadOnlyGridDblClick(Sender: TObject);
+begin
+  IBSQLEditFrame1.InsertSelectedReadOnlyField;
 end;
 
 procedure TIBInsertSQLEditorForm.Loaded;
