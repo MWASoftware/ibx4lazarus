@@ -1,7 +1,7 @@
 object IBXLoginDlg: TIBXLoginDlg
-  Left = 1858
+  Left = 1232
   Height = 230
-  Top = 458
+  Top = 296
   Width = 385
   ActiveControl = Password
   BorderIcons = [biSystemMenu]
@@ -11,7 +11,7 @@ object IBXLoginDlg: TIBXLoginDlg
   ClientWidth = 385
   DefaultMonitor = dmPrimary
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object DatabaseName: TLabel
     Left = 144
     Height = 14

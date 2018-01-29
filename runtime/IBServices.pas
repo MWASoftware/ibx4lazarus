@@ -58,7 +58,7 @@ const
   DefaultBufferSize = 32000;
 
   SPBPrefix = 'isc_spb_';
-  isc_spb_last_spb_constant = 12;
+  isc_spb_last_spb_constant = 13;
   SPBConstantNames: array[1..isc_spb_last_spb_constant] of String = (
     'user_name',
     'sys_user_name',
@@ -71,7 +71,8 @@ const
     'options',
     'connect_timeout',
     'dummy_packet_interval',
-    'sql_role_name'
+    'sql_role_name',
+    'expected_db'
   );
 
   SPBConstantValues: array[1..isc_spb_last_spb_constant] of Integer = (
@@ -86,7 +87,8 @@ const
     isc_spb_options,
     isc_spb_connect_timeout,
     isc_spb_dummy_packet_interval,
-    isc_spb_sql_role_name
+    isc_spb_sql_role_name,
+    isc_spb_expected_db
   );
 
 type
@@ -766,9 +768,12 @@ end;
 procedure TIBCustomService.InternalServiceQuery;
 begin
   CheckActive;
-  FServiceQueryResults := FService.Query(FSQPB,FSRB);
-  FSQPB := nil;
-  FSRB := nil;
+  try
+    FServiceQueryResults := FService.Query(FSQPB,FSRB);
+  finally
+    FSQPB := nil;
+    FSRB := nil;
+  end;
   MonitorHook.ServiceQuery(Self);
 end;
 
@@ -934,7 +939,9 @@ begin
         break;
       end;
     case SPBServerVal of
-      isc_spb_user_name, isc_spb_password:
+      isc_spb_user_name,
+      isc_spb_password,
+      isc_spb_expected_db:
         Result.Add(SPBServerVal).AsString := param_value;
       else
       begin
@@ -1502,7 +1509,12 @@ begin
   SQPB.Add(isc_info_svc_timeout).AsInteger := 1;
   if FSendBytes > 0 then
     Result := SQPB.Add(isc_info_svc_line).CopyFrom(stream,FSendBytes);
-  InternalServiceQuery;
+  try
+    InternalServiceQuery;
+  except
+    FSendBytes := 0;
+    raise;
+  end;
 
   FSendBytes := 0;
   for i := 0 to FServiceQueryResults.Count - 1 do

@@ -98,7 +98,7 @@ object Form1: TForm1
     TabOrder = 8
   end
   object IBServerProperties1: TIBServerProperties
-    ServerName = 'localhost'
+    ServerName = 'olympus'
     Protocol = TCP
     Params.Strings = (
       'user_name=SYSDBA'

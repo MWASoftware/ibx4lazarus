@@ -95,6 +95,9 @@ IBX Change Log  version                                              (2.2-0) Thu
 22. FB3UserManager example added to illustrate use if IBX for managing user logins, passwords
     and connections using IBX and with single or multiple security databases.
 
+23. IBServices: SQRB and SRB buffers are now reset when service query throws and exception.
+    This avoids errors due to a stale SQRB or SRB being used for the next query.
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 
