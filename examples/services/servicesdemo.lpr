@@ -7,7 +7,8 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  ibexpress,Forms, Unit1, Unit2, Unit3, ListUsersUnit, LimboTransactionsUnit
+  ibexpress, Forms, memdslaz, Unit1, Unit2, Unit3, ListUsersUnit,
+  LimboTransactionsUnit, NewUserDlgUnit, ChgPasswordDlgUnit
   { you can add units after this };
 
 {$R *.res}
@@ -20,6 +21,8 @@ begin
   Application.CreateForm(TForm3, Form3);
   Application.CreateForm(TListUsersForm, ListUsersForm);
   Application.CreateForm(TLimboTransactionsForm, LimboTransactionsForm);
+  Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);
+  Application.CreateForm(TNewUserDlg, NewUserDlg);
   Application.Run;
 end.
 

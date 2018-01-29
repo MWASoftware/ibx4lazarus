@@ -102,7 +102,6 @@ object Form1: TForm1
     Protocol = TCP
     Params.Strings = (
       'user_name=SYSDBA'
-      ''
     )
     TraceFlags = []
     Options = []

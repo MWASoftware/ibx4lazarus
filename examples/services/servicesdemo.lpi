@@ -23,15 +23,24 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="2">
+    <RequiredPackages Count="5">
       <Item1>
-        <PackageName Value="ibexpress"/>
+        <PackageName Value="MemDSLaz"/>
       </Item1>
       <Item2>
-        <PackageName Value="LCL"/>
+        <PackageName Value="ibcontrols"/>
       </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="ibexpress"/>
+      </Item4>
+      <Item5>
+        <PackageName Value="LCL"/>
+      </Item5>
     </RequiredPackages>
-    <Units Count="6">
+    <Units Count="8">
       <Unit0>
         <Filename Value="servicesdemo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -71,6 +80,20 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit5>
+      <Unit6>
+        <Filename Value="ChgPasswordDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ChgPasswordDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="NewUserDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="NewUserDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit7>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

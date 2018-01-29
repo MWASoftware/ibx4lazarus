@@ -6,6 +6,7 @@ object ListUsersForm: TListUsersForm
   Caption = 'Display Users'
   ClientHeight = 404
   ClientWidth = 861
+  OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.8.1.0'
@@ -17,96 +18,125 @@ object ListUsersForm: TListUsersForm
     Caption = 'Registered Users'
     ParentColor = False
   end
-  object StringGrid1: TStringGrid
-    Left = 8
-    Height = 336
-    Top = 32
-    Width = 824
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    AutoFillColumns = True
-    ColCount = 6
-    Columns = <    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'User ID'
-        Width = 137
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'Group ID'
-        Width = 137
-      end    
-      item
-        ReadOnly = True
-        Title.Alignment = taCenter
-        Title.Caption = 'User Name'
-        Width = 137
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'First Name'
-        Width = 137
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'Middle Name'
-        Width = 137
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'Last Name'
-        Width = 137
-      end>
-    DefaultColWidth = 120
-    FixedCols = 0
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected, goEditing, goSmoothScroll]
-    ScrollBars = ssAutoVertical
-    TabOrder = 0
-    OnEditingDone = StringGrid1EditingDone
-    ColWidths = (
-      137
-      137
-      137
-      137
-      137
-      137
-    )
-    Cells = (
-      1
-      0
-      0
-      'User ID'
-    )
-  end
   object Button1: TButton
-    Left = 757
+    Left = 752
     Height = 25
     Top = 373
-    Width = 75
+    Width = 80
+    Action = DeleteUser
     Anchors = [akRight, akBottom]
-    Caption = 'Delete'
-    OnClick = Button1Click
-    TabOrder = 1
+    TabOrder = 0
   end
   object Button2: TButton
     Left = 8
     Height = 25
     Top = 373
     Width = 75
+    Action = AddUser
     Anchors = [akLeft, akBottom]
-    Caption = 'Add'
-    OnClick = Button2Click
-    TabOrder = 2
+    TabOrder = 1
   end
   object Button3: TButton
     Left = 88
     Height = 25
     Top = 373
     Width = 120
+    Action = ChangePassword
     Anchors = [akLeft, akBottom]
-    Caption = 'Change Password'
-    OnClick = Button3Click
+    TabOrder = 2
+  end
+  object IBDynamicGrid1: TIBDynamicGrid
+    Left = 8
+    Height = 336
+    Top = 32
+    Width = 848
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Color = clWindow
+    Columns = <    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'User ID'
+        Width = 60
+        FieldName = 'UserID'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Group  ID'
+        Width = 70
+        FieldName = 'GroupID'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'User Name'
+        Width = 120
+        FieldName = 'UserName'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'First Name'
+        Width = 100
+        FieldName = 'FirstName'
+        AutoSizeColumn = True
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Middle Name'
+        Width = 100
+        FieldName = 'MiddleName'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Last Name'
+        Width = 100
+        FieldName = 'LastName'
+        AutoSizeColumn = True
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end>
+    DataSource = UserListSource
+    PopupMenu = PopupMenu1
+    Scrollbars = ssAutoVertical
     TabOrder = 3
+    ExpandEditorPanelBelowRow = False
+    Descending = False
+    EditorBorderStyle = bsSingle
+    DefaultPositionAtEnd = False
+  end
+  object Button4: TButton
+    Left = 216
+    Height = 25
+    Top = 373
+    Width = 112
+    Action = SaveChanges
+    Anchors = [akLeft, akBottom]
+    TabOrder = 4
   end
   object IBSecurityService1: TIBSecurityService
     ServerName = 'localhost'
@@ -117,5 +147,99 @@ object ListUsersForm: TListUsersForm
     GroupID = 0
     left = 768
     top = 288
+  end
+  object UserListSource: TDataSource
+    DataSet = UserList
+    left = 359
+    top = 189
+  end
+  object UserList: TMemDataset
+    FieldDefs = <    
+      item
+        Name = 'UserID'
+        DataType = ftInteger
+      end    
+      item
+        Name = 'GroupID'
+        DataType = ftInteger
+      end    
+      item
+        Name = 'UserName'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'FirstName'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'MiddleName'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'LastName'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'Password'
+        DataType = ftString
+        Size = 32
+      end>
+    AfterOpen = UserListAfterOpen
+    BeforeClose = UserListBeforeClose
+    AfterInsert = UserListAfterInsert
+    BeforePost = UserListBeforePost
+    AfterPost = UserListAfterPost
+    BeforeDelete = UserListBeforeDelete
+    left = 436
+    top = 189
+  end
+  object ActionList1: TActionList
+    left = 88
+    top = 184
+    object AddUser: TAction
+      Caption = 'New User'
+      OnExecute = AddUserExecute
+    end
+    object ChangePassword: TAction
+      Caption = 'Change Password'
+      OnExecute = ChangePasswordExecute
+      OnUpdate = ChangePasswordUpdate
+    end
+    object DeleteUser: TAction
+      Caption = 'Delete User'
+      OnExecute = DeleteUserExecute
+      OnUpdate = ChangePasswordUpdate
+    end
+    object SaveChanges: TAction
+      Caption = 'Save Changes'
+      OnExecute = SaveChangesExecute
+      OnUpdate = SaveChangesUpdate
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    left = 181
+    top = 191
+    object MenuItem1: TMenuItem
+      Action = AddUser
+    end
+    object MenuItem2: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem3: TMenuItem
+      Action = ChangePassword
+    end
+    object MenuItem4: TMenuItem
+      Action = DeleteUser
+    end
+    object MenuItem5: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem6: TMenuItem
+      Action = SaveChanges
+    end
   end
 end

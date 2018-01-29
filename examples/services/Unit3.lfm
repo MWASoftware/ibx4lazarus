@@ -1,7 +1,7 @@
 object Form3: TForm3
-  Left = 401
+  Left = 799
   Height = 270
-  Top = 193
+  Top = 225
   Width = 358
   Caption = 'Restore Database'
   ClientHeight = 270

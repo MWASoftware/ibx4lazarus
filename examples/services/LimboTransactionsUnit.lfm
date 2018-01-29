@@ -1,11 +1,12 @@
 object LimboTransactionsForm: TLimboTransactionsForm
-  Left = 236
+  Left = 592
   Height = 386
-  Top = 485
+  Top = 495
   Width = 798
   Caption = 'Limbo Transactions'
   ClientHeight = 386
   ClientWidth = 798
+  OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
   LCLVersion = '1.8.1.0'
@@ -126,7 +127,7 @@ object LimboTransactionsForm: TLimboTransactionsForm
     OnClick = Button4Click
     TabOrder = 4
   end
-  object IBValidationService1: TIBValidationService
+  object LimboTransactionValidation: TIBValidationService
     ServerName = 'localhost'
     Protocol = TCP
     TraceFlags = []

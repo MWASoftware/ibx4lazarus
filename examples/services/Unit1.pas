@@ -37,10 +37,13 @@ type
     procedure FormShow(Sender: TObject);
   private
     { private declarations }
+    FAltDBName: string;
     procedure DoBackup(secDB: PtrInt);
     procedure DoRestore(secDB: PtrInt);
     procedure DoShowStatistics(secDB: PtrInt);
     procedure DoValidation(secDB: PtrInt);
+    procedure DoLimboTransactions(secDB: PtrInt);
+    procedure DoListUsers(secDB: PtrInt);
     procedure AttachService(aService: TIBCustomService); overload;
     procedure AttachService(aService: TIBCustomService; secDB: integer;
       aDatabaseName: string); overload;
@@ -65,6 +68,10 @@ resourcestring
   sLoginAgain = 'This database appears to use an alternative security database. '+
                 'You must now log into the alternative security database using ' +
                 'login credentials for the alternative security database';
+
+  sSecDatabaseLogin = 'Firebird 3 or later: if you want select an alternative Security Database '+ LineEnding+
+                      'then enter the name of a Database that uses this Security Database. '+ LineEnding+
+                      'otherwise leave blank for the default security database';
 
 { TForm1 }
 
@@ -267,6 +274,63 @@ begin
   end;
 end;
 
+procedure TForm1.DoLimboTransactions(secDB: PtrInt);
+var NeedsExpectedDB: boolean;
+begin
+  with LimboTransactionsForm do
+  try
+    AttachService(LimboTransactionValidation,secDB,LimboTransactionValidation.DatabaseName);
+    try
+      {test access credentials}
+      LimboTransactionValidation.ServiceStart;
+      LimboTransactionValidation.FetchLimboTransactionInfo;
+    except
+       on E: EIBInterBaseError do
+         if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
+         begin
+           NeedsExpectedDB := true;
+           Exit;
+         end;
+    end;
+    ShowModal;
+  finally
+    LimboTransactionValidation.Active := false;
+    if NeedsExpectedDB then {Need expected_db}
+    begin
+      MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
+      Application.QueueAsyncCall(@DoLimboTransactions,use_alt_sec_db_login);
+    end;
+  end;
+end;
+
+procedure TForm1.DoListUsers(secDB: PtrInt);
+var NeedsExpectedDB: boolean;
+begin
+  with ListUsersForm do
+  try
+    AttachService(IBSecurityService1,SecDB,FAltDBName);
+    try
+      {test access credentials}
+      IBSecurityService1.DisplayUsers;
+    except
+       on E: EIBInterBaseError do
+         if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
+         begin
+           NeedsExpectedDB := true;
+           Exit;
+         end;
+    end;
+    ShowModal;
+  finally
+    IBSecurityService1.Active := false;
+    if NeedsExpectedDB then {Need expected_db}
+    begin
+      MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
+      Application.QueueAsyncCall(@DoListUsers,use_alt_sec_db_login);
+    end;
+  end;
+end;
+
 procedure TForm1.AttachService(aService: TIBCustomService);
 begin
   with aService do
@@ -297,7 +361,7 @@ begin
     if secDB = use_alt_sec_db_login then
     begin
       LoginPrompt := true;
-      Params.Add('expected_db='+aDatabaseName);
+//      Params.Add('expected_db='+aDatabaseName);
       Params.Delete(index);
     end
     else
@@ -355,8 +419,11 @@ end;
 
 procedure TForm1.Button6Click(Sender: TObject);
 begin
-  ListUsersForm.IBSecurityService1.ServiceIntf := IBServerProperties1.ServiceIntf;
-  ListUsersForm.ShowModal;
+  FAltDBName := '';
+  if InputQuery('Select Database',sSecDatabaseLogin,FAltDBName) and (FAltDBName <> '') then
+    Application.QueueAsyncCall(@DoListUsers,use_alt_sec_db_login)
+  else
+    Application.QueueAsyncCall(@DoListUsers,use_global_login);
 end;
 
 procedure TForm1.Button7Click(Sender: TObject);
@@ -377,13 +444,12 @@ var DBName: string;
 begin
   with LimboTransactionsForm do
   begin
-    DBName := IBValidationService1.DatabaseName;
-    if InputQuery('Select Database','Enter Database Name on ' + IBValidationService1.ServerName,
+    DBName := LimboTransactionValidation.DatabaseName;
+    if InputQuery('Select Database','Enter Database Name on ' + IBServerProperties1.ServerName,
            DBName) then
     begin
-      IBValidationService1.ServiceIntf := IBServerProperties1.ServiceIntf;
-      IBValidationService1.DatabaseName := DBName;
-      ShowModal;
+      LimboTransactionValidation.DatabaseName := DBName;
+      Application.QueueAsyncCall(@DoLimboTransactions,use_global_login);
     end;
   end;
 end;
