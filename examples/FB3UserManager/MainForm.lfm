@@ -265,6 +265,7 @@ object Form1: TForm1
           DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
         end>
       DataSource = UserTagsSource
+      PopupMenu = PopupMenu3
       Scrollbars = ssAutoVertical
       TabOrder = 5
       ExpandEditorPanelBelowRow = False
@@ -754,6 +755,15 @@ object Form1: TForm1
       OnExecute = DisconnectUserExecute
       OnUpdate = DisconnectUserUpdate
     end
+    object AddTag: TAction
+      Caption = 'Add Tag'
+      OnExecute = AddTagExecute
+    end
+    object DeleteTag: TAction
+      Caption = 'Delete Tag'
+      OnExecute = DeleteTagExecute
+      OnUpdate = DeleteTagUpdate
+    end
   end
   object PopupMenu1: TPopupMenu
     left = 156
@@ -1049,6 +1059,7 @@ object Form1: TForm1
     Database = IBDatabase1
     Transaction = IBTransaction1
     AfterDelete = UserListAfterPost
+    AfterInsert = UserTagsAfterInsert
     AfterPost = UserListAfterPost
     BufferChunks = 1000
     CachedUpdates = False
@@ -1092,5 +1103,15 @@ object Form1: TForm1
     OnApplyUpdates = TagsUpdateApplyUpdates
     left = 933
     top = 251
+  end
+  object PopupMenu3: TPopupMenu
+    left = 824
+    top = 224
+    object MenuItem6: TMenuItem
+      Action = AddTag
+    end
+    object MenuItem7: TMenuItem
+      Action = DeleteTag
+    end
   end
 end

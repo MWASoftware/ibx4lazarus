@@ -15,8 +15,13 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    DeleteTag: TAction;
+    AddTag: TAction;
     ApplicationProperties1: TApplicationProperties;
     AttachmentsSource: TDataSource;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
+    PopupMenu3: TPopupMenu;
     TagsUpdate: TIBUpdate;
     UserTagsSource: TDataSource;
     DBEdit5: TDBEdit;
@@ -95,6 +100,7 @@ type
     UserListSource: TDataSource;
     UserListUSERNAME: TIBStringField;
     UserListUSERPASSWORD: TIBStringField;
+    procedure AddTagExecute(Sender: TObject);
     procedure AddUserExecute(Sender: TObject);
     procedure AddUserUpdate(Sender: TObject);
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
@@ -102,6 +108,8 @@ type
     procedure ChgPasswordExecute(Sender: TObject);
     procedure ChgPasswordUpdate(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
+    procedure DeleteTagExecute(Sender: TObject);
+    procedure DeleteTagUpdate(Sender: TObject);
     procedure DeleteUserExecute(Sender: TObject);
     procedure DisconnectUserExecute(Sender: TObject);
     procedure DisconnectUserUpdate(Sender: TObject);
@@ -126,6 +134,7 @@ type
     procedure UserListAfterOpen(DataSet: TDataSet);
     procedure UserListAfterPost(DataSet: TDataSet);
     procedure UserListBeforeClose(DataSet: TDataSet);
+    procedure UserTagsAfterInsert(DataSet: TDataSet);
   private
       FIsAdmin: boolean;
      FDisconnecting: boolean;
@@ -251,6 +260,11 @@ begin
   UserTags.Active := false;
 end;
 
+procedure TForm1.UserTagsAfterInsert(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('SEC$USER_NAME').AsString := UserList.FieldByName('UserName').AsString;
+end;
+
 procedure TForm1.DoReopen(Data: PtrInt);
 begin
   if not FDisconnecting and IBDatabase1.Connected then
@@ -298,6 +312,11 @@ begin
     FieldByName('UserName').AsString := NewUserName;
     FieldByName('USERPASSWORD').AsString := NewPassword;
   end;
+end;
+
+procedure TForm1.AddTagExecute(Sender: TObject);
+begin
+  UserTags.Append;
 end;
 
 procedure TForm1.AddUserUpdate(Sender: TObject);
@@ -353,6 +372,16 @@ begin
        DatabaseQuery.FieldByName('UserName').AsString;
   if FIsAdmin then
     StatusBar1.SimpleText := StatusBar1.SimpleText + ' with Administrator Privileges';
+end;
+
+procedure TForm1.DeleteTagExecute(Sender: TObject);
+begin
+  UserTags.Delete;
+end;
+
+procedure TForm1.DeleteTagUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := UserTags.Active and (UserTags.RecordCount > 0);
 end;
 
 procedure TForm1.DeleteUserExecute(Sender: TObject);
@@ -467,18 +496,27 @@ end;
 
 procedure TForm1.TagsUpdateApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
+var sql: string;
 begin
 //  ShowParams(Params);
+  sql := '';
   case UpdateKind of
   ukInsert,
   ukModify:
-    ApplyUserChange.SQL.Text := 'ALTER USER ' + Trim(UserList.FieldByName('UserName').AsString)
+    begin
+      sql := 'ALTER USER ' + Trim(Params.ByName('SEC$USER_NAME').AsString)
          + ' TAGS (' + QuoteIdentifierIfNeeded(IBDatabase1.SQLDialect,Params.ByName('SEC$KEY').AsString)
-         + '=''' + SQLSafeString(Params.ByName('SEC$VALUE').AsString) + ''')';
+         + '=''' + SQLSafeString(Params.ByName('SEC$VALUE').AsString) + '''';
+      if Params.ByName('SEC$KEY').AsString <> Params.ByName('OLD_SEC$KEY').AsString then
+        sql += ', DROP ' + QuoteIdentifierIfNeeded(IBDatabase1.SQLDialect,Params.ByName('OLD_SEC$KEY').AsString);
+      sql +=')'
+    end;
+
   ukDelete:
-    ApplyUserChange.SQL.Text := 'ALTER USER ' + Trim(UserList.FieldByName('UserName').AsString)
+    sql := 'ALTER USER ' + Trim(Params.ByName('SEC$USER_NAME').AsString)
          + ' TAGS (DROP ' + QuoteIdentifierIfNeeded(IBDatabase1.SQLDialect,Params.ByName('SEC$KEY').AsString) + ')';
   end;
+  ApplyUserChange.SQL.Text := sql;
   ApplyUserChange.ExecQuery;
 end;
 
