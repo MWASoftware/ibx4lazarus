@@ -101,6 +101,7 @@ type
     UserListUSERNAME: TIBStringField;
     UserListUSERPASSWORD: TIBStringField;
     procedure AddTagExecute(Sender: TObject);
+    procedure AddTagUpdate(Sender: TObject);
     procedure AddUserExecute(Sender: TObject);
     procedure AddUserUpdate(Sender: TObject);
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
@@ -317,6 +318,11 @@ end;
 procedure TForm1.AddTagExecute(Sender: TObject);
 begin
   UserTags.Append;
+end;
+
+procedure TForm1.AddTagUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := UserTags.State = dsBrowse;
 end;
 
 procedure TForm1.AddUserUpdate(Sender: TObject);

@@ -758,6 +758,7 @@ object Form1: TForm1
     object AddTag: TAction
       Caption = 'Add Tag'
       OnExecute = AddTagExecute
+      OnUpdate = AddTagUpdate
     end
     object DeleteTag: TAction
       Caption = 'Delete Tag'
