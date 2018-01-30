@@ -19,8 +19,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="323"/>
-        <CursorPos X="60" Y="325"/>
+        <TopLine Value="328"/>
+        <CursorPos X="75" Y="330"/>
         <UsageCount Value="37"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -172,124 +172,124 @@
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="MainForm.pas"/>
-        <Caret Line="473" Column="41" TopLine="443"/>
-      </Position1>
-      <Position2>
-        <Filename Value="MainForm.pas"/>
-        <Caret Line="476" Column="109" TopLine="443"/>
-      </Position2>
-      <Position3>
-        <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1226" TopLine="1195"/>
-      </Position3>
-      <Position4>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <Caret Line="3329" Column="56" TopLine="3319"/>
-      </Position4>
-      <Position5>
+      </Position1>
+      <Position2>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
         <Caret Line="254" TopLine="234"/>
-      </Position5>
-      <Position6>
+      </Position2>
+      <Position3>
         <Filename Value="MainForm.pas"/>
         <Caret Line="475" Column="82" TopLine="443"/>
+      </Position3>
+      <Position4>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="463" Column="43" TopLine="443"/>
+      </Position4>
+      <Position5>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="456" Column="3" TopLine="444"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
+        <Caret Line="254" Column="52" TopLine="234"/>
       </Position6>
       <Position7>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="463" Column="43" TopLine="443"/>
+        <Caret Line="456" Column="3" TopLine="444"/>
       </Position7>
       <Position8>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="456" Column="3" TopLine="444"/>
+        <Caret Line="188" TopLine="151"/>
       </Position8>
       <Position9>
-        <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
-        <Caret Line="254" Column="52" TopLine="234"/>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="482" Column="37" TopLine="446"/>
       </Position9>
       <Position10>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="456" Column="3" TopLine="444"/>
+        <Caret Line="480" Column="20" TopLine="446"/>
       </Position10>
       <Position11>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="188" TopLine="151"/>
+        <Caret Line="487" Column="20" TopLine="453"/>
       </Position11>
       <Position12>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="482" Column="37" TopLine="446"/>
+        <Caret Line="313" Column="19" TopLine="311"/>
       </Position12>
       <Position13>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="480" Column="20" TopLine="446"/>
+        <Caret Line="259" Column="94" TopLine="257"/>
       </Position13>
       <Position14>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="487" Column="20" TopLine="453"/>
+        <Caret Line="492" Column="67" TopLine="460"/>
       </Position14>
       <Position15>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="313" Column="19" TopLine="311"/>
+        <Caret Line="493" Column="67" TopLine="461"/>
       </Position15>
       <Position16>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="259" Column="94" TopLine="257"/>
+        <Caret Line="494" Column="67" TopLine="462"/>
       </Position16>
       <Position17>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="492" Column="67" TopLine="460"/>
+        <Caret Line="501" Column="67" TopLine="469"/>
       </Position17>
       <Position18>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="493" Column="67" TopLine="461"/>
+        <Caret Line="383" Column="79" TopLine="381"/>
       </Position18>
       <Position19>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="494" Column="67" TopLine="462"/>
+        <Caret Line="378" Column="18" TopLine="376"/>
       </Position19>
       <Position20>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="501" Column="67" TopLine="469"/>
+        <Caret Line="379" Column="18" TopLine="377"/>
       </Position20>
       <Position21>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="383" Column="79" TopLine="381"/>
+        <Caret Line="502" Column="13" TopLine="484"/>
       </Position21>
       <Position22>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="378" Column="18" TopLine="376"/>
+        <Caret Line="519" TopLine="484"/>
       </Position22>
       <Position23>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="379" Column="18" TopLine="377"/>
+        <Caret Line="235" TopLine="206"/>
       </Position23>
       <Position24>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="502" Column="13" TopLine="484"/>
+        <Caret Line="521" TopLine="485"/>
       </Position24>
       <Position25>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="519" TopLine="484"/>
+        <Caret Line="266" TopLine="263"/>
       </Position25>
       <Position26>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="235" TopLine="206"/>
+        <Caret Line="384" Column="81" TopLine="382"/>
       </Position26>
       <Position27>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="521" TopLine="485"/>
+        <Caret Line="385" Column="19" TopLine="383"/>
       </Position27>
       <Position28>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="266" TopLine="263"/>
+        <Caret Line="325" Column="60" TopLine="323"/>
       </Position28>
       <Position29>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="384" Column="81" TopLine="382"/>
+        <Caret Line="330" Column="3" TopLine="328"/>
       </Position29>
       <Position30>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="385" Column="19" TopLine="383"/>
+        <Caret Line="308" Column="3" TopLine="304"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>

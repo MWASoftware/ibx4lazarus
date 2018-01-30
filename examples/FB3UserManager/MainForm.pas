@@ -322,12 +322,12 @@ end;
 
 procedure TForm1.AddTagUpdate(Sender: TObject);
 begin
-  (Sender as TAction).Enabled := UserTags.State = dsBrowse;
+  (Sender as TAction).Enabled := FIsAdmin and (UserTags.State = dsBrowse);
 end;
 
 procedure TForm1.AddUserUpdate(Sender: TObject);
 begin
-  (Sender as TAction).Enabled := FIsAdmin;
+  (Sender as TAction).Enabled := FIsAdmin and (UserList.State = dsBrowse);
 end;
 
 procedure TForm1.ApplicationProperties1Exception(Sender: TObject; E: Exception);
