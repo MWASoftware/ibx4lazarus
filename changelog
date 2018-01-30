@@ -75,7 +75,7 @@ IBX Change Log  version                                               (2.2-0) Mo
 15. TIBXScript: turn off database login prompt when reconnecting - this avoids prompting
     for password on reconnect.
 
-16. IBDatabase: use IAttachment for connection default character set id, code page
+16. TIBDatabase: use IAttachment for connection default character set id, code page
     and character set name.
 
 17. TIBDatabaseInfo: cache ODS Version information on first request in order to minimise
@@ -105,6 +105,8 @@ IBX Change Log  version                                               (2.2-0) Mo
 
 25. IBServices: TIBControlAndQueryService.WriteNextChunk no longer ignores isc_info_svc_timeout.
     This avoids truncated backups when the server returns a timeout (busy) response.
+
+26. TIBDatabase: isc_dpb_page_size now supported as a database parameter when using TIBDatabase.CreateDatabase.
 
 
 

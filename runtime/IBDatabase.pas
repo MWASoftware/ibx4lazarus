@@ -2189,7 +2189,7 @@ begin
     case DPBVal of
       isc_dpb_user_name, isc_dpb_password, isc_dpb_password_enc,
       isc_dpb_sys_user_name, isc_dpb_license, isc_dpb_encrypt_key,
-      isc_dpb_lc_messages, isc_dpb_lc_ctype,
+      isc_dpb_lc_messages, isc_dpb_lc_ctype, isc_dpb_page_size,
       isc_dpb_sql_role_name, isc_dpb_sql_dialect:
       begin
         if DPBVal = isc_dpb_sql_dialect then
