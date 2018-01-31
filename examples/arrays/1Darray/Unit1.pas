@@ -32,7 +32,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   DbCtrls, StdCtrls, db, DBControlGrid, IBArrayGrid,  IBDatabase,
-  IBCustomDataSet, IB;
+  IBCustomDataSet, IB, Types;
 
 {$DEFINE LOCALDATABASE}
 
@@ -215,7 +215,7 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   {$IFDEF LOCALDATABASE}
-  IBDatabase1.DatabaseName := GetTempDir + sDatabaseName
+//  IBDatabase1.DatabaseName := GetTempDir + sDatabaseName
   {$else}
   IBDatabase1.DatabaseName := sDatabaseName
   {$ENDIF}
