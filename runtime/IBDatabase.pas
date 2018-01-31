@@ -476,7 +476,7 @@ function GenerateTPB(sl: TStrings): ITPB;
 implementation
 
 uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
-     typInfo, FBMessages, IBErrorCodes {$IFDEF WINDOWS}, Windows, Windirs {$ENDIF};
+     typInfo, FBMessages, IBErrorCodes {$IFDEF WINDOWS}, Windirs {$ENDIF};
 
 { TIBDatabase }
 

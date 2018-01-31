@@ -95,7 +95,7 @@ object Form1: TForm1
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = True
     AllowStreamedConnected = False
-    DatabaseName = 'localhost:/tmp/IDTest.fdb'
+    DatabaseName = '$DATADIR$IDTest.fdb'
     Params.Strings = (
       'user_name=SYSDBA'
       'lc_ctype=UTF8'

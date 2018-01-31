@@ -108,7 +108,7 @@ IBX Change Log  version                                               (2.2-0) Mo
 
 26. TIBDatabase: isc_dpb_page_size now supported as a database parameter when using TIBDatabase.CreateDatabase.
 
-26. TIBDatabase: DatabaseName property may now be prefixed by $TEMP$ or $DATADIR$ for local
+27. TIBDatabase: DatabaseName property may now be prefixed by $TEMP$ or $DATADIR$ for local
     databasenames. These are respectively expanded to the local system's temp directory
     (including trailing delimiter) or to a directory a prescribed data directory (including
     trailing delimiter). Under Unix systems the data directory is a hidden directory
@@ -117,6 +117,12 @@ IBX Change Log  version                                               (2.2-0) Mo
     Under Windows, the directory is the same as the Data Directory as decribed
     above but instead prefixed by the User's application data path. These may be
     used to improve application portability.
+
+28. TIBTable: FieldDefs property is no longer published. Due to the use of TIBFieldDef
+    this has not worked for a long time and is not useful either. FieldDefs should be
+    managed using the Fields Editor as with any other dataset. To access the fields
+    editor for a TIBTable component, double click on the component. The fields editor
+    is then displayed.
 
 
 

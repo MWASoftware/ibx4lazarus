@@ -17,6 +17,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="328"/>
         <CursorPos X="75" Y="330"/>
         <UsageCount Value="46"/>
@@ -195,12 +196,10 @@
       </Unit24>
       <Unit25>
         <Filename Value="../../runtime/IBServices.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="54"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="251"/>
         <CursorPos X="19" Y="290"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit25>
       <Unit26>
         <Filename Value="../../changelog"/>
