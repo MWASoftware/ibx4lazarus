@@ -7,7 +7,7 @@
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="56"/>
+        <IsVisibleTab Value="True"/>
         <CursorPos X="43" Y="73"/>
         <UsageCount Value="27"/>
         <Loaded Value="True"/>
@@ -208,27 +208,24 @@
       </Unit28>
       <Unit29>
         <Filename Value="../../iblocaldb/IBCMLocalDBSupport.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="112"/>
         <CursorPos X="3" Y="117"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit29>
       <Unit30>
         <Filename Value="../../iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="123"/>
         <CursorPos X="39" Y="141"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit30>
     </Units>
     <OtherDefines Count="2">
       <Define0 Value="UseCThreads"/>
       <Define1 Value="IBX_CONSOLE_MODE"/>
     </OtherDefines>
-    <JumpHistory Count="10" HistoryIndex="9">
+    <JumpHistory Count="5" HistoryIndex="4">
       <Position1>
         <Filename Value="project1.lpr"/>
         <Caret Line="18" Column="74" TopLine="18"/>
@@ -249,26 +246,6 @@
         <Filename Value="project1.lpr"/>
         <Caret Line="73" Column="43" TopLine="56"/>
       </Position5>
-      <Position6>
-        <Filename Value="../../iblocaldb/IBCMLocalDBSupport.pas"/>
-        <Caret Line="40" Column="37" TopLine="29"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="88" Column="3" TopLine="68"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="142" Column="31" TopLine="123"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../iblocaldb/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="440" Column="3" TopLine="437"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../iblocaldb/IBCMLocalDBSupport.pas"/>
-        <Caret Line="49" Column="39" TopLine="29"/>
-      </Position10>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

@@ -57,7 +57,7 @@ implementation
 
 {$R *.lfm}
 
-uses IBErrorCodes;
+uses IBErrorCodes, FBMessages;
 
 const
   use_global_login     = 0; {Login to backup/restore with global sec db}
@@ -73,6 +73,8 @@ resourcestring
 procedure TForm1.FormShow(Sender: TObject);
 var i: integer;
 begin
+  {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
+  FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
   Form3.IBRestoreService1.DatabaseName.Clear;
   Form3.IBRestoreService1.DatabaseName.Add(GetTempDir + 'mytest.fdb');
   AttachService(IBServerProperties1);

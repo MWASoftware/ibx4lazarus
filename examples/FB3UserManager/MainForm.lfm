@@ -1,198 +1,37 @@
 object Form1: TForm1
   Left = 414
-  Height = 546
+  Height = 606
   Top = 150
-  Width = 1165
+  Width = 980
   Caption = 'FB3 User Manager'
-  ClientHeight = 546
-  ClientWidth = 1165
+  ClientHeight = 606
+  ClientWidth = 980
   OnClose = FormClose
   OnDestroy = FormDestroy
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.8.1.0'
-  object IBDynamicGrid1: TIBDynamicGrid
-    Left = 0
-    Height = 524
-    Top = 0
-    Width = 987
-    Align = alLeft
-    Color = clWindow
-    Columns = <    
-      item
-        ReadOnly = True
-        Title.Alignment = taCenter
-        Title.Caption = 'User Name'
-        Width = 120
-        FieldName = 'USERNAME'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'First Name'
-        Width = 80
-        FieldName = 'SEC$FIRST_NAME'
-        AutoSizeColumn = True
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'Middle Name'
-        Width = 85
-        FieldName = 'SEC$MIDDLE_NAME'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'Last Name'
-        Width = 80
-        FieldName = 'SEC$LAST_NAME'
-        AutoSizeColumn = True
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Alignment = taCenter
-        Title.Alignment = taCenter
-        Title.Caption = 'Active'
-        Width = 55
-        FieldName = 'SEC$ACTIVE'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Alignment = taCenter
-        Title.Alignment = taCenter
-        Title.Caption = 'Admin'
-        Width = 55
-        FieldName = 'SEC$ADMIN'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'DB Creator'
-        Width = 70
-        FieldName = 'DBCREATOR'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Alignment = taCenter
-        ReadOnly = True
-        Title.Alignment = taCenter
-        Title.Caption = 'Logged In'
-        Width = 70
-        FieldName = 'LOGGEDIN'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Alignment = taCenter
-        Title.Alignment = taCenter
-        Title.Caption = 'Att. ID'
-        Width = 50
-        FieldName = 'MON$ATTACHMENT_ID'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Alignment = taCenter
-        ReadOnly = True
-        Title.Alignment = taCenter
-        Title.Caption = 'With Role Name'
-        Width = 100
-        FieldName = 'ROLENAME'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Alignment = taCenter
-        ReadOnly = True
-        Title.Alignment = taCenter
-        Title.Caption = 'Remote Host'
-        Width = 100
-        FieldName = 'MON$REMOTE_HOST'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        ReadOnly = True
-        Title.Alignment = taCenter
-        Title.Caption = 'User Manager'
-        Width = 100
-        FieldName = 'SEC$PLUGIN'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end>
-    DataSource = UserListSource
-    PopupMenu = PopupMenu1
-    Scrollbars = ssAutoVertical
-    TabOrder = 0
-    ExpandEditorPanelBelowRow = False
-    Descending = False
-    EditorBorderStyle = bsSingle
-    DefaultPositionAtEnd = False
-    IndexFieldNames = 'USERNAME'
-  end
   object Splitter1: TSplitter
-    Left = 987
-    Height = 524
+    Left = 787
+    Height = 584
     Top = 0
     Width = 5
   end
   object Panel1: TPanel
-    Left = 992
-    Height = 524
+    Left = 792
+    Height = 584
     Top = 0
-    Width = 173
+    Width = 188
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 524
-    ClientWidth = 173
-    TabOrder = 2
+    ClientHeight = 584
+    ClientWidth = 188
+    TabOrder = 1
     object IBDynamicGrid2: TIBDynamicGrid
       Left = 0
-      Height = 195
+      Height = 161
       Top = 50
-      Width = 173
+      Width = 188
       Align = alTop
       Color = clWindow
       Columns = <      
@@ -229,13 +68,13 @@ object Form1: TForm1
     object Panel2: TPanel
       Left = 0
       Height = 274
-      Top = 250
-      Width = 173
-      Align = alClient
+      Top = 310
+      Width = 188
+      Align = alBottom
       BevelInner = bvLowered
       BevelOuter = bvLowered
       ClientHeight = 274
-      ClientWidth = 173
+      ClientWidth = 188
       TabOrder = 1
       object Label2: TLabel
         Left = 13
@@ -249,7 +88,7 @@ object Form1: TForm1
         Left = 13
         Height = 24
         Top = 114
-        Width = 151
+        Width = 166
         DataField = 'MON$SEC_DATABASE'
         DataSource = DBQuerySource
         Anchors = [akTop, akLeft, akRight]
@@ -269,7 +108,7 @@ object Form1: TForm1
         Left = 13
         Height = 24
         Top = 71
-        Width = 151
+        Width = 166
         DataField = 'MON$OWNER'
         DataSource = DBQuerySource
         Anchors = [akTop, akLeft, akRight]
@@ -289,7 +128,7 @@ object Form1: TForm1
         Left = 13
         Height = 24
         Top = 157
-        Width = 151
+        Width = 166
         DataField = 'MON$CREATION_DATE'
         DataSource = DBQuerySource
         Anchors = [akTop, akLeft, akRight]
@@ -309,7 +148,7 @@ object Form1: TForm1
         Left = 15
         Height = 24
         Top = 200
-        Width = 149
+        Width = 164
         DataField = 'OSDVERSION'
         DataSource = DBQuerySource
         Anchors = [akTop, akLeft, akRight]
@@ -321,7 +160,7 @@ object Form1: TForm1
         Left = 16
         Height = 28
         Top = 235
-        Width = 146
+        Width = 161
         Action = SaveChanges
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 4
@@ -338,7 +177,7 @@ object Form1: TForm1
         Left = 13
         Height = 24
         Top = 28
-        Width = 151
+        Width = 166
         DataField = 'MON$DATABASE_NAME'
         DataSource = DBQuerySource
         Anchors = [akTop, akLeft, akRight]
@@ -351,12 +190,12 @@ object Form1: TForm1
       Left = 0
       Height = 50
       Top = 0
-      Width = 173
+      Width = 188
       Align = alTop
       BevelInner = bvLowered
       BevelOuter = bvLowered
       ClientHeight = 50
-      ClientWidth = 173
+      ClientWidth = 188
       TabOrder = 2
       object DBText1: TDBText
         Left = 10
@@ -380,23 +219,306 @@ object Form1: TForm1
       Cursor = crVSplit
       Left = 0
       Height = 5
-      Top = 245
-      Width = 173
+      Top = 211
+      Width = 188
       Align = alTop
       ResizeAnchor = akTop
+    end
+    object Panel5: TPanel
+      Left = 0
+      Height = 26
+      Top = 216
+      Width = 188
+      Align = alTop
+      BevelInner = bvRaised
+      Caption = 'Tags'
+      TabOrder = 4
+    end
+    object IBDynamicGrid4: TIBDynamicGrid
+      Left = 0
+      Height = 63
+      Top = 242
+      Width = 188
+      Align = alClient
+      Color = clWindow
+      Columns = <      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Key'
+          Width = 70
+          FieldName = 'SEC$KEY'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Value'
+          Width = 90
+          FieldName = 'SEC$VALUE'
+          AutoSizeColumn = True
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end>
+      DataSource = UserTagsSource
+      PopupMenu = PopupMenu3
+      Scrollbars = ssAutoVertical
+      TabOrder = 5
+      ExpandEditorPanelBelowRow = False
+      Descending = False
+      EditorBorderStyle = bsSingle
+      DefaultPositionAtEnd = False
+    end
+    object Splitter4: TSplitter
+      Cursor = crVSplit
+      Left = 0
+      Height = 5
+      Top = 305
+      Width = 188
+      Align = alBottom
+      ResizeAnchor = akBottom
     end
   end
   object StatusBar1: TStatusBar
     Left = 0
     Height = 22
-    Top = 524
-    Width = 1165
+    Top = 584
+    Width = 980
     BorderWidth = 1
     Panels = <>
     SimpleText = 'DatabaseName'
   end
+  object Panel4: TPanel
+    Left = 0
+    Height = 584
+    Top = 0
+    Width = 787
+    Align = alLeft
+    ClientHeight = 584
+    ClientWidth = 787
+    TabOrder = 3
+    object IBDynamicGrid1: TIBDynamicGrid
+      Left = 1
+      Height = 423
+      Top = 1
+      Width = 785
+      Align = alTop
+      Color = clWindow
+      Columns = <      
+        item
+          ReadOnly = True
+          Title.Alignment = taCenter
+          Title.Caption = 'User Name'
+          Width = 120
+          FieldName = 'USERNAME'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'First Name'
+          Width = 80
+          FieldName = 'SEC$FIRST_NAME'
+          AutoSizeColumn = True
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Middle Name'
+          Width = 85
+          FieldName = 'SEC$MIDDLE_NAME'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Last Name'
+          Width = 80
+          FieldName = 'SEC$LAST_NAME'
+          AutoSizeColumn = True
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Alignment = taCenter
+          Title.Alignment = taCenter
+          Title.Caption = 'Active'
+          Width = 55
+          FieldName = 'SEC$ACTIVE'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Alignment = taCenter
+          Title.Alignment = taCenter
+          Title.Caption = 'Admin'
+          Width = 55
+          FieldName = 'SEC$ADMIN'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'DB Creator'
+          Width = 70
+          FieldName = 'DBCREATOR'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Alignment = taCenter
+          ReadOnly = True
+          Title.Alignment = taCenter
+          Title.Caption = 'Logged In'
+          Width = 70
+          FieldName = 'LOGGEDIN'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          ReadOnly = True
+          Title.Alignment = taCenter
+          Title.Caption = 'User Manager'
+          Width = 100
+          FieldName = 'SEC$PLUGIN'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end>
+      DataSource = UserListSource
+      PopupMenu = PopupMenu1
+      Scrollbars = ssAutoVertical
+      TabOrder = 0
+      ExpandEditorPanelBelowRow = False
+      Descending = False
+      EditorBorderStyle = bsSingle
+      DefaultPositionAtEnd = False
+      IndexFieldNames = 'USERNAME'
+    end
+    object Splitter3: TSplitter
+      Cursor = crVSplit
+      Left = 1
+      Height = 5
+      Top = 424
+      Width = 785
+      Align = alTop
+      ResizeAnchor = akTop
+    end
+    object IBDynamicGrid3: TIBDynamicGrid
+      Left = 1
+      Height = 154
+      Top = 429
+      Width = 785
+      Align = alClient
+      Color = clWindow
+      Columns = <      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Att. ID'
+          Width = 60
+          FieldName = 'MON$ATTACHMENT_ID'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Database'
+          Width = 120
+          FieldName = 'MON$ATTACHMENT_NAME'
+          AutoSizeColumn = True
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'With Role Name'
+          Width = 150
+          FieldName = 'MON$ROLE'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Remote Host'
+          Width = 100
+          FieldName = 'MON$REMOTE_HOST'
+          AutoSizeColumn = True
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Logged In At'
+          Width = 120
+          FieldName = 'MON$TIMESTAMP'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end      
+        item
+          Title.Alignment = taCenter
+          Title.Caption = 'Remote OS User'
+          Width = 100
+          FieldName = 'MON$REMOTE_OS_USER'
+          AutoSizeColumn = False
+          InitialSortColumn = False
+          DBLookupProperties.ItemHeight = 0
+          DBLookupProperties.ItemWidth = 0
+          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        end>
+      DataSource = AttachmentsSource
+      PopupMenu = PopupMenu2
+      Scrollbars = ssAutoVertical
+      TabOrder = 2
+      ExpandEditorPanelBelowRow = False
+      Descending = False
+      EditorBorderStyle = bsSingle
+      DefaultPositionAtEnd = False
+    end
+  end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -438,15 +560,17 @@ object Form1: TForm1
     SQL.Strings = (
       'Select A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
       'A.SEC$ACTIVE, A.SEC$USER_NAME as UserName, A.SEC$MIDDLE_NAME,'
-      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME, B.MON$ATTACHMENT_ID,'
-      'Trim(B.MON$ROLE) as RoleName, B.MON$REMOTE_HOST,'
+      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME,'
       'cast(NULL as VarChar(32)) as USERPASSWORD, CURRENT_CONNECTION,'
-      'case when B.MON$ATTACHMENT_ID is not null then true else false end as LoggedIn,'
+      'case when Count(B.MON$ATTACHMENT_ID) > 0 then true else false end as LoggedIn,'
       'case When C.SEC$USER is not null then true else false end as DBCreator'
       'From SEC$USERS A'
       'Left Outer Join MON$ATTACHMENTS B'
       'On A.SEC$USER_NAME = B.MON$USER'
       'Left Outer Join SEC$DB_CREATORS  C on C.SEC$USER = A.SEC$USER_NAME'
+      'Group By A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
+      'A.SEC$ACTIVE, A.SEC$USER_NAME, A.SEC$MIDDLE_NAME,'
+      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME, C.SEC$USER'
     )
     Params = <>
     UpdateObject = UpdateUsers
@@ -526,29 +650,10 @@ object Form1: TForm1
       Required = False
       Size = 32
     end
-    object UserListMONREMOTE_HOST: TIBStringField
-      FieldKind = fkData
-      FieldName = 'MON$REMOTE_HOST'
-      Index = 7
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = True
-      Required = False
-      Size = 255
-    end
-    object UserListMONATTACHMENT_ID: TIBLargeIntField
-      FieldKind = fkData
-      FieldName = 'MON$ATTACHMENT_ID'
-      Index = 8
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = True
-      Required = False
-    end
     object UserListUSERPASSWORD: TIBStringField
       FieldKind = fkData
       FieldName = 'USERPASSWORD'
-      Index = 9
+      Index = 7
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -558,7 +663,7 @@ object Form1: TForm1
     object UserListUSERNAME: TIBStringField
       FieldKind = fkData
       FieldName = 'USERNAME'
-      Index = 10
+      Index = 8
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -568,27 +673,17 @@ object Form1: TForm1
     object UserListLOGGEDIN: TBooleanField
       FieldKind = fkData
       FieldName = 'LOGGEDIN'
-      Index = 11
+      Index = 9
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = True
       DisplayValues = 'True;False'
     end
-    object UserListROLENAME: TIBStringField
-      FieldKind = fkData
-      FieldName = 'ROLENAME'
-      Index = 12
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 31
-    end
     object UserListCURRENT_CONNECTION: TIBLargeIntField
       FieldKind = fkData
       FieldName = 'CURRENT_CONNECTION'
-      Index = 13
+      Index = 10
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -597,7 +692,7 @@ object Form1: TForm1
     object UserListDBCREATOR: TBooleanField
       FieldKind = fkData
       FieldName = 'DBCREATOR'
-      Index = 14
+      Index = 11
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -609,8 +704,7 @@ object Form1: TForm1
     RefreshSQL.Strings = (
       'Select A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
       'A.SEC$ACTIVE, A.SEC$USER_NAME as UserName, A.SEC$MIDDLE_NAME,'
-      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME, B.MON$ATTACHMENT_ID,'
-      'Trim(B.MON$ROLE) as RoleName, B.MON$REMOTE_HOST,'
+      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME,'
       'cast(NULL as VarChar(32)) as USERPASSWORD, CURRENT_CONNECTION,'
       'case when B.MON$ATTACHMENT_ID is not null then true else false end as LoggedIn,'
       'case When C.SEC$USER is not null then true else false end as DBCreator'
@@ -661,6 +755,16 @@ object Form1: TForm1
       OnExecute = DisconnectUserExecute
       OnUpdate = DisconnectUserUpdate
     end
+    object AddTag: TAction
+      Caption = 'Add Tag'
+      OnExecute = AddTagExecute
+      OnUpdate = AddTagUpdate
+    end
+    object DeleteTag: TAction
+      Caption = 'Delete Tag'
+      OnExecute = DeleteTagExecute
+      OnUpdate = DeleteTagUpdate
+    end
   end
   object PopupMenu1: TPopupMenu
     left = 156
@@ -677,14 +781,11 @@ object Form1: TForm1
     object MenuItem4: TMenuItem
       Action = DeleteUser
     end
-    object MenuItem5: TMenuItem
-      Action = DisconnectUser
-    end
   end
   object RoleSource: TDataSource
     DataSet = RoleNameList
-    left = 960
-    top = 88
+    left = 896
+    top = 80
   end
   object RoleNameList: TIBQuery
     AllowAutoActivateTransaction = False
@@ -716,8 +817,8 @@ object Form1: TForm1
       end>
     UpdateObject = UpdateUserRoles
     DataSetCloseAction = dcSaveChanges
-    left = 960
-    top = 147
+    left = 888
+    top = 144
     ParamData = <    
       item
         DataType = ftUnknown
@@ -873,19 +974,6 @@ object Form1: TForm1
     left = 240
     top = 32
   end
-  object DropConnection: TIBSQL
-    Database = IBDatabase1
-    GenerateParamNames = False
-    UniqueParamNames = False
-    ParamCheck = True
-    SQL.Strings = (
-      'Delete From MON$ATTACHMENTS A'
-      'Where MON$ATTACHMENT_ID = :ID'
-    )
-    Transaction = IBTransaction1
-    left = 267
-    top = 349
-  end
   object IBDatabaseInfo: TIBDatabaseInfo
     Database = IBDatabase1
     left = 451
@@ -895,5 +983,136 @@ object Form1: TForm1
     OnException = ApplicationProperties1Exception
     left = 584
     top = 36
+  end
+  object Attachments: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AfterDelete = AttachmentsAfterDelete
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = UserListSource
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.MON$REMOTE_PID, A.MON$SERVER_PID, A.'
+      'MON$ATTACHMENT_ID, A.MON$CLIENT_VERSION, A.'
+      'MON$REMOTE_PROCESS, A.MON$ATTACHMENT_NAME, A.'
+      'MON$TIMESTAMP, A.MON$AUTH_METHOD, A.MON$REMOTE_ADDRESS'
+      ', A.MON$REMOTE_PROTOCOL, A.MON$REMOTE_VERSION, A.'
+      'MON$CHARACTER_SET_ID, A.MON$USER, A.MON$ROLE, A.'
+      'MON$STATE, A.MON$STAT_ID, A.MON$REMOTE_HOST, A.'
+      'MON$SYSTEM_FLAG, A.MON$GARBAGE_COLLECTION, A.'
+      'MON$REMOTE_OS_USER From MON$ATTACHMENTS A'
+      'Where MON$USER = :UserName'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'UserName'
+        ParamType = ptInput
+      end>
+    UpdateObject = UpdateAttachments
+    DataSetCloseAction = dcDiscardChanges
+    left = 576
+    top = 448
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'UserName'
+        ParamType = ptInput
+      end>
+  end
+  object AttachmentsSource: TDataSource
+    DataSet = Attachments
+    left = 456
+    top = 448
+  end
+  object PopupMenu2: TPopupMenu
+    left = 183
+    top = 471
+    object MenuItem5: TMenuItem
+      Action = DisconnectUser
+    end
+  end
+  object UpdateAttachments: TIBUpdateSQL
+    RefreshSQL.Strings = (
+      'Select A.MON$REMOTE_PID, A.MON$SERVER_PID, A.'
+      'MON$ATTACHMENT_ID, A.MON$CLIENT_VERSION, A.'
+      'MON$REMOTE_PROCESS, A.MON$ATTACHMENT_NAME, A.'
+      'MON$TIMESTAMP, A.MON$AUTH_METHOD, A.MON$REMOTE_ADDRESS'
+      ', A.MON$REMOTE_PROTOCOL, A.MON$REMOTE_VERSION, A.'
+      'MON$CHARACTER_SET_ID, A.MON$USER, A.MON$ROLE, A.'
+      'MON$STATE, A.MON$STAT_ID, A.MON$REMOTE_HOST, A.'
+      'MON$SYSTEM_FLAG, A.MON$GARBAGE_COLLECTION, A.'
+      'MON$REMOTE_OS_USER From MON$ATTACHMENTS A'
+      'Where MON$ATTACHMENT_ID = :MON$ATTACHMENT_ID'
+    )
+    DeleteSQL.Strings = (
+      'Delete From MON$ATTACHMENTS A'
+      'Where MON$ATTACHMENT_ID = :MON$ATTACHMENT_ID'
+    )
+    left = 688
+    top = 448
+  end
+  object UserTags: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AfterDelete = UserListAfterPost
+    AfterInsert = UserTagsAfterInsert
+    AfterPost = UserListAfterPost
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = UserListSource
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select a.SEC$USER_NAME, A.SEC$KEY, A.SEC$VALUE'
+      'From'
+      'SEC$USER_ATTRIBUTES  A'
+      'Where SEC$USER_NAME = :UserName'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'UserName'
+        ParamType = ptInput
+      end>
+    UpdateObject = TagsUpdate
+    DataSetCloseAction = dcSaveChanges
+    left = 864
+    top = 248
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'UserName'
+        ParamType = ptInput
+      end>
+  end
+  object UserTagsSource: TDataSource
+    DataSet = UserTags
+    left = 775
+    top = 256
+  end
+  object TagsUpdate: TIBUpdate
+    RefreshSQL.Strings = (
+      'Select A.SEC$USER_NAME, A.SEC$KEY, A.SEC$VALUE From '
+      'SEC$USER_ATTRIBUTES A'
+      'Where SEC$USER_NAME = :SEC$USER_NAME'
+    )
+    OnApplyUpdates = TagsUpdateApplyUpdates
+    left = 933
+    top = 251
+  end
+  object PopupMenu3: TPopupMenu
+    left = 824
+    top = 224
+    object MenuItem6: TMenuItem
+      Action = AddTag
+    end
+    object MenuItem7: TMenuItem
+      Action = DeleteTag
+    end
   end
 end

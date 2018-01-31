@@ -59,7 +59,6 @@ type
     FMasterLink: TMasterDataLink;
     FMasterFieldsList: TStringList;
     FDetailFieldsList: TStringList;
-    FStoreDefs: Boolean;
     FIndexDefs: TIndexDefs;
     FDefaultIndex: Boolean;
     FReadOnly: Boolean;
@@ -71,6 +70,7 @@ type
     FSwitchingIndex: Boolean;
     FPrimaryIndexFields: string;
     FTableTypes: TIBTableTypes;
+    FStoreDefs: boolean;
     WhereAllRefreshSQL: TStrings;
     WhereDBKeyRefreshSQL: TStrings;
     WherePrimaryRefreshSQL: TStrings;
@@ -97,7 +97,6 @@ type
     function GetExists: Boolean;
     procedure SetIndexDefs(Value: TIndexDefs);
     procedure ExtractLinkFields;
-    function FieldDefsStored: Boolean;
     function IndexDefsStored: Boolean;
     function GetMasterFields: string;
     procedure SetMasterFields(const Value: string);
@@ -156,7 +155,6 @@ type
     property DataSetCloseAction;
 //    property Constraints stored ConstraintsStored;
     property DefaultIndex: Boolean read FDefaultIndex write FDefaultIndex default True;
-    property FieldDefs stored FieldDefsStored;
     property Filter;
     property Filtered;
     property GeneratorField;
@@ -931,11 +929,6 @@ begin
     Query.Free;
     Database.InternalTransaction.Commit;
   end;
-end;
-
-function TIBTable.FieldDefsStored: Boolean;
-begin
-  Result := StoreDefs and (FieldDefs.Count > 0);
 end;
 
 function TIBTable.IndexDefsStored: Boolean;

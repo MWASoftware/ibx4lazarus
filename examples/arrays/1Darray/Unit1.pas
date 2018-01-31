@@ -32,13 +32,13 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   DbCtrls, StdCtrls, db, DBControlGrid, IBArrayGrid,  IBDatabase,
-  IBCustomDataSet, IB;
+  IBCustomDataSet, IB, Types;
 
 {$DEFINE LOCALDATABASE}
 
 const
   sDatabaseName = '1Dtest.fdb'; {If LOCALDATABASE defined then prepended with
-                               path to temp folder}
+                               path to user data folder}
 
   {If you want to explicitly define the test database location then undefine
   LOCALDATABASE and set explicit path e.g.
@@ -214,9 +214,7 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  {$IFDEF LOCALDATABASE}
-  IBDatabase1.DatabaseName := GetTempDir + sDatabaseName
-  {$else}
+  {$IFNDEF LOCALDATABASE}
   IBDatabase1.DatabaseName := sDatabaseName
   {$ENDIF}
 end;

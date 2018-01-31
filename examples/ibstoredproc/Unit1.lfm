@@ -112,7 +112,7 @@ object Form1: TForm1
     Connected = False
     CreateIfNotExists = True
     AllowStreamedConnected = False
-    DatabaseName = '/tmp/sptest.fdb'
+    DatabaseName = '$DATADIR$sptest.fdb'
     Params.Strings = (
       'user_name=SYSDBA'
     )

@@ -476,7 +476,7 @@ function GenerateTPB(sl: TStrings): ITPB;
 implementation
 
 uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
-     typInfo, FBMessages, IBErrorCodes;
+     typInfo, FBMessages, IBErrorCodes {$IFDEF WINDOWS}, Windirs {$ENDIF};
 
 { TIBDatabase }
 
@@ -920,7 +920,41 @@ begin
   end;
 end;
 
- procedure TIBDataBase.DoConnect;
+procedure TIBDataBase.DoConnect;
+
+  function ExpandDBName(aDBName: string): string;
+  const
+    TmpPrefix = '$TEMP$';
+    DataPrefix = '$DATADIR$';
+  var
+    LocalDirName: string;
+  begin
+    if Pos(TmpPrefix,aDBName) = 1 then
+    begin
+      system.Delete(aDBName,1,Length(TmpPrefix));
+      Result := GetTempDir + aDBName
+    end
+    else
+    if Pos(DataPrefix,aDBName) = 1 then
+    begin
+      system.Delete(aDBName,1,Length(DataPrefix));
+      if Sysutils.VendorName <> '' then
+        LocalDirName :=  Sysutils.VendorName
+      else
+        LocalDirName :=  'IBX';
+      {$IFDEF UNIX}
+      LocalDirName := GetUserDir + '.' + LocalDirName;
+      {$ENDIF}
+      {$IFDEF WINDOWS}
+      LocalDirName := GetWindowsSpecialDir(CSIDL_LOCAL_APPDATA) + LocalDirName;
+      {$ENDIF}
+      CreateDir(LocalDirName);
+      Result := LocalDirName + DirectorySeparator + aDBName;
+    end
+    else
+      Result := aDBName;
+  end;
+
 var
   TempDBParams: TStrings;
   I: integer;
@@ -937,7 +971,8 @@ begin
     FDBParamsChanged := True;
   end;
   { Use builtin login prompt if requested }
-  aDBName := FDBName;
+  aDBName := ExpandDBName(FDBName);
+
   if (LoginPrompt or (csDesigning in ComponentState)) and not Login(aDBName) then
     IBError(ibxeOperationCancelled, [nil]);
 
@@ -2189,7 +2224,7 @@ begin
     case DPBVal of
       isc_dpb_user_name, isc_dpb_password, isc_dpb_password_enc,
       isc_dpb_sys_user_name, isc_dpb_license, isc_dpb_encrypt_key,
-      isc_dpb_lc_messages, isc_dpb_lc_ctype,
+      isc_dpb_lc_messages, isc_dpb_lc_ctype, isc_dpb_page_size,
       isc_dpb_sql_role_name, isc_dpb_sql_dialect:
       begin
         if DPBVal = isc_dpb_sql_dialect then

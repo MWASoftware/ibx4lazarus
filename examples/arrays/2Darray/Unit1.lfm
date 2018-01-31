@@ -10,7 +10,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poDefaultSizeOnly
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.1.0'
   object IBArrayGrid1: TIBArrayGrid
     Left = 24
     Height = 335
@@ -29,7 +29,6 @@ object Form1: TForm1
       'Col8'
     )
     ColumnLabelFont.Height = -13
-    ColumnLabelFont.Name = 'Sans'
     ColumnLabelFont.Style = [fsBold]
     RowLabels.Strings = (
       'Row 1'
@@ -47,36 +46,38 @@ object Form1: TForm1
     DefaultColWidth = 40
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
     TabOrder = 0
-    ColCount = 27
-    RowCount = 19
+    ColCount = 29
+    RowCount = 21
     ColWidths = (
       80
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      32
-      49
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      30
+      39
     )
   end
   object DBEdit1: TDBEdit
@@ -114,7 +115,7 @@ object Form1: TForm1
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = True
     AllowStreamedConnected = False
-    DatabaseName = '/tmp/test.fdb'
+    DatabaseName = '$DATADIR$2Dtest.fdb'
     Params.Strings = (
       'lc_ctype=UTF8'
       'user_name=SYSDBA'

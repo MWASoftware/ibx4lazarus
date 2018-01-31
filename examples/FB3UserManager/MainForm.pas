@@ -7,20 +7,38 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ActnList,
   Menus, ExtCtrls, DbCtrls, StdCtrls, ComCtrls, db, IBDatabase, IBQuery,
-  IBCustomDataSet, IBUpdate, IBSQL, IBDatabaseInfo, IBDynamicGrid, IB;
+  IBCustomDataSet, IBUpdate, IBSQL, IBDatabaseInfo, IBUpdateSQL, IBDynamicGrid,
+  IB;
 
 type
 
   { TForm1 }
 
   TForm1 = class(TForm)
+    DeleteTag: TAction;
+    AddTag: TAction;
     ApplicationProperties1: TApplicationProperties;
+    AttachmentsSource: TDataSource;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
+    PopupMenu3: TPopupMenu;
+    TagsUpdate: TIBUpdate;
+    UserTagsSource: TDataSource;
     DBEdit5: TDBEdit;
     DisconnectUser: TAction;
-    DropConnection: TIBSQL;
     IBDatabaseInfo: TIBDatabaseInfo;
+    IBDynamicGrid1: TIBDynamicGrid;
+    IBDynamicGrid3: TIBDynamicGrid;
+    Attachments: TIBQuery;
+    IBDynamicGrid4: TIBDynamicGrid;
+    UserTags: TIBQuery;
+    Panel5: TPanel;
+    Splitter4: TSplitter;
+    UpdateAttachments: TIBUpdateSQL;
     Label6: TLabel;
     MenuItem5: TMenuItem;
+    Panel4: TPanel;
+    PopupMenu2: TPopupMenu;
     RoleNameListGRANTED: TBooleanField;
     SaveChanges: TAction;
     ActionList1: TActionList;
@@ -36,7 +54,6 @@ type
     DBText1: TDBText;
     DeleteUser: TAction;
     IBDatabase1: TIBDatabase;
-    IBDynamicGrid1: TIBDynamicGrid;
     IBDynamicGrid2: TIBDynamicGrid;
     DatabaseQuery: TIBQuery;
     IBTransaction1: TIBTransaction;
@@ -49,6 +66,7 @@ type
     Panel2: TPanel;
     Panel3: TPanel;
     Splitter2: TSplitter;
+    Splitter3: TSplitter;
     StatusBar1: TStatusBar;
     UpdateUsers: TIBUpdate;
     UpdateUserRoles: TIBUpdate;
@@ -72,9 +90,6 @@ type
     UserListCURRENT_CONNECTION: TIBLargeIntField;
     UserListDBCREATOR: TBooleanField;
     UserListLOGGEDIN: TBooleanField;
-    UserListMONATTACHMENT_ID: TIBLargeIntField;
-    UserListMONREMOTE_HOST: TIBStringField;
-    UserListROLENAME: TIBStringField;
     UserListSECACTIVE: TBooleanField;
     UserListSECADMIN: TBooleanField;
     UserListSECDESCRIPTION: TIBMemoField;
@@ -85,12 +100,17 @@ type
     UserListSource: TDataSource;
     UserListUSERNAME: TIBStringField;
     UserListUSERPASSWORD: TIBStringField;
+    procedure AddTagExecute(Sender: TObject);
+    procedure AddTagUpdate(Sender: TObject);
     procedure AddUserExecute(Sender: TObject);
     procedure AddUserUpdate(Sender: TObject);
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
+    procedure AttachmentsAfterDelete(DataSet: TDataSet);
     procedure ChgPasswordExecute(Sender: TObject);
     procedure ChgPasswordUpdate(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
+    procedure DeleteTagExecute(Sender: TObject);
+    procedure DeleteTagUpdate(Sender: TObject);
     procedure DeleteUserExecute(Sender: TObject);
     procedure DisconnectUserExecute(Sender: TObject);
     procedure DisconnectUserUpdate(Sender: TObject);
@@ -105,6 +125,8 @@ type
     procedure IBTransaction1AfterTransactionEnd(Sender: TObject);
     procedure SaveChangesExecute(Sender: TObject);
     procedure SaveChangesUpdate(Sender: TObject);
+    procedure TagsUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
+      Params: ISQLParams);
     procedure UpdateUserRolesApplyUpdates(Sender: TObject;
       UpdateKind: TUpdateKind; Params: ISQLParams);
     procedure UpdateUsersApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
@@ -113,6 +135,7 @@ type
     procedure UserListAfterOpen(DataSet: TDataSet);
     procedure UserListAfterPost(DataSet: TDataSet);
     procedure UserListBeforeClose(DataSet: TDataSet);
+    procedure UserTagsAfterInsert(DataSet: TDataSet);
   private
       FIsAdmin: boolean;
      FDisconnecting: boolean;
@@ -128,7 +151,16 @@ implementation
 
 {$R *.lfm}
 
-uses NewUserDlgUnit, ChgPasswordDlgUnit, DBLoginDlgUnit, FBMessages;
+uses NewUserDlgUnit, ChgPasswordDlgUnit, DBLoginDlgUnit, FBMessages, IBUtils;
+
+  procedure ShowParams(Params: ISQLParams);
+  var i: integer;
+  begin
+    for i := 0 to Params.Count - 1 do
+      writeln(Params[i].Name,' = ',Params[i].AsString);
+  end;
+
+
 
 { TForm1 }
 
@@ -141,16 +173,16 @@ procedure TForm1.UpdateUsersApplyUpdates(Sender: TObject;
     Result := Trim(Params.ByName('UserName').AsString);
     Param := Params.ByName('USERPASSWORD');
     if (Param <> nil) and not Param.IsNull  then
-      Result += ' PASSWORD ''' + Param.AsString + '''';
+      Result += ' PASSWORD ''' + SQLSafeString(Param.AsString) + '''';
     Param := Params.ByName('SEC$FIRST_NAME');
     if Param <> nil then
-      Result += ' FIRSTNAME ''' + Param.AsString + '''';
+      Result += ' FIRSTNAME ''' + SQLSafeString(Param.AsString) + '''';
     Param := Params.ByName('SEC$MIDDLE_NAME');
     if Param <> nil then
-      Result += ' MIDDLENAME ''' + Param.AsString + '''';
+      Result += ' MIDDLENAME ''' + SQLSafeString(Param.AsString) + '''';
     Param := Params.ByName('SEC$LAST_NAME');
     if Param <> nil then
-      Result += ' LASTNAME ''' + Param.AsString + '''';
+      Result += ' LASTNAME ''' + SQLSafeString(Param.AsString) + '''';
     Param := Params.ByName('SEC$ACTIVE');
     if Param <> nil then
     begin
@@ -161,16 +193,8 @@ procedure TForm1.UpdateUsersApplyUpdates(Sender: TObject;
     end;
   end;
 
-{  procedure ShowParams;
-  var i: integer;
-  begin
-    for i := 0 to Params.Count - 1 do
-      writeln(Params[i].Name,' = ',Params[i].AsString);
-  end; }
-
 begin
-//  ShowParams;
-  begin
+//  ShowParams(Params);
     case UpdateKind of
     ukInsert:
       ApplyUserChange.SQL.Text := 'CREATE USER ' + FormatStmtOptions;
@@ -180,7 +204,6 @@ begin
       ApplyUserChange.SQL.Text := 'DROP USER ' + Trim(Params.ByName('UserName').AsString);
     end;
     ApplyUserChange.ExecQuery;
-  end;
 
   if UpdateKind = ukModify then
   {Update Admin Role if allowed}
@@ -222,6 +245,8 @@ end;
 procedure TForm1.UserListAfterOpen(DataSet: TDataSet);
 begin
   RoleNameList.Active := true;
+  Attachments.Active := true;
+  UserTags.Active := true;
 end;
 
 procedure TForm1.UserListAfterPost(DataSet: TDataSet);
@@ -232,6 +257,13 @@ end;
 procedure TForm1.UserListBeforeClose(DataSet: TDataSet);
 begin
   RoleNameList.Active := false;
+  Attachments.Active := false;
+  UserTags.Active := false;
+end;
+
+procedure TForm1.UserTagsAfterInsert(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('SEC$USER_NAME').AsString := UserList.FieldByName('UserName').AsString;
 end;
 
 procedure TForm1.DoReopen(Data: PtrInt);
@@ -283,9 +315,19 @@ begin
   end;
 end;
 
+procedure TForm1.AddTagExecute(Sender: TObject);
+begin
+  UserTags.Append;
+end;
+
+procedure TForm1.AddTagUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := FIsAdmin and (UserTags.State = dsBrowse);
+end;
+
 procedure TForm1.AddUserUpdate(Sender: TObject);
 begin
-  (Sender as TAction).Enabled := FIsAdmin;
+  (Sender as TAction).Enabled := FIsAdmin and (UserList.State = dsBrowse);
 end;
 
 procedure TForm1.ApplicationProperties1Exception(Sender: TObject; E: Exception);
@@ -299,6 +341,11 @@ begin
   end;
   MessageDlg(E.Message,mtError,[mbOK],0);
   Application.QueueAsyncCall(@DoReopen,0);
+end;
+
+procedure TForm1.AttachmentsAfterDelete(DataSet: TDataSet);
+begin
+  IBTransaction1.Commit;
 end;
 
 procedure TForm1.ChgPasswordExecute(Sender: TObject);
@@ -333,6 +380,16 @@ begin
     StatusBar1.SimpleText := StatusBar1.SimpleText + ' with Administrator Privileges';
 end;
 
+procedure TForm1.DeleteTagExecute(Sender: TObject);
+begin
+  UserTags.Delete;
+end;
+
+procedure TForm1.DeleteTagUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := UserTags.Active and (UserTags.RecordCount > 0);
+end;
+
 procedure TForm1.DeleteUserExecute(Sender: TObject);
 begin
   if MessageDlg('Do you really want to delete user ' + Trim(UserList.FieldByName('UserName').AsString),
@@ -344,19 +401,14 @@ procedure TForm1.DisconnectUserExecute(Sender: TObject);
 begin
   if MessageDlg('Do you really want to disconnect user ' + Trim(UserList.FieldByName('UserName').AsString),
      mtConfirmation,[mbYes,mbNo],0) = mrYes then
-  with DropConnection do
-  begin
-    ParamByName('ID').AsInteger := UserList.FieldByName('MON$ATTACHMENT_ID').AsInteger;
-    ExecQuery;
-    Transaction.Commit;
-  end;
+    Attachments.Delete;
 end;
 
 procedure TForm1.DisconnectUserUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := UserList.Active and (UserList.RecordCount > 0) and
-     not UserList.FieldByName('MON$ATTACHMENT_ID').IsNull and
-     (UserList.FieldByName('MON$ATTACHMENT_ID').AsInteger <> UserList.FieldByName('CURRENT_CONNECTION').AsInteger);
+     not Attachments.FieldByName('MON$ATTACHMENT_ID').IsNull and
+     (Attachments.FieldByName('MON$ATTACHMENT_ID').AsInteger <> UserList.FieldByName('CURRENT_CONNECTION').AsInteger);
 end;
 
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -444,7 +496,34 @@ end;
 procedure TForm1.SaveChangesUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := (UserList.State in [dsInsert,dsEdit]) or
-                                 (RoleNameList.State in [dsInsert,dsEdit]);
+                                 (RoleNameList.State in [dsInsert,dsEdit]) or
+                                 (UserTags.State in [dsInsert,dsEdit]) ;
+end;
+
+procedure TForm1.TagsUpdateApplyUpdates(Sender: TObject;
+  UpdateKind: TUpdateKind; Params: ISQLParams);
+var sql: string;
+begin
+//  ShowParams(Params);
+  sql := '';
+  case UpdateKind of
+  ukInsert,
+  ukModify:
+    begin
+      sql := 'ALTER USER ' + Trim(Params.ByName('SEC$USER_NAME').AsString)
+         + ' TAGS (' + QuoteIdentifierIfNeeded(IBDatabase1.SQLDialect,Params.ByName('SEC$KEY').AsString)
+         + '=''' + SQLSafeString(Params.ByName('SEC$VALUE').AsString) + '''';
+      if Params.ByName('SEC$KEY').AsString <> Params.ByName('OLD_SEC$KEY').AsString then
+        sql += ', DROP ' + QuoteIdentifierIfNeeded(IBDatabase1.SQLDialect,Params.ByName('OLD_SEC$KEY').AsString);
+      sql +=')'
+    end;
+
+  ukDelete:
+    sql := 'ALTER USER ' + Trim(Params.ByName('SEC$USER_NAME').AsString)
+         + ' TAGS (DROP ' + QuoteIdentifierIfNeeded(IBDatabase1.SQLDialect,Params.ByName('SEC$KEY').AsString) + ')';
+  end;
+  ApplyUserChange.SQL.Text := sql;
+  ApplyUserChange.ExecQuery;
 end;
 
 end.

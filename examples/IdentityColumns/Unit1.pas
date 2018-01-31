@@ -66,9 +66,7 @@ const
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  {$IFDEF LOCALDATABASE}
-  IBDatabase1.DatabaseName := GetTempDir + sDatabaseName
-  {$else}
+  {$IFNDEF LOCALDATABASE}
   IBDatabase1.DatabaseName := sDatabaseName
   {$ENDIF}
 end;

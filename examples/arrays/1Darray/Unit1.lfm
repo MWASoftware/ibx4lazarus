@@ -96,7 +96,6 @@ object Form1: TForm1
             'Dec'
           )
           ColumnLabelFont.Height = -13
-          ColumnLabelFont.Name = 'Sans'
           ColumnLabelFont.Style = [fsBold]
           RowLabelColumnWidth = 64
           TextAlignment = taRightJustify
@@ -107,7 +106,7 @@ object Form1: TForm1
           ScrollBars = ssNone
           TabOrder = 0
           ColCount = 12
-          RowCount = 20
+          RowCount = 4
           ColWidths = (
             41
             41
@@ -171,7 +170,7 @@ object Form1: TForm1
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = True
     AllowStreamedConnected = False
-    DatabaseName = '/tmp/1Dtest.fdb'
+    DatabaseName = '$DATADIR$1Dtest.fdb'
     Params.Strings = (
       'user_name=SYSDBA'
       'lc_ctype=UTF8'
