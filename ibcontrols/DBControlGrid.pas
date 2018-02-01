@@ -609,7 +609,8 @@ begin
     begin
       FCacheRefreshQueued := true;
       Application.QueueAsyncCall(@DoMoveRecord,PtrInt(aRow));
-    end
+    end;
+    Canvas.FillRect(aRect);
   end
   else
      Canvas.Draw(aRect.Left,aRect.Top,CachedRow)
