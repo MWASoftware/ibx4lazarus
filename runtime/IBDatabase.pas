@@ -127,8 +127,20 @@ const
     'trusted_role',
     'org_filename',
     'utf8_ilename',
-    'ext_call_depth'
-  );
+    'ext_call_depth',
+    'auth_block',
+    'client_version',
+    'remote_protocol',
+    'host_name',
+    'os_user',
+    'specific_auth_data',
+    'auth_plugin_list',
+    'auth_plugin_name',
+    'config',
+    'nolinger',
+    'reset_icu',
+    'map_attach'
+    );
 
   TPBPrefix = 'isc_tpb_';
   TPBConstantNames: array[1..isc_tpb_last_tpb_constant] of string = (
@@ -2243,7 +2255,7 @@ begin
         Result.Add(DPBVal).SetAsInteger(StrToInt(ParamValue));
 
       isc_dpb_activate_shadow, isc_dpb_delete_shadow, isc_dpb_begin_log,
-      isc_dpb_quit_log:
+      isc_dpb_map_attach, isc_dpb_quit_log:
         Result.Add(DPBVal).SetAsByte(0);
       else
       begin

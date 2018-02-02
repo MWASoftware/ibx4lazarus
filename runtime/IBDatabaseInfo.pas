@@ -43,6 +43,9 @@ type
   { TIBDatabaseInfo }
 
   TIBDatabaseInfo = class(TComponent)
+  private
+    function GetDateDBCreated: TDateTime;
+    function GetTransactionCount: Long;
   protected
     FDatabase: TIBDatabase;
     FUserNames   : TStringList;
@@ -92,8 +95,10 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function GetLongDatabaseInfo(DatabaseInfoCommand: Integer): Long;
+    function GetDatabasePage(PageNo: integer): string;
     property Allocation: Long read GetAllocation;
     property BaseLevel: Long read GetBaseLevel;
+    property DateDBCreated: TDateTime read GetDateDBCreated;
     property DBFileName: String read GetDBFileName;
     property DBSiteName: String read GetDBSiteName;
     property DBImplementationNo: Long read GetDBImplementationNo;
@@ -113,6 +118,7 @@ type
     property Marks: Long read GetMarks;
     property Reads: Long read GetReads;
     property Writes: Long read GetWrites;
+    property TransactionCount: Long read GetTransactionCount;
     property BackoutCount: TStringList read GetBackoutCount;
     property DeleteCount: TStringList read GetDeleteCount;
     property ExpungeCount: TStringList read GetExpungeCount;
@@ -160,6 +166,21 @@ begin
   if assigned(FReadSeqCount) then FReadSeqCount.Free;
   if assigned(FUpdateCount) then FUpdateCount.Free;
   inherited Destroy;
+end;
+
+function TIBDatabaseInfo.GetDateDBCreated: TDateTime;
+begin
+  CheckDatabase;
+  with Database.Attachment.GetDBInformation([isc_info_creation_date]) do
+    if (Count > 0) and (Items[0].GetItemType = isc_info_creation_date) then
+      Result := Items[0].GetAsDateTime
+    else
+      IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
+end;
+
+function TIBDatabaseInfo.GetTransactionCount: Long;
+begin
+  result := GetLongDatabaseInfo(isc_info_active_tran_count);
 end;
 
 procedure TIBDatabaseInfo.CheckDatabase;
@@ -401,6 +422,18 @@ begin
   with Database.Attachment.GetDBInformation([DatabaseInfoCommand]) do
     if (Count > 0) and (Items[0].GetItemType = DatabaseInfoCommand) then
       Result := Items[0].AsInteger
+    else
+      IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
+end;
+
+function TIBDatabaseInfo.GetDatabasePage(PageNo: integer): string;
+var DBRequest: IDIRB;
+begin
+  DBRequest := Database.Attachment.AllocateDIRB;
+  DBRequest.Add(fb_info_page_contents).AsInteger := PageNo;
+  with Database.Attachment.GetDBInformation(DBRequest) do
+    if (Count > 0) and (Items[0].GetItemType = fb_info_page_contents) then
+      Result := Items[0].AsString
     else
       IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;

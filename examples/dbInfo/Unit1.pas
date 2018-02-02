@@ -25,6 +25,7 @@ type
     { private declarations }
     procedure ShowBoolValue(aValue: Long; WhenTrue, WhenFalse: string);
     procedure ShowStrings(aCaption: string; List: TStrings);
+    function HexString(s: AnsiString): string;
   public
     { public declarations }
   end;
@@ -67,6 +68,7 @@ begin
     Memo1.Lines.Add('DB File Name = ' + DBFileName);
     Memo1.Lines.Add('DB Site Name = ' + DBSiteName);
     Memo1.Lines.Add('DB Implementation No = ' + IntToStr(DBImplementationNo));
+    Memo1.Lines.Add('Database Created: ' + DateTimeToStr(DateDBCreated));
     Memo1.Lines.Add('DB Implementation Class = ' + IntToStr(DBImplementationClass));
     ShowBoolValue(NoReserve, 'No Space Reserved','Space is Reserved');
     Memo1.Lines.Add('ODS Minor Version = ' + IntToStr(ODSMinorVersion));
@@ -83,6 +85,7 @@ begin
     Memo1.Lines.Add('Marks = ' + IntToStr(Marks));
     Memo1.Lines.Add('Reads = ' + IntToStr(Reads));
     Memo1.Lines.Add('Writes = ' + IntToStr(Writes));
+    Memo1.Lines.Add('Transaction Count = ' + IntToStr(TransactionCount));
     AddPerfStats('Backout Count',BackoutCount);
     AddPerfStats('Delete Count',DeleteCount);
     AddPerfStats('Expunge Count',ExpungeCount);
@@ -94,6 +97,8 @@ begin
     Memo1.Lines.Add('');
     Memo1.Lines.Add('DB SQLDialect = ' + IntToStr(DBSQLDialect));
     ShowBoolValue(ReadOnly,'Database is Read Only','Database is Read/Write');
+    Memo1.Lines.Add('Hex Dump of Database Page 100:');
+    Memo1.Lines.Add(HexString(GetDatabasePage(100)));
   end;
 end;
 
@@ -117,6 +122,14 @@ begin
     s := s + List[i];
   end;
   Memo1.Lines.Add(s);
+end;
+
+function TForm1.HexString(s: AnsiString): string;
+var i: integer;
+begin
+  Result := '';
+  for i := 1 to length(s) do
+    Result += Format('%x ',[byte(s[i])]);
 end;
 
 procedure TForm1.AddPerfStats(Heading: string;

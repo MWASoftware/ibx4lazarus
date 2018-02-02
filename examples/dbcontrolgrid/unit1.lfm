@@ -417,10 +417,10 @@ object Form1: TForm1
     Text = 'None Specified'
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     CreateIfNotExists = False
     AllowStreamedConnected = False
-    DatabaseName = 'localhost:employee'
+    DatabaseName = 'employee'
     Params.Strings = (
       'user_name=SYSDBA'
       'lc_ctype=UTF8'

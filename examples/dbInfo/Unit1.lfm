@@ -28,7 +28,7 @@ object Form1: TForm1
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = False
     AllowStreamedConnected = False
-    DatabaseName = 'localhost:employee'
+    DatabaseName = 'employee'
     Params.Strings = (
       'lc_ctype=UTF8'
       'user_name=SYSDBA'

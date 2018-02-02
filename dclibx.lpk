@@ -9,7 +9,7 @@
       <SearchPaths>
         <IncludeFiles Value="design"/>
         <OtherUnitFiles Value="design"/>
-        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="design/lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Parsing>
         <SyntaxOptions>
