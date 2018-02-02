@@ -8,7 +8,7 @@
       <Version Value="11"/>
       <SearchPaths>
         <OtherUnitFiles Value="ibcontrols"/>
-        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="ibcontrols/lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
     <Description Value="Data and IBX Aware controls"/>

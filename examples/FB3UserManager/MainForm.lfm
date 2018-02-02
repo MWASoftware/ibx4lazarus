@@ -528,8 +528,8 @@ object Form1: TForm1
     DatabaseName = 'employee'
     Params.Strings = (
       'user_name=SYSDBA'
-      'sql_role_name=RDB$ADMIN'
       'lc_ctype=UTF8'
+      ''
     )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0

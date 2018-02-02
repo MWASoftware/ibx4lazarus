@@ -124,7 +124,10 @@ IBX Change Log  version                                                (2.2-0) W
     editor for a TIBTable component, double click on the component. The fields editor
     is then displayed.
 
-
+29. TIBDatabaseInfo: new properties/function
+     * DateDBCreated (returns date/time database created)
+     * TransactionCount (returns no. of active transactions)
+     * GetDatabasePage(PageNo: integer) (returns contents of specified database page - SYSDBA only).
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 
