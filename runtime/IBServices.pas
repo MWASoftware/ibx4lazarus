@@ -116,11 +116,13 @@ type
     FOnAttach: TNotifyEvent;
     FProtocol: TProtocol;
     FParams: TStrings;
+    FServerVersionNo: array [1..4] of integer;
     FServiceQueryResults: IServiceQueryResults;
     function GetActive: Boolean;
     function GetServiceParamBySPB(const Idx: Integer): String;
     function GetSQPB: ISQPB;
     function GetSRB: ISRB;
+    function GetServerVersionNo(index: integer): integer;
     procedure SetActive(const Value: Boolean);
     procedure SetParams(const Value: TStrings);
     procedure SetServerName(const Value: string);
@@ -160,6 +162,7 @@ type
     property ServiceIntf: IServiceManager read FService write SetService;
     property ServiceParamBySPB[const Idx: Integer]: String read GetServiceParamBySPB
                                                       write SetServiceParamBySPB;
+    property ServerVersionNo[index: integer]: integer read GetServerVersionNo;
   published
     property Active: Boolean read GetActive write SetActive default False;
     property ServerName: string read FServerName write SetServerName;
@@ -464,6 +467,7 @@ type
     LastName: string;
     GroupID: Integer;
     UserID: Integer;
+    Admin: boolean;
   end;
 
   TSecurityAction = (ActionAddUser, ActionDeleteUser, ActionModifyUser, ActionDisplayUser);
@@ -528,7 +532,7 @@ type
 implementation
 
 uses
-  IBSQLMonitor, FBMessages;
+  IBSQLMonitor, FBMessages, RegExpr;
 
 { TIBBackupRestoreService }
 
@@ -541,6 +545,35 @@ end;
 { TIBCustomService }
 
 procedure TIBCustomService.Attach;
+
+  procedure GetServerVersionNo;
+  var Req: ISRB;
+      Results: IServiceQueryResults;
+      RegexObj: TRegExpr;
+      s: string;
+  begin
+    Req := FService.AllocateSRB;
+    Req.Add(isc_info_svc_server_version);
+    Results := FService.Query(nil,Req);
+    if (Results.Count = 1) and (Results[0].getItemType = isc_info_svc_server_version) then
+    RegexObj := TRegExpr.Create;
+    try
+      {extact database file spec}
+      RegexObj.ModifierG := false; {turn off greedy matches}
+      RegexObj.Expression := '[A-Z][A-Z]-V([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+) .*';
+      s := Results[0].AsString;
+      if RegexObj.Exec(s) then
+      begin
+        FServerVersionNo[1] := StrToInt(system.copy(s,RegexObj.MatchPos[1],RegexObj.MatchLen[1]));
+        FServerVersionNo[2] := StrToInt(system.copy(s,RegexObj.MatchPos[2],RegexObj.MatchLen[2]));
+        FServerVersionNo[3] := StrToInt(system.copy(s,RegexObj.MatchPos[3],RegexObj.MatchLen[3]));
+        FServerVersionNo[4] := StrToInt(system.copy(s,RegexObj.MatchPos[4],RegexObj.MatchLen[4]));
+      end;
+    finally
+      RegexObj.Free;
+    end;
+  end;
+
 var aServerName: string;
 begin
   CheckInactive;
@@ -559,6 +592,7 @@ begin
   end;
 
   FService := FirebirdAPI.GetServiceManager(aServerName,FProtocol,FSPB);
+  GetServerVersionNo;
 
   if Assigned(FOnAttach) then
     FOnAttach(Self);
@@ -764,6 +798,15 @@ begin
   if FSRB = nil then
     FSRB := FService.AllocateSRB;
   Result := FSRB;
+end;
+
+function TIBCustomService.GetServerVersionNo(index: integer): integer;
+begin
+  CheckActive;
+  if (index >= Low(FServerVersionNo)) and (index <= High(FServerVersionNo)) then
+    Result := FServerVersionNo[index]
+  else
+    IBError(ibxeInfoBufferIndexError,[index]);
 end;
 
 procedure TIBCustomService.InternalServiceQuery;
@@ -1831,6 +1874,9 @@ begin
           isc_spb_sec_groupid:
             FUserInfo[k].GroupID := AsInteger;
 
+          isc_spb_sec_admin:
+            FUserInfo[k].Admin := AsInteger <> 0;
+
           else
             IBError(ibxeOutputParsingError, [getItemType]);
           end;
@@ -1870,7 +1916,11 @@ end;
 procedure TIBSecurityService.DisplayUsers;
 begin
   SecurityAction := ActionDisplayUser;
-  SRB.Add(isc_action_svc_display_user);
+  if (ServerVersionNo[1] > 2) or
+     ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5)) then
+     SRB.Add(isc_action_svc_display_user_adm) {Firebird 2.5 and later only}
+  else
+    SRB.Add(isc_action_svc_display_user);
   InternalServiceStart;
   FetchUserInfo;
 end;
@@ -1878,7 +1928,11 @@ end;
 procedure TIBSecurityService.DisplayUser(UserName: String);
 begin
   SecurityAction := ActionDisplayUser;
-  SRB.Add(isc_action_svc_display_user);
+  if (ServerVersionNo[1] > 2) or
+     ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5)) then
+     SRB.Add(isc_action_svc_display_user_adm) {Firebird 2.5 and later only}
+  else
+    SRB.Add(isc_action_svc_display_user);
   SRB.Add(isc_spb_sec_username).AsString := UserName;
   InternalServiceStart;
   FetchUserInfo;

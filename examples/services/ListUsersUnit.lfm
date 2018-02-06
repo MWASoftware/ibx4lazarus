@@ -119,6 +119,17 @@ object ListUsersForm: TListUsersForm
         DBLookupProperties.ItemHeight = 0
         DBLookupProperties.ItemWidth = 0
         DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Admin'
+        Width = 64
+        FieldName = 'Admin'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end>
     DataSource = UserListSource
     PopupMenu = PopupMenu1
@@ -187,6 +198,10 @@ object ListUsersForm: TListUsersForm
         Name = 'Password'
         DataType = ftString
         Size = 32
+      end    
+      item
+        Name = 'Admin'
+        DataType = ftBoolean
       end>
     AfterOpen = UserListAfterOpen
     BeforeClose = UserListBeforeClose

@@ -87,6 +87,7 @@ procedure TListUsersForm.UserListAfterInsert(DataSet: TDataSet);
 begin
   DataSet.FieldByName('UserID').AsInteger := 0;
   DataSet.FieldByName('GroupID').AsInteger := 0;
+  DataSet.FieldByName('Admin').AsBoolean := false;
 end;
 
 procedure TListUsersForm.AddUserExecute(Sender: TObject);
@@ -153,6 +154,7 @@ begin
         FieldByName('MiddleName').AsString := MiddleName;
         FieldByName('LastName').AsString := LastName;
         FieldByName('Password').AsString := Password;
+        FieldByName('Admin').AsBoolean := Admin;
         Post;
       end;
     finally
