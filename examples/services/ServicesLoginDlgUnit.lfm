@@ -1,0 +1,90 @@
+object SvcLoginDlg: TSvcLoginDlg
+  Left = 1390
+  Height = 192
+  Top = 370
+  Width = 385
+  ActiveControl = Password
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'Services Login'
+  ClientHeight = 192
+  ClientWidth = 385
+  Position = poScreenCenter
+  LCLVersion = '1.8.1.0'
+  object Bevel1: TBevel
+    Left = 15
+    Height = 140
+    Top = 15
+    Width = 356
+    Anchors = [akTop, akLeft, akRight, akBottom]
+  end
+  object TargetCaption: TLabel
+    Left = 33
+    Height = 14
+    Top = 28
+    Width = 43
+    Caption = 'Server:'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 32
+    Height = 14
+    Top = 72
+    Width = 74
+    Caption = 'User  Name:'
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 33
+    Height = 14
+    Top = 120
+    Width = 59
+    Caption = 'Password:'
+    ParentColor = False
+  end
+  object Button1: TButton
+    Left = 296
+    Height = 25
+    Top = 163
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 215
+    Height = 25
+    Top = 163
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 1
+  end
+  object ServiceName: TEdit
+    Left = 142
+    Height = 24
+    Top = 24
+    Width = 192
+    TabOrder = 2
+  end
+  object UserName: TEdit
+    Left = 142
+    Height = 24
+    Top = 68
+    Width = 192
+    TabOrder = 3
+  end
+  object Password: TEdit
+    Left = 142
+    Height = 24
+    Top = 114
+    Width = 192
+    EchoMode = emPassword
+    PasswordChar = '*'
+    TabOrder = 4
+  end
+end

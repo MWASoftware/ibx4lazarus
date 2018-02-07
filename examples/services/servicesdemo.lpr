@@ -8,7 +8,8 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   ibexpress, Forms, memdslaz, Unit1, Unit2, Unit3, ListUsersUnit,
-  LimboTransactionsUnit, NewUserDlgUnit, ChgPasswordDlgUnit
+  LimboTransactionsUnit, NewUserDlgUnit, ChgPasswordDlgUnit,
+  ServicesLoginDlgUnit
   { you can add units after this };
 
 {$R *.res}
@@ -23,6 +24,7 @@ begin
   Application.CreateForm(TLimboTransactionsForm, LimboTransactionsForm);
   Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);
   Application.CreateForm(TNewUserDlg, NewUserDlg);
+  Application.CreateForm(TSvcLoginDlg, SvcLoginDlg);
   Application.Run;
 end.
 

@@ -35,6 +35,8 @@ type
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure IBServerProperties1Login(Service: TIBCustomService;
+      LoginParams: TStrings);
   private
     { private declarations }
     procedure DoBackup(secDB: PtrInt);
@@ -57,7 +59,7 @@ implementation
 
 {$R *.lfm}
 
-uses IBErrorCodes, FBMessages;
+uses IBErrorCodes, FBMessages, ServicesLoginDlgUnit;
 
 const
   use_global_login     = 0; {Login to backup/restore with global sec db}
@@ -84,6 +86,10 @@ begin
     Memo1.Lines.Add('Server Version = ' + VersionInfo.ServerVersion);
     Memo1.Lines.Add('Server Implementation = ' + VersionInfo.ServerImplementation);
     Memo1.Lines.Add('Service Version = ' + IntToStr(VersionInfo.ServiceVersion));
+    Memo1.Lines.Add(Format('Firebird Release = %d.%d.%d (Build no. %d)',[ServerVersionNo[1],
+                                                             ServerVersionNo[2],
+                                                             ServerVersionNo[3],
+                                                             ServerVersionNo[4]]));
     FetchDatabaseInfo;
     Memo1.Lines.Add('No. of attachments = ' + IntToStr(DatabaseInfo.NoOfAttachments));
     Memo1.Lines.Add('No. of databases = ' + IntToStr(DatabaseInfo.NoOfDatabases));
@@ -95,6 +101,25 @@ begin
     Memo1.Lines.Add('Security Database Location = ' + ConfigParams.SecurityDatabaseLocation);
     Active := false;
   end;
+end;
+
+procedure TForm1.IBServerProperties1Login(Service: TIBCustomService;
+  LoginParams: TStrings);
+var aServiceName: string;
+    aUserName: string;
+    aPassword: string;
+begin
+  aServiceName := Service.ServerName;
+  aUserName := LoginParams.Values['user_name'];
+  aPassword := '';
+  if SvcLoginDlg.ShowModal(aServiceName, aUserName, aPassword) = mrOK then
+  begin
+    Service.ServerName := aServiceName;
+    LoginParams.Values['user_name'] := aUserName;
+    LoginParams.Values['password'] := aPassword;
+  end
+  else
+    IBError(ibxeOperationCancelled, [nil]);
 end;
 
 procedure TForm1.DoBackup(secDB: PtrInt);

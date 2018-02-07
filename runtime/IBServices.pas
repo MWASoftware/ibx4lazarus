@@ -96,7 +96,7 @@ type
 
   TIBCustomService = class;
 
-  TLoginEvent = procedure(Database: TIBCustomService;
+  TLoginEvent = procedure(Service: TIBCustomService;
     LoginParams: TStrings) of object;
 
   { TIBCustomService }
@@ -467,16 +467,19 @@ type
     LastName: string;
     GroupID: Integer;
     UserID: Integer;
-    Admin: boolean;
+    AdminRole: boolean;
   end;
 
   TSecurityAction = (ActionAddUser, ActionDeleteUser, ActionModifyUser, ActionDisplayUser);
   TSecurityModifyParam = (ModifyFirstName, ModifyMiddleName, ModifyLastName, ModifyUserId,
-                         ModifyGroupId, ModifyPassword);
+                         ModifyGroupId, ModifyPassword, ModifyAdminRole);
   TSecurityModifyParams = set of TSecurityModifyParam;
+
+  { TIBSecurityService }
 
   TIBSecurityService = class(TIBControlAndQueryService)
   private
+    FAdminRole: boolean;
     FUserID: Integer;
     FGroupID: Integer;
     FFirstName: string;
@@ -489,6 +492,7 @@ type
     FSecurityAction: TSecurityAction;
     FModifyParams: TSecurityModifyParams;
     procedure ClearParams;
+    procedure SetAdminRole(AValue: boolean);
     procedure SetSecurityAction (Value: TSecurityAction);
     procedure SetFirstName (Value: String);
     procedure SetMiddleName (Value: String);
@@ -512,6 +516,7 @@ type
     procedure AddUser;
     procedure DeleteUser;
     procedure ModifyUser;
+    function HasAdminRole: boolean;
     property  UserInfo[Index: Integer]: TUserInfo read GetUserInfo;
     property  UserInfoCount: Integer read GetUserInfoCount;
 
@@ -526,6 +531,7 @@ type
     property UserID : Integer read FUserID write SetUserID;
     property GroupID : Integer read FGroupID write SetGroupID;
     property Password : string read FPassword write setPassword;
+    property AdminRole: boolean read FAdminRole write SetAdminRole;
   end;
 
 
@@ -1875,7 +1881,7 @@ begin
             FUserInfo[k].GroupID := AsInteger;
 
           isc_spb_sec_admin:
-            FUserInfo[k].Admin := AsInteger <> 0;
+            FUserInfo[k].AdminRole := AsInteger <> 0;
 
           else
             IBError(ibxeOutputParsingError, [getItemType]);
@@ -1916,20 +1922,18 @@ end;
 procedure TIBSecurityService.DisplayUsers;
 begin
   SecurityAction := ActionDisplayUser;
-  if (ServerVersionNo[1] > 2) or
-     ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5)) then
-     SRB.Add(isc_action_svc_display_user_adm) {Firebird 2.5 and later only}
+  if HasAdminRole then
+    SRB.Add(isc_action_svc_display_user_adm) {Firebird 2.5 and later only}
   else
     SRB.Add(isc_action_svc_display_user);
   InternalServiceStart;
   FetchUserInfo;
 end;
 
-procedure TIBSecurityService.DisplayUser(UserName: String);
+procedure TIBSecurityService.DisplayUser(UserName: string);
 begin
   SecurityAction := ActionDisplayUser;
-  if (ServerVersionNo[1] > 2) or
-     ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5)) then
+  if HasAdminRole then
      SRB.Add(isc_action_svc_display_user_adm) {Firebird 2.5 and later only}
   else
     SRB.Add(isc_action_svc_display_user);
@@ -1942,6 +1946,12 @@ procedure TIBSecurityService.ModifyUser;
 begin
   SecurityAction := ActionModifyUser;
   ServiceStart;
+end;
+
+function TIBSecurityService.HasAdminRole: boolean;
+begin
+  Result :=  (ServerVersionNo[1] > 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5));
 end;
 
 procedure TIBSecurityService.SetSecurityAction (Value: TSecurityAction);
@@ -1960,6 +1970,13 @@ begin
   FGroupID := 0;
   FUserID := 0;
   FPassword := '';
+end;
+
+procedure TIBSecurityService.SetAdminRole(AValue: boolean);
+begin
+  if not HasAdminRole then Exit;
+  FAdminRole := AValue;
+  Include (FModifyParams, ModifyAdminRole);
 end;
 
 procedure TIBSecurityService.SetFirstName (Value: String);
@@ -2027,6 +2044,7 @@ begin
       SRB.Add(isc_spb_sec_firstname).AsString := FFirstName;
       SRB.Add(isc_spb_sec_middlename).AsString := FMiddleName;
       SRB.Add(isc_spb_sec_lastname).AsString := FLastName;
+      SRB.Add(isc_spb_sec_admin).AsInteger := ord(FAdminRole);
     end;
     ActionDeleteUser:
     begin
@@ -2059,6 +2077,13 @@ begin
         SRB.Add(isc_spb_sec_middlename).AsString := FMiddleName;
       if (ModifyLastName in FModifyParams) then
         SRB.Add(isc_spb_sec_lastname).AsString := FLastName;
+      if (ModifyAdminRole in FModifyParams) then
+      begin
+        if FAdminRole then
+          SRB.Add(isc_spb_sec_admin).AsInteger := 1
+        else
+          SRB.Add(isc_spb_sec_admin).AsInteger := 0;
+      end;
     end;
   end;
   ClearParams;
