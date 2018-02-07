@@ -147,6 +147,12 @@ IBX Change Log  version                                                 (2.2-0) 
 35. TIBRestoreService: now supports new options RestoreMetaDataOnly and
     NoDBTriggersOnRestore (Firebird 2.5 and later).
 
+36. TIBOnlineValidationService component added to the IBServices and the "Firebird Admin"
+    palette. This uses the online validation feature added in Firebird 2.5. The
+    services's properties enable inclusion/exclusion of tables and indexes using
+    regular expressions. See.
+    https://firebirdsql.org/file/documentation/release_notes/html/en/2_5/rnfb25-apiods-api.html#rnfb25-apiods-api-onlinevalidation
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

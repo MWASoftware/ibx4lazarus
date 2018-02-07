@@ -467,6 +467,30 @@ type
                                          write FGlobalAction;
   end;
 
+  { TIBOnlineValidationService }
+
+  TIBOnlineValidationService = class(TIBControlAndQueryService)
+  private
+    FDatabaseName: string;
+    FExcludeIndexes: string;
+    FExcludeTables: string;
+    FIncludeIndexes: string;
+    FIncludeTables: string;
+    FLockTimeout: integer;
+    procedure SetDatabaseName(AValue: string);
+  protected
+    procedure SetServiceStartOptions; override;
+  public
+    procedure ServiceStart; override;
+  published
+    property IncludeTables: string read FIncludeTables write FIncludeTables;
+    property ExcludeTables: string read FExcludeTables write FExcludeTables;
+    property IncludeIndexes: string read FIncludeIndexes write FIncludeIndexes;
+    property ExcludeIndexes: string read FExcludeIndexes write FExcludeIndexes;
+    property LockTimeout: integer read FLockTimeout write FLockTimeout;
+    property DatabaseName: string read FDatabaseName write SetDatabaseName;
+  end;
+
   TUserInfo = class
   public
     UserName: string;
@@ -547,6 +571,43 @@ implementation
 
 uses
   IBSQLMonitor, FBMessages, RegExpr;
+
+{ TIBOnlineValidationService }
+
+procedure TIBOnlineValidationService.SetDatabaseName(AValue: string);
+begin
+  if FDatabaseName = AValue then Exit;
+  FDatabaseName := AValue;
+end;
+
+procedure TIBOnlineValidationService.SetServiceStartOptions;
+begin
+  inherited SetServiceStartOptions;
+  Action := isc_action_svc_validate;
+  if FDatabaseName = '' then
+    IBError(ibxeStartParamsError, [nil]);
+  SRB.Add(isc_action_svc_validate);
+  SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
+  if IncludeTables <> '' then
+    SRB.Add(isc_spb_val_tab_incl).AsString := IncludeTables;
+  if ExcludeTables <> '' then
+    SRB.Add(isc_spb_val_tab_excl).AsString := ExcludeTables;
+  if IncludeIndexes <> '' then
+    SRB.Add(isc_spb_val_idx_incl).AsString := IncludeIndexes;
+  if ExcludeIndexes <> '' then
+    SRB.Add(isc_spb_val_idx_excl).AsString := ExcludeIndexes;
+  if LockTimeout <> 0 then
+    SRB.Add(isc_spb_val_lock_timeout).AsInteger := LockTimeout;
+end;
+
+procedure TIBOnlineValidationService.ServiceStart;
+begin
+  {Firebird 2.5 and later}
+  if (ServerVersionNo[1] < 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] < 5)) then
+    IBError(ibxeServiceUnavailable,[]);
+  inherited ServiceStart;
+end;
 
 { TIBBackupRestoreService }
 

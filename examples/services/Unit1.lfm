@@ -135,4 +135,14 @@ object Form1: TForm1
     left = 320
     top = 160
   end
+  object IBOnlineValidationService1: TIBOnlineValidationService
+    ServerName = 'localhost'
+    Protocol = TCP
+    TraceFlags = []
+    IncludeTables = 'EMPLOYEE|JOB'
+    LockTimeout = 0
+    DatabaseName = 'employee'
+    left = 320
+    top = 228
+  end
 end

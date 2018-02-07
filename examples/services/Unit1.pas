@@ -22,6 +22,7 @@ type
     Button7: TButton;
     Button8: TButton;
     IBLogService1: TIBLogService;
+    IBOnlineValidationService1: TIBOnlineValidationService;
     IBServerProperties1: TIBServerProperties;
     IBStatisticalService1: TIBStatisticalService;
     IBValidationService1: TIBValidationService;
@@ -39,6 +40,7 @@ type
       LoginParams: TStrings);
   private
     { private declarations }
+    FUseOnlineValidation: boolean;
     procedure DoBackup(secDB: PtrInt);
     procedure DoRestore(secDB: PtrInt);
     procedure DoShowStatistics(secDB: PtrInt);
@@ -59,7 +61,7 @@ implementation
 
 {$R *.lfm}
 
-uses IBErrorCodes, FBMessages, ServicesLoginDlgUnit;
+uses IBErrorCodes, FBMessages, ServicesLoginDlgUnit, SelectValidationDlgUnit;
 
 const
   use_global_login     = 0; {Login to backup/restore with global sec db}
@@ -274,11 +276,23 @@ end;
 
 procedure TForm1.DoValidation(secDB: PtrInt);
 var NeedsExpectedDB: boolean;
+    aValidationService: TIBControlAndQueryService;
+    DBName: string;
 begin
+  if FUseOnlineValidation then
+  begin
+    aValidationService := IBOnlineValidationService1;
+    DBName := IBOnlineValidationService1.DatabaseName;
+  end
+  else
+  begin
+    aValidationService := IBValidationService1;
+    DBName := IBValidationService1.DatabaseName;
+  end;
   NeedsExpectedDB := false;
-  AttachService(IBValidationService1,secDB,IBValidationService1.DatabaseName);
+  AttachService(aValidationService,secDB,DBName);
   Application.ProcessMessages;
-  with IBValidationService1 do
+  with aValidationService do
   try
     Active := true;
     try
@@ -449,8 +463,7 @@ procedure TForm1.Button7Click(Sender: TObject);
 var DBName: string;
 begin
   DBName := IBValidationService1.DatabaseName;
-  if InputQuery('Select Database','Enter Database Name on ' + IBServerProperties1.ServerName,
-         DBName) then
+  if SelectValidationDlg.ShowModal(IBServerProperties1.ServerName,DBName,FUseOnlineValidation) = mrOK then
   begin
     IBValidationService1.DatabaseName := DBName;
     Memo1.Lines.Add('Database Validation for ' + IBValidationService1.DatabaseName);

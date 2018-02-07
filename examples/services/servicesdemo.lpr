@@ -9,7 +9,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   ibexpress, Forms, memdslaz, Unit1, Unit2, Unit3, ListUsersUnit,
   LimboTransactionsUnit, NewUserDlgUnit, ChgPasswordDlgUnit,
-  ServicesLoginDlgUnit
+  ServicesLoginDlgUnit, SelectValidationDlgUnit
   { you can add units after this };
 
 {$R *.res}
@@ -25,6 +25,7 @@ begin
   Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);
   Application.CreateForm(TNewUserDlg, NewUserDlg);
   Application.CreateForm(TSvcLoginDlg, SvcLoginDlg);
+  Application.CreateForm(TSelectValidationDlg, SelectValidationDlg);
   Application.Run;
 end.
 
