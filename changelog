@@ -155,6 +155,9 @@ IBX Change Log  version                                                  (2.2-0)
 
 37. TIBDatabaseInfo: Support added to report Pages Free and Pages Used.
 
+38. IBServices: procedure TIBConfigService.SetNoLinger added to set no linger
+    option on a database.
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

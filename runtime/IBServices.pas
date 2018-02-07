@@ -310,6 +310,7 @@ type
     procedure SetAsyncMode (Value: Boolean);
     procedure SetReadOnly (Value: Boolean);
     procedure SetAutoAdmin(Value: Boolean);
+    procedure SetNoLinger;
   published
     property DatabaseName: string read FDatabaseName write SetDatabaseName;
   end;
@@ -1432,6 +1433,14 @@ begin
     SRB.Add(isc_action_svc_set_mapping)
   else
     SRB.Add(isc_action_svc_drop_mapping);
+  InternalServiceStart;
+end;
+
+procedure TIBConfigService.SetNoLinger;
+begin
+  SRB.Add(isc_action_svc_properties);
+  SRB.Add(isc_spb_dbname).AsString :=  FDatabaseName;
+  SRB.Add(isc_spb_options).AsInteger := isc_spb_prp_nolinger;
   InternalServiceStart;
 end;
 
