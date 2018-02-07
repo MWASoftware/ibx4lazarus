@@ -39,11 +39,10 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IBDatabaseInfo.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="185"/>
         <CursorPos X="51" Y="192"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../fbintf/IB.pas"/>
@@ -233,8 +232,8 @@
       <Unit30>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="97"/>
-        <CursorPos X="102" Y="130"/>
+        <TopLine Value="124"/>
+        <CursorPos X="72" Y="156"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit30>
@@ -259,7 +258,7 @@
         <UsageCount Value="10"/>
       </Unit33>
     </Units>
-    <JumpHistory Count="20" HistoryIndex="19">
+    <JumpHistory Count="17" HistoryIndex="16">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="65" Column="71" TopLine="53"/>
@@ -328,18 +327,6 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="9" Column="29"/>
       </Position17>
-      <Position18>
-        <Filename Value="../../runtime/IBDatabaseInfo.pas"/>
-        <Caret Line="118" Column="33" TopLine="96"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../runtime/IBDatabaseInfo.pas"/>
-        <Caret Line="79" Column="14" TopLine="60"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../runtime/IBDatabaseInfo.pas"/>
-        <Caret Line="134" Column="48" TopLine="96"/>
-      </Position20>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

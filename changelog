@@ -153,6 +153,8 @@ IBX Change Log  version                                                  (2.2-0)
     regular expressions. See.
     https://firebirdsql.org/file/documentation/release_notes/html/en/2_5/rnfb25-apiods-api.html#rnfb25-apiods-api-onlinevalidation
 
+37. TIBDatabaseInfo: Support added to report Pages Free and Pages Used.
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 
