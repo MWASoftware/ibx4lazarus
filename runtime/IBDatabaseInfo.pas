@@ -45,6 +45,8 @@ type
   TIBDatabaseInfo = class(TComponent)
   private
     function GetDateDBCreated: TDateTime;
+    function GetPagesFree: Long;
+    function GetPagesUsed: Long;
     function GetTransactionCount: Long;
   protected
     FDatabase: TIBDatabase;
@@ -128,6 +130,8 @@ type
     property ReadSeqCount: TStringList read GetReadSeqCount;
     property UpdateCount: TStringList read GetUpdateCount;
     property DBSQLDialect : Long read GetDBSQLDialect;
+    property PagesUsed: Long read GetPagesUsed;
+    property PagesFree: Long read GetPagesFree;
     property ReadOnly: Long read GetReadOnly;
   published
     property Database: TIBDatabase read FDatabase write FDatabase;
@@ -176,6 +180,16 @@ begin
       Result := Items[0].GetAsDateTime
     else
       IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
+end;
+
+function TIBDatabaseInfo.GetPagesFree: Long;
+begin
+  result := GetLongDatabaseInfo(fb_info_pages_used);
+end;
+
+function TIBDatabaseInfo.GetPagesUsed: Long;
+begin
+  result := GetLongDatabaseInfo(fb_info_pages_free);
 end;
 
 function TIBDatabaseInfo.GetTransactionCount: Long;
