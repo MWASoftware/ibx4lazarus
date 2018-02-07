@@ -53,16 +53,16 @@
         <ResourceBaseClass Value="Form"/>
       </Unit1>
       <Unit2>
-        <Filename Value="Unit2.pas"/>
+        <Filename Value="BackupDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form2"/>
+        <ComponentName Value="BackupDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit2>
       <Unit3>
-        <Filename Value="Unit3.pas"/>
+        <Filename Value="RestoreDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form3"/>
+        <ComponentName Value="RestoreDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit3>

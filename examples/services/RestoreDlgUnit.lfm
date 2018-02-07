@@ -1,4 +1,4 @@
-object Form3: TForm3
+object RestoreDlg: TRestoreDlg
   Left = 799
   Height = 270
   Top = 225

@@ -1,4 +1,4 @@
-unit Unit2;
+unit BackupDlgUnit;
 
 {$mode objfpc}{$H+}
 
@@ -10,9 +10,9 @@ uses
 
 type
 
-  { TForm2 }
+  { TBackupDlg }
 
-  TForm2 = class(TForm)
+  TBackupDlg = class(TForm)
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
@@ -37,21 +37,21 @@ type
   end;
 
 var
-  Form2: TForm2;
+  BackupDlg: TBackupDlg;
 
 implementation
 
 {$R *.lfm}
 
-{ TForm2 }
+{ TBackupDlg }
 
-procedure TForm2.SpeedButton1Click(Sender: TObject);
+procedure TBackupDlg.SpeedButton1Click(Sender: TObject);
 begin
   if SaveDialog1.Execute then
     Edit3.Text := SaveDialog1.Filename;
 end;
 
-procedure TForm2.FormShow(Sender: TObject);
+procedure TBackupDlg.FormShow(Sender: TObject);
 begin
   Edit1.Text := IBBackupService1.ServerName;
   if IBBackupService1.BackupFileLocation = flServerSide then
@@ -62,7 +62,7 @@ begin
   IBBackupService1.BackupFile.Clear;
 end;
 
-procedure TForm2.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+procedure TBackupDlg.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   if ModalResult <> mrOK then Exit;
   if Edit2.Text = '' then

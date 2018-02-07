@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  IBServices, IB, Unit2, Unit3,  ListUsersUnit, LimboTransactionsUnit;
+  IBServices, IB;
 
 type
 
@@ -61,7 +61,8 @@ implementation
 
 {$R *.lfm}
 
-uses IBErrorCodes, FBMessages, ServicesLoginDlgUnit, SelectValidationDlgUnit;
+uses IBErrorCodes, FBMessages, ServicesLoginDlgUnit, SelectValidationDlgUnit,
+  BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit;
 
 const
   use_global_login     = 0; {Login to backup/restore with global sec db}
@@ -79,8 +80,8 @@ var i: integer;
 begin
   {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
   FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
-  Form3.IBRestoreService1.DatabaseName.Clear;
-  Form3.IBRestoreService1.DatabaseName.Add(GetTempDir + 'mytest.fdb');
+  RestoreDlg.IBRestoreService1.DatabaseName.Clear;
+  RestoreDlg.IBRestoreService1.DatabaseName.Add(GetTempDir + 'mytest.fdb');
   AttachService(IBServerProperties1);
   with IBServerProperties1 do
   begin
@@ -130,7 +131,7 @@ var bakfile: TFileStream;
     BackupCount: integer;
 begin
   bakfile := nil;
-  with Form2 do
+  with BackupDlg do
   try
     AttachService(IBBackupService1,secDB,IBBackupService1.DatabaseName);
 
@@ -192,7 +193,7 @@ var bakfile: TFileStream;
     NeedsExpectedDB: boolean;
 begin
   bakfile := nil;
-  with Form3 do
+  with RestoreDlg do
   try
     AttachService(IBRestoreService1,secDB,IBRestoreService1.DatabaseName[0]);
 
@@ -415,15 +416,15 @@ end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
-  Form2.IBBackupService1.ServerName := IBServerProperties1.ServerName;
-  if Form2.ShowModal = mrOK then
+  BackupDlg.IBBackupService1.ServerName := IBServerProperties1.ServerName;
+  if BackupDlg.ShowModal = mrOK then
     Application.QueueAsyncCall(@DoBackup,use_global_login);
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 begin
-  Form3.IBRestoreService1.ServerName := IBServerProperties1.ServerName;
-  if Form3.ShowModal = mrOK then
+  RestoreDlg.IBRestoreService1.ServerName := IBServerProperties1.ServerName;
+  if RestoreDlg.ShowModal = mrOK then
     Application.QueueAsyncCall(@DoRestore,use_global_login);
 end;
 
