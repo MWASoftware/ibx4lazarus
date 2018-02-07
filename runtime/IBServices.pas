@@ -481,13 +481,14 @@ type
   protected
     procedure SetServiceStartOptions; override;
   public
+    constructor Create(AOwner: TComponent); override;
     procedure ServiceStart; override;
   published
     property IncludeTables: string read FIncludeTables write FIncludeTables;
     property ExcludeTables: string read FExcludeTables write FExcludeTables;
     property IncludeIndexes: string read FIncludeIndexes write FIncludeIndexes;
     property ExcludeIndexes: string read FExcludeIndexes write FExcludeIndexes;
-    property LockTimeout: integer read FLockTimeout write FLockTimeout;
+    property LockTimeout: integer read FLockTimeout write FLockTimeout default 10;
     property DatabaseName: string read FDatabaseName write SetDatabaseName;
   end;
 
@@ -598,6 +599,12 @@ begin
     SRB.Add(isc_spb_val_idx_excl).AsString := ExcludeIndexes;
   if LockTimeout <> 0 then
     SRB.Add(isc_spb_val_lock_timeout).AsInteger := LockTimeout;
+end;
+
+constructor TIBOnlineValidationService.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FLockTimeout := 10;
 end;
 
 procedure TIBOnlineValidationService.ServiceStart;
