@@ -45,7 +45,7 @@ type
     procedure DoValidation(secDB: PtrInt);
     procedure DoLimboTransactions(secDB: PtrInt);
     procedure DoListUsers(secDB: PtrInt);
-    procedure AttachService(aService: TIBCustomService); overload;
+    procedure AttachService(aService: TIBCustomService; Initialise:boolean = false); overload;
     procedure AttachService(aService: TIBCustomService; secDB: integer;
       aDatabaseName: string); overload;
   public
@@ -149,13 +149,24 @@ begin
           end;
           Application.ProcessMessages;
         end;
-        BackupCount := bakfile.Size;
+        if bakfile <> nil then
+          BackupCount := bakfile.Size;
       finally
         if bakfile <> nil then
           bakfile.Free;
       end;
-      Memo1.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
-      MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
+      case IBBackupService1.BackupFileLocation of
+      flServerSide:
+        begin
+          Memo1.Lines.Add('Backup Completed');
+          MessageDlg('Backup Completed',mtInformation,[mbOK],0);
+        end;
+      flClientSide:
+        begin
+          Memo1.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
+          MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
+        end;
+      end;
     except
      on E: EIBInterBaseError do
        if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
@@ -338,10 +349,16 @@ begin
   end;
 end;
 
-procedure TForm1.AttachService(aService: TIBCustomService);
+procedure TForm1.AttachService(aService: TIBCustomService; Initialise: boolean);
 begin
   with aService do
   repeat
+    if Initialise then
+    begin
+      ServerName := IBServerProperties1.ServerName;
+      Params.Assign(IBServerProperties1.Params);
+      LoginPrompt := Params.IndexOfName('password') = -1;
+    end;
     try
       Active := true;
     except
@@ -399,10 +416,9 @@ end;
 procedure TForm1.Button4Click(Sender: TObject);
 begin
   Memo1.Lines.Add('Server Log');
-  IBLogService1.ServiceIntf := IBServerProperties1.ServiceIntf;
+  AttachService(IBLogService1,true);
   with IBLogService1 do
   begin
-    Active := true;
     ServiceStart;
     while not Eof do
     begin

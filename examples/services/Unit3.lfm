@@ -167,13 +167,14 @@ object Form3: TForm3
     )
     TraceFlags = []
     Verbose = True
+    StatisticsRequested = [bsTotalTime]
     BackupFileLocation = flClientSide
     DatabaseName.Strings = (
       '/tmp/mytest.fdb'
     )
     PageSize = 0
     PageBuffers = 0
-    left = 306
+    left = 304
     top = 232
   end
 end

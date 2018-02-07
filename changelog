@@ -131,7 +131,22 @@ IBX Change Log  version                                                 (2.2-0) 
 
 30. IBServices classes now provided the decoded release number in the (array) property ServerVersionNo.
 
-31. TIBSecurityService now supports display/modification of the User Admin Role (Firbird 2.5 and later).
+31. TIBSecurityService now supports display/modification of the User Admin Role (Firebird 2.5 and later).
+
+32. TIBConfigService now has a procedure SetAutoAdmin(Value: boolean) to enable/disable
+    the automtic mapping of privileged OS users to the RDB$ADMIN role (Firebird 2.5 and later).
+
+33. TIBBackupService: New Option - NoDBTriggers equivalent to -nodbtriggers switch introduced
+    in the gbak utility at V.2.1 to prevent database-level and transaction-level triggers from
+    firing during backup and restore. TIBRestoreService has equivalent option NoDBTriggersOnRestore.
+
+34. Both TIBBackupService and TIBRestoreService now support backup/restore statistics options
+    for verbose output using the new property "StatisticsRequested".
+    see https://firebirdsql.org/file/documentation/release_notes/html/en/2_5/rnfb25-util-gbak.html#rnfb25-util-gbakstats
+
+35. TIBRestoreService: now supports new options RestoreMetaDataOnly and
+    NoDBTriggersOnRestore (Firebird 2.5 and later).
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

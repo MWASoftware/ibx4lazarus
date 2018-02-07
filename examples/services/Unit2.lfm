@@ -152,10 +152,11 @@ object Form2: TForm2
     )
     TraceFlags = []
     Verbose = True
+    StatisticsRequested = [bsTotalTime]
     BackupFileLocation = flClientSide
     BlockingFactor = 0
     DatabaseName = 'employee'
-    Options = []
+    Options = [NoDBTriggers]
     left = 312
     top = 24
   end

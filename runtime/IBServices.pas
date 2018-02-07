@@ -290,6 +290,8 @@ type
 
   TShutdownMode = (Forced, DenyTransaction, DenyAttachment);
 
+  { TIBConfigService }
+
   TIBConfigService = class(TIBControlService)
   private
     FDatabaseName: string;
@@ -307,6 +309,7 @@ type
     procedure SetReserveSpace (Value: Boolean);
     procedure SetAsyncMode (Value: Boolean);
     procedure SetReadOnly (Value: Boolean);
+    procedure SetAutoAdmin(Value: Boolean);
   published
     property DatabaseName: string read FDatabaseName write SetDatabaseName;
   end;
@@ -337,24 +340,29 @@ type
   end;
 
   TBackupLocation = (flServerSide,flClientSide);
+  TBackupStatsOption = (bsTotalTime,bsTimeDelta,bsPageReads,bsPageWrites);
+  TBackupStatsOptions = set of TBackupStatsOption;
 
   { TIBBackupRestoreService }
 
   TIBBackupRestoreService = class(TIBControlAndQueryService)
   private
     FBackupFileLocation: TBackupLocation;
+    FStatisticsRequested: TBackupStatsOptions;
     FVerbose: Boolean;
   protected
+    procedure SetServiceStartOptions; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
     property Verbose : Boolean read FVerbose write FVerbose default False;
+    property StatisticsRequested: TBackupStatsOptions read FStatisticsRequested write FStatisticsRequested;
     property BackupFileLocation: TBackupLocation read FBackupFileLocation
                                                       write FBackupFileLocation default flServerSide;
   end;
 
   TBackupOption = (IgnoreChecksums, IgnoreLimbo, MetadataOnly, NoGarbageCollection,
-    OldMetadataDesc, NonTransportable, ConvertExtTables);
+    OldMetadataDesc, NonTransportable, ConvertExtTables, NoDBTriggers);
   TBackupOptions = set of TBackupOption;
 
   TIBBackupService = class (TIBBackupRestoreService)
@@ -379,7 +387,7 @@ type
   end;
 
   TRestoreOption = (DeactivateIndexes, NoShadow, NoValidityCheck, OneRelationAtATime,
-    Replace, CreateNewDB, UseAllSpace);
+    Replace, CreateNewDB, UseAllSpace, RestoreMetaDataOnly, NoDBTriggersOnRestore);
 
   TRestoreOptions = set of TRestoreOption;
 
@@ -541,6 +549,28 @@ uses
   IBSQLMonitor, FBMessages, RegExpr;
 
 { TIBBackupRestoreService }
+
+procedure TIBBackupRestoreService.SetServiceStartOptions;
+var options: string;
+begin
+  {Firebird 2.5 and later}
+  if (ServerVersionNo[1] < 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] < 5)) then Exit;
+
+  if StatisticsRequested <> [] then
+  begin
+    options := '';
+    if bsTotalTime in StatisticsRequested then
+      options += 'T';
+    if bsTimeDelta in StatisticsRequested then
+      options += 'D';
+    if bsPageReads in StatisticsRequested then
+      options += 'R';
+    if bsPageWrites in StatisticsRequested then
+      options += 'W';
+    SRB.Add(isc_spb_bkp_stat).AsString := options;
+  end;
+end;
 
 constructor TIBBackupRestoreService.Create(AOwner: TComponent);
 begin
@@ -1325,6 +1355,18 @@ begin
   InternalServiceStart;
 end;
 
+procedure TIBConfigService.SetAutoAdmin(Value: Boolean);
+begin
+  {only available for Firebird 2.5 and later}
+  if (ServerVersionNo[1] < 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] < 5)) then Exit;
+  if Value then
+    SRB.Add(isc_action_svc_set_mapping)
+  else
+    SRB.Add(isc_action_svc_drop_mapping);
+  InternalServiceStart;
+end;
+
 procedure TIBConfigService.SetReserveSpace(Value: Boolean);
 begin
   SRB.Add(isc_action_svc_properties);
@@ -1421,12 +1463,22 @@ begin
     param := param or isc_spb_bkp_non_transportable;
   if (ConvertExtTables in Options) then
     param := param or isc_spb_bkp_convert;
+  {Firebird 2.5 and later}
+  if (ServerVersionNo[1] > 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5)) then
+  begin
+    if (NoDBTriggers in Options) then
+      param := param or isc_spb_bkp_no_triggers;
+  end;
   Action := isc_action_svc_backup;
   SRB.Add(isc_action_svc_backup);
   SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
   SRB.Add(isc_spb_options).AsInteger := param;
   if Verbose  and (BackupFileLocation = flServerSide) then
+  begin
     SRB.Add(isc_spb_verbose);
+    inherited SetServiceStartOptions;
+  end;
   if FBlockingFactor > 0 then
     SRB.Add(isc_spb_bkp_factor).AsInteger := FBlockingFactor;
   if BackupFileLocation = flServerSide then
@@ -1486,11 +1538,23 @@ begin
     param := param or isc_spb_res_create;
   if (UseAllSpace in Options) then
     param := param or isc_spb_res_use_all_space;
+  if (RestoreMetaDataOnly in Options) then
+    param := param or isc_spb_res_metadata_only;
+  {Firebird 2.5 and later}
+  if (ServerVersionNo[1] > 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5)) then
+  begin
+    if (NoDBTriggersOnRestore in Options) then
+      param := param or isc_spb_bkp_no_triggers;
+  end;
   Action := isc_action_svc_restore;
   SRB.Add(isc_action_svc_restore);
   SRB.Add(isc_spb_options).AsInteger := param;
   if Verbose then
+  begin
     SRB.Add(isc_spb_verbose);
+    inherited SetServiceStartOptions;
+  end;
   if FPageSize > 0 then
     SRB.Add(isc_spb_res_page_size).AsInteger := FPageSize;
   if FPageBuffers > 0 then
