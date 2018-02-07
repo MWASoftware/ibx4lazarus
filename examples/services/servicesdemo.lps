@@ -115,7 +115,7 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="107"/>
-        <CursorPos X="70" Y="134"/>
+        <CursorPos X="5" Y="134"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
@@ -475,7 +475,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="50"/>
         <CursorPos X="17" Y="82"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="21"/>
       </Unit59>
       <Unit60>
         <Filename Value="../FB3UserManager/MainForm.pas"/>
