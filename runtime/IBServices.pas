@@ -96,7 +96,7 @@ type
 
   TIBCustomService = class;
 
-  TLoginEvent = procedure(Database: TIBCustomService;
+  TLoginEvent = procedure(Service: TIBCustomService;
     LoginParams: TStrings) of object;
 
   { TIBCustomService }
@@ -116,11 +116,13 @@ type
     FOnAttach: TNotifyEvent;
     FProtocol: TProtocol;
     FParams: TStrings;
+    FServerVersionNo: array [1..4] of integer;
     FServiceQueryResults: IServiceQueryResults;
     function GetActive: Boolean;
     function GetServiceParamBySPB(const Idx: Integer): String;
     function GetSQPB: ISQPB;
     function GetSRB: ISRB;
+    function GetServerVersionNo(index: integer): integer;
     procedure SetActive(const Value: Boolean);
     procedure SetParams(const Value: TStrings);
     procedure SetServerName(const Value: string);
@@ -160,6 +162,7 @@ type
     property ServiceIntf: IServiceManager read FService write SetService;
     property ServiceParamBySPB[const Idx: Integer]: String read GetServiceParamBySPB
                                                       write SetServiceParamBySPB;
+    property ServerVersionNo[index: integer]: integer read GetServerVersionNo;
   published
     property Active: Boolean read GetActive write SetActive default False;
     property ServerName: string read FServerName write SetServerName;
@@ -287,6 +290,8 @@ type
 
   TShutdownMode = (Forced, DenyTransaction, DenyAttachment);
 
+  { TIBConfigService }
+
   TIBConfigService = class(TIBControlService)
   private
     FDatabaseName: string;
@@ -304,6 +309,7 @@ type
     procedure SetReserveSpace (Value: Boolean);
     procedure SetAsyncMode (Value: Boolean);
     procedure SetReadOnly (Value: Boolean);
+    procedure SetAutoAdmin(Value: Boolean);
   published
     property DatabaseName: string read FDatabaseName write SetDatabaseName;
   end;
@@ -334,24 +340,29 @@ type
   end;
 
   TBackupLocation = (flServerSide,flClientSide);
+  TBackupStatsOption = (bsTotalTime,bsTimeDelta,bsPageReads,bsPageWrites);
+  TBackupStatsOptions = set of TBackupStatsOption;
 
   { TIBBackupRestoreService }
 
   TIBBackupRestoreService = class(TIBControlAndQueryService)
   private
     FBackupFileLocation: TBackupLocation;
+    FStatisticsRequested: TBackupStatsOptions;
     FVerbose: Boolean;
   protected
+    procedure SetServiceStartOptions; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
     property Verbose : Boolean read FVerbose write FVerbose default False;
+    property StatisticsRequested: TBackupStatsOptions read FStatisticsRequested write FStatisticsRequested;
     property BackupFileLocation: TBackupLocation read FBackupFileLocation
                                                       write FBackupFileLocation default flServerSide;
   end;
 
   TBackupOption = (IgnoreChecksums, IgnoreLimbo, MetadataOnly, NoGarbageCollection,
-    OldMetadataDesc, NonTransportable, ConvertExtTables);
+    OldMetadataDesc, NonTransportable, ConvertExtTables, NoDBTriggers);
   TBackupOptions = set of TBackupOption;
 
   TIBBackupService = class (TIBBackupRestoreService)
@@ -376,7 +387,7 @@ type
   end;
 
   TRestoreOption = (DeactivateIndexes, NoShadow, NoValidityCheck, OneRelationAtATime,
-    Replace, CreateNewDB, UseAllSpace);
+    Replace, CreateNewDB, UseAllSpace, RestoreMetaDataOnly, NoDBTriggersOnRestore);
 
   TRestoreOptions = set of TRestoreOption;
 
@@ -456,6 +467,31 @@ type
                                          write FGlobalAction;
   end;
 
+  { TIBOnlineValidationService }
+
+  TIBOnlineValidationService = class(TIBControlAndQueryService)
+  private
+    FDatabaseName: string;
+    FExcludeIndexes: string;
+    FExcludeTables: string;
+    FIncludeIndexes: string;
+    FIncludeTables: string;
+    FLockTimeout: integer;
+    procedure SetDatabaseName(AValue: string);
+  protected
+    procedure SetServiceStartOptions; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure ServiceStart; override;
+  published
+    property IncludeTables: string read FIncludeTables write FIncludeTables;
+    property ExcludeTables: string read FExcludeTables write FExcludeTables;
+    property IncludeIndexes: string read FIncludeIndexes write FIncludeIndexes;
+    property ExcludeIndexes: string read FExcludeIndexes write FExcludeIndexes;
+    property LockTimeout: integer read FLockTimeout write FLockTimeout default 10;
+    property DatabaseName: string read FDatabaseName write SetDatabaseName;
+  end;
+
   TUserInfo = class
   public
     UserName: string;
@@ -464,15 +500,19 @@ type
     LastName: string;
     GroupID: Integer;
     UserID: Integer;
+    AdminRole: boolean;
   end;
 
   TSecurityAction = (ActionAddUser, ActionDeleteUser, ActionModifyUser, ActionDisplayUser);
   TSecurityModifyParam = (ModifyFirstName, ModifyMiddleName, ModifyLastName, ModifyUserId,
-                         ModifyGroupId, ModifyPassword);
+                         ModifyGroupId, ModifyPassword, ModifyAdminRole);
   TSecurityModifyParams = set of TSecurityModifyParam;
+
+  { TIBSecurityService }
 
   TIBSecurityService = class(TIBControlAndQueryService)
   private
+    FAdminRole: boolean;
     FUserID: Integer;
     FGroupID: Integer;
     FFirstName: string;
@@ -485,6 +525,7 @@ type
     FSecurityAction: TSecurityAction;
     FModifyParams: TSecurityModifyParams;
     procedure ClearParams;
+    procedure SetAdminRole(AValue: boolean);
     procedure SetSecurityAction (Value: TSecurityAction);
     procedure SetFirstName (Value: String);
     procedure SetMiddleName (Value: String);
@@ -508,6 +549,7 @@ type
     procedure AddUser;
     procedure DeleteUser;
     procedure ModifyUser;
+    function HasAdminRole: boolean;
     property  UserInfo[Index: Integer]: TUserInfo read GetUserInfo;
     property  UserInfoCount: Integer read GetUserInfoCount;
 
@@ -522,15 +564,81 @@ type
     property UserID : Integer read FUserID write SetUserID;
     property GroupID : Integer read FGroupID write SetGroupID;
     property Password : string read FPassword write setPassword;
+    property AdminRole: boolean read FAdminRole write SetAdminRole;
   end;
 
 
 implementation
 
 uses
-  IBSQLMonitor, FBMessages;
+  IBSQLMonitor, FBMessages, RegExpr;
+
+{ TIBOnlineValidationService }
+
+procedure TIBOnlineValidationService.SetDatabaseName(AValue: string);
+begin
+  if FDatabaseName = AValue then Exit;
+  FDatabaseName := AValue;
+end;
+
+procedure TIBOnlineValidationService.SetServiceStartOptions;
+begin
+  inherited SetServiceStartOptions;
+  Action := isc_action_svc_validate;
+  if FDatabaseName = '' then
+    IBError(ibxeStartParamsError, [nil]);
+  SRB.Add(isc_action_svc_validate);
+  SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
+  if IncludeTables <> '' then
+    SRB.Add(isc_spb_val_tab_incl).AsString := IncludeTables;
+  if ExcludeTables <> '' then
+    SRB.Add(isc_spb_val_tab_excl).AsString := ExcludeTables;
+  if IncludeIndexes <> '' then
+    SRB.Add(isc_spb_val_idx_incl).AsString := IncludeIndexes;
+  if ExcludeIndexes <> '' then
+    SRB.Add(isc_spb_val_idx_excl).AsString := ExcludeIndexes;
+  if LockTimeout <> 0 then
+    SRB.Add(isc_spb_val_lock_timeout).AsInteger := LockTimeout;
+end;
+
+constructor TIBOnlineValidationService.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FLockTimeout := 10;
+end;
+
+procedure TIBOnlineValidationService.ServiceStart;
+begin
+  {Firebird 2.5 and later}
+  if (ServerVersionNo[1] < 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] < 5)) then
+    IBError(ibxeServiceUnavailable,[]);
+  inherited ServiceStart;
+end;
 
 { TIBBackupRestoreService }
+
+procedure TIBBackupRestoreService.SetServiceStartOptions;
+var options: string;
+begin
+  {Firebird 2.5 and later}
+  if (ServerVersionNo[1] < 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] < 5)) then Exit;
+
+  if StatisticsRequested <> [] then
+  begin
+    options := '';
+    if bsTotalTime in StatisticsRequested then
+      options += 'T';
+    if bsTimeDelta in StatisticsRequested then
+      options += 'D';
+    if bsPageReads in StatisticsRequested then
+      options += 'R';
+    if bsPageWrites in StatisticsRequested then
+      options += 'W';
+    SRB.Add(isc_spb_bkp_stat).AsString := options;
+  end;
+end;
 
 constructor TIBBackupRestoreService.Create(AOwner: TComponent);
 begin
@@ -541,6 +649,35 @@ end;
 { TIBCustomService }
 
 procedure TIBCustomService.Attach;
+
+  procedure GetServerVersionNo;
+  var Req: ISRB;
+      Results: IServiceQueryResults;
+      RegexObj: TRegExpr;
+      s: string;
+  begin
+    Req := FService.AllocateSRB;
+    Req.Add(isc_info_svc_server_version);
+    Results := FService.Query(nil,Req);
+    if (Results.Count = 1) and (Results[0].getItemType = isc_info_svc_server_version) then
+    RegexObj := TRegExpr.Create;
+    try
+      {extact database file spec}
+      RegexObj.ModifierG := false; {turn off greedy matches}
+      RegexObj.Expression := '[A-Z][A-Z]-V([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+) .*';
+      s := Results[0].AsString;
+      if RegexObj.Exec(s) then
+      begin
+        FServerVersionNo[1] := StrToInt(system.copy(s,RegexObj.MatchPos[1],RegexObj.MatchLen[1]));
+        FServerVersionNo[2] := StrToInt(system.copy(s,RegexObj.MatchPos[2],RegexObj.MatchLen[2]));
+        FServerVersionNo[3] := StrToInt(system.copy(s,RegexObj.MatchPos[3],RegexObj.MatchLen[3]));
+        FServerVersionNo[4] := StrToInt(system.copy(s,RegexObj.MatchPos[4],RegexObj.MatchLen[4]));
+      end;
+    finally
+      RegexObj.Free;
+    end;
+  end;
+
 var aServerName: string;
 begin
   CheckInactive;
@@ -559,6 +696,7 @@ begin
   end;
 
   FService := FirebirdAPI.GetServiceManager(aServerName,FProtocol,FSPB);
+  GetServerVersionNo;
 
   if Assigned(FOnAttach) then
     FOnAttach(Self);
@@ -764,6 +902,15 @@ begin
   if FSRB = nil then
     FSRB := FService.AllocateSRB;
   Result := FSRB;
+end;
+
+function TIBCustomService.GetServerVersionNo(index: integer): integer;
+begin
+  CheckActive;
+  if (index >= Low(FServerVersionNo)) and (index <= High(FServerVersionNo)) then
+    Result := FServerVersionNo[index]
+  else
+    IBError(ibxeInfoBufferIndexError,[index]);
 end;
 
 procedure TIBCustomService.InternalServiceQuery;
@@ -1276,6 +1423,18 @@ begin
   InternalServiceStart;
 end;
 
+procedure TIBConfigService.SetAutoAdmin(Value: Boolean);
+begin
+  {only available for Firebird 2.5 and later}
+  if (ServerVersionNo[1] < 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] < 5)) then Exit;
+  if Value then
+    SRB.Add(isc_action_svc_set_mapping)
+  else
+    SRB.Add(isc_action_svc_drop_mapping);
+  InternalServiceStart;
+end;
+
 procedure TIBConfigService.SetReserveSpace(Value: Boolean);
 begin
   SRB.Add(isc_action_svc_properties);
@@ -1372,12 +1531,22 @@ begin
     param := param or isc_spb_bkp_non_transportable;
   if (ConvertExtTables in Options) then
     param := param or isc_spb_bkp_convert;
+  {Firebird 2.5 and later}
+  if (ServerVersionNo[1] > 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5)) then
+  begin
+    if (NoDBTriggers in Options) then
+      param := param or isc_spb_bkp_no_triggers;
+  end;
   Action := isc_action_svc_backup;
   SRB.Add(isc_action_svc_backup);
   SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
   SRB.Add(isc_spb_options).AsInteger := param;
   if Verbose  and (BackupFileLocation = flServerSide) then
+  begin
     SRB.Add(isc_spb_verbose);
+    inherited SetServiceStartOptions;
+  end;
   if FBlockingFactor > 0 then
     SRB.Add(isc_spb_bkp_factor).AsInteger := FBlockingFactor;
   if BackupFileLocation = flServerSide then
@@ -1437,11 +1606,23 @@ begin
     param := param or isc_spb_res_create;
   if (UseAllSpace in Options) then
     param := param or isc_spb_res_use_all_space;
+  if (RestoreMetaDataOnly in Options) then
+    param := param or isc_spb_res_metadata_only;
+  {Firebird 2.5 and later}
+  if (ServerVersionNo[1] > 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5)) then
+  begin
+    if (NoDBTriggersOnRestore in Options) then
+      param := param or isc_spb_bkp_no_triggers;
+  end;
   Action := isc_action_svc_restore;
   SRB.Add(isc_action_svc_restore);
   SRB.Add(isc_spb_options).AsInteger := param;
   if Verbose then
+  begin
     SRB.Add(isc_spb_verbose);
+    inherited SetServiceStartOptions;
+  end;
   if FPageSize > 0 then
     SRB.Add(isc_spb_res_page_size).AsInteger := FPageSize;
   if FPageBuffers > 0 then
@@ -1831,6 +2012,9 @@ begin
           isc_spb_sec_groupid:
             FUserInfo[k].GroupID := AsInteger;
 
+          isc_spb_sec_admin:
+            FUserInfo[k].AdminRole := AsInteger <> 0;
+
           else
             IBError(ibxeOutputParsingError, [getItemType]);
           end;
@@ -1870,15 +2054,21 @@ end;
 procedure TIBSecurityService.DisplayUsers;
 begin
   SecurityAction := ActionDisplayUser;
-  SRB.Add(isc_action_svc_display_user);
+  if HasAdminRole then
+    SRB.Add(isc_action_svc_display_user_adm) {Firebird 2.5 and later only}
+  else
+    SRB.Add(isc_action_svc_display_user);
   InternalServiceStart;
   FetchUserInfo;
 end;
 
-procedure TIBSecurityService.DisplayUser(UserName: String);
+procedure TIBSecurityService.DisplayUser(UserName: string);
 begin
   SecurityAction := ActionDisplayUser;
-  SRB.Add(isc_action_svc_display_user);
+  if HasAdminRole then
+     SRB.Add(isc_action_svc_display_user_adm) {Firebird 2.5 and later only}
+  else
+    SRB.Add(isc_action_svc_display_user);
   SRB.Add(isc_spb_sec_username).AsString := UserName;
   InternalServiceStart;
   FetchUserInfo;
@@ -1888,6 +2078,12 @@ procedure TIBSecurityService.ModifyUser;
 begin
   SecurityAction := ActionModifyUser;
   ServiceStart;
+end;
+
+function TIBSecurityService.HasAdminRole: boolean;
+begin
+  Result :=  (ServerVersionNo[1] > 2) or
+             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5));
 end;
 
 procedure TIBSecurityService.SetSecurityAction (Value: TSecurityAction);
@@ -1906,6 +2102,13 @@ begin
   FGroupID := 0;
   FUserID := 0;
   FPassword := '';
+end;
+
+procedure TIBSecurityService.SetAdminRole(AValue: boolean);
+begin
+  if not HasAdminRole then Exit;
+  FAdminRole := AValue;
+  Include (FModifyParams, ModifyAdminRole);
 end;
 
 procedure TIBSecurityService.SetFirstName (Value: String);
@@ -1973,6 +2176,7 @@ begin
       SRB.Add(isc_spb_sec_firstname).AsString := FFirstName;
       SRB.Add(isc_spb_sec_middlename).AsString := FMiddleName;
       SRB.Add(isc_spb_sec_lastname).AsString := FLastName;
+      SRB.Add(isc_spb_sec_admin).AsInteger := ord(FAdminRole);
     end;
     ActionDeleteUser:
     begin
@@ -2005,6 +2209,13 @@ begin
         SRB.Add(isc_spb_sec_middlename).AsString := FMiddleName;
       if (ModifyLastName in FModifyParams) then
         SRB.Add(isc_spb_sec_lastname).AsString := FLastName;
+      if (ModifyAdminRole in FModifyParams) then
+      begin
+        if FAdminRole then
+          SRB.Add(isc_spb_sec_admin).AsInteger := 1
+        else
+          SRB.Add(isc_spb_sec_admin).AsInteger := 0;
+      end;
     end;
   end;
   ClearParams;

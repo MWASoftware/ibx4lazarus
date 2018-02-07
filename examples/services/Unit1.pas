@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  IBServices, IB, Unit2, Unit3,  ListUsersUnit, LimboTransactionsUnit;
+  IBServices, IB;
 
 type
 
@@ -22,6 +22,7 @@ type
     Button7: TButton;
     Button8: TButton;
     IBLogService1: TIBLogService;
+    IBOnlineValidationService1: TIBOnlineValidationService;
     IBServerProperties1: TIBServerProperties;
     IBStatisticalService1: TIBStatisticalService;
     IBValidationService1: TIBValidationService;
@@ -35,15 +36,18 @@ type
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure IBServerProperties1Login(Service: TIBCustomService;
+      LoginParams: TStrings);
   private
     { private declarations }
+    FUseOnlineValidation: boolean;
     procedure DoBackup(secDB: PtrInt);
     procedure DoRestore(secDB: PtrInt);
     procedure DoShowStatistics(secDB: PtrInt);
     procedure DoValidation(secDB: PtrInt);
     procedure DoLimboTransactions(secDB: PtrInt);
     procedure DoListUsers(secDB: PtrInt);
-    procedure AttachService(aService: TIBCustomService); overload;
+    procedure AttachService(aService: TIBCustomService; Initialise:boolean = false); overload;
     procedure AttachService(aService: TIBCustomService; secDB: integer;
       aDatabaseName: string); overload;
   public
@@ -57,7 +61,8 @@ implementation
 
 {$R *.lfm}
 
-uses IBErrorCodes, FBMessages;
+uses IBErrorCodes, FBMessages, ServicesLoginDlgUnit, SelectValidationDlgUnit,
+  BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit;
 
 const
   use_global_login     = 0; {Login to backup/restore with global sec db}
@@ -75,8 +80,8 @@ var i: integer;
 begin
   {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
   FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
-  Form3.IBRestoreService1.DatabaseName.Clear;
-  Form3.IBRestoreService1.DatabaseName.Add(GetTempDir + 'mytest.fdb');
+  RestoreDlg.IBRestoreService1.DatabaseName.Clear;
+  RestoreDlg.IBRestoreService1.DatabaseName.Add(GetTempDir + 'mytest.fdb');
   AttachService(IBServerProperties1);
   with IBServerProperties1 do
   begin
@@ -84,6 +89,10 @@ begin
     Memo1.Lines.Add('Server Version = ' + VersionInfo.ServerVersion);
     Memo1.Lines.Add('Server Implementation = ' + VersionInfo.ServerImplementation);
     Memo1.Lines.Add('Service Version = ' + IntToStr(VersionInfo.ServiceVersion));
+    Memo1.Lines.Add(Format('Firebird Release = %d.%d.%d (Build no. %d)',[ServerVersionNo[1],
+                                                             ServerVersionNo[2],
+                                                             ServerVersionNo[3],
+                                                             ServerVersionNo[4]]));
     FetchDatabaseInfo;
     Memo1.Lines.Add('No. of attachments = ' + IntToStr(DatabaseInfo.NoOfAttachments));
     Memo1.Lines.Add('No. of databases = ' + IntToStr(DatabaseInfo.NoOfDatabases));
@@ -97,13 +106,32 @@ begin
   end;
 end;
 
+procedure TForm1.IBServerProperties1Login(Service: TIBCustomService;
+  LoginParams: TStrings);
+var aServiceName: string;
+    aUserName: string;
+    aPassword: string;
+begin
+  aServiceName := Service.ServerName;
+  aUserName := LoginParams.Values['user_name'];
+  aPassword := '';
+  if SvcLoginDlg.ShowModal(aServiceName, aUserName, aPassword) = mrOK then
+  begin
+    Service.ServerName := aServiceName;
+    LoginParams.Values['user_name'] := aUserName;
+    LoginParams.Values['password'] := aPassword;
+  end
+  else
+    IBError(ibxeOperationCancelled, [nil]);
+end;
+
 procedure TForm1.DoBackup(secDB: PtrInt);
 var bakfile: TFileStream;
     NeedsExpectedDB: boolean;
     BackupCount: integer;
 begin
   bakfile := nil;
-  with Form2 do
+  with BackupDlg do
   try
     AttachService(IBBackupService1,secDB,IBBackupService1.DatabaseName);
 
@@ -124,13 +152,24 @@ begin
           end;
           Application.ProcessMessages;
         end;
-        BackupCount := bakfile.Size;
+        if bakfile <> nil then
+          BackupCount := bakfile.Size;
       finally
         if bakfile <> nil then
           bakfile.Free;
       end;
-      Memo1.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
-      MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
+      case IBBackupService1.BackupFileLocation of
+      flServerSide:
+        begin
+          Memo1.Lines.Add('Backup Completed');
+          MessageDlg('Backup Completed',mtInformation,[mbOK],0);
+        end;
+      flClientSide:
+        begin
+          Memo1.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
+          MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
+        end;
+      end;
     except
      on E: EIBInterBaseError do
        if (E.IBErrorCode = isc_sec_context) and (secDB = use_global_login) then {Need expected_db}
@@ -154,7 +193,7 @@ var bakfile: TFileStream;
     NeedsExpectedDB: boolean;
 begin
   bakfile := nil;
-  with Form3 do
+  with RestoreDlg do
   try
     AttachService(IBRestoreService1,secDB,IBRestoreService1.DatabaseName[0]);
 
@@ -238,11 +277,23 @@ end;
 
 procedure TForm1.DoValidation(secDB: PtrInt);
 var NeedsExpectedDB: boolean;
+    aValidationService: TIBControlAndQueryService;
+    DBName: string;
 begin
+  if FUseOnlineValidation then
+  begin
+    aValidationService := IBOnlineValidationService1;
+    DBName := IBOnlineValidationService1.DatabaseName;
+  end
+  else
+  begin
+    aValidationService := IBValidationService1;
+    DBName := IBValidationService1.DatabaseName;
+  end;
   NeedsExpectedDB := false;
-  AttachService(IBValidationService1,secDB,IBValidationService1.DatabaseName);
+  AttachService(aValidationService,secDB,DBName);
   Application.ProcessMessages;
-  with IBValidationService1 do
+  with aValidationService do
   try
     Active := true;
     try
@@ -313,10 +364,16 @@ begin
   end;
 end;
 
-procedure TForm1.AttachService(aService: TIBCustomService);
+procedure TForm1.AttachService(aService: TIBCustomService; Initialise: boolean);
 begin
   with aService do
   repeat
+    if Initialise then
+    begin
+      ServerName := IBServerProperties1.ServerName;
+      Params.Assign(IBServerProperties1.Params);
+      LoginPrompt := Params.IndexOfName('password') = -1;
+    end;
     try
       Active := true;
     except
@@ -359,25 +416,24 @@ end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
-  Form2.IBBackupService1.ServerName := IBServerProperties1.ServerName;
-  if Form2.ShowModal = mrOK then
+  BackupDlg.IBBackupService1.ServerName := IBServerProperties1.ServerName;
+  if BackupDlg.ShowModal = mrOK then
     Application.QueueAsyncCall(@DoBackup,use_global_login);
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 begin
-  Form3.IBRestoreService1.ServerName := IBServerProperties1.ServerName;
-  if Form3.ShowModal = mrOK then
+  RestoreDlg.IBRestoreService1.ServerName := IBServerProperties1.ServerName;
+  if RestoreDlg.ShowModal = mrOK then
     Application.QueueAsyncCall(@DoRestore,use_global_login);
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
 begin
   Memo1.Lines.Add('Server Log');
-  IBLogService1.ServiceIntf := IBServerProperties1.ServiceIntf;
+  AttachService(IBLogService1,true);
   with IBLogService1 do
   begin
-    Active := true;
     ServiceStart;
     while not Eof do
     begin
@@ -408,8 +464,7 @@ procedure TForm1.Button7Click(Sender: TObject);
 var DBName: string;
 begin
   DBName := IBValidationService1.DatabaseName;
-  if InputQuery('Select Database','Enter Database Name on ' + IBServerProperties1.ServerName,
-         DBName) then
+  if SelectValidationDlg.ShowModal(IBServerProperties1.ServerName,DBName,FUseOnlineValidation) = mrOK then
   begin
     IBValidationService1.DatabaseName := DBName;
     Memo1.Lines.Add('Database Validation for ' + IBValidationService1.DatabaseName);

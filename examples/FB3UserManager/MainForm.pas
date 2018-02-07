@@ -134,6 +134,7 @@ type
     procedure UserListAfterInsert(DataSet: TDataSet);
     procedure UserListAfterOpen(DataSet: TDataSet);
     procedure UserListAfterPost(DataSet: TDataSet);
+    procedure UserListAfterScroll(DataSet: TDataSet);
     procedure UserListBeforeClose(DataSet: TDataSet);
     procedure UserTagsAfterInsert(DataSet: TDataSet);
   private
@@ -191,6 +192,9 @@ procedure TForm1.UpdateUsersApplyUpdates(Sender: TObject;
       else
         Result += ' INACTIVE';
     end;
+    Param := Params.ByName('SEC$PLUGIN');
+    if Param <> nil then
+      Result += ' USING PLUGIN ' + QuoteIdentifierIfNeeded((Sender as TIBUpdate).DataSet.Database.SQLDialect,Param.AsString);
   end;
 
 begin
@@ -240,6 +244,7 @@ begin
   UserList.FieldByName('SEC$ADMIN').AsBoolean := false;
   UserList.FieldByName('SEC$ACTIVE').AsBoolean := false;
   UserList.FieldByName('DBCreator').AsBoolean := false;
+  UserList.FieldByName('SEC$PLUGIN').AsString := 'Srp';
 end;
 
 procedure TForm1.UserListAfterOpen(DataSet: TDataSet);
@@ -252,6 +257,11 @@ end;
 procedure TForm1.UserListAfterPost(DataSet: TDataSet);
 begin
   IBTransaction1.Commit;
+end;
+
+procedure TForm1.UserListAfterScroll(DataSet: TDataSet);
+begin
+  UserList.FieldByName('SEC$PLUGIN').ReadOnly := UserList.State <> dsInsert;
 end;
 
 procedure TForm1.UserListBeforeClose(DataSet: TDataSet);

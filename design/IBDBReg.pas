@@ -447,7 +447,7 @@ begin
        TIBBlockFormatOut,TIBCSVDataOut,TIBInsertStmtsOut]);
   if FirebirdAPI.HasServiceAPI  then
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
-      TIBRestoreService, TIBValidationService, TIBStatisticalService,
+      TIBRestoreService, TIBValidationService, TIBOnlineValidationService, TIBStatisticalService,
       TIBLogService, TIBSecurityService, TIBServerProperties]);
 
 

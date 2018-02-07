@@ -1,4 +1,4 @@
-unit Unit3;
+unit RestoreDlgUnit;
 
 {$mode objfpc}{$H+}
 
@@ -10,9 +10,9 @@ uses
 
 type
 
-  { TForm3 }
+  { TRestoreDlg }
 
-  TForm3 = class(TForm)
+  TRestoreDlg = class(TForm)
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
@@ -38,21 +38,21 @@ type
   end;
 
 var
-  Form3: TForm3;
+  RestoreDlg: TRestoreDlg;
 
 implementation
 
 {$R *.lfm}
 
-{ TForm3 }
+{ TRestoreDlg }
 
-procedure TForm3.SpeedButton1Click(Sender: TObject);
+procedure TRestoreDlg.SpeedButton1Click(Sender: TObject);
 begin
   if OpenDialog1.Execute then
     Edit3.Text := OpenDialog1.Filename;
 end;
 
-procedure TForm3.FormShow(Sender: TObject);
+procedure TRestoreDlg.FormShow(Sender: TObject);
 begin
   Edit1.Text := IBRestoreService1.ServerName;
   if IBRestoreService1.BackupFileLocation = flServerSide then
@@ -63,7 +63,7 @@ begin
   IBRestoreService1.BackupFile.Clear;
 end;
 
-procedure TForm3.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+procedure TRestoreDlg.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   if ModalResult <> mrOK then Exit;
   if Edit2.Text = '' then

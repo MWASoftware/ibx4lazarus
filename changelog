@@ -1,4 +1,4 @@
-IBX Change Log  version                                                 (2.2-0) Fri, 02 Feb 2018 13:27:33 +0000
+IBX Change Log  version                                                  (2.2-0) Wed, 07 Feb 2018 13:34:41 +0000
 
 1. IBExtract: Identity columns - add additional check for null column for generator name.
 
@@ -128,6 +128,31 @@ IBX Change Log  version                                                 (2.2-0) 
      * DateDBCreated (returns date/time database created)
      * TransactionCount (returns no. of active transactions)
      * GetDatabasePage(PageNo: integer) (returns contents of specified database page - SYSDBA only).
+
+30. IBServices classes now provided the decoded release number in the (array) property ServerVersionNo.
+
+31. TIBSecurityService now supports display/modification of the User Admin Role (Firebird 2.5 and later).
+
+32. TIBConfigService now has a procedure SetAutoAdmin(Value: boolean) to enable/disable
+    the automtic mapping of privileged OS users to the RDB$ADMIN role (Firebird 2.5 and later).
+
+33. TIBBackupService: New Option - NoDBTriggers equivalent to -nodbtriggers switch introduced
+    in the gbak utility at V.2.1 to prevent database-level and transaction-level triggers from
+    firing during backup and restore. TIBRestoreService has equivalent option NoDBTriggersOnRestore.
+
+34. Both TIBBackupService and TIBRestoreService now support backup/restore statistics options
+    for verbose output using the new property "StatisticsRequested".
+    see https://firebirdsql.org/file/documentation/release_notes/html/en/2_5/rnfb25-util-gbak.html#rnfb25-util-gbakstats
+
+35. TIBRestoreService: now supports new options RestoreMetaDataOnly and
+    NoDBTriggersOnRestore (Firebird 2.5 and later).
+
+36. TIBOnlineValidationService component added to the IBServices and the "Firebird Admin"
+    palette. This uses the online validation feature added in Firebird 2.5. The
+    services's properties enable inclusion/exclusion of tables and indexes using
+    regular expressions. See.
+    https://firebirdsql.org/file/documentation/release_notes/html/en/2_5/rnfb25-apiods-api.html#rnfb25-apiods-api-onlinevalidation
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

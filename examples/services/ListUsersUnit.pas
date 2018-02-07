@@ -87,6 +87,8 @@ procedure TListUsersForm.UserListAfterInsert(DataSet: TDataSet);
 begin
   DataSet.FieldByName('UserID').AsInteger := 0;
   DataSet.FieldByName('GroupID').AsInteger := 0;
+  DataSet.FieldByName('Admin').AsBoolean := false;
+  DataSet.FieldByName('Password').Clear;
 end;
 
 procedure TListUsersForm.AddUserExecute(Sender: TObject);
@@ -139,6 +141,7 @@ begin
   with IBSecurityService1 do
   begin
     IBSecurityService1.Active := true;
+    IBDynamicGrid1.Columns[6].ReadOnly := not HasAdminRole;
     DisplayUsers;
     FLoading := true;
     try
@@ -152,7 +155,8 @@ begin
         FieldByName('FirstName').AsString := FirstName;
         FieldByName('MiddleName').AsString := MiddleName;
         FieldByName('LastName').AsString := LastName;
-        FieldByName('Password').AsString := Password;
+        FieldByName('Password').Clear;
+        FieldByName('Admin').AsBoolean := AdminRole;
         Post;
       end;
     finally
@@ -202,7 +206,9 @@ procedure TListUsersForm.UserListBeforePost(DataSet: TDataSet);
       FirstName := FieldByName('FirstName').AsString;
       MiddleName := FieldByName('MiddleName').AsString;
       LastName := FieldByName('LastName').AsString;
-      Password := FieldByName('Password').AsString;
+      if not FieldByName('Password').IsNull then
+        Password := FieldByName('Password').AsString;
+      AdminRole := FieldByName('Admin').AsBoolean;
     end;
   end;
 

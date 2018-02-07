@@ -1,28 +1,20 @@
-object Form2: TForm2
-  Left = 809
-  Height = 257
-  Top = 271
-  Width = 374
-  Caption = 'Backup Database'
-  ClientHeight = 257
-  ClientWidth = 374
+object RestoreDlg: TRestoreDlg
+  Left = 799
+  Height = 270
+  Top = 225
+  Width = 358
+  Caption = 'Restore Database'
+  ClientHeight = 270
+  ClientWidth = 358
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
   LCLVersion = '1.8.1.0'
   object Bevel1: TBevel
     Left = 3
-    Height = 209
+    Height = 230
     Top = 2
     Width = 347
-  end
-  object Label1: TLabel
-    Left = 12
-    Height = 14
-    Top = 64
-    Width = 95
-    Caption = 'Database Name'
-    ParentColor = False
   end
   object Label2: TLabel
     Left = 12
@@ -40,12 +32,38 @@ object Form2: TForm2
     ReadOnly = True
     TabOrder = 0
   end
+  object Label1: TLabel
+    Left = 12
+    Height = 14
+    Top = 64
+    Width = 95
+    Caption = 'Database Name'
+    ParentColor = False
+  end
   object Edit2: TEdit
     Left = 12
     Height = 24
     Top = 80
     Width = 296
     TabOrder = 1
+  end
+  object RadioButton1: TRadioButton
+    Left = 12
+    Height = 22
+    Top = 122
+    Width = 93
+    Caption = 'Server Side'
+    Checked = True
+    TabOrder = 2
+    TabStop = True
+  end
+  object RadioButton2: TRadioButton
+    Left = 134
+    Height = 22
+    Top = 122
+    Width = 88
+    Caption = 'Client Side'
+    TabOrder = 3
   end
   object Label3: TLabel
     Left = 12
@@ -54,24 +72,6 @@ object Form2: TForm2
     Width = 68
     Caption = 'Backup File'
     ParentColor = False
-  end
-  object RadioButton1: TRadioButton
-    Left = 12
-    Height = 22
-    Top = 122
-    Width = 93
-    Caption = 'Server Side'
-    TabOrder = 2
-  end
-  object RadioButton2: TRadioButton
-    Left = 134
-    Height = 22
-    Top = 122
-    Width = 88
-    Caption = 'Client Side'
-    Checked = True
-    TabOrder = 3
-    TabStop = True
   end
   object Edit3: TEdit
     Left = 12
@@ -126,7 +126,7 @@ object Form2: TForm2
   object Button1: TButton
     Left = 96
     Height = 25
-    Top = 224
+    Top = 236
     Width = 75
     Caption = 'OK'
     Default = True
@@ -136,34 +136,45 @@ object Form2: TForm2
   object Button2: TButton
     Left = 191
     Height = 25
-    Top = 224
+    Top = 236
     Width = 75
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 6
   end
-  object IBBackupService1: TIBBackupService
+  object CheckBox1: TCheckBox
+    Left = 12
+    Height = 22
+    Top = 208
+    Width = 182
+    Caption = 'Replace Existing Database'
+    TabOrder = 7
+  end
+  object OpenDialog1: TOpenDialog
+    Title = 'Open existing backup file'
+    DefaultExt = '.gbk'
+    Filter = 'Backup Files|*.gbk|All Files|*.*'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 312
+    top = 136
+  end
+  object IBRestoreService1: TIBRestoreService
     ServerName = 'localhost'
     Protocol = TCP
     Params.Strings = (
       'user_name=SYSDBA'
-      ''
     )
     TraceFlags = []
     Verbose = True
+    StatisticsRequested = [bsTotalTime]
     BackupFileLocation = flClientSide
-    BlockingFactor = 0
-    DatabaseName = 'employee'
-    Options = []
-    left = 312
-    top = 24
-  end
-  object SaveDialog1: TSaveDialog
-    DefaultExt = '.gbk'
-    Filter = 'Backup Files|*.gbk|All Files|*.*'
-    Options = [ofOverwritePrompt, ofPathMustExist, ofEnableSizing, ofViewDetail]
-    left = 309
-    top = 143
+    DatabaseName.Strings = (
+      '/tmp/mytest.fdb'
+    )
+    PageSize = 0
+    PageBuffers = 0
+    left = 304
+    top = 232
   end
 end

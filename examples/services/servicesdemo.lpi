@@ -40,7 +40,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="8">
+    <Units Count="10">
       <Unit0>
         <Filename Value="servicesdemo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -53,16 +53,16 @@
         <ResourceBaseClass Value="Form"/>
       </Unit1>
       <Unit2>
-        <Filename Value="Unit2.pas"/>
+        <Filename Value="BackupDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form2"/>
+        <ComponentName Value="BackupDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit2>
       <Unit3>
-        <Filename Value="Unit3.pas"/>
+        <Filename Value="RestoreDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form3"/>
+        <ComponentName Value="RestoreDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit3>
@@ -94,6 +94,19 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit7>
+      <Unit8>
+        <Filename Value="ServicesLoginDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="SvcLoginDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="SelectValidationDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="SelectValidationDlg"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit9>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
