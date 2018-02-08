@@ -80,7 +80,6 @@ end;
 procedure TLimboTransactionsForm.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
-  LimboTransactionValidation.Active := false;
 end;
 
 procedure TLimboTransactionsForm.StringGrid1EditingDone(Sender: TObject);

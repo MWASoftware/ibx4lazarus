@@ -158,6 +158,10 @@ IBX Change Log  version                                                  (2.2-0)
 38. IBServices: procedure TIBConfigService.SetNoLinger added to set no linger
     option on a database.
 
+39. TIBCustomService: Assign method implemented to allow copying of service login
+    context between service API components. "Detach" method now only detaches
+    service when last reference to the service interface detaches.
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

@@ -102,7 +102,6 @@ begin
     Memo1.Lines.Add('Base Location = ' + ConfigParams.BaseLocation);
     Memo1.Lines.Add('Lock File Location = ' + ConfigParams.LockFileLocation);
     Memo1.Lines.Add('Security Database Location = ' + ConfigParams.SecurityDatabaseLocation);
-    Active := false;
   end;
 end;
 
@@ -315,7 +314,6 @@ begin
     Memo1.Lines.Add('Validation Completed');
     MessageDlg('Validation Completed',mtInformation,[mbOK],0);
   finally
-    Active := false;
     if NeedsExpectedDB then {Need expected_db}
     begin
       MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
@@ -356,22 +354,20 @@ end;
 procedure TForm1.DoListUsers(secDB: PtrInt);
 begin
   with ListUsersForm do
-  try
+  begin
     AttachService(IBSecurityService1,SecDB,'');
     ShowModal;
-  finally
-    IBSecurityService1.Active := false;
   end;
 end;
 
 procedure TForm1.AttachService(aService: TIBCustomService; Initialise: boolean);
 begin
   with aService do
-  repeat
+  while not Active do
+  begin
     if Initialise then
     begin
-      ServerName := IBServerProperties1.ServerName;
-      Params.Assign(IBServerProperties1.Params);
+      Assign(IBServerProperties1);
       LoginPrompt := Params.IndexOfName('password') = -1;
     end;
     try
@@ -385,7 +381,7 @@ begin
      On E:Exception do
        MessageDlg(E.Message,mtError,[mbOK],0);
     end;
-  until Active; {Loop until logged in or user cancels}
+  end; {Loop until logged in or user cancels}
 end;
 
 procedure TForm1.AttachService(aService: TIBCustomService; secDB: integer; aDatabaseName: string
@@ -394,11 +390,12 @@ var index: integer;
 begin
   with aService do
   begin
-    ServerName := IBServerProperties1.ServerName;
-    Params.Assign(IBServerProperties1.Params);
+    if not active then
+      Assign(IBServerProperties1);
     index := Params.IndexOfName('password');
     if secDB = use_alt_sec_db_login then
     begin
+      ServiceIntf := nil;
       LoginPrompt := true;
       Params.Add('expected_db='+aDatabaseName);
       Params.Delete(index);

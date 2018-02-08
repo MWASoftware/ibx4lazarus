@@ -153,6 +153,7 @@ type
     destructor Destroy; override;
     procedure Attach;
     procedure Detach;
+    procedure Assign(Source: TPersistent); override;
 
     {Copies database parameters as give in the DBParams to the Service
       omitting any parameters not appropriate for TIBService. Typically, the
@@ -835,9 +836,24 @@ end;
 procedure TIBCustomService.Detach;
 begin
   CheckActive;
-  FService.Detach;
   FService := nil;
   MonitorHook.ServiceDetach(Self);
+end;
+
+procedure TIBCustomService.Assign(Source: TPersistent);
+begin
+  if Source is TIBCustomService then
+  with Source as TIBCustomService do
+  begin
+    self.ServerName := ServerName;
+    self.Params.Assign(Params);
+    self.FService := FService;
+    self.FServerVersionNo := FServerVersionNo;
+    self.Protocol := Protocol;
+    self.LoginPrompt := LoginPrompt
+  end
+  else
+    inherited Assign(Source);
 end;
 
 procedure TIBCustomService.SetDBParams(DBParams: TStrings);

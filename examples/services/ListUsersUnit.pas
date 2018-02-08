@@ -160,7 +160,6 @@ begin
         Post;
       end;
     finally
-      IBSecurityService1.Active := false;
       FLoading := false;
     end;
   end;
@@ -186,12 +185,8 @@ begin
   with IBSecurityService1 do
   begin
     Active := true;
-    try
-      UserName := UserList.FieldByName('UserName').AsString;
-      DeleteUser;
-    finally
-      Active := false;
-    end;
+    UserName := UserList.FieldByName('UserName').AsString;
+    DeleteUser;
   end;
 end;
 
@@ -227,7 +222,6 @@ procedure TListUsersForm.UserListBeforePost(DataSet: TDataSet);
         IBSecurityService1.AddUser;
       end;
     end;
-    IBSecurityService1.Active := false;
 end;
 
 procedure TListUsersForm.DoRefresh(Data: PtrInt);
