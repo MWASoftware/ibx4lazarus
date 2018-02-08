@@ -190,7 +190,6 @@ type
     FOnLogin: TIBDatabaseLoginEvent;
     FSQLHourGlass: Boolean;
     FTraceFlags: TTraceFlags;
-    FDBSQLDialect: Integer;
     FSQLDialect: Integer;
     FOnDialectDowngradeWarning: TNotifyEvent;
     FSQLObjects: TList;
@@ -213,7 +212,6 @@ type
     function GetDefaultCharSetName: AnsiString;
     function GetDefaultCodePage: TSystemCodePage;
     function GetRemoteProtocol: string;
-    function GetSQLDialect: Integer;
     procedure SetSQLDialect(const Value: Integer);
     procedure ValidateClientSQLDialect;
     procedure DBParamsChange(Sender: TObject);
@@ -270,7 +268,7 @@ type
     procedure RemoveTransactions;
 
     property Attachment: IAttachment read FAttachment;
-    property DBSQLDialect : Integer read FDBSQLDialect;
+    property DBSQLDialect : Integer read GetDBSQLDialect;
     property IsReadOnly: Boolean read GetIsReadOnly;
     property SQLObjectCount: Integer read GetSQLObjectCount;
     property SQLObjects[Index: Integer]: TIBBase read GetSQLObject;
@@ -294,7 +292,7 @@ type
     property DefaultTransaction: TIBTransaction read FDefaultTransaction
                                                  write SetDefaultTransaction;
     property IdleTimer: Integer read GetIdleTimer write SetIdleTimer;
-    property SQLDialect : Integer read GetSQLDialect write SetSQLDialect default 3;
+    property SQLDialect : Integer read FSQLDialect write SetSQLDialect default 3;
     property SQLHourGlass: Boolean read FSQLHourGlass write FSQLHourGlass default true;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
     property UseDefaultSystemCodePage: boolean read FUseDefaultSystemCodePage
@@ -520,7 +518,6 @@ begin
   FTimer.Enabled := False;
   FTimer.Interval := 0;
   FTimer.OnTimer := TimeoutConnection;
-  FDBSQLDialect := 1;
   FSQLDialect := 3;
   FTraceFlags := [];
   FDataSets := TList.Create;
@@ -618,7 +615,6 @@ end;
 begin
   if Connected then
     InternalClose(False);
-  FDBSQLDialect := 1;
 end;
 
   procedure TIBDataBase.CreateDatabase;
@@ -632,7 +628,7 @@ end;
 procedure TIBDataBase.CreateDatabase(createDatabaseSQL: string);
 begin
   CheckInactive;
-  FAttachment := FirebirdAPI.CreateDatabase(createDatabaseSQL,FSQLDialect);
+  FAttachment := FirebirdAPI.CreateDatabase(createDatabaseSQL,SQLDialect);
   FDBName := Attachment.GetConnectString;
   if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
     OnCreateDatabase(self);
@@ -779,6 +775,7 @@ begin
 
   FAttachment.Disconnect(Force);
   FAttachment := nil;
+  FDPB := nil;
 
   if not (csDesigning in ComponentState) then
     MonitorHook.DBDisconnect(Self);
@@ -1030,7 +1027,10 @@ begin
      if FCreateDatabase then
      begin
        FCreateDatabase := false;
+       FDPB.Add(isc_dpb_set_db_SQL_dialect).AsByte := SQLDialect; {create with this SQL Dialect}
        FAttachment := FirebirdAPI.CreateDatabase(aDBName,FDPB, false);
+       if FAttachment = nil then
+         FDPB := nil;
        if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
          OnCreateDatabase(self);
      end
@@ -1092,7 +1092,6 @@ begin
 
   if not (csDesigning in ComponentState) then
     FDBName := aDBName; {Synchronise at run time}
-  FDBSQLDialect := GetDBSQLDialect;
   ValidateClientSQLDialect;
   for i := 0 to FSQLObjects.Count - 1 do
   begin
@@ -1274,29 +1273,20 @@ begin
   DatabaseInfo.Free;
 end;
 
- function TIBDataBase.GetSQLDialect: Integer;
-begin
-  Result := FSQLDialect;
-end;
-
 
  procedure TIBDataBase.SetSQLDialect( const Value: Integer);
 begin
   if (Value < 1) then IBError(ibxeSQLDialectInvalid, [nil]);
-  if ((FAttachment = nil) or (Value <= FDBSQLDialect))  then
+  if (Attachment = nil) or (Value <= DBSQLDialect)  then
     FSQLDialect := Value
   else
     IBError(ibxeSQLDialectInvalid, [nil]);
 end;
 
  function TIBDataBase.GetDBSQLDialect: Integer;
-var
-  DatabaseInfo: TIBDatabaseInfo;
 begin
-  DatabaseInfo := TIBDatabaseInfo.Create(self);
-  DatabaseInfo.Database := self;
-  result := DatabaseInfo.DBSQLDialect;
-  DatabaseInfo.Free;
+  CheckActive;
+  Result := Attachment.GetSQLDialect;
 end;
 
 function TIBDataBase.GetDefaultCharSetID: integer;
@@ -1331,9 +1321,9 @@ end;
 
  procedure TIBDataBase.ValidateClientSQLDialect;
 begin
-  if (FDBSQLDialect < FSQLDialect) then
+  if (DBSQLDialect < FSQLDialect) then
   begin
-    FSQLDialect := FDBSQLDialect;
+    FSQLDialect := DBSQLDialect;
     if Assigned (FOnDialectDowngradeWarning) then
       FOnDialectDowngradeWarning(self);
   end;
@@ -1421,7 +1411,7 @@ begin
     Query.SQL.Text := 'Select R.RDB$FIELD_NAME ' + {do not localize}
       'from RDB$RELATION_FIELDS R ' + {do not localize}
       'where R.RDB$RELATION_NAME = ' + {do not localize}
-      '''' + ExtractIdentifier(SQLDialect, TableName) +
+      '''' + ExtractIdentifier(DBSQLDialect, TableName) +
       ''' and Exists(Select * From RDB$FIELDS F Where R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME)' ; {do not localize}
     Query.Prepare;
     Query.ExecQuery;

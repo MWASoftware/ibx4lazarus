@@ -34,6 +34,7 @@ object Form1: TForm1
       'user_name=SYSDBA'
     )
     IdleTimer = 0
+    SQLDialect = 1
     TraceFlags = []
     UseDefaultSystemCodePage = False
     left = 224

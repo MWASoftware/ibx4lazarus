@@ -63,8 +63,10 @@ begin
   TableNameLookup.Active := true;
   Memo1.Lines.Add('Authentication Method = '+ IBDatabase1.AuthenticationMethod);
   Memo1.Lines.Add('Remote Protocol = ' + IBDatabase1.RemoteProtocol);
+  Memo1.Lines.Add('Attachment SQLDialect = ' + IntToStr(IBDatabase1.DBSQLDialect));
   with IBDatabaseInfo1 do
   begin
+    Memo1.Lines.Add('DB SQLDialect = ' + IntToStr(DBSQLDialect));
     Memo1.Lines.Add('Allocation = ' + IntToStr(Allocation));
     Memo1.Lines.Add('Base Level = ' + IntToStr(BaseLevel));
     Memo1.Lines.Add('DB File Name = ' + DBFileName);
@@ -99,7 +101,6 @@ begin
     AddPerfStats('Read Seq Count',ReadSeqCount);
     AddPerfStats('Update Count',UpdateCount);
     Memo1.Lines.Add('');
-    Memo1.Lines.Add('DB SQLDialect = ' + IntToStr(DBSQLDialect));
     ShowBoolValue(ReadOnly,'Database is Read Only','Database is Read/Write');
     Memo1.Lines.Add('Hex Dump of Database Page 100:');
     Memo1.Lines.Add(HexString(GetDatabasePage(100)));
