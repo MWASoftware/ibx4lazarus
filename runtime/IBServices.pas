@@ -104,6 +104,7 @@ type
   TIBCustomService = class(TComponent)
   private
     FParamsChanged : Boolean;
+    FPortNo: integer;
     FSPB : ISPB;
     FSRB: ISRB;
     FSQPB: ISQPB;
@@ -168,6 +169,7 @@ type
     property Active: Boolean read GetActive write SetActive default False;
     property ServerName: string read FServerName write SetServerName;
     property Protocol: TProtocol read FProtocol write SetProtocol default Local;
+    property PortNo: integer read FPortNo write FPortNo;
     property Params: TStrings read FParams write SetParams;
     property LoginPrompt: Boolean read FLoginPrompt write FLoginPrompt default True;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;

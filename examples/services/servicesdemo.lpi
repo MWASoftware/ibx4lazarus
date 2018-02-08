@@ -40,7 +40,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="11">
+    <Units Count="12">
       <Unit0>
         <Filename Value="servicesdemo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -112,8 +112,16 @@
         <Filename Value="SelectDBDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="SelectDBDlg"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit10>
+      <Unit11>
+        <Filename Value="DatabasePropertiesUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DatabaseProperties"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit11>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

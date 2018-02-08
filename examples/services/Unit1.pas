@@ -454,7 +454,6 @@ begin
 end;
 
 procedure TForm1.Button8Click(Sender: TObject);
-var DBName: string;
 begin
   with LimboTransactionsForm do
   begin
