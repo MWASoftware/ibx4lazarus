@@ -1,7 +1,7 @@
 object RestoreDlg: TRestoreDlg
-  Left = 799
+  Left = 1399
   Height = 270
-  Top = 225
+  Top = 553
   Width = 358
   Caption = 'Restore Database'
   ClientHeight = 270
@@ -35,7 +35,7 @@ object RestoreDlg: TRestoreDlg
   object Label1: TLabel
     Left = 12
     Height = 14
-    Top = 64
+    Top = 56
     Width = 95
     Caption = 'Database Name'
     ParentColor = False
@@ -43,14 +43,14 @@ object RestoreDlg: TRestoreDlg
   object Edit2: TEdit
     Left = 12
     Height = 24
-    Top = 80
+    Top = 72
     Width = 296
     TabOrder = 1
   end
   object RadioButton1: TRadioButton
     Left = 12
     Height = 22
-    Top = 122
+    Top = 128
     Width = 93
     Caption = 'Server Side'
     Checked = True
@@ -60,7 +60,7 @@ object RestoreDlg: TRestoreDlg
   object RadioButton2: TRadioButton
     Left = 134
     Height = 22
-    Top = 122
+    Top = 128
     Width = 88
     Caption = 'Client Side'
     TabOrder = 3
@@ -150,6 +150,14 @@ object RestoreDlg: TRestoreDlg
     Width = 182
     Caption = 'Replace Existing Database'
     TabOrder = 7
+  end
+  object UseAltSecDB: TCheckBox
+    Left = 12
+    Height = 22
+    Top = 96
+    Width = 190
+    Caption = 'Uses Alt. Security Database'
+    TabOrder = 8
   end
   object OpenDialog1: TOpenDialog
     Title = 'Open existing backup file'

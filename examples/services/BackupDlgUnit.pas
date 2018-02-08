@@ -27,6 +27,7 @@ type
     RadioButton2: TRadioButton;
     SaveDialog1: TSaveDialog;
     SpeedButton1: TSpeedButton;
+    UseAltSecDB: TCheckBox;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);

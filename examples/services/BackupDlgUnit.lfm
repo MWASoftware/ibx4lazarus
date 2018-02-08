@@ -19,7 +19,7 @@ object BackupDlg: TBackupDlg
   object Label1: TLabel
     Left = 12
     Height = 14
-    Top = 64
+    Top = 56
     Width = 95
     Caption = 'Database Name'
     ParentColor = False
@@ -43,7 +43,7 @@ object BackupDlg: TBackupDlg
   object Edit2: TEdit
     Left = 12
     Height = 24
-    Top = 80
+    Top = 72
     Width = 296
     TabOrder = 1
   end
@@ -58,7 +58,7 @@ object BackupDlg: TBackupDlg
   object RadioButton1: TRadioButton
     Left = 12
     Height = 22
-    Top = 122
+    Top = 128
     Width = 93
     Caption = 'Server Side'
     TabOrder = 2
@@ -66,7 +66,7 @@ object BackupDlg: TBackupDlg
   object RadioButton2: TRadioButton
     Left = 134
     Height = 22
-    Top = 122
+    Top = 128
     Width = 88
     Caption = 'Client Side'
     Checked = True
@@ -142,6 +142,14 @@ object BackupDlg: TBackupDlg
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 6
+  end
+  object UseAltSecDB: TCheckBox
+    Left = 12
+    Height = 22
+    Top = 96
+    Width = 190
+    Caption = 'Uses Alt. Security Database'
+    TabOrder = 7
   end
   object IBBackupService1: TIBBackupService
     ServerName = 'localhost'

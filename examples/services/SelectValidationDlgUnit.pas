@@ -22,11 +22,12 @@ type
     Label2: TLabel;
     OnlineValidation: TRadioButton;
     FullValidation: TRadioButton;
+    UseAltSecDB: TCheckBox;
   private
 
   public
     function ShowModal(aServerName: string;
-      var DatabaseName: string; var aOnlineValidation: boolean): TModalResult;
+      var DatabaseName: string; var aOnlineValidation: boolean; var IsExpectedDB: boolean): TModalResult;
   end;
 
 var
@@ -39,16 +40,19 @@ implementation
 { TSelectValidationDlg }
 
 function TSelectValidationDlg.ShowModal(aServerName: string;
-  var DatabaseName: string; var aOnlineValidation: boolean): TModalResult;
+  var DatabaseName: string; var aOnlineValidation: boolean;
+  var IsExpectedDB: boolean): TModalResult;
 begin
   Edit1.Text := DatabaseName;
   Edit2.text := aServerName;
+  UseAltSecDB.Checked := IsExpectedDB;
   OnlineValidation.checked := aOnlineValidation;
   Result := inherited ShowModal;
   if Result = mrOK then
   begin
     DatabaseName := Edit1.Text;
     aOnlineValidation := OnlineValidation.checked;
+    IsExpectedDB := UseAltSecDB.Checked;
   end;
 end;
 

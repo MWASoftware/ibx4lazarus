@@ -845,12 +845,13 @@ begin
   if Source is TIBCustomService then
   with Source as TIBCustomService do
   begin
-    self.ServerName := ServerName;
+    self.FService := nil;  {Now appears inactive}
+    self.FServerName := FServerName;
     self.Params.Assign(Params);
-    self.FService := FService;
     self.FServerVersionNo := FServerVersionNo;
-    self.Protocol := Protocol;
-    self.LoginPrompt := LoginPrompt
+    self.FProtocol := FProtocol;
+    self.FLoginPrompt := FLoginPrompt;
+    self.FService := FService;
   end
   else
     inherited Assign(Source);

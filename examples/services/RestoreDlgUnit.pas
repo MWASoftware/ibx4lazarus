@@ -28,6 +28,7 @@ type
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     SpeedButton1: TSpeedButton;
+    UseAltSecDB: TCheckBox;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
@@ -55,6 +56,7 @@ end;
 procedure TRestoreDlg.FormShow(Sender: TObject);
 begin
   Edit1.Text := IBRestoreService1.ServerName;
+  UseAltSecDB.Checked := false;
   if IBRestoreService1.BackupFileLocation = flServerSide then
     RadioButton1.Checked := true
   else

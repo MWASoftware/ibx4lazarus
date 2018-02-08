@@ -1,17 +1,17 @@
 object SelectValidationDlg: TSelectValidationDlg
   Left = 980
-  Height = 193
+  Height = 230
   Top = 554
   Width = 350
   BorderStyle = bsDialog
   Caption = 'Select Database'
-  ClientHeight = 193
+  ClientHeight = 230
   ClientWidth = 350
   Position = poMainFormCenter
   LCLVersion = '1.8.1.0'
   object Bevel1: TBevel
     Left = 8
-    Height = 176
+    Height = 208
     Top = 8
     Width = 248
   end
@@ -34,7 +34,7 @@ object SelectValidationDlg: TSelectValidationDlg
   object OnlineValidation: TRadioButton
     Left = 20
     Height = 22
-    Top = 120
+    Top = 144
     Width = 124
     Caption = 'Online Validation'
     TabOrder = 1
@@ -42,7 +42,7 @@ object SelectValidationDlg: TSelectValidationDlg
   object FullValidation: TRadioButton
     Left = 20
     Height = 22
-    Top = 152
+    Top = 176
     Width = 106
     Caption = 'Full Validation'
     Checked = True
@@ -85,5 +85,13 @@ object SelectValidationDlg: TSelectValidationDlg
     ReadOnly = True
     TabOrder = 4
     Text = 'Edit2'
+  end
+  object UseAltSecDB: TCheckBox
+    Left = 16
+    Height = 22
+    Top = 112
+    Width = 190
+    Caption = 'Uses Alt. Security Database'
+    TabOrder = 6
   end
 end

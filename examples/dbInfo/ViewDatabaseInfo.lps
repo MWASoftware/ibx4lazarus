@@ -46,7 +46,7 @@
       </Unit3>
       <Unit4>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="189"/>
         <CursorPos X="3" Y="209"/>
         <UsageCount Value="11"/>
@@ -67,7 +67,7 @@
       </Unit6>
       <Unit7>
         <Filename Value="../../../fbintf/client/3.0/FB30Attachment.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="121"/>
         <CursorPos X="50" Y="136"/>
         <UsageCount Value="11"/>
@@ -233,17 +233,15 @@
       </Unit29>
       <Unit30>
         <Filename Value="../../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="148"/>
         <CursorPos X="49" Y="169"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit30>
       <Unit31>
         <Filename Value="../../../fbintf/include/consts_pub.inc"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="75"/>
         <CursorPos X="3" Y="94"/>
         <UsageCount Value="10"/>
@@ -265,7 +263,8 @@
       </Unit33>
       <Unit34>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <EditorIndex Value="3"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="236"/>
         <CursorPos X="15" Y="255"/>
         <UsageCount Value="11"/>
@@ -273,13 +272,13 @@
       </Unit34>
       <Unit35>
         <Filename Value="../../../fbintf/client/FBParamBlock.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="58"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit35>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="../../runtime/IBDatabase.pas"/>
         <Caret Line="1019" TopLine="992"/>
@@ -358,48 +357,44 @@
       </Position19>
       <Position20>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="985" Column="3" TopLine="1017"/>
+        <Caret Line="215" Column="15" TopLine="197"/>
       </Position20>
       <Position21>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="215" Column="15" TopLine="197"/>
+        <Caret Line="1284" TopLine="1277"/>
       </Position21>
       <Position22>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1284" TopLine="1277"/>
+        <Caret Line="216" Column="15" TopLine="198"/>
       </Position22>
       <Position23>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="216" Column="15" TopLine="198"/>
+        <Caret Line="1326" Column="34" TopLine="1322"/>
       </Position23>
       <Position24>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1326" Column="34" TopLine="1322"/>
+        <Caret Line="1280" Column="38" TopLine="1260"/>
       </Position24>
       <Position25>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1280" Column="38" TopLine="1260"/>
+        <Caret Line="1326" Column="20" TopLine="1306"/>
       </Position25>
       <Position26>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="1326" Column="20" TopLine="1306"/>
+        <Caret Line="256" Column="15" TopLine="237"/>
       </Position26>
       <Position27>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="256" Column="15" TopLine="237"/>
+        <Caret Line="630" Column="3" TopLine="628"/>
       </Position27>
       <Position28>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="630" Column="3" TopLine="628"/>
+        <Caret Line="255" Column="15" TopLine="237"/>
       </Position28>
       <Position29>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <Caret Line="255" Column="15" TopLine="237"/>
-      </Position29>
-      <Position30>
-        <Filename Value="../../runtime/IBDatabase.pas"/>
         <Caret Line="622" Column="3" TopLine="620"/>
-      </Position30>
+      </Position29>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
