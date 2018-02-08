@@ -207,10 +207,12 @@ type
     FLoginCalled: boolean;
     FUseDefaultSystemCodePage: boolean;
     procedure EnsureInactive;
+    function GetAuthenticationMethod: string;
     function GetDBSQLDialect: Integer;
     function GetDefaultCharSetID: integer;
     function GetDefaultCharSetName: AnsiString;
     function GetDefaultCodePage: TSystemCodePage;
+    function GetRemoteProtocol: string;
     function GetSQLDialect: Integer;
     procedure SetSQLDialect(const Value: Integer);
     procedure ValidateClientSQLDialect;
@@ -278,6 +280,8 @@ type
     property DefaultCharSetName: AnsiString read GetDefaultCharSetName;
     property DefaultCharSetID: integer read GetDefaultCharSetID;
     property DefaultCodePage: TSystemCodePage read GetDefaultCodePage;
+    property AuthenticationMethod: string read GetAuthenticationMethod;
+    property RemoteProtocol: string read GetRemoteProtocol;
 
   published
     property Connected;
@@ -560,6 +564,12 @@ begin
     if FAttachment <> nil then
       Close;
   end
+end;
+
+function TIBDataBase.GetAuthenticationMethod: string;
+begin
+  CheckActive;
+  Result := Attachment.GetAuthenticationMethod;
 end;
 
  procedure TIBDataBase.CheckInactive;
@@ -1311,6 +1321,12 @@ begin
     Attachment.CharSetID2CodePage(DefaultCharSetID,Result)
   else
     Result := CP_NONE;
+end;
+
+function TIBDataBase.GetRemoteProtocol: string;
+begin
+  CheckActive;
+  Result := Attachment.GetRemoteProtocol;
 end;
 
  procedure TIBDataBase.ValidateClientSQLDialect;

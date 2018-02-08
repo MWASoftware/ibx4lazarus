@@ -61,6 +61,8 @@ procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);
 begin
   IBTransaction1.Active := true;
   TableNameLookup.Active := true;
+  Memo1.Lines.Add('Authentication Method = '+ IBDatabase1.AuthenticationMethod);
+  Memo1.Lines.Add('Remote Protocol = ' + IBDatabase1.RemoteProtocol);
   with IBDatabaseInfo1 do
   begin
     Memo1.Lines.Add('Allocation = ' + IntToStr(Allocation));

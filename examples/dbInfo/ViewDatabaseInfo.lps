@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="34">
+    <Units Count="35">
       <Unit0>
         <Filename Value="ViewDatabaseInfo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -19,9 +19,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="65"/>
-        <CursorPos X="55" Y="89"/>
+        <TopLine Value="44"/>
+        <CursorPos X="42" Y="65"/>
         <UsageCount Value="26"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -231,10 +230,12 @@
       </Unit29>
       <Unit30>
         <Filename Value="../../changelog"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="124"/>
-        <CursorPos X="72" Y="156"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="136"/>
+        <CursorPos X="80" Y="166"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit30>
       <Unit31>
@@ -257,8 +258,16 @@
         <CursorPos X="55" Y="71"/>
         <UsageCount Value="10"/>
       </Unit33>
+      <Unit34>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1309"/>
+        <CursorPos X="27" Y="1329"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit34>
     </Units>
-    <JumpHistory Count="17" HistoryIndex="16">
+    <JumpHistory Count="22" HistoryIndex="21">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="65" Column="71" TopLine="53"/>
@@ -327,6 +336,26 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="9" Column="29"/>
       </Position17>
+      <Position18>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <Caret Line="282" Column="51" TopLine="257"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <Caret Line="570" Column="47" TopLine="567"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <Caret Line="284" Column="60" TopLine="253"/>
+      </Position20>
+      <Position21>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="65" Column="68" TopLine="52"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <Caret Line="1329" Column="27" TopLine="1309"/>
+      </Position22>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
