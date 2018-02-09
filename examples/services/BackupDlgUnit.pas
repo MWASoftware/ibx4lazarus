@@ -30,6 +30,8 @@ type
     UseAltSecDB: TCheckBox;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure IBBackupService1Login(Service: TIBCustomService;
+      LoginParams: TStrings);
     procedure SpeedButton1Click(Sender: TObject);
   private
     { private declarations }
@@ -43,6 +45,8 @@ var
 implementation
 
 {$R *.lfm}
+
+uses MainFormUnit;
 
 { TBackupDlg }
 
@@ -61,6 +65,12 @@ begin
     RadioButton2.Checked := true;
   Edit2.Text := IBBackupService1.DatabaseName;
   IBBackupService1.BackupFile.Clear;
+end;
+
+procedure TBackupDlg.IBBackupService1Login(Service: TIBCustomService;
+  LoginParams: TStrings);
+begin
+  Form1.IBStatisticalService1Login(Service,LoginParams);
 end;
 
 procedure TBackupDlg.FormClose(Sender: TObject; var CloseAction: TCloseAction);

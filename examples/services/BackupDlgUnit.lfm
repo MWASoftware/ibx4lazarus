@@ -159,6 +159,7 @@ object BackupDlg: TBackupDlg
       ''
     )
     TraceFlags = []
+    OnLogin = IBBackupService1Login
     Verbose = True
     StatisticsRequested = [bsTotalTime]
     BackupFileLocation = flClientSide

@@ -7,7 +7,6 @@ object DatabaseProperties: TDatabaseProperties
   Caption = 'Database Properties'
   ClientHeight = 457
   ClientWidth = 814
-  OnShow = FormShow
   Position = poMainFormCenter
   LCLVersion = '1.8.1.0'
   object Bevel1: TBevel
@@ -73,6 +72,7 @@ object DatabaseProperties: TDatabaseProperties
     Top = 311
     Width = 84
     Caption = 'Read Only'
+    OnChange = DBIsReadOnlyChange
     TabOrder = 3
   end
   object SyncWrites: TCheckBox
@@ -81,36 +81,39 @@ object DatabaseProperties: TDatabaseProperties
     Top = 359
     Width = 173
     Caption = 'Synchronous Disk Writes'
+    OnChange = SyncWritesChange
     TabOrder = 4
   end
   object Label7: TLabel
-    Left = 404
+    Left = 400
     Height = 14
-    Top = 26
+    Top = 347
     Width = 128
     Caption = 'S&weep Interval set to'
     FocusControl = SweepInterval
     ParentColor = False
   end
   object SweepInterval: TEdit
-    Left = 536
+    Left = 533
     Height = 24
-    Top = 20
+    Top = 342
     Width = 89
     Alignment = taRightJustify
+    NumbersOnly = True
+    OnEditingDone = SweepIntervalEditingDone
     TabOrder = 5
     Text = 'SweepInterval'
   end
   object Label8: TLabel
     Left = 632
     Height = 14
-    Top = 24
+    Top = 347
     Width = 74
     Caption = 'Transactions'
     ParentColor = False
   end
   object Label6: TLabel
-    Left = 70
+    Left = 71
     Height = 14
     Top = 20
     Width = 39
@@ -127,11 +130,11 @@ object DatabaseProperties: TDatabaseProperties
     Text = 'Edit7'
   end
   object Label9: TLabel
-    Left = 24
+    Left = 19
     Height = 14
     Top = 83
-    Width = 86
-    Caption = 'Database Path'
+    Width = 91
+    Caption = 'Connect String'
     ParentColor = False
   end
   object Edit8: TEdit
@@ -148,6 +151,7 @@ object DatabaseProperties: TDatabaseProperties
     Top = 335
     Width = 62
     Caption = 'Online'
+    OnChange = DatabaseOnlineChange
     TabOrder = 8
   end
   object IsShadowChk: TCheckBox
@@ -156,20 +160,21 @@ object DatabaseProperties: TDatabaseProperties
     Top = 383
     Width = 132
     Caption = 'Shadow Database'
+    OnChange = IsShadowChkChange
     TabOrder = 9
   end
   object Label11: TLabel
-    Left = 439
+    Left = 435
     Height = 14
-    Top = 57
+    Top = 26
     Width = 93
     Caption = 'Pages Allocated'
     ParentColor = False
   end
   object AllocatedPages: TEdit
-    Left = 536
+    Left = 533
     Height = 24
-    Top = 51
+    Top = 20
     Width = 89
     Alignment = taRightJustify
     ReadOnly = True
@@ -177,9 +182,9 @@ object DatabaseProperties: TDatabaseProperties
     Text = 'AllocatedPages'
   end
   object Label19: TLabel
-    Left = 476
+    Left = 472
     Height = 14
-    Top = 88
+    Top = 57
     Width = 56
     Caption = 'Page Size'
     ParentColor = False
@@ -187,15 +192,15 @@ object DatabaseProperties: TDatabaseProperties
   object Label20: TLabel
     Left = 632
     Height = 14
-    Top = 92
+    Top = 61
     Width = 33
     Caption = 'bytes'
     ParentColor = False
   end
   object PageSize: TEdit
-    Left = 536
+    Left = 533
     Height = 24
-    Top = 82
+    Top = 51
     Width = 89
     Alignment = taRightJustify
     ReadOnly = True
@@ -203,83 +208,71 @@ object DatabaseProperties: TDatabaseProperties
     Text = 'PageSize'
   end
   object Label13: TLabel
-    Left = 27
+    Left = 28
     Height = 14
-    Top = 212
+    Top = 277
     Width = 83
     Caption = 'Character Set'
     ParentColor = False
   end
-  object DBEdit1: TDBEdit
-    Left = 120
-    Height = 24
-    Top = 208
-    Width = 266
-    DataField = 'RDB$CHARACTER_SET_NAME'
-    DataSource = DatabaseSource
-    ReadOnly = True
-    CharCase = ecNormal
-    MaxLength = 0
-    TabOrder = 12
-  end
   object Label12: TLabel
-    Left = 434
+    Left = 430
     Height = 14
-    Top = 181
+    Top = 150
     Width = 98
     Caption = 'Current Memory'
     ParentColor = False
   end
   object Label14: TLabel
-    Left = 456
+    Left = 452
     Height = 14
-    Top = 212
+    Top = 181
     Width = 76
     Caption = 'Max Memory'
     ParentColor = False
   end
   object Label15: TLabel
-    Left = 451
+    Left = 447
     Height = 14
-    Top = 243
+    Top = 212
     Width = 81
     Caption = 'No. of Buffers'
     ParentColor = False
   end
   object Edit10: TEdit
-    Left = 536
+    Left = 533
+    Height = 24
+    Top = 144
+    Width = 89
+    Alignment = taRightJustify
+    ReadOnly = True
+    TabOrder = 12
+    Text = 'Edit10'
+  end
+  object Edit11: TEdit
+    Left = 533
     Height = 24
     Top = 175
     Width = 89
     Alignment = taRightJustify
     ReadOnly = True
     TabOrder = 13
-    Text = 'Edit10'
+    Text = 'Edit11'
   end
-  object Edit11: TEdit
-    Left = 536
+  object Edit12: TEdit
+    Left = 533
     Height = 24
     Top = 206
     Width = 89
     Alignment = taRightJustify
     ReadOnly = True
     TabOrder = 14
-    Text = 'Edit11'
-  end
-  object Edit12: TEdit
-    Left = 536
-    Height = 24
-    Top = 237
-    Width = 89
-    Alignment = taRightJustify
-    ReadOnly = True
-    TabOrder = 15
     Text = 'Edit12'
   end
   object Label21: TLabel
     Left = 632
     Height = 14
-    Top = 180
+    Top = 149
     Width = 33
     Caption = 'bytes'
     ParentColor = False
@@ -287,7 +280,7 @@ object DatabaseProperties: TDatabaseProperties
   object Label22: TLabel
     Left = 632
     Height = 14
-    Top = 213
+    Top = 182
     Width = 33
     Caption = 'bytes'
     ParentColor = False
@@ -298,22 +291,24 @@ object DatabaseProperties: TDatabaseProperties
     Top = 407
     Width = 239
     Caption = 'Space Reserved for Backup Records'
-    TabOrder = 16
+    OnChange = NoReserveChange
+    TabOrder = 15
   end
   object Edit13: TEdit
-    Left = 536
+    Left = 533
     Height = 24
-    Top = 268
+    Top = 311
     Width = 89
     Alignment = taRightJustify
     NumbersOnly = True
-    TabOrder = 17
+    OnEditingDone = Edit13EditingDone
+    TabOrder = 16
     Text = 'Edit13'
   end
   object Label16: TLabel
-    Left = 457
+    Left = 453
     Height = 14
-    Top = 274
+    Top = 317
     Width = 75
     Caption = 'Linger Delay'
     ParentColor = False
@@ -321,88 +316,82 @@ object DatabaseProperties: TDatabaseProperties
   object Label17: TLabel
     Left = 632
     Height = 14
-    Top = 274
+    Top = 317
     Width = 49
     Caption = 'seconds'
     ParentColor = False
   end
   object SecDatabase: TDBEdit
-    Left = 120
+    Left = 121
     Height = 24
-    Top = 272
+    Top = 240
     Width = 266
     DataField = 'MON$SEC_DATABASE'
     DataSource = DatabaseSource
+    ReadOnly = True
     CharCase = ecNormal
     MaxLength = 0
-    TabOrder = 18
+    TabOrder = 17
   end
   object Label18: TLabel
-    Left = 23
+    Left = 24
     Height = 14
-    Top = 276
+    Top = 244
     Width = 86
     Caption = 'Sec. Database'
     ParentColor = False
   end
   object Label23: TLabel
-    Left = 432
+    Left = 430
     Height = 14
-    Top = 312
+    Top = 245
     Width = 100
     Caption = 'Date DB Created'
     ParentColor = False
   end
   object DBDateEdit1: TDBDateEdit
-    Left = 534
+    Left = 533
     Height = 24
-    Top = 307
-    Width = 127
+    Top = 237
+    Width = 116
     CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
     ReadOnly = True
     DateOrder = doNone
     ButtonWidth = 23
     NumGlyphs = 1
     MaxLength = 0
-    TabOrder = 19
+    TabOrder = 18
     Text = 'DBDateEdit1'
     DataField = 'MON$CREATION_DATE'
     DataSource = DatabaseSource
   end
   object DBEdit3: TDBEdit
-    Left = 120
+    Left = 121
     Height = 24
-    Top = 240
+    Top = 208
     Width = 266
     DataField = 'MON$OWNER'
     DataSource = DatabaseSource
+    ReadOnly = True
     CharCase = ecNormal
     MaxLength = 0
-    TabOrder = 20
+    TabOrder = 19
   end
   object Label24: TLabel
-    Left = 50
+    Left = 51
     Height = 14
-    Top = 243
+    Top = 211
     Width = 60
     Caption = 'DB Owner'
     ParentColor = False
   end
   object Label2: TLabel
-    Left = 14
+    Left = 15
     Height = 14
     Top = 52
     Width = 95
     Caption = 'Database Name'
     ParentColor = False
-  end
-  object Edit1: TEdit
-    Left = 120
-    Height = 24
-    Top = 48
-    Width = 263
-    TabOrder = 21
-    Text = 'Edit1'
   end
   object Button1: TButton
     Left = 728
@@ -410,61 +399,91 @@ object DatabaseProperties: TDatabaseProperties
     Top = 6
     Width = 75
     Caption = 'Close'
-    Default = True
     ModalResult = 11
-    TabOrder = 22
+    TabOrder = 20
   end
   object Label3: TLabel
-    Left = 464
+    Left = 460
     Height = 14
-    Top = 119
+    Top = 88
     Width = 68
     Caption = 'Pages Used'
     ParentColor = False
   end
   object Label10: TLabel
-    Left = 442
+    Left = 438
     Height = 14
-    Top = 150
+    Top = 119
     Width = 90
     Caption = 'Pages Available'
     ParentColor = False
   end
   object Edit3: TEdit
-    Left = 536
+    Left = 533
+    Height = 24
+    Top = 82
+    Width = 89
+    Alignment = taRightJustify
+    ReadOnly = True
+    TabOrder = 21
+    Text = 'Edit3'
+  end
+  object Edit4: TEdit
+    Left = 533
     Height = 24
     Top = 113
     Width = 89
     Alignment = taRightJustify
     ReadOnly = True
-    TabOrder = 23
-    Text = 'Edit3'
-  end
-  object Edit4: TEdit
-    Left = 536
-    Height = 24
-    Top = 144
-    Width = 89
-    Alignment = taRightJustify
-    ReadOnly = True
-    TabOrder = 24
+    TabOrder = 22
     Text = 'Edit4'
+  end
+  object DBEdit2: TDBEdit
+    Left = 120
+    Height = 24
+    Top = 47
+    Width = 264
+    DataField = 'MON$DATABASE_NAME'
+    DataSource = DatabaseSource
+    ReadOnly = True
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 23
+  end
+  object DBCharacterSet: TIBLookupComboEditBox
+    Left = 121
+    Height = 27
+    Top = 272
+    Width = 266
+    DataField = 'RDB$CHARACTER_SET_NAME'
+    DataSource = DBCharSetSource
+    KeyField = 'RDB$CHARACTER_SET_NAME'
+    ListField = 'RDB$CHARACTER_SET_NAME'
+    ListFieldIndex = 0
+    ListSource = CharSetSource
+    LookupCache = False
+    OnEditingDone = DBCharacterSetEditingDone
+    TabOrder = 24
+    AutoInsert = False
+    AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+    ItemHeight = 0
   end
   object IBDatabaseInfo: TIBDatabaseInfo
     Database = IBDatabase1
-    left = 376
-    top = 312
+    left = 744
+    top = 327
   end
   object DatabaseSource: TDataSource
     DataSet = DatabaseQuery
-    left = 48
-    top = 304
+    left = 640
+    top = 392
   end
   object DatabaseQuery: TIBQuery
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = IBTransaction1
     AfterOpen = DatabaseQueryAfterOpen
+    BeforeClose = DatabaseQueryBeforeClose
     BeforeOpen = DatabaseQueryBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
@@ -474,37 +493,41 @@ object DatabaseProperties: TDatabaseProperties
       'SELECT * FROM RDB$DATABASE, MON$DATABASE'
     )
     Params = <>
-    DataSetCloseAction = dcDiscardChanges
-    left = 48
-    top = 352
+    DataSetCloseAction = dcSaveChanges
+    left = 744
+    top = 392
   end
-  object SetLinger: TIBSQL
+  object ExecDDL: TIBSQL
     Database = IBDatabase1
     GenerateParamNames = False
     UniqueParamNames = False
     ParamCheck = True
     SQL.Strings = (
-      'ALTER DATABASE SET LINGER TO :DELAY'
+      ''
     )
     Transaction = IBTransaction1
-    left = 400
-    top = 360
+    left = 744
+    top = 272
   end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
+    AfterDisconnect = IBDatabase1AfterDisconnect
+    BeforeDisconnect = IBDatabase1BeforeDisconnect
     OnLogin = IBDatabase1Login
     CreateIfNotExists = False
     AllowStreamedConnected = False
+    DatabaseName = 'employee'
     Params.Strings = (
       'lc_ctype=UTF8'
+      'user_name=SYSDBA'
     )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
     UseDefaultSystemCodePage = False
-    left = 504
-    top = 360
+    left = 744
+    top = 152
   end
   object IBTransaction1: TIBTransaction
     Active = False
@@ -514,19 +537,79 @@ object DatabaseProperties: TDatabaseProperties
       'rec_version'
       'nowait'
     )
-    left = 592
-    top = 361
+    AfterTransactionEnd = IBTransaction1AfterTransactionEnd
+    left = 744
+    top = 208
   end
   object IBConfigService1: TIBConfigService
     LoginPrompt = False
     TraceFlags = []
     left = 747
-    top = 160
+    top = 96
   end
   object IBStatisticalService1: TIBStatisticalService
     TraceFlags = []
     Options = [HeaderPages]
     left = 747
-    top = 107
+    top = 43
+  end
+  object CharSetLookup: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select trim(A.RDB$CHARACTER_SET_NAME) as RDB$CHARACTER_SET_NAME'
+      ' From'
+      'RDB$CHARACTER_SETS A order by 1'
+      ''
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 48
+    top = 384
+  end
+  object CharSetSource: TDataSource
+    DataSet = CharSetLookup
+    left = 42
+    top = 327
+  end
+  object IBUpdate1: TIBUpdate
+    RefreshSQL.Strings = (
+      'Select Trim(A.RDB$CHARACTER_SET_NAME)   as RDB$CHARACTER_SET_NAME'
+      ' From RDB$DATABASE A'
+    )
+    OnApplyUpdates = IBUpdate1ApplyUpdates
+    left = 544
+    top = 392
+  end
+  object DBCharSet: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AfterClose = DBCharSetAfterClose
+    AfterPost = DBCharSetAfterPost
+    BeforeOpen = DBCharSetBeforeOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select Trim(A.RDB$CHARACTER_SET_NAME)   as RDB$CHARACTER_SET_NAME'
+      ' From RDB$DATABASE A'
+    )
+    Params = <>
+    UpdateObject = IBUpdate1
+    DataSetCloseAction = dcSaveChanges
+    left = 472
+    top = 384
+  end
+  object DBCharSetSource: TDataSource
+    DataSet = DBCharSet
+    left = 392
+    top = 400
   end
 end

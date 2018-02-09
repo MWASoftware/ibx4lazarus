@@ -173,6 +173,9 @@ IBX Change Log  version                                                  (2.2-0)
     be set to a non-standard port number when necessary. If zero then the default
     port number is used.
 
+43: TIBLookupComboeditBox: Ensure dataset updated when change selected with the keyboard
+    and not just the mouse.
+
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000
 

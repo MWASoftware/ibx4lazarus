@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   DbCtrls, Buttons, DBExtCtrls, ActnList, ExtCtrls, db, IBDatabaseInfo, IBQuery,
-  IBSQL, IBDatabase, IBServices, IB;
+  IBSQL, IBDatabase, IBServices, IBUpdate, IBLookupComboEditBox, IB;
 
 type
 
@@ -20,11 +20,12 @@ type
     DatabaseOnline: TCheckBox;
     DatabaseQuery: TIBQuery;
     DatabaseSource: TDataSource;
+    CharSetSource: TDataSource;
+    DBCharSetSource: TDataSource;
     DBDateEdit1: TDBDateEdit;
-    DBEdit1: TDBEdit;
+    DBEdit2: TDBEdit;
     DBEdit3: TDBEdit;
     DBIsReadOnly: TCheckBox;
-    Edit1: TEdit;
     Edit10: TEdit;
     Edit11: TEdit;
     Edit12: TEdit;
@@ -39,8 +40,12 @@ type
     IBConfigService1: TIBConfigService;
     IBDatabase1: TIBDatabase;
     IBDatabaseInfo: TIBDatabaseInfo;
+    CharSetLookup: TIBQuery;
+    DBCharSet: TIBQuery;
+    DBCharacterSet: TIBLookupComboEditBox;
     IBStatisticalService1: TIBStatisticalService;
     IBTransaction1: TIBTransaction;
+    IBUpdate1: TIBUpdate;
     IsShadowChk: TCheckBox;
     Label1: TLabel;
     Label10: TLabel;
@@ -69,23 +74,43 @@ type
     NoReserve: TCheckBox;
     PageSize: TEdit;
     SecDatabase: TDBEdit;
-    SetLinger: TIBSQL;
+    ExecDDL: TIBSQL;
     SweepInterval: TEdit;
     SyncWrites: TCheckBox;
+    procedure DatabaseOnlineChange(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
+    procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
     procedure DatabaseQueryBeforeOpen(DataSet: TDataSet);
-    procedure FormShow(Sender: TObject);
+    procedure DBCharSetAfterClose(DataSet: TDataSet);
+    procedure DBCharSetAfterPost(DataSet: TDataSet);
+    procedure DBCharSetBeforeOpen(DataSet: TDataSet);
+    procedure DBIsReadOnlyChange(Sender: TObject);
+    procedure Edit13EditingDone(Sender: TObject);
     procedure IBDatabase1AfterConnect(Sender: TObject);
+    procedure IBDatabase1AfterDisconnect(Sender: TObject);
+    procedure IBDatabase1BeforeDisconnect(Sender: TObject);
     procedure IBDatabase1Login(Database: TIBDatabase; LoginParams: TStrings);
+    procedure IBTransaction1AfterTransactionEnd(Sender: TObject);
+    procedure IBUpdate1ApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
+      Params: ISQLParams);
+    procedure IsShadowChkChange(Sender: TObject);
+    procedure NoReserveChange(Sender: TObject);
+    procedure DBCharacterSetEditingDone(Sender: TObject);
+    procedure SweepIntervalEditingDone(Sender: TObject);
+    procedure SyncWritesChange(Sender: TObject);
   private
     FDatabaseOnline: boolean;
     FShadowDatabase: boolean;
     FLoading: boolean;
+    FDisconnecting: boolean;
+    FDBPassword: string;
     procedure GetDBFlags;
     procedure LoadData;
     procedure Connect;
+    procedure DoCommit(Data: PtrInt);
   public
     function ShowModal(ActiveService: TIBCustomService; DBName: string; aPassword: string): TModalResult;
+    function IsDatabaseOnline: boolean;
   end;
 
 var
@@ -95,16 +120,28 @@ implementation
 
 {$R *.lfm}
 
-uses IBUtils, MainFormUnit, DBLoginDlgUnit, FBMessages, IBErrorCodes;
+uses IBUtils, MainFormUnit, DBLoginDlgUnit, FBMessages, IBErrorCodes,
+  BringOnlineDlgUnit, ShutdownRegDlgUnit, ShutdownDatabaseDlgUnit;
 
 { TDatabaseProperties }
 
 procedure TDatabaseProperties.IBDatabase1AfterConnect(Sender: TObject);
 begin
+  IBDatabase1.LoginPrompt := false;
   IBTransaction1.Active := true;
   with IBDatabaseInfo do
     if (ODSMajorVersion > 11) or ((ODSMajorVersion = 11) and (ODSMinorVersion >= 1)) then
       DataBaseQuery.Active := true;
+end;
+
+procedure TDatabaseProperties.IBDatabase1AfterDisconnect(Sender: TObject);
+begin
+  FDisconnecting := false;
+end;
+
+procedure TDatabaseProperties.IBDatabase1BeforeDisconnect(Sender: TObject);
+begin
+  FDisconnecting := true;
 end;
 
 procedure TDatabaseProperties.IBDatabase1Login(Database: TIBDatabase;
@@ -118,6 +155,7 @@ begin
   aPassword := '';
   if DBLoginDlg.ShowModal(aDatabaseName, aUserName, aPassword) = mrOK then
   begin
+    FDBPassword := aPassword;
     Database.DatabaseName := aDatabaseName;
     LoginParams.Values['user_name'] := aUserName;
     LoginParams.Values['password'] := aPassword;
@@ -130,9 +168,69 @@ begin
     IBError(ibxeOperationCancelled, [nil]);
 end;
 
+procedure TDatabaseProperties.IBTransaction1AfterTransactionEnd(Sender: TObject
+  );
+begin
+  if not FDisconnecting then
+  begin
+    IBTransaction1.Active := true;
+    DatabaseQuery.Active := true;
+  end;
+end;
+
+procedure TDatabaseProperties.IBUpdate1ApplyUpdates(Sender: TObject;
+  UpdateKind: TUpdateKind; Params: ISQLParams);
+begin
+  if UpdateKind = ukModify then
+  begin
+    ExecDDL.SQL.Text := 'ALTER DATABASE SET DEFAULT CHARACTER SET ' +
+                Params.ByName('RDB$CHARACTER_SET_NAME').AsString;
+    ExecDDL.ExecQuery;
+  end;
+end;
+
+procedure TDatabaseProperties.IsShadowChkChange(Sender: TObject);
+begin
+  if FLoading then Exit;
+  IBConfigService1.ActivateShadow;
+  while IBConfigService1.IsServiceRunning do;
+  MessageDlg('Shadow Database activated. You should now rename the file or change the database alias name to point to the shadow',
+    mtInformation,[mbOK],0);
+  IsShadowChk.Enabled := false;
+end;
+
+procedure TDatabaseProperties.NoReserveChange(Sender: TObject);
+begin
+  if FLoading then Exit;
+  IBConfigService1.SetReserveSpace(NoReserve.Checked);
+  while IBConfigService1.IsServiceRunning do;
+end;
+
+procedure TDatabaseProperties.DBCharacterSetEditingDone(Sender: TObject);
+begin
+  if DBCharSet.State = dsEdit then
+    DBCharSet.Post;
+end;
+
+procedure TDatabaseProperties.SweepIntervalEditingDone(Sender: TObject);
+begin
+  if FLoading then Exit;
+  IBConfigService1.SetSweepInterval(StrToInt(SweepInterval.Text));
+  while IBConfigService1.IsServiceRunning do;
+end;
+
+procedure TDatabaseProperties.SyncWritesChange(Sender: TObject);
+begin
+  if FLoading then Exit;
+  IBConfigService1.SetAsyncMode(not SyncWrites.Checked);
+  while IBConfigService1.IsServiceRunning do;
+end;
+
 procedure TDatabaseProperties.GetDBFlags;
 var Line: string;
 begin
+  if not IBStatisticalService1.Active then
+    IBStatisticalService1.Assign(IBConfigService1);
   FDatabaseOnline := true;
   FShadowDatabase := false;
   with IBStatisticalService1 do
@@ -146,8 +244,7 @@ begin
          if (Pos('Attributes',Line) <> 0) and ((Pos('database shutdown',Line) <> 0)
                    or (Pos('multi-user maintenance',Line) <> 0)) then
            FDatabaseOnline := false;
-         if (Pos('Attributes',Line) <> 0) and ((Pos('database shutdown',Line) <> 0)
-                   or (Pos('multi-user maintenance',Line) <> 0)) then
+         if (Pos('Attributes',Line) <> 0) and (Pos('shadow',Line) <> 0) then
            FShadowDatabase := true;
 
       end
@@ -162,12 +259,11 @@ begin
   if FLoading then Exit;
   FLoading := true;
   try
-    Edit1.Text :=  IBDatabase1.DatabaseName;
     Edit2.Text :=  Format('%d.%d',[IBDatabaseInfo.ODSMajorVersion,IBDatabaseInfo.ODSMinorVersion]);
     Edit5.Text :=  IBDatabaseInfo.Version;
     Edit6.Text :=  IntToStr(IBDatabaseInfo.DBSQLDialect);
     Edit7.Text := IBConfigService1.ServerName;
-    Edit8.Text := IBDatabaseInfo.DBFileName;
+    Edit8.Text := IBDatabase1.DatabaseName;
     Edit10.Text := IntToStr(IBDatabaseInfo.CurrentMemory);
     Edit11.Text := IntToStr(IBDatabaseInfo.MaxMemory);
     Edit12.Text := IntToStr(IBDatabaseInfo.NumBuffers);
@@ -182,14 +278,16 @@ begin
     GetDBFlags;
     DatabaseOnline.Checked := FDatabaseOnline;
     IsShadowChk.Checked := FShadowDatabase;
+    IsShadowChk.Enabled := FShadowDatabase;
   finally
     FLoading := false;
   end;
 end;
 
 procedure TDatabaseProperties.Connect;
-var index: integer;
 begin
+  if FDBPassword <> '' then
+    IBDatabase1.Params.Values['password'] := FDBPassword;  {needed for reconnect}
   try
     IBDatabase1.Connected := true;
   except on E:EIBInterBaseError do
@@ -198,9 +296,6 @@ begin
       IBConfigService1.Active := false;
       IBStatisticalService1.Active := false;
       IBDatabase1.LoginPrompt := true;
-      index := IBDatabase1.Params.IndexOfName('password');
-      if index <> -1 then
-        IBDatabase1.Params.Delete(index);
       repeat
         try
           IBDatabase1.Connected := true;
@@ -211,30 +306,100 @@ begin
             Exit
           end;
         On E:Exception do
-         MessageDlg(E.Message,mtError,[mbOK],0);
+          begin
+            MessageDlg(E.Message,mtError,[mbOK],0);
+            FDBPassword := '';
+          end;
         end;
       until IBDatabase1.Connected;
     end
     else
       raise;
   end;
+  IBDatabase1.LoginPrompt := false;
   IBConfigService1.Active := true;
-  IBStatisticalService1.Assign(IBConfigService1);
+  LoadData;
 end;
 
-procedure TDatabaseProperties.FormShow(Sender: TObject);
+procedure TDatabaseProperties.DoCommit(Data: PtrInt);
 begin
-  LoadData;
+  if IBTransaction1.Active then
+    IBTransaction1.Commit;
 end;
 
 procedure TDatabaseProperties.DatabaseQueryBeforeOpen(DataSet: TDataSet);
 begin
   SecDatabase.Enabled := IBDatabaseInfo.ODSMajorVersion >= 12;
+  DBCharacterSet.ReadOnly := IBDatabaseInfo.ODSMajorVersion < 12;
+end;
+
+procedure TDatabaseProperties.DBCharSetAfterClose(DataSet: TDataSet);
+begin
+  CharSetLookup.Active := false;
+end;
+
+procedure TDatabaseProperties.DBCharSetAfterPost(DataSet: TDataSet);
+begin
+  Application.QueueAsyncCall(@DoCommit,0);
+end;
+
+procedure TDatabaseProperties.DBCharSetBeforeOpen(DataSet: TDataSet);
+begin
+  CharSetLookup.Active := true;
+end;
+
+procedure TDatabaseProperties.DBIsReadOnlyChange(Sender: TObject);
+begin
+  if FLoading then Exit;
+  IBDatabase1.Connected := false;
+  try
+    try
+      IBConfigService1.SetReadOnly(DBIsReadOnly.Checked);
+      while IBConfigService1.IsServiceRunning do;
+    except on E:Exception do
+     begin
+       MessageDlg(E.message,mtError,[mbOK],0);
+       FLoading := true;
+       try
+         DBIsReadOnly.Checked := not DBIsReadOnly.Checked;
+       finally
+         FLoading := false;
+       end;
+     end;
+    end
+  finally
+    Connect;
+  end;
+end;
+
+procedure TDatabaseProperties.Edit13EditingDone(Sender: TObject);
+begin
+  if (StrToInt(Edit13.Text) =  DatabaseQuery.FieldByName('RDB$LINGER').AsInteger) then Exit;
+
+  if (Edit13.Text = '') or (StrToInt(Edit13.Text) = 0) then
+  begin
+    if MessageDlg('Turn off Linger Permanently?',mtConfirmation,[mbYes,mbNo],0) = mrNo then
+    begin
+      IBConfigService1.SetNoLinger;
+      DatabaseQueryAfterOpen(DatabaseQuery);
+      Exit;
+    end;
+    ExecDDL.SQL.Text := 'ALTER DATABASE DROP LINGER'
+  end
+  else
+    ExecDDL.SQL.Text := 'ALTER DATABASE SET LINGER TO ' + Edit13.Text;
+  with ExecDDL do
+  begin
+    Transaction.Active := true;
+    ExecQuery;
+    Transaction.Commit;
+  end;
 end;
 
 procedure TDatabaseProperties.DatabaseQueryAfterOpen(DataSet: TDataSet);
 var Linger: TField;
 begin
+  DBCharSet.Active :=true;
    Linger := DataSet.FieldByName('RDB$LINGER');
    if Linger <> nil then
    begin
@@ -248,16 +413,47 @@ begin
    Edit13.ReadOnly := (Linger = nil) or (IBDatabaseInfo.ODSMajorVersion < 12);
 end;
 
+procedure TDatabaseProperties.DatabaseQueryBeforeClose(DataSet: TDataSet);
+begin
+  DBCharSet.Active := false;
+end;
+
+procedure TDatabaseProperties.DatabaseOnlineChange(Sender: TObject);
+var ShutDownMode: TShutdownMode;
+    Delay: integer;
+begin
+   if FLoading then Exit;
+   if DatabaseOnline.Checked then
+   begin
+     BringOnlineDlg.ShowModal(IBConfigService1);
+     IBTransaction1.Commit; {refresh}
+   end
+   else
+   begin
+     ShutDownMode := Forced;
+     if ShutdownReqDlg.ShowModal(IBConfigService1.DatabaseName,ShutDownMode,Delay) = mrOK then
+     begin
+       IBDatabase1.Connected := false;
+       ShutdownDatabaseDlg.Shutdown(IBConfigService1,ShutDownMode,Delay);
+       Connect;
+     end
+     else
+       LoadData;
+   end;
+end;
+
 function TDatabaseProperties.ShowModal(ActiveService: TIBCustomService;
   DBName: string; aPassword: string): TModalResult;
 var index: integer;
 begin
+  FDBPassword := '';
   IBConfigService1.Assign(ActiveService);
   IBConfigService1.DatabaseName := DBName;
   IBStatisticalService1.DatabaseName := DBName;
 
   with IBConfigService1 do
   begin
+    IBDatabase1.Params.Clear;
     IBDatabase1.DatabaseName := MakeConnectString(ServerName,DBName,Protocol,PortNo);
     index := Params.IndexOfName('user_name');
     if index <> -1 then
@@ -283,6 +479,12 @@ begin
   end;
   Result := inherited ShowModal;
   IBDatabase1.Connected := false;
+end;
+
+function TDatabaseProperties.IsDatabaseOnline: boolean;
+begin
+  GetDBFlags;
+  Result := FDatabaseOnline;
 end;
 
 end.

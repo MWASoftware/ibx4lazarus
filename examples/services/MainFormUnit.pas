@@ -300,10 +300,10 @@ begin
   with BackupDlg do
   begin
     Memo1.Lines.Add('Starting Backup');
-    IBBackupService1.ServiceStart;
+    if IBBackupService1.BackupFileLocation = flClientSide then
+      bakfile := TFileStream.Create(IBBackupService1.BackupFile[0],fmCreate);
     try
-      if IBBackupService1.BackupFileLocation = flClientSide then
-        bakfile := TFileStream.Create(IBBackupService1.BackupFile[0],fmCreate);
+      IBBackupService1.ServiceStart;
       while not IBBackupService1.Eof do
       begin
         case IBBackupService1.BackupFileLocation of
@@ -342,11 +342,11 @@ begin
   bakfile := nil;
   with RestoreDlg do
   begin
-    IBRestoreService1.ServiceStart;
-    Memo1.Lines.Add('Restore Started');
     if IBRestoreService1.BackupFileLocation = flClientSide then
       bakfile := TFileStream.Create(IBRestoreService1.BackupFile[0],fmOpenRead);
+    Memo1.Lines.Add('Restore Started');
     try
+      IBRestoreService1.ServiceStart;
       while not IBRestoreService1.Eof do
       begin
         case IBRestoreService1.BackupFileLocation of

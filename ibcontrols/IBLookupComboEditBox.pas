@@ -96,6 +96,7 @@ type
     FInCheckAndInsert: boolean;
     FLastKeyValue: variant;
     FCurText: string;
+    FModified: boolean;
     procedure DoActiveChanged(Data: PtrInt);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
     function GetListSource: TDataSource;
@@ -360,6 +361,7 @@ begin
     finally
       FUpdating := false
     end;
+    FModified := true;
   end;
 end;
 
@@ -583,7 +585,10 @@ begin
     FForceAutoComplete := false;
   end;
   CheckAndInsert;
+  if FModified then
+    Change; {ensure Update}
   inherited EditingDone;
+  FModified := false;
 end;
 
 end.
