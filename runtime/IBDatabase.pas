@@ -183,7 +183,6 @@ type
     FAttachment: IAttachment;
     FCreateDatabase: boolean;
     FCreateIfNotExists: boolean;
-    FDPB: IDPB;
     FAllowStreamedConnected: boolean;
     FHiddenPassword: string;
     FOnCreateDatabase: TNotifyEvent;
@@ -510,7 +509,6 @@ begin
   FDBParamsChanged := True;
   TStringList(FDBParams).OnChange := DBParamsChange;
   TStringList(FDBParams).OnChanging := DBParamsChanging;
-  FDPB := nil;
   FUserNames := nil;
   FInternalTransaction := TIBTransaction.Create(self);
   FInternalTransaction.DefaultDatabase := Self;
@@ -537,7 +535,6 @@ begin
   RemoveSQLObjects;
   RemoveTransactions;
   FInternalTransaction.Free;
-  FDPB := nil;
   FDBParams.Free;
   FSQLObjects.Free;
   FUserNames.Free;
@@ -775,7 +772,6 @@ begin
 
   FAttachment.Disconnect(Force);
   FAttachment := nil;
-  FDPB := nil;
 
   if not (csDesigning in ComponentState) then
     MonitorHook.DBDisconnect(Self);
@@ -981,7 +977,10 @@ var
   Status: IStatus;
   CharSetID: integer;
   CharSetName: AnsiString;
+  DPB: IDPB;
+  PW: IDPBItem;
 begin
+  DPB := nil;
   CheckInactive;
   CheckDatabaseName;
   if (not LoginPrompt) and (FHiddenPassword <> '') then
@@ -1012,36 +1011,36 @@ begin
 
    repeat
      { Generate a new DPB if necessary }
-     if (FDPB = nil) or FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text) then
+     if (DPB = nil) or FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text) then
      begin
        FDBParamsChanged := False;
        if (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
-         FDPB := GenerateDPB(TempDBParams)
+         DPB := GenerateDPB(TempDBParams)
        else
        begin
           TempDBParams.Values['password'] := FHiddenPassword;
-          FDPB := GenerateDPB(TempDBParams);
+          DPB := GenerateDPB(TempDBParams);
        end;
      end;
 
      if FCreateDatabase then
      begin
        FCreateDatabase := false;
-       FDPB.Add(isc_dpb_set_db_SQL_dialect).AsByte := SQLDialect; {create with this SQL Dialect}
-       FAttachment := FirebirdAPI.CreateDatabase(aDBName,FDPB, false);
+       DPB.Add(isc_dpb_set_db_SQL_dialect).AsByte := SQLDialect; {create with this SQL Dialect}
+       FAttachment := FirebirdAPI.CreateDatabase(aDBName,DPB, false);
        if FAttachment = nil then
-         FDPB := nil;
+         DPB := nil;
        if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
          OnCreateDatabase(self);
      end
      else
-       FAttachment := FirebirdAPI.OpenDatabase(aDBName,FDPB,false);
+       FAttachment := FirebirdAPI.OpenDatabase(aDBName,DPB,false);
 
      if FAttachment = nil then
      begin
        Status := FirebirdAPI.GetStatus;
        {$IFDEF UNIX}
-       if Pos(':',aDBName) = 0 then
+       if GetProtocol(aDBName) = Local then
        begin
            if ((Status.GetSQLCode = -901) and (Status.GetIBErrorCode = isc_random)) {Access permissions on firebird temp}
               or
@@ -1089,6 +1088,8 @@ begin
   finally
    TempDBParams.Free;
   end;
+  PW := Attachment.getDPB.Find(isc_dpb_password);
+  if PW <> nil then PW.AsString := 'xxxxxxxx'; {Hide password}
 
   if not (csDesigning in ComponentState) then
     FDBName := aDBName; {Synchronise at run time}

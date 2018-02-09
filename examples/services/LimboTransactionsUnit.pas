@@ -44,7 +44,7 @@ implementation
 
 {$R *.lfm}
 
-uses Unit1;
+uses MainFormUnit;
 
 { TLimboTransactionsForm }
 

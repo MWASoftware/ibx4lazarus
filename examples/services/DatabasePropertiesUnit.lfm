@@ -1,7 +1,7 @@
 object DatabaseProperties: TDatabaseProperties
-  Left = 697
+  Left = 964
   Height = 457
-  Top = 427
+  Top = 504
   Width = 814
   BorderStyle = bsDialog
   Caption = 'Database Properties'
@@ -84,7 +84,7 @@ object DatabaseProperties: TDatabaseProperties
     TabOrder = 4
   end
   object Label7: TLabel
-    Left = 420
+    Left = 404
     Height = 14
     Top = 26
     Width = 128
@@ -93,18 +93,18 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object SweepInterval: TEdit
-    Left = 552
+    Left = 536
     Height = 24
     Top = 20
-    Width = 65
+    Width = 89
     Alignment = taRightJustify
     TabOrder = 5
     Text = 'SweepInterval'
   end
   object Label8: TLabel
-    Left = 618
+    Left = 632
     Height = 14
-    Top = 26
+    Top = 24
     Width = 74
     Caption = 'Transactions'
     ParentColor = False
@@ -159,7 +159,7 @@ object DatabaseProperties: TDatabaseProperties
     TabOrder = 9
   end
   object Label11: TLabel
-    Left = 455
+    Left = 439
     Height = 14
     Top = 57
     Width = 93
@@ -167,17 +167,17 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object AllocatedPages: TEdit
-    Left = 552
+    Left = 536
     Height = 24
     Top = 51
-    Width = 65
+    Width = 89
     Alignment = taRightJustify
     ReadOnly = True
     TabOrder = 10
     Text = 'AllocatedPages'
   end
   object Label19: TLabel
-    Left = 492
+    Left = 476
     Height = 14
     Top = 88
     Width = 56
@@ -185,7 +185,7 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object Label20: TLabel
-    Left = 630
+    Left = 632
     Height = 14
     Top = 92
     Width = 33
@@ -193,10 +193,10 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object PageSize: TEdit
-    Left = 552
+    Left = 536
     Height = 24
     Top = 82
-    Width = 65
+    Width = 89
     Alignment = taRightJustify
     ReadOnly = True
     TabOrder = 11
@@ -223,7 +223,7 @@ object DatabaseProperties: TDatabaseProperties
     TabOrder = 12
   end
   object Label12: TLabel
-    Left = 450
+    Left = 434
     Height = 14
     Top = 181
     Width = 98
@@ -231,7 +231,7 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object Label14: TLabel
-    Left = 472
+    Left = 456
     Height = 14
     Top = 212
     Width = 76
@@ -239,7 +239,7 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object Label15: TLabel
-    Left = 467
+    Left = 451
     Height = 14
     Top = 243
     Width = 81
@@ -247,34 +247,37 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object Edit10: TEdit
-    Left = 552
+    Left = 536
     Height = 24
     Top = 175
-    Width = 65
+    Width = 89
     Alignment = taRightJustify
+    ReadOnly = True
     TabOrder = 13
     Text = 'Edit10'
   end
   object Edit11: TEdit
-    Left = 552
+    Left = 536
     Height = 24
     Top = 206
-    Width = 65
+    Width = 89
     Alignment = taRightJustify
+    ReadOnly = True
     TabOrder = 14
     Text = 'Edit11'
   end
   object Edit12: TEdit
-    Left = 552
+    Left = 536
     Height = 24
     Top = 237
-    Width = 65
+    Width = 89
     Alignment = taRightJustify
+    ReadOnly = True
     TabOrder = 15
     Text = 'Edit12'
   end
   object Label21: TLabel
-    Left = 630
+    Left = 632
     Height = 14
     Top = 180
     Width = 33
@@ -282,7 +285,7 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object Label22: TLabel
-    Left = 630
+    Left = 632
     Height = 14
     Top = 213
     Width = 33
@@ -298,17 +301,17 @@ object DatabaseProperties: TDatabaseProperties
     TabOrder = 16
   end
   object Edit13: TEdit
-    Left = 552
+    Left = 536
     Height = 24
     Top = 268
-    Width = 65
+    Width = 89
     Alignment = taRightJustify
     NumbersOnly = True
     TabOrder = 17
     Text = 'Edit13'
   end
   object Label16: TLabel
-    Left = 473
+    Left = 457
     Height = 14
     Top = 274
     Width = 75
@@ -316,7 +319,7 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object Label17: TLabel
-    Left = 633
+    Left = 632
     Height = 14
     Top = 274
     Width = 49
@@ -343,7 +346,7 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object Label23: TLabel
-    Left = 448
+    Left = 432
     Height = 14
     Top = 312
     Width = 100
@@ -351,7 +354,7 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object DBDateEdit1: TDBDateEdit
-    Left = 550
+    Left = 534
     Height = 24
     Top = 307
     Width = 127
@@ -406,23 +409,13 @@ object DatabaseProperties: TDatabaseProperties
     Height = 28
     Top = 6
     Width = 75
-    Caption = 'OK'
+    Caption = 'Close'
     Default = True
-    ModalResult = 1
+    ModalResult = 11
     TabOrder = 22
   end
-  object Button2: TButton
-    Left = 730
-    Height = 28
-    Top = 41
-    Width = 75
-    Cancel = True
-    Caption = 'Cancel'
-    ModalResult = 2
-    TabOrder = 23
-  end
   object Label3: TLabel
-    Left = 480
+    Left = 464
     Height = 14
     Top = 119
     Width = 68
@@ -430,7 +423,7 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object Label10: TLabel
-    Left = 458
+    Left = 442
     Height = 14
     Top = 150
     Width = 90
@@ -438,28 +431,28 @@ object DatabaseProperties: TDatabaseProperties
     ParentColor = False
   end
   object Edit3: TEdit
-    Left = 552
+    Left = 536
     Height = 24
     Top = 113
-    Width = 63
+    Width = 89
     Alignment = taRightJustify
     ReadOnly = True
-    TabOrder = 24
+    TabOrder = 23
     Text = 'Edit3'
   end
   object Edit4: TEdit
-    Left = 552
+    Left = 536
     Height = 24
     Top = 144
-    Width = 63
+    Width = 89
     Alignment = taRightJustify
     ReadOnly = True
-    TabOrder = 25
+    TabOrder = 24
     Text = 'Edit4'
   end
   object IBDatabaseInfo: TIBDatabaseInfo
     Database = IBDatabase1
-    left = 392
+    left = 376
     top = 312
   end
   object DatabaseSource: TDataSource
@@ -469,6 +462,8 @@ object DatabaseProperties: TDatabaseProperties
   end
   object DatabaseQuery: TIBQuery
     AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
     AfterOpen = DatabaseQueryAfterOpen
     BeforeOpen = DatabaseQueryBeforeOpen
     BufferChunks = 1000
@@ -484,20 +479,26 @@ object DatabaseProperties: TDatabaseProperties
     top = 352
   end
   object SetLinger: TIBSQL
+    Database = IBDatabase1
     GenerateParamNames = False
     UniqueParamNames = False
     ParamCheck = True
     SQL.Strings = (
       'ALTER DATABASE SET LINGER TO :DELAY'
     )
+    Transaction = IBTransaction1
     left = 400
     top = 360
   end
   object IBDatabase1: TIBDatabase
     Connected = False
     AfterConnect = IBDatabase1AfterConnect
+    OnLogin = IBDatabase1Login
     CreateIfNotExists = False
     AllowStreamedConnected = False
+    Params.Strings = (
+      'lc_ctype=UTF8'
+    )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
@@ -517,13 +518,14 @@ object DatabaseProperties: TDatabaseProperties
     top = 361
   end
   object IBConfigService1: TIBConfigService
+    LoginPrompt = False
     TraceFlags = []
     left = 747
     top = 160
   end
   object IBStatisticalService1: TIBStatisticalService
     TraceFlags = []
-    Options = []
+    Options = [HeaderPages]
     left = 747
     top = 107
   end

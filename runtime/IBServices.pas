@@ -105,7 +105,6 @@ type
   private
     FParamsChanged : Boolean;
     FPortNo: integer;
-    FSPB : ISPB;
     FSRB: ISRB;
     FSQPB: ISQPB;
     FTraceFlags: TTraceFlags;
@@ -131,7 +130,7 @@ type
     procedure SetService(AValue: IServiceManager);
     procedure SetServiceParamBySPB(const Idx: Integer;
       const Value: String);
-    function IndexOfSPBConst(action: byte): Integer;
+    function IndexOfSPBConst(action: byte; List: TStrings): Integer;
     function GetSPBConstName(action: byte): string;
     procedure ParamsChange(Sender: TObject);
     procedure ParamsChanging(Sender: TObject);
@@ -140,7 +139,7 @@ type
 
   protected
     procedure Loaded; override;
-    function Login(var aServerName: string): Boolean;
+    function Login(var aServerName: string; LOginParams: TStrings): Boolean;
     procedure CheckActive;
     procedure CheckInactive;
     procedure HandleException(Sender: TObject);
@@ -683,23 +682,29 @@ procedure TIBCustomService.Attach;
   end;
 
 var aServerName: string;
+    TempSvcParams: TStrings;
+    SPB: ISPB;
+    PW: ISPBItem;
 begin
   CheckInactive;
   CheckServerName;
 
   aServerName := FServerName;
 
-  if FLoginPrompt and not Login(aServerName) then
-    IBError(ibxeOperationCancelled, [nil]);
-
-  { Generate a new SPB if necessary }
-  if FParamsChanged then
-  begin
-    FParamsChanged := False;
-    FSPB := GenerateSPB(FParams);
+  TempSvcParams := TStringList.Create;
+  try
+    TempSvcParams.Assign(FParams);
+    if FLoginPrompt and not Login(aServerName,TempSvcParams) then
+      IBError(ibxeOperationCancelled, [nil]);
+    SPB := GenerateSPB(TempSvcParams);
+  finally
+    TempSvcParams.Free;
   end;
 
-  FService := FirebirdAPI.GetServiceManager(aServerName,FProtocol,FSPB);
+  FService := FirebirdAPI.GetServiceManager(aServerName,FProtocol,SPB);
+  PW := FService.getSPB.Find(isc_spb_password);
+  if PW <> nil then PW.AsString := 'xxxxxxxx'; {Hide password}
+
   GetServerVersionNo;
 
   if Assigned(FOnAttach) then
@@ -722,51 +727,44 @@ begin
   end;
 end;
 
-function TIBCustomService.Login(var aServerName: string): Boolean;
+function TIBCustomService.Login(var aServerName: string; LoginParams: TStrings
+  ): Boolean;
 var
   IndexOfUser, IndexOfPassword: Integer;
   Username, Password: String;
-  LoginParams: TStrings;
+  ExtLoginParams: TStrings;
 begin
   if Assigned(FOnLogin) then begin
     result := True;
-    LoginParams := TStringList.Create;
+    ExtLoginParams := TStringList.Create;
     try
-      LoginParams.Assign(Params);
-      FOnLogin(Self, LoginParams);
-      Params.Assign (LoginParams);
+      ExtLoginParams.Assign(Params);
+      FOnLogin(Self, ExtLoginParams);
+      LoginParams.Assign (ExtLoginParams);
       aServerName := ServerName;
     finally
-      LoginParams.Free;
+      ExtLoginParams.Free;
     end;
   end
   else
   if assigned(IBGUIInterface)  then
   begin
-    IndexOfUser := IndexOfSPBConst(isc_spb_user_name);
+    IndexOfUser := LoginParams.IndexOfName(GetSPBConstName(isc_spb_user_name));
     if IndexOfUser <> -1 then
-      Username := Copy(Params[IndexOfUser],
-                                         Pos('=', Params[IndexOfUser]) + 1, {mbcs ok}
-                                         Length(Params[IndexOfUser]));
-    IndexOfPassword := IndexOfSPBConst(isc_spb_password);
+      Username := LoginParams.ValueFromIndex[IndexOfUser]
+    else
+      UserName := '';
+    IndexOfPassword :=LoginParams.IndexOfName(GetSPBConstName(isc_spb_password));
     if IndexOfPassword <> -1 then
-      Password := Copy(Params[IndexOfPassword],
-                                         Pos('=', Params[IndexOfPassword]) + 1, {mbcs ok}
-                                         Length(Params[IndexOfPassword]));
+      Password := LoginParams.ValueFromIndex[IndexOfPassword]
+    else
+      Password := '';
+
     result := IBGUIInterface.ServerLoginDialog(aServerName, Username, Password);
     if result then
     begin
-      IndexOfPassword := IndexOfSPBConst(isc_spb_password);
-      if IndexOfUser = -1 then
-        Params.Add(GetSPBConstName(isc_spb_user_name) + '=' + Username)
-      else
-        Params[IndexOfUser] := GetSPBConstName(isc_spb_user_name) +
-                                 '=' + Username;
-      if IndexOfPassword = -1 then
-        Params.Add(GetSPBConstName(isc_spb_password) + '=' + Password)
-      else
-        Params[IndexOfPassword] := GetSPBConstName(isc_spb_password) +
-                                     '=' + Password;
+      LoginParams.Values[GetSPBConstName(isc_spb_user_name)] := UserName;
+      LoginParams.Values[GetSPBConstName(isc_spb_password)] := Password;
     end
   end
   else
@@ -815,7 +813,6 @@ begin
   FTraceFlags := [];
   FService := nil;
   FSRB := nil;
-  FSPB := nil;
   FServiceQueryResults := nil;
   FProtocol := Local;
   if (AOwner <> nil) and
@@ -829,7 +826,6 @@ begin
   if FService <> nil then
       Detach;
   FSRB := nil;
-  FSPB := nil;
   FParams.Free;
   FServiceQueryResults := nil;
   inherited Destroy;
@@ -891,7 +887,7 @@ var
 begin
   if (Idx > 0) and (Idx <= isc_spb_last_spb_constant) then
   begin
-    ConstIdx := IndexOfSPBConst(Idx);
+    ConstIdx := IndexOfSPBConst(Idx,Params);
     if ConstIdx = -1 then
       result := ''
     else
@@ -950,18 +946,12 @@ begin
   if csReading in ComponentState then
     FStreamedActive := Value
   else
-    if Value <> Active then
-    begin
-      if Value then
-        Attach
-      else
-        Detach;
-    end
-   else if Value then
-   begin
-     FService.Detach;
-     FService.Attach;
-   end;
+  if Value = Active then Exit;
+
+  if Value then
+    Attach
+  else
+    Detach;
 end;
 
 procedure TIBCustomService.SetParams(const Value: TStrings);
@@ -1002,7 +992,7 @@ procedure TIBCustomService.SetServiceParamBySPB(const Idx: Integer;
 var
   ConstIdx: Integer;
 begin
-  ConstIdx := IndexOfSPBConst(Idx);
+  ConstIdx := IndexOfSPBConst(Idx,Params);
   if (Value = '') then
   begin
     if ConstIdx <> -1 then
@@ -1017,7 +1007,7 @@ begin
   end;
 end;
 
-function TIBCustomService.IndexOfSPBConst(action: byte): Integer;
+function TIBCustomService.IndexOfSPBConst(action: byte; List: TStrings): Integer;
 var
   i,  pos_of_str: Integer;
   st: string;
@@ -1025,9 +1015,9 @@ begin
   result := -1;
   st := GetSPBConstName(action);
   if st <> '' then
-  for i := 0 to Params.Count - 1 do
+  for i := 0 to List.Count - 1 do
   begin
-    pos_of_str := Pos(st, Params[i]); {mbcs ok}
+    pos_of_str := Pos(st, List[i]); {mbcs ok}
     if (pos_of_str = 1) or (pos_of_str = Length(SPBPrefix) + 1) then
     begin
       result := i;
@@ -1359,7 +1349,6 @@ constructor TIBControlService.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
   FSRB := nil;
-  FSPB := nil;
 end;
 
 procedure TIBControlService.InternalServiceStart;

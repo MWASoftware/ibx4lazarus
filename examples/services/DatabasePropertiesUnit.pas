@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   DbCtrls, Buttons, DBExtCtrls, ActnList, ExtCtrls, db, IBDatabaseInfo, IBQuery,
-  IBSQL, IBDatabase, IBServices;
+  IBSQL, IBDatabase, IBServices, IB;
 
 type
 
@@ -17,7 +17,6 @@ type
     AllocatedPages: TEdit;
     Bevel1: TBevel;
     Button1: TButton;
-    Button2: TButton;
     DatabaseOnline: TCheckBox;
     DatabaseQuery: TIBQuery;
     DatabaseSource: TDataSource;
@@ -77,14 +76,16 @@ type
     procedure DatabaseQueryBeforeOpen(DataSet: TDataSet);
     procedure FormShow(Sender: TObject);
     procedure IBDatabase1AfterConnect(Sender: TObject);
+    procedure IBDatabase1Login(Database: TIBDatabase; LoginParams: TStrings);
   private
     FDatabaseOnline: boolean;
     FShadowDatabase: boolean;
     FLoading: boolean;
     procedure GetDBFlags;
     procedure LoadData;
+    procedure Connect;
   public
-    function ShowModal(ActiveService: TIBCustomServer; ServerName, DBName: string; ForceLogin: boolean): TModalResult;
+    function ShowModal(ActiveService: TIBCustomService; DBName: string; aPassword: string): TModalResult;
   end;
 
 var
@@ -94,23 +95,48 @@ implementation
 
 {$R *.lfm}
 
-uses IBUtils;
+uses IBUtils, MainFormUnit, DBLoginDlgUnit, FBMessages, IBErrorCodes;
 
 { TDatabaseProperties }
 
 procedure TDatabaseProperties.IBDatabase1AfterConnect(Sender: TObject);
 begin
+  IBTransaction1.Active := true;
   with IBDatabaseInfo do
-    if (ODSMajorVersion > 11) or ((ODSMajorVersion = 11( and (ODSMinorVersion >= 1) then
+    if (ODSMajorVersion > 11) or ((ODSMajorVersion = 11) and (ODSMinorVersion >= 1)) then
       DataBaseQuery.Active := true;
+end;
+
+procedure TDatabaseProperties.IBDatabase1Login(Database: TIBDatabase;
+  LoginParams: TStrings);
+var aDatabaseName: string;
+    aUserName: string;
+    aPassword: string;
+begin
+  aDatabaseName := Database.DatabaseName;
+  aUserName := LoginParams.Values['user_name'];
+  aPassword := '';
+  if DBLoginDlg.ShowModal(aDatabaseName, aUserName, aPassword) = mrOK then
+  begin
+    Database.DatabaseName := aDatabaseName;
+    LoginParams.Values['user_name'] := aUserName;
+    LoginParams.Values['password'] := aPassword;
+    IBConfigService1.Params.Values['user_name'] := aUserName;
+    IBConfigService1.Params.Values['password'] := aPassword;
+    IBConfigService1.Params.Values['expected_db'] := IBConfigService1.DatabaseName;
+    IBConfigService1.LoginPrompt := false;
+  end
+  else
+    IBError(ibxeOperationCancelled, [nil]);
 end;
 
 procedure TDatabaseProperties.GetDBFlags;
 var Line: string;
 begin
+  FDatabaseOnline := true;
+  FShadowDatabase := false;
   with IBStatisticalService1 do
   begin
-    DatabaseName := IBDatabase1.DatabasePath;
     Active := True;
     try
       ServiceStart;
@@ -150,15 +176,50 @@ begin
     DBIsReadOnly.Checked := IBDatabaseInfo.ReadOnly <> 0;
     SyncWrites.Checked := IBDatabaseInfo.ForcedWrites = 1;
     SweepInterval.Text := IntToStr(IBDatabaseInfo.SweepInterval);
-    GetDBFlags;
-    DatabaseOnline.Checked := FDatabaseOnline;
-    IsShadowChk.Checked := FShadowDatabase;
     AllocatedPages.Text := IntToStr(IBDatabaseInfo.Allocation);
     PageSize.Text := IntToStr(IBDatabaseInfo.PageSize);
     NoReserve.Checked := IBDatabaseInfo.NoReserve = 0;
+    GetDBFlags;
+    DatabaseOnline.Checked := FDatabaseOnline;
+    IsShadowChk.Checked := FShadowDatabase;
   finally
     FLoading := false;
   end;
+end;
+
+procedure TDatabaseProperties.Connect;
+var index: integer;
+begin
+  try
+    IBDatabase1.Connected := true;
+  except on E:EIBInterBaseError do
+    if E.IBErrorCode = isc_login then
+    begin
+      IBConfigService1.Active := false;
+      IBStatisticalService1.Active := false;
+      IBDatabase1.LoginPrompt := true;
+      index := IBDatabase1.Params.IndexOfName('password');
+      if index <> -1 then
+        IBDatabase1.Params.Delete(index);
+      repeat
+        try
+          IBDatabase1.Connected := true;
+        except
+         on E:EIBClientError do
+          begin
+            Close;
+            Exit
+          end;
+        On E:Exception do
+         MessageDlg(E.Message,mtError,[mbOK],0);
+        end;
+      until IBDatabase1.Connected;
+    end
+    else
+      raise;
+  end;
+  IBConfigService1.Active := true;
+  IBStatisticalService1.Assign(IBConfigService1);
 end;
 
 procedure TDatabaseProperties.FormShow(Sender: TObject);
@@ -187,30 +248,41 @@ begin
    Edit13.ReadOnly := (Linger = nil) or (IBDatabaseInfo.ODSMajorVersion < 12);
 end;
 
-function TDatabaseProperties.ShowModal(ActiveService: TIBCustomServer;
-  ServerName, DBName: string; ForceLogin: boolean): TModalResult;
+function TDatabaseProperties.ShowModal(ActiveService: TIBCustomService;
+  DBName: string; aPassword: string): TModalResult;
 var index: integer;
 begin
   IBConfigService1.Assign(ActiveService);
-  IBStatisticalService1.Assign(ActiveService);
+  IBConfigService1.DatabaseName := DBName;
+  IBStatisticalService1.DatabaseName := DBName;
+
   with IBConfigService1 do
   begin
     IBDatabase1.DatabaseName := MakeConnectString(ServerName,DBName,Protocol,PortNo);
     index := Params.IndexOfName('user_name');
     if index <> -1 then
       IBDatabase1.Params.Values['user_name'] := Params.Values['user_name'];
-    if not ForceLogin then
+    if aPassword <> '' then
     begin
-      index := Params.IndexOfName('password');
-      if index <> -1 then
-        IBDatabase1.Params.Values['password'] := Params.Values['password'];
-      IBDatabase1.LoginPrompt := index = -1;
+      IBDatabase1.Params.Values['password'] := aPassword;
+      IBDatabase1.LoginPrompt := false;
     end
     else
+    begin
       IBDatabase1.LoginPrompt := true;
+      IBConfigService1.Active := false;
+    end;
   end;
-  IBDatabase1.Connected := true;
+  try
+    Connect;
+  except on E:Exception do
+    begin
+      MessageDlg(E.Message,mtError,[mbOK],0);
+      Exit;
+    end;
+  end;
   Result := inherited ShowModal;
+  IBDatabase1.Connected := false;
 end;
 
 end.

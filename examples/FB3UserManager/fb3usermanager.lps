@@ -17,8 +17,9 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="239"/>
-        <CursorPos Y="248"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="477"/>
+        <CursorPos Y="493"/>
         <UsageCount Value="49"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -84,7 +85,7 @@
       </Unit8>
       <Unit9>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="2220"/>
         <CursorPos X="27" Y="2258"/>
         <UsageCount Value="18"/>
@@ -121,7 +122,7 @@
       </Unit13>
       <Unit14>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="234"/>
         <CursorPos Y="254"/>
         <UsageCount Value="15"/>
@@ -212,16 +213,14 @@
       </Unit26>
       <Unit27>
         <Filename Value="../../../fbintf/client/3.0/firebird/Firebird.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1861"/>
         <CursorPos X="9" Y="1875"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit27>
       <Unit28>
         <Filename Value="../../../fbintf/include/consts_pub.inc"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="29"/>
         <CursorPos X="23" Y="104"/>
         <UsageCount Value="11"/>
@@ -229,13 +228,13 @@
       </Unit28>
       <Unit29>
         <Filename Value="../../runtime/IBUpdate.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="2"/>
         <CursorPos X="3" Y="16"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit29>
     </Units>
-    <JumpHistory Count="25" HistoryIndex="24">
+    <JumpHistory Count="23" HistoryIndex="22">
       <Position1>
         <Filename Value="MainForm.pas"/>
         <Caret Line="502" Column="13" TopLine="484"/>
@@ -325,17 +324,9 @@
         <Caret Line="261" TopLine="258"/>
       </Position22>
       <Position23>
-        <Filename Value="../../../fbintf/client/3.0/firebird/Firebird.pas"/>
-        <Caret Line="1474" Column="26" TopLine="1442"/>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="248" TopLine="239"/>
       </Position23>
-      <Position24>
-        <Filename Value="../../../fbintf/client/3.0/firebird/Firebird.pas"/>
-        <Caret Line="1664" Column="12" TopLine="1644"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../../fbintf/client/3.0/firebird/Firebird.pas"/>
-        <Caret Line="1868" Column="2" TopLine="1848"/>
-      </Position25>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

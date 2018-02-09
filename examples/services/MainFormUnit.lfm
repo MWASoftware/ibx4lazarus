@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 660
+  Left = 627
   Height = 371
-  Top = 461
+  Top = 458
   Width = 622
   Caption = 'Server Properties'
   ClientHeight = 371
@@ -60,42 +60,23 @@ object Form1: TForm1
     TabOrder = 4
   end
   object Button5: TButton
-    Left = 248
+    Left = 328
     Height = 25
-    Top = 312
+    Top = 313
     Width = 75
     Anchors = [akLeft, akBottom]
-    Caption = 'Statistics'
+    Caption = 'Database'
     OnClick = Button5Click
     TabOrder = 5
   end
   object Button6: TButton
-    Left = 328
+    Left = 248
     Height = 25
-    Top = 312
+    Top = 313
     Width = 75
     Caption = 'Users'
     OnClick = Button6Click
     TabOrder = 6
-  end
-  object Button7: TButton
-    Left = 408
-    Height = 25
-    Top = 312
-    Width = 75
-    Anchors = [akLeft, akBottom]
-    Caption = 'Validate'
-    OnClick = Button7Click
-    TabOrder = 7
-  end
-  object Button8: TButton
-    Left = 9
-    Height = 25
-    Top = 344
-    Width = 151
-    Caption = 'Limbo Transactions'
-    OnClick = Button8Click
-    TabOrder = 8
   end
   object IBServerProperties1: TIBServerProperties
     ServerName = 'localhost'
@@ -120,6 +101,7 @@ object Form1: TForm1
     ServerName = 'localhost'
     Protocol = TCP
     TraceFlags = []
+    OnLogin = IBStatisticalService1Login
     DatabaseName = 'employee'
     Options = [DataPages]
     left = 320
@@ -129,6 +111,7 @@ object Form1: TForm1
     ServerName = 'localhost'
     Protocol = TCP
     TraceFlags = []
+    OnLogin = IBStatisticalService1Login
     DatabaseName = 'employee'
     Options = [ValidateFull]
     GlobalAction = CommitGlobal
@@ -139,9 +122,46 @@ object Form1: TForm1
     ServerName = 'localhost'
     Protocol = TCP
     TraceFlags = []
+    OnLogin = IBStatisticalService1Login
     IncludeTables = 'EMPLOYEE|JOB'
     DatabaseName = 'employee'
     left = 320
     top = 228
+  end
+  object ActionList1: TActionList
+    left = 456
+    top = 32
+    object Properties: TAction
+      Caption = 'Properties'
+      OnExecute = PropertiesExecute
+    end
+    object Statistics: TAction
+      Caption = 'Statistics'
+      OnExecute = StatisticsExecute
+    end
+    object Validate: TAction
+      Caption = 'Validate'
+      OnExecute = ValidateExecute
+    end
+    object LimboTransactions: TAction
+      Caption = 'Limbo Transactions'
+      OnExecute = LimboTransactionsExecute
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    left = 456
+    top = 108
+    object MenuItem1: TMenuItem
+      Action = Properties
+    end
+    object MenuItem2: TMenuItem
+      Action = Statistics
+    end
+    object MenuItem3: TMenuItem
+      Action = Validate
+    end
+    object MenuItem4: TMenuItem
+      Action = LimboTransactions
+    end
   end
 end

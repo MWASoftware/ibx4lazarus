@@ -1,4 +1,4 @@
-unit Unit1;
+unit MainFormUnit;
 
 {$mode objfpc}{$H+}
 
@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  IBServices, IB;
+  ActnList, Menus, IBServices, IB;
 
 type
 
@@ -15,14 +15,22 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    LimboTransactions: TAction;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
+    PopupMenu1: TPopupMenu;
+    Validate: TAction;
+    Statistics: TAction;
+    Properties: TAction;
+    ActionList1: TActionList;
     Button1: TButton;
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
-    Button7: TButton;
-    Button8: TButton;
     IBLogService1: TIBLogService;
     IBOnlineValidationService1: TIBOnlineValidationService;
     IBServerProperties1: TIBServerProperties;
@@ -35,16 +43,21 @@ type
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
-    procedure Button7Click(Sender: TObject);
-    procedure Button8Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure IBServerProperties1Login(Service: TIBCustomService;
       LoginParams: TStrings);
+    procedure IBStatisticalService1Login(Service: TIBCustomService;
+      LoginParams: TStrings);
+    procedure LimboTransactionsExecute(Sender: TObject);
+    procedure PropertiesExecute(Sender: TObject);
+    procedure StatisticsExecute(Sender: TObject);
+    procedure ValidateExecute(Sender: TObject);
   private
     { private declarations }
     FValidationService: TIBControlAndQueryService;
     FDBName: string;
     FIsExpectedDB: boolean;
+    FServerPassword: string;
     function RunService(aService: TIBCustomService; secDB: integer;
       RunProc: TRunServiceProc): integer;
     procedure RunBackup;
@@ -69,18 +82,14 @@ implementation
 {$R *.lfm}
 
 uses IBErrorCodes, FBMessages, ServicesLoginDlgUnit, SelectValidationDlgUnit,
-  BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit, SelectDBDlgUnit;
+  BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit, SelectDBDlgUnit,
+  DatabasePropertiesUnit, AltDBSvcLoginDlgUnit;
 
 const
   use_global_login     = 0; {Login to backup/restore with global sec db}
   use_alt_sec_db_login = 1; {Login to backup/restore with alt sec db}
   login_failed         = -1;
   login_successful     = -2;
-
-resourcestring
-  sLoginAgain = 'This database appears to use an alternative security database. '+
-                'You must now log into the alternative security database using ' +
-                'login credentials for the alternative security database';
 
 { TForm1 }
 
@@ -143,9 +152,92 @@ begin
     Service.ServerName := aServiceName;
     LoginParams.Values['user_name'] := aUserName;
     LoginParams.Values['password'] := aPassword;
+    FServerPassword := aPassword;
   end
   else
     IBError(ibxeOperationCancelled, [nil]);
+end;
+
+procedure TForm1.IBStatisticalService1Login(Service: TIBCustomService;
+  LoginParams: TStrings);
+var aServiceName: string;
+    aUserName: string;
+    aPassword: string;
+begin
+  aServiceName := Service.ServerName;
+  aUserName := LoginParams.Values['user_name'];
+  aPassword := '';
+  if AltDBSvcLoginDlg.ShowModal(aServiceName, aUserName, aPassword) = mrOK then
+  begin
+    Service.ServerName := aServiceName;
+    LoginParams.Values['user_name'] := aUserName;
+    LoginParams.Values['password'] := aPassword;
+  end
+  else
+    IBError(ibxeOperationCancelled, [nil]);
+end;
+
+procedure TForm1.LimboTransactionsExecute(Sender: TObject);
+begin
+  with LimboTransactionsForm do
+  begin
+    if SelectDBDlg.ShowModal(FDBName,FIsExpectedDB) = mrOK then
+    begin
+      LimboTransactionValidation.DatabaseName := FDBName;
+      if FIsExpectedDB then
+        Application.QueueAsyncCall(@DoLimboTransactions,use_alt_sec_db_login)
+      else
+        Application.QueueAsyncCall(@DoLimboTransactions,use_global_login);
+    end;
+  end;
+end;
+
+procedure TForm1.PropertiesExecute(Sender: TObject);
+begin
+  if SelectDBDlg.ShowModal(FDBName,FIsExpectedDB) = mrOK then
+  begin
+    if FIsExpectedDB then
+      DatabaseProperties.ShowModal(IBServerProperties1,FDBName,'')
+    else
+      DatabaseProperties.ShowModal(IBServerProperties1,FDBName,FServerPassword);
+  end;
+end;
+
+procedure TForm1.StatisticsExecute(Sender: TObject);
+begin
+  if SelectDBDlg.ShowModal(FDBName,FIsExpectedDB) = mrOK then
+  begin
+    IBStatisticalService1.DatabaseName := FDBName;
+    if FIsExpectedDB then
+      Application.QueueAsyncCall(@DoShowStatistics,use_alt_sec_db_login)
+    else
+      Application.QueueAsyncCall(@DoShowStatistics,use_global_login);
+  end;
+end;
+
+procedure TForm1.ValidateExecute(Sender: TObject);
+var DBName: string;
+    UseOnlineValidation: boolean;
+begin
+  UseOnlineValidation := false;
+  if SelectValidationDlg.ShowModal(IBServerProperties1.ServerName,FDBName,UseOnlineValidation,FIsExpectedDB) = mrOK then
+  begin
+    if UseOnlineValidation then
+    begin
+      FValidationService := IBOnlineValidationService1;
+      IBOnlineValidationService1.DatabaseName := FDBName;
+    end
+    else
+    begin
+      FValidationService :=  IBValidationService1;
+      IBValidationService1.DatabaseName := FDBName;
+    end;
+    Memo1.Lines.Add('Database Validation for ' + FDBName);
+    if FIsExpectedDB then
+      Application.QueueAsyncCall(@DoValidation,use_alt_sec_db_login)
+    else
+      Application.QueueAsyncCall(@DoValidation,use_global_login);
+  end;
 end;
 
 function TForm1.RunService(aService: TIBCustomService; secDB: integer;
@@ -163,10 +255,9 @@ begin
       LoginPrompt := true;
       Params.Add('expected_db='+FDBName);
       index := Params.IndexOfName('password');
-      Params.Delete(index);
-    end
-    else
-      LoginPrompt := index = -1;
+      if index <> -1 then
+        Params.Delete(index);
+    end;
 
     {Now make sure we are logged in}
 
@@ -197,8 +288,6 @@ begin
       end;
     finally
       aService.Active := false;
-      if Result = use_alt_sec_db_login then {Need expected_db}
-        MessageDlg(sLoginAgain,mtInformation,[mbOK],0);
     end;
   end;
 end;
@@ -284,7 +373,7 @@ end;
 procedure TForm1.RunShowStatistics;
 begin
   with IBStatisticalService1 do
-  begin
+  try
     ServiceStart;
     Memo1.Lines.Add('Database Statistics for ' + IBStatisticalService1.DatabaseName);
     while not Eof do
@@ -292,13 +381,15 @@ begin
       Memo1.Lines.Add(GetNextLine);
       Application.ProcessMessages;
     end;
+  except on E:Exception do
+    MessageDlg(E.Message,mtError,[mbOK],0);
   end;
 end;
 
 procedure TForm1.RunValidation;
 begin
   with FValidationService do
-  begin
+  TRY
     ServiceStart;
     Memo1.Lines.Add('Running...');
     while not Eof do
@@ -308,17 +399,21 @@ begin
     end;
     Memo1.Lines.Add('Validation Completed');
     MessageDlg('Validation Completed',mtInformation,[mbOK],0);
+  except on E:Exception do
+    MessageDlg(E.Message,mtError,[mbOK],0);
   end;
 end;
 
 procedure TForm1.RunLimboTransactions;
 begin
   with LimboTransactionsForm do
-  begin
+  TRY
     {test access credentials}
     LimboTransactionValidation.ServiceStart;
     LimboTransactionValidation.FetchLimboTransactionInfo;
     ShowModal;
+  except on E:Exception do
+    MessageDlg(E.Message,mtError,[mbOK],0);
   end;
 end;
 
@@ -409,14 +504,7 @@ end;
 
 procedure TForm1.Button5Click(Sender: TObject);
 begin
-  if SelectDBDlg.ShowModal(FDBName,FIsExpectedDB) = mrOK then
-  begin
-    IBStatisticalService1.DatabaseName := FDBName;
-    if FIsExpectedDB then
-      Application.QueueAsyncCall(@DoShowStatistics,use_alt_sec_db_login)
-    else
-      Application.QueueAsyncCall(@DoShowStatistics,use_global_login);
-  end;
+  PopupMenu1.PopUp(Mouse.CursorPos.X,Mouse.CursorPos.Y);
 end;
 
 procedure TForm1.Button6Click(Sender: TObject);
@@ -425,46 +513,6 @@ begin
   begin
     IBSecurityService1.Assign(IBServerProperties1);
     ShowModal;
-  end;
-end;
-
-procedure TForm1.Button7Click(Sender: TObject);
-var DBName: string;
-    UseOnlineValidation: boolean;
-begin
-  UseOnlineValidation := false;
-  if SelectValidationDlg.ShowModal(IBServerProperties1.ServerName,FDBName,UseOnlineValidation,FIsExpectedDB) = mrOK then
-  begin
-    if UseOnlineValidation then
-    begin
-      FValidationService := IBOnlineValidationService1;
-      IBOnlineValidationService1.DatabaseName := FDBName;
-    end
-    else
-    begin
-      FValidationService :=  IBValidationService1;
-      IBValidationService1.DatabaseName := FDBName;
-    end;
-    Memo1.Lines.Add('Database Validation for ' + FDBName);
-    if FIsExpectedDB then
-      Application.QueueAsyncCall(@DoValidation,use_alt_sec_db_login)
-    else
-      Application.QueueAsyncCall(@DoValidation,use_global_login);
-  end;
-end;
-
-procedure TForm1.Button8Click(Sender: TObject);
-begin
-  with LimboTransactionsForm do
-  begin
-    if SelectDBDlg.ShowModal(FDBName,FIsExpectedDB) = mrOK then
-    begin
-      LimboTransactionValidation.DatabaseName := FDBName;
-      if FIsExpectedDB then
-        Application.QueueAsyncCall(@DoLimboTransactions,use_alt_sec_db_login)
-      else
-        Application.QueueAsyncCall(@DoLimboTransactions,use_global_login);
-    end;
   end;
 end;
 
