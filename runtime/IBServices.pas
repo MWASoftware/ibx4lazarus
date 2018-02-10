@@ -701,7 +701,7 @@ begin
     TempSvcParams.Free;
   end;
 
-  FService := FirebirdAPI.GetServiceManager(aServerName,FProtocol,SPB);
+  FService := FirebirdAPI.GetServiceManager(aServerName,PortNo,FProtocol,SPB);
   PW := FService.getSPB.Find(isc_spb_password);
   if PW <> nil then PW.AsString := 'xxxxxxxx'; {Hide password}
 

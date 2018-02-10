@@ -8,7 +8,7 @@ object DatabaseProperties: TDatabaseProperties
   ClientHeight = 471
   ClientWidth = 814
   Position = poMainFormCenter
-  LCLVersion = '1.6.2.0'
+  LCLVersion = '1.8.1.0'
   object Bevel1: TBevel
     Left = 8
     Height = 456
@@ -17,15 +17,15 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label1: TLabel
     Left = 40
-    Height = 17
+    Height = 14
     Top = 117
-    Width = 70
+    Width = 73
     Caption = 'ODS Version'
     ParentColor = False
   end
   object Edit2: TEdit
     Left = 120
-    Height = 27
+    Height = 24
     Top = 112
     Width = 266
     ReadOnly = True
@@ -34,15 +34,15 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label4: TLabel
     Left = 19
-    Height = 17
+    Height = 14
     Top = 150
-    Width = 85
+    Width = 91
     Caption = 'Svr Version No.'
     ParentColor = False
   end
   object Edit5: TEdit
     Left = 120
-    Height = 27
+    Height = 24
     Top = 144
     Width = 266
     ReadOnly = True
@@ -51,15 +51,15 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label5: TLabel
     Left = 41
-    Height = 17
+    Height = 14
     Top = 183
-    Width = 64
+    Width = 69
     Caption = 'SQL Dialect'
     ParentColor = False
   end
   object Edit6: TEdit
     Left = 120
-    Height = 27
+    Height = 24
     Top = 176
     Width = 266
     ReadOnly = True
@@ -70,7 +70,7 @@ object DatabaseProperties: TDatabaseProperties
     Left = 111
     Height = 22
     Top = 311
-    Width = 80
+    Width = 84
     Caption = 'Read Only'
     OnChange = DBIsReadOnlyChange
     TabOrder = 3
@@ -79,23 +79,23 @@ object DatabaseProperties: TDatabaseProperties
     Left = 111
     Height = 22
     Top = 359
-    Width = 162
+    Width = 173
     Caption = 'Synchronous Disk Writes'
     OnChange = SyncWritesChange
     TabOrder = 4
   end
   object Label7: TLabel
     Left = 400
-    Height = 17
+    Height = 14
     Top = 347
-    Width = 117
+    Width = 128
     Caption = 'S&weep Interval set to'
     FocusControl = SweepInterval
     ParentColor = False
   end
   object SweepInterval: TEdit
     Left = 533
-    Height = 27
+    Height = 24
     Top = 342
     Width = 89
     Alignment = taRightJustify
@@ -106,23 +106,23 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label8: TLabel
     Left = 632
-    Height = 17
+    Height = 14
     Top = 347
-    Width = 72
+    Width = 74
     Caption = 'Transactions'
     ParentColor = False
   end
   object Label6: TLabel
     Left = 71
-    Height = 17
+    Height = 14
     Top = 20
-    Width = 37
+    Width = 39
     Caption = 'Server'
     ParentColor = False
   end
   object Edit7: TEdit
     Left = 120
-    Height = 27
+    Height = 24
     Top = 16
     Width = 265
     ReadOnly = True
@@ -131,15 +131,15 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label9: TLabel
     Left = 19
-    Height = 17
+    Height = 14
     Top = 83
-    Width = 82
+    Width = 91
     Caption = 'Connect String'
     ParentColor = False
   end
   object Edit8: TEdit
     Left = 120
-    Height = 27
+    Height = 24
     Top = 80
     Width = 265
     TabOrder = 7
@@ -149,7 +149,7 @@ object DatabaseProperties: TDatabaseProperties
     Left = 111
     Height = 22
     Top = 335
-    Width = 60
+    Width = 62
     Caption = 'Online'
     OnChange = DatabaseOnlineChange
     TabOrder = 8
@@ -158,22 +158,22 @@ object DatabaseProperties: TDatabaseProperties
     Left = 111
     Height = 22
     Top = 383
-    Width = 125
+    Width = 132
     Caption = 'Shadow Database'
     OnChange = IsShadowChkChange
     TabOrder = 9
   end
   object Label11: TLabel
     Left = 435
-    Height = 17
+    Height = 14
     Top = 26
-    Width = 89
+    Width = 93
     Caption = 'Pages Allocated'
     ParentColor = False
   end
   object AllocatedPages: TEdit
     Left = 533
-    Height = 27
+    Height = 24
     Top = 20
     Width = 89
     Alignment = taRightJustify
@@ -183,23 +183,23 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label19: TLabel
     Left = 472
-    Height = 17
+    Height = 14
     Top = 57
-    Width = 54
+    Width = 56
     Caption = 'Page Size'
     ParentColor = False
   end
   object Label20: TLabel
     Left = 632
-    Height = 17
+    Height = 14
     Top = 61
-    Width = 30
+    Width = 33
     Caption = 'bytes'
     ParentColor = False
   end
   object PageSize: TEdit
     Left = 533
-    Height = 27
+    Height = 24
     Top = 51
     Width = 89
     Alignment = taRightJustify
@@ -209,39 +209,39 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label13: TLabel
     Left = 28
-    Height = 17
+    Height = 14
     Top = 277
-    Width = 77
+    Width = 83
     Caption = 'Character Set'
     ParentColor = False
   end
   object Label12: TLabel
     Left = 430
-    Height = 17
+    Height = 14
     Top = 150
-    Width = 93
+    Width = 98
     Caption = 'Current Memory'
     ParentColor = False
   end
   object Label14: TLabel
     Left = 452
-    Height = 17
+    Height = 14
     Top = 181
-    Width = 74
+    Width = 76
     Caption = 'Max Memory'
     ParentColor = False
   end
   object Label15: TLabel
     Left = 447
-    Height = 17
+    Height = 14
     Top = 212
-    Width = 77
+    Width = 81
     Caption = 'No. of Buffers'
     ParentColor = False
   end
   object Edit10: TEdit
     Left = 533
-    Height = 27
+    Height = 24
     Top = 144
     Width = 89
     Alignment = taRightJustify
@@ -251,7 +251,7 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Edit11: TEdit
     Left = 533
-    Height = 27
+    Height = 24
     Top = 175
     Width = 89
     Alignment = taRightJustify
@@ -261,7 +261,7 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Edit12: TEdit
     Left = 533
-    Height = 27
+    Height = 24
     Top = 206
     Width = 89
     Alignment = taRightJustify
@@ -271,17 +271,17 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label21: TLabel
     Left = 632
-    Height = 17
+    Height = 14
     Top = 149
-    Width = 30
+    Width = 33
     Caption = 'bytes'
     ParentColor = False
   end
   object Label22: TLabel
     Left = 632
-    Height = 17
+    Height = 14
     Top = 182
-    Width = 30
+    Width = 33
     Caption = 'bytes'
     ParentColor = False
   end
@@ -289,14 +289,14 @@ object DatabaseProperties: TDatabaseProperties
     Left = 111
     Height = 22
     Top = 407
-    Width = 224
+    Width = 239
     Caption = 'Space Reserved for Backup Records'
     OnChange = NoReserveChange
     TabOrder = 15
   end
   object LingerDelay: TEdit
     Left = 533
-    Height = 27
+    Height = 24
     Top = 311
     Width = 89
     Alignment = taRightJustify
@@ -307,23 +307,23 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label16: TLabel
     Left = 453
-    Height = 17
+    Height = 14
     Top = 317
-    Width = 70
+    Width = 75
     Caption = 'Linger Delay'
     ParentColor = False
   end
   object Label17: TLabel
     Left = 632
-    Height = 17
+    Height = 14
     Top = 317
-    Width = 46
+    Width = 49
     Caption = 'seconds'
     ParentColor = False
   end
   object SecDatabase: TDBEdit
     Left = 121
-    Height = 27
+    Height = 24
     Top = 240
     Width = 266
     DataField = 'MON$SEC_DATABASE'
@@ -335,23 +335,23 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label18: TLabel
     Left = 24
-    Height = 17
+    Height = 14
     Top = 244
-    Width = 80
+    Width = 86
     Caption = 'Sec. Database'
     ParentColor = False
   end
   object Label23: TLabel
     Left = 430
-    Height = 17
+    Height = 14
     Top = 245
-    Width = 95
+    Width = 100
     Caption = 'Date DB Created'
     ParentColor = False
   end
   object DBOwner: TDBEdit
     Left = 121
-    Height = 27
+    Height = 24
     Top = 208
     Width = 266
     DataField = 'MON$OWNER'
@@ -363,17 +363,17 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label24: TLabel
     Left = 51
-    Height = 17
+    Height = 14
     Top = 211
-    Width = 57
+    Width = 60
     Caption = 'DB Owner'
     ParentColor = False
   end
   object Label2: TLabel
     Left = 15
-    Height = 17
+    Height = 14
     Top = 52
-    Width = 91
+    Width = 95
     Caption = 'Database Name'
     ParentColor = False
   end
@@ -388,23 +388,23 @@ object DatabaseProperties: TDatabaseProperties
   end
   object Label3: TLabel
     Left = 460
-    Height = 17
+    Height = 14
     Top = 88
-    Width = 66
+    Width = 68
     Caption = 'Pages Used'
     ParentColor = False
   end
   object Label10: TLabel
     Left = 438
-    Height = 17
+    Height = 14
     Top = 119
-    Width = 88
+    Width = 90
     Caption = 'Pages Available'
     ParentColor = False
   end
   object PagesUsed: TEdit
     Left = 533
-    Height = 27
+    Height = 24
     Top = 82
     Width = 89
     Alignment = taRightJustify
@@ -414,7 +414,7 @@ object DatabaseProperties: TDatabaseProperties
   end
   object PagesAvail: TEdit
     Left = 533
-    Height = 27
+    Height = 24
     Top = 113
     Width = 89
     Alignment = taRightJustify
@@ -424,7 +424,7 @@ object DatabaseProperties: TDatabaseProperties
   end
   object DBEdit2: TDBEdit
     Left = 120
-    Height = 27
+    Height = 24
     Top = 47
     Width = 264
     DataField = 'MON$DATABASE_NAME'
@@ -434,9 +434,41 @@ object DatabaseProperties: TDatabaseProperties
     MaxLength = 0
     TabOrder = 22
   end
+  object DBEdit1: TDBEdit
+    Left = 533
+    Height = 24
+    Top = 240
+    Width = 132
+    DataField = 'MON$CREATION_DATE'
+    DataSource = DatabaseSource
+    ReadOnly = True
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 24
+  end
+  object AutoAdmin: TCheckBox
+    Left = 112
+    Height = 22
+    Top = 432
+    Width = 151
+    Caption = 'Auto Admin Mapping'
+    OnChange = AutoAdminChange
+    TabOrder = 25
+  end
+  object DBCharSetRO: TDBEdit
+    Left = 120
+    Height = 24
+    Top = 272
+    Width = 264
+    DataField = 'RDB$CHARACTER_SET_NAME'
+    DataSource = DBCharSetSource
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 26
+  end
   object DBCharacterSet: TIBLookupComboEditBox
     Left = 121
-    Height = 29
+    Height = 27
     Top = 272
     Width = 266
     DataField = 'RDB$CHARACTER_SET_NAME'
@@ -451,27 +483,6 @@ object DatabaseProperties: TDatabaseProperties
     AutoInsert = False
     AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
     ItemHeight = 0
-  end
-  object DBEdit1: TDBEdit
-    Left = 533
-    Height = 27
-    Top = 240
-    Width = 132
-    DataField = 'MON$CREATION_DATE'
-    DataSource = DatabaseSource
-    ReadOnly = True
-    CharCase = ecNormal
-    MaxLength = 0
-    TabOrder = 24
-  end
-  object AutoAdmin: TCheckBox
-    Left = 112
-    Height = 22
-    Top = 432
-    Width = 141
-    Caption = 'Auto Admin Mapping'
-    OnChange = AutoAdminChange
-    TabOrder = 25
   end
   object IBDatabaseInfo: TIBDatabaseInfo
     Database = IBDatabase1
@@ -489,7 +500,6 @@ object DatabaseProperties: TDatabaseProperties
     Transaction = IBTransaction1
     AfterOpen = DatabaseQueryAfterOpen
     BeforeClose = DatabaseQueryBeforeClose
-    BeforeOpen = DatabaseQueryBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
     GenerateParamNames = False
@@ -515,7 +525,7 @@ object DatabaseProperties: TDatabaseProperties
     top = 272
   end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect

@@ -25,6 +25,7 @@ type
     DBCharSetSource: TDataSource;
     DBEdit1: TDBEdit;
     DBEdit2: TDBEdit;
+    DBCharSetRO: TDBEdit;
     DBOwner: TDBEdit;
     DBIsReadOnly: TCheckBox;
     Edit10: TEdit;
@@ -83,7 +84,6 @@ type
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
     procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
-    procedure DatabaseQueryBeforeOpen(DataSet: TDataSet);
     procedure DBCharSetAfterClose(DataSet: TDataSet);
     procedure DBCharSetBeforeOpen(DataSet: TDataSet);
     procedure DBIsReadOnlyChange(Sender: TObject);
@@ -135,14 +135,17 @@ begin
   begin
     SecDatabase.Enabled := false;
     SecDatabase.DataField := '';
-    DBCharacterSet.ReadOnly := true;
+    DBCharacterSet.Visible := false;
+    DBCharSetRO.Visible := true;
     AutoAdmin.Enabled := false;
     DBOwner.Enabled := false;
     DBOwner.DataField := '';
     LingerDelay.Enabled := false;
     PagesUsed.Enabled := false;
     PagesAvail.Enabled := false;
-  end;
+  end
+  else
+    DBCharSetRO.Visible := false;
 
   {Virtual tables did not exist prior to Firebird 2.1 - so don't bother with old version}
   with IBDatabaseInfo do
@@ -214,11 +217,23 @@ end;
 procedure TDatabaseProperties.IsShadowChkChange(Sender: TObject);
 begin
   if FLoading then Exit;
-  IBConfigService1.ActivateShadow;
-  while IBConfigService1.IsServiceRunning do;
-  MessageDlg('Shadow Database activated. You should now rename the file or change the database alias name to point to the shadow',
-    mtInformation,[mbOK],0);
-  IsShadowChk.Enabled := false;
+  if not FShadowDatabase then
+  begin
+    MessageDlg('A Normal Database cannot be changed into a Shadow Database',mtError,[mbOK],0);
+    FLoading := true;
+    try
+      IsShadowChk.Checked := false;
+    finally
+      FLoading := false;
+    end;
+  end
+  else
+  begin
+    IBConfigService1.ActivateShadow;
+    while IBConfigService1.IsServiceRunning do;
+    MessageDlg('Shadow Database activated. You should now rename the file or change the database alias name to point to the shadow',
+      mtInformation,[mbOK],0);
+  end;
 end;
 
 procedure TDatabaseProperties.NoReserveChange(Sender: TObject);
@@ -307,7 +322,6 @@ begin
     GetDBFlags;
     DatabaseOnline.Checked := FDatabaseOnline;
     IsShadowChk.Checked := FShadowDatabase;
-    IsShadowChk.Enabled := FShadowDatabase;
     if IBDatabaseInfo.ODSMajorVersion >= 12 then
     begin
       PagesUsed.Text := IntToStr(IBDatabaseInfo.PagesUsed);
@@ -363,10 +377,6 @@ begin
   end;
   IBDatabase1.LoginPrompt := false;
   LoadData;
-end;
-
-procedure TDatabaseProperties.DatabaseQueryBeforeOpen(DataSet: TDataSet);
-begin
 end;
 
 procedure TDatabaseProperties.DBCharSetAfterClose(DataSet: TDataSet);
