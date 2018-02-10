@@ -118,6 +118,7 @@ begin
       end;
     end; {Loop until logged in or user cancels}
 
+    {Display the server properties}
     FetchVersionInfo;
     Memo1.Lines.Add('Server Version = ' + VersionInfo.ServerVersion);
     Memo1.Lines.Add('Server Implementation = ' + VersionInfo.ServerImplementation);
@@ -136,7 +137,10 @@ begin
     Memo1.Lines.Add('Lock File Location = ' + ConfigParams.LockFileLocation);
     Memo1.Lines.Add('Security Database Location = ' + ConfigParams.SecurityDatabaseLocation);
   end;
+  {Leave IBServerProperties1 as active and use this as the common service interface}
 end;
+
+{This is the initial logon to the default security database on the server}
 
 procedure TForm1.IBServerProperties1Login(Service: TIBCustomService;
   LoginParams: TStrings);
@@ -152,11 +156,13 @@ begin
     Service.ServerName := aServiceName;
     LoginParams.Values['user_name'] := aUserName;
     LoginParams.Values['password'] := aPassword;
-    FServerPassword := aPassword;
+    FServerPassword := aPassword; {Remember this for database login}
   end
   else
     IBError(ibxeOperationCancelled, [nil]);
 end;
+
+{This is the login dialog for a alt. security database}
 
 procedure TForm1.IBStatisticalService1Login(Service: TIBCustomService;
   LoginParams: TStrings);
@@ -216,8 +222,7 @@ begin
 end;
 
 procedure TForm1.ValidateExecute(Sender: TObject);
-var DBName: string;
-    UseOnlineValidation: boolean;
+var UseOnlineValidation: boolean;
 begin
   UseOnlineValidation := false;
   if SelectValidationDlg.ShowModal(IBServerProperties1.ServerName,FDBName,UseOnlineValidation,FIsExpectedDB) = mrOK then
@@ -239,6 +244,8 @@ begin
       Application.QueueAsyncCall(@DoValidation,use_global_login);
   end;
 end;
+
+{Common code for launching a service that might need to use and alt. security database}
 
 function TForm1.RunService(aService: TIBCustomService; secDB: integer;
   RunProc: TRunServiceProc): integer;
@@ -320,6 +327,8 @@ begin
       if bakfile <> nil then
         bakfile.Free;
     end;
+
+    {Report completion}
     case IBBackupService1.BackupFileLocation of
     flServerSide:
       begin
@@ -407,7 +416,7 @@ end;
 procedure TForm1.RunLimboTransactions;
 begin
   with LimboTransactionsForm do
-  TRY
+  try
     {test access credentials}
     LimboTransactionValidation.ServiceStart;
     LimboTransactionValidation.FetchLimboTransactionInfo;
@@ -490,6 +499,8 @@ end;
 procedure TForm1.Button4Click(Sender: TObject);
 begin
   Memo1.Lines.Add('Server Log');
+  {No chance that we will need an alt. security database - so just assign it the
+   server connection}
   IBLogService1.Assign(IBServerProperties1);
   with IBLogService1 do
   begin
@@ -511,6 +522,8 @@ procedure TForm1.Button6Click(Sender: TObject);
 begin
   with ListUsersForm do
   begin
+    {No chance that we will need an alt. security database - so just assign it the
+     server connection}
     IBSecurityService1.Assign(IBServerProperties1);
     ShowModal;
   end;

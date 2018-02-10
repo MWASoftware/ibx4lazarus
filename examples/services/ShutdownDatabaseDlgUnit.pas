@@ -132,6 +132,7 @@ procedure TShutdownDatabaseDlg.CloseBtnClick(Sender: TObject);
 begin
   FShutdownWaitThread.Abort;
   IBConfigService.BringDatabaseOnline;
+  while IBConfigService.IsServiceRunning do;
   Close;
 end;
 
@@ -158,6 +159,7 @@ begin
     IBConfigService.Active := true;
     try
       IBConfigService.ShutDownDatabase(aShutDownmode,0);
+      while IBConfigService.IsServiceRunning do;
       if aDelay = 0 then
         MessageDlg(sDatabaseShutdown,mtInformation,[mbOK],0);
     finally

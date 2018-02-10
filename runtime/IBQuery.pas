@@ -27,7 +27,7 @@
 {    IBX For Lazarus (Firebird Express)                                  }
 {    Contributor: Tony Whyman, MWA Software http://www.mwasoftware.co.uk }
 {    Portions created by MWA Software are copyright McCallum Whyman      }
-{    Associates Ltd 2011                                                 }
+{    Associates Ltd 2011 - 2018                                               }
 {                                                                        }
 {************************************************************************}
 

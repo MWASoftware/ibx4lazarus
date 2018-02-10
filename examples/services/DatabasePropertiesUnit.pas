@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  DbCtrls, Buttons, DBExtCtrls, ActnList, ExtCtrls, db, IBDatabaseInfo, IBQuery,
+  DbCtrls, Buttons,  ActnList, ExtCtrls, db, IBDatabaseInfo, IBQuery,
   IBSQL, IBDatabase, IBServices, IBUpdate, IBLookupComboEditBox, IB;
 
 type
@@ -22,7 +22,7 @@ type
     DatabaseSource: TDataSource;
     CharSetSource: TDataSource;
     DBCharSetSource: TDataSource;
-    DBDateEdit1: TDBDateEdit;
+    DBEdit1: TDBEdit;
     DBEdit2: TDBEdit;
     DBEdit3: TDBEdit;
     DBIsReadOnly: TCheckBox;
@@ -82,7 +82,6 @@ type
     procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
     procedure DatabaseQueryBeforeOpen(DataSet: TDataSet);
     procedure DBCharSetAfterClose(DataSet: TDataSet);
-    procedure DBCharSetAfterPost(DataSet: TDataSet);
     procedure DBCharSetBeforeOpen(DataSet: TDataSet);
     procedure DBIsReadOnlyChange(Sender: TObject);
     procedure Edit13EditingDone(Sender: TObject);
@@ -107,7 +106,6 @@ type
     procedure GetDBFlags;
     procedure LoadData;
     procedure Connect;
-    procedure DoCommit(Data: PtrInt);
   public
     function ShowModal(ActiveService: TIBCustomService; DBName: string; aPassword: string): TModalResult;
     function IsDatabaseOnline: boolean;
@@ -120,7 +118,7 @@ implementation
 
 {$R *.lfm}
 
-uses IBUtils, MainFormUnit, DBLoginDlgUnit, FBMessages, IBErrorCodes,
+uses IBUtils, DBLoginDlgUnit, FBMessages, IBErrorCodes,
   BringOnlineDlgUnit, ShutdownRegDlgUnit, ShutdownDatabaseDlgUnit;
 
 { TDatabaseProperties }
@@ -129,6 +127,8 @@ procedure TDatabaseProperties.IBDatabase1AfterConnect(Sender: TObject);
 begin
   IBDatabase1.LoginPrompt := false;
   IBTransaction1.Active := true;
+
+  {Virtual tables did not exist prior to Firebird 2.1 - so don't bother with old version}
   with IBDatabaseInfo do
     if (ODSMajorVersion > 11) or ((ODSMajorVersion = 11) and (ODSMinorVersion >= 1)) then
       DataBaseQuery.Active := true;
@@ -144,6 +144,8 @@ begin
   FDisconnecting := true;
 end;
 
+{Login dialog when using an Alt. security database}
+
 procedure TDatabaseProperties.IBDatabase1Login(Database: TIBDatabase;
   LoginParams: TStrings);
 var aDatabaseName: string;
@@ -155,10 +157,12 @@ begin
   aPassword := '';
   if DBLoginDlg.ShowModal(aDatabaseName, aUserName, aPassword) = mrOK then
   begin
-    FDBPassword := aPassword;
+    FDBPassword := aPassword; {remember for reconnect}
     Database.DatabaseName := aDatabaseName;
     LoginParams.Values['user_name'] := aUserName;
     LoginParams.Values['password'] := aPassword;
+
+    {Copy to config service as we also need to login to the alt. sec. database}
     IBConfigService1.Params.Values['user_name'] := aUserName;
     IBConfigService1.Params.Values['password'] := aPassword;
     IBConfigService1.Params.Values['expected_db'] := IBConfigService1.DatabaseName;
@@ -167,6 +171,8 @@ begin
   else
     IBError(ibxeOperationCancelled, [nil]);
 end;
+
+{Reopen datasets if database not closing when a transaction ends}
 
 procedure TDatabaseProperties.IBTransaction1AfterTransactionEnd(Sender: TObject
   );
@@ -226,6 +232,9 @@ begin
   while IBConfigService1.IsServiceRunning do;
 end;
 
+{If we want to know if this is a shadow database or if it is shutdown then
+ we have to look a the attributes in the database header.}
+
 procedure TDatabaseProperties.GetDBFlags;
 var Line: string;
 begin
@@ -238,7 +247,7 @@ begin
     Active := True;
     try
       ServiceStart;
-      While not Eof do
+      while not Eof do
       begin
          Line := GetNextLine;
          if (Pos('Attributes',Line) <> 0) and ((Pos('database shutdown',Line) <> 0)
@@ -257,6 +266,7 @@ end;
 procedure TDatabaseProperties.LoadData;
 begin
   if FLoading then Exit;
+  IBConfigService1.Active := true;
   FLoading := true;
   try
     Edit2.Text :=  Format('%d.%d',[IBDatabaseInfo.ODSMajorVersion,IBDatabaseInfo.ODSMinorVersion]);
@@ -284,8 +294,14 @@ begin
   end;
 end;
 
+{When we connect to the database we may need to loop around if we need to
+ connect via an alt. sec. database and the user doesn't enter the password
+ right first time.}
+
 procedure TDatabaseProperties.Connect;
 begin
+  {Was the password remembered from an earlier login i.e. we are reconnecting
+   after performing some task.}
   if FDBPassword <> '' then
     IBDatabase1.Params.Values['password'] := FDBPassword;  {needed for reconnect}
   try
@@ -301,10 +317,8 @@ begin
           IBDatabase1.Connected := true;
         except
          on E:EIBClientError do
-          begin
-            Close;
-            Exit
-          end;
+           raise;
+
         On E:Exception do
           begin
             MessageDlg(E.Message,mtError,[mbOK],0);
@@ -317,14 +331,7 @@ begin
       raise;
   end;
   IBDatabase1.LoginPrompt := false;
-  IBConfigService1.Active := true;
   LoadData;
-end;
-
-procedure TDatabaseProperties.DoCommit(Data: PtrInt);
-begin
-  if IBTransaction1.Active then
-    IBTransaction1.Commit;
 end;
 
 procedure TDatabaseProperties.DatabaseQueryBeforeOpen(DataSet: TDataSet);
@@ -338,15 +345,13 @@ begin
   CharSetLookup.Active := false;
 end;
 
-procedure TDatabaseProperties.DBCharSetAfterPost(DataSet: TDataSet);
-begin
-  Application.QueueAsyncCall(@DoCommit,0);
-end;
-
 procedure TDatabaseProperties.DBCharSetBeforeOpen(DataSet: TDataSet);
 begin
   CharSetLookup.Active := true;
 end;
+
+{If we change the database to read only or back to read/write then
+ we must disconnect and the reconnect}
 
 procedure TDatabaseProperties.DBIsReadOnlyChange(Sender: TObject);
 begin
@@ -381,7 +386,7 @@ begin
     if MessageDlg('Turn off Linger Permanently?',mtConfirmation,[mbYes,mbNo],0) = mrNo then
     begin
       IBConfigService1.SetNoLinger;
-      DatabaseQueryAfterOpen(DatabaseQuery);
+      DatabaseQueryAfterOpen(DatabaseQuery);   {refresh linger edit box}
       Exit;
     end;
     ExecDDL.SQL.Text := 'ALTER DATABASE DROP LINGER'
@@ -396,20 +401,23 @@ begin
   end;
 end;
 
+{Linger only because available in Firebird 3, so care needed not to raise
+ an exception with earlier versions}
+
 procedure TDatabaseProperties.DatabaseQueryAfterOpen(DataSet: TDataSet);
 var Linger: TField;
 begin
   DBCharSet.Active :=true;
-   Linger := DataSet.FieldByName('RDB$LINGER');
-   if Linger <> nil then
-   begin
-     if Linger.IsNull then
-       Edit13.Text := '0'
-     else
-       Edit13.Text := Linger.AsString;
-   end
-   else
-     Edit13.Text := 'n/a';
+  Linger := DataSet.FieldByName('RDB$LINGER');
+  if Linger <> nil then
+  begin
+    if Linger.IsNull then
+      Edit13.Text := '0'
+    else
+      Edit13.Text := Linger.AsString;
+  end
+  else
+    Edit13.Text := 'n/a';
    Edit13.ReadOnly := (Linger = nil) or (IBDatabaseInfo.ODSMajorVersion < 12);
 end;
 
@@ -425,17 +433,22 @@ begin
    if FLoading then Exit;
    if DatabaseOnline.Checked then
    begin
+     {Bring the database back online}
      BringOnlineDlg.ShowModal(IBConfigService1);
      IBTransaction1.Commit; {refresh}
    end
    else
    begin
+     {Shutdown the database}
      ShutDownMode := Forced;
      if ShutdownReqDlg.ShowModal(IBConfigService1.DatabaseName,ShutDownMode,Delay) = mrOK then
      begin
        IBDatabase1.Connected := false;
-       ShutdownDatabaseDlg.Shutdown(IBConfigService1,ShutDownMode,Delay);
-       Connect;
+       try
+         ShutdownDatabaseDlg.Shutdown(IBConfigService1,ShutDownMode,Delay);
+       finally
+         Connect;
+       end;
      end
      else
        LoadData;
@@ -453,6 +466,9 @@ begin
 
   with IBConfigService1 do
   begin
+
+    {Setup the database params from what we know about the server}
+
     IBDatabase1.Params.Clear;
     IBDatabase1.DatabaseName := MakeConnectString(ServerName,DBName,Protocol,PortNo);
     index := Params.IndexOfName('user_name');
@@ -469,6 +485,8 @@ begin
       IBConfigService1.Active := false;
     end;
   end;
+
+  {Now connect to the database}
   try
     Connect;
   except on E:Exception do

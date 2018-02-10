@@ -123,7 +123,7 @@ type
     procedure SetItemIndex(const Val: integer); override;
     function SQLSafe(aText: string): string;
     procedure UpdateShowing; override;
-
+    procedure UpdateData(Sender: TObject); override;
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
@@ -553,6 +553,12 @@ begin
     ActiveChanged(nil);
 end;
 
+procedure TIBLookupComboEditBox.UpdateData(Sender: TObject);
+begin
+  inherited UpdateData(Sender);
+  FModified := false;
+end;
+
 constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
 begin
   inherited Create(TheComponent);
@@ -588,7 +594,6 @@ begin
   if FModified then
     Change; {ensure Update}
   inherited EditingDone;
-  FModified := false;
 end;
 
 end.

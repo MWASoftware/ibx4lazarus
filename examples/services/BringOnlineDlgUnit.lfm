@@ -7,6 +7,7 @@ object BringOnlineDlg: TBringOnlineDlg
   Caption = 'BringOnlineDlg'
   ClientHeight = 109
   ClientWidth = 353
+  OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.8.1.0'
@@ -42,7 +43,6 @@ object BringOnlineDlg: TBringOnlineDlg
     Width = 75
     Cancel = True
     Caption = 'Cancel'
-    ModalResult = 11
     OnClick = CloseBtnClick
     TabOrder = 1
   end

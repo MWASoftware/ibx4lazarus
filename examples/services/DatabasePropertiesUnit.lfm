@@ -33,11 +33,11 @@ object DatabaseProperties: TDatabaseProperties
     Text = 'Edit2'
   end
   object Label4: TLabel
-    Left = 22
+    Left = 19
     Height = 14
-    Top = 152
-    Width = 88
-    Caption = 'DB Version No.'
+    Top = 150
+    Width = 91
+    Caption = 'Svr Version No.'
     ParentColor = False
   end
   object Edit5: TEdit
@@ -349,22 +349,6 @@ object DatabaseProperties: TDatabaseProperties
     Caption = 'Date DB Created'
     ParentColor = False
   end
-  object DBDateEdit1: TDBDateEdit
-    Left = 533
-    Height = 24
-    Top = 237
-    Width = 116
-    CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
-    ReadOnly = True
-    DateOrder = doNone
-    ButtonWidth = 23
-    NumGlyphs = 1
-    MaxLength = 0
-    TabOrder = 18
-    Text = 'DBDateEdit1'
-    DataField = 'MON$CREATION_DATE'
-    DataSource = DatabaseSource
-  end
   object DBEdit3: TDBEdit
     Left = 121
     Height = 24
@@ -375,7 +359,7 @@ object DatabaseProperties: TDatabaseProperties
     ReadOnly = True
     CharCase = ecNormal
     MaxLength = 0
-    TabOrder = 19
+    TabOrder = 18
   end
   object Label24: TLabel
     Left = 51
@@ -400,7 +384,7 @@ object DatabaseProperties: TDatabaseProperties
     Width = 75
     Caption = 'Close'
     ModalResult = 11
-    TabOrder = 20
+    TabOrder = 19
   end
   object Label3: TLabel
     Left = 460
@@ -425,7 +409,7 @@ object DatabaseProperties: TDatabaseProperties
     Width = 89
     Alignment = taRightJustify
     ReadOnly = True
-    TabOrder = 21
+    TabOrder = 20
     Text = 'Edit3'
   end
   object Edit4: TEdit
@@ -435,7 +419,7 @@ object DatabaseProperties: TDatabaseProperties
     Width = 89
     Alignment = taRightJustify
     ReadOnly = True
-    TabOrder = 22
+    TabOrder = 21
     Text = 'Edit4'
   end
   object DBEdit2: TDBEdit
@@ -448,7 +432,7 @@ object DatabaseProperties: TDatabaseProperties
     ReadOnly = True
     CharCase = ecNormal
     MaxLength = 0
-    TabOrder = 23
+    TabOrder = 22
   end
   object DBCharacterSet: TIBLookupComboEditBox
     Left = 121
@@ -463,10 +447,22 @@ object DatabaseProperties: TDatabaseProperties
     ListSource = CharSetSource
     LookupCache = False
     OnEditingDone = DBCharacterSetEditingDone
-    TabOrder = 24
+    TabOrder = 23
     AutoInsert = False
     AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
     ItemHeight = 0
+  end
+  object DBEdit1: TDBEdit
+    Left = 533
+    Height = 24
+    Top = 240
+    Width = 132
+    DataField = 'MON$CREATION_DATE'
+    DataSource = DatabaseSource
+    ReadOnly = True
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 24
   end
   object IBDatabaseInfo: TIBDatabaseInfo
     Database = IBDatabase1
@@ -510,7 +506,7 @@ object DatabaseProperties: TDatabaseProperties
     top = 272
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -591,8 +587,8 @@ object DatabaseProperties: TDatabaseProperties
     Database = IBDatabase1
     Transaction = IBTransaction1
     AfterClose = DBCharSetAfterClose
-    AfterPost = DBCharSetAfterPost
     BeforeOpen = DBCharSetBeforeOpen
+    AutoCommit = acCommitRetaining
     BufferChunks = 1000
     CachedUpdates = False
     GenerateParamNames = False
