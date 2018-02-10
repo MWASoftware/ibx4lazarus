@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="10"/>
+    <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="93">
+    <Units Count="94">
       <Unit0>
         <Filename Value="servicesdemo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -17,7 +17,6 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="121"/>
         <CursorPos X="60" Y="142"/>
         <UsageCount Value="149"/>
@@ -203,9 +202,11 @@
       </Unit18>
       <Unit19>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="37"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1027"/>
+        <CursorPos Y="1037"/>
         <UsageCount Value="17"/>
+        <Loaded Value="True"/>
       </Unit19>
       <Unit20>
         <Filename Value="../../changelog"/>
@@ -334,10 +335,11 @@
       </Unit35>
       <Unit36>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1215"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1233"/>
         <CursorPos Y="1246"/>
         <UsageCount Value="25"/>
+        <Loaded Value="True"/>
       </Unit36>
       <Unit37>
         <Filename Value="../../../fbintf/client/FBMessages.pas"/>
@@ -744,12 +746,33 @@
         <CursorPos X="67" Y="138"/>
         <UsageCount Value="10"/>
       </Unit92>
+      <Unit93>
+        <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="260"/>
+        <CursorPos Y="279"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit93>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="4" HistoryIndex="3">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="225" Column="5" TopLine="133"/>
       </Position1>
+      <Position2>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="142" Column="60" TopLine="121"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../../fbintf/IB.pas"/>
+        <Caret Line="1246" TopLine="1233"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/IBDatabase.pas"/>
+        <Caret Line="1037" TopLine="1027"/>
+      </Position4>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
