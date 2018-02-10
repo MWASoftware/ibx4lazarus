@@ -25,15 +25,15 @@ type
     DBCharSetSource: TDataSource;
     DBEdit1: TDBEdit;
     DBEdit2: TDBEdit;
-    DBEdit3: TDBEdit;
+    DBOwner: TDBEdit;
     DBIsReadOnly: TCheckBox;
     Edit10: TEdit;
     Edit11: TEdit;
     Edit12: TEdit;
-    Edit13: TEdit;
+    LingerDelay: TEdit;
     Edit2: TEdit;
-    Edit3: TEdit;
-    Edit4: TEdit;
+    PagesUsed: TEdit;
+    PagesAvail: TEdit;
     Edit5: TEdit;
     Edit6: TEdit;
     Edit7: TEdit;
@@ -87,7 +87,7 @@ type
     procedure DBCharSetAfterClose(DataSet: TDataSet);
     procedure DBCharSetBeforeOpen(DataSet: TDataSet);
     procedure DBIsReadOnlyChange(Sender: TObject);
-    procedure Edit13EditingDone(Sender: TObject);
+    procedure LingerDelayEditingDone(Sender: TObject);
     procedure IBDatabase1AfterConnect(Sender: TObject);
     procedure IBDatabase1AfterDisconnect(Sender: TObject);
     procedure IBDatabase1BeforeDisconnect(Sender: TObject);
@@ -131,6 +131,18 @@ procedure TDatabaseProperties.IBDatabase1AfterConnect(Sender: TObject);
 begin
   IBDatabase1.LoginPrompt := false;
   IBTransaction1.Active := true;
+  if IBDatabaseInfo.ODSMajorVersion < 12 then
+  begin
+    SecDatabase.Enabled := false;
+    SecDatabase.DataField := '';
+    DBCharacterSet.ReadOnly := true;
+    AutoAdmin.Enabled := false;
+    DBOwner.Enabled := false;
+    DBOwner.DataField := '';
+    LingerDelay.Enabled := false;
+    PagesUsed.Enabled := false;
+    PagesAvail.Enabled := false;
+  end;
 
   {Virtual tables did not exist prior to Firebird 2.1 - so don't bother with old version}
   with IBDatabaseInfo do
@@ -286,13 +298,11 @@ begin
     Edit10.Text := IntToStr(IBDatabaseInfo.CurrentMemory);
     Edit11.Text := IntToStr(IBDatabaseInfo.MaxMemory);
     Edit12.Text := IntToStr(IBDatabaseInfo.NumBuffers);
-    Edit3.Text := IntToStr(IBDatabaseInfo.PagesUsed);
-    Edit4.Text := IntToStr(IBDatabaseInfo.PagesFree);
+    AllocatedPages.Text := IntToStr(IBDatabaseInfo.Allocation);
+    PageSize.Text := IntToStr(IBDatabaseInfo.PageSize);
     DBIsReadOnly.Checked := IBDatabaseInfo.ReadOnly <> 0;
     SyncWrites.Checked := IBDatabaseInfo.ForcedWrites = 1;
     SweepInterval.Text := IntToStr(IBDatabaseInfo.SweepInterval);
-    AllocatedPages.Text := IntToStr(IBDatabaseInfo.Allocation);
-    PageSize.Text := IntToStr(IBDatabaseInfo.PageSize);
     NoReserve.Checked := IBDatabaseInfo.NoReserve = 0;
     GetDBFlags;
     DatabaseOnline.Checked := FDatabaseOnline;
@@ -300,8 +310,15 @@ begin
     IsShadowChk.Enabled := FShadowDatabase;
     if IBDatabaseInfo.ODSMajorVersion >= 12 then
     begin
+      PagesUsed.Text := IntToStr(IBDatabaseInfo.PagesUsed);
+      PagesAvail.Text := IntToStr(IBDatabaseInfo.PagesFree);
       SecGlobalAuth.Active := true; {sets AutoAdmin}
       SecGlobalAuth.Active := false;
+    end
+    else
+    begin
+      PagesUsed.Text := '';
+      PagesAvail.Text := '';
     end;
   finally
     FLoading := false;
@@ -350,9 +367,6 @@ end;
 
 procedure TDatabaseProperties.DatabaseQueryBeforeOpen(DataSet: TDataSet);
 begin
-  SecDatabase.Enabled := IBDatabaseInfo.ODSMajorVersion >= 12;
-  DBCharacterSet.ReadOnly := IBDatabaseInfo.ODSMajorVersion < 12;
-  AutoAdmin.Enabled := IBDatabaseInfo.ODSMajorVersion >= 12;
 end;
 
 procedure TDatabaseProperties.DBCharSetAfterClose(DataSet: TDataSet);
@@ -392,11 +406,11 @@ begin
   end;
 end;
 
-procedure TDatabaseProperties.Edit13EditingDone(Sender: TObject);
+procedure TDatabaseProperties.LingerDelayEditingDone(Sender: TObject);
 begin
-  if (StrToInt(Edit13.Text) =  DatabaseQuery.FieldByName('RDB$LINGER').AsInteger) then Exit;
+  if (StrToInt(LingerDelay.Text) =  DatabaseQuery.FieldByName('RDB$LINGER').AsInteger) then Exit;
 
-  if (Edit13.Text = '') or (StrToInt(Edit13.Text) = 0) then
+  if (LingerDelay.Text = '') or (StrToInt(LingerDelay.Text) = 0) then
   begin
     if MessageDlg('Turn off Linger Permanently?',mtConfirmation,[mbYes,mbNo],0) = mrNo then
     begin
@@ -407,7 +421,7 @@ begin
     ExecDDL.SQL.Text := 'ALTER DATABASE DROP LINGER'
   end
   else
-    ExecDDL.SQL.Text := 'ALTER DATABASE SET LINGER TO ' + Edit13.Text;
+    ExecDDL.SQL.Text := 'ALTER DATABASE SET LINGER TO ' + LingerDelay.Text;
   with ExecDDL do
   begin
     Transaction.Active := true;
@@ -423,17 +437,16 @@ procedure TDatabaseProperties.DatabaseQueryAfterOpen(DataSet: TDataSet);
 var Linger: TField;
 begin
   DBCharSet.Active :=true;
-  Linger := DataSet.FieldByName('RDB$LINGER');
+  Linger := DataSet.FindField('RDB$LINGER');
   if Linger <> nil then
   begin
     if Linger.IsNull then
-      Edit13.Text := '0'
+      LingerDelay.Text := '0'
     else
-      Edit13.Text := Linger.AsString;
+      LingerDelay.Text := Linger.AsString;
   end
   else
-    Edit13.Text := 'n/a';
-   Edit13.ReadOnly := (Linger = nil) or (IBDatabaseInfo.ODSMajorVersion < 12);
+    LingerDelay.Text := 'n/a';
 end;
 
 procedure TDatabaseProperties.DatabaseQueryBeforeClose(DataSet: TDataSet);
