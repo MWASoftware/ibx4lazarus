@@ -136,6 +136,15 @@ begin
     Memo1.Lines.Add('Base Location = ' + ConfigParams.BaseLocation);
     Memo1.Lines.Add('Lock File Location = ' + ConfigParams.LockFileLocation);
     Memo1.Lines.Add('Security Database Location = ' + ConfigParams.SecurityDatabaseLocation);
+
+    if ServerVersionNo[1] < 3 then
+    begin
+      {Hide References to Alt.Sec. Database if Firebird 2.x or earlier}
+      SelectDBDlg.UseAltSecDB.Visible := false;
+      SelectValidationDlg.UseAltSecDB.Visible := false;
+      RestoreDlg.UseAltSecDB.Visible := false;
+      BackupDlg.UseAltSecDB.Visible := false;
+    end;
   end;
   {Leave IBServerProperties1 as active and use this as the common service interface}
 end;

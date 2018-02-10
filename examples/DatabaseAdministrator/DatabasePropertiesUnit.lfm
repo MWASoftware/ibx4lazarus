@@ -1,17 +1,17 @@
 object DatabaseProperties: TDatabaseProperties
-  Left = 964
-  Height = 457
-  Top = 504
+  Left = 945
+  Height = 471
+  Top = 396
   Width = 814
   BorderStyle = bsDialog
   Caption = 'Database Properties'
-  ClientHeight = 457
+  ClientHeight = 471
   ClientWidth = 814
   Position = poMainFormCenter
   LCLVersion = '1.8.1.0'
   object Bevel1: TBevel
     Left = 8
-    Height = 441
+    Height = 456
     Top = 8
     Width = 710
   end
@@ -464,6 +464,15 @@ object DatabaseProperties: TDatabaseProperties
     MaxLength = 0
     TabOrder = 24
   end
+  object AutoAdmin: TCheckBox
+    Left = 112
+    Height = 22
+    Top = 432
+    Width = 151
+    Caption = 'Auto Admin Mapping'
+    OnChange = AutoAdminChange
+    TabOrder = 25
+  end
   object IBDatabaseInfo: TIBDatabaseInfo
     Database = IBDatabase1
     left = 744
@@ -506,7 +515,7 @@ object DatabaseProperties: TDatabaseProperties
     top = 272
   end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -607,5 +616,24 @@ object DatabaseProperties: TDatabaseProperties
     DataSet = DBCharSet
     left = 392
     top = 400
+  end
+  object SecGlobalAuth: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = IBTransaction1
+    AfterOpen = SecGlobalAuthAfterOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select count(*) as Mappings'
+      'From SEC$GLOBAL_AUTH_MAPPING A'
+      'Where SEC$MAP_NAME = ''AutoAdminImplementationMapping'''
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 320
+    top = 320
   end
 end

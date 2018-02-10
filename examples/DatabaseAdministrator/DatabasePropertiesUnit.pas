@@ -17,6 +17,7 @@ type
     AllocatedPages: TEdit;
     Bevel1: TBevel;
     Button1: TButton;
+    AutoAdmin: TCheckBox;
     DatabaseOnline: TCheckBox;
     DatabaseQuery: TIBQuery;
     DatabaseSource: TDataSource;
@@ -43,6 +44,7 @@ type
     CharSetLookup: TIBQuery;
     DBCharSet: TIBQuery;
     DBCharacterSet: TIBLookupComboEditBox;
+    SecGlobalAuth: TIBQuery;
     IBStatisticalService1: TIBStatisticalService;
     IBTransaction1: TIBTransaction;
     IBUpdate1: TIBUpdate;
@@ -77,6 +79,7 @@ type
     ExecDDL: TIBSQL;
     SweepInterval: TEdit;
     SyncWrites: TCheckBox;
+    procedure AutoAdminChange(Sender: TObject);
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
     procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
@@ -95,6 +98,7 @@ type
     procedure IsShadowChkChange(Sender: TObject);
     procedure NoReserveChange(Sender: TObject);
     procedure DBCharacterSetEditingDone(Sender: TObject);
+    procedure SecGlobalAuthAfterOpen(DataSet: TDataSet);
     procedure SweepIntervalEditingDone(Sender: TObject);
     procedure SyncWritesChange(Sender: TObject);
   private
@@ -218,6 +222,11 @@ begin
     DBCharSet.Post;
 end;
 
+procedure TDatabaseProperties.SecGlobalAuthAfterOpen(DataSet: TDataSet);
+begin
+  AutoAdmin.Checked := DataSet.FieldByName('Mappings').AsInteger > 0;
+end;
+
 procedure TDatabaseProperties.SweepIntervalEditingDone(Sender: TObject);
 begin
   if FLoading then Exit;
@@ -289,6 +298,11 @@ begin
     DatabaseOnline.Checked := FDatabaseOnline;
     IsShadowChk.Checked := FShadowDatabase;
     IsShadowChk.Enabled := FShadowDatabase;
+    if IBDatabaseInfo.ODSMajorVersion >= 12 then
+    begin
+      SecGlobalAuth.Active := true; {sets AutoAdmin}
+      SecGlobalAuth.Active := false;
+    end;
   finally
     FLoading := false;
   end;
@@ -338,6 +352,7 @@ procedure TDatabaseProperties.DatabaseQueryBeforeOpen(DataSet: TDataSet);
 begin
   SecDatabase.Enabled := IBDatabaseInfo.ODSMajorVersion >= 12;
   DBCharacterSet.ReadOnly := IBDatabaseInfo.ODSMajorVersion < 12;
+  AutoAdmin.Enabled := IBDatabaseInfo.ODSMajorVersion >= 12;
 end;
 
 procedure TDatabaseProperties.DBCharSetAfterClose(DataSet: TDataSet);
@@ -453,6 +468,25 @@ begin
      else
        LoadData;
    end;
+end;
+
+procedure TDatabaseProperties.AutoAdminChange(Sender: TObject);
+begin
+  if FLoading then Exit;
+  try
+    IBConfigService1.SetAutoAdmin(AutoAdmin.Checked);
+    while IBConfigService1.IsServiceRunning do;
+  except on E:Exception do
+   begin
+    MessageDlg(E.message,mtError,[mbOK],0);
+     FLoading := true;
+     try
+       AutoAdmin.Checked := not AutoAdmin.Checked;
+     finally
+       FLoading := false;
+     end;
+   end;
+  end;
 end;
 
 function TDatabaseProperties.ShowModal(ActiveService: TIBCustomService;
