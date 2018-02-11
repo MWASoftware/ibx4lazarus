@@ -11,7 +11,7 @@ uses
   LimboTransactionsUnit, NewUserDlgUnit, ChgPasswordDlgUnit,
   ServicesLoginDlgUnit, SelectValidationDlgUnit, SelectDBDlgUnit, DatabasePropertiesUnit,
   DBLoginDlgUnit, AltDBSvcLoginDlgUnit, BringOnlineDlgUnit, ShutdownRegDlgUnit,
-  ShutdownDatabaseDlgUnit
+  ShutdownDatabaseDlgUnit,AddShadowSetDlgUnit, AddSecondaryFileDlgUnit, AddShadowFileDlgUnit
 
   { you can add units after this };
 
@@ -36,6 +36,9 @@ begin
   Application.CreateForm(TBringOnlineDlg, BringOnlineDlg);
   Application.CreateForm(TShutdownReqDlg, ShutdownReqDlg);
   Application.CreateForm(TShutdownDatabaseDlg, ShutdownDatabaseDlg);
+  Application.CreateForm(TAddShadowFileDlg, AddShadowFileDlg);
+  Application.CreateForm(TAddShadowSetDlg, AddShadowSetDlg);
+  Application.CreateForm(TAddSecondaryFileDlg, AddSecondaryFileDlg);
   Application.Run;
 end.
 

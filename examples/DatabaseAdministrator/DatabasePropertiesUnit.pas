@@ -5,36 +5,44 @@ unit DatabasePropertiesUnit;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  DbCtrls, Buttons,  ActnList, ExtCtrls, db, IBDatabaseInfo, IBQuery,
-  IBSQL, IBDatabase, IBServices, IBUpdate, IBLookupComboEditBox, IB;
+  Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, Forms, Controls,
+  Graphics, Dialogs, StdCtrls, DbCtrls, Buttons, ActnList, ExtCtrls, ComCtrls,
+  db, IBDatabaseInfo, IBQuery, IBSQL, IBDatabase, IBServices, IBUpdate,
+  IBCustomDataSet, IBExtract, IBLookupComboEditBox, IBDynamicGrid, IB;
 
 type
 
   { TDatabaseProperties }
 
   TDatabaseProperties = class(TForm)
+    ActionList1: TActionList;
+    AddFileBtn: TButton;
+    AddSecondary: TAction;
+    AddShadowBtn: TButton;
+    AddShadowSet: TAction;
     AllocatedPages: TEdit;
-    Bevel1: TBevel;
-    Button1: TButton;
     AutoAdmin: TCheckBox;
+    Button1: TButton;
+    CharSetLookup: TIBQuery;
+    CharSetSource: TDataSource;
     DatabaseOnline: TCheckBox;
     DatabaseQuery: TIBQuery;
     DatabaseSource: TDataSource;
-    CharSetSource: TDataSource;
+    DBCharacterSet: TIBLookupComboEditBox;
+    DBCharSet: TIBQuery;
+    DBCharSetRO: TDBEdit;
     DBCharSetSource: TDataSource;
     DBEdit1: TDBEdit;
     DBEdit2: TDBEdit;
-    DBCharSetRO: TDBEdit;
-    DBOwner: TDBEdit;
     DBIsReadOnly: TCheckBox;
+    DBOwner: TDBEdit;
+    DBSecFiles: TIBQuery;
+    IBExtract1: TIBExtract;
+    PrimaryDBFile: TEdit;
     Edit10: TEdit;
     Edit11: TEdit;
     Edit12: TEdit;
-    LingerDelay: TEdit;
     Edit2: TEdit;
-    PagesUsed: TEdit;
-    PagesAvail: TEdit;
     Edit5: TEdit;
     Edit6: TEdit;
     Edit7: TEdit;
@@ -42,12 +50,11 @@ type
     IBConfigService1: TIBConfigService;
     IBDatabase1: TIBDatabase;
     IBDatabaseInfo: TIBDatabaseInfo;
-    CharSetLookup: TIBQuery;
-    DBCharSet: TIBQuery;
-    DBCharacterSet: TIBLookupComboEditBox;
-    SecGlobalAuth: TIBQuery;
+    IBDynamicGrid1: TIBDynamicGrid;
+    IBDynamicGrid2: TIBDynamicGrid;
     IBStatisticalService1: TIBStatisticalService;
-    IBTransaction1: TIBTransaction;
+    CurrentTransaction: TIBTransaction;
+    ExecDDL: TIBSQL;
     IBUpdate1: TIBUpdate;
     IsShadowChk: TCheckBox;
     Label1: TLabel;
@@ -67,6 +74,9 @@ type
     Label22: TLabel;
     Label23: TLabel;
     Label24: TLabel;
+    Label25: TLabel;
+    Label26: TLabel;
+    Label27: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
@@ -74,12 +84,35 @@ type
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
+    LingerDelay: TEdit;
     NoReserve: TCheckBox;
+    PageControl1: TPageControl;
+    PagesAvail: TEdit;
     PageSize: TEdit;
+    PagesUsed: TEdit;
+    RemoveShadow: TAction;
+    RemoveShadowBtn: TButton;
     SecDatabase: TDBEdit;
-    ExecDDL: TIBSQL;
+    SecFiles: TDataSource;
+    SecGlobalAuth: TIBQuery;
+    ShadowFiles: TIBQuery;
+    ShadowFilesFileMode: TStringField;
+    ShadowFilesRDBFILE_FLAGS: TSmallintField;
+    ShadowFilesRDBFILE_LENGTH: TIntegerField;
+    ShadowFilesRDBFILE_NAME: TIBStringField;
+    ShadowFilesRDBFILE_SEQUENCE: TSmallintField;
+    ShadowFilesRDBFILE_START: TIntegerField;
+    ShadowFilesRDBSHADOW_NUMBER: TSmallintField;
+    ShadowSource: TDataSource;
     SweepInterval: TEdit;
     SyncWrites: TCheckBox;
+    GeneralTab: TTabSheet;
+    FilesTab: TTabSheet;
+    Schema: TTabSheet;
+    SynEdit1: TSynEdit;
+    SynSQLSyn1: TSynSQLSyn;
+    procedure AddSecondaryExecute(Sender: TObject);
+    procedure AddShadowSetExecute(Sender: TObject);
     procedure AutoAdminChange(Sender: TObject);
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
@@ -87,20 +120,25 @@ type
     procedure DBCharSetAfterClose(DataSet: TDataSet);
     procedure DBCharSetBeforeOpen(DataSet: TDataSet);
     procedure DBIsReadOnlyChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure LingerDelayEditingDone(Sender: TObject);
     procedure IBDatabase1AfterConnect(Sender: TObject);
     procedure IBDatabase1AfterDisconnect(Sender: TObject);
     procedure IBDatabase1BeforeDisconnect(Sender: TObject);
     procedure IBDatabase1Login(Database: TIBDatabase; LoginParams: TStrings);
-    procedure IBTransaction1AfterTransactionEnd(Sender: TObject);
+    procedure CurrentTransactionAfterTransactionEnd(Sender: TObject);
     procedure IBUpdate1ApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
     procedure IsShadowChkChange(Sender: TObject);
     procedure NoReserveChange(Sender: TObject);
     procedure DBCharacterSetEditingDone(Sender: TObject);
+    procedure RemoveShadowExecute(Sender: TObject);
+    procedure RemoveShadowUpdate(Sender: TObject);
+    procedure SchemaShow(Sender: TObject);
     procedure SecGlobalAuthAfterOpen(DataSet: TDataSet);
     procedure SweepIntervalEditingDone(Sender: TObject);
     procedure SyncWritesChange(Sender: TObject);
+    procedure FilesTabShow(Sender: TObject);
   private
     FDatabaseOnline: boolean;
     FShadowDatabase: boolean;
@@ -110,6 +148,7 @@ type
     procedure GetDBFlags;
     procedure LoadData;
     procedure Connect;
+    procedure DoExtract(Data: PtrInt);
   public
     function ShowModal(ActiveService: TIBCustomService; DBName: string; aPassword: string): TModalResult;
     function IsDatabaseOnline: boolean;
@@ -123,14 +162,26 @@ implementation
 {$R *.lfm}
 
 uses IBUtils, DBLoginDlgUnit, FBMessages, IBErrorCodes,
-  BringOnlineDlgUnit, ShutdownRegDlgUnit, ShutdownDatabaseDlgUnit;
+  BringOnlineDlgUnit, ShutdownRegDlgUnit, ShutdownDatabaseDlgUnit,
+  AddShadowSetDlgUnit, AddSecondaryFileDlgUnit;
+
+const
+  sAddSecondarySQL  = 'Alter Database Add File ''%s'' Starting at %d';
+  sAddSecondarySQL2 = 'Alter Database Add File ''%s'' Starting at %d Length %d';
+  sRemoveShadow     = 'Drop Shadow %d';
+  sRemoveShadow12   = 'Drop Shadow %d DELETE FILE';
+  sPreserveShadow   = 'Drop Shadow %d PRESERVE FILE';
+
+resourcestring
+  sPreserveShadowFiles = 'Preserve Shadow Set Files after drop?';
+
 
 { TDatabaseProperties }
 
 procedure TDatabaseProperties.IBDatabase1AfterConnect(Sender: TObject);
 begin
   IBDatabase1.LoginPrompt := false;
-  IBTransaction1.Active := true;
+  CurrentTransaction.Active := true;
   if IBDatabaseInfo.ODSMajorVersion < 12 then
   begin
     SecDatabase.Enabled := false;
@@ -151,6 +202,8 @@ begin
   with IBDatabaseInfo do
     if (ODSMajorVersion > 11) or ((ODSMajorVersion = 11) and (ODSMinorVersion >= 1)) then
       DataBaseQuery.Active := true;
+  if PageControl1.ActivePage = FilesTab then
+    FilesTab.FilesTabShow(nil);
 end;
 
 procedure TDatabaseProperties.IBDatabase1AfterDisconnect(Sender: TObject);
@@ -193,12 +246,12 @@ end;
 
 {Reopen datasets if database not closing when a transaction ends}
 
-procedure TDatabaseProperties.IBTransaction1AfterTransactionEnd(Sender: TObject
+procedure TDatabaseProperties.CurrentTransactionAfterTransactionEnd(Sender: TObject
   );
 begin
   if not FDisconnecting then
   begin
-    IBTransaction1.Active := true;
+    CurrentTransaction.Active := true;
     DatabaseQuery.Active := true;
   end;
 end;
@@ -249,6 +302,38 @@ begin
     DBCharSet.Post;
 end;
 
+procedure TDatabaseProperties.RemoveShadowExecute(Sender: TObject);
+var ShadowSet: integer;
+begin
+  ShadowSet := ShadowSource.DataSet.FieldByName('RDB$Shadow_Number').AsInteger;
+  if IBDatabaseInfo.ODSMajorVersion < 12 then
+  begin
+    if MessageDlg(Format(sRemoveShadow,[ShadowSet]),mtConfirmation,[mbYes,mbNo],0) = mrYes then
+       ExecDDL.SQL.Text := Format(sRemoveShadow,[ShadowSet]);
+  end
+  else
+    case MessageDlg(Format(sPreserveShadowFiles,[ShadowSet]),mtConfirmation,[mbYes,mbNo,mbCancel],0) of
+    mrNo:
+      ExecDDL.SQL.Text  :=Format(sRemoveShadow12,[ShadowSet]);
+    mrYes:
+      ExecDDL.SQL.Text := Format(sPreserveShadow,[ShadowSet]);
+    mrCancel:
+      Exit;
+    end;
+  ExecDDL.ExecQuery;
+  CurrentTransaction.Commit;
+end;
+
+procedure TDatabaseProperties.RemoveShadowUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled :=  ShadowFiles.Active and (ShadowFiles.RecordCount > 0);
+end;
+
+procedure TDatabaseProperties.SchemaShow(Sender: TObject);
+begin
+  Application.QueueAsyncCall(@DoExtract,0);
+end;
+
 procedure TDatabaseProperties.SecGlobalAuthAfterOpen(DataSet: TDataSet);
 begin
   AutoAdmin.Checked := DataSet.FieldByName('Mappings').AsInteger > 0;
@@ -266,6 +351,12 @@ begin
   if FLoading then Exit;
   IBConfigService1.SetAsyncMode(not SyncWrites.Checked);
   while IBConfigService1.IsServiceRunning do;
+end;
+
+procedure TDatabaseProperties.FilesTabShow(Sender: TObject);
+begin
+  DBSecFiles.Active := true;
+  ShadowFiles.Active := true;
 end;
 
 {If we want to know if this is a shadow database or if it is shutdown then
@@ -319,6 +410,7 @@ begin
     SyncWrites.Checked := IBDatabaseInfo.ForcedWrites = 1;
     SweepInterval.Text := IntToStr(IBDatabaseInfo.SweepInterval);
     NoReserve.Checked := IBDatabaseInfo.NoReserve = 0;
+    PrimaryDBFile.Text := IBDatabaseInfo.DBFileName;
     GetDBFlags;
     DatabaseOnline.Checked := FDatabaseOnline;
     IsShadowChk.Checked := FShadowDatabase;
@@ -379,6 +471,12 @@ begin
   LoadData;
 end;
 
+procedure TDatabaseProperties.DoExtract(Data: PtrInt);
+begin
+  IBExtract1.ExtractObject(eoDatabase);
+  SynEdit1.Lines.Assign(IBExtract1.Items);
+end;
+
 procedure TDatabaseProperties.DBCharSetAfterClose(DataSet: TDataSet);
 begin
   CharSetLookup.Active := false;
@@ -414,6 +512,11 @@ begin
   finally
     Connect;
   end;
+end;
+
+procedure TDatabaseProperties.FormShow(Sender: TObject);
+begin
+  PageControl1.ActivePage := GeneralTab;
 end;
 
 procedure TDatabaseProperties.LingerDelayEditingDone(Sender: TObject);
@@ -473,7 +576,7 @@ begin
    begin
      {Bring the database back online}
      BringOnlineDlg.ShowModal(IBConfigService1);
-     IBTransaction1.Commit; {refresh}
+     CurrentTransaction.Commit; {refresh}
    end
    else
    begin
@@ -509,6 +612,58 @@ begin
        FLoading := false;
      end;
    end;
+  end;
+end;
+
+procedure TDatabaseProperties.AddShadowSetExecute(Sender: TObject);
+var CurrentLocation: TBookmark;
+    ShadowSet: integer;
+begin
+  if ShadowSource.DataSet.RecordCount = 0 then
+    ShadowSet := 1
+  else
+  with ShadowSource.DataSet do
+  begin
+    CurrentLocation := Bookmark;
+    DisableControls;
+    try
+      Last;
+      ShadowSet := FieldByName('RDB$Shadow_Number').AsInteger + 1;
+    finally
+      Bookmark := CurrentLocation;
+      EnableControls
+    end
+  end;
+  AddShadowSetDlg.ShowModal(ShadowSet);
+  CurrentTransaction.Commit;
+end;
+
+procedure TDatabaseProperties.AddSecondaryExecute(Sender: TObject);
+var FileName: string;
+    StartAt: integer;
+    FileLength: integer;
+    Pages: boolean;
+    SQLText: string;
+begin
+  StartAt := 0;
+  if IsDatabaseOnline then
+    raise Exception.Create('The database must be shutdown before adding secondary files');
+
+  if AddSecondaryFileDlg.ShowModal(FileName,StartAt,FileLength,Pages) = mrOK then
+  begin
+    if not Pages then
+    begin
+      StartAt := StartAt*1024*1024 div IBDatabaseInfo.PageSize;
+      if FileLength <> -1 then
+        FileLength := FileLength*1024*1024 div IBDatabaseInfo.PageSize;
+    end;
+    if FileLength <> -1 then
+      SQLText := Format(sAddSecondarySQL2,[FileName,StartAt,FileLength])
+    else
+      SQLText := Format(sAddSecondarySQL,[FileName,StartAt]);
+    ExecDDL.SQL.Text := SQLText;
+    ExecDDL.ExecQuery;
+    CurrentTransaction.Commit;
   end;
 end;
 
