@@ -219,8 +219,8 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="152"/>
-        <CursorPos X="3" Y="187"/>
+        <TopLine Value="80"/>
+        <CursorPos Y="87"/>
         <UsageCount Value="22"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -274,124 +274,135 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
-        <Caret Line="91" Column="14" TopLine="71"/>
+        <Caret Line="156" Column="40" TopLine="137"/>
       </Position1>
       <Position2>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
-        <Caret Line="156" Column="40" TopLine="137"/>
+        <Caret Line="183" TopLine="149"/>
       </Position2>
       <Position3>
-        <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
-        <Caret Line="183" TopLine="149"/>
-      </Position3>
-      <Position4>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
         <Caret Line="254" TopLine="234"/>
+      </Position3>
+      <Position4>
+        <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
+        <Caret Line="168" Column="38" TopLine="149"/>
       </Position4>
       <Position5>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
-        <Caret Line="168" Column="38" TopLine="149"/>
+        <Caret Line="157" Column="33" TopLine="147"/>
       </Position5>
       <Position6>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
-        <Caret Line="157" Column="33" TopLine="147"/>
+        <Caret Line="154" Column="46" TopLine="144"/>
       </Position6>
       <Position7>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
-        <Caret Line="154" Column="46" TopLine="144"/>
+        <Caret Line="153" TopLine="144"/>
       </Position7>
       <Position8>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
-        <Caret Line="153" TopLine="144"/>
+        <Caret Line="161" Column="6" TopLine="144"/>
       </Position8>
       <Position9>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
-        <Caret Line="161" Column="6" TopLine="144"/>
+        <Caret Line="186" Column="34" TopLine="152"/>
       </Position9>
       <Position10>
-        <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
-        <Caret Line="186" Column="34" TopLine="152"/>
-      </Position10>
-      <Position11>
         <Filename Value="../../../fbintf/IB.pas"/>
         <Caret Line="1145" Column="18" TopLine="1125"/>
-      </Position11>
-      <Position12>
+      </Position10>
+      <Position11>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
         <Caret Line="179" Column="33" TopLine="152"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../../fbintf/IB.pas"/>
+        <Caret Line="1239" TopLine="1213"/>
       </Position12>
       <Position13>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1239" TopLine="1213"/>
+        <Caret Line="1242" TopLine="1213"/>
       </Position13>
       <Position14>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1242" TopLine="1213"/>
+        <Caret Line="1239" TopLine="1213"/>
       </Position14>
       <Position15>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1239" TopLine="1213"/>
+        <Caret Line="1240" TopLine="1213"/>
       </Position15>
       <Position16>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1240" TopLine="1213"/>
+        <Caret Line="1224" TopLine="1213"/>
       </Position16>
       <Position17>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1224" TopLine="1213"/>
+        <Caret Line="1227" TopLine="1213"/>
       </Position17>
       <Position18>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1227" TopLine="1213"/>
+        <Caret Line="1224" TopLine="1213"/>
       </Position18>
       <Position19>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1224" TopLine="1213"/>
+        <Caret Line="1225" TopLine="1213"/>
       </Position19>
       <Position20>
-        <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1225" TopLine="1213"/>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/sysutils/sysutils.inc"/>
+        <Caret Line="178" TopLine="158"/>
       </Position20>
       <Position21>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/sysutils/sysutils.inc"/>
-        <Caret Line="178" TopLine="158"/>
+        <Caret Line="181" TopLine="158"/>
       </Position21>
       <Position22>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/sysutils/sysutils.inc"/>
-        <Caret Line="181" TopLine="158"/>
+        <Caret Line="179" TopLine="158"/>
       </Position22>
       <Position23>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/sysutils/sysutils.inc"/>
-        <Caret Line="179" TopLine="158"/>
+        <Caret Line="180" TopLine="158"/>
       </Position23>
       <Position24>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/sysutils/sysutils.inc"/>
-        <Caret Line="180" TopLine="158"/>
+        <Caret Line="181" TopLine="158"/>
       </Position24>
       <Position25>
-        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/sysutils/sysutils.inc"/>
-        <Caret Line="181" TopLine="158"/>
+        <Filename Value="../../../fbintf/IB.pas"/>
+        <Caret Line="1226" TopLine="1213"/>
       </Position25>
       <Position26>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1226" TopLine="1213"/>
+        <Caret Line="1227" TopLine="1213"/>
       </Position26>
       <Position27>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1227" TopLine="1213"/>
+        <Caret Line="1241" TopLine="1213"/>
       </Position27>
       <Position28>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1241" TopLine="1213"/>
+        <Caret Line="1242" TopLine="1213"/>
       </Position28>
       <Position29>
-        <Filename Value="../../../fbintf/IB.pas"/>
-        <Caret Line="1242" TopLine="1213"/>
+        <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
+        <Caret Line="186" TopLine="152"/>
       </Position29>
       <Position30>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
-        <Caret Line="186" TopLine="152"/>
+        <Caret Line="26" Column="18" TopLine="21"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="ShutdownDatabaseDlgUnit.pas"/>
+        <Line Value="87"/>
+      </Item1>
+    </BreakPoints>
+  </Debugging>
 </CONFIG>

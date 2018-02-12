@@ -183,8 +183,7 @@ begin
   begin
     ShowModal;
     if FSecContextError  then
-      raise EIBInterBaseError.Create(FirebirdAPI.getStatus);
-//      raise EIBInterBaseError.Create(0,isc_sec_context,'');
+      raise EIBInterBaseError.Create(FirebirdAPI.getStatus); {re-raise the error}
   end;
 end;
 
