@@ -16,13 +16,12 @@ type
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
-    UseAltSecDB: TCheckBox;
     Edit1: TEdit;
     Label1: TLabel;
   private
 
   public
-    function ShowModal(var DatabaseName: string; var IsExpectedDB: boolean): TModalResult;
+    function ShowModal(var DatabaseName: string): TModalResult;
 
   end;
 
@@ -35,16 +34,13 @@ implementation
 
 { TSelectDBDlg }
 
-function TSelectDBDlg.ShowModal(var DatabaseName: string;
-  var IsExpectedDB: boolean): TModalResult;
+function TSelectDBDlg.ShowModal(var DatabaseName: string): TModalResult;
 begin
   Edit1.Text := DatabaseName;
-  UseAltSecDB.Checked := IsExpectedDB;
   Result := inherited ShowModal;
   if Result = mrOK then
   begin
    DatabaseName := Edit1.Text;
-   IsExpectedDB := UseAltSecDB.Checked;
   end;
 
 end;

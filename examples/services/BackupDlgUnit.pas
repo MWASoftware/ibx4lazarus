@@ -27,17 +27,15 @@ type
     RadioButton2: TRadioButton;
     SaveDialog1: TSaveDialog;
     SpeedButton1: TSpeedButton;
-    UseAltSecDB: TCheckBox;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
-    procedure IBBackupService1Login(Service: TIBCustomService;
-      LoginParams: TStrings);
     procedure SpeedButton1Click(Sender: TObject);
   private
     { private declarations }
   public
     { public declarations }
-  end;
+     procedure RunBackup;
+ end;
 
 var
   BackupDlg: TBackupDlg;
@@ -56,6 +54,50 @@ begin
     Edit3.Text := SaveDialog1.Filename;
 end;
 
+procedure TBackupDlg.RunBackup;
+var bakfile: TFileStream;
+    BackupCount: integer;
+begin
+  bakfile := nil;
+  MainForm.Memo1.Lines.Add('Starting Backup');
+  if IBBackupService1.BackupFileLocation = flClientSide then
+    bakfile := TFileStream.Create(IBBackupService1.BackupFile[0],fmCreate);
+  try
+    IBBackupService1.ServiceStart;
+    while not IBBackupService1.Eof do
+    begin
+      case IBBackupService1.BackupFileLocation of
+      flServerSide:
+        MainForm.Memo1.Lines.Add(IBBackupService1.GetNextLine);
+      flClientSide:
+        IBBackupService1.WriteNextChunk(bakfile);
+      end;
+      Application.ProcessMessages;
+    end;
+    if bakfile <> nil then
+      BackupCount := bakfile.Size;
+  finally
+    if bakfile <> nil then
+      bakfile.Free;
+  end;
+
+  while IBBackupService1.IsServiceRunning do; {flush}
+
+  {Report completion}
+  case IBBackupService1.BackupFileLocation of
+  flServerSide:
+    begin
+      MainForm.Memo1.Lines.Add('Backup Completed');
+      MessageDlg('Backup Completed',mtInformation,[mbOK],0);
+    end;
+  flClientSide:
+    begin
+      MainForm.Memo1.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
+      MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
+    end;
+  end;
+end;
+
 procedure TBackupDlg.FormShow(Sender: TObject);
 begin
   Edit1.Text := IBBackupService1.ServerName;
@@ -65,12 +107,6 @@ begin
     RadioButton2.Checked := true;
   Edit2.Text := IBBackupService1.DatabaseName;
   IBBackupService1.BackupFile.Clear;
-end;
-
-procedure TBackupDlg.IBBackupService1Login(Service: TIBCustomService;
-  LoginParams: TStrings);
-begin
-  Form1.AltSecDBLogin(Service,LoginParams);
 end;
 
 procedure TBackupDlg.FormClose(Sender: TObject; var CloseAction: TCloseAction);

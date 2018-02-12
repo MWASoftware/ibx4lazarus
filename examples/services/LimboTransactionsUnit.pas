@@ -163,14 +163,14 @@ procedure TLimboTransactionsForm.RunGFix;
 begin
   with LimboTransactionValidation do
   begin
-    Form1.Memo1.Lines.Add('Starting Limbo transaction resolution');
+    MainForm.Memo1.Lines.Add('Starting Limbo transaction resolution');
     FixLimboTransactionErrors;
     while not Eof do
     begin
-      Form1.Memo1.Lines.Add(GetNextLine);
+      MainForm.Memo1.Lines.Add(GetNextLine);
       Application.ProcessMessages;
     end;
-    Form1.Memo1.Lines.Add('Limbo Transaction resolution complete');
+    MainForm.Memo1.Lines.Add('Limbo Transaction resolution complete');
     Application.QueueAsyncCall(@DoRefresh,0);
   end;
 end;

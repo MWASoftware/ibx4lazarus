@@ -1,4 +1,4 @@
-object Form1: TForm1
+object MainForm: TMainForm
   Left = 627
   Height = 371
   Top = 458
@@ -19,63 +19,63 @@ object Form1: TForm1
     ScrollBars = ssAutoVertical
     TabOrder = 0
   end
-  object Button1: TButton
+  object CLoseBtn: TButton
     Left = 535
     Height = 25
     Top = 312
     Width = 75
     Anchors = [akRight, akBottom]
     Caption = 'Close'
-    OnClick = Button1Click
+    OnClick = CLoseBtnClick
     TabOrder = 1
   end
-  object Button2: TButton
+  object BackupBtn: TButton
     Left = 8
     Height = 25
     Top = 313
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = 'Backup'
-    OnClick = Button2Click
+    OnClick = BackupBtnClick
     TabOrder = 2
   end
-  object Button3: TButton
+  object RestoreBtn: TButton
     Left = 88
     Height = 25
     Top = 313
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = 'Restore'
-    OnClick = Button3Click
+    OnClick = RestoreBtnClick
     TabOrder = 3
   end
-  object Button4: TButton
+  object ServerLOgBtn: TButton
     Left = 168
     Height = 25
     Top = 313
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = 'Server Log'
-    OnClick = Button4Click
+    OnClick = ServerLOgBtnClick
     TabOrder = 4
   end
-  object Button5: TButton
+  object DatabaseBtn: TButton
     Left = 328
     Height = 25
     Top = 313
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = 'Database'
-    OnClick = Button5Click
+    OnClick = DatabaseBtnClick
     TabOrder = 5
   end
-  object Button6: TButton
+  object UsersBtn: TButton
     Left = 248
     Height = 25
     Top = 313
     Width = 75
     Caption = 'Users'
-    OnClick = Button6Click
+    OnClick = UsersBtnClick
     TabOrder = 6
   end
   object IBServerProperties1: TIBServerProperties
@@ -126,7 +126,6 @@ object Form1: TForm1
     Protocol = TCP
     PortNo = 0
     TraceFlags = []
-    IncludeTables = 'EMPLOYEE|JOB'
     DatabaseName = 'employee'
     left = 320
     top = 228

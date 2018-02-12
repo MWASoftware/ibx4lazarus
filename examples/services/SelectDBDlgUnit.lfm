@@ -1,17 +1,17 @@
 object SelectDBDlg: TSelectDBDlg
   Left = 746
-  Height = 103
+  Height = 92
   Top = 264
   Width = 366
   BorderStyle = bsDialog
   Caption = 'Select Database'
-  ClientHeight = 103
+  ClientHeight = 92
   ClientWidth = 366
   Position = poMainFormCenter
   LCLVersion = '1.8.1.0'
   object Bevel1: TBevel
     Left = 9
-    Height = 90
+    Height = 74
     Top = 6
     Width = 271
   end
@@ -50,13 +50,5 @@ object SelectDBDlg: TSelectDBDlg
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
-  end
-  object UseAltSecDB: TCheckBox
-    Left = 24
-    Height = 22
-    Top = 63
-    Width = 190
-    Caption = 'Uses Alt. Security Database'
-    TabOrder = 3
   end
 end

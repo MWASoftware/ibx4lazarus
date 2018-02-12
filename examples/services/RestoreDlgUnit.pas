@@ -28,16 +28,14 @@ type
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     SpeedButton1: TSpeedButton;
-    UseAltSecDB: TCheckBox;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
-    procedure IBRestoreService1Login(Service: TIBCustomService;
-      LoginParams: TStrings);
     procedure SpeedButton1Click(Sender: TObject);
   private
     { private declarations }
   public
     { public declarations }
+    procedure RunRestore;
   end;
 
 var
@@ -57,22 +55,49 @@ begin
     Edit3.Text := OpenDialog1.Filename;
 end;
 
+procedure TRestoreDlg.RunRestore;
+var bakfile: TFileStream;
+    line: string;
+begin
+  bakfile := nil;
+  if IBRestoreService1.BackupFileLocation = flClientSide then
+    bakfile := TFileStream.Create(IBRestoreService1.BackupFile[0],fmOpenRead);
+  MainForm.Memo1.Lines.Add('Restore Started');
+  try
+    IBRestoreService1.ServiceStart;
+    while not IBRestoreService1.Eof do
+    begin
+      case IBRestoreService1.BackupFileLocation of
+      flServerSide:
+        MainForm.Memo1.Lines.Add(Trim(IBRestoreService1.GetNextLine));
+      flClientSide:
+        begin
+          IBRestoreService1.SendNextChunk(bakfile,line);
+          if line <> '' then
+           MainForm. Memo1.Lines.Add(line);
+        end;
+      end;
+      Application.ProcessMessages
+    end;
+  finally
+    if bakfile <> nil then
+      bakfile.Free;
+  end;
+  while IBRestoreService1.IsServiceRunning do; {flush}
+
+  MainForm.Memo1.Lines.Add('Restore Completed');
+  MessageDlg('Restore Completed',mtInformation,[mbOK],0);
+end;
+
 procedure TRestoreDlg.FormShow(Sender: TObject);
 begin
   Edit1.Text := IBRestoreService1.ServerName;
-  UseAltSecDB.Checked := false;
   if IBRestoreService1.BackupFileLocation = flServerSide then
     RadioButton1.Checked := true
   else
     RadioButton2.Checked := true;
   Edit2.Text := IBRestoreService1.DatabaseName[0];
   IBRestoreService1.BackupFile.Clear;
-end;
-
-procedure TRestoreDlg.IBRestoreService1Login(Service: TIBCustomService;
-  LoginParams: TStrings);
-begin
-  Form1.AltSecDBLogin(Service,LoginParams);
 end;
 
 procedure TRestoreDlg.FormClose(Sender: TObject; var CloseAction: TCloseAction);
