@@ -10,8 +10,8 @@ uses
   Forms, MainFormUnit, ibexpress,
   ServicesLoginDlgUnit, SelectValidationDlgUnit, SelectDBDlgUnit,
   BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit,
-  AltDBSvcLoginDlgUnit,NewUserDlgUnit, ChgPasswordDlgUnit
-  { you can add units after this };
+  AltDBSvcLoginDlgUnit,NewUserDlgUnit, ChgPasswordDlgUnit, BringOnlineDlgUnit,
+  ShutdownDatabaseDlgUnit, ShutdownRegDlgUnit;
 
 {$R *.res}
 
@@ -29,6 +29,9 @@ begin
   Application.CreateForm(TSvcLoginDlg, SvcLoginDlg);
   Application.CreateForm(TSelectValidationDlg, SelectValidationDlg);
   Application.CreateForm(TSelectDBDlg, SelectDBDlg);
+  Application.CreateForm(TBringOnlineDlg, BringOnlineDlg);
+  Application.CreateForm(TShutdownReqDlg, ShutdownReqDlg);
+  Application.CreateForm(TShutdownDatabaseDlg, ShutdownDatabaseDlg);
   Application.Run;
 end.
 

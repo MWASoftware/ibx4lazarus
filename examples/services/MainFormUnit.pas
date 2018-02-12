@@ -15,6 +15,12 @@ type
   { TMainForm }
 
   TMainForm = class(TForm)
+    MenuItem6: TMenuItem;
+    Shutdown: TAction;
+    BringOnline: TAction;
+    MenuItem1: TMenuItem;
+    MenuItem5: TMenuItem;
+    Sweep: TAction;
     LimboTransactions: TAction;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
@@ -35,11 +41,14 @@ type
     IBStatisticalService1: TIBStatisticalService;
     IBValidationService1: TIBValidationService;
     Memo1: TMemo;
+    procedure BringOnlineExecute(Sender: TObject);
     procedure CLoseBtnClick(Sender: TObject);
     procedure BackupBtnClick(Sender: TObject);
     procedure RestoreBtnClick(Sender: TObject);
     procedure ServerLOgBtnClick(Sender: TObject);
     procedure DatabaseBtnClick(Sender: TObject);
+    procedure ShutdownExecute(Sender: TObject);
+    procedure SweepExecute(Sender: TObject);
     procedure UsersBtnClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure IBServerProperties1Login(Service: TIBCustomService;
@@ -55,6 +64,8 @@ type
     FDBName: string;
     FServerUserName: string;
     FServerPassword: string;
+    FShutDownMode: TShutdownMode;
+    FDelay: integer;
     procedure SetDBName(AValue: string);
     procedure UseServerLogin;
     function RunService(aService: TIBCustomService; RunProc: TRunServiceProc
@@ -62,9 +73,13 @@ type
     procedure RunShowStatistics;
     procedure RunValidation;
     procedure RunLimboTransactions;
+    procedure RunSweep;
+    procedure RunBringOnline;
+    procedure RunShutdown;
     property DBName: string read FDBName write SetDBName;
   public
     { public declarations }
+    function IsDatabaseOnline: boolean;
   end;
 
 var
@@ -75,7 +90,13 @@ implementation
 {$R *.lfm}
 
 uses IBErrorCodes, FBMessages, ServicesLoginDlgUnit, SelectValidationDlgUnit, SelectDBDlgUnit,
-  BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit, AltDBSvcLoginDlgUnit;
+  BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit, AltDBSvcLoginDlgUnit,
+  BringOnlineDlgUnit, ShutdownDatabaseDlgUnit, ShutdownRegDlgUnit;
+
+resourcestring
+  sDBSweep     = 'Database sweep started';
+  sSweepOK     = 'Sweep successfully completed';
+
 
 { TMainForm }
 
@@ -180,7 +201,6 @@ begin
     if SelectDBDlg.ShowModal(aDBName) = mrOK then
     begin
       DBName := aDBName;
-      LimboTransactionValidation.DatabaseName := DBName;
       RunService(LimboTransactionValidation,@RunLimboTransactions);
     end;
   end;
@@ -190,10 +210,10 @@ procedure TMainForm.StatisticsExecute(Sender: TObject);
 var aDBName: string;
 begin
   aDBName := DBName;
-  if SelectDBDlg.ShowModal(FDBName) = mrOK then
+  if SelectDBDlg.ShowModal(aDBName) = mrOK then
   begin
     DBName := aDBName;
-    IBStatisticalService1.DatabaseName := DBName;
+    IBStatisticalService1.Options := [DataPages];
     RunService(IBStatisticalService1,@RunShowStatistics);
   end;
 end;
@@ -208,14 +228,11 @@ begin
   begin
     DBName := aDBName;
     if UseOnlineValidation then
-    begin
-      FValidationService := IBOnlineValidationService1;
-      IBOnlineValidationService1.DatabaseName := DBName;
-    end
+      FValidationService := IBOnlineValidationService1
     else
     begin
       FValidationService :=  IBValidationService1;
-      IBValidationService1.DatabaseName := DBName;
+      IBValidationService1.Options := [ValidateFull];
     end;
     RunService(FValidationService,@RunValidation);
   end;
@@ -283,11 +300,24 @@ function TMainForm.RunService(aService: TIBCustomService; RunProc: TRunServicePr
 
 begin
   Result := false;
+  if aService is TIBValidationService then
+    TIBValidationService(aService).DatabaseName := DBName
+  else
+  if aService is TIBOnlineValidationService then
+      TIBOnlineValidationService(aService).DatabaseName := DBName
+  else
+  if aService is TIBStatisticalService then
+    TIBStatisticalService(aService).DatabaseName := DBName
+  else
+  if aService is TIBConfigService then
+    TIBConfigService(aService).DatabaseName := DBName;
   try
     repeat
       with aService do
-        if not active then
+      begin
+        Active := false;
         Assign(IBServerProperties1);
+      end;
       try
         RunProc;
         Result := true;
@@ -351,9 +381,92 @@ begin
   end;
 end;
 
+procedure TMainForm.RunSweep;
+var ReportCount: integer;
+begin
+  ReportCount := 0;
+  with IBValidationService1 do
+  begin
+    Memo1.Lines.Add(Format(sDBSweep,[DatabaseName]));
+    try
+      ServiceStart;
+      While not Eof do
+      begin
+        Inc(ReportCount);
+        Memo1.Lines.Add(GetNextLine);
+        Application.ProcessMessages;
+      end
+    finally
+      while IsServiceRunning do;
+    end
+  end;
+  Memo1.Lines.Add(sSweepOK);
+end;
+
+function TMainForm.IsDatabaseOnline: boolean;
+var Line: string;
+begin
+  {Scan header page to see if database is online - assumes that service is already set up}
+  Result := true;
+  with IBStatisticalService1 do
+  begin
+    Assign(IBServerProperties1);
+    Options := [HeaderPages];
+    Active := True;
+    try
+      ServiceStart;
+      while not Eof do
+      begin
+         Line := GetNextLine;
+         if (Pos('Attributes',Line) <> 0) and ((Pos('database shutdown',Line) <> 0)
+                   or (Pos('multi-user maintenance',Line) <> 0)) then
+           Result := false;
+
+      end;
+      while IsServiceRunning do;
+    finally
+      Active := False;
+    end
+  end;
+end;
+
+procedure TMainForm.RunBringOnline;
+begin
+  if IsDatabaseOnline then
+    MessageDlg('Database is already online!',mtInformation,[mbOK],0)
+  else
+  begin
+    BringOnlineDlg.IBConfigService.Assign(IBServerProperties1);
+    BringOnlineDlg.IBConfigService.DatabaseName := DBName;
+    BringOnlineDlg.ShowModal;
+  end;
+end;
+
+procedure TMainForm.RunShutdown;
+begin
+  if not IsDatabaseOnline then
+    MessageDlg('Database is already shutdown!',mtInformation,[mbOK],0)
+  else
+  begin
+    ShutdownDatabaseDlg.IBConfigService.DatabaseName := DBName;
+    ShutdownDatabaseDlg.Shutdown(FShutDownMode,FDelay);
+  end;
+end;
+
 procedure TMainForm.CLoseBtnClick(Sender: TObject);
 begin
   Close
+end;
+
+procedure TMainForm.BringOnlineExecute(Sender: TObject);
+var aDBName: string;
+begin
+  aDBName := DBName;
+  if SelectDBDlg.ShowModal(aDBName) = mrOK then
+  begin
+    DBName := aDBName;
+    RunService(IBStatisticalService1,@RunBringOnline);
+  end;
 end;
 
 procedure TMainForm.BackupBtnClick(Sender: TObject);
@@ -399,6 +512,30 @@ end;
 procedure TMainForm.DatabaseBtnClick(Sender: TObject);
 begin
   PopupMenu1.PopUp(Mouse.CursorPos.X,Mouse.CursorPos.Y);
+end;
+
+procedure TMainForm.ShutdownExecute(Sender: TObject);
+var aDBName: string;
+begin
+  aDBName := DBName;
+  FShutDownMode := Forced;
+  if ShutdownReqDlg.ShowModal(aDBName,FShutDownMode,FDelay) = mrOK then
+  begin
+    DBName := aDBName;
+    RunService(ShutdownDatabaseDlg.IBConfigService,@RunShutdown);
+  end;
+end;
+
+procedure TMainForm.SweepExecute(Sender: TObject);
+var aDBName: string;
+begin
+  aDBName := DBName;
+  if SelectDBDlg.ShowModal(aDBName) = mrOK then
+  begin
+    DBName := aDBName;
+    IBValidationService1.Options := [SweepDB];
+    RunService(IBValidationService1,@RunSweep);
+  end;
 end;
 
 procedure TMainForm.UsersBtnClick(Sender: TObject);

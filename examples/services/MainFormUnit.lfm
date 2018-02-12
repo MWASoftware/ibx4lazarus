@@ -145,6 +145,18 @@ object MainForm: TMainForm
       Caption = 'Limbo Transactions'
       OnExecute = LimboTransactionsExecute
     end
+    object Sweep: TAction
+      Caption = 'Sweep'
+      OnExecute = SweepExecute
+    end
+    object BringOnline: TAction
+      Caption = 'Bring Online'
+      OnExecute = BringOnlineExecute
+    end
+    object Shutdown: TAction
+      Caption = 'Shutdown'
+      OnExecute = ShutdownExecute
+    end
   end
   object PopupMenu1: TPopupMenu
     left = 456
@@ -157,6 +169,15 @@ object MainForm: TMainForm
     end
     object MenuItem4: TMenuItem
       Action = LimboTransactions
+    end
+    object MenuItem1: TMenuItem
+      Action = Sweep
+    end
+    object MenuItem5: TMenuItem
+      Action = BringOnline
+    end
+    object MenuItem6: TMenuItem
+      Action = Shutdown
     end
   end
 end
