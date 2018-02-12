@@ -840,6 +840,7 @@ end;
 
 procedure TIBCustomService.Assign(Source: TPersistent);
 begin
+  if Source = self then Exit;
   if Source is TIBCustomService then
   with Source as TIBCustomService do
   begin
@@ -1099,6 +1100,7 @@ begin
     case SPBServerVal of
       isc_spb_user_name,
       isc_spb_password,
+      isc_spb_sql_role_name,
       isc_spb_expected_db:
         Result.Add(SPBServerVal).AsString := param_value;
       else

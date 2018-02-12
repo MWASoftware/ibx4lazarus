@@ -70,7 +70,7 @@ end;
 procedure TBackupDlg.IBBackupService1Login(Service: TIBCustomService;
   LoginParams: TStrings);
 begin
-  Form1.IBStatisticalService1Login(Service,LoginParams);
+  Form1.AltSecDBLogin(Service,LoginParams);
 end;
 
 procedure TBackupDlg.FormClose(Sender: TObject; var CloseAction: TCloseAction);

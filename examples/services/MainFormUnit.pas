@@ -44,17 +44,21 @@ type
     procedure FormShow(Sender: TObject);
     procedure IBServerProperties1Login(Service: TIBCustomService;
       LoginParams: TStrings);
-    procedure IBStatisticalService1Login(Service: TIBCustomService;
+    procedure AltSecDBLogin(Service: TIBCustomService;
       LoginParams: TStrings);
     procedure LimboTransactionsExecute(Sender: TObject);
     procedure StatisticsExecute(Sender: TObject);
     procedure ValidateExecute(Sender: TObject);
   private
+    procedure SetDBName(AValue: string);
+  private
     { private declarations }
     FValidationService: TIBControlAndQueryService;
     FDBName: string;
     FIsExpectedDB: boolean;
+    FServerUserName: string;
     FServerPassword: string;
+    procedure AltDBLogin;
     function RunService(aService: TIBCustomService; secDB: integer;
       RunProc: TRunServiceProc): integer;
     procedure RunBackup;
@@ -65,8 +69,8 @@ type
     procedure DoBackup(secDB: PtrInt);
     procedure DoRestore(secDB: PtrInt);
     procedure DoShowStatistics(secDB: PtrInt);
-    procedure DoValidation(secDB: PtrInt);
     procedure DoLimboTransactions(secDB: PtrInt);
+    property DBName: string read FDBName write SetDBName;
   public
     { public declarations }
   end;
@@ -142,6 +146,7 @@ begin
       BackupDlg.UseAltSecDB.Visible := false;
     end;
   end;
+  IBServerProperties1.OnLogin := @AltSecDBLogin;
   {Leave IBServerProperties1 as active and use this as the common service interface}
 end;
 
@@ -161,7 +166,8 @@ begin
     Service.ServerName := aServiceName;
     LoginParams.Values['user_name'] := aUserName;
     LoginParams.Values['password'] := aPassword;
-    FServerPassword := aPassword; {Remember this for database login}
+    FServerUserName := aUserName;
+    FServerPassword := aPassword;
   end
   else
     IBError(ibxeOperationCancelled, [nil]);
@@ -169,7 +175,7 @@ end;
 
 {This is the login dialog for a alt. security database}
 
-procedure TForm1.IBStatisticalService1Login(Service: TIBCustomService;
+procedure TForm1.AltSecDBLogin(Service: TIBCustomService;
   LoginParams: TStrings);
 var aServiceName: string;
     aUserName: string;
@@ -217,10 +223,13 @@ end;
 
 procedure TForm1.ValidateExecute(Sender: TObject);
 var UseOnlineValidation: boolean;
+    aDBName: string;
 begin
   UseOnlineValidation := false;
-  if SelectValidationDlg.ShowModal(IBServerProperties1.ServerName,FDBName,UseOnlineValidation,FIsExpectedDB) = mrOK then
+  aDBName := FDBName;
+  if SelectValidationDlg.ShowModal(IBServerProperties1.ServerName,aDBName,UseOnlineValidation,FIsExpectedDB) = mrOK then
   begin
+    DBName := aDBName;
     if UseOnlineValidation then
     begin
       FValidationService := IBOnlineValidationService1;
@@ -231,11 +240,89 @@ begin
       FValidationService :=  IBValidationService1;
       IBValidationService1.DatabaseName := FDBName;
     end;
+    FValidationService.Assign(IBServerProperties1);
     Memo1.Lines.Add('Database Validation for ' + FDBName);
-    if FIsExpectedDB then
-      Application.QueueAsyncCall(@DoValidation,use_alt_sec_db_login)
-    else
-      Application.QueueAsyncCall(@DoValidation,use_global_login);
+    repeat
+      try
+        with FValidationService do
+        begin
+          ServiceStart;
+          Memo1.Lines.Add('Running...');
+          while not Eof do
+          begin
+            Memo1.Lines.Add(GetNextLine);
+            Application.ProcessMessages;
+          end;
+          Memo1.Lines.Add('Validation Completed');
+          MessageDlg('Validation Completed',mtInformation,[mbOK],0);
+          Exit;
+        end;
+      except
+         on E: EIBInterBaseError do
+           if (E.IBErrorCode = isc_sec_context)  then {Need expected_db}
+           begin
+             AltDBLogin;
+             FValidationService.Assign(IBServerProperties1);
+           end
+           else
+           begin
+             MessageDlg(E.Message,mtError,[mbOK],0);
+             Exit;
+           end;
+         on E:Exception do
+             MessageDlg(E.Message,mtError,[mbOK],0);
+      end;
+    until false;
+  end;
+end;
+
+procedure TForm1.SetDBName(AValue: string);
+var index: integer;
+begin
+  if FDBName = AValue then Exit;
+  index := IBServerProperties1.Params.IndexOfName('expected_db');
+  if index <> -1 then
+  begin
+    {Log back in at Server Level}
+    IBServerProperties1.Active := false;
+    IBServerProperties1.LoginPrompt := false;
+    IBServerProperties1.Params.Values['user_name'] := FServerUserName;
+    IBServerProperties1.Params.Values['password'] := FServerPassword;
+    IBServerProperties1.Params.Delete(index);
+    IBServerProperties1.Active := true;
+  end;
+  FDBName := AValue;
+end;
+
+procedure TForm1.AltDBLogin;
+var index: integer;
+begin
+  with IBServerProperties1 do
+  begin
+    Active := false;
+    LoginPrompt := true;
+    Params.Add('expected_db='+IBValidationService1.DatabaseName);
+    index := Params.IndexOfName('password');
+    if index <> -1 then
+      Params.Delete(index);
+
+    {Now make sure we are logged in}
+
+    while not Active do
+    begin
+      try
+        Active := true;
+      except
+       on E:EIBClientError do
+          raise;
+       On E:Exception do
+       begin
+         MessageDlg(E.Message,mtError,[mbOK],0);
+         Active := false;
+       end;
+      end;
+    end; {Loop until logged in or user cancels}
+
   end;
 end;
 
@@ -392,7 +479,7 @@ end;
 procedure TForm1.RunValidation;
 begin
   with FValidationService do
-  TRY
+  try
     ServiceStart;
     Memo1.Lines.Add('Running...');
     while not Eof do
@@ -438,12 +525,6 @@ procedure TForm1.DoShowStatistics(secDB: PtrInt);
 begin
   if RunService(IBStatisticalService1,secDB,@RunShowStatistics) = use_alt_sec_db_login then
      RunService(IBStatisticalService1,use_alt_sec_db_login,@RunShowStatistics)
-end;
-
-procedure TForm1.DoValidation(secDB: PtrInt);
-begin
-  if RunService(FValidationService,secDB,@RunValidation) = use_alt_sec_db_login then
-     RunService(FValidationService,use_alt_sec_db_login,@RunValidation)
 end;
 
 procedure TForm1.DoLimboTransactions(secDB: PtrInt);

@@ -72,7 +72,7 @@ end;
 procedure TRestoreDlg.IBRestoreService1Login(Service: TIBCustomService;
   LoginParams: TStrings);
 begin
-  Form1.IBStatisticalService1Login(Service,LoginParams);
+  Form1.AltSecDBLogin(Service,LoginParams);
 end;
 
 procedure TRestoreDlg.FormClose(Sender: TObject; var CloseAction: TCloseAction);
