@@ -10,7 +10,44 @@ uses
 
 type
 
-  { TShutdownWaitThread }
+  { TShutdownDatabaseDlg }
+
+  TShutdownDatabaseDlg = class(TForm)
+    Bevel1: TBevel;
+    CloseBtn: TButton;
+    IBConfigService: TIBConfigService;
+    ProgressBar1: TProgressBar;
+    StatusMsg: TLabel;
+    procedure CloseBtnClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+  private
+    FShutDownmode: TShutdownMode;
+    FDelay: integer;
+    FAborting: boolean;
+    FSecContextError: boolean;
+    FShutdownWaitThread: TThread;
+    procedure OnWaitCompleted(Sender: TObject);
+  public
+     procedure Shutdown(aShutDownmode: TShutdownMode; aDelay: integer);
+     property Aborting: boolean read FAborting;
+  end;
+
+var
+  ShutdownDatabaseDlg: TShutdownDatabaseDlg;
+
+implementation
+
+{$R *.lfm}
+
+uses IBErrorCodes;
+
+resourcestring
+  sWaitStatusMsg = 'Waiting for %s to shutdown';
+  sDatabaseShutdown  = 'Database has been successfully shutdown';
+  sOnCompleted = 'Shutdown of %s completed with response: %s';
+
+type
+    { TShutdownWaitThread }
 
   TShutdownWaitThread = class(TThread)
   private
@@ -34,40 +71,7 @@ type
     property ErrorMessage: string read FErrorMessage;
   end;
 
-  { TShutdownDatabaseDlg }
 
-  TShutdownDatabaseDlg = class(TForm)
-    Bevel1: TBevel;
-    CloseBtn: TButton;
-    IBConfigService: TIBConfigService;
-    ProgressBar1: TProgressBar;
-    StatusMsg: TLabel;
-    procedure CloseBtnClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-  private
-    FShutDownmode: TShutdownMode;
-    FDelay: integer;
-    FAbort: boolean;
-    FShutdownWaitThread: TShutdownWaitThread;
-    FSecContextError: boolean;
-    procedure OnWaitCompleted(Sender: TObject);
-  public
-     procedure Shutdown(aShutDownmode: TShutdownMode; aDelay: integer);
-  end;
-
-var
-  ShutdownDatabaseDlg: TShutdownDatabaseDlg;
-
-implementation
-
-{$R *.lfm}
-
-uses IBErrorCodes;
-
-resourcestring
-  sWaitStatusMsg = 'Waiting for %s to shutdown';
-  sDatabaseShutdown  = 'Database has been successfully shutdown';
-  sOnCompleted = 'Shutdown of %s completed with response: %s';
 
 { TShutdownWaitThread }
 
@@ -97,9 +101,13 @@ begin
         FErrorMessage := E.Message;
     end;
   finally
+    if not FSecContextError then
+      while FIBConfigService.IsServiceRunning do;
+    if Terminated then
+      FIBConfigService.BringDatabaseOnline;
     FIBConfigService.Active := false;
   end;
-    Synchronize(@DoCallback);
+  Synchronize(@DoCallback);
 end;
 
 constructor TShutdownWaitThread.Create(aService: TIBConfigService;
@@ -124,7 +132,6 @@ end;
 
 procedure TShutdownWaitThread.Abort;
 begin
-  FOnCompleted := nil;
   Terminate;
 end;
 
@@ -132,17 +139,15 @@ end;
 
 procedure TShutdownDatabaseDlg.FormShow(Sender: TObject);
 begin
-  Cursor := crHourGlass;
-  FAbort := false;
+  FAborting := false;
   StatusMsg.Caption := Format(sWaitStatusMsg,[IBConfigService.DatabaseName]);
   FShutdownWaitThread := TShutdownWaitThread.Create(IBConfigService,FShutDownMode,FDelay,@OnWaitCompleted);
 end;
 
 procedure TShutdownDatabaseDlg.CloseBtnClick(Sender: TObject);
 begin
-  FShutdownWaitThread.Abort;
-  IBConfigService.BringDatabaseOnline;
-  while IBConfigService.IsServiceRunning do;
+  FAborting := true;
+  FShutdownWaitThread.Terminate;
   Close;
 end;
 
@@ -152,13 +157,10 @@ begin
     if not Success and SecContextError then
       self.FSecContextError := true
     else
-    begin
+    if not FAborting then
       MessageDlg(Format(sOnCompleted,[IBConfigService.DatabaseName,ErrorMessage]),
                mtInformation,[mbOK],0);
-      try
-        while IBConfigService.IsServiceRunning do;
-      except end;
-    end;
+  FAborting := false;
   Close;
 end;
 

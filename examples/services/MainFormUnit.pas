@@ -15,6 +15,7 @@ type
   { TMainForm }
 
   TMainForm = class(TForm)
+    IBConfigService1: TIBConfigService;
     MenuItem6: TMenuItem;
     Shutdown: TAction;
     BringOnline: TAction;
@@ -42,6 +43,7 @@ type
     IBValidationService1: TIBValidationService;
     Memo1: TMemo;
     procedure BringOnlineExecute(Sender: TObject);
+    procedure BringOnlineUpdate(Sender: TObject);
     procedure CLoseBtnClick(Sender: TObject);
     procedure BackupBtnClick(Sender: TObject);
     procedure RestoreBtnClick(Sender: TObject);
@@ -91,7 +93,7 @@ implementation
 
 uses IBErrorCodes, FBMessages, ServicesLoginDlgUnit, SelectValidationDlgUnit, SelectDBDlgUnit,
   BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit, AltDBSvcLoginDlgUnit,
-  BringOnlineDlgUnit, ShutdownDatabaseDlgUnit, ShutdownRegDlgUnit;
+  ShutdownDatabaseDlgUnit, ShutdownRegDlgUnit;
 
 resourcestring
   sDBSweep     = 'Database sweep started';
@@ -436,9 +438,14 @@ begin
     MessageDlg('Database is already online!',mtInformation,[mbOK],0)
   else
   begin
-    BringOnlineDlg.IBConfigService.Assign(IBServerProperties1);
-    BringOnlineDlg.IBConfigService.DatabaseName := DBName;
-    BringOnlineDlg.ShowModal;
+    IBConfigService1.Assign(IBServerProperties1);
+    IBConfigService1.DatabaseName := DBName;
+    IBConfigService1.BringDatabaseOnline;
+    while IBConfigService1.IsServiceRunning do;
+    if IsDatabaseOnline then
+      MessageDlg('Database is back online',mtInformation,[mbOK],0)
+    else
+      MessageDlg('Database is still shutdown!',mtError,[mbOK],0);
   end;
 end;
 
@@ -467,6 +474,11 @@ begin
     DBName := aDBName;
     RunService(IBStatisticalService1,@RunBringOnline);
   end;
+end;
+
+procedure TMainForm.BringOnlineUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := not ShutdownDatabaseDlg.Aborting;
 end;
 
 procedure TMainForm.BackupBtnClick(Sender: TObject);
@@ -518,7 +530,7 @@ procedure TMainForm.ShutdownExecute(Sender: TObject);
 var aDBName: string;
 begin
   aDBName := DBName;
-  FShutDownMode := Forced;
+  FShutDownMode := DenyTransaction;
   if ShutdownReqDlg.ShowModal(aDBName,FShutDownMode,FDelay) = mrOK then
   begin
     DBName := aDBName;

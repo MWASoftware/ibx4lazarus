@@ -32,7 +32,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="15">
+    <Units Count="14">
       <Unit0>
         <Filename Value="services.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -115,26 +115,19 @@
         <ResourceBaseClass Value="Form"/>
       </Unit11>
       <Unit12>
-        <Filename Value="BringOnlineDlgUnit.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="BringOnlineDlg"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit12>
-      <Unit13>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ShutdownDatabaseDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit13>
-      <Unit14>
+      </Unit12>
+      <Unit13>
         <Filename Value="ShutdownRegDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ShutdownReqDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit14>
+      </Unit13>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

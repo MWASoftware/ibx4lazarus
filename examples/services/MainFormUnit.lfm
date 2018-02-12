@@ -152,10 +152,12 @@ object MainForm: TMainForm
     object BringOnline: TAction
       Caption = 'Bring Online'
       OnExecute = BringOnlineExecute
+      OnUpdate = BringOnlineUpdate
     end
     object Shutdown: TAction
       Caption = 'Shutdown'
       OnExecute = ShutdownExecute
+      OnUpdate = BringOnlineUpdate
     end
   end
   object PopupMenu1: TPopupMenu
@@ -179,5 +181,11 @@ object MainForm: TMainForm
     object MenuItem6: TMenuItem
       Action = Shutdown
     end
+  end
+  object IBConfigService1: TIBConfigService
+    PortNo = 0
+    TraceFlags = []
+    left = 466
+    top = 188
   end
 end

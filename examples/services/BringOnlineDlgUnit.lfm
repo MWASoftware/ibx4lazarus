@@ -1,13 +1,13 @@
 object BringOnlineDlg: TBringOnlineDlg
-  Left = 1966
+  Left = 1408
   Height = 109
-  Top = 349
+  Top = 300
   Width = 353
   BorderStyle = bsNone
   Caption = 'BringOnlineDlg'
   ClientHeight = 109
   ClientWidth = 353
-  OnShow = FormShow
+  OnClose = FormClose
   Position = poScreenCenter
   LCLVersion = '1.8.1.0'
   object Bevel1: TBevel
