@@ -1,0 +1,280 @@
+object DatabaseData: TDatabaseData
+  OldCreateOrder = False
+  Height = 466
+  HorizontalOffset = 1046
+  VerticalOffset = 455
+  Width = 510
+  PPI = 96
+  object IBDatabase1: TIBDatabase
+    Connected = False
+    AfterConnect = IBDatabase1AfterConnect
+    AfterDisconnect = IBDatabase1AfterDisconnect
+    BeforeDisconnect = IBDatabase1BeforeDisconnect
+    OnLogin = IBDatabase1Login
+    CreateIfNotExists = False
+    AllowStreamedConnected = False
+    DatabaseName = 'employee'
+    Params.Strings = (
+      'lc_ctype=UTF8'
+      'user_name=SYSDBA'
+      'sql_role_name=RDB$ADMIN'
+    )
+    DefaultTransaction = CurrentTransaction
+    IdleTimer = 0
+    TraceFlags = []
+    UseDefaultSystemCodePage = False
+    left = 40
+    top = 24
+  end
+  object CurrentTransaction: TIBTransaction
+    Active = False
+    DefaultDatabase = IBDatabase1
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait'
+    )
+    AfterTransactionEnd = CurrentTransactionAfterTransactionEnd
+    left = 168
+    top = 24
+  end
+  object ExecDDL: TIBSQL
+    Database = IBDatabase1
+    GenerateParamNames = False
+    UniqueParamNames = False
+    ParamCheck = True
+    SQL.Strings = (
+      ''
+    )
+    Transaction = CurrentTransaction
+    left = 152
+    top = 208
+  end
+  object DatabaseQuery: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    AfterOpen = DatabaseQueryAfterOpen
+    BeforeClose = DatabaseQueryBeforeClose
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'SELECT * FROM RDB$DATABASE, MON$DATABASE'
+    )
+    Params = <>
+    DataSetCloseAction = dcSaveChanges
+    left = 288
+    top = 24
+  end
+  object DBCharSet: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    AfterClose = DBCharSetAfterClose
+    BeforeOpen = DBCharSetBeforeOpen
+    AutoCommit = acCommitRetaining
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select Trim(A.RDB$CHARACTER_SET_NAME)   as RDB$CHARACTER_SET_NAME'
+      ' From RDB$DATABASE A'
+    )
+    Params = <>
+    UpdateObject = UpdateCharSet
+    DataSetCloseAction = dcSaveChanges
+    left = 424
+    top = 32
+  end
+  object ShadowFiles: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select * From RDB$Files Where RDB$Shadow_Number <> 0 '
+      'Order by RDB$Shadow_Number, RDB$FILE_SEQUENCE'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 32
+    top = 208
+    object ShadowFilesRDBFILE_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$FILE_NAME'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 253
+    end
+    object ShadowFilesRDBFILE_SEQUENCE: TSmallintField
+      FieldKind = fkData
+      FieldName = 'RDB$FILE_SEQUENCE'
+      Index = 1
+      LookupCache = False
+      Origin = 'RDB$FILES.RDB$FILE_SEQUENCE'
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object ShadowFilesRDBFILE_START: TIntegerField
+      FieldKind = fkData
+      FieldName = 'RDB$FILE_START'
+      Index = 2
+      LookupCache = False
+      Origin = 'RDB$FILES.RDB$FILE_START'
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object ShadowFilesRDBFILE_LENGTH: TIntegerField
+      FieldKind = fkData
+      FieldName = 'RDB$FILE_LENGTH'
+      Index = 3
+      LookupCache = False
+      Origin = 'RDB$FILES.RDB$FILE_LENGTH'
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object ShadowFilesRDBFILE_FLAGS: TSmallintField
+      FieldKind = fkData
+      FieldName = 'RDB$FILE_FLAGS'
+      Index = 4
+      LookupCache = False
+      Origin = 'RDB$FILES.RDB$FILE_FLAGS'
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object ShadowFilesRDBSHADOW_NUMBER: TSmallintField
+      FieldKind = fkData
+      FieldName = 'RDB$SHADOW_NUMBER'
+      Index = 5
+      LookupCache = False
+      Origin = 'RDB$FILES.RDB$SHADOW_NUMBER'
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object ShadowFilesFileMode: TStringField
+      FieldKind = fkCalculated
+      FieldName = 'FileMode'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+  end
+  object SecGlobalAuth: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select count(*) as Mappings'
+      'From SEC$GLOBAL_AUTH_MAPPING A'
+      'Where SEC$MAP_NAME = ''AutoAdminImplementationMapping'''
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 288
+    top = 112
+  end
+  object CharSetLookup: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select trim(A.RDB$CHARACTER_SET_NAME) as RDB$CHARACTER_SET_NAME'
+      ' From'
+      'RDB$CHARACTER_SETS A order by 1'
+      ''
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 160
+    top = 104
+  end
+  object DBSecFiles: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select * From RDB$Files Where RDB$Shadow_Number is null or RDB$Shadow_Number = 0 '
+      'Order by RDB$FILE_SEQUENCE'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 32
+    top = 104
+  end
+  object UpdateCharSet: TIBUpdate
+    RefreshSQL.Strings = (
+      'Select Trim(A.RDB$CHARACTER_SET_NAME)   as RDB$CHARACTER_SET_NAME'
+      ' From RDB$DATABASE A'
+    )
+    OnApplyUpdates = UpdateCharSetApplyUpdates
+    left = 424
+    top = 104
+  end
+  object IBDatabaseInfo: TIBDatabaseInfo
+    Database = IBDatabase1
+    left = 280
+    top = 200
+  end
+  object AttmtQuery: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select * from MON$ATTACHMENTS'
+      'Where MON$ATTACHMENT_ID = CURRENT_CONNECTION'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 408
+    top = 192
+  end
+  object IBStatisticalService1: TIBStatisticalService
+    PortNo = 0
+    Params.Strings = (
+      'sql_role_name=RDB$ADMIN'
+    )
+    LoginPrompt = False
+    TraceFlags = []
+    Options = [HeaderPages]
+    left = 33
+    top = 283
+  end
+  object IBConfigService1: TIBConfigService
+    PortNo = 0
+    TraceFlags = []
+    left = 162
+    top = 285
+  end
+end

@@ -1,22 +1,15 @@
-object BringOnlineDlg: TBringOnlineDlg
-  Left = 1408
-  Height = 109
-  Top = 300
-  Width = 353
+object ShutdownDatabaseDlg: TShutdownDatabaseDlg
+  Left = 2067
+  Height = 113
+  Top = 326
+  Width = 338
   BorderStyle = bsNone
-  Caption = 'BringOnlineDlg'
-  ClientHeight = 109
-  ClientWidth = 353
-  OnClose = FormClose
+  Caption = 'ShutdownDatabaseDlg'
+  ClientHeight = 113
+  ClientWidth = 338
+  OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.8.1.0'
-  object Bevel1: TBevel
-    Left = 0
-    Height = 109
-    Top = 0
-    Width = 353
-    Align = alClient
-  end
   object StatusMsg: TLabel
     Left = 24
     Height = 14
@@ -46,16 +39,18 @@ object BringOnlineDlg: TBringOnlineDlg
     OnClick = CloseBtnClick
     TabOrder = 1
   end
+  object Bevel1: TBevel
+    Left = 0
+    Height = 113
+    Top = 0
+    Width = 338
+    Align = alClient
+  end
   object IBConfigService: TIBConfigService
+    Protocol = TCP
     PortNo = 0
     TraceFlags = []
-    left = 256
+    left = 253
     top = 64
-  end
-  object WaitTimer: TTimer
-    Enabled = False
-    OnTimer = WaitTimerTimer
-    left = 28
-    top = 67
   end
 end

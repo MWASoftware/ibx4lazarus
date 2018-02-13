@@ -1,0 +1,735 @@
+object MainForm: TMainForm
+  Left = 409
+  Height = 566
+  Top = 154
+  Width = 817
+  Caption = 'Database Administrator Demo'
+  ClientHeight = 546
+  ClientWidth = 817
+  Menu = MainMenu1
+  OnShow = FormShow
+  LCLVersion = '1.8.1.0'
+  object ToolBar1: TToolBar
+    Left = 0
+    Height = 26
+    Top = 0
+    Width = 817
+    Caption = 'ToolBar1'
+    Images = MenuImages
+    TabOrder = 0
+    object ToolButton1: TToolButton
+      Left = 1
+      Top = 2
+      Action = Backup
+      ShowCaption = False
+    end
+    object ToolButton2: TToolButton
+      Left = 24
+      Height = 22
+      Top = 2
+      Caption = 'ToolButton2'
+      Style = tbsSeparator
+    end
+    object ToolButton3: TToolButton
+      Left = 32
+      Top = 2
+      Action = Restore
+    end
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 22
+    Top = 524
+    Width = 817
+    Panels = <>
+  end
+  object PageControl1: TPageControl
+    Left = 0
+    Height = 498
+    Top = 26
+    Width = 817
+    ActivePage = Properties
+    Align = alClient
+    TabIndex = 0
+    TabOrder = 2
+    object Properties: TTabSheet
+      Caption = 'Properties'
+      ClientHeight = 466
+      ClientWidth = 811
+      OnShow = PropertiesShow
+      object Label6: TLabel
+        Left = 71
+        Height = 14
+        Top = 20
+        Width = 39
+        Caption = 'Server'
+        ParentColor = False
+      end
+      object Label2: TLabel
+        Left = 15
+        Height = 14
+        Top = 52
+        Width = 95
+        Caption = 'Database Name'
+        ParentColor = False
+      end
+      object DatabaseAliasName: TDBEdit
+        Left = 120
+        Height = 24
+        Top = 47
+        Width = 264
+        DataField = 'MON$DATABASE_NAME'
+        DataSource = DatabaseSource
+        ReadOnly = True
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 0
+      end
+      object Label9: TLabel
+        Left = 19
+        Height = 14
+        Top = 83
+        Width = 91
+        Caption = 'Connect String'
+        ParentColor = False
+      end
+      object Edit8: TEdit
+        Left = 120
+        Height = 24
+        Top = 80
+        Width = 265
+        TabOrder = 1
+        Text = 'Edit8'
+      end
+      object Label1: TLabel
+        Left = 40
+        Height = 14
+        Top = 117
+        Width = 73
+        Caption = 'ODS Version'
+        ParentColor = False
+      end
+      object Edit2: TEdit
+        Left = 120
+        Height = 24
+        Top = 112
+        Width = 266
+        ReadOnly = True
+        TabOrder = 2
+        Text = 'Edit2'
+      end
+      object Label4: TLabel
+        Left = 19
+        Height = 14
+        Top = 150
+        Width = 91
+        Caption = 'Svr Version No.'
+        ParentColor = False
+      end
+      object Edit5: TEdit
+        Left = 120
+        Height = 24
+        Top = 144
+        Width = 266
+        ReadOnly = True
+        TabOrder = 3
+        Text = 'Edit5'
+      end
+      object Label5: TLabel
+        Left = 41
+        Height = 14
+        Top = 183
+        Width = 69
+        Caption = 'SQL Dialect'
+        ParentColor = False
+      end
+      object Edit6: TEdit
+        Left = 120
+        Height = 24
+        Top = 176
+        Width = 266
+        ReadOnly = True
+        TabOrder = 4
+        Text = 'Edit6'
+      end
+      object Label24: TLabel
+        Left = 51
+        Height = 14
+        Top = 211
+        Width = 60
+        Caption = 'DB Owner'
+        ParentColor = False
+      end
+      object DBOwner: TDBEdit
+        Left = 121
+        Height = 24
+        Top = 208
+        Width = 266
+        DataField = 'MON$OWNER'
+        DataSource = DatabaseSource
+        ReadOnly = True
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 5
+      end
+      object Label18: TLabel
+        Left = 24
+        Height = 14
+        Top = 244
+        Width = 86
+        Caption = 'Sec. Database'
+        ParentColor = False
+      end
+      object SecDatabase: TDBEdit
+        Left = 121
+        Height = 24
+        Top = 240
+        Width = 266
+        DataField = 'MON$SEC_DATABASE'
+        DataSource = DatabaseSource
+        ReadOnly = True
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 6
+      end
+      object Label13: TLabel
+        Left = 28
+        Height = 14
+        Top = 277
+        Width = 83
+        Caption = 'Character Set'
+        ParentColor = False
+      end
+      object DBCharSetRO: TDBEdit
+        Left = 120
+        Height = 24
+        Top = 272
+        Width = 264
+        DataField = 'RDB$CHARACTER_SET_NAME'
+        DataSource = DBCharSetSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 8
+      end
+      object DBCharacterSet: TIBLookupComboEditBox
+        Left = 121
+        Height = 27
+        Top = 272
+        Width = 266
+        DataField = 'RDB$CHARACTER_SET_NAME'
+        DataSource = DBCharSetSource
+        KeyField = 'RDB$CHARACTER_SET_NAME'
+        ListField = 'RDB$CHARACTER_SET_NAME'
+        ListFieldIndex = 0
+        ListSource = CharSetSource
+        LookupCache = False
+        OnEditingDone = DBCharacterSetEditingDone
+        TabOrder = 7
+        AutoInsert = False
+        AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+        ItemHeight = 0
+      end
+      object DBIsReadOnly: TCheckBox
+        Left = 111
+        Height = 22
+        Top = 311
+        Width = 84
+        Caption = 'Read Only'
+        OnChange = DBIsReadOnlyChange
+        TabOrder = 9
+      end
+      object DatabaseOnline: TCheckBox
+        Left = 111
+        Height = 22
+        Top = 335
+        Width = 62
+        Caption = 'Online'
+        OnChange = DatabaseOnlineChange
+        TabOrder = 10
+      end
+      object SyncWrites: TCheckBox
+        Left = 111
+        Height = 22
+        Top = 359
+        Width = 173
+        Caption = 'Synchronous Disk Writes'
+        OnChange = SyncWritesChange
+        TabOrder = 11
+      end
+      object IsShadowChk: TCheckBox
+        Left = 111
+        Height = 22
+        Top = 383
+        Width = 132
+        Caption = 'Shadow Database'
+        OnChange = IsShadowChkChange
+        TabOrder = 12
+      end
+      object NoReserve: TCheckBox
+        Left = 111
+        Height = 22
+        Top = 407
+        Width = 239
+        Caption = 'Space Reserved for Backup Records'
+        OnChange = NoReserveChange
+        TabOrder = 13
+      end
+      object AutoAdmin: TCheckBox
+        Left = 112
+        Height = 22
+        Top = 432
+        Width = 151
+        Caption = 'Auto Admin Mapping'
+        OnChange = AutoAdminChange
+        TabOrder = 14
+      end
+      object Label11: TLabel
+        Left = 435
+        Height = 14
+        Top = 26
+        Width = 93
+        Caption = 'Pages Allocated'
+        ParentColor = False
+      end
+      object AllocatedPages: TEdit
+        Left = 533
+        Height = 24
+        Top = 20
+        Width = 89
+        Alignment = taRightJustify
+        ReadOnly = True
+        TabOrder = 15
+        Text = 'AllocatedPages'
+      end
+      object Label19: TLabel
+        Left = 472
+        Height = 14
+        Top = 57
+        Width = 56
+        Caption = 'Page Size'
+        ParentColor = False
+      end
+      object Label3: TLabel
+        Left = 460
+        Height = 14
+        Top = 88
+        Width = 68
+        Caption = 'Pages Used'
+        ParentColor = False
+      end
+      object PagesUsed: TEdit
+        Left = 533
+        Height = 24
+        Top = 82
+        Width = 89
+        Alignment = taRightJustify
+        ReadOnly = True
+        TabOrder = 16
+        Text = 'PagesUsed'
+      end
+      object Label10: TLabel
+        Left = 438
+        Height = 14
+        Top = 119
+        Width = 90
+        Caption = 'Pages Available'
+        ParentColor = False
+      end
+      object PagesAvail: TEdit
+        Left = 533
+        Height = 24
+        Top = 113
+        Width = 89
+        Alignment = taRightJustify
+        ReadOnly = True
+        TabOrder = 17
+        Text = 'PagesAvail'
+      end
+      object Label12: TLabel
+        Left = 430
+        Height = 14
+        Top = 150
+        Width = 98
+        Caption = 'Current Memory'
+        ParentColor = False
+      end
+      object Edit10: TEdit
+        Left = 533
+        Height = 24
+        Top = 144
+        Width = 89
+        Alignment = taRightJustify
+        ReadOnly = True
+        TabOrder = 18
+        Text = 'Edit10'
+      end
+      object Label20: TLabel
+        Left = 632
+        Height = 14
+        Top = 57
+        Width = 33
+        Caption = 'bytes'
+        ParentColor = False
+      end
+      object Label21: TLabel
+        Left = 632
+        Height = 14
+        Top = 149
+        Width = 33
+        Caption = 'bytes'
+        ParentColor = False
+      end
+      object Label14: TLabel
+        Left = 452
+        Height = 14
+        Top = 181
+        Width = 76
+        Caption = 'Max Memory'
+        ParentColor = False
+      end
+      object Edit11: TEdit
+        Left = 533
+        Height = 24
+        Top = 175
+        Width = 89
+        Alignment = taRightJustify
+        ReadOnly = True
+        TabOrder = 19
+        Text = 'Edit11'
+      end
+      object Label22: TLabel
+        Left = 632
+        Height = 14
+        Top = 182
+        Width = 33
+        Caption = 'bytes'
+        ParentColor = False
+      end
+      object Label15: TLabel
+        Left = 447
+        Height = 14
+        Top = 212
+        Width = 81
+        Caption = 'No. of Buffers'
+        ParentColor = False
+      end
+      object Edit12: TEdit
+        Left = 533
+        Height = 24
+        Top = 206
+        Width = 89
+        Alignment = taRightJustify
+        ReadOnly = True
+        TabOrder = 20
+        Text = 'Edit12'
+      end
+      object Label23: TLabel
+        Left = 430
+        Height = 14
+        Top = 245
+        Width = 100
+        Caption = 'Date DB Created'
+        ParentColor = False
+      end
+      object DBEdit1: TDBEdit
+        Left = 533
+        Height = 24
+        Top = 240
+        Width = 132
+        DataField = 'MON$CREATION_DATE'
+        DataSource = DatabaseSource
+        ReadOnly = True
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 21
+      end
+      object Label16: TLabel
+        Left = 453
+        Height = 14
+        Top = 317
+        Width = 75
+        Caption = 'Linger Delay'
+        ParentColor = False
+      end
+      object LingerDelay: TEdit
+        Left = 533
+        Height = 24
+        Top = 311
+        Width = 89
+        Alignment = taRightJustify
+        NumbersOnly = True
+        OnEditingDone = LingerDelayEditingDone
+        TabOrder = 22
+        Text = 'LingerDelay'
+      end
+      object Label17: TLabel
+        Left = 632
+        Height = 14
+        Top = 317
+        Width = 49
+        Caption = 'seconds'
+        ParentColor = False
+      end
+      object Label7: TLabel
+        Left = 400
+        Height = 14
+        Top = 347
+        Width = 128
+        Caption = 'S&weep Interval set to'
+        FocusControl = SweepInterval
+        ParentColor = False
+      end
+      object SweepInterval: TEdit
+        Left = 533
+        Height = 24
+        Top = 342
+        Width = 89
+        Alignment = taRightJustify
+        NumbersOnly = True
+        OnEditingDone = SweepIntervalEditingDone
+        TabOrder = 23
+        Text = 'SweepInterval'
+      end
+      object Label8: TLabel
+        Left = 632
+        Height = 14
+        Top = 347
+        Width = 74
+        Caption = 'Transactions'
+        ParentColor = False
+      end
+      object DBEdit3: TDBEdit
+        Left = 120
+        Height = 24
+        Top = 15
+        Width = 264
+        DataField = 'MON$REMOTE_HOST'
+        DataSource = AttmtSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 24
+      end
+      object DBEdit4: TDBEdit
+        Left = 533
+        Height = 24
+        Top = 52
+        Width = 89
+        DataField = 'MON$PAGE_SIZE'
+        DataSource = DatabaseSource
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 25
+      end
+    end
+  end
+  object MainMenu1: TMainMenu
+    left = 184
+    top = 8
+    object MenuItem1: TMenuItem
+      Caption = 'File'
+      object MenuItem6: TMenuItem
+        Action = OpenDatabase
+      end
+      object MenuItem7: TMenuItem
+        Caption = '-'
+      end
+      object MenuItem3: TMenuItem
+        Action = Backup
+      end
+      object MenuItem5: TMenuItem
+        Action = Restore
+      end
+      object MenuItem4: TMenuItem
+        Caption = '-'
+      end
+      object MenuItem2: TMenuItem
+        Action = Quit
+      end
+    end
+  end
+  object ActionList1: TActionList
+    Images = MenuImages
+    left = 256
+    top = 10
+    object Quit: TAction
+      Caption = 'Exit'
+    end
+    object Backup: TAction
+      Caption = 'Backup'
+      ImageIndex = 0
+    end
+    object Restore: TAction
+      Caption = 'Restore'
+      ImageIndex = 1
+    end
+    object OpenDatabase: TAction
+      Caption = 'Open Database'
+      OnExecute = OpenDatabaseExecute
+    end
+  end
+  object MenuImages: TImageList
+    left = 336
+    top = 8
+    Bitmap = {
+      4C69040000001000000010000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000FF0000
+      00FF000000FF000000FF000000FF000000000000000000000000000000000000
+      00000000000000000000000084FF0000000000000000000000FF848400FFFFFF
+      00FF000000FFFFFF00FFFFFF00FF000000000000000000000000000000000000
+      00000000000000000000000084FF000084FF00000000000000FF848400FF8484
+      00FFFFFF00FF000000FFFFFF00FF000000000000000000000000000000000000
+      0000000084FF000084FF000084FF000084FF000084FF000000FF848400FFFFFF
+      00FF000000FFFFFF00FFFFFF00FF000000000000000000000000000000000000
+      0000000084FF00000000000084FF000084FF00000000000000FF848400FF8484
+      00FFFFFF00FF000000FFFFFF00FF000000000000000000000000000000000000
+      0000000084FF00000000000084FF0000000000000000000000FF848400FFFFFF
+      00FF000000FFFFFF00FFFFFF00FF000000000000000000000000000000000000
+      0000000084FF0000000000000000000000000000000000000000000000FF0000
+      00FF000000FF000000FF000000FF000000000000000000000000000000000000
+      0000000084FF0000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF00000000000000FF00000000000000008484
+      84FFC6C6C6FFC6C6C6FFC6C6C6FF000000FF000000FFC6C6C6FFC6C6C6FFC6C6
+      C6FF848484FF000000000000000000000000000000FF848484FF848484FF0000
+      00FF000000FF000000FF848484FFC6C6C6FFC6C6C6FF848484FF000000FF0000
+      00FF000000FF848484FFC6C6C6FF00000000000000FF848484FF000000FF8484
+      84FF0000000000000000000000FFC6C6C6FF848484FF000000FF848484FF0000
+      000000000000000000FF848484FF00000000000000FF848484FF000000FF0000
+      0000000000FF00000000000000FFC6C6C6FFC6C6C6FF000000FF000000000000
+      00FF00000000000000FF848484FF00000000000000FF848484FF000000FF8484
+      84FF00000000848484FF000000FFC6C6C6FFC6C6C6FF000000FF848484FF0000
+      0000848484FF000000FF848484FF00000000000000FF848484FF848484FF0000
+      00FF000000FF000000FF848484FF848484FF848484FF848484FF000000FF0000
+      00FF000000FF000000FF848484FF00000000000000FF848484FFC6C6C6FFC6C6
+      C6FFC6C6C6FFC6C6C6FFC6C6C6FFC6C6C6FF00000000C6C6C6FF848484FF8484
+      84FF848484FF848484FFC6C6C6FF000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000FF0000
+      00FF000000FF000000FF000000FF000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000FF848400FFFFFF
+      00FF000000FFFFFF00FFFFFF00FF000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000FF848400FF8484
+      00FFFFFF00FF000000FFFFFF00FF000000000000000000000000000000000000
+      0000000084FF000084FF000084FF000084FF000084FF000000FF848400FFFFFF
+      00FF000000FFFFFF00FFFFFF00FF000000000000000000000000000000000000
+      0000000084FF00000000000000000000000000000000000000FF848400FF8484
+      00FFFFFF00FF000000FFFFFF00FF000000000000000000000000000084FF0000
+      84FF000084FF000084FF000084FF0000000000000000000000FF848400FFFFFF
+      00FF000000FFFFFF00FFFFFF00FF000000000000000000000000000000000000
+      84FF000084FF000084FF00000000000000000000000000000000000000FF0000
+      00FF000000FF000000FF000000FF000000000000000000000000000000000000
+      0000000084FF0000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF00000000000000FF00000000000000008484
+      84FFC6C6C6FFC6C6C6FFC6C6C6FF000000FF000000FFC6C6C6FFC6C6C6FFC6C6
+      C6FF848484FF000000000000000000000000000000FF848484FF848484FF0000
+      00FF000000FF000000FF848484FFC6C6C6FFC6C6C6FF848484FF000000FF0000
+      00FF000000FF848484FFC6C6C6FF00000000000000FF848484FF000000FF8484
+      84FF0000000000000000000000FFC6C6C6FF848484FF000000FF848484FF0000
+      000000000000000000FF848484FF00000000000000FF848484FF000000FF0000
+      0000000000FF00000000000000FFC6C6C6FFC6C6C6FF000000FF000000000000
+      00FF00000000000000FF848484FF00000000000000FF848484FF000000FF8484
+      84FF00000000848484FF000000FFC6C6C6FFC6C6C6FF000000FF848484FF0000
+      0000848484FF000000FF848484FF00000000000000FF848484FF848484FF0000
+      00FF000000FF000000FF848484FF848484FF848484FF848484FF000000FF0000
+      00FF000000FF000000FF848484FF00000000000000FF848484FFC6C6C6FFC6C6
+      C6FFC6C6C6FFC6C6C6FFC6C6C6FFC6C6C6FF00000000C6C6C6FF848484FF8484
+      84FF848484FF848484FFC6C6C6FFA46534FF5959F3FF5959F3FF5959F3FF5959
+      F3FF5959F3FF5959F3FF5959F3FF5959F3FF5959F3FF5959F3FF5959F3FF5959
+      F3FF5959F3FFA46534FF00000000A46534FF5959F3FF5959F3FF5959F3FF5959
+      F3FF5959F3FF5959F3FF5959F3FF5959F3FF5959F3FF5959F3FF5959F3FF5959
+      F3FF5959F3FFA46534FF00000000A46534FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFA46534FF00000000A46534FFFFFFFFFF2929EFFFFFFFFFFF2929
+      EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFA46534FF00000000A46534FFFFFFFFFFFFFFFFFF2929EFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFA46534FF00000000A46534FFFFFFFFFFFFFFFFFF2929EFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFA46534FF00000000A46534FFFFFFFFFFFFFFFFFF2929EFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFA46534FF00000000A46534FFFFFFFFFF2929EFFFFFFFFFFF2929
+      EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFA46534FF00000000A46534FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFA46534FF00000000A46534FFA46534FFA46534FFA46534FFA465
+      34FFA46534FFA46534FFA46534FFA46534FFA46534FFA46534FFA46534FFA465
+      34FFA46534FFA46534FF00000000A46534FFA46534FFA46534FFB6BDBAFFB6BD
+      BAFFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFA46534FFA46534FFA465
+      34FFA46534FFA46534FF00000000A46534FFA46534FFA46534FFB6BDBAFFA465
+      34FFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFA46534FFA46534FFA465
+      34FFA46534FFA46534FF00000000A46534FFA46534FFA46534FFB6BDBAFFA465
+      34FFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFA46534FFA46534FFA465
+      34FFA46534FFA46534FF00000000A46534FFA46534FFA46534FFB6BDBAFFA465
+      34FFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFA46534FFA46534FFA465
+      34FFA46534FFA46534FF00000000A46534FFA46534FFA46534FFB6BDBAFFA465
+      34FFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFA46534FFA46534FFA465
+      34FFA46534FFA46534FF00000000A4653455A46534FFA46534FFB6BDBAFFB6BD
+      BAFFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFB6BDBAFFA46534FFA46534FFA465
+      34FFA46534FFA46534FF0000000000000000959493099898973D9C9C9B67A3A3
+      A293B1B1B0C2CECFCEDCE0E1E0E9CBCBC7EAB9B7B3DEB0AFA9C4AEADA896B0AE
+      AA6AACABA6409A99980A00000000A1A1A048A2A3A2FFA1A19FFF9E9E9CFF9C9D
+      9AFF9C9C9BFFA6A7A6FFDBDCDCFFC5C4BDFFAEAAA1FFA7A49BFFA7A59CFFABAA
+      A4FFB4B3AFFFB9B8B4FFADACA84C9C9C9BABBCBDBCFFC0C1C0FFC2C2C1FFC3C3
+      C2FFC8C8C7FFD7D8D8FFEAEAEAFFBBB8B1FFA9A69CFFA5A197FFA09C93FFA09C
+      93FFA7A49CFFB2B0AAFFA09E99AC8C8C8AABA2A2A0FFBDBEBDFFCCCECDFFD5D5
+      D5FFDEDFDFFFE9E9EAFFDEDEDBFFC8C6C2FFB7B5AFFFACAAA3FFA7A59EFFA8A7
+      A1FFB1AFACFFA8A6A3FF8E8B84AB8D8D8CABA2A2A0FFBFC1C0FFE0E0E0FFFBFD
+      FDFFECEDECFFD7D7D4FFC4C4BFFFB4B3ADFFA4A29AFF9C9990FFA6A39DFFAEAE
+      AAFFB9B8B7FFA9A8A5FF8F8C86AB8D806E99A3A4A1FFC0C1C1FFDFE0E0FFF8FA
+      F9FFEAEBEBFFD9D9D7FFC8C8C3FFB7B5B0FFA6A49DFF9D9A92FFA6A39EFFAEAE
+      AAFFB9B8B8FFAAA9A7FF8F826F9E8E8C899B615443FF837053FFBDA987FFE5D9
+      C3FFE6E3D8FFDDDDDAFFD9DBD9FFD3D3D1FFB7B7B2FFB8B3A9FFBEB3A1FFBEAD
+      93FF9F8E75FFA8A196FFBAB6B1B28F8F8DAB989A99FF898987FF72706DFF6762
+      5BFF655D52FF685E50FF857C70FF8C8579FF898275FFABA69EFF908B84FF9C98
+      95FFA9A8A4FFB5B4B2FFC7C6C3CD8D8D8BABA3A2A0FFC1C3C2FFDADCDCFFE8E9
+      E9FFDFE0DFFFDEDFDEFFCFD0CDFFC0BFBBFFB2B1ABFFAAA7A1FFABABA5FF7EB3
+      79FFB8B9B8FFAAA9A6FF8F8C85AB8C8B88ABA2A3A1FFBFC1C0FFDEDFDFFFF7F9
+      F8FFEAEAE9FFD9D9D6FFC8C8C3FFB7B6B1FFA6A49DFF9E9B93FF6BB161FF56AF
+      49FF65B35BFFA7A7A3FF8F8B84AB8C7C678F9E8868FFC3C3BFFFE3E9F0FFFEFF
+      FFFFEDEEEFFFDADBD9FFC9C8C3FFB8B6B0FFA5A49CFF6BB061FF55B148FF50B0
+      43FF50B144FF67AF5EFF98826E968F908FAB767571FF615748FF655844FF7969
+      50FF8C7859FF967F5EFF99825CFF977F5AFF6EAB60FF3FA432FF269816FF228F
+      15FF28981DFF32A528FF489D43C78D8D8BABA4A4A2FFB9BAB9FFB9BAB9FFAFB1
+      B2FF9DA1A4FF969A9EFF878C90FF7C7F82FF7B7479FF63975BFF1E8D11FF2178
+      18FF2B8625FF899C84FF99898FA88C8C8BACA2A2A0FFBFC1C0FFDEDFDFFFF9FB
+      FBFFEEEFEEFFDDDDD9FFCAC9C5FFB8B7B1FFA7A39DFF6FA565FF259619FF2B85
+      24FF389534FF88A183FF918C87AB91918F49A0A1A0FFC1C2C1FFE0E0E0FFF7F9
+      F8FFE9EAE9FFD9D9D6FFC8C8C3FFB6B5B0FFA7A49DFF71A667FF2EA723FF3CAC
+      36FF4FBC4DFF8CA588FF97908F5B00000000999B9B0AAEB0AF40CBCCCC6CDEE0
+      DF94D9D9D8B7CCCDCAD0BFBFBBD7B1B0ACD8A4A29CD372A06AC333A32BB643AE
+      3EB552BC52B658A6593E00000000
+    }
+  end
+  object CharSetSource: TDataSource
+    DataSet = DatabaseData.CharSetLookup
+    left = 48
+    top = 360
+  end
+  object SecFiles: TDataSource
+    DataSet = DatabaseData.DBSecFiles
+    left = 40
+    top = 472
+  end
+  object DBCharSetSource: TDataSource
+    DataSet = DatabaseData.DBCharSet
+    left = 48
+    top = 416
+  end
+  object DatabaseSource: TDataSource
+    DataSet = DatabaseData.DatabaseQuery
+    left = 512
+    top = 448
+  end
+  object IBDatabaseInfo: TIBDatabaseInfo
+    Database = DatabaseData.IBDatabase1
+    left = 424
+    top = 8
+  end
+  object AttmtSource: TDataSource
+    DataSet = DatabaseData.AttmtQuery
+    left = 416
+    top = 448
+  end
+end
