@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 409
+  Left = 654
   Height = 566
-  Top = 154
+  Top = 195
   Width = 817
   Caption = 'Database Administrator Demo'
   ClientHeight = 546
@@ -557,10 +557,12 @@ object MainForm: TMainForm
     object Backup: TAction
       Caption = 'Backup'
       ImageIndex = 0
+      OnExecute = BackupExecute
     end
     object Restore: TAction
       Caption = 'Restore'
       ImageIndex = 1
+      OnExecute = RestoreExecute
     end
     object OpenDatabase: TAction
       Caption = 'Open Database'

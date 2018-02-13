@@ -69,7 +69,6 @@ object DBLoginDlg: TDBLoginDlg
     Height = 24
     Top = 96
     Width = 192
-    ReadOnly = True
     TabOrder = 2
   end
   object UserName: TEdit

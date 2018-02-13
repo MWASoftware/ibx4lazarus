@@ -6,14 +6,13 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  Buttons, ExtCtrls, IBServices;
+  Buttons, ExtCtrls, ComCtrls, IBServices;
 
 type
 
   { TBackupDlg }
 
   TBackupDlg = class(TForm)
-    Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
     Edit1: TEdit;
@@ -23,18 +22,24 @@ type
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
+    Report: TMemo;
+    PageControl1: TPageControl;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     SaveDialog1: TSaveDialog;
     SpeedButton1: TSpeedButton;
+    SelectTab: TTabSheet;
+    ReportTab: TTabSheet;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure ReportTabShow(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
   private
     { private declarations }
+    procedure DoBackup(Data: PtrInt);
   public
     { public declarations }
-     procedure RunBackup;
+    function ShowModal(aService: TIBCustomService; DBName: string): TModalResult;
  end;
 
 var
@@ -54,12 +59,12 @@ begin
     Edit3.Text := SaveDialog1.Filename;
 end;
 
-procedure TBackupDlg.RunBackup;
+procedure TBackupDlg.DoBackup(Data: PtrInt);
 var bakfile: TFileStream;
     BackupCount: integer;
 begin
   bakfile := nil;
-  MainForm.Memo1.Lines.Add('Starting Backup');
+  Report.Lines.Add('Starting Backup');
   if IBBackupService1.BackupFileLocation = flClientSide then
     bakfile := TFileStream.Create(IBBackupService1.BackupFile[0],fmCreate);
   try
@@ -68,7 +73,7 @@ begin
     begin
       case IBBackupService1.BackupFileLocation of
       flServerSide:
-        MainForm.Memo1.Lines.Add(IBBackupService1.GetNextLine);
+        Report.Lines.Add(IBBackupService1.GetNextLine);
       flClientSide:
         IBBackupService1.WriteNextChunk(bakfile);
       end;
@@ -87,19 +92,29 @@ begin
   case IBBackupService1.BackupFileLocation of
   flServerSide:
     begin
-      MainForm.Memo1.Lines.Add('Backup Completed');
+      Report.Lines.Add('Backup Completed');
       MessageDlg('Backup Completed',mtInformation,[mbOK],0);
     end;
   flClientSide:
     begin
-      MainForm.Memo1.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
+      Report.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
       MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
     end;
   end;
+  IBBackupService1.Active := false;
+end;
+
+function TBackupDlg.ShowModal(aService: TIBCustomService; DBName: string
+  ): TModalResult;
+begin
+  IBBackupService1.Assign(aService);
+  IBBackupService1.DatabaseName := DBName;
+  Result := inherited ShowModal;
 end;
 
 procedure TBackupDlg.FormShow(Sender: TObject);
 begin
+  PageControl1.ActivePage := SelectTab;
   Edit1.Text := IBBackupService1.ServerName;
   if IBBackupService1.BackupFileLocation = flServerSide then
     RadioButton1.Checked := true
@@ -109,19 +124,28 @@ begin
   IBBackupService1.BackupFile.Clear;
 end;
 
+procedure TBackupDlg.ReportTabShow(Sender: TObject);
+begin
+  Report.Lines.Clear;
+end;
+
 procedure TBackupDlg.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   if ModalResult <> mrOK then Exit;
-  if Edit2.Text = '' then
-    raise Exception.Create('A Database Name must be given');
-  if Edit3.Text = '' then
-    raise Exception.Create('A Backup File Name must be given');
-  IBBackupService1.DatabaseName := Edit2.Text;
-  IBBackupService1.BackupFile.Add(Edit3.Text);
-  if RadioButton1.Checked then
-     IBBackupService1.BackupFileLocation := flServerSide
-  else
-    IBBackupService1.BackupFileLocation := flClientSide;
+
+  if PageControl1.ActivePage = SelectTab then
+  begin
+    CloseAction := caNone;
+    if Edit3.Text = '' then
+      raise Exception.Create('A Backup File Name must be given');
+    IBBackupService1.BackupFile.Add(Edit3.Text);
+    if RadioButton1.Checked then
+       IBBackupService1.BackupFileLocation := flServerSide
+    else
+      IBBackupService1.BackupFileLocation := flClientSide;
+    PageControl1.ActivePage := ReportTab;
+    Application.QueueAsyncCall(@DoBackup,0);
+  end;
 end;
 
 end.

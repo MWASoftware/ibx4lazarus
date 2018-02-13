@@ -92,6 +92,7 @@ type
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
     procedure AutoAdminChange(Sender: TObject);
+    procedure BackupExecute(Sender: TObject);
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DBCharacterSetEditingDone(Sender: TObject);
     procedure DBIsReadOnlyChange(Sender: TObject);
@@ -101,6 +102,7 @@ type
     procedure NoReserveChange(Sender: TObject);
     procedure OpenDatabaseExecute(Sender: TObject);
     procedure PropertiesShow(Sender: TObject);
+    procedure RestoreExecute(Sender: TObject);
     procedure SweepIntervalEditingDone(Sender: TObject);
     procedure SyncWritesChange(Sender: TObject);
   private
@@ -183,6 +185,11 @@ begin
   end;
 end;
 
+procedure TMainForm.BackupExecute(Sender: TObject);
+begin
+  DatabaseData.BackupDatabase;
+end;
+
 procedure TMainForm.DatabaseOnlineChange(Sender: TObject);
 var ShutDownMode: TShutDownMode;
     Delay: integer;
@@ -216,6 +223,11 @@ procedure TMainForm.PropertiesShow(Sender: TObject);
 begin
   if Visible then
     LoadData;
+end;
+
+procedure TMainForm.RestoreExecute(Sender: TObject);
+begin
+  DatabaseData.RestoreDatabase;
 end;
 
 procedure TMainForm.SweepIntervalEditingDone(Sender: TObject);

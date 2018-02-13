@@ -72,6 +72,8 @@ type
     destructor Destroy; override;
     procedure Connect;
     procedure Disconnect;
+    procedure BackupDatabase;
+    procedure RestoreDatabase;
     procedure BringDatabaseOnline;
     procedure ShutDown(aShutDownmode: TShutdownMode; aDelay: integer);
     function IsDatabaseOnline: boolean;
@@ -95,7 +97,8 @@ implementation
 
 {$R *.lfm}
 
-uses DBLoginDlgUnit, IBUtils, FBMessages, IBErrorCodes, ShutdownDatabaseDlgUnit;
+uses DBLoginDlgUnit, IBUtils, FBMessages, IBErrorCodes, ShutdownDatabaseDlgUnit,
+  BackupDlgUnit, RestoreDlgUnit;
 
 { TDatabaseData }
 
@@ -116,22 +119,26 @@ begin
   if FDBHeaderScanned then Exit;
   FIsShadowDatabase := false;
 
-  ActivateService(IBStatisticalService1);
+  try
+    ActivateService(IBStatisticalService1);
 
-  with IBStatisticalService1 do
-  begin
-    try
-      ServiceStart;
-      while not Eof do
-      begin
-         Line := GetNextLine;
-         if (Pos('Attributes',Line) <> 0) and (Pos('shadow',Line) <> 0) then
-           FIsShadowDatabase := true;
+    with IBStatisticalService1 do
+    begin
+      try
+        ServiceStart;
+        while not Eof do
+        begin
+           Line := GetNextLine;
+           if (Pos('Attributes',Line) <> 0) and (Pos('shadow',Line) <> 0) then
+             FIsShadowDatabase := true;
 
+        end
+      finally
+        Active := False;
       end
-    finally
-      Active := False;
-    end
+    end;
+  except on E: Exception do
+    MessageDlg('Error getting DB Header Page: ' + E.Message,mtError,[mbOK],0);
   end;
 end;
 
@@ -194,7 +201,8 @@ begin
     if Protocol = Local then
     begin
       ServerName := 'Localhost';
-      Protocol := TCP;
+      if not FileExists(IBDatabase1.DatabaseName) or FileIsReadOnly(IBDatabase1.DatabaseName) then
+        Protocol := TCP; {Use loopback if we can't read/write file}
     end
     else
       ServerName := AttmtQuery.FieldByName('MON$REMOTE_HOST').AsString;
@@ -295,6 +303,23 @@ procedure TDatabaseData.Disconnect;
 begin
   FDBPassword := '';
   IBDatabase1.Connected := false;
+end;
+
+procedure TDatabaseData.BackupDatabase;
+begin
+  ActivateService(IBConfigService1);
+  BackupDlg.ShowModal(IBConfigService1,IBDatabase1.DatabaseName);
+end;
+
+procedure TDatabaseData.RestoreDatabase;
+begin
+  ActivateService(IBConfigService1);
+  IBDatabase1.Connected := false;
+  try
+    RestoreDlg.ShowModal(IBConfigService1,IBDatabase1.DatabaseName);
+  finally
+    IBDatabase1.Connected := true;
+  end;
 end;
 
 procedure TDatabaseData.BringDatabaseOnline;
