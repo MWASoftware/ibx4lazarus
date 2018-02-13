@@ -1,11 +1,11 @@
 object MainForm: TMainForm
-  Left = 681
-  Height = 566
-  Top = 222
-  Width = 752
+  Left = 517
+  Height = 574
+  Top = 170
+  Width = 915
   Caption = 'Database Administrator Demo'
-  ClientHeight = 546
-  ClientWidth = 752
+  ClientHeight = 554
+  ClientWidth = 915
   Menu = MainMenu1
   OnShow = FormShow
   LCLVersion = '1.8.1.0'
@@ -13,7 +13,7 @@ object MainForm: TMainForm
     Left = 0
     Height = 26
     Top = 0
-    Width = 752
+    Width = 915
     Caption = 'ToolBar1'
     Images = MenuImages
     TabOrder = 0
@@ -51,23 +51,23 @@ object MainForm: TMainForm
   object StatusBar1: TStatusBar
     Left = 0
     Height = 22
-    Top = 524
-    Width = 752
+    Top = 532
+    Width = 915
     Panels = <>
   end
   object PageControl1: TPageControl
     Left = 0
-    Height = 498
+    Height = 506
     Top = 26
-    Width = 752
-    ActivePage = Properties
+    Width = 915
+    ActivePage = AttachmentsTab
     Align = alClient
-    TabIndex = 0
+    TabIndex = 7
     TabOrder = 2
     object Properties: TTabSheet
       Caption = 'Properties'
-      ClientHeight = 466
-      ClientWidth = 746
+      ClientHeight = 474
+      ClientWidth = 909
       OnShow = PropertiesShow
       object Label6: TLabel
         Left = 71
@@ -532,8 +532,8 @@ object MainForm: TMainForm
     end
     object FilesTab: TTabSheet
       Caption = 'Files'
-      ClientHeight = 466
-      ClientWidth = 746
+      ClientHeight = 474
+      ClientWidth = 909
       OnShow = FilesTabShow
       object Label25: TLabel
         Left = 16
@@ -547,7 +547,7 @@ object MainForm: TMainForm
         Left = 16
         Height = 24
         Top = 32
-        Width = 551
+        Width = 474
         Anchors = [akTop, akLeft, akRight]
         ReadOnly = True
         TabOrder = 0
@@ -565,7 +565,7 @@ object MainForm: TMainForm
         Left = 16
         Height = 160
         Top = 88
-        Width = 591
+        Width = 763
         Anchors = [akTop, akLeft, akRight]
         Color = clWindow
         Columns = <        
@@ -623,7 +623,7 @@ object MainForm: TMainForm
         DefaultPositionAtEnd = False
       end
       object AddFileBtn: TButton
-        Left = 632
+        Left = 795
         Height = 25
         Top = 88
         Width = 91
@@ -641,9 +641,9 @@ object MainForm: TMainForm
       end
       object IBDynamicGrid2: TIBDynamicGrid
         Left = 16
-        Height = 164
+        Height = 179
         Top = 280
-        Width = 592
+        Width = 763
         Anchors = [akTop, akLeft, akRight, akBottom]
         Color = clWindow
         Columns = <        
@@ -724,7 +724,7 @@ object MainForm: TMainForm
         DefaultPositionAtEnd = False
       end
       object AddShadowBtn: TButton
-        Left = 632
+        Left = 795
         Height = 25
         Top = 280
         Width = 91
@@ -733,7 +733,7 @@ object MainForm: TMainForm
         TabOrder = 4
       end
       object RemoveShadowBtn: TButton
-        Left = 632
+        Left = 795
         Height = 25
         Top = 312
         Width = 91
@@ -744,14 +744,14 @@ object MainForm: TMainForm
     end
     object SchemaTab: TTabSheet
       Caption = 'Schema'
-      ClientHeight = 466
-      ClientWidth = 746
+      ClientHeight = 474
+      ClientWidth = 909
       OnShow = SchemaTabShow
       inline SynEdit1: TSynEdit
         Left = 0
-        Height = 466
+        Height = 474
         Top = 0
-        Width = 746
+        Width = 909
         Align = alClient
         Font.Height = -11
         Font.Name = 'DejaVu Sans Mono'
@@ -1251,11 +1251,11 @@ object MainForm: TMainForm
     end
     object StatisticsTab: TTabSheet
       Caption = 'Statistics'
-      ClientHeight = 466
-      ClientWidth = 746
+      ClientHeight = 474
+      ClientWidth = 909
       OnShow = StatisticsTabShow
       object StatsOptions: TComboBox
-        Left = 512
+        Left = 667
         Height = 27
         Top = 8
         Width = 228
@@ -1285,7 +1285,7 @@ object MainForm: TMainForm
         Left = 8
         Height = 422
         Top = 40
-        Width = 732
+        Width = 883
         Anchors = [akTop, akLeft, akRight, akBottom]
         Lines.Strings = (
           'Memo1'
@@ -1296,17 +1296,17 @@ object MainForm: TMainForm
     end
     object ServerTab: TTabSheet
       Caption = 'Server'
-      ClientHeight = 466
-      ClientWidth = 746
+      ClientHeight = 474
+      ClientWidth = 909
       OnShow = ServerTabShow
       object Panel1: TPanel
         Left = 0
-        Height = 466
+        Height = 474
         Top = 0
         Width = 370
         Align = alLeft
         BevelOuter = bvNone
-        ClientHeight = 466
+        ClientHeight = 474
         ClientWidth = 370
         TabOrder = 0
         object Label29: TLabel
@@ -1319,7 +1319,7 @@ object MainForm: TMainForm
         end
         object ServerPropMemo: TMemo
           Left = 8
-          Height = 431
+          Height = 439
           Top = 26
           Width = 353
           Anchors = [akTop, akLeft, akRight, akBottom]
@@ -1332,19 +1332,19 @@ object MainForm: TMainForm
       end
       object Splitter1: TSplitter
         Left = 370
-        Height = 466
+        Height = 474
         Top = 0
         Width = 5
       end
       object Panel2: TPanel
         Left = 375
-        Height = 466
+        Height = 474
         Top = 0
-        Width = 371
+        Width = 534
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 466
-        ClientWidth = 371
+        ClientHeight = 474
+        ClientWidth = 534
         TabOrder = 2
         object Label30: TLabel
           Left = 8
@@ -1356,9 +1356,9 @@ object MainForm: TMainForm
         end
         object ServerLog: TMemo
           Left = 8
-          Height = 431
+          Height = 439
           Top = 26
-          Width = 353
+          Width = 516
           Anchors = [akTop, akLeft, akRight, akBottom]
           Lines.Strings = (
             'ServerLog'
@@ -1368,10 +1368,330 @@ object MainForm: TMainForm
         end
       end
     end
+    object FB3UserManager: TTabSheet
+      Caption = 'User Manager'
+      ClientHeight = 474
+      ClientWidth = 909
+      OnShow = FB3UserManagerShow
+      object Panel4: TPanel
+        Left = 0
+        Height = 474
+        Top = 0
+        Width = 739
+        Align = alLeft
+        ClientHeight = 474
+        ClientWidth = 739
+        TabOrder = 0
+        object IBDynamicGrid3: TIBDynamicGrid
+          Left = 1
+          Height = 472
+          Top = 1
+          Width = 737
+          Align = alClient
+          Color = clWindow
+          Columns = <          
+            item
+              ReadOnly = True
+              Title.Alignment = taCenter
+              Title.Caption = 'User Name'
+              Width = 120
+              FieldName = 'USERNAME'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'First Name'
+              Width = 80
+              FieldName = 'SEC$FIRST_NAME'
+              AutoSizeColumn = True
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'Middle Name'
+              Width = 85
+              FieldName = 'SEC$MIDDLE_NAME'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'Last Name'
+              Width = 80
+              FieldName = 'SEC$LAST_NAME'
+              AutoSizeColumn = True
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Alignment = taCenter
+              Title.Alignment = taCenter
+              Title.Caption = 'Active'
+              Width = 55
+              FieldName = 'SEC$ACTIVE'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Alignment = taCenter
+              Title.Alignment = taCenter
+              Title.Caption = 'Admin'
+              Width = 55
+              FieldName = 'SEC$ADMIN'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'DB Creator'
+              Width = 70
+              FieldName = 'DBCREATOR'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Alignment = taCenter
+              ReadOnly = True
+              Title.Alignment = taCenter
+              Title.Caption = 'Logged In'
+              Width = 70
+              FieldName = 'LOGGEDIN'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              ButtonStyle = cbsPickList
+              PickList.Strings = (
+                'Srp'
+                'Legacy_UserManager'
+              )
+              Title.Alignment = taCenter
+              Title.Caption = 'User Manager'
+              Width = 100
+              FieldName = 'SEC$PLUGIN'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end>
+          DataSource = UserListSource
+          PopupMenu = PopupMenu1
+          Scrollbars = ssAutoVertical
+          TabOrder = 0
+          ExpandEditorPanelBelowRow = False
+          Descending = False
+          EditorBorderStyle = bsSingle
+          DefaultPositionAtEnd = False
+          IndexFieldNames = 'USERNAME'
+        end
+      end
+      object Splitter2: TSplitter
+        Left = 739
+        Height = 474
+        Top = 0
+        Width = 5
+      end
+      object Panel3: TPanel
+        Left = 744
+        Height = 474
+        Top = 0
+        Width = 165
+        Align = alClient
+        BevelOuter = bvNone
+        ClientHeight = 474
+        ClientWidth = 165
+        TabOrder = 2
+        object IBDynamicGrid4: TIBDynamicGrid
+          Left = 0
+          Height = 161
+          Top = 50
+          Width = 165
+          Align = alTop
+          Color = clWindow
+          Columns = <          
+            item
+              Title.Caption = ''
+              Width = 30
+              FieldName = 'GRANTED'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'Role'
+              Width = 70
+              FieldName = 'RDB$ROLE_NAME'
+              AutoSizeColumn = True
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end>
+          DataSource = RoleSource
+          Options = [dgEditing, dgIndicator, dgColumnResize, dgColumnMove, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+          Scrollbars = ssAutoVertical
+          TabOrder = 0
+          ExpandEditorPanelBelowRow = False
+          Descending = False
+          EditorBorderStyle = bsSingle
+          DefaultPositionAtEnd = False
+        end
+        object Panel5: TPanel
+          Left = 0
+          Height = 61
+          Top = 413
+          Width = 165
+          Align = alBottom
+          BevelInner = bvLowered
+          BevelOuter = bvLowered
+          ClientHeight = 61
+          ClientWidth = 165
+          TabOrder = 1
+          object Button1: TButton
+            Left = 16
+            Height = 28
+            Top = 16
+            Width = 138
+            Action = SaveChanges
+            Anchors = [akTop, akLeft, akRight]
+            TabOrder = 0
+          end
+        end
+        object Panel6: TPanel
+          Left = 0
+          Height = 50
+          Top = 0
+          Width = 165
+          Align = alTop
+          BevelInner = bvLowered
+          BevelOuter = bvLowered
+          ClientHeight = 50
+          ClientWidth = 165
+          TabOrder = 2
+          object DBText1: TDBText
+            Left = 10
+            Height = 14
+            Top = 30
+            Width = 49
+            DataField = 'USERNAME'
+            ParentColor = False
+          end
+          object Label36: TLabel
+            Left = 10
+            Height = 14
+            Top = 10
+            Width = 104
+            Caption = 'Roles Assigned to'
+            ParentColor = False
+          end
+        end
+        object Splitter3: TSplitter
+          Cursor = crVSplit
+          Left = 0
+          Height = 5
+          Top = 211
+          Width = 165
+          Align = alTop
+          ResizeAnchor = akTop
+        end
+        object Panel7: TPanel
+          Left = 0
+          Height = 26
+          Top = 216
+          Width = 165
+          Align = alTop
+          BevelInner = bvRaised
+          Caption = 'Tags'
+          TabOrder = 4
+        end
+        object IBDynamicGrid5: TIBDynamicGrid
+          Left = 0
+          Height = 166
+          Top = 242
+          Width = 165
+          Align = alClient
+          Color = clWindow
+          Columns = <          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'Key'
+              Width = 70
+              FieldName = 'SEC$KEY'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'Value'
+              Width = 90
+              FieldName = 'SEC$VALUE'
+              AutoSizeColumn = True
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end>
+          DataSource = UserTagsSource
+          PopupMenu = PopupMenu2
+          Scrollbars = ssAutoVertical
+          TabOrder = 5
+          ExpandEditorPanelBelowRow = False
+          Descending = False
+          EditorBorderStyle = bsSingle
+          DefaultPositionAtEnd = False
+        end
+        object Splitter4: TSplitter
+          Cursor = crVSplit
+          Left = 0
+          Height = 5
+          Top = 408
+          Width = 165
+          Align = alBottom
+          ResizeAnchor = akBottom
+        end
+      end
+    end
+    object LegacyUsersTab: TTabSheet
+      Caption = 'User Manager'
+    end
+    object AttachmentsTab: TTabSheet
+      Caption = 'Attachments'
+    end
   end
   object MainMenu1: TMainMenu
-    left = 184
-    top = 8
+    left = 712
+    top = 64
     object MenuItem1: TMenuItem
       Caption = 'File'
       object MenuItem6: TMenuItem
@@ -1405,8 +1725,8 @@ object MainForm: TMainForm
   end
   object ActionList1: TActionList
     Images = MenuImages
-    left = 256
-    top = 10
+    left = 712
+    top = 128
     object Quit: TAction
       Category = 'General'
       Caption = 'Exit'
@@ -1458,10 +1778,46 @@ object MainForm: TMainForm
       OnExecute = DropDatabaseExecute
       OnUpdate = DropDatabaseUpdate
     end
+    object AddUser: TAction
+      Category = 'Users'
+      Caption = 'Add New User'
+      OnExecute = AddUserExecute
+      OnUpdate = AddUserUpdate
+    end
+    object ChgPassword: TAction
+      Category = 'Users'
+      Caption = 'Change Password'
+      OnExecute = ChgPasswordExecute
+      OnUpdate = ChgPasswordUpdate
+    end
+    object DeleteUser: TAction
+      Category = 'Users'
+      Caption = 'Delete'
+      OnExecute = DeleteUserExecute
+      OnUpdate = ChgPasswordUpdate
+    end
+    object SaveChanges: TAction
+      Category = 'Users'
+      Caption = 'Save Changes'
+      OnExecute = SaveChangesExecute
+      OnUpdate = SaveChangesUpdate
+    end
+    object AddTag: TAction
+      Category = 'Tags'
+      Caption = 'Add Tag'
+      OnExecute = AddTagExecute
+      OnUpdate = AddTagUpdate
+    end
+    object DeleteTag: TAction
+      Category = 'Tags'
+      Caption = 'Delete'
+      OnExecute = DeleteTagExecute
+      OnUpdate = DeleteTagUpdate
+    end
   end
   object MenuImages: TImageList
-    left = 336
-    top = 8
+    left = 704
+    top = 184
     Bitmap = {
       4C69040000001000000010000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000FF0000
@@ -1616,8 +1972,8 @@ object MainForm: TMainForm
   end
   object IBDatabaseInfo: TIBDatabaseInfo
     Database = DatabaseData.IBDatabase1
-    left = 424
-    top = 8
+    left = 712
+    top = 240
   end
   object AttmtSource: TDataSource
     DataSet = DatabaseData.AttmtQuery
@@ -1636,28 +1992,69 @@ object MainForm: TMainForm
     KeyAttri.Foreground = clBlue
     NumberAttri.Foreground = clRed
     SQLDialect = sqlSybase
-    left = 568
-    top = 16
+    left = 712
+    top = 352
   end
   object IBExtract1: TIBExtract
     Database = DatabaseData.IBDatabase1
     Transaction = DatabaseData.CurrentTransaction
     ShowSystem = False
-    left = 504
-    top = 8
+    left = 712
+    top = 296
   end
   object SQlSaveDialog: TSaveDialog
     DefaultExt = '.sql'
     Filter = 'SQLFiles (*.sql)|*.sql|All Files|*.*'
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    left = 672
-    top = 464
+    left = 712
+    top = 472
   end
   object SaveDialog: TSaveDialog
     DefaultExt = '.txt'
     Filter = 'Text Files (*.txt)|*.txt|All Files |*.*'
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    left = 592
-    top = 464
+    left = 712
+    top = 416
+  end
+  object UserListSource: TDataSource
+    DataSet = DatabaseData.UserList
+    left = 304
+    top = 368
+  end
+  object RoleSource: TDataSource
+    DataSet = DatabaseData.RoleNameList
+    left = 864
+    top = 160
+  end
+  object UserTagsSource: TDataSource
+    DataSet = DatabaseData.UserTags
+    left = 880
+    top = 400
+  end
+  object PopupMenu1: TPopupMenu
+    left = 325
+    top = 255
+    object MenuItem11: TMenuItem
+      Action = AddUser
+    end
+    object MenuItem12: TMenuItem
+      Action = ChgPassword
+    end
+    object MenuItem13: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem14: TMenuItem
+      Action = DeleteUser
+    end
+  end
+  object PopupMenu2: TPopupMenu
+    left = 845
+    top = 346
+    object MenuItem15: TMenuItem
+      Action = AddTag
+    end
+    object MenuItem16: TMenuItem
+      Action = DeleteTag
+    end
   end
 end

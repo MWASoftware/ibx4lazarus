@@ -1,12 +1,12 @@
 object DatabaseData: TDatabaseData
   OldCreateOrder = False
   Height = 466
-  HorizontalOffset = 1046
-  VerticalOffset = 455
-  Width = 510
+  HorizontalOffset = 959
+  VerticalOffset = 402
+  Width = 629
   PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -257,8 +257,8 @@ object DatabaseData: TDatabaseData
     )
     Params = <>
     DataSetCloseAction = dcDiscardChanges
-    left = 408
-    top = 192
+    left = 544
+    top = 112
   end
   object IBStatisticalService1: TIBStatisticalService
     PortNo = 0
@@ -311,5 +311,382 @@ object DatabaseData: TDatabaseData
     OnLogin = IBStatisticalService1Login
     left = 162
     top = 368
+  end
+  object UserList: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    AfterDelete = UserListAfterPost
+    AfterInsert = UserListAfterInsert
+    AfterOpen = UserListAfterOpen
+    AfterPost = UserListAfterPost
+    AfterScroll = UserListAfterScroll
+    BeforeClose = UserListBeforeClose
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
+      'A.SEC$ACTIVE, A.SEC$USER_NAME as UserName, A.SEC$MIDDLE_NAME,'
+      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME,'
+      'cast(NULL as VarChar(32)) as USERPASSWORD, CURRENT_CONNECTION,'
+      'case when Count(B.MON$ATTACHMENT_ID) > 0 then true else false end as LoggedIn,'
+      'case When C.SEC$USER is not null then true else false end as DBCreator'
+      'From SEC$USERS A'
+      'Left Outer Join MON$ATTACHMENTS B'
+      'On A.SEC$USER_NAME = B.MON$USER'
+      'Left Outer Join SEC$DB_CREATORS  C on C.SEC$USER = A.SEC$USER_NAME'
+      'Group By A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
+      'A.SEC$ACTIVE, A.SEC$USER_NAME, A.SEC$MIDDLE_NAME,'
+      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME, C.SEC$USER'
+    )
+    Params = <>
+    UpdateObject = UpdateUsers
+    DataSetCloseAction = dcSaveChanges
+    left = 416
+    top = 352
+    object UserListSECDESCRIPTION: TIBMemoField
+      FieldKind = fkData
+      FieldName = 'SEC$DESCRIPTION'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      BlobType = ftMemo
+      Size = 8
+      Transliterate = False
+      DisplayTextAsClassName = False
+    end
+    object UserListSECPLUGIN: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SEC$PLUGIN'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = True
+      Required = False
+      Size = 31
+    end
+    object UserListSECADMIN: TBooleanField
+      FieldKind = fkData
+      FieldName = 'SEC$ADMIN'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      DisplayValues = 'True;False'
+    end
+    object UserListSECACTIVE: TBooleanField
+      FieldKind = fkData
+      FieldName = 'SEC$ACTIVE'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      DisplayValues = 'True;False'
+    end
+    object UserListSECMIDDLE_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SEC$MIDDLE_NAME'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object UserListSECFIRST_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SEC$FIRST_NAME'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object UserListSECLAST_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SEC$LAST_NAME'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object UserListUSERPASSWORD: TIBStringField
+      FieldKind = fkData
+      FieldName = 'USERPASSWORD'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object UserListUSERNAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'USERNAME'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object UserListLOGGEDIN: TBooleanField
+      FieldKind = fkData
+      FieldName = 'LOGGEDIN'
+      Index = 9
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      DisplayValues = 'True;False'
+    end
+    object UserListCURRENT_CONNECTION: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'CURRENT_CONNECTION'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object UserListDBCREATOR: TBooleanField
+      FieldKind = fkData
+      FieldName = 'DBCREATOR'
+      Index = 11
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      DisplayValues = 'True;False'
+    end
+  end
+  object UpdateUsers: TIBUpdate
+    RefreshSQL.Strings = (
+      'Select A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
+      'A.SEC$ACTIVE, A.SEC$USER_NAME as UserName, A.SEC$MIDDLE_NAME,'
+      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME,'
+      'cast(NULL as VarChar(32)) as USERPASSWORD, CURRENT_CONNECTION,'
+      'case when B.MON$ATTACHMENT_ID is not null then true else false end as LoggedIn,'
+      'case When C.SEC$USER is not null then true else false end as DBCreator'
+      'From SEC$USERS A'
+      'Left Outer Join MON$ATTACHMENTS B'
+      'On A.SEC$USER_NAME = B.MON$USER'
+      'Left Outer Join SEC$DB_CREATORS  C on C.SEC$USER = A.SEC$USER_NAME'
+      'Where  A.SEC$USER_NAME = :UserName'
+    )
+    OnApplyUpdates = UpdateUsersApplyUpdates
+    left = 544
+    top = 360
+  end
+  object RoleNameList: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    AfterDelete = UserListAfterPost
+    AfterPost = UserListAfterPost
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = UserListSource
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
+      'P.RDB$USER,RDB$PRIVILEGE,   r.RDB$SECURITY_CLASS, cast(:USERNAME as VARCHAR(32)) as USERNAME,'
+      'Case When RDB$PRIVILEGE is null then false else true End as GRANTED'
+      'FROM RDB$ROLES r'
+      'Left Outer JOIN ('
+      'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
+      'Where RDB$USER = :USERNAME and RDB$PRIVILEGE = ''M'''
+      ') P  On P.RDB$RELATION_NAME = r.RDB$ROLE_NAME '
+      ''
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'USERNAME'
+        ParamType = ptInput
+      end>
+    UpdateObject = UpdateUserRoles
+    DataSetCloseAction = dcSaveChanges
+    left = 424
+    top = 280
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'USERNAME'
+        ParamType = ptInput
+      end>
+    object RoleNameListRDBROLE_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$ROLE_NAME'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object RoleNameListRDBOWNER_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$OWNER_NAME'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object RoleNameListRDBDESCRIPTION: TIBMemoField
+      FieldKind = fkData
+      FieldName = 'RDB$DESCRIPTION'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      BlobType = ftMemo
+      Size = 8
+      Transliterate = False
+      DisplayTextAsClassName = False
+    end
+    object RoleNameListRDBSYSTEM_FLAG: TSmallintField
+      FieldKind = fkData
+      FieldName = 'RDB$SYSTEM_FLAG'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object RoleNameListRDBUSER: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$USER'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object RoleNameListRDBSECURITY_CLASS: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$SECURITY_CLASS'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object RoleNameListRDBPRIVILEGE: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$PRIVILEGE'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 6
+    end
+    object RoleNameListUSERNAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'USERNAME'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object RoleNameListGRANTED: TBooleanField
+      FieldKind = fkData
+      FieldName = 'GRANTED'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      DisplayValues = 'True;False'
+    end
+  end
+  object UpdateUserRoles: TIBUpdate
+    RefreshSQL.Strings = (
+      'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
+      'P.RDB$USER,RDB$PRIVILEGE,   r.RDB$SECURITY_CLASS, cast(:USERNAME as VARCHAR(32)) as USERNAME,'
+      'Case When RDB$PRIVILEGE is null then false else true End as GRANTED'
+      'FROM RDB$ROLES r'
+      'Left Outer JOIN ('
+      'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
+      'Where RDB$USER = :USERNAME and RDB$PRIVILEGE = ''M'''
+      ') P  On P.RDB$RELATION_NAME = r.RDB$ROLE_NAME '
+      'Where  r.RDB$ROLE_NAME = :RDB$ROLE_NAME'
+    )
+    OnApplyUpdates = UpdateUserRolesApplyUpdates
+    left = 544
+    top = 288
+  end
+  object ApplicationProperties1: TApplicationProperties
+    OnException = ApplicationProperties1Exception
+    left = 528
+    top = 32
+  end
+  object UserTags: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    AfterDelete = UserListAfterPost
+    AfterInsert = UserTagsAfterInsert
+    AfterPost = UserListAfterPost
+    BufferChunks = 1000
+    CachedUpdates = False
+    DataSource = UserListSource
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select a.SEC$USER_NAME, A.SEC$KEY, A.SEC$VALUE'
+      'From'
+      'SEC$USER_ATTRIBUTES  A'
+      'Where SEC$USER_NAME = :UserName'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'UserName'
+        ParamType = ptInput
+      end>
+    UpdateObject = TagsUpdate
+    DataSetCloseAction = dcSaveChanges
+    left = 424
+    top = 192
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'UserName'
+        ParamType = ptInput
+      end>
+  end
+  object TagsUpdate: TIBUpdate
+    RefreshSQL.Strings = (
+      'Select A.SEC$USER_NAME, A.SEC$KEY, A.SEC$VALUE From '
+      'SEC$USER_ATTRIBUTES A'
+      'Where SEC$USER_NAME = :SEC$USER_NAME'
+    )
+    OnApplyUpdates = TagsUpdateApplyUpdates
+    left = 536
+    top = 200
+  end
+  object UserListSource: TDataSource
+    DataSet = UserList
+    left = 304
+    top = 360
   end
 end

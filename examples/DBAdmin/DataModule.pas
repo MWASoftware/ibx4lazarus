@@ -13,9 +13,11 @@ type
   { TDatabaseData }
 
   TDatabaseData = class(TDataModule)
+    ApplicationProperties1: TApplicationProperties;
     CharSetLookup: TIBQuery;
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
+    UserListSource: TDataSource;
     DBCharSet: TIBQuery;
     DBSecFiles: TIBQuery;
     ExecDDL: TIBSQL;
@@ -26,7 +28,18 @@ type
     IBLogService1: TIBLogService;
     IBServerProperties1: TIBServerProperties;
     IBStatisticalService1: TIBStatisticalService;
+    RoleNameList: TIBQuery;
+    RoleNameListGRANTED: TBooleanField;
+    RoleNameListRDBDESCRIPTION: TIBMemoField;
+    RoleNameListRDBOWNER_NAME: TIBStringField;
+    RoleNameListRDBPRIVILEGE: TIBStringField;
+    RoleNameListRDBROLE_NAME: TIBStringField;
+    RoleNameListRDBSECURITY_CLASS: TIBStringField;
+    RoleNameListRDBSYSTEM_FLAG: TSmallintField;
+    RoleNameListRDBUSER: TIBStringField;
+    RoleNameListUSERNAME: TIBStringField;
     TableNameLookup: TIBQuery;
+    TagsUpdate: TIBUpdate;
     UpdateCharSet: TIBUpdate;
     SecGlobalAuth: TIBQuery;
     ShadowFiles: TIBQuery;
@@ -37,6 +50,23 @@ type
     ShadowFilesRDBFILE_SEQUENCE: TSmallintField;
     ShadowFilesRDBFILE_START: TIntegerField;
     ShadowFilesRDBSHADOW_NUMBER: TSmallintField;
+    UpdateUserRoles: TIBUpdate;
+    UpdateUsers: TIBUpdate;
+    UserList: TIBQuery;
+    UserListCURRENT_CONNECTION: TIBLargeIntField;
+    UserListDBCREATOR: TBooleanField;
+    UserListLOGGEDIN: TBooleanField;
+    UserListSECACTIVE: TBooleanField;
+    UserListSECADMIN: TBooleanField;
+    UserListSECDESCRIPTION: TIBMemoField;
+    UserListSECFIRST_NAME: TIBStringField;
+    UserListSECLAST_NAME: TIBStringField;
+    UserListSECMIDDLE_NAME: TIBStringField;
+    UserListSECPLUGIN: TIBStringField;
+    UserListUSERNAME: TIBStringField;
+    UserListUSERPASSWORD: TIBStringField;
+    UserTags: TIBQuery;
+    procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
     procedure CurrentTransactionAfterTransactionEnd(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
     procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
@@ -48,8 +78,20 @@ type
     procedure IBDatabase1Login(Database: TIBDatabase; LoginParams: TStrings);
     procedure IBStatisticalService1Login(Service: TIBCustomService;
       LoginParams: TStrings);
+    procedure TagsUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
+      Params: ISQLParams);
     procedure UpdateCharSetApplyUpdates(Sender: TObject;
       UpdateKind: TUpdateKind; Params: ISQLParams);
+    procedure UpdateUserRolesApplyUpdates(Sender: TObject;
+      UpdateKind: TUpdateKind; Params: ISQLParams);
+    procedure UpdateUsersApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
+      Params: ISQLParams);
+    procedure UserListAfterInsert(DataSet: TDataSet);
+    procedure UserListAfterOpen(DataSet: TDataSet);
+    procedure UserListAfterPost(DataSet: TDataSet);
+    procedure UserListAfterScroll(DataSet: TDataSet);
+    procedure UserListBeforeClose(DataSet: TDataSet);
+    procedure UserTagsAfterInsert(DataSet: TDataSet);
   private
     FAfterDataReload: TNotifyEvent;
     FAfterDBConnect: TNotifyEvent;
@@ -137,6 +179,139 @@ begin
                 Params.ByName('RDB$CHARACTER_SET_NAME').AsString;
     ExecDDL.ExecQuery;
   end;
+end;
+
+procedure TDatabaseData.UpdateUserRolesApplyUpdates(Sender: TObject;
+  UpdateKind: TUpdateKind; Params: ISQLParams);
+
+  procedure Grant(Params: ISQLParams);
+  begin
+    ExecDDL.SQL.Text := 'Grant ' + trim(Params.ByName('RDB$ROLE_NAME').AsString) + ' to ' + Params.ByName('USERNAME').AsString;
+    ExecDDL.ExecQuery;
+  end;
+
+  procedure Revoke(Params: ISQLParams);
+  begin
+    ExecDDL.SQL.Text := 'Revoke ' + trim(Params.ByName('RDB$ROLE_NAME').AsString) + ' from ' + Params.ByName('USERNAME').AsString;
+    ExecDDL.ExecQuery;
+  end;
+
+begin
+  if UpdateKind = ukModify then
+  begin
+    if Params.ByName('GRANTED').AsInteger = 0 then
+      Revoke(Params)
+    else
+      Grant(Params);
+  end;
+end;
+
+procedure TDatabaseData.UpdateUsersApplyUpdates(Sender: TObject;
+  UpdateKind: TUpdateKind; Params: ISQLParams);
+
+  function FormatStmtOptions: string;
+  var Param: ISQLParam;
+  begin
+    Result := Trim(Params.ByName('UserName').AsString);
+    Param := Params.ByName('USERPASSWORD');
+    if (Param <> nil) and not Param.IsNull  then
+      Result += ' PASSWORD ''' + SQLSafeString(Param.AsString) + '''';
+    Param := Params.ByName('SEC$FIRST_NAME');
+    if Param <> nil then
+      Result += ' FIRSTNAME ''' + SQLSafeString(Param.AsString) + '''';
+    Param := Params.ByName('SEC$MIDDLE_NAME');
+    if Param <> nil then
+      Result += ' MIDDLENAME ''' + SQLSafeString(Param.AsString) + '''';
+    Param := Params.ByName('SEC$LAST_NAME');
+    if Param <> nil then
+      Result += ' LASTNAME ''' + SQLSafeString(Param.AsString) + '''';
+    Param := Params.ByName('SEC$ACTIVE');
+    if Param <> nil then
+    begin
+      if Param.AsBoolean then
+        Result += ' ACTIVE'
+      else
+        Result += ' INACTIVE';
+    end;
+    Param := Params.ByName('SEC$PLUGIN');
+    if Param <> nil then
+      Result += ' USING PLUGIN ' + QuoteIdentifierIfNeeded((Sender as TIBUpdate).DataSet.Database.SQLDialect,Param.AsString);
+  end;
+
+begin
+    case UpdateKind of
+    ukInsert:
+      ExecDDL.SQL.Text := 'CREATE USER ' + FormatStmtOptions;
+    ukModify:
+        ExecDDL.SQL.Text := 'ALTER USER ' + FormatStmtOptions;
+    ukDelete:
+      ExecDDL.SQL.Text := 'DROP USER ' + Trim(Params.ByName('UserName').AsString);
+    end;
+    ExecDDL.ExecQuery;
+
+  if UpdateKind = ukModify then
+  {Update Admin Role if allowed}
+  begin
+    if Params.ByName('SEC$ADMIN').AsBoolean and not Params.ByName('OLD_SEC$ADMIN').AsBoolean then
+    begin
+      ExecDDL.SQL.Text := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) + ' GRANT ADMIN ROLE';
+      ExecDDL.ExecQuery;
+    end
+    else
+    if not Params.ByName('SEC$ADMIN').AsBoolean and Params.ByName('OLD_SEC$ADMIN').AsBoolean then
+    begin
+      ExecDDL.SQL.Text := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) + ' REVOKE ADMIN ROLE';
+      ExecDDL.ExecQuery;
+    end
+  end;
+
+  {Update DB Creator Role}
+  if Params.ByName('DBCreator').AsBoolean and not Params.ByName('OLD_DBCreator').AsBoolean then
+  begin
+    ExecDDL.SQL.Text := 'GRANT CREATE DATABASE TO USER ' + Trim(Params.ByName('UserName').AsString);
+    ExecDDL.ExecQuery;
+  end
+  else
+  if not Params.ByName('DBCreator').AsBoolean and Params.ByName('OLD_DBCreator').AsBoolean then
+  begin
+    ExecDDL.SQL.Text := 'REVOKE CREATE DATABASE FROM USER ' + Trim(Params.ByName('UserName').AsString);
+    ExecDDL.ExecQuery;
+  end
+end;
+
+procedure TDatabaseData.UserListAfterInsert(DataSet: TDataSet);
+begin
+  UserList.FieldByName('SEC$ADMIN').AsBoolean := false;
+  UserList.FieldByName('SEC$ACTIVE').AsBoolean := false;
+  UserList.FieldByName('DBCreator').AsBoolean := false;
+  UserList.FieldByName('SEC$PLUGIN').AsString := 'Srp';
+end;
+
+procedure TDatabaseData.UserListAfterOpen(DataSet: TDataSet);
+begin
+  RoleNameList.Active := true;
+  UserTags.Active := true;
+end;
+
+procedure TDatabaseData.UserListAfterPost(DataSet: TDataSet);
+begin
+  CurrentTransaction.Commit;
+end;
+
+procedure TDatabaseData.UserListAfterScroll(DataSet: TDataSet);
+begin
+  UserList.FieldByName('SEC$PLUGIN').ReadOnly := UserList.State <> dsInsert;
+end;
+
+procedure TDatabaseData.UserListBeforeClose(DataSet: TDataSet);
+begin
+  RoleNameList.Active := false;
+  UserTags.Active := false;
+end;
+
+procedure TDatabaseData.UserTagsAfterInsert(DataSet: TDataSet);
+begin
+  DataSet.FieldByName('SEC$USER_NAME').AsString := UserList.FieldByName('UserName').AsString;
 end;
 
 procedure TDatabaseData.GetDBFlags;
@@ -280,12 +455,6 @@ begin
 
   SecPlugin := DatabaseQuery.FindField('MON$SEC_DATABASE');
   UsingDefaultSecDatabase := (SecPlugin = nil) or (Trim(SecPlugin.AsString) = 'Default');
-
-(*  if not UsingDefaultSecDatabase and (aService is TIBConfigService) and
-     not  AService.Active and IBStatisticalService1.Active then
-  begin
-    {Force login to default security database}
-  end;*)
 
   {The server properties service is the base service holding the service interface}
   if not IBServerProperties1.Active then
@@ -716,6 +885,31 @@ begin
   end;
 end;
 
+procedure TDatabaseData.TagsUpdateApplyUpdates(Sender: TObject;
+  UpdateKind: TUpdateKind; Params: ISQLParams);
+var sql: string;
+begin
+  sql := '';
+  case UpdateKind of
+  ukInsert,
+  ukModify:
+    begin
+      sql := 'ALTER USER ' + Trim(Params.ByName('SEC$USER_NAME').AsString)
+         + ' TAGS (' + QuoteIdentifierIfNeeded(IBDatabase1.SQLDialect,Params.ByName('SEC$KEY').AsString)
+         + '=''' + SQLSafeString(Params.ByName('SEC$VALUE').AsString) + '''';
+      if Params.ByName('SEC$KEY').AsString <> Params.ByName('OLD_SEC$KEY').AsString then
+        sql += ', DROP ' + QuoteIdentifierIfNeeded(IBDatabase1.SQLDialect,Params.ByName('OLD_SEC$KEY').AsString);
+      sql +=')'
+    end;
+
+  ukDelete:
+    sql := 'ALTER USER ' + Trim(Params.ByName('SEC$USER_NAME').AsString)
+         + ' TAGS (DROP ' + QuoteIdentifierIfNeeded(IBDatabase1.SQLDialect,Params.ByName('SEC$KEY').AsString) + ')';
+  end;
+  ExecDDL.SQL.Text := sql;
+  ExecDDL.ExecQuery;
+end;
+
 procedure TDatabaseData.IBDatabase1AfterConnect(Sender: TObject);
 begin
   {Virtual tables did not exist prior to Firebird 2.1 - so don't bother with old version}
@@ -753,6 +947,20 @@ procedure TDatabaseData.CurrentTransactionAfterTransactionEnd(Sender: TObject);
 begin
   if not Disconnecting and not (csDestroying in ComponentState) then
     Application.QueueAsyncCall(@ReloadData,0);
+end;
+
+procedure TDatabaseData.ApplicationProperties1Exception(Sender: TObject;
+  E: Exception);
+begin
+  if E is EIBInterBaseError then
+  begin
+    if RoleNameList.State in [dsInsert,dsEdit] then
+      RoleNameList.Cancel;
+    if UserList.State in [dsInsert,dsEdit] then
+      UserList.Cancel;
+  end;
+  MessageDlg(E.Message,mtError,[mbOK],0);
+  CurrentTransaction.Commit;
 end;
 
 procedure TDatabaseData.DatabaseQueryBeforeClose(DataSet: TDataSet);

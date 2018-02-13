@@ -14,51 +14,36 @@ type
   { TMainForm }
 
   TMainForm = class(TForm)
-    DropDatabase: TAction;
-    Edit1: TEdit;
-    Label29: TLabel;
-    Label30: TLabel;
-    MenuItem10: TMenuItem;
-    MenuItem9: TMenuItem;
-    ServerLog: TMemo;
-    ServerPropMemo: TMemo;
-    MenuItem8: TMenuItem;
-    Panel1: TPanel;
-    Panel2: TPanel;
-    Save: TAction;
-    IBExtract1: TIBExtract;
-    Label28: TLabel;
-    SaveDialog: TSaveDialog;
-    Splitter1: TSplitter;
-    SQlSaveDialog: TSaveDialog;
-    StatsMemo: TMemo;
-    RemoveShadow: TAction;
-    AddShadowSet: TAction;
-    AddSecondary: TAction;
+    DeleteTag: TAction;
+    AddTag: TAction;
+    MenuItem11: TMenuItem;
+    MenuItem12: TMenuItem;
+    MenuItem13: TMenuItem;
+    MenuItem14: TMenuItem;
+    MenuItem15: TMenuItem;
+    MenuItem16: TMenuItem;
+    PopupMenu1: TPopupMenu;
+    PopupMenu2: TPopupMenu;
+    SaveChanges: TAction;
+    DeleteUser: TAction;
+    ChgPassword: TAction;
+    AddUser: TAction;
     AddFileBtn: TButton;
     AddShadowBtn: TButton;
-    DBEdit4: TDBEdit;
-    IBDynamicGrid1: TIBDynamicGrid;
-    IBDynamicGrid2: TIBDynamicGrid;
-    Label25: TLabel;
-    Label26: TLabel;
-    Label27: TLabel;
-    MenuItem6: TMenuItem;
-    MenuItem7: TMenuItem;
-    OpenDatabase: TAction;
     AllocatedPages: TEdit;
     AutoAdmin: TCheckBox;
-    CharSetSource: TDataSource;
+    Button1: TButton;
+    DatabaseAliasName: TDBEdit;
     DatabaseOnline: TCheckBox;
-    DatabaseSource: TDataSource;
-    AttmtSource: TDataSource;
     DBCharacterSet: TIBLookupComboEditBox;
     DBCharSetRO: TDBEdit;
-    DBCharSetSource: TDataSource;
     DBEdit1: TDBEdit;
-    DatabaseAliasName: TDBEdit;
+    DBEdit4: TDBEdit;
     DBIsReadOnly: TCheckBox;
     DBOwner: TDBEdit;
+    DBText1: TDBText;
+    DropDatabase: TAction;
+    Edit1: TEdit;
     Edit10: TEdit;
     Edit11: TEdit;
     Edit12: TEdit;
@@ -66,7 +51,13 @@ type
     Edit5: TEdit;
     Edit6: TEdit;
     Edit8: TEdit;
-    IBDatabaseInfo: TIBDatabaseInfo;
+    FB3UserManager: TTabSheet;
+    FilesTab: TTabSheet;
+    IBDynamicGrid1: TIBDynamicGrid;
+    IBDynamicGrid2: TIBDynamicGrid;
+    IBDynamicGrid3: TIBDynamicGrid;
+    IBDynamicGrid4: TIBDynamicGrid;
+    IBDynamicGrid5: TIBDynamicGrid;
     IsShadowChk: TCheckBox;
     Label1: TLabel;
     Label10: TLabel;
@@ -85,7 +76,14 @@ type
     Label22: TLabel;
     Label23: TLabel;
     Label24: TLabel;
+    Label25: TLabel;
+    Label26: TLabel;
+    Label27: TLabel;
+    Label28: TLabel;
+    Label29: TLabel;
     Label3: TLabel;
+    Label30: TLabel;
+    Label36: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
@@ -93,14 +91,51 @@ type
     Label8: TLabel;
     Label9: TLabel;
     LingerDelay: TEdit;
+    MenuItem10: TMenuItem;
+    MenuItem9: TMenuItem;
+    MenuItem8: TMenuItem;
+    NoReserve: TCheckBox;
+    PageControl1: TPageControl;
+    PagesAvail: TEdit;
+    PagesUsed: TEdit;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    Panel5: TPanel;
+    Panel6: TPanel;
+    Panel7: TPanel;
+    PrimaryDBFile: TEdit;
+    Properties: TTabSheet;
+    RemoveShadowBtn: TButton;
+    RoleSource: TDataSource;
+    Save: TAction;
+    IBExtract1: TIBExtract;
+    SaveDialog: TSaveDialog;
+    SchemaTab: TTabSheet;
+    SecDatabase: TDBEdit;
+    ServerLog: TMemo;
+    ServerPropMemo: TMemo;
+    ServerTab: TTabSheet;
+    Splitter1: TSplitter;
+    Splitter2: TSplitter;
+    Splitter3: TSplitter;
+    Splitter4: TSplitter;
+    SQlSaveDialog: TSaveDialog;
+    RemoveShadow: TAction;
+    AddShadowSet: TAction;
+    AddSecondary: TAction;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
+    OpenDatabase: TAction;
+    CharSetSource: TDataSource;
+    DatabaseSource: TDataSource;
+    AttmtSource: TDataSource;
+    DBCharSetSource: TDataSource;
+    IBDatabaseInfo: TIBDatabaseInfo;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
-    NoReserve: TCheckBox;
-    PagesAvail: TEdit;
-    PagesUsed: TEdit;
-    PrimaryDBFile: TEdit;
-    RemoveShadowBtn: TButton;
     Restore: TAction;
     Backup: TAction;
     MenuImages: TImageList;
@@ -109,36 +144,45 @@ type
     Quit: TAction;
     ActionList1: TActionList;
     MainMenu1: TMainMenu;
-    PageControl1: TPageControl;
-    SecDatabase: TDBEdit;
     SecFiles: TDataSource;
     ShadowSource: TDataSource;
+    StatisticsTab: TTabSheet;
+    StatsMemo: TMemo;
     StatsOptions: TComboBox;
     StatusBar1: TStatusBar;
-    Properties: TTabSheet;
     SweepInterval: TEdit;
     SyncWrites: TCheckBox;
-    FilesTab: TTabSheet;
-    SchemaTab: TTabSheet;
     SynEdit1: TSynEdit;
     SynSQLSyn1: TSynSQLSyn;
-    StatisticsTab: TTabSheet;
-    ServerTab: TTabSheet;
+    AttachmentsTab: TTabSheet;
+    LegacyUsersTab: TTabSheet;
     ToolBar1: TToolBar;
     ToolButton1: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
     ToolButton4: TToolButton;
     ToolButton5: TToolButton;
+    UserListSource: TDataSource;
+    UserTagsSource: TDataSource;
     procedure AddSecondaryExecute(Sender: TObject);
     procedure AddShadowSetExecute(Sender: TObject);
+    procedure AddTagExecute(Sender: TObject);
+    procedure AddTagUpdate(Sender: TObject);
+    procedure AddUserExecute(Sender: TObject);
+    procedure AddUserUpdate(Sender: TObject);
     procedure AutoAdminChange(Sender: TObject);
     procedure BackupExecute(Sender: TObject);
+    procedure ChgPasswordExecute(Sender: TObject);
+    procedure ChgPasswordUpdate(Sender: TObject);
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DBCharacterSetEditingDone(Sender: TObject);
     procedure DBIsReadOnlyChange(Sender: TObject);
+    procedure DeleteTagExecute(Sender: TObject);
+    procedure DeleteTagUpdate(Sender: TObject);
+    procedure DeleteUserExecute(Sender: TObject);
     procedure DropDatabaseExecute(Sender: TObject);
     procedure DropDatabaseUpdate(Sender: TObject);
+    procedure FB3UserManagerShow(Sender: TObject);
     procedure FilesTabShow(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure IsShadowChkChange(Sender: TObject);
@@ -149,6 +193,8 @@ type
     procedure RemoveShadowExecute(Sender: TObject);
     procedure RemoveShadowUpdate(Sender: TObject);
     procedure RestoreExecute(Sender: TObject);
+    procedure SaveChangesExecute(Sender: TObject);
+    procedure SaveChangesUpdate(Sender: TObject);
     procedure SaveExecute(Sender: TObject);
     procedure SaveUpdate(Sender: TObject);
     procedure SchemaTabShow(Sender: TObject);
@@ -172,7 +218,8 @@ implementation
 
 {$R *.lfm}
 
-uses DataModule, ShutdownRegDlgUnit, AddSecondaryFileDlgUnit;
+uses DataModule, ShutdownRegDlgUnit, AddSecondaryFileDlgUnit, NewUserDlgUnit,
+  ChgPasswordDlgUnit;
 
 { TMainForm }
 
@@ -269,9 +316,55 @@ begin
   DatabaseData.AddShadowSet;
 end;
 
+procedure TMainForm.AddTagExecute(Sender: TObject);
+begin
+  UserTagsSource.DataSet.Append;
+end;
+
+procedure TMainForm.AddTagUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := (UserTagsSource.State = dsBrowse);
+end;
+
+procedure TMainForm.AddUserExecute(Sender: TObject);
+var NewUserName: string;
+    NewPassword: string;
+begin
+  NewUserName := '';
+  if NewUserDlg.ShowModal(NewUserName,NewPassword) = mrOK then
+  with UserListSource.DataSet do
+  begin
+    Append;
+    FieldByName('UserName').AsString := NewUserName;
+    FieldByName('USERPASSWORD').AsString := NewPassword;
+  end;
+end;
+
+procedure TMainForm.AddUserUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := (UserListSource.State = dsBrowse);
+end;
+
 procedure TMainForm.BackupExecute(Sender: TObject);
 begin
   DatabaseData.BackupDatabase;
+end;
+
+procedure TMainForm.ChgPasswordExecute(Sender: TObject);
+var NewPassword: string;
+begin
+  NewPassword := '';
+  if ChgPasswordDlg.ShowModal(NewPassword) = mrOK then
+  with UserListSource.DataSet do
+  begin
+    Edit;
+    FieldByName('USERPASSWORD').AsString := NewPassword;
+  end;
+end;
+
+procedure TMainForm.ChgPasswordUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := UserListSource.DataSet.Active and (UserListSource.DataSet.RecordCount > 0);
 end;
 
 procedure TMainForm.DatabaseOnlineChange(Sender: TObject);
@@ -298,6 +391,23 @@ begin
   end;
 end;
 
+procedure TMainForm.DeleteTagExecute(Sender: TObject);
+begin
+  UserTagsSource.DataSet.Delete;
+end;
+
+procedure TMainForm.DeleteTagUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := UserTagsSource.DataSet.Active and (UserTagsSource.DataSet.RecordCount > 0);
+end;
+
+procedure TMainForm.DeleteUserExecute(Sender: TObject);
+begin
+  if MessageDlg('Do you really want to delete user ' + Trim(UserListSource.DataSet.FieldByName('UserName').AsString),
+     mtConfirmation,[mbYes,mbNo],0) = mrYes then
+     UserListSource.DataSet.Delete;
+end;
+
 procedure TMainForm.DropDatabaseExecute(Sender: TObject);
 begin
   if MessageDlg(Format('Do you really want to delete the database "%s". You will lose all your data!',
@@ -312,6 +422,12 @@ end;
 procedure TMainForm.DropDatabaseUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := IBDatabaseInfo.Database.Connected;
+end;
+
+procedure TMainForm.FB3UserManagerShow(Sender: TObject);
+begin
+  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  UserListSource.DataSet.Active := true;
 end;
 
 procedure TMainForm.FilesTabShow(Sender: TObject);
@@ -349,6 +465,18 @@ end;
 procedure TMainForm.RestoreExecute(Sender: TObject);
 begin
   DatabaseData.RestoreDatabase;
+end;
+
+procedure TMainForm.SaveChangesExecute(Sender: TObject);
+begin
+  DatabaseData.CurrentTransaction.Commit;
+end;
+
+procedure TMainForm.SaveChangesUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := (UserListSource.DataSet.State in [dsInsert,dsEdit]) or
+                                 (RoleSource.DataSet.State in [dsInsert,dsEdit]) or
+                                 (UserTagsSource.DataSet.State in [dsInsert,dsEdit]) ;
 end;
 
 procedure TMainForm.SaveExecute(Sender: TObject);
@@ -408,6 +536,8 @@ end;
 procedure TMainForm.HandleDBConnect(Sender: TObject);
 begin
   PageControl1.ActivePage := Properties;
+  StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s',
+         [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.IBDatabase1.Params.Values['user_name']]);
 end;
 
 procedure TMainForm.HandleLoadData(Sender: TObject);
