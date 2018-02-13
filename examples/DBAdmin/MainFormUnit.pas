@@ -7,14 +7,24 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
   ComCtrls, ActnList, StdCtrls, DbCtrls, db, IBLookupComboEditBox,
-  IBDatabaseInfo, IBServices;
+  IBDynamicGrid, IBDatabaseInfo, IBServices;
 
 type
 
   { TMainForm }
 
   TMainForm = class(TForm)
+    RemoveShadow: TAction;
+    AddShadowSet: TAction;
+    AddSecondary: TAction;
+    AddFileBtn: TButton;
+    AddShadowBtn: TButton;
     DBEdit4: TDBEdit;
+    IBDynamicGrid1: TIBDynamicGrid;
+    IBDynamicGrid2: TIBDynamicGrid;
+    Label25: TLabel;
+    Label26: TLabel;
+    Label27: TLabel;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
     OpenDatabase: TAction;
@@ -72,6 +82,8 @@ type
     NoReserve: TCheckBox;
     PagesAvail: TEdit;
     PagesUsed: TEdit;
+    PrimaryDBFile: TEdit;
+    RemoveShadowBtn: TButton;
     Restore: TAction;
     Backup: TAction;
     MenuImages: TImageList;
@@ -83,25 +95,32 @@ type
     PageControl1: TPageControl;
     SecDatabase: TDBEdit;
     SecFiles: TDataSource;
+    ShadowSource: TDataSource;
     StatusBar1: TStatusBar;
     Properties: TTabSheet;
     SweepInterval: TEdit;
     SyncWrites: TCheckBox;
+    FilesTab: TTabSheet;
     ToolBar1: TToolBar;
     ToolButton1: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
+    procedure AddSecondaryExecute(Sender: TObject);
+    procedure AddShadowSetExecute(Sender: TObject);
     procedure AutoAdminChange(Sender: TObject);
     procedure BackupExecute(Sender: TObject);
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DBCharacterSetEditingDone(Sender: TObject);
     procedure DBIsReadOnlyChange(Sender: TObject);
+    procedure FilesTabShow(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure IsShadowChkChange(Sender: TObject);
     procedure LingerDelayEditingDone(Sender: TObject);
     procedure NoReserveChange(Sender: TObject);
     procedure OpenDatabaseExecute(Sender: TObject);
     procedure PropertiesShow(Sender: TObject);
+    procedure RemoveShadowExecute(Sender: TObject);
+    procedure RemoveShadowUpdate(Sender: TObject);
     procedure RestoreExecute(Sender: TObject);
     procedure SweepIntervalEditingDone(Sender: TObject);
     procedure SyncWritesChange(Sender: TObject);
@@ -120,12 +139,13 @@ implementation
 
 {$R *.lfm}
 
-uses DataModule, ShutdownRegDlgUnit;
+uses DataModule, ShutdownRegDlgUnit, AddSecondaryFileDlgUnit;
 
 { TMainForm }
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin
+  PageControl1.ActivePage := Properties;
   DatabaseData.AfterDBConnect := @HandleDBConnect;
   DatabaseData.AfterDataReload := @HandleLoadData;
   DatabaseData.Connect;
@@ -185,6 +205,37 @@ begin
   end;
 end;
 
+procedure TMainForm.AddSecondaryExecute(Sender: TObject);
+var FileName: string;
+    StartAt: integer;
+    FileLength: integer;
+    Pages: boolean;
+begin
+  StartAt := 0;
+  if DatabaseData.IsDatabaseOnline then
+  begin
+    MessageDlg('The database must be shutdown before adding secondary files',
+                 mtError,[mbOK],0);
+    exit;
+  end;
+
+  if AddSecondaryFileDlg.ShowModal(FileName,StartAt,FileLength,Pages) = mrOK then
+  begin
+    if not Pages then
+    begin
+      StartAt := StartAt*1024*1024 div IBDatabaseInfo.PageSize;
+      if FileLength <> -1 then
+        FileLength := FileLength*1024*1024 div IBDatabaseInfo.PageSize;
+    end;
+    DatabaseData.AddSecondaryFile(FileName,StartAt,FileLength);
+  end;
+end;
+
+procedure TMainForm.AddShadowSetExecute(Sender: TObject);
+begin
+  DatabaseData.AddShadowSet;
+end;
+
 procedure TMainForm.BackupExecute(Sender: TObject);
 begin
   DatabaseData.BackupDatabase;
@@ -214,6 +265,14 @@ begin
   end;
 end;
 
+procedure TMainForm.FilesTabShow(Sender: TObject);
+begin
+  if not Visible then Exit;
+  PrimaryDBFile.Text := IBDatabaseInfo.DBFileName;
+  SecFiles.DataSet.Active := true;
+  ShadowSource.DataSet.Active := true;
+end;
+
 procedure TMainForm.OpenDatabaseExecute(Sender: TObject);
 begin
   DatabaseData.Connect;
@@ -223,6 +282,18 @@ procedure TMainForm.PropertiesShow(Sender: TObject);
 begin
   if Visible then
     LoadData;
+end;
+
+procedure TMainForm.RemoveShadowExecute(Sender: TObject);
+var ShadowSet: integer;
+begin
+  ShadowSet := ShadowSource.DataSet.FieldByName('RDB$Shadow_Number').AsInteger;
+  DatabaseData.RemoveShadowSet(ShadowSet);
+end;
+
+procedure TMainForm.RemoveShadowUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled :=  ShadowSource.DataSet.Active and (ShadowSource.DataSet.RecordCount > 0);
 end;
 
 procedure TMainForm.RestoreExecute(Sender: TObject);
@@ -244,7 +315,7 @@ end;
 
 procedure TMainForm.HandleDBConnect(Sender: TObject);
 begin
-  //
+  PageControl1.ActivePage := Properties;
 end;
 
 procedure TMainForm.HandleLoadData(Sender: TObject);
@@ -255,7 +326,7 @@ end;
 
 procedure TMainForm.LoadData;
 begin
-  if FLoading then Exit;
+  if FLoading or not IBDatabaseInfo.Database.Connected then Exit;
   FLoading := true;
   try
     Edit2.Text :=  Format('%d.%d',[IBDatabaseInfo.ODSMajorVersion,IBDatabaseInfo.ODSMinorVersion]);
@@ -271,7 +342,6 @@ begin
     SweepInterval.Text := IntToStr(IBDatabaseInfo.SweepInterval);
     NoReserve.Checked := DatabaseData.NoReserve;
     LingerDelay.Text := DatabaseData.LingerDelay;
-//    PrimaryDBFile.Text := IBDatabaseInfo.DBFileName;
     DatabaseOnline.Checked := DatabaseData.IsDatabaseOnline;
     IsShadowChk.Checked := DatabaseData.IsShadowDatabase;
     if IBDatabaseInfo.ODSMajorVersion >= 12 then

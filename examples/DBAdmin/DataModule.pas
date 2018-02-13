@@ -79,6 +79,9 @@ type
     function IsDatabaseOnline: boolean;
     function IsShadowDatabase: boolean;
     procedure ActivateShadow;
+    procedure AddSecondaryFile(aFileName: string; StartAt,FileLength: integer);
+    procedure AddShadowSet;
+    procedure RemoveShadowSet(ShadowSet: integer);
     property AutoAdmin: boolean read GetAutoAdmin write SetAutoAdmin;
     property Disconnecting: boolean read FDisconnecting;
     property ForcedWrites: boolean read GetForcedWrites write SetForcedWrites;
@@ -98,7 +101,17 @@ implementation
 {$R *.lfm}
 
 uses DBLoginDlgUnit, IBUtils, FBMessages, IBErrorCodes, ShutdownDatabaseDlgUnit,
-  BackupDlgUnit, RestoreDlgUnit;
+  BackupDlgUnit, RestoreDlgUnit, AddShadowSetDlgUnit;
+
+const
+  sAddSecondarySQL  = 'Alter Database Add File ''%s'' Starting at %d';
+  sAddSecondarySQL2 = 'Alter Database Add File ''%s'' Starting at %d Length %d';
+  sRemoveShadow     = 'Drop Shadow %d';
+  sRemoveShadow12   = 'Drop Shadow %d DELETE FILE';
+  sPreserveShadow   = 'Drop Shadow %d PRESERVE FILE';
+
+resourcestring
+  sPreserveShadowFiles = 'Preserve Shadow Set Files after drop?';
 
 { TDatabaseData }
 
@@ -423,6 +436,62 @@ begin
   while IBConfigService1.IsServiceRunning do;
   MessageDlg('Shadow Database activated. You should now rename the file or change the database alias name to point to the shadow',
     mtInformation,[mbOK],0);
+end;
+
+procedure TDatabaseData.AddSecondaryFile(aFileName: string; StartAt,
+  FileLength: integer);
+var SQLText: string;
+begin
+  if FileLength <> -1 then
+    SQLText := Format(sAddSecondarySQL2,[aFileName,StartAt,FileLength])
+  else
+    SQLText := Format(sAddSecondarySQL,[aFileName,StartAt]);
+  ExecDDL.SQL.Text := SQLText;
+  ExecDDL.ExecQuery;
+  CurrentTransaction.Commit;
+end;
+
+procedure TDatabaseData.AddShadowSet;
+var CurrentLocation: TBookmark;
+    ShadowSet: integer;
+begin
+  if ShadowFiles.RecordCount = 0 then
+    ShadowSet := 1
+  else
+  with ShadowFiles do
+  begin
+    CurrentLocation := Bookmark;
+    DisableControls;
+    try
+      Last;
+      ShadowSet := FieldByName('RDB$Shadow_Number').AsInteger + 1;
+    finally
+      Bookmark := CurrentLocation;
+      EnableControls
+    end
+  end;
+  AddShadowSetDlg.ShowModal(ShadowSet);
+  CurrentTransaction.Commit;
+end;
+
+procedure TDatabaseData.RemoveShadowSet(ShadowSet: integer);
+begin
+  if IBDatabaseInfo.ODSMajorVersion < 12 then
+  begin
+    if MessageDlg(Format(sRemoveShadow,[ShadowSet]),mtConfirmation,[mbYes,mbNo],0) = mrYes then
+       ExecDDL.SQL.Text := Format(sRemoveShadow,[ShadowSet]);
+  end
+  else
+    case MessageDlg(Format(sPreserveShadowFiles,[ShadowSet]),mtConfirmation,[mbYes,mbNo,mbCancel],0) of
+    mrNo:
+      ExecDDL.SQL.Text  :=Format(sRemoveShadow12,[ShadowSet]);
+    mrYes:
+      ExecDDL.SQL.Text := Format(sPreserveShadow,[ShadowSet]);
+    mrCancel:
+      Exit;
+    end;
+  ExecDDL.ExecQuery;
+  CurrentTransaction.Commit;
 end;
 
 procedure TDatabaseData.IBDatabase1Login(Database: TIBDatabase;
