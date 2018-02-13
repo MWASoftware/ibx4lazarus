@@ -1,4 +1,4 @@
-unit DBLoginDlgUnit;
+unit ServicesLoginDlgUnit;
 
 {$mode objfpc}{$H+}
 
@@ -14,50 +14,46 @@ uses
   Forms, StdCtrls, ExtCtrls, Buttons, IB, IBDialogs;
 
 type
-  { TDBLoginDlg }
+  { TSvcLoginDlg }
 
-  TDBLoginDlg = class(TForm)
+  TSvcLoginDlg = class(TForm)
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
-    CreateIfNotExist: TCheckBox;
     Label1: TLabel;
     TargetCaption: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Password: TEdit;
     UserName: TEdit;
-    DatabaseName: TEdit;
+    ServerName: TEdit;
   private
     { private declarations }
   public
     { public declarations }
-    function ShowModal(var aDatabaseName, aUserName, aPassword: string;
-      var aCreateIfNotExist: boolean): TModalResult;
+    function ShowModal(aServerName: string; var aUserName, aPassword: string
+      ): TModalResult;
   end;
 
-var DBLoginDlg: TDBLoginDlg;
+var SvcLoginDlg: TSvcLoginDlg;
 
 implementation
 
 {$R *.lfm}
 
-{ TDBLoginDlg }
+{ TSvcLoginDlg }
 
-function TDBLoginDlg.ShowModal(var aDatabaseName, aUserName, aPassword: string;
-  var aCreateIfNotExist: boolean): TModalResult;
+function TSvcLoginDlg.ShowModal(aServerName: string; var aUserName,
+  aPassword: string): TModalResult;
 begin
-  DatabaseName.Text := aDatabaseName;
+  ServerName.Text := aServerName;
   UserName.Text := aUserName;
   Password.Text := '';
-  CreateIfNotExist.Checked := false;
   Result := inherited ShowModal;
   if Result = mrOK then
   begin
-    aDatabaseName := DatabaseName.Text;
     aUserName := UserName.Text;
     aPassword := Password.Text;
-    aCreateIfNotExist := CreateIfNotExist.Checked;
   end;
 end;
 

@@ -1,10 +1,10 @@
 object RestoreDlg: TRestoreDlg
   Left = 823
-  Height = 271
+  Height = 303
   Top = 507
   Width = 358
   Caption = 'Restore Database'
-  ClientHeight = 271
+  ClientHeight = 303
   ClientWidth = 358
   OnClose = FormClose
   OnShow = FormShow
@@ -13,7 +13,7 @@ object RestoreDlg: TRestoreDlg
   object Button1: TButton
     Left = 96
     Height = 25
-    Top = 240
+    Top = 272
     Width = 75
     Caption = 'OK'
     Default = True
@@ -23,7 +23,7 @@ object RestoreDlg: TRestoreDlg
   object Button2: TButton
     Left = 191
     Height = 25
-    Top = 240
+    Top = 272
     Width = 75
     Cancel = True
     Caption = 'Cancel'
@@ -32,7 +32,7 @@ object RestoreDlg: TRestoreDlg
   end
   object PageControl1: TPageControl
     Left = 9
-    Height = 222
+    Height = 254
     Top = 10
     Width = 337
     ActivePage = SelectTab
@@ -41,7 +41,7 @@ object RestoreDlg: TRestoreDlg
     TabOrder = 2
     object SelectTab: TTabSheet
       Caption = 'SelectTab'
-      ClientHeight = 216
+      ClientHeight = 248
       ClientWidth = 331
       object Label2: TLabel
         Left = 12
@@ -96,7 +96,7 @@ object RestoreDlg: TRestoreDlg
       object Label3: TLabel
         Left = 12
         Height = 14
-        Top = 144
+        Top = 192
         Width = 68
         Caption = 'Backup File'
         ParentColor = False
@@ -104,14 +104,14 @@ object RestoreDlg: TRestoreDlg
       object Edit3: TEdit
         Left = 12
         Height = 24
-        Top = 160
+        Top = 208
         Width = 288
         TabOrder = 4
       end
       object SpeedButton1: TSpeedButton
         Left = 306
         Height = 25
-        Top = 160
+        Top = 208
         Width = 25
         Glyph.Data = {
           36040000424D3604000000000000360000002800000010000000100000000100
@@ -151,10 +151,35 @@ object RestoreDlg: TRestoreDlg
         }
         OnClick = SpeedButton1Click
       end
+      object Label4: TLabel
+        Left = 16
+        Height = 14
+        Top = 144
+        Width = 56
+        Caption = 'Page Size'
+        ParentColor = False
+      end
+      object PageSize: TEdit
+        Left = 16
+        Height = 24
+        Top = 160
+        Width = 104
+        NumbersOnly = True
+        TabOrder = 5
+        Text = 'PageSize'
+      end
+      object Label5: TLabel
+        Left = 130
+        Height = 14
+        Top = 164
+        Width = 33
+        Caption = 'bytes'
+        ParentColor = False
+      end
     end
     object ReportTab: TTabSheet
       Caption = 'ReportTab'
-      ClientHeight = 216
+      ClientHeight = 248
       ClientWidth = 331
       OnShow = ReportTabShow
       object Report: TMemo

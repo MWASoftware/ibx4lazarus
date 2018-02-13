@@ -5,15 +5,33 @@ unit MainFormUnit;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
-  ComCtrls, ActnList, StdCtrls, DbCtrls, db, IBLookupComboEditBox,
-  IBDynamicGrid, IBDatabaseInfo, IBServices;
+  Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, Forms, Controls,
+  Graphics, Dialogs, Menus, ComCtrls, ActnList, StdCtrls, DbCtrls, ExtCtrls, db,
+  IBLookupComboEditBox, IBDynamicGrid, IBDatabaseInfo, IBServices, IBExtract;
 
 type
 
   { TMainForm }
 
   TMainForm = class(TForm)
+    DropDatabase: TAction;
+    Edit1: TEdit;
+    Label29: TLabel;
+    Label30: TLabel;
+    MenuItem10: TMenuItem;
+    MenuItem9: TMenuItem;
+    ServerLog: TMemo;
+    ServerPropMemo: TMemo;
+    MenuItem8: TMenuItem;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Save: TAction;
+    IBExtract1: TIBExtract;
+    Label28: TLabel;
+    SaveDialog: TSaveDialog;
+    Splitter1: TSplitter;
+    SQlSaveDialog: TSaveDialog;
+    StatsMemo: TMemo;
     RemoveShadow: TAction;
     AddShadowSet: TAction;
     AddSecondary: TAction;
@@ -39,7 +57,6 @@ type
     DBCharSetSource: TDataSource;
     DBEdit1: TDBEdit;
     DatabaseAliasName: TDBEdit;
-    DBEdit3: TDBEdit;
     DBIsReadOnly: TCheckBox;
     DBOwner: TDBEdit;
     Edit10: TEdit;
@@ -96,15 +113,23 @@ type
     SecDatabase: TDBEdit;
     SecFiles: TDataSource;
     ShadowSource: TDataSource;
+    StatsOptions: TComboBox;
     StatusBar1: TStatusBar;
     Properties: TTabSheet;
     SweepInterval: TEdit;
     SyncWrites: TCheckBox;
     FilesTab: TTabSheet;
+    SchemaTab: TTabSheet;
+    SynEdit1: TSynEdit;
+    SynSQLSyn1: TSynSQLSyn;
+    StatisticsTab: TTabSheet;
+    ServerTab: TTabSheet;
     ToolBar1: TToolBar;
     ToolButton1: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
+    ToolButton4: TToolButton;
+    ToolButton5: TToolButton;
     procedure AddSecondaryExecute(Sender: TObject);
     procedure AddShadowSetExecute(Sender: TObject);
     procedure AutoAdminChange(Sender: TObject);
@@ -112,6 +137,8 @@ type
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DBCharacterSetEditingDone(Sender: TObject);
     procedure DBIsReadOnlyChange(Sender: TObject);
+    procedure DropDatabaseExecute(Sender: TObject);
+    procedure DropDatabaseUpdate(Sender: TObject);
     procedure FilesTabShow(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure IsShadowChkChange(Sender: TObject);
@@ -122,6 +149,11 @@ type
     procedure RemoveShadowExecute(Sender: TObject);
     procedure RemoveShadowUpdate(Sender: TObject);
     procedure RestoreExecute(Sender: TObject);
+    procedure SaveExecute(Sender: TObject);
+    procedure SaveUpdate(Sender: TObject);
+    procedure SchemaTabShow(Sender: TObject);
+    procedure ServerTabShow(Sender: TObject);
+    procedure StatisticsTabShow(Sender: TObject);
     procedure SweepIntervalEditingDone(Sender: TObject);
     procedure SyncWritesChange(Sender: TObject);
   private
@@ -129,6 +161,7 @@ type
     procedure HandleDBConnect(Sender: TObject);
     procedure HandleLoadData(Sender: TObject);
     procedure LoadData;
+    procedure DoExtract(Data: PtrInt);
   public
   end;
 
@@ -265,9 +298,25 @@ begin
   end;
 end;
 
+procedure TMainForm.DropDatabaseExecute(Sender: TObject);
+begin
+  if MessageDlg(Format('Do you really want to delete the database "%s". You will lose all your data!',
+        [IBDatabaseInfo.Database.DatabaseName]),mtConfirmation,[mbYes,mbNo],0) = mrYes then
+  begin
+    DatabaseData.DropDatabase;
+    DatabaseData.Connect;
+    if not IBDatabaseInfo.Database.Connected then Close;
+  end;
+end;
+
+procedure TMainForm.DropDatabaseUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := IBDatabaseInfo.Database.Connected;
+end;
+
 procedure TMainForm.FilesTabShow(Sender: TObject);
 begin
-  if not Visible then Exit;
+  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
   PrimaryDBFile.Text := IBDatabaseInfo.DBFileName;
   SecFiles.DataSet.Active := true;
   ShadowSource.DataSet.Active := true;
@@ -276,11 +325,12 @@ end;
 procedure TMainForm.OpenDatabaseExecute(Sender: TObject);
 begin
   DatabaseData.Connect;
+  if not IBDatabaseInfo.Database.Connected then Close;
 end;
 
 procedure TMainForm.PropertiesShow(Sender: TObject);
 begin
-  if Visible then
+  if Visible and IBDatabaseInfo.Database.Connected then
     LoadData;
 end;
 
@@ -299,6 +349,48 @@ end;
 procedure TMainForm.RestoreExecute(Sender: TObject);
 begin
   DatabaseData.RestoreDatabase;
+end;
+
+procedure TMainForm.SaveExecute(Sender: TObject);
+begin
+  if PageControl1.ActivePage = SchemaTab then
+  begin
+    if SQLSaveDialog.Execute then
+       SynEdit1.Lines.SaveToFile(SQLSaveDialog.FileName);
+  end
+  else
+  if PageControl1.ActivePage = StatisticsTab then
+  begin
+    if SaveDialog.Execute then
+      StatsMemo.Lines.SaveToFile(SaveDialog.FileName);
+  end;
+end;
+
+procedure TMainForm.SaveUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := (PageControl1.ActivePage = SchemaTab) or
+                                 (PageControl1.ActivePage = StatisticsTab);
+end;
+
+procedure TMainForm.SchemaTabShow(Sender: TObject);
+begin
+  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  SynEdit1.Lines.Clear;
+  Application.QueueAsyncCall(@DoExtract,0);
+end;
+
+procedure TMainForm.ServerTabShow(Sender: TObject);
+begin
+  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  DatabaseData.LoadServerProperties(ServerPropMemo.Lines);
+  DatabaseData.LoadServerLog(ServerLog.Lines);
+end;
+
+procedure TMainForm.StatisticsTabShow(Sender: TObject);
+begin
+  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  StatsMemo.Lines.Clear;
+  DatabaseData.LoadDatabaseStatistics(StatsOptions.ItemIndex,StatsMemo.Lines);
 end;
 
 procedure TMainForm.SweepIntervalEditingDone(Sender: TObject);
@@ -326,9 +418,10 @@ end;
 
 procedure TMainForm.LoadData;
 begin
-  if FLoading or not IBDatabaseInfo.Database.Connected then Exit;
+  if FLoading then Exit;
   FLoading := true;
   try
+    Edit1.Text := IBDatabaseInfo.DBSiteName;
     Edit2.Text :=  Format('%d.%d',[IBDatabaseInfo.ODSMajorVersion,IBDatabaseInfo.ODSMinorVersion]);
     Edit5.Text :=  IBDatabaseInfo.Version;
     Edit6.Text :=  IntToStr(IBDatabaseInfo.DBSQLDialect);
@@ -357,6 +450,18 @@ begin
     end;
   finally
     FLoading := false;
+  end;
+end;
+
+procedure TMainForm.DoExtract(Data: PtrInt);
+begin
+  Screen.Cursor := crHourGlass;
+  try
+    Application.ProcessMessages;
+    IBExtract1.ExtractObject(eoDatabase);
+    SynEdit1.Lines.Assign(IBExtract1.Items);
+  finally
+    Screen.Cursor := crDefault;
   end;
 end;
 

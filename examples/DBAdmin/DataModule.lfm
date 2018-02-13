@@ -267,6 +267,7 @@ object DatabaseData: TDatabaseData
     )
     LoginPrompt = False
     TraceFlags = []
+    OnLogin = IBStatisticalService1Login
     Options = [HeaderPages]
     left = 33
     top = 283
@@ -274,7 +275,41 @@ object DatabaseData: TDatabaseData
   object IBConfigService1: TIBConfigService
     PortNo = 0
     TraceFlags = []
+    OnLogin = IBStatisticalService1Login
     left = 162
     top = 285
+  end
+  object TableNameLookup: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'SELECT r.RDB$RELATION_ID,'
+      '    trim(r.RDB$RELATION_NAME) as RDB$RELATION_NAME'
+      'FROM RDB$RELATIONS r'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 288
+    top = 283
+  end
+  object IBServerProperties1: TIBServerProperties
+    PortNo = 0
+    TraceFlags = []
+    OnLogin = IBStatisticalService1Login
+    Options = []
+    left = 40
+    top = 368
+  end
+  object IBLogService1: TIBLogService
+    PortNo = 0
+    TraceFlags = []
+    OnLogin = IBStatisticalService1Login
+    left = 162
+    top = 368
   end
 end

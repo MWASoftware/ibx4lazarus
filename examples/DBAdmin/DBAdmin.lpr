@@ -9,7 +9,8 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, memdslaz, MainFormUnit, DataModule, ibexpress,
   DBLoginDlgUnit, ShutdownRegDlgUnit, ShutdownDatabaseDlgUnit, BackupDlgUnit,
-  RestoreDlgUnit, AddSecondaryFileDlgUnit, AddShadowSetDlgUnit, AddShadowFileDlgUnit
+  RestoreDlgUnit, AddSecondaryFileDlgUnit, AddShadowSetDlgUnit, AddShadowFileDlgUnit,
+  ServicesLoginDlgUnit
   { you can add units after this };
 
 {$R *.res}
@@ -27,6 +28,7 @@ begin
   Application.CreateForm(TAddSecondaryFileDlg, AddSecondaryFileDlg);
   Application.CreateForm(TAddShadowFileDlg, AddShadowFileDlg);
   Application.CreateForm(TAddShadowSetDlg, AddShadowSetDlg);
+  Application.CreateForm(TSvcLoginDlg, SvcLoginDlg);
   Application.Run;
 end.
 

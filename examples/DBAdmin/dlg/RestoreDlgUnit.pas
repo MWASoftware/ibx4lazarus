@@ -18,10 +18,13 @@ type
     Edit1: TEdit;
     Edit2: TEdit;
     Edit3: TEdit;
+    PageSize: TEdit;
     IBRestoreService1: TIBRestoreService;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
     Report: TMemo;
     OpenDialog1: TOpenDialog;
     PageControl1: TPageControl;
@@ -39,7 +42,8 @@ type
     procedure DoRestore(Data: PtrInt);
   public
     { public declarations }
-     function ShowModal(aService: TIBCustomService; DBName: string): TModalResult;
+     function ShowModal(aService: TIBCustomService; DBName: string;
+       DefaultPageSize: integer): TModalResult;
  end;
 
 var
@@ -88,17 +92,19 @@ begin
       bakfile.Free;
   end;
   while IBRestoreService1.IsServiceRunning do; {flush}
+  IBRestoreService1.ACtive := false;
 
   Report.Lines.Add('Restore Completed');
   MessageDlg('Restore Completed',mtInformation,[mbOK],0);
 end;
 
-function TRestoreDlg.ShowModal(aService: TIBCustomService; DBName: string
-  ): TModalResult;
+function TRestoreDlg.ShowModal(aService: TIBCustomService; DBName: string;
+  DefaultPageSize: integer): TModalResult;
 begin
   IBRestoreService1.Assign(aService);
   IBRestoreService1.DatabaseName.Clear;
   IBRestoreService1.DatabaseName.Add(DBName);
+  PageSize.Text := IntToStr(DefaultPageSize);
   Result := inherited ShowModal;
 end;
 
@@ -133,6 +139,7 @@ begin
        IBRestoreService1.BackupFileLocation := flServerSide
     else
       IBRestoreService1.BackupFileLocation := flClientSide;
+    IBRestoreService1.PageSize := StrToInt(PageSize.Text);
     PageControl1.ActivePage := ReportTab;
     Application.QueueAsyncCall(@DoRestore,0);
   end;
