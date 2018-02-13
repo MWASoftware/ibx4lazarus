@@ -5,8 +5,9 @@ unit DataModule;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, db, IBDatabase, IBSQL, IBQuery, IBCustomDataSet,
-  IBUpdate, IBDatabaseInfo, IBServices, IB, Dialogs, Controls, Forms;
+  Classes, SysUtils, FileUtil, db, memds, IBDatabase, IBSQL, IBQuery,
+  IBCustomDataSet, IBUpdate, IBDatabaseInfo, IBServices, IB, Dialogs, Controls,
+  Forms;
 
 type
 
@@ -17,6 +18,9 @@ type
     CharSetLookup: TIBQuery;
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
+    IBSecurityService1: TIBSecurityService;
+    LegacyUserList: TMemDataset;
+    UserListGROUPID: TLongintField;
     UserListSource: TDataSource;
     DBCharSet: TIBQuery;
     DBSecFiles: TIBQuery;
@@ -58,11 +62,11 @@ type
     UserListLOGGEDIN: TBooleanField;
     UserListSECACTIVE: TBooleanField;
     UserListSECADMIN: TBooleanField;
-    UserListSECDESCRIPTION: TIBMemoField;
     UserListSECFIRST_NAME: TIBStringField;
     UserListSECLAST_NAME: TIBStringField;
     UserListSECMIDDLE_NAME: TIBStringField;
     UserListSECPLUGIN: TIBStringField;
+    UserListUSERID: TLongintField;
     UserListUSERNAME: TIBStringField;
     UserListUSERPASSWORD: TIBStringField;
     UserTags: TIBQuery;
@@ -78,6 +82,10 @@ type
     procedure IBDatabase1Login(Database: TIBDatabase; LoginParams: TStrings);
     procedure IBStatisticalService1Login(Service: TIBCustomService;
       LoginParams: TStrings);
+    procedure LegacyUserListAfterOpen(DataSet: TDataSet);
+    procedure LegacyUserListBeforeClose(DataSet: TDataSet);
+    procedure LegacyUserListBeforeDelete(DataSet: TDataSet);
+    procedure LegacyUserListBeforePost(DataSet: TDataSet);
     procedure TagsUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
     procedure UpdateCharSetApplyUpdates(Sender: TObject;
@@ -103,6 +111,7 @@ type
     FServerUserName: string;
     FServerPassword: string;
     FLocalConnect: boolean;
+    FUsersLoading: boolean;
     procedure ActivateService(aService: TIBCustomService);
     function GetAutoAdmin: boolean;
     procedure GetDBFlags;
@@ -241,7 +250,7 @@ procedure TDatabaseData.UpdateUsersApplyUpdates(Sender: TObject;
 begin
     case UpdateKind of
     ukInsert:
-      ExecDDL.SQL.Text := 'CREATE USER ' + FormatStmtOptions;
+        ExecDDL.SQL.Text := 'CREATE USER ' + FormatStmtOptions;
     ukModify:
         ExecDDL.SQL.Text := 'ALTER USER ' + FormatStmtOptions;
     ukDelete:
@@ -249,6 +258,15 @@ begin
     end;
     ExecDDL.ExecQuery;
 
+  if UpdateKind = ukInsert then
+  begin
+    if Params.ByName('SEC$ADMIN').AsBoolean then
+    begin
+      ExecDDL.SQL.Text := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) + ' GRANT ADMIN ROLE';
+      ExecDDL.ExecQuery;
+    end;
+  end
+  else
   if UpdateKind = ukModify then
   {Update Admin Role if allowed}
   begin
@@ -281,14 +299,18 @@ end;
 
 procedure TDatabaseData.UserListAfterInsert(DataSet: TDataSet);
 begin
-  UserList.FieldByName('SEC$ADMIN').AsBoolean := false;
-  UserList.FieldByName('SEC$ACTIVE').AsBoolean := false;
-  UserList.FieldByName('DBCreator').AsBoolean := false;
-  UserList.FieldByName('SEC$PLUGIN').AsString := 'Srp';
+  DataSet.FieldByName('SEC$ADMIN').AsBoolean := false;
+  DataSet.FieldByName('SEC$ACTIVE').AsBoolean := false;
+  DataSet.FieldByName('DBCreator').AsBoolean := false;
+  DataSet.FieldByName('SEC$PLUGIN').AsString := 'Srp';
+  DataSet.FieldByName('UserID').AsInteger := 0;
+  DataSet.FieldByName('GroupID').AsInteger := 0;
+  DataSet.FieldByName('UserPassword').Clear;
 end;
 
 procedure TDatabaseData.UserListAfterOpen(DataSet: TDataSet);
 begin
+  UserListSource.DataSet := UserList;
   RoleNameList.Active := true;
   UserTags.Active := true;
 end;
@@ -885,6 +907,93 @@ begin
   end;
 end;
 
+procedure TDatabaseData.LegacyUserListAfterOpen(DataSet: TDataSet);
+var i: integer;
+begin
+  ActivateService(IBSecurityService1);
+  with IBSecurityService1 do
+  begin
+    DisplayUsers;
+    FUsersLoading := true;
+    try
+      for i := 0 to UserInfoCount - 1 do
+      with UserInfo[i],LegacyUserList do
+      begin
+        Append;
+        FieldByName('UserID').AsInteger := UserID;
+        FieldByName('GroupID').AsInteger := GroupID;
+        FieldByName('UserName').AsString := UserName;
+        FieldByName('SEC$FIRST_NAME').AsString := FirstName;
+        FieldByName('SEC$MIDDLE_NAME').AsString := MiddleName;
+        FieldByName('SEC$LAST_NAME').AsString := LastName;
+        FieldByName('UserPassword').Clear;
+        FieldByName('SEC$ADMIN').AsBoolean := AdminRole;
+        Post;
+      end;
+    finally
+      FUsersLoading := false;
+    end;
+  end;
+  UserListSource.DataSet := LegacyUserList;
+  RoleNameList.Active := true;
+end;
+
+procedure TDatabaseData.LegacyUserListBeforeClose(DataSet: TDataSet);
+begin
+  RoleNameList.Active := false;
+  with LegacyUserList do
+  begin
+    if State in [dsEdit,dsInsert] then Post;
+    Clear(false);
+  end;
+end;
+
+procedure TDatabaseData.LegacyUserListBeforeDelete(DataSet: TDataSet);
+begin
+  ActivateService(IBSecurityService1);
+  with IBSecurityService1 do
+  begin
+    UserName := DataSet.FieldByName('UserName').AsString;
+    DeleteUser;
+  end;
+end;
+
+procedure TDatabaseData.LegacyUserListBeforePost(DataSet: TDataSet);
+
+  procedure SetParams;
+  begin
+    with LegacyUserList, IBSecurityService1 do
+    begin
+      UserID := FieldByName('UserID').AsInteger;
+      GroupID := FieldByName('GroupID').AsInteger;
+      UserName := FieldByName('UserName').AsString;
+      FirstName := FieldByName('SEC$FIRST_NAME').AsString;
+      MiddleName := FieldByName('SEC$MIDDLE_NAME').AsString;
+      LastName := FieldByName('SEC$LAST_NAME').AsString;
+      if not FieldByName('UserPassword').IsNull then
+        Password := FieldByName('UserPassword').AsString;
+      AdminRole := FieldByName('SEC$ADMIN').AsBoolean;
+    end;
+  end;
+
+ begin
+    if FUsersLoading then Exit;
+    ActivateService(IBSecurityService1);
+    case LegacyUserList.State of
+    dsEdit:
+      begin
+        SetParams;
+        IBSecurityService1.ModifyUser;
+      end;
+    dsInsert:
+      begin
+        SetParams;
+        IBSecurityService1.AddUser;
+      end;
+    end;
+
+end;
+
 procedure TDatabaseData.TagsUpdateApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 var sql: string;
@@ -960,7 +1069,7 @@ begin
       UserList.Cancel;
   end;
   MessageDlg(E.Message,mtError,[mbOK],0);
-  CurrentTransaction.Commit;
+  CurrentTransaction.Rollback;
 end;
 
 procedure TDatabaseData.DatabaseQueryBeforeClose(DataSet: TDataSet);

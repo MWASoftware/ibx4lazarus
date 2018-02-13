@@ -5,9 +5,11 @@ unit MainFormUnit;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, Forms, Controls,
-  Graphics, Dialogs, Menus, ComCtrls, ActnList, StdCtrls, DbCtrls, ExtCtrls, db,
-  IBLookupComboEditBox, IBDynamicGrid, IBDatabaseInfo, IBServices, IBExtract;
+  Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, SynGutterBase,
+  SynGutterMarks, SynGutterLineNumber, SynGutterChanges, SynGutter,
+  SynGutterCodeFolding, Forms, Controls, Graphics, Dialogs, Menus, ComCtrls,
+  ActnList, StdCtrls, DbCtrls, ExtCtrls, db, IBLookupComboEditBox,
+  IBDynamicGrid, IBDatabaseInfo, IBServices, IBExtract, IBQuery;
 
 type
 
@@ -22,6 +24,7 @@ type
     MenuItem14: TMenuItem;
     MenuItem15: TMenuItem;
     MenuItem16: TMenuItem;
+    Panel7: TPanel;
     PopupMenu1: TPopupMenu;
     PopupMenu2: TPopupMenu;
     SaveChanges: TAction;
@@ -55,9 +58,9 @@ type
     FilesTab: TTabSheet;
     IBDynamicGrid1: TIBDynamicGrid;
     IBDynamicGrid2: TIBDynamicGrid;
-    IBDynamicGrid3: TIBDynamicGrid;
+    UserManagerGrid: TIBDynamicGrid;
     IBDynamicGrid4: TIBDynamicGrid;
-    IBDynamicGrid5: TIBDynamicGrid;
+    TagsGrid: TIBDynamicGrid;
     IsShadowChk: TCheckBox;
     Label1: TLabel;
     Label10: TLabel;
@@ -104,7 +107,7 @@ type
     Panel4: TPanel;
     Panel5: TPanel;
     Panel6: TPanel;
-    Panel7: TPanel;
+    TagsHeader: TPanel;
     PrimaryDBFile: TEdit;
     Properties: TTabSheet;
     RemoveShadowBtn: TButton;
@@ -155,7 +158,6 @@ type
     SynEdit1: TSynEdit;
     SynSQLSyn1: TSynSQLSyn;
     AttachmentsTab: TTabSheet;
-    LegacyUsersTab: TTabSheet;
     ToolBar1: TToolBar;
     ToolButton1: TToolButton;
     ToolButton2: TToolButton;
@@ -208,6 +210,7 @@ type
     procedure HandleLoadData(Sender: TObject);
     procedure LoadData;
     procedure DoExtract(Data: PtrInt);
+    procedure ConfigureUserManager;
   public
   end;
 
@@ -469,7 +472,10 @@ end;
 
 procedure TMainForm.SaveChangesExecute(Sender: TObject);
 begin
-  DatabaseData.CurrentTransaction.Commit;
+  if RoleSource.DataSet.State in [dsEdit,dsInsert] then
+    RoleSource.DataSet.Post;
+  if UserListSource.DataSet.State in [dsEdit,dsInsert] then
+    UserListSource.DataSet.Post;
 end;
 
 procedure TMainForm.SaveChangesUpdate(Sender: TObject);
@@ -535,6 +541,7 @@ end;
 
 procedure TMainForm.HandleDBConnect(Sender: TObject);
 begin
+  ConfigureUserManager;
   PageControl1.ActivePage := Properties;
   StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s',
          [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.IBDatabase1.Params.Values['user_name']]);
@@ -592,6 +599,31 @@ begin
     SynEdit1.Lines.Assign(IBExtract1.Items);
   finally
     Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TMainForm.ConfigureUserManager;
+var i: integer;
+begin
+  if IBDatabaseInfo.ODSMajorVersion >= 12 then
+  begin
+    for i in [9,10] do
+      UserManagerGrid.Columns[i].Visible := false;
+      for i in [4,6,7,8] do
+        UserManagerGrid.Columns[i].Visible := true ;
+    UserListSource.DataSet := DatabaseData.UserList;
+    TagsHeader.Visible := true;
+    TagsGrid.Visible := true;
+  end
+  else
+  begin
+    for i in [4,6,7,8] do
+      UserManagerGrid.Columns[i].Visible := false;
+      for i in [9,10] do
+        UserManagerGrid.Columns[i].Visible := true;
+      UserListSource.DataSet := DatabaseData.LegacyUserList;
+      TagsHeader.Visible := false;
+      TagsGrid.Visible := false;
   end;
 end;
 

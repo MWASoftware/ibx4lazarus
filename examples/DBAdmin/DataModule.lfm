@@ -1,6 +1,6 @@
 object DatabaseData: TDatabaseData
   OldCreateOrder = False
-  Height = 466
+  Height = 488
   HorizontalOffset = 959
   VerticalOffset = 402
   Width = 629
@@ -316,7 +316,6 @@ object DatabaseData: TDatabaseData
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
-    AfterDelete = UserListAfterPost
     AfterInsert = UserListAfterInsert
     AfterOpen = UserListAfterOpen
     AfterPost = UserListAfterPost
@@ -346,23 +345,10 @@ object DatabaseData: TDatabaseData
     DataSetCloseAction = dcSaveChanges
     left = 416
     top = 352
-    object UserListSECDESCRIPTION: TIBMemoField
-      FieldKind = fkData
-      FieldName = 'SEC$DESCRIPTION'
-      Index = 0
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      BlobType = ftMemo
-      Size = 8
-      Transliterate = False
-      DisplayTextAsClassName = False
-    end
     object UserListSECPLUGIN: TIBStringField
       FieldKind = fkData
       FieldName = 'SEC$PLUGIN'
-      Index = 1
+      Index = 0
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = True
@@ -372,7 +358,7 @@ object DatabaseData: TDatabaseData
     object UserListSECADMIN: TBooleanField
       FieldKind = fkData
       FieldName = 'SEC$ADMIN'
-      Index = 2
+      Index = 1
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -382,7 +368,7 @@ object DatabaseData: TDatabaseData
     object UserListSECACTIVE: TBooleanField
       FieldKind = fkData
       FieldName = 'SEC$ACTIVE'
-      Index = 3
+      Index = 2
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -392,7 +378,7 @@ object DatabaseData: TDatabaseData
     object UserListSECMIDDLE_NAME: TIBStringField
       FieldKind = fkData
       FieldName = 'SEC$MIDDLE_NAME'
-      Index = 4
+      Index = 3
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -402,7 +388,7 @@ object DatabaseData: TDatabaseData
     object UserListSECFIRST_NAME: TIBStringField
       FieldKind = fkData
       FieldName = 'SEC$FIRST_NAME'
-      Index = 5
+      Index = 4
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -412,7 +398,7 @@ object DatabaseData: TDatabaseData
     object UserListSECLAST_NAME: TIBStringField
       FieldKind = fkData
       FieldName = 'SEC$LAST_NAME'
-      Index = 6
+      Index = 5
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -422,7 +408,7 @@ object DatabaseData: TDatabaseData
     object UserListUSERPASSWORD: TIBStringField
       FieldKind = fkData
       FieldName = 'USERPASSWORD'
-      Index = 7
+      Index = 6
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -432,7 +418,7 @@ object DatabaseData: TDatabaseData
     object UserListUSERNAME: TIBStringField
       FieldKind = fkData
       FieldName = 'USERNAME'
-      Index = 8
+      Index = 7
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -442,7 +428,7 @@ object DatabaseData: TDatabaseData
     object UserListLOGGEDIN: TBooleanField
       FieldKind = fkData
       FieldName = 'LOGGEDIN'
-      Index = 9
+      Index = 8
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -452,7 +438,7 @@ object DatabaseData: TDatabaseData
     object UserListCURRENT_CONNECTION: TIBLargeIntField
       FieldKind = fkData
       FieldName = 'CURRENT_CONNECTION'
-      Index = 10
+      Index = 9
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -461,12 +447,30 @@ object DatabaseData: TDatabaseData
     object UserListDBCREATOR: TBooleanField
       FieldKind = fkData
       FieldName = 'DBCREATOR'
-      Index = 11
+      Index = 10
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = True
       DisplayValues = 'True;False'
+    end
+    object UserListUSERID: TLongintField
+      FieldKind = fkCalculated
+      FieldName = 'USERID'
+      Index = 11
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object UserListGROUPID: TLongintField
+      FieldKind = fkCalculated
+      FieldName = 'GROUPID'
+      Index = 12
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
     end
   end
   object UpdateUsers: TIBUpdate
@@ -491,8 +495,7 @@ object DatabaseData: TDatabaseData
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
-    AfterDelete = UserListAfterPost
-    AfterPost = UserListAfterPost
+    AutoCommit = acCommitRetaining
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserListSource
@@ -643,9 +646,7 @@ object DatabaseData: TDatabaseData
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
-    AfterDelete = UserListAfterPost
     AfterInsert = UserTagsAfterInsert
-    AfterPost = UserListAfterPost
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserListSource
@@ -688,5 +689,81 @@ object DatabaseData: TDatabaseData
     DataSet = UserList
     left = 304
     top = 360
+  end
+  object LegacyUserList: TMemDataset
+    FieldDefs = <    
+      item
+        Name = 'USERID'
+        DataType = ftInteger
+      end    
+      item
+        Name = 'GROUPID'
+        DataType = ftInteger
+      end    
+      item
+        Name = 'USERNAME'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'SEC$FIRST_NAME'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'SEC$MIDDLE_NAME'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'SEC$LAST_NAME'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'USERPASSWORD'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'SEC$ADMIN'
+        DataType = ftBoolean
+      end    
+      item
+        Name = 'SEC$PLUGIN'
+        DataType = ftString
+        Size = 31
+      end    
+      item
+        Name = 'SEC$ACTIVE'
+        DataType = ftBoolean
+      end    
+      item
+        Name = 'LOGGEDIN'
+        DataType = ftBoolean
+      end    
+      item
+        Name = 'DBCREATOR'
+        DataType = ftBoolean
+      end>
+    AfterOpen = LegacyUserListAfterOpen
+    BeforeClose = LegacyUserListBeforeClose
+    AfterInsert = UserListAfterInsert
+    BeforePost = LegacyUserListBeforePost
+    BeforeDelete = LegacyUserListBeforeDelete
+    left = 520
+    top = 416
+  end
+  object IBSecurityService1: TIBSecurityService
+    ServerName = 'localhost'
+    Protocol = TCP
+    PortNo = 0
+    TraceFlags = []
+    SecurityAction = ActionAddUser
+    UserID = 0
+    GroupID = 0
+    AdminRole = False
+    left = 48
+    top = 432
   end
 end

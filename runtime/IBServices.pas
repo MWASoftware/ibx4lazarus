@@ -1063,7 +1063,7 @@ end;
 }
 function TIBCustomService.GenerateSPB(sl: TStrings): ISPB;
 var
-  i, j, SPBVal, SPBServerVal: UShort;
+  i, j, SPBServerVal: UShort;
   param_name, param_value: String;
 begin
   { The SPB is initially empty, with the exception that
@@ -1087,13 +1087,11 @@ begin
     { We want to translate the parameter name to some integer
       value. We do this by scanning through a list of known
       service parameter names (SPBConstantNames, defined above). }
-    SPBVal := 0;
     SPBServerVal := 0;
     { Find the parameter }
     for j := 1 to isc_spb_last_spb_constant do
       if (param_name = SPBConstantNames[j]) then
       begin
-        SPBVal := j;
         SPBServerVal := SPBConstantValues[j];
         break;
       end;
@@ -2125,7 +2123,6 @@ end;
 
 procedure TIBSecurityService.SetAdminRole(AValue: boolean);
 begin
-  if not HasAdminRole then Exit;
   FAdminRole := AValue;
   Include (FModifyParams, ModifyAdminRole);
 end;
@@ -2195,7 +2192,8 @@ begin
       SRB.Add(isc_spb_sec_firstname).AsString := FFirstName;
       SRB.Add(isc_spb_sec_middlename).AsString := FMiddleName;
       SRB.Add(isc_spb_sec_lastname).AsString := FLastName;
-      SRB.Add(isc_spb_sec_admin).AsInteger := ord(FAdminRole);
+      if HasAdminRole then
+        SRB.Add(isc_spb_sec_admin).AsInteger := ord(FAdminRole);
     end;
     ActionDeleteUser:
     begin
@@ -2228,7 +2226,7 @@ begin
         SRB.Add(isc_spb_sec_middlename).AsString := FMiddleName;
       if (ModifyLastName in FModifyParams) then
         SRB.Add(isc_spb_sec_lastname).AsString := FLastName;
-      if (ModifyAdminRole in FModifyParams) then
+      if (ModifyAdminRole in FModifyParams) and HasAdminRole then
       begin
         if FAdminRole then
           SRB.Add(isc_spb_sec_admin).AsInteger := 1
