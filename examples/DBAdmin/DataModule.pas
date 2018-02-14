@@ -18,6 +18,7 @@ type
     CharSetLookup: TIBQuery;
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
+    Attachments: TIBDataSet;
     IBSecurityService1: TIBSecurityService;
     LegacyUserList: TMemDataset;
     UserListGROUPID: TLongintField;
@@ -71,6 +72,7 @@ type
     UserListUSERPASSWORD: TIBStringField;
     UserTags: TIBQuery;
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
+    procedure AttachmentsAfterOpen(DataSet: TDataSet);
     procedure CurrentTransactionAfterTransactionEnd(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
     procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
@@ -1070,6 +1072,11 @@ begin
   end;
   MessageDlg(E.Message,mtError,[mbOK],0);
   CurrentTransaction.Rollback;
+end;
+
+procedure TDatabaseData.AttachmentsAfterOpen(DataSet: TDataSet);
+begin
+  Attachments.Locate('MON$ATTACHMENT_ID',AttmtQuery.FieldByName('MON$ATTACHMENT_ID').AsInteger,[]);
 end;
 
 procedure TDatabaseData.DatabaseQueryBeforeClose(DataSet: TDataSet);

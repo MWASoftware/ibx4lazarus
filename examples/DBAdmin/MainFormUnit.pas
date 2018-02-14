@@ -16,8 +16,26 @@ type
   { TMainForm }
 
   TMainForm = class(TForm)
+    DisconnectAttachment: TAction;
+    MenuItem17: TMenuItem;
+    AttmtPopup: TPopupMenu;
+    MenuItem18: TMenuItem;
+    ToggleAutoRefresh: TAction;
+    AttachSource: TDataSource;
+    DBCheckBox1: TDBCheckBox;
+    DBEdit2: TDBEdit;
+    DBEdit3: TDBEdit;
+    DBEdit5: TDBEdit;
+    DBEdit6: TDBEdit;
+    DBEdit7: TDBEdit;
     DeleteTag: TAction;
     AddTag: TAction;
+    AttmtGrid: TIBDynamicGrid;
+    Label31: TLabel;
+    Label32: TLabel;
+    Label33: TLabel;
+    Label34: TLabel;
+    Label35: TLabel;
     MenuItem11: TMenuItem;
     MenuItem12: TMenuItem;
     MenuItem13: TMenuItem;
@@ -25,8 +43,9 @@ type
     MenuItem15: TMenuItem;
     MenuItem16: TMenuItem;
     Panel7: TPanel;
-    PopupMenu1: TPopupMenu;
-    PopupMenu2: TPopupMenu;
+    AttDetailsPanel: TPanel;
+    UserPopup: TPopupMenu;
+    UserTagPopup: TPopupMenu;
     SaveChanges: TAction;
     DeleteUser: TAction;
     ChgPassword: TAction;
@@ -58,6 +77,7 @@ type
     FilesTab: TTabSheet;
     IBDynamicGrid1: TIBDynamicGrid;
     IBDynamicGrid2: TIBDynamicGrid;
+    AttmtTimer: TTimer;
     UserManagerGrid: TIBDynamicGrid;
     IBDynamicGrid4: TIBDynamicGrid;
     TagsGrid: TIBDynamicGrid;
@@ -172,6 +192,9 @@ type
     procedure AddTagUpdate(Sender: TObject);
     procedure AddUserExecute(Sender: TObject);
     procedure AddUserUpdate(Sender: TObject);
+    procedure AttachmentsTabHide(Sender: TObject);
+    procedure AttachmentsTabShow(Sender: TObject);
+    procedure AttmtTimerTimer(Sender: TObject);
     procedure AutoAdminChange(Sender: TObject);
     procedure BackupExecute(Sender: TObject);
     procedure ChgPasswordExecute(Sender: TObject);
@@ -182,6 +205,8 @@ type
     procedure DeleteTagExecute(Sender: TObject);
     procedure DeleteTagUpdate(Sender: TObject);
     procedure DeleteUserExecute(Sender: TObject);
+    procedure DisconnectAttachmentExecute(Sender: TObject);
+    procedure DisconnectAttachmentUpdate(Sender: TObject);
     procedure DropDatabaseExecute(Sender: TObject);
     procedure DropDatabaseUpdate(Sender: TObject);
     procedure FB3UserManagerShow(Sender: TObject);
@@ -204,6 +229,8 @@ type
     procedure StatisticsTabShow(Sender: TObject);
     procedure SweepIntervalEditingDone(Sender: TObject);
     procedure SyncWritesChange(Sender: TObject);
+    procedure ToggleAutoRefreshExecute(Sender: TObject);
+    procedure ToggleAutoRefreshUpdate(Sender: TObject);
   private
     FLoading: boolean;
     procedure HandleDBConnect(Sender: TObject);
@@ -348,6 +375,24 @@ begin
   (Sender as TAction).Enabled := (UserListSource.State = dsBrowse);
 end;
 
+procedure TMainForm.AttachmentsTabHide(Sender: TObject);
+begin
+  AttachSource.DataSet.Active := false;
+  AttmtTimer.Enabled := false;
+end;
+
+procedure TMainForm.AttachmentsTabShow(Sender: TObject);
+begin
+  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  AttachSource.DataSet.Active := true;
+  AttmtGrid.ShowEditorPanel; {assume located at current connection}
+end;
+
+procedure TMainForm.AttmtTimerTimer(Sender: TObject);
+begin
+  DatabaseData.CurrentTransaction.Commit; {force a refresh}
+end;
+
 procedure TMainForm.BackupExecute(Sender: TObject);
 begin
   DatabaseData.BackupDatabase;
@@ -409,6 +454,21 @@ begin
   if MessageDlg('Do you really want to delete user ' + Trim(UserListSource.DataSet.FieldByName('UserName').AsString),
      mtConfirmation,[mbYes,mbNo],0) = mrYes then
      UserListSource.DataSet.Delete;
+end;
+
+procedure TMainForm.DisconnectAttachmentExecute(Sender: TObject);
+begin
+  if MessageDlg('Disconnect Attachment ID ' + AttachSource.DataSet.FieldByName('MON$ATTACHMENT_ID').AsString,
+       mtConfirmation,[mbYes,mbNo],0) = mrYes then
+    AttachSource.DataSet.Delete;
+end;
+
+procedure TMainForm.DisconnectAttachmentUpdate(Sender: TObject);
+begin
+  with AttachSource.DataSet do
+  (Sender as TAction).Enabled := Active and (RecordCount > 0)
+    and (FieldByName('MON$ATTACHMENT_ID').AsInteger <>
+          FieldByName('CURRENT_CONNECTION').AsInteger);
 end;
 
 procedure TMainForm.DropDatabaseExecute(Sender: TObject);
@@ -537,6 +597,17 @@ procedure TMainForm.SyncWritesChange(Sender: TObject);
 begin
   if FLoading then Exit;
   DatabaseData.ForcedWrites := SyncWrites.Checked;
+end;
+
+procedure TMainForm.ToggleAutoRefreshExecute(Sender: TObject);
+begin
+  AttmtTimer.Enabled := not AttmtTimer.Enabled;
+end;
+
+procedure TMainForm.ToggleAutoRefreshUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := AttachSource.DataSet.Active;
+  (Sender as TAction).Checked := AttmtTimer.Enabled;
 end;
 
 procedure TMainForm.HandleDBConnect(Sender: TObject);

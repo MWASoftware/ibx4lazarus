@@ -766,4 +766,32 @@ object DatabaseData: TDatabaseData
     left = 48
     top = 432
   end
+  object Attachments: TIBDataSet
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    AfterOpen = AttachmentsAfterOpen
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      'Delete from MON$ATTACHMENTS Where MON$ATTACHMENT_ID = :MON$ATTACHMENT_ID'
+    )
+    SelectSQL.Strings = (
+      'SELECT r.MON$ATTACHMENT_ID, r.MON$SERVER_PID, r.MON$STATE,'
+      '    r.MON$ATTACHMENT_NAME, r.MON$USER, r.MON$ROLE, r.MON$REMOTE_PROTOCOL,'
+      '    r.MON$REMOTE_ADDRESS, r.MON$REMOTE_PID, r.MON$CHARACTER_SET_ID,'
+      '    r.MON$TIMESTAMP, r.MON$GARBAGE_COLLECTION, r.MON$REMOTE_PROCESS,'
+      '    r.MON$STAT_ID, r.MON$CLIENT_VERSION, r.MON$REMOTE_VERSION,'
+      '    r.MON$REMOTE_HOST, r.MON$REMOTE_OS_USER, r.MON$AUTH_METHOD,'
+      '    S.RDB$CHARACTER_SET_NAME, CURRENT_CONNECTION'
+      'FROM MON$ATTACHMENTS r'
+      'JOIN RDB$CHARACTER_SETS S On S.RDB$CHARACTER_SET_ID = r.MON$CHARACTER_SET_ID'
+      'Where r.MON$SYSTEM_FLAG = 0'
+    )
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
+    DataSetCloseAction = dcDiscardChanges
+    left = 163
+    top = 434
+  end
 end

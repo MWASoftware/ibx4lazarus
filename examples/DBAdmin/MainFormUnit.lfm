@@ -60,9 +60,9 @@ object MainForm: TMainForm
     Height = 506
     Top = 26
     Width = 915
-    ActivePage = Properties
+    ActivePage = ServerTab
     Align = alClient
-    TabIndex = 0
+    TabIndex = 5
     TabOrder = 2
     object Properties: TTabSheet
       Caption = 'Properties'
@@ -755,6 +755,305 @@ object MainForm: TMainForm
         TabOrder = 5
       end
     end
+    object AttachmentsTab: TTabSheet
+      Caption = 'Attachments'
+      ClientHeight = 474
+      ClientWidth = 909
+      OnHide = AttachmentsTabHide
+      OnShow = AttachmentsTabShow
+      object AttmtGrid: TIBDynamicGrid
+        Left = 0
+        Height = 474
+        Top = 0
+        Width = 909
+        Align = alClient
+        Color = clWindow
+        Columns = <        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'ID'
+            Width = 40
+            FieldName = 'MON$ATTACHMENT_ID'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Connect Str'
+            Width = 100
+            FieldName = 'MON$ATTACHMENT_NAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Client'
+            Width = 120
+            FieldName = 'MON$REMOTE_HOST'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Client Name'
+            Width = 100
+            FieldName = 'MON$REMOTE_PROCESS'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'User'
+            Width = 80
+            FieldName = 'MON$USER'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Role'
+            Width = 80
+            FieldName = 'MON$ROLE'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'IP Address'
+            Width = 100
+            FieldName = 'MON$REMOTE_ADDRESS'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Alignment = taCenter
+            Title.Alignment = taCenter
+            Title.Caption = 'Protocol'
+            Width = 60
+            FieldName = 'MON$REMOTE_PROTOCOL'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Char Set'
+            Width = 60
+            FieldName = 'RDB$CHARACTER_SET_NAME'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Alignment = taCenter
+            Title.Alignment = taCenter
+            Title.Caption = 'State'
+            Width = 60
+            FieldName = 'MON$STATE'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
+        DataSource = AttachSource
+        PopupMenu = AttmtPopup
+        Scrollbars = ssAutoVertical
+        TabOrder = 0
+        EditorPanel = AttDetailsPanel
+        ExpandEditorPanelBelowRow = True
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
+      end
+      object AttDetailsPanel: TPanel
+        Left = 74
+        Height = 60
+        Top = 164
+        Width = 628
+        BevelInner = bvLowered
+        ClientHeight = 60
+        ClientWidth = 628
+        TabOrder = 1
+        object Label31: TLabel
+          Left = 21
+          Height = 14
+          Top = 14
+          Width = 63
+          Caption = 'Server PID'
+          ParentColor = False
+        end
+        object Label32: TLabel
+          Left = 15
+          Height = 14
+          Top = 36
+          Width = 69
+          Caption = 'Remote PID'
+          ParentColor = False
+        end
+        object DBEdit2: TDBEdit
+          Left = 88
+          Height = 24
+          Top = 8
+          Width = 48
+          DataField = 'MON$SERVER_PID'
+          DataSource = AttachSource
+          CharCase = ecNormal
+          MaxLength = 0
+          TabOrder = 0
+        end
+        object DBEdit3: TDBEdit
+          Left = 88
+          Height = 24
+          Top = 32
+          Width = 48
+          DataField = 'MON$REMOTE_PID'
+          DataSource = AttachSource
+          CharCase = ecNormal
+          MaxLength = 0
+          TabOrder = 1
+        end
+        object Label33: TLabel
+          Left = 171
+          Height = 14
+          Top = 14
+          Width = 78
+          Caption = 'Auth Method'
+          ParentColor = False
+        end
+        object Label34: TLabel
+          Left = 152
+          Height = 14
+          Top = 36
+          Width = 97
+          Caption = 'Remote OS User'
+          ParentColor = False
+        end
+        object DBEdit5: TDBEdit
+          Left = 258
+          Height = 24
+          Top = 8
+          Width = 64
+          DataField = 'MON$AUTH_METHOD'
+          DataSource = AttachSource
+          CharCase = ecNormal
+          MaxLength = 0
+          TabOrder = 2
+        end
+        object DBEdit6: TDBEdit
+          Left = 259
+          Height = 24
+          Top = 32
+          Width = 61
+          DataField = 'MON$REMOTE_OS_USER'
+          DataSource = AttachSource
+          CharCase = ecNormal
+          MaxLength = 0
+          TabOrder = 3
+        end
+        object DBCheckBox1: TDBCheckBox
+          Left = 348
+          Height = 23
+          Top = 8
+          Width = 202
+          Caption = 'Garbage Collection Allowed'
+          DataField = 'MON$GARBAGE_COLLECTION'
+          DataSource = AttachSource
+          TabOrder = 4
+          ValueChecked = '1'
+          ValueUnchecked = '0'
+        end
+        object Label35: TLabel
+          Left = 352
+          Height = 14
+          Top = 36
+          Width = 72
+          Caption = 'Statistics ID'
+          ParentColor = False
+        end
+        object DBEdit7: TDBEdit
+          Left = 432
+          Height = 24
+          Top = 32
+          Width = 64
+          DataField = 'MON$STAT_ID'
+          DataSource = AttachSource
+          CharCase = ecNormal
+          MaxLength = 0
+          TabOrder = 5
+        end
+      end
+    end
+    object StatisticsTab: TTabSheet
+      Caption = 'Statistics'
+      ClientHeight = 474
+      ClientWidth = 909
+      OnShow = StatisticsTabShow
+      object StatsOptions: TComboBox
+        Left = 667
+        Height = 27
+        Top = 8
+        Width = 228
+        Anchors = [akTop, akRight]
+        ItemHeight = 0
+        ItemIndex = 0
+        Items.Strings = (
+          'Header Only'
+          'Performance and Operational'
+          'Header and Data'
+          'Header, Data and Indexes'
+          'All'
+        )
+        OnCloseUp = StatisticsTabShow
+        TabOrder = 0
+        Text = 'Header Only'
+      end
+      object Label28: TLabel
+        Left = 8
+        Height = 14
+        Top = 24
+        Width = 115
+        Caption = 'Database Statistics'
+        ParentColor = False
+      end
+      object StatsMemo: TMemo
+        Left = 8
+        Height = 422
+        Top = 40
+        Width = 883
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        Lines.Strings = (
+          'Memo1'
+        )
+        ScrollBars = ssAutoBoth
+        TabOrder = 1
+      end
+    end
     object SchemaTab: TTabSheet
       Caption = 'Schema'
       ClientHeight = 474
@@ -1262,51 +1561,6 @@ object MainForm: TMainForm
         end
       end
     end
-    object StatisticsTab: TTabSheet
-      Caption = 'Statistics'
-      ClientHeight = 474
-      ClientWidth = 909
-      OnShow = StatisticsTabShow
-      object StatsOptions: TComboBox
-        Left = 667
-        Height = 27
-        Top = 8
-        Width = 228
-        Anchors = [akTop, akRight]
-        ItemHeight = 0
-        ItemIndex = 0
-        Items.Strings = (
-          'Header Only'
-          'Performance and Operational'
-          'Header and Data'
-          'Header, Data and Indexes'
-          'All'
-        )
-        OnCloseUp = StatisticsTabShow
-        TabOrder = 0
-        Text = 'Header Only'
-      end
-      object Label28: TLabel
-        Left = 8
-        Height = 14
-        Top = 24
-        Width = 115
-        Caption = 'Database Statistics'
-        ParentColor = False
-      end
-      object StatsMemo: TMemo
-        Left = 8
-        Height = 422
-        Top = 40
-        Width = 883
-        Anchors = [akTop, akLeft, akRight, akBottom]
-        Lines.Strings = (
-          'Memo1'
-        )
-        ScrollBars = ssAutoBoth
-        TabOrder = 1
-      end
-    end
     object ServerTab: TTabSheet
       Caption = 'Server'
       ClientHeight = 474
@@ -1535,7 +1789,7 @@ object MainForm: TMainForm
               DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
             end>
           DataSource = UserListSource
-          PopupMenu = PopupMenu1
+          PopupMenu = UserPopup
           Scrollbars = ssAutoVertical
           TabOrder = 0
           ExpandEditorPanelBelowRow = False
@@ -1699,7 +1953,7 @@ object MainForm: TMainForm
               DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
             end>
           DataSource = UserTagsSource
-          PopupMenu = PopupMenu2
+          PopupMenu = UserTagPopup
           Scrollbars = ssAutoVertical
           TabOrder = 5
           ExpandEditorPanelBelowRow = False
@@ -1717,9 +1971,6 @@ object MainForm: TMainForm
           ResizeAnchor = akBottom
         end
       end
-    end
-    object AttachmentsTab: TTabSheet
-      Caption = 'Attachments'
     end
   end
   object MainMenu1: TMainMenu
@@ -1846,6 +2097,18 @@ object MainForm: TMainForm
       Caption = 'Delete'
       OnExecute = DeleteTagExecute
       OnUpdate = DeleteTagUpdate
+    end
+    object ToggleAutoRefresh: TAction
+      Category = 'Attachments'
+      Caption = 'Auto Refresh'
+      OnExecute = ToggleAutoRefreshExecute
+      OnUpdate = ToggleAutoRefreshUpdate
+    end
+    object DisconnectAttachment: TAction
+      Category = 'Attachments'
+      Caption = 'Disconnect'
+      OnExecute = DisconnectAttachmentExecute
+      OnUpdate = DisconnectAttachmentUpdate
     end
   end
   object MenuImages: TImageList
@@ -2064,7 +2327,7 @@ object MainForm: TMainForm
     left = 880
     top = 400
   end
-  object PopupMenu1: TPopupMenu
+  object UserPopup: TPopupMenu
     left = 325
     top = 255
     object MenuItem11: TMenuItem
@@ -2080,7 +2343,7 @@ object MainForm: TMainForm
       Action = DeleteUser
     end
   end
-  object PopupMenu2: TPopupMenu
+  object UserTagPopup: TPopupMenu
     left = 845
     top = 346
     object MenuItem15: TMenuItem
@@ -2088,6 +2351,28 @@ object MainForm: TMainForm
     end
     object MenuItem16: TMenuItem
       Action = DeleteTag
+    end
+  end
+  object AttachSource: TDataSource
+    DataSet = DatabaseData.Attachments
+    left = 364
+    top = 84
+  end
+  object AttmtTimer: TTimer
+    Enabled = False
+    Interval = 5000
+    OnTimer = AttmtTimerTimer
+    left = 792
+    top = 64
+  end
+  object AttmtPopup: TPopupMenu
+    left = 407
+    top = 312
+    object MenuItem17: TMenuItem
+      Action = ToggleAutoRefresh
+    end
+    object MenuItem18: TMenuItem
+      Action = DisconnectAttachment
     end
   end
 end
