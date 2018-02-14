@@ -103,7 +103,9 @@ begin
     end;
   finally
     if not FSecContextError then
+    try
       while FIBConfigService.IsServiceRunning do;
+    except   end;
     if Terminated and FSuccess then
       FIBConfigService.BringDatabaseOnline;
     FIBConfigService.Active := false;

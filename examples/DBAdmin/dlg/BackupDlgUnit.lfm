@@ -1,10 +1,10 @@
 object BackupDlg: TBackupDlg
-  Left = 809
-  Height = 242
-  Top = 271
+  Left = 526
+  Height = 351
+  Top = 450
   Width = 374
   Caption = 'Backup Database'
-  ClientHeight = 242
+  ClientHeight = 351
   ClientWidth = 374
   OnClose = FormClose
   OnShow = FormShow
@@ -13,7 +13,7 @@ object BackupDlg: TBackupDlg
   object Button1: TButton
     Left = 96
     Height = 25
-    Top = 208
+    Top = 320
     Width = 75
     Caption = 'OK'
     Default = True
@@ -23,7 +23,7 @@ object BackupDlg: TBackupDlg
   object Button2: TButton
     Left = 191
     Height = 25
-    Top = 208
+    Top = 320
     Width = 75
     Cancel = True
     Caption = 'Cancel'
@@ -32,7 +32,7 @@ object BackupDlg: TBackupDlg
   end
   object PageControl1: TPageControl
     Left = 10
-    Height = 195
+    Height = 297
     Top = 7
     Width = 357
     ActivePage = SelectTab
@@ -41,7 +41,7 @@ object BackupDlg: TBackupDlg
     TabOrder = 2
     object SelectTab: TTabSheet
       Caption = 'SelectTab'
-      ClientHeight = 189
+      ClientHeight = 291
       ClientWidth = 351
       object Label2: TLabel
         Left = 12
@@ -151,10 +151,42 @@ object BackupDlg: TBackupDlg
         }
         OnClick = SpeedButton1Click
       end
+      object IgnoreChecksums: TCheckBox
+        Left = 16
+        Height = 22
+        Top = 192
+        Width = 136
+        Caption = 'Ignore Checksums'
+        TabOrder = 5
+      end
+      object IgnoreLimboTransactions: TCheckBox
+        Left = 16
+        Height = 22
+        Top = 216
+        Width = 182
+        Caption = 'Ignore Limbo Transactions'
+        TabOrder = 6
+      end
+      object MetadataOnly: TCheckBox
+        Left = 16
+        Height = 22
+        Top = 240
+        Width = 111
+        Caption = 'Metadata Only'
+        TabOrder = 7
+      end
+      object NoGarbageCollection: TCheckBox
+        Left = 16
+        Height = 22
+        Top = 264
+        Width = 157
+        Caption = 'No Garbage Collection'
+        TabOrder = 8
+      end
     end
     object ReportTab: TTabSheet
       Caption = 'ReportTab'
-      ClientHeight = 189
+      ClientHeight = 291
       ClientWidth = 351
       OnShow = ReportTabShow
       object Report: TMemo

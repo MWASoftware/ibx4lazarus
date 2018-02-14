@@ -1,12 +1,12 @@
 object DatabaseData: TDatabaseData
   OldCreateOrder = False
-  Height = 488
-  HorizontalOffset = 959
-  VerticalOffset = 402
+  Height = 552
+  HorizontalOffset = 1072
+  VerticalOffset = 354
   Width = 629
   PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -766,17 +766,17 @@ object DatabaseData: TDatabaseData
     left = 48
     top = 432
   end
-  object Attachments: TIBDataSet
+  object Attachments: TIBQuery
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
+    AfterDelete = AttachmentsAfterDelete
     AfterOpen = AttachmentsAfterOpen
     BufferChunks = 1000
     CachedUpdates = False
-    DeleteSQL.Strings = (
-      'Delete from MON$ATTACHMENTS Where MON$ATTACHMENT_ID = :MON$ATTACHMENT_ID'
-    )
-    SelectSQL.Strings = (
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
       'SELECT r.MON$ATTACHMENT_ID, r.MON$SERVER_PID, r.MON$STATE,'
       '    r.MON$ATTACHMENT_NAME, r.MON$USER, r.MON$ROLE, r.MON$REMOTE_PROTOCOL,'
       '    r.MON$REMOTE_ADDRESS, r.MON$REMOTE_PID, r.MON$CHARACTER_SET_ID,'
@@ -788,10 +788,76 @@ object DatabaseData: TDatabaseData
       'JOIN RDB$CHARACTER_SETS S On S.RDB$CHARACTER_SET_ID = r.MON$CHARACTER_SET_ID'
       'Where r.MON$SYSTEM_FLAG = 0'
     )
-    GeneratorField.ApplyOnEvent = gaeOnNewRecord
-    GenerateParamNames = False
+    Params = <>
+    UpdateObject = AttUpdate
     DataSetCloseAction = dcDiscardChanges
-    left = 163
-    top = 434
+    left = 280
+    top = 433
+  end
+  object AttUpdate: TIBUpdate
+    OnApplyUpdates = AttUpdateApplyUpdates
+    left = 376
+    top = 432
+  end
+  object IBValidationService1: TIBValidationService
+    PortNo = 0
+    TraceFlags = []
+    Options = [ValidateFull]
+    GlobalAction = CommitGlobal
+    left = 168
+    top = 432
+  end
+  object IBOnlineValidationService1: TIBOnlineValidationService
+    PortNo = 0
+    TraceFlags = []
+    left = 64
+    top = 498
+  end
+  object InLimboList: TMemDataset
+    FieldDefs = <    
+      item
+        Name = 'TransactionID'
+        DataType = ftInteger
+      end    
+      item
+        Name = 'TransactionType'
+        DataType = ftString
+        Size = 16
+      end    
+      item
+        Name = 'HostSite'
+        DataType = ftString
+        Size = 256
+      end    
+      item
+        Name = 'RemoteSite'
+        DataType = ftString
+        Size = 256
+      end    
+      item
+        Name = 'DatabasePath'
+        DataType = ftString
+        Size = 256
+      end    
+      item
+        Name = 'State'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'RecommendedAction'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'RequestedAction'
+        DataType = ftString
+        Size = 32
+      end>
+    AfterOpen = InLimboListAfterOpen
+    BeforeClose = InLimboListBeforeClose
+    BeforePost = InLimboListBeforePost
+    left = 224
+    top = 498
   end
 end

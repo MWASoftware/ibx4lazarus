@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, SynGutterBase,
   SynGutterMarks, SynGutterLineNumber, SynGutterChanges, SynGutter,
   SynGutterCodeFolding, Forms, Controls, Graphics, Dialogs, Menus, ComCtrls,
-  ActnList, StdCtrls, DbCtrls, ExtCtrls, db, IBLookupComboEditBox,
+  ActnList, StdCtrls, DbCtrls, ExtCtrls, Buttons, db, IBLookupComboEditBox,
   IBDynamicGrid, IBDatabaseInfo, IBServices, IBExtract, IBQuery;
 
 type
@@ -16,10 +16,32 @@ type
   { TMainForm }
 
   TMainForm = class(TForm)
+    ApplySelected: TAction;
+    Commit2Phase: TAction;
+    DBOwner: TEdit;
+    SecDatabase: TEdit;
+    RollbackAll: TAction;
+    CommitAll: TAction;
+    Button3: TButton;
+    Button4: TButton;
+    Button5: TButton;
+    Button6: TButton;
+    IBDynamicGrid3: TIBDynamicGrid;
+    Label38: TLabel;
+    Label39: TLabel;
+    LimboListSource: TDataSource;
+    LimboReport: TMemo;
+    RunRepair: TAction;
+    Button2: TButton;
+    SelectRepairAction: TComboBox;
     DisconnectAttachment: TAction;
+    Label37: TLabel;
+    LimboTab: TTabSheet;
+    ValidationReport: TMemo;
     MenuItem17: TMenuItem;
     AttmtPopup: TPopupMenu;
     MenuItem18: TMenuItem;
+    RepairTab: TTabSheet;
     ToggleAutoRefresh: TAction;
     AttachSource: TDataSource;
     DBCheckBox1: TDBCheckBox;
@@ -62,7 +84,6 @@ type
     DBEdit1: TDBEdit;
     DBEdit4: TDBEdit;
     DBIsReadOnly: TCheckBox;
-    DBOwner: TDBEdit;
     DBText1: TDBText;
     DropDatabase: TAction;
     Edit1: TEdit;
@@ -136,7 +157,6 @@ type
     IBExtract1: TIBExtract;
     SaveDialog: TSaveDialog;
     SchemaTab: TTabSheet;
-    SecDatabase: TDBEdit;
     ServerLog: TMemo;
     ServerPropMemo: TMemo;
     ServerTab: TTabSheet;
@@ -192,6 +212,7 @@ type
     procedure AddTagUpdate(Sender: TObject);
     procedure AddUserExecute(Sender: TObject);
     procedure AddUserUpdate(Sender: TObject);
+    procedure ApplySelectedExecute(Sender: TObject);
     procedure AttachmentsTabHide(Sender: TObject);
     procedure AttachmentsTabShow(Sender: TObject);
     procedure AttmtTimerTimer(Sender: TObject);
@@ -199,6 +220,9 @@ type
     procedure BackupExecute(Sender: TObject);
     procedure ChgPasswordExecute(Sender: TObject);
     procedure ChgPasswordUpdate(Sender: TObject);
+    procedure Commit2PhaseExecute(Sender: TObject);
+    procedure CommitAllExecute(Sender: TObject);
+    procedure CommitAllUpdate(Sender: TObject);
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DBCharacterSetEditingDone(Sender: TObject);
     procedure DBIsReadOnlyChange(Sender: TObject);
@@ -213,6 +237,8 @@ type
     procedure FilesTabShow(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure IsShadowChkChange(Sender: TObject);
+    procedure LimboTabHide(Sender: TObject);
+    procedure LimboTabShow(Sender: TObject);
     procedure LingerDelayEditingDone(Sender: TObject);
     procedure NoReserveChange(Sender: TObject);
     procedure OpenDatabaseExecute(Sender: TObject);
@@ -220,19 +246,26 @@ type
     procedure RemoveShadowExecute(Sender: TObject);
     procedure RemoveShadowUpdate(Sender: TObject);
     procedure RestoreExecute(Sender: TObject);
+    procedure RollbackAllExecute(Sender: TObject);
+    procedure RunRepairExecute(Sender: TObject);
     procedure SaveChangesExecute(Sender: TObject);
     procedure SaveChangesUpdate(Sender: TObject);
     procedure SaveExecute(Sender: TObject);
     procedure SaveUpdate(Sender: TObject);
     procedure SchemaTabShow(Sender: TObject);
+    procedure ServerTabHide(Sender: TObject);
     procedure ServerTabShow(Sender: TObject);
+    procedure StatisticsTabHide(Sender: TObject);
     procedure StatisticsTabShow(Sender: TObject);
+    procedure StatsOptionsCloseUp(Sender: TObject);
     procedure SweepIntervalEditingDone(Sender: TObject);
     procedure SyncWritesChange(Sender: TObject);
     procedure ToggleAutoRefreshExecute(Sender: TObject);
     procedure ToggleAutoRefreshUpdate(Sender: TObject);
   private
     FLoading: boolean;
+    FLastStatsIndex: integer;
+    FServerError: boolean;
     procedure HandleDBConnect(Sender: TObject);
     procedure HandleLoadData(Sender: TObject);
     procedure LoadData;
@@ -276,6 +309,17 @@ begin
   end
   else
     DatabaseData.ActivateShadow;
+end;
+
+procedure TMainForm.LimboTabHide(Sender: TObject);
+begin
+  LimboListSource.DataSet.Active := false;
+end;
+
+procedure TMainForm.LimboTabShow(Sender: TObject);
+begin
+  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  LimboListSource.DataSet.Active := true;
 end;
 
 procedure TMainForm.LingerDelayEditingDone(Sender: TObject);
@@ -375,6 +419,11 @@ begin
   (Sender as TAction).Enabled := (UserListSource.State = dsBrowse);
 end;
 
+procedure TMainForm.ApplySelectedExecute(Sender: TObject);
+begin
+  DatabaseData.LimboResolution(NoGlobalAction,LimboReport.Lines);
+end;
+
 procedure TMainForm.AttachmentsTabHide(Sender: TObject);
 begin
   AttachSource.DataSet.Active := false;
@@ -413,6 +462,22 @@ end;
 procedure TMainForm.ChgPasswordUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := UserListSource.DataSet.Active and (UserListSource.DataSet.RecordCount > 0);
+end;
+
+procedure TMainForm.Commit2PhaseExecute(Sender: TObject);
+begin
+  DatabaseData.LimboResolution(RecoverTwoPhaseGlobal,LimboReport.Lines);
+end;
+
+procedure TMainForm.CommitAllExecute(Sender: TObject);
+begin
+  DatabaseData.LimboResolution(CommitGlobal,LimboReport.Lines);
+end;
+
+procedure TMainForm.CommitAllUpdate(Sender: TObject);
+begin
+  with LimboListSource.DataSet do
+  (Sender as TAction).Enabled := Active and (RecordCount > 0);
 end;
 
 procedure TMainForm.DatabaseOnlineChange(Sender: TObject);
@@ -530,6 +595,17 @@ begin
   DatabaseData.RestoreDatabase;
 end;
 
+procedure TMainForm.RollbackAllExecute(Sender: TObject);
+begin
+  DatabaseData.LimboResolution(RollbackGlobal,LimboReport.Lines);
+end;
+
+procedure TMainForm.RunRepairExecute(Sender: TObject);
+begin
+  ValidationReport.Lines.Clear;
+  DatabaseData.DatabaseRepair(SelectRepairAction.ItemIndex,ValidationReport.Lines);
+end;
+
 procedure TMainForm.SaveChangesExecute(Sender: TObject);
 begin
   if RoleSource.DataSet.State in [dsEdit,dsInsert] then
@@ -573,17 +649,41 @@ begin
   Application.QueueAsyncCall(@DoExtract,0);
 end;
 
+procedure TMainForm.ServerTabHide(Sender: TObject);
+begin
+  FServerError := false;
+end;
+
 procedure TMainForm.ServerTabShow(Sender: TObject);
 begin
-  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
-  DatabaseData.LoadServerProperties(ServerPropMemo.Lines);
-  DatabaseData.LoadServerLog(ServerLog.Lines);
+  if not Visible or not IBDatabaseInfo.Database.Connected or FServerError then Exit;
+  try
+    DatabaseData.LoadServerProperties(ServerPropMemo.Lines);
+    DatabaseData.LoadServerLog(ServerLog.Lines);
+  except
+   FServerError := true;
+   ServerPropMemo.Lines.Clear;
+   ServerLog.Lines.Clear;
+   raise;
+  end;
+end;
+
+procedure TMainForm.StatisticsTabHide(Sender: TObject);
+begin
+  FLastStatsIndex := -1;
 end;
 
 procedure TMainForm.StatisticsTabShow(Sender: TObject);
 begin
   if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  if FLastStatsIndex <> StatsOptions.ItemIndex then {avoids loops if exception raise in load stats}
+    StatsOptionsCloseUp(nil);
+end;
+
+procedure TMainForm.StatsOptionsCloseUp(Sender: TObject);
+begin
   StatsMemo.Lines.Clear;
+  FLastStatsIndex := StatsOptions.ItemIndex;
   DatabaseData.LoadDatabaseStatistics(StatsOptions.ItemIndex,StatsMemo.Lines);
 end;
 
@@ -614,12 +714,15 @@ procedure TMainForm.HandleDBConnect(Sender: TObject);
 begin
   ConfigureUserManager;
   PageControl1.ActivePage := Properties;
-  StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s',
-         [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.IBDatabase1.Params.Values['user_name']]);
+  ValidationReport.Lines.Clear;
+  LimboReport.Lines.Clear;
 end;
 
 procedure TMainForm.HandleLoadData(Sender: TObject);
 begin
+  StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s by %s, using %s security database',
+         [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.IBDatabase1.Params.Values['user_name'],
+          DatabaseData.AuthMethod, DatabaseData.SecurityDatabase]);
   if assigned(PageControl1.ActivePage.OnShow) then
     PageControl1.ActivePage.OnShow(nil);
 end;
@@ -643,6 +746,8 @@ begin
     SweepInterval.Text := IntToStr(IBDatabaseInfo.SweepInterval);
     NoReserve.Checked := DatabaseData.NoReserve;
     LingerDelay.Text := DatabaseData.LingerDelay;
+    SecDatabase.Text := DatabaseData.SecurityDatabase;
+    DBOwner.Text := DatabaseData.DBOwner;
     DatabaseOnline.Checked := DatabaseData.IsDatabaseOnline;
     IsShadowChk.Checked := DatabaseData.IsShadowDatabase;
     if IBDatabaseInfo.ODSMajorVersion >= 12 then

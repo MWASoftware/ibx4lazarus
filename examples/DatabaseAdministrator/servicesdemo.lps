@@ -7,7 +7,7 @@
       <Unit0>
         <Filename Value="servicesdemo.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="6"/>
         <CursorPos X="93" Y="14"/>
         <UsageCount Value="161"/>
         <Loaded Value="True"/>
@@ -30,7 +30,7 @@
         <ComponentName Value="BackupDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="34"/>
         <CursorPos X="12" Y="43"/>
         <UsageCount Value="152"/>
@@ -64,10 +64,13 @@
         <ComponentName Value="LimboTransactionsForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="140"/>
-        <CursorPos X="14" Y="59"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="59"/>
+        <CursorPos X="63" Y="80"/>
         <UsageCount Value="109"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="ChgPasswordDlgUnit.pas"/>
@@ -129,7 +132,6 @@
         <ComponentName Value="DatabaseProperties"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="599"/>
         <CursorPos Y="616"/>
@@ -164,7 +166,7 @@
         <ComponentName Value="BringOnlineDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="43"/>
         <CursorPos X="78" Y="74"/>
         <UsageCount Value="40"/>
@@ -201,7 +203,7 @@
         <ComponentName Value="AddSecondaryFileDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="7"/>
         <CursorPos X="29"/>
         <UsageCount Value="29"/>
         <Loaded Value="True"/>
@@ -213,7 +215,7 @@
         <ComponentName Value="AddShadowFileDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="9"/>
         <CursorPos X="16" Y="16"/>
         <UsageCount Value="29"/>
         <Loaded Value="True"/>
@@ -225,7 +227,7 @@
         <ComponentName Value="AddShadowSetDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="16"/>
         <CursorPos X="56" Y="9"/>
         <UsageCount Value="29"/>
@@ -247,7 +249,7 @@
       </Unit21>
       <Unit22>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="2204"/>
         <CursorPos X="10" Y="2206"/>
         <UsageCount Value="24"/>
@@ -483,7 +485,7 @@
       <Unit53>
         <Filename Value="../../../../lcl/stdctrls.pp"/>
         <UnitName Value="StdCtrls"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="12"/>
         <TopLine Value="1242"/>
         <CursorPos X="21" Y="1273"/>
         <UsageCount Value="15"/>
@@ -799,7 +801,7 @@
       </Unit96>
       <Unit97>
         <Filename Value="../../../../lcl/include/buttoncontrol.inc"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="14"/>
         <TopLine Value="54"/>
         <CursorPos X="35" Y="88"/>
         <UsageCount Value="15"/>
@@ -807,7 +809,7 @@
       </Unit97>
       <Unit98>
         <Filename Value="../../../../lcl/include/customcheckbox.inc"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="13"/>
         <TopLine Value="65"/>
         <CursorPos X="3" Y="67"/>
         <UsageCount Value="15"/>
@@ -830,7 +832,7 @@
       <Unit101>
         <Filename Value="../../../../lcl/extctrls.pp"/>
         <UnitName Value="ExtCtrls"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="10"/>
         <TopLine Value="590"/>
         <CursorPos X="3" Y="610"/>
         <UsageCount Value="15"/>

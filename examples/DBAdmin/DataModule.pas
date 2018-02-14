@@ -18,8 +18,12 @@ type
     CharSetLookup: TIBQuery;
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
-    Attachments: TIBDataSet;
+    Attachments: TIBQuery;
+    IBOnlineValidationService1: TIBOnlineValidationService;
     IBSecurityService1: TIBSecurityService;
+    AttUpdate: TIBUpdate;
+    IBValidationService1: TIBValidationService;
+    InLimboList: TMemDataset;
     LegacyUserList: TMemDataset;
     UserListGROUPID: TLongintField;
     UserListSource: TDataSource;
@@ -72,6 +76,7 @@ type
     UserListUSERPASSWORD: TIBStringField;
     UserTags: TIBQuery;
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
+    procedure AttachmentsAfterDelete(DataSet: TDataSet);
     procedure AttachmentsAfterOpen(DataSet: TDataSet);
     procedure CurrentTransactionAfterTransactionEnd(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
@@ -84,6 +89,11 @@ type
     procedure IBDatabase1Login(Database: TIBDatabase; LoginParams: TStrings);
     procedure IBStatisticalService1Login(Service: TIBCustomService;
       LoginParams: TStrings);
+    procedure AttUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
+      Params: ISQLParams);
+    procedure InLimboListAfterOpen(DataSet: TDataSet);
+    procedure InLimboListBeforeClose(DataSet: TDataSet);
+    procedure InLimboListBeforePost(DataSet: TDataSet);
     procedure LegacyUserListAfterOpen(DataSet: TDataSet);
     procedure LegacyUserListBeforeClose(DataSet: TDataSet);
     procedure LegacyUserListBeforeDelete(DataSet: TDataSet);
@@ -114,13 +124,18 @@ type
     FServerPassword: string;
     FLocalConnect: boolean;
     FUsersLoading: boolean;
+    FLoadingLimboTr: boolean;
     procedure ActivateService(aService: TIBCustomService);
+    function GetAuthMethod: string;
     function GetAutoAdmin: boolean;
     procedure GetDBFlags;
+    function GetDBOwner: string;
     function GetDBReadOnly: boolean;
     function GetForcedWrites: boolean;
     function GetLingerDelay: string;
     function GetNoReserve: boolean;
+    function GetRoleName: string;
+    function GetSecurityDatabase: string;
     function GetSweepInterval: integer;
     procedure SetAutoAdmin(AValue: boolean);
     procedure SetDBReadOnly(AValue: boolean);
@@ -138,6 +153,8 @@ type
     procedure RestoreDatabase;
     procedure BringDatabaseOnline;
     procedure ShutDown(aShutDownmode: TShutdownMode; aDelay: integer);
+    procedure DatabaseRepair(ActionID: integer; ReportLines: TStrings);
+    procedure LimboResolution(ActionID: TTransactionGlobalAction; Report: TStrings);
     function IsDatabaseOnline: boolean;
     function IsShadowDatabase: boolean;
     procedure ActivateShadow;
@@ -155,6 +172,10 @@ type
     property DBReadOnly: boolean read GetDBReadOnly write SetDBReadOnly;
     property NoReserve: boolean read GetNoReserve write SetNoReserve;
     property SweepInterval: integer read GetSweepInterval write SetSweepInterval;
+    property SecurityDatabase: string read GetSecurityDatabase;
+    property AuthMethod: string read GetAuthMethod;
+    property RoleName: string read GetRoleName;
+    property DBOwner: string read GetDBOwner;
     property AfterDBConnect: TNotifyEvent read FAfterDBConnect write FAfterDBConnect;
     property AfterDataReload: TNotifyEvent read FAfterDataReload write FAfterDataReload;
   end;
@@ -368,6 +389,16 @@ begin
   end;
 end;
 
+function TDatabaseData.GetDBOwner: string;
+var DBOField: TField;
+begin
+  DBOField := DatabaseQuery.FindField('MON$OWNER');
+  if DBOField <> nil then
+    Result := DBOField.AsString
+  else
+    Result := 'n/a';
+end;
+
 function TDatabaseData.GetAutoAdmin: boolean;
 begin
   Result := false;
@@ -429,7 +460,16 @@ procedure TDatabaseData.ActivateService(aService: TIBCustomService);
       TIBStatisticalService(IBService).DatabaseName := DBName
     else
     if IBService is TIBConfigService then
-      TIBConfigService(IBService).DatabaseName := DBName;
+      TIBConfigService(IBService).DatabaseName := DBName
+    else
+    if IBService is TIBBackupService then
+      TIBBackupService(IBService).DatabaseName := DBName
+    else
+    if IBService is TIBRestoreService then
+    begin
+      TIBRestoreService(IBService).DatabaseName.Clear;
+      TIBRestoreService(IBService).DatabaseName.Add(DBName);
+    end;
   end;
 
   procedure SetupParams(IBService: TIBCustomService; UseDefaultSecDatabase: boolean; DBName: string);
@@ -511,7 +551,17 @@ begin
     Exit;
 
   aService.Assign(IBServerProperties1);
-  AssignDatabase(aService,AttmtQuery.FieldByName('MON$ATTACHMENT_NAME').AsString);
+  AssignDatabase(aService,IBDatabaseInfo.DBFileName);
+end;
+
+function TDatabaseData.GetAuthMethod: string;
+var AuthMeth: TField;
+begin
+  AuthMeth := AttmtQuery.FindField('MON$AUTH_METHOD');
+  if AuthMeth = nil then
+    Result := 'Legacy_auth'
+  else
+    Result := AuthMeth.AsString;
 end;
 
 procedure TDatabaseData.SetNoReserve(AValue: boolean);
@@ -562,6 +612,8 @@ begin
       end;
     end;
   until IBDatabase1.Connected;
+  if assigned(FAfterDBConnect) then
+    AfterDBConnect(self);
 end;
 
 procedure TDatabaseData.Disconnect;
@@ -583,18 +635,21 @@ end;
 
 procedure TDatabaseData.BackupDatabase;
 begin
-  ActivateService(IBConfigService1);
-  BackupDlg.ShowModal(IBConfigService1,IBDatabase1.DatabaseName);
+  with BackupDlg do
+  begin
+    ActivateService(IBBackupService1);
+    ShowModal;
+  end;
 end;
 
 procedure TDatabaseData.RestoreDatabase;
 var DefaultPageSize: integer;
 begin
-  ActivateService(IBConfigService1);
   DefaultPageSize := DatabaseQuery.FieldByName('MON$PAGE_SIZE').AsInteger;
+  ActivateService(RestoreDlg.IBRestoreService1);
   IBDatabase1.Connected := false;
   try
-    RestoreDlg.ShowModal(IBConfigService1,IBDatabase1.DatabaseName,DefaultPageSize);
+    RestoreDlg.ShowModal(DefaultPageSize);
   finally
     IBDatabase1.Connected := true;
   end;
@@ -632,6 +687,95 @@ begin
   end;
 end;
 
+procedure TDatabaseData.DatabaseRepair(ActionID: integer; ReportLines: TStrings
+  );
+
+  procedure DoSweep;
+  begin
+    ActivateService(IBValidationService1);
+    with IBValidationService1 do
+    begin
+      Options := [SweepDB];
+      ReportLines.Add(Format('Database sweep of % started',[IBDatabase1.DatabaseName]));
+      try
+        ServiceStart;
+        While not Eof do
+        begin
+          Application.ProcessMessages;
+          ReportLines.Add(GetNextLine);
+        end
+      finally
+        while IsServiceRunning do;
+      end;
+      ReportLines.Add('Sweep successfully completed');
+      MessageDlg('Sweep successfully completed',mtInformation,[mbOK],0);
+    end;
+  end;
+
+  procedure DoValidation(aService: TIBControlAndQueryService; VType: string);
+  begin
+    ActivateService(aService);
+    with aService do
+    try
+      ReportLines.Add(Format('%s Validation of %s started',[VType, IBDatabase1.DatabaseName]));
+      IBDatabase1.Connected := false;
+      try
+        ServiceStart;
+        while not Eof do
+        begin
+          Application.ProcessMessages;
+          ReportLines.Add(GetNextLine);
+        end;
+      finally
+        while IsServiceRunning do;
+      end;
+      ReportLines.Add(VType + ' Validation Completed');
+      MessageDlg(VType + ' Validation Completed',mtInformation,[mbOK],0);
+    finally
+      IBDatabase1.Connected := true;
+    end;
+  end;
+
+begin
+   case ActionID of
+   0: {sweep}
+     DoSweep;
+
+   1: {Online Validation }
+     DoValidation(IBOnlineValidationService1,'Online');
+
+   2: {Full Validation}
+     begin
+      IBValidationService1.Options := [ValidateFull];
+      DoValidation(IBValidationService1,'Full');
+     end;
+   end;
+end;
+
+procedure TDatabaseData.LimboResolution(ActionID: TTransactionGlobalAction;
+  Report: TStrings);
+begin
+  if not InLimboList.Active then
+    raise Exception.Create('Limbo Transactions List not available');
+
+  with InLimboList do
+    if State = dsEdit then Post;
+  Report.Clear;
+  ActivateService(IBValidationService1);
+  with IBValidationService1 do
+  begin
+    GlobalAction := ActionID;
+    Report.Add('Starting Limbo transaction resolution');
+    FixLimboTransactionErrors;
+    while not Eof do
+    begin
+      Application.ProcessMessages;
+      Report.Add(GetNextLine);
+    end;
+    Report.Add('Limbo Transaction resolution complete');
+  end;
+end;
+
 function TDatabaseData.GetLingerDelay: string;
 var Linger: TField;
 begin
@@ -650,6 +794,21 @@ end;
 function TDatabaseData.GetNoReserve: boolean;
 begin
   Result :=  DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$RESERVE_SPACE').AsInteger <> 0);
+end;
+
+function TDatabaseData.GetRoleName: string;
+begin
+  Result := AttmtQuery.FieldByName('MON$ROLE').AsString;
+end;
+
+function TDatabaseData.GetSecurityDatabase: string;
+var SecPlugin: TField;
+begin
+  SecPlugin := DatabaseQuery.FindField('MON$SEC_DATABASE');
+  if SecPlugin = nil then
+    Result := 'Legacy'
+  else
+    Result := Trim(SecPlugin.AsString);
 end;
 
 function TDatabaseData.GetSweepInterval: integer;
@@ -803,6 +962,7 @@ end;
 
 procedure TDatabaseData.LoadDatabaseStatistics(OptionID: integer; Lines: TStrings);
 begin
+  ActivateService(IBStatisticalService1);
   if OptionID = 1 then
     LoadPerformanceStatistics(Lines)
   else
@@ -907,6 +1067,117 @@ begin
     FServerUserName := aUserName;
     FServerPassword := aPassword;
   end;
+end;
+
+procedure TDatabaseData.AttUpdateApplyUpdates(Sender: TObject;
+  UpdateKind: TUpdateKind; Params: ISQLParams);
+begin
+  if UpdateKind = ukDelete then
+  begin
+    ExecDDL.SQL.Text := 'Delete from MON$ATTACHMENTS Where MON$ATTACHMENT_ID =' +
+      Params.ByName('MON$ATTACHMENT_ID').Asstring;
+    ExecDDL.ExecQuery;
+  end;
+end;
+
+procedure TDatabaseData.InLimboListAfterOpen(DataSet: TDataSet);
+
+  function TypeToStr(MultiDatabase: boolean): string;
+  begin
+    if MultiDatabase then
+      Result := 'Multi DB'
+    else
+      Result := 'Single DB';
+  end;
+
+  function StateToStr(State: TTransactionState): string;
+  begin
+    case State of
+    LimboState:
+      Result := 'Limbo';
+    CommitState:
+      Result := 'Commit';
+    RollbackState:
+      Result := 'Rollback';
+    else
+      Result := 'Unknown';
+    end;
+  end;
+
+  function AdviseToStr(Advise: TTransactionAdvise): string;
+  begin
+    case Advise of
+    CommitAdvise:
+      Result := 'Commit';
+    RollbackAdvise:
+      Result := 'Rollback';
+    else
+      Result := 'Unknown';
+    end;
+  end;
+
+  function ActionToStr(anAction: IBServices.TTransactionAction): string;
+  begin
+    case anAction of
+    CommitAction:
+      Result := 'Commit';
+    RollbackAction:
+      Result := 'Rollback';
+    end;
+  end;
+
+var i: integer;
+begin
+  if FLoadingLimboTr then Exit;
+  FLoadingLimboTr := true;
+  with IBValidationService1 do
+  try
+    Options := [LimboTransactions];
+    ActivateService(IBValidationService1);
+    ServiceStart;
+    FetchLimboTransactionInfo;
+    for i := 0 to LimboTransactionInfoCount - 1 do
+    with LimboTransactionInfo[i] do
+    begin
+      InLimboList.Append;
+      InLimboList.FieldByName('TransactionID').AsInteger := ID;
+      InLimboList.FieldByName('TransactionType').AsString := TypeToStr(MultiDatabase);
+      InLimboList.FieldByName('HostSite').AsString := HostSite;
+      InLimboList.FieldByName('RemoteSite').AsString := RemoteSite;
+      InLimboList.FieldByName('DatabasePath').AsString := RemoteDatabasePath;
+      InLimboList.FieldByName('State').AsString := StateToStr(State);
+      InLimboList.FieldByName('RecommendedAction').AsString := AdviseToStr(Advise);
+      InLimboList.FieldByName('RequestedAction').AsString := ActionToStr(Action);
+      InLimboList.Post;
+    end;
+  finally
+    FLoadingLimboTr := false;
+  end;
+end;
+
+procedure TDatabaseData.InLimboListBeforeClose(DataSet: TDataSet);
+begin
+  InLimboList.Clear(false);
+end;
+
+procedure TDatabaseData.InLimboListBeforePost(DataSet: TDataSet);
+var i: integer;
+begin
+  if FLoadingLimboTr then Exit;
+  with IBValidationService1 do
+  for i := 0 to LimboTransactionInfoCount - 1 do
+    with LimboTransactionInfo[i] do
+    begin
+      if ID = InLimboList.FieldByName('TransactionID').AsInteger then
+      begin
+       if InLimboList.FieldByName('RequestedAction').AsString = 'Commit' then
+         Action := CommitAction
+       else
+         if InLimboList.FieldByName('RequestedAction').AsString = 'Rollback' then
+           Action := RollbackAction;
+       break;
+      end;
+    end;
 end;
 
 procedure TDatabaseData.LegacyUserListAfterOpen(DataSet: TDataSet);
@@ -1032,10 +1303,6 @@ begin
     end;
 
   FLocalConnect := GetProtocol(IBDatabase1.DatabaseName) = Local;
-
-  if assigned(FAfterDBConnect) then
-    AfterDBConnect(self);
-
   ReloadData;
 end;
 
@@ -1072,6 +1339,11 @@ begin
   end;
   MessageDlg(E.Message,mtError,[mbOK],0);
   CurrentTransaction.Rollback;
+end;
+
+procedure TDatabaseData.AttachmentsAfterDelete(DataSet: TDataSet);
+begin
+  CurrentTransaction.Commit;
 end;
 
 procedure TDatabaseData.AttachmentsAfterOpen(DataSet: TDataSet);

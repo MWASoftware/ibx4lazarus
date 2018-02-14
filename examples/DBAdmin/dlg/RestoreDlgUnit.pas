@@ -15,9 +15,16 @@ type
   TRestoreDlg = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    DeActivateIndexes: TCheckBox;
+    NoDBTriggersOnRestore: TCheckBox;
+    NoShadow: TCheckBox;
+    NoValidityCheck: TCheckBox;
+    OneRelationAtATime: TCheckBox;
+    RestoreMetaDataOnly: TCheckBox;
+    UseAllSpace: TCheckBox;
     Edit1: TEdit;
-    Edit2: TEdit;
-    Edit3: TEdit;
+    DBName: TEdit;
+    SourceArchive: TEdit;
     PageSize: TEdit;
     IBRestoreService1: TIBRestoreService;
     Label1: TLabel;
@@ -42,8 +49,7 @@ type
     procedure DoRestore(Data: PtrInt);
   public
     { public declarations }
-     function ShowModal(aService: TIBCustomService; DBName: string;
-       DefaultPageSize: integer): TModalResult;
+     function ShowModal(DefaultPageSize: integer): TModalResult;
  end;
 
 var
@@ -60,7 +66,7 @@ uses MainFormUnit;
 procedure TRestoreDlg.SpeedButton1Click(Sender: TObject);
 begin
   if OpenDialog1.Execute then
-    Edit3.Text := OpenDialog1.Filename;
+    SourceArchive.Text := OpenDialog1.Filename;
 end;
 
 procedure TRestoreDlg.DoRestore(Data: PtrInt);
@@ -98,12 +104,8 @@ begin
   MessageDlg('Restore Completed',mtInformation,[mbOK],0);
 end;
 
-function TRestoreDlg.ShowModal(aService: TIBCustomService; DBName: string;
-  DefaultPageSize: integer): TModalResult;
+function TRestoreDlg.ShowModal(DefaultPageSize: integer): TModalResult;
 begin
-  IBRestoreService1.Assign(aService);
-  IBRestoreService1.DatabaseName.Clear;
-  IBRestoreService1.DatabaseName.Add(DBName);
   PageSize.Text := IntToStr(DefaultPageSize);
   Result := inherited ShowModal;
 end;
@@ -116,7 +118,7 @@ begin
     RadioButton1.Checked := true
   else
     RadioButton2.Checked := true;
-  Edit2.Text := IBRestoreService1.DatabaseName[0];
+  DBName.Text := IBRestoreService1.DatabaseName[0];
   IBRestoreService1.BackupFile.Clear;
 end;
 
@@ -132,14 +134,33 @@ begin
   if PageControl1.ActivePage = SelectTab then
   begin
     CloseAction := caNone;
-    if Edit3.Text = '' then
+    if SourceArchive.Text = '' then
       raise Exception.Create('A Backup File Name must be given');
-    IBRestoreService1.BackupFile.Add(Edit3.Text);
-    if RadioButton1.Checked then
-       IBRestoreService1.BackupFileLocation := flServerSide
-    else
-      IBRestoreService1.BackupFileLocation := flClientSide;
-    IBRestoreService1.PageSize := StrToInt(PageSize.Text);
+    with IBRestoreService1 do
+    begin
+      if RadioButton1.Checked then
+         BackupFileLocation := flServerSide
+      else
+        BackupFileLocation := flClientSide;
+      BackupFile.Add(SourceArchive.Text);
+      PageSize := StrToInt(self.PageSize.Text);
+      Options := [Replace];
+      if DeactivateIndexes.Checked then
+        Options := Options + [IBServices.DeactivateIndexes];
+      if NoDBTriggersOnRestore.Checked then
+        Options := Options + [IBServices.NoDBTriggersOnRestore];
+      if NoShadow.Checked then
+        Options := Options + [IBServices.NoShadow];
+      if NoValidityCheck.Checked then
+        Options := Options + [IBServices.NoValidityCheck];
+      if OneRelationAtATime.Checked then
+        Options := Options + [IBServices.OneRelationAtATime];
+      if RestoreMetaDataOnly.Checked then
+        Options := Options + [IBServices.RestoreMetaDataOnly];
+      if UseAllSpace.Checked then
+        Options := Options + [IBServices.UseAllSpace];
+    end;
+
     PageControl1.ActivePage := ReportTab;
     Application.QueueAsyncCall(@DoRestore,0);
   end;

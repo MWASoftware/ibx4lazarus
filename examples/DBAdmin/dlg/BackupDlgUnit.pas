@@ -15,6 +15,10 @@ type
   TBackupDlg = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    NoGarbageCollection: TCheckBox;
+    MetadataOnly: TCheckBox;
+    IgnoreLimboTransactions: TCheckBox;
+    IgnoreChecksums: TCheckBox;
     Edit1: TEdit;
     Edit2: TEdit;
     Edit3: TEdit;
@@ -39,7 +43,6 @@ type
     procedure DoBackup(Data: PtrInt);
   public
     { public declarations }
-    function ShowModal(aService: TIBCustomService; DBName: string): TModalResult;
  end;
 
 var
@@ -64,6 +67,19 @@ var bakfile: TFileStream;
     BackupCount: integer;
 begin
   bakfile := nil;
+  with IBBackupService1 do
+  begin
+  Options := [NoDBTriggers];
+  if IgnoreChecksums.Checked then
+    Options := Options + [IBServices.IgnoreChecksums];
+  if IgnoreLimboTransactions.Checked then
+    Options := Options + [IgnoreLimbo];
+  if MetadataOnly.Checked then
+    Options := Options + [IBServices.MetadataOnly];
+  if NoGarbageCollection.Checked then
+    Options := Options + [IBServices.NoGarbageCollection];
+  end;
+
   Report.Lines.Add('Starting Backup');
   if IBBackupService1.BackupFileLocation = flClientSide then
     bakfile := TFileStream.Create(IBBackupService1.BackupFile[0],fmCreate);
@@ -102,14 +118,6 @@ begin
     end;
   end;
   IBBackupService1.Active := false;
-end;
-
-function TBackupDlg.ShowModal(aService: TIBCustomService; DBName: string
-  ): TModalResult;
-begin
-  IBBackupService1.Assign(aService);
-  IBBackupService1.DatabaseName := DBName;
-  Result := inherited ShowModal;
 end;
 
 procedure TBackupDlg.FormShow(Sender: TObject);

@@ -21,7 +21,9 @@ object MainForm: TMainForm
       Left = 1
       Top = 2
       Action = Backup
+      ParentShowHint = False
       ShowCaption = False
+      ShowHint = True
     end
     object ToolButton2: TToolButton
       Left = 24
@@ -34,6 +36,8 @@ object MainForm: TMainForm
       Left = 32
       Top = 2
       Action = Restore
+      ParentShowHint = False
+      ShowHint = True
     end
     object ToolButton4: TToolButton
       Left = 55
@@ -60,9 +64,11 @@ object MainForm: TMainForm
     Height = 506
     Top = 26
     Width = 915
-    ActivePage = ServerTab
+    ActivePage = Properties
     Align = alClient
-    TabIndex = 5
+    ParentShowHint = False
+    ShowHint = True
+    TabIndex = 0
     TabOrder = 2
     object Properties: TTabSheet
       Caption = 'Properties'
@@ -184,18 +190,6 @@ object MainForm: TMainForm
           Caption = 'DB Owner'
           ParentColor = False
         end
-        object DBOwner: TDBEdit
-          Left = 121
-          Height = 24
-          Top = 208
-          Width = 266
-          DataField = 'MON$OWNER'
-          DataSource = DatabaseSource
-          ReadOnly = True
-          CharCase = ecNormal
-          MaxLength = 0
-          TabOrder = 5
-        end
         object Label18: TLabel
           Left = 24
           Height = 14
@@ -203,18 +197,6 @@ object MainForm: TMainForm
           Width = 86
           Caption = 'Sec. Database'
           ParentColor = False
-        end
-        object SecDatabase: TDBEdit
-          Left = 121
-          Height = 24
-          Top = 240
-          Width = 266
-          DataField = 'MON$SEC_DATABASE'
-          DataSource = DatabaseSource
-          ReadOnly = True
-          CharCase = ecNormal
-          MaxLength = 0
-          TabOrder = 6
         end
         object Label13: TLabel
           Left = 28
@@ -233,7 +215,7 @@ object MainForm: TMainForm
           DataSource = DBCharSetSource
           CharCase = ecNormal
           MaxLength = 0
-          TabOrder = 8
+          TabOrder = 6
         end
         object DBCharacterSet: TIBLookupComboEditBox
           Left = 121
@@ -248,7 +230,7 @@ object MainForm: TMainForm
           ListSource = CharSetSource
           LookupCache = False
           OnEditingDone = DBCharacterSetEditingDone
-          TabOrder = 7
+          TabOrder = 5
           AutoInsert = False
           AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           ItemHeight = 0
@@ -260,7 +242,7 @@ object MainForm: TMainForm
           Width = 84
           Caption = 'Read Only'
           OnChange = DBIsReadOnlyChange
-          TabOrder = 9
+          TabOrder = 7
         end
         object DatabaseOnline: TCheckBox
           Left = 111
@@ -269,7 +251,7 @@ object MainForm: TMainForm
           Width = 62
           Caption = 'Online'
           OnChange = DatabaseOnlineChange
-          TabOrder = 10
+          TabOrder = 8
         end
         object SyncWrites: TCheckBox
           Left = 111
@@ -278,7 +260,7 @@ object MainForm: TMainForm
           Width = 173
           Caption = 'Synchronous Disk Writes'
           OnChange = SyncWritesChange
-          TabOrder = 11
+          TabOrder = 9
         end
         object IsShadowChk: TCheckBox
           Left = 111
@@ -287,7 +269,7 @@ object MainForm: TMainForm
           Width = 132
           Caption = 'Shadow Database'
           OnChange = IsShadowChkChange
-          TabOrder = 12
+          TabOrder = 10
         end
         object NoReserve: TCheckBox
           Left = 111
@@ -296,7 +278,7 @@ object MainForm: TMainForm
           Width = 239
           Caption = 'Space Reserved for Backup Records'
           OnChange = NoReserveChange
-          TabOrder = 13
+          TabOrder = 11
         end
         object AutoAdmin: TCheckBox
           Left = 112
@@ -305,7 +287,7 @@ object MainForm: TMainForm
           Width = 151
           Caption = 'Auto Admin Mapping'
           OnChange = AutoAdminChange
-          TabOrder = 14
+          TabOrder = 12
         end
         object Label11: TLabel
           Left = 435
@@ -322,7 +304,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 15
+          TabOrder = 13
           Text = 'AllocatedPages'
         end
         object Label19: TLabel
@@ -348,7 +330,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 16
+          TabOrder = 14
           Text = 'PagesUsed'
         end
         object Label10: TLabel
@@ -366,7 +348,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 17
+          TabOrder = 15
           Text = 'PagesAvail'
         end
         object Label12: TLabel
@@ -384,7 +366,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 18
+          TabOrder = 16
           Text = 'Edit10'
         end
         object Label20: TLabel
@@ -418,7 +400,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 19
+          TabOrder = 17
           Text = 'Edit11'
         end
         object Label22: TLabel
@@ -444,7 +426,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 20
+          TabOrder = 18
           Text = 'Edit12'
         end
         object Label23: TLabel
@@ -465,7 +447,7 @@ object MainForm: TMainForm
           ReadOnly = True
           CharCase = ecNormal
           MaxLength = 0
-          TabOrder = 21
+          TabOrder = 19
         end
         object Label16: TLabel
           Left = 453
@@ -483,7 +465,7 @@ object MainForm: TMainForm
           Alignment = taRightJustify
           NumbersOnly = True
           OnEditingDone = LingerDelayEditingDone
-          TabOrder = 22
+          TabOrder = 20
           Text = 'LingerDelay'
         end
         object Label17: TLabel
@@ -511,7 +493,7 @@ object MainForm: TMainForm
           Alignment = taRightJustify
           NumbersOnly = True
           OnEditingDone = SweepIntervalEditingDone
-          TabOrder = 23
+          TabOrder = 21
           Text = 'SweepInterval'
         end
         object Label8: TLabel
@@ -531,15 +513,33 @@ object MainForm: TMainForm
           DataSource = DatabaseSource
           CharCase = ecNormal
           MaxLength = 0
-          TabOrder = 24
+          TabOrder = 22
         end
         object Edit1: TEdit
           Left = 121
           Height = 24
           Top = 16
           Width = 263
-          TabOrder = 25
+          TabOrder = 23
           Text = 'Edit1'
+        end
+        object SecDatabase: TEdit
+          Left = 121
+          Height = 24
+          Top = 241
+          Width = 263
+          ReadOnly = True
+          TabOrder = 24
+          Text = 'SecDatabase'
+        end
+        object DBOwner: TEdit
+          Left = 120
+          Height = 24
+          Top = 208
+          Width = 264
+          ReadOnly = True
+          TabOrder = 25
+          Text = 'DBOwner'
         end
       end
     end
@@ -1013,6 +1013,7 @@ object MainForm: TMainForm
       Caption = 'Statistics'
       ClientHeight = 474
       ClientWidth = 909
+      OnHide = StatisticsTabHide
       OnShow = StatisticsTabShow
       object StatsOptions: TComboBox
         Left = 667
@@ -1029,7 +1030,7 @@ object MainForm: TMainForm
           'Header, Data and Indexes'
           'All'
         )
-        OnCloseUp = StatisticsTabShow
+        OnCloseUp = StatsOptionsCloseUp
         TabOrder = 0
         Text = 'Header Only'
       end
@@ -1565,6 +1566,7 @@ object MainForm: TMainForm
       Caption = 'Server'
       ClientHeight = 474
       ClientWidth = 909
+      OnHide = ServerTabHide
       OnShow = ServerTabShow
       object Panel1: TPanel
         Left = 0
@@ -1972,6 +1974,242 @@ object MainForm: TMainForm
         end
       end
     end
+    object RepairTab: TTabSheet
+      Caption = 'Database Repair'
+      ClientHeight = 474
+      ClientWidth = 909
+      object SelectRepairAction: TComboBox
+        Left = 656
+        Height = 27
+        Top = 8
+        Width = 200
+        Anchors = [akTop, akRight]
+        ItemHeight = 0
+        ItemIndex = 0
+        Items.Strings = (
+          'Database Sweep'
+          'Online Validation'
+          'Full Validation'
+        )
+        TabOrder = 0
+        Text = 'Database Sweep'
+      end
+      object ValidationReport: TMemo
+        Left = 8
+        Height = 420
+        Top = 40
+        Width = 892
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        Lines.Strings = (
+          'ValidationReport'
+        )
+        ScrollBars = ssAutoBoth
+        TabOrder = 1
+      end
+      object Label37: TLabel
+        Left = 8
+        Height = 14
+        Top = 24
+        Width = 101
+        Caption = 'Validation Report'
+        ParentColor = False
+      end
+      object Button2: TButton
+        Left = 864
+        Height = 25
+        Top = 9
+        Width = 35
+        Action = RunRepair
+        Anchors = [akTop, akRight]
+        TabOrder = 2
+      end
+    end
+    object LimboTab: TTabSheet
+      Caption = 'Limbo Transactions'
+      ClientHeight = 474
+      ClientWidth = 909
+      OnHide = LimboTabHide
+      OnShow = LimboTabShow
+      object Label38: TLabel
+        Left = 12
+        Height = 14
+        Top = 8
+        Width = 74
+        Caption = 'Transactions'
+        ParentColor = False
+      end
+      object IBDynamicGrid3: TIBDynamicGrid
+        Left = 13
+        Height = 242
+        Top = 24
+        Width = 875
+        Anchors = [akTop, akLeft, akRight]
+        Color = clWindow
+        Columns = <        
+          item
+            ReadOnly = True
+            Title.Alignment = taCenter
+            Title.Caption = 'ID'
+            Width = 60
+            FieldName = 'TransactionID'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            ReadOnly = True
+            Title.Alignment = taCenter
+            Title.Caption = 'Type'
+            Width = 80
+            FieldName = 'TransactionType'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            ReadOnly = True
+            Title.Alignment = taCenter
+            Title.Caption = 'Host Site'
+            Width = 100
+            FieldName = 'HostSite'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            ReadOnly = True
+            Title.Alignment = taCenter
+            Title.Caption = 'Remote Site'
+            Width = 100
+            FieldName = 'RemoteSite'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            ReadOnly = True
+            Title.Alignment = taCenter
+            Title.Caption = 'Database Path'
+            Width = 150
+            FieldName = 'DatabasePath'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            ReadOnly = True
+            Title.Alignment = taCenter
+            Title.Caption = 'State'
+            Width = 80
+            FieldName = 'State'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            ReadOnly = True
+            Title.Alignment = taCenter
+            Title.Caption = 'Rec. Action'
+            Width = 100
+            FieldName = 'RecommendedAction'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            PickList.Strings = (
+              'Commit'
+              'Rollback'
+            )
+            Title.Alignment = taCenter
+            Title.Caption = 'Req. Action'
+            Width = 100
+            FieldName = 'RequestedAction'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
+        DataSource = LimboListSource
+        Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+        Scrollbars = ssAutoVertical
+        TabOrder = 0
+        ExpandEditorPanelBelowRow = False
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
+      end
+      object Button3: TButton
+        Left = 13
+        Height = 25
+        Top = 440
+        Width = 100
+        Action = CommitAll
+        Anchors = [akLeft, akBottom]
+        TabOrder = 1
+      end
+      object Button4: TButton
+        Left = 125
+        Height = 25
+        Top = 440
+        Width = 100
+        Action = RollbackAll
+        Anchors = [akLeft, akBottom]
+        TabOrder = 2
+      end
+      object Button5: TButton
+        Left = 230
+        Height = 25
+        Top = 440
+        Width = 127
+        Action = Commit2Phase
+        Anchors = [akLeft, akBottom]
+        TabOrder = 3
+      end
+      object Button6: TButton
+        Left = 365
+        Height = 25
+        Top = 440
+        Width = 144
+        Action = ApplySelected
+        Anchors = [akLeft, akBottom]
+        TabOrder = 4
+      end
+      object Label39: TLabel
+        Left = 17
+        Height = 14
+        Top = 280
+        Width = 104
+        Caption = 'Resolution Report'
+        ParentColor = False
+      end
+      object LimboReport: TMemo
+        Left = 16
+        Height = 134
+        Top = 296
+        Width = 872
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        Lines.Strings = (
+          'LimboReport'
+        )
+        TabOrder = 5
+      end
+    end
   end
   object MainMenu1: TMainMenu
     left = 712
@@ -2018,13 +2256,15 @@ object MainForm: TMainForm
     object Backup: TAction
       Category = 'General'
       Caption = 'Backup'
-      ImageIndex = 0
+      Hint = 'Backup Database to Archive File'
+      ImageIndex = 1
       OnExecute = BackupExecute
     end
     object Restore: TAction
       Category = 'General'
       Caption = 'Restore'
-      ImageIndex = 1
+      Hint = 'Restore Database From Archive'
+      ImageIndex = 0
       OnExecute = RestoreExecute
     end
     object OpenDatabase: TAction
@@ -2109,6 +2349,35 @@ object MainForm: TMainForm
       Caption = 'Disconnect'
       OnExecute = DisconnectAttachmentExecute
       OnUpdate = DisconnectAttachmentUpdate
+    end
+    object RunRepair: TAction
+      Category = 'Repair'
+      Caption = 'Run'
+      OnExecute = RunRepairExecute
+    end
+    object CommitAll: TAction
+      Category = 'Limbo'
+      Caption = 'Commit All'
+      OnExecute = CommitAllExecute
+      OnUpdate = CommitAllUpdate
+    end
+    object RollbackAll: TAction
+      Category = 'Limbo'
+      Caption = 'Rollback All'
+      OnExecute = RollbackAllExecute
+      OnUpdate = CommitAllUpdate
+    end
+    object Commit2Phase: TAction
+      Category = 'Limbo'
+      Caption = 'Commit 2 Phase All'
+      OnExecute = Commit2PhaseExecute
+      OnUpdate = CommitAllUpdate
+    end
+    object ApplySelected: TAction
+      Category = 'Limbo'
+      Caption = 'Apply Selected Action'
+      OnExecute = ApplySelectedExecute
+      OnUpdate = CommitAllUpdate
     end
   end
   object MenuImages: TImageList
@@ -2248,22 +2517,22 @@ object MainForm: TMainForm
   end
   object CharSetSource: TDataSource
     DataSet = DatabaseData.CharSetLookup
-    left = 48
-    top = 360
+    left = 552
+    top = 240
   end
   object SecFiles: TDataSource
     DataSet = DatabaseData.DBSecFiles
-    left = 40
-    top = 472
+    left = 552
+    top = 376
   end
   object DBCharSetSource: TDataSource
     DataSet = DatabaseData.DBCharSet
-    left = 48
-    top = 416
+    left = 552
+    top = 304
   end
   object DatabaseSource: TDataSource
     DataSet = DatabaseData.DatabaseQuery
-    left = 512
+    left = 560
     top = 448
   end
   object IBDatabaseInfo: TIBDatabaseInfo
@@ -2278,8 +2547,8 @@ object MainForm: TMainForm
   end
   object ShadowSource: TDataSource
     DataSet = DatabaseData.ShadowFiles
-    left = 360
-    top = 408
+    left = 424
+    top = 400
   end
   object SynSQLSyn1: TSynSQLSyn
     DefaultFilter = 'SQL Files (*.sql)|*.sql'
@@ -2314,22 +2583,22 @@ object MainForm: TMainForm
   end
   object UserListSource: TDataSource
     DataSet = DatabaseData.UserList
-    left = 304
-    top = 368
+    left = 416
+    top = 328
   end
   object RoleSource: TDataSource
     DataSet = DatabaseData.RoleNameList
-    left = 864
-    top = 160
+    left = 416
+    top = 272
   end
   object UserTagsSource: TDataSource
     DataSet = DatabaseData.UserTags
-    left = 880
-    top = 400
+    left = 416
+    top = 224
   end
   object UserPopup: TPopupMenu
-    left = 325
-    top = 255
+    left = 840
+    top = 296
     object MenuItem11: TMenuItem
       Action = AddUser
     end
@@ -2355,8 +2624,8 @@ object MainForm: TMainForm
   end
   object AttachSource: TDataSource
     DataSet = DatabaseData.Attachments
-    left = 364
-    top = 84
+    left = 552
+    top = 112
   end
   object AttmtTimer: TTimer
     Enabled = False
@@ -2366,13 +2635,18 @@ object MainForm: TMainForm
     top = 64
   end
   object AttmtPopup: TPopupMenu
-    left = 407
-    top = 312
+    left = 840
+    top = 240
     object MenuItem17: TMenuItem
       Action = ToggleAutoRefresh
     end
     object MenuItem18: TMenuItem
       Action = DisconnectAttachment
     end
+  end
+  object LimboListSource: TDataSource
+    DataSet = DatabaseData.InLimboList
+    left = 552
+    top = 176
   end
 end
