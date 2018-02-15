@@ -16,6 +16,8 @@ type
     Button1: TButton;
     Button2: TButton;
     DeActivateIndexes: TCheckBox;
+    PageBuffers: TEdit;
+    Label6: TLabel;
     NoDBTriggersOnRestore: TCheckBox;
     NoShadow: TCheckBox;
     NoValidityCheck: TCheckBox;
@@ -49,7 +51,7 @@ type
     procedure DoRestore(Data: PtrInt);
   public
     { public declarations }
-     function ShowModal(DefaultPageSize: integer): TModalResult;
+     function ShowModal(DefaultPageSize, DefaultNumBuffers: integer): TModalResult;
  end;
 
 var
@@ -104,9 +106,11 @@ begin
   MessageDlg('Restore Completed',mtInformation,[mbOK],0);
 end;
 
-function TRestoreDlg.ShowModal(DefaultPageSize: integer): TModalResult;
+function TRestoreDlg.ShowModal(DefaultPageSize, DefaultNumBuffers: integer
+  ): TModalResult;
 begin
   PageSize.Text := IntToStr(DefaultPageSize);
+  PageBuffers.Text := IntToStr(DefaultNumBuffers);
   Result := inherited ShowModal;
 end;
 
@@ -120,6 +124,7 @@ begin
     RadioButton2.Checked := true;
   DBName.Text := IBRestoreService1.DatabaseName[0];
   IBRestoreService1.BackupFile.Clear;
+  SourceArchive.SetFocus;
 end;
 
 procedure TRestoreDlg.ReportTabShow(Sender: TObject);
@@ -144,6 +149,7 @@ begin
         BackupFileLocation := flClientSide;
       BackupFile.Add(SourceArchive.Text);
       PageSize := StrToInt(self.PageSize.Text);
+      PageBuffers := StrToInt(self.PageBuffers.Text);
       Options := [Replace];
       if DeactivateIndexes.Checked then
         Options := Options + [IBServices.DeactivateIndexes];

@@ -64,11 +64,11 @@ object MainForm: TMainForm
     Height = 506
     Top = 26
     Width = 915
-    ActivePage = AttachmentsTab
+    ActivePage = UserManagerTab
     Align = alClient
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 2
+    TabIndex = 6
     TabOrder = 2
     object Properties: TTabSheet
       Caption = 'Properties'
@@ -213,6 +213,7 @@ object MainForm: TMainForm
           Width = 264
           DataField = 'RDB$CHARACTER_SET_NAME'
           DataSource = DBCharSetSource
+          ReadOnly = True
           CharCase = ecNormal
           MaxLength = 0
           TabOrder = 6
@@ -892,9 +893,9 @@ object MainForm: TMainForm
         DefaultPositionAtEnd = False
       end
       object AttDetailsPanel: TPanel
-        Left = 74
+        Left = 32
         Height = 60
-        Top = 164
+        Top = 88
         Width = 628
         BevelInner = bvLowered
         ClientHeight = 60
@@ -938,44 +939,6 @@ object MainForm: TMainForm
           MaxLength = 0
           TabOrder = 1
         end
-        object Label33: TLabel
-          Left = 171
-          Height = 14
-          Top = 14
-          Width = 78
-          Caption = 'Auth Method'
-          ParentColor = False
-        end
-        object Label34: TLabel
-          Left = 152
-          Height = 14
-          Top = 36
-          Width = 97
-          Caption = 'Remote OS User'
-          ParentColor = False
-        end
-        object DBEdit5: TDBEdit
-          Left = 258
-          Height = 24
-          Top = 8
-          Width = 64
-          DataField = 'MON$AUTH_METHOD'
-          DataSource = AttachSource
-          CharCase = ecNormal
-          MaxLength = 0
-          TabOrder = 2
-        end
-        object DBEdit6: TDBEdit
-          Left = 259
-          Height = 24
-          Top = 32
-          Width = 61
-          DataField = 'MON$REMOTE_OS_USER'
-          DataSource = AttachSource
-          CharCase = ecNormal
-          MaxLength = 0
-          TabOrder = 3
-        end
         object DBCheckBox1: TDBCheckBox
           Left = 348
           Height = 23
@@ -984,7 +947,7 @@ object MainForm: TMainForm
           Caption = 'Garbage Collection Allowed'
           DataField = 'MON$GARBAGE_COLLECTION'
           DataSource = AttachSource
-          TabOrder = 4
+          TabOrder = 2
           ValueChecked = '1'
           ValueUnchecked = '0'
         end
@@ -1005,7 +968,55 @@ object MainForm: TMainForm
           DataSource = AttachSource
           CharCase = ecNormal
           MaxLength = 0
-          TabOrder = 5
+          TabOrder = 3
+        end
+        object AttmntODS12Panel: TPanel
+          Left = 154
+          Height = 56
+          Top = 2
+          Width = 183
+          BevelOuter = bvNone
+          ClientHeight = 56
+          ClientWidth = 183
+          TabOrder = 4
+          object AuthMethLabel: TLabel
+            Left = 8
+            Height = 14
+            Top = 12
+            Width = 78
+            Caption = 'Auth Method'
+            ParentColor = False
+          end
+          object RemoteOSLabel: TLabel
+            Left = 8
+            Height = 14
+            Top = 34
+            Width = 97
+            Caption = 'Remote OS User'
+            ParentColor = False
+          end
+          object AuthMethod: TDBEdit
+            Left = 111
+            Height = 24
+            Top = 6
+            Width = 64
+            DataField = 'MON$AUTH_METHOD'
+            DataSource = AttachSource
+            CharCase = ecNormal
+            MaxLength = 0
+            TabOrder = 0
+          end
+          object RemoteOSUser: TDBEdit
+            Left = 112
+            Height = 24
+            Top = 30
+            Width = 63
+            DataField = 'MON$REMOTE_OS_USER'
+            DataSource = AttachSource
+            CharCase = ecNormal
+            MaxLength = 0
+            TabOrder = 1
+          end
         end
       end
     end
@@ -1637,11 +1648,11 @@ object MainForm: TMainForm
         end
       end
     end
-    object FB3UserManager: TTabSheet
+    object UserManagerTab: TTabSheet
       Caption = 'User Manager'
       ClientHeight = 474
       ClientWidth = 909
-      OnShow = FB3UserManagerShow
+      OnShow = UserManagerTabShow
       object Panel4: TPanel
         Left = 0
         Height = 474
@@ -1826,6 +1837,7 @@ object MainForm: TMainForm
           Color = clWindow
           Columns = <          
             item
+              ButtonStyle = cbsCheckboxColumn
               Title.Caption = ''
               Width = 30
               FieldName = 'GRANTED'

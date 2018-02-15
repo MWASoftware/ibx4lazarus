@@ -15,6 +15,37 @@ type
 
   TDatabaseData = class(TDataModule)
     ApplicationProperties1: TApplicationProperties;
+    AttachmentsMONATTACHMENT_ID: TIBLargeIntField;
+    AttachmentsMONATTACHMENT_NAME: TIBStringField;
+    AttachmentsMONAUTH_METHOD: TIBStringField;
+    AttachmentsMONCHARACTER_SET_ID: TIBSmallintField;
+    AttachmentsMONCLIENT_VERSION: TIBStringField;
+    AttachmentsMONGARBAGE_COLLECTION: TIBSmallintField;
+    AttachmentsMONREMOTE_ADDRESS: TIBStringField;
+    AttachmentsMONREMOTE_HOST: TIBStringField;
+    AttachmentsMONREMOTE_OS_USER: TIBStringField;
+    AttachmentsMONREMOTE_PID: TIBIntegerField;
+    AttachmentsMONREMOTE_PROCESS: TIBStringField;
+    AttachmentsMONREMOTE_PROTOCOL: TIBStringField;
+    AttachmentsMONREMOTE_VERSION: TIBStringField;
+    AttachmentsMONROLE: TIBStringField;
+    AttachmentsMONSERVER_PID: TIBIntegerField;
+    AttachmentsMONSTATE: TIBSmallintField;
+    AttachmentsMONSTAT_ID: TIBIntegerField;
+    AttachmentsMONSYSTEM_FLAG: TIBSmallintField;
+    AttachmentsMONTIMESTAMP: TDateTimeField;
+    AttachmentsMONUSER: TIBStringField;
+    AttachmentsRDBBYTES_PER_CHARACTER: TIBSmallintField;
+    AttachmentsRDBCHARACTER_SET_ID: TIBSmallintField;
+    AttachmentsRDBCHARACTER_SET_NAME: TIBStringField;
+    AttachmentsRDBDEFAULT_COLLATE_NAME: TIBStringField;
+    AttachmentsRDBDESCRIPTION: TIBMemoField;
+    AttachmentsRDBFORM_OF_USE: TIBStringField;
+    AttachmentsRDBFUNCTION_NAME: TIBStringField;
+    AttachmentsRDBNUMBER_OF_CHARACTERS: TIBIntegerField;
+    AttachmentsRDBOWNER_NAME: TIBStringField;
+    AttachmentsRDBSECURITY_CLASS: TIBStringField;
+    AttachmentsRDBSYSTEM_FLAG: TIBSmallintField;
     CharSetLookup: TIBQuery;
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
@@ -129,6 +160,7 @@ type
     procedure GetDBFlags;
     function GetDBOwner: string;
     function GetDBReadOnly: boolean;
+    function GetEmbeddedMode: boolean;
     function GetForcedWrites: boolean;
     function GetLingerDelay: string;
     function GetNoReserve: boolean;
@@ -172,6 +204,7 @@ type
     property SweepInterval: integer read GetSweepInterval write SetSweepInterval;
     property SecurityDatabase: string read GetSecurityDatabase;
     property AuthMethod: string read GetAuthMethod;
+    property EmbeddedMode: boolean read GetEmbeddedMode;
     property RoleName: string read GetRoleName;
     property DBOwner: string read GetDBOwner;
     property AfterDBConnect: TNotifyEvent read FAfterDBConnect write FAfterDBConnect;
@@ -414,6 +447,11 @@ begin
   Result := DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$READ_ONLY').AsInteger  <> 0);
 end;
 
+function TDatabaseData.GetEmbeddedMode: boolean;
+begin
+  Result := IBServerProperties1.Active and (IBServerProperties1.Protocol = Local);
+end;
+
 function TDatabaseData.GetForcedWrites: boolean;
 begin
   Result := DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$FORCED_WRITES').AsInteger  <> 0);
@@ -647,12 +685,14 @@ end;
 
 procedure TDatabaseData.RestoreDatabase;
 var DefaultPageSize: integer;
+    DefaultNumBuffers: integer;
 begin
   DefaultPageSize := DatabaseQuery.FieldByName('MON$PAGE_SIZE').AsInteger;
+  DefaultNumBuffers := DatabaseQuery.FieldByName('MON$PAGE_BUFFERS').AsInteger;
   ActivateService(RestoreDlg.IBRestoreService1);
   IBDatabase1.Connected := false;
   try
-    RestoreDlg.ShowModal(DefaultPageSize);
+    RestoreDlg.ShowModal(DefaultPageSize,DefaultNumBuffers);
   finally
     IBDatabase1.Connected := true;
   end;
@@ -745,7 +785,10 @@ begin
      DoSweep;
 
    1: {Online Validation }
-     DoValidation(IBOnlineValidationService1,'Online');
+     if IBDatabaseInfo.ODSMajorVersion < 12 then
+       MessageDlg('This function is not available for Firebird versions < 3',mtError,[mbOK],0)
+     else
+       DoValidation(IBOnlineValidationService1,'Online');
 
    2: {Full Validation}
      begin
@@ -1304,6 +1347,30 @@ begin
     begin
       IBDatabase1.Connected := false;
       raise Exception.Create('This application requires Firebird 2.1 or later');
+    end
+    else
+    if ODSMajorVersion < 12 then
+    {Don't expect to be able to find these fields}
+    begin
+      AttachmentsMONCLIENT_VERSION.FieldKind := fkCalculated;
+      AttachmentsMONREMOTE_VERSION.FieldKind := fkCalculated;
+      AttachmentsMONREMOTE_HOST.FieldKind := fkCalculated;
+      AttachmentsMONREMOTE_OS_USER.FieldKind := fkCalculated;
+      AttachmentsMONAUTH_METHOD.FieldKind := fkCalculated;
+      AttachmentsMONSYSTEM_FLAG.FieldKind := fkCalculated;
+      AttachmentsRDBSECURITY_CLASS.FieldKind := fkCalculated;
+      AttachmentsRDBOWNER_NAME.FieldKind := fkCalculated;
+    end
+    else
+    begin
+      AttachmentsMONCLIENT_VERSION.FieldKind := fkData;
+      AttachmentsMONREMOTE_VERSION.FieldKind := fkData;
+      AttachmentsMONREMOTE_HOST.FieldKind := fkData;
+      AttachmentsMONREMOTE_OS_USER.FieldKind := fkData;
+      AttachmentsMONAUTH_METHOD.FieldKind := fkData;
+      AttachmentsMONSYSTEM_FLAG.FieldKind := fkData;
+      AttachmentsRDBSECURITY_CLASS.FieldKind := fkData;
+      AttachmentsRDBOWNER_NAME.FieldKind := fkData;
     end;
 
   FLocalConnect := FProtocol = Local;

@@ -109,7 +109,7 @@ object RestoreDlg: TRestoreDlg
         Height = 24
         Top = 208
         Width = 364
-        TabOrder = 4
+        TabOrder = 6
       end
       object SpeedButton1: TSpeedButton
         Left = 384
@@ -168,11 +168,11 @@ object RestoreDlg: TRestoreDlg
         Top = 160
         Width = 104
         NumbersOnly = True
-        TabOrder = 5
+        TabOrder = 4
         Text = 'PageSize'
       end
       object Label5: TLabel
-        Left = 130
+        Left = 120
         Height = 14
         Top = 165
         Width = 33
@@ -185,7 +185,7 @@ object RestoreDlg: TRestoreDlg
         Top = 241
         Width = 139
         Caption = 'Deactivate Indexes'
-        TabOrder = 6
+        TabOrder = 7
       end
       object NoDBTriggersOnRestore: TCheckBox
         Left = 17
@@ -193,7 +193,7 @@ object RestoreDlg: TRestoreDlg
         Top = 264
         Width = 220
         Caption = 'No Database Triggers On Restore'
-        TabOrder = 7
+        TabOrder = 8
       end
       object NoShadow: TCheckBox
         Left = 17
@@ -201,7 +201,7 @@ object RestoreDlg: TRestoreDlg
         Top = 288
         Width = 286
         Caption = 'Do not recreate shadow files during restore'
-        TabOrder = 8
+        TabOrder = 9
       end
       object NoValidityCheck: TCheckBox
         Left = 17
@@ -209,7 +209,7 @@ object RestoreDlg: TRestoreDlg
         Top = 312
         Width = 316
         Caption = 'Do not enforce validity conditions during restore'
-        TabOrder = 9
+        TabOrder = 10
       end
       object OneRelationAtATime: TCheckBox
         Left = 17
@@ -217,7 +217,7 @@ object RestoreDlg: TRestoreDlg
         Top = 336
         Width = 303
         Caption = 'Commit after completing restore of each table'
-        TabOrder = 10
+        TabOrder = 11
       end
       object RestoreMetaDataOnly: TCheckBox
         Left = 17
@@ -225,7 +225,7 @@ object RestoreDlg: TRestoreDlg
         Top = 360
         Width = 160
         Caption = 'Restore MetaData Only'
-        TabOrder = 11
+        TabOrder = 12
       end
       object UseAllSpace: TCheckBox
         Left = 17
@@ -233,7 +233,24 @@ object RestoreDlg: TRestoreDlg
         Top = 384
         Width = 397
         Caption = 'Do not reserve 20% of each data page for future rec. versions'
-        TabOrder = 12
+        TabOrder = 13
+      end
+      object Label6: TLabel
+        Left = 197
+        Height = 14
+        Top = 144
+        Width = 122
+        Caption = 'No. of Cache Buffers'
+        ParentColor = False
+      end
+      object PageBuffers: TEdit
+        Left = 197
+        Height = 24
+        Top = 160
+        Width = 107
+        NumbersOnly = True
+        TabOrder = 5
+        Text = 'PageBuffers'
       end
     end
     object ReportTab: TTabSheet
@@ -260,8 +277,8 @@ object RestoreDlg: TRestoreDlg
     DefaultExt = '.gbk'
     Filter = 'Backup Files|*.gbk|All Files|*.*'
     Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
-    left = 288
-    top = 128
+    left = 368
+    top = 24
   end
   object IBRestoreService1: TIBRestoreService
     ServerName = 'localhost'

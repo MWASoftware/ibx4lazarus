@@ -17,8 +17,13 @@ type
 
   TMainForm = class(TForm)
     ApplySelected: TAction;
+    AuthMethLabel: TLabel;
+    AuthMethod: TDBEdit;
     Commit2Phase: TAction;
     DBOwner: TEdit;
+    AttmntODS12Panel: TPanel;
+    RemoteOSLabel: TLabel;
+    RemoteOSUser: TDBEdit;
     SecDatabase: TEdit;
     RollbackAll: TAction;
     CommitAll: TAction;
@@ -47,16 +52,12 @@ type
     DBCheckBox1: TDBCheckBox;
     DBEdit2: TDBEdit;
     DBEdit3: TDBEdit;
-    DBEdit5: TDBEdit;
-    DBEdit6: TDBEdit;
     DBEdit7: TDBEdit;
     DeleteTag: TAction;
     AddTag: TAction;
     AttmtGrid: TIBDynamicGrid;
     Label31: TLabel;
     Label32: TLabel;
-    Label33: TLabel;
-    Label34: TLabel;
     Label35: TLabel;
     MenuItem11: TMenuItem;
     MenuItem12: TMenuItem;
@@ -94,7 +95,7 @@ type
     Edit5: TEdit;
     Edit6: TEdit;
     Edit8: TEdit;
-    FB3UserManager: TTabSheet;
+    UserManagerTab: TTabSheet;
     FilesTab: TTabSheet;
     IBDynamicGrid1: TIBDynamicGrid;
     IBDynamicGrid2: TIBDynamicGrid;
@@ -233,7 +234,7 @@ type
     procedure DisconnectAttachmentUpdate(Sender: TObject);
     procedure DropDatabaseExecute(Sender: TObject);
     procedure DropDatabaseUpdate(Sender: TObject);
-    procedure FB3UserManagerShow(Sender: TObject);
+    procedure UserManagerTabShow(Sender: TObject);
     procedure FilesTabShow(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure IsShadowChkChange(Sender: TObject);
@@ -270,7 +271,7 @@ type
     procedure HandleLoadData(Sender: TObject);
     procedure LoadData;
     procedure DoExtract(Data: PtrInt);
-    procedure ConfigureUserManager;
+    procedure ConfigureForServerVersion;
   public
   end;
 
@@ -552,7 +553,7 @@ begin
   (Sender as TAction).Enabled := IBDatabaseInfo.Database.Connected;
 end;
 
-procedure TMainForm.FB3UserManagerShow(Sender: TObject);
+procedure TMainForm.UserManagerTabShow(Sender: TObject);
 begin
   if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
   UserListSource.DataSet.Active := true;
@@ -712,7 +713,7 @@ end;
 
 procedure TMainForm.HandleDBConnect(Sender: TObject);
 begin
-  ConfigureUserManager;
+  ConfigureForServerVersion;
   PageControl1.ActivePage := Properties;
   ValidationReport.Lines.Clear;
   LimboReport.Lines.Clear;
@@ -721,7 +722,6 @@ end;
 
 procedure TMainForm.HandleLoadData(Sender: TObject);
 begin
-  PageControl1.ActivePage := Properties;
   StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s by %s, using %s security database',
          [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.IBDatabase1.Params.Values['user_name'],
           DatabaseData.AuthMethod, DatabaseData.SecurityDatabase]);
@@ -780,7 +780,7 @@ begin
   end;
 end;
 
-procedure TMainForm.ConfigureUserManager;
+procedure TMainForm.ConfigureForServerVersion;
 var i: integer;
 begin
   if IBDatabaseInfo.ODSMajorVersion >= 12 then
@@ -792,6 +792,10 @@ begin
     UserListSource.DataSet := DatabaseData.UserList;
     TagsHeader.Visible := true;
     TagsGrid.Visible := true;
+    AttmtGrid.Columns[2].Visible := true;
+    AttmntODS12Panel.Visible := true;
+    DBCharacterSet.Visible := true;
+    DBCharSetRO.Visible := false;
   end
   else
   begin
@@ -802,7 +806,12 @@ begin
       UserListSource.DataSet := DatabaseData.LegacyUserList;
       TagsHeader.Visible := false;
       TagsGrid.Visible := false;
+      AttmtGrid.Columns[2].Visible := false;
+      AttmntODS12Panel.Visible := false;
+      DBCharacterSet.Visible := false;
+      DBCharSetRO.Visible := true;
   end;
+  UserManagerTab.TabVisible := not DatabaseData.EmbeddedMode;
 end;
 
 end.

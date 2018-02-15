@@ -500,7 +500,7 @@ object DatabaseData: TDatabaseData
     SQL.Strings = (
       'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
       'P.RDB$USER,RDB$PRIVILEGE,   cast(:USERNAME as VARCHAR(32)) as USERNAME,'
-      'Case When RDB$PRIVILEGE is null then false else true End as GRANTED'
+      'Case When RDB$PRIVILEGE is null then 0 else 1 End as GRANTED'
       'FROM RDB$ROLES r'
       'Left Outer JOIN ('
       'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
@@ -527,14 +527,14 @@ object DatabaseData: TDatabaseData
   end
   object UpdateUserRoles: TIBUpdate
     RefreshSQL.Strings = (
-      'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
-      'P.RDB$USER,RDB$PRIVILEGE,   r.RDB$SECURITY_CLASS, cast(:USERNAME as VARCHAR(32)) as USERNAME,'
-      'Case When RDB$PRIVILEGE is null then false else true End as GRANTED'
+      'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG,'
+      'P.RDB$USER,RDB$PRIVILEGE,   cast(:USERNAME as VARCHAR(32)) as USERNAME,'
+      'Case When RDB$PRIVILEGE is null then 0 else 1 End as GRANTED'
       'FROM RDB$ROLES r'
       'Left Outer JOIN ('
-      'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES '
+      'Select RDB$RELATION_NAME, RDB$PRIVILEGE, RDB$USER  From RDB$USER_PRIVILEGES'
       'Where RDB$USER = :USERNAME and RDB$PRIVILEGE = ''M'''
-      ') P  On P.RDB$RELATION_NAME = r.RDB$ROLE_NAME '
+      ') P  On P.RDB$RELATION_NAME = r.RDB$ROLE_NAME'
       'Where  r.RDB$ROLE_NAME = :RDB$ROLE_NAME'
     )
     OnApplyUpdates = UpdateUserRolesApplyUpdates
@@ -691,6 +691,306 @@ object DatabaseData: TDatabaseData
     DataSetCloseAction = dcDiscardChanges
     left = 280
     top = 433
+    object AttachmentsMONATTACHMENT_ID: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$ATTACHMENT_ID'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsMONSERVER_PID: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'MON$SERVER_PID'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsMONSTATE: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$STATE'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsMONATTACHMENT_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$ATTACHMENT_NAME'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 255
+    end
+    object AttachmentsMONUSER: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$USER'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object AttachmentsMONROLE: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$ROLE'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object AttachmentsMONREMOTE_PROTOCOL: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$REMOTE_PROTOCOL'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 10
+    end
+    object AttachmentsMONREMOTE_ADDRESS: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$REMOTE_ADDRESS'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 255
+    end
+    object AttachmentsMONREMOTE_PID: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'MON$REMOTE_PID'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsMONCHARACTER_SET_ID: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$CHARACTER_SET_ID'
+      Index = 9
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsMONTIMESTAMP: TDateTimeField
+      FieldKind = fkData
+      FieldName = 'MON$TIMESTAMP'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsMONGARBAGE_COLLECTION: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$GARBAGE_COLLECTION'
+      Index = 11
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsMONREMOTE_PROCESS: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$REMOTE_PROCESS'
+      Index = 12
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 255
+    end
+    object AttachmentsMONSTAT_ID: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'MON$STAT_ID'
+      Index = 13
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsMONCLIENT_VERSION: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$CLIENT_VERSION'
+      Index = 14
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 255
+    end
+    object AttachmentsMONREMOTE_VERSION: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$REMOTE_VERSION'
+      Index = 15
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 255
+    end
+    object AttachmentsMONREMOTE_HOST: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$REMOTE_HOST'
+      Index = 16
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 255
+    end
+    object AttachmentsMONREMOTE_OS_USER: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$REMOTE_OS_USER'
+      Index = 17
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 255
+    end
+    object AttachmentsMONAUTH_METHOD: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$AUTH_METHOD'
+      Index = 18
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 255
+    end
+    object AttachmentsMONSYSTEM_FLAG: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$SYSTEM_FLAG'
+      Index = 19
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object AttachmentsRDBCHARACTER_SET_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$CHARACTER_SET_NAME'
+      Index = 20
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object AttachmentsRDBFORM_OF_USE: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$FORM_OF_USE'
+      Index = 21
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object AttachmentsRDBNUMBER_OF_CHARACTERS: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'RDB$NUMBER_OF_CHARACTERS'
+      Index = 22
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsRDBDEFAULT_COLLATE_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$DEFAULT_COLLATE_NAME'
+      Index = 23
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object AttachmentsRDBCHARACTER_SET_ID: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'RDB$CHARACTER_SET_ID'
+      Index = 24
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsRDBSYSTEM_FLAG: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'RDB$SYSTEM_FLAG'
+      Index = 25
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object AttachmentsRDBDESCRIPTION: TIBMemoField
+      FieldKind = fkData
+      FieldName = 'RDB$DESCRIPTION'
+      Index = 26
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      BlobType = ftMemo
+      Size = 8
+      Transliterate = False
+      DisplayTextAsClassName = False
+    end
+    object AttachmentsRDBFUNCTION_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$FUNCTION_NAME'
+      Index = 27
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object AttachmentsRDBBYTES_PER_CHARACTER: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'RDB$BYTES_PER_CHARACTER'
+      Index = 28
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AttachmentsRDBSECURITY_CLASS: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$SECURITY_CLASS'
+      Index = 29
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object AttachmentsRDBOWNER_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$OWNER_NAME'
+      Index = 30
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
   end
   object AttUpdate: TIBUpdate
     OnApplyUpdates = AttUpdateApplyUpdates
