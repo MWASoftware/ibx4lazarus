@@ -356,6 +356,8 @@ begin
   DataSet.FieldByName('UserID').AsInteger := 0;
   DataSet.FieldByName('GroupID').AsInteger := 0;
   DataSet.FieldByName('UserPassword').Clear;
+  RoleNameList.Active := false; {Prevent role assignments until saved}
+  UserTags.Active := false; {ditto}
 end;
 
 procedure TDatabaseData.UserListAfterOpen(DataSet: TDataSet);

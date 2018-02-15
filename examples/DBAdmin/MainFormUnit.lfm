@@ -8,7 +8,7 @@ object MainForm: TMainForm
   ClientWidth = 915
   Menu = MainMenu1
   OnShow = FormShow
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.0.6'
   object ToolBar1: TToolBar
     Left = 0
     Height = 26
@@ -54,14 +54,14 @@ object MainForm: TMainForm
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 22
-    Top = 532
+    Height = 23
+    Top = 531
     Width = 915
     Panels = <>
   end
   object PageControl1: TPageControl
     Left = 0
-    Height = 506
+    Height = 505
     Top = 26
     Width = 915
     ActivePage = UserManagerTab
@@ -72,40 +72,40 @@ object MainForm: TMainForm
     TabOrder = 2
     object Properties: TTabSheet
       Caption = 'Properties'
-      ClientHeight = 474
-      ClientWidth = 909
+      ClientHeight = 477
+      ClientWidth = 907
       OnShow = PropertiesShow
       object Panel7: TPanel
         Left = 0
-        Height = 474
+        Height = 477
         Top = 0
-        Width = 909
+        Width = 907
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 474
-        ClientWidth = 909
+        ClientHeight = 477
+        ClientWidth = 907
         Color = clWindow
         ParentColor = False
         TabOrder = 0
         object Label6: TLabel
           Left = 71
-          Height = 14
+          Height = 15
           Top = 20
-          Width = 39
+          Width = 32
           Caption = 'Server'
           ParentColor = False
         end
         object Label2: TLabel
           Left = 15
-          Height = 14
+          Height = 15
           Top = 52
-          Width = 95
+          Width = 83
           Caption = 'Database Name'
           ParentColor = False
         end
         object DatabaseAliasName: TDBEdit
           Left = 120
-          Height = 24
+          Height = 23
           Top = 47
           Width = 264
           DataField = 'MON$DATABASE_NAME'
@@ -117,15 +117,15 @@ object MainForm: TMainForm
         end
         object Label9: TLabel
           Left = 19
-          Height = 14
+          Height = 15
           Top = 83
-          Width = 91
+          Width = 79
           Caption = 'Connect String'
           ParentColor = False
         end
         object Edit8: TEdit
           Left = 120
-          Height = 24
+          Height = 23
           Top = 80
           Width = 265
           TabOrder = 1
@@ -133,15 +133,15 @@ object MainForm: TMainForm
         end
         object Label1: TLabel
           Left = 40
-          Height = 14
+          Height = 15
           Top = 117
-          Width = 73
+          Width = 65
           Caption = 'ODS Version'
           ParentColor = False
         end
         object Edit2: TEdit
           Left = 120
-          Height = 24
+          Height = 23
           Top = 112
           Width = 266
           ReadOnly = True
@@ -150,15 +150,15 @@ object MainForm: TMainForm
         end
         object Label4: TLabel
           Left = 19
-          Height = 14
+          Height = 15
           Top = 150
-          Width = 91
+          Width = 80
           Caption = 'Svr Version No.'
           ParentColor = False
         end
         object Edit5: TEdit
           Left = 120
-          Height = 24
+          Height = 23
           Top = 144
           Width = 266
           ReadOnly = True
@@ -167,15 +167,15 @@ object MainForm: TMainForm
         end
         object Label5: TLabel
           Left = 41
-          Height = 14
+          Height = 15
           Top = 183
-          Width = 69
+          Width = 60
           Caption = 'SQL Dialect'
           ParentColor = False
         end
         object Edit6: TEdit
           Left = 120
-          Height = 24
+          Height = 23
           Top = 176
           Width = 266
           ReadOnly = True
@@ -184,31 +184,31 @@ object MainForm: TMainForm
         end
         object Label24: TLabel
           Left = 51
-          Height = 14
+          Height = 15
           Top = 211
-          Width = 60
+          Width = 53
           Caption = 'DB Owner'
           ParentColor = False
         end
         object Label18: TLabel
           Left = 24
-          Height = 14
+          Height = 15
           Top = 244
-          Width = 86
+          Width = 72
           Caption = 'Sec. Database'
           ParentColor = False
         end
         object Label13: TLabel
           Left = 28
-          Height = 14
+          Height = 15
           Top = 277
-          Width = 83
+          Width = 70
           Caption = 'Character Set'
           ParentColor = False
         end
         object DBCharSetRO: TDBEdit
           Left = 120
-          Height = 24
+          Height = 23
           Top = 272
           Width = 264
           DataField = 'RDB$CHARACTER_SET_NAME'
@@ -220,7 +220,7 @@ object MainForm: TMainForm
         end
         object DBCharacterSet: TIBLookupComboEditBox
           Left = 121
-          Height = 27
+          Height = 23
           Top = 272
           Width = 266
           DataField = 'RDB$CHARACTER_SET_NAME'
@@ -234,73 +234,73 @@ object MainForm: TMainForm
           TabOrder = 5
           AutoInsert = False
           AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          ItemHeight = 0
+          ItemHeight = 15
         end
         object DBIsReadOnly: TCheckBox
           Left = 111
-          Height = 22
+          Height = 19
           Top = 311
-          Width = 84
+          Width = 74
           Caption = 'Read Only'
           OnChange = DBIsReadOnlyChange
           TabOrder = 7
         end
         object DatabaseOnline: TCheckBox
           Left = 111
-          Height = 22
+          Height = 19
           Top = 335
-          Width = 62
+          Width = 55
           Caption = 'Online'
           OnChange = DatabaseOnlineChange
           TabOrder = 8
         end
         object SyncWrites: TCheckBox
           Left = 111
-          Height = 22
+          Height = 19
           Top = 359
-          Width = 173
+          Width = 150
           Caption = 'Synchronous Disk Writes'
           OnChange = SyncWritesChange
           TabOrder = 9
         end
         object IsShadowChk: TCheckBox
           Left = 111
-          Height = 22
+          Height = 19
           Top = 383
-          Width = 132
+          Width = 113
           Caption = 'Shadow Database'
           OnChange = IsShadowChkChange
           TabOrder = 10
         end
         object NoReserve: TCheckBox
           Left = 111
-          Height = 22
+          Height = 19
           Top = 407
-          Width = 239
+          Width = 206
           Caption = 'Space Reserved for Backup Records'
           OnChange = NoReserveChange
           TabOrder = 11
         end
         object AutoAdmin: TCheckBox
           Left = 112
-          Height = 22
+          Height = 19
           Top = 432
-          Width = 151
+          Width = 136
           Caption = 'Auto Admin Mapping'
           OnChange = AutoAdminChange
           TabOrder = 12
         end
         object Label11: TLabel
           Left = 435
-          Height = 14
+          Height = 15
           Top = 26
-          Width = 93
+          Width = 84
           Caption = 'Pages Allocated'
           ParentColor = False
         end
         object AllocatedPages: TEdit
           Left = 533
-          Height = 24
+          Height = 23
           Top = 20
           Width = 89
           Alignment = taRightJustify
@@ -310,23 +310,23 @@ object MainForm: TMainForm
         end
         object Label19: TLabel
           Left = 472
-          Height = 14
+          Height = 15
           Top = 57
-          Width = 56
+          Width = 49
           Caption = 'Page Size'
           ParentColor = False
         end
         object Label3: TLabel
           Left = 460
-          Height = 14
+          Height = 15
           Top = 88
-          Width = 68
+          Width = 60
           Caption = 'Pages Used'
           ParentColor = False
         end
         object PagesUsed: TEdit
           Left = 533
-          Height = 24
+          Height = 23
           Top = 82
           Width = 89
           Alignment = taRightJustify
@@ -336,15 +336,15 @@ object MainForm: TMainForm
         end
         object Label10: TLabel
           Left = 438
-          Height = 14
+          Height = 15
           Top = 119
-          Width = 90
+          Width = 82
           Caption = 'Pages Available'
           ParentColor = False
         end
         object PagesAvail: TEdit
           Left = 533
-          Height = 24
+          Height = 23
           Top = 113
           Width = 89
           Alignment = taRightJustify
@@ -354,15 +354,15 @@ object MainForm: TMainForm
         end
         object Label12: TLabel
           Left = 430
-          Height = 14
+          Height = 15
           Top = 150
-          Width = 98
+          Width = 88
           Caption = 'Current Memory'
           ParentColor = False
         end
         object Edit10: TEdit
           Left = 533
-          Height = 24
+          Height = 23
           Top = 144
           Width = 89
           Alignment = taRightJustify
@@ -372,31 +372,31 @@ object MainForm: TMainForm
         end
         object Label20: TLabel
           Left = 632
-          Height = 14
+          Height = 15
           Top = 57
-          Width = 33
+          Width = 28
           Caption = 'bytes'
           ParentColor = False
         end
         object Label21: TLabel
           Left = 632
-          Height = 14
+          Height = 15
           Top = 149
-          Width = 33
+          Width = 28
           Caption = 'bytes'
           ParentColor = False
         end
         object Label14: TLabel
           Left = 452
-          Height = 14
+          Height = 15
           Top = 181
-          Width = 76
+          Width = 70
           Caption = 'Max Memory'
           ParentColor = False
         end
         object Edit11: TEdit
           Left = 533
-          Height = 24
+          Height = 23
           Top = 175
           Width = 89
           Alignment = taRightJustify
@@ -406,23 +406,23 @@ object MainForm: TMainForm
         end
         object Label22: TLabel
           Left = 632
-          Height = 14
+          Height = 15
           Top = 182
-          Width = 33
+          Width = 28
           Caption = 'bytes'
           ParentColor = False
         end
         object Label15: TLabel
           Left = 447
-          Height = 14
+          Height = 15
           Top = 212
-          Width = 81
+          Width = 73
           Caption = 'No. of Buffers'
           ParentColor = False
         end
         object Edit12: TEdit
           Left = 533
-          Height = 24
+          Height = 23
           Top = 206
           Width = 89
           Alignment = taRightJustify
@@ -432,15 +432,15 @@ object MainForm: TMainForm
         end
         object Label23: TLabel
           Left = 430
-          Height = 14
+          Height = 15
           Top = 245
-          Width = 100
+          Width = 86
           Caption = 'Date DB Created'
           ParentColor = False
         end
         object DBEdit1: TDBEdit
           Left = 533
-          Height = 24
+          Height = 23
           Top = 240
           Width = 132
           DataField = 'MON$CREATION_DATE'
@@ -452,15 +452,15 @@ object MainForm: TMainForm
         end
         object Label16: TLabel
           Left = 453
-          Height = 14
+          Height = 15
           Top = 317
-          Width = 75
+          Width = 65
           Caption = 'Linger Delay'
           ParentColor = False
         end
         object LingerDelay: TEdit
           Left = 533
-          Height = 24
+          Height = 23
           Top = 311
           Width = 89
           Alignment = taRightJustify
@@ -471,24 +471,24 @@ object MainForm: TMainForm
         end
         object Label17: TLabel
           Left = 632
-          Height = 14
+          Height = 15
           Top = 317
-          Width = 49
+          Width = 43
           Caption = 'seconds'
           ParentColor = False
         end
         object Label7: TLabel
           Left = 400
-          Height = 14
+          Height = 15
           Top = 347
-          Width = 128
+          Width = 108
           Caption = 'S&weep Interval set to'
           FocusControl = SweepInterval
           ParentColor = False
         end
         object SweepInterval: TEdit
           Left = 533
-          Height = 24
+          Height = 23
           Top = 342
           Width = 89
           Alignment = taRightJustify
@@ -499,15 +499,15 @@ object MainForm: TMainForm
         end
         object Label8: TLabel
           Left = 632
-          Height = 14
+          Height = 15
           Top = 347
-          Width = 74
+          Width = 67
           Caption = 'Transactions'
           ParentColor = False
         end
         object DBEdit4: TDBEdit
           Left = 533
-          Height = 24
+          Height = 23
           Top = 52
           Width = 89
           DataField = 'MON$PAGE_SIZE'
@@ -518,7 +518,7 @@ object MainForm: TMainForm
         end
         object Edit1: TEdit
           Left = 121
-          Height = 24
+          Height = 23
           Top = 16
           Width = 263
           TabOrder = 23
@@ -526,7 +526,7 @@ object MainForm: TMainForm
         end
         object SecDatabase: TEdit
           Left = 121
-          Height = 24
+          Height = 23
           Top = 241
           Width = 263
           ReadOnly = True
@@ -535,7 +535,7 @@ object MainForm: TMainForm
         end
         object DBOwner: TEdit
           Left = 120
-          Height = 24
+          Height = 23
           Top = 208
           Width = 264
           ReadOnly = True
@@ -1028,11 +1028,11 @@ object MainForm: TMainForm
       OnShow = StatisticsTabShow
       object StatsOptions: TComboBox
         Left = 667
-        Height = 27
+        Height = 23
         Top = 8
         Width = 228
         Anchors = [akTop, akRight]
-        ItemHeight = 0
+        ItemHeight = 15
         ItemIndex = 0
         Items.Strings = (
           'Header Only'
@@ -1084,7 +1084,7 @@ object MainForm: TMainForm
         ParentColor = False
         ParentFont = False
         TabOrder = 0
-        Gutter.Width = 55
+        Gutter.Width = 57
         Gutter.MouseActions = <>
         RightGutter.Width = 0
         RightGutter.MouseActions = <>
@@ -1542,7 +1542,7 @@ object MainForm: TMainForm
             MouseActions = <>
           end
           object SynGutterLineNumber1: TSynGutterLineNumber
-            Width = 15
+            Width = 17
             MouseActions = <>
             MarkupInfo.Background = clBtnFace
             MarkupInfo.Foreground = clNone
@@ -1650,21 +1650,21 @@ object MainForm: TMainForm
     end
     object UserManagerTab: TTabSheet
       Caption = 'User Manager'
-      ClientHeight = 474
-      ClientWidth = 909
+      ClientHeight = 477
+      ClientWidth = 907
       OnShow = UserManagerTabShow
       object Panel4: TPanel
         Left = 0
-        Height = 474
+        Height = 477
         Top = 0
         Width = 739
         Align = alLeft
-        ClientHeight = 474
+        ClientHeight = 477
         ClientWidth = 739
         TabOrder = 0
         object UserManagerGrid: TIBDynamicGrid
           Left = 1
-          Height = 472
+          Height = 475
           Top = 1
           Width = 737
           Align = alClient
@@ -1814,25 +1814,25 @@ object MainForm: TMainForm
       end
       object Splitter2: TSplitter
         Left = 739
-        Height = 474
+        Height = 477
         Top = 0
         Width = 5
       end
       object Panel3: TPanel
         Left = 744
-        Height = 474
+        Height = 477
         Top = 0
-        Width = 165
+        Width = 163
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 474
-        ClientWidth = 165
+        ClientHeight = 477
+        ClientWidth = 163
         TabOrder = 2
         object IBDynamicGrid4: TIBDynamicGrid
           Left = 0
           Height = 161
           Top = 50
-          Width = 165
+          Width = 163
           Align = alTop
           Color = clWindow
           Columns = <          
@@ -1870,19 +1870,19 @@ object MainForm: TMainForm
         object Panel5: TPanel
           Left = 0
           Height = 61
-          Top = 413
-          Width = 165
+          Top = 416
+          Width = 163
           Align = alBottom
           BevelInner = bvLowered
           BevelOuter = bvLowered
           ClientHeight = 61
-          ClientWidth = 165
+          ClientWidth = 163
           TabOrder = 1
           object Button1: TButton
             Left = 16
             Height = 28
             Top = 16
-            Width = 138
+            Width = 136
             Action = SaveChanges
             Anchors = [akTop, akLeft, akRight]
             TabOrder = 0
@@ -1892,27 +1892,27 @@ object MainForm: TMainForm
           Left = 0
           Height = 50
           Top = 0
-          Width = 165
+          Width = 163
           Align = alTop
           BevelInner = bvLowered
           BevelOuter = bvLowered
           ClientHeight = 50
-          ClientWidth = 165
+          ClientWidth = 163
           TabOrder = 2
           object DBText1: TDBText
             Left = 10
-            Height = 14
+            Height = 15
             Top = 30
-            Width = 49
+            Width = 43
             DataField = 'USERNAME'
             DataSource = UserListSource
             ParentColor = False
           end
           object Label36: TLabel
             Left = 10
-            Height = 14
+            Height = 15
             Top = 10
-            Width = 104
+            Width = 93
             Caption = 'Roles Assigned to'
             ParentColor = False
           end
@@ -1922,7 +1922,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 5
           Top = 211
-          Width = 165
+          Width = 163
           Align = alTop
           ResizeAnchor = akTop
         end
@@ -1930,7 +1930,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 26
           Top = 216
-          Width = 165
+          Width = 163
           Align = alTop
           BevelInner = bvRaised
           Caption = 'Tags'
@@ -1938,16 +1938,16 @@ object MainForm: TMainForm
         end
         object TagsGrid: TIBDynamicGrid
           Left = 0
-          Height = 166
+          Height = 169
           Top = 242
-          Width = 165
+          Width = 163
           Align = alClient
           Color = clWindow
           Columns = <          
             item
               Title.Alignment = taCenter
               Title.Caption = 'Key'
-              Width = 70
+              Width = 60
               FieldName = 'SEC$KEY'
               AutoSizeColumn = False
               InitialSortColumn = False
@@ -1958,7 +1958,7 @@ object MainForm: TMainForm
             item
               Title.Alignment = taCenter
               Title.Caption = 'Value'
-              Width = 90
+              Width = 60
               FieldName = 'SEC$VALUE'
               AutoSizeColumn = True
               InitialSortColumn = False
@@ -1979,8 +1979,8 @@ object MainForm: TMainForm
           Cursor = crVSplit
           Left = 0
           Height = 5
-          Top = 408
-          Width = 165
+          Top = 411
+          Width = 163
           Align = alBottom
           ResizeAnchor = akBottom
         end
@@ -1992,11 +1992,11 @@ object MainForm: TMainForm
       ClientWidth = 909
       object SelectRepairAction: TComboBox
         Left = 656
-        Height = 27
+        Height = 23
         Top = 8
         Width = 200
         Anchors = [akTop, akRight]
-        ItemHeight = 0
+        ItemHeight = 15
         ItemIndex = 0
         Items.Strings = (
           'Database Sweep'
