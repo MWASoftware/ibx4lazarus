@@ -266,14 +266,12 @@ object DatabaseData: TDatabaseData
     )
     LoginPrompt = False
     TraceFlags = []
-    OnLogin = IBStatisticalService1Login
     Options = [HeaderPages]
     left = 33
     top = 283
   end
   object IBConfigService1: TIBConfigService
     TraceFlags = []
-    OnLogin = IBStatisticalService1Login
     left = 162
     top = 285
   end
@@ -297,14 +295,12 @@ object DatabaseData: TDatabaseData
   end
   object IBServerProperties1: TIBServerProperties
     TraceFlags = []
-    OnLogin = IBStatisticalService1Login
     Options = []
     left = 40
     top = 368
   end
   object IBLogService1: TIBLogService
     TraceFlags = []
-    OnLogin = IBStatisticalService1Login
     left = 162
     top = 368
   end

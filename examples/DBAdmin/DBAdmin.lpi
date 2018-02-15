@@ -41,7 +41,7 @@
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="14">
+    <Units Count="13">
       <Unit0>
         <Filename Value="DBAdmin.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -117,26 +117,19 @@
         <ResourceBaseClass Value="Form"/>
       </Unit10>
       <Unit11>
-        <Filename Value="dlg/ServicesLoginDlgUnit.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="SvcLoginDlg"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit11>
-      <Unit12>
         <Filename Value="dlg/NewUserDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="NewUserDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit12>
-      <Unit13>
+      </Unit11>
+      <Unit12>
         <Filename Value="dlg/ChgPasswordDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ChgPasswordDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit13>
+      </Unit12>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

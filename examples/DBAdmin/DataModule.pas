@@ -110,8 +110,6 @@ type
     procedure IBDatabase1AfterDisconnect(Sender: TObject);
     procedure IBDatabase1BeforeDisconnect(Sender: TObject);
     procedure IBDatabase1Login(Database: TIBDatabase; LoginParams: TStrings);
-    procedure IBStatisticalService1Login(Service: TIBCustomService;
-      LoginParams: TStrings);
     procedure AttUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
     procedure InLimboListAfterOpen(DataSet: TDataSet);
@@ -143,8 +141,6 @@ type
     FISShadowDatabase: boolean;
     FDBUserName: string;
     FDBPassword: string;
-    FServerUserName: string;
-    FServerPassword: string;
     FLocalConnect: boolean;
     FUsersLoading: boolean;
     FLoadingLimboTr: boolean;
@@ -219,7 +215,7 @@ implementation
 {$R *.lfm}
 
 uses DBLoginDlgUnit, IBUtils, FBMessages, IBErrorCodes, ShutdownDatabaseDlgUnit,
-  BackupDlgUnit, RestoreDlgUnit, AddShadowSetDlgUnit, ServicesLoginDlgUnit;
+  BackupDlgUnit, RestoreDlgUnit, AddShadowSetDlgUnit;
 
 const
   sAddSecondarySQL  = 'Alter Database Add File ''%s'' Starting at %d';
@@ -514,16 +510,9 @@ procedure TDatabaseData.ActivateService(aService: TIBCustomService);
     with IBService do
     begin
       Active := false;
-      if FServerPassword <> '' then
-      begin
-        Params.Values['user_name'] := FServerUserName;
-        Params.Values['password'] := FServerPassword;
-      end
-      else
-      begin
-        Params.Values['user_name'] := FDBUserName;
-        Params.Values['password'] := FDBPassword;
-      end;
+      {Use database login user name and password}
+      Params.Values['user_name'] := FDBUserName;
+      Params.Values['password'] := FDBPassword;
 
       if FProtocol <> unknownProtocol then
         Protocol := FProtocol
@@ -532,6 +521,7 @@ procedure TDatabaseData.ActivateService(aService: TIBCustomService);
       PortNo := FPortNo;
       if Protocol = Local then
       begin
+        {If Local we must specify the server as the Localhost}
         ServerName := 'Localhost';
         if not FileExists(DBName) or FileIsReadOnly(DBName) then
           Protocol := TCP; {Use loopback if we can't read/write file}
@@ -566,7 +556,7 @@ begin
     SetupParams(IBServerProperties1,UsingDefaultSecDatabase,FDatabasePathName);
     with IBServerProperties1 do
     begin
-      LoginPrompt := (Protocol <> Local) and (FDBPassword = '') and (FServerPassword = '');
+      LoginPrompt := (Protocol <> Local) and (FDBPassword = '');  {Does this ever occur?}
       repeat
         try
           Active := true;
@@ -660,7 +650,6 @@ end;
 procedure TDatabaseData.Disconnect;
 begin
   FDBPassword := '';
-  FServerPassword := '';
   FLocalConnect := false;
   IBDatabase1.Connected := false;
   IBConfigService1.Active := false;
@@ -1098,21 +1087,6 @@ begin
   end
   else
     IBError(ibxeOperationCancelled, [nil]);
-end;
-
-procedure TDatabaseData.IBStatisticalService1Login(Service: TIBCustomService;
-  LoginParams: TStrings);
-var aUserName,
-    aPassword: string;
-begin
-  aUserName := LoginParams.Values['user_name'];
-  if SvcLoginDlg.ShowModal(Service.ServerName,aUserName,aPassword) = mrOK then
-  begin
-    LoginParams.Values['user_name'] := aUserName;
-    LoginParams.Values['password'] := aPassword;
-    FServerUserName := aUserName;
-    FServerPassword := aPassword;
-  end;
 end;
 
 procedure TDatabaseData.AttUpdateApplyUpdates(Sender: TObject;

@@ -10,7 +10,7 @@ uses
   Forms, memdslaz, MainFormUnit, DataModule, ibexpress,
   DBLoginDlgUnit, ShutdownRegDlgUnit, ShutdownDatabaseDlgUnit, BackupDlgUnit,
   RestoreDlgUnit, AddSecondaryFileDlgUnit, AddShadowSetDlgUnit, AddShadowFileDlgUnit,
-  ServicesLoginDlgUnit, NewUserDlgUnit, ChgPasswordDlgUnit
+  NewUserDlgUnit, ChgPasswordDlgUnit
   { you can add units after this };
 
 {$R *.res}
@@ -28,7 +28,6 @@ begin
   Application.CreateForm(TAddSecondaryFileDlg, AddSecondaryFileDlg);
   Application.CreateForm(TAddShadowFileDlg, AddShadowFileDlg);
   Application.CreateForm(TAddShadowSetDlg, AddShadowSetDlg);
-  Application.CreateForm(TSvcLoginDlg, SvcLoginDlg);
   Application.CreateForm(TNewUserDlg, NewUserDlg);
   Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);
   Application.Run;
