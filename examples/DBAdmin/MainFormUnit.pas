@@ -609,6 +609,8 @@ end;
 
 procedure TMainForm.SaveChangesExecute(Sender: TObject);
 begin
+  if UserTagsSource.DataSet.State in [dsEdit,dsInsert] then
+    UserTagsSource.DataSet.Post;
   if RoleSource.DataSet.State in [dsEdit,dsInsert] then
     RoleSource.DataSet.Post;
   if UserListSource.DataSet.State in [dsEdit,dsInsert] then

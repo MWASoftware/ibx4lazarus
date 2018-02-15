@@ -385,7 +385,7 @@ end;
 
 procedure TDatabaseData.UserTagsAfterInsert(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('SEC$USER_NAME').AsString := UserList.FieldByName('UserName').AsString;
+  DataSet.FieldByName('SEC$USER_NAME').AsString := DataSet.DataSource.DataSet.FieldByName('UserName').AsString;
 end;
 
 procedure TDatabaseData.GetDBFlags;

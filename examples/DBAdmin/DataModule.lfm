@@ -6,7 +6,7 @@ object DatabaseData: TDatabaseData
   Width = 629
   PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -546,7 +546,9 @@ object DatabaseData: TDatabaseData
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
+    AfterDelete = UserListAfterPost
     AfterInsert = UserTagsAfterInsert
+    AfterPost = UserListAfterPost
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserListSource
@@ -580,6 +582,7 @@ object DatabaseData: TDatabaseData
       'Select A.SEC$USER_NAME, A.SEC$KEY, A.SEC$VALUE From '
       'SEC$USER_ATTRIBUTES A'
       'Where SEC$USER_NAME = :SEC$USER_NAME'
+      '  and A.SEC$KEY = :SEC$KEY'
     )
     OnApplyUpdates = TagsUpdateApplyUpdates
     left = 536
