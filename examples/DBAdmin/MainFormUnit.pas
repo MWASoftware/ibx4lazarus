@@ -760,8 +760,9 @@ begin
     end
     else
     begin
-      PagesUsed.Text := '';
-      PagesAvail.Text := '';
+      PagesUsed.Text := 'n/a';
+      PagesAvail.Text := 'n/a';
+      AutoAdmin.Checked :=  false;
     end;
   finally
     FLoading := false;
