@@ -5,11 +5,10 @@ unit MainFormUnit;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, SynGutterBase,
-  SynGutterMarks, SynGutterLineNumber, SynGutterChanges, SynGutter,
+  Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL,
   SynGutterCodeFolding, Forms, Controls, Graphics, Dialogs, Menus, ComCtrls,
   ActnList, StdCtrls, DbCtrls, ExtCtrls, Buttons, db, IBLookupComboEditBox,
-  IBDynamicGrid, IBDatabaseInfo, IBServices, IBExtract, IBQuery;
+  IBDynamicGrid, IBDatabaseInfo, IBServices, IBExtract;
 
 type
 
@@ -188,7 +187,7 @@ type
     Quit: TAction;
     ActionList1: TActionList;
     MainMenu1: TMainMenu;
-    SecFiles: TDataSource;
+    SecDBFilesSource: TDataSource;
     ShadowSource: TDataSource;
     StatisticsTab: TTabSheet;
     StatsMemo: TMemo;
@@ -577,7 +576,7 @@ procedure TMainForm.FilesTabShow(Sender: TObject);
 begin
   if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
   PrimaryDBFile.Text := IBDatabaseInfo.DBFileName;
-  SecFiles.DataSet.Active := true;
+  SecDBFilesSource.DataSet.Active := true;
   ShadowSource.DataSet.Active := true;
 end;
 
@@ -801,7 +800,8 @@ procedure TMainForm.ConfigureForServerVersion;
 var i: integer;
 begin
   if (IBDatabaseInfo.ODSMajorVersion >= 12) and
-     ((DatabaseData.DBUserName = 'SYSDBA') or not DatabaseData.HasUserAdminPrivilege) then
+     ((DatabaseData.DBUserName = 'SYSDBA') or (DatabaseData.RoleName = 'RDB$ADMIN') or
+            not DatabaseData.HasUserAdminPrivilege) then
   begin
     for i in [9,10] do
       UserManagerGrid.Columns[i].Visible := false;

@@ -115,7 +115,6 @@ end;
 
 constructor TShutdownWaitThread.Create(aService: TIBConfigService;
   Options: TShutdownMode; Wait: Integer; OnCompleted: TNotifyEvent);
-var Password: string;
 begin
   inherited Create(false);
   FOptions := Options;

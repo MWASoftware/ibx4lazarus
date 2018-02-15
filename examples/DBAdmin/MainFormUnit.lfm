@@ -627,7 +627,7 @@ object MainForm: TMainForm
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end>
-        DataSource = SecFiles
+        DataSource = SecDBFilesSource
         ReadOnly = True
         Scrollbars = ssAutoVertical
         TabOrder = 1
@@ -2532,7 +2532,7 @@ object MainForm: TMainForm
     left = 552
     top = 240
   end
-  object SecFiles: TDataSource
+  object SecDBFilesSource: TDataSource
     DataSet = DatabaseData.DBSecFiles
     left = 552
     top = 376

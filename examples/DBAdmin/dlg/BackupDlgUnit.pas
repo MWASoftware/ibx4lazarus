@@ -53,8 +53,6 @@ implementation
 
 {$R *.lfm}
 
-uses MainFormUnit;
-
 { TBackupDlg }
 
 procedure TBackupDlg.SpeedButton1Click(Sender: TObject);

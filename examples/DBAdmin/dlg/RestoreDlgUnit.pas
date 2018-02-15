@@ -61,8 +61,6 @@ implementation
 
 {$R *.lfm}
 
-uses MainFormUnit;
-
 { TRestoreDlg }
 
 procedure TRestoreDlg.SpeedButton1Click(Sender: TObject);

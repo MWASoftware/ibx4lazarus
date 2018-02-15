@@ -219,7 +219,7 @@ implementation
 
 {$R *.lfm}
 
-uses DBLoginDlgUnit, IBUtils, FBMessages, IBErrorCodes, ShutdownDatabaseDlgUnit,
+uses DBLoginDlgUnit, IBUtils, FBMessages, ShutdownDatabaseDlgUnit,
   BackupDlgUnit, RestoreDlgUnit, AddShadowSetDlgUnit;
 
 const
@@ -324,7 +324,7 @@ begin
      ExecDDL.SQL.Text := GetAlterPasswordStmt;
      if ExecDDL.SQL.Text <> '' then
        ExecDDL.ExecQuery;
-     exit;
+     Exit;
     end;
 
     case UpdateKind of
@@ -339,6 +339,7 @@ begin
 
   if UpdateKind = ukInsert then
   begin
+    {if new user is also given the admin role then we need to add this}
     if Params.ByName('SEC$ADMIN').AsBoolean then
     begin
       ExecDDL.SQL.Text := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) + ' GRANT ADMIN ROLE';
@@ -893,8 +894,9 @@ end;
 
 function TDatabaseData.GetUserAdminPrivilege: boolean;
 begin
-  Result := IBDatabaseInfo.ODSMajorVersion >= 12;
-  if Result then
+  Result := false;
+  {For ODS 12 use SEC$USERS table}
+  if IBDatabaseInfo.ODSMajorVersion >= 12 then
   with AdminUserQuery do
   begin
     ExecQuery;
@@ -902,6 +904,16 @@ begin
       Result := not EOF and FieldByName('SEC$ADMIN').AsBoolean;
     finally
       Close;
+    end;
+  end
+  {if need to know for ODS 11.2 then will have to use Service API}
+  else
+  begin
+    ActivateService(IBSecurityService1);
+    with IBSecurityService1 do
+    begin
+      DisplayUser(DBUserName);
+      Result := (UserInfoCount > 0) and UserInfo[0].AdminRole;
     end;
   end;
 end;
@@ -1127,6 +1139,7 @@ begin
   aDatabaseName := Database.DatabaseName;
   aUserName := LoginParams.Values['user_name'];
   aPassword := '';
+  aCreateIfNotExist := false;
   if DBLoginDlg.ShowModal(aDatabaseName, aUserName, aPassword, aCreateIfNotExist) = mrOK then
   begin
     FDBPassword := aPassword; {remember for reconnect}
