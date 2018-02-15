@@ -533,7 +533,7 @@ begin
   with AttachSource.DataSet do
   (Sender as TAction).Enabled := Active and (RecordCount > 0)
     and (FieldByName('MON$ATTACHMENT_ID').AsInteger <>
-          FieldByName('CURRENT_CONNECTION').AsInteger);
+          AttmtSource.DataSet.FieldByName('MON$ATTACHMENT_ID').AsInteger);
 end;
 
 procedure TMainForm.DropDatabaseExecute(Sender: TObject);
@@ -716,10 +716,12 @@ begin
   PageControl1.ActivePage := Properties;
   ValidationReport.Lines.Clear;
   LimboReport.Lines.Clear;
+  FLastStatsIndex := -1;
 end;
 
 procedure TMainForm.HandleLoadData(Sender: TObject);
 begin
+  PageControl1.ActivePage := Properties;
   StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s by %s, using %s security database',
          [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.IBDatabase1.Params.Values['user_name'],
           DatabaseData.AuthMethod, DatabaseData.SecurityDatabase]);

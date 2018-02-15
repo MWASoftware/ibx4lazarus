@@ -38,15 +38,6 @@ type
     IBServerProperties1: TIBServerProperties;
     IBStatisticalService1: TIBStatisticalService;
     RoleNameList: TIBQuery;
-    RoleNameListGRANTED: TBooleanField;
-    RoleNameListRDBDESCRIPTION: TIBMemoField;
-    RoleNameListRDBOWNER_NAME: TIBStringField;
-    RoleNameListRDBPRIVILEGE: TIBStringField;
-    RoleNameListRDBROLE_NAME: TIBStringField;
-    RoleNameListRDBSECURITY_CLASS: TIBStringField;
-    RoleNameListRDBSYSTEM_FLAG: TSmallintField;
-    RoleNameListRDBUSER: TIBStringField;
-    RoleNameListUSERNAME: TIBStringField;
     TableNameLookup: TIBQuery;
     TagsUpdate: TIBUpdate;
     UpdateCharSet: TIBUpdate;
@@ -78,6 +69,7 @@ type
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
     procedure AttachmentsAfterDelete(DataSet: TDataSet);
     procedure AttachmentsAfterOpen(DataSet: TDataSet);
+    procedure AttachmentsBeforeOpen(DataSet: TDataSet);
     procedure CurrentTransactionAfterTransactionEnd(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
     procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
@@ -125,6 +117,12 @@ type
     FLocalConnect: boolean;
     FUsersLoading: boolean;
     FLoadingLimboTr: boolean;
+
+    {Parsed results of connectstring;}
+    FServerName: string;
+    FPortNo: string;
+    FProtocol: TProtocolAll;
+    FDatabasePathName: string;
     procedure ActivateService(aService: TIBCustomService);
     function GetAuthMethod: string;
     function GetAutoAdmin: boolean;
@@ -489,7 +487,11 @@ procedure TDatabaseData.ActivateService(aService: TIBCustomService);
         Params.Values['password'] := FDBPassword;
       end;
 
-      Protocol := GetProtocol(IBDatabase1.DatabaseName);
+      if FProtocol <> unknownProtocol then
+        Protocol := FProtocol
+      else
+        Protocol := Local;
+      PortNo := FPortNo;
       if Protocol = Local then
       begin
         ServerName := 'Localhost';
@@ -497,7 +499,7 @@ procedure TDatabaseData.ActivateService(aService: TIBCustomService);
           Protocol := TCP; {Use loopback if we can't read/write file}
       end
       else
-        ServerName := IBDatabaseInfo.DBSiteName;
+        ServerName := FServername;
     end;
     AssignDatabase(IBService,DBName);
 
@@ -523,7 +525,7 @@ begin
   {The server properties service is the base service holding the service interface}
   if not IBServerProperties1.Active then
   begin
-    SetupParams(IBServerProperties1,UsingDefaultSecDatabase,AttmtQuery.FieldByName('MON$ATTACHMENT_NAME').AsString);
+    SetupParams(IBServerProperties1,UsingDefaultSecDatabase,FDatabasePathName);
     with IBServerProperties1 do
     begin
       LoginPrompt := (Protocol <> Local) and (FDBPassword = '') and (FServerPassword = '');
@@ -551,7 +553,7 @@ begin
     Exit;
 
   aService.Assign(IBServerProperties1);
-  AssignDatabase(aService,IBDatabaseInfo.DBFileName);
+  AssignDatabase(aService,FDatabasePathName);
 end;
 
 function TDatabaseData.GetAuthMethod: string;
@@ -612,6 +614,7 @@ begin
       end;
     end;
   until IBDatabase1.Connected;
+
   if assigned(FAfterDBConnect) then
     AfterDBConnect(self);
 end;
@@ -1294,6 +1297,7 @@ end;
 
 procedure TDatabaseData.IBDatabase1AfterConnect(Sender: TObject);
 begin
+  ParseConnectString(IBDatabase1.DatabaseName,FServerName,FDatabasePathName,FProtocol,FPortNo);
   {Virtual tables did not exist prior to Firebird 2.1 - so don't bother with old version}
   with IBDatabaseInfo do
     if (ODSMajorVersion < 11) or ((ODSMajorVersion = 11) and (ODSMinorVersion < 1)) then
@@ -1302,7 +1306,7 @@ begin
       raise Exception.Create('This application requires Firebird 2.1 or later');
     end;
 
-  FLocalConnect := GetProtocol(IBDatabase1.DatabaseName) = Local;
+  FLocalConnect := FProtocol = Local;
   ReloadData;
 end;
 
@@ -1349,6 +1353,12 @@ end;
 procedure TDatabaseData.AttachmentsAfterOpen(DataSet: TDataSet);
 begin
   Attachments.Locate('MON$ATTACHMENT_ID',AttmtQuery.FieldByName('MON$ATTACHMENT_ID').AsInteger,[]);
+end;
+
+procedure TDatabaseData.AttachmentsBeforeOpen(DataSet: TDataSet);
+begin
+  if IBDatabaseInfo.ODSMajorVersion >= 12 then
+    (DataSet as TIBQuery).Parser.Add2WhereClause('r.MON$SYSTEM_FLAG = 0');
 end;
 
 procedure TDatabaseData.DatabaseQueryBeforeClose(DataSet: TDataSet);

@@ -146,7 +146,6 @@ object BackupDlg: TBackupDlg
   object IBBackupService1: TIBBackupService
     ServerName = 'localhost'
     Protocol = TCP
-    PortNo = 0
     Params.Strings = (
       'user_name=SYSDBA'
       ''

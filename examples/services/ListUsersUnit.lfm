@@ -152,7 +152,6 @@ object ListUsersForm: TListUsersForm
   object IBSecurityService1: TIBSecurityService
     ServerName = 'localhost'
     Protocol = TCP
-    PortNo = 0
     TraceFlags = []
     SecurityAction = ActionAddUser
     UserID = 0

@@ -6,7 +6,7 @@ object DatabaseData: TDatabaseData
   Width = 629
   PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -261,7 +261,6 @@ object DatabaseData: TDatabaseData
     top = 112
   end
   object IBStatisticalService1: TIBStatisticalService
-    PortNo = 0
     Params.Strings = (
       'sql_role_name=RDB$ADMIN'
     )
@@ -273,7 +272,6 @@ object DatabaseData: TDatabaseData
     top = 283
   end
   object IBConfigService1: TIBConfigService
-    PortNo = 0
     TraceFlags = []
     OnLogin = IBStatisticalService1Login
     left = 162
@@ -298,7 +296,6 @@ object DatabaseData: TDatabaseData
     top = 283
   end
   object IBServerProperties1: TIBServerProperties
-    PortNo = 0
     TraceFlags = []
     OnLogin = IBStatisticalService1Login
     Options = []
@@ -306,7 +303,6 @@ object DatabaseData: TDatabaseData
     top = 368
   end
   object IBLogService1: TIBLogService
-    PortNo = 0
     TraceFlags = []
     OnLogin = IBStatisticalService1Login
     left = 162
@@ -503,7 +499,7 @@ object DatabaseData: TDatabaseData
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
       'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
-      'P.RDB$USER,RDB$PRIVILEGE,   r.RDB$SECURITY_CLASS, cast(:USERNAME as VARCHAR(32)) as USERNAME,'
+      'P.RDB$USER,RDB$PRIVILEGE,   cast(:USERNAME as VARCHAR(32)) as USERNAME,'
       'Case When RDB$PRIVILEGE is null then false else true End as GRANTED'
       'FROM RDB$ROLES r'
       'Left Outer JOIN ('
@@ -528,98 +524,6 @@ object DatabaseData: TDatabaseData
         Name = 'USERNAME'
         ParamType = ptInput
       end>
-    object RoleNameListRDBROLE_NAME: TIBStringField
-      FieldKind = fkData
-      FieldName = 'RDB$ROLE_NAME'
-      Index = 0
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 31
-    end
-    object RoleNameListRDBOWNER_NAME: TIBStringField
-      FieldKind = fkData
-      FieldName = 'RDB$OWNER_NAME'
-      Index = 1
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 31
-    end
-    object RoleNameListRDBDESCRIPTION: TIBMemoField
-      FieldKind = fkData
-      FieldName = 'RDB$DESCRIPTION'
-      Index = 2
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      BlobType = ftMemo
-      Size = 8
-      Transliterate = False
-      DisplayTextAsClassName = False
-    end
-    object RoleNameListRDBSYSTEM_FLAG: TSmallintField
-      FieldKind = fkData
-      FieldName = 'RDB$SYSTEM_FLAG'
-      Index = 3
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = True
-    end
-    object RoleNameListRDBUSER: TIBStringField
-      FieldKind = fkData
-      FieldName = 'RDB$USER'
-      Index = 4
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 31
-    end
-    object RoleNameListRDBSECURITY_CLASS: TIBStringField
-      FieldKind = fkData
-      FieldName = 'RDB$SECURITY_CLASS'
-      Index = 5
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 31
-    end
-    object RoleNameListRDBPRIVILEGE: TIBStringField
-      FieldKind = fkData
-      FieldName = 'RDB$PRIVILEGE'
-      Index = 6
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 6
-    end
-    object RoleNameListUSERNAME: TIBStringField
-      FieldKind = fkData
-      FieldName = 'USERNAME'
-      Index = 7
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 32
-    end
-    object RoleNameListGRANTED: TBooleanField
-      FieldKind = fkData
-      FieldName = 'GRANTED'
-      Index = 8
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = True
-      DisplayValues = 'True;False'
-    end
   end
   object UpdateUserRoles: TIBUpdate
     RefreshSQL.Strings = (
@@ -757,7 +661,6 @@ object DatabaseData: TDatabaseData
   object IBSecurityService1: TIBSecurityService
     ServerName = 'localhost'
     Protocol = TCP
-    PortNo = 0
     TraceFlags = []
     SecurityAction = ActionAddUser
     UserID = 0
@@ -772,21 +675,16 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     AfterDelete = AttachmentsAfterDelete
     AfterOpen = AttachmentsAfterOpen
+    BeforeOpen = AttachmentsBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
-      'SELECT r.MON$ATTACHMENT_ID, r.MON$SERVER_PID, r.MON$STATE,'
-      '    r.MON$ATTACHMENT_NAME, r.MON$USER, r.MON$ROLE, r.MON$REMOTE_PROTOCOL,'
-      '    r.MON$REMOTE_ADDRESS, r.MON$REMOTE_PID, r.MON$CHARACTER_SET_ID,'
-      '    r.MON$TIMESTAMP, r.MON$GARBAGE_COLLECTION, r.MON$REMOTE_PROCESS,'
-      '    r.MON$STAT_ID, r.MON$CLIENT_VERSION, r.MON$REMOTE_VERSION,'
-      '    r.MON$REMOTE_HOST, r.MON$REMOTE_OS_USER, r.MON$AUTH_METHOD,'
-      '    S.RDB$CHARACTER_SET_NAME, CURRENT_CONNECTION'
+      'SELECT *'
       'FROM MON$ATTACHMENTS r'
       'JOIN RDB$CHARACTER_SETS S On S.RDB$CHARACTER_SET_ID = r.MON$CHARACTER_SET_ID'
-      'Where r.MON$SYSTEM_FLAG = 0'
+      ''
     )
     Params = <>
     UpdateObject = AttUpdate
@@ -800,7 +698,6 @@ object DatabaseData: TDatabaseData
     top = 432
   end
   object IBValidationService1: TIBValidationService
-    PortNo = 0
     TraceFlags = []
     Options = [ValidateFull]
     GlobalAction = CommitGlobal
@@ -808,7 +705,6 @@ object DatabaseData: TDatabaseData
     top = 432
   end
   object IBOnlineValidationService1: TIBOnlineValidationService
-    PortNo = 0
     TraceFlags = []
     left = 64
     top = 498

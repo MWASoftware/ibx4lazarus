@@ -48,7 +48,6 @@ object ShutdownDatabaseDlg: TShutdownDatabaseDlg
   end
   object IBConfigService: TIBConfigService
     Protocol = TCP
-    PortNo = 0
     TraceFlags = []
     left = 253
     top = 64

@@ -1280,14 +1280,12 @@ object DatabaseProperties: TDatabaseProperties
     top = 208
   end
   object IBConfigService1: TIBConfigService
-    PortNo = 0
     LoginPrompt = False
     TraceFlags = []
     left = 747
     top = 96
   end
   object IBStatisticalService1: TIBStatisticalService
-    PortNo = 0
     TraceFlags = []
     Options = [HeaderPages]
     left = 747

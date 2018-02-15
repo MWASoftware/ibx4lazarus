@@ -266,7 +266,6 @@ object RestoreDlg: TRestoreDlg
   object IBRestoreService1: TIBRestoreService
     ServerName = 'localhost'
     Protocol = TCP
-    PortNo = 0
     Params.Strings = (
       'user_name=SYSDBA'
     )

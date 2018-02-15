@@ -64,11 +64,11 @@ object MainForm: TMainForm
     Height = 506
     Top = 26
     Width = 915
-    ActivePage = Properties
+    ActivePage = AttachmentsTab
     Align = alClient
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 2
     object Properties: TTabSheet
       Caption = 'Properties'

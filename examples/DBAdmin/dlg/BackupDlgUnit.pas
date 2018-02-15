@@ -15,6 +15,7 @@ type
   TBackupDlg = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    NoDBTriggers: TCheckBox;
     NoGarbageCollection: TCheckBox;
     MetadataOnly: TCheckBox;
     IgnoreLimboTransactions: TCheckBox;
@@ -69,7 +70,7 @@ begin
   bakfile := nil;
   with IBBackupService1 do
   begin
-  Options := [NoDBTriggers];
+  Options := [];
   if IgnoreChecksums.Checked then
     Options := Options + [IBServices.IgnoreChecksums];
   if IgnoreLimboTransactions.Checked then
@@ -78,6 +79,8 @@ begin
     Options := Options + [IBServices.MetadataOnly];
   if NoGarbageCollection.Checked then
     Options := Options + [IBServices.NoGarbageCollection];
+  if NoDBTriggers.Checked then
+    Options := Options + [IBServices.NoDBTriggers];
   end;
 
   Report.Lines.Add('Starting Backup');

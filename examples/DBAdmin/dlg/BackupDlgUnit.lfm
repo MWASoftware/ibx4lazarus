@@ -1,10 +1,10 @@
 object BackupDlg: TBackupDlg
-  Left = 526
-  Height = 351
-  Top = 450
+  Left = 538
+  Height = 370
+  Top = 459
   Width = 374
   Caption = 'Backup Database'
-  ClientHeight = 351
+  ClientHeight = 370
   ClientWidth = 374
   OnClose = FormClose
   OnShow = FormShow
@@ -13,8 +13,9 @@ object BackupDlg: TBackupDlg
   object Button1: TButton
     Left = 96
     Height = 25
-    Top = 320
+    Top = 335
     Width = 75
+    Anchors = [akLeft, akBottom]
     Caption = 'OK'
     Default = True
     ModalResult = 1
@@ -23,8 +24,9 @@ object BackupDlg: TBackupDlg
   object Button2: TButton
     Left = 191
     Height = 25
-    Top = 320
+    Top = 335
     Width = 75
+    Anchors = [akLeft, akBottom]
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
@@ -32,16 +34,17 @@ object BackupDlg: TBackupDlg
   end
   object PageControl1: TPageControl
     Left = 10
-    Height = 297
+    Height = 320
     Top = 7
     Width = 357
     ActivePage = SelectTab
+    Anchors = [akTop, akLeft, akRight, akBottom]
     ShowTabs = False
     TabIndex = 0
     TabOrder = 2
     object SelectTab: TTabSheet
       Caption = 'SelectTab'
-      ClientHeight = 291
+      ClientHeight = 314
       ClientWidth = 351
       object Label2: TLabel
         Left = 12
@@ -183,10 +186,18 @@ object BackupDlg: TBackupDlg
         Caption = 'No Garbage Collection'
         TabOrder = 8
       end
+      object NoDBTriggers: TCheckBox
+        Left = 16
+        Height = 22
+        Top = 288
+        Width = 151
+        Caption = 'No Database Triggers'
+        TabOrder = 9
+      end
     end
     object ReportTab: TTabSheet
       Caption = 'ReportTab'
-      ClientHeight = 291
+      ClientHeight = 314
       ClientWidth = 351
       OnShow = ReportTabShow
       object Report: TMemo
@@ -206,7 +217,6 @@ object BackupDlg: TBackupDlg
   object IBBackupService1: TIBBackupService
     ServerName = 'localhost'
     Protocol = TCP
-    PortNo = 0
     Params.Strings = (
       'user_name=SYSDBA'
       ''

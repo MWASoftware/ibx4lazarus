@@ -81,7 +81,6 @@ object MainForm: TMainForm
   object IBServerProperties1: TIBServerProperties
     ServerName = 'localhost'
     Protocol = TCP
-    PortNo = 0
     Params.Strings = (
       'user_name=SYSDBA'
       'sql_role_name=RDB$ADMIN'
@@ -95,7 +94,6 @@ object MainForm: TMainForm
   object IBLogService1: TIBLogService
     ServerName = 'localhost'
     Protocol = TCP
-    PortNo = 0
     TraceFlags = []
     left = 320
     top = 72
@@ -103,7 +101,6 @@ object MainForm: TMainForm
   object IBStatisticalService1: TIBStatisticalService
     ServerName = 'localhost'
     Protocol = TCP
-    PortNo = 0
     TraceFlags = []
     DatabaseName = 'employee'
     Options = [DataPages]
@@ -113,7 +110,6 @@ object MainForm: TMainForm
   object IBValidationService1: TIBValidationService
     ServerName = 'localhost'
     Protocol = TCP
-    PortNo = 0
     TraceFlags = []
     DatabaseName = 'employee'
     Options = [ValidateFull]
@@ -124,7 +120,6 @@ object MainForm: TMainForm
   object IBOnlineValidationService1: TIBOnlineValidationService
     ServerName = 'localhost'
     Protocol = TCP
-    PortNo = 0
     TraceFlags = []
     DatabaseName = 'employee'
     left = 320
@@ -183,7 +178,6 @@ object MainForm: TMainForm
     end
   end
   object IBConfigService1: TIBConfigService
-    PortNo = 0
     TraceFlags = []
     left = 466
     top = 188
