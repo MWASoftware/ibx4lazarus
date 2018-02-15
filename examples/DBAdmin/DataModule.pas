@@ -53,6 +53,7 @@ type
     IBOnlineValidationService1: TIBOnlineValidationService;
     IBSecurityService1: TIBSecurityService;
     AttUpdate: TIBUpdate;
+    AdminUserQuery: TIBSQL;
     IBValidationService1: TIBValidationService;
     InLimboList: TMemDataset;
     LegacyUserList: TMemDataset;
@@ -156,6 +157,7 @@ type
     procedure GetDBFlags;
     function GetDBOwner: string;
     function GetDBReadOnly: boolean;
+    function GetDBUserName: string;
     function GetEmbeddedMode: boolean;
     function GetForcedWrites: boolean;
     function GetLingerDelay: string;
@@ -163,6 +165,7 @@ type
     function GetRoleName: string;
     function GetSecurityDatabase: string;
     function GetSweepInterval: integer;
+    function GetUserAdminPrivilege: boolean;
     procedure SetAutoAdmin(AValue: boolean);
     procedure SetDBReadOnly(AValue: boolean);
     procedure SetForcedWrites(AValue: boolean);
@@ -201,8 +204,10 @@ type
     property SecurityDatabase: string read GetSecurityDatabase;
     property AuthMethod: string read GetAuthMethod;
     property EmbeddedMode: boolean read GetEmbeddedMode;
+    property DBUserName: string read GetDBUserName;
     property RoleName: string read GetRoleName;
     property DBOwner: string read GetDBOwner;
+    property HasUserAdminPrivilege: boolean read GetUserAdminPrivilege;
     property AfterDBConnect: TNotifyEvent read FAfterDBConnect write FAfterDBConnect;
     property AfterDataReload: TNotifyEvent read FAfterDataReload write FAfterDataReload;
   end;
@@ -297,7 +302,31 @@ procedure TDatabaseData.UpdateUsersApplyUpdates(Sender: TObject;
       Result += ' USING PLUGIN ' + QuoteIdentifierIfNeeded((Sender as TIBUpdate).DataSet.Database.SQLDialect,Param.AsString);
   end;
 
+  function GetAlterPasswordStmt: string;
+  var Param: ISQLParam;
+  begin
+    Result := '';
+    Param := Params.ByName('USERPASSWORD');
+    if (UpdateKind = ukModify) and not Param.IsNull then
+    begin
+      Result := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) +
+          ' PASSWORD ''' + SQLSafeString(Param.AsString) + '''';
+      Param := Params.ByName('SEC$PLUGIN');
+     if Param <> nil then
+       Result += ' USING PLUGIN ' + QuoteIdentifierIfNeeded((Sender as TIBUpdate).DataSet.Database.SQLDialect,Param.AsString);
+    end;
+  end;
+
 begin
+    {non SYSDBA user not an RDB$ADMIN can only change their password}
+    if (DBUserName <> 'SYSDBA') and (RoleName <> 'RDB$ADMIN') then
+    begin
+     ExecDDL.SQL.Text := GetAlterPasswordStmt;
+     if ExecDDL.SQL.Text <> '' then
+       ExecDDL.ExecQuery;
+     exit;
+    end;
+
     case UpdateKind of
     ukInsert:
         ExecDDL.SQL.Text := 'CREATE USER ' + FormatStmtOptions;
@@ -445,6 +474,11 @@ begin
   Result := DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$READ_ONLY').AsInteger  <> 0);
 end;
 
+function TDatabaseData.GetDBUserName: string;
+begin
+  Result := Trim(AttmtQuery.FieldByName('MON$USER').AsString);
+end;
+
 function TDatabaseData.GetEmbeddedMode: boolean;
 begin
   Result := IBServerProperties1.Active and (IBServerProperties1.Protocol = Local);
@@ -515,6 +549,7 @@ procedure TDatabaseData.ActivateService(aService: TIBCustomService);
       {Use database login user name and password}
       Params.Values['user_name'] := FDBUserName;
       Params.Values['password'] := FDBPassword;
+      Params.Values['sql_role_name'] := 'RDB$ADMIN';
 
       if FProtocol <> unknownProtocol then
         Protocol := FProtocol
@@ -835,7 +870,7 @@ end;
 
 function TDatabaseData.GetRoleName: string;
 begin
-  Result := AttmtQuery.FieldByName('MON$ROLE').AsString;
+  Result := Trim(AttmtQuery.FieldByName('MON$ROLE').AsString);
 end;
 
 function TDatabaseData.GetSecurityDatabase: string;
@@ -854,6 +889,21 @@ begin
     Result :=  DatabaseQuery.FieldByName('MON$SWEEP_INTERVAL').AsInteger
   else
     Result := 0;
+end;
+
+function TDatabaseData.GetUserAdminPrivilege: boolean;
+begin
+  Result := IBDatabaseInfo.ODSMajorVersion >= 12;
+  if Result then
+  with AdminUserQuery do
+  begin
+    ExecQuery;
+    try
+      Result := not EOF and FieldByName('SEC$ADMIN').AsBoolean;
+    finally
+      Close;
+    end;
+  end;
 end;
 
 procedure TDatabaseData.SetAutoAdmin(AValue: boolean);

@@ -262,7 +262,7 @@ object DatabaseData: TDatabaseData
   end
   object IBStatisticalService1: TIBStatisticalService
     Params.Strings = (
-      'sql_role_name=RDB$ADMIN'
+      ''
     )
     LoginPrompt = False
     TraceFlags = []
@@ -294,6 +294,9 @@ object DatabaseData: TDatabaseData
     top = 283
   end
   object IBServerProperties1: TIBServerProperties
+    Params.Strings = (
+      ''
+    )
     TraceFlags = []
     Options = []
     left = 40
@@ -1054,5 +1057,18 @@ object DatabaseData: TDatabaseData
     BeforePost = InLimboListBeforePost
     left = 224
     top = 498
+  end
+  object AdminUserQuery: TIBSQL
+    Database = IBDatabase1
+    GenerateParamNames = False
+    UniqueParamNames = False
+    ParamCheck = True
+    SQL.Strings = (
+      'Select A.SEC$ADMIN From SEC$USERS A'
+      'Where SEC$USER_NAME = CURRENT_USER'
+    )
+    Transaction = CurrentTransaction
+    left = 424
+    top = 496
   end
 end

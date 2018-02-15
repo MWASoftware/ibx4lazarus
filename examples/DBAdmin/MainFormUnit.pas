@@ -230,6 +230,7 @@ type
     procedure DeleteTagExecute(Sender: TObject);
     procedure DeleteTagUpdate(Sender: TObject);
     procedure DeleteUserExecute(Sender: TObject);
+    procedure DeleteUserUpdate(Sender: TObject);
     procedure DisconnectAttachmentExecute(Sender: TObject);
     procedure DisconnectAttachmentUpdate(Sender: TObject);
     procedure DropDatabaseExecute(Sender: TObject);
@@ -417,7 +418,8 @@ end;
 
 procedure TMainForm.AddUserUpdate(Sender: TObject);
 begin
-  (Sender as TAction).Enabled := (UserListSource.State = dsBrowse);
+  (Sender as TAction).Enabled := (UserListSource.State = dsBrowse) and
+     ((DatabaseData.DBUserName = 'SYSDBA') or DatabaseData.HasUserAdminPrivilege);
 end;
 
 procedure TMainForm.ApplySelectedExecute(Sender: TObject);
@@ -457,6 +459,12 @@ begin
   begin
     Edit;
     FieldByName('USERPASSWORD').AsString := NewPassword;
+    try
+      Post
+    except
+      Cancel;
+      raise;
+    end;
   end;
 end;
 
@@ -520,6 +528,12 @@ begin
   if MessageDlg('Do you really want to delete user ' + Trim(UserListSource.DataSet.FieldByName('UserName').AsString),
      mtConfirmation,[mbYes,mbNo],0) = mrYes then
      UserListSource.DataSet.Delete;
+end;
+
+procedure TMainForm.DeleteUserUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := UserListSource.DataSet.Active and (UserListSource.DataSet.RecordCount > 0) and
+    ((DatabaseData.DBUserName = 'SYSDBA') or DatabaseData.HasUserAdminPrivilege);
 end;
 
 procedure TMainForm.DisconnectAttachmentExecute(Sender: TObject);
@@ -786,7 +800,8 @@ end;
 procedure TMainForm.ConfigureForServerVersion;
 var i: integer;
 begin
-  if IBDatabaseInfo.ODSMajorVersion >= 12 then
+  if (IBDatabaseInfo.ODSMajorVersion >= 12) and
+     ((DatabaseData.DBUserName = 'SYSDBA') or not DatabaseData.HasUserAdminPrivilege) then
   begin
     for i in [9,10] do
       UserManagerGrid.Columns[i].Visible := false;
@@ -795,10 +810,6 @@ begin
     UserListSource.DataSet := DatabaseData.UserList;
     TagsHeader.Visible := true;
     TagsGrid.Visible := true;
-    AttmtGrid.Columns[2].Visible := true;
-    AttmntODS12Panel.Visible := true;
-    DBCharacterSet.Visible := true;
-    DBCharSetRO.Visible := false;
   end
   else
   begin
@@ -809,6 +820,17 @@ begin
       UserListSource.DataSet := DatabaseData.LegacyUserList;
       TagsHeader.Visible := false;
       TagsGrid.Visible := false;
+  end;
+
+  if IBDatabaseInfo.ODSMajorVersion >= 12 then
+  begin
+    AttmtGrid.Columns[2].Visible := true;
+    AttmntODS12Panel.Visible := true;
+    DBCharacterSet.Visible := true;
+    DBCharSetRO.Visible := false;
+  end
+  else
+  begin
       AttmtGrid.Columns[2].Visible := false;
       AttmntODS12Panel.Visible := false;
       DBCharacterSet.Visible := false;

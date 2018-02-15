@@ -2185,7 +2185,8 @@ begin
         IBError(ibxeStartParamsError, [nil]);
       SRB.Add(isc_action_svc_add_user);
       SRB.Add(isc_spb_sec_username).AsString := FUserName;
-      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
+      if FSQLRole <> '' then
+        SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
       SRB.Add(isc_spb_sec_userid).AsInteger := FUserID;
       SRB.Add(isc_spb_sec_groupid).AsInteger := FGroupID;
       SRB.Add(isc_spb_sec_password).AsString := FPassword;
@@ -2203,7 +2204,8 @@ begin
         IBError(ibxeStartParamsError, [nil]);
       SRB.Add(isc_action_svc_delete_user);
       SRB.Add(isc_spb_sec_username).AsString := FUserName;
-      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
+      if FSQLRole <> '' then
+        SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
     end;
     ActionModifyUser:
     begin
@@ -2213,7 +2215,8 @@ begin
         IBError(ibxeStartParamsError, [nil]);
       SRB.Add(isc_action_svc_modify_user);
       SRB.Add(isc_spb_sec_username).AsString := FUserName;
-      SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
+      if FSQLRole <> '' then
+        SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
       if (ModifyUserId in FModifyParams) then
         SRB.Add(isc_spb_sec_userid).AsInteger := FUserID;
       if (ModifyGroupId in FModifyParams) then
