@@ -568,7 +568,7 @@ end;
 
 procedure TMainForm.UserManagerTabShow(Sender: TObject);
 begin
-  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  if not Visible or not IBDatabaseInfo.Database.Connected or DatabaseData.EmbeddedMode then Exit;
   UserListSource.DataSet.Active := true;
 end;
 

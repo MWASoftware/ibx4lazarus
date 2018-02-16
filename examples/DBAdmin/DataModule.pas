@@ -591,7 +591,9 @@ begin
   {The server properties service is the base service holding the service interface}
   if not IBServerProperties1.Active then
   begin
-    SetupParams(IBServerProperties1,UsingDefaultSecDatabase,FDatabasePathName);
+    SetupParams(IBServerProperties1,UsingDefaultSecDatabase,
+                 {noe that on a local server, the following always gives us the actual path}
+                 DatabaseQuery.FieldByName('MON$DATABASE_NAME').AsString);
     with IBServerProperties1 do
     begin
       LoginPrompt := (Protocol <> Local) and (FDBPassword = '');  {Does this ever occur?}
