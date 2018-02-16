@@ -173,14 +173,15 @@ object MainForm: TMainForm
           Caption = 'SQL Dialect'
           ParentColor = False
         end
-        object Edit6: TEdit
+        object DBSQLDialect: TEdit
           Left = 120
           Height = 24
           Top = 176
           Width = 266
-          ReadOnly = True
+          NumbersOnly = True
+          OnEditingDone = DBSQLDialectEditingDone
           TabOrder = 4
-          Text = 'Edit6'
+          Text = 'DBSQLDialect'
         end
         object Label24: TLabel
           Left = 51

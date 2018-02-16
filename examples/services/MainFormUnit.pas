@@ -145,6 +145,11 @@ begin
     Memo1.Lines.Add('Base Location = ' + ConfigParams.BaseLocation);
     Memo1.Lines.Add('Lock File Location = ' + ConfigParams.LockFileLocation);
     Memo1.Lines.Add('Security Database Location = ' + ConfigParams.SecurityDatabaseLocation);
+    Memo1.Lines.Add('Message File Location = ' + ConfigParams.MessageFileLocation);
+    for i := Low(ConfigParams.ConfigFileParams) to High(ConfigParams.ConfigFileParams) do
+      writeln(ConfigParams.ConfigFileParams[i]);
+    for i := Low(ConfigParams.ConfigFileData.ConfigFileKey) to High(ConfigParams.ConfigFileData.ConfigFileKey) do
+      writeln(ConfigParams.ConfigFileData.ConfigFileKey[i],' = ',ConfigParams.ConfigFileData.ConfigFileValue[i]);
   end;
   IBServerProperties1.OnLogin := @AltSecDBLogin;
   {Leave IBServerProperties1 as active and use this as the common service interface}

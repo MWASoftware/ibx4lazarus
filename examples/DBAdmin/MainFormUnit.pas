@@ -92,7 +92,7 @@ type
     Edit12: TEdit;
     Edit2: TEdit;
     Edit5: TEdit;
-    Edit6: TEdit;
+    DBSQLDialect: TEdit;
     Edit8: TEdit;
     UserManagerTab: TTabSheet;
     FilesTab: TTabSheet;
@@ -226,6 +226,7 @@ type
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DBCharacterSetEditingDone(Sender: TObject);
     procedure DBIsReadOnlyChange(Sender: TObject);
+    procedure DBSQLDialectEditingDone(Sender: TObject);
     procedure DeleteTagExecute(Sender: TObject);
     procedure DeleteTagUpdate(Sender: TObject);
     procedure DeleteUserExecute(Sender: TObject);
@@ -512,6 +513,12 @@ begin
   end;
 end;
 
+procedure TMainForm.DBSQLDialectEditingDone(Sender: TObject);
+begin
+  if FLoading then Exit;
+  DatabaseData.DBSQLDialect := StrToInt(DBSQLDialect.Text);
+end;
+
 procedure TMainForm.DeleteTagExecute(Sender: TObject);
 begin
   UserTagsSource.DataSet.Delete;
@@ -752,7 +759,7 @@ begin
     Edit1.Text := IBDatabaseInfo.DBSiteName;
     Edit2.Text :=  Format('%d.%d',[IBDatabaseInfo.ODSMajorVersion,IBDatabaseInfo.ODSMinorVersion]);
     Edit5.Text :=  IBDatabaseInfo.Version;
-    Edit6.Text :=  IntToStr(IBDatabaseInfo.DBSQLDialect);
+    DBSQLDialect.Text :=  IntToStr(DatabaseData.DBSQLDialect);
     Edit8.Text := DatabaseData.IBDatabase1.DatabaseName;
     Edit10.Text := IntToStr(IBDatabaseInfo.CurrentMemory);
     Edit11.Text := IntToStr(IBDatabaseInfo.MaxMemory);

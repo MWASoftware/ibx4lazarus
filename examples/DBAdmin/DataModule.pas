@@ -157,6 +157,7 @@ type
     procedure GetDBFlags;
     function GetDBOwner: string;
     function GetDBReadOnly: boolean;
+    function GetDBSQLDialect: integer;
     function GetDBUserName: string;
     function GetEmbeddedMode: boolean;
     function GetForcedWrites: boolean;
@@ -168,6 +169,7 @@ type
     function GetUserAdminPrivilege: boolean;
     procedure SetAutoAdmin(AValue: boolean);
     procedure SetDBReadOnly(AValue: boolean);
+    procedure SetDBSQLDialect(AValue: integer);
     procedure SetForcedWrites(AValue: boolean);
     procedure SetLingerDelay(AValue: string);
     procedure SetNoReserve(AValue: boolean);
@@ -207,6 +209,7 @@ type
     property DBUserName: string read GetDBUserName;
     property RoleName: string read GetRoleName;
     property DBOwner: string read GetDBOwner;
+    property DBSQLDialect: integer read GetDBSQLDialect write SetDBSQLDialect;
     property HasUserAdminPrivilege: boolean read GetUserAdminPrivilege;
     property AfterDBConnect: TNotifyEvent read FAfterDBConnect write FAfterDBConnect;
     property AfterDataReload: TNotifyEvent read FAfterDataReload write FAfterDataReload;
@@ -475,6 +478,11 @@ begin
   Result := DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$READ_ONLY').AsInteger  <> 0);
 end;
 
+function TDatabaseData.GetDBSQLDialect: integer;
+begin
+  Result := IBDatabaseInfo.DBSQLDialect;
+end;
+
 function TDatabaseData.GetDBUserName: string;
 begin
   Result := Trim(AttmtQuery.FieldByName('MON$USER').AsString);
@@ -561,8 +569,8 @@ procedure TDatabaseData.ActivateService(aService: TIBCustomService);
       begin
         {If Local we must specify the server as the Localhost}
         ServerName := 'Localhost';
-        if not FileExists(DBName) or FileIsReadOnly(DBName) then
-          Protocol := TCP; {Use loopback if we can't read/write file}
+        if not AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull then
+          Protocol := TCP; {Use loopback if database does not use embedded server}
       end
       else
         ServerName := FServername;
@@ -939,6 +947,18 @@ begin
   end;
 end;
 
+procedure TDatabaseData.SetDBSQLDialect(AValue: integer);
+begin
+  ActivateService(IBConfigService1);
+  IBDatabase1.Connected := false;
+  try
+    IBConfigService1.SetDBSqlDialect(AValue);
+    while IBConfigService1.IsServiceRunning do;
+  finally
+    IBDatabase1.Connected := true;
+  end;
+end;
+
 procedure TDatabaseData.SetForcedWrites(AValue: boolean);
 begin
   ActivateService(IBConfigService1);
@@ -1101,11 +1121,12 @@ begin
     Lines.Add('No. of attachments = ' + IntToStr(DatabaseInfo.NoOfAttachments));
     Lines.Add('No. of databases = ' + IntToStr(DatabaseInfo.NoOfDatabases));
     for i := 0 to DatabaseInfo.NoOfDatabases - 1 do
-      Lines.Add('DB Name = ' + DatabaseInfo.DbName[i]);
+      Lines.Add(Format('DB Name (%d) = %s',[i+1, DatabaseInfo.DbName[i]]));
     FetchConfigParams;
     Lines.Add('Base Location = ' + ConfigParams.BaseLocation);
     Lines.Add('Lock File Location = ' + ConfigParams.LockFileLocation);
     Lines.Add('Security Database Location = ' + ConfigParams.SecurityDatabaseLocation);
+    Lines.Add('Message File Location = ' + ConfigParams.MessageFileLocation);
   end;
 end;
 

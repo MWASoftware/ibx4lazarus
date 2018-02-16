@@ -3,7 +3,7 @@ object ListUsersForm: TListUsersForm
   Height = 404
   Top = 270
   Width = 861
-  Caption = 'Display Users'
+  Caption = 'User Management'
   ClientHeight = 404
   ClientWidth = 861
   OnClose = FormClose
@@ -54,28 +54,6 @@ object ListUsersForm: TListUsersForm
     Color = clWindow
     Columns = <    
       item
-        Title.Alignment = taCenter
-        Title.Caption = 'User ID'
-        Width = 60
-        FieldName = 'UserID'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
-        Title.Alignment = taCenter
-        Title.Caption = 'Group  ID'
-        Width = 70
-        FieldName = 'GroupID'
-        AutoSizeColumn = False
-        InitialSortColumn = False
-        DBLookupProperties.ItemHeight = 0
-        DBLookupProperties.ItemWidth = 0
-        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      end    
-      item
         ReadOnly = True
         Title.Alignment = taCenter
         Title.Caption = 'User Name'
@@ -125,6 +103,28 @@ object ListUsersForm: TListUsersForm
         Title.Caption = 'Admin'
         Width = 64
         FieldName = 'Admin'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'User ID'
+        Width = 60
+        FieldName = 'UserID'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      end    
+      item
+        Title.Alignment = taCenter
+        Title.Caption = 'Group  ID'
+        Width = 70
+        FieldName = 'GroupID'
         AutoSizeColumn = False
         InitialSortColumn = False
         DBLookupProperties.ItemHeight = 0
