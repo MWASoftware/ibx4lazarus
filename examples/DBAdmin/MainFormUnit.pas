@@ -15,12 +15,34 @@ type
   { TMainForm }
 
   TMainForm = class(TForm)
+    DBTablesSource: TDataSource;
+    SelectAllTables: TCheckBox;
+    Label40: TLabel;
+    SelectedTablesGrid: TIBDynamicGrid;
+    Label37: TLabel;
+    Panel8: TPanel;
+    DBTablesPanel: TPanel;
+    Panel9: TPanel;
+    Phase2Repair: TAction;
     ApplySelected: TAction;
     AuthMethLabel: TLabel;
     AuthMethod: TDBEdit;
+    Button7: TButton;
+    IgnoreChecksumsOnRepair: TCheckBox;
+    DBTablesSplitter: TSplitter;
+    Alltables: TRadioButton;
+    SelectedTablesOnly: TRadioButton;
+    ValidateRepairRecordFragments: TCheckBox;
+    IgnoreChecksums: TCheckBox;
+    Label34: TLabel;
+    ReadOnlyValidation: TCheckBox;
+    RecordFragments: TCheckBox;
     Commit2Phase: TAction;
     DBOwner: TEdit;
     AttmntODS12Panel: TPanel;
+    Label33: TLabel;
+    RepairOptionsTab: TTabSheet;
+    ValidateOptions: TPageControl;
     RemoteOSLabel: TLabel;
     RemoteOSUser: TDBEdit;
     SecDatabase: TEdit;
@@ -39,9 +61,8 @@ type
     Button2: TButton;
     SelectRepairAction: TComboBox;
     DisconnectAttachment: TAction;
-    Label37: TLabel;
     LimboTab: TTabSheet;
-    ValidationReport: TMemo;
+    ValidateOptionsTab: TTabSheet;
     MenuItem17: TMenuItem;
     AttmtPopup: TPopupMenu;
     MenuItem18: TMenuItem;
@@ -206,6 +227,7 @@ type
     ToolButton5: TToolButton;
     UserListSource: TDataSource;
     UserTagsSource: TDataSource;
+    ValidationReport: TMemo;
     procedure AddSecondaryExecute(Sender: TObject);
     procedure AddShadowSetExecute(Sender: TObject);
     procedure AddTagExecute(Sender: TObject);
@@ -236,6 +258,11 @@ type
     procedure DropDatabaseExecute(Sender: TObject);
     procedure DropDatabaseUpdate(Sender: TObject);
     procedure PageBuffersEditingDone(Sender: TObject);
+    procedure RepairTabHide(Sender: TObject);
+    procedure RepairTabShow(Sender: TObject);
+    procedure SelectAllTablesChange(Sender: TObject);
+    procedure SelectedTablesOnlyChange(Sender: TObject);
+    procedure SelectRepairActionCloseUp(Sender: TObject);
     procedure UserManagerTabShow(Sender: TObject);
     procedure FilesTabShow(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -274,6 +301,7 @@ type
     procedure LoadData;
     procedure DoExtract(Data: PtrInt);
     procedure ConfigureForServerVersion;
+    procedure ConfigureOnlineValidation;
   public
   end;
 
@@ -580,6 +608,58 @@ begin
   DatabaseData.PageBuffers := StrToInt(PageBuffers.Text);
 end;
 
+procedure TMainForm.RepairTabHide(Sender: TObject);
+begin
+  DBTablesSource.DataSet.Active := false;
+end;
+
+procedure TMainForm.RepairTabShow(Sender: TObject);
+begin
+  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  ValidateOptions.Enabled := SelectRepairAction.ItemIndex = 2;
+  ValidateOptions.ActivePage := ValidateOptionsTab;
+  ConfigureOnlineValidation;
+end;
+
+procedure TMainForm.SelectAllTablesChange(Sender: TObject);
+var aBookmark: TBookmark;
+begin
+  with DBTablesSource.DataSet do
+  if Active then
+  begin
+    aBookmark := Bookmark;
+    DisableControls;
+    try
+      First;
+      while not EOF do
+      begin
+        Edit;
+        if SelectAllTables.Checked then
+          FieldByName('Selected').AsInteger := 1
+        else
+          FieldByName('Selected').AsInteger := 0;
+        Post;
+        Next;
+      end;
+    finally
+       Bookmark := aBookmark;
+       EnableControls;
+    end;
+  end;
+end;
+
+procedure TMainForm.SelectedTablesOnlyChange(Sender: TObject);
+begin
+  SelectedTablesGrid.Enabled := SelectedTablesOnly.Checked;
+  SelectAllTables.Enabled := SelectedTablesOnly.Checked;
+end;
+
+procedure TMainForm.SelectRepairActionCloseUp(Sender: TObject);
+begin
+  ValidateOptions.Enabled := SelectRepairAction.ItemIndex = 2;
+  ConfigureOnlineValidation;
+end;
+
 procedure TMainForm.UserManagerTabShow(Sender: TObject);
 begin
   if not Visible or not IBDatabaseInfo.Database.Connected or DatabaseData.EmbeddedMode then Exit;
@@ -629,9 +709,45 @@ begin
 end;
 
 procedure TMainForm.RunRepairExecute(Sender: TObject);
+var Options: TValidateOptions;
 begin
   ValidationReport.Lines.Clear;
-  DatabaseData.DatabaseRepair(SelectRepairAction.ItemIndex,ValidationReport.Lines);
+  case SelectRepairAction.ItemIndex of
+  0: {sweep}
+    Options := [SweepDB];
+  1: {Online Validation }
+    begin
+      DatabaseData.OnlineValidation(ValidationReport.Lines,SelectedTablesOnly.Checked);
+      Exit;
+    end;
+  2: {Full Validation}
+    if ValidateOptions.ActivePage = ValidateOptionsTab then
+    begin
+      Options := [ValidateDB];
+      if RecordFragments.Checked then
+        Options += [ValidateFull];
+      if ReadOnlyValidation.Checked then
+        Options += [CheckDB];
+      if IgnoreChecksums.Checked then
+        Options += [IgnoreChecksum];
+    end
+    else
+    begin
+      Options := [MendDB];
+      if ValidateRepairRecordFragments.Checked then
+        Options += [ValidateFull];
+      if IgnoreChecksumsOnRepair.Checked then
+        Options += [IgnoreChecksum];
+    end;
+  3: {Kill Shadows}
+    Options := [KillShadows];
+  end;
+
+  DatabaseData.DatabaseRepair(Options,ValidationReport.Lines);
+  if (SelectRepairAction.ItemIndex = 2) and (ValidateDB in Options) then
+    ValidateOptions.ActivePage := RepairOptionsTab
+  else
+    ValidateOptions.ActivePage := ValidateOptionsTab;
 end;
 
 procedure TMainForm.SaveChangesExecute(Sender: TObject);
@@ -851,6 +967,25 @@ begin
       DBCharSetRO.Visible := true;
   end;
   UserManagerTab.TabVisible := not DatabaseData.EmbeddedMode;
+end;
+
+procedure TMainForm.ConfigureOnlineValidation;
+begin
+  if SelectRepairAction.ItemIndex = 1 then
+  begin
+    DBTablesPanel.Visible := true;
+    DBTablesSplitter.Visible := true;
+    SelectedTablesGrid.Enabled := SelectedTablesOnly.Checked;
+    SelectAllTables.Checked := true;
+    DBTablesSource.DataSet.Active := true;
+  end
+  else
+  begin
+    DBTablesPanel.Visible := false;
+    DBTablesSplitter.Visible := false;
+    SelectAllTables.Enabled := false;
+    DBTablesSource.DataSet.Active := false;
+  end;
 end;
 
 end.

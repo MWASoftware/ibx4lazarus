@@ -1072,4 +1072,31 @@ object DatabaseData: TDatabaseData
     left = 424
     top = 496
   end
+  object DBTables: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = IBDatabase1
+    Transaction = CurrentTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    SQL.Strings = (
+      'Select Trim(A.RDB$RELATION_NAME) as RDB$RELATION_NAME, 1 as Selected'
+      ' From RDB$RELATIONS A'
+      ' Where RDB$SYSTEM_FLAG = 0'
+    )
+    Params = <>
+    UpdateObject = IBUpdate1
+    DataSetCloseAction = dcDiscardChanges
+    left = 520
+    top = 488
+  end
+  object IBUpdate1: TIBUpdate
+    RefreshSQL.Strings = (
+      ''
+    )
+    OnApplyUpdates = IBUpdate1ApplyUpdates
+    left = 568
+    top = 472
+  end
 end

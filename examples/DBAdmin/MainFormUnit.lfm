@@ -1,10 +1,10 @@
 object MainForm: TMainForm
   Left = 595
-  Height = 574
+  Height = 594
   Top = 178
   Width = 915
   Caption = 'Database Administrator Demo'
-  ClientHeight = 554
+  ClientHeight = 574
   ClientWidth = 915
   Menu = MainMenu1
   OnShow = FormShow
@@ -55,13 +55,13 @@ object MainForm: TMainForm
   object StatusBar1: TStatusBar
     Left = 0
     Height = 22
-    Top = 532
+    Top = 552
     Width = 915
     Panels = <>
   end
   object PageControl1: TPageControl
     Left = 0
-    Height = 506
+    Height = 526
     Top = 26
     Width = 915
     ActivePage = RepairTab
@@ -72,7 +72,7 @@ object MainForm: TMainForm
     TabOrder = 2
     object Properties: TTabSheet
       Caption = 'Properties'
-      ClientHeight = 474
+      ClientHeight = 494
       ClientWidth = 909
       OnShow = PropertiesShow
       object Panel7: TPanel
@@ -548,7 +548,7 @@ object MainForm: TMainForm
     end
     object FilesTab: TTabSheet
       Caption = 'Files'
-      ClientHeight = 474
+      ClientHeight = 494
       ClientWidth = 909
       OnShow = FilesTabShow
       object Label25: TLabel
@@ -657,7 +657,7 @@ object MainForm: TMainForm
       end
       object IBDynamicGrid2: TIBDynamicGrid
         Left = 16
-        Height = 179
+        Height = 199
         Top = 280
         Width = 763
         Anchors = [akTop, akLeft, akRight, akBottom]
@@ -760,7 +760,7 @@ object MainForm: TMainForm
     end
     object AttachmentsTab: TTabSheet
       Caption = 'Attachments'
-      ClientHeight = 474
+      ClientHeight = 494
       ClientWidth = 909
       OnHide = AttachmentsTabHide
       OnShow = AttachmentsTabShow
@@ -1024,7 +1024,7 @@ object MainForm: TMainForm
     end
     object StatisticsTab: TTabSheet
       Caption = 'Statistics'
-      ClientHeight = 474
+      ClientHeight = 494
       ClientWidth = 909
       OnHide = StatisticsTabHide
       OnShow = StatisticsTabShow
@@ -1070,7 +1070,7 @@ object MainForm: TMainForm
     end
     object SchemaTab: TTabSheet
       Caption = 'Schema'
-      ClientHeight = 474
+      ClientHeight = 494
       ClientWidth = 909
       OnShow = SchemaTabShow
       inline SynEdit1: TSynEdit
@@ -1577,7 +1577,7 @@ object MainForm: TMainForm
     end
     object ServerTab: TTabSheet
       Caption = 'Server'
-      ClientHeight = 474
+      ClientHeight = 494
       ClientWidth = 909
       OnHide = ServerTabHide
       OnShow = ServerTabShow
@@ -1652,21 +1652,21 @@ object MainForm: TMainForm
     end
     object UserManagerTab: TTabSheet
       Caption = 'User Manager'
-      ClientHeight = 474
+      ClientHeight = 494
       ClientWidth = 909
       OnShow = UserManagerTabShow
       object Panel4: TPanel
         Left = 0
-        Height = 474
+        Height = 494
         Top = 0
         Width = 739
         Align = alLeft
-        ClientHeight = 474
+        ClientHeight = 494
         ClientWidth = 739
         TabOrder = 0
         object UserManagerGrid: TIBDynamicGrid
           Left = 1
-          Height = 472
+          Height = 492
           Top = 1
           Width = 737
           Align = alClient
@@ -1816,18 +1816,18 @@ object MainForm: TMainForm
       end
       object Splitter2: TSplitter
         Left = 739
-        Height = 474
+        Height = 494
         Top = 0
         Width = 5
       end
       object Panel3: TPanel
         Left = 744
-        Height = 474
+        Height = 494
         Top = 0
         Width = 165
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 474
+        ClientHeight = 494
         ClientWidth = 165
         TabOrder = 2
         object IBDynamicGrid4: TIBDynamicGrid
@@ -1872,7 +1872,7 @@ object MainForm: TMainForm
         object Panel5: TPanel
           Left = 0
           Height = 61
-          Top = 413
+          Top = 433
           Width = 165
           Align = alBottom
           BevelInner = bvLowered
@@ -1940,7 +1940,7 @@ object MainForm: TMainForm
         end
         object TagsGrid: TIBDynamicGrid
           Left = 0
-          Height = 166
+          Height = 186
           Top = 242
           Width = 165
           Align = alClient
@@ -1981,7 +1981,7 @@ object MainForm: TMainForm
           Cursor = crVSplit
           Left = 0
           Height = 5
-          Top = 408
+          Top = 428
           Width = 165
           Align = alBottom
           ResizeAnchor = akBottom
@@ -1990,8 +1990,10 @@ object MainForm: TMainForm
     end
     object RepairTab: TTabSheet
       Caption = 'Database Repair'
-      ClientHeight = 474
+      ClientHeight = 494
       ClientWidth = 909
+      OnHide = RepairTabHide
+      OnShow = RepairTabShow
       object SelectRepairAction: TComboBox
         Left = 656
         Height = 27
@@ -2003,31 +2005,12 @@ object MainForm: TMainForm
         Items.Strings = (
           'Database Sweep'
           'Online Validation'
-          'Full Validation'
+          'Database Validation'
           'Kill Shadows'
         )
+        OnCloseUp = SelectRepairActionCloseUp
         TabOrder = 0
         Text = 'Database Sweep'
-      end
-      object ValidationReport: TMemo
-        Left = 8
-        Height = 420
-        Top = 40
-        Width = 892
-        Anchors = [akTop, akLeft, akRight, akBottom]
-        Lines.Strings = (
-          'ValidationReport'
-        )
-        ScrollBars = ssAutoBoth
-        TabOrder = 1
-      end
-      object Label37: TLabel
-        Left = 8
-        Height = 14
-        Top = 24
-        Width = 101
-        Caption = 'Validation Report'
-        ParentColor = False
       end
       object Button2: TButton
         Left = 864
@@ -2036,12 +2019,239 @@ object MainForm: TMainForm
         Width = 35
         Action = RunRepair
         Anchors = [akTop, akRight]
+        TabOrder = 1
+      end
+      object ValidateOptions: TPageControl
+        Left = 6
+        Height = 108
+        Top = 7
+        Width = 322
+        ActivePage = RepairOptionsTab
+        ShowTabs = False
+        TabIndex = 1
         TabOrder = 2
+        object ValidateOptionsTab: TTabSheet
+          Caption = 'ValidateOptionsTab'
+          ClientHeight = 102
+          ClientWidth = 316
+          object Label33: TLabel
+            Left = 5
+            Height = 14
+            Top = 9
+            Width = 108
+            Caption = 'Validation Options'
+            ParentColor = False
+          end
+          object RecordFragments: TCheckBox
+            Left = 32
+            Height = 22
+            Top = 29
+            Width = 184
+            Caption = 'Validate Record Fragments'
+            Checked = True
+            State = cbChecked
+            TabOrder = 0
+          end
+          object ReadOnlyValidation: TCheckBox
+            Left = 32
+            Height = 22
+            Top = 51
+            Width = 146
+            Caption = 'Read Only Validation'
+            TabOrder = 1
+          end
+          object IgnoreChecksums: TCheckBox
+            Left = 32
+            Height = 22
+            Top = 73
+            Width = 136
+            Caption = 'Ignore Checksums'
+            TabOrder = 2
+          end
+        end
+        object RepairOptionsTab: TTabSheet
+          Caption = 'RepairOptionsTab'
+          ClientHeight = 102
+          ClientWidth = 316
+          object Label34: TLabel
+            Left = 10
+            Height = 40
+            Top = 8
+            Width = 294
+            AutoSize = False
+            Caption = 'If errors have been reported, you should now select the repair options and click on repair'
+            ParentColor = False
+            WordWrap = True
+          end
+          object ValidateRepairRecordFragments: TCheckBox
+            Left = 16
+            Height = 22
+            Top = 48
+            Width = 184
+            Caption = 'Validate Record Fragments'
+            Checked = True
+            State = cbChecked
+            TabOrder = 0
+          end
+          object IgnoreChecksumsOnRepair: TCheckBox
+            Left = 16
+            Height = 22
+            Top = 71
+            Width = 170
+            Caption = 'Ignore Checksum Errors'
+            TabOrder = 1
+          end
+          object Button7: TButton
+            Left = 231
+            Height = 25
+            Top = 70
+            Width = 75
+            Action = Phase2Repair
+            TabOrder = 2
+          end
+        end
+      end
+      object Panel8: TPanel
+        Left = 10
+        Height = 356
+        Top = 123
+        Width = 890
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        BevelOuter = bvNone
+        Caption = 'ValidationPanel'
+        ClientHeight = 356
+        ClientWidth = 890
+        TabOrder = 3
+        object DBTablesPanel: TPanel
+          Left = 0
+          Height = 356
+          Top = 0
+          Width = 170
+          Align = alLeft
+          BevelOuter = bvNone
+          ClientHeight = 356
+          ClientWidth = 170
+          TabOrder = 0
+          object Alltables: TRadioButton
+            Left = 9
+            Height = 22
+            Top = 32
+            Width = 78
+            Caption = 'All Tables'
+            Checked = True
+            OnChange = SelectedTablesOnlyChange
+            TabOrder = 0
+            TabStop = True
+          end
+          object SelectedTablesOnly: TRadioButton
+            Left = 9
+            Height = 22
+            Top = 56
+            Width = 147
+            Caption = 'Selected Tables Only'
+            OnChange = SelectedTablesOnlyChange
+            TabOrder = 1
+          end
+          object SelectedTablesGrid: TIBDynamicGrid
+            Left = 0
+            Height = 243
+            Top = 90
+            Width = 170
+            Anchors = [akTop, akLeft, akRight, akBottom]
+            Color = clWindow
+            Columns = <            
+              item
+                ButtonStyle = cbsCheckboxColumn
+                Title.Caption = 'SELECTED'
+                Width = 30
+                FieldName = 'SELECTED'
+                AutoSizeColumn = False
+                InitialSortColumn = False
+                DBLookupProperties.ItemHeight = 0
+                DBLookupProperties.ItemWidth = 0
+                DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+              end            
+              item
+                Title.Caption = 'RDB$RELATION_NAME'
+                Width = 80
+                FieldName = 'RDB$RELATION_NAME'
+                AutoSizeColumn = True
+                InitialSortColumn = False
+                DBLookupProperties.ItemHeight = 0
+                DBLookupProperties.ItemWidth = 0
+                DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+              end>
+            DataSource = DBTablesSource
+            FixedCols = 0
+            Options = [dgEditing, dgColumnResize, dgColumnMove, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
+            Scrollbars = ssAutoVertical
+            TabOrder = 2
+            ExpandEditorPanelBelowRow = False
+            Descending = False
+            EditorBorderStyle = bsSingle
+            DefaultPositionAtEnd = False
+          end
+          object Label40: TLabel
+            Left = 9
+            Height = 14
+            Top = 7
+            Width = 47
+            Caption = 'Validate'
+            ParentColor = False
+          end
+          object SelectAllTables: TCheckBox
+            Left = 0
+            Height = 22
+            Top = 336
+            Width = 134
+            Caption = 'Select/Deselect All'
+            OnChange = SelectAllTablesChange
+            TabOrder = 3
+          end
+        end
+        object DBTablesSplitter: TSplitter
+          Left = 170
+          Height = 356
+          Top = 0
+          Width = 5
+        end
+        object Panel9: TPanel
+          Left = 175
+          Height = 356
+          Top = 0
+          Width = 715
+          Align = alClient
+          BevelOuter = bvNone
+          ClientHeight = 356
+          ClientWidth = 715
+          TabOrder = 2
+          object Label37: TLabel
+            Left = 0
+            Height = 14
+            Top = 8
+            Width = 101
+            Caption = 'Validation Report'
+            ParentColor = False
+          end
+          object ValidationReport: TMemo
+            Left = 0
+            Height = 332
+            Top = 24
+            Width = 715
+            Align = alBottom
+            Anchors = [akTop, akLeft, akRight, akBottom]
+            Lines.Strings = (
+              'ValidationReport'
+            )
+            ScrollBars = ssAutoBoth
+            TabOrder = 0
+          end
+        end
       end
     end
     object LimboTab: TTabSheet
       Caption = 'Limbo Transactions'
-      ClientHeight = 474
+      ClientHeight = 494
       ClientWidth = 909
       OnHide = LimboTabHide
       OnShow = LimboTabShow
@@ -2394,6 +2604,11 @@ object MainForm: TMainForm
       OnExecute = ApplySelectedExecute
       OnUpdate = CommitAllUpdate
     end
+    object Phase2Repair: TAction
+      Category = 'Repair'
+      Caption = 'Repair'
+      OnExecute = RunRepairExecute
+    end
   end
   object MenuImages: TImageList
     left = 704
@@ -2663,5 +2878,10 @@ object MainForm: TMainForm
     DataSet = DatabaseData.InLimboList
     left = 552
     top = 176
+  end
+  object DBTablesSource: TDataSource
+    DataSet = DatabaseData.DBTables
+    left = 304
+    top = 224
   end
 end

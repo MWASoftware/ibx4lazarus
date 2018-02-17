@@ -51,9 +51,11 @@ type
     DatabaseQuery: TIBQuery;
     Attachments: TIBQuery;
     IBOnlineValidationService1: TIBOnlineValidationService;
+    DBTables: TIBQuery;
     IBSecurityService1: TIBSecurityService;
     AttUpdate: TIBUpdate;
     AdminUserQuery: TIBSQL;
+    IBUpdate1: TIBUpdate;
     IBValidationService1: TIBValidationService;
     InLimboList: TMemDataset;
     LegacyUserList: TMemDataset;
@@ -112,6 +114,8 @@ type
     procedure IBDatabase1BeforeDisconnect(Sender: TObject);
     procedure IBDatabase1Login(Database: TIBDatabase; LoginParams: TStrings);
     procedure AttUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
+      Params: ISQLParams);
+    procedure IBUpdate1ApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
     procedure InLimboListAfterOpen(DataSet: TDataSet);
     procedure InLimboListBeforeClose(DataSet: TDataSet);
@@ -187,7 +191,8 @@ type
     procedure RestoreDatabase;
     procedure BringDatabaseOnline;
     procedure ShutDown(aShutDownmode: TShutdownMode; aDelay: integer);
-    procedure DatabaseRepair(ActionID: integer; ReportLines: TStrings);
+    procedure DatabaseRepair(Options: TValidateOptions; ReportLines: TStrings);
+    procedure OnlineValidation(ReportLines: TStrings; SelectedTablesOnly: boolean);
     procedure LimboResolution(ActionID: TTransactionGlobalAction; Report: TStrings);
     function IsDatabaseOnline: boolean;
     function IsShadowDatabase: boolean;
@@ -741,7 +746,7 @@ begin
           if MessageDlg('I/O Error reported on database file. If this is a shadow file, do you want '+
                         'to kill all unavailable shadow sets?. The original message is ' + E.Message,
                         mtInformation,[mbYes,mbNo],0) = mrYes then
-           KillShadows
+           try KillShadows except end
           else
             Exit;
         end
@@ -765,6 +770,9 @@ begin
   IBConfigService1.Active := false;
   IBStatisticalService1.Active := false;
   IBServerProperties1.Active := false;
+  IBValidationService1.Active := false;
+  IBLogService1.Active := false;
+  IBSecurityService1.Active := false;
 end;
 
 procedure TDatabaseData.DropDatabase;
@@ -829,95 +837,96 @@ begin
   end;
 end;
 
-procedure TDatabaseData.DatabaseRepair(ActionID: integer; ReportLines: TStrings
-  );
+procedure TDatabaseData.DatabaseRepair(Options: TValidateOptions; ReportLines: TStrings);
 
-  procedure DoSweep;
+  procedure ReportOptions;
+  var Line: string;
   begin
-    ActivateService(IBValidationService1);
-    with IBValidationService1 do
-    begin
-      Options := [SweepDB];
-      ReportLines.Add(Format('Database sweep of % started',[IBDatabase1.DatabaseName]));
-      try
-        ServiceStart;
-        While not Eof do
-        begin
-          Application.ProcessMessages;
-          ReportLines.Add(GetNextLine);
-        end
-      finally
-        while IsServiceRunning do;
-      end;
-      ReportLines.Add('Sweep successfully completed');
-      MessageDlg('Sweep successfully completed',mtInformation,[mbOK],0);
-    end;
-  end;
-
-  procedure DoValidation(aService: TIBControlAndQueryService; VType: string);
-  begin
-    ActivateService(aService);
-    with aService do
-    try
-      ReportLines.Add(Format('%s Validation of %s started',[VType, IBDatabase1.DatabaseName]));
-      IBDatabase1.Connected := false;
-      try
-        ServiceStart;
-        while not Eof do
-        begin
-          Application.ProcessMessages;
-          ReportLines.Add(GetNextLine);
-        end;
-      finally
-        while IsServiceRunning do;
-      end;
-      ReportLines.Add(VType + ' Validation Completed');
-      MessageDlg(VType + ' Validation Completed',mtInformation,[mbOK],0);
-    finally
-      IBDatabase1.Connected := true;
-    end;
-  end;
-
-  procedure DoKilLShadows;
-  begin
-    ActivateService(IBValidationService1);
-    with IBValidationService1 do
-    begin
-      Options := [KillShadows];
-      try
-        ServiceStart;
-        While not Eof do
-        begin
-          Application.ProcessMessages;
-          ReportLines.Add(GetNextLine);
-        end
-      finally
-        while IsServiceRunning do;
-      end;
-      MessageDlg('Operation Completed',mtInformation,[mbOK],0);
-    end;
+    Line := 'With Options: [';
+    if (ValidateDB in Options) then Line += 'ValidateDB ';
+    if (SweepDB in Options) then Line += 'SweepDB ';
+    if (KillShadows in Options) then Line += 'KillShadows ';
+    if (ValidateFull in Options) then Line += 'ValidateFull ';
+    if (CheckDB in Options) then Line += 'CheckDB ';
+    if (IgnoreChecksum in Options) then Line +='IgnoreChecksum ';
+    if (MendDB in Options) then Line +='MendDB ';
+    Line +=']';
+    ReportLines.Add(Line);
   end;
 
 begin
-   case ActionID of
-   0: {sweep}
-     DoSweep;
+  ActivateService(IBValidationService1);
+  ReportLines.Add(Format('Validation of %s started',[IBValidationService1.DatabaseName]));
+  ReportOptions;
+  IBDatabase1.Connected := false;
+  with IBValidationService1 do
+  try
+    try
+      ServiceStart;
+      while not Eof do
+      begin
+        Application.ProcessMessages;
+        ReportLines.Add(GetNextLine);
+      end;
+    finally
+      while IsServiceRunning do;
+    end;
+    ReportLines.Add('Operation Completed');
+    MessageDlg('Operation Completed',mtInformation,[mbOK],0);
+  finally
+    IBDatabase1.Connected := true;
+  end;
+end;
 
-   1: {Online Validation }
-     if IBDatabaseInfo.ODSMajorVersion < 12 then
-       MessageDlg('This function is not available for Firebird versions < 3',mtError,[mbOK],0)
-     else
-       DoValidation(IBOnlineValidationService1,'Online');
-
-   2: {Full Validation}
-     begin
-      IBValidationService1.Options := [ValidateFull];
-      DoValidation(IBValidationService1,'Full');
-     end;
-
-   3: {Kill Shadows}
-     DoKillShadows;
-   end;
+procedure TDatabaseData.OnlineValidation(ReportLines: TStrings;
+  SelectedTablesOnly: boolean);
+var TableNames: string;
+    Separator: string;
+begin
+  ActivateService(IBOnlineValidationService1);
+  with IBOnlineValidationService1 do
+  begin
+    if SelectedTablesOnly then
+    begin
+      TableNames := '';
+      with DBTables do
+      if Active then
+      begin
+        DisableControls;
+        try
+          Separator := '';
+          First;
+          while not EOF do
+          begin
+            if FieldByName('Selected').AsInteger <> 0 then
+            begin
+              TableNames += Separator + FieldByName('RDB$RELATION_NAME').AsString;
+              Separator := '|';
+            end;
+            Next;
+          end;
+        finally
+          EnableControls;
+        end;
+      end;
+      IncludeTables := TableNames;
+    end
+    else
+      IncludeTables := '';
+    ReportLines.Add(Format('Online Validation of %s started',[IBOnlineValidationService1.DatabaseName]));
+    try
+      ServiceStart;
+      while not Eof do
+      begin
+        Application.ProcessMessages;
+        ReportLines.Add(GetNextLine);
+      end;
+    finally
+      while IsServiceRunning do;
+    end;
+    ReportLines.Add('Online Validation Completed');
+    MessageDlg('Online Validation Completed',mtInformation,[mbOK],0);
+  end;
 end;
 
 procedure TDatabaseData.LimboResolution(ActionID: TTransactionGlobalAction;
@@ -1279,6 +1288,12 @@ begin
   end;
 end;
 
+procedure TDatabaseData.IBUpdate1ApplyUpdates(Sender: TObject;
+  UpdateKind: TUpdateKind; Params: ISQLParams);
+begin
+  // Do nothing
+end;
+
 procedure TDatabaseData.InLimboListAfterOpen(DataSet: TDataSet);
 
   function TypeToStr(MultiDatabase: boolean): string;
@@ -1580,7 +1595,8 @@ begin
       UserList.Cancel;
   end;
   MessageDlg(E.Message,mtError,[mbOK],0);
-  CurrentTransaction.Rollback;
+  if CurrentTransaction.Active then
+    CurrentTransaction.Rollback;
 end;
 
 procedure TDatabaseData.AttachmentsAfterDelete(DataSet: TDataSet);
