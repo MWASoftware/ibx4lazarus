@@ -89,7 +89,7 @@ type
     Edit1: TEdit;
     Edit10: TEdit;
     Edit11: TEdit;
-    Edit12: TEdit;
+    PageBuffers: TEdit;
     Edit2: TEdit;
     Edit5: TEdit;
     DBSQLDialect: TEdit;
@@ -235,6 +235,7 @@ type
     procedure DisconnectAttachmentUpdate(Sender: TObject);
     procedure DropDatabaseExecute(Sender: TObject);
     procedure DropDatabaseUpdate(Sender: TObject);
+    procedure PageBuffersEditingDone(Sender: TObject);
     procedure UserManagerTabShow(Sender: TObject);
     procedure FilesTabShow(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -294,6 +295,7 @@ begin
   DatabaseData.AfterDBConnect := @HandleDBConnect;
   DatabaseData.AfterDataReload := @HandleLoadData;
   DatabaseData.Connect;
+  if not DatabaseData.IBDatabase1.Connected then Close;
 end;
 
 procedure TMainForm.IsShadowChkChange(Sender: TObject);
@@ -573,6 +575,11 @@ begin
   (Sender as TAction).Enabled := IBDatabaseInfo.Database.Connected;
 end;
 
+procedure TMainForm.PageBuffersEditingDone(Sender: TObject);
+begin
+  DatabaseData.PageBuffers := StrToInt(PageBuffers.Text);
+end;
+
 procedure TMainForm.UserManagerTabShow(Sender: TObject);
 begin
   if not Visible or not IBDatabaseInfo.Database.Connected or DatabaseData.EmbeddedMode then Exit;
@@ -763,7 +770,7 @@ begin
     Edit8.Text := DatabaseData.IBDatabase1.DatabaseName;
     Edit10.Text := IntToStr(IBDatabaseInfo.CurrentMemory);
     Edit11.Text := IntToStr(IBDatabaseInfo.MaxMemory);
-    Edit12.Text := IntToStr(IBDatabaseInfo.NumBuffers);
+    PageBuffers.Text := IntToStr(DatabaseData.PageBuffers);
     AllocatedPages.Text := IntToStr(IBDatabaseInfo.Allocation);
     DBIsReadOnly.Checked := DatabaseData.DBReadOnly;
     SyncWrites.Checked := DatabaseData.ForcedWrites;

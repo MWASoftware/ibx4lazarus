@@ -93,6 +93,7 @@ object DatabaseData: TDatabaseData
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
+    OnCalcFields = ShadowFilesCalcFields
     BufferChunks = 1000
     CachedUpdates = False
     GenerateParamNames = False

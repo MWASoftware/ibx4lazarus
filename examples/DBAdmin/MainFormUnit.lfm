@@ -64,11 +64,11 @@ object MainForm: TMainForm
     Height = 506
     Top = 26
     Width = 915
-    ActivePage = Properties
+    ActivePage = RepairTab
     Align = alClient
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 7
     TabOrder = 2
     object Properties: TTabSheet
       Caption = 'Properties'
@@ -421,15 +421,16 @@ object MainForm: TMainForm
           Caption = 'No. of Buffers'
           ParentColor = False
         end
-        object Edit12: TEdit
+        object PageBuffers: TEdit
           Left = 533
           Height = 24
           Top = 206
           Width = 89
           Alignment = taRightJustify
-          ReadOnly = True
+          NumbersOnly = True
+          OnEditingDone = PageBuffersEditingDone
           TabOrder = 18
-          Text = 'Edit12'
+          Text = 'PageBuffers'
         end
         object Label23: TLabel
           Left = 430
@@ -1993,7 +1994,7 @@ object MainForm: TMainForm
       ClientWidth = 909
       object SelectRepairAction: TComboBox
         Left = 656
-        Height = 23
+        Height = 27
         Top = 8
         Width = 200
         Anchors = [akTop, akRight]
@@ -2003,6 +2004,7 @@ object MainForm: TMainForm
           'Database Sweep'
           'Online Validation'
           'Full Validation'
+          'Kill Shadows'
         )
         TabOrder = 0
         Text = 'Database Sweep'

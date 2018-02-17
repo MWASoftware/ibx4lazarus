@@ -120,6 +120,7 @@ type
     procedure LegacyUserListBeforeClose(DataSet: TDataSet);
     procedure LegacyUserListBeforeDelete(DataSet: TDataSet);
     procedure LegacyUserListBeforePost(DataSet: TDataSet);
+    procedure ShadowFilesCalcFields(DataSet: TDataSet);
     procedure TagsUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
     procedure UpdateCharSetApplyUpdates(Sender: TObject;
@@ -163,6 +164,7 @@ type
     function GetForcedWrites: boolean;
     function GetLingerDelay: string;
     function GetNoReserve: boolean;
+    function GetPageBuffers: integer;
     function GetRoleName: string;
     function GetSecurityDatabase: string;
     function GetSweepInterval: integer;
@@ -173,6 +175,7 @@ type
     procedure SetForcedWrites(AValue: boolean);
     procedure SetLingerDelay(AValue: string);
     procedure SetNoReserve(AValue: boolean);
+    procedure SetPageBuffers(AValue: integer);
     procedure SetSweepInterval(AValue: integer);
     procedure ReloadData(Data: PtrInt=0);
   public
@@ -202,6 +205,7 @@ type
     property LingerDelay: string read GetLingerDelay write SetLingerDelay;
     property DBReadOnly: boolean read GetDBReadOnly write SetDBReadOnly;
     property NoReserve: boolean read GetNoReserve write SetNoReserve;
+    property PageBuffers: integer read GetPageBuffers write SetPageBuffers;
     property SweepInterval: integer read GetSweepInterval write SetSweepInterval;
     property SecurityDatabase: string read GetSecurityDatabase;
     property AuthMethod: string read GetAuthMethod;
@@ -223,7 +227,7 @@ implementation
 {$R *.lfm}
 
 uses DBLoginDlgUnit, IBUtils, FBMessages, ShutdownDatabaseDlgUnit,
-  BackupDlgUnit, RestoreDlgUnit, AddShadowSetDlgUnit;
+  BackupDlgUnit, RestoreDlgUnit, AddShadowSetDlgUnit, IBErrorCodes;
 
 const
   sAddSecondarySQL  = 'Alter Database Add File ''%s'' Starting at %d';
@@ -569,7 +573,13 @@ procedure TDatabaseData.ActivateService(aService: TIBCustomService);
       begin
         {If Local we must specify the server as the Localhost}
         ServerName := 'Localhost';
-        if not AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull then
+        if AttmtQuery.Active then
+        begin
+          if not AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull then
+            Protocol := TCP; {Use loopback if database does not use embedded server}
+        end
+        else {Special case - database not open}
+        if not FileExists(DBName) or FileIsReadOnly(DBName) then
           Protocol := TCP; {Use loopback if database does not use embedded server}
       end
       else
@@ -588,6 +598,14 @@ procedure TDatabaseData.ActivateService(aService: TIBCustomService);
     end;
   end;
 
+  function GetDatabaseName: string;
+  begin
+    if DatabaseQuery.Active then
+      Result := DatabaseQuery.FieldByName('MON$DATABASE_NAME').AsString
+    else
+      Result := FDatabasePathName;
+  end;
+
 var SecPlugin: TField;
     UsingDefaultSecDatabase: boolean;
 begin
@@ -600,8 +618,8 @@ begin
   if not IBServerProperties1.Active then
   begin
     SetupParams(IBServerProperties1,UsingDefaultSecDatabase,
-                 {noe that on a local server, the following always gives us the actual path}
-                 DatabaseQuery.FieldByName('MON$DATABASE_NAME').AsString);
+                   {note that on a local server, the following always gives us the actual path}
+                   GetDatabaseName);
     with IBServerProperties1 do
     begin
       LoginPrompt := (Protocol <> Local) and (FDBPassword = '');  {Does this ever occur?}
@@ -649,6 +667,13 @@ begin
   while IBConfigService1.IsServiceRunning do;
 end;
 
+procedure TDatabaseData.SetPageBuffers(AValue: integer);
+begin
+  ActivateService(IBConfigService1);
+  IBConfigService1.SetPageBuffers(AValue);
+  while IBConfigService1.IsServiceRunning do;
+end;
+
 procedure TDatabaseData.SetSweepInterval(AValue: integer);
 begin
   ActivateService(IBConfigService1);
@@ -673,6 +698,32 @@ begin
 end;
 
 procedure TDatabaseData.Connect;
+
+  procedure ReportException(E: Exception);
+  begin
+   MessageDlg(E.Message,mtError,[mbOK],0);
+   FDBPassword := '';
+  end;
+
+  procedure KillShadows;
+  begin
+    ActivateService(IBValidationService1);
+    with IBValidationService1 do
+    begin
+      Options := [IBServices.KillShadows];
+      try
+        try
+          ServiceStart;
+        except  end;
+        While not Eof do
+          GetNextLine;
+      finally
+        while IsServiceRunning do;
+      end;
+      MessageDlg('All Unavailable Shadows killed',mtInformation,[mbOK],0);
+    end;
+  end;
+
 begin
   Disconnect;
   repeat
@@ -683,11 +734,22 @@ begin
       begin
         Exit
       end;
-    On E:Exception do
+    On E: EIBInterBaseError do
       begin
-       MessageDlg(E.Message,mtError,[mbOK],0);
-       FDBPassword := '';
+        if E.IBErrorCode = isc_io_error then
+        begin
+          if MessageDlg('I/O Error reported on database file. If this is a shadow file, do you want '+
+                        'to kill all unavailable shadow sets?. The original message is ' + E.Message,
+                        mtInformation,[mbYes,mbNo],0) = mrYes then
+           KillShadows
+          else
+            Exit;
+        end
+        else
+          ReportException(E);
       end;
+    On E:Exception do
+      ReportException(E);
     end;
   until IBDatabase1.Connected;
 
@@ -816,6 +878,26 @@ procedure TDatabaseData.DatabaseRepair(ActionID: integer; ReportLines: TStrings
     end;
   end;
 
+  procedure DoKilLShadows;
+  begin
+    ActivateService(IBValidationService1);
+    with IBValidationService1 do
+    begin
+      Options := [KillShadows];
+      try
+        ServiceStart;
+        While not Eof do
+        begin
+          Application.ProcessMessages;
+          ReportLines.Add(GetNextLine);
+        end
+      finally
+        while IsServiceRunning do;
+      end;
+      MessageDlg('Operation Completed',mtInformation,[mbOK],0);
+    end;
+  end;
+
 begin
    case ActionID of
    0: {sweep}
@@ -832,6 +914,9 @@ begin
       IBValidationService1.Options := [ValidateFull];
       DoValidation(IBValidationService1,'Full');
      end;
+
+   3: {Kill Shadows}
+     DoKillShadows;
    end;
 end;
 
@@ -877,6 +962,11 @@ end;
 function TDatabaseData.GetNoReserve: boolean;
 begin
   Result :=  DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$RESERVE_SPACE').AsInteger <> 0);
+end;
+
+function TDatabaseData.GetPageBuffers: integer;
+begin
+  Result := IBDatabaseInfo.NumBuffers;
 end;
 
 function TDatabaseData.GetRoleName: string;
@@ -1172,6 +1262,7 @@ begin
     FDBUserName := aUserName;
     FDBPassword := aPassword;
     Database.CreateIfNotExists := aCreateIfNotExist;
+    ParseConnectString(aDatabaseName,FServerName,FDatabasePathName,FProtocol,FPortNo);
   end
   else
     IBError(ibxeOperationCancelled, [nil]);
@@ -1375,6 +1466,25 @@ procedure TDatabaseData.LegacyUserListBeforePost(DataSet: TDataSet);
 
 end;
 
+procedure TDatabaseData.ShadowFilesCalcFields(DataSet: TDataSet);
+var Flags: integer;
+begin
+  Flags := DataSet.FieldByName('RDB$FILE_FLAGS').AsInteger;
+  if Flags and $10 <> 0 then
+    DataSet.FieldByName('FileMode').AsString := 'C'
+  else
+  if Flags and $04 <> 0 then
+    DataSet.FieldByName('FileMode').AsString := 'M'
+  else
+  if Flags and $01 <> 0 then
+    if DataSet.FieldByName('RDB$FILE_SEQUENCE').AsInteger = 0 then
+      DataSet.FieldByName('FileMode').AsString := 'A'
+    else
+      DataSet.FieldByName('FileMode').AsString := '+'
+  else
+    DataSet.FieldByName('FileMode').AsString := ''
+end;
+
 procedure TDatabaseData.TagsUpdateApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 var sql: string;
@@ -1402,7 +1512,6 @@ end;
 
 procedure TDatabaseData.IBDatabase1AfterConnect(Sender: TObject);
 begin
-  ParseConnectString(IBDatabase1.DatabaseName,FServerName,FDatabasePathName,FProtocol,FPortNo);
   {Virtual tables did not exist prior to Firebird 2.1 - so don't bother with old version}
   with IBDatabaseInfo do
     if (ODSMajorVersion < 11) or ((ODSMajorVersion = 11) and (ODSMinorVersion < 1)) then
