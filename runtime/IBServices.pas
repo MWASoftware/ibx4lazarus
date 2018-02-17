@@ -390,7 +390,7 @@ type
   end;
 
   TRestoreOption = (DeactivateIndexes, NoShadow, NoValidityCheck, OneRelationAtATime,
-    Replace, CreateNewDB, UseAllSpace, RestoreMetaDataOnly, NoDBTriggersOnRestore);
+    Replace, CreateNewDB, UseAllSpace, RestoreMetaDataOnly);
 
   TRestoreOptions = set of TRestoreOption;
 
@@ -1625,13 +1625,6 @@ begin
     param := param or isc_spb_res_use_all_space;
   if (RestoreMetaDataOnly in Options) then
     param := param or isc_spb_res_metadata_only;
-  {Firebird 2.5 and later}
-  if (ServerVersionNo[1] > 2) or
-             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5)) then
-  begin
-    if (NoDBTriggersOnRestore in Options) then
-      param := param or isc_spb_bkp_no_triggers;
-  end;
   Action := isc_action_svc_restore;
   SRB.Add(isc_action_svc_restore);
   SRB.Add(isc_spb_options).AsInteger := param;

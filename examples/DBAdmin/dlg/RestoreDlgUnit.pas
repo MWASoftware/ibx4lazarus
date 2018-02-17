@@ -18,7 +18,6 @@ type
     DeActivateIndexes: TCheckBox;
     PageBuffers: TEdit;
     Label6: TLabel;
-    NoDBTriggersOnRestore: TCheckBox;
     NoShadow: TCheckBox;
     NoValidityCheck: TCheckBox;
     OneRelationAtATime: TCheckBox;
@@ -151,8 +150,6 @@ begin
       Options := [Replace];
       if DeactivateIndexes.Checked then
         Options := Options + [IBServices.DeactivateIndexes];
-      if NoDBTriggersOnRestore.Checked then
-        Options := Options + [IBServices.NoDBTriggersOnRestore];
       if NoShadow.Checked then
         Options := Options + [IBServices.NoShadow];
       if NoValidityCheck.Checked then

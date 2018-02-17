@@ -1,10 +1,10 @@
 object RestoreDlg: TRestoreDlg
   Left = 749
-  Height = 465
+  Height = 448
   Top = 314
   Width = 440
   Caption = 'Restore Database'
-  ClientHeight = 465
+  ClientHeight = 448
   ClientWidth = 440
   OnClose = FormClose
   OnShow = FormShow
@@ -13,7 +13,7 @@ object RestoreDlg: TRestoreDlg
   object Button1: TButton
     Left = 128
     Height = 25
-    Top = 432
+    Top = 415
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = 'OK'
@@ -24,7 +24,7 @@ object RestoreDlg: TRestoreDlg
   object Button2: TButton
     Left = 223
     Height = 25
-    Top = 432
+    Top = 415
     Width = 75
     Anchors = [akLeft, akBottom]
     Cancel = True
@@ -34,7 +34,7 @@ object RestoreDlg: TRestoreDlg
   end
   object PageControl1: TPageControl
     Left = 9
-    Height = 415
+    Height = 398
     Top = 10
     Width = 423
     ActivePage = SelectTab
@@ -44,7 +44,7 @@ object RestoreDlg: TRestoreDlg
     TabOrder = 2
     object SelectTab: TTabSheet
       Caption = 'SelectTab'
-      ClientHeight = 409
+      ClientHeight = 392
       ClientWidth = 417
       object Label2: TLabel
         Left = 12
@@ -187,53 +187,45 @@ object RestoreDlg: TRestoreDlg
         Caption = 'Deactivate Indexes'
         TabOrder = 7
       end
-      object NoDBTriggersOnRestore: TCheckBox
-        Left = 17
-        Height = 22
-        Top = 264
-        Width = 220
-        Caption = 'No Database Triggers On Restore'
-        TabOrder = 8
-      end
       object NoShadow: TCheckBox
         Left = 17
         Height = 22
-        Top = 288
+        Top = 264
         Width = 286
         Caption = 'Do not recreate shadow files during restore'
-        TabOrder = 9
+        TabOrder = 8
       end
       object NoValidityCheck: TCheckBox
         Left = 17
         Height = 22
-        Top = 312
+        Top = 288
         Width = 316
         Caption = 'Do not enforce validity conditions during restore'
-        TabOrder = 10
+        TabOrder = 9
       end
       object OneRelationAtATime: TCheckBox
         Left = 17
         Height = 22
-        Top = 336
+        Top = 312
         Width = 303
         Caption = 'Commit after completing restore of each table'
-        TabOrder = 11
+        TabOrder = 10
       end
       object RestoreMetaDataOnly: TCheckBox
         Left = 17
         Height = 22
-        Top = 360
+        Top = 336
         Width = 160
         Caption = 'Restore MetaData Only'
-        TabOrder = 12
+        TabOrder = 11
       end
       object UseAllSpace: TCheckBox
         Left = 17
         Height = 22
-        Top = 384
+        Top = 360
         Width = 397
         Caption = 'Do not reserve 20% of each data page for future rec. versions'
-        TabOrder = 13
+        TabOrder = 12
       end
       object Label6: TLabel
         Left = 197
@@ -255,7 +247,7 @@ object RestoreDlg: TRestoreDlg
     end
     object ReportTab: TTabSheet
       Caption = 'ReportTab'
-      ClientHeight = 409
+      ClientHeight = 392
       ClientWidth = 417
       OnShow = ReportTabShow
       object Report: TMemo
