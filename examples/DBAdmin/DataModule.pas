@@ -14,6 +14,13 @@ type
   { TDatabaseData }
 
   TDatabaseData = class(TDataModule)
+    AccessRightsCHILDCOUNT: TIBLargeIntField;
+    AccessRightsDisplayName: TStringField;
+    AccessRightsID: TIBStringField;
+    AccessRightsImageIndex: TLongintField;
+    AccessRightsPARENT: TIBStringField;
+    AccessRightsSUBJECT_NAME: TIBStringField;
+    AccessRightsSUBJECT_TYPE: TIBSmallintField;
     ApplicationProperties1: TApplicationProperties;
     AttachmentsMONATTACHMENT_ID: TIBLargeIntField;
     AttachmentsMONATTACHMENT_NAME: TIBStringField;
@@ -50,8 +57,12 @@ type
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
     Attachments: TIBQuery;
+    AccessRightsSource: TDataSource;
     IBOnlineValidationService1: TIBOnlineValidationService;
     DBTables: TIBQuery;
+    AuthMappings: TIBQuery;
+    AccessRights: TIBQuery;
+    SubjectAccessRights: TIBQuery;
     IBSecurityService1: TIBSecurityService;
     AttUpdate: TIBUpdate;
     AdminUserQuery: TIBSQL;
@@ -100,6 +111,10 @@ type
     UserListUSERNAME: TIBStringField;
     UserListUSERPASSWORD: TIBStringField;
     UserTags: TIBQuery;
+    procedure AccessRightsAfterOpen(DataSet: TDataSet);
+    procedure AccessRightsBeforeClose(DataSet: TDataSet);
+    procedure AccessRightsBeforeOpen(DataSet: TDataSet);
+    procedure AccessRightsCalcFields(DataSet: TDataSet);
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
     procedure AttachmentsAfterDelete(DataSet: TDataSet);
     procedure AttachmentsAfterOpen(DataSet: TDataSet);
@@ -204,6 +219,7 @@ type
     procedure LoadDatabaseStatistics(OptionID: integer; Lines: TStrings);
     procedure LoadServerProperties(Lines: TStrings);
     procedure LoadServerLog(Lines: TStrings);
+    procedure RevokeAll;
     property AutoAdmin: boolean read GetAutoAdmin write SetAutoAdmin;
     property Disconnecting: boolean read FDisconnecting;
     property ForcedWrites: boolean read GetForcedWrites write SetForcedWrites;
@@ -743,12 +759,13 @@ begin
       begin
         if E.IBErrorCode = isc_io_error then
         begin
+            FDBPassword := '';
           if MessageDlg('I/O Error reported on database file. If this is a shadow file, do you want '+
                         'to kill all unavailable shadow sets?. The original message is ' + E.Message,
                         mtInformation,[mbYes,mbNo],0) = mrYes then
-           try KillShadows except end
+            try KillShadows except end
           else
-            Exit;
+            continue;
         end
         else
           ReportException(E);
@@ -1244,6 +1261,35 @@ begin
   end;
 end;
 
+procedure TDatabaseData.RevokeAll;
+begin
+  with SubjectAccessRights do
+  if Active then
+  begin
+    DisableControls;
+    try
+      First;
+      while not EOF do
+      begin
+        if FieldByName('OBJECT_TYPE').AsInteger = 0 then
+          ExecDDL.SQL.Text := Format('Revoke All on %s from %s',[
+                  FieldByName('OBJECT_NAME').AsString,
+                  FieldByName('SUBJECT_NAME').AsString])
+        else
+          ExecDDL.SQL.Text := Format('Revoke All on %s %s from %s',[
+                    FieldByName('OBJECT_TYPE_NAME').AsString,
+                    FieldByName('OBJECT_NAME').AsString,
+                    FieldByName('SUBJECT_NAME').AsString]);
+        ExecDDL.ExecQuery;
+        Next;
+      end;
+    finally
+      EnableControls;
+    end;
+    CurrentTransaction.Commit;
+  end;
+end;
+
 procedure TDatabaseData.IBDatabase1Login(Database: TIBDatabase;
   LoginParams: TStrings);
 var aDatabaseName: string;
@@ -1409,7 +1455,7 @@ begin
         Append;
         FieldByName('UserID').AsInteger := UserID;
         FieldByName('GroupID').AsInteger := GroupID;
-        FieldByName('UserName').AsString := UserName;
+        FieldByName('UserName').AsString := Trim(UserName);
         FieldByName('SEC$FIRST_NAME').AsString := FirstName;
         FieldByName('SEC$MIDDLE_NAME').AsString := MiddleName;
         FieldByName('SEC$LAST_NAME').AsString := LastName;
@@ -1597,6 +1643,39 @@ begin
   MessageDlg(E.Message,mtError,[mbOK],0);
   if CurrentTransaction.Active then
     CurrentTransaction.Rollback;
+end;
+
+procedure TDatabaseData.AccessRightsBeforeClose(DataSet: TDataSet);
+begin
+  SubjectAccessRights.Active := false;
+end;
+
+procedure TDatabaseData.AccessRightsBeforeOpen(DataSet: TDataSet);
+begin
+  writeln((Dataset as TIBQuery).Parser.SQLText);
+end;
+
+procedure TDatabaseData.AccessRightsCalcFields(DataSet: TDataSet);
+begin
+  AccessRightsDisplayName.AsString := AccessRightsSUBJECT_NAME.AsString;
+  if AccessRightsSUBJECT_TYPE.AsInteger = 8 then
+  begin
+    if  (AccessRightsSUBJECT_NAME.AsString <> 'PUBLIC') and UserListSource.DataSet.Active and
+       not UserListSource.DataSet.Locate('USERNAME',AccessRightsSUBJECT_NAME.AsString,[]) then
+    begin
+      AccessRightsImageIndex.AsInteger := 4;
+      AccessRightsDisplayName.AsString := AccessRightsSUBJECT_NAME.AsString + ' (stale)';
+    end
+    else
+      AccessRightsImageIndex.AsInteger := -1
+  end
+  else
+    AccessRightsImageIndex.AsInteger := -1;
+end;
+
+procedure TDatabaseData.AccessRightsAfterOpen(DataSet: TDataSet);
+begin
+  SubjectAccessRights.Active := true;
 end;
 
 procedure TDatabaseData.AttachmentsAfterDelete(DataSet: TDataSet);

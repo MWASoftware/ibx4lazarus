@@ -499,6 +499,7 @@ begin
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'TextField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ParentField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'HasChildField', TIBTreeViewFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ImageIndexField', TIBTreeViewFieldProperty);
 
   IBGUIInterface :=  TIBDSLCLInterface.Create;
 end;

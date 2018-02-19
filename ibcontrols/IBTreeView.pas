@@ -88,6 +88,7 @@ type
     FDataLink: TIBTreeViewDatalink;
     FIBTreeViewControlLink: TIBTreeViewControlLink;
     FHasChildField: string;
+    FImageIndexField: string;
     FKeyField: string;
     FTextField: string;
     FParentField: string;
@@ -111,6 +112,7 @@ type
     procedure NodeUpdated(Node: TTreeNode);
     procedure RecordChanged(Sender: TObject; Field: TField);
     procedure SetHasChildField(AValue: string);
+    procedure SetImageIndexField(AValue: string);
     procedure SetKeyField(AValue: string);
     procedure SetTextField(AValue: string);
     procedure SetDataSource(AValue: TDataSource);
@@ -167,6 +169,7 @@ type
     property Images;
     property Indent;
     property HasChildField: string read FHasChildField write SetHasChildField;
+    property ImageIndexField: string read FImageIndexField write SetImageIndexField;
     property KeyField: string read FKeyField write SetKeyField;
     property MultiSelect;
     property MultiSelectStyle;
@@ -361,6 +364,8 @@ begin
       while not DataSet.EOF do
       begin
         Node := Items.AddChild(FExpandNode,DataSet.FieldByName(TextField).AsString);
+        if ImageIndexField <> '' then
+          Node.ImageIndex := DataSet.FieldByName(ImageIndexField).AsInteger;
         TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
         Node.HasChildren := (HasChildField = '') or (DataSet.FieldByName(HasChildField).AsInteger <> 0);
         Inc(ChildCount);
@@ -446,6 +451,20 @@ begin
     end;
   end
   else
+  if assigned(Field) and (Field.FieldName = ImageIndexField) then
+  begin
+    Node := FindNode(DataSet.FieldByName(KeyField).AsVariant);
+    if assigned(Node) then
+    begin
+      FUpdating := true;
+      try
+        Node.ImageIndex := Field.AsInteger
+      finally
+        FUpdating := false
+      end;
+    end;
+  end
+  else
   if assigned(Field) and (Field.FieldName = ParentField) then
   begin
     Node := FindNode(DataSet.FieldByName(KeyField).AsVariant);
@@ -472,6 +491,13 @@ procedure TIBTreeView.SetHasChildField(AValue: string);
 begin
   if FHasChildField = AValue then Exit;
   FHasChildField := AValue;
+  Reinitialise
+end;
+
+procedure TIBTreeView.SetImageIndexField(AValue: string);
+begin
+  if FImageIndexField = AValue then Exit;
+  FImageIndexField := AValue;
   Reinitialise
 end;
 

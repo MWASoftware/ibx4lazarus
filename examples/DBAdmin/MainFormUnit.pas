@@ -8,14 +8,23 @@ uses
   Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL,
   SynGutterCodeFolding, Forms, Controls, Graphics, Dialogs, Menus, ComCtrls,
   ActnList, StdCtrls, DbCtrls, ExtCtrls, Buttons, db, IBLookupComboEditBox,
-  IBDynamicGrid, IBDatabaseInfo, IBServices, IBExtract;
+  IBDynamicGrid, IBTreeView, IBDatabaseInfo, IBServices, IBExtract;
 
 type
 
   { TMainForm }
 
   TMainForm = class(TForm)
+    AccessRightsPopup: TPopupMenu;
+    MenuItem19: TMenuItem;
+    RevokeAll: TAction;
+    AuthMapSource: TDataSource;
+    AccessRightsSource: TDataSource;
+    SubjectAccessRightsSource: TDataSource;
     DBTablesSource: TDataSource;
+    IBDynamicGrid5: TIBDynamicGrid;
+    IBDynamicGrid6: TIBDynamicGrid;
+    IBTreeView1: TIBTreeView;
     SelectAllTables: TCheckBox;
     Label40: TLabel;
     SelectedTablesGrid: TIBDynamicGrid;
@@ -32,6 +41,9 @@ type
     DBTablesSplitter: TSplitter;
     Alltables: TRadioButton;
     SelectedTablesOnly: TRadioButton;
+    MappingsTab: TTabSheet;
+    AccessRightsTab: TTabSheet;
+    Splitter5: TSplitter;
     ValidateRepairRecordFragments: TCheckBox;
     IgnoreChecksums: TCheckBox;
     Label34: TLabel;
@@ -228,6 +240,8 @@ type
     UserListSource: TDataSource;
     UserTagsSource: TDataSource;
     ValidationReport: TMemo;
+    procedure AccessRightsTabHide(Sender: TObject);
+    procedure AccessRightsTabShow(Sender: TObject);
     procedure AddSecondaryExecute(Sender: TObject);
     procedure AddShadowSetExecute(Sender: TObject);
     procedure AddTagExecute(Sender: TObject);
@@ -257,12 +271,17 @@ type
     procedure DisconnectAttachmentUpdate(Sender: TObject);
     procedure DropDatabaseExecute(Sender: TObject);
     procedure DropDatabaseUpdate(Sender: TObject);
+    procedure MappingsTabHide(Sender: TObject);
+    procedure MappingsTabShow(Sender: TObject);
     procedure PageBuffersEditingDone(Sender: TObject);
     procedure RepairTabHide(Sender: TObject);
     procedure RepairTabShow(Sender: TObject);
+    procedure RevokeAllExecute(Sender: TObject);
+    procedure RevokeAllUpdate(Sender: TObject);
     procedure SelectAllTablesChange(Sender: TObject);
     procedure SelectedTablesOnlyChange(Sender: TObject);
     procedure SelectRepairActionCloseUp(Sender: TObject);
+    procedure UserManagerTabHide(Sender: TObject);
     procedure UserManagerTabShow(Sender: TObject);
     procedure FilesTabShow(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -415,6 +434,19 @@ begin
     end;
     DatabaseData.AddSecondaryFile(FileName,StartAt,FileLength);
   end;
+end;
+
+procedure TMainForm.AccessRightsTabShow(Sender: TObject);
+begin
+  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  UserListSource.DataSet.Active := true;
+  AccessRightsSource.DataSet.Active := true;
+end;
+
+procedure TMainForm.AccessRightsTabHide(Sender: TObject);
+begin
+  AccessRightsSource.DataSet.Active := false;
+  UserListSource.DataSet.Active := PageControl1.ActivePage = UserManagerTab;
 end;
 
 procedure TMainForm.AddShadowSetExecute(Sender: TObject);
@@ -603,6 +635,17 @@ begin
   (Sender as TAction).Enabled := IBDatabaseInfo.Database.Connected;
 end;
 
+procedure TMainForm.MappingsTabHide(Sender: TObject);
+begin
+  AuthMapSource.DataSet.Active := false;
+end;
+
+procedure TMainForm.MappingsTabShow(Sender: TObject);
+begin
+  if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
+  AuthMapSource.DataSet.Active := true;
+end;
+
 procedure TMainForm.PageBuffersEditingDone(Sender: TObject);
 begin
   DatabaseData.PageBuffers := StrToInt(PageBuffers.Text);
@@ -619,6 +662,20 @@ begin
   ValidateOptions.Enabled := SelectRepairAction.ItemIndex = 2;
   ValidateOptions.ActivePage := ValidateOptionsTab;
   ConfigureOnlineValidation;
+end;
+
+procedure TMainForm.RevokeAllExecute(Sender: TObject);
+begin
+  if MessageDlg('Revoke all Access Rights from User ' + Trim(IBTreeView1.Selected.Text),
+      mtConfirmation,[mbYes,mbNo],0) = mrYes then
+    DatabaseData.RevokeAll;
+end;
+
+procedure TMainForm.RevokeAllUpdate(Sender: TObject);
+begin
+  with AccessRightsSource.DataSet do
+  (Sender as TAction).Enabled := Active and (RecordCount > 0) and
+    (FieldByName('SUBJECT_TYPE').AsInteger = 8);
 end;
 
 procedure TMainForm.SelectAllTablesChange(Sender: TObject);
@@ -658,6 +715,11 @@ procedure TMainForm.SelectRepairActionCloseUp(Sender: TObject);
 begin
   ValidateOptions.Enabled := SelectRepairAction.ItemIndex = 2;
   ConfigureOnlineValidation;
+end;
+
+procedure TMainForm.UserManagerTabHide(Sender: TObject);
+begin
+  UserListSource.DataSet.Active := PageControl1.ActivePage = AccessRightsTab;
 end;
 
 procedure TMainForm.UserManagerTabShow(Sender: TObject);

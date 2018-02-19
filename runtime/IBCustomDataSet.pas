@@ -2939,7 +2939,14 @@ end;
 procedure TIBCustomDataSet.RegisterIBLink(Sender: TIBControlLink);
 begin
   if FIBLinks.IndexOf(Sender) = -1 then
+  begin
     FIBLinks.Add(Sender);
+    if Active then
+    begin
+      Active := false;
+      Active := true;
+    end;
+  end;
 end;
 
 
