@@ -16,15 +16,18 @@ type
 
   TMainForm = class(TForm)
     AccessRightsPopup: TPopupMenu;
+    AccessRightsSource: TDataSource;
+    DBEdit5: TDBEdit;
+    Label41: TLabel;
     MenuItem19: TMenuItem;
+    UpdateColsPanel: TPanel;
     RevokeAll: TAction;
     AuthMapSource: TDataSource;
-    AccessRightsSource: TDataSource;
     SubjectAccessRightsSource: TDataSource;
     DBTablesSource: TDataSource;
     IBDynamicGrid5: TIBDynamicGrid;
-    IBDynamicGrid6: TIBDynamicGrid;
-    IBTreeView1: TIBTreeView;
+    SubjectAccessRightsGrid: TIBDynamicGrid;
+    AccessRightsTreeView: TIBTreeView;
     SelectAllTables: TCheckBox;
     Label40: TLabel;
     SelectedTablesGrid: TIBDynamicGrid;
@@ -271,6 +274,7 @@ type
     procedure DisconnectAttachmentUpdate(Sender: TObject);
     procedure DropDatabaseExecute(Sender: TObject);
     procedure DropDatabaseUpdate(Sender: TObject);
+    procedure AccessRightsTreeViewSelectionChanged(Sender: TObject);
     procedure MappingsTabHide(Sender: TObject);
     procedure MappingsTabShow(Sender: TObject);
     procedure PageBuffersEditingDone(Sender: TObject);
@@ -341,6 +345,8 @@ begin
   PageControl1.ActivePage := Properties;
   DatabaseData.AfterDBConnect := @HandleDBConnect;
   DatabaseData.AfterDataReload := @HandleLoadData;
+  AccessRightsTreeView.DataSource := AccessRightsSource;
+  SubjectAccessRightsGrid.DataSource := SubjectAccessRightsSource;
   DatabaseData.Connect;
   if not DatabaseData.IBDatabase1.Connected then Close;
 end;
@@ -445,6 +451,7 @@ end;
 
 procedure TMainForm.AccessRightsTabHide(Sender: TObject);
 begin
+  SubjectAccessRightsSource.DataSet.Active := false;
   AccessRightsSource.DataSet.Active := false;
   UserListSource.DataSet.Active := PageControl1.ActivePage = UserManagerTab;
 end;
@@ -635,6 +642,18 @@ begin
   (Sender as TAction).Enabled := IBDatabaseInfo.Database.Connected;
 end;
 
+procedure TMainForm.AccessRightsTreeViewSelectionChanged(Sender: TObject);
+begin
+  if SubjectAccessRightsSource.DataSet = nil then Exit;
+  if AccessRightsSource.DataSet.Active then
+  begin
+    if AccessRightsTreeView.Selected.Parent = nil then
+      SubjectAccessRightsSource.DataSet.Active := false
+    else
+      DatabaseData.SyncSubjectAccessRights(TIBTreeNode(AccessRightsTreeView.Selected).KeyValue);
+  end;
+end;
+
 procedure TMainForm.MappingsTabHide(Sender: TObject);
 begin
   AuthMapSource.DataSet.Active := false;
@@ -666,7 +685,7 @@ end;
 
 procedure TMainForm.RevokeAllExecute(Sender: TObject);
 begin
-  if MessageDlg('Revoke all Access Rights from User ' + Trim(IBTreeView1.Selected.Text),
+  if MessageDlg('Revoke all Access Rights from User ' + Trim(AccessRightsTreeView.Selected.Text),
       mtConfirmation,[mbYes,mbNo],0) = mrYes then
     DatabaseData.RevokeAll;
 end;

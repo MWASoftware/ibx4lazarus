@@ -57,7 +57,6 @@ type
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
     Attachments: TIBQuery;
-    AccessRightsSource: TDataSource;
     IBOnlineValidationService1: TIBOnlineValidationService;
     DBTables: TIBQuery;
     AuthMappings: TIBQuery;
@@ -112,8 +111,6 @@ type
     UserListUSERPASSWORD: TIBStringField;
     UserTags: TIBQuery;
     procedure AccessRightsAfterOpen(DataSet: TDataSet);
-    procedure AccessRightsBeforeClose(DataSet: TDataSet);
-    procedure AccessRightsBeforeOpen(DataSet: TDataSet);
     procedure AccessRightsCalcFields(DataSet: TDataSet);
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
     procedure AttachmentsAfterDelete(DataSet: TDataSet);
@@ -140,6 +137,8 @@ type
     procedure LegacyUserListBeforeDelete(DataSet: TDataSet);
     procedure LegacyUserListBeforePost(DataSet: TDataSet);
     procedure ShadowFilesCalcFields(DataSet: TDataSet);
+    procedure SubjectAccessRightsAfterOpen(DataSet: TDataSet);
+    procedure SubjectAccessRightsBeforeOpen(DataSet: TDataSet);
     procedure TagsUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
     procedure UpdateCharSetApplyUpdates(Sender: TObject;
@@ -165,7 +164,7 @@ type
     FLocalConnect: boolean;
     FUsersLoading: boolean;
     FLoadingLimboTr: boolean;
-
+    FSubjectAccessRightsID: string;
     {Parsed results of connectstring;}
     FServerName: string;
     FPortNo: string;
@@ -220,6 +219,7 @@ type
     procedure LoadServerProperties(Lines: TStrings);
     procedure LoadServerLog(Lines: TStrings);
     procedure RevokeAll;
+    procedure SyncSubjectAccessRights(ID: string);
     property AutoAdmin: boolean read GetAutoAdmin write SetAutoAdmin;
     property Disconnecting: boolean read FDisconnecting;
     property ForcedWrites: boolean read GetForcedWrites write SetForcedWrites;
@@ -1290,6 +1290,14 @@ begin
   end;
 end;
 
+procedure TDatabaseData.SyncSubjectAccessRights(ID: string);
+begin
+  if FSubjectAccessRightsID = ID then Exit;
+  SubjectAccessRights.Active := false;
+  FSubjectAccessRightsID := ID;
+  SubjectAccessRights.Active := true;
+end;
+
 procedure TDatabaseData.IBDatabase1Login(Database: TIBDatabase;
   LoginParams: TStrings);
 var aDatabaseName: string;
@@ -1546,6 +1554,16 @@ begin
     DataSet.FieldByName('FileMode').AsString := ''
 end;
 
+procedure TDatabaseData.SubjectAccessRightsAfterOpen(DataSet: TDataSet);
+begin
+  writeln('Subject opened');
+end;
+
+procedure TDatabaseData.SubjectAccessRightsBeforeOpen(DataSet: TDataSet);
+begin
+  SubjectAccessRights.ParamByName('ID').AsString := FSubjectAccessRightsID;
+end;
+
 procedure TDatabaseData.TagsUpdateApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 var sql: string;
@@ -1645,16 +1663,6 @@ begin
     CurrentTransaction.Rollback;
 end;
 
-procedure TDatabaseData.AccessRightsBeforeClose(DataSet: TDataSet);
-begin
-  SubjectAccessRights.Active := false;
-end;
-
-procedure TDatabaseData.AccessRightsBeforeOpen(DataSet: TDataSet);
-begin
-  writeln((Dataset as TIBQuery).Parser.SQLText);
-end;
-
 procedure TDatabaseData.AccessRightsCalcFields(DataSet: TDataSet);
 begin
   AccessRightsDisplayName.AsString := AccessRightsSUBJECT_NAME.AsString;
@@ -1675,7 +1683,7 @@ end;
 
 procedure TDatabaseData.AccessRightsAfterOpen(DataSet: TDataSet);
 begin
-  SubjectAccessRights.Active := true;
+  writeln('Open Access Rights');
 end;
 
 procedure TDatabaseData.AttachmentsAfterDelete(DataSet: TDataSet);

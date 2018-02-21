@@ -64,12 +64,12 @@ object MainForm: TMainForm
     Height = 526
     Top = 26
     Width = 905
-    ActivePage = MappingsTab
+    ActivePage = AccessRightsTab
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 8
+    TabIndex = 7
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
@@ -2000,14 +2000,13 @@ object MainForm: TMainForm
       ClientWidth = 899
       OnHide = AccessRightsTabHide
       OnShow = AccessRightsTabShow
-      object IBTreeView1: TIBTreeView
+      object AccessRightsTreeView: TIBTreeView
         Left = 0
         Height = 494
         Top = 0
         Width = 300
         Align = alLeft
         TextField = 'DisplayName'
-        DataSource = AccessRightsSource
         Images = MenuImages
         HasChildField = 'CHILDCOUNT'
         ImageIndexField = 'ImageIndex'
@@ -2015,6 +2014,7 @@ object MainForm: TMainForm
         ParentField = 'PARENT'
         PopupMenu = AccessRightsPopup
         TabOrder = 0
+        OnSelectionChanged = AccessRightsTreeViewSelectionChanged
       end
       object Splitter5: TSplitter
         Left = 300
@@ -2022,7 +2022,7 @@ object MainForm: TMainForm
         Top = 0
         Width = 5
       end
-      object IBDynamicGrid6: TIBDynamicGrid
+      object SubjectAccessRightsGrid: TIBDynamicGrid
         Left = 305
         Height = 494
         Top = 0
@@ -2047,7 +2047,7 @@ object MainForm: TMainForm
             Width = 150
             FieldName = 'OBJECT_NAME'
             AutoSizeColumn = True
-            InitialSortColumn = False
+            InitialSortColumn = True
             DBLookupProperties.ItemHeight = 0
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
@@ -2085,13 +2085,44 @@ object MainForm: TMainForm
             DBLookupProperties.ItemWidth = 0
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end>
-        DataSource = SubjectAccessRightsSource
         Scrollbars = ssAutoVertical
         TabOrder = 2
-        ExpandEditorPanelBelowRow = False
+        EditorPanel = UpdateColsPanel
+        ExpandEditorPanelBelowRow = True
         Descending = False
         EditorBorderStyle = bsSingle
         DefaultPositionAtEnd = False
+      end
+      object UpdateColsPanel: TPanel
+        Left = 328
+        Height = 32
+        Top = 40
+        Width = 544
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        ClientHeight = 30
+        ClientWidth = 542
+        TabOrder = 3
+        object Label41: TLabel
+          Left = 19
+          Height = 14
+          Top = 8
+          Width = 100
+          Caption = 'Update Columns'
+          ParentColor = False
+        end
+        object DBEdit5: TDBEdit
+          Left = 128
+          Height = 24
+          Top = 4
+          Width = 404
+          DataField = 'UPDATE_COLUMNS'
+          DataSource = SubjectAccessRightsSource
+          Anchors = [akTop, akLeft, akRight]
+          CharCase = ecNormal
+          MaxLength = 0
+          TabOrder = 0
+        end
       end
     end
     object MappingsTab: TTabSheet
@@ -3133,11 +3164,6 @@ object MainForm: TMainForm
     left = 303
     top = 286
   end
-  object AccessRightsSource: TDataSource
-    DataSet = DatabaseData.AccessRights
-    left = 293
-    top = 360
-  end
   object SubjectAccessRightsSource: TDataSource
     DataSet = DatabaseData.SubjectAccessRights
     left = 297
@@ -3149,5 +3175,10 @@ object MainForm: TMainForm
     object MenuItem19: TMenuItem
       Action = RevokeAll
     end
+  end
+  object AccessRightsSource: TDataSource
+    DataSet = DatabaseData.AccessRights
+    left = 288
+    top = 360
   end
 end

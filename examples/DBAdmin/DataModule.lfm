@@ -1157,8 +1157,6 @@ object DatabaseData: TDatabaseData
     Database = IBDatabase1
     Transaction = CurrentTransaction
     AfterOpen = AccessRightsAfterOpen
-    BeforeClose = AccessRightsBeforeClose
-    BeforeOpen = AccessRightsBeforeOpen
     OnCalcFields = AccessRightsCalcFields
     BufferChunks = 1000
     CachedUpdates = False
@@ -1290,9 +1288,10 @@ object DatabaseData: TDatabaseData
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
+    AfterOpen = SubjectAccessRightsAfterOpen
+    BeforeOpen = SubjectAccessRightsBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
-    DataSource = AccessRightsSource
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
@@ -1300,17 +1299,24 @@ object DatabaseData: TDatabaseData
       '  UP.RDB$USER_TYPE as SUBJECT_TYPE,'
       '  T1.RDB$TYPE_NAME as SUBJECT_TYPE_NAME,'
       '  UP.RDB$OBJECT_TYPE as OBJECT_TYPE,'
-      '  T2.RDB$TYPE_NAME as OBJECT_TYPE_NAME,'
+      '  case T2.RDB$TYPE_NAME'
+      '      When ''RELATION'' then ''TABLE'''
+      '      When ''FIELD'' then ''DOMAIN'''
+      '  Else T2.RDB$TYPE_NAME End  as OBJECT_TYPE_NAME,'
       '  UP.RDB$RELATION_NAME as OBJECT_NAME,'
-      '  List(Trim(RDB$PRIVILEGE)) as Granted_Privileges,'
+      '  List(DISTINCT Trim(RDB$PRIVILEGE)) as Granted_Privileges,'
+      '  coalesce(List(Trim(UP.RDB$FIELD_NAME)),''<All Columns>'') as Update_Columns,'
       '  UP.RDB$GRANTOR as GrantedBy,'
       '  coalesce(UP.RDB$GRANT_OPTION,0) as GRANT_OPTION'
       '  From RDB$USER_PRIVILEGES UP'
       '  JOIN RDB$TYPES T1 On T1.RDB$TYPE = UP.RDB$USER_TYPE and T1.RDB$FIELD_NAME = ''RDB$OBJECT_TYPE'''
       '  JOIN RDB$TYPES T2 On T2.RDB$TYPE = UP.RDB$OBJECT_TYPE and T2.RDB$FIELD_NAME = ''RDB$OBJECT_TYPE'''
       '  Where Trim(UP.RDB$USER) || UP.RDB$USER_TYPE = :ID and'
-      '    (UP.RDB$OBJECT_TYPE <> 0 or'
-      '      not Exists(Select * from RDB$RELATIONS Where RDB$RELATION_NAME = UP.RDB$RELATION_NAME and RDB$SYSTEM_FLAG <> 0))'
+      '    ('
+      '    (UP.RDB$OBJECT_TYPE in (0,13) and'
+      '      not Exists(Select * from RDB$RELATIONS Where RDB$RELATION_NAME = UP.RDB$RELATION_NAME and RDB$SYSTEM_FLAG <> 0)) or'
+      '    (UP.RDB$OBJECT_TYPE = 9 and UP.RDB$RELATION_NAME not Similar to ''RDB$%|SEC$%|MON$%|SQL$%'')'
+      '    )'
       '  Group BY UP.RDB$USER,UP.RDB$USER_TYPE,UP.RDB$OBJECT_TYPE,'
       '    UP.RDB$RELATION_NAME, UP.RDB$GRANTOR, RDB$GRANT_OPTION,T1.RDB$TYPE_NAME,'
       '    T2.RDB$TYPE_NAME'
@@ -1331,10 +1337,5 @@ object DatabaseData: TDatabaseData
         Name = 'ID'
         ParamType = ptInput
       end>
-  end
-  object AccessRightsSource: TDataSource
-    DataSet = AccessRights
-    left = 640
-    top = 200
   end
 end

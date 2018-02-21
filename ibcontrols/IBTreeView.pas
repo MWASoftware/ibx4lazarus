@@ -382,7 +382,7 @@ end;
 
 procedure TIBTreeView.DataSetChanged(Sender: TObject);
 begin
-//  Reinitialise
+//  Do nothing;
 end;
 
 function TIBTreeView.GetDataSet: TDataSet;
