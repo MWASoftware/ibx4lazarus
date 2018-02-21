@@ -6,7 +6,7 @@ object DatabaseData: TDatabaseData
   Width = 730
   PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -1086,18 +1086,18 @@ object DatabaseData: TDatabaseData
       ' Where RDB$SYSTEM_FLAG = 0'
     )
     Params = <>
-    UpdateObject = IBUpdate1
+    UpdateObject = DBTablesUpdate
     DataSetCloseAction = dcDiscardChanges
     left = 520
     top = 488
   end
-  object IBUpdate1: TIBUpdate
+  object DBTablesUpdate: TIBUpdate
     RefreshSQL.Strings = (
       ''
     )
-    OnApplyUpdates = IBUpdate1ApplyUpdates
-    left = 568
-    top = 472
+    OnApplyUpdates = DBTablesUpdateApplyUpdates
+    left = 592
+    top = 480
   end
   object AuthMappings: TIBQuery
     AllowAutoActivateTransaction = False

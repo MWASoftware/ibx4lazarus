@@ -230,11 +230,11 @@ begin
   Opts := TStringList.Create;
   NonOpts := TStringList.Create;
   try
-    ErrorMsg := CheckOptions('aAhbeu:i:o:p:r:s:t:',['help','user','pass','role'],Opts,NonOpts);
+    ErrorMsg := CheckOptions('aAhbegu:i:o:p:r:s:t:',['help','user','pass','role'],Opts,NonOpts);
     {Database name is last parameter if given and not an option}
     if (NonOpts.Count > 0) and ((Opts.Count = 0) or
              ((Opts.ValueFromIndex[Opts.Count-1] <> NonOpts[NonOpts.Count-1])) or
-             (ParamCount = 1) or (ParamStr(ParamCount-1)[2] in ['!','A','h','b','e']))then
+             (ParamCount = 1) or (ParamStr(ParamCount-1)[2] in ['!','A','h','b','e','g']))then
       FIBDatabase.DatabaseName := ParamStr(ParamCount);
   finally
     Opts.Free;
@@ -272,7 +272,9 @@ begin
   {Process Command line options}
 
   if HasOption('a') then
+  begin
     DoExtract := true;
+  end;
 
   if HasOption('A') then
   begin
@@ -291,6 +293,9 @@ begin
 
   if HasOption('i') then
     SQLFileName := GetOptionValue('i');
+
+  if HasOption('g')then
+    ExtractTypes += [etGrantsToUser];
 
   if HasOption('o') then
   begin
@@ -426,6 +431,7 @@ begin
   writeln(stderr,'-A            write database metadata and table data to stdout');
   writeln(stderr,'-b            stop on first error');
   writeln(stderr,'-e            echo sql statements to stdout');
+  writeln(stderr,'-g            include grants to normal users in database metadata');
   writeln(stderr,'-i <filename> execute SQL script from file');
   writeln(stderr,'-h            show this information');
   writeln(stderr,'-o <filename> output to this file instead of stdout');

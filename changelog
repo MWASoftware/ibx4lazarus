@@ -81,7 +81,7 @@ IBX Change Log  version                                                  (2.2-0)
 17. TIBDatabaseInfo: cache ODS Version information on first request in order to minimise
     DB info lookups"
 
-18. IBExtract: now supports DDL Triggers.
+18. IBExtract: now supports DDL Triggers and Grants to DDL objects.
 
 19. Add a property Editor for TIBUpdate.RefreshSQL.
 
@@ -180,6 +180,10 @@ IBX Change Log  version                                                  (2.2-0)
 
 45. IBTTreeview: new ImageIndex Property allows the image index for each node to be
     set from a database field.
+
+46. TIBExtract: new extract type (etGrantsToUser) for use with eoDatabase. If included
+    then database schema includes grants to all users. If not present then the
+    only user grants included are those to User PUBLIC.
 
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000

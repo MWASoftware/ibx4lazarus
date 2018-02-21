@@ -58,7 +58,7 @@ type
 
   TExtractType =
     (etDomain, etTable, etRole, etTrigger, etForeign,
-     etIndex, etData, etGrant, etCheck);
+     etIndex, etData, etGrant, etCheck, etGrantsToUser);
 
   TExtractTypes = Set of TExtractType;
 
@@ -82,19 +82,19 @@ type
     procedure SetDatabase(const Value: TIBDatabase);
     procedure SetTransaction(const Value: TIBTransaction);
     function PrintValidation(ToValidate : String;	flag : Boolean) : String;
-    procedure ShowGrants(MetaObject: String; Terminator : String);
+    procedure ShowGrants(MetaObject: String; Terminator : String; NoUserGrants: boolean=false);
     procedure ShowGrantsTo(MetaObject: String; ObjectType: integer;
       Terminator: String);
     procedure ShowGrantRoles(Terminator : String);
     procedure GetProcedureArgs(Proc : String);
   protected
-    function ExtractDDL(Flag: Boolean; TableName: String; IncludeData: boolean =
-      false): Boolean;
+    function ExtractDDL(Flag: Boolean; TableName: String; ExtractTypes: TExtractTypes =
+      []): Boolean;
     function ExtractListTable(RelationName, NewName: String; DomainFlag: Boolean): Boolean;
     procedure ExtractListView (ViewName : String);
     procedure ListData(ObjectName : String);
-    procedure ListRoles(ObjectName : String = '');
-    procedure ListGrants;
+    procedure ListRoles(ObjectName : String = ''; IncludeGrants:boolean=false);
+    procedure ListGrants(ExtractTypes : TExtractTypes = []);
     procedure ListProcs(ProcDDLType: TProcDDLType = pdCreateProc; ProcedureName : String = '';
       IncludeGrants:boolean=false);
     procedure ListAllTables(flag : Boolean);
@@ -363,7 +363,8 @@ begin
   inherited;
 end;
 
-function TIBExtract.ExtractDDL(Flag: Boolean; TableName: String; IncludeData: boolean = false) : Boolean;
+function TIBExtract.ExtractDDL(Flag: Boolean; TableName: String;
+  ExtractTypes: TExtractTypes): Boolean;
 var
 	DidConnect : Boolean;
 	DidStart : Boolean;
@@ -400,11 +401,11 @@ begin
     ListFunctions;
     ListDomains;
     ListAllTables(flag);
-    if IncludeData then
+    if etData in ExtractTypes then
       ListData('');
     ListIndex;
     ListForeign;
-    if IncludeData then
+    if etData in ExtractTypes then
       ListGenerators('',[etData])
     else
       ListGenerators;
@@ -414,7 +415,7 @@ begin
     ListProcs(pdCreateStub);
     ListTriggers;
     ListProcs(pdAlterProc);
-    ListGrants;
+    ListGrants(ExtractTypes);
   end;
 
   if DidStart then
@@ -1028,13 +1029,25 @@ end;
  	 Print the permissions on all user tables.
  	 Get separate permissions on table/views and then procedures }
 
-procedure TIBExtract.ListGrants;
+procedure TIBExtract.ListGrants(ExtractTypes: TExtractTypes);
 const
   SecuritySQL = 'SELECT * FROM RDB$RELATIONS ' +
                 'WHERE ' +
                 '  (RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL) AND ' +
                 '  RDB$SECURITY_CLASS STARTING WITH ''SQL$'' ' +
                 'ORDER BY RDB$RELATION_NAME';
+
+  DomainSQL  = 'select RDB$FIELD_NAME from RDB$FIELDS '+
+    'where RDB$SYSTEM_FLAG <> 1 and RDB$FIELD_NAME not Similar to ''RDB$%|SEC$%|MON$%|SQL$%'' '+
+    'order BY RDB$FIELD_NAME';
+
+  CharacterSetSQL = 'Select * From RDB$CHARACTER_SETS  '+
+                    'Where RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL ' +
+                    'Order by RDB$CHARACTER_SET_NAME';
+
+  CollationsSQL = 'Select * From RDB$COLLATIONS  '+
+                    'Where RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL ' +
+                    'Order by RDB$COLLATION_NAME';
 
   ProcedureSQL = 'select * from RDB$PROCEDURES '+
                  'Where RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL ' +
@@ -1047,6 +1060,34 @@ const
   GeneratorSQL = 'select * from RDB$GENERATORS '+
                  'Where RDB$SYSTEM_FLAG <> 1 OR RDB$SYSTEM_FLAG IS NULL ' +
                  'Order BY RDB$GENERATOR_NAME';
+
+  MetadataGrantsSQL =
+  'Select PR.RDB$USER, PR.RDB$USER_TYPE, '+
+  'T.RDB$TYPE_NAME as USER_TYPE_NAME, '+
+  'Case PR.RDB$PRIVILEGE '+
+  '  When ''C'' then ''CREATE'' '+
+  '  When ''O'' then ''DROP ANY'' '+
+  '  When ''L'' then ''ALTER ANY''  End as Privilege, '+
+  'Case PR.RDB$RELATION_NAME '+
+  '  When ''SQL$COLLATIONS'' then ''COLLATION'' '+
+  '  When ''SQL$CHARSETS'' then ''CHARACTER SET'' '+
+  '  When ''SQL$DATABASE'' then ''DATABASE'' '+
+  '  When ''SQL$DOMAINS'' then ''DOMAIN'' '+
+  '  When ''SQL$EXCEPTIONS'' then ''EXCEPTION'' '+
+  '  When ''SQL$FILTERS'' then ''FILTER'' '+
+  '  When ''SQL$FUNCTIONS'' then ''FUNCTION'' '+
+  '  When ''SQL$GENERATORS'' then ''GENERATOR'' '+
+  '  When ''SQL$PACKAGES'' then ''PACKAGE'' '+
+  '  When ''SQL$PROCEDURES'' then ''PROCEDURE'' '+
+  '  When ''SQL$ROLES'' then ''ROLE'' '+
+  '  When ''SQL$VIEWS'' then ''VIEW'' '+
+  '  When ''SQL$TABLES'' then ''TABLE'' End as METAOBJECTNAME,'+
+
+  'case when coalesce(RDB$GRANT_OPTION,0) <> 0 then '' WITH GRANT OPTION'' '+
+  'ELSE '''' End as GRANTOPTION '+
+  'FROM RDB$USER_PRIVILEGES PR '+
+  'JOIN RDB$TYPES T On T.RDB$TYPE = PR.RDB$USER_TYPE and T.RDB$FIELD_NAME = ''RDB$OBJECT_TYPE'' '+
+  'Where PR.RDB$RELATION_NAME like ''SQL$%'' and PR.RDB$PRIVILEGE in (''L'',''C'',''O'')';
 
 var
   qryRoles : TIBSQL;
@@ -1068,7 +1109,7 @@ begin
       while not qryRoles.Eof do
       begin
         RelationName := Trim(qryRoles.FieldByName('rdb$relation_Name').AsString);
-        ShowGrants(RelationName, Term);
+        ShowGrants(RelationName, Term, not (etGrantsToUser in ExtractTypes));
         qryRoles.Next;
       end;
     finally
@@ -1077,28 +1118,72 @@ begin
 
     ShowGrantRoles(Term);
 
-    qryRoles.SQL.Text := ExceptionSQL;
-    qryRoles.ExecQuery;
-    try
-      while not qryRoles.Eof do
-      begin
-        ShowGrants(Trim(qryRoles.FieldByName('RDB$EXCEPTION_NAME').AsString), Term);
-        qryRoles.Next;
+    if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
+    begin
+      qryRoles.SQL.Text := DomainSQL;
+      qryRoles.ExecQuery;
+      try
+        while not qryRoles.Eof do
+        begin
+          ShowGrants(Trim(qryRoles.FieldByName('RDB$FIELD_NAME').AsString), Term,
+                  not (etGrantsToUser in ExtractTypes));
+          qryRoles.Next;
+        end;
+      finally
+        qryRoles.Close;
       end;
-    finally
-      qryRoles.Close;
-    end;
 
-    qryRoles.SQL.Text := GeneratorSQL;
-    qryRoles.ExecQuery;
-    try
-      while not qryRoles.Eof do
-      begin
-        ShowGrants(Trim(qryRoles.FieldByName('RDB$GENERATOR_NAME').AsString), Term);
-        qryRoles.Next;
+      qryRoles.SQL.Text := CharacterSetSQL;
+      qryRoles.ExecQuery;
+      try
+        while not qryRoles.Eof do
+        begin
+          ShowGrants(Trim(qryRoles.FieldByName('RDB$CHARACTER_SET_NAME').AsString), Term,
+              not (etGrantsToUser in ExtractTypes));
+          qryRoles.Next;
+        end;
+      finally
+        qryRoles.Close;
       end;
-    finally
-      qryRoles.Close;
+
+      qryRoles.SQL.Text := CollationsSQL;
+      qryRoles.ExecQuery;
+      try
+        while not qryRoles.Eof do
+        begin
+          ShowGrants(Trim(qryRoles.FieldByName('RDB$COLLATION_NAME').AsString), Term,
+                 not (etGrantsToUser in ExtractTypes));
+          qryRoles.Next;
+        end;
+      finally
+        qryRoles.Close;
+      end;
+
+      qryRoles.SQL.Text := ExceptionSQL;
+      qryRoles.ExecQuery;
+      try
+        while not qryRoles.Eof do
+        begin
+          ShowGrants(Trim(qryRoles.FieldByName('RDB$EXCEPTION_NAME').AsString), Term,
+                     not (etGrantsToUser in ExtractTypes));
+          qryRoles.Next;
+        end;
+      finally
+        qryRoles.Close;
+      end;
+
+      qryRoles.SQL.Text := GeneratorSQL;
+      qryRoles.ExecQuery;
+      try
+        while not qryRoles.Eof do
+        begin
+          ShowGrants(Trim(qryRoles.FieldByName('RDB$GENERATOR_NAME').AsString), Term,
+                 not (etGrantsToUser in ExtractTypes));
+          qryRoles.Next;
+        end;
+      finally
+        qryRoles.Close;
+      end;
     end;
 
     qryRoles.SQL.Text := ProcedureSQL;
@@ -1106,10 +1191,33 @@ begin
     try
       while not qryRoles.Eof do
       begin
-        ShowGrants(Trim(qryRoles.FieldByName('RDB$PROCEDURE_NAME').AsString), Term);
+        ShowGrants(Trim(qryRoles.FieldByName('RDB$PROCEDURE_NAME').AsString), Term,
+                not (etGrantsToUser in ExtractTypes));
         qryRoles.Next;
       end;
     finally
+      qryRoles.Close;
+    end;
+
+    {Metadata Grants}
+    if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
+    begin
+      qryRoles.SQL.Text := MetadataGrantsSQL;
+      qryRoles.ExecQuery;
+      while not qryRoles.Eof do
+      begin
+        if (etGrantsToUser in ExtractTypes) or
+           (qryRoles.FieldByName('RDB$USER_TYPE').AsInteger <> obj_user) or
+           (qryRoles.FieldByName('RDB$USER').AsString = 'PUBLIC') then
+        FMetaData.Add(Format('GRANT %s %s TO %s "%s" %s%s', [
+                              qryRoles.FieldByName('Privilege').AsString,
+                              qryRoles.FieldByName('METAOBJECTNAME').AsString,
+                              qryRoles.FieldByName('USER_TYPE_NAME').AsString,
+                              qryRoles.FieldByName('RDB$USER').AsString,
+                              qryRoles.FieldByName('GRANTOPTION').AsString,
+                              Term]));
+        qryRoles.Next;
+      end;
       qryRoles.Close;
     end;
   finally
@@ -2725,7 +2833,7 @@ begin
   end;
   FMetaData.Clear;
   case ObjectType of
-    eoDatabase : ExtractDDL(true, '', etData in ExtractTypes);
+    eoDatabase : ExtractDDL(true, '', ExtractTypes);
     eoDomain :
       if etTable in ExtractTypes then
         ListDomains(ObjectName, etTable)
@@ -2785,7 +2893,7 @@ begin
     eoGenerator : ListGenerators(ObjectName,ExtractTypes);
     eoException : ListException(ObjectName);
     eoBLOBFilter : ListFilters(ObjectName);
-    eoRole : ListRoles(ObjectName);
+    eoRole : ListRoles(ObjectName,etGrant in ExtractTypes);
     eoTrigger : 
       if etTable in ExtractTypes then
       begin
@@ -2886,70 +2994,74 @@ end;
    Grant various privileges to procedures.
    All privileges may have the with_grant option set. }
 
-procedure TIBExtract.ShowGrants(MetaObject: String; Terminator: String);
+procedure TIBExtract.ShowGrants(MetaObject: String; Terminator: String;
+  NoUserGrants: boolean);
 const
   GrantsBaseSelect =
-  'Select Trim(RDB$USER) as RDB$USER,List("Privileges") as Privileges, '+
-  'coalesce(RDB$GRANT_OPTION,0) as RDB$GRANT_OPTION,METAOBJECTNAME, '+
-  'RDB$USER_TYPE, RDB$OBJECT_TYPE, '+
-  'case  RDB$OBJECT_TYPE '+
-  'When 0 then ''TABLE'' '+
-  'When 5 then ''PROCEDURE'' '+
-  'When 7 then ''EXCEPTION'' '+
-  'When 11 then ''CHARACTER SET'' '+
-  'When 14 then ''GENERATOR'' '+
-  'ELSE NULL END as OBJECT_TYPE_NAME, '+
-  'case RDB$USER_TYPE '+
-  'When 5 then ''PROCEDURE'' '+
-  'When 2 then ''TRIGGER'' '+
-  'When 8 then ''USER'' '+
-  'When 13 then ''ROLE'' '+
-  'ELSE NULL END as USER_TYPE_NAME, '+
-  'case '+
-  'When coalesce(RDB$GRANT_OPTION,0) <> 0 and RDB$USER_TYPE = 13 then '' WITH ADMIN OPTION'' '+
-  'When coalesce(RDB$GRANT_OPTION,0) <> 0 and RDB$USER_TYPE <> 13 then '' WITH GRANT OPTION'' '+
-  'ELSE '''' End as GRANTOPTION '+
-  'From (  '+
-  'Select PR.RDB$USER,PR.RDB$RELATION_NAME as METAOBJECTNAME, LIST(DISTINCT Trim(Case PR.RDB$PRIVILEGE  '+
-  'When ''X'' then ''EXECUTE''  '+
-  'When ''S'' then ''SELECT''  '+
-  'When ''U'' then ''UPDATE''   '+
-  'When ''D'' then ''DELETE''  '+
-  'When ''R'' then ''REFERENCES''  '+
-  'When ''G'' then ''USAGE''  '+
-  'When ''I'' then ''INSERT'' end )) as "Privileges",  '+
-  'PR.RDB$GRANT_OPTION,  PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE,OW.RDB$OWNER_NAME  '+
-  'FROM RDB$USER_PRIVILEGES PR  '+
-  'JOIN ObjectOwners OW On OW.METAOBJECTNAME = PR.RDB$RELATION_NAME and OW.ObjectType = PR.RDB$OBJECT_TYPE '+
-  'Where PR.RDB$PRIVILEGE <> ''M'' and (PR.RDB$PRIVILEGE <> ''U'' or PR.RDB$FIELD_NAME is null)  '+
-  'Group By PR.RDB$USER,PR.RDB$RELATION_NAME,PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE,OW.RDB$OWNER_NAME  '+
-  'UNION  '+
-  'Select PR.RDB$USER,PR.RDB$RELATION_NAME, ''Update('' || List(Trim(PR.RDB$FIELD_NAME)) || '')'',  '+
-  'PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE, OW.RDB$OWNER_NAME   '+
-  'FROM RDB$USER_PRIVILEGES PR  '+
-  'JOIN ObjectOwners OW On OW.METAOBJECTNAME = PR.RDB$RELATION_NAME and OW.ObjectType = PR.RDB$OBJECT_TYPE '+
-  'Where PR.RDB$PRIVILEGE = ''U'' and PR.RDB$FIELD_NAME is not null   '+
-  'Group By PR.RDB$USER,PR.RDB$RELATION_NAME,PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE, OW.RDB$OWNER_NAME)  '+
-  'Where METAOBJECTNAME = :METAOBJECTNAME and RDB$USER <> RDB$OWNER_NAME  '+
-  'Group By RDB$USER,RDB$GRANT_OPTION,  RDB$USER_TYPE, RDB$OBJECT_TYPE,METAOBJECTNAME '+
-  'ORDER BY RDB$USER, RDB$OBJECT_TYPE';
+    'Select Trim(RDB$USER) as RDB$USER,List("Privileges") as Privileges,  '+
+    'coalesce(RDB$GRANT_OPTION,0) as RDB$GRANT_OPTION,METAOBJECTNAME,  '+
+    'RDB$USER_TYPE, RDB$OBJECT_TYPE,  '+
+    'case T2.RDB$TYPE_NAME  '+
+    '  When ''RELATION'' then ''TABLE''  '+
+    '  When ''FIELD'' then ''DOMAIN''  '+
+    'Else T2.RDB$TYPE_NAME End as OBJECT_TYPE_NAME,  '+
+    'T1.RDB$TYPE_NAME as USER_TYPE_NAME,  '+
+    'case  '+
+    'When coalesce(RDB$GRANT_OPTION,0) <> 0 and RDB$USER_TYPE = 13 then '' WITH ADMIN OPTION''  '+
+    'When coalesce(RDB$GRANT_OPTION,0) <> 0 and RDB$USER_TYPE <> 13 then '' WITH GRANT OPTION''  '+
+    'ELSE '''' End as GRANTOPTION,  '+
+    'case When RDB$OWNER_NAME = RDB$GRANTOR then '''' '+
+    'else coalesce('' GRANTED BY "'' || Trim(RDB$GRANTOR) || ''"'','''') END as GRANTEDBY  '+
+    'From (   '+
+    'Select PR.RDB$USER,PR.RDB$RELATION_NAME as METAOBJECTNAME, LIST(DISTINCT Trim(Case PR.RDB$PRIVILEGE   '+
+    'When ''X'' then ''EXECUTE''   '+
+    'When ''S'' then ''SELECT''   '+
+    'When ''U'' then ''UPDATE''    '+
+    'When ''D'' then ''DELETE''   '+
+    'When ''R'' then ''REFERENCES''   '+
+    'When ''G'' then ''USAGE''   '+
+    'When ''I'' then ''INSERT''  '+
+    'end )) as "Privileges",   '+
+    'PR.RDB$GRANT_OPTION,  PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE,OW.RDB$OWNER_NAME,PR.RDB$GRANTOR   '+
+    'FROM RDB$USER_PRIVILEGES PR   '+
+    'JOIN ObjectOwners OW On OW.METAOBJECTNAME = PR.RDB$RELATION_NAME and OW.ObjectType = PR.RDB$OBJECT_TYPE  '+
+    'Where PR.RDB$PRIVILEGE <> ''M'' and (PR.RDB$PRIVILEGE <> ''U'' or PR.RDB$FIELD_NAME is null)   '+
+    'Group By PR.RDB$USER,PR.RDB$RELATION_NAME,PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE,OW.RDB$OWNER_NAME,PR.RDB$GRANTOR   '+
+    'UNION   '+
+    'Select PR.RDB$USER,PR.RDB$RELATION_NAME, ''Update('' || List(Trim(PR.RDB$FIELD_NAME)) || '')'',   '+
+    'PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE, OW.RDB$OWNER_NAME,PR.RDB$GRANTOR    '+
+    'FROM RDB$USER_PRIVILEGES PR   '+
+    'JOIN ObjectOwners OW On OW.METAOBJECTNAME = PR.RDB$RELATION_NAME and OW.ObjectType = PR.RDB$OBJECT_TYPE  '+
+    'Where PR.RDB$PRIVILEGE = ''U'' and PR.RDB$FIELD_NAME is not null    '+
+    'Group By PR.RDB$USER,PR.RDB$RELATION_NAME,PR.RDB$GRANT_OPTION, PR.RDB$USER_TYPE, PR.RDB$OBJECT_TYPE, OW.RDB$OWNER_NAME,PR.RDB$GRANTOR) A '+
+    'JOIN RDB$TYPES T1 On T1.RDB$TYPE = RDB$USER_TYPE and T1.RDB$FIELD_NAME = ''RDB$OBJECT_TYPE''  '+
+    'JOIN RDB$TYPES T2 On T2.RDB$TYPE = RDB$OBJECT_TYPE and T2.RDB$FIELD_NAME = ''RDB$OBJECT_TYPE''  '+
+    'Where METAOBJECTNAME = :METAOBJECTNAME and RDB$USER <> RDB$OWNER_NAME   '+
+    'Group By RDB$USER,RDB$GRANT_OPTION,  RDB$USER_TYPE, RDB$OBJECT_TYPE,METAOBJECTNAME,RDB$GRANTOR,T2.RDB$TYPE_NAME,T1.RDB$TYPE_NAME,RDB$OWNER_NAME  '+
+    'ORDER BY RDB$USER, RDB$OBJECT_TYPE';
 
   GrantsSQL12 =
-  'with ObjectOwners As ( '+
-  'Select RDB$RELATION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 0 as ObjectType '+
-  'From RDB$RELATIONS '+
-  'UNION '+
-  'Select RDB$PROCEDURE_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 5 as ObjectType '+
-  'From RDB$PROCEDURES '+
-  'UNION '+
-  'Select RDB$EXCEPTION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 7 as ObjectType '+
-  'From RDB$EXCEPTIONS '+
-  'UNION '+
-  'Select RDB$GENERATOR_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 14 as ObjectType '+
-  'From RDB$GENERATORS '+
-  'UNION '+
-  'Select RDB$CHARACTER_SET_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 11 as ObjectType '+
-  'From RDB$CHARACTER_SETS '+
+  'with ObjectOwners As (  '+
+  '  Select RDB$RELATION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 0 as ObjectType  '+
+  '  From RDB$RELATIONS  '+
+  '  UNION  '+
+  '  Select RDB$PROCEDURE_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 5 as ObjectType  '+
+  '  From RDB$PROCEDURES  '+
+  '  UNION  '+
+  '  Select RDB$EXCEPTION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 7 as ObjectType  '+
+  '  From RDB$EXCEPTIONS  '+
+  '  UNION  '+
+  '  Select RDB$FIELD_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 9 as ObjectType  '+
+  '  From RDB$FIELDS Where RDB$FIELD_NAME not Similar to ''RDB$%|SEC$%|MON$%|SQL$%'' '+
+  '  UNION  '+
+  '  Select RDB$GENERATOR_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 14 as ObjectType  '+
+  '  From RDB$GENERATORS  '+
+  '  UNION  '+
+  '  Select RDB$CHARACTER_SET_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 11 as ObjectType  '+
+  '  From RDB$CHARACTER_SETS  '+
+  '  UNION  '+
+  '  Select RDB$COLLATION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 17 as ObjectType  '+
+  '  From RDB$COLLATIONS  '+
   ') '+ GrantsBaseSelect;
 
   GrantsSQL =
@@ -2986,13 +3098,16 @@ begin
     qryOwnerPriv.ExecQuery;
     while not qryOwnerPriv.Eof do
     begin
-      FMetaData.Add(Format('GRANT %s ON %s "%s" TO %s "%s" %s%s', [
+      if not NoUserGrants or (qryOwnerPriv.FieldByName('RDB$USER_TYPE').AsInteger <> obj_user)
+          or (qryOwnerPriv.FieldByName('RDB$USER').AsString = 'PUBLIC') then
+      FMetaData.Add(Format('GRANT %s ON %s "%s" TO %s "%s" %s%s%s', [
                             qryOwnerPriv.FieldByName('Privileges').AsString,
                             qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
                             qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString,
                             qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString,
                             qryOwnerPriv.FieldByName('RDB$USER').AsString,
                             qryOwnerPriv.FieldByName('GRANTOPTION').AsString,
+                            qryOwnerPriv.FieldByName('GRANTEDBY').AsString,
                             Terminator]));
       qryOwnerPriv.Next;
     end;
@@ -3362,7 +3477,7 @@ begin
   end;
 end;
 
-procedure TIBExtract.ListRoles(ObjectName: String);
+procedure TIBExtract.ListRoles(ObjectName: String; IncludeGrants: boolean);
 const
   RolesSQL =
     'select * from RDB$ROLES WHERE RDB$SYSTEM_FLAG = 0 ' +
@@ -3409,6 +3524,8 @@ begin
             PrevOwner := OwnerName;
           end;
           FMetaData.Add('CREATE ROLE ' + RoleName + Term);
+          if IncludeGrants then
+            ShowGrantsTo(qryRoles.FieldByName('rdb$Role_Name').AsString,obj_sql_role,Term);
           qryRoles.Next;
         end;
       finally

@@ -66,7 +66,7 @@ type
     IBSecurityService1: TIBSecurityService;
     AttUpdate: TIBUpdate;
     AdminUserQuery: TIBSQL;
-    IBUpdate1: TIBUpdate;
+    DBTablesUpdate: TIBUpdate;
     IBValidationService1: TIBValidationService;
     InLimboList: TMemDataset;
     LegacyUserList: TMemDataset;
@@ -130,7 +130,7 @@ type
     procedure IBDatabase1Login(Database: TIBDatabase; LoginParams: TStrings);
     procedure AttUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
-    procedure IBUpdate1ApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
+    procedure DBTablesUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
     procedure InLimboListAfterOpen(DataSet: TDataSet);
     procedure InLimboListBeforeClose(DataSet: TDataSet);
@@ -1334,7 +1334,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.IBUpdate1ApplyUpdates(Sender: TObject;
+procedure TDatabaseData.DBTablesUpdateApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 begin
   // Do nothing
