@@ -17,6 +17,7 @@ type
   TMainForm = class(TForm)
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
+    IncludeUserGrants: TCheckBox;
     DBEdit5: TDBEdit;
     Label41: TLabel;
     MenuItem19: TMenuItem;
@@ -347,7 +348,9 @@ begin
   PageControl1.ActivePage := Properties;
   DatabaseData.AfterDBConnect := @HandleDBConnect;
   DatabaseData.AfterDataReload := @HandleLoadData;
+  AccessRightsTreeView.DataSource := nil;
   AccessRightsTreeView.DataSource := AccessRightsSource;
+  SubjectAccessRightsGrid.DataSource := nil;
   SubjectAccessRightsGrid.DataSource := SubjectAccessRightsSource;
   DatabaseData.Connect;
   if not DatabaseData.IBDatabase1.Connected then Close;
@@ -1011,7 +1014,10 @@ begin
   Screen.Cursor := crHourGlass;
   try
     Application.ProcessMessages;
-    IBExtract1.ExtractObject(eoDatabase);
+    if IncludeUserGrants.Checked then
+      IBExtract1.ExtractObject(eoDatabase,'',[etGrantsToUser])
+    else
+      IBExtract1.ExtractObject(eoDatabase);
     SynEdit1.Lines.Assign(IBExtract1.Items);
   finally
     Screen.Cursor := crDefault;

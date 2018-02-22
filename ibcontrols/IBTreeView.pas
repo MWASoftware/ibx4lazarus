@@ -90,6 +90,7 @@ type
     FHasChildField: string;
     FImageIndexField: string;
     FKeyField: string;
+    FSelectedIndexField: string;
     FTextField: string;
     FParentField: string;
     FExpandNode: TTreeNode;
@@ -114,6 +115,7 @@ type
     procedure SetHasChildField(AValue: string);
     procedure SetImageIndexField(AValue: string);
     procedure SetKeyField(AValue: string);
+    procedure SetSelectedIndexField(AValue: string);
     procedure SetTextField(AValue: string);
     procedure SetDataSource(AValue: TDataSource);
     procedure SetParentField(AValue: string);
@@ -170,6 +172,7 @@ type
     property Indent;
     property HasChildField: string read FHasChildField write SetHasChildField;
     property ImageIndexField: string read FImageIndexField write SetImageIndexField;
+    property SelectedIndexField: string read FSelectedIndexField write SetSelectedIndexField;
     property KeyField: string read FKeyField write SetKeyField;
     property MultiSelect;
     property MultiSelectStyle;
@@ -368,6 +371,8 @@ begin
           Node := Items.AddChild(FExpandNode,DataSet.FieldByName(TextField).AsString);
           if ImageIndexField <> '' then
             Node.ImageIndex := DataSet.FieldByName(ImageIndexField).AsInteger;
+          if SelectedIndexField <> '' then
+            Node.SelectedIndex := DataSet.FieldByName(SelectedIndexField).AsInteger;
           TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
           Node.HasChildren := (HasChildField = '') or (DataSet.FieldByName(HasChildField).AsInteger <> 0);
           Inc(ChildCount);
@@ -509,6 +514,13 @@ begin
   if FKeyField = AValue then Exit;
   FKeyField := AValue;
   Reinitialise
+end;
+
+procedure TIBTreeView.SetSelectedIndexField(AValue: string);
+begin
+  if FSelectedIndexField = AValue then Exit;
+  FSelectedIndexField := AValue;
+  Reinitialise;
 end;
 
 procedure TIBTreeView.SetTextField(AValue: string);

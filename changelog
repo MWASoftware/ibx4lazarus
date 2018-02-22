@@ -174,8 +174,8 @@ IBX Change Log  version                                                  (2.2-0)
 
 42. TIBCustomDataset: reopen query if already active when a TIBControlLink is added.
 
-43. TIBTTreeview: new ImageIndex Property allows the image index for each node to be
-    set from a database field.
+43. TIBTreeview: new ImageIndexField and SelectedIndexField Property allows the
+    image index and selected image index for each node to be set from a database field.
 
 44. TIBExtract: new extract type (etGrantsToUser) for use with eoDatabase. If included
     then database schema includes grants to all users. If not present then the
