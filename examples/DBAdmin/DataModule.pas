@@ -1289,15 +1289,20 @@ begin
       First;
       while not EOF do
       begin
-        if FieldByName('OBJECT_TYPE').AsInteger = 0 then
+        if FieldByName('OBJECT_TYPE').AsInteger = 0 {relation} then
           ExecDDL.SQL.Text := Format('Revoke All on %s from %s',[
-                  FieldByName('OBJECT_NAME').AsString,
-                  FieldByName('SUBJECT_NAME').AsString])
+                  Trim(FieldByName('OBJECT_NAME').AsString),
+                  Trim(FieldByName('SUBJECT_NAME').AsString)])
+        else
+        if FieldByName('OBJECT_TYPE').AsInteger = 13 {role} then
+          ExecDDL.SQL.Text := Format('Revoke %s from %s',[
+                  Trim(FieldByName('OBJECT_NAME').AsString),
+                  Trim(FieldByName('SUBJECT_NAME').AsString)])
         else
           ExecDDL.SQL.Text := Format('Revoke All on %s %s from %s',[
-                    FieldByName('OBJECT_TYPE_NAME').AsString,
-                    FieldByName('OBJECT_NAME').AsString,
-                    FieldByName('SUBJECT_NAME').AsString]);
+                    Trim(FieldByName('OBJECT_TYPE_NAME').AsString),
+                    Trim(FieldByName('OBJECT_NAME').AsString),
+                    Trim(FieldByName('SUBJECT_NAME').AsString)]);
         ExecDDL.ExecQuery;
         Next;
       end;
