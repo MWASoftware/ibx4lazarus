@@ -27,7 +27,7 @@
 {    IBX For Lazarus (Firebird Express)                                  }
 {    Contributor: Tony Whyman, MWA Software http://www.mwasoftware.co.uk }
 {    Portions created by MWA Software are copyright McCallum Whyman      }
-{    Associates Ltd 2011                                                 }
+{    Associates Ltd 2011 - 2018                                               }
 {                                                                        }
 {************************************************************************}
 
@@ -183,14 +183,12 @@ type
     FAttachment: IAttachment;
     FCreateDatabase: boolean;
     FCreateIfNotExists: boolean;
-    FDPB: IDPB;
     FAllowStreamedConnected: boolean;
     FHiddenPassword: string;
     FOnCreateDatabase: TNotifyEvent;
     FOnLogin: TIBDatabaseLoginEvent;
     FSQLHourGlass: Boolean;
     FTraceFlags: TTraceFlags;
-    FDBSQLDialect: Integer;
     FSQLDialect: Integer;
     FOnDialectDowngradeWarning: TNotifyEvent;
     FSQLObjects: TList;
@@ -207,11 +205,12 @@ type
     FLoginCalled: boolean;
     FUseDefaultSystemCodePage: boolean;
     procedure EnsureInactive;
+    function GetAuthenticationMethod: string;
     function GetDBSQLDialect: Integer;
     function GetDefaultCharSetID: integer;
     function GetDefaultCharSetName: AnsiString;
     function GetDefaultCodePage: TSystemCodePage;
-    function GetSQLDialect: Integer;
+    function GetRemoteProtocol: string;
     procedure SetSQLDialect(const Value: Integer);
     procedure ValidateClientSQLDialect;
     procedure DBParamsChange(Sender: TObject);
@@ -268,7 +267,7 @@ type
     procedure RemoveTransactions;
 
     property Attachment: IAttachment read FAttachment;
-    property DBSQLDialect : Integer read FDBSQLDialect;
+    property DBSQLDialect : Integer read GetDBSQLDialect;
     property IsReadOnly: Boolean read GetIsReadOnly;
     property SQLObjectCount: Integer read GetSQLObjectCount;
     property SQLObjects[Index: Integer]: TIBBase read GetSQLObject;
@@ -278,6 +277,8 @@ type
     property DefaultCharSetName: AnsiString read GetDefaultCharSetName;
     property DefaultCharSetID: integer read GetDefaultCharSetID;
     property DefaultCodePage: TSystemCodePage read GetDefaultCodePage;
+    property AuthenticationMethod: string read GetAuthenticationMethod;
+    property RemoteProtocol: string read GetRemoteProtocol;
 
   published
     property Connected;
@@ -290,7 +291,7 @@ type
     property DefaultTransaction: TIBTransaction read FDefaultTransaction
                                                  write SetDefaultTransaction;
     property IdleTimer: Integer read GetIdleTimer write SetIdleTimer;
-    property SQLDialect : Integer read GetSQLDialect write SetSQLDialect default 3;
+    property SQLDialect : Integer read FSQLDialect write SetSQLDialect default 3;
     property SQLHourGlass: Boolean read FSQLHourGlass write FSQLHourGlass default true;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
     property UseDefaultSystemCodePage: boolean read FUseDefaultSystemCodePage
@@ -508,7 +509,6 @@ begin
   FDBParamsChanged := True;
   TStringList(FDBParams).OnChange := DBParamsChange;
   TStringList(FDBParams).OnChanging := DBParamsChanging;
-  FDPB := nil;
   FUserNames := nil;
   FInternalTransaction := TIBTransaction.Create(self);
   FInternalTransaction.DefaultDatabase := Self;
@@ -516,7 +516,6 @@ begin
   FTimer.Enabled := False;
   FTimer.Interval := 0;
   FTimer.OnTimer := TimeoutConnection;
-  FDBSQLDialect := 1;
   FSQLDialect := 3;
   FTraceFlags := [];
   FDataSets := TList.Create;
@@ -536,7 +535,6 @@ begin
   RemoveSQLObjects;
   RemoveTransactions;
   FInternalTransaction.Free;
-  FDPB := nil;
   FDBParams.Free;
   FSQLObjects.Free;
   FUserNames.Free;
@@ -560,6 +558,12 @@ begin
     if FAttachment <> nil then
       Close;
   end
+end;
+
+function TIBDataBase.GetAuthenticationMethod: string;
+begin
+  CheckActive;
+  Result := Attachment.GetAuthenticationMethod;
 end;
 
  procedure TIBDataBase.CheckInactive;
@@ -608,7 +612,6 @@ end;
 begin
   if Connected then
     InternalClose(False);
-  FDBSQLDialect := 1;
 end;
 
   procedure TIBDataBase.CreateDatabase;
@@ -622,7 +625,7 @@ end;
 procedure TIBDataBase.CreateDatabase(createDatabaseSQL: string);
 begin
   CheckInactive;
-  FAttachment := FirebirdAPI.CreateDatabase(createDatabaseSQL,FSQLDialect);
+  FAttachment := FirebirdAPI.CreateDatabase(createDatabaseSQL,SQLDialect);
   FDBName := Attachment.GetConnectString;
   if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
     OnCreateDatabase(self);
@@ -974,7 +977,10 @@ var
   Status: IStatus;
   CharSetID: integer;
   CharSetName: AnsiString;
+  DPB: IDPB;
+  PW: IDPBItem;
 begin
+  DPB := nil;
   CheckInactive;
   CheckDatabaseName;
   if (not LoginPrompt) and (FHiddenPassword <> '') then
@@ -1005,33 +1011,36 @@ begin
 
    repeat
      { Generate a new DPB if necessary }
-     if (FDPB = nil) or FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text) then
+     if (DPB = nil) or FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text) then
      begin
        FDBParamsChanged := False;
        if (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
-         FDPB := GenerateDPB(TempDBParams)
+         DPB := GenerateDPB(TempDBParams)
        else
        begin
           TempDBParams.Values['password'] := FHiddenPassword;
-          FDPB := GenerateDPB(TempDBParams);
+          DPB := GenerateDPB(TempDBParams);
        end;
      end;
 
      if FCreateDatabase then
      begin
        FCreateDatabase := false;
-       FAttachment := FirebirdAPI.CreateDatabase(aDBName,FDPB, false);
+       DPB.Add(isc_dpb_set_db_SQL_dialect).AsByte := SQLDialect; {create with this SQL Dialect}
+       FAttachment := FirebirdAPI.CreateDatabase(aDBName,DPB, false);
+       if FAttachment = nil then
+         DPB := nil;
        if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
          OnCreateDatabase(self);
      end
      else
-       FAttachment := FirebirdAPI.OpenDatabase(aDBName,FDPB,false);
+       FAttachment := FirebirdAPI.OpenDatabase(aDBName,DPB,false);
 
      if FAttachment = nil then
      begin
        Status := FirebirdAPI.GetStatus;
        {$IFDEF UNIX}
-       if Pos(':',aDBName) = 0 then
+       if GetProtocol(aDBName) = Local then
        begin
            if ((Status.GetSQLCode = -901) and (Status.GetIBErrorCode = isc_random)) {Access permissions on firebird temp}
               or
@@ -1079,10 +1088,11 @@ begin
   finally
    TempDBParams.Free;
   end;
+  PW := Attachment.getDPB.Find(isc_dpb_password);
+  if PW <> nil then PW.AsString := 'xxxxxxxx'; {Hide password}
 
   if not (csDesigning in ComponentState) then
     FDBName := aDBName; {Synchronise at run time}
-  FDBSQLDialect := GetDBSQLDialect;
   ValidateClientSQLDialect;
   for i := 0 to FSQLObjects.Count - 1 do
   begin
@@ -1264,29 +1274,20 @@ begin
   DatabaseInfo.Free;
 end;
 
- function TIBDataBase.GetSQLDialect: Integer;
-begin
-  Result := FSQLDialect;
-end;
-
 
  procedure TIBDataBase.SetSQLDialect( const Value: Integer);
 begin
   if (Value < 1) then IBError(ibxeSQLDialectInvalid, [nil]);
-  if ((FAttachment = nil) or (Value <= FDBSQLDialect))  then
+  if (Attachment = nil) or (Value <= DBSQLDialect)  then
     FSQLDialect := Value
   else
     IBError(ibxeSQLDialectInvalid, [nil]);
 end;
 
  function TIBDataBase.GetDBSQLDialect: Integer;
-var
-  DatabaseInfo: TIBDatabaseInfo;
 begin
-  DatabaseInfo := TIBDatabaseInfo.Create(self);
-  DatabaseInfo.Database := self;
-  result := DatabaseInfo.DBSQLDialect;
-  DatabaseInfo.Free;
+  CheckActive;
+  Result := Attachment.GetSQLDialect;
 end;
 
 function TIBDataBase.GetDefaultCharSetID: integer;
@@ -1313,11 +1314,17 @@ begin
     Result := CP_NONE;
 end;
 
+function TIBDataBase.GetRemoteProtocol: string;
+begin
+  CheckActive;
+  Result := Attachment.GetRemoteProtocol;
+end;
+
  procedure TIBDataBase.ValidateClientSQLDialect;
 begin
-  if (FDBSQLDialect < FSQLDialect) then
+  if (DBSQLDialect < FSQLDialect) then
   begin
-    FSQLDialect := FDBSQLDialect;
+    FSQLDialect := DBSQLDialect;
     if Assigned (FOnDialectDowngradeWarning) then
       FOnDialectDowngradeWarning(self);
   end;
@@ -1405,7 +1412,7 @@ begin
     Query.SQL.Text := 'Select R.RDB$FIELD_NAME ' + {do not localize}
       'from RDB$RELATION_FIELDS R ' + {do not localize}
       'where R.RDB$RELATION_NAME = ' + {do not localize}
-      '''' + ExtractIdentifier(SQLDialect, TableName) +
+      '''' + ExtractIdentifier(DBSQLDialect, TableName) +
       ''' and Exists(Select * From RDB$FIELDS F Where R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME)' ; {do not localize}
     Query.Prepare;
     Query.ExecQuery;

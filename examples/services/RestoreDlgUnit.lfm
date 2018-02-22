@@ -1,10 +1,10 @@
 object RestoreDlg: TRestoreDlg
-  Left = 799
-  Height = 270
-  Top = 225
+  Left = 1399
+  Height = 265
+  Top = 553
   Width = 358
   Caption = 'Restore Database'
-  ClientHeight = 270
+  ClientHeight = 265
   ClientWidth = 358
   OnClose = FormClose
   OnShow = FormShow
@@ -12,7 +12,7 @@ object RestoreDlg: TRestoreDlg
   LCLVersion = '1.8.1.0'
   object Bevel1: TBevel
     Left = 3
-    Height = 230
+    Height = 222
     Top = 2
     Width = 347
   end
@@ -35,7 +35,7 @@ object RestoreDlg: TRestoreDlg
   object Label1: TLabel
     Left = 12
     Height = 14
-    Top = 64
+    Top = 56
     Width = 95
     Caption = 'Database Name'
     ParentColor = False
@@ -43,14 +43,14 @@ object RestoreDlg: TRestoreDlg
   object Edit2: TEdit
     Left = 12
     Height = 24
-    Top = 80
+    Top = 72
     Width = 296
     TabOrder = 1
   end
   object RadioButton1: TRadioButton
     Left = 12
     Height = 22
-    Top = 122
+    Top = 112
     Width = 93
     Caption = 'Server Side'
     Checked = True
@@ -60,7 +60,7 @@ object RestoreDlg: TRestoreDlg
   object RadioButton2: TRadioButton
     Left = 134
     Height = 22
-    Top = 122
+    Top = 112
     Width = 88
     Caption = 'Client Side'
     TabOrder = 3
@@ -68,7 +68,7 @@ object RestoreDlg: TRestoreDlg
   object Label3: TLabel
     Left = 12
     Height = 14
-    Top = 160
+    Top = 144
     Width = 68
     Caption = 'Backup File'
     ParentColor = False
@@ -76,14 +76,14 @@ object RestoreDlg: TRestoreDlg
   object Edit3: TEdit
     Left = 12
     Height = 24
-    Top = 176
+    Top = 160
     Width = 288
     TabOrder = 4
   end
   object SpeedButton1: TSpeedButton
     Left = 310
     Height = 25
-    Top = 176
+    Top = 160
     Width = 25
     Glyph.Data = {
       36040000424D3604000000000000360000002800000010000000100000000100
@@ -126,7 +126,7 @@ object RestoreDlg: TRestoreDlg
   object Button1: TButton
     Left = 96
     Height = 25
-    Top = 236
+    Top = 232
     Width = 75
     Caption = 'OK'
     Default = True
@@ -136,7 +136,7 @@ object RestoreDlg: TRestoreDlg
   object Button2: TButton
     Left = 191
     Height = 25
-    Top = 236
+    Top = 232
     Width = 75
     Cancel = True
     Caption = 'Cancel'
@@ -146,7 +146,7 @@ object RestoreDlg: TRestoreDlg
   object CheckBox1: TCheckBox
     Left = 12
     Height = 22
-    Top = 208
+    Top = 192
     Width = 182
     Caption = 'Replace Existing Database'
     TabOrder = 7
@@ -157,7 +157,7 @@ object RestoreDlg: TRestoreDlg
     Filter = 'Backup Files|*.gbk|All Files|*.*'
     Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
     left = 312
-    top = 136
+    top = 104
   end
   object IBRestoreService1: TIBRestoreService
     ServerName = 'localhost'
@@ -174,7 +174,7 @@ object RestoreDlg: TRestoreDlg
     )
     PageSize = 0
     PageBuffers = 0
-    left = 304
-    top = 232
+    left = 272
+    top = 16
   end
 end

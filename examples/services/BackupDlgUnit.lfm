@@ -1,10 +1,10 @@
 object BackupDlg: TBackupDlg
   Left = 809
-  Height = 257
+  Height = 242
   Top = 271
   Width = 374
   Caption = 'Backup Database'
-  ClientHeight = 257
+  ClientHeight = 242
   ClientWidth = 374
   OnClose = FormClose
   OnShow = FormShow
@@ -12,14 +12,14 @@ object BackupDlg: TBackupDlg
   LCLVersion = '1.8.1.0'
   object Bevel1: TBevel
     Left = 3
-    Height = 209
+    Height = 198
     Top = 2
     Width = 347
   end
   object Label1: TLabel
     Left = 12
     Height = 14
-    Top = 64
+    Top = 56
     Width = 95
     Caption = 'Database Name'
     ParentColor = False
@@ -43,14 +43,14 @@ object BackupDlg: TBackupDlg
   object Edit2: TEdit
     Left = 12
     Height = 24
-    Top = 80
+    Top = 72
     Width = 296
     TabOrder = 1
   end
   object Label3: TLabel
     Left = 12
     Height = 14
-    Top = 160
+    Top = 144
     Width = 68
     Caption = 'Backup File'
     ParentColor = False
@@ -58,7 +58,7 @@ object BackupDlg: TBackupDlg
   object RadioButton1: TRadioButton
     Left = 12
     Height = 22
-    Top = 122
+    Top = 112
     Width = 93
     Caption = 'Server Side'
     TabOrder = 2
@@ -66,7 +66,7 @@ object BackupDlg: TBackupDlg
   object RadioButton2: TRadioButton
     Left = 134
     Height = 22
-    Top = 122
+    Top = 112
     Width = 88
     Caption = 'Client Side'
     Checked = True
@@ -76,14 +76,14 @@ object BackupDlg: TBackupDlg
   object Edit3: TEdit
     Left = 12
     Height = 24
-    Top = 176
+    Top = 160
     Width = 288
     TabOrder = 4
   end
   object SpeedButton1: TSpeedButton
     Left = 310
     Height = 25
-    Top = 176
+    Top = 160
     Width = 25
     Glyph.Data = {
       36040000424D3604000000000000360000002800000010000000100000000100
@@ -126,7 +126,7 @@ object BackupDlg: TBackupDlg
   object Button1: TButton
     Left = 96
     Height = 25
-    Top = 224
+    Top = 208
     Width = 75
     Caption = 'OK'
     Default = True
@@ -136,7 +136,7 @@ object BackupDlg: TBackupDlg
   object Button2: TButton
     Left = 191
     Height = 25
-    Top = 224
+    Top = 208
     Width = 75
     Cancel = True
     Caption = 'Cancel'
@@ -165,6 +165,6 @@ object BackupDlg: TBackupDlg
     Filter = 'Backup Files|*.gbk|All Files|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist, ofEnableSizing, ofViewDetail]
     left = 309
-    top = 143
+    top = 120
   end
 end

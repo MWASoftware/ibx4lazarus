@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="10"/>
+    <BuildModes Active="Default"/>
+    <Units Count="30">
+      <Unit0>
+        <Filename Value="services.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="14"/>
+        <UsageCount Value="53"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="MainFormUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="MainForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="434"/>
+        <CursorPos X="70" Y="273"/>
+        <ExtraEditorCount Value="1"/>
+        <ExtraEditor1>
+          <EditorIndex Value="-1"/>
+          <WindowIndex Value="-1"/>
+          <TopLine Value="370"/>
+          <CursorPos X="4" Y="385"/>
+        </ExtraEditor1>
+        <UsageCount Value="53"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="AltDBSvcLoginDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AltDBSvcLoginDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="58" Y="27"/>
+        <UsageCount Value="53"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="BackupDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="BackupDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="73"/>
+        <CursorPos X="26" Y="91"/>
+        <UsageCount Value="53"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="ChgPasswordDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ChgPasswordDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="93" Y="26"/>
+        <UsageCount Value="53"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="LimboTransactionsUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="LimboTransactionsForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="139"/>
+        <CursorPos X="24" Y="167"/>
+        <UsageCount Value="53"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="ListUsersUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ListUsersForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="76"/>
+        <CursorPos X="3" Y="78"/>
+        <UsageCount Value="53"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="NewUserDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="NewUserDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="106" Y="30"/>
+        <UsageCount Value="53"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="RestoreDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="RestoreDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="66"/>
+        <CursorPos X="3" Y="87"/>
+        <UsageCount Value="53"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="ServicesLoginDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="SvcLoginDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="106" Y="31"/>
+        <UsageCount Value="53"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="SelectValidationDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="SelectValidationDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="17"/>
+        <CursorPos X="45" Y="45"/>
+        <UsageCount Value="53"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="SelectDBDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="SelectDBDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="10"/>
+        <CursorPos X="33" Y="27"/>
+        <UsageCount Value="53"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ShutdownDatabaseDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="11"/>
+        <CursorPos X="21" Y="14"/>
+        <UsageCount Value="47"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="ShutdownRegDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ShutdownReqDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="22"/>
+        <CursorPos X="40" Y="57"/>
+        <UsageCount Value="47"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="BringOnlineDlgUnit.pas"/>
+        <ComponentName Value="BringOnlineDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="43"/>
+        <CursorPos Y="62"/>
+        <UsageCount Value="26"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="60"/>
+        <CursorPos X="3" Y="297"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="../../../fbintf/IB.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1214"/>
+        <CursorPos X="32" Y="1245"/>
+        <UsageCount Value="18"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="234"/>
+        <CursorPos Y="254"/>
+        <UsageCount Value="12"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="../../../fbintf/client/3.0/FB30ClientAPI.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="222"/>
+        <CursorPos X="100" Y="242"/>
+        <UsageCount Value="11"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="../../../fbintf/client/FBServices.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="38"/>
+        <CursorPos X="15" Y="58"/>
+        <UsageCount Value="11"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="../../../fbintf/client/3.0/FB30Services.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="122"/>
+        <CursorPos Y="158"/>
+        <UsageCount Value="12"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/classes/persist.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="27"/>
+        <UsageCount Value="9"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="SweepDatabaseDlgUnit.pas"/>
+        <ComponentName Value="SweepDatabaseDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="25" Y="9"/>
+        <UsageCount Value="20"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/thread.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="352"/>
+        <CursorPos Y="372"/>
+        <UsageCount Value="11"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/sysutilh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="87"/>
+        <CursorPos X="4" Y="107"/>
+        <UsageCount Value="10"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/sysutils/sysutils.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="158"/>
+        <CursorPos Y="181"/>
+        <UsageCount Value="10"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/except.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="161"/>
+        <CursorPos X="112" Y="185"/>
+        <UsageCount Value="10"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="../../../../lcl/forms.pp"/>
+        <UnitName Value="Forms"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="626"/>
+        <CursorPos X="14" Y="644"/>
+        <UsageCount Value="16"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="../../../../lcl/include/customform.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2921"/>
+        <CursorPos X="3" Y="2939"/>
+        <UsageCount Value="10"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="../../../fbintf/include/consts_pub.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="310"/>
+        <CursorPos X="26" Y="329"/>
+        <UsageCount Value="10"/>
+      </Unit29>
+    </Units>
+    <JumpHistory Count="22" HistoryIndex="20">
+      <Position1>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="522" TopLine="507"/>
+      </Position1>
+      <Position2>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="549" Column="41" TopLine="526"/>
+      </Position2>
+      <Position3>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="78" Column="15" TopLine="58"/>
+      </Position3>
+      <Position4>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="405" Column="25" TopLine="386"/>
+      </Position4>
+      <Position5>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="404" TopLine="386"/>
+      </Position5>
+      <Position6>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="239" Column="42" TopLine="223"/>
+      </Position6>
+      <Position7>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="76" Column="15" TopLine="56"/>
+      </Position7>
+      <Position8>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="372" TopLine="359"/>
+      </Position8>
+      <Position9>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="237" Column="54" TopLine="223"/>
+      </Position9>
+      <Position10>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="491" Column="11" TopLine="475"/>
+      </Position10>
+      <Position11>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="73" Column="14" TopLine="53"/>
+      </Position11>
+      <Position12>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="274" Column="20" TopLine="265"/>
+      </Position12>
+      <Position13>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="41" Column="41" TopLine="21"/>
+      </Position13>
+      <Position14>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="55" Column="18" TopLine="51"/>
+      </Position14>
+      <Position15>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="152" Column="110" TopLine="121"/>
+      </Position15>
+      <Position16>
+        <Filename Value="LimboTransactionsUnit.pas"/>
+        <Caret Line="167" Column="24" TopLine="139"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="462" Column="15" TopLine="441"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../runtime/IBServices.pas"/>
+        <Caret Line="1877" Column="3" TopLine="1873"/>
+      </Position18>
+      <Position19>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="160" Column="32" TopLine="143"/>
+      </Position19>
+      <Position20>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="73" Column="23" TopLine="57"/>
+      </Position20>
+      <Position21>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="273" Column="70" TopLine="273"/>
+      </Position21>
+      <Position22>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="50" Column="14" TopLine="32"/>
+      </Position22>
+    </JumpHistory>
+  </ProjectSession>
+</CONFIG>

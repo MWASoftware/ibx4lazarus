@@ -96,6 +96,7 @@ type
     FInCheckAndInsert: boolean;
     FLastKeyValue: variant;
     FCurText: string;
+    FModified: boolean;
     procedure DoActiveChanged(Data: PtrInt);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
     function GetListSource: TDataSource;
@@ -122,7 +123,7 @@ type
     procedure SetItemIndex(const Val: integer); override;
     function SQLSafe(aText: string): string;
     procedure UpdateShowing; override;
-
+    procedure UpdateData(Sender: TObject); override;
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
@@ -360,6 +361,7 @@ begin
     finally
       FUpdating := false
     end;
+    FModified := true;
   end;
 end;
 
@@ -551,6 +553,12 @@ begin
     ActiveChanged(nil);
 end;
 
+procedure TIBLookupComboEditBox.UpdateData(Sender: TObject);
+begin
+  inherited UpdateData(Sender);
+  FModified := false;
+end;
+
 constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
 begin
   inherited Create(TheComponent);
@@ -583,6 +591,8 @@ begin
     FForceAutoComplete := false;
   end;
   CheckAndInsert;
+  if FModified then
+    Change; {ensure Update}
   inherited EditingDone;
 end;
 

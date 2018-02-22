@@ -1,3 +1,29 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2015 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*) 
+            
 unit RestoreDlgUnit;
 
 {$mode objfpc}{$H+}
@@ -35,6 +61,7 @@ type
     { private declarations }
   public
     { public declarations }
+    procedure RunRestore;
   end;
 
 var
@@ -44,12 +71,48 @@ implementation
 
 {$R *.lfm}
 
+uses MainFormUnit;
+
 { TRestoreDlg }
 
 procedure TRestoreDlg.SpeedButton1Click(Sender: TObject);
 begin
   if OpenDialog1.Execute then
     Edit3.Text := OpenDialog1.Filename;
+end;
+
+procedure TRestoreDlg.RunRestore;
+var bakfile: TFileStream;
+    line: string;
+begin
+  bakfile := nil;
+  if IBRestoreService1.BackupFileLocation = flClientSide then
+    bakfile := TFileStream.Create(IBRestoreService1.BackupFile[0],fmOpenRead);
+  MainForm.Memo1.Lines.Add('Restore Started');
+  try
+    IBRestoreService1.ServiceStart;
+    while not IBRestoreService1.Eof do
+    begin
+      case IBRestoreService1.BackupFileLocation of
+      flServerSide:
+        MainForm.Memo1.Lines.Add(Trim(IBRestoreService1.GetNextLine));
+      flClientSide:
+        begin
+          IBRestoreService1.SendNextChunk(bakfile,line);
+          if line <> '' then
+           MainForm. Memo1.Lines.Add(line);
+        end;
+      end;
+      Application.ProcessMessages
+    end;
+  finally
+    if bakfile <> nil then
+      bakfile.Free;
+  end;
+  while IBRestoreService1.IsServiceRunning do; {flush}
+
+  MainForm.Memo1.Lines.Add('Restore Completed');
+  MessageDlg('Restore Completed',mtInformation,[mbOK],0);
 end;
 
 procedure TRestoreDlg.FormShow(Sender: TObject);

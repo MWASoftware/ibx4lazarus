@@ -19,6 +19,7 @@ Options:
 -A            write database metadata and table data to stdout
 -b            stop on first error
 -e            echo sql statements to stdout
+-g            include grants to normal users in database metadata
 -h            show this information
 -i <filename> execute SQL script from file
 -o <filename> output to this file instead of stdout
@@ -83,6 +84,10 @@ fbsql -a -u SYSDBA -p masterkey employee
 
 will write out the metadata for the local employee database to stdout (assuming
 default password).
+
+fbsql -a -g -u SYSDBA -p masterkey employee
+
+as above metadata will include grants to normal users (and not just to PUBLIC).
 
 fbsql -A -u SYSDBA -p masterkey -o employeedump.sql employee
 

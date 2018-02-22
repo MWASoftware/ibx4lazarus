@@ -88,7 +88,9 @@ type
     FDataLink: TIBTreeViewDatalink;
     FIBTreeViewControlLink: TIBTreeViewControlLink;
     FHasChildField: string;
+    FImageIndexField: string;
     FKeyField: string;
+    FSelectedIndexField: string;
     FTextField: string;
     FParentField: string;
     FExpandNode: TTreeNode;
@@ -111,7 +113,9 @@ type
     procedure NodeUpdated(Node: TTreeNode);
     procedure RecordChanged(Sender: TObject; Field: TField);
     procedure SetHasChildField(AValue: string);
+    procedure SetImageIndexField(AValue: string);
     procedure SetKeyField(AValue: string);
+    procedure SetSelectedIndexField(AValue: string);
     procedure SetTextField(AValue: string);
     procedure SetDataSource(AValue: TDataSource);
     procedure SetParentField(AValue: string);
@@ -167,6 +171,8 @@ type
     property Images;
     property Indent;
     property HasChildField: string read FHasChildField write SetHasChildField;
+    property ImageIndexField: string read FImageIndexField write SetImageIndexField;
+    property SelectedIndexField: string read FSelectedIndexField write SetSelectedIndexField;
     property KeyField: string read FKeyField write SetKeyField;
     property MultiSelect;
     property MultiSelectStyle;
@@ -360,10 +366,17 @@ begin
       DataSet.First;
       while not DataSet.EOF do
       begin
-        Node := Items.AddChild(FExpandNode,DataSet.FieldByName(TextField).AsString);
-        TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
-        Node.HasChildren := (HasChildField = '') or (DataSet.FieldByName(HasChildField).AsInteger <> 0);
-        Inc(ChildCount);
+        if (FExpandNode = nil) or (TIBTreeNode(FExpandNode).KeyValue <> DataSet.FieldByName(KeyField).AsVariant) then
+        begin
+          Node := Items.AddChild(FExpandNode,DataSet.FieldByName(TextField).AsString);
+          if ImageIndexField <> '' then
+            Node.ImageIndex := DataSet.FieldByName(ImageIndexField).AsInteger;
+          if SelectedIndexField <> '' then
+            Node.SelectedIndex := DataSet.FieldByName(SelectedIndexField).AsInteger;
+          TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
+          Node.HasChildren := (HasChildField = '') or (DataSet.FieldByName(HasChildField).AsInteger <> 0);
+          Inc(ChildCount);
+        end;
         DataSet.Next
       end;
     finally
@@ -377,7 +390,7 @@ end;
 
 procedure TIBTreeView.DataSetChanged(Sender: TObject);
 begin
-//  Reinitialise
+//  Do nothing;
 end;
 
 function TIBTreeView.GetDataSet: TDataSet;
@@ -446,6 +459,20 @@ begin
     end;
   end
   else
+  if assigned(Field) and (Field.FieldName = ImageIndexField) then
+  begin
+    Node := FindNode(DataSet.FieldByName(KeyField).AsVariant);
+    if assigned(Node) then
+    begin
+      FUpdating := true;
+      try
+        Node.ImageIndex := Field.AsInteger
+      finally
+        FUpdating := false
+      end;
+    end;
+  end
+  else
   if assigned(Field) and (Field.FieldName = ParentField) then
   begin
     Node := FindNode(DataSet.FieldByName(KeyField).AsVariant);
@@ -475,11 +502,25 @@ begin
   Reinitialise
 end;
 
+procedure TIBTreeView.SetImageIndexField(AValue: string);
+begin
+  if FImageIndexField = AValue then Exit;
+  FImageIndexField := AValue;
+  Reinitialise
+end;
+
 procedure TIBTreeView.SetKeyField(AValue: string);
 begin
   if FKeyField = AValue then Exit;
   FKeyField := AValue;
   Reinitialise
+end;
+
+procedure TIBTreeView.SetSelectedIndexField(AValue: string);
+begin
+  if FSelectedIndexField = AValue then Exit;
+  FSelectedIndexField := AValue;
+  Reinitialise;
 end;
 
 procedure TIBTreeView.SetTextField(AValue: string);
@@ -569,7 +610,10 @@ begin
       Parser.Add2WhereClause(GetRelationNameQualifier + '"' + FParentField + '" is null')
     else
     if assigned(FExpandNode) then
+    begin
       Parser.Add2WhereClause(GetRelationNameQualifier + '"' + FParentField + '" = :IBX_PARENT_VALUE');
+      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + FKeyField + '" = :IBX_PARENT_VALUE',true);
+    end;
 end;
 
 procedure TIBTreeView.Added(Node: TTreeNode);
@@ -631,8 +675,7 @@ begin
     FExpandNode := Node;
     DataSet.Active := false;
     DataSet.Active := true;
-    if assigned(Selected) then
-      ScrollToNode(TIBTreeNode(Selected))
+    Selected := Node;
   end;
 end;
 

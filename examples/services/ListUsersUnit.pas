@@ -1,3 +1,29 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2015 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*) 
+            
 unit ListUsersUnit;
 
 {$mode objfpc}{$H+}
@@ -160,7 +186,6 @@ begin
         Post;
       end;
     finally
-      IBSecurityService1.Active := false;
       FLoading := false;
     end;
   end;
@@ -186,12 +211,8 @@ begin
   with IBSecurityService1 do
   begin
     Active := true;
-    try
-      UserName := UserList.FieldByName('UserName').AsString;
-      DeleteUser;
-    finally
-      Active := false;
-    end;
+    UserName := UserList.FieldByName('UserName').AsString;
+    DeleteUser;
   end;
 end;
 
@@ -227,7 +248,6 @@ procedure TListUsersForm.UserListBeforePost(DataSet: TDataSet);
         IBSecurityService1.AddUser;
       end;
     end;
-    IBSecurityService1.Active := false;
 end;
 
 procedure TListUsersForm.DoRefresh(Data: PtrInt);

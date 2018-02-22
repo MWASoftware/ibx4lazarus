@@ -24,6 +24,7 @@
     <RunParams>
       <local>
         <FormatVersion Value="1"/>
+        <CommandLineParams Value="-A -g -u SYSDBA -p masterkey employee"/>
       </local>
     </RunParams>
     <RequiredPackages Count="2">

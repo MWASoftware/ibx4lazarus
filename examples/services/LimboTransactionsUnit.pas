@@ -1,3 +1,29 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2015 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*) 
+            
 unit LimboTransactionsUnit;
 
 {$mode objfpc}{$H+}
@@ -44,7 +70,7 @@ implementation
 
 {$R *.lfm}
 
-uses Unit1;
+uses MainFormUnit;
 
 { TLimboTransactionsForm }
 
@@ -80,7 +106,6 @@ end;
 procedure TLimboTransactionsForm.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
-  LimboTransactionValidation.Active := false;
 end;
 
 procedure TLimboTransactionsForm.StringGrid1EditingDone(Sender: TObject);
@@ -164,14 +189,14 @@ procedure TLimboTransactionsForm.RunGFix;
 begin
   with LimboTransactionValidation do
   begin
-    Form1.Memo1.Lines.Add('Starting Limbo transaction resolution');
+    MainForm.Memo1.Lines.Add('Starting Limbo transaction resolution');
     FixLimboTransactionErrors;
     while not Eof do
     begin
-      Form1.Memo1.Lines.Add(GetNextLine);
+      MainForm.Memo1.Lines.Add(GetNextLine);
       Application.ProcessMessages;
     end;
-    Form1.Memo1.Lines.Add('Limbo Transaction resolution complete');
+    MainForm.Memo1.Lines.Add('Limbo Transaction resolution complete');
     Application.QueueAsyncCall(@DoRefresh,0);
   end;
 end;

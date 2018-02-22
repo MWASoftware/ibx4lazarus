@@ -34,9 +34,10 @@ object Form1: TForm1
       'user_name=SYSDBA'
     )
     IdleTimer = 0
+    SQLDialect = 1
     TraceFlags = []
     UseDefaultSystemCodePage = False
-    left = 280
+    left = 224
     top = 56
   end
   object IBDatabaseInfo1: TIBDatabaseInfo

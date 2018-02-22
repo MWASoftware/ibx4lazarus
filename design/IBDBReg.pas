@@ -27,7 +27,7 @@
 {    IBX For Lazarus (Firebird Express)                                  }
 {    Contributor: Tony Whyman, MWA Software http://www.mwasoftware.co.uk }
 {    Portions created by MWA Software are copyright McCallum Whyman      }
-{    Associates Ltd 2011                                                 }
+{    Associates Ltd 2011 - 2018                                               }
 {************************************************************************}
 
 unit IBDBReg;
@@ -499,6 +499,8 @@ begin
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'TextField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ParentField', TIBTreeViewFieldProperty);
   RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'HasChildField', TIBTreeViewFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ImageIndexField', TIBTreeViewFieldProperty);
+  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'SelectedIndexField', TIBTreeViewFieldProperty);
 
   IBGUIInterface :=  TIBDSLCLInterface.Create;
 end;

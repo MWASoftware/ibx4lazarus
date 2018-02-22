@@ -1,3 +1,29 @@
+(*
+ *  IBX For Lazarus (Firebird Express)
+ *
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2015 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*) 
+            
 unit Unit1;
 
 {$mode objfpc}{$H+}
@@ -61,8 +87,12 @@ procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);
 begin
   IBTransaction1.Active := true;
   TableNameLookup.Active := true;
+  Memo1.Lines.Add('Authentication Method = '+ IBDatabase1.AuthenticationMethod);
+  Memo1.Lines.Add('Remote Protocol = ' + IBDatabase1.RemoteProtocol);
+  Memo1.Lines.Add('Attachment SQLDialect = ' + IntToStr(IBDatabase1.DBSQLDialect));
   with IBDatabaseInfo1 do
   begin
+    Memo1.Lines.Add('DB SQLDialect = ' + IntToStr(DBSQLDialect));
     Memo1.Lines.Add('Allocation = ' + IntToStr(Allocation));
     Memo1.Lines.Add('Base Level = ' + IntToStr(BaseLevel));
     Memo1.Lines.Add('DB File Name = ' + DBFileName);
@@ -85,6 +115,8 @@ begin
     Memo1.Lines.Add('Marks = ' + IntToStr(Marks));
     Memo1.Lines.Add('Reads = ' + IntToStr(Reads));
     Memo1.Lines.Add('Writes = ' + IntToStr(Writes));
+    Memo1.Lines.Add('Pages Free = ' + IntToStr(PagesFree));
+    Memo1.Lines.Add('Pages Used = ' + IntToStr(PagesUsed));
     Memo1.Lines.Add('Transaction Count = ' + IntToStr(TransactionCount));
     AddPerfStats('Backout Count',BackoutCount);
     AddPerfStats('Delete Count',DeleteCount);
@@ -95,7 +127,6 @@ begin
     AddPerfStats('Read Seq Count',ReadSeqCount);
     AddPerfStats('Update Count',UpdateCount);
     Memo1.Lines.Add('');
-    Memo1.Lines.Add('DB SQLDialect = ' + IntToStr(DBSQLDialect));
     ShowBoolValue(ReadOnly,'Database is Read Only','Database is Read/Write');
     Memo1.Lines.Add('Hex Dump of Database Page 100:');
     Memo1.Lines.Add(HexString(GetDatabasePage(100)));

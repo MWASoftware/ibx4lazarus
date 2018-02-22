@@ -1,11 +1,11 @@
 object SelectValidationDlg: TSelectValidationDlg
   Left = 980
-  Height = 193
+  Height = 196
   Top = 554
   Width = 350
   BorderStyle = bsDialog
   Caption = 'Select Database'
-  ClientHeight = 193
+  ClientHeight = 196
   ClientWidth = 350
   Position = poMainFormCenter
   LCLVersion = '1.8.1.0'
