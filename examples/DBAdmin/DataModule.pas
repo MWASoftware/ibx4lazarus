@@ -779,6 +779,7 @@ end;
 
 procedure TDatabaseData.Disconnect;
 begin
+  FDBUserName := '';
   FDBPassword := '';
   FLocalConnect := false;
   IBDatabase1.Connected := false;
