@@ -53,6 +53,7 @@ type
     DBEdit3: TDBEdit;
     DBEdit4: TDBEdit;
     DepartmentsCHILDCOUNT: TIntegerField;
+    DepartmentsIMAGEINDEX: TIBIntegerField;
     IBDynamicGrid1: TIBDynamicGrid;
     IBLookupComboEditBox1: TIBLookupComboEditBox;
     ImageList1: TImageList;
@@ -109,12 +110,10 @@ type
     procedure DepartmentsAfterDelete(DataSet: TDataSet);
     procedure DepartmentsAfterInsert(DataSet: TDataSet);
     procedure DepartmentsAfterTransactionEnd(Sender: TObject);
-    procedure DepartmentsBUDGETChange(Sender: TField);
     procedure DepartmentsBUDGETGetText(Sender: TField; var aText: string;
       DisplayText: Boolean);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
-    procedure IBTreeView1Addition(Sender: TObject; Node: TTreeNode);
     procedure IBTreeView1DragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure IBTreeView1DragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
@@ -124,7 +123,6 @@ type
     FDirty: boolean;
     FClosing: boolean;
     procedure Reopen(Data: PtrInt);
-    procedure SetNodeImage(Node: TTreeNode);
   public
     { public declarations }
   end;
@@ -209,11 +207,6 @@ begin
     Application.QueueAsyncCall(@Reopen,0);
 end;
 
-procedure TForm1.DepartmentsBUDGETChange(Sender: TField);
-begin
-  SetNodeImage(IBTreeView1.Selected)
-end;
-
 procedure TForm1.DepartmentsBUDGETGetText(Sender: TField; var aText: string;
   DisplayText: Boolean);
 begin
@@ -239,11 +232,6 @@ begin
     end;
   until IBDatabase1.Connected;
   Reopen(0);
-end;
-
-procedure TForm1.IBTreeView1Addition(Sender: TObject; Node: TTreeNode);
-begin
-  SetNodeImage(Node)
 end;
 
 procedure TForm1.IBTreeView1DragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -290,17 +278,6 @@ begin
   Managers.Active := true;
   Departments.Active := true;
   Staff.Active := true;
-end;
-
-procedure TForm1.SetNodeImage(Node: TTreeNode);
-begin
-  if Departments.FieldByName('Budget').AsFloat < 500000 then
-     Node.ImageIndex := 0
-  else
-  if Departments.FieldByName('Budget').AsFloat = 500000 then
-    Node.ImageIndex := 2
-  else
-    Node.ImageIndex := 1
 end;
 
 end.

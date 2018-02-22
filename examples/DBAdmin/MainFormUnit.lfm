@@ -64,12 +64,12 @@ object MainForm: TMainForm
     Height = 547
     Top = 26
     Width = 905
-    ActivePage = SchemaTab
+    ActivePage = Properties
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 4
+    TabIndex = 0
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
@@ -79,12 +79,12 @@ object MainForm: TMainForm
       OnShow = PropertiesShow
       object Panel7: TPanel
         Left = 0
-        Height = 494
+        Height = 515
         Top = 0
         Width = 899
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 494
+        ClientHeight = 515
         ClientWidth = 899
         Color = clWindow
         ParentColor = False
@@ -1674,16 +1674,16 @@ object MainForm: TMainForm
       OnShow = UserManagerTabShow
       object Panel4: TPanel
         Left = 0
-        Height = 494
+        Height = 515
         Top = 0
         Width = 739
         Align = alLeft
-        ClientHeight = 494
+        ClientHeight = 515
         ClientWidth = 739
         TabOrder = 0
         object UserManagerGrid: TIBDynamicGrid
           Left = 1
-          Height = 492
+          Height = 513
           Top = 1
           Width = 737
           Align = alClient
@@ -1833,18 +1833,18 @@ object MainForm: TMainForm
       end
       object Splitter2: TSplitter
         Left = 739
-        Height = 494
+        Height = 515
         Top = 0
         Width = 5
       end
       object Panel3: TPanel
         Left = 744
-        Height = 494
+        Height = 515
         Top = 0
         Width = 155
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 494
+        ClientHeight = 515
         ClientWidth = 155
         TabOrder = 2
         object IBDynamicGrid4: TIBDynamicGrid
@@ -1889,7 +1889,7 @@ object MainForm: TMainForm
         object Panel5: TPanel
           Left = 0
           Height = 61
-          Top = 433
+          Top = 454
           Width = 155
           Align = alBottom
           BevelInner = bvLowered
@@ -1957,7 +1957,7 @@ object MainForm: TMainForm
         end
         object TagsGrid: TIBDynamicGrid
           Left = 0
-          Height = 186
+          Height = 207
           Top = 242
           Width = 155
           Align = alClient
@@ -1998,7 +1998,7 @@ object MainForm: TMainForm
           Cursor = crVSplit
           Left = 0
           Height = 5
-          Top = 428
+          Top = 449
           Width = 155
           Align = alBottom
           ResizeAnchor = akBottom

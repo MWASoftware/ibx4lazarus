@@ -503,7 +503,7 @@ begin
   with UserListSource.DataSet do
   begin
     Append;
-    FieldByName('UserName').AsString := NewUserName;
+    FieldByName('UserName').AsString := AnsiUpperCase(NewUserName);
     FieldByName('USERPASSWORD').AsString := NewPassword;
   end;
 end;
@@ -668,9 +668,9 @@ end;
 procedure TMainForm.AccessRightsTreeViewSelectionChanged(Sender: TObject);
 begin
   if SubjectAccessRightsSource.DataSet = nil then Exit;
-  if AccessRightsSource.DataSet.Active then
+  if AccessRightsSource.DataSet.Active  then
   begin
-    if AccessRightsTreeView.Selected.Parent = nil then
+    if (AccessRightsTreeView.Selected = nil) or (AccessRightsTreeView.Selected.Parent = nil) then
       SubjectAccessRightsSource.DataSet.Active := false
     else
       DatabaseData.SyncSubjectAccessRights(TIBTreeNode(AccessRightsTreeView.Selected).KeyValue);
@@ -1069,6 +1069,7 @@ begin
 
   if IBDatabaseInfo.ODSMajorVersion >= 12 then
   begin
+    MappingsTab.TabVisible := true;
     AttmtGrid.Columns[2].Visible := true;
     AttmntODS12Panel.Visible := true;
     DBCharacterSet.Visible := true;
@@ -1076,10 +1077,11 @@ begin
   end
   else
   begin
-      AttmtGrid.Columns[2].Visible := false;
-      AttmntODS12Panel.Visible := false;
-      DBCharacterSet.Visible := false;
-      DBCharSetRO.Visible := true;
+    MappingsTab.TabVisible := false;
+    AttmtGrid.Columns[2].Visible := false;
+    AttmntODS12Panel.Visible := false;
+    DBCharacterSet.Visible := false;
+    DBCharSetRO.Visible := true;
   end;
   UserManagerTab.TabVisible := not DatabaseData.EmbeddedMode;
 end;

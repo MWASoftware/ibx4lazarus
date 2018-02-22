@@ -10,7 +10,7 @@ object Form1: TForm1
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.6.4.0'
   object Panel1: TPanel
     Left = 11
     Height = 367
@@ -29,16 +29,18 @@ object Form1: TForm1
       Align = alLeft
       TextField = 'DEPARTMENT'
       DataSource = DataSource1
+      DefaultItemHeight = 16
       DragMode = dmAutomatic
       Images = ImageList1
       HasChildField = 'CHILDCOUNT'
+      ImageIndexField = 'IMAGEINDEX'
+      SelectedIndexField = 'IMAGEINDEX'
       KeyField = 'DEPT_NO'
       ParentField = 'HEAD_DEPT'
       PopupMenu = PopupMenu1
       RelationName = 'A'
       ScrollBars = ssAutoBoth
       TabOrder = 0
-      OnAddition = IBTreeView1Addition
       OnDragDrop = IBTreeView1DragDrop
       OnDragOver = IBTreeView1DragOver
     end
@@ -71,15 +73,15 @@ object Form1: TForm1
         TabOrder = 0
         object Label2: TLabel
           Left = 11
-          Height = 14
+          Height = 13
           Top = 16
-          Width = 25
+          Width = 20
           Caption = 'Title'
           ParentColor = False
         end
         object DBEdit1: TDBEdit
           Left = 11
-          Height = 24
+          Height = 21
           Top = 31
           Width = 373
           DataField = 'DEPARTMENT'
@@ -91,15 +93,15 @@ object Form1: TForm1
         end
         object Label3: TLabel
           Left = 13
-          Height = 14
+          Height = 13
           Top = 71
-          Width = 51
+          Width = 40
           Caption = 'Location'
           ParentColor = False
         end
         object DBEdit4: TDBEdit
           Left = 13
-          Height = 24
+          Height = 21
           Top = 86
           Width = 179
           DataField = 'LOCATION'
@@ -110,15 +112,15 @@ object Form1: TForm1
         end
         object Label4: TLabel
           Left = 219
-          Height = 14
+          Height = 13
           Top = 71
-          Width = 44
+          Width = 34
           Caption = 'Budget'
           ParentColor = False
         end
         object DBEdit2: TDBEdit
           Left = 219
-          Height = 24
+          Height = 21
           Top = 86
           Width = 165
           DataField = 'BUDGET'
@@ -130,15 +132,15 @@ object Form1: TForm1
         end
         object Label5: TLabel
           Left = 219
-          Height = 14
+          Height = 13
           Top = 121
-          Width = 61
+          Width = 50
           Caption = 'Phone No.'
           ParentColor = False
         end
         object DBEdit3: TDBEdit
           Left = 219
-          Height = 24
+          Height = 21
           Top = 136
           Width = 165
           DataField = 'PHONE_NO'
@@ -150,15 +152,15 @@ object Form1: TForm1
         end
         object Label6: TLabel
           Left = 12
-          Height = 14
+          Height = 13
           Top = 121
-          Width = 52
+          Width = 42
           Caption = 'Manager'
           ParentColor = False
         end
         object IBLookupComboEditBox1: TIBLookupComboEditBox
           Left = 13
-          Height = 27
+          Height = 21
           Top = 136
           Width = 180
           DataField = 'MNGR_NO'
@@ -171,13 +173,13 @@ object Form1: TForm1
           TabOrder = 4
           AutoInsert = False
           AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          ItemHeight = 0
+          ItemHeight = 13
         end
         object Label7: TLabel
           Left = 12
-          Height = 14
+          Height = 13
           Top = 172
-          Width = 115
+          Width = 92
           Caption = 'Departmental Staff'
           ParentColor = False
         end
@@ -249,9 +251,9 @@ object Form1: TForm1
   end
   object Label1: TLabel
     Left = 11
-    Height = 14
+    Height = 13
     Top = 17
-    Width = 79
+    Width = 62
     Caption = 'Departments'
     ParentColor = False
   end
@@ -321,7 +323,11 @@ object Form1: TForm1
     )
     RefreshSQL.Strings = (
       'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO,'
-      'count(B.DEPT_NO) as ChildCount'
+      'count(B.DEPT_NO) as ChildCount,'
+      'case'
+      '  when A.Budget < 500000 then 0'
+      '  when A.Budget = 500000 then 2'
+      '  else 1 end as ImageIndex'
       'From DEPARTMENT A'
       'Left Outer JOIN DEPARTMENT B On B.HEAD_DEPT = A.DEPT_NO'
       'Where A.DEPT_NO = :DEPT_NO'
@@ -330,7 +336,11 @@ object Form1: TForm1
     )
     SelectSQL.Strings = (
       'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO,'
-      'count(B.DEPT_NO) as ChildCount'
+      'count(B.DEPT_NO) as ChildCount,'
+      'case'
+      '  when A.Budget < 500000 then 0'
+      '  when A.Budget = 500000 then 2'
+      '  else 1 end as ImageIndex'
       'From DEPARTMENT A'
       'Left Outer JOIN DEPARTMENT B On B.HEAD_DEPT = A.DEPT_NO'
       'Group By A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT, A.MNGR_NO, A.BUDGET, A.LOCATION, A.PHONE_NO'
@@ -400,7 +410,6 @@ object Form1: TForm1
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = False
-      OnChange = DepartmentsBUDGETChange
       OnGetText = DepartmentsBUDGETGetText
       Precision = 18
       Currency = False
@@ -434,6 +443,15 @@ object Form1: TForm1
       FieldKind = fkData
       FieldName = 'CHILDCOUNT'
       Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+    end
+    object DepartmentsIMAGEINDEX: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'IMAGEINDEX'
+      Index = 8
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False

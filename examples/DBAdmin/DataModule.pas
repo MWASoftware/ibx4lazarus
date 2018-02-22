@@ -725,6 +725,8 @@ begin
   AttmtQuery.Active := true;
   if assigned(FAfterDataReload) then
     AfterDataReload(self);
+  if LegacyUserList.Active then
+    RoleNameList.Active := true;
 end;
 
 destructor TDatabaseData.Destroy;
@@ -1287,15 +1289,20 @@ begin
       First;
       while not EOF do
       begin
-        if FieldByName('OBJECT_TYPE').AsInteger = 0 then
+        if FieldByName('OBJECT_TYPE').AsInteger = 0 {relation} then
           ExecDDL.SQL.Text := Format('Revoke All on %s from %s',[
-                  FieldByName('OBJECT_NAME').AsString,
-                  FieldByName('SUBJECT_NAME').AsString])
+                  Trim(FieldByName('OBJECT_NAME').AsString),
+                  Trim(FieldByName('SUBJECT_NAME').AsString)])
+        else
+        if FieldByName('OBJECT_TYPE').AsInteger = 13 {role} then
+          ExecDDL.SQL.Text := Format('Revoke %s from %s',[
+                  Trim(FieldByName('OBJECT_NAME').AsString),
+                  Trim(FieldByName('SUBJECT_NAME').AsString)])
         else
           ExecDDL.SQL.Text := Format('Revoke All on %s %s from %s',[
-                    FieldByName('OBJECT_TYPE_NAME').AsString,
-                    FieldByName('OBJECT_NAME').AsString,
-                    FieldByName('SUBJECT_NAME').AsString]);
+                    Trim(FieldByName('OBJECT_TYPE_NAME').AsString),
+                    Trim(FieldByName('OBJECT_NAME').AsString),
+                    Trim(FieldByName('SUBJECT_NAME').AsString)]);
         ExecDDL.ExecQuery;
         Next;
       end;
@@ -1492,6 +1499,7 @@ begin
     end;
   end;
   UserListSource.DataSet := LegacyUserList;
+  CurrentTransaction.Active := true;
   RoleNameList.Active := true;
 end;
 
@@ -1512,6 +1520,7 @@ begin
   begin
     UserName := DataSet.FieldByName('UserName').AsString;
     DeleteUser;
+    while IsServiceRunning do;
   end;
 end;
 
@@ -1548,7 +1557,7 @@ procedure TDatabaseData.LegacyUserListBeforePost(DataSet: TDataSet);
         IBSecurityService1.AddUser;
       end;
     end;
-
+    while IBSecurityService1.IsServiceRunning do;
 end;
 
 procedure TDatabaseData.ShadowFilesCalcFields(DataSet: TDataSet);

@@ -115,8 +115,11 @@ begin
     Memo1.Lines.Add('Marks = ' + IntToStr(Marks));
     Memo1.Lines.Add('Reads = ' + IntToStr(Reads));
     Memo1.Lines.Add('Writes = ' + IntToStr(Writes));
-    Memo1.Lines.Add('Pages Free = ' + IntToStr(PagesFree));
-    Memo1.Lines.Add('Pages Used = ' + IntToStr(PagesUsed));
+    if ODSMajorVersion >= 12 then
+    begin
+      Memo1.Lines.Add('Pages Free = ' + IntToStr(PagesFree));
+      Memo1.Lines.Add('Pages Used = ' + IntToStr(PagesUsed));
+    end;
     Memo1.Lines.Add('Transaction Count = ' + IntToStr(TransactionCount));
     AddPerfStats('Backout Count',BackoutCount);
     AddPerfStats('Delete Count',DeleteCount);
