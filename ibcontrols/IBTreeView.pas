@@ -52,7 +52,6 @@ type
     FOwner: TIBTreeView;
   protected
     procedure ActiveChanged; override;
-    procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     procedure DataSetChanged; override;
     procedure RecordChanged(Field: TField); override;
     procedure UpdateData; override;
@@ -820,13 +819,6 @@ end;
 procedure TIBTreeViewDatalink.ActiveChanged;
 begin
   FOwner.ActiveChanged(self)
-end;
-
-procedure TIBTreeViewDatalink.DataEvent(Event: TDataEvent; Info: Ptrint);
-begin
-  inherited DataEvent(Event, Info);
-  if Event = deUpdateState then
-    FOwner.IBControlLinkChanged;
 end;
 
 procedure TIBTreeViewDatalink.DataSetChanged;

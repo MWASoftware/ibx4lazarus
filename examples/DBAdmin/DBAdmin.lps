@@ -17,8 +17,7 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="432"/>
-        <CursorPos Y="452"/>
+        <CursorPos X="22" Y="11"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -29,9 +28,10 @@
         <ComponentName Value="DatabaseData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="1647"/>
-        <CursorPos Y="1676"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1676"/>
+        <CursorPos X="21" Y="1680"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -227,11 +227,10 @@
       </Unit23>
       <Unit24>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1844"/>
         <CursorPos X="19" Y="1858"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit24>
       <Unit25>
         <Filename Value="../../../../../fpcsrc/3.0.4/packages/fcl-db/src/base/database.inc"/>
@@ -277,11 +276,10 @@
       </Unit30>
       <Unit31>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1214"/>
         <CursorPos Y="1227"/>
         <UsageCount Value="18"/>
-        <Loaded Value="True"/>
       </Unit31>
       <Unit32>
         <Filename Value="../../runtime/IBSQL.pas"/>
@@ -378,11 +376,10 @@
       </Unit44>
       <Unit45>
         <Filename Value="../../../../../fpcsrc/3.0.4/packages/fcl-db/src/base/dataset.inc"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1077"/>
         <CursorPos Y="1097"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit45>
       <Unit46>
         <Filename Value="../../../fbintf/client/3.0/FB30ClientAPI.pas"/>
@@ -489,38 +486,34 @@
       </Unit59>
       <Unit60>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="347"/>
-        <CursorPos X="113" Y="367"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="33"/>
+        <CursorPos Y="55"/>
         <UsageCount Value="15"/>
         <Loaded Value="True"/>
       </Unit60>
       <Unit61>
         <Filename Value="../../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="157"/>
-        <CursorPos X="32" Y="189"/>
+        <CursorPos X="35" Y="185"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit61>
       <Unit62>
         <Filename Value="../../../../lcl/comctrls.pp"/>
         <UnitName Value="ComCtrls"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="3011"/>
         <CursorPos X="3" Y="2880"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit62>
       <Unit63>
         <Filename Value="../../../../lcl/include/treeview.inc"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="4361"/>
         <CursorPos Y="4386"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit63>
       <Unit64>
         <Filename Value="../../design/IBDBReg.pas"/>
@@ -531,46 +524,41 @@
       </Unit64>
       <Unit65>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/variant.inc"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="431"/>
         <CursorPos Y="452"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit65>
       <Unit66>
         <Filename Value="../../runtime/IBExtract.pas"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="3031"/>
         <CursorPos X="86" Y="3055"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit66>
       <Unit67>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/datasource.inc"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="647"/>
         <CursorPos X="28" Y="679"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit67>
       <Unit68>
         <Filename Value="../../../../lcl/include/control.inc"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="2271"/>
         <CursorPos Y="2291"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit68>
       <Unit69>
         <Filename Value="/usr/share/fpcsrc/packages/rtl-objpas/src/inc/variants.pp"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="2822"/>
         <CursorPos Y="2842"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit69>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="12" HistoryIndex="11">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="351" TopLine="345"/>
@@ -604,92 +592,21 @@
         <Caret Line="656" TopLine="629"/>
       </Position8>
       <Position9>
-        <Filename Value="../../../../lcl/include/treeview.inc"/>
-        <Caret Line="4382" TopLine="4361"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="11" Column="22"/>
       </Position9>
       <Position10>
-        <Filename Value="../../../../lcl/include/treeview.inc"/>
-        <Caret Line="4385" TopLine="4361"/>
+        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
+        <Caret Line="55" Column="23" TopLine="46"/>
       </Position10>
       <Position11>
-        <Filename Value="../../../../lcl/include/treeview.inc"/>
-        <Caret Line="4386" TopLine="4361"/>
+        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
+        <Caret Line="825" TopLine="807"/>
       </Position11>
       <Position12>
-        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/variant.inc"/>
-        <Caret Line="451" TopLine="431"/>
+        <Filename Value="DataModule.pas"/>
+        <Caret Line="1675" Column="27" TopLine="1648"/>
       </Position12>
-      <Position13>
-        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/variant.inc"/>
-        <Caret Line="452" TopLine="431"/>
-      </Position13>
-      <Position14>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1293" TopLine="1273"/>
-      </Position14>
-      <Position15>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1294" Column="66" TopLine="1273"/>
-      </Position15>
-      <Position16>
-        <Filename Value="DataModule.pas"/>
-      </Position16>
-      <Position17>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1676" TopLine="1647"/>
-      </Position17>
-      <Position18>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="825" Column="6" TopLine="811"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="124" Column="15" TopLine="106"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="601" Column="5" TopLine="574"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="132" Column="16" TopLine="113"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="658" Column="3" TopLine="656"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="127" Column="16" TopLine="109"/>
-      </Position23>
-      <Position24>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="607" Column="3" TopLine="605"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="105" Column="15" TopLine="86"/>
-      </Position25>
-      <Position26>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="375" TopLine="355"/>
-      </Position26>
-      <Position27>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="367" Column="36" TopLine="347"/>
-      </Position27>
-      <Position28>
-        <Filename Value="/usr/share/fpcsrc/packages/rtl-objpas/src/inc/variants.pp"/>
-        <Caret Line="2842" TopLine="2822"/>
-      </Position28>
-      <Position29>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="364" Column="25" TopLine="347"/>
-      </Position29>
-      <Position30>
-        <Filename Value="/usr/share/fpcsrc/packages/rtl-objpas/src/inc/variants.pp"/>
-        <Caret Line="2842" TopLine="2822"/>
-      </Position30>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
