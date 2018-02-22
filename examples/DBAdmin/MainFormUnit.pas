@@ -1069,6 +1069,7 @@ begin
 
   if IBDatabaseInfo.ODSMajorVersion >= 12 then
   begin
+    MappingsTab.TabVisible := true;
     AttmtGrid.Columns[2].Visible := true;
     AttmntODS12Panel.Visible := true;
     DBCharacterSet.Visible := true;
@@ -1076,10 +1077,11 @@ begin
   end
   else
   begin
-      AttmtGrid.Columns[2].Visible := false;
-      AttmntODS12Panel.Visible := false;
-      DBCharacterSet.Visible := false;
-      DBCharSetRO.Visible := true;
+    MappingsTab.TabVisible := false;
+    AttmtGrid.Columns[2].Visible := false;
+    AttmntODS12Panel.Visible := false;
+    DBCharacterSet.Visible := false;
+    DBCharSetRO.Visible := true;
   end;
   UserManagerTab.TabVisible := not DatabaseData.EmbeddedMode;
 end;

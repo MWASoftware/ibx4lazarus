@@ -9,12 +9,12 @@ object ListUsersForm: TListUsersForm
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.6.4.0'
   object Label1: TLabel
     Left = 8
-    Height = 14
+    Height = 13
     Top = 14
-    Width = 100
+    Width = 82
     Caption = 'Registered Users'
     ParentColor = False
   end

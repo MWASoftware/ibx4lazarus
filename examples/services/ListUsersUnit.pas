@@ -213,6 +213,7 @@ begin
     Active := true;
     UserName := UserList.FieldByName('UserName').AsString;
     DeleteUser;
+    while IsServiceRunning do;
   end;
 end;
 
@@ -248,6 +249,7 @@ procedure TListUsersForm.UserListBeforePost(DataSet: TDataSet);
         IBSecurityService1.AddUser;
       end;
     end;
+    while IBSecurityService1.IsServiceRunning do;
 end;
 
 procedure TListUsersForm.DoRefresh(Data: PtrInt);

@@ -656,7 +656,9 @@ object DatabaseData: TDatabaseData
     BeforeClose = LegacyUserListBeforeClose
     AfterInsert = UserListAfterInsert
     BeforePost = LegacyUserListBeforePost
+    AfterPost = UserListAfterPost
     BeforeDelete = LegacyUserListBeforeDelete
+    AfterDelete = UserListAfterPost
     left = 520
     top = 416
   end

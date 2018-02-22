@@ -725,6 +725,8 @@ begin
   AttmtQuery.Active := true;
   if assigned(FAfterDataReload) then
     AfterDataReload(self);
+  if LegacyUserList.Active then
+    RoleNameList.Active := true;
 end;
 
 destructor TDatabaseData.Destroy;
@@ -1492,6 +1494,7 @@ begin
     end;
   end;
   UserListSource.DataSet := LegacyUserList;
+  CurrentTransaction.Active := true;
   RoleNameList.Active := true;
 end;
 
@@ -1512,6 +1515,7 @@ begin
   begin
     UserName := DataSet.FieldByName('UserName').AsString;
     DeleteUser;
+    while IsServiceRunning do;
   end;
 end;
 
@@ -1548,7 +1552,7 @@ procedure TDatabaseData.LegacyUserListBeforePost(DataSet: TDataSet);
         IBSecurityService1.AddUser;
       end;
     end;
-
+    while IBSecurityService1.IsServiceRunning do;
 end;
 
 procedure TDatabaseData.ShadowFilesCalcFields(DataSet: TDataSet);
