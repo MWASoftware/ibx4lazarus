@@ -92,23 +92,20 @@ IBX Change Log  version                                                  (2.2-0)
 21. Property Editors now automatically include System Tables when opened and when the query table
     is a System Table.
 
-22. FB3UserManager example added to illustrate use if IBX for managing user logins, passwords
-    and connections using IBX and with single or multiple security databases.
-
-23. IBServices: SQRB and SRB buffers are now reset when service query throws and exception.
+22. IBServices: SQRB and SRB buffers are now reset when service query throws and exception.
     This avoids errors due to a stale SQRB or SRB being used for the next query.
 
-24. IBServices: Service attach parameters now include "expected_db". This is used to
+23. IBServices: Service attach parameters now include "expected_db". This is used to
     add the SPB item isc_spb_expected_db. This names a database using
     an alternative Security Database (FB3 onwards) and allows (e.g. backup/restore) using such a
     database. examples/services re-written to illustrate use of "expected_db".
 
-25. IBServices: TIBControlAndQueryService.WriteNextChunk no longer ignores isc_info_svc_timeout.
+24. IBServices: TIBControlAndQueryService.WriteNextChunk no longer ignores isc_info_svc_timeout.
     This avoids truncated backups when the server returns a timeout (busy) response.
 
-26. TIBDatabase: isc_dpb_page_size now supported as a database parameter when using TIBDatabase.CreateDatabase.
+25. TIBDatabase: isc_dpb_page_size now supported as a database parameter when using TIBDatabase.CreateDatabase.
 
-27. TIBDatabase: DatabaseName property may now be prefixed by $TEMP$ or $DATADIR$ for local
+26. TIBDatabase: DatabaseName property may now be prefixed by $TEMP$ or $DATADIR$ for local
     databasenames. These are respectively expanded to the local system's temp directory
     (including trailing delimiter) or to a directory a prescribed data directory (including
     trailing delimiter). Under Unix systems the data directory is a hidden directory
@@ -118,72 +115,74 @@ IBX Change Log  version                                                  (2.2-0)
     above but instead prefixed by the User's application data path. These may be
     used to improve application portability.
 
-28. TIBTable: FieldDefs property is no longer published. Due to the use of TIBFieldDef
+27. TIBTable: FieldDefs property is no longer published. Due to the use of TIBFieldDef
     this has not worked for a long time and is not useful either. FieldDefs should be
     managed using the Fields Editor as with any other dataset. To access the fields
     editor for a TIBTable component, double click on the component. The fields editor
     is then displayed.
 
-29. TIBDatabaseInfo: new properties/function
+28. TIBDatabaseInfo: new properties/function
      * DateDBCreated (returns date/time database created)
      * TransactionCount (returns no. of active transactions)
      * GetDatabasePage(PageNo: integer) (returns contents of specified database page - SYSDBA only).
+     * PagesFree
+     * PagesUsed
 
-30. IBServices classes now provided the decoded release number in the (array) property ServerVersionNo.
+29. IBServices classes now provided the decoded release number in the (array) property ServerVersionNo.
 
-31. TIBSecurityService now supports display/modification of the User Admin Role (Firebird 2.5 and later).
+30. TIBSecurityService now supports display/modification of the User Admin Role (Firebird 2.5 and later).
 
-32. TIBConfigService now has a procedure SetAutoAdmin(Value: boolean) to enable/disable
+31. TIBConfigService now has a procedure SetAutoAdmin(Value: boolean) to enable/disable
     the automtic mapping of privileged OS users to the RDB$ADMIN role (Firebird 2.5 and later).
 
-33. TIBBackupService: New Option - NoDBTriggers equivalent to -nodbtriggers switch introduced
+32. TIBBackupService: New Option - NoDBTriggers equivalent to -nodbtriggers switch introduced
     in the gbak utility at V.2.1 to prevent database-level and transaction-level triggers from
-    firing during backup and restore. TIBRestoreService has equivalent option NoDBTriggersOnRestore.
+    firing during backup and restore.
 
-34. Both TIBBackupService and TIBRestoreService now support backup/restore statistics options
+33. Both TIBBackupService and TIBRestoreService now support backup/restore statistics options
     for verbose output using the new property "StatisticsRequested".
     see https://firebirdsql.org/file/documentation/release_notes/html/en/2_5/rnfb25-util-gbak.html#rnfb25-util-gbakstats
 
-35. TIBRestoreService: now supports new options RestoreMetaDataOnly and
-    NoDBTriggersOnRestore (Firebird 2.5 and later).
+34. TIBRestoreService: now supports new options RestoreMetaDataOnly (Firebird 2.5 and later).
 
-36. TIBOnlineValidationService component added to the IBServices and the "Firebird Admin"
+35. TIBOnlineValidationService component added to the IBServices and the "Firebird Admin"
     palette. This uses the online validation feature added in Firebird 2.5. The
     services's properties enable inclusion/exclusion of tables and indexes using
     regular expressions. See.
     https://firebirdsql.org/file/documentation/release_notes/html/en/2_5/rnfb25-apiods-api.html#rnfb25-apiods-api-onlinevalidation
 
-37. TIBDatabaseInfo: Support added to report Pages Free and Pages Used.
-
-38. IBServices: procedure TIBConfigService.SetNoLinger added to set no linger
+36. IBServices: procedure TIBConfigService.SetNoLinger added to set no linger
     option on a database.
 
-39. TIBCustomService: Assign method implemented to allow copying of service login
+37. TIBCustomService: Assign method implemented to allow copying of service login
     context between service API components. "Detach" method now only detaches
     service when last reference to the service interface detaches. Tidy up of
     code for SetActive and Attach methods including password hiding.
 
-40. TIBDatabase: new proterties: AuthenticationMethod and RemoteProtocol. Read only
+38. TIBDatabase: new proterties: AuthenticationMethod and RemoteProtocol. Read only
     and used to determine the auth method and protocol used for the connection.
 
-41. TIBDatabase: ensure that SQLDialect setting is used when creating a database using
+39. TIBDatabase: ensure that SQLDialect setting is used when creating a database using
     a Create Database Statement generated by IBX.
 
-42. All IBServices now have an additional published property "PortNo". This may
+40. All IBServices now have an additional published property "PortNo". This may
     be set to a non-standard port number when necessary. If zero then the default
     port number is used.
 
-43: TIBLookupComboeditBox: Ensure dataset updated when change selected with the keyboard
+41: TIBLookupComboeditBox: Ensure dataset updated when change selected with the keyboard
     and not just the mouse.
 
-44. IBCustomDataset: reopen query if already active when a TIBControlLink is added.
+42. TIBCustomDataset: reopen query if already active when a TIBControlLink is added.
 
-45. IBTTreeview: new ImageIndex Property allows the image index for each node to be
+43. TIBTTreeview: new ImageIndex Property allows the image index for each node to be
     set from a database field.
 
-46. TIBExtract: new extract type (etGrantsToUser) for use with eoDatabase. If included
+44. TIBExtract: new extract type (etGrantsToUser) for use with eoDatabase. If included
     then database schema includes grants to all users. If not present then the
     only user grants included are those to User PUBLIC.
+
+45. TIBTreeView: performance improvement. When expanding include both expanded node
+    and child nodes in dataset.
 
 
 IBX Change Log  version                            (2.1-0) Fri, 15 Dec 2017 12:20:11 +0000

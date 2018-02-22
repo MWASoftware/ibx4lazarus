@@ -285,6 +285,8 @@ type
     procedure SelectAllTablesChange(Sender: TObject);
     procedure SelectedTablesOnlyChange(Sender: TObject);
     procedure SelectRepairActionCloseUp(Sender: TObject);
+    procedure SubjectAccessRightsSourceDataChange(Sender: TObject; Field: TField
+      );
     procedure UserManagerTabHide(Sender: TObject);
     procedure UserManagerTabShow(Sender: TObject);
     procedure FilesTabShow(Sender: TObject);
@@ -447,6 +449,7 @@ begin
   if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
   UserListSource.DataSet.Active := true;
   AccessRightsSource.DataSet.Active := true;
+  AccessRightsTreeViewSelectionChanged(nil);
 end;
 
 procedure TMainForm.AccessRightsTabHide(Sender: TObject);
@@ -736,6 +739,13 @@ begin
   ConfigureOnlineValidation;
 end;
 
+procedure TMainForm.SubjectAccessRightsSourceDataChange(Sender: TObject;
+  Field: TField);
+begin
+  if (Field = nil) and not (Sender as TDataSource).Dataset.FieldByName('UPDATE_COLUMNS').IsNull then
+    SubjectAccessRightsGrid.ShowEditorPanel;
+end;
+
 procedure TMainForm.UserManagerTabHide(Sender: TObject);
 begin
   UserListSource.DataSet.Active := PageControl1.ActivePage = AccessRightsTab;
@@ -757,6 +767,7 @@ end;
 
 procedure TMainForm.OpenDatabaseExecute(Sender: TObject);
 begin
+  PageControl1.ActivePage := Properties;
   DatabaseData.Connect;
   if not IBDatabaseInfo.Database.Connected then Close;
 end;

@@ -52,6 +52,7 @@ type
     FOwner: TIBTreeView;
   protected
     procedure ActiveChanged; override;
+    procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     procedure DataSetChanged; override;
     procedure RecordChanged(Field: TField); override;
     procedure UpdateData; override;
@@ -363,12 +364,15 @@ begin
       DataSet.First;
       while not DataSet.EOF do
       begin
-        Node := Items.AddChild(FExpandNode,DataSet.FieldByName(TextField).AsString);
-        if ImageIndexField <> '' then
-          Node.ImageIndex := DataSet.FieldByName(ImageIndexField).AsInteger;
-        TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
-        Node.HasChildren := (HasChildField = '') or (DataSet.FieldByName(HasChildField).AsInteger <> 0);
-        Inc(ChildCount);
+        if (FExpandNode = nil) or (TIBTreeNode(FExpandNode).KeyValue <> DataSet.FieldByName(KeyField).AsVariant) then
+        begin
+          Node := Items.AddChild(FExpandNode,DataSet.FieldByName(TextField).AsString);
+          if ImageIndexField <> '' then
+            Node.ImageIndex := DataSet.FieldByName(ImageIndexField).AsInteger;
+          TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
+          Node.HasChildren := (HasChildField = '') or (DataSet.FieldByName(HasChildField).AsInteger <> 0);
+          Inc(ChildCount);
+        end;
         DataSet.Next
       end;
     finally
@@ -595,7 +599,10 @@ begin
       Parser.Add2WhereClause(GetRelationNameQualifier + '"' + FParentField + '" is null')
     else
     if assigned(FExpandNode) then
+    begin
       Parser.Add2WhereClause(GetRelationNameQualifier + '"' + FParentField + '" = :IBX_PARENT_VALUE');
+      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + FKeyField + '" = :IBX_PARENT_VALUE',true);
+    end;
 end;
 
 procedure TIBTreeView.Added(Node: TTreeNode);
@@ -657,8 +664,7 @@ begin
     FExpandNode := Node;
     DataSet.Active := false;
     DataSet.Active := true;
-    if assigned(Selected) then
-      ScrollToNode(TIBTreeNode(Selected))
+    Selected := Node;
   end;
 end;
 
@@ -814,6 +820,13 @@ end;
 procedure TIBTreeViewDatalink.ActiveChanged;
 begin
   FOwner.ActiveChanged(self)
+end;
+
+procedure TIBTreeViewDatalink.DataEvent(Event: TDataEvent; Info: Ptrint);
+begin
+  inherited DataEvent(Event, Info);
+  if Event = deUpdateState then
+    FOwner.IBControlLinkChanged;
 end;
 
 procedure TIBTreeViewDatalink.DataSetChanged;

@@ -1,8 +1,8 @@
 object DatabaseData: TDatabaseData
   OldCreateOrder = False
   Height = 552
-  HorizontalOffset = 959
-  VerticalOffset = 341
+  HorizontalOffset = 662
+  VerticalOffset = 400
   Width = 730
   PPI = 96
   object IBDatabase1: TIBDatabase
@@ -1156,7 +1156,6 @@ object DatabaseData: TDatabaseData
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
-    AfterOpen = AccessRightsAfterOpen
     OnCalcFields = AccessRightsCalcFields
     BufferChunks = 1000
     CachedUpdates = False
@@ -1288,7 +1287,6 @@ object DatabaseData: TDatabaseData
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
-    AfterOpen = SubjectAccessRightsAfterOpen
     BeforeOpen = SubjectAccessRightsBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
@@ -1305,14 +1303,14 @@ object DatabaseData: TDatabaseData
       '  Else T2.RDB$TYPE_NAME End  as OBJECT_TYPE_NAME,'
       '  UP.RDB$RELATION_NAME as OBJECT_NAME,'
       '  List(DISTINCT Trim(RDB$PRIVILEGE)) as Granted_Privileges,'
-      '  coalesce(List(Trim(UP.RDB$FIELD_NAME)),''<All Columns>'') as Update_Columns,'
+      '  List(Trim(UP.RDB$FIELD_NAME)) as Update_Columns,'
       '  UP.RDB$GRANTOR as GrantedBy,'
       '  coalesce(UP.RDB$GRANT_OPTION,0) as GRANT_OPTION'
       '  From RDB$USER_PRIVILEGES UP'
       '  JOIN RDB$TYPES T1 On T1.RDB$TYPE = UP.RDB$USER_TYPE and T1.RDB$FIELD_NAME = ''RDB$OBJECT_TYPE'''
       '  JOIN RDB$TYPES T2 On T2.RDB$TYPE = UP.RDB$OBJECT_TYPE and T2.RDB$FIELD_NAME = ''RDB$OBJECT_TYPE'''
       '  Where Trim(UP.RDB$USER) || UP.RDB$USER_TYPE = :ID and'
-      '    ('
+      '    (not (UP.RDB$OBJECT_TYPE in (0,9,13)) or'
       '    (UP.RDB$OBJECT_TYPE in (0,13) and'
       '      not Exists(Select * from RDB$RELATIONS Where RDB$RELATION_NAME = UP.RDB$RELATION_NAME and RDB$SYSTEM_FLAG <> 0)) or'
       '    (UP.RDB$OBJECT_TYPE = 9 and UP.RDB$RELATION_NAME not Similar to ''RDB$%|SEC$%|MON$%|SQL$%'')'

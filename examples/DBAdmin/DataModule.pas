@@ -110,7 +110,6 @@ type
     UserListUSERNAME: TIBStringField;
     UserListUSERPASSWORD: TIBStringField;
     UserTags: TIBQuery;
-    procedure AccessRightsAfterOpen(DataSet: TDataSet);
     procedure AccessRightsCalcFields(DataSet: TDataSet);
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
     procedure AttachmentsAfterDelete(DataSet: TDataSet);
@@ -137,7 +136,6 @@ type
     procedure LegacyUserListBeforeDelete(DataSet: TDataSet);
     procedure LegacyUserListBeforePost(DataSet: TDataSet);
     procedure ShadowFilesCalcFields(DataSet: TDataSet);
-    procedure SubjectAccessRightsAfterOpen(DataSet: TDataSet);
     procedure SubjectAccessRightsBeforeOpen(DataSet: TDataSet);
     procedure TagsUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
@@ -1292,7 +1290,7 @@ end;
 
 procedure TDatabaseData.SyncSubjectAccessRights(ID: string);
 begin
-  if FSubjectAccessRightsID = ID then Exit;
+  if (FSubjectAccessRightsID = ID) and SubjectAccessRights.Active then Exit;
   SubjectAccessRights.Active := false;
   FSubjectAccessRightsID := ID;
   SubjectAccessRights.Active := true;
@@ -1554,11 +1552,6 @@ begin
     DataSet.FieldByName('FileMode').AsString := ''
 end;
 
-procedure TDatabaseData.SubjectAccessRightsAfterOpen(DataSet: TDataSet);
-begin
-  writeln('Subject opened');
-end;
-
 procedure TDatabaseData.SubjectAccessRightsBeforeOpen(DataSet: TDataSet);
 begin
   SubjectAccessRights.ParamByName('ID').AsString := FSubjectAccessRightsID;
@@ -1679,11 +1672,6 @@ begin
   end
   else
     AccessRightsImageIndex.AsInteger := -1;
-end;
-
-procedure TDatabaseData.AccessRightsAfterOpen(DataSet: TDataSet);
-begin
-  writeln('Open Access Rights');
 end;
 
 procedure TDatabaseData.AttachmentsAfterDelete(DataSet: TDataSet);
