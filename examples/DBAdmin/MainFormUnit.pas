@@ -34,6 +34,7 @@ type
   TMainForm = class(TForm)
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
+    DatabaseAliasName: TEdit;
     IncludeUserGrants: TCheckBox;
     DBEdit5: TDBEdit;
     Label41: TLabel;
@@ -131,7 +132,6 @@ type
     AllocatedPages: TEdit;
     AutoAdmin: TCheckBox;
     Button1: TButton;
-    DatabaseAliasName: TDBEdit;
     DatabaseOnline: TCheckBox;
     DBCharacterSet: TIBLookupComboEditBox;
     DBCharSetRO: TDBEdit;
@@ -144,10 +144,10 @@ type
     Edit10: TEdit;
     Edit11: TEdit;
     PageBuffers: TEdit;
-    Edit2: TEdit;
-    Edit5: TEdit;
+    ODSVersionString: TEdit;
+    ServerVersionNo: TEdit;
     DBSQLDialect: TEdit;
-    Edit8: TEdit;
+    ConnectString: TEdit;
     UserManagerTab: TTabSheet;
     FilesTab: TTabSheet;
     IBDynamicGrid1: TIBDynamicGrid;
@@ -991,11 +991,12 @@ begin
   if FLoading then Exit;
   FLoading := true;
   try
+    DatabaseAliasName.Text := DatabaseData.DatabaseName;
     Edit1.Text := IBDatabaseInfo.DBSiteName;
-    Edit2.Text :=  Format('%d.%d',[IBDatabaseInfo.ODSMajorVersion,IBDatabaseInfo.ODSMinorVersion]);
-    Edit5.Text :=  IBDatabaseInfo.Version;
+    ODSVersionString.Text :=  Format('%d.%d',[IBDatabaseInfo.ODSMajorVersion,IBDatabaseInfo.ODSMinorVersion]);
+    ServerVersionNo.Text :=  IBDatabaseInfo.Version;
     DBSQLDialect.Text :=  IntToStr(DatabaseData.DBSQLDialect);
-    Edit8.Text := DatabaseData.IBDatabase1.DatabaseName;
+    ConnectString.Text := DatabaseData.IBDatabase1.DatabaseName;
     Edit10.Text := IntToStr(IBDatabaseInfo.CurrentMemory);
     Edit11.Text := IntToStr(IBDatabaseInfo.MaxMemory);
     PageBuffers.Text := IntToStr(DatabaseData.PageBuffers);

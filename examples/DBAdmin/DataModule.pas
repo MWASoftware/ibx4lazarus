@@ -188,6 +188,7 @@ type
     procedure ActivateService(aService: TIBCustomService);
     function GetAuthMethod: string;
     function GetAutoAdmin: boolean;
+    function GetDatabaseName: string;
     procedure GetDBFlags;
     function GetDBOwner: string;
     function GetDBReadOnly: boolean;
@@ -243,6 +244,7 @@ type
     property NoReserve: boolean read GetNoReserve write SetNoReserve;
     property PageBuffers: integer read GetPageBuffers write SetPageBuffers;
     property SweepInterval: integer read GetSweepInterval write SetSweepInterval;
+    property DatabaseName: string read GetDatabaseName;
     property SecurityDatabase: string read GetSecurityDatabase;
     property AuthMethod: string read GetAuthMethod;
     property EmbeddedMode: boolean read GetEmbeddedMode;
@@ -513,6 +515,14 @@ begin
   end;
 end;
 
+function TDatabaseData.GetDatabaseName: string;
+begin
+  if DatabaseQuery.Active and not DatabaseQuery.FieldByName('MON$DATABASE_NAME').IsNull then
+    Result := DatabaseQuery.FieldByName('MON$DATABASE_NAME').AsString
+  else
+    Result := FDatabasePathName;
+end;
+
 function TDatabaseData.GetDBReadOnly: boolean;
 begin
   Result := DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$READ_ONLY').AsInteger  <> 0);
@@ -632,14 +642,6 @@ procedure TDatabaseData.ActivateService(aService: TIBCustomService);
       index := IBService.Params.IndexOfName('expected_db');
       if index <> -1 then IBService.Params.Delete(index);
     end;
-  end;
-
-  function GetDatabaseName: string;
-  begin
-    if DatabaseQuery.Active then
-      Result := DatabaseQuery.FieldByName('MON$DATABASE_NAME').AsString
-    else
-      Result := FDatabasePathName;
   end;
 
 var SecPlugin: TField;
@@ -1067,6 +1069,7 @@ begin
   ActivateService(IBConfigService1);
   IBConfigService1.SetAutoAdmin(AValue);
   while IBConfigService1.IsServiceRunning do;
+  CurrentTransaction.Commit;
 end;
 
 procedure TDatabaseData.SetDBReadOnly(AValue: boolean);
