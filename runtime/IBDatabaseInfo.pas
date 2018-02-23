@@ -45,6 +45,8 @@ type
   TIBDatabaseInfo = class(TComponent)
   private
     function GetDateDBCreated: TDateTime;
+    function GetEncrypted: boolean;
+    function GetEncryptionKeyName: string;
     function GetPagesFree: Long;
     function GetPagesUsed: Long;
     function GetTransactionCount: Long;
@@ -105,6 +107,8 @@ type
     property DBSiteName: String read GetDBSiteName;
     property DBImplementationNo: Long read GetDBImplementationNo;
     property DBImplementationClass: Long read GetDBImplementationClass;
+    property Encrypted: boolean read GetEncrypted;
+    property EncryptionKeyName: string read GetEncryptionKeyName;
     property NoReserve: Long read GetNoReserve;
     property ODSMinorVersion: Long read GetODSMinorVersion;
     property ODSMajorVersion: Long read GetODSMajorVersion;
@@ -180,6 +184,30 @@ begin
       Result := Items[0].GetAsDateTime
     else
       IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
+end;
+
+function TIBDatabaseInfo.GetEncrypted: boolean;
+var ConnFlags: Long;
+begin
+  Result := ODSMajorVersion >= 12;
+  if Result then
+  try
+    ConnFlags := GetLongDatabaseInfo(fb_info_conn_flags);
+    Result := (ConnFlags and fb_info_crypt_encrypted) <> 0;
+  except
+    Result := false; {Introduced in Firebird 3.0.3}
+  end;
+end;
+
+function TIBDatabaseInfo.GetEncryptionKeyName: string;
+begin
+  CheckDatabase;
+  {Introduced in Firebird 3.0.3}
+  with Database.Attachment.GetDBInformation([fb_info_crypt_key]) do
+    if (Count > 0) and (Items[0].GetItemType = fb_info_crypt_key) then
+      Result := Items[0].AsString
+    else
+     IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
 function TIBDatabaseInfo.GetPagesFree: Long;

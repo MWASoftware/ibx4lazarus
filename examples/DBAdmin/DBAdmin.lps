@@ -17,8 +17,9 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="653"/>
-        <CursorPos X="48" Y="673"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="1037"/>
+        <CursorPos X="3" Y="1047"/>
         <UsageCount Value="109"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -29,7 +30,6 @@
         <ComponentName Value="DatabaseData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
         <TopLine Value="1275"/>
         <CursorPos X="37" Y="1309"/>
@@ -587,122 +587,122 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="352" Column="45" TopLine="345"/>
+        <Caret Line="353" Column="45" TopLine="346"/>
       </Position1>
       <Position2>
         <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="353" Column="45" TopLine="346"/>
+        <Caret Line="890" Column="36" TopLine="886"/>
       </Position2>
       <Position3>
         <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="890" Column="36" TopLine="886"/>
+        <Caret Line="328" Column="15" TopLine="308"/>
       </Position3>
       <Position4>
         <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="328" Column="15" TopLine="308"/>
+        <Caret Line="1018" Column="58" TopLine="1012"/>
       </Position4>
       <Position5>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="1018" Column="58" TopLine="1012"/>
+        <Filename Value="DataModule.pas"/>
+        <Caret Line="200" Column="20" TopLine="193"/>
       </Position5>
       <Position6>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="200" Column="20" TopLine="193"/>
+        <Caret Line="750" Column="34" TopLine="736"/>
       </Position6>
       <Position7>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="750" Column="34" TopLine="736"/>
+        <Caret Line="1312" Column="59" TopLine="1300"/>
       </Position7>
       <Position8>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1312" Column="59" TopLine="1300"/>
-      </Position8>
-      <Position9>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="344" Column="18" TopLine="312"/>
+      </Position8>
+      <Position9>
+        <Filename Value="DataModule.pas"/>
       </Position9>
       <Position10>
-        <Filename Value="DataModule.pas"/>
-      </Position10>
-      <Position11>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="347" Column="25" TopLine="326"/>
+      </Position10>
+      <Position11>
+        <Filename Value="DataModule.pas"/>
+        <Caret Line="1541" Column="5" TopLine="1522"/>
       </Position11>
       <Position12>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="1541" Column="5" TopLine="1522"/>
+        <Caret Line="307" TopLine="291"/>
       </Position12>
       <Position13>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="307" TopLine="291"/>
+        <Caret Line="309" TopLine="291"/>
       </Position13>
       <Position14>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="309" TopLine="291"/>
+        <Caret Line="312" TopLine="291"/>
       </Position14>
       <Position15>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="312" TopLine="291"/>
+        <Caret Line="295" TopLine="287"/>
       </Position15>
       <Position16>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="295" TopLine="287"/>
+        <Caret Line="296" TopLine="287"/>
       </Position16>
       <Position17>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="296" TopLine="287"/>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/astrings.inc"/>
+        <Caret Line="141" TopLine="121"/>
       </Position17>
       <Position18>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/astrings.inc"/>
-        <Caret Line="141" TopLine="121"/>
+        <Caret Line="142" TopLine="121"/>
       </Position18>
       <Position19>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/astrings.inc"/>
-        <Caret Line="142" TopLine="121"/>
+        <Caret Line="150" TopLine="121"/>
       </Position19>
       <Position20>
-        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/astrings.inc"/>
-        <Caret Line="150" TopLine="121"/>
-      </Position20>
-      <Position21>
         <Filename Value="DataModule.pas"/>
         <Caret Line="297" Column="9" TopLine="287"/>
-      </Position21>
-      <Position22>
+      </Position20>
+      <Position21>
         <Filename Value="../../runtime/IBSQL.pas"/>
         <Caret Line="705" TopLine="685"/>
+      </Position21>
+      <Position22>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="1091" Column="3" TopLine="1064"/>
       </Position22>
       <Position23>
         <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="1091" Column="3" TopLine="1064"/>
+        <Caret Line="506" Column="67" TopLine="497"/>
       </Position23>
       <Position24>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="506" Column="67" TopLine="497"/>
-      </Position24>
-      <Position25>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
         <Caret Line="254" TopLine="234"/>
-      </Position25>
-      <Position26>
+      </Position24>
+      <Position25>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="713" TopLine="693"/>
+      </Position25>
+      <Position26>
+        <Filename Value="DataModule.pas"/>
+        <Caret Line="1298" Column="51" TopLine="1281"/>
       </Position26>
       <Position27>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="1298" Column="51" TopLine="1281"/>
+        <Caret Line="1300" Column="61" TopLine="1275"/>
       </Position27>
       <Position28>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1300" Column="61" TopLine="1275"/>
-      </Position28>
-      <Position29>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
         <Caret Line="254" TopLine="234"/>
-      </Position29>
-      <Position30>
+      </Position28>
+      <Position29>
         <Filename Value="DataModule.pas"/>
         <Caret Line="1298" Column="46" TopLine="1275"/>
+      </Position29>
+      <Position30>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="346" Column="32" TopLine="344"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>
