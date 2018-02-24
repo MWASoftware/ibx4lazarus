@@ -701,9 +701,8 @@ end;
 procedure TMainForm.RepairTabShow(Sender: TObject);
 begin
   if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
-  ValidateOptions.Enabled := SelectRepairAction.ItemIndex = 2;
+  SelectRepairActionCloseUp(nil);
   ValidateOptions.ActivePage := ValidateOptionsTab;
-  ConfigureOnlineValidation;
 end;
 
 procedure TMainForm.RevokeAllExecute(Sender: TObject);
@@ -755,6 +754,12 @@ end;
 
 procedure TMainForm.SelectRepairActionCloseUp(Sender: TObject);
 begin
+  if (SelectRepairAction.ItemIndex = 1) and (IBDatabaseInfo.ODSMajorVersion < 12) then
+  begin
+    MessageDlg('Online validation is not support by Firebird prior to release 3',
+               mtError,[mbOK],0);
+    SelectRepairAction.ItemIndex := 2;
+  end;
   ValidateOptions.Enabled := SelectRepairAction.ItemIndex = 2;
   ConfigureOnlineValidation;
 end;

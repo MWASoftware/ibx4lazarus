@@ -920,6 +920,8 @@ procedure TDatabaseData.OnlineValidation(ReportLines: TStrings;
 var TableNames: string;
     Separator: string;
 begin
+  if IBDatabaseInfo.ODSMajorVersion < 12 then
+    raise Exception.Create('Online Validation is not supported');
   ActivateService(IBOnlineValidationService1);
   with IBOnlineValidationService1 do
   begin
@@ -987,6 +989,9 @@ begin
       Report.Add(GetNextLine);
     end;
     Report.Add('Limbo Transaction resolution complete');
+    CurrentTransaction.Commit;
+    InLimboList.Active := false;
+    InLimboList.Active := true;
   end;
 end;
 
@@ -1426,8 +1431,8 @@ begin
   FLoadingLimboTr := true;
   with IBValidationService1 do
   try
-    Options := [LimboTransactions];
     ActivateService(IBValidationService1);
+    Options := [LimboTransactions];
     ServiceStart;
     FetchLimboTransactionInfo;
     for i := 0 to LimboTransactionInfoCount - 1 do
