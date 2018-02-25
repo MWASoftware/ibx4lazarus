@@ -33,7 +33,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, MainFormUnit, ibexpress,
+  Forms, memdslaz, MainFormUnit, ibexpress,
   ServicesLoginDlgUnit, SelectValidationDlgUnit, SelectDBDlgUnit,
   BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit,
   AltDBSvcLoginDlgUnit,NewUserDlgUnit, ChgPasswordDlgUnit,
