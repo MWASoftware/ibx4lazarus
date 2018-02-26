@@ -708,15 +708,25 @@ end;
 procedure TDatabaseData.SetPageBuffers(AValue: integer);
 begin
   ActivateService(IBConfigService1);
-  IBConfigService1.SetPageBuffers(AValue);
-  while IBConfigService1.IsServiceRunning do;
+  IBDatabase1.Connected := false;
+  try
+    IBConfigService1.SetPageBuffers(AValue);
+   while IBConfigService1.IsServiceRunning do;
+  finally
+    IBDatabase1.Connected := true;
+  end;
 end;
 
 procedure TDatabaseData.SetSweepInterval(AValue: integer);
 begin
   ActivateService(IBConfigService1);
-  IBConfigService1.SetSweepInterval(AValue);
-  while IBConfigService1.IsServiceRunning do;
+  IBDatabase1.Connected := false;
+  try
+    IBConfigService1.SetSweepInterval(AValue);
+    while IBConfigService1.IsServiceRunning do;
+  finally
+    IBDatabase1.Connected := true;
+  end;
 end;
 
 procedure TDatabaseData.ReloadData(Data: PtrInt);
