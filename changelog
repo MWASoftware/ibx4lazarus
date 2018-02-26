@@ -1,4 +1,4 @@
-IBX Change Log  version                                                    (2.2-0) Thu, 22 Feb 2018 17:12:26 +0000
+IBX Change Log  version                                                     (2.2-0) Sun, 25 Feb 2018 08:49:41 +0000
 
 1. IBExtract: Identity columns - add additional check for null column for generator name.
 
@@ -125,8 +125,10 @@ IBX Change Log  version                                                    (2.2-
      * DateDBCreated (returns date/time database created)
      * TransactionCount (returns no. of active transactions)
      * GetDatabasePage(PageNo: integer) (returns contents of specified database page - SYSDBA only).
-     * PagesFree
-     * PagesUsed
+     * PagesFree (Firebird 3 or later)
+     * PagesUsed (Firebird 3 or later)
+     * Encrypted (returns true if database encrypted. (Firebird 3.0.3 or later only)
+     * EncryptionKeyName (returns the name of the encryption key if any (Firebird 3.0.3 or later only)
 
 29. IBServices classes now provided the decoded release number in the (array) property ServerVersionNo.
 

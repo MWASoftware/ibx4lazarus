@@ -1,66 +1,150 @@
 object LimboTransactionsForm: TLimboTransactionsForm
   Left = 592
-  Height = 386
-  Top = 495
-  Width = 798
+  Height = 535
+  Top = 346
+  Width = 822
   Caption = 'Limbo Transactions'
-  ClientHeight = 386
-  ClientWidth = 798
+  ClientHeight = 535
+  ClientWidth = 822
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
   LCLVersion = '1.8.1.0'
-  object Label1: TLabel
-    Left = 14
+  object Button1: TButton
+    Left = 16
+    Height = 25
+    Top = 501
+    Width = 100
+    Action = CommitAll
+    Anchors = [akLeft, akBottom]
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 128
+    Height = 25
+    Top = 501
+    Width = 100
+    Action = RollbackAll
+    Anchors = [akLeft, akBottom]
+    TabOrder = 1
+  end
+  object Button3: TButton
+    Left = 368
+    Height = 25
+    Top = 501
+    Width = 144
+    Action = ApplySelectedAction
+    Anchors = [akLeft, akBottom]
+    TabOrder = 2
+  end
+  object Button4: TButton
+    Left = 233
+    Height = 25
+    Top = 501
+    Width = 127
+    Action = Commit2PhaseAll
+    Anchors = [akLeft, akBottom]
+    TabOrder = 3
+  end
+  object Label38: TLabel
+    Left = 12
     Height = 14
-    Top = 12
+    Top = 8
     Width = 74
     Caption = 'Transactions'
     ParentColor = False
   end
-  object StringGrid1: TStringGrid
-    Left = 16
-    Height = 316
-    Top = 28
-    Width = 764
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    AutoFillColumns = True
-    ColCount = 8
+  object IBDynamicGrid3: TIBDynamicGrid
+    Left = 12
+    Height = 242
+    Top = 24
+    Width = 804
+    Anchors = [akTop, akLeft, akRight]
+    Color = clWindow
     Columns = <    
       item
+        ReadOnly = True
         Title.Alignment = taCenter
-        Title.Caption = 'Transaction ID'
-        Width = 95
+        Title.Caption = 'ID'
+        Width = 60
+        FieldName = 'TransactionID'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end    
       item
+        ReadOnly = True
         Title.Alignment = taCenter
         Title.Caption = 'Type'
-        Width = 95
+        Width = 80
+        FieldName = 'TransactionType'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end    
       item
+        ReadOnly = True
         Title.Alignment = taCenter
         Title.Caption = 'Host Site'
-        Width = 95
+        Width = 100
+        FieldName = 'HostSite'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end    
       item
+        ReadOnly = True
         Title.Alignment = taCenter
         Title.Caption = 'Remote Site'
-        Width = 95
+        Width = 100
+        FieldName = 'RemoteSite'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end    
       item
+        ReadOnly = True
         Title.Alignment = taCenter
         Title.Caption = 'Database Path'
-        Width = 95
+        Width = 150
+        FieldName = 'DatabasePath'
+        AutoSizeColumn = True
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end    
       item
+        ReadOnly = True
         Title.Alignment = taCenter
         Title.Caption = 'State'
-        Width = 95
+        Width = 80
+        FieldName = 'State'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end    
       item
+        ReadOnly = True
         Title.Alignment = taCenter
         Title.Caption = 'Rec. Action'
-        Width = 95
+        Width = 100
+        FieldName = 'RecommendedAction'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end    
       item
         PickList.Strings = (
@@ -68,64 +152,52 @@ object LimboTransactionsForm: TLimboTransactionsForm
           'Rollback'
         )
         Title.Alignment = taCenter
-        Title.Caption = 'Action'
-        Width = 97
+        Title.Caption = 'Req. Action'
+        Width = 100
+        FieldName = 'RequestedAction'
+        AutoSizeColumn = False
+        InitialSortColumn = False
+        DBLookupProperties.ItemHeight = 0
+        DBLookupProperties.ItemWidth = 0
+        DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       end>
-    FixedCols = 0
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
-    ScrollBars = ssAutoVertical
-    TabOrder = 0
-    OnEditingDone = StringGrid1EditingDone
-    ColWidths = (
-      95
-      95
-      95
-      95
-      95
-      95
-      95
-      97
-    )
-  end
-  object Button1: TButton
-    Left = 16
-    Height = 25
-    Top = 352
-    Width = 100
-    Anchors = [akLeft, akBottom]
-    Caption = 'Commit All'
-    OnClick = Button1Click
-    TabOrder = 1
-  end
-  object Button2: TButton
-    Left = 128
-    Height = 25
-    Top = 352
-    Width = 100
-    Anchors = [akLeft, akBottom]
-    Caption = 'Rollback All'
-    OnClick = Button2Click
-    TabOrder = 2
-  end
-  object Button3: TButton
-    Left = 368
-    Height = 25
-    Top = 352
-    Width = 144
-    Anchors = [akLeft, akBottom]
-    Caption = 'Apply Selected Action'
-    OnClick = Button3Click
-    TabOrder = 3
-  end
-  object Button4: TButton
-    Left = 233
-    Height = 25
-    Top = 352
-    Width = 127
-    Anchors = [akLeft, akBottom]
-    Caption = 'Commit 2 Phase All'
-    OnClick = Button4Click
+    DataSource = LimboListSource
+    Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit, dgDisableDelete, dgDisableInsert]
+    Scrollbars = ssAutoVertical
     TabOrder = 4
+    ExpandEditorPanelBelowRow = False
+    Descending = False
+    EditorBorderStyle = bsSingle
+    DefaultPositionAtEnd = False
+  end
+  object Label39: TLabel
+    Left = 12
+    Height = 14
+    Top = 280
+    Width = 104
+    Caption = 'Resolution Report'
+    ParentColor = False
+  end
+  object LimboReport: TMemo
+    Left = 12
+    Height = 200
+    Top = 296
+    Width = 804
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Lines.Strings = (
+      'LimboReport'
+    )
+    TabOrder = 5
+  end
+  object Button5: TButton
+    Left = 736
+    Height = 25
+    Top = 501
+    Width = 75
+    Anchors = [akTop, akRight]
+    Caption = 'Close'
+    ModalResult = 11
+    TabOrder = 6
   end
   object LimboTransactionValidation: TIBValidationService
     ServerName = 'localhost'
@@ -136,5 +208,81 @@ object LimboTransactionsForm: TLimboTransactionsForm
     GlobalAction = CommitGlobal
     left = 726
     top = 302
+  end
+  object LimboListSource: TDataSource
+    DataSet = InLimboList
+    left = 580
+    top = 204
+  end
+  object InLimboList: TMemDataset
+    FieldDefs = <    
+      item
+        Name = 'TransactionID'
+        DataType = ftInteger
+      end    
+      item
+        Name = 'TransactionType'
+        DataType = ftString
+        Size = 16
+      end    
+      item
+        Name = 'HostSite'
+        DataType = ftString
+        Size = 256
+      end    
+      item
+        Name = 'RemoteSite'
+        DataType = ftString
+        Size = 256
+      end    
+      item
+        Name = 'DatabasePath'
+        DataType = ftString
+        Size = 256
+      end    
+      item
+        Name = 'State'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'RecommendedAction'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'RequestedAction'
+        DataType = ftString
+        Size = 32
+      end>
+    AfterOpen = InLimboListAfterOpen
+    BeforeClose = InLimboListBeforeClose
+    BeforePost = InLimboListBeforePost
+    left = 680
+    top = 208
+  end
+  object ActionList1: TActionList
+    left = 576
+    top = 304
+    object CommitAll: TAction
+      Caption = 'Commit All'
+      OnExecute = CommitAllExecute
+      OnUpdate = CommitAllUpdate
+    end
+    object RollbackAll: TAction
+      Caption = 'Rollback All'
+      OnExecute = RollbackAllExecute
+      OnUpdate = CommitAllUpdate
+    end
+    object Commit2PhaseAll: TAction
+      Caption = 'Commit 2 Phase All'
+      OnExecute = Commit2PhaseAllExecute
+      OnUpdate = CommitAllUpdate
+    end
+    object ApplySelectedAction: TAction
+      Caption = 'Apply Selected Action'
+      OnExecute = ApplySelectedActionExecute
+      OnUpdate = CommitAllUpdate
+    end
   end
 end

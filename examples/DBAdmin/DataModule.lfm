@@ -1085,6 +1085,7 @@ object DatabaseData: TDatabaseData
       'Select Trim(A.RDB$RELATION_NAME) as RDB$RELATION_NAME, 1 as Selected'
       ' From RDB$RELATIONS A'
       ' Where RDB$SYSTEM_FLAG = 0'
+      ' order by 1'
     )
     Params = <>
     UpdateObject = DBTablesUpdate

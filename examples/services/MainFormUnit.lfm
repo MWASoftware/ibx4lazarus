@@ -79,7 +79,7 @@ object MainForm: TMainForm
     TabOrder = 6
   end
   object IBServerProperties1: TIBServerProperties
-    ServerName = 'localhost'
+    ServerName = 'Localhost'
     Protocol = TCP
     Params.Strings = (
       'user_name=SYSDBA'
