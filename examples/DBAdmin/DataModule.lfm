@@ -4,8 +4,9 @@ object DatabaseData: TDatabaseData
   HorizontalOffset = 662
   VerticalOffset = 400
   Width = 730
+  PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -1305,12 +1306,27 @@ object DatabaseData: TDatabaseData
       '  Else T2.RDB$TYPE_NAME End  as OBJECT_TYPE_NAME,'
       '  UP.RDB$RELATION_NAME as OBJECT_NAME,'
       '  List(DISTINCT Trim(RDB$PRIVILEGE)) as Granted_Privileges,'
-      '  List(Trim(UP.RDB$FIELD_NAME)) as Update_Columns,'
+      '  UC.Update_Columns,'
+      '  RC.Reference_Columns,'
       '  UP.RDB$GRANTOR as GrantedBy,'
       '  coalesce(UP.RDB$GRANT_OPTION,0) as GRANT_OPTION'
       '  From RDB$USER_PRIVILEGES UP'
       '  JOIN RDB$TYPES T1 On T1.RDB$TYPE = UP.RDB$USER_TYPE and T1.RDB$FIELD_NAME = ''RDB$OBJECT_TYPE'''
       '  JOIN RDB$TYPES T2 On T2.RDB$TYPE = UP.RDB$OBJECT_TYPE and T2.RDB$FIELD_NAME = ''RDB$OBJECT_TYPE'''
+      '  Left Outer JOIN ('
+      '    Select RDB$USER, RDB$USER_TYPE, RDB$OBJECT_TYPE, RDB$RELATION_NAME,'
+      '      List(Trim(RDB$FIELD_NAME)) as Update_Columns'
+      '      From RDB$USER_PRIVILEGES Where RDB$PRIVILEGE = ''U'''
+      '      Group By RDB$USER, RDB$USER_TYPE, RDB$OBJECT_TYPE, RDB$RELATION_NAME) UC'
+      '    On UC.RDB$USER = UP.RDB$USER and UC.RDB$USER_TYPE = UP.RDB$USER_TYPE and'
+      '       UC.RDB$OBJECT_TYPE = UP.RDB$OBJECT_TYPE and UC.RDB$RELATION_NAME = UP.RDB$RELATION_NAME'
+      '  Left Outer JOIN ('
+      '    Select RDB$USER, RDB$USER_TYPE, RDB$OBJECT_TYPE, RDB$RELATION_NAME,'
+      '      List(Trim(RDB$FIELD_NAME)) as Reference_Columns'
+      '      From RDB$USER_PRIVILEGES Where RDB$PRIVILEGE = ''R'''
+      '      Group By RDB$USER, RDB$USER_TYPE, RDB$OBJECT_TYPE, RDB$RELATION_NAME) RC'
+      '    On RC.RDB$USER = UP.RDB$USER and RC.RDB$USER_TYPE = UP.RDB$USER_TYPE and'
+      '       RC.RDB$OBJECT_TYPE = UP.RDB$OBJECT_TYPE and RC.RDB$RELATION_NAME = UP.RDB$RELATION_NAME'
       '  Where Trim(UP.RDB$USER) || UP.RDB$USER_TYPE = :ID and'
       '    (not (UP.RDB$OBJECT_TYPE in (0,9,13)) or'
       '    (UP.RDB$OBJECT_TYPE in (0,13) and'
@@ -1319,7 +1335,7 @@ object DatabaseData: TDatabaseData
       '    )'
       '  Group BY UP.RDB$USER,UP.RDB$USER_TYPE,UP.RDB$OBJECT_TYPE,'
       '    UP.RDB$RELATION_NAME, UP.RDB$GRANTOR, RDB$GRANT_OPTION,T1.RDB$TYPE_NAME,'
-      '    T2.RDB$TYPE_NAME'
+      '    T2.RDB$TYPE_NAME, UC.Update_Columns, RC.Reference_Columns'
       ''
     )
     Params = <    

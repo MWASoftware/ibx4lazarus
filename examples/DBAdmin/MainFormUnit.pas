@@ -35,11 +35,12 @@ type
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
     DatabaseAliasName: TEdit;
-    IncludeUserGrants: TCheckBox;
     DBEdit5: TDBEdit;
+    DBEdit6: TDBEdit;
+    IncludeUserGrants: TCheckBox;
     Label41: TLabel;
+    Label42: TLabel;
     MenuItem19: TMenuItem;
-    UpdateColsPanel: TPanel;
     RevokeAll: TAction;
     AuthMapSource: TDataSource;
     SubjectAccessRightsSource: TDataSource;
@@ -66,6 +67,7 @@ type
     MappingsTab: TTabSheet;
     AccessRightsTab: TTabSheet;
     Splitter5: TSplitter;
+    UpdateColsPanel: TPanel;
     ValidateRepairRecordFragments: TCheckBox;
     IgnoreChecksums: TCheckBox;
     Label34: TLabel;
@@ -767,7 +769,8 @@ end;
 procedure TMainForm.SubjectAccessRightsSourceDataChange(Sender: TObject;
   Field: TField);
 begin
-  if (Field = nil) and not (Sender as TDataSource).Dataset.FieldByName('UPDATE_COLUMNS').IsNull then
+  if (Field = nil) and (not (Sender as TDataSource).Dataset.FieldByName('UPDATE_COLUMNS').IsNull or
+    not (Sender as TDataSource).Dataset.FieldByName('REFERENCE_COLUMNS').IsNull) then
     SubjectAccessRightsGrid.ShowEditorPanel;
 end;
 

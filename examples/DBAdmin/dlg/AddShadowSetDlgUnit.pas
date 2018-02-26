@@ -112,6 +112,7 @@ begin
       Transaction.Active := true;
       SQL.Text := FSQLText;
       ExecQuery;
+      Transaction.Commit;
     end;
   except On E:Exception do
     FErrorMessage := E.Message;

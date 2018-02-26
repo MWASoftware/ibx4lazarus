@@ -1171,7 +1171,7 @@ begin
     end
   end;
   AddShadowSetDlg.ShowModal(ShadowSet);
-  CurrentTransaction.Commit;
+  CurrentTransaction.Active := true;
 end;
 
 procedure TDatabaseData.RemoveShadowSet(ShadowSet: integer);
