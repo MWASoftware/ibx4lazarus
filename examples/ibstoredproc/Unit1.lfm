@@ -1,10 +1,10 @@
 object Form1: TForm1
   Left = 777
-  Height = 534
+  Height = 556
   Top = 253
   Width = 656
   Caption = 'IBStoredProc Demo'
-  ClientHeight = 534
+  ClientHeight = 556
   ClientWidth = 656
   DefaultMonitor = dmPrimary
   OnCreate = FormCreate
@@ -67,8 +67,8 @@ object Form1: TForm1
   end
   object Memo1: TMemo
     Left = 26
-    Height = 124
-    Top = 188
+    Height = 120
+    Top = 192
     Width = 598
     Anchors = [akTop, akLeft, akRight]
     Lines.Strings = (
@@ -99,7 +99,7 @@ object Form1: TForm1
   end
   object Label3: TLabel
     Left = 35
-    Height = 209
+    Height = 231
     Top = 319
     Width = 477
     Anchors = [akTop, akLeft, akRight, akBottom]

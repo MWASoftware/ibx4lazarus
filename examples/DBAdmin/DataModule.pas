@@ -540,7 +540,7 @@ end;
 
 function TDatabaseData.GetEmbeddedMode: boolean;
 begin
-  Result := IBServerProperties1.Active and (IBServerProperties1.Protocol = Local);
+  Result := AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull;
 end;
 
 function TDatabaseData.GetForcedWrites: boolean;
