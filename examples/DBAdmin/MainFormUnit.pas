@@ -35,11 +35,12 @@ type
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
     DatabaseAliasName: TEdit;
-    IncludeUserGrants: TCheckBox;
     DBEdit5: TDBEdit;
+    DBEdit6: TDBEdit;
+    IncludeUserGrants: TCheckBox;
     Label41: TLabel;
+    Label42: TLabel;
     MenuItem19: TMenuItem;
-    UpdateColsPanel: TPanel;
     RevokeAll: TAction;
     AuthMapSource: TDataSource;
     SubjectAccessRightsSource: TDataSource;
@@ -66,6 +67,7 @@ type
     MappingsTab: TTabSheet;
     AccessRightsTab: TTabSheet;
     Splitter5: TSplitter;
+    UpdateColsPanel: TPanel;
     ValidateRepairRecordFragments: TCheckBox;
     IgnoreChecksums: TCheckBox;
     Label34: TLabel;
@@ -767,7 +769,8 @@ end;
 procedure TMainForm.SubjectAccessRightsSourceDataChange(Sender: TObject;
   Field: TField);
 begin
-  if (Field = nil) and not (Sender as TDataSource).Dataset.FieldByName('UPDATE_COLUMNS').IsNull then
+  if (Field = nil) and (not (Sender as TDataSource).Dataset.FieldByName('UPDATE_COLUMNS').IsNull or
+    not (Sender as TDataSource).Dataset.FieldByName('REFERENCE_COLUMNS').IsNull) then
     SubjectAccessRightsGrid.ShowEditorPanel;
 end;
 
@@ -984,9 +987,19 @@ end;
 
 procedure TMainForm.HandleLoadData(Sender: TObject);
 begin
-  StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s by %s, using %s security database',
-         [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.IBDatabase1.Params.Values['user_name'],
-          DatabaseData.AuthMethod, DatabaseData.SecurityDatabase]);
+  if DatabaseData.EmbeddedMode then
+    StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s in embedded mode',
+       [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.IBDatabase1.Params.Values['user_name']
+        ])
+  else
+  if DatabaseData.DBUserName = 'SYSDBA' then
+  StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s by %s, using %s security database.',
+       [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.DBUserName,
+        DatabaseData.AuthMethod, DatabaseData.SecurityDatabase])
+  else
+    StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s by %s, using %s security database. Role = %s',
+         [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.DBUserName,
+          DatabaseData.AuthMethod, DatabaseData.SecurityDatabase,DatabaseData.RoleName]);
   if assigned(PageControl1.ActivePage.OnShow) then
     PageControl1.ActivePage.OnShow(nil);
 end;
@@ -1090,6 +1103,7 @@ begin
     DBCharSetRO.Visible := true;
   end;
   UserManagerTab.TabVisible := not DatabaseData.EmbeddedMode;
+  AccessRightsTab.TabVisible := not DatabaseData.EmbeddedMode;
 end;
 
 procedure TMainForm.ConfigureOnlineValidation;

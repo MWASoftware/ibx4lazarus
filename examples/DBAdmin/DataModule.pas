@@ -498,7 +498,7 @@ var DBOField: TField;
 begin
   DBOField := DatabaseQuery.FindField('MON$OWNER');
   if DBOField <> nil then
-    Result := DBOField.AsString
+    Result := Trim(DBOField.AsString)
   else
     Result := 'n/a';
 end;
@@ -540,7 +540,7 @@ end;
 
 function TDatabaseData.GetEmbeddedMode: boolean;
 begin
-  Result := IBServerProperties1.Active and (IBServerProperties1.Protocol = Local);
+  Result := AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull;
 end;
 
 function TDatabaseData.GetForcedWrites: boolean;
@@ -1171,7 +1171,7 @@ begin
     end
   end;
   AddShadowSetDlg.ShowModal(ShadowSet);
-  CurrentTransaction.Commit;
+  CurrentTransaction.Active := true;
 end;
 
 procedure TDatabaseData.RemoveShadowSet(ShadowSet: integer);

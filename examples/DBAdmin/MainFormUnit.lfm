@@ -2102,37 +2102,6 @@ object MainForm: TMainForm
         EditorBorderStyle = bsSingle
         DefaultPositionAtEnd = False
       end
-      object UpdateColsPanel: TPanel
-        Left = 328
-        Height = 32
-        Top = 40
-        Width = 544
-        BevelOuter = bvNone
-        BorderStyle = bsSingle
-        ClientHeight = 30
-        ClientWidth = 542
-        TabOrder = 3
-        object Label41: TLabel
-          Left = 19
-          Height = 14
-          Top = 8
-          Width = 100
-          Caption = 'Update Columns'
-          ParentColor = False
-        end
-        object DBEdit5: TDBEdit
-          Left = 128
-          Height = 24
-          Top = 4
-          Width = 404
-          DataField = 'UPDATE_COLUMNS'
-          DataSource = SubjectAccessRightsSource
-          Anchors = [akTop, akLeft, akRight]
-          CharCase = ecNormal
-          MaxLength = 0
-          TabOrder = 0
-        end
-      end
     end
     object MappingsTab: TTabSheet
       Caption = 'Auth Mappings'
@@ -2278,8 +2247,8 @@ object MainForm: TMainForm
         TabOrder = 2
         object ValidateOptionsTab: TTabSheet
           Caption = 'ValidateOptionsTab'
-          ClientHeight = 102
-          ClientWidth = 316
+          ClientHeight = 104
+          ClientWidth = 318
           object Label33: TLabel
             Left = 5
             Height = 14
@@ -2317,8 +2286,8 @@ object MainForm: TMainForm
         end
         object RepairOptionsTab: TTabSheet
           Caption = 'RepairOptionsTab'
-          ClientHeight = 102
-          ClientWidth = 316
+          ClientHeight = 104
+          ClientWidth = 318
           object Label34: TLabel
             Left = 10
             Height = 40
@@ -2681,6 +2650,57 @@ object MainForm: TMainForm
         )
         TabOrder = 5
       end
+    end
+  end
+  object UpdateColsPanel: TPanel
+    Left = 328
+    Height = 64
+    Top = 128
+    Width = 544
+    BevelOuter = bvNone
+    BorderStyle = bsSingle
+    ClientHeight = 62
+    ClientWidth = 542
+    TabOrder = 3
+    object Label41: TLabel
+      Left = 32
+      Height = 14
+      Top = 8
+      Width = 100
+      Caption = 'Update Columns'
+      ParentColor = False
+    end
+    object DBEdit5: TDBEdit
+      Left = 144
+      Height = 24
+      Top = 4
+      Width = 388
+      DataField = 'UPDATE_COLUMNS'
+      DataSource = SubjectAccessRightsSource
+      Anchors = [akTop, akLeft, akRight]
+      CharCase = ecNormal
+      MaxLength = 0
+      TabOrder = 0
+    end
+    object Label42: TLabel
+      Left = 8
+      Height = 14
+      Top = 40
+      Width = 123
+      Caption = 'Referenced Columns'
+      ParentColor = False
+    end
+    object DBEdit6: TDBEdit
+      Left = 144
+      Height = 24
+      Top = 35
+      Width = 388
+      DataField = 'REFERENCE_COLUMNS'
+      DataSource = SubjectAccessRightsSource
+      Anchors = [akTop, akLeft, akRight]
+      CharCase = ecNormal
+      MaxLength = 0
+      TabOrder = 1
     end
   end
   object MainMenu1: TMainMenu
