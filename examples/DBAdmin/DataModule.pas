@@ -498,7 +498,7 @@ var DBOField: TField;
 begin
   DBOField := DatabaseQuery.FindField('MON$OWNER');
   if DBOField <> nil then
-    Result := DBOField.AsString
+    Result := Trim(DBOField.AsString)
   else
     Result := 'n/a';
 end;

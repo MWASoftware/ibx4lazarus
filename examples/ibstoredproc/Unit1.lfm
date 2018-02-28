@@ -104,7 +104,7 @@ object Form1: TForm1
     Width = 477
     Anchors = [akTop, akLeft, akRight, akBottom]
     AutoSize = False
-    Caption = 'This demonstrates the use of TIBStoredProc with the Firebird 3 packages example provided with the Firebird 3 source code. A database is created in a temporary location when the application is first run. Once this completes, click on "Populate Table". This uses IBStoredProc2 to call the global stored procedure "test", which populates the temporary table displayed above.'#10#10'Now click on Get Lines. This uses IBStoredProc1 to call the GET_LINES procedure in the FB$OUT package. It returns a text blob which is then shown in the TMemo control.'#10#10'After the database has been created you can inspect the TIBStoredProc properties. However, note that under Windows you will have to first change the TIBDatabase.DatabaseName property to your user specific temporary file location otherwise the drop down lists will not work.'
+    Caption = 'This demonstrates the use of TIBStoredProc with the Firebird 3 packages example provided with the Firebird 3 source code. A database is created in a temporary location when the application is first run. Once this completes, click on "Populate Table". This uses IBStoredProc2 to call the global stored procedure "test", which populates the temporary table displayed above.'#10#10'Now click on Get Lines. This uses IBStoredProc1 to call the GET_LINES procedure in the FB$OUT package. It returns a text blob which is then shown in the TMemo control.'#10#10'After the database has been created you can inspect the TIBStoredProc properties. '
     ParentColor = False
     WordWrap = True
   end
