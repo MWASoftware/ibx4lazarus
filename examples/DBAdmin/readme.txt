@@ -15,4 +15,4 @@ Unlike the Services API example, the program is focused on a specific database. 
 * Database Validation and Repair
 * Limbo Transaction Resolution.
 
-The example is discussed in detail in section 4 of the User Guide "Firebird Server Management using IBX" in the ibx/docs directory.
+The example is discussed in detail in section 3 of the User Guide "Firebird Server Management using IBX" in the ibx/docs directory.
