@@ -46,8 +46,8 @@ unit IBSQLMonitor;
 interface
 
 uses
-  IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, IBTypes ,SysUtils,
-  Classes,
+  IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, IBXServices,
+  IBTypes ,SysUtils,  Classes,
 {$IFDEF WINDOWS }
   Windows
 {$ELSE}
@@ -121,10 +121,14 @@ type
     procedure TRCommitRetaining(tr: TIBTransaction); 
     procedure TRRollback(tr: TIBTransaction);
     procedure TRRollbackRetaining(tr: TIBTransaction);
-    procedure ServiceAttach(service: TIBCustomService); 
-    procedure ServiceDetach(service: TIBCustomService);
-    procedure ServiceQuery(service: TIBCustomService);
-    procedure ServiceStart(service: TIBCustomService);
+    procedure ServiceAttach(service: TIBCustomService); overload;
+    procedure ServiceDetach(service: TIBCustomService); overload;
+    procedure ServiceQuery(service: TIBCustomService); overload;
+    procedure ServiceStart(service: TIBCustomService); overload;
+    procedure ServiceAttach(service: TIBXServicesConnection); overload;
+    procedure ServiceDetach(service: TIBXServicesConnection); overload;
+    procedure ServiceQuery(service: TIBXCustomService); overload;
+    procedure ServiceStart(service: TIBXCustomService); overload;
     procedure SendMisc(Msg : String);
     function GetTraceFlags : TTraceFlags;
     function GetMonitorCount : Integer;
@@ -215,10 +219,14 @@ type
     procedure TRCommitRetaining(tr: TIBTransaction); virtual;
     procedure TRRollback(tr: TIBTransaction); virtual;
     procedure TRRollbackRetaining(tr: TIBTransaction); virtual;
-    procedure ServiceAttach(service: TIBCustomService); virtual;
-    procedure ServiceDetach(service: TIBCustomService); virtual;
-    procedure ServiceQuery(service: TIBCustomService); virtual;
-    procedure ServiceStart(service: TIBCustomService); virtual;
+    procedure ServiceAttach(service: TIBCustomService); virtual; overload;
+    procedure ServiceDetach(service: TIBCustomService); virtual; overload;
+    procedure ServiceQuery(service: TIBCustomService); virtual;  overload;
+    procedure ServiceStart(service: TIBCustomService); virtual;  overload;
+    procedure ServiceAttach(service: TIBXServicesConnection); virtual; overload;
+    procedure ServiceDetach(service: TIBXServicesConnection); virtual; overload;
+    procedure ServiceQuery(service: TIBXCustomService); virtual;  overload;
+    procedure ServiceStart(service: TIBXCustomService); virtual;  overload;
     procedure SendMisc(Msg : String);
     function GetEnabled: Boolean;
     function GetTraceFlags: TTraceFlags;
@@ -475,6 +483,58 @@ begin
 end;
 
 procedure TIBSQLMonitorHook.ServiceStart(service: TIBCustomService);
+var
+  st: String;
+begin
+  if FEnabled then
+  begin
+    if not (tfService in (FTraceFlags * service.TraceFlags)) then
+      Exit;
+    st := service.Name + ': [Start]'; {do not localize}
+    WriteSQLData(st, tfService);
+  end;
+end;
+
+procedure TIBSQLMonitorHook.ServiceAttach(service: TIBXServicesConnection);
+var
+  st: String;
+begin
+  if FEnabled then
+  begin
+    if not (tfService in (FTraceFlags * service.TraceFlags)) then
+      Exit;
+    st := service.Name + ': [Attach]'; {do not localize}
+    WriteSQLData(st, tfService);
+  end;
+end;
+
+procedure TIBSQLMonitorHook.ServiceDetach(service: TIBXServicesConnection);
+var
+  st: String;
+begin
+  if FEnabled then
+  begin
+    if not (tfService in (FTraceFlags * service.TraceFlags)) then
+      Exit;
+    st := service.Name + ': [Detach]'; {do not localize}
+    WriteSQLData(st, tfService);
+  end;
+end;
+
+procedure TIBSQLMonitorHook.ServiceQuery(service: TIBXCustomService);
+var
+  st: String;
+begin
+  if FEnabled then
+  begin
+    if not (tfService in (FTraceFlags * service.TraceFlags)) then
+      Exit;
+    st := service.Name + ': [Query]'; {do not localize}
+    WriteSQLData(st, tfService);
+  end;
+end;
+
+procedure TIBSQLMonitorHook.ServiceStart(service: TIBXCustomService);
 var
   st: String;
 begin

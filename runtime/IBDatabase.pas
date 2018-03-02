@@ -200,7 +200,6 @@ type
     FDefaultTransaction: TIBTransaction;
     FInternalTransaction: TIBTransaction;
     FTimer: TFPTimer;
-    FUserNames: TStringList;
     FDataSets: TList;
     FLoginCalled: boolean;
     FUseDefaultSystemCodePage: boolean;
@@ -509,7 +508,6 @@ begin
   FDBParamsChanged := True;
   TStringList(FDBParams).OnChange := DBParamsChange;
   TStringList(FDBParams).OnChanging := DBParamsChanging;
-  FUserNames := nil;
   FInternalTransaction := TIBTransaction.Create(self);
   FInternalTransaction.DefaultDatabase := Self;
   FTimer := TFPTimer.Create(Self);
@@ -537,7 +535,6 @@ begin
   FInternalTransaction.Free;
   FDBParams.Free;
   FSQLObjects.Free;
-  FUserNames.Free;
   FTransactions.Free;
   FDataSets.Free;
   inherited Destroy;
@@ -852,19 +849,14 @@ var
 
   procedure HidePassword;
   var
-    I: Integer;
     IndexAt: Integer;
   begin
-    IndexAt := 0;
-    for I := 0 to Params.Count -1 do
-      if Pos('password', LowerCase(Trim(Params.Names[i]))) = 1 then {mbcs ok}
-      begin
-        FHiddenPassword := Params.Values[Params.Names[i]];
-        IndexAt := I;
-        break;
-      end;
-    if IndexAt <> 0 then
+    IndexAt := Params.IndexOfName('password');
+    if IndexAt <> -1 then
+    begin
+      FHiddenPassword := Params.ValueFromIndex[IndexAt];
       Params.Delete(IndexAt);
+    end;
   end;
 
 begin
@@ -891,15 +883,11 @@ begin
   begin
     IndexOfUser := IndexOfDBConst(DPBConstantNames[isc_dpb_user_name]);
     if IndexOfUser <> -1 then
-      Username := Copy(Params[IndexOfUser],
-                                         Pos('=', Params[IndexOfUser]) + 1, {mbcs ok}
-                                         Length(Params[IndexOfUser]));
+      Username := Params.ValueFromIndex[IndexOfUser];
     IndexOfPassword := IndexOfDBConst(DPBConstantNames[isc_dpb_password]);
     if IndexOfPassword <> -1 then
     begin
-      Password := Copy(Params[IndexOfPassword],
-                                         Pos('=', Params[IndexOfPassword]) + 1, {mbcs ok}
-                                         Length(Params[IndexOfPassword]));
+      Password := Params.ValueFromIndex[IndexOfPassword];
       OldPassword := password;
     end;
 
@@ -909,10 +897,9 @@ begin
       if Username <> '' then
       begin
         if IndexOfUser = -1 then
-          Params.Add(DPBConstantNames[isc_dpb_user_name] + '=' + Username)
+          Params.Values[DPBConstantNames[isc_dpb_user_name]] := Username
         else
-          Params[IndexOfUser] := DPBConstantNames[isc_dpb_user_name] +
-                                 '=' + Username;
+          Params.ValueFromIndex[IndexOfUser] := Username;
       end
       else
       if IndexOfUser <> -1 then
