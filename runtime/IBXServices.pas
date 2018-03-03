@@ -5,27 +5,31 @@ unit IBXServices;
 interface
 
 uses
-  Classes, SysUtils, DB, IB, IBTypes, IBExternals;
+  Classes, SysUtils, DB, IB, IBTypes, IBSQLMonitor, IBExternals, memds;
 
 type
   TIBXCustomService = class;
   TIBXServicesConnection = class;
+
+  IIBXServicesClient = interface
+    procedure OnBeforeDisconnect(Sender: TIBXServicesConnection);
+  end;
+
   TIBXServicesLoginEvent = procedure(Service: TIBXServicesConnection; LoginParams: TStrings) of object;
 
   { TIBXServicesConnection }
 
-  TIBXServicesConnection = class(TCustomConnection)
+  TIBXServicesConnection = class(TIBXMonitoredConnection)
   private
     FConnectString: string;
     FParams: TStrings;
-    FIBXServices: TList;
+    FIBXServices: array of IIBXServicesClient;
     FOnLogin: TIBXServicesLoginEvent;
     FService: IServiceManager;
     FPortNo: string;
     FServerName: string;
     FProtocol: TProtocol;
     FServerVersionNo: array [1..4] of integer;
-    FTraceFlags: TTraceFlags;
     procedure CheckActive;
     procedure CheckInactive;
     procedure CheckServerName;
@@ -39,7 +43,6 @@ type
     procedure SetPortNo(AValue: string);
     procedure SetProtocol(AValue: TProtocol);
     procedure SetServerName(AValue: string);
-    procedure SetService(AValue: IServiceManager);
   protected
     procedure DoConnect; override;
     procedure DoDisconnect; override;
@@ -47,11 +50,13 @@ type
     function GetDataset(Index : longint) : TDataset; override;
     function GetDataSetCount : Longint; override;
     procedure ReadState(Reader: TReader); override;
+    procedure RegisterIntf(intf: IIBXServicesClient);
+    procedure UnRegisterIntf(intf: IIBXServicesClient);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property ServerVersionNo[index: integer]: integer read GetServerVersionNo;
-    property ServiceIntf: IServiceManager read FService write SetService;
+    property ServiceIntf: IServiceManager read FService;
   published
     property Connected;
     property ConnectString: string read FConnectString write SetConnectString;
@@ -60,7 +65,7 @@ type
     property PortNo: string read FPortNo write SetPortNo;
     property Params: TStrings read FParams write SetParams;
     property ServerName: string read FServerName write SetServerName;
-    property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
+    property TraceFlags;
     property AfterConnect;
     property AfterDisconnect;
     property BeforeConnect;
@@ -70,19 +75,18 @@ type
 
  { TIBXCustomService }
 
- TIBXCustomService = class(TComponent)
+ TIBXCustomService = class(TIBXMonitoredService,IIBXServicesClient)
  private
    FSRB: ISRB;
    FSQPB: ISQPB;
    FServiceQueryResults: IServiceQueryResults;
    FServicesConnection: TIBXServicesConnection;
-   FTraceFlags: TTraceFlags;
    procedure CheckActive;
    function GetSQPB: ISQPB;
    function GetSRB: ISRB;
    procedure SetServicesConnection(AValue: TIBXServicesConnection);
  protected
-   procedure HandleServiceDetached(Sender: TIBXServicesConnection); virtual;
+   procedure OnBeforeDisconnect(Sender: TIBXServicesConnection); virtual;
    procedure InternalServiceQuery;
    property SRB: ISRB read GetSRB;
    property SQPB: ISQPB read GetSQPB;
@@ -93,7 +97,7 @@ type
  published
    property ServicesConnection: TIBXServicesConnection read FServicesConnection
      write SetServicesConnection;
-   property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
+   property TraceFlags;
 end;
 
  { TDatabaseInfo }
@@ -148,7 +152,7 @@ end;
    function GetDatabaseInfo: TDatabaseInfo;
    function GetVersionInfo: TVersionInfo;
  protected
-   procedure HandleServiceDetached(Sender: TIBXServicesConnection); override;
+   procedure OnBeforeDisconnect(Sender: TIBXServicesConnection); override;
  public
    property DatabaseInfo: TDatabaseInfo read GetDatabaseInfo;
    property VersionInfo: TVersionInfo read GetVersionInfo;
@@ -386,11 +390,128 @@ end;
     property Options: TValidateOptions read FOptions write FOptions;
   end;
 
+  TUserInfo = class
+  public
+    UserName: string;
+    FirstName: string;
+    MiddleName: string;
+    LastName: string;
+    GroupID: Integer;
+    UserID: Integer;
+    AdminRole: boolean;
+  end;
+
+  TSecurityAction = (ActionAddUser, ActionDeleteUser, ActionModifyUser, ActionDisplayUser);
+  TSecurityModifyParam = (ModifyFirstName, ModifyMiddleName, ModifyLastName, ModifyUserId,
+                         ModifyGroupId, ModifyPassword, ModifyAdminRole);
+  TSecurityModifyParams = set of TSecurityModifyParam;
+
+  { TIBXSecurityService }
+
+  TIBXSecurityService = class(TIBXControlAndQueryService)
+  private
+    FAdminRole: boolean;
+    FUserID: Integer;
+    FGroupID: Integer;
+    FFirstName: string;
+    FUserName: string;
+    FPassword: string;
+    FSQLRole: string;
+    FLastName: string;
+    FMiddleName: string;
+    FUserInfo: array of TUserInfo;
+    FSecurityAction: TSecurityAction;
+    FModifyParams: TSecurityModifyParams;
+    procedure ClearParams;
+    procedure SetAdminRole(AValue: boolean);
+    procedure SetSecurityAction (Value: TSecurityAction);
+    procedure SetFirstName (Value: String);
+    procedure SetMiddleName (Value: String);
+    procedure SetLastName (Value: String);
+    procedure SetPassword (Value: String);
+    procedure SetUserId (Value: Integer);
+    procedure SetGroupId (Value: Integer);
+
+    procedure FetchUserInfo;
+    function GetUserInfo(Index: Integer): TUserInfo;
+    function GetUserInfoCount: Integer;
+
+  protected
+    procedure Loaded; override;
+    procedure SetServiceStartOptions; override;
+    property SecurityAction: TSecurityAction read FSecurityAction
+                                             write SetSecurityAction;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure DisplayUsers;
+    procedure DisplayUser(aUserName: string);
+    procedure AddUser;
+    procedure DeleteUser;
+    procedure ModifyUser;
+    function HasAdminRole: boolean;
+    property UserInfo[Index: Integer]: TUserInfo read GetUserInfo;
+    property UserInfoCount: Integer read GetUserInfoCount;
+
+  published
+    property SQlRole : string read FSQLRole write FSQLrole;
+    property UserName : string read FUserName write FUserName;
+    property FirstName : string read FFirstName write SetFirstName;
+    property MiddleName : string read FMiddleName write SetMiddleName;
+    property LastName : string read FLastName write SetLastName;
+    property UserID : Integer read FUserID write SetUserID;
+    property GroupID : Integer read FGroupID write SetGroupID;
+    property Password : string read FPassword write setPassword;
+    property AdminRole: boolean read FAdminRole write SetAdminRole;
+  end;
+
+  TTransactionGlobalAction = (CommitGlobal, RollbackGlobal, RecoverTwoPhaseGlobal,
+                             NoGlobalAction);
+  TTransactionState = (LimboState, CommitState, RollbackState, UnknownState);
+  TTransactionAdvise = (CommitAdvise, RollbackAdvise, UnknownAdvise);
+  TTransactionAction = (CommitAction, RollbackAction);
+
+  TLimboTransactionInfo = class
+  public
+    MultiDatabase: Boolean;
+    ID: Integer;
+    HostSite: String;
+    RemoteSite: String;
+    RemoteDatabasePath: String;
+    State: TTransactionState;
+    Advise: TTransactionAdvise;
+    Action: TTransactionAction;
+  end;
+
+ { TIBXLimboTransactionResolutionService }
+
+  TIBXLimboTransactionResolutionService = class(TIBXControlAndQueryService)
+  private
+    FLimboTransactionInfo: array of TLimboTransactionInfo;
+    FGlobalAction: TTransactionGlobalAction;
+    function GetLimboTransactionInfo(index: integer): TLimboTransactionInfo;
+    function GetLimboTransactionInfoCount: integer;
+
+  protected
+    procedure SetServiceStartOptions; override;
+  public
+    destructor Destroy; override;
+    procedure Clear;
+    procedure FetchLimboTransactionInfo;
+    procedure FixLimboTransactionErrors;
+    property LimboTransactionInfo[Index: integer]: TLimboTransactionInfo read GetLimboTransactionInfo;
+    property LimboTransactionInfoCount: Integer read GetLimboTransactionInfoCount;
+
+  published
+    property GlobalAction: TTransactionGlobalAction read FGlobalAction
+                                         write FGlobalAction;
+
+  end;
 
 
 implementation
 
-uses FBMessages, IBUtils, IBSQLMonitor, RegExpr, CustApp;
+uses FBMessages, IBUtils, RegExpr, CustApp;
 
 const
   SPBPrefix = 'isc_spb_';
@@ -426,6 +547,480 @@ const
     isc_spb_sql_role_name,
     isc_spb_expected_db
   );
+
+  { TIBXLimboTransactionResolutionService }
+
+  function TIBXLimboTransactionResolutionService.GetLimboTransactionInfo(
+    index: integer): TLimboTransactionInfo;
+  begin
+    if index <= High(FLimboTransactionInfo) then
+      result := FLimboTransactionInfo[index]
+    else
+      result := nil;
+  end;
+
+
+
+  function TIBXLimboTransactionResolutionService.GetLimboTransactionInfoCount: integer;
+  begin
+    Result := Length(FLimboTransactionInfo);
+  end;
+
+  procedure TIBXLimboTransactionResolutionService.SetServiceStartOptions;
+  var i: integer;
+  begin
+    SRB.Add(isc_action_svc_repair);
+    AddDBNameToSRB;
+    if Length(FLimboTransactionInfo) = 0 then
+      SRB.Add(isc_spb_options).AsInteger := isc_spb_rpr_list_limbo_trans
+    else
+    {Fixing existing transactions}
+    begin
+      case FGlobalAction of
+      NoGlobalAction:
+        begin
+          for i := 0 to LimboTransactionInfoCount - 1 do
+          begin
+            if (FLimboTransactionInfo[i].Action = CommitAction) then
+              SRB.Add(isc_spb_rpr_commit_trans).AsInteger :=  FLimboTransactionInfo[i].ID
+            else
+              SRB.Add(isc_spb_rpr_rollback_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
+          end;
+        end;
+
+      CommitGlobal:
+        begin
+          for i := 0 to LimboTransactionInfoCount - 1 do
+            SRB.Add(isc_spb_rpr_commit_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
+        end;
+
+        RollbackGlobal:
+          begin
+            for i := 0 to LimboTransactionInfoCount - 1 do
+              SRB.Add(isc_spb_rpr_rollback_trans).AsInteger :=  FLimboTransactionInfo[i].ID;
+          end;
+
+        RecoverTwoPhaseGlobal:
+        begin
+          for i := 0 to LimboTransactionInfoCount - 1 do
+            SRB.Add(isc_spb_rpr_recover_two_phase).AsInteger :=  FLimboTransactionInfo[i].ID;
+        end;
+      end;
+    end;
+  end;
+
+  destructor TIBXLimboTransactionResolutionService.Destroy;
+  begin
+    Clear;
+    inherited Destroy;
+  end;
+
+  procedure TIBXLimboTransactionResolutionService.Clear;
+  var
+    i : Integer;
+  begin
+    for i := 0 to High(FLimboTransactionInfo) do
+      FLimboTransactionInfo[i].Free;
+    SetLength(FLimboTransactionInfo,0);
+  end;
+
+  procedure TIBXLimboTransactionResolutionService.FetchLimboTransactionInfo;
+
+    procedure NextLimboTransaction(index: integer);
+    begin
+      SetLength(FLimboTransactionInfo, index+1);
+      FLimboTransactionInfo[index] := TLimboTransactionInfo.Create;
+      { if no advice commit as default }
+      FLimboTransactionInfo[index].Advise := UnknownAdvise;
+      FLimboTransactionInfo[index].Action:= CommitAction;
+    end;
+
+  var
+    i,j, k: Integer;
+  begin
+    Clear;
+    ServiceStart;
+    SRB.Add(isc_info_svc_limbo_trans);
+    InternalServiceQuery;
+
+    k := -1;
+    for i := 0 to FServiceQueryResults.Count - 1 do
+    with FServiceQueryResults[i] do
+    case getItemType of
+    isc_info_svc_limbo_trans:
+      begin
+        if FServiceQueryResults[i].Count = 0 then continue;
+        NextLimboTransaction(0);
+        for j := 0 to FServiceQueryResults[i].Count - 1 do
+        begin
+          with FServiceQueryResults[i][j] do
+          begin
+            case getItemType of
+              isc_spb_single_tra_id:
+              begin
+                Inc(k);
+                if k > 0 then
+                  NextLimboTransaction(k);
+                FLimboTransactionInfo[k].MultiDatabase := False;
+                FLimboTransactionInfo[k].ID := AsInteger;
+              end;
+
+              isc_spb_multi_tra_id:
+              begin
+                Inc(k);
+                if k > 0 then
+                  NextLimboTransaction(k);
+                FLimboTransactionInfo[k].MultiDatabase := True;
+                FLimboTransactionInfo[k].ID := AsInteger;
+              end;
+
+              isc_spb_tra_host_site:
+                FLimboTransactionInfo[k].HostSite := AsString;
+
+              isc_spb_tra_state:
+                case AsByte of
+                  isc_spb_tra_state_limbo:
+                    FLimboTransactionInfo[k].State := LimboState;
+
+                  isc_spb_tra_state_commit:
+                    FLimboTransactionInfo[k].State := CommitState;
+
+                  isc_spb_tra_state_rollback:
+                    FLimboTransactionInfo[k].State := RollbackState;
+
+                  else
+                    FLimboTransactionInfo[k].State := UnknownState;
+                end;
+
+              isc_spb_tra_remote_site:
+                FLimboTransactionInfo[k].RemoteSite := AsString;
+
+              isc_spb_tra_db_path:
+                FLimboTransactionInfo[k].RemoteDatabasePath := AsString;
+
+              isc_spb_tra_advise:
+              with FLimboTransactionInfo[k] do
+              begin
+                case (AsByte) of
+                isc_spb_tra_advise_commit:
+                begin
+                  Advise := CommitAdvise;
+                  Action:= CommitAction;
+                end;
+
+                isc_spb_tra_advise_rollback:
+                begin
+                  Advise := RollbackAdvise;
+                  Action := RollbackAction;
+                end;
+
+                else
+                  Advise := UnknownAdvise;
+                end;
+              end;
+
+              else
+                IBError(ibxeOutputParsingError, [getItemType]);
+            end;
+          end;
+        end;
+      end;
+    else
+      IBError(ibxeOutputParsingError, [getItemType]);
+    end;
+  end;
+
+  procedure TIBXLimboTransactionResolutionService.FixLimboTransactionErrors;
+  begin
+    if Length(FLimboTransactionInfo) > 0 then
+      ServiceStart; {Fix is implicit in non-zero list of Limbo transactions}
+  end;
+
+  { TIBXSecurityService }
+
+  constructor TIBXSecurityService.Create(AOwner: TComponent);
+  begin
+    inherited Create(AOwner);
+    FModifyParams := [];
+  end;
+
+  destructor TIBXSecurityService.Destroy;
+  var
+    i : Integer;
+  begin
+    for i := 0 to High(FUserInfo) do
+      FUserInfo[i].Free;
+    FUserInfo := nil;
+    inherited Destroy;
+  end;
+
+  procedure TIBXSecurityService.FetchUserInfo;
+  var
+    i, j, k: Integer;
+  begin
+    SRB.Add(isc_info_svc_get_users);
+    InternalServiceQuery;
+
+    for i := 0 to High(FUserInfo) do
+      FUserInfo[i].Free;
+    for i := 0 to FServiceQueryResults.Count - 1 do
+    with FServiceQueryResults[i] do
+    begin
+      case getItemType of
+      isc_info_svc_get_users:
+        begin
+          SetLength(FUserInfo,1);
+          k := 0;
+          FUserInfo[0] := TUserInfo.Create;
+          FUserInfo[0].UserName := '';
+          for j := 0 to FServiceQueryResults[i].Count - 1 do
+          begin
+            with FServiceQueryResults[i][j] do
+            case getItemType of
+            isc_spb_sec_username:
+              begin
+                if FUserInfo[k].UserName <> '' then
+                begin
+                  Inc(k);
+                  SetLength(FUserInfo,k+1);
+                  if FUserInfo[k] = nil then
+                    FUserInfo[k] := TUserInfo.Create;
+                end;
+                FUserInfo[k].UserName := AsString;
+              end;
+
+            isc_spb_sec_firstname:
+              FUserInfo[k].FirstName := AsString;
+
+            isc_spb_sec_middlename:
+              FUserInfo[k].MiddleName := AsString;
+
+            isc_spb_sec_lastname:
+              FUserInfo[k].LastName := AsString;
+
+            isc_spb_sec_userId:
+              FUserInfo[k].UserId := AsInteger;
+
+            isc_spb_sec_groupid:
+              FUserInfo[k].GroupID := AsInteger;
+
+            isc_spb_sec_admin:
+              FUserInfo[k].AdminRole := AsInteger <> 0;
+
+            else
+              IBError(ibxeOutputParsingError, [getItemType]);
+            end;
+          end;
+        end;
+      else
+        IBError(ibxeOutputParsingError, [getItemType]);
+      end;
+    end;
+  end;
+
+  function TIBXSecurityService.GetUserInfo(Index: Integer): TUserInfo;
+  begin
+    if Index <= High(FUSerInfo) then
+      result := FUserInfo[Index]
+    else
+      result := nil;
+  end;
+
+  function TIBXSecurityService.GetUserInfoCount: Integer;
+  begin
+    Result := Length(FUserInfo);
+  end;
+
+  procedure TIBXSecurityService.AddUser;
+  begin
+    SecurityAction := ActionAddUser;
+    ServiceStart;
+  end;
+
+  procedure TIBXSecurityService.DeleteUser;
+  begin
+    SecurityAction := ActionDeleteUser;
+    ServiceStart;
+  end;
+
+  procedure TIBXSecurityService.DisplayUsers;
+  begin
+    SecurityAction := ActionDisplayUser;
+    ClearParams;
+    ServiceStart;
+    FetchUserInfo;
+  end;
+
+  procedure TIBXSecurityService.DisplayUser(aUserName: string);
+  begin
+    SecurityAction := ActionDisplayUser;
+    ClearParams;
+    FUserName := aUserName;
+    ServiceStart;
+    FetchUserInfo;
+  end;
+
+  procedure TIBXSecurityService.ModifyUser;
+  begin
+    SecurityAction := ActionModifyUser;
+    ServiceStart;
+  end;
+
+  function TIBXSecurityService.HasAdminRole: boolean;
+  begin
+    CheckActive;
+    with ServicesConnection do
+    Result :=  (ServerVersionNo[1] > 2) or
+               ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5));
+  end;
+
+  procedure TIBXSecurityService.SetSecurityAction (Value: TSecurityAction);
+  begin
+    FSecurityAction := Value;
+    if Value = ActionDeleteUser then
+      ClearParams;
+  end;
+
+  procedure TIBXSecurityService.ClearParams;
+  begin
+    FModifyParams := [];
+    FFirstName := '';
+    FMiddleName := '';
+    FLastName := '';
+    FGroupID := 0;
+    FUserID := 0;
+    FPassword := '';
+  end;
+
+  procedure TIBXSecurityService.SetAdminRole(AValue: boolean);
+  begin
+    FAdminRole := AValue;
+    Include (FModifyParams, ModifyAdminRole);
+  end;
+
+  procedure TIBXSecurityService.SetFirstName (Value: String);
+  begin
+    FFirstName := Value;
+    Include (FModifyParams, ModifyFirstName);
+  end;
+
+  procedure TIBXSecurityService.SetMiddleName (Value: String);
+  begin
+    FMiddleName := Value;
+    Include (FModifyParams, ModifyMiddleName);
+  end;
+
+  procedure TIBXSecurityService.SetLastName (Value: String);
+  begin
+    FLastName := Value;
+    Include (FModifyParams, ModifyLastName);
+  end;
+
+  procedure TIBXSecurityService.SetPassword (Value: String);
+  begin
+    FPassword := Value;
+    Include (FModifyParams, ModifyPassword);
+  end;
+
+  procedure TIBXSecurityService.SetUserId (Value: Integer);
+  begin
+    FUserId := Value;
+    Include (FModifyParams, ModifyUserId);
+  end;
+
+  procedure TIBXSecurityService.SetGroupId (Value: Integer);
+  begin
+    FGroupId := Value;
+    Include (FModifyParams, ModifyGroupId);
+  end;
+
+  procedure TIBXSecurityService.Loaded;
+  begin
+    inherited Loaded;
+    ClearParams;
+  end;
+
+  procedure TIBXSecurityService.SetServiceStartOptions;
+  var
+    Len: UShort;
+
+  begin
+    case FSecurityAction of
+    ActionDisplayUser:
+      begin
+        if HasAdminRole then
+          SRB.Add(isc_action_svc_display_user_adm) {Firebird 2.5 and later only}
+        else
+          SRB.Add(isc_action_svc_display_user);
+        if UserName <> '' then
+          SRB.Add(isc_spb_sec_username).AsString := UserName;
+      end;
+
+      ActionAddUser:
+      begin
+        if ( Pos(' ', FUserName) > 0 ) then
+          IBError(ibxeStartParamsError, [nil]);
+        Len := Length(FUserName);
+        if (Len = 0) then
+          IBError(ibxeStartParamsError, [nil]);
+        SRB.Add(isc_action_svc_add_user);
+        SRB.Add(isc_spb_sec_username).AsString := FUserName;
+        if FSQLRole <> '' then
+          SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
+        SRB.Add(isc_spb_sec_userid).AsInteger := FUserID;
+        SRB.Add(isc_spb_sec_groupid).AsInteger := FGroupID;
+        SRB.Add(isc_spb_sec_password).AsString := FPassword;
+        SRB.Add(isc_spb_sec_firstname).AsString := FFirstName;
+        SRB.Add(isc_spb_sec_middlename).AsString := FMiddleName;
+        SRB.Add(isc_spb_sec_lastname).AsString := FLastName;
+        if HasAdminRole then
+          SRB.Add(isc_spb_sec_admin).AsInteger := ord(FAdminRole);
+      end;
+
+      ActionDeleteUser:
+      begin
+        Len := Length(FUserName);
+        if (Len = 0) then
+          IBError(ibxeStartParamsError, [nil]);
+        SRB.Add(isc_action_svc_delete_user);
+        SRB.Add(isc_spb_sec_username).AsString := FUserName;
+        if FSQLRole <> '' then
+          SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
+      end;
+
+      ActionModifyUser:
+      begin
+        Len := Length(FUserName);
+        if (Len = 0) then
+          IBError(ibxeStartParamsError, [nil]);
+        SRB.Add(isc_action_svc_modify_user);
+        SRB.Add(isc_spb_sec_username).AsString := FUserName;
+        if FSQLRole <> '' then
+          SRB.Add(isc_spb_sql_role_name).AsString := FSQLRole;
+        if (ModifyUserId in FModifyParams) then
+          SRB.Add(isc_spb_sec_userid).AsInteger := FUserID;
+        if (ModifyGroupId in FModifyParams) then
+          SRB.Add(isc_spb_sec_groupid).AsInteger := FGroupID;
+        if (ModifyPassword in FModifyParams) then
+          SRB.Add(isc_spb_sec_password).AsString := FPassword;
+        if (ModifyFirstName in FModifyParams) then
+          SRB.Add(isc_spb_sec_firstname).AsString := FFirstName;
+        if (ModifyMiddleName in FModifyParams) then
+          SRB.Add(isc_spb_sec_middlename).AsString := FMiddleName;
+        if (ModifyLastName in FModifyParams) then
+          SRB.Add(isc_spb_sec_lastname).AsString := FLastName;
+        if (ModifyAdminRole in FModifyParams) and HasAdminRole then
+        begin
+          if FAdminRole then
+            SRB.Add(isc_spb_sec_admin).AsInteger := 1
+          else
+            SRB.Add(isc_spb_sec_admin).AsInteger := 0;
+        end;
+      end;
+    end;
+    ClearParams;
+  end;
+
 
 { TIBXValidationService }
 
@@ -707,7 +1302,7 @@ end;
 
 procedure TIBXBackupService.SetServiceStartOptions;
 var
-  param, i: Integer;
+  param: Integer;
 begin
   SRB.Add(isc_action_svc_backup);
   AddDBNameToSRB;
@@ -1357,10 +1952,10 @@ begin
   Result := VersionInfo;
 end;
 
-procedure TIBXServerProperties.HandleServiceDetached(
-  Sender: TIBXServicesConnection);
+procedure TIBXServerProperties.OnBeforeDisconnect(Sender: TIBXServicesConnection
+  );
 begin
-  inherited HandleServiceDetached(Sender);
+  inherited;
   if assigned(FDatabaseInfo) then FreeAndNil(FDatabaseInfo);
   if assigned(FVersionInfo) then FreeAndNil(FVersionInfo);
   if assigned(FConfigParams) then FreeAndNil(FConfigParams);
@@ -1396,14 +1991,13 @@ procedure TIBXCustomService.SetServicesConnection(AValue: TIBXServicesConnection
 begin
   if FServicesConnection = AValue then Exit;
   if FServicesConnection <> nil then
-    FServicesConnection.FIBXServices.Remove(self);
+    FServicesConnection.UnRegisterIntf(self);
   FServicesConnection := AValue;
   if FServicesConnection <> nil then
-    FServicesConnection.FIBXServices.Add(self);
+    FServicesConnection.RegisterIntf(self);
 end;
 
-procedure TIBXCustomService.HandleServiceDetached(Sender: TIBXServicesConnection
-  );
+procedure TIBXCustomService.OnBeforeDisconnect(Sender: TIBXServicesConnection);
 begin
   FSRB := nil;
   FServiceQueryResults := nil;
@@ -1433,7 +2027,11 @@ end;
 
 destructor TIBXCustomService.Destroy;
 begin
-  HandleServiceDetached(nil);
+  if ServicesConnection <> nil then
+  begin
+    OnBeforeDisconnect(ServicesConnection);
+    ServicesConnection := nil;
+  end;
   inherited Destroy;
 end;
 
@@ -1626,17 +2224,6 @@ begin
   FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
 end;
 
-procedure TIBXServicesConnection.SetService(AValue: IServiceManager);
-begin
-  if FService = AValue then Exit;
-  FService := AValue;
-  if AValue <> nil then
-  begin
-    FPortNo := FService.getPortNo;
-    ServerName := FService.getServerName;
-  end;
-end;
-
 procedure TIBXServicesConnection.DoConnect;
 
   procedure ParseServerVersionNo;
@@ -1693,17 +2280,19 @@ begin
 
   ParseServerVersionNo;
 
-  MonitorHook.ServiceAttach(Self);
+  if tfService in TraceFlags then
+    MonitorHook.ServiceAttach(Self);
 end;
 
 procedure TIBXServicesConnection.DoDisconnect;
 var i: integer;
 begin
   CheckActive;
-  for i := 0 to FIBXServices.Count - 1 do
-    TIBXCustomService(FIBXServices).HandleServiceDetached(self);
+  for i := 0 to Length(FIBXServices) - 1 do
+    FIBXServices[i].OnBeforeDisconnect(self);
   FService := nil;
-  MonitorHook.ServiceDetach(Self);
+  if tfService in TraceFlags then
+    MonitorHook.ServiceDetach(Self);
 end;
 
 function TIBXServicesConnection.GetConnected: Boolean;
@@ -1727,14 +2316,32 @@ begin
   inherited ReadState(Reader);
 end;
 
+procedure TIBXServicesConnection.RegisterIntf(intf: IIBXServicesClient);
+begin
+  Setlength(FIBXServices,Length(FIBXServices) + 1);
+  FIBXServices[Length(FIBXServices)-1] := intf;
+end;
+
+procedure TIBXServicesConnection.UnRegisterIntf(intf: IIBXServicesClient);
+var i, j: integer;
+begin
+  for i := length(FIBXServices) - 1 downto 0 do
+    if FIBXServices[i] = intf then
+    begin
+      for j := i + 1 to length(FIBXServices) - 1 do
+        FIBXServices[j-1] := FIBXServices[j];
+      SetLength(FIBXServices,Length(FIBXServices)-1);
+      break;
+    end;
+end;
+
 constructor TIBXServicesConnection.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FServerName := '';
   FParams := TStringList.Create;
-  FIBXServices := TList.Create;
+  Setlength(FIBXServices,0);
   TStringList(FParams).OnChanging := @ParamsChanging;
-  FTraceFlags := [];
   FService := nil;
   FProtocol := Local;
   if (AOwner <> nil) and
@@ -1746,7 +2353,7 @@ end;
 destructor TIBXServicesConnection.Destroy;
 begin
   inherited Destroy;
-  if assigned(FIBXServices) then FIBXServices.Free;
+  Setlength(FIBXServices,0);
   if assigned(FParams) then FParams.Free;
 end;
 
