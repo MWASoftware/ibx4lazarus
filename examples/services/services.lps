@@ -3,13 +3,13 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="53">
+    <Units Count="57">
       <Unit0>
         <Filename Value="services.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="14"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainFormUnit.pas"/>
@@ -26,7 +26,7 @@
           <TopLine Value="370"/>
           <CursorPos X="4" Y="385"/>
         </ExtraEditor1>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -38,7 +38,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="58" Y="27"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
       </Unit2>
       <Unit3>
         <Filename Value="BackupDlgUnit.pas"/>
@@ -49,7 +49,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="83"/>
         <CursorPos X="76" Y="90"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
       </Unit3>
       <Unit4>
         <Filename Value="ChgPasswordDlgUnit.pas"/>
@@ -59,7 +59,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="93" Y="26"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
       </Unit4>
       <Unit5>
         <Filename Value="LimboTransactionsUnit.pas"/>
@@ -67,10 +67,10 @@
         <ComponentName Value="LimboTransactionsForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="218"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="219"/>
         <CursorPos Y="191"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit5>
@@ -83,7 +83,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="220"/>
         <CursorPos Y="252"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
       </Unit6>
       <Unit7>
         <Filename Value="NewUserDlgUnit.pas"/>
@@ -93,7 +93,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="106" Y="30"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
       </Unit7>
       <Unit8>
         <Filename Value="RestoreDlgUnit.pas"/>
@@ -104,7 +104,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="84"/>
         <CursorPos X="71" Y="98"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
       </Unit8>
       <Unit9>
         <Filename Value="ServicesLoginDlgUnit.pas"/>
@@ -114,7 +114,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="106" Y="31"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
       </Unit9>
       <Unit10>
         <Filename Value="SelectValidationDlgUnit.pas"/>
@@ -125,7 +125,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="17"/>
         <CursorPos X="45" Y="45"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
       </Unit10>
       <Unit11>
         <Filename Value="SelectDBDlgUnit.pas"/>
@@ -136,7 +136,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="10"/>
         <CursorPos X="33" Y="27"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="81"/>
       </Unit11>
       <Unit12>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
@@ -147,7 +147,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
         <CursorPos X="21" Y="14"/>
-        <UsageCount Value="72"/>
+        <UsageCount Value="75"/>
       </Unit12>
       <Unit13>
         <Filename Value="ShutdownRegDlgUnit.pas"/>
@@ -158,7 +158,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
         <CursorPos X="40" Y="57"/>
-        <UsageCount Value="72"/>
+        <UsageCount Value="75"/>
       </Unit13>
       <Unit14>
         <Filename Value="BringOnlineDlgUnit.pas"/>
@@ -173,16 +173,16 @@
       <Unit15>
         <Filename Value="../../runtime/IBServices.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="128"/>
+        <TopLine Value="137"/>
         <CursorPos X="30" Y="175"/>
-        <UsageCount Value="35"/>
+        <UsageCount Value="36"/>
         <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="931"/>
-        <CursorPos X="3" Y="951"/>
+        <TopLine Value="1042"/>
+        <CursorPos Y="1071"/>
         <UsageCount Value="19"/>
       </Unit16>
       <Unit17>
@@ -202,8 +202,8 @@
       <Unit19>
         <Filename Value="../../../fbintf/client/FBServices.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="46"/>
-        <CursorPos X="14" Y="66"/>
+        <TopLine Value="110"/>
+        <CursorPos X="23" Y="118"/>
         <UsageCount Value="18"/>
       </Unit19>
       <Unit20>
@@ -302,26 +302,25 @@
       <Unit33>
         <Filename Value="../../runtime/IBXServices.pas"/>
         <IsVisibleTab Value="True"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="679"/>
-        <CursorPos X="15" Y="703"/>
-        <UsageCount Value="21"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="550"/>
+        <CursorPos X="41" Y="575"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit33>
       <Unit34>
         <Filename Value="../../runtime/IBDatabase.pas"/>
-        <EditorIndex Value="7"/>
-        <TopLine Value="345"/>
+        <EditorIndex Value="8"/>
         <CursorPos X="24" Y="365"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit34>
       <Unit35>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
-        <EditorIndex Value="6"/>
-        <TopLine Value="188"/>
-        <CursorPos X="3" Y="201"/>
-        <UsageCount Value="18"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="1610"/>
+        <CursorPos X="19" Y="1630"/>
+        <UsageCount Value="19"/>
         <Loaded Value="True"/>
       </Unit35>
       <Unit36>
@@ -376,10 +375,11 @@
       </Unit42>
       <Unit43>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2728"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="2693"/>
         <CursorPos X="3" Y="2732"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="17"/>
+        <Loaded Value="True"/>
       </Unit43>
       <Unit44>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/sysutils.inc"/>
@@ -391,26 +391,26 @@
       <Unit45>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/custapp.pp"/>
         <UnitName Value="CustApp"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="10"/>
         <CursorPos X="3" Y="30"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit45>
       <Unit46>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/memds/memds.pp"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="797"/>
-        <CursorPos X="2" Y="800"/>
-        <UsageCount Value="14"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="145"/>
+        <CursorPos Y="176"/>
+        <UsageCount Value="15"/>
         <Loaded Value="True"/>
       </Unit46>
       <Unit47>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="381"/>
-        <CursorPos X="2" Y="384"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="1550"/>
+        <CursorPos X="29" Y="1554"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit47>
       <Unit48>
         <Filename Value="/usr/share/fpcsrc/rtl/inc/objpash.inc"/>
@@ -449,127 +449,155 @@
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit52>
+      <Unit53>
+        <Filename Value="../../../fbintf/client/3.0/firebird/Firebird.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos Y="21"/>
+        <UsageCount Value="10"/>
+      </Unit53>
+      <Unit54>
+        <Filename Value="../../changelog"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit54>
+      <Unit55>
+        <Filename Value="../../../fbintf/changelog"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="9"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dbconst.pas"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="30"/>
+        <CursorPos X="3" Y="26"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit56>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/memds/memds.pp"/>
-        <Caret Line="1069" Column="3" TopLine="1066"/>
+        <Filename Value="../../runtime/IBXServices.pas"/>
+        <Caret Line="179" Column="25" TopLine="160"/>
       </Position1>
       <Position2>
-        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/memds/memds.pp"/>
-        <Caret Line="132" Column="15" TopLine="121"/>
+        <Filename Value="../../runtime/IBXServices.pas"/>
+        <Caret Line="2098" Column="48" TopLine="2080"/>
       </Position2>
       <Position3>
-        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/memds/memds.pp"/>
-        <Caret Line="392" Column="3" TopLine="389"/>
+        <Filename Value="../../runtime/IBXServices.pas"/>
+        <Caret Line="44" Column="67" TopLine="24"/>
       </Position3>
       <Position4>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="530" Column="32" TopLine="509"/>
+        <Caret Line="45" Column="30" TopLine="29"/>
       </Position4>
       <Position5>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="532" Column="34" TopLine="512"/>
+        <Caret Line="2489" Column="23" TopLine="2488"/>
       </Position5>
       <Position6>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="616" Column="26" TopLine="597"/>
+        <Caret Line="12" Column="21"/>
       </Position6>
       <Position7>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="548" Column="21" TopLine="523"/>
+        <Caret Line="45" Column="67" TopLine="13"/>
       </Position7>
       <Position8>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="598" Column="24" TopLine="593"/>
+        <Caret Line="171" Column="22" TopLine="139"/>
       </Position8>
       <Position9>
-        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/memds/memds.pp"/>
-        <Caret Line="97" Column="15" TopLine="77"/>
+        <Filename Value="../../runtime/IBXServices.pas"/>
+        <Caret Line="173" Column="20" TopLine="141"/>
       </Position9>
       <Position10>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="614" Column="15" TopLine="596"/>
+        <Caret Line="192" Column="56" TopLine="160"/>
       </Position10>
       <Position11>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="549" Column="23" TopLine="528"/>
+        <Caret Line="232" Column="24" TopLine="207"/>
       </Position11>
       <Position12>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="609" Column="12" TopLine="592"/>
+        <Caret Line="1702" Column="3" TopLine="1699"/>
       </Position12>
       <Position13>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="463" Column="18" TopLine="434"/>
+        <Caret Line="230" Column="37" TopLine="206"/>
       </Position13>
       <Position14>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="966" Column="32" TopLine="959"/>
+        <Caret Line="173" Column="2" TopLine="153"/>
       </Position14>
       <Position15>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="672" Column="43" TopLine="633"/>
+        <Caret Line="45" Column="83" TopLine="24"/>
       </Position15>
       <Position16>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="703" Column="25" TopLine="679"/>
+        <Caret Line="2498" Column="28" TopLine="2488"/>
       </Position16>
       <Position17>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="534" Column="20" TopLine="512"/>
+        <Caret Line="19" Column="38"/>
       </Position17>
       <Position18>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="566" Column="7" TopLine="530"/>
+        <Caret Line="566" Column="17" TopLine="531"/>
       </Position18>
       <Position19>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="560" Column="65" TopLine="538"/>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/memds/memds.pp"/>
+        <Caret Line="98" Column="26" TopLine="89"/>
       </Position19>
       <Position20>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="621" Column="22" TopLine="605"/>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/memds/memds.pp"/>
+        <Caret Line="562" Column="3" TopLine="556"/>
       </Position20>
       <Position21>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="564" Column="22" TopLine="544"/>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
+        <Caret Line="201" Column="3" TopLine="188"/>
       </Position21>
       <Position22>
-        <Filename Value="LimboTransactionsUnit.pas"/>
-        <Caret Line="175" Column="34" TopLine="156"/>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
+        <Caret Line="1621" Column="15" TopLine="1602"/>
       </Position22>
       <Position23>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="672" Column="20" TopLine="661"/>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
+        <Caret Line="1472" Column="3" TopLine="1469"/>
       </Position23>
       <Position24>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="567" Column="20" TopLine="539"/>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
+        <Caret Line="1630" Column="15" TopLine="1610"/>
       </Position24>
       <Position25>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="617" TopLine="599"/>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
+        <Caret Line="1553" Column="3" TopLine="1550"/>
       </Position25>
       <Position26>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="515" Column="56" TopLine="502"/>
+        <Caret Line="723" Column="21" TopLine="703"/>
       </Position26>
       <Position27>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="1025" Column="49" TopLine="1019"/>
+        <Caret Line="566" Column="32" TopLine="536"/>
       </Position27>
       <Position28>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="567" Column="82" TopLine="537"/>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
+        <Caret Line="1630" Column="19" TopLine="1610"/>
       </Position28>
       <Position29>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="731" Column="50" TopLine="704"/>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
+        <Caret Line="1554" Column="29" TopLine="1550"/>
       </Position29>
       <Position30>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="653" Column="34" TopLine="634"/>
+        <Caret Line="734" Column="40" TopLine="728"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>

@@ -9,13 +9,14 @@ uses
 
 type
   TIBXCustomService = class;
+  TIBXControlService = class;
   TIBXServicesConnection = class;
 
   IIBXServicesClient = interface
     procedure OnBeforeDisconnect(Sender: TIBXServicesConnection);
   end;
 
-  TSecContextAction = (scRaiseError, scRepeat);
+  TSecContextAction = (scRaiseError, scReconnect);
 
   TIBXServicesLoginEvent = procedure(Service: TIBXServicesConnection; LoginParams: TStrings) of object;
   TIBXServicesSecContextEvent = procedure(Service: TIBXServicesConnection; var action: TSecContextAction) of object;
@@ -34,13 +35,14 @@ type
     FServerName: string;
     FProtocol: TProtocol;
     FServerVersionNo: array [1..4] of integer;
+    FExpectedDB: string;
     procedure CheckActive;
     procedure CheckInactive;
     procedure CheckServerName;
     function GenerateSPB(sl: TStrings): ISPB;
     function GetServerVersionNo(index: integer): integer;
     function GetSPBConstName(action: byte): string;
-    procedure HandleSecContextException(Sender: TIBXCustomService; var action: TSecContextAction);
+    procedure HandleSecContextException(Sender: TIBXControlService; var action: TSecContextAction);
     function Login(var aServerName: string; LoginParams: TStrings): Boolean;
     procedure ParamsChanging(Sender: TObject);
     procedure SetConnectString(AValue: string);
@@ -198,7 +200,7 @@ end;
    function GetNextLine : String;
    function GetNextChunk : String;
    procedure ServiceStart; override;
-   function WriteNextChunk(stream: TStream): integer;
+   function ReceiveNextChunk(stream: TStream): integer;
    function SendNextChunk(stream: TStream; var line: String): integer;
    procedure DoOnGetNextLine(Line: string);
    procedure OnBeforeDisconnect(Sender: TIBXServicesConnection); override;
@@ -208,6 +210,7 @@ end;
  public
    constructor Create(aOwner: TComponent); override;
    destructor Destroy; override;
+   procedure Execute(OutputLog: TStrings);
    property Eof: boolean read FEof;
  published
    property OnGetNextLine: TIBXOnGetNextLine read FOnGetNextLine write FOnGetNextLine;
@@ -218,8 +221,6 @@ end;
  TIBXLogService = class(TIBXControlAndQueryService)
  protected
    procedure SetServiceStartOptions; override;
- public
-   procedure GetServerLog(Lines: TStrings);
  end;
 
  TDBShutdownMode = (Forced, DenyTransaction, DenyAttachment);
@@ -253,8 +254,6 @@ end;
    FOptions: TStatOptions;
  protected
    procedure SetServiceStartOptions; override;
- public
-   procedure GetStatisticsReport(Lines: TStrings);
  published
    property DatabaseName;
    property Options: TStatOptions read FOptions write FOptions;
@@ -310,7 +309,7 @@ end;
  public
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
-   procedure PerformBackup(Lines: TStrings);
+   {Use inherited Execute method to perform backup}
  published
    { a name=value pair of filename and length }
    property BackupFile: TStrings read FBackupFile write SetBackupFile;
@@ -358,7 +357,7 @@ end;
  public
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
-   procedure PerformRestore(Lines: TStrings);
+   {use inherited Execute method to perform restore}
  published
    property BackupFiles: TStrings read FBackupFiles write SetBackupFiles;
  end;
@@ -398,7 +397,7 @@ end;
   protected
     procedure SetServiceStartOptions; override;
   public
-    procedure PerformValidation(Lines: TStrings);
+    {use inherited Execute method to perform validation}
   published
     property DatabaseName;
     property Options: TValidateOptions read FOptions write FOptions;
@@ -562,8 +561,11 @@ end;
     procedure InternalClose; override;
     procedure InternalOpen; override;
     procedure InternalPost; override;
+    property BeforeDelete;
+    property AfterDelete;
   public
     constructor Create(AOwner:TComponent); override;
+    procedure Delete; override;
     procedure FixErrors(GlobalAction: TTransactionGlobalAction; Lines: TStrings);
   end;
 
@@ -725,9 +727,15 @@ const
     end;
   end;
 
+  procedure TIBXServicesLimboTransactionsList.Delete;
+  begin
+    //Do nothing
+  end;
+
   procedure TIBXServicesLimboTransactionsList.FixErrors(
     GlobalAction: TTransactionGlobalAction; Lines: TStrings);
   begin
+    if State = dsEdit then Post;
     (FSource as TIBXLimboTransactionResolutionService).GlobalAction := GlobalAction;
     (FSource as TIBXLimboTransactionResolutionService).FixLimboTransactionErrors(Lines);
   end;
@@ -1357,13 +1365,6 @@ begin
    SRB.Add(isc_spb_options).AsInteger := param;
 end;
 
-procedure TIBXValidationService.PerformValidation(Lines: TStrings);
-begin
-  ServiceStart;
-  while not Eof do
-    Lines.Add(GetNextLine);
-end;
-
 { TIBXOnlineValidationService }
 
 procedure TIBXOnlineValidationService.SetServiceStartOptions;
@@ -1432,14 +1433,6 @@ destructor TIBXServerSideRestoreService.Destroy;
 begin
   if assigned(FBackupFiles) then FBackupFiles.Free;
   inherited Destroy;
-end;
-
-procedure TIBXServerSideRestoreService.PerformRestore(Lines: TStrings);
-begin
-  ServiceStart;
-  while not Eof do
-    Lines.Add(GetNextLine);
-  while IsServiceRunning do; {flush}
 end;
 
 { TIBXRestoreService }
@@ -1593,13 +1586,6 @@ begin
   inherited Destroy;
 end;
 
-procedure TIBXServerSideBackupService.PerformBackup(Lines: TStrings);
-begin
-  ServiceStart;
-  while not Eof do
-    Lines.Add(GetNextLine);
-end;
-
 { TIBXBackupService }
 
 procedure TIBXBackupService.SetServiceStartOptions;
@@ -1652,7 +1638,7 @@ begin
   InitialSize := S.Size;
   ServiceStart;
   while not Eof do
-    WriteNextChunk(S);
+    ReceiveNextChunk(S);
   BytesWritten := S.Size - InitialSize;
 end;
 
@@ -1715,13 +1701,6 @@ begin
   if (SystemRelations in Options) then
     param := param or isc_spb_sts_sys_relations;
   SRB.Add(isc_spb_options).AsInteger := param;
-end;
-
-procedure TIBXStatisticalService.GetStatisticsReport(Lines: TStrings);
-begin
-  ServiceStart;
-  while not Eof do
-    Lines.Add(GetNextLine);
 end;
 
 { TIBXConfigService }
@@ -1857,14 +1836,6 @@ begin
   SRB.Add(isc_action_svc_get_ib_log);
 end;
 
-procedure TIBXLogService.GetServerLog(Lines: TStrings);
-begin
-  Lines.Clear;
-  ServiceStart;
-  while not Eof do
-    Lines.Add(GetNextLine);
-end;
-
 { TIBXControlAndQueryService }
 
 function TIBXControlAndQueryService.GetNextLine: String;
@@ -1937,7 +1908,7 @@ begin
   FServiceStarted := true;
 end;
 
-function TIBXControlAndQueryService.WriteNextChunk(stream: TStream): integer;
+function TIBXControlAndQueryService.ReceiveNextChunk(stream: TStream): integer;
 var
   i: Integer;
   TimeOut: boolean;
@@ -2078,6 +2049,17 @@ destructor TIBXControlAndQueryService.Destroy;
 begin
   if assigned(FDataSets) then FDataSets.Free;
   inherited Destroy;
+end;
+
+procedure TIBXControlAndQueryService.Execute(OutputLog: TStrings);
+begin
+  ServiceStart;
+  while not Eof do
+    if OutputLog <> nil then
+      OutputLog.Add(GetNextLine)
+    else
+      GetNextLine;
+  while IsServiceRunning do; {flush}
 end;
 
 { TIBXControlService }
@@ -2513,29 +2495,34 @@ begin
 end;
 
 procedure TIBXServicesConnection.HandleSecContextException(
-  Sender: TIBXCustomService; var action: TSecContextAction);
+  Sender: TIBXControlService; var action: TSecContextAction);
 var OldServiceIntf: IServiceManager;
 begin
   action := scRaiseError;
   if assigned(FOnSecurityContextException) then
   begin
     OnSecurityContextException(self,action);
-    if action = scRepeat then
+    if action = scReconnect then
     begin
-      OldServiceIntf := FService;
-      Connected := false;
-      while not Connected do
-      begin
-        try
-          Connected := true;
-        except
-         on E:EIBClientError do
-          begin
-            action := scRaiseError;
-            FService := OldServiceIntf;
-            break;
+      FExpectedDB := Sender.DatabaseName;
+      try
+        OldServiceIntf := FService;
+        Connected := false;
+        while not Connected do
+        begin
+          try
+            Connected := true;
+          except
+           on E:EIBClientError do
+            begin
+              action := scRaiseError;
+              FService := OldServiceIntf;
+              break;
+            end;
           end;
         end;
+      finally
+        FExpectedDB := '';
       end;
     end;
   end;
@@ -2660,6 +2647,8 @@ begin
   TempSvcParams := TStringList.Create;
   try
     TempSvcParams.Assign(FParams);
+    if FExpectedDB <> '' then
+      TempSvcParams.Values['expected_db'] := FExpectedDB;
     if LoginPrompt and not Login(aServerName,TempSvcParams) then
       IBError(ibxeOperationCancelled, [nil]);
     SPB := GenerateSPB(TempSvcParams);
