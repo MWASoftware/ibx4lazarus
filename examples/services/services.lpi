@@ -38,7 +38,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="14">
+    <Units Count="13">
       <Unit0>
         <Filename Value="services.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -51,89 +51,82 @@
         <ResourceBaseClass Value="Form"/>
       </Unit1>
       <Unit2>
-        <Filename Value="AltDBSvcLoginDlgUnit.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="AltDBSvcLoginDlg"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit2>
-      <Unit3>
         <Filename Value="BackupDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="BackupDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit3>
-      <Unit4>
+      </Unit2>
+      <Unit3>
         <Filename Value="ChgPasswordDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ChgPasswordDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit4>
-      <Unit5>
+      </Unit3>
+      <Unit4>
         <Filename Value="LimboTransactionsUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="LimboTransactionsForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit5>
-      <Unit6>
+      </Unit4>
+      <Unit5>
         <Filename Value="ListUsersUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ListUsersForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit6>
-      <Unit7>
+      </Unit5>
+      <Unit6>
         <Filename Value="NewUserDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="NewUserDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit7>
-      <Unit8>
+      </Unit6>
+      <Unit7>
         <Filename Value="RestoreDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="RestoreDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit8>
-      <Unit9>
+      </Unit7>
+      <Unit8>
         <Filename Value="ServicesLoginDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="SvcLoginDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit9>
-      <Unit10>
+      </Unit8>
+      <Unit9>
         <Filename Value="SelectValidationDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="SelectValidationDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit10>
-      <Unit11>
+      </Unit9>
+      <Unit10>
         <Filename Value="SelectDBDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="SelectDBDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit11>
-      <Unit12>
+      </Unit10>
+      <Unit11>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ShutdownDatabaseDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit12>
-      <Unit13>
+      </Unit11>
+      <Unit12>
         <Filename Value="ShutdownRegDlgUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ShutdownReqDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit13>
+      </Unit12>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -36,7 +36,7 @@ uses
   Forms, memdslaz, MainFormUnit, ibexpress,
   ServicesLoginDlgUnit, SelectValidationDlgUnit, SelectDBDlgUnit,
   BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit,
-  AltDBSvcLoginDlgUnit,NewUserDlgUnit, ChgPasswordDlgUnit,
+  NewUserDlgUnit, ChgPasswordDlgUnit,
   ShutdownDatabaseDlgUnit, ShutdownRegDlgUnit;
 
 {$R *.res}
@@ -45,7 +45,6 @@ begin
   RequireDerivedFormResource := True;
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
-  Application.CreateForm(TAltDBSvcLoginDlg, AltDBSvcLoginDlg);
   Application.CreateForm(TBackupDlg, BackupDlg);
   Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);
   Application.CreateForm(TLimboTransactionsForm, LimboTransactionsForm);

@@ -9,12 +9,12 @@ object ListUsersForm: TListUsersForm
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.8.3.0'
   object Label1: TLabel
     Left = 8
-    Height = 13
+    Height = 14
     Top = 14
-    Width = 82
+    Width = 100
     Caption = 'Registered Users'
     ParentColor = False
   end
@@ -149,68 +149,9 @@ object ListUsersForm: TListUsersForm
     Anchors = [akLeft, akBottom]
     TabOrder = 4
   end
-  object IBSecurityService1: TIBSecurityService
-    ServerName = 'localhost'
-    Protocol = TCP
-    TraceFlags = []
-    SecurityAction = ActionAddUser
-    UserID = 0
-    GroupID = 0
-    AdminRole = False
-    left = 440
-    top = 256
-  end
   object UserListSource: TDataSource
     DataSet = UserList
     left = 359
-    top = 189
-  end
-  object UserList: TMemDataset
-    FieldDefs = <    
-      item
-        Name = 'UserID'
-        DataType = ftInteger
-      end    
-      item
-        Name = 'GroupID'
-        DataType = ftInteger
-      end    
-      item
-        Name = 'UserName'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'FirstName'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'MiddleName'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'LastName'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'Password'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'Admin'
-        DataType = ftBoolean
-      end>
-    AfterOpen = UserListAfterOpen
-    BeforeClose = UserListBeforeClose
-    AfterInsert = UserListAfterInsert
-    BeforePost = UserListBeforePost
-    AfterPost = UserListAfterPost
-    BeforeDelete = UserListBeforeDelete
-    left = 436
     top = 189
   end
   object ActionList1: TActionList
@@ -257,5 +198,65 @@ object ListUsersForm: TListUsersForm
     object MenuItem6: TMenuItem
       Action = SaveChanges
     end
+  end
+  object IBXSecurityService1: TIBXSecurityService
+    ServicesConnection = MainForm.IBXServicesConnection1
+    TraceFlags = []
+    UserID = 0
+    GroupID = 0
+    AdminRole = False
+    left = 457
+    top = 124
+  end
+  object UserList: TIBXServicesUserList
+    FieldDefs = <    
+      item
+        Name = 'UserID'
+        DataType = ftInteger
+        Precision = -1
+      end    
+      item
+        Name = 'GroupID'
+        DataType = ftInteger
+        Precision = -1
+      end    
+      item
+        Name = 'UserName'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'FirstName'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'MiddleName'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'LastName'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'Password'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'Admin'
+        DataType = ftBoolean
+        Precision = -1
+      end>
+    Source = IBXSecurityService1
+    left = 486
+    top = 210
   end
 end

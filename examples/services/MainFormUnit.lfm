@@ -78,48 +78,36 @@ object MainForm: TMainForm
     OnClick = UsersBtnClick
     TabOrder = 6
   end
-  object IBServerProperties1: TIBServerProperties
-    ServerName = 'Localhost'
-    Protocol = TCP
-    Params.Strings = (
-      'user_name=SYSDBA'
-      'sql_role_name=RDB$ADMIN'
-    )
+  object IBServerProperties1: TIBXServerProperties
+    ServicesConnection = IBXServicesConnection1
     TraceFlags = []
-    OnLogin = IBServerProperties1Login
-    Options = []
     left = 320
     top = 24
   end
-  object IBLogService1: TIBLogService
-    ServerName = 'localhost'
-    Protocol = TCP
+  object IBLogService1: TIBXLogService
+    ServicesConnection = IBXServicesConnection1
     TraceFlags = []
     left = 320
     top = 72
   end
-  object IBStatisticalService1: TIBStatisticalService
-    ServerName = 'localhost'
-    Protocol = TCP
+  object IBStatisticalService1: TIBXStatisticalService
+    ServicesConnection = IBXServicesConnection1
     TraceFlags = []
     DatabaseName = 'employee'
     Options = [DataPages]
     left = 320
     top = 112
   end
-  object IBValidationService1: TIBValidationService
-    ServerName = 'localhost'
-    Protocol = TCP
+  object IBValidationService1: TIBXValidationService
+    ServicesConnection = IBXServicesConnection1
     TraceFlags = []
     DatabaseName = 'employee'
     Options = [ValidateFull]
-    GlobalAction = CommitGlobal
     left = 320
     top = 160
   end
-  object IBOnlineValidationService1: TIBOnlineValidationService
-    ServerName = 'localhost'
-    Protocol = TCP
+  object IBOnlineValidationService1: TIBXOnlineValidationService
+    ServicesConnection = IBXServicesConnection1
     TraceFlags = []
     DatabaseName = 'employee'
     left = 320
@@ -177,9 +165,25 @@ object MainForm: TMainForm
       Action = Shutdown
     end
   end
-  object IBConfigService1: TIBConfigService
+  object IBConfigService1: TIBXConfigService
+    ServicesConnection = IBXServicesConnection1
     TraceFlags = []
     left = 466
     top = 188
+  end
+  object IBXServicesConnection1: TIBXServicesConnection
+    Connected = False
+    OnLogin = IBXServicesConnection1Login
+    ConnectString = 'localhost:service_mgr'
+    Protocol = TCP
+    Params.Strings = (
+      'sql_role_name=RDB$ADMIN'
+      'user_name=SYSDBA'
+    )
+    ServerName = 'localhost'
+    TraceFlags = []
+    OnSecurityContextException = IBXServicesConnection1SecurityContextException
+    left = 128
+    top = 35
   end
 end

@@ -9,7 +9,7 @@ object ShutdownDatabaseDlg: TShutdownDatabaseDlg
   ClientWidth = 338
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object StatusMsg: TLabel
     Left = 24
     Height = 14
@@ -46,10 +46,10 @@ object ShutdownDatabaseDlg: TShutdownDatabaseDlg
     Width = 338
     Align = alClient
   end
-  object IBConfigService: TIBConfigService
-    Protocol = TCP
+  object IBConfigService: TIBXConfigService
+    ServicesConnection = MainForm.IBXServicesConnection1
     TraceFlags = []
-    left = 253
-    top = 64
+    left = 258
+    top = 63
   end
 end

@@ -9,7 +9,7 @@ object LimboTransactionsForm: TLimboTransactionsForm
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Button1: TButton
     Left = 16
     Height = 25
@@ -199,67 +199,10 @@ object LimboTransactionsForm: TLimboTransactionsForm
     ModalResult = 11
     TabOrder = 6
   end
-  object LimboTransactionValidation: TIBValidationService
-    ServerName = 'localhost'
-    Protocol = TCP
-    TraceFlags = []
-    DatabaseName = 'employee'
-    Options = [LimboTransactions]
-    GlobalAction = CommitGlobal
-    left = 726
-    top = 302
-  end
   object LimboListSource: TDataSource
     DataSet = InLimboList
     left = 580
     top = 204
-  end
-  object InLimboList: TMemDataset
-    FieldDefs = <    
-      item
-        Name = 'TransactionID'
-        DataType = ftInteger
-      end    
-      item
-        Name = 'TransactionType'
-        DataType = ftString
-        Size = 16
-      end    
-      item
-        Name = 'HostSite'
-        DataType = ftString
-        Size = 256
-      end    
-      item
-        Name = 'RemoteSite'
-        DataType = ftString
-        Size = 256
-      end    
-      item
-        Name = 'DatabasePath'
-        DataType = ftString
-        Size = 256
-      end    
-      item
-        Name = 'State'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'RecommendedAction'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'RequestedAction'
-        DataType = ftString
-        Size = 32
-      end>
-    AfterOpen = InLimboListAfterOpen
-    BeforeClose = InLimboListBeforeClose
-    BeforePost = InLimboListBeforePost
-    left = 680
-    top = 208
   end
   object ActionList1: TActionList
     left = 576
@@ -284,5 +227,65 @@ object LimboTransactionsForm: TLimboTransactionsForm
       OnExecute = ApplySelectedActionExecute
       OnUpdate = CommitAllUpdate
     end
+  end
+  object IBXLimboTransactionResolutionService1: TIBXLimboTransactionResolutionService
+    ServicesConnection = MainForm.IBXServicesConnection1
+    TraceFlags = []
+    GlobalAction = CommitGlobal
+    left = 656
+    top = 104
+  end
+  object InLimboList: TIBXServicesLimboTransactionsList
+    FieldDefs = <    
+      item
+        Name = 'TransactionID'
+        DataType = ftInteger
+        Precision = -1
+      end    
+      item
+        Name = 'TransactionType'
+        DataType = ftString
+        Precision = -1
+        Size = 16
+      end    
+      item
+        Name = 'HostSite'
+        DataType = ftString
+        Precision = -1
+        Size = 256
+      end    
+      item
+        Name = 'RemoteSite'
+        DataType = ftString
+        Precision = -1
+        Size = 256
+      end    
+      item
+        Name = 'DatabasePath'
+        DataType = ftString
+        Precision = -1
+        Size = 256
+      end    
+      item
+        Name = 'State'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'RecommendedAction'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'RequestedAction'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end>
+    Source = IBXLimboTransactionResolutionService1
+    left = 660
+    top = 163
   end
 end

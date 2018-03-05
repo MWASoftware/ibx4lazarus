@@ -32,8 +32,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  Grids, ActnList, Menus, db, memds, IBServices, IBCustomDataSet, IBDatabase,
-  IBDynamicGrid;
+  Grids, ActnList, Menus, db, IBCustomDataSet, IBDatabase,
+  IBXServices, IBDynamicGrid;
 
 type
 
@@ -41,6 +41,8 @@ type
 
   TListUsersForm = class(TForm)
     Button4: TButton;
+    IBXSecurityService1: TIBXSecurityService;
+    UserList: TIBXServicesUserList;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
@@ -57,9 +59,7 @@ type
     Button2: TButton;
     Button3: TButton;
     IBDynamicGrid1: TIBDynamicGrid;
-    IBSecurityService1: TIBSecurityService;
     Label1: TLabel;
-    UserList: TMemDataset;
     UserListSource: TDataSource;
     procedure AddUserExecute(Sender: TObject);
     procedure ChangePasswordExecute(Sender: TObject);
@@ -69,16 +69,8 @@ type
     procedure FormShow(Sender: TObject);
     procedure SaveChangesExecute(Sender: TObject);
     procedure SaveChangesUpdate(Sender: TObject);
-    procedure UserListAfterInsert(DataSet: TDataSet);
-    procedure UserListAfterOpen(DataSet: TDataSet);
-    procedure UserListAfterPost(DataSet: TDataSet);
-    procedure UserListBeforeClose(DataSet: TDataSet);
-    procedure UserListBeforeDelete(DataSet: TDataSet);
-    procedure UserListBeforePost(DataSet: TDataSet);
   private
     { private declarations }
-    FLoading: boolean;
-    procedure DoRefresh(Data: PtrInt);
   public
     { public declarations }
   end;
@@ -96,7 +88,7 @@ uses NewUserDlgUnit, ChgPasswordDlgUnit;
 
 procedure TListUsersForm.FormShow(Sender: TObject);
 begin
-  Application.QueueAsyncCall(@DoRefresh,0);
+  UserList.Active := true;
 end;
 
 procedure TListUsersForm.SaveChangesExecute(Sender: TObject);
@@ -107,14 +99,6 @@ end;
 procedure TListUsersForm.SaveChangesUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := UserList.State in [dsInsert,dsEdit];
-end;
-
-procedure TListUsersForm.UserListAfterInsert(DataSet: TDataSet);
-begin
-  DataSet.FieldByName('UserID').AsInteger := 0;
-  DataSet.FieldByName('GroupID').AsInteger := 0;
-  DataSet.FieldByName('Admin').AsBoolean := false;
-  DataSet.FieldByName('Password').Clear;
 end;
 
 procedure TListUsersForm.AddUserExecute(Sender: TObject);
@@ -159,103 +143,6 @@ procedure TListUsersForm.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
   UserList.Active := false;
-end;
-
-procedure TListUsersForm.UserListAfterOpen(DataSet: TDataSet);
-var i: integer;
-begin
-  with IBSecurityService1 do
-  begin
-    IBSecurityService1.Active := true;
-    IBDynamicGrid1.Columns[6].ReadOnly := not HasAdminRole;
-    DisplayUsers;
-    FLoading := true;
-    try
-      for i := 0 to UserInfoCount - 1 do
-      with UserInfo[i],UserList do
-      begin
-        Append;
-        FieldByName('UserID').AsInteger := UserID;
-        FieldByName('GroupID').AsInteger := GroupID;
-        FieldByName('UserName').AsString := UserName;
-        FieldByName('FirstName').AsString := FirstName;
-        FieldByName('MiddleName').AsString := MiddleName;
-        FieldByName('LastName').AsString := LastName;
-        FieldByName('Password').Clear;
-        FieldByName('Admin').AsBoolean := AdminRole;
-        Post;
-      end;
-    finally
-      FLoading := false;
-    end;
-  end;
-end;
-
-procedure TListUsersForm.UserListAfterPost(DataSet: TDataSet);
-begin
-  if not FLoading then
-    Application.QueueAsyncCall(@DoRefresh,0);
-end;
-
-procedure TListUsersForm.UserListBeforeClose(DataSet: TDataSet);
-begin
-  with UserList do
-  begin
-    if State in [dsEdit,dsInsert] then Post;
-    Clear(false);
-  end;
-end;
-
-procedure TListUsersForm.UserListBeforeDelete(DataSet: TDataSet);
-begin
-  with IBSecurityService1 do
-  begin
-    Active := true;
-    UserName := UserList.FieldByName('UserName').AsString;
-    DeleteUser;
-    while IsServiceRunning do;
-  end;
-end;
-
-procedure TListUsersForm.UserListBeforePost(DataSet: TDataSet);
-  procedure SetParams;
-  begin
-    with UserList, IBSecurityService1 do
-    begin
-      UserID := FieldByName('UserID').AsInteger;
-      GroupID := FieldByName('GroupID').AsInteger;
-      UserName := FieldByName('UserName').AsString;
-      FirstName := FieldByName('FirstName').AsString;
-      MiddleName := FieldByName('MiddleName').AsString;
-      LastName := FieldByName('LastName').AsString;
-      if not FieldByName('Password').IsNull then
-        Password := FieldByName('Password').AsString;
-      AdminRole := FieldByName('Admin').AsBoolean;
-    end;
-  end;
-
- begin
-    if FLoading then Exit;
-    IBSecurityService1.Active := true;
-    case UserList.State of
-    dsEdit:
-      begin
-        SetParams;
-        IBSecurityService1.ModifyUser;
-      end;
-    dsInsert:
-      begin
-        SetParams;
-        IBSecurityService1.AddUser;
-      end;
-    end;
-    while IBSecurityService1.IsServiceRunning do;
-end;
-
-procedure TListUsersForm.DoRefresh(Data: PtrInt);
-begin
-  UserList.Active := false;
-  UserList.Active := true;
 end;
 
 end.

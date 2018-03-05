@@ -19,7 +19,7 @@ type
   TSecContextAction = (scRaiseError, scReconnect);
 
   TIBXServicesLoginEvent = procedure(Service: TIBXServicesConnection; LoginParams: TStrings) of object;
-  TIBXServicesSecContextEvent = procedure(Service: TIBXServicesConnection; var action: TSecContextAction) of object;
+  TIBXServicesSecContextEvent = procedure(Service: TIBXServicesConnection; var aAction: TSecContextAction) of object;
 
   { TIBXServicesConnection }
 
@@ -173,7 +173,9 @@ end;
  TIBXControlService = class(TIBXCustomService)
  private
    FDatabaseName: string;
+   FAction: TSecContextAction;
    function GetIsServiceRunning: Boolean;
+   procedure CallSecContextException;
  protected
    procedure AddDBNameToSRB;
    procedure CheckServiceNotRunning;
@@ -516,6 +518,7 @@ end;
     property LimboTransactionInfoCount: Integer read GetLimboTransactionInfoCount;
 
   published
+    property DatabaseName;
     property GlobalAction: TTransactionGlobalAction read FGlobalAction
                                          write FGlobalAction;
 
@@ -544,10 +547,12 @@ end;
   private
     FLoading: boolean;
   protected
+    procedure DoBeforePost; override;
+    procedure DoAfterInsert; override;
+    procedure DoAfterPost; override;
+    procedure DoAfterOpen; override;
     procedure InternalClose; override;
     procedure InternalDelete; override;
-    procedure InternalOpen; override;
-    procedure InternalPost; override;
   public
     constructor Create(AOwner:TComponent); override;
   end;
@@ -558,8 +563,8 @@ end;
   private
     FLoading: boolean;
   protected
+    procedure DoAfterOpen; override;
     procedure InternalClose; override;
-    procedure InternalOpen; override;
     procedure InternalPost; override;
     property BeforeDelete;
     property AfterDelete;
@@ -610,57 +615,51 @@ const
 
   { TIBXServicesLimboTransactionsList }
 
-  procedure TIBXServicesLimboTransactionsList.InternalClose;
-  begin
-    Clear(false);
-    inherited InternalClose;
-  end;
+  procedure TIBXServicesLimboTransactionsList.DoAfterOpen;
 
-  procedure TIBXServicesLimboTransactionsList.InternalOpen;
-
-  function TypeToStr(MultiDatabase: boolean): string;
-  begin
-    if MultiDatabase then
-      Result := 'Multi DB'
-    else
-      Result := 'Single DB';
-  end;
-
-  function StateToStr(State: TTransactionState): string;
-  begin
-    case State of
-    LimboState:
-      Result := 'Limbo';
-    CommitState:
-      Result := 'Commit';
-    RollbackState:
-      Result := 'Rollback';
-    else
-      Result := 'Unknown';
+    function TypeToStr(MultiDatabase: boolean): string;
+    begin
+      if MultiDatabase then
+        Result := 'Multi DB'
+      else
+        Result := 'Single DB';
     end;
-  end;
 
-  function AdviseToStr(Advise: TTransactionAdvise): string;
-  begin
-    case Advise of
-    CommitAdvise:
-      Result := 'Commit';
-    RollbackAdvise:
-      Result := 'Rollback';
-    else
-      Result := 'Unknown';
+    function StateToStr(State: TTransactionState): string;
+    begin
+      case State of
+      LimboState:
+        Result := 'Limbo';
+      CommitState:
+        Result := 'Commit';
+      RollbackState:
+        Result := 'Rollback';
+      else
+        Result := 'Unknown';
+      end;
     end;
-  end;
 
-  function ActionToStr(anAction: TTransactionAction): string;
-  begin
-    case anAction of
-    CommitAction:
-      Result := 'Commit';
-    RollbackAction:
-      Result := 'Rollback';
+    function AdviseToStr(Advise: TTransactionAdvise): string;
+    begin
+      case Advise of
+      CommitAdvise:
+        Result := 'Commit';
+      RollbackAdvise:
+        Result := 'Rollback';
+      else
+        Result := 'Unknown';
+      end;
     end;
-  end;
+
+    function ActionToStr(anAction: TTransactionAction): string;
+    begin
+      case anAction of
+      CommitAction:
+        Result := 'Commit';
+      RollbackAction:
+        Result := 'Rollback';
+      end;
+    end;
 
   var i: integer;
   begin
@@ -686,7 +685,13 @@ const
     finally
       FLoading := false;
     end;
-    inherited InternalOpen;
+  inherited DoAfterOpen;
+end;
+
+  procedure TIBXServicesLimboTransactionsList.InternalClose;
+  begin
+    Clear(false);
+    inherited InternalClose;
   end;
 
   procedure TIBXServicesLimboTransactionsList.InternalPost;
@@ -742,26 +747,76 @@ const
 
   { TIBXServicesUserList }
 
-  procedure TIBXServicesUserList.InternalClose;
+  procedure TIBXServicesUserList.DoBeforePost;
+    procedure SetParams;
+    begin
+      with FSource as TIBXSecurityService do
+      begin
+        UserID := FieldByName('UserID').AsInteger;
+        GroupID := FieldByName('GroupID').AsInteger;
+        UserName := FieldByName('UserName').AsString;
+        FirstName := FieldByName('FirstName').AsString;
+        MiddleName := FieldByName('MiddleName').AsString;
+        LastName := FieldByName('LastName').AsString;
+        if not FieldByName('Password').IsNull then
+          Password := FieldByName('Password').AsString;
+        AdminRole := FieldByName('Admin').AsBoolean;
+      end;
+    end;
+
   begin
-    Clear(false);
-    inherited InternalClose;
+    inherited DoBeforePost;
+    if FLoading then Exit;
+    case State of
+    dsEdit:
+      begin
+        SetParams;
+        (FSource as TIBXSecurityService).ModifyUser;
+      end;
+    dsInsert:
+      begin
+        SetParams;
+        (FSource as TIBXSecurityService).AddUser;
+      end;
+    end;
   end;
 
-  procedure TIBXServicesUserList.InternalDelete;
+  procedure TIBXServicesUserList.DoAfterInsert;
   begin
+    FieldByName('UserID').AsInteger := 0;
+    FieldByName('GroupID').AsInteger := 0;
+    FieldByName('Admin').AsBoolean := false;
+    FieldByName('Password').Clear;
+    inherited DoAfterInsert;
+  end;
+
+  procedure TIBXServicesUserList.DoAfterPost;
+  begin
+    inherited DoAfterPost;
+    {Refresh}
+    if not FLoading then
     with FSource as TIBXSecurityService do
     begin
-      UserName := FieldByName('UserName').AsString;
-      DeleteUser;
+      DisplayUser(FieldByName('UserName').AsString);
+      if UserInfoCount > 0 then
+      with UserInfo[0] do
+      begin
+        FieldByName('UserID').AsInteger := UserID;
+        FieldByName('GroupID').AsInteger := GroupID;
+        FieldByName('FirstName').AsString := FirstName;
+        FieldByName('MiddleName').AsString := MiddleName;
+        FieldByName('LastName').AsString := LastName;
+        FieldByName('Password').Clear;
+        FieldByName('Admin').AsBoolean := AdminRole;
+      end;
     end;
-    inherited InternalDelete;
+
   end;
 
-  procedure TIBXServicesUserList.InternalOpen;
+  procedure TIBXServicesUserList.DoAfterOpen;
   var i: integer;
   begin
-    inherited InternalOpen;
+    inherited DoAfterOpen;
     with FSource as TIBXSecurityService do
     begin
       DisplayUsers;
@@ -787,39 +842,20 @@ const
     end;
   end;
 
-  procedure TIBXServicesUserList.InternalPost;
+  procedure TIBXServicesUserList.InternalClose;
+  begin
+    Clear(false);
+    inherited InternalClose;
+  end;
 
-    procedure SetParams;
+  procedure TIBXServicesUserList.InternalDelete;
+  begin
+    with FSource as TIBXSecurityService do
     begin
-      with FSource as TIBXSecurityService do
-      begin
-        UserID := FieldByName('UserID').AsInteger;
-        GroupID := FieldByName('GroupID').AsInteger;
-        UserName := FieldByName('UserName').AsString;
-        FirstName := FieldByName('FirstName').AsString;
-        MiddleName := FieldByName('MiddleName').AsString;
-        LastName := FieldByName('LastName').AsString;
-        if not FieldByName('Password').IsNull then
-          Password := FieldByName('Password').AsString;
-        AdminRole := FieldByName('Admin').AsBoolean;
-      end;
+      UserName := FieldByName('UserName').AsString;
+      DeleteUser;
     end;
-
-   begin
-      if FLoading then Exit;
-      case State of
-      dsEdit:
-        begin
-          SetParams;
-          (FSource as TIBXSecurityService).ModifyUser;
-        end;
-      dsInsert:
-        begin
-          SetParams;
-          (FSource as TIBXSecurityService).AddUser;
-        end;
-      end;
-    inherited InternalPost;
+    inherited InternalDelete;
   end;
 
   constructor TIBXServicesUserList.Create(AOwner: TComponent);
@@ -831,6 +867,7 @@ const
       Add('UserID',ftInteger);
       Add('GroupID',ftInteger);
       Add('UserName',ftString,32);
+      Add('FirstName',ftString,32);
       Add('MiddleName',ftString,32);
       Add('LastName',ftString,32);
       Add('Password',ftString,32);
@@ -843,7 +880,7 @@ const
   procedure TIBXServicesDataSet.SetSource(AValue: TIBXControlAndQueryService);
   begin
    if FSource = AValue then Exit;
-   if not (FSource is FRequiredSource) then
+   if not (AValue is FRequiredSource) then
      IBError(ibxeNotRequiredDataSetSource,[FSource.ClassName]);
    if FSource <> nil then
      FSource.UnRegisterDataSet(self);
@@ -2047,8 +2084,8 @@ end;
 
 destructor TIBXControlAndQueryService.Destroy;
 begin
-  if assigned(FDataSets) then FDataSets.Free;
   inherited Destroy;
+  if assigned(FDataSets) then FDataSets.Free;
 end;
 
 procedure TIBXControlAndQueryService.Execute(OutputLog: TStrings);
@@ -2072,6 +2109,11 @@ begin
   Result := (FServiceQueryResults.Count > 0) and
              (FServiceQueryResults[0].getItemType = isc_info_svc_running) and
               (FServiceQueryResults[0].AsInteger = 1);
+end;
+
+procedure TIBXControlService.CallSecContextException;
+begin
+  ServicesConnection.HandleSecContextException(self,FAction)
 end;
 
 procedure TIBXControlService.AddDBNameToSRB;
@@ -2105,7 +2147,14 @@ begin
         on E: EIBInterBaseError do
           if E.IBErrorCode = isc_sec_context then {Need to change sec. database}
           begin
-            ServicesConnection.HandleSecContextException(self,action);
+            if MainThreadID = TThread.CurrentThread.ThreadID then
+              ServicesConnection.HandleSecContextException(self,action)
+            else
+            begin
+              FAction := action;
+              TThread.Synchronize(TThread.CurrentThread,@CallSecContextException);
+              action := FAction;
+            end;
             if action = scRaiseError then
               raise;
           end
@@ -2295,7 +2344,7 @@ begin
       end;
     end;
   end;
-  Result := VersionInfo;
+  Result := FVersionInfo;
 end;
 
 procedure TIBXServerProperties.OnBeforeDisconnect(Sender: TIBXServicesConnection
@@ -2726,6 +2775,7 @@ begin
   TStringList(FParams).OnChanging := @ParamsChanging;
   FService := nil;
   FProtocol := Local;
+  LoginPrompt := true;
   if (AOwner <> nil) and
      (AOwner is TCustomApplication) and
      TCustomApplication(AOwner).ConsoleApplication then

@@ -401,7 +401,7 @@ implementation
 
 uses IB, IBQuery, IBStoredProc, IBCustomDataSet, FBMessages,
      IBSQL, IBSQLMonitor, IBDatabaseInfo, IBEvents, IBTypes,
-     IBServices, IBDatabaseEdit, IBTransactionEdit,
+     IBServices, IBXServices, IBDatabaseEdit, IBTransactionEdit,
      IBBatchMove, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
@@ -411,9 +411,10 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet, FBMessages,
 
 const
   IBPalette1 = 'Firebird'; {do not localize}
-  IBPalette2 = 'Firebird Admin'; {do not localize}
+  IBPalette2 = 'Firebird Legacy Admin'; {do not localize}
   IBPalette3 = 'Firebird Data Controls';   {do not localize}
-  
+  IBPalette4 = 'Firebird Admin'; {do not localize}
+
  resourcestring
    SInterbaseExpressVersion = 'Firebird Express for Lazarus ' + IBX_VERSION;
    SEditSQL = 'Edit SQL';
@@ -446,12 +447,21 @@ begin
        TIBStoredProc,TIBBatchMove,  TIBTable,TIBExtract, TIBXScript, TIBLocalDBSupport,
        TIBBlockFormatOut,TIBCSVDataOut,TIBInsertStmtsOut]);
   if FirebirdAPI.HasServiceAPI  then
+  begin
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
-      TIBRestoreService, TIBValidationService, TIBOnlineValidationService, TIBStatisticalService,
+      TIBRestoreService, TIBValidationService,
+      TIBOnlineValidationService, TIBStatisticalService,
       TIBLogService, TIBSecurityService, TIBServerProperties]);
-
+    RegisterComponents(IBPalette4, [TIBXServicesConnection, TIBXConfigService,
+      TIBXBackupService, TIBXServerSideBackupService,
+      TIBXRestoreService, TIBXServerSideRestoreService,
+      TIBXValidationService, TIBXOnlineValidationService, TIBXStatisticalService,
+      TIBXLogService, TIBXSecurityService, TIBXServerProperties,
+      TIBXLimboTransactionResolutionService,TIBXServicesUserList, TIBXServicesLimboTransactionsList]);
+  end;
 
   RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView,TDBControlGrid, TIBArrayGrid]);
+
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'DatabaseName', TIBFileNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'StoredProcName', TIBStoredProcNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'PackageName', TIBPackageNameProperty); {do not localize}

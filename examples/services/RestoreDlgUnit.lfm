@@ -9,7 +9,7 @@ object RestoreDlg: TRestoreDlg
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Bevel1: TBevel
     Left = 3
     Height = 222
@@ -24,7 +24,7 @@ object RestoreDlg: TRestoreDlg
     Caption = 'Server'
     ParentColor = False
   end
-  object Edit1: TEdit
+  object ServerName: TEdit
     Left = 12
     Height = 24
     Top = 24
@@ -40,30 +40,30 @@ object RestoreDlg: TRestoreDlg
     Caption = 'Database Name'
     ParentColor = False
   end
-  object Edit2: TEdit
+  object DBName: TEdit
     Left = 12
     Height = 24
     Top = 72
     Width = 296
     TabOrder = 1
   end
-  object RadioButton1: TRadioButton
+  object ServerSideBtn: TRadioButton
     Left = 12
     Height = 22
     Top = 112
     Width = 93
     Caption = 'Server Side'
-    Checked = True
     TabOrder = 2
-    TabStop = True
   end
-  object RadioButton2: TRadioButton
+  object ClientSideBtn: TRadioButton
     Left = 134
     Height = 22
     Top = 112
     Width = 88
     Caption = 'Client Side'
+    Checked = True
     TabOrder = 3
+    TabStop = True
   end
   object Label3: TLabel
     Left = 12
@@ -73,7 +73,7 @@ object RestoreDlg: TRestoreDlg
     Caption = 'Backup File'
     ParentColor = False
   end
-  object Edit3: TEdit
+  object BackupFileName: TEdit
     Left = 12
     Height = 24
     Top = 160
@@ -143,7 +143,7 @@ object RestoreDlg: TRestoreDlg
     ModalResult = 2
     TabOrder = 6
   end
-  object CheckBox1: TCheckBox
+  object ReplaceExisting: TCheckBox
     Left = 12
     Height = 22
     Top = 192
@@ -159,22 +159,15 @@ object RestoreDlg: TRestoreDlg
     left = 312
     top = 104
   end
-  object IBRestoreService1: TIBRestoreService
-    ServerName = 'localhost'
-    Protocol = TCP
-    Params.Strings = (
-      'user_name=SYSDBA'
-    )
+  object IBRestoreService1: TIBXServerSideRestoreService
+    ServicesConnection = MainForm.IBXServicesConnection1
     TraceFlags = []
+    OnGetNextLine = IBRestoreService1GetNextLine
     Verbose = True
     StatisticsRequested = [bsTotalTime]
-    BackupFileLocation = flClientSide
-    DatabaseName.Strings = (
-      '/tmp/mytest.fdb'
-    )
     PageSize = 0
     PageBuffers = 0
-    left = 272
+    left = 216
     top = 16
   end
 end
