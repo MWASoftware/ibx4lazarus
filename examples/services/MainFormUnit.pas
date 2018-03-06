@@ -250,7 +250,7 @@ begin
     Lines := TStringList.Create;
     try
       Execute(Lines);
-      for i := 0 to Lines.Count do
+      for i := 0 to Lines.Count - 1 do
       begin
         line := Lines[i];
          if (Pos('Attributes',Line) <> 0) and ((Pos('database shutdown',Line) <> 0)

@@ -1,7 +1,7 @@
 object BackupDlg: TBackupDlg
-  Left = 809
+  Left = 714
   Height = 242
-  Top = 271
+  Top = 224
   Width = 374
   Caption = 'Backup Database'
   ClientHeight = 242
@@ -150,14 +150,22 @@ object BackupDlg: TBackupDlg
     left = 309
     top = 120
   end
-  object IBBackupService1: TIBXServerSideBackupService
+  object CSBackupService1: TIBXClientSideBackupService
     ServicesConnection = MainForm.IBXServicesConnection1
     TraceFlags = []
-    Verbose = True
-    StatisticsRequested = [bsTotalTime]
     BlockingFactor = 0
     Options = [NoDBTriggers]
-    left = 264
+    left = 133
+    top = 14
+  end
+  object SSBackupService1: TIBXServerSideBackupService
+    ServicesConnection = MainForm.IBXServicesConnection1
+    TraceFlags = []
+    BlockingFactor = 0
+    Options = [NoDBTriggers]
+    StatisticsRequested = [bsTotalTime]
+    Verbose = True
+    left = 272
     top = 16
   end
 end

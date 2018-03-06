@@ -42,11 +42,12 @@ type
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
+    CSRestoreService1: TIBXClientSideRestoreService;
+    SSRestoreService1: TIBXServerSideRestoreService;
     ReplaceExisting: TCheckBox;
     ServerName: TEdit;
     DBName: TEdit;
     BackupFileName: TEdit;
-    IBRestoreService1: TIBXServerSideRestoreService;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
@@ -88,9 +89,9 @@ procedure TRestoreDlg.RunRestore;
 begin
   FOutputLog.Add('Restore Started');
   if ClientSideBtn.Checked then
-    IBRestoreService1.RestoreFromFile(IBRestoreService1.BackupFiles[0],FOutputLog)
+    CSRestoreService1.RestoreFromFile(BackupFilename.Text,FOutputLog)
   else
-    IBRestoreService1.Execute(FOutputLog);
+    SSRestoreService1.Execute(FOutputLog);
 
   FOutputLog.Add('Restore Completed');
   MessageDlg('Restore Completed',mtInformation,[mbOK],0);
@@ -99,21 +100,19 @@ end;
 function TRestoreDlg.ShowModal(var aDBName: string; OutputLog: TStrings
   ): TModalResult;
 begin
-  IBRestoreService1.DatabaseFiles[0] := aDBName;
+  DBName.Text := aDBName;
   FOutputLog := OutputLog;
   Result := inherited ShowModal;
   if Result = mrOK then
   begin
     RunRestore;
-    aDBName := IBRestoreService1.DatabaseFiles[0];
+    aDBName := DBName.Text;
   end;
 end;
 
 procedure TRestoreDlg.FormShow(Sender: TObject);
 begin
-  ServerName.Text := IBRestoreService1.ServicesConnection.ServerName;
-  DBName.Text := IBRestoreService1.DatabaseFiles[0];
-  IBRestoreService1.BackupFiles.Clear;
+  ServerName.Text := CSRestoreService1.ServicesConnection.ServerName;
 end;
 
 procedure TRestoreDlg.IBRestoreService1GetNextLine(Sender: TObject;
@@ -129,13 +128,22 @@ begin
     raise Exception.Create('A Database Name must be given');
   if BackupFileName.Text = '' then
     raise Exception.Create('A Backup File Name must be given');
-  IBRestoreService1.DatabaseFiles.Clear;
-  IBRestoreService1.DatabaseFiles.Add(DBName.Text);
-  IBRestoreService1.BackupFiles.Add(BackupFileName.Text);
+  CSRestoreService1.DatabaseFiles.Clear;
+  CSRestoreService1.DatabaseFiles.Add(DBName.Text);
+  SSRestoreService1.DatabaseFiles.Clear;
+  SSRestoreService1.DatabaseFiles.Add(DBName.Text);
+  SSRestoreService1.BackupFiles.Clear;
+  SSRestoreService1.BackupFiles.Add(BackupFileName.Text);
   if ReplaceExisting.Checked then
-     IBRestoreService1.Options := IBRestoreService1.Options + [Replace] - [CreateNewDB]
+  begin
+     CSRestoreService1.Options := CSRestoreService1.Options + [Replace] - [CreateNewDB];
+     SSRestoreService1.Options := SSRestoreService1.Options + [Replace] - [CreateNewDB];
+  end
   else
-    IBRestoreService1.Options := IBRestoreService1.Options - [Replace] + [CreateNewDB]
+  begin
+    CSRestoreService1.Options := CSRestoreService1.Options - [Replace] + [CreateNewDB];
+    SSRestoreService1.Options := SSRestoreService1.Options - [Replace] + [CreateNewDB];
+  end;
 end;
 
 end.

@@ -448,16 +448,16 @@ begin
        TIBBlockFormatOut,TIBCSVDataOut,TIBInsertStmtsOut]);
   if FirebirdAPI.HasServiceAPI  then
   begin
+    RegisterComponents(IBPalette4, [TIBXServicesConnection, TIBXConfigService,
+      TIBXClientSideBackupService, TIBXServerSideBackupService,
+      TIBXClientSideRestoreService, TIBXServerSideRestoreService,
+      TIBXValidationService, TIBXOnlineValidationService, TIBXStatisticalService,
+      TIBXLogService, TIBXSecurityService, TIBXServerProperties,
+      TIBXLimboTransactionResolutionService,TIBXServicesUserList, TIBXServicesLimboTransactionsList]);
     RegisterComponents(IBPalette2, [TIBConfigService, TIBBackupService,
       TIBRestoreService, TIBValidationService,
       TIBOnlineValidationService, TIBStatisticalService,
       TIBLogService, TIBSecurityService, TIBServerProperties]);
-    RegisterComponents(IBPalette4, [TIBXServicesConnection, TIBXConfigService,
-      TIBXBackupService, TIBXServerSideBackupService,
-      TIBXRestoreService, TIBXServerSideRestoreService,
-      TIBXValidationService, TIBXOnlineValidationService, TIBXStatisticalService,
-      TIBXLogService, TIBXSecurityService, TIBXServerProperties,
-      TIBXLimboTransactionResolutionService,TIBXServicesUserList, TIBXServicesLimboTransactionsList]);
   end;
 
   RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView,TDBControlGrid, TIBArrayGrid]);

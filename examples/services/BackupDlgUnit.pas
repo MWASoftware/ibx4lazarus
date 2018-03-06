@@ -42,10 +42,11 @@ type
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
+    CSBackupService1: TIBXClientSideBackupService;
+    SSBackupService1: TIBXServerSideBackupService;
     ServerName: TEdit;
     DBName: TEdit;
     BackupFilename: TEdit;
-    IBBackupService1: TIBXServerSideBackupService;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
@@ -82,13 +83,13 @@ end;
 
 function TBackupDlg.ShowModal(var aDBName: string; OutputLog: TStrings): TModalResult;
 begin
-  IBBackupService1.DatabaseName := aDBName;
+  DBName.Text := aDBName;
   FOutputLog := OutputLog;
   Result := inherited ShowModal;
   if Result = mrOK then
   begin
     RunBackup;
-    aDBName := IBBackupService1.DatabaseName;
+    aDBName := DBName.Text;
   end;
 end;
 
@@ -98,13 +99,13 @@ begin
   FOutputLog.Add('Starting Backup');
   if ClientSideBtn.Checked then
   begin
-    IBBackupService1.BackupToFile(BackupFilename.Text,BackupCount);
+    CSBackupService1.BackupToFile(BackupFilename.Text,BackupCount);
     FOutputLog.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
     MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
   end
   else
   begin
-    IBBackupService1.Execute(FOutputLog);
+    SSBackupService1.Execute(FOutputLog);
     FOutputLog.Add('Backup Completed');
     MessageDlg('Backup Completed',mtInformation,[mbOK],0);
   end;
@@ -112,9 +113,8 @@ end;
 
 procedure TBackupDlg.FormShow(Sender: TObject);
 begin
-  ServerName.Text := IBBackupService1.ServicesConnection.ServerName;
-  DBName.Text := IBBackupService1.DatabaseName;
-  IBBackupService1.BackupFile.Clear;
+  ServerName.Text := CSBackupService1.ServicesConnection.ServerName;
+  SSBackupService1.BackupFile.Clear;
 end;
 
 procedure TBackupDlg.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -124,9 +124,10 @@ begin
     raise Exception.Create('A Database Name must be given');
   if BackupFilename.Text = '' then
     raise Exception.Create('A Backup File Name must be given');
-  IBBackupService1.DatabaseName := DBName.Text;
+  CSBackupService1.DatabaseName := DBName.Text;
+  SSBackupService1.DatabaseName := DBName.Text;
   if ServerSideBtn.Checked then
-    IBBackupService1.BackupFile.Add(BackupFilename.Text);
+    SSBackupService1.BackupFile.Add(BackupFilename.Text);
 end;
 
 end.

@@ -159,15 +159,24 @@ object RestoreDlg: TRestoreDlg
     left = 312
     top = 104
   end
-  object IBRestoreService1: TIBXServerSideRestoreService
+  object CSRestoreService1: TIBXClientSideRestoreService
     ServicesConnection = MainForm.IBXServicesConnection1
     TraceFlags = []
-    OnGetNextLine = IBRestoreService1GetNextLine
-    Verbose = True
-    StatisticsRequested = [bsTotalTime]
     PageSize = 0
     PageBuffers = 0
-    left = 216
-    top = 16
+    StatisticsRequested = [bsTotalTime]
+    Verbose = True
+    left = 101
+    top = 21
+  end
+  object SSRestoreService1: TIBXServerSideRestoreService
+    ServicesConnection = MainForm.IBXServicesConnection1
+    TraceFlags = []
+    PageSize = 0
+    PageBuffers = 0
+    StatisticsRequested = [bsTotalTime]
+    Verbose = True
+    left = 226
+    top = 19
   end
 end
