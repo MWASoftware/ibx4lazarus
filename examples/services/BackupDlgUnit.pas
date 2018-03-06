@@ -57,6 +57,7 @@ type
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
+    procedure SSBackupService1GetNextLine(Sender: TObject; var Line: string);
   private
     { private declarations }
     FOutputLog: TStrings;
@@ -79,6 +80,12 @@ procedure TBackupDlg.SpeedButton1Click(Sender: TObject);
 begin
   if SaveDialog1.Execute then
     BackupFilename.Text := SaveDialog1.Filename;
+end;
+
+procedure TBackupDlg.SSBackupService1GetNextLine(Sender: TObject;
+  var Line: string);
+begin
+  Application.ProcessMessages;
 end;
 
 function TBackupDlg.ShowModal(var aDBName: string; OutputLog: TStrings): TModalResult;

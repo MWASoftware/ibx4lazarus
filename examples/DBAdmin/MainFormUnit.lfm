@@ -8,7 +8,7 @@ object MainForm: TMainForm
   ClientWidth = 939
   Menu = MainMenu1
   OnShow = FormShow
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object ToolBar1: TToolBar
     Left = 0
     Height = 26
@@ -64,12 +64,12 @@ object MainForm: TMainForm
     Height = 548
     Top = 26
     Width = 939
-    ActivePage = Properties
+    ActivePage = UserManagerTab
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 6
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
@@ -1689,7 +1689,7 @@ object MainForm: TMainForm
               Title.Alignment = taCenter
               Title.Caption = 'User Name'
               Width = 120
-              FieldName = 'USERNAME'
+              FieldName = 'SEC$USER_NAME'
               AutoSizeColumn = False
               InitialSortColumn = False
               DBLookupProperties.ItemHeight = 0
@@ -3180,7 +3180,6 @@ object MainForm: TMainForm
     end
   end
   object LimboListSource: TDataSource
-    DataSet = DatabaseData.InLimboList
     left = 552
     top = 176
   end

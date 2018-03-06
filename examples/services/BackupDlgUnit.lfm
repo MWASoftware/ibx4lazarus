@@ -161,6 +161,7 @@ object BackupDlg: TBackupDlg
   object SSBackupService1: TIBXServerSideBackupService
     ServicesConnection = MainForm.IBXServicesConnection1
     TraceFlags = []
+    OnGetNextLine = SSBackupService1GetNextLine
     BlockingFactor = 0
     Options = [NoDBTriggers]
     StatisticsRequested = [bsTotalTime]

@@ -23,8 +23,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, db, memds, IBDatabase, IBSQL, IBQuery,
-  IBCustomDataSet, IBUpdate, IBDatabaseInfo, IBServices, IB, Dialogs, Controls,
-  Forms;
+  IBCustomDataSet, IBUpdate, IBDatabaseInfo, IBServices, IBXServices, IB,
+  Dialogs, Controls, Forms;
 
 type
 
@@ -74,30 +74,35 @@ type
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
     Attachments: TIBQuery;
-    IBOnlineValidationService1: TIBOnlineValidationService;
     DBTables: TIBQuery;
     AuthMappings: TIBQuery;
     AccessRights: TIBQuery;
+    IBConfigService1: TIBXConfigService;
+    IBServerProperties1: TIBXServerProperties;
+    IBLogService1: TIBXLogService;
+    IBSecurityService1: TIBXSecurityService;
+    IBOnlineValidationService1: TIBXOnlineValidationService;
+
+      IBLimboTrans: TIBXLimboTransactionResolutionService;
+    IBXServicesConnection1: TIBXServicesConnection;
+    IBStatisticalService1: TIBXStatisticalService;
+    IBValidationService1: TIBXValidationService;
+    InLimboList: TIBXServicesLimboTransactionsList;
+    LegacyUserList: TIBXServicesUserList;
     SubjectAccessRights: TIBQuery;
-    IBSecurityService1: TIBSecurityService;
     AttUpdate: TIBUpdate;
     AdminUserQuery: TIBSQL;
     DBTablesUpdate: TIBUpdate;
-    IBValidationService1: TIBValidationService;
-    InLimboList: TMemDataset;
-    LegacyUserList: TMemDataset;
     UserListGROUPID: TLongintField;
+    UserListSECPASSWORD: TIBStringField;
+    UserListSECUSER_NAME: TIBStringField;
     UserListSource: TDataSource;
     DBCharSet: TIBQuery;
     DBSecFiles: TIBQuery;
     ExecDDL: TIBSQL;
-    IBConfigService1: TIBConfigService;
     IBDatabase1: TIBDatabase;
     IBDatabaseInfo: TIBDatabaseInfo;
     AttmtQuery: TIBQuery;
-    IBLogService1: TIBLogService;
-    IBServerProperties1: TIBServerProperties;
-    IBStatisticalService1: TIBStatisticalService;
     RoleNameList: TIBQuery;
     TableNameLookup: TIBQuery;
     TagsUpdate: TIBUpdate;
@@ -124,8 +129,6 @@ type
     UserListSECMIDDLE_NAME: TIBStringField;
     UserListSECPLUGIN: TIBStringField;
     UserListUSERID: TLongintField;
-    UserListUSERNAME: TIBStringField;
-    UserListUSERPASSWORD: TIBStringField;
     UserTags: TIBQuery;
     procedure AccessRightsCalcFields(DataSet: TDataSet);
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
@@ -145,13 +148,12 @@ type
       Params: ISQLParams);
     procedure DBTablesUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
       Params: ISQLParams);
-    procedure InLimboListAfterOpen(DataSet: TDataSet);
-    procedure InLimboListBeforeClose(DataSet: TDataSet);
-    procedure InLimboListBeforePost(DataSet: TDataSet);
+    procedure IBValidationService1GetNextLine(Sender: TObject; var Line: string
+      );
+    procedure IBXServicesConnection1Login(Service: TIBXServicesConnection;
+      LoginParams: TStrings);
     procedure LegacyUserListAfterOpen(DataSet: TDataSet);
     procedure LegacyUserListBeforeClose(DataSet: TDataSet);
-    procedure LegacyUserListBeforeDelete(DataSet: TDataSet);
-    procedure LegacyUserListBeforePost(DataSet: TDataSet);
     procedure ShadowFilesCalcFields(DataSet: TDataSet);
     procedure SubjectAccessRightsBeforeOpen(DataSet: TDataSet);
     procedure TagsUpdateApplyUpdates(Sender: TObject; UpdateKind: TUpdateKind;
@@ -164,7 +166,6 @@ type
       Params: ISQLParams);
     procedure UserListAfterInsert(DataSet: TDataSet);
     procedure UserListAfterOpen(DataSet: TDataSet);
-    procedure UserListAfterPost(DataSet: TDataSet);
     procedure UserListAfterScroll(DataSet: TDataSet);
     procedure UserListBeforeClose(DataSet: TDataSet);
     procedure UserTagsAfterInsert(DataSet: TDataSet);
@@ -177,15 +178,12 @@ type
     FDBUserName: string;
     FDBPassword: string;
     FLocalConnect: boolean;
-    FUsersLoading: boolean;
-    FLoadingLimboTr: boolean;
     FSubjectAccessRightsID: string;
     {Parsed results of connectstring;}
     FServerName: string;
     FPortNo: string;
     FProtocol: TProtocolAll;
     FDatabasePathName: string;
-    procedure ActivateService(aService: TIBCustomService);
     function GetAuthMethod: string;
     function GetAutoAdmin: boolean;
     function GetDatabaseName: string;
@@ -295,13 +293,13 @@ procedure TDatabaseData.UpdateUserRolesApplyUpdates(Sender: TObject;
 
   procedure Grant(Params: ISQLParams);
   begin
-    ExecDDL.SQL.Text := 'Grant ' + trim(Params.ByName('RDB$ROLE_NAME').AsString) + ' to ' + Params.ByName('USERNAME').AsString;
+    ExecDDL.SQL.Text := 'Grant ' + trim(Params.ByName('RDB$ROLE_NAME').AsString) + ' to ' + Params.ByName('SEC$USER_NAME').AsString;
     ExecDDL.ExecQuery;
   end;
 
   procedure Revoke(Params: ISQLParams);
   begin
-    ExecDDL.SQL.Text := 'Revoke ' + trim(Params.ByName('RDB$ROLE_NAME').AsString) + ' from ' + Params.ByName('USERNAME').AsString;
+    ExecDDL.SQL.Text := 'Revoke ' + trim(Params.ByName('RDB$ROLE_NAME').AsString) + ' from ' + Params.ByName('SEC$USER_NAME').AsString;
     ExecDDL.ExecQuery;
   end;
 
@@ -318,11 +316,13 @@ end;
 procedure TDatabaseData.UpdateUsersApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 
+var UserName: string;
+
   function FormatStmtOptions: string;
   var Param: ISQLParam;
   begin
-    Result := Trim(Params.ByName('UserName').AsString);
-    Param := Params.ByName('USERPASSWORD');
+    Result := UserName;
+    Param := Params.ByName('SEC$PASSWORD');
     if (Param <> nil) and not Param.IsNull  then
       Result += ' PASSWORD ''' + SQLSafeString(Param.AsString) + '''';
     Param := Params.ByName('SEC$FIRST_NAME');
@@ -351,10 +351,10 @@ procedure TDatabaseData.UpdateUsersApplyUpdates(Sender: TObject;
   var Param: ISQLParam;
   begin
     Result := '';
-    Param := Params.ByName('USERPASSWORD');
+    Param := Params.ByName('SEC$PASSWORD');
     if (UpdateKind = ukModify) and not Param.IsNull then
     begin
-      Result := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) +
+      Result := 'ALTER USER ' + UserName) +
           ' PASSWORD ''' + SQLSafeString(Param.AsString) + '''';
       Param := Params.ByName('SEC$PLUGIN');
      if Param <> nil then
@@ -363,31 +363,32 @@ procedure TDatabaseData.UpdateUsersApplyUpdates(Sender: TObject;
   end;
 
 begin
-    {non SYSDBA user not an RDB$ADMIN can only change their password}
-    if (DBUserName <> 'SYSDBA') and (RoleName <> 'RDB$ADMIN') then
-    begin
-     ExecDDL.SQL.Text := GetAlterPasswordStmt;
-     if ExecDDL.SQL.Text <> '' then
-       ExecDDL.ExecQuery;
-     Exit;
-    end;
+  UserName := Trim(Params.ByName('SEC$USER_NAME').AsString);
+  {non SYSDBA user not an RDB$ADMIN can only change their password}
+  if (DBUserName <> 'SYSDBA') and (RoleName <> 'RDB$ADMIN') then
+  begin
+   ExecDDL.SQL.Text := GetAlterPasswordStmt;
+   if ExecDDL.SQL.Text <> '' then
+     ExecDDL.ExecQuery;
+   Exit;
+  end;
 
-    case UpdateKind of
-    ukInsert:
-        ExecDDL.SQL.Text := 'CREATE USER ' + FormatStmtOptions;
-    ukModify:
-        ExecDDL.SQL.Text := 'ALTER USER ' + FormatStmtOptions;
-    ukDelete:
-      ExecDDL.SQL.Text := 'DROP USER ' + Trim(Params.ByName('UserName').AsString);
-    end;
-    ExecDDL.ExecQuery;
+  case UpdateKind of
+  ukInsert:
+      ExecDDL.SQL.Text := 'CREATE USER ' + FormatStmtOptions;
+  ukModify:
+      ExecDDL.SQL.Text := 'ALTER USER ' + FormatStmtOptions;
+  ukDelete:
+    ExecDDL.SQL.Text := 'DROP USER ' + UserName;
+  end;
+  ExecDDL.ExecQuery;
 
   if UpdateKind = ukInsert then
   begin
     {if new user is also given the admin role then we need to add this}
     if Params.ByName('SEC$ADMIN').AsBoolean then
     begin
-      ExecDDL.SQL.Text := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) + ' GRANT ADMIN ROLE';
+      ExecDDL.SQL.Text := 'ALTER USER ' + UserName + ' GRANT ADMIN ROLE';
       ExecDDL.ExecQuery;
     end;
   end
@@ -397,13 +398,13 @@ begin
   begin
     if Params.ByName('SEC$ADMIN').AsBoolean and not Params.ByName('OLD_SEC$ADMIN').AsBoolean then
     begin
-      ExecDDL.SQL.Text := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) + ' GRANT ADMIN ROLE';
+      ExecDDL.SQL.Text := 'ALTER USER ' + v + ' GRANT ADMIN ROLE';
       ExecDDL.ExecQuery;
     end
     else
     if not Params.ByName('SEC$ADMIN').AsBoolean and Params.ByName('OLD_SEC$ADMIN').AsBoolean then
     begin
-      ExecDDL.SQL.Text := 'ALTER USER ' + Trim(Params.ByName('UserName').AsString) + ' REVOKE ADMIN ROLE';
+      ExecDDL.SQL.Text := 'ALTER USER ' + UserName + ' REVOKE ADMIN ROLE';
       ExecDDL.ExecQuery;
     end
   end;
@@ -411,26 +412,19 @@ begin
   {Update DB Creator Role}
   if Params.ByName('DBCreator').AsBoolean and not Params.ByName('OLD_DBCreator').AsBoolean then
   begin
-    ExecDDL.SQL.Text := 'GRANT CREATE DATABASE TO USER ' + Trim(Params.ByName('UserName').AsString);
+    ExecDDL.SQL.Text := 'GRANT CREATE DATABASE TO USER ' + UserName;
     ExecDDL.ExecQuery;
   end
   else
   if not Params.ByName('DBCreator').AsBoolean and Params.ByName('OLD_DBCreator').AsBoolean then
   begin
-    ExecDDL.SQL.Text := 'REVOKE CREATE DATABASE FROM USER ' + Trim(Params.ByName('UserName').AsString);
+    ExecDDL.SQL.Text := 'REVOKE CREATE DATABASE FROM USER ' + UserName;
     ExecDDL.ExecQuery;
   end
 end;
 
 procedure TDatabaseData.UserListAfterInsert(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('SEC$ADMIN').AsBoolean := false;
-  DataSet.FieldByName('SEC$ACTIVE').AsBoolean := false;
-  DataSet.FieldByName('DBCreator').AsBoolean := false;
-  DataSet.FieldByName('SEC$PLUGIN').AsString := 'Srp';
-  DataSet.FieldByName('UserID').AsInteger := 0;
-  DataSet.FieldByName('GroupID').AsInteger := 0;
-  DataSet.FieldByName('UserPassword').Clear;
   RoleNameList.Active := false; {Prevent role assignments until saved}
   UserTags.Active := false; {ditto}
 end;
@@ -440,11 +434,6 @@ begin
   UserListSource.DataSet := UserList;
   RoleNameList.Active := true;
   UserTags.Active := true;
-end;
-
-procedure TDatabaseData.UserListAfterPost(DataSet: TDataSet);
-begin
-  CurrentTransaction.Commit;
 end;
 
 procedure TDatabaseData.UserListAfterScroll(DataSet: TDataSet);
@@ -460,33 +449,37 @@ end;
 
 procedure TDatabaseData.UserTagsAfterInsert(DataSet: TDataSet);
 begin
-  DataSet.FieldByName('SEC$USER_NAME').AsString := DataSet.DataSource.DataSet.FieldByName('UserName').AsString;
+  DataSet.FieldByName('SEC$USER_NAME').AsString := DataSet.DataSource.DataSet.FieldByName('SEC$USER_NAME').AsString;
 end;
 
 procedure TDatabaseData.GetDBFlags;
-var Line: string;
+var Lines: TStringList;
+    i: integer;
+    line: string;
 begin
   if FDBHeaderScanned or not DatabaseQuery.Active or not AttmtQuery.Active then Exit;
   FIsShadowDatabase := false;
 
   try
-    ActivateService(IBStatisticalService1);
-
     with IBStatisticalService1 do
     begin
-      try
         Options := [HeaderPages];
-        ServiceStart;
-        while not Eof do
-        begin
-           Line := GetNextLine;
-           if (Pos('Attributes',Line) <> 0) and (Pos('shadow',Line) <> 0) then
-             FIsShadowDatabase := true;
-
-        end
-      finally
-        Active := False;
-      end
+        Lines := TStringList.Create;
+        try
+          Execute(Lines);
+          for i := 0 to Lines.Count - 1 do
+          begin
+            line := Lines[i];
+             if (Pos('Attributes',Line) <> 0) and (Pos('shadow',Line) <> 0) then
+             begin
+               FIsShadowDatabase := true;
+               break;
+             end;
+          end;
+        finally
+          Lines.Free;
+        end;
+        FDBHeaderScanned := true;
     end;
   except on E: Exception do
     MessageDlg('Error getting DB Header Page: ' + E.Message,mtError,[mbOK],0);
@@ -556,7 +549,6 @@ begin
   begin
     if MessageDlg('Turn off Linger Permanently?',mtConfirmation,[mbYes,mbNo],0) = mrNo then
     begin
-      ActivateService(IBConfigService1);
       IBConfigService1.SetNoLinger;
       CurrentTransaction.Commit; {Refresh}
       Exit;
@@ -573,120 +565,6 @@ begin
   end;
 end;
 
-procedure TDatabaseData.ActivateService(aService: TIBCustomService);
-
-  procedure AssignDatabase(IBService: TIBCustomService; DBName: string);
-  begin
-    if IBService is TIBValidationService then
-      TIBValidationService(IBService).DatabaseName := DBName
-    else
-    if IBService is TIBOnlineValidationService then
-        TIBOnlineValidationService(IBService).DatabaseName := DBName
-    else
-    if IBService is TIBStatisticalService then
-      TIBStatisticalService(IBService).DatabaseName := DBName
-    else
-    if IBService is TIBConfigService then
-      TIBConfigService(IBService).DatabaseName := DBName
-    else
-    if IBService is TIBBackupService then
-      TIBBackupService(IBService).DatabaseName := DBName
-    else
-    if IBService is TIBRestoreService then
-    begin
-      TIBRestoreService(IBService).DatabaseName.Clear;
-      TIBRestoreService(IBService).DatabaseName.Add(DBName);
-    end;
-  end;
-
-  procedure SetupParams(IBService: TIBCustomService; UseDefaultSecDatabase: boolean; DBName: string);
-  var index: integer;
-  begin
-    with IBService do
-    begin
-      Active := false;
-      {Use database login user name and password}
-      Params.Values['user_name'] := FDBUserName;
-      Params.Values['password'] := FDBPassword;
-      Params.Values['sql_role_name'] := 'RDB$ADMIN';
-
-      if FProtocol <> unknownProtocol then
-        Protocol := FProtocol
-      else
-        Protocol := Local;
-      PortNo := FPortNo;
-      if Protocol = Local then
-      begin
-        {If Local we must specify the server as the Localhost}
-        ServerName := 'Localhost';
-        if AttmtQuery.Active then
-        begin
-          if not AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull then
-            Protocol := TCP; {Use loopback if database does not use embedded server}
-        end
-        else {Special case - database not open}
-        if not FileExists(DBName) or FileIsReadOnly(DBName) then
-          Protocol := TCP; {Use loopback if database does not use embedded server}
-      end
-      else
-        ServerName := FServername;
-    end;
-    AssignDatabase(IBService,DBName);
-
-    {Are we using a different security database?}
-
-    if not UseDefaultSecDatabase then
-      IBService.Params.Values['expected_db'] := DBName
-    else
-    begin
-      index := IBService.Params.IndexOfName('expected_db');
-      if index <> -1 then IBService.Params.Delete(index);
-    end;
-  end;
-
-var SecPlugin: TField;
-    UsingDefaultSecDatabase: boolean;
-begin
-  {Are we using a different security database?}
-
-  SecPlugin := DatabaseQuery.FindField('MON$SEC_DATABASE');
-  UsingDefaultSecDatabase := (SecPlugin = nil) or (Trim(SecPlugin.AsString) = 'Default');
-
-  {The server properties service is the base service holding the service interface}
-  if not IBServerProperties1.Active then
-  begin
-    SetupParams(IBServerProperties1,UsingDefaultSecDatabase,
-                   {note that on a local server, the following always gives us the actual path}
-                   GetDatabaseName);
-    with IBServerProperties1 do
-    begin
-      LoginPrompt := (Protocol <> Local) and (FDBPassword = '');  {Does this ever occur?}
-      repeat
-        try
-          Active := true;
-          LoginPrompt := false;
-        except
-          on E:EIBClientError do {Typically Login cancelled}
-            begin
-              MessageDlg(E.Message,mtError,[mbOK],0);
-              Exit;
-            end;
-          on E:Exception do
-            begin
-              MessageDlg(E.Message,mtError,[mbOK],0);
-              LoginPrompt := true;
-            end;
-          end;
-      until Active;
-    end;
-  end;
-
-  if aService = IBServerProperties1 then
-    Exit;
-
-  aService.Assign(IBServerProperties1);
-  AssignDatabase(aService,FDatabasePathName);
-end;
 
 function TDatabaseData.GetAuthMethod: string;
 var AuthMeth: TField;
@@ -700,18 +578,14 @@ end;
 
 procedure TDatabaseData.SetNoReserve(AValue: boolean);
 begin
-  ActivateService(IBConfigService1);
   IBConfigService1.SetReserveSpace(AValue);
-  while IBConfigService1.IsServiceRunning do;
 end;
 
 procedure TDatabaseData.SetPageBuffers(AValue: integer);
 begin
-  ActivateService(IBConfigService1);
   IBDatabase1.Connected := false;
   try
     IBConfigService1.SetPageBuffers(AValue);
-   while IBConfigService1.IsServiceRunning do;
   finally
     IBDatabase1.Connected := true;
   end;
@@ -719,11 +593,9 @@ end;
 
 procedure TDatabaseData.SetSweepInterval(AValue: integer);
 begin
-  ActivateService(IBConfigService1);
   IBDatabase1.Connected := false;
   try
     IBConfigService1.SetSweepInterval(AValue);
-    while IBConfigService1.IsServiceRunning do;
   finally
     IBDatabase1.Connected := true;
   end;
@@ -804,6 +676,13 @@ begin
     end;
   until IBDatabase1.Connected;
 
+  IBXServicesConnection1.Connected := true;
+  IBStatisticalService1.DatabaseName := DatabaseName;
+  IBConfigService1.DatabaseName := DatabaseName;
+  IBValidationService1.DatabaseName := DatabaseName;
+  IBOnlineValidationService1.DatabaseName := DatabaseName;
+  IBLimboTrans.DatabaseName := DatabaseName;
+
   if assigned(FAfterDBConnect) then
     AfterDBConnect(self);
 end;
@@ -814,12 +693,8 @@ begin
   FDBPassword := '';
   FLocalConnect := false;
   IBDatabase1.Connected := false;
-  IBConfigService1.Active := false;
-  IBStatisticalService1.Active := false;
-  IBServerProperties1.Active := false;
-  IBValidationService1.Active := false;
-  IBLogService1.Active := false;
-  IBSecurityService1.Active := false;
+  IBXServicesConnection1.Connected := false;
+  FDBHeaderScanned := false;
 end;
 
 procedure TDatabaseData.DropDatabase;
@@ -830,11 +705,7 @@ end;
 
 procedure TDatabaseData.BackupDatabase;
 begin
-  with BackupDlg do
-  begin
-    ActivateService(IBBackupService1);
-    ShowModal;
-  end;
+  BackupDlg.ShowModal;
 end;
 
 procedure TDatabaseData.RestoreDatabase;
@@ -843,7 +714,6 @@ var DefaultPageSize: integer;
 begin
   DefaultPageSize := DatabaseQuery.FieldByName('MON$PAGE_SIZE').AsInteger;
   DefaultNumBuffers := DatabaseQuery.FieldByName('MON$PAGE_BUFFERS').AsInteger;
-  ActivateService(RestoreDlg.IBRestoreService1);
   IBDatabase1.Connected := false;
   try
     RestoreDlg.ShowModal(DefaultPageSize,DefaultNumBuffers);
@@ -858,11 +728,9 @@ begin
     MessageDlg('Database is already online!',mtInformation,[mbOK],0)
   else
   begin
-    ActivateService(IBConfigService1);
     IBDatabase1.Connected := false;
     try
       IBConfigService1.BringDatabaseOnline;
-      while IBConfigService1.IsServiceRunning do;
     finally
       IBDatabase1.Connected := true;
     end;
@@ -875,7 +743,6 @@ end;
 
 procedure TDatabaseData.ShutDown(aShutDownmode: TShutdownMode; aDelay: integer);
 begin
-  ActivateService(IBConfigService1);
   IBDatabase1.Connected := false;
   try
     ShutdownDatabaseDlg.Shutdown(IBConfigService1, aShutDownmode, aDelay);
@@ -902,22 +769,12 @@ procedure TDatabaseData.DatabaseRepair(Options: TValidateOptions; ReportLines: T
   end;
 
 begin
-  ActivateService(IBValidationService1);
   ReportLines.Add(Format('Validation of %s started',[IBValidationService1.DatabaseName]));
   ReportOptions;
   IBDatabase1.Connected := false;
   with IBValidationService1 do
   try
-    try
-      ServiceStart;
-      while not Eof do
-      begin
-        Application.ProcessMessages;
-        ReportLines.Add(GetNextLine);
-      end;
-    finally
-      while IsServiceRunning do;
-    end;
+    Execute(ReportLines);
     ReportLines.Add('Operation Completed');
     MessageDlg('Operation Completed',mtInformation,[mbOK],0);
   finally
@@ -932,7 +789,6 @@ var TableNames: string;
 begin
   if IBDatabaseInfo.ODSMajorVersion < 12 then
     raise Exception.Create('Online Validation is not supported');
-  ActivateService(IBOnlineValidationService1);
   with IBOnlineValidationService1 do
   begin
     if SelectedTablesOnly then
@@ -963,16 +819,7 @@ begin
     else
       IncludeTables := '';
     ReportLines.Add(Format('Online Validation of %s started',[IBOnlineValidationService1.DatabaseName]));
-    try
-      ServiceStart;
-      while not Eof do
-      begin
-        Application.ProcessMessages;
-        ReportLines.Add(GetNextLine);
-      end;
-    finally
-      while IsServiceRunning do;
-    end;
+    Execute(ReportLines);
     ReportLines.Add('Online Validation Completed');
     MessageDlg('Online Validation Completed',mtInformation,[mbOK],0);
   end;
@@ -987,22 +834,10 @@ begin
   with InLimboList do
     if State = dsEdit then Post;
   Report.Clear;
-  ActivateService(IBValidationService1);
-  with IBValidationService1 do
-  begin
-    GlobalAction := ActionID;
-    Report.Add('Starting Limbo transaction resolution');
-    FixLimboTransactionErrors;
-    while not Eof do
-    begin
-      Application.ProcessMessages;
-      Report.Add(GetNextLine);
-    end;
-    Report.Add('Limbo Transaction resolution complete');
-    CurrentTransaction.Commit;
-    InLimboList.Active := false;
-    InLimboList.Active := true;
-  end;
+  Report.Add('Starting Limbo transaction resolution');
+  InLimboList.FixErrors(ActionID,Report);
+  Report.Add('Limbo Transaction resolution complete');
+  CurrentTransaction.Commit;
 end;
 
 function TDatabaseData.GetLingerDelay: string;
@@ -1070,7 +905,6 @@ begin
   {if need to know for ODS 11.2 then will have to use Service API}
   else
   begin
-    ActivateService(IBSecurityService1);
     with IBSecurityService1 do
     begin
       DisplayUser(DBUserName);
@@ -1081,19 +915,15 @@ end;
 
 procedure TDatabaseData.SetAutoAdmin(AValue: boolean);
 begin
-  ActivateService(IBConfigService1);
   IBConfigService1.SetAutoAdmin(AValue);
-  while IBConfigService1.IsServiceRunning do;
   CurrentTransaction.Commit;
 end;
 
 procedure TDatabaseData.SetDBReadOnly(AValue: boolean);
 begin
-  ActivateService(IBConfigService1);
   IBDatabase1.Connected := false;
   try
     IBConfigService1.SetReadOnly(AValue);
-    while IBConfigService1.IsServiceRunning do;
   finally
     IBDatabase1.Connected := true;
   end;
@@ -1101,11 +931,9 @@ end;
 
 procedure TDatabaseData.SetDBSQLDialect(AValue: integer);
 begin
-  ActivateService(IBConfigService1);
   IBDatabase1.Connected := false;
   try
     IBConfigService1.SetDBSqlDialect(AValue);
-    while IBConfigService1.IsServiceRunning do;
   finally
     IBDatabase1.Connected := true;
   end;
@@ -1113,9 +941,7 @@ end;
 
 procedure TDatabaseData.SetForcedWrites(AValue: boolean);
 begin
-  ActivateService(IBConfigService1);
   IBConfigService1.SetAsyncMode(not AValue);
-  while IBConfigService1.IsServiceRunning do;
 end;
 
 function TDatabaseData.IsDatabaseOnline: boolean;
@@ -1131,9 +957,7 @@ end;
 
 procedure TDatabaseData.ActivateShadow;
 begin
-  ActivateService(IBConfigService1);
   IBConfigService1.ActivateShadow;
-  while IBConfigService1.IsServiceRunning do;
   MessageDlg('Shadow Database activated. You should now rename the file or change the database alias name to point to the shadow',
     mtInformation,[mbOK],0);
 end;
@@ -1235,7 +1059,6 @@ end;
 
 procedure TDatabaseData.LoadDatabaseStatistics(OptionID: integer; Lines: TStrings);
 begin
-  ActivateService(IBStatisticalService1);
   if OptionID = 1 then
     LoadPerformanceStatistics(Lines)
   else
@@ -1247,10 +1070,7 @@ begin
     3: Options := [IndexPages];
     4: Options := [SystemRelations]
     end;
-    Active := true;
-    ServiceStart;
-    while not Eof do
-      Lines.Add(GetNextLine);
+    Execute(Lines);
   end;
 end;
 
@@ -1258,10 +1078,8 @@ procedure TDatabaseData.LoadServerProperties(Lines: TStrings);
 var i: integer;
 begin
   Lines.Clear;
-  ActivateService(IBServerProperties1);
   with IBServerProperties1 do
   begin
-    FetchVersionInfo;
     Lines.Add('Server Version = ' + VersionInfo.ServerVersion);
     Lines.Add('Server Implementation = ' + VersionInfo.ServerImplementation);
     Lines.Add('Service Version = ' + IntToStr(VersionInfo.ServiceVersion));
@@ -1269,12 +1087,10 @@ begin
                                                              ServerVersionNo[2],
                                                              ServerVersionNo[3],
                                                              ServerVersionNo[4]]));
-    FetchDatabaseInfo;
     Lines.Add('No. of attachments = ' + IntToStr(DatabaseInfo.NoOfAttachments));
     Lines.Add('No. of databases = ' + IntToStr(DatabaseInfo.NoOfDatabases));
     for i := 0 to DatabaseInfo.NoOfDatabases - 1 do
       Lines.Add(Format('DB Name (%d) = %s',[i+1, DatabaseInfo.DbName[i]]));
-    FetchConfigParams;
     Lines.Add('Base Location = ' + ConfigParams.BaseLocation);
     Lines.Add('Lock File Location = ' + ConfigParams.LockFileLocation);
     Lines.Add('Security Database Location = ' + ConfigParams.SecurityDatabaseLocation);
@@ -1285,16 +1101,10 @@ end;
 procedure TDatabaseData.LoadServerLog(Lines: TStrings);
 begin
   Lines.Clear;
-  ActivateService(IBLogService1);
   if IBLogService1.Protocol = Local then
     Lines.Add('Server Log not available with embedded server')
   else
-  with IBLogService1 do
-  begin
-    ServiceStart;
-    while not Eof do
-      Lines.Add(GetNextLine);
-  end;
+    IBLogService1.Execute(Lines);
 end;
 
 procedure TDatabaseData.RevokeAll;
@@ -1389,133 +1199,57 @@ begin
   // Do nothing
 end;
 
-procedure TDatabaseData.InLimboListAfterOpen(DataSet: TDataSet);
-
-  function TypeToStr(MultiDatabase: boolean): string;
-  begin
-    if MultiDatabase then
-      Result := 'Multi DB'
-    else
-      Result := 'Single DB';
-  end;
-
-  function StateToStr(State: TTransactionState): string;
-  begin
-    case State of
-    LimboState:
-      Result := 'Limbo';
-    CommitState:
-      Result := 'Commit';
-    RollbackState:
-      Result := 'Rollback';
-    else
-      Result := 'Unknown';
-    end;
-  end;
-
-  function AdviseToStr(Advise: TTransactionAdvise): string;
-  begin
-    case Advise of
-    CommitAdvise:
-      Result := 'Commit';
-    RollbackAdvise:
-      Result := 'Rollback';
-    else
-      Result := 'Unknown';
-    end;
-  end;
-
-  function ActionToStr(anAction: IBServices.TTransactionAction): string;
-  begin
-    case anAction of
-    CommitAction:
-      Result := 'Commit';
-    RollbackAction:
-      Result := 'Rollback';
-    end;
-  end;
-
-var i: integer;
+procedure TDatabaseData.IBValidationService1GetNextLine(Sender: TObject;
+  var Line: string);
 begin
-  if FLoadingLimboTr then Exit;
-  FLoadingLimboTr := true;
-  with IBValidationService1 do
-  try
-    ActivateService(IBValidationService1);
-    Options := [LimboTransactions];
-    ServiceStart;
-    FetchLimboTransactionInfo;
-    for i := 0 to LimboTransactionInfoCount - 1 do
-    with LimboTransactionInfo[i] do
-    begin
-      InLimboList.Append;
-      InLimboList.FieldByName('TransactionID').AsInteger := ID;
-      InLimboList.FieldByName('TransactionType').AsString := TypeToStr(MultiDatabase);
-      InLimboList.FieldByName('HostSite').AsString := HostSite;
-      InLimboList.FieldByName('RemoteSite').AsString := RemoteSite;
-      InLimboList.FieldByName('DatabasePath').AsString := RemoteDatabasePath;
-      InLimboList.FieldByName('State').AsString := StateToStr(State);
-      InLimboList.FieldByName('RecommendedAction').AsString := AdviseToStr(Advise);
-      InLimboList.FieldByName('RequestedAction').AsString := ActionToStr(Action);
-      InLimboList.Post;
-    end;
-  finally
-    FLoadingLimboTr := false;
-  end;
+  Application.ProcessMessages;
 end;
 
-procedure TDatabaseData.InLimboListBeforeClose(DataSet: TDataSet);
+procedure TDatabaseData.IBXServicesConnection1Login(
+  Service: TIBXServicesConnection; LoginParams: TStrings);
+var SecPlugin: TField;
+    UsingDefaultSecDatabase: boolean;
+    index: integer;
 begin
-  InLimboList.Clear(false);
-end;
+  LoginParams.Values['user_name'] := FDBUserName;
+  LoginParams.Values['password'] := FDBPassword;
+  LoginParams.Values['sql_role_name'] := 'RDB$ADMIN';
 
-procedure TDatabaseData.InLimboListBeforePost(DataSet: TDataSet);
-var i: integer;
-begin
-  if FLoadingLimboTr then Exit;
-  with IBValidationService1 do
-  for i := 0 to LimboTransactionInfoCount - 1 do
-    with LimboTransactionInfo[i] do
+  if FProtocol <> unknownProtocol then
+    Service.Protocol := FProtocol
+  else
+    Service.Protocol := Local;
+  Service.PortNo := FPortNo;
+  if Service.Protocol = Local then
+  begin
+    {If Local we must specify the server as the Localhost}
+    Service.ServerName := 'Localhost';
+    if AttmtQuery.Active then
     begin
-      if ID = InLimboList.FieldByName('TransactionID').AsInteger then
-      begin
-       if InLimboList.FieldByName('RequestedAction').AsString = 'Commit' then
-         Action := CommitAction
-       else
-         if InLimboList.FieldByName('RequestedAction').AsString = 'Rollback' then
-           Action := RollbackAction;
-       break;
-      end;
-    end;
+      if not AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull then
+        Service.Protocol := TCP; {Use loopback if database does not use embedded server}
+    end
+    else {Special case - database not open}
+    if not FileExists(DBName) or FileIsReadOnly(DBName) then
+      Service.Protocol := TCP; {Use loopback if database does not use embedded server}
+  end
+  else
+    Service.ServerName := FServername;
+
+  {Are we using a different security database?}
+
+  SecPlugin := DatabaseQuery.FindField('MON$SEC_DATABASE');
+  if (SecPlugin = nil) or (Trim(SecPlugin.AsString) = 'Default') then
+  begin
+    index := LoginParams.IndexOfName('expected_db');
+    if index <> -1 then LoginParams.Delete(index);
+  end
+  else
+    LoginParams.Values['expected_db'] := DBName
 end;
 
 procedure TDatabaseData.LegacyUserListAfterOpen(DataSet: TDataSet);
-var i: integer;
 begin
-  ActivateService(IBSecurityService1);
-  with IBSecurityService1 do
-  begin
-    DisplayUsers;
-    FUsersLoading := true;
-    try
-      for i := 0 to UserInfoCount - 1 do
-      with UserInfo[i],LegacyUserList do
-      begin
-        Append;
-        FieldByName('UserID').AsInteger := UserID;
-        FieldByName('GroupID').AsInteger := GroupID;
-        FieldByName('UserName').AsString := Trim(UserName);
-        FieldByName('SEC$FIRST_NAME').AsString := FirstName;
-        FieldByName('SEC$MIDDLE_NAME').AsString := MiddleName;
-        FieldByName('SEC$LAST_NAME').AsString := LastName;
-        FieldByName('UserPassword').Clear;
-        FieldByName('SEC$ADMIN').AsBoolean := AdminRole;
-        Post;
-      end;
-    finally
-      FUsersLoading := false;
-    end;
-  end;
   UserListSource.DataSet := LegacyUserList;
   CurrentTransaction.Active := true;
   RoleNameList.Active := true;
@@ -1524,58 +1258,6 @@ end;
 procedure TDatabaseData.LegacyUserListBeforeClose(DataSet: TDataSet);
 begin
   RoleNameList.Active := false;
-  with LegacyUserList do
-  begin
-    if State in [dsEdit,dsInsert] then Post;
-    Clear(false);
-  end;
-end;
-
-procedure TDatabaseData.LegacyUserListBeforeDelete(DataSet: TDataSet);
-begin
-  ActivateService(IBSecurityService1);
-  with IBSecurityService1 do
-  begin
-    UserName := DataSet.FieldByName('UserName').AsString;
-    DeleteUser;
-    while IsServiceRunning do;
-  end;
-end;
-
-procedure TDatabaseData.LegacyUserListBeforePost(DataSet: TDataSet);
-
-  procedure SetParams;
-  begin
-    with LegacyUserList, IBSecurityService1 do
-    begin
-      UserID := FieldByName('UserID').AsInteger;
-      GroupID := FieldByName('GroupID').AsInteger;
-      UserName := FieldByName('UserName').AsString;
-      FirstName := FieldByName('SEC$FIRST_NAME').AsString;
-      MiddleName := FieldByName('SEC$MIDDLE_NAME').AsString;
-      LastName := FieldByName('SEC$LAST_NAME').AsString;
-      if not FieldByName('UserPassword').IsNull then
-        Password := FieldByName('UserPassword').AsString;
-      AdminRole := FieldByName('SEC$ADMIN').AsBoolean;
-    end;
-  end;
-
- begin
-    if FUsersLoading then Exit;
-    ActivateService(IBSecurityService1);
-    case LegacyUserList.State of
-    dsEdit:
-      begin
-        SetParams;
-        IBSecurityService1.ModifyUser;
-      end;
-    dsInsert:
-      begin
-        SetParams;
-        IBSecurityService1.AddUser;
-      end;
-    end;
-    while IBSecurityService1.IsServiceRunning do;
 end;
 
 procedure TDatabaseData.ShadowFilesCalcFields(DataSet: TDataSet);
@@ -1707,7 +1389,7 @@ begin
   if AccessRightsSUBJECT_TYPE.AsInteger = 8 then
   begin
     if  (AccessRightsSUBJECT_NAME.AsString <> 'PUBLIC') and UserListSource.DataSet.Active and
-       not UserListSource.DataSet.Locate('USERNAME',AccessRightsSUBJECT_NAME.AsString,[]) then
+       not UserListSource.DataSet.Locate('SEC$USER_NAME',AccessRightsSUBJECT_NAME.AsString,[]) then
     begin
       AccessRightsImageIndex.AsInteger := 4;
       AccessRightsDisplayName.AsString := AccessRightsSUBJECT_NAME.AsString + ' (stale)';

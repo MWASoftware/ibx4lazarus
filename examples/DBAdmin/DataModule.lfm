@@ -4,6 +4,7 @@ object DatabaseData: TDatabaseData
   HorizontalOffset = 662
   VerticalOffset = 400
   Width = 730
+  PPI = 96
   object IBDatabase1: TIBDatabase
     Connected = False
     AfterConnect = IBDatabase1AfterConnect
@@ -260,21 +261,6 @@ object DatabaseData: TDatabaseData
     left = 544
     top = 112
   end
-  object IBStatisticalService1: TIBStatisticalService
-    Params.Strings = (
-      ''
-    )
-    LoginPrompt = False
-    TraceFlags = []
-    Options = [HeaderPages]
-    left = 33
-    top = 283
-  end
-  object IBConfigService1: TIBConfigService
-    TraceFlags = []
-    left = 162
-    top = 285
-  end
   object TableNameLookup: TIBQuery
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
@@ -293,27 +279,12 @@ object DatabaseData: TDatabaseData
     left = 288
     top = 283
   end
-  object IBServerProperties1: TIBServerProperties
-    Params.Strings = (
-      ''
-    )
-    TraceFlags = []
-    Options = []
-    left = 40
-    top = 368
-  end
-  object IBLogService1: TIBLogService
-    TraceFlags = []
-    left = 162
-    top = 368
-  end
   object UserList: TIBQuery
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
     AfterInsert = UserListAfterInsert
     AfterOpen = UserListAfterOpen
-    AfterPost = UserListAfterPost
     AfterScroll = UserListAfterScroll
     BeforeClose = UserListBeforeClose
     BufferChunks = 1000
@@ -322,9 +293,9 @@ object DatabaseData: TDatabaseData
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
       'Select A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
-      'A.SEC$ACTIVE, Trim(A.SEC$USER_NAME) as UserName, A.SEC$MIDDLE_NAME,'
+      'A.SEC$ACTIVE, Trim(A.SEC$USER_NAME) as SEC$USER_NAME, A.SEC$MIDDLE_NAME,'
       'A.SEC$FIRST_NAME, A.SEC$LAST_NAME,'
-      'cast(NULL as VarChar(32)) as USERPASSWORD, CURRENT_CONNECTION,'
+      'cast(NULL as VarChar(32)) as SEC$PASSWORD, CURRENT_CONNECTION,'
       'case when Count(B.MON$ATTACHMENT_ID) > 0 then true else false end as LoggedIn,'
       'case When C.SEC$USER is not null then true else false end as DBCreator'
       'From SEC$USERS A'
@@ -400,30 +371,10 @@ object DatabaseData: TDatabaseData
       Required = False
       Size = 32
     end
-    object UserListUSERPASSWORD: TIBStringField
-      FieldKind = fkData
-      FieldName = 'USERPASSWORD'
-      Index = 6
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 32
-    end
-    object UserListUSERNAME: TIBStringField
-      FieldKind = fkData
-      FieldName = 'USERNAME'
-      Index = 7
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 31
-    end
     object UserListLOGGEDIN: TBooleanField
       FieldKind = fkData
       FieldName = 'LOGGEDIN'
-      Index = 8
+      Index = 6
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -433,7 +384,7 @@ object DatabaseData: TDatabaseData
     object UserListCURRENT_CONNECTION: TIBLargeIntField
       FieldKind = fkData
       FieldName = 'CURRENT_CONNECTION'
-      Index = 9
+      Index = 7
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -442,7 +393,7 @@ object DatabaseData: TDatabaseData
     object UserListDBCREATOR: TBooleanField
       FieldKind = fkData
       FieldName = 'DBCREATOR'
-      Index = 10
+      Index = 8
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -452,7 +403,7 @@ object DatabaseData: TDatabaseData
     object UserListUSERID: TLongintField
       FieldKind = fkCalculated
       FieldName = 'USERID'
-      Index = 11
+      Index = 9
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -461,11 +412,31 @@ object DatabaseData: TDatabaseData
     object UserListGROUPID: TLongintField
       FieldKind = fkCalculated
       FieldName = 'GROUPID'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object UserListSECPASSWORD: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SEC$PASSWORD'
+      Index = 11
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 32
+    end
+    object UserListSECUSER_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SEC$USER_NAME'
       Index = 12
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = False
+      Size = 31
     end
   end
   object UpdateUsers: TIBUpdate
@@ -549,9 +520,7 @@ object DatabaseData: TDatabaseData
     AllowAutoActivateTransaction = False
     Database = IBDatabase1
     Transaction = CurrentTransaction
-    AfterDelete = UserListAfterPost
     AfterInsert = UserTagsAfterInsert
-    AfterPost = UserListAfterPost
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserListSource
@@ -595,83 +564,6 @@ object DatabaseData: TDatabaseData
     DataSet = UserList
     left = 304
     top = 360
-  end
-  object LegacyUserList: TMemDataset
-    FieldDefs = <    
-      item
-        Name = 'USERID'
-        DataType = ftInteger
-      end    
-      item
-        Name = 'GROUPID'
-        DataType = ftInteger
-      end    
-      item
-        Name = 'USERNAME'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'SEC$FIRST_NAME'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'SEC$MIDDLE_NAME'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'SEC$LAST_NAME'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'USERPASSWORD'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'SEC$ADMIN'
-        DataType = ftBoolean
-      end    
-      item
-        Name = 'SEC$PLUGIN'
-        DataType = ftString
-        Size = 31
-      end    
-      item
-        Name = 'SEC$ACTIVE'
-        DataType = ftBoolean
-      end    
-      item
-        Name = 'LOGGEDIN'
-        DataType = ftBoolean
-      end    
-      item
-        Name = 'DBCREATOR'
-        DataType = ftBoolean
-      end>
-    AfterOpen = LegacyUserListAfterOpen
-    BeforeClose = LegacyUserListBeforeClose
-    AfterInsert = UserListAfterInsert
-    BeforePost = LegacyUserListBeforePost
-    AfterPost = UserListAfterPost
-    BeforeDelete = LegacyUserListBeforeDelete
-    AfterDelete = UserListAfterPost
-    left = 520
-    top = 416
-  end
-  object IBSecurityService1: TIBSecurityService
-    ServerName = 'localhost'
-    Protocol = TCP
-    TraceFlags = []
-    SecurityAction = ActionAddUser
-    UserID = 0
-    GroupID = 0
-    AdminRole = False
-    left = 48
-    top = 432
   end
   object Attachments: TIBQuery
     AllowAutoActivateTransaction = False
@@ -1001,65 +893,6 @@ object DatabaseData: TDatabaseData
     left = 376
     top = 432
   end
-  object IBValidationService1: TIBValidationService
-    TraceFlags = []
-    Options = [ValidateFull]
-    GlobalAction = CommitGlobal
-    left = 168
-    top = 432
-  end
-  object IBOnlineValidationService1: TIBOnlineValidationService
-    TraceFlags = []
-    left = 64
-    top = 498
-  end
-  object InLimboList: TMemDataset
-    FieldDefs = <    
-      item
-        Name = 'TransactionID'
-        DataType = ftInteger
-      end    
-      item
-        Name = 'TransactionType'
-        DataType = ftString
-        Size = 16
-      end    
-      item
-        Name = 'HostSite'
-        DataType = ftString
-        Size = 256
-      end    
-      item
-        Name = 'RemoteSite'
-        DataType = ftString
-        Size = 256
-      end    
-      item
-        Name = 'DatabasePath'
-        DataType = ftString
-        Size = 256
-      end    
-      item
-        Name = 'State'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'RecommendedAction'
-        DataType = ftString
-        Size = 32
-      end    
-      item
-        Name = 'RequestedAction'
-        DataType = ftString
-        Size = 32
-      end>
-    AfterOpen = InLimboListAfterOpen
-    BeforeClose = InLimboListBeforeClose
-    BeforePost = InLimboListBeforePost
-    left = 224
-    top = 498
-  end
   object AdminUserQuery: TIBSQL
     Database = IBDatabase1
     GenerateParamNames = False
@@ -1352,5 +1185,191 @@ object DatabaseData: TDatabaseData
         Name = 'ID'
         ParamType = ptInput
       end>
+  end
+  object IBXServicesConnection1: TIBXServicesConnection
+    Connected = False
+    OnLogin = IBXServicesConnection1Login
+    TraceFlags = []
+    left = 640
+    top = 48
+  end
+  object IBStatisticalService1: TIBXStatisticalService
+    ServicesConnection = IBXServicesConnection1
+    TraceFlags = []
+    Options = [HeaderPages]
+    left = 48
+    top = 287
+  end
+  object IBConfigService1: TIBXConfigService
+    ServicesConnection = IBXServicesConnection1
+    TraceFlags = []
+    left = 168
+    top = 283
+  end
+  object IBServerProperties1: TIBXServerProperties
+    ServicesConnection = IBXServicesConnection1
+    TraceFlags = []
+    left = 40
+    top = 365
+  end
+  object IBLogService1: TIBXLogService
+    ServicesConnection = IBXServicesConnection1
+    TraceFlags = []
+    left = 168
+    top = 365
+  end
+  object IBSecurityService1: TIBXSecurityService
+    ServicesConnection = IBXServicesConnection1
+    TraceFlags = []
+    UserID = 0
+    GroupID = 0
+    AdminRole = False
+    left = 36
+    top = 437
+  end
+  object IBValidationService1: TIBXValidationService
+    ServicesConnection = IBXServicesConnection1
+    TraceFlags = []
+    OnGetNextLine = IBValidationService1GetNextLine
+    Options = [ValidateFull]
+    left = 632
+    top = 416
+  end
+  object IBOnlineValidationService1: TIBXOnlineValidationService
+    ServicesConnection = IBXServicesConnection1
+    TraceFlags = []
+    OnGetNextLine = IBValidationService1GetNextLine
+    left = 40
+    top = 503
+  end
+  object LegacyUserList: TIBXServicesUserList
+    FieldDefs = <    
+      item
+        Name = 'UserID'
+        DataType = ftInteger
+        Precision = -1
+      end    
+      item
+        Name = 'GroupID'
+        DataType = ftInteger
+        Precision = -1
+      end    
+      item
+        Name = 'SEC$USER_NAME'
+        DataType = ftString
+        Precision = -1
+        Size = 31
+      end    
+      item
+        Name = 'SEC$FIRST_NAME'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'SEC$MIDDLE_NAME'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'SEC$LAST_NAME'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'SEC$PASSWORD'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'SEC$ADMIN'
+        DataType = ftBoolean
+        Precision = -1
+      end    
+      item
+        Name = 'SEC$PLUGIN'
+        DataType = ftString
+        Size = 21
+      end    
+      item
+        Name = 'SEC$ACTIVE'
+        DataType = ftBoolean
+      end    
+      item
+        Name = 'LOGGEDIN'
+        DataType = ftBoolean
+      end    
+      item
+        Name = 'DBCREATOR'
+        DataType = ftBoolean
+      end>
+    AfterOpen = LegacyUserListAfterOpen
+    BeforeClose = LegacyUserListBeforeClose
+    AfterInsert = UserListAfterInsert
+    left = 167
+    top = 438
+  end
+  object InLimboList: TIBXServicesLimboTransactionsList
+    FieldDefs = <    
+      item
+        Name = 'TransactionID'
+        DataType = ftInteger
+        Precision = -1
+      end    
+      item
+        Name = 'TransactionType'
+        DataType = ftString
+        Precision = -1
+        Size = 16
+      end    
+      item
+        Name = 'HostSite'
+        DataType = ftString
+        Precision = -1
+        Size = 256
+      end    
+      item
+        Name = 'RemoteSite'
+        DataType = ftString
+        Precision = -1
+        Size = 256
+      end    
+      item
+        Name = 'DatabasePath'
+        DataType = ftString
+        Precision = -1
+        Size = 256
+      end    
+      item
+        Name = 'State'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'RecommendedAction'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end    
+      item
+        Name = 'RequestedAction'
+        DataType = ftString
+        Precision = -1
+        Size = 32
+      end>
+    Source = IBLimboTrans
+    left = 296
+    top = 496
+  end
+  object IBLimboTrans: TIBXLimboTransactionResolutionService
+    ServicesConnection = IBXServicesConnection1
+    TraceFlags = []
+    GlobalAction = CommitGlobal
+    left = 176
+    top = 496
   end
 end

@@ -591,6 +591,7 @@ end;
     procedure SetSource(AValue: TIBXControlAndQueryService);
   protected
     FRequiredSource: TRequiredSources;
+    procedure DoBeforeClose; override;
     procedure Notification( AComponent: TComponent; Operation: TOperation); override;
   public
     destructor Destroy; override;
@@ -608,9 +609,7 @@ end;
     procedure DoAfterInsert; override;
     procedure DoAfterPost; override;
     procedure DoAfterOpen; override;
-    procedure InternalClose; override;
     procedure InternalDelete; override;
-    procedure Loaded; override;
   public
     constructor Create(AOwner:TComponent); override;
   end;
@@ -623,10 +622,6 @@ end;
   protected
     procedure DoAfterOpen; override;
     procedure DoBeforePost; override;
-    procedure InternalClose; override;
-    property BeforeDelete;
-    property AfterDelete;
-    procedure Loaded; override;
   public
     constructor Create(AOwner:TComponent); override;
     procedure Delete; override;
@@ -865,34 +860,23 @@ begin
     end;
 end;
 
-  procedure TIBXServicesLimboTransactionsList.InternalClose;
-  begin
-    Clear(false);
-    inherited InternalClose;
-  end;
-
-
-procedure TIBXServicesLimboTransactionsList.Loaded;
-begin
-  inherited Loaded;
-  with FieldDefs do
-  if Count = 0 then
-  begin
-    Add('TransactionID',ftInteger);
-    Add('TransactionType',ftString,16);
-    Add('HostSite',ftString,256);
-    Add('RemoteSite',ftString,256);
-    Add('DatabasePath',ftString,256);
-    Add('State',ftString,32);
-    Add('RecommendedAction',ftString,32);
-    Add('RequestedAction',ftString,32);
-  end;
-end;
 
   constructor TIBXServicesLimboTransactionsList.Create(AOwner: TComponent);
   begin
     inherited Create(AOwner);
     FRequiredSource := TIBXLimboTransactionResolutionService;
+    with FieldDefs do
+    if Count = 0 then
+    begin
+      Add('TransactionID',ftInteger);
+      Add('TransactionType',ftString,16);
+      Add('HostSite',ftString,256);
+      Add('RemoteSite',ftString,256);
+      Add('DatabasePath',ftString,256);
+      Add('State',ftString,32);
+      Add('RecommendedAction',ftString,32);
+      Add('RequestedAction',ftString,32);
+    end;
   end;
 
   procedure TIBXServicesLimboTransactionsList.Delete;
@@ -906,6 +890,8 @@ end;
     if State = dsEdit then Post;
     (FSource as TIBXLimboTransactionResolutionService).GlobalAction := GlobalAction;
     (FSource as TIBXLimboTransactionResolutionService).FixLimboTransactionErrors(Lines);
+    Active := false;
+    Active := true;
   end;
 
   { TIBXServicesUserList }
@@ -917,13 +903,13 @@ end;
       begin
         UserID := FieldByName('UserID').AsInteger;
         GroupID := FieldByName('GroupID').AsInteger;
-        UserName := FieldByName('UserName').AsString;
-        FirstName := FieldByName('FirstName').AsString;
-        MiddleName := FieldByName('MiddleName').AsString;
-        LastName := FieldByName('LastName').AsString;
-        if not FieldByName('Password').IsNull then
-          Password := FieldByName('Password').AsString;
-        AdminRole := FieldByName('Admin').AsBoolean;
+        UserName := FieldByName('SEC$USER_NAME').AsString;
+        FirstName := FieldByName('SEC$FIRST_NAME').AsString;
+        MiddleName := FieldByName('SEC$MIDDLE_NAME').AsString;
+        LastName := FieldByName('SEC$LAST_NAME').AsString;
+        if not FieldByName('SEC$PASSWORD').IsNull then
+          Password := FieldByName('SEC$PASSWORD').AsString;
+        AdminRole := FieldByName('SEC$ADMIN').AsBoolean;
       end;
     end;
 
@@ -948,8 +934,8 @@ end;
   begin
     FieldByName('UserID').AsInteger := 0;
     FieldByName('GroupID').AsInteger := 0;
-    FieldByName('Admin').AsBoolean := false;
-    FieldByName('Password').Clear;
+    FieldByName('SEC$PASSWORD').Clear;
+    FieldByName('SEC$ADMIN').AsBoolean := false;
     inherited DoAfterInsert;
   end;
 
@@ -966,11 +952,12 @@ end;
       begin
         FieldByName('UserID').AsInteger := UserID;
         FieldByName('GroupID').AsInteger := GroupID;
-        FieldByName('FirstName').AsString := FirstName;
-        FieldByName('MiddleName').AsString := MiddleName;
-        FieldByName('LastName').AsString := LastName;
-        FieldByName('Password').Clear;
-        FieldByName('Admin').AsBoolean := AdminRole;
+        FieldByName('SEC$USER_NAME').AsString := UserName;
+        FieldByName('SEC$FIRST_NAME').AsString := FirstName;
+        FieldByName('SEC$MIDDLE_NAME').AsString := MiddleName;
+        FieldByName('SEC$LAST_NAME').AsString := LastName;
+        FieldByName('SEC$PASSWORD').Clear;
+        FieldByName('SEC$ADMIN').AsBoolean := AdminRole;
       end;
     end;
 
@@ -998,12 +985,12 @@ end;
             Append;
             FieldByName('UserID').AsInteger := UserID;
             FieldByName('GroupID').AsInteger := GroupID;
-            FieldByName('UserName').AsString := UserName;
-            FieldByName('FirstName').AsString := FirstName;
-            FieldByName('MiddleName').AsString := MiddleName;
-            FieldByName('LastName').AsString := LastName;
-            FieldByName('Password').Clear;
-            FieldByName('Admin').AsBoolean := AdminRole;
+            FieldByName('SEC$USER_NAME').AsString := UserName;
+            FieldByName('SEC$FIRST_NAME').AsString := FirstName;
+            FieldByName('SEC$MIDDLE_NAME').AsString := MiddleName;
+            FieldByName('SEC$LAST_NAME').AsString := LastName;
+            FieldByName('SEC$PASSWORD').Clear;
+            FieldByName('SEC$ADMIN').AsBoolean := AdminRole;
             Post;
           end;
         finally
@@ -1015,43 +1002,32 @@ end;
     end;
   end;
 
-  procedure TIBXServicesUserList.InternalClose;
-  begin
-    Clear(false);
-    inherited InternalClose;
-  end;
-
   procedure TIBXServicesUserList.InternalDelete;
   begin
     with FSource as TIBXSecurityService do
     begin
-      UserName := FieldByName('UserName').AsString;
+      UserName := FieldByName('SEC$USER_NAME').AsString;
       DeleteUser;
     end;
     inherited InternalDelete;
   end;
 
-  procedure TIBXServicesUserList.Loaded;
-begin
-  inherited Loaded;
-  with FieldDefs do
-  if Count = 0 then
-  begin
-    Add('UserID',ftInteger);
-    Add('GroupID',ftInteger);
-    Add('UserName',ftString,31);
-    Add('FirstName',ftString,32);
-    Add('MiddleName',ftString,32);
-    Add('LastName',ftString,32);
-    Add('Password',ftString,32);
-    Add('Admin',ftBoolean);
-  end;
-end;
-
   constructor TIBXServicesUserList.Create(AOwner: TComponent);
   begin
     inherited Create(AOwner);
     FRequiredSource := TIBXSecurityService;
+    with FieldDefs do
+    if Count = 0 then
+    begin
+      Add('UserID',ftInteger);
+      Add('GroupID',ftInteger);
+      Add('SEC$USER_NAME',ftString,31);
+      Add('SEC$FIRST_NAME',ftString,32);
+      Add('SEC$MIDDLE_NAME',ftString,32);
+      Add('SEC$LAST_NAME',ftString,32);
+      Add('SEC$PASSWORD',ftString,32);
+      Add('SEC$ADMIN',ftBoolean);
+    end;
   end;
 
   { TIBXServicesDataSet }
@@ -1073,6 +1049,13 @@ end;
       FreeNotification(FSource);
    end;
   end;
+
+procedure TIBXServicesDataSet.DoBeforeClose;
+begin
+ if State in [dsEdit,dsInsert] then Post;
+ Clear(false);
+ inherited DoBeforeClose;
+end;
 
 procedure TIBXServicesDataSet.Notification(AComponent: TComponent;
     Operation: TOperation);

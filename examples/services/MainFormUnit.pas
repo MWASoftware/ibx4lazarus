@@ -170,9 +170,9 @@ begin
     Memo1.Lines.Add('Security Database Location = ' + ConfigParams.SecurityDatabaseLocation);
     Memo1.Lines.Add('Message File Location = ' + ConfigParams.MessageFileLocation);
     for i := Low(ConfigParams.ConfigFileParams) to High(ConfigParams.ConfigFileParams) do
-      writeln(ConfigParams.ConfigFileParams[i]);
+      Memo1.Lines.Add(ConfigParams.ConfigFileParams[i]);
     for i := Low(ConfigParams.ConfigFileData.ConfigFileKey) to High(ConfigParams.ConfigFileData.ConfigFileKey) do
-      writeln(ConfigParams.ConfigFileData.ConfigFileKey[i],' = ',ConfigParams.ConfigFileData.ConfigFileValue[i]);
+      Memo1.Lines.Add(Format('%d=%s',[ConfigParams.ConfigFileData.ConfigFileKey[i],ConfigParams.ConfigFileData.ConfigFileValue[i]]));
   end;
 end;
 

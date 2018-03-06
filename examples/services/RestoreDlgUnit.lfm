@@ -172,6 +172,7 @@ object RestoreDlg: TRestoreDlg
   object SSRestoreService1: TIBXServerSideRestoreService
     ServicesConnection = MainForm.IBXServicesConnection1
     TraceFlags = []
+    OnGetNextLine = IBRestoreService1GetNextLine
     PageSize = 0
     PageBuffers = 0
     StatisticsRequested = [bsTotalTime]

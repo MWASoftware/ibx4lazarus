@@ -58,7 +58,7 @@ object ListUsersForm: TListUsersForm
         Title.Alignment = taCenter
         Title.Caption = 'User Name'
         Width = 120
-        FieldName = 'UserName'
+        FieldName = 'SEC$USER_NAME'
         AutoSizeColumn = False
         InitialSortColumn = False
         DBLookupProperties.ItemHeight = 0
@@ -69,7 +69,7 @@ object ListUsersForm: TListUsersForm
         Title.Alignment = taCenter
         Title.Caption = 'First Name'
         Width = 100
-        FieldName = 'FirstName'
+        FieldName = 'SEC$FIRST_NAME'
         AutoSizeColumn = True
         InitialSortColumn = False
         DBLookupProperties.ItemHeight = 0
@@ -80,7 +80,7 @@ object ListUsersForm: TListUsersForm
         Title.Alignment = taCenter
         Title.Caption = 'Middle Name'
         Width = 100
-        FieldName = 'MiddleName'
+        FieldName = 'SEC$MIDDLE_NAME'
         AutoSizeColumn = False
         InitialSortColumn = False
         DBLookupProperties.ItemHeight = 0
@@ -91,7 +91,7 @@ object ListUsersForm: TListUsersForm
         Title.Alignment = taCenter
         Title.Caption = 'Last Name'
         Width = 100
-        FieldName = 'LastName'
+        FieldName = 'SEC$LAST_NAME'
         AutoSizeColumn = True
         InitialSortColumn = False
         DBLookupProperties.ItemHeight = 0
@@ -102,7 +102,7 @@ object ListUsersForm: TListUsersForm
         Title.Alignment = taCenter
         Title.Caption = 'Admin'
         Width = 64
-        FieldName = 'Admin'
+        FieldName = 'SEC$ADMIN'
         AutoSizeColumn = False
         InitialSortColumn = False
         DBLookupProperties.ItemHeight = 0
@@ -221,42 +221,42 @@ object ListUsersForm: TListUsersForm
         Precision = -1
       end    
       item
-        Name = 'UserName'
+        Name = 'SEC$USER_NAME'
         DataType = ftString
         Precision = -1
         Size = 31
       end    
       item
-        Name = 'FirstName'
+        Name = 'SEC$FIRST_NAME'
         DataType = ftString
         Precision = -1
         Size = 32
       end    
       item
-        Name = 'MiddleName'
+        Name = 'SEC$MIDDLE_NAME'
         DataType = ftString
         Precision = -1
         Size = 32
       end    
       item
-        Name = 'LastName'
+        Name = 'SEC$LAST_NAME'
         DataType = ftString
         Precision = -1
         Size = 32
       end    
       item
-        Name = 'Password'
+        Name = 'SEC$PASSWORD'
         DataType = ftString
         Precision = -1
         Size = 32
       end    
       item
-        Name = 'Admin'
+        Name = 'SEC$ADMIN'
         DataType = ftBoolean
         Precision = -1
       end>
     Source = IBXSecurityService1
-    left = 486
-    top = 210
+    left = 480
+    top = 197
   end
 end
