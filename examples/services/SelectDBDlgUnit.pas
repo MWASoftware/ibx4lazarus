@@ -44,6 +44,7 @@ type
     Button2: TButton;
     Edit1: TEdit;
     Label1: TLabel;
+    procedure FormShow(Sender: TObject);
   private
 
   public
@@ -59,6 +60,11 @@ implementation
 {$R *.lfm}
 
 { TSelectDBDlg }
+
+procedure TSelectDBDlg.FormShow(Sender: TObject);
+begin
+  Edit1.SetFocus;
+end;
 
 function TSelectDBDlg.ShowModal(var DatabaseName: string): TModalResult;
 begin

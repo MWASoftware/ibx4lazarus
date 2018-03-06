@@ -7,8 +7,9 @@ object SelectDBDlg: TSelectDBDlg
   Caption = 'Select Database'
   ClientHeight = 92
   ClientWidth = 366
+  OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Bevel1: TBevel
     Left = 9
     Height = 74

@@ -42,6 +42,7 @@ type
     function GenerateSPB(sl: TStrings): ISPB;
     function GetServerVersionNo(index: integer): integer;
     function GetSPBConstName(action: byte): string;
+    procedure HandleException(Sender: TObject);
     procedure HandleSecContextException(Sender: TIBXControlService; var action: TSecContextAction);
     function Login(var aServerName: string; LoginParams: TStrings): Boolean;
     procedure ParamsChanging(Sender: TObject);
@@ -96,7 +97,9 @@ type
    procedure SetServicesConnection(AValue: TIBXServicesConnection);
  protected
    procedure OnBeforeDisconnect(Sender: TIBXServicesConnection); virtual;
-   procedure InternalServiceQuery;
+   procedure InternalServiceQuery(RaiseExceptionOnError: boolean=true);
+   procedure DoServiceQuery; virtual;
+   procedure Notification( AComponent: TComponent; Operation: TOperation); override;
    property SRB: ISRB read GetSRB;
    property SQPB: ISQPB read GetSQPB;
    property ServiceQueryResults: IServiceQueryResults read FServiceQueryResults;
@@ -174,12 +177,15 @@ end;
  private
    FDatabaseName: string;
    FAction: TSecContextAction;
+   FLastStartSRB: ISRB;
    function GetIsServiceRunning: Boolean;
+   procedure HandleSecContextErr;
    procedure CallSecContextException;
  protected
    procedure AddDBNameToSRB;
    procedure CheckServiceNotRunning;
    procedure InternalServiceStart;
+   procedure DoServiceQuery; override;
    procedure SetServiceStartOptions; virtual;
    procedure ServiceStart; virtual;
    property DatabaseName: string read FDatabaseName write FDatabaseName;
@@ -552,9 +558,9 @@ end;
     procedure SetSource(AValue: TIBXControlAndQueryService);
   protected
     FRequiredSource: TRequiredSources;
-    Property FileName;
-    property Filtered;
-    Property FieldDefs;
+    procedure Notification( AComponent: TComponent; Operation: TOperation); override;
+  public
+    destructor Destroy; override;
   published
     property Source: TIBXControlAndQueryService read FSource write SetSource;
   end;
@@ -833,12 +839,12 @@ end;
   end;
 
 
-  procedure TIBXServicesLimboTransactionsList.Loaded;
+procedure TIBXServicesLimboTransactionsList.Loaded;
 begin
   inherited Loaded;
   with FieldDefs do
+  if Count = 0 then
   begin
-    Clear;
     Add('TransactionID',ftInteger);
     Add('TransactionType',ftString,16);
     Add('HostSite',ftString,256);
@@ -939,30 +945,40 @@ end;
 
   procedure TIBXServicesUserList.DoAfterOpen;
   var i: integer;
+      Buf: TStringList;
   begin
     inherited DoAfterOpen;
-    with FSource as TIBXSecurityService do
-    begin
-      DisplayUsers;
-      FLoading := true;
-      try
-        for i := 0 to UserInfoCount - 1 do
-        with UserInfo[i] do
-        begin
-          Append;
-          FieldByName('UserID').AsInteger := UserID;
-          FieldByName('GroupID').AsInteger := GroupID;
-          FieldByName('UserName').AsString := UserName;
-          FieldByName('FirstName').AsString := FirstName;
-          FieldByName('MiddleName').AsString := MiddleName;
-          FieldByName('LastName').AsString := LastName;
-          FieldByName('Password').Clear;
-          FieldByName('Admin').AsBoolean := AdminRole;
-          Post;
+    buf := TStringList.Create; {Used to sort user info}
+    try
+      with FSource as TIBXSecurityService do
+      begin
+        buf.Sorted := true;
+        DisplayUsers;
+        FLoading := true;
+        try
+          for i := 0 to UserInfoCount - 1 do
+            buf.AddObject(UserInfo[i].UserName,UserInfo[i]);
+
+          for i := 0 to buf.Count - 1 do
+          with TUserInfo(buf.Objects[i]) do
+          begin
+            Append;
+            FieldByName('UserID').AsInteger := UserID;
+            FieldByName('GroupID').AsInteger := GroupID;
+            FieldByName('UserName').AsString := UserName;
+            FieldByName('FirstName').AsString := FirstName;
+            FieldByName('MiddleName').AsString := MiddleName;
+            FieldByName('LastName').AsString := LastName;
+            FieldByName('Password').Clear;
+            FieldByName('Admin').AsBoolean := AdminRole;
+            Post;
+          end;
+        finally
+          FLoading := false;
         end;
-      finally
-        FLoading := false;
       end;
+    finally
+      Buf.Free;
     end;
   end;
 
@@ -986,11 +1002,11 @@ end;
 begin
   inherited Loaded;
   with FieldDefs do
+  if Count = 0 then
   begin
-    Clear;
     Add('UserID',ftInteger);
     Add('GroupID',ftInteger);
-    Add('UserName',ftString,32);
+    Add('UserName',ftString,31);
     Add('FirstName',ftString,32);
     Add('MiddleName',ftString,32);
     Add('LastName',ftString,32);
@@ -1010,14 +1026,34 @@ end;
   procedure TIBXServicesDataSet.SetSource(AValue: TIBXControlAndQueryService);
   begin
    if FSource = AValue then Exit;
-   if not (AValue is FRequiredSource) then
-     IBError(ibxeNotRequiredDataSetSource,[FSource.ClassName]);
+   if (AValue <> nil) and not (AValue is FRequiredSource) then
+     IBError(ibxeNotRequiredDataSetSource,[AValue.ClassName]);
    if FSource <> nil then
+   begin
      FSource.UnRegisterDataSet(self);
+     RemoveFreeNotification(FSource);
+   end;
    FSource := AValue;
    if FSource <> nil then
+   begin
       FSource.RegisterDataSet(self);
+      FreeNotification(FSource);
+   end;
   end;
+
+procedure TIBXServicesDataSet.Notification(AComponent: TComponent;
+    Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FSource) then
+    FSource := nil;
+end;
+
+destructor TIBXServicesDataSet.Destroy;
+begin
+  Source := nil;
+  inherited Destroy;
+end;
 
   { TIBXLimboTransactionResolutionService }
 
@@ -2164,11 +2200,20 @@ end;
 function TIBXControlService.GetIsServiceRunning: Boolean;
 begin
   SRB.Add(isc_info_svc_running);
-  InternalServiceQuery;
+  InternalServiceQuery(false);
+  Result := (FServiceQueryResults <> nil) and (FServiceQueryResults.Count > 0) and
+               (FServiceQueryResults[0].getItemType = isc_info_svc_running) and
+                (FServiceQueryResults[0].AsInteger = 1);
 
-  Result := (FServiceQueryResults.Count > 0) and
-             (FServiceQueryResults[0].getItemType = isc_info_svc_running) and
-              (FServiceQueryResults[0].AsInteger = 1);
+end;
+
+procedure TIBXControlService.HandleSecContextErr;
+begin
+  FAction := scRaiseError;
+  if MainThreadID = TThread.CurrentThread.ThreadID then
+    ServicesConnection.HandleSecContextException(self,FAction)
+  else
+    TThread.Synchronize(TThread.CurrentThread,@CallSecContextException);
 end;
 
 procedure TIBXControlService.CallSecContextException;
@@ -2191,42 +2236,75 @@ end;
 
 procedure TIBXControlService.InternalServiceStart;
 var done: boolean;
-    action: TSecContextAction;
+    theError: EIBInterBaseError;
 begin
   if SRB = nil then
     IBError(ibxeStartParamsError, [nil]);
 
+  FLastStartSRB := SRB;
   done := false;
+  theError := nil;
   try
     repeat
       CheckActive;
-      try
-        ServicesConnection.ServiceIntf.Start(SRB);
-        done := true;
-      except
-        on E: EIBInterBaseError do
-          if E.IBErrorCode = isc_sec_context then {Need to change sec. database}
-          begin
-            if MainThreadID = TThread.CurrentThread.ThreadID then
-              ServicesConnection.HandleSecContextException(self,action)
-            else
-            begin
-              FAction := action;
-              TThread.Synchronize(TThread.CurrentThread,@CallSecContextException);
-              action := FAction;
-            end;
-            if action = scRaiseError then
-              raise;
-          end
+      done := ServicesConnection.ServiceIntf.Start(SRB,false);
+      if not done then
+      begin
+        theError := EIBInterBaseError.Create(FirebirdAPI.GetStatus);
+        if FirebirdAPI.GetStatus.GetIBErrorCode = isc_sec_context then
+        begin
+          HandleSecContextErr;
+          if FAction = scRaiseError then
+            raise theError
           else
-            raise;
+            theError.Free;
+        end
+        else
+          raise theError;
       end;
-    until done;
+   until done;
   finally
     FSRB := nil;
   end;
   if tfService in ServicesConnection.TraceFlags then
     MonitorHook.ServiceStart(Self);
+end;
+
+procedure TIBXControlService.DoServiceQuery;
+var done: boolean;
+    LastSRB: ISRB;
+    LastSQPB: ISQPB;
+    theError: EIBInterBaseError;
+begin
+  done := false;
+  theError := nil;
+  repeat
+    LastSRB := SRB;
+    LastSQPB := SQPB;
+    inherited DoServiceQuery;
+    done := FServiceQueryResults <> nil;
+    if not done then
+    begin
+      if FirebirdAPI.GetStatus.GetIBErrorCode = isc_sec_context then
+      begin
+        theError := EIBInterBaseError.Create(FirebirdAPI.GetStatus); {save exception}
+        HandleSecContextErr;
+        if FAction = scReconnect then
+        begin
+          {Restart service}
+          theError.Free;
+          FSRB := FLastStartSRB;
+          InternalServiceStart;
+          FSRB := LastSRB;
+          FSQPB := LastSQPB;
+        end
+        else
+          raise theError;
+      end
+      else
+        break;
+    end;
+  until done;
 end;
 
 procedure TIBXControlService.SetServiceStartOptions;
@@ -2446,10 +2524,16 @@ procedure TIBXCustomService.SetServicesConnection(AValue: TIBXServicesConnection
 begin
   if FServicesConnection = AValue then Exit;
   if FServicesConnection <> nil then
+  begin
     FServicesConnection.UnRegisterIntf(self);
+    RemoveFreeNotification(FServicesConnection);
+  end;
   FServicesConnection := AValue;
   if FServicesConnection <> nil then
+  begin
     FServicesConnection.RegisterIntf(self);
+    FreeNotification(FServicesConnection);
+  end;
 end;
 
 procedure TIBXCustomService.OnBeforeDisconnect(Sender: TIBXServicesConnection);
@@ -2459,17 +2543,34 @@ begin
   FSQPB := nil;
 end;
 
-procedure TIBXCustomService.InternalServiceQuery;
+procedure TIBXCustomService.InternalServiceQuery(RaiseExceptionOnError: boolean
+  );
 begin
   CheckActive;
   try
-    FServiceQueryResults := ServicesConnection.ServiceIntf.Query(FSQPB,FSRB);
+    FServiceQueryResults := nil;
+    DoServiceQuery;
+    if (FServiceQueryResults = nil) and RaiseExceptionOnError then
+      raise EIBInterBaseError.Create(FirebirdAPI.GetStatus);
   finally
     FSQPB := nil;
     FSRB := nil;
   end;
   if tfService in ServicesConnection.TraceFlags then
     MonitorHook.ServiceQuery(Self);
+end;
+
+procedure TIBXCustomService.DoServiceQuery;
+begin
+  FServiceQueryResults := ServicesConnection.ServiceIntf.Query(FSQPB,FSRB,false);
+end;
+
+procedure TIBXCustomService.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = ServicesConnection) then
+    ServicesConnection := nil;
 end;
 
 constructor TIBXCustomService.Create(AOwner: TComponent);
@@ -2603,36 +2704,53 @@ begin
     end;
 end;
 
+procedure TIBXServicesConnection.HandleException(Sender: TObject);
+var aParent: TComponent;
+begin
+  aParent := Owner;
+  while aParent <> nil do
+  begin
+    if aParent is TCustomApplication then
+    begin
+      TCustomApplication(aParent).HandleException(Sender);
+      Exit;
+    end;
+    aParent := aParent.Owner;
+  end;
+  SysUtils.ShowException(ExceptObject,ExceptAddr);
+end;
+
 procedure TIBXServicesConnection.HandleSecContextException(
   Sender: TIBXControlService; var action: TSecContextAction);
 var OldServiceIntf: IServiceManager;
 begin
   action := scRaiseError;
   if assigned(FOnSecurityContextException) then
-  begin
     OnSecurityContextException(self,action);
-    if action = scReconnect then
-    begin
-      FExpectedDB := Sender.DatabaseName;
-      try
-        OldServiceIntf := FService;
-        Connected := false;
-        while not Connected do
-        begin
-          try
-            Connected := true;
-          except
-           on E:EIBClientError do
-            begin
-              action := scRaiseError;
-              FService := OldServiceIntf;
-              break;
-            end;
+
+  if action = scReconnect then
+  begin
+    FExpectedDB := Sender.DatabaseName;
+    try
+      OldServiceIntf := FService;
+      Connected := false;
+      while not Connected do
+      begin
+        try
+          Connected := true;
+        except
+         on E:EIBClientError do
+          begin
+            action := scRaiseError;
+            FService := OldServiceIntf;
+            break;
           end;
+         else
+           HandleException(self);
         end;
-      finally
-        FExpectedDB := '';
       end;
+    finally
+      FExpectedDB := '';
     end;
   end;
 end;
@@ -2756,10 +2874,10 @@ begin
   TempSvcParams := TStringList.Create;
   try
     TempSvcParams.Assign(FParams);
-    if FExpectedDB <> '' then
-      TempSvcParams.Values['expected_db'] := FExpectedDB;
     if LoginPrompt and not Login(aServerName,TempSvcParams) then
       IBError(ibxeOperationCancelled, [nil]);
+    if FExpectedDB <> '' then
+      TempSvcParams.Values['expected_db'] := FExpectedDB;
     SPB := GenerateSPB(TempSvcParams);
   finally
     TempSvcParams.Free;

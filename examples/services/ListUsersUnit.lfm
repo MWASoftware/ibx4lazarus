@@ -224,7 +224,7 @@ object ListUsersForm: TListUsersForm
         Name = 'UserName'
         DataType = ftString
         Precision = -1
-        Size = 32
+        Size = 31
       end    
       item
         Name = 'FirstName'
