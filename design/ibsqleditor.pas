@@ -33,7 +33,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, SynEdit, LResources, Forms, Controls, Graphics,
   Dialogs, StdCtrls, ComCtrls, ibinsertsqleditor, IBSQLEditFrame,
-  IBLookupComboEditBox, IBDynamicGrid, IBDatabase, IBSQL, IBQuery, IB, Types, db;
+  IBDatabase, IBSQL, IB, db;
 
 type
 

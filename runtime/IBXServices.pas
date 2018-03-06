@@ -1,3 +1,36 @@
+{************************************************************************}
+{                                                                        }
+{       Borland Delphi Visual Component Library                          }
+{       InterBase Express core components                                }
+{                                                                        }
+{       Copyright (c) 1998-2000 Inprise Corporation                      }
+{                                                                        }
+{    InterBase Express is based in part on the product                   }
+{    Free IB Components, written by Gregory H. Deatz for                 }
+{    Hoagland, Longo, Moran, Dunst & Doukas Company.                     }
+{    Free IB Components is used under license.                           }
+{                                                                        }
+{    The contents of this file are subject to the InterBase              }
+{    Public License Version 1.0 (the "License"); you may not             }
+{    use this file except in compliance with the License. You            }
+{    may obtain a copy of the License at http://www.Inprise.com/IPL.html }
+{    Software distributed under the License is distributed on            }
+{    an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either              }
+{    express or implied. See the License for the specific language       }
+{    governing rights and limitations under the License.                 }
+{    The Original Code was created by InterBase Software Corporation     }
+{       and its successors.                                              }
+{    Portions created by Inprise Corporation are Copyright (C) Inprise   }
+{       Corporation. All Rights Reserved.                                }
+{    Contributor(s): Jeff Overcash                                       }
+{                                                                        }
+{    IBX For Lazarus (Firebird Express)                                  }
+{    Contributor: Tony Whyman, MWA Software http://www.mwasoftware.co.uk }
+{    Portions created by MWA Software are copyright McCallum Whyman      }
+{    Associates Ltd 2011 - 2018                                                }
+{                                                                        }
+{************************************************************************}
+
 unit IBXServices;
 
 {$mode objfpc}{$H+}
@@ -1680,6 +1713,8 @@ begin
 
   SetArchiveSource;
 
+  if FDatabaseFiles.Count > 0 then
+    DatabaseName := FDatabaseFiles[0]; {needed if an isc_sec_context error}
   for i := 0 to FDatabaseFiles.Count - 1 do
   begin
     if (Trim(FDatabaseFiles[i]) = '') then continue;
@@ -2211,7 +2246,7 @@ procedure TIBXControlService.HandleSecContextErr;
 begin
   FAction := scRaiseError;
   if MainThreadID = TThread.CurrentThread.ThreadID then
-    ServicesConnection.HandleSecContextException(self,FAction)
+    CallSecContextException
   else
     TThread.Synchronize(TThread.CurrentThread,@CallSecContextException);
 end;
@@ -2251,13 +2286,16 @@ begin
       if not done then
       begin
         theError := EIBInterBaseError.Create(FirebirdAPI.GetStatus);
-        if FirebirdAPI.GetStatus.GetIBErrorCode = isc_sec_context then
+        if theError.IBErrorCode = isc_sec_context then
         begin
           HandleSecContextErr;
           if FAction = scRaiseError then
             raise theError
           else
+          begin
             theError.Free;
+            FSRB := FLastStartSRB;
+          end;
         end
         else
           raise theError;
@@ -2302,7 +2340,7 @@ begin
           raise theError;
       end
       else
-        break;
+        break; {Let the caller handle the error}
     end;
   until done;
 end;

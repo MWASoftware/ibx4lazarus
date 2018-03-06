@@ -55,7 +55,7 @@ uses
 {$ELSE}
   baseunix, unix,
 {$ENDIF}
-  SysUtils, Classes, IBExternals, IB, IBDatabase, IBUtils;
+  SysUtils, Classes, IB, IBDatabase, IBUtils;
 
 type
   { TIBBatch }

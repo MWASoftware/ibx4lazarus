@@ -24,7 +24,7 @@
  *
 *)
 
-unit ibserviceeditor;
+unit IBXServiceEditor;
 
 {$mode objfpc}
 
@@ -32,13 +32,13 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, LResources, Forms, Controls, Graphics, Dialogs,
-  ExtCtrls, StdCtrls, IBServices, IB;
+  ExtCtrls, StdCtrls, IBXServices, IB;
 
 type
 
-  { TIBServiceEditorForm }
+  { TIBXServiceEditorForm }
 
-  TIBServiceEditorForm = class(TForm)
+  TIBXServiceEditorForm = class(TForm)
     Bevel1: TBevel;
     CancelBtn: TButton;
     PortNo: TEdit;
@@ -71,21 +71,21 @@ type
     procedure DeleteParam(aName: string);
   public
     { public declarations }
-    Service: TIBCustomService;
+    Service: TIBXServicesConnection;
   end;
 
-function EditIBService(aService: TIBCustomService): boolean;
+function EditIBXService(aService: TIBXServicesConnection): boolean;
 
 var
-  IBServiceEditorForm: TIBServiceEditorForm;
+  IBXServiceEditorForm: TIBXServiceEditorForm;
 
 implementation
 
 {$R *.lfm}
 
-function EditIBService(aService: TIBCustomService): boolean;
+function EditIBXService(aService: TIBXServicesConnection): boolean;
 begin
-  with TIBServiceEditorForm.Create(Application) do
+  with TIBXServiceEditorForm.Create(Application) do
   try
     Service := aService;
     Result := Edit
@@ -94,9 +94,9 @@ begin
   end
 end;
 
-{ TIBServiceEditorForm }
+{ TIBXServiceEditorForm }
 
-procedure TIBServiceEditorForm.LocalRbtnClick(Sender: TObject);
+procedure TIBXServiceEditorForm.LocalRbtnClick(Sender: TObject);
 begin
   Label7.Enabled := False;
   Label8.Enabled := False;
@@ -104,12 +104,12 @@ begin
   Protocol.Enabled := False;
 end;
 
-procedure TIBServiceEditorForm.PasswordChange(Sender: TObject);
+procedure TIBXServiceEditorForm.PasswordChange(Sender: TObject);
 begin
   AddParam('password', Password.Text);
 end;
 
-procedure TIBServiceEditorForm.RemoteRbtnClick(Sender: TObject);
+procedure TIBXServiceEditorForm.RemoteRbtnClick(Sender: TObject);
 begin
   Label7.Enabled := True;
   Label8.Enabled := True;
@@ -119,11 +119,11 @@ begin
     Protocol.Text := 'TCP';
 end;
 
-procedure TIBServiceEditorForm.TestClick(Sender: TObject);
-var tempService: TIBControlService; {Use as example for test}
+procedure TIBXServiceEditorForm.TestClick(Sender: TObject);
+var tempService: TIBXServicesConnection; {Use as example for test}
 begin
   Test.Enabled := false;
-  tempService := TIBControlService.Create(nil);
+  tempService := TIBXServicesConnection.Create(nil);
   try
     if LocalRbtn.Checked then
     begin
@@ -143,9 +143,9 @@ begin
     tempService.Params.Assign(ServiceParams.Lines);
     tempService.LoginPrompt := true;
     try
-      tempService.Active := true;
+      tempService.Connected := true;
       ShowMessage('Successful Connection');
-      tempService.Active := false;
+      tempService.Connected := false;
     except on E: Exception do
       ShowMessage(E.Message)
     end;
@@ -155,12 +155,12 @@ begin
   end;
 end;
 
-procedure TIBServiceEditorForm.UserNameChange(Sender: TObject);
+procedure TIBXServiceEditorForm.UserNameChange(Sender: TObject);
 begin
   AddParam('user_name', UserName.Text);
 end;
 
-function TIBServiceEditorForm.Edit: Boolean;
+function TIBXServiceEditorForm.Edit: Boolean;
 begin
   if Trim(Service.Params.Text) = '' then
     ServiceParams.Clear
@@ -197,7 +197,7 @@ begin
   end;
 end;
 
-function TIBServiceEditorForm.GetParam(aName: string): string;
+function TIBXServiceEditorForm.GetParam(aName: string): string;
 var
   i: Integer;
 begin
@@ -212,7 +212,7 @@ begin
   end;
 end;
 
-procedure TIBServiceEditorForm.AddParam(aName, Value: string);
+procedure TIBXServiceEditorForm.AddParam(aName, Value: string);
 var
   i: Integer;
   found: boolean;
@@ -237,7 +237,7 @@ begin
     DeleteParam(Name);
 end;
 
-procedure TIBServiceEditorForm.DeleteParam(aName: string);
+procedure TIBXServiceEditorForm.DeleteParam(aName: string);
 var
   i: Integer;
 begin

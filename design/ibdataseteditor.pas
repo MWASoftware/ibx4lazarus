@@ -33,7 +33,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ComCtrls,
   StdCtrls, ExtCtrls, IBSQLEditFrame, IBCustomDataSet,
-  IBDatabase, IBLookupComboEditBox, IBDynamicGrid, Types;
+  IBDatabase, IBLookupComboEditBox, IBDynamicGrid;
 
 type
 
@@ -138,7 +138,6 @@ end;
 { TIBDataSetEditorForm }
 
 procedure TIBDataSetEditorForm.FormShow(Sender: TObject);
-var TableName: string;
 begin
   PageControl.ActivePage := FieldsPage;
   FModifySQL.Assign(FDataSet.ModifySQL);

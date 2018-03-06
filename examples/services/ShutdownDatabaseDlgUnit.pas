@@ -65,8 +65,6 @@ implementation
 
 {$R *.lfm}
 
-uses IBErrorCodes;
-
 resourcestring
   sWaitStatusMsg = 'Waiting for %s to shutdown';
   sDatabaseShutdown  = 'Database has been successfully shutdown';
@@ -128,7 +126,6 @@ end;
 
 constructor TShutdownWaitThread.Create(aService: TIBXConfigService;
   Options: TDBShutdownMode; Wait: Integer; OnCompleted: TNotifyEvent);
-var Password: string;
 begin
   inherited Create(false);
   FOptions := Options;

@@ -1,9 +1,9 @@
-object IBServiceEditorForm: TIBServiceEditorForm
+object IBXServiceEditorForm: TIBXServiceEditorForm
   Left = 761
   Height = 340
   Top = 285
   Width = 438
-  Caption = 'Service Editor'
+  Caption = 'Services Connection Editor'
   ClientHeight = 340
   ClientWidth = 438
   Position = poScreenCenter

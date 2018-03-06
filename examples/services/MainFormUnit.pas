@@ -131,6 +131,8 @@ begin
   {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
   FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
   FDBName := sDefaultDatabaseName;
+
+  {Open the Services API connection }
   with IBXServicesConnection1 do
   begin
     while not Connected do
@@ -149,9 +151,9 @@ begin
     end; {Loop until logged in or user cancels}
   end;
 
+  {Now display the server properties}
   with IBServerProperties1, ServicesConnection do
   begin
-    {Display the server properties}
     Memo1.Lines.Add('Server Version = ' + VersionInfo.ServerVersion);
     Memo1.Lines.Add('Server Implementation = ' + VersionInfo.ServerImplementation);
     Memo1.Lines.Add('Service Version = ' + IntToStr(VersionInfo.ServiceVersion));
@@ -366,10 +368,7 @@ begin
     if not IsDatabaseOnline then
       MessageDlg('Database is already shutdown!',mtInformation,[mbOK],0)
     else
-    begin
-      ShutdownDatabaseDlg.IBConfigService.DatabaseName := DBName;
       ShutdownDatabaseDlg.Shutdown(DBName,FShutDownMode,FDelay);
-    end;
   end;
 end;
 

@@ -203,6 +203,15 @@ type
    function GetVerbCount: Integer; override;
   end;
 
+  { TIBXServiceEditor }
+
+  TIBXServiceEditor = class(TComponentEditor)
+  public
+    procedure ExecuteVerb(Index: Integer); override;
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+  end;
+
   TIBStoredProcParamsProperty = class(TCollectionPropertyEditor)
   end;
 
@@ -407,7 +416,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet, FBMessages,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
      IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
      IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport, IBDSDialogs,
-     IBArrayGrid, IBVersion, IBDataOutput;
+     IBArrayGrid, IBVersion, IBDataOutput, IBXServiceEditor;
 
 const
   IBPalette1 = 'Firebird'; {do not localize}
@@ -498,6 +507,7 @@ begin
   RegisterComponentEditor(TIBSQL, TIBSQLEditor);
   RegisterComponentEditor(TIBCustomService, TIBServiceEditor);
   RegisterComponentEditor(TIBArrayGrid, TIBArrayGridEditor);
+  RegisterComponentEditor(TIBXServicesConnection, TIBXServiceEditor);
 
 
   {Firebird Data Access Controls}
@@ -535,6 +545,38 @@ begin
       end;
     end;
   end;
+end;
+
+{ TIBXServiceEditor }
+
+procedure TIBXServiceEditor.ExecuteVerb(Index: Integer);
+begin
+  if Index < inherited GetVerbCount then
+    inherited ExecuteVerb(Index) else
+  begin
+    Dec(Index, inherited GetVerbCount);
+    case Index of
+      0 : if IBXServiceEditor.EditIBXService(TIBXServicesConnection(Component)) then Designer.Modified;
+    end;
+  end;
+end;
+
+function TIBXServiceEditor.GetVerb(Index: Integer): string;
+begin
+  if Index < inherited GetVerbCount then
+    Result := inherited GetVerb(Index) else
+  begin
+    Dec(Index, inherited GetVerbCount);
+    case Index of
+      0: Result := SIBServiceEditor;
+      1 : Result := SInterbaseExpressVersion;
+    end;
+  end;
+end;
+
+function TIBXServiceEditor.GetVerbCount: Integer;
+begin
+  Result := inherited GetVerbCount + 2;
 end;
 
 { TIBUpdateRefreshSQLProperty }

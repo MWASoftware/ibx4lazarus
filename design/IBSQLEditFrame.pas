@@ -32,7 +32,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, LResources, Forms,
   Controls, ActnList, Menus, Dialogs, ComCtrls, ExtCtrls, StdCtrls, IBQuery,
-  IBSQL, IBDatabase, IBUpdate, IBDatabaseInfo, IBLookupComboEditBox,
+  IBSQL, IBDatabase, IBUpdate, IBDatabaseInfo,
   IBCustomDataset, db, LazSynTextArea, IB;
 
 type
@@ -702,7 +702,6 @@ procedure TIBSQLEditFrame.GenerateModifySQL(QuotedStrings: boolean;
 var FieldNames: TStrings;
     ReadOnlyFieldNames: TStrings;
     UpdateFields: TStrings;
-    i, index: integer;
 begin
   SQL.Clear;
   FieldNames := TStringList.Create;

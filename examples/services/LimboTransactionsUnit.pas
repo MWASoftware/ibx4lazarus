@@ -32,7 +32,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  Grids, ActnList, db, IBXServices, IBDynamicGrid;
+  ActnList, db, IBXServices, IBDynamicGrid;
 
 type
   { TLimboTransactionsForm }
@@ -76,8 +76,6 @@ var
 implementation
 
 {$R *.lfm}
-
-uses MainFormUnit;
 
 { TLimboTransactionsForm }
 
