@@ -2,13 +2,13 @@
   This source is only used to compile and install the package.
  }
 
-unit ibexpress;
+unit ibLegacyServices;
 
 {$warn 5023 off : no warning about unused units}
 interface
 
 uses
-  IBDialogs;
+  IBServices;
 
 implementation
 

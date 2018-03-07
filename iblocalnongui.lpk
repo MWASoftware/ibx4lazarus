@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <Package Version="4">
-    <Name Value="iblocaldb"/>
-    <Type Value="RunAndDesignTime"/>
+    <Name Value="iblocalnongui"/>
+    <Type Value="RunTimeOnly"/>
     <Author Value="MWA Software"/>
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
-        <OtherUnitFiles Value="iblocaldb/gui"/>
-        <UnitOutputDirectory Value="iblocaldb/gui/lib/$(TargetCPU)-$(TargetOS)"/>
+        <OtherUnitFiles Value="iblocaldb/nongui"/>
+        <UnitOutputDirectory Value="iblocaldb/nongui/lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>
         <CompilerMessages>
@@ -42,38 +42,26 @@
  *
 "/>
     <Version Major="2" Minor="2"/>
-    <Files Count="6">
+    <Files Count="3">
       <Item1>
-        <Filename Value="iblocaldb/gui/IBLocalDBSupport.pas"/>
-        <UnitName Value="IBLocalDBSupport"/>
+        <Filename Value="iblocaldb/nongui/IBCMLocalDBSupport.pas"/>
+        <UnitName Value="IBCMLocalDBSupport"/>
       </Item1>
       <Item2>
-        <Filename Value="iblocaldb/gui/IBXCreateDatabaseDlg.pas"/>
-        <UnitName Value="IBXCreateDatabaseDlg"/>
+        <Filename Value="iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
+        <UnitName Value="IBXCustomIBLocalDBSupport"/>
       </Item2>
       <Item3>
-        <Filename Value="iblocaldb/gui/IBXCreateDatabaseFromSQLDlgUnit.pas"/>
-        <UnitName Value="IBXCreateDatabaseFromSQLDlgUnit"/>
+        <Filename Value="iblocaldb/nongui/IBXUpgradeConfFile.pas"/>
+        <UnitName Value="IBXUpgradeConfFile"/>
       </Item3>
-      <Item4>
-        <Filename Value="iblocaldb/gui/IBXSaveDatabaseDlg.pas"/>
-        <UnitName Value="IBXSaveDatabaseDlg"/>
-      </Item4>
-      <Item5>
-        <Filename Value="iblocaldb/gui/IBXUpgradeDatabaseDlg.pas"/>
-        <UnitName Value="IBXUpgradeDatabaseDlg"/>
-      </Item5>
-      <Item6>
-        <Filename Value="iblocaldb/gui/IBXViewLogDig.pas"/>
-        <UnitName Value="IBXViewLogDig"/>
-      </Item6>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="LCL"/>
+        <PackageName Value="LCLBase"/>
       </Item1>
       <Item2>
-        <PackageName Value="iblocalnongui"/>
+        <PackageName Value="ibnongui"/>
       </Item2>
       <Item3>
         <PackageName Value="FCL"/>

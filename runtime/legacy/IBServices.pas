@@ -52,7 +52,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, IB, IBExternals, CustApp, IBTypes;
+  SysUtils, Classes, IB, IBExternals, CustApp, IBTypes, IBSQLMonitor;
 
 const
   DefaultBufferSize = 32000;
@@ -101,7 +101,7 @@ type
 
   { TIBCustomService }
 
-  TIBCustomService = class(TComponent)
+  TIBCustomService = class(TIBMonitoredService)
   private
     FParamsChanged : Boolean;
     FPortNo: string;
@@ -574,7 +574,7 @@ type
 implementation
 
 uses
-  IBSQLMonitor, FBMessages, RegExpr;
+  FBMessages, RegExpr;
 
 { TIBOnlineValidationService }
 

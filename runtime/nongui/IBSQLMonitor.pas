@@ -46,7 +46,7 @@ unit IBSQLMonitor;
 interface
 
 uses
-  IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase, IBServices, DB,
+  IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase,  DB,
   IBTypes ,SysUtils,  Classes,
 {$IFDEF WINDOWS }
   Windows
@@ -106,6 +106,13 @@ type
     property Enabled;
   end;
 
+  TIBMonitoredService = class(TComponent)
+  private
+    FTraceFlags: TTraceFlags;
+  protected
+    property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
+  end;
+
   { TIBXMonitoredService }
 
   TIBXMonitoredService = class(TComponent)
@@ -137,10 +144,10 @@ type
     procedure TRCommitRetaining(tr: TIBTransaction); 
     procedure TRRollback(tr: TIBTransaction);
     procedure TRRollbackRetaining(tr: TIBTransaction);
-    procedure ServiceAttach(service: TIBCustomService); overload;
-    procedure ServiceDetach(service: TIBCustomService); overload;
-    procedure ServiceQuery(service: TIBCustomService); overload;
-    procedure ServiceStart(service: TIBCustomService); overload;
+    procedure ServiceAttach(service: TIBMonitoredService); overload;
+    procedure ServiceDetach(service: TIBMonitoredService); overload;
+    procedure ServiceQuery(service: TIBMonitoredService); overload;
+    procedure ServiceStart(service: TIBMonitoredService); overload;
     procedure ServiceAttach(service: TIBXMonitoredConnection); overload;
     procedure ServiceDetach(service: TIBXMonitoredConnection); overload;
     procedure ServiceQuery(service: TIBXMonitoredService); overload;
@@ -235,10 +242,10 @@ type
     procedure TRCommitRetaining(tr: TIBTransaction); virtual;
     procedure TRRollback(tr: TIBTransaction); virtual;
     procedure TRRollbackRetaining(tr: TIBTransaction); virtual;
-    procedure ServiceAttach(service: TIBCustomService); virtual; overload;
-    procedure ServiceDetach(service: TIBCustomService); virtual; overload;
-    procedure ServiceQuery(service: TIBCustomService); virtual;  overload;
-    procedure ServiceStart(service: TIBCustomService); virtual;  overload;
+    procedure ServiceAttach(service: TIBMonitoredService); virtual; overload;
+    procedure ServiceDetach(service: TIBMonitoredService); virtual; overload;
+    procedure ServiceQuery(service: TIBMonitoredService); virtual;  overload;
+    procedure ServiceStart(service: TIBMonitoredService); virtual;  overload;
     procedure ServiceAttach(service: TIBXMonitoredConnection); virtual; overload;
     procedure ServiceDetach(service: TIBXMonitoredConnection); virtual; overload;
     procedure ServiceQuery(service: TIBXMonitoredService); virtual;  overload;
@@ -459,7 +466,7 @@ begin
   end;
 end;
 
-procedure TIBSQLMonitorHook.ServiceAttach(service: TIBCustomService);
+procedure TIBSQLMonitorHook.ServiceAttach(service: TIBMonitoredService);
 var
   st: String;
 begin
@@ -472,7 +479,7 @@ begin
   end;
 end;
 
-procedure TIBSQLMonitorHook.ServiceDetach(service: TIBCustomService);
+procedure TIBSQLMonitorHook.ServiceDetach(service: TIBMonitoredService);
 var
   st: String;
 begin
@@ -485,7 +492,7 @@ begin
   end;
 end;
 
-procedure TIBSQLMonitorHook.ServiceQuery(service: TIBCustomService);
+procedure TIBSQLMonitorHook.ServiceQuery(service: TIBMonitoredService);
 var
   st: String;
 begin
@@ -498,7 +505,7 @@ begin
   end;
 end;
 
-procedure TIBSQLMonitorHook.ServiceStart(service: TIBCustomService);
+procedure TIBSQLMonitorHook.ServiceStart(service: TIBMonitoredService);
 var
   st: String;
 begin

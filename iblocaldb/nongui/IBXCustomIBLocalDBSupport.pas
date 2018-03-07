@@ -30,8 +30,8 @@ unit IBXCustomIBLocalDBSupport;
 interface
 
 uses
-  Classes,  IBDatabase, SysUtils, IBServices, IBXUpgradeConfFile, ibxscript,
-  IB;
+  Classes,  IBDatabase, SysUtils, IBXUpgradeConfFile, ibxscript,
+  IB, IBXServices;
 
 type
 
@@ -88,6 +88,7 @@ type
   TCustomIBLocalDBSupport = class(TComponent)
   private
     { Private declarations }
+    FServicesConnection: TIBXServicesConnection;
     FActiveDatabasePathName: string;
     FCurrentDBVersionNo: integer;
     FEmptyDBArchive: string;
@@ -114,13 +115,11 @@ type
     FSavedBeforeConnect: TNotifyEvent;
     FSavedBeforeDisconnect: TNotifyEvent;
     procedure CheckEnabled;
-    procedure CreateDatabase(DBName: string; DBParams: TStrings; Overwrite: boolean);
+    procedure CreateDatabase(DBName: string; Overwrite: boolean);
     function GetDatabase: TIBDatabase;
     function GetSharedDataDir: string;
     procedure SetDatabase(AValue: TIBDatabase);
     function GetDBNameAndPath: string;
-    procedure InitDatabaseParameters(DBParams: TStrings;
-                              var DBName: string);
     function MapSharedDataDir(aDataDir: string): string;
     procedure OnBeforeDatabaseConnect(Sender: TObject; DBParams: TStrings;
                               var DBName: string);
@@ -138,14 +137,15 @@ type
     function AllowInitialisation: boolean; virtual;
     function AllowRestore: boolean; virtual;
     procedure CreateDir(DirName: string);
-    function InternalCreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; virtual; abstract;
-    function CreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean;
+    procedure InitServicesConnection(DatabaseName: string);
+    function InternalCreateNewDatabase(DBName:string; DBArchive: string): boolean; virtual; abstract;
+    function CreateNewDatabase(DBName: string; DBArchive: string): boolean;
     procedure Downgrade(DBArchive: string); virtual;
     procedure DowngradeDone;
     procedure Loaded; override;
-    function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; virtual; abstract;
+    function RestoreDatabaseFromArchive(DBName:string; aFilename: string): boolean; virtual; abstract;
     function RunUpgradeDatabase(TargetVersionNo: integer): boolean; virtual; abstract;
-    function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean; virtual; abstract;
+    function SaveDatabaseToArchive(DBName: string;  aFilename: string): boolean; virtual; abstract;
     function UpdateVersionNo: boolean;
     property DownGradeArchive: string read FDownGradeArchive;
     property UpgradeConf: TUpgradeConfFile read FUpgradeConf;
@@ -179,6 +179,7 @@ type
     property ActiveDatabasePathName: string read FActiveDatabasePathName;
     property CurrentDBVersionNo: integer read FCurrentDBVersionNo;
     property SharedDataDir: string read GetSharedDataDir;
+    property ServicesConnection: TIBXServicesConnection read FServicesConnection;
 
     { Likely to be Published declarations }
     property Database: TIBDatabase read GetDatabase write SetDatabase;
@@ -201,7 +202,7 @@ type
 implementation
 
 {$IFDEF Unix} uses initc, regexpr {$ENDIF}
-{$IFDEF WINDOWS} uses Windows ,Windirs {$ENDIF};
+{$IFDEF WINDOWS} uses Windows ,Windirs {$ENDIF}, IBUtils;
 
 resourcestring
   sNoDowngrade = 'Database Schema is %d. Unable to downgrade to version %d';
@@ -220,7 +221,7 @@ begin
     raise EIBLocalException.Create(sLocalDBDisabled);
 end;
 
-procedure TCustomIBLocalDBSupport.CreateDatabase(DBName: string; DBParams: TStrings;
+procedure TCustomIBLocalDBSupport.CreateDatabase(DBName: string;
   Overwrite: boolean);
 var DBArchive: string;
 begin
@@ -245,7 +246,7 @@ begin
  SetupFirebirdEnv;
  SaveEvents;
  try
-   if not CreateNewDatabase(DBName,DBParams,DBArchive) then
+   if not CreateNewDatabase(DBName,DBArchive) then
    begin
      Database.Connected := true;
      Database.DropDatabase;
@@ -329,7 +330,9 @@ begin
   if not FirebirdAPI.IsEmbeddedServer then
      raise EIBLocalFatalError.Create(sNoEmbeddedServer);
 
-  InitDatabaseParameters(DBParams,DBName);
+  DBName := GetDBNameAndPath;
+  if not FileExists(DBName) then
+    CreateDatabase(DBName,false);
   FActiveDatabasePathName := DBName;
   SetupFirebirdEnv;
 end;
@@ -434,16 +437,43 @@ begin
     mkdir(DirName);
 end;
 
-function TCustomIBLocalDBSupport.CreateNewDatabase(DBName: string;
-  DBParams: TStrings; DBArchive: string): boolean;
+procedure TCustomIBLocalDBSupport.InitServicesConnection(DatabaseName: string);
+var aServerName, aDBName: string;
+    aProtocol: TProtocolAll;
+    aPortNo: string;
+    TempDBParams: TStringList;
+begin
+  if FServicesConnection = nil then
+    FServicesConnection := TIBXServicesConnection.Create(self);
+  FServicesConnection.LoginPrompt := false;
+  if ParseConnectString(DatabaseName,aServerName,aDBName,aProtocol,aPortNo) then
+  begin
+    FServicesConnection.ServerName := aServerName;
+    FServicesConnection.Protocol := aProtocol;
+    FServicesConnection.PortNo := aPortNo;
+    TempDBParams := TStringList.Create;
+    try
+      TempDBParams.Assign(Database.Params);
+      PrepareDBParams(TempDBParams);
+      FServicesConnection.SetDBParams(TempDBParams);
+    finally
+      TempDBParams.Free;
+    end;
+    FServicesConnection.Connected := true;
+  end;
+end;
+
+function TCustomIBLocalDBSupport.CreateNewDatabase(DBName: string; DBArchive: string): boolean;
 begin
   Result := false;
   if FInCreateNew then Exit;
   FInCreateNew := true;
+  InitServicesConnection(DBName);
   try
-    Result := InternalCreateNewDatabase(DBName,DBParams,DBArchive);
+    Result := InternalCreateNewDatabase(DBName,DBArchive);
   finally
     FInCreateNew := false;
+    ServicesConnection.Connected := false;
   end;
 end;
 
@@ -532,20 +562,12 @@ begin
 end;
 
 procedure TCustomIBLocalDBSupport.NewDatabase;
-var TempDBParams: TStringList;
 begin
   CheckEnabled;
   if not AllowInitialisation then Exit;
 
-  TempDBParams := TStringList.Create;
-  try
-   TempDBParams.Assign(Database.Params);
-   Database.Connected := false;
-   PrepareDBParams(TempDBParams);
-   CreateDatabase(Database.DatabaseName,TempDBParams,true);
-  finally
-    TempDBParams.Free;
-  end;
+  Database.Connected := false;
+  CreateDatabase(Database.DatabaseName,true);
   Database.Connected := true;
 end;
 
@@ -579,22 +601,18 @@ begin
     FUpgradeConf.CheckUpgradeAvailable(TargetVersionNo);
     FInUpgrade := true;
     try
-      RunUpgradeDatabase(TargetVersionNo);
+      InitServicesConnection(Database.DatabaseName);
+      try
+        RunUpgradeDatabase(TargetVersionNo);
+      finally
+        ServicesConnection.Connected := false;
+      end;
     finally
       FInUpgrade := false;
     end;
   finally
     FreeAndNil(FUpgradeConf);
   end;
-end;
-
-procedure TCustomIBLocalDBSupport.InitDatabaseParameters(DBParams: TStrings;
-  var DBName: string);
-begin
-    PrepareDBParams(DBParams);
-    DBName := GetDBNameAndPath;
-    if not FileExists(DBName) then
-      CreateDatabase(DBName,DBParams,false);
 end;
 
 procedure TCustomIBLocalDBSupport.Loaded;
@@ -608,34 +626,28 @@ begin
 end;
 
 procedure TCustomIBLocalDBSupport.RestoreDatabase(filename: string);
-var TempDBParams: TStringList;
 begin
   CheckEnabled;
   if not AllowRestore then Exit;
 
-  TempDBParams := TStringList.Create;
+  InitServicesConnection(Database.DatabaseName);
+  Database.Connected := false;
   try
-   TempDBParams.Assign(Database.Params);
-   PrepareDBParams(TempDBParams);
-   Database.Connected := false;
-   RestoreDatabaseFromArchive(Database.DatabaseName,TempDBParams,filename);
+    RestoreDatabaseFromArchive(Database.DatabaseName,filename);
   finally
-    TempDBParams.Free;
+    ServicesConnection.Connected := false;
+    Database.Connected := true;
   end;
-  Database.Connected := true;
 end;
 
 procedure TCustomIBLocalDBSupport.SaveDatabase(filename: string);
-var TempDBParams: TStringList;
 begin
   CheckEnabled;
-  TempDBParams := TStringList.Create;
+  InitServicesConnection(Database.DatabaseName);
   try
-   TempDBParams.Assign(Database.Params);
-   PrepareDBParams(TempDBParams);
-   SaveDatabaseToArchive(Database.DatabaseName,TempDBParams,filename);
+    SaveDatabaseToArchive(Database.DatabaseName,filename);
   finally
-    TempDBParams.Free;
+    ServicesConnection.Connected := false;
   end;
 end;
 

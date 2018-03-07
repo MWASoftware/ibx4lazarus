@@ -3,13 +3,13 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="83">
+    <Units Count="92">
       <Unit0>
         <Filename Value="DBAdmin.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos Y="26"/>
-        <UsageCount Value="125"/>
+        <UsageCount Value="127"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainFormUnit.pas"/>
@@ -17,10 +17,9 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="348"/>
         <CursorPos X="33" Y="361"/>
-        <UsageCount Value="125"/>
+        <UsageCount Value="127"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -33,7 +32,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1313"/>
         <CursorPos Y="1349"/>
-        <UsageCount Value="125"/>
+        <UsageCount Value="127"/>
       </Unit2>
       <Unit3>
         <Filename Value="dlg/DBLoginDlgUnit.pas"/>
@@ -44,7 +43,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
         <CursorPos X="75" Y="48"/>
-        <UsageCount Value="125"/>
+        <UsageCount Value="127"/>
       </Unit3>
       <Unit4>
         <Filename Value="dlg/ShutdownDatabaseDlgUnit.pas"/>
@@ -54,7 +53,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="51" Y="58"/>
-        <UsageCount Value="123"/>
+        <UsageCount Value="125"/>
       </Unit4>
       <Unit5>
         <Filename Value="dlg/ShutdownRegDlgUnit.pas"/>
@@ -65,7 +64,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="38"/>
         <CursorPos X="25" Y="73"/>
-        <UsageCount Value="123"/>
+        <UsageCount Value="125"/>
       </Unit5>
       <Unit6>
         <Filename Value="dlg/BackupDlgUnit.pas"/>
@@ -76,7 +75,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="123"/>
         <CursorPos X="50" Y="142"/>
-        <UsageCount Value="121"/>
+        <UsageCount Value="123"/>
       </Unit6>
       <Unit7>
         <Filename Value="dlg/RestoreDlgUnit.pas"/>
@@ -87,7 +86,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="132"/>
         <CursorPos X="60" Y="162"/>
-        <UsageCount Value="121"/>
+        <UsageCount Value="123"/>
       </Unit7>
       <Unit8>
         <Filename Value="dlg/AddSecondaryFileDlgUnit.pas"/>
@@ -97,7 +96,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="60" Y="12"/>
-        <UsageCount Value="120"/>
+        <UsageCount Value="122"/>
       </Unit8>
       <Unit9>
         <Filename Value="dlg/AddShadowSetDlgUnit.pas"/>
@@ -108,7 +107,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="101"/>
         <CursorPos X="18" Y="115"/>
-        <UsageCount Value="119"/>
+        <UsageCount Value="121"/>
       </Unit9>
       <Unit10>
         <Filename Value="dlg/AddShadowFileDlgUnit.pas"/>
@@ -118,7 +117,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="48" Y="77"/>
-        <UsageCount Value="119"/>
+        <UsageCount Value="121"/>
       </Unit10>
       <Unit11>
         <Filename Value="dlg/NewUserDlgUnit.pas"/>
@@ -129,7 +128,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="27"/>
         <CursorPos X="14" Y="47"/>
-        <UsageCount Value="109"/>
+        <UsageCount Value="111"/>
       </Unit11>
       <Unit12>
         <Filename Value="dlg/ChgPasswordDlgUnit.pas"/>
@@ -139,7 +138,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="24"/>
-        <UsageCount Value="109"/>
+        <UsageCount Value="111"/>
       </Unit12>
       <Unit13>
         <Filename Value="dlg/ServicesLoginDlgUnit.pas"/>
@@ -272,8 +271,8 @@
       <Unit31>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1214"/>
-        <CursorPos Y="1227"/>
+        <TopLine Value="910"/>
+        <CursorPos X="24" Y="930"/>
         <UsageCount Value="16"/>
       </Unit31>
       <Unit32>
@@ -638,8 +637,72 @@
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit82>
+      <Unit83>
+        <Filename Value="../../runtime/legacy/IBServices.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="551"/>
+        <CursorPos X="3" Y="577"/>
+        <UsageCount Value="10"/>
+      </Unit83>
+      <Unit84>
+        <Filename Value="../../runtime/IBTypes.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="17"/>
+        <CursorPos X="48" Y="18"/>
+        <UsageCount Value="10"/>
+      </Unit84>
+      <Unit85>
+        <Filename Value="../../runtime/IBSQLMonitor.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="10"/>
+        <CursorPos X="18" Y="40"/>
+        <UsageCount Value="10"/>
+      </Unit85>
+      <Unit86>
+        <Filename Value="../../ibexpress.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="12" Y="11"/>
+        <UsageCount Value="10"/>
+      </Unit86>
+      <Unit87>
+        <Filename Value="../../iblocaldb/IBLocalDBSupport.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="31"/>
+        <UsageCount Value="10"/>
+      </Unit87>
+      <Unit88>
+        <Filename Value="../../iblocaldb/IBCMLocalDBSupport.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="30"/>
+        <UsageCount Value="10"/>
+      </Unit88>
+      <Unit89>
+        <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="13"/>
+        <CursorPos X="35" Y="33"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit89>
+      <Unit90>
+        <Filename Value="../../iblocaldb/nongui/IBCMLocalDBSupport.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="62"/>
+        <CursorPos X="83" Y="82"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit90>
+      <Unit91>
+        <Filename Value="../../iblocaldb/gui/IBLocalDBSupport.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="13"/>
+        <CursorPos X="22" Y="33"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit91>
     </Units>
-    <JumpHistory Count="10" HistoryIndex="9">
+    <JumpHistory Count="15" HistoryIndex="14">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="1049" Column="13" TopLine="1035"/>
@@ -680,6 +743,26 @@
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="368" Column="45" TopLine="348"/>
       </Position10>
+      <Position11>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="361" Column="33" TopLine="348"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
+        <Caret Line="33" Column="35" TopLine="13"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../iblocaldb/nongui/IBCMLocalDBSupport.pas"/>
+        <Caret Line="59" Column="6" TopLine="105"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../iblocaldb/nongui/IBCMLocalDBSupport.pas"/>
+        <Caret Line="93" Column="70" TopLine="74"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../iblocaldb/nongui/IBCMLocalDBSupport.pas"/>
+        <Caret Line="82" Column="83" TopLine="62"/>
+      </Position15>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

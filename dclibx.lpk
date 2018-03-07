@@ -222,29 +222,32 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <UnitName Value="ibserviceeditor"/>
       </Item17>
     </Files>
-    <RequiredPkgs Count="7">
+    <RequiredPkgs Count="8">
       <Item1>
-        <PackageName Value="SynEdit"/>
+        <PackageName Value="ibLegacyServices"/>
       </Item1>
       <Item2>
-        <PackageName Value="iblocaldb"/>
+        <PackageName Value="SynEdit"/>
       </Item2>
       <Item3>
-        <PackageName Value="ibcontrols"/>
+        <PackageName Value="iblocaldb"/>
       </Item3>
       <Item4>
-        <PackageName Value="ibexpress"/>
+        <PackageName Value="ibcontrols"/>
       </Item4>
       <Item5>
-        <PackageName Value="IDEIntf"/>
+        <PackageName Value="ibexpress"/>
       </Item5>
       <Item6>
-        <PackageName Value="LCL"/>
+        <PackageName Value="IDEIntf"/>
       </Item6>
       <Item7>
+        <PackageName Value="LCL"/>
+      </Item7>
+      <Item8>
         <PackageName Value="FCL"/>
         <MinVersion Major="1" Valid="True"/>
-      </Item7>
+      </Item8>
     </RequiredPkgs>
     <UsageOptions>
       <CustomOptions Value="-dUseCThreads 

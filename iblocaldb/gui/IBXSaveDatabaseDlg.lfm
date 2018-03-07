@@ -13,7 +13,7 @@ object SaveDatabaseDlg: TSaveDatabaseDlg
   Font.Name = 'Tahoma'
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.4.4.0'
+  LCLVersion = '1.8.3.0'
   object Panel1: TPanel
     Left = 0
     Height = 117
@@ -37,7 +37,7 @@ object SaveDatabaseDlg: TSaveDatabaseDlg
       Left = 65
       Height = 13
       Top = 38
-      Width = 95
+      Width = 103
       Caption = 'Saving Database'
       Font.Color = clWindowText
       Font.Height = -11
@@ -54,22 +54,20 @@ object SaveDatabaseDlg: TSaveDatabaseDlg
     left = 168
     top = 80
   end
-  object IBBackupService1: TIBBackupService
-    Params.Strings = (
-      ''
-    )
-    LoginPrompt = False
-    TraceFlags = []
-    Verbose = True
-    BlockingFactor = 0
-    Options = []
-    left = 120
-    top = 80
-  end
   object Timer1: TTimer
     Interval = 0
     OnTimer = Timer1Timer
     left = 208
     top = 80
+  end
+  object IBBackupService1: TIBXServerSideBackupService
+    TraceFlags = []
+    OnGetNextLine = IBBackupService1GetNextLine
+    BlockingFactor = 0
+    Options = []
+    StatisticsRequested = []
+    Verbose = True
+    left = 87
+    top = 68
   end
 end

@@ -30,7 +30,7 @@ unit IBCMLocalDBSupport;
 interface
 
 uses
-  Classes, SysUtils, IBXCustomIBLocalDBSupport, ibxscript;
+  Classes, SysUtils, IBXCustomIBLocalDBSupport, ibxscript, IBXServices;
 
 type
   TOnLogMessage = procedure(Sender: TObject; Msg: string) of object;
@@ -46,21 +46,22 @@ type
     procedure WriteLog(Msg: string);
     procedure HandleCreateDatabase(Sender: TObject; var DatabaseFileName: string);
   protected
-    function InternalCreateNewDatabase(DBName:string; DBParams: TStrings; DBArchive: string): boolean; override;
-    function RestoreDatabaseFromArchive(DBName:string; DBParams: TStrings; aFilename: string): boolean; override;
+    function InternalCreateNewDatabase(DBName:string; DBArchive: string): boolean; override;
+    function RestoreDatabaseFromArchive(DBName:string; aFilename: string): boolean; override;
     function RunUpgradeDatabase(TargetVersionNo: integer): boolean; override;
-    function SaveDatabaseToArchive(DBName: string; DBParams:TStrings; aFilename: string): boolean; override;
+    function SaveDatabaseToArchive(DBName: string; aFilename: string): boolean; override;
   public
     property OnLogMessage: TOnLogMessage read FOnLogMessage write FOnLogMessage;
   end;
 
 implementation
 
-uses IBServices, IBXUpgradeConfFile, IBDatabase;
+uses IBXUpgradeConfFile, IBDatabase;
 
 resourcestring
-  sUpdateMsg =       'Applying Update from %s';
-  sCreatingDatabase= 'Creating new Database';
+  sUpdateMsg         = 'Applying Update from %s';
+  sCreatingDatabase  = 'Creating new Database';
+  sBackupDone        = 'Database Archived to %s (%d bytes written)';
 
 { TIBCMLocalDBSupport }
 
@@ -90,7 +91,7 @@ begin
       end;
       Add2Log(self,UpgradeInfo.UserMessage);
       Add2Log(self,Format(sUpdateMsg,[UpgradeInfo.UpdateSQLFile]));
-      if not IBXScript.PerformUpdate(UpgradeInfo.UpdateSQLFile,true) then
+      if not IBXScript.RunScript(UpgradeInfo.UpdateSQLFile) then
        break;
       UpdateVersionNo;
     end;
@@ -110,36 +111,35 @@ begin
 end;
 
 function TIBCMLocalDBSupport.InternalCreateNewDatabase(DBName: string;
-  DBParams: TStrings; DBArchive: string): boolean;
-var Service: TIBRestoreService;
+  DBArchive: string): boolean;
+var Service: TIBXClientSideRestoreService;
     Ext: string;
+    i: integer;
+    OutputLog: TStringList;
 begin
   Result := true;
   CreateDir(ExtractFileDir(DBName));
   Ext := AnsiUpperCase(ExtractFileExt(DBArchive));
   if Ext = '.GBK' then
   begin
-    Service := TIBRestoreService.Create(self);
+    Service := TIBXClientSideRestoreService.Create(self);
     with Service do
     try
-     SetDBParams(DBParams);
-     LoginPrompt := false;
-     BackupFile.Clear;
-     DatabaseName.Clear;
-     Options := [CreateNewDB];
-     BackupFile.Add(DBArchive);
-     DatabaseName.Add(DBName);
-     Active := true;
-     WriteLog(sCreatingDatabase);
-     ServiceStart;
-     try
-       while not Eof do
-         WriteLog(Trim(GetNextLine));
-     finally
-       Active := false
-     end;
+      ServicesConnection := self.ServicesConnection;
+      DatabaseFiles.Clear;
+      Options := [CreateNewDB];
+      DatabaseFiles.Add(DBName);
+      OutputLog := TStringList.Create;
+      try
+        WriteLog(sCreatingDatabase);
+        RestoreFromFile(DBArchive,OutputLog);
+        for i := 0 to OutputLog.Count - 1 do
+          WriteLog(OutputLog[i]);
+      finally
+        OutputLog.Free;
+      end;
     finally
-      Free
+      Free;
     end;
   end
   else
@@ -159,30 +159,29 @@ begin
 end;
 
 function TIBCMLocalDBSupport.RestoreDatabaseFromArchive(DBName: string;
-  DBParams: TStrings; aFilename: string): boolean;
-var Service: TIBRestoreService;
+  aFilename: string): boolean;
+var Service: TIBXClientSideRestoreService;
+    i: integer;
+    OutputLog: TStringList;
 begin
   Result := true;
-  Service := TIBRestoreService.Create(self);
+  Service := TIBXClientSideRestoreService.Create(self);
   with Service do
   try
-    SetDBParams(DBParams);
-    LoginPrompt := false;
-    BackupFile.Clear;
-    DatabaseName.Clear;
+    ServicesConnection := self.ServicesConnection;
+    DatabaseFiles.Clear;
     Options := [replace];
-    BackupFile.Add(aFilename);
-    DatabaseName.Add(DBName);
-    Active := true;
-    ServiceStart;
+    DatabaseFiles.Add(DBName);
+    OutputLog := TStringList.Create;
     try
-      while not Eof do
-        WriteLog(Trim(GetNextLine));
+      RestoreFromFile(aFilename,OutputLog);
+      for i := 0 to OutputLog.Count - 1 do
+        WriteLog(OutputLog[i]);
     finally
-      Active := false
+      OutputLog.Free;
     end;
   finally
-    Free
+    Free;
   end;
 end;
 
@@ -199,6 +198,7 @@ begin
     IBXScript.Transaction := IBTransaction;
     IBXScript.OnErrorLog := @Add2Log;
     IBXScript.OnOutputLog := @Add2Log;
+    IBXScript.AutoDDL := true;
     IBTransaction.DefaultDatabase := Database;
     IBTransaction.Params.Clear;
     IBTransaction.Params.Add('concurrency');
@@ -214,28 +214,20 @@ begin
 end;
 
 function TIBCMLocalDBSupport.SaveDatabaseToArchive(DBName: string;
-  DBParams: TStrings; aFilename: string): boolean;
-var Service: TIBBackupService;
+  aFilename: string): boolean;
+var Service: TIBXClientSideBackupService;
+    BackupCount: integer;
 begin
   Result := true;
-  Service := TIBBackupService.Create(self);
+  Service := TIBXClientSideBackupService.Create(self);
   with Service do
   try
-   SetDBParams(DBParams);
-   LoginPrompt := false;
-   BackupFile.Clear;
+   ServicesConnection := self.ServicesConnection;
    DatabaseName := DBName;
-   BackupFile.Add(aFilename);
-   Active := true;
-   ServiceStart;
-   try
-     while not Eof do
-       WriteLog(Trim(GetNextLine));
-   finally
-     Active := false
-   end;
+   BackupToFile(aFilename, BackupCount);
+   WriteLog(Format(sBackupDone,[aFileName,BackupCount]));
   finally
-    Free
+    Free;
   end;
 end;
 

@@ -13,7 +13,7 @@ object CreateDatabaseDlg: TCreateDatabaseDlg
   Font.Name = 'Tahoma'
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.4.4.0'
+  LCLVersion = '1.8.3.0'
   object Panel1: TPanel
     Left = 0
     Height = 118
@@ -38,7 +38,7 @@ object CreateDatabaseDlg: TCreateDatabaseDlg
       Left = 57
       Height = 13
       Top = 32
-      Width = 131
+      Width = 143
       Caption = 'Creating New Database'
       Font.Color = clWindowText
       Font.Height = -11
@@ -47,18 +47,6 @@ object CreateDatabaseDlg: TCreateDatabaseDlg
       ParentColor = False
       ParentFont = False
     end
-  end
-  object IBRestoreService1: TIBRestoreService
-    Params.Strings = (
-      ''
-    )
-    LoginPrompt = False
-    TraceFlags = []
-    Verbose = True
-    PageSize = 0
-    PageBuffers = 0
-    left = 64
-    top = 8
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = '.fdb'
@@ -72,5 +60,15 @@ object CreateDatabaseDlg: TCreateDatabaseDlg
     OnTimer = Timer1Timer
     left = 210
     top = 10
+  end
+  object IBRestoreService1: TIBXServerSideRestoreService
+    TraceFlags = []
+    OnGetNextLine = IBRestoreService1GetNextLine
+    PageSize = 0
+    PageBuffers = 0
+    StatisticsRequested = []
+    Verbose = True
+    left = 176
+    top = 64
   end
 end

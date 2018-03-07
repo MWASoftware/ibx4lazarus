@@ -31,20 +31,21 @@ interface
 
 uses
   LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, IBServices, StdCtrls, ExtCtrls;
+  Dialogs, IBXServices, StdCtrls, ExtCtrls;
 
 type
 
   { TCreateDatabaseDlg }
 
   TCreateDatabaseDlg = class(TForm)
-    IBRestoreService1: TIBRestoreService;
+    IBRestoreService1: TIBXServerSideRestoreService;
     Panel1: TPanel;
     Status: TLabel;
     Label1: TLabel;
     OpenDialog1: TOpenDialog;
     Timer1: TTimer;
     procedure FormShow(Sender: TObject);
+    procedure IBRestoreService1GetNextLine(Sender: TObject; var Line: string);
     procedure Timer1Timer(Sender: TObject);
   private
     { Private declarations }
@@ -56,13 +57,15 @@ type
 var
   CreateDatabaseDlg: TCreateDatabaseDlg;
 
-function RestoreDatabaseFromArchive(DBName: string; DBParams: TStrings; aFilename: string): boolean;
+function RestoreDatabaseFromArchive(DBName: string;
+   aServicesConnection: TIBXServicesConnection;  aFilename: string): boolean;
 
-function CreateNewDatabase(DBName: string; DBParams: TStrings; DBArchive: string): boolean;
+function CreateNewDatabase(DBName: string;
+   aServicesConnection: TIBXServicesConnection;  DBArchive: string): boolean;
 
 implementation
 
-function RestoreDatabaseFromArchive(DBName: string; DBParams: TStrings;
+function RestoreDatabaseFromArchive(DBName: string; aServicesConnection: TIBXServicesConnection;
   aFilename: string): boolean;
 begin
  with TCreateDatabaseDlg.Create(Application) do
@@ -75,29 +78,29 @@ begin
     else
       Exit;
    end;
-   IBRestoreService1.SetDBParams(DBParams);
-   IBRestoreService1.BackupFile.Clear;
-   IBRestoreService1.DatabaseName.Clear;
+   IBRestoreService1.ServicesConnection := aServicesConnection;
+   IBRestoreService1.BackupFiles.Clear;
+   IBRestoreService1.DatabaseFiles.Clear;
    IBRestoreService1.Options := [replace];
-   IBRestoreService1.BackupFile.Add(aFilename);
-   IBRestoreService1.DatabaseName.Add(DBName);
+   IBRestoreService1.BackupFiles.Add(aFilename);
+   IBRestoreService1.DatabaseFiles.Add(DBName);
    Result := ShowModal = mrOK;
  finally
    Free
  end;
 end;
 
-function CreateNewDatabase(DBName: string; DBParams: TStrings; DBArchive: string
-  ): boolean;
+function CreateNewDatabase(DBName: string;
+  aServicesConnection: TIBXServicesConnection;  DBArchive: string): boolean;
 begin
  with TCreateDatabaseDlg.Create(Application) do
  try
-  IBRestoreService1.SetDBParams(DBParams);
-  IBRestoreService1.BackupFile.Clear;
-  IBRestoreService1.DatabaseName.Clear;
+  IBRestoreService1.ServicesConnection := aServicesConnection;
+  IBRestoreService1.BackupFiles.Clear;
+  IBRestoreService1.DatabaseFiles.Clear;
   IBRestoreService1.Options := [CreateNewDB];
-  IBRestoreService1.BackupFile.Add(DBArchive);
-  IBRestoreService1.DatabaseName.Add(DBName);
+  IBRestoreService1.BackupFiles.Add(DBArchive);
+  IBRestoreService1.DatabaseFiles.Add(DBName);
   Result := ShowModal = mrOK;
  finally
    Free
@@ -112,10 +115,17 @@ begin
  Application.QueueAsyncCall(@DoRestore,0)
 end;
 
+procedure TCreateDatabaseDlg.IBRestoreService1GetNextLine(Sender: TObject;
+  var Line: string);
+begin
+  Status.Caption := Line;
+  Application.ProcessMessages;
+end;
+
 procedure TCreateDatabaseDlg.Timer1Timer(Sender: TObject);
 begin
   Timer1.Interval := 0;
-  if FileExists(IBRestoreService1.DatabaseName[0]) then
+  if FileExists(IBRestoreService1.DatabaseFiles[0]) then
   begin
     ModalResult := mrOK
   end
@@ -126,18 +136,8 @@ end;
 procedure TCreateDatabaseDlg.DoRestore(Data: PtrInt);
 begin
  try
-  IBRestoreService1.Active := true;
-  IBRestoreService1.ServiceStart;
-  try
-    while not IBRestoreService1.Eof do
-    begin
-      Status.Caption := Trim(IBRestoreService1.GetNextLine);
-      Application.ProcessMessages
-    end;
-  finally
-    IBRestoreService1.Active := false
-  end;
-  Timer1.Interval := 500;
+   IBRestoreService1.Execute(nil);
+   Timer1.Interval := 500;
  except on E:Exception do
    raise
  end;

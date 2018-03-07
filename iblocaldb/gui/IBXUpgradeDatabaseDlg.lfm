@@ -10,7 +10,7 @@ object UpgradeDatabaseDlg: TUpgradeDatabaseDlg
   ClientWidth = 324
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.0.5'
+  LCLVersion = '1.8.3.0'
   object Panel1: TPanel
     Left = 0
     Height = 132

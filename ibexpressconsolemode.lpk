@@ -7,8 +7,7 @@
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
-        <OtherUnitFiles Value="runtime;iblocaldb"/>
-        <UnitOutputDirectory Value="runtime/lib/$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="consolemode/lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Parsing>
         <SyntaxOptions>
@@ -152,90 +151,12 @@ II.1. Advertising Materials. All advertising materials mentioning features or us
 II.2. Endorsements. The names &quot;Inprise,&quot; &quot;InterBase,&quot; &quot;ISC,&quot; and &quot;IB&quot; must not be used to endorse or promote Contributor Versions or Larger Works without the prior written permission of Inprise.
 II.3. Product Names. Contributor Versions and Larger Works may not be called &quot;Inprise&quot; or &quot;InterBase&quot; nor may the words &quot;Inprise&quot; or &quot;InterBase&quot; appear in their names without the prior written permission of Inprise Corporation."/>
     <Version Major="2" Minor="2"/>
-    <Files Count="19">
-      <Item1>
-        <Filename Value="runtime/IBBatchMove.pas"/>
-        <UnitName Value="IBBatchMove"/>
-      </Item1>
-      <Item2>
-        <Filename Value="runtime/IBBlob.pas"/>
-        <UnitName Value="IBBlob"/>
-      </Item2>
-      <Item3>
-        <Filename Value="runtime/IBCustomDataSet.pas"/>
-        <UnitName Value="IBCustomDataSet"/>
-      </Item3>
-      <Item4>
-        <Filename Value="runtime/IBDatabase.pas"/>
-        <UnitName Value="IBDatabase"/>
-      </Item4>
-      <Item5>
-        <Filename Value="runtime/IBEvents.pas"/>
-        <UnitName Value="IBEvents"/>
-      </Item5>
-      <Item6>
-        <Filename Value="runtime/IBExtract.pas"/>
-        <UnitName Value="IBExtract"/>
-      </Item6>
-      <Item7>
-        <Filename Value="runtime/IBQuery.pas"/>
-        <UnitName Value="IBQuery"/>
-      </Item7>
-      <Item8>
-        <Filename Value="runtime/IBServices.pas"/>
-        <UnitName Value="IBServices"/>
-      </Item8>
-      <Item9>
-        <Filename Value="runtime/IBSQL.pas"/>
-        <UnitName Value="IBSQL"/>
-      </Item9>
-      <Item10>
-        <Filename Value="runtime/IBStoredProc.pas"/>
-        <UnitName Value="IBStoredProc"/>
-      </Item10>
-      <Item11>
-        <Filename Value="runtime/IBDatabaseInfo.pas"/>
-        <UnitName Value="IBDatabaseInfo"/>
-      </Item11>
-      <Item12>
-        <Filename Value="runtime/IBUpdateSQL.pas"/>
-        <UnitName Value="IBUpdateSQL"/>
-      </Item12>
-      <Item13>
-        <Filename Value="runtime/IBTable.pas"/>
-        <UnitName Value="IBTable"/>
-      </Item13>
-      <Item14>
-        <Filename Value="runtime/IBSQLMonitor.pas"/>
-        <UnitName Value="IBSQLMonitor"/>
-      </Item14>
-      <Item15>
-        <Filename Value="runtime/IBSQLParser.pas"/>
-        <UnitName Value="IBSQLParser"/>
-      </Item15>
-      <Item16>
-        <Filename Value="runtime/ibxscript.pas"/>
-        <UnitName Value="ibxscript"/>
-      </Item16>
-      <Item17>
-        <Filename Value="iblocaldb/IBCMLocalDBSupport.pas"/>
-        <UnitName Value="IBCMLocalDBSupport"/>
-      </Item17>
-      <Item18>
-        <Filename Value="runtime/IBVersion.pas"/>
-        <UnitName Value="IBVersion"/>
-      </Item18>
-      <Item19>
-        <Filename Value="runtime/IBDataOutput.pas"/>
-        <UnitName Value="IBDataOutput"/>
-      </Item19>
-    </Files>
     <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="fbintf"/>
+        <PackageName Value="iblocalnongui"/>
       </Item1>
       <Item2>
-        <PackageName Value="LazUtils"/>
+        <PackageName Value="ibnongui"/>
       </Item2>
       <Item3>
         <PackageName Value="FCL"/>

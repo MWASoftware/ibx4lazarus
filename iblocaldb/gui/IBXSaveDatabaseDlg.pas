@@ -31,20 +31,21 @@ interface
 
 uses
   LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, IBServices, StdCtrls, ExtCtrls;
+  Dialogs, IBXServices, StdCtrls, ExtCtrls;
 
 type
 
   { TSaveDatabaseDlg }
 
   TSaveDatabaseDlg = class(TForm)
+    IBBackupService1: TIBXServerSideBackupService;
     Panel1: TPanel;
     Status: TLabel;
     Label1: TLabel;
     SaveDialog1: TSaveDialog;
-    IBBackupService1: TIBBackupService;
     Timer1: TTimer;
     procedure FormShow(Sender: TObject);
+    procedure IBBackupService1GetNextLine(Sender: TObject; var Line: string);
     procedure Timer1Timer(Sender: TObject);
   private
     { Private declarations }
@@ -56,7 +57,8 @@ type
 var
   SaveDatabaseDlg: TSaveDatabaseDlg;
 
-function SaveDatabaseToArchive(DBName: string;  DBParams: TStrings; aFilename: string): boolean;
+function SaveDatabaseToArchive(DBName: string;
+  aServicesConnection: TIBXServicesConnection; aFilename: string): boolean;
 
 implementation
 
@@ -68,8 +70,8 @@ const
   rgPersonal          = 'Personal';
 {$ENDIF}
 
-function SaveDatabaseToArchive(DBName: string; DBParams: TStrings;
-  aFilename: string): boolean;
+function SaveDatabaseToArchive(DBName: string;
+  aServicesConnection: TIBXServicesConnection; aFilename: string): boolean;
 begin
  with TSaveDatabaseDlg.Create(Application) do
  try
@@ -92,10 +94,10 @@ begin
     else
       Exit;
   end;
-  IBBackupService1.SetDBParams(DBParams);
-  IBBackupService1.BackupFile.Clear;
+  IBBackupService1.ServicesConnection := aServicesConnection;
   IBBackupService1.DatabaseName := DBName;
-  IBBackupService1.BackupFile.Add(aFilename);
+  IBBackupService1.BackupFile.Clear;
+  IBBackupService1.BackupFile.Add(aFileName);
   Result := ShowModal = mrOK
  finally
    Free
@@ -112,6 +114,13 @@ begin
  Application.QueueAsyncCall(@DoBackup,0);
 end;
 
+procedure TSaveDatabaseDlg.IBBackupService1GetNextLine(Sender: TObject;
+  var Line: string);
+begin
+  Status.Caption := Line;
+  Application.ProcessMessages;
+end;
+
 procedure TSaveDatabaseDlg.Timer1Timer(Sender: TObject);
 begin
   Timer1.Interval := 0;
@@ -124,17 +133,7 @@ end;
 procedure TSaveDatabaseDlg.DoBackup(Data: PtrInt);
 begin
  try
-  IBBackupService1.Active := true;
-  IBBackupService1.ServiceStart;
-  try
-    while not IBBackupService1.Eof do
-    begin
-      Status.Caption := IBBackupService1.GetNextLine;
-      Application.ProcessMessages
-    end;
-  finally
-    IBBackupService1.Active := false
-  end;
+  IBBackupService1.Execute(nil);
  except
    ModalResult := mrCancel;
    raise

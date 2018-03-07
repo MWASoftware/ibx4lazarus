@@ -1,26 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <Package Version="4">
-    <Name Value="ibexpress"/>
-    <AddToProjectUsesSection Value="True"/>
-    <Author Value="Various"/>
+    <Name Value="ibnongui"/>
+    <Type Value="RunTimeOnly"/>
+    <Author Value="various"/>
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
-        <OtherUnitFiles Value="runtime/gui"/>
-        <UnitOutputDirectory Value="runtime/gui/lib/$(TargetCPU)-$(TargetOS)"/>
+        <OtherUnitFiles Value="runtime/nongui"/>
+        <UnitOutputDirectory Value="runtime/nongui/lib/$(TargetCPU)-$(TargetOS)/"/>
       </SearchPaths>
-      <Parsing>
-        <SyntaxOptions>
-          <UseAnsiStrings Value="False"/>
-        </SyntaxOptions>
-      </Parsing>
-      <CodeGeneration>
-        <Checks>
-          <RangeChecks Value="True"/>
-          <StackChecks Value="True"/>
-        </Checks>
-      </CodeGeneration>
       <Other>
         <CompilerMessages>
           <IgnoredMessages idx5024="True"/>
@@ -28,34 +17,10 @@
         <CustomOptions Value="-dUseCThreads"/>
       </Other>
     </CompilerOptions>
-    <Description Value="   Borland Delphi Visual Component Library  
-   InterBase Express core components
+    <Description Value="Borland Delphi Visual Component Library  
+   InterBase Express core components (non- gui)
 
-   Copyright (c) 1998-2000 Inprise Corporation  
-
-InterBase Express is based in part on the product   
-Free IB Components, written by Gregory H. Deatz for 
-Hoagland, Longo, Moran, Dunst &amp; Doukas Company. 
-Free IB Components is used under license.   
-
-The contents of this file are subject to the InterBase  
-Public License Version 1.0 (the &quot;License&quot;); you may not 
-use this file except in compliance with the License. You
-may obtain a copy of the License at http://www.Inprise.com/IPL.html 
-Software distributed under the License is distributed on
-an &quot;AS IS&quot; basis, WITHOUT WARRANTY OF ANY KIND, either  
-express or implied. See the License for the specific language   
-governing rights and limitations under the License. 
-The Original Code was created by InterBase Software Corporation 
-   and its successors.  
-Portions created by Inprise Corporation are Copyright (C) Inprise   
-   Corporation. All Rights Reserved.
-Contributor(s): Jeff Overcash   
-
-IBX For Lazarus (Firebird Express)  
-Contributor: Tony Whyman, MWA Software (http://www.mwasoftare.co.uk 
-Portions created by MWA Software are copyright McCallum Whyman  
-Associates Ltd 2011   "/>
+   Copyright (c) 1998-2000 Inprise Corporation  "/>
     <License Value="INTERBASE PUBLIC LICENSE 
 Version 1.0 
 1. Definitions. 
@@ -161,22 +126,97 @@ II.1. Advertising Materials. All advertising materials mentioning features or us
 II.2. Endorsements. The names &quot;Inprise,&quot; &quot;InterBase,&quot; &quot;ISC,&quot; and &quot;IB&quot; must not be used to endorse or promote Contributor Versions or Larger Works without the prior written permission of Inprise.
 II.3. Product Names. Contributor Versions and Larger Works may not be called &quot;Inprise&quot; or &quot;InterBase&quot; nor may the words &quot;Inprise&quot; or &quot;InterBase&quot; appear in their names without the prior written permission of Inprise Corporation."/>
     <Version Major="2" Minor="2"/>
-    <Files Count="1">
+    <Files Count="20">
       <Item1>
-        <Filename Value="runtime/gui/IBDialogs.pas"/>
-        <UnitName Value="IBDialogs"/>
+        <Filename Value="runtime/nongui/IBBatchMove.pas"/>
+        <UnitName Value="IBBatchMove"/>
       </Item1>
+      <Item2>
+        <Filename Value="runtime/nongui/IBBlob.pas"/>
+        <UnitName Value="IBBlob"/>
+      </Item2>
+      <Item3>
+        <Filename Value="runtime/nongui/IBCustomDataSet.pas"/>
+        <UnitName Value="IBCustomDataSet"/>
+      </Item3>
+      <Item4>
+        <Filename Value="runtime/nongui/IBDatabase.pas"/>
+        <UnitName Value="IBDatabase"/>
+      </Item4>
+      <Item5>
+        <Filename Value="runtime/nongui/IBDatabaseInfo.pas"/>
+        <UnitName Value="IBDatabaseInfo"/>
+      </Item5>
+      <Item6>
+        <Filename Value="runtime/nongui/IBDataOutput.pas"/>
+        <UnitName Value="IBDataOutput"/>
+      </Item6>
+      <Item7>
+        <Filename Value="runtime/nongui/IBEvents.pas"/>
+        <UnitName Value="IBEvents"/>
+      </Item7>
+      <Item8>
+        <Filename Value="runtime/nongui/IBExtract.pas"/>
+        <UnitName Value="IBExtract"/>
+      </Item8>
+      <Item9>
+        <Filename Value="runtime/nongui/IBQuery.pas"/>
+        <UnitName Value="IBQuery"/>
+      </Item9>
+      <Item10>
+        <Filename Value="runtime/nongui/IBSQL.pas"/>
+        <UnitName Value="IBSQL"/>
+      </Item10>
+      <Item11>
+        <Filename Value="runtime/nongui/IBSQLMonitor.pas"/>
+        <UnitName Value="IBSQLMonitor"/>
+      </Item11>
+      <Item12>
+        <Filename Value="runtime/nongui/IBSQLParser.pas"/>
+        <UnitName Value="IBSQLParser"/>
+      </Item12>
+      <Item13>
+        <Filename Value="runtime/nongui/IBStoredProc.pas"/>
+        <UnitName Value="IBStoredProc"/>
+      </Item13>
+      <Item14>
+        <Filename Value="runtime/nongui/IBTable.pas"/>
+        <UnitName Value="IBTable"/>
+      </Item14>
+      <Item15>
+        <Filename Value="runtime/nongui/IBTypes.pas"/>
+        <UnitName Value="IBTypes"/>
+      </Item15>
+      <Item16>
+        <Filename Value="runtime/nongui/IBUpdate.pas"/>
+        <UnitName Value="IBUpdate"/>
+      </Item16>
+      <Item17>
+        <Filename Value="runtime/nongui/IBUpdateSQL.pas"/>
+        <UnitName Value="IBUpdateSQL"/>
+      </Item17>
+      <Item18>
+        <Filename Value="runtime/nongui/IBVersion.pas"/>
+        <UnitName Value="IBVersion"/>
+      </Item18>
+      <Item19>
+        <Filename Value="runtime/nongui/ibxscript.pas"/>
+        <UnitName Value="ibxscript"/>
+      </Item19>
+      <Item20>
+        <Filename Value="runtime/nongui/IBXServices.pas"/>
+        <UnitName Value="IBXServices"/>
+      </Item20>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="ibnongui"/>
+        <PackageName Value="LazUtils"/>
       </Item1>
       <Item2>
-        <PackageName Value="LCL"/>
+        <PackageName Value="fbintf"/>
       </Item2>
       <Item3>
         <PackageName Value="FCL"/>
-        <MinVersion Major="1" Valid="True"/>
       </Item3>
     </RequiredPkgs>
     <UsageOptions>
@@ -184,7 +224,6 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
     </UsageOptions>
     <PublishOptions>
       <Version Value="2"/>
-      <IgnoreBinaries Value="False"/>
     </PublishOptions>
   </Package>
 </CONFIG>

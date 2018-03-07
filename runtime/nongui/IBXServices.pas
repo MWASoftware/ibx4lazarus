@@ -96,6 +96,10 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    {Copies database parameters as give in the DBParams to the Services connection
+      omitting any parameters not appropriate for Services API. Typically, the
+      DBParams are TIBDatabase.Params}
+    procedure SetDBParams(DBParams: TStrings);
     property ServerVersionNo[index: integer]: integer read GetServerVersionNo;
     property ServiceIntf: IServiceManager read FService;
   published
@@ -686,7 +690,8 @@ const
         if line <> '' then
         begin
           DoOnGetNextLine(line);
-          Lines.Add(line);
+          if Lines <> nil then
+            Lines.Add(line);
         end;
       end;
     finally
@@ -723,7 +728,8 @@ const
           if line <> '' then
           begin
             DoOnGetNextLine(line);
-            Lines.Add(line);
+            if Lines <> nil then
+              Lines.Add(line);
           end;
         end;
       finally
@@ -2622,6 +2628,7 @@ end;
 procedure TIBXServicesConnection.SetPortNo(AValue: string);
 begin
   if FPortNo = AValue then Exit;
+  Connected := false;
   FPortNo := AValue;
   FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
 end;
@@ -2831,6 +2838,7 @@ var aServiceName: AnsiString;
     aProtocol: TProtocolAll;
 begin
   if FConnectString = AValue then Exit;
+  Connected := false;
   if not ParseConnectString(AValue,FServerName,aServiceName,aProtocol,FPortNo)
     or (aServiceName <> 'service_mgr') or (aProtocol = unknownProtocol) then
     IBError(ibxeBadConnectString, [nil]);
@@ -2841,6 +2849,7 @@ end;
 procedure TIBXServicesConnection.SetProtocol(AValue: TProtocol);
 begin
   if FProtocol = AValue then Exit;
+  Connected := false;
   FProtocol := AValue;
   FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
 end;
@@ -2848,6 +2857,7 @@ end;
 procedure TIBXServicesConnection.SetServerName(AValue: string);
 begin
   if FServerName = AValue then Exit;
+  Connected := false;
   FServerName := AValue;
   FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
 end;
@@ -2986,6 +2996,27 @@ begin
   inherited Destroy;
   Setlength(FIBXServices,0);
   if assigned(FParams) then FParams.Free;
+end;
+
+procedure TIBXServicesConnection.SetDBParams(DBParams: TStrings);
+var i: integer;
+    j: integer;
+    k: integer;
+    ParamName: string;
+begin
+  Params.Clear;
+  for i := 0 to DBParams.Count - 1 do
+  begin
+    ParamName := DBParams[i];
+    k := Pos('=',ParamName);
+    if k > 0 then system.Delete(ParamName,k,Length(ParamName)-k+1);
+    for j := 1 to isc_spb_last_spb_constant do
+      if ParamName = SPBConstantNames[j] then
+      begin
+        Params.Add(DBParams[i]);
+        break;
+      end;
+  end;
 end;
 
 end.
