@@ -32,7 +32,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, Buttons, IBServices, IBXServices;
+  StdCtrls, Buttons, IBXServices;
 
 type
 

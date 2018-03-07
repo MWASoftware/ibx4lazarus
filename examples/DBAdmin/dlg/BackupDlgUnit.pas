@@ -109,8 +109,8 @@ procedure TBackupDlg.DoServerBackup(Data: PtrInt);
 begin
   with IBXServerSideBackupService1 do
   begin
-    BackupFile.Clear;
-    BackupFile.Add(BackupFileName.Text);
+    BackupFiles.Clear;
+    BackupFiles.Add(BackupFileName.Text);
     Options := [];
     if IgnoreChecksums.Checked then
       Options := Options + [IBXServices.IgnoreChecksums];

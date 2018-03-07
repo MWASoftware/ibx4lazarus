@@ -96,8 +96,8 @@ begin
   end;
   IBBackupService1.ServicesConnection := aServicesConnection;
   IBBackupService1.DatabaseName := DBName;
-  IBBackupService1.BackupFile.Clear;
-  IBBackupService1.BackupFile.Add(aFileName);
+  IBBackupService1.BackupFiles.Clear;
+  IBBackupService1.BackupFiles.Add(aFileName);
   Result := ShowModal = mrOK
  finally
    Free
@@ -124,7 +124,7 @@ end;
 procedure TSaveDatabaseDlg.Timer1Timer(Sender: TObject);
 begin
   Timer1.Interval := 0;
-  if FileExists(IBBackupService1.BackupFile[0])  then
+  if FileExists(IBBackupService1.BackupFiles[0])  then
     ModalResult := mrOK
   else
     ModalResult := mrCancel

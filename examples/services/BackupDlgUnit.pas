@@ -121,7 +121,7 @@ end;
 procedure TBackupDlg.FormShow(Sender: TObject);
 begin
   ServerName.Text := CSBackupService1.ServicesConnection.ServerName;
-  SSBackupService1.BackupFile.Clear;
+  SSBackupService1.BackupFiles.Clear;
 end;
 
 procedure TBackupDlg.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -134,7 +134,7 @@ begin
   CSBackupService1.DatabaseName := DBName.Text;
   SSBackupService1.DatabaseName := DBName.Text;
   if ServerSideBtn.Checked then
-    SSBackupService1.BackupFile.Add(BackupFilename.Text);
+    SSBackupService1.BackupFiles.Add(BackupFilename.Text);
 end;
 
 end.
