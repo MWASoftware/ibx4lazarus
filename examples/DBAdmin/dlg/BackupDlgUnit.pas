@@ -23,7 +23,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  Buttons, ExtCtrls, ComCtrls, IBServices;
+  Buttons, ExtCtrls, ComCtrls, IBXServices;
 
 type
 
@@ -32,22 +32,23 @@ type
   TBackupDlg = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    IBXClientSideBackupService1: TIBXClientSideBackupService;
+    IBXServerSideBackupService1: TIBXServerSideBackupService;
     NoDBTriggers: TCheckBox;
     NoGarbageCollection: TCheckBox;
     MetadataOnly: TCheckBox;
     IgnoreLimboTransactions: TCheckBox;
     IgnoreChecksums: TCheckBox;
-    Edit1: TEdit;
-    Edit2: TEdit;
-    Edit3: TEdit;
-    IBBackupService1: TIBBackupService;
+    ServerName: TEdit;
+    DBName: TEdit;
+    BackupFileName: TEdit;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Report: TMemo;
     PageControl1: TPageControl;
-    RadioButton1: TRadioButton;
-    RadioButton2: TRadioButton;
+    ServerSideBtn: TRadioButton;
+    ClientSideBtn: TRadioButton;
     SaveDialog1: TSaveDialog;
     SpeedButton1: TSpeedButton;
     SelectTab: TTabSheet;
@@ -58,9 +59,11 @@ type
     procedure SpeedButton1Click(Sender: TObject);
   private
     { private declarations }
-    procedure DoBackup(Data: PtrInt);
+    procedure DoClientBackup(Data: PtrInt);
+    procedure DoServerBackup(Data: PtrInt);
   public
     { public declarations }
+    function ShowModal(aDBName: string): TModalResult;
  end;
 
 var
@@ -75,79 +78,70 @@ implementation
 procedure TBackupDlg.SpeedButton1Click(Sender: TObject);
 begin
   if SaveDialog1.Execute then
-    Edit3.Text := SaveDialog1.Filename;
+    BackupFileName.Text := SaveDialog1.Filename;
 end;
 
-procedure TBackupDlg.DoBackup(Data: PtrInt);
-var bakfile: TFileStream;
-    BackupCount: integer;
+procedure TBackupDlg.DoClientBackup(Data: PtrInt);
+var BackupCount: integer;
 begin
-  bakfile := nil;
-  with IBBackupService1 do
+  with IBXClientSideBackupService1 do
   begin
-  Options := [];
-  if IgnoreChecksums.Checked then
-    Options := Options + [IBServices.IgnoreChecksums];
-  if IgnoreLimboTransactions.Checked then
-    Options := Options + [IgnoreLimbo];
-  if MetadataOnly.Checked then
-    Options := Options + [IBServices.MetadataOnly];
-  if NoGarbageCollection.Checked then
-    Options := Options + [IBServices.NoGarbageCollection];
-  if NoDBTriggers.Checked then
-    Options := Options + [IBServices.NoDBTriggers];
-  end;
+    Options := [];
+    if IgnoreChecksums.Checked then
+      Options := Options + [IBXServices.IgnoreChecksums];
+    if IgnoreLimboTransactions.Checked then
+      Options := Options + [IgnoreLimbo];
+    if MetadataOnly.Checked then
+      Options := Options + [IBXServices.MetadataOnly];
+    if NoGarbageCollection.Checked then
+      Options := Options + [IBXServices.NoGarbageCollection];
+    if NoDBTriggers.Checked then
+      Options := Options + [IBXServices.NoDBTriggers];
 
-  Report.Lines.Add('Starting Backup');
-  if IBBackupService1.BackupFileLocation = flClientSide then
-    bakfile := TFileStream.Create(IBBackupService1.BackupFile[0],fmCreate);
-  try
-    IBBackupService1.ServiceStart;
-    while not IBBackupService1.Eof do
-    begin
-      case IBBackupService1.BackupFileLocation of
-      flServerSide:
-        Report.Lines.Add(IBBackupService1.GetNextLine);
-      flClientSide:
-        IBBackupService1.WriteNextChunk(bakfile);
-      end;
-      Application.ProcessMessages;
-    end;
-    if bakfile <> nil then
-      BackupCount := bakfile.Size;
-  finally
-    if bakfile <> nil then
-      bakfile.Free;
+    Report.Lines.Add('Starting Backup');
+    BackupToFile(BackupFileName.Text, BackupCount);
   end;
+  Report.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
+  MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
+end;
 
-  while IBBackupService1.IsServiceRunning do; {flush}
-
-  {Report completion}
-  case IBBackupService1.BackupFileLocation of
-  flServerSide:
-    begin
-      Report.Lines.Add('Backup Completed');
-      MessageDlg('Backup Completed',mtInformation,[mbOK],0);
-    end;
-  flClientSide:
-    begin
-      Report.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
-      MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
-    end;
+procedure TBackupDlg.DoServerBackup(Data: PtrInt);
+begin
+  with IBXServerSideBackupService1 do
+  begin
+    BackupFile.Clear;
+    BackupFile.Add(BackupFileName.Text);
+    Options := [];
+    if IgnoreChecksums.Checked then
+      Options := Options + [IBXServices.IgnoreChecksums];
+    if IgnoreLimboTransactions.Checked then
+      Options := Options + [IgnoreLimbo];
+    if MetadataOnly.Checked then
+      Options := Options + [IBXServices.MetadataOnly];
+    if NoGarbageCollection.Checked then
+      Options := Options + [IBXServices.NoGarbageCollection];
+    if NoDBTriggers.Checked then
+      Options := Options + [IBXServices.NoDBTriggers];
+    Report.Lines.Add('Starting Backup');
+    Execute(Report.Lines);
+    Report.Lines.Add('Backup Completed');
+    MessageDlg('Backup Completed',mtInformation,[mbOK],0);
   end;
-  IBBackupService1.Active := false;
+end;
+
+function TBackupDlg.ShowModal(aDBName: string): TModalResult;
+begin
+  IBXClientSideBackupService1.DatabaseName := aDBName;
+  IBXServerSideBackupService1.DatabaseName := aDBName;
+  Result := inherited ShowModal;
 end;
 
 procedure TBackupDlg.FormShow(Sender: TObject);
 begin
   PageControl1.ActivePage := SelectTab;
-  Edit1.Text := IBBackupService1.ServerName;
-  if IBBackupService1.BackupFileLocation = flServerSide then
-    RadioButton1.Checked := true
-  else
-    RadioButton2.Checked := true;
-  Edit2.Text := IBBackupService1.DatabaseName;
-  IBBackupService1.BackupFile.Clear;
+  ServerName.Text := IBXClientSideBackupService1.ServicesConnection.ServerName;
+  DBName.Text := IBXClientSideBackupService1.DatabaseName;
+  BackupFileName.Text := '';
 end;
 
 procedure TBackupDlg.ReportTabShow(Sender: TObject);
@@ -162,15 +156,13 @@ begin
   if PageControl1.ActivePage = SelectTab then
   begin
     CloseAction := caNone;
-    if Edit3.Text = '' then
+    if BackupFileName.Text = '' then
       raise Exception.Create('A Backup File Name must be given');
-    IBBackupService1.BackupFile.Add(Edit3.Text);
-    if RadioButton1.Checked then
-       IBBackupService1.BackupFileLocation := flServerSide
-    else
-      IBBackupService1.BackupFileLocation := flClientSide;
     PageControl1.ActivePage := ReportTab;
-    Application.QueueAsyncCall(@DoBackup,0);
+    if ServerSideBtn.Checked then
+      Application.QueueAsyncCall(@DoServerBackup,0)
+    else
+      Application.QueueAsyncCall(@DoClientBackup,0);
   end;
 end;
 

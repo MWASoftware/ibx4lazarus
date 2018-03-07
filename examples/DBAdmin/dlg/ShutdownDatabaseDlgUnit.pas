@@ -1,20 +1,29 @@
 (*
- * ShutdownDatabaseDlgUnit.pas
- * Copyright (C) 2018 Tony Whyman <tony@mwasoftware.co.uk>
+ *  IBX For Lazarus (Firebird Express)
  *
- * DBAdmin is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * DBAdmin is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
- *)
+ *  The contents of this file are subject to the Initial Developer's
+ *  Public License Version 1.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy
+ *  of the License here:
+ *
+ *    http://www.firebirdsql.org/index.php?op=doc&id=idpl
+ *
+ *  Software distributed under the License is distributed on an "AS
+ *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ *  implied. See the License for the specific language governing rights
+ *  and limitations under the License.
+ *
+ *  The Initial Developer of the Original Code is Tony Whyman.
+ *
+ *  The Original Code is (C) 2015 Tony Whyman, MWA Software
+ *  (http://www.mwasoftware.co.uk).
+ *
+ *  All Rights Reserved.
+ *
+ *  Contributor(s): ______________________________________.
+ *
+*) 
+            
 unit ShutdownDatabaseDlgUnit;
 
 {$mode objfpc}{$H+}
@@ -23,7 +32,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ComCtrls, ExtCtrls, IBServices, IB;
+  ComCtrls, ExtCtrls, IBXServices, IB;
 
 type
 
@@ -32,21 +41,20 @@ type
   TShutdownDatabaseDlg = class(TForm)
     Bevel1: TBevel;
     CloseBtn: TButton;
-    IBConfigService: TIBConfigService;
+    IBConfigService: TIBXConfigService;
     ProgressBar1: TProgressBar;
     StatusMsg: TLabel;
     procedure CloseBtnClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
-    FShutDownmode: TShutdownMode;
+    FShutDownmode: TDBShutdownMode;
     FDelay: integer;
     FAborting: boolean;
     FSecContextError: boolean;
     FShutdownWaitThread: TThread;
     procedure OnWaitCompleted(Sender: TObject);
   public
-     procedure Shutdown(aService: TIBConfigService; aShutDownmode: TShutdownMode;
-       aDelay: integer);
+     procedure Shutdown(aDBName: string; aShutDownmode: TDBShutdownMode; aDelay: integer);
      property Aborting: boolean read FAborting;
   end;
 
@@ -56,8 +64,6 @@ var
 implementation
 
 {$R *.lfm}
-
-uses IBErrorCodes;
 
 resourcestring
   sWaitStatusMsg = 'Waiting for %s to shutdown';
@@ -70,8 +76,8 @@ type
   TShutdownWaitThread = class(TThread)
   private
     FErrorMessage: string;
-    FIBConfigService: TIBConfigService;
-    FOptions: TShutdownMode;
+    FIBConfigService: TIBXConfigService;
+    FOptions: TDBShutdownMode;
     FSecContextError: boolean;
     FSuccess: boolean;
     FWait: integer;
@@ -80,7 +86,7 @@ type
   protected
     procedure Execute; override;
   public
-    constructor Create(aService: TIBConfigService; Options: TShutdownMode;
+    constructor Create(aService: TIBXConfigService; Options: TDBShutdownMode;
       Wait: Integer; OnCompleted: TNotifyEvent);
     destructor Destroy; override;
     procedure Abort;
@@ -102,44 +108,32 @@ end;
 procedure TShutdownWaitThread.Execute;
 begin
   FSuccess := false;
-  FIBConfigService.Active := true;
   try
     try
       FIBConfigService.ShutDownDatabase(FOptions,FWait);
       FErrorMessage := 'Completed without error';
       FSuccess := true;
     except
-      on E: EIBInterBaseError do
-        if E.IBErrorCode = isc_sec_context then
-          FSecContextError := true
-        else
-          FErrorMessage := E.Message;
-
       on E: Exception do
         FErrorMessage := E.Message;
     end;
   finally
-    if not FSecContextError then
-    try
-      while FIBConfigService.IsServiceRunning do;
-    except   end;
     if Terminated and FSuccess then
       FIBConfigService.BringDatabaseOnline;
-    FIBConfigService.Active := false;
   end;
   Synchronize(@DoCallback);
 end;
 
-constructor TShutdownWaitThread.Create(aService: TIBConfigService;
-  Options: TShutdownMode; Wait: Integer; OnCompleted: TNotifyEvent);
+constructor TShutdownWaitThread.Create(aService: TIBXConfigService;
+  Options: TDBShutdownMode; Wait: Integer; OnCompleted: TNotifyEvent);
 begin
   inherited Create(false);
   FOptions := Options;
   FWait := Wait;
   FOnCompleted := OnCompleted;
   FreeOnTerminate := true;
-  FIBConfigService := TIBConfigService.Create(nil);
-  FIBConfigService.Assign(aService);
+  FIBConfigService := TIBXConfigService.Create(nil);
+  FIBConfigService.ServicesConnection := aService.ServicesConnection;
   FIBConfigService.DatabaseName := aService.DatabaseNAme;
 end;
 
@@ -173,9 +167,6 @@ end;
 procedure TShutdownDatabaseDlg.OnWaitCompleted(Sender: TObject);
 begin
   with TShutdownWaitThread(Sender) do
-    if not Success and SecContextError then
-      self.FSecContextError := true
-    else
     if not FAborting then
       MessageDlg(Format(sOnCompleted,[IBConfigService.DatabaseName,ErrorMessage]),
                mtInformation,[mbOK],0);
@@ -183,32 +174,20 @@ begin
   Close;
 end;
 
-procedure TShutdownDatabaseDlg.Shutdown(aService: TIBConfigService;
-  aShutDownmode: TShutdownMode; aDelay: integer);
+procedure TShutdownDatabaseDlg.Shutdown(aDBName: string;
+  aShutDownmode: TDBShutdownMode; aDelay: integer);
 begin
-  IBConfigService.Assign(aService);
-  IBConfigService.DatabaseName := aService.DatabaseName;
+  IBConfigService.DatabaseName := aDBName;
   FShutDownmode := aShutDownmode;
   FDelay := aDelay;
   FSecContextError := false;
   if aDelay <= 0 then
   begin
-    IBConfigService.Active := true;
-    try
       IBConfigService.ShutDownDatabase(aShutDownmode,0);
-      while IBConfigService.IsServiceRunning do;
-      if aDelay = 0 then
-        MessageDlg(sDatabaseShutdown,mtInformation,[mbOK],0);
-    finally
-      IBConfigService.Active := false;
-    end
+      MessageDlg(sDatabaseShutdown,mtInformation,[mbOK],0);
   end
   else
-  begin
     ShowModal;
-    if FSecContextError  then
-      raise EIBInterBaseError.Create(FirebirdAPI.getStatus); {re-raise the error}
-  end;
 end;
 
 end.

@@ -23,7 +23,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, IBServices;
+  StdCtrls, IBXServices;
 
 type
 
@@ -43,7 +43,7 @@ type
   private
 
   public
-    function ShowModal(const aDatabaseName: string; var aShutDownmode: TShutdownMode;
+    function ShowModal(const aDatabaseName: string; var aShutDownmode: TDBShutdownMode;
       var aDelay: integer): TModalResult;
   end;
 
@@ -62,7 +62,7 @@ begin
 end;
 
 function TShutdownReqDlg.ShowModal(const aDatabaseName: string;
-  var aShutDownmode: TShutdownMode; var aDelay: integer): TModalResult;
+  var aShutDownmode: TDBShutdownMode; var aDelay: integer): TModalResult;
 begin
   ShutdownOptions.ItemIndex := ord(aShutDownmode);
   DatabaseName.Text := aDatabaseName;
@@ -70,7 +70,7 @@ begin
   if Result = mrOK then
   begin
     aDelay := StrToInt(Delay.Text);
-    aShutDownmode := TShutdownMode(ShutdownOptions.ItemIndex);
+    aShutDownmode := TDBShutdownMode(ShutdownOptions.ItemIndex);
   end;
 end;
 

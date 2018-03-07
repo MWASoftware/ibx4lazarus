@@ -23,7 +23,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, db, memds, IBDatabase, IBSQL, IBQuery,
-  IBCustomDataSet, IBUpdate, IBDatabaseInfo, IBServices, IBXServices, IB,
+  IBCustomDataSet, IBUpdate, IBDatabaseInfo, IBXServices, IB,
   Dialogs, Controls, Forms;
 
 type
@@ -218,7 +218,7 @@ type
     procedure BackupDatabase;
     procedure RestoreDatabase;
     procedure BringDatabaseOnline;
-    procedure ShutDown(aShutDownmode: TShutdownMode; aDelay: integer);
+    procedure ShutDown(aShutDownmode: TDBShutdownMode; aDelay: integer);
     procedure DatabaseRepair(Options: TValidateOptions; ReportLines: TStrings);
     procedure OnlineValidation(ReportLines: TStrings; SelectedTablesOnly: boolean);
     procedure LimboResolution(ActionID: TTransactionGlobalAction; Report: TStrings);
@@ -354,7 +354,7 @@ var UserName: string;
     Param := Params.ByName('SEC$PASSWORD');
     if (UpdateKind = ukModify) and not Param.IsNull then
     begin
-      Result := 'ALTER USER ' + UserName) +
+      Result := 'ALTER USER ' + UserName +
           ' PASSWORD ''' + SQLSafeString(Param.AsString) + '''';
       Param := Params.ByName('SEC$PLUGIN');
      if Param <> nil then
@@ -398,7 +398,7 @@ begin
   begin
     if Params.ByName('SEC$ADMIN').AsBoolean and not Params.ByName('OLD_SEC$ADMIN').AsBoolean then
     begin
-      ExecDDL.SQL.Text := 'ALTER USER ' + v + ' GRANT ADMIN ROLE';
+      ExecDDL.SQL.Text := 'ALTER USER ' + UserName + ' GRANT ADMIN ROLE';
       ExecDDL.ExecQuery;
     end
     else
@@ -607,8 +607,6 @@ begin
   CurrentTransaction.Active := true;
   DataBaseQuery.Active := true;
   AttmtQuery.Active := true;
-  if assigned(FAfterDataReload) then
-    AfterDataReload(self);
   if LegacyUserList.Active then
     RoleNameList.Active := true;
 end;
@@ -629,19 +627,10 @@ procedure TDatabaseData.Connect;
 
   procedure KillShadows;
   begin
-    ActivateService(IBValidationService1);
     with IBValidationService1 do
     begin
-      Options := [IBServices.KillShadows];
-      try
-        try
-          ServiceStart;
-        except  end;
-        While not Eof do
-          GetNextLine;
-      finally
-        while IsServiceRunning do;
-      end;
+      Options := [IBXServices.KillShadows];
+      Execute(nil);
       MessageDlg('All Unavailable Shadows killed',mtInformation,[mbOK],0);
     end;
   end;
@@ -676,13 +665,6 @@ begin
     end;
   until IBDatabase1.Connected;
 
-  IBXServicesConnection1.Connected := true;
-  IBStatisticalService1.DatabaseName := DatabaseName;
-  IBConfigService1.DatabaseName := DatabaseName;
-  IBValidationService1.DatabaseName := DatabaseName;
-  IBOnlineValidationService1.DatabaseName := DatabaseName;
-  IBLimboTrans.DatabaseName := DatabaseName;
-
   if assigned(FAfterDBConnect) then
     AfterDBConnect(self);
 end;
@@ -705,7 +687,7 @@ end;
 
 procedure TDatabaseData.BackupDatabase;
 begin
-  BackupDlg.ShowModal;
+  BackupDlg.ShowModal(DatabaseName);
 end;
 
 procedure TDatabaseData.RestoreDatabase;
@@ -716,7 +698,7 @@ begin
   DefaultNumBuffers := DatabaseQuery.FieldByName('MON$PAGE_BUFFERS').AsInteger;
   IBDatabase1.Connected := false;
   try
-    RestoreDlg.ShowModal(DefaultPageSize,DefaultNumBuffers);
+    RestoreDlg.ShowModal(DatabaseName,DefaultPageSize,DefaultNumBuffers);
   finally
     IBDatabase1.Connected := true;
   end;
@@ -741,11 +723,12 @@ begin
   end;
 end;
 
-procedure TDatabaseData.ShutDown(aShutDownmode: TShutdownMode; aDelay: integer);
+procedure TDatabaseData.ShutDown(aShutDownmode: TDBShutdownMode; aDelay: integer
+  );
 begin
   IBDatabase1.Connected := false;
   try
-    ShutdownDatabaseDlg.Shutdown(IBConfigService1, aShutDownmode, aDelay);
+    ShutdownDatabaseDlg.Shutdown(DatabaseName, aShutDownmode, aDelay);
   finally
     IBDatabase1.Connected := true;
   end;
@@ -1083,6 +1066,7 @@ begin
     Lines.Add('Server Version = ' + VersionInfo.ServerVersion);
     Lines.Add('Server Implementation = ' + VersionInfo.ServerImplementation);
     Lines.Add('Service Version = ' + IntToStr(VersionInfo.ServiceVersion));
+    with ServicesConnection do
     Lines.Add(Format('Firebird Release = %d.%d.%d (Build no. %d)',[ServerVersionNo[1],
                                                              ServerVersionNo[2],
                                                              ServerVersionNo[3],
@@ -1101,7 +1085,7 @@ end;
 procedure TDatabaseData.LoadServerLog(Lines: TStrings);
 begin
   Lines.Clear;
-  if IBLogService1.Protocol = Local then
+  if IBLogService1.ServicesConnection.Protocol = Local then
     Lines.Add('Server Log not available with embedded server')
   else
     IBLogService1.Execute(Lines);
@@ -1230,7 +1214,7 @@ begin
         Service.Protocol := TCP; {Use loopback if database does not use embedded server}
     end
     else {Special case - database not open}
-    if not FileExists(DBName) or FileIsReadOnly(DBName) then
+    if not FileExists(DatabaseName) or FileIsReadOnly(DatabaseName) then
       Service.Protocol := TCP; {Use loopback if database does not use embedded server}
   end
   else
@@ -1245,7 +1229,7 @@ begin
     if index <> -1 then LoginParams.Delete(index);
   end
   else
-    LoginParams.Values['expected_db'] := DBName
+    LoginParams.Values['expected_db'] := DatabaseName
 end;
 
 procedure TDatabaseData.LegacyUserListAfterOpen(DataSet: TDataSet);
@@ -1345,6 +1329,23 @@ begin
 
   FLocalConnect := FProtocol = Local;
   ReloadData;
+  try
+    IBXServicesConnection1.Connected := true;
+  except on E: Exception do
+    begin
+      Application.ShowException(E);
+      (Sender as TIBDatabase).Connected := false;
+      FDBPassword := '';
+      Exit;
+    end;
+  end;
+  IBStatisticalService1.DatabaseName := DatabaseName;
+  IBConfigService1.DatabaseName := DatabaseName;
+  IBValidationService1.DatabaseName := DatabaseName;
+  IBOnlineValidationService1.DatabaseName := DatabaseName;
+  IBLimboTrans.DatabaseName := DatabaseName;
+  if assigned(FAfterDataReload) then
+    AfterDataReload(self);
 end;
 
 procedure TDatabaseData.IBDatabase1AfterDisconnect(Sender: TObject);

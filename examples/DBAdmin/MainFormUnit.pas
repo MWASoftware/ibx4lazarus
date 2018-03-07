@@ -25,7 +25,7 @@ uses
   Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL,
   SynGutterCodeFolding, Forms, Controls, Graphics, Dialogs, Menus, ComCtrls,
   ActnList, StdCtrls, DbCtrls, ExtCtrls, Buttons, db, IBLookupComboEditBox,
-  IBDynamicGrid, IBTreeView, IBDatabaseInfo, IBServices, IBExtract;
+  IBDynamicGrid, IBTreeView, IBDatabaseInfo, IBXServices, IBExtract, IB;
 
 type
 
@@ -358,12 +358,15 @@ implementation
 {$R *.lfm}
 
 uses DataModule, ShutdownRegDlgUnit, AddSecondaryFileDlgUnit, NewUserDlgUnit,
-  ChgPasswordDlgUnit;
+  ChgPasswordDlgUnit, FBMessages;
 
 { TMainForm }
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin
+  {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
+  FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
+  Application.ExceptionDialog := aedOkMessageBox;
   PageControl1.ActivePage := Properties;
   DatabaseData.AfterDBConnect := @HandleDBConnect;
   DatabaseData.AfterDataReload := @HandleLoadData;
@@ -505,8 +508,8 @@ begin
   with UserListSource.DataSet do
   begin
     Append;
-    FieldByName('UserName').AsString := AnsiUpperCase(NewUserName);
-    FieldByName('USERPASSWORD').AsString := NewPassword;
+    FieldByName('SEC$USER_NAME').AsString := AnsiUpperCase(NewUserName);
+    FieldByName('SEC$PASSWORD').AsString := NewPassword;
   end;
 end;
 
@@ -584,7 +587,7 @@ begin
 end;
 
 procedure TMainForm.DatabaseOnlineChange(Sender: TObject);
-var ShutDownMode: TShutDownMode;
+var ShutDownMode: TDBShutDownMode;
     Delay: integer;
 begin
   if FLoading then Exit;
@@ -1104,6 +1107,7 @@ begin
   end;
   UserManagerTab.TabVisible := not DatabaseData.EmbeddedMode;
   AccessRightsTab.TabVisible := not DatabaseData.EmbeddedMode;
+  AutoAdmin.Enabled := not DatabaseData.EmbeddedMode;
 end;
 
 procedure TMainForm.ConfigureOnlineValidation;

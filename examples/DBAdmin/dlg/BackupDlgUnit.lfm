@@ -9,7 +9,7 @@ object BackupDlg: TBackupDlg
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Button1: TButton
     Left = 96
     Height = 25
@@ -54,7 +54,7 @@ object BackupDlg: TBackupDlg
         Caption = 'Server'
         ParentColor = False
       end
-      object Edit1: TEdit
+      object ServerName: TEdit
         Left = 12
         Height = 24
         Top = 24
@@ -70,7 +70,7 @@ object BackupDlg: TBackupDlg
         Caption = 'Database Name'
         ParentColor = False
       end
-      object Edit2: TEdit
+      object DBName: TEdit
         Left = 12
         Height = 24
         Top = 72
@@ -78,7 +78,7 @@ object BackupDlg: TBackupDlg
         ReadOnly = True
         TabOrder = 1
       end
-      object RadioButton1: TRadioButton
+      object ServerSideBtn: TRadioButton
         Left = 12
         Height = 22
         Top = 112
@@ -86,7 +86,7 @@ object BackupDlg: TBackupDlg
         Caption = 'Server Side'
         TabOrder = 2
       end
-      object RadioButton2: TRadioButton
+      object ClientSideBtn: TRadioButton
         Left = 134
         Height = 22
         Top = 112
@@ -104,7 +104,7 @@ object BackupDlg: TBackupDlg
         Caption = 'Backup File'
         ParentColor = False
       end
-      object Edit3: TEdit
+      object BackupFileName: TEdit
         Left = 12
         Height = 24
         Top = 160
@@ -214,28 +214,29 @@ object BackupDlg: TBackupDlg
       end
     end
   end
-  object IBBackupService1: TIBBackupService
-    ServerName = 'localhost'
-    Protocol = TCP
-    Params.Strings = (
-      'user_name=SYSDBA'
-      ''
-    )
-    TraceFlags = []
-    Verbose = True
-    StatisticsRequested = [bsTotalTime]
-    BackupFileLocation = flClientSide
-    BlockingFactor = 0
-    DatabaseName = 'employee'
-    Options = [NoDBTriggers]
-    left = 312
-    top = 24
-  end
   object SaveDialog1: TSaveDialog
     DefaultExt = '.gbk'
     Filter = 'Backup Files|*.gbk|All Files|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist, ofEnableSizing, ofViewDetail]
     left = 309
     top = 120
+  end
+  object IBXClientSideBackupService1: TIBXClientSideBackupService
+    ServicesConnection = DatabaseData.IBXServicesConnection1
+    TraceFlags = []
+    BlockingFactor = 0
+    Options = []
+    left = 262
+    top = 216
+  end
+  object IBXServerSideBackupService1: TIBXServerSideBackupService
+    ServicesConnection = DatabaseData.IBXServicesConnection1
+    TraceFlags = []
+    BlockingFactor = 0
+    Options = []
+    StatisticsRequested = [bsTotalTime]
+    Verbose = True
+    left = 257
+    top = 279
   end
 end

@@ -9,7 +9,7 @@ object RestoreDlg: TRestoreDlg
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Button1: TButton
     Left = 128
     Height = 25
@@ -54,7 +54,7 @@ object RestoreDlg: TRestoreDlg
         Caption = 'Server'
         ParentColor = False
       end
-      object Edit1: TEdit
+      object ServerName: TEdit
         Left = 12
         Height = 24
         Top = 24
@@ -78,23 +78,23 @@ object RestoreDlg: TRestoreDlg
         ReadOnly = True
         TabOrder = 1
       end
-      object RadioButton1: TRadioButton
+      object ServerSideBtn: TRadioButton
         Left = 12
         Height = 22
         Top = 112
         Width = 93
         Caption = 'Server Side'
-        Checked = True
         TabOrder = 2
-        TabStop = True
       end
-      object RadioButton2: TRadioButton
+      object ClientSideBtn: TRadioButton
         Left = 134
         Height = 22
         Top = 112
         Width = 88
         Caption = 'Client Side'
+        Checked = True
         TabOrder = 3
+        TabStop = True
       end
       object Label3: TLabel
         Left = 12
@@ -272,23 +272,28 @@ object RestoreDlg: TRestoreDlg
     left = 368
     top = 24
   end
-  object IBRestoreService1: TIBRestoreService
-    ServerName = 'localhost'
-    Protocol = TCP
-    Params.Strings = (
-      'user_name=SYSDBA'
-    )
+  object IBXClientSideRestoreService1: TIBXClientSideRestoreService
+    ServicesConnection = DatabaseData.IBXServicesConnection1
     TraceFlags = []
-    Verbose = True
-    StatisticsRequested = [bsTotalTime]
-    BackupFileLocation = flClientSide
-    DatabaseName.Strings = (
-      '/tmp/mytest.fdb'
-    )
+    OnGetNextLine = IBXClientSideRestoreService1GetNextLine
     PageSize = 0
     PageBuffers = 0
     Options = [Replace]
-    left = 272
-    top = 16
+    StatisticsRequested = [bsTotalTime]
+    Verbose = True
+    left = 224
+    top = 208
+  end
+  object IBXServerSideRestoreService1: TIBXServerSideRestoreService
+    ServicesConnection = DatabaseData.IBXServicesConnection1
+    TraceFlags = []
+    OnGetNextLine = IBXClientSideRestoreService1GetNextLine
+    PageSize = 0
+    PageBuffers = 0
+    Options = [Replace]
+    StatisticsRequested = [bsTotalTime]
+    Verbose = True
+    left = 232
+    top = 32
   end
 end

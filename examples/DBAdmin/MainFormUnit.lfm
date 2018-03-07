@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 596
+  Left = 648
   Height = 616
-  Top = 178
+  Top = 231
   Width = 939
   Caption = 'Database Administrator Demo'
   ClientHeight = 596
@@ -64,12 +64,12 @@ object MainForm: TMainForm
     Height = 548
     Top = 26
     Width = 939
-    ActivePage = UserManagerTab
+    ActivePage = Properties
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 6
+    TabIndex = 0
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
@@ -1823,7 +1823,7 @@ object MainForm: TMainForm
           Descending = False
           EditorBorderStyle = bsSingle
           DefaultPositionAtEnd = False
-          IndexFieldNames = 'USERNAME'
+          IndexFieldNames = 'SEC$USER_NAME'
         end
       end
       object Splitter2: TSplitter
@@ -1918,7 +1918,7 @@ object MainForm: TMainForm
             Height = 14
             Top = 30
             Width = 49
-            DataField = 'USERNAME'
+            DataField = 'SEC$USER_NAME'
             DataSource = UserListSource
             ParentColor = False
           end
@@ -3180,6 +3180,7 @@ object MainForm: TMainForm
     end
   end
   object LimboListSource: TDataSource
+    DataSet = DatabaseData.InLimboList
     left = 552
     top = 176
   end

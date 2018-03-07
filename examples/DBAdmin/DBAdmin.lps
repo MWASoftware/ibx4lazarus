@@ -3,12 +3,13 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="80">
+    <Units Count="83">
       <Unit0>
         <Filename Value="DBAdmin.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="123"/>
+        <CursorPos Y="26"/>
+        <UsageCount Value="125"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainFormUnit.pas"/>
@@ -16,9 +17,10 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="776"/>
-        <CursorPos X="3" Y="776"/>
-        <UsageCount Value="123"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="348"/>
+        <CursorPos X="33" Y="361"/>
+        <UsageCount Value="125"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -28,12 +30,10 @@
         <ComponentName Value="DatabaseData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="1397"/>
-        <CursorPos X="56" Y="1392"/>
-        <UsageCount Value="123"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1313"/>
+        <CursorPos Y="1349"/>
+        <UsageCount Value="125"/>
       </Unit2>
       <Unit3>
         <Filename Value="dlg/DBLoginDlgUnit.pas"/>
@@ -44,7 +44,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
         <CursorPos X="75" Y="48"/>
-        <UsageCount Value="123"/>
+        <UsageCount Value="125"/>
       </Unit3>
       <Unit4>
         <Filename Value="dlg/ShutdownDatabaseDlgUnit.pas"/>
@@ -53,9 +53,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="98"/>
-        <CursorPos Y="118"/>
-        <UsageCount Value="121"/>
+        <CursorPos X="51" Y="58"/>
+        <UsageCount Value="123"/>
       </Unit4>
       <Unit5>
         <Filename Value="dlg/ShutdownRegDlgUnit.pas"/>
@@ -64,9 +63,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="22"/>
-        <CursorPos Y="57"/>
-        <UsageCount Value="121"/>
+        <TopLine Value="38"/>
+        <CursorPos X="25" Y="73"/>
+        <UsageCount Value="123"/>
       </Unit5>
       <Unit6>
         <Filename Value="dlg/BackupDlgUnit.pas"/>
@@ -74,13 +73,10 @@
         <ComponentName Value="BackupDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="108"/>
-        <CursorPos X="78" Y="132"/>
-        <UsageCount Value="119"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="123"/>
+        <CursorPos X="50" Y="142"/>
+        <UsageCount Value="121"/>
       </Unit6>
       <Unit7>
         <Filename Value="dlg/RestoreDlgUnit.pas"/>
@@ -90,8 +86,8 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="132"/>
-        <CursorPos Y="153"/>
-        <UsageCount Value="119"/>
+        <CursorPos X="60" Y="162"/>
+        <UsageCount Value="121"/>
       </Unit7>
       <Unit8>
         <Filename Value="dlg/AddSecondaryFileDlgUnit.pas"/>
@@ -101,7 +97,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="60" Y="12"/>
-        <UsageCount Value="118"/>
+        <UsageCount Value="120"/>
       </Unit8>
       <Unit9>
         <Filename Value="dlg/AddShadowSetDlgUnit.pas"/>
@@ -112,7 +108,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="101"/>
         <CursorPos X="18" Y="115"/>
-        <UsageCount Value="117"/>
+        <UsageCount Value="119"/>
       </Unit9>
       <Unit10>
         <Filename Value="dlg/AddShadowFileDlgUnit.pas"/>
@@ -122,7 +118,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="48" Y="77"/>
-        <UsageCount Value="117"/>
+        <UsageCount Value="119"/>
       </Unit10>
       <Unit11>
         <Filename Value="dlg/NewUserDlgUnit.pas"/>
@@ -131,8 +127,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="20"/>
-        <UsageCount Value="107"/>
+        <TopLine Value="27"/>
+        <CursorPos X="14" Y="47"/>
+        <UsageCount Value="109"/>
       </Unit11>
       <Unit12>
         <Filename Value="dlg/ChgPasswordDlgUnit.pas"/>
@@ -142,7 +139,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="24"/>
-        <UsageCount Value="107"/>
+        <UsageCount Value="109"/>
       </Unit12>
       <Unit13>
         <Filename Value="dlg/ServicesLoginDlgUnit.pas"/>
@@ -156,9 +153,9 @@
       <Unit14>
         <Filename Value="MainFormUnit.lfm"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="53"/>
-        <CursorPos Y="82"/>
-        <UsageCount Value="4"/>
+        <TopLine Value="1889"/>
+        <CursorPos X="39" Y="1921"/>
+        <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit14>
       <Unit15>
@@ -172,7 +169,7 @@
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="234"/>
-        <CursorPos Y="254"/>
+        <CursorPos X="29" Y="263"/>
         <UsageCount Value="27"/>
       </Unit16>
       <Unit17>
@@ -183,8 +180,8 @@
       <Unit18>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1215"/>
-        <CursorPos Y="1246"/>
+        <TopLine Value="231"/>
+        <CursorPos X="15" Y="251"/>
         <UsageCount Value="28"/>
       </Unit18>
       <Unit19>
@@ -212,9 +209,9 @@
         <Filename Value="../../../../lcl/forms.pp"/>
         <UnitName Value="Forms"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1436"/>
-        <CursorPos X="31" Y="1456"/>
-        <UsageCount Value="3"/>
+        <TopLine Value="1275"/>
+        <CursorPos X="20" Y="1296"/>
+        <UsageCount Value="10"/>
       </Unit22>
       <Unit23>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/filutilh.inc"/>
@@ -226,8 +223,8 @@
       <Unit24>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="399"/>
-        <CursorPos X="14" Y="416"/>
+        <TopLine Value="2222"/>
+        <CursorPos Y="2242"/>
         <UsageCount Value="12"/>
       </Unit24>
       <Unit25>
@@ -317,9 +314,9 @@
       <Unit37>
         <Filename Value="../../../fbintf/client/3.0/FB30Services.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="106"/>
-        <CursorPos X="32" Y="127"/>
-        <UsageCount Value="9"/>
+        <TopLine Value="105"/>
+        <CursorPos X="15" Y="124"/>
+        <UsageCount Value="10"/>
       </Unit37>
       <Unit38>
         <Filename Value="../../../../lcl/include/customcombobox.inc"/>
@@ -403,9 +400,9 @@
       <Unit49>
         <Filename Value="DataModule.lfm"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="233"/>
-        <CursorPos X="21" Y="265"/>
-        <UsageCount Value="5"/>
+        <TopLine Value="469"/>
+        <CursorPos X="88" Y="501"/>
+        <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit49>
       <Unit50>
@@ -609,141 +606,80 @@
       </Unit78>
       <Unit79>
         <Filename Value="../../runtime/IBXServices.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="1929"/>
-        <CursorPos X="3" Y="1931"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="1015"/>
+        <CursorPos X="19" Y="1048"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <WindowIndex Value="-1"/>
-          <TopLine Value="1015"/>
-          <CursorPos X="19" Y="1048"/>
+          <TopLine Value="887"/>
+          <CursorPos X="5" Y="890"/>
         </ExtraEditor1>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="11"/>
       </Unit79>
+      <Unit80>
+        <Filename Value="../../../fbintf/client/2.5/FB25Services.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="143"/>
+        <CursorPos X="15" Y="162"/>
+        <UsageCount Value="10"/>
+      </Unit80>
+      <Unit81>
+        <Filename Value="../../../../lcl/include/application.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1563"/>
+        <CursorPos X="15" Y="1580"/>
+        <UsageCount Value="10"/>
+      </Unit81>
+      <Unit82>
+        <Filename Value="../../../fbintf/changelog"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit82>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="10" HistoryIndex="9">
       <Position1>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="629" Column="19" TopLine="605"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="1049" Column="13" TopLine="1035"/>
       </Position1>
       <Position2>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1540" TopLine="1540"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="348" Column="32" TopLine="321"/>
       </Position2>
       <Position3>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1541" TopLine="1541"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="1107" Column="54" TopLine="1076"/>
       </Position3>
       <Position4>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1478" Column="16" TopLine="1447"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="26" Column="28" TopLine="13"/>
       </Position4>
       <Position5>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="895" Column="28" TopLine="873"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="23" Column="11" TopLine="13"/>
       </Position5>
       <Position6>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="608" TopLine="587"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="524" TopLine="521"/>
       </Position6>
       <Position7>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="907" TopLine="907"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="523" TopLine="520"/>
       </Position7>
       <Position8>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="595" TopLine="590"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="369" TopLine="365"/>
       </Position8>
       <Position9>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="1060" TopLine="1060"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="28" Column="72"/>
       </Position9>
       <Position10>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="625" Column="26" TopLine="598"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="368" Column="45" TopLine="348"/>
       </Position10>
-      <Position11>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="862" TopLine="862"/>
-      </Position11>
-      <Position12>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1429" Column="16" TopLine="1417"/>
-      </Position12>
-      <Position13>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1424" TopLine="1424"/>
-      </Position13>
-      <Position14>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1423" TopLine="1423"/>
-      </Position14>
-      <Position15>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1451" Column="35" TopLine="1425"/>
-      </Position15>
-      <Position16>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="214" Column="15" TopLine="190"/>
-      </Position16>
-      <Position17>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="777" Column="13" TopLine="748"/>
-      </Position17>
-      <Position18>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="185" Column="21" TopLine="169"/>
-      </Position18>
-      <Position19>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="561" TopLine="536"/>
-      </Position19>
-      <Position20>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="480" Column="17" TopLine="449"/>
-      </Position20>
-      <Position21>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="173" Column="21" TopLine="153"/>
-      </Position21>
-      <Position22>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="458" Column="22" TopLine="426"/>
-      </Position22>
-      <Position23>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="474" Column="55" TopLine="448"/>
-      </Position23>
-      <Position24>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="214" Column="22" TopLine="205"/>
-      </Position24>
-      <Position25>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="702" Column="29" TopLine="695"/>
-      </Position25>
-      <Position26>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="173" Column="21" TopLine="154"/>
-      </Position26>
-      <Position27>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="778" TopLine="759"/>
-      </Position27>
-      <Position28>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="628" Column="24" TopLine="604"/>
-      </Position28>
-      <Position29>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="944" Column="25" TopLine="922"/>
-      </Position29>
-      <Position30>
-        <Filename Value="../../runtime/IBXServices.pas"/>
-        <Caret Line="280" Column="14" TopLine="260"/>
-      </Position30>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
