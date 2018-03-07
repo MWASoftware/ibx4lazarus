@@ -166,6 +166,7 @@ type
       Params: ISQLParams);
     procedure UserListAfterInsert(DataSet: TDataSet);
     procedure UserListAfterOpen(DataSet: TDataSet);
+    procedure UserListAfterPost(DataSet: TDataSet);
     procedure UserListAfterScroll(DataSet: TDataSet);
     procedure UserListBeforeClose(DataSet: TDataSet);
     procedure UserTagsAfterInsert(DataSet: TDataSet);
@@ -425,6 +426,13 @@ end;
 
 procedure TDatabaseData.UserListAfterInsert(DataSet: TDataSet);
 begin
+  DataSet.FieldByName('SEC$ADMIN').AsBoolean := false;
+  DataSet.FieldByName('SEC$ACTIVE').AsBoolean := false;
+  DataSet.FieldByName('DBCreator').AsBoolean := false;
+  DataSet.FieldByName('SEC$PLUGIN').AsString := 'Srp';
+  DataSet.FieldByName('UserID').AsInteger := 0;
+  DataSet.FieldByName('GroupID').AsInteger := 0;
+  DataSet.FieldByName('SEC$PASSWORD').Clear;
   RoleNameList.Active := false; {Prevent role assignments until saved}
   UserTags.Active := false; {ditto}
 end;
@@ -434,6 +442,11 @@ begin
   UserListSource.DataSet := UserList;
   RoleNameList.Active := true;
   UserTags.Active := true;
+end;
+
+procedure TDatabaseData.UserListAfterPost(DataSet: TDataSet);
+begin
+  CurrentTransaction.Commit;
 end;
 
 procedure TDatabaseData.UserListAfterScroll(DataSet: TDataSet);
@@ -609,6 +622,18 @@ begin
   AttmtQuery.Active := true;
   if LegacyUserList.Active then
     RoleNameList.Active := true;
+  try
+    IBXServicesConnection1.Connected := true;
+  except on E: Exception do
+    begin
+      Application.ShowException(E);
+      IBDatabase1.Connected := false;
+      FDBPassword := '';
+      Exit;
+    end;
+  end;
+  if assigned(FAfterDataReload) then
+    AfterDataReload(self);
 end;
 
 destructor TDatabaseData.Destroy;
@@ -1328,24 +1353,12 @@ begin
     end;
 
   FLocalConnect := FProtocol = Local;
-  ReloadData;
-  try
-    IBXServicesConnection1.Connected := true;
-  except on E: Exception do
-    begin
-      Application.ShowException(E);
-      (Sender as TIBDatabase).Connected := false;
-      FDBPassword := '';
-      Exit;
-    end;
-  end;
   IBStatisticalService1.DatabaseName := DatabaseName;
   IBConfigService1.DatabaseName := DatabaseName;
   IBValidationService1.DatabaseName := DatabaseName;
   IBOnlineValidationService1.DatabaseName := DatabaseName;
   IBLimboTrans.DatabaseName := DatabaseName;
-  if assigned(FAfterDataReload) then
-    AfterDataReload(self);
+  ReloadData;
 end;
 
 procedure TDatabaseData.IBDatabase1AfterDisconnect(Sender: TObject);

@@ -6,7 +6,7 @@ object DatabaseData: TDatabaseData
   Width = 730
   PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -285,6 +285,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     AfterInsert = UserListAfterInsert
     AfterOpen = UserListAfterOpen
+    AfterPost = UserListAfterPost
     AfterScroll = UserListAfterScroll
     BeforeClose = UserListBeforeClose
     BufferChunks = 1000
@@ -444,7 +445,7 @@ object DatabaseData: TDatabaseData
       'Select A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
       'A.SEC$ACTIVE, A.SEC$USER_NAME, A.SEC$MIDDLE_NAME,'
       'A.SEC$FIRST_NAME, A.SEC$LAST_NAME,'
-      'cast(NULL as VarChar(32)) as USERPASSWORD, CURRENT_CONNECTION,'
+      'cast(NULL as VarChar(32)) as SEC$PASSWORD, CURRENT_CONNECTION,'
       'case when B.MON$ATTACHMENT_ID is not null then true else false end as LoggedIn,'
       'case When C.SEC$USER is not null then true else false end as DBCreator'
       'From SEC$USERS A'
@@ -469,7 +470,7 @@ object DatabaseData: TDatabaseData
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     SQL.Strings = (
       'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
-      'P.RDB$USER,RDB$PRIVILEGE,   cast(:SEC$USER_NAME as VARCHAR(32)) as USERNAME,'
+      'P.RDB$USER,RDB$PRIVILEGE,   cast(:SEC$USER_NAME as VARCHAR(32)) as SEC$USER_NAME,'
       'Case When RDB$PRIVILEGE is null then 0 else 1 End as GRANTED'
       'FROM RDB$ROLES r'
       'Left Outer JOIN ('
@@ -498,7 +499,7 @@ object DatabaseData: TDatabaseData
   object UpdateUserRoles: TIBUpdate
     RefreshSQL.Strings = (
       'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG,'
-      'P.RDB$USER,RDB$PRIVILEGE,   cast(:SEC$USER_NAME as VARCHAR(32)) as USERNAME,'
+      'P.RDB$USER,RDB$PRIVILEGE,   cast(:SEC$USER_NAME as VARCHAR(32)) as SEC$USER_NAME,'
       'Case When RDB$PRIVILEGE is null then 0 else 1 End as GRANTED'
       'FROM RDB$ROLES r'
       'Left Outer JOIN ('

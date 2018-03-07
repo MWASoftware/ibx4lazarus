@@ -555,7 +555,7 @@ begin
   with UserListSource.DataSet do
   begin
     Edit;
-    FieldByName('USERPASSWORD').AsString := NewPassword;
+    FieldByName('SEC$PASSWORD').AsString := NewPassword;
     try
       Post
     except
@@ -628,7 +628,7 @@ end;
 
 procedure TMainForm.DeleteUserExecute(Sender: TObject);
 begin
-  if MessageDlg('Do you really want to delete user ' + Trim(UserListSource.DataSet.FieldByName('UserName').AsString),
+  if MessageDlg('Do you really want to delete user ' + Trim(UserListSource.DataSet.FieldByName('SEC$USER_NAME').AsString),
      mtConfirmation,[mbYes,mbNo],0) = mrYes then
      UserListSource.DataSet.Delete;
 end;
