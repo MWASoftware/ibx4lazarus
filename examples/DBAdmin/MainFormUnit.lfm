@@ -64,12 +64,12 @@ object MainForm: TMainForm
     Height = 548
     Top = 26
     Width = 939
-    ActivePage = Properties
+    ActivePage = RepairTab
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 9
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
@@ -272,15 +272,6 @@ object MainForm: TMainForm
           OnChange = NoReserveChange
           TabOrder = 10
         end
-        object AutoAdmin: TCheckBox
-          Left = 112
-          Height = 22
-          Top = 432
-          Width = 151
-          Caption = 'Auto Admin Mapping'
-          OnChange = AutoAdminChange
-          TabOrder = 11
-        end
         object Label11: TLabel
           Left = 435
           Height = 14
@@ -296,7 +287,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 12
+          TabOrder = 11
           Text = 'AllocatedPages'
         end
         object Label19: TLabel
@@ -322,7 +313,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 13
+          TabOrder = 12
           Text = 'PagesUsed'
         end
         object Label10: TLabel
@@ -340,7 +331,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 14
+          TabOrder = 13
           Text = 'PagesAvail'
         end
         object Label12: TLabel
@@ -358,7 +349,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 15
+          TabOrder = 14
           Text = 'Edit10'
         end
         object Label20: TLabel
@@ -392,7 +383,7 @@ object MainForm: TMainForm
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
-          TabOrder = 16
+          TabOrder = 15
           Text = 'Edit11'
         end
         object Label22: TLabel
@@ -419,7 +410,7 @@ object MainForm: TMainForm
           Alignment = taRightJustify
           NumbersOnly = True
           OnEditingDone = PageBuffersEditingDone
-          TabOrder = 17
+          TabOrder = 16
           Text = 'PageBuffers'
         end
         object Label23: TLabel
@@ -440,7 +431,7 @@ object MainForm: TMainForm
           ReadOnly = True
           CharCase = ecNormal
           MaxLength = 0
-          TabOrder = 18
+          TabOrder = 17
         end
         object Label16: TLabel
           Left = 453
@@ -458,7 +449,7 @@ object MainForm: TMainForm
           Alignment = taRightJustify
           NumbersOnly = True
           OnEditingDone = LingerDelayEditingDone
-          TabOrder = 19
+          TabOrder = 18
           Text = 'LingerDelay'
         end
         object Label17: TLabel
@@ -486,7 +477,7 @@ object MainForm: TMainForm
           Alignment = taRightJustify
           NumbersOnly = True
           OnEditingDone = SweepIntervalEditingDone
-          TabOrder = 20
+          TabOrder = 19
           Text = 'SweepInterval'
         end
         object Label8: TLabel
@@ -506,7 +497,7 @@ object MainForm: TMainForm
           DataSource = DatabaseSource
           CharCase = ecNormal
           MaxLength = 0
-          TabOrder = 21
+          TabOrder = 20
         end
         object Edit1: TEdit
           Left = 121
@@ -514,7 +505,7 @@ object MainForm: TMainForm
           Top = 16
           Width = 263
           ParentFont = False
-          TabOrder = 22
+          TabOrder = 21
           Text = 'Edit1'
         end
         object SecDatabase: TEdit
@@ -523,7 +514,7 @@ object MainForm: TMainForm
           Top = 241
           Width = 263
           ReadOnly = True
-          TabOrder = 23
+          TabOrder = 22
           Text = 'SecDatabase'
         end
         object DBOwner: TEdit
@@ -532,7 +523,7 @@ object MainForm: TMainForm
           Top = 208
           Width = 264
           ReadOnly = True
-          TabOrder = 24
+          TabOrder = 23
           Text = 'DBOwner'
         end
         object DatabaseAliasName: TEdit
@@ -541,7 +532,7 @@ object MainForm: TMainForm
           Top = 48
           Width = 264
           ReadOnly = True
-          TabOrder = 25
+          TabOrder = 24
           Text = 'DatabaseAliasName'
         end
       end
@@ -2111,10 +2102,10 @@ object MainForm: TMainForm
       OnShow = MappingsTabShow
       object IBDynamicGrid5: TIBDynamicGrid
         Left = 0
-        Height = 516
-        Top = 0
+        Height = 492
+        Top = 24
         Width = 933
-        Align = alClient
+        Anchors = [akTop, akLeft, akRight, akBottom]
         Color = clWindow
         Columns = <        
           item
@@ -2202,6 +2193,16 @@ object MainForm: TMainForm
         EditorBorderStyle = bsSingle
         DefaultPositionAtEnd = False
       end
+      object AutoAdmin: TCheckBox
+        Left = 776
+        Height = 22
+        Top = 2
+        Width = 151
+        Anchors = [akTop, akRight]
+        Caption = 'Auto Admin Mapping'
+        OnChange = AutoAdminChange
+        TabOrder = 1
+      end
     end
     object RepairTab: TTabSheet
       Caption = 'Database Repair'
@@ -2247,8 +2248,8 @@ object MainForm: TMainForm
         TabOrder = 2
         object ValidateOptionsTab: TTabSheet
           Caption = 'ValidateOptionsTab'
-          ClientHeight = 104
-          ClientWidth = 318
+          ClientHeight = 102
+          ClientWidth = 316
           object Label33: TLabel
             Left = 5
             Height = 14
@@ -2286,8 +2287,8 @@ object MainForm: TMainForm
         end
         object RepairOptionsTab: TTabSheet
           Caption = 'RepairOptionsTab'
-          ClientHeight = 104
-          ClientWidth = 318
+          ClientHeight = 102
+          ClientWidth = 316
           object Label34: TLabel
             Left = 10
             Height = 40

@@ -923,7 +923,7 @@ end;
 
 procedure TDatabaseData.SetAutoAdmin(AValue: boolean);
 begin
-  IBConfigService1.SetAutoAdmin(AValue);
+  IBSecurityService1.SetAutoAdmin(AValue);
   CurrentTransaction.Commit;
 end;
 

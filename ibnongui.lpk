@@ -8,7 +8,7 @@
       <Version Value="11"/>
       <SearchPaths>
         <OtherUnitFiles Value="runtime/nongui"/>
-        <UnitOutputDirectory Value="runtime/nongui/lib/$(TargetCPU)-$(TargetOS)/"/>
+        <UnitOutputDirectory Value="runtime/nongui/lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>
         <CompilerMessages>

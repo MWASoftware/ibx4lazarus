@@ -28,6 +28,12 @@ packages.
 
 4. The iblocal package has been updated to use the new Services API components.
 
+5. procedure SetAutoAdmin; in the new IBX Services this method is now a member of
+   TIBXSecurityService. It had been wrongly classified in the previous version
+   as a per database configuration item. It is global to a server and hence
+   correctly positioned as part of the Security Package. In the DBAdmin example,
+   the setting has moved to the mappings page.
+
 IBX Change Log  version                                                       (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO

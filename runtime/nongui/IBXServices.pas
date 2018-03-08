@@ -133,6 +133,7 @@ type
    function GetSRB: ISRB;
    procedure SetServicesConnection(AValue: TIBXServicesConnection);
  protected
+   procedure Clear; virtual;
    procedure OnBeforeDisconnect(Sender: TIBXServicesConnection); virtual;
    procedure InternalServiceQuery(RaiseExceptionOnError: boolean=true);
    procedure DoServiceQuery; virtual;
@@ -201,7 +202,7 @@ end;
    function GetDatabaseInfo: TDatabaseInfo;
    function GetVersionInfo: TVersionInfo;
  protected
-   procedure OnBeforeDisconnect(Sender: TIBXServicesConnection); override;
+   procedure Clear; override;
  public
    property DatabaseInfo: TDatabaseInfo read GetDatabaseInfo;
    property VersionInfo: TVersionInfo read GetVersionInfo;
@@ -220,6 +221,7 @@ end;
    procedure CallSecContextException;
  protected
    procedure AddDBNameToSRB;
+   procedure Clear; override;
    procedure CheckServiceNotRunning;
    procedure InternalServiceStart;
    procedure DoServiceQuery; override;
@@ -255,7 +257,7 @@ end;
  public
    constructor Create(aOwner: TComponent); override;
    destructor Destroy; override;
-   procedure Execute(OutputLog: TStrings);
+   procedure Execute(OutputLog: TStrings); virtual;
    property Eof: boolean read FEof;
  published
    property OnGetNextLine: TIBXOnGetNextLine read FOnGetNextLine write FOnGetNextLine;
@@ -283,7 +285,6 @@ end;
    procedure SetReserveSpace (Value: Boolean);
    procedure SetAsyncMode (Value: Boolean);
    procedure SetReadOnly (Value: Boolean);
-   procedure SetAutoAdmin(Value: Boolean);
    procedure SetNoLinger;
  published
    property DatabaseName;
@@ -343,6 +344,7 @@ end;
 
  TIBXClientSideBackupService = class(TIBXBackupService)
  protected
+   procedure Execute(OutputLog: TStrings); override;
    procedure SetBackupTarget; override;
  public
    procedure BackupToStream(S: TStream; var BytesWritten: integer);
@@ -402,6 +404,7 @@ end;
 
  TIBXClientSideRestoreService = class(TIBXRestoreService)
  protected
+   procedure Execute(OutputLog: TStrings); override;
    procedure SetArchiveSource; override;
  public
    procedure RestoreFromStream(S: TStream; OutputLog: TStrings);
@@ -513,6 +516,7 @@ end;
     function GetUserInfoCount: Integer;
 
   protected
+    procedure Execute(OutputLog: TStrings); override;
     procedure Loaded; override;
     procedure SetServiceStartOptions; override;
     property SecurityAction: TSecurityAction read FSecurityAction
@@ -526,6 +530,7 @@ end;
     procedure DeleteUser;
     procedure ModifyUser;
     function HasAdminRole: boolean;
+    procedure SetAutoAdmin(Value: Boolean);
     property UserInfo[Index: Integer]: TUserInfo read GetUserInfo;
     property UserInfoCount: Integer read GetUserInfoCount;
 
@@ -567,14 +572,14 @@ end;
     FGlobalAction: TTransactionGlobalAction;
     function GetLimboTransactionInfo(index: integer): TLimboTransactionInfo;
     function GetLimboTransactionInfoCount: integer;
+    function FetchLimboTransactionInfo: integer;
 
   protected
     procedure SetServiceStartOptions; override;
   public
     destructor Destroy; override;
-    procedure Clear;
-    procedure FetchLimboTransactionInfo;
-    procedure FixLimboTransactionErrors(Lines: TStrings);
+    procedure Clear; override;
+    procedure Execute(OutputLog: TStrings); override;
     property LimboTransactionInfo[Index: integer]: TLimboTransactionInfo read GetLimboTransactionInfo;
     property LimboTransactionInfoCount: Integer read GetLimboTransactionInfoCount;
 
@@ -624,12 +629,13 @@ end;
   private
     FLoading: boolean;
   protected
+    procedure DoBeforeInsert; override;
     procedure DoAfterOpen; override;
     procedure DoBeforePost; override;
   public
     constructor Create(AOwner:TComponent); override;
     procedure Delete; override;
-    procedure FixErrors(GlobalAction: TTransactionGlobalAction; Lines: TStrings);
+    procedure FixErrors(GlobalAction: TTransactionGlobalAction; OutputLog: TStrings);
   end;
 
 implementation
@@ -673,20 +679,63 @@ const
 
   { TIBXClientSideRestoreService }
 
-  procedure TIBXClientSideRestoreService.SetArchiveSource;
-  begin
-    SRB.Add(isc_spb_bkp_file).AsString := 'stdin';
-  end;
+procedure TIBXClientSideRestoreService.Execute(OutputLog: TStrings);
+begin
+  // Do nothing
+end;
 
-    procedure TIBXClientSideRestoreService.RestoreFromStream(S: TStream;
+procedure TIBXClientSideRestoreService.SetArchiveSource;
+begin
+  SRB.Add(isc_spb_bkp_file).AsString := 'stdin';
+end;
+
+procedure TIBXClientSideRestoreService.RestoreFromStream(S: TStream;
     OutputLog: TStrings);
-  var line: string;
-  begin
-    ServiceStart;
-    try
-      while not Eof do
+var line: string;
+begin
+  ServiceStart;
+  try
+    while not Eof do
+    begin
+      SendNextChunk(S,line);
+      if line <> '' then
       begin
-        SendNextChunk(S,line);
+        DoOnGetNextLine(line);
+        if OutputLog <> nil then
+          OutputLog.Add(line);
+      end;
+    end;
+  finally
+    while IsServiceRunning do; {flush}
+  end;
+end;
+
+procedure TIBXClientSideRestoreService.RestoreFromFile(aFileName: string;
+    OutputLog: TStrings);
+var F: TFileStream;
+begin
+  F := TFileStream.Create(aFileName,fmOpenRead);
+  try
+   RestoreFromStream(F,OutputLog)
+  finally
+    F.Free;
+  end;
+end;
+
+procedure TIBXClientSideRestoreService.RestoreFromFiles(FileList: TStrings;
+    OutputLog: TStrings);
+var i: integer;
+    F: TFileStream;
+    line: string;
+begin
+  ServiceStart;
+  for i := 0 to FileList.Count - 1 do
+  begin
+    F := TFileStream.Create(FileList[i],fmOpenRead);
+    try
+      while Eof do
+      begin
+        SendNextChunk(F,line);
         if line <> '' then
         begin
           DoOnGetNextLine(line);
@@ -695,84 +744,58 @@ const
         end;
       end;
     finally
-      while IsServiceRunning do; {flush}
-    end;
-  end;
-
-    procedure TIBXClientSideRestoreService.RestoreFromFile(aFileName: string;
-    OutputLog: TStrings);
-  var F: TFileStream;
-  begin
-    F := TFileStream.Create(aFileName,fmOpenRead);
-    try
-     RestoreFromStream(F,OutputLog)
-    finally
       F.Free;
+      while IsServiceRunning do; {flush}
+      FEof := false;
     end;
   end;
-
-    procedure TIBXClientSideRestoreService.RestoreFromFiles(FileList: TStrings;
-    OutputLog: TStrings);
-  var i: integer;
-      F: TFileStream;
-      line: string;
-  begin
-    ServiceStart;
-    for i := 0 to FileList.Count - 1 do
-    begin
-      F := TFileStream.Create(FileList[i],fmOpenRead);
-      try
-        while Eof do
-        begin
-          SendNextChunk(F,line);
-          if line <> '' then
-          begin
-            DoOnGetNextLine(line);
-            if OutputLog <> nil then
-              OutputLog.Add(line);
-          end;
-        end;
-      finally
-        F.Free;
-        while IsServiceRunning do; {flush}
-        FEof := false;
-      end;
-    end;
-  end;
+end;
 
   { TIBXClientSideBackupService }
 
-  procedure TIBXClientSideBackupService.SetBackupTarget;
-  begin
-    SRB.Add(isc_spb_bkp_file).AsString := 'stdout';
-  end;
+procedure TIBXClientSideBackupService.Execute(OutputLog: TStrings);
+begin
+  //Do nothing
+end;
 
-  procedure TIBXClientSideBackupService.BackupToStream(S: TStream;
-    var BytesWritten: integer);
-  var InitialSize: integer;
-  begin
-    InitialSize := S.Size;
-    ServiceStart;
-    while not Eof do
-      ReceiveNextChunk(S);
-    BytesWritten := S.Size - InitialSize;
-  end;
+procedure TIBXClientSideBackupService.SetBackupTarget;
+begin
+  SRB.Add(isc_spb_bkp_file).AsString := 'stdout';
+end;
 
-  procedure TIBXClientSideBackupService.BackupToFile(aFileName: string;
+procedure TIBXClientSideBackupService.BackupToStream(S: TStream;
     var BytesWritten: integer);
-  var F: TFileStream;
-  begin
-    F := TFileStream.Create(aFileName,fmCreate);
-    try
-      BackupToStream(F,BytesWritten);
-    finally
-      F.Free;
-    end;
+var InitialSize: integer;
+begin
+  InitialSize := S.Size;
+  ServiceStart;
+  while not Eof do
+    ReceiveNextChunk(S);
+  BytesWritten := S.Size - InitialSize;
+end;
+
+procedure TIBXClientSideBackupService.BackupToFile(aFileName: string;
+    var BytesWritten: integer);
+var F: TFileStream;
+begin
+  F := TFileStream.Create(aFileName,fmCreate);
+  try
+    BackupToStream(F,BytesWritten);
+  finally
+    F.Free;
   end;
+end;
 
   { TIBXServicesLimboTransactionsList }
 
-  procedure TIBXServicesLimboTransactionsList.DoAfterOpen;
+procedure TIBXServicesLimboTransactionsList.DoBeforeInsert;
+begin
+  inherited DoBeforeInsert;
+  if not FLoading then
+    IBError(ibxeNoLimboTransactionInsert,[nil]);
+end;
+
+procedure TIBXServicesLimboTransactionsList.DoAfterOpen;
 
     function TypeToStr(MultiDatabase: boolean): string;
     begin
@@ -818,31 +841,31 @@ const
       end;
     end;
 
-  var i: integer;
-  begin
-    if FLoading then Exit;
-    FLoading := true;
-    with FSource as TIBXLimboTransactionResolutionService do
-    try
-      FetchLimboTransactionInfo;
-      for i := 0 to LimboTransactionInfoCount - 1 do
-      with LimboTransactionInfo[i] do
-      begin
-        Append;
-        FieldByName('TransactionID').AsInteger := ID;
-        FieldByName('TransactionType').AsString := TypeToStr(MultiDatabase);
-        FieldByName('HostSite').AsString := HostSite;
-        FieldByName('RemoteSite').AsString := RemoteSite;
-        FieldByName('DatabasePath').AsString := RemoteDatabasePath;
-        FieldByName('State').AsString := StateToStr(State);
-        FieldByName('RecommendedAction').AsString := AdviseToStr(Advise);
-        FieldByName('RequestedAction').AsString := ActionToStr(Action);
-        Post;
-      end;
-    finally
-      FLoading := false;
+var i: integer;
+begin
+  if FLoading then Exit;
+  FLoading := true;
+  with FSource as TIBXLimboTransactionResolutionService do
+  try
+    FetchLimboTransactionInfo;
+    for i := 0 to LimboTransactionInfoCount - 1 do
+    with LimboTransactionInfo[i] do
+    begin
+      Append;
+      FieldByName('TransactionID').AsInteger := ID;
+      FieldByName('TransactionType').AsString := TypeToStr(MultiDatabase);
+      FieldByName('HostSite').AsString := HostSite;
+      FieldByName('RemoteSite').AsString := RemoteSite;
+      FieldByName('DatabasePath').AsString := RemoteDatabasePath;
+      FieldByName('State').AsString := StateToStr(State);
+      FieldByName('RecommendedAction').AsString := AdviseToStr(Advise);
+      FieldByName('RequestedAction').AsString := ActionToStr(Action);
+      Post;
     end;
-  inherited DoAfterOpen;
+  finally
+    FLoading := false;
+  end;
+inherited DoAfterOpen;
 end;
 
 procedure TIBXServicesLimboTransactionsList.DoBeforePost;
@@ -890,12 +913,12 @@ end;
     //Do nothing
   end;
 
-  procedure TIBXServicesLimboTransactionsList.FixErrors(
-    GlobalAction: TTransactionGlobalAction; Lines: TStrings);
+    procedure TIBXServicesLimboTransactionsList.FixErrors(
+    GlobalAction: TTransactionGlobalAction; OutputLog: TStrings);
   begin
     if State = dsEdit then Post;
     (FSource as TIBXLimboTransactionResolutionService).GlobalAction := GlobalAction;
-    (FSource as TIBXLimboTransactionResolutionService).FixLimboTransactionErrors(Lines);
+    (FSource as TIBXLimboTransactionResolutionService).Execute(OutputLog);
     Active := false;
     Active := true;
   end;
@@ -1082,15 +1105,17 @@ end;
   function TIBXLimboTransactionResolutionService.GetLimboTransactionInfo(
     index: integer): TLimboTransactionInfo;
   begin
-    if index <= High(FLimboTransactionInfo) then
-      result := FLimboTransactionInfo[index]
+    if index < GetLimboTransactionInfoCount then
+      Result := FLimboTransactionInfo[index]
     else
-      result := nil;
+      Result := nil;
   end;
 
   function TIBXLimboTransactionResolutionService.GetLimboTransactionInfoCount: integer;
   begin
     Result := Length(FLimboTransactionInfo);
+    if Result = 0 then
+      Result := FetchLimboTransactionInfo;
   end;
 
   procedure TIBXLimboTransactionResolutionService.SetServiceStartOptions;
@@ -1151,7 +1176,8 @@ end;
     SetLength(FLimboTransactionInfo,0);
   end;
 
-  procedure TIBXLimboTransactionResolutionService.FetchLimboTransactionInfo;
+
+  function TIBXLimboTransactionResolutionService.FetchLimboTransactionInfo: integer;
 
     procedure NextLimboTransaction(index: integer);
     begin
@@ -1166,6 +1192,7 @@ end;
     i,j, k: Integer;
   begin
     Clear;
+    Result := 0;
     ServiceStart;
     SRB.Add(isc_info_svc_limbo_trans);
     InternalServiceQuery;
@@ -1255,18 +1282,20 @@ end;
     else
       IBError(ibxeOutputParsingError, [getItemType]);
     end;
+    Result := Length(FLimboTransactionInfo);
   end;
 
-    procedure TIBXLimboTransactionResolutionService.FixLimboTransactionErrors(
-    Lines: TStrings);
-  begin
+procedure TIBXLimboTransactionResolutionService.Execute(OutputLog: TStrings);
+begin
     if Length(FLimboTransactionInfo) > 0 then
     begin
       ServiceStart; {Fix is implicit in non-zero list of Limbo transactions}
       while not Eof do
-        Lines.Add(GetNextLine);
+        OutputLog.Add(GetNextLine);
+      while IsServiceRunning do;
+      Clear;
     end;
-  end;
+end;
 
   { TIBXSecurityService }
 
@@ -1285,6 +1314,11 @@ end;
     FUserInfo := nil;
     inherited Destroy;
   end;
+
+  procedure TIBXSecurityService.Execute(OutputLog: TStrings);
+begin
+  //Do nothing
+end;
 
   procedure TIBXSecurityService.FetchUserInfo;
   var
@@ -1408,6 +1442,21 @@ end;
     with ServicesConnection do
     Result :=  (ServerVersionNo[1] > 2) or
                ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] = 5));
+  end;
+
+  procedure TIBXSecurityService.SetAutoAdmin(Value: Boolean);
+  begin
+    CheckActive;
+    {only available for Firebird 2.5 and later}
+    with ServicesConnection do
+    if (ServerVersionNo[1] < 2) or
+               ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] < 5)) then Exit;
+    if Value then
+      SRB.Add(isc_action_svc_set_mapping)
+    else
+      SRB.Add(isc_action_svc_drop_mapping);
+    InternalServiceStart;
+    while IsServiceRunning do;
   end;
 
   procedure TIBXSecurityService.SetSecurityAction (Value: TSecurityAction);
@@ -1958,21 +2007,6 @@ begin
   while IsServiceRunning do;
 end;
 
-procedure TIBXConfigService.SetAutoAdmin(Value: Boolean);
-begin
-  CheckActive;
-  {only available for Firebird 2.5 and later}
-  with ServicesConnection do
-  if (ServerVersionNo[1] < 2) or
-             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] < 5)) then Exit;
-  if Value then
-    SRB.Add(isc_action_svc_set_mapping)
-  else
-    SRB.Add(isc_action_svc_drop_mapping);
-  InternalServiceStart;
-  while IsServiceRunning do;
-end;
-
 procedure TIBXConfigService.SetNoLinger;
 begin
   SRB.Add(isc_action_svc_properties);
@@ -2252,6 +2286,12 @@ begin
   SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
 end;
 
+procedure TIBXControlService.Clear;
+begin
+  inherited Clear;
+  FLastStartSRB := nil;
+end;
+
 procedure TIBXControlService.CheckServiceNotRunning;
 begin
   if IsServiceRunning then
@@ -2512,8 +2552,7 @@ begin
   Result := FVersionInfo;
 end;
 
-procedure TIBXServerProperties.OnBeforeDisconnect(Sender: TIBXServicesConnection
-  );
+procedure TIBXServerProperties.Clear;
 begin
   inherited;
   if assigned(FDatabaseInfo) then FreeAndNil(FDatabaseInfo);
@@ -2555,6 +2594,7 @@ begin
     FServicesConnection.UnRegisterIntf(self);
     RemoveFreeNotification(FServicesConnection);
   end;
+  Clear;
   FServicesConnection := AValue;
   if FServicesConnection <> nil then
   begin
@@ -2565,9 +2605,7 @@ end;
 
 procedure TIBXCustomService.OnBeforeDisconnect(Sender: TIBXServicesConnection);
 begin
-  FSRB := nil;
-  FServiceQueryResults := nil;
-  FSQPB := nil;
+  Clear;
 end;
 
 procedure TIBXCustomService.InternalServiceQuery(RaiseExceptionOnError: boolean
@@ -2616,6 +2654,13 @@ begin
     ServicesConnection := nil;
   end;
   inherited Destroy;
+end;
+
+procedure TIBXCustomService.Clear;
+begin
+  FSRB := nil;
+  FServiceQueryResults := nil;
+  FSQPB := nil;
 end;
 
 { TIBXServicesConnection }

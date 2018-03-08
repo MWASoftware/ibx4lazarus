@@ -34,6 +34,7 @@ type
   TMainForm = class(TForm)
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
+    AutoAdmin: TCheckBox;
     DatabaseAliasName: TEdit;
     DBEdit5: TDBEdit;
     DBEdit6: TDBEdit;
@@ -132,7 +133,6 @@ type
     AddFileBtn: TButton;
     AddShadowBtn: TButton;
     AllocatedPages: TEdit;
-    AutoAdmin: TCheckBox;
     Button1: TButton;
     DatabaseOnline: TCheckBox;
     DBCharacterSet: TIBLookupComboEditBox;
@@ -690,7 +690,7 @@ end;
 procedure TMainForm.MappingsTabShow(Sender: TObject);
 begin
   if not Visible or not IBDatabaseInfo.Database.Connected then Exit;
-  AuthMapSource.DataSet.Active := true;
+  AuthMapSource.DataSet.Active := IBDatabaseInfo.ODSMajorVersion > 11;
 end;
 
 procedure TMainForm.PageBuffersEditingDone(Sender: TObject);
@@ -1091,7 +1091,6 @@ begin
 
   if IBDatabaseInfo.ODSMajorVersion >= 12 then
   begin
-    MappingsTab.TabVisible := true;
     AttmtGrid.Columns[2].Visible := true;
     AttmntODS12Panel.Visible := true;
     DBCharacterSet.Visible := true;
@@ -1099,12 +1098,13 @@ begin
   end
   else
   begin
-    MappingsTab.TabVisible := false;
     AttmtGrid.Columns[2].Visible := false;
     AttmntODS12Panel.Visible := false;
     DBCharacterSet.Visible := false;
     DBCharSetRO.Visible := true;
   end;
+  MappingsTab.TabVisible := (IBDatabaseInfo.ODSMajorVersion > 11) or
+    ((IBDatabaseInfo.ODSMajorVersion = 11) and (IBDatabaseInfo.ODSMinorVersion > 0));
   UserManagerTab.TabVisible := not DatabaseData.EmbeddedMode;
   AccessRightsTab.TabVisible := not DatabaseData.EmbeddedMode;
   AutoAdmin.Enabled := not DatabaseData.EmbeddedMode;
