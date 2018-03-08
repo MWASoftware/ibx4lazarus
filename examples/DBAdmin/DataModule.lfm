@@ -1190,6 +1190,9 @@ object DatabaseData: TDatabaseData
   object IBXServicesConnection1: TIBXServicesConnection
     Connected = False
     OnLogin = IBXServicesConnection1Login
+    Params.Strings = (
+      'sql_role_name=RDB$ADMIN'
+    )
     TraceFlags = []
     left = 640
     top = 48

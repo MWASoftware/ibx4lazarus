@@ -77,7 +77,7 @@ type
     procedure CLoseBtnClick(Sender: TObject);
     procedure BackupBtnClick(Sender: TObject);
     procedure IBXServicesConnection1Login(Service: TIBXServicesConnection;
-      LoginParams: TStrings);
+      var aServerName: string; LoginParams: TStrings);
     procedure IBXServicesConnection1SecurityContextException(
       Service: TIBXServicesConnection; var aAction: TSecContextAction);
     procedure RestoreBtnClick(Sender: TObject);
@@ -130,6 +130,7 @@ var i: integer;
 begin
   {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
   FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
+  Application.ExceptionDialog := aedOkMessageBox;
   FDBName := sDefaultDatabaseName;
 
   {Open the Services API connection }
@@ -311,12 +312,12 @@ end;
 {Logon to the current security database on the server}
 
 procedure TMainForm.IBXServicesConnection1Login(
-  Service: TIBXServicesConnection; LoginParams: TStrings);
+  Service: TIBXServicesConnection; var aServerName: string; LoginParams: TStrings);
 var aServiceName: string;
     aUserName: string;
     aPassword: string;
 begin
-  aServiceName := Service.ServerName;
+  aServiceName := aServerName;
   aUserName := LoginParams.Values['user_name'];
   aPassword := '';
   if SvcLoginDlg.ShowModal(aServiceName, aUserName, aPassword) = mrOK then
@@ -326,6 +327,7 @@ begin
     LoginParams.Values['password'] := aPassword;
     FServerUserName := aUserName;
     FServerPassword := aPassword;
+    aServerName := aServiceName;
   end
   else
     IBError(ibxeOperationCancelled, [nil]);

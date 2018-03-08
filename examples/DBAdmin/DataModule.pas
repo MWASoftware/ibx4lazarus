@@ -151,7 +151,7 @@ type
     procedure IBValidationService1GetNextLine(Sender: TObject; var Line: string
       );
     procedure IBXServicesConnection1Login(Service: TIBXServicesConnection;
-      LoginParams: TStrings);
+      var aServerName: string; LoginParams: TStrings);
     procedure LegacyUserListAfterOpen(DataSet: TDataSet);
     procedure LegacyUserListBeforeClose(DataSet: TDataSet);
     procedure ShadowFilesCalcFields(DataSet: TDataSet);
@@ -185,6 +185,7 @@ type
     FPortNo: string;
     FProtocol: TProtocolAll;
     FDatabasePathName: string;
+    procedure ConnectServicesAPI;
     function GetAuthMethod: string;
     function GetAutoAdmin: boolean;
     function GetDatabaseName: string;
@@ -465,6 +466,21 @@ begin
   DataSet.FieldByName('SEC$USER_NAME').AsString := DataSet.DataSource.DataSet.FieldByName('SEC$USER_NAME').AsString;
 end;
 
+procedure TDatabaseData.ConnectServicesAPI;
+begin
+  if IBXServicesConnection1.Connected then Exit;
+  try
+    IBXServicesConnection1.ConnectUsing(IBDatabase1);
+  except on E: Exception do
+    begin
+      Application.ShowException(E);
+      IBDatabase1.Connected := false;
+      FDBPassword := '';
+      Exit;
+    end;
+  end;
+end;
+
 procedure TDatabaseData.GetDBFlags;
 var Lines: TStringList;
     i: integer;
@@ -622,16 +638,6 @@ begin
   AttmtQuery.Active := true;
   if LegacyUserList.Active then
     RoleNameList.Active := true;
-  try
-    IBXServicesConnection1.Connected := true;
-  except on E: Exception do
-    begin
-      Application.ShowException(E);
-      IBDatabase1.Connected := false;
-      FDBPassword := '';
-      Exit;
-    end;
-  end;
   if assigned(FAfterDataReload) then
     AfterDataReload(self);
 end;
@@ -1215,46 +1221,10 @@ begin
 end;
 
 procedure TDatabaseData.IBXServicesConnection1Login(
-  Service: TIBXServicesConnection; LoginParams: TStrings);
-var SecPlugin: TField;
-    UsingDefaultSecDatabase: boolean;
-    index: integer;
+  Service: TIBXServicesConnection; var aServerName: string; LoginParams: TStrings);
 begin
   LoginParams.Values['user_name'] := FDBUserName;
   LoginParams.Values['password'] := FDBPassword;
-  LoginParams.Values['sql_role_name'] := 'RDB$ADMIN';
-
-  if FProtocol <> unknownProtocol then
-    Service.Protocol := FProtocol
-  else
-    Service.Protocol := Local;
-  Service.PortNo := FPortNo;
-  if Service.Protocol = Local then
-  begin
-    {If Local we must specify the server as the Localhost}
-    Service.ServerName := 'Localhost';
-    if AttmtQuery.Active then
-    begin
-      if not AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull then
-        Service.Protocol := TCP; {Use loopback if database does not use embedded server}
-    end
-    else {Special case - database not open}
-    if not FileExists(DatabaseName) or FileIsReadOnly(DatabaseName) then
-      Service.Protocol := TCP; {Use loopback if database does not use embedded server}
-  end
-  else
-    Service.ServerName := FServername;
-
-  {Are we using a different security database?}
-
-  SecPlugin := DatabaseQuery.FindField('MON$SEC_DATABASE');
-  if (SecPlugin = nil) or (Trim(SecPlugin.AsString) = 'Default') then
-  begin
-    index := LoginParams.IndexOfName('expected_db');
-    if index <> -1 then LoginParams.Delete(index);
-  end
-  else
-    LoginParams.Values['expected_db'] := DatabaseName
 end;
 
 procedure TDatabaseData.LegacyUserListAfterOpen(DataSet: TDataSet);
@@ -1353,11 +1323,7 @@ begin
     end;
 
   FLocalConnect := FProtocol = Local;
-  IBStatisticalService1.DatabaseName := DatabaseName;
-  IBConfigService1.DatabaseName := DatabaseName;
-  IBValidationService1.DatabaseName := DatabaseName;
-  IBOnlineValidationService1.DatabaseName := DatabaseName;
-  IBLimboTrans.DatabaseName := DatabaseName;
+  ConnectServicesAPI;
   ReloadData;
 end;
 

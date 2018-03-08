@@ -38,7 +38,7 @@ unit IBXServices;
 interface
 
 uses
-  Classes, SysUtils, DB, IB, IBTypes, IBSQLMonitor, IBExternals, memds;
+  Classes, SysUtils, DB, IB, IBDatabase, IBTypes, IBSQLMonitor, IBExternals, memds;
 
 type
   TIBXCustomService = class;
@@ -46,18 +46,20 @@ type
   TIBXServicesConnection = class;
 
   IIBXServicesClient = interface
+    procedure OnAfterConnect(Sender: TIBXServicesConnection; aDatabaseName: string);
     procedure OnBeforeDisconnect(Sender: TIBXServicesConnection);
   end;
 
   TSecContextAction = (scRaiseError, scReconnect);
 
-  TIBXServicesLoginEvent = procedure(Service: TIBXServicesConnection; LoginParams: TStrings) of object;
+  TIBXServicesLoginEvent = procedure(Service: TIBXServicesConnection; var aServerName: string; LoginParams: TStrings) of object;
   TIBXServicesSecContextEvent = procedure(Service: TIBXServicesConnection; var aAction: TSecContextAction) of object;
 
   { TIBXServicesConnection }
 
   TIBXServicesConnection = class(TIBXMonitoredConnection)
   private
+    FDatabase: TIBDatabase;
     FConnectString: string;
     FOnSecurityContextException: TIBXServicesSecContextEvent;
     FParams: TStrings;
@@ -96,6 +98,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure ConnectUsing(aDatabase: TIBDatabase);
     {Copies database parameters as give in the DBParams to the Services connection
       omitting any parameters not appropriate for Services API. Typically, the
       DBParams are TIBDatabase.Params}
@@ -134,6 +137,7 @@ type
    procedure SetServicesConnection(AValue: TIBXServicesConnection);
  protected
    procedure Clear; virtual;
+   procedure OnAfterConnect(Sender: TIBXServicesConnection; aDatabaseName: string); virtual;
    procedure OnBeforeDisconnect(Sender: TIBXServicesConnection); virtual;
    procedure InternalServiceQuery(RaiseExceptionOnError: boolean=true);
    procedure DoServiceQuery; virtual;
@@ -219,15 +223,17 @@ end;
    function GetIsServiceRunning: Boolean;
    procedure HandleSecContextErr;
    procedure CallSecContextException;
+   procedure SetDatabaseName(AValue: string);
  protected
+   procedure DatabaseNameChanged; virtual;
+   procedure OnAfterConnect(Sender: TIBXServicesConnection; aDatabaseName: string); override;
    procedure AddDBNameToSRB;
-   procedure Clear; override;
    procedure CheckServiceNotRunning;
    procedure InternalServiceStart;
    procedure DoServiceQuery; override;
    procedure SetServiceStartOptions; virtual;
    procedure ServiceStart; virtual;
-   property DatabaseName: string read FDatabaseName write FDatabaseName;
+   property DatabaseName: string read FDatabaseName write SetDatabaseName;
  public
    property IsServiceRunning : Boolean read GetIsServiceRunning;
  end;
@@ -385,6 +391,7 @@ end;
    FPageBuffers: Integer;
    procedure SetDatabaseFiles(const Value: TStrings);
  protected
+   procedure DatabaseNameChanged; override;
    procedure SetServiceStartOptions; override;
    procedure SetArchiveSource; virtual; abstract;
  public
@@ -891,6 +898,7 @@ end;
 
 
   constructor TIBXServicesLimboTransactionsList.Create(AOwner: TComponent);
+  var i: integer;
   begin
     inherited Create(AOwner);
     FRequiredSource := TIBXLimboTransactionResolutionService;
@@ -905,6 +913,8 @@ end;
       Add('State',ftString,32);
       Add('RecommendedAction',ftString,32);
       Add('RequestedAction',ftString,32);
+      for i := 0 to Count - 2 do
+        Items[i].Attributes := Items[i].Attributes + [faReadOnly];
     end;
   end;
 
@@ -1717,6 +1727,13 @@ begin
   FDatabaseFiles.Assign(Value);
 end;
 
+procedure TIBXRestoreService.DatabaseNameChanged;
+begin
+  inherited DatabaseNameChanged;
+  DatabaseFiles.Clear;
+  DatabaseFiles.Add(DatabaseName);
+end;
+
 procedure TIBXRestoreService.SetServiceStartOptions;
 var
   param: Integer;
@@ -2257,12 +2274,15 @@ end;
 
 function TIBXControlService.GetIsServiceRunning: Boolean;
 begin
-  SRB.Add(isc_info_svc_running);
-  InternalServiceQuery(false);
-  Result := (FServiceQueryResults <> nil) and (FServiceQueryResults.Count > 0) and
-               (FServiceQueryResults[0].getItemType = isc_info_svc_running) and
-                (FServiceQueryResults[0].AsInteger = 1);
-
+  Result := (ServicesConnection <> nil) and (ServicesConnection.Connected);
+  if Result then
+  begin
+    SRB.Add(isc_info_svc_running);
+    InternalServiceQuery(false);
+    Result := (FServiceQueryResults <> nil) and (FServiceQueryResults.Count > 0) and
+                 (FServiceQueryResults[0].getItemType = isc_info_svc_running) and
+                  (FServiceQueryResults[0].AsInteger = 1);
+  end;
 end;
 
 procedure TIBXControlService.HandleSecContextErr;
@@ -2279,17 +2299,32 @@ begin
   ServicesConnection.HandleSecContextException(self,FAction)
 end;
 
+procedure TIBXControlService.SetDatabaseName(AValue: string);
+begin
+  if FDatabaseName = AValue then Exit;
+  CheckServiceNotRunning;
+  FDatabaseName := AValue;
+  DatabaseNameChanged;
+end;
+
+procedure TIBXControlService.DatabaseNameChanged;
+begin
+  //Do nothing
+end;
+
+procedure TIBXControlService.OnAfterConnect(Sender: TIBXServicesConnection;
+  aDatabaseName: string);
+begin
+  inherited OnAfterConnect(Sender,aDatabaseName);
+  if aDatabaseName <> '' then
+    DatabaseName := aDatabaseName;
+end;
+
 procedure TIBXControlService.AddDBNameToSRB;
 begin
   if FDatabaseName = '' then
     IBError(ibxeStartParamsError, [nil]);
   SRB.Add(isc_spb_dbname).AsString := FDatabaseName;
-end;
-
-procedure TIBXControlService.Clear;
-begin
-  inherited Clear;
-  FLastStartSRB := nil;
 end;
 
 procedure TIBXControlService.CheckServiceNotRunning;
@@ -2663,6 +2698,12 @@ begin
   FSQPB := nil;
 end;
 
+procedure TIBXCustomService.OnAfterConnect(Sender: TIBXServicesConnection;
+  aDatabaseName: string);
+begin
+  //Do nothing
+end;
+
 { TIBXServicesConnection }
 
 procedure TIBXServicesConnection.SetParams(AValue: TStrings);
@@ -2841,9 +2882,8 @@ begin
     ExtLoginParams := TStringList.Create;
     try
       ExtLoginParams.Assign(Params);
-      FOnLogin(Self, ExtLoginParams);
+      FOnLogin(Self, aServerName, ExtLoginParams);
       LoginParams.Assign (ExtLoginParams);
-      aServerName := ServerName;
     finally
       ExtLoginParams.Free;
     end;
@@ -2938,32 +2978,62 @@ procedure TIBXServicesConnection.DoConnect;
   end;
 
 var aServerName: string;
+    aProtocol: TProtocolAll;
+    aPortNo: string;
+    aDBName: string;
     TempSvcParams: TStrings;
     SPB: ISPB;
     PW: ISPBItem;
+    i: integer;
 begin
   CheckInactive;
   CheckServerName;
 
   aServerName := FServerName;
+  aProtocol := FProtocol;
+  aPortNo := PortNo;
+  aDBName := '';
+
+  if FDatabase <> nil then
+  {Get Connect String from Database Connect String}
+  begin
+    if ParseConnectString(FDatabase.DatabaseName,aServerName,aDBName,aProtocol,aPortNo) and
+      (aProtocol = Local) and
+      (FDatabase.Attachment.GetRemoteProtocol <> '') then
+    begin
+      {Use loopback if database does not use embedded server}
+      aServerName := 'Localhost';
+      aProtocol := TCP;
+    end;
+  end;
 
   TempSvcParams := TStringList.Create;
   try
     TempSvcParams.Assign(FParams);
     if LoginPrompt and not Login(aServerName,TempSvcParams) then
       IBError(ibxeOperationCancelled, [nil]);
-    if FExpectedDB <> '' then
-      TempSvcParams.Values['expected_db'] := FExpectedDB;
+
+    {Use of non-default security database}
+    if FExpectedDB <> '' then {set when handling an isc_sec_context exception}
+      TempSvcParams.Values['expected_db'] := FExpectedDB
+    else
+    if (FDatabase <> nil) and (FDatabase.Attachment.GetSecurityDatabase <> 'Default')
+        and (aDBName <> '') then
+        {Connect using database using non-default security database}
+      TempSvcParams.Values['expected_db'] := aDBName;
     SPB := GenerateSPB(TempSvcParams);
   finally
     TempSvcParams.Free;
   end;
 
-  FService := FirebirdAPI.GetServiceManager(aServerName,PortNo,FProtocol,SPB);
+  FService := FirebirdAPI.GetServiceManager(aServerName,aPortNo,aProtocol,SPB);
   PW := FService.getSPB.Find(isc_spb_password);
   if PW <> nil then PW.AsString := 'xxxxxxxx'; {Hide password}
 
   ParseServerVersionNo;
+
+  for i := low(FIBXServices) to high(FIBXServices) do
+    FIBXServices[i].OnAfterConnect(self,aDBName);
 
   if tfService in TraceFlags then
     MonitorHook.ServiceAttach(Self);
@@ -3041,6 +3111,19 @@ begin
   inherited Destroy;
   Setlength(FIBXServices,0);
   if assigned(FParams) then FParams.Free;
+end;
+
+procedure TIBXServicesConnection.ConnectUsing(aDatabase: TIBDatabase);
+begin
+  if not aDatabase.Connected then
+    IBError(ibxeDatabaseNotConnected,[nil]);
+  Connected := false;
+  FDatabase := aDatabase;
+  try
+    Connected := true;
+  finally
+    FDatabase := nil;
+  end;
 end;
 
 procedure TIBXServicesConnection.SetDBParams(DBParams: TStrings);
