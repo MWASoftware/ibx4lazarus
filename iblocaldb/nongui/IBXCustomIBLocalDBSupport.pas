@@ -131,7 +131,6 @@ type
     { Protected declarations }
     function AllowInitialisation: boolean; virtual;
     function AllowRestore: boolean; virtual;
-    procedure DBDisconnectRetain;
     procedure CreateDir(DirName: string);
     function InternalCreateNewDatabase(DBArchive: string): boolean; virtual; abstract;
     procedure Downgrade(DBArchive: string); virtual;
@@ -306,7 +305,6 @@ begin
   if not DowngradePending and FNewDBCreated and assigned(FOnNewDatabaseOpen) then
     OnNewDatabaseOpen(self);
   FNewDBCreated := false;
-
 end;
 
 procedure TCustomIBLocalDBSupport.OnAfterDatabaseDisconnect(Sender: TObject);
@@ -391,14 +389,6 @@ end;
 function TCustomIBLocalDBSupport.AllowRestore: boolean;
 begin
   Result := true;
-end;
-
-procedure TCustomIBLocalDBSupport.DBDisconnectRetain;
-var i : integer;
-begin
-  for i := 0 to Database.TransactionCount - 1  do
-    Database.Transactions[i].BeforeDatabaseDisconnect(Database);
-  Database.Attachment.Disconnect;
 end;
 
 procedure TCustomIBLocalDBSupport.CreateDir(DirName: string);

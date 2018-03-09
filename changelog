@@ -37,6 +37,9 @@ packages.
 6. TIBSScript: IgnoreCreateDatabase added. If true then CREATE DATABASE statements
    are ignored.
 
+7. TIBDatabase: DropDatabase now ensures that all transactions have been properly
+   closed before the database is dropped.
+
 IBX Change Log  version                                                       (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO

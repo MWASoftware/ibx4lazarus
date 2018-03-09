@@ -131,7 +131,7 @@ begin
       BackupFiles.Add(DBArchive);
       Options := [Replace];
       WriteLog(sCreatingDatabase);
-      DBDisconnectRetain;
+      Database.Attachment.Disconnect;
       try
         Execute(nil);
       finally

@@ -176,9 +176,12 @@ type
   TIBDatabaseLoginEvent = procedure(Database: TIBDatabase;
     LoginParams: TStrings) of object;
 
+
   TIBFileName = type string;
   { TIBDatabase }
   TIBDataBase = class(TCustomConnection)
+  private
+    type TIBDatabaseCloseActions = (caNormal,caForce, caDropDatabase);
   private
     FAttachment: IAttachment;
     FCreateDatabase: boolean;
@@ -231,7 +234,7 @@ type
     function AddSQLObject(ds: TIBBase): Integer;
     procedure RemoveSQLObject(Idx: Integer);
     procedure RemoveSQLObjects;
-    procedure InternalClose(Force: Boolean);
+    procedure InternalClose(CloseAction: TIBDatabaseCloseActions);
     procedure DoOnCreateDatabase;
 
   protected
@@ -351,6 +354,7 @@ type
     function GetSQLObjectCount: Integer;
     function GetInTransaction: Boolean;
     function GetIdleTimer: Integer;
+    procedure BeforeDatabaseDisconnect(DB: TIBDatabase);
     procedure SetActive(Value: Boolean);
     procedure SetDefaultDatabase(Value: TIBDatabase);
     procedure SetIdleTimer(Value: Integer);
@@ -369,7 +373,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure BeforeDatabaseDisconnect(DB: TIBDatabase);
     procedure Commit;
     procedure CommitRetaining;
     procedure Rollback;
@@ -616,7 +619,7 @@ end;
  procedure TIBDataBase.DoDisconnect;
 begin
   if Connected then
-    InternalClose(False);
+    InternalClose(caNormal);
 end;
 
   procedure TIBDataBase.CreateDatabase;
@@ -637,9 +640,7 @@ end;
 
  procedure TIBDataBase.DropDatabase;
 begin
-  CheckActive;
-  FAttachment.DropDatabase;
-  FAttachment := nil;
+  InternalClose(caDropDatabase);
 end;
 
  procedure TIBDataBase.DBParamsChange(Sender: TObject);
@@ -687,7 +688,7 @@ end;
  procedure TIBDataBase.ForceClose;
 begin
   if Connected then
-    InternalClose(True);
+    InternalClose(caForce);
 end;
 
  function TIBDataBase.GetConnected: Boolean;
@@ -745,7 +746,7 @@ begin
   end;
 end;
 
- procedure TIBDataBase.InternalClose(Force: Boolean);
+  procedure TIBDataBase.InternalClose(CloseAction: TIBDatabaseCloseActions);
 var
   i: Integer;
 begin
@@ -759,7 +760,7 @@ begin
       if FTransactions[i] <> nil then
         Transactions[i].BeforeDatabaseDisconnect(Self);
     except
-      if not Force then
+      if CloseAction <> caForce then
         raise;
     end;
   end;
@@ -769,12 +770,19 @@ begin
       if FSQLObjects[i] <> nil then
         SQLObjects[i].DoBeforeDatabaseDisconnect;
     except
-      if not Force then
+      if CloseAction <> caForce then
         raise;
     end;
   end;
 
-  FAttachment.Disconnect(Force);
+  case CloseAction of
+  caNormal:
+    FAttachment.Disconnect(false);
+  caForce:
+    FAttachment.Disconnect(true);
+  caDropDatabase:
+    FAttachment.DropDatabase;
+  end;
   FAttachment := nil;
 
   if not (csDesigning in ComponentState) then

@@ -121,7 +121,7 @@ begin
   Ext := AnsiUpperCase(ExtractFileExt(DBArchive));
   if Ext = '.GBK' then
   begin
-    DBDisconnectRetain;
+    Database.Attachment.Disconnect;
     try
       Result := IBXCreateDatabaseDlg.RestoreDatabaseFromArchive(RestoreService,DBArchive)
     finally
