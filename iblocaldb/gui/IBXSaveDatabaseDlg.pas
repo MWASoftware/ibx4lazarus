@@ -57,8 +57,7 @@ type
 var
   SaveDatabaseDlg: TSaveDatabaseDlg;
 
-function SaveDatabaseToArchive(DBName: string;
-  aServicesConnection: TIBXServicesConnection; aFilename: string): boolean;
+function SaveDatabaseToArchive(aBackupService: TIBXServerSideBackupService; aFilename: string): boolean;
 
 implementation
 
@@ -70,8 +69,8 @@ const
   rgPersonal          = 'Personal';
 {$ENDIF}
 
-function SaveDatabaseToArchive(DBName: string;
-  aServicesConnection: TIBXServicesConnection; aFilename: string): boolean;
+function SaveDatabaseToArchive(aBackupService: TIBXServerSideBackupService;
+  aFilename: string): boolean;
 begin
  with TSaveDatabaseDlg.Create(Application) do
  try
@@ -94,8 +93,7 @@ begin
     else
       Exit;
   end;
-  IBBackupService1.ServicesConnection := aServicesConnection;
-  IBBackupService1.DatabaseName := DBName;
+  IBBackupService1.Assign(aBackupService);
   IBBackupService1.BackupFiles.Clear;
   IBBackupService1.BackupFiles.Add(aFileName);
   Result := ShowModal = mrOK

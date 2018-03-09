@@ -54,7 +54,7 @@ type
   private
     FOnGetDatabaseVersionNo: TGetDatabaseVersionNo;
     FOnUpgradeStepCompleted: TNotifyEvent;
-    FServicesConnection: TIBXServicesConnection;
+    FBackupService: TIBXServerSideBackupService;
     { private declarations }
     FUpgradeLog: TStrings;
     FTargetVersionNo: integer;
@@ -68,8 +68,6 @@ type
     constructor Create(theOwner: TComponent); override;
     destructor Destroy; override;
     procedure Add2Log(Msg: string);
-    property ServicesConnection: TIBXServicesConnection read FServicesConnection
-             write FServicesConnection;
     property OnGetDatabaseVersionNo: TGetDatabaseVersionNo read FOnGetDatabaseVersionNo
              write FOnGetDatabaseVersionNo;
     property OnUpgradeStepCompleted: TNotifyEvent read FOnUpgradeStepCompleted write FOnUpgradeStepCompleted;
@@ -80,7 +78,7 @@ var
   UpgradeDatabaseDlg: TUpgradeDatabaseDlg;
 
 function RunUpgradeDatabase(aDatabase: TIBDatabase;
-                            aServicesConnection: TIBXServicesConnection;
+                            aBackupService: TIBXServerSideBackupService;
                             UpgradeConf: TUpgradeConfFile;
                             ArchiveStub: string;
                             TargetVersionNo: integer;
@@ -102,7 +100,7 @@ resourcestring
   sUpdateFailed    = 'Update Failed - %s';
 
 function RunUpgradeDatabase(aDatabase: TIBDatabase;
-  aServicesConnection: TIBXServicesConnection;
+  aBackupService: TIBXServerSideBackupService;
   UpgradeConf: TUpgradeConfFile; ArchiveStub: string; TargetVersionNo: integer;
   aOnGetDatabaseVersionNo: TGetDatabaseVersionNo;
   aOnUpgradeStepCompleted: TNotifyEvent): boolean;
@@ -113,7 +111,7 @@ begin
   with TUpgradeDatabaseDlg.Create(Application) do
   try
     FTargetVersionNo := TargetVersionNo;
-    ServicesConnection := aServicesConnection;
+    FBackupService := aBackupService;
     FUpgradeConf := UpgradeConf;
     FArchiveStub := ArchiveStub;
     IBXScript.Database := aDatabase;
@@ -194,8 +192,7 @@ begin
         begin
           CreateDir(ExtractFileDir(FArchiveStub));
           DBArchive := FArchiveStub + '.' + IntToStr(CurrentDBVersionNo) + '.gbk';
-          with IBXScript.Database do
-            SaveDatabaseToArchive(DatabaseName,ServicesConnection,DBArchive);
+          SaveDatabaseToArchive(FBackupService,DBArchive);
         end;
         Add2Log(UpgradeInfo.UserMessage);
         Status.Caption := UpgradeInfo.UserMessage;

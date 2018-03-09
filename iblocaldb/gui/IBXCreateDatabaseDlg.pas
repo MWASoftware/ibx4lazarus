@@ -57,16 +57,16 @@ type
 var
   CreateDatabaseDlg: TCreateDatabaseDlg;
 
-function RestoreDatabaseFromArchive(DBName: string;
-   aServicesConnection: TIBXServicesConnection;  aFilename: string): boolean;
+function RestoreDatabaseFromArchive(
+   aRestoreService: TIBXServerSideRestoreService;  aFilename: string): boolean;
 
-function CreateNewDatabase(DBName: string;
-   aServicesConnection: TIBXServicesConnection;  DBArchive: string): boolean;
+function CreateNewDatabase(
+   aRestoreService: TIBXServerSideRestoreService;  DBArchive: string): boolean;
 
 implementation
 
-function RestoreDatabaseFromArchive(DBName: string; aServicesConnection: TIBXServicesConnection;
-  aFilename: string): boolean;
+function RestoreDatabaseFromArchive(
+  aRestoreService: TIBXServerSideRestoreService; aFilename: string): boolean;
 begin
  with TCreateDatabaseDlg.Create(Application) do
  try
@@ -78,29 +78,25 @@ begin
     else
       Exit;
    end;
-   IBRestoreService1.ServicesConnection := aServicesConnection;
+   IBRestoreService1.Assign(aRestoreService);
    IBRestoreService1.BackupFiles.Clear;
-   IBRestoreService1.DatabaseFiles.Clear;
    IBRestoreService1.Options := [replace];
    IBRestoreService1.BackupFiles.Add(aFilename);
-   IBRestoreService1.DatabaseFiles.Add(DBName);
    Result := ShowModal = mrOK;
  finally
    Free
  end;
 end;
 
-function CreateNewDatabase(DBName: string;
-  aServicesConnection: TIBXServicesConnection;  DBArchive: string): boolean;
+function CreateNewDatabase(aRestoreService: TIBXServerSideRestoreService;
+  DBArchive: string): boolean;
 begin
  with TCreateDatabaseDlg.Create(Application) do
  try
-  IBRestoreService1.ServicesConnection := aServicesConnection;
+  IBRestoreService1.Assign(aRestoreService);
   IBRestoreService1.BackupFiles.Clear;
-  IBRestoreService1.DatabaseFiles.Clear;
-  IBRestoreService1.Options := [CreateNewDB];
   IBRestoreService1.BackupFiles.Add(DBArchive);
-  IBRestoreService1.DatabaseFiles.Add(DBName);
+  IBRestoreService1.Options := [CreateNewDB];
   Result := ShowModal = mrOK;
  finally
    Free

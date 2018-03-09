@@ -148,6 +148,7 @@ type
  public
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
+   procedure Assign(Source: TPersistent); override;
  published
    property ServicesConnection: TIBXServicesConnection read FServicesConnection
      write SetServicesConnection;
@@ -235,6 +236,7 @@ end;
    procedure ServiceStart; virtual;
    property DatabaseName: string read FDatabaseName write SetDatabaseName;
  public
+   procedure Assign(Source: TPersistent); override;
    property IsServiceRunning : Boolean read GetIsServiceRunning;
  end;
 
@@ -2422,6 +2424,13 @@ begin
   InternalServiceStart;
 end;
 
+procedure TIBXControlService.Assign(Source: TPersistent);
+begin
+  inherited Assign(Source);
+  if Source is TIBXControlService then
+    DatabaseName := TIBXControlService(Source).DatabaseName;
+end;
+
 { TConfigParams }
 
 constructor TConfigParams.Create;
@@ -2689,6 +2698,12 @@ begin
     ServicesConnection := nil;
   end;
   inherited Destroy;
+end;
+
+procedure TIBXCustomService.Assign(Source: TPersistent);
+begin
+  if Source is TIBXCustomService then
+    ServicesConnection := TIBXCustomService(Source).ServicesConnection;
 end;
 
 procedure TIBXCustomService.Clear;
@@ -2997,7 +3012,7 @@ begin
   if FDatabase <> nil then
   {Get Connect String from Database Connect String}
   begin
-    if ParseConnectString(FDatabase.DatabaseName,aServerName,aDBName,aProtocol,aPortNo) and
+    if ParseConnectString(FDatabase.Attachment.GetConnectString,aServerName,aDBName,aProtocol,aPortNo) and
       (aProtocol = Local) and
       (FDatabase.Attachment.GetRemoteProtocol <> '') then
     begin

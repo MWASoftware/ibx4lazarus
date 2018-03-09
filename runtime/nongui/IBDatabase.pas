@@ -210,6 +210,7 @@ type
     function GetDefaultCharSetName: AnsiString;
     function GetDefaultCodePage: TSystemCodePage;
     function GetRemoteProtocol: string;
+    function GetSQLObjectsCount: Integer;
     procedure SetSQLDialect(const Value: Integer);
     procedure ValidateClientSQLDialect;
     procedure DBParamsChange(Sender: TObject);
@@ -231,6 +232,7 @@ type
     procedure RemoveSQLObject(Idx: Integer);
     procedure RemoveSQLObjects;
     procedure InternalClose(Force: Boolean);
+    procedure DoOnCreateDatabase;
 
   protected
     procedure DoConnect; override;
@@ -268,7 +270,8 @@ type
     property Attachment: IAttachment read FAttachment;
     property DBSQLDialect : Integer read GetDBSQLDialect;
     property IsReadOnly: Boolean read GetIsReadOnly;
-    property SQLObjectCount: Integer read GetSQLObjectCount;
+    property SQLObjectCount: Integer read GetSQLObjectCount; {ignores nil objects}
+    property SQLObjectsCount: Integer read GetSQLObjectsCount;
     property SQLObjects[Index: Integer]: TIBBase read GetSQLObject;
     property TransactionCount: Integer read GetTransactionCount;
     property Transactions[Index: Integer]: TIBTransaction read GetTransaction;
@@ -348,7 +351,6 @@ type
     function GetSQLObjectCount: Integer;
     function GetInTransaction: Boolean;
     function GetIdleTimer: Integer;
-    procedure BeforeDatabaseDisconnect(DB: TIBDatabase);
     procedure SetActive(Value: Boolean);
     procedure SetDefaultDatabase(Value: TIBDatabase);
     procedure SetIdleTimer(Value: Integer);
@@ -367,6 +369,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure BeforeDatabaseDisconnect(DB: TIBDatabase);
     procedure Commit;
     procedure CommitRetaining;
     procedure Rollback;
@@ -414,7 +417,7 @@ type
 
   TTransactionEndEvent = procedure(Sender:TObject; Action: TTransactionAction) of object;
   TBeforeDatabaseConnectEvent = procedure (Sender: TObject; DBParams: TStrings;
-                              var DBName: string) of object;
+                              var DBName: string; var CreateIfNotExists: boolean) of object;
 
   { TIBBase }
 
@@ -422,6 +425,8 @@ type
     It is to more easily manage the database and transaction
     connections. }
   TIBBase = class(TObject)
+  private
+    FOnCreateDatabase: TNotifyEvent;
   protected
     FBeforeDatabaseConnect: TBeforeDatabaseConnectEvent;
     FDatabase: TIBDatabase;
@@ -438,10 +443,11 @@ type
     FOnTransactionFree: TNotifyEvent;
 
     procedure DoBeforeDatabaseConnect(DBParams: TStrings;
-                              var DBName: string); virtual;
+                              var DBName: string; var CreateIfNotExists: boolean); virtual;
     procedure DoAfterDatabaseConnect; virtual;
     procedure DoBeforeDatabaseDisconnect; virtual;
     procedure DoAfterDatabaseDisconnect; virtual;
+    procedure DoOnCreateDatabase; virtual;
     procedure DoDatabaseFree; virtual;
     procedure DoBeforeTransactionEnd(Action: TTransactionAction); virtual;
     procedure DoAfterTransactionEnd; virtual;
@@ -470,6 +476,8 @@ type
                                                    write FBeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect: TNotifyEvent read FAfterDatabaseDisconnect
                                                   write FAfterDatabaseDisconnect;
+    property OnCreateDatabase: TNotifyEvent read FOnCreateDatabase
+                                            write FOnCreateDatabase;
     property OnDatabaseFree: TNotifyEvent read FOnDatabaseFree write FOnDatabaseFree;
     property BeforeTransactionEnd: TTransactionEndEvent read FBeforeTransactionEnd write FBeforeTransactionEnd;
     property AfterTransactionEnd: TNotifyEvent read FAfterTransactionEnd write FAfterTransactionEnd;
@@ -624,8 +632,7 @@ begin
   CheckInactive;
   FAttachment := FirebirdAPI.CreateDatabase(createDatabaseSQL,SQLDialect);
   FDBName := Attachment.GetConnectString;
-  if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
-    OnCreateDatabase(self);
+  DoOnCreateDatabase;
 end;
 
  procedure TIBDataBase.DropDatabase;
@@ -777,6 +784,18 @@ begin
     if FSQLObjects[i] <> nil then
       SQLObjects[i].DoAfterDatabaseDisconnect;
 end;
+
+ procedure TIBDataBase.DoOnCreateDatabase;
+ var i: integer;
+ begin
+   for i := 0 to FSQLObjects.Count - 1 do
+   begin
+       if FSQLObjects[i] <> nil then
+         SQLObjects[i].DoOnCreateDatabase;
+   end;
+   if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
+     OnCreateDatabase(self);
+ end;
 
 procedure TIBDataBase.CheckStreamConnect;
 var
@@ -966,8 +985,10 @@ var
   CharSetName: AnsiString;
   DPB: IDPB;
   PW: IDPBItem;
+  aCreateIfNotExists: boolean;
 begin
   DPB := nil;
+  aCreateIfNotExists := CreateIfNotExists;
   CheckInactive;
   CheckDatabaseName;
   if (not LoginPrompt) and (FHiddenPassword <> '') then
@@ -993,7 +1014,7 @@ begin
    for i := 0 to FSQLObjects.Count - 1 do
    begin
        if FSQLObjects[i] <> nil then
-         SQLObjects[i].DoBeforeDatabaseConnect(TempDBParams,aDBName);
+         SQLObjects[i].DoBeforeDatabaseConnect(TempDBParams,aDBName, aCreateIfNotExists);
    end;
 
    repeat
@@ -1017,8 +1038,7 @@ begin
        FAttachment := FirebirdAPI.CreateDatabase(aDBName,DPB, false);
        if FAttachment = nil then
          DPB := nil;
-       if assigned(FOnCreateDatabase) and (FAttachment <> nil) then
-         OnCreateDatabase(self);
+       DoOnCreateDatabase;
      end
      else
        FAttachment := FirebirdAPI.OpenDatabase(aDBName,DPB,false);
@@ -1044,7 +1064,7 @@ begin
        end;
        {$ENDIF}
        if ((Status.GetSQLCode = -902) and (Status.GetIBErrorCode = isc_io_error)) {Database not found}
-                        and CreateIfNotExists and not (csDesigning in ComponentState) then
+                        and aCreateIfNotExists and not (csDesigning in ComponentState) then
          FCreateDatabase := true
        else
          raise EIBInterBaseError.Create(Status);
@@ -1305,6 +1325,11 @@ function TIBDataBase.GetRemoteProtocol: string;
 begin
   CheckActive;
   Result := Attachment.GetRemoteProtocol;
+end;
+
+function TIBDataBase.GetSQLObjectsCount: Integer;
+begin
+  Result := FSQLObjects.Count;
 end;
 
  procedure TIBDataBase.ValidateClientSQLDialect;
@@ -2076,11 +2101,11 @@ begin
   FTransaction.CheckInTransaction;
 end;
 
-procedure TIBBase.DoBeforeDatabaseConnect(DBParams: TStrings; var DBName: string
-  );
+procedure TIBBase.DoBeforeDatabaseConnect(DBParams: TStrings;
+  var DBName: string; var CreateIfNotExists: boolean);
 begin
   if assigned(FBeforeDatabaseConnect) then
-    BeforeDatabaseConnect(self,DBParams,DBName);
+    BeforeDatabaseConnect(self,DBParams,DBName,CreateIfNotExists);
 end;
 
 procedure TIBBase.DoAfterDatabaseConnect;
@@ -2156,6 +2181,12 @@ procedure TIBBase.DoAfterPost(Sender: TObject);
 begin
   if FTransaction <> nil then
     FTransaction.DoAfterPost(Sender);
+end;
+
+procedure TIBBase.DoOnCreateDatabase;
+begin
+  if assigned(FOnCreateDatabase) then
+    OnCreateDatabase(self);
 end;
 
 procedure TIBBase.SetDatabase(Value: TIBDatabase);

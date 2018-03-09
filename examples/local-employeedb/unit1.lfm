@@ -11,7 +11,7 @@ object Form1: TForm1
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Button1: TButton
     Left = 956
     Height = 25
@@ -545,8 +545,8 @@ object Form1: TForm1
     AllowStreamedConnected = False
     DatabaseName = 'employee'
     Params.Strings = (
-      'user_name=SYSDBA'
       'lc_ctype=UTF8'
+      'user_name=SYSDBA'
     )
     DefaultTransaction = IBTransaction1
     IdleTimer = 0

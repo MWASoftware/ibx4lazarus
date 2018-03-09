@@ -44,11 +44,11 @@ type
   protected
     function AllowInitialisation: boolean; override;
     function AllowRestore: boolean; override;
-    function InternalCreateNewDatabase(DBName: string; DBArchive: string): boolean; override;
+    function InternalCreateNewDatabase(DBArchive: string): boolean; override;
     procedure Downgrade(DBArchive: string); override;
-    function RestoreDatabaseFromArchive(DBName:string; aFilename: string): boolean; override;
+    function RestoreDatabaseFromArchive(aFilename: string): boolean; override;
     function RunUpgradeDatabase(TargetVersionNo: integer): boolean; override;
-    function SaveDatabaseToArchive(DBName: string; aFilename: string): boolean; override;
+    function SaveDatabaseToArchive(aFilename: string): boolean; override;
   published
     property Database;
     property DatabaseName;
@@ -114,20 +114,23 @@ begin
             (MessageDlg(sReplaceBackup,mtWarning,[mbOK,mbCancel],0) = mrOK);
 end;
 
-function TIBLocalDBSupport.InternalCreateNewDatabase(DBName: string;
-  DBArchive: string): boolean;
+function TIBLocalDBSupport.InternalCreateNewDatabase(DBArchive: string
+  ): boolean;
 var Ext: string;
 begin
-  CreateDir(ExtractFileDir(DBName));
   Ext := AnsiUpperCase(ExtractFileExt(DBArchive));
   if Ext = '.GBK' then
-    Result := IBXCreateDatabaseDlg.CreateNewDatabase(DBName,ServicesConnection,DBArchive)
+  begin
+    DBDisconnectRetain;
+    try
+      Result := IBXCreateDatabaseDlg.RestoreDatabaseFromArchive(RestoreService,DBArchive)
+    finally
+      Database.Attachment.Connect;
+    end;
+  end
   else
   if Ext = '.SQL' then
-  begin
-    Database.DatabaseName := DBName;
     Result := IBXCreateDatabaseFromSQLDlgUnit.CreateNewDatabase(Database,DBArchive)
-  end
   else
     raise Exception.CreateFmt('Archive file (%s) has an unknown extension',[DBArchive]);
 end;
@@ -143,24 +146,23 @@ begin
   end;
 end;
 
-function TIBLocalDBSupport.RestoreDatabaseFromArchive(DBName: string;
-  aFilename: string): boolean;
+function TIBLocalDBSupport.RestoreDatabaseFromArchive(aFilename: string
+  ): boolean;
 begin
-  Result := IBXCreateDatabaseDlg.RestoreDatabaseFromArchive(DBName,ServicesConnection,aFileName);
+  Result := IBXCreateDatabaseDlg.RestoreDatabaseFromArchive(RestoreService,aFileName);
 end;
 
 function TIBLocalDBSupport.RunUpgradeDatabase(TargetVersionNo: integer
   ): boolean;
 begin
-  Result := IBXUpgradeDatabaseDlg.RunUpgradeDatabase(Database,ServicesConnection,UpgradeConf,
+  Result := IBXUpgradeDatabaseDlg.RunUpgradeDatabase(Database,BackupService,UpgradeConf,
                   ChangeFileExt(ActiveDatabasePathName,''),
                   TargetVersionNo,@HandleGetDBVersionNo, @HandleUpgradeStepCompleted);
 end;
 
-function TIBLocalDBSupport.SaveDatabaseToArchive(DBName: string;
-  aFilename: string): boolean;
+function TIBLocalDBSupport.SaveDatabaseToArchive(aFilename: string): boolean;
 begin
-  Result := IBXSaveDatabaseDlg.SaveDatabaseToArchive(DBName,ServicesConnection,aFileName);
+  Result := IBXSaveDatabaseDlg.SaveDatabaseToArchive(BackupService,aFileName);
 end;
 
 end.

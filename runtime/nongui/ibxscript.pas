@@ -274,6 +274,7 @@ type
     FIBSQLProcessor: TIBSQLProcessor;
     FDatabase: TIBDatabase;
     FDataOutputFormatter: TIBCustomDataOutput;
+    FIgnoreCreateDatabase: boolean;
     FIgnoreGrants: boolean;
     FOnCreateDatabase: TOnCreateDatabase;
     FOnErrorLog: TLogEvent;
@@ -317,7 +318,8 @@ type
     property AutoDDL: boolean read FAutoDDL write FAutoDDL default true;
     property Echo: boolean read FEcho write FEcho default true;  {Echo Input to Log}
     property IgnoreGrants: boolean read FIgnoreGrants write FIgnoreGrants;
-    property Transaction: TIBTransaction read FTransaction write SetTransaction;
+    property IgnoreCreateDatabase: boolean read FIgnoreCreateDatabase write FIgnoreCreateDatabase;
+    property Transaction: TIBTransaction read GetTransaction write SetTransaction;
     property ShowAffectedRows: boolean read FShowAffectedRows write FShowAffectedRows;
     property ShowPerformanceStats: boolean read FShowPerformanceStats write SetShowPerformanceStats;
     property StopOnFirstError: boolean read FStopOnFirstError write FStopOnFirstError default true;
@@ -557,8 +559,10 @@ end;
 procedure TCustomIBXScript.DoCommit;
 begin
   with GetTransaction do
+  begin
     if InTransaction then Commit;
-  GetTransaction.Active := true;
+    Active := true;
+  end;
 end;
 
 procedure TCustomIBXScript.DoReconnect;
@@ -626,7 +630,7 @@ end;
 
 function TCustomIBXScript.GetTransaction: TIBTransaction;
 begin
- if FTransaction = nil then
+ if not (csDesigning in ComponentState) and (FTransaction = nil) then
    Result := FInternalTransaction
  else
    Result := FTransaction;
@@ -726,8 +730,8 @@ begin
 
   except on E:Exception do
       begin
-        if FInternalTransaction.InTransaction then
-          FInternalTransaction.Rollback;
+        with GetTransaction do
+          if InTransaction then Rollback;
         if assigned(OnErrorLog) then
         begin
           Add2Log(Format(sStatementError,[FSymbolStream.GetErrorPrefix,
@@ -861,6 +865,11 @@ begin
     RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +''(.*)''(.*)(\' + Terminator + '|)';
     if RegexObj.Exec(ucStmt) then
     begin
+      if IgnoreCreateDatabase then
+      begin
+        Result := true;
+        Exit;
+      end;
       FileName := system.copy(stmt,RegexObj.MatchPos[2], RegexObj.MatchLen[2]);
       if assigned(FOnCreateDatabase) then
         OnCreateDatabase(self,FileName);
