@@ -235,12 +235,12 @@ begin
 
     {Now output the header}
 
-    Add2Log(DashedLine);
+    Add2Log(DashedLine,false);
     s := '|';
     for i := 0 to MetaData.Count - 1 do
       s += TextAlign(MetaData[i].Name,FColWidths[i],taCentre) + '|';
-    Add2Log(s);
-    Add2Log(DashedLine);
+    Add2Log(s,false);
+    Add2Log(DashedLine,false);
   end;
 end;
 
@@ -292,13 +292,13 @@ begin
     end;
     s += '|';
   end;
-  Add2Log(s);
-  Add2Log(DashedLine);
+  Add2Log(s,false);
+  Add2Log(DashedLine,false);
 end;
 
 procedure TIBBlockFormatOut.TrailerOut(Add2Log: TAdd2Log);
 begin
-  Add2Log(DashedLine);
+  Add2Log(DashedLine,false);
 end;
 
 { TIBInsertStmtsOut }
@@ -311,9 +311,9 @@ begin
   if TableName = '' then
     IBError(ibxeUniqueRelationReqd,[nil]);
 
-  Add2Log('');
-  Add2Log('/* Inserting data into Table: ' + TableName + ' */');
-  Add2Log('');
+  Add2Log('',false);
+  Add2Log('/* Inserting data into Table: ' + TableName + ' */',false);
+  Add2Log('',false);
 
   FInsertHeader := 'INSERT INTO ' + QuoteIdentifier(Database.SQLDialect, TableName) + ' (';
   with FIBSQL do
@@ -394,7 +394,7 @@ begin
     end;
   end;
   s += ');';
-  Add2Log(s);
+  Add2Log(s,false);
 end;
 
 constructor TIBInsertStmtsOut.Create(aOwner: TComponent);
@@ -415,7 +415,7 @@ begin
     if i <> 0 then s += ',';
     s += FIBSQL.MetaData[i].getAliasName;
   end;
-  Add2Log(s);
+  Add2Log(s,false);
 end;
 
 procedure TIBCSVDataOut.FormattedDataOut(Add2Log: TAdd2Log);
@@ -445,7 +445,7 @@ begin
       end;
     end;
   end;
-  Add2Log(s);
+  Add2Log(s,false);
 end;
 
 constructor TIBCSVDataOut.Create(aOwner: TComponent);
@@ -512,7 +512,7 @@ begin
   FIBSQL.Prepare;
   FIBSQL.Statement.EnableStatistics(ShowPerformanceStats);
   if PlanOptions <> poNoPlan then
-    Add2Log(FIBSQL.Plan);
+    Add2Log(FIBSQL.Plan,false);
   if PlanOptions = poPlanOnly then
     Exit;
 
@@ -594,21 +594,27 @@ begin
     done := false;
 end;
 
+{$IFDEF WINDOWS}
+const FC = '%d';
+{$ELSE}
+const FC = '%f';
+{$ENDIF}
+
 class procedure TIBCustomDataOutput.ShowPerfStats(Statement: IStatement;
   Add2Log: TAdd2Log);
 var stats: TPerfCounters;
 begin
   if Statement.GetPerfStatistics(stats) then
   begin
-    Add2Log(Format('Current memory = %f',[stats[psCurrentMemory]]));
-    Add2Log(Format('Delta memory = %f',[stats[psDeltaMemory]]));
-    Add2Log(Format('Max memory = %f',[stats[psMaxMemory]]));
+    Add2Log(Format('Current memory = ' + FC,[stats[psCurrentMemory]]));
+    Add2Log(Format('Delta memory = ' + FC,[stats[psDeltaMemory]]));
+    Add2Log(Format('Max memory = ' + FC,[stats[psMaxMemory]]));
     Add2Log('Elapsed time= ' + FormatFloat('#0.000',stats[psRealTime]/1000) +' sec');
     Add2Log('Cpu = ' + FormatFloat('#0.000',stats[psUserTime]/1000) + ' sec');
-    Add2Log(Format('Buffers = %f',[stats[psBuffers]]));
-    Add2Log(Format('Reads = %f',[stats[psReads]]));
-    Add2Log(Format('Writes = %f',[stats[psWrites]]));
-    Add2Log(Format('Fetches = %f',[stats[psFetches]]));
+    Add2Log(Format('Buffers = ' + FC,[stats[psBuffers]]));
+    Add2Log(Format('Reads = ' + FC,[stats[psReads]]));
+    Add2Log(Format('Writes = ' + FC,[stats[psWrites]]));
+    Add2Log(Format('Fetches = ' + FC,[stats[psFetches]]));
  end;
 end;
 
