@@ -443,8 +443,8 @@ procedure TCustomIBLocalDBSupport.PrepareDBParams(DBParams: TStrings);
 begin
     Remove('user_name');
     Remove('password');
+    DBParams.Values['user_name'] := 'SYSDBA';
     {$IFDEF WINDOWS}
-      DBParams.Values['user_name'] := 'SYSDBA';
       DBParams.Values['password'] := 'masterkey';
     {$ENDIF}
 end;
@@ -475,6 +475,7 @@ begin
   FOptions := [iblAutoUpgrade, iblAllowDowngrade];
   FServicesConnection := TIBXServicesConnection.Create(self);
   FServicesConnection.LoginPrompt := false;
+  FServicesConnection.Params.Values['user_name'] := 'SYSDBA';
   FBackupService := TIBXServerSideBackupService.Create(self);
   FBackupService.ServicesConnection := FServicesConnection;
   FBackupService.Verbose := true;

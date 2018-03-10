@@ -165,9 +165,10 @@
       </Unit13>
       <Unit14>
         <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="85"/>
-        <CursorPos Y="308"/>
+        <TopLine Value="454"/>
+        <CursorPos X="23" Y="478"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
@@ -180,9 +181,8 @@
       </Unit14>
       <Unit15>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="764"/>
+        <TopLine Value="753"/>
         <CursorPos X="3" Y="753"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
@@ -333,123 +333,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="354" Column="15" TopLine="337"/>
+        <Caret Line="1836" TopLine="1831"/>
       </Position1>
       <Position2>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1836" TopLine="1831"/>
+        <Caret Line="371" Column="19" TopLine="335"/>
       </Position2>
       <Position3>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="371" Column="19" TopLine="335"/>
+        <Caret Line="1493" Column="3" TopLine="1491"/>
       </Position3>
       <Position4>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1493" Column="3" TopLine="1491"/>
+        <Caret Line="354" Column="39" TopLine="344"/>
       </Position4>
       <Position5>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="354" Column="39" TopLine="344"/>
+        <Caret Line="437" Column="30" TopLine="405"/>
       </Position5>
       <Position6>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="437" Column="30" TopLine="405"/>
+        <Caret Line="448" Column="41" TopLine="416"/>
       </Position6>
       <Position7>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="448" Column="41" TopLine="416"/>
+        <Caret Line="475" Column="83" TopLine="443"/>
       </Position7>
       <Position8>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="475" Column="83" TopLine="443"/>
+        <Caret Line="476" Column="83" TopLine="444"/>
       </Position8>
       <Position9>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="476" Column="83" TopLine="444"/>
+        <Caret Line="760" Column="39" TopLine="728"/>
       </Position9>
       <Position10>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="760" Column="39" TopLine="728"/>
+        <Caret Line="354" Column="15" TopLine="340"/>
       </Position10>
       <Position11>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="354" Column="15" TopLine="340"/>
+        <Caret Line="1836" Column="3" TopLine="1834"/>
       </Position11>
       <Position12>
-        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1836" Column="3" TopLine="1834"/>
+        <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
+        <Caret Line="406" Column="55" TopLine="391"/>
       </Position12>
       <Position13>
         <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="406" Column="55" TopLine="391"/>
+        <Caret Line="169" Column="27" TopLine="137"/>
       </Position13>
       <Position14>
         <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="169" Column="27" TopLine="137"/>
+        <Caret Line="577" TopLine="557"/>
       </Position14>
       <Position15>
         <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="577" TopLine="557"/>
+        <Caret Line="156" Column="22" TopLine="137"/>
       </Position15>
       <Position16>
         <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="156" Column="22" TopLine="137"/>
+        <Caret Line="500" Column="3" TopLine="498"/>
       </Position16>
       <Position17>
         <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="500" Column="3" TopLine="498"/>
+        <Caret Line="125" Column="25" TopLine="117"/>
       </Position17>
       <Position18>
         <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="125" Column="25" TopLine="117"/>
+        <Caret Line="445" Column="5" TopLine="434"/>
       </Position18>
       <Position19>
         <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="445" Column="5" TopLine="434"/>
+        <Caret Line="120" Column="28" TopLine="107"/>
       </Position19>
       <Position20>
-        <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
-        <Caret Line="120" Column="28" TopLine="107"/>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="718" Column="74" TopLine="699"/>
       </Position20>
       <Position21>
         <Filename Value="../../runtime/nongui/ibxscript.pas"/>
-        <Caret Line="718" Column="74" TopLine="699"/>
+        <Caret Line="293" Column="23" TopLine="283"/>
       </Position21>
       <Position22>
-        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
-        <Caret Line="293" Column="23" TopLine="283"/>
+        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
+        <Caret Line="241" Column="22" TopLine="232"/>
       </Position22>
       <Position23>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="241" Column="22" TopLine="232"/>
+        <Caret Line="1004" Column="15" TopLine="992"/>
       </Position23>
       <Position24>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1004" Column="15" TopLine="992"/>
+        <Caret Line="190" Column="20" TopLine="170"/>
       </Position24>
       <Position25>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="190" Column="20" TopLine="170"/>
+        <Caret Line="884" Column="22" TopLine="852"/>
       </Position25>
       <Position26>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="884" Column="22" TopLine="852"/>
+        <Caret Line="935" Column="24" TopLine="915"/>
       </Position26>
       <Position27>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="935" Column="24" TopLine="915"/>
+        <Caret Line="938" Column="24" TopLine="915"/>
       </Position27>
       <Position28>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="938" Column="24" TopLine="915"/>
+        <Caret Line="1002" Column="44" TopLine="970"/>
       </Position28>
       <Position29>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1002" Column="44" TopLine="970"/>
+        <Caret Line="237" Column="21" TopLine="229"/>
       </Position29>
       <Position30>
-        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="237" Column="21" TopLine="229"/>
+        <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
+        <Caret Line="125" Column="27" TopLine="122"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

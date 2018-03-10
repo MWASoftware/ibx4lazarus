@@ -1988,44 +1988,43 @@ begin
   CheckNotInTransaction;
   CheckDatabasesInList;
   if TransactionIntf <> nil then
-  begin
-    TransactionIntf.Start(DefaultAction);
-    Exit;
-  end;
-
-  for i := 0 to FDatabases.Count - 1 do
-   if  FDatabases[i] <> nil then
-   begin
-     with TIBDatabase(FDatabases[i]) do
-     if not Connected then
-       if StreamedConnected then
-       begin
-         Open;
-         StreamedConnected := False;
-       end
-       else
-         IBError(ibxeDatabaseClosed, [nil]);
-   end;
-  if FTRParamsChanged then
-  begin
-    FTRParamsChanged := False;
-    FTPB :=  GenerateTPB(FTRParams);
-  end;
-
-  ValidDatabaseCount := 0;
-  for i := 0 to DatabaseCount - 1 do
-    if Databases[i] <> nil then Inc(ValidDatabaseCount);
-
-  if ValidDatabaseCount = 1 then
-    FTransactionIntf := Databases[0].Attachment.StartTransaction(FTPB,DefaultAction)
+    TransactionIntf.Start(DefaultAction)
   else
   begin
-    SetLength(Attachments,ValidDatabaseCount);
-    for i := 0 to DatabaseCount - 1 do
-      if Databases[i] <> nil then
-        Attachments[i] := Databases[i].Attachment;
+    for i := 0 to FDatabases.Count - 1 do
+     if  FDatabases[i] <> nil then
+     begin
+       with TIBDatabase(FDatabases[i]) do
+       if not Connected then
+         if StreamedConnected then
+         begin
+           Open;
+           StreamedConnected := False;
+         end
+         else
+           IBError(ibxeDatabaseClosed, [nil]);
+     end;
+    if FTRParamsChanged then
+    begin
+      FTRParamsChanged := False;
+      FTPB :=  GenerateTPB(FTRParams);
+    end;
 
-    FTransactionIntf := FirebirdAPI.StartTransaction(Attachments,FTPB,DefaultAction);
+    ValidDatabaseCount := 0;
+    for i := 0 to DatabaseCount - 1 do
+      if Databases[i] <> nil then Inc(ValidDatabaseCount);
+
+    if ValidDatabaseCount = 1 then
+      FTransactionIntf := Databases[0].Attachment.StartTransaction(FTPB,DefaultAction)
+    else
+    begin
+      SetLength(Attachments,ValidDatabaseCount);
+      for i := 0 to DatabaseCount - 1 do
+        if Databases[i] <> nil then
+          Attachments[i] := Databases[i].Attachment;
+
+      FTransactionIntf := FirebirdAPI.StartTransaction(Attachments,FTPB,DefaultAction);
+    end;
   end;
 
   if not (csDesigning in ComponentState) then
