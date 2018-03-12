@@ -110,8 +110,8 @@ begin
   with UserList do
   begin
     Append;
-    FieldByName('UserName').AsString := NewUserName;
-    FieldByName('Password').AsString := NewPassword;
+    FieldByName('SEC$USER_NAME').AsString := NewUserName;
+    FieldByName('SEC$PASSWORD').AsString := NewPassword;
   end;
 end;
 
@@ -123,7 +123,7 @@ begin
   with UserList do
   begin
     Edit;
-    FieldByName('Password').AsString := NewPassword;
+    FieldByName('SEC$PASSWORD').AsString := NewPassword;
   end;
 end;
 
@@ -134,7 +134,7 @@ end;
 
 procedure TListUsersForm.DeleteUserExecute(Sender: TObject);
 begin
-  if MessageDlg(Format('Do you really want delete user %s',[UserList.FieldByName('UserName').AsString]),
+  if MessageDlg(Format('Do you really want delete user %s',[UserList.FieldByName('SEC$USER_NAME').AsString]),
         mtConfirmation,[mbYes,mbNo],0) = mrYes then
     UserList.Delete;
 end;

@@ -70,9 +70,10 @@
         <ComponentName Value="ListUsersForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="15"/>
-        <CursorPos X="49" Y="37"/>
+        <TopLine Value="95"/>
+        <CursorPos X="30" Y="126"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -183,8 +184,8 @@
       <Unit16>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="36"/>
-        <CursorPos Y="62"/>
+        <TopLine Value="1222"/>
+        <CursorPos Y="1249"/>
         <UsageCount Value="23"/>
         <Loaded Value="True"/>
       </Unit16>
@@ -673,10 +674,9 @@
       </Unit83>
       <Unit84>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="2318"/>
-        <CursorPos Y="2350"/>
+        <CursorPos X="34" Y="2335"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit84>
@@ -696,14 +696,13 @@
       </Unit86>
       <Unit87>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/astrings.inc"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="121"/>
         <CursorPos Y="141"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit87>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <Caret Line="728" Column="11" TopLine="706"/>
@@ -816,6 +815,10 @@
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <Caret Line="1786" TopLine="1756"/>
       </Position28>
+      <Position29>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="2335" Column="34" TopLine="2318"/>
+      </Position29>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
