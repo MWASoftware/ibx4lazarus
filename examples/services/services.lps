@@ -35,12 +35,10 @@
         <ComponentName Value="BackupDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="101"/>
         <CursorPos X="33" Y="137"/>
         <UsageCount Value="104"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="ChgPasswordDlgUnit.pas"/>
@@ -58,11 +56,10 @@
         <ComponentName Value="LimboTransactionsForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="60"/>
         <CursorPos Y="80"/>
         <UsageCount Value="104"/>
-        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="ListUsersUnit.pas"/>
@@ -70,12 +67,10 @@
         <ComponentName Value="ListUsersForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="71"/>
         <CursorPos X="57" Y="111"/>
         <UsageCount Value="104"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="NewUserDlgUnit.pas"/>
@@ -93,12 +88,10 @@
         <ComponentName Value="RestoreDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="76"/>
         <CursorPos Y="90"/>
         <UsageCount Value="104"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="ServicesLoginDlgUnit.pas"/>
@@ -182,11 +175,10 @@
       </Unit15>
       <Unit16>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1222"/>
         <CursorPos Y="1249"/>
         <UsageCount Value="23"/>
-        <Loaded Value="True"/>
       </Unit16>
       <Unit17>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
@@ -204,10 +196,11 @@
       </Unit18>
       <Unit19>
         <Filename Value="../../../fbintf/client/FBServices.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="54"/>
-        <CursorPos X="70" Y="73"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="49"/>
+        <CursorPos X="12" Y="93"/>
         <UsageCount Value="18"/>
+        <Loaded Value="True"/>
       </Unit19>
       <Unit20>
         <Filename Value="../../../fbintf/client/3.0/FB30Services.pas"/>
@@ -475,11 +468,10 @@
       </Unit56>
       <Unit57>
         <Filename Value="../../design/IBDBReg.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="388"/>
         <CursorPos X="26" Y="408"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit57>
       <Unit58>
         <Filename Value="MainFormUnit.lfm"/>
@@ -597,10 +589,12 @@
       </Unit73>
       <Unit74>
         <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="297"/>
-        <CursorPos X="3" Y="300"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="254"/>
+        <CursorPos X="18" Y="255"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit74>
       <Unit75>
         <Filename Value="../../../fbintf/client/3.0/FB30Attachment.pas"/>
@@ -665,34 +659,29 @@
         <ComponentName Value="IBServiceEditorForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="122"/>
         <CursorPos Y="143"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit83>
       <Unit84>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1875"/>
         <CursorPos X="68" Y="1890"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit84>
       <Unit85>
         <Filename Value="../../runtime/nongui/IBTypes.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit85>
       <Unit86>
         <Filename Value="../../../../lcl/include/control.inc"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="3487"/>
         <CursorPos Y="3519"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit86>
       <Unit87>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/astrings.inc"/>
@@ -702,127 +691,30 @@
         <UsageCount Value="10"/>
       </Unit87>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="6" HistoryIndex="5">
       <Position1>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1753" Column="27" TopLine="1738"/>
+        <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
+        <Caret Line="316" Column="55" TopLine="297"/>
       </Position1>
       <Position2>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="388" Column="38" TopLine="377"/>
+        <Filename Value="../../../fbintf/client/FBServices.pas"/>
+        <Caret Line="74" Column="52" TopLine="54"/>
       </Position2>
       <Position3>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="306" Column="45" TopLine="301"/>
+        <Filename Value="../../../fbintf/client/FBServices.pas"/>
       </Position3>
       <Position4>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="233" Column="28" TopLine="222"/>
+        <Filename Value="../../../fbintf/client/FBServices.pas"/>
+        <Caret Line="52" Column="14" TopLine="20"/>
       </Position4>
       <Position5>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="2351" Column="20" TopLine="2338"/>
+        <Filename Value="../../../fbintf/client/FBServices.pas"/>
+        <Caret Line="84" Column="39" TopLine="52"/>
       </Position5>
       <Position6>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="397" Column="21" TopLine="377"/>
+        <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
+        <Caret Line="69" Column="20" TopLine="56"/>
       </Position6>
-      <Position7>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1776" Column="14" TopLine="1749"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1786" TopLine="1756"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="2335" Column="34" TopLine="2318"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="2322" Column="5" TopLine="2314"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="229" Column="27" TopLine="210"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="2314" Column="3" TopLine="2312"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="227" Column="21" TopLine="215"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="2306" Column="3" TopLine="2304"/>
-      </Position14>
-      <Position15>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="396" Column="19" TopLine="378"/>
-      </Position15>
-      <Position16>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1735" Column="3" TopLine="1733"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="397" Column="14" TopLine="376"/>
-      </Position17>
-      <Position18>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1745" Column="3" TopLine="1755"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="2367" TopLine="2345"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="2114" TopLine="2094"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="2424" TopLine="2404"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="397" Column="22" TopLine="368"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1746" Column="26" TopLine="1737"/>
-      </Position23>
-      <Position24>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="326" Column="14" TopLine="306"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1885" Column="32" TopLine="1875"/>
-      </Position25>
-      <Position26>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1884" TopLine="1875"/>
-      </Position26>
-      <Position27>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1886" TopLine="1875"/>
-      </Position27>
-      <Position28>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1888" TopLine="1875"/>
-      </Position28>
-      <Position29>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1889" TopLine="1875"/>
-      </Position29>
-      <Position30>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1891" TopLine="1875"/>
-      </Position30>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

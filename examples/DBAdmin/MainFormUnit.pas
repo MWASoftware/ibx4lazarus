@@ -295,6 +295,7 @@ type
     procedure DropDatabaseExecute(Sender: TObject);
     procedure DropDatabaseUpdate(Sender: TObject);
     procedure AccessRightsTreeViewSelectionChanged(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure MappingsTabHide(Sender: TObject);
     procedure MappingsTabShow(Sender: TObject);
     procedure PageBuffersEditingDone(Sender: TObject);
@@ -680,6 +681,11 @@ begin
     else
       DatabaseData.SyncSubjectAccessRights(TIBTreeNode(AccessRightsTreeView.Selected).KeyValue);
   end;
+end;
+
+procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  DatabaseData.Disconnect;
 end;
 
 procedure TMainForm.MappingsTabHide(Sender: TObject);
