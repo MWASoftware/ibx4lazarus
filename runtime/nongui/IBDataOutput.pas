@@ -594,27 +594,21 @@ begin
     done := false;
 end;
 
-{$IFDEF WINDOWS}
-const FC = '%d';
-{$ELSE}
-const FC = '%f';
-{$ENDIF}
-
 class procedure TIBCustomDataOutput.ShowPerfStats(Statement: IStatement;
   Add2Log: TAdd2Log);
 var stats: TPerfCounters;
 begin
   if Statement.GetPerfStatistics(stats) then
   begin
-    Add2Log(Format('Current memory = ' + FC,[stats[psCurrentMemory]]));
-    Add2Log(Format('Delta memory = ' + FC,[stats[psDeltaMemory]]));
-    Add2Log(Format('Max memory = ' + FC,[stats[psMaxMemory]]));
+    Add2Log('Current memory = ' + FormatFloat('#,##0',stats[psCurrentMemory]));
+    Add2Log('Delta memory = ' + FormatFloat('#,##0',stats[psDeltaMemory]));
+    Add2Log('Max memory = ' + FormatFloat('#,##0',stats[psMaxMemory]));
     Add2Log('Elapsed time= ' + FormatFloat('#0.000',stats[psRealTime]/1000) +' sec');
     Add2Log('Cpu = ' + FormatFloat('#0.000',stats[psUserTime]/1000) + ' sec');
-    Add2Log(Format('Buffers = ' + FC,[stats[psBuffers]]));
-    Add2Log(Format('Reads = ' + FC,[stats[psReads]]));
-    Add2Log(Format('Writes = ' + FC,[stats[psWrites]]));
-    Add2Log(Format('Fetches = ' + FC,[stats[psFetches]]));
+    Add2Log('Buffers = ' + FormatFloat('#0',stats[psBuffers]));
+    Add2Log('Reads = ' + FormatFloat('#0',stats[psReads]));
+    Add2Log('Writes = ' + FormatFloat('#0',stats[psWrites]));
+    Add2Log('Fetches = ' + FormatFloat('#0',stats[psFetches]));
  end;
 end;
 

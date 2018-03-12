@@ -3,13 +3,12 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="39">
+    <Units Count="40">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="112"/>
-        <CursorPos X="35" Y="131"/>
+        <TopLine Value="100"/>
+        <CursorPos X="46" Y="126"/>
         <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -160,10 +159,10 @@
       </Unit21>
       <Unit22>
         <Filename Value="../../changelog"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="31"/>
         <CursorPos X="33" Y="63"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit22>
@@ -225,10 +224,12 @@
       </Unit30>
       <Unit31>
         <Filename Value="../../runtime/nongui/IBDataOutput.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="583"/>
-        <CursorPos X="2" Y="618"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="577"/>
+        <CursorPos X="61" Y="611"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit31>
       <Unit32>
         <Filename Value="../../../fbintf/testsuite/Test4.pas"/>
@@ -246,31 +247,28 @@
       </Unit33>
       <Unit34>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="614"/>
-        <CursorPos X="42" Y="632"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="756"/>
+        <CursorPos X="31" Y="784"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit34>
       <Unit35>
         <Filename Value="../../../fbintf/client/FBStatement.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="87"/>
         <CursorPos X="27" Y="97"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit35>
       <Unit36>
         <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="983"/>
         <CursorPos X="3" Y="986"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit36>
       <Unit37>
         <Filename Value="../../runtime/nongui/IBQuery.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="86"/>
         <CursorPos X="24" Y="105"/>
         <UsageCount Value="10"/>
@@ -278,18 +276,25 @@
       </Unit37>
       <Unit38>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="624"/>
         <CursorPos X="29" Y="646"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit38>
+      <Unit39>
+        <Filename Value="../../runtime/nongui/IBTable.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="125"/>
+        <CursorPos X="31" Y="148"/>
+        <UsageCount Value="10"/>
+      </Unit39>
     </Units>
     <OtherDefines Count="2">
       <Define0 Value="UseCThreads"/>
       <Define1 Value="IBX_CONSOLE_MODE"/>
     </OtherDefines>
-    <JumpHistory Count="17" HistoryIndex="16">
+    <JumpHistory Count="11" HistoryIndex="10">
       <Position1>
         <Filename Value="project1.lpr"/>
         <Caret Line="18" Column="74" TopLine="18"/>
@@ -319,45 +324,21 @@
         <Caret Line="54" Column="54" TopLine="25"/>
       </Position7>
       <Position8>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret TopLine="343"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="495" Column="15" TopLine="477"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../../fbintf/client/FBStatement.pas"/>
-        <Caret Line="96" Column="22" TopLine="62"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../../fbintf/client/FBStatement.pas"/>
-        <Caret Line="194" Column="16" TopLine="182"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
-        <Caret Line="32" Column="47"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
-        <Caret Line="245" Column="15" TopLine="225"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2504" Column="91" TopLine="2483"/>
-      </Position14>
-      <Position15>
         <Filename Value="project1.lpr"/>
         <Caret Line="131" Column="88" TopLine="96"/>
-      </Position15>
-      <Position16>
+      </Position8>
+      <Position9>
         <Filename Value="project1.lpr"/>
         <Caret Line="136" Column="24" TopLine="99"/>
-      </Position16>
-      <Position17>
+      </Position9>
+      <Position10>
         <Filename Value="../../../fbintf/IB.pas"/>
         <Caret Line="21" Column="110"/>
-      </Position17>
+      </Position10>
+      <Position11>
+        <Filename Value="../../runtime/nongui/IBDataOutput.pas"/>
+        <Caret Line="611" Column="44" TopLine="577"/>
+      </Position11>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

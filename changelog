@@ -43,10 +43,10 @@ packages.
 8. TIBTransaction: OnStartTransaction event now fires every time the transaction
    is started and not just the first time.
 
-9. IBDataOutput: Performance statistics are now formatter with "%d" on Windows and
-   "%f" on Linux. This should avoid platform dependent problems.
+9. IBDataOutput: Use FormatFloat for all performance statistics to avoid platform
+   depenendency with comp type.
 
-10. IBDataOutput: data output is now sent to stdout instead of stderr.
+10. IBDataOutput: select query data output is now sent to stdout instead of stderr.
 
 11. TIBDatabase: Remove regression. If a user login dialog changes the DatabaseName
     then this is recognised and not ignored.
