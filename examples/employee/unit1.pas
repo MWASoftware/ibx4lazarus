@@ -354,6 +354,7 @@ begin
   if AfterDate.Date > 0 then
      (DataSet as TIBParserDataSet).Parser.Add2WhereClause('HIRE_DATE > :AfterDate');
 
+
   case SalaryRange.ItemIndex of
   1:
     (DataSet as TIBParserDataSet).Parser.Add2WhereClause('Salary < 40000');

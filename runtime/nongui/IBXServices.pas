@@ -1771,7 +1771,7 @@ begin
   SetArchiveSource;
 
   if FDatabaseFiles.Count > 0 then
-    DatabaseName := FDatabaseFiles[0]; {needed if an isc_sec_context error}
+    FDatabaseName := FDatabaseFiles[0]; {needed if an isc_sec_context error}
   for i := 0 to FDatabaseFiles.Count - 1 do
   begin
     if (Trim(FDatabaseFiles[i]) = '') then continue;
@@ -1783,7 +1783,6 @@ begin
     else
       SRB.Add(isc_spb_dbname).AsString := FDatabaseFiles[i];
   end;
-
 end;
 
 constructor TIBXRestoreService.Create(AOwner: TComponent);
