@@ -987,7 +987,7 @@ end;
     if not FLoading then
     with FSource as TIBXSecurityService do
     begin
-      DisplayUser(FieldByName('UserName').AsString);
+      DisplayUser(FieldByName('SEC$USER_NAME').AsString);
       if UserInfoCount > 0 then
       with UserInfo[0] do
       begin

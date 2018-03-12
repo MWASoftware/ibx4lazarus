@@ -48,6 +48,9 @@ packages.
 
 10. IBDataOutput: data output is now sent to stdout instead of stderr.
 
+11. TIBDatabase: Remove regression. If a user login dialog changes the DatabaseName
+    then this is recognised and not ignored.
+
 IBX Change Log  version                                                       (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO
