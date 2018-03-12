@@ -6,7 +6,7 @@ object DatabaseData: TDatabaseData
   Width = 730
   PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -1313,6 +1313,7 @@ object DatabaseData: TDatabaseData
     AfterOpen = LegacyUserListAfterOpen
     BeforeClose = LegacyUserListBeforeClose
     AfterInsert = UserListAfterInsert
+    Source = IBSecurityService1
     left = 167
     top = 438
   end

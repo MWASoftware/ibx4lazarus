@@ -1116,7 +1116,7 @@ end;
 procedure TDatabaseData.LoadServerLog(Lines: TStrings);
 begin
   Lines.Clear;
-  if IBLogService1.ServicesConnection.Protocol = Local then
+  if IBLogService1.ServicesConnection.ServiceIntf.getProtocol = Local then
     Lines.Add('Server Log not available with embedded server')
   else
     IBLogService1.Execute(Lines);

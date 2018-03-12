@@ -9,7 +9,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="14"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainFormUnit.pas"/>
@@ -25,7 +25,7 @@
           <TopLine Value="235"/>
           <CursorPos X="18" Y="252"/>
         </ExtraEditor1>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -38,7 +38,7 @@
         <EditorIndex Value="8"/>
         <TopLine Value="101"/>
         <CursorPos X="33" Y="137"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit2>
@@ -50,7 +50,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="93" Y="26"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
       </Unit3>
       <Unit4>
         <Filename Value="LimboTransactionsUnit.pas"/>
@@ -61,7 +61,7 @@
         <EditorIndex Value="4"/>
         <TopLine Value="60"/>
         <CursorPos Y="80"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
@@ -73,7 +73,7 @@
         <EditorIndex Value="3"/>
         <TopLine Value="71"/>
         <CursorPos X="57" Y="111"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit5>
@@ -85,7 +85,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="106" Y="30"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
       </Unit6>
       <Unit7>
         <Filename Value="RestoreDlgUnit.pas"/>
@@ -96,7 +96,7 @@
         <EditorIndex Value="9"/>
         <TopLine Value="76"/>
         <CursorPos Y="90"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit7>
@@ -108,7 +108,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="106" Y="31"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
       </Unit8>
       <Unit9>
         <Filename Value="SelectValidationDlgUnit.pas"/>
@@ -119,7 +119,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="17"/>
         <CursorPos X="45" Y="45"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
       </Unit9>
       <Unit10>
         <Filename Value="SelectDBDlgUnit.pas"/>
@@ -130,7 +130,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="42"/>
         <CursorPos X="18" Y="66"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="104"/>
       </Unit10>
       <Unit11>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
@@ -141,7 +141,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="48"/>
         <CursorPos Y="68"/>
-        <UsageCount Value="97"/>
+        <UsageCount Value="98"/>
       </Unit11>
       <Unit12>
         <Filename Value="ShutdownRegDlgUnit.pas"/>
@@ -152,7 +152,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="49"/>
         <CursorPos X="25" Y="82"/>
-        <UsageCount Value="97"/>
+        <UsageCount Value="98"/>
       </Unit12>
       <Unit13>
         <Filename Value="AltDBSvcLoginDlgUnit.pas"/>
@@ -675,8 +675,8 @@
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="2318"/>
-        <CursorPos X="34" Y="2335"/>
+        <TopLine Value="1875"/>
+        <CursorPos X="68" Y="1890"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit84>
@@ -702,123 +702,127 @@
         <UsageCount Value="10"/>
       </Unit87>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="728" Column="11" TopLine="706"/>
+        <Caret Line="1753" Column="27" TopLine="1738"/>
       </Position1>
       <Position2>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="783" Column="45" TopLine="770"/>
+        <Caret Line="388" Column="38" TopLine="377"/>
       </Position2>
       <Position3>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="343" Column="24" TopLine="335"/>
+        <Caret Line="306" Column="45" TopLine="301"/>
       </Position3>
       <Position4>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1844" Column="3" TopLine="1840"/>
+        <Caret Line="233" Column="28" TopLine="222"/>
       </Position4>
       <Position5>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="343" Column="14" TopLine="323"/>
+        <Caret Line="2351" Column="20" TopLine="2338"/>
       </Position5>
       <Position6>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1844" Column="3" TopLine="1840"/>
+        <Caret Line="397" Column="21" TopLine="377"/>
       </Position6>
       <Position7>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="397" Column="31" TopLine="377"/>
+        <Caret Line="1776" Column="14" TopLine="1749"/>
       </Position7>
       <Position8>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1764" TopLine="1746"/>
+        <Caret Line="1786" TopLine="1756"/>
       </Position8>
       <Position9>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1766" TopLine="1746"/>
+        <Caret Line="2335" Column="34" TopLine="2318"/>
       </Position9>
       <Position10>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1768" TopLine="1746"/>
+        <Caret Line="2322" Column="5" TopLine="2314"/>
       </Position10>
       <Position11>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1771" TopLine="1746"/>
+        <Caret Line="229" Column="27" TopLine="210"/>
       </Position11>
       <Position12>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="697" TopLine="677"/>
+        <Caret Line="2314" Column="3" TopLine="2312"/>
       </Position12>
       <Position13>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="698" TopLine="677"/>
+        <Caret Line="227" Column="21" TopLine="215"/>
       </Position13>
       <Position14>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="699" TopLine="677"/>
+        <Caret Line="2306" Column="3" TopLine="2304"/>
       </Position14>
       <Position15>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1773" TopLine="1754"/>
+        <Caret Line="396" Column="19" TopLine="378"/>
       </Position15>
       <Position16>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1774" TopLine="1754"/>
+        <Caret Line="1735" Column="3" TopLine="1733"/>
       </Position16>
       <Position17>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1775" TopLine="1766"/>
+        <Caret Line="397" Column="14" TopLine="376"/>
       </Position17>
       <Position18>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1777" TopLine="1766"/>
+        <Caret Line="1745" Column="3" TopLine="1755"/>
       </Position18>
       <Position19>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1778" TopLine="1766"/>
+        <Caret Line="2367" TopLine="2345"/>
       </Position19>
       <Position20>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1784" TopLine="1766"/>
+        <Caret Line="2114" TopLine="2094"/>
       </Position20>
       <Position21>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1753" Column="27" TopLine="1738"/>
+        <Caret Line="2424" TopLine="2404"/>
       </Position21>
       <Position22>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="388" Column="38" TopLine="377"/>
+        <Caret Line="397" Column="22" TopLine="368"/>
       </Position22>
       <Position23>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="306" Column="45" TopLine="301"/>
+        <Caret Line="1746" Column="26" TopLine="1737"/>
       </Position23>
       <Position24>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="233" Column="28" TopLine="222"/>
+        <Caret Line="326" Column="14" TopLine="306"/>
       </Position24>
       <Position25>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="2351" Column="20" TopLine="2338"/>
+        <Caret Line="1885" Column="32" TopLine="1875"/>
       </Position25>
       <Position26>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="397" Column="21" TopLine="377"/>
+        <Caret Line="1884" TopLine="1875"/>
       </Position26>
       <Position27>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1776" Column="14" TopLine="1749"/>
+        <Caret Line="1886" TopLine="1875"/>
       </Position27>
       <Position28>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1786" TopLine="1756"/>
+        <Caret Line="1888" TopLine="1875"/>
       </Position28>
       <Position29>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="2335" Column="34" TopLine="2318"/>
+        <Caret Line="1889" TopLine="1875"/>
       </Position29>
+      <Position30>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="1891" TopLine="1875"/>
+      </Position30>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

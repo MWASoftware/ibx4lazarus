@@ -874,7 +874,7 @@ begin
   finally
     FLoading := false;
   end;
-inherited DoAfterOpen;
+  inherited DoAfterOpen;
 end;
 
 procedure TIBXServicesLimboTransactionsList.DoBeforePost;
@@ -1008,7 +1008,6 @@ end;
   var i: integer;
       Buf: TStringList;
   begin
-    inherited DoAfterOpen;
     buf := TStringList.Create; {Used to sort user info}
     try
       with FSource as TIBXSecurityService do
@@ -1041,6 +1040,7 @@ end;
     finally
       Buf.Free;
     end;
+    inherited DoAfterOpen;
   end;
 
   procedure TIBXServicesUserList.InternalDelete;
@@ -1093,6 +1093,7 @@ end;
 
 procedure TIBXServicesDataSet.DoBeforeClose;
 begin
+ if csDestroying in ComponentState then Exit;
  if State in [dsEdit,dsInsert] then Post;
  Clear(false);
  inherited DoBeforeClose;
@@ -1883,9 +1884,10 @@ begin
     SRB.Add(isc_spb_verbose);
 
   with ServicesConnection do
-  {Firebird 2.5 and later}
+  {Firebird 2.5.5 and later}
   if (ServerVersionNo[1] < 2) or
-             ((ServerVersionNo[1] = 2) and (ServerVersionNo[2] < 5)) then Exit;
+     ((ServerVersionNo[1] = 2) and ((ServerVersionNo[2] < 5) or
+          ((ServerVersionNo[2] = 5) and (ServerVersionNo[3] < 5)))) then Exit;
 
   if StatisticsRequested <> [] then
   begin
