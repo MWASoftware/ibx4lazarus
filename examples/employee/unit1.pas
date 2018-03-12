@@ -171,25 +171,10 @@ implementation
 
 {$R *.lfm}
 
-uses IB, Unit2;
+uses IB, Unit2, FBMessages;
 
 const
   sNoName = '<no name>';
-
-function ExtractDBException(msg: string): string;
-var Lines: TStringList;
-begin
-     Lines := TStringList.Create;
-     try
-       Lines.Text := msg;
-       if pos('exception',Lines[0]) = 1 then
-         Result := Lines[2]
-       else
-         Result := msg
-     finally
-       Lines.Free
-     end;
-end;
 
 { TForm1 }
 
@@ -393,6 +378,9 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
+  {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
+  FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
+  Application.ExceptionDialog := aedOkMessageBox;
   repeat
     try
       IBDatabase1.Connected := true;
@@ -426,7 +414,7 @@ procedure TForm1.EmployeesPostError(DataSet: TDataSet; E: EDatabaseError;
 begin
   if E is EIBError then
    begin
-       MessageDlg(ExtractDBException(EIBError(E).message),mtError,[mbOK],0);
+       MessageDlg(EIBError(E).message,mtError,[mbOK],0);
        DataSet.Cancel;
        DataAction  := daAbort
    end;
