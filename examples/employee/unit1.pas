@@ -213,6 +213,7 @@ begin
   with IBTransaction1 do
     if not InTransaction then StartTransaction;
   Countries.Active := true;
+  Employees.EnableStatistics := true;
   Employees.Active := true;
   JobCodes.Active := true;
   Depts.Active := true;

@@ -51,7 +51,7 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
-  Classes, SysUtils, CustApp, IBDatabase, IBQuery
+  Classes, SysUtils, CustApp, IBDatabase, IBQuery, IB
   { you can add units after this };
 
 const
@@ -93,12 +93,15 @@ type
 
 procedure TMyApplication.DoQuery;
 var i, rowno: integer;
+    stats: TPerfCounters;
+    SelectCount, InsertCount, UpdateCount, DeleteCount: integer;
 begin
   with TIBQuery.Create(self) do
   try
      AllowAutoActivateTransaction := true;
      Database := FIBDatabase;
      SQL.Text := sqlExample;
+     EnableStatistics := true;
      Active := true;
      rowno := 1;
      while not EOF do
@@ -112,6 +115,25 @@ begin
        end;
        writeln;
        next;
+     end;
+     if GetPerfStatistics(stats) then
+     begin
+       writeln('Current memory = ', FormatFloat('#,##0',stats[psCurrentMemory]));
+       writeln('Delta memory = ', FormatFloat('#,##0',stats[psDeltaMemory]));
+       writeln('Max memory = ', FormatFloat('#,##0',stats[psMaxMemory]));
+       writeln('Elapsed time= ', FormatFloat('#0.000',stats[psRealTime]/1000),' sec');
+       writeln('Cpu = ', FormatFloat('#0.000',stats[psUserTime]/1000),' sec');
+       writeln('Buffers = ', FormatFloat('#0',stats[psBuffers]));
+       writeln('Reads = ', FormatFloat('#0',stats[psReads]));
+       writeln('Writes = ', FormatFloat('#0',stats[psWrites]));
+       writeln('Fetches = ', FormatFloat('#0',stats[psFetches]));
+     end;
+     if StmtHandle.GetRowsAffected(SelectCount, InsertCount, UpdateCount, DeleteCount) then
+     begin
+       writeln('Selects = ',SelectCount);
+       writeln('Inserts = ',InsertCount);
+       writeln('Updates = ',UpdateCount);
+       writeln('Deletes = ',DeleteCount);
      end;
   finally
     Free;

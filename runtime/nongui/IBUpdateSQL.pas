@@ -45,6 +45,7 @@ type
   TIBUpdateSQL = class(TIBDataSetUpdateObject)
   private
     FDataSet: TIBCustomDataSet;
+    FLastUpdateKind :TUpdateKind;
     FQueries: array[TUpdateKind] of TIBSQL;
     FSQLText: array[TUpdateKind] of TStrings;
     function GetQuery(UpdateKind: TUpdateKind): TIBSQL;
@@ -62,6 +63,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function GetRowsAffected(var SelectCount, InsertCount, UpdateCount,
+      DeleteCount: integer): boolean; override;
     property DataSet;
     property Query[UpdateKind: TUpdateKind]: TIBSQL read GetQuery;
     property SQL[UpdateKind: TUpdateKind]: TStrings read GetSQL write SetSQL;
@@ -98,6 +101,15 @@ begin
   for UpdateKind := Low(TUpdateKind) to High(TUpdateKind) do
     FSQLText[UpdateKind].Free;
   inherited Destroy;
+end;
+
+function TIBUpdateSQL.GetRowsAffected(var SelectCount, InsertCount,
+                                 UpdateCount, DeleteCount: integer): boolean;
+begin
+  if Query[FLastUpdateKind].Statement <> nil  then
+    Query[FLastUpdateKind].Statement.GetRowsAffected(SelectCount, InsertCount,  UpdateCount, DeleteCount)
+  else
+    inherited;
 end;
 
 procedure TIBUpdateSQL.ExecSQL(UpdateKind: TUpdateKind; buff: PChar);
@@ -187,6 +199,7 @@ begin
   InternalPrepare(UpdateKind);
   InternalSetParams(Query[UpdateKind].Params,buff);
   ExecSQL(UpdateKind,buff);
+  FLastUpdateKind := UpdateKind;
 end;
 
 end.

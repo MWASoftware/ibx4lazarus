@@ -51,6 +51,20 @@ packages.
 11. TIBDatabase: Remove regression. If a user login dialog changes the DatabaseName
     then this is recognised and not ignored.
 
+12. TIBDataSet, TIBQuery, TIBTable: additions:
+    function GetRowsAffected(var SelectCount, InsertCount, UpdateCount, DeleteCount: integer): boolean;
+    function GetPerfStatistics(var stats: TPerfCounters): boolean;
+    property EnableStatistics: boolean read FEnableStatistics write SetEnableStatistics;
+
+    GetRowsAffected returns the affected row counts from the last insert/update/delete
+    if EnableStatistics = true then GetPerfStatistics returns the current stats
+    counters for the select query. Note: stats accumulate after each fetch from
+    the database. To get total query cost after open, call the "Last" method
+    and then GetPerfStatistics.
+
+    See ibx/examples/consolemode for an example of the use of GetPerfStatistics
+
+
 IBX Change Log  version                                                       (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO

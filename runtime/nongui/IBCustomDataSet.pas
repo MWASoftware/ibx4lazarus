@@ -81,6 +81,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function GetRowsAffected(var SelectCount, InsertCount, UpdateCount,
+                                 DeleteCount: integer): boolean; virtual;
   published
     property RefreshSQL: TStrings read FRefreshSQL write SetRefreshSQL;
   end;
@@ -379,6 +381,7 @@ type
     FArrayFieldCount: integer;
     FArrayCacheOffset: integer;
     FAutoCommit: TIBAutoCommit;
+    FEnableStatistics: boolean;
     FGenerateParamNames: Boolean;
     FGeneratorField: TIBGenerator;
     FNeedsRefresh: Boolean;
@@ -445,6 +448,10 @@ type
     FIBLinks: TList;
     FFieldColumns: PFieldColumns;
     FBufferUpdatedOnQryReturn: boolean;
+    FSelectCount: integer;
+    FInsertCount: integer;
+    FUpdateCount: integer;
+    FDeleteCount: integer;
     procedure ColumnDataToBuffer(QryResults: IResults; ColumnIndex,
       FieldIndex: integer; Buffer: PChar);
     procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
@@ -698,6 +705,12 @@ type
     property DataSetCloseAction: TDataSetCloseAction
                read FDataSetCloseAction write FDataSetCloseAction;
 
+  public
+    {Performance Statistics}
+    function GetRowsAffected(var SelectCount, InsertCount, UpdateCount, DeleteCount: integer): boolean;
+    function GetPerfStatistics(var stats: TPerfCounters): boolean;
+    property EnableStatistics: boolean read FEnableStatistics write FEnableStatistics;
+
   published
     property AllowAutoActivateTransaction: Boolean read FAllowAutoActivateTransaction
                  write FAllowAutoActivateTransaction;
@@ -776,6 +789,7 @@ type
     property AutoCommit;
     property BufferChunks;
     property CachedUpdates;
+    property EnableStatistics;
     property DeleteSQL;
     property InsertSQL;
     property RefreshSQL;
@@ -2482,10 +2496,12 @@ begin
       FUpdateObject.Apply(ukInsert,Buff)
     else
       FUpdateObject.Apply(ukModify,Buff);
+    FUpdateObject.GetRowsAffected(FSelectCount, FInsertCount, FUpdateCount, FDeleteCount);
   end
   else begin
     SetInternalSQLParams(Qry.Params, Buff);
     Qry.ExecQuery;
+    Qry.Statement.GetRowsAffected(FSelectCount, FInsertCount, FUpdateCount, FDeleteCount);
     if Qry.FieldCount > 0 then {Has RETURNING Clause}
       UpdateRecordFromQuery(Qry.Current,Buff);
   end;
@@ -3020,6 +3036,22 @@ begin
   if not FInternalPrepared then
     InternalPrepare;
   Result := Params.ByName(ParamName);
+end;
+
+function TIBCustomDataSet.GetRowsAffected(var SelectCount, InsertCount,
+  UpdateCount, DeleteCount: integer): boolean;
+begin
+  Result := Active;
+  SelectCount := FSelectCount;
+  InsertCount := FInsertCount;
+  UpdateCount := FUpdateCount;
+  DeleteCount := FDeleteCount;
+end;
+
+function TIBCustomDataSet.GetPerfStatistics(var stats: TPerfCounters): boolean;
+begin
+  Result := EnableStatistics and (FQSelect.Statement <> nil) and
+     FQSelect.Statement.GetPerfStatistics(stats);
 end;
 
 {Beware: the parameter FCache is used as an identifier to determine which
@@ -4261,6 +4293,8 @@ begin
       IBError(ibxeEmptyQuery, [nil]);
     if not FInternalPrepared then
       InternalPrepare;
+    if FQSelect.Statement <> nil then
+      FQSelect.Statement.EnableStatistics(FEnableStatistics);
    if FQSelect.SQLStatementType = SQLSelect then
    begin
       if DefaultFields then
@@ -4996,6 +5030,15 @@ destructor TIBDataSetUpdateObject.Destroy;
 begin
   FRefreshSQL.Free;
   inherited Destroy;
+end;
+
+function TIBDataSetUpdateObject.GetRowsAffected(
+  var SelectCount, InsertCount, UpdateCount, DeleteCount: integer): boolean;
+begin
+  SelectCount := 0;
+  InsertCount := 0;
+  UpdateCount := 0;
+  DeleteCount := 0;
 end;
 
 procedure TIBDataSetUpdateObject.SetRefreshSQL(value: TStrings);

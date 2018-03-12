@@ -145,6 +145,7 @@ type
     property Exists: Boolean read GetExists;
     property IndexFieldCount: Integer read GetIndexFieldCount;
     property IndexFields[Index: Integer]: TField read GetIndexField write SetIndexField;
+    property SelectStmtHandle;
     property TableNames: TStrings read GetTableNames;
 
   published
@@ -155,6 +156,7 @@ type
     property DataSetCloseAction;
 //    property Constraints stored ConstraintsStored;
     property DefaultIndex: Boolean read FDefaultIndex write FDefaultIndex default True;
+    property EnableStatistics;
     property Filter;
     property Filtered;
     property GeneratorField;

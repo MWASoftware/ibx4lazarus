@@ -115,6 +115,7 @@ type
     property BufferChunks;
     property CachedUpdates;
     property DataSource read GetDataSource write SetDataSource;
+    property EnableStatistics;
     property GenerateParamNames;
  //   property Constraints stored ConstraintsStored;
     property GeneratorField;
