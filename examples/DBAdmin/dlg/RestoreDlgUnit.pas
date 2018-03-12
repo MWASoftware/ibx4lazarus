@@ -71,7 +71,7 @@ type
     procedure DoServerRestore(Data: PtrInt);
   public
     { public declarations }
-     function ShowModal(aDBName: string; DefaultPageSize, DefaultNumBuffers: integer): TModalResult;
+     function ShowModal(DefaultPageSize, DefaultNumBuffers: integer): TModalResult;
  end;
 
 var
@@ -143,15 +143,11 @@ begin
   end;
 end;
 
-function TRestoreDlg.ShowModal(aDBName: string; DefaultPageSize,
+function TRestoreDlg.ShowModal(DefaultPageSize,
   DefaultNumBuffers: integer): TModalResult;
 begin
   PageSize.Text := IntToStr(DefaultPageSize);
   PageBuffers.Text := IntToStr(DefaultNumBuffers);
-  IBXClientSideRestoreService1.DatabaseFiles.Clear;
-  IBXClientSideRestoreService1.DatabaseFiles.Add(aDBName);
-  IBXServerSideRestoreService1.DatabaseFiles.Clear;
-  IBXServerSideRestoreService1.DatabaseFiles.Add(aDBName);
   Result := inherited ShowModal;
 end;
 

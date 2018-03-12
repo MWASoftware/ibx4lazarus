@@ -63,7 +63,6 @@ type
     procedure DoServerBackup(Data: PtrInt);
   public
     { public declarations }
-    function ShowModal(aDBName: string): TModalResult;
  end;
 
 var
@@ -127,13 +126,6 @@ begin
     Report.Lines.Add('Backup Completed');
     MessageDlg('Backup Completed',mtInformation,[mbOK],0);
   end;
-end;
-
-function TBackupDlg.ShowModal(aDBName: string): TModalResult;
-begin
-  IBXClientSideBackupService1.DatabaseName := aDBName;
-  IBXServerSideBackupService1.DatabaseName := aDBName;
-  Result := inherited ShowModal;
 end;
 
 procedure TBackupDlg.FormShow(Sender: TObject);

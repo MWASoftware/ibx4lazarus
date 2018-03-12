@@ -1035,7 +1035,7 @@ begin
     begin
       PagesUsed.Text := IntToStr(IBDatabaseInfo.PagesUsed);
       PagesAvail.Text := IntToStr(IBDatabaseInfo.PagesFree);
-      AutoAdmin.Checked := DatabaseData.AutoAdmin;
+      AutoAdmin.Checked := not DatabaseData.EmbeddedMode and DatabaseData.AutoAdmin;
     end
     else
     begin
@@ -1103,8 +1103,9 @@ begin
     DBCharacterSet.Visible := false;
     DBCharSetRO.Visible := true;
   end;
-  MappingsTab.TabVisible := (IBDatabaseInfo.ODSMajorVersion > 11) or
-    ((IBDatabaseInfo.ODSMajorVersion = 11) and (IBDatabaseInfo.ODSMinorVersion > 0));
+  MappingsTab.TabVisible := not DatabaseData.EmbeddedMode and
+  ((IBDatabaseInfo.ODSMajorVersion > 11) or
+    ((IBDatabaseInfo.ODSMajorVersion = 11) and (IBDatabaseInfo.ODSMinorVersion > 0)));
   UserManagerTab.TabVisible := not DatabaseData.EmbeddedMode;
   AccessRightsTab.TabVisible := not DatabaseData.EmbeddedMode;
   AutoAdmin.Enabled := not DatabaseData.EmbeddedMode;

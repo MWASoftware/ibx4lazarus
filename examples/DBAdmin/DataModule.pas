@@ -718,7 +718,7 @@ end;
 
 procedure TDatabaseData.BackupDatabase;
 begin
-  BackupDlg.ShowModal(DatabaseName);
+  BackupDlg.ShowModal;
 end;
 
 procedure TDatabaseData.RestoreDatabase;
@@ -729,7 +729,7 @@ begin
   DefaultNumBuffers := DatabaseQuery.FieldByName('MON$PAGE_BUFFERS').AsInteger;
   IBDatabase1.Connected := false;
   try
-    RestoreDlg.ShowModal(DatabaseName,DefaultPageSize,DefaultNumBuffers);
+    RestoreDlg.ShowModal(DefaultPageSize,DefaultNumBuffers);
   finally
     IBDatabase1.Connected := true;
   end;

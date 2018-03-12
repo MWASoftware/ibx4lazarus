@@ -899,7 +899,7 @@ begin
       LoginParams.Assign(Params);
       FOnLogin(Self, LoginParams);
       Params.Assign (LoginParams);
-      aDatabaseName := FDBName;
+      aDatabaseName := aDatabaseName;
       HidePassword;
     finally
       LoginParams.Free;
@@ -987,7 +987,7 @@ procedure TIBDataBase.DoConnect;
 var
   TempDBParams: TStrings;
   I: integer;
-  aDBName: string;
+  aDBName, oldDBName: string;
   Status: IStatus;
   CharSetID: integer;
   CharSetName: AnsiString;
@@ -1007,8 +1007,13 @@ begin
   { Use builtin login prompt if requested }
   aDBName := ExpandDBName(FDBName);
 
+  oldDBName := FDBName;
   if (LoginPrompt or (csDesigning in ComponentState)) and not Login(aDBName) then
     IBError(ibxeOperationCancelled, [nil]);
+  if oldDBName <> FDBName then {user login dialog changed DatabaseName}
+    aDBName := ExpandDBName(FDBName)
+  else
+    aDBName := ExpandDBName(aDBName); {in case built-in dialog changed aDBName}
 
   TempDBParams := TStringList.Create;
   try
