@@ -183,6 +183,7 @@ type
   private
     type TIBDatabaseCloseActions = (caNormal,caForce, caDropDatabase);
   private
+    FCloseAction: TIBDatabaseCloseActions;
     FAttachment: IAttachment;
     FCreateDatabase: boolean;
     FCreateIfNotExists: boolean;
@@ -234,7 +235,7 @@ type
     function AddSQLObject(ds: TIBBase): Integer;
     procedure RemoveSQLObject(Idx: Integer);
     procedure RemoveSQLObjects;
-    procedure InternalClose(CloseAction: TIBDatabaseCloseActions);
+    procedure InternalClose;
     procedure DoOnCreateDatabase;
 
   protected
@@ -529,6 +530,7 @@ begin
   FTraceFlags := [];
   FDataSets := TList.Create;
   CheckStreamConnect;
+  FCloseAction := caNormal;
 end;
 
 destructor TIBDataBase.Destroy;
@@ -619,7 +621,7 @@ end;
  procedure TIBDataBase.DoDisconnect;
 begin
   if Connected then
-    InternalClose(caNormal);
+    InternalClose;
 end;
 
   procedure TIBDataBase.CreateDatabase;
@@ -640,7 +642,11 @@ end;
 
  procedure TIBDataBase.DropDatabase;
 begin
-  InternalClose(caDropDatabase);
+  if Connected then
+  begin
+    FCloseAction := caDropDatabase;
+    Connected := false;
+  end;
 end;
 
  procedure TIBDataBase.DBParamsChange(Sender: TObject);
@@ -688,7 +694,10 @@ end;
  procedure TIBDataBase.ForceClose;
 begin
   if Connected then
-    InternalClose(caForce);
+   begin
+     FCloseAction := caForce;
+     Connected := false;
+   end;
 end;
 
  function TIBDataBase.GetConnected: Boolean;
@@ -746,7 +755,7 @@ begin
   end;
 end;
 
-  procedure TIBDataBase.InternalClose(CloseAction: TIBDatabaseCloseActions);
+    procedure TIBDataBase.InternalClose;
 var
   i: Integer;
 begin
@@ -760,7 +769,7 @@ begin
       if FTransactions[i] <> nil then
         Transactions[i].BeforeDatabaseDisconnect(Self);
     except
-      if CloseAction <> caForce then
+      if FCloseAction <> caForce then
         raise;
     end;
   end;
@@ -770,12 +779,12 @@ begin
       if FSQLObjects[i] <> nil then
         SQLObjects[i].DoBeforeDatabaseDisconnect;
     except
-      if CloseAction <> caForce then
+      if FCloseAction <> caForce then
         raise;
     end;
   end;
 
-  case CloseAction of
+  case FCloseAction of
   caNormal:
     FAttachment.Disconnect(false);
   caForce:
@@ -784,6 +793,7 @@ begin
     FAttachment.DropDatabase;
   end;
   FAttachment := nil;
+  FCloseAction := caNormal;
 
   if not (csDesigning in ComponentState) then
     MonitorHook.DBDisconnect(Self);
@@ -996,7 +1006,7 @@ var
   aCreateIfNotExists: boolean;
 begin
   DPB := nil;
-  aCreateIfNotExists := CreateIfNotExists;
+  FCloseAction := caNormal;
   CheckInactive;
   CheckDatabaseName;
   if (not LoginPrompt) and (FHiddenPassword <> '') then
@@ -1015,6 +1025,7 @@ begin
   else
     aDBName := ExpandDBName(aDBName); {in case built-in dialog changed aDBName}
 
+  aCreateIfNotExists := CreateIfNotExists;
   TempDBParams := TStringList.Create;
   try
    TempDBParams.Assign(FDBParams);

@@ -299,6 +299,7 @@ type
     procedure MappingsTabHide(Sender: TObject);
     procedure MappingsTabShow(Sender: TObject);
     procedure PageBuffersEditingDone(Sender: TObject);
+    procedure QuitExecute(Sender: TObject);
     procedure RepairTabHide(Sender: TObject);
     procedure RepairTabShow(Sender: TObject);
     procedure RevokeAllExecute(Sender: TObject);
@@ -702,6 +703,11 @@ end;
 procedure TMainForm.PageBuffersEditingDone(Sender: TObject);
 begin
   DatabaseData.PageBuffers := StrToInt(PageBuffers.Text);
+end;
+
+procedure TMainForm.QuitExecute(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TMainForm.RepairTabHide(Sender: TObject);

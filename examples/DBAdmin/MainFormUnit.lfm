@@ -2746,6 +2746,7 @@ object MainForm: TMainForm
     object Quit: TAction
       Category = 'General'
       Caption = 'Exit'
+      OnExecute = QuitExecute
     end
     object Backup: TAction
       Category = 'General'
@@ -3101,6 +3102,7 @@ object MainForm: TMainForm
     Database = DatabaseData.IBDatabase1
     Transaction = DatabaseData.CurrentTransaction
     ShowSystem = False
+    AlwaysQuoteIdentifiers = False
     left = 712
     top = 296
   end
