@@ -7,8 +7,9 @@
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="92"/>
-        <CursorPos X="76" Y="101"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="95"/>
+        <CursorPos X="58" Y="130"/>
         <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -223,12 +224,10 @@
       </Unit30>
       <Unit31>
         <Filename Value="../../runtime/nongui/IBDataOutput.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="579"/>
-        <CursorPos X="45" Y="608"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="581"/>
+        <CursorPos X="82" Y="604"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit31>
       <Unit32>
         <Filename Value="../../../fbintf/testsuite/Test4.pas"/>
@@ -288,11 +287,10 @@
       </Unit39>
       <Unit40>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/sysinth.inc"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="117"/>
-        <CursorPos X="76" Y="137"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="16"/>
+        <CursorPos X="21" Y="37"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit40>
     </Units>
     <OtherDefines Count="2">

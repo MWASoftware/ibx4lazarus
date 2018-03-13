@@ -440,8 +440,8 @@ begin
   writeln(stderr,'-s <sql>      Execute SQL text');
   writeln(stderr,'-t            specify output format for SQL Statements');
   writeln(stderr,'              BLK (default) for block format');
-  writeln(stderr,'              CSV (default) for CSV format');
-  writeln(stderr,'              INS (default) for Insert Statement format');
+  writeln(stderr,'              CSV for CSV format');
+  writeln(stderr,'              INS for Insert Statement format');
   writeln(stderr,'-u <username> open database with this username (defaults to SYSDBA)');
   writeln;
   writeln(stderr,'Environment Variables:');

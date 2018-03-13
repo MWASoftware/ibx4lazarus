@@ -8,19 +8,19 @@
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="127"/>
-        <CursorPos X="15" Y="60"/>
+        <CursorPos X="12" Y="38"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="readme.txt"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="65"/>
-        <CursorPos X="80" Y="90"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="10"/>
+        <CursorPos X="46" Y="32"/>
         <UsageCount Value="200"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit1>
       <Unit2>
@@ -97,7 +97,7 @@
         <Filename Value="..\..\..\fbintf\client\FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="234"/>
-        <CursorPos Y="254"/>
+        <CursorPos X="62" Y="253"/>
         <UsageCount Value="12"/>
       </Unit12>
       <Unit13>
@@ -452,8 +452,8 @@
       <Unit61>
         <Filename Value="..\..\runtime\nongui\IBDataOutput.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="502"/>
-        <CursorPos X="32" Y="585"/>
+        <TopLine Value="301"/>
+        <CursorPos X="21" Y="324"/>
         <UsageCount Value="11"/>
       </Unit61>
       <Unit62>
@@ -493,7 +493,16 @@
         <DefaultSyntaxHighlighter Value="SQL"/>
       </Unit66>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="2" HistoryIndex="1">
+      <Position1>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="60" Column="15" TopLine="292"/>
+      </Position1>
+      <Position2>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="38" Column="12"/>
+      </Position2>
+    </JumpHistory>
   </ProjectSession>
   <Debugging>
     <Watches Count="1">

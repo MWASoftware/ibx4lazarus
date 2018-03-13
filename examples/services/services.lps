@@ -17,6 +17,7 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="128"/>
         <CursorPos Y="134"/>
         <ExtraEditorCount Value="1"/>
@@ -196,11 +197,10 @@
       </Unit18>
       <Unit19>
         <Filename Value="../../../fbintf/client/FBServices.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="49"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="54"/>
         <CursorPos X="12" Y="93"/>
         <UsageCount Value="18"/>
-        <Loaded Value="True"/>
       </Unit19>
       <Unit20>
         <Filename Value="../../../fbintf/client/3.0/FB30Services.pas"/>
@@ -589,12 +589,10 @@
       </Unit73>
       <Unit74>
         <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="254"/>
         <CursorPos X="18" Y="255"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit74>
       <Unit75>
         <Filename Value="../../../fbintf/client/3.0/FB30Attachment.pas"/>
@@ -691,30 +689,6 @@
         <UsageCount Value="10"/>
       </Unit87>
     </Units>
-    <JumpHistory Count="6" HistoryIndex="5">
-      <Position1>
-        <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
-        <Caret Line="316" Column="55" TopLine="297"/>
-      </Position1>
-      <Position2>
-        <Filename Value="../../../fbintf/client/FBServices.pas"/>
-        <Caret Line="74" Column="52" TopLine="54"/>
-      </Position2>
-      <Position3>
-        <Filename Value="../../../fbintf/client/FBServices.pas"/>
-      </Position3>
-      <Position4>
-        <Filename Value="../../../fbintf/client/FBServices.pas"/>
-        <Caret Line="52" Column="14" TopLine="20"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../../fbintf/client/FBServices.pas"/>
-        <Caret Line="84" Column="39" TopLine="52"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
-        <Caret Line="69" Column="20" TopLine="56"/>
-      </Position6>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectSession>
 </CONFIG>

@@ -97,8 +97,10 @@ var i, rowno: integer;
     stats: TPerfCounters;
     SelectCount, InsertCount, UpdateCount, DeleteCount: integer;
     LargeCompFormat: string;
+    ThreeSigPlacesFormat: string;
 begin
   LargeCompFormat := '#' + DefaultFormatSettings.ThousandSeparator + '##0';
+  ThreeSigPlacesFormat := '#0' + DefaultFormatSettings.DecimalSeparator + '000';
   with TIBQuery.Create(self) do
   try
      AllowAutoActivateTransaction := true;
@@ -124,8 +126,8 @@ begin
        writeln('Current memory = ', FormatFloat(LargeCompFormat,stats[psCurrentMemory]));
        writeln('Delta memory = ', FormatFloat(LargeCompFormat,stats[psDeltaMemory]));
        writeln('Max memory = ', FormatFloat(LargeCompFormat,stats[psMaxMemory]));
-       writeln('Elapsed time= ', FormatFloat('#0.000',stats[psRealTime]/1000),' sec');
-       writeln('Cpu = ', FormatFloat('#0.000',stats[psUserTime]/1000),' sec');
+       writeln('Elapsed time= ', FormatFloat(ThreeSigPlacesFormat,stats[psRealTime]/1000),' sec');
+       writeln('Cpu = ', FormatFloat(ThreeSigPlacesFormat,stats[psUserTime]/1000),' sec');
        writeln('Buffers = ', FormatFloat('#0',stats[psBuffers]));
        writeln('Reads = ', FormatFloat('#0',stats[psReads]));
        writeln('Writes = ', FormatFloat('#0',stats[psWrites]));

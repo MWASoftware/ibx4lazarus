@@ -648,7 +648,7 @@ begin
     try
       Connected := false;
     finally
-      FCloseAction := caNOrmal;
+      FCloseAction := caNormal;
     end;
   end;
 end;
@@ -763,7 +763,7 @@ begin
   end;
 end;
 
-    procedure TIBDataBase.InternalClose;
+procedure TIBDataBase.InternalClose;
 var
   i: Integer;
 begin

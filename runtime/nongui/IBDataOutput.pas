@@ -315,7 +315,7 @@ begin
   Add2Log('/* Inserting data into Table: ' + TableName + ' */',false);
   Add2Log('',false);
 
-  FInsertHeader := 'INSERT INTO ' + QuoteIdentifier(Database.SQLDialect, TableName) + ' (';
+  FInsertHeader := 'INSERT INTO ' + QuoteIdentifierIfNeeded(Database.SQLDialect, TableName) + ' (';
   with FIBSQL do
   begin
     j := 0;
@@ -598,15 +598,17 @@ class procedure TIBCustomDataOutput.ShowPerfStats(Statement: IStatement;
   Add2Log: TAdd2Log);
 var stats: TPerfCounters;
     LargeCompFormat: string;
+    ThreeSigPlacesFormat: string;
 begin
   LargeCompFormat := '#' + DefaultFormatSettings.ThousandSeparator + '##0';
+  ThreeSigPlacesFormat := '#0' + DefaultFormatSettings.DecimalSeparator + '000';
   if Statement.GetPerfStatistics(stats) then
   begin
     Add2Log('Current memory = ' + FormatFloat(LargeCompFormat,stats[psCurrentMemory]));
     Add2Log('Delta memory = ' + FormatFloat(LargeCompFormat,stats[psDeltaMemory]));
     Add2Log('Max memory = ' + FormatFloat(LargeCompFormat,stats[psMaxMemory]));
-    Add2Log('Elapsed time= ' + FormatFloat('#0.000',stats[psRealTime]/1000) +' sec');
-    Add2Log('Cpu = ' + FormatFloat('#0.000',stats[psUserTime]/1000) + ' sec');
+    Add2Log('Elapsed time= ' + FormatFloat(ThreeSigPlacesFormat,stats[psRealTime]/1000) +' sec');
+    Add2Log('Cpu = ' + FormatFloat(ThreeSigPlacesFormat,stats[psUserTime]/1000) + ' sec');
     Add2Log('Buffers = ' + FormatFloat('#0',stats[psBuffers]));
     Add2Log('Reads = ' + FormatFloat('#0',stats[psReads]));
     Add2Log('Writes = ' + FormatFloat('#0',stats[psWrites]));

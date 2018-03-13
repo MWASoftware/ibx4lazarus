@@ -26,6 +26,10 @@ Options:
 -p <password> provide password on command line (insecure)
 -r <rolename> open database with this rolename
 -s <sql>      Execute SQL text
+-t            specify output format for SQL Statements
+              BLK (default) for block format
+              CSV for CSV format
+              INS for Insert Statement format
 -u <username> open database with this username (defaults to SYSDBA)
 
 Environment Variables:

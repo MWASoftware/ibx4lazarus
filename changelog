@@ -1,4 +1,4 @@
-IBX Change Log  version                                                       (2.3-0) Wed, 28 Feb 2018 10:57:45 +0000
+IBX Change Log  version  (2.3-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 IMPORTANT: the source code tree has been re-organised for IBX 2.3. Please remove
 all previous copies of the IBX source code tree before installing this release.
@@ -11,7 +11,7 @@ Add->New Requirement and select "ibLegacyServices" from the list of available
 packages.
 
 1. New unit IBXServices. The IBXServices unit is a re-architectured update of
-   the IBServices unit provding what is intended to be a clearer and easier to
+   the IBServices unit providing what is intended to be a clearer and easier to
    use set of IB Services components. See Chapter 10 of the IBX User Guide for
    more information and the guide to "Firebird Service Management Using IBX".
    As indicated above, the legacy services components are still available and
@@ -34,11 +34,12 @@ packages.
    correctly positioned as part of the Security Package. In the DBAdmin example,
    the setting has moved to the mappings page.
 
-6. TIBSScript: IgnoreCreateDatabase added. If true then CREATE DATABASE statements
+6. TIBXScript: IgnoreCreateDatabase added. If true then CREATE DATABASE statements
    are ignored.
 
 7. TIBDatabase: DropDatabase now ensures that all transactions have been properly
-   closed before the database is dropped.
+   closed before the database is dropped. Before and After Disconnect event handlers
+   are also fired.
 
 8. TIBTransaction: OnStartTransaction event now fires every time the transaction
    is started and not just the first time.
@@ -79,17 +80,18 @@ packages.
        property MasterDetailDelay: integer {defaults to zero}
 
     When non-zero and the dataset is a detail table referencing a master table
-    through either a MasterSoruce (TIBTable) or a DataSource (TIBDataSet, TIBQuery)
+    through either a MasterSource (TIBTable) or a DataSource (TIBDataSet, TIBQuery)
     then a synchronisation delay is added (in milliseconds) between the master
     row changing and the detail dataset being re-opened. If the master dataset
     is scrolled before the delay expires then the delay is reset. This can be used
     to avoid performance overheads when scrolling through a large master dataset.
 
-    Note: requires a thread manager. Under Linux the chreads unit must be included
-    in your project.
+    Note: uses fptimer and hence requires a thread manager. Under Linux the
+    chreads unit must be included in your project. TTimer is not used in order
+    to avoid an LCL dependency.
 
 
-IBX Change Log  version                                                       (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
+IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO
 AVOID DUPLICATE PPU WARNINGS. PLEASE REMOVE EARLIER VERSIONS OF IBX BEFORE INSTALLING THIS
