@@ -73,7 +73,7 @@ type
     FTransaction : TIBTransaction;
     FMetaData: TStrings;
     FDatabaseInfo: TIBDatabaseInfo;
-//    FShowSystem: Boolean;
+    FShowSystem: Boolean;
     { Private declarations }
     procedure Add2MetaData(const Msg: string; IsError: boolean=true);
     function GetDatabase: TIBDatabase;
@@ -132,7 +132,7 @@ type
     { Published declarations }
     property Database : TIBDatabase read GetDatabase write SetDatabase;
     property Transaction : TIBTransaction read GetTransaction write SetTransaction;
-//    property ShowSystem: Boolean read FShowSystem write FShowSystem;
+    property ShowSystem: Boolean read FShowSystem write FShowSystem;
     property AlwaysQuoteIdentifiers: boolean read FAlwaysQuoteIdentifiers write FAlwaysQuoteIdentifiers;
   end;
 
