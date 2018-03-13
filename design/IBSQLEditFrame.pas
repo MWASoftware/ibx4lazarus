@@ -924,7 +924,7 @@ begin
              (not PrimaryKeys.Active or not PrimaryKeys.Locate('columnName;Selected',
                   VarArrayOf([IdentityCols.FieldByName('ColumnName').AsString,0]),[loCaseInsensitive])) then
           begin
-            InsertSQL := InsertSQL + Separator + IdentityCols.FieldByName('ColumnName').AsString;
+            InsertSQL := InsertSQL + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,IdentityCols.FieldByName('ColumnName').AsString);
             Separator := ', ';
           end;
           IdentityCols.Next;

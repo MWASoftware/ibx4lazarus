@@ -8,7 +8,8 @@
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="40"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="127"/>
         <CursorPos X="15" Y="60"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -122,11 +123,10 @@
       </Unit15>
       <Unit16>
         <Filename Value="..\..\changelog"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="40"/>
-        <CursorPos X="72" Y="73"/>
+        <CursorPos X="75" Y="73"/>
         <UsageCount Value="23"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
       <Unit17>
@@ -472,12 +472,10 @@
       </Unit63>
       <Unit64>
         <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="44"/>
-        <CursorPos X="3" Y="76"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="116"/>
+        <CursorPos X="36" Y="136"/>
+        <UsageCount Value="10"/>
       </Unit64>
       <Unit65>
         <Filename Value="Makefile.fpc"/>
@@ -495,92 +493,7 @@
         <DefaultSyntaxHighlighter Value="SQL"/>
       </Unit66>
     </Units>
-    <JumpHistory Count="22" HistoryIndex="21">
-      <Position1>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="3017" Column="90" TopLine="3000"/>
-      </Position1>
-      <Position2>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="3108" Column="61" TopLine="3087"/>
-      </Position2>
-      <Position3>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="3017" Column="33" TopLine="3003"/>
-      </Position3>
-      <Position4>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="3011" Column="36" TopLine="3003"/>
-      </Position4>
-      <Position5>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-      </Position5>
-      <Position6>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="4" Column="47"/>
-      </Position6>
-      <Position7>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="8" Column="16"/>
-      </Position7>
-      <Position8>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="2747" Column="46" TopLine="2715"/>
-      </Position8>
-      <Position9>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-      </Position9>
-      <Position10>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="4" Column="47"/>
-      </Position10>
-      <Position11>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="8" Column="16"/>
-      </Position11>
-      <Position12>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="2747" Column="46" TopLine="2715"/>
-      </Position12>
-      <Position13>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="3004" Column="57" TopLine="2993"/>
-      </Position13>
-      <Position14>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="3027" Column="28" TopLine="2995"/>
-      </Position14>
-      <Position15>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="3138" Column="55" TopLine="3106"/>
-      </Position15>
-      <Position16>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="3174" Column="32" TopLine="3164"/>
-      </Position16>
-      <Position17>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="662" Column="29" TopLine="642"/>
-      </Position17>
-      <Position18>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="135" Column="24" TopLine="107"/>
-      </Position18>
-      <Position19>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-      </Position19>
-      <Position20>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="76" Column="16" TopLine="44"/>
-      </Position20>
-      <Position21>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-        <Caret Line="135" Column="3" TopLine="103"/>
-      </Position21>
-      <Position22>
-        <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
-      </Position22>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectSession>
   <Debugging>
     <Watches Count="1">

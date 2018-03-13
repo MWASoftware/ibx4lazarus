@@ -9,7 +9,7 @@ object Form1: TForm1
   DefaultMonitor = dmPrimary
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Panel1: TPanel
     Left = 0
     Height = 453
@@ -185,8 +185,10 @@ object Form1: TForm1
     BufferChunks = 1000
     CachedUpdates = False
     DataSetCloseAction = dcSaveChanges
+    EnableStatistics = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     IndexFieldNames = 'DEPT_NO'
+    MasterDetailDelay = 500
     ReadOnly = True
     TableName = 'DEPARTMENT'
     left = 424
@@ -289,12 +291,14 @@ object Form1: TForm1
     BufferChunks = 1000
     CachedUpdates = False
     DataSetCloseAction = dcSaveChanges
+    EnableStatistics = False
     GeneratorField.Generator = 'EMP_NO_GEN                                                                                                                  '
     GeneratorField.Field = 'EMP_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     IndexFieldNames = 'DEPT_NO'
     MasterFields = 'DEPT_NO'
     MasterSource = DataSource2
+    MasterDetailDelay = 300
     TableName = 'EMPLOYEE'
     left = 576
     top = 24

@@ -53,7 +53,7 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IB,  IBSQL, Db,
-  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo;
+  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, fpTimer;
 
 const
   BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
@@ -293,9 +293,14 @@ type
      property CodePage: TSystemCodePage read FFCodePage write FFCodePage;
    end;
 
+  { TIBDataLink }
+
   TIBDataLink = class(TDetailDataLink)
   private
     FDataSet: TIBCustomDataSet;
+    FDelayTimerValue: integer;
+    FTimer: TFPTimer;
+    procedure HandleRefreshTimer(Sender: TObject);
   protected
     procedure ActiveChanged; override;
     procedure RecordChanged(Field: TField); override;
@@ -304,6 +309,8 @@ type
   public
     constructor Create(ADataSet: TIBCustomDataSet);
     destructor Destroy; override;
+    property DelayTimerValue: integer {in Milliseconds}
+            read FDelayTimerValue write FDelayTimerValue;
   end;
 
   TIBGeneratorApplyOnEvent = (gaeOnNewRecord,gaeOnPostRecord);
@@ -524,6 +531,8 @@ type
                        DoCheck: Boolean): TGetResult; virtual;
 
   protected
+    function GetMasterDetailDelay: integer; virtual;
+    procedure SetMasterDetailDelay(AValue: integer); virtual;
     procedure ActivateConnection;
     function ActivateTransaction: Boolean;
     procedure DeactivateTransaction;
@@ -702,6 +711,7 @@ type
     property UpdatesPending: Boolean read FUpdatesPending;
     property UpdateRecordTypes: TIBUpdateRecordTypes read FUpdateRecordTypes
                                                       write SetUpdateRecordTypes;
+    property MasterDetailDelay: integer read GetMasterDetailDelay write SetMasterDetailDelay;
     property DataSetCloseAction: TDataSetCloseAction
                read FDataSetCloseAction write FDataSetCloseAction;
 
@@ -797,6 +807,7 @@ type
     property ModifySQL;
     property GeneratorField;
     property GenerateParamNames;
+    property MasterDetailDelay;
     property ParamCheck;
     property UniDirectional;
     property Filtered;
@@ -1398,14 +1409,25 @@ constructor TIBDataLink.Create(ADataSet: TIBCustomDataSet);
 begin
   inherited Create;
   FDataSet := ADataSet;
+  FTimer := TFPTimer.Create(nil);
+  FTimer.Enabled := true;
+  FTimer.Interval := 0;
+  FTimer.OnTimer := HandleRefreshTimer;
+  FDelayTimerValue := 0;
 end;
 
 destructor TIBDataLink.Destroy;
 begin
   FDataSet.FDataLink := nil;
+  if assigned(FTimer) then FTimer.Free;
   inherited Destroy;
 end;
 
+procedure TIBDataLink.HandleRefreshTimer(Sender: TObject);
+begin
+  FTimer.Interval := 0;
+  FDataSet.RefreshParams;
+end;
 
 procedure TIBDataLink.ActiveChanged;
 begin
@@ -1422,7 +1444,15 @@ end;
 procedure TIBDataLink.RecordChanged(Field: TField);
 begin
   if (Field = nil) and FDataSet.Active then
-    FDataSet.RefreshParams;
+  begin
+    if FDelayTimerValue > 0 then
+    begin
+      FTimer.Interval := FDelayTimerValue;
+      FTimer.StartTimer;
+    end
+    else
+      FDataSet.RefreshParams;
+  end;
 end;
 
 procedure TIBDataLink.CheckBrowseMode;
@@ -2191,6 +2221,11 @@ begin
     else
       FillChar(Buffer[fdDataOfs],fdDataSize,0);
   end;
+end;
+
+function TIBCustomDataSet.GetMasterDetailDelay: integer;
+begin
+  Result := FDataLink.DelayTimerValue;
 end;
 
 { Read the record from FQSelect.Current into the record buffer
@@ -4682,6 +4717,11 @@ end;
 function TIBCustomDataSet.GetSelectStmtIntf: IStatement;
 begin
   Result := FQSelect.Statement;
+end;
+
+procedure TIBCustomDataSet.SetMasterDetailDelay(AValue: integer);
+begin
+  FDataLink.DelayTimerValue := AValue;
 end;
 
 function TIBCustomDataSet.GetParser: TSelectSQLParser;

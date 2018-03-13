@@ -128,6 +128,8 @@ type
     procedure SetFilterText(const Value: string); override;
     procedure SetFilterOptions(Value: TFilterOptions); override;
     procedure InternalRefreshRow; override;
+    function GetMasterDetailDelay: integer; override;
+    procedure SetMasterDetailDelay(AValue: integer); override;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -165,6 +167,7 @@ type
     property IndexName: string read GetIndexName write SetIndexName;
     property MasterFields: string read GetMasterFields write SetMasterFields;
     property MasterSource: TDataSource read GetDataSource write SetDataSource;
+    property MasterDetailDelay;
     property ReadOnly: Boolean read FReadOnly write SetReadOnly default False;
     property StoreDefs: Boolean read FStoreDefs write FStoreDefs default False;
     property TableName: String read FTableName write SetTableName;
@@ -183,7 +186,60 @@ type
 
 implementation
 
-uses FBMessages;
+uses FBMessages, fpTimer;
+
+type
+
+  { TIBMasterDataLink }
+
+  TIBMasterDataLink = class(TMasterDataLink)
+  private
+    FDelayTimerValue: integer;
+    FTimer: TFPTimer;
+    procedure HandleRefreshTimer(Sender: TObject);
+  protected
+    procedure DoMasterChange; override;
+  public
+    constructor Create(ADataSet: TDataSet); override;
+    destructor Destroy; override;
+    property DelayTimerValue: integer {in Milliseconds}
+            read FDelayTimerValue write FDelayTimerValue;
+  end;
+
+{ TIBMasterDataLink }
+
+procedure TIBMasterDataLink.HandleRefreshTimer(Sender: TObject);
+begin
+  FTimer.Interval := 0;
+  inherited DoMasterChange;
+end;
+
+procedure TIBMasterDataLink.DoMasterChange;
+begin
+  if FDelayTimerValue = 0 then
+    inherited DoMasterChange
+  else
+  begin
+    FTimer.Interval := FDelayTimerValue;
+    FTimer.StartTimer;
+  end;
+end;
+
+constructor TIBMasterDataLink.Create(ADataSet: TDataSet);
+begin
+  inherited Create(ADataSet);
+  FTimer := TFPTimer.Create(nil);
+  FTimer.Enabled := true;
+  FTimer.Interval := 0;
+  FTimer.OnTimer := HandleRefreshTimer;
+  FDelayTimerValue := 0;
+end;
+
+destructor TIBMasterDataLink.Destroy;
+begin
+  if assigned(FTimer) then FTimer.Free;
+  inherited Destroy;
+end;
 
 { TIBTable }
 
@@ -200,7 +256,7 @@ begin
   FRegenerateSQL := True;
   FMasterFieldsList := TStringList.Create;
   FDetailFieldsList := TStringList.Create;
-  FMasterLink := TMasterDataLink.Create(Self);
+  FMasterLink := TIBMasterDataLink.Create(Self);
   FMasterLink.OnMasterChange := MasterChanged;
   FMasterLink.OnMasterDisable := MasterDisabled;
   QRefresh.OnSQLChanging := nil;
@@ -297,6 +353,16 @@ begin
   else
     QRefresh.SQL.Assign(WhereAllRefreshSQL);
   inherited InternalRefreshRow;
+end;
+
+function TIBTable.GetMasterDetailDelay: integer;
+begin
+  Result := TIBMasterDataLink(FMasterLink).DelayTimerValue
+end;
+
+procedure TIBTable.SetMasterDetailDelay(AValue: integer);
+begin
+  TIBMasterDataLink(FMasterLink).DelayTimerValue := AValue;
 end;
 
 procedure TIBTable.DefChanged(Sender: TObject);
@@ -998,7 +1064,7 @@ begin
   inherited DoOnNewRecord;
 end;
 
-function TIBTable.FormatFieldsList(Value: String): String;
+function TIBTable.FormatFieldsList(Value: string): string;
 var
   FieldName: string;
   i: Integer;

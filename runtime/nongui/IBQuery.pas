@@ -119,6 +119,7 @@ type
     property GenerateParamNames;
  //   property Constraints stored ConstraintsStored;
     property GeneratorField;
+    property MasterDetailDelay;
     property ParamCheck;
     property SQL: TStrings read FSQL write SetQuery;
     property Params: TParams read FParams write SetParamsList;

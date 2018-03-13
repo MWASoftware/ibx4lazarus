@@ -72,6 +72,22 @@ packages.
     only delimited if the identifier is a reserved word, contains lower case or special
     characters. Set this property to true to retain previous behaviour.
 
+15. Insert SQL Property Editor. In Insert Returning Clause, Identity column names
+    are now inserted in double quotes if not Reserved Words or valid SQL Identifiers.
+
+16. TIBDataSet, TIBQuery, TIBTable: addition:
+       property MasterDetailDelay: integer {defaults to zero}
+
+    When non-zero and the dataset is a detail table referencing a master table
+    through either a MasterSoruce (TIBTable) or a DataSource (TIBDataSet, TIBQuery)
+    then a synchronisation delay is added (in milliseconds) between the master
+    row changing and the detail dataset being re-opened. If the master dataset
+    is scrolled before the delay expires then the delay is reset. This can be used
+    to avoid performance overheads when scrolling through a large master dataset.
+
+    Note: requires a thread manager. Under Linux the chreads unit must be included
+    in your project.
+
 
 IBX Change Log  version                                                       (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 

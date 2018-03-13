@@ -1049,8 +1049,10 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BeforeOpen = UserTablesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select trim(RDB$RELATION_NAME) as RDB$RELATION_NAME,'
       'RDB$RELATION_ID  From RDB$RELATIONS'
@@ -1073,8 +1075,10 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserTableSource
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select Trim(RF.RDB$FIELD_NAME) as ColumnName,'
       '1 as Selected,'
@@ -1112,8 +1116,10 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserTableSource
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select Trim(S.RDB$FIELD_NAME) as ColumnName,'
       '1 as Selected From'
@@ -1151,8 +1157,10 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BeforeOpen = UserProceduresBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select Trim(RDB$PROCEDURE_NAME) as '
       'RDB$PROCEDURE_NAME, RDB$PROCEDURE_INPUTS,'
@@ -1175,8 +1183,10 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserProcSource
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select Trim(P.RDB$PARAMETER_NAME) as ColumnName,'
       '1 as Selected From'
@@ -1225,8 +1235,10 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserProcSource
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select Trim(P.RDB$PARAMETER_NAME) as ColumnName,'
       '1 as Selected From'
@@ -1295,8 +1307,10 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserTableSource
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select Trim(RDB$FIELD_NAME) as ColumnName,1 as'
       'Selected From RDB$RELATION_FIELDS'
@@ -1337,8 +1351,10 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserTableSource
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select Trim(RF.RDB$FIELD_NAME) as ColumnName,'
       '1 as Selected'
@@ -1381,8 +1397,10 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BeforeClose = PackageNamesBeforeClose
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select distinct Trim(RDB$PACKAGE_NAME) as '
       'RDB$PACKAGE_NAME,  1 as PACKAGE_NAME_TYPE from RDB$PROCEDURES Where'
