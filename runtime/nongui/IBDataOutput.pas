@@ -597,12 +597,14 @@ end;
 class procedure TIBCustomDataOutput.ShowPerfStats(Statement: IStatement;
   Add2Log: TAdd2Log);
 var stats: TPerfCounters;
+    LargeCompFormat: string;
 begin
+  LargeCompFormat := '#' + DefaultFormatSettings.ThousandSeparator + '##0';
   if Statement.GetPerfStatistics(stats) then
   begin
-    Add2Log('Current memory = ' + FormatFloat('#,##0',stats[psCurrentMemory]));
-    Add2Log('Delta memory = ' + FormatFloat('#,##0',stats[psDeltaMemory]));
-    Add2Log('Max memory = ' + FormatFloat('#,##0',stats[psMaxMemory]));
+    Add2Log('Current memory = ' + FormatFloat(LargeCompFormat,stats[psCurrentMemory]));
+    Add2Log('Delta memory = ' + FormatFloat(LargeCompFormat,stats[psDeltaMemory]));
+    Add2Log('Max memory = ' + FormatFloat(LargeCompFormat,stats[psMaxMemory]));
     Add2Log('Elapsed time= ' + FormatFloat('#0.000',stats[psRealTime]/1000) +' sec');
     Add2Log('Cpu = ' + FormatFloat('#0.000',stats[psUserTime]/1000) + ' sec');
     Add2Log('Buffers = ' + FormatFloat('#0',stats[psBuffers]));
