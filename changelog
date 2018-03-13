@@ -64,6 +64,14 @@ packages.
 
     See ibx/examples/consolemode for an example of the use of GetPerfStatistics
 
+13. TIBExtract: Identity columns DDL. "Start with clause" now correctly encapsulated
+    in parenthesises.
+
+14. TIBExtract: new published property "AlwaysQuoteIdentifiers". If true then in dialect 3
+    SQL identifiers are always delimited by double quotes. If false, then they are
+    only delimited if the identifier is a reserved word, contains lower case or special
+    characters. Set this property to true to retain previous behaviour.
+
 
 IBX Change Log  version                                                       (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
