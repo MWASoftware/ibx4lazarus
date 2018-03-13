@@ -645,7 +645,11 @@ begin
   if Connected then
   begin
     FCloseAction := caDropDatabase;
-    Connected := false;
+    try
+      Connected := false;
+    finally
+      FCloseAction := caNOrmal;
+    end;
   end;
 end;
 
@@ -696,7 +700,11 @@ begin
   if Connected then
    begin
      FCloseAction := caForce;
-     Connected := false;
+     try
+       Connected := false;
+     finally
+       FCloseAction := caNormal;
+     end;
    end;
 end;
 

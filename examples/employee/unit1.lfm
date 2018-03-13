@@ -590,6 +590,7 @@ object Form1: TForm1
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select sum(Salary) as TotalSalaries'
       'From EMPLOYEE'
@@ -687,6 +688,7 @@ object Form1: TForm1
     GeneratorField.Field = 'EMP_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
+    MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
     AfterTransactionEnd = EmployeesAfterTransactionEnd
     OnValidatePost = EmployeesValidatePost
@@ -850,6 +852,7 @@ object Form1: TForm1
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select A.COUNTRY, A.CURRENCY From COUNTRY A'
       'JOIN JOB J On J.JOB_COUNTRY = A.COUNTRY'
@@ -897,6 +900,7 @@ object Form1: TForm1
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select A.JOB_CODE, A.JOB_TITLE From JOB A'
       'Where JOB_COUNTRY = :JOB_COUNTRY and JOB_GRADE = :JOB_GRADE'
@@ -937,6 +941,7 @@ object Form1: TForm1
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select A.DEPT_NO, A.DEPARTMENT From DEPARTMENT A'
       ''
