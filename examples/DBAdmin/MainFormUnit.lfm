@@ -65,12 +65,12 @@ object MainForm: TMainForm
     Height = 548
     Top = 26
     Width = 939
-    ActivePage = Properties
+    ActivePage = AttachmentsTab
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
@@ -765,6 +765,7 @@ object MainForm: TMainForm
         Color = clWindow
         Columns = <        
           item
+            ReadOnly = True
             Title.Alignment = taCenter
             Title.Caption = 'ID'
             Width = 40
@@ -776,6 +777,7 @@ object MainForm: TMainForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Alignment = taCenter
             Title.Caption = 'Connect Str'
             Width = 100
@@ -787,6 +789,7 @@ object MainForm: TMainForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Alignment = taCenter
             Title.Caption = 'Client'
             Width = 120
@@ -798,6 +801,7 @@ object MainForm: TMainForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Alignment = taCenter
             Title.Caption = 'Client Name'
             Width = 100
@@ -809,6 +813,7 @@ object MainForm: TMainForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Alignment = taCenter
             Title.Caption = 'User'
             Width = 80
@@ -820,6 +825,7 @@ object MainForm: TMainForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Alignment = taCenter
             Title.Caption = 'Role'
             Width = 80
@@ -831,6 +837,7 @@ object MainForm: TMainForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Alignment = taCenter
             Title.Caption = 'IP Address'
             Width = 100
@@ -843,6 +850,7 @@ object MainForm: TMainForm
           end        
           item
             Alignment = taCenter
+            ReadOnly = True
             Title.Alignment = taCenter
             Title.Caption = 'Protocol'
             Width = 60
@@ -854,6 +862,7 @@ object MainForm: TMainForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end        
           item
+            ReadOnly = True
             Title.Alignment = taCenter
             Title.Caption = 'Char Set'
             Width = 60
@@ -866,6 +875,7 @@ object MainForm: TMainForm
           end        
           item
             Alignment = taCenter
+            ReadOnly = True
             Title.Alignment = taCenter
             Title.Caption = 'State'
             Width = 60
@@ -877,6 +887,7 @@ object MainForm: TMainForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end>
         DataSource = AttachSource
+        Options = [dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
         PopupMenu = AttmtPopup
         Scrollbars = ssAutoVertical
         TabOrder = 0
@@ -918,6 +929,7 @@ object MainForm: TMainForm
           Width = 48
           DataField = 'MON$SERVER_PID'
           DataSource = AttachSource
+          ReadOnly = True
           CharCase = ecNormal
           MaxLength = 0
           TabOrder = 0
@@ -929,6 +941,7 @@ object MainForm: TMainForm
           Width = 48
           DataField = 'MON$REMOTE_PID'
           DataSource = AttachSource
+          ReadOnly = True
           CharCase = ecNormal
           MaxLength = 0
           TabOrder = 1
@@ -941,6 +954,7 @@ object MainForm: TMainForm
           Caption = 'Garbage Collection Allowed'
           DataField = 'MON$GARBAGE_COLLECTION'
           DataSource = AttachSource
+          ReadOnly = True
           TabOrder = 2
           ValueChecked = '1'
           ValueUnchecked = '0'
@@ -960,6 +974,7 @@ object MainForm: TMainForm
           Width = 64
           DataField = 'MON$STAT_ID'
           DataSource = AttachSource
+          ReadOnly = True
           CharCase = ecNormal
           MaxLength = 0
           TabOrder = 3

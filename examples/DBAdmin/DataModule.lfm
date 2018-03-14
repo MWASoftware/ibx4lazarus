@@ -4,8 +4,9 @@ object DatabaseData: TDatabaseData
   HorizontalOffset = 645
   VerticalOffset = 400
   Width = 730
+  PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -57,8 +58,10 @@ object DatabaseData: TDatabaseData
     BeforeClose = DatabaseQueryBeforeClose
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'SELECT * FROM RDB$DATABASE, MON$DATABASE'
     )
@@ -76,8 +79,10 @@ object DatabaseData: TDatabaseData
     AutoCommit = acCommitRetaining
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select Trim(A.RDB$CHARACTER_SET_NAME)   as RDB$CHARACTER_SET_NAME'
       ' From RDB$DATABASE A'
@@ -95,8 +100,10 @@ object DatabaseData: TDatabaseData
     OnCalcFields = ShadowFilesCalcFields
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select * From RDB$Files Where RDB$Shadow_Number <> 0 '
       'Order by RDB$Shadow_Number, RDB$FILE_SEQUENCE'
@@ -181,8 +188,10 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select count(*) as Mappings'
       'From SEC$GLOBAL_AUTH_MAPPING A'
@@ -199,8 +208,10 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select trim(A.RDB$CHARACTER_SET_NAME) as RDB$CHARACTER_SET_NAME'
       ' From'
@@ -218,8 +229,10 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select * From RDB$Files Where RDB$Shadow_Number is null or RDB$Shadow_Number = 0 '
       'Order by RDB$FILE_SEQUENCE'
@@ -249,8 +262,10 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select * from MON$ATTACHMENTS'
       'Where MON$ATTACHMENT_ID = CURRENT_CONNECTION'
@@ -266,8 +281,10 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'SELECT r.RDB$RELATION_ID,'
       '    trim(r.RDB$RELATION_NAME) as RDB$RELATION_NAME'
@@ -289,8 +306,10 @@ object DatabaseData: TDatabaseData
     BeforeClose = UserListBeforeClose
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
       'A.SEC$ACTIVE, Trim(A.SEC$USER_NAME) as SEC$USER_NAME, A.SEC$MIDDLE_NAME,'
@@ -465,8 +484,10 @@ object DatabaseData: TDatabaseData
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserListSource
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'SELECT r.RDB$ROLE_NAME, r.RDB$OWNER_NAME, r.RDB$DESCRIPTION, r.RDB$SYSTEM_FLAG, '
       'P.RDB$USER,RDB$PRIVILEGE,   cast(:SEC$USER_NAME as VARCHAR(32)) as SEC$USER_NAME,'
@@ -524,8 +545,10 @@ object DatabaseData: TDatabaseData
     BufferChunks = 1000
     CachedUpdates = False
     DataSource = UserListSource
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select a.SEC$USER_NAME, A.SEC$KEY, A.SEC$VALUE'
       'From'
@@ -574,8 +597,10 @@ object DatabaseData: TDatabaseData
     BeforeOpen = AttachmentsBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'SELECT *'
       'FROM MON$ATTACHMENTS r'
@@ -912,8 +937,10 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select Trim(A.RDB$RELATION_NAME) as RDB$RELATION_NAME, 1 as Selected'
       ' From RDB$RELATIONS A'
@@ -940,8 +967,10 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'SELECT r.RDB$DB_KEY, cast(''Local'' as VarChar(6)) as MAPTYPE, r.RDB$MAP_NAME,'
       '    Case'
@@ -994,8 +1023,10 @@ object DatabaseData: TDatabaseData
     OnCalcFields = AccessRightsCalcFields
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'with recursive AccessRight as ('
       'Select UP.RDB$USER as SUBJECT_NAME,'
@@ -1125,8 +1156,10 @@ object DatabaseData: TDatabaseData
     BeforeOpen = SubjectAccessRightsBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select UP.RDB$USER as SUBJECT_NAME,'
       '  UP.RDB$USER_TYPE as SUBJECT_TYPE,'
@@ -1312,6 +1345,7 @@ object DatabaseData: TDatabaseData
     AfterOpen = LegacyUserListAfterOpen
     BeforeClose = LegacyUserListBeforeClose
     AfterInsert = UserListAfterInsert
+    AfterPost = LegacyUserListAfterPost
     Source = IBSecurityService1
     left = 167
     top = 438

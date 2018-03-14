@@ -640,6 +640,7 @@ end;
   protected
     procedure DoBeforeInsert; override;
     procedure DoAfterOpen; override;
+    procedure DoAfterPost; override;
     procedure DoBeforePost; override;
   public
     constructor Create(AOwner:TComponent); override;
@@ -877,6 +878,12 @@ begin
   inherited DoAfterOpen;
 end;
 
+procedure TIBXServicesLimboTransactionsList.DoAfterPost;
+begin
+  if not FLoading then
+    inherited DoAfterPost;
+end;
+
 procedure TIBXServicesLimboTransactionsList.DoBeforePost;
   var i: integer;
 begin
@@ -982,26 +989,27 @@ end;
 
   procedure TIBXServicesUserList.DoAfterPost;
   begin
-    inherited DoAfterPost;
     {Refresh}
     if not FLoading then
-    with FSource as TIBXSecurityService do
     begin
-      DisplayUser(FieldByName('SEC$USER_NAME').AsString);
-      if UserInfoCount > 0 then
-      with UserInfo[0] do
+      inherited DoAfterPost;
+      with FSource as TIBXSecurityService do
       begin
-        FieldByName('UserID').AsInteger := UserID;
-        FieldByName('GroupID').AsInteger := GroupID;
-        FieldByName('SEC$USER_NAME').AsString := UserName;
-        FieldByName('SEC$FIRST_NAME').AsString := FirstName;
-        FieldByName('SEC$MIDDLE_NAME').AsString := MiddleName;
-        FieldByName('SEC$LAST_NAME').AsString := LastName;
-        FieldByName('SEC$PASSWORD').Clear;
-        FieldByName('SEC$ADMIN').AsBoolean := AdminRole;
+        DisplayUser(FieldByName('SEC$USER_NAME').AsString);
+        if UserInfoCount > 0 then
+        with UserInfo[0] do
+        begin
+          FieldByName('UserID').AsInteger := UserID;
+          FieldByName('GroupID').AsInteger := GroupID;
+          FieldByName('SEC$USER_NAME').AsString := UserName;
+          FieldByName('SEC$FIRST_NAME').AsString := FirstName;
+          FieldByName('SEC$MIDDLE_NAME').AsString := MiddleName;
+          FieldByName('SEC$LAST_NAME').AsString := LastName;
+          FieldByName('SEC$PASSWORD').Clear;
+          FieldByName('SEC$ADMIN').AsBoolean := AdminRole;
+        end;
       end;
     end;
-
   end;
 
   procedure TIBXServicesUserList.DoAfterOpen;

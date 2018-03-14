@@ -153,6 +153,7 @@ type
     procedure IBXServicesConnection1Login(Service: TIBXServicesConnection;
       var aServerName: string; LoginParams: TStrings);
     procedure LegacyUserListAfterOpen(DataSet: TDataSet);
+    procedure LegacyUserListAfterPost(DataSet: TDataSet);
     procedure LegacyUserListBeforeClose(DataSet: TDataSet);
     procedure ShadowFilesCalcFields(DataSet: TDataSet);
     procedure SubjectAccessRightsBeforeOpen(DataSet: TDataSet);
@@ -1231,6 +1232,11 @@ procedure TDatabaseData.LegacyUserListAfterOpen(DataSet: TDataSet);
 begin
   UserListSource.DataSet := LegacyUserList;
   CurrentTransaction.Active := true;
+  RoleNameList.Active := true;
+end;
+
+procedure TDatabaseData.LegacyUserListAfterPost(DataSet: TDataSet);
+begin
   RoleNameList.Active := true;
 end;
 

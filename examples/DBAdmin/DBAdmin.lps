@@ -18,10 +18,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="710"/>
-        <CursorPos X="9" Y="710"/>
+        <TopLine Value="541"/>
+        <CursorPos X="3" Y="541"/>
         <UsageCount Value="144"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="DataModule.pas"/>
@@ -29,10 +30,12 @@
         <ComponentName Value="DatabaseData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1165"/>
-        <CursorPos X="23" Y="1187"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1238"/>
+        <CursorPos X="31" Y="1240"/>
         <UsageCount Value="144"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="dlg/DBLoginDlgUnit.pas"/>
@@ -715,9 +718,9 @@
       </Unit93>
       <Unit94>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="372"/>
-        <CursorPos X="14" Y="396"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="881"/>
+        <CursorPos X="3" Y="884"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
@@ -725,6 +728,7 @@
           <CursorPos X="3" Y="2051"/>
         </ExtraEditor1>
         <UsageCount Value="19"/>
+        <Loaded Value="True"/>
       </Unit94>
       <Unit95>
         <Filename Value="../../iblocaldb/gui/IBXSaveDatabaseDlg.pas"/>
@@ -825,11 +829,43 @@
         <UsageCount Value="10"/>
       </Unit108>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="9" HistoryIndex="8">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="689" Column="22" TopLine="687"/>
       </Position1>
+      <Position2>
+        <Filename Value="DataModule.pas"/>
+        <Caret Line="1195" Column="95" TopLine="1166"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="396" Column="14" TopLine="372"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="627" Column="20" TopLine="602"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="1006" TopLine="974"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="643" TopLine="617"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="883" Column="3" TopLine="880"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="644" TopLine="623"/>
+      </Position8>
+      <Position9>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="716" Column="9" TopLine="716"/>
+      </Position9>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
