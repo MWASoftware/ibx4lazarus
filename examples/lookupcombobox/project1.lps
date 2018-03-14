@@ -17,7 +17,9 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <CursorPos X="23" Y="13"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="289"/>
+        <CursorPos X="3" Y="315"/>
         <UsageCount Value="48"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -28,13 +30,11 @@
         <ComponentName Value="SelectDeptDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="10"/>
         <CursorPos X="40" Y="25"/>
         <UsageCount Value="33"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
@@ -405,11 +405,15 @@
         <UsageCount Value="10"/>
       </Unit56>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="10" Column="17"/>
       </Position1>
+      <Position2>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="13" Column="23" TopLine="19"/>
+      </Position2>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
