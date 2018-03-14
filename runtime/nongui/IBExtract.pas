@@ -1119,7 +1119,8 @@ begin
      qryRoles.Close;
     end;
 
-    ShowGrantRoles(Term);
+    if etGrantsToUser in ExtractTypes then
+      ShowGrantRoles(Term);
 
     if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
     begin

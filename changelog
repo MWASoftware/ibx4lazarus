@@ -90,6 +90,8 @@ packages.
     chreads unit must be included in your project. TTimer is not used in order
     to avoid an LCL dependency.
 
+17. TIBExtract: User role grants now excluded when etGrantsToUser not specified
+    with Extract Option eoDatabase.
 
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 

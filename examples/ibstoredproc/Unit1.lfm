@@ -10,7 +10,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poDefaultSizeOnly
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Label1: TLabel
     Left = 26
     Height = 14
@@ -166,8 +166,10 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select A.LINE_NUM, A.CONTENT From FB$OUT_TABLE A'
     )

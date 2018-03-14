@@ -493,15 +493,11 @@
         <DefaultSyntaxHighlighter Value="SQL"/>
       </Unit66>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="1">
       <Position1>
         <Filename Value="fbsql.lpr"/>
-        <Caret Line="60" Column="15" TopLine="292"/>
-      </Position1>
-      <Position2>
-        <Filename Value="fbsql.lpr"/>
         <Caret Line="38" Column="12"/>
-      </Position2>
+      </Position1>
     </JumpHistory>
   </ProjectSession>
   <Debugging>

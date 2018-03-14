@@ -133,13 +133,11 @@ type
     procedure AddEmployeeExecute(Sender: TObject);
     procedure BeforeDateChange(Sender: TObject);
     procedure CancelChangesExecute(Sender: TObject);
-    procedure CountriesBeforeOpen(DataSet: TDataSet);
     procedure DeleteEmployeeExecute(Sender: TObject);
     procedure EditEmployeeExecute(Sender: TObject);
     procedure EditEmployeeUpdate(Sender: TObject);
     procedure EmployeesAfterInsert(DataSet: TDataSet);
     procedure EmployeesAfterOpen(DataSet: TDataSet);
-    procedure EmployeesAfterScroll(DataSet: TDataSet);
     procedure EmployeesBeforeClose(DataSet: TDataSet);
     procedure EmployeesBeforeOpen(DataSet: TDataSet);
     procedure EmployeesJOB_CODEChange(Sender: TField);
@@ -152,7 +150,6 @@ type
       var DataAction: TDataAction);
     procedure EmployeesSALARYGetText(Sender: TField; var aText: string;
       DisplayText: Boolean);
-    procedure JobCodesBeforeOpen(DataSet: TDataSet);
     procedure SaveChangesExecute(Sender: TObject);
     procedure SaveChangesUpdate(Sender: TObject);
   private
@@ -208,12 +205,6 @@ begin
     aText := Sender.AsString
 end;
 
-procedure TForm1.JobCodesBeforeOpen(DataSet: TDataSet);
-begin
-  JobCodes.ParamByName('JOB_GRADE').AsInteger := EmployeesJOB_GRADE.AsInteger;
-  JobCodes.ParamByName('JOB_COUNTRY').AsString := EmployeesJOB_COUNTRY.AsString
-end;
-
 procedure TForm1.SaveChangesExecute(Sender: TObject);
 begin
   Employees.Transaction.Commit
@@ -228,10 +219,8 @@ procedure TForm1.Reopen(Data: PtrInt);
 begin
   with IBTransaction1 do
     if not InTransaction then StartTransaction;
-  Countries.Active := true;
-  Employees.Active := true;
-  JobCodes.Active := true;
   Depts.Active := true;
+  Employees.Active := true;
 end;
 
 procedure TForm1.DoOpenDatabase(Data: PtrInt);
@@ -319,12 +308,6 @@ begin
   Employees.Transaction.Rollback
 end;
 
-procedure TForm1.CountriesBeforeOpen(DataSet: TDataSet);
-begin
-  Countries.ParamByName('JOB_GRADE').AsInteger := EmployeesJOB_GRADE.AsInteger;
-  Countries.ParamByName('JOB_CODE').AsString := EmployeesJOB_CODE.AsString
-end;
-
 procedure TForm1.DeleteEmployeeExecute(Sender: TObject);
 begin
   if MessageDlg(
@@ -359,17 +342,16 @@ end;
 procedure TForm1.EmployeesAfterOpen(DataSet: TDataSet);
 begin
   TotalsQuery.Active := true;
+  Countries.Active := true;
+  JobCodes.Active := true;
   IBDynamicGrid1.SetFocus;
-end;
-
-procedure TForm1.EmployeesAfterScroll(DataSet: TDataSet);
-begin
-  JobGradeChangeTimer.Interval := 200;
 end;
 
 procedure TForm1.EmployeesBeforeClose(DataSet: TDataSet);
 begin
-  TotalsQuery.Active := false
+  TotalsQuery.Active := false;
+  Countries.Active := false;
+  JobCodes.Active := false;
 end;
 
 procedure TForm1.EmployeesBeforeOpen(DataSet: TDataSet);
