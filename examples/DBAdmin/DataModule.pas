@@ -659,11 +659,23 @@ procedure TDatabaseData.Connect;
 
   procedure KillShadows;
   begin
-    with IBValidationService1 do
+    with IBXServicesConnection1 do
     begin
-      Options := [IBXServices.KillShadows];
-      Execute(nil);
-      MessageDlg('All Unavailable Shadows killed',mtInformation,[mbOK],0);
+      ServerName := FServerName;
+      Protocol := FProtocol;
+      PortNo := FPortNo;
+      Connected := true;
+    end;
+    try
+      with IBValidationService1 do
+      begin
+        DatabaseName := FDatabasePathName;
+        Options := [IBXServices.KillShadows];
+        Execute(nil);
+        MessageDlg('All Unavailable Shadows killed',mtInformation,[mbOK],0);
+      end;
+    finally
+      IBXServicesConnection1.Connected := false;
     end;
   end;
 
@@ -681,13 +693,12 @@ begin
       begin
         if E.IBErrorCode = isc_io_error then
         begin
-            FDBPassword := '';
           if MessageDlg('I/O Error reported on database file. If this is a shadow file, do you want '+
                         'to kill all unavailable shadow sets?. The original message is ' + E.Message,
-                        mtInformation,[mbYes,mbNo],0) = mrYes then
-            try KillShadows except end
-          else
-            continue;
+                        mtInformation,[mbYes,mbNo],0) = mrNo then
+            break;
+          try KillShadows except end;
+          FDBPassword := '';
         end
         else
           ReportException(E);
