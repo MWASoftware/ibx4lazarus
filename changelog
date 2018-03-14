@@ -93,6 +93,11 @@ packages.
 17. TIBExtract: User role grants now excluded when etGrantsToUser not specified
     with Extract Option eoDatabase.
 
+18. TIBLookupComboEditBox: Workaround added for https://bugs.freepascal.org/view.php?id=33428
+    When a deLaoutChanged event is reported on the ListSource dataset, the
+    combobox text is updated. This allows a listsource (detail) to be in a Master/Detail
+    relationship with the control's datasource (master).
+
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO
