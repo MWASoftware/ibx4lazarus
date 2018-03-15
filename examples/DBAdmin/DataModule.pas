@@ -153,6 +153,7 @@ type
     procedure IBXServicesConnection1Login(Service: TIBXServicesConnection;
       var aServerName: string; LoginParams: TStrings);
     procedure LegacyUserListAfterOpen(DataSet: TDataSet);
+    procedure LegacyUserListAfterPost(DataSet: TDataSet);
     procedure LegacyUserListBeforeClose(DataSet: TDataSet);
     procedure ShadowFilesCalcFields(DataSet: TDataSet);
     procedure SubjectAccessRightsBeforeOpen(DataSet: TDataSet);
@@ -658,11 +659,23 @@ procedure TDatabaseData.Connect;
 
   procedure KillShadows;
   begin
-    with IBValidationService1 do
+    with IBXServicesConnection1 do
     begin
-      Options := [IBXServices.KillShadows];
-      Execute(nil);
-      MessageDlg('All Unavailable Shadows killed',mtInformation,[mbOK],0);
+      ServerName := FServerName;
+      Protocol := FProtocol;
+      PortNo := FPortNo;
+      Connected := true;
+    end;
+    try
+      with IBValidationService1 do
+      begin
+        DatabaseName := FDatabasePathName;
+        Options := [IBXServices.KillShadows];
+        Execute(nil);
+        MessageDlg('All Unavailable Shadows killed',mtInformation,[mbOK],0);
+      end;
+    finally
+      IBXServicesConnection1.Connected := false;
     end;
   end;
 
@@ -680,13 +693,12 @@ begin
       begin
         if E.IBErrorCode = isc_io_error then
         begin
-            FDBPassword := '';
           if MessageDlg('I/O Error reported on database file. If this is a shadow file, do you want '+
                         'to kill all unavailable shadow sets?. The original message is ' + E.Message,
-                        mtInformation,[mbYes,mbNo],0) = mrYes then
-            try KillShadows except end
-          else
+                        mtInformation,[mbYes,mbNo],0) = mrNo then
             continue;
+          try KillShadows except end;
+          FDBPassword := '';
         end
         else
           ReportException(E);
@@ -1231,6 +1243,11 @@ procedure TDatabaseData.LegacyUserListAfterOpen(DataSet: TDataSet);
 begin
   UserListSource.DataSet := LegacyUserList;
   CurrentTransaction.Active := true;
+  RoleNameList.Active := true;
+end;
+
+procedure TDatabaseData.LegacyUserListAfterPost(DataSet: TDataSet);
+begin
   RoleNameList.Active := true;
 end;
 

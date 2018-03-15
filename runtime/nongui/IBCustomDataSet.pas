@@ -49,8 +49,9 @@ interface
 uses
 {$IFDEF WINDOWS }
   Windows,
-{$ELSE}
-  unix,
+{$ENDIF}
+{$IFDEF UNIX}
+  cthreads, unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IB,  IBSQL, Db,
   IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, fpTimer;
@@ -301,6 +302,7 @@ type
     FDelayTimerValue: integer;
     FTimer: TFPTimer;
     procedure HandleRefreshTimer(Sender: TObject);
+    procedure SetDelayTimerValue(AValue: integer);
   protected
     procedure ActiveChanged; override;
     procedure RecordChanged(Field: TField); override;
@@ -310,7 +312,7 @@ type
     constructor Create(ADataSet: TIBCustomDataSet);
     destructor Destroy; override;
     property DelayTimerValue: integer {in Milliseconds}
-            read FDelayTimerValue write FDelayTimerValue;
+            read FDelayTimerValue write SetDelayTimerValue;
   end;
 
   TIBGeneratorApplyOnEvent = (gaeOnNewRecord,gaeOnPostRecord);
@@ -1410,7 +1412,7 @@ begin
   inherited Create;
   FDataSet := ADataSet;
   FTimer := TFPTimer.Create(nil);
-  FTimer.Enabled := true;
+  FTimer.Enabled := false;
   FTimer.Interval := 0;
   FTimer.OnTimer := HandleRefreshTimer;
   FDelayTimerValue := 0;
@@ -1425,8 +1427,16 @@ end;
 
 procedure TIBDataLink.HandleRefreshTimer(Sender: TObject);
 begin
-  FTimer.Interval := 0;
-  FDataSet.RefreshParams;
+  FTimer.Enabled := false;
+  if FDataSet.Active then
+    FDataSet.RefreshParams;
+end;
+
+procedure TIBDataLink.SetDelayTimerValue(AValue: integer);
+begin
+  if FDelayTimerValue = AValue then Exit;
+  FDelayTimerValue := AValue;
+  FTimer.Interval := FDelayTimerValue;
 end;
 
 procedure TIBDataLink.ActiveChanged;
@@ -1445,12 +1455,20 @@ procedure TIBDataLink.RecordChanged(Field: TField);
 begin
   if (Field = nil) and FDataSet.Active then
   begin
+    {$IF FPC_FULLVERSION >= 30002}
     if FDelayTimerValue > 0 then
+    with FTimer do
     begin
-      FTimer.Interval := FDelayTimerValue;
-      FTimer.StartTimer;
+      if Enabled then
+      begin
+        StopTimer;
+        StartTimer;
+      end
+      else
+        Enabled := true;
     end
     else
+    {$IFEND}
       FDataSet.RefreshParams;
   end;
 end;

@@ -41,14 +41,14 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="27">
+    <Units Count="31">
       <Unit0>
         <Filename Value="IntegratedMonitoring.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="4" Y="20"/>
-        <UsageCount Value="122"/>
+        <UsageCount Value="123"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainForm.pas"/>
@@ -59,8 +59,8 @@
         <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <TopLine Value="28"/>
-        <CursorPos X="41" Y="36"/>
-        <UsageCount Value="122"/>
+        <CursorPos X="7" Y="36"/>
+        <UsageCount Value="123"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -73,7 +73,7 @@
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="42" Y="15"/>
-        <UsageCount Value="24"/>
+        <UsageCount Value="25"/>
       </Unit2>
       <Unit3>
         <Filename Value="SelectDeptDlgUnit.pas"/>
@@ -84,15 +84,15 @@
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="21" Y="13"/>
-        <UsageCount Value="24"/>
+        <UsageCount Value="25"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="2135"/>
-        <CursorPos X="3" Y="2147"/>
-        <UsageCount Value="11"/>
+        <TopLine Value="1426"/>
+        <CursorPos X="9" Y="1467"/>
+        <UsageCount Value="12"/>
       </Unit4>
       <Unit5>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
@@ -106,8 +106,8 @@
         <Filename Value="../../runtime/nongui/IBSQLMonitor.pas"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="103"/>
-        <CursorPos X="21" Y="120"/>
+        <TopLine Value="197"/>
+        <CursorPos X="10" Y="212"/>
         <UsageCount Value="10"/>
       </Unit6>
       <Unit7>
@@ -273,6 +273,37 @@
         <CursorPos X="41" Y="148"/>
         <UsageCount Value="10"/>
       </Unit26>
+      <Unit27>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/fptimer.pp"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="308"/>
+        <CursorPos X="3" Y="310"/>
+        <UsageCount Value="11"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="../../runtime/nongui/sv5ipc.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="21" Y="14"/>
+        <UsageCount Value="10"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="../../changelog"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="64"/>
+        <CursorPos X="61" Y="91"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/unix/eventlog.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="67"/>
+        <UsageCount Value="10"/>
+      </Unit30>
     </Units>
     <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
@@ -281,7 +312,7 @@
       </Position1>
       <Position2>
         <Filename Value="MainForm.pas"/>
-        <Caret Line="36" Column="41" TopLine="28"/>
+        <Caret Line="36" Column="7" TopLine="28"/>
       </Position2>
     </JumpHistory>
   </ProjectOptions>
