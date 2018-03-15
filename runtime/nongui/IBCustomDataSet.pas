@@ -51,7 +51,7 @@ uses
   Windows,
 {$ENDIF}
 {$IFDEF UNIX}
-  cthreads, unix,
+  unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IB,  IBSQL, Db,
   IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, fpTimer;
@@ -1436,7 +1436,9 @@ procedure TIBDataLink.SetDelayTimerValue(AValue: integer);
 begin
   if FDelayTimerValue = AValue then Exit;
   FDelayTimerValue := AValue;
+  {$IF FPC_FULLVERSION >= 30002}
   FTimer.Interval := FDelayTimerValue;
+  {$IFEND}
 end;
 
 procedure TIBDataLink.ActiveChanged;

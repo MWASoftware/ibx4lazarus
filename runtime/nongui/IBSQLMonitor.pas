@@ -52,7 +52,7 @@ uses
   Windows
 {$ENDIF}
 {$IFDEF UNIX}
-  cthreads, unix
+  unix
 {$ENDIF}
 ;
 
