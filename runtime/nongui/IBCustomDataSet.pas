@@ -49,8 +49,9 @@ interface
 uses
 {$IFDEF WINDOWS }
   Windows,
-{$ELSE}
-  unix,
+{$ENDIF}
+{$IFDEF UNIX}
+  cthreads, unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IB,  IBSQL, Db,
   IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, fpTimer;
@@ -1411,9 +1412,7 @@ begin
   inherited Create;
   FDataSet := ADataSet;
   FTimer := TFPTimer.Create(nil);
-  {$IF FPC_FULLVERSION >= 30002}
-  FTimer.Enabled := true;
-  {$IFEND}
+  FTimer.Enabled := false;
   FTimer.Interval := 0;
   FTimer.OnTimer := HandleRefreshTimer;
   FDelayTimerValue := 0;
@@ -1428,7 +1427,7 @@ end;
 
 procedure TIBDataLink.HandleRefreshTimer(Sender: TObject);
 begin
-  FTimer.StopTimer;
+  FTimer.Enabled := false;
   if FDataSet.Active then
     FDataSet.RefreshParams;
 end;
@@ -1458,7 +1457,16 @@ begin
   begin
     {$IF FPC_FULLVERSION >= 30002}
     if FDelayTimerValue > 0 then
-      FTimer.StartTimer
+    with FTimer do
+    begin
+      if Enabled then
+      begin
+        StopTimer;
+        StartTimer;
+      end
+      else
+        Enabled := true;
+    end
     else
     {$IFEND}
       FDataSet.RefreshParams;

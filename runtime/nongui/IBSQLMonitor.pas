@@ -50,8 +50,9 @@ uses
   IBTypes ,SysUtils,  Classes,
 {$IFDEF WINDOWS }
   Windows
-{$ELSE}
-  unix
+{$ENDIF}
+{$IFDEF UNIX}
+  cthreads, unix
 {$ENDIF}
 ;
 
@@ -844,7 +845,8 @@ begin
         if FMsgs.Items[0] is TReleaseObject then
         begin
           {$IFDEF DEBUG}writeln('Post Release');{$ENDIF}
-          Synchronize(PostRelease);
+          if not Terminated then
+            Synchronize(PostRelease);
         end
         else
         { Otherwise write the TraceObject to the buffer }
@@ -1098,7 +1100,8 @@ begin
        not ((st.FMsg = ' ') and (st.FDataType = tfMisc)) then
     begin
       {$IFDEF DEBUG}writeln('Sending Message to Monitors');{$ENDIF}
-      Synchronize(AlertMonitors);
+      if not Terminated then
+        Synchronize(AlertMonitors);
     end;
   end;
   {$IFDEF DEBUG}writeln('Read Thread Ends');{$ENDIF}

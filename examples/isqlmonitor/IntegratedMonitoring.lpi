@@ -41,7 +41,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="30">
+    <Units Count="31">
       <Unit0>
         <Filename Value="IntegratedMonitoring.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -56,6 +56,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <TopLine Value="28"/>
         <CursorPos X="7" Y="36"/>
@@ -87,13 +88,11 @@
       </Unit3>
       <Unit4>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="1422"/>
-        <CursorPos X="24" Y="1413"/>
+        <TopLine Value="1426"/>
+        <CursorPos X="9" Y="1467"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
@@ -278,8 +277,8 @@
         <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/fptimer.pp"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="130"/>
-        <CursorPos X="3" Y="132"/>
+        <TopLine Value="308"/>
+        <CursorPos X="3" Y="310"/>
         <UsageCount Value="11"/>
       </Unit27>
       <Unit28>
@@ -298,8 +297,15 @@
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit29>
+      <Unit30>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/unix/eventlog.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="67"/>
+        <UsageCount Value="10"/>
+      </Unit30>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="MainForm.pas"/>
         <Caret Line="37" Column="4" TopLine="28"/>
@@ -308,10 +314,6 @@
         <Filename Value="MainForm.pas"/>
         <Caret Line="36" Column="7" TopLine="28"/>
       </Position2>
-      <Position3>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1413" Column="24" TopLine="1404"/>
-      </Position3>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
