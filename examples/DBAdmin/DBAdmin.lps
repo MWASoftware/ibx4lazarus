@@ -181,11 +181,10 @@
       </Unit17>
       <Unit18>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1220"/>
         <CursorPos Y="1249"/>
         <UsageCount Value="33"/>
-        <Loaded Value="True"/>
       </Unit18>
       <Unit19>
         <Filename Value="../../runtime/IBDatabaseInfo.pas"/>

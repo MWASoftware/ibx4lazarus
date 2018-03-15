@@ -1411,7 +1411,9 @@ begin
   inherited Create;
   FDataSet := ADataSet;
   FTimer := TFPTimer.Create(nil);
+  {$IF FPC_FULLVERSION >= 30002}
   FTimer.Enabled := true;
+  {$IFEND}
   FTimer.Interval := 0;
   FTimer.OnTimer := HandleRefreshTimer;
   FDelayTimerValue := 0;

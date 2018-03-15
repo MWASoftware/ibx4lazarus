@@ -56,7 +56,6 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <TopLine Value="28"/>
         <CursorPos X="7" Y="36"/>
@@ -88,11 +87,13 @@
       </Unit3>
       <Unit4>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="1434"/>
-        <CursorPos X="34" Y="1457"/>
+        <TopLine Value="1422"/>
+        <CursorPos X="24" Y="1413"/>
         <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
@@ -277,8 +278,8 @@
         <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/fptimer.pp"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="61"/>
-        <CursorPos X="15" Y="82"/>
+        <TopLine Value="130"/>
+        <CursorPos X="3" Y="132"/>
         <UsageCount Value="11"/>
       </Unit27>
       <Unit28>
@@ -298,7 +299,7 @@
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit29>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
         <Filename Value="MainForm.pas"/>
         <Caret Line="37" Column="4" TopLine="28"/>
@@ -307,6 +308,10 @@
         <Filename Value="MainForm.pas"/>
         <Caret Line="36" Column="7" TopLine="28"/>
       </Position2>
+      <Position3>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="1413" Column="24" TopLine="1404"/>
+      </Position3>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
