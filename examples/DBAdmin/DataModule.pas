@@ -696,7 +696,7 @@ begin
           if MessageDlg('I/O Error reported on database file. If this is a shadow file, do you want '+
                         'to kill all unavailable shadow sets?. The original message is ' + E.Message,
                         mtInformation,[mbYes,mbNo],0) = mrNo then
-            break;
+            continue;
           try KillShadows except end;
           FDBPassword := '';
         end
