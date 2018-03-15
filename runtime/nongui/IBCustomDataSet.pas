@@ -301,6 +301,7 @@ type
     FDelayTimerValue: integer;
     FTimer: TFPTimer;
     procedure HandleRefreshTimer(Sender: TObject);
+    procedure SetDelayTimerValue(AValue: integer);
   protected
     procedure ActiveChanged; override;
     procedure RecordChanged(Field: TField); override;
@@ -310,7 +311,7 @@ type
     constructor Create(ADataSet: TIBCustomDataSet);
     destructor Destroy; override;
     property DelayTimerValue: integer {in Milliseconds}
-            read FDelayTimerValue write FDelayTimerValue;
+            read FDelayTimerValue write SetDelayTimerValue;
   end;
 
   TIBGeneratorApplyOnEvent = (gaeOnNewRecord,gaeOnPostRecord);
@@ -1425,8 +1426,16 @@ end;
 
 procedure TIBDataLink.HandleRefreshTimer(Sender: TObject);
 begin
-  FTimer.Interval := 0;
-  FDataSet.RefreshParams;
+  FTimer.StopTimer;
+  if FDataSet.Active then
+    FDataSet.RefreshParams;
+end;
+
+procedure TIBDataLink.SetDelayTimerValue(AValue: integer);
+begin
+  if FDelayTimerValue = AValue then Exit;
+  FDelayTimerValue := AValue;
+  FTimer.Interval := FDelayTimerValue;
 end;
 
 procedure TIBDataLink.ActiveChanged;
@@ -1445,12 +1454,11 @@ procedure TIBDataLink.RecordChanged(Field: TField);
 begin
   if (Field = nil) and FDataSet.Active then
   begin
+    {$IF FPC_FULLVERSION >= 30002}
     if FDelayTimerValue > 0 then
-    begin
-      FTimer.Interval := FDelayTimerValue;
-      FTimer.StartTimer;
-    end
+      FTimer.StartTimer
     else
+    {$IFEND}
       FDataSet.RefreshParams;
   end;
 end;

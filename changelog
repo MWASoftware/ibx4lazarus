@@ -88,7 +88,7 @@ packages.
 
     Note: uses fptimer and hence requires a thread manager. Under Linux the
     chreads unit must be included in your project. TTimer is not used in order
-    to avoid an LCL dependency.
+    to avoid an LCL dependency. Requires FPC 3.0.2 or later.
 
 17. TIBExtract: User role grants now excluded when etGrantsToUser not specified
     with Extract Option eoDatabase.
