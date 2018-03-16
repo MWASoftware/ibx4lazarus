@@ -229,10 +229,8 @@ end;
 
 procedure TIBMasterDataLink.DoMasterChange;
 begin
-  if FDelayTimerValue = 0 then
-    inherited DoMasterChange
   {$IF FPC_FULLVERSION >= 30002}
-  else
+  if FDelayTimerValue > 0 then
   with FTimer do
   begin
     CheckSynchronize; {Ensure not waiting on Synchronize}
@@ -244,7 +242,9 @@ begin
     else
       Enabled := true;
   end
+  else
   {$IFEND}
+    inherited DoMasterChange
 end;
 
 constructor TIBMasterDataLink.Create(ADataSet: TDataSet);
