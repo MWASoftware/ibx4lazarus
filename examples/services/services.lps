@@ -38,7 +38,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="101"/>
-        <CursorPos X="33" Y="137"/>
+        <CursorPos X="121" Y="123"/>
         <UsageCount Value="104"/>
       </Unit2>
       <Unit3>
@@ -48,7 +48,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="93" Y="26"/>
+        <CursorPos X="123" Y="22"/>
         <UsageCount Value="104"/>
       </Unit3>
       <Unit4>
@@ -59,7 +59,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="60"/>
-        <CursorPos Y="80"/>
+        <CursorPos X="97" Y="80"/>
         <UsageCount Value="104"/>
       </Unit4>
       <Unit5>
@@ -69,8 +69,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="71"/>
-        <CursorPos X="57" Y="111"/>
+        <TopLine Value="72"/>
+        <CursorPos X="89" Y="92"/>
         <UsageCount Value="104"/>
       </Unit5>
       <Unit6>
@@ -80,7 +80,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="106" Y="30"/>
+        <CursorPos X="104" Y="24"/>
         <UsageCount Value="104"/>
       </Unit6>
       <Unit7>
@@ -91,7 +91,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="76"/>
-        <CursorPos Y="90"/>
+        <CursorPos X="43" Y="86"/>
         <UsageCount Value="104"/>
       </Unit7>
       <Unit8>
@@ -101,7 +101,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="106" Y="31"/>
+        <CursorPos X="104" Y="27"/>
         <UsageCount Value="104"/>
       </Unit8>
       <Unit9>
@@ -112,7 +112,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="17"/>
-        <CursorPos X="45" Y="45"/>
+        <CursorPos X="94" Y="42"/>
         <UsageCount Value="104"/>
       </Unit9>
       <Unit10>
@@ -122,8 +122,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="42"/>
-        <CursorPos X="18" Y="66"/>
+        <TopLine Value="41"/>
+        <CursorPos X="104" Y="68"/>
         <UsageCount Value="104"/>
       </Unit10>
       <Unit11>
@@ -133,8 +133,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="48"/>
-        <CursorPos Y="68"/>
+        <TopLine Value="155"/>
+        <CursorPos X="107" Y="74"/>
         <UsageCount Value="98"/>
       </Unit11>
       <Unit12>
@@ -144,8 +144,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="49"/>
-        <CursorPos X="25" Y="82"/>
+        <TopLine Value="48"/>
+        <CursorPos X="93" Y="73"/>
         <UsageCount Value="98"/>
       </Unit12>
       <Unit13>

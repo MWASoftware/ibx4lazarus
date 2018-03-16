@@ -771,7 +771,7 @@ procedure TDatabaseData.ShutDown(aShutDownmode: TDBShutdownMode; aDelay: integer
 begin
   IBDatabase1.Connected := false;
   try
-    ShutdownDatabaseDlg.Shutdown(DatabaseName, aShutDownmode, aDelay);
+    ShutdownDatabaseDlg.Shutdown(aShutDownmode, aDelay);
   finally
     IBDatabase1.Connected := true;
   end;

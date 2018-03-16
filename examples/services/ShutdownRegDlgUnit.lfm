@@ -1,7 +1,7 @@
 object ShutdownReqDlg: TShutdownReqDlg
-  Left = 2067
+  Left = 1350
   Height = 198
-  Top = 353
+  Top = 612
   Width = 425
   BorderStyle = bsDialog
   Caption = 'Database Shutdown'
@@ -9,7 +9,7 @@ object ShutdownReqDlg: TShutdownReqDlg
   ClientWidth = 425
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Bevel1: TBevel
     Left = 8
     Height = 176
