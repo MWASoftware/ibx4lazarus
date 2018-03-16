@@ -52,7 +52,7 @@ uses
   Windows
 {$ENDIF}
 {$IFDEF UNIX}
-  cthreads, unix
+  unix
 {$ENDIF}
 ;
 
@@ -573,6 +573,8 @@ end;
 
 procedure TIBSQLMonitorHook.SetEnabled(const Value: Boolean);
 begin
+  if Value and not IsMultiThread then
+    IBError(ibxMultiThreadRequired,['IBSQLMonitor']);
   if FEnabled <> Value then
     FEnabled := Value;
   if (not FEnabled) and (Assigned(FWriterThread)) then

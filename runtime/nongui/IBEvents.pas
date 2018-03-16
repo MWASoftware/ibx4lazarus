@@ -54,7 +54,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  Classes, IBExternals, IB, IBDatabase;
+  Classes, IB, IBDatabase;
 
 const
   MaxEvents = 15;

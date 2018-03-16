@@ -182,8 +182,6 @@ end;
     FOnSelectPanelEditor: TOnSelectPanelEditor;
     FResizing: boolean;
     FWeHaveFocus: boolean;
-    FHidingEditorPanel: boolean;
-    FAllowHide: boolean;
     FMouseDown: boolean;
     function ActiveControl: TControl;
     procedure DoShowEditorPanel(Data: PtrInt);

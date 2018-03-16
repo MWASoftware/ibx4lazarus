@@ -107,9 +107,9 @@ function TIBUpdateSQL.GetRowsAffected(var SelectCount, InsertCount,
                                  UpdateCount, DeleteCount: integer): boolean;
 begin
   if Query[FLastUpdateKind].Statement <> nil  then
-    Query[FLastUpdateKind].Statement.GetRowsAffected(SelectCount, InsertCount,  UpdateCount, DeleteCount)
+    Result := Query[FLastUpdateKind].Statement.GetRowsAffected(SelectCount, InsertCount,  UpdateCount, DeleteCount)
   else
-    inherited;
+    Result := inherited;
 end;
 
 procedure TIBUpdateSQL.ExecSQL(UpdateKind: TUpdateKind; buff: PChar);

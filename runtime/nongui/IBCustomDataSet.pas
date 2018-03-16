@@ -51,7 +51,7 @@ uses
   Windows,
 {$ENDIF}
 {$IFDEF UNIX}
-  cthreads, unix,
+  unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IB,  IBSQL, Db,
   IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, fpTimer;
@@ -1436,7 +1436,11 @@ procedure TIBDataLink.SetDelayTimerValue(AValue: integer);
 begin
   if FDelayTimerValue = AValue then Exit;
   FDelayTimerValue := AValue;
+  {$IF FPC_FULLVERSION >= 30002}
+  if (AValue > 0) and not IsMultiThread then
+    IBError(ibxMultiThreadRequired,['TIBQuery/TIBDataset MasterDetailDelay']);
   FTimer.Interval := FDelayTimerValue;
+  {$IFEND}
 end;
 
 procedure TIBDataLink.ActiveChanged;
@@ -1459,6 +1463,7 @@ begin
     if FDelayTimerValue > 0 then
     with FTimer do
     begin
+      CheckSynchronize; {Ensure not waiting on Synchronize}
       if Enabled then
       begin
         StopTimer;
@@ -5093,6 +5098,7 @@ end;
 function TIBDataSetUpdateObject.GetRowsAffected(
   var SelectCount, InsertCount, UpdateCount, DeleteCount: integer): boolean;
 begin
+  Result := true;
   SelectCount := 0;
   InsertCount := 0;
   UpdateCount := 0;

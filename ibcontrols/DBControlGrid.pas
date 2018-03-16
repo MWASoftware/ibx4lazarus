@@ -418,7 +418,6 @@ begin
 end;
 
 function TRowCache.Add2Cache(RecNo: Longint; Control: TWinControl): TBitmap;
-var i: integer;
 begin
   Dec(RecNo); {Adust to zero base}
   ExtendCache(RecNo + 1);
@@ -1176,8 +1175,6 @@ begin
     result := dsInactive;
 end;
 
-var
-  DataCol: Integer;
 begin
   PrepareCanvas(aCol, aRow, aState);
 
@@ -1288,8 +1285,6 @@ end;
 procedure TDBControlGrid.KeyDown(var Key: Word; Shift: TShiftState);
 type
   TOperation=(opMoveBy,opCancel,opAppend,opInsert,opDelete);
-var
-  DeltaCol,DeltaRow: Integer;
 
   procedure DoOnKeyDown;
   begin

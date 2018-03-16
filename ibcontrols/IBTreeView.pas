@@ -331,7 +331,6 @@ end;
 { TIBTreeView }
 
 procedure TIBTreeView.ActiveChanged(Sender: TObject);
-var AtTopLevel: boolean;
 begin
   if (csDesigning in ComponentState) then Exit;
   IBControlLinkChanged;
@@ -342,7 +341,6 @@ begin
   end
   else
   begin
-    AtTopLevel := Items.TopLvlCount = 0;
     AddNodes;
     if not FLocatingNode and (Selected = nil) and (Items.TopLvlCount > 0) then
     begin

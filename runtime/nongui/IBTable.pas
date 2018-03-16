@@ -197,39 +197,61 @@ type
     FDelayTimerValue: integer;
     FTimer: TFPTimer;
     procedure HandleRefreshTimer(Sender: TObject);
+    procedure SetDelayTimerValue(AValue: integer);
   protected
     procedure DoMasterChange; override;
   public
     constructor Create(ADataSet: TDataSet); override;
     destructor Destroy; override;
     property DelayTimerValue: integer {in Milliseconds}
-            read FDelayTimerValue write FDelayTimerValue;
+            read FDelayTimerValue write SetDelayTimerValue;
   end;
 
 { TIBMasterDataLink }
 
 procedure TIBMasterDataLink.HandleRefreshTimer(Sender: TObject);
 begin
-  FTimer.Interval := 0;
-  inherited DoMasterChange;
+  FTimer.Enabled := false;
+  if GetDetailDataSet.Active then
+    inherited DoMasterChange;
+end;
+
+procedure TIBMasterDataLink.SetDelayTimerValue(AValue: integer);
+begin
+  if FDelayTimerValue = AValue then Exit;
+  FDelayTimerValue := AValue;
+  {$IF FPC_FULLVERSION >= 30002}
+  if (AValue > 0) and not IsMultiThread then
+    IBError(ibxMultiThreadRequired,['TIBTable MasterDetailDelay']);
+  FTimer.Interval := FDelayTimerValue;
+  {$IFEND}
 end;
 
 procedure TIBMasterDataLink.DoMasterChange;
 begin
   if FDelayTimerValue = 0 then
     inherited DoMasterChange
+  {$IF FPC_FULLVERSION >= 30002}
   else
+  with FTimer do
   begin
-    FTimer.Interval := FDelayTimerValue;
-    FTimer.StartTimer;
-  end;
+    CheckSynchronize; {Ensure not waiting on Synchronize}
+    if Enabled then
+    begin
+      StopTimer;
+      StartTimer;
+    end
+    else
+      Enabled := true;
+  end
+  {$IFEND}
 end;
 
 constructor TIBMasterDataLink.Create(ADataSet: TDataSet);
 begin
   inherited Create(ADataSet);
   FTimer := TFPTimer.Create(nil);
-  FTimer.Enabled := true;
+  FTimer.Enabled := false;
   FTimer.Interval := 0;
   FTimer.OnTimer := HandleRefreshTimer;
   FDelayTimerValue := 0;
