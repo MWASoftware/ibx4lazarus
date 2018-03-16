@@ -1,7 +1,7 @@
 object AddShadowFileDlg: TAddShadowFileDlg
-  Left = 2191
+  Left = 496
   Height = 129
-  Top = 388
+  Top = 305
   Width = 383
   BorderStyle = bsDialog
   Caption = 'Add Shadow File'
@@ -10,7 +10,7 @@ object AddShadowFileDlg: TAddShadowFileDlg
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.0.5'
+  LCLVersion = '1.8.3.0'
   object Bevel1: TBevel
     Left = 8
     Height = 112

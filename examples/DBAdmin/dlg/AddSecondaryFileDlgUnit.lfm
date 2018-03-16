@@ -1,7 +1,7 @@
 object AddSecondaryFileDlg: TAddSecondaryFileDlg
-  Left = 2106
+  Left = 1292
   Height = 186
-  Top = 356
+  Top = 532
   Width = 386
   BorderStyle = bsDialog
   Caption = 'Add Secondary File'
@@ -9,7 +9,7 @@ object AddSecondaryFileDlg: TAddSecondaryFileDlg
   ClientWidth = 386
   OnClose = FormClose
   Position = poMainFormCenter
-  LCLVersion = '1.8.0.5'
+  LCLVersion = '1.8.3.0'
   object Bevel1: TBevel
     Left = 8
     Height = 168

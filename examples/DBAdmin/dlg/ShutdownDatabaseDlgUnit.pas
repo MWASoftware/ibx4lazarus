@@ -54,7 +54,7 @@ type
     FShutdownWaitThread: TThread;
     procedure OnWaitCompleted(Sender: TObject);
   public
-     procedure Shutdown(aDBName: string; aShutDownmode: TDBShutdownMode; aDelay: integer);
+     procedure Shutdown(aShutDownmode: TDBShutdownMode; aDelay: integer);
      property Aborting: boolean read FAborting;
   end;
 
@@ -174,10 +174,9 @@ begin
   Close;
 end;
 
-procedure TShutdownDatabaseDlg.Shutdown(aDBName: string;
-  aShutDownmode: TDBShutdownMode; aDelay: integer);
+procedure TShutdownDatabaseDlg.Shutdown(aShutDownmode: TDBShutdownMode;
+  aDelay: integer);
 begin
-  IBConfigService.DatabaseName := aDBName;
   FShutDownmode := aShutDownmode;
   FDelay := aDelay;
   FSecContextError := false;

@@ -1,7 +1,7 @@
 object NewUserDlg: TNewUserDlg
-  Left = 2046
+  Left = 1269
   Height = 195
-  Top = 381
+  Top = 301
   Width = 352
   BorderStyle = bsDialog
   Caption = 'New User'
@@ -10,7 +10,7 @@ object NewUserDlg: TNewUserDlg
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Bevel1: TBevel
     Left = 5
     Height = 178

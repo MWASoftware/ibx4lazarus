@@ -1,7 +1,7 @@
 object ShutdownDatabaseDlg: TShutdownDatabaseDlg
-  Left = 2067
+  Left = 1320
   Height = 113
-  Top = 326
+  Top = 339
   Width = 338
   BorderStyle = bsNone
   Caption = 'ShutdownDatabaseDlg'
