@@ -221,6 +221,8 @@ begin
   if FDelayTimerValue = AValue then Exit;
   FDelayTimerValue := AValue;
   {$IF FPC_FULLVERSION >= 30002}
+  if (AValue > 0) and not IsMultiThread then
+    IBError(ibxMultiThreadRequired,['TIBTable MasterDetailDelay']);
   FTimer.Interval := FDelayTimerValue;
   {$IFEND}
 end;
@@ -233,6 +235,7 @@ begin
   else
   with FTimer do
   begin
+    CheckSynchronize; {Ensure not waiting on Synchronize}
     if Enabled then
     begin
       StopTimer;
