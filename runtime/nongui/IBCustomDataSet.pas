@@ -5095,6 +5095,7 @@ end;
 function TIBDataSetUpdateObject.GetRowsAffected(
   var SelectCount, InsertCount, UpdateCount, DeleteCount: integer): boolean;
 begin
+  Result := true;
   SelectCount := 0;
   InsertCount := 0;
   UpdateCount := 0;

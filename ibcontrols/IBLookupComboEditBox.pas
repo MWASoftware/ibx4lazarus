@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DbCtrls,
-  ExtCtrls, IBSQLParser, DB, StdCtrls, IBCustomDataSet, LCLVersion;
+  ExtCtrls, IBSQLParser, DB, StdCtrls, IBCustomDataSet;
 
 type
 
@@ -77,7 +77,6 @@ type
 
   TIBLookupComboEditBox = class(TDBLookupComboBox)
   private
-    FCanAutoInsert: TCanAutoInsert;
     { Private declarations }
     FDataLink: TIBLookupComboDataLink;
     FIBLookupControlLink: TIBLookupControlLink;
@@ -148,7 +147,7 @@ type
 
 implementation
 
-uses IBQuery, LCLType, Variants, LCLProc, LazUTF8;
+uses LCLType, Variants, LCLProc, LazUTF8;
 
 { TIBLookupControlLink }
 
@@ -196,7 +195,6 @@ end;
 { TIBLookupComboEditBox }
 
 procedure TIBLookupComboEditBox.HandleTimer(Sender: TObject);
-var ActiveState: boolean;
 begin
   FTimer.Interval := 0;
   FFiltered := Text <> '';
