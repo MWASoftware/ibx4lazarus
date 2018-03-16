@@ -17,7 +17,6 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="870"/>
         <CursorPos X="43" Y="902"/>
         <UsageCount Value="145"/>
@@ -30,6 +29,7 @@
         <ComponentName Value="DatabaseData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="769"/>
         <CursorPos X="34" Y="774"/>
@@ -493,8 +493,8 @@
       <Unit61>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="58"/>
-        <CursorPos X="36" Y="94"/>
+        <TopLine Value="82"/>
+        <CursorPos X="9" Y="107"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit61>

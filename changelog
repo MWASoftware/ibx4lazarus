@@ -98,6 +98,14 @@ packages.
     combobox text is updated. This allows a listsource (detail) to be in a Master/Detail
     relationship with the control's datasource (master).
 
+19. TIBExtract: Full BigInt value range now supported for Generators/Sequences.
+
+20. Select Procedures (Procedure type 1) now include "SUSPEND;" clause in their
+    stubs. Pedantic fix really, as procedures output in dependency order anyway.
+
+21. TIBExtact: Package Headers and Package Bodies are now included in the extracted
+    DDL.
+
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO

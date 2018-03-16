@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="60">
+    <Units Count="61">
       <Unit0>
         <Filename Value="ibtablestest.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -428,16 +428,14 @@
         <CursorPos X="131" Y="462"/>
         <UsageCount Value="10"/>
       </Unit59>
+      <Unit60>
+        <Filename Value="../../runtime/nongui/IBExtract.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3356"/>
+        <CursorPos X="47" Y="3388"/>
+        <UsageCount Value="10"/>
+      </Unit60>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
-      <Position1>
-        <Filename Value="Unit1.pas"/>
-        <Caret Line="34" Column="6" TopLine="9"/>
-      </Position1>
-      <Position2>
-        <Filename Value="Unit1.pas"/>
-        <Caret Line="35" Column="41" TopLine="9"/>
-      </Position2>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectSession>
 </CONFIG>
