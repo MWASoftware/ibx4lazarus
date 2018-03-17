@@ -2,7 +2,6 @@
 <CONFIG>
   <Package Version="4">
     <Name Value="ibnongui"/>
-    <Type Value="RunTimeOnly"/>
     <Author Value="various"/>
     <CompilerOptions>
       <Version Value="11"/>

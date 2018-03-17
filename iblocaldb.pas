@@ -9,14 +9,8 @@ interface
 
 uses
   IBLocalDBSupport, IBXCreateDatabaseDlg, IBXCreateDatabaseFromSQLDlgUnit, 
-  IBXSaveDatabaseDlg, IBXUpgradeDatabaseDlg, IBXViewLogDig, LazarusPackageIntf;
+  IBXSaveDatabaseDlg, IBXUpgradeDatabaseDlg, IBXViewLogDig;
 
 implementation
 
-procedure Register;
-begin
-end;
-
-initialization
-  RegisterPackage('iblocaldb', @Register);
 end.
