@@ -2,7 +2,6 @@
 <CONFIG>
   <Package Version="4">
     <Name Value="iblocaldb"/>
-    <Type Value="RunAndDesignTime"/>
     <Author Value="MWA Software"/>
     <CompilerOptions>
       <Version Value="11"/>

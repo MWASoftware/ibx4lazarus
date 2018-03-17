@@ -2,7 +2,6 @@
 <CONFIG>
   <Package Version="4">
     <Name Value="iblocalnongui"/>
-    <Type Value="RunTimeOnly"/>
     <Author Value="MWA Software"/>
     <CompilerOptions>
       <Version Value="11"/>

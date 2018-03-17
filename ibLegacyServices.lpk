@@ -2,7 +2,6 @@
 <CONFIG>
   <Package Version="4">
     <Name Value="ibLegacyServices"/>
-    <Type Value="RunTimeOnly"/>
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
