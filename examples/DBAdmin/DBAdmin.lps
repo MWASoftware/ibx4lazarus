@@ -31,8 +31,8 @@
         <ResourceBaseClass Value="DataModule"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="769"/>
-        <CursorPos X="34" Y="774"/>
+        <TopLine Value="468"/>
+        <CursorPos X="20" Y="486"/>
         <UsageCount Value="145"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -444,9 +444,9 @@
       <Unit54>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="676"/>
-        <CursorPos X="28" Y="702"/>
-        <UsageCount Value="8"/>
+        <TopLine Value="635"/>
+        <CursorPos X="19" Y="666"/>
+        <UsageCount Value="10"/>
       </Unit54>
       <Unit55>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
@@ -605,9 +605,9 @@
       <Unit78>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/stringl.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="892"/>
-        <CursorPos X="3" Y="897"/>
-        <UsageCount Value="8"/>
+        <TopLine Value="738"/>
+        <CursorPos X="3" Y="742"/>
+        <UsageCount Value="10"/>
       </Unit78>
       <Unit79>
         <Filename Value="../../runtime/IBXServices.pas"/>
@@ -721,13 +721,13 @@
       <Unit94>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2047"/>
-        <CursorPos X="3" Y="2051"/>
+        <TopLine Value="3023"/>
+        <CursorPos X="3" Y="2977"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="3023"/>
-          <CursorPos X="3" Y="2977"/>
+          <TopLine Value="2779"/>
+          <CursorPos X="41" Y="2818"/>
         </ExtraEditor1>
         <UsageCount Value="19"/>
       </Unit94>
@@ -837,122 +837,11 @@
         <UsageCount Value="10"/>
       </Unit109>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="1">
       <Position1>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="1195" Column="95" TopLine="1166"/>
+        <Caret Line="486" Column="20" TopLine="468"/>
       </Position1>
-      <Position2>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="716" Column="9" TopLine="716"/>
-      </Position2>
-      <Position3>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1248" Column="18" TopLine="1238"/>
-      </Position3>
-      <Position4>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1343" Column="3" TopLine="1341"/>
-      </Position4>
-      <Position5>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="1351" Column="55" TopLine="1336"/>
-      </Position5>
-      <Position6>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="219" Column="21" TopLine="190"/>
-      </Position6>
-      <Position7>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="706" Column="3" TopLine="704"/>
-      </Position7>
-      <Position8>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="218" Column="15" TopLine="200"/>
-      </Position8>
-      <Position9>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="676" Column="97" TopLine="649"/>
-      </Position9>
-      <Position10>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="677" Column="30" TopLine="657"/>
-      </Position10>
-      <Position11>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="698" Column="40" TopLine="680"/>
-      </Position11>
-      <Position12>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="701" TopLine="657"/>
-      </Position12>
-      <Position13>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="358" Column="33" TopLine="345"/>
-      </Position13>
-      <Position14>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="496" Column="11" TopLine="464"/>
-      </Position14>
-      <Position15>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="501" Column="43" TopLine="469"/>
-      </Position15>
-      <Position16>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="623" Column="11" TopLine="591"/>
-      </Position16>
-      <Position17>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="628" Column="77" TopLine="596"/>
-      </Position17>
-      <Position18>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="890" Column="14" TopLine="858"/>
-      </Position18>
-      <Position19>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="891" Column="13" TopLine="859"/>
-      </Position19>
-      <Position20>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="681" Column="32" TopLine="672"/>
-      </Position20>
-      <Position21>
-        <Filename Value="DataModule.pas"/>
-      </Position21>
-      <Position22>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="132" Column="13" TopLine="100"/>
-      </Position22>
-      <Position23>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="173" Column="23" TopLine="141"/>
-      </Position23>
-      <Position24>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="439" Column="11" TopLine="407"/>
-      </Position24>
-      <Position25>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="446" Column="11" TopLine="414"/>
-      </Position25>
-      <Position26>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="462" Column="11" TopLine="430"/>
-      </Position26>
-      <Position27>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="448" Column="40" TopLine="433"/>
-      </Position27>
-      <Position28>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="224" Column="20" TopLine="208"/>
-      </Position28>
-      <Position29>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="774" Column="34" TopLine="769"/>
-      </Position29>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

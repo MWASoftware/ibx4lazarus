@@ -3153,15 +3153,12 @@ end;
 procedure TIBXServicesConnection.SetDBParams(DBParams: TStrings);
 var i: integer;
     j: integer;
-    k: integer;
     ParamName: string;
 begin
   Params.Clear;
   for i := 0 to DBParams.Count - 1 do
   begin
-    ParamName := DBParams[i];
-    k := Pos('=',ParamName);
-    if k > 0 then system.Delete(ParamName,k,Length(ParamName)-k+1);
+    ParamName := DBParams.Names[i];
     for j := 1 to isc_spb_last_spb_constant do
       if ParamName = SPBConstantNames[j] then
       begin

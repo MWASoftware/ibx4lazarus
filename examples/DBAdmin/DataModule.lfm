@@ -4,6 +4,7 @@ object DatabaseData: TDatabaseData
   HorizontalOffset = 645
   VerticalOffset = 400
   Width = 730
+  PPI = 96
   object IBDatabase1: TIBDatabase
     Connected = False
     AfterConnect = IBDatabase1AfterConnect
