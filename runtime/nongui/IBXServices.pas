@@ -3163,7 +3163,7 @@ begin
     k := Pos('=',ParamName);
     if k > 0 then system.Delete(ParamName,k,Length(ParamName)-k+1);
     for j := 1 to isc_spb_last_spb_constant do
-      if ParamName = SPBConstantNames[j] then
+      if CompareText(ParamName,SPBConstantNames[j]) = 0 then
       begin
         Params.Add(DBParams[i]);
         break;

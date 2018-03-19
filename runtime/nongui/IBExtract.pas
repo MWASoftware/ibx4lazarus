@@ -419,10 +419,12 @@ begin
     ListViews;
     ListCheck;
     ListException;
-    ListPackages(paHeader);
+    if DatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
+      ListPackages(paHeader);
     ListProcs(pdCreateStub);
     ListTriggers;
-    ListPackages(paBody);
+    if DatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
+      ListPackages(paBody);
     ListProcs(pdAlterProc);
     ListGrants(ExtractTypes);
   end;
@@ -1213,17 +1215,20 @@ begin
       qryRoles.Close;
     end;
 
-    qryRoles.SQL.Text := PackagesSQL;
-    qryRoles.ExecQuery;
-    try
-      while not qryRoles.Eof do
-      begin
-        ShowGrants(Trim(qryRoles.FieldByName('RDB$PACKAGE_NAME').AsString), Term,
-                not (etGrantsToUser in ExtractTypes));
-        qryRoles.Next;
+    if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
+    begin
+      qryRoles.SQL.Text := PackagesSQL;
+      qryRoles.ExecQuery;
+      try
+        while not qryRoles.Eof do
+        begin
+          ShowGrants(Trim(qryRoles.FieldByName('RDB$PACKAGE_NAME').AsString), Term,
+                  not (etGrantsToUser in ExtractTypes));
+          qryRoles.Next;
+        end;
+      finally
+        qryRoles.Close;
       end;
-    finally
-      qryRoles.Close;
     end;
 
     {Metadata Grants}
@@ -1356,9 +1361,23 @@ const
                   'JOIN ( ' +
                   'Select RDB$PROCEDURE_NAME, max(ProcLevel) as ProcLevel From Procs ' +
                   'Group By RDB$PROCEDURE_NAME) A On A.RDB$PROCEDURE_NAME = P.RDB$PROCEDURE_NAME ' +
-                  'Where P.RDB$PACKAGE_NAME is NULL '+
                   'Order by A.ProcLevel desc, P.RDB$PROCEDURE_NAME asc';
 
+  ProcedureSQLODS12 =  {Order procedures by dependency order and then procedure name}
+                  'with recursive Procs as ( ' +
+                  'Select RDB$PROCEDURE_NAME, 1 as ProcLevel from RDB$PROCEDURES ' +
+                  'UNION ALL ' +
+                  'Select D.RDB$DEPENDED_ON_NAME, ProcLevel + 1 From RDB$DEPENDENCIES D ' +
+                  'JOIN Procs on Procs.RDB$PROCEDURE_NAME = D.RDB$DEPENDENT_NAME ' +
+                  '  and Procs.RDB$PROCEDURE_NAME <> D.RDB$DEPENDED_ON_NAME ' +
+                  'JOIN RDB$PROCEDURES P On P.RDB$PROCEDURE_NAME = D.RDB$DEPENDED_ON_NAME ' +
+                  '  ) ' +
+                  'SELECT * FROM RDB$PROCEDURES P ' +
+                  'JOIN ( ' +
+                  'Select RDB$PROCEDURE_NAME, max(ProcLevel) as ProcLevel From Procs ' +
+                  'Group By RDB$PROCEDURE_NAME) A On A.RDB$PROCEDURE_NAME = P.RDB$PROCEDURE_NAME ' +
+                  'Where P.RDB$PACKAGE_NAME is NULL '+
+                  'Order by A.ProcLevel desc, P.RDB$PROCEDURE_NAME asc';
   ProcedureNameSQL =
     'SELECT * FROM RDB$PROCEDURES ' +
     'WHERE RDB$PROCEDURE_NAME = :ProcedureName ' +
@@ -1377,7 +1396,12 @@ begin
   SList := TStringList.Create;
   try
     if ProcedureName = '' then
-      qryProcedures.SQL.Text := ProcedureSQL
+    begin
+      if DatabaseInfo.ODSMajorVersion < ODS_VERSION12 then
+        qryProcedures.SQL.Text := ProcedureSQL
+      else
+        qryProcedures.SQL.Text := ProcedureSQLODS12;
+    end
     else
     begin
       qryProcedures.SQL.Text := ProcedureNameSQL;
@@ -2997,9 +3021,14 @@ begin
      end;
     eoPackage:
      begin
-       ListPackages(paBoth,ObjectName, etGrant in ExtractTypes);
-       if (ObjectName <> '' ) and (etGrant in ExtractTypes) then
-         ShowGrants(ObjectName, Term);
+       if DatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
+       begin
+         ListPackages(paBoth,ObjectName, etGrant in ExtractTypes);
+         if (ObjectName <> '' ) and (etGrant in ExtractTypes) then
+           ShowGrants(ObjectName, Term);
+       end
+       else
+         IBError(ibxeODSVersionRequired,['12.0']);
      end;
     eoFunction : ListFunctions(ObjectName);
     eoGenerator : ListGenerators(ObjectName,ExtractTypes);
