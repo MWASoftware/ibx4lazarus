@@ -574,7 +574,7 @@ end;
 procedure TIBSQLMonitorHook.SetEnabled(const Value: Boolean);
 begin
   if Value and not IsMultiThread then
-    IBError(ibxMultiThreadRequired,['IBSQLMonitor']);
+    IBError(ibxeMultiThreadRequired,['IBSQLMonitor']);
   if FEnabled <> Value then
     FEnabled := Value;
   if (not FEnabled) and (Assigned(FWriterThread)) then
