@@ -10,7 +10,7 @@ object Form1: TForm1
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '1.8.3.0'
   object Label1: TLabel
     Left = 16
     Height = 14
@@ -32,7 +32,7 @@ object Form1: TForm1
     ScrollListDataset = True
     TabOrder = 0
     AutoInsert = True
-    AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactRetainPrefixCase, cbactSearchAscending]
+    AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
     ItemHeight = 0
     KeyPressInterval = 600
     OnCanAutoInsert = IBLookupComboEditBox1CanAutoInsert
@@ -334,6 +334,7 @@ object Form1: TForm1
     AfterPost = EmployeesAfterPost
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     DeleteSQL.Strings = (
       'Execute Procedure DELETE_EMPLOYEE :EMP_NO'
     )
@@ -390,6 +391,7 @@ object Form1: TForm1
     GeneratorField.Field = 'EMP_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
+    MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
     AfterTransactionEnd = EmployeesAfterTransactionEnd
     left = 376
@@ -561,8 +563,10 @@ object Form1: TForm1
     BeforeOpen = CountriesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select A.COUNTRY, A.CURRENCY From COUNTRY A'
       'JOIN JOB J On J.JOB_COUNTRY = A.COUNTRY'
@@ -606,8 +610,10 @@ object Form1: TForm1
     BeforeOpen = JobCodesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select distinct A.JOB_CODE, A.JOB_TITLE From JOB A'
       'Where JOB_GRADE = :JOB_GRADE'

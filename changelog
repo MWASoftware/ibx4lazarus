@@ -106,6 +106,14 @@ packages.
 21. TIBExtact: Package Headers and Package Bodies are now included in the extracted
     DDL (Firebird 3 and later only).
 
+22. TIBLookupComboBox Autocomplete Fixes:
+    i. Only appended text is now selected after autocomplete.
+    ii. Uppercase keys no longer ignored for autocomplete.
+    iii. Retain Prefix case is now honoured correctly.
+    iv. When a DataSource is assigned, typing after autocomplete now extends prefix
+        before autocomplete performed. i.e. behaviour now the same as when
+        no DataSource assigned.
+
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO

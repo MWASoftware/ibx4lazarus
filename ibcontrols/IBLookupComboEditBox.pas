@@ -345,6 +345,7 @@ begin
              sCompleteText := ListSource.DataSet.FieldByName(ListField).AsString;
              if (sCompleteText <> FCurText) then
              begin
+               KeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
                sResultText := sCompleteText;
                if ((cbactEndOfLineComplete in AutoCompleteText) and
                          (cbactRetainPrefixCase in AutoCompleteText)) then
@@ -354,9 +355,8 @@ begin
                end;
                Text := sResultText;
                SelStart := iSelStart;
-               SelLength := UTF8Length(Text);
+               SelLength := UTF8Length(Text) - iSelStart;
              end;
-             KeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant;
            end
            else
            begin
@@ -513,11 +513,15 @@ begin
   end
   else
   begin
-    FTimer.Interval := 0;
     if (IsEditableTextKey(Key) or (Key = VK_BACK))
        and AutoComplete and (Style <> csDropDownList) and
        (not (cbactEndOfLineComplete in AutoCompleteText) or (SelStart = UTF8Length(Text))) then
+    begin
+      FTimer.Interval := 0;
       FTimer.Interval := FKeyPressInterval;
+    end
+    else
+      FTimer.Interval := 0;
   end;
 end;
 
@@ -537,6 +541,8 @@ end;
 
 procedure TIBLookupComboEditBox.SetItemIndex(const Val: integer);
 begin
+  if Val > 0 then
+    FCurText := '';
   inherited SetItemIndex(Val);
   FLastKeyValue := KeyValue;
 end;
@@ -562,6 +568,8 @@ end;
 procedure TIBLookupComboEditBox.UpdateData(Sender: TObject);
 begin
   inherited UpdateData(Sender);
+  if FCurText <> '' then
+    Text := FCurText + Text;
   FModified := false;
 end;
 
@@ -597,6 +605,7 @@ begin
     FForceAutoComplete := false;
   end;
   CheckAndInsert;
+  FCurText := '';
   if FModified then
     Change; {ensure Update}
   inherited EditingDone;
