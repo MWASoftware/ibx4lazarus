@@ -31,7 +31,7 @@ object Form1: TForm1
     LookupCache = False
     ScrollListDataset = True
     TabOrder = 0
-    AutoInsert = True
+    AutoInsert = False
     AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
     ItemHeight = 0
     KeyPressInterval = 600

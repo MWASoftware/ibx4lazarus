@@ -520,8 +520,6 @@ begin
       FTimer.Interval := 0;
       FTimer.Interval := FKeyPressInterval;
     end
-    else
-      FTimer.Interval := 0;
   end;
 end;
 
