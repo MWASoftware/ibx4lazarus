@@ -1906,7 +1906,7 @@ begin
   #0..#8,#10..#31,' ':
     Result := ' ';
 
-  #9,';','"','''','/',
+  #9,';','"','''','/','-',
   '*','=','>','<',',':
     Result := C;
   else
@@ -2020,6 +2020,18 @@ begin
           if FNextSymbol = '/' then
           begin
             FString := '/*' + system.copy(FLine,FIndex,length(FLine)- FIndex + 1) + ' */';
+            Result := sqCommentLine;
+            FIndex := 0;
+            FNextSymbol := sqNone
+          end;
+
+        '-':
+          if FXMLMode > 0 then
+            break
+          else
+          if FNextSymbol = '-' then
+          begin
+            FString := '--' + system.copy(FLine,FIndex,length(FLine)- FIndex + 1) ;
             Result := sqCommentLine;
             FIndex := 0;
             FNextSymbol := sqNone
