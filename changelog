@@ -115,7 +115,16 @@ packages.
         no DataSource assigned.
 
 23. Single Line Comments starting with '--' are now ignored when occurding
-    between SQL statements
+    between SQL statements.
+
+24. TIBExtract: New published property CaseSensitiveObjectNames. If false (default) then
+    ObjectNames are converted to upper case before matching against metadata object
+    names, unless the objectname is delimited by double quotes, in which case, the
+    double quotes are removed and the remaining string is used (unmodified) to match
+    against the metadata object name.
+
+    If true then the ObjectName is used as is without modification and matched
+    against the metadata object name. No attempt is made to remove double quotes.
 
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 

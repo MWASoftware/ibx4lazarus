@@ -35,6 +35,7 @@
         <CursorPos Y="474"/>
         <UsageCount Value="146"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="dlg/DBLoginDlgUnit.pas"/>
@@ -164,8 +165,8 @@
       <Unit15>
         <Filename Value="../../../fbintf/IBUtils.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="527"/>
-        <CursorPos X="3" Y="530"/>
+        <TopLine Value="307"/>
+        <CursorPos X="10" Y="327"/>
         <UsageCount Value="27"/>
       </Unit15>
       <Unit16>
@@ -442,11 +443,10 @@
       </Unit53>
       <Unit54>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="675"/>
         <CursorPos X="15" Y="693"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit54>
       <Unit55>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
@@ -604,11 +604,10 @@
       </Unit77>
       <Unit78>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/stringl.inc"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="219"/>
         <CursorPos X="3" Y="224"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit78>
       <Unit79>
         <Filename Value="../../runtime/IBXServices.pas"/>
@@ -721,17 +720,16 @@
       </Unit93>
       <Unit94>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="3133"/>
-        <CursorPos Y="3169"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2779"/>
+        <CursorPos X="41" Y="2818"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="2779"/>
-          <CursorPos X="41" Y="2818"/>
+          <TopLine Value="3133"/>
+          <CursorPos Y="3169"/>
         </ExtraEditor1>
         <UsageCount Value="19"/>
-        <Loaded Value="True"/>
       </Unit94>
       <Unit95>
         <Filename Value="../../iblocaldb/gui/IBXSaveDatabaseDlg.pas"/>
@@ -764,11 +762,10 @@
       </Unit98>
       <Unit99>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1083"/>
         <CursorPos Y="1102"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit99>
       <Unit100>
         <Filename Value="../../runtime/nongui/IBSQLMonitor.pas"/>
@@ -828,8 +825,8 @@
       <Unit108>
         <Filename Value="../../runtime/nongui/IBExtract.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1390"/>
-        <CursorPos X="54" Y="1400"/>
+        <TopLine Value="2948"/>
+        <CursorPos X="63" Y="2968"/>
         <UsageCount Value="10"/>
       </Unit108>
       <Unit109>
@@ -855,11 +852,10 @@
       </Unit111>
       <Unit112>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/sysstrh.inc"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="59"/>
         <CursorPos X="10" Y="86"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit112>
       <Unit113>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/sysstr.inc"/>
@@ -869,55 +865,15 @@
         <UsageCount Value="10"/>
       </Unit113>
     </Units>
-    <JumpHistory Count="12" HistoryIndex="11">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="DataModule.pas"/>
         <Caret Line="26" Column="54" TopLine="15"/>
       </Position1>
       <Position2>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="105" Column="23" TopLine="92"/>
-      </Position2>
-      <Position3>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="3163" Column="13" TopLine="3133"/>
-      </Position3>
-      <Position4>
-        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/sysstrh.inc"/>
-        <Caret Line="79" Column="10" TopLine="59"/>
-      </Position4>
-      <Position5>
-        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/sysstrh.inc"/>
-        <Caret Line="86" Column="10" TopLine="59"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="3161" Column="30" TopLine="3133"/>
-      </Position6>
-      <Position7>
-        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <Caret Line="706" Column="53" TopLine="687"/>
-      </Position7>
-      <Position8>
-        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <Caret Line="616" Column="14" TopLine="597"/>
-      </Position8>
-      <Position9>
-        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="254" Column="10" TopLine="248"/>
-      </Position9>
-      <Position10>
-        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <Caret Line="693" Column="15" TopLine="675"/>
-      </Position10>
-      <Position11>
         <Filename Value="DataModule.pas"/>
         <Caret Line="189" Column="23" TopLine="189"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="3169" TopLine="3133"/>
-      </Position12>
+      </Position2>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

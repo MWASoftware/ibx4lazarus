@@ -71,6 +71,7 @@ type
   TIBExtract = class(TComponent)
   private
     FAlwaysQuoteIdentifiers: boolean;
+    FCaseSensitiveObjectNames: boolean;
     FDatabase : TIBDatabase;
     FTransaction : TIBTransaction;
     FMetaData: TStrings;
@@ -137,6 +138,7 @@ type
     property Transaction : TIBTransaction read GetTransaction write SetTransaction;
     property ShowSystem: Boolean read FShowSystem write FShowSystem;
     property AlwaysQuoteIdentifiers: boolean read FAlwaysQuoteIdentifiers write FAlwaysQuoteIdentifiers;
+    property CaseSensitiveObjectNames: boolean read FCaseSensitiveObjectNames write FCaseSensitiveObjectNames;
   end;
 
   TSQLType = record
@@ -2962,6 +2964,8 @@ begin
     DidActivate := true;
   end;
   FMetaData.Clear;
+  if not CaseSensitiveObjectNames then
+    ObjectName := ExtractIdentifier(FDatabaseInfo.DBSQLDialect,ObjectName);
   case ObjectType of
     eoDatabase : ExtractDDL(true, '', ExtractTypes);
     eoDomain :
