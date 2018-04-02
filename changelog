@@ -1,4 +1,4 @@
-IBX Change Log  version        (2.3-0) Mon, 19 Mar 2018 09:45:35 +0000
+IBX Change Log  version         (2.3-0) Sun, 01 Apr 2018 16:49:36 +0100
 
 IMPORTANT: the source code tree has been re-organised for IBX 2.3. Please remove
 all previous copies of the IBX source code tree before installing this release.
@@ -114,7 +114,7 @@ packages.
         before autocomplete performed. i.e. behaviour now the same as when
         no DataSource assigned.
 
-23. Single Line Comments starting with '--' are now ignored when occurding
+23. Single Line Comments starting with '--' are now ignored when occurring
     between SQL statements.
 
 24. TIBExtract: New published property CaseSensitiveObjectNames. If false (default) then
