@@ -3,13 +3,13 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="57">
+    <Units Count="65">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="23" Y="17"/>
-        <UsageCount Value="48"/>
+        <UsageCount Value="49"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -17,10 +17,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="289"/>
-        <CursorPos X="3" Y="315"/>
-        <UsageCount Value="48"/>
+        <CursorPos X="14" Y="36"/>
+        <UsageCount Value="49"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -30,24 +28,26 @@
         <ComponentName Value="SelectDeptDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="10"/>
         <CursorPos X="40" Y="25"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="10"/>
-        <CursorPos X="26" Y="26"/>
+        <TopLine Value="501"/>
+        <CursorPos Y="523"/>
         <UsageCount Value="21"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
+        <UnitName Value="DbCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="151"/>
-        <CursorPos X="26" Y="165"/>
+        <TopLine Value="680"/>
+        <CursorPos X="16" Y="698"/>
         <UsageCount Value="17"/>
       </Unit4>
       <Unit5>
@@ -60,8 +60,8 @@
       <Unit6>
         <Filename Value="../../../../lcl/include/control.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="3479"/>
-        <CursorPos Y="3497"/>
+        <TopLine Value="4972"/>
+        <CursorPos X="25" Y="4980"/>
         <UsageCount Value="12"/>
       </Unit6>
       <Unit7>
@@ -84,9 +84,10 @@
       </Unit9>
       <Unit10>
         <Filename Value="../../../../lcl/stdctrls.pp"/>
+        <UnitName Value="StdCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="277"/>
-        <CursorPos X="24" Y="289"/>
+        <TopLine Value="326"/>
+        <CursorPos X="15" Y="345"/>
         <UsageCount Value="14"/>
       </Unit10>
       <Unit11>
@@ -163,8 +164,8 @@
       <Unit22>
         <Filename Value="../../../../lcl/include/customcombobox.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="537"/>
-        <CursorPos Y="548"/>
+        <TopLine Value="343"/>
+        <CursorPos X="50" Y="354"/>
         <UsageCount Value="12"/>
       </Unit22>
       <Unit23>
@@ -189,16 +190,18 @@
       </Unit25>
       <Unit26>
         <Filename Value="../../../../lcl/lcltype.pp"/>
+        <UnitName Value="LCLType"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="390"/>
-        <CursorPos X="3" Y="403"/>
+        <TopLine Value="440"/>
+        <CursorPos X="3" Y="448"/>
         <UsageCount Value="10"/>
       </Unit26>
       <Unit27>
         <Filename Value="../../../../lcl/lclproc.pas"/>
+        <UnitName Value="LCLProc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="770"/>
-        <CursorPos X="2" Y="772"/>
+        <TopLine Value="819"/>
+        <CursorPos Y="827"/>
         <UsageCount Value="10"/>
       </Unit27>
       <Unit28>
@@ -285,16 +288,17 @@
       </Unit39>
       <Unit40>
         <Filename Value="../../../../lcl/controls.pp"/>
+        <UnitName Value="Controls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2031"/>
-        <CursorPos X="15" Y="2047"/>
+        <TopLine Value="1957"/>
+        <CursorPos X="27" Y="1980"/>
         <UsageCount Value="10"/>
       </Unit40>
       <Unit41>
         <Filename Value="../../../../lcl/include/wincontrol.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="8202"/>
-        <CursorPos Y="8233"/>
+        <TopLine Value="5365"/>
+        <CursorPos X="19" Y="5388"/>
         <UsageCount Value="10"/>
       </Unit41>
       <Unit42>
@@ -393,8 +397,8 @@
         <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
         <UnitName Value="Gtk2WSStdCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1836"/>
-        <CursorPos Y="1868"/>
+        <TopLine Value="1796"/>
+        <CursorPos X="3" Y="1803"/>
         <UsageCount Value="10"/>
       </Unit55>
       <Unit56>
@@ -404,16 +408,66 @@
         <CursorPos X="102" Y="56"/>
         <UsageCount Value="10"/>
       </Unit56>
+      <Unit57>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wscomctrls.pp"/>
+        <UnitName Value="Gtk2WSComCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="16"/>
+        <UsageCount Value="10"/>
+      </Unit57>
+      <Unit58>
+        <Filename Value="../../../../lcl/interfaces/gtk2/interfaces.pas"/>
+        <UnitName Value="Interfaces"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="6" Y="32"/>
+        <UsageCount Value="10"/>
+      </Unit58>
+      <Unit59>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2int.pas"/>
+        <UnitName Value="Gtk2Int"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="157"/>
+        <UsageCount Value="10"/>
+      </Unit59>
+      <Unit60>
+        <Filename Value="../../../../lcl/widgetset/wsstdctrls.pp"/>
+        <UnitName Value="WSStdCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="80"/>
+        <CursorPos X="3" Y="102"/>
+        <UsageCount Value="10"/>
+      </Unit60>
+      <Unit61>
+        <Filename Value="/usr/share/fpcsrc/packages/gtk2/src/gtk+/gtk/gtkentry.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="140"/>
+        <CursorPos X="11" Y="160"/>
+        <UsageCount Value="10"/>
+      </Unit61>
+      <Unit62>
+        <Filename Value="../../../../lcl/extctrls.pp"/>
+        <UnitName Value="ExtCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="171"/>
+        <CursorPos X="19" Y="191"/>
+        <UsageCount Value="10"/>
+      </Unit62>
+      <Unit63>
+        <Filename Value="../../../../lcl/customtimer.pas"/>
+        <UnitName Value="CustomTimer"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="115"/>
+        <CursorPos Y="125"/>
+        <UsageCount Value="10"/>
+      </Unit63>
+      <Unit64>
+        <Filename Value="../../../fbintf/client/3.0/firebird/Firebird.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4693"/>
+        <CursorPos Y="4713"/>
+        <UsageCount Value="10"/>
+      </Unit64>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
-      <Position1>
-        <Filename Value="Unit1.pas"/>
-        <Caret Line="10" Column="17"/>
-      </Position1>
-      <Position2>
-        <Filename Value="Unit1.pas"/>
-        <Caret Line="13" Column="23" TopLine="19"/>
-      </Position2>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectSession>
 </CONFIG>

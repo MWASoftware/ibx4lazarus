@@ -65,12 +65,12 @@ object MainForm: TMainForm
     Height = 548
     Top = 26
     Width = 939
-    ActivePage = AccessRightsTab
+    ActivePage = SchemaTab
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 7
+    TabIndex = 4
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet

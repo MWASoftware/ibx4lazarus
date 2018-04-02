@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="37">
+    <Units Count="38">
       <Unit0>
         <Filename Value="ViewDatabaseInfo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="30"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -19,10 +19,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="93"/>
-        <CursorPos Y="118"/>
-        <UsageCount Value="29"/>
+        <CursorPos X="27" Y="35"/>
+        <UsageCount Value="30"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -278,8 +276,17 @@
         <CursorPos X="3" Y="957"/>
         <UsageCount Value="10"/>
       </Unit36>
+      <Unit37>
+        <Filename Value="../../runtime/nongui/IBDatabaseInfo.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="189"/>
+        <CursorPos X="27" Y="195"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit37>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="5" HistoryIndex="4">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="118" Column="56" TopLine="102"/>
@@ -288,6 +295,18 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="118" Column="54" TopLine="99"/>
       </Position2>
+      <Position3>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="35" Column="27"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/nongui/IBDatabaseInfo.pas"/>
+        <Caret TopLine="61"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/nongui/IBDatabaseInfo.pas"/>
+        <Caret Line="48" Column="14" TopLine="28"/>
+      </Position5>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
