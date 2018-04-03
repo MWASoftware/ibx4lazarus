@@ -58,7 +58,8 @@ type
 
   TExtractType =
     (etDomain, etTable, etRole, etTrigger, etForeign,
-     etIndex, etData, etGrant, etCheck, etGrantsToUser);
+     etIndex, etData, etGrant, etCheck, etGrantsToUser,
+     etDatabaseTriggers, etDDLTriggers);
 
   TExtractTypes = Set of TExtractType;
 
@@ -1576,6 +1577,8 @@ var
   SList : TStrings;
 begin
   Header := true;
+  if [etTable,etTrigger ] * ExtractTypes <> [] then
+    ExtractTypes -= [etDatabaseTriggers,etDDLTriggers];
   SList := TStringList.Create;
   qryTriggers := TIBSQL.Create(FDatabase);
   try
@@ -1615,29 +1618,35 @@ begin
         else
           InActive := 'ACTIVE';
 
-      if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
-        SList.Add('/* ');
+      if (ExtractTypes * [etDatabaseTriggers,etDDLTriggers] = []) or
+         ((etDatabaseTriggers in ExtractTypes) and (qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInt64 and $2000 <> 0)) or
+         ((etDDLTriggers in ExtractTypes) and (qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInt64 and $4000 <> 0))
+         then
+      begin
+        if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
+          SList.Add('/* ');
 
-      {Database or Transaction trigger}
-      SList.Add(Format('CREATE TRIGGER %s%s%s %s POSITION %d',
-                [QuoteIdentifier( TriggerName),
-                LineEnding, InActive,
-                GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInt64),
-                qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
+        {Database or Transaction trigger}
+        SList.Add(Format('CREATE TRIGGER %s%s%s %s POSITION %d',
+                  [QuoteIdentifier( TriggerName),
+                  LineEnding, InActive,
+                  GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInt64),
+                  qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
 
-      if RelationName <> '' then
-        SList.Add('ON ' + QuoteIdentifier( RelationName));
+        if RelationName <> '' then
+          SList.Add('ON ' + QuoteIdentifier( RelationName));
 
-      if not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
-        SList.Add(qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString)
-      else
-        SList.Add('AS BEGIN EXIT; END');
-      SList.Add(' ' + ProcTerm);
-      if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
-        SList.Add(' */');
-      FMetaData.AddStrings(SList);
-      if etGrant in ExtractTypes then
-        ShowGrantsTo(TriggerName,obj_trigger,ProcTerm);
+        if not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
+          SList.Add(qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString)
+        else
+          SList.Add('AS BEGIN EXIT; END');
+        SList.Add(' ' + ProcTerm);
+        if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
+          SList.Add(' */');
+        FMetaData.AddStrings(SList);
+        if etGrant in ExtractTypes then
+          ShowGrantsTo(TriggerName,obj_trigger,ProcTerm);
+      end;
       qryTriggers.Next;
     end;
     if not Header then
@@ -3041,17 +3050,12 @@ begin
     eoRole : ListRoles(ObjectName,etGrant in ExtractTypes);
     eoTrigger : 
       if etTable in ExtractTypes then
-      begin
-        if etGrant in ExtractTypes then
-          ListTriggers(ObjectName, [etTable,etGrant])
-        else
-          ListTriggers(ObjectName, [etTable])
-      end
+        ListTriggers(ObjectName, ExtractTypes * [etTable,etGrant])
       else
-      if etGrant in ExtractTypes then
-        ListTriggers(ObjectName,[etTrigger,etGrant])
+      if ExtractTypes * [etDatabaseTriggers,etDDLTriggers] = [] then
+        ListTriggers(ObjectName,[etTrigger] + (ExtractTypes * [etGrant]))
       else
-        ListTriggers(ObjectName);
+        ListTriggers(ObjectName,ExtractTypes * [etDatabaseTriggers,etDDLTriggers, etGrant]);
     eoForeign :
       if etTable in ExtractTypes then
         ListForeign(ObjectName, etTable)

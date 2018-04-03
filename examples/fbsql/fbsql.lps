@@ -9,8 +9,8 @@
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="7"/>
-        <CursorPos X="9" Y="7"/>
+        <TopLine Value="207"/>
+        <CursorPos X="74" Y="227"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -507,7 +507,16 @@
         <UsageCount Value="10"/>
       </Unit67>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="2" HistoryIndex="1">
+      <Position1>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="7" Column="9" TopLine="160"/>
+      </Position1>
+      <Position2>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="227" Column="76" TopLine="207"/>
+      </Position2>
+    </JumpHistory>
   </ProjectSession>
   <Debugging>
     <Watches Count="1">
