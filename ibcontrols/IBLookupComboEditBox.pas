@@ -512,14 +512,24 @@ begin
     SelectAll;
   end
   else
+  if AutoComplete and (Style <> csDropDownList) then
   begin
-    if (IsEditableTextKey(Key) or (Key = VK_BACK))
-       and AutoComplete and (Style <> csDropDownList) and
-       (not (cbactEndOfLineComplete in AutoCompleteText) or (SelStart = UTF8Length(Text))) then
+    if (Key = VK_BACK) or (Key = VK_DELETE) then
+    begin
+      if SelStart = 0 then
+      begin
+        SelStart := UTF8Length(Text);
+        SelLength := 0;
+      end;
+      FTimer.Interval := 0;
+    end
+    else
+    if IsEditableTextKey(Key) and
+     (not(cbactEndOfLineComplete in AutoCompleteText) or (SelStart = UTF8Length(Text))) then
     begin
       FTimer.Interval := 0;
       FTimer.Interval := FKeyPressInterval;
-    end
+    end;
   end;
 end;
 
