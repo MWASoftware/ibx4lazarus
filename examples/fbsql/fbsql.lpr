@@ -224,7 +224,7 @@ var
 begin
   writeln(stderr,'fbsql: an SQL interpreter for Firebird');
   writeln(stderr,'Built using IBX ' + IBX_VERSION);
-  writeln(stderr,'Copyright (c) MWA Software 2017');
+  writeln(stderr,'Copyright (c) MWA Software ' + system.copy({$I %DATE%},1,4));
 
   // quick check parameters
   Opts := TStringList.Create;

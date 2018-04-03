@@ -17,7 +17,8 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="870"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="184"/>
         <CursorPos X="43" Y="902"/>
         <UsageCount Value="146"/>
         <Loaded Value="True"/>
@@ -29,7 +30,6 @@
         <ComponentName Value="DatabaseData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="454"/>
         <CursorPos Y="474"/>
