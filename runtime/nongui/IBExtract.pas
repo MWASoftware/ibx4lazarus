@@ -67,6 +67,11 @@ type
 
   TPackageDDLType = (paHeader,paBody,paBoth);
 
+  TCommentType = (ctCharacterSet,ctCollation,ctDomain,ctException,
+                  ctExternalFunction, ctFilter, ctGenerator, ctIndex, ctPackage,
+                  ctProcedure, ctRole, ctSequence, ctTable, ctTrigger,
+                  ctView, ctColumn,ctParameter, ctDatabase);
+
   { TIBExtract }
 
   TIBExtract = class(TComponent)
@@ -80,6 +85,8 @@ type
     FShowSystem: Boolean;
     { Private declarations }
     procedure Add2MetaData(const Msg: string; IsError: boolean=true);
+    procedure AddComment(Query: TIBSQL; cType: TCommentType; OutStrings: TStrings;
+        CommentFieldName: string = 'RDB$DESCRIPTION');
     function GetDatabase: TIBDatabase;
     function GetIndexSegments ( indexname : String) : String;
     function GetTransaction: TIBTransaction;
@@ -482,7 +489,7 @@ const
 
 var
   Collation, CharSetId : integer;
-	i : integer;
+  i : integer;
   Column, Constraint : String;
   SubType : integer;
   IntChar : integer;
@@ -491,6 +498,7 @@ var
   FieldScale, FieldType : Integer;
   CreateTable: string;
   TableType: integer;
+  Comments: TStrings;
 begin
   Result := true;
   IntChar := 0;
@@ -503,6 +511,7 @@ begin
   qryConstraints := TIBSQL.Create(FDatabase);
   qryRelConstraints := TIBSQL.Create(FDatabase);
   qryGenerators := TIBSQL.Create(FDatabase);
+  Comments := TStringList.Create;
   try
     qryTables.SQL.Add(TableListSQL);
     RelationName := trim(RelationName);
@@ -533,11 +542,13 @@ begin
         FMetaData.Add(Format('EXTERNAL FILE %s ',
           [QuotedStr(qryTables.FieldByName('RDB$EXTERNAL_FILE').AsString)]));
       FMetaData.Add('(');
+      AddComment(qryTables,ctTable,Comments);
     end;
 
     while not qryTables.Eof do
     begin
-      Column := '  ' + QuoteIdentifier( qryTables.FieldByName('RDB$FIELD_NAME').AsString) + TAB;
+       AddComment(qryTables,ctColumn,Comments,'RDB$DESCRIPTION1');
+       Column := '  ' + QuoteIdentifier( qryTables.FieldByName('RDB$FIELD_NAME').AsString) + TAB;
 
     {  Check first for computed fields, then domains.
        If this is a known domain, then just print the domain rather than type
@@ -767,7 +778,9 @@ begin
       else
        FMetaData.Add(')' + TERM);
     end;
+    FMetaData.AddStrings(Comments);
   finally
+    Comments.Free;
     qryTables.Free;
     qryPrecision.Free;
     qryConstraints.Free;
@@ -800,10 +813,12 @@ const
 var
   qryViews, qryColumns : TIBSQL;
   RelationName, ColList : String;
+  Comments: TStrings;
 begin
   ColList := '';
   qryViews := TIBSQL.Create(FDatabase);
   qryColumns := TIBSQL.Create(FDatabase);
+  Comments := TStringList.Create;
   try
     qryViews.SQL.Add(ViewsSQL);
     qryViews.Params.ByName('viewname').AsString := ViewName;
@@ -811,6 +826,7 @@ begin
     while not qryViews.Eof do
     begin
       FMetaData.Add('');
+      AddComment(qryViews,ctView,Comments);
       RelationName := QuoteIdentifier(
           qryViews.FieldByName('RDB$RELATION_NAME').AsString);
       FMetaData.Add(Format('%s/* View: %s, Owner: %s */%s', [
@@ -825,6 +841,7 @@ begin
       qryColumns.ExecQuery;
       while not qryColumns.Eof do
       begin
+        AddComment(qryColumns,ctColumn,Comments);
         ColList := ColList + QuoteIdentifier(
               qryColumns.FieldByName('RDB$FIELD_NAME').AsString);
         qryColumns.Next;
@@ -836,6 +853,8 @@ begin
       qryViews.Next;
     end;
   finally
+    FMetaData.AddStrings(Comments);
+    Comments.Free;
     qryViews.Free;
     qryColumns.Free;
   end;
@@ -898,6 +917,64 @@ end;
 procedure TIBExtract.Add2MetaData(const Msg: string; IsError: boolean);
 begin
   FMetaData.Add(Msg);
+end;
+
+procedure TIBExtract.AddComment(Query: TIBSQL; cType: TCommentType;
+  OutStrings: TStrings; CommentFieldName: string);
+var cmt: string;
+begin
+  if Query.HasField(CommentFieldName) and not Query.FieldByName(CommentFieldName).IsNull then
+  begin
+    cmt := 'COMMENT ON ';
+    case cType of
+      ctCharacterSet:         cmt += 'CHARACTER SET';
+      ctCollation:            cmt += 'COLLATION';
+      ctDomain:               cmt += 'DOMAIN';
+      ctException:            cmt += 'EXCEPTION';
+      ctExternalFunction:     cmt += 'EXTERNAL FUNCTION';
+      ctFilter:               cmt += 'FILTER';
+      ctGenerator:            cmt += 'GENERATOR';
+      ctIndex:                cmt += 'INDEX';
+      ctPackage:              cmt += 'PACKAGE';
+      ctProcedure:            cmt += 'PROCEDURE';
+      ctRole:                 cmt += 'ROLE';
+      ctSequence:             cmt += 'SEQUENCE';
+      ctTable:                cmt += 'TABLE';
+      ctTrigger:              cmt += 'TRIGGER';
+      ctView:                 cmt += 'VIEW';
+      ctColumn:               cmt += 'COLUMN';
+      ctParameter:            cmt += 'PARAMETER';
+      ctDatabase:             cmt += 'DATABASE';
+    end;
+    cmt += ' ';
+    case cType of
+      ctCharacterSet:         cmt += QuoteIdentifier(query.FieldByName('RDB$CHARACTER_SET_NAME').AsString);
+      ctCollation:            cmt += QuoteIdentifier(query.FieldByName('RDB$COLLATION_NAME').AsString);
+      ctDomain:               cmt += QuoteIdentifier(query.FieldByName('RDB$FIELD_NAME').AsString);
+      ctException:            cmt += QuoteIdentifier(query.FieldByName('RDB$EXCEPTION_NAME').AsString);
+      ctExternalFunction,
+      ctFilter:               cmt += QuoteIdentifier(query.FieldByName('RDB$FUNCTION_NAME').AsString);
+      ctGenerator,
+      ctSequence :            cmt += QuoteIdentifier(query.FieldByName('RDB$GENERATOR_NAME').AsString);
+      ctIndex:                cmt += QuoteIdentifier(query.FieldByName('RDB$INDEX_NAME').AsString);
+      ctPackage:              cmt += QuoteIdentifier(query.FieldByName('RDB$PACKAGE_NAME').AsString);
+      ctProcedure:            cmt += QuoteIdentifier(query.FieldByName('RDB$PROCEDURE_NAME').AsString);
+      ctRole:                 cmt += QuoteIdentifier(query.FieldByName('RDB$ROLE_NAME').AsString);
+      ctTable,
+      ctView:                 cmt += QuoteIdentifier(query.FieldByName('RDB$RELATION_NAME').AsString);
+      ctTrigger:              cmt += QuoteIdentifier(query.FieldByName('RDB$TRIGGER_NAME').AsString);
+      ctColumn:               cmt += QuoteIdentifier(query.FieldByName('RDB$RELATION_NAME').AsString)
+                                  +  '.' + QuoteIdentifier(query.FieldByName('RDB$FIELD_NAME').AsString);
+      ctParameter:            if Query.HasField('RDB$PROCEDURE_NAME') then
+                                cmt += QuoteIdentifier(query.FieldByName('RDB$PROCEDURE_NAME').AsString)
+                                    +  '.' + QuoteIdentifier(query.FieldByName('RDB$PARAMETER_NAME').AsString)
+                              else
+                              cmt += QuoteIdentifier(query.FieldByName('RDB$FUNCTION_NAME').AsString)
+                                  +  '.' + QuoteIdentifier(query.FieldByName('RDB$ARGUMENT_NAME').AsString);
+    end;
+    cmt += ' IS ''' + SQLSafeString(Query.FieldByName(CommentFieldName).AsString) + '''' + TERM;
+    OutStrings.Add(cmt);
+  end;
 end;
 
 function TIBExtract.GetDatabase: TIBDatabase;
@@ -1272,9 +1349,11 @@ var
   Header : Boolean;
   SList : TStrings;
   aPackageName: string;
+  Comments: TStrings;
 begin
   Header := true;
   qryPackages := TIBSQL.Create(FDatabase);
+  Comments := TStringList.Create;
   SList := TStringList.Create;
   try
     if PackageName = '' then
@@ -1297,6 +1376,7 @@ begin
         Header := false;
       end;
 
+      AddComment(qryPackages,ctPackage,Comments);
       aPackageName := qryPackages.FieldByName('RDB$PACKAGE_NAME').AsString;
       if PackageDDLType in [paHeader,paBoth] then
       begin
@@ -1328,7 +1408,9 @@ begin
       FMetaData.Add('COMMIT WORK;');
       FMetaData.Add('SET AUTODDL ON;');
     end;
+    FMetaData.AddStrings(Comments);
   finally
+    Comments.Free;
     SList.Free;
     qryPackages.Free;
   end;
@@ -1391,11 +1473,12 @@ var
   ProcName : String;
   SList : TStrings;
   Header : Boolean;
-
+  Comments: TStrings;
 begin
 
   Header := true;
   qryProcedures := TIBSQL.Create(FDatabase);
+  Comments := TStringList.Create;
   SList := TStringList.Create;
   try
     if ProcedureName = '' then
@@ -1427,6 +1510,7 @@ begin
       case ProcDDLType of
       pdCreateStub:
         begin
+          AddComment(qryProcedures,ctProcedure,Comments);
           FMetaData.Add(Format(CreateProcedureStr1, [QuoteIdentifier(
              ProcName)]));
           GetProcedureArgs(ProcName);
@@ -1438,6 +1522,7 @@ begin
 
       pdCreateProc:
       begin
+        AddComment(qryProcedures,ctProcedure,Comments);
         FMetaData.Add(Format(CreateProcedureStr1, [QuoteIdentifier(
            ProcName)]));
         GetProcedureArgs(ProcName);
@@ -1479,9 +1564,11 @@ begin
       FMetaData.Add('COMMIT WORK;');
       FMetaData.Add('SET AUTODDL ON;');
     end;
+    FMetaData.AddStrings(Comments);
   finally
     qryProcedures.Free;
     SList.Free;
+    Comments.Free;
   end;
 end;
 
@@ -1575,11 +1662,13 @@ var
   TriggerName, RelationName, InActive: String;
   qryTriggers : TIBSQL;
   SList : TStrings;
+  Comments: TStrings;
 begin
   Header := true;
   if [etTable,etTrigger ] * ExtractTypes <> [] then
     ExtractTypes -= [etDatabaseTriggers,etDDLTriggers];
   SList := TStringList.Create;
+  Comments := TStringList.Create;
   qryTriggers := TIBSQL.Create(FDatabase);
   try
     if ObjectName = '' then
@@ -1600,6 +1689,7 @@ begin
     qryTriggers.ExecQuery;
     while not qryTriggers.Eof do
     begin
+      AddComment(qryTriggers,ctTrigger,Comments);
       SList.Clear;
       if Header then
       begin
@@ -1654,7 +1744,9 @@ begin
       FMetaData.Add('COMMIT WORK ' + ProcTerm);
       FMetaData.Add('SET TERM ' + Term + ProcTerm);
     end;
+    FMetaData.AddStrings(Comments);
   finally
+    Comments.Free;
     qryTriggers.Free;
     SList.Free;
   end;
@@ -1766,6 +1858,7 @@ var
   Buffer : String;
   qryDB : TIBSQL;
   FileFlags, FileLength, FileSequence, FileStart : Integer;
+  Comments: TStrings;
 
   function GetLongDatabaseInfo(DatabaseInfoCommand: Integer): LongInt;
   begin
@@ -1794,6 +1887,7 @@ begin
   FMetaData.Add(Buffer);
   Buffer := '';
 
+  Comments := TStringList.Create;
   qryDB := TIBSQL.Create(FDatabase);
   try
     qryDB.SQL.Text := CharInfoSQL;
@@ -1807,6 +1901,7 @@ begin
     else
       Buffer := Buffer + Term;
     FMetaData.Add(Buffer);
+    AddComment(qryDB,ctDatabase,Comments);
     qryDB.Close;
     {List secondary files and shadows as
       alter db and create shadow in comment}
@@ -1965,8 +2060,10 @@ begin
       else
         FMetaData.Add(Format('%s%s%s', [Term, LineEnding, LineEnding]));
     end;
+    FMetaData.AddStrings(Comments);
   finally
     qryDB.Free;
+    Comments.Free;
   end;
 
 (*
@@ -2132,6 +2229,7 @@ begin
     qryDomains.ExecQuery;
     while not qryDomains.Eof do
     begin
+      AddComment(qryDomains,ctDomain,FMetaData);
       FieldName := qryDomains.FieldByName('RDB$FIELD_NAME').AsString;
       { Skip over artifical domains }
       if (Pos('RDB$',FieldName) = 1) and
@@ -2204,6 +2302,7 @@ begin
       FMetaData.Add(Format('CREATE EXCEPTION %s %s%s',
         [QuoteIdentifier( qryException.FieldByName('RDB$EXCEPTION_NAME').AsString),
         QuotedStr(qryException.FieldByName('RDB$MESSAGE').AsString), Term]));
+      AddComment(qryException,ctException,FMetaData);
       qryException.Next;
     end;
   finally
@@ -2264,7 +2363,7 @@ begin
         [TAB, qryFilters.FieldByName('RDB$ENTRYPOINT').AsString,
          qryFilters.FieldByName('RDB$MODULE_NAME').AsString, Term]));
       FMetaData.Add('');
-
+      AddComment(qryFilters,ctFilter,FMetaData);
       qryFilters.Next;
     end;
 
@@ -2436,8 +2535,10 @@ var
   First, FirstArg, DidCharset, PrecisionKnown : Boolean;
   ReturnBuffer, TypeBuffer, Line : String;
   i, FieldType : Integer;
+  Comments: TStrings;
 begin
   First := true;
+  Comments := TStringList.Create;
   qryFunctions := TIBSQL.Create(FDatabase);
   qryFuncArgs := TIBSQL.Create(FDatabase);
   qryFuncPos := TIBSQL.Create(FDatabase);
@@ -2463,6 +2564,7 @@ begin
         First := false;
       end; //end_if
       { Start new function declaration }
+      AddComment(qryFunctions,ctExternalFunction,Comments);
       FMetaData.Add(Format('DECLARE EXTERNAL FUNCTION %s',
         [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
       Line := '';
@@ -2474,6 +2576,7 @@ begin
       qryFuncArgs.ExecQuery;
       while not qryFuncArgs.Eof do
       begin
+        AddComment(qryFuncArgs,ctParameter,Comments);
         { Find parameter type }
         i := 0;
         FieldType := qryFuncArgs.FieldByName('RDB$FIELD_TYPE').AsInteger;
@@ -2590,11 +2693,13 @@ begin
 
       qryFunctions.Next;
     end;
+    FMetaData.AddStrings(Comments);
   finally
     qryFunctions.Free;
     qryFuncArgs.Free;
     qryCharSets.Free;
     qryFuncPos.Free;
+    Comments.Free;
   end;
 end;
 
@@ -2666,6 +2771,7 @@ begin
           qryValue.Close;
         end;
       end;
+      AddComment(qryGenerator,ctSequence,FMetaData);
       qryGenerator.Next;
     end;
   finally
@@ -2770,6 +2876,7 @@ begin
           ')' + Term;
 
       FMetaData.Add(Line);
+      AddComment(qryIndex,ctIndex,FMetaData);
       qryIndex.Next;
     end;
   finally
@@ -3663,8 +3770,10 @@ const
 var
   qryRoles : TIBSQL;
   PrevOwner, RoleName, OwnerName : String;
+  Comments: TStrings;
 begin
   {Process GRANT roles}
+  Comments := TStringList.Create;
   qryRoles := TIBSQL.Create(FDatabase);
   try
     if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION9 then
@@ -3685,6 +3794,7 @@ begin
       try
         while not qryRoles.Eof do
         begin
+          AddComment(qryRoles,ctRole,Comments);
           RoleName := QuoteIdentifier(
               qryRoles.FieldByName('rdb$Role_Name').AsString);
           OwnerName := Trim(qryRoles.FieldByName('rdb$Owner_Name').AsString);
@@ -3703,9 +3813,11 @@ begin
       finally
         qryRoles.Close;
       end;
+      FMetaData.AddStrings(Comments);
     end;
   finally
     qryRoles.Free;
+    Comments.Free;
   end;
 end;
 

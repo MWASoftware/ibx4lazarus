@@ -139,6 +139,8 @@ packages.
     a commit or reconnect statement and instead activated only when next SQL statement
     is executed.
 
+29. TIBSQL.HasField should no longer generate and exception when the field does not exist.
+
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO

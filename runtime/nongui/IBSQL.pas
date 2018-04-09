@@ -741,11 +741,21 @@ begin
 end;
 
 function TIBSQL.HasField(FieldName: String): boolean;
+var i: integer;
 begin
-  if FResults = nil then
+  if MetaData = nil then
     IBError(ibxeNoFieldAccess,[nil]);
 
-  Result := FResults.ByName(FieldName) <> nil;
+  Result := false;
+  for i := 0 to MetaData.Count - 1 do
+  begin
+    writeln(MetaData.ColMetaData[i].Name);
+    if MetaData.ColMetaData[i].Name = FieldName then
+    begin
+      Result := true;
+      Exit;
+    end;
+  end;
 end;
 
 function TIBSQL.GetEOF: Boolean;
