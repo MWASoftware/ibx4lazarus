@@ -293,7 +293,6 @@ type
     FAutoDDL: boolean;
     procedure DoCommit;
     procedure DoReconnect;
-    procedure ExecSQL(stmt: string);
     function GetOnProgressEvent: TOnProgressEvent;
     function GetTransaction: TIBTransaction;
     procedure SetDatabase(AValue: TIBDatabase);
@@ -305,6 +304,7 @@ type
   protected
     FSymbolStream: TSymbolStream;
     procedure Add2Log(const Msg: string; IsError: boolean=true); virtual;
+    procedure ExecSQL(stmt: string);
     procedure EchoNextLine(Sender: TObject; Line: string);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function ProcessStatement(stmt: string): boolean; virtual;

@@ -9,8 +9,8 @@
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="207"/>
-        <CursorPos X="74" Y="227"/>
+        <TopLine Value="154"/>
+        <CursorPos X="3" Y="159"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -445,15 +445,15 @@
       <Unit60>
         <Filename Value="..\..\runtime\nongui\ibxscript.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="978"/>
-        <CursorPos X="22" Y="992"/>
+        <TopLine Value="1046"/>
+        <CursorPos X="29" Y="1049"/>
         <UsageCount Value="11"/>
       </Unit60>
       <Unit61>
         <Filename Value="..\..\runtime\nongui\IBDataOutput.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="301"/>
-        <CursorPos X="21" Y="324"/>
+        <TopLine Value="54"/>
+        <CursorPos X="15" Y="136"/>
         <UsageCount Value="11"/>
       </Unit61>
       <Unit62>
@@ -507,15 +507,31 @@
         <UsageCount Value="10"/>
       </Unit67>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="6" HistoryIndex="5">
       <Position1>
         <Filename Value="fbsql.lpr"/>
-        <Caret Line="7" Column="9" TopLine="160"/>
+        <Caret Line="227" Column="76" TopLine="207"/>
       </Position1>
       <Position2>
         <Filename Value="fbsql.lpr"/>
-        <Caret Line="227" Column="76" TopLine="207"/>
+        <Caret Line="82" Column="26" TopLine="55"/>
       </Position2>
+      <Position3>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="159" Column="34" TopLine="148"/>
+      </Position3>
+      <Position4>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="154" Column="26" TopLine="148"/>
+      </Position4>
+      <Position5>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="77" Column="40" TopLine="57"/>
+      </Position5>
+      <Position6>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="82" Column="16" TopLine="57"/>
+      </Position6>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
