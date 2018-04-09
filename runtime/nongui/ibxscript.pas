@@ -39,6 +39,8 @@ const
 
   BlobLineLength = 40;
 
+  DefaultTerminator = ';';
+
   {Non-character symbols}
   sqNone                 = #0;
   sqEnd                  = #1;
@@ -732,6 +734,7 @@ begin
       begin
         with GetTransaction do
           if InTransaction then Rollback;
+        FSymbolStream.Terminator := DefaultTerminator;
         if assigned(OnErrorLog) then
         begin
           Add2Log(Format(sStatementError,[FSymbolStream.GetErrorPrefix,
@@ -1933,7 +1936,7 @@ end;
 constructor TSymbolStream.Create;
 begin
   inherited;
-  FTerminator := ';';
+  FTerminator := DefaultTerminator;
   NextStatement;
 end;
 

@@ -130,6 +130,9 @@ packages.
     with eoTrigger, these extract types can be used to select only Database Triggers,
     or DDL Triggers or both. Ignored when etTable or etTrigger included in Extract Types.
 
+26. TIBXScript: If an exception occurs during the processing of a statement, the
+    statement separate character is now reset to the default (';').
+
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO
