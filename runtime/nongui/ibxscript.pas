@@ -561,23 +561,14 @@ end;
 procedure TCustomIBXScript.DoCommit;
 begin
   with GetTransaction do
-  begin
     if InTransaction then Commit;
-    Active := true;
-  end;
 end;
 
 procedure TCustomIBXScript.DoReconnect;
-var LoginPrompt: boolean;
 begin
   with GetTransaction do
     if InTransaction then Commit;
-  LoginPrompt := Database.LoginPrompt;
-  Database.LoginPrompt := false;
-  Database.Connected := false;
-  Database.Connected := true;
-  Database.LoginPrompt := LoginPrompt;
-  GetTransaction.Active := true;
+  Database.Reconnect;
 end;
 
 procedure TCustomIBXScript.ExecSQL(stmt: string);

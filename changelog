@@ -133,6 +133,12 @@ packages.
 26. TIBXScript: If an exception occurs during the processing of a statement, the
     statement separate character is now reset to the default (';').
 
+27. TIBDatabase: Reconnect method added and used by TIBXScript for reconnect.
+
+28. TIBXScript: Transaction is no longer automatically reactivated immediately processing
+    a commit or reconnect statement and instead activated only when next SQL statement
+    is executed.
+
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO
