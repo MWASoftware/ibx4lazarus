@@ -70,7 +70,7 @@ type
   TCommentType = (ctDatabase, ctCharacterSet,ctCollation,ctDomain,ctException,
                   ctExternalFunction, ctFilter, ctGenerator, ctIndex, ctPackage,
                   ctProcedure, ctRole, ctSequence, ctTable, ctTrigger,
-                  ctView, ctColumn,ctParameter);
+                  ctView, ctColumn,ctParameter, ctArgument);
   TCommentTypes = set of TCommentType;
 
   { TIBExtract }
@@ -93,6 +93,7 @@ type
     function GetIndexSegments ( indexname : String) : String;
     function GetTransaction: TIBTransaction;
     function GetTriggerType(TypeID: Int64): string;
+    function LookupDDLObject(cType: TCommentType): integer;
     procedure SetDatabase(const Value: TIBDatabase);
     procedure SetTransaction(const Value: TIBTransaction);
     function PrintValidation(ToValidate : String;	flag : Boolean) : String;
@@ -140,6 +141,7 @@ type
     function GetCharacterSets(CharSetId, Collation : integer;	CollateOnly : Boolean) : String;
     procedure ExtractObject(ObjectType : TExtractObjectTypes; ObjectName : String = '';
       ExtractTypes : TExtractTypes = []);
+    procedure ListObjectNames(ObjectType: integer; Names: TStrings);
     property DatabaseInfo : TIBDatabaseInfo read FDatabaseInfo;
     property Items : TStrings read FMetaData;
 
@@ -258,10 +260,15 @@ const
   obj_user = 8;
   obj_field = 9;
   obj_index = 10;
-  obj_count = 11;
+  obj_character_set = 11;
   obj_user_group = 12;
   obj_sql_role = 13;
+  obj_generator = 14;
+  obj_udf = 15;
+  obj_blob_filter = 16;
+  obj_collation = 17;
   obj_package = 18;
+  obj_package_body = 19;
 
 implementation
 
@@ -327,6 +334,151 @@ const
   (ObjectName: 'PACKAGE BODY'; Bits: 2; Bit1: tpCreate; Bit2: tpDrop; Bit3: tpNone)
 );
 
+type
+  TDDLObjects = record
+    ObjectName: string;
+    ObjType: integer;
+    SystemTableName: string;
+    NameField: string;
+    NameSpaceField: string;
+    Condition: string;
+    CommentType: TCommentType;
+  end;
+
+const
+  DDLObjects: array [0..18] of TDDLObjects = (
+  (ObjectName: 'CHARACTER SET';
+        ObjType: obj_character_set;
+        SystemTableName:  'RDB$CHARACTER_SETS';
+        NameField: 'RDB$CHARACTER_SET_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctCharacterSet),
+  (ObjectName: 'COLLATION';
+        ObjType: obj_collation;
+        SystemTableName: 'RDB$COLLATIONS';
+        NameField: 'RDB$COLLATION_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctCollation),
+  (ObjectName: 'DOMAIN';
+        ObjType: obj_field;
+        SystemTableName: 'RDB$FIELDS';
+        NameField: 'RDB$FIELD_NAME';
+        NameSpaceField: '';
+        Condition: 'RDB$SYSTEM_FLAG = 0';
+        CommentType: ctDomain),
+  (ObjectName: 'EXCEPTION';
+        ObjType: -1;
+        SystemTableName: 'RDB$EXCEPTIONS';
+        NameField: 'RDB$EXCEPTION_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctException),
+  (ObjectName: 'EXTERNAL FUNCTION';
+        ObjType: obj_exception;
+        SystemTableName: 'RDB$FUNCTIONS';
+        NameField: 'RDB$FUNCTION_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctExternalFunction),
+  (ObjectName: 'FILTER';
+        ObjType: obj_blob_filter;
+        SystemTableName: 'RDB$FILTERS';
+        NameField: 'RDB$FUNCTION_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctFilter),
+  (ObjectName: 'GENERATOR';
+        ObjType: obj_generator;
+        SystemTableName: 'RDB$GENERATORS';
+        NameField: 'RDB$GENERATOR_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctGenerator),
+  (ObjectName: 'INDEX';
+        ObjType: obj_index;
+        SystemTableName: 'RDB$INDICES';
+        NameField: 'RDB$INDEX_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctIndex),
+  (ObjectName: 'PACKAGE';
+        ObjType: obj_package;
+        SystemTableName: 'RDB$PACKAGES';
+        NameField: 'RDB$PACKAGE_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctPackage),
+  (ObjectName: 'PROCEDURE';
+        ObjType: obj_procedure;
+        SystemTableName: 'RDB$PROCEDURES';
+        NameField: 'RDB$PROCEDURE_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctProcedure),
+  (ObjectName: 'ROLE';
+        ObjType: obj_sql_role;
+        SystemTableName: 'RDB$ROLES';
+        NameField: 'RDB$ROLE_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctRole),
+  (ObjectName: 'SEQUENCE';
+        ObjType: obj_generator;
+        SystemTableName: 'RDB$GENERATORS';
+        NameField: 'RDB$GENERATOR_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctSequence),
+  (ObjectName: 'TABLE';
+        ObjType: obj_relation;
+        SystemTableName: 'RDB$RELATIONS';
+        NameField: 'RDB$RELATION_NAME';
+        NameSpaceField: '';
+        Condition: 'RDB$RELATION_TYPE = 0';
+        CommentType: ctTable),
+  (ObjectName: 'TRIGGER';
+        ObjType: obj_trigger;
+        SystemTableName: 'RDB$TRIGGERS';
+        NameField: 'RDB$TRIGGER_NAME';
+        NameSpaceField: '';
+        Condition: '';
+        CommentType: ctTrigger),
+  (ObjectName: 'VIEW';
+        ObjType: obj_view;
+        SystemTableName: 'RDB$RELATIONS';
+        NameField: 'RDB$RELATION_NAME';
+        NameSpaceField: '';
+        Condition: 'RDB$RELATION_TYPE = 1';
+        CommentType: ctView),
+  (ObjectName: 'COLUMN';
+        ObjType: -1;
+        SystemTableName: 'RDB$RELATION_FIELDS';
+        NameField: 'RDB$FIELD_NAME';
+        NameSpaceField: 'RDB$RELATION_NAME';
+        Condition: '';
+        CommentType: ctColumn),
+  (ObjectName: 'PARAMETER';
+        ObjType: -1;
+        SystemTableName: 'RDB$PROCEDURE_PARAMETERS';
+        NameField: 'RDB$PARAMETER_NAME';
+        NameSpaceField: 'RDB$PROCEDURE_NAME';
+        Condition: '';
+        CommentType: ctParameter),
+  (ObjectName: 'PARAMETER';
+        ObjType: -1;
+        SystemTableName: 'RDB$FUNCTION_ARGUMENTS';
+        NameField: 'RDB$ARGUMENT_NAME';
+        NameSpaceField: 'RDB$FUNCTION_NAME';
+        Condition: '';
+        CommentType: ctArgument),
+  (ObjectName: 'DATABASE';
+        ObjType: -1;
+        SystemTableName: 'RDB$DATABASE';
+        NameField: '';
+        CommentType: ctDatabase)
+);
 { TIBExtract }
 
 {	                ArrayDimensions
@@ -928,60 +1080,36 @@ begin
   FMetaData.Add(Msg);
 end;
 
+function TIBExtract.LookupDDLObject(cType: TCommentType): integer;
+begin
+  for Result := Low(DDLObjects) to High(DDLObjects) do
+  begin
+    if DDLObjects[Result].CommentType = cType then Exit;
+  end;
+  Result := -1;
+end;
+
+
 procedure TIBExtract.AddComment(Query: TIBSQL; cType: TCommentType;
   OutStrings: TStrings; CommentFieldName: string);
 var cmt: string;
+    index: integer;
 begin
   if IncludeMetaDataComments and
       Query.HasField(CommentFieldName) and not Query.FieldByName(CommentFieldName).IsNull then
   begin
-    cmt := 'COMMENT ON ';
-    case cType of
-      ctCharacterSet:         cmt += 'CHARACTER SET';
-      ctCollation:            cmt += 'COLLATION';
-      ctDomain:               cmt += 'DOMAIN';
-      ctException:            cmt += 'EXCEPTION';
-      ctExternalFunction:     cmt += 'EXTERNAL FUNCTION';
-      ctFilter:               cmt += 'FILTER';
-      ctGenerator:            cmt += 'GENERATOR';
-      ctIndex:                cmt += 'INDEX';
-      ctPackage:              cmt += 'PACKAGE';
-      ctProcedure:            cmt += 'PROCEDURE';
-      ctRole:                 cmt += 'ROLE';
-      ctSequence:             cmt += 'SEQUENCE';
-      ctTable:                cmt += 'TABLE';
-      ctTrigger:              cmt += 'TRIGGER';
-      ctView:                 cmt += 'VIEW';
-      ctColumn:               cmt += 'COLUMN';
-      ctParameter:            cmt += 'PARAMETER';
-      ctDatabase:             cmt += 'DATABASE';
+    index := LookupDDLObject(cType);
+    if index = -1 then Exit;
+
+    with DDLObjects[index] do
+    begin
+      cmt := 'COMMENT ON ' + ObjectName + ' ';
+      if NameSpaceField <> '' then
+        cmt += QuoteIdentifier(query.FieldByName(NameSpaceField).AsString) + '.';
+      if NameField <> '' then
+        cmt += QuoteIdentifier(query.FieldByName(NameField).AsString);
     end;
-    cmt += ' ';
-    case cType of
-      ctCharacterSet:         cmt += QuoteIdentifier(query.FieldByName('RDB$CHARACTER_SET_NAME').AsString);
-      ctCollation:            cmt += QuoteIdentifier(query.FieldByName('RDB$COLLATION_NAME').AsString);
-      ctDomain:               cmt += QuoteIdentifier(query.FieldByName('RDB$FIELD_NAME').AsString);
-      ctException:            cmt += QuoteIdentifier(query.FieldByName('RDB$EXCEPTION_NAME').AsString);
-      ctExternalFunction,
-      ctFilter:               cmt += QuoteIdentifier(query.FieldByName('RDB$FUNCTION_NAME').AsString);
-      ctGenerator,
-      ctSequence :            cmt += QuoteIdentifier(query.FieldByName('RDB$GENERATOR_NAME').AsString);
-      ctIndex:                cmt += QuoteIdentifier(query.FieldByName('RDB$INDEX_NAME').AsString);
-      ctPackage:              cmt += QuoteIdentifier(query.FieldByName('RDB$PACKAGE_NAME').AsString);
-      ctProcedure:            cmt += QuoteIdentifier(query.FieldByName('RDB$PROCEDURE_NAME').AsString);
-      ctRole:                 cmt += QuoteIdentifier(query.FieldByName('RDB$ROLE_NAME').AsString);
-      ctTable,
-      ctView:                 cmt += QuoteIdentifier(query.FieldByName('RDB$RELATION_NAME').AsString);
-      ctTrigger:              cmt += QuoteIdentifier(query.FieldByName('RDB$TRIGGER_NAME').AsString);
-      ctColumn:               cmt += QuoteIdentifier(query.FieldByName('RDB$RELATION_NAME').AsString)
-                                  +  '.' + QuoteIdentifier(query.FieldByName('RDB$FIELD_NAME').AsString);
-      ctParameter:            if Query.HasField('RDB$PROCEDURE_NAME') then
-                                cmt += QuoteIdentifier(query.FieldByName('RDB$PROCEDURE_NAME').AsString)
-                                    +  '.' + QuoteIdentifier(query.FieldByName('RDB$PARAMETER_NAME').AsString)
-                              else
-                              cmt += QuoteIdentifier(query.FieldByName('RDB$FUNCTION_NAME').AsString)
-                                  +  '.' + QuoteIdentifier(query.FieldByName('RDB$ARGUMENT_NAME').AsString);
-    end;
+
     cmt += ' IS ''' + SQLSafeString(Query.FieldByName(CommentFieldName).AsString) + '''' + TERM;
     OutStrings.Add(cmt);
   end;
@@ -1845,51 +1973,34 @@ end;
 
 procedure TIBExtract.ListComments(CommentTypes: TCommentTypes);
 
-  procedure DoListComments(cmt: TCommentType; FunctionArg: boolean = false);
+  procedure DoListComments(cmt: TCommentType);
   var qryCmt: TIBSQL;
-      MetadataTableName: string;
-      Condition: string;
+      sql: string;
+      index: integer;
   begin
-    MetadataTableName := '';
-    Condition := '';
+    index := LookupDDLObject(cmt);
+    if index = -1 then Exit;
+
     qryCmt := TIBSQL.Create(FDatabase);
     try
-      case cmt of
-        ctCharacterSet:         MetadataTableName := 'RDB$CHARACTER_SETS';
-        ctCollation:            MetadataTableName := 'RDB$COLLATIONS';
-        ctDomain:               MetadataTableName := 'RDB$FIELDS';
-        ctException:            MetadataTableName := 'RDB$EXCEPTIONS';
-        ctExternalFunction:     MetadataTableName := 'RDB$FUNCTIONS';
-        ctFilter:               MetadataTableName := 'RDB$FILTERS';
-        ctGenerator,
-        ctSequence:             MetadataTableName := 'RDB$GENERATORS';
-        ctIndex:                MetadataTableName := 'RDB$INDICES';
-        ctPackage:              MetadataTableName := 'RDB$PACKAGES';
-        ctProcedure:            MetadataTableName := 'RDB$PROCEDURES';
-        ctRole:                 MetadataTableName := 'RDB$ROLES';
-        ctTable:                MetadataTableName := 'RDB$RELATIONS';
-        ctTrigger:              MetadataTableName := 'RDB$TRIGGERS';
-        ctView:
+      with DDLObjects[index] do
+      begin
+        sql := 'Select * From '+ SystemTableName;
+        if not (cmt in [ctCharacterSet, ctCollation, ctDatabase]) then
+        begin
+          if not ShowSystem then
+            sql += ' Where (RDB$SYSTEM_FLAG is null or RDB$SYSTEM_FLAG = 0)';
+          if Condition <> '' then
           begin
-            MetadataTableName := 'RDB$RELATIONS';
-            Condition := ' AND NOT RDB$VIEW_BLR IS NULL AND RDB$FLAGS = 1';
-          end;
-
-        ctColumn:               MetadataTableName := 'RDB$RELATION_FIELDS';
-        ctParameter:
-          begin
-            if FunctionArg then
-              MetadataTableName := 'RDB$PROCEDURE_PARAMETERS'
+            if not ShowSystem then
+              sql += ' AND ' + Condition
             else
-              MetadataTableName := 'RDB$FUNCTION_ARGUMENTS';
-         end;
-
-        ctDatabase:             qryCmt.SQL.Text := 'Select * From RDB$DATABASE';
+              sql += ' Where ' + Condition;
+          end;
+        end;
+        sql += ' Order by 1';
       end;
-      if not (cmt in [ctCharacterSet, ctCollation]) then
-        Condition := ' Where (RDB$SYSTEM_FLAG is null or RDB$SYSTEM_FLAG <> 1)'+ Condition;
-      if MetadataTableName <> '' then
-        qryCmt.SQL.Text := 'Select * From '+ MetadataTableName + Condition + ' Order by 1';
+      qryCmt.SQL.Text := sql;
       qryCmt.ExecQuery;
       while not qryCmt.Eof do
       begin
@@ -1899,8 +2010,6 @@ procedure TIBExtract.ListComments(CommentTypes: TCommentTypes);
     finally
       qryCmt.Free;
     end;
-    if (cmt = ctParameter) and not FunctionArg then
-      DoListComments(ctParameter,true); {Add function arguments}
   end;
 
 var cType: TCommentType;
@@ -3266,6 +3375,52 @@ begin
   end;
   if DidActivate then
     FTransaction.Commit;
+end;
+
+procedure TIBExtract.ListObjectNames(ObjectType: integer; Names: TStrings);
+var qryObjects: TIBSQL;
+    i, index: integer;
+    sql: string;
+begin
+  index := -1;
+  Names.Clear;
+  for i := Low(DDLObjects) to High(DDLObjects) do
+  begin
+    if DDLObjects[i].ObjType = ObjectType then
+    begin
+      index := i;
+      break;
+    end;
+  end;
+  if index = -1 then Exit;
+
+  qryObjects := TIBSQL.Create(FDatabase);
+  try
+    with DDLObjects[index] do
+    begin
+      sql := 'Select ' + NameField + ' From ' + SystemTableName;
+      if not ShowSystem then
+        sql += ' Where (RDB$SYSTEM_FLAG is null or RDB$SYSTEM_FLAG = 0)';
+      if Condition <> '' then
+      begin
+        if not ShowSystem then
+          sql += ' AND ' + Condition
+        else
+          sql += ' Where ' + Condition;
+      end;
+      sql += ' Order by 1';
+    end;
+
+    qryObjects.SQL.Text := sql;
+    qryObjects.ExecQuery;
+    while not qryObjects.Eof do
+    begin
+      Names.Add(qryObjects.Fields[0].AsString);
+      qryObjects.Next;
+    end;
+  finally
+    qryObjects.Free;
+  end;
 end;
 
 function TIBExtract.GetFieldType(FieldType, FieldSubType, FieldScale,
