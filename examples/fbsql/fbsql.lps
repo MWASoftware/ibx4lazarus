@@ -4,13 +4,13 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="68">
+    <Units Count="71">
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="207"/>
-        <CursorPos X="74" Y="227"/>
+        <TopLine Value="404"/>
+        <CursorPos X="21" Y="436"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -33,8 +33,8 @@
       <Unit3>
         <Filename Value="..\..\..\fbintf\IB.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="335"/>
-        <CursorPos X="14" Y="354"/>
+        <TopLine Value="1220"/>
+        <CursorPos Y="1249"/>
         <UsageCount Value="68"/>
       </Unit3>
       <Unit4>
@@ -97,7 +97,7 @@
         <Filename Value="..\..\..\fbintf\client\FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="234"/>
-        <CursorPos X="62" Y="253"/>
+        <CursorPos Y="254"/>
         <UsageCount Value="12"/>
       </Unit12>
       <Unit13>
@@ -124,9 +124,9 @@
       <Unit16>
         <Filename Value="..\..\changelog"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="67"/>
-        <CursorPos X="81" Y="104"/>
-        <UsageCount Value="24"/>
+        <TopLine Value="109"/>
+        <CursorPos X="62" Y="131"/>
+        <UsageCount Value="25"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
       <Unit17>
@@ -223,9 +223,9 @@
       <Unit29>
         <Filename Value="..\..\..\fbintf\client\2.5\IBHeader.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="96"/>
-        <CursorPos X="4" Y="115"/>
-        <UsageCount Value="5"/>
+        <TopLine Value="717"/>
+        <CursorPos X="20" Y="1668"/>
+        <UsageCount Value="10"/>
       </Unit29>
       <Unit30>
         <Filename Value="..\..\..\fbintf\client\FBParamBlock.pas"/>
@@ -244,9 +244,9 @@
       <Unit32>
         <Filename Value="..\..\..\fbintf\client\FBAttachment.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="109"/>
+        <TopLine Value="118"/>
         <CursorPos X="3" Y="118"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="10"/>
       </Unit32>
       <Unit33>
         <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\rtl\unix\sysunixh.inc"/>
@@ -271,9 +271,9 @@
       <Unit35>
         <Filename Value="..\..\..\fbintf\client\3.0\FB30Attachment.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="140"/>
-        <CursorPos Y="175"/>
-        <UsageCount Value="9"/>
+        <TopLine Value="44"/>
+        <CursorPos X="15" Y="64"/>
+        <UsageCount Value="10"/>
       </Unit35>
       <Unit36>
         <Filename Value="..\..\..\fbintf\client\2.5\FB25Attachment.pas"/>
@@ -292,9 +292,9 @@
       <Unit38>
         <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\packages\fcl-db\src\base\db.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1947"/>
-        <CursorPos X="20" Y="1960"/>
-        <UsageCount Value="4"/>
+        <TopLine Value="1961"/>
+        <CursorPos X="14" Y="1980"/>
+        <UsageCount Value="10"/>
       </Unit38>
       <Unit39>
         <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\packages\fcl-db\src\base\database.inc"/>
@@ -307,8 +307,8 @@
         <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\packages\regexpr\src\regexpr.pas"/>
         <UnitName Value="RegExpr"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="532"/>
-        <CursorPos X="14" Y="551"/>
+        <TopLine Value="410"/>
+        <CursorPos X="23" Y="417"/>
         <UsageCount Value="10"/>
       </Unit40>
       <Unit41>
@@ -445,15 +445,15 @@
       <Unit60>
         <Filename Value="..\..\runtime\nongui\ibxscript.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="978"/>
-        <CursorPos X="22" Y="992"/>
-        <UsageCount Value="11"/>
+        <TopLine Value="851"/>
+        <CursorPos X="43" Y="876"/>
+        <UsageCount Value="12"/>
       </Unit60>
       <Unit61>
         <Filename Value="..\..\runtime\nongui\IBDataOutput.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="301"/>
-        <CursorPos X="21" Y="324"/>
+        <TopLine Value="54"/>
+        <CursorPos X="15" Y="136"/>
         <UsageCount Value="11"/>
       </Unit61>
       <Unit62>
@@ -466,9 +466,9 @@
       <Unit63>
         <Filename Value="..\..\runtime\nongui\IBDatabase.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1307"/>
-        <CursorPos X="3" Y="1309"/>
-        <UsageCount Value="11"/>
+        <TopLine Value="700"/>
+        <CursorPos X="38" Y="713"/>
+        <UsageCount Value="12"/>
       </Unit63>
       <Unit64>
         <Filename Value="..\..\runtime\nongui\IBExtract.pas"/>
@@ -506,16 +506,33 @@
         <CursorPos X="24" Y="48"/>
         <UsageCount Value="10"/>
       </Unit67>
+      <Unit68>
+        <Filename Value="..\..\..\..\..\fpcsrc\3.0.4\packages\fcl-db\src\base\database.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="534"/>
+        <CursorPos Y="554"/>
+        <UsageCount Value="10"/>
+      </Unit68>
+      <Unit69>
+        <Filename Value="..\..\..\fbintf\client\3.0\firebird\Firebird.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1075"/>
+        <CursorPos X="9" Y="1086"/>
+        <UsageCount Value="10"/>
+      </Unit69>
+      <Unit70>
+        <Filename Value="..\..\test\fbisqlTest\runtest.sh"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Bash"/>
+      </Unit70>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="1">
       <Position1>
         <Filename Value="fbsql.lpr"/>
-        <Caret Line="7" Column="9" TopLine="160"/>
+        <Caret Line="41" Column="20" TopLine="31"/>
       </Position1>
-      <Position2>
-        <Filename Value="fbsql.lpr"/>
-        <Caret Line="227" Column="76" TopLine="207"/>
-      </Position2>
     </JumpHistory>
   </ProjectSession>
   <Debugging>

@@ -41,6 +41,8 @@ type
     IncludeUserGrants: TCheckBox;
     Label41: TLabel;
     Label42: TLabel;
+    Label43: TLabel;
+    DBComments: TMemo;
     MenuItem19: TMenuItem;
     RevokeAll: TAction;
     AuthMapSource: TDataSource;
@@ -284,6 +286,7 @@ type
     procedure CommitAllUpdate(Sender: TObject);
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DBCharacterSetEditingDone(Sender: TObject);
+    procedure DBCommentsEditingDone(Sender: TObject);
     procedure DBIsReadOnlyChange(Sender: TObject);
     procedure DBSQLDialectEditingDone(Sender: TObject);
     procedure DeleteTagExecute(Sender: TObject);
@@ -425,6 +428,11 @@ begin
   with DBCharSetSource.Dataset do
   if State = dsEdit then
     Post;
+end;
+
+procedure TMainForm.DBCommentsEditingDone(Sender: TObject);
+begin
+  DatabaseData.Description := DBComments.Lines.Text;
 end;
 
 procedure TMainForm.AutoAdminChange(Sender: TObject);
@@ -1055,6 +1063,7 @@ begin
       PagesAvail.Text := 'n/a';
       AutoAdmin.Checked :=  false;
     end;
+    DBComments.Lines.Text := DatabaseData.Description;
   finally
     FLoading := false;
   end;

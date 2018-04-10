@@ -206,7 +206,7 @@ type
     procedure CheckValidStatement;   { raise error if statement is invalid.}
     procedure Close;
     procedure ExecQuery;
-    function HasField(FieldName: String): boolean;
+    function HasField(FieldName: String): boolean; {Note: case sensitive match}
     function FieldByName(FieldName: String): ISQLData;
     function ParamByName(ParamName: String): ISQLParam;
     procedure FreeHandle;
@@ -741,11 +741,20 @@ begin
 end;
 
 function TIBSQL.HasField(FieldName: String): boolean;
+var i: integer;
 begin
-  if FResults = nil then
+  if MetaData = nil then
     IBError(ibxeNoFieldAccess,[nil]);
 
-  Result := FResults.ByName(FieldName) <> nil;
+  Result := false;
+  for i := 0 to MetaData.Count - 1 do
+  begin
+    if MetaData.ColMetaData[i].Name = FieldName then
+    begin
+      Result := true;
+      Exit;
+    end;
+  end;
 end;
 
 function TIBSQL.GetEOF: Boolean;

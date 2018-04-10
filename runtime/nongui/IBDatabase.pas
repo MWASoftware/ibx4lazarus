@@ -207,6 +207,7 @@ type
     FDataSets: TList;
     FLoginCalled: boolean;
     FUseDefaultSystemCodePage: boolean;
+    FUseHiddenPassword: boolean;
     procedure EnsureInactive;
     function GetAuthenticationMethod: string;
     function GetDBSQLDialect: Integer;
@@ -268,6 +269,7 @@ type
     function AddTransaction(TR: TIBTransaction): Integer;
     function FindTransaction(TR: TIBTransaction): Integer;
     function FindDefaultTransaction(): TIBTransaction;
+    procedure ReConnect;
     procedure RemoveTransaction(Idx: Integer);
     procedure RemoveTransactions;
 
@@ -695,6 +697,33 @@ begin
   end;
 end;
 
+procedure TIBDataBase.ReConnect;
+var OldLoginPrompt: boolean;
+    OldPassword: string;
+begin
+  CheckActive;
+  if FHiddenPassword <> '' then
+  begin
+    OldLoginPrompt := LoginPrompt;
+    OldPassword := FHiddenPassword;
+    LoginPrompt := false;
+    FUseHiddenPassword := true;
+    try
+      Connected := false;
+      FHiddenPassword := OldPassword;
+      Connected := true;
+    finally
+      LoginPrompt := OldLoginPrompt;
+      FUseHiddenPassword := false;
+    end;
+  end
+  else
+  begin
+    Connected := false;
+    Connected := true;
+  end;
+end;
+
  procedure TIBDataBase.ForceClose;
 begin
   if Connected then
@@ -801,6 +830,7 @@ begin
     FAttachment.DropDatabase;
   end;
   FAttachment := nil;
+  FHiddenPassword := '';
   FCloseAction := caNormal;
 
   if not (csDesigning in ComponentState) then
@@ -1017,7 +1047,7 @@ begin
   FCloseAction := caNormal;
   CheckInactive;
   CheckDatabaseName;
-  if (not LoginPrompt) and (FHiddenPassword <> '') then
+  if (not LoginPrompt) and (FHiddenPassword <> '') and not FUseHiddenPassword then
   begin
     FHiddenPassword := '';
     FDBParamsChanged := True;
@@ -1054,7 +1084,7 @@ begin
      if (DPB = nil) or FDBParamsChanged or (TempDBParams.Text <> FDBParams.Text) then
      begin
        FDBParamsChanged := False;
-       if (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
+       if not FUseHiddenPassword and (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
          DPB := GenerateDPB(TempDBParams)
        else
        begin

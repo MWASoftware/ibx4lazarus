@@ -57,6 +57,7 @@ type
     FExtract: TIBExtract;
     FOutputFile: TStream;
     FDataOutputFormatter: TDataOutputFormatter;
+    FPromptedForPassword: string;
     procedure LogHandler(Sender: TObject; Msg: string);
     procedure ErrorLogHandler(Sender: TObject; Msg: string);
     procedure loginPrompt(Database: TIBDatabase; LoginParams: TStrings);
@@ -204,6 +205,7 @@ end;
 procedure TFBSQL.loginPrompt(Database: TIBDatabase; LoginParams: TStrings);
 var password: string;
 begin
+  if LoginParams.Values['password'] <> '' then Exit;
   write(LoginParams.Values['user_name'] + '''s Password:');
   password := getpassword;
   if password <> '' then
