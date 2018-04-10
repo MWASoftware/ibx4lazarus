@@ -195,6 +195,7 @@ type
     function GetDBReadOnly: boolean;
     function GetDBSQLDialect: integer;
     function GetDBUserName: string;
+    function GetDescription: string;
     function GetEmbeddedMode: boolean;
     function GetForcedWrites: boolean;
     function GetLingerDelay: string;
@@ -207,6 +208,7 @@ type
     procedure SetAutoAdmin(AValue: boolean);
     procedure SetDBReadOnly(AValue: boolean);
     procedure SetDBSQLDialect(AValue: integer);
+    procedure SetDescription(AValue: string);
     procedure SetForcedWrites(AValue: boolean);
     procedure SetLingerDelay(AValue: string);
     procedure SetNoReserve(AValue: boolean);
@@ -238,6 +240,7 @@ type
     procedure RevokeAll;
     procedure SyncSubjectAccessRights(ID: string);
     property AutoAdmin: boolean read GetAutoAdmin write SetAutoAdmin;
+    property Description: string read GetDescription write SetDescription;
     property Disconnecting: boolean read FDisconnecting;
     property ForcedWrites: boolean read GetForcedWrites write SetForcedWrites;
     property LingerDelay: string read GetLingerDelay write SetLingerDelay;
@@ -559,6 +562,11 @@ end;
 function TDatabaseData.GetDBUserName: string;
 begin
   Result := Trim(AttmtQuery.FieldByName('MON$USER').AsString);
+end;
+
+function TDatabaseData.GetDescription: string;
+begin
+  Result :=  DatabaseQuery.FieldByName('RDB$DESCRIPTION').AsString;
 end;
 
 function TDatabaseData.GetEmbeddedMode: boolean;
@@ -965,6 +973,19 @@ begin
   end;
 end;
 
+procedure TDatabaseData.SetDescription(AValue: string);
+begin
+  with TIBSQL.Create(IBDatabase1) do
+  try
+    SQL.Text := 'Comment on Database is ''' + SQLSafeString(AValue) + '''';
+    Transaction.Active := true;
+    ExecQuery;
+  finally
+    Free;
+  end;
+  CurrentTransaction.Commit;
+end;
+
 procedure TDatabaseData.SetForcedWrites(AValue: boolean);
 begin
   IBConfigService1.SetAsyncMode(not AValue);
@@ -1362,7 +1383,10 @@ end;
 procedure TDatabaseData.CurrentTransactionAfterTransactionEnd(Sender: TObject);
 begin
   if not Disconnecting and not (csDestroying in ComponentState) then
+  begin
+    CurrentTransaction.Active := true;
     Application.QueueAsyncCall(@ReloadData,0);
+  end;
 end;
 
 procedure TDatabaseData.ApplicationProperties1Exception(Sender: TObject;

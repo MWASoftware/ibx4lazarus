@@ -65,12 +65,12 @@ object MainForm: TMainForm
     Height = 548
     Top = 26
     Width = 939
-    ActivePage = SchemaTab
+    ActivePage = Properties
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 4
+    TabIndex = 0
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
@@ -274,17 +274,17 @@ object MainForm: TMainForm
           TabOrder = 10
         end
         object Label11: TLabel
-          Left = 435
+          Left = 728
           Height = 14
-          Top = 26
+          Top = 22
           Width = 93
           Caption = 'Pages Allocated'
           ParentColor = False
         end
         object AllocatedPages: TEdit
-          Left = 533
+          Left = 826
           Height = 24
-          Top = 20
+          Top = 16
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
@@ -294,23 +294,23 @@ object MainForm: TMainForm
         object Label19: TLabel
           Left = 472
           Height = 14
-          Top = 57
+          Top = 22
           Width = 56
           Caption = 'Page Size'
           ParentColor = False
         end
         object Label3: TLabel
-          Left = 460
+          Left = 752
           Height = 14
-          Top = 88
+          Top = 52
           Width = 68
           Caption = 'Pages Used'
           ParentColor = False
         end
         object PagesUsed: TEdit
-          Left = 533
+          Left = 826
           Height = 24
-          Top = 82
+          Top = 48
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
@@ -318,17 +318,17 @@ object MainForm: TMainForm
           Text = 'PagesUsed'
         end
         object Label10: TLabel
-          Left = 438
+          Left = 730
           Height = 14
-          Top = 119
+          Top = 85
           Width = 90
           Caption = 'Pages Available'
           ParentColor = False
         end
         object PagesAvail: TEdit
-          Left = 533
+          Left = 826
           Height = 24
-          Top = 113
+          Top = 80
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
@@ -336,17 +336,17 @@ object MainForm: TMainForm
           Text = 'PagesAvail'
         end
         object Label12: TLabel
-          Left = 430
+          Left = 432
           Height = 14
-          Top = 150
+          Top = 52
           Width = 98
           Caption = 'Current Memory'
           ParentColor = False
         end
         object Edit10: TEdit
-          Left = 533
+          Left = 535
           Height = 24
-          Top = 144
+          Top = 48
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
@@ -356,31 +356,31 @@ object MainForm: TMainForm
         object Label20: TLabel
           Left = 632
           Height = 14
-          Top = 57
+          Top = 22
           Width = 33
           Caption = 'bytes'
           ParentColor = False
         end
         object Label21: TLabel
-          Left = 632
+          Left = 634
           Height = 14
-          Top = 149
+          Top = 57
           Width = 33
           Caption = 'bytes'
           ParentColor = False
         end
         object Label14: TLabel
-          Left = 452
+          Left = 454
           Height = 14
-          Top = 181
+          Top = 85
           Width = 76
           Caption = 'Max Memory'
           ParentColor = False
         end
         object Edit11: TEdit
-          Left = 533
+          Left = 536
           Height = 24
-          Top = 175
+          Top = 80
           Width = 89
           Alignment = taRightJustify
           ReadOnly = True
@@ -388,25 +388,25 @@ object MainForm: TMainForm
           Text = 'Edit11'
         end
         object Label22: TLabel
-          Left = 632
+          Left = 635
           Height = 14
-          Top = 182
+          Top = 85
           Width = 33
           Caption = 'bytes'
           ParentColor = False
         end
         object Label15: TLabel
-          Left = 447
+          Left = 740
           Height = 14
-          Top = 212
+          Top = 117
           Width = 81
           Caption = 'No. of Buffers'
           ParentColor = False
         end
         object PageBuffers: TEdit
-          Left = 533
+          Left = 826
           Height = 24
-          Top = 206
+          Top = 112
           Width = 89
           Alignment = taRightJustify
           NumbersOnly = True
@@ -415,17 +415,17 @@ object MainForm: TMainForm
           Text = 'PageBuffers'
         end
         object Label23: TLabel
-          Left = 430
+          Left = 679
           Height = 14
-          Top = 245
+          Top = 277
           Width = 100
           Caption = 'Date DB Created'
           ParentColor = False
         end
         object DBEdit1: TDBEdit
-          Left = 533
+          Left = 783
           Height = 24
-          Top = 240
+          Top = 272
           Width = 132
           DataField = 'MON$CREATION_DATE'
           DataSource = DatabaseSource
@@ -437,15 +437,15 @@ object MainForm: TMainForm
         object Label16: TLabel
           Left = 453
           Height = 14
-          Top = 317
+          Top = 120
           Width = 75
           Caption = 'Linger Delay'
           ParentColor = False
         end
         object LingerDelay: TEdit
-          Left = 533
+          Left = 536
           Height = 24
-          Top = 311
+          Top = 112
           Width = 89
           Alignment = taRightJustify
           NumbersOnly = True
@@ -456,24 +456,24 @@ object MainForm: TMainForm
         object Label17: TLabel
           Left = 632
           Height = 14
-          Top = 317
+          Top = 118
           Width = 49
           Caption = 'seconds'
           ParentColor = False
         end
         object Label7: TLabel
-          Left = 400
+          Left = 402
           Height = 14
-          Top = 347
+          Top = 151
           Width = 128
           Caption = 'S&weep Interval set to'
           FocusControl = SweepInterval
           ParentColor = False
         end
         object SweepInterval: TEdit
-          Left = 533
+          Left = 535
           Height = 24
-          Top = 342
+          Top = 144
           Width = 89
           Alignment = taRightJustify
           NumbersOnly = True
@@ -484,15 +484,15 @@ object MainForm: TMainForm
         object Label8: TLabel
           Left = 632
           Height = 14
-          Top = 347
+          Top = 151
           Width = 74
           Caption = 'Transactions'
           ParentColor = False
         end
         object DBEdit4: TDBEdit
-          Left = 533
+          Left = 536
           Height = 24
-          Top = 52
+          Top = 16
           Width = 89
           DataField = 'MON$PAGE_SIZE'
           DataSource = DatabaseSource
@@ -535,6 +535,27 @@ object MainForm: TMainForm
           ReadOnly = True
           TabOrder = 24
           Text = 'DatabaseAliasName'
+        end
+        object Label43: TLabel
+          Left = 536
+          Height = 14
+          Top = 296
+          Width = 65
+          Caption = 'Comments'
+          ParentColor = False
+        end
+        object DBComments: TMemo
+          Left = 536
+          Height = 118
+          Top = 311
+          Width = 379
+          Anchors = [akTop, akLeft, akRight, akBottom]
+          Lines.Strings = (
+            'DBComments'
+          )
+          OnEditingDone = DBCommentsEditingDone
+          ScrollBars = ssVertical
+          TabOrder = 25
         end
       end
     end
@@ -1037,7 +1058,7 @@ object MainForm: TMainForm
       OnShow = StatisticsTabShow
       object StatsOptions: TComboBox
         Left = 667
-        Height = 23
+        Height = 27
         Top = 8
         Width = 228
         Anchors = [akTop, akRight]
@@ -2230,7 +2251,7 @@ object MainForm: TMainForm
       OnShow = RepairTabShow
       object SelectRepairAction: TComboBox
         Left = 654
-        Height = 23
+        Height = 27
         Top = 8
         Width = 200
         Anchors = [akTop, akRight]
@@ -2266,8 +2287,8 @@ object MainForm: TMainForm
         TabOrder = 2
         object ValidateOptionsTab: TTabSheet
           Caption = 'ValidateOptionsTab'
-          ClientHeight = 104
-          ClientWidth = 318
+          ClientHeight = 102
+          ClientWidth = 316
           object Label33: TLabel
             Left = 5
             Height = 14
@@ -2305,8 +2326,8 @@ object MainForm: TMainForm
         end
         object RepairOptionsTab: TTabSheet
           Caption = 'RepairOptionsTab'
-          ClientHeight = 104
-          ClientWidth = 318
+          ClientHeight = 102
+          ClientWidth = 316
           object Label34: TLabel
             Left = 10
             Height = 40
@@ -2319,9 +2340,9 @@ object MainForm: TMainForm
           end
           object ValidateRepairRecordFragments: TCheckBox
             Left = 16
-            Height = 19
+            Height = 22
             Top = 48
-            Width = 161
+            Width = 184
             Caption = 'Validate Record Fragments'
             Checked = True
             State = cbChecked
@@ -2329,9 +2350,9 @@ object MainForm: TMainForm
           end
           object IgnoreChecksumsOnRepair: TCheckBox
             Left = 16
-            Height = 19
+            Height = 22
             Top = 71
-            Width = 146
+            Width = 170
             Caption = 'Ignore Checksum Errors'
             TabOrder = 1
           end
@@ -2368,9 +2389,9 @@ object MainForm: TMainForm
           TabOrder = 0
           object Alltables: TRadioButton
             Left = 9
-            Height = 19
+            Height = 22
             Top = 32
-            Width = 71
+            Width = 78
             Caption = 'All Tables'
             Checked = True
             OnChange = SelectedTablesOnlyChange
@@ -2379,9 +2400,9 @@ object MainForm: TMainForm
           end
           object SelectedTablesOnly: TRadioButton
             Left = 9
-            Height = 19
+            Height = 22
             Top = 56
-            Width = 129
+            Width = 147
             Caption = 'Selected Tables Only'
             OnChange = SelectedTablesOnlyChange
             TabOrder = 1
@@ -2427,17 +2448,17 @@ object MainForm: TMainForm
           end
           object Label40: TLabel
             Left = 9
-            Height = 15
+            Height = 14
             Top = 7
-            Width = 42
+            Width = 47
             Caption = 'Validate'
             ParentColor = False
           end
           object SelectAllTables: TCheckBox
             Left = 0
-            Height = 19
-            Top = 366
-            Width = 117
+            Height = 22
+            Top = 363
+            Width = 134
             Anchors = [akLeft, akBottom]
             Caption = 'Select/Deselect All'
             OnChange = SelectAllTablesChange
@@ -2462,9 +2483,9 @@ object MainForm: TMainForm
           TabOrder = 2
           object Label37: TLabel
             Left = 0
-            Height = 15
+            Height = 14
             Top = 8
-            Width = 91
+            Width = 101
             Caption = 'Validation Report'
             ParentColor = False
           end
@@ -2672,9 +2693,9 @@ object MainForm: TMainForm
     end
   end
   object UpdateColsPanel: TPanel
-    Left = 328
+    Left = 40
     Height = 64
-    Top = 128
+    Top = 488
     Width = 544
     BevelOuter = bvNone
     BorderStyle = bsSingle
@@ -3102,8 +3123,8 @@ object MainForm: TMainForm
   end
   object ShadowSource: TDataSource
     DataSet = DatabaseData.ShadowFiles
-    left = 424
-    top = 400
+    left = 464
+    top = 512
   end
   object SynSQLSyn1: TSynSQLSyn
     DefaultFilter = 'SQL Files (*.sql)|*.sql'
@@ -3120,6 +3141,7 @@ object MainForm: TMainForm
     Transaction = DatabaseData.CurrentTransaction
     ShowSystem = False
     AlwaysQuoteIdentifiers = False
+    CaseSensitiveObjectNames = False
     left = 712
     top = 296
   end

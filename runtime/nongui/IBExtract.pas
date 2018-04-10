@@ -270,6 +270,9 @@ const
   obj_package = 18;
   obj_package_body = 19;
 
+  obj_function = 100;
+  obj_domain = 101;
+
 implementation
 
 uses FBMessages, IBDataOutput;
@@ -362,21 +365,21 @@ const
         Condition: '';
         CommentType: ctCollation),
   (ObjectName: 'DOMAIN';
-        ObjType: obj_field;
+        ObjType: obj_domain;
         SystemTableName: 'RDB$FIELDS';
         NameField: 'RDB$FIELD_NAME';
         NameSpaceField: '';
         Condition: 'RDB$SYSTEM_FLAG = 0';
         CommentType: ctDomain),
   (ObjectName: 'EXCEPTION';
-        ObjType: -1;
+        ObjType: obj_exception;
         SystemTableName: 'RDB$EXCEPTIONS';
         NameField: 'RDB$EXCEPTION_NAME';
         NameSpaceField: '';
         Condition: '';
         CommentType: ctException),
   (ObjectName: 'EXTERNAL FUNCTION';
-        ObjType: obj_exception;
+        ObjType: obj_function;
         SystemTableName: 'RDB$FUNCTIONS';
         NameField: 'RDB$FUNCTION_NAME';
         NameSpaceField: '';
