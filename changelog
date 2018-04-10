@@ -141,6 +141,14 @@ packages.
 
 29. TIBSQL.HasField should no longer generate and exception when the field does not exist.
 
+30. TIBXScript: case insensitive regex now used when matching statements instead of
+    converting statement to upper case.
+
+31. TIBExtract: metadata comments now supported. New published property
+    IncludeMetaDataComments (default true). If true then metadata comments included
+    in extracted DDL. New Extract Object member eoComments. This may be used with
+    ExtractObject method to list all metadata comments.
+
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO

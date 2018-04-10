@@ -206,7 +206,7 @@ type
     procedure CheckValidStatement;   { raise error if statement is invalid.}
     procedure Close;
     procedure ExecQuery;
-    function HasField(FieldName: String): boolean;
+    function HasField(FieldName: String): boolean; {Note: case sensitive match}
     function FieldByName(FieldName: String): ISQLData;
     function ParamByName(ParamName: String): ISQLParam;
     procedure FreeHandle;
@@ -749,7 +749,6 @@ begin
   Result := false;
   for i := 0 to MetaData.Count - 1 do
   begin
-    writeln(MetaData.ColMetaData[i].Name);
     if MetaData.ColMetaData[i].Name = FieldName then
     begin
       Result := true;

@@ -54,7 +54,7 @@ type
   TExtractObjectTypes =
     (eoDatabase, eoDomain, eoTable, eoView, eoProcedure, eoFunction, eoPackage,
      eoGenerator, eoException, eoBLOBFilter, eoRole, eoTrigger, eoForeign,
-     eoIndexes, eoChecks, eoData);
+     eoIndexes, eoChecks, eoComments, eoData);
 
   TExtractType =
     (etDomain, etTable, etRole, etTrigger, etForeign,
@@ -67,10 +67,11 @@ type
 
   TPackageDDLType = (paHeader,paBody,paBoth);
 
-  TCommentType = (ctCharacterSet,ctCollation,ctDomain,ctException,
+  TCommentType = (ctDatabase, ctCharacterSet,ctCollation,ctDomain,ctException,
                   ctExternalFunction, ctFilter, ctGenerator, ctIndex, ctPackage,
                   ctProcedure, ctRole, ctSequence, ctTable, ctTrigger,
-                  ctView, ctColumn,ctParameter, ctDatabase);
+                  ctView, ctColumn,ctParameter);
+  TCommentTypes = set of TCommentType;
 
   { TIBExtract }
 
@@ -79,6 +80,7 @@ type
     FAlwaysQuoteIdentifiers: boolean;
     FCaseSensitiveObjectNames: boolean;
     FDatabase : TIBDatabase;
+    FIncludeMetaDataComments: boolean;
     FTransaction : TIBTransaction;
     FMetaData: TStrings;
     FDatabaseInfo: TIBDatabaseInfo;
@@ -113,7 +115,7 @@ type
     procedure ListAllTables(flag : Boolean);
     procedure ListTriggers(ObjectName: String=''; ExtractTypes: TExtractTypes = [etTrigger]);
     procedure ListCheck(ObjectName : String = ''; ExtractType : TExtractType = etCheck);
-    function PrintSet(var Used : Boolean) : String;
+    procedure ListComments(CommentTypes: TCommentTypes = []);
     procedure ListCreateDb(TargetDb : String = '');
     procedure ListDomains(ObjectName : String = ''; ExtractType : TExtractType = etDomain);
     procedure ListException(ExceptionName : String = '');
@@ -124,6 +126,7 @@ type
     procedure ListIndex(ObjectName : String = ''; ExtractType : TExtractType = etIndex);
     procedure ListViews(ViewName : String = '');
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function PrintSet(var Used : Boolean) : String;
     function QuoteIdentifier(Value: String): String;
 
     { Protected declarations }
@@ -146,6 +149,7 @@ type
     property Transaction : TIBTransaction read GetTransaction write SetTransaction;
     property ShowSystem: Boolean read FShowSystem write FShowSystem;
     property AlwaysQuoteIdentifiers: boolean read FAlwaysQuoteIdentifiers write FAlwaysQuoteIdentifiers;
+    property IncludeMetaDataComments: boolean read FIncludeMetaDataComments write FIncludeMetaDataComments default true;
     property CaseSensitiveObjectNames: boolean read FCaseSensitiveObjectNames write FCaseSensitiveObjectNames;
   end;
 
@@ -371,6 +375,7 @@ begin
     Database := TIBDatabase(AOwner);
   if AOwner is TIBTransaction then
     Transaction := TIBTransaction(AOwner);
+  FIncludeMetaDataComments := true;
 end;
 
 destructor TIBExtract.Destroy;
@@ -436,6 +441,10 @@ begin
     if DatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
       ListPackages(paBody);
     ListProcs(pdAlterProc);
+    FMetaData.Add('');
+    FMetaData.Add('/* Comments on System Objects */');
+    FMetaData.Add('');
+    ListComments([ctCollation,ctCharacterSet]);
     ListGrants(ExtractTypes);
   end;
 
@@ -923,7 +932,8 @@ procedure TIBExtract.AddComment(Query: TIBSQL; cType: TCommentType;
   OutStrings: TStrings; CommentFieldName: string);
 var cmt: string;
 begin
-  if Query.HasField(CommentFieldName) and not Query.FieldByName(CommentFieldName).IsNull then
+  if IncludeMetaDataComments and
+      Query.HasField(CommentFieldName) and not Query.FieldByName(CommentFieldName).IsNull then
   begin
     cmt := 'COMMENT ON ';
     case cType of
@@ -1833,6 +1843,78 @@ begin
   end;
 end;
 
+procedure TIBExtract.ListComments(CommentTypes: TCommentTypes);
+
+  procedure DoListComments(cmt: TCommentType; FunctionArg: boolean = false);
+  var qryCmt: TIBSQL;
+      MetadataTableName: string;
+      Condition: string;
+  begin
+    MetadataTableName := '';
+    Condition := '';
+    qryCmt := TIBSQL.Create(FDatabase);
+    try
+      case cmt of
+        ctCharacterSet:         MetadataTableName := 'RDB$CHARACTER_SETS';
+        ctCollation:            MetadataTableName := 'RDB$COLLATIONS';
+        ctDomain:               MetadataTableName := 'RDB$FIELDS';
+        ctException:            MetadataTableName := 'RDB$EXCEPTIONS';
+        ctExternalFunction:     MetadataTableName := 'RDB$FUNCTIONS';
+        ctFilter:               MetadataTableName := 'RDB$FILTERS';
+        ctGenerator,
+        ctSequence:             MetadataTableName := 'RDB$GENERATORS';
+        ctIndex:                MetadataTableName := 'RDB$INDICES';
+        ctPackage:              MetadataTableName := 'RDB$PACKAGES';
+        ctProcedure:            MetadataTableName := 'RDB$PROCEDURES';
+        ctRole:                 MetadataTableName := 'RDB$ROLES';
+        ctTable:                MetadataTableName := 'RDB$RELATIONS';
+        ctTrigger:              MetadataTableName := 'RDB$TRIGGERS';
+        ctView:
+          begin
+            MetadataTableName := 'RDB$RELATIONS';
+            Condition := ' AND NOT RDB$VIEW_BLR IS NULL AND RDB$FLAGS = 1';
+          end;
+
+        ctColumn:               MetadataTableName := 'RDB$RELATION_FIELDS';
+        ctParameter:
+          begin
+            if FunctionArg then
+              MetadataTableName := 'RDB$PROCEDURE_PARAMETERS'
+            else
+              MetadataTableName := 'RDB$FUNCTION_ARGUMENTS';
+         end;
+
+        ctDatabase:             qryCmt.SQL.Text := 'Select * From RDB$DATABASE';
+      end;
+      if not (cmt in [ctCharacterSet, ctCollation]) then
+        Condition := ' Where (RDB$SYSTEM_FLAG is null or RDB$SYSTEM_FLAG <> 1)'+ Condition;
+      if MetadataTableName <> '' then
+        qryCmt.SQL.Text := 'Select * From '+ MetadataTableName + Condition + ' Order by 1';
+      qryCmt.ExecQuery;
+      while not qryCmt.Eof do
+      begin
+        AddComment(qryCmt,cmt,FMetaData);
+        qryCmt.Next;
+      end;
+    finally
+      qryCmt.Free;
+    end;
+    if (cmt = ctParameter) and not FunctionArg then
+      DoListComments(ctParameter,true); {Add function arguments}
+  end;
+
+var cType: TCommentType;
+begin
+  if CommentTypes = [] then
+  begin
+    for cType := low(TCommentType) to High(TCommentType) do
+      DoListComments(cType)
+  end
+  else
+  for cType in CommentTypes do
+    DoListComments(cType);
+end;
+
 {             ListCreateDb
   Functional description
     Print the create database command if requested.  At least put
@@ -2229,7 +2311,6 @@ begin
     qryDomains.ExecQuery;
     while not qryDomains.Eof do
     begin
-      AddComment(qryDomains,ctDomain,FMetaData);
       FieldName := qryDomains.FieldByName('RDB$FIELD_NAME').AsString;
       { Skip over artifical domains }
       if (Pos('RDB$',FieldName) = 1) and
@@ -2249,6 +2330,7 @@ begin
       Line := Format('CREATE DOMAIN %s AS ', [FieldName]);
       Line := Line + FormatDomainStr + Term;
       FMetaData.Add(Line);
+      AddComment(qryDomains,ctDomain,FMetaData);
       qryDomains.Next;
     end;
   finally
@@ -3178,6 +3260,8 @@ begin
         ListCheck(ObjectName, etTable)
       else
         ListCheck(ObjectName);
+    eoComments:
+       ListComments;
     eoData : ListData(ObjectName);
   end;
   if DidActivate then

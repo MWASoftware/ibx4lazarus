@@ -4,13 +4,13 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="70">
+    <Units Count="71">
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="305"/>
-        <CursorPos X="75" Y="338"/>
+        <TopLine Value="404"/>
+        <CursorPos X="21" Y="436"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -97,7 +97,7 @@
         <Filename Value="..\..\..\fbintf\client\FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="234"/>
-        <CursorPos X="62" Y="253"/>
+        <CursorPos Y="254"/>
         <UsageCount Value="12"/>
       </Unit12>
       <Unit13>
@@ -307,8 +307,8 @@
         <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\packages\regexpr\src\regexpr.pas"/>
         <UnitName Value="RegExpr"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="532"/>
-        <CursorPos X="14" Y="551"/>
+        <TopLine Value="410"/>
+        <CursorPos X="23" Y="417"/>
         <UsageCount Value="10"/>
       </Unit40>
       <Unit41>
@@ -445,8 +445,8 @@
       <Unit60>
         <Filename Value="..\..\runtime\nongui\ibxscript.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="563"/>
-        <CursorPos X="21" Y="577"/>
+        <TopLine Value="851"/>
+        <CursorPos X="43" Y="876"/>
         <UsageCount Value="12"/>
       </Unit60>
       <Unit61>
@@ -466,8 +466,8 @@
       <Unit63>
         <Filename Value="..\..\runtime\nongui\IBDatabase.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1051"/>
-        <CursorPos X="33" Y="1083"/>
+        <TopLine Value="700"/>
+        <CursorPos X="38" Y="713"/>
         <UsageCount Value="12"/>
       </Unit63>
       <Unit64>
@@ -520,8 +520,20 @@
         <CursorPos X="9" Y="1086"/>
         <UsageCount Value="10"/>
       </Unit69>
+      <Unit70>
+        <Filename Value="..\..\test\fbisqlTest\runtest.sh"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Bash"/>
+      </Unit70>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="41" Column="20" TopLine="31"/>
+      </Position1>
+    </JumpHistory>
   </ProjectSession>
   <Debugging>
     <Watches Count="1">

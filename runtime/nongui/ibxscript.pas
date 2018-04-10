@@ -741,7 +741,6 @@ end;
 
 function TCustomIBXScript.ProcessStatement(stmt: string): boolean;
 var command: string;
-    ucStmt: string;
 
   function Toggle(aValue: string): boolean;
   begin
@@ -762,11 +761,11 @@ var command: string;
     try
       RegexObj.ModifierG := false; {turn off greedy matches}
       RegexObj.Expression := ' +USER +''(.+)''';
-      if RegexObj.Exec(ucStmt) then
+      if RegexObj.Exec(stmt) then
         FDatabase.Params.Values['user_name'] := RegexObj.Match[1];
 
       RegexObj.Expression := ' +PASSWORD +''(.+)''';
-      if RegexObj.Exec(ucStmt) then
+      if RegexObj.Exec(stmt) then
         FDatabase.Params.Values['password'] :=
                     system.copy(stmt,RegexObj.MatchPos[1],RegexObj.MatchLen[1]);
     finally
@@ -781,14 +780,15 @@ var command: string;
     RegexObj := TRegExpr.Create;
     try
       RegexObj.ModifierG := false; {turn off greedy matches}
+      RegexObj.ModifierI := true; {case insensitive}
       RegexObj.Expression := '^ *CONNECT +''(.*)''';
-      if RegexObj.Exec(ucStmt) then
+      if RegexObj.Exec(stmt) then
       begin
         FDatabase.DatabaseName := system.copy(stmt,RegexObj.MatchPos[1],RegexObj.MatchLen[1]);
       end;
 
       RegexObj.Expression := ' +ROLE +''(.+)''';
-      if RegexObj.Exec(ucStmt) then
+      if RegexObj.Exec(stmt) then
         FDatabase.Params.Values['sql_role_name'] := RegexObj.Match[1]
       else
       with FDatabase.Params do
@@ -796,7 +796,7 @@ var command: string;
         Delete(IndexOfName('sql_role_name'));
 
       RegexObj.Expression := ' +CACHE +([0-9]+)';
-      if RegexObj.Exec(ucStmt) then
+      if RegexObj.Exec(stmt) then
         FDatabase.Params.Values['cache_manager'] := RegexObj.Match[1]
       else
       with FDatabase.Params do
@@ -813,27 +813,26 @@ var command: string;
     RegexObj := TRegExpr.Create;
     try
       RegexObj.ModifierG := false; {turn off greedy matches}
+      RegexObj.ModifierI := true; {case insensitive}
       RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +(''.*'') +USER +''(.+)''';
-      if not RegexObj.Exec(ucStmt) and (FDatabase.Params.IndexOfName('user_name') <> -1) then
+      if not RegexObj.Exec(stmt) and (FDatabase.Params.IndexOfName('user_name') <> -1) then
       begin
         RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +(''.*'')';
-        if RegexObj.Exec(ucStmt) then
+        if RegexObj.Exec(stmt) then
         begin
           system.Insert(' USER ''' + FDatabase.Params.Values['user_name'] +'''',stmt,
                  RegexObj.MatchPos[2] + RegexObj.MatchLen[2]);
-          ucStmt := AnsiUpperCase(stmt);
         end;
       end;
 
       RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +''.*'' +USER +''.+'' PASSWORD +''(.+)''';
-      if not RegexObj.Exec(ucStmt) and (FDatabase.Params.IndexOfName('password') <> -1) then
+      if not RegexObj.Exec(stmt) and (FDatabase.Params.IndexOfName('password') <> -1) then
       begin
         RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +''.*'' +(USER +''.+'')';
-        if RegexObj.Exec(ucStmt) then
+        if RegexObj.Exec(stmt) then
         begin
           system.Insert(' PASSWORD ''' + FDatabase.Params.Values['password'] +'''',stmt,
                  RegexObj.MatchPos[2] + RegexObj.MatchLen[2]);
-          ucStmt := AnsiUpperCase(stmt);
         end;
       end;
     finally
@@ -851,13 +850,13 @@ var  RegexObj: TRegExpr;
      LoginPrompt: boolean;
 begin
   Result := false;
-  ucStmt := AnsiUpperCase(stmt);
   Terminator := FSymbolStream.Terminator;
   RegexObj := TRegExpr.Create;
   try
     {process create database}
+    RegexObj.ModifierI := true; {case insensitive}
     RegexObj.Expression := '^ *CREATE +(DATABASE|SCHEMA) +''(.*)''(.*)(\' + Terminator + '|)';
-    if RegexObj.Exec(ucStmt) then
+    if RegexObj.Exec(stmt) then
     begin
       if IgnoreCreateDatabase then
       begin
@@ -868,30 +867,30 @@ begin
       if assigned(FOnCreateDatabase) then
         OnCreateDatabase(self,FileName);
       stmt := 'CREATE DATABASE ''' + FileName + '''' + system.copy(stmt,RegexObj.MatchPos[3], RegexObj.MatchLen[3]);
-      ucStmt := AnsiUpperCase(stmt);
       UpdateUserPassword;
       FDatabase.Connected := false;
       FDatabase.CreateDatabase(stmt);
       FDatabase.Connected := false;
       ExtractUserInfo;
-      DoReconnect;
+      FDatabase.Connected := true;
       Result := true;
       Exit;
     end;
 
     {process connect statement}
     RegexObj.Expression := '^ *CONNECT +.*(\' + Terminator + '|)';
-    if RegexObj.Exec(ucStmt) then
+    if RegexObj.Exec(stmt) then
     begin
       ExtractConnectInfo;
-      DoReconnect;
+      FDatabase.Connected := false;
+      FDatabase.Connected := true;
       Result := true;
       Exit;
     end;
 
     {Process Drop Database}
     RegexObj.Expression := '^ *DROP +DATABASE *(\' + Terminator + '|)';
-    if RegexObj.Exec(ucStmt) then
+    if RegexObj.Exec(stmt) then
     begin
       FDatabase.DropDatabase;
       Result := true;
@@ -900,7 +899,7 @@ begin
 
     {process commit statement}
     RegexObj.Expression := '^ *COMMIT *(\' + Terminator + '|)';
-    if RegexObj.Exec(ucStmt) then
+    if RegexObj.Exec(stmt) then
     begin
       DoCommit;
       Result := true;
@@ -909,7 +908,7 @@ begin
 
     {process Reconnect statement}
     RegexObj.Expression := '^ *RECONNECT *(\' + Terminator + '|)';
-    if RegexObj.Exec(ucStmt) then
+    if RegexObj.Exec(stmt) then
     begin
       DoReconnect;
       Result := true;
@@ -919,7 +918,7 @@ begin
 
     {Process Set Term}
     RegexObj.Expression := '^ *SET +TERM +(.) *(\' + Terminator + '|)';
-    if RegexObj.Exec(ucStmt) then
+    if RegexObj.Exec(stmt) then
     begin
        FSymbolStream.Terminator := RegexObj.Match[1][1];
        Result := true;
@@ -928,7 +927,7 @@ begin
 
     {process Set SQL Dialect}
     RegexObj.Expression := '^ *SET +SQL +DIALECT +([0-9]) *(\' + Terminator + '|)';
-    if RegexObj.Exec(ucStmt) then
+    if RegexObj.Exec(stmt) then
     begin
       n := StrToInt(RegexObj.Match[1]);
       if Database.SQLDialect <> n then
@@ -943,7 +942,7 @@ begin
 
     {Process Remaining Set statements}
     RegexObj.Expression := '^ *SET +([A-Z]+)( +[A-Z0-9]+|) *(\' + Terminator + '|)';
-    if RegexObj.Exec(ucStmt) then
+    if RegexObj.Exec(stmt) then
     begin
       command := AnsiUpperCase(RegexObj.Match[1]);
       param := trim(RegexObj.Match[2]);

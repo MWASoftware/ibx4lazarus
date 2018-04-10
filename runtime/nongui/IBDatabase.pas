@@ -699,15 +699,18 @@ end;
 
 procedure TIBDataBase.ReConnect;
 var OldLoginPrompt: boolean;
+    OldPassword: string;
 begin
   CheckActive;
   if FHiddenPassword <> '' then
   begin
     OldLoginPrompt := LoginPrompt;
+    OldPassword := FHiddenPassword;
     LoginPrompt := false;
     FUseHiddenPassword := true;
     try
       Connected := false;
+      FHiddenPassword := OldPassword;
       Connected := true;
     finally
       LoginPrompt := OldLoginPrompt;
@@ -827,6 +830,7 @@ begin
     FAttachment.DropDatabase;
   end;
   FAttachment := nil;
+  FHiddenPassword := '';
   FCloseAction := caNormal;
 
   if not (csDesigning in ComponentState) then
