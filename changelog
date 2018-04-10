@@ -149,6 +149,8 @@ packages.
     in extracted DDL. New Extract Object member eoComments. This may be used with
     ExtractObject method to list all metadata comments.
 
+32. TIBExtract: ListObjectNames method added.
+
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
 NOTE: THE LOCATIONS OF SOME OF THE UNIT DIRECTORIES HAS CHANGED FROM IBX 2.1. THIS IS TO
