@@ -24,10 +24,10 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, memdslaz, MainFormUnit, DataModule, ibexpress,
+  Forms, memdslaz, MainFormUnit, DataModule, SelectSQLResultsUnit, ibexpress,
   DBLoginDlgUnit, ShutdownRegDlgUnit, ShutdownDatabaseDlgUnit, BackupDlgUnit,
   RestoreDlgUnit, AddSecondaryFileDlgUnit, AddShadowSetDlgUnit, AddShadowFileDlgUnit,
-  NewUserDlgUnit, ChgPasswordDlgUnit
+  NewUserDlgUnit, ChgPasswordDlgUnit, ExecuteSQLScriptDlgUnit
   { you can add units after this };
 
 {$R *.res}
@@ -47,6 +47,7 @@ begin
   Application.CreateForm(TAddShadowSetDlg, AddShadowSetDlg);
   Application.CreateForm(TNewUserDlg, NewUserDlg);
   Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);
+  Application.CreateForm(TExecuteSQLScriptDlg, ExecuteSQLScriptDlg);
   Application.Run;
 end.
 
