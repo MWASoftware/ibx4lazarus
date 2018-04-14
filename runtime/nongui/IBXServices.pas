@@ -3051,6 +3051,10 @@ begin
   end;
 
   FService := FirebirdAPI.GetServiceManager(aServerName,aPortNo,aProtocol,SPB);
+  FServername := aServerName;
+  FProtocol := aProtocol;
+  FPortNo := aPortNo;
+  FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
   PW := FService.getSPB.Find(isc_spb_password);
   if PW <> nil then PW.AsString := 'xxxxxxxx'; {Hide password}
 

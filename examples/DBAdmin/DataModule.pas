@@ -203,6 +203,7 @@ type
     function GetPageBuffers: integer;
     function GetRoleName: string;
     function GetSecurityDatabase: string;
+    function GetServerName: string;
     function GetSweepInterval: integer;
     function GetUserAdminPrivilege: boolean;
     procedure SetAutoAdmin(AValue: boolean);
@@ -256,6 +257,7 @@ type
     property RoleName: string read GetRoleName;
     property DBOwner: string read GetDBOwner;
     property DBSQLDialect: integer read GetDBSQLDialect write SetDBSQLDialect;
+    property ServerName: string read GetServerName;
     property HasUserAdminPrivilege: boolean read GetUserAdminPrivilege;
     property AfterDBConnect: TNotifyEvent read FAfterDBConnect write FAfterDBConnect;
     property AfterDataReload: TNotifyEvent read FAfterDataReload write FAfterDataReload;
@@ -912,6 +914,11 @@ begin
     Result := 'Legacy'
   else
     Result := Trim(SecPlugin.AsString);
+end;
+
+function TDatabaseData.GetServerName: string;
+begin
+  Result := IBXServicesConnection1.ServerName;
 end;
 
 function TDatabaseData.GetSweepInterval: integer;

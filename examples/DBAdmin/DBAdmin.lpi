@@ -44,7 +44,7 @@
         <PackageName Value="LCL"/>
       </Item7>
     </RequiredPackages>
-    <Units Count="13">
+    <Units Count="15">
       <Unit0>
         <Filename Value="DBAdmin.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -133,6 +133,20 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit12>
+      <Unit13>
+        <Filename Value="dlg/ExecuteSQLScriptDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ExecuteSQLScriptDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="SelectSQLResultsUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="SelectSQLResults"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit14>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

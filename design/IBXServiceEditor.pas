@@ -41,6 +41,7 @@ type
   TIBXServiceEditorForm = class(TForm)
     Bevel1: TBevel;
     CancelBtn: TButton;
+    ConnectionTypeBtn: TRadioGroup;
     PortNo: TEdit;
     Label1: TLabel;
     ServiceParams: TMemo;
@@ -49,26 +50,25 @@ type
     Label5: TLabel;
     Label7: TLabel;
     Label8: TLabel;
-    LocalRbtn: TRadioButton;
     LoginPrompt: TCheckBox;
     OKBtn: TButton;
     Password: TEdit;
     Protocol: TComboBox;
-    RemoteRbtn: TRadioButton;
     ServerName: TEdit;
     Test: TButton;
     UserName: TEdit;
-    procedure LocalRbtnClick(Sender: TObject);
-    procedure PasswordChange(Sender: TObject);
-    procedure RemoteRbtnClick(Sender: TObject);
+    procedure ConnectionTypeBtnSelectionChanged(Sender: TObject);
+    procedure PasswordEditingDone(Sender: TObject);
+    procedure ProtocolCloseUp(Sender: TObject);
+    procedure ServiceParamsEditingDone(Sender: TObject);
     procedure TestClick(Sender: TObject);
-    procedure UserNameChange(Sender: TObject);
+    procedure UserNameEditingDone(Sender: TObject);
   private
     { private declarations }
     function Edit: Boolean;
-    function GetParam(aName: string): string;
     procedure AddParam(aName, Value: string);
     procedure DeleteParam(aName: string);
+    procedure UpdateParamEditBoxes;
   public
     { public declarations }
     Service: TIBXServicesConnection;
@@ -96,27 +96,41 @@ end;
 
 { TIBXServiceEditorForm }
 
-procedure TIBXServiceEditorForm.LocalRbtnClick(Sender: TObject);
+procedure TIBXServiceEditorForm.ConnectionTypeBtnSelectionChanged(
+  Sender: TObject);
 begin
-  Label7.Enabled := False;
-  Label8.Enabled := False;
-  ServerName.Enabled := False;
-  Protocol.Enabled := False;
+  if ConnectionTypeBtn.ItemIndex = 0 then
+  begin
+    Label7.Enabled := False;
+    ServerName.Text := '';
+    ServerName.Enabled := False;
+    Protocol.ItemIndex := 3;
+  end
+  else
+  begin
+    Label7.Enabled := True;
+    ServerName.Enabled := True;
+    if Protocol.ItemIndex = 3 then
+      Protocol.ItemIndex := 4;
+  end;
 end;
 
-procedure TIBXServiceEditorForm.PasswordChange(Sender: TObject);
+procedure TIBXServiceEditorForm.PasswordEditingDone(Sender: TObject);
 begin
   AddParam('password', Password.Text);
 end;
 
-procedure TIBXServiceEditorForm.RemoteRbtnClick(Sender: TObject);
+procedure TIBXServiceEditorForm.ProtocolCloseUp(Sender: TObject);
 begin
-  Label7.Enabled := True;
-  Label8.Enabled := True;
-  Protocol.Enabled := True;
-  ServerName.Enabled := True;
-  if Protocol.Text = '' then
-    Protocol.Text := 'TCP';
+  if Protocol.ItemIndex = 3 then
+    ConnectionTypeBtn.ItemIndex := 0
+  else
+    ConnectionTypeBtn.ItemIndex := 1;
+end;
+
+procedure TIBXServiceEditorForm.ServiceParamsEditingDone(Sender: TObject);
+begin
+  UpdateParamEditBoxes;
 end;
 
 procedure TIBXServiceEditorForm.TestClick(Sender: TObject);
@@ -125,20 +139,8 @@ begin
   Test.Enabled := false;
   tempService := TIBXServicesConnection.Create(nil);
   try
-    if LocalRbtn.Checked then
-    begin
-      tempService.ServerName := '';
-      tempService.Protocol := Local;
-    end
-    else
-    begin
-      case Protocol.ItemIndex of
-      0: tempService.Protocol := TCP;
-      1: tempService.Protocol := NamedPipe;
-      2: tempService.Protocol := SPX;
-      end;
-      tempService.ServerName := ServerName.Text
-    end;
+    tempService.Protocol := TProtocol(Protocol.ItemIndex);
+    tempService.ServerName := ServerName.Text;
     tempService.PortNo := PortNo.Text;
     tempService.Params.Assign(ServiceParams.Lines);
     tempService.LoginPrompt := true;
@@ -155,7 +157,7 @@ begin
   end;
 end;
 
-procedure TIBXServiceEditorForm.UserNameChange(Sender: TObject);
+procedure TIBXServiceEditorForm.UserNameEditingDone(Sender: TObject);
 begin
   AddParam('user_name', UserName.Text);
 end;
@@ -168,73 +170,30 @@ begin
     ServiceParams.Lines.Assign(Service.Params);
 
   ServerName.Text := Service.ServerName;
+  Protocol.ItemIndex := ord(Service.Protocol);
   LoginPrompt.Checked := Service.LoginPrompt;
   PortNo.Text := Service.PortNo;
-  UserName.Text := GetParam('user_name');
-  Password.Text := GetParam('password');
-  RemoteRbtn.Checked := (Service.Protocol <> Local);
+  ProtocolCloseUp(nil);
+  ConnectionTypeBtnSelectionChanged(nil);
+  UpdateParamEditBoxes;
   Result := False;
   if ShowModal = mrOk then
   begin
-    if LocalRbtn.Checked then
-    begin
-      Service.Protocol := Local;
-      Service.ServerName := ''
-    end
-    else
-    begin
-      case Protocol.ItemIndex of
-      0: Service.Protocol := TCP;
-      1: Service.Protocol := NamedPipe;
-      2: Service.Protocol := SPX;
-      end;
-      Service.ServerName := ServerName.Text
-    end;
-    Service.Params := ServiceParams.Lines;
-    Service.LoginPrompt := LoginPrompt.Checked;
+    Service.Protocol := TProtocol(Protocol.ItemIndex);
+    Service.ServerName := ServerName.Text;
     Service.PortNo := PortNo.Text;
+    Service.Params.Assign(ServiceParams.Lines);
+    Service.LoginPrompt := LoginPrompt.Checked;
     Result := True;
   end;
 end;
 
-function TIBXServiceEditorForm.GetParam(aName: string): string;
-var
-  i: Integer;
-begin
-  Result := '';
-  for i := 0 to ServiceParams.Lines.Count - 1 do
-  begin
-    if (Pos(aName, LowerCase(ServiceParams.Lines.Names[i])) = 1) then
-    begin
-      Result := ServiceParams.Lines.Values[ServiceParams.Lines.Names[i]];
-      break;
-    end;
-  end;
-end;
-
 procedure TIBXServiceEditorForm.AddParam(aName, Value: string);
-var
-  i: Integer;
-  found: boolean;
 begin
-  found := False;
-  if Trim(Value) <> '' then
-  begin
-    ServiceParams.Lines.NameValueSeparator := '=';
-    for i := 0 to ServiceParams.Lines.Count - 1 do
-    begin
-      if (Pos(aName, LowerCase(ServiceParams.Lines.Names[i])) = 1) then {mbcs ok}
-      begin
-        ServiceParams.Lines.Values[ServiceParams.Lines.Names[i]] := Value;
-        found := True;
-        break;
-      end;
-    end;
-    if not found then
-      ServiceParams.Lines.Add(aName + '=' + Value);
-  end
+  if Trim(Value) = '' then
+    DeleteParam(aName)
   else
-    DeleteParam(Name);
+    ServiceParams.Lines.Values[aName] := Trim(Value);
 end;
 
 procedure TIBXServiceEditorForm.DeleteParam(aName: string);
@@ -249,6 +208,12 @@ begin
         break;
       end;
     end;
+end;
+
+procedure TIBXServiceEditorForm.UpdateParamEditBoxes;
+begin
+  UserName.Text := ServiceParams.Lines.Values['user_name'];
+  Password.Text := ServiceParams.Lines.Values['password'];
 end;
 
 

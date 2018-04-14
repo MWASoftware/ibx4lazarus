@@ -34,6 +34,9 @@ type
   TMainForm = class(TForm)
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
+    MenuItem20: TMenuItem;
+    MenuItem21: TMenuItem;
+    RunScript: TAction;
     AutoAdmin: TCheckBox;
     DatabaseAliasName: TEdit;
     DBEdit5: TDBEdit;
@@ -70,6 +73,8 @@ type
     MappingsTab: TTabSheet;
     AccessRightsTab: TTabSheet;
     Splitter5: TSplitter;
+    ToolButton6: TToolButton;
+    ToolButton7: TToolButton;
     UpdateColsPanel: TPanel;
     ValidateRepairRecordFragments: TCheckBox;
     IgnoreChecksums: TCheckBox;
@@ -307,6 +312,7 @@ type
     procedure RepairTabShow(Sender: TObject);
     procedure RevokeAllExecute(Sender: TObject);
     procedure RevokeAllUpdate(Sender: TObject);
+    procedure RunScriptExecute(Sender: TObject);
     procedure SelectAllTablesChange(Sender: TObject);
     procedure SelectedTablesOnlyChange(Sender: TObject);
     procedure SelectRepairActionCloseUp(Sender: TObject);
@@ -363,7 +369,7 @@ implementation
 {$R *.lfm}
 
 uses DataModule, ShutdownRegDlgUnit, AddSecondaryFileDlgUnit, NewUserDlgUnit,
-  ChgPasswordDlgUnit, FBMessages;
+  ChgPasswordDlgUnit, FBMessages, ExecuteSQLScriptDlgUnit;
 
 { TMainForm }
 
@@ -742,6 +748,11 @@ begin
   with AccessRightsSource.DataSet do
   (Sender as TAction).Enabled := Active and (RecordCount > 0) and
     (FieldByName('SUBJECT_TYPE').AsInteger = 8);
+end;
+
+procedure TMainForm.RunScriptExecute(Sender: TObject);
+begin
+  ExecuteSQLScriptDlg.ShowModal;
 end;
 
 procedure TMainForm.SelectAllTablesChange(Sender: TObject);

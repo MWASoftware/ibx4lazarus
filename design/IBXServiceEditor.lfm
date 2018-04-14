@@ -15,33 +15,12 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Width = 395
     Anchors = [akTop, akLeft, akRight, akBottom]
   end
-  object LocalRbtn: TRadioButton
-    Left = 32
-    Height = 22
-    Top = 32
-    Width = 55
-    Caption = '&Local'
-    Checked = True
-    OnClick = LocalRbtnClick
-    TabOrder = 0
-    TabStop = True
-  end
-  object RemoteRbtn: TRadioButton
-    Left = 97
-    Height = 22
-    Top = 32
-    Width = 69
-    Caption = '&Remote'
-    OnClick = RemoteRbtnClick
-    TabOrder = 1
-  end
   object Label7: TLabel
     Left = 32
     Height = 14
     Top = 71
     Width = 43
     Caption = '&Server:'
-    Enabled = False
     ParentColor = False
   end
   object ServerName: TEdit
@@ -49,8 +28,7 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Height = 24
     Top = 89
     Width = 144
-    Enabled = False
-    TabOrder = 2
+    TabOrder = 0
   end
   object Label8: TLabel
     Left = 217
@@ -58,7 +36,6 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Top = 71
     Width = 52
     Caption = '&Protocol:'
-    Enabled = False
     ParentColor = False
   end
   object Protocol: TComboBox
@@ -66,14 +43,22 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Height = 27
     Top = 89
     Width = 120
-    Enabled = False
     ItemHeight = 0
+    ItemIndex = 4
     Items.Strings = (
       'TCP'
       'NamedPipe'
       'SPX'
+      'Local'
+      'inet'
+      'inet4'
+      'inet6'
+      'wnet'
+      'xnet'
     )
-    TabOrder = 3
+    OnCloseUp = ProtocolCloseUp
+    TabOrder = 1
+    Text = 'inet'
   end
   object Label2: TLabel
     Left = 32
@@ -88,8 +73,8 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Height = 24
     Top = 154
     Width = 137
-    OnChange = UserNameChange
-    TabOrder = 4
+    OnEditingDone = UserNameEditingDone
+    TabOrder = 2
   end
   object Label3: TLabel
     Left = 32
@@ -104,8 +89,8 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Height = 24
     Top = 210
     Width = 137
-    OnChange = PasswordChange
-    TabOrder = 5
+    OnEditingDone = PasswordEditingDone
+    TabOrder = 3
   end
   object LoginPrompt: TCheckBox
     Left = 32
@@ -113,15 +98,16 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Top = 256
     Width = 105
     Caption = 'Lo&gin Prompt'
-    TabOrder = 6
+    TabOrder = 4
   end
   object ServiceParams: TMemo
     Left = 217
     Height = 124
     Top = 154
     Width = 183
+    OnEditingDone = ServiceParamsEditingDone
     ScrollBars = ssAutoVertical
-    TabOrder = 7
+    TabOrder = 5
   end
   object Label5: TLabel
     Left = 217
@@ -141,7 +127,7 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 8
+    TabOrder = 6
   end
   object CancelBtn: TButton
     Left = 169
@@ -152,7 +138,7 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 9
+    TabOrder = 7
   end
   object Test: TButton
     Left = 249
@@ -162,7 +148,7 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Anchors = [akLeft, akBottom]
     Caption = '&Test'
     OnClick = TestClick
-    TabOrder = 10
+    TabOrder = 8
   end
   object Label1: TLabel
     Left = 352
@@ -177,6 +163,31 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     Height = 24
     Top = 89
     Width = 48
-    TabOrder = 11
+    TabOrder = 9
+  end
+  object ConnectionTypeBtn: TRadioGroup
+    Left = 32
+    Height = 35
+    Top = 32
+    Width = 368
+    AutoFill = True
+    Caption = 'Connection'
+    ChildSizing.LeftRightSpacing = 6
+    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+    ChildSizing.EnlargeVertical = crsHomogenousChildResize
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 2
+    ClientHeight = 20
+    ClientWidth = 366
+    Columns = 2
+    ItemIndex = 0
+    Items.Strings = (
+      'Local'
+      'Remote'
+    )
+    OnSelectionChanged = ConnectionTypeBtnSelectionChanged
+    TabOrder = 10
   end
 end
