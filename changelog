@@ -1,4 +1,4 @@
-IBX Change Log  version             (2.3-0) Tue, 10 Apr 2018 14:27:10 +0100
+IBX Change Log  version              (2.3-0) Sat, 14 Apr 2018 16:42:39 +0100
 
 IMPORTANT: the source code tree has been re-organised for IBX 2.3. Please remove
 all previous copies of the IBX source code tree before installing this release.
@@ -150,6 +150,9 @@ packages.
     ExtractObject method to list all metadata comments.
 
 32. TIBExtract: ListObjectNames method added.
+
+33. Updated Database component editor to support additional connection string
+    types.
 
 IBX Change Log  version  (2.2-0) Wed, 28 Feb 2018 10:57:45 +0000
 
