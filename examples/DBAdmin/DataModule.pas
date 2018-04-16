@@ -689,7 +689,9 @@ procedure TDatabaseData.Connect;
     end;
   end;
 
+var KillDone: boolean;
 begin
+  KillDone := false;
   Disconnect;
   repeat
     try
@@ -701,14 +703,15 @@ begin
       end;
     On E: EIBInterBaseError do
       begin
-        if E.IBErrorCode = isc_io_error then
+        FDBPassword := '';
+        if (E.IBErrorCode = isc_io_error) and not KillDone then
         begin
           if MessageDlg('I/O Error reported on database file. If this is a shadow file, do you want '+
                         'to kill all unavailable shadow sets?. The original message is ' + E.Message,
                         mtInformation,[mbYes,mbNo],0) = mrNo then
             continue;
           try KillShadows except end;
-          FDBPassword := '';
+          KillDone := true;
         end
         else
           ReportException(E);
