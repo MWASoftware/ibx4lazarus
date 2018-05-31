@@ -75,7 +75,7 @@ type
                  stInDoubleQuotes, stInComment, stInCommentLine, stInOrder,
                  stNestedWhere,stNestedFrom,stInOrderBy,stDone,stUnion,
                  stInParam,stNestedGroupBy,stCTE,stCTE1,stCTE2,stCTE3, stCTEquoted,
-                 stInCTE,stCTEClosed);
+                 stInCTE,stCTEClosed, stNotASelectStmt);
 
   PCTEDef = ^TCTEDef;
   TCTEDef = record
@@ -126,6 +126,7 @@ type
     function Check4ReservedWord(const Text: string): TSQLSymbol;
     procedure AnalyseLine(const Line: string);
     procedure AnalyseSQL(Lines: TStrings);
+    function GetNotaSelectStmt: boolean;
     procedure InitCTE;
     procedure AddCTE;
     function GetNextSymbol(C: char): TSQLSymbol;
@@ -168,6 +169,7 @@ type
     property UnionAll: boolean read FUnionAll write FUnionAll;
              {When true this is joined by "Union All" to the parent Select}
     property ParamList: TStringList read FParamList;
+    property NotaSelectStmt: boolean read GetNotaSelectStmt;
     property OnSQLChanging: TNotifyEvent read FOnSQLChanging write FOnSQLChanging;
   end;
 
@@ -240,6 +242,11 @@ begin
   Result := FCTEs.Count;
 end;
 
+function TSelectSQLParser.GetNotaSelectStmt: boolean;
+begin
+  Result := FState = stNotASelectStmt;
+end;
+
 procedure TSelectSQLParser.Add2WhereClause(const Condition: string;
   OrClause: boolean; IncludeUnions: boolean);
 begin
@@ -277,9 +284,16 @@ begin
   begin
     if FState = stError then
       raise Exception.Create('Entered Error State');
+
     Symbol := GetSymbol(Line,FIndex);
     if (FState = stInParam) and (Symbol <> sqString) then
       raise Exception.Create(sBadParameter);
+
+    if (FState = stInit) and not (Symbol in [sqSelect,sqWith]) then
+    begin
+      FState := stNotASelectStmt;
+      Exit; {abandon all hope}
+    end;
 
     case Symbol of
     sqSpace:

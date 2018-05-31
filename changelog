@@ -1,3 +1,14 @@
+IBX Change Log  version                (2.3-1) Mon, 16 Apr 2018 09:48:06 +0100
+
+1.  IBSQLParser: new property NotaSelectStmt. Set to true if SQL does not start
+    with "with" or "select".
+
+2.  TIBCustomDataSet: SQLParser ignored if it does not contain a valid select
+    statement. This avoids problems if "Execute Block" is used as the Query.
+
+3.  Fix error in TIBXScript processing of "set" statements. This avoids exceptions
+    being raised for valid set statements processed by a data formatter.
+
 IBX Change Log  version                (2.3-0) Mon, 16 Apr 2018 09:48:06 +0100
 
 IMPORTANT: the source code tree has been re-organised for IBX 2.3. Please remove

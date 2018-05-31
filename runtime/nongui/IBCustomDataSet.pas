@@ -2699,7 +2699,7 @@ begin
     ActivateTransaction;
     FBase.CheckDatabase;
     FBase.CheckTransaction;
-    if HasParser and (FParser.SQLText <> FQSelect.SQL.Text) then
+    if HasParser and not FParser.NotaSelectStmt and (FParser.SQLText <> FQSelect.SQL.Text) then
     begin
       FQSelect.OnSQLChanged := nil; {Do not react to change}
       try

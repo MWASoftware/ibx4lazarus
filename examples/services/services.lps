@@ -177,22 +177,22 @@
       <Unit16>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1222"/>
+        <TopLine Value="1220"/>
         <CursorPos Y="1249"/>
         <UsageCount Value="23"/>
       </Unit16>
       <Unit17>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="246"/>
-        <CursorPos X="13" Y="261"/>
+        <TopLine Value="244"/>
+        <CursorPos X="3" Y="248"/>
         <UsageCount Value="14"/>
       </Unit17>
       <Unit18>
         <Filename Value="../../../fbintf/client/3.0/FB30ClientAPI.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="61"/>
-        <CursorPos X="14" Y="84"/>
+        <TopLine Value="108"/>
+        <CursorPos X="35" Y="128"/>
         <UsageCount Value="11"/>
       </Unit18>
       <Unit19>
@@ -442,9 +442,9 @@
       <Unit53>
         <Filename Value="../../../fbintf/client/3.0/firebird/Firebird.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="4"/>
-        <CursorPos Y="21"/>
-        <UsageCount Value="9"/>
+        <TopLine Value="2221"/>
+        <CursorPos X="9" Y="2240"/>
+        <UsageCount Value="10"/>
       </Unit53>
       <Unit54>
         <Filename Value="../../changelog"/>
