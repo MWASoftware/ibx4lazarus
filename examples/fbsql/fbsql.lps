@@ -4,7 +4,7 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="72">
+    <Units Count="71">
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -124,7 +124,8 @@
       <Unit16>
         <Filename Value="..\..\changelog"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="73" Y="10"/>
+        <TopLine Value="109"/>
+        <CursorPos X="62" Y="131"/>
         <UsageCount Value="25"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
@@ -444,15 +445,15 @@
       <Unit60>
         <Filename Value="..\..\runtime\nongui\ibxscript.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="967"/>
-        <CursorPos X="49" Y="990"/>
+        <TopLine Value="851"/>
+        <CursorPos X="43" Y="876"/>
         <UsageCount Value="12"/>
       </Unit60>
       <Unit61>
         <Filename Value="..\..\runtime\nongui\IBDataOutput.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="543"/>
-        <CursorPos Y="595"/>
+        <TopLine Value="54"/>
+        <CursorPos X="15" Y="136"/>
         <UsageCount Value="11"/>
       </Unit61>
       <Unit62>
@@ -526,23 +527,12 @@
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="Bash"/>
       </Unit70>
-      <Unit71>
-        <Filename Value="..\..\..\fbintf\client\FBSQLLex.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="184"/>
-        <CursorPos X="18" Y="217"/>
-        <UsageCount Value="10"/>
-      </Unit71>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="1">
       <Position1>
         <Filename Value="fbsql.lpr"/>
         <Caret Line="41" Column="20" TopLine="31"/>
       </Position1>
-      <Position2>
-        <Filename Value="fbsql.lpr"/>
-        <Caret Line="436" Column="21" TopLine="404"/>
-      </Position2>
     </JumpHistory>
   </ProjectSession>
   <Debugging>

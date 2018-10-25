@@ -9,7 +9,7 @@ object Form1: TForm1
   DefaultMonitor = dmPrimary
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.3.0'
+  LCLVersion = '1.8.0.4'
   object Label1: TLabel
     Left = 14
     Height = 14
@@ -114,7 +114,6 @@ object Form1: TForm1
   object IBXScript1: TIBXScript
     Database = IBDatabase1
     IgnoreGrants = False
-    IgnoreCreateDatabase = False
     Transaction = IBTransaction1
     ShowAffectedRows = False
     ShowPerformanceStats = False
@@ -136,7 +135,6 @@ object Form1: TForm1
       'lc_ctype=UTF8                           '
       'user_name=SYSDBA'
     )
-    DefaultTransaction = IBTransaction1
     IdleTimer = 0
     TraceFlags = []
     UseDefaultSystemCodePage = False

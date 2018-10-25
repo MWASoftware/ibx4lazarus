@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="26">
+    <Units Count="23">
       <Unit0>
         <Filename Value="ibstoredprocdemo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -57,8 +57,8 @@
       <Unit5>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="926"/>
-        <CursorPos X="14" Y="945"/>
+        <TopLine Value="897"/>
+        <CursorPos X="31" Y="917"/>
         <UsageCount Value="10"/>
       </Unit5>
       <Unit6>
@@ -121,8 +121,8 @@
       <Unit14>
         <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="758"/>
-        <CursorPos X="25" Y="768"/>
+        <TopLine Value="98"/>
+        <CursorPos X="12" Y="117"/>
         <UsageCount Value="10"/>
       </Unit14>
       <Unit15>
@@ -180,28 +180,28 @@
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="SQL"/>
       </Unit22>
-      <Unit23>
-        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="963"/>
-        <CursorPos X="72" Y="974"/>
-        <UsageCount Value="10"/>
-      </Unit23>
-      <Unit24>
-        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/astrings.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="160"/>
-        <CursorPos Y="189"/>
-        <UsageCount Value="10"/>
-      </Unit24>
-      <Unit25>
-        <Filename Value="/usr/share/fpcsrc/rtl/unix/cwstring.pp"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="899"/>
-        <CursorPos Y="919"/>
-        <UsageCount Value="10"/>
-      </Unit25>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="5" HistoryIndex="4">
+      <Position1>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="81" TopLine="66"/>
+      </Position1>
+      <Position2>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="80" TopLine="65"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="112" Column="27" TopLine="91"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="112" Column="27" TopLine="58"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="114" Column="27" TopLine="75"/>
+      </Position5>
+    </JumpHistory>
   </ProjectSession>
 </CONFIG>

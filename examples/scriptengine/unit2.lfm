@@ -11,7 +11,7 @@ object SelectSQLResults: TSelectSQLResults
   OnClose = FormClose
   OnShow = FormShow
   Position = poDefault
-  LCLVersion = '1.8.3.0'
+  LCLVersion = '1.8.0.4'
   object IBDynamicGrid1: TIBDynamicGrid
     Left = 0
     Height = 436
@@ -35,10 +35,8 @@ object SelectSQLResults: TSelectSQLResults
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
-    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
-    MasterDetailDelay = 0
     Params = <>
     DataSetCloseAction = dcDiscardChanges
     left = 591
