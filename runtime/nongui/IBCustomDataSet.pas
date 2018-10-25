@@ -1158,10 +1158,18 @@ begin
        3, {Assume UNICODE_FSS is really UTF8}
        4: {Include GB18030 - assuming UTF8 routines work for this codeset}
          if DisplayWidth = 0 then
+           {$if not defined(ValidUTF8String)}
+           Result := Utf8EscapeControlChars(TextToSingleLine(Result))
+           {$else}
            Result := ValidUTF8String(TextToSingleLine(Result))
+           {$endif}
          else
          if UTF8Length(Result) > DisplayWidth then {Show truncation with elipses}
+           {$if not defined(ValidUTF8String)}
+           Result := Utf8EscapeControlChars(TextToSingleLine(UTF8Copy(Result,1,DisplayWidth-3))) + '...';
+           {$else}
            Result := ValidUTF8String(TextToSingleLine(UTF8Copy(Result,1,DisplayWidth-3))) + '...';
+           {$endif}
        end;
    end
 end;

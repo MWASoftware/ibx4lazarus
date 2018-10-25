@@ -1,3 +1,9 @@
+IBX Change Log  version                (2.3-1) Mon, 16 Apr 2018 09:48:06 +0100
+
+1. IBCustomDataset: replace deprecated function ValidUTF8String with call to
+   Utf8EscapeControlChars
+
+
 IBX Change Log  version                (2.3-0) Mon, 16 Apr 2018 09:48:06 +0100
 
 IMPORTANT: the source code tree has been re-organised for IBX 2.3. Please remove
