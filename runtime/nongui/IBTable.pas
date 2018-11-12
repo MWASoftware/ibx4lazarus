@@ -221,8 +221,10 @@ begin
   if FDelayTimerValue = AValue then Exit;
   FDelayTimerValue := AValue;
   {$IF FPC_FULLVERSION >= 30002}
+  {$ifdef UNIX}
   if (AValue > 0) and not IsMultiThread then
     IBError(ibxeMultiThreadRequired,['TIBTable MasterDetailDelay']);
+  {$endif}
   FTimer.Interval := FDelayTimerValue;
   {$IFEND}
 end;
