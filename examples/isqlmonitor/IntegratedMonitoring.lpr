@@ -37,7 +37,8 @@ uses
 
 {$R *.res}
 
-begin   Application.Title := 'Integrated Monitoring Example';
+begin   
+  Application.Title := 'Integrated Monitoring Example';
 
 {
   if you want to open a console window in Windows (for writeln debugging

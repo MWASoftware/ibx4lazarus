@@ -56,11 +56,14 @@ type
                                NameReadOnly: Boolean): Boolean; virtual;
     procedure SetCursor;
     procedure RestoreCursor;
+    function CreateTimer: TIBTimerInf;
   end;
 
 implementation
 
 {$R IBDialogs.lfm}
+
+uses CustomTimer;
 
 type
   { TIBXLoginDlg }
@@ -80,6 +83,90 @@ type
   public
     { public declarations }
   end;
+
+  { TIBTimer }
+
+  TIBTimer = class(TInterfacedObject,TIBTimerInf)
+  private
+    FTimer: TCustomTimer;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function GetEnabled: boolean;
+    procedure SetEnabled(Value: Boolean);
+    function GetInterval: Cardinal;
+    procedure SetInterval(Value: Cardinal);
+    function GetOnTimer: TNotifyEvent;
+    procedure SetOnTimer(Value: TNotifyEvent);
+    function GetOnStartTimer: TNotifyEvent;
+    procedure SetOnStartTimer(Value: TNotifyEvent);
+    function GetOnStopTimer: TNotifyEvent;
+    procedure SetOnStopTimer(Value: TNotifyEvent);
+end;
+
+{ TIBTimer }
+
+constructor TIBTimer.Create;
+begin
+  inherited Create;
+  FTimer := TCustomTimer.Create(nil);
+end;
+
+destructor TIBTimer.Destroy;
+begin
+  if FTimer <> nil then FTimer.Free;
+  inherited Destroy;
+end;
+
+function TIBTimer.GetEnabled: boolean;
+begin
+  Result := FTimer.Enabled;
+end;
+
+procedure TIBTimer.SetEnabled(Value: Boolean);
+begin
+  FTimer.Enabled := Value;
+end;
+
+function TIBTimer.GetInterval: Cardinal;
+begin
+  Result := FTimer.Interval;
+end;
+
+procedure TIBTimer.SetInterval(Value: Cardinal);
+begin
+  FTimer.Interval := Value;
+end;
+
+function TIBTimer.GetOnTimer: TNotifyEvent;
+begin
+  Result := FTimer.OnTimer;
+end;
+
+procedure TIBTimer.SetOnTimer(Value: TNotifyEvent);
+begin
+  FTimer.OnTimer := Value;
+end;
+
+function TIBTimer.GetOnStartTimer: TNotifyEvent;
+begin
+  Result := FTimer.OnStartTimer;
+end;
+
+procedure TIBTimer.SetOnStartTimer(Value: TNotifyEvent);
+begin
+  FTimer.OnStartTimer := Value;
+end;
+
+function TIBTimer.GetOnStopTimer: TNotifyEvent;
+begin
+  Result := FTimer.OnStopTimer;
+end;
+
+procedure TIBTimer.SetOnStopTimer(Value: TNotifyEvent);
+begin
+  FTimer.OnStopTimer := Value;
+end;
 
 function TIBLCLInterface.ServerLoginDialog(var AServerName: string;
   var AUserName, APassword: string): Boolean;
@@ -158,6 +245,11 @@ begin
      if FSetCursorDepth = 0 then
        Screen.Cursor := crDefault
   end;
+end;
+
+function TIBLCLInterface.CreateTimer: TIBTimerInf;
+begin
+  Result := TIBTimer.Create;
 end;
 
 initialization

@@ -186,7 +186,7 @@ type
 
 implementation
 
-uses FBMessages, fpTimer;
+uses FBMessages, IBTypes;
 
 type
 
@@ -195,14 +195,13 @@ type
   TIBMasterDataLink = class(TMasterDataLink)
   private
     FDelayTimerValue: integer;
-    FTimer: TFPTimer;
+    FTimer: TIBTimerInf;
     procedure HandleRefreshTimer(Sender: TObject);
     procedure SetDelayTimerValue(AValue: integer);
   protected
     procedure DoMasterChange; override;
   public
     constructor Create(ADataSet: TDataSet); override;
-    destructor Destroy; override;
     property DelayTimerValue: integer {in Milliseconds}
             read FDelayTimerValue write SetDelayTimerValue;
   end;
@@ -219,50 +218,38 @@ end;
 procedure TIBMasterDataLink.SetDelayTimerValue(AValue: integer);
 begin
   if FDelayTimerValue = AValue then Exit;
+  if assigned(FTimer) then
+    FTimer.Enabled := false;
   FDelayTimerValue := AValue;
-  {$IF FPC_FULLVERSION >= 30002}
-  {$ifdef UNIX}
-  if (AValue > 0) and not IsMultiThread then
-    IBError(ibxeMultiThreadRequired,['TIBTable MasterDetailDelay']);
-  {$endif}
-  FTimer.Interval := FDelayTimerValue;
-  {$IFEND}
 end;
 
 procedure TIBMasterDataLink.DoMasterChange;
 begin
-  {$IF FPC_FULLVERSION >= 30002}
-  if FDelayTimerValue > 0 then
+  if assigned(FTimer) and (FDelayTimerValue > 0) then
   with FTimer do
   begin
-    CheckSynchronize; {Ensure not waiting on Synchronize}
-    if Enabled then
-    begin
-      StopTimer;
-      StartTimer;
-    end
-    else
-      Enabled := true;
+    FTimer.Enabled := false;
+    FTimer.Interval := FDelayTimerValue;
+    FTimer.Enabled := true;
   end
   else
-  {$IFEND}
     inherited DoMasterChange
 end;
 
 constructor TIBMasterDataLink.Create(ADataSet: TDataSet);
 begin
   inherited Create(ADataSet);
-  FTimer := TFPTimer.Create(nil);
-  FTimer.Enabled := false;
-  FTimer.Interval := 0;
-  FTimer.OnTimer := HandleRefreshTimer;
+  if assigned(IBGUIInterface) then
+  begin
+    FTimer := IBGUIInterface.CreateTimer;
+    if FTimer <> nil then
+    begin
+      FTimer.Enabled := false;
+      FTimer.Interval := 0;
+      FTimer.OnTimer := HandleRefreshTimer;
+    end;
+  end;
   FDelayTimerValue := 0;
-end;
-
-destructor TIBMasterDataLink.Destroy;
-begin
-  if assigned(FTimer) then FTimer.Free;
-  inherited Destroy;
 end;
 
 { TIBTable }
