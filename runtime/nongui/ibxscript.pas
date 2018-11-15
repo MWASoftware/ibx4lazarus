@@ -985,10 +985,13 @@ begin
       begin
         if assigned(DataOutputFormatter) then
           DataOutputFormatter.SetCommand(command,param,stmt,Result);
-        if not Result and assigned(OnSetStatement) then
-          OnSetStatement(self,command,param,stmt,Result)
-        else
-          raise Exception.CreateFmt(sInvalidSetStatement, [command,stmt]);
+        if not Result then
+        begin
+          if assigned(OnSetStatement) then
+            OnSetStatement(self,command,param,stmt,Result)
+          else
+            raise Exception.CreateFmt(sInvalidSetStatement, [command,stmt]);
+        end;
         Exit;
       end;
       Result := true;
