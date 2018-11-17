@@ -31,7 +31,7 @@ unit ibxscript;
 
 interface
 
-uses Classes, IBDatabase,  IBSQL, IB, IBDataOutput;
+uses Classes, IBDatabase,  IBSQL, IB, IBDataOutput, IBUtils;
 
 const
   ibx_blob = 'IBX_BLOB';
@@ -64,27 +64,61 @@ type
 
   TSQLStates =  (stInit, stError, stInSQL, stNested,  stInDeclaration);
 
-  TXMLStates =  (stInTag,stAttribute,stAttributeValue,stQuotedAttributeValue,
-                 stTagged,stEndTag);
-
-  TXMLTag    =   (xtNone,xtBlob,xtArray,xtElt);
-
   TOnNextLine = procedure(Sender: TObject; Line: string) of object;
   TOnProgressEvent = procedure (Sender: TObject; Reset: boolean; value: integer) of object;
 
-  TXMLTagDef = record
-    XMLTag: TXMLTag;
-    TagValue: string;
-  end;
 
-const
-  XMLTagDefs: array [0..2] of TXMLTagDef = (
-    (XMLTag: xtBlob;   TagValue: 'blob'),
-    (XMLTag: xtArray;  TagValue: 'array'),
-    (XMLTag: xtElt;    TagValue: 'elt')
-    );
 
 type
+
+  { TSQLStatementReader }
+
+  TSQLStatementReader = class(TSQLTokeniser)
+  private
+    type
+      TXMLStates =  (stNoXML, stInTag,stAttribute,stAttributeValue,stQuotedAttributeValue,
+                     stTagged,stEndTag, stData);
+      TXMLTag    =   (xtNone,xtBlob,xtArray,xtElt);
+      TXMLTagDef = record
+        XMLTag: TXMLTag;
+        TagValue: string;
+      end;
+    const
+      XMLTagDefs: array [0..2] of TXMLTagDef = (
+        (XMLTag: xtBlob;   TagValue: 'blob'),
+        (XMLTag: xtArray;  TagValue: 'array'),
+        (XMLTag: xtElt;    TagValue: 'elt')
+        );
+  private
+    FState: TXMLStates;
+    FXMLTag: TXMLTag;
+//    FXMLTagStack: array [1..20] of TXMLTag;
+//    FXMLTagIndex: integer;
+    FAttributeName: string;
+    FXMLData: string;
+    FBlobData: array of TBlobData;
+    FCurrentBlob: integer;
+    FBlobBuffer: PChar;
+    FArrayData: array of TArrayData;
+    FCurrentArray: integer;
+    function FindTag(tag: string; var xmlTag: TXMLTag): boolean;
+    function GetArrayData(index: integer): TArrayData;
+    function GetArrayDataCount: integer;
+    function GetBlobData(index: integer): TBlobData;
+    function GetBlobDataCount: integer;
+    procedure ProcessAttributeValue(attrValue: string);
+    procedure ProcessBoundsList(boundsList: string);
+  protected
+    function GetNextTokenHook(C: char; var token: TSQLTokens): boolean; override;
+    function TokenFound(var token: TSQLTokens): boolean; override;
+  public
+    constructor Create;
+    property BlobData[index: integer]: TBlobData read GetBlobData;
+    property BlobDataCount: integer read GetBlobDataCount;
+    property ArrayData[index: integer]: TArrayData read GetArrayData;
+    property ArrayDataCount: integer read GetArrayDataCount;
+ end;
+
 
   { TSymbolStream }
 
@@ -489,6 +523,200 @@ end;
 procedure StringToHex(octetString: string; TextOut: TStrings; MaxLineLength: integer); overload;
 begin
     TextOut.Add(StringToHex(octetString,MaxLineLength));
+end;
+
+{ TSQLStatementReader }
+
+function TSQLStatementReader.FindTag(tag: string; var xmlTag: TXMLTag): boolean;
+var i: integer;
+begin
+  Result := false;
+  for i := 0 to Length(XMLTagDefs) - 1 do
+    if XMLTagDefs[i].TagValue = tag then
+    begin
+      xmlTag := XMLTagDefs[i].XMLTag;
+      Result := true;
+      break;
+    end;
+end;
+
+function TSQLStatementReader.GetArrayData(index: integer): TArrayData;
+begin
+  if (index < 0) or (index > ArrayDataCount) then
+    FSymbolStream.ShowError(sArrayIndexError,[index]);
+  Result := FArrayData[index];
+end;
+
+function TSQLStatementReader.GetArrayDataCount: integer;
+begin
+  Result := Length(FArrayData);
+end;
+
+function TSQLStatementReader.GetBlobData(index: integer): TBlobData;
+begin
+  if (index < 0) or (index > BlobDataCount) then
+    FSymbolStream.ShowError(sBlobIndexError,[index]);
+  Result := FBlobData[index];
+end;
+
+function TSQLStatementReader.GetBlobDataCount: integer;
+begin
+  Result := Length(FBlobData);
+end;
+
+procedure TSQLStatementReader.ProcessAttributeValue(attrValue: string);
+begin
+  case FXMLTag of
+  xtBlob:
+    if FAttributeName = 'subtype' then
+      FBlobData[FCurrentBlob].SubType := StrToInt(attrValue)
+    else
+      FSymbolStream.ShowError(sXMLAttributeError,[FAttributeName,attrValue]);
+
+  xtArray:
+    if FAttributeName = 'sqltype' then
+      FArrayData[FCurrentArray].SQLType := StrToInt(attrValue)
+    else
+    if FAttributeName = 'relation_name' then
+      FArrayData[FCurrentArray].relationName := attrValue
+    else
+    if FAttributeName = 'column_name' then
+      FArrayData[FCurrentArray].columnName := attrValue
+    else
+    if FAttributeName = 'dim' then
+      FArrayData[FCurrentArray].Dim := StrToInt(attrValue)
+    else
+    if FAttributeName = 'length' then
+      FArrayData[FCurrentArray].Size := StrToInt(attrValue)
+    else
+    if FAttributeName = 'scale' then
+      FArrayData[FCurrentArray].Scale := StrToInt(attrValue)
+    else
+    if FAttributeName = 'charset' then
+      FArrayData[FCurrentArray].CharSet := attrValue
+    else
+    if FAttributeName = 'bounds' then
+      ProcessBoundsList(attrValue)
+    else
+      FSymbolStream.ShowError(sXMLAttributeError,[FAttributeName,attrValue]);
+
+  xtElt:
+    if FAttributeName = 'ix' then
+      with FArrayData[FCurrentArray] do
+        Index[CurrentRow] :=  StrToInt(attrValue)
+     else
+        FSymbolStream.ShowError(sXMLAttributeError,[FAttributeName,attrValue]);
+  end;
+end;
+
+procedure TSQLStatementReader.ProcessBoundsList(boundsList: string);
+var list: TStringList;
+    i,j: integer;
+begin
+  list := TStringList.Create;
+  try
+    list.Delimiter := ',';
+    list.DelimitedText := boundsList;
+    with FArrayData[FCurrentArray] do
+    begin
+      if dim <> list.Count then
+        FSymbolStream.ShowError(sInvalidBoundsList,[boundsList]);
+      SetLength(bounds,dim);
+      for i := 0 to list.Count - 1 do
+      begin
+        j := Pos(':',list[i]);
+        if j = 0 then
+          raise Exception.CreateFmt(sInvalidBoundsList,[boundsList]);
+        bounds[i].LowerBound := StrToInt(system.copy(list[i],1,j-1));
+        bounds[i].UpperBound := StrToInt(system.copy(list[i],j+1,length(list[i])-j));
+      end;
+    end;
+  finally
+    list.Free;
+  end;
+end;
+
+function TSQLStatementReader.GetNextTokenHook(C: char; var token: TSQLTokens
+  ): boolean;
+begin
+  Result := false;
+end;
+
+function TSQLStatementReader.TokenFound(var token: TSQLTokens): boolean;
+begin
+  case FState of
+  stNoXML:
+    if token = sqltLT then
+    begin
+      QueueToken(token);
+      State := stInTag;
+    end;
+
+  stInTag:
+    case token of
+    sqltIdentifier:
+      begin
+        if FindTag(TokenText,FXMLTag) then
+        begin
+          QueueToken(token);
+          State := stTagged;
+        end
+        else
+        begin
+          ReleaseQueue(token);
+          FXMLState := stNoXML;
+        end;
+      end;
+
+    sqltForwardSlash:
+      FState := stEndTag;
+
+    else
+      begin
+        ReleaseQueue(token);
+        FXMLState := stNoXML;
+      end;
+    end;
+
+  stTagged:
+    case token of
+    sqltIdentifier:
+      begin
+        FAttributeName := TokenText;
+        QueueToken(token);
+        State := stAttribute;
+      end;
+
+    sqltGT:
+      begin
+        ResetQueue;
+        FState := stXMLData;
+      end;
+    end;
+
+  stAttribute:
+    if token = sqltEquals then
+    begin
+      QueueToken(token);
+      State := stAttributeValue;
+    end;
+
+  stAttributeValue:
+    if token in [sqltIdentifier,sqltIdentifierInDoubleQuotes] then
+    begin
+      ProcessAttributeValue(TokenText);
+      QueueToken(token);
+      State := stTagged;
+    end;
+
+  end;
+  Result := (FXMLState = stNoXML) and inherited TokenFound;
+end;
+
+constructor TSQLStatementReader.Create;
+begin
+  inherited;
+  FXMLState := stNoXML;
 end;
 
 
