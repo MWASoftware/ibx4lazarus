@@ -31,7 +31,7 @@ unit IBSQLParser;
 
 interface
 
-uses Classes, DB;
+uses Classes, DB, IBUtils;
 
 {
   The SQL Parser is a partial SQL Parser intended to parser a Firebird DML (Select)
@@ -64,6 +64,27 @@ uses Classes, DB;
 }
 
 type
+
+  { TSelectSQLTokeniser }
+
+  TSelectSQLTokeniser = class(TSQLStreamTokeniser)
+  private
+    type
+      TSQLState = (stDefault, stWith, stInCTE, stInRecursiveCTE,stInSelect,
+                   stInFrom,stInWhere,stInGroupBy,
+                   stInHaving,stInPlan, stInUnion, stInUnionAll,
+                   stInOrderBy, stInRows, stNotASelectStmt);
+  private
+    FSQLState: TSQLState;
+    FNested: integer;
+    FNextTag: TXMLTag;
+    FClause: string;
+  protected
+    function TokenFound(var token: TSQLTokens): boolean; override;
+    procedure Reset; override;
+  public
+  end;
+
   TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes, sqComma,
                 sqString,sqCommentStart,sqUnion,sqAll,sqColon,
                 sqCommentEnd,sqCommentLine,sqAsterisk,sqForwardSlash,
@@ -187,6 +208,265 @@ resourcestring
   sStackUnderFlow = 'Stack Underflow';
   sStackOverFlow  = 'Stack Overflow';
   sBadParameter   = 'Bad SQL Parameter';
+
+{ TSelectSQLTokeniser }
+
+function TSelectSQLTokeniser.TokenFound(var token: TSQLTokens): boolean;
+var StateOnEntry: TSQLState;
+    temp: TSQLTokens;
+begin
+  StateOnEntry := FSQLState;
+  if not (token in [sqltEOF,sqltComment,sqltCommentLine]) then
+  begin
+    if FNested = 0  then
+    case FSQLState of
+    stDefault:
+      begin
+        case token of
+        sqltSelect:
+          FSQLState := stInSelect;
+
+        sqltWith:
+          FSQLState := stWith;
+
+        else
+          FSQLState := stNotASelectStmt;
+        end;
+      end;
+
+    stWith:
+      begin
+        case token of
+        sqltRecursive:
+          FSQLState := stInRecursiveCTE;
+
+        sqltIdentifier:
+          FSQLState := stInCTE;
+
+        else
+          FSQLState := stNotASelectStmt;
+        end;
+      end;
+
+    stInCTE,
+    stInRecursiveCTE:
+      begin
+        case token of
+        sqltOpenBracket:
+          Inc(FNested);
+
+        sqltCloseBracket:
+          Dec(FNested);
+
+        sqltComma,
+        sqltAs:
+          {ignore};
+
+        else
+          if FNested = 0 then
+            FSQLState := stNotASelectStmt;
+        end;
+      end;
+
+    stInSelect:
+      begin
+        case token of
+        sqltOpenBracket:
+          Inc(FNested);
+
+        sqltCloseBracket:
+          Dec(FNested);
+
+        sqltFrom:
+          if FNested = 0 then
+            FSQLState := stInFrom;
+        end;
+      end;
+
+    stInFrom:
+    begin
+      case token of
+      sqltOpenBracket:
+        Inc(FNested);
+
+      sqltCloseBracket:
+        Dec(FNested);
+
+      else
+        if FNested = 0 then
+        case token of
+        sqltWhere:
+          FSQLState := stInWhere;
+
+        sqltGroup:
+          FSQLState := stInGroup;
+
+        sqltHaving:
+          FSQLState := stInHaving;
+
+        sqltPlan:
+          FSQLState := stInPlan;
+
+        sqltUnion:
+          FSQLState := stInUnion;
+
+        sqltOrder:
+          FSQLState := stInOrderBy;
+
+        sqltRows:
+          FSQLState := stInRows;
+
+        end;
+      end;
+    end;
+
+    stInWhere:
+    begin
+      case token of
+      sqltOpenBracket:
+        Inc(FNested);
+
+      sqltCloseBracket:
+        Dec(FNested);
+
+      else
+        if FNested = 0 then
+        case token of
+        sqltGroup:
+          FSQLState := stInGroup;
+
+        sqltHaving:
+          FSQLState := stInHaving;
+
+        sqltPlan:
+          FSQLState := stInPlan;
+
+        sqltUnion:
+          FSQLState := stInUnion;
+
+        sqltOrder:
+          FSQLState := stInOrderBy;
+
+        sqltRows:
+          FSQLState := stInRows;
+        end;
+      end;
+    end;
+
+    stInGroupBy:
+      if FNested = 0 then
+      case token of
+      sqltHaving:
+        FSQLState := stInHaving;
+
+      sqltPlan:
+        FSQLState := stInPlan;
+
+      sqltUnion:
+        FSQLState := stInUnion;
+
+      sqltOrder:
+        FSQLState := stInOrderBy;
+
+      sqltRows:
+        FSQLState := stInRows;
+      end;
+
+    stInHaving:
+      case token of
+      sqltOpenBracket:
+        Inc(FNested);
+
+      sqltCloseBracket:
+        Dec(FNested);
+
+      else
+        if FNested = 0 then
+        case token of
+        sqltPlan:
+          FSQLState := stInPlan;
+
+        sqltUnion:
+          FSQLState := stInUnion;
+
+        sqltOrder:
+          FSQLState := stInOrderBy;
+
+        sqltRows:
+          FSQLState := stInRows;
+        end;
+      end;
+
+    stInPlan:
+      case token of
+      sqltOpenBracket:
+        Inc(FNested);
+
+      sqltCloseBracket:
+        Dec(FNested);
+      else
+        if FNested = 0 then
+        case token of
+        sqltUnion:
+          FSQLState := stInUnion;
+
+        sqltOrder:
+          FSQLState := stInOrderBy;
+
+        sqltRows:
+          FSQLState := stInRows;
+        end;
+      end;
+
+    stInUnion:
+      if FNested = 0 then
+      case token of
+      sqltOrder:
+        FSQLState := stInOrderBy;
+
+      sqltRows:
+        FSQLState := stInRows;
+
+      sqltAll:
+        FSQLState := stUnionAll;
+      end;
+
+    stInOrderBy:
+      if FNested = 0 then
+      case token of
+      sqltOrder:
+        FSQLState := stInOrderBy;
+
+      sqltRows:
+        FSQLState := stInRows;
+      end;
+
+    else
+      if (token = sqltEOF) or ((FNested = 0) and (TokenText = DefaultTerminator)) then
+        FSQLState := stDefault;
+    end;
+
+    if (token <> sqltEOF) and (StateOnEntry <> stDefault) and (StateOnEntry = FSQLState) then
+      FClause += TokenText
+    else
+    begin
+      temp := token;
+      token := FNextTag;
+      FNextTag := temp;
+      SetTokenText(FClause);
+      FClause := '';
+    end;
+
+  end;
+  Result := (StateOnEntry <> stDefault) and (StateOnEntry <> FSQLState) and inherited TokenFound(token);
+end;
+
+procedure TSelectSQLTokeniser.Reset;
+begin
+  inherited Reset;
+  FSQLState := stDefault;
+  FNested := 0;
+end;
 
 { TSelectSQLParser }
 

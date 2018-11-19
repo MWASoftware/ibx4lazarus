@@ -153,9 +153,6 @@ type
     procedure EchoNextLine(aLine: string);
     property NextStatement: boolean read FNextStatement;
   public
-    const
-        DefaultTerminator = ';';
-  public
     constructor Create;
     function GetNextStatement(var stmt: string) : boolean;
     property HasBegin: boolean read FHasBegin;
@@ -387,18 +384,13 @@ implementation
 uses Sysutils, RegExpr;
 
 resourcestring
-  sTerminatorUnknownState = 'Statement Terminator in unexpected state (%d)';
   sNoSelectSQL = 'Select SQL Statements are not supported';
-  sStackUnderflow = 'Stack Underflow';
   sNoParamQueries =  'Parameterised Queries are not supported';
-  sStackOverFlow = 'Stack Overflow';
   sResolveQueryParam =  'Resolving Query Parameter: %s';
   sXMLStackUnderflow = 'XML Stack Underflow';
   sInvalidEndTag = 'XML End Tag Mismatch - %s';
   sBadEndTagClosing = 'XML End Tag incorrectly closed';
   sXMLStackOverFlow = 'XML Stack Overflow';
-  sErrorState = 'Entered Error State';
-  sXMLError = 'Invalid XML (%c)';
   sXMLAttributeError = 'Unexpected attribute - "%s" = "%s"';
   sInvalidBoundsList = 'Invalid array bounds list - "%s"';
   sBinaryBlockMustbeEven = 'Binary block must have an even number of characters';
