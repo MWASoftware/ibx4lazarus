@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="10"/>
+    <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="9">
+    <Units Count="16">
       <Unit0>
         <Filename Value="sqlparser.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="18" Y="10"/>
-        <UsageCount Value="30"/>
+        <UsageCount Value="33"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainForm.pas"/>
@@ -17,10 +17,9 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="19"/>
-        <CursorPos X="12" Y="45"/>
-        <UsageCount Value="30"/>
+        <TopLine Value="43"/>
+        <CursorPos X="10" Y="71"/>
+        <UsageCount Value="33"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -69,7 +68,193 @@
         <UsageCount Value="12"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit8>
+      <Unit9>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="192"/>
+        <CursorPos X="33" Y="203"/>
+        <ExtraEditorCount Value="1"/>
+        <ExtraEditor1>
+          <EditorIndex Value="-1"/>
+          <TopLine Value="152"/>
+          <CursorPos Y="188"/>
+        </ExtraEditor1>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1160"/>
+        <CursorPos Y="1179"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="524"/>
+        <CursorPos Y="533"/>
+        <UsageCount Value="11"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="../../../ibx.trunk/runtime/nongui/ibxscript.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="39"/>
+        <CursorPos Y="39"/>
+        <UsageCount Value="10"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="1812"/>
+        <CursorPos X="8" Y="1841"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="../../../ibx.trunk/runtime/nongui/IBSQLParser.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="163"/>
+        <CursorPos X="18" Y="176"/>
+        <UsageCount Value="10"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="3433"/>
+        <CursorPos X="33" Y="3452"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit15>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="730" TopLine="698"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="101" Column="5" TopLine="73"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="188" Column="11" TopLine="155"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="488" Column="27" TopLine="474"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="3452" Column="33" TopLine="3433"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="212" Column="15" TopLine="194"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="395" Column="62" TopLine="376"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="400" Column="23" TopLine="382"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="532" Column="31" TopLine="515"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="547" Column="23" TopLine="532"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="80" Column="33" TopLine="71"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="550" Column="24" TopLine="531"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="552" Column="37" TopLine="534"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="647" Column="22" TopLine="629"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="671" Column="46" TopLine="653"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="180" Column="15" TopLine="161"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="1809" Column="3" TopLine="1807"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="180" Column="20" TopLine="161"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="181" TopLine="174"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="1801" TopLine="1785"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="179" TopLine="161"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="1802" Column="18" TopLine="1783"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="1813" Column="8" TopLine="1794"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="1824" Column="8" TopLine="1805"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="1841" Column="8" TopLine="1812"/>
+      </Position25>
+      <Position26>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="712" Column="29" TopLine="695"/>
+      </Position26>
+      <Position27>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="156" TopLine="132"/>
+      </Position27>
+      <Position28>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="401" TopLine="391"/>
+      </Position28>
+      <Position29>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="726" TopLine="707"/>
+      </Position29>
+      <Position30>
+        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
+        <Caret Line="727" Column="3" TopLine="707"/>
+      </Position30>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode="default"/>
+    </RunParams>
   </ProjectSession>
 </CONFIG>

@@ -121,14 +121,13 @@ type
    protected
      function GetErrorPrefix: string; virtual; abstract;
      function TokenFound(var token: TSQLTokens): boolean; override;
+     procedure Reset; override;
      procedure ShowError(msg: string; params: array of const); virtual; overload;
      procedure ShowError(msg: string); overload;
    public
      constructor Create;
-     destructor Destroy; override;
      class function FormatBlob(Field: ISQLData): string;
      class function FormatArray(Database: TIBDatabase; ar: IArray): string;
-     procedure Clear; virtual;
      property BlobData[index: integer]: TBlobData read GetBlobData;
      property BlobDataCount: integer read GetBlobDataCount;
      property ArrayData[index: integer]: TArrayData read GetArrayData;
@@ -177,8 +176,7 @@ type
     function GetChar: char; override;
     function GetErrorPrefix: string; override;
   public
-    destructor Destroy; override;
-    procedure Clear; override;
+    procedure Reset; override;
     procedure SetStreamSource(Lines: TStrings); overload;
     procedure SetStreamSource(S: TStream); overload;
     procedure SetStreamSource(FileName: string); overload;
@@ -894,6 +892,9 @@ function TSQLXMLReader.TokenFound(var token: TSQLTokens): boolean;
 
 var XMLTag: TXMLTag;
 begin
+  Result := inherited TokenFound(token);
+  if not Result then Exit;
+
   case FXMLState of
   stNoXML:
     if token = sqltLT then
@@ -1065,7 +1066,7 @@ begin
 
   {Only allow token to be returned if not processing an XML tag}
 
-  Result := (FXMLState = stNoXML) and inherited TokenFound(token);
+  Result := FXMLState = stNoXML;
 end;
 
 procedure TSQLXMLReader.ShowError(msg: string; params: array of const);
@@ -1082,12 +1083,6 @@ constructor TSQLXMLReader.Create;
 begin
   inherited;
   FXMLState := stNoXML;
-end;
-
-destructor TSQLXMLReader.Destroy;
-begin
-  Clear;
-  inherited Destroy;
 end;
 
 class function TSQLXMLReader.FormatBlob(Field: ISQLData): string;
@@ -1171,9 +1166,9 @@ begin
     TextOut.Free;
   end;       end;
 
-procedure TSQLXMLReader.Clear;
+procedure TSQLXMLReader.Reset;
 begin
-  Reset;
+  inherited Reset;
   FXMLTagIndex := 0;
   SetLength(FBlobData,0);
   SetLength(FArrayData,0);
@@ -1802,15 +1797,9 @@ begin
   Result := Format(sOnLineError,[FLineIndex,FIndex]);
 end;
 
-destructor TBatchSQLStatementReader.Destroy;
+procedure TBatchSQLStatementReader.Reset;
 begin
-  Clear;
-  inherited Destroy;
-end;
-
-procedure TBatchSQLStatementReader.Clear;
-begin
-  inherited Clear;
+  inherited Reset;
   if FOwnsInStream and assigned(FInStream) then
     FInStream.Free;
   FInStream := nil;
@@ -1821,7 +1810,7 @@ end;
 
 procedure TBatchSQLStatementReader.SetStreamSource(Lines: TStrings);
 begin
-  Clear;
+  Reset;
   FInStream := TMemoryStream.Create;
   FOwnsInStream := true;
   Lines.SaveToStream(FInStream);
@@ -1832,7 +1821,7 @@ end;
 
 procedure TBatchSQLStatementReader.SetStreamSource(S: TStream);
 begin
-  Clear;
+  Reset;
   FInStream := S;
   if assigned(OnProgressEvent) then
     OnProgressEvent(self,true,S.Size - S.Position);
@@ -1840,7 +1829,7 @@ end;
 
 procedure TBatchSQLStatementReader.SetStreamSource(FileName: string);
 begin
-  Clear;
+  Reset;
   FInStream := TFileStream.Create(FileName,fmShareCompat);
   FOwnsInStream := true;
   if assigned(OnProgressEvent) then
@@ -1849,7 +1838,7 @@ end;
 
 procedure TBatchSQLStatementReader.SetStringStreamSource(S: string);
 begin
-  Clear;
+  Reset;
   FInStream := TStringStream.Create(S);
   FOwnsInStream := true;
   if assigned(OnProgressEvent) then

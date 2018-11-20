@@ -3449,7 +3449,7 @@ procedure TIBCustomDataSet.DoBeforeOpen;
 var i: integer;
 begin
   if assigned(FParser) then
-     FParser.Reset;
+     FParser.RestoreClauseValues;
   for i := 0 to FIBLinks.Count - 1 do
     TIBControlLink(FIBLinks[i]).UpdateSQL(self);
   inherited DoBeforeOpen;
