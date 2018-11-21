@@ -76,7 +76,7 @@ type
     type
       TSQLState = (stDefault, stWith, stInCTE, stInRecursiveCTE, stCTEAs, stInNextCTE,
                    stInSelect, stInFrom,stInWhere,stInGroupBy,
-                   stInHaving,stInPlan, stInUnion, stInUnionAll,
+                   stInHaving,stInPlan, stInUnion, stInUnionAll, stUnionEnd,
                    stInOrderBy, stInRows, stNotASelectStmt);
 
       TSQLStates = set of TSQLState;
@@ -88,13 +88,17 @@ type
     FClause: string;
     FParamList: TStrings;
     FHasText: boolean;
+    FUnionMember: boolean;
     function GetNotaSelectStmt: boolean;
   protected
+    FCTEName: string;
+    procedure Assign(source: TSQLTokeniser); override;
     function TokenFound(var token: TSQLTokens): boolean; override;
     procedure Reset; override;
   public
-    constructor Create;
+    constructor Create(UnionMember: boolean);
     destructor Destroy; override;
+    procedure Clear; virtual;
     property ParamList: TStrings read FParamList;
     property NotaSelectStmt: boolean read GetNotaSelectStmt;
   end;
@@ -142,7 +146,7 @@ type
     procedure AnalyseSQL;
     function GetCTE(Index: integer): PCTEDef;
     function GetCTECount: integer;
-    function AddCTE(aName: string; Recursive: boolean): PCTEDef;
+    function AddCTE(aName: string; Recursive: boolean; text: string): PCTEDef;
     procedure FlushCTEs;
     function GetSQLText: string;
     procedure SetSelectClause(const Value: string);
@@ -150,10 +154,10 @@ type
     procedure SetGroupClause(const Value: string);
     procedure SetFromClause(const Value: string);
   protected
-    constructor Create(aOwner: TSelectSQLParser; InString: string; Index:integer=1); overload;
+    constructor Create(aOwner: TSelectSQLParser); overload;
+    procedure Assign(source: TSQLTokeniser); override;
     procedure Changed;
     function GetChar: char; override;
-    procedure Reset; override;
   public
     constructor Create(aDataSet: TDataSet; SQLText: TStrings); overload;
     constructor Create(aDataSet: TDataSet; const SQLText: string); overload;
@@ -162,6 +166,7 @@ type
       IncludeUnions: boolean = false);
     procedure Add2HavingClause(const Condition: string; OrClause: boolean=false;
       IncludeUnions: boolean = false);
+    procedure Clear; override;
     procedure DropUnion;
     function GetFieldPosition(AliasName: string): integer;
     procedure ResetWhereClause;
@@ -205,11 +210,9 @@ begin
    sqltSelect:
      FSelectClause := Trim(TokenText);
    sqltWith:
-     AddCTE(Trim(TokenText),false);
+     AddCTE(FCTEName,false,Trim(TokenText));
    sqltRecursive:
-     AddCTE(Trim(TokenText),true);
-   sqltAs:
-     FCTEs[Length(FCTES)-1]^.Text := Trim(TokenText);
+     AddCTE(FCTEName,true,Trim(TokenText));
    sqltFrom:
      FFromClause := Trim(TokenText);
    sqltWhere:
@@ -222,8 +225,9 @@ begin
      FPlanClause := Trim(TokenText);
    sqltUnion:
      begin
-       FUnion := TSelectSQLParser.Create(self,FInString,FIndex);
-       FIndex := Length(FInString) + 1;
+       FUnion := TSelectSQLParser.Create(self);
+       Assign(FUnion); {copy back state}
+       FNextToken := sqltSpace;
      end;
    sqltOrder:
      FOrderByClause := Trim(TokenText);
@@ -231,9 +235,10 @@ begin
      FRowsClause := Trim(TokenText);
    sqltAll:
      begin
-       FUnion := TSelectSQLParser.Create(self,FInString,FIndex);
+       FUnion := TSelectSQLParser.Create(self);
        FUnion.FUnionAll := true;
-       break;
+       Assign(FUnion); {copy back state}
+       FNextToken := sqltSpace;
      end;
    end;
  end;
@@ -255,12 +260,14 @@ begin
   Result := Length(FCTEs);
 end;
 
-function TSelectSQLParser.AddCTE(aName: string; Recursive: boolean): PCTEDef;
+function TSelectSQLParser.AddCTE(aName: string; Recursive: boolean; text: string
+  ): PCTEDef;
 var index: integer;
 begin
   new(Result);
   Result^.Name := aName;
   Result^.Recursive := Recursive;
+  Result^.text := text;
   index := Length(FCTEs);
   SetLength(FCTEs,index+1);
   FCTEs[index] := Result;
@@ -300,15 +307,13 @@ begin
     SQL.Add('SELECT ' + SelectClause);
     SQL.Add('FROM ' + FromClause);
     if WhereClause <> '' then
-      SQL.Add('Where ' + WhereClause);
+      SQL.Add('WHERE ' + WhereClause);
     if GroupClause <> '' then
       SQL.Add('GROUP BY ' + GroupClause);
     if HavingClause <> '' then
       SQL.Add('HAVING ' + HavingClause);
     if PlanClause <> '' then
       SQL.Add('PLAN ' + PlanClause);
-    if OrderByClause <> '' then
-      SQL.Add('ORDER BY ' + OrderByClause);
     if Union <> nil then
     begin
       if Union.UnionAll then
@@ -317,6 +322,10 @@ begin
         SQL.Add('UNION');
       SQL.Add(Union.SQLText)
     end;
+    if OrderByClause <> '' then
+      SQL.Add('ORDER ' + OrderByClause);
+    if RowsClause <> '' then
+      SQL.Add('ROWS ' + RowsClause);
     Result := SQL.Text
   finally
     SQL.Free
@@ -362,16 +371,27 @@ begin
   end;
 end;
 
-constructor TSelectSQLParser.Create(aOwner: TSelectSQLParser; InString: string;
-  Index: integer);
+constructor TSelectSQLParser.Create(aOwner: TSelectSQLParser);
 begin
-  inherited Create;
+  inherited Create(aOwner <> nil);
   FOwner := aOwner;
   if assigned(FOwner) then
+  begin
     FDataSet := FOwner.DataSet;
-  FInString := InString;
-  FIndex := Index;
+    {copy state}
+    Assign(aOwner);
+  end;
   AnalyseSQL;
+end;
+
+procedure TSelectSQLParser.Assign(source: TSQLTokeniser);
+begin
+  inherited Assign(source);
+  if source is TSelectSQLParser then
+  begin
+    FInString := TSelectSQLParser(source).FInString;
+    FIndex := TSelectSQLParser(source).FIndex;
+  end;
 end;
 
 procedure TSelectSQLParser.Changed;
@@ -397,18 +417,23 @@ end;
 constructor TSelectSQLParser.Create(aDataSet: TDataSet; SQLText: TStrings);
 begin
   FDataSet := aDataSet;
-  Create(nil,SQLText.Text,1);
+  FInString := SQLText.Text;
+  FIndex := 1;
+  Create(nil);
 end;
 
 constructor TSelectSQLParser.Create(aDataSet: TDataSet; const SQLText: string);
 begin
   FDataSet := aDataSet;
-  Create(nil,SQLText,1)
+  FInString := SQLText;
+  FIndex := 1;
+  Create(nil);
 end;
 
 destructor TSelectSQLParser.Destroy;
 begin
   FDestroying := true;
+  Clear;
   inherited Destroy;
 end;
 
@@ -440,6 +465,26 @@ begin
   if IncludeUnions and (Union <> nil) then
     Union.Add2HavingClause(Condition,OrClause,IncludeUnions);
   Changed;
+end;
+
+procedure TSelectSQLParser.Clear;
+begin
+ inherited Clear;
+ DropUnion;
+ FlushCTEs;
+ FInString := '';
+ FIndex := 1;
+ FSelectClause := '';
+ FFromClause := '';
+ FWhereClause := '';
+ FGroupClause := '';
+ FHavingClause := '';
+ FPlanClause := '';
+ FUnionAll := false;
+ FOrderByClause := '';
+ FOriginalWhereClause := '';
+ FOriginalOrderByClause := '';
+ FOriginalHavingClause := '';
 end;
 
 procedure TSelectSQLParser.DropUnion;
@@ -491,18 +536,24 @@ begin
  ResetOrderByClause
 end;
 
-procedure TSelectSQLParser.Reset;
-begin
-  inherited Reset;
-  DropUnion;
-  FlushCTEs;
-end;
-
 { TSelectSQLTokeniser }
 
 function TSelectSQLTokeniser.GetNotaSelectStmt: boolean;
 begin
   Result := FSQLState = stNotASelectStmt;
+end;
+
+procedure TSelectSQLTokeniser.Assign(source: TSQLTokeniser);
+begin
+  inherited Assign(source);
+  if source is TSelectSQLTokeniser then
+  begin
+    FSQLState := TSelectSQLTokeniser(source).FSQLState;
+    FNested := TSelectSQLTokeniser(source).FNested;
+    FNextToken := TSelectSQLTokeniser(source).FNextToken;
+    FPrevCTEToken := TSelectSQLTokeniser(source).FPrevCTEToken;
+    FClause := TSelectSQLTokeniser(source).FClause;
+  end;
 end;
 
 function TSelectSQLTokeniser.TokenFound(var token: TSQLTokens): boolean;
@@ -555,23 +606,54 @@ function TSelectSQLTokeniser.TokenFound(var token: TSQLTokens): boolean;
       FSQLState := stInUnion;
 
     sqltOrder:
-      FSQLState := stInOrderBy;
+      begin
+        if FUnionMember then
+        {stop and return to owning object}
+        begin
+          ResetQueue(sqltEOF,'');
+          QueueToken(token);
+          ReleaseQueue;
+          token := sqltEOF;
+          FSQLState := stUnionEnd;
+        end
+        else
+          FSQLState := stInOrderBy;
+      end;
 
     sqltRows:
-      FSQLState := stInRows;
+      if FUnionMember then
+      {stop and return to owning object}
+      begin
+        ResetQueue(sqltEOF,'');
+        QueueToken(token);
+        ReleaseQueue;
+        token := sqltEOF;
+        FSQLState := stUnionEnd;
+      end
+      else
+        FSQLState := stInRows;
 
     sqltAll:
       FSQLState := stInUnionAll;
    end;
-   if not (FSQLState in AllowStates) then
+   if not (FSQLState in AllowStates + [stDefault]) then
      FSQLState := SaveState
    else
    if SaveState <> FSQLState then
      swap(token,FNextToken);
   end;
 
-var StateOnEntry: TSQLState;
-    DoNotReturnToken: boolean;
+  var StateOnEntry: TSQLState;
+      DoNotReturnToken: boolean;
+
+  function TokenIncomplete: boolean;
+  begin
+     {we are not done if we are in not the default state and no state change,
+      unless we are a union member and the state is stUnionEnd}
+     Result :=  (FUnionMember and (StateOnEntry = stUnionEnd)) or
+                ((StateOnEntry = stDefault) or  (StateOnEntry = FSQLState));
+  end;
+
 begin
   Result := inherited TokenFound(token);
   if not Result or NotaSelectStmt then Exit;
@@ -592,6 +674,7 @@ begin
       if not FHasText then
         FSQLState := stNotASelectStmt {empty statements are not select statements}
       else
+      if FSQLState <> stUnionEnd then
         FSQLState := stDefault;
       swap(token,FNextToken);
     end
@@ -620,33 +703,32 @@ begin
         sqltRecursive:
           begin
             FSQLState := stInRecursiveCTE;
-            DoNotReturnToken := true;
             FNextToken := token;
           end;
 
         sqltIdentifier:
           begin
-            FClause := TokenText;
+            FCTEName := TokenText;
             FSQLState := stCTEAs;
             FPrevCTEToken := FNextToken;
             token := FNextToken;
-            FNextToken := sqltAs;
           end
 
         else
           IBError(ibxErrorParsing,['with']);
         end;
+        DoNotReturnToken := true;
       end;
 
     stInRecursiveCTE:
       case token of
       sqltIdentifier:
         begin
-          FClause := TokenText;
+          FCTEName := TokenText;
           FSQLState := stCTEAs;
           token := FNextToken;
           FPrevCTEToken := FNextToken;
-          FNextToken := sqltAs;
+          DoNotReturnToken := true;
         end;
 
       else
@@ -657,10 +739,10 @@ begin
       case token of
       sqltIdentifier:
         begin
-          FClause := TokenText;
+          FCTEName := TokenText;
           FSQLState := stCTEAs;
           token := FPrevCTEToken;
-          FNextToken := sqltAs;
+          DoNotReturnToken := true;
         end;
 
       else
@@ -705,11 +787,11 @@ begin
       ChangeState([stInFrom],true);
 
     stInFrom:
-      ChangeState([stInWhere,stInGroupBy, stInHaving,stInPlan, stInUnion,
+      ChangeState([stInWhere,stInGroupBy, stInHaving,stInPlan, stInUnion,stUnionEnd,
                         stInOrderBy, stInRows],true);
 
     stInWhere:
-      ChangeState([stInGroupBy, stInHaving,stInPlan, stInUnion,
+      ChangeState([stInGroupBy, stInHaving,stInPlan, stInUnion,stUnionEnd,
                        stInOrderBy, stInRows],true);
 
     stInGroupBy:
@@ -719,13 +801,13 @@ begin
         SetTokenText('');
       end
       else
-        ChangeState([stInHaving,stInPlan, stInUnion, stInOrderBy, stInRows],false);
+        ChangeState([stInHaving,stInPlan, stInUnion, stUnionEnd, stInOrderBy, stInRows],false);
 
     stInHaving:
-      ChangeState([stInPlan, stInUnion, stInOrderBy, stInRows],true);
+      ChangeState([stInPlan, stInUnion, stUnionEnd, stInOrderBy, stInRows],true);
 
     stInPlan:
-      ChangeState([stInUnion, stInOrderBy, stInRows],true);
+      ChangeState([stInUnion, stUnionEnd, stInOrderBy, stInRows],true);
 
     stInUnion:
       case token of
@@ -736,26 +818,35 @@ begin
         end;
       else
         begin
+          ResetQueue(token);
+          ReleaseQueue;
           swap(token,FNextToken);
           FSQLState := stDefault;
         end;
       end;
 
+    stUnionEnd: {On return from union clause}
+      ChangeState([stInOrderBy, stInRows],false);
+
     stInOrderBy:
       if token = sqltBy then
       begin
+        FClause := '';
         DoNotReturnToken := true;
-        SetTokenText('');
       end
       else
         ChangeState([stInRows],false);
+
+    stInRows:
+      ChangeState([],false);
+
     end;
 
     {On EOF or state change return the next element, otherwise just add to text buffer}
 
-    if (token <> sqltEOF) and (StateOnEntry <> stDefault) and
-       (StateOnEntry = FSQLState) then
+    if (token <> sqltEOF) and TokenIncomplete  then
     begin
+      if StateOnEntry <> stDefault then
       case token of
       sqltQuotedString:
         FClause += '''' + SQLSafeString(TokenText) + '''';
@@ -772,6 +863,7 @@ begin
       else
         FClause += TokenText;
       end;
+      DoNotReturnToken := true;
     end
     else
     begin
@@ -781,7 +873,7 @@ begin
     end;
 
   end;
-  Result := not DoNotReturnToken and (StateOnEntry <> stDefault) and (StateOnEntry <> FSQLState);
+  Result := not DoNotReturnToken ;
 end;
 
 procedure TSelectSQLTokeniser.Reset;
@@ -790,14 +882,12 @@ begin
   FSQLState := stDefault;
   FNested := 0;
   FNextToken := sqltSpace;
-  FHasText := false;
-  if assigned(FParamList) then
-    FParamList.Clear;
 end;
 
-constructor TSelectSQLTokeniser.Create;
+constructor TSelectSQLTokeniser.Create(UnionMember: boolean);
 begin
   inherited Create;
+  FUnionMember := UnionMember;
   FParamList := TStringList.Create;
 end;
 
@@ -806,6 +896,14 @@ begin
   if assigned(FParamList) then FParamList.Free;
   FParamList := nil;
   inherited Destroy;
+end;
+
+procedure TSelectSQLTokeniser.Clear;
+begin
+  Reset;
+  FHasText := false;
+  if assigned(FParamList) then
+    FParamList.Clear;
 end;
 
 
