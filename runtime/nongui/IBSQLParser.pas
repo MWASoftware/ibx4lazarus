@@ -691,6 +691,11 @@ begin
         sqltWith:
           FSQLState := stWith;
 
+        sqltCR,
+        sqltEOL,
+        sqltspace:
+          {ignore};
+
         else
           FSQLState := stNotASelectStmt;
         end;

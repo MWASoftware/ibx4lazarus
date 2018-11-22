@@ -94,7 +94,6 @@ type
      FOnProgressEvent: TOnProgressEvent;
      FTransaction: TIBTransaction;
      FXMLState: TXMLStates;
-     FXMLTag: TXMLTag;
      FXMLTagStack: array [1..MaxXMLTags] of TXMLTag;
      FXMLTagIndex: integer;
      FAttributeName: string;
@@ -105,7 +104,6 @@ type
      FArrayData: array of TArrayData;
      FCurrentArray: integer;
      FXMLString: string;
-     FOrigCompressWhiteSpace: boolean;
      function FindTag(tag: string; var xmlTag: TXMLTag): boolean;
      function GetArrayData(index: integer): TArrayData;
      function GetArrayDataCount: integer;
@@ -116,7 +114,7 @@ type
      procedure ProcessBoundsList(boundsList: string);
      procedure ProcessTagValue(tagValue: string);
      procedure XMLTagInit(xmltag: TXMLTag);
-     procedure XMLTagEnd(xmltag: TXMLTag);
+     function XMLTagEnd(var xmltag: TXMLTag): boolean;
      procedure XMLTagEnter;
    protected
      function GetErrorPrefix: string; virtual; abstract;
@@ -126,6 +124,7 @@ type
      procedure ShowError(msg: string); overload;
    public
      constructor Create;
+     procedure FreeDataObjects;
      class function FormatBlob(Field: ISQLData): string;
      class function FormatArray(Database: TIBDatabase; ar: IArray): string;
      property BlobData[index: integer]: TBlobData read GetBlobData;
@@ -260,10 +259,12 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function ProcessStatement(stmt: string): boolean; virtual;
     function ProcessStream: boolean;
+    procedure SetSQLStatementReader(SQLStatementReader: TSQLStatementReader);
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
     procedure DefaultSelectSQLHandler(aSQLText: string);
+    property SQLStatementReader: TSQLStatementReader read FSQLReader;
   published
     property Database: TIBDatabase read FDatabase write SetDatabase;
     property DataOutputFormatter: TIBCustomDataOutput read FDataOutputFormatter
@@ -489,9 +490,11 @@ begin
                stmt += TokenText;
              end;
 
-          sqltComment,
+          sqltComment:
+            stmt += '/*' + TokenText + '*/';
+
           sqltCommentLine:
-            {ignore};
+            stmt += '//' + TokenText + LineEnding;
 
           sqltQuotedString:
             stmt += '''' + SQLSafeString(TokenText) + '''';
@@ -499,15 +502,17 @@ begin
           sqltIdentifierInDoubleQuotes:
             stmt += '"' + TokenText + '"';
 
+          sqltEOL:
+            stmt += LineEnding;
+
           else
             begin
-              stmt += TokenText;
               if tokentext = Terminator then
               begin
                 FNextStatement := true;
-//                writeln(stmt);
                 Exit;
               end;
+              stmt += TokenText;
             end;
           end;
         end;
@@ -531,15 +536,20 @@ begin
               State := stDefault;
           end;
 
-        sqltComment,
+        sqltComment:
+          stmt += '/*' + TokenText + '*/';
+
         sqltCommentLine:
-          {ignore};
+          stmt += '//' + TokenText + LineEnding;
 
         sqltQuotedString:
           stmt += '''' + SQLSafeString(TokenText) + '''';
 
         sqltIdentifierInDoubleQuotes:
           stmt += '"' + TokenText + '"';
+
+        sqltEOL:
+          stmt += LineEnding;
 
         else
           stmt += TokenText;
@@ -552,15 +562,20 @@ begin
       begin
         case token of
 
-        sqltComment,
+        sqltComment:
+          stmt += '/*' + TokenText + '*/';
+
         sqltCommentLine:
-          {ignore};
+          stmt += '//' + TokenText + LineEnding;
 
         sqltCloseSquareBracket:
         begin
           stmt += TokenText;
           State := stDefault;
         end;
+
+        sqltEOL:
+          stmt += LineEnding;
 
         else
           stmt += TokenText;
@@ -807,19 +822,17 @@ begin
     end;
 
   xtElt:
-    if FXMLTagStack[FXMLTagIndex] = xtArray then
       with FArrayData[FCurrentArray] do
         Inc(CurrentRow)
-    else ShowError(SNotInArray);
-
   end;
 end;
 
-procedure TSQLXMLReader.XMLTagEnd(xmltag: TXMLTag);
+function TSQLXMLReader.XMLTagEnd(var xmltag: TXMLTag): boolean;
 begin
   if FXMLTagIndex = 0 then
     ShowError(sXMLStackUnderflow,[nil]);
 
+  xmlTag := FXMLTagStack[FXMLTagIndex];
   case FXMLTagStack[FXMLTagIndex] of
   xtBlob:
     FBlobData[FCurrentBlob].BlobIntf.Close;
@@ -831,6 +844,7 @@ begin
     Dec(FArrayData[FCurrentArray].CurrentRow);
   end;
   Dec(FXMLTagIndex);
+  Result := FXMLTagIndex = 0;
 end;
 
 procedure TSQLXMLReader.XMLTagEnter;
@@ -877,6 +891,7 @@ function TSQLXMLReader.TokenFound(var token: TSQLTokens): boolean;
      if FXMLTagIndex = 0 then
      {nothing to do with XML so go back to processing SQL}
      begin
+       QueueToken(token);
        ReleaseQueue(token);
        FXMLState := stNoXML
      end
@@ -899,6 +914,7 @@ begin
   stNoXML:
     if token = sqltLT then
     begin
+      ResetQueue;
       QueueToken(token); {save in case this is not XML}
       FXMLState := stInTag;
     end;
@@ -938,8 +954,6 @@ begin
     sqltGT:
       begin
         ResetQueue;
-        FOrigCompressWhiteSpace := CompressWhiteSpace;
-        CompressWhiteSpace := false;
         XMLTagEnter;
         FXMLState := stXMLData;
       end;
@@ -1035,23 +1049,22 @@ begin
     sqltGT:
       begin
         ProcessTagValue(FXMLString);
-        XMLTagEnd(XMLTag);
-        if FXMLTagIndex = 0 then
+        if XMLTagEnd(XMLTag) then
         begin
           ResetQueue;
           QueueToken(sqltColon,':');
-          case FXMLTagStack[FXMLTagIndex] of
+          case XMLTag of
             xtBlob:
               QueueToken(sqltIdentifier,Format(ibx_blob+'%d',[FCurrentBlob]));
 
             xtArray:
               QueueToken(sqltIdentifier, Format(ibx_array+'%d',[FCurrentArray]));
           end;
-          CompressWhiteSpace := FOrigCompressWhiteSpace;
+          ReleaseQueue(token);
           FXMLState := stNoXML;
        end
-        else
-          FXMLState := stXMLData;
+       else
+         FXMLState := stXMLData;
       end;
 
     sqltSpace,
@@ -1083,6 +1096,15 @@ constructor TSQLXMLReader.Create;
 begin
   inherited;
   FXMLState := stNoXML;
+end;
+
+procedure TSQLXMLReader.FreeDataObjects;
+begin
+  FXMLTagIndex := 0;
+  SetLength(FBlobData,0);
+  FCurrentBlob := -1;
+  SetLength(FArrayData,0);
+  FCurrentArray := -1;
 end;
 
 class function TSQLXMLReader.FormatBlob(Field: ISQLData): string;
@@ -1169,9 +1191,7 @@ begin
 procedure TSQLXMLReader.Reset;
 begin
   inherited Reset;
-  FXMLTagIndex := 0;
-  SetLength(FBlobData,0);
-  SetLength(FArrayData,0);
+  FreeDataObjects;
   FXMLString := '';
   FreeMem(FBlobBuffer);
 end;
@@ -1183,8 +1203,8 @@ end;
 constructor TIBXScript.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
-  FSQLReader := TBatchSQLStatementReader.Create;
-  FSQLReader.OnNextLine := @EchoNextLine;
+  SetSQLStatementReader(TBatchSQLStatementReader.Create);
+  SQLStatementReader.OnNextLine := @EchoNextLine;
 end;
 
 function TIBXScript.PerformUpdate(SQLFile: string; aAutoDDL: boolean): boolean;
@@ -1257,7 +1277,7 @@ begin
    FISQL.SQL.Text := stmt;
    FISQL.Transaction := GetTransaction;
    FISQL.Transaction.Active := true;
-   FISQL.ParamCheck := not FSQLReader.HasBegin; {Probably PSQL}
+//   FISQL.ParamCheck := not FSQLReader.HasBegin; {Probably PSQL}
    FISQL.Prepare;
    FISQL.Statement.EnableStatistics(ShowPerformanceStats);
 
@@ -1394,8 +1414,9 @@ begin
   Result := false;
   while FSQLReader.GetNextStatement(stmt) do
   try
+    stmt := trim(stmt);
 //    writeln('stmt = ',stmt);
-    if trim(stmt) = '' then continue;
+    if stmt = '' then continue;
     if not ProcessStatement(stmt) then
       ExecSQL(stmt);
 
@@ -1415,6 +1436,12 @@ begin
       end
   end;
   Result := true;
+end;
+
+procedure TCustomIBXScript.SetSQLStatementReader(
+  SQLStatementReader: TSQLStatementReader);
+begin
+  FSQLReader := SQLStatementReader;
 end;
 
 function TCustomIBXScript.ProcessStatement(stmt: string): boolean;
