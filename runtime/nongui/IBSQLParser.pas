@@ -31,7 +31,7 @@ unit IBSQLParser;
 
 interface
 
-uses Classes, DB;
+uses Classes, DB, IBUtils;
 
 {
   The SQL Parser is a partial SQL Parser intended to parser a Firebird DML (Select)
@@ -64,82 +64,100 @@ uses Classes, DB;
 }
 
 type
-  TSQLSymbol = (sqNone,sqSpace,sqSemiColon,sqSingleQuotes,sqDoubleQuotes, sqComma,
-                sqString,sqCommentStart,sqUnion,sqAll,sqColon,
-                sqCommentEnd,sqCommentLine,sqAsterisk,sqForwardSlash,
-                sqSelect,sqFrom,sqWhere,sqGroup,sqOrder,sqBy,sqOpenBracket,
-                sqCloseBracket,sqHaving,sqPlan,sqEOL,sqWith,sqRecursive,sqAs);
 
-  TSQLStates =  (stInit, stError, stInSelect,stInFrom,stInWhere,stInGroupBy,
-                 stInHaving,stInPlan, stNestedSelect,stInSingleQuotes, stInGroup,
-                 stInDoubleQuotes, stInComment, stInCommentLine, stInOrder,
-                 stNestedWhere,stNestedFrom,stInOrderBy,stDone,stUnion,
-                 stInParam,stNestedGroupBy,stCTE,stCTE1,stCTE2,stCTE3, stCTEquoted,
-                 stInCTE,stCTEClosed, stNotASelectStmt);
+  { TSelectSQLTokeniser }
 
-  PCTEDef = ^TCTEDef;
-  TCTEDef = record
-    Recursive: boolean;
-    Name: string;
-    Text: string;
+  {The select SQL tokeniser returns each successive clause. The token returned
+   identifies the reserved word that starts the clause. e.g. sqltFrom and the tokentext
+   is the remainder of the clause.}
+
+  TSelectSQLTokeniser = class(TSQLwithNamedParamsTokeniser)
+  private
+    type
+      TSQLState = (stDefault, stWith, stInCTE, stInRecursiveCTE, stCTEAs, stInNextCTE,
+                   stInSelect, stInFrom,stInWhere,stInGroupBy,
+                   stInHaving,stInPlan, stInUnion, stInUnionAll, stUnionEnd,
+                   stInOrderBy, stInRows, stNotASelectStmt);
+
+      TSQLStates = set of TSQLState;
+  private
+    FSQLState: TSQLState;
+    FNested: integer;
+    FNextToken: TSQLTokens;
+    FPrevCTEToken: TSQLTokens;
+    FClause: string;
+    FParamList: TStrings;
+    FHasText: boolean;
+    FUnionMember: boolean;
+    function GetNotaSelectStmt: boolean;
+  protected
+    FCTEName: string;
+    procedure Assign(source: TSQLTokeniser); override;
+    function TokenFound(var token: TSQLTokens): boolean; override;
+    procedure Reset; override;
+  public
+    constructor Create(UnionMember: boolean);
+    destructor Destroy; override;
+    procedure Clear; virtual;
+    property ParamList: TStrings read FParamList;
+    property NotaSelectStmt: boolean read GetNotaSelectStmt;
   end;
 
   { TSelectSQLParser }
 
-  TSelectSQLParser = class
+  TSelectSQLParser = class(TSelectSQLTokeniser)
+  public
+    type
+      PCTEDef = ^TCTEDef;
+      TCTEDef = record
+        Recursive: boolean;
+        Name: string;
+        Text: string;
+      end;
+
   private
     FDataSet: TDataSet;
-    FHavingClause: string;
-    FOriginalHavingClause: string;
-    FOnSQLChanging: TNotifyEvent;
-    FSelectClause: string;
-    FGroupClause: string;
-    FUnionAll: boolean;
-    FWhereClause: string;
-    FOriginalWhereClause: string;
-    FOrderByClause: string;
-    FOriginalOrderByClause: string;
-    FPlanClause: string;
-    FFromClause: string;
-    FState: TSQLStates;
-    FString: string;
-    FLastSymbol: TSQLSymbol;
-    FLastChar: char;
-    FStack: array [0..16] of TSQLStates;
-    FStackindex: integer;
-    FIndex: integer;
-    FStartLine: integer;
-    FUnion: TSelectSQLParser;
-    FAllowUnionAll: boolean;
-    FLiteral: string;
-    FParamList: TStringList;
-    FCTEs: TList;
-    FCTE: TCTEDef;
-    FNested: integer;
-    FDestroying: boolean;
     FOwner: TSelectSQLParser;
-    procedure AddToSQL(const Word: string);
-    procedure CTEClear;
+    FOnSQLChanging: TNotifyEvent;
+    FDestroying: boolean;
+
+    {Properties set after analysis}
+    FSelectClause: string;
+    FFromClause: string;
+    FWhereClause: string;
+    FGroupClause: string;
+    FHavingClause: string;
+    FPlanClause: string;
+    FUnionAll: boolean;
+    FOrderByClause: string;
+    FRowsClause: string;
+    FUnion: TSelectSQLParser;
+    FCTEs: array of PCTEDef;
+
+    {Saved values}
+    FOriginalWhereClause: string;
+    FOriginalOrderByClause: string;
+    FOriginalHavingClause: string;
+
+    {Input buffer}
+    FInString: string;
+    FIndex: integer;
+
+    procedure AnalyseSQL;
     function GetCTE(Index: integer): PCTEDef;
     function GetCTECount: integer;
-    function GetSQlText: string;
-    function Check4ReservedWord(const Text: string): TSQLSymbol;
-    procedure AnalyseLine(const Line: string);
-    procedure AnalyseSQL(Lines: TStrings);
-    function GetNotaSelectStmt: boolean;
-    procedure InitCTE;
-    procedure AddCTE;
-    function GetNextSymbol(C: char): TSQLSymbol;
-    function GetSymbol(const Line: string; var index: integer): TSQLSymbol;
-    function PopState: TSQLStates;
-    procedure SetState(AState: TSQLStates);
+    function AddCTE(aName: string; Recursive: boolean; text: string): PCTEDef;
+    procedure FlushCTEs;
+    function GetSQLText: string;
     procedure SetSelectClause(const Value: string);
     procedure SetOrderByClause(const Value: string);
     procedure SetGroupClause(const Value: string);
     procedure SetFromClause(const Value: string);
   protected
-    constructor Create(aOwner: TSelectSQLParser; SQLText: TStrings; StartLine, StartIndex: integer); overload;
+    constructor Create(aOwner: TSelectSQLParser); overload;
+    procedure Assign(source: TSQLTokeniser); override;
     procedure Changed;
+    function GetChar: char; override;
   public
     constructor Create(aDataSet: TDataSet; SQLText: TStrings); overload;
     constructor Create(aDataSet: TDataSet; const SQLText: string); overload;
@@ -148,12 +166,13 @@ type
       IncludeUnions: boolean = false);
     procedure Add2HavingClause(const Condition: string; OrClause: boolean=false;
       IncludeUnions: boolean = false);
+    procedure Clear; override;
     procedure DropUnion;
     function GetFieldPosition(AliasName: string): integer;
     procedure ResetWhereClause;
     procedure ResetHavingClause;
     procedure ResetOrderByClause;
-    procedure Reset;
+    procedure RestoreClauseValues;
     property CTEs[Index: integer]: PCTEDef read GetCTE;
     property CTECount: integer read GetCTECount;
     property DataSet: TDataSet read FDataSet;
@@ -164,74 +183,73 @@ type
     property PlanClause: string read FPlanClause;
     property WhereClause: string read FWhereClause write FWhereClause;
     property OrderByClause: string read FOrderByClause write SetOrderByClause;
+    property RowsClause: string read FRowsClause;
     property SQLText: string read GetSQLText;
     property Union: TSelectSQLParser read FUnion;
     property UnionAll: boolean read FUnionAll write FUnionAll;
              {When true this is joined by "Union All" to the parent Select}
-    property ParamList: TStringList read FParamList;
-    property NotaSelectStmt: boolean read GetNotaSelectStmt;
     property OnSQLChanging: TNotifyEvent read FOnSQLChanging write FOnSQLChanging;
   end;
 
-  TFilterCallback = procedure(Parser: TSelectSQLParser; Key: integer) of object; 
+  TFilterCallback = procedure(Parser: TSelectSQLParser; Key: integer) of object;
 
 implementation
 
-uses Sysutils, IBCustomDataSet;
-
-resourcestring
-  sBadBy          = 'Unexpected symbol "BY" in: %s';
-  sBadSymbol      = 'Unknown Symbol';
-  sIncomplete     = 'Incomplete Union';
-  sBadSQL         = 'Error processing SQL "%s" - %s';
-  sStackUnderFlow = 'Stack Underflow';
-  sStackOverFlow  = 'Stack Overflow';
-  sBadParameter   = 'Bad SQL Parameter';
+uses Sysutils, IBCustomDataSet, IB, FBMessages;
 
 { TSelectSQLParser }
 
-procedure TSelectSQLParser.AddToSQL(const Word: string);
+procedure TSelectSQLParser.AnalyseSQL;
+var token: TSQLTokens;
 begin
-  case FState of
-  stNestedSelect,
-  stInSelect:
-    FSelectClause := FSelectClause + Word;
-  stNestedFrom,
-  stInFrom:
-    FFromClause := FFromClause + Word;
-  stNestedWhere,
-  stInWhere:
-    FWhereClause := FWhereClause + Word;
-  stNestedGroupBy,
-  stInGroupBy:
-    FGroupClause := FGroupClause + Word;
-  stInHaving:
-    FHavingClause := FHavingClause + Word;
-  stInPlan:
-    FPlanClause := FPlanClause + Word;
-  stInOrderBy:
-    FOrderByClause := FOrderByClause + Word;
-  stInDoubleQuotes,
-  stInSingleQuotes:
-    FLiteral := FLiteral + Word;
-  stInCTE:
-    FCTE.Text := FCTE.Text + Word;
-  stCTE2:
-    FCTE.Name := Trim(FCTE.Name + Word);
-  end;
-end;
-
-procedure TSelectSQLParser.CTEClear;
-var i: integer;
-begin
-  for i := 0 to FCTEs.Count - 1 do
-    dispose(PCTEDef(FCTEs[i]));
-  FCTEs.Clear;
+ while not EOF do
+ begin
+   token := GetNextToken;
+//   writeln('HL: ',token,',',TokenText);
+   case token of
+   sqltSelect:
+     FSelectClause := Trim(TokenText);
+   sqltWith:
+     AddCTE(FCTEName,false,Trim(TokenText));
+   sqltRecursive:
+     AddCTE(FCTEName,true,Trim(TokenText));
+   sqltFrom:
+     FFromClause := Trim(TokenText);
+   sqltWhere:
+     FWhereClause := Trim(TokenText);
+   sqltGroup:
+     FGroupClause := Trim(TokenText);
+   sqltHaving:
+     FHavingClause := Trim(TokenText);
+   sqltPlan:
+     FPlanClause := Trim(TokenText);
+   sqltUnion:
+     begin
+       FUnion := TSelectSQLParser.Create(self);
+       Assign(FUnion); {copy back state}
+       FNextToken := sqltSpace;
+     end;
+   sqltOrder:
+     FOrderByClause := Trim(TokenText);
+   sqltRows:
+     FRowsClause := Trim(TokenText);
+   sqltAll:
+     begin
+       FUnion := TSelectSQLParser.Create(self);
+       FUnion.FUnionAll := true;
+       Assign(FUnion); {copy back state}
+       FNextToken := sqltSpace;
+     end;
+   end;
+ end;
+ FOriginalWhereClause := WhereClause;
+ FOriginalHavingClause := HavingClause;
+ FOriginalOrderByClause := OrderByClause
 end;
 
 function TSelectSQLParser.GetCTE(Index: integer): PCTEDef;
 begin
-  if (Index < 0) or (index >= FCTEs.Count) then
+  if (Index < 0) or (index >= GetCTECount) then
      raise Exception.Create('CTE Index out of bounds');
 
   Result := FCTEs[Index]
@@ -239,12 +257,184 @@ end;
 
 function TSelectSQLParser.GetCTECount: integer;
 begin
-  Result := FCTEs.Count;
+  Result := Length(FCTEs);
 end;
 
-function TSelectSQLParser.GetNotaSelectStmt: boolean;
+function TSelectSQLParser.AddCTE(aName: string; Recursive: boolean; text: string
+  ): PCTEDef;
+var index: integer;
 begin
-  Result := FState = stNotASelectStmt;
+  new(Result);
+  Result^.Name := aName;
+  Result^.Recursive := Recursive;
+  Result^.text := text;
+  index := Length(FCTEs);
+  SetLength(FCTEs,index+1);
+  FCTEs[index] := Result;
+end;
+
+procedure TSelectSQLParser.FlushCTEs;
+var i: integer;
+begin
+  for i := 0 to Length(FCTEs) - 1 do
+    dispose(FCTEs[i]);
+  SetLength(FCTEs,0);
+end;
+
+function TSelectSQLParser.GetSQLText: string;
+var SQL: TStringList;
+    I: integer;
+begin
+  SQL := TStringList.Create;
+  try
+    for I := 0 to CTECount - 1 do
+    begin
+      if I = 0 then
+      begin
+        if CTEs[I]^.Recursive then
+          SQL.Add('WITH RECURSIVE ' + CTEs[I]^.Name + ' AS ' + CTES[I]^.Text )
+        else
+          SQL.Add('WITH ' + CTEs[I]^.Name + ' AS ' + CTES[I]^.Text)
+      end
+      else
+      begin
+        SQL.Strings[SQL.Count-1] := SQL.Strings[SQL.Count-1] + ',';
+        SQL.Add(CTEs[I]^.Name + ' AS ' + CTES[I]^.Text)
+      end
+    end;
+    if CTECount > 0 then
+      SQL.Add('');
+    SQL.Add('SELECT ' + SelectClause);
+    SQL.Add('FROM ' + FromClause);
+    if WhereClause <> '' then
+      SQL.Add('WHERE ' + WhereClause);
+    if GroupClause <> '' then
+      SQL.Add('GROUP BY ' + GroupClause);
+    if HavingClause <> '' then
+      SQL.Add('HAVING ' + HavingClause);
+    if PlanClause <> '' then
+      SQL.Add('PLAN ' + PlanClause);
+    if Union <> nil then
+    begin
+      if Union.UnionAll then
+         SQL.Add('UNION ALL')
+      else
+        SQL.Add('UNION');
+      SQL.Add(Union.SQLText)
+    end;
+    if OrderByClause <> '' then
+      SQL.Add('ORDER BY ' + OrderByClause);
+    if RowsClause <> '' then
+      SQL.Add('ROWS ' + RowsClause);
+    Result := SQL.Text
+  finally
+    SQL.Free
+  end
+end;
+
+procedure TSelectSQLParser.SetSelectClause(const Value: string);
+begin
+  if FSelectClause <> Value then
+  begin
+    FSelectClause := Value;
+    Changed
+  end;
+end;
+
+procedure TSelectSQLParser.SetOrderByClause(const Value: string);
+begin
+  if Union <> nil then
+    Union.OrderByClause := Value
+  else
+  if FOrderByClause <> Value then
+  begin
+    FOrderByClause := Value;
+    Changed
+  end;
+end;
+
+procedure TSelectSQLParser.SetGroupClause(const Value: string);
+begin
+  if FGroupClause <> Value then
+  begin
+    FGroupClause := Value;
+    Changed
+  end;
+end;
+
+procedure TSelectSQLParser.SetFromClause(const Value: string);
+begin
+  if FFromClause <> Value then
+  begin
+    FFromClause := Value;
+    Changed
+  end;
+end;
+
+constructor TSelectSQLParser.Create(aOwner: TSelectSQLParser);
+begin
+  inherited Create(aOwner <> nil);
+  FOwner := aOwner;
+  if assigned(FOwner) then
+  begin
+    FDataSet := FOwner.DataSet;
+    {copy state}
+    Assign(aOwner);
+  end;
+  AnalyseSQL;
+end;
+
+procedure TSelectSQLParser.Assign(source: TSQLTokeniser);
+begin
+  inherited Assign(source);
+  if source is TSelectSQLParser then
+  begin
+    FInString := TSelectSQLParser(source).FInString;
+    FIndex := TSelectSQLParser(source).FIndex;
+  end;
+end;
+
+procedure TSelectSQLParser.Changed;
+begin
+  if FOwner <> nil then
+    FOwner.Changed
+  else
+  if assigned(FOnSQLChanging) and not FDestroying then
+     OnSQLChanging(self)
+end;
+
+function TSelectSQLParser.GetChar: char;
+begin
+  if FIndex <= Length(FInString) then
+  begin
+    Result := FInString[FIndex];
+    Inc(FIndex);
+  end
+  else
+    Result := #0;
+end;
+
+constructor TSelectSQLParser.Create(aDataSet: TDataSet; SQLText: TStrings);
+begin
+  FDataSet := aDataSet;
+  FInString := SQLText.Text;
+  FIndex := 1;
+  Create(nil);
+end;
+
+constructor TSelectSQLParser.Create(aDataSet: TDataSet; const SQLText: string);
+begin
+  FDataSet := aDataSet;
+  FInString := SQLText;
+  FIndex := 1;
+  Create(nil);
+end;
+
+destructor TSelectSQLParser.Destroy;
+begin
+  FDestroying := true;
+  Clear;
+  inherited Destroy;
 end;
 
 procedure TSelectSQLParser.Add2WhereClause(const Condition: string;
@@ -277,651 +467,24 @@ begin
   Changed;
 end;
 
-procedure TSelectSQLParser.AnalyseLine(const Line: string);
-var Symbol: TSQLSymbol;
+procedure TSelectSQLParser.Clear;
 begin
-  while true do
-  begin
-    if FState = stError then
-      raise Exception.Create('Entered Error State');
-
-    Symbol := GetSymbol(Line,FIndex);
-    if (FState = stInParam) and (Symbol <> sqString) then
-      raise Exception.Create(sBadParameter);
-
-    if (FState = stInit) and not (Symbol in [sqSelect,sqWith]) then
-    begin
-      FState := stNotASelectStmt;
-      Exit; {abandon all hope}
-    end;
-
-    case Symbol of
-    sqSpace:
-      if not (FState in [stInComment,stInCommentLine]) then
-        AddToSQL(' ');
-
-    sqColon:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        AddToSQL(':');
-        if not (FState in [stInSingleQuotes,stInDoubleQuotes]) then
-          SetState(stInParam);
-      end;
-
-    sqSemiColon:
-      if not (FState in [stInComment,stInCommentLine]) then
-        case FState of
-        stInWhere,stInGroupBy,
-        stInHaving,stInPlan,stInFrom:
-          begin
-            FState := stDone;
-            Exit
-          end;
-
-        stInSingleQuotes, stInDoubleQuotes:
-          AddToSQL(';');
-
-         else
-          raise Exception.Create('Unexpected ";"')
-        end;
-
-    sqAsterisk:
-      if not (FState in [stInComment,stInCommentLine]) then
-       AddToSQL('*');
-
-    sqForwardSlash:
-      if not (FState in [stInComment,stInCommentLine]) then
-       AddToSQL('/');
-
-    sqOpenBracket:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        if FNested = 0 then
-        case FState of
-        stInSelect,
-        stNestedSelect:
-          SetState(stNestedSelect);
-
-        stInFrom,
-        stNestedFrom:
-          SetState(stNestedFrom);
-
-        stInWhere,
-        stNestedWhere:
-          SetState(stNestedWhere);
-
-        stInGroupBy,
-        stNestedGroupBy:
-          SetState(stNestedGroupBy);
-
-        stCTE3:
-          begin
-            FState := stCTEClosed;
-            SetState(stInCTE);
-          end;
-        end;
-        if (FNested > 0 ) or (FState <> stInCTE) then
-          AddToSQL('(');
-        Inc(FNested);
-      end;
-
-    sqCloseBracket:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        Dec(FNested);
-        if (FNested > 0) or (FState <> stInCTE) then
-          AddToSQL(')');
-        if FNested = 0 then
-        begin
-          if FState = stInCTE then
-             FState := PopState
-          else
-          if FState in [stNestedSelect,stNestedFrom,stNestedWhere,stNestedGroupBy] then
-            FState := PopState;
-        end;
-        if FState = stCTEClosed then
-          AddCTE;
-      end;
-
-    sqComma:
-      if FState = stCTEClosed then
-         FState := stCTE
-      else
-        AddToSQL(',');
-
-    sqCommentStart:
-      if not (FState in [stInComment,stInCommentLine]) then
-        SetState(stInComment);
-
-    sqCommentEnd:
-      if FState = stInComment then
-        FState := PopState
-      else
-        FState := stError;
-
-    sqCommentLine:
-      if not (FState in [stInComment,stInCommentLine]) then
-        SetState(stInCommentLine);
-
-    sqSingleQuotes:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        case FState of
-        stInSingleQuotes:
-          begin
-            FState := PopState;
-            AddToSQL(FLiteral)
-          end;
-        stInDoubleQuotes:
-          {Ignore};
-        else
-         begin
-          FLiteral := '';
-          SetState(stInSingleQuotes)
-         end
-        end;
-        AddToSQL('''')
-      end;
-
-    sqDoubleQuotes:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        case FState of
-        stInSingleQuotes:
-          {Ignore};
-        stInDoubleQuotes:
-          begin
-            FState := PopState;
-            AddToSQL(FLiteral)
-          end;
-        else
-         begin
-          FLiteral := '';
-          SetState(stInDoubleQuotes)
-         end
-        end;
-        AddToSQL('"')
-      end;
-
-    sqString:
-      if not (FState in [stInComment,stInCommentLine]) then
-      begin
-        if FState = stInParam then
-        begin
-          FState := PopState;
-          ParamList.Add(FString)
-        end
-        else
-        if FState in [stCTE, stCTE1] then
-          FState := stCTE2;
-        AddToSQL(FString)
-      end;
-
-    sqEOL:
-      begin
-        case FState of
-        stInCommentLine:
-          FState := PopState;
-        stInDoubleQuotes,
-        stInSingleQuotes:
-          Begin
-            FLiteral := FLiteral + #$0A;
-            Exit;
-          End;
-        end;
-        AddToSQL(' ');
-        Exit;
-      end;
-
-      sqSelect:
-        if FState in [stInSingleQuotes,stInDoubleQuotes,stNestedFrom,stNestedWhere,stNestedSelect,stInCTE] then
-          AddToSql(FString)
-        else
-          FState := stInSelect;
-
-      sqFrom:
-        if FState = stInSelect then
-          FState := stInFrom
-        else
-          AddToSql(FString);
-{        if FState in [stInSingleQuotes,stInDoubleQuotes,stNestedFrom,stNestedWhere,
-          stNestedGroupBy,stNestedSelect] then
-          AddToSql(FString)
-        else
-          FState := stInFrom;}
-
-      sqGroup:
-        if FState in [stInSingleQuotes,stInDoubleQuotes,stNestedFrom,stNestedWhere,stInCTE] then
-          AddToSql(FString)
-        else
-          FState := stInGroup;
-
-      sqWhere:
-        if FState in [stInSingleQuotes,stInDoubleQuotes,stNestedFrom,stNestedWhere,stNestedSelect,stInCTE] then
-          AddToSql(FString)
-        else
-          FState := stInWhere;
-
-      sqHaving:
-        if FState in [stInSingleQuotes,stInDoubleQuotes,stNestedFrom,stNestedWhere,stInCTE] then
-          AddToSql(FString)
-        else
-          FState := stInHaving;
-
-      sqPlan:
-        if FState in [stInSingleQuotes,stInDoubleQuotes,stNestedFrom,stNestedWhere,stInCTE] then
-          AddToSql(FString)
-        else
-          FState := stInPlan;
-
-      sqOrder:
-        if FState in [stInSingleQuotes,stInDoubleQuotes,stNestedFrom,stNestedWhere] then
-          AddToSql(FString)
-        else
-          FState := stInOrder;
-
-      sqUnion:
-        if FState in [stInSingleQuotes,stInDoubleQuotes,stNestedFrom,stNestedWhere,stInCTE] then
-          AddToSql(FString)
-        else
-        begin
-          FState := stUnion;
-          Exit
-        end;
-
-      sqAll:
-        if FState in [stInSingleQuotes,stInDoubleQuotes,stNestedFrom,stNestedWhere,stInCTE] then
-          AddToSql(FString)
-        else
-        if (FState = stInit) and FAllowUnionAll and not FUnionAll then
-           FUnionAll := true
-        else
-         raise Exception.Create('Unexpected symbol "all"');
-
-      sqBy:
-        case FState of
-        stInGroup:
-          FState := stInGroupBy;
-        stInOrder:
-          FState := stInOrderBy;
-        stNestedFrom,stNestedWhere,stInCTE,
-        stInSingleQuotes,
-        stInDoubleQuotes:
-          AddToSql(FString);
-        else
-          raise Exception.CreateFmt(sBadBy,[Line])
-        end;
-
-      sqWith:
-        if FState = stInit then
-        begin
-          FState := stCTE;
-          InitCTE;
-        end
-        else
-          raise Exception.Create('Unexpected symbol "with"');
-
-      sqRecursive:
-        if FState = stCTE then
-        begin
-          FCTE.Recursive := true;
-          FState := stCTE1
-        end
-      else
-        raise Exception.Create('Unexpected symbol "recursive"');
-
-      sqAs:
-      if FState = stCTE2 then
-        FState := stCTE3
-      else
-        AddToSQL('as');
-
-    else
-      raise Exception.Create(sBadSymbol);
-    end
-  end
-end;
-
-procedure TSelectSQLParser.AnalyseSQL(Lines: TStrings);
-var I: integer;
-begin
- try
-  for I := FStartLine to Lines.Count - 1 do
-  try
-      AnalyseLine(Lines[I]);
-      case FState of
-      stDone:
-        break;
-      stUnion:
-        begin
-          if FIndex > length(Lines[I]) then
-            if I+1 < Lines.Count then
-              FUnion := TSelectSQLParser.Create(self,Lines,I+1,1)
-            else
-              raise Exception.Create(sIncomplete)
-          else
-            FUnion := TSelectSQLParser.Create(self,Lines,I,FIndex);
-          Exit
-        end;
-      end;
-      FIndex := 1;
-  except on E: Exception do
-    raise Exception.CreateFmt(sBadSQL,[Lines[I],E.Message])
-  end;
- finally
-  FOriginalWhereClause := WhereClause;
-  FOriginalHavingClause := HavingClause;
-  FOriginalOrderByClause := OrderByClause
- end;
-end;
-
-procedure TSelectSQLParser.InitCTE;
-begin
-  with FCTE do
-  begin
-    Recursive := false;
-    Name := '';
-    Text := '';
-  end;
-end;
-
-procedure TSelectSQLParser.AddCTE;
-var cte: PCTEDef;
-begin
-  new(cte);
-  cte^.Name := FCTE.Name;
-  cte^.Recursive := FCTE.Recursive;
-  cte^.Text := FCTE.Text;
-  FCTEs.add(cte);
-  InitCTE;
-end;
-
-function TSelectSQLParser.Check4ReservedWord(const Text: string): TSQLSymbol;
-begin
-      Result := sqString;
-      if CompareText(Text,'select') = 0 then
-        Result := sqSelect
-      else
-      if CompareText(Text,'from') = 0 then
-        Result := sqFrom
-      else
-      if CompareText(Text,'where') = 0 then
-        Result := sqWhere
-      else
-      if CompareText(Text,'group') = 0 then
-        Result := sqGroup
-      else
-      if CompareText(Text,'by') = 0 then
-        Result := sqBy
-      else
-      if CompareText(Text,'having') = 0 then
-        Result := sqHaving
-      else
-      if CompareText(Text,'plan') = 0 then
-        Result := sqPlan
-      else
-      if CompareText(Text,'union') = 0 then
-        Result := sqUnion
-      else
-      if CompareText(Text,'all') = 0 then
-        Result := sqAll
-      else
-      if CompareText(Text,'order') = 0 then
-        Result := sqOrder
-      else
-      if CompareText(Text,'with') = 0 then
-        Result := sqWith
-      else
-      if CompareText(Text,'recursive') = 0 then
-        Result := sqRecursive
-      else
-      if CompareText(Text,'as') = 0 then
-        Result := sqAs
-end;
-
-constructor TSelectSQLParser.Create(aDataSet: TDataSet; SQLText: TStrings);
-begin
-  FDataSet := aDataSet;
-  Create(nil,SQLText,0,1)
-end;
-
-constructor TSelectSQLParser.Create(aDataSet: TDataSet; const SQLText: string);
-var Lines: TStringList;
-begin
-  Lines := TStringList.Create;
-  try
-    Lines.Text := SQLText;
-    Create(aDataSet,Lines)
-  finally
-    Lines.Free
-  end
-end;
-
-constructor TSelectSQLParser.Create(aOwner: TSelectSQLParser;
-  SQLText: TStrings; StartLine, StartIndex: integer);
-begin
-  inherited Create;
-  FOwner := aOwner;
-  FParamList := TStringList.Create;
-  FCTEs := TList.Create;
-  FLastSymbol := sqNone;
-  FState := stInit;
-  FStartLine := StartLine;
-  FIndex := StartIndex;
-  FAllowUnionAll := true;
-  AnalyseSQL(SQLText);
-end;
-
-procedure TSelectSQLParser.Changed;
-begin
-  if FOwner <> nil then
-    FOwner.Changed
-  else
-  if assigned(FOnSQLChanging) and not FDestroying then
-     OnSQLChanging(self)
-end;
-
-function TSelectSQLParser.GetNextSymbol(C: char): TSQLSymbol;
-begin
-    case C of
-    ' ',#9:
-      Result := sqSpace;
-    ';':
-      Result := sqSemiColon;
-    '"':
-      Result := sqDoubleQuotes;
-    '''':
-      Result := sqSingleQuotes;
-    '/':
-      Result := sqForwardSlash;
-    '*':
-      Result := sqAsterisk;
-    '(':
-      Result := sqOpenBracket;
-    ')':
-      Result := sqCloseBracket;
-    ':':
-      Result := sqColon;
-    ',':
-      Result := sqComma;
-    else
-      begin
-        Result := sqString;
-        FLastChar := C
-      end
-    end
-end;
-
-function TSelectSQLParser.GetSymbol(const Line: string; var index: integer): TSQLSymbol;
-begin
-  Result := FLastSymbol;
-  if Result = sqString then
-      FString := FLastChar;
-  FLastSymbol := sqNone;
-
-  while (index <= Length(Line)) and (FLastSymbol = sqNone) do
-  begin
-    FLastSymbol := GetNextSymbol(Line[index]);
-    {combine if possible}
-    case Result of
-    sqNone:
-      begin
-        Result := FLastSymbol;
-        if FLastSymbol = sqString then
-          FString := FLastChar;
-        FLastSymbol := sqNone
-      end;
-
-    sqSpace:
-      if FLastSymbol = sqSpace then
-        FLastSymbol := sqNone;
-
-    sqForwardSlash:
-      if FLastSymbol = sqAsterisk then
-      begin
-        Result := sqCommentStart;
-        FLastSymbol := sqNone
-      end
-      else
-      if FLastSymbol = sqForwardSlash then
-      begin
-        Result := sqCommentLine;
-        FLastSymbol := sqNone
-      end;
-
-    sqAsterisk:
-      if FLastSymbol = sqForwardSlash then
-      begin
-        Result := sqCommentEnd;
-        FLastSymbol := sqNone
-      end;
-
-    sqString:
-      if FLastSymbol = sqString then
-      begin
-        FString := FString + FLastChar;
-        FLastSymbol := sqNone
-      end;
-    end;
-    Inc(index)
-  end;
-
-  if (Result = sqString)  and not (FState in [stInComment,stInCommentLine, stInSingleQuotes,stInDoubleQuotes])then
-    Result := Check4ReservedWord(FString);
-
-  if (index > Length(Line)) then
-  begin
-    if  (Result = sqNone) then
-      Result := sqEOL
-    else
-    if (FLastSymbol = sqNone) and (Result <> sqEOL) then
-      FLastSymbol := sqEOL;
-  end;
-
-end;
-
-function TSelectSQLParser.GetSQlText: string;
-var SQL: TStringList;
-    I: integer;
-begin
-  SQL := TStringList.Create;
-  try
-    for I := 0 to CTECount - 1 do
-    begin
-      if I = 0 then
-      begin
-        if CTEs[I]^.Recursive then
-          SQL.Add('WITH RECURSIVE ' + CTEs[I]^.Name + ' AS (' + CTES[I]^.Text + ')')
-        else
-          SQL.Add('WITH ' + CTEs[I]^.Name + ' AS (' + CTES[I]^.Text +')')
-      end
-      else
-      begin
-        SQL.Add(',');
-        SQL.Add(CTEs[I]^.Name + ' AS (' + CTES[I]^.Text +')')
-      end
-    end;
-    if CTECount > 0 then
-      SQL.Add('');
-    SQL.Add('SELECT ' + SelectClause + #13#10' FROM ' + FromClause);
-    if WhereClause <> '' then
-      SQL.Add('Where ' + WhereClause);
-    if GroupClause <> '' then
-      SQL.Add('GROUP BY ' + GroupClause);
-    if HavingClause <> '' then
-      SQL.Add('HAVING ' + HavingClause);
-    if PlanClause <> '' then
-      SQL.Add('PLAN ' + PlanClause);
-    if OrderByClause <> '' then
-      SQL.Add('ORDER BY ' + OrderByClause);
-    if Union <> nil then
-    begin
-      if Union.UnionAll then
-         SQL.Add('UNION ALL')
-      else
-        SQL.Add('UNION');
-      SQL.Add(Union.SQLText)
-    end;
-    Result := SQL.Text
-  finally
-    SQL.Free
-  end
-end;
-
-function TSelectSQLParser.PopState: TSQLStates;
-begin
-  if FStackIndex = 0 then
-    raise Exception.Create(sStackUnderFlow);
-  Dec(FStackIndex);
-  Result := FStack[FStackIndex]
-end;
-
-procedure TSelectSQLParser.SetState(AState: TSQLStates);
-begin
-  if FStackIndex > 16 then
-    raise Exception.Create(sStackOverFlow);
-  FStack[FStackIndex] := FState;
-  Inc(FStackIndex);
-  FState := AState
-end;
-
-procedure TSelectSQLParser.SetSelectClause(const Value: string);
-begin
-  if FSelectClause <> Value then
-  begin
-    FSelectClause := Value;
-    Changed
-  end;
-end;
-
-procedure TSelectSQLParser.SetFromClause(const Value: string);
-begin
-  if FFromClause <> Value then
-  begin
-    FFromClause := Value;
-    Changed
-  end;
-end;
-
-procedure TSelectSQLParser.SetGroupClause(const Value: string);
-begin
-  if FGroupClause <> Value then
-  begin
-    FGroupClause := Value;
-    Changed
-  end;
-end;
-
-procedure TSelectSQLParser.SetOrderByClause(const Value: string);
-begin
-  if Union <> nil then
-    Union.OrderByClause := Value
-  else
-  if FOrderByClause <> Value then
-  begin
-    FOrderByClause := Value;
-    Changed
-  end;
+ inherited Clear;
+ DropUnion;
+ FlushCTEs;
+ FInString := '';
+ FIndex := 1;
+ FSelectClause := '';
+ FFromClause := '';
+ FWhereClause := '';
+ FGroupClause := '';
+ FHavingClause := '';
+ FPlanClause := '';
+ FUnionAll := false;
+ FOrderByClause := '';
+ FOriginalWhereClause := '';
+ FOriginalOrderByClause := '';
+ FOriginalHavingClause := '';
 end;
 
 procedure TSelectSQLParser.DropUnion;
@@ -944,47 +507,413 @@ end;
 
 procedure TSelectSQLParser.ResetWhereClause;
 begin
-  FWhereClause := FOriginalWhereClause;
-  if Union <> nil then
-     Union.ResetWhereClause;
-  Changed
+ FWhereClause := FOriginalWhereClause;
+ if Union <> nil then
+    Union.ResetWhereClause;
+ Changed
 end;
 
 procedure TSelectSQLParser.ResetHavingClause;
 begin
-  FHavingClause := FOriginalHavingClause;
-  if Union <> nil then
-     Union.ResetHavingClause;
-  Changed
+ FHavingClause := FOriginalHavingClause;
+ if Union <> nil then
+    Union.ResetHavingClause;
+ Changed
 end;
 
 procedure TSelectSQLParser.ResetOrderByClause;
 begin
-  FOrderbyClause := FOriginalOrderByClause;
-  if Union <> nil then
-     Union.ResetOrderByClause;
-  Changed
+ FOrderbyClause := FOriginalOrderByClause;
+ if Union <> nil then
+    Union.ResetOrderByClause;
+ Changed
 end;
 
-procedure TSelectSQLParser.Reset;
+procedure TSelectSQLParser.RestoreClauseValues;
 begin
-  ResetWhereClause;
-  ResetHavingClause;
-  ResetOrderByClause
+ ResetWhereClause;
+ ResetHavingClause;
+ ResetOrderByClause
 end;
 
-destructor TSelectSQLParser.Destroy;
+{ TSelectSQLTokeniser }
+
+function TSelectSQLTokeniser.GetNotaSelectStmt: boolean;
 begin
-  FDestroying := true;
-  DropUnion;
-  if FParamList <> nil then FParamList.Free;
-  if FCTEs <> nil then
+  Result := FSQLState = stNotASelectStmt;
+end;
+
+procedure TSelectSQLTokeniser.Assign(source: TSQLTokeniser);
+begin
+  inherited Assign(source);
+  if source is TSelectSQLTokeniser then
   begin
-    CTEClear;
-    FCTEs.Free;
+    FSQLState := TSelectSQLTokeniser(source).FSQLState;
+    FNested := TSelectSQLTokeniser(source).FNested;
+    FNextToken := TSelectSQLTokeniser(source).FNextToken;
+    FPrevCTEToken := TSelectSQLTokeniser(source).FPrevCTEToken;
+    FClause := TSelectSQLTokeniser(source).FClause;
   end;
-  inherited;
 end;
+
+function TSelectSQLTokeniser.TokenFound(var token: TSQLTokens): boolean;
+
+  procedure swap(var a,b: TSQLTokens);
+  var c: TSQLTokens;
+  begin
+    c:= a;
+    a := b;
+    b := c;
+  end;
+
+  procedure ChangeState(AllowStates: TSQLStates; DoNesting: boolean);
+  var SaveState: TSQLState;
+  begin
+    SaveState := FSQLState;
+    if DoNesting then
+      case token of
+      sqltOpenBracket:
+        begin
+          Inc(FNested);
+          Exit;
+        end;
+
+      sqltCloseBracket:
+        Begin
+          Dec(FNested);
+          Exit;
+        end;
+      end;
+
+    if FNested = 0 then
+    case token of
+    sqltFrom:
+      FSQLState := stInFrom;
+
+    sqltWhere:
+      FSQLState := stInWhere;
+
+    sqltGroup:
+      FSQLState := stInGroupBy;
+
+    sqltHaving:
+      FSQLState := stInHaving;
+
+    sqltPlan:
+      FSQLState := stInPlan;
+
+    sqltUnion:
+      FSQLState := stInUnion;
+
+    sqltOrder:
+      begin
+        if FUnionMember then
+        {stop and return to owning object}
+        begin
+          ResetQueue(sqltEOF,'');
+          QueueToken(token);
+          ReleaseQueue;
+          token := sqltEOF;
+          FSQLState := stUnionEnd;
+        end
+        else
+          FSQLState := stInOrderBy;
+      end;
+
+    sqltRows:
+      if FUnionMember then
+      {stop and return to owning object}
+      begin
+        ResetQueue(sqltEOF,'');
+        QueueToken(token);
+        ReleaseQueue;
+        token := sqltEOF;
+        FSQLState := stUnionEnd;
+      end
+      else
+        FSQLState := stInRows;
+
+    sqltAll:
+      FSQLState := stInUnionAll;
+   end;
+   if not (FSQLState in AllowStates + [stDefault]) then
+     FSQLState := SaveState
+   else
+   if SaveState <> FSQLState then
+     swap(token,FNextToken);
+  end;
+
+  var StateOnEntry: TSQLState;
+      DoNotReturnToken: boolean;
+
+  function TokenIncomplete: boolean;
+  begin
+     {we are not done if we are in not the default state and no state change,
+      unless we are a union member and the state is stUnionEnd}
+     Result :=  (FUnionMember and (StateOnEntry = stUnionEnd)) or
+                ((StateOnEntry = stDefault) or  (StateOnEntry = FSQLState));
+  end;
+
+begin
+  Result := inherited TokenFound(token);
+  if not Result or NotaSelectStmt then Exit;
+
+//  writeln(token);
+  StateOnEntry := FSQLState;
+  DoNotReturnToken := false;
+
+  if not (token in [sqltComment,sqltCommentLine]) then
+  begin
+    if token in [sqltParam, sqltQuotedParam] then
+      FParamList.Add(TokenText);
+
+    if (token = sqltEOF) or ((FNested = 0) and
+      not (token in [sqltQuotedString,sqltIdentifierInDoubleQuotes]) and
+      (TokenText = DefaultTerminator)) then
+    begin
+      if not FHasText then
+        FSQLState := stNotASelectStmt {empty statements are not select statements}
+      else
+      if FSQLState <> stUnionEnd then
+        FSQLState := stDefault;
+      swap(token,FNextToken);
+    end
+    else
+    if not (token in [sqltSpace,sqltEOL]) then
+    case FSQLState of
+    stDefault:
+      begin
+        if FNested = 0 then {not inside a pair of brackets}
+        case token of
+        sqltSelect:
+          FSQLState := stInSelect;
+
+        sqltWith:
+          FSQLState := stWith;
+
+        sqltCR,
+        sqltEOL,
+        sqltspace:
+          {ignore};
+
+        else
+          FSQLState := stNotASelectStmt;
+        end;
+        FNextToken := token;
+      end;
+
+    stWith:
+      begin
+        case token of
+        sqltRecursive:
+          begin
+            FSQLState := stInRecursiveCTE;
+            FNextToken := token;
+          end;
+
+        sqltIdentifier:
+          begin
+            FCTEName := TokenText;
+            FSQLState := stCTEAs;
+            FPrevCTEToken := FNextToken;
+            token := FNextToken;
+          end
+
+        else
+          IBError(ibxErrorParsing,['with']);
+        end;
+        DoNotReturnToken := true;
+      end;
+
+    stInRecursiveCTE:
+      case token of
+      sqltIdentifier:
+        begin
+          FCTEName := TokenText;
+          FSQLState := stCTEAs;
+          token := FNextToken;
+          FPrevCTEToken := FNextToken;
+          DoNotReturnToken := true;
+        end;
+
+      else
+        IBError(ibxErrorParsing,['with recursive']);
+      end;
+
+    stInNextCTE:
+      case token of
+      sqltIdentifier:
+        begin
+          FCTEName := TokenText;
+          FSQLState := stCTEAs;
+          token := FPrevCTEToken;
+          DoNotReturnToken := true;
+        end;
+
+      else
+        IBError(ibxErrorParsing,['with']);
+      end;
+
+    stCTEAs:
+      if token = sqltAs then
+      begin
+        FSQLState := stInCTE;
+        DoNotReturnToken := true;
+      end
+    else
+      IBError(ibxErrorParsing,['with']);
+
+    stInCTE:
+      begin
+        case token of
+        sqltOpenBracket:
+          Inc(FNested);
+
+        sqltCloseBracket:
+          Dec(FNested);
+
+        sqltComma:
+          if FNested = 0 then
+          begin
+            FSQLState := stInNextCTE;
+            token := FNextToken;
+          end;
+
+        sqltSelect:
+          if FNested = 0 then
+          begin
+            FSQLState := stInSelect;
+            swap(FNextToken,token);
+          end;
+        end;
+      end;
+
+    stInSelect:
+      ChangeState([stInFrom],true);
+
+    stInFrom:
+      ChangeState([stInWhere,stInGroupBy, stInHaving,stInPlan, stInUnion,stUnionEnd,
+                        stInOrderBy, stInRows],true);
+
+    stInWhere:
+      ChangeState([stInGroupBy, stInHaving,stInPlan, stInUnion,stUnionEnd,
+                       stInOrderBy, stInRows],true);
+
+    stInGroupBy:
+      if token = sqltBy then
+      begin
+        FClause := '';
+        SetTokenText('');
+        DoNotReturnToken := true;
+      end
+      else
+        ChangeState([stInHaving,stInPlan, stInUnion, stUnionEnd, stInOrderBy, stInRows],false);
+
+    stInHaving:
+      ChangeState([stInPlan, stInUnion, stUnionEnd, stInOrderBy, stInRows],true);
+
+    stInPlan:
+      ChangeState([stInUnion, stUnionEnd, stInOrderBy, stInRows],true);
+
+    stInUnion:
+      case token of
+      sqltAll:
+        begin
+          FSQLState := stDefault;
+          FNextToken := token;
+        end;
+      else
+        begin
+          ResetQueue(token);
+          ReleaseQueue;
+          swap(token,FNextToken);
+          FSQLState := stDefault;
+        end;
+      end;
+
+    stUnionEnd: {On return from union clause}
+      ChangeState([stInOrderBy, stInRows],false);
+
+    stInOrderBy:
+      if token = sqltBy then
+      begin
+        FClause := '';
+        SetTokenText('');
+        DoNotReturnToken := true;
+      end
+      else
+        ChangeState([stInRows],false);
+
+    stInRows:
+      ChangeState([],false);
+
+    end;
+
+    {On EOF or state change return the next element, otherwise just add to text buffer}
+
+    if (token <> sqltEOF) and TokenIncomplete  then
+    begin
+      if StateOnEntry <> stDefault then
+      case token of
+      sqltQuotedString:
+        FClause += '''' + SQLSafeString(TokenText) + '''';
+
+      sqltIdentifierInDoubleQuotes:
+        FClause += '"' + StringReplace(TokenText,'"','""',[rfReplaceAll]) + '"';
+
+      sqltParam:
+        FClause += ':' + TokenText;
+
+      sqltQuotedParam:
+        FClause += ':"' + StringReplace(TokenText,'"','""',[rfReplaceAll]) + '"';
+
+      else
+        FClause += TokenText;
+      end;
+      DoNotReturnToken := true;
+    end
+    else
+    begin
+      FHasText := true;
+      SetTokenText(FClause);
+      FClause := '';
+    end;
+
+  end;
+  Result := not DoNotReturnToken ;
+end;
+
+procedure TSelectSQLTokeniser.Reset;
+begin
+  inherited Reset;
+  FSQLState := stDefault;
+  FNested := 0;
+  FNextToken := sqltSpace;
+end;
+
+constructor TSelectSQLTokeniser.Create(UnionMember: boolean);
+begin
+  inherited Create;
+  FUnionMember := UnionMember;
+  FParamList := TStringList.Create;
+end;
+
+destructor TSelectSQLTokeniser.Destroy;
+begin
+  if assigned(FParamList) then FParamList.Free;
+  FParamList := nil;
+  inherited Destroy;
+end;
+
+procedure TSelectSQLTokeniser.Clear;
+begin
+  Reset;
+  FHasText := false;
+  if assigned(FParamList) then
+    FParamList.Clear;
+end;
+
+
 
 end.
 

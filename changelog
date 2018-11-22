@@ -7,13 +7,21 @@ IBX Change Log  version                 (2.3-1) Thu, 25 Oct 2018 14:39:45 +0100
    IBGUIInterface. Note: master/detail delay timer does not apply to console
    mode apps.
 
-3. IBSQLParser: new property NotaSelectStmt. Set to true if SQL does not start
-    with "with" or "select".
+3. TIBCustomDataSet: SQLParser ignored if it does not contain a valid select
+   statement. This avoids problems if "Execute Block" is used as the Query.
 
-4.  TIBCustomDataSet: SQLParser ignored if it does not contain a valid select
-    statement. This avoids problems if "Execute Block" is used as the Query.
+4. IBSQLParser now uses the common SQL tokeniser from fbintf. This replaces the
+   internal SQL tokeniser routines.
 
-5.  Fix error in TIBXScript processing of "set" statements. This avoids exceptions
+5. IBSQLParser: new property NotaSelectStmt. Set to true if SQL fails to parse
+   as a select statement, with or without CTEs.
+
+6. IBSQLParser: parser now recognises the "ROWS" clause.
+
+7. TIBXScript now uses the common SQL tokeniser from fbintf. This replaces the
+   internal SQL tokeniser routines.
+
+8.  Fix error in TIBXScript processing of "set" statements. This avoids exceptions
     being raised for valid set statements processed by a data formatter.
 
 IBX Change Log  version                (2.3-0) Mon, 16 Apr 2018 09:48:06 +0100

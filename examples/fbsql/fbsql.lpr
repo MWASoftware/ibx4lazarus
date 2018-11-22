@@ -160,14 +160,14 @@ begin
   Result := inherited ProcessStatement(stmt);
   if not Result then
   begin
-    Terminator := FSymbolStream.Terminator;
+    Terminator := SQLStatementReader.Terminator;
     ucStmt := AnsiUpperCase(stmt);
     RegexObj := TRegExpr.Create;
     try
       RegexObj.Expression := '^ *(QUIT|EXIT) *(\' + Terminator + '|)';
       if RegexObj.Exec(ucStmt) then
       begin
-         TInteractiveSymbolStream(FSymbolStream).Terminated := true;
+         TInteractiveSQLStatementReader(SQLStatementReader).Terminated := true;
          Result := true;
       end;
     finally
@@ -179,7 +179,7 @@ end;
 constructor TInteractiveSQLProcessor.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
-  FSymbolStream := TInteractiveSymbolStream.Create;
+  SetSQLStatementReader(TInteractiveSQLStatementReader.Create);
 end;
 
 procedure TInteractiveSQLProcessor.Run;

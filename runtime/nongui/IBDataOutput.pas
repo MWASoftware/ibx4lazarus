@@ -361,7 +361,7 @@ begin
             s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar
         end
         else
-          s += TIBXMLProcessor.FormatBlob(Current[i]);
+          s += TSQLXMLReader.FormatBlob(Current[i]);
 
       SQL_ARRAY:
         begin
@@ -369,7 +369,7 @@ begin
           if ar = nil then
             s += 'NULL'
           else
-            s += TIBXMLProcessor.FormatArray(Database,ar);
+            s += TSQLXMLReader.FormatArray(Database,ar);
         end;
 
       SQL_TEXT, SQL_VARYING:

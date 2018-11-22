@@ -68,16 +68,18 @@ uses
 }
 
 type
-  TRowCacheState = (rcEmpty,rcPresent,rcDeleted);
-  TRowDetails = record
-    FState: TRowCacheState;
-    FAlternateColor: boolean;
-    FBitmap: TBitmap;
-  end;
-
   { TRowCache }
 
   TRowCache = class
+  private
+    type
+      TRowCacheState = (rcEmpty,rcPresent,rcDeleted);
+      TRowDetails = record
+        FState: TRowCacheState;
+        FAlternateColor: boolean;
+        FBitmap: TBitmap;
+  end;
+
   private
     FAltColorStartNormal: boolean;
     FHeight: integer;
