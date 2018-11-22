@@ -323,7 +323,7 @@ begin
       SQL.Add(Union.SQLText)
     end;
     if OrderByClause <> '' then
-      SQL.Add('ORDER ' + OrderByClause);
+      SQL.Add('ORDER BY ' + OrderByClause);
     if RowsClause <> '' then
       SQL.Add('ROWS ' + RowsClause);
     Result := SQL.Text
@@ -802,8 +802,9 @@ begin
     stInGroupBy:
       if token = sqltBy then
       begin
-        DoNotReturnToken := true;
+        FClause := '';
         SetTokenText('');
+        DoNotReturnToken := true;
       end
       else
         ChangeState([stInHaving,stInPlan, stInUnion, stUnionEnd, stInOrderBy, stInRows],false);
@@ -837,6 +838,7 @@ begin
       if token = sqltBy then
       begin
         FClause := '';
+        SetTokenText('');
         DoNotReturnToken := true;
       end
       else
