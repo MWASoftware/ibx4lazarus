@@ -56,10 +56,6 @@ uses
   SysUtils, Classes, IBDatabase, IBExternals, IB,  IBSQL, Db,
   IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, IBTypes;
 
-const
-  BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
-  UniCache           =  2;     { Uni-directional cache is 2 records big }
-
 type
   TIBCustomDataSet = class;
   TIBDataSet = class;
@@ -88,8 +84,6 @@ type
     property RefreshSQL: TStrings read FRefreshSQL write SetRefreshSQL;
   end;
 
-  TBlobDataArray = array[0..0] of TIBBlobStream;
-  PBlobDataArray = ^TBlobDataArray;
   TIBArrayField = class;
 
   { TIBArray }
@@ -107,51 +101,6 @@ type
     destructor Destroy; override;
     property ArrayIntf: IArray read FArray;
   end;
-
-  TArrayDataArray = array [0..0] of TIBArray;
-  PArrayDataArray = ^TArrayDataArray;
-
-  { TIBCustomDataSet }
-
-  TCachedUpdateStatus = (
-                         cusUnmodified, cusModified, cusInserted,
-                         cusDeleted, cusUninserted
-                        );
-  TIBDBKey = record
-    DBKey: array[0..7] of Byte;
-  end;
-  PIBDBKey = ^TIBDBKey;
-
-  PFieldData = ^TFieldData;
-  TFieldData = record
-   fdIsNull: Boolean;
-   fdDataLength: Short;
- end;
-
- PColumnData = ^TColumnData;
- TColumnData = record
-  fdDataType: Short;
-  fdDataScale: Short;
-  fdNullable: Boolean;
-  fdDataSize: Short;
-  fdDataOfs: Integer;
-  fdCodePage: TSystemCodePage;
- end;
-
- PFieldColumns = ^TFieldColumns;
- TFieldColumns =  array[1..1] of TColumnData;
-
-  TRecordData = record
-    rdBookmarkFlag: TBookmarkFlag;
-    rdFieldCount: Short;
-    rdRecordNumber: Integer;
-    rdCachedUpdateStatus: TCachedUpdateStatus;
-    rdUpdateStatus: TUpdateStatus;
-    rdSavedOffset: DWORD;
-    rdDBKey: TIBDBKey;
-    rdFields: array[1..1] of TFieldData;
-  end;
-  PRecordData = ^TRecordData;
 
   { TIBArrayField }
 
@@ -366,8 +315,6 @@ type
 
   TIBAutoCommit = (acDisabled, acCommitRetaining);
 
-  { TIBCustomDataSet }
-
   TIBUpdateAction = (uaFail, uaAbort, uaSkip, uaRetry, uaApply, uaApplied);
 
   TIBUpdateErrorEvent = procedure(DataSet: TDataSet; E: EDatabaseError;
@@ -376,15 +323,77 @@ type
   TIBUpdateRecordEvent = procedure(DataSet: TDataSet; UpdateKind: TUpdateKind;
                                    var UpdateAction: TIBUpdateAction) of object;
 
-  TIBUpdateRecordTypes = set of TCachedUpdateStatus;
-
   TDataSetCloseAction = (dcDiscardChanges, dcSaveChanges);
 
   TOnValidatePost = procedure (Sender: TObject; var CancelPost: boolean) of object;
 
   TOnDeleteReturning = procedure (Sender: TObject; QryResults: IResults) of object;
 
+  { TIBCustomDataSet }
+
   TIBCustomDataSet = class(TDataset)
+  private
+    const
+      BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
+      UniCache           =  2;     { Uni-directional cache is 2 records big }
+
+      {Buffer cache constants for record selection}
+      FILE_BEGIN = 0;
+      FILE_CURRENT = 1;
+      FILE_END = 2;
+
+      {internal type declarations}
+    type
+      TArrayDataArray = array [0..0] of TIBArray;
+      PArrayDataArray = ^TArrayDataArray;
+
+      TBlobDataArray = array[0..0] of TIBBlobStream;
+      PBlobDataArray = ^TBlobDataArray;
+
+      TCachedUpdateStatus = (
+                         cusUnmodified, cusModified, cusInserted,
+                         cusDeleted, cusUninserted
+                        );
+      TIBUpdateRecordTypes = set of TCachedUpdateStatus;
+
+      PFieldData = ^TFieldData;
+      TFieldData = record
+        fdIsNull: Boolean;
+        fdDataLength: Short;
+      end;
+
+      PColumnData = ^TColumnData;
+      TColumnData = record
+        fdDataType: Short;
+        fdDataScale: Short;
+        fdNullable: Boolean;
+        fdDataSize: Short;
+        fdDataOfs: Integer;
+        fdCodePage: TSystemCodePage;
+      end;
+
+      PFieldColumns = ^TFieldColumns;
+      TFieldColumns =  array[1..1] of TColumnData;
+
+  protected
+    type
+      TIBDBKey = record
+        DBKey: array[0..7] of Byte;
+      end;
+      PIBDBKey = ^TIBDBKey;
+
+    TRecordData = record
+      rdBookmarkFlag: TBookmarkFlag;
+      rdFieldCount: Short;
+      rdRecordNumber: Integer;
+      rdCachedUpdateStatus: TCachedUpdateStatus;
+      rdUpdateStatus: TUpdateStatus;
+      rdSavedOffset: DWORD;
+      rdDBKey: TIBDBKey;
+      rdFields: array[1..1] of TFieldData;
+    end;
+    PRecordData = ^TRecordData;
+
   private
     FAllowAutoActivateTransaction: Boolean;
     FArrayFieldCount: integer;
@@ -897,7 +906,7 @@ type
   end;
 
 const
-DefaultFieldClasses: array[TFieldType] of TFieldClass = (
+  DefaultFieldClasses: array[TFieldType] of TFieldClass = (
     nil,                { ftUnknown }
     TIBStringField,     { ftString }
     TIBSmallintField,   { ftSmallint }
@@ -955,10 +964,6 @@ DefaultFieldClasses: array[TFieldType] of TFieldClass = (
 implementation
 
 uses Variants, FmtBCD, LazUTF8, FBMessages, IBQuery;
-
-const FILE_BEGIN = 0;
-      FILE_CURRENT = 1;
-      FILE_END = 2;
 
 type
 
