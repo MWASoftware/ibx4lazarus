@@ -24,6 +24,14 @@ IBX Change Log  version                 (2.3-1) Thu, 25 Oct 2018 14:39:45 +0100
 8.  Fix error in TIBXScript processing of "set" statements. This avoids exceptions
     being raised for valid set statements processed by a data formatter.
 
+9. New published property for TIBDatabase and TIBXServicesConnection. This is
+   FirebirdLibraryPathName: string. If not empty it is used to explicitly specify
+   the path of the Firebird Library used by the database/services connection.
+
+10. New read only public property for TIBDatabase and TIBXServicesConnection. This
+   is FirebirdAPI and returns the IFirebirdAPI interface used by the database/
+   services connection.
+
 IBX Change Log  version                (2.3-0) Mon, 16 Apr 2018 09:48:06 +0100
 
 IMPORTANT: the source code tree has been re-organised for IBX 2.3. Please remove
