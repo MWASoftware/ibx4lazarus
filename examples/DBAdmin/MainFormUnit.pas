@@ -376,7 +376,7 @@ uses DataModule, ShutdownRegDlgUnit, AddSecondaryFileDlgUnit, NewUserDlgUnit,
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
-  FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
+  DatabaseData.IBDatabase1.FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
   Application.ExceptionDialog := aedOkMessageBox;
   PageControl1.ActivePage := Properties;
   DatabaseData.AfterDBConnect := @HandleDBConnect;

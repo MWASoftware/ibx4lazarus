@@ -129,7 +129,7 @@ procedure TMainForm.FormShow(Sender: TObject);
 var i: integer;
 begin
   {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
-  FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
+  IBXServicesConnection1.FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
   Application.ExceptionDialog := aedOkMessageBox;
   FDBName := sDefaultDatabaseName;
 

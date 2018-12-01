@@ -188,6 +188,7 @@ type
     FCreateDatabase: boolean;
     FCreateIfNotExists: boolean;
     FAllowStreamedConnected: boolean;
+    FFirebirdLibraryPathName: string;
     FHiddenPassword: string;
     FOnCreateDatabase: TNotifyEvent;
     FOnLogin: TIBDatabaseLoginEvent;
@@ -208,14 +209,17 @@ type
     FLoginCalled: boolean;
     FUseDefaultSystemCodePage: boolean;
     FUseHiddenPassword: boolean;
+    FFirebirdAPI: IFirebirdAPI;
     procedure EnsureInactive;
     function GetAuthenticationMethod: string;
     function GetDBSQLDialect: Integer;
     function GetDefaultCharSetID: integer;
     function GetDefaultCharSetName: AnsiString;
     function GetDefaultCodePage: TSystemCodePage;
+    function GetFirebirdAPI: IFirebirdAPI;
     function GetRemoteProtocol: string;
     function GetSQLObjectsCount: Integer;
+    procedure SetFirebirdLibraryPathName(AValue: string);
     procedure SetSQLDialect(const Value: Integer);
     procedure ValidateClientSQLDialect;
     procedure DBParamsChange(Sender: TObject);
@@ -274,6 +278,7 @@ type
     procedure RemoveTransactions;
 
     property Attachment: IAttachment read FAttachment;
+    property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property DBSQLDialect : Integer read GetDBSQLDialect;
     property IsReadOnly: Boolean read GetIsReadOnly;
     property SQLObjectCount: Integer read GetSQLObjectCount; {ignores nil objects}
@@ -294,6 +299,8 @@ type
     property AllowStreamedConnected: boolean read FAllowStreamedConnected
              write FAllowStreamedConnected;
     property DatabaseName: TIBFileName read FDBName write SetDatabaseName;
+    property FirebirdLibraryPathName: string read FFirebirdLibraryPathName
+                                             write SetFirebirdLibraryPathName;
     property Params: TStrings read FDBParams write SetDBParams;
     property LoginPrompt default True;
     property DefaultTransaction: TIBTransaction read FDefaultTransaction
@@ -311,7 +318,8 @@ type
     property OnCreateDatabase: TNotifyEvent read FOnCreateDatabase write FOnCreateDatabase;
     property OnLogin: TIBDatabaseLoginEvent read FOnLogin write FOnLogin;
     property OnIdleTimer: TNotifyEvent read FOnIdleTimer write FOnIdleTimer;
-    property OnDialectDowngradeWarning: TNotifyEvent read FOnDialectDowngradeWarning write FOnDialectDowngradeWarning;
+    property OnDialectDowngradeWarning: TNotifyEvent read FOnDialectDowngradeWarning
+                                                     write FOnDialectDowngradeWarning;
   end;
 
   TDefaultEndAction = TARollback..TACommit;
@@ -495,8 +503,8 @@ type
                                           write SetTransaction;
   end;
 
-function GenerateDPB(sl: TStrings): IDPB;
-function GenerateTPB(sl: TStrings): ITPB;
+function GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
+function GenerateTPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): ITPB;
 
 
 implementation
@@ -552,6 +560,7 @@ begin
   FSQLObjects.Free;
   FTransactions.Free;
   FDataSets.Free;
+  FFirebirdAPI := nil;
   inherited Destroy;
 end;
 
@@ -1085,11 +1094,11 @@ begin
      begin
        FDBParamsChanged := False;
        if not FUseHiddenPassword and (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
-         DPB := GenerateDPB(TempDBParams)
+         DPB := GenerateDPB(FirebirdAPI,TempDBParams)
        else
        begin
           TempDBParams.Values['password'] := FHiddenPassword;
-          DPB := GenerateDPB(TempDBParams);
+          DPB := GenerateDPB(FirebirdAPI,TempDBParams);
        end;
      end;
 
@@ -1383,6 +1392,23 @@ begin
     Result := CP_NONE;
 end;
 
+function TIBDataBase.GetFirebirdAPI: IFirebirdAPI;
+var fblib: IFirebirdLibrary;
+begin
+  if FFirebirdAPI = nil then
+  begin
+    if (csDesigning in ComponentState) or (Trim(FFirebirdLibraryPathName) = '') then
+      FFirebirdAPI := IB.FirebirdAPI
+    else
+    begin
+      fblib := IB.LoadFBLibrary(FFirebirdLibraryPathName);
+      if assigned(fblib) then
+        FFirebirdAPI := fblib.GetFirebirdAPI;
+    end;
+  end;
+  Result := FFirebirdAPI;
+end;
+
 function TIBDataBase.GetRemoteProtocol: string;
 begin
   CheckActive;
@@ -1392,6 +1418,14 @@ end;
 function TIBDataBase.GetSQLObjectsCount: Integer;
 begin
   Result := FSQLObjects.Count;
+end;
+
+procedure TIBDataBase.SetFirebirdLibraryPathName(AValue: string);
+begin
+  if FFirebirdLibraryPathName = AValue then Exit;
+  FFirebirdLibraryPathName := AValue;
+  ForceClose;
+  FFirebirdAPI := nil;
 end;
 
  procedure TIBDataBase.ValidateClientSQLDialect;
@@ -2061,7 +2095,7 @@ begin
     if FTRParamsChanged then
     begin
       FTRParamsChanged := False;
-      FTPB :=  GenerateTPB(FTRParams);
+      FTPB :=  GenerateTPB(Databases[0].FirebirdAPI,FTRParams);
     end;
 
     ValidDatabaseCount := 0;
@@ -2077,7 +2111,7 @@ begin
         if Databases[i] <> nil then
           Attachments[i] := Databases[i].Attachment;
 
-      FTransactionIntf := FirebirdAPI.StartTransaction(Attachments,FTPB,DefaultAction);
+      FTransactionIntf := Databases[0].FirebirdAPI.StartTransaction(Attachments,FTPB,DefaultAction);
     end;
   end;
 
@@ -2282,7 +2316,7 @@ end;
   parameter buffer, and return it and its length
   in DPB and DPBLength, respectively. }
 
-function GenerateDPB(sl: TStrings): IDPB;
+function GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
 var
   i, j: Integer;
   DPBVal: UShort;
@@ -2360,7 +2394,7 @@ end;
   of the transaction parameters, generate a transaction
   parameter buffer, and return it and its length in
   TPB and TPBLength, respectively. }
-function GenerateTPB(sl: TStrings): ITPB;
+function GenerateTPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): ITPB;
 var
   i, j, TPBVal: Integer;
   ParamName, ParamValue: string;

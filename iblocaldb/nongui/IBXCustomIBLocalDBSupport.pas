@@ -284,7 +284,7 @@ procedure TCustomIBLocalDBSupport.OnBeforeDatabaseConnect(Sender: TObject;
 begin
   if not Enabled or (csDesigning in ComponentState) then Exit;
 
-  if not FirebirdAPI.IsEmbeddedServer then
+  if not assigned(Database) or not Database.FirebirdAPI.IsEmbeddedServer then
      raise EIBLocalFatalError.Create(sNoEmbeddedServer);
 
   DBName := GetDBNameAndPath;

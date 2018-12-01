@@ -60,7 +60,9 @@ type
   TIBXServicesConnection = class(TIBXMonitoredConnection)
   private
     FDatabase: TIBDatabase;
+    FFirebirdAPI: IFirebirdAPI;
     FConnectString: string;
+    FFirebirdLibraryPathName: string;
     FOnSecurityContextException: TIBXServicesSecContextEvent;
     FParams: TStrings;
     FIBXServices: array of IIBXServicesClient;
@@ -75,6 +77,7 @@ type
     procedure CheckInactive;
     procedure CheckServerName;
     function GenerateSPB(sl: TStrings): ISPB;
+    function GetFirebirdAPI: IFirebirdAPI;
     function GetServerVersionNo(index: integer): integer;
     function GetSPBConstName(action: byte): string;
     procedure HandleException(Sender: TObject);
@@ -82,6 +85,7 @@ type
     function Login(var aServerName: string; LoginParams: TStrings): Boolean;
     procedure ParamsChanging(Sender: TObject);
     procedure SetConnectString(AValue: string);
+    procedure SetFirebirdLibraryPathName(AValue: string);
     procedure SetParams(AValue: TStrings);
     procedure SetPortNo(AValue: string);
     procedure SetProtocol(AValue: TProtocol);
@@ -103,11 +107,14 @@ type
       omitting any parameters not appropriate for Services API. Typically, the
       DBParams are TIBDatabase.Params}
     procedure SetDBParams(DBParams: TStrings);
+    property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property ServerVersionNo[index: integer]: integer read GetServerVersionNo;
     property ServiceIntf: IServiceManager read FService;
   published
     property Connected;
     property ConnectString: string read FConnectString write SetConnectString;
+    property FirebirdLibraryPathName: string read FFirebirdLibraryPathName
+                                             write SetFirebirdLibraryPathName;
     property LoginPrompt default True;
     property Protocol: TProtocol read FProtocol write SetProtocol default Local;
     property PortNo: string read FPortNo write SetPortNo;
@@ -2360,7 +2367,7 @@ begin
       done := ServicesConnection.ServiceIntf.Start(SRB,false);
       if not done then
       begin
-        theError := EIBInterBaseError.Create(FirebirdAPI.GetStatus);
+        theError := EIBInterBaseError.Create(ServicesConnection.GetFirebirdAPI.GetStatus);
         if theError.IBErrorCode = isc_sec_context then
         begin
           HandleSecContextErr;
@@ -2398,9 +2405,9 @@ begin
     done := FServiceQueryResults <> nil;
     if not done then
     begin
-      if FirebirdAPI.GetStatus.GetIBErrorCode = isc_sec_context then
+      if ServicesConnection.GetFirebirdAPI.GetStatus.GetIBErrorCode = isc_sec_context then
       begin
-        theError := EIBInterBaseError.Create(FirebirdAPI.GetStatus); {save exception}
+        theError := EIBInterBaseError.Create(ServicesConnection.GetFirebirdAPI.GetStatus); {save exception}
         HandleSecContextErr;
         if FAction = scReconnect then
         begin
@@ -2669,7 +2676,7 @@ begin
     FServiceQueryResults := nil;
     DoServiceQuery;
     if (FServiceQueryResults = nil) and RaiseExceptionOnError then
-      raise EIBInterBaseError.Create(FirebirdAPI.GetStatus);
+      raise EIBInterBaseError.Create(ServicesConnection.GetFirebirdAPI.GetStatus);
   finally
     FSQPB := nil;
     FSRB := nil;
@@ -2821,6 +2828,23 @@ begin
   end;
 end;
 
+function TIBXServicesConnection.GetFirebirdAPI: IFirebirdAPI;
+var fblib: IFirebirdLibrary;
+begin
+  if FFirebirdAPI = nil then
+  begin
+    if (csDesigning in ComponentState) or (Trim(FFirebirdLibraryPathName) = '') then
+      FFirebirdAPI := IB.FirebirdAPI
+    else
+    begin
+      fblib := IB.LoadFBLibrary(FFirebirdLibraryPathName);
+      if assigned(fblib) then
+        FFirebirdAPI := fblib.GetFirebirdAPI;
+    end;
+  end;
+  Result := FFirebirdAPI;
+end;
+
 function TIBXServicesConnection.GetServerVersionNo(index: integer): integer;
 begin
   CheckActive;
@@ -2955,6 +2979,14 @@ begin
   FProtocol := TProtocol(aProtocol);
 end;
 
+procedure TIBXServicesConnection.SetFirebirdLibraryPathName(AValue: string);
+begin
+  if FFirebirdLibraryPathName = AValue then Exit;
+  FFirebirdLibraryPathName := AValue;
+  Connected := false;
+  FFirebirdAPI := nil;
+end;
+
 procedure TIBXServicesConnection.SetProtocol(AValue: TProtocol);
 begin
   if FProtocol = AValue then Exit;
@@ -3021,6 +3053,7 @@ begin
   if FDatabase <> nil then
   {Get Connect String from Database Connect String}
   begin
+    FFirebirdAPI := FDatabase.FirebirdAPI;
     if ParseConnectString(FDatabase.Attachment.GetConnectString,aServerName,aDBName,aProtocol,aPortNo) and
       (aProtocol = Local) and
       (FDatabase.Attachment.GetRemoteProtocol <> '') then
@@ -3139,6 +3172,7 @@ begin
   inherited Destroy;
   Setlength(FIBXServices,0);
   if assigned(FParams) then FParams.Free;
+  FFirebirdAPI := nil;
 end;
 
 procedure TIBXServicesConnection.ConnectUsing(aDatabase: TIBDatabase);

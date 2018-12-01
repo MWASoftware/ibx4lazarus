@@ -513,7 +513,7 @@ end;
 procedure TForm1.FormShow(Sender: TObject);
 begin
   {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
-  FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
+  IBDatabase1.FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
   Application.ExceptionDialog := aedOkMessageBox;
   try
     IBDatabase1.Connected := true;
