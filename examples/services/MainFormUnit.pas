@@ -155,6 +155,7 @@ begin
   {Now display the server properties}
   with IBServerProperties1, ServicesConnection do
   begin
+    Memo1.Lines.Add('Firebird Library PathName = ' + IBXServicesConnection1.FirebirdAPI.GetFBLibrary.GetLibraryFilePath);
     Memo1.Lines.Add('Server Version = ' + VersionInfo.ServerVersion);
     Memo1.Lines.Add('Server Implementation = ' + VersionInfo.ServerImplementation);
     Memo1.Lines.Add('Service Version = ' + IntToStr(VersionInfo.ServiceVersion));

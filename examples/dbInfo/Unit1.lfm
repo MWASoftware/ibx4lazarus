@@ -9,7 +9,7 @@ object Form1: TForm1
   DefaultMonitor = dmPrimary
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '2.0.0.2'
   object Memo1: TMemo
     Left = 12
     Height = 302
@@ -51,8 +51,10 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'SELECT r.RDB$RELATION_ID,'
       '    trim(r.RDB$RELATION_NAME) as RDB$RELATION_NAME'

@@ -92,6 +92,7 @@ begin
   Memo1.Lines.Add('Attachment SQLDialect = ' + IntToStr(IBDatabase1.DBSQLDialect));
   with IBDatabaseInfo1 do
   begin
+    Memo1.Lines.Add('Firebird Library Pathname = ' + IBDatabase1.FirebirdAPI.GetFBLibrary.GetLibraryFilePath);
     Memo1.Lines.Add('DB SQLDialect = ' + IntToStr(DBSQLDialect));
     Memo1.Lines.Add('Allocation = ' + IntToStr(Allocation));
     Memo1.Lines.Add('Base Level = ' + IntToStr(BaseLevel));
