@@ -17,6 +17,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <CursorPos X="23" Y="36"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
@@ -36,8 +37,8 @@
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="611"/>
-        <CursorPos X="15" Y="619"/>
+        <TopLine Value="102"/>
+        <CursorPos X="14" Y="120"/>
         <UsageCount Value="24"/>
       </Unit3>
       <Unit4>
@@ -45,7 +46,7 @@
         <UnitName Value="DBCtrls"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="841"/>
-        <CursorPos X="15" Y="872"/>
+        <CursorPos X="20" Y="841"/>
         <UsageCount Value="19"/>
       </Unit4>
       <Unit5>
@@ -181,12 +182,10 @@
       </Unit24>
       <Unit25>
         <Filename Value="../../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="10"/>
-        <CursorPos X="14" Y="37"/>
+        <CursorPos Y="39"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit25>
       <Unit26>
