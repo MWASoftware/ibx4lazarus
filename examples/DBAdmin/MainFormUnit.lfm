@@ -569,6 +569,14 @@ object MainForm: TMainForm
           ScrollBars = ssVertical
           TabOrder = 25
         end
+        object ClientLibrary: TLabel
+          Left = 112
+          Height = 14
+          Top = 464
+          Width = 76
+          Caption = 'ClientLibrary'
+          ParentColor = False
+        end
       end
     end
     object FilesTab: TTabSheet
@@ -2195,7 +2203,7 @@ object MainForm: TMainForm
           item
             Title.Alignment = taCenter
             Title.Caption = 'Database'
-            Width = 150
+            Width = 120
             FieldName = 'RDB$MAP_DB'
             AutoSizeColumn = False
             InitialSortColumn = False
@@ -2206,7 +2214,7 @@ object MainForm: TMainForm
           item
             Title.Alignment = taCenter
             Title.Caption = 'Mapping From'
-            Width = 150
+            Width = 120
             FieldName = 'MAP_FROM'
             AutoSizeColumn = False
             InitialSortColumn = False
@@ -2217,7 +2225,7 @@ object MainForm: TMainForm
           item
             Title.Alignment = taCenter
             Title.Caption = 'Mapping To'
-            Width = 150
+            Width = 120
             FieldName = 'MAP_TO'
             AutoSizeColumn = False
             InitialSortColumn = False

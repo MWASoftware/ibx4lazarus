@@ -34,6 +34,7 @@ type
   TMainForm = class(TForm)
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
+    ClientLibrary: TLabel;
     MenuItem20: TMenuItem;
     MenuItem21: TMenuItem;
     RunScript: TAction;
@@ -1036,6 +1037,8 @@ begin
           DatabaseData.AuthMethod, DatabaseData.SecurityDatabase,DatabaseData.RoleName]);
   if assigned(PageControl1.ActivePage.OnShow) then
     PageControl1.ActivePage.OnShow(nil);
+  ClientLibrary.Caption := 'Firebird Client Library: ' + DatabaseData.IBDatabase1.FirebirdAPI.GetFBLibrary.GetLibraryFilePath +
+  ' (API Version = ' + DatabaseData.IBDatabase1.FirebirdAPI.GetImplementationVersion + ')';
 end;
 
 procedure TMainForm.LoadData;

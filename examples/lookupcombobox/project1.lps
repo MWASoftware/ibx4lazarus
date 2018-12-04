@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="10"/>
+    <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="65">
+    <Units Count="77">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="23" Y="17"/>
-        <UsageCount Value="49"/>
+        <UsageCount Value="53"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -17,8 +17,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <CursorPos X="14" Y="36"/>
-        <UsageCount Value="49"/>
+        <CursorPos X="23" Y="36"/>
+        <UsageCount Value="53"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -28,27 +28,25 @@
         <ComponentName Value="SelectDeptDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="10"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="28"/>
         <CursorPos X="40" Y="25"/>
-        <UsageCount Value="34"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="38"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="501"/>
-        <CursorPos Y="523"/>
-        <UsageCount Value="21"/>
+        <TopLine Value="611"/>
+        <CursorPos X="15" Y="619"/>
+        <UsageCount Value="24"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
-        <UnitName Value="DbCtrls"/>
+        <UnitName Value="DBCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="680"/>
-        <CursorPos X="16" Y="698"/>
-        <UsageCount Value="17"/>
+        <TopLine Value="841"/>
+        <CursorPos X="15" Y="872"/>
+        <UsageCount Value="19"/>
       </Unit4>
       <Unit5>
         <Filename Value="../../../../lcl/include/dblookup.inc"/>
@@ -60,21 +58,21 @@
       <Unit6>
         <Filename Value="../../../../lcl/include/control.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="4972"/>
-        <CursorPos X="25" Y="4980"/>
-        <UsageCount Value="12"/>
+        <TopLine Value="3539"/>
+        <CursorPos X="13" Y="3552"/>
+        <UsageCount Value="13"/>
       </Unit6>
       <Unit7>
         <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="86" Y="93"/>
-        <UsageCount Value="17"/>
+        <TopLine Value="63"/>
+        <CursorPos X="41" Y="94"/>
+        <UsageCount Value="19"/>
       </Unit7>
       <Unit8>
         <Filename Value="../../../../lcl/include/customdbcombobox.inc"/>
-        <TopLine Value="89"/>
-        <CursorPos X="38" Y="113"/>
-        <UsageCount Value="14"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="16"/>
       </Unit8>
       <Unit9>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
@@ -86,9 +84,9 @@
         <Filename Value="../../../../lcl/stdctrls.pp"/>
         <UnitName Value="StdCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="326"/>
-        <CursorPos X="15" Y="345"/>
-        <UsageCount Value="14"/>
+        <TopLine Value="328"/>
+        <CursorPos X="36" Y="357"/>
+        <UsageCount Value="16"/>
       </Unit10>
       <Unit11>
         <Filename Value="../../runtime/IBCustomDataSet.pas"/>
@@ -119,9 +117,9 @@
       <Unit15>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="660"/>
-        <CursorPos X="15" Y="675"/>
-        <UsageCount Value="14"/>
+        <TopLine Value="1767"/>
+        <CursorPos X="14" Y="1785"/>
+        <UsageCount Value="15"/>
       </Unit15>
       <Unit16>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
@@ -164,9 +162,9 @@
       <Unit22>
         <Filename Value="../../../../lcl/include/customcombobox.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="343"/>
-        <CursorPos X="50" Y="354"/>
-        <UsageCount Value="12"/>
+        <TopLine Value="857"/>
+        <CursorPos X="34" Y="888"/>
+        <UsageCount Value="14"/>
       </Unit22>
       <Unit23>
         <Filename Value="../../runtime/IBSQLParser.pas"/>
@@ -183,26 +181,29 @@
       </Unit24>
       <Unit25>
         <Filename Value="../../changelog"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="79" Y="17"/>
-        <UsageCount Value="12"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="10"/>
+        <CursorPos X="14" Y="37"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit25>
       <Unit26>
         <Filename Value="../../../../lcl/lcltype.pp"/>
         <UnitName Value="LCLType"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="440"/>
-        <CursorPos X="3" Y="448"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="43"/>
+        <CursorPos X="3" Y="61"/>
+        <UsageCount Value="11"/>
       </Unit26>
       <Unit27>
         <Filename Value="../../../../lcl/lclproc.pas"/>
         <UnitName Value="LCLProc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="819"/>
-        <CursorPos Y="827"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="868"/>
+        <CursorPos Y="894"/>
+        <UsageCount Value="11"/>
       </Unit27>
       <Unit28>
         <Filename Value="../../../../../projects/DBPanelGrid/dbpanelgrid.pas"/>
@@ -290,16 +291,16 @@
         <Filename Value="../../../../lcl/controls.pp"/>
         <UnitName Value="Controls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1957"/>
-        <CursorPos X="27" Y="1980"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="1404"/>
+        <CursorPos X="14" Y="1424"/>
+        <UsageCount Value="12"/>
       </Unit40>
       <Unit41>
         <Filename Value="../../../../lcl/include/wincontrol.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="5365"/>
-        <CursorPos X="19" Y="5388"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="5989"/>
+        <CursorPos Y="6019"/>
+        <UsageCount Value="11"/>
       </Unit41>
       <Unit42>
         <Filename Value="../../runtime/IBServices.pas"/>
@@ -397,8 +398,8 @@
         <Filename Value="../../../../lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
         <UnitName Value="Gtk2WSStdCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1796"/>
-        <CursorPos X="3" Y="1803"/>
+        <TopLine Value="2196"/>
+        <CursorPos X="50" Y="2175"/>
         <UsageCount Value="10"/>
       </Unit55>
       <Unit56>
@@ -433,8 +434,8 @@
         <Filename Value="../../../../lcl/widgetset/wsstdctrls.pp"/>
         <UnitName Value="WSStdCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="80"/>
-        <CursorPos X="3" Y="102"/>
+        <TopLine Value="68"/>
+        <CursorPos X="3" Y="97"/>
         <UsageCount Value="10"/>
       </Unit60>
       <Unit61>
@@ -467,7 +468,109 @@
         <CursorPos Y="4713"/>
         <UsageCount Value="10"/>
       </Unit64>
+      <Unit65>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/astrings.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="161"/>
+        <CursorPos Y="189"/>
+        <UsageCount Value="11"/>
+      </Unit65>
+      <Unit66>
+        <Filename Value="../../../../components/lazutils/lazutf8.pas"/>
+        <UnitName Value="LazUTF8"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="459"/>
+        <CursorPos X="20" Y="474"/>
+        <UsageCount Value="13"/>
+      </Unit66>
+      <Unit67>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/x86_64/x86_64.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="732"/>
+        <CursorPos Y="751"/>
+        <UsageCount Value="11"/>
+      </Unit67>
+      <Unit68>
+        <Filename Value="../../../../../lazarus18/lcl/include/customcombobox.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="450"/>
+        <CursorPos X="36" Y="472"/>
+        <UsageCount Value="10"/>
+      </Unit68>
+      <Unit69>
+        <Filename Value="../../../../../lazarus18/lcl/interfaces/gtk2/gtk2wsstdctrls.pp"/>
+        <UnitName Value="Gtk2WSStdCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2170"/>
+        <CursorPos X="37" Y="2182"/>
+        <UsageCount Value="10"/>
+      </Unit69>
+      <Unit70>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/objpas.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="582"/>
+        <CursorPos Y="609"/>
+        <UsageCount Value="10"/>
+      </Unit70>
+      <Unit71>
+        <Filename Value="../../../../lcl/lclmessageglue.pas"/>
+        <UnitName Value="LCLMessageGlue"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="101"/>
+        <CursorPos Y="123"/>
+        <UsageCount Value="10"/>
+      </Unit71>
+      <Unit72>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2proc.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2537"/>
+        <CursorPos Y="2557"/>
+        <UsageCount Value="10"/>
+      </Unit72>
+      <Unit73>
+        <Filename Value="../../../../lcl/interfaces/gtk2/gtk2callback.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="755"/>
+        <CursorPos Y="774"/>
+        <UsageCount Value="10"/>
+      </Unit73>
+      <Unit74>
+        <Filename Value="../../../../../lazarus18/lcl/include/customdbcombobox.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="64"/>
+        <CursorPos X="31" Y="95"/>
+        <UsageCount Value="10"/>
+      </Unit74>
+      <Unit75>
+        <Filename Value="../../../../../lazarus18/lcl/dbctrls.pp"/>
+        <UnitName Value="DbCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1749"/>
+        <CursorPos X="11" Y="1768"/>
+        <UsageCount Value="10"/>
+      </Unit75>
+      <Unit76>
+        <Filename Value="../../../../../fpcsrc/3.0.4/packages/rtl-objpas/src/inc/cvarutil.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="24"/>
+        <UsageCount Value="11"/>
+      </Unit76>
     </Units>
     <JumpHistory HistoryIndex="-1"/>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode="default"/>
+    </RunParams>
   </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="../../../../lcl/include/wincontrol.inc"/>
+        <Line Value="7392"/>
+      </Item1>
+    </BreakPoints>
+  </Debugging>
 </CONFIG>

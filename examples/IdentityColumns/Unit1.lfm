@@ -11,7 +11,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poDefaultSizeOnly
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '2.0.0.2'
   object IBDynamicGrid1: TIBDynamicGrid
     Left = 10
     Height = 301
@@ -91,7 +91,7 @@ object Form1: TForm1
     WordWrap = True
   end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = True
     AllowStreamedConnected = False
@@ -125,29 +125,32 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     DeleteSQL.Strings = (
       'Delete From IDTEST A'
-      'Where A.KEY = :OLD_KEY'
+      'Where A."KEY" = :OLD_KEY'
     )
     InsertSQL.Strings = (
-      'Insert Into IDTEST(SOMETEXT)'
-      'Values(:SOMETEXT) RETURNING KEY, COMPTEXT'
+      'Insert Into IDTEST (SOMETEXT)'
+      'Values(:SOMETEXT)'
+      ' RETURNING "KEY", COMPTEXT'
     )
     RefreshSQL.Strings = (
-      'Select A.COMPTEXT, A.KEY, A.SOMETEXT From IDTEST A'
-      'Where A.KEY = :KEY'
+      'Select A."KEY", A.SOMETEXT, A.COMPTEXT From IDTEST A'
+      'Where A."KEY" = :"KEY"'
     )
     SelectSQL.Strings = (
-      'Select A.COMPTEXT, A.KEY, A.SOMETEXT From IDTEST A'
+      'Select A."KEY", A.SOMETEXT, A.COMPTEXT From IDTEST A'
     )
     ModifySQL.Strings = (
       'Update IDTEST A Set '
       '  A.SOMETEXT = :SOMETEXT'
-      'Where A.KEY = :OLD_KEY'
-      'RETURNING COMPTEXT'
+      'Where A."KEY" = :OLD_KEY'
+      ' RETURNING A.COMPTEXT'
     )
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
+    MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
     left = 400
     top = 46

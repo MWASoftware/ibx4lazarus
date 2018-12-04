@@ -55,6 +55,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <TopLine Value="28"/>
         <CursorPos X="12" Y="36"/>
@@ -86,12 +87,11 @@
       </Unit3>
       <Unit4>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="1414"/>
         <CursorPos X="29" Y="1422"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
@@ -289,12 +289,10 @@
       </Unit28>
       <Unit29>
         <Filename Value="../../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="14" Y="8"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit29>
       <Unit30>
@@ -321,7 +319,7 @@
         <UsageCount Value="10"/>
       </Unit32>
     </Units>
-    <JumpHistory Count="6" HistoryIndex="5">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="MainForm.pas"/>
         <Caret Line="37" Column="4" TopLine="28"/>
@@ -330,22 +328,6 @@
         <Filename Value="MainForm.pas"/>
         <Caret Line="36" Column="12" TopLine="28"/>
       </Position2>
-      <Position3>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret TopLine="31"/>
-      </Position3>
-      <Position4>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="304" Column="20" TopLine="281"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1450" Column="35" TopLine="1438"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../changelog"/>
-        <Caret Line="83" Column="28" TopLine="58"/>
-      </Position6>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

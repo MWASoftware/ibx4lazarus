@@ -30,7 +30,7 @@ unit IBLookupComboEditBox;
 interface
 
 uses
-  Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DbCtrls,
+  Classes, SysUtils, LCLType, LResources, Forms, Controls, Graphics, Dialogs, DbCtrls,
   ExtCtrls, IBSQLParser, DB, StdCtrls, IBCustomDataSet;
 
 type
@@ -117,6 +117,7 @@ type
     procedure CheckAndInsert;
     procedure DoEnter; override;
     procedure DoExit; override;
+    function DoEdit: boolean; override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -124,6 +125,7 @@ type
     function SQLSafe(aText: string): string;
     procedure UpdateShowing; override;
     procedure UpdateData(Sender: TObject); override;
+    procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
@@ -147,7 +149,7 @@ type
 
 implementation
 
-uses LCLType, Variants, LCLProc, LazUTF8;
+uses Variants, LCLProc, LazUTF8;
 
 { TIBLookupControlLink }
 
@@ -498,6 +500,16 @@ begin
   inherited DoExit;
 end;
 
+function TIBLookupComboEditBox.DoEdit: boolean;
+begin
+  {DoEdit will swallow characters if no editable Field. Hence, to enabled
+   writing we must avoid calling the inherited method.}
+  if ((DataSource = nil) or (Field = nil)) and not ReadOnly then
+    Result := true
+  else
+    Result := inherited DoEdit;
+end;
+
 procedure TIBLookupComboEditBox.KeyUp(var Key: Word; Shift: TShiftState);
 begin
   inherited KeyUp(Key, Shift);
@@ -579,6 +591,32 @@ begin
   if FCurText <> '' then
     Text := FCurText + Text;
   FModified := false;
+end;
+
+type
+
+  { THackedCustomComboBox }
+
+  THackedCustomComboBox = class(TCustomComboBox)
+  private
+    procedure CallUTF8KeyPress(var UTF8Key: TUTF8Char);
+  end;
+
+{ THackedCustomComboBox }
+
+procedure THackedCustomComboBox.CallUTF8KeyPress(var UTF8Key: TUTF8Char);
+begin
+  inherited UTF8KeyPress(UTF8Key);
+end;
+
+procedure TIBLookupComboEditBox.UTF8KeyPress(var UTF8Key: TUTF8Char);
+begin
+  {TDBLookupComboBox.UTF8KeyPress will swallow the character if
+  the datalink is not editable. hence to enable writing we must override it}
+  if ((DataSource = nil) or (Field = nil)) and not ReadOnly then
+    THackedCustomComboBox(self).CallUTF8KeyPress(UTF8Key)
+  else
+    inherited;
 end;
 
 constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);

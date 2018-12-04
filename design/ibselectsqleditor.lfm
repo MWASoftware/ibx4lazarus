@@ -2,14 +2,14 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   Left = 678
   Height = 487
   Top = 264
-  Width = 747
+  Width = 795
   ActiveControl = PageControl
   Caption = 'Select SQL Editor'
   ClientHeight = 487
-  ClientWidth = 747
+  ClientWidth = 795
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '2.0.0.2'
   object Label3: TLabel
     Left = 278
     Height = 14
@@ -19,7 +19,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     ParentColor = False
   end
   object Button1: TButton
-    Left = 550
+    Left = 598
     Height = 30
     Top = 429
     Width = 72
@@ -30,7 +30,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 0
   end
   object Button2: TButton
-    Left = 638
+    Left = 686
     Height = 30
     Top = 429
     Width = 72
@@ -41,7 +41,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 1
   end
   object GenerateBtn: TButton
-    Left = 278
+    Left = 326
     Height = 30
     Top = 429
     Width = 101
@@ -51,7 +51,7 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 2
   end
   object TestBtn: TButton
-    Left = 414
+    Left = 462
     Height = 30
     Top = 429
     Width = 66
@@ -373,19 +373,25 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     Left = 282
     Height = 389
     Top = 24
-    Width = 448
+    Width = 496
     Anchors = [akTop, akLeft, akRight, akBottom]
     ClientHeight = 389
-    ClientWidth = 448
+    ClientWidth = 496
     TabOrder = 7
     DesignLeft = 1974
     DesignTop = 200
     inherited SQLText: TSynEdit
       Height = 363
-      Width = 448
+      Width = 496
     end
     inherited ToolBar1: TToolBar
-      Width = 448
+      Width = 496
+      inherited ToolButton3: TToolButton
+        Height = 22
+      end
+      inherited ToolButton7: TToolButton
+        Height = 22
+      end
     end
     inherited FieldNameList: TIBQuery
       ParamData = <      

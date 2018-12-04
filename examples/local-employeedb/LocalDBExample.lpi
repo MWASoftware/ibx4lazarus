@@ -59,6 +59,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="485"/>
         <CursorPos X="15" Y="516"/>
         <UsageCount Value="173"/>
@@ -144,11 +145,10 @@
       </Unit11>
       <Unit12>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="39"/>
         <CursorPos Y="2663"/>
         <UsageCount Value="18"/>
-        <Loaded Value="True"/>
       </Unit12>
       <Unit13>
         <Filename Value="../../iblocaldb/gui/IBXCreateDatabaseDlg.pas"/>
@@ -176,17 +176,16 @@
       </Unit14>
       <Unit15>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="290"/>
-        <CursorPos X="37" Y="302"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="753"/>
+        <CursorPos X="3" Y="753"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="753"/>
-          <CursorPos X="3" Y="753"/>
+          <TopLine Value="290"/>
+          <CursorPos X="37" Y="302"/>
         </ExtraEditor1>
         <UsageCount Value="18"/>
-        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/memds/memds.pp"/>
@@ -240,12 +239,10 @@
       </Unit22>
       <Unit23>
         <Filename Value="../../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="4"/>
         <CursorPos X="24" Y="33"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit23>
       <Unit24>

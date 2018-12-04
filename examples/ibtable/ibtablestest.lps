@@ -18,6 +18,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="87"/>
         <CursorPos X="21" Y="98"/>
         <UsageCount Value="39"/>
@@ -97,12 +98,10 @@
       </Unit11>
       <Unit12>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1186"/>
         <CursorPos X="21" Y="1193"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit12>
       <Unit13>
         <Filename Value="../../../fbintf/client/FBStatement.pas"/>

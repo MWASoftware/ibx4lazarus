@@ -756,16 +756,12 @@ procedure TIBSQLEditFrame.AddWhereClause(
 var WhereClause: string;
     Separator: string;
     Count: integer;
-    Prefix: string;
     ColumnName: string;
+    ColParamName: string;
 begin
   Count := 0;
   WhereClause := 'Where';
   Separator := ' A.';
-  if UseOldValues then
-    Prefix := ':OLD_'
-  else
-    Prefix := ':';
   with PrimaryKeys do
   begin
     DisableControls;
@@ -778,12 +774,21 @@ begin
         begin
           Inc(Count);
           ColumnName := FieldByName('ColumnName').AsString;
-          if QuotedStrings then
-            WhereClause := WhereClause + Separator + '"' + ColumnName +
-                   '" = ' + Prefix+ AnsiUpperCase(ColumnName)
+          if UseOldValues then
+            ColParamName := 'OLD_' + AnsiUpperCase(ColumnName)
           else
-            WhereClause := WhereClause + Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,ColumnName) +
-                   ' = ' + Prefix + AnsiUpperCase(ColumnName);
+            ColParamName := AnsiUpperCase(ColumnName);
+
+          if QuotedStrings then
+            WhereClause := WhereClause +
+                           Separator +
+                           '"' + ColumnName + '" = :"' + ColParamName + '"'
+          else
+            WhereClause := WhereClause +
+                           Separator +
+                           QuoteIdentifierIfNeeded(Database.SQLDialect,ColumnName) +
+                           ' = :' +
+                           QuoteIdentifierIfNeeded(Database.SQLDialect,ColParamName);
           Separator := ' AND A.';
         end;
         Next;
@@ -903,7 +908,10 @@ begin
     Separator := ':';
     for I := 0 to FieldNames.Count - 1 do
       begin
-         InsertSQL := InsertSQL + Separator +  AnsiUpperCase(FieldNames[I]) ;
+        if QuotedStrings then
+          InsertSQL := InsertSQL + Separator +  '"' + AnsiUpperCase(FieldNames[I]) + '"'
+        else
+          InsertSQL := InsertSQL + Separator +  QuoteIdentifierIfNeeded(Database.SQLDialect,AnsiUpperCase(FieldNames[I])) ;
          Separator := ', :';
       end;
     InsertSQL := InsertSQL + ')';
@@ -961,9 +969,10 @@ begin
   for I := 0 to FieldNames.Count - 1 do
     begin
       if QuotedStrings then
-        UpdateSQL := Separator + '"' + FieldNames[I] + '" = :' + AnsiUpperCase(FieldNames[I])
+        UpdateSQL := Separator + '"' + FieldNames[I] + '" = :"' + AnsiUpperCase(FieldNames[I]) + '"'
       else
-        UpdateSQL := Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,FieldNames[I]) + ' = :' + AnsiUpperCase(FieldNames[I]);
+        UpdateSQL := Separator + QuoteIdentifierIfNeeded(Database.SQLDialect,FieldNames[I]) + ' = :' +
+                                 QuoteIdentifierIfNeeded(Database.SQLDialect,AnsiUpperCase(FieldNames[I]));
       if I < FieldNames.Count - 1 then
         UpdateSQL := UpdateSQL + ',';
       SQL.Add(UpdateSQL);

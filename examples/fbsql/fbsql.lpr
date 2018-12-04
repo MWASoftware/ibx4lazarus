@@ -180,6 +180,7 @@ constructor TInteractiveSQLProcessor.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
   SetSQLStatementReader(TInteractiveSQLStatementReader.Create);
+  Echo := true;
 end;
 
 procedure TInteractiveSQLProcessor.Run;

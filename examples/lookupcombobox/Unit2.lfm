@@ -1,7 +1,7 @@
 object SelectDeptDlg: TSelectDeptDlg
-  Left = 677
+  Left = 1195
   Height = 449
-  Top = 296
+  Top = 507
   Width = 485
   BorderStyle = bsDialog
   Caption = 'Select Department'
@@ -10,7 +10,7 @@ object SelectDeptDlg: TSelectDeptDlg
   OnClose = FormClose
   OnShow = FormShow
   Position = poOwnerFormCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '2.0.0.2'
   object Label1: TLabel
     Left = 16
     Height = 14
@@ -61,8 +61,10 @@ object SelectDeptDlg: TSelectDeptDlg
     Transaction = Form1.IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select A.DEPT_NO, A.DEPARTMENT, A.HEAD_DEPT,count(B.DEPT_NO)'
       'as ChildCount '

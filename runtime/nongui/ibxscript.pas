@@ -144,15 +144,13 @@ type
       TSQLState = (stDefault,stInBlock, stInArrayDim);
   private
     FHasBegin: boolean;
-    FNextStatement: boolean;
     FOnNextLine: TOnNextLine;
     FTerminator: char;
   protected
     procedure EchoNextLine(aLine: string);
-    property NextStatement: boolean read FNextStatement;
   public
     constructor Create;
-    function GetNextStatement(var stmt: string) : boolean;
+    function GetNextStatement(var stmt: string) : boolean; virtual;
     property HasBegin: boolean read FHasBegin;
     property Terminator: char read FTerminator write FTerminator default DefaultTerminator;
     property OnNextLine: TOnNextLine read FOnNextLine write FOnNextLine;
@@ -194,12 +192,14 @@ type
     FTerminated: boolean;
     FLine: string;
     FLineIndex: integer;
+    FNextStatement: boolean;
     function GetNextLine(var Line: string):boolean;
   protected
     function GetChar: char; override;
     function GetErrorPrefix: string; override;
   public
     constructor Create(aPrompt: string='SQL>'; aContinue: string = 'CON>');
+    function GetNextStatement(var stmt: string) : boolean; override;
     property Terminated: boolean read FTerminated write FTerminated;
   end;
 
@@ -460,16 +460,16 @@ function TSQLStatementReader.GetNextStatement(var stmt: string): boolean;
 var State: TSQLState;
     Nested: integer;
     token: TSQLTokens;
+    EndOfStatement: boolean;
 begin
   FHasBegin := false;
-  FNextStatement := false;
   Result := false;
+  EndOfStatement := false;
   Nested := 0;
   stmt := '';
   State := stDefault;
-  while not EOF do
+  while not EOF and not EndOfStatement do
   begin
-    Result := true;
     token := GetNextToken;
 //    writeln(token,' ',TokenText);
     case State of
@@ -508,11 +508,9 @@ begin
           else
             begin
               if tokentext = Terminator then
-              begin
-                FNextStatement := true;
-                Exit;
-              end;
-              stmt += TokenText;
+                EndOfStatement := true
+              else
+                stmt += TokenText;
             end;
           end;
         end;
@@ -581,9 +579,9 @@ begin
           stmt += TokenText;
         end;
       end;
-
     end;
   end;
+  Result := stmt <> '';
 end;
 
 { TSQLXMLReader }
@@ -1204,7 +1202,6 @@ constructor TIBXScript.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
   SetSQLStatementReader(TBatchSQLStatementReader.Create);
-  SQLStatementReader.OnNextLine := @EchoNextLine;
 end;
 
 function TIBXScript.PerformUpdate(SQLFile: string; aAutoDDL: boolean): boolean;
@@ -1442,6 +1439,7 @@ procedure TCustomIBXScript.SetSQLStatementReader(
   SQLStatementReader: TSQLStatementReader);
 begin
   FSQLReader := SQLStatementReader;
+  FSQLReader.OnNextLine := @EchoNextLine;
 end;
 
 function TCustomIBXScript.ProcessStatement(stmt: string): boolean;
@@ -1754,7 +1752,7 @@ end;
 
 function TInteractiveSQLStatementReader.GetNextLine(var Line: string): boolean;
 begin
-  if NextStatement then
+  if FNextStatement then
     write(FPrompt)
   else
     write(FContinuePrompt);
@@ -1773,11 +1771,22 @@ begin
   else
   if FLineIndex > Length(FLine) then
   begin
-    if GetNextLine(FLine) and (Length(FLine) > 0) then
-       Result := FLine[1]
+    Result := LF;
+    FLineIndex := 0;
+  end
+  else
+  if FLineIndex = 0 then
+  begin
+    if not GetNextLine(FLine) then
+      Result := #0
     else
-      Result := #0;
-    FLineIndex := 2;
+    if Length(FLine) = 0 then
+      Result := LF
+    else
+    begin
+      Result := FLine[1];
+      FLineIndex := 2;
+    end
   end
   else
   begin
@@ -1790,7 +1799,16 @@ constructor TInteractiveSQLStatementReader.Create(aPrompt: string; aContinue: st
 begin
   inherited Create;
   FPrompt := aPrompt;
+  FLineIndex := 0;
+  FNextStatement := true;
   FContinuePrompt := aContinue;
+end;
+
+function TInteractiveSQLStatementReader.GetNextStatement(var stmt: string
+  ): boolean;
+begin
+  Result := inherited GetNextStatement(stmt);
+  FNextStatement := Result;
 end;
 
 { TBatchSQLStatementReader }

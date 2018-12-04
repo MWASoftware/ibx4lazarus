@@ -23,13 +23,13 @@
     </PublishOptions>
     <RunParams>
       <local>
-        <CommandLineParams Value="-i test.sql"/>
+        <CommandLineParams Value="-u SYSDBA employee"/>
       </local>
       <FormatVersion Value="2"/>
       <Modes Count="1">
         <Mode0 Name="default">
           <local>
-            <CommandLineParams Value="-i test.sql"/>
+            <CommandLineParams Value="-u SYSDBA employee"/>
           </local>
         </Mode0>
       </Modes>
