@@ -141,7 +141,7 @@ type
   TSQLStatementReader = class(TSQLXMLReader)
   private
     type
-      TSQLState = (stDefault,stInBlock, stInArrayDim);
+      TSQLState = (stDefault, stInStmt, stInBlock, stInArrayDim, stInDeclare);
   private
     FHasBegin: boolean;
     FOnNextLine: TOnNextLine;
@@ -471,9 +471,17 @@ begin
   while not EOF and not EndOfStatement do
   begin
     token := GetNextToken;
-//    writeln(token,' ',TokenText);
+//    writeln(token,' ',TokenText,' ',Terminator);
     case State of
     stDefault:
+      {ignore everything before a reserved word}
+      if (token <= high(TSQLReservedWords)) or (token = sqltIdentifier) then
+        begin
+          State := stInStmt;
+          stmt += TokenText;
+        end;
+
+    stInStmt:
        begin
         case token of
           sqltBegin:
@@ -483,6 +491,12 @@ begin
             Nested := 1;
             stmt += TokenText;
           end;
+
+          sqltDeclare:
+            begin
+              State := stInDeclare;
+              stmt += TokenText;
+            end;
 
           sqltOpenSquareBracket:
              begin
@@ -494,7 +508,7 @@ begin
             stmt += '/*' + TokenText + '*/';
 
           sqltCommentLine:
-            stmt += '//' + TokenText + LineEnding;
+            stmt += '/*' + TokenText + ' */' + LineEnding;
 
           sqltQuotedString:
             stmt += '''' + SQLSafeString(TokenText) + '''';
@@ -507,8 +521,11 @@ begin
 
           else
             begin
-              if tokentext = Terminator then
-                EndOfStatement := true
+              if (tokentext = Terminator) and (Nested = 0) then
+              begin
+                EndOfStatement := true;
+                State := stDefault;
+              end
               else
                 stmt += TokenText;
             end;
@@ -531,14 +548,17 @@ begin
             Dec(Nested);
             stmt += TokenText;
             if Nested = 0 then
+            begin
               State := stDefault;
+              EndOfStatement := true;
+            end;
           end;
 
         sqltComment:
           stmt += '/*' + TokenText + '*/';
 
         sqltCommentLine:
-          stmt += '//' + TokenText + LineEnding;
+          stmt += '/*' + TokenText + ' */' + LineEnding;
 
         sqltQuotedString:
           stmt += '''' + SQLSafeString(TokenText) + '''';
@@ -564,13 +584,39 @@ begin
           stmt += '/*' + TokenText + '*/';
 
         sqltCommentLine:
-          stmt += '//' + TokenText + LineEnding;
+          stmt += '/*' + TokenText + ' */' + LineEnding;
 
         sqltCloseSquareBracket:
         begin
           stmt += TokenText;
-          State := stDefault;
+          State := stInStmt;
         end;
+
+        sqltEOL:
+          stmt += LineEnding;
+
+        else
+          stmt += TokenText;
+        end;
+      end;
+
+    {ignore Declare statement for terminator - semi-colon terminates declaration}
+
+    stInDeclare:
+      begin
+        case token of
+
+        sqltComment:
+          stmt += '/*' + TokenText + '*/';
+
+        sqltCommentLine:
+          stmt += '/*' + TokenText + ' */' + LineEnding;
+
+        sqltSemiColon:
+          begin
+            State := stInStmt;
+            stmt += TokenText;
+          end;
 
         sqltEOL:
           stmt += LineEnding;
