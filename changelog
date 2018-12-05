@@ -1,4 +1,4 @@
-IBX Change Log  version                  (2.3-2) Wed, 05 Dec 2018 09:27:45 +0000
+IBX Change Log  version                   (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 
 1. Remove need to check for IsMultiThread by providing access to GUI timers via
    IBGUIInterface. Note: master/detail delay timer does not apply to console
