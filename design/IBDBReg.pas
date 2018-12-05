@@ -438,6 +438,7 @@ const
 
 procedure Register;
 begin
+  AllowUseOfFBLIB := true;
   if not TryIBLoad then
   begin
     MessageDlg('IBX is unable to locate the Firebird Library - have you remembered to install it?',mtError,[mbOK],0);

@@ -37,6 +37,11 @@ IBX Change Log  version                 (2.3-2) Thu, 25 Oct 2018 14:39:45 +0100
     TIBLookupComboEditBox has been updated to workaround this problem. As long as
     ReadOnly is false, the text box is editable when no DataSource is specified.
 
+12. AllowUseOfFBLIB is now set to "true" at design time. This is to allow use of
+    the FBLIB environment variable. If you do not want to permit this then you
+    must modify the Register procedure in the design/IBDBReg.pas unit to remove
+    this setting.
+
 IBX Change Log  version                 (2.3-1) Thu, 25 Oct 2018 14:39:45 +0100
 
 1. IBCustomDataset: replace deprecated function ValidUTF8String with call to
