@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="96"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -21,9 +21,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="157"/>
-        <CursorPos Y="180"/>
-        <UsageCount Value="93"/>
+        <CursorPos X="34" Y="35"/>
+        <UsageCount Value="96"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -37,14 +36,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="5"/>
         <CursorPos X="33" Y="17"/>
-        <UsageCount Value="87"/>
+        <UsageCount Value="90"/>
       </Unit2>
       <Unit3>
         <Filename Value="tests/SelectQuery.sql"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="26" Y="2"/>
-        <UsageCount Value="86"/>
+        <UsageCount Value="89"/>
         <DefaultSyntaxHighlighter Value="SQL"/>
       </Unit3>
       <Unit4>
@@ -385,22 +384,21 @@
       <Unit50>
         <Filename Value="../../runtime/nongui/ibxscript.pas"/>
         <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
-        <TopLine Value="1776"/>
-        <CursorPos X="72" Y="1786"/>
+        <TopLine Value="877"/>
+        <CursorPos X="3" Y="899"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="877"/>
-          <CursorPos X="3" Y="899"/>
+          <TopLine Value="490"/>
+          <CursorPos X="26" Y="505"/>
         </ExtraEditor1>
-        <UsageCount Value="19"/>
+        <UsageCount Value="20"/>
       </Unit50>
       <Unit51>
         <Filename Value="../../../fbintf/IBUtils.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1016"/>
-        <CursorPos X="33" Y="1037"/>
+        <TopLine Value="302"/>
+        <CursorPos X="24" Y="307"/>
         <UsageCount Value="19"/>
       </Unit51>
       <Unit52>

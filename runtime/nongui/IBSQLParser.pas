@@ -679,7 +679,7 @@ begin
       swap(token,FNextToken);
     end
     else
-    if not (token in [sqltSpace,sqltEOL]) then
+    if not (token in [sqltSpace,sqltEOL,sqltCR]) then
     case FSQLState of
     stDefault:
       begin
@@ -690,11 +690,6 @@ begin
 
         sqltWith:
           FSQLState := stWith;
-
-        sqltCR,
-        sqltEOL,
-        sqltspace:
-          {ignore};
 
         else
           FSQLState := stNotASelectStmt;
