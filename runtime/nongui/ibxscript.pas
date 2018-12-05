@@ -516,6 +516,8 @@ begin
           sqltIdentifierInDoubleQuotes:
             stmt += '"' + TokenText + '"';
 
+          sqltCR: {ignore};
+
           sqltEOL:
             stmt += LineEnding;
 
@@ -566,6 +568,8 @@ begin
         sqltIdentifierInDoubleQuotes:
           stmt += '"' + TokenText + '"';
 
+        sqltCR: {ignore};
+
         sqltEOL:
           stmt += LineEnding;
 
@@ -592,6 +596,8 @@ begin
           State := stInStmt;
         end;
 
+        sqltCR: {ignore};
+
         sqltEOL:
           stmt += LineEnding;
 
@@ -617,6 +623,8 @@ begin
             State := stInStmt;
             stmt += TokenText;
           end;
+
+        sqltCR: {ignore};
 
         sqltEOL:
           stmt += LineEnding;
