@@ -31,7 +31,7 @@
         <ComponentName Value="DatabaseData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <CursorPos X="52" Y="26"/>
+        <CursorPos X="9" Y="9"/>
         <UsageCount Value="154"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -537,9 +537,9 @@
       <Unit66>
         <Filename Value="../../design/IBDBReg.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="476"/>
-        <CursorPos X="107" Y="503"/>
-        <UsageCount Value="6"/>
+        <TopLine Value="460"/>
+        <CursorPos X="111" Y="485"/>
+        <UsageCount Value="10"/>
       </Unit66>
       <Unit67>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/variant.inc"/>
@@ -619,8 +619,8 @@
       <Unit79>
         <Filename Value="../../../fbintf/client/FBMessages.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="233"/>
-        <CursorPos X="11" Y="255"/>
+        <TopLine Value="264"/>
+        <CursorPos X="21" Y="287"/>
         <UsageCount Value="12"/>
       </Unit79>
       <Unit80>
@@ -784,8 +784,8 @@
       <Unit101>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1083"/>
-        <CursorPos Y="1102"/>
+        <TopLine Value="1421"/>
+        <CursorPos X="3" Y="1425"/>
         <UsageCount Value="12"/>
       </Unit101>
       <Unit102>

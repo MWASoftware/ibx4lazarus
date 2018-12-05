@@ -188,7 +188,7 @@ type
     FCreateDatabase: boolean;
     FCreateIfNotExists: boolean;
     FAllowStreamedConnected: boolean;
-    FFirebirdLibraryPathName: string;
+    FFirebirdLibraryPathName: TIBFileName;
     FHiddenPassword: string;
     FOnCreateDatabase: TNotifyEvent;
     FOnLogin: TIBDatabaseLoginEvent;
@@ -219,7 +219,7 @@ type
     function GetFirebirdAPI: IFirebirdAPI;
     function GetRemoteProtocol: string;
     function GetSQLObjectsCount: Integer;
-    procedure SetFirebirdLibraryPathName(AValue: string);
+    procedure SetFirebirdLibraryPathName(AValue: TIBFileName);
     procedure SetSQLDialect(const Value: Integer);
     procedure ValidateClientSQLDialect;
     procedure DBParamsChange(Sender: TObject);
@@ -299,7 +299,7 @@ type
     property AllowStreamedConnected: boolean read FAllowStreamedConnected
              write FAllowStreamedConnected;
     property DatabaseName: TIBFileName read FDBName write SetDatabaseName;
-    property FirebirdLibraryPathName: string read FFirebirdLibraryPathName
+    property FirebirdLibraryPathName: TIBFileName read FFirebirdLibraryPathName
                                              write SetFirebirdLibraryPathName;
     property Params: TStrings read FDBParams write SetDBParams;
     property LoginPrompt default True;
@@ -1420,7 +1420,7 @@ begin
   Result := FSQLObjects.Count;
 end;
 
-procedure TIBDataBase.SetFirebirdLibraryPathName(AValue: string);
+procedure TIBDataBase.SetFirebirdLibraryPathName(AValue: TIBFileName);
 begin
   if FFirebirdLibraryPathName = AValue then Exit;
   FFirebirdLibraryPathName := AValue;
