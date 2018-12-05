@@ -560,7 +560,7 @@ begin
           stmt += '/*' + TokenText + '*/';
 
         sqltCommentLine:
-          stmt += '/*' + TokenText + ' */' + LineEnding;
+          stmt += '/* ' + TokenText + ' */' + LineEnding;
 
         sqltQuotedString:
           stmt += '''' + SQLSafeString(TokenText) + '''';
@@ -588,7 +588,7 @@ begin
           stmt += '/*' + TokenText + '*/';
 
         sqltCommentLine:
-          stmt += '/*' + TokenText + ' */' + LineEnding;
+          stmt += '/* ' + TokenText + ' */' + LineEnding;
 
         sqltCloseSquareBracket:
         begin
@@ -616,7 +616,7 @@ begin
           stmt += '/*' + TokenText + '*/';
 
         sqltCommentLine:
-          stmt += '/*' + TokenText + ' */' + LineEnding;
+          stmt += '/* ' + TokenText + ' */' + LineEnding;
 
         sqltSemiColon:
           begin

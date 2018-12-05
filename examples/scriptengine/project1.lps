@@ -20,7 +20,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos X="34" Y="35"/>
         <UsageCount Value="97"/>
         <Loaded Value="True"/>
@@ -383,23 +382,26 @@
       </Unit49>
       <Unit50>
         <Filename Value="../../runtime/nongui/ibxscript.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="490"/>
-        <CursorPos X="26" Y="505"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="604"/>
+        <CursorPos X="23" Y="619"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="15"/>
-          <CursorPos X="58" Y="34"/>
+          <TopLine Value="490"/>
+          <CursorPos X="26" Y="505"/>
         </ExtraEditor1>
         <UsageCount Value="20"/>
+        <Loaded Value="True"/>
       </Unit50>
       <Unit51>
         <Filename Value="../../../fbintf/IBUtils.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1319"/>
-        <CursorPos Y="1273"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1270"/>
+        <CursorPos X="9" Y="1294"/>
         <UsageCount Value="19"/>
+        <Loaded Value="True"/>
       </Unit51>
       <Unit52>
         <Filename Value="../../../ibx.trunk/runtime/nongui/ibxscript.pas"/>
@@ -437,11 +439,103 @@
         <UsageCount Value="13"/>
       </Unit56>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="24" HistoryIndex="23">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="35" Column="34"/>
       </Position1>
+      <Position2>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="34" Column="58" TopLine="15"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="153" Column="14" TopLine="134"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1290" Column="17" TopLine="1280"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1293" TopLine="1280"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1414" TopLine="1382"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1287" TopLine="1269"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1293" TopLine="1269"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1414" TopLine="1382"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1287" TopLine="1269"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1293" TopLine="1269"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1414" TopLine="1382"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1287" TopLine="1269"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1293" TopLine="1269"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1288" TopLine="1280"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1294" TopLine="1280"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1416" TopLine="1384"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1296" TopLine="1270"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1288" TopLine="1270"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1293" Column="15" TopLine="1276"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1291" Column="13" TopLine="1276"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1297" TopLine="1276"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1418" TopLine="1386"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="1288" TopLine="1270"/>
+      </Position24>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
