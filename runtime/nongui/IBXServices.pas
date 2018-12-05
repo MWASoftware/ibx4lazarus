@@ -62,7 +62,7 @@ type
     FDatabase: TIBDatabase;
     FFirebirdAPI: IFirebirdAPI;
     FConnectString: string;
-    FFirebirdLibraryPathName: string;
+    FFirebirdLibraryPathName: TIBFileName;
     FOnSecurityContextException: TIBXServicesSecContextEvent;
     FParams: TStrings;
     FIBXServices: array of IIBXServicesClient;
@@ -85,7 +85,7 @@ type
     function Login(var aServerName: string; LoginParams: TStrings): Boolean;
     procedure ParamsChanging(Sender: TObject);
     procedure SetConnectString(AValue: string);
-    procedure SetFirebirdLibraryPathName(AValue: string);
+    procedure SetFirebirdLibraryPathName(AValue: TIBFileName);
     procedure SetParams(AValue: TStrings);
     procedure SetPortNo(AValue: string);
     procedure SetProtocol(AValue: TProtocol);
@@ -113,7 +113,7 @@ type
   published
     property Connected;
     property ConnectString: string read FConnectString write SetConnectString;
-    property FirebirdLibraryPathName: string read FFirebirdLibraryPathName
+    property FirebirdLibraryPathName: TIBFileName read FFirebirdLibraryPathName
                                              write SetFirebirdLibraryPathName;
     property LoginPrompt default True;
     property Protocol: TProtocol read FProtocol write SetProtocol default Local;
@@ -2978,7 +2978,8 @@ begin
   FProtocol := TProtocol(aProtocol);
 end;
 
-procedure TIBXServicesConnection.SetFirebirdLibraryPathName(AValue: string);
+procedure TIBXServicesConnection.SetFirebirdLibraryPathName(AValue: TIBFileName
+  );
 begin
   if FFirebirdLibraryPathName = AValue then Exit;
   FFirebirdLibraryPathName := AValue;

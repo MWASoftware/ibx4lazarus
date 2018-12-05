@@ -483,6 +483,7 @@ begin
 
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'DatabaseName', TIBFileNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'FirebirdLibraryPathName', TIBLibraryNameProperty); {do not localize}
+  RegisterPropertyEditor(TypeInfo(TIBFileName), TIBXServicesConnection, 'FirebirdLibraryPathName', TIBLibraryNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'StoredProcName', TIBStoredProcNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'PackageName', TIBPackageNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TParams), TIBStoredProc, 'Params', TIBStoredProcParamsProperty);
