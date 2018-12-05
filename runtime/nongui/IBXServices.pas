@@ -864,7 +864,6 @@ begin
   FLoading := true;
   with FSource as TIBXLimboTransactionResolutionService do
   try
-    FetchLimboTransactionInfo;
     for i := 0 to LimboTransactionInfoCount - 1 do
     with LimboTransactionInfo[i] do
     begin

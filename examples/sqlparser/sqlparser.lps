@@ -72,13 +72,13 @@
       <Unit9>
         <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="152"/>
-        <CursorPos Y="188"/>
+        <TopLine Value="192"/>
+        <CursorPos X="33" Y="203"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="192"/>
-          <CursorPos X="33" Y="203"/>
+          <TopLine Value="666"/>
+          <CursorPos Y="694"/>
         </ExtraEditor1>
         <UsageCount Value="12"/>
       </Unit9>
@@ -133,7 +133,12 @@
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="71" Column="10" TopLine="43"/>
+      </Position1>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>
