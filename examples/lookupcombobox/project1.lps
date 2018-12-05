@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="77">
+    <Units Count="79">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -17,8 +17,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="23" Y="36"/>
+        <CursorPos X="14" Y="36"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -36,10 +35,12 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="102"/>
-        <CursorPos X="14" Y="120"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="613"/>
+        <CursorPos X="9" Y="628"/>
         <UsageCount Value="24"/>
+        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
@@ -136,8 +137,9 @@
       </Unit17>
       <Unit18>
         <Filename Value="../../design/IBDBReg.pas"/>
-        <TopLine Value="404"/>
-        <CursorPos X="62" Y="429"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="431"/>
+        <CursorPos X="35" Y="450"/>
         <UsageCount Value="10"/>
       </Unit18>
       <Unit19>
@@ -554,8 +556,43 @@
         <CursorPos Y="24"/>
         <UsageCount Value="11"/>
       </Unit76>
+      <Unit77>
+        <Filename Value="../../../../lcl/lclversion.pas"/>
+        <UnitName Value="LCLVersion"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="24"/>
+        <CursorPos X="10" Y="35"/>
+        <UsageCount Value="10"/>
+      </Unit77>
+      <Unit78>
+        <Filename Value="../../../../components/lazutils/lazversion.pas"/>
+        <UnitName Value="LazVersion"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit78>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="5" HistoryIndex="4">
+      <Position1>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="36" Column="14"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="34" Column="67"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="121" Column="18" TopLine="99"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="558" Column="36" TopLine="527"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="131" Column="21" TopLine="106"/>
+      </Position5>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>

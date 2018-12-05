@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LCLType, LResources, Forms, Controls, Graphics, Dialogs, DbCtrls,
-  ExtCtrls, IBSQLParser, DB, StdCtrls, IBCustomDataSet;
+  ExtCtrls, IBSQLParser, DB, StdCtrls, IBCustomDataSet, LCLVersion;
 
 type
 
@@ -117,7 +117,9 @@ type
     procedure CheckAndInsert;
     procedure DoEnter; override;
     procedure DoExit; override;
+    {$if lcl_fullversion >= 2000000}
     function DoEdit: boolean; override;
+    {$ifend}
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -125,7 +127,9 @@ type
     function SQLSafe(aText: string): string;
     procedure UpdateShowing; override;
     procedure UpdateData(Sender: TObject); override;
+    {$if lcl_fullversion >= 2000000}
     procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
+    {$ifend}
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
@@ -500,6 +504,7 @@ begin
   inherited DoExit;
 end;
 
+{$if lcl_fullversion >= 2000000}
 function TIBLookupComboEditBox.DoEdit: boolean;
 begin
   {DoEdit will swallow characters if no editable Field. Hence, to enabled
@@ -509,6 +514,7 @@ begin
   else
     Result := inherited DoEdit;
 end;
+{$ifend}
 
 procedure TIBLookupComboEditBox.KeyUp(var Key: Word; Shift: TShiftState);
 begin
@@ -593,6 +599,7 @@ begin
   FModified := false;
 end;
 
+{$if lcl_fullversion >= 2000000}
 type
 
   { THackedCustomComboBox }
@@ -618,6 +625,7 @@ begin
   else
     inherited;
 end;
+{$ifend}
 
 constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
 begin
