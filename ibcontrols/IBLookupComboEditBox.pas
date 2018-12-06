@@ -627,12 +627,14 @@ end;
 
 procedure TIBLookupComboEditBox.CloseUp;
 begin
-  DoOnCloseUp;
+  inherited CloseUp;
+  inherited DoEdit;
 end;
 
 procedure TIBLookupComboEditBox.Select;
 begin
-  DoOnSelect;
+  inherited Select;
+  inherited DoEdit;
 end;
 
 function TIBLookupComboEditBox.DoEdit: boolean;
@@ -682,8 +684,6 @@ begin
   if FModified then
     Change; {ensure Update}
   inherited EditingDone;
-  if (DataSource = nil) or (DataField = '') then
-    UpdateData(nil);
 end;
 
 end.
