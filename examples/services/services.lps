@@ -18,8 +18,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="144"/>
-        <CursorPos X="122" Y="158"/>
+        <TopLine Value="119"/>
+        <CursorPos Y="130"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
@@ -664,10 +664,11 @@
       </Unit83>
       <Unit84>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2817"/>
-        <CursorPos X="80" Y="2836"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="88"/>
+        <CursorPos X="25" Y="113"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit84>
       <Unit85>
         <Filename Value="../../runtime/nongui/IBTypes.pas"/>
@@ -703,7 +704,16 @@
         <UsageCount Value="10"/>
       </Unit89>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="2" HistoryIndex="1">
+      <Position1>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="157" Column="38" TopLine="132"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="162" Column="39" TopLine="145"/>
+      </Position2>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>

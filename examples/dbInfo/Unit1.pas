@@ -84,12 +84,20 @@ begin
 end;
 
 procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);
+var S: TStrings;
 begin
   IBTransaction1.Active := true;
   TableNameLookup.Active := true;
   Memo1.Lines.Add('Authentication Method = '+ IBDatabase1.AuthenticationMethod);
   Memo1.Lines.Add('Remote Protocol = ' + IBDatabase1.RemoteProtocol);
   Memo1.Lines.Add('Attachment SQLDialect = ' + IntToStr(IBDatabase1.DBSQLDialect));
+  S := TStringList.Create;
+  try
+    IBDatabase1.Attachment.getFBVersion(S);
+    Memo1.Lines.AddStrings(S);
+  finally
+    S.Free;
+  end;
   with IBDatabaseInfo1 do
   begin
     Memo1.Lines.Add('Firebird Library Pathname = ' + IBDatabase1.FirebirdAPI.GetFBLibrary.GetLibraryFilePath);

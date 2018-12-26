@@ -210,6 +210,7 @@ type
     FUseDefaultSystemCodePage: boolean;
     FUseHiddenPassword: boolean;
     FFirebirdAPI: IFirebirdAPI;
+    FWireCompression: boolean;
     procedure EnsureInactive;
     function GetAuthenticationMethod: string;
     function GetDBSQLDialect: Integer;
@@ -311,6 +312,7 @@ type
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
     property UseDefaultSystemCodePage: boolean read FUseDefaultSystemCodePage
                                                write FUseDefaultSystemCodePage;
+    property WireCompression: boolean read FWireCompression write FWireCompression;
     property AfterConnect;
     property AfterDisconnect;
     property BeforeConnect;
@@ -503,7 +505,7 @@ type
                                           write SetTransaction;
   end;
 
-function GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
+function GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings; WireCompression: boolean): IDPB;
 function GenerateTPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): ITPB;
 
 
@@ -1094,11 +1096,11 @@ begin
      begin
        FDBParamsChanged := False;
        if not FUseHiddenPassword and (not LoginPrompt and not (csDesigning in ComponentState)) or (FHiddenPassword = '') then
-         DPB := GenerateDPB(FirebirdAPI,TempDBParams)
+         DPB := GenerateDPB(FirebirdAPI,TempDBParams,WireCompression)
        else
        begin
           TempDBParams.Values['password'] := FHiddenPassword;
-          DPB := GenerateDPB(FirebirdAPI,TempDBParams);
+          DPB := GenerateDPB(FirebirdAPI,TempDBParams,WireCompression);
        end;
      end;
 
@@ -2316,7 +2318,7 @@ end;
   parameter buffer, and return it and its length
   in DPB and DPBLength, respectively. }
 
-function GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
+function GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings; WireCompression: boolean): IDPB;
 var
   i, j: Integer;
   DPBVal: UShort;
@@ -2387,6 +2389,8 @@ begin
       end;
     end;
   end;
+  if WireCompression then
+    Result.Add(isc_dpb_config).SetAsString('WireCompression=true');
 end;
 
 { GenerateTPB -

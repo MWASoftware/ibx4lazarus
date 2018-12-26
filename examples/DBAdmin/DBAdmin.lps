@@ -17,7 +17,6 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="1013"/>
         <CursorPos X="5" Y="1041"/>
@@ -783,10 +782,12 @@
       </Unit100>
       <Unit101>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1421"/>
-        <CursorPos X="3" Y="1425"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="2365"/>
+        <CursorPos X="10" Y="2321"/>
         <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit101>
       <Unit102>
         <Filename Value="../../runtime/nongui/IBSQLMonitor.pas"/>
@@ -995,7 +996,7 @@
         <UsageCount Value="10"/>
       </Unit129>
     </Units>
-    <JumpHistory Count="9" HistoryIndex="8">
+    <JumpHistory Count="10" HistoryIndex="9">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="155" Column="39" TopLine="134"/>
@@ -1032,6 +1033,10 @@
         <Filename Value="DataModule.pas"/>
         <Caret Line="26" Column="52"/>
       </Position9>
+      <Position10>
+        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
+        <Caret Line="1447" Column="18" TopLine="1421"/>
+      </Position10>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

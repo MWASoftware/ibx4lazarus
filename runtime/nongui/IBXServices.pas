@@ -73,6 +73,7 @@ type
     FProtocol: TProtocol;
     FServerVersionNo: array [1..4] of integer;
     FExpectedDB: string;
+    FWireCompression: boolean;
     procedure CheckActive;
     procedure CheckInactive;
     procedure CheckServerName;
@@ -121,6 +122,7 @@ type
     property Params: TStrings read FParams write SetParams;
     property ServerName: string read FServerName write SetServerName;
     property TraceFlags;
+    property WireCompression: boolean read FWireCompression write FWireCompression;
     property AfterConnect;
     property AfterDisconnect;
     property BeforeConnect;
@@ -2825,6 +2827,8 @@ begin
       end;
     end;
   end;
+  if WireCompression then
+    Result.Add(isc_spb_config).AsString := 'WireCompression=true';
 end;
 
 function TIBXServicesConnection.GetFirebirdAPI: IFirebirdAPI;

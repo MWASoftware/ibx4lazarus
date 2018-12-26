@@ -37,6 +37,7 @@ object Form1: TForm1
     SQLDialect = 1
     TraceFlags = []
     UseDefaultSystemCodePage = False
+    WireCompression = False
     left = 224
     top = 56
   end

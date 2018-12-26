@@ -4,6 +4,7 @@ object DatabaseData: TDatabaseData
   HorizontalOffset = 645
   VerticalOffset = 400
   Width = 730
+  PPI = 96
   object IBDatabase1: TIBDatabase
     Connected = False
     AfterConnect = IBDatabase1AfterConnect
@@ -22,6 +23,7 @@ object DatabaseData: TDatabaseData
     IdleTimer = 0
     TraceFlags = []
     UseDefaultSystemCodePage = False
+    WireCompression = True
     left = 40
     top = 24
   end
@@ -1225,6 +1227,7 @@ object DatabaseData: TDatabaseData
       'sql_role_name=RDB$ADMIN'
     )
     TraceFlags = []
+    WireCompression = False
     left = 640
     top = 48
   end

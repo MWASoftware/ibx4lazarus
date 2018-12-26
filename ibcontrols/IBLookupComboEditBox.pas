@@ -124,7 +124,6 @@ type
     procedure Change; override;
     procedure CloseUp; override;
     procedure Select; override;
-    procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
     {$ifend}
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Loaded; override;
@@ -594,30 +593,14 @@ type
 
   THackedCustomComboBox = class(TCustomComboBox)
   private
-    procedure CallUTF8KeyPress(var UTF8Key: TUTF8Char);
     procedure CallChange;
   end;
 
 { THackedCustomComboBox }
 
-procedure THackedCustomComboBox.CallUTF8KeyPress(var UTF8Key: TUTF8Char);
-begin
-  inherited UTF8KeyPress(UTF8Key);
-end;
-
 procedure THackedCustomComboBox.CallChange;
 begin
   inherited Change;
-end;
-
-procedure TIBLookupComboEditBox.UTF8KeyPress(var UTF8Key: TUTF8Char);
-begin
-  {TDBLookupComboBox.UTF8KeyPress will swallow the character if
-  the datalink is not editable. hence to enable writing we must override it}
-  if ((DataSource = nil) or (Field = nil)) and not ReadOnly then
-    THackedCustomComboBox(self).CallUTF8KeyPress(UTF8Key)
-  else
-    inherited;
 end;
 
 procedure TIBLookupComboEditBox.Change;
@@ -641,7 +624,7 @@ function TIBLookupComboEditBox.DoEdit: boolean;
 begin
   {DoEdit will swallow characters if no editable Field. Hence, to enabled
    writing we must avoid calling the inherited method.}
-  if ((DataSource = nil) or (Field = nil)) and not ReadOnly then
+  if IsUnbound then
     Result := true
   else
     Result := inherited DoEdit;
