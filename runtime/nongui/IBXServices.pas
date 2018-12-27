@@ -59,10 +59,11 @@ type
 
   TIBXServicesConnection = class(TIBXMonitoredConnection)
   private
+    FConfigOverrides: TStrings;
     FDatabase: TIBDatabase;
     FFirebirdAPI: IFirebirdAPI;
     FConnectString: string;
-    FFirebirdLibraryPathName: string;
+    FFirebirdLibraryPathName: TIBFileName;
     FOnSecurityContextException: TIBXServicesSecContextEvent;
     FParams: TStrings;
     FIBXServices: array of IIBXServicesClient;
@@ -80,16 +81,19 @@ type
     function GetFirebirdAPI: IFirebirdAPI;
     function GetServerVersionNo(index: integer): integer;
     function GetSPBConstName(action: byte): string;
+    function GetWireCompression: boolean;
     procedure HandleException(Sender: TObject);
     procedure HandleSecContextException(Sender: TIBXControlService; var action: TSecContextAction);
     function Login(var aServerName: string; LoginParams: TStrings): Boolean;
     procedure ParamsChanging(Sender: TObject);
+    procedure SetConfigOverrides(AValue: TStrings);
     procedure SetConnectString(AValue: string);
-    procedure SetFirebirdLibraryPathName(AValue: string);
+    procedure SetFirebirdLibraryPathName(AValue: TIBFileName);
     procedure SetParams(AValue: TStrings);
     procedure SetPortNo(AValue: string);
     procedure SetProtocol(AValue: TProtocol);
     procedure SetServerName(AValue: string);
+    procedure SetWireCompression(AValue: boolean);
   protected
     procedure DoConnect; override;
     procedure DoDisconnect; override;
@@ -113,7 +117,8 @@ type
   published
     property Connected;
     property ConnectString: string read FConnectString write SetConnectString;
-    property FirebirdLibraryPathName: string read FFirebirdLibraryPathName
+    property ConfigOverrides: TStrings read FConfigOverrides write SetConfigOverrides;
+    property FirebirdLibraryPathName: TIBFileName read FFirebirdLibraryPathName
                                              write SetFirebirdLibraryPathName;
     property LoginPrompt default True;
     property Protocol: TProtocol read FProtocol write SetProtocol default Local;
@@ -121,6 +126,8 @@ type
     property Params: TStrings read FParams write SetParams;
     property ServerName: string read FServerName write SetServerName;
     property TraceFlags;
+    property WireCompression: boolean read GetWireCompression write SetWireCompression
+                stored false;
     property AfterConnect;
     property AfterDisconnect;
     property BeforeConnect;
@@ -2777,7 +2784,8 @@ end;
 }
 function TIBXServicesConnection.GenerateSPB(sl: TStrings): ISPB;
 var
-  i, j, SPBServerVal: UShort;
+  i, j: integer;
+  SPBServerVal: UShort;
   param_name, param_value: String;
 begin
   { The SPB is initially empty, with the exception that
@@ -2787,7 +2795,6 @@ begin
 
   { Iterate through the textual service parameters, constructing
    a SPB on-the-fly }
-  if sl.Count > 0 then
   for i := 0 to sl.Count - 1 do
   begin
    { Get the parameter's name and value from the list,
@@ -2825,6 +2832,8 @@ begin
       end;
     end;
   end;
+  if FConfigOverrides.Count > 0 then
+    Result.Add(isc_spb_config).SetAsString(FConfigOverrides.Text);
 end;
 
 function TIBXServicesConnection.GetFirebirdAPI: IFirebirdAPI;
@@ -2863,6 +2872,11 @@ begin
       Result := SPBConstantNames[i];
       break;
     end;
+end;
+
+function TIBXServicesConnection.GetWireCompression: boolean;
+begin
+  Result := CompareText(FConfigOverrides.Values['WireCompression'],'true') = 0;
 end;
 
 procedure TIBXServicesConnection.HandleException(Sender: TObject);
@@ -2965,6 +2979,12 @@ begin
   CheckInactive;
 end;
 
+procedure TIBXServicesConnection.SetConfigOverrides(AValue: TStrings);
+begin
+  if FConfigOverrides = AValue then Exit;
+  FConfigOverrides.Assign(AValue);
+end;
+
 procedure TIBXServicesConnection.SetConnectString(AValue: string);
 var aServiceName: AnsiString;
     aProtocol: TProtocolAll;
@@ -2978,7 +2998,8 @@ begin
   FProtocol := TProtocol(aProtocol);
 end;
 
-procedure TIBXServicesConnection.SetFirebirdLibraryPathName(AValue: string);
+procedure TIBXServicesConnection.SetFirebirdLibraryPathName(AValue: TIBFileName
+  );
 begin
   if FFirebirdLibraryPathName = AValue then Exit;
   FFirebirdLibraryPathName := AValue;
@@ -3000,6 +3021,19 @@ begin
   Connected := false;
   FServerName := AValue;
   FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
+end;
+
+procedure TIBXServicesConnection.SetWireCompression(AValue: boolean);
+var Index: integer;
+begin
+  if AValue then
+    FConfigOverrides.Values['WireCompression'] := 'true'
+  else
+  begin
+    Index := FConfigOverrides.IndexOfName('WireCompression');
+    if Index <> -1 then
+      FConfigOverrides.Delete(Index);
+  end;
 end;
 
 procedure TIBXServicesConnection.DoConnect;
@@ -3053,6 +3087,7 @@ begin
   {Get Connect String from Database Connect String}
   begin
     FFirebirdAPI := FDatabase.FirebirdAPI;
+    FConfigOverrides.Assign(FDatabase.ConfigOverrides);
     if ParseConnectString(FDatabase.Attachment.GetConnectString,aServerName,aDBName,aProtocol,aPortNo) and
       (aProtocol = Local) and
       (FDatabase.Attachment.GetRemoteProtocol <> '') then
@@ -3155,6 +3190,7 @@ begin
   inherited Create(AOwner);
   FServerName := '';
   FParams := TStringList.Create;
+  FConfigOverrides := TStringList.Create;
   Setlength(FIBXServices,0);
   TStringList(FParams).OnChanging := @ParamsChanging;
   FService := nil;
@@ -3171,6 +3207,7 @@ begin
   inherited Destroy;
   Setlength(FIBXServices,0);
   if assigned(FParams) then FParams.Free;
+  if assigned (FConfigOverrides) then FConfigOverrides.Free;
   FFirebirdAPI := nil;
 end;
 

@@ -118,7 +118,12 @@ type
     procedure DoEnter; override;
     procedure DoExit; override;
     {$if lcl_fullversion >= 2000000}
+    {Deferred update changes in Lazarus 2.0 stop the combo box working when
+     the datasource is nil. We thus have to reverse out the changes :(}
     function DoEdit: boolean; override;
+    procedure Change; override;
+    procedure CloseUp; override;
+    procedure Select; override;
     {$ifend}
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Loaded; override;
@@ -127,9 +132,6 @@ type
     function SQLSafe(aText: string): string;
     procedure UpdateShowing; override;
     procedure UpdateData(Sender: TObject); override;
-    {$if lcl_fullversion >= 2000000}
-    procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
-    {$ifend}
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
@@ -504,24 +506,9 @@ begin
   inherited DoExit;
 end;
 
-{$if lcl_fullversion >= 2000000}
-function TIBLookupComboEditBox.DoEdit: boolean;
-begin
-  {DoEdit will swallow characters if no editable Field. Hence, to enabled
-   writing we must avoid calling the inherited method.}
-  if ((DataSource = nil) or (Field = nil)) and not ReadOnly then
-    Result := true
-  else
-    Result := inherited DoEdit;
-end;
-{$ifend}
-
 procedure TIBLookupComboEditBox.KeyUp(var Key: Word; Shift: TShiftState);
 begin
   inherited KeyUp(Key, Shift);
-  if Key = VK_RETURN then
-     EditingDone
-  else
   if Key = VK_ESCAPE then
   begin
     SelStart := UTF8Length(Text);      {Ensure end of line selection}
@@ -606,24 +593,41 @@ type
 
   THackedCustomComboBox = class(TCustomComboBox)
   private
-    procedure CallUTF8KeyPress(var UTF8Key: TUTF8Char);
+    procedure CallChange;
   end;
 
 { THackedCustomComboBox }
 
-procedure THackedCustomComboBox.CallUTF8KeyPress(var UTF8Key: TUTF8Char);
+procedure THackedCustomComboBox.CallChange;
 begin
-  inherited UTF8KeyPress(UTF8Key);
+  inherited Change;
 end;
 
-procedure TIBLookupComboEditBox.UTF8KeyPress(var UTF8Key: TUTF8Char);
+procedure TIBLookupComboEditBox.Change;
 begin
-  {TDBLookupComboBox.UTF8KeyPress will swallow the character if
-  the datalink is not editable. hence to enable writing we must override it}
-  if ((DataSource = nil) or (Field = nil)) and not ReadOnly then
-    THackedCustomComboBox(self).CallUTF8KeyPress(UTF8Key)
+  THackedCustomComboBox(self).CallChange;
+end;
+
+procedure TIBLookupComboEditBox.CloseUp;
+begin
+  inherited CloseUp;
+  inherited DoEdit;
+end;
+
+procedure TIBLookupComboEditBox.Select;
+begin
+  inherited Select;
+  inherited DoEdit;
+end;
+
+function TIBLookupComboEditBox.DoEdit: boolean;
+begin
+  {DoEdit will swallow characters if no editable Field. Hence, to enabled
+   writing we must avoid calling the inherited method.}
+  if IsUnbound then
+    Result := true
   else
-    inherited;
+    Result := inherited DoEdit;
 end;
 {$ifend}
 

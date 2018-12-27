@@ -57,11 +57,14 @@ type
 
   TIBDatabaseEditForm = class(TForm)
     Browse: TButton;
+    UseWireCompression: TCheckBox;
     DatabasePath: TEdit;
     Label1: TLabel;
+    Label10: TLabel;
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
+    ConfigOverrides: TMemo;
     PortNo: TEdit;
     Protocol: TComboBox;
     ConnectionTypeBtn: TRadioGroup;
@@ -84,6 +87,7 @@ type
     CharacterSet: TComboBox;
     Test: TButton;
     procedure BrowseClick(Sender: TObject);
+    procedure ConfigOverridesEditingDone(Sender: TObject);
     procedure DatabaseParamsEditingDone(Sender: TObject);
     procedure OKBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -96,9 +100,11 @@ type
     procedure TestClick(Sender: TObject);
     procedure UserNameEditingDone(Sender: TObject);
     procedure UseSystemDefaultCSChange(Sender: TObject);
+    procedure UseWireCompressionEditingDone(Sender: TObject);
   private
     { Private declarations }
     Database: TIBDatabase;
+    FChanging: boolean;
     function Edit: Boolean;
     procedure AddParam(aName, aValue: string);
     procedure DeleteParam(aName: string);
@@ -181,19 +187,19 @@ begin
   end;
   ProtocolCloseUp(nil);
   ConnectionTypeBtnSelectionChanged(nil);
-  if Trim(Database.Params.Text) = '' then
-    DatabaseParams.Clear
-  else
-    DatabaseParams.Lines.Assign(Database.Params);
+  DatabaseParams.Lines.Assign(Database.Params);
+  ConfigOverrides.Lines.Assign(Database.ConfigOverrides);
   LoginPrompt.Checked := Database.LoginPrompt;
   UpdateParamEditBoxes;
   UseSystemDefaultCS.Checked := Database.UseDefaultSystemCodePage;
+  UseWireCompression.Checked := Database.WireCompression;
   Result := False;
   if ShowModal = mrOk then
   begin
     Database.DatabaseName := MakeConnectString(ServerName.Text, DatabasePath.Text,
       TProtocolAll(Protocol.ItemIndex), PortNo.Text);
-    Database.Params := DatabaseParams.Lines;
+    Database.Params.Assign(DatabaseParams.Lines);
+    Database.ConfigOverrides.Assign(ConfigOverrides.Lines);
     Database.LoginPrompt := LoginPrompt.Checked;
     Database.UseDefaultSystemCodePage := UseSystemDefaultCS.Checked;
     Result := True;
@@ -211,6 +217,16 @@ begin
     finally
       Free
     end;
+end;
+
+procedure TIBDatabaseEditForm.ConfigOverridesEditingDone(Sender: TObject);
+begin
+  FChanging := true;
+  try
+    UseWireCompression.Checked := CompareText(ConfigOverrides.Lines.Values['WireCompression'],'true') = 0;
+  finally
+    FChanging := false;
+  end;
 end;
 
 procedure TIBDatabaseEditForm.DatabaseParamsEditingDone(Sender: TObject);
@@ -326,6 +342,20 @@ begin
   else
   if (CharacterSet.Text <> 'None') then {do not localize}
       AddParam('lc_ctype', CharacterSet.Text)
+end;
+
+procedure TIBDatabaseEditForm.UseWireCompressionEditingDone(Sender: TObject);
+var Index: integer;
+begin
+  if FChanging then Exit;
+  if UseWireCompression.Checked then
+    ConfigOverrides.Lines.Values['WireCompression'] := 'true'
+  else
+  begin
+    Index := ConfigOverrides.Lines.IndexOfName('WireCompression');
+    if Index <> -1 then
+      ConfigOverrides.Lines.Delete(Index);
+  end;
 end;
 
 

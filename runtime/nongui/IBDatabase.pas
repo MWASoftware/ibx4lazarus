@@ -185,10 +185,11 @@ type
   private
     FCloseAction: TIBDatabaseCloseActions;
     FAttachment: IAttachment;
+    FConfigOverrides: TStrings;
     FCreateDatabase: boolean;
     FCreateIfNotExists: boolean;
     FAllowStreamedConnected: boolean;
-    FFirebirdLibraryPathName: string;
+    FFirebirdLibraryPathName: TIBFileName;
     FHiddenPassword: string;
     FOnCreateDatabase: TNotifyEvent;
     FOnLogin: TIBDatabaseLoginEvent;
@@ -219,11 +220,15 @@ type
     function GetFirebirdAPI: IFirebirdAPI;
     function GetRemoteProtocol: string;
     function GetSQLObjectsCount: Integer;
-    procedure SetFirebirdLibraryPathName(AValue: string);
+    function GetWireCompression: boolean;
+    procedure SetConfigOverrides(AValue: TStrings);
+    procedure SetFirebirdLibraryPathName(AValue: TIBFileName);
     procedure SetSQLDialect(const Value: Integer);
+    procedure SetWireCompression(AValue: boolean);
     procedure ValidateClientSQLDialect;
     procedure DBParamsChange(Sender: TObject);
     procedure DBParamsChanging(Sender: TObject);
+    function GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
     function GetSQLObject(Index: Integer): TIBBase;
     function GetSQLObjectCount: Integer;
     function GetIdleTimer: Integer;
@@ -299,9 +304,10 @@ type
     property AllowStreamedConnected: boolean read FAllowStreamedConnected
              write FAllowStreamedConnected;
     property DatabaseName: TIBFileName read FDBName write SetDatabaseName;
-    property FirebirdLibraryPathName: string read FFirebirdLibraryPathName
+    property FirebirdLibraryPathName: TIBFileName read FFirebirdLibraryPathName
                                              write SetFirebirdLibraryPathName;
     property Params: TStrings read FDBParams write SetDBParams;
+    property ConfigOverrides: TStrings read FConfigOverrides write SetConfigOverrides;
     property LoginPrompt default True;
     property DefaultTransaction: TIBTransaction read FDefaultTransaction
                                                  write SetDefaultTransaction;
@@ -311,6 +317,8 @@ type
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
     property UseDefaultSystemCodePage: boolean read FUseDefaultSystemCodePage
                                                write FUseDefaultSystemCodePage;
+    property WireCompression: boolean read GetWireCompression write SetWireCompression
+             stored false;
     property AfterConnect;
     property AfterDisconnect;
     property BeforeConnect;
@@ -376,6 +384,7 @@ type
     function AddSQLObject(ds: TIBBase): Integer;
     procedure RemoveSQLObject(Idx: Integer);
     procedure RemoveSQLObjects;
+    function GenerateTPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): ITPB;
 
   protected
     procedure Loaded; override;
@@ -503,9 +512,6 @@ type
                                           write SetTransaction;
   end;
 
-function GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
-function GenerateTPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): ITPB;
-
 
 implementation
 
@@ -520,6 +526,7 @@ begin
   LoginPrompt := True;
   FSQLObjects := TList.Create;
   FTransactions := TList.Create;
+  FConfigOverrides := TStringList.Create;
   FDBName := '';
   FDBParams := TStringList.Create;
   FSQLHourGlass := true;
@@ -556,6 +563,7 @@ begin
   RemoveSQLObjects;
   RemoveTransactions;
   FInternalTransaction.Free;
+  FConfigOverrides.Free;
   FDBParams.Free;
   FSQLObjects.Free;
   FTransactions.Free;
@@ -1362,6 +1370,19 @@ begin
     IBError(ibxeSQLDialectInvalid, [nil]);
 end;
 
+procedure TIBDataBase.SetWireCompression(AValue: boolean);
+var Index: integer;
+begin
+  if AValue then
+    FConfigOverrides.Values['WireCompression'] := 'true'
+  else
+  begin
+    Index := FConfigOverrides.IndexOfName('WireCompression');
+    if Index <> -1 then
+      FConfigOverrides.Delete(Index);
+  end;
+end;
+
  function TIBDataBase.GetDBSQLDialect: Integer;
 begin
   CheckActive;
@@ -1420,7 +1441,18 @@ begin
   Result := FSQLObjects.Count;
 end;
 
-procedure TIBDataBase.SetFirebirdLibraryPathName(AValue: string);
+function TIBDataBase.GetWireCompression: boolean;
+begin
+  Result := CompareText(FConfigOverrides.Values['WireCompression'],'true') = 0;
+end;
+
+procedure TIBDataBase.SetConfigOverrides(AValue: TStrings);
+begin
+  if FConfigOverrides = AValue then Exit;
+  FConfigOverrides.Assign(AValue);
+end;
+
+procedure TIBDataBase.SetFirebirdLibraryPathName(AValue: TIBFileName);
 begin
   if FFirebirdLibraryPathName = AValue then Exit;
   FFirebirdLibraryPathName := AValue;
@@ -2316,7 +2348,7 @@ end;
   parameter buffer, and return it and its length
   in DPB and DPBLength, respectively. }
 
-function GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
+function TIBDatabase.GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
 var
   i, j: Integer;
   DPBVal: UShort;
@@ -2387,6 +2419,8 @@ begin
       end;
     end;
   end;
+  if FConfigOverrides.Count > 0 then
+    Result.Add(isc_dpb_config).SetAsString(FConfigOverrides.Text);
 end;
 
 { GenerateTPB -
@@ -2394,7 +2428,7 @@ end;
   of the transaction parameters, generate a transaction
   parameter buffer, and return it and its length in
   TPB and TPBLength, respectively. }
-function GenerateTPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): ITPB;
+function TIBTransaction.GenerateTPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): ITPB;
 var
   i, j, TPBVal: Integer;
   ParamName, ParamValue: string;

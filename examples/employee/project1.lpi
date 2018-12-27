@@ -39,7 +39,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="51">
+    <Units Count="54">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -96,8 +96,8 @@
       <Unit6>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1174"/>
-        <CursorPos X="23" Y="1205"/>
+        <TopLine Value="138"/>
+        <CursorPos X="17" Y="140"/>
         <UsageCount Value="14"/>
       </Unit6>
       <Unit7>
@@ -411,6 +411,27 @@
         <CursorPos X="18" Y="27"/>
         <UsageCount Value="10"/>
       </Unit50>
+      <Unit51>
+        <Filename Value="../../../fbintf/include/consts_pub.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="100"/>
+        <CursorPos X="14" Y="118"/>
+        <UsageCount Value="10"/>
+      </Unit51>
+      <Unit52>
+        <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="71"/>
+        <CursorPos X="34" Y="87"/>
+        <UsageCount Value="10"/>
+      </Unit52>
+      <Unit53>
+        <Filename Value="../../../fbintf/client/FBParamBlock.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="86"/>
+        <CursorPos X="3" Y="62"/>
+        <UsageCount Value="10"/>
+      </Unit53>
     </Units>
     <JumpHistory Count="1">
       <Position1>

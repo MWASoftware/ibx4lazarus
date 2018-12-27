@@ -516,6 +516,8 @@ begin
           sqltIdentifierInDoubleQuotes:
             stmt += '"' + TokenText + '"';
 
+          sqltCR: {ignore};
+
           sqltEOL:
             stmt += LineEnding;
 
@@ -558,13 +560,15 @@ begin
           stmt += '/*' + TokenText + '*/';
 
         sqltCommentLine:
-          stmt += '/*' + TokenText + ' */' + LineEnding;
+          stmt += '/* ' + TokenText + ' */' + LineEnding;
 
         sqltQuotedString:
           stmt += '''' + SQLSafeString(TokenText) + '''';
 
         sqltIdentifierInDoubleQuotes:
           stmt += '"' + TokenText + '"';
+
+        sqltCR: {ignore};
 
         sqltEOL:
           stmt += LineEnding;
@@ -584,13 +588,15 @@ begin
           stmt += '/*' + TokenText + '*/';
 
         sqltCommentLine:
-          stmt += '/*' + TokenText + ' */' + LineEnding;
+          stmt += '/* ' + TokenText + ' */' + LineEnding;
 
         sqltCloseSquareBracket:
         begin
           stmt += TokenText;
           State := stInStmt;
         end;
+
+        sqltCR: {ignore};
 
         sqltEOL:
           stmt += LineEnding;
@@ -610,13 +616,15 @@ begin
           stmt += '/*' + TokenText + '*/';
 
         sqltCommentLine:
-          stmt += '/*' + TokenText + ' */' + LineEnding;
+          stmt += '/* ' + TokenText + ' */' + LineEnding;
 
         sqltSemiColon:
           begin
             State := stInStmt;
             stmt += TokenText;
           end;
+
+        sqltCR: {ignore};
 
         sqltEOL:
           stmt += LineEnding;

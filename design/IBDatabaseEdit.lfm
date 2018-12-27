@@ -12,7 +12,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
   OnCreate = FormCreate
   ParentFont = True
   Position = poScreenCenter
-  LCLVersion = '1.8.3.0'
+  LCLVersion = '2.0.0.2'
   object Panel1: TPanel
     Left = 5
     Height = 36
@@ -133,7 +133,7 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
     end
     object DatabaseParams: TMemo
       Left = 249
-      Height = 124
+      Height = 80
       Top = 27
       Width = 183
       OnEditingDone = DatabaseParamsEditingDone
@@ -212,13 +212,38 @@ object IBDatabaseEditForm: TIBDatabaseEditForm
       TabOrder = 3
     end
     object UseSystemDefaultCS: TCheckBox
-      Left = 209
+      Left = 24
       Height = 22
-      Top = 200
+      Top = 264
       Width = 229
       Caption = 'Use System Default Character Set'
       OnChange = UseSystemDefaultCSChange
       TabOrder = 6
+    end
+    object Label10: TLabel
+      Left = 249
+      Height = 14
+      Top = 121
+      Width = 123
+      Caption = 'Config File Overrides'
+      ParentColor = False
+    end
+    object ConfigOverrides: TMemo
+      Left = 249
+      Height = 86
+      Top = 136
+      Width = 182
+      OnEditingDone = ConfigOverridesEditingDone
+      TabOrder = 7
+    end
+    object UseWireCompression: TCheckBox
+      Left = 249
+      Height = 22
+      Top = 235
+      Width = 158
+      Caption = 'Use Wire Compression'
+      OnEditingDone = UseWireCompressionEditingDone
+      TabOrder = 8
     end
   end
   object Label7: TLabel

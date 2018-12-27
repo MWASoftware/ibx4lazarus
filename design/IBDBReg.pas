@@ -63,9 +63,18 @@ type
   Property editor the DataBase Name property.  Brings up the Open dialog }
 
   TIBFileNameProperty = class(TStringProperty)
+  protected
+    function GetFilter: string; virtual;
   public
     procedure Edit; override;
     function GetAttributes: TPropertyAttributes; override;
+  end;
+
+  { TIBLibraryNameProperty }
+
+  TIBLibraryNameProperty = class(TIBFileNameProperty)
+  protected
+    function GetFilter: string; override;
   end;
 
   { TIBNameProperty
@@ -473,6 +482,8 @@ begin
   RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView,TDBControlGrid, TIBArrayGrid]);
 
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'DatabaseName', TIBFileNameProperty); {do not localize}
+  RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'FirebirdLibraryPathName', TIBLibraryNameProperty); {do not localize}
+  RegisterPropertyEditor(TypeInfo(TIBFileName), TIBXServicesConnection, 'FirebirdLibraryPathName', TIBLibraryNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'StoredProcName', TIBStoredProcNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(string), TIBStoredProc, 'PackageName', TIBPackageNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TParams), TIBStoredProc, 'Params', TIBStoredProcParamsProperty);
@@ -546,6 +557,13 @@ begin
       end;
     end;
   end;
+end;
+
+{ TIBLibraryNameProperty }
+
+function TIBLibraryNameProperty.GetFilter: string;
+begin
+  Result := SLibraryNameFilter; {do not localise}
 end;
 
 { TIBXServiceEditor }
@@ -764,13 +782,18 @@ begin
   Result := inherited GetVerbCount + 2;
 end;
 
+function TIBFileNameProperty.GetFilter: string;
+begin
+  Result := SDatabaseFilter; {do not localize}
+end;
+
 { TIBFileNameProperty }
 procedure TIBFileNameProperty.Edit;
 begin
   with TOpenDialog.Create(Application) do
     try
       InitialDir := ExtractFilePath(GetStrValue);
-      Filter := SDatabaseFilter; {do not localize}
+      Filter := GetFilter;
       if Execute then
         SetStrValue(FileName);
     finally

@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="130">
+    <Units Count="131">
       <Unit0>
         <Filename Value="DBAdmin.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -19,8 +19,8 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1013"/>
-        <CursorPos X="5" Y="1041"/>
+        <TopLine Value="1048"/>
+        <CursorPos Y="1083"/>
         <UsageCount Value="154"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -31,7 +31,7 @@
         <ComponentName Value="DatabaseData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <CursorPos X="52" Y="26"/>
+        <CursorPos X="9" Y="9"/>
         <UsageCount Value="154"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -318,9 +318,9 @@
       <Unit36>
         <Filename Value="../../../fbintf/client/3.0/FB30Attachment.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="45"/>
-        <CursorPos X="14" Y="80"/>
-        <UsageCount Value="9"/>
+        <TopLine Value="384"/>
+        <CursorPos X="17" Y="408"/>
+        <UsageCount Value="10"/>
       </Unit36>
       <Unit37>
         <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
@@ -537,9 +537,9 @@
       <Unit66>
         <Filename Value="../../design/IBDBReg.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="476"/>
-        <CursorPos X="107" Y="503"/>
-        <UsageCount Value="6"/>
+        <TopLine Value="460"/>
+        <CursorPos X="111" Y="485"/>
+        <UsageCount Value="10"/>
       </Unit66>
       <Unit67>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/variant.inc"/>
@@ -619,8 +619,8 @@
       <Unit79>
         <Filename Value="../../../fbintf/client/FBMessages.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="233"/>
-        <CursorPos X="11" Y="255"/>
+        <TopLine Value="264"/>
+        <CursorPos X="21" Y="287"/>
         <UsageCount Value="12"/>
       </Unit79>
       <Unit80>
@@ -742,13 +742,13 @@
       <Unit96>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2768"/>
-        <CursorPos X="36" Y="2787"/>
+        <TopLine Value="851"/>
+        <CursorPos Y="867"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="851"/>
-          <CursorPos Y="867"/>
+          <TopLine Value="3072"/>
+          <CursorPos X="54" Y="3090"/>
         </ExtraEditor1>
         <UsageCount Value="19"/>
       </Unit96>
@@ -784,8 +784,8 @@
       <Unit101>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1083"/>
-        <CursorPos Y="1102"/>
+        <TopLine Value="2321"/>
+        <CursorPos X="10" Y="2321"/>
         <UsageCount Value="12"/>
       </Unit101>
       <Unit102>
@@ -994,8 +994,15 @@
         <CursorPos Y="40"/>
         <UsageCount Value="10"/>
       </Unit129>
+      <Unit130>
+        <Filename Value="../../../fbintf/client/2.5/FB25Attachment.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="339"/>
+        <CursorPos X="17" Y="370"/>
+        <UsageCount Value="10"/>
+      </Unit130>
     </Units>
-    <JumpHistory Count="9" HistoryIndex="8">
+    <JumpHistory Count="14" HistoryIndex="13">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="155" Column="39" TopLine="134"/>
@@ -1032,6 +1039,26 @@
         <Filename Value="DataModule.pas"/>
         <Caret Line="26" Column="52"/>
       </Position9>
+      <Position10>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="1041" Column="5" TopLine="1013"/>
+      </Position10>
+      <Position11>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="1042" Column="5" TopLine="1014"/>
+      </Position11>
+      <Position12>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="1043" Column="5" TopLine="1015"/>
+      </Position12>
+      <Position13>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="843" Column="9" TopLine="840"/>
+      </Position13>
+      <Position14>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="360" Column="15" TopLine="360"/>
+      </Position14>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

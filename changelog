@@ -1,3 +1,13 @@
+IBX Change Log  version                     (2.3-3 Build 11263) Thu, 27 Dec 2018 15:17:57 +0000
+
+This is rc1 for 2.2.3.
+
+1. New property for TIBDatabase and TIBXServicesConnection. This is "WireCompression".
+   If this property is set to true then the Client will request WireCompression for
+   the connection. Note: "WireCompression = true" must be set in the server's
+   "firebird.conf". This property is overridden if "WireCompression = true" is set
+   in the client "firebird.conf" when wire compression is always requested by the client.
+
 IBX Change Log  version                   (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 
 1. Remove need to check for IsMultiThread by providing access to GUI timers via

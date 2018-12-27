@@ -1,16 +1,16 @@
 object IBXServiceEditorForm: TIBXServiceEditorForm
-  Left = 761
-  Height = 340
-  Top = 285
+  Left = 1032
+  Height = 400
+  Top = 401
   Width = 438
   Caption = 'Services Connection Editor'
-  ClientHeight = 340
+  ClientHeight = 400
   ClientWidth = 438
   Position = poScreenCenter
-  LCLVersion = '1.8.3.0'
+  LCLVersion = '2.0.0.2'
   object Bevel1: TBevel
     Left = 21
-    Height = 269
+    Height = 329
     Top = 22
     Width = 395
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -102,7 +102,7 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
   end
   object ServiceParams: TMemo
     Left = 217
-    Height = 124
+    Height = 80
     Top = 154
     Width = 183
     OnEditingDone = ServiceParamsEditingDone
@@ -121,7 +121,7 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
   object OKBtn: TButton
     Left = 88
     Height = 30
-    Top = 300
+    Top = 360
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = 'OK'
@@ -132,7 +132,7 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
   object CancelBtn: TButton
     Left = 169
     Height = 30
-    Top = 300
+    Top = 360
     Width = 74
     Anchors = [akLeft, akBottom]
     Cancel = True
@@ -143,7 +143,7 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
   object Test: TButton
     Left = 249
     Height = 30
-    Top = 299
+    Top = 359
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = '&Test'
@@ -189,5 +189,30 @@ object IBXServiceEditorForm: TIBXServiceEditorForm
     )
     OnSelectionChanged = ConnectionTypeBtnSelectionChanged
     TabOrder = 10
+  end
+  object UseWireCompression: TCheckBox
+    Left = 32
+    Height = 22
+    Top = 288
+    Width = 158
+    Caption = 'Use Wire Compression'
+    OnEditingDone = UseWireCompressionEditingDone
+    TabOrder = 11
+  end
+  object Label10: TLabel
+    Left = 218
+    Height = 14
+    Top = 240
+    Width = 123
+    Caption = 'Config File Overrides'
+    ParentColor = False
+  end
+  object ConfigOverrides: TMemo
+    Left = 218
+    Height = 86
+    Top = 255
+    Width = 182
+    OnEditingDone = ConfigOverridesEditingDone
+    TabOrder = 12
   end
 end
