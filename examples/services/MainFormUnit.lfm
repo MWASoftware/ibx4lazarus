@@ -182,7 +182,6 @@ object MainForm: TMainForm
     )
     ServerName = 'localhost'
     TraceFlags = []
-    WireCompression = False
     OnSecurityContextException = IBXServicesConnection1SecurityContextException
     left = 128
     top = 35

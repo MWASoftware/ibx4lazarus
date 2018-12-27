@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 789
+  Left = 839
   Height = 339
-  Top = 215
+  Top = 239
   Width = 487
   Caption = 'Database Information'
   ClientHeight = 339
@@ -37,7 +37,6 @@ object Form1: TForm1
     SQLDialect = 1
     TraceFlags = []
     UseDefaultSystemCodePage = False
-    WireCompression = False
     left = 224
     top = 56
   end
