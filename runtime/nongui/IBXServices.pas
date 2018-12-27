@@ -3087,6 +3087,7 @@ begin
   {Get Connect String from Database Connect String}
   begin
     FFirebirdAPI := FDatabase.FirebirdAPI;
+    FConfigOverrides.Assign(FDatabase.ConfigOverrides);
     if ParseConnectString(FDatabase.Attachment.GetConnectString,aServerName,aDBName,aProtocol,aPortNo) and
       (aProtocol = Local) and
       (FDatabase.Attachment.GetRemoteProtocol <> '') then

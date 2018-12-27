@@ -35,6 +35,8 @@ type
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
     ClientLibrary: TLabel;
+    Label44: TLabel;
+    ClientServerVersion: TMemo;
     MenuItem20: TMenuItem;
     MenuItem21: TMenuItem;
     RunScript: TAction;
@@ -1077,6 +1079,7 @@ begin
       PagesAvail.Text := 'n/a';
       AutoAdmin.Checked :=  false;
     end;
+    DatabaseData.IBDatabase1.Attachment.getFBVersion(ClientServerVersion.Lines);
     DBComments.Lines.Text := DatabaseData.Description;
   finally
     FLoading := false;

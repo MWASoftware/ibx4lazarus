@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="130">
+    <Units Count="131">
       <Unit0>
         <Filename Value="DBAdmin.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -17,9 +17,10 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1013"/>
-        <CursorPos X="5" Y="1041"/>
+        <TopLine Value="1048"/>
+        <CursorPos Y="1083"/>
         <UsageCount Value="154"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -317,9 +318,9 @@
       <Unit36>
         <Filename Value="../../../fbintf/client/3.0/FB30Attachment.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="45"/>
-        <CursorPos X="14" Y="80"/>
-        <UsageCount Value="9"/>
+        <TopLine Value="384"/>
+        <CursorPos X="17" Y="408"/>
+        <UsageCount Value="10"/>
       </Unit36>
       <Unit37>
         <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
@@ -741,13 +742,13 @@
       <Unit96>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2768"/>
-        <CursorPos X="36" Y="2787"/>
+        <TopLine Value="851"/>
+        <CursorPos Y="867"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="851"/>
-          <CursorPos Y="867"/>
+          <TopLine Value="3072"/>
+          <CursorPos X="54" Y="3090"/>
         </ExtraEditor1>
         <UsageCount Value="19"/>
       </Unit96>
@@ -782,12 +783,10 @@
       </Unit100>
       <Unit101>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="2365"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2321"/>
         <CursorPos X="10" Y="2321"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit101>
       <Unit102>
         <Filename Value="../../runtime/nongui/IBSQLMonitor.pas"/>
@@ -995,8 +994,15 @@
         <CursorPos Y="40"/>
         <UsageCount Value="10"/>
       </Unit129>
+      <Unit130>
+        <Filename Value="../../../fbintf/client/2.5/FB25Attachment.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="339"/>
+        <CursorPos X="17" Y="370"/>
+        <UsageCount Value="10"/>
+      </Unit130>
     </Units>
-    <JumpHistory Count="10" HistoryIndex="9">
+    <JumpHistory Count="14" HistoryIndex="13">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="155" Column="39" TopLine="134"/>
@@ -1034,9 +1040,25 @@
         <Caret Line="26" Column="52"/>
       </Position9>
       <Position10>
-        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1447" Column="18" TopLine="1421"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="1041" Column="5" TopLine="1013"/>
       </Position10>
+      <Position11>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="1042" Column="5" TopLine="1014"/>
+      </Position11>
+      <Position12>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="1043" Column="5" TopLine="1015"/>
+      </Position12>
+      <Position13>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="843" Column="9" TopLine="840"/>
+      </Position13>
+      <Position14>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="360" Column="15" TopLine="360"/>
+      </Position14>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
