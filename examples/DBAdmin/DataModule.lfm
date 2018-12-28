@@ -19,9 +19,6 @@ object DatabaseData: TDatabaseData
       'user_name=SYSDBA'
       'sql_role_name=RDB$ADMIN'
     )
-    ConfigOverrides.Strings = (
-      'WireCompression=true'
-    )
     DefaultTransaction = CurrentTransaction
     IdleTimer = 0
     TraceFlags = []
