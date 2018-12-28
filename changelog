@@ -1,10 +1,24 @@
 IBX Change Log  version (2.3-3 Build 11288) Fri, 28 Dec 2018 10:04:17 +0000
 
-1. New property for TIBDatabase and TIBXServicesConnection. This is "WireCompression".
-   If this property is set to true then the Client will request WireCompression for
-   the connection. Note: "WireCompression = true" must be set in the server's
-   "firebird.conf". This property is overridden if "WireCompression = true" is set
-   in the client "firebird.conf" when wire compression is always requested by the client.
+1. New property for TIBDatabase and TIBXServicesConnection. This is "ConfigOverrides"
+   and is used to override the default settings in the client side "firebird.conf" This
+   includes "WireCompression" and "WireCrypt". The value of this property is a "TStrings".
+   Each line of the string list should be a setting in the same format as "firebird.conf".
+   For example "WireCompression = true" in order to request wire compression on the client side.
+
+   Note: explicit settings in the client side "firebird.conf" appear to take precedence
+   over settings given in TIBDatabase and TIBXServicesConnection. Many client side settings
+   also require a compatible setting in the server side "firebird.conf". For example
+   "WireCompression = true" must also be set in the server's "firebird.conf" for wire
+   compression to be used.
+
+   Whether or not WireCompression or WireCrypt are in use can be checked using the information
+   returned with the Client/Server protocol version. See ibx/examples/dbadmin and
+   ibx/examples/dbinfo for examples of how to display this information.
+
+2. New property for TIBDatabase and TIBXServicesConnection: "WireCompression". This
+   is a "convenience" property. If set the "WireCompression=true" is added to the
+   ConfigOverrides. If unchecked then this setting is removed.
 
 IBX Change Log  version (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 
