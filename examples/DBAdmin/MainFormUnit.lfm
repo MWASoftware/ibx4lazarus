@@ -427,21 +427,23 @@ object MainForm: TMainForm
           Text = 'PageBuffers'
         end
         object Label23: TLabel
-          Left = 679
+          Left = 680
           Height = 14
-          Top = 277
+          Top = 317
           Width = 100
+          Anchors = [akTop, akRight]
           Caption = 'Date DB Created'
           ParentColor = False
         end
         object DBEdit1: TDBEdit
-          Left = 783
+          Left = 784
           Height = 24
-          Top = 272
+          Top = 312
           Width = 132
           DataField = 'MON$CREATION_DATE'
           DataSource = DatabaseSource
           ReadOnly = True
+          Anchors = [akTop, akRight]
           CharCase = ecNormal
           MaxLength = 0
           TabOrder = 17
@@ -549,24 +551,24 @@ object MainForm: TMainForm
           Text = 'DatabaseAliasName'
         end
         object Label43: TLabel
-          Left = 536
+          Left = 403
           Height = 14
-          Top = 296
+          Top = 328
           Width = 65
           Caption = 'Comments'
           ParentColor = False
         end
         object DBComments: TMemo
-          Left = 536
-          Height = 118
-          Top = 311
-          Width = 379
+          Left = 403
+          Height = 85
+          Top = 344
+          Width = 512
           Anchors = [akTop, akLeft, akRight, akBottom]
           Lines.Strings = (
             'DBComments'
           )
           OnEditingDone = DBCommentsEditingDone
-          ScrollBars = ssVertical
+          ScrollBars = ssAutoVertical
           TabOrder = 25
         end
         object ClientLibrary: TLabel
@@ -576,6 +578,25 @@ object MainForm: TMainForm
           Width = 76
           Caption = 'ClientLibrary'
           ParentColor = False
+        end
+        object Label44: TLabel
+          Left = 403
+          Height = 14
+          Top = 183
+          Width = 203
+          Caption = 'Client/Server Version and Protocol'
+          ParentColor = False
+        end
+        object ClientServerVersion: TMemo
+          Left = 403
+          Height = 104
+          Top = 200
+          Width = 511
+          Anchors = [akTop, akLeft, akRight]
+          Font.Height = -11
+          ParentFont = False
+          ScrollBars = ssAutoVertical
+          TabOrder = 26
         end
       end
     end
@@ -3227,7 +3248,7 @@ object MainForm: TMainForm
   object UserListSource: TDataSource
     DataSet = DatabaseData.UserList
     left = 416
-    top = 328
+    top = 360
   end
   object RoleSource: TDataSource
     DataSet = DatabaseData.RoleNameList
