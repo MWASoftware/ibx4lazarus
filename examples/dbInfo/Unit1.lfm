@@ -33,6 +33,9 @@ object Form1: TForm1
       'lc_ctype=UTF8'
       'user_name=SYSDBA'
     )
+    ConfigOverrides.Strings = (
+      'WireCompression=true'
+    )
     IdleTimer = 0
     SQLDialect = 1
     TraceFlags = []

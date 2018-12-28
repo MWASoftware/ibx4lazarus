@@ -117,7 +117,7 @@ type
     procedure CheckAndInsert;
     procedure DoEnter; override;
     procedure DoExit; override;
-    {$if lcl_fullversion >= 2000000}
+    {$if lcl_fullversion >= 2000003}
     {Deferred update changes in Lazarus 2.0 stop the combo box working when
      the datasource is nil. We thus have to reverse out the changes :(}
     function DoEdit: boolean; override;
@@ -586,7 +586,7 @@ begin
   FModified := false;
 end;
 
-{$if lcl_fullversion >= 2000000}
+{$if lcl_fullversion >= 2000003}
 type
 
   { THackedCustomComboBox }

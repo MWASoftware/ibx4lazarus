@@ -18,6 +18,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
+        <TopLine Value="16"/>
         <CursorPos X="11" Y="36"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
@@ -37,8 +38,8 @@
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="603"/>
-        <CursorPos X="16" Y="627"/>
+        <TopLine Value="105"/>
+        <CursorPos X="36" Y="120"/>
         <UsageCount Value="24"/>
       </Unit3>
       <Unit4>
@@ -300,8 +301,8 @@
       <Unit41>
         <Filename Value="../../../../lcl/include/wincontrol.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="5989"/>
-        <CursorPos Y="6019"/>
+        <TopLine Value="7381"/>
+        <CursorPos Y="7393"/>
         <UsageCount Value="11"/>
       </Unit41>
       <Unit42>
@@ -562,13 +563,14 @@
         <UnitName Value="LCLVersion"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="24"/>
-        <CursorPos X="10" Y="35"/>
+        <CursorPos X="29" Y="45"/>
         <UsageCount Value="10"/>
       </Unit77>
       <Unit78>
         <Filename Value="../../../../components/lazutils/lazversion.pas"/>
         <UnitName Value="LazVersion"/>
         <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="27"/>
         <UsageCount Value="10"/>
       </Unit78>
       <Unit79>
@@ -579,21 +581,15 @@
         <UsageCount Value="10"/>
       </Unit79>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="36" Column="11" TopLine="16"/>
+      </Position1>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
-  <Debugging>
-    <BreakPoints Count="1">
-      <Item1>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="../../../../lcl/include/wincontrol.inc"/>
-        <Line Value="7392"/>
-      </Item1>
-    </BreakPoints>
-  </Debugging>
 </CONFIG>
