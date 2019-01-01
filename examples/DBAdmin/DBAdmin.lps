@@ -205,8 +205,8 @@
       <Unit20>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1108"/>
-        <CursorPos X="38" Y="1143"/>
+        <TopLine Value="51"/>
+        <CursorPos X="25" Y="77"/>
         <UsageCount Value="33"/>
       </Unit20>
       <Unit21>
@@ -659,8 +659,8 @@
       <Unit84>
         <Filename Value="../../../fbintf/changelog"/>
         <EditorIndex Value="-1"/>
-        <CursorPos Y="17"/>
-        <UsageCount Value="9"/>
+        <CursorPos X="4" Y="10"/>
+        <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit84>
       <Unit85>
