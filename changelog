@@ -61,6 +61,15 @@ IBX Change Log  version (2.3-3 Build 11288) Fri, 28 Dec 2018 10:04:17 +0000
    in the output e.g. to replace unprintable characters with alternative strings.
    This only applies to columns with an SQL Type of SQL_VARYING and SQL_TEXT.
 
+8. TIBDataSet now raises an exception when ParamByName called with an invalid parameter name.
+
+9. TIBQuery now uses IBX SQL Parser instead of TParams SQL parser in order to ensure
+   consistency with SQL queries.
+
+10. CaseSensitiveParameterNames property added to TIBSQL, TIBDataSet and TIBQuery.
+    When true, SQL statement parameter names are parsed case sensitive. Note for
+    TIBDataSet only applies to Select query.
+
 IBX Change Log  version (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 
 1. Remove need to check for IsMultiThread by providing access to GUI timers via

@@ -39,7 +39,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="57">
+    <Units Count="62">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -55,9 +55,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="106"/>
-        <CursorPos X="18" Y="122"/>
+        <TopLine Value="195"/>
+        <CursorPos X="34" Y="197"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -71,7 +70,7 @@
         <UnitName Value="Unit2"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="39" Y="9"/>
-        <UsageCount Value="41"/>
+        <UsageCount Value="45"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -124,9 +123,9 @@
       <Unit10>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1609"/>
-        <CursorPos X="15" Y="1629"/>
-        <UsageCount Value="12"/>
+        <TopLine Value="1257"/>
+        <CursorPos X="15" Y="1278"/>
+        <UsageCount Value="13"/>
       </Unit10>
       <Unit11>
         <Filename Value="../../design/IBSQLEditFrame.pas"/>
@@ -155,8 +154,8 @@
       <Unit14>
         <Filename Value="../../../fbintf/client/FBMessages.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="585"/>
-        <CursorPos X="23" Y="616"/>
+        <TopLine Value="635"/>
+        <CursorPos X="27" Y="664"/>
         <UsageCount Value="10"/>
       </Unit14>
       <Unit15>
@@ -175,9 +174,12 @@
       </Unit16>
       <Unit17>
         <Filename Value="../../changelog"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="47" Y="499"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="34"/>
+        <CursorPos X="45" Y="71"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit17>
       <Unit18>
@@ -220,9 +222,9 @@
       <Unit23>
         <Filename Value="../../../fbintf/client/FBSQLData.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1381"/>
-        <CursorPos X="14" Y="1386"/>
-        <UsageCount Value="13"/>
+        <TopLine Value="552"/>
+        <CursorPos X="3" Y="557"/>
+        <UsageCount Value="14"/>
       </Unit23>
       <Unit24>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
@@ -262,9 +264,9 @@
       <Unit29>
         <Filename Value="../../../fbintf/IBUtils.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="433"/>
-        <CursorPos X="57" Y="472"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="1399"/>
+        <CursorPos X="42" Y="1411"/>
+        <UsageCount Value="11"/>
       </Unit29>
       <Unit30>
         <Filename Value="../../runtime/IBXServices.pas"/>
@@ -282,9 +284,9 @@
       <Unit32>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="4037"/>
-        <CursorPos X="37" Y="4067"/>
-        <UsageCount Value="11"/>
+        <TopLine Value="3092"/>
+        <CursorPos X="49" Y="3111"/>
+        <UsageCount Value="12"/>
       </Unit32>
       <Unit33>
         <Filename Value="../../../fbintf/client/FBStatement.pas"/>
@@ -310,15 +312,15 @@
       <Unit36>
         <Filename Value="../../runtime/nongui/IBQuery.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="110"/>
-        <CursorPos X="5" Y="119"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="353"/>
+        <CursorPos Y="373"/>
+        <UsageCount Value="11"/>
       </Unit36>
       <Unit37>
         <Filename Value="../../runtime/nongui/IBTable.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="144"/>
-        <CursorPos X="5" Y="159"/>
+        <TopLine Value="54"/>
+        <CursorPos X="15" Y="106"/>
         <UsageCount Value="10"/>
       </Unit37>
       <Unit38>
@@ -352,9 +354,9 @@
       <Unit42>
         <Filename Value="../../runtime/nongui/IBSQL.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="191"/>
-        <CursorPos X="15" Y="208"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="863"/>
+        <CursorPos Y="885"/>
+        <UsageCount Value="11"/>
       </Unit42>
       <Unit43>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
@@ -455,8 +457,51 @@
         <CursorPos X="1024" Y="310"/>
         <UsageCount Value="10"/>
       </Unit56>
+      <Unit57>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dsparams.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="195"/>
+        <CursorPos Y="200"/>
+        <UsageCount Value="11"/>
+      </Unit57>
+      <Unit58>
+        <Filename Value="../../../../../fpcsrc/3.0.4/packages/fcl-db/src/base/dsparams.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="688"/>
+        <CursorPos Y="708"/>
+        <UsageCount Value="10"/>
+      </Unit58>
+      <Unit59>
+        <Filename Value="../../runtime/nongui/IBStoredProc.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="49"/>
+        <UsageCount Value="10"/>
+      </Unit59>
+      <Unit60>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/astrings.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="161"/>
+        <CursorPos Y="189"/>
+        <UsageCount Value="10"/>
+      </Unit60>
+      <Unit61>
+        <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/classes/stringl.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1201"/>
+        <CursorPos Y="1223"/>
+        <UsageCount Value="10"/>
+      </Unit61>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="2" HistoryIndex="1">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="285" TopLine="278"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../changelog"/>
+        <Caret Line="527" Column="25" TopLine="504"/>
+      </Position2>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

@@ -125,14 +125,14 @@
         <Filename Value="..\..\changelog"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
-        <CursorPos X="32" Y="58"/>
+        <CursorPos X="87" Y="26"/>
         <UsageCount Value="28"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
       <Unit17>
         <Filename Value="..\..\..\fbintf\changelog"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="18" Y="20"/>
+        <CursorPos X="33" Y="20"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit17>
