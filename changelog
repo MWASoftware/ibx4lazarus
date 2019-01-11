@@ -23,6 +23,44 @@ IBX Change Log  version (2.3-3 Build 11288) Fri, 28 Dec 2018 10:04:17 +0000
 3. TIBExtract: 64-bit integer types are now correctly extracted as "BIGINT" and
    not "INT64".
 
+4. New published properties for TIBCSVDataOut, TIBInsertStmtsOut and TIBBlockFormatOut
+   These are:
+    property TimestampFormat: string;
+    property DateFormat: string;
+    property TimeFormat: string;
+
+   Respectively, these provide the date time format templates for SQL types: TIMESTAMP,
+   DATETIME and TIME. The format strings use the standard FPC date/time format
+   characters (see https://www.freepascal.org/docs-html/rtl/sysutils/formatchars.html).
+
+   If any of the above properties are set to an empty string, then the locale default
+   is used. This uses the ShortDateFormat and the LongTimeFormat. In timestamp, the
+   locale default is extended by appending '.zzz' to include milliseconds.
+
+   TIBCSVDataOut by default sets these properties to the empty string, while the other
+   two use: 'yyyy.mm.dd hh:nn:ss.zzz', 'yyyy.mm.dd' and 'hh:nn:ss.zzz' respectively.
+
+5. New published property for TIBCSVDataOut:
+     property QuoteStrings: boolean (default true)
+
+   If false then strings are unquoted, otherwise, the QuoteChar property value is
+   used to delimit each and every string in the output.
+
+6. New published properties for TIBCSVDataOut:
+    property FieldSeparator: string;
+    property HeaderSeparator: string;
+
+   Respectively, these provide the separator character(s) used to separate fields
+   in data and header rows. Both default to ','.
+
+7. New published properties for TIBCSVDataOut and TIBBlockFormatOut:
+    TOnFormatTextString = procedure(sender: TObject; var TextString: string) of object;
+    property OnFormatTextString;
+
+   This event handler can be used to process text strings before they are included
+   in the output e.g. to replace unprintable characters with alternative strings.
+   This only applies to columns with an SQL Type of SQL_VARYING and SQL_TEXT.
+
 IBX Change Log  version (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 
 1. Remove need to check for IsMultiThread by providing access to GUI timers via
