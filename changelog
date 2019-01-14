@@ -1,4 +1,4 @@
-IBX Change Log  version (2.3-3 Build 11288) Fri, 28 Dec 2018 10:04:17 +0000
+IBX Change Log  version (2.3-3 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
 
 1. New property for TIBDatabase and TIBXServicesConnection. This is "ConfigOverrides"
    and is used to override the default settings in the client side "firebird.conf" This
