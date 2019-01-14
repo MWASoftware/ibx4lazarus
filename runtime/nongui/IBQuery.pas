@@ -58,6 +58,7 @@ type
     FSQLUpdating: boolean;
     FInQueryChanged: boolean;
     function GetRowsAffected: Integer;
+    function ParseSQL(ParamList: TParams; SQL: string; DoClear: boolean): string;
     procedure PrepareSQL;
     procedure QueryChanged(Sender: TObject);
     procedure ReadParamData(Reader: TReader);
@@ -114,6 +115,7 @@ type
     property AutoCommit;
     property BufferChunks;
     property CachedUpdates;
+    property CaseSensitiveParameterNames;
     property DataSource read GetDataSource write SetDataSource;
     property EnableStatistics;
     property GenerateParamNames;
@@ -141,7 +143,7 @@ end;
 
 implementation
 
-uses FBMessages;
+uses FBMessages, IBUtils;
 
 { TIBQuery }
 
@@ -233,12 +235,12 @@ begin
     begin
       Disconnect;
       if csDesigning in ComponentState then
-        FText := FParams.ParseSQL(SQL.Text, true)
+        FText := ParseSQL(FParams,SQL.Text, true)
       else
         FText := SQL.Text;
       DataEvent(dePropertyChange, 0);
     end else
-      FText := FParams.ParseSQL(SQL.Text, true);
+      FText := ParseSQL(FParams,SQL.Text, true);
 
     if not FSQLUpdating then
     begin
@@ -351,10 +353,24 @@ end;
 
 
 function TIBQuery.ParamByName(const Value: string): TParam;
+var i: integer;
 begin
   if not Prepared then
     Prepare;
-  Result := FParams.ParamByName(Value);
+  Result := nil;
+  if not CaseSensitiveParameterNames then
+    Result := FParams.ParamByName(Value)
+  else
+  begin
+    i := FParams.Count - 1;
+    while (Result = nil) and (i >= 0) do
+      if CompareStr(Value,FParams.Items[i].Name) = 0 then
+        Result := FParams.Items[i]
+      else
+        Dec(i);
+    if Result = nil then
+      IBError(ibxeParameterNameNotFound,[Value]);
+  end;
 end;
 
 procedure TIBQuery.BatchInput(InputObject: TIBBatchInput);
@@ -453,7 +469,7 @@ begin
   begin
     List := TParams.Create(Self);
     try
-      FText := List.ParseSQL(SQL.Text, True);
+      FText := ParseSQL(List,SQL.Text, True);
       List.AssignValues(FParams);
       FParams.Clear;
       FParams.Assign(List);
@@ -469,6 +485,27 @@ begin
   Result := -1;
   if Prepared then
    Result := QSelect.RowsAffected
+end;
+
+function TIBQuery.ParseSQL(ParamList: TParams; SQL: string; DoClear: boolean
+  ): string;
+var ParamNames: TStrings;
+    i: integer;
+begin
+  ParamNames := TStringList.Create;
+  try
+    Result := TSQLParamProcessor.Execute(SQL,GenerateParamNames,ParamNames);
+    if DoClear then ParamList.Clear;
+    for i := 0 to ParamNames.Count - 1 do
+    begin
+      if not CaseSensitiveParameterNames then
+        ParamNames[i] := AnsiUpperCase(ParamNames[i]);
+      if ParamList.FindParam(ParamNames[i]) = nil then
+        ParamList.CreateParam(ftUnknown, ParamNames[i], ptInput);
+    end;
+  finally
+    ParamNames.Free
+  end;
 end;
 
 

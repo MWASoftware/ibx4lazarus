@@ -20,7 +20,7 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="1048"/>
-        <CursorPos Y="1083"/>
+        <CursorPos X="20" Y="1074"/>
         <UsageCount Value="154"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -205,8 +205,8 @@
       <Unit20>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1108"/>
-        <CursorPos X="38" Y="1143"/>
+        <TopLine Value="51"/>
+        <CursorPos X="25" Y="77"/>
         <UsageCount Value="33"/>
       </Unit20>
       <Unit21>
@@ -425,9 +425,7 @@
       <Unit51>
         <Filename Value="DataModule.lfm"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="469"/>
-        <CursorPos X="88" Y="501"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit51>
       <Unit52>
@@ -661,8 +659,8 @@
       <Unit84>
         <Filename Value="../../../fbintf/changelog"/>
         <EditorIndex Value="-1"/>
-        <CursorPos Y="17"/>
-        <UsageCount Value="9"/>
+        <CursorPos X="4" Y="10"/>
+        <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit84>
       <Unit85>

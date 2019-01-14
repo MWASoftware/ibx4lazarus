@@ -158,6 +158,7 @@ type
 
   TIBSQL = class(TComponent)
   private
+    FCaseSensitiveParameterNames: boolean;
     FMetaData: IMetaData;
     FSQLParams: ISQLParams;
     FStatement: IStatement;
@@ -231,6 +232,8 @@ type
     property MetaData: IMetaData read FMetaData;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
+    property CaseSensitiveParameterNames: boolean read FCaseSensitiveParameterNames
+                                                  write FCaseSensitiveParameterNames;
     property GenerateParamNames: Boolean read FGenerateParamNames write FGenerateParamNames;
     property UniqueParamNames: Boolean read FUniqueParamNames write SetUniqueParamNames;
     property GoToFirstRecordOnExecute: Boolean read FGoToFirstRecordOnExecute
@@ -913,7 +916,8 @@ begin
     FStatement := Database.Attachment.PrepareWithNamedParameters(
                      Transaction.TransactionIntf,
                      SQL.Text,
-                     GenerateParamNames);
+                     GenerateParamNames,
+                     CaseSensitiveParameterNames);
   {$IFDEF IBXQUERYSTATS}
   FStatement.EnableStatistics(true);
   {$ENDIF}

@@ -54,16 +54,21 @@ type
   TPlanOptions = (poNoPlan,poIncludePlan, poPlanOnly);
 
   TAdd2Log = procedure(const Msg: string; IsError: boolean=true) of object;
+  TOnFormatTextString = procedure(sender: TObject; var TextString: string) of object;
 
   { TIBCustomDataOutput }
 
   TIBCustomDataOutput = class(TComponent)
   private
+    FDateFormat: string;
     FIBSQL: TIBSQL;
     FIncludeHeader: Boolean;
+    FOnFormatTextString: TOnFormatTextString;
     FPlanOptions: TPlanOptions;
     FRowCount: integer;
     FShowPerformanceStats: boolean;
+    FTimeFormat: string;
+    FTimestampFormat: string;
     function GetDatabase: TIBDatabase;
     function GetTransaction: TIBTransaction;
     procedure SetDatabase(AValue: TIBDatabase);
@@ -72,7 +77,12 @@ type
     procedure HeaderOut(Add2Log: TAdd2Log); virtual;
     procedure FormattedDataOut(Add2Log: TAdd2Log); virtual; abstract;
     procedure TrailerOut(Add2Log: TAdd2Log); virtual;
+    function FormatTimestamp(aValue: ISQLData): string;
+    function FormatDate(aValue: ISQLData): string;
+    function FormatTime(aValue: ISQLData): string;
+    function FormatTextString(aValue: string): string;
     property IncludeHeader: Boolean read FIncludeHeader write FIncludeHeader default true;
+    property OnFormatTextString: TOnFormatTextString read FOnFormatTextString write FOnFormatTextString;
   public
     constructor Create(aOwner: TComponent); override;
     procedure Assign(Source: TPersistent); override;
@@ -85,6 +95,9 @@ type
     property PlanOptions: TPlanOptions read FPlanOptions write FPlanOptions;
     property RowCount: integer read FRowCount write FRowCount;
     property ShowPerformanceStats: boolean read FShowPerformanceStats write FShowPerformanceStats;
+    property TimestampFormat: string read FTimestampFormat write FTimestampFormat;
+    property DateFormat: string read FDateFormat write FDateFormat;
+    property TimeFormat: string read FTimeFormat write FTimeFormat;
  end;
 
   TDataOutputFormatter = class of TIBCustomDataOutput;
@@ -93,7 +106,10 @@ type
 
   TIBCSVDataOut = class(TIBCustomDataOutput)
   private
+    FFieldSeparator: string;
+    FHeaderSeparator: string;
     FQuoteChar: char;
+    FQuoteStrings: boolean;
   protected
     procedure HeaderOut(Add2Log: TAdd2Log); override;
     procedure FormattedDataOut(Add2Log: TAdd2Log); override;
@@ -101,7 +117,11 @@ type
     constructor Create(aOwner: TComponent); override;
   published
     property IncludeHeader;
+    property FieldSeparator: string read FFieldSeparator write FFieldSeparator;
+    property HeaderSeparator: string read FHeaderSeparator write FHeaderSeparator;
+    property QuoteStrings: boolean read FQuoteStrings write FQuoteStrings default true;
     property QuoteChar: char read FQuoteChar write FQuoteChar default '''';
+    property OnFormatTextString;
   end;
 
   { TIBInsertStmtsOut }
@@ -137,6 +157,7 @@ type
     procedure TrailerOut(Add2Log: TAdd2Log); override;
   published
     property IncludeHeader;
+    property OnFormatTextString;
   end;
 
 implementation
@@ -208,13 +229,22 @@ begin
           FColWidths[i] := 21; {leave room for the decimal point}
 
       SQL_TIMESTAMP:
-        FColWidths[i] := 23;
+        if TimestampFormat = '' then  {Default format}
+          FColWidths[i] := GetDateTimeStrLength(dfTimestamp)
+        else
+          FColWidths[i] := Length(TimestampFormat);
 
       SQL_TYPE_DATE:
-        FColWidths[i] := 10;
+        if DateFormat = '' then {Default format}
+          FColWidths[i] := GetDateTimeStrLength(dfDateTime)
+        else
+          FColWidths[i] := Length(DateFormat);
 
       SQL_TYPE_TIME:
-        FColWidths[i] := 12;
+        if TimeFormat = '' then {Default format}
+          FColWidths[i] := GetDateTimeStrLength(dfTime)
+        else
+          FColWidths[i] := Length(TimeFormat);
 
       SQL_BLOB:
         if SQLSubType = 1 then
@@ -259,34 +289,34 @@ var i: integer;
 begin
   s := '|';
   for i := 0 to FIBSQL.Current.Count - 1 do
-  with FIBSQL.Current[i] do
+  with FIBSQL do
   begin
-    if IsNull then
+    if Current[i].IsNull then
       s += TextAlign('NULL',FColWidths[i],taCentre)
     else
-    case SQLType of
+    case Current[i].SQLType of
     SQL_VARYING, SQL_TEXT:
-      s += TextAlign(AsString,FColWidths[i],taLeft);
+      s += TextAlign(FormatTextString(Current[i].AsString),FColWidths[i],taLeft);
 
     SQL_TIMESTAMP:
-      s += TextAlign(FormatDateTime(sTimeStampFormat,AsDateTime),FColWidths[i],taLeft);
+      s += TextAlign(FormatTimeStamp(Current[i]),FColWidths[i],taLeft);
 
     SQL_TYPE_DATE:
-      s += TextAlign(FormatDateTime(sDateFormat,AsDateTime),FColWidths[i],taLeft);
+      s += TextAlign(FormatDate(Current[i]),FColWidths[i],taLeft);
 
     SQL_TYPE_TIME:
-      s += TextAlign(FormatDateTime(sTimeFormat,AsDateTime),FColWidths[i],taLeft);
+      s += TextAlign(FormatTime(Current[i]),FColWidths[i],taLeft);
 
     SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT,
     SQL_LONG, SQL_SHORT, SQL_INT64:
-      s += TextAlign(AsString,FColWidths[i],taRight);
+      s += TextAlign(Current[i].AsString,FColWidths[i],taRight);
 
     SQL_BOOLEAN, SQL_ARRAY:
-      s += TextAlign(AsString,FColWidths[i],taCentre);
+      s += TextAlign(Current[i].AsString,FColWidths[i],taCentre);
 
     SQL_BLOB:
-      if SQLSubType = 1 then
-        s += TextAlign(TruncateTextBlob(AsString),FColWidths[i],taLeft)
+      if Current[i].SQLSubType = 1 then
+        s += TextAlign(TruncateTextBlob(Current[i].AsString),FColWidths[i],taLeft)
       else
         s += TextAlign(sBlob,FColWidths[i],taCentre);
     end;
@@ -379,13 +409,13 @@ begin
           s += QuoteChar + SQLSafeString(Current[i].AsString) + QuoteChar;
 
       SQL_TIMESTAMP:
-        s += QuoteChar + FormatDateTime(sTimeStampFormat,Current[i].AsDateTime) + QuoteChar;
+        s += QuoteChar + FormatTimeStamp(Current[i]) + QuoteChar;
 
       SQL_TYPE_DATE:
-        s += QuoteChar + FormatDateTime(sDateFormat,Current[i].AsDateTime) + QuoteChar;
+        s += QuoteChar + FormatDate(Current[i]) + QuoteChar;
 
       SQL_TYPE_TIME:
-        s += QuoteChar + FormatDateTime(sTimeFormat,Current[i].AsDateTime) + QuoteChar;
+        s += QuoteChar + FormatTime(Current[i]) + QuoteChar;
 
       else
         s += Current[i].AsString;
@@ -412,13 +442,22 @@ begin
   s := '';
   for i := 0 to FIBSQL.MetaData.Count - 1 do
   begin
-    if i <> 0 then s += ',';
+    if i <> 0 then s += HeaderSeparator;
     s += FIBSQL.MetaData[i].getAliasName;
   end;
   Add2Log(s,false);
 end;
 
 procedure TIBCSVDataOut.FormattedDataOut(Add2Log: TAdd2Log);
+
+  function GetQuoteChar: string;
+  begin
+    if QuoteStrings then
+      Result := QuoteChar
+    else
+      Result := '';
+  end;
+
 var i: integer;
     s: string;
 begin
@@ -428,17 +467,25 @@ begin
     for i := 0 to Current.Count - 1 do
     with Current[i] do
     begin
-      if i <> 0 then s += ',';
+      if i <> 0 then s += FieldSeparator;
       case SQLType of
       SQL_BLOB:
         if SQLSubType <> 1 then
           s += sBlob
         else
-          s += QuoteChar + Current[i].AsString + QuoteChar;
+          s += GetQuoteChar + Current[i].AsString + GetQuoteChar;
 
-      SQL_VARYING,SQL_TEXT,
-      SQL_TIMESTAMP,SQL_TYPE_DATE,SQL_TYPE_TIME:
-        s += QuoteChar + Current[i].AsString + QuoteChar;
+      SQL_VARYING,SQL_TEXT:
+        s += GetQuoteChar + FormatTextString(Current[i].AsString) + GetQuoteChar;
+
+      SQL_TIMESTAMP:
+        s += GetQuoteChar + FormatTimeStamp(Current[i]) + GetQuoteChar;
+
+      SQL_TYPE_DATE:
+        s += GetQuoteChar + FormatDate(Current[i]) + GetQuoteChar;
+
+      SQL_TYPE_TIME:
+        s += GetQuoteChar + FormatTime(Current[i]) + GetQuoteChar;
 
       else
         s += Current[i].AsString;
@@ -451,7 +498,13 @@ end;
 constructor TIBCSVDataOut.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
+  FQuoteStrings := true;
   FQuoteChar := '''';
+  FTimestampFormat := '';
+  FDateFormat := '';
+  FTimestampFormat := '';
+  FFieldSeparator := ',';
+  FHeaderSeparator := ',';
 end;
 
 { TIBCustomDataOutput }
@@ -486,11 +539,45 @@ begin
   //stub
 end;
 
+function TIBCustomDataOutput.FormatTimestamp(aValue: ISQLData): string;
+begin
+  if TimeStampFormat <> '' then
+    Result := FormatDateTime(TimeStampFormat,aValue.AsDateTime)
+  else
+    Result := aValue.AsString;
+end;
+
+function TIBCustomDataOutput.FormatDate(aValue: ISQLData): string;
+begin
+  if DateFormat <> '' then
+    Result := FormatDateTime(DateFormat,aValue.AsDateTime)
+  else
+    Result := aValue.AsString;
+end;
+
+function TIBCustomDataOutput.FormatTime(aValue: ISQLData): string;
+begin
+  if TimeFormat <> '' then
+    Result := FormatDateTime(TimeFormat,aValue.AsDateTime)
+  else
+    Result := aValue.AsString;
+end;
+
+function TIBCustomDataOutput.FormatTextString(aValue: string): string;
+begin
+  Result := aValue;
+  if assigned(FOnFormatTextString) then
+    OnFormatTextString(self,Result);
+end;
+
 constructor TIBCustomDataOutput.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
   FIBSQL := TIBSQL.Create(self);
   FIncludeHeader := true;
+  FTimestampFormat := sTimestampFormat;
+  FDateFormat := sDateFormat;
+  FTimeFormat := sTimeFormat;
 end;
 
 procedure TIBCustomDataOutput.Assign(Source: TPersistent);

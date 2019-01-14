@@ -201,7 +201,7 @@ const
     (SqlType : blr_sql_time; TypeName : 'TIME'),		{ NTX: keyword }
     (SqlType : blr_sql_date; TypeName : 'DATE'),		{ NTX: keyword }
     (SqlType : blr_timestamp; TypeName : 'TIMESTAMP'),		{ NTX: keyword }
-    (SqlType : blr_int64; TypeName : 'INT64'),
+    (SqlType : blr_int64; TypeName : 'BIGINT'),
     (SqlType : blr_bool; TypeName : 'BOOLEAN'));
 
   SubTypes : Array[0..8] of String = (

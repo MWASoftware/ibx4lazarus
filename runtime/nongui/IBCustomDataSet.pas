@@ -399,6 +399,7 @@ type
     FArrayFieldCount: integer;
     FArrayCacheOffset: integer;
     FAutoCommit: TIBAutoCommit;
+    FCaseSensitiveParameterNames: boolean;
     FEnableStatistics: boolean;
     FGenerateParamNames: Boolean;
     FGeneratorField: TIBGenerator;
@@ -474,6 +475,7 @@ type
       FieldIndex: integer; Buffer: PChar);
     procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
     function GetSelectStmtIntf: IStatement;
+    procedure SetCaseSensitiveParameterNames(AValue: boolean);
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
 
@@ -652,6 +654,8 @@ type
     property SelectStmtHandle: IStatement read GetSelectStmtIntf;
 
     {Likely to be made published by descendant classes}
+    property CaseSensitiveParameterNames: boolean read FCaseSensitiveParameterNames
+                                                  write SetCaseSensitiveParameterNames;
     property BufferChunks: Integer read FBufferChunks write SetBufferChunks;
     property CachedUpdates: Boolean read FCachedUpdates write SetCachedUpdates;
     property UniDirectional: Boolean read FUniDirectional write SetUniDirectional default False;
@@ -810,6 +814,7 @@ type
     property AutoCommit;
     property BufferChunks;
     property CachedUpdates;
+    property CaseSensitiveParameterNames;
     property EnableStatistics;
     property DeleteSQL;
     property InsertSQL;
@@ -3102,6 +3107,8 @@ begin
   if not FInternalPrepared then
     InternalPrepare;
   Result := Params.ByName(ParamName);
+  if Result = nil then
+    IBError(ibxeParameterNameNotFound,[ParamName]);
 end;
 
 function TIBCustomDataSet.GetRowsAffected(var SelectCount, InsertCount,
@@ -4748,6 +4755,14 @@ end;
 function TIBCustomDataSet.GetSelectStmtIntf: IStatement;
 begin
   Result := FQSelect.Statement;
+end;
+
+procedure TIBCustomDataSet.SetCaseSensitiveParameterNames(AValue: boolean);
+begin
+  if FCaseSensitiveParameterNames = AValue then Exit;
+  FCaseSensitiveParameterNames := AValue;
+  if assigned(FQSelect) then
+    FQSelect.CaseSensitiveParameterNames := AValue;
 end;
 
 procedure TIBCustomDataSet.SetMasterDetailDelay(AValue: integer);

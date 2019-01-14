@@ -22,7 +22,6 @@ object DatabaseData: TDatabaseData
     IdleTimer = 0
     TraceFlags = []
     UseDefaultSystemCodePage = False
-    WireCompression = True
     left = 40
     top = 24
   end
@@ -1226,7 +1225,6 @@ object DatabaseData: TDatabaseData
       'sql_role_name=RDB$ADMIN'
     )
     TraceFlags = []
-    WireCompression = False
     left = 640
     top = 48
   end
