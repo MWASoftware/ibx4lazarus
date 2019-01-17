@@ -31,7 +31,8 @@
         <ComponentName Value="DBCreateForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="2"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="27"/>
         <CursorPos X="8" Y="58"/>
         <UsageCount Value="20"/>
@@ -189,15 +190,13 @@
       </Unit23>
       <Unit24>
         <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1000"/>
         <CursorPos Y="1013"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit24>
     </Units>
-    <JumpHistory Count="8" HistoryIndex="7">
+    <JumpHistory Count="6" HistoryIndex="5">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="81" TopLine="66"/>
@@ -222,14 +221,6 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="35" Column="39"/>
       </Position6>
-      <Position7>
-        <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
-        <Caret TopLine="10"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
-        <Caret Line="249" Column="15" TopLine="230"/>
-      </Position8>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
