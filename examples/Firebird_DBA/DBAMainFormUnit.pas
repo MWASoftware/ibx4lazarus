@@ -17,6 +17,8 @@ type
   TDBAMainForm = class(TMainForm)
     IBTreeView1: TIBTreeView;
     Splitter6: TSplitter;
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormShow(Sender: TObject);
   private
 
   public
@@ -29,6 +31,21 @@ var
 implementation
 
 {$R *.lfm}
+
+{ TDBAMainForm }
+
+procedure TDBAMainForm.FormShow(Sender: TObject);
+begin
+  LocalDatabase.Connected := true;
+  inherited;
+end;
+
+procedure TDBAMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction
+  );
+begin
+  LocalDatabase.Connected := false;
+  inherited;
+end;
 
 end.
 

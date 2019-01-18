@@ -9,7 +9,7 @@ object MainForm: TMainForm
   Menu = MainMenu1
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '2.0.0.2'
+  LCLVersion = '2.0.0.3'
   object ToolBar1: TToolBar
     Left = 0
     Height = 26
@@ -77,12 +77,12 @@ object MainForm: TMainForm
     Height = 548
     Top = 26
     Width = 939
-    ActivePage = Properties
+    ActivePage = ServerTab
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 5
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
@@ -1665,11 +1665,11 @@ object MainForm: TMainForm
         Left = 0
         Height = 516
         Top = 0
-        Width = 370
+        Width = 491
         Align = alLeft
         BevelOuter = bvNone
         ClientHeight = 516
-        ClientWidth = 370
+        ClientWidth = 491
         TabOrder = 0
         object Label29: TLabel
           Left = 5
@@ -1679,34 +1679,260 @@ object MainForm: TMainForm
           Caption = 'Properties'
           ParentColor = False
         end
-        object ServerPropMemo: TMemo
+        object Label53: TLabel
           Left = 8
-          Height = 481
-          Top = 26
-          Width = 353
-          Anchors = [akTop, akLeft, akRight, akBottom]
+          Height = 14
+          Top = 296
+          Width = 98
+          Caption = 'Open Databases'
+          ParentColor = False
+        end
+        object OpenDatabasesList: TMemo
+          Left = 8
+          Height = 90
+          Top = 312
+          Width = 480
+          Anchors = [akTop, akLeft, akRight]
           Lines.Strings = (
-            'ServerPropMemo'
+            ''
           )
-          ScrollBars = ssAutoBoth
+          ScrollBars = ssAutoVertical
           TabOrder = 0
+        end
+        object ConfigDataLabel: TLabel
+          Left = 8
+          Height = 14
+          Top = 408
+          Width = 71
+          Caption = 'Config Data'
+          ParentColor = False
+        end
+        object ConfigDataGrid: TIBDynamicGrid
+          Left = 8
+          Height = 82
+          Top = 424
+          Width = 480
+          Anchors = [akTop, akLeft, akRight, akBottom]
+          Color = clWindow
+          Columns = <          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'Description'
+              Width = 100
+              FieldName = 'ParamDescription'
+              AutoSizeColumn = True
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'Value'
+              Width = 60
+              FieldName = 'ParamValue'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end>
+          DataSource = ConfigDataSource
+          Scrollbars = ssAutoVertical
+          TabOrder = 1
+          ExpandEditorPanelBelowRow = False
+          Descending = False
+          EditorBorderStyle = bsSingle
+          DefaultPositionAtEnd = False
+        end
+        object Panel10: TPanel
+          Left = 6
+          Height = 264
+          Top = 24
+          Width = 482
+          Anchors = [akTop, akLeft, akRight]
+          BevelInner = bvLowered
+          BevelOuter = bvLowered
+          ClientHeight = 264
+          ClientWidth = 482
+          Color = clWindow
+          ParentColor = False
+          TabOrder = 2
+          object Label45: TLabel
+            Left = 8
+            Height = 14
+            Top = 48
+            Width = 90
+            Caption = 'Server Version:'
+            ParentColor = False
+          end
+          object Label46: TLabel
+            Left = 8
+            Height = 14
+            Top = 102
+            Width = 143
+            Caption = 'Server Implementation:'
+            ParentColor = False
+          end
+          object Label47: TLabel
+            Left = 8
+            Height = 14
+            Top = 75
+            Width = 95
+            Caption = 'Service Version:'
+            ParentColor = False
+          end
+          object Label48: TLabel
+            Left = 8
+            Height = 14
+            Top = 129
+            Width = 107
+            Caption = 'Firebird Directory:'
+            ParentColor = False
+          end
+          object Label49: TLabel
+            Left = 8
+            Height = 14
+            Top = 156
+            Width = 113
+            Caption = 'Lock File Directory:'
+            ParentColor = False
+          end
+          object Label50: TLabel
+            Left = 8
+            Height = 14
+            Top = 183
+            Width = 114
+            Caption = 'Security Database:'
+            ParentColor = False
+          end
+          object Edit2: TEdit
+            Left = 160
+            Height = 24
+            Top = 44
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 0
+            Text = 'Edit2'
+          end
+          object Edit3: TEdit
+            Left = 160
+            Height = 24
+            Top = 71
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 1
+            Text = 'Edit3'
+          end
+          object Edit4: TEdit
+            Left = 160
+            Height = 24
+            Top = 98
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 2
+            Text = 'Edit4'
+          end
+          object Edit5: TEdit
+            Left = 160
+            Height = 24
+            Top = 125
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 3
+            Text = 'Edit5'
+          end
+          object Edit6: TEdit
+            Left = 160
+            Height = 24
+            Top = 152
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 4
+            Text = 'Edit6'
+          end
+          object Edit7: TEdit
+            Left = 160
+            Height = 24
+            Top = 179
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 5
+            Text = 'Edit7'
+          end
+          object Label51: TLabel
+            Left = 8
+            Height = 14
+            Top = 21
+            Width = 78
+            Caption = 'Server Name'
+            ParentColor = False
+          end
+          object Edit8: TEdit
+            Left = 160
+            Height = 24
+            Top = 16
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            TabOrder = 6
+            Text = 'Edit8'
+          end
+          object Label52: TLabel
+            Left = 8
+            Height = 14
+            Top = 212
+            Width = 142
+            Caption = 'Messages File Directory:'
+            ParentColor = False
+          end
+          object Edit9: TEdit
+            Left = 160
+            Height = 24
+            Top = 208
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            TabOrder = 7
+            Text = 'Edit9'
+          end
+          object Edit12: TEdit
+            Left = 160
+            Height = 24
+            Top = 236
+            Width = 312
+            TabOrder = 8
+            Text = 'Edit12'
+          end
+          object Label54: TLabel
+            Left = 8
+            Height = 14
+            Top = 240
+            Width = 117
+            Caption = 'No. of Attachments'
+            ParentColor = False
+          end
         end
       end
       object Splitter1: TSplitter
-        Left = 370
+        Left = 491
         Height = 516
         Top = 0
         Width = 5
       end
       object Panel2: TPanel
-        Left = 375
+        Left = 496
         Height = 516
         Top = 0
-        Width = 558
+        Width = 437
         Align = alClient
         BevelOuter = bvNone
         ClientHeight = 516
-        ClientWidth = 558
+        ClientWidth = 437
         TabOrder = 2
         object Label30: TLabel
           Left = 8
@@ -1720,7 +1946,7 @@ object MainForm: TMainForm
           Left = 8
           Height = 481
           Top = 26
-          Width = 540
+          Width = 419
           Anchors = [akTop, akLeft, akRight, akBottom]
           Lines.Strings = (
             'ServerLog'
@@ -2734,9 +2960,9 @@ object MainForm: TMainForm
     end
   end
   object UpdateColsPanel: TPanel
-    Left = 40
+    Left = 376
     Height = 64
-    Top = 488
+    Top = 496
     Width = 544
     BevelOuter = bvNone
     BorderStyle = bsSingle
@@ -2755,7 +2981,7 @@ object MainForm: TMainForm
       Left = 144
       Height = 24
       Top = 4
-      Width = 388
+      Width = 386
       DataField = 'UPDATE_COLUMNS'
       DataSource = SubjectAccessRightsSource
       Anchors = [akTop, akLeft, akRight]
@@ -2764,9 +2990,9 @@ object MainForm: TMainForm
       TabOrder = 0
     end
     object Label42: TLabel
-      Left = 8
+      Left = 9
       Height = 14
-      Top = 40
+      Top = 35
       Width = 123
       Caption = 'Referenced Columns'
       ParentColor = False
@@ -2775,7 +3001,7 @@ object MainForm: TMainForm
       Left = 144
       Height = 24
       Top = 35
-      Width = 388
+      Width = 386
       DataField = 'REFERENCE_COLUMNS'
       DataSource = SubjectAccessRightsSource
       Anchors = [akTop, akLeft, akRight]
@@ -3178,22 +3404,18 @@ object MainForm: TMainForm
     }
   end
   object CharSetSource: TDataSource
-    DataSet = DatabaseData.CharSetLookup
     left = 552
     top = 240
   end
   object SecDBFilesSource: TDataSource
-    DataSet = DatabaseData.DBSecFiles
     left = 552
     top = 376
   end
   object DBCharSetSource: TDataSource
-    DataSet = DatabaseData.DBCharSet
     left = 552
     top = 304
   end
   object DatabaseSource: TDataSource
-    DataSet = DatabaseData.DatabaseQuery
     left = 560
     top = 448
   end
@@ -3203,12 +3425,10 @@ object MainForm: TMainForm
     top = 240
   end
   object AttmtSource: TDataSource
-    DataSet = DatabaseData.AttmtQuery
     left = 416
     top = 448
   end
   object ShadowSource: TDataSource
-    DataSet = DatabaseData.ShadowFiles
     left = 464
     top = 512
   end
@@ -3223,8 +3443,6 @@ object MainForm: TMainForm
     top = 352
   end
   object IBExtract1: TIBExtract
-    Database = DatabaseData.IBDatabase1
-    Transaction = DatabaseData.CurrentTransaction
     ShowSystem = False
     AlwaysQuoteIdentifiers = False
     CaseSensitiveObjectNames = False
@@ -3246,17 +3464,14 @@ object MainForm: TMainForm
     top = 416
   end
   object UserListSource: TDataSource
-    DataSet = DatabaseData.UserList
     left = 416
     top = 360
   end
   object RoleSource: TDataSource
-    DataSet = DatabaseData.RoleNameList
     left = 416
     top = 272
   end
   object UserTagsSource: TDataSource
-    DataSet = DatabaseData.UserTags
     left = 416
     top = 224
   end
@@ -3287,7 +3502,6 @@ object MainForm: TMainForm
     end
   end
   object AttachSource: TDataSource
-    DataSet = DatabaseData.Attachments
     left = 552
     top = 112
   end
@@ -3309,22 +3523,18 @@ object MainForm: TMainForm
     end
   end
   object LimboListSource: TDataSource
-    DataSet = DatabaseData.InLimboList
     left = 552
     top = 176
   end
   object DBTablesSource: TDataSource
-    DataSet = DatabaseData.DBTables
     left = 304
     top = 224
   end
   object AuthMapSource: TDataSource
-    DataSet = DatabaseData.AuthMappings
     left = 303
     top = 286
   end
   object SubjectAccessRightsSource: TDataSource
-    DataSet = DatabaseData.SubjectAccessRights
     OnDataChange = SubjectAccessRightsSourceDataChange
     left = 297
     top = 429
@@ -3337,8 +3547,12 @@ object MainForm: TMainForm
     end
   end
   object AccessRightsSource: TDataSource
-    DataSet = DatabaseData.AccessRights
     left = 288
     top = 360
+  end
+  object ConfigDataSource: TDataSource
+    DataSet = DatabaseData.ConfigDataset
+    left = 288
+    top = 504
   end
 end

@@ -22,10 +22,10 @@ unit MainFormUnit;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL,
-  SynGutterCodeFolding, Forms, Controls, Graphics, Dialogs, Menus, ComCtrls,
-  ActnList, StdCtrls, DbCtrls, ExtCtrls, Buttons, db, IBLookupComboEditBox,
-  IBDynamicGrid, IBTreeView, IBDatabaseInfo, IBXServices, IBExtract, IB;
+  Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, SynGutterCodeFolding,
+  Forms, Controls, Graphics, Dialogs, Menus, ComCtrls, ActnList, StdCtrls,
+  DbCtrls, ExtCtrls, Buttons, db, memds, IBLookupComboEditBox, IBDynamicGrid,
+  IBTreeView, IBDatabaseInfo, IBXServices, IBExtract, IB;
 
 type
 
@@ -35,10 +35,34 @@ type
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
     ClientLibrary: TLabel;
+    ConfigDataGrid: TIBDynamicGrid;
+    ConfigDataLabel: TLabel;
+    ConfigDataSource: TDataSource;
+    Edit12: TEdit;
+    Edit2: TEdit;
+    Edit3: TEdit;
+    Edit4: TEdit;
+    Edit5: TEdit;
+    Edit6: TEdit;
+    Edit7: TEdit;
+    Edit8: TEdit;
+    Edit9: TEdit;
     Label44: TLabel;
     ClientServerVersion: TMemo;
+    Label45: TLabel;
+    Label46: TLabel;
+    Label47: TLabel;
+    Label48: TLabel;
+    Label49: TLabel;
+    Label50: TLabel;
+    Label51: TLabel;
+    Label52: TLabel;
+    Label53: TLabel;
+    Label54: TLabel;
+    OpenDatabasesList: TMemo;
     MenuItem20: TMenuItem;
     MenuItem21: TMenuItem;
+    Panel10: TPanel;
     RunScript: TAction;
     AutoAdmin: TCheckBox;
     DatabaseAliasName: TEdit;
@@ -224,7 +248,6 @@ type
     SaveDialog: TSaveDialog;
     SchemaTab: TTabSheet;
     ServerLog: TMemo;
-    ServerPropMemo: TMemo;
     ServerTab: TTabSheet;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
@@ -358,6 +381,7 @@ type
     procedure HandleDBConnect(Sender: TObject);
     procedure HandleLoadData(Sender: TObject);
     procedure LoadData;
+    procedure LoadServerData;
     procedure DoExtract(Data: PtrInt);
     procedure ConfigureForServerVersion;
     procedure ConfigureOnlineValidation;
@@ -839,7 +863,7 @@ end;
 
 procedure TMainForm.PropertiesShow(Sender: TObject);
 begin
-  if Visible and IBDatabaseInfo.Database.Connected then
+  if Visible and (IBDatabaseInfo.Database <> nil) and IBDatabaseInfo.Database.Connected then
     LoadData;
 end;
 
@@ -959,13 +983,12 @@ end;
 
 procedure TMainForm.ServerTabShow(Sender: TObject);
 begin
-  if not Visible or not IBDatabaseInfo.Database.Connected or FServerError then Exit;
+  if not Visible or FServerError then Exit;
   try
-    DatabaseData.LoadServerProperties(ServerPropMemo.Lines);
+    LoadServerData;
     DatabaseData.LoadServerLog(ServerLog.Lines);
   except
    FServerError := true;
-   ServerPropMemo.Lines.Clear;
    ServerLog.Lines.Clear;
    raise;
   end;
@@ -1083,6 +1106,38 @@ begin
     DBComments.Lines.Text := DatabaseData.Description;
   finally
     FLoading := false;
+  end;
+end;
+
+procedure TMainForm.LoadServerData;
+var i: integer;
+begin
+  with DatabaseData.IBServerProperties1 do
+  begin
+    Edit3.Text := VersionInfo.ServerVersion;
+    Edit2.Text := IntToStr(VersionInfo.ServiceVersion);
+    Edit4.Text := VersionInfo.ServerImplementation;
+    OpenDatabasesList.Clear;
+    for i := 0 to DatabaseInfo.NoOfDatabases - 1 do
+      OpenDatabasesList.Lines.Add(DatabaseInfo.DbName[i]);
+    ConfigDataGrid.Visible := DatabaseData.LoadConfigData(ConfigParams.ConfigFileData);
+    ConfigDataLabel.Visible := ConfigDataGrid.Visible;
+    if ConfigDataGrid.Visible then
+    begin
+      OpenDatabasesList.Height := ConfigDataLabel.Top - OpenDatabasesList.Top - 6;
+      OpenDatabasesList.Anchors := OpenDatabasesList.Anchors - [akBottom];
+    end
+    else
+    begin
+      OpenDatabasesList.Height := ConfigDataGrid.Top - OpenDatabasesList.Top + ConfigDataGrid.Height;
+      OpenDatabasesList.Anchors := OpenDatabasesList.Anchors + [akBottom];
+    end;
+    Edit5.Text := ConfigParams.BaseLocation;
+    Edit6.Text := ConfigParams.LockFileLocation;
+    Edit7.Text :=  ConfigParams.SecurityDatabaseLocation;
+    Edit9.Text :=  ConfigParams.MessageFileLocation;
+    Edit8.Text := ServicesConnection.ServerName;
+    Edit12.Text := IntToStr(DatabaseInfo.NoOfAttachments);
   end;
 end;
 

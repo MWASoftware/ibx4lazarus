@@ -6,6 +6,8 @@ inherited DBAMainForm: TDBAMainForm
   Caption = 'Firebird Database Administrator'
   ClientHeight = 600
   ClientWidth = 1148
+  OnClose = FormClose
+  OnShow = FormShow
   inherited ToolBar1: TToolBar
     Width = 1148
     inherited ToolButton2: TToolButton
@@ -26,6 +28,8 @@ inherited DBAMainForm: TDBAMainForm
     Left = 157
     Height = 552
     Width = 991
+    ActivePage = ServerTab
+    TabIndex = 5
     inherited Properties: TTabSheet
       ClientHeight = 520
       ClientWidth = 985
@@ -68,6 +72,26 @@ inherited DBAMainForm: TDBAMainForm
     inherited ServerTab: TTabSheet
       ClientHeight = 520
       ClientWidth = 985
+      inherited Panel1: TPanel
+        Height = 520
+        ClientHeight = 520
+        inherited ServerPropMemo: TMemo
+          Height = 485
+        end
+      end
+      inherited Splitter1: TSplitter
+        Height = 520
+      end
+      inherited Panel2: TPanel
+        Height = 520
+        Width = 610
+        ClientHeight = 520
+        ClientWidth = 610
+        inherited ServerLog: TMemo
+          Height = 485
+          Width = 592
+        end
+      end
     end
     inherited UserManagerTab: TTabSheet
       ClientHeight = 520

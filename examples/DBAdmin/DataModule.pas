@@ -71,6 +71,7 @@ type
     AttachmentsRDBSECURITY_CLASS: TIBStringField;
     AttachmentsRDBSYSTEM_FLAG: TIBSmallintField;
     CharSetLookup: TIBQuery;
+    ConfigDataset: TMemDataset;
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
     Attachments: TIBQuery;
@@ -135,6 +136,7 @@ type
     procedure AttachmentsAfterDelete(DataSet: TDataSet);
     procedure AttachmentsAfterOpen(DataSet: TDataSet);
     procedure AttachmentsBeforeOpen(DataSet: TDataSet);
+    procedure ConfigDatasetAfterClose(DataSet: TDataSet);
     procedure CurrentTransactionAfterTransactionEnd(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
     procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
@@ -236,6 +238,7 @@ type
     procedure RemoveShadowSet(ShadowSet: integer);
     procedure LoadPerformanceStatistics(Lines: TStrings);
     procedure LoadDatabaseStatistics(OptionID: integer; Lines: TStrings);
+    function LoadConfigData(ConfigFileData: TConfigFileData): boolean;
     procedure LoadServerProperties(Lines: TStrings);
     procedure LoadServerLog(Lines: TStrings);
     procedure RevokeAll;
@@ -1131,6 +1134,58 @@ begin
   end;
 end;
 
+function TDatabaseData.LoadConfigData(ConfigFileData: TConfigFileData): boolean;
+var i: integer;
+    aValue: integer;
+begin
+  for i := 0 to Length(ConfigFileData.ConfigFileKey) - 1 do
+  begin
+    aValue := ConfigFileData.ConfigFileValue[i] ;
+    with ConfigDataset do
+    case ConfigFileData.ConfigFileKey[i] of
+    ISCCFG_LOCKMEM_KEY:
+      AppendRecord(['Lock mem', aValue]);
+    ISCCFG_LOCKSEM_KEY:
+      AppendRecord(['Lock Semaphores', aValue]);
+    ISCCFG_LOCKSIG_KEY:
+      AppendRecord(['Lock sig', aValue]);
+    ISCCFG_EVNTMEM_KEY:
+      AppendRecord(['Event mem', aValue]);
+    ISCCFG_PRIORITY_KEY:
+      AppendRecord(['Priority', aValue]);
+    ISCCFG_MEMMIN_KEY:
+      AppendRecord(['Min memory', aValue]);
+    ISCCFG_MEMMAX_KEY:
+      AppendRecord(['Max Memory', aValue]);
+    ISCCFG_LOCKORDER_KEY:
+      AppendRecord(['Lock order', aValue]);
+    ISCCFG_ANYLOCKMEM_KEY:
+      AppendRecord(['Any lock mem', aValue]);
+    ISCCFG_ANYLOCKSEM_KEY:
+      AppendRecord(['Any lock semaphore',aValue]);
+    ISCCFG_ANYLOCKSIG_KEY:
+      AppendRecord(['any lock sig', aValue]);
+    ISCCFG_ANYEVNTMEM_KEY:
+      AppendRecord(['any event mem', aValue]);
+    ISCCFG_LOCKHASH_KEY:
+      AppendRecord(['Lock hash', aValue]);
+    ISCCFG_DEADLOCK_KEY:
+      AppendRecord(['Deadlock', aValue]);
+    ISCCFG_LOCKSPIN_KEY:
+      AppendRecord(['Lock spin', aValue]);
+    ISCCFG_CONN_TIMEOUT_KEY:
+      AppendRecord(['Conn timeout', aValue]);
+    ISCCFG_DUMMY_INTRVL_KEY:
+      AppendRecord(['Dummy interval', aValue]);
+    ISCCFG_IPCMAP_KEY:
+      AppendRecord(['Map size', aValue]);
+    ISCCFG_DBCACHE_KEY:
+      AppendRecord(['Cache size', aValue]);
+    end;
+  end;
+  Result := ConfigDataset.Active and (ConfigDataset.RecordCount > 0);
+end;
+
 procedure TDatabaseData.LoadServerProperties(Lines: TStrings);
 var i: integer;
 begin
@@ -1147,7 +1202,7 @@ begin
                                                              ServerVersionNo[4]]));
     Lines.Add('No. of attachments = ' + IntToStr(DatabaseInfo.NoOfAttachments));
     Lines.Add('No. of databases = ' + IntToStr(DatabaseInfo.NoOfDatabases));
-    for i := 0 to DatabaseInfo.NoOfDatabases - 1 do
+    for i := 0 to length(DatabaseInfo.DbName) - 1 do
       Lines.Add(Format('DB Name (%d) = %s',[i+1, DatabaseInfo.DbName[i]]));
     Lines.Add('Base Location = ' + ConfigParams.BaseLocation);
     Lines.Add('Lock File Location = ' + ConfigParams.LockFileLocation);
@@ -1446,6 +1501,11 @@ procedure TDatabaseData.AttachmentsBeforeOpen(DataSet: TDataSet);
 begin
   if IBDatabaseInfo.ODSMajorVersion >= 12 then
     (DataSet as TIBQuery).Parser.Add2WhereClause('r.MON$SYSTEM_FLAG = 0');
+end;
+
+procedure TDatabaseData.ConfigDatasetAfterClose(DataSet: TDataSet);
+begin
+  ConfigDataset.Clear(false);
 end;
 
 procedure TDatabaseData.DatabaseQueryBeforeClose(DataSet: TDataSet);
