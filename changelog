@@ -70,6 +70,9 @@ IBX Change Log  version (2.3-3 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
     When true, SQL statement parameter names are parsed case sensitive. Note for
     TIBDataSet only applies to Select query.
 
+11. IBEvents: removing a TIBEvent component from a form should no longer result in
+    an IDE exception.
+
 IBX Change Log  version (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 
 1. Remove need to check for IsMultiThread by providing access to GUI timers via
