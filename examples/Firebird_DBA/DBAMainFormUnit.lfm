@@ -1,0 +1,183 @@
+inherited DBAMainForm: TDBAMainForm
+  Left = 605
+  Height = 620
+  Top = 241
+  Width = 1148
+  Caption = 'Firebird Database Administrator'
+  ClientHeight = 600
+  ClientWidth = 1148
+  inherited ToolBar1: TToolBar
+    Width = 1148
+    inherited ToolButton2: TToolButton
+      Height = 22
+    end
+    inherited ToolButton4: TToolButton
+      Height = 22
+    end
+    inherited ToolButton6: TToolButton
+      Height = 22
+    end
+  end
+  inherited StatusBar1: TStatusBar
+    Top = 578
+    Width = 1148
+  end
+  inherited PageControl1: TPageControl
+    Left = 157
+    Height = 552
+    Width = 991
+    inherited Properties: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+      inherited Panel7: TPanel
+        Height = 520
+        Width = 985
+        ClientHeight = 520
+        ClientWidth = 985
+        inherited Label23: TLabel
+          Left = 732
+        end
+        inherited DBEdit1: TDBEdit
+          Left = 836
+        end
+        inherited DBComments: TMemo
+          Height = 89
+          Width = 564
+        end
+        inherited ClientServerVersion: TMemo
+          Width = 563
+        end
+      end
+    end
+    inherited FilesTab: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+    end
+    inherited AttachmentsTab: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+    end
+    inherited StatisticsTab: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+    end
+    inherited SchemaTab: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+    end
+    inherited ServerTab: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+    end
+    inherited UserManagerTab: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+    end
+    inherited AccessRightsTab: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+    end
+    inherited MappingsTab: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+    end
+    inherited RepairTab: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+      inherited ValidateOptions: TPageControl
+        inherited ValidateOptionsTab: TTabSheet
+          ClientHeight = 104
+          ClientWidth = 318
+        end
+        inherited RepairOptionsTab: TTabSheet
+          ClientHeight = 104
+          ClientWidth = 318
+        end
+      end
+    end
+    inherited LimboTab: TTabSheet
+      ClientHeight = 520
+      ClientWidth = 985
+    end
+  end
+  inherited UpdateColsPanel: TPanel
+    ClientHeight = 62
+    ClientWidth = 542
+    inherited DBEdit5: TDBEdit
+      Width = 386
+    end
+    inherited DBEdit6: TDBEdit
+      Width = 386
+    end
+  end
+  object IBTreeView1: TIBTreeView[4]
+    Left = 0
+    Height = 552
+    Top = 26
+    Width = 152
+    Align = alLeft
+    TabOrder = 4
+  end
+  object Splitter6: TSplitter[5]
+    Left = 152
+    Height = 552
+    Top = 26
+    Width = 5
+  end
+  inherited MainMenu1: TMainMenu[6]
+  end
+  inherited ActionList1: TActionList[7]
+  end
+  inherited MenuImages: TImageList[8]
+  end
+  inherited CharSetSource: TDataSource[9]
+  end
+  inherited SecDBFilesSource: TDataSource[10]
+  end
+  inherited DBCharSetSource: TDataSource[11]
+  end
+  inherited DatabaseSource: TDataSource[12]
+  end
+  inherited IBDatabaseInfo: TIBDatabaseInfo[13]
+  end
+  inherited AttmtSource: TDataSource[14]
+  end
+  inherited ShadowSource: TDataSource[15]
+  end
+  inherited SynSQLSyn1: TSynSQLSyn[16]
+  end
+  inherited IBExtract1: TIBExtract[17]
+  end
+  inherited SQlSaveDialog: TSaveDialog[18]
+  end
+  inherited SaveDialog: TSaveDialog[19]
+  end
+  inherited UserListSource: TDataSource[20]
+  end
+  inherited RoleSource: TDataSource[21]
+  end
+  inherited UserTagsSource: TDataSource[22]
+  end
+  inherited UserPopup: TPopupMenu[23]
+  end
+  inherited UserTagPopup: TPopupMenu[24]
+  end
+  inherited AttachSource: TDataSource[25]
+  end
+  inherited AttmtTimer: TTimer[26]
+  end
+  inherited AttmtPopup: TPopupMenu[27]
+  end
+  inherited LimboListSource: TDataSource[28]
+  end
+  inherited DBTablesSource: TDataSource[29]
+  end
+  inherited AuthMapSource: TDataSource[30]
+  end
+  inherited SubjectAccessRightsSource: TDataSource[31]
+  end
+  inherited AccessRightsPopup: TPopupMenu[32]
+  end
+  inherited AccessRightsSource: TDataSource[33]
+  end
+end

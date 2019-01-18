@@ -139,6 +139,7 @@ begin
   TStringList(FEvents).OnChange := nil;
   FBase.Free;
   FEvents.Free;
+  inherited Destroy;
 end;
 
 procedure TIBEvents.EventHandler(Sender: IEvents);

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="12">
+      <Unit0>
+        <Filename Value="firebird_dba.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="22"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="DBAMainFormUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DBAMainForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="38" Y="30"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="../DBAdmin/MainFormUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="10"/>
+        <CursorPos X="12" Y="34"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="../DBAdmin/DataModule.pas"/>
+        <IsPartOfProject Value="True"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="22"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="../DBAdmin/SelectSQLResultsUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="22"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="dlg/CreateNewDBDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="CreateNewDBDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="34" Y="4"/>
+        <UsageCount Value="22"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="dlg/RegisterExistingDBDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="RegisterExistingDBDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="57" Y="3"/>
+        <UsageCount Value="22"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="dlg/RegisterServerDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="RegisterServerDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="40" Y="25"/>
+        <UsageCount Value="22"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="LocalDataModule.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DataModule1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="34" Y="26"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="dlg/CreateNewDBDlgUnit.lfm"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="134"/>
+        <CursorPos X="21" Y="142"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2241"/>
+        <CursorPos X="3" Y="2244"/>
+        <UsageCount Value="10"/>
+      </Unit11>
+    </Units>
+    <JumpHistory Count="19" HistoryIndex="18">
+      <Position1>
+        <Filename Value="DBAMainFormUnit.pas"/>
+        <Caret Line="22" Column="38"/>
+      </Position1>
+      <Position2>
+        <Filename Value="DBAMainFormUnit.pas"/>
+        <Caret Line="29" Column="38"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="93" Column="20" TopLine="77"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="137" Column="3" TopLine="134"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="95" Column="24" TopLine="72"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="260" Column="3" TopLine="241"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="95" Column="22" TopLine="77"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="260" Column="3" TopLine="247"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="94" Column="15" TopLine="77"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="208" Column="3" TopLine="205"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="82" Column="22" TopLine="74"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="231" Column="3" TopLine="227"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="93" Column="19" TopLine="63"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="137" Column="3" TopLine="120"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="95" Column="16" TopLine="75"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="123" Column="15" TopLine="114"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../runtime/nongui/IBEvents.pas"/>
+        <Caret Line="93" Column="18" TopLine="72"/>
+      </Position17>
+      <Position18>
+        <Filename Value="LocalDataModule.pas"/>
+        <Caret Line="23" Column="34"/>
+      </Position18>
+      <Position19>
+        <Filename Value="LocalDataModule.pas"/>
+        <Caret Line="27" Column="34"/>
+      </Position19>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>

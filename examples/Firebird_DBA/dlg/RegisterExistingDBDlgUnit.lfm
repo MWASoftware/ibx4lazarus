@@ -1,0 +1,104 @@
+object RegisterExistingDBDlg: TRegisterExistingDBDlg
+  Left = 1844
+  Height = 254
+  Top = 280
+  Width = 420
+  BorderStyle = bsDialog
+  Caption = 'Register Existing Database'
+  ClientHeight = 254
+  ClientWidth = 420
+  OnShow = FormShow
+  Position = poMainFormCenter
+  LCLVersion = '1.8.0.5'
+  object Bevel1: TBevel
+    Left = 10
+    Height = 230
+    Top = 10
+    Width = 329
+  end
+  object Label1: TLabel
+    Left = 22
+    Height = 14
+    Top = 24
+    Width = 39
+    Caption = 'Server'
+    ParentColor = False
+  end
+  object Button1: TButton
+    Left = 342
+    Height = 29
+    Top = 10
+    Width = 75
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 342
+    Height = 29
+    Top = 47
+    Width = 75
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 1
+  end
+  object Edit1: TEdit
+    Left = 22
+    Height = 24
+    Top = 38
+    Width = 178
+    ReadOnly = True
+    TabOrder = 2
+    Text = 'Edit1'
+  end
+  object Label2: TLabel
+    Left = 22
+    Height = 14
+    Top = 80
+    Width = 95
+    Caption = 'Database Name'
+    ParentColor = False
+  end
+  object Edit2: TEdit
+    Left = 22
+    Height = 24
+    Top = 94
+    Width = 178
+    TabOrder = 3
+    Text = 'Edit2'
+  end
+  object Label3: TLabel
+    Left = 22
+    Height = 14
+    Top = 136
+    Width = 86
+    Caption = 'Database Path'
+    ParentColor = False
+  end
+  object Edit3: TEdit
+    Left = 22
+    Height = 24
+    Top = 151
+    Width = 298
+    TabOrder = 4
+    Text = 'Edit3'
+  end
+  object Label4: TLabel
+    Left = 22
+    Height = 14
+    Top = 192
+    Width = 113
+    Caption = 'Default User Name'
+    ParentColor = False
+  end
+  object Edit4: TEdit
+    Left = 22
+    Height = 24
+    Top = 207
+    Width = 176
+    TabOrder = 5
+    Text = 'Edit4'
+  end
+end
