@@ -31,9 +31,12 @@ type
     procedure IBTreeView1EditingEnd(Sender: TObject; Node: TTreeNode;
       Cancel: Boolean);
     procedure IBTreeView1SelectionChanged(Sender: TObject);
+    procedure ServersAndDatabasesAfterDelete(DataSet: TDataSet);
     procedure ServersAndDatabasesAfterInsert(DataSet: TDataSet);
     procedure ServersAndDatabasesAfterOpen(DataSet: TDataSet);
     procedure ServersAndDatabasesAfterPost(DataSet: TDataSet);
+    procedure ServersAndDatabasesValidatePost(Sender: TObject;
+      var CancelPost: boolean);
   private
     FLocated: boolean;
     FNewItemType: integer;  {-1 => Server root, 0 => Server, 1 => database}
@@ -84,18 +87,27 @@ begin
     with TIBTreeView(RegisteredObjectsTree) do
     if not VarIsNull(SelectedKeyValue) then
     begin
-      ServerDataList.Add(SelectedKeyValue, Selected.Text);
-      ChangeFrame(TServersView, SelectedKeyValue);
+      ServerDataList.ServerData[SelectedKeyValue].Select;
+      PageControl1.Visible := true;
     end;
 
   1:
     with TIBTreeView(RegisteredObjectsTree) do
     if not VarIsNull(SelectedKeyValue) then
     begin
-      if RemoteDatabases.Add(SelectedKeyValue, Selected.Text).ServerID <> -1 then
-        ChangeFrame(TDatabaseView, SelectedKeyValue);
+      if DatabaseDataList.DatabaseData[SelectedKeyValue].Select then
+      PageControl1.Visible := true;
     end;
   end;
+end;
+
+procedure TDBAMainForm.ServersAndDatabasesAfterDelete(DataSet: TDataSet);
+begin
+  ServersAndDatabases.CommitRetaining;
+  if Dataset.FieldByName('ItemType').AsInteger = 0 then
+    ServerDataList.Remove(Dataset.FieldByName('ID').AsInteger)
+  else
+    DatabaseDataList.Remove(Dataset.FieldByName('ID').AsInteger);
 end;
 
 procedure TDBAMainForm.ServersAndDatabasesAfterInsert(DataSet: TDataSet);
@@ -116,9 +128,19 @@ end;
 
 procedure TDBAMainForm.ServersAndDatabasesAfterPost(DataSet: TDataSet);
 begin
+  ServersAndDatabases.Transaction.CommitRetaining;
+  if Dataset.FieldByName('ItemType').AsInteger = 0 then
+    ServerDataList.Update(Dataset.FieldByName('ID').AsInteger)
+  else
+    DatabaseDataList.Update(Dataset.FieldByName('ID').AsInteger);
+end;
+
+procedure TDBAMainForm.ServersAndDatabasesValidatePost(Sender: TObject;
+  var CancelPost: boolean);
+begin
   CancelPost := ServersAndDatabases.FieldByName('ItemName').AsString = '';
   if CancelPost then
-    MessageDlg('A Server must be given a name',mtError,[mbOK],0);
+    MessageDlg('A Server must be given a name',mtError,[mbOK],0)
 end;
 
 procedure TDBAMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction

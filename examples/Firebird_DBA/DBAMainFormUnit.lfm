@@ -280,6 +280,7 @@ inherited DBAMainForm: TDBAMainForm
     AllowAutoActivateTransaction = False
     Database = LocalData.LocalDatabase
     Transaction = LocalData.IBTransaction
+    AfterDelete = ServersAndDatabasesAfterDelete
     AfterInsert = ServersAndDatabasesAfterInsert
     AfterOpen = ServersAndDatabasesAfterOpen
     AfterPost = ServersAndDatabasesAfterPost
@@ -319,6 +320,7 @@ inherited DBAMainForm: TDBAMainForm
     GenerateParamNames = False
     MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
+    OnValidatePost = ServersAndDatabasesValidatePost
     left = 80
     top = 208
     object ServersAndDatabasesITEMTYPE: TIntegerField

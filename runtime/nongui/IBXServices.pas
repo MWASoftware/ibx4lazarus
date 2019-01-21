@@ -85,6 +85,7 @@ type
     procedure HandleException(Sender: TObject);
     procedure HandleSecContextException(Sender: TIBXControlService; var action: TSecContextAction);
     function Login(var aServerName: string; LoginParams: TStrings): Boolean;
+    procedure ParseServerVersionNo;
     procedure ParamsChanging(Sender: TObject);
     procedure SetConfigOverrides(AValue: TStrings);
     procedure SetConnectString(AValue: string);
@@ -93,6 +94,7 @@ type
     procedure SetPortNo(AValue: string);
     procedure SetProtocol(AValue: TProtocol);
     procedure SetServerName(AValue: string);
+    procedure SetServiceIntf(AValue: IServiceManager);
     procedure SetWireCompression(AValue: boolean);
   protected
     procedure DoConnect; override;
@@ -113,7 +115,7 @@ type
     procedure SetDBParams(DBParams: TStrings);
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property ServerVersionNo[index: integer]: integer read GetServerVersionNo;
-    property ServiceIntf: IServiceManager read FService;
+    property ServiceIntf: IServiceManager read FService write SetServiceIntf;
   published
     property Connected;
     property ConnectString: string read FConnectString write SetConnectString;
@@ -2974,6 +2976,34 @@ begin
     IBError(ibxeNoLoginDialog,[]);
 end;
 
+procedure TIBXServicesConnection.ParseServerVersionNo;
+var Req: ISRB;
+    Results: IServiceQueryResults;
+    RegexObj: TRegExpr;
+    s: string;
+begin
+  Req := FService.AllocateSRB;
+  Req.Add(isc_info_svc_server_version);
+  Results := FService.Query(nil,Req);
+  if (Results.Count = 1) and (Results[0].getItemType = isc_info_svc_server_version) then
+  RegexObj := TRegExpr.Create;
+  try
+    {extact database file spec}
+    RegexObj.ModifierG := false; {turn off greedy matches}
+    RegexObj.Expression := '[A-Z][A-Z]-V([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+) .*';
+    s := Results[0].AsString;
+    if RegexObj.Exec(s) then
+    begin
+      FServerVersionNo[1] := StrToInt(RegexObj.Match[1]);
+      FServerVersionNo[2] := StrToInt(RegexObj.Match[2]);
+      FServerVersionNo[3] := StrToInt(RegexObj.Match[3]);
+      FServerVersionNo[4] := StrToInt(RegexObj.Match[4]);
+    end;
+  finally
+    RegexObj.Free;
+  end;
+end;
+
 procedure TIBXServicesConnection.ParamsChanging(Sender: TObject);
 begin
   CheckInactive;
@@ -3023,6 +3053,40 @@ begin
   FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
 end;
 
+procedure TIBXServicesConnection.SetServiceIntf(AValue: IServiceManager);
+var i: integer;
+begin
+  if FService = AValue then Exit;
+  if FService <> nil then
+  begin
+    if Assigned(BeforeDisconnect) then
+      BeforeDisconnect(self);
+    for i := 0 to Length(FIBXServices) - 1 do
+      FIBXServices[i].OnBeforeDisconnect(self);
+    FService := nil;
+    if Assigned(AfterDisconnect) then
+      AfterDisconnect(self);
+  end;
+  FFirebirdAPI := nil;
+  if AValue <> nil then
+  begin
+    if Assigned(BeforeConnect) then
+      BeforeConnect(self);
+    FService := AValue;
+    ParseServerVersionNo;
+    FServername := FService.getServerName;
+    FProtocol := FService.getProtocol;
+    FPortNo := FService.getPortNo;
+    FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
+    if FFirebirdLibraryPathName <> '' then
+      FFirebirdLibraryPathName := FService.getFirebirdAPI.GetFBLibrary.GetLibraryFilePath;
+    for i := low(FIBXServices) to high(FIBXServices) do
+      FIBXServices[i].OnAfterConnect(self,aDBName);
+    if Assigned(AfterConnect) then
+      AfterConnect(self);
+  end;
+end;
+
 procedure TIBXServicesConnection.SetWireCompression(AValue: boolean);
 var Index: integer;
 begin
@@ -3037,34 +3101,6 @@ begin
 end;
 
 procedure TIBXServicesConnection.DoConnect;
-
-  procedure ParseServerVersionNo;
-  var Req: ISRB;
-      Results: IServiceQueryResults;
-      RegexObj: TRegExpr;
-      s: string;
-  begin
-    Req := FService.AllocateSRB;
-    Req.Add(isc_info_svc_server_version);
-    Results := FService.Query(nil,Req);
-    if (Results.Count = 1) and (Results[0].getItemType = isc_info_svc_server_version) then
-    RegexObj := TRegExpr.Create;
-    try
-      {extact database file spec}
-      RegexObj.ModifierG := false; {turn off greedy matches}
-      RegexObj.Expression := '[A-Z][A-Z]-V([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+) .*';
-      s := Results[0].AsString;
-      if RegexObj.Exec(s) then
-      begin
-        FServerVersionNo[1] := StrToInt(RegexObj.Match[1]);
-        FServerVersionNo[2] := StrToInt(RegexObj.Match[2]);
-        FServerVersionNo[3] := StrToInt(RegexObj.Match[3]);
-        FServerVersionNo[4] := StrToInt(RegexObj.Match[4]);
-      end;
-    finally
-      RegexObj.Free;
-    end;
-  end;
 
 var aServerName: string;
     aProtocol: TProtocolAll;

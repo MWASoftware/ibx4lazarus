@@ -188,7 +188,6 @@ type
     FPortNo: string;
     FProtocol: TProtocolAll;
     FDatabasePathName: string;
-    procedure ConnectServicesAPI;
     function GetAuthMethod: string;
     function GetAutoAdmin: boolean;
     function GetDatabaseName: string;
@@ -218,6 +217,10 @@ type
     procedure SetPageBuffers(AValue: integer);
     procedure SetSweepInterval(AValue: integer);
     procedure ReloadData(Data: PtrInt=0);
+  protected
+    procedure ConnectServicesAPI; virtual;
+    function CallLoginDlg(var aDatabaseName, aUserName, aPassword: string;
+      var aCreateIfNotExist: boolean): TModalResult; virtual;
   public
     destructor Destroy; override;
     procedure Connect;
@@ -488,6 +491,12 @@ begin
       Exit;
     end;
   end;
+end;
+
+function TDatabaseData.CallLoginDlg(var aDatabaseName, aUserName,
+  aPassword: string; var aCreateIfNotExist: boolean): TModalResult;
+begin
+  Result := DBLoginDlg.ShowModal(aDatabaseName, aUserName, aPassword, aCreateIfNotExist);
 end;
 
 procedure TDatabaseData.GetDBFlags;
@@ -1138,6 +1147,8 @@ function TDatabaseData.LoadConfigData(ConfigFileData: TConfigFileData): boolean;
 var i: integer;
     aValue: integer;
 begin
+  ConfigDataset.Active := true;
+  ConfigDataset.Clear(false);
   for i := 0 to Length(ConfigFileData.ConfigFileKey) - 1 do
   begin
     aValue := ConfigFileData.ConfigFileValue[i] ;
@@ -1280,7 +1291,7 @@ begin
   aUserName := LoginParams.Values['user_name'];
   aPassword := '';
   aCreateIfNotExist := false;
-  if DBLoginDlg.ShowModal(aDatabaseName, aUserName, aPassword, aCreateIfNotExist) = mrOK then
+  if CallLoginDlg(aDatabaseName, aUserName, aPassword, aCreateIfNotExist) = mrOK then
   begin
     FDBPassword := aPassword; {remember for reconnect}
     Database.DatabaseName := aDatabaseName;

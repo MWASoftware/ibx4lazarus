@@ -6,27 +6,33 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, DataModule, IBXServices,
-  ServerDataUnit;
+  ServerDataUnit,DatabaseDataUnit;
 
 type
 
   { TDBADatabaseData }
 
   TDBADatabaseData = class(TDatabaseData)
+    procedure IBDatabase1AfterConnect(Sender: TObject);
     procedure IBXServicesConnection1AfterConnect(Sender: TObject);
     procedure IBXServicesConnection1AfterDisconnect(Sender: TObject);
     procedure IBXServicesConnection1Login(Service: TIBXServicesConnection;
       var aServerName: string; LoginParams: TStrings);
   private
+    FDatabaseData: TDatabaseData;
     FServiceUserName: string;
     FServicePassword: string;
     FServiceConnectCount: integer;
     FServerData: TServerData;
+    procedure SetDatabaseData(AValue: TDatabaseData);
     procedure SetServerData(AValue: TServerData);
   protected
     procedure ConnectServicesAPI; override;
+    function CallLoginDlg(var aDatabaseName, aUserName, aPassword: string;
+      var aCreateIfNotExist: boolean): TModalResult; override;
   public
     property ServerData: TServerData read FServerData write SetServerData;
+    property DatabaseData: TDatabaseData read FDatabaseData write SetDatabaseData;
   end;
 
 var
@@ -40,9 +46,17 @@ uses PasswordCacheUnit;
 
 { TDBADatabaseData }
 
+procedure TDBADatabaseData.IBDatabase1AfterConnect(Sender: TObject);
+begin
+  inherited;
+  FDatabaseData.Attachment := IBDatabase1.Attachment;
+  FDatabaseData.DefaultUserName := FDatabaseUserName;
+  PasswordCache.SavePassword(FDatabaseUserName,IBDatabase1.DatabaseName,FDatabasePassword);
+end;
+
 procedure TDBADatabaseData.IBXServicesConnection1AfterConnect(Sender: TObject);
 begin
-  FCurrentServerData.ServiceIntf := IBXServicesConnection1.ServiceIntf;
+  FServerData.ServiceIntf := IBXServicesConnection1.ServiceIntf;
   ServerData.DefaultUserName := FServiceUserName;
   if IBDatabase1.Connected then
     PasswordCache.SavePassword(FServiceUserName,IBDatabase1.DatabaseName,FServicePassword)
@@ -96,9 +110,31 @@ begin
   end;
 end;
 
+procedure TDBADatabaseData.SetDatabaseData(AValue: TDatabaseData);
+begin
+  if FDatabaseData = AValue then Exit;
+  FDatabaseData := AValue;
+  IBDatabase1.Attachment := FDatabaseData.Attachment;
+  if not IBDatabase1.Connected then
+  begin
+    IBDatabase1.DatabaseName := FDatabaseData.DatabasePath;
+    FDatabaseUserName := FDatabaseData.DefaultUserName;
+    FDatabasePassword := '';
+    IBDatabase1.Connected := true;
+  end;
+end;
+
 procedure TDBADatabaseData.ConnectServicesAPI;
 begin
   ServerData := DatabaseData.ServerData;
+end;
+
+function TDBADatabaseData.CallLoginDlg(var aDatabaseName, aUserName,
+  aPassword: string; var aCreateIfNotExist: boolean): TModalResult;
+begin
+  Result := inherited CallLoginDlg(aDatabaseName, aUserName, aPassword, aCreateIfNotExist);
+  FDatabaseUserName := aUserName;
+  FDatabasePassword := aPassword;
 end;
 
 end.

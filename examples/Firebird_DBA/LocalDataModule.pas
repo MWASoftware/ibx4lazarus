@@ -110,6 +110,8 @@ implementation
 
 {$R *.lfm}
 
+uses ServerDataList, DatabaseDataList;
+
 { EDBVersionProblem }
 
 constructor EDBVersionProblem.Create(aVersionFound, aVersionWanted: integer);
@@ -141,7 +143,10 @@ procedure TLocalData.LocalDatabaseAfterConnect(Sender: TObject);
 begin
   CheckDBVersion;
   FSQLHistory.LoadSQLHistory;
+  AppDatabases.Active := true;
   PasswordCacheTable.Active := true;
+  ServerDataList.Refresh;
+  DatabaseDataList.Refresh;
 end;
 
 procedure TLocalData.LocalDatabaseAfterDisconnect(Sender: TObject);

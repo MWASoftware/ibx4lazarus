@@ -1,4 +1,12 @@
 inherited DBADatabaseData: TDBADatabaseData
+  Height = 552
+  HorizontalOffset = 724
+  VerticalOffset = 476
+  Width = 730
+  PPI = 96
+  inherited IBDatabase1: TIBDatabase
+    AfterConnect = IBDatabase1AfterConnect
+  end
   inherited RoleNameList: TIBQuery
     ParamData = <    
       item
