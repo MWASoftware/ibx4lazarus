@@ -27,6 +27,12 @@ Create Table DBCONTROL (
   UUID char(16) CHARACTER SET OCTETS
 );
 
+Create Table UserConfig (
+  KeyName VarChar(32),
+  KeyValue VarChar(128),
+  Primary Key KeyName;
+);
+
 Create Table SQLHistory (
   SeqNo Smallint not null,
   SQLText Blob sub_type text,

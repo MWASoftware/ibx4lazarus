@@ -7,7 +7,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, memdslaz, DBAMainFormUnit, ibexpress
+  Forms, memdslaz, DBAMainFormUnit, ibexpress, DBADataModule
   { you can add units after this };
 
 {$R *.res}
@@ -33,6 +33,7 @@ begin
   Application.CreateForm(TRestoreDlg, RestoreDlg);
   Application.CreateForm(TShutdownDatabaseDlg, ShutdownDatabaseDlg);
   Application.CreateForm(TShutdownReqDlg, ShutdownReqDlg);
+  Application.CreateForm(TDBADatabaseData, DBADatabaseData);
   Application.Run;
 end.
 

@@ -51,7 +51,7 @@
         <PackageName Value="LCL"/>
       </Item8>
     </RequiredPackages>
-    <Units Count="20">
+    <Units Count="24">
       <Unit0>
         <Filename Value="firebird_dba.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -66,6 +66,7 @@
       <Unit2>
         <Filename Value="../DBAdmin/MainFormUnit.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit2>
@@ -186,6 +187,25 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit19>
+      <Unit20>
+        <Filename Value="DatabaseListUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="PasswordCacheUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="ServerDataUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="DBADataModule.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DBADatabaseData"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+      </Unit23>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

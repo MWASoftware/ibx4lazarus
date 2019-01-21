@@ -1,0 +1,31 @@
+inherited DBADatabaseData: TDBADatabaseData
+  inherited RoleNameList: TIBQuery
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'SEC$USER_NAME'
+        ParamType = ptInput
+      end>
+  end
+  inherited UserTags: TIBQuery
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'SEC$USER_NAME'
+        ParamType = ptInput
+      end>
+  end
+  inherited SubjectAccessRights: TIBQuery
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'ID'
+        ParamType = ptInput
+      end>
+  end
+  inherited IBXServicesConnection1: TIBXServicesConnection
+    AfterConnect = IBXServicesConnection1AfterConnect
+    OnLogin = IBXServicesConnection1Login
+    ConnectString = 'service_mgr'
+  end
+end
