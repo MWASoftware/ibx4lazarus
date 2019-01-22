@@ -94,7 +94,7 @@ type
     procedure SetPortNo(AValue: string);
     procedure SetProtocol(AValue: TProtocol);
     procedure SetServerName(AValue: string);
-    procedure SetServiceIntf(AValue: IServiceManager);
+    procedure SetServiceIntf(AValue: IServiceManager); overload;
     procedure SetWireCompression(AValue: boolean);
   protected
     procedure DoConnect; override;
@@ -113,6 +113,7 @@ type
       omitting any parameters not appropriate for Services API. Typically, the
       DBParams are TIBDatabase.Params}
     procedure SetDBParams(DBParams: TStrings);
+    procedure SetServiceIntf(aServiceIntf: IServiceManager; aDatabase: TIBDatabase); overload;
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property ServerVersionNo[index: integer]: integer read GetServerVersionNo;
     property ServiceIntf: IServiceManager read FService write SetServiceIntf;
@@ -3054,37 +3055,8 @@ begin
 end;
 
 procedure TIBXServicesConnection.SetServiceIntf(AValue: IServiceManager);
-var i: integer;
 begin
-  if FService = AValue then Exit;
-  if FService <> nil then
-  begin
-    if Assigned(BeforeDisconnect) then
-      BeforeDisconnect(self);
-    for i := 0 to Length(FIBXServices) - 1 do
-      FIBXServices[i].OnBeforeDisconnect(self);
-    FService := nil;
-    if Assigned(AfterDisconnect) then
-      AfterDisconnect(self);
-  end;
-  FFirebirdAPI := nil;
-  if AValue <> nil then
-  begin
-    if Assigned(BeforeConnect) then
-      BeforeConnect(self);
-    FService := AValue;
-    ParseServerVersionNo;
-    FServername := FService.getServerName;
-    FProtocol := FService.getProtocol;
-    FPortNo := FService.getPortNo;
-    FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
-    if FFirebirdLibraryPathName <> '' then
-      FFirebirdLibraryPathName := FService.getFirebirdAPI.GetFBLibrary.GetLibraryFilePath;
-    for i := low(FIBXServices) to high(FIBXServices) do
-      FIBXServices[i].OnAfterConnect(self,aDBName);
-    if Assigned(AfterConnect) then
-      AfterConnect(self);
-  end;
+  SetServiceIntf(AValue,nil);
 end;
 
 procedure TIBXServicesConnection.SetWireCompression(AValue: boolean);
@@ -3278,6 +3250,42 @@ begin
         Params.Add(DBParams[i]);
         break;
       end;
+  end;
+end;
+
+procedure TIBXServicesConnection.SetServiceIntf(aServiceIntf: IServiceManager;
+  aDatabase: TIBDatabase);
+var i: integer;
+begin
+  if FService = aServiceIntf then Exit;
+  if FService <> nil then
+  begin
+    if Assigned(BeforeDisconnect) then
+      BeforeDisconnect(self);
+    for i := 0 to Length(FIBXServices) - 1 do
+      FIBXServices[i].OnBeforeDisconnect(self);
+    FService := nil;
+    if Assigned(AfterDisconnect) then
+      AfterDisconnect(self);
+  end;
+  FFirebirdAPI := nil;
+  if aServiceIntf <> nil then
+  begin
+    if Assigned(BeforeConnect) then
+      BeforeConnect(self);
+    FService := aServiceIntf;
+    ParseServerVersionNo;
+    FServername := FService.getServerName;
+    FProtocol := FService.getProtocol;
+    FPortNo := FService.getPortNo;
+    FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
+    if FFirebirdLibraryPathName <> '' then
+      FFirebirdLibraryPathName := FService.getFirebirdAPI.GetFBLibrary.GetLibraryFilePath;
+    if aDatabase <> nil then
+      for i := low(FIBXServices) to high(FIBXServices) do
+        FIBXServices[i].OnAfterConnect(self,aDatabase.DatabaseName);
+    if Assigned(AfterConnect) then
+      AfterConnect(self);
   end;
 end;
 

@@ -28,6 +28,8 @@ inherited DBAMainForm: TDBAMainForm
     Left = 157
     Height = 552
     Width = 991
+    ActivePage = UserManagerTab
+    TabIndex = 6
     inherited Properties: TTabSheet
       ClientHeight = 520
       ClientWidth = 985
@@ -68,6 +70,7 @@ inherited DBAMainForm: TDBAMainForm
       ClientWidth = 985
     end
     inherited ServerTab: TTabSheet
+      Tag = 1
       ClientHeight = 520
       ClientWidth = 985
       inherited Panel1: TPanel
@@ -89,8 +92,54 @@ inherited DBAMainForm: TDBAMainForm
       end
     end
     inherited UserManagerTab: TTabSheet
+      Tag = 1
       ClientHeight = 520
       ClientWidth = 985
+      inherited Panel4: TPanel
+        Height = 520
+        ClientHeight = 520
+        inherited UserManagerGrid: TIBDynamicGrid
+          Height = 518
+        end
+      end
+      inherited Splitter2: TSplitter
+        Height = 520
+      end
+      inherited Panel3: TPanel
+        Height = 520
+        Width = 241
+        ClientHeight = 520
+        ClientWidth = 241
+        inherited IBDynamicGrid4: TIBDynamicGrid
+          Width = 241
+        end
+        inherited Panel5: TPanel
+          Top = 459
+          Width = 241
+          ClientWidth = 241
+          inherited Button1: TButton
+            Width = 214
+          end
+        end
+        inherited Panel6: TPanel
+          Width = 241
+          ClientWidth = 241
+        end
+        inherited Splitter3: TSplitter
+          Width = 241
+        end
+        inherited TagsHeader: TPanel
+          Width = 241
+        end
+        inherited TagsGrid: TIBDynamicGrid
+          Height = 212
+          Width = 241
+        end
+        inherited Splitter4: TSplitter
+          Top = 454
+          Width = 241
+        end
+      end
     end
     inherited AccessRightsTab: TTabSheet
       ClientHeight = 520
@@ -123,7 +172,7 @@ inherited DBAMainForm: TDBAMainForm
     ClientHeight = 62
     ClientWidth = 542
   end
-  object IBTreeView1: TIBTreeView[4]
+  object RegisteredObjectsTree: TIBTreeView[4]
     Left = 0
     Height = 552
     Top = 26
@@ -134,12 +183,15 @@ inherited DBAMainForm: TDBAMainForm
     Images = TreeViewImages
     HasChildField = 'HASCHILD'
     ImageIndexField = 'ITEMTYPE'
+    SelectedIndexField = 'ITEMTYPE'
     KeyField = 'ID'
     ParentField = 'PARENT'
+    PopupMenu = PopupMenu1
     TabOrder = 4
-    OnAddition = IBTreeView1Addition
-    OnEditingEnd = IBTreeView1EditingEnd
-    OnSelectionChanged = IBTreeView1SelectionChanged
+    OnAddition = RegisteredObjectsTreeAddition
+    OnCreateNodeClass = RegisteredObjectsTreeCreateNodeClass
+    OnEditingEnd = RegisteredObjectsTreeEditingEnd
+    OnSelectionChanged = RegisteredObjectsTreeSelectionChanged
   end
   object Splitter6: TSplitter[5]
     Left = 152
@@ -374,5 +426,39 @@ inherited DBAMainForm: TDBAMainForm
     DataSet = ServersAndDatabases
     left = 32
     top = 208
+  end
+  object ActionList2: TActionList[38]
+    left = 80
+    top = 256
+    object AddServer: TAction
+      Caption = 'Register Server'
+      OnExecute = AddServerExecute
+      OnUpdate = AddServerUpdate
+    end
+    object AddDatabase: TAction
+      Caption = 'Register Existing Database'
+      OnExecute = AddDatabaseExecute
+      OnUpdate = AddDatabaseUpdate
+    end
+    object CreateDatabase: TAction
+      Caption = 'Create New Database'
+      OnUpdate = AddDatabaseUpdate
+    end
+  end
+  object PopupMenu1: TPopupMenu[39]
+    left = 79
+    top = 301
+    object MenuItem22: TMenuItem
+      Action = AddServer
+    end
+    object MenuItem23: TMenuItem
+      Action = AddDatabase
+    end
+    object MenuItem25: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem24: TMenuItem
+      Action = CreateDatabase
+    end
   end
 end

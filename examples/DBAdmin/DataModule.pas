@@ -28,9 +28,9 @@ uses
 
 type
 
-  { TDatabaseData }
+  { TDBDataModule }
 
-  TDatabaseData = class(TDataModule)
+  TDBDataModule = class(TDataModule)
     AccessRightsCHILDCOUNT: TIBLargeIntField;
     AccessRightsDisplayName: TStringField;
     AccessRightsID: TIBStringField;
@@ -270,7 +270,7 @@ type
   end;
 
 var
-  DatabaseData: TDatabaseData;
+  DBDataModule: TDBDataModule;
 
 implementation
 
@@ -289,9 +289,9 @@ const
 resourcestring
   sPreserveShadowFiles = 'Preserve Shadow Set Files after drop?';
 
-{ TDatabaseData }
+{ TDBDataModule }
 
-procedure TDatabaseData.UpdateCharSetApplyUpdates(Sender: TObject;
+procedure TDBDataModule.UpdateCharSetApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 begin
   if UpdateKind = ukModify then
@@ -302,7 +302,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.UpdateUserRolesApplyUpdates(Sender: TObject;
+procedure TDBDataModule.UpdateUserRolesApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 
   procedure Grant(Params: ISQLParams);
@@ -327,7 +327,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.UpdateUsersApplyUpdates(Sender: TObject;
+procedure TDBDataModule.UpdateUsersApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 
 var UserName: string;
@@ -437,7 +437,7 @@ begin
   end
 end;
 
-procedure TDatabaseData.UserListAfterInsert(DataSet: TDataSet);
+procedure TDBDataModule.UserListAfterInsert(DataSet: TDataSet);
 begin
   DataSet.FieldByName('SEC$ADMIN').AsBoolean := false;
   DataSet.FieldByName('SEC$ACTIVE').AsBoolean := false;
@@ -450,35 +450,35 @@ begin
   UserTags.Active := false; {ditto}
 end;
 
-procedure TDatabaseData.UserListAfterOpen(DataSet: TDataSet);
+procedure TDBDataModule.UserListAfterOpen(DataSet: TDataSet);
 begin
   UserListSource.DataSet := UserList;
   RoleNameList.Active := true;
   UserTags.Active := true;
 end;
 
-procedure TDatabaseData.UserListAfterPost(DataSet: TDataSet);
+procedure TDBDataModule.UserListAfterPost(DataSet: TDataSet);
 begin
   CurrentTransaction.Commit;
 end;
 
-procedure TDatabaseData.UserListAfterScroll(DataSet: TDataSet);
+procedure TDBDataModule.UserListAfterScroll(DataSet: TDataSet);
 begin
   UserList.FieldByName('SEC$PLUGIN').ReadOnly := UserList.State <> dsInsert;
 end;
 
-procedure TDatabaseData.UserListBeforeClose(DataSet: TDataSet);
+procedure TDBDataModule.UserListBeforeClose(DataSet: TDataSet);
 begin
   RoleNameList.Active := false;
   UserTags.Active := false;
 end;
 
-procedure TDatabaseData.UserTagsAfterInsert(DataSet: TDataSet);
+procedure TDBDataModule.UserTagsAfterInsert(DataSet: TDataSet);
 begin
   DataSet.FieldByName('SEC$USER_NAME').AsString := DataSet.DataSource.DataSet.FieldByName('SEC$USER_NAME').AsString;
 end;
 
-procedure TDatabaseData.ConnectServicesAPI;
+procedure TDBDataModule.ConnectServicesAPI;
 begin
   if IBXServicesConnection1.Connected then Exit;
   try
@@ -493,13 +493,13 @@ begin
   end;
 end;
 
-function TDatabaseData.CallLoginDlg(var aDatabaseName, aUserName,
+function TDBDataModule.CallLoginDlg(var aDatabaseName, aUserName,
   aPassword: string; var aCreateIfNotExist: boolean): TModalResult;
 begin
   Result := DBLoginDlg.ShowModal(aDatabaseName, aUserName, aPassword, aCreateIfNotExist);
 end;
 
-procedure TDatabaseData.GetDBFlags;
+procedure TDBDataModule.GetDBFlags;
 var Lines: TStringList;
     i: integer;
     line: string;
@@ -533,7 +533,7 @@ begin
   end;
 end;
 
-function TDatabaseData.GetDBOwner: string;
+function TDBDataModule.GetDBOwner: string;
 var DBOField: TField;
 begin
   DBOField := DatabaseQuery.FindField('MON$OWNER');
@@ -543,7 +543,7 @@ begin
     Result := 'n/a';
 end;
 
-function TDatabaseData.GetAutoAdmin: boolean;
+function TDBDataModule.GetAutoAdmin: boolean;
 begin
   Result := false;
   if not CurrentTransaction.Active then Exit;
@@ -555,7 +555,7 @@ begin
   end;
 end;
 
-function TDatabaseData.GetDatabaseName: string;
+function TDBDataModule.GetDatabaseName: string;
 begin
   if DatabaseQuery.Active and not DatabaseQuery.FieldByName('MON$DATABASE_NAME').IsNull then
     Result := DatabaseQuery.FieldByName('MON$DATABASE_NAME').AsString
@@ -563,37 +563,37 @@ begin
     Result := FDatabasePathName;
 end;
 
-function TDatabaseData.GetDBReadOnly: boolean;
+function TDBDataModule.GetDBReadOnly: boolean;
 begin
   Result := DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$READ_ONLY').AsInteger  <> 0);
 end;
 
-function TDatabaseData.GetDBSQLDialect: integer;
+function TDBDataModule.GetDBSQLDialect: integer;
 begin
   Result := IBDatabaseInfo.DBSQLDialect;
 end;
 
-function TDatabaseData.GetDBUserName: string;
+function TDBDataModule.GetDBUserName: string;
 begin
   Result := Trim(AttmtQuery.FieldByName('MON$USER').AsString);
 end;
 
-function TDatabaseData.GetDescription: string;
+function TDBDataModule.GetDescription: string;
 begin
   Result :=  DatabaseQuery.FieldByName('RDB$DESCRIPTION').AsString;
 end;
 
-function TDatabaseData.GetEmbeddedMode: boolean;
+function TDBDataModule.GetEmbeddedMode: boolean;
 begin
   Result := AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull;
 end;
 
-function TDatabaseData.GetForcedWrites: boolean;
+function TDBDataModule.GetForcedWrites: boolean;
 begin
   Result := DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$FORCED_WRITES').AsInteger  <> 0);
 end;
 
-procedure TDatabaseData.SetLingerDelay(AValue: string);
+procedure TDBDataModule.SetLingerDelay(AValue: string);
 begin
   if (StrToInt(AValue) =  DatabaseQuery.FieldByName('RDB$LINGER').AsInteger) then Exit;
 
@@ -618,7 +618,7 @@ begin
 end;
 
 
-function TDatabaseData.GetAuthMethod: string;
+function TDBDataModule.GetAuthMethod: string;
 var AuthMeth: TField;
 begin
   AuthMeth := AttmtQuery.FindField('MON$AUTH_METHOD');
@@ -628,12 +628,12 @@ begin
     Result := AuthMeth.AsString;
 end;
 
-procedure TDatabaseData.SetNoReserve(AValue: boolean);
+procedure TDBDataModule.SetNoReserve(AValue: boolean);
 begin
   IBConfigService1.SetReserveSpace(AValue);
 end;
 
-procedure TDatabaseData.SetPageBuffers(AValue: integer);
+procedure TDBDataModule.SetPageBuffers(AValue: integer);
 begin
   IBDatabase1.Connected := false;
   try
@@ -643,7 +643,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.SetSweepInterval(AValue: integer);
+procedure TDBDataModule.SetSweepInterval(AValue: integer);
 begin
   IBDatabase1.Connected := false;
   try
@@ -653,7 +653,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.ReloadData(Data: PtrInt);
+procedure TDBDataModule.ReloadData(Data: PtrInt);
 begin
   if csDestroying in ComponentState then Exit;
   CurrentTransaction.Active := true;
@@ -665,13 +665,13 @@ begin
     AfterDataReload(self);
 end;
 
-destructor TDatabaseData.Destroy;
+destructor TDBDataModule.Destroy;
 begin
   Application.RemoveAsyncCalls(self);
   inherited Destroy;
 end;
 
-procedure TDatabaseData.Connect;
+procedure TDBDataModule.Connect;
 
   procedure ReportException(E: Exception);
   begin
@@ -737,7 +737,7 @@ begin
     AfterDBConnect(self);
 end;
 
-procedure TDatabaseData.Disconnect;
+procedure TDBDataModule.Disconnect;
 begin
   FDBUserName := '';
   FDBPassword := '';
@@ -747,18 +747,18 @@ begin
   FDBHeaderScanned := false;
 end;
 
-procedure TDatabaseData.DropDatabase;
+procedure TDBDataModule.DropDatabase;
 begin
   IBDatabase1.DropDatabase;
   Disconnect;
 end;
 
-procedure TDatabaseData.BackupDatabase;
+procedure TDBDataModule.BackupDatabase;
 begin
   BackupDlg.ShowModal;
 end;
 
-procedure TDatabaseData.RestoreDatabase;
+procedure TDBDataModule.RestoreDatabase;
 var DefaultPageSize: integer;
     DefaultNumBuffers: integer;
 begin
@@ -772,7 +772,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.BringDatabaseOnline;
+procedure TDBDataModule.BringDatabaseOnline;
 begin
   if IsDatabaseOnline then
     MessageDlg('Database is already online!',mtInformation,[mbOK],0)
@@ -791,7 +791,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.ShutDown(aShutDownmode: TDBShutdownMode; aDelay: integer
+procedure TDBDataModule.ShutDown(aShutDownmode: TDBShutdownMode; aDelay: integer
   );
 begin
   IBDatabase1.Connected := false;
@@ -802,7 +802,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.DatabaseRepair(Options: TValidateOptions; ReportLines: TStrings);
+procedure TDBDataModule.DatabaseRepair(Options: TValidateOptions; ReportLines: TStrings);
 
   procedure ReportOptions;
   var Line: string;
@@ -833,7 +833,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.OnlineValidation(ReportLines: TStrings;
+procedure TDBDataModule.OnlineValidation(ReportLines: TStrings;
   SelectedTablesOnly: boolean);
 var TableNames: string;
     Separator: string;
@@ -876,7 +876,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.LimboResolution(ActionID: TTransactionGlobalAction;
+procedure TDBDataModule.LimboResolution(ActionID: TTransactionGlobalAction;
   Report: TStrings);
 begin
   if not InLimboList.Active then
@@ -891,7 +891,7 @@ begin
   CurrentTransaction.Commit;
 end;
 
-function TDatabaseData.GetLingerDelay: string;
+function TDBDataModule.GetLingerDelay: string;
 var Linger: TField;
 begin
   Result := 'n/a';
@@ -906,22 +906,22 @@ begin
   end;
 end;
 
-function TDatabaseData.GetNoReserve: boolean;
+function TDBDataModule.GetNoReserve: boolean;
 begin
   Result :=  DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$RESERVE_SPACE').AsInteger <> 0);
 end;
 
-function TDatabaseData.GetPageBuffers: integer;
+function TDBDataModule.GetPageBuffers: integer;
 begin
   Result := IBDatabaseInfo.NumBuffers;
 end;
 
-function TDatabaseData.GetRoleName: string;
+function TDBDataModule.GetRoleName: string;
 begin
   Result := Trim(AttmtQuery.FieldByName('MON$ROLE').AsString);
 end;
 
-function TDatabaseData.GetSecurityDatabase: string;
+function TDBDataModule.GetSecurityDatabase: string;
 var SecPlugin: TField;
 begin
   SecPlugin := DatabaseQuery.FindField('MON$SEC_DATABASE');
@@ -931,12 +931,12 @@ begin
     Result := Trim(SecPlugin.AsString);
 end;
 
-function TDatabaseData.GetServerName: string;
+function TDBDataModule.GetServerName: string;
 begin
   Result := IBXServicesConnection1.ServerName;
 end;
 
-function TDatabaseData.GetSweepInterval: integer;
+function TDBDataModule.GetSweepInterval: integer;
 begin
   if DatabaseQuery.Active then
     Result :=  DatabaseQuery.FieldByName('MON$SWEEP_INTERVAL').AsInteger
@@ -944,7 +944,7 @@ begin
     Result := 0;
 end;
 
-function TDatabaseData.GetUserAdminPrivilege: boolean;
+function TDBDataModule.GetUserAdminPrivilege: boolean;
 begin
   Result := false;
   {For ODS 12 use SEC$USERS table}
@@ -969,13 +969,13 @@ begin
   end;
 end;
 
-procedure TDatabaseData.SetAutoAdmin(AValue: boolean);
+procedure TDBDataModule.SetAutoAdmin(AValue: boolean);
 begin
   IBSecurityService1.SetAutoAdmin(AValue);
   CurrentTransaction.Commit;
 end;
 
-procedure TDatabaseData.SetDBReadOnly(AValue: boolean);
+procedure TDBDataModule.SetDBReadOnly(AValue: boolean);
 begin
   IBDatabase1.Connected := false;
   try
@@ -985,7 +985,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.SetDBSQLDialect(AValue: integer);
+procedure TDBDataModule.SetDBSQLDialect(AValue: integer);
 begin
   IBDatabase1.Connected := false;
   try
@@ -995,7 +995,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.SetDescription(AValue: string);
+procedure TDBDataModule.SetDescription(AValue: string);
 begin
   with TIBSQL.Create(IBDatabase1) do
   try
@@ -1008,30 +1008,30 @@ begin
   CurrentTransaction.Commit;
 end;
 
-procedure TDatabaseData.SetForcedWrites(AValue: boolean);
+procedure TDBDataModule.SetForcedWrites(AValue: boolean);
 begin
   IBConfigService1.SetAsyncMode(not AValue);
 end;
 
-function TDatabaseData.IsDatabaseOnline: boolean;
+function TDBDataModule.IsDatabaseOnline: boolean;
 begin
   Result := DatabaseQuery.Active and (DatabaseQuery.FieldByName('MON$SHUTDOWN_MODE').AsInteger = 0);
 end;
 
-function TDatabaseData.IsShadowDatabase: boolean;
+function TDBDataModule.IsShadowDatabase: boolean;
 begin
   GetDBFlags;
   Result := FIsShadowDatabase;
 end;
 
-procedure TDatabaseData.ActivateShadow;
+procedure TDBDataModule.ActivateShadow;
 begin
   IBConfigService1.ActivateShadow;
   MessageDlg('Shadow Database activated. You should now rename the file or change the database alias name to point to the shadow',
     mtInformation,[mbOK],0);
 end;
 
-procedure TDatabaseData.AddSecondaryFile(aFileName: string; StartAt,
+procedure TDBDataModule.AddSecondaryFile(aFileName: string; StartAt,
   FileLength: integer);
 var SQLText: string;
 begin
@@ -1044,7 +1044,7 @@ begin
   CurrentTransaction.Commit;
 end;
 
-procedure TDatabaseData.AddShadowSet;
+procedure TDBDataModule.AddShadowSet;
 var CurrentLocation: TBookmark;
     ShadowSet: integer;
 begin
@@ -1067,7 +1067,7 @@ begin
   CurrentTransaction.Active := true;
 end;
 
-procedure TDatabaseData.RemoveShadowSet(ShadowSet: integer);
+procedure TDBDataModule.RemoveShadowSet(ShadowSet: integer);
 begin
   if IBDatabaseInfo.ODSMajorVersion < 12 then
   begin
@@ -1087,7 +1087,7 @@ begin
   CurrentTransaction.Commit;
 end;
 
-procedure TDatabaseData.LoadPerformanceStatistics(Lines: TStrings);
+procedure TDBDataModule.LoadPerformanceStatistics(Lines: TStrings);
 
   procedure AddPerfStats(Heading: string; stats: TStrings);
   var i: integer;
@@ -1126,7 +1126,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.LoadDatabaseStatistics(OptionID: integer; Lines: TStrings);
+procedure TDBDataModule.LoadDatabaseStatistics(OptionID: integer; Lines: TStrings);
 begin
   if OptionID = 1 then
     LoadPerformanceStatistics(Lines)
@@ -1143,7 +1143,7 @@ begin
   end;
 end;
 
-function TDatabaseData.LoadConfigData(ConfigFileData: TConfigFileData): boolean;
+function TDBDataModule.LoadConfigData(ConfigFileData: TConfigFileData): boolean;
 var i: integer;
     aValue: integer;
 begin
@@ -1197,7 +1197,7 @@ begin
   Result := ConfigDataset.Active and (ConfigDataset.RecordCount > 0);
 end;
 
-procedure TDatabaseData.LoadServerProperties(Lines: TStrings);
+procedure TDBDataModule.LoadServerProperties(Lines: TStrings);
 var i: integer;
 begin
   Lines.Clear;
@@ -1222,7 +1222,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.LoadServerLog(Lines: TStrings);
+procedure TDBDataModule.LoadServerLog(Lines: TStrings);
 begin
   Lines.Clear;
   if IBLogService1.ServicesConnection.ServiceIntf.getProtocol = Local then
@@ -1231,7 +1231,7 @@ begin
     IBLogService1.Execute(Lines);
 end;
 
-procedure TDatabaseData.RevokeAll;
+procedure TDBDataModule.RevokeAll;
 begin
   with SubjectAccessRights do
   if Active then
@@ -1265,7 +1265,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.SyncSubjectAccessRights(ID: string);
+procedure TDBDataModule.SyncSubjectAccessRights(ID: string);
 begin
   if (FSubjectAccessRightsID = ID) and SubjectAccessRights.Active then Exit;
   SubjectAccessRights.Active := false;
@@ -1273,7 +1273,7 @@ begin
   SubjectAccessRights.Active := true;
 end;
 
-procedure TDatabaseData.IBDatabase1Login(Database: TIBDatabase;
+procedure TDBDataModule.IBDatabase1Login(Database: TIBDatabase;
   LoginParams: TStrings);
 var aDatabaseName: string;
     aUserName: string;
@@ -1306,7 +1306,7 @@ begin
     IBError(ibxeOperationCancelled, [nil]);
 end;
 
-procedure TDatabaseData.AttUpdateApplyUpdates(Sender: TObject;
+procedure TDBDataModule.AttUpdateApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 begin
   if UpdateKind = ukDelete then
@@ -1317,43 +1317,43 @@ begin
   end;
 end;
 
-procedure TDatabaseData.DBTablesUpdateApplyUpdates(Sender: TObject;
+procedure TDBDataModule.DBTablesUpdateApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 begin
   // Do nothing
 end;
 
-procedure TDatabaseData.IBValidationService1GetNextLine(Sender: TObject;
+procedure TDBDataModule.IBValidationService1GetNextLine(Sender: TObject;
   var Line: string);
 begin
   Application.ProcessMessages;
 end;
 
-procedure TDatabaseData.IBXServicesConnection1Login(
+procedure TDBDataModule.IBXServicesConnection1Login(
   Service: TIBXServicesConnection; var aServerName: string; LoginParams: TStrings);
 begin
   LoginParams.Values['user_name'] := FDBUserName;
   LoginParams.Values['password'] := FDBPassword;
 end;
 
-procedure TDatabaseData.LegacyUserListAfterOpen(DataSet: TDataSet);
+procedure TDBDataModule.LegacyUserListAfterOpen(DataSet: TDataSet);
 begin
   UserListSource.DataSet := LegacyUserList;
   CurrentTransaction.Active := true;
   RoleNameList.Active := true;
 end;
 
-procedure TDatabaseData.LegacyUserListAfterPost(DataSet: TDataSet);
+procedure TDBDataModule.LegacyUserListAfterPost(DataSet: TDataSet);
 begin
   RoleNameList.Active := true;
 end;
 
-procedure TDatabaseData.LegacyUserListBeforeClose(DataSet: TDataSet);
+procedure TDBDataModule.LegacyUserListBeforeClose(DataSet: TDataSet);
 begin
   RoleNameList.Active := false;
 end;
 
-procedure TDatabaseData.ShadowFilesCalcFields(DataSet: TDataSet);
+procedure TDBDataModule.ShadowFilesCalcFields(DataSet: TDataSet);
 var Flags: integer;
 begin
   Flags := DataSet.FieldByName('RDB$FILE_FLAGS').AsInteger;
@@ -1372,12 +1372,12 @@ begin
     DataSet.FieldByName('FileMode').AsString := ''
 end;
 
-procedure TDatabaseData.SubjectAccessRightsBeforeOpen(DataSet: TDataSet);
+procedure TDBDataModule.SubjectAccessRightsBeforeOpen(DataSet: TDataSet);
 begin
   SubjectAccessRights.ParamByName('ID').AsString := FSubjectAccessRightsID;
 end;
 
-procedure TDatabaseData.TagsUpdateApplyUpdates(Sender: TObject;
+procedure TDBDataModule.TagsUpdateApplyUpdates(Sender: TObject;
   UpdateKind: TUpdateKind; Params: ISQLParams);
 var sql: string;
 begin
@@ -1402,7 +1402,7 @@ begin
   ExecDDL.ExecQuery;
 end;
 
-procedure TDatabaseData.IBDatabase1AfterConnect(Sender: TObject);
+procedure TDBDataModule.IBDatabase1AfterConnect(Sender: TObject);
 begin
   {Virtual tables did not exist prior to Firebird 2.1 - so don't bother with old version}
   with IBDatabaseInfo do
@@ -1441,22 +1441,22 @@ begin
   ReloadData;
 end;
 
-procedure TDatabaseData.IBDatabase1AfterDisconnect(Sender: TObject);
+procedure TDBDataModule.IBDatabase1AfterDisconnect(Sender: TObject);
 begin
   FDisconnecting := false;
 end;
 
-procedure TDatabaseData.IBDatabase1BeforeDisconnect(Sender: TObject);
+procedure TDBDataModule.IBDatabase1BeforeDisconnect(Sender: TObject);
 begin
   FDisconnecting := true;
 end;
 
-procedure TDatabaseData.DatabaseQueryAfterOpen(DataSet: TDataSet);
+procedure TDBDataModule.DatabaseQueryAfterOpen(DataSet: TDataSet);
 begin
   DBCharSet.Active := true;
 end;
 
-procedure TDatabaseData.CurrentTransactionAfterTransactionEnd(Sender: TObject);
+procedure TDBDataModule.CurrentTransactionAfterTransactionEnd(Sender: TObject);
 begin
   if not Disconnecting and not (csDestroying in ComponentState) then
   begin
@@ -1465,7 +1465,7 @@ begin
   end;
 end;
 
-procedure TDatabaseData.ApplicationProperties1Exception(Sender: TObject;
+procedure TDBDataModule.ApplicationProperties1Exception(Sender: TObject;
   E: Exception);
 begin
   if E is EIBInterBaseError then
@@ -1480,7 +1480,7 @@ begin
     CurrentTransaction.Rollback;
 end;
 
-procedure TDatabaseData.AccessRightsCalcFields(DataSet: TDataSet);
+procedure TDBDataModule.AccessRightsCalcFields(DataSet: TDataSet);
 begin
   AccessRightsDisplayName.AsString := AccessRightsSUBJECT_NAME.AsString;
   if AccessRightsSUBJECT_TYPE.AsInteger = 8 then
@@ -1498,38 +1498,38 @@ begin
     AccessRightsImageIndex.AsInteger := -1;
 end;
 
-procedure TDatabaseData.AttachmentsAfterDelete(DataSet: TDataSet);
+procedure TDBDataModule.AttachmentsAfterDelete(DataSet: TDataSet);
 begin
   CurrentTransaction.Commit;
 end;
 
-procedure TDatabaseData.AttachmentsAfterOpen(DataSet: TDataSet);
+procedure TDBDataModule.AttachmentsAfterOpen(DataSet: TDataSet);
 begin
   Attachments.Locate('MON$ATTACHMENT_ID',AttmtQuery.FieldByName('MON$ATTACHMENT_ID').AsInteger,[]);
 end;
 
-procedure TDatabaseData.AttachmentsBeforeOpen(DataSet: TDataSet);
+procedure TDBDataModule.AttachmentsBeforeOpen(DataSet: TDataSet);
 begin
   if IBDatabaseInfo.ODSMajorVersion >= 12 then
     (DataSet as TIBQuery).Parser.Add2WhereClause('r.MON$SYSTEM_FLAG = 0');
 end;
 
-procedure TDatabaseData.ConfigDatasetAfterClose(DataSet: TDataSet);
+procedure TDBDataModule.ConfigDatasetAfterClose(DataSet: TDataSet);
 begin
   ConfigDataset.Clear(false);
 end;
 
-procedure TDatabaseData.DatabaseQueryBeforeClose(DataSet: TDataSet);
+procedure TDBDataModule.DatabaseQueryBeforeClose(DataSet: TDataSet);
 begin
   DBCharSet.Active := false;
 end;
 
-procedure TDatabaseData.DBCharSetAfterClose(DataSet: TDataSet);
+procedure TDBDataModule.DBCharSetAfterClose(DataSet: TDataSet);
 begin
   CharSetLookup.Active := false;
 end;
 
-procedure TDatabaseData.DBCharSetBeforeOpen(DataSet: TDataSet);
+procedure TDBDataModule.DBCharSetBeforeOpen(DataSet: TDataSet);
 begin
   CharSetLookup.Active := true;
 end;

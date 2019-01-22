@@ -16,13 +16,17 @@ type
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
-    Edit1: TEdit;
+    DomainName: TEdit;
+    DefaultUserName: TEdit;
+    Label2: TLabel;
+    Label3: TLabel;
+    ServerName: TEdit;
     Label1: TLabel;
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
   private
 
   public
-    function ShowModal(var aServerName: string): TModalResult;
   end;
 
 var
@@ -36,15 +40,17 @@ implementation
 
 procedure TRegisterServerDlg.FormShow(Sender: TObject);
 begin
-  Edit1.SetFocus;
+  ServerName.Text := 'My Server';
+  DomainName.Text := '';
+  DefaultUserName.Text := '';
+  ServerName.SetFocus;
 end;
 
-function TRegisterServerDlg.ShowModal(var aServerName: string): TModalResult;
+procedure TRegisterServerDlg.FormClose(Sender: TObject;
+  var CloseAction: TCloseAction);
 begin
-  Edit1.Text := aServerName;
-  Result := inherited ShowModal;
-  if Result = mrOK then
-    aServerName := Edit1.text;
+  if DomainName.Text = '' then
+    raise Exception.Create('A Domain Name must be provided');
 end;
 
 end.

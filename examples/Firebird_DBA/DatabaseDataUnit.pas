@@ -5,7 +5,7 @@ unit DatabaseDataUnit;
 interface
 
 uses
-  Classes, SysUtils, Forms, IB, ServerDataUnit;
+  Classes, SysUtils, Forms, IB, ServerDataUnit, RegisterExistingDBDlgUnit;
 
 type
   TDatabaseDataList = class;
@@ -23,6 +23,9 @@ type
       sqlUpdateName = 'Update Databases Set DatabaseName = ? Where DatabaseID = ?';
       sqlUpdateUser = 'Update Databases Set DefaultUserName = ? Where DatabaseID = ?';
   private
+    FAppID: integer;
+    FCreateIfNotExists: boolean;
+    FDBControlTable: string;
     FOwner: TDatabaseDataList;
     FAttachment: IAttachment;
     FDatabaseID: integer;
@@ -30,6 +33,9 @@ type
     FDatabasePath: string;
     FDefaultUserName: string;
     FServerData: TServerData;
+    FShutDownProc: string;
+    FTitle: string;
+    procedure SetAppID(AValue: integer);
     procedure SetDatabaseName(AValue: string);
     procedure SetDatabasePath(AValue: string);
     procedure SetDefaultUserName(AValue: string);
@@ -44,11 +50,14 @@ type
     property DatabaseName: string read FDatabaseName write SetDatabaseName;
     property DefaultUserName: string read FDefaultUserName write SetDefaultUserName;
     property Attachment: IAttachment read FAttachment write FAttachment;
+    property CreateIfNotExists: boolean read FCreateIfNotExists write FCreateIfNotExists;
+    property AppID: integer read FAppID write SetAppID;
+    property Title: string read FTitle;
+    property DBControlTable: string read FDBControlTable;
+    property ShutDownProc: string read FShutDownProc;
     property ServerData: TServerData read FServerData;
     property Owner: TDatabaseDataList read FOwner;
   end;
-
-  { TDatabaseList }
 
   { TDatabaseDataList }
 
@@ -56,19 +65,18 @@ type
   private
     FDatabaseDataList: array of TDatabaseData;
     function FindDatabaseData(aDatabaseID: integer): integer;
-    function GetRemoteDatabase(aDatabaseID: integer): TDatabaseData;
+    function GetDatabaseData(index: integer): TDatabaseData;
   public
     constructor Create;
     destructor Destroy; override;
-    function Add(aDatabaseName: string; aServer: TServerData): TDatabaseData; overload;
-    function Add(aDatabaseID: integer; aServer: TServerData): TDatabaseData; overload;
-    function ByIndex(index: integer): IAttachment;
+    function Add(aDatabaseName: string; aServer: TServerData): integer; overload;
+    function Add(aDatabaseID: integer; aServer: TServerData): integer; overload;
     procedure Clear;
     procedure Refresh;
     procedure Remove(aDatabaseID: integer);
     procedure Select(aDatabaseID: integer);
-    procedure Update(aDatabaseID: integer);
-    property Attachment[aDatabaseID: integer]: IAttachment read GetRemoteDatabase; default;
+    procedure Update(aDatabaseID: integer; dlg: TRegisterExistingDBDlg);
+    property DatabaseData[index: integer] read GetDatabaseData;
   end;
 
 var
@@ -76,7 +84,7 @@ var
 
 implementation
 
-uses DBADataModule;
+uses DBADataModule, LocalDataModule;
 
 { TDatabaseData }
 
@@ -85,6 +93,18 @@ begin
   if FDatabaseName = AValue then Exit;
   FDatabaseName := AValue;
   LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateName,[FDatabaseName,FDatabaseID]);
+end;
+
+procedure TDatabaseData.SetAppID(AValue: integer);
+begin
+  if FAppID = AValue then Exit;
+  FAppID := AValue;
+  if LocalData.AppDatabases.Locate('ID',FAppID,[]) then
+  begin
+    FTitle := LocalData.AppDatabases.FieldByName('Title').AsString;
+    FDBControlTable := LocalData.AppDatabases.FieldByName('DBControlTable').AsString;
+    FShutDownProc := LocalData.AppDatabases.FieldByName('ShutDownProc').AsString;
+  end;
 end;
 
 procedure TDatabaseData.SetDatabasePath(AValue: string);
@@ -104,7 +124,7 @@ end;
 constructor TDatabaseData.Create(aOwner: TDatabaseDataList;
   aDatabaseName: string; aServer: TServerData);
 begin
-  inherited;
+  inherited Create;
   FOwner := aOwner;
   FDatabaseName := aDatabaseName;
   FServerData := aServer;
@@ -135,8 +155,8 @@ begin
     DefaultUserName := ByName('DefaultUserName').AsString;
     aServerID := ByName('Server').AsInteger;
     if aServerID <> ServerData.ServerID then
-      ServerData := ServerDataList.ServerData[aServerID];
-    if ServerData = nil then
+      FServerData := ServerDataList.ServerData[aServerID];
+    if FServerData = nil then
       raise Exception.CreateFmt('Unknown Server for DatabaseName = %s',[DatabaseName]);
   end;
 end;
@@ -160,20 +180,6 @@ begin
     end;
 end;
 
-function TDatabaseDataList.GetRemoteDatabase(aDatabaseID: integer
-  ): TDatabaseData;
-var index: integer;
-begin
-  index := FindDatabaseData(aDatabaseID);
-  if index <> -1 then
-  begin
-    Result := FDatabaseDataList[index];
-    Result.Connect;
-  end
-  else
-    Result := nil;
-end;
-
 constructor TDatabaseDataList.Create;
 begin
   inherited Create;
@@ -186,29 +192,21 @@ begin
   inherited Destroy;
 end;
 
-function TDatabaseDataList.Add(aDatabaseName: string; aServer: TServerData): TDatabaseData;
-var index: integer;
+function TDatabaseDataList.Add(aDatabaseName: string; aServer: TServerData): integer;
 begin
   SetLength(FDatabaseDataList,Length(FDatabaseDataList)+1);
-  index := Length(FDatabaseDataList)-1;
-  FDatabaseDataList[index] := TDatabaseData.Create(self,aDatabaseName,aServer);
-  Result := FDatabaseDataList[index];
+  Result := Length(FDatabaseDataList)-1;
+  FDatabaseDataList[Result] := TDatabaseData.Create(self,aDatabaseName,aServer);
 end;
 
-function TDatabaseDataList.Add(aDatabaseID: integer; aServer: TServerData): TDatabaseData;
-var index: integer;
+function TDatabaseDataList.Add(aDatabaseID: integer; aServer: TServerData): integer;
 begin
-  index := FindDatabaseData(aDatabaseID);
-  if index = -1 then
-  begin
-    SetLength(FDatabaseDataList,Length(FDatabaseDataList)+1);
-    index := Length(FDatabaseDataList)-1;
-    FDatabaseDataList[index] := TDatabaseData.Create(self,aDatabaseIO,aServer);
-  end;
-  Result := FDatabaseDataList[index];
+  SetLength(FDatabaseDataList,Length(FDatabaseDataList)+1);
+  Result := Length(FDatabaseDataList)-1;
+  FDatabaseDataList[Result] := TDatabaseData.Create(self,aDatabaseID,aServer);
 end;
 
-function TDatabaseDataList.ByIndex(index: integer): IAttachment;
+function TDatabaseDataList.GetDatabaseData(index: integer): TDatabaseData;
 begin
   if (index < 0) or (index >= Length(FDatabaseDataList)) then
     raise Exception.CreateFmt('Database Index (%d) out of range',[index]);
@@ -227,7 +225,7 @@ procedure TDatabaseDataList.Refresh;
 var i: integer;
 begin
   Clear;
-
+  LoadDatabaseList;
 end;
 
 procedure TDatabaseDataList.Remove(aDatabaseID: integer);
@@ -251,14 +249,27 @@ begin
   end;
 end;
 
-procedure TDatabaseDataList.Update(aDatabaseID: integer);
+procedure TDatabaseDataList.Update(aDatabaseID: integer;
+  dlg: TRegisterExistingDBDlg);
 var index: integer;
 begin
   index := FindDatabaseData(aDatabaseID);
   if index <> -1 then
     FDatabaseDataList[index].Refresh
   else
-    Add(aDatabaseID);
+    index := Add(aDatabaseID);
+  if dlg <> nil then
+  with FDatabaseDataList[index] do
+  begin
+    DatabaseName := dlg.DatabaseName;
+    DatabasePath := dlg.DatabasePath;
+    DefaultUserName := dlg.DefaultUserName;
+    if dlg is TCreateNewDBDlg then
+    begin
+      CreateIfNotExists := true;
+      AppID := TCreateNewDBDlg(dlg).AppDBLookup.KeyValue;
+    end;
+  end;
 end;
 
 initialization

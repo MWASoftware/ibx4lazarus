@@ -1,7 +1,7 @@
 inherited CreateNewDBDlg: TCreateNewDBDlg
-  Left = 2298
+  Left = 2302
   Height = 308
-  Top = 404
+  Top = 300
   Caption = 'Create New Database'
   ClientHeight = 308
   OnClose = FormClose
@@ -11,8 +11,8 @@ inherited CreateNewDBDlg: TCreateNewDBDlg
   inherited Label4: TLabel
     Top = 248
   end
-  inherited Edit4: TEdit
-    Top = 263
+  inherited DefaultUserName: TEdit
+    Top = 264
   end
   object Label5: TLabel[11]
     Left = 22
@@ -38,6 +38,7 @@ inherited CreateNewDBDlg: TCreateNewDBDlg
     ItemHeight = 0
   end
   object AppDBSource: TDataSource[13]
+    DataSet = LocalData.AppDatabases
     left = 358
     top = 111
   end

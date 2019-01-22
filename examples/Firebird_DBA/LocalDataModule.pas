@@ -110,7 +110,7 @@ implementation
 
 {$R *.lfm}
 
-uses ServerDataList, DatabaseDataList;
+uses ServerDataUnit, DatabaseDataUnit;
 
 { EDBVersionProblem }
 

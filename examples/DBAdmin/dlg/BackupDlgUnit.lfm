@@ -222,7 +222,7 @@ object BackupDlg: TBackupDlg
     top = 120
   end
   object IBXClientSideBackupService1: TIBXClientSideBackupService
-    ServicesConnection = DatabaseData.IBXServicesConnection1
+    ServicesConnection = DBDataModule.IBXServicesConnection1
     TraceFlags = []
     BlockingFactor = 0
     Options = []
@@ -230,7 +230,7 @@ object BackupDlg: TBackupDlg
     top = 216
   end
   object IBXServerSideBackupService1: TIBXServerSideBackupService
-    ServicesConnection = DatabaseData.IBXServicesConnection1
+    ServicesConnection = DBDataModule.IBXServicesConnection1
     TraceFlags = []
     BlockingFactor = 0
     Options = []

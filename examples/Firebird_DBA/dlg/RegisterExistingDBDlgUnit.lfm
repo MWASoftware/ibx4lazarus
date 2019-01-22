@@ -1,7 +1,7 @@
 object RegisterExistingDBDlg: TRegisterExistingDBDlg
-  Left = 1844
+  Left = 1005
   Height = 254
-  Top = 280
+  Top = 405
   Width = 420
   BorderStyle = bsDialog
   Caption = 'Register Existing Database'
@@ -9,7 +9,7 @@ object RegisterExistingDBDlg: TRegisterExistingDBDlg
   ClientWidth = 420
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.0.5'
+  LCLVersion = '2.0.0.3'
   object Bevel1: TBevel
     Left = 10
     Height = 230
@@ -44,14 +44,14 @@ object RegisterExistingDBDlg: TRegisterExistingDBDlg
     ModalResult = 2
     TabOrder = 1
   end
-  object Edit1: TEdit
+  object ServerName: TEdit
     Left = 22
     Height = 24
     Top = 38
     Width = 178
     ReadOnly = True
     TabOrder = 2
-    Text = 'Edit1'
+    Text = 'ServerName'
   end
   object Label2: TLabel
     Left = 22
@@ -61,13 +61,13 @@ object RegisterExistingDBDlg: TRegisterExistingDBDlg
     Caption = 'Database Name'
     ParentColor = False
   end
-  object Edit2: TEdit
+  object DatabaseName: TEdit
     Left = 22
     Height = 24
     Top = 94
     Width = 178
     TabOrder = 3
-    Text = 'Edit2'
+    Text = 'DatabaseName'
   end
   object Label3: TLabel
     Left = 22
@@ -77,13 +77,13 @@ object RegisterExistingDBDlg: TRegisterExistingDBDlg
     Caption = 'Database Path'
     ParentColor = False
   end
-  object Edit3: TEdit
+  object DatabasePath: TEdit
     Left = 22
     Height = 24
     Top = 151
     Width = 298
     TabOrder = 4
-    Text = 'Edit3'
+    Text = 'DatabasePath'
   end
   object Label4: TLabel
     Left = 22
@@ -93,12 +93,12 @@ object RegisterExistingDBDlg: TRegisterExistingDBDlg
     Caption = 'Default User Name'
     ParentColor = False
   end
-  object Edit4: TEdit
+  object DefaultUserName: TEdit
     Left = 22
     Height = 24
     Top = 207
     Width = 176
     TabOrder = 5
-    Text = 'Edit4'
+    Text = 'DefaultUserName'
   end
 end

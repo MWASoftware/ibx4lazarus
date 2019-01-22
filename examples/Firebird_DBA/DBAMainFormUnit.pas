@@ -11,11 +11,21 @@ uses
   IBExtract, IBCustomDataSet;
 
 type
+  TDBANodeItemType = (ntRoot,ntServer,ntDatabase);
 
   { TDBAMainForm }
 
   TDBAMainForm = class(TMainForm)
-    IBTreeView1: TIBTreeView;
+    CreateDatabase: TAction;
+    AddDatabase: TAction;
+    AddServer: TAction;
+    ActionList2: TActionList;
+    MenuItem23: TMenuItem;
+    MenuItem24: TMenuItem;
+    MenuItem25: TMenuItem;
+    RegisteredObjectsTree: TIBTreeView;
+    MenuItem22: TMenuItem;
+    PopupMenu1: TPopupMenu;
     ServersAndDatabases: TIBDataSet;
     ServersAndDatabasesHASCHILD: TIntegerField;
     ServersAndDatabasesID: TIntegerField;
@@ -25,12 +35,18 @@ type
     Splitter6: TSplitter;
     TreeSource: TDataSource;
     TreeViewImages: TImageList;
+    procedure AddDatabaseExecute(Sender: TObject);
+    procedure AddDatabaseUpdate(Sender: TObject);
+    procedure AddServerExecute(Sender: TObject);
+    procedure AddServerUpdate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
-    procedure IBTreeView1Addition(Sender: TObject; Node: TTreeNode);
-    procedure IBTreeView1EditingEnd(Sender: TObject; Node: TTreeNode;
+    procedure RegisteredObjectsTreeAddition(Sender: TObject; Node: TTreeNode);
+    procedure RegisteredObjectsTreeCreateNodeClass(Sender: TCustomTreeView;
+      var NodeClass: TTreeNodeClass);
+    procedure RegisteredObjectsTreeEditingEnd(Sender: TObject; Node: TTreeNode;
       Cancel: Boolean);
-    procedure IBTreeView1SelectionChanged(Sender: TObject);
+    procedure RegisteredObjectsTreeSelectionChanged(Sender: TObject);
     procedure ServersAndDatabasesAfterDelete(DataSet: TDataSet);
     procedure ServersAndDatabasesAfterInsert(DataSet: TDataSet);
     procedure ServersAndDatabasesAfterOpen(DataSet: TDataSet);
@@ -39,7 +55,7 @@ type
       var CancelPost: boolean);
   private
     FLocated: boolean;
-    FNewItemType: integer;  {-1 => Server root, 0 => Server, 1 => database}
+    FNewItemType: TDBANodeItemType;
   public
 
   end;
@@ -51,7 +67,19 @@ implementation
 
 {$R *.lfm}
 
-uses DataModule, Variants;
+uses DataModule, Variants, RegisterServerDlgUnit, CreateNewDBDlgUnit, RegisterExistingDBDlgUnit,
+  ServerDataUnit, DatabaseDataUnit;
+
+type
+
+  { TDBATreeNode }
+
+  TDBATreeNode = class(TIBTreeNode)
+  private
+    FItemType: TDBANodeItemType;
+  public
+    property ItemType: TDBANodeItemType read FItemType write FItemType;
+  end;
 
 { TDBAMainForm }
 
@@ -62,41 +90,69 @@ begin
   inherited;
 end;
 
-procedure TDBAMainForm.IBTreeView1Addition(Sender: TObject; Node: TTreeNode);
+procedure TDBAMainForm.RegisteredObjectsTreeAddition(Sender: TObject; Node: TTreeNode);
 begin
-  Node.ImageIndex := ServersAndDatabases.FieldByName('ItemType').AsInteger;
+  TDBANode(Node).ItemType := TDBAItemType(ServersAndDatabases.FieldByName('ItemType').AsInteger);
+  if TObject(Node.Data) is TRegisterServerDlg then
+    ServerDataList.Update(TIBTreeNode(Node).KeyValue,TRegisterServerDlg(Node.Data))
+  else
+  if (TObject(Node.Data) is TRegisterExistingDBDlg then
+    DatabaseDataList.Update(TIBTreeNode(Node).KeyValue,TRegisterExistingDBDlg(Node.Data));
+  Node.Data := nil;
 end;
 
-procedure TDBAMainForm.IBTreeView1EditingEnd(Sender: TObject; Node: TTreeNode;
+procedure TDBAMainForm.RegisteredObjectsTreeCreateNodeClass(
+  Sender: TCustomTreeView; var NodeClass: TTreeNodeClass);
+begin
+  NodeClass := TDBATreeNode;
+end;
+
+procedure TDBAMainForm.RegisteredObjectsTreeEditingEnd(Sender: TObject; Node: TTreeNode;
   Cancel: Boolean);
 begin
   if (Node <> nil) and not VarIsNull(TIBTreeNode(Node).KeyValue) then
-  begin
-    UpdateServerData(TIBTreeNode(Node).KeyValue,Node.Text);
-    UpdateDatabaseData(TIBTreeNode(Node).KeyValue,Node.Text);
-  end;
+    case TDBANode(Node).ItemType of
+    ntServer:
+      ServerDataList.Update(TIBTreeNode(Node).KeyValue,nil);
+    ntDatabase:
+      DatabaseDataList.Update(TIBTreeNode(Node).KeyValue,nil);
+    end;
 end;
 
-procedure TDBAMainForm.IBTreeView1SelectionChanged(Sender: TObject);
+procedure TDBAMainForm.RegisteredObjectsTreeSelectionChanged(Sender: TObject);
+
+ procedure ShowDBTabs(Visible: boolean);
+ var i : integer;
+ begin
+   for i := 0 to PageControl1.PageCount -1  do
+    if PageControl1.Pages[i].Tag = 0 then
+       PageControl1.Pages[i].TabVisible := Visible;
+ end;
+
 begin
   if RegisteredObjectsTree.Selected <> nil then
-  case RegisteredObjectsTree.Selected.ImageIndex of
-  -1:
-    PageControl1.Visible := false;
-  0:
-    with TIBTreeView(RegisteredObjectsTree) do
-    if not VarIsNull(SelectedKeyValue) then
-    begin
-      ServerDataList.ServerData[SelectedKeyValue].Select;
-      PageControl1.Visible := true;
-    end;
+  begin
+    case TDBANode(RegisteredObjectsTree.Selected).ItemType of
+    ntRoot:
+      PageControl1.Visible := false;
 
-  1:
-    with TIBTreeView(RegisteredObjectsTree) do
-    if not VarIsNull(SelectedKeyValue) then
-    begin
-      if DatabaseDataList.DatabaseData[SelectedKeyValue].Select then
-      PageControl1.Visible := true;
+    ntServer:
+      with TIBTreeView(RegisteredObjectsTree) do
+      if not VarIsNull(SelectedKeyValue) then
+      begin
+        ServerDataList.ServerData[SelectedKeyValue].Select;
+        PageControl1.Visible := true;
+        ShowDBTabs(false);
+      end;
+
+    ntDatabase:
+      with TIBTreeView(RegisteredObjectsTree) do
+      if not VarIsNull(SelectedKeyValue) then
+      begin
+        if DatabaseDataList.DatabaseData[SelectedKeyValue].Select then
+        PageControl1.Visible := true;
+        ShowDBTabs(true);
+      end;
     end;
   end;
 end;
@@ -112,13 +168,13 @@ end;
 
 procedure TDBAMainForm.ServersAndDatabasesAfterInsert(DataSet: TDataSet);
 begin
-  ServersAndDatabases.FieldByName('ItemType').AsInteger := FNewItemType;
+  ServersAndDatabases.FieldByName('ItemType').AsInteger := ord(FNewItemType);
 end;
 
 procedure TDBAMainForm.ServersAndDatabasesAfterOpen(DataSet: TDataSet);
 var CurServerDB: string;
 begin
-  if (RegisteredObjectsTree.Selected <> nil) and (RegisteredObjectsTree.Selected.ImageIndex = -1) then
+  if (RegisteredObjectsTree.Selected <> nil) and (TDBANode(RegisteredObjectsTree.Selected).ItemType = ntRoot) then
     RegisteredObjectsTree.Selected.Expand(false);
   CurServerDB := LocalData.UserConfig[rgCurServerDB];
   if not FLocated and (CurServerDB <> '') then
@@ -129,10 +185,6 @@ end;
 procedure TDBAMainForm.ServersAndDatabasesAfterPost(DataSet: TDataSet);
 begin
   ServersAndDatabases.Transaction.CommitRetaining;
-  if Dataset.FieldByName('ItemType').AsInteger = 0 then
-    ServerDataList.Update(Dataset.FieldByName('ID').AsInteger)
-  else
-    DatabaseDataList.Update(Dataset.FieldByName('ID').AsInteger);
 end;
 
 procedure TDBAMainForm.ServersAndDatabasesValidatePost(Sender: TObject;
@@ -148,6 +200,42 @@ procedure TDBAMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction
 begin
   LocalDatabase.Connected := false;
   inherited;
+end;
+
+procedure TDBAMainForm.AddServerUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Visible := (RegisteredObjectsTree.Selected <> nil) and
+     (TDBANode(RegisteredObjectsTree.Selected).ItemType = ntRoot);
+end;
+
+procedure TDBAMainForm.AddServerExecute(Sender: TObject);
+begin
+  if RegisterServerDlg.ShowModal = mrOK then
+  begin
+    FNewItemType := ntServer;
+    RegisteredObjectsTree.Selected.Expand(true);
+    RegisteredObjectsTree.Selected := RegisteredObjectsTree.Items.AddChildObject(RegisteredObjectsTree.Selected,
+                                                                                 RegisterServerDlg.ServerName.Text,
+                                                                                 RegisterServerDlg);
+  end;
+end;
+
+procedure TDBAMainForm.AddDatabaseUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Visible := (RegisteredObjectsTree.Selected <> nil) and
+     (TDBANode(RegisteredObjectsTree.Selected).ItemType = ntServer);
+end;
+
+procedure TDBAMainForm.AddDatabaseExecute(Sender: TObject);
+begin
+  if RegisterExistingDBDlg.ShowModal(RegisteredObjectsTree.Selected.Text) = mrOK then
+  begin
+    FNewItemType := ntDatabase;
+    RegisteredObjectsTree.Selected.Expand(true);
+    RegisteredObjectsTree.Selected := RegisteredObjectsTree.Items.AddChildObject(RegisteredObjectsTree.Selected,
+                                                                                 RegisterExistingDBDlg.DatabaseName.Text,
+                                                                                 RegisterExistingDBDlg);
+  end;
 end;
 
 end.

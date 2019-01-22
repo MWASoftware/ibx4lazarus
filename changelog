@@ -1,3 +1,9 @@
+IBX Change Log  version (2.3-4 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
+
+1. Code tidyup in IBTreeView: Node properties initialisation moved from TIBTreeView.AddNodes
+   to TIBTreeView.Added. An OnAddition event handler is no longer needed to initialise
+   ImageIndex and SelectImageIndex values on AddNode.
+
 IBX Change Log  version (2.3-3 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
 
 1. New property for TIBDatabase and TIBXServicesConnection. This is "ConfigOverrides"

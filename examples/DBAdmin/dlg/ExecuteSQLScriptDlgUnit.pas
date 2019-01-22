@@ -103,8 +103,8 @@ end;
 procedure TExecuteSQLScriptDlg.FormShow(Sender: TObject);
 begin
   PageControl1.ActivePage := SelectTab;
-  ServerName.Text := DatabaseData.ServerName;
-  DBName.Text := DatabaseData.DatabaseName;
+  ServerName.Text := DBDataModule.ServerName;
+  DBName.Text := DBDataModule.DatabaseName;
   SourceFileName.Text := '';
   Report.Lines.Clear;
 end;

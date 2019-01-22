@@ -23,7 +23,7 @@ begin
   Application.CreateForm(TAddSecondaryFileDlg, AddSecondaryFileDlg);
   Application.CreateForm(TAddShadowFileDlg, AddShadowFileDlg);
   Application.CreateForm(TLocalData, LocalData);
-  Application.CreateForm(TDatabaseData, DatabaseData);
+  Application.CreateForm(TDBDataModule, DBDataModule);
   Application.CreateForm(TAddShadowSetDlg, AddShadowSetDlg);
   Application.CreateForm(TBackupDlg, BackupDlg);
   Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);

@@ -1,4 +1,4 @@
-object DatabaseData: TDatabaseData
+object DBDataModule: TDBDataModule
   OldCreateOrder = False
   Height = 552
   HorizontalOffset = 645

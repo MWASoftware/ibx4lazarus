@@ -3404,31 +3404,37 @@ object MainForm: TMainForm
     }
   end
   object CharSetSource: TDataSource
+    DataSet = DBDataModule.CharSetLookup
     left = 552
     top = 240
   end
   object SecDBFilesSource: TDataSource
+    DataSet = DBDataModule.DBSecFiles
     left = 552
     top = 376
   end
   object DBCharSetSource: TDataSource
+    DataSet = DBDataModule.DBCharSet
     left = 552
     top = 304
   end
   object DatabaseSource: TDataSource
+    DataSet = DBDataModule.DatabaseQuery
     left = 560
     top = 448
   end
   object IBDatabaseInfo: TIBDatabaseInfo
-    Database = DatabaseData.IBDatabase1
+    Database = DBDataModule.IBDatabase1
     left = 712
     top = 240
   end
   object AttmtSource: TDataSource
+    DataSet = DBDataModule.AttmtQuery
     left = 416
     top = 448
   end
   object ShadowSource: TDataSource
+    DataSet = DBDataModule.ShadowFiles
     left = 464
     top = 512
   end
@@ -3443,6 +3449,8 @@ object MainForm: TMainForm
     top = 352
   end
   object IBExtract1: TIBExtract
+    Database = DBDataModule.IBDatabase1
+    Transaction = DBDataModule.CurrentTransaction
     ShowSystem = False
     AlwaysQuoteIdentifiers = False
     CaseSensitiveObjectNames = False
@@ -3464,14 +3472,17 @@ object MainForm: TMainForm
     top = 416
   end
   object UserListSource: TDataSource
+    DataSet = DBDataModule.UserList
     left = 416
     top = 360
   end
   object RoleSource: TDataSource
+    DataSet = DBDataModule.RoleNameList
     left = 416
     top = 272
   end
   object UserTagsSource: TDataSource
+    DataSet = DBDataModule.UserTags
     left = 416
     top = 224
   end
@@ -3502,6 +3513,7 @@ object MainForm: TMainForm
     end
   end
   object AttachSource: TDataSource
+    DataSet = DBDataModule.Attachments
     left = 552
     top = 112
   end
@@ -3523,18 +3535,22 @@ object MainForm: TMainForm
     end
   end
   object LimboListSource: TDataSource
+    DataSet = DBDataModule.InLimboList
     left = 552
     top = 176
   end
   object DBTablesSource: TDataSource
+    DataSet = DBDataModule.DBTables
     left = 304
     top = 224
   end
   object AuthMapSource: TDataSource
+    DataSet = DBDataModule.AuthMappings
     left = 303
     top = 286
   end
   object SubjectAccessRightsSource: TDataSource
+    DataSet = DBDataModule.SubjectAccessRights
     OnDataChange = SubjectAccessRightsSourceDataChange
     left = 297
     top = 429
@@ -3547,11 +3563,12 @@ object MainForm: TMainForm
     end
   end
   object AccessRightsSource: TDataSource
+    DataSet = DBDataModule.AccessRights
     left = 288
     top = 360
   end
   object ConfigDataSource: TDataSource
-    DataSet = DatabaseData.ConfigDataset
+    DataSet = DBDataModule.ConfigDataset
     left = 288
     top = 504
   end

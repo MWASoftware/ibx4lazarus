@@ -5,7 +5,7 @@ unit ServerDataUnit;
 interface
 
 uses
-  Classes, SysUtils, IBXServices, IB, Forms, Dialogs, Controls;
+  Classes, SysUtils, IBXServices, IB, Forms, Dialogs, Controls, RegisterServerDlgUnit;
 
 type
   TServerDataList = class;
@@ -62,11 +62,11 @@ type
     destructor Destroy; override;
     procedure LoadServerData;
     procedure Clear;
-    procedure Add(aServerName: string); overload;
-    procedure Add(aServerID: integer); overload;
+    function Add(aServerName: string): integer; overload;
+    function Add(aServerID: integer): integer; overload;
     procedure Refresh;
     procedure Remove(aServerID: integer);
-    procedure Update(aServerID: integer);
+    procedure Update(aServerID: integer; dlg: TRegisterServerDlg);
     property ServerData[ServerID: integer]: TServerData read GetServerData; default;
   end;
 
@@ -143,22 +143,20 @@ begin
   FServerDataLoaded := false;
 end;
 
-procedure TServerDataList.Add(aServerName: string);
-var index: integer;
+function TServerDataList.Add(aServerName: string): integer;
 begin
   SetLength(FServerData,Length(FServerData)+1);
-  index := Length(FServerData)-1;
+  Result := Length(FServerData)-1;
 //    writeln('Add Server ', aServerName, ', index = ', index);
-  FServerData[index] := TServerData.Create(self,aServerName,aServerName,'','');                                                                                               ,11
+  FServerData[Result] := TServerData.Create(self,aServerName,aServerName,'','');                                                                                               ,11
 end;
 
-procedure TServerDataList.Add(aServerID: integer);
-var index: integer;
+function TServerDataList.Add(aServerID: integer): integer;
 begin
   SetLength(FServerData,Length(FServerData)+1);
-  index := Length(FServerData)-1;
+  Result := Length(FServerData)-1;
 //    writeln('Add Server ',aServerID, ', index = ', index);
-  FServerData[index] := TServerData.Create(self,aServerID);                                                                                               ,11
+  FServerData[Result] := TServerData.Create(self,aServerID);                                                                                               ,11
 end;
 
 procedure TServerDataList.Refresh;
@@ -180,14 +178,20 @@ begin
   end;
 end;
 
-procedure TServerDataList.Update(aServerID: integer);
+procedure TServerDataList.Update(aServerID: integer; dlg: TRegisterServerDlg);
 var index, j: integer;
 begin
   index := FindServerData(aServerID);
   if index <> -1 then
     ServerData[index].Refresh
   else
-    Add(aServerID);
+    index := Add(aServerID);
+  if dlg <> nil then
+  with ServerData[index] do
+  begin
+    DomainName := dlg.DomainName.Text;
+    DefaultUserName ;= dlg.DefaultUserName.Text;
+  end;
 end;
 
 constructor TServerDataList.Create;
@@ -271,7 +275,7 @@ end;
 
 procedure TServerData.Select;
 begin
-  DBADataModule.IBDatabase1.Connected := false;
+  DBADataModule.DatabaseData := nil;
   DBADataModule.ServerData := self;
 end;
 

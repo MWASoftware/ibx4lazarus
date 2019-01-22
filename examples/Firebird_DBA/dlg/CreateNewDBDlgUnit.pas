@@ -18,11 +18,6 @@ type
     Label5: TLabel;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
   private
-
-  public
-    function ShowModal(aServerName: string;
-            var DatabaseID: integer;
-            var aDatabaseName, aDatabasePath, aUserName: string): TModalResult;
   end;
 
 var
@@ -44,15 +39,6 @@ begin
     MessageDlg('An Application Database must be selected',mtError,[mbOK],0);
     CloseAction := caNone;
   end;
-end;
-
-function TCreateNewDBDlg.ShowModal(aServerName: string;
-  var DatabaseID: integer; var aDatabaseName, aDatabasePath, aUserName: string
-  ): TModalResult;
-begin
-  Result := inherited ShowModal(aServerName, aDatabaseName, aDatabasePath, aUserName);
-  if Result = mrOK then
-    DatabaseID := AppDBLookup.KeyValue
 end;
 
 end.

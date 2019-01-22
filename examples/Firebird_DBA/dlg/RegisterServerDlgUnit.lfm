@@ -1,18 +1,19 @@
 object RegisterServerDlg: TRegisterServerDlg
-  Left = 2038
-  Height = 102
-  Top = 367
+  Left = 1451
+  Height = 189
+  Top = 233
   Width = 330
   BorderStyle = bsDialog
   Caption = 'Register Server'
-  ClientHeight = 102
+  ClientHeight = 189
   ClientWidth = 330
+  OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '2.0.0.3'
   object Bevel1: TBevel
     Left = 8
-    Height = 76
+    Height = 172
     Top = 12
     Width = 230
   end
@@ -38,18 +39,50 @@ object RegisterServerDlg: TRegisterServerDlg
   end
   object Label1: TLabel
     Left = 18
-    Height = 15
+    Height = 14
     Top = 23
-    Width = 97
-    Caption = 'Enter Server Name'
+    Width = 78
+    Caption = 'Server Name'
     ParentColor = False
   end
-  object Edit1: TEdit
+  object ServerName: TEdit
     Left = 16
-    Height = 23
+    Height = 24
     Top = 40
     Width = 216
     TabOrder = 2
-    Text = 'Edit1'
+    Text = 'ServerName'
+  end
+  object Label2: TLabel
+    Left = 18
+    Height = 14
+    Top = 75
+    Width = 128
+    Caption = 'Server Domain Name'
+    ParentColor = False
+  end
+  object DomainName: TEdit
+    Left = 18
+    Height = 24
+    Top = 88
+    Width = 214
+    TabOrder = 3
+    Text = 'DomainName'
+  end
+  object Label3: TLabel
+    Left = 18
+    Height = 14
+    Top = 120
+    Width = 113
+    Caption = 'Default User Name'
+    ParentColor = False
+  end
+  object DefaultUserName: TEdit
+    Left = 18
+    Height = 24
+    Top = 136
+    Width = 214
+    TabOrder = 4
+    Text = 'DefaultUserName'
   end
 end
