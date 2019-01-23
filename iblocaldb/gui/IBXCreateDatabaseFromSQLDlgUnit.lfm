@@ -1,7 +1,7 @@
 object IBXCreateDatabaseFromSQLDlg: TIBXCreateDatabaseFromSQLDlg
-  Left = 2028
+  Left = 1460
   Height = 111
-  Top = 371
+  Top = 374
   Width = 255
   BorderStyle = bsNone
   Caption = 'IBXCreateDatabaseFromSQLDlg'
@@ -9,7 +9,7 @@ object IBXCreateDatabaseFromSQLDlg: TIBXCreateDatabaseFromSQLDlg
   ClientWidth = 255
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '2.0.0.3'
   object Bevel1: TBevel
     Left = 0
     Height = 111
@@ -43,11 +43,22 @@ object IBXCreateDatabaseFromSQLDlg: TIBXCreateDatabaseFromSQLDlg
     AutoDDL = False
     Echo = False
     IgnoreGrants = False
+    IgnoreCreateDatabase = False
     ShowAffectedRows = False
     ShowPerformanceStats = False
     OnProgressEvent = IBXScriptProgressEvent
     OnCreateDatabase = IBXScriptCreateDatabase
     left = 211
     top = 11
+  end
+  object IBTransaction1: TIBTransaction
+    Active = False
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait'
+    )
+    left = 208
+    top = 80
   end
 end

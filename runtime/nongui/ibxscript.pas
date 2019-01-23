@@ -1494,6 +1494,7 @@ procedure TCustomIBXScript.SetSQLStatementReader(
 begin
   FSQLReader := SQLStatementReader;
   FSQLReader.OnNextLine := @EchoNextLine;
+  FSQLReader.Transaction := FInternalTransaction;
 end;
 
 function TCustomIBXScript.ProcessStatement(stmt: string): boolean;
@@ -1764,7 +1765,10 @@ procedure TCustomIBXScript.SetTransaction(AValue: TIBTransaction);
 begin
   if FTransaction = AValue then Exit;
   FTransaction := AValue;
-  FSQLReader.Transaction := AValue;
+  if FTransaction = nil then
+    FSQLReader.Transaction := FInternalTransaction
+  else
+    FSQLReader.Transaction := FTransaction;
 end;
 
 constructor TCustomIBXScript.Create(aOwner: TComponent);

@@ -43,7 +43,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="38">
+    <Units Count="39">
       <Unit0>
         <Filename Value="LocalDBExample.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -156,34 +156,33 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="32"/>
-        <CursorPos X="15" Y="52"/>
+        <TopLine Value="56"/>
+        <CursorPos X="29" Y="50"/>
         <UsageCount Value="17"/>
       </Unit13>
       <Unit14>
         <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
         <EditorIndex Value="-1"/>
-        <WindowIndex Value="1"/>
-        <TopLine Value="316"/>
-        <CursorPos X="2" Y="319"/>
+        <TopLine Value="454"/>
+        <CursorPos X="66" Y="467"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="454"/>
-          <CursorPos X="66" Y="467"/>
+          <TopLine Value="135"/>
+          <CursorPos X="14" Y="135"/>
         </ExtraEditor1>
         <UsageCount Value="18"/>
       </Unit14>
       <Unit15>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="753"/>
-        <CursorPos X="3" Y="753"/>
+        <TopLine Value="290"/>
+        <CursorPos X="37" Y="302"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="290"/>
-          <CursorPos X="37" Y="302"/>
+          <TopLine Value="1087"/>
+          <CursorPos X="3" Y="1121"/>
         </ExtraEditor1>
         <UsageCount Value="18"/>
       </Unit15>
@@ -270,8 +269,8 @@
       <Unit27>
         <Filename Value="../../iblocaldb/gui/IBLocalDBSupport.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="106"/>
-        <CursorPos X="24" Y="124"/>
+        <TopLine Value="112"/>
+        <CursorPos X="53" Y="133"/>
         <UsageCount Value="13"/>
       </Unit27>
       <Unit28>
@@ -348,6 +347,16 @@
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit37>
+      <Unit38>
+        <Filename Value="../../iblocaldb/gui/IBXCreateDatabaseFromSQLDlgUnit.pas"/>
+        <ComponentName Value="IBXCreateDatabaseFromSQLDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="86"/>
+        <CursorPos X="3" Y="102"/>
+        <UsageCount Value="10"/>
+      </Unit38>
     </Units>
     <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
