@@ -40,10 +40,13 @@ type
   TIBCMLocalDBSupport = class(TCustomIBLocalDBSupport)
   private
     FOnLogMessage: TOnLogMessage;
+    FOnProgressEvent: TOnProgressEvent;
     procedure Add2Log(Sender: TObject; Msg: string);
     procedure DoUpgrade(IBXScript: TIBXScript; TargetVersionNo: integer);
     procedure WriteLog(Msg: string);
     procedure HandleOnGetNextLine(Sender: TObject; var Line: string);
+    procedure IBXScriptCreateDatabase(Sender: TObject;
+      var DatabaseFileName: string);
   protected
     procedure Downgrade(DBArchive: string); override;
     function InternalCreateNewDatabase(DBArchive: string): boolean; override;
@@ -53,6 +56,7 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     property OnLogMessage: TOnLogMessage read FOnLogMessage write FOnLogMessage;
+    property OnProgressEvent: TOnProgressEvent read FOnProgressEvent write FOnProgressEvent; {Progress Bar Support}
   end;
 
 implementation
@@ -112,6 +116,13 @@ begin
     OnLogMessage(self,Line);
 end;
 
+procedure TIBCMLocalDBSupport.IBXScriptCreateDatabase(Sender: TObject;
+  var DatabaseFileName: string);
+begin
+  DatabaseFileName := (Sender as TIBXScript).Database.Attachment.GetConnectString;
+  (Sender as TIBXScript).Database.DropDatabase;
+end;
+
 procedure TIBCMLocalDBSupport.Downgrade(DBArchive: string);
 begin
   RestoreDatabase(DBArchive);
@@ -144,9 +155,11 @@ begin
   with TIBXScript.Create(self) do
   try
     Database := self.Database;
-    IgnoreCreateDatabase := true;
+    OnCreateDatabase := @IBXScriptCreateDatabase;
+    OnProgressEvent := FOnProgressEvent;
     WriteLog(sCreatingDatabase);
     Result := RunScript(DBArchive);
+    Add2Log(self,''); {ensure EOL sent}
   finally
     Free
   end

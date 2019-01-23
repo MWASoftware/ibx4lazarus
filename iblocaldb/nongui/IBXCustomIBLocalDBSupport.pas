@@ -111,6 +111,7 @@ type
     FDownGradeArchive: string;
     FSharedDataDir: string;
     FUpgradeConf: TUpgradeConfFile;
+    FInOnCreateDB: boolean;
     procedure CheckEnabled;
     function GetDatabase: TIBDatabase;
     function GetSharedDataDir: string;
@@ -282,7 +283,7 @@ end;
 procedure TCustomIBLocalDBSupport.OnBeforeDatabaseConnect(Sender: TObject;
   DBParams: TStrings; var DBName: string; var CreateIfNotExists: boolean);
 begin
-  if not Enabled or (csDesigning in ComponentState) then Exit;
+  if FInOnCreateDB or not Enabled or (csDesigning in ComponentState) then Exit;
 
   if not assigned(Database) or not Database.FirebirdAPI.IsEmbeddedServer then
      raise EIBLocalFatalError.Create(sNoEmbeddedServer);
@@ -297,6 +298,7 @@ end;
 
 procedure TCustomIBLocalDBSupport.OnDatabaseConnected(Sender: TObject);
 begin
+  if FInOnCreateDB then Exit;
   if not Enabled or (csDesigning in ComponentState) or
       FInUpgrade then Exit; {Avoids problem if RECONNECT used in script}
 
@@ -315,28 +317,35 @@ end;
 procedure TCustomIBLocalDBSupport.OnCreateDatabase(Sender: TObject);
 var DBArchive: string;
 begin
- CheckEnabled;
- DBArchive := EmptyDBArchive;
- if DBArchive = '' then
-   raise EIBLocalException.Create(sEmptyDBArchiveMissing);
+ if FInOnCreateDB then Exit;
 
- if not TUpgradeConfFile.IsAbsolutePath(DBArchive) then
-   DBArchive := SharedDataDir + DBArchive;
-
- if not FileExists(DBArchive) then
-   raise EIBLocalException.CreateFmt(sEmptyDBArchiveNotFound,[DBArchive]);
-
- ServicesConnection.ConnectUsing(Database);
+ FInOnCreateDB := true;
  try
-   if not InternalCreateNewDatabase(DBArchive) then
-   begin
-     Database.DropDatabase;
-     raise EIBLocalException.Create(sCreateFailed);
+   CheckEnabled;
+   DBArchive := EmptyDBArchive;
+   if DBArchive = '' then
+     raise EIBLocalException.Create(sEmptyDBArchiveMissing);
+
+   if not TUpgradeConfFile.IsAbsolutePath(DBArchive) then
+     DBArchive := SharedDataDir + DBArchive;
+
+   if not FileExists(DBArchive) then
+     raise EIBLocalException.CreateFmt(sEmptyDBArchiveNotFound,[DBArchive]);
+
+   ServicesConnection.ConnectUsing(Database);
+   try
+     if not InternalCreateNewDatabase(DBArchive) then
+     begin
+       Database.DropDatabase;
+       raise EIBLocalException.Create(sCreateFailed);
+     end;
+   finally
+     ServicesConnection.Connected := false;
    end;
+   FNewDBCreated := true;
  finally
-   ServicesConnection.Connected := false;
+   FInOnCreateDB := false;
  end;
- FNewDBCreated := true;
 end;
 
 procedure TCustomIBLocalDBSupport.SetFirebirdDirectory(AValue: string);

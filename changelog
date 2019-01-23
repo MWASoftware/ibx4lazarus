@@ -1,4 +1,4 @@
-IBX Change Log  version (2.3-3 Build 11348) Fri, 28 Dec 2018 10:04:17 +0000
+IBX Change Log  version (2.3-3 Build 11361) Fri, 28 Dec 2018 10:04:17 +0000
 
 1. New property for TIBDatabase and TIBXServicesConnection. This is "ConfigOverrides"
    and is used to override the default settings in the client side "firebird.conf" This
@@ -72,6 +72,14 @@ IBX Change Log  version (2.3-3 Build 11348) Fri, 28 Dec 2018 10:04:17 +0000
 
 11. IBEvents: removing a TIBEvent component from a form should no longer result in
     an IDE exception.
+
+12. LocalDBSupport: initial database creation should now work correctly
+    when the schema source is an sql file.
+
+13. TIBCMLocalDBSupport: new event handler "property OnProgressEvent: TOnProgressEvent"
+    when defined, this handler will be called by the internal TIBXScript during
+    initial database creation when the schema source is an sql file and may be used
+    to provide a visual indication of progress in console mode.
 
 IBX Change Log  version (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 

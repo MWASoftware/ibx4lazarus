@@ -40,6 +40,7 @@ type
 
   TIBXCreateDatabaseFromSQLDlg = class(TForm)
     Bevel1: TBevel;
+    IBTransaction1: TIBTransaction;
     IBXScript: TIBXScript;
     Label1: TLabel;
     ProgressBar: TProgressBar;
@@ -73,8 +74,9 @@ begin
   try
     FileName := DBArchive;
     IBXScript.Database := aDatabase;
-    IBXScript.Transaction := aDatabase.DefaultTransaction;
-    DatabasePath := aDatabase.DatabaseName;
+    IBTransaction1.DefaultDatabase := aDatabase;
+    IBXScript.Transaction := IBTransaction1;
+    DatabasePath := aDatabase.Attachment.GetConnectString;
     Result := ShowModal = mrOK;
   finally
     Free
@@ -91,7 +93,7 @@ begin
   if Reset then
     ProgressBar.Max := value
   else
-    ProgressBar.StepIt;
+    ProgressBar.StepBy(Value);
   Application.ProcessMessages;
 end;
 
@@ -99,30 +101,10 @@ procedure TIBXCreateDatabaseFromSQLDlg.DoRunScript(Data: PtrInt);
 begin
   try
     ModalResult := mrCancel;
-    IBXScript.Database.CreateDatabase; {try to create the database}
-    repeat
-      try
-        if IBXScript.RunScript(FileName) then
+    if IBXScript.RunScript(FileName) then
           ModalResult := mrOK;
-        break;
-      except on E:EIBInterBaseError do
-      begin
-        writeln(E.IBErrorCode);
-        if (E.IBErrorCode = isc_io_error) or  (E.IBErrorCode = isc_db_or_file_exists) then
-          {script contains Create Database Statement}
-        begin
-          IBXScript.Database.Connected := true;
-          IBXScript.Database.DropDatabase;
-          {repeat above and let script create database}
-        end
-        else
-          raise;
-      end;
-      end;
-    until false;
     with IBXScript.Transaction do
       if InTransaction then Commit;
-    IBXScript.Database.Connected := false;
   except on E:Exception do
     begin
       MessageDlg(E.Message,mtError,[mbOK],0);
@@ -141,6 +123,7 @@ procedure TIBXCreateDatabaseFromSQLDlg.IBXScriptCreateDatabase(Sender: TObject;
   var DatabaseFileName: string);
 begin
   DatabaseFileName := DatabasePath;
+  IBXScript.Database.DropDatabase;
 end;
 
 end.
