@@ -62,6 +62,7 @@ type
     FMinVersionNo: integer;
     { private declarations }
     FSQLHistory: TSQLSaveList;
+    FUUID: string;
     procedure CheckDBVersion;
     function GetControlTableName: string;
     function GetCurrentDBVersionNo: integer;
@@ -72,7 +73,7 @@ type
     function GetDatabaseDirs: TStrings;
     function HasTable(TableName: string): boolean;
     procedure SetNewUUID;
-    procedure SetUserConfig(KeyName: string; AValue: string);
+    procedure SetUserConfig(KeyName: string; KeyValue: string);
   protected
     procedure Loaded; override;
   public
@@ -110,7 +111,10 @@ implementation
 
 {$R *.lfm}
 
-uses ServerDataUnit, DatabaseDataUnit;
+uses ServerDataUnit, DatabaseDataUnit, IniFiles, FileUtil;
+
+resourcestring
+  sBadDBVersion = 'Wrong Database Version, expecting %d found %d.';
 
 { EDBVersionProblem }
 
@@ -131,7 +135,7 @@ end;
 procedure TLocalData.IBLocalDBSupportGetSharedDataDir(Sender: TObject;
   var SharedDataDir: string);
 begin
-  if DirectoryExists('data')
+  if DirectoryExists('data') then
     SharedDataDir := 'data' + DirectorySeparator + 'regdatabase'
   {$IFDEF UNIX}
   else
@@ -152,6 +156,9 @@ end;
 procedure TLocalData.LocalDatabaseAfterDisconnect(Sender: TObject);
 begin
   FSQLHistory.SaveSQLHistory;
+  DatabaseDataList.Clear;
+  ServerDataList.Clear;
+  AppDatabases.Active := false;
 end;
 
 procedure TLocalData.CheckDBVersion;
@@ -335,7 +342,7 @@ begin
   GetCurrentDBVersionNo;
 end;
 
-procedure TLocalData.SetUserConfig(KeyName: string; AValue: string);
+procedure TLocalData.SetUserConfig(KeyName: string; KeyValue: string);
 begin
   with UpdateKey do
   begin
@@ -343,7 +350,7 @@ begin
     ParamByName('KeyName').AsString := KeyName;
     ParamByName('KeyValue').AsString := KeyValue;
     ExecQuery;
-    Transction.Commit;
+    Transaction.Commit;
   end;
 end;
 

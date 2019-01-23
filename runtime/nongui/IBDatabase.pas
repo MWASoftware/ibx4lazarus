@@ -1150,8 +1150,9 @@ begin
        DPB.Add(isc_dpb_set_db_SQL_dialect).AsByte := SQLDialect; {create with this SQL Dialect}
        FAttachment := FirebirdAPI.CreateDatabase(aDBName,DPB, false);
        if FAttachment = nil then
-         DPB := nil;
-       DoOnCreateDatabase;
+         DPB := nil
+       else
+         DoOnCreateDatabase;
      end
      else
        FAttachment := FirebirdAPI.OpenDatabase(aDBName,DPB,false);

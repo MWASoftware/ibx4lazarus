@@ -9,7 +9,7 @@ object IBXCreateDatabaseFromSQLDlg: TIBXCreateDatabaseFromSQLDlg
   ClientWidth = 255
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '2.0.0.3'
   object Bevel1: TBevel
     Left = 0
     Height = 111
@@ -43,6 +43,7 @@ object IBXCreateDatabaseFromSQLDlg: TIBXCreateDatabaseFromSQLDlg
     AutoDDL = False
     Echo = False
     IgnoreGrants = False
+    IgnoreCreateDatabase = True
     ShowAffectedRows = False
     ShowPerformanceStats = False
     OnProgressEvent = IBXScriptProgressEvent

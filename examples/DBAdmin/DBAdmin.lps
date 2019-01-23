@@ -7,10 +7,11 @@
       <Unit0>
         <Filename Value="DBAdmin.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="15"/>
-        <CursorPos X="41" Y="39"/>
-        <UsageCount Value="157"/>
+        <CursorPos X="63" Y="30"/>
+        <UsageCount Value="158"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -22,7 +23,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="1111"/>
         <CursorPos X="17" Y="1116"/>
-        <UsageCount Value="157"/>
+        <UsageCount Value="158"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -32,10 +33,9 @@
         <ComponentName Value="DBDataModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="293"/>
+        <TopLine Value="1163"/>
         <CursorPos X="24" Y="1200"/>
-        <UsageCount Value="157"/>
+        <UsageCount Value="158"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit2>
@@ -48,7 +48,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
         <CursorPos X="70" Y="37"/>
-        <UsageCount Value="157"/>
+        <UsageCount Value="158"/>
       </Unit3>
       <Unit4>
         <Filename Value="dlg/ShutdownDatabaseDlgUnit.pas"/>
@@ -59,7 +59,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="127"/>
         <CursorPos Y="180"/>
-        <UsageCount Value="155"/>
+        <UsageCount Value="156"/>
       </Unit4>
       <Unit5>
         <Filename Value="dlg/ShutdownRegDlgUnit.pas"/>
@@ -70,7 +70,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="39"/>
         <CursorPos X="48" Y="42"/>
-        <UsageCount Value="155"/>
+        <UsageCount Value="156"/>
       </Unit5>
       <Unit6>
         <Filename Value="dlg/BackupDlgUnit.pas"/>
@@ -81,7 +81,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="6"/>
         <CursorPos X="36" Y="26"/>
-        <UsageCount Value="153"/>
+        <UsageCount Value="154"/>
       </Unit6>
       <Unit7>
         <Filename Value="dlg/RestoreDlgUnit.pas"/>
@@ -92,7 +92,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="132"/>
         <CursorPos X="101" Y="153"/>
-        <UsageCount Value="153"/>
+        <UsageCount Value="154"/>
       </Unit7>
       <Unit8>
         <Filename Value="dlg/AddSecondaryFileDlgUnit.pas"/>
@@ -102,7 +102,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="60" Y="12"/>
-        <UsageCount Value="152"/>
+        <UsageCount Value="153"/>
       </Unit8>
       <Unit9>
         <Filename Value="dlg/AddShadowSetDlgUnit.pas"/>
@@ -113,7 +113,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="101"/>
         <CursorPos X="58" Y="123"/>
-        <UsageCount Value="151"/>
+        <UsageCount Value="152"/>
       </Unit9>
       <Unit10>
         <Filename Value="dlg/AddShadowFileDlgUnit.pas"/>
@@ -124,7 +124,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="39"/>
         <CursorPos X="41" Y="41"/>
-        <UsageCount Value="151"/>
+        <UsageCount Value="152"/>
       </Unit10>
       <Unit11>
         <Filename Value="dlg/NewUserDlgUnit.pas"/>
@@ -135,7 +135,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="27"/>
         <CursorPos X="77" Y="46"/>
-        <UsageCount Value="141"/>
+        <UsageCount Value="142"/>
       </Unit11>
       <Unit12>
         <Filename Value="dlg/ChgPasswordDlgUnit.pas"/>
@@ -145,7 +145,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="73" Y="19"/>
-        <UsageCount Value="141"/>
+        <UsageCount Value="142"/>
       </Unit12>
       <Unit13>
         <Filename Value="dlg/ExecuteSQLScriptDlgUnit.pas"/>
@@ -156,7 +156,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="105"/>
         <CursorPos X="38" Y="87"/>
-        <UsageCount Value="30"/>
+        <UsageCount Value="31"/>
       </Unit13>
       <Unit14>
         <Filename Value="SelectSQLResultsUnit.pas"/>
@@ -167,7 +167,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="60"/>
         <CursorPos X="19" Y="81"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="30"/>
       </Unit14>
       <Unit15>
         <Filename Value="dlg/ServicesLoginDlgUnit.pas"/>

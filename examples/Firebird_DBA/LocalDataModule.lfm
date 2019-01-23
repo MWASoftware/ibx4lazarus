@@ -32,7 +32,7 @@ object LocalData: TLocalData
     AfterDisconnect = LocalDatabaseAfterDisconnect
     CreateIfNotExists = False
     AllowStreamedConnected = False
-    DatabaseName = ' '
+    DatabaseName = 'FirebirdDBA.fdb '
     Params.Strings = (
       'user_name=SYSDBA'
       'lc_ctype=UTF8'

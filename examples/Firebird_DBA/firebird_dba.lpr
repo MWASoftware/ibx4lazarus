@@ -7,8 +7,13 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, memdslaz, DBAMainFormUnit, ibexpress, DBADataModule
-  { you can add units after this };
+  Forms, memdslaz, DBAMainFormUnit, ibexpress, DBADataModule, LocalDataModule,
+  RegisterServerDlgUnit, RegisterExistingDBDlgUnit, CreateNewDBDlgUnit,
+  SelectSQLResultsUnit, DBLoginDlgUnit, ShutdownRegDlgUnit,
+  ShutdownDatabaseDlgUnit, BackupDlgUnit, RestoreDlgUnit, AddSecondaryFileDlgUnit,
+  AddShadowSetDlgUnit, AddShadowFileDlgUnit, NewUserDlgUnit, ChgPasswordDlgUnit,
+  ExecuteSQLScriptDlgUnit
+ { you can add units after this };
 
 {$R *.res}
 
@@ -23,7 +28,7 @@ begin
   Application.CreateForm(TAddSecondaryFileDlg, AddSecondaryFileDlg);
   Application.CreateForm(TAddShadowFileDlg, AddShadowFileDlg);
   Application.CreateForm(TLocalData, LocalData);
-  Application.CreateForm(TDBDataModule, DBDataModule);
+  Application.CreateForm(TDBADatabaseData, DBADatabaseData);
   Application.CreateForm(TAddShadowSetDlg, AddShadowSetDlg);
   Application.CreateForm(TBackupDlg, BackupDlg);
   Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);

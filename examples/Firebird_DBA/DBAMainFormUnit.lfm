@@ -442,6 +442,7 @@ inherited DBAMainForm: TDBAMainForm
     end
     object CreateDatabase: TAction
       Caption = 'Create New Database'
+      OnExecute = CreateDatabaseExecute
       OnUpdate = AddDatabaseUpdate
     end
   end

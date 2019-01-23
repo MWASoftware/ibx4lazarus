@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls;
+  ExtCtrls, ServerDataUnit;
 
 type
 
@@ -26,9 +26,11 @@ type
     Label4: TLabel;
     procedure FormShow(Sender: TObject);
   private
+    FServerData: TServerData;
 
   public
-    function ShowModal(aServerName: string): TModalResult;
+    function ShowModal(aServerData: TServerData): TModalResult;
+    property ServerData: TServerData read FServerData;
   end;
 
 var
@@ -45,9 +47,11 @@ begin
   DatabaseName.SetFocus;
 end;
 
-function TRegisterExistingDBDlg.ShowModal(aServerName: string): TModalResult;
+function TRegisterExistingDBDlg.ShowModal(aServerData: TServerData
+  ): TModalResult;
 begin
-  ServerName.Text := aServerName;
+  FServerData := aServerData;
+  ServerName.Text := FServerData.ServerName;
   DatabaseName.Text := '';
   DatabasePath.Text := '';
   DefaultUserName.Text := '';

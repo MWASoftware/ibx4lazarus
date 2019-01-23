@@ -66,7 +66,7 @@ type
     function Add(aServerID: integer): integer; overload;
     procedure Refresh;
     procedure Remove(aServerID: integer);
-    procedure Update(aServerID: integer; dlg: TRegisterServerDlg);
+    function Update(aServerID: integer; dlg: TRegisterServerDlg): TServerData;
     property ServerData[ServerID: integer]: TServerData read GetServerData; default;
   end;
 
@@ -75,13 +75,14 @@ var
 
 implementation
 
-uses IBTypes, PasswordCacheUnit, LocalDataModule;
+uses IBTypes, PasswordCacheUnit, LocalDataModule, IBSQL, DBADataModule;
 
 { TServerDataList }
 
 function TServerDataList.FindServerData(aServerID: integer): integer;
 var i: integer;
 begin
+  LoadServerData;
   Result := -1;
   for i := 0 to Length(FServerData) - 1 do
     if FServerData[i].ServerID = aServerID then
@@ -119,10 +120,13 @@ begin
       begin
         SetLength(FServerData,Length(FServerData)+1);
         index := Length(FServerData)-1;
-        FServerData[index] := TServerData.Create(self,FieldByName('ServerID').AsInteger,
-                                                      FieldByName('ServerName').AsString,
-                                                      FieldByName('DomainName').AsString,
-                                                      FieldByName('DefaultUserName').AsString);
+        FServerData[index] := TServerData.Create(self,FieldByName('ServerID').AsInteger);
+        with FServerData[index] do
+        begin
+          ServerName := FieldByName('ServerName').AsString;
+          DomainName := FieldByName('DomainName').AsString;
+          DefaultUserName := FieldByName('DefaultUserName').AsString;
+        end;
         Next;
       end;
     finally
@@ -148,7 +152,7 @@ begin
   SetLength(FServerData,Length(FServerData)+1);
   Result := Length(FServerData)-1;
 //    writeln('Add Server ', aServerName, ', index = ', index);
-  FServerData[Result] := TServerData.Create(self,aServerName,aServerName,'','');                                                                                               ,11
+  FServerData[Result] := TServerData.Create(self,aServerName,aServerName,'');
 end;
 
 function TServerDataList.Add(aServerID: integer): integer;
@@ -156,7 +160,7 @@ begin
   SetLength(FServerData,Length(FServerData)+1);
   Result := Length(FServerData)-1;
 //    writeln('Add Server ',aServerID, ', index = ', index);
-  FServerData[Result] := TServerData.Create(self,aServerID);                                                                                               ,11
+  FServerData[Result] := TServerData.Create(self,aServerID);
 end;
 
 procedure TServerDataList.Refresh;
@@ -178,19 +182,26 @@ begin
   end;
 end;
 
-procedure TServerDataList.Update(aServerID: integer; dlg: TRegisterServerDlg);
+function TServerDataList.Update(aServerID: integer; dlg: TRegisterServerDlg
+  ): TServerData;
 var index, j: integer;
 begin
   index := FindServerData(aServerID);
   if index <> -1 then
-    ServerData[index].Refresh
+  begin
+    Result := FServerData[index];
+    Result.Refresh;
+  end
   else
+  begin
     index := Add(aServerID);
+    Result := FServerData[index];
+  end;
   if dlg <> nil then
-  with ServerData[index] do
+  with Result do
   begin
     DomainName := dlg.DomainName.Text;
-    DefaultUserName ;= dlg.DefaultUserName.Text;
+    DefaultUserName := dlg.DefaultUserName.Text;
   end;
 end;
 
@@ -275,8 +286,8 @@ end;
 
 procedure TServerData.Select;
 begin
-  DBADataModule.DatabaseData := nil;
-  DBADataModule.ServerData := self;
+  DBADatabaseData.DatabaseData := nil;
+  DBADatabaseData.ServerData := self;
 end;
 
 initialization

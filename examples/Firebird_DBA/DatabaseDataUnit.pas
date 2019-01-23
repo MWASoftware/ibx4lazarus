@@ -63,9 +63,14 @@ type
 
   TDatabaseDataList = class
   private
+    const
+      sqlSelectAll = 'Select * from Databases order by DatabaseID';
+  private
     FDatabaseDataList: array of TDatabaseData;
+    FDatabaseListLoaded: boolean;
     function FindDatabaseData(aDatabaseID: integer): integer;
     function GetDatabaseData(index: integer): TDatabaseData;
+    procedure LoadDatabaseList;
   public
     constructor Create;
     destructor Destroy; override;
@@ -75,8 +80,8 @@ type
     procedure Refresh;
     procedure Remove(aDatabaseID: integer);
     procedure Select(aDatabaseID: integer);
-    procedure Update(aDatabaseID: integer; dlg: TRegisterExistingDBDlg);
-    property DatabaseData[index: integer] read GetDatabaseData;
+    function Update(aDatabaseID: integer; dlg: TRegisterExistingDBDlg): TDatabaseData;
+    property DatabaseData[index: integer]: TDatabaseData read GetDatabaseData;
   end;
 
 var
@@ -84,7 +89,7 @@ var
 
 implementation
 
-uses DBADataModule, LocalDataModule;
+uses DBADataModule, LocalDataModule, IBSQL, CreateNewDBDlgUnit;
 
 { TDatabaseData }
 
@@ -213,12 +218,52 @@ begin
   Result := FDatabaseDataList[index];
 end;
 
+procedure TDatabaseDataList.LoadDatabaseList;
+var index: integer;
+begin
+  if FDatabaseListLoaded then Exit;
+
+  SetLength(FDatabaseDataList,0);
+  with TIBSQL.Create(nil) do
+  try
+    SQL.Text := sqlSelectAll;
+    Database := LocalData.LocalDatabase;
+    Transaction := LocalData.IBTransaction;
+    Transaction.Active := true;
+    ExecQuery;
+    try
+      while not EOF do
+      begin
+        SetLength(FDatabaseDataList,Length(FDatabaseDataList)+1);
+        index := Length(FDatabaseDataList)-1;
+        FDatabaseDataList[index] := TDatabaseData.Create(self,
+                                                         FieldByName('DatabaseID').AsInteger,
+                                                         ServerDataList[FieldByName('Server').AsInteger]);
+        with FDatabaseDataList[index] do
+        begin
+          DatabaseName := FieldByName('DatabaseName').AsString;
+          DatabasePath := FieldByName('DatabasePath').AsString;
+          DefaultUserName := FieldByName('DefaultUserName').AsString;
+        end;
+        Next;
+      end;
+    finally
+      Close;
+    end;
+  finally
+    Free
+  end;
+
+  FDatabaseListLoaded := true;
+end;
+
 procedure TDatabaseDataList.Clear;
 var i: integer;
 begin
   for i := 0 to Length(FDatabaseDataList) - 1 do
      FDatabaseDataList[i].Free;
   SetLength(FDatabaseDataList,0);
+  FDatabaseListLoaded := false;
 end;
 
 procedure TDatabaseDataList.Refresh;
@@ -243,27 +288,33 @@ end;
 
 procedure TDatabaseDataList.Select(aDatabaseID: integer);
 begin
-  with DBADatabaseData do
-  begin
-    IBDatabase1.Attachment := Attachment[aDatabaseID];
-  end;
+  DBADatabaseData.IBDatabase1.Attachment := DatabaseData[aDatabaseID].Attachment;
 end;
 
-procedure TDatabaseDataList.Update(aDatabaseID: integer;
-  dlg: TRegisterExistingDBDlg);
+function TDatabaseDataList.Update(aDatabaseID: integer;
+  dlg: TRegisterExistingDBDlg): TDatabaseData;
 var index: integer;
 begin
+  Result := nil;
   index := FindDatabaseData(aDatabaseID);
   if index <> -1 then
-    FDatabaseDataList[index].Refresh
+  begin
+    Result := FDatabaseDataList[index];
+    Result.Refresh;
+  end
   else
-    index := Add(aDatabaseID);
+  if dlg <> nil then
+  begin
+    index := Add(aDatabaseID,dlg.ServerData);
+    Result := FDatabaseDataList[index];
+  end;
+
   if dlg <> nil then
   with FDatabaseDataList[index] do
   begin
-    DatabaseName := dlg.DatabaseName;
-    DatabasePath := dlg.DatabasePath;
-    DefaultUserName := dlg.DefaultUserName;
+    DatabaseName := dlg.DatabaseName.Text;
+    DatabasePath := dlg.DatabasePath.Text;
+    DefaultUserName := dlg.DefaultUserName.Text;
     if dlg is TCreateNewDBDlg then
     begin
       CreateIfNotExists := true;
