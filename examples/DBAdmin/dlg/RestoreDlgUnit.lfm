@@ -273,7 +273,7 @@ object RestoreDlg: TRestoreDlg
     top = 24
   end
   object IBXClientSideRestoreService1: TIBXClientSideRestoreService
-    ServicesConnection = DatabaseData.IBXServicesConnection1
+    ServicesConnection = DBDataModule.IBXServicesConnection1
     TraceFlags = []
     OnGetNextLine = IBXClientSideRestoreService1GetNextLine
     PageSize = 0
@@ -285,7 +285,7 @@ object RestoreDlg: TRestoreDlg
     top = 208
   end
   object IBXServerSideRestoreService1: TIBXServerSideRestoreService
-    ServicesConnection = DatabaseData.IBXServicesConnection1
+    ServicesConnection = DBDataModule.IBXServicesConnection1
     TraceFlags = []
     OnGetNextLine = IBXClientSideRestoreService1GetNextLine
     PageSize = 0

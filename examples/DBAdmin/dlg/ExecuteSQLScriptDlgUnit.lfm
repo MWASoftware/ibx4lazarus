@@ -201,7 +201,7 @@ object ExecuteSQLScriptDlg: TExecuteSQLScriptDlg
     TabOrder = 2
   end
   object IBXScript1: TIBXScript
-    Database = DatabaseData.IBDatabase1
+    Database = DBDataModule.IBDatabase1
     IgnoreGrants = False
     IgnoreCreateDatabase = True
     Transaction = IBTransaction1
@@ -223,7 +223,7 @@ object ExecuteSQLScriptDlg: TExecuteSQLScriptDlg
   end
   object IBTransaction1: TIBTransaction
     Active = False
-    DefaultDatabase = DatabaseData.IBDatabase1
+    DefaultDatabase = DBDataModule.IBDatabase1
     Params.Strings = (
       'concurrency'
       'nowait'

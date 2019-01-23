@@ -174,6 +174,7 @@ type
 
     property ActiveDatabasePathName: string read FActiveDatabasePathName;
     property CurrentDBVersionNo: integer read FCurrentDBVersionNo;
+    property InOnCreateDB: boolean read FInOnCreateDB;
     property SharedDataDir: string read GetSharedDataDir;
     property ServicesConnection: TIBXServicesConnection read FServicesConnection;
 

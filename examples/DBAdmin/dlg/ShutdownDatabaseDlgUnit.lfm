@@ -47,7 +47,7 @@ object ShutdownDatabaseDlg: TShutdownDatabaseDlg
     Align = alClient
   end
   object IBConfigService: TIBXConfigService
-    ServicesConnection = DatabaseData.IBXServicesConnection1
+    ServicesConnection = DBDataModule.IBXServicesConnection1
     TraceFlags = []
     left = 258
     top = 63

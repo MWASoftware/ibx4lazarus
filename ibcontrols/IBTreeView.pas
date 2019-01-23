@@ -367,11 +367,6 @@ begin
         if (FExpandNode = nil) or (TIBTreeNode(FExpandNode).KeyValue <> DataSet.FieldByName(KeyField).AsVariant) then
         begin
           Node := Items.AddChild(FExpandNode,DataSet.FieldByName(TextField).AsString);
-          if ImageIndexField <> '' then
-            Node.ImageIndex := DataSet.FieldByName(ImageIndexField).AsInteger;
-          if SelectedIndexField <> '' then
-            Node.SelectedIndex := DataSet.FieldByName(SelectedIndexField).AsInteger;
-          TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
           Node.HasChildren := (HasChildField = '') or (DataSet.FieldByName(HasChildField).AsInteger <> 0);
           Inc(ChildCount);
         end;
@@ -616,14 +611,21 @@ end;
 
 procedure TIBTreeView.Added(Node: TTreeNode);
 begin
-  if assigned(DataSet) and DataSet.Active and not FNoAddNodeToDataset then
+  if assigned(DataSet) and DataSet.Active then
   begin
-    DataSet.Append;
+    if not FNoAddNodeToDataset then
+    begin
+      DataSet.Append;
+      if (Node.Text = '') and not DataSet.FieldByName(TextField).IsNull then
+         Node.Text := DataSet.FieldByName(TextField).AsString;
+      FModifiedNode := TIBTreeNode(Node);
+      FDataLink.UpdateRecord;
+    end;
     TIBTreeNode(Node).FKeyValue := DataSet.FieldByName(KeyField).AsVariant;
-    if (Node.Text = '') and not DataSet.FieldByName(TextField).IsNull then
-       Node.Text := DataSet.FieldByName(TextField).AsString;
-    FModifiedNode := TIBTreeNode(Node);
-    FDataLink.UpdateRecord
+    if ImageIndexField <> '' then
+      Node.ImageIndex := DataSet.FieldByName(ImageIndexField).AsInteger;
+    if SelectedIndexField <> '' then
+      Node.SelectedIndex := DataSet.FieldByName(SelectedIndexField).AsInteger;
   end;
   inherited Added(Node);
 end;

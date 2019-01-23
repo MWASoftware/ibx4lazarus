@@ -36,7 +36,7 @@ begin
   RequireDerivedFormResource := True;
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
-  Application.CreateForm(TDatabaseData, DatabaseData);
+  Application.CreateForm(TDBDataModule, DBDataModule);
   Application.CreateForm(TDBLoginDlg, DBLoginDlg);
   Application.CreateForm(TShutdownDatabaseDlg, ShutdownDatabaseDlg);
   Application.CreateForm(TShutdownReqDlg, ShutdownReqDlg);

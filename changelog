@@ -1,4 +1,11 @@
-IBX Change Log  version (2.3-3 Build 11361) Fri, 28 Dec 2018 10:04:17 +0000
+IBX Change Log  version (2.3-4 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
+
+1. Code tidyup in IBTreeView: Node properties initialisation moved from TIBTreeView.AddNodes
+   to TIBTreeView.Added. An OnAddition event handler is no longer needed to initialise
+   ImageIndex and SelectImageIndex values on AddNode.
+
+IBX Change Log  version (2.3-3 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
+
 
 1. New property for TIBDatabase and TIBXServicesConnection. This is "ConfigOverrides"
    and is used to override the default settings in the client side "firebird.conf" This
@@ -80,6 +87,11 @@ IBX Change Log  version (2.3-3 Build 11361) Fri, 28 Dec 2018 10:04:17 +0000
     when defined, this handler will be called by the internal TIBXScript during
     initial database creation when the schema source is an sql file and may be used
     to provide a visual indication of progress in console mode.
+
+14. TCustomIBLocalDBSupport: new public property "InOnCreateDB: boolean". This is set
+    to true while a new local database is being created and its schema populated.
+    Useful in (e.g.) TIBDatabase.OnAfterConnect handler to suppress actions
+    when the database is disconnected/connected during the create DB procedure.
 
 IBX Change Log  version (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 

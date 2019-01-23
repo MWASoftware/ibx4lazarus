@@ -22,10 +22,10 @@ unit MainFormUnit;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL,
-  SynGutterCodeFolding, Forms, Controls, Graphics, Dialogs, Menus, ComCtrls,
-  ActnList, StdCtrls, DbCtrls, ExtCtrls, Buttons, db, IBLookupComboEditBox,
-  IBDynamicGrid, IBTreeView, IBDatabaseInfo, IBXServices, IBExtract, IB;
+  Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, SynGutterCodeFolding,
+  Forms, Controls, Graphics, Dialogs, Menus, ComCtrls, ActnList, StdCtrls,
+  DbCtrls, ExtCtrls, Buttons, db, memds, IBLookupComboEditBox, IBDynamicGrid,
+  IBTreeView, IBDatabaseInfo, IBXServices, IBExtract, IB;
 
 type
 
@@ -35,10 +35,34 @@ type
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
     ClientLibrary: TLabel;
+    ConfigDataGrid: TIBDynamicGrid;
+    ConfigDataLabel: TLabel;
+    ConfigDataSource: TDataSource;
+    Edit12: TEdit;
+    Edit2: TEdit;
+    Edit3: TEdit;
+    Edit4: TEdit;
+    Edit5: TEdit;
+    Edit6: TEdit;
+    Edit7: TEdit;
+    Edit8: TEdit;
+    Edit9: TEdit;
     Label44: TLabel;
     ClientServerVersion: TMemo;
+    Label45: TLabel;
+    Label46: TLabel;
+    Label47: TLabel;
+    Label48: TLabel;
+    Label49: TLabel;
+    Label50: TLabel;
+    Label51: TLabel;
+    Label52: TLabel;
+    Label53: TLabel;
+    Label54: TLabel;
+    OpenDatabasesList: TMemo;
     MenuItem20: TMenuItem;
     MenuItem21: TMenuItem;
+    Panel10: TPanel;
     RunScript: TAction;
     AutoAdmin: TCheckBox;
     DatabaseAliasName: TEdit;
@@ -224,7 +248,6 @@ type
     SaveDialog: TSaveDialog;
     SchemaTab: TTabSheet;
     ServerLog: TMemo;
-    ServerPropMemo: TMemo;
     ServerTab: TTabSheet;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
@@ -358,6 +381,7 @@ type
     procedure HandleDBConnect(Sender: TObject);
     procedure HandleLoadData(Sender: TObject);
     procedure LoadData;
+    procedure LoadServerData;
     procedure DoExtract(Data: PtrInt);
     procedure ConfigureForServerVersion;
     procedure ConfigureOnlineValidation;
@@ -379,23 +403,22 @@ uses DataModule, ShutdownRegDlgUnit, AddSecondaryFileDlgUnit, NewUserDlgUnit,
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
-  DatabaseData.IBDatabase1.FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
+  DBDataModule.IBDatabase1.FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
   Application.ExceptionDialog := aedOkMessageBox;
   PageControl1.ActivePage := Properties;
-  DatabaseData.AfterDBConnect := @HandleDBConnect;
-  DatabaseData.AfterDataReload := @HandleLoadData;
+  DBDataModule.AfterDBConnect := @HandleDBConnect;
+  DBDataModule.AfterDataReload := @HandleLoadData;
   AccessRightsTreeView.DataSource := nil;
   AccessRightsTreeView.DataSource := AccessRightsSource;
   SubjectAccessRightsGrid.DataSource := nil;
   SubjectAccessRightsGrid.DataSource := SubjectAccessRightsSource;
-  DatabaseData.Connect;
-  if not DatabaseData.IBDatabase1.Connected then Close;
+  if not DBDataModule.Connect then Close;
 end;
 
 procedure TMainForm.IsShadowChkChange(Sender: TObject);
 begin
   if FLoading then Exit;
-  if not DatabaseData.IsShadowDatabase then
+  if not DBDataModule.IsShadowDatabase then
   begin
     MessageDlg('A Normal Database cannot be changed into a Shadow Database',mtError,[mbOK],0);
     FLoading := true;
@@ -406,7 +429,7 @@ begin
     end;
   end
   else
-    DatabaseData.ActivateShadow;
+    DBDataModule.ActivateShadow;
 end;
 
 procedure TMainForm.LimboTabHide(Sender: TObject);
@@ -423,13 +446,13 @@ end;
 procedure TMainForm.LingerDelayEditingDone(Sender: TObject);
 begin
   if FLoading then Exit;
-  DatabaseData.LingerDelay := LingerDelay.Text;
+  DBDataModule.LingerDelay := LingerDelay.Text;
 end;
 
 procedure TMainForm.NoReserveChange(Sender: TObject);
 begin
   if FLoading then Exit;
-  DatabaseData.NoReserve := NoReserve.Checked;
+  DBDataModule.NoReserve := NoReserve.Checked;
 end;
 
 procedure TMainForm.DBCharacterSetEditingDone(Sender: TObject);
@@ -441,14 +464,14 @@ end;
 
 procedure TMainForm.DBCommentsEditingDone(Sender: TObject);
 begin
-  DatabaseData.Description := DBComments.Lines.Text;
+  DBDataModule.Description := DBComments.Lines.Text;
 end;
 
 procedure TMainForm.AutoAdminChange(Sender: TObject);
 begin
   if FLoading then Exit;
   try
-    DatabaseData.AutoAdmin := AutoAdmin.Checked;
+    DBDataModule.AutoAdmin := AutoAdmin.Checked;
   except on E:Exception do
    begin
     MessageDlg(E.message,mtError,[mbOK],0);
@@ -469,7 +492,7 @@ var FileName: string;
     Pages: boolean;
 begin
   StartAt := 0;
-  if DatabaseData.IsDatabaseOnline then
+  if DBDataModule.IsDatabaseOnline then
   begin
     MessageDlg('The database must be shutdown before adding secondary files',
                  mtError,[mbOK],0);
@@ -484,7 +507,7 @@ begin
       if FileLength <> -1 then
         FileLength := FileLength*1024*1024 div IBDatabaseInfo.PageSize;
     end;
-    DatabaseData.AddSecondaryFile(FileName,StartAt,FileLength);
+    DBDataModule.AddSecondaryFile(FileName,StartAt,FileLength);
   end;
 end;
 
@@ -505,7 +528,7 @@ end;
 
 procedure TMainForm.AddShadowSetExecute(Sender: TObject);
 begin
-  DatabaseData.AddShadowSet;
+  DBDataModule.AddShadowSet;
 end;
 
 procedure TMainForm.AddTagExecute(Sender: TObject);
@@ -535,12 +558,12 @@ end;
 procedure TMainForm.AddUserUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := (UserListSource.State = dsBrowse) and
-     ((DatabaseData.DBUserName = 'SYSDBA') or DatabaseData.HasUserAdminPrivilege);
+     ((DBDataModule.DBUserName = 'SYSDBA') or DBDataModule.HasUserAdminPrivilege);
 end;
 
 procedure TMainForm.ApplySelectedExecute(Sender: TObject);
 begin
-  DatabaseData.LimboResolution(NoGlobalAction,LimboReport.Lines);
+  DBDataModule.LimboResolution(NoGlobalAction,LimboReport.Lines);
 end;
 
 procedure TMainForm.AttachmentsTabHide(Sender: TObject);
@@ -558,12 +581,12 @@ end;
 
 procedure TMainForm.AttmtTimerTimer(Sender: TObject);
 begin
-  DatabaseData.CurrentTransaction.Commit; {force a refresh}
+  DBDataModule.CurrentTransaction.Commit; {force a refresh}
 end;
 
 procedure TMainForm.BackupExecute(Sender: TObject);
 begin
-  DatabaseData.BackupDatabase;
+  DBDataModule.BackupDatabase;
 end;
 
 procedure TMainForm.ChgPasswordExecute(Sender: TObject);
@@ -591,12 +614,12 @@ end;
 
 procedure TMainForm.Commit2PhaseExecute(Sender: TObject);
 begin
-  DatabaseData.LimboResolution(RecoverTwoPhaseGlobal,LimboReport.Lines);
+  DBDataModule.LimboResolution(RecoverTwoPhaseGlobal,LimboReport.Lines);
 end;
 
 procedure TMainForm.CommitAllExecute(Sender: TObject);
 begin
-  DatabaseData.LimboResolution(CommitGlobal,LimboReport.Lines);
+  DBDataModule.LimboResolution(CommitGlobal,LimboReport.Lines);
 end;
 
 procedure TMainForm.CommitAllUpdate(Sender: TObject);
@@ -613,17 +636,17 @@ begin
   ShutDownMode := DenyTransaction;
   Delay := 60;
   if DatabaseOnline.Checked then
-    DatabaseData.BringDatabaseOnline
+    DBDataModule.BringDatabaseOnline
   else
   if ShutdownReqDlg.ShowModal(DatabaseAliasName.Text,ShutDownMode,Delay) = mrOK then
-    DatabaseData.Shutdown(ShutdownMode,Delay);
+    DBDataModule.Shutdown(ShutdownMode,Delay);
 end;
 
 procedure TMainForm.DBIsReadOnlyChange(Sender: TObject);
 begin
   if FLoading then Exit;
   try
-    DatabaseData.DBReadOnly := DBIsReadOnly.Checked;
+    DBDataModule.DBReadOnly := DBIsReadOnly.Checked;
   except on E:Exception do
      MessageDlg(E.message,mtError,[mbOK],0);
   end;
@@ -632,7 +655,7 @@ end;
 procedure TMainForm.DBSQLDialectEditingDone(Sender: TObject);
 begin
   if FLoading then Exit;
-  DatabaseData.DBSQLDialect := StrToInt(DBSQLDialect.Text);
+  DBDataModule.DBSQLDialect := StrToInt(DBSQLDialect.Text);
 end;
 
 procedure TMainForm.DeleteTagExecute(Sender: TObject);
@@ -655,7 +678,7 @@ end;
 procedure TMainForm.DeleteUserUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := UserListSource.DataSet.Active and (UserListSource.DataSet.RecordCount > 0) and
-    ((DatabaseData.DBUserName = 'SYSDBA') or DatabaseData.HasUserAdminPrivilege);
+    ((DBDataModule.DBUserName = 'SYSDBA') or DBDataModule.HasUserAdminPrivilege);
 end;
 
 procedure TMainForm.DisconnectAttachmentExecute(Sender: TObject);
@@ -678,8 +701,8 @@ begin
   if MessageDlg(Format('Do you really want to delete the database "%s". You will lose all your data!',
         [IBDatabaseInfo.Database.DatabaseName]),mtConfirmation,[mbYes,mbNo],0) = mrYes then
   begin
-    DatabaseData.DropDatabase;
-    DatabaseData.Connect;
+    DBDataModule.DropDatabase;
+    DBDataModule.Connect;
     if not IBDatabaseInfo.Database.Connected then Close;
   end;
 end;
@@ -697,13 +720,13 @@ begin
     if (AccessRightsTreeView.Selected = nil) or (AccessRightsTreeView.Selected.Parent = nil) then
       SubjectAccessRightsSource.DataSet.Active := false
     else
-      DatabaseData.SyncSubjectAccessRights(TIBTreeNode(AccessRightsTreeView.Selected).KeyValue);
+      DBDataModule.SyncSubjectAccessRights(TIBTreeNode(AccessRightsTreeView.Selected).KeyValue);
   end;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-  DatabaseData.Disconnect;
+  DBDataModule.Disconnect;
 end;
 
 procedure TMainForm.MappingsTabHide(Sender: TObject);
@@ -719,7 +742,7 @@ end;
 
 procedure TMainForm.PageBuffersEditingDone(Sender: TObject);
 begin
-  DatabaseData.PageBuffers := StrToInt(PageBuffers.Text);
+  DBDataModule.PageBuffers := StrToInt(PageBuffers.Text);
 end;
 
 procedure TMainForm.QuitExecute(Sender: TObject);
@@ -743,7 +766,7 @@ procedure TMainForm.RevokeAllExecute(Sender: TObject);
 begin
   if MessageDlg('Revoke all Access Rights from User ' + Trim(AccessRightsTreeView.Selected.Text),
       mtConfirmation,[mbYes,mbNo],0) = mrYes then
-    DatabaseData.RevokeAll;
+    DBDataModule.RevokeAll;
 end;
 
 procedure TMainForm.RevokeAllUpdate(Sender: TObject);
@@ -818,7 +841,7 @@ end;
 
 procedure TMainForm.UserManagerTabShow(Sender: TObject);
 begin
-  if not Visible or not IBDatabaseInfo.Database.Connected or DatabaseData.EmbeddedMode then Exit;
+  if not Visible or not IBDatabaseInfo.Database.Connected or DBDataModule.EmbeddedMode then Exit;
   UserListSource.DataSet.Active := true;
 end;
 
@@ -833,13 +856,13 @@ end;
 procedure TMainForm.OpenDatabaseExecute(Sender: TObject);
 begin
   PageControl1.ActivePage := Properties;
-  DatabaseData.Connect;
+  DBDataModule.Connect;
   if not IBDatabaseInfo.Database.Connected then Close;
 end;
 
 procedure TMainForm.PropertiesShow(Sender: TObject);
 begin
-  if Visible and IBDatabaseInfo.Database.Connected then
+  if Visible and (IBDatabaseInfo.Database <> nil) and IBDatabaseInfo.Database.Connected then
     LoadData;
 end;
 
@@ -847,7 +870,7 @@ procedure TMainForm.RemoveShadowExecute(Sender: TObject);
 var ShadowSet: integer;
 begin
   ShadowSet := ShadowSource.DataSet.FieldByName('RDB$Shadow_Number').AsInteger;
-  DatabaseData.RemoveShadowSet(ShadowSet);
+  DBDataModule.RemoveShadowSet(ShadowSet);
 end;
 
 procedure TMainForm.RemoveShadowUpdate(Sender: TObject);
@@ -857,12 +880,12 @@ end;
 
 procedure TMainForm.RestoreExecute(Sender: TObject);
 begin
-  DatabaseData.RestoreDatabase;
+  DBDataModule.RestoreDatabase;
 end;
 
 procedure TMainForm.RollbackAllExecute(Sender: TObject);
 begin
-  DatabaseData.LimboResolution(RollbackGlobal,LimboReport.Lines);
+  DBDataModule.LimboResolution(RollbackGlobal,LimboReport.Lines);
 end;
 
 procedure TMainForm.RunRepairExecute(Sender: TObject);
@@ -874,7 +897,7 @@ begin
     Options := [SweepDB];
   1: {Online Validation }
     begin
-      DatabaseData.OnlineValidation(ValidationReport.Lines,SelectedTablesOnly.Checked);
+      DBDataModule.OnlineValidation(ValidationReport.Lines,SelectedTablesOnly.Checked);
       Exit;
     end;
   2: {Full Validation}
@@ -900,7 +923,7 @@ begin
     Options := [KillShadows];
   end;
 
-  DatabaseData.DatabaseRepair(Options,ValidationReport.Lines);
+  DBDataModule.DatabaseRepair(Options,ValidationReport.Lines);
   if (SelectRepairAction.ItemIndex = 2) and (ValidateDB in Options) then
     ValidateOptions.ActivePage := RepairOptionsTab
   else
@@ -959,13 +982,12 @@ end;
 
 procedure TMainForm.ServerTabShow(Sender: TObject);
 begin
-  if not Visible or not IBDatabaseInfo.Database.Connected or FServerError then Exit;
+  if not Visible or FServerError then Exit;
   try
-    DatabaseData.LoadServerProperties(ServerPropMemo.Lines);
-    DatabaseData.LoadServerLog(ServerLog.Lines);
+    LoadServerData;
+    DBDataModule.LoadServerLog(ServerLog.Lines);
   except
    FServerError := true;
-   ServerPropMemo.Lines.Clear;
    ServerLog.Lines.Clear;
    raise;
   end;
@@ -987,19 +1009,19 @@ procedure TMainForm.StatsOptionsCloseUp(Sender: TObject);
 begin
   StatsMemo.Lines.Clear;
   FLastStatsIndex := StatsOptions.ItemIndex;
-  DatabaseData.LoadDatabaseStatistics(StatsOptions.ItemIndex,StatsMemo.Lines);
+  DBDataModule.LoadDatabaseStatistics(StatsOptions.ItemIndex,StatsMemo.Lines);
 end;
 
 procedure TMainForm.SweepIntervalEditingDone(Sender: TObject);
 begin
   if FLoading then Exit;
-  DatabaseData.SweepInterval := StrtoInt(SweepInterval.Text);
+  DBDataModule.SweepInterval := StrtoInt(SweepInterval.Text);
 end;
 
 procedure TMainForm.SyncWritesChange(Sender: TObject);
 begin
   if FLoading then Exit;
-  DatabaseData.ForcedWrites := SyncWrites.Checked;
+  DBDataModule.ForcedWrites := SyncWrites.Checked;
 end;
 
 procedure TMainForm.ToggleAutoRefreshExecute(Sender: TObject);
@@ -1024,23 +1046,23 @@ end;
 
 procedure TMainForm.HandleLoadData(Sender: TObject);
 begin
-  if DatabaseData.EmbeddedMode then
+  if DBDataModule.EmbeddedMode then
     StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s in embedded mode',
-       [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.IBDatabase1.Params.Values['user_name']
+       [DBDataModule.IBDatabase1.DatabaseName,DBDataModule.IBDatabase1.Params.Values['user_name']
         ])
   else
-  if DatabaseData.DBUserName = 'SYSDBA' then
+  if DBDataModule.DBUserName = 'SYSDBA' then
   StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s by %s, using %s security database.',
-       [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.DBUserName,
-        DatabaseData.AuthMethod, DatabaseData.SecurityDatabase])
+       [DBDataModule.IBDatabase1.DatabaseName,DBDataModule.DBUserName,
+        DBDataModule.AuthMethod, DBDataModule.SecurityDatabase])
   else
     StatusBar1.SimpleText := Format('Database: %s - Logged in as user %s by %s, using %s security database. Role = %s',
-         [DatabaseData.IBDatabase1.DatabaseName,DatabaseData.DBUserName,
-          DatabaseData.AuthMethod, DatabaseData.SecurityDatabase,DatabaseData.RoleName]);
+         [DBDataModule.IBDatabase1.DatabaseName,DBDataModule.DBUserName,
+          DBDataModule.AuthMethod, DBDataModule.SecurityDatabase,DBDataModule.RoleName]);
   if assigned(PageControl1.ActivePage.OnShow) then
     PageControl1.ActivePage.OnShow(nil);
-  ClientLibrary.Caption := 'Firebird Client Library: ' + DatabaseData.IBDatabase1.FirebirdAPI.GetFBLibrary.GetLibraryFilePath +
-  ' (API Version = ' + DatabaseData.IBDatabase1.FirebirdAPI.GetImplementationVersion + ')';
+  ClientLibrary.Caption := 'Firebird Client Library: ' + DBDataModule.IBDatabase1.FirebirdAPI.GetFBLibrary.GetLibraryFilePath +
+  ' (API Version = ' + DBDataModule.IBDatabase1.FirebirdAPI.GetImplementationVersion + ')';
 end;
 
 procedure TMainForm.LoadData;
@@ -1048,30 +1070,30 @@ begin
   if FLoading then Exit;
   FLoading := true;
   try
-    DatabaseAliasName.Text := DatabaseData.DatabaseName;
+    DatabaseAliasName.Text := DBDataModule.DatabaseName;
     Edit1.Text := IBDatabaseInfo.DBSiteName;
     ODSVersionString.Text :=  Format('%d.%d',[IBDatabaseInfo.ODSMajorVersion,IBDatabaseInfo.ODSMinorVersion]);
     ServerVersionNo.Text :=  IBDatabaseInfo.Version;
-    DBSQLDialect.Text :=  IntToStr(DatabaseData.DBSQLDialect);
-    ConnectString.Text := DatabaseData.IBDatabase1.DatabaseName;
+    DBSQLDialect.Text :=  IntToStr(DBDataModule.DBSQLDialect);
+    ConnectString.Text := DBDataModule.IBDatabase1.DatabaseName;
     Edit10.Text := IntToStr(IBDatabaseInfo.CurrentMemory);
     Edit11.Text := IntToStr(IBDatabaseInfo.MaxMemory);
-    PageBuffers.Text := IntToStr(DatabaseData.PageBuffers);
+    PageBuffers.Text := IntToStr(DBDataModule.PageBuffers);
     AllocatedPages.Text := IntToStr(IBDatabaseInfo.Allocation);
-    DBIsReadOnly.Checked := DatabaseData.DBReadOnly;
-    SyncWrites.Checked := DatabaseData.ForcedWrites;
+    DBIsReadOnly.Checked := DBDataModule.DBReadOnly;
+    SyncWrites.Checked := DBDataModule.ForcedWrites;
     SweepInterval.Text := IntToStr(IBDatabaseInfo.SweepInterval);
-    NoReserve.Checked := DatabaseData.NoReserve;
-    LingerDelay.Text := DatabaseData.LingerDelay;
-    SecDatabase.Text := DatabaseData.SecurityDatabase;
-    DBOwner.Text := DatabaseData.DBOwner;
-    DatabaseOnline.Checked := DatabaseData.IsDatabaseOnline;
-    IsShadowChk.Checked := DatabaseData.IsShadowDatabase;
+    NoReserve.Checked := DBDataModule.NoReserve;
+    LingerDelay.Text := DBDataModule.LingerDelay;
+    SecDatabase.Text := DBDataModule.SecurityDatabase;
+    DBOwner.Text := DBDataModule.DBOwner;
+    DatabaseOnline.Checked := DBDataModule.IsDatabaseOnline;
+    IsShadowChk.Checked := DBDataModule.IsShadowDatabase;
     if IBDatabaseInfo.ODSMajorVersion >= 12 then
     begin
       PagesUsed.Text := IntToStr(IBDatabaseInfo.PagesUsed);
       PagesAvail.Text := IntToStr(IBDatabaseInfo.PagesFree);
-      AutoAdmin.Checked := not DatabaseData.EmbeddedMode and DatabaseData.AutoAdmin;
+      AutoAdmin.Checked := not DBDataModule.EmbeddedMode and DBDataModule.AutoAdmin;
     end
     else
     begin
@@ -1079,10 +1101,42 @@ begin
       PagesAvail.Text := 'n/a';
       AutoAdmin.Checked :=  false;
     end;
-    DatabaseData.IBDatabase1.Attachment.getFBVersion(ClientServerVersion.Lines);
-    DBComments.Lines.Text := DatabaseData.Description;
+    DBDataModule.IBDatabase1.Attachment.getFBVersion(ClientServerVersion.Lines);
+    DBComments.Lines.Text := DBDataModule.Description;
   finally
     FLoading := false;
+  end;
+end;
+
+procedure TMainForm.LoadServerData;
+var i: integer;
+begin
+  with DBDataModule.IBServerProperties1 do
+  begin
+    Edit3.Text := VersionInfo.ServerVersion;
+    Edit2.Text := IntToStr(VersionInfo.ServiceVersion);
+    Edit4.Text := VersionInfo.ServerImplementation;
+    OpenDatabasesList.Clear;
+    for i := 0 to DatabaseInfo.NoOfDatabases - 1 do
+      OpenDatabasesList.Lines.Add(DatabaseInfo.DbName[i]);
+    ConfigDataGrid.Visible := DBDataModule.LoadConfigData(ConfigParams.ConfigFileData);
+    ConfigDataLabel.Visible := ConfigDataGrid.Visible;
+    if ConfigDataGrid.Visible then
+    begin
+      OpenDatabasesList.Height := ConfigDataLabel.Top - OpenDatabasesList.Top - 6;
+      OpenDatabasesList.Anchors := OpenDatabasesList.Anchors - [akBottom];
+    end
+    else
+    begin
+      OpenDatabasesList.Height := ConfigDataGrid.Top - OpenDatabasesList.Top + ConfigDataGrid.Height;
+      OpenDatabasesList.Anchors := OpenDatabasesList.Anchors + [akBottom];
+    end;
+    Edit5.Text := ConfigParams.BaseLocation;
+    Edit6.Text := ConfigParams.LockFileLocation;
+    Edit7.Text :=  ConfigParams.SecurityDatabaseLocation;
+    Edit9.Text :=  ConfigParams.MessageFileLocation;
+    Edit8.Text := ServicesConnection.ServerName;
+    Edit12.Text := IntToStr(DatabaseInfo.NoOfAttachments);
   end;
 end;
 
@@ -1105,14 +1159,14 @@ procedure TMainForm.ConfigureForServerVersion;
 var i: integer;
 begin
   if (IBDatabaseInfo.ODSMajorVersion >= 12) and
-     ((DatabaseData.DBUserName = 'SYSDBA') or (DatabaseData.RoleName = 'RDB$ADMIN') or
-            not DatabaseData.HasUserAdminPrivilege) then
+     ((DBDataModule.DBUserName = 'SYSDBA') or (DBDataModule.RoleName = 'RDB$ADMIN') or
+            not DBDataModule.HasUserAdminPrivilege) then
   begin
     for i in [9,10] do
       UserManagerGrid.Columns[i].Visible := false;
       for i in [4,6,7,8] do
         UserManagerGrid.Columns[i].Visible := true ;
-    UserListSource.DataSet := DatabaseData.UserList;
+    UserListSource.DataSet := DBDataModule.UserList;
     TagsHeader.Visible := true;
     TagsGrid.Visible := true;
   end
@@ -1122,7 +1176,7 @@ begin
       UserManagerGrid.Columns[i].Visible := false;
       for i in [9,10] do
         UserManagerGrid.Columns[i].Visible := true;
-      UserListSource.DataSet := DatabaseData.LegacyUserList;
+      UserListSource.DataSet := DBDataModule.LegacyUserList;
       TagsHeader.Visible := false;
       TagsGrid.Visible := false;
   end;
@@ -1141,12 +1195,12 @@ begin
     DBCharacterSet.Visible := false;
     DBCharSetRO.Visible := true;
   end;
-  MappingsTab.TabVisible := not DatabaseData.EmbeddedMode and
+  MappingsTab.TabVisible := not DBDataModule.EmbeddedMode and
   ((IBDatabaseInfo.ODSMajorVersion > 11) or
     ((IBDatabaseInfo.ODSMajorVersion = 11) and (IBDatabaseInfo.ODSMinorVersion > 0)));
-  UserManagerTab.TabVisible := not DatabaseData.EmbeddedMode;
-  AccessRightsTab.TabVisible := not DatabaseData.EmbeddedMode;
-  AutoAdmin.Enabled := not DatabaseData.EmbeddedMode;
+  UserManagerTab.TabVisible := not DBDataModule.EmbeddedMode;
+  AccessRightsTab.TabVisible := not DBDataModule.EmbeddedMode;
+  AutoAdmin.Enabled := not DBDataModule.EmbeddedMode;
 end;
 
 procedure TMainForm.ConfigureOnlineValidation;
