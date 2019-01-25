@@ -1,8 +1,8 @@
 inherited DBADatabaseData: TDBADatabaseData
   OnCreate = DataModuleCreate
   Height = 552
-  HorizontalOffset = 724
-  VerticalOffset = 476
+  HorizontalOffset = 804
+  VerticalOffset = 119
   Width = 730
   PPI = 96
   inherited IBDatabase1: TIBDatabase

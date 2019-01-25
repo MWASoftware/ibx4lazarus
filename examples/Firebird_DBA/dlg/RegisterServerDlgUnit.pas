@@ -42,15 +42,13 @@ procedure TRegisterServerDlg.FormShow(Sender: TObject);
 begin
   ServerName.Text := 'My Server';
   DomainName.Text := '';
-  DefaultUserName.Text := '';
+  DefaultUserName.Text := 'SYSDBA';
   ServerName.SetFocus;
 end;
 
 procedure TRegisterServerDlg.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
-  if DomainName.Text = '' then
-    raise Exception.Create('A Domain Name must be provided');
 end;
 
 end.

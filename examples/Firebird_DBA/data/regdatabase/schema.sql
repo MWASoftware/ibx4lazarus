@@ -94,15 +94,15 @@ Create View DatabasesByServer As
 
 with recursive ServerInfo As (
   Select 0 as ItemType, -1 as ID, 'Servers' as ItemName,
-    cast (Null as VarChar(256)) as DomainName, null as Parent From RDB$Database
+     null as Parent From RDB$Database
   Union
-  Select 1 as ItemType, ServerID as ID, ServerName as ItemName, DomainName, -1 as Parent
+  Select 1 as ItemType, ServerID as ID, ServerName as ItemName,  -1 as Parent
    From Servers
   Union all
-  Select 2, DB.DatabaseID, DB.DatabaseName, NULL, DB.Server
+  Select 2, DB.DatabaseID, DB.DatabaseName, DB.Server
     From Databases DB
     Join ServerInfo SI On SI.ID = DB.Server
-    Where SI.ItemType = 0
+    Where SI.ItemType = 1
 )
 Select * From ServerInfo;
 
@@ -123,11 +123,7 @@ As
 Begin
   if (new.ItemType = 1) then
   begin
-    if (new.ItemName is not distinct from new.DomainName) then
-      Update Servers Set ServerName = new.ItemName, DomainName = NULL, ServerID = new.ID
-        Where ServerID = old.ID;
-    else
-      Update Servers Set ServerName = new.ItemName, DomainName = coalesce(new.DomainName,old.ItemName), ServerID = new.ID
+      Update Servers Set ServerName = new.ItemName,  ServerID = new.ID
         Where ServerID = old.ID;
   end
   else

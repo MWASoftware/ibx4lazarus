@@ -1239,6 +1239,7 @@ object DBDataModule: TDBDataModule
   end
   object IBXServicesConnection1: TIBXServicesConnection
     Connected = False
+    AfterConnect = IBXServicesConnection1AfterConnect
     OnLogin = IBXServicesConnection1Login
     Params.Strings = (
       'sql_role_name=RDB$ADMIN'

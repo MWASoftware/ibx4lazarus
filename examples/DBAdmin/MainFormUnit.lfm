@@ -77,12 +77,12 @@ object MainForm: TMainForm
     Height = 548
     Top = 26
     Width = 939
-    ActivePage = ServerTab
+    ActivePage = UserManagerTab
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 5
+    TabIndex = 6
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
@@ -1880,6 +1880,7 @@ object MainForm: TMainForm
             Top = 16
             Width = 312
             Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
             TabOrder = 6
             Text = 'Edit8'
           end
@@ -1897,6 +1898,7 @@ object MainForm: TMainForm
             Top = 208
             Width = 312
             Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
             TabOrder = 7
             Text = 'Edit9'
           end
@@ -1905,6 +1907,7 @@ object MainForm: TMainForm
             Height = 24
             Top = 236
             Width = 312
+            ReadOnly = True
             TabOrder = 8
             Text = 'Edit12'
           end
@@ -2137,7 +2140,7 @@ object MainForm: TMainForm
         ClientHeight = 516
         ClientWidth = 189
         TabOrder = 2
-        object IBDynamicGrid4: TIBDynamicGrid
+        object RolesGrid: TIBDynamicGrid
           Left = 0
           Height = 161
           Top = 50
@@ -2197,7 +2200,7 @@ object MainForm: TMainForm
             TabOrder = 0
           end
         end
-        object Panel6: TPanel
+        object RolesHeaderPanel: TPanel
           Left = 0
           Height = 50
           Top = 0

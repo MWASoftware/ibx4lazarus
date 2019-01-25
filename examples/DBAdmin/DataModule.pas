@@ -152,6 +152,7 @@ type
       Params: ISQLParams);
     procedure IBValidationService1GetNextLine(Sender: TObject; var Line: string
       );
+    procedure IBXServicesConnection1AfterConnect(Sender: TObject);
     procedure IBXServicesConnection1Login(Service: TIBXServicesConnection;
       var aServerName: string; LoginParams: TStrings);
     procedure LegacyUserListAfterOpen(DataSet: TDataSet);
@@ -197,7 +198,6 @@ type
     function GetDBSQLDialect: integer;
     function GetDBUserName: string;
     function GetDescription: string;
-    function GetEmbeddedMode: boolean;
     function GetForcedWrites: boolean;
     function GetLingerDelay: string;
     function GetNoReserve: boolean;
@@ -218,6 +218,8 @@ type
     procedure SetSweepInterval(AValue: integer);
     procedure ReloadData(Data: PtrInt=0);
   protected
+    FServiceUserName: string;
+    function GetEmbeddedMode: boolean; virtual;
     procedure ConnectServicesAPI; virtual;
     function CallLoginDlg(var aDatabaseName, aUserName, aPassword: string;
       var aCreateIfNotExist: boolean): TModalResult; virtual;
@@ -264,6 +266,7 @@ type
     property DBOwner: string read GetDBOwner;
     property DBSQLDialect: integer read GetDBSQLDialect write SetDBSQLDialect;
     property ServerName: string read GetServerName;
+    property ServiceUserName: string read FServiceUserName;
     property HasUserAdminPrivilege: boolean read GetUserAdminPrivilege;
     property AfterDBConnect: TNotifyEvent read FAfterDBConnect write FAfterDBConnect;
     property AfterDataReload: TNotifyEvent read FAfterDataReload write FAfterDataReload;
@@ -575,17 +578,23 @@ end;
 
 function TDBDataModule.GetDBUserName: string;
 begin
-  Result := Trim(AttmtQuery.FieldByName('MON$USER').AsString);
+  if AttmtQuery.Active then
+    Result := Trim(AttmtQuery.FieldByName('MON$USER').AsString)
+  else
+    Result := '';
 end;
 
 function TDBDataModule.GetDescription: string;
 begin
-  Result :=  DatabaseQuery.FieldByName('RDB$DESCRIPTION').AsString;
+  if DatabaseQuery.Active then
+    Result :=  DatabaseQuery.FieldByName('RDB$DESCRIPTION').AsString
+  else
+    Result := '';
 end;
 
 function TDBDataModule.GetEmbeddedMode: boolean;
 begin
-  Result := AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull;
+  Result := AttmtQuery.Active and AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull;
 end;
 
 function TDBDataModule.GetForcedWrites: boolean;
@@ -742,6 +751,7 @@ procedure TDBDataModule.Disconnect;
 begin
   FDBUserName := '';
   FDBPassword := '';
+  FServiceUserName := '';
   FLocalConnect := false;
   IBDatabase1.Connected := false;
   IBXServicesConnection1.Connected := false;
@@ -949,7 +959,7 @@ function TDBDataModule.GetUserAdminPrivilege: boolean;
 begin
   Result := false;
   {For ODS 12 use SEC$USERS table}
-  if IBDatabaseInfo.ODSMajorVersion >= 12 then
+  if IBDatabase1.Connected and (IBDatabaseInfo.ODSMajorVersion >= 12) then
   with AdminUserQuery do
   begin
     ExecQuery;
@@ -964,7 +974,7 @@ begin
   begin
     with IBSecurityService1 do
     begin
-      DisplayUser(DBUserName);
+      DisplayUser(ServiceUserName);
       Result := (UserInfoCount > 0) and UserInfo[0].AdminRole;
     end;
   end;
@@ -1330,6 +1340,14 @@ begin
   Application.ProcessMessages;
 end;
 
+procedure TDBDataModule.IBXServicesConnection1AfterConnect(Sender: TObject);
+var UN: ISPBItem;
+begin
+  UN := IBXServicesConnection1.ServiceIntf.getSPB.Find(isc_spb_user_name);
+  if UN <> nil then
+    FServiceUserName := UN.AsString;
+end;
+
 procedure TDBDataModule.IBXServicesConnection1Login(
   Service: TIBXServicesConnection; var aServerName: string; LoginParams: TStrings);
 begin
@@ -1340,13 +1358,17 @@ end;
 procedure TDBDataModule.LegacyUserListAfterOpen(DataSet: TDataSet);
 begin
   UserListSource.DataSet := LegacyUserList;
-  CurrentTransaction.Active := true;
-  RoleNameList.Active := true;
+  if IBDatabase1.Connected then
+  begin
+    CurrentTransaction.Active := true;
+    RoleNameList.Active := true;
+  end;
 end;
 
 procedure TDBDataModule.LegacyUserListAfterPost(DataSet: TDataSet);
 begin
-  RoleNameList.Active := true;
+  if IBDatabase1.Connected then
+    RoleNameList.Active := true;
 end;
 
 procedure TDBDataModule.LegacyUserListBeforeClose(DataSet: TDataSet);

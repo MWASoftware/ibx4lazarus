@@ -31,18 +31,17 @@ type
    FServiceIntf: IServiceManager;
    procedure SetDomainName(AValue: string);
    procedure SetDefaultUserName(AValue: string);
-   procedure SetFDefaultUserName(AValue: string);
    procedure SetServerName(AValue: string);
   public
    constructor Create(aOwner: TServerDataList; aServerName,
      aDomainName, aDefaultUserName: string); overload;
    constructor Create(aOwner: TServerDataList; aServerID: integer); overload;
    procedure Refresh;
-   procedure Select;
+   function Select(Reselect: boolean=false): boolean;
    property ServerID: integer read FServerID;
    property ServerName: string read FServerName write SetServerName;
    property DomainName: string read FDomainName write SetDomainName;
-   property DefaultUserName: string read FDefaultUserName write SetFDefaultUserName;
+   property DefaultUserName: string read FDefaultUserName write SetDefaultUserName;
    property ServiceIntf: IServiceManager read FServiceIntf write FServiceIntf;
   end;
 
@@ -55,6 +54,7 @@ type
   private
     FServerData: array of TServerData;
     FServerDataLoaded: boolean;
+    FLoading: boolean;
     function FindServerData(aServerID: integer): integer;
     function GetServerData(aServerID: integer): TServerData;
   public
@@ -107,33 +107,38 @@ var index: integer;
 begin
   if FServerDataLoaded then Exit;
 
-  SetLength(FServerData,0);
-  with TIBSQL.Create(nil) do
+  FLoading := true;
   try
-    SQL.Text := sqlListServers;
-    Database := LocalData.LocalDatabase;
-    Transaction := LocalData.IBTransaction;
-    Transaction.Active := true;
-    ExecQuery;
+    SetLength(FServerData,0);
+    with TIBSQL.Create(nil) do
     try
-      while not EOF do
-      begin
-        SetLength(FServerData,Length(FServerData)+1);
-        index := Length(FServerData)-1;
-        FServerData[index] := TServerData.Create(self,FieldByName('ServerID').AsInteger);
-        with FServerData[index] do
+      SQL.Text := sqlListServers;
+      Database := LocalData.LocalDatabase;
+      Transaction := LocalData.IBTransaction;
+      Transaction.Active := true;
+      ExecQuery;
+      try
+        while not EOF do
         begin
-          ServerName := FieldByName('ServerName').AsString;
-          DomainName := FieldByName('DomainName').AsString;
-          DefaultUserName := FieldByName('DefaultUserName').AsString;
+          SetLength(FServerData,Length(FServerData)+1);
+          index := Length(FServerData)-1;
+          FServerData[index] := TServerData.Create(self,FieldByName('ServerID').AsInteger);
+          with FServerData[index] do
+          begin
+            ServerName := FieldByName('ServerName').AsString;
+            DomainName := FieldByName('DomainName').AsString;
+            DefaultUserName := FieldByName('DefaultUserName').AsString;
+          end;
+          Next;
         end;
-        Next;
+      finally
+        Close;
       end;
     finally
-      Close;
+      Free
     end;
   finally
-    Free
+    FLoading := false;
   end;
   FServerDataLoaded := true;
 end;
@@ -224,28 +229,30 @@ procedure TServerData.SetDomainName(AValue: string);
 begin
   if FDomainName = AValue then Exit;
   FDomainName := AValue;
-  FServiceIntf := nil;
-  LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateDomainName,[FDomainName,FServerID]);
+  if not FOwner.FLoading then
+  begin
+    FServiceIntf := nil;
+    with LocalData do
+      LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateDomainName,[FDomainName,FServerID]);
+  end;
 end;
 
 procedure TServerData.SetDefaultUserName(AValue: string);
 begin
   if FDefaultUserName = AValue then Exit;
   FDefaultUserName := AValue;
-  LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateUserName,[FDefaultUserName,FServerID]);
-end;
-
-procedure TServerData.SetFDefaultUserName(AValue: string);
-begin
-  if FDefaultUserName = AValue then Exit;
-  FDefaultUserName := AValue;
+  if not FOwner.FLoading then
+  with LocalData do
+    LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateUserName,[FDefaultUserName,FServerID]);
 end;
 
 procedure TServerData.SetServerName(AValue: string);
 begin
   if FServerName = AValue then Exit;
   FServerName := AValue;
-  LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateServerName,[FServerName,FServerID]);
+  if not FOwner.FLoading then
+  with LocalData do
+    LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateServerName,[FServerName,FServerID]);
 end;
 
 constructor TServerData.Create(aOwner: TServerDataList; aServerName,
@@ -267,6 +274,7 @@ end;
 constructor TServerData.Create(aOwner: TServerDataList; aServerID: integer);
 begin
   inherited Create;
+  FOwner := aOwner;
   FServerID := aServerID;
   Refresh;
   FServiceIntf := nil;
@@ -285,10 +293,13 @@ begin
   end;
 end;
 
-procedure TServerData.Select;
+function TServerData.Select(Reselect: boolean): boolean;
 begin
   DBADatabaseData.DatabaseData := nil;
+  if Reselect then
+    DBADatabaseData.ServerData := nil;
   DBADatabaseData.ServerData := self;
+  Result := DBADatabaseData.IBXServicesConnection1.Connected;
 end;
 
 initialization

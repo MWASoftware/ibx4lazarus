@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
   StdCtrls, DBCtrls, Menus, ActnList, db, SynEdit, SynHighlighterSQL,
   MainFormUnit, IBLookupComboEditBox, IBDynamicGrid, IBTreeView, IBDatabaseInfo,
-  IBExtract, IBCustomDataSet;
+  IBExtract, IBCustomDataSet, IB;
 
 type
   TDBANodeItemType = (ntRoot,ntServer,ntDatabase);
@@ -16,6 +16,7 @@ type
   { TDBAMainForm }
 
   TDBAMainForm = class(TMainForm)
+    DeleteNode: TAction;
     CreateDatabase: TAction;
     AddDatabase: TAction;
     AddServer: TAction;
@@ -23,6 +24,8 @@ type
     MenuItem23: TMenuItem;
     MenuItem24: TMenuItem;
     MenuItem25: TMenuItem;
+    MenuItem26: TMenuItem;
+    MenuItem27: TMenuItem;
     RegisteredObjectsTree: TIBTreeView;
     MenuItem22: TMenuItem;
     PopupMenu1: TPopupMenu;
@@ -40,8 +43,12 @@ type
     procedure AddServerExecute(Sender: TObject);
     procedure AddServerUpdate(Sender: TObject);
     procedure CreateDatabaseExecute(Sender: TObject);
+    procedure DeleteNodeExecute(Sender: TObject);
+    procedure DeleteNodeUpdate(Sender: TObject);
+    procedure Edit8EditingDone(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure PopupMenu1Popup(Sender: TObject);
     procedure RegisteredObjectsTreeAddition(Sender: TObject; Node: TTreeNode);
     procedure RegisteredObjectsTreeCreateNodeClass(Sender: TCustomTreeView;
       var NodeClass: TTreeNodeClass);
@@ -54,11 +61,15 @@ type
     procedure ServersAndDatabasesAfterPost(DataSet: TDataSet);
     procedure ServersAndDatabasesValidatePost(Sender: TObject;
       var CancelPost: boolean);
+    procedure ServerTabShow(Sender: TObject);
+    procedure UserManagerTabShow(Sender: TObject);
   private
     FLocated: boolean;
+    FOpening: boolean;
     FNewItemType: TDBANodeItemType;
-  public
-
+    procedure DoSelect(Data: PtrInt);
+  protected
+    procedure ConfigureForServerVersion; override;
   end;
 
 var
@@ -69,7 +80,7 @@ implementation
 {$R *.lfm}
 
 uses DataModule, Variants, RegisterServerDlgUnit, CreateNewDBDlgUnit, RegisterExistingDBDlgUnit,
-  ServerDataUnit, DatabaseDataUnit, LocalDataModule;
+  ServerDataUnit, DatabaseDataUnit, LocalDataModule, DBADataModule;
 
 type
 
@@ -89,15 +100,25 @@ begin
   LocalData.LocalDatabase.Connected := true;
   ServersAndDatabases.Active := true;
   inherited;
+  PageControl1.ActivePage := ServerTab;
+end;
+
+procedure TDBAMainForm.PopupMenu1Popup(Sender: TObject);
+begin
+  MenuItem25.Visible :=  (RegisteredObjectsTree.Selected <> nil) and
+       (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType <> ntRoot);
+  MenuItem27.Visible := MenuItem25.Visible;
 end;
 
 procedure TDBAMainForm.RegisteredObjectsTreeAddition(Sender: TObject; Node: TTreeNode);
 begin
+  if ServersAndDatabases.State = dsInsert then
+    ServersAndDatabases.Post;
   TDBATreeNode(Node).ItemType := TDBANodeItemType(ServersAndDatabases.FieldByName('ItemType').AsInteger);
-  if TObject(Node.Data) is TRegisterServerDlg then
+  if (TObject(Node.Data) is TRegisterServerDlg) or (TDBATreeNode(Node).ItemType = ntServer) then
     Node.Data := ServerDataList.Update(TIBTreeNode(Node).KeyValue,TRegisterServerDlg(Node.Data))
   else
-  if TObject(Node.Data) is TRegisterExistingDBDlg then
+  if (TObject(Node.Data) is TRegisterExistingDBDlg) or (TDBATreeNode(Node).ItemType = ntDatabase) then
     Node.Data := DatabaseDataList.Update(TIBTreeNode(Node).KeyValue,TRegisterExistingDBDlg(Node.Data));
 end;
 
@@ -121,37 +142,65 @@ end;
 
 procedure TDBAMainForm.RegisteredObjectsTreeSelectionChanged(Sender: TObject);
 
- procedure ShowDBTabs(Visible: boolean);
- var i : integer;
- begin
-   for i := 0 to PageControl1.PageCount -1  do
-    if PageControl1.Pages[i].Tag = 0 then
-       PageControl1.Pages[i].TabVisible := Visible;
- end;
+  procedure NoSelection;
+  begin
+    PageControl1.Visible := false;
+    StatusBar1.SimpleText := '';
+  end;
 
 begin
   if RegisteredObjectsTree.Selected <> nil then
   begin
     case TDBATreeNode(RegisteredObjectsTree.Selected).ItemType of
     ntRoot:
-      PageControl1.Visible := false;
+      NoSelection;
 
     ntServer:
       with TIBTreeView(RegisteredObjectsTree) do
       if not VarIsNull(SelectedKeyValue) then
-      begin
-        ServerDataList.ServerData[SelectedKeyValue].Select;
-        PageControl1.Visible := true;
-        ShowDBTabs(false);
+      try
+        if ServerDataList.ServerData[SelectedKeyValue].Select then
+        begin
+          ConfigureForServerVersion;
+          PageControl1.ActivePage := ServerTab;
+          PageControl1.Visible := true;
+          StatusBar1.SimpleText := Format('Server: %s - Logged in as user %s',[
+                                          DBADatabaseData.ServerData.SERVERNAME,
+                                          DBADatabaseData.ServiceUserName]);
+          if DBADatabaseData.EmbeddedMode then
+            StatusBar1.SimpleText := StatusBar1.SimpleText + ' in embedded mode';
+          Selected.Expand(false);
+          PageControl1.ActivePage.OnShow(nil);
+        end
+        else
+          NoSelection;
+      except
+        On E: EIBClientError do
+          NoSelection;
+        else
+        begin
+          NoSelection;
+          raise;
+        end;
       end;
 
     ntDatabase:
       with TIBTreeView(RegisteredObjectsTree) do
       if not VarIsNull(SelectedKeyValue) then
-      begin
-        DatabaseDataList.DatabaseData[SelectedKeyValue].Select;
-        PageControl1.Visible := true;
-        ShowDBTabs(true);
+      try
+        if DatabaseDataList.DatabaseData[SelectedKeyValue].Select then
+        begin
+          PageControl1.Visible := true;
+          PageControl1.ActivePage := Properties;
+        end
+        else
+        begin
+          NoSelection;
+          Application.QueueAsyncCall(@DoSelect,PtrInt(Selected.Parent));
+        end;
+      except
+        NoSelection;
+        raise;
       end;
     end;
   end;
@@ -174,13 +223,18 @@ end;
 procedure TDBAMainForm.ServersAndDatabasesAfterOpen(DataSet: TDataSet);
 var CurServerDB: string;
 begin
-  PageControl1.Visible := false;
-  if (RegisteredObjectsTree.Selected <> nil) and (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType = ntRoot) then
-    RegisteredObjectsTree.Selected.Expand(false);
-  CurServerDB := LocalData.UserConfig[rgCurServerDB];
-  if not FLocated and (CurServerDB <> '') then
-     RegisteredObjectsTree.FindNode(StrIntListToVar(CurServerDB),true);
-  FLocated := true;
+  if FLocated or FOpening then Exit;
+  FOpening := true;
+  try
+    if (RegisteredObjectsTree.Selected <> nil) and (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType = ntRoot) then
+      RegisteredObjectsTree.Selected.Expand(false);
+    CurServerDB := LocalData.UserConfig[rgCurServerDB];
+    if CurServerDB <> '' then
+       RegisteredObjectsTree.Selected := RegisteredObjectsTree.FindNode(StrIntListToVar(CurServerDB),true);
+    FLocated := true;
+  finally
+    FOpening := false
+  end;
 end;
 
 procedure TDBAMainForm.ServersAndDatabasesAfterPost(DataSet: TDataSet);
@@ -196,9 +250,58 @@ begin
     MessageDlg('A Server must be given a name',mtError,[mbOK],0)
 end;
 
+procedure TDBAMainForm.ServerTabShow(Sender: TObject);
+begin
+  if not Visible or (DBADatabaseData.ServerData = nil) then Exit;
+  inherited;
+end;
+
+procedure TDBAMainForm.UserManagerTabShow(Sender: TObject);
+begin
+  if Visible and (DBADatabaseData.DatabaseData = nil) then
+      UserListSource.DataSet.Active := not DBADatabaseData.EmbeddedMode
+  else
+    inherited;
+end;
+
+procedure TDBAMainForm.DoSelect(Data: PtrInt);
+begin
+  RegisteredObjectsTree.Selected := TTreeNode(Data);
+end;
+
+procedure TDBAMainForm.ConfigureForServerVersion;
+var i: integer;
+begin
+  if DBADatabaseData.DatabaseData = nil then
+  begin
+    UserListSource.DataSet := DBDataModule.LegacyUserList;
+    for i in [0,1,2,3,4,7,8,9,10] do
+     PageControl1.Pages[i].TabVisible := false;
+    PageControl1.Pages[6].TabVisible := not DBADatabaseData.EmbeddedMode;
+    for i in [4,6,7,8] do
+      UserManagerGrid.Columns[i].Visible := false;
+    for i in [9,10] do
+      UserManagerGrid.Columns[i].Visible := true;
+    TagsHeader.Visible := false;
+    TagsGrid.Visible := false;
+    RolesHeaderPanel.Visible := false;
+    RolesGrid.Visible := false;
+  end
+  else
+  begin
+    for i in [0,1,2,3,4,6,7,8,9,10] do
+     PageControl1.Pages[i].TabVisible := true;
+    RolesHeaderPanel.Visible := true;
+    RolesGrid.Visible := true;
+    inherited ConfigureForServerVersion;
+  end;
+end;
+
 procedure TDBAMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction
   );
 begin
+   LocalData.UserConfig[rgCurServerDB] :=
+      VarToStrIntList(RegisteredObjectsTree.GetNodePath(RegisteredObjectsTree.Selected));
   LocalData.LocalDatabase.Connected := false;
   inherited;
 end;
@@ -219,6 +322,30 @@ begin
                                                                                  CreateNewDBDlg.DatabaseName.Text,
                                                                                  CreateNewDBDlg);
   end;
+end;
+
+procedure TDBAMainForm.DeleteNodeExecute(Sender: TObject);
+var Node: TTreeNode;
+begin
+  if MessageDlg(Format('Do you really want to delete "%s"?',[RegisteredObjectsTree.Selected.Text]),
+    mtConfirmation,[mbYes,mbNo],0) = mrYes then
+  begin
+    Node := RegisteredObjectsTree.Selected.Parent;
+    RegisteredObjectsTree.Selected.Delete;
+    RegisteredObjectsTree.Selected := Node;
+  end;
+end;
+
+procedure TDBAMainForm.DeleteNodeUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Enabled := (RegisteredObjectsTree.Selected <> nil) and
+       (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType <> ntRoot);
+end;
+
+procedure TDBAMainForm.Edit8EditingDone(Sender: TObject);
+begin
+  DBADatabaseData.ServerData.DomainName := (Sender as TEdit).Text;
+  DBADatabaseData.ServerData.Select(true);
 end;
 
 procedure TDBAMainForm.AddServerExecute(Sender: TObject);

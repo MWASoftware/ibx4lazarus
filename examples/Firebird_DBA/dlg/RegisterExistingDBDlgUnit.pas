@@ -51,10 +51,13 @@ function TRegisterExistingDBDlg.ShowModal(aServerData: TServerData
   ): TModalResult;
 begin
   FServerData := aServerData;
-  ServerName.Text := FServerData.ServerName;
+  if aServerData = nil then
+    ServerName.Text := ''
+  else
+    ServerName.Text := FServerData.ServerName;
   DatabaseName.Text := '';
   DatabasePath.Text := '';
-  DefaultUserName.Text := '';
+  DefaultUserName.Text := 'SYSDBA';
   Result := inherited ShowModal;
 end;
 

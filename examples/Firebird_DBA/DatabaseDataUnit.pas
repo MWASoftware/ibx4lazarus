@@ -44,7 +44,7 @@ type
       aDatabaseName: string; aServer: TServerData); overload;
     constructor Create(aOwner: TDatabaseDataList; aDatabaseID: integer; aServer: TServerData); overload;
     procedure Refresh;
-    procedure Select;
+    function Select: boolean;
     property DatabaseID: integer read FDatabaseID;
     property DatabasePath: string read FDatabasePath write SetDatabasePath;
     property DatabaseName: string read FDatabaseName write SetDatabaseName;
@@ -68,8 +68,9 @@ type
   private
     FDatabaseDataList: array of TDatabaseData;
     FDatabaseListLoaded: boolean;
+    FLoading: boolean;
     function FindDatabaseData(aDatabaseID: integer): integer;
-    function GetDatabaseData(index: integer): TDatabaseData;
+    function GetDatabaseData(aDatabaseID: integer): TDatabaseData;
     procedure LoadDatabaseList;
   public
     constructor Create;
@@ -97,14 +98,15 @@ procedure TDatabaseData.SetDatabaseName(AValue: string);
 begin
   if FDatabaseName = AValue then Exit;
   FDatabaseName := AValue;
-  LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateName,[FDatabaseName,FDatabaseID]);
+  if not Owner.FLoading then
+    LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateName,[FDatabaseName,FDatabaseID]);
 end;
 
 procedure TDatabaseData.SetAppID(AValue: integer);
 begin
   if FAppID = AValue then Exit;
   FAppID := AValue;
-  if LocalData.AppDatabases.Locate('ID',FAppID,[]) then
+  if not Owner.FLoading and LocalData.AppDatabases.Locate('ID',FAppID,[]) then
   begin
     FTitle := LocalData.AppDatabases.FieldByName('Title').AsString;
     FDBControlTable := LocalData.AppDatabases.FieldByName('DBControlTable').AsString;
@@ -116,14 +118,16 @@ procedure TDatabaseData.SetDatabasePath(AValue: string);
 begin
   if FDatabasePath = AValue then Exit;
   FDatabasePath := AValue;
-  LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdatePath,[FDatabasePath,FDatabaseID]);
+  if not Owner.FLoading then
+    LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdatePath,[FDatabasePath,FDatabaseID]);
 end;
 
 procedure TDatabaseData.SetDefaultUserName(AValue: string);
 begin
   if FDefaultUserName = AValue then Exit;
   FDefaultUserName := AValue;
-  LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateUser,[FDefaultUserName,FDatabaseID]);
+  if not Owner.FLoading then
+    LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateUser,[FDefaultUserName,FDatabaseID]);
 end;
 
 constructor TDatabaseData.Create(aOwner: TDatabaseDataList;
@@ -166,9 +170,10 @@ begin
   end;
 end;
 
-procedure TDatabaseData.Select;
+function TDatabaseData.Select: boolean;
 begin
   DBADatabaseData.DatabaseData := self;
+  Result := DBADatabaseData.IBDatabase1.Connected;;
 end;
 
 { TDatabaseDataList }
@@ -211,11 +216,14 @@ begin
   FDatabaseDataList[Result] := TDatabaseData.Create(self,aDatabaseID,aServer);
 end;
 
-function TDatabaseDataList.GetDatabaseData(index: integer): TDatabaseData;
+function TDatabaseDataList.GetDatabaseData(aDatabaseID: integer): TDatabaseData;
+var index: integer;
 begin
-  if (index < 0) or (index >= Length(FDatabaseDataList)) then
-    raise Exception.CreateFmt('Database Index (%d) out of range',[index]);
-  Result := FDatabaseDataList[index];
+  index := FindDatabaseData(aDatabaseID);
+  if index <> -1 then
+    Result := FDatabaseDataList[index]
+  else
+    Result := nil;
 end;
 
 procedure TDatabaseDataList.LoadDatabaseList;
@@ -223,38 +231,43 @@ var index: integer;
 begin
   if FDatabaseListLoaded then Exit;
 
-  SetLength(FDatabaseDataList,0);
-  with TIBSQL.Create(nil) do
+  FLoading := true;
   try
-    SQL.Text := sqlSelectAll;
-    Database := LocalData.LocalDatabase;
-    Transaction := LocalData.IBTransaction;
-    Transaction.Active := true;
-    ExecQuery;
+    SetLength(FDatabaseDataList,0);
+    with TIBSQL.Create(nil) do
     try
-      while not EOF do
-      begin
-        SetLength(FDatabaseDataList,Length(FDatabaseDataList)+1);
-        index := Length(FDatabaseDataList)-1;
-        FDatabaseDataList[index] := TDatabaseData.Create(self,
-                                                         FieldByName('DatabaseID').AsInteger,
-                                                         ServerDataList[FieldByName('Server').AsInteger]);
-        with FDatabaseDataList[index] do
+      SQL.Text := sqlSelectAll;
+      Database := LocalData.LocalDatabase;
+      Transaction := LocalData.IBTransaction;
+      Transaction.Active := true;
+      ExecQuery;
+      try
+        while not EOF do
         begin
-          DatabaseName := FieldByName('DatabaseName').AsString;
-          DatabasePath := FieldByName('DatabasePath').AsString;
-          DefaultUserName := FieldByName('DefaultUserName').AsString;
+          SetLength(FDatabaseDataList,Length(FDatabaseDataList)+1);
+          index := Length(FDatabaseDataList)-1;
+          FDatabaseDataList[index] := TDatabaseData.Create(self,
+                                                           FieldByName('DatabaseID').AsInteger,
+                                                           ServerDataList[FieldByName('Server').AsInteger]);
+          with FDatabaseDataList[index] do
+          begin
+            DatabaseName := FieldByName('DatabaseName').AsString;
+            DatabasePath := FieldByName('DatabasePath').AsString;
+            DefaultUserName := FieldByName('DefaultUserName').AsString;
+          end;
+          Next;
         end;
-        Next;
+      finally
+        Close;
       end;
     finally
-      Close;
+      Free
     end;
-  finally
-    Free
-  end;
 
-  FDatabaseListLoaded := true;
+    FDatabaseListLoaded := true;
+  finally
+    FLoading := false
+  end;
 end;
 
 procedure TDatabaseDataList.Clear;

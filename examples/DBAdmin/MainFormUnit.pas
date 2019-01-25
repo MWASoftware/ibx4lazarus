@@ -190,7 +190,7 @@ type
     IBDynamicGrid2: TIBDynamicGrid;
     AttmtTimer: TTimer;
     UserManagerGrid: TIBDynamicGrid;
-    IBDynamicGrid4: TIBDynamicGrid;
+    RolesGrid: TIBDynamicGrid;
     TagsGrid: TIBDynamicGrid;
     IsShadowChk: TCheckBox;
     Label1: TLabel;
@@ -237,7 +237,7 @@ type
     Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
-    Panel6: TPanel;
+    RolesHeaderPanel: TPanel;
     TagsHeader: TPanel;
     PrimaryDBFile: TEdit;
     Properties: TTabSheet;
@@ -383,8 +383,9 @@ type
     procedure LoadData;
     procedure LoadServerData;
     procedure DoExtract(Data: PtrInt);
-    procedure ConfigureForServerVersion;
     procedure ConfigureOnlineValidation;
+  protected
+    procedure ConfigureForServerVersion; virtual;
   public
   end;
 
@@ -558,7 +559,7 @@ end;
 procedure TMainForm.AddUserUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := (UserListSource.State = dsBrowse) and
-     ((DBDataModule.DBUserName = 'SYSDBA') or DBDataModule.HasUserAdminPrivilege);
+     ((DBDataModule.ServiceUserName = 'SYSDBA') or DBDataModule.HasUserAdminPrivilege);
 end;
 
 procedure TMainForm.ApplySelectedExecute(Sender: TObject);
@@ -678,7 +679,7 @@ end;
 procedure TMainForm.DeleteUserUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := UserListSource.DataSet.Active and (UserListSource.DataSet.RecordCount > 0) and
-    ((DBDataModule.DBUserName = 'SYSDBA') or DBDataModule.HasUserAdminPrivilege);
+    ((DBDataModule.ServiceUserName = 'SYSDBA') or DBDataModule.HasUserAdminPrivilege);
 end;
 
 procedure TMainForm.DisconnectAttachmentExecute(Sender: TObject);
@@ -1159,7 +1160,7 @@ procedure TMainForm.ConfigureForServerVersion;
 var i: integer;
 begin
   if (IBDatabaseInfo.ODSMajorVersion >= 12) and
-     ((DBDataModule.DBUserName = 'SYSDBA') or (DBDataModule.RoleName = 'RDB$ADMIN') or
+     ((DBDataModule.ServiceUserName = 'SYSDBA') or (DBDataModule.RoleName = 'RDB$ADMIN') or
             not DBDataModule.HasUserAdminPrivilege) then
   begin
     for i in [9,10] do
