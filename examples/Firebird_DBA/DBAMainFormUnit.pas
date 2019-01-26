@@ -57,7 +57,6 @@ type
     procedure RegisteredObjectsTreeSelectionChanged(Sender: TObject);
     procedure ServersAndDatabasesAfterDelete(DataSet: TDataSet);
     procedure ServersAndDatabasesAfterInsert(DataSet: TDataSet);
-    procedure ServersAndDatabasesAfterOpen(DataSet: TDataSet);
     procedure ServersAndDatabasesAfterPost(DataSet: TDataSet);
     procedure ServersAndDatabasesValidatePost(Sender: TObject;
       var CancelPost: boolean);
@@ -65,7 +64,6 @@ type
     procedure UserManagerTabShow(Sender: TObject);
   private
     FLocated: boolean;
-    FOpening: boolean;
     FNewItemType: TDBANodeItemType;
     procedure DoSelect(Data: PtrInt);
   protected
@@ -96,11 +94,16 @@ type
 { TDBAMainForm }
 
 procedure TDBAMainForm.FormShow(Sender: TObject);
+var CurServerDB: string;
 begin
   LocalData.LocalDatabase.Connected := true;
   ServersAndDatabases.Active := true;
   inherited;
   PageControl1.ActivePage := ServerTab;
+  FLocated := true;
+  CurServerDB := LocalData.UserConfig[rgCurServerDB];
+  if CurServerDB <> '' then
+     RegisteredObjectsTree.Selected := RegisteredObjectsTree.FindNode(StrIntListToVar(CurServerDB),true);
 end;
 
 procedure TDBAMainForm.PopupMenu1Popup(Sender: TObject);
@@ -149,7 +152,7 @@ procedure TDBAMainForm.RegisteredObjectsTreeSelectionChanged(Sender: TObject);
   end;
 
 begin
-  if RegisteredObjectsTree.Selected <> nil then
+  if FLocated and (RegisteredObjectsTree.Selected <> nil) then
   begin
     case TDBATreeNode(RegisteredObjectsTree.Selected).ItemType of
     ntRoot:
@@ -190,6 +193,7 @@ begin
       try
         if DatabaseDataList.DatabaseData[SelectedKeyValue].Select then
         begin
+          ConfigureForServerVersion;
           PageControl1.Visible := true;
           PageControl1.ActivePage := Properties;
         end
@@ -218,23 +222,6 @@ end;
 procedure TDBAMainForm.ServersAndDatabasesAfterInsert(DataSet: TDataSet);
 begin
   ServersAndDatabases.FieldByName('ItemType').AsInteger := ord(FNewItemType);
-end;
-
-procedure TDBAMainForm.ServersAndDatabasesAfterOpen(DataSet: TDataSet);
-var CurServerDB: string;
-begin
-  if FLocated or FOpening then Exit;
-  FOpening := true;
-  try
-    if (RegisteredObjectsTree.Selected <> nil) and (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType = ntRoot) then
-      RegisteredObjectsTree.Selected.Expand(false);
-    CurServerDB := LocalData.UserConfig[rgCurServerDB];
-    if CurServerDB <> '' then
-       RegisteredObjectsTree.Selected := RegisteredObjectsTree.FindNode(StrIntListToVar(CurServerDB),true);
-    FLocated := true;
-  finally
-    FOpening := false
-  end;
 end;
 
 procedure TDBAMainForm.ServersAndDatabasesAfterPost(DataSet: TDataSet);

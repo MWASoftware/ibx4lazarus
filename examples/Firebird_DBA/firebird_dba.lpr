@@ -21,14 +21,14 @@ begin
   RequireDerivedFormResource := True;
   Application.Scaled := True;
   Application.Initialize;
+  Application.CreateForm(TLocalData, LocalData);
   Application.CreateForm(TDBAMainForm, DBAMainForm);
+  Application.CreateForm(TDBADatabaseData, DBADatabaseData);
   Application.CreateForm(TRegisterExistingDBDlg, RegisterExistingDBDlg);
   Application.CreateForm(TRegisterServerDlg, RegisterServerDlg);
   Application.CreateForm(TCreateNewDBDlg, CreateNewDBDlg);
   Application.CreateForm(TAddSecondaryFileDlg, AddSecondaryFileDlg);
   Application.CreateForm(TAddShadowFileDlg, AddShadowFileDlg);
-  Application.CreateForm(TLocalData, LocalData);
-  Application.CreateForm(TDBADatabaseData, DBADatabaseData);
   Application.CreateForm(TAddShadowSetDlg, AddShadowSetDlg);
   Application.CreateForm(TBackupDlg, BackupDlg);
   Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);
@@ -38,7 +38,6 @@ begin
   Application.CreateForm(TRestoreDlg, RestoreDlg);
   Application.CreateForm(TShutdownDatabaseDlg, ShutdownDatabaseDlg);
   Application.CreateForm(TShutdownReqDlg, ShutdownReqDlg);
-  Application.CreateForm(TDBADatabaseData, DBADatabaseData);
   Application.Run;
 end.
 

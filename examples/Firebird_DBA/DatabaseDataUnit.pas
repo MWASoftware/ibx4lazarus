@@ -148,7 +148,6 @@ begin
   FOwner := aOwner;
   FDatabaseID := aDatabaseID;
   FServerData := aServer;
-  Refresh;
 end;
 
 procedure TDatabaseData.Refresh;
@@ -173,7 +172,7 @@ end;
 function TDatabaseData.Select: boolean;
 begin
   DBADatabaseData.DatabaseData := self;
-  Result := DBADatabaseData.IBDatabase1.Connected;;
+  Result := DBADatabaseData.IBDatabase1.Connected;
 end;
 
 { TDatabaseDataList }

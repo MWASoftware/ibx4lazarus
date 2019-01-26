@@ -1494,13 +1494,16 @@ begin
   if Assigned(BeforeConnect) then
     BeforeConnect(self);
   FAttachment := AValue;
-  ValidateClientSQLDialect;
-  FDBName := FAttachment.GetConnectString;
-  if FFirebirdLibraryPathName <> '' then
-    FFirebirdLibraryPathName := FAttachment.getFirebirdAPI.GetFBLibrary.GetLibraryFilePath;
-  InternalAfterConnect;
-  if Assigned(AfterConnect) then
-    AfterConnect(self);
+  if FAttachment <> nil then
+  begin
+    ValidateClientSQLDialect;
+    FDBName := FAttachment.GetConnectString;
+    if FFirebirdLibraryPathName <> '' then
+      FFirebirdLibraryPathName := FAttachment.getFirebirdAPI.GetFBLibrary.GetLibraryFilePath;
+    InternalAfterConnect;
+    if Assigned(AfterConnect) then
+      AfterConnect(self);
+  end;
 end;
 
 procedure TIBDataBase.SetConfigOverrides(AValue: TStrings);

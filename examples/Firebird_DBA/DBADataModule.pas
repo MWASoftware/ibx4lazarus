@@ -42,6 +42,7 @@ type
       var aCreateIfNotExist: boolean): TModalResult; override;
   public
     function Connect: boolean; override;
+    procedure Disconnect; override;
     property ServerData: TServerData read FServerData write SetServerData;
     property DatabaseData: TDatabaseData read FDatabaseData write SetDatabaseData;
   end;
@@ -64,6 +65,9 @@ end;
 
 procedure TDBADatabaseData.IBDatabase1AfterConnect(Sender: TObject);
 begin
+  CurrentTransaction.Active := true;
+  DataBaseQuery.Active := true;
+  AttmtQuery.Active := true;
   FDatabaseData.Attachment := IBDatabase1.Attachment;
   FDatabaseData.DefaultUserName := DBUserName;
   PasswordCache.SavePassword(DBUserName,IBDatabase1.DatabaseName,FDatabasePassword);
@@ -98,6 +102,7 @@ begin
   ServerData.DefaultUserName := FServiceUserName;
   if IBDatabase1.Connected then
   begin
+    CurrentTransaction.Active := true;
     DatabaseQuery.Active := true;
     if ServerData.DomainName <> '' then
       PasswordCache.SavePassword(FServiceUserName,FDatabaseData.DatabasePath,ServerData.DomainName,FServicePassword,
@@ -209,25 +214,25 @@ begin
      IBDatabase1.Attachment := nil
   else
   begin
-    ServerData := AValue.ServerData;
     IBDatabase1.Attachment := FDatabaseData.Attachment;
     if not IBDatabase1.Connected then
     begin
       FDBConnectCount := 0;
-      IBDatabase1.DatabaseName := FDatabaseData.DatabasePath;
+      IBDatabase1.DatabaseName := 'inet://'+ FDatabaseData.ServerData.DomainName + '/' + FDatabaseData.DatabasePath;
       IBDatabase1.CreateIfNotExists := FDatabaseData.CreateIfNotExists;
       IBDatabase1.Params.Values['user_name'] := FDatabaseData.DefaultUserName;
       FDatabasePassword := '';
       Connect;
-      if not IBDatabase1.Connected then
-        ServerData := nil;
-    end;
+    end
+    else
+      ConnectServicesAPI;
   end;
 end;
 
 procedure TDBADatabaseData.ConnectServicesAPI;
 begin
-  IBXServicesConnection1.Connected := true;
+  ServerData := nil;
+  ServerData := FDatabaseData.ServerData;
 end;
 
 function TDBADatabaseData.CallLoginDlg(var aDatabaseName, aUserName,
@@ -256,6 +261,13 @@ begin
     Result := inherited Connect
   else
     Result := true;
+end;
+
+procedure TDBADatabaseData.Disconnect;
+begin
+  inherited Disconnect;
+  if FServerData <> nil then
+    IBXServicesConnection1.ServiceIntf := FServerData.ServiceIntf;
 end;
 
 end.

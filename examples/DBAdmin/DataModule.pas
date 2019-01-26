@@ -226,7 +226,7 @@ type
   public
     destructor Destroy; override;
     function Connect: boolean; virtual;
-    procedure Disconnect;
+    procedure Disconnect; virtual;
     procedure DropDatabase;
     procedure BackupDatabase;
     procedure RestoreDatabase;
@@ -577,11 +577,20 @@ begin
 end;
 
 function TDBDataModule.GetDBUserName: string;
+var DPB: IDPB;
+    info: IDPBItem;
 begin
+  Result := '';
   if AttmtQuery.Active then
     Result := Trim(AttmtQuery.FieldByName('MON$USER').AsString)
   else
-    Result := '';
+  if IBDatabase1.Connected then
+  begin
+    DPB := IBDatabase1.Attachment.getDPB;
+    info := DPB.Find(isc_dpb_user_name);
+    if info <> nil then
+      Result := info.AsString;
+  end
 end;
 
 function TDBDataModule.GetDescription: string;

@@ -170,10 +170,10 @@ inherited DBAMainForm: TDBAMainForm
   end
   inherited UpdateColsPanel: TPanel
     inherited DBEdit5: TDBEdit
-      Width = 376
+      Width = 374
     end
     inherited DBEdit6: TDBEdit
-      Width = 376
+      Width = 374
     end
   end
   object RegisteredObjectsTree: TIBTreeView[4]
@@ -339,7 +339,6 @@ inherited DBAMainForm: TDBAMainForm
     Transaction = LocalData.IBTransaction
     AfterDelete = ServersAndDatabasesAfterDelete
     AfterInsert = ServersAndDatabasesAfterInsert
-    AfterOpen = ServersAndDatabasesAfterOpen
     AfterPost = ServersAndDatabasesAfterPost
     BufferChunks = 1000
     CachedUpdates = False

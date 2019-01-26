@@ -3256,6 +3256,9 @@ end;
 procedure TIBXServicesConnection.SetServiceIntf(aServiceIntf: IServiceManager;
   aDatabase: TIBDatabase);
 var i: integer;
+    var aServerName,aDatabaseName: AnsiString;
+        aProtocol: TProtocolAll;
+        aPortNo: AnsiString;
 begin
   if FService = aServiceIntf then Exit;
   if FService <> nil then
@@ -3282,8 +3285,11 @@ begin
     if FFirebirdLibraryPathName <> '' then
       FFirebirdLibraryPathName := FService.getFirebirdAPI.GetFBLibrary.GetLibraryFilePath;
     if aDatabase <> nil then
-      for i := low(FIBXServices) to high(FIBXServices) do
-        FIBXServices[i].OnAfterConnect(self,aDatabase.DatabaseName);
+    begin
+      if ParseConnectString(aDatabase.DatabaseName,aServerName,aDatabaseName,aProtocol,aPortNo) then
+        for i := low(FIBXServices) to high(FIBXServices) do
+          FIBXServices[i].OnAfterConnect(self,aDatabaseName);
+    end;
     if Assigned(AfterConnect) then
       AfterConnect(self);
   end;
