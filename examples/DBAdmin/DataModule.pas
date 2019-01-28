@@ -692,6 +692,7 @@ procedure TDatabaseData.Connect;
 var KillDone: boolean;
 begin
   KillDone := false;
+  Result := false;
   Disconnect;
   repeat
     try
