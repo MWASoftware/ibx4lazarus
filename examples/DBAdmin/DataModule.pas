@@ -722,6 +722,7 @@ function TDBDataModule.Connect: boolean;
 var KillDone: boolean;
 begin
   KillDone := false;
+  Result := false;
   Disconnect;
   repeat
     try

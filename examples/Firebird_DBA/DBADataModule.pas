@@ -18,7 +18,9 @@ type
     IBXScript1: TIBXScript;
     procedure DataModuleCreate(Sender: TObject);
     procedure IBDatabase1AfterConnect(Sender: TObject);
+    procedure IBDatabase1AfterDisconnect(Sender: TObject);
     procedure IBDatabase1CreateDatabase(Sender: TObject);
+    procedure IBDatabase1Login(Database: TIBDatabase; LoginParams: TStrings);
     procedure IBXScript1CreateDatabase(Sender: TObject;
       var DatabaseFileName: string);
     procedure IBXServicesConnection1AfterConnect(Sender: TObject);
@@ -54,7 +56,7 @@ implementation
 
 {$R *.lfm}
 
-uses PasswordCacheUnit, LocalDataModule, IBTypes, FBMessages;
+uses PasswordCacheUnit, LocalDataModule, IBTypes, FBMessages, IBUtils;
 
 { TDBADatabaseData }
 
@@ -69,11 +71,20 @@ begin
   DataBaseQuery.Active := true;
   AttmtQuery.Active := true;
   FDatabaseData.Attachment := IBDatabase1.Attachment;
-  FDatabaseData.DefaultUserName := DBUserName;
-  PasswordCache.SavePassword(DBUserName,IBDatabase1.DatabaseName,FDatabasePassword);
   if FDatabaseData.AppID = 0 then
     FDatabaseData.AppID := IdentifyDatabase;
+  FDatabaseData.DefaultUserName := DBUserName;
+  PasswordCache.SavePassword(DBUserName,ExtractDatabaseName(IBDatabase1.DatabaseName),
+                             ExtractServerName(IBDatabase1.DatabaseName),
+                             FDatabasePassword,
+                             SecurityDatabase);
   inherited;
+end;
+
+procedure TDBADatabaseData.IBDatabase1AfterDisconnect(Sender: TObject);
+begin
+  inherited;
+  FDatabasePassword := '';
 end;
 
 procedure TDBADatabaseData.IBDatabase1CreateDatabase(Sender: TObject);
@@ -89,6 +100,13 @@ begin
   end;
 end;
 
+procedure TDBADatabaseData.IBDatabase1Login(Database: TIBDatabase;
+  LoginParams: TStrings);
+begin
+  inherited;
+  FDatabasePassword := LoginParams.Values['password'];
+end;
+
 procedure TDBADatabaseData.IBXScript1CreateDatabase(Sender: TObject;
   var DatabaseFileName: string);
 begin
@@ -100,16 +118,7 @@ begin
   inherited;
   FServerData.ServiceIntf := IBXServicesConnection1.ServiceIntf;
   ServerData.DefaultUserName := FServiceUserName;
-  if IBDatabase1.Connected then
-  begin
-    CurrentTransaction.Active := true;
-    DatabaseQuery.Active := true;
-    if ServerData.DomainName <> '' then
-      PasswordCache.SavePassword(FServiceUserName,FDatabaseData.DatabasePath,ServerData.DomainName,FServicePassword,
-        Trim(DatabaseQuery.FieldByName('MON$SEC_DATABASE').AsString))
-  end
-  else
-  if ServerData.DomainName <> '' then
+  if not IBDatabase1.Connected and (ServerData.DomainName <> '') then
     PasswordCache.SavePassword(FServiceUserName,ServerData.DomainName,FServicePassword)
 end;
 
@@ -130,7 +139,7 @@ begin
   begin
     prompt := true;
     if IBDatabase1.Connected and (FServiceConnectCount = 0) then
-        prompt := not PasswordCache.GetPassword(FServiceUserName,IBDatabase1.DatabaseName,aServerName,FServicePassword)
+      prompt := not PasswordCache.GetPassword(FServiceUserName,ExtractDatabaseName(IBDatabase1.DatabaseName),aServerName,FServicePassword)
     else
     if FServiceConnectCount < 2 then
       prompt := not PasswordCache.GetPassword(FServiceUserName,aServerName,FServicePassword);
@@ -182,11 +191,9 @@ begin
     IBXServicesConnection1.Connected := false;
     Exit;
   end;
-  if IBDatabase1.Connected then
-    IBXServicesConnection1.SetServiceIntf(ServerData.ServiceIntf,IBDatabase1)
-  else
-    IBXServicesConnection1.ServiceIntf := ServerData.ServiceIntf;
-  if not IBXServicesConnection1.Connected then
+
+  IBXServicesConnection1.ServiceIntf := ServerData.ServiceIntf;
+  while not IBXServicesConnection1.Connected do
   begin
     if ServerData.DomainName = '' then
       IBXServicesConnection1.Protocol := Local
@@ -194,8 +201,17 @@ begin
        IBXServicesConnection1.Protocol := inet;
     IBXServicesConnection1.ServerName := ServerData.DomainName;
     FServiceUserName := ServerData.DefaultUserName;
-    IBXServicesConnection1.Connected := true;
+    try
+      IBXServicesConnection1.Connected := true;
+    except on E:EIBClientError do
+      break;
+    end;
   end;
+  if IBDatabase1.Connected then
+  begin
+    IBXServicesConnection1.ServiceIntf := nil;
+    IBXServicesConnection1.SetServiceIntf(ServerData.ServiceIntf,IBDatabase1);
+  end
 end;
 
 function TDBADatabaseData.GetEmbeddedMode: boolean;
@@ -240,19 +256,23 @@ function TDBADatabaseData.CallLoginDlg(var aDatabaseName, aUserName,
 var prompt: boolean;
 begin
   prompt := true;
-  if FDBConnectCount = 0 then
+  if (FDBConnectCount = 0) and assigned(ServerData) then
   begin
-      prompt := not (PasswordCache.GetPassword(aUserName,aDatabaseName,ServerData.DomainName,aPassword) or
+      prompt := not (PasswordCache.GetPassword(aUserName,ExtractDatabaseName(aDatabaseName),ServerData.DomainName,aPassword) or
                      PasswordCache.GetPassword(aUserName,ServerData.DomainName,aPassword));
   end;
 
   Inc(FDBConnectCount);
   if prompt then
-    Result := inherited CallLoginDlg(aDatabaseName, aUserName, aPassword, aCreateIfNotExist)
+  begin
+    if assigned(IBGUIInterface) and
+      IBGUIInterface.LoginDialogEx(aDatabaseName, aUserName, aPassword,false) then
+        Result := mrOK
+      else
+        Result := mrCancel;
+  end
   else
     Result := mrOK;
-  if IBDatabase1.Connected then
-    FDatabasePassword := aPassword;
 end;
 
 function TDBADatabaseData.Connect: boolean;

@@ -54,10 +54,13 @@ type
       var NodeClass: TTreeNodeClass);
     procedure RegisteredObjectsTreeEditingEnd(Sender: TObject; Node: TTreeNode;
       Cancel: Boolean);
+    procedure RegisteredObjectsTreeExpanding(Sender: TObject; Node: TTreeNode;
+      var AllowExpansion: Boolean);
     procedure RegisteredObjectsTreeSelectionChanged(Sender: TObject);
     procedure ServersAndDatabasesAfterDelete(DataSet: TDataSet);
     procedure ServersAndDatabasesAfterInsert(DataSet: TDataSet);
     procedure ServersAndDatabasesAfterPost(DataSet: TDataSet);
+    procedure ServersAndDatabasesBeforeDelete(DataSet: TDataSet);
     procedure ServersAndDatabasesValidatePost(Sender: TObject;
       var CancelPost: boolean);
     procedure ServerTabShow(Sender: TObject);
@@ -65,6 +68,7 @@ type
   private
     FLocated: boolean;
     FNewItemType: TDBANodeItemType;
+    FExpandNode: TTreeNode;
     procedure DoSelect(Data: PtrInt);
   protected
     procedure ConfigureForServerVersion; override;
@@ -96,6 +100,7 @@ type
 procedure TDBAMainForm.FormShow(Sender: TObject);
 var CurServerDB: string;
 begin
+  PageControl1.Visible := false;
   LocalData.LocalDatabase.Connected := true;
   ServersAndDatabases.Active := true;
   inherited;
@@ -109,7 +114,7 @@ end;
 procedure TDBAMainForm.PopupMenu1Popup(Sender: TObject);
 begin
   MenuItem25.Visible :=  (RegisteredObjectsTree.Selected <> nil) and
-       (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType <> ntRoot);
+       (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType = ntServer);
   MenuItem27.Visible := MenuItem25.Visible;
 end;
 
@@ -143,6 +148,12 @@ begin
     end;
 end;
 
+procedure TDBAMainForm.RegisteredObjectsTreeExpanding(Sender: TObject;
+  Node: TTreeNode; var AllowExpansion: Boolean);
+begin
+  FExpandNode := Node;
+end;
+
 procedure TDBAMainForm.RegisteredObjectsTreeSelectionChanged(Sender: TObject);
 
   procedure NoSelection;
@@ -152,7 +163,7 @@ procedure TDBAMainForm.RegisteredObjectsTreeSelectionChanged(Sender: TObject);
   end;
 
 begin
-  if FLocated and (RegisteredObjectsTree.Selected <> nil) then
+  if FLocated and (RegisteredObjectsTree.Selected <> nil) and (FExpandNode <> RegisteredObjectsTree.Selected) then
   begin
     case TDBATreeNode(RegisteredObjectsTree.Selected).ItemType of
     ntRoot:
@@ -200,7 +211,7 @@ begin
         else
         begin
           NoSelection;
-          Application.QueueAsyncCall(@DoSelect,PtrInt(Selected.Parent));
+//          Application.QueueAsyncCall(@DoSelect,PtrInt(Selected.Parent));
         end;
       except
         NoSelection;
@@ -208,15 +219,12 @@ begin
       end;
     end;
   end;
+  FExpandNode := nil;
 end;
 
 procedure TDBAMainForm.ServersAndDatabasesAfterDelete(DataSet: TDataSet);
 begin
   ServersAndDatabases.Transaction.CommitRetaining;
-  if Dataset.FieldByName('ItemType').AsInteger = 0 then
-    ServerDataList.Remove(Dataset.FieldByName('ID').AsInteger)
-  else
-    DatabaseDataList.Remove(Dataset.FieldByName('ID').AsInteger);
 end;
 
 procedure TDBAMainForm.ServersAndDatabasesAfterInsert(DataSet: TDataSet);
@@ -227,6 +235,14 @@ end;
 procedure TDBAMainForm.ServersAndDatabasesAfterPost(DataSet: TDataSet);
 begin
   ServersAndDatabases.Transaction.CommitRetaining;
+end;
+
+procedure TDBAMainForm.ServersAndDatabasesBeforeDelete(DataSet: TDataSet);
+begin
+  if Dataset.FieldByName('ItemType').AsInteger = 0 then
+    ServerDataList.Remove(Dataset.FieldByName('ID').AsInteger)
+  else
+    DatabaseDataList.Remove(Dataset.FieldByName('ID').AsInteger);
 end;
 
 procedure TDBAMainForm.ServersAndDatabasesValidatePost(Sender: TObject;

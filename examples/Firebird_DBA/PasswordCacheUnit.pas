@@ -26,16 +26,42 @@ type
   end;
 
 function PasswordCache: TPasswordCache;
+function ExtractDatabaseName(ConnectString: string): string;
+function ExtractServerName(ConnectString: string): string;
 
 implementation
 
-uses LocalDataModule, Variants;
+uses LocalDataModule, Variants, IBUtils;
 
 var FPasswordCache: TPasswordCache;
 
 function PasswordCache: TPasswordCache;
 begin
   Result := FPasswordCache;
+end;
+
+function ExtractDatabaseName(ConnectString: string): string;
+var aServerName: AnsiString;
+    aDatabaseName: AnsiString;
+    aProtocol: TProtocolAll;
+    aPortNo: AnsiString;
+begin
+  if ParseConnectString(ConnectString,aServerName, aDatabaseName, aProtocol, aPortNo) then
+    Result := aDatabaseName
+  else
+    Result := '';
+end;
+
+function ExtractServerName(ConnectString: string): string;
+var aServerName: AnsiString;
+    aDatabaseName: AnsiString;
+    aProtocol: TProtocolAll;
+    aPortNo: AnsiString;
+begin
+  if ParseConnectString(ConnectString,aServerName, aDatabaseName, aProtocol, aPortNo) then
+    Result := aServerName
+  else
+    Result := '';
 end;
 
 { TPasswordCache }
