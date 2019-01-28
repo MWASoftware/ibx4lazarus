@@ -58,14 +58,6 @@ inherited DBAMainForm: TDBAMainForm
     inherited AttachmentsTab: TTabSheet
       ClientHeight = 520
       ClientWidth = 985
-      inherited AttDetailsPanel: TPanel
-        ClientHeight = 60
-        ClientWidth = 628
-        inherited AttmntODS12Panel: TPanel
-          ClientHeight = 56
-          ClientWidth = 183
-        end
-      end
     end
     inherited StatisticsTab: TTabSheet
       ClientHeight = 520
@@ -86,10 +78,7 @@ inherited DBAMainForm: TDBAMainForm
       inherited Panel1: TPanel
         Height = 520
         ClientHeight = 520
-        ClientWidth = 491
         inherited Panel10: TPanel
-          ClientHeight = 264
-          ClientWidth = 482
           inherited Label51: TLabel
             Width = 128
             Caption = 'Server Domain Name'
@@ -128,7 +117,6 @@ inherited DBAMainForm: TDBAMainForm
       inherited Panel4: TPanel
         Height = 520
         ClientHeight = 520
-        ClientWidth = 739
         inherited UserManagerGrid: TIBDynamicGrid
           Height = 518
         end
@@ -147,7 +135,6 @@ inherited DBAMainForm: TDBAMainForm
         inherited Panel5: TPanel
           Top = 459
           Width = 241
-          ClientHeight = 61
           ClientWidth = 241
           inherited Button1: TButton
             Width = 214
@@ -155,7 +142,6 @@ inherited DBAMainForm: TDBAMainForm
         end
         inherited RolesHeaderPanel: TPanel
           Width = 241
-          ClientHeight = 50
           ClientWidth = 241
         end
         inherited Splitter3: TSplitter
@@ -193,18 +179,6 @@ inherited DBAMainForm: TDBAMainForm
         inherited RepairOptionsTab: TTabSheet
           ClientHeight = 104
           ClientWidth = 318
-        end
-      end
-      inherited Panel8: TPanel
-        ClientHeight = 384
-        ClientWidth = 888
-        inherited DBTablesPanel: TPanel
-          ClientHeight = 384
-          ClientWidth = 170
-        end
-        inherited Panel9: TPanel
-          ClientHeight = 384
-          ClientWidth = 713
         end
       end
     end
@@ -255,6 +229,24 @@ inherited DBAMainForm: TDBAMainForm
   inherited MainMenu1: TMainMenu[6]
   end
   inherited ActionList1: TActionList[7]
+    inherited Backup: TAction
+      OnUpdate = BackupUpdate
+    end
+    inherited Restore: TAction
+      OnUpdate = BackupUpdate
+    end
+    inherited OpenDatabase: TAction
+      Visible = False
+    end
+    inherited Save: TAction
+      OnUpdate = SaveUpdate
+    end
+    inherited DropDatabase: TAction
+      OnUpdate = DropDatabaseUpdate
+    end
+    inherited RunScript: TAction
+      OnUpdate = RunScriptUpdate
+    end
   end
   inherited MenuImages: TImageList[8]
   end
@@ -508,6 +500,16 @@ inherited DBAMainForm: TDBAMainForm
       OnExecute = DeleteNodeExecute
       OnUpdate = DeleteNodeUpdate
     end
+    object Disconnect: TAction
+      Caption = 'Disconnect'
+      OnExecute = DisconnectExecute
+      OnUpdate = DeleteNodeUpdate
+    end
+    object ShowProperties: TAction
+      Caption = 'Properties'
+      OnExecute = ShowPropertiesExecute
+      OnUpdate = DeleteNodeUpdate
+    end
   end
   object PopupMenu1: TPopupMenu[39]
     OnPopup = PopupMenu1Popup
@@ -518,6 +520,9 @@ inherited DBAMainForm: TDBAMainForm
     end
     object MenuItem23: TMenuItem
       Action = AddDatabase
+    end
+    object MenuItem28: TMenuItem
+      Action = Disconnect
     end
     object MenuItem25: TMenuItem
       Caption = '-'
@@ -530,6 +535,9 @@ inherited DBAMainForm: TDBAMainForm
     end
     object MenuItem26: TMenuItem
       Action = DeleteNode
+    end
+    object MenuItem29: TMenuItem
+      Action = ShowProperties
     end
   end
 end

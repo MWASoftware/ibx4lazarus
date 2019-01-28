@@ -90,8 +90,10 @@ begin
                  [aServerName,aUserName]);
   Result := not Results.IsEof;
   if Result then
+  begin
     password := FPasswordList[Results[0].AsInteger];
-//  writeln('Get PW ', aUserName, ',', aServerName,',',password);
+//    writeln('Get PW ', aUserName, ',', aServerName,',',password, ',', Results[0].AsInteger);
+  end;
 end;
 
 function TPasswordCache.GetPassword(aUserName, aDatabaseName,

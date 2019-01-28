@@ -44,6 +44,7 @@ type
       aDatabaseName: string; aServer: TServerData); overload;
     constructor Create(aOwner: TDatabaseDataList; aDatabaseID: integer; aServer: TServerData); overload;
     procedure Refresh;
+    procedure Disconnect;
     function Select: boolean;
     property DatabaseID: integer read FDatabaseID;
     property DatabasePath: string read FDatabasePath write SetDatabasePath;
@@ -167,6 +168,13 @@ begin
     if FServerData = nil then
       raise Exception.CreateFmt('Unknown Server for DatabaseName = %s',[DatabaseName]);
   end;
+end;
+
+procedure TDatabaseData.Disconnect;
+begin
+  if DBADatabaseData.DatabaseData = self then
+    DBADatabaseData.DatabaseData := nil;
+  FAttachment := nil;
 end;
 
 function TDatabaseData.Select: boolean;

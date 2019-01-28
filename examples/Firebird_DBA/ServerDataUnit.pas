@@ -37,6 +37,7 @@ type
      aDomainName, aDefaultUserName: string); overload;
    constructor Create(aOwner: TServerDataList; aServerID: integer); overload;
    procedure Refresh;
+   procedure Disconnect;
    function Select(Reselect: boolean=false): boolean;
    property ServerID: integer read FServerID;
    property ServerName: string read FServerName write SetServerName;
@@ -231,7 +232,7 @@ begin
   FDomainName := AValue;
   if not FOwner.FLoading then
   begin
-    FServiceIntf := nil;
+    Disconnect;
     with LocalData do
       LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateDomainName,[FDomainName,FServerID]);
   end;
@@ -291,6 +292,16 @@ begin
     FDomainName := ByName('DomainName').AsString;
     FDefaultUserName := ByName('DefaultUserName').AsString;
   end;
+end;
+
+procedure TServerData.Disconnect;
+begin
+  if DBADatabaseData.ServerData = self then
+  begin
+     DBADatabaseData.DatabaseData := nil;
+     DBADatabaseData.ServerData := nil;
+  end;
+  FServiceIntf := nil;
 end;
 
 function TServerData.Select(Reselect: boolean): boolean;

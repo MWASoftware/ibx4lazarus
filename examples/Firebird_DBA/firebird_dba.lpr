@@ -12,7 +12,7 @@ uses
   SelectSQLResultsUnit, DBLoginDlgUnit, ShutdownRegDlgUnit,
   ShutdownDatabaseDlgUnit, BackupDlgUnit, RestoreDlgUnit, AddSecondaryFileDlgUnit,
   AddShadowSetDlgUnit, AddShadowFileDlgUnit, NewUserDlgUnit, ChgPasswordDlgUnit,
-  ExecuteSQLScriptDlgUnit
+  ExecuteSQLScriptDlgUnit, ServerPropertiesDlgUnit
  { you can add units after this };
 
 {$R *.res}
@@ -38,6 +38,7 @@ begin
   Application.CreateForm(TRestoreDlg, RestoreDlg);
   Application.CreateForm(TShutdownDatabaseDlg, ShutdownDatabaseDlg);
   Application.CreateForm(TShutdownReqDlg, ShutdownReqDlg);
+  Application.CreateForm(TServerPropertiesDlg, ServerPropertiesDlg);
   Application.Run;
 end.
 

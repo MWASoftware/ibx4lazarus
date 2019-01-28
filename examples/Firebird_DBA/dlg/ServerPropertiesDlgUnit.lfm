@@ -1,0 +1,5 @@
+inherited ServerPropertiesDlg: TServerPropertiesDlg
+  Caption = 'Server Properties'
+  OnClose = FormClose
+  OnShow = FormShow
+end

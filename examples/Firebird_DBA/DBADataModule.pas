@@ -6,8 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, db, memds, DataModule,
-  IBXServices, IBDatabase, IBSQL, IBQuery, IBCustomDataSet, IBUpdate,
-  IBDatabaseInfo, ibxscript, ServerDataUnit, DatabaseDataUnit,IB;
+  IBXServices, IBDatabase, IBQuery, ibxscript, ServerDataUnit, DatabaseDataUnit,IB;
 
 type
 
@@ -225,6 +224,7 @@ end;
 procedure TDBADatabaseData.SetDatabaseData(AValue: TDatabaseData);
 begin
   if FDatabaseData = AValue then Exit;
+  FServerData := nil;
   FDatabaseData := AValue;
   if FDatabaseData = nil then
      IBDatabase1.Attachment := nil
@@ -256,10 +256,11 @@ function TDBADatabaseData.CallLoginDlg(var aDatabaseName, aUserName,
 var prompt: boolean;
 begin
   prompt := true;
-  if (FDBConnectCount = 0) and assigned(ServerData) then
+  if (FDBConnectCount = 0) and assigned(FDatabaseData.ServerData) then
   begin
-      prompt := not (PasswordCache.GetPassword(aUserName,ExtractDatabaseName(aDatabaseName),ServerData.DomainName,aPassword) or
-                     PasswordCache.GetPassword(aUserName,ServerData.DomainName,aPassword));
+      prompt := not (PasswordCache.GetPassword(aUserName,ExtractDatabaseName(aDatabaseName),
+                                               FDatabaseData.ServerData.DomainName,aPassword) or
+                     PasswordCache.GetPassword(aUserName,FDatabaseData.ServerData.DomainName,aPassword));
   end;
 
   Inc(FDBConnectCount);
