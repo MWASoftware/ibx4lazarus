@@ -638,6 +638,7 @@ type
     procedure SetFieldData(Field : TField; Buffer : Pointer;
       NativeFormat : Boolean); overload; override;
     procedure SetRecNo(Value: Integer); override;
+    procedure SetFilterText(const Value: string); override;
 
   protected
     {Likely to be made public by descendant classes}
@@ -4660,6 +4661,11 @@ begin
     Resync([]);
     DoAfterScroll;
   end;
+end;
+
+procedure TIBCustomDataSet.SetFilterText(const Value: string);
+begin
+  IBError(ibxeNotSupported,[nil]);
 end;
 
 procedure TIBCustomDataSet.Disconnect;
