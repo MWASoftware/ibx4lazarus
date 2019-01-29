@@ -133,7 +133,8 @@ begin
   begin
     Disconnect;
     LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdatePath,[FDatabasePath,FDatabaseID]);
-    Select;
+    if DBADatabaseData.DatabaseData = self then
+      Select;
   end;
 end;
 

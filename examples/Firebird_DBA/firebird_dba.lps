@@ -3,14 +3,14 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="90">
+    <Units Count="91">
       <Unit0>
         <Filename Value="firebird_dba.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="8"/>
         <CursorPos Y="34"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="97"/>
       </Unit0>
       <Unit1>
         <Filename Value="DBAMainFormUnit.pas"/>
@@ -18,9 +18,9 @@
         <ComponentName Value="DBAMainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="373"/>
-        <CursorPos X="3" Y="375"/>
-        <UsageCount Value="96"/>
+        <TopLine Value="132"/>
+        <CursorPos Y="151"/>
+        <UsageCount Value="97"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -30,10 +30,10 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="588"/>
         <CursorPos X="3" Y="590"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="97"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -42,10 +42,10 @@
         <ComponentName Value="DBDataModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="780"/>
-        <CursorPos X="34" Y="788"/>
-        <UsageCount Value="96"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="1293"/>
+        <CursorPos X="46" Y="1316"/>
+        <UsageCount Value="97"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -56,7 +56,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="97"/>
       </Unit4>
       <Unit5>
         <Filename Value="dlg/CreateNewDBDlgUnit.pas"/>
@@ -64,10 +64,11 @@
         <ComponentName Value="CreateNewDBDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="8"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="7"/>
         <CursorPos Y="42"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="97"/>
+        <Loaded Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="dlg/RegisterExistingDBDlgUnit.pas"/>
@@ -78,7 +79,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="29"/>
         <CursorPos X="33" Y="62"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="97"/>
       </Unit6>
       <Unit7>
         <Filename Value="dlg/RegisterServerDlgUnit.pas"/>
@@ -89,7 +90,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="18"/>
         <CursorPos X="26" Y="48"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="97"/>
       </Unit7>
       <Unit8>
         <Filename Value="LocalDataModule.pas"/>
@@ -100,7 +101,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="150"/>
         <CursorPos Y="166"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="97"/>
       </Unit8>
       <Unit9>
         <Filename Value="../DBAdmin/dlg/AddSecondaryFileDlgUnit.pas"/>
@@ -110,7 +111,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="44" Y="24"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
       </Unit9>
       <Unit10>
         <Filename Value="../DBAdmin/dlg/AddShadowFileDlgUnit.pas"/>
@@ -119,7 +120,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
       </Unit10>
       <Unit11>
         <Filename Value="../DBAdmin/dlg/AddShadowSetDlgUnit.pas"/>
@@ -129,7 +130,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="45" Y="10"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
       </Unit11>
       <Unit12>
         <Filename Value="../DBAdmin/dlg/BackupDlgUnit.pas"/>
@@ -140,7 +141,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="115"/>
         <CursorPos X="56" Y="134"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
       </Unit12>
       <Unit13>
         <Filename Value="../DBAdmin/dlg/ChgPasswordDlgUnit.pas"/>
@@ -149,7 +150,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
       </Unit13>
       <Unit14>
         <Filename Value="../DBAdmin/dlg/DBLoginDlgUnit.pas"/>
@@ -160,7 +161,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="33"/>
         <CursorPos X="53" Y="53"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
       </Unit14>
       <Unit15>
         <Filename Value="../DBAdmin/dlg/ExecuteSQLScriptDlgUnit.pas"/>
@@ -171,7 +172,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="87"/>
         <CursorPos X="30" Y="107"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
       </Unit15>
       <Unit16>
         <Filename Value="../DBAdmin/dlg/NewUserDlgUnit.pas"/>
@@ -180,7 +181,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
       </Unit16>
       <Unit17>
         <Filename Value="../DBAdmin/dlg/RestoreDlgUnit.pas"/>
@@ -189,7 +190,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="93"/>
+        <TopLine Value="31"/>
+        <CursorPos X="46" Y="36"/>
+        <UsageCount Value="94"/>
       </Unit17>
       <Unit18>
         <Filename Value="../DBAdmin/dlg/ShutdownDatabaseDlgUnit.pas"/>
@@ -198,7 +201,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
       </Unit18>
       <Unit19>
         <Filename Value="../DBAdmin/dlg/ShutdownRegDlgUnit.pas"/>
@@ -207,15 +210,15 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
       </Unit19>
       <Unit20>
         <Filename Value="DatabaseDataUnit.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="371"/>
-        <CursorPos X="3" Y="375"/>
-        <UsageCount Value="89"/>
+        <TopLine Value="111"/>
+        <CursorPos Y="130"/>
+        <UsageCount Value="90"/>
         <Loaded Value="True"/>
       </Unit20>
       <Unit21>
@@ -224,7 +227,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="134"/>
         <CursorPos X="17" Y="161"/>
-        <UsageCount Value="89"/>
+        <UsageCount Value="90"/>
       </Unit21>
       <Unit22>
         <Filename Value="ServerDataUnit.pas"/>
@@ -232,7 +235,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
         <CursorPos X="45" Y="46"/>
-        <UsageCount Value="89"/>
+        <UsageCount Value="90"/>
       </Unit22>
       <Unit23>
         <Filename Value="DBADataModule.pas"/>
@@ -240,10 +243,11 @@
         <ComponentName Value="DBADatabaseData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="52"/>
-        <CursorPos X="34" Y="65"/>
-        <UsageCount Value="89"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="98"/>
+        <CursorPos X="8" Y="108"/>
+        <UsageCount Value="90"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit23>
@@ -256,7 +260,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="21"/>
         <CursorPos X="18" Y="54"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="32"/>
       </Unit24>
       <Unit25>
         <Filename Value="dlg/DatabasePropertiesDlgUnit.pas"/>
@@ -267,7 +271,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="20"/>
         <CursorPos Y="51"/>
-        <UsageCount Value="30"/>
+        <UsageCount Value="31"/>
       </Unit25>
       <Unit26>
         <Filename Value="dlg/DBABackupDlgUnit.pas"/>
@@ -277,7 +281,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="71" Y="14"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="24"/>
       </Unit26>
       <Unit27>
         <Filename Value="dlg/CreateNewDBDlgUnit.lfm"/>
@@ -294,10 +298,11 @@
       </Unit28>
       <Unit29>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="1156"/>
         <CursorPos Y="1184"/>
         <UsageCount Value="19"/>
+        <Loaded Value="True"/>
       </Unit29>
       <Unit30>
         <Filename Value="../../runtime/nongui/IBSQL.pas"/>
@@ -322,11 +327,10 @@
       </Unit32>
       <Unit33>
         <Filename Value="../../iblocaldb/gui/IBLocalDBSupport.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="118"/>
         <CursorPos Y="132"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit33>
       <Unit34>
         <Filename Value="../../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
@@ -337,11 +341,10 @@
       </Unit34>
       <Unit35>
         <Filename Value="data/regdatabase/schema.sql"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="9"/>
         <CursorPos X="46" Y="20"/>
         <UsageCount Value="30"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="SQL"/>
       </Unit35>
       <Unit36>
@@ -354,8 +357,8 @@
       <Unit37>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="652"/>
-        <CursorPos X="95" Y="676"/>
+        <TopLine Value="737"/>
+        <CursorPos X="3" Y="741"/>
         <UsageCount Value="28"/>
       </Unit37>
       <Unit38>
@@ -402,10 +405,11 @@
       </Unit43>
       <Unit44>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="390"/>
-        <CursorPos Y="412"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="612"/>
+        <CursorPos Y="631"/>
         <UsageCount Value="16"/>
+        <Loaded Value="True"/>
       </Unit44>
       <Unit45>
         <Filename Value="../../../../lcl/comctrls.pp"/>
@@ -417,10 +421,11 @@
       </Unit45>
       <Unit46>
         <Filename Value="../../../../lcl/include/treeview.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="5432"/>
-        <CursorPos X="3" Y="5434"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="6057"/>
+        <CursorPos Y="6076"/>
         <UsageCount Value="13"/>
+        <Loaded Value="True"/>
       </Unit46>
       <Unit47>
         <Filename Value="data/databases/employee/database.conf"/>
@@ -468,24 +473,20 @@
         <ComponentName Value="IBXCreateDatabaseFromSQLDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="58"/>
-        <CursorPos X="37" Y="27"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="36"/>
+        <CursorPos X="30" Y="62"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit53>
       <Unit54>
         <Filename Value="../../iblocaldb/gui/IBXCreateDatabaseDlg.pas"/>
         <ComponentName Value="CreateDatabaseDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="57"/>
         <CursorPos X="101" Y="82"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit54>
       <Unit55>
         <Filename Value="../../changelog"/>
@@ -733,52 +734,139 @@
         <CursorPos X="12" Y="193"/>
         <UsageCount Value="10"/>
       </Unit89>
+      <Unit90>
+        <Filename Value="dlg/DBACreateDatabaseDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DBACreateDatabaseDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="50"/>
+        <CursorPos X="53" Y="63"/>
+        <UsageCount Value="21"/>
+      </Unit90>
     </Units>
-    <JumpHistory Count="11" HistoryIndex="10">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="DBAMainFormUnit.pas"/>
-        <Caret Line="257" Column="51" TopLine="246"/>
+        <Filename Value="../DBAdmin/DataModule.pas"/>
+        <Caret Line="1315" TopLine="1284"/>
       </Position1>
       <Position2>
-        <Filename Value="DatabaseDataUnit.pas"/>
-        <Caret Line="95" Column="8" TopLine="62"/>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="297" TopLine="278"/>
       </Position2>
       <Position3>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="293" Column="15" TopLine="267"/>
+        <Caret Line="298" TopLine="278"/>
       </Position3>
       <Position4>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="42" Column="14" TopLine="30"/>
+        <Caret Line="299" TopLine="278"/>
       </Position4>
       <Position5>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="267" Column="47" TopLine="248"/>
+        <Caret Line="301" TopLine="278"/>
       </Position5>
       <Position6>
-        <Filename Value="../../iblocaldb/gui/IBLocalDBSupport.pas"/>
-        <Caret Line="48" Column="29" TopLine="19"/>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="302" TopLine="278"/>
       </Position6>
       <Position7>
-        <Filename Value="DBAMainFormUnit.pas"/>
-        <Caret Line="375" Column="3" TopLine="373"/>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="301" TopLine="278"/>
       </Position7>
       <Position8>
-        <Filename Value="../DBAdmin/MainFormUnit.pas"/>
-        <Caret Line="590" Column="3" TopLine="588"/>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="302" TopLine="278"/>
       </Position8>
       <Position9>
-        <Filename Value="../DBAdmin/DataModule.pas"/>
-        <Caret Line="232" Column="22" TopLine="229"/>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="301" TopLine="278"/>
       </Position9>
       <Position10>
-        <Filename Value="../../iblocaldb/gui/IBXCreateDatabaseDlg.pas"/>
-        <Caret Line="62" Column="56" TopLine="56"/>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="303" TopLine="278"/>
       </Position10>
       <Position11>
-        <Filename Value="../../iblocaldb/gui/IBXCreateDatabaseFromSQLDlgUnit.pas"/>
-        <Caret Line="61" Column="66" TopLine="50"/>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="307" TopLine="278"/>
       </Position11>
+      <Position12>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="308" TopLine="278"/>
+      </Position12>
+      <Position13>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="317" TopLine="299"/>
+      </Position13>
+      <Position14>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="318" TopLine="299"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../DBAdmin/DataModule.pas"/>
+        <Caret Line="1317" TopLine="1292"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../DBAdmin/DataModule.pas"/>
+        <Caret Line="1318" TopLine="1292"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../DBAdmin/DataModule.pas"/>
+        <Caret Line="1319" TopLine="1292"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../DBAdmin/DataModule.pas"/>
+        <Caret Line="1320" TopLine="1292"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../DBAdmin/DataModule.pas"/>
+        <Caret Line="1321" TopLine="1292"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../DBAdmin/DataModule.pas"/>
+        <Caret Line="1322" TopLine="1292"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../DBAdmin/DataModule.pas"/>
+        <Caret Line="1323" TopLine="1292"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../DBAdmin/DataModule.pas"/>
+        <Caret Line="1316" Column="46" TopLine="1293"/>
+      </Position22>
+      <Position23>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="123" TopLine="104"/>
+      </Position23>
+      <Position24>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="47" Column="14" TopLine="29"/>
+      </Position24>
+      <Position25>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="299" Column="55" TopLine="293"/>
+      </Position25>
+      <Position26>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="43" Column="15" TopLine="25"/>
+      </Position26>
+      <Position27>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="233" Column="3" TopLine="214"/>
+      </Position27>
+      <Position28>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="42" Column="15" TopLine="25"/>
+      </Position28>
+      <Position29>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="273" TopLine="258"/>
+      </Position29>
+      <Position30>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="285" Column="46" TopLine="258"/>
+      </Position30>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

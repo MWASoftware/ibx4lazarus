@@ -13,7 +13,8 @@ uses
   ShutdownDatabaseDlgUnit, BackupDlgUnit, RestoreDlgUnit,
   AddSecondaryFileDlgUnit, AddShadowSetDlgUnit, AddShadowFileDlgUnit,
   NewUserDlgUnit, ChgPasswordDlgUnit, ExecuteSQLScriptDlgUnit,
-  ServerPropertiesDlgUnit, DatabasePropertiesDlgUnit, DBABackupDlgUnit
+  ServerPropertiesDlgUnit, DatabasePropertiesDlgUnit, DBABackupDlgUnit,
+  DBACreateDatabaseDlgUnit
  { you can add units after this };
 
 {$R *.res}

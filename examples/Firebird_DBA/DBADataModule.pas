@@ -62,7 +62,7 @@ implementation
 {$R *.lfm}
 
 uses PasswordCacheUnit, LocalDataModule, IBTypes, FBMessages, IBUtils,
-  IBXCreateDatabaseFromSQLDlgUnit;
+  IBXCreateDatabaseFromSQLDlgUnit, DBACreateDatabaseDlgUnit;
 
 { TDBADatabaseData }
 
@@ -103,15 +103,16 @@ begin
     Schema := localData.AppDatabases.FieldByName('schema').AsString;
     if IsGBakFile(Schema) then
     begin
+      ConnectServicesAPI;
       IBDatabase1.Connected := false;
       try
-        Result := IBXCreateDatabaseDlg.RestoreDatabaseFromArchive(IBXClientSideRestoreService1,Schema)
+        DBACreateDatabaseDlgUnit.RestoreDatabaseFromArchive(IBXClientSideRestoreService1,Schema)
       finally
         IBDatabase1.Connected := true;;
       end;
     end
     else
-      Result := IBXCreateDatabaseFromSQLDlgUnit.CreateNewDatabase(IBDatabase1,Schema)
+      IBXCreateDatabaseFromSQLDlgUnit.CreateNewDatabase(IBDatabase1,Schema)
   end
   else
     raise Exception.CreateFmt('Unable to locate database ID %d',[FDatabaseData.AppID]);
@@ -270,7 +271,6 @@ begin
     begin
       FDBConnectCount := 0;
       IBDatabase1.DatabaseName := 'inet://'+ FDatabaseData.ServerData.DomainName + '/' + FDatabaseData.DatabasePath;
-      IBDatabase1.CreateIfNotExists := FDatabaseData.CreateIfNotExists;
       if FDatabaseData.ConnectAsUser then
          IBDatabase1.Params.Values['user_name'] := ''
       else
@@ -296,6 +296,7 @@ function TDBADatabaseData.CallLoginDlg(var aDatabaseName, aUserName,
 var prompt: boolean;
 begin
   prompt := true;
+  aCreateIfNotExist := FDatabaseData.CreateIfNotExists;
   if (FDBConnectCount = 0) and assigned(FDatabaseData.ServerData) then
   begin
       prompt := not PasswordCache.GetPassword(aUserName,ExtractDatabaseName(aDatabaseName),
