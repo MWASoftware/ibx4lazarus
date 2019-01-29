@@ -10,9 +10,10 @@ uses
   Forms, memdslaz, DBAMainFormUnit, ibexpress, DBADataModule, LocalDataModule,
   RegisterServerDlgUnit, RegisterExistingDBDlgUnit, CreateNewDBDlgUnit,
   SelectSQLResultsUnit, DBLoginDlgUnit, ShutdownRegDlgUnit,
-  ShutdownDatabaseDlgUnit, BackupDlgUnit, RestoreDlgUnit, AddSecondaryFileDlgUnit,
-  AddShadowSetDlgUnit, AddShadowFileDlgUnit, NewUserDlgUnit, ChgPasswordDlgUnit,
-  ExecuteSQLScriptDlgUnit, ServerPropertiesDlgUnit
+  ShutdownDatabaseDlgUnit, BackupDlgUnit, RestoreDlgUnit,
+  AddSecondaryFileDlgUnit, AddShadowSetDlgUnit, AddShadowFileDlgUnit,
+  NewUserDlgUnit, ChgPasswordDlgUnit, ExecuteSQLScriptDlgUnit,
+  ServerPropertiesDlgUnit, DatabasePropertiesDlgUnit, DBABackupDlgUnit
  { you can add units after this };
 
 {$R *.res}
@@ -30,7 +31,6 @@ begin
   Application.CreateForm(TAddSecondaryFileDlg, AddSecondaryFileDlg);
   Application.CreateForm(TAddShadowFileDlg, AddShadowFileDlg);
   Application.CreateForm(TAddShadowSetDlg, AddShadowSetDlg);
-  Application.CreateForm(TBackupDlg, BackupDlg);
   Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);
   Application.CreateForm(TDBLoginDlg, DBLoginDlg);
   Application.CreateForm(TExecuteSQLScriptDlg, ExecuteSQLScriptDlg);
@@ -39,6 +39,8 @@ begin
   Application.CreateForm(TShutdownDatabaseDlg, ShutdownDatabaseDlg);
   Application.CreateForm(TShutdownReqDlg, ShutdownReqDlg);
   Application.CreateForm(TServerPropertiesDlg, ServerPropertiesDlg);
+  Application.CreateForm(TDatabasePropertiesDlg, DatabasePropertiesDlg);
+  Application.CreateForm(TDBABackupDlg, DBABackupDlg);
   Application.Run;
 end.
 

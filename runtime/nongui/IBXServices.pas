@@ -733,7 +733,7 @@ begin
       end;
     end;
   finally
-    while IsServiceRunning do; {flush}
+    while IsServiceRunning do sleep(500); {flush}
   end;
 end;
 
@@ -772,7 +772,7 @@ begin
       end;
     finally
       F.Free;
-      while IsServiceRunning do; {flush}
+      while IsServiceRunning do sleep(500); {flush}
       FEof := false;
     end;
   end;
@@ -1329,7 +1329,7 @@ begin
       ServiceStart; {Fix is implicit in non-zero list of Limbo transactions}
       while not Eof do
         OutputLog.Add(GetNextLine);
-      while IsServiceRunning do;
+      while IsServiceRunning do sleep(500);
       Clear;
     end;
 end;
@@ -2293,7 +2293,7 @@ begin
       else
         GetNextLine;
   finally
-    while IsServiceRunning do; {flush}
+    while IsServiceRunning do sleep(500); {flush}
   end;
 end;
 

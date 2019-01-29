@@ -16,6 +16,7 @@ type
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
+    UsesAltSecDB: TCheckBox;
     ServerName: TEdit;
     DatabaseName: TEdit;
     DatabasePath: TEdit;
@@ -58,6 +59,7 @@ begin
   DatabaseName.Text := '';
   DatabasePath.Text := '';
   DefaultUserName.Text := 'SYSDBA';
+  UsesAltSecDB.Checked := false;
   Result := inherited ShowModal;
 end;
 

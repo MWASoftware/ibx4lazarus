@@ -22,8 +22,10 @@ type
       sqlUpdatePath = 'Update Databases Set DatabasePath = ? Where DatabaseID = ?';
       sqlUpdateName = 'Update Databases Set DatabaseName = ? Where DatabaseID = ?';
       sqlUpdateUser = 'Update Databases Set DefaultUserName = ? Where DatabaseID = ?';
+      sqlUpdateSecDB = 'Update Databases Set UsesDefaultSecDatabase = ? Where DatabaseID = ?';
   private
     FAppID: integer;
+    FConnectAsUser: boolean;
     FCreateIfNotExists: boolean;
     FDBControlTable: string;
     FOwner: TDatabaseDataList;
@@ -35,21 +37,28 @@ type
     FServerData: TServerData;
     FShutDownProc: string;
     FTitle: string;
+    FUsesDefaultSecDatabase: boolean;
     procedure SetAppID(AValue: integer);
     procedure SetDatabaseName(AValue: string);
     procedure SetDatabasePath(AValue: string);
     procedure SetDefaultUserName(AValue: string);
+    procedure SetUsesDefaultSecDatabase(AValue: boolean);
   public
     constructor Create(aOwner: TDatabaseDataList;
       aDatabaseName: string; aServer: TServerData); overload;
     constructor Create(aOwner: TDatabaseDataList; aDatabaseID: integer; aServer: TServerData); overload;
+    destructor Destroy; override;
     procedure Refresh;
     procedure Disconnect;
+    function Reconnect: boolean;
+    function ConnectAs: boolean;
     function Select: boolean;
+    procedure SetSecDatabase(aSecDatabase: string);
     property DatabaseID: integer read FDatabaseID;
     property DatabasePath: string read FDatabasePath write SetDatabasePath;
     property DatabaseName: string read FDatabaseName write SetDatabaseName;
     property DefaultUserName: string read FDefaultUserName write SetDefaultUserName;
+    property UsesDefaultSecDatabase: boolean read FUsesDefaultSecDatabase write SetUsesDefaultSecDatabase;
     property Attachment: IAttachment read FAttachment write FAttachment;
     property CreateIfNotExists: boolean read FCreateIfNotExists write FCreateIfNotExists;
     property AppID: integer read FAppID write SetAppID;
@@ -57,6 +66,7 @@ type
     property DBControlTable: string read FDBControlTable;
     property ShutDownProc: string read FShutDownProc;
     property ServerData: TServerData read FServerData;
+    property ConnectAsUser: boolean read FConnectAsUser;
     property Owner: TDatabaseDataList read FOwner;
   end;
 
@@ -99,8 +109,8 @@ procedure TDatabaseData.SetDatabaseName(AValue: string);
 begin
   if FDatabaseName = AValue then Exit;
   FDatabaseName := AValue;
-  if not Owner.FLoading then
-    LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateName,[FDatabaseName,FDatabaseID]);
+{  if not Owner.FLoading then
+    LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateName,[FDatabaseName,FDatabaseID]); }
 end;
 
 procedure TDatabaseData.SetAppID(AValue: integer);
@@ -120,7 +130,11 @@ begin
   if FDatabasePath = AValue then Exit;
   FDatabasePath := AValue;
   if not Owner.FLoading then
+  begin
+    Disconnect;
     LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdatePath,[FDatabasePath,FDatabaseID]);
+    Select;
+  end;
 end;
 
 procedure TDatabaseData.SetDefaultUserName(AValue: string);
@@ -129,6 +143,14 @@ begin
   FDefaultUserName := AValue;
   if not Owner.FLoading then
     LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateUser,[FDefaultUserName,FDatabaseID]);
+end;
+
+procedure TDatabaseData.SetUsesDefaultSecDatabase(AValue: boolean);
+begin
+  if FUsesDefaultSecDatabase = AValue then Exit;
+  FUsesDefaultSecDatabase := AValue;
+  if not Owner.FLoading then
+    LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateSecDB,[FUsesDefaultSecDatabase,FDatabaseID]);
 end;
 
 constructor TDatabaseData.Create(aOwner: TDatabaseDataList;
@@ -151,6 +173,13 @@ begin
   FServerData := aServer;
 end;
 
+destructor TDatabaseData.Destroy;
+begin
+  if ServerData.Owner = nil then
+    ServerData.Free;
+  inherited Destroy;
+end;
+
 procedure TDatabaseData.Refresh;
 var QueryResults: IResultSet;
     aServerID: integer;
@@ -161,7 +190,8 @@ begin
   begin
     FDatabaseName := ByName('DatabaseName').AsString;
     FDatabasePath := ByName('DatabasePath').AsString;
-    DefaultUserName := ByName('DefaultUserName').AsString;
+    FDefaultUserName := ByName('DefaultUserName').AsString;
+    FUsesDefaultSecDatabase := ByName('UsesDefaultSecDatabase').AsBoolean;
     aServerID := ByName('Server').AsInteger;
     if aServerID <> ServerData.ServerID then
       FServerData := ServerDataList.ServerData[aServerID];
@@ -177,10 +207,36 @@ begin
   FAttachment := nil;
 end;
 
+function TDatabaseData.Reconnect: boolean;
+begin
+  Disconnect;
+  Result := Select;
+end;
+
+function TDatabaseData.ConnectAs: boolean;
+begin
+  FConnectAsUser := true;
+  try
+    Result := Reconnect;
+  finally
+    FConnectAsUser := false;
+  end;
+end;
+
 function TDatabaseData.Select: boolean;
 begin
   DBADatabaseData.DatabaseData := self;
   Result := DBADatabaseData.IBDatabase1.Connected;
+end;
+
+procedure TDatabaseData.SetSecDatabase(aSecDatabase: string);
+var oldServerDAta: TServerData;
+begin
+  oldServerData := FServerData;
+  FServerData := TServerData.Create(nil,oldServerData.ServerID,aSecDatabase);
+  FServerData.DefaultUserName := oldServerData.DefaultUserName;
+  FServerData.ServerName := oldServerData.ServerName;
+  FServerData.DomainName := oldServerData.DomainName;
 end;
 
 { TDatabaseDataList }
@@ -261,6 +317,7 @@ begin
             DatabaseName := FieldByName('DatabaseName').AsString;
             DatabasePath := FieldByName('DatabasePath').AsString;
             DefaultUserName := FieldByName('DefaultUserName').AsString;
+            UsesDefaultSecDatabase := FieldByName('UsesDefaultSecDatabase').AsBoolean;
           end;
           Next;
         end;
@@ -335,6 +392,7 @@ begin
     DatabaseName := dlg.DatabaseName.Text;
     DatabasePath := dlg.DatabasePath.Text;
     DefaultUserName := dlg.DefaultUserName.Text;
+    UsesDefaultSecDatabase := not dlg.UsesAltSecDB.Checked;
     if dlg is TCreateNewDBDlg then
     begin
       CreateIfNotExists := true;

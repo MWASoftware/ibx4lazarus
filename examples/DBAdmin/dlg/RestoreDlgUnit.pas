@@ -40,6 +40,7 @@ type
     NoShadow: TCheckBox;
     NoValidityCheck: TCheckBox;
     OneRelationAtATime: TCheckBox;
+    ProgressBar1: TProgressBar;
     RestoreMetaDataOnly: TCheckBox;
     UseAllSpace: TCheckBox;
     ServerName: TEdit;
@@ -91,6 +92,7 @@ end;
 
 procedure TRestoreDlg.DoClientRestore(Data: PtrInt);
 begin
+  Progressbar1.Visible := true;
   with IBXClientSideRestoreService1 do
   begin
     PageSize := StrToInt(self.PageSize.Text);
@@ -111,12 +113,14 @@ begin
     Report.Lines.Add('Restore Started');
     RestoreFromFile(SourceArchive.Text,Report.Lines);
     Report.Lines.Add('Restore Completed');
+    Progressbar1.Visible := false;
     MessageDlg('Restore Completed',mtInformation,[mbOK],0);
   end;
 end;
 
 procedure TRestoreDlg.DoServerRestore(Data: PtrInt);
 begin
+  Progressbar1.Visible := true;
   with IBXServerSideRestoreService1 do
   begin
     PageSize := StrToInt(self.PageSize.Text);
@@ -139,6 +143,7 @@ begin
     Report.Lines.Add('Restore Started');
     Execute(Report.Lines);
     Report.Lines.Add('Restore Completed');
+    Progressbar1.Visible := false;
     MessageDlg('Restore Completed',mtInformation,[mbOK],0);
   end;
 end;
@@ -162,6 +167,7 @@ end;
 procedure TRestoreDlg.IBXClientSideRestoreService1GetNextLine(Sender: TObject;
   var Line: string);
 begin
+  Report.VertScrollBar.Position := (Report.Lines.Count-1)*20;
   Application.ProcessMessages;
 end;
 

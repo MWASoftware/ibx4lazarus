@@ -9,7 +9,9 @@ inherited DBADatabaseData: TDBADatabaseData
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     OnLogin = IBDatabase1Login
-    Params.Strings = (    )
+    Params.Strings = (
+      'sql_role_name=RDB$ADMIN'
+    )
     OnCreateDatabase = IBDatabase1CreateDatabase
   end
   inherited RoleNameList: TIBQuery
@@ -41,6 +43,7 @@ inherited DBADatabaseData: TDBADatabaseData
     OnLogin = IBXServicesConnection1Login
     ConnectString = 'service_mgr'
     Params.Strings = (    )
+    OnSecurityContextException = IBXServicesConnection1SecurityContextException
   end
   object IBXScript1: TIBXScript[41]
     Database = IBDatabase1

@@ -17,6 +17,7 @@ Create Table Databases (
   DatabasePath VarChar(256),
   DatabaseName VarChar(64),
   DefaultUserName VarChar(32) Default 'SYSDBA',
+  UsesDefaultSecDatabase Boolean default true,
   Server Integer not null References Servers(ServerID)
     On Update Cascade
     On Delete Cascade,

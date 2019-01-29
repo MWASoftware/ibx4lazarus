@@ -1,0 +1,17 @@
+inherited DBABackupDlg: TDBABackupDlg
+  OnCreate = FormCreate
+  inherited PageControl1: TPageControl
+    inherited SelectTab: TTabSheet
+      ClientHeight = 314
+    end
+    inherited ReportTab: TTabSheet
+      ClientHeight = 314
+    end
+  end
+  inherited IBXClientSideBackupService1: TIBXClientSideBackupService
+    ServicesConnection = DBADatabaseData.IBXServicesConnection1
+  end
+  inherited IBXServerSideBackupService1: TIBXServerSideBackupService
+    ServicesConnection = DBADatabaseData.IBXServicesConnection1
+  end
+end

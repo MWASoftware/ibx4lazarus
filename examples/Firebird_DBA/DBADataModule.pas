@@ -26,13 +26,18 @@ type
     procedure IBXServicesConnection1AfterDisconnect(Sender: TObject);
     procedure IBXServicesConnection1Login(Service: TIBXServicesConnection;
       var aServerName: string; LoginParams: TStrings);
+    procedure IBXServicesConnection1SecurityContextException(
+      Service: TIBXServicesConnection; var aAction: TSecContextAction);
   private
     FDatabaseData: TDatabaseData;
     FServicePassword: string;
     FDatabasePassword: string;
+    FNewPassword: boolean;
+    FNewServicePassword: boolean;
     FServiceConnectCount: integer;
     FDBConnectCount: integer;
     FServerData: TServerData;
+    FSecDBException: boolean;
     function IdentifyDatabase: integer;
     procedure SetDatabaseData(AValue: TDatabaseData);
     procedure SetServerData(AValue: TServerData);
@@ -44,6 +49,7 @@ type
   public
     function Connect: boolean; override;
     procedure Disconnect; override;
+    procedure Reconnect;
     property ServerData: TServerData read FServerData write SetServerData;
     property DatabaseData: TDatabaseData read FDatabaseData write SetDatabaseData;
   end;
@@ -73,10 +79,12 @@ begin
   if FDatabaseData.AppID = 0 then
     FDatabaseData.AppID := IdentifyDatabase;
   FDatabaseData.DefaultUserName := DBUserName;
-  PasswordCache.SavePassword(DBUserName,ExtractDatabaseName(IBDatabase1.DatabaseName),
-                             ExtractServerName(IBDatabase1.DatabaseName),
-                             FDatabasePassword,
-                             SecurityDatabase);
+  if FNewPassword then
+    PasswordCache.SavePassword(DBUserName,ExtractDatabaseName(IBDatabase1.DatabaseName),
+                               ExtractServerName(IBDatabase1.DatabaseName),
+                               FDatabasePassword,
+                               SecurityDatabase);
+  FNewPassword := false;
   inherited;
 end;
 
@@ -96,7 +104,9 @@ begin
        IBXClientSideRestoreService1.RestoreFromFile(Schema,nil)
     else
       IBXScript1.ExecSQLScript(Schema);
-  end;
+  end
+  else
+    raise Exception.CreateFmt('Unable to locate database ID %d',[FDatabaseData.AppID]);
 end;
 
 procedure TDBADatabaseData.IBDatabase1Login(Database: TIBDatabase;
@@ -104,6 +114,7 @@ procedure TDBADatabaseData.IBDatabase1Login(Database: TIBDatabase;
 begin
   inherited;
   FDatabasePassword := LoginParams.Values['password'];
+  FNewPassword := true;
 end;
 
 procedure TDBADatabaseData.IBXScript1CreateDatabase(Sender: TObject;
@@ -117,8 +128,9 @@ begin
   inherited;
   FServerData.ServiceIntf := IBXServicesConnection1.ServiceIntf;
   ServerData.DefaultUserName := FServiceUserName;
-  if not IBDatabase1.Connected and (ServerData.DomainName <> '') then
-    PasswordCache.SavePassword(FServiceUserName,ServerData.DomainName,FServicePassword)
+  if not IBDatabase1.Connected and (ServerData.DomainName <> '') and FNewServicePassword then
+    PasswordCache.SavePassword(FServiceUserName,ServerData.DomainName,FServicePassword);
+  FNewServicePassword := false;
 end;
 
 procedure TDBADatabaseData.IBXServicesConnection1AfterDisconnect(Sender: TObject
@@ -138,9 +150,13 @@ begin
   begin
     prompt := true;
     if IBDatabase1.Connected and (FServiceConnectCount = 0) then
-      prompt := not PasswordCache.GetPassword(FServiceUserName,ExtractDatabaseName(IBDatabase1.DatabaseName),aServerName,FServicePassword)
+    begin
+      prompt := not PasswordCache.GetPassword(FServiceUserName,ExtractDatabaseName(IBDatabase1.DatabaseName),aServerName,FServicePassword);
+      if not prompt then
+        LoginParams.Values['expected_db'] := ExtractDatabaseName(IBDatabase1.DatabaseName);
+    end
     else
-    if FServiceConnectCount < 2 then
+    if (FServiceConnectCount < 2) and not FSecDBException then
       prompt := not PasswordCache.GetPassword(FServiceUserName,aServerName,FServicePassword);
 
     if prompt then
@@ -158,7 +174,15 @@ begin
   end;
   LoginParams.Values['user_name'] := FServiceUserName;
   LoginParams.Values['password'] := FServicePassword;
+  FNewServicePassword := true;
   Inc(FServiceConnectCount);
+  FSecDBException := false;
+end;
+
+procedure TDBADatabaseData.IBXServicesConnection1SecurityContextException(
+  Service: TIBXServicesConnection; var aAction: TSecContextAction);
+begin
+  FSecDBException := true;
 end;
 
 function TDBADatabaseData.IdentifyDatabase: integer;
@@ -199,7 +223,10 @@ begin
     else
        IBXServicesConnection1.Protocol := inet;
     IBXServicesConnection1.ServerName := ServerData.DomainName;
-    FServiceUserName := ServerData.DefaultUserName;
+    if ServerData.ConnectAsUser then
+      FServiceUserName := ''
+    else
+      FServiceUserName := ServerData.DefaultUserName;
     try
       IBXServicesConnection1.Connected := true;
     except on E:EIBClientError do
@@ -236,7 +263,10 @@ begin
       FDBConnectCount := 0;
       IBDatabase1.DatabaseName := 'inet://'+ FDatabaseData.ServerData.DomainName + '/' + FDatabaseData.DatabasePath;
       IBDatabase1.CreateIfNotExists := FDatabaseData.CreateIfNotExists;
-      IBDatabase1.Params.Values['user_name'] := FDatabaseData.DefaultUserName;
+      if FDatabaseData.ConnectAsUser then
+         IBDatabase1.Params.Values['user_name'] := ''
+      else
+        IBDatabase1.Params.Values['user_name'] := FDatabaseData.DefaultUserName;
       FDatabasePassword := '';
       Connect;
     end
@@ -248,6 +278,8 @@ end;
 procedure TDBADatabaseData.ConnectServicesAPI;
 begin
   ServerData := nil;
+  if SecurityDatabase <> FDatabaseData.ServerData.SecDatabase then
+    FDatabaseData.SetSecDatabase(SecurityDatabase);
   ServerData := FDatabaseData.ServerData;
 end;
 
@@ -258,9 +290,10 @@ begin
   prompt := true;
   if (FDBConnectCount = 0) and assigned(FDatabaseData.ServerData) then
   begin
-      prompt := not (PasswordCache.GetPassword(aUserName,ExtractDatabaseName(aDatabaseName),
-                                               FDatabaseData.ServerData.DomainName,aPassword) or
-                     PasswordCache.GetPassword(aUserName,FDatabaseData.ServerData.DomainName,aPassword));
+      prompt := not PasswordCache.GetPassword(aUserName,ExtractDatabaseName(aDatabaseName),
+                                               FDatabaseData.ServerData.DomainName,aPassword);
+      if prompt and FDatabaseData.UsesDefaultSecDatabase then
+        prompt := not PasswordCache.GetPassword(aUserName,FDatabaseData.ServerData.DomainName,aPassword);
   end;
 
   Inc(FDBConnectCount);
@@ -289,6 +322,15 @@ begin
   inherited Disconnect;
   if FServerData <> nil then
     IBXServicesConnection1.ServiceIntf := FServerData.ServiceIntf;
+end;
+
+procedure TDBADatabaseData.Reconnect;
+begin
+  Disconnect;
+  if DatabaseData <> nil then
+    Connect
+  else
+    IBXServicesConnection1.Connected := true;
 end;
 
 end.

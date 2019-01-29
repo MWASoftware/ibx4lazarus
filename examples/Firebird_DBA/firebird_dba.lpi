@@ -51,7 +51,7 @@
         <PackageName Value="LCL"/>
       </Item8>
     </RequiredPackages>
-    <Units Count="25">
+    <Units Count="27">
       <Unit0>
         <Filename Value="firebird_dba.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -213,6 +213,20 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit24>
+      <Unit25>
+        <Filename Value="dlg/DatabasePropertiesDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DatabasePropertiesDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="dlg/DBABackupDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DBABackupDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit26>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

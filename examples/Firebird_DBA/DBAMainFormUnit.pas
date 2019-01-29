@@ -16,6 +16,10 @@ type
   { TDBAMainForm }
 
   TDBAMainForm = class(TMainForm)
+    ConnectAs: TAction;
+    MenuItem30: TMenuItem;
+    MenuItem31: TMenuItem;
+    Reconnect: TAction;
     MenuItem29: TMenuItem;
     ShowProperties: TAction;
     Disconnect: TAction;
@@ -42,6 +46,9 @@ type
     Splitter6: TSplitter;
     TreeSource: TDataSource;
     TreeViewImages: TImageList;
+    procedure ConnectAsExecute(Sender: TObject);
+    procedure ReconnectExecute(Sender: TObject);
+    procedure ReconnectUpdate(Sender: TObject);
     procedure ShowPropertiesExecute(Sender: TObject);
     procedure AddDatabaseExecute(Sender: TObject);
     procedure AddDatabaseUpdate(Sender: TObject);
@@ -93,7 +100,8 @@ implementation
 {$R *.lfm}
 
 uses DataModule, Variants, RegisterServerDlgUnit, CreateNewDBDlgUnit, RegisterExistingDBDlgUnit,
-  ServerDataUnit, DatabaseDataUnit, LocalDataModule, DBADataModule, ServerPropertiesDlgUnit;
+  ServerDataUnit, DatabaseDataUnit, LocalDataModule, DBADataModule, ServerPropertiesDlgUnit,
+  DatabasePropertiesDlgUnit;
 
 type
 
@@ -119,7 +127,7 @@ begin
   FLocated := true;
   CurServerDB := LocalData.UserConfig[rgCurServerDB];
   if CurServerDB <> '' then
-     RegisteredObjectsTree.Selected := RegisteredObjectsTree.FindNode(StrIntListToVar(CurServerDB),true);
+    Application.QueueAsyncCall(@DoSelect,PtrInt(RegisteredObjectsTree.FindNode(StrIntListToVar(CurServerDB),true)));
 end;
 
 procedure TDBAMainForm.PopupMenu1Popup(Sender: TObject);
@@ -154,7 +162,7 @@ begin
   if (Node <> nil) and not VarIsNull(TIBTreeNode(Node).KeyValue) then
     case TDBATreeNode(Node).ItemType of
     ntServer:
-      ServerDataList.Update(TIBTreeNode(Node).KeyValue,nil);
+        ServerDataList.Update(TIBTreeNode(Node).KeyValue,nil).ServerName := Node.Text;
     ntDatabase:
       DatabaseDataList.Update(TIBTreeNode(Node).KeyValue,nil);
     end;
@@ -237,13 +245,13 @@ end;
 
 procedure TDBAMainForm.RunScriptUpdate(Sender: TObject);
 begin
-  (Sender as TAction).Visible :=  (RegisteredObjectsTree.Selected <> nil) and
+  (Sender as TAction).Enabled :=  (RegisteredObjectsTree.Selected <> nil) and
                                  (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType = ntDatabase);
 end;
 
 procedure TDBAMainForm.SaveUpdate(Sender: TObject);
 begin
-  (Sender as TAction).Visible :=  (RegisteredObjectsTree.Selected <> nil) and
+  (Sender as TAction).Enabled :=  (RegisteredObjectsTree.Selected <> nil) and
                                  (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType = ntDatabase);
   inherited;
 end;
@@ -358,7 +366,7 @@ end;
 
 procedure TDBAMainForm.BackupUpdate(Sender: TObject);
 begin
-  (Sender as TAction).Visible := (RegisteredObjectsTree.Selected <> nil) and
+  (Sender as TAction).Enabled := (RegisteredObjectsTree.Selected <> nil) and
                                  (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType = ntDatabase);
 end;
 
@@ -425,8 +433,8 @@ end;
 
 procedure TDBAMainForm.Edit8EditingDone(Sender: TObject);
 begin
-  DBADatabaseData.ServerData.DomainName := (Sender as TEdit).Text;
-  DBADatabaseData.ServerData.Select(true);
+  if DBADatabaseData.ServerData <> nil then
+    DBADatabaseData.ServerData.DomainName := (Sender as TEdit).Text;
 end;
 
 procedure TDBAMainForm.AddServerExecute(Sender: TObject);
@@ -460,8 +468,10 @@ begin
 end;
 
 procedure TDBAMainForm.ShowPropertiesExecute(Sender: TObject);
+var ServerData: TServerData;
+    DatabaseData: TDatabaseData;
 begin
-  if FLocated and (RegisteredObjectsTree.Selected <> nil) and (FExpandNode <> RegisteredObjectsTree.Selected) then
+  if FLocated and (RegisteredObjectsTree.Selected <> nil)  then
   begin
       case TDBATreeNode(RegisteredObjectsTree.Selected).ItemType of
       ntServer:
@@ -469,9 +479,19 @@ begin
         begin
           if not VarIsNull(SelectedKeyValue) then
           begin
-            if ServerPropertiesDlg.ShowModal(ServerDataList.ServerData[SelectedKeyValue]) = mrOK then
-              if not ServerDataList.ServerData[SelectedKeyValue].Select(true) then
-                PageControl1.Visible := false;
+            ServerData := ServerDataList.ServerData[SelectedKeyValue];
+            ServerData.Select;
+            if ServerPropertiesDlg.ShowModal(ServerData) = mrOK then
+            begin
+              RegisteredObjectsTree.Selected.Text := ServerData.ServerName;
+              if not DBADatabaseData.IBXServicesConnection1.Connected then
+                PageControl1.Visible := false
+              else
+              begin
+                ServerData.Select;
+                PageControl1.ActivePage.OnShow(nil);
+              end;
+            end;
           end;
         end;
 
@@ -479,8 +499,57 @@ begin
         with TIBTreeView(RegisteredObjectsTree) do
         if not VarIsNull(SelectedKeyValue) then
         begin
-//          DatabaseDataList.DatabaseData[SelectedKeyValue].Disconnect;
-//          PageControl1.Visible := false;
+          DatabaseData := DatabaseDataList.DatabaseData[SelectedKeyValue];
+          DatabaseData.Select;
+          if DatabasePropertiesDlg.ShowModal(DatabaseData) = mrOK then
+          begin
+            RegisteredObjectsTree.Selected.Text := DatabaseData.DatabaseName;
+            if not DBADatabaseData.IBDatabase1.Connected then
+              PageControl1.Visible := false
+            else
+              PageControl1.ActivePage.OnShow(nil);
+          end;
+        end;
+      end;
+  end;
+end;
+
+procedure TDBAMainForm.ReconnectUpdate(Sender: TObject);
+begin
+  (Sender as TAction).Visible := (RegisteredObjectsTree.Selected <> nil) and
+       (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType = ntDatabase);
+end;
+
+procedure TDBAMainForm.ReconnectExecute(Sender: TObject);
+begin
+  TDatabaseData(RegisteredObjectsTree.Selected.Data).Reconnect;
+end;
+
+procedure TDBAMainForm.ConnectAsExecute(Sender: TObject);
+var ServerData: TServerData;
+    DatabaseData: TDatabaseData;
+begin
+  if FLocated and (RegisteredObjectsTree.Selected <> nil)  then
+  begin
+      case TDBATreeNode(RegisteredObjectsTree.Selected).ItemType of
+      ntServer:
+        with TIBTreeView(RegisteredObjectsTree) do
+        begin
+          if not VarIsNull(SelectedKeyValue) then
+          begin
+            ServerData := ServerDataList.ServerData[SelectedKeyValue];
+            if not ServerData.ConnectAs then
+                PageControl1.Visible := false
+            end;
+          end;
+
+      ntDatabase:
+        with TIBTreeView(RegisteredObjectsTree) do
+        if not VarIsNull(SelectedKeyValue) then
+        begin
+          DatabaseData := DatabaseDataList.DatabaseData[SelectedKeyValue];
+          if not DatabaseData.ConnectAs then
+              PageControl1.Visible := false
         end;
       end;
   end;

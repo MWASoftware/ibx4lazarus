@@ -1,7 +1,7 @@
 inherited DBAMainForm: TDBAMainForm
-  Left = 582
+  Left = 268
   Height = 620
-  Top = 247
+  Top = 207
   Width = 1148
   Caption = 'Firebird Database Administrator'
   ClientHeight = 600
@@ -28,6 +28,8 @@ inherited DBAMainForm: TDBAMainForm
     Left = 157
     Height = 552
     Width = 991
+    ActivePage = ServerTab
+    TabIndex = 5
     inherited Properties: TTabSheet
       ClientHeight = 520
       ClientWidth = 985
@@ -213,12 +215,14 @@ inherited DBAMainForm: TDBAMainForm
     ParentField = 'PARENT'
     PopupMenu = PopupMenu1
     RelationName = 'A'
+    RightClickSelect = True
     TabOrder = 4
     OnAddition = RegisteredObjectsTreeAddition
     OnCreateNodeClass = RegisteredObjectsTreeCreateNodeClass
     OnEditingEnd = RegisteredObjectsTreeEditingEnd
     OnExpanding = RegisteredObjectsTreeExpanding
     OnSelectionChanged = RegisteredObjectsTreeSelectionChanged
+    Options = [tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
   end
   object Splitter6: TSplitter[5]
     Left = 152
@@ -510,6 +514,16 @@ inherited DBAMainForm: TDBAMainForm
       OnExecute = ShowPropertiesExecute
       OnUpdate = DeleteNodeUpdate
     end
+    object Reconnect: TAction
+      Caption = 'Reconnect'
+      OnExecute = ReconnectExecute
+      OnUpdate = ReconnectUpdate
+    end
+    object ConnectAs: TAction
+      Caption = 'Connect As'
+      OnExecute = ConnectAsExecute
+      OnUpdate = DeleteNodeUpdate
+    end
   end
   object PopupMenu1: TPopupMenu[39]
     OnPopup = PopupMenu1Popup
@@ -521,8 +535,14 @@ inherited DBAMainForm: TDBAMainForm
     object MenuItem23: TMenuItem
       Action = AddDatabase
     end
+    object MenuItem31: TMenuItem
+      Action = ConnectAs
+    end
     object MenuItem28: TMenuItem
       Action = Disconnect
+    end
+    object MenuItem30: TMenuItem
+      Action = Reconnect
     end
     object MenuItem25: TMenuItem
       Caption = '-'

@@ -23,8 +23,10 @@ type
       sqlUpdateUserName = 'Update SERVERS Set DefaultUserName = ? Where ServerID = ?';
       sqlUpdateDomainName = 'Update SERVERS Set DomainName = ? Where ServerID = ?';
   private
+    FConnectAsUser: boolean;
    FDomainName: string;
    FOwner: TServerDataList;
+   FSecDatabase: string;
    FServerID: integer;
    FServerName: string;
    FDefaultUserName: string;
@@ -35,15 +37,20 @@ type
   public
    constructor Create(aOwner: TServerDataList; aServerName,
      aDomainName, aDefaultUserName: string); overload;
-   constructor Create(aOwner: TServerDataList; aServerID: integer); overload;
+   constructor Create(aOwner: TServerDataList; aServerID: integer; aSecDatabase: string='Default'); overload;
    procedure Refresh;
    procedure Disconnect;
+   function Reconnect: boolean;
+   function ConnectAs: boolean;
    function Select(Reselect: boolean=false): boolean;
+   property Owner: TServerDataList read FOwner;
    property ServerID: integer read FServerID;
    property ServerName: string read FServerName write SetServerName;
    property DomainName: string read FDomainName write SetDomainName;
    property DefaultUserName: string read FDefaultUserName write SetDefaultUserName;
+   property ConnectAsUser: boolean read FConnectAsUser;
    property ServiceIntf: IServiceManager read FServiceIntf write FServiceIntf;
+   property SecDatabase: string read FSecDatabase;
   end;
 
   { TServerDataList }
@@ -235,6 +242,7 @@ begin
     Disconnect;
     with LocalData do
       LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateDomainName,[FDomainName,FServerID]);
+    Select(true);
   end;
 end;
 
@@ -251,9 +259,9 @@ procedure TServerData.SetServerName(AValue: string);
 begin
   if FServerName = AValue then Exit;
   FServerName := AValue;
-  if not FOwner.FLoading then
+  {if not FOwner.FLoading then
   with LocalData do
-    LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateServerName,[FServerName,FServerID]);
+    LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateServerName,[FServerName,FServerID]);}
 end;
 
 constructor TServerData.Create(aOwner: TServerDataList; aServerName,
@@ -261,6 +269,7 @@ constructor TServerData.Create(aOwner: TServerDataList; aServerName,
 begin
   inherited Create;
   FOwner := aOwner;
+  FSecDatabase := 'Default';
   FServerName := aServerName;
   FDefaultUserName := aDefaultUserName;
   if aDomainName = '' then
@@ -272,10 +281,12 @@ begin
   FServiceIntf := nil;
 end;
 
-constructor TServerData.Create(aOwner: TServerDataList; aServerID: integer);
+constructor TServerData.Create(aOwner: TServerDataList; aServerID: integer;
+  aSecDatabase: string);
 begin
   inherited Create;
   FOwner := aOwner;
+  FSecDatabase := aSecDatabase;
   FServerID := aServerID;
   Refresh;
   FServiceIntf := nil;
@@ -302,6 +313,21 @@ begin
      DBADatabaseData.ServerData := nil;
   end;
   FServiceIntf := nil;
+end;
+
+function TServerData.Reconnect: boolean;
+begin
+  Result := Select(true);
+end;
+
+function TServerData.ConnectAs: boolean;
+begin
+  FConnectAsUser := true;
+  try
+    Result := Reconnect;
+  finally
+    FConnectAsUser := false;
+  end;
 end;
 
 function TServerData.Select(Reselect: boolean): boolean;
