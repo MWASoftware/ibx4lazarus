@@ -124,8 +124,8 @@
       <Unit10>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1257"/>
-        <CursorPos X="15" Y="1278"/>
+        <TopLine Value="1507"/>
+        <CursorPos Y="1538"/>
         <UsageCount Value="13"/>
       </Unit10>
       <Unit11>
@@ -155,8 +155,8 @@
       <Unit14>
         <Filename Value="../../../fbintf/client/FBMessages.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="635"/>
-        <CursorPos X="27" Y="664"/>
+        <TopLine Value="283"/>
+        <CursorPos X="23" Y="278"/>
         <UsageCount Value="10"/>
       </Unit14>
       <Unit15>
@@ -283,8 +283,8 @@
       <Unit32>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="3101"/>
-        <CursorPos X="3" Y="3105"/>
+        <TopLine Value="4664"/>
+        <CursorPos X="35" Y="4668"/>
         <UsageCount Value="12"/>
       </Unit32>
       <Unit33>

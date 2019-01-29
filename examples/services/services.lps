@@ -184,8 +184,8 @@
       <Unit17>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="246"/>
-        <CursorPos X="13" Y="261"/>
+        <TopLine Value="324"/>
+        <CursorPos Y="343"/>
         <UsageCount Value="14"/>
       </Unit17>
       <Unit18>
@@ -665,8 +665,8 @@
       <Unit84>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2875"/>
-        <CursorPos Y="2880"/>
+        <TopLine Value="3090"/>
+        <CursorPos Y="3121"/>
         <UsageCount Value="11"/>
       </Unit84>
       <Unit85>
@@ -709,4 +709,15 @@
       <Modes Count="0" ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="../../runtime/nongui/IBXServices.pas"/>
+        <Line Value="3121"/>
+      </Item1>
+    </BreakPoints>
+  </Debugging>
 </CONFIG>

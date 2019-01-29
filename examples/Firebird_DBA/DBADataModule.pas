@@ -61,7 +61,8 @@ implementation
 
 {$R *.lfm}
 
-uses PasswordCacheUnit, LocalDataModule, IBTypes, FBMessages, IBUtils;
+uses PasswordCacheUnit, LocalDataModule, IBTypes, FBMessages, IBUtils,
+  IBXCreateDatabaseFromSQLDlgUnit;
 
 { TDBADatabaseData }
 
@@ -100,10 +101,17 @@ begin
   if LocalData.AppDatabases.Locate('ID',FDatabaseData.AppID,[]) then
   begin
     Schema := localData.AppDatabases.FieldByName('schema').AsString;
-    if UpperCase(ExtractFileExt(Schema)) = '.GBK' then
-       IBXClientSideRestoreService1.RestoreFromFile(Schema,nil)
+    if IsGBakFile(Schema) then
+    begin
+      IBDatabase1.Connected := false;
+      try
+        Result := IBXCreateDatabaseDlg.RestoreDatabaseFromArchive(IBXClientSideRestoreService1,Schema)
+      finally
+        IBDatabase1.Connected := true;;
+      end;
+    end
     else
-      IBXScript1.ExecSQLScript(Schema);
+      Result := IBXCreateDatabaseFromSQLDlgUnit.CreateNewDatabase(IBDatabase1,Schema)
   end
   else
     raise Exception.CreateFmt('Unable to locate database ID %d',[FDatabaseData.AppID]);

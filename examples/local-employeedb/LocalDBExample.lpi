@@ -146,8 +146,8 @@
       <Unit12>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="39"/>
-        <CursorPos Y="2663"/>
+        <TopLine Value="695"/>
+        <CursorPos X="19" Y="713"/>
         <UsageCount Value="18"/>
       </Unit12>
       <Unit13>
@@ -203,8 +203,8 @@
       <Unit18>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="346"/>
-        <CursorPos X="28" Y="365"/>
+        <TopLine Value="324"/>
+        <CursorPos Y="343"/>
         <UsageCount Value="10"/>
       </Unit18>
       <Unit19>

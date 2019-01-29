@@ -665,6 +665,8 @@ end;
     procedure FixErrors(GlobalAction: TTransactionGlobalAction; OutputLog: TStrings);
   end;
 
+function IsGbakFile(aFileName: string): boolean;
+
 implementation
 
 uses FBMessages, IBUtils, RegExpr, CustApp, IBErrorCodes;
@@ -703,6 +705,22 @@ const
     isc_spb_sql_role_name,
     isc_spb_expected_db
   );
+
+function IsGbakFile(aFileName: string): boolean;
+const
+  Signature = #$00#$02#$04;
+var F: TFilestream;
+    Buffer: array [1..3] of char;
+begin
+  Result := false;
+  F := TFileStream.Create(aFileName,fmOpenRead);
+  try
+    F.Read(Buffer,3);
+    Result := CompareText(Buffer,Signature) = 0;
+  finally
+    F.Free;
+  end;
+end;
 
   { TIBXClientSideRestoreService }
 
