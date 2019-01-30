@@ -238,6 +238,7 @@ begin
   FServerData.DefaultUserName := oldServerData.DefaultUserName;
   FServerData.ServerName := oldServerData.ServerName;
   FServerData.DomainName := oldServerData.DomainName;
+  UsesDefaultSecDatabase := aSecDatabase <> 'Default';
 end;
 
 { TDatabaseDataList }

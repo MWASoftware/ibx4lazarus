@@ -104,11 +104,11 @@ begin
     if IsGBakFile(Schema) then
     begin
       ConnectServicesAPI;
-      IBDatabase1.Connected := false;
+      IBDatabase1.Attachment.Disconnect;
       try
         DBACreateDatabaseDlgUnit.RestoreDatabaseFromArchive(IBXClientSideRestoreService1,Schema)
       finally
-        IBDatabase1.Connected := true;;
+        IBDatabase1.Attachment.Connect;
       end;
     end
     else
