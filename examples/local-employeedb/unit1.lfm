@@ -11,7 +11,7 @@ object Form1: TForm1
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.0.0.2'
+  LCLVersion = '2.0.0.3'
   object Button1: TButton
     Left = 956
     Height = 25
@@ -634,6 +634,7 @@ object Form1: TForm1
     BeforeOpen = EmployeesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -682,6 +683,7 @@ object Form1: TForm1
     BeforeOpen = EmployeesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     DeleteSQL.Strings = (
       'Delete From EMPLOYEE A'
@@ -882,6 +884,7 @@ object Form1: TForm1
     BeforeOpen = CountriesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -930,6 +933,7 @@ object Form1: TForm1
     BeforeOpen = JobCodesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -971,6 +975,7 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -1041,6 +1046,7 @@ object Form1: TForm1
   end
   object CheckVersionTablePresent: TIBSQL
     Database = IBDatabase1
+    CaseSensitiveParameterNames = False
     GenerateParamNames = False
     UniqueParamNames = False
     ParamCheck = True
@@ -1053,6 +1059,7 @@ object Form1: TForm1
   end
   object GetDBVersionNoQuery: TIBSQL
     Database = IBDatabase1
+    CaseSensitiveParameterNames = False
     GenerateParamNames = False
     UniqueParamNames = False
     ParamCheck = True

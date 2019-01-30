@@ -86,6 +86,12 @@ IBX Change Log  version (2.3-3 Build 11361) Fri, 28 Dec 2018 10:04:17 +0000
     Useful in (e.g.) TIBDatabase.OnAfterConnect handler to suppress actions
     when the database is disconnected/connected during the create DB procedure.
 
+15. TIBXScript: any User/password parameters found in a CREATE DATABASE statement
+    are now always ignored and replaced by the user name and password provided as
+    the login parameters for the TIBDatabase referenced from the TIBXScript. The
+    IgnoreCreateDatabase property still applies and the CREATE DATABASE statement is
+    completely ignored if this property is true.
+
 IBX Change Log  version (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 
 1. Remove need to check for IsMultiThread by providing access to GUI timers via

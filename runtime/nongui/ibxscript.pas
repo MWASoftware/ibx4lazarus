@@ -1626,11 +1626,9 @@ begin
         OnCreateDatabase(self,FileName);
       stmt := 'CREATE DATABASE ''' + FileName + '''' + system.copy(stmt,RegexObj.MatchPos[3], RegexObj.MatchLen[3]);
       UpdateUserPassword;
-      FDatabase.Connected := false;
+      if FDatabase.Connected then
+        FDatabase.Dropdatabase;
       FDatabase.CreateDatabase(stmt);
-      FDatabase.Connected := false;
-      ExtractUserInfo;
-      FDatabase.Connected := true;
       Result := true;
       Exit;
     end;
