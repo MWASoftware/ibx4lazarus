@@ -18,7 +18,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function GetPassword(aUserName, aServerName: string; var password: string): boolean; overload;
-    function GetPassword(aUserName, aDatabaseName, aServerName: string; var password: string): boolean; overload;
+    function GetPassword(aUserName, aDatabaseName, aServerName: string; var password: string; RequireDBMatch: boolean=false): boolean; overload;
     procedure SavePassword(aUserName, aServerName, aPassword: string); overload;
     procedure SavePassword(aUserName, aDatabaseName, aServerName, aPassword, aSecDatabase: string); overload;
     procedure RemovePassword(aUserName, aServerName: string); overload;
@@ -97,10 +97,17 @@ begin
 end;
 
 function TPasswordCache.GetPassword(aUserName, aDatabaseName,
-  aServerName: string; var password: string): boolean;
+  aServerName: string; var password: string; RequireDBMatch: boolean): boolean;
 var Results: IResultSet;
 begin
   with LocalData do
+  if RequireDBMatch then
+  Results := LocalDatabase.Attachment.OpenCursorAtStart(
+               PasswordCacheTable.Transaction.TransactionIntf,
+               'Select DBAPasswordIndex From PasswordCache Where ServerName = ? '+
+               'and DBAUSER = ? and DatabaseName = ? ',
+               [aServerName,aUserName,aDatabaseName])
+  else
     Results := LocalDatabase.Attachment.OpenCursorAtStart(
                  PasswordCacheTable.Transaction.TransactionIntf,
                  'Select DBAPasswordIndex From PasswordCache Where ServerName = ? '+

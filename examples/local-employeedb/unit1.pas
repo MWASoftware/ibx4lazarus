@@ -189,6 +189,7 @@ type
     { private declarations }
     FDirty: boolean;
     FNoAutoReopen: boolean;
+    procedure DoDBOpen(Data: PtrInt);
     procedure Reopen(Data: PtrInt);
     function GetDBVersionNo: integer;
   public
@@ -238,6 +239,25 @@ end;
 procedure TForm1.SaveChangesUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := FDirty
+end;
+
+procedure TForm1.DoDBOpen(Data: PtrInt);
+begin
+  try
+    IBDatabase1.Connected := true;
+  except On E:Exception do
+    begin
+     MessageDlg(E.Message,mtError,[mbOK],0);
+     Close;
+     Exit
+    end;
+  end;
+
+  {If upgrade failed or downgrade not pending then exit}
+  with IBLocalDBSupport1 do
+    if (CurrentDBVersionNo < RequiredVersionNo) or
+       ((CurrentDBVersionNo >  RequiredVersionNo) and not DowngradePending) then
+    Close;
 end;
 
 procedure TForm1.Reopen(Data: PtrInt);
@@ -515,21 +535,7 @@ begin
   {Set IB Exceptions to only show text message - omit SQLCode and Engine Code}
   IBDatabase1.FirebirdAPI.GetStatus.SetIBDataBaseErrorMessages([ShowIBMessage]);
   Application.ExceptionDialog := aedOkMessageBox;
-  try
-    IBDatabase1.Connected := true;
-  except On E:Exception do
-    begin
-     MessageDlg(E.Message,mtError,[mbOK],0);
-     Close;
-     Exit
-    end;
-  end;
-
-  {If upgrade failed or downgrade not pending then exit}
-  with IBLocalDBSupport1 do
-    if (CurrentDBVersionNo < RequiredVersionNo) or
-       ((CurrentDBVersionNo >  RequiredVersionNo) and not DowngradePending) then
-    Close;
+  Application.QueueAsyncCall(@DoDBOpen,0);
 end;
 
 procedure TForm1.EmployeesAfterDelete(DataSet: TDataSet);

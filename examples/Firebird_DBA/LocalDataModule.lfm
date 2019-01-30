@@ -199,6 +199,11 @@ object LocalData: TLocalData
       item
         Name = 'ShutdownProc'
         DataType = ftString
+      end    
+      item
+        Name = 'UpgradeConfFile'
+        DataType = ftString
+        Size = 512
       end>
     AfterOpen = AppDatabasesAfterOpen
     AfterClose = AppDatabasesAfterClose

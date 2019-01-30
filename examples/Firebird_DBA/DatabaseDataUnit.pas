@@ -27,6 +27,7 @@ type
     FAppID: integer;
     FConnectAsUser: boolean;
     FCreateIfNotExists: boolean;
+    FCurrentVersion: integer;
     FDBControlTable: string;
     FOwner: TDatabaseDataList;
     FAttachment: IAttachment;
@@ -37,6 +38,7 @@ type
     FServerData: TServerData;
     FShutDownProc: string;
     FTitle: string;
+    FUpgradeConfFile: string;
     FUsesDefaultSecDatabase: boolean;
     procedure SetAppID(AValue: integer);
     procedure SetDatabaseName(AValue: string);
@@ -50,6 +52,7 @@ type
     destructor Destroy; override;
     procedure Refresh;
     procedure Disconnect;
+    procedure DropDatabase;
     function Reconnect: boolean;
     function ConnectAs: boolean;
     function Select: boolean;
@@ -63,6 +66,8 @@ type
     property CreateIfNotExists: boolean read FCreateIfNotExists write FCreateIfNotExists;
     property AppID: integer read FAppID write SetAppID;
     property Title: string read FTitle;
+    property CurrentVersion: integer read FCurrentVersion;
+    property UpgradeConfFile: string read FUpgradeConfFile;
     property DBControlTable: string read FDBControlTable;
     property ShutDownProc: string read FShutDownProc;
     property ServerData: TServerData read FServerData;
@@ -122,6 +127,8 @@ begin
     FTitle := LocalData.AppDatabases.FieldByName('Title').AsString;
     FDBControlTable := LocalData.AppDatabases.FieldByName('DBControlTable').AsString;
     FShutDownProc := LocalData.AppDatabases.FieldByName('ShutDownProc').AsString;
+    FCurrentVersion := LocalData.AppDatabases.FieldByName('CurrentVersion').AsInteger;
+    FUpgradeConfFile := LocalData.AppDatabases.FieldByName('UpgradeConfFile').AsString;
   end;
 end;
 
@@ -208,6 +215,17 @@ begin
   FAttachment := nil;
 end;
 
+procedure TDatabaseData.DropDatabase;
+begin
+  if DBADatabaseData.DatabaseData = self then
+  begin
+    if DBADatabaseData.IBDatabase1.Connected then
+       DBADatabaseData.IBDatabase1.DropDatabase;
+    DBADatabaseData.DatabaseData := nil;
+  end;
+  FAttachment := nil;
+end;
+
 function TDatabaseData.Reconnect: boolean;
 begin
   Disconnect;
@@ -238,7 +256,7 @@ begin
   FServerData.DefaultUserName := oldServerData.DefaultUserName;
   FServerData.ServerName := oldServerData.ServerName;
   FServerData.DomainName := oldServerData.DomainName;
-  UsesDefaultSecDatabase := aSecDatabase <> 'Default';
+  UsesDefaultSecDatabase := aSecDatabase = 'Default';
 end;
 
 { TDatabaseDataList }

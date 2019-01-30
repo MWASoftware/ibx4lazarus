@@ -10,7 +10,7 @@ object UpgradeDatabaseDlg: TUpgradeDatabaseDlg
   ClientWidth = 324
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.3.0'
+  LCLVersion = '2.0.0.3'
   object Panel1: TPanel
     Left = 0
     Height = 132
@@ -60,6 +60,7 @@ object UpgradeDatabaseDlg: TUpgradeDatabaseDlg
   end
   object IBXScript: TIBXScript
     IgnoreGrants = True
+    IgnoreCreateDatabase = True
     Transaction = UpdateTransaction
     ShowAffectedRows = False
     ShowPerformanceStats = False

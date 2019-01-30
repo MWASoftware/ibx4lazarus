@@ -16,11 +16,19 @@ type
   { TDBAMainForm }
 
   TDBAMainForm = class(TMainForm)
+    UpgradeButton: TButton;
+    DBADropDatabase: TAction;
     ConnectAs: TAction;
+    Label55: TLabel;
+    Label56: TLabel;
     MenuItem30: TMenuItem;
     MenuItem31: TMenuItem;
+    MenuItem32: TMenuItem;
     Reconnect: TAction;
     MenuItem29: TMenuItem;
+    SchemaInfoPanel: TPanel;
+    SchemaTitle: TEdit;
+    SchemaVersion: TEdit;
     ShowProperties: TAction;
     Disconnect: TAction;
     DeleteNode: TAction;
@@ -47,6 +55,7 @@ type
     TreeSource: TDataSource;
     TreeViewImages: TImageList;
     procedure ConnectAsExecute(Sender: TObject);
+    procedure DBADropDatabaseExecute(Sender: TObject);
     procedure ReconnectExecute(Sender: TObject);
     procedure ReconnectUpdate(Sender: TObject);
     procedure ShowPropertiesExecute(Sender: TObject);
@@ -62,7 +71,6 @@ type
     procedure DropDatabaseUpdate(Sender: TObject);
     procedure Edit8EditingDone(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormShow(Sender: TObject);
     procedure PopupMenu1Popup(Sender: TObject);
     procedure RegisteredObjectsTreeAddition(Sender: TObject; Node: TTreeNode);
     procedure RegisteredObjectsTreeCreateNodeClass(Sender: TCustomTreeView;
@@ -81,15 +89,17 @@ type
     procedure ServersAndDatabasesValidatePost(Sender: TObject;
       var CancelPost: boolean);
     procedure ServerTabShow(Sender: TObject);
+    procedure UpgradeButtonClick(Sender: TObject);
     procedure UserManagerTabShow(Sender: TObject);
   private
     FLocated: boolean;
     FNewItemType: TDBANodeItemType;
     FExpandNode: TTreeNode;
-    procedure DoSelect(Data: PtrInt);
     procedure UpdateActions;
   protected
     procedure ConfigureForServerVersion; override;
+    procedure ConnectToDatabase; override;
+    procedure LoadData; override;
   end;
 
 var
@@ -115,20 +125,6 @@ type
   end;
 
 { TDBAMainForm }
-
-procedure TDBAMainForm.FormShow(Sender: TObject);
-var CurServerDB: string;
-begin
-  PageControl1.Visible := false;
-  LocalData.LocalDatabase.Connected := true;
-  ServersAndDatabases.Active := true;
-  inherited;
-  PageControl1.ActivePage := ServerTab;
-  FLocated := true;
-  CurServerDB := LocalData.UserConfig[rgCurServerDB];
-  if CurServerDB <> '' then
-    Application.QueueAsyncCall(@DoSelect,PtrInt(RegisteredObjectsTree.FindNode(StrIntListToVar(CurServerDB),true)));
-end;
 
 procedure TDBAMainForm.PopupMenu1Popup(Sender: TObject);
 begin
@@ -293,17 +289,18 @@ begin
   inherited;
 end;
 
+procedure TDBAMainForm.UpgradeButtonClick(Sender: TObject);
+begin
+  if Messagedlg('Upgrade Database?',mtConfirmation,[mbYes,mbNo],0) = mrYes then
+    DBADatabaseData.PerformUpgrade(@HandleLoadData);
+end;
+
 procedure TDBAMainForm.UserManagerTabShow(Sender: TObject);
 begin
   if Visible and (DBADatabaseData.DatabaseData = nil) then
       UserListSource.DataSet.Active := not DBADatabaseData.EmbeddedMode
   else
     inherited;
-end;
-
-procedure TDBAMainForm.DoSelect(Data: PtrInt);
-begin
-  RegisteredObjectsTree.Selected := TTreeNode(Data);
 end;
 
 procedure TDBAMainForm.UpdateActions;
@@ -347,6 +344,40 @@ begin
     RolesGrid.Visible := true;
     inherited ConfigureForServerVersion;
   end;
+end;
+
+procedure TDBAMainForm.ConnectToDatabase;
+var CurServerDB: string;
+begin
+  LocalData.LocalDatabase.Connected := true;
+  ServersAndDatabases.Active := true;
+  FLocated := true;
+  CurServerDB := LocalData.UserConfig[rgCurServerDB];
+  if CurServerDB <> '' then
+    RegisteredObjectsTree.Selected := RegisteredObjectsTree.FindNode(StrIntListToVar(CurServerDB),true);
+end;
+
+procedure TDBAMainForm.LoadData;
+begin
+  inherited LoadData;
+  if (DBADatabaseData.DatabaseData <> nil) and (DBADatabaseData.DatabaseData.AppID <> 0) then
+  begin
+    SchemaInfoPanel.Visible := true;
+    SchemaTitle.Text := DBADatabaseData.DatabaseData.Title;
+    if DBADatabaseData.SchemaVersion > 0 then
+      SchemaVersion.Text := IntToStr(DBADatabaseData.SchemaVersion)
+    else
+      SchemaVersion.Text := 'n/a';
+    if DBADatabaseData.DatabaseData.CurrentVersion > DBADatabaseData.SchemaVersion then
+    begin
+      UpgradeButton.Caption := Format('Upgrade Schema to Version %d',[DBADatabaseData.DatabaseData.CurrentVersion]);
+      UpgradeButton.Visible := true;
+    end
+    else
+      UpgradeButton.Visible := false
+  end
+  else
+    SchemaInfoPanel.Visible := false;
 end;
 
 procedure TDBAMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction
@@ -552,6 +583,19 @@ begin
               PageControl1.Visible := false
         end;
       end;
+  end;
+end;
+
+procedure TDBAMainForm.DBADropDatabaseExecute(Sender: TObject);
+var Node: TTreeNode;
+begin
+  if MessageDlg(Format('Do you really want to Drop Database "%s"?',[RegisteredObjectsTree.Selected.Text]),
+    mtConfirmation,[mbYes,mbNo],0) = mrYes then
+  begin
+    Node := RegisteredObjectsTree.Selected.Parent;
+    TDatabaseData(RegisteredObjectsTree.Selected.Data).DropDatabase;
+    RegisteredObjectsTree.Selected.Delete;
+    RegisteredObjectsTree.Selected := Node;
   end;
 end;
 

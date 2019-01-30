@@ -378,14 +378,16 @@ type
     FLoading: boolean;
     FLastStatsIndex: integer;
     FServerError: boolean;
-    procedure HandleDBConnect(Sender: TObject);
-    procedure HandleLoadData(Sender: TObject);
-    procedure LoadData;
+    procedure DoDBOpen(Data: PtrInt);
     procedure LoadServerData;
     procedure DoExtract(Data: PtrInt);
     procedure ConfigureOnlineValidation;
   protected
+    procedure HandleDBConnect(Sender: TObject);
+    procedure HandleLoadData(Sender: TObject);
     procedure ConfigureForServerVersion; virtual;
+    procedure ConnectToDatabase; virtual;
+    procedure LoadData; virtual;
   public
   end;
 
@@ -413,7 +415,8 @@ begin
   AccessRightsTreeView.DataSource := AccessRightsSource;
   SubjectAccessRightsGrid.DataSource := nil;
   SubjectAccessRightsGrid.DataSource := SubjectAccessRightsSource;
-  if not DBDataModule.Connect then Close;
+  PageControl1.Visible := false;
+  Application.QueueAsyncCall(@DoDBOpen,0);
 end;
 
 procedure TMainForm.IsShadowChkChange(Sender: TObject);
@@ -1036,6 +1039,11 @@ begin
   (Sender as TAction).Checked := AttmtTimer.Enabled;
 end;
 
+procedure TMainForm.DoDBOpen(Data: PtrInt);
+begin
+  ConnectToDatabase;
+end;
+
 procedure TMainForm.HandleDBConnect(Sender: TObject);
 begin
   ConfigureForServerVersion;
@@ -1202,6 +1210,12 @@ begin
   UserManagerTab.TabVisible := not DBDataModule.EmbeddedMode;
   AccessRightsTab.TabVisible := not DBDataModule.EmbeddedMode;
   AutoAdmin.Enabled := not DBDataModule.EmbeddedMode;
+end;
+
+procedure TMainForm.ConnectToDatabase;
+begin
+  if not DBDataModule.Connect then Close;
+  PageControl1.Visible := true;
 end;
 
 procedure TMainForm.ConfigureOnlineValidation;

@@ -6,7 +6,7 @@ object DBDataModule: TDBDataModule
   Width = 730
   PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -71,6 +71,259 @@ object DBDataModule: TDBDataModule
     DataSetCloseAction = dcSaveChanges
     left = 288
     top = 24
+    object DatabaseQueryRDBDESCRIPTION: TIBMemoField
+      FieldKind = fkData
+      FieldName = 'RDB$DESCRIPTION'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      BlobType = ftMemo
+      Size = 8
+      Transliterate = False
+      DisplayTextAsClassName = False
+    end
+    object DatabaseQueryRDBRELATION_ID: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'RDB$RELATION_ID'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryRDBSECURITY_CLASS: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$SECURITY_CLASS'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object DatabaseQueryRDBCHARACTER_SET_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$CHARACTER_SET_NAME'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object DatabaseQueryRDBLINGER: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'RDB$LINGER'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONDATABASE_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$DATABASE_NAME'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 255
+    end
+    object DatabaseQueryMONPAGE_SIZE: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$PAGE_SIZE'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONODS_MAJOR: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$ODS_MAJOR'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONODS_MINOR: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$ODS_MINOR'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONOLDEST_TRANSACTION: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$OLDEST_TRANSACTION'
+      Index = 9
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONOLDEST_ACTIVE: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$OLDEST_ACTIVE'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONOLDEST_SNAPSHOT: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$OLDEST_SNAPSHOT'
+      Index = 11
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONNEXT_TRANSACTION: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$NEXT_TRANSACTION'
+      Index = 12
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONPAGE_BUFFERS: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'MON$PAGE_BUFFERS'
+      Index = 13
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONSQL_DIALECT: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$SQL_DIALECT'
+      Index = 14
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONSHUTDOWN_MODE: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$SHUTDOWN_MODE'
+      Index = 15
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONSWEEP_INTERVAL: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'MON$SWEEP_INTERVAL'
+      Index = 16
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONREAD_ONLY: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$READ_ONLY'
+      Index = 17
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONFORCED_WRITES: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$FORCED_WRITES'
+      Index = 18
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONRESERVE_SPACE: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$RESERVE_SPACE'
+      Index = 19
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONCREATION_DATE: TDateTimeField
+      Alignment = taRightJustify
+      FieldKind = fkData
+      FieldName = 'MON$CREATION_DATE'
+      Index = 20
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONPAGES: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$PAGES'
+      Index = 21
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONSTAT_ID: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'MON$STAT_ID'
+      Index = 22
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONBACKUP_STATE: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$BACKUP_STATE'
+      Index = 23
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONCRYPT_PAGE: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$CRYPT_PAGE'
+      Index = 24
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONOWNER: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$OWNER'
+      Index = 25
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object DatabaseQueryMONSEC_DATABASE: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$SEC_DATABASE'
+      Index = 26
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 7
+    end
   end
   object DBCharSet: TIBQuery
     AllowAutoActivateTransaction = False

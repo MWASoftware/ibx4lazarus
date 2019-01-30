@@ -261,12 +261,6 @@ begin
       AppDatabaseDir := DatabaseDirs[i];
       AppDatabases.FieldByName('Path').AsString := AppDatabaseDir;
 
-      if FileExists(AppDatabaseDir + DirectorySeparator + 'schema.sql') then
-         AppDatabases.FieldByName('schema').AsString := AppDatabaseDir + DirectorySeparator + 'schema.sql'
-      else
-      if FileExists(AppDatabaseDir + DirectorySeparator + 'schema.gbk') then
-         AppDatabases.FieldByName('schema').AsString := AppDatabaseDir + DirectorySeparator + 'schema.gbk';
-
       if FileExists(AppDatabaseDir + DirectorySeparator + 'database.conf') then
       begin
         ini := TIniFile.Create(AppDatabaseDir + DirectorySeparator + 'database.conf');
@@ -275,12 +269,14 @@ begin
           AppDatabases.FieldByName('DBControlTable').AsString := ini.ReadString('Database','DBControlTable','');
           AppDatabases.FieldByName('Signature').AsString := ini.ReadString('Database','Signature','');
           AppDatabases.FieldByName('ShutdownProc').AsString := ini.ReadString('Database','ShutdownProcedure','');
+          AppDatabases.FieldByName('schema').AsString := AppDatabaseDir + DirectorySeparator + ini.ReadString('Database','Schema','schema.gbk');
         finally
           ini.Free;
         end;
 
         if FileExists(AppDatabaseDir + DirectorySeparator + 'upgrade.conf') then
         begin
+          AppDatabases.FieldByName('UpgradeConfFile').AsString := AppDatabaseDir + DirectorySeparator + 'upgrade.conf';
           ini := TIniFile.Create(AppDatabaseDir + DirectorySeparator + 'upgrade.conf');
           try
             AppDatabases.FieldByName('CurrentVersion').AsInteger := ini.ReadInteger('status','current',0);

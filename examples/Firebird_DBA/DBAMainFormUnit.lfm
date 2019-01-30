@@ -1,81 +1,154 @@
 inherited DBAMainForm: TDBAMainForm
-  Left = 268
-  Height = 620
-  Top = 207
-  Width = 1148
+  Left = 149
+  Height = 625
+  Top = 228
+  Width = 1174
   Caption = 'Firebird Database Administrator'
-  ClientHeight = 600
-  ClientWidth = 1148
+  ClientHeight = 605
+  ClientWidth = 1174
   OnClose = FormClose
-  OnShow = FormShow
   inherited ToolBar1: TToolBar
-    Width = 1148
-    inherited ToolButton2: TToolButton
-      Height = 22
-    end
-    inherited ToolButton4: TToolButton
-      Height = 22
-    end
-    inherited ToolButton6: TToolButton
-      Height = 22
-    end
+    Width = 1174
   end
   inherited StatusBar1: TStatusBar
-    Top = 578
-    Width = 1148
+    Top = 583
+    Width = 1174
   end
   inherited PageControl1: TPageControl
     Left = 157
-    Height = 552
-    Width = 991
-    ActivePage = ServerTab
-    TabIndex = 5
+    Height = 557
+    Width = 1017
     inherited Properties: TTabSheet
-      ClientHeight = 520
-      ClientWidth = 985
+      ClientHeight = 525
+      ClientWidth = 1011
       inherited Panel7: TPanel
-        Height = 520
-        Width = 985
-        ClientHeight = 520
-        ClientWidth = 985
-        inherited Label23: TLabel
-          Left = 732
+        Height = 525
+        Width = 1011
+        ClientHeight = 525
+        ClientWidth = 1011
+        inherited Label11: TLabel
+          Left = 810
         end
-        inherited DBEdit1: TDBEdit
+        inherited AllocatedPages: TEdit
+          Left = 910
+        end
+        inherited Label3: TLabel
           Left = 836
         end
+        inherited PagesUsed: TEdit
+          Left = 910
+        end
+        inherited Label10: TLabel
+          Left = 814
+        end
+        inherited PagesAvail: TEdit
+          Left = 910
+        end
+        inherited Label15: TLabel
+          Left = 823
+        end
+        inherited PageBuffers: TEdit
+          Left = 910
+        end
+        inherited Label23: TLabel
+          Left = 806
+        end
+        inherited DBEdit1: TDBEdit
+          Left = 910
+        end
         inherited DBComments: TMemo
-          Height = 89
-          Width = 564
+          Height = 90
+          Width = 590
+        end
+        inherited ClientLibrary: TLabel
+          Left = 914
+          Top = 508
+          Anchors = [akTop, akRight, akBottom]
         end
         inherited ClientServerVersion: TMemo
-          Width = 563
+          Width = 589
+        end
+        object SchemaInfoPanel: TPanel[54]
+          Left = 402
+          Height = 102
+          Top = 170
+          Width = 609
+          Anchors = [akTop, akLeft, akRight]
+          BevelOuter = bvNone
+          ClientHeight = 102
+          ClientWidth = 609
+          TabOrder = 27
+          object Label55: TLabel
+            Left = 74
+            Height = 14
+            Top = 16
+            Width = 49
+            Caption = 'Schema'
+            ParentColor = False
+          end
+          object SchemaTitle: TEdit
+            Left = 133
+            Height = 24
+            Top = 12
+            Width = 464
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 0
+            Text = 'SchemaTitle'
+          end
+          object Label56: TLabel
+            Left = 27
+            Height = 14
+            Top = 48
+            Width = 96
+            Caption = 'Schema Version'
+            ParentColor = False
+          end
+          object SchemaVersion: TEdit
+            Left = 133
+            Height = 24
+            Top = 44
+            Width = 80
+            Alignment = taRightJustify
+            ReadOnly = True
+            TabOrder = 1
+            Text = 'SchemaVersion'
+          end
+          object UpgradeButton: TButton
+            Left = 352
+            Height = 25
+            Top = 44
+            Width = 243
+            Caption = 'UpgradeButton'
+            OnClick = UpgradeButtonClick
+            TabOrder = 2
+          end
         end
       end
     end
     inherited FilesTab: TTabSheet
-      ClientHeight = 520
-      ClientWidth = 985
+      ClientHeight = 525
+      ClientWidth = 1011
     end
     inherited AttachmentsTab: TTabSheet
-      ClientHeight = 520
-      ClientWidth = 985
+      ClientHeight = 525
+      ClientWidth = 1011
     end
     inherited StatisticsTab: TTabSheet
-      ClientHeight = 520
-      ClientWidth = 985
+      ClientHeight = 525
+      ClientWidth = 1011
     end
     inherited SchemaTab: TTabSheet
-      ClientHeight = 520
-      ClientWidth = 985
+      ClientHeight = 525
+      ClientWidth = 1011
       inherited SynEdit1: TSynEdit
         Width = 985
       end
     end
     inherited ServerTab: TTabSheet
       Tag = 1
-      ClientHeight = 520
-      ClientWidth = 985
+      ClientHeight = 525
+      ClientWidth = 1011
       OnShow = ServerTabShow
       inherited Panel1: TPanel
         Height = 520
@@ -113,8 +186,8 @@ inherited DBAMainForm: TDBAMainForm
     end
     inherited UserManagerTab: TTabSheet
       Tag = 1
-      ClientHeight = 520
-      ClientWidth = 985
+      ClientHeight = 525
+      ClientWidth = 1011
       OnShow = UserManagerTabShow
       inherited Panel4: TPanel
         Height = 520
@@ -163,45 +236,33 @@ inherited DBAMainForm: TDBAMainForm
       end
     end
     inherited AccessRightsTab: TTabSheet
-      ClientHeight = 520
-      ClientWidth = 985
+      ClientHeight = 525
+      ClientWidth = 1011
     end
     inherited MappingsTab: TTabSheet
-      ClientHeight = 520
-      ClientWidth = 985
+      ClientHeight = 525
+      ClientWidth = 1011
     end
     inherited RepairTab: TTabSheet
-      ClientHeight = 520
-      ClientWidth = 985
-      inherited ValidateOptions: TPageControl
-        inherited ValidateOptionsTab: TTabSheet
-          ClientHeight = 104
-          ClientWidth = 318
-        end
-        inherited RepairOptionsTab: TTabSheet
-          ClientHeight = 104
-          ClientWidth = 318
-        end
-      end
+      ClientHeight = 525
+      ClientWidth = 1011
     end
     inherited LimboTab: TTabSheet
-      ClientHeight = 520
-      ClientWidth = 985
+      ClientHeight = 525
+      ClientWidth = 1011
     end
   end
   inherited UpdateColsPanel: TPanel
-    ClientHeight = 62
-    ClientWidth = 542
     inherited DBEdit5: TDBEdit
-      Width = 370
+      Width = 366
     end
     inherited DBEdit6: TDBEdit
-      Width = 370
+      Width = 366
     end
   end
   object RegisteredObjectsTree: TIBTreeView[4]
     Left = 0
-    Height = 552
+    Height = 557
     Top = 26
     Width = 152
     Align = alLeft
@@ -226,11 +287,16 @@ inherited DBAMainForm: TDBAMainForm
   end
   object Splitter6: TSplitter[5]
     Left = 152
-    Height = 552
+    Height = 557
     Top = 26
     Width = 5
   end
   inherited MainMenu1: TMainMenu[6]
+    inherited MenuItem1: TMenuItem
+      inherited MenuItem9: TMenuItem
+        Action = DBADropDatabase
+      end
+    end
   end
   inherited ActionList1: TActionList[7]
     inherited Backup: TAction
@@ -524,6 +590,11 @@ inherited DBAMainForm: TDBAMainForm
       OnExecute = ConnectAsExecute
       OnUpdate = DeleteNodeUpdate
     end
+    object DBADropDatabase: TAction
+      Caption = 'Drop Database'
+      OnExecute = DBADropDatabaseExecute
+      OnUpdate = ReconnectUpdate
+    end
   end
   object PopupMenu1: TPopupMenu[39]
     OnPopup = PopupMenu1Popup
@@ -549,6 +620,9 @@ inherited DBAMainForm: TDBAMainForm
     end
     object MenuItem24: TMenuItem
       Action = CreateDatabase
+    end
+    object MenuItem32: TMenuItem
+      Action = DBADropDatabase
     end
     object MenuItem27: TMenuItem
       Caption = '-'

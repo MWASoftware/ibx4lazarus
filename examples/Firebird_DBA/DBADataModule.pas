@@ -30,6 +30,7 @@ type
       Service: TIBXServicesConnection; var aAction: TSecContextAction);
   private
     FDatabaseData: TDatabaseData;
+    FSchemaVersion: integer;
     FServicePassword: string;
     FDatabasePassword: string;
     FNewPassword: boolean;
@@ -39,6 +40,9 @@ type
     FServerData: TServerData;
     FSecDBException: boolean;
     function IdentifyDatabase: integer;
+    function GetSchemaVersion: integer;
+    function HasTable(aTableName: string): boolean;
+    procedure GetSchemaVersion2(Sender: TObject; var VersionNo: integer);
     procedure SetDatabaseData(AValue: TDatabaseData);
     procedure SetServerData(AValue: TServerData);
   protected
@@ -50,8 +54,10 @@ type
     function Connect: boolean; override;
     procedure Disconnect; override;
     procedure Reconnect;
+    procedure PerformUpgrade(aOnUpgradeDone: TNotifyEvent);
     property ServerData: TServerData read FServerData write SetServerData;
     property DatabaseData: TDatabaseData read FDatabaseData write SetDatabaseData;
+    property SchemaVersion: integer read GetSchemaVersion;
   end;
 
 var
@@ -62,7 +68,8 @@ implementation
 {$R *.lfm}
 
 uses PasswordCacheUnit, LocalDataModule, IBTypes, FBMessages, IBUtils,
-  IBXCreateDatabaseFromSQLDlgUnit, DBACreateDatabaseDlgUnit;
+  IBXCreateDatabaseFromSQLDlgUnit, DBACreateDatabaseDlgUnit,
+  IBXUpgradeDatabaseDlg, IBXUpgradeConfFile;
 
 { TDBADatabaseData }
 
@@ -98,6 +105,11 @@ end;
 procedure TDBADatabaseData.IBDatabase1CreateDatabase(Sender: TObject);
 var Schema: string;
 begin
+  if FNewPassword then
+    PasswordCache.SavePassword(DBUserName,ExtractDatabaseName(IBDatabase1.DatabaseName),
+                               ExtractServerName(IBDatabase1.DatabaseName),
+                               FDatabasePassword,
+                               SecurityDatabase);
   if LocalData.AppDatabases.Locate('ID',FDatabaseData.AppID,[]) then
   begin
     Schema := localData.AppDatabases.FieldByName('schema').AsString;
@@ -112,7 +124,8 @@ begin
       end;
     end
     else
-      IBXCreateDatabaseFromSQLDlgUnit.CreateNewDatabase(IBDatabase1,Schema)
+      IBXCreateDatabaseFromSQLDlgUnit.CreateNewDatabase(IBDatabase1,Schema);
+    PerformUpgrade(nil);
   end
   else
     raise Exception.CreateFmt('Unable to locate database ID %d',[FDatabaseData.AppID]);
@@ -162,7 +175,10 @@ begin
     begin
       prompt := not PasswordCache.GetPassword(FServiceUserName,ExtractDatabaseName(IBDatabase1.DatabaseName),aServerName,FServicePassword);
       if not prompt then
-        LoginParams.Values['expected_db'] := ExtractDatabaseName(IBDatabase1.DatabaseName);
+        LoginParams.Values['expected_db'] := ExtractDatabaseName(IBDatabase1.DatabaseName)
+      else
+      if not FSecDBException then
+        prompt := not PasswordCache.GetPassword(FServiceUserName,aServerName,FServicePassword);
     end
     else
     if (FServiceConnectCount < 2) and not FSecDBException then
@@ -213,6 +229,27 @@ begin
   end;
 end;
 
+function TDBADatabaseData.GetSchemaVersion: integer;
+begin
+  if (FDatabaseData.DBControlTable <> '') and HasTable(FDatabaseData.DBControlTable) then
+    Result := IBDatabase1.Attachment.OpenCursorAtStart('Select VersionNo From ' + FDatabaseData.DBControlTable)[0].AsInteger
+  else
+    Result := 0;
+end;
+
+function TDBADatabaseData.HasTable(aTableName: string): boolean;
+begin
+  Result := IBDatabase1.Attachment.OpenCursorAtStart(
+         Format('Select Case when Exists(Select * From RDB$RELATIONS Where RDB$RELATION_NAME = ''%s'') then 1 else 0 end From RDB$DATABASE',[aTableName]))
+         [0].AsInteger = 1;
+end;
+
+procedure TDBADatabaseData.GetSchemaVersion2(Sender: TObject;
+  var VersionNo: integer);
+begin
+  VersionNo := GetSchemaVersion;
+end;
+
 procedure TDBADatabaseData.SetServerData(AValue: TServerData);
 begin
   if FServerData = AValue then Exit;
@@ -238,8 +275,11 @@ begin
       FServiceUserName := ServerData.DefaultUserName;
     try
       IBXServicesConnection1.Connected := true;
-    except on E:EIBClientError do
-      break;
+    except
+      on E:EIBClientError do
+        break;
+      on E: Exception do
+        Application.ShowException(E);
     end;
   end;
   if IBDatabase1.Connected then
@@ -300,7 +340,8 @@ begin
   if (FDBConnectCount = 0) and assigned(FDatabaseData.ServerData) then
   begin
       prompt := not PasswordCache.GetPassword(aUserName,ExtractDatabaseName(aDatabaseName),
-                                               FDatabaseData.ServerData.DomainName,aPassword);
+                                               FDatabaseData.ServerData.DomainName,aPassword,
+                                               not FDatabaseData.UsesDefaultSecDatabase);
       if prompt and FDatabaseData.UsesDefaultSecDatabase then
         prompt := not PasswordCache.GetPassword(aUserName,FDatabaseData.ServerData.DomainName,aPassword);
   end;
@@ -340,6 +381,18 @@ begin
     Connect
   else
     IBXServicesConnection1.Connected := true;
+end;
+
+procedure TDBADatabaseData.PerformUpgrade(aOnUpgradeDone: TNotifyEvent);
+var UpgradeConfFile: TUpgradeConfFile;
+begin
+  UpgradeConfFile := TUpgradeConfFile.Create(FDatabaseData.UpgradeConfFile);
+  try
+    RunUpgradeDatabase(IBDatabase1,nil,UpgradeConfFile,'',FDatabaseData.
+                       CurrentVersion,@GetSchemaVersion2,aOnUpgradeDone);
+  finally
+    UpgradeConfFile.Free;
+  end;
 end;
 
 end.
