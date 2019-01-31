@@ -27,6 +27,8 @@ inherited DBAMainForm: TDBAMainForm
     Left = 157
     Height = 557
     Width = 1017
+    ActivePage = LimboTab
+    TabIndex = 10
     inherited Properties: TTabSheet
       ClientHeight = 525
       ClientWidth = 1011
@@ -149,16 +151,26 @@ inherited DBAMainForm: TDBAMainForm
     inherited AttachmentsTab: TTabSheet
       ClientHeight = 525
       ClientWidth = 1011
+      inherited AttmtGrid: TIBDynamicGrid
+        Height = 525
+        Width = 1011
+      end
     end
     inherited StatisticsTab: TTabSheet
       ClientHeight = 525
       ClientWidth = 1011
+      inherited StatsOptions: TComboBox
+        Left = 772
+      end
+      inherited StatsMemo: TMemo
+        Width = 992
+      end
     end
     inherited SchemaTab: TTabSheet
       ClientHeight = 525
       ClientWidth = 1011
       inherited SynEdit1: TSynEdit
-        Width = 985
+        Width = 1011
       end
     end
     inherited ServerTab: TTabSheet
@@ -167,8 +179,11 @@ inherited DBAMainForm: TDBAMainForm
       ClientWidth = 1011
       OnShow = ServerTabShow
       inherited Panel1: TPanel
-        Height = 520
-        ClientHeight = 520
+        Height = 525
+        ClientHeight = 525
+        inherited ConfigDataGrid: TIBDynamicGrid
+          Height = 90
+        end
         inherited Panel10: TPanel
           inherited Label51: TLabel
             Width = 128
@@ -187,16 +202,16 @@ inherited DBAMainForm: TDBAMainForm
         end
       end
       inherited Splitter1: TSplitter
-        Height = 520
+        Height = 525
       end
       inherited Panel2: TPanel
-        Height = 520
-        Width = 489
-        ClientHeight = 520
-        ClientWidth = 489
+        Height = 525
+        Width = 515
+        ClientHeight = 525
+        ClientWidth = 515
         inherited ServerLog: TMemo
-          Height = 485
-          Width = 471
+          Height = 490
+          Width = 497
         end
       end
     end
@@ -206,76 +221,115 @@ inherited DBAMainForm: TDBAMainForm
       ClientWidth = 1011
       OnShow = UserManagerTabShow
       inherited Panel4: TPanel
-        Height = 520
-        ClientHeight = 520
+        Height = 525
+        ClientHeight = 525
         inherited UserManagerGrid: TIBDynamicGrid
-          Height = 518
+          Height = 523
         end
       end
       inherited Splitter2: TSplitter
-        Height = 520
+        Height = 525
       end
       inherited Panel3: TPanel
-        Height = 520
-        Width = 241
-        ClientHeight = 520
-        ClientWidth = 241
+        Height = 525
+        Width = 179
+        ClientHeight = 525
+        ClientWidth = 179
         inherited RolesGrid: TIBDynamicGrid
-          Width = 241
+          Width = 179
         end
         inherited Panel5: TPanel
-          Top = 459
-          Width = 241
-          ClientWidth = 241
+          Top = 464
+          Width = 179
+          ClientWidth = 179
           inherited Button1: TButton
-            Width = 214
+            Width = 152
           end
         end
         inherited RolesHeaderPanel: TPanel
-          Width = 241
-          ClientWidth = 241
+          Width = 179
+          ClientWidth = 179
         end
         inherited Splitter3: TSplitter
-          Width = 241
+          Width = 179
         end
         inherited TagsHeader: TPanel
-          Width = 241
+          Width = 179
         end
         inherited TagsGrid: TIBDynamicGrid
-          Height = 212
-          Width = 241
+          Height = 217
+          Width = 179
         end
         inherited Splitter4: TSplitter
-          Top = 454
-          Width = 241
+          Top = 459
+          Width = 179
         end
       end
     end
     inherited AccessRightsTab: TTabSheet
       ClientHeight = 525
       ClientWidth = 1011
+      inherited AccessRightsTreeView: TIBTreeView
+        Height = 525
+      end
+      inherited Splitter5: TSplitter
+        Height = 525
+      end
+      inherited SubjectAccessRightsGrid: TIBDynamicGrid
+        Height = 525
+        Width = 706
+      end
     end
     inherited MappingsTab: TTabSheet
       ClientHeight = 525
       ClientWidth = 1011
+      inherited IBDynamicGrid5: TIBDynamicGrid
+        Width = 997
+      end
+      inherited AutoAdmin: TCheckBox
+        Left = 848
+      end
     end
     inherited RepairTab: TTabSheet
       ClientHeight = 525
       ClientWidth = 1011
+      inherited SelectRepairAction: TComboBox
+        Left = 757
+        Top = 7
+      end
+      inherited Button2: TButton
+        Left = 965
+        Top = 8
+      end
       inherited ValidateOptions: TPageControl
         inherited ValidateOptionsTab: TTabSheet
-          ClientHeight = 104
-          ClientWidth = 318
+          ClientHeight = 102
         end
         inherited RepairOptionsTab: TTabSheet
-          ClientHeight = 104
-          ClientWidth = 318
+          ClientHeight = 102
+        end
+      end
+      inherited Panel8: TPanel
+        Width = 990
+        ClientWidth = 990
+        inherited Panel9: TPanel
+          Width = 815
+          ClientWidth = 815
+          inherited ValidationReport: TMemo
+            Width = 815
+          end
         end
       end
     end
     inherited LimboTab: TTabSheet
       ClientHeight = 525
       ClientWidth = 1011
+      inherited IBDynamicGrid3: TIBDynamicGrid
+        Width = 990
+      end
+      inherited LimboReport: TMemo
+        Width = 987
+      end
     end
   end
   inherited UpdateColsPanel: TPanel

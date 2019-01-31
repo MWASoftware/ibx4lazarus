@@ -249,7 +249,8 @@ procedure TDBAMainForm.SaveUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled :=  (RegisteredObjectsTree.Selected <> nil) and
                                  (TDBATreeNode(RegisteredObjectsTree.Selected).ItemType = ntDatabase);
-  inherited;
+  if (Sender as TAction).Enabled then
+    inherited;
 end;
 
 procedure TDBAMainForm.ServersAndDatabasesAfterDelete(DataSet: TDataSet);

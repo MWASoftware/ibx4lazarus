@@ -666,7 +666,7 @@
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3090"/>
-        <CursorPos Y="3121"/>
+        <CursorPos X="24" Y="3120"/>
         <UsageCount Value="11"/>
       </Unit84>
       <Unit85>
@@ -703,21 +703,15 @@
         <UsageCount Value="10"/>
       </Unit89>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="115" Column="42" TopLine="93"/>
+      </Position1>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
-  <Debugging>
-    <BreakPoints Count="1">
-      <Item1>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="../../runtime/nongui/IBXServices.pas"/>
-        <Line Value="3121"/>
-      </Item1>
-    </BreakPoints>
-  </Debugging>
 </CONFIG>

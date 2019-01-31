@@ -24,7 +24,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, SynGutterCodeFolding,
   Forms, Controls, Graphics, Dialogs, Menus, ComCtrls, ActnList, StdCtrls,
-  DbCtrls, ExtCtrls, Buttons, db, memds, IBLookupComboEditBox, IBDynamicGrid,
+  DbCtrls, ExtCtrls, Buttons, db, IBLookupComboEditBox, IBDynamicGrid,
   IBTreeView, IBDatabaseInfo, IBXServices, IBExtract, IB;
 
 type

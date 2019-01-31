@@ -218,6 +218,7 @@ type
     FPortNo: string;
     FProtocol: TProtocolAll;
     FDatabasePathName: string;
+    FHasUserAdminPrivilege: boolean;
     function GetAuthMethod: string;
     function GetAutoAdmin: boolean;
     function GetDatabaseName: string;
@@ -296,7 +297,7 @@ type
     property DBSQLDialect: integer read GetDBSQLDialect write SetDBSQLDialect;
     property ServerName: string read GetServerName;
     property ServiceUserName: string read FServiceUserName;
-    property HasUserAdminPrivilege: boolean read GetUserAdminPrivilege;
+    property HasUserAdminPrivilege: boolean read FHasUserAdminPrivilege;
     property AfterDBConnect: TNotifyEvent read FAfterDBConnect write FAfterDBConnect;
     property AfterDataReload: TNotifyEvent read FAfterDataReload write FAfterDataReload;
   end;
@@ -1500,6 +1501,8 @@ begin
 
   FLocalConnect := FProtocol = Local;
   ConnectServicesAPI;
+  CurrentTransaction.Active := true;
+  FHasUserAdminPrivilege := GetUserAdminPrivilege;
   ReloadData;
 end;
 
