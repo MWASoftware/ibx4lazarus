@@ -44,7 +44,9 @@ IBX Change Log  version (2.3-3 Build 11361) Fri, 28 Dec 2018 10:04:17 +0000
      property QuoteStrings: boolean (default true)
 
    If false then strings are unquoted, otherwise, the QuoteChar property value is
-   used to delimit each and every string in the output.
+   used to de1. Code tidyup in IBTreeView: Node properties initialisation moved from TIBTreeView.AddNodes
+   to TIBTreeView.Added. An OnAddition event handler is no longer needed to initialise
+   ImageIndex and SelectImageIndex values on AddNode.limit each and every string in the output.
 
 6. New published properties for TIBCSVDataOut:
     property FieldSeparator: string;
@@ -91,6 +93,14 @@ IBX Change Log  version (2.3-3 Build 11361) Fri, 28 Dec 2018 10:04:17 +0000
     the login parameters for the TIBDatabase referenced from the TIBXScript. The
     IgnoreCreateDatabase property still applies and the CREATE DATABASE statement is
     completely ignored if this property is true.
+
+16. Code tidyup in IBTreeView: Node properties initialisation moved from TIBTreeView.AddNodes
+    to TIBTreeView.Added. An OnAddition event handler is no longer needed to initialise
+    ImageIndex and SelectImageIndex values on AddNode.
+
+17. TIBDatabase.Attachment and TIBXServices.ServicesIntf are now read/write properties.
+    This may be used (e.g.) to allow multiple TIBDatabase objects to share the same
+    database connection.
 
 IBX Change Log  version (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 

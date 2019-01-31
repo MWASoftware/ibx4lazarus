@@ -1,9 +1,10 @@
-object DatabaseData: TDatabaseData
+object DBDataModule: TDBDataModule
   OldCreateOrder = False
   Height = 552
   HorizontalOffset = 645
   VerticalOffset = 400
   Width = 730
+  PPI = 96
   object IBDatabase1: TIBDatabase
     Connected = False
     AfterConnect = IBDatabase1AfterConnect
@@ -39,6 +40,7 @@ object DatabaseData: TDatabaseData
   end
   object ExecDDL: TIBSQL
     Database = IBDatabase1
+    CaseSensitiveParameterNames = False
     GenerateParamNames = False
     UniqueParamNames = False
     ParamCheck = True
@@ -57,6 +59,7 @@ object DatabaseData: TDatabaseData
     BeforeClose = DatabaseQueryBeforeClose
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -78,6 +81,7 @@ object DatabaseData: TDatabaseData
     AutoCommit = acCommitRetaining
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -99,6 +103,7 @@ object DatabaseData: TDatabaseData
     OnCalcFields = ShadowFilesCalcFields
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -187,6 +192,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -207,6 +213,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -228,6 +235,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -261,6 +269,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -280,6 +289,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -305,6 +315,7 @@ object DatabaseData: TDatabaseData
     BeforeClose = UserListBeforeClose
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -482,6 +493,7 @@ object DatabaseData: TDatabaseData
     AutoCommit = acCommitRetaining
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = UserListSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -543,6 +555,7 @@ object DatabaseData: TDatabaseData
     AfterInsert = UserTagsAfterInsert
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = UserListSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -596,6 +609,7 @@ object DatabaseData: TDatabaseData
     BeforeOpen = AttachmentsBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -919,6 +933,7 @@ object DatabaseData: TDatabaseData
   end
   object AdminUserQuery: TIBSQL
     Database = IBDatabase1
+    CaseSensitiveParameterNames = False
     GenerateParamNames = False
     UniqueParamNames = False
     ParamCheck = True
@@ -936,6 +951,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -966,6 +982,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -1022,6 +1039,7 @@ object DatabaseData: TDatabaseData
     OnCalcFields = AccessRightsCalcFields
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -1155,6 +1173,7 @@ object DatabaseData: TDatabaseData
     BeforeOpen = SubjectAccessRightsBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -1408,5 +1427,20 @@ object DatabaseData: TDatabaseData
     GlobalAction = CommitGlobal
     left = 176
     top = 496
+  end
+  object ConfigDataset: TMemDataset
+    FieldDefs = <    
+      item
+        Name = 'ParamDescription'
+        DataType = ftString
+        Size = 256
+      end    
+      item
+        Name = 'ParamValue'
+        DataType = ftInteger
+      end>
+    AfterClose = ConfigDatasetAfterClose
+    left = 528
+    top = 424
   end
 end

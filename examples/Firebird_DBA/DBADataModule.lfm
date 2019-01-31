@@ -1,0 +1,65 @@
+inherited DBADatabaseData: TDBADatabaseData
+  OnCreate = DataModuleCreate
+  Height = 552
+  HorizontalOffset = 724
+  VerticalOffset = 476
+  Width = 730
+  PPI = 96
+  inherited IBDatabase1: TIBDatabase
+    Connected = True
+    AfterConnect = IBDatabase1AfterConnect
+    Params.Strings = (
+      'user_name=SYSDBA'
+    )
+    OnCreateDatabase = IBDatabase1CreateDatabase
+  end
+  inherited RoleNameList: TIBQuery
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'SEC$USER_NAME'
+        ParamType = ptInput
+      end>
+  end
+  inherited UserTags: TIBQuery
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'SEC$USER_NAME'
+        ParamType = ptInput
+      end>
+  end
+  inherited SubjectAccessRights: TIBQuery
+    ParamData = <    
+      item
+        DataType = ftUnknown
+        Name = 'ID'
+        ParamType = ptInput
+      end>
+  end
+  inherited IBXServicesConnection1: TIBXServicesConnection
+    AfterConnect = IBXServicesConnection1AfterConnect
+    OnLogin = IBXServicesConnection1Login
+    ConnectString = 'service_mgr'
+    Params.Strings = (    )
+  end
+  object IBXScript1: TIBXScript[41]
+    Database = IBDatabase1
+    IgnoreGrants = False
+    IgnoreCreateDatabase = False
+    ShowAffectedRows = False
+    ShowPerformanceStats = False
+    OnCreateDatabase = IBXScript1CreateDatabase
+    left = 103
+    top = 67
+  end
+  object IBXClientSideRestoreService1: TIBXClientSideRestoreService[42]
+    ServicesConnection = IBXServicesConnection1
+    TraceFlags = []
+    PageSize = 0
+    PageBuffers = 0
+    StatisticsRequested = []
+    left = 101
+    top = 155
+  end
+end

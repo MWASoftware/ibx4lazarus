@@ -43,7 +43,7 @@ object IBXCreateDatabaseFromSQLDlg: TIBXCreateDatabaseFromSQLDlg
     AutoDDL = False
     Echo = False
     IgnoreGrants = False
-    IgnoreCreateDatabase = False
+    IgnoreCreateDatabase = True
     ShowAffectedRows = False
     ShowPerformanceStats = False
     OnProgressEvent = IBXScriptProgressEvent

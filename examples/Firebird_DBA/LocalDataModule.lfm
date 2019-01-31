@@ -1,0 +1,250 @@
+object LocalData: TLocalData
+  OldCreateOrder = False
+  Height = 215
+  HorizontalOffset = 847
+  VerticalOffset = 154
+  Width = 332
+  PPI = 96
+  object DBControl: TIBQuery
+    AllowAutoActivateTransaction = True
+    Database = LocalDatabase
+    Transaction = IBTransaction
+    AutoCalcFields = False
+    BufferChunks = 1000
+    CachedUpdates = False
+    CaseSensitiveParameterNames = False
+    EnableStatistics = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
+    SQL.Strings = (
+      'Select * From DBControl'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 152
+    top = 24
+  end
+  object LocalDatabase: TIBDatabase
+    Connected = False
+    LoginPrompt = False
+    AfterConnect = LocalDatabaseAfterConnect
+    AfterDisconnect = LocalDatabaseAfterDisconnect
+    CreateIfNotExists = False
+    AllowStreamedConnected = False
+    DatabaseName = 'FirebirdDBA.fdb '
+    Params.Strings = (
+      'user_name=SYSDBA'
+      'lc_ctype=UTF8'
+    )
+    DefaultTransaction = IBTransaction
+    IdleTimer = 0
+    TraceFlags = [tfQPrepare, tfQFetch, tfStmt, tfConnect, tfTransact]
+    UseDefaultSystemCodePage = False
+    left = 40
+    top = 24
+  end
+  object IBTransaction: TIBTransaction
+    Active = False
+    DefaultDatabase = LocalDatabase
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait'
+    )
+    left = 96
+    top = 24
+  end
+  object ServersQuery: TIBQuery
+    AllowAutoActivateTransaction = False
+    Database = LocalDatabase
+    Transaction = IBTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    CaseSensitiveParameterNames = False
+    EnableStatistics = False
+    GenerateParamNames = False
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
+    SQL.Strings = (
+      'Select A.SERVERID, A.SERVERNAME, A.DEFAULTUSERNAME From SERVERS A'
+    )
+    Params = <>
+    DataSetCloseAction = dcDiscardChanges
+    left = 152
+    top = 64
+  end
+  object IBLocalDBSupport: TIBLocalDBSupport
+    Database = LocalDatabase
+    DatabaseName = 'FirebirdDBA.fdb'
+    EmptyDBArchive = 'schema.sql'
+    Options = [iblAutoUpgrade, iblAllowDowngrade]
+    RequiredVersionNo = 1
+    UpgradeConfFile = 'upgrade.conf'
+    VendorName = 'MWA Software'
+    OnGetSharedDataDir = IBLocalDBSupportGetSharedDataDir
+    left = 40
+    top = 64
+  end
+  object PasswordCacheTable: TIBDataSet
+    AllowAutoActivateTransaction = False
+    Database = LocalDatabase
+    Transaction = IBTransaction
+    BufferChunks = 1000
+    CachedUpdates = False
+    CaseSensitiveParameterNames = False
+    EnableStatistics = False
+    DeleteSQL.Strings = (
+      'Delete From PASSWORDCACHE A'
+      'Where A.DBAPASSWORDINDEX = :OLD_DBAPASSWORDINDEX'
+    )
+    InsertSQL.Strings = (
+      'Insert Into PASSWORDCACHE (DBAPASSWORDINDEX, '
+      'SERVERNAME, DATABASENAME, DBAUSER, SECURITYDATABASE)'
+      'Values(:DBAPASSWORDINDEX, :SERVERNAME, :DATABASENAME, '
+      ':DBAUSER, :SECURITYDATABASE)'
+      ''
+    )
+    RefreshSQL.Strings = (
+      'Select A.DBAPASSWORDINDEX, A.SERVERNAME, A.'
+      'DATABASENAME, A.DBAUSER, A.SECURITYDATABASE From '
+      'PASSWORDCACHE A'
+      'Where A.DBAPASSWORDINDEX = :DBAPASSWORDINDEX'
+    )
+    SelectSQL.Strings = (
+      'Select A.DBAPASSWORDINDEX, A.SERVERNAME, A.'
+      'DATABASENAME, A.DBAUSER, A.SECURITYDATABASE From '
+      'PASSWORDCACHE A'
+    )
+    ModifySQL.Strings = (
+      'Update PASSWORDCACHE A Set '
+      '  A.SERVERNAME = :SERVERNAME,'
+      '  A.DATABASENAME = :DATABASENAME,'
+      '  A.DBAUSER = :DBAUSER,'
+      '  A.SECURITYDATABASE = :SECURITYDATABASE'
+      'Where A.DBAPASSWORDINDEX = :OLD_DBAPASSWORDINDEX'
+      ''
+    )
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
+    MasterDetailDelay = 0
+    DataSetCloseAction = dcSaveChanges
+    left = 152
+    top = 104
+  end
+  object LoadSQLHistory: TIBSQL
+    Database = LocalDatabase
+    CaseSensitiveParameterNames = False
+    GenerateParamNames = False
+    UniqueParamNames = False
+    ParamCheck = True
+    SQL.Strings = (
+      'Select A.SEQNO, A.SQLTEXT From SQLHISTORY A'
+      'order by 1 desc'
+    )
+    Transaction = IBTransaction
+    left = 104
+    top = 152
+  end
+  object SaveSQLHistory: TIBSQL
+    Database = LocalDatabase
+    CaseSensitiveParameterNames = False
+    GenerateParamNames = False
+    UniqueParamNames = False
+    ParamCheck = True
+    SQL.Strings = (
+      'Update or Insert Into SQLHISTORY(SEQNO, SQLTEXT)'
+      'Values(:SEQNO, :SQLTEXT)'
+      'Matching (SEQNO)'
+    )
+    Transaction = IBTransaction
+    left = 40
+    top = 152
+  end
+  object AppDatabases: TMemDataset
+    FieldDefs = <    
+      item
+        Name = 'ID'
+        DataType = ftInteger
+      end    
+      item
+        Name = 'Title'
+        DataType = ftString
+        Size = 256
+      end    
+      item
+        Name = 'DBControlTable'
+        DataType = ftString
+        Size = 32
+      end    
+      item
+        Name = 'Signature'
+        DataType = ftString
+        Size = 1024
+      end    
+      item
+        Name = 'schema'
+        DataType = ftString
+        Size = 128
+      end    
+      item
+        Name = 'path'
+        DataType = ftString
+        Size = 1024
+      end    
+      item
+        Name = 'CurrentVersion'
+        DataType = ftInteger
+      end    
+      item
+        Name = 'ShutdownProc'
+        DataType = ftString
+      end>
+    AfterOpen = AppDatabasesAfterOpen
+    AfterClose = AppDatabasesAfterClose
+    left = 208
+    top = 24
+  end
+  object SetUUID: TIBSQL
+    Database = LocalDatabase
+    CaseSensitiveParameterNames = False
+    GenerateParamNames = False
+    UniqueParamNames = False
+    ParamCheck = True
+    SQL.Strings = (
+      'Update DBCONTROL Set UUID = GEN_UUID()'
+    )
+    Transaction = IBTransaction
+    left = 152
+    top = 152
+  end
+  object LookupKey: TIBSQL
+    Database = LocalDatabase
+    CaseSensitiveParameterNames = False
+    GenerateParamNames = False
+    UniqueParamNames = False
+    ParamCheck = True
+    SQL.Strings = (
+      'Select KeyValue From UserConfig Where KeyName = '
+      ':KeyName'
+    )
+    Transaction = IBTransaction
+    left = 208
+    top = 104
+  end
+  object UpdateKey: TIBSQL
+    Database = LocalDatabase
+    CaseSensitiveParameterNames = False
+    GenerateParamNames = False
+    UniqueParamNames = False
+    ParamCheck = True
+    SQL.Strings = (
+      'Update or Insert into UserConfig(KeyName,KeyValue)'
+      'Values(:KeyName,:KeyValue)'
+      'Matching (KeyName)'
+    )
+    Transaction = IBTransaction
+    left = 208
+    top = 152
+  end
+end
