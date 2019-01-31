@@ -17,7 +17,7 @@ IBX Change Log  version (2.3-3 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
    returned with the Client/Server protocol version. See ibx/examples/dbadmin and
    ibx/examples/dbinfo for examples of how to display this information.
 
-2. New property for TIBDatabase and TIBXServicesCoCode tidyup in IBTrennection: "WireCompression". This
+2. New property for TIBDatabase and TIBXServicesConnection: "WireCompression". This
    is a "convenience" property. If set the "WireCompression=true" is added to the
    ConfigOverrides. If unchecked then this setting is removed.
 
@@ -64,7 +64,7 @@ IBX Change Log  version (2.3-3 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
 
 8. TIBDataSet now raises an exception when ParamByName called with an invalid parameter name.
 
-9. TIBQuery now uses IBX SQL Parser instead of TParams SQL parser in order to ensure
+9. TIBQuery now uses IBX SQL Parser instead of the TParams SQL parser in order to ensure
    consistency with SQL queries.
 
 10. CaseSensitiveParameterNames property added to TIBSQL, TIBDataSet and TIBQuery.
@@ -93,9 +93,9 @@ IBX Change Log  version (2.3-3 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
     IgnoreCreateDatabase property still applies and the CREATE DATABASE statement is
     completely ignored if this property is true.
 
-16.Code tidyup in IBTreeView: Node properties initialisation moved from TIBTreeView.AddNodes
-   to TIBTreeView.Added. An OnAddition event handler is no longer needed to initialise
-   ImageIndex and SelectImageIndex values on AddNode.
+16. Code tidyup in IBTreeView: Node properties initialisation moved from TIBTreeView.AddNodes
+    to TIBTreeView.Added. An OnAddition event handler is no longer needed to initialise
+    ImageIndex and SelectImageIndex values on AddNode.
 
 17. TIBDatabase.Attachment and TIBXServicesConnection.ServicesIntf properties are now
     read/write. This should enabled (e.g.) multiple instances of TIBDatabase to share
@@ -103,7 +103,7 @@ IBX Change Log  version (2.3-3 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
 
 IBX Change Log  version (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 
-1. Remove need to check for IsMultiThread by providCode tidyup in IBTreing access to GUI timers via
+1. Remove need to check for IsMultiThread by providing access to GUI timers via
    IBGUIInterface. Note: master/detail delay timer does not apply to console
    mode apps.
 
