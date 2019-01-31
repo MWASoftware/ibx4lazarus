@@ -1,4 +1,4 @@
-inherited DBABackupDlg: TDBABackupDlg
+inherited DBARestoreDlg: TDBARestoreDlg
   OnCreate = FormCreate
   inherited PageControl1: TPageControl
     inherited SelectTab: TTabSheet
@@ -10,10 +10,10 @@ inherited DBABackupDlg: TDBABackupDlg
       end
     end
   end
-  inherited IBXClientSideBackupService1: TIBXClientSideBackupService
+  inherited IBXClientSideRestoreService1: TIBXClientSideRestoreService
     ServicesConnection = DBADatabaseData.IBXServicesConnection1
   end
-  inherited IBXServerSideBackupService1: TIBXServerSideBackupService
+  inherited IBXServerSideRestoreService1: TIBXServerSideRestoreService
     ServicesConnection = DBADatabaseData.IBXServicesConnection1
   end
 end

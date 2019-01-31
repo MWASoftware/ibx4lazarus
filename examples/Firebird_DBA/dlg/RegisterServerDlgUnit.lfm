@@ -1,21 +1,21 @@
 object RegisterServerDlg: TRegisterServerDlg
   Left = 1451
-  Height = 189
+  Height = 214
   Top = 233
   Width = 330
   BorderStyle = bsDialog
   Caption = 'Register Server'
-  ClientHeight = 189
+  ClientHeight = 214
   ClientWidth = 330
-  OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
   LCLVersion = '2.0.0.3'
   object Bevel1: TBevel
     Left = 8
-    Height = 172
+    Height = 197
     Top = 12
     Width = 230
+    Anchors = [akTop, akLeft, akRight, akBottom]
   end
   object Button1: TButton
     Left = 245
@@ -40,7 +40,7 @@ object RegisterServerDlg: TRegisterServerDlg
   object Label1: TLabel
     Left = 18
     Height = 14
-    Top = 23
+    Top = 56
     Width = 78
     Caption = 'Server Name'
     ParentColor = False
@@ -48,7 +48,7 @@ object RegisterServerDlg: TRegisterServerDlg
   object ServerName: TEdit
     Left = 16
     Height = 24
-    Top = 40
+    Top = 73
     Width = 216
     TabOrder = 2
     Text = 'ServerName'
@@ -56,7 +56,7 @@ object RegisterServerDlg: TRegisterServerDlg
   object Label2: TLabel
     Left = 18
     Height = 14
-    Top = 75
+    Top = 108
     Width = 128
     Caption = 'Server Domain Name'
     ParentColor = False
@@ -64,7 +64,7 @@ object RegisterServerDlg: TRegisterServerDlg
   object DomainName: TEdit
     Left = 18
     Height = 24
-    Top = 88
+    Top = 121
     Width = 214
     TabOrder = 3
     Text = 'DomainName'
@@ -72,7 +72,7 @@ object RegisterServerDlg: TRegisterServerDlg
   object Label3: TLabel
     Left = 18
     Height = 14
-    Top = 120
+    Top = 153
     Width = 113
     Caption = 'Default User Name'
     ParentColor = False
@@ -80,9 +80,28 @@ object RegisterServerDlg: TRegisterServerDlg
   object DefaultUserName: TEdit
     Left = 18
     Height = 24
-    Top = 136
+    Top = 169
     Width = 214
     TabOrder = 4
     Text = 'DefaultUserName'
+  end
+  object LocalBtn: TRadioButton
+    Left = 23
+    Height = 22
+    Top = 24
+    Width = 55
+    Caption = 'Local'
+    Checked = True
+    OnChange = RemoteBtnChange
+    TabOrder = 5
+  end
+  object RemoteBtn: TRadioButton
+    Left = 104
+    Height = 22
+    Top = 24
+    Width = 69
+    Caption = 'Remote'
+    OnChange = RemoteBtnChange
+    TabOrder = 6
   end
 end

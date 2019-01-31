@@ -51,7 +51,7 @@
         <PackageName Value="LCL"/>
       </Item8>
     </RequiredPackages>
-    <Units Count="28">
+    <Units Count="32">
       <Unit0>
         <Filename Value="firebird_dba.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -234,6 +234,34 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit27>
+      <Unit28>
+        <Filename Value="dlg/DBAShutdownDatabaseDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DBAShutdownDatabaseDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="dlg/DBAAddShadowSetDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DBAAddShadowSetDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="dlg/DBAExecuteSQLScriptDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DBAExecuteSQLScriptDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="dlg/DBARestoreDlgUnit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DBARestoreDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit31>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -253,6 +281,9 @@
         </Win32>
       </Options>
     </Linking>
+    <Other>
+      <CustomOptions Value="-dUseCThreads"/>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">

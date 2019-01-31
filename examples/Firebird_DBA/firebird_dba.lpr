@@ -9,12 +9,13 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, memdslaz, DBAMainFormUnit, ibexpress, DBADataModule, LocalDataModule,
   RegisterServerDlgUnit, RegisterExistingDBDlgUnit, CreateNewDBDlgUnit,
-  SelectSQLResultsUnit, DBLoginDlgUnit, ShutdownRegDlgUnit,
-  ShutdownDatabaseDlgUnit, BackupDlgUnit, RestoreDlgUnit,
-  AddSecondaryFileDlgUnit, AddShadowSetDlgUnit, AddShadowFileDlgUnit,
-  NewUserDlgUnit, ChgPasswordDlgUnit, ExecuteSQLScriptDlgUnit,
-  ServerPropertiesDlgUnit, DatabasePropertiesDlgUnit, DBABackupDlgUnit,
-  DBACreateDatabaseDlgUnit
+  SelectSQLResultsUnit, ShutdownRegDlgUnit, ShutdownDatabaseDlgUnit,
+  BackupDlgUnit, RestoreDlgUnit, AddSecondaryFileDlgUnit, AddShadowSetDlgUnit,
+  AddShadowFileDlgUnit, NewUserDlgUnit, ChgPasswordDlgUnit,
+  ExecuteSQLScriptDlgUnit, DBLoginDlgUnit, ServerPropertiesDlgUnit,
+  DatabasePropertiesDlgUnit, DBABackupDlgUnit, DBACreateDatabaseDlgUnit,
+  DBAShutdownDatabaseDlgUnit, DBAAddShadowSetDlgUnit,
+  DBAExecuteSQLScriptDlgUnit, DBARestoreDlgUnit
  { you can add units after this };
 
 {$R *.res}
@@ -31,17 +32,16 @@ begin
   Application.CreateForm(TCreateNewDBDlg, CreateNewDBDlg);
   Application.CreateForm(TAddSecondaryFileDlg, AddSecondaryFileDlg);
   Application.CreateForm(TAddShadowFileDlg, AddShadowFileDlg);
-  Application.CreateForm(TAddShadowSetDlg, AddShadowSetDlg);
   Application.CreateForm(TChgPasswordDlg, ChgPasswordDlg);
-  Application.CreateForm(TDBLoginDlg, DBLoginDlg);
-  Application.CreateForm(TExecuteSQLScriptDlg, ExecuteSQLScriptDlg);
   Application.CreateForm(TNewUserDlg, NewUserDlg);
-  Application.CreateForm(TRestoreDlg, RestoreDlg);
-  Application.CreateForm(TShutdownDatabaseDlg, ShutdownDatabaseDlg);
   Application.CreateForm(TShutdownReqDlg, ShutdownReqDlg);
   Application.CreateForm(TServerPropertiesDlg, ServerPropertiesDlg);
   Application.CreateForm(TDatabasePropertiesDlg, DatabasePropertiesDlg);
   Application.CreateForm(TDBABackupDlg, DBABackupDlg);
+  Application.CreateForm(TDBAShutdownDatabaseDlg, DBAShutdownDatabaseDlg);
+  Application.CreateForm(TDBAAddShadowSetDlg, DBAAddShadowSetDlg);
+  Application.CreateForm(TDBAExecuteSQLScriptDlg, DBAExecuteSQLScriptDlg);
+  Application.CreateForm(TDBARestoreDlg, DBARestoreDlg);
   Application.Run;
 end.
 

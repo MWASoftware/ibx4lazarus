@@ -167,6 +167,8 @@ type
     procedure CurrentTransactionAfterTransactionEnd(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
     procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
+    procedure DatabaseQueryMONCREATION_DATEGetText(Sender: TField;
+      var aText: string; DisplayText: Boolean);
     procedure DBCharSetAfterClose(DataSet: TDataSet);
     procedure DBCharSetBeforeOpen(DataSet: TDataSet);
     procedure IBDatabase1AfterConnect(Sender: TObject);
@@ -1582,6 +1584,16 @@ end;
 procedure TDBDataModule.DatabaseQueryBeforeClose(DataSet: TDataSet);
 begin
   DBCharSet.Active := false;
+end;
+
+procedure TDBDataModule.DatabaseQueryMONCREATION_DATEGetText(Sender: TField;
+  var aText: string; DisplayText: Boolean);
+begin
+  if DisplayText then
+    with DefaultFormatSettings do
+      aText := FormatDateTime(LongDateFormat + ' ' + LongTimeFormat,Sender.AsDateTime)
+  else
+      aText := Sender.AsString;
 end;
 
 procedure TDBDataModule.DBCharSetAfterClose(DataSet: TDataSet);

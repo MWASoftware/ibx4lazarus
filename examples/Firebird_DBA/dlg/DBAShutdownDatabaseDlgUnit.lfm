@@ -1,0 +1,9 @@
+inherited DBAShutdownDatabaseDlg: TDBAShutdownDatabaseDlg
+  Left = 1191
+  Top = 426
+  Caption = 'DBAShutdownDatabaseDlg'
+  OnCreate = FormCreate
+  inherited IBConfigService: TIBXConfigService
+    ServicesConnection = DBADatabaseData.IBXServicesConnection1
+  end
+end

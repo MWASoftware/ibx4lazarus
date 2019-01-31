@@ -45,8 +45,13 @@ procedure TServerPropertiesDlg.FormShow(Sender: TObject);
 begin
   ServerName.Text := FServerData.ServerName;
   DomainName.Text := FServerData.DomainName;
+  LocalBtn.Checked := DomainName.Text = '';
+  RemoteBtnChange(nil);
   DefaultUserName.Text := FServerData.DefaultUserName;
-  ServerName.SetFocus;
+  if DomainName.Enabled then
+    DomainName.SetFocus
+  else
+    ServerName.SetFocus;
 end;
 
 function TServerPropertiesDlg.ShowModal(ServerData: TServerData): TModalResult;

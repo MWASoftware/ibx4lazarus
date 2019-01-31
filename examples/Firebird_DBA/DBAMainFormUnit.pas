@@ -473,7 +473,6 @@ begin
   if RegisterServerDlg.ShowModal = mrOK then
   begin
     FNewItemType := ntServer;
-    RegisteredObjectsTree.Selected.Expand(true);
     RegisteredObjectsTree.Selected := RegisteredObjectsTree.Items.AddChildObject(RegisteredObjectsTree.Selected,
                                                                                  RegisterServerDlg.ServerName.Text,
                                                                                  RegisterServerDlg);
@@ -491,7 +490,6 @@ begin
   if RegisterExistingDBDlg.ShowModal(TServerData(RegisteredObjectsTree.Selected.Data)) = mrOK then
   begin
     FNewItemType := ntDatabase;
-    RegisteredObjectsTree.Selected.Expand(true);
     RegisteredObjectsTree.Selected := RegisteredObjectsTree.Items.AddChildObject(RegisteredObjectsTree.Selected,
                                                                                  RegisterExistingDBDlg.DatabaseName.Text,
                                                                                  RegisterExistingDBDlg);

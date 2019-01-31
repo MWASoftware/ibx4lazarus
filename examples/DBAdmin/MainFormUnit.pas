@@ -171,7 +171,7 @@ type
     DatabaseOnline: TCheckBox;
     DBCharacterSet: TIBLookupComboEditBox;
     DBCharSetRO: TDBEdit;
-    DBEdit1: TDBEdit;
+    DateDbCreated: TDBEdit;
     DBEdit4: TDBEdit;
     DBIsReadOnly: TCheckBox;
     DBText1: TDBText;
@@ -208,7 +208,7 @@ type
     Label20: TLabel;
     Label21: TLabel;
     Label22: TLabel;
-    Label23: TLabel;
+    DateDBCreatedLabel: TLabel;
     Label24: TLabel;
     Label25: TLabel;
     Label26: TLabel;

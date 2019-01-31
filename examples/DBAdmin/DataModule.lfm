@@ -6,7 +6,7 @@ object DBDataModule: TDBDataModule
   Width = 730
   PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -259,7 +259,6 @@ object DBDataModule: TDBDataModule
       Required = False
     end
     object DatabaseQueryMONCREATION_DATE: TDateTimeField
-      Alignment = taRightJustify
       FieldKind = fkData
       FieldName = 'MON$CREATION_DATE'
       Index = 20
@@ -267,6 +266,7 @@ object DBDataModule: TDBDataModule
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = False
+      OnGetText = DatabaseQueryMONCREATION_DATEGetText
     end
     object DatabaseQueryMONPAGES: TIBLargeIntField
       FieldKind = fkData

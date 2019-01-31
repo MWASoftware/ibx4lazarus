@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="139">
+    <Units Count="140">
       <Unit0>
         <Filename Value="DBAdmin.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -18,8 +18,9 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="405"/>
-        <CursorPos X="33" Y="418"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="1076"/>
+        <CursorPos X="3" Y="1079"/>
         <UsageCount Value="160"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -30,10 +31,9 @@
         <ComponentName Value="DBDataModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="746"/>
-        <CursorPos X="33" Y="763"/>
+        <TopLine Value="1569"/>
+        <CursorPos X="32" Y="1596"/>
         <UsageCount Value="160"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1056,127 +1056,135 @@
         <CursorPos Y="81"/>
         <UsageCount Value="10"/>
       </Unit138>
+      <Unit139>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/sysinth.inc"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="44"/>
+        <CursorPos X="24" Y="57"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit139>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="381" Column="20" TopLine="366"/>
+        <Filename Value="DataModule.pas"/>
+        <Caret Line="737" Column="33" TopLine="720"/>
       </Position1>
       <Position2>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="1217" Column="23" TopLine="1196"/>
+        <Filename Value="DataModule.pas"/>
+        <Caret Line="738" Column="33" TopLine="721"/>
       </Position2>
       <Position3>
-        <Filename Value="MainFormUnit.pas"/>
-        <Caret Line="390" Column="15" TopLine="372"/>
+        <Filename Value="DataModule.pas"/>
+        <Caret Line="739" Column="33" TopLine="722"/>
       </Position3>
       <Position4>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="736" Column="33" TopLine="719"/>
+        <Caret Line="740" Column="33" TopLine="723"/>
       </Position4>
       <Position5>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="737" Column="33" TopLine="720"/>
+        <Caret Line="741" Column="33" TopLine="724"/>
       </Position5>
       <Position6>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="738" Column="33" TopLine="721"/>
+        <Caret Line="742" Column="33" TopLine="725"/>
       </Position6>
       <Position7>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="739" Column="33" TopLine="722"/>
+        <Caret Line="743" Column="33" TopLine="726"/>
       </Position7>
       <Position8>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="740" Column="33" TopLine="723"/>
+        <Caret Line="744" Column="33" TopLine="727"/>
       </Position8>
       <Position9>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="741" Column="33" TopLine="724"/>
+        <Caret Line="745" Column="33" TopLine="728"/>
       </Position9>
       <Position10>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="742" Column="33" TopLine="725"/>
+        <Caret Line="746" Column="33" TopLine="729"/>
       </Position10>
       <Position11>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="743" Column="33" TopLine="726"/>
+        <Caret Line="747" Column="33" TopLine="730"/>
       </Position11>
       <Position12>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="744" Column="33" TopLine="727"/>
+        <Caret Line="748" Column="33" TopLine="731"/>
       </Position12>
       <Position13>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="745" Column="33" TopLine="728"/>
+        <Caret Line="749" Column="33" TopLine="732"/>
       </Position13>
       <Position14>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="746" Column="33" TopLine="729"/>
+        <Caret Line="750" Column="33" TopLine="733"/>
       </Position14>
       <Position15>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="747" Column="33" TopLine="730"/>
+        <Caret Line="751" Column="33" TopLine="734"/>
       </Position15>
       <Position16>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="748" Column="33" TopLine="731"/>
+        <Caret Line="752" Column="33" TopLine="735"/>
       </Position16>
       <Position17>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="749" Column="33" TopLine="732"/>
+        <Caret Line="753" Column="33" TopLine="736"/>
       </Position17>
       <Position18>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="750" Column="33" TopLine="733"/>
+        <Caret Line="754" Column="33" TopLine="737"/>
       </Position18>
       <Position19>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="751" Column="33" TopLine="734"/>
+        <Caret Line="755" Column="33" TopLine="738"/>
       </Position19>
       <Position20>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="752" Column="33" TopLine="735"/>
+        <Caret Line="756" Column="33" TopLine="739"/>
       </Position20>
       <Position21>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="753" Column="33" TopLine="736"/>
+        <Caret Line="757" Column="33" TopLine="740"/>
       </Position21>
       <Position22>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="754" Column="33" TopLine="737"/>
+        <Caret Line="758" Column="33" TopLine="741"/>
       </Position22>
       <Position23>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="755" Column="33" TopLine="738"/>
+        <Caret Line="759" Column="33" TopLine="742"/>
       </Position23>
       <Position24>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="756" Column="33" TopLine="739"/>
+        <Caret Line="760" Column="33" TopLine="743"/>
       </Position24>
       <Position25>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="757" Column="33" TopLine="740"/>
+        <Caret Line="761" Column="33" TopLine="744"/>
       </Position25>
       <Position26>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="758" Column="33" TopLine="741"/>
+        <Caret Line="762" Column="33" TopLine="745"/>
       </Position26>
       <Position27>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="759" Column="33" TopLine="742"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="428" Column="31" TopLine="405"/>
       </Position27>
       <Position28>
-        <Filename Value="DataModule.pas"/>
-        <Caret Line="760" Column="33" TopLine="743"/>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="390" Column="15" TopLine="369"/>
       </Position28>
       <Position29>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="761" Column="33" TopLine="744"/>
+        <Caret Line="753" Column="13" TopLine="748"/>
       </Position29>
       <Position30>
         <Filename Value="DataModule.pas"/>
-        <Caret Line="762" Column="33" TopLine="745"/>
+        <Caret Line="1593" Column="38" TopLine="1569"/>
       </Position30>
     </JumpHistory>
     <RunParams>
