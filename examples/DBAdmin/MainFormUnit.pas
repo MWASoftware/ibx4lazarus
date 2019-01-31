@@ -171,7 +171,7 @@ type
     DatabaseOnline: TCheckBox;
     DBCharacterSet: TIBLookupComboEditBox;
     DBCharSetRO: TDBEdit;
-    DBEdit1: TDBEdit;
+    DateDbCreated: TDBEdit;
     DBEdit4: TDBEdit;
     DBIsReadOnly: TCheckBox;
     DBText1: TDBText;
@@ -190,7 +190,7 @@ type
     IBDynamicGrid2: TIBDynamicGrid;
     AttmtTimer: TTimer;
     UserManagerGrid: TIBDynamicGrid;
-    IBDynamicGrid4: TIBDynamicGrid;
+    RolesGrid: TIBDynamicGrid;
     TagsGrid: TIBDynamicGrid;
     IsShadowChk: TCheckBox;
     Label1: TLabel;
@@ -208,7 +208,7 @@ type
     Label20: TLabel;
     Label21: TLabel;
     Label22: TLabel;
-    Label23: TLabel;
+    DateDBCreatedLabel: TLabel;
     Label24: TLabel;
     Label25: TLabel;
     Label26: TLabel;
@@ -237,7 +237,7 @@ type
     Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
-    Panel6: TPanel;
+    RolesHeaderPanel: TPanel;
     TagsHeader: TPanel;
     PrimaryDBFile: TEdit;
     Properties: TTabSheet;
@@ -378,13 +378,16 @@ type
     FLoading: boolean;
     FLastStatsIndex: integer;
     FServerError: boolean;
-    procedure HandleDBConnect(Sender: TObject);
-    procedure HandleLoadData(Sender: TObject);
-    procedure LoadData;
+    procedure DoDBOpen(Data: PtrInt);
     procedure LoadServerData;
     procedure DoExtract(Data: PtrInt);
-    procedure ConfigureForServerVersion;
     procedure ConfigureOnlineValidation;
+  protected
+    procedure HandleDBConnect(Sender: TObject);
+    procedure HandleLoadData(Sender: TObject);
+    procedure ConfigureForServerVersion; virtual;
+    procedure ConnectToDatabase; virtual;
+    procedure LoadData; virtual;
   public
   end;
 
@@ -412,8 +415,8 @@ begin
   AccessRightsTreeView.DataSource := AccessRightsSource;
   SubjectAccessRightsGrid.DataSource := nil;
   SubjectAccessRightsGrid.DataSource := SubjectAccessRightsSource;
-  DBDataModule.Connect;
-  if not DBDataModule.IBDatabase1.Connected then Close;
+  PageControl1.Visible := false;
+  Application.QueueAsyncCall(@DoDBOpen,0);
 end;
 
 procedure TMainForm.IsShadowChkChange(Sender: TObject);
@@ -559,7 +562,7 @@ end;
 procedure TMainForm.AddUserUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := (UserListSource.State = dsBrowse) and
-     ((DBDataModule.DBUserName = 'SYSDBA') or DBDataModule.HasUserAdminPrivilege);
+     ((DBDataModule.ServiceUserName = 'SYSDBA') or DBDataModule.HasUserAdminPrivilege);
 end;
 
 procedure TMainForm.ApplySelectedExecute(Sender: TObject);
@@ -679,7 +682,7 @@ end;
 procedure TMainForm.DeleteUserUpdate(Sender: TObject);
 begin
   (Sender as TAction).Enabled := UserListSource.DataSet.Active and (UserListSource.DataSet.RecordCount > 0) and
-    ((DBDataModule.DBUserName = 'SYSDBA') or DBDataModule.HasUserAdminPrivilege);
+    ((DBDataModule.ServiceUserName = 'SYSDBA') or DBDataModule.HasUserAdminPrivilege);
 end;
 
 procedure TMainForm.DisconnectAttachmentExecute(Sender: TObject);
@@ -1036,6 +1039,11 @@ begin
   (Sender as TAction).Checked := AttmtTimer.Enabled;
 end;
 
+procedure TMainForm.DoDBOpen(Data: PtrInt);
+begin
+  ConnectToDatabase;
+end;
+
 procedure TMainForm.HandleDBConnect(Sender: TObject);
 begin
   ConfigureForServerVersion;
@@ -1160,7 +1168,7 @@ procedure TMainForm.ConfigureForServerVersion;
 var i: integer;
 begin
   if (IBDatabaseInfo.ODSMajorVersion >= 12) and
-     ((DBDataModule.DBUserName = 'SYSDBA') or (DBDataModule.RoleName = 'RDB$ADMIN') or
+     ((DBDataModule.ServiceUserName = 'SYSDBA') or (DBDataModule.RoleName = 'RDB$ADMIN') or
             not DBDataModule.HasUserAdminPrivilege) then
   begin
     for i in [9,10] do
@@ -1202,6 +1210,12 @@ begin
   UserManagerTab.TabVisible := not DBDataModule.EmbeddedMode;
   AccessRightsTab.TabVisible := not DBDataModule.EmbeddedMode;
   AutoAdmin.Enabled := not DBDataModule.EmbeddedMode;
+end;
+
+procedure TMainForm.ConnectToDatabase;
+begin
+  if not DBDataModule.Connect then Close;
+  PageControl1.Visible := true;
 end;
 
 procedure TMainForm.ConfigureOnlineValidation;

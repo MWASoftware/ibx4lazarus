@@ -75,6 +75,33 @@ type
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
     Attachments: TIBQuery;
+    DatabaseQueryMONBACKUP_STATE: TIBSmallintField;
+    DatabaseQueryMONCREATION_DATE: TDateTimeField;
+    DatabaseQueryMONCRYPT_PAGE: TIBLargeIntField;
+    DatabaseQueryMONDATABASE_NAME: TIBStringField;
+    DatabaseQueryMONFORCED_WRITES: TIBSmallintField;
+    DatabaseQueryMONNEXT_TRANSACTION: TIBLargeIntField;
+    DatabaseQueryMONODS_MAJOR: TIBSmallintField;
+    DatabaseQueryMONODS_MINOR: TIBSmallintField;
+    DatabaseQueryMONOLDEST_ACTIVE: TIBLargeIntField;
+    DatabaseQueryMONOLDEST_SNAPSHOT: TIBLargeIntField;
+    DatabaseQueryMONOLDEST_TRANSACTION: TIBLargeIntField;
+    DatabaseQueryMONOWNER: TIBStringField;
+    DatabaseQueryMONPAGES: TIBLargeIntField;
+    DatabaseQueryMONPAGE_BUFFERS: TIBIntegerField;
+    DatabaseQueryMONPAGE_SIZE: TIBSmallintField;
+    DatabaseQueryMONREAD_ONLY: TIBSmallintField;
+    DatabaseQueryMONRESERVE_SPACE: TIBSmallintField;
+    DatabaseQueryMONSEC_DATABASE: TIBStringField;
+    DatabaseQueryMONSHUTDOWN_MODE: TIBSmallintField;
+    DatabaseQueryMONSQL_DIALECT: TIBSmallintField;
+    DatabaseQueryMONSTAT_ID: TIBIntegerField;
+    DatabaseQueryMONSWEEP_INTERVAL: TIBIntegerField;
+    DatabaseQueryRDBCHARACTER_SET_NAME: TIBStringField;
+    DatabaseQueryRDBDESCRIPTION: TIBMemoField;
+    DatabaseQueryRDBLINGER: TIBIntegerField;
+    DatabaseQueryRDBRELATION_ID: TIBSmallintField;
+    DatabaseQueryRDBSECURITY_CLASS: TIBStringField;
     DBTables: TIBQuery;
     AuthMappings: TIBQuery;
     AccessRights: TIBQuery;
@@ -140,6 +167,8 @@ type
     procedure CurrentTransactionAfterTransactionEnd(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
     procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
+    procedure DatabaseQueryMONCREATION_DATEGetText(Sender: TField;
+      var aText: string; DisplayText: Boolean);
     procedure DBCharSetAfterClose(DataSet: TDataSet);
     procedure DBCharSetBeforeOpen(DataSet: TDataSet);
     procedure IBDatabase1AfterConnect(Sender: TObject);
@@ -152,6 +181,7 @@ type
       Params: ISQLParams);
     procedure IBValidationService1GetNextLine(Sender: TObject; var Line: string
       );
+    procedure IBXServicesConnection1AfterConnect(Sender: TObject);
     procedure IBXServicesConnection1Login(Service: TIBXServicesConnection;
       var aServerName: string; LoginParams: TStrings);
     procedure LegacyUserListAfterOpen(DataSet: TDataSet);
@@ -197,7 +227,6 @@ type
     function GetDBSQLDialect: integer;
     function GetDBUserName: string;
     function GetDescription: string;
-    function GetEmbeddedMode: boolean;
     function GetForcedWrites: boolean;
     function GetLingerDelay: string;
     function GetNoReserve: boolean;
@@ -218,13 +247,15 @@ type
     procedure SetSweepInterval(AValue: integer);
     procedure ReloadData(Data: PtrInt=0);
   protected
+    FServiceUserName: string;
+    function GetEmbeddedMode: boolean; virtual;
     procedure ConnectServicesAPI; virtual;
     function CallLoginDlg(var aDatabaseName, aUserName, aPassword: string;
       var aCreateIfNotExist: boolean): TModalResult; virtual;
   public
     destructor Destroy; override;
-    procedure Connect;
-    procedure Disconnect;
+    function Connect: boolean; virtual;
+    procedure Disconnect; virtual;
     procedure DropDatabase;
     procedure BackupDatabase;
     procedure RestoreDatabase;
@@ -264,6 +295,7 @@ type
     property DBOwner: string read GetDBOwner;
     property DBSQLDialect: integer read GetDBSQLDialect write SetDBSQLDialect;
     property ServerName: string read GetServerName;
+    property ServiceUserName: string read FServiceUserName;
     property HasUserAdminPrivilege: boolean read GetUserAdminPrivilege;
     property AfterDBConnect: TNotifyEvent read FAfterDBConnect write FAfterDBConnect;
     property AfterDataReload: TNotifyEvent read FAfterDataReload write FAfterDataReload;
@@ -574,18 +606,33 @@ begin
 end;
 
 function TDBDataModule.GetDBUserName: string;
+var DPB: IDPB;
+    info: IDPBItem;
 begin
-  Result := Trim(AttmtQuery.FieldByName('MON$USER').AsString);
+  Result := '';
+  if AttmtQuery.Active then
+    Result := Trim(AttmtQuery.FieldByName('MON$USER').AsString)
+  else
+  if IBDatabase1.Connected then
+  begin
+    DPB := IBDatabase1.Attachment.getDPB;
+    info := DPB.Find(isc_dpb_user_name);
+    if info <> nil then
+      Result := info.AsString;
+  end
 end;
 
 function TDBDataModule.GetDescription: string;
 begin
-  Result :=  DatabaseQuery.FieldByName('RDB$DESCRIPTION').AsString;
+  if DatabaseQuery.Active then
+    Result :=  DatabaseQuery.FieldByName('RDB$DESCRIPTION').AsString
+  else
+    Result := '';
 end;
 
 function TDBDataModule.GetEmbeddedMode: boolean;
 begin
-  Result := AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull;
+  Result := AttmtQuery.Active and AttmtQuery.FieldByName('MON$REMOTE_PROTOCOL').IsNull;
 end;
 
 function TDBDataModule.GetForcedWrites: boolean;
@@ -671,7 +718,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TDBDataModule.Connect;
+function TDBDataModule.Connect: boolean;
 
   procedure ReportException(E: Exception);
   begin
@@ -736,12 +783,14 @@ begin
 
   if assigned(FAfterDBConnect) then
     AfterDBConnect(self);
+  Result := IBDatabase1.Connected;
 end;
 
 procedure TDBDataModule.Disconnect;
 begin
   FDBUserName := '';
   FDBPassword := '';
+  FServiceUserName := '';
   FLocalConnect := false;
   IBDatabase1.Connected := false;
   IBXServicesConnection1.Connected := false;
@@ -949,7 +998,7 @@ function TDBDataModule.GetUserAdminPrivilege: boolean;
 begin
   Result := false;
   {For ODS 12 use SEC$USERS table}
-  if IBDatabaseInfo.ODSMajorVersion >= 12 then
+  if IBDatabase1.Connected and (IBDatabaseInfo.ODSMajorVersion >= 12) then
   with AdminUserQuery do
   begin
     ExecQuery;
@@ -964,7 +1013,7 @@ begin
   begin
     with IBSecurityService1 do
     begin
-      DisplayUser(DBUserName);
+      DisplayUser(ServiceUserName);
       Result := (UserInfoCount > 0) and UserInfo[0].AdminRole;
     end;
   end;
@@ -1330,6 +1379,14 @@ begin
   Application.ProcessMessages;
 end;
 
+procedure TDBDataModule.IBXServicesConnection1AfterConnect(Sender: TObject);
+var UN: ISPBItem;
+begin
+  UN := IBXServicesConnection1.ServiceIntf.getSPB.Find(isc_spb_user_name);
+  if UN <> nil then
+    FServiceUserName := UN.AsString;
+end;
+
 procedure TDBDataModule.IBXServicesConnection1Login(
   Service: TIBXServicesConnection; var aServerName: string; LoginParams: TStrings);
 begin
@@ -1340,13 +1397,17 @@ end;
 procedure TDBDataModule.LegacyUserListAfterOpen(DataSet: TDataSet);
 begin
   UserListSource.DataSet := LegacyUserList;
-  CurrentTransaction.Active := true;
-  RoleNameList.Active := true;
+  if IBDatabase1.Connected then
+  begin
+    CurrentTransaction.Active := true;
+    RoleNameList.Active := true;
+  end;
 end;
 
 procedure TDBDataModule.LegacyUserListAfterPost(DataSet: TDataSet);
 begin
-  RoleNameList.Active := true;
+  if IBDatabase1.Connected then
+    RoleNameList.Active := true;
 end;
 
 procedure TDBDataModule.LegacyUserListBeforeClose(DataSet: TDataSet);
@@ -1523,6 +1584,16 @@ end;
 procedure TDBDataModule.DatabaseQueryBeforeClose(DataSet: TDataSet);
 begin
   DBCharSet.Active := false;
+end;
+
+procedure TDBDataModule.DatabaseQueryMONCREATION_DATEGetText(Sender: TField;
+  var aText: string; DisplayText: Boolean);
+begin
+  if DisplayText then
+    with DefaultFormatSettings do
+      aText := FormatDateTime(LongDateFormat + ' ' + LongTimeFormat,Sender.AsDateTime)
+  else
+      aText := Sender.AsString;
 end;
 
 procedure TDBDataModule.DBCharSetAfterClose(DataSet: TDataSet);

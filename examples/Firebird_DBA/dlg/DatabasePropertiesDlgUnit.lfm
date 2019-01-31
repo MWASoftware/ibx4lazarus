@@ -1,0 +1,5 @@
+inherited DatabasePropertiesDlg: TDatabasePropertiesDlg
+  Caption = 'Database Properties'
+  OnClose = FormClose
+  OnShow = FormShow
+end

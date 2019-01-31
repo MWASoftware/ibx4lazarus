@@ -18,7 +18,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function GetPassword(aUserName, aServerName: string; var password: string): boolean; overload;
-    function GetPassword(aUserName, aDatabaseName, aServerName: string; var password: string): boolean; overload;
+    function GetPassword(aUserName, aDatabaseName, aServerName: string; var password: string; RequireDBMatch: boolean=false): boolean; overload;
     procedure SavePassword(aUserName, aServerName, aPassword: string); overload;
     procedure SavePassword(aUserName, aDatabaseName, aServerName, aPassword, aSecDatabase: string); overload;
     procedure RemovePassword(aUserName, aServerName: string); overload;
@@ -26,16 +26,42 @@ type
   end;
 
 function PasswordCache: TPasswordCache;
+function ExtractDatabaseName(ConnectString: string): string;
+function ExtractServerName(ConnectString: string): string;
 
 implementation
 
-uses LocalDataModule, Variants;
+uses LocalDataModule, Variants, IBUtils;
 
 var FPasswordCache: TPasswordCache;
 
 function PasswordCache: TPasswordCache;
 begin
   Result := FPasswordCache;
+end;
+
+function ExtractDatabaseName(ConnectString: string): string;
+var aServerName: AnsiString;
+    aDatabaseName: AnsiString;
+    aProtocol: TProtocolAll;
+    aPortNo: AnsiString;
+begin
+  if ParseConnectString(ConnectString,aServerName, aDatabaseName, aProtocol, aPortNo) then
+    Result := aDatabaseName
+  else
+    Result := '';
+end;
+
+function ExtractServerName(ConnectString: string): string;
+var aServerName: AnsiString;
+    aDatabaseName: AnsiString;
+    aProtocol: TProtocolAll;
+    aPortNo: AnsiString;
+begin
+  if ParseConnectString(ConnectString,aServerName, aDatabaseName, aProtocol, aPortNo) then
+    Result := aServerName
+  else
+    Result := '';
 end;
 
 { TPasswordCache }
@@ -64,15 +90,24 @@ begin
                  [aServerName,aUserName]);
   Result := not Results.IsEof;
   if Result then
+  begin
     password := FPasswordList[Results[0].AsInteger];
-//  writeln('Get PW ', aUserName, ',', aServerName,',',password);
+//    writeln('Get PW ', aUserName, ',', aServerName,',',password, ',', Results[0].AsInteger);
+  end;
 end;
 
 function TPasswordCache.GetPassword(aUserName, aDatabaseName,
-  aServerName: string; var password: string): boolean;
+  aServerName: string; var password: string; RequireDBMatch: boolean): boolean;
 var Results: IResultSet;
 begin
   with LocalData do
+  if RequireDBMatch then
+  Results := LocalDatabase.Attachment.OpenCursorAtStart(
+               PasswordCacheTable.Transaction.TransactionIntf,
+               'Select DBAPasswordIndex From PasswordCache Where ServerName = ? '+
+               'and DBAUSER = ? and DatabaseName = ? ',
+               [aServerName,aUserName,aDatabaseName])
+  else
     Results := LocalDatabase.Attachment.OpenCursorAtStart(
                  PasswordCacheTable.Transaction.TransactionIntf,
                  'Select DBAPasswordIndex From PasswordCache Where ServerName = ? '+

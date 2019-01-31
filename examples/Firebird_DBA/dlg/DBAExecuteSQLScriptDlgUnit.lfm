@@ -1,0 +1,9 @@
+inherited DBAExecuteSQLScriptDlg: TDBAExecuteSQLScriptDlg
+  OnCreate = FormCreate
+  inherited IBXScript1: TIBXScript
+    Database = DBADatabaseData.IBDatabase1
+  end
+  inherited IBTransaction1: TIBTransaction
+    DefaultDatabase = DBADatabaseData.IBDatabase1
+  end
+end

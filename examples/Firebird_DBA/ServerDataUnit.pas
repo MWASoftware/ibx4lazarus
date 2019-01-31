@@ -18,32 +18,39 @@ type
       sqlInsert = 'Insert into SERVERS(ServerId,ServerName,DomainName,DefaultUserName) ' +
                   'Values(Gen_ID(UniqueID,1),:ServerName,:DomainName,:DefaultUserName) '+
                   'Returning(ServerID)';
-      sqlRefresh = 'Select * From SERVERS A Where A.SERVERID = :ServerID';
+      sqlRefresh = 'Select * From SERVERS A Where A.SERVERID = ?';
       sqlUpdateServerName = 'Update SERVERS Set ServerName = ? Where ServerID = ?';
       sqlUpdateUserName = 'Update SERVERS Set DefaultUserName = ? Where ServerID = ?';
       sqlUpdateDomainName = 'Update SERVERS Set DomainName = ? Where ServerID = ?';
   private
+    FConnectAsUser: boolean;
    FDomainName: string;
    FOwner: TServerDataList;
+   FSecDatabase: string;
    FServerID: integer;
    FServerName: string;
    FDefaultUserName: string;
    FServiceIntf: IServiceManager;
    procedure SetDomainName(AValue: string);
    procedure SetDefaultUserName(AValue: string);
-   procedure SetFDefaultUserName(AValue: string);
    procedure SetServerName(AValue: string);
   public
    constructor Create(aOwner: TServerDataList; aServerName,
      aDomainName, aDefaultUserName: string); overload;
-   constructor Create(aOwner: TServerDataList; aServerID: integer); overload;
+   constructor Create(aOwner: TServerDataList; aServerID: integer; aSecDatabase: string='Default'); overload;
    procedure Refresh;
-   procedure Select;
+   procedure Disconnect;
+   function Reconnect: boolean;
+   function ConnectAs: boolean;
+   function Select(Reselect: boolean=false): boolean;
+   property Owner: TServerDataList read FOwner;
    property ServerID: integer read FServerID;
    property ServerName: string read FServerName write SetServerName;
    property DomainName: string read FDomainName write SetDomainName;
-   property DefaultUserName: string read FDefaultUserName write SetFDefaultUserName;
+   property DefaultUserName: string read FDefaultUserName write SetDefaultUserName;
+   property ConnectAsUser: boolean read FConnectAsUser;
    property ServiceIntf: IServiceManager read FServiceIntf write FServiceIntf;
+   property SecDatabase: string read FSecDatabase;
   end;
 
   { TServerDataList }
@@ -55,6 +62,7 @@ type
   private
     FServerData: array of TServerData;
     FServerDataLoaded: boolean;
+    FLoading: boolean;
     function FindServerData(aServerID: integer): integer;
     function GetServerData(aServerID: integer): TServerData;
   public
@@ -107,33 +115,38 @@ var index: integer;
 begin
   if FServerDataLoaded then Exit;
 
-  SetLength(FServerData,0);
-  with TIBSQL.Create(nil) do
+  FLoading := true;
   try
-    SQL.Text := sqlListServers;
-    Database := LocalData.LocalDatabase;
-    Transaction := LocalData.IBTransaction;
-    Transaction.Active := true;
-    ExecQuery;
+    SetLength(FServerData,0);
+    with TIBSQL.Create(nil) do
     try
-      while not EOF do
-      begin
-        SetLength(FServerData,Length(FServerData)+1);
-        index := Length(FServerData)-1;
-        FServerData[index] := TServerData.Create(self,FieldByName('ServerID').AsInteger);
-        with FServerData[index] do
+      SQL.Text := sqlListServers;
+      Database := LocalData.LocalDatabase;
+      Transaction := LocalData.IBTransaction;
+      Transaction.Active := true;
+      ExecQuery;
+      try
+        while not EOF do
         begin
-          ServerName := FieldByName('ServerName').AsString;
-          DomainName := FieldByName('DomainName').AsString;
-          DefaultUserName := FieldByName('DefaultUserName').AsString;
+          SetLength(FServerData,Length(FServerData)+1);
+          index := Length(FServerData)-1;
+          FServerData[index] := TServerData.Create(self,FieldByName('ServerID').AsInteger);
+          with FServerData[index] do
+          begin
+            ServerName := FieldByName('ServerName').AsString;
+            DomainName := FieldByName('DomainName').AsString;
+            DefaultUserName := FieldByName('DefaultUserName').AsString;
+          end;
+          Next;
         end;
-        Next;
+      finally
+        Close;
       end;
     finally
-      Close;
+      Free
     end;
   finally
-    Free
+    FLoading := false;
   end;
   FServerDataLoaded := true;
 end;
@@ -200,6 +213,7 @@ begin
   if dlg <> nil then
   with Result do
   begin
+    ServerName := dlg.ServerName.Text;
     DomainName := dlg.DomainName.Text;
     DefaultUserName := dlg.DefaultUserName.Text;
   end;
@@ -223,28 +237,31 @@ procedure TServerData.SetDomainName(AValue: string);
 begin
   if FDomainName = AValue then Exit;
   FDomainName := AValue;
-  FServiceIntf := nil;
-  LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateDomainName,[FDomainName,FServerID]);
+  if not FOwner.FLoading then
+  begin
+    Disconnect;
+    with LocalData do
+      LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateDomainName,[FDomainName,FServerID]);
+    Select(true);
+  end;
 end;
 
 procedure TServerData.SetDefaultUserName(AValue: string);
 begin
   if FDefaultUserName = AValue then Exit;
   FDefaultUserName := AValue;
-  LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateUserName,[FDefaultUserName,FServerID]);
-end;
-
-procedure TServerData.SetFDefaultUserName(AValue: string);
-begin
-  if FDefaultUserName = AValue then Exit;
-  FDefaultUserName := AValue;
+  if not FOwner.FLoading then
+  with LocalData do
+    LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateUserName,[FDefaultUserName,FServerID]);
 end;
 
 procedure TServerData.SetServerName(AValue: string);
 begin
   if FServerName = AValue then Exit;
   FServerName := AValue;
-  LocalData.LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateServerName,[FServerName,FServerID]);
+  {if not FOwner.FLoading then
+  with LocalData do
+    LocalDatabase.Attachment.ExecuteSQL([isc_tpb_write],sqlUpdateServerName,[FServerName,FServerID]);}
 end;
 
 constructor TServerData.Create(aOwner: TServerDataList; aServerName,
@@ -252,6 +269,7 @@ constructor TServerData.Create(aOwner: TServerDataList; aServerName,
 begin
   inherited Create;
   FOwner := aOwner;
+  FSecDatabase := 'Default';
   FServerName := aServerName;
   FDefaultUserName := aDefaultUserName;
   if aDomainName = '' then
@@ -263,9 +281,12 @@ begin
   FServiceIntf := nil;
 end;
 
-constructor TServerData.Create(aOwner: TServerDataList; aServerID: integer);
+constructor TServerData.Create(aOwner: TServerDataList; aServerID: integer;
+  aSecDatabase: string);
 begin
   inherited Create;
+  FOwner := aOwner;
+  FSecDatabase := aSecDatabase;
   FServerID := aServerID;
   Refresh;
   FServiceIntf := nil;
@@ -284,10 +305,38 @@ begin
   end;
 end;
 
-procedure TServerData.Select;
+procedure TServerData.Disconnect;
+begin
+  if DBADatabaseData.ServerData = self then
+  begin
+     DBADatabaseData.DatabaseData := nil;
+     DBADatabaseData.ServerData := nil;
+  end;
+  FServiceIntf := nil;
+end;
+
+function TServerData.Reconnect: boolean;
+begin
+  Result := Select(true);
+end;
+
+function TServerData.ConnectAs: boolean;
+begin
+  FConnectAsUser := true;
+  try
+    Result := Reconnect;
+  finally
+    FConnectAsUser := false;
+  end;
+end;
+
+function TServerData.Select(Reselect: boolean): boolean;
 begin
   DBADatabaseData.DatabaseData := nil;
+  if Reselect then
+    DBADatabaseData.ServerData := nil;
   DBADatabaseData.ServerData := self;
+  Result := DBADatabaseData.IBXServicesConnection1.Connected;
 end;
 
 initialization

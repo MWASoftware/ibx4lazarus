@@ -251,6 +251,7 @@ end;
    procedure DoServiceQuery; override;
    procedure SetServiceStartOptions; virtual;
    procedure ServiceStart; virtual;
+   procedure WaitForServiceStop(AbortAfter: integer=5 {seconds});
    property DatabaseName: string read FDatabaseName write SetDatabaseName;
  public
    procedure Assign(Source: TPersistent); override;
@@ -751,7 +752,7 @@ begin
       end;
     end;
   finally
-    while IsServiceRunning do; {flush}
+    WaitForServiceStop; {flush}
   end;
 end;
 
@@ -790,7 +791,7 @@ begin
       end;
     finally
       F.Free;
-      while IsServiceRunning do; {flush}
+      WaitForServiceStop; {flush}
       FEof := false;
     end;
   end;
@@ -817,6 +818,7 @@ begin
   while not Eof do
     ReceiveNextChunk(S);
   BytesWritten := S.Size - InitialSize;
+  WaitForServiceStop;
 end;
 
 procedure TIBXClientSideBackupService.BackupToFile(aFileName: string;
@@ -1347,7 +1349,7 @@ begin
       ServiceStart; {Fix is implicit in non-zero list of Limbo transactions}
       while not Eof do
         OutputLog.Add(GetNextLine);
-      while IsServiceRunning do;
+      WaitForServiceStop;
       Clear;
     end;
 end;
@@ -1456,14 +1458,14 @@ end;
   begin
     SecurityAction := ActionAddUser;
     ServiceStart;
-    while IsServiceRunning do;
+    WaitForServiceStop;
   end;
 
   procedure TIBXSecurityService.DeleteUser;
   begin
     SecurityAction := ActionDeleteUser;
     ServiceStart;
-    while IsServiceRunning do;
+    WaitForServiceStop;
   end;
 
   procedure TIBXSecurityService.DisplayUsers;
@@ -1488,7 +1490,7 @@ end;
   begin
     SecurityAction := ActionModifyUser;
     ServiceStart;
-    while IsServiceRunning do;
+    WaitForServiceStop;
   end;
 
   function TIBXSecurityService.HasAdminRole: boolean;
@@ -1511,7 +1513,7 @@ end;
     else
       SRB.Add(isc_action_svc_drop_mapping);
     InternalServiceStart;
-    while IsServiceRunning do;
+    WaitForServiceStop;
   end;
 
   procedure TIBXSecurityService.SetSecurityAction (Value: TSecurityAction);
@@ -1981,7 +1983,7 @@ begin
   else
     SRB.Add(isc_spb_prp_deny_new_attachments).AsInteger := Wait;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetSweepInterval(Value: Integer);
@@ -1991,7 +1993,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_prp_sweep_interval).AsInteger := Value;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetDBSqlDialect(Value: Integer);
@@ -2000,7 +2002,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_prp_set_sql_dialect).AsInteger := Value;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetPageBuffers(Value: Integer);
@@ -2009,7 +2011,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_prp_page_buffers).AsInteger := Value;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.ActivateShadow;
@@ -2018,7 +2020,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_options).AsInteger := isc_spb_prp_activate;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.BringDatabaseOnline;
@@ -2027,7 +2029,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_options).AsInteger := isc_spb_prp_db_online;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetReserveSpace(Value: Boolean);
@@ -2040,7 +2042,7 @@ begin
   else
     AsByte := isc_spb_prp_res_use_full;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetAsyncMode(Value: Boolean);
@@ -2053,7 +2055,7 @@ begin
   else
     AsByte := isc_spb_prp_wm_sync;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetReadOnly(Value: Boolean);
@@ -2066,7 +2068,7 @@ begin
   else
     AsByte := isc_spb_prp_am_readwrite;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetNoLinger;
@@ -2075,7 +2077,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_options).AsInteger := isc_spb_prp_nolinger;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 { TIBXLogService }
@@ -2311,7 +2313,7 @@ begin
       else
         GetNextLine;
   finally
-    while IsServiceRunning do; {flush}
+    WaitForServiceStop; {flush}
   end;
 end;
 
@@ -2465,6 +2467,17 @@ begin
   CheckServiceNotRunning;
   SetServiceStartOptions;
   InternalServiceStart;
+end;
+
+procedure TIBXControlService.WaitForServiceStop(AbortAfter: integer);
+var WaitUntil: TDateTime;
+begin
+  WaitUntil := Now + EncodeTime(0,0,AbortAfter,0);
+  while IsServiceRunning do
+  begin
+    sleep(500);
+    if Now > WaitUntil then Exit;
+  end;
 end;
 
 procedure TIBXControlService.Assign(Source: TPersistent);
@@ -3274,6 +3287,9 @@ end;
 procedure TIBXServicesConnection.SetServiceIntf(aServiceIntf: IServiceManager;
   aDatabase: TIBDatabase);
 var i: integer;
+    var aServerName,aDatabaseName: AnsiString;
+        aProtocol: TProtocolAll;
+        aPortNo: AnsiString;
 begin
   if FService = aServiceIntf then Exit;
   if FService <> nil then
@@ -3300,8 +3316,11 @@ begin
     if FFirebirdLibraryPathName <> '' then
       FFirebirdLibraryPathName := FService.getFirebirdAPI.GetFBLibrary.GetLibraryFilePath;
     if aDatabase <> nil then
-      for i := low(FIBXServices) to high(FIBXServices) do
-        FIBXServices[i].OnAfterConnect(self,aDatabase.DatabaseName);
+    begin
+      if ParseConnectString(aDatabase.DatabaseName,aServerName,aDatabaseName,aProtocol,aPortNo) then
+        for i := low(FIBXServices) to high(FIBXServices) do
+          FIBXServices[i].OnAfterConnect(self,aDatabaseName);
+    end;
     if Assigned(AfterConnect) then
       AfterConnect(self);
   end;

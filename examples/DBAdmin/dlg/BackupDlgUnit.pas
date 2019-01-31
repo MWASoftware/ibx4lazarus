@@ -39,6 +39,7 @@ type
     MetadataOnly: TCheckBox;
     IgnoreLimboTransactions: TCheckBox;
     IgnoreChecksums: TCheckBox;
+    ProgressBar1: TProgressBar;
     ServerName: TEdit;
     DBName: TEdit;
     BackupFileName: TEdit;
@@ -55,6 +56,8 @@ type
     ReportTab: TTabSheet;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure IBXClientSideBackupService1GetNextLine(Sender: TObject;
+      var Line: string);
     procedure ReportTabShow(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
   private
@@ -83,6 +86,7 @@ end;
 procedure TBackupDlg.DoClientBackup(Data: PtrInt);
 var BackupCount: integer;
 begin
+  ProgressBar1.Visible := true;
   with IBXClientSideBackupService1 do
   begin
     Options := [];
@@ -101,11 +105,13 @@ begin
     BackupToFile(BackupFileName.Text, BackupCount);
   end;
   Report.Lines.Add(Format('Backup Completed - File Size = %d bytes',[BackupCount]));
+  ProgressBar1.Visible := false;
   MessageDlg(Format('Backup Completed - File Size = %d bytes',[BackupCount]),mtInformation,[mbOK],0);
 end;
 
 procedure TBackupDlg.DoServerBackup(Data: PtrInt);
 begin
+  ProgressBar1.Visible := true;
   with IBXServerSideBackupService1 do
   begin
     BackupFiles.Clear;
@@ -124,6 +130,7 @@ begin
     Report.Lines.Add('Starting Backup');
     Execute(Report.Lines);
     Report.Lines.Add('Backup Completed');
+    ProgressBar1.Visible := false;
     MessageDlg('Backup Completed',mtInformation,[mbOK],0);
   end;
 end;
@@ -134,6 +141,12 @@ begin
   ServerName.Text := IBXClientSideBackupService1.ServicesConnection.ServerName;
   DBName.Text := IBXClientSideBackupService1.DatabaseName;
   BackupFileName.Text := '';
+end;
+
+procedure TBackupDlg.IBXClientSideBackupService1GetNextLine(Sender: TObject;
+  var Line: string);
+begin
+  Application.ProcessMessages;
 end;
 
 procedure TBackupDlg.ReportTabShow(Sender: TObject);
@@ -151,6 +164,7 @@ begin
     if BackupFileName.Text = '' then
       raise Exception.Create('A Backup File Name must be given');
     PageControl1.ActivePage := ReportTab;
+    Application.ProcessMessages;
     if ServerSideBtn.Checked then
       Application.QueueAsyncCall(@DoServerBackup,0)
     else

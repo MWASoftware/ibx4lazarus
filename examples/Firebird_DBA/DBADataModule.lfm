@@ -1,15 +1,16 @@
 inherited DBADatabaseData: TDBADatabaseData
   OnCreate = DataModuleCreate
   Height = 552
-  HorizontalOffset = 724
-  VerticalOffset = 476
+  HorizontalOffset = 482
+  VerticalOffset = 322
   Width = 730
   PPI = 96
   inherited IBDatabase1: TIBDatabase
-    Connected = True
     AfterConnect = IBDatabase1AfterConnect
+    AfterDisconnect = IBDatabase1AfterDisconnect
+    OnLogin = IBDatabase1Login
     Params.Strings = (
-      'user_name=SYSDBA'
+      'sql_role_name=RDB$ADMIN'
     )
     OnCreateDatabase = IBDatabase1CreateDatabase
   end
@@ -42,6 +43,7 @@ inherited DBADatabaseData: TDBADatabaseData
     OnLogin = IBXServicesConnection1Login
     ConnectString = 'service_mgr'
     Params.Strings = (    )
+    OnSecurityContextException = IBXServicesConnection1SecurityContextException
   end
   object IBXScript1: TIBXScript[41]
     Database = IBDatabase1

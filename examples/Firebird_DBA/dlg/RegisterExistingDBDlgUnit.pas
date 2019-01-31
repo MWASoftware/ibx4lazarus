@@ -16,6 +16,7 @@ type
     Bevel1: TBevel;
     Button1: TButton;
     Button2: TButton;
+    UsesAltSecDB: TCheckBox;
     ServerName: TEdit;
     DatabaseName: TEdit;
     DatabasePath: TEdit;
@@ -51,10 +52,14 @@ function TRegisterExistingDBDlg.ShowModal(aServerData: TServerData
   ): TModalResult;
 begin
   FServerData := aServerData;
-  ServerName.Text := FServerData.ServerName;
+  if aServerData = nil then
+    ServerName.Text := ''
+  else
+    ServerName.Text := FServerData.ServerName;
   DatabaseName.Text := '';
   DatabasePath.Text := '';
-  DefaultUserName.Text := '';
+  DefaultUserName.Text := 'SYSDBA';
+  UsesAltSecDB.Checked := false;
   Result := inherited ShowModal;
 end;
 

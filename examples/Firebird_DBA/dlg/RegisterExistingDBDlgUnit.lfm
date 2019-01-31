@@ -1,18 +1,18 @@
 object RegisterExistingDBDlg: TRegisterExistingDBDlg
   Left = 1005
-  Height = 254
+  Height = 304
   Top = 405
   Width = 420
   BorderStyle = bsDialog
   Caption = 'Register Existing Database'
-  ClientHeight = 254
+  ClientHeight = 304
   ClientWidth = 420
   OnShow = FormShow
   Position = poMainFormCenter
   LCLVersion = '2.0.0.3'
   object Bevel1: TBevel
     Left = 10
-    Height = 230
+    Height = 262
     Top = 10
     Width = 329
   end
@@ -100,5 +100,13 @@ object RegisterExistingDBDlg: TRegisterExistingDBDlg
     Width = 176
     TabOrder = 5
     Text = 'DefaultUserName'
+  end
+  object UsesAltSecDB: TCheckBox
+    Left = 22
+    Height = 22
+    Top = 243
+    Width = 235
+    Caption = 'Uses Alternative Security Database'
+    TabOrder = 6
   end
 end

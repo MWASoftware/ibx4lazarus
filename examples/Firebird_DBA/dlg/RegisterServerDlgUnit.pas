@@ -20,10 +20,12 @@ type
     DefaultUserName: TEdit;
     Label2: TLabel;
     Label3: TLabel;
+    LocalBtn: TRadioButton;
+    RemoteBtn: TRadioButton;
     ServerName: TEdit;
     Label1: TLabel;
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure RemoteBtnChange(Sender: TObject);
   private
 
   public
@@ -42,15 +44,17 @@ procedure TRegisterServerDlg.FormShow(Sender: TObject);
 begin
   ServerName.Text := 'My Server';
   DomainName.Text := '';
-  DefaultUserName.Text := '';
+  DefaultUserName.Text := 'SYSDBA';
+  LocalBtn.Checked := true;
+  RemoteBtnChange(nil);
   ServerName.SetFocus;
 end;
 
-procedure TRegisterServerDlg.FormClose(Sender: TObject;
-  var CloseAction: TCloseAction);
+procedure TRegisterServerDlg.RemoteBtnChange(Sender: TObject);
 begin
-  if DomainName.Text = '' then
-    raise Exception.Create('A Domain Name must be provided');
+  DomainName.Enabled := RemoteBtn.Checked;
+  if not DomainName.Enabled then
+    DomainName.Text := '';
 end;
 
 end.

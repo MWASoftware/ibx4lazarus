@@ -1,0 +1,19 @@
+inherited DBARestoreDlg: TDBARestoreDlg
+  OnCreate = FormCreate
+  inherited PageControl1: TPageControl
+    inherited SelectTab: TTabSheet
+      inherited ServerSideBtn: TRadioButton
+        Visible = False
+      end
+      inherited ClientSideBtn: TRadioButton
+        Visible = False
+      end
+    end
+  end
+  inherited IBXClientSideRestoreService1: TIBXClientSideRestoreService
+    ServicesConnection = DBADatabaseData.IBXServicesConnection1
+  end
+  inherited IBXServerSideRestoreService1: TIBXServerSideRestoreService
+    ServicesConnection = DBADatabaseData.IBXServicesConnection1
+  end
+end

@@ -1,3 +1,5 @@
+Set AutoDDL On;
+
 Create Database '/tmp/databasemgr.fdb' Default Character Set UTF8;
 
 Create Table Servers (
@@ -15,6 +17,7 @@ Create Table Databases (
   DatabasePath VarChar(256),
   DatabaseName VarChar(64),
   DefaultUserName VarChar(32) Default 'SYSDBA',
+  UsesDefaultSecDatabase Boolean default true,
   Server Integer not null References Servers(ServerID)
     On Update Cascade
     On Delete Cascade,
@@ -30,7 +33,7 @@ Create Table DBCONTROL (
 Create Table UserConfig (
   KeyName VarChar(32),
   KeyValue VarChar(128),
-  Primary Key KeyName;
+  Primary Key (KeyName)
 );
 
 Create Table SQLHistory (
@@ -91,16 +94,16 @@ Create Global Temporary Table PasswordCache (
 Create View DatabasesByServer As
 
 with recursive ServerInfo As (
-  Select -1 as ItemType, -1 as ID, 'Servers' as ItemName,
-    cast (Null as VarChar(256)) as DomainName, null as Parent From RDB$Database
+  Select 0 as ItemType, -1 as ID, 'Servers' as ItemName,
+     null as Parent From RDB$Database
   Union
-  Select 0 as ItemType, ServerID as ID, ServerName as ItemName, DomainName, -1 as Parent
+  Select 1 as ItemType, ServerID as ID, ServerName as ItemName,  -1 as Parent
    From Servers
   Union all
-  Select 1, DB.DatabaseID, DB.DatabaseName, NULL, DB.Server
+  Select 2, DB.DatabaseID, DB.DatabaseName, DB.Server
     From Databases DB
     Join ServerInfo SI On SI.ID = DB.Server
-    Where SI.ItemType = 0
+    Where SI.ItemType = 1
 )
 Select * From ServerInfo;
 
@@ -109,7 +112,7 @@ Create trigger Insert_DatabasesByServer
 Active before Insert on DatabasesByServer
 As
 Begin
-  if (new.ItemType = 0) then
+  if (new.ItemType = 1) then
     Insert Into Servers(ServerID,ServerName) Values(new.ID,new.ItemName);
   else
     Insert Into Databases(DatabaseID,DatabaseName,Server) Values(new.ID,new.ItemName,new.Parent);
@@ -119,13 +122,9 @@ Create Trigger Update_DatabasesByServer
 Active before Update on DatabasesByServer
 As
 Begin
-  if (new.ItemType = 0) then
+  if (new.ItemType = 1) then
   begin
-    if (new.ItemName is not distinct from new.DomainName) then
-      Update Servers Set ServerName = new.ItemName, DomainName = NULL, ServerID = new.ID
-        Where ServerID = old.ID;
-    else
-      Update Servers Set ServerName = new.ItemName, DomainName = coalesce(new.DomainName,old.ItemName), ServerID = new.ID
+      Update Servers Set ServerName = new.ItemName,  ServerID = new.ID
         Where ServerID = old.ID;
   end
   else
@@ -137,7 +136,7 @@ Create Trigger Delete_DatabasesByServer
  Active before Delete on DatabasesByServer
 As
 Begin
-  if (old.ItemType = 0) then
+  if (old.ItemType = 1) then
     Delete From Servers Where ServerID = old.ID;
   else
     Delete From Databases Where DatabaseID = old.ID;

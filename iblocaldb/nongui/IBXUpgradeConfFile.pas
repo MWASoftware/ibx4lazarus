@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  *
- *  Contributor(s): ______________________________________.
+ *  Contributor(s): ____________________________UpgradeConfFile__________.
  *
 *)
 unit IBXUpgradeConfFile;

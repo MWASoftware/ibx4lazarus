@@ -9,7 +9,7 @@ object BackupDlg: TBackupDlg
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.3.0'
+  LCLVersion = '2.0.0.3'
   object Button1: TButton
     Left = 96
     Height = 25
@@ -202,7 +202,7 @@ object BackupDlg: TBackupDlg
       OnShow = ReportTabShow
       object Report: TMemo
         Left = 0
-        Height = 189
+        Height = 294
         Top = 0
         Width = 351
         Align = alClient
@@ -211,6 +211,15 @@ object BackupDlg: TBackupDlg
         )
         ScrollBars = ssAutoBoth
         TabOrder = 0
+      end
+      object ProgressBar1: TProgressBar
+        Left = 0
+        Height = 20
+        Top = 294
+        Width = 351
+        Align = alBottom
+        Style = pbstMarquee
+        TabOrder = 1
       end
     end
   end
@@ -224,6 +233,7 @@ object BackupDlg: TBackupDlg
   object IBXClientSideBackupService1: TIBXClientSideBackupService
     ServicesConnection = DBDataModule.IBXServicesConnection1
     TraceFlags = []
+    OnGetNextLine = IBXClientSideBackupService1GetNextLine
     BlockingFactor = 0
     Options = []
     left = 262
@@ -232,6 +242,7 @@ object BackupDlg: TBackupDlg
   object IBXServerSideBackupService1: TIBXServerSideBackupService
     ServicesConnection = DBDataModule.IBXServicesConnection1
     TraceFlags = []
+    OnGetNextLine = IBXClientSideBackupService1GetNextLine
     BlockingFactor = 0
     Options = []
     StatisticsRequested = [bsTotalTime]

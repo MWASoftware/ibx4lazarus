@@ -19,6 +19,7 @@ type
     FList: TList;
     FHeadPtr: integer;
     FTailPtr: integer;
+    FModified: boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -57,7 +58,7 @@ type
     procedure IBLocalDBSupportGetSharedDataDir(Sender: TObject;
       var SharedDataDir: string);
     procedure LocalDatabaseAfterConnect(Sender: TObject);
-    procedure LocalDatabaseAfterDisconnect(Sender: TObject);
+    procedure LocalDatabaseBeforeDisconnect(Sender: TObject);
   private
     FMinVersionNo: integer;
     { private declarations }
@@ -145,6 +146,7 @@ end;
 
 procedure TLocalData.LocalDatabaseAfterConnect(Sender: TObject);
 begin
+  if IBLocalDBSupport.InOnCreateDB then Exit;
   CheckDBVersion;
   FSQLHistory.LoadSQLHistory;
   AppDatabases.Active := true;
@@ -153,8 +155,9 @@ begin
   DatabaseDataList.Refresh;
 end;
 
-procedure TLocalData.LocalDatabaseAfterDisconnect(Sender: TObject);
+procedure TLocalData.LocalDatabaseBeforeDisconnect(Sender: TObject);
 begin
+  if IBLocalDBSupport.InOnCreateDB then Exit;
   FSQLHistory.SaveSQLHistory;
   DatabaseDataList.Clear;
   ServerDataList.Clear;
@@ -258,12 +261,6 @@ begin
       AppDatabaseDir := DatabaseDirs[i];
       AppDatabases.FieldByName('Path').AsString := AppDatabaseDir;
 
-      if FileExists(AppDatabaseDir + DirectorySeparator + 'schema.sql') then
-         AppDatabases.FieldByName('schema').AsString := AppDatabaseDir + DirectorySeparator + 'schema.sql'
-      else
-      if FileExists(AppDatabaseDir + DirectorySeparator + 'schema.gbk') then
-         AppDatabases.FieldByName('schema').AsString := AppDatabaseDir + DirectorySeparator + 'schema.gbk';
-
       if FileExists(AppDatabaseDir + DirectorySeparator + 'database.conf') then
       begin
         ini := TIniFile.Create(AppDatabaseDir + DirectorySeparator + 'database.conf');
@@ -272,12 +269,14 @@ begin
           AppDatabases.FieldByName('DBControlTable').AsString := ini.ReadString('Database','DBControlTable','');
           AppDatabases.FieldByName('Signature').AsString := ini.ReadString('Database','Signature','');
           AppDatabases.FieldByName('ShutdownProc').AsString := ini.ReadString('Database','ShutdownProcedure','');
+          AppDatabases.FieldByName('schema').AsString := AppDatabaseDir + DirectorySeparator + ini.ReadString('Database','Schema','schema.gbk');
         finally
           ini.Free;
         end;
 
         if FileExists(AppDatabaseDir + DirectorySeparator + 'upgrade.conf') then
         begin
+          AppDatabases.FieldByName('UpgradeConfFile').AsString := AppDatabaseDir + DirectorySeparator + 'upgrade.conf';
           ini := TIniFile.Create(AppDatabaseDir + DirectorySeparator + 'upgrade.conf');
           try
             AppDatabases.FieldByName('CurrentVersion').AsInteger := ini.ReadInteger('status','current',0);
@@ -451,12 +450,15 @@ begin
   s.Assign(sql);
   FHeadPtr := FList.Add(s) + 1;
   FTailPtr := FHeadPtr - 1;
+  FModified := true;
 //  writeln(FHeadPtr,',',FTailPtr);
 end;
 
 procedure TSQLSaveList.SaveSQLHistory;
 var LowerBound, i, j: integer;
 begin
+  if not FModified then Exit;
+
   with LocalData.SaveSQLHistory do
   begin
     Transaction.Active := true;
@@ -473,6 +475,7 @@ begin
     end;
     Transaction.Commit;
   end;
+  FModified := false;
 end;
 
 procedure TSQLSaveList.LoadSQLHistory;
