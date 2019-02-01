@@ -54,6 +54,9 @@ type
     FOwner: TIBLookupComboEditBox;
   protected
     procedure ActiveChanged; override;
+    {$if lcl_fullversion < 2000003}
+    procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
+    {$endif}
     procedure RecordChanged(Field: TField); override;
     procedure UpdateData; override;
   public
@@ -174,6 +177,15 @@ procedure TIBLookupComboDataLink.ActiveChanged;
 begin
   FOwner.ActiveChanged(self)
 end;
+
+{$if lcl_fullversion < 2000003}
+procedure TIBLookupComboDataLink.DataEvent(Event: TDataEvent; Info: Ptrint);
+begin
+  inherited DataEvent(Event, Info);
+  if Event = deLayoutChange then
+   FOwner.LookupCache := FOwner.LookupCache; {sneaky way of calling UpdateLookup}
+end;
+{$endif}
 
 procedure TIBLookupComboDataLink.RecordChanged(Field: TField);
 begin
@@ -593,8 +605,7 @@ end;
 
 procedure TIBLookupComboEditBox.CloseUp;
 begin
-  if IsUnbound then
-    inherited DoEdit;
+  inherited DoEdit;
   inherited CloseUp;
   EditingDone;
 end;
