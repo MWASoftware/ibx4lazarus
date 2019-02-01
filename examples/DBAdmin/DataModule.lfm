@@ -4,7 +4,6 @@ object DBDataModule: TDBDataModule
   HorizontalOffset = 767
   VerticalOffset = 395
   Width = 730
-  PPI = 96
   object IBDatabase1: TIBDatabase
     Connected = False
     AfterConnect = IBDatabase1AfterConnect

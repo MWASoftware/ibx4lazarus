@@ -4,7 +4,6 @@ object LocalData: TLocalData
   HorizontalOffset = 847
   VerticalOffset = 154
   Width = 332
-  PPI = 96
   object DBControl: TIBQuery
     AllowAutoActivateTransaction = True
     Database = LocalDatabase
