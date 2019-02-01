@@ -1,20 +1,20 @@
 object MainForm: TMainForm
   Left = 648
-  Height = 616
+  Height = 619
   Top = 231
-  Width = 939
+  Width = 976
   Caption = 'Database Administrator Demo'
-  ClientHeight = 596
-  ClientWidth = 939
+  ClientHeight = 599
+  ClientWidth = 976
   Menu = MainMenu1
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '2.0.0.2'
+  LCLVersion = '2.0.0.3'
   object ToolBar1: TToolBar
     Left = 0
     Height = 26
     Top = 0
-    Width = 939
+    Width = 976
     Caption = 'ToolBar1'
     Images = MenuImages
     TabOrder = 0
@@ -68,37 +68,37 @@ object MainForm: TMainForm
   object StatusBar1: TStatusBar
     Left = 0
     Height = 22
-    Top = 574
-    Width = 939
+    Top = 577
+    Width = 976
     Panels = <>
   end
   object PageControl1: TPageControl
     Left = 0
-    Height = 548
+    Height = 551
     Top = 26
-    Width = 939
-    ActivePage = Properties
+    Width = 976
+    ActivePage = AccessRightsTab
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 0
+    TabIndex = 7
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
       Caption = 'Properties'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnShow = PropertiesShow
       object Panel7: TPanel
         Left = 0
-        Height = 516
+        Height = 519
         Top = 0
-        Width = 933
+        Width = 970
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 516
-        ClientWidth = 933
+        ClientHeight = 519
+        ClientWidth = 970
         Color = clWindow
         ParentColor = False
         TabOrder = 0
@@ -169,18 +169,19 @@ object MainForm: TMainForm
           Text = 'ServerVersionNo'
         end
         object Label5: TLabel
-          Left = 41
+          Left = 789
           Height = 14
-          Top = 183
+          Top = 23
           Width = 69
           Caption = 'SQL Dialect'
           ParentColor = False
         end
         object DBSQLDialect: TEdit
-          Left = 120
+          Left = 865
           Height = 24
-          Top = 176
-          Width = 266
+          Top = 16
+          Width = 89
+          Alignment = taRightJustify
           NumbersOnly = True
           OnEditingDone = DBSQLDialectEditingDone
           TabOrder = 3
@@ -286,19 +287,21 @@ object MainForm: TMainForm
           TabOrder = 10
         end
         object Label11: TLabel
-          Left = 728
+          Left = 765
           Height = 14
-          Top = 22
+          Top = 52
           Width = 93
+          Anchors = [akTop, akRight]
           Caption = 'Pages Allocated'
           ParentColor = False
         end
         object AllocatedPages: TEdit
-          Left = 826
+          Left = 865
           Height = 24
-          Top = 16
+          Top = 48
           Width = 89
           Alignment = taRightJustify
+          Anchors = [akTop, akRight]
           ReadOnly = True
           TabOrder = 11
           Text = 'AllocatedPages'
@@ -312,37 +315,41 @@ object MainForm: TMainForm
           ParentColor = False
         end
         object Label3: TLabel
-          Left = 752
+          Left = 791
           Height = 14
-          Top = 52
+          Top = 85
           Width = 68
+          Anchors = [akTop, akRight]
           Caption = 'Pages Used'
           ParentColor = False
         end
         object PagesUsed: TEdit
-          Left = 826
+          Left = 865
           Height = 24
-          Top = 48
+          Top = 80
           Width = 89
           Alignment = taRightJustify
+          Anchors = [akTop, akRight]
           ReadOnly = True
           TabOrder = 12
           Text = 'PagesUsed'
         end
         object Label10: TLabel
-          Left = 730
+          Left = 769
           Height = 14
-          Top = 85
+          Top = 118
           Width = 90
+          Anchors = [akTop, akRight]
           Caption = 'Pages Available'
           ParentColor = False
         end
         object PagesAvail: TEdit
-          Left = 826
+          Left = 865
           Height = 24
-          Top = 80
+          Top = 112
           Width = 89
           Alignment = taRightJustify
+          Anchors = [akTop, akRight]
           ReadOnly = True
           TabOrder = 13
           Text = 'PagesAvail'
@@ -408,50 +415,52 @@ object MainForm: TMainForm
           ParentColor = False
         end
         object Label15: TLabel
-          Left = 740
+          Left = 778
           Height = 14
-          Top = 117
+          Top = 150
           Width = 81
+          Anchors = [akTop, akRight]
           Caption = 'No. of Buffers'
           ParentColor = False
         end
         object PageBuffers: TEdit
-          Left = 826
+          Left = 865
           Height = 24
-          Top = 112
+          Top = 141
           Width = 89
           Alignment = taRightJustify
+          Anchors = [akTop, akRight]
           NumbersOnly = True
           OnEditingDone = PageBuffersEditingDone
           TabOrder = 16
           Text = 'PageBuffers'
         end
-        object Label23: TLabel
-          Left = 680
+        object DateDBCreatedLabel: TLabel
+          Left = 8
           Height = 14
-          Top = 317
+          Top = 180
           Width = 100
           Anchors = [akTop, akRight]
           Caption = 'Date DB Created'
           ParentColor = False
         end
-        object DBEdit1: TDBEdit
-          Left = 784
+        object DateDbCreated: TDBEdit
+          Left = 120
           Height = 24
-          Top = 312
-          Width = 132
+          Top = 176
+          Width = 265
           DataField = 'MON$CREATION_DATE'
           DataSource = DatabaseSource
           ReadOnly = True
-          Anchors = [akTop, akRight]
+          Alignment = taRightJustify
           CharCase = ecNormal
           MaxLength = 0
           TabOrder = 17
         end
         object Label16: TLabel
-          Left = 453
+          Left = 456
           Height = 14
-          Top = 120
+          Top = 117
           Width = 75
           Caption = 'Linger Delay'
           ParentColor = False
@@ -551,18 +560,18 @@ object MainForm: TMainForm
           Text = 'DatabaseAliasName'
         end
         object Label43: TLabel
-          Left = 403
+          Left = 400
           Height = 14
-          Top = 328
+          Top = 398
           Width = 65
           Caption = 'Comments'
           ParentColor = False
         end
         object DBComments: TMemo
-          Left = 403
-          Height = 85
-          Top = 344
-          Width = 512
+          Left = 400
+          Height = 82
+          Top = 414
+          Width = 549
           Anchors = [akTop, akLeft, akRight, akBottom]
           Lines.Strings = (
             'DBComments'
@@ -572,26 +581,28 @@ object MainForm: TMainForm
           TabOrder = 25
         end
         object ClientLibrary: TLabel
-          Left = 112
+          Left = 873
           Height = 14
-          Top = 464
+          Top = 504
           Width = 76
+          Alignment = taRightJustify
+          Anchors = [akRight, akBottom]
           Caption = 'ClientLibrary'
           ParentColor = False
         end
         object Label44: TLabel
-          Left = 403
+          Left = 402
           Height = 14
-          Top = 183
+          Top = 272
           Width = 203
           Caption = 'Client/Server Version and Protocol'
           ParentColor = False
         end
         object ClientServerVersion: TMemo
-          Left = 403
+          Left = 400
           Height = 104
-          Top = 200
-          Width = 511
+          Top = 288
+          Width = 548
           Anchors = [akTop, akLeft, akRight]
           Font.Height = -11
           ParentFont = False
@@ -602,8 +613,8 @@ object MainForm: TMainForm
     end
     object FilesTab: TTabSheet
       Caption = 'Files'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnShow = FilesTabShow
       object Label25: TLabel
         Left = 16
@@ -617,7 +628,7 @@ object MainForm: TMainForm
         Left = 16
         Height = 24
         Top = 32
-        Width = 474
+        Width = 553
         Anchors = [akTop, akLeft, akRight]
         ReadOnly = True
         TabOrder = 0
@@ -635,7 +646,7 @@ object MainForm: TMainForm
         Left = 16
         Height = 160
         Top = 88
-        Width = 763
+        Width = 842
         Anchors = [akTop, akLeft, akRight]
         Color = clWindow
         Columns = <        
@@ -693,7 +704,7 @@ object MainForm: TMainForm
         DefaultPositionAtEnd = False
       end
       object AddFileBtn: TButton
-        Left = 795
+        Left = 874
         Height = 25
         Top = 88
         Width = 91
@@ -713,7 +724,7 @@ object MainForm: TMainForm
         Left = 16
         Height = 200
         Top = 280
-        Width = 763
+        Width = 842
         Anchors = [akTop, akLeft, akRight, akBottom]
         Color = clWindow
         Columns = <        
@@ -794,7 +805,7 @@ object MainForm: TMainForm
         DefaultPositionAtEnd = False
       end
       object AddShadowBtn: TButton
-        Left = 795
+        Left = 874
         Height = 25
         Top = 280
         Width = 91
@@ -803,7 +814,7 @@ object MainForm: TMainForm
         TabOrder = 4
       end
       object RemoveShadowBtn: TButton
-        Left = 795
+        Left = 874
         Height = 25
         Top = 312
         Width = 91
@@ -814,15 +825,15 @@ object MainForm: TMainForm
     end
     object AttachmentsTab: TTabSheet
       Caption = 'Attachments'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnHide = AttachmentsTabHide
       OnShow = AttachmentsTabShow
       object AttmtGrid: TIBDynamicGrid
         Left = 0
-        Height = 516
+        Height = 519
         Top = 0
-        Width = 933
+        Width = 970
         Align = alClient
         Color = clWindow
         Columns = <        
@@ -1093,12 +1104,12 @@ object MainForm: TMainForm
     end
     object StatisticsTab: TTabSheet
       Caption = 'Statistics'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnHide = StatisticsTabHide
       OnShow = StatisticsTabShow
       object StatsOptions: TComboBox
-        Left = 667
+        Left = 732
         Height = 27
         Top = 8
         Width = 228
@@ -1126,9 +1137,9 @@ object MainForm: TMainForm
       end
       object StatsMemo: TMemo
         Left = 8
-        Height = 423
+        Height = 464
         Top = 40
-        Width = 883
+        Width = 952
         Anchors = [akTop, akLeft, akRight, akBottom]
         Lines.Strings = (
           'Memo1'
@@ -1139,14 +1150,14 @@ object MainForm: TMainForm
     end
     object SchemaTab: TTabSheet
       Caption = 'Schema'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnShow = SchemaTabShow
       inline SynEdit1: TSynEdit
         Left = 0
         Height = 495
         Top = 0
-        Width = 933
+        Width = 970
         Align = alTop
         Anchors = [akTop, akLeft, akRight, akBottom]
         Font.Height = -11
@@ -1657,19 +1668,19 @@ object MainForm: TMainForm
     end
     object ServerTab: TTabSheet
       Caption = 'Server'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnHide = ServerTabHide
       OnShow = ServerTabShow
       object Panel1: TPanel
         Left = 0
-        Height = 516
+        Height = 519
         Top = 0
-        Width = 370
+        Width = 491
         Align = alLeft
         BevelOuter = bvNone
-        ClientHeight = 516
-        ClientWidth = 370
+        ClientHeight = 519
+        ClientWidth = 491
         TabOrder = 0
         object Label29: TLabel
           Left = 5
@@ -1679,34 +1690,263 @@ object MainForm: TMainForm
           Caption = 'Properties'
           ParentColor = False
         end
-        object ServerPropMemo: TMemo
+        object Label53: TLabel
           Left = 8
-          Height = 481
-          Top = 26
-          Width = 353
-          Anchors = [akTop, akLeft, akRight, akBottom]
+          Height = 14
+          Top = 296
+          Width = 98
+          Caption = 'Open Databases'
+          ParentColor = False
+        end
+        object OpenDatabasesList: TMemo
+          Left = 8
+          Height = 90
+          Top = 312
+          Width = 480
+          Anchors = [akTop, akLeft, akRight]
           Lines.Strings = (
-            'ServerPropMemo'
+            ''
           )
-          ScrollBars = ssAutoBoth
+          ScrollBars = ssAutoVertical
           TabOrder = 0
+        end
+        object ConfigDataLabel: TLabel
+          Left = 8
+          Height = 14
+          Top = 408
+          Width = 71
+          Caption = 'Config Data'
+          ParentColor = False
+        end
+        object ConfigDataGrid: TIBDynamicGrid
+          Left = 8
+          Height = 85
+          Top = 424
+          Width = 480
+          Anchors = [akTop, akLeft, akRight, akBottom]
+          Color = clWindow
+          Columns = <          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'Description'
+              Width = 100
+              FieldName = 'ParamDescription'
+              AutoSizeColumn = True
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end          
+            item
+              Title.Alignment = taCenter
+              Title.Caption = 'Value'
+              Width = 60
+              FieldName = 'ParamValue'
+              AutoSizeColumn = False
+              InitialSortColumn = False
+              DBLookupProperties.ItemHeight = 0
+              DBLookupProperties.ItemWidth = 0
+              DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+            end>
+          DataSource = ConfigDataSource
+          Scrollbars = ssAutoVertical
+          TabOrder = 1
+          ExpandEditorPanelBelowRow = False
+          Descending = False
+          EditorBorderStyle = bsSingle
+          DefaultPositionAtEnd = False
+        end
+        object Panel10: TPanel
+          Left = 6
+          Height = 264
+          Top = 24
+          Width = 482
+          Anchors = [akTop, akLeft, akRight]
+          BevelInner = bvLowered
+          BevelOuter = bvLowered
+          ClientHeight = 264
+          ClientWidth = 482
+          Color = clWindow
+          ParentColor = False
+          TabOrder = 2
+          object Label45: TLabel
+            Left = 8
+            Height = 14
+            Top = 48
+            Width = 90
+            Caption = 'Server Version:'
+            ParentColor = False
+          end
+          object Label46: TLabel
+            Left = 8
+            Height = 14
+            Top = 102
+            Width = 143
+            Caption = 'Server Implementation:'
+            ParentColor = False
+          end
+          object Label47: TLabel
+            Left = 8
+            Height = 14
+            Top = 75
+            Width = 95
+            Caption = 'Service Version:'
+            ParentColor = False
+          end
+          object Label48: TLabel
+            Left = 8
+            Height = 14
+            Top = 129
+            Width = 107
+            Caption = 'Firebird Directory:'
+            ParentColor = False
+          end
+          object Label49: TLabel
+            Left = 8
+            Height = 14
+            Top = 156
+            Width = 113
+            Caption = 'Lock File Directory:'
+            ParentColor = False
+          end
+          object Label50: TLabel
+            Left = 8
+            Height = 14
+            Top = 183
+            Width = 114
+            Caption = 'Security Database:'
+            ParentColor = False
+          end
+          object Edit2: TEdit
+            Left = 160
+            Height = 24
+            Top = 44
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 0
+            Text = 'Edit2'
+          end
+          object Edit3: TEdit
+            Left = 160
+            Height = 24
+            Top = 71
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 1
+            Text = 'Edit3'
+          end
+          object Edit4: TEdit
+            Left = 160
+            Height = 24
+            Top = 98
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 2
+            Text = 'Edit4'
+          end
+          object Edit5: TEdit
+            Left = 160
+            Height = 24
+            Top = 125
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 3
+            Text = 'Edit5'
+          end
+          object Edit6: TEdit
+            Left = 160
+            Height = 24
+            Top = 152
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 4
+            Text = 'Edit6'
+          end
+          object Edit7: TEdit
+            Left = 160
+            Height = 24
+            Top = 179
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 5
+            Text = 'Edit7'
+          end
+          object Label51: TLabel
+            Left = 8
+            Height = 14
+            Top = 21
+            Width = 78
+            Caption = 'Server Name'
+            ParentColor = False
+          end
+          object Edit8: TEdit
+            Left = 160
+            Height = 24
+            Top = 16
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 6
+            Text = 'Edit8'
+          end
+          object Label52: TLabel
+            Left = 8
+            Height = 14
+            Top = 212
+            Width = 142
+            Caption = 'Messages File Directory:'
+            ParentColor = False
+          end
+          object Edit9: TEdit
+            Left = 160
+            Height = 24
+            Top = 208
+            Width = 312
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 7
+            Text = 'Edit9'
+          end
+          object Edit12: TEdit
+            Left = 160
+            Height = 24
+            Top = 236
+            Width = 312
+            ReadOnly = True
+            TabOrder = 8
+            Text = 'Edit12'
+          end
+          object Label54: TLabel
+            Left = 8
+            Height = 14
+            Top = 240
+            Width = 117
+            Caption = 'No. of Attachments'
+            ParentColor = False
+          end
         end
       end
       object Splitter1: TSplitter
-        Left = 370
-        Height = 516
+        Left = 491
+        Height = 519
         Top = 0
         Width = 5
       end
       object Panel2: TPanel
-        Left = 375
-        Height = 516
+        Left = 496
+        Height = 519
         Top = 0
-        Width = 558
+        Width = 474
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 516
-        ClientWidth = 558
+        ClientHeight = 519
+        ClientWidth = 474
         TabOrder = 2
         object Label30: TLabel
           Left = 8
@@ -1718,9 +1958,9 @@ object MainForm: TMainForm
         end
         object ServerLog: TMemo
           Left = 8
-          Height = 481
+          Height = 484
           Top = 26
-          Width = 540
+          Width = 456
           Anchors = [akTop, akLeft, akRight, akBottom]
           Lines.Strings = (
             'ServerLog'
@@ -1732,24 +1972,24 @@ object MainForm: TMainForm
     end
     object UserManagerTab: TTabSheet
       Caption = 'User Manager'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnHide = UserManagerTabHide
       OnShow = UserManagerTabShow
       object Panel4: TPanel
         Left = 0
-        Height = 516
+        Height = 519
         Top = 0
-        Width = 739
+        Width = 827
         Align = alLeft
-        ClientHeight = 516
-        ClientWidth = 739
+        ClientHeight = 519
+        ClientWidth = 827
         TabOrder = 0
         object UserManagerGrid: TIBDynamicGrid
           Left = 1
-          Height = 514
+          Height = 517
           Top = 1
-          Width = 737
+          Width = 825
           Align = alClient
           Color = clWindow
           Columns = <          
@@ -1896,26 +2136,26 @@ object MainForm: TMainForm
         end
       end
       object Splitter2: TSplitter
-        Left = 739
-        Height = 516
+        Left = 827
+        Height = 519
         Top = 0
         Width = 5
       end
       object Panel3: TPanel
-        Left = 744
-        Height = 516
+        Left = 832
+        Height = 519
         Top = 0
-        Width = 189
+        Width = 138
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 516
-        ClientWidth = 189
+        ClientHeight = 519
+        ClientWidth = 138
         TabOrder = 2
-        object IBDynamicGrid4: TIBDynamicGrid
+        object RolesGrid: TIBDynamicGrid
           Left = 0
           Height = 161
           Top = 50
-          Width = 189
+          Width = 138
           Align = alTop
           Color = clWindow
           Columns = <          
@@ -1953,34 +2193,34 @@ object MainForm: TMainForm
         object Panel5: TPanel
           Left = 0
           Height = 61
-          Top = 455
-          Width = 189
+          Top = 458
+          Width = 138
           Align = alBottom
           BevelInner = bvLowered
           BevelOuter = bvLowered
           ClientHeight = 61
-          ClientWidth = 189
+          ClientWidth = 138
           TabOrder = 1
           object Button1: TButton
             Left = 16
             Height = 28
             Top = 16
-            Width = 162
+            Width = 111
             Action = SaveChanges
             Anchors = [akTop, akLeft, akRight]
             TabOrder = 0
           end
         end
-        object Panel6: TPanel
+        object RolesHeaderPanel: TPanel
           Left = 0
           Height = 50
           Top = 0
-          Width = 189
+          Width = 138
           Align = alTop
           BevelInner = bvLowered
           BevelOuter = bvLowered
           ClientHeight = 50
-          ClientWidth = 189
+          ClientWidth = 138
           TabOrder = 2
           object DBText1: TDBText
             Left = 10
@@ -2005,7 +2245,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 5
           Top = 211
-          Width = 189
+          Width = 138
           Align = alTop
           ResizeAnchor = akTop
         end
@@ -2013,7 +2253,7 @@ object MainForm: TMainForm
           Left = 0
           Height = 26
           Top = 216
-          Width = 189
+          Width = 138
           Align = alTop
           BevelInner = bvRaised
           Caption = 'Tags'
@@ -2021,9 +2261,9 @@ object MainForm: TMainForm
         end
         object TagsGrid: TIBDynamicGrid
           Left = 0
-          Height = 208
+          Height = 211
           Top = 242
-          Width = 189
+          Width = 138
           Align = alClient
           Color = clWindow
           Columns = <          
@@ -2062,8 +2302,8 @@ object MainForm: TMainForm
           Cursor = crVSplit
           Left = 0
           Height = 5
-          Top = 450
-          Width = 189
+          Top = 453
+          Width = 138
           Align = alBottom
           ResizeAnchor = akBottom
         end
@@ -2071,13 +2311,13 @@ object MainForm: TMainForm
     end
     object AccessRightsTab: TTabSheet
       Caption = 'Access Rights'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnHide = AccessRightsTabHide
       OnShow = AccessRightsTabShow
       object AccessRightsTreeView: TIBTreeView
         Left = 0
-        Height = 516
+        Height = 519
         Top = 0
         Width = 300
         Align = alLeft
@@ -2097,15 +2337,15 @@ object MainForm: TMainForm
       end
       object Splitter5: TSplitter
         Left = 300
-        Height = 516
+        Height = 519
         Top = 0
         Width = 5
       end
       object SubjectAccessRightsGrid: TIBDynamicGrid
         Left = 305
-        Height = 516
+        Height = 519
         Top = 0
-        Width = 628
+        Width = 665
         Align = alClient
         Color = clWindow
         Columns = <        
@@ -2156,7 +2396,7 @@ object MainForm: TMainForm
           item
             ButtonStyle = cbsCheckboxColumn
             Title.Caption = 'Grant Opt'
-            Width = 64
+            Width = 80
             FieldName = 'GRANT_OPTION'
             AutoSizeColumn = False
             InitialSortColumn = False
@@ -2176,15 +2416,15 @@ object MainForm: TMainForm
     end
     object MappingsTab: TTabSheet
       Caption = 'Auth Mappings'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnHide = MappingsTabHide
       OnShow = MappingsTabShow
       object IBDynamicGrid5: TIBDynamicGrid
         Left = 0
         Height = 492
         Top = 24
-        Width = 933
+        Width = 973
         Anchors = [akTop, akLeft, akRight, akBottom]
         Color = clWindow
         Columns = <        
@@ -2274,7 +2514,7 @@ object MainForm: TMainForm
         DefaultPositionAtEnd = False
       end
       object AutoAdmin: TCheckBox
-        Left = 776
+        Left = 816
         Height = 22
         Top = 2
         Width = 151
@@ -2286,12 +2526,12 @@ object MainForm: TMainForm
     end
     object RepairTab: TTabSheet
       Caption = 'Database Repair'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnHide = RepairTabHide
       OnShow = RepairTabShow
       object SelectRepairAction: TComboBox
-        Left = 654
+        Left = 712
         Height = 27
         Top = 8
         Width = 200
@@ -2309,7 +2549,7 @@ object MainForm: TMainForm
         Text = 'Database Sweep'
       end
       object Button2: TButton
-        Left = 862
+        Left = 920
         Height = 25
         Top = 9
         Width = 35
@@ -2411,12 +2651,12 @@ object MainForm: TMainForm
         Left = 10
         Height = 384
         Top = 123
-        Width = 888
+        Width = 950
         Anchors = [akTop, akLeft, akRight, akBottom]
         BevelOuter = bvNone
         Caption = 'ValidationPanel'
         ClientHeight = 384
-        ClientWidth = 888
+        ClientWidth = 950
         TabOrder = 3
         object DBTablesPanel: TPanel
           Left = 0
@@ -2516,11 +2756,11 @@ object MainForm: TMainForm
           Left = 175
           Height = 384
           Top = 0
-          Width = 713
+          Width = 775
           Align = alClient
           BevelOuter = bvNone
           ClientHeight = 384
-          ClientWidth = 713
+          ClientWidth = 775
           TabOrder = 2
           object Label37: TLabel
             Left = 0
@@ -2532,9 +2772,9 @@ object MainForm: TMainForm
           end
           object ValidationReport: TMemo
             Left = 0
-            Height = 360
-            Top = 24
-            Width = 713
+            Height = 359
+            Top = 25
+            Width = 775
             Align = alBottom
             Anchors = [akTop, akLeft, akRight, akBottom]
             Lines.Strings = (
@@ -2548,8 +2788,8 @@ object MainForm: TMainForm
     end
     object LimboTab: TTabSheet
       Caption = 'Limbo Transactions'
-      ClientHeight = 516
-      ClientWidth = 933
+      ClientHeight = 519
+      ClientWidth = 970
       OnHide = LimboTabHide
       OnShow = LimboTabShow
       object Label38: TLabel
@@ -2564,7 +2804,7 @@ object MainForm: TMainForm
         Left = 13
         Height = 242
         Top = 24
-        Width = 909
+        Width = 947
         Anchors = [akTop, akLeft, akRight]
         Color = clWindow
         Columns = <        
@@ -2724,7 +2964,7 @@ object MainForm: TMainForm
         Left = 16
         Height = 178
         Top = 296
-        Width = 906
+        Width = 947
         Anchors = [akTop, akLeft, akRight, akBottom]
         Lines.Strings = (
           'LimboReport'
@@ -2755,7 +2995,7 @@ object MainForm: TMainForm
       Left = 144
       Height = 24
       Top = 4
-      Width = 388
+      Width = 386
       DataField = 'UPDATE_COLUMNS'
       DataSource = SubjectAccessRightsSource
       Anchors = [akTop, akLeft, akRight]
@@ -2764,9 +3004,9 @@ object MainForm: TMainForm
       TabOrder = 0
     end
     object Label42: TLabel
-      Left = 8
+      Left = 9
       Height = 14
-      Top = 40
+      Top = 35
       Width = 123
       Caption = 'Referenced Columns'
       ParentColor = False
@@ -2775,7 +3015,7 @@ object MainForm: TMainForm
       Left = 144
       Height = 24
       Top = 35
-      Width = 388
+      Width = 386
       DataField = 'REFERENCE_COLUMNS'
       DataSource = SubjectAccessRightsSource
       Anchors = [akTop, akLeft, akRight]
@@ -2785,8 +3025,8 @@ object MainForm: TMainForm
     end
   end
   object MainMenu1: TMainMenu
-    left = 712
-    top = 64
+    left = 720
+    top = 80
     object MenuItem1: TMenuItem
       Caption = 'File'
       object MenuItem6: TMenuItem
@@ -3178,37 +3418,37 @@ object MainForm: TMainForm
     }
   end
   object CharSetSource: TDataSource
-    DataSet = DatabaseData.CharSetLookup
+    DataSet = DBDataModule.CharSetLookup
     left = 552
     top = 240
   end
   object SecDBFilesSource: TDataSource
-    DataSet = DatabaseData.DBSecFiles
+    DataSet = DBDataModule.DBSecFiles
     left = 552
     top = 376
   end
   object DBCharSetSource: TDataSource
-    DataSet = DatabaseData.DBCharSet
+    DataSet = DBDataModule.DBCharSet
     left = 552
     top = 304
   end
   object DatabaseSource: TDataSource
-    DataSet = DatabaseData.DatabaseQuery
+    DataSet = DBDataModule.DatabaseQuery
     left = 560
     top = 448
   end
   object IBDatabaseInfo: TIBDatabaseInfo
-    Database = DatabaseData.IBDatabase1
+    Database = DBDataModule.IBDatabase1
     left = 712
     top = 240
   end
   object AttmtSource: TDataSource
-    DataSet = DatabaseData.AttmtQuery
+    DataSet = DBDataModule.AttmtQuery
     left = 416
     top = 448
   end
   object ShadowSource: TDataSource
-    DataSet = DatabaseData.ShadowFiles
+    DataSet = DBDataModule.ShadowFiles
     left = 464
     top = 512
   end
@@ -3223,8 +3463,8 @@ object MainForm: TMainForm
     top = 352
   end
   object IBExtract1: TIBExtract
-    Database = DatabaseData.IBDatabase1
-    Transaction = DatabaseData.CurrentTransaction
+    Database = DBDataModule.IBDatabase1
+    Transaction = DBDataModule.CurrentTransaction
     ShowSystem = False
     AlwaysQuoteIdentifiers = False
     CaseSensitiveObjectNames = False
@@ -3246,17 +3486,17 @@ object MainForm: TMainForm
     top = 416
   end
   object UserListSource: TDataSource
-    DataSet = DatabaseData.UserList
+    DataSet = DBDataModule.UserList
     left = 416
     top = 360
   end
   object RoleSource: TDataSource
-    DataSet = DatabaseData.RoleNameList
+    DataSet = DBDataModule.RoleNameList
     left = 416
     top = 272
   end
   object UserTagsSource: TDataSource
-    DataSet = DatabaseData.UserTags
+    DataSet = DBDataModule.UserTags
     left = 416
     top = 224
   end
@@ -3287,7 +3527,7 @@ object MainForm: TMainForm
     end
   end
   object AttachSource: TDataSource
-    DataSet = DatabaseData.Attachments
+    DataSet = DBDataModule.Attachments
     left = 552
     top = 112
   end
@@ -3296,7 +3536,7 @@ object MainForm: TMainForm
     Interval = 5000
     OnTimer = AttmtTimerTimer
     left = 792
-    top = 64
+    top = 80
   end
   object AttmtPopup: TPopupMenu
     left = 840
@@ -3309,22 +3549,22 @@ object MainForm: TMainForm
     end
   end
   object LimboListSource: TDataSource
-    DataSet = DatabaseData.InLimboList
+    DataSet = DBDataModule.InLimboList
     left = 552
     top = 176
   end
   object DBTablesSource: TDataSource
-    DataSet = DatabaseData.DBTables
+    DataSet = DBDataModule.DBTables
     left = 304
     top = 224
   end
   object AuthMapSource: TDataSource
-    DataSet = DatabaseData.AuthMappings
+    DataSet = DBDataModule.AuthMappings
     left = 303
     top = 286
   end
   object SubjectAccessRightsSource: TDataSource
-    DataSet = DatabaseData.SubjectAccessRights
+    DataSet = DBDataModule.SubjectAccessRights
     OnDataChange = SubjectAccessRightsSourceDataChange
     left = 297
     top = 429
@@ -3337,8 +3577,13 @@ object MainForm: TMainForm
     end
   end
   object AccessRightsSource: TDataSource
-    DataSet = DatabaseData.AccessRights
+    DataSet = DBDataModule.AccessRights
     left = 288
     top = 360
+  end
+  object ConfigDataSource: TDataSource
+    DataSet = DBDataModule.ConfigDataset
+    left = 288
+    top = 504
   end
 end

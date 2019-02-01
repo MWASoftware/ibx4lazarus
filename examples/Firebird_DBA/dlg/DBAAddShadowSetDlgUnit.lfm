@@ -1,0 +1,9 @@
+inherited DBAAddShadowSetDlg: TDBAAddShadowSetDlg
+  OnCreate = FormCreate
+  inherited ExecSQL: TIBSQL
+    Database = DBADatabaseData.IBDatabase1
+  end
+  inherited IBDatabaseInfo: TIBDatabaseInfo
+    Database = DBADatabaseData.IBDatabase1
+  end
+end

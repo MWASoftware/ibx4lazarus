@@ -130,11 +130,9 @@ end;
 
 function TIBCMLocalDBSupport.InternalCreateNewDatabase(DBArchive: string
   ): boolean;
-var Ext: string;
 begin
   Result := true;
-  Ext := AnsiUpperCase(ExtractFileExt(DBArchive));
-  if Ext = '.GBK' then
+  if IsGbakFile(DBArchive) then
   begin
     with RestoreService do
     begin
@@ -151,7 +149,6 @@ begin
     end;
   end
   else
-  if (Ext = '.SQL') and Database.Connected then
   with TIBXScript.Create(self) do
   try
     Database := self.Database;
@@ -163,8 +160,6 @@ begin
   finally
     Free
   end
-  else
-    raise Exception.CreateFmt('Archive file (%s) has an unknown extension',[DBArchive]);
 end;
 
 function TIBCMLocalDBSupport.RestoreDatabaseFromArchive(

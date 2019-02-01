@@ -1,7 +1,7 @@
 object RestoreDlg: TRestoreDlg
-  Left = 749
+  Left = 978
   Height = 448
-  Top = 314
+  Top = 455
   Width = 440
   Caption = 'Restore Database'
   ClientHeight = 448
@@ -9,7 +9,7 @@ object RestoreDlg: TRestoreDlg
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '1.8.3.0'
+  LCLVersion = '2.0.0.3'
   object Button1: TButton
     Left = 128
     Height = 25
@@ -252,15 +252,24 @@ object RestoreDlg: TRestoreDlg
       OnShow = ReportTabShow
       object Report: TMemo
         Left = 0
-        Height = 248
+        Height = 372
         Top = 0
-        Width = 331
+        Width = 417
         Align = alClient
         Lines.Strings = (
           'Report'
         )
         ScrollBars = ssAutoBoth
         TabOrder = 0
+      end
+      object ProgressBar1: TProgressBar
+        Left = 0
+        Height = 20
+        Top = 372
+        Width = 417
+        Align = alBottom
+        Style = pbstMarquee
+        TabOrder = 1
       end
     end
   end
@@ -273,7 +282,7 @@ object RestoreDlg: TRestoreDlg
     top = 24
   end
   object IBXClientSideRestoreService1: TIBXClientSideRestoreService
-    ServicesConnection = DatabaseData.IBXServicesConnection1
+    ServicesConnection = DBDataModule.IBXServicesConnection1
     TraceFlags = []
     OnGetNextLine = IBXClientSideRestoreService1GetNextLine
     PageSize = 0
@@ -285,7 +294,7 @@ object RestoreDlg: TRestoreDlg
     top = 208
   end
   object IBXServerSideRestoreService1: TIBXServerSideRestoreService
-    ServicesConnection = DatabaseData.IBXServicesConnection1
+    ServicesConnection = DBDataModule.IBXServicesConnection1
     TraceFlags = []
     OnGetNextLine = IBXClientSideRestoreService1GetNextLine
     PageSize = 0

@@ -18,8 +18,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="95"/>
-        <CursorPos X="3" Y="100"/>
+        <TopLine Value="93"/>
+        <CursorPos X="42" Y="115"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
@@ -184,8 +184,8 @@
       <Unit17>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="246"/>
-        <CursorPos X="13" Y="261"/>
+        <TopLine Value="324"/>
+        <CursorPos Y="343"/>
         <UsageCount Value="14"/>
       </Unit17>
       <Unit18>
@@ -665,8 +665,8 @@
       <Unit84>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2875"/>
-        <CursorPos Y="2880"/>
+        <TopLine Value="3090"/>
+        <CursorPos X="24" Y="3120"/>
         <UsageCount Value="11"/>
       </Unit84>
       <Unit85>
@@ -703,7 +703,12 @@
         <UsageCount Value="10"/>
       </Unit89>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="115" Column="42" TopLine="93"/>
+      </Position1>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>

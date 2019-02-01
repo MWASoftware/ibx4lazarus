@@ -1,8 +1,8 @@
-object DatabaseData: TDatabaseData
+object DBDataModule: TDBDataModule
   OldCreateOrder = False
   Height = 552
-  HorizontalOffset = 645
-  VerticalOffset = 400
+  HorizontalOffset = 767
+  VerticalOffset = 395
   Width = 730
   object IBDatabase1: TIBDatabase
     Connected = False
@@ -39,6 +39,7 @@ object DatabaseData: TDatabaseData
   end
   object ExecDDL: TIBSQL
     Database = IBDatabase1
+    CaseSensitiveParameterNames = False
     GenerateParamNames = False
     UniqueParamNames = False
     ParamCheck = True
@@ -57,6 +58,7 @@ object DatabaseData: TDatabaseData
     BeforeClose = DatabaseQueryBeforeClose
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -68,6 +70,259 @@ object DatabaseData: TDatabaseData
     DataSetCloseAction = dcSaveChanges
     left = 288
     top = 24
+    object DatabaseQueryRDBDESCRIPTION: TIBMemoField
+      FieldKind = fkData
+      FieldName = 'RDB$DESCRIPTION'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      BlobType = ftMemo
+      Size = 8
+      Transliterate = False
+      DisplayTextAsClassName = False
+    end
+    object DatabaseQueryRDBRELATION_ID: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'RDB$RELATION_ID'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryRDBSECURITY_CLASS: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$SECURITY_CLASS'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object DatabaseQueryRDBCHARACTER_SET_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'RDB$CHARACTER_SET_NAME'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object DatabaseQueryRDBLINGER: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'RDB$LINGER'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONDATABASE_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$DATABASE_NAME'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 255
+    end
+    object DatabaseQueryMONPAGE_SIZE: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$PAGE_SIZE'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONODS_MAJOR: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$ODS_MAJOR'
+      Index = 7
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONODS_MINOR: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$ODS_MINOR'
+      Index = 8
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONOLDEST_TRANSACTION: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$OLDEST_TRANSACTION'
+      Index = 9
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONOLDEST_ACTIVE: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$OLDEST_ACTIVE'
+      Index = 10
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONOLDEST_SNAPSHOT: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$OLDEST_SNAPSHOT'
+      Index = 11
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONNEXT_TRANSACTION: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$NEXT_TRANSACTION'
+      Index = 12
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONPAGE_BUFFERS: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'MON$PAGE_BUFFERS'
+      Index = 13
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONSQL_DIALECT: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$SQL_DIALECT'
+      Index = 14
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONSHUTDOWN_MODE: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$SHUTDOWN_MODE'
+      Index = 15
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONSWEEP_INTERVAL: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'MON$SWEEP_INTERVAL'
+      Index = 16
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONREAD_ONLY: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$READ_ONLY'
+      Index = 17
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONFORCED_WRITES: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$FORCED_WRITES'
+      Index = 18
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONRESERVE_SPACE: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$RESERVE_SPACE'
+      Index = 19
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONCREATION_DATE: TDateTimeField
+      FieldKind = fkData
+      FieldName = 'MON$CREATION_DATE'
+      Index = 20
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      OnGetText = DatabaseQueryMONCREATION_DATEGetText
+    end
+    object DatabaseQueryMONPAGES: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$PAGES'
+      Index = 21
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONSTAT_ID: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'MON$STAT_ID'
+      Index = 22
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONBACKUP_STATE: TIBSmallintField
+      FieldKind = fkData
+      FieldName = 'MON$BACKUP_STATE'
+      Index = 23
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONCRYPT_PAGE: TIBLargeIntField
+      FieldKind = fkData
+      FieldName = 'MON$CRYPT_PAGE'
+      Index = 24
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object DatabaseQueryMONOWNER: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$OWNER'
+      Index = 25
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 31
+    end
+    object DatabaseQueryMONSEC_DATABASE: TIBStringField
+      FieldKind = fkData
+      FieldName = 'MON$SEC_DATABASE'
+      Index = 26
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 7
+    end
   end
   object DBCharSet: TIBQuery
     AllowAutoActivateTransaction = False
@@ -78,6 +333,7 @@ object DatabaseData: TDatabaseData
     AutoCommit = acCommitRetaining
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -99,6 +355,7 @@ object DatabaseData: TDatabaseData
     OnCalcFields = ShadowFilesCalcFields
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -187,6 +444,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -207,6 +465,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -228,6 +487,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -261,6 +521,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -280,6 +541,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -305,6 +567,7 @@ object DatabaseData: TDatabaseData
     BeforeClose = UserListBeforeClose
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -482,6 +745,7 @@ object DatabaseData: TDatabaseData
     AutoCommit = acCommitRetaining
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = UserListSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -543,6 +807,7 @@ object DatabaseData: TDatabaseData
     AfterInsert = UserTagsAfterInsert
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = UserListSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -596,6 +861,7 @@ object DatabaseData: TDatabaseData
     BeforeOpen = AttachmentsBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -919,6 +1185,7 @@ object DatabaseData: TDatabaseData
   end
   object AdminUserQuery: TIBSQL
     Database = IBDatabase1
+    CaseSensitiveParameterNames = False
     GenerateParamNames = False
     UniqueParamNames = False
     ParamCheck = True
@@ -936,6 +1203,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -966,6 +1234,7 @@ object DatabaseData: TDatabaseData
     Transaction = CurrentTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -1022,6 +1291,7 @@ object DatabaseData: TDatabaseData
     OnCalcFields = AccessRightsCalcFields
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -1155,6 +1425,7 @@ object DatabaseData: TDatabaseData
     BeforeOpen = SubjectAccessRightsBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -1220,6 +1491,7 @@ object DatabaseData: TDatabaseData
   end
   object IBXServicesConnection1: TIBXServicesConnection
     Connected = False
+    AfterConnect = IBXServicesConnection1AfterConnect
     OnLogin = IBXServicesConnection1Login
     Params.Strings = (
       'sql_role_name=RDB$ADMIN'
@@ -1408,5 +1680,20 @@ object DatabaseData: TDatabaseData
     GlobalAction = CommitGlobal
     left = 176
     top = 496
+  end
+  object ConfigDataset: TMemDataset
+    FieldDefs = <    
+      item
+        Name = 'ParamDescription'
+        DataType = ftString
+        Size = 256
+      end    
+      item
+        Name = 'ParamValue'
+        DataType = ftInteger
+      end>
+    AfterClose = ConfigDatasetAfterClose
+    left = 528
+    top = 424
   end
 end

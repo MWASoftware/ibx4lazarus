@@ -1,0 +1,49 @@
+inherited CreateNewDBDlg: TCreateNewDBDlg
+  Left = 2302
+  Height = 341
+  Top = 300
+  Caption = 'Create New Database'
+  ClientHeight = 341
+  OnClose = FormClose
+  inherited Bevel1: TBevel
+    Height = 318
+  end
+  inherited Label4: TLabel
+    Top = 248
+  end
+  inherited DefaultUserName: TEdit
+    Top = 264
+  end
+  inherited UsesAltSecDB: TCheckBox
+    Top = 296
+    TabOrder = 7
+  end
+  object Label5: TLabel[12]
+    Left = 22
+    Height = 14
+    Top = 192
+    Width = 67
+    Caption = 'Application'
+    ParentColor = False
+  end
+  object AppDBLookup: TIBLookupComboEditBox[13]
+    Left = 22
+    Height = 27
+    Top = 208
+    Width = 298
+    KeyField = 'ID'
+    ListField = 'Title'
+    ListFieldIndex = 0
+    ListSource = AppDBSource
+    LookupCache = False
+    TabOrder = 6
+    AutoInsert = False
+    AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+    ItemHeight = 0
+  end
+  object AppDBSource: TDataSource[14]
+    DataSet = LocalData.AppDatabases
+    left = 358
+    top = 111
+  end
+end

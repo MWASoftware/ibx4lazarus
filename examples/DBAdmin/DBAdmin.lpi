@@ -60,7 +60,7 @@
       <Unit2>
         <Filename Value="DataModule.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="DatabaseData"/>
+        <ComponentName Value="DBDataModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
       </Unit2>

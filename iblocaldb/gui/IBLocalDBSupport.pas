@@ -30,7 +30,8 @@ unit IBLocalDBSupport;
 interface
 
 uses
-  Classes, SysUtils, LResources, Forms, Controls,  Dialogs, IBXCustomIBLocalDBSupport;
+  Classes, SysUtils, LResources, Forms, Controls,  Dialogs, IBXCustomIBLocalDBSupport,
+  IBXServices;
 
 type
 
@@ -116,10 +117,8 @@ end;
 
 function TIBLocalDBSupport.InternalCreateNewDatabase(DBArchive: string
   ): boolean;
-var Ext: string;
 begin
-  Ext := AnsiUpperCase(ExtractFileExt(DBArchive));
-  if Ext = '.GBK' then
+  if IsGBakFile(DBArchive) then
   begin
     Database.Attachment.Disconnect;
     try
@@ -129,10 +128,7 @@ begin
     end;
   end
   else
-  if Ext = '.SQL' then
     Result := IBXCreateDatabaseFromSQLDlgUnit.CreateNewDatabase(Database,DBArchive)
-  else
-    raise Exception.CreateFmt('Archive file (%s) has an unknown extension',[DBArchive]);
 end;
 
 procedure TIBLocalDBSupport.Downgrade(DBArchive: string);

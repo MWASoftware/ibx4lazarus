@@ -52,6 +52,7 @@ type
   private
     FDatabasePath: string;
     FFileName: string;
+    FCompletedOK: integer;
     procedure DoRunScript(Data: PtrInt);
   public
     property FileName: string read FFileName write FFileName;
@@ -77,7 +78,8 @@ begin
     IBTransaction1.DefaultDatabase := aDatabase;
     IBXScript.Transaction := IBTransaction1;
     DatabasePath := aDatabase.Attachment.GetConnectString;
-    Result := ShowModal = mrOK;
+    ShowModal;
+    Result := FCompletedOK <> 0;
   finally
     Free
   end
@@ -100,17 +102,16 @@ end;
 procedure TIBXCreateDatabaseFromSQLDlg.DoRunScript(Data: PtrInt);
 begin
   try
-    ModalResult := mrCancel;
     if IBXScript.RunScript(FileName) then
-          ModalResult := mrOK;
+          FCompletedOK := 1;
     with IBXScript.Transaction do
       if InTransaction then Commit;
   except on E:Exception do
     begin
       MessageDlg(E.Message,mtError,[mbOK],0);
-      Close;
     end;
   end;
+  Close;
 end;
 
 procedure TIBXCreateDatabaseFromSQLDlg.FormShow(Sender: TObject);
@@ -123,7 +124,6 @@ procedure TIBXCreateDatabaseFromSQLDlg.IBXScriptCreateDatabase(Sender: TObject;
   var DatabaseFileName: string);
 begin
   DatabaseFileName := DatabasePath;
-  IBXScript.Database.DropDatabase;
 end;
 
 end.

@@ -85,6 +85,7 @@ type
     procedure HandleException(Sender: TObject);
     procedure HandleSecContextException(Sender: TIBXControlService; var action: TSecContextAction);
     function Login(var aServerName: string; LoginParams: TStrings): Boolean;
+    procedure ParseServerVersionNo;
     procedure ParamsChanging(Sender: TObject);
     procedure SetConfigOverrides(AValue: TStrings);
     procedure SetConnectString(AValue: string);
@@ -93,6 +94,7 @@ type
     procedure SetPortNo(AValue: string);
     procedure SetProtocol(AValue: TProtocol);
     procedure SetServerName(AValue: string);
+    procedure SetServiceIntf(AValue: IServiceManager); overload;
     procedure SetWireCompression(AValue: boolean);
   protected
     procedure DoConnect; override;
@@ -111,9 +113,10 @@ type
       omitting any parameters not appropriate for Services API. Typically, the
       DBParams are TIBDatabase.Params}
     procedure SetDBParams(DBParams: TStrings);
+    procedure SetServiceIntf(aServiceIntf: IServiceManager; aDatabase: TIBDatabase); overload;
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property ServerVersionNo[index: integer]: integer read GetServerVersionNo;
-    property ServiceIntf: IServiceManager read FService;
+    property ServiceIntf: IServiceManager read FService write SetServiceIntf;
   published
     property Connected;
     property ConnectString: string read FConnectString write SetConnectString;
@@ -248,6 +251,7 @@ end;
    procedure DoServiceQuery; override;
    procedure SetServiceStartOptions; virtual;
    procedure ServiceStart; virtual;
+   procedure WaitForServiceStop(AbortAfter: integer=5 {seconds});
    property DatabaseName: string read FDatabaseName write SetDatabaseName;
  public
    procedure Assign(Source: TPersistent); override;
@@ -662,6 +666,8 @@ end;
     procedure FixErrors(GlobalAction: TTransactionGlobalAction; OutputLog: TStrings);
   end;
 
+function IsGbakFile(aFileName: string): boolean;
+
 implementation
 
 uses FBMessages, IBUtils, RegExpr, CustApp, IBErrorCodes;
@@ -701,6 +707,22 @@ const
     isc_spb_expected_db
   );
 
+function IsGbakFile(aFileName: string): boolean;
+const
+  Signature = #$00#$02#$04;
+var F: TFilestream;
+    Buffer: array [1..3] of char;
+begin
+  Result := false;
+  F := TFileStream.Create(aFileName,fmOpenRead);
+  try
+    F.Read(Buffer,3);
+    Result := CompareText(Buffer,Signature) = 0;
+  finally
+    F.Free;
+  end;
+end;
+
   { TIBXClientSideRestoreService }
 
 procedure TIBXClientSideRestoreService.Execute(OutputLog: TStrings);
@@ -730,7 +752,7 @@ begin
       end;
     end;
   finally
-    while IsServiceRunning do; {flush}
+    WaitForServiceStop; {flush}
   end;
 end;
 
@@ -769,7 +791,7 @@ begin
       end;
     finally
       F.Free;
-      while IsServiceRunning do; {flush}
+      WaitForServiceStop; {flush}
       FEof := false;
     end;
   end;
@@ -796,6 +818,7 @@ begin
   while not Eof do
     ReceiveNextChunk(S);
   BytesWritten := S.Size - InitialSize;
+  WaitForServiceStop;
 end;
 
 procedure TIBXClientSideBackupService.BackupToFile(aFileName: string;
@@ -1326,7 +1349,7 @@ begin
       ServiceStart; {Fix is implicit in non-zero list of Limbo transactions}
       while not Eof do
         OutputLog.Add(GetNextLine);
-      while IsServiceRunning do;
+      WaitForServiceStop;
       Clear;
     end;
 end;
@@ -1435,14 +1458,14 @@ end;
   begin
     SecurityAction := ActionAddUser;
     ServiceStart;
-    while IsServiceRunning do;
+    WaitForServiceStop;
   end;
 
   procedure TIBXSecurityService.DeleteUser;
   begin
     SecurityAction := ActionDeleteUser;
     ServiceStart;
-    while IsServiceRunning do;
+    WaitForServiceStop;
   end;
 
   procedure TIBXSecurityService.DisplayUsers;
@@ -1467,7 +1490,7 @@ end;
   begin
     SecurityAction := ActionModifyUser;
     ServiceStart;
-    while IsServiceRunning do;
+    WaitForServiceStop;
   end;
 
   function TIBXSecurityService.HasAdminRole: boolean;
@@ -1490,7 +1513,7 @@ end;
     else
       SRB.Add(isc_action_svc_drop_mapping);
     InternalServiceStart;
-    while IsServiceRunning do;
+    WaitForServiceStop;
   end;
 
   procedure TIBXSecurityService.SetSecurityAction (Value: TSecurityAction);
@@ -1960,7 +1983,7 @@ begin
   else
     SRB.Add(isc_spb_prp_deny_new_attachments).AsInteger := Wait;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetSweepInterval(Value: Integer);
@@ -1970,7 +1993,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_prp_sweep_interval).AsInteger := Value;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetDBSqlDialect(Value: Integer);
@@ -1979,7 +2002,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_prp_set_sql_dialect).AsInteger := Value;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetPageBuffers(Value: Integer);
@@ -1988,7 +2011,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_prp_page_buffers).AsInteger := Value;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.ActivateShadow;
@@ -1997,7 +2020,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_options).AsInteger := isc_spb_prp_activate;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.BringDatabaseOnline;
@@ -2006,7 +2029,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_options).AsInteger := isc_spb_prp_db_online;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetReserveSpace(Value: Boolean);
@@ -2019,7 +2042,7 @@ begin
   else
     AsByte := isc_spb_prp_res_use_full;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetAsyncMode(Value: Boolean);
@@ -2032,7 +2055,7 @@ begin
   else
     AsByte := isc_spb_prp_wm_sync;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetReadOnly(Value: Boolean);
@@ -2045,7 +2068,7 @@ begin
   else
     AsByte := isc_spb_prp_am_readwrite;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 procedure TIBXConfigService.SetNoLinger;
@@ -2054,7 +2077,7 @@ begin
   AddDBNameToSRB;
   SRB.Add(isc_spb_options).AsInteger := isc_spb_prp_nolinger;
   InternalServiceStart;
-  while IsServiceRunning do;
+  WaitForServiceStop;
 end;
 
 { TIBXLogService }
@@ -2290,7 +2313,7 @@ begin
       else
         GetNextLine;
   finally
-    while IsServiceRunning do; {flush}
+    WaitForServiceStop; {flush}
   end;
 end;
 
@@ -2444,6 +2467,17 @@ begin
   CheckServiceNotRunning;
   SetServiceStartOptions;
   InternalServiceStart;
+end;
+
+procedure TIBXControlService.WaitForServiceStop(AbortAfter: integer);
+var WaitUntil: TDateTime;
+begin
+  WaitUntil := Now + EncodeTime(0,0,AbortAfter,0);
+  while IsServiceRunning do
+  begin
+    sleep(500);
+    if Now > WaitUntil then Exit;
+  end;
 end;
 
 procedure TIBXControlService.Assign(Source: TPersistent);
@@ -2974,6 +3008,34 @@ begin
     IBError(ibxeNoLoginDialog,[]);
 end;
 
+procedure TIBXServicesConnection.ParseServerVersionNo;
+var Req: ISRB;
+    Results: IServiceQueryResults;
+    RegexObj: TRegExpr;
+    s: string;
+begin
+  Req := FService.AllocateSRB;
+  Req.Add(isc_info_svc_server_version);
+  Results := FService.Query(nil,Req);
+  if (Results.Count = 1) and (Results[0].getItemType = isc_info_svc_server_version) then
+  RegexObj := TRegExpr.Create;
+  try
+    {extact database file spec}
+    RegexObj.ModifierG := false; {turn off greedy matches}
+    RegexObj.Expression := '[A-Z][A-Z]-V([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+) .*';
+    s := Results[0].AsString;
+    if RegexObj.Exec(s) then
+    begin
+      FServerVersionNo[1] := StrToInt(RegexObj.Match[1]);
+      FServerVersionNo[2] := StrToInt(RegexObj.Match[2]);
+      FServerVersionNo[3] := StrToInt(RegexObj.Match[3]);
+      FServerVersionNo[4] := StrToInt(RegexObj.Match[4]);
+    end;
+  finally
+    RegexObj.Free;
+  end;
+end;
+
 procedure TIBXServicesConnection.ParamsChanging(Sender: TObject);
 begin
   CheckInactive;
@@ -3023,6 +3085,11 @@ begin
   FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
 end;
 
+procedure TIBXServicesConnection.SetServiceIntf(AValue: IServiceManager);
+begin
+  SetServiceIntf(AValue,nil);
+end;
+
 procedure TIBXServicesConnection.SetWireCompression(AValue: boolean);
 var Index: integer;
 begin
@@ -3037,34 +3104,6 @@ begin
 end;
 
 procedure TIBXServicesConnection.DoConnect;
-
-  procedure ParseServerVersionNo;
-  var Req: ISRB;
-      Results: IServiceQueryResults;
-      RegexObj: TRegExpr;
-      s: string;
-  begin
-    Req := FService.AllocateSRB;
-    Req.Add(isc_info_svc_server_version);
-    Results := FService.Query(nil,Req);
-    if (Results.Count = 1) and (Results[0].getItemType = isc_info_svc_server_version) then
-    RegexObj := TRegExpr.Create;
-    try
-      {extact database file spec}
-      RegexObj.ModifierG := false; {turn off greedy matches}
-      RegexObj.Expression := '[A-Z][A-Z]-V([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+) .*';
-      s := Results[0].AsString;
-      if RegexObj.Exec(s) then
-      begin
-        FServerVersionNo[1] := StrToInt(RegexObj.Match[1]);
-        FServerVersionNo[2] := StrToInt(RegexObj.Match[2]);
-        FServerVersionNo[3] := StrToInt(RegexObj.Match[3]);
-        FServerVersionNo[4] := StrToInt(RegexObj.Match[4]);
-      end;
-    finally
-      RegexObj.Free;
-    end;
-  end;
 
 var aServerName: string;
     aProtocol: TProtocolAll;
@@ -3242,6 +3281,48 @@ begin
         Params.Add(DBParams[i]);
         break;
       end;
+  end;
+end;
+
+procedure TIBXServicesConnection.SetServiceIntf(aServiceIntf: IServiceManager;
+  aDatabase: TIBDatabase);
+var i: integer;
+    var aServerName,aDatabaseName: AnsiString;
+        aProtocol: TProtocolAll;
+        aPortNo: AnsiString;
+begin
+  if FService = aServiceIntf then Exit;
+  if FService <> nil then
+  begin
+    if Assigned(BeforeDisconnect) then
+      BeforeDisconnect(self);
+    for i := 0 to Length(FIBXServices) - 1 do
+      FIBXServices[i].OnBeforeDisconnect(self);
+    FService := nil;
+    if Assigned(AfterDisconnect) then
+      AfterDisconnect(self);
+  end;
+  FFirebirdAPI := nil;
+  if aServiceIntf <> nil then
+  begin
+    if Assigned(BeforeConnect) then
+      BeforeConnect(self);
+    FService := aServiceIntf;
+    ParseServerVersionNo;
+    FServername := FService.getServerName;
+    FProtocol := FService.getProtocol;
+    FPortNo := FService.getPortNo;
+    FConnectString := MakeConnectString(FServerName,'service_mgr',FProtocol,FPortNo);
+    if FFirebirdLibraryPathName <> '' then
+      FFirebirdLibraryPathName := FService.getFirebirdAPI.GetFBLibrary.GetLibraryFilePath;
+    if aDatabase <> nil then
+    begin
+      if ParseConnectString(aDatabase.DatabaseName,aServerName,aDatabaseName,aProtocol,aPortNo) then
+        for i := low(FIBXServices) to high(FIBXServices) do
+          FIBXServices[i].OnAfterConnect(self,aDatabaseName);
+    end;
+    if Assigned(AfterConnect) then
+      AfterConnect(self);
   end;
 end;
 

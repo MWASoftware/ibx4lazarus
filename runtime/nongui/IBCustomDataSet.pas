@@ -593,7 +593,6 @@ type
     procedure DoBeforeInsert; override;
     procedure DoAfterInsert; override;
     procedure DoBeforeClose; override;
-    procedure DoBeforeOpen; override;
     procedure DoBeforePost; override;
     procedure DoAfterPost; override;
     procedure FreeRecordBuffer(var Buffer: PChar); override;
@@ -720,6 +719,7 @@ type
     function IsSequenced: Boolean; override;
     procedure Post; override;
     function ParamByName(ParamName: String): ISQLParam;
+    function FindParam(ParamName: String): ISQLParam;
     property ArrayFieldCount: integer read FArrayFieldCount;
     property DatabaseInfo: TIBDatabaseInfo read FDatabaseInfo;
     property UpdateObject: TIBDataSetUpdateObject read FUpdateObject write SetUpdateObject;
@@ -777,7 +777,12 @@ type
                                                    write FOnDeleteReturning;
   end;
 
+  { TIBParserDataSet }
+
   TIBParserDataSet = class(TIBCustomDataSet)
+  protected
+    procedure SetFilterText(const Value: string); override;
+    procedure DoBeforeOpen; override;
   public
     property Parser;
   end;
@@ -1029,6 +1034,33 @@ type
     end;
     Result := str;
   end;
+
+{ TIBParserDataSet }
+
+procedure TIBParserDataSet.SetFilterText(const Value: string);
+begin
+  if Filter = Value then Exit;
+  inherited SetFilterText(Value);
+  if Active and Filtered then {reopen dataset}
+  begin
+    Active := false;
+    Active := true;
+  end;
+end;
+
+procedure TIBParserDataSet.DoBeforeOpen;
+var i: integer;
+begin
+  if assigned(FParser) then
+     FParser.RestoreClauseValues;
+  if Filtered and (Filter <> '') then
+    Parser.Add2WhereClause(Filter);
+  for i := 0 to FIBLinks.Count - 1 do
+    TIBControlLink(FIBLinks[i]).UpdateSQL(self);
+  inherited DoBeforeOpen;
+  for i := 0 to FIBLinks.Count - 1 do
+    TIBControlLink(FIBLinks[i]).UpdateParams(self);
+end;
 
 { TIBLargeIntField }
 
@@ -3102,13 +3134,18 @@ end;
 
 function TIBCustomDataSet.ParamByName(ParamName: String): ISQLParam;
 begin
+  Result := FindParam(ParamName);
+  if Result = nil then
+    IBError(ibxeParameterNameNotFound,[ParamName]);
+end;
+
+function TIBCustomDataSet.FindParam(ParamName: String): ISQLParam;
+begin
   ActivateConnection;
   ActivateTransaction;
   if not FInternalPrepared then
     InternalPrepare;
   Result := Params.ByName(ParamName);
-  if Result = nil then
-    IBError(ibxeParameterNameNotFound,[ParamName]);
 end;
 
 function TIBCustomDataSet.GetRowsAffected(var SelectCount, InsertCount,
@@ -3455,18 +3492,6 @@ begin
   end;
   if FCachedUpdates and FUpdatesPending and (DataSetCloseAction = dcSaveChanges) then
     ApplyUpdates;
-end;
-
-procedure TIBCustomDataSet.DoBeforeOpen;
-var i: integer;
-begin
-  if assigned(FParser) then
-     FParser.RestoreClauseValues;
-  for i := 0 to FIBLinks.Count - 1 do
-    TIBControlLink(FIBLinks[i]).UpdateSQL(self);
-  inherited DoBeforeOpen;
-  for i := 0 to FIBLinks.Count - 1 do
-    TIBControlLink(FIBLinks[i]).UpdateParams(self);
 end;
 
 procedure TIBCustomDataSet.DoBeforePost;

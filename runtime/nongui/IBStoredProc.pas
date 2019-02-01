@@ -73,6 +73,7 @@ type
 
     procedure DefineProperties(Filer: TFiler); override;
     procedure SetFiltered(Value: Boolean); override;
+    procedure SetFilterText(const Value: string); override;
     procedure InitFieldDefs; override;
     function GetParamsCount: Word;
     procedure SetPrepared(Value: Boolean);
@@ -187,6 +188,11 @@ begin
   end
   else
     inherited SetFiltered(value);
+end;
+
+procedure TIBStoredProc.SetFilterText(const Value: string);
+begin
+  IBError(ibxeIsAExecuteProcedure,[nil]);
 end;
 
  procedure TIBStoredProc.InitFieldDefs;

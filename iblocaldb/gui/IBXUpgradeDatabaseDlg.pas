@@ -188,7 +188,7 @@ begin
       UpdateAvailable := FUpgradeConf.GetUpgradeInfo(CurVersionNo+1,UpgradeInfo);
       if UpdateAvailable then
       begin
-        if UpgradeInfo.BackupDB then
+        if UpgradeInfo.BackupDB and (FBackupService <> nil) then
         begin
           CreateDir(ExtractFileDir(FArchiveStub));
           DBArchive := FArchiveStub + '.' + IntToStr(CurrentDBVersionNo) + '.gbk';

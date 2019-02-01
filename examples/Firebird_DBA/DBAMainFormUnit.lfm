@@ -1,0 +1,751 @@
+inherited DBAMainForm: TDBAMainForm
+  Left = 232
+  Height = 625
+  Top = 265
+  Width = 1174
+  Caption = 'Firebird Database Administrator'
+  ClientHeight = 605
+  ClientWidth = 1174
+  OnClose = FormClose
+  inherited ToolBar1: TToolBar
+    Width = 1174
+    inherited ToolButton2: TToolButton
+      Height = 22
+    end
+    inherited ToolButton4: TToolButton
+      Height = 22
+    end
+    inherited ToolButton6: TToolButton
+      Height = 22
+    end
+  end
+  inherited StatusBar1: TStatusBar
+    Top = 583
+    Width = 1174
+  end
+  inherited PageControl1: TPageControl
+    Left = 157
+    Height = 557
+    Width = 1017
+    ActivePage = LimboTab
+    TabIndex = 10
+    inherited Properties: TTabSheet
+      ClientHeight = 525
+      ClientWidth = 1011
+      inherited Panel7: TPanel
+        Height = 525
+        Width = 1011
+        ClientHeight = 525
+        ClientWidth = 1011
+        inherited ConnectString: TEdit
+          ReadOnly = True
+        end
+        inherited Label5: TLabel
+          Left = 832
+          Top = 22
+        end
+        inherited DBSQLDialect: TEdit
+          Left = 910
+        end
+        inherited Label11: TLabel
+          Left = 810
+        end
+        inherited AllocatedPages: TEdit
+          Left = 910
+        end
+        inherited Label3: TLabel
+          Left = 836
+        end
+        inherited PagesUsed: TEdit
+          Left = 910
+        end
+        inherited Label10: TLabel
+          Left = 814
+        end
+        inherited PagesAvail: TEdit
+          Left = 910
+        end
+        inherited Label15: TLabel
+          Left = 823
+        end
+        inherited PageBuffers: TEdit
+          Left = 910
+        end
+        inherited Edit1: TEdit
+          ReadOnly = True
+        end
+        inherited DBComments: TMemo
+          Height = 90
+          Width = 590
+        end
+        inherited ClientLibrary: TLabel
+          Left = 914
+          Top = 508
+          Anchors = [akTop, akRight, akBottom]
+        end
+        inherited ClientServerVersion: TMemo
+          Width = 589
+        end
+        object SchemaInfoPanel: TPanel[54]
+          Left = 402
+          Height = 102
+          Top = 170
+          Width = 609
+          Anchors = [akTop, akLeft, akRight]
+          BevelOuter = bvNone
+          ClientHeight = 102
+          ClientWidth = 609
+          TabOrder = 27
+          object Label55: TLabel
+            Left = 74
+            Height = 14
+            Top = 16
+            Width = 49
+            Caption = 'Schema'
+            ParentColor = False
+          end
+          object SchemaTitle: TEdit
+            Left = 133
+            Height = 24
+            Top = 12
+            Width = 464
+            Anchors = [akTop, akLeft, akRight]
+            ReadOnly = True
+            TabOrder = 0
+            Text = 'SchemaTitle'
+          end
+          object Label56: TLabel
+            Left = 27
+            Height = 14
+            Top = 48
+            Width = 96
+            Caption = 'Schema Version'
+            ParentColor = False
+          end
+          object SchemaVersion: TEdit
+            Left = 133
+            Height = 24
+            Top = 44
+            Width = 89
+            Alignment = taRightJustify
+            ReadOnly = True
+            TabOrder = 1
+            Text = 'SchemaVersion'
+          end
+          object UpgradeButton: TButton
+            Left = 352
+            Height = 25
+            Top = 44
+            Width = 243
+            Caption = 'UpgradeButton'
+            OnClick = UpgradeButtonClick
+            TabOrder = 2
+          end
+        end
+      end
+    end
+    inherited FilesTab: TTabSheet
+      ClientHeight = 525
+      ClientWidth = 1011
+    end
+    inherited AttachmentsTab: TTabSheet
+      ClientHeight = 525
+      ClientWidth = 1011
+      inherited AttmtGrid: TIBDynamicGrid
+        Height = 525
+        Width = 1011
+      end
+    end
+    inherited StatisticsTab: TTabSheet
+      ClientHeight = 525
+      ClientWidth = 1011
+      inherited StatsOptions: TComboBox
+        Left = 772
+      end
+      inherited StatsMemo: TMemo
+        Width = 992
+      end
+    end
+    inherited SchemaTab: TTabSheet
+      ClientHeight = 525
+      ClientWidth = 1011
+      inherited SynEdit1: TSynEdit
+        Width = 1011
+      end
+    end
+    inherited ServerTab: TTabSheet
+      Tag = 1
+      ClientHeight = 525
+      ClientWidth = 1011
+      OnShow = ServerTabShow
+      inherited Panel1: TPanel
+        Height = 525
+        ClientHeight = 525
+        inherited ConfigDataGrid: TIBDynamicGrid
+          Height = 90
+        end
+        inherited Panel10: TPanel
+          inherited Label51: TLabel
+            Width = 128
+            Caption = 'Server Domain Name'
+          end
+          inherited Edit8: TEdit
+            OnEditingDone = Edit8EditingDone
+            ReadOnly = False
+          end
+          inherited Edit9: TEdit
+            ReadOnly = False
+          end
+          inherited Edit12: TEdit
+            ReadOnly = False
+          end
+        end
+      end
+      inherited Splitter1: TSplitter
+        Height = 525
+      end
+      inherited Panel2: TPanel
+        Height = 525
+        Width = 515
+        ClientHeight = 525
+        ClientWidth = 515
+        inherited ServerLog: TMemo
+          Height = 490
+          Width = 497
+        end
+      end
+    end
+    inherited UserManagerTab: TTabSheet
+      Tag = 1
+      ClientHeight = 525
+      ClientWidth = 1011
+      OnShow = UserManagerTabShow
+      inherited Panel4: TPanel
+        Height = 525
+        ClientHeight = 525
+        inherited UserManagerGrid: TIBDynamicGrid
+          Height = 523
+        end
+      end
+      inherited Splitter2: TSplitter
+        Height = 525
+      end
+      inherited Panel3: TPanel
+        Height = 525
+        Width = 179
+        ClientHeight = 525
+        ClientWidth = 179
+        inherited RolesGrid: TIBDynamicGrid
+          Width = 179
+        end
+        inherited Panel5: TPanel
+          Top = 464
+          Width = 179
+          ClientWidth = 179
+          inherited Button1: TButton
+            Width = 152
+          end
+        end
+        inherited RolesHeaderPanel: TPanel
+          Width = 179
+          ClientWidth = 179
+        end
+        inherited Splitter3: TSplitter
+          Width = 179
+        end
+        inherited TagsHeader: TPanel
+          Width = 179
+        end
+        inherited TagsGrid: TIBDynamicGrid
+          Height = 217
+          Width = 179
+        end
+        inherited Splitter4: TSplitter
+          Top = 459
+          Width = 179
+        end
+      end
+    end
+    inherited AccessRightsTab: TTabSheet
+      ClientHeight = 525
+      ClientWidth = 1011
+      inherited AccessRightsTreeView: TIBTreeView
+        Height = 525
+      end
+      inherited Splitter5: TSplitter
+        Height = 525
+      end
+      inherited SubjectAccessRightsGrid: TIBDynamicGrid
+        Height = 525
+        Width = 706
+      end
+    end
+    inherited MappingsTab: TTabSheet
+      ClientHeight = 525
+      ClientWidth = 1011
+      inherited IBDynamicGrid5: TIBDynamicGrid
+        Width = 997
+      end
+      inherited AutoAdmin: TCheckBox
+        Left = 848
+      end
+    end
+    inherited RepairTab: TTabSheet
+      ClientHeight = 525
+      ClientWidth = 1011
+      inherited SelectRepairAction: TComboBox
+        Left = 757
+        Top = 7
+      end
+      inherited Button2: TButton
+        Left = 965
+        Top = 8
+      end
+      inherited ValidateOptions: TPageControl
+        inherited ValidateOptionsTab: TTabSheet
+          ClientHeight = 102
+        end
+        inherited RepairOptionsTab: TTabSheet
+          ClientHeight = 102
+        end
+      end
+      inherited Panel8: TPanel
+        Width = 990
+        ClientWidth = 990
+        inherited Panel9: TPanel
+          Width = 815
+          ClientWidth = 815
+          inherited ValidationReport: TMemo
+            Width = 815
+          end
+        end
+      end
+    end
+    inherited LimboTab: TTabSheet
+      ClientHeight = 525
+      ClientWidth = 1011
+      inherited IBDynamicGrid3: TIBDynamicGrid
+        Width = 990
+      end
+      inherited LimboReport: TMemo
+        Width = 987
+      end
+    end
+  end
+  inherited UpdateColsPanel: TPanel
+    ClientHeight = 62
+    ClientWidth = 542
+    inherited DBEdit5: TDBEdit
+      Width = 364
+    end
+    inherited DBEdit6: TDBEdit
+      Width = 364
+    end
+  end
+  object RegisteredObjectsTree: TIBTreeView[4]
+    Left = 0
+    Height = 557
+    Top = 26
+    Width = 152
+    Align = alLeft
+    TextField = 'ITEMNAME'
+    DataSource = TreeSource
+    Images = TreeViewImages
+    HasChildField = 'HASCHILD'
+    ImageIndexField = 'ITEMTYPE'
+    SelectedIndexField = 'ITEMTYPE'
+    KeyField = 'ID'
+    ParentField = 'PARENT'
+    PopupMenu = PopupMenu1
+    RelationName = 'A'
+    RightClickSelect = True
+    TabOrder = 4
+    OnAddition = RegisteredObjectsTreeAddition
+    OnCreateNodeClass = RegisteredObjectsTreeCreateNodeClass
+    OnEditingEnd = RegisteredObjectsTreeEditingEnd
+    OnExpanding = RegisteredObjectsTreeExpanding
+    OnSelectionChanged = RegisteredObjectsTreeSelectionChanged
+    Options = [tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+  end
+  object Splitter6: TSplitter[5]
+    Left = 152
+    Height = 557
+    Top = 26
+    Width = 5
+  end
+  inherited MainMenu1: TMainMenu[6]
+    inherited MenuItem1: TMenuItem
+      inherited MenuItem9: TMenuItem
+        Action = DBADropDatabase
+      end
+    end
+  end
+  inherited ActionList1: TActionList[7]
+    inherited Backup: TAction
+      OnUpdate = BackupUpdate
+    end
+    inherited Restore: TAction
+      OnUpdate = BackupUpdate
+    end
+    inherited OpenDatabase: TAction
+      Visible = False
+    end
+    inherited Save: TAction
+      OnUpdate = SaveUpdate
+    end
+    inherited DropDatabase: TAction
+      OnUpdate = DropDatabaseUpdate
+    end
+    inherited RunScript: TAction
+      OnUpdate = RunScriptUpdate
+    end
+  end
+  inherited MenuImages: TImageList[8]
+  end
+  inherited CharSetSource: TDataSource[9]
+  end
+  inherited SecDBFilesSource: TDataSource[10]
+  end
+  inherited DBCharSetSource: TDataSource[11]
+  end
+  inherited DatabaseSource: TDataSource[12]
+  end
+  inherited IBDatabaseInfo: TIBDatabaseInfo[13]
+  end
+  inherited AttmtSource: TDataSource[14]
+  end
+  inherited ShadowSource: TDataSource[15]
+  end
+  inherited SynSQLSyn1: TSynSQLSyn[16]
+  end
+  inherited IBExtract1: TIBExtract[17]
+  end
+  inherited SQlSaveDialog: TSaveDialog[18]
+  end
+  inherited SaveDialog: TSaveDialog[19]
+  end
+  inherited UserListSource: TDataSource[20]
+  end
+  inherited RoleSource: TDataSource[21]
+  end
+  inherited UserTagsSource: TDataSource[22]
+  end
+  inherited UserPopup: TPopupMenu[23]
+  end
+  inherited UserTagPopup: TPopupMenu[24]
+  end
+  inherited AttachSource: TDataSource[25]
+  end
+  inherited AttmtTimer: TTimer[26]
+  end
+  inherited AttmtPopup: TPopupMenu[27]
+  end
+  inherited LimboListSource: TDataSource[28]
+  end
+  inherited DBTablesSource: TDataSource[29]
+  end
+  inherited AuthMapSource: TDataSource[30]
+  end
+  inherited SubjectAccessRightsSource: TDataSource[31]
+  end
+  inherited AccessRightsPopup: TPopupMenu[32]
+  end
+  inherited AccessRightsSource: TDataSource[33]
+  end
+  inherited ConfigDataSource: TDataSource[34]
+  end
+  object TreeViewImages: TImageList[35]
+    left = 80
+    top = 160
+    Bitmap = {
+      4C6903000000100000001000000000000000000000000000000000000000FF89
+      040AACE8A3789EF7C0B9DAA953D6C0B262D4C6A556AF98D3876BFF0000030000
+      000000000000000000000000000000000000C6C1660000000000C6E2A07CADF9
+      C9FFA2FFDDFFB9DBA2FFC9C17EFFC6BC7BFFD49246FFC88F47FF7EE296FF87D7
+      7B7000000000F5892900000000000000000000000000D3E5ADB3B0FFDDFFA2FF
+      DAFFBBEAC9FFC4DFC1FFCACEA6FFB9FDE9FFC7C591FFD88439FFD07E37FF5BFE
+      AEFF7AD471AA000000000000000000000000C8D78C7FBDFFE3FFA0FFD8FFB9FF
+      EFFFCEF0E3FFCEE7D7FFD0C8A2FFCEFFFFFFD8B478FFE39545FFA2D694FF74F9
+      B3FF3DFFA4FF88BD537C00000000E987140DBEEFBEFF92FFCDFFAFFFE4FFC9FF
+      FBFFCEF7F4FFCEF5EEFFD0C9A2FFD7BE8AFFE1AF68FFE8A654FFA8D998FF94DB
+      98FF52FFABFF46DA6EFFFF190010E8B15B7BAFEEB3FFACF4C0FFBBF7DBFFD6EE
+      D8FFD1F3E7FFCFECDCFFD5D7B2FFDDC892FFE6BD78FFD9C075FFBAC985FF7EFE
+      BEFF61F8A7FF74B45BFF6EBD5084E8B468BBB1E29BFFD5DB96FFEDD698FFE1E3
+      B8FFDCECCBFFDBE9C9FFDEDEB2FFE8D7A1FFF2D499FFF4CD90FFACE7ADFF9BE4
+      A5FFA5AF67FF2CEE81FF6DB14BCADC9E4CD5BCD48BFFF7C66EFFEFD187FFE9D9
+      9DFFE6DEA9FFE5DEA9FFEBDCA6FFF3DFACFFF9E2B3FFF3DBB5FF9BF8C2FFC2CB
+      93FFD09257FF57C461FF3DCA5DEBC49648D1E2AD5CFFF0B862FFF4C66FFFF2CE
+      7FFFF0D188FFEFD188FFF4D695FFF9DEACFFF9E7C9FFFDEEDEFFA2F1BDFF66FF
+      B6FF31FFA1FF00FE81FF849237ECAF8B43ADC9AB5BFF78F2A6FFE3BA67FFF0BE
+      68FFF3C36BFFF3C36BFFF4CB85FFF4D7A9FFFAE7D0FFACF5C9FF72FFBAFF51FF
+      A9FF15FF8BFF00F179FF65A042CDAB752F6280BD63FF46FFA5FF7FECA0FFE5A9
+      58FFE6AF5CFFE6AF5CFFE7B770FFEBC794FFF3D5B6FF6AFFB8FF56FFABFF26FF
+      94FF00F97CFF00E274FFA676228B00000000A18F40F907FF8DFF3DFFA1FFA0C3
+      75FFDC994CFFD99C4EFFD89B51FFE3B67CFFF6CCA2FF5CFBA7FF75EF9CFF30EE
+      7FFF00E573FF36AA4EFFFF3A001700000000D16D2B4F47CB63FF05FF82FF1AFF
+      91FF5FDA7DFFC98A41FFCE8D45FFDEA663FFEFC589FFFFD6A0FFF0C082FFCBA0
+      59FF00C866FFA767198D00000000000000000000000035BA568400EB77FF00FD
+      80FF00FF83FFA19142FFCA8641FFDA9E57FFE4AD64FFE1A656FFD9994CFF7AA9
+      63FF866F20BE00000000C9580A0000000000C4520700000000006087335B927B
+      25FFB46E1EFFBB6A1BFFBB6C1BFFC47825FFC87C24FFCF8A3CFFD68E54FFAE5F
+      168700000000C45207000000000000000000000000000000000000000000FF00
+      0000B751006EB65400B7B85500DABA5501DEBF5C0DC1C25C1780AE1900100000
+      0000C04E04000000000000000000000000790000006300000063000000630000
+      0063000000630000006300000063000000630000006300000066000000930000
+      00960000008C000000830000007E000000650000000100000004000000000000
+      000000000000000000000000000000000000000000000000001B000000840000
+      008F00000090000000560000003600000064000000230000006F000000000000
+      000000000000000000000000000000000000000000000000001B000000830000
+      008E0000008F00000055000000360000006B0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000009000000790000
+      0083000000750000004D00000042000000530000009300000093000000930000
+      0093000000930000009300000093000000930000009300000093000000900000
+      009000000091000000930000006E0000006B0000001B0000001B0000001B0000
+      001B0000001B0000001B0000001B0000001B0000001B0000001F000000840000
+      008C000000730000006200000050000000650000001300000033000000000000
+      000000000000000000000000000000000000000000000000001C000000840000
+      0090000000920000005700000036000000640000001E0000005D000000000000
+      000000000000000000000000000000000000000000000000001B000000850000
+      00910000009100000057000000360000006A0000000000000000000000000000
+      00000000000000000000000000000000000000000000000000000000006A0000
+      00710000005B000000420000004100000063000000A00000009F0000009F0000
+      009F0000009E0000009E0000009E0000009D0000009D0000009C0000008F0000
+      008E0000009000000093000000860000006C0000000000000000000000000000
+      00000000000000000000000000000000000000000000000000000000006F0000
+      0078000000600000004700000041000000640000001E0000005D000000000000
+      000000000000000000000000000000000000000000000000001B000000850000
+      0090000000910000005700000036000000650000001300000033000000000000
+      000000000000000000000000000000000000000000000000001C000000850000
+      0090000000930000005700000036000000690000001900000019000000190000
+      001900000019000000190000001900000019000000190000001D0000007E0000
+      00850000006C0000005D0000004D0000005A0000009C0000009B0000009B0000
+      009A000000990000009900000098000000970000009700000096000000920000
+      00910000009100000092000000740000006B0000000000000000000000000000
+      000000000000000000000000000000000000000000000000000A0000007D0000
+      008800000079000000500000003FFFFFFF0000000000B1AB9F35B0AA9EA8AFA9
+      9DF5AEA89CFFAEA89CFFAEA89CFFAEA89CFFAEA89CFFAEA89CFFAFA99DF5B0AA
+      9EA8B1AB9F3500000000FFFFFF00FFFFFF00B1AB9F71B6B0A4FFD2CABFFFE2D9
+      D0FFEFE7DDFFEEE6DCFFEEE6DCFFEEE6DCFFEEE6DCFFEFE7DDFFE2D9D0FFD2CA
+      BFFFB6B0A4FFB1AB9F71FFFFFF00FFFFFF00AFA99DFFE1D8CEFFE1D8CEFFDFD6
+      CCFFDFD6CBFFDFD5CBFFDFD5CBFFDFD5CBFFDFD5CBFFDFD6CBFFDFD6CCFFE1D8
+      CEFFE1D8CEFFAFA99DFFFFFFFF00FFFFFF00AEA89CFFFBF5EFFFEEE7DEFFE3DC
+      D3FFDDD5CCFFDDD5CBFFDDD4CBFFDDD4CBFFDDD4CBFFDDD5CBFFE3DCD3FFEEE7
+      DEFFFBF6EFFFAEA89CFFFFFFFF00FFFFFF00B0AA9DFFC7C0B8FFE1DBD2FFF3ED
+      E6FFFDF9F2FFFCF8F1FFFBF7F0FFFBF7F0FFFCF8F1FFFDF8F2FFF4EEE6FFE2DB
+      D3FFCAC3B9FFAFAA9DFFFFFFFF00FFFFFF00B1AB9EFFC8BFB7FFCBC3BAFFD2C8
+      BFFFD8CEC5FFDFD5CDFFE9DED8FFE9DDD6FFE0D6CFFFDACFC7FFD3CBC2FFCEC6
+      BDFFC9C2B8FFB0AB9EFFFFFFFF00FFFFFF00B1AB9FFFCAC1B9FFCEC7BEFFD5CC
+      C3FFDAD1C8FFE1D7CFFFE8DCD6FFEADFD8FFE2D8D1FFDCD2CAFFD6CEC5FFD1C9
+      C0FFCBC4BAFFB1AB9FFFFFFFFF00FFFFFF009E998EB4A3998FFFB6AEA4FFC8BF
+      B6FFD8CFC7FFE3D9D1FFEADED8FFECE1DAFFE4DAD3FFDAD1C9FFCAC1B8FFB8AF
+      A6FFA49C92FF9E998EB4FFFFFF00FFFFFF00A49E93ADF9F4EEFFD7D0C8FFC6BE
+      B6FFBEB5ABFFC2B9AFFFC7BCB4FFC8BEB5FFC3B9B1FFBFB6ACFFC7BFB7FFD8D1
+      C9FFF9F5EDFFA49E93ADFFFFFF00FFFFFF00B0AA9EFFC9C2B9FFE2DDD4FFF5EF
+      E9FFFFFBF4FFFEFAF3FFFDF9F2FFFDF9F2FFFDFAF3FFFFFBF4FFF6F0E8FFE4DD
+      D5FFCBC4BAFFB0AA9EFFFFFFFF00FFFFFF00B0AB9EFFC8BFB7FFCBC3BAFFD2C9
+      C0FFD8CFC5FFDFD5CDFFE9DFD8FFE9DDD6FFE0D6CFFFDAD0C8FFD3CBC2FFCEC6
+      BDFFC9C2B7FFB0AA9EFFFFFFFF00FFFFFF00B1AB9FFFC9C0B8FFCDC5BCFFD4CB
+      C2FFDAD1C8FFE1D7CFFFE7DCD5FFEADFD8FFE2D8D1FFDCD2CAFFD5CDC4FFCFC7
+      BEFFCAC3B9FFB1AB9FFFFFFFFF00FFFFFF00B1AB9FFFC7C0B6FFCFC7BEFFD5CC
+      C3FFDBD2C9FFE2D8D0FFE9DDD7FFEBE0D9FFE3D9D2FFDDD3CBFFD6CEC5FFD1C9
+      C0FFC9C2B9FFB1AB9FFFFFFFFF00FFFFFF008E8A808DB4ADA2FFC2BBB0FFD0C7
+      BEFFDFD5CDFFE6DCD4FFEDE1DBFFEFE4DDFFE7DDD6FFE1D6CFFFD1C9BFFFC3BC
+      B1FFB4AEA2FF8E8A808DFFFFFF00FFFFFF000000001765625B5DA19C91B9AFA9
+      9DF7AFA99DFFAEA99CFFAEA89CFFAEA89CFFAEA89CFFAFA99DFFAFA99DF7A19C
+      91B965625B5D00000017FFFFFF00FFFFFF00000000000000000B000000220000
+      0031000000330000003300000033000000330000003300000033000000310000
+      00220000000B00000000FFFFFF00
+    }
+  end
+  object ServersAndDatabases: TIBDataSet[36]
+    AllowAutoActivateTransaction = False
+    Database = LocalData.LocalDatabase
+    Transaction = LocalData.IBTransaction
+    AfterDelete = ServersAndDatabasesAfterDelete
+    AfterInsert = ServersAndDatabasesAfterInsert
+    AfterPost = ServersAndDatabasesAfterPost
+    BeforeDelete = ServersAndDatabasesBeforeDelete
+    BufferChunks = 1000
+    CachedUpdates = False
+    CaseSensitiveParameterNames = False
+    EnableStatistics = False
+    DeleteSQL.Strings = (
+      'Delete From DATABASESBYSERVER A Where A.ID = :ID'
+    )
+    InsertSQL.Strings = (
+      'Insert Into DATABASESBYSERVER(ITEMTYPE, ID, ITEMNAME, PARENT)'
+      'Values(:ITEMTYPE, :ID, :ITEMNAME, :PARENT)'
+    )
+    RefreshSQL.Strings = (
+      'Select A.ITEMTYPE, A.ID, A.ITEMNAME, A.PARENT,'
+      'count(B.ID) as HasChild'
+      'From DATABASESBYSERVER A'
+      'Left Outer Join DATABASESBYSERVER B on A.ID = B.Parent'
+      'WHERE A.ID = :ID'
+      'Group By  A.ITEMTYPE, A.ID, A.ITEMNAME, A.PARENT'
+      ''
+    )
+    SelectSQL.Strings = (
+      'Select A.ITEMTYPE, A.ID, A.ITEMNAME, A.PARENT,'
+      'count(B.ID) as HasChild'
+      'From DATABASESBYSERVER A'
+      'Left Outer Join DATABASESBYSERVER B on A.ID = B.Parent'
+      'Group By  A.ITEMTYPE, A.ID, A.ITEMNAME, A.PARENT'
+      'Order by 3 asc'
+    )
+    ModifySQL.Strings = (
+      'Update DATABASESBYSERVER A Set '
+      '  A.ITEMTYPE = :ITEMTYPE,'
+      '  A.ITEMNAME = :ITEMNAME,'
+      '  A.PARENT = :PARENT'
+      'Where A.ID = :ID'
+    )
+    GeneratorField.Generator = 'UNIQUEID'
+    GeneratorField.Field = 'ID'
+    GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    GenerateParamNames = False
+    MasterDetailDelay = 0
+    DataSetCloseAction = dcSaveChanges
+    OnValidatePost = ServersAndDatabasesValidatePost
+    left = 80
+    top = 208
+    object ServersAndDatabasesITEMTYPE: TIntegerField
+      FieldKind = fkData
+      FieldName = 'ITEMTYPE'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object ServersAndDatabasesID: TIntegerField
+      FieldKind = fkData
+      FieldName = 'ID'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object ServersAndDatabasesITEMNAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'ITEMNAME'
+      Index = 2
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+      Size = 256
+    end
+    object ServersAndDatabasesPARENT: TIntegerField
+      FieldKind = fkData
+      FieldName = 'PARENT'
+      Index = 3
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object ServersAndDatabasesHASCHILD: TIntegerField
+      FieldKind = fkData
+      FieldName = 'HASCHILD'
+      Index = 4
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+  end
+  object TreeSource: TDataSource[37]
+    DataSet = ServersAndDatabases
+    left = 32
+    top = 208
+  end
+  object ActionList2: TActionList[38]
+    left = 80
+    top = 256
+    object AddServer: TAction
+      Caption = 'Register Server'
+      OnExecute = AddServerExecute
+      OnUpdate = AddServerUpdate
+    end
+    object AddDatabase: TAction
+      Caption = 'Register Existing Database'
+      OnExecute = AddDatabaseExecute
+      OnUpdate = AddDatabaseUpdate
+    end
+    object CreateDatabase: TAction
+      Caption = 'Create New Database'
+      OnExecute = CreateDatabaseExecute
+      OnUpdate = AddDatabaseUpdate
+    end
+    object DeleteNode: TAction
+      Caption = 'Delete'
+      OnExecute = DeleteNodeExecute
+      OnUpdate = DeleteNodeUpdate
+    end
+    object Disconnect: TAction
+      Caption = 'Disconnect'
+      OnExecute = DisconnectExecute
+      OnUpdate = DeleteNodeUpdate
+    end
+    object ShowProperties: TAction
+      Caption = 'Properties'
+      OnExecute = ShowPropertiesExecute
+      OnUpdate = DeleteNodeUpdate
+    end
+    object Reconnect: TAction
+      Caption = 'Reconnect'
+      OnExecute = ReconnectExecute
+      OnUpdate = ReconnectUpdate
+    end
+    object ConnectAs: TAction
+      Caption = 'Connect As'
+      OnExecute = ConnectAsExecute
+      OnUpdate = DeleteNodeUpdate
+    end
+    object DBADropDatabase: TAction
+      Caption = 'Drop Database'
+      OnExecute = DBADropDatabaseExecute
+      OnUpdate = ReconnectUpdate
+    end
+  end
+  object PopupMenu1: TPopupMenu[39]
+    OnPopup = PopupMenu1Popup
+    left = 79
+    top = 301
+    object MenuItem22: TMenuItem
+      Action = AddServer
+    end
+    object MenuItem23: TMenuItem
+      Action = AddDatabase
+    end
+    object MenuItem31: TMenuItem
+      Action = ConnectAs
+    end
+    object MenuItem28: TMenuItem
+      Action = Disconnect
+    end
+    object MenuItem30: TMenuItem
+      Action = Reconnect
+    end
+    object MenuItem25: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem24: TMenuItem
+      Action = CreateDatabase
+    end
+    object MenuItem32: TMenuItem
+      Action = DBADropDatabase
+    end
+    object MenuItem27: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem26: TMenuItem
+      Action = DeleteNode
+    end
+    object MenuItem29: TMenuItem
+      Action = ShowProperties
+    end
+  end
+end

@@ -221,6 +221,7 @@ type
     function GetRemoteProtocol: string;
     function GetSQLObjectsCount: Integer;
     function GetWireCompression: boolean;
+    procedure SetAttachment(AValue: IAttachment);
     procedure SetConfigOverrides(AValue: TStrings);
     procedure SetFirebirdLibraryPathName(AValue: TIBFileName);
     procedure SetSQLDialect(const Value: Integer);
@@ -246,6 +247,11 @@ type
     procedure RemoveSQLObject(Idx: Integer);
     procedure RemoveSQLObjects;
     procedure InternalClose;
+    procedure InternalBeforeClose;
+    procedure InternalAfterClose;
+    procedure InternalBeforeConnect(aDBParams: TStrings; var aDBName: string;
+      var aCreateIfNotExists: boolean);
+    procedure InternalAfterConnect;
     procedure DoOnCreateDatabase;
 
   protected
@@ -282,7 +288,7 @@ type
     procedure RemoveTransaction(Idx: Integer);
     procedure RemoveTransactions;
 
-    property Attachment: IAttachment read FAttachment;
+    property Attachment: IAttachment read FAttachment write SetAttachment;
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property DBSQLDialect : Integer read GetDBSQLDialect;
     property IsReadOnly: Boolean read GetIsReadOnly;
@@ -810,10 +816,31 @@ begin
 end;
 
 procedure TIBDataBase.InternalClose;
+begin
+  CheckActive;
+  InternalBeforeClose;
+  case FCloseAction of
+  caNormal:
+    FAttachment.Disconnect(false);
+  caForce:
+    FAttachment.Disconnect(true);
+  caDropDatabase:
+    FAttachment.DropDatabase;
+  end;
+  FAttachment := nil;
+  FHiddenPassword := '';
+  FCloseAction := caNormal;
+
+  if not (csDesigning in ComponentState) then
+    MonitorHook.DBDisconnect(Self);
+
+  InternalAfterClose;
+end;
+
+procedure TIBDataBase.InternalBeforeClose;
 var
   i: Integer;
 begin
-  CheckActive;
   { Tell all connected transactions that we're disconnecting.
     This is so transactions can commit/rollback, accordingly
   }
@@ -838,24 +865,37 @@ begin
     end;
   end;
 
-  case FCloseAction of
-  caNormal:
-    FAttachment.Disconnect(false);
-  caForce:
-    FAttachment.Disconnect(true);
-  caDropDatabase:
-    FAttachment.DropDatabase;
-  end;
-  FAttachment := nil;
-  FHiddenPassword := '';
-  FCloseAction := caNormal;
+end;
 
-  if not (csDesigning in ComponentState) then
-    MonitorHook.DBDisconnect(Self);
-
+procedure TIBDataBase.InternalAfterClose;
+var
+  i: Integer;
+begin
   for i := 0 to FSQLObjects.Count - 1 do
     if FSQLObjects[i] <> nil then
       SQLObjects[i].DoAfterDatabaseDisconnect;
+end;
+
+procedure TIBDataBase.InternalBeforeConnect(aDBParams: TStrings; var aDBName: string;
+                          var aCreateIfNotExists: boolean);
+var i: integer;
+begin
+  {Opportunity to override defaults}
+  for i := 0 to FSQLObjects.Count - 1 do
+  begin
+      if FSQLObjects[i] <> nil then
+        SQLObjects[i].DoBeforeDatabaseConnect(aDBParams,aDBName, aCreateIfNotExists);
+  end;
+end;
+
+procedure TIBDataBase.InternalAfterConnect;
+var i: integer;
+begin
+  for i := 0 to FSQLObjects.Count - 1 do
+  begin
+      if FSQLObjects[i] <> nil then
+        SQLObjects[i].DoAfterDatabaseConnect;
+  end;
 end;
 
  procedure TIBDataBase.DoOnCreateDatabase;
@@ -1051,7 +1091,6 @@ procedure TIBDataBase.DoConnect;
 
 var
   TempDBParams: TStrings;
-  I: integer;
   aDBName, oldDBName: string;
   Status: IStatus;
   CharSetID: integer;
@@ -1089,12 +1128,7 @@ begin
    if UseDefaultSystemCodePage then
      TempDBParams.Values['lc_ctype'] :='UTF8';
    {$endif}
-   {Opportunity to override defaults}
-   for i := 0 to FSQLObjects.Count - 1 do
-   begin
-       if FSQLObjects[i] <> nil then
-         SQLObjects[i].DoBeforeDatabaseConnect(TempDBParams,aDBName, aCreateIfNotExists);
-   end;
+   InternalBeforeConnect(TempDBParams,aDBName,aCreateIfNotExists);
 
    repeat
      { Generate a new DPB if necessary }
@@ -1181,11 +1215,7 @@ begin
   if not (csDesigning in ComponentState) then
     FDBName := aDBName; {Synchronise at run time}
   ValidateClientSQLDialect;
-  for i := 0 to FSQLObjects.Count - 1 do
-  begin
-      if FSQLObjects[i] <> nil then
-        SQLObjects[i].DoAfterDatabaseConnect;
-  end;
+  InternalAfterConnect;
   if not (csDesigning in ComponentState) then
     MonitorHook.DBConnect(Self);
 end;
@@ -1445,6 +1475,35 @@ end;
 function TIBDataBase.GetWireCompression: boolean;
 begin
   Result := CompareText(FConfigOverrides.Values['WireCompression'],'true') = 0;
+end;
+
+procedure TIBDataBase.SetAttachment(AValue: IAttachment);
+begin
+  if FAttachment = AValue then Exit;
+  if FAttachment <> nil then
+  begin
+    if Assigned(BeforeDisconnect) then
+      BeforeDisconnect(self);
+    InternalBeforeClose;
+    FAttachment := nil;
+    FFirebirdAPI := nil;
+    InternalAfterClose;
+    if Assigned(AfterDisconnect) then
+      AfterDisconnect(self);
+  end;
+  if Assigned(BeforeConnect) then
+    BeforeConnect(self);
+  FAttachment := AValue;
+  if FAttachment <> nil then
+  begin
+    ValidateClientSQLDialect;
+    FDBName := FAttachment.GetConnectString;
+    if FFirebirdLibraryPathName <> '' then
+      FFirebirdLibraryPathName := FAttachment.getFirebirdAPI.GetFBLibrary.GetLibraryFilePath;
+    InternalAfterConnect;
+    if Assigned(AfterConnect) then
+      AfterConnect(self);
+  end;
 end;
 
 procedure TIBDataBase.SetConfigOverrides(AValue: TStrings);
@@ -2349,7 +2408,7 @@ end;
   parameter buffer, and return it and its length
   in DPB and DPBLength, respectively. }
 
-function TIBDatabase.GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
+function TIBDataBase.GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
 var
   i, j: Integer;
   DPBVal: UShort;

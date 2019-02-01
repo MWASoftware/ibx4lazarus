@@ -31,7 +31,7 @@ object SelectSQLResults: TSelectSQLResults
   end
   object SelectQuery: TIBQuery
     AllowAutoActivateTransaction = True
-    Database = DatabaseData.IBDatabase1
+    Database = DBDataModule.IBDatabase1
     Transaction = IBTransaction1
     AfterOpen = SelectQueryAfterOpen
     BufferChunks = 1000
@@ -47,7 +47,7 @@ object SelectSQLResults: TSelectSQLResults
   end
   object IBTransaction1: TIBTransaction
     Active = False
-    DefaultDatabase = DatabaseData.IBDatabase1
+    DefaultDatabase = DBDataModule.IBDatabase1
     Params.Strings = (
       'concurrency'
       'nowait'

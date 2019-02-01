@@ -32,18 +32,19 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  DBGrids, db, IBDatabase, IBTable, IBCustomDataSet, IBDynamicGrid, IB;
+  DBGrids, StdCtrls, db, IBDatabase, IBTable, IBCustomDataSet, IBDynamicGrid,
+  IB;
 
 type
 
   { TForm1 }
 
   TForm1 = class(TForm)
+    CheckBox1: TCheckBox;
     Datasource1: TDataSource;
     DataSource2: TDataSource;
     IBDatabase1: TIBDatabase;
     IBDynamicGrid1: TIBDynamicGrid;
-    IBDynamicGrid2: TIBDynamicGrid;
     Employees: TIBTable;
     EmployeesDEPT_NO: TIBStringField;
     EmployeesEMP_NO: TSmallintField;
@@ -64,10 +65,14 @@ type
     DeptsLOCATION: TIBStringField;
     DeptsMNGR_NO: TSmallintField;
     DeptsPHONE_NO: TIBStringField;
+    IBDynamicGrid2: TIBDynamicGrid;
     IBTransaction1: TIBTransaction;
     Panel1: TPanel;
     Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
     Splitter1: TSplitter;
+    procedure CheckBox1Change(Sender: TObject);
     procedure EmployeesSALARYGetText(Sender: TField; var aText: string;
       DisplayText: Boolean);
     procedure FormShow(Sender: TObject);
@@ -112,6 +117,14 @@ begin
     aText := FormatFloat('$#,##0.00',Sender.AsFloat)
   else
     aText := Sender.AsString;
+end;
+
+procedure TForm1.CheckBox1Change(Sender: TObject);
+begin
+  if (Sender as TCheckbox).Checked then
+    Employees.Filter := 'Salary < 100000'
+  else
+    Employees.Filter := '';
 end;
 
 procedure TForm1.IBDatabase1AfterConnect(Sender: TObject);

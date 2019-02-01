@@ -195,16 +195,16 @@ object AddShadowSetDlg: TAddShadowSetDlg
     end
   end
   object ExecSQL: TIBSQL
-    Database = DatabaseData.IBDatabase1
+    Database = DBDataModule.IBDatabase1
     GenerateParamNames = False
     UniqueParamNames = False
     ParamCheck = True
-    Transaction = DatabaseData.CurrentTransaction
+    Transaction = DBDataModule.CurrentTransaction
     left = 494
     top = 226
   end
   object IBDatabaseInfo: TIBDatabaseInfo
-    Database = DatabaseData.IBDatabase1
+    Database = DBDataModule.IBDatabase1
     left = 496
     top = 98
   end

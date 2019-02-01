@@ -19,8 +19,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="87"/>
-        <CursorPos X="21" Y="98"/>
+        <TopLine Value="92"/>
+        <CursorPos X="28" Y="127"/>
         <UsageCount Value="39"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -189,7 +189,8 @@
       <Unit25>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="4" Y="8"/>
+        <TopLine Value="87"/>
+        <CursorPos X="34" Y="123"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit25>
@@ -246,8 +247,8 @@
       <Unit33>
         <Filename Value="../../runtime/nongui/IBTable.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="215"/>
-        <CursorPos Y="236"/>
+        <TopLine Value="54"/>
+        <CursorPos X="15" Y="85"/>
         <UsageCount Value="10"/>
       </Unit33>
       <Unit34>
@@ -523,7 +524,48 @@
         <UsageCount Value="10"/>
       </Unit72>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="10" HistoryIndex="9">
+      <Position1>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="98" Column="21" TopLine="87"/>
+      </Position1>
+      <Position2>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="100" Column="21" TopLine="89"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="99" Column="21" TopLine="88"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="100" Column="21" TopLine="89"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="101" Column="21" TopLine="90"/>
+      </Position5>
+      <Position6>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="100" Column="21" TopLine="89"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="101" Column="21" TopLine="90"/>
+      </Position7>
+      <Position8>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="102" Column="21" TopLine="91"/>
+      </Position8>
+      <Position9>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="101" Column="21" TopLine="90"/>
+      </Position9>
+      <Position10>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="103" Column="21" TopLine="92"/>
+      </Position10>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>
