@@ -54,7 +54,6 @@ type
     FOwner: TIBLookupComboEditBox;
   protected
     procedure ActiveChanged; override;
-    procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     procedure RecordChanged(Field: TField); override;
     procedure UpdateData; override;
   public
@@ -129,7 +128,6 @@ type
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetItemIndex(const Val: integer); override;
-    function SQLSafe(aText: string): string;
     procedure UpdateShowing; override;
     procedure UpdateData(Sender: TObject); override;
   public
@@ -155,7 +153,7 @@ type
 
 implementation
 
-uses Variants, LCLProc, LazUTF8;
+uses Variants, LCLProc, LazUTF8, IBUtils;
 
 { TIBLookupControlLink }
 
@@ -175,13 +173,6 @@ end;
 procedure TIBLookupComboDataLink.ActiveChanged;
 begin
   FOwner.ActiveChanged(self)
-end;
-
-procedure TIBLookupComboDataLink.DataEvent(Event: TDataEvent; Info: Ptrint);
-begin
-  inherited DataEvent(Event, Info);
-  if Event = deLayoutChange then
-   FOwner.LookupCache := FOwner.LookupCache; {sneaky way of calling UpdateLookup}
 end;
 
 procedure TIBLookupComboDataLink.RecordChanged(Field: TField);
@@ -392,10 +383,10 @@ begin
       FilterText := Text;
     if cbactSearchCaseSensitive in AutoCompleteText then
       Parser.Add2WhereClause(GetRelationNameQualifier + '"' + ListField + '" Like ''' +
-                                  SQLSafe(FilterText) + '%''')
+                                  SQLSafeString(FilterText) + '%''')
     else
       Parser.Add2WhereClause('Upper(' + GetRelationNameQualifier + '"' +  ListField + '") Like Upper(''' +
-                                  SQLSafe(FilterText) + '%'')');
+                                  SQLSafeString(FilterText) + '%'')');
 
     if cbactSearchAscending in AutoCompleteText then
     begin
@@ -560,17 +551,6 @@ begin
   FLastKeyValue := KeyValue;
 end;
 
-function TIBLookupComboEditBox.SQLSafe(aText: string): string;
-var I: integer;
-begin
-  Result := '';
-  for I := 1 to length(aText) do
-    if aText[I] = '''' then
-      Result := Result + ''''''
-    else
-      Result := Result + aText[I];
-end;
-
 procedure TIBLookupComboEditBox.UpdateShowing;
 begin
   inherited UpdateShowing;
@@ -610,8 +590,9 @@ end;
 
 procedure TIBLookupComboEditBox.CloseUp;
 begin
-  inherited CloseUp;
   inherited DoEdit;
+  inherited CloseUp;
+  EditingDone;
 end;
 
 procedure TIBLookupComboEditBox.Select;
