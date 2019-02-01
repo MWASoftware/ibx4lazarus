@@ -9,7 +9,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="23" Y="17"/>
-        <UsageCount Value="53"/>
+        <UsageCount Value="54"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -17,9 +17,10 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="16"/>
         <CursorPos X="16" Y="36"/>
-        <UsageCount Value="53"/>
+        <UsageCount Value="54"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -32,25 +33,22 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="28"/>
         <CursorPos X="40" Y="25"/>
-        <UsageCount Value="38"/>
+        <UsageCount Value="39"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="39"/>
-        <CursorPos Y="57"/>
-        <UsageCount Value="24"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="569"/>
+        <CursorPos X="15" Y="588"/>
+        <UsageCount Value="25"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
         <UnitName Value="DBCtrls"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="845"/>
-        <CursorPos X="30" Y="864"/>
-        <UsageCount Value="19"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="825"/>
+        <CursorPos X="14" Y="844"/>
+        <UsageCount Value="20"/>
       </Unit4>
       <Unit5>
         <Filename Value="../../../../lcl/include/dblookup.inc"/>
@@ -68,17 +66,16 @@
       </Unit6>
       <Unit7>
         <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="46"/>
-        <CursorPos X="44" Y="203"/>
-        <UsageCount Value="19"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="58"/>
+        <CursorPos X="3" Y="60"/>
+        <UsageCount Value="20"/>
       </Unit7>
       <Unit8>
         <Filename Value="../../../../lcl/include/customdbcombobox.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="35"/>
-        <CursorPos X="3" Y="37"/>
+        <TopLine Value="4"/>
+        <CursorPos X="35" Y="35"/>
         <UsageCount Value="16"/>
       </Unit8>
       <Unit9>
@@ -124,8 +121,8 @@
       <Unit15>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1767"/>
-        <CursorPos X="14" Y="1785"/>
+        <TopLine Value="342"/>
+        <CursorPos X="14" Y="342"/>
         <UsageCount Value="15"/>
       </Unit15>
       <Unit16>
@@ -282,8 +279,8 @@
       <Unit38>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/fields.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2029"/>
-        <CursorPos X="3" Y="2034"/>
+        <TopLine Value="558"/>
+        <CursorPos X="3" Y="561"/>
         <UsageCount Value="10"/>
       </Unit38>
       <Unit39>
@@ -584,122 +581,7 @@
         <UsageCount Value="10"/>
       </Unit79>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
-      <Position1>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="183" Column="16" TopLine="152"/>
-      </Position1>
-      <Position2>
-        <Filename Value="../../../../lcl/dbctrls.pp"/>
-        <Caret Line="907" Column="64" TopLine="889"/>
-      </Position2>
-      <Position3>
-        <Filename Value="../../../../lcl/dbctrls.pp"/>
-        <Caret Line="861" Column="15" TopLine="861"/>
-      </Position3>
-      <Position4>
-        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <Caret Line="185" Column="3" TopLine="174"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../../../lcl/dbctrls.pp"/>
-        <Caret Line="863" Column="18" TopLine="836"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <Caret Line="199" Column="11" TopLine="175"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="183" Column="16" TopLine="152"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="92" Column="14" TopLine="61"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="234" Column="38" TopLine="203"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="338" Column="14" TopLine="307"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="375" Column="16" TopLine="345"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="388" Column="17" TopLine="357"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="124" Column="20" TopLine="102"/>
-      </Position14>
-      <Position15>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="603" Column="19" TopLine="572"/>
-      </Position15>
-      <Position16>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="609" Column="21" TopLine="578"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="625" Column="9" TopLine="111"/>
-      </Position17>
-      <Position18>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="183" Column="17" TopLine="164"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="120" Column="16" TopLine="100"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="608" TopLine="573"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="120" Column="26" TopLine="102"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="179" TopLine="152"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <Caret Line="199" Column="12" TopLine="174"/>
-      </Position23>
-      <Position24>
-        <Filename Value="../../../../lcl/dbctrls.pp"/>
-        <Caret Line="864" Column="15" TopLine="844"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <Caret Line="203" Column="31" TopLine="175"/>
-      </Position25>
-      <Position26>
-        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <Caret Line="183" Column="46" TopLine="175"/>
-      </Position26>
-      <Position27>
-        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-      </Position27>
-      <Position28>
-        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <Caret Line="71" Column="18" TopLine="40"/>
-      </Position28>
-      <Position29>
-        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <Caret Line="199" Column="20" TopLine="168"/>
-      </Position29>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>

@@ -585,12 +585,16 @@ end;
 
 procedure TIBLookupComboEditBox.Change;
 begin
-  THackedCustomComboBox(self).CallChange;
+  if IsUnbound then
+    THackedCustomComboBox(self).CallChange
+  else
+    inherited Change;
 end;
 
 procedure TIBLookupComboEditBox.CloseUp;
 begin
-  inherited DoEdit;
+  if IsUnbound then
+    inherited DoEdit;
   inherited CloseUp;
   EditingDone;
 end;
@@ -598,7 +602,8 @@ end;
 procedure TIBLookupComboEditBox.Select;
 begin
   inherited Select;
-  inherited DoEdit;
+  if IsUnbound then
+    inherited DoEdit;
 end;
 
 function TIBLookupComboEditBox.DoEdit: boolean;
