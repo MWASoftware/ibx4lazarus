@@ -63,6 +63,8 @@ IBX Change Log  version (2.3-3 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
    This only applies to columns with an SQL Type of SQL_VARYING and SQL_TEXT.
 
 8. TIBDataSet now raises an exception when ParamByName called with an invalid parameter name.
+   Uses "FindParam" if in order to find out if a parameter with a given name exists
+   and without raising and exception if it does not.
 
 9. TIBQuery now uses IBX SQL Parser instead of the TParams SQL parser in order to ensure
    consistency with SQL queries.
@@ -100,6 +102,25 @@ IBX Change Log  version (2.3-3 Build 11336) Fri, 28 Dec 2018 10:04:17 +0000
 17. TIBDatabase.Attachment and TIBXServicesConnection.ServicesIntf properties are now
     read/write. This should enabled (e.g.) multiple instances of TIBDatabase to share
     the same database connection.
+
+18. TIBDataSet and TIBQuery now support the TDataSet "Filter" property.
+    if provided, this should be an conditional SQL expression suitable for
+    including in an SQL Select statement "where" clause. If non-empty and the
+    "Filtered" property is true then the SQL expression provided as the value of
+    the "Filter" property is "ANDed" with any existing condition statement
+    in the SQL statement's "Where" clause.
+
+    If the "Filter" property is set at run time, the "Filtered" property is true
+    and the dataset is already open, then the dataset is closed and re-opened automatically.
+
+    The "Filter" condition may include IBX style parameters. In which case, their
+    value must be set by the dataset's "OnBeforeOpen" event handler.
+
+    This is a public property for TIBDataSet and TIBQuery query and intended for
+    use at run time.
+
+    Note: The property is a published property of TIBTable. The TIBTable functionality
+    is unaffected by this change.
 
 IBX Change Log  version (2.3-2) Wed, 05 Dec 2018 12:19:23 +0000
 

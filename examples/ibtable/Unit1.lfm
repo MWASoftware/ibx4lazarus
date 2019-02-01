@@ -3,13 +3,14 @@ object Form1: TForm1
   Height = 453
   Top = 397
   Width = 943
+  Align = alTop
   Caption = 'IB Tables Example'
   ClientHeight = 453
   ClientWidth = 943
   DefaultMonitor = dmPrimary
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.0.0.2'
+  LCLVersion = '2.0.0.3'
   object Panel1: TPanel
     Left = 0
     Height = 453
@@ -63,88 +64,120 @@ object Form1: TForm1
       Top = 1
       Width = 5
     end
-    object IBDynamicGrid2: TIBDynamicGrid
+    object Panel3: TPanel
       Left = 176
       Height = 451
       Top = 1
       Width = 766
       Align = alClient
-      Color = clWindow
-      Columns = <      
-        item
-          Title.Alignment = taCenter
-          Title.Caption = 'Last Name'
-          Width = 150
-          FieldName = 'LAST_NAME'
-          AutoSizeColumn = True
-          InitialSortColumn = False
-          DBLookupProperties.ItemHeight = 0
-          DBLookupProperties.ItemWidth = 0
-          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        end      
-        item
-          Title.Alignment = taCenter
-          Title.Caption = 'First Name'
-          Width = 150
-          FieldName = 'FIRST_NAME'
-          AutoSizeColumn = False
-          InitialSortColumn = False
-          DBLookupProperties.ItemHeight = 0
-          DBLookupProperties.ItemWidth = 0
-          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        end      
-        item
-          ReadOnly = True
-          Title.Alignment = taCenter
-          Title.Caption = 'Full Name'
-          Width = 120
-          FieldName = 'FULL_NAME'
-          AutoSizeColumn = True
-          InitialSortColumn = False
-          DBLookupProperties.ItemHeight = 0
-          DBLookupProperties.ItemWidth = 0
-          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        end      
-        item
-          Title.Alignment = taCenter
-          Title.Caption = 'Emp No.'
-          Width = 80
-          FieldName = 'EMP_NO'
-          AutoSizeColumn = False
-          InitialSortColumn = False
-          DBLookupProperties.ItemHeight = 0
-          DBLookupProperties.ItemWidth = 0
-          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        end      
-        item
-          Title.Alignment = taCenter
-          Title.Caption = 'Hire Date'
-          Width = 120
-          FieldName = 'HIRE_DATE'
-          AutoSizeColumn = False
-          InitialSortColumn = False
-          DBLookupProperties.ItemHeight = 0
-          DBLookupProperties.ItemWidth = 0
-          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        end      
-        item
-          Title.Alignment = taCenter
-          Title.Caption = 'Salary'
-          Width = 100
-          FieldName = 'SALARY'
-          AutoSizeColumn = False
-          InitialSortColumn = False
-          DBLookupProperties.ItemHeight = 0
-          DBLookupProperties.ItemWidth = 0
-          DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-        end>
-      DataSource = Datasource1
-      Scrollbars = ssAutoVertical
+      BevelOuter = bvNone
+      ClientHeight = 451
+      ClientWidth = 766
       TabOrder = 2
-      ExpandEditorPanelBelowRow = False
-      Descending = False
-      EditorBorderStyle = bsSingle
-      DefaultPositionAtEnd = False
+      object Panel4: TPanel
+        Left = 0
+        Height = 20
+        Top = 0
+        Width = 766
+        Align = alTop
+        BevelOuter = bvNone
+        ClientHeight = 20
+        ClientWidth = 766
+        TabOrder = 0
+        object CheckBox1: TCheckBox
+          Left = 517
+          Height = 22
+          Top = 0
+          Width = 239
+          Anchors = [akTop, akRight]
+          Caption = 'Show only Salaries Below $100,000'
+          OnChange = CheckBox1Change
+          TabOrder = 0
+        end
+      end
+      object IBDynamicGrid2: TIBDynamicGrid
+        Left = 0
+        Height = 431
+        Top = 20
+        Width = 766
+        Align = alClient
+        Color = clWindow
+        Columns = <        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Last Name'
+            Width = 150
+            FieldName = 'LAST_NAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'First Name'
+            Width = 150
+            FieldName = 'FIRST_NAME'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            ReadOnly = True
+            Title.Alignment = taCenter
+            Title.Caption = 'Full Name'
+            Width = 120
+            FieldName = 'FULL_NAME'
+            AutoSizeColumn = True
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Emp No.'
+            Width = 80
+            FieldName = 'EMP_NO'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Hire Date'
+            Width = 120
+            FieldName = 'HIRE_DATE'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end        
+          item
+            Title.Alignment = taCenter
+            Title.Caption = 'Salary'
+            Width = 100
+            FieldName = 'SALARY'
+            AutoSizeColumn = False
+            InitialSortColumn = False
+            DBLookupProperties.ItemHeight = 0
+            DBLookupProperties.ItemWidth = 0
+            DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+          end>
+        DataSource = Datasource1
+        Scrollbars = ssAutoVertical
+        TabOrder = 1
+        ExpandEditorPanelBelowRow = False
+        Descending = False
+        EditorBorderStyle = bsSingle
+        DefaultPositionAtEnd = False
+      end
     end
   end
   object IBDatabase1: TIBDatabase
@@ -162,7 +195,7 @@ object Form1: TForm1
     TraceFlags = []
     UseDefaultSystemCodePage = False
     left = 184
-    top = 24
+    top = 56
   end
   object IBTransaction1: TIBTransaction
     Active = False
@@ -173,7 +206,7 @@ object Form1: TForm1
       'nowait'
     )
     left = 272
-    top = 24
+    top = 56
   end
   object Depts: TIBTable
     AllowAutoActivateTransaction = True
@@ -192,7 +225,7 @@ object Form1: TForm1
     ReadOnly = True
     TableName = 'DEPARTMENT'
     left = 424
-    top = 24
+    top = 56
     object DeptsDEPT_NO: TIBStringField
       DisplayWidth = 3
       FieldKind = fkData
@@ -276,12 +309,12 @@ object Form1: TForm1
   object DataSource2: TDataSource
     DataSet = Depts
     left = 360
-    top = 24
+    top = 56
   end
   object Datasource1: TDataSource
     DataSet = Employees
     left = 496
-    top = 24
+    top = 56
   end
   object Employees: TIBTable
     AllowAutoActivateTransaction = False
@@ -292,6 +325,7 @@ object Form1: TForm1
     CachedUpdates = False
     DataSetCloseAction = dcSaveChanges
     EnableStatistics = False
+    Filtered = True
     GeneratorField.Generator = 'EMP_NO_GEN                                                                                                                  '
     GeneratorField.Field = 'EMP_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -301,7 +335,7 @@ object Form1: TForm1
     MasterDetailDelay = 300
     TableName = 'EMPLOYEE'
     left = 576
-    top = 24
+    top = 56
     object EmployeesEMP_NO: TSmallintField
       DisplayWidth = 10
       FieldKind = fkData
