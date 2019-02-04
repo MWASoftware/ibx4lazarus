@@ -640,10 +640,10 @@ end;
 {$ifend}
 
 {$if lcl_fullversion = 2000002}
-procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
+procedure TIBLookupComboEditBox.UTF8KeyPress(var UTF8Key: TUTF8Char);
 begin
   if DataSource = nil then
-    THackedCustomComboBox(self).UTF8KeyPress(UTF8Key)
+    THackedCustomComboBox(self).CallUTF8KeyPress(UTF8Key)
   else
     inherited;
 end;
