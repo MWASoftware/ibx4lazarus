@@ -75,33 +75,6 @@ type
     CurrentTransaction: TIBTransaction;
     DatabaseQuery: TIBQuery;
     Attachments: TIBQuery;
-    DatabaseQueryMONBACKUP_STATE: TIBSmallintField;
-    DatabaseQueryMONCREATION_DATE: TDateTimeField;
-    DatabaseQueryMONCRYPT_PAGE: TIBLargeIntField;
-    DatabaseQueryMONDATABASE_NAME: TIBStringField;
-    DatabaseQueryMONFORCED_WRITES: TIBSmallintField;
-    DatabaseQueryMONNEXT_TRANSACTION: TIBLargeIntField;
-    DatabaseQueryMONODS_MAJOR: TIBSmallintField;
-    DatabaseQueryMONODS_MINOR: TIBSmallintField;
-    DatabaseQueryMONOLDEST_ACTIVE: TIBLargeIntField;
-    DatabaseQueryMONOLDEST_SNAPSHOT: TIBLargeIntField;
-    DatabaseQueryMONOLDEST_TRANSACTION: TIBLargeIntField;
-    DatabaseQueryMONOWNER: TIBStringField;
-    DatabaseQueryMONPAGES: TIBLargeIntField;
-    DatabaseQueryMONPAGE_BUFFERS: TIBIntegerField;
-    DatabaseQueryMONPAGE_SIZE: TIBSmallintField;
-    DatabaseQueryMONREAD_ONLY: TIBSmallintField;
-    DatabaseQueryMONRESERVE_SPACE: TIBSmallintField;
-    DatabaseQueryMONSEC_DATABASE: TIBStringField;
-    DatabaseQueryMONSHUTDOWN_MODE: TIBSmallintField;
-    DatabaseQueryMONSQL_DIALECT: TIBSmallintField;
-    DatabaseQueryMONSTAT_ID: TIBIntegerField;
-    DatabaseQueryMONSWEEP_INTERVAL: TIBIntegerField;
-    DatabaseQueryRDBCHARACTER_SET_NAME: TIBStringField;
-    DatabaseQueryRDBDESCRIPTION: TIBMemoField;
-    DatabaseQueryRDBLINGER: TIBIntegerField;
-    DatabaseQueryRDBRELATION_ID: TIBSmallintField;
-    DatabaseQueryRDBSECURITY_CLASS: TIBStringField;
     DBTables: TIBQuery;
     AuthMappings: TIBQuery;
     AccessRights: TIBQuery;
@@ -167,8 +140,6 @@ type
     procedure CurrentTransactionAfterTransactionEnd(Sender: TObject);
     procedure DatabaseQueryAfterOpen(DataSet: TDataSet);
     procedure DatabaseQueryBeforeClose(DataSet: TDataSet);
-    procedure DatabaseQueryMONCREATION_DATEGetText(Sender: TField;
-      var aText: string; DisplayText: Boolean);
     procedure DBCharSetAfterClose(DataSet: TDataSet);
     procedure DBCharSetBeforeOpen(DataSet: TDataSet);
     procedure IBDatabase1AfterConnect(Sender: TObject);
@@ -222,6 +193,7 @@ type
     function GetAuthMethod: string;
     function GetAutoAdmin: boolean;
     function GetDatabaseName: string;
+    function GetDBDateCreated: string;
     procedure GetDBFlags;
     function GetDBOwner: string;
     function GetDBReadOnly: boolean;
@@ -295,6 +267,7 @@ type
     property RoleName: string read GetRoleName;
     property DBOwner: string read GetDBOwner;
     property DBSQLDialect: integer read GetDBSQLDialect write SetDBSQLDialect;
+    property DBDateCreated: string read GetDBDateCreated;
     property ServerName: string read GetServerName;
     property ServiceUserName: string read FServiceUserName;
     property HasUserAdminPrivilege: boolean read FHasUserAdminPrivilege;
@@ -594,6 +567,16 @@ begin
     Result := DatabaseQuery.FieldByName('MON$DATABASE_NAME').AsString
   else
     Result := FDatabasePathName;
+end;
+
+function TDBDataModule.GetDBDateCreated: string;
+begin
+  with DefaultFormatSettings do
+  try
+    Result := FormatDateTime(LongDateFormat + ' ' + LongTimeFormat,DatabaseQuery.FieldByName('MON$CREATION_DATE').AsDateTime);
+  except
+    Result := 'unknown';
+  end;
 end;
 
 function TDBDataModule.GetDBReadOnly: boolean;
@@ -1587,16 +1570,6 @@ end;
 procedure TDBDataModule.DatabaseQueryBeforeClose(DataSet: TDataSet);
 begin
   DBCharSet.Active := false;
-end;
-
-procedure TDBDataModule.DatabaseQueryMONCREATION_DATEGetText(Sender: TField;
-  var aText: string; DisplayText: Boolean);
-begin
-  if DisplayText then
-    with DefaultFormatSettings do
-      aText := FormatDateTime(LongDateFormat + ' ' + LongTimeFormat,Sender.AsDateTime)
-  else
-      aText := Sender.AsString;
 end;
 
 procedure TDBDataModule.DBCharSetAfterClose(DataSet: TDataSet);

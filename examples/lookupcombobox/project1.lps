@@ -9,7 +9,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="23" Y="17"/>
-        <UsageCount Value="53"/>
+        <UsageCount Value="54"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -19,8 +19,8 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <TopLine Value="16"/>
-        <CursorPos X="11" Y="36"/>
-        <UsageCount Value="53"/>
+        <CursorPos X="16" Y="36"/>
+        <UsageCount Value="54"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -33,22 +33,22 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="28"/>
         <CursorPos X="40" Y="25"/>
-        <UsageCount Value="38"/>
+        <UsageCount Value="39"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="105"/>
-        <CursorPos X="36" Y="120"/>
-        <UsageCount Value="24"/>
+        <TopLine Value="569"/>
+        <CursorPos X="15" Y="588"/>
+        <UsageCount Value="25"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
         <UnitName Value="DBCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="724"/>
-        <CursorPos X="17" Y="742"/>
-        <UsageCount Value="19"/>
+        <TopLine Value="825"/>
+        <CursorPos X="14" Y="844"/>
+        <UsageCount Value="20"/>
       </Unit4>
       <Unit5>
         <Filename Value="../../../../lcl/include/dblookup.inc"/>
@@ -67,15 +67,15 @@
       <Unit7>
         <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="44"/>
-        <CursorPos X="3" Y="46"/>
-        <UsageCount Value="19"/>
+        <TopLine Value="58"/>
+        <CursorPos X="3" Y="60"/>
+        <UsageCount Value="20"/>
       </Unit7>
       <Unit8>
         <Filename Value="../../../../lcl/include/customdbcombobox.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="35"/>
-        <CursorPos X="3" Y="37"/>
+        <TopLine Value="4"/>
+        <CursorPos X="35" Y="35"/>
         <UsageCount Value="16"/>
       </Unit8>
       <Unit9>
@@ -121,8 +121,8 @@
       <Unit15>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1767"/>
-        <CursorPos X="14" Y="1785"/>
+        <TopLine Value="342"/>
+        <CursorPos X="14" Y="342"/>
         <UsageCount Value="15"/>
       </Unit15>
       <Unit16>
@@ -279,8 +279,8 @@
       <Unit38>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/fields.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2029"/>
-        <CursorPos X="3" Y="2034"/>
+        <TopLine Value="558"/>
+        <CursorPos X="3" Y="561"/>
         <UsageCount Value="10"/>
       </Unit38>
       <Unit39>
@@ -581,12 +581,7 @@
         <UsageCount Value="10"/>
       </Unit79>
     </Units>
-    <JumpHistory Count="1">
-      <Position1>
-        <Filename Value="Unit1.pas"/>
-        <Caret Line="36" Column="11" TopLine="16"/>
-      </Position1>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>
