@@ -127,6 +127,9 @@ type
     procedure CloseUp; override;
     procedure Select; override;
     {$ifend}
+    {$if lcl_fullversion = 2000002}
+    procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
+    {$ifend}
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -578,6 +581,8 @@ begin
   FModified := false;
 end;
 
+
+{Workarounds due to bugs in various Lazarus 2.0 release candidates}
 {$if lcl_fullversion >= 2000002}
 type
 
@@ -586,6 +591,7 @@ type
   THackedCustomComboBox = class(TCustomComboBox)
   private
     procedure CallChange;
+    procedure CallUTF8KeyPress(var UTF8Key: TUTF8Char);
   end;
 
 { THackedCustomComboBox }
@@ -593,6 +599,11 @@ type
 procedure THackedCustomComboBox.CallChange;
 begin
   inherited Change;
+end;
+
+procedure THackedCustomComboBox.CallUTF8KeyPress(var UTF8Key: TUTF8Char);
+begin
+  inherited UTF8KeyPress(UTF8Key);
 end;
 
 procedure TIBLookupComboEditBox.Change;
@@ -627,6 +638,17 @@ begin
     Result := inherited DoEdit;
 end;
 {$ifend}
+
+{$if lcl_fullversion = 2000002}
+procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
+begin
+  if DataSource = nil then
+    THackedCustomComboBox(self).UTF8KeyPress(UTF8Key)
+  else
+    inherited;
+end;
+{$ifend}
+
 
 constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
 begin
