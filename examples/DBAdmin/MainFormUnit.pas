@@ -39,6 +39,7 @@ type
     ConfigDataLabel: TLabel;
     ConfigDataSource: TDataSource;
     Edit12: TEdit;
+    DBDateCreated: TEdit;
     Edit2: TEdit;
     Edit3: TEdit;
     Edit4: TEdit;
@@ -171,7 +172,6 @@ type
     DatabaseOnline: TCheckBox;
     DBCharacterSet: TIBLookupComboEditBox;
     DBCharSetRO: TDBEdit;
-    DateDbCreated: TDBEdit;
     DBEdit4: TDBEdit;
     DBIsReadOnly: TCheckBox;
     DBText1: TDBText;
@@ -1085,6 +1085,7 @@ begin
     ServerVersionNo.Text :=  IBDatabaseInfo.Version;
     DBSQLDialect.Text :=  IntToStr(DBDataModule.DBSQLDialect);
     ConnectString.Text := DBDataModule.IBDatabase1.DatabaseName;
+    DBDateCreated.Text := DBDataModule.DBDateCreated;
     Edit10.Text := IntToStr(IBDatabaseInfo.CurrentMemory);
     Edit11.Text := IntToStr(IBDatabaseInfo.MaxMemory);
     PageBuffers.Text := IntToStr(DBDataModule.PageBuffers);
