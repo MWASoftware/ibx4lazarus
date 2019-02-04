@@ -27,8 +27,6 @@ inherited DBAMainForm: TDBAMainForm
     Left = 157
     Height = 557
     Width = 1017
-    ActivePage = LimboTab
-    TabIndex = 10
     inherited Properties: TTabSheet
       ClientHeight = 525
       ClientWidth = 1011
@@ -303,10 +301,12 @@ inherited DBAMainForm: TDBAMainForm
       end
       inherited ValidateOptions: TPageControl
         inherited ValidateOptionsTab: TTabSheet
-          ClientHeight = 102
+          ClientHeight = 104
+          ClientWidth = 318
         end
         inherited RepairOptionsTab: TTabSheet
-          ClientHeight = 102
+          ClientHeight = 104
+          ClientWidth = 318
         end
       end
       inherited Panel8: TPanel
