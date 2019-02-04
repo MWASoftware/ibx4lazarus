@@ -119,7 +119,7 @@ type
     procedure CheckAndInsert;
     procedure DoEnter; override;
     procedure DoExit; override;
-    {$if lcl_fullversion >= 2000003}
+    {$if lcl_fullversion >= 2000002}
     {Deferred update changes in Lazarus 2.0 stop the combo box working when
      the datasource is nil. We thus have to reverse out the changes :(}
     function DoEdit: boolean; override;
@@ -578,7 +578,7 @@ begin
   FModified := false;
 end;
 
-{$if lcl_fullversion >= 2000003}
+{$if lcl_fullversion >= 2000002}
 type
 
   { THackedCustomComboBox }
@@ -597,7 +597,7 @@ end;
 
 procedure TIBLookupComboEditBox.Change;
 begin
-  if IsUnbound then
+  if DataSource = nil then
     THackedCustomComboBox(self).CallChange
   else
     inherited Change;
@@ -613,7 +613,7 @@ end;
 procedure TIBLookupComboEditBox.Select;
 begin
   inherited Select;
-  if IsUnbound then
+  if DataSource = nil then
     inherited DoEdit;
 end;
 
@@ -621,7 +621,7 @@ function TIBLookupComboEditBox.DoEdit: boolean;
 begin
   {DoEdit will swallow characters if no editable Field. Hence, to enabled
    writing we must avoid calling the inherited method.}
-  if IsUnbound then
+  if DataSource = nil then
     Result := true
   else
     Result := inherited DoEdit;
