@@ -54,7 +54,7 @@ type
     FOwner: TIBLookupComboEditBox;
   protected
     procedure ActiveChanged; override;
-    {$if lcl_fullversion < 2000003}
+    {$if lcl_fullversion < 2000000}
     procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     {$endif}
     procedure RecordChanged(Field: TField); override;
@@ -181,7 +181,7 @@ begin
   FOwner.ActiveChanged(self)
 end;
 
-{$if lcl_fullversion < 2000003}
+{$if lcl_fullversion < 2000000}
 procedure TIBLookupComboDataLink.DataEvent(Event: TDataEvent; Info: Ptrint);
 begin
   inherited DataEvent(Event, Info);

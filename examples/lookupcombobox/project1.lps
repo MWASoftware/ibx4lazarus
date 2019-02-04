@@ -37,9 +37,9 @@
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="618"/>
-        <CursorPos X="49" Y="646"/>
-        <UsageCount Value="25"/>
+        <TopLine Value="159"/>
+        <CursorPos X="31" Y="184"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -48,7 +48,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="851"/>
         <CursorPos X="20" Y="869"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
@@ -70,7 +70,7 @@
         <EditorIndex Value="4"/>
         <TopLine Value="99"/>
         <CursorPos X="33" Y="99"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
@@ -92,7 +92,7 @@
         <EditorIndex Value="3"/>
         <TopLine Value="340"/>
         <CursorPos X="51" Y="357"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="17"/>
         <Loaded Value="True"/>
       </Unit10>
       <Unit11>
@@ -584,7 +584,7 @@
         <UsageCount Value="10"/>
       </Unit79>
     </Units>
-    <JumpHistory Count="15" HistoryIndex="14">
+    <JumpHistory Count="17" HistoryIndex="16">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="36" Column="16" TopLine="16"/>
@@ -644,6 +644,14 @@
         <Filename Value="../../../../lcl/dbctrls.pp"/>
         <Caret Line="869" Column="20" TopLine="851"/>
       </Position15>
+      <Position16>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="519" Column="66" TopLine="498"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="57" Column="25" TopLine="34"/>
+      </Position17>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
