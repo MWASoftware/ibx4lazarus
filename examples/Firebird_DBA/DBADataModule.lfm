@@ -4,7 +4,6 @@ inherited DBADatabaseData: TDBADatabaseData
   HorizontalOffset = 482
   VerticalOffset = 322
   Width = 730
-  PPI = 96
   inherited IBDatabase1: TIBDatabase
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
