@@ -9,7 +9,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="23" Y="17"/>
-        <UsageCount Value="54"/>
+        <UsageCount Value="56"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -18,9 +18,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="16"/>
         <CursorPos X="16" Y="36"/>
-        <UsageCount Value="54"/>
+        <UsageCount Value="56"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -33,21 +32,21 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="28"/>
         <CursorPos X="40" Y="25"/>
-        <UsageCount Value="39"/>
+        <UsageCount Value="41"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="569"/>
-        <CursorPos X="15" Y="588"/>
-        <UsageCount Value="25"/>
+        <TopLine Value="159"/>
+        <CursorPos X="31" Y="184"/>
+        <UsageCount Value="26"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
         <UnitName Value="DBCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="825"/>
-        <CursorPos X="14" Y="844"/>
+        <TopLine Value="851"/>
+        <CursorPos X="20" Y="869"/>
         <UsageCount Value="20"/>
       </Unit4>
       <Unit5>
@@ -67,8 +66,8 @@
       <Unit7>
         <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="58"/>
-        <CursorPos X="3" Y="60"/>
+        <TopLine Value="99"/>
+        <CursorPos X="33" Y="99"/>
         <UsageCount Value="20"/>
       </Unit7>
       <Unit8>
@@ -88,8 +87,8 @@
         <Filename Value="../../../../lcl/stdctrls.pp"/>
         <UnitName Value="StdCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="308"/>
-        <CursorPos X="15" Y="327"/>
+        <TopLine Value="340"/>
+        <CursorPos X="51" Y="357"/>
         <UsageCount Value="16"/>
       </Unit10>
       <Unit11>
@@ -581,7 +580,12 @@
         <UsageCount Value="10"/>
       </Unit79>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="36" Column="16" TopLine="16"/>
+      </Position1>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>

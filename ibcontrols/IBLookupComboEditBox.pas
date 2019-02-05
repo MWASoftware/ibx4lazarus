@@ -54,7 +54,7 @@ type
     FOwner: TIBLookupComboEditBox;
   protected
     procedure ActiveChanged; override;
-    {$if lcl_fullversion < 2000003}
+    {$if lcl_fullversion < 2000000}
     procedure DataEvent(Event: TDataEvent; Info: Ptrint); override;
     {$endif}
     procedure RecordChanged(Field: TField); override;
@@ -119,13 +119,16 @@ type
     procedure CheckAndInsert;
     procedure DoEnter; override;
     procedure DoExit; override;
-    {$if lcl_fullversion >= 2000003}
+    {$if lcl_fullversion >= 2000002}
     {Deferred update changes in Lazarus 2.0 stop the combo box working when
      the datasource is nil. We thus have to reverse out the changes :(}
     function DoEdit: boolean; override;
     procedure Change; override;
     procedure CloseUp; override;
     procedure Select; override;
+    {$ifend}
+    {$if lcl_fullversion = 2000002}
+    procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
     {$ifend}
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Loaded; override;
@@ -178,7 +181,7 @@ begin
   FOwner.ActiveChanged(self)
 end;
 
-{$if lcl_fullversion < 2000003}
+{$if lcl_fullversion < 2000000}
 procedure TIBLookupComboDataLink.DataEvent(Event: TDataEvent; Info: Ptrint);
 begin
   inherited DataEvent(Event, Info);
@@ -578,7 +581,9 @@ begin
   FModified := false;
 end;
 
-{$if lcl_fullversion >= 2000003}
+
+{Workarounds due to bugs in various Lazarus 2.0 release candidates}
+{$if lcl_fullversion >= 2000002}
 type
 
   { THackedCustomComboBox }
@@ -586,6 +591,7 @@ type
   THackedCustomComboBox = class(TCustomComboBox)
   private
     procedure CallChange;
+    procedure CallUTF8KeyPress(var UTF8Key: TUTF8Char);
   end;
 
 { THackedCustomComboBox }
@@ -595,9 +601,14 @@ begin
   inherited Change;
 end;
 
+procedure THackedCustomComboBox.CallUTF8KeyPress(var UTF8Key: TUTF8Char);
+begin
+  inherited UTF8KeyPress(UTF8Key);
+end;
+
 procedure TIBLookupComboEditBox.Change;
 begin
-  if IsUnbound then
+  if DataSource = nil then
     THackedCustomComboBox(self).CallChange
   else
     inherited Change;
@@ -613,7 +624,7 @@ end;
 procedure TIBLookupComboEditBox.Select;
 begin
   inherited Select;
-  if IsUnbound then
+  if DataSource = nil then
     inherited DoEdit;
 end;
 
@@ -621,12 +632,23 @@ function TIBLookupComboEditBox.DoEdit: boolean;
 begin
   {DoEdit will swallow characters if no editable Field. Hence, to enabled
    writing we must avoid calling the inherited method.}
-  if IsUnbound then
+  if DataSource = nil then
     Result := true
   else
     Result := inherited DoEdit;
 end;
 {$ifend}
+
+{$if lcl_fullversion = 2000002}
+procedure TIBLookupComboEditBox.UTF8KeyPress(var UTF8Key: TUTF8Char);
+begin
+  if DataSource = nil then
+    THackedCustomComboBox(self).CallUTF8KeyPress(UTF8Key)
+  else
+    inherited;
+end;
+{$ifend}
+
 
 constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
 begin

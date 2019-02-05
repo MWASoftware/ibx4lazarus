@@ -57,7 +57,7 @@ type
     procedure PerformUpgrade(aOnUpgradeDone: TNotifyEvent);
     property ServerData: TServerData read FServerData write SetServerData;
     property DatabaseData: TDatabaseData read FDatabaseData write SetDatabaseData;
-    property SchemaVersion: integer read GetSchemaVersion;
+    property SchemaVersion: integer read FSchemaVersion;
   end;
 
 var
@@ -93,6 +93,7 @@ begin
                                FDatabasePassword,
                                SecurityDatabase);
   FNewPassword := false;
+  FSchemaVersion := GetSchemaVersion;
   inherited;
 end;
 
@@ -393,6 +394,7 @@ begin
   finally
     UpgradeConfFile.Free;
   end;
+  FSchemaVersion := GetSchemaVersion;
 end;
 
 end.
