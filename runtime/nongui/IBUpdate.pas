@@ -88,6 +88,7 @@ type
     function getSQLParam(index: integer): ISQLParam;
     function ByName(Idx: AnsiString): ISQLParam ;
     function GetModified: Boolean;
+    function GetHasCaseSensitiveParams: Boolean;
   end;
 
   { TParamIntf }
@@ -486,6 +487,11 @@ end;
 function TParamListIntf.GetModified: Boolean;
 begin
   Result := FModified;
+end;
+
+function TParamListIntf.GetHasCaseSensitiveParams: Boolean;
+begin
+  Result := false;
 end;
 
 { TIBUpdate }
