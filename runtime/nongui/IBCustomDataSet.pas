@@ -5256,7 +5256,9 @@ end;
 
 procedure TIBGenerator.SetQuerySQL;
 begin
-  FQuery.SQL.Text := Format('Select Gen_ID(%s,%d) From RDB$Database',[FGeneratorName,Increment]);
+  if Database <> nil then
+    FQuery.SQL.Text := Format('Select Gen_ID(%s,%d) From RDB$Database',
+      [QuoteIdentifierIfNeeded(Database.SQLDialect,FGeneratorName),Increment]);
 end;
 
 function TIBGenerator.GetDatabase: TIBDatabase;
@@ -5272,6 +5274,7 @@ end;
 procedure TIBGenerator.SetDatabase(AValue: TIBDatabase);
 begin
   FQuery.Database := AValue;
+  SetQuerySQL;
 end;
 
 procedure TIBGenerator.SetGeneratorName(AValue: string);

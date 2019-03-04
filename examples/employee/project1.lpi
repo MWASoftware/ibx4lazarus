@@ -71,7 +71,7 @@
         <UnitName Value="Unit2"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="39" Y="9"/>
-        <UsageCount Value="49"/>
+        <UsageCount Value="50"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -97,8 +97,8 @@
       <Unit6>
         <Filename Value="../../../fbintf/IB.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="553"/>
-        <CursorPos X="28" Y="567"/>
+        <TopLine Value="1302"/>
+        <CursorPos Y="1329"/>
         <UsageCount Value="16"/>
       </Unit6>
       <Unit7>
@@ -176,8 +176,7 @@
       <Unit17>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="34"/>
-        <CursorPos X="45" Y="71"/>
+        <CursorPos X="43" Y="4"/>
         <UsageCount Value="11"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit17>
@@ -263,8 +262,8 @@
       <Unit29>
         <Filename Value="../../../fbintf/IBUtils.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1401"/>
-        <CursorPos Y="1418"/>
+        <TopLine Value="950"/>
+        <CursorPos Y="975"/>
         <UsageCount Value="11"/>
       </Unit29>
       <Unit30>
@@ -283,8 +282,8 @@
       <Unit32>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="4664"/>
-        <CursorPos X="35" Y="4668"/>
+        <TopLine Value="5243"/>
+        <CursorPos X="21" Y="5253"/>
         <UsageCount Value="12"/>
       </Unit32>
       <Unit33>
@@ -353,8 +352,8 @@
       <Unit42>
         <Filename Value="../../runtime/nongui/IBSQL.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="186"/>
-        <CursorPos X="14" Y="191"/>
+        <TopLine Value="828"/>
+        <CursorPos Y="849"/>
         <UsageCount Value="11"/>
       </Unit42>
       <Unit43>
