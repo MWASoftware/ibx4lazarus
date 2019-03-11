@@ -39,7 +39,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="63">
+    <Units Count="64">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -71,7 +71,7 @@
         <UnitName Value="Unit2"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="39" Y="9"/>
-        <UsageCount Value="50"/>
+        <UsageCount Value="51"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -176,7 +176,7 @@
       <Unit17>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="43" Y="4"/>
+        <CursorPos X="49" Y="7"/>
         <UsageCount Value="11"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit17>
@@ -324,8 +324,8 @@
       <Unit38>
         <Filename Value="../../runtime/nongui/IBDataOutput.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="91"/>
-        <CursorPos X="15" Y="110"/>
+        <TopLine Value="653"/>
+        <CursorPos X="3" Y="640"/>
         <UsageCount Value="12"/>
       </Unit38>
       <Unit39>
@@ -497,6 +497,13 @@
         <CursorPos X="23" Y="177"/>
         <UsageCount Value="11"/>
       </Unit62>
+      <Unit63>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1682"/>
+        <CursorPos Y="1711"/>
+        <UsageCount Value="10"/>
+      </Unit63>
     </Units>
     <JumpHistory HistoryIndex="-1"/>
   </ProjectOptions>

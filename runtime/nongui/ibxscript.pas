@@ -1702,6 +1702,11 @@ begin
     begin
       command := AnsiUpperCase(RegexObj.Match[1]);
       param := trim(RegexObj.Match[2]);
+      if command = 'GENERATOR' then
+      begin
+        Result := true;
+        Exit;
+      end;
       if command = 'AUTODDL' then
         AutoDDL := ((RegexObj.MatchLen[2] = 0) and not AutoDDL) or
                    (RegexObj.MatchLen[2] > 0) and Toggle(param)

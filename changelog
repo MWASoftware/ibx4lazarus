@@ -3,6 +3,9 @@ IBX Change Log  version (2.3-4 Build 11512) Fri, 28 Dec 2018 10:04:17 +0000
 1.  TIBXDataSet and Generators: Generator Names that are not all upper case or
     not SQL Identifiers are now supported.
 
+2.  TIBXScript: Set Generator is no longer rejected as unrecognised SQL and is
+    passed to the Firebird engine for execution.
+
 IBX Change Log  version (2.3-3 Build 11512) Fri, 28 Dec 2018 10:04:17 +0000
 
 
