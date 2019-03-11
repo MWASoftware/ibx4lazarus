@@ -55,7 +55,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="195"/>
         <CursorPos X="34" Y="197"/>
         <UsageCount Value="200"/>
@@ -499,13 +498,24 @@
       </Unit62>
       <Unit63>
         <Filename Value="../../runtime/nongui/ibxscript.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1682"/>
-        <CursorPos Y="1711"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1461"/>
+        <CursorPos X="3" Y="1465"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit63>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="2" HistoryIndex="1">
+      <Position1>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="1707" Column="24" TopLine="1679"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="261" Column="14" TopLine="243"/>
+      </Position2>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

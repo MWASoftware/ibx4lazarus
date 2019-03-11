@@ -1704,7 +1704,7 @@ begin
       param := trim(RegexObj.Match[2]);
       if command = 'GENERATOR' then
       begin
-        Result := true;
+        Result := false;
         Exit;
       end;
       if command = 'AUTODDL' then
