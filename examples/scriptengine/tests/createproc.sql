@@ -6,7 +6,7 @@ Create Procedure MyProc1
 As
   Declare THECOUNTRY VarChar(32);
 Begin
- //Begin
+ --Begin
  THECOUNTRY = '';
   Update COUNTRY SET COUNTRY = 'None' Where COUNTRY = :THECOUNTRY;
  /* End */

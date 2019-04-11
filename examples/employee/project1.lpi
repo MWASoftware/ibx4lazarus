@@ -39,7 +39,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="64">
+    <Units Count="65">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -55,6 +55,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="195"/>
         <CursorPos X="34" Y="197"/>
         <UsageCount Value="200"/>
@@ -261,8 +262,8 @@
       <Unit29>
         <Filename Value="../../../fbintf/IBUtils.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="950"/>
-        <CursorPos Y="975"/>
+        <TopLine Value="668"/>
+        <CursorPos X="27" Y="687"/>
         <UsageCount Value="11"/>
       </Unit29>
       <Unit30>
@@ -316,8 +317,8 @@
       <Unit37>
         <Filename Value="../../runtime/nongui/IBTable.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="54"/>
-        <CursorPos X="15" Y="106"/>
+        <TopLine Value="1322"/>
+        <CursorPos X="37" Y="1374"/>
         <UsageCount Value="10"/>
       </Unit37>
       <Unit38>
@@ -498,24 +499,21 @@
       </Unit62>
       <Unit63>
         <Filename Value="../../runtime/nongui/ibxscript.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1461"/>
         <CursorPos X="3" Y="1465"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit63>
+      <Unit64>
+        <Filename Value="/tmp/myibxtools.pas"/>
+        <UnitName Value="MyIBXTools"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="76"/>
+        <CursorPos X="33" Y="10"/>
+        <UsageCount Value="10"/>
+      </Unit64>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
-      <Position1>
-        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
-        <Caret Line="1707" Column="24" TopLine="1679"/>
-      </Position1>
-      <Position2>
-        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
-        <Caret Line="261" Column="14" TopLine="243"/>
-      </Position2>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
