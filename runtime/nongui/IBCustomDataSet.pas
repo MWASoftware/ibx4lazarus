@@ -3025,6 +3025,7 @@ procedure TIBCustomDataSet.SetUniDirectional(Value: Boolean);
 begin
   CheckDatasetClosed;
   FUniDirectional := Value;
+  inherited SetUniDirectional(Value);
 end;
 
 procedure TIBCustomDataSet.SetUpdateRecordTypes(Value: TIBUpdateRecordTypes);
