@@ -162,7 +162,7 @@ type
 
 implementation
 
-uses IBUtils, FBMessages, Math, IBXScript;
+uses IBUtils, IBMessages, Math, IBXScript;
 
 { TIBBlockFormatOut }
 

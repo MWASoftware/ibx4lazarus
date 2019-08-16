@@ -186,7 +186,7 @@ type
 
 implementation
 
-uses FBMessages, IBTypes;
+uses IBMessages, IBTypes;
 
 type
 

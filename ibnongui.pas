@@ -11,7 +11,7 @@ uses
   IBBatchMove, IBBlob, IBCustomDataSet, IBDatabase, IBDatabaseInfo, 
   IBDataOutput, IBEvents, IBExtract, IBQuery, IBSQL, IBSQLMonitor, 
   IBSQLParser, IBStoredProc, IBTable, IBTypes, IBUpdate, IBUpdateSQL, 
-  IBVersion, ibxscript, IBXServices;
+  IBVersion, ibxscript, IBXServices, IBMessages;
 
 implementation
 

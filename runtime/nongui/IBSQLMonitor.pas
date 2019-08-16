@@ -172,7 +172,7 @@ function MonitoringEnabled: Boolean;
 implementation
 
 uses
-   contnrs, syncobjs, CustApp, FBMessages
+   contnrs, syncobjs, CustApp, IBMessages
    {$IFDEF USE_SV5_IPC}
    ,ipc, Errors, baseunix
    {$ENDIF};

@@ -105,7 +105,7 @@ type
 
 implementation
 
-uses SysUtils, FBMessages;
+uses SysUtils, IBMessages;
 
 { TIBEvents }
 

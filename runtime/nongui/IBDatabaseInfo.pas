@@ -144,7 +144,7 @@ type
 implementation
 
 uses
-  FBMessages;
+  IBMessages;
 
 { TIBDatabaseInfo }
 

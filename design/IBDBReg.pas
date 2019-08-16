@@ -417,7 +417,7 @@ procedure Register;
 
 implementation
 
-uses IB, IBQuery, IBStoredProc, IBCustomDataSet, FBMessages,
+uses IB, IBQuery, IBStoredProc, IBCustomDataSet, IBMessages,
      IBSQL, IBSQLMonitor, IBDatabaseInfo, IBEvents, IBTypes,
      IBServices, IBXServices, IBDatabaseEdit, IBTransactionEdit,
      IBBatchMove, IBExtract,LResources, IBSelectSQLEditor,

@@ -522,7 +522,7 @@ type
 implementation
 
 uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
-     typInfo, FBMessages, IBErrorCodes {$IFDEF WINDOWS}, Windirs {$ENDIF};
+     typInfo, IBMessages, IBErrorCodes {$IFDEF WINDOWS}, Windirs {$ENDIF};
 
 { TIBDatabase }
 

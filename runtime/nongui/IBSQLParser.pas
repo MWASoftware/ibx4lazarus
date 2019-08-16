@@ -195,7 +195,7 @@ type
 
 implementation
 
-uses Sysutils, IBCustomDataSet, IB, FBMessages;
+uses Sysutils, IBCustomDataSet, IB, IBMessages;
 
 { TSelectSQLParser }
 

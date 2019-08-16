@@ -113,7 +113,7 @@ type
 
 implementation
 
- uses  FBMessages;
+ uses  IBMessages;
 
 { TIBStoredProc }
 

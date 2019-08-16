@@ -80,7 +80,7 @@ var
 
 implementation
 
-uses FBMessages;
+uses IBMessages;
 
 {$R *.lfm}
 

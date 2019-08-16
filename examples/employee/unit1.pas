@@ -171,7 +171,7 @@ implementation
 
 {$R *.lfm}
 
-uses IB, Unit2, FBMessages;
+uses IB, Unit2, IBMessages;
 
 const
   sNoName = '<no name>';

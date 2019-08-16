@@ -251,7 +251,7 @@ procedure IBAlloc(var P; OldSize, NewSize: Integer);
 implementation
 
 uses
-   Variants, IBSQLMonitor, FBMessages, IBCustomDataSet;
+   Variants, IBSQLMonitor, IBMessages, IBCustomDataSet;
 
 procedure IBAlloc(var P; OldSize, NewSize: Integer);
 var

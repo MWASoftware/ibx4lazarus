@@ -31,7 +31,7 @@ unit IBUpdate;
 interface
 
 uses
-  Classes, SysUtils, IBCustomDataSet, DB, IB, IBDatabase, IBExternals, FBMessages;
+  Classes, SysUtils, IBCustomDataSet, DB, IB, IBDatabase, IBExternals, IBMessages;
 
 type
 

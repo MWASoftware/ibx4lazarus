@@ -111,7 +111,7 @@ type
 
 implementation
 
-uses FBMessages, IBCustomDataSet;
+uses IBMessages, IBCustomDataSet;
 
 { TIBBlobStream }
 constructor TIBBlobStream.Create;

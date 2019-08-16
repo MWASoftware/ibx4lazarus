@@ -574,7 +574,7 @@ type
 implementation
 
 uses
-  FBMessages, RegExpr;
+  IBMessages, RegExpr;
 
 { TIBOnlineValidationService }
 

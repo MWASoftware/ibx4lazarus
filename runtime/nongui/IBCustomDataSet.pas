@@ -973,7 +973,7 @@ const
 
 implementation
 
-uses Variants, FmtBCD, LazUTF8, FBMessages, IBQuery;
+uses Variants, FmtBCD, LazUTF8, IBMessages, IBQuery;
 
 type
 
