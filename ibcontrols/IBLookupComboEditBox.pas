@@ -113,6 +113,7 @@ type
     procedure UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
     procedure HandleEnter(Data: PtrInt);
     procedure UpdateLinkData(Sender: TObject);
+    procedure ValidateListField;
   protected
     { Protected declarations }
     procedure ActiveChanged(Sender: TObject);
@@ -159,7 +160,7 @@ type
 
 implementation
 
-uses Variants, LCLProc, LazUTF8, IBUtils;
+uses Variants, LCLProc, LazUTF8, IBUtils, IBMessages;
 
 { TIBLookupControlLink }
 
@@ -251,6 +252,7 @@ begin
      and ListSource.DataSet.Active   then
   begin
     begin
+      ValidateListField;
       if varIsNull(FLastKeyValue) and (ItemIndex = -1) then
         KeyValue := ListSource.DataSet.FieldByName(KeyField).AsVariant
       else
@@ -430,6 +432,32 @@ procedure TIBLookupComboEditBox.UpdateLinkData(Sender: TObject);
 begin
   if FInserting then
     ListSource.DataSet.FieldByName(ListField).AsString := Text
+end;
+
+{Check to ensure that ListField exists and convert to upper case if necessary}
+
+procedure TIBLookupComboEditBox.ValidateListField;
+var SQLDialect: integer;
+    FieldNames: TStringList;
+begin
+  if (ListSource = nil) or (ListSource.DataSet = nil) then Exit;
+  SQLDialect := (ListSource.DataSet as TIBCustomDataSet).Database.SQLDialect;
+  FieldNames := TStringList.Create;
+  try
+    FieldNames.CaseSensitive := true;
+    FieldNames.Sorted := true;
+    FieldNames.Duplicates := dupError;
+    ListSource.DataSet.GetFieldNames(FieldNames);
+    if FieldNames.IndexOf(ListField) = -1 then {not found}
+    begin
+      if (SQLDialect = 3) and (FieldNames.IndexOf(AnsiUpperCase(ListField)) <> - 1) then {normalise to upper case}
+        ListField := AnsiUpperCase(ListField)
+      else
+        IBError(ibxeListFieldNotFound,[ListField])
+    end;
+  finally
+    FieldNames.Free;
+  end;
 end;
 
 procedure TIBLookupComboEditBox.CheckAndInsert;

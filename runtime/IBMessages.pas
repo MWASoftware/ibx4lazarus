@@ -167,7 +167,8 @@ type
       ibxeMultiThreadRequired,
       ibxeODSVersionRequired,
       ibxErrorParsing,
-      ibxeParameterNameNotFound
+      ibxeParameterNameNotFound,
+      ibxeListFieldNotFound
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -300,6 +301,7 @@ resourcestring
   SODSVersionRequired = 'This feature requires ODS Version %s or later';
   SErrorParsing = 'Error parsing SQL Statement at clause starting with %s';
   SParameterNameNotFound = 'Parameter Name (%s) not found';
+  SListFieldNotFound = 'ListField Name is not a valid dataset column name (%s)';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -394,7 +396,8 @@ const
     SMultiThreadRequired,
     SODSVersionRequired,
     SErrorParsing,
-    SParameterNameNotFound
+    SParameterNameNotFound,
+    SListFieldNotFound
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
