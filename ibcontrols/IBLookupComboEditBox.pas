@@ -389,6 +389,7 @@ procedure TIBLookupComboEditBox.UpdateSQL(Sender: TObject;
   Parser: TSelectSQLParser);
 var FieldPosition: integer;
     FilterText: string;
+    SQLDialect: integer;
 begin
   if FFiltered then
   begin
@@ -396,11 +397,17 @@ begin
       FilterText := FCurText
     else
       FilterText := Text;
+
+    if Parser.DataSet <> nil then
+      SQLDialect := (Parser.DataSet as TIBCustomDataSet).Database.SQLDialect
+    else
+      SQLDialect := 1;
+
     if cbactSearchCaseSensitive in AutoCompleteText then
-      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + ListField + '" Like ''' +
+      Parser.Add2WhereClause(GetRelationNameQualifier + QuoteIdentifierIfNeeded(SQLDialect,ListField) + ' Like ''' +
                                   SQLSafeString(FilterText) + '%''')
     else
-      Parser.Add2WhereClause('Upper(' + GetRelationNameQualifier + '"' +  ListField + '") Like Upper(''' +
+      Parser.Add2WhereClause('Upper(' + GetRelationNameQualifier + QuoteIdentifierIfNeeded(SQLDialect,ListField) + ') Like Upper(''' +
                                   SQLSafeString(FilterText) + '%'')');
 
     if cbactSearchAscending in AutoCompleteText then
