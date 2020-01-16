@@ -139,7 +139,9 @@ const
     'config',
     'nolinger',
     'reset_icu',
-    'map_attach'
+    'map_attach',
+    'session_time_zone',
+    'set_db_replica'
     );
 
   TPBPrefix = 'isc_tpb_';
@@ -164,7 +166,8 @@ const
     'no_rec_version',
     'restart_requests',
     'no_auto_undo',
-    'lock_timeout'
+    'lock_timeout',
+    'read_consistency'
   );
 
 type

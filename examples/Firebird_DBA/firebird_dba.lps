@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="100">
+    <Units Count="102">
       <Unit0>
         <Filename Value="firebird_dba.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -250,7 +250,6 @@
         <ComponentName Value="DBADatabaseData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
         <TopLine Value="81"/>
         <CursorPos Y="97"/>
@@ -586,10 +585,12 @@
       </Unit65>
       <Unit66>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/objpas.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="38"/>
-        <CursorPos Y="62"/>
-        <UsageCount Value="8"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="39"/>
+        <CursorPos Y="71"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit66>
       <Unit67>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/generic.inc"/>
@@ -826,125 +827,141 @@
         <CursorPos Y="372"/>
         <UsageCount Value="10"/>
       </Unit99>
+      <Unit100>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="425"/>
+        <CursorPos X="53" Y="444"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit100>
+      <Unit101>
+        <Filename Value="../../runtime/IBMessages.pas"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="377"/>
+        <CursorPos Y="410"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit101>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="DBAMainFormUnit.pas"/>
-        <Caret Line="365" Column="80" TopLine="348"/>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="60" Column="50" TopLine="42"/>
       </Position1>
       <Position2>
-        <Filename Value="DBAMainFormUnit.pas"/>
-        <Caret Line="368" Column="56" TopLine="348"/>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="43" Column="14" TopLine="43"/>
       </Position2>
       <Position3>
         <Filename Value="DBAMainFormUnit.pas"/>
-        <Caret Line="370" Column="58" TopLine="348"/>
+        <Caret Line="373" Column="74" TopLine="348"/>
       </Position3>
       <Position4>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="60" Column="50" TopLine="42"/>
+        <Caret Line="45" Column="27" TopLine="43"/>
       </Position4>
       <Position5>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="43" Column="14" TopLine="43"/>
+        <Caret Line="250" Column="3" TopLine="245"/>
       </Position5>
       <Position6>
-        <Filename Value="DBAMainFormUnit.pas"/>
-        <Caret Line="373" Column="74" TopLine="348"/>
+        <Filename Value="DBADataModule.pas"/>
+        <Caret Line="19" Column="24" TopLine="14"/>
       </Position6>
       <Position7>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="45" Column="27" TopLine="43"/>
+        <Caret Line="83" Column="3" TopLine="81"/>
       </Position7>
       <Position8>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="250" Column="3" TopLine="245"/>
+        <Caret Line="54" Column="17" TopLine="23"/>
       </Position8>
       <Position9>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="19" Column="24" TopLine="14"/>
+        <Caret Line="364" Column="3" TopLine="361"/>
       </Position9>
       <Position10>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="83" Column="3" TopLine="81"/>
+        <Caret Line="19" Column="28" TopLine="14"/>
       </Position10>
       <Position11>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="54" Column="17" TopLine="23"/>
+        <Caret Line="88" TopLine="81"/>
       </Position11>
       <Position12>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="364" Column="3" TopLine="361"/>
+        <Caret Line="57" Column="23" TopLine="29"/>
       </Position12>
       <Position13>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="19" Column="28" TopLine="14"/>
+        <Caret Line="397" Column="17" TopLine="363"/>
       </Position13>
       <Position14>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="88" TopLine="81"/>
       </Position14>
       <Position15>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="57" Column="23" TopLine="29"/>
+        <Caret Line="33" Column="19" TopLine="2"/>
       </Position15>
       <Position16>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="397" Column="17" TopLine="363"/>
+        <Caret Line="60" Column="56" TopLine="30"/>
       </Position16>
       <Position17>
         <Filename Value="DBADataModule.pas"/>
+        <Caret Line="87" Column="17" TopLine="56"/>
       </Position17>
       <Position18>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="33" Column="19" TopLine="2"/>
+        <Caret Line="390" Column="37" TopLine="364"/>
       </Position18>
       <Position19>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="60" Column="56" TopLine="30"/>
+        <Caret Line="54" Column="15" TopLine="39"/>
       </Position19>
       <Position20>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="87" Column="17" TopLine="56"/>
+        <Caret Line="365" Column="3" TopLine="362"/>
       </Position20>
       <Position21>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="390" Column="37" TopLine="364"/>
+        <Caret Line="46" Column="24" TopLine="37"/>
       </Position21>
       <Position22>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="54" Column="15" TopLine="39"/>
+        <Caret Line="214" Column="43" TopLine="188"/>
       </Position22>
       <Position23>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="365" Column="3" TopLine="362"/>
       </Position23>
       <Position24>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="46" Column="24" TopLine="37"/>
+        <Caret Line="42" Column="30" TopLine="11"/>
       </Position24>
       <Position25>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="214" Column="43" TopLine="188"/>
+        <Caret Line="88" Column="39" TopLine="58"/>
       </Position25>
       <Position26>
         <Filename Value="DBADataModule.pas"/>
+        <Caret Line="42" Column="14" TopLine="42"/>
       </Position26>
       <Position27>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="42" Column="30" TopLine="11"/>
+        <Caret Line="230" TopLine="213"/>
       </Position27>
       <Position28>
         <Filename Value="DBADataModule.pas"/>
-        <Caret Line="88" Column="39" TopLine="58"/>
+        <Caret Line="97" TopLine="81"/>
       </Position28>
       <Position29>
-        <Filename Value="DBADataModule.pas"/>
-        <Caret Line="42" Column="14" TopLine="42"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="443" Column="79" TopLine="425"/>
       </Position29>
       <Position30>
-        <Filename Value="DBADataModule.pas"/>
-        <Caret Line="230" TopLine="213"/>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="444" Column="53" TopLine="425"/>
       </Position30>
     </JumpHistory>
     <RunParams>

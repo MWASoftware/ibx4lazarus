@@ -60,7 +60,7 @@ type
 
 implementation
 
-uses variants;
+uses variants, FmtBCD;
 
 type
 
@@ -113,6 +113,7 @@ type
     function GetAsCurrency: Currency;
     function GetAsInt64: Int64;
     function GetAsDateTime: TDateTime;
+    function GetAsSQLTimestamp: ISQLTimestamp;
     function GetAsDouble: Double;
     function GetAsFloat: Float;
     function GetAsLong: Long;
@@ -124,6 +125,7 @@ type
     function GetAsVariant: Variant;
     function GetAsBlob: IBlob;
     function GetAsArray: IArray;
+    function GetAsBCD: tBCD;
     procedure Clear;
     function GetModified: boolean;
     procedure SetAsBoolean(AValue: boolean);
@@ -133,6 +135,7 @@ type
     procedure SetAsLong(aValue: Long);
     procedure SetAsTime(aValue: TDateTime);
     procedure SetAsDateTime(aValue: TDateTime);
+    procedure SetAsSQLTimestamp(aValue: ISQLParamTimestamp);
     procedure SetAsDouble(aValue: Double);
     procedure SetAsFloat(aValue: Float);
     procedure SetAsPointer(aValue: Pointer);
@@ -144,6 +147,7 @@ type
     procedure SetAsArray(anArray: IArray);
     procedure SetAsQuad(aValue: TISC_QUAD);
     procedure SetCharSetID(aValue: cardinal);
+    procedure SetAsBcd(aValue: tBCD);
   end;
 
 { TParamIntf }
@@ -222,6 +226,11 @@ begin
 end;
 
 function TParamIntf.GetAsDateTime: TDateTime;
+begin
+  Result := FOwner.FParams[FIndex].Value;
+end;
+
+function TParamIntf.GetAsSQLTimestamp: ISQLTimestamp;
 begin
   Result := FOwner.FParams[FIndex].Value;
 end;
@@ -315,6 +324,11 @@ begin
   IBError(ibxeNotSupported,[]);
 end;
 
+function TParamIntf.GetAsBCD: tBCD;
+begin
+  Result := VarToBCD(FOwner.FParams[FIndex].Value);
+end;
+
 procedure TParamIntf.Clear;
 begin
   FOwner.SetParam(FIndex,NULL);
@@ -358,6 +372,11 @@ end;
 procedure TParamIntf.SetAsDateTime(aValue: TDateTime);
 begin
   FOwner.SetParam(FIndex,AValue);
+end;
+
+procedure TParamIntf.SetAsSQLTimestamp(aValue: ISQLParamTimestamp);
+begin
+   FOwner.SetParam(FIndex,AValue);
 end;
 
 procedure TParamIntf.SetAsDouble(aValue: Double);
@@ -420,6 +439,11 @@ begin
   s := str;
   if FOwner.Database.Attachment.CharSetID2CodePage(aValue,codepage) then
     SetCodePage(s,codepage,codepage <> cp_none);
+end;
+
+procedure TParamIntf.SetAsBcd(aValue: tBCD);
+begin
+  FOwner.SetParam(FIndex,VarFmtBCDCreate(AValue));
 end;
 
 { TParamListIntf }

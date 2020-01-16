@@ -41,7 +41,7 @@ type
    - automatic resizing of selected columns to fill the available row length
    - automatic positioning and sizing of a "totals" control, typically at the
      column footer, on a per column basis.
-   - DataSet resorting on header row click, sorting the dataset by the selected column.
+   - DataSet re-sorting on header row click, sorting the dataset by the selected column.
      A second click on the same header cell reversed the sort order.
    - Reselection of the same row following resorting.
    - A new cell editor that provides the same functionality as TIBLookupComboEditBox.

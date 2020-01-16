@@ -40,7 +40,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="7">
+    <Units Count="10">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -55,7 +55,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos X="25" Y="11"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
@@ -106,8 +105,69 @@
         <CursorPos X="3" Y="604"/>
         <UsageCount Value="10"/>
       </Unit6>
+      <Unit7>
+        <Filename Value="../../../fbintf/client/2.5/FB25Array.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="146"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="../../../fbintf/client/3.0/FB30Array.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="203"/>
+        <CursorPos X="3" Y="203"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="../../../fbintf/client/FBArray.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="733"/>
+        <CursorPos Y="769"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit9>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="9" HistoryIndex="8">
+      <Position1>
+        <Filename Value="../../../fbintf/client/3.0/FB30Array.pas"/>
+        <Caret Line="187" Column="26" TopLine="181"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../../fbintf/client/3.0/FB30Array.pas"/>
+        <Caret Line="80" Column="15" TopLine="61"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../../fbintf/client/FBArray.pas"/>
+        <Caret Line="163" Column="15" TopLine="145"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../../fbintf/client/3.0/FB30Array.pas"/>
+        <Caret Line="80" Column="22" TopLine="61"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../../fbintf/client/FBArray.pas"/>
+        <Caret Line="170" Column="21" TopLine="147"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../../fbintf/client/FBArray.pas"/>
+        <Caret Line="749" Column="12" TopLine="743"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../../fbintf/client/FBArray.pas"/>
+        <Caret Line="141" Column="23" TopLine="122"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../../fbintf/client/FBArray.pas"/>
+        <Caret Line="278" Column="46" TopLine="247"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../../fbintf/client/FBArray.pas"/>
+        <Caret Line="660" Column="28" TopLine="629"/>
+      </Position9>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
