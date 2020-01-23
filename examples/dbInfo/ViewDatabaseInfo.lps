@@ -19,9 +19,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="87"/>
-        <CursorPos X="37" Y="87"/>
+        <TopLine Value="97"/>
+        <CursorPos X="40" Y="116"/>
         <UsageCount Value="31"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -280,10 +279,12 @@
       </Unit36>
       <Unit37>
         <Filename Value="../../runtime/nongui/IBDatabaseInfo.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="294"/>
-        <CursorPos X="17" Y="206"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="331"/>
+        <CursorPos Y="340"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit37>
       <Unit38>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
@@ -335,7 +336,20 @@
         <UsageCount Value="10"/>
       </Unit44>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="3" HistoryIndex="2">
+      <Position1>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="116" Column="40" TopLine="97"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../runtime/nongui/IBDatabaseInfo.pas"/>
+        <Caret Line="116" Column="39" TopLine="102"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/nongui/IBDatabaseInfo.pas"/>
+        <Caret Line="75" Column="14" TopLine="75"/>
+      </Position3>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>

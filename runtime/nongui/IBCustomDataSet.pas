@@ -177,6 +177,23 @@ type
     property Size default 8;
   end;
 
+  {TFMTBCDField is overridden so that the properties can be set correctly at
+   bind time and to enable IBX appplications to check for an Identity column}
+
+  { TIBFMTBCDField }
+
+  TIBFMTBCDField = class(TFMTBCDField)
+  private
+    FIdentityColumn: boolean;
+  protected
+    procedure Bind(Binding: Boolean); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    property IdentityColumn: boolean read FIdentityColumn;
+  published
+    property Size default 8;
+  end;
+
   {The following integer field types extend the built in versions to enable IBX appplications
    to check for an Identity column}
 
@@ -954,7 +971,7 @@ const
     nil,     { ftIDispatch }
     TGuidField,        { ftGuid }
     TDateTimeField,    {ftTimestamp}
-    TIBBCDField,       {ftFMTBcd}
+    TFMTBCDField,       {ftFMTBcd}
     nil,  {ftFixedWideChar}
     nil);   {ftWideMemo}
 (*
@@ -1034,6 +1051,21 @@ type
     end;
     Result := str;
   end;
+
+{ TIBFMTBCDField }
+
+procedure TIBFMTBCDField.Bind(Binding: Boolean);
+begin
+  inherited Bind(Binding);
+  if Binding and (FieldDef <> nil) then
+     FIdentityColumn := (FieldDef as TIBFieldDef).IdentityColumn;
+end;
+
+constructor TIBFMTBCDField.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  Size := 8;
+end;
 
 { TIBParserDataSet }
 
@@ -2171,7 +2203,11 @@ begin
         SQL_VARYING,
         SQL_TEXT,
         SQL_BLOB:
-          fdCodePage := Qry.Metadata[i].getCodePage;
+          fdCodePage := colMetadata.getCodePage;
+        SQL_DEC16,
+        SQL_DEC34,
+        SQL_DEC_FIXED:
+          fdDataSize := colMetadata.GetSize;
         end;
         fdDataOfs := FRecordSize;
         Inc(FRecordSize, fdDataSize);
@@ -2884,7 +2920,7 @@ end;
 procedure TIBCustomDataSet.SetInternalSQLParams(Params: ISQLParams; Buffer: Pointer);
 var
   i, j: Integer;
-  cr, data: PChar;
+  cr, data: PByte;
   fn: string;
   st: RawByteString;
   OldBuffer: Pointer;
@@ -2934,7 +2970,7 @@ begin
             case fdDataType of
               SQL_TEXT, SQL_VARYING:
               begin
-                SetString(st, data, fdDataLength);
+                SetString(st, PAnsiChar(data), fdDataLength);
                 SetCodePage(st,fdCodePage,false);
                 Param.AsString := st;
               end;
@@ -2969,6 +3005,10 @@ begin
               Param.AsDateTime := PDateTime(data)^;
             SQL_BOOLEAN:
               Param.AsBoolean := PWordBool(data)^;
+            SQL_DEC16,
+            SQL_DEC34,
+            SQL_DEC_FIXED:
+              Param.AsBCD := Database.attachment.getFirebirdAPI.SQLDecFloatDecode(fdDataType,fdDataScale,data);
           end;
         end;
       end;
@@ -3605,7 +3645,8 @@ end;
 
 function TIBCustomDataSet.InternalGetFieldData(Field: TField; Buffer: Pointer): Boolean;
 var
-  Buff, Data: PChar;
+  Buff: PChar;
+  Data: PByte;
   CurrentRecord: PRecordData;
 begin
   result := False;
@@ -3632,7 +3673,7 @@ begin
     result := not fdIsNull;
     if result and (Buffer <> nil) then
       begin
-        Data := Buff + fdDataOfs;
+        Data := PByte(Buff) + fdDataOfs;
         if (fdDataType = SQL_VARYING) or (fdDataType = SQL_TEXT) then
         begin
           if fdDataLength < Field.DataSize then
@@ -3644,7 +3685,14 @@ begin
             IBError(ibxeFieldSizeError,[Field.FieldName])
         end
         else
+        case fdDataType of
+        SQL_DEC16,
+        SQL_DEC34,
+        SQL_DEC_FIXED:
+          pBCD(Buffer)^ := Database.attachment.getFirebirdAPI.SQLDecFloatDecode(fdDataType,fdDataScale,Data);
+        else
           Move(Data^, Buffer^, Field.DataSize);
+        end;
       end;
   end;
 end;
@@ -4165,7 +4213,7 @@ begin
               FieldType := ftFloat
             else
             begin
-              FieldType := ftFMTBCD;
+              FieldType := ftBCD;
               FieldPrecision := 9;
               FieldSize := -getScale;
             end;
@@ -4214,6 +4262,25 @@ begin
           end;
           SQL_BOOLEAN:
              FieldType:= ftBoolean;
+
+          SQL_DEC16:
+            begin
+              FieldType := ftFmtBCD;
+              FieldPrecision := 16;
+            end;
+
+          SQL_DEC34:
+          begin
+            FieldType := ftFmtBCD;
+            FieldPrecision := 34;
+          end;
+
+          SQL_DEC_FIXED:
+          begin
+            FieldType := ftFmtBCD;
+            FieldPrecision := 34 - getScale;
+          end;
+
           else
             FieldType := ftUnknown;
         end;
@@ -4351,6 +4418,8 @@ begin
           end;
           ftArray:
             cur_param.AsArray := TIBArrayField(cur_field).ArrayIntf;
+          ftFmtBCD:
+            cur_param.AsBCD := TFmtBCDField(cur_field).AsBCD;
           else
             IBError(ibxeNotSupported, [nil]);
         end;
@@ -4639,7 +4708,14 @@ begin
           fdIsNull := True
         else
         begin
-          Move(Buffer^, Buff[fdDataOfs],fdDataSize);
+          case fdDataType of
+          SQL_DEC16,
+          SQL_DEC34,
+          SQL_DEC_FIXED:
+            Database.attachment.getFirebirdAPI.SQLDecFloatEncode(pBCD(Buffer)^,fdDataType,PByte(Buff + fdDataOfs));
+          else
+            Move(Buffer^, Buff[fdDataOfs],fdDataSize);
+          end;
           if (fdDataType = SQL_TEXT) or (fdDataType = SQL_VARYING) then
             fdDataLength := StrLen(PChar(Buffer));
           fdIsNull := False;
