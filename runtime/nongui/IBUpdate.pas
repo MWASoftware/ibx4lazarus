@@ -72,12 +72,14 @@ type
       Name: string;
       Value: variant;
       Modified: boolean;
+      TimeZoneID: TFBTimeZoneID;
     end;
   private
     FDatabase: TIBDatabase;
     FModified: boolean;
     FParams: array of TParamRec;
     procedure SetParam(index: integer; aValue: variant);
+    procedure SetTimeZoneID(index: integer; aValue: TFBTimeZoneID);
   public
     constructor Create(aFields: TFields; aDatabase: TIBDatabase);
     destructor Destroy; override;
@@ -133,8 +135,10 @@ type
     procedure SetAsInt64(aValue: Int64);
     procedure SetAsDate(aValue: TDateTime);
     procedure SetAsLong(aValue: Long);
-    procedure SetAsTime(aValue: TDateTime);
-    procedure SetAsDateTime(aValue: TDateTime);
+    procedure SetAsTime(aValue: TDateTime); overload;
+    procedure SetAsTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID); overload;
+    procedure SetAsDateTime(aValue: TDateTime); overload;
+    procedure SetAsDateTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID); overload;
     procedure SetAsSQLTimestamp(aValue: ISQLParamTimestamp);
     procedure SetAsDouble(aValue: Double);
     procedure SetAsFloat(aValue: Float);
@@ -231,7 +235,9 @@ begin
 end;
 
 function TParamIntf.GetAsSQLTimestamp: ISQLTimestamp;
+var ts: ISQLParamTimestamp;
 begin
+  ts := Owner.Database.Attachment.GetSQLTimestampParam;
   Result := FOwner.FParams[FIndex].Value;
 end;
 
@@ -369,9 +375,22 @@ begin
   FOwner.SetParam(FIndex,AValue);
 end;
 
+procedure TParamIntf.SetAsTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID);
+begin
+  FOwner.SetParam(FIndex,AValue);
+  FOwner.SetTimeZoneID(FIndex,aTimeZoneID);
+end;
+
 procedure TParamIntf.SetAsDateTime(aValue: TDateTime);
 begin
   FOwner.SetParam(FIndex,AValue);
+end;
+
+procedure TParamIntf.SetAsDateTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID
+  );
+begin
+  FOwner.SetParam(FIndex,AValue);
+  FOwner.SetTimeZoneID(FIndex,aTimeZoneID);
 end;
 
 procedure TParamIntf.SetAsSQLTimestamp(aValue: ISQLParamTimestamp);
@@ -452,7 +471,14 @@ procedure TParamListIntf.SetParam(index: integer; aValue: variant);
 begin
   FParams[index].Value := aValue;
   FParams[index].Modified := true;
+  FParams[index].TimeZoneID := TimeZoneID_GMT;
   FModified := true;
+end;
+
+procedure TParamListIntf.SetTimeZoneID(index: integer; aValue: TFBTimeZoneID);
+begin
+  if FParams[index].Modified then
+    FParams[index].TimeZoneID := aValue;
 end;
 
 constructor TParamListIntf.Create(aFields: TFields; aDatabase: TIBDatabase);
