@@ -115,7 +115,9 @@ type
     function GetAsCurrency: Currency;
     function GetAsInt64: Int64;
     function GetAsDateTime: TDateTime;
-    function GetAsSQLTimestamp: ISQLTimestamp;
+    procedure GetAsDateTime(var aDateTime: TDateTime; var aTimezoneID: TFBTimeZoneID); overload;
+    procedure GetAsDateTime(var aDateTime: TDateTime; var aTimezone: AnsiString); overload;
+    function GetAsUTCDateTime: TDateTime;
     function GetAsDouble: Double;
     function GetAsFloat: Float;
     function GetAsLong: Long;
@@ -137,9 +139,11 @@ type
     procedure SetAsLong(aValue: Long);
     procedure SetAsTime(aValue: TDateTime); overload;
     procedure SetAsTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID); overload;
+    procedure SetAsTime(aValue: TDateTime; aTimeZone: AnsiString); overload;
     procedure SetAsDateTime(aValue: TDateTime); overload;
     procedure SetAsDateTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID); overload;
-    procedure SetAsSQLTimestamp(aValue: ISQLParamTimestamp);
+    procedure SetAsDateTime(aValue: TDateTime; aTimeZone: AnsiString); overload;
+    procedure SetAsUTCDateTime(aUTCTime: TDateTime; aTimeZone: AnsiString);
     procedure SetAsDouble(aValue: Double);
     procedure SetAsFloat(aValue: Float);
     procedure SetAsPointer(aValue: Pointer);
@@ -234,11 +238,47 @@ begin
   Result := FOwner.FParams[FIndex].Value;
 end;
 
-function TParamIntf.GetAsSQLTimestamp: ISQLTimestamp;
-var ts: ISQLParamTimestamp;
+procedure TParamIntf.GetAsDateTime(var aDateTime: TDateTime;
+  var aTimezoneID: TFBTimeZoneID);
 begin
-  ts := Owner.Database.Attachment.GetSQLTimestampParam;
-  Result := FOwner.FParams[FIndex].Value;
+  with FOwner.FParams[FIndex] do
+  if VarIsArray(Value) then
+  begin
+    aDateTime := Value[0];
+    if VarType(Value[1]) in [varSmallint, varInteger, varByte, varWord, varShortInt] then
+      aTimezoneID := Value[1]
+    else
+      aTimeZoneID := FOwner.DataBase.attachment.getFirebirdAPI.TimeZoneName2TimeZoneID(Value[1]);
+  end
+  else
+  begin
+    aDateTime := FOwner.FParams[FIndex].Value;
+    aTimeZoneID := TimeZoneID_GMT;
+  end;
+end;
+
+procedure TParamIntf.GetAsDateTime(var aDateTime: TDateTime;
+  var aTimezone: AnsiString);
+begin
+  with FOwner.FParams[FIndex] do
+  if VarIsArray(Value) then
+  begin
+    aDateTime := Value[0];
+    if VarType(Value[1]) in [varSmallint, varInteger, varByte, varWord, varShortInt] then
+      aTimeZone := FOwner.DataBase.attachment.getFirebirdAPI.TimeZoneID2TimeZoneName(Value[1])
+    else
+      aTimezone := Value[1];
+  end
+  else
+  begin
+    aDateTime := FOwner.FParams[FIndex].Value;
+    aTimeZone := 'GMT';
+  end;
+end;
+
+function TParamIntf.GetAsUTCDateTime: TDateTime;
+begin
+  IBError(ibxeNotSupported,[]);
 end;
 
 function TParamIntf.GetAsDouble: Double;
@@ -381,6 +421,11 @@ begin
   FOwner.SetTimeZoneID(FIndex,aTimeZoneID);
 end;
 
+procedure TParamIntf.SetAsTime(aValue: TDateTime; aTimeZone: AnsiString);
+begin
+  FOwner.SetParam(FIndex,VarArrayOf([aValue,aTimeZone]));
+end;
+
 procedure TParamIntf.SetAsDateTime(aValue: TDateTime);
 begin
   FOwner.SetParam(FIndex,AValue);
@@ -389,13 +434,19 @@ end;
 procedure TParamIntf.SetAsDateTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID
   );
 begin
-  FOwner.SetParam(FIndex,AValue);
-  FOwner.SetTimeZoneID(FIndex,aTimeZoneID);
+  with FOwner.DataBase.attachment.getFirebirdAPI do
+    FOwner.SetParam(FIndex,VarArrayOf([aValue,TimeZoneID2TimeZoneName(aTimeZoneID)]));
 end;
 
-procedure TParamIntf.SetAsSQLTimestamp(aValue: ISQLParamTimestamp);
+procedure TParamIntf.SetAsDateTime(aValue: TDateTime; aTimeZone: AnsiString);
 begin
-   FOwner.SetParam(FIndex,AValue);
+  FOwner.SetParam(FIndex,VarArrayOf([aValue,aTimeZone]));
+end;
+
+procedure TParamIntf.SetAsUTCDateTime(aUTCTime: TDateTime; aTimeZone: AnsiString
+  );
+begin
+  IBError(ibxeNotSupported,[]);
 end;
 
 procedure TParamIntf.SetAsDouble(aValue: Double);

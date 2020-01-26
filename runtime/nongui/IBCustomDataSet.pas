@@ -1110,8 +1110,6 @@ type
 { TIBDateTimeField }
 
 function TIBDateTimeField.GetTimeZoneName: string;
-var ZoneOffset, DSTOffset, EffectiveOffset: integer;
-    TimeZone: AnsiString;
 begin
   if not FTimeZoneNameIsKnown then
   with (DataSet as TIBCustomDataSet).Database, attachment.getFirebirdAPI do
@@ -1124,9 +1122,8 @@ begin
     else
     {Need to determine whether daylight savings time in use for date/timezone
      and then format time displayment.}
-    TimeZone := TimeZoneID2TimeZoneName(FTimeZoneID);
-    GetTimeZoneInfo(attachment,TimeZone,FTimestamp,ZoneOffset, DSTOffset, EffectiveOffset);
-    FTimeZoneName := FormatTimeZoneOffset(EffectiveOffset);
+    FTimeZoneName := FormatTimeZoneOffset(GetEffectiveOffsetMins(FTimestamp,
+                                          TimeZoneID2TimeZoneName(FTimeZoneID)));
     FTimeZoneNameIsKnown := true;
   end;
   Result := FTimeZoneName;
@@ -2491,7 +2488,7 @@ begin
         SQL_TIMESTAMP_TZ,
         SQL_TIME_TZ:
         begin
-          ColData.AsDateTime(LocalTimeWithTimeZone.Timestamp, LocalTimeWithTimeZone.TimeZoneID);
+          ColData.GetAsDateTime(LocalTimeWithTimeZone.Timestamp, LocalTimeWithTimeZone.TimeZoneID);
           LocalData := PByte(@LocalTimeWithTimeZone);
         end;
         SQL_SHORT, SQL_LONG:
@@ -3155,7 +3152,6 @@ var
   st: RawByteString;
   OldBuffer: Pointer;
   Param: ISQLParam;
-  ts: ISQLParamTimestamp;
 begin
   if (Buffer = nil) then
     IBError(ibxeBufferNotSet, [nil]);
@@ -4654,12 +4650,7 @@ begin
           ftTime:
             if (cur_field is TIBDateTimeField) and TIBDateTimeField(cur_field).HasTimeZone
               and (cur_param.GetSQLType = SQL_TIME_TZ) then
-            begin
-              ts := Database.attachment.GetSQLTimestampParam;
-              ts.AsTime := cur_field.AsDateTime;
-              ts.SetTimeZoneID(TIBDateTimeField(cur_field).TimeZoneID);
-              cur_param.SetAsSQLTimestamp(ts);
-            end
+              cur_param.SetAsDateTime(cur_Field.asDateTime,TIBDateTimeField(cur_field).TimeZoneID)
             else
               cur_param.AsTime := cur_field.AsDateTime;
           ftDateTime:
