@@ -74,7 +74,7 @@ type
 
   TCommentType = (ctDatabase, ctCharacterSet,ctCollation,ctDomain,ctException,
                   ctExternalFunction, ctFilter, ctGenerator, ctIndex, ctPackage,
-                  ctProcedure, ctRole, ctSequence, ctTable, ctTrigger,
+                  ctProcedure, ctFunction, ctRole, ctSequence, ctTable, ctTrigger,
                   ctView, ctColumn,ctParameter, ctArgument);
   TCommentTypes = set of TCommentType;
 
@@ -95,6 +95,7 @@ type
     procedure Add2MetaData(const Msg: string; IsError: boolean=true);
     procedure AddComment(Query: TIBSQL; cType: TCommentType; OutStrings: TStrings;
         CommentFieldName: string = 'RDB$DESCRIPTION');
+    function GetCollationName(CharacterSetID, CollationID: integer): string;
     function GetDatabase: TIBDatabase;
     function GetIndexSegments ( indexname : String) : String;
     function GetTransaction: TIBTransaction;
@@ -109,6 +110,7 @@ type
     procedure ShowGrantRoles(Terminator : String);
     procedure GetProcedureArgs(Proc : String);
   protected
+    { Protected declarations }
     function ExtractDDL(Flag: Boolean; TableName: String; ExtractTypes: TExtractTypes =
       []): Boolean;
     function ExtractListTable(RelationName, NewName: String; DomainFlag: Boolean): Boolean;
@@ -128,22 +130,29 @@ type
     procedure ListException(ExceptionName : String = '');
     procedure ListFilters(FilterName : String = '');
     procedure ListForeign(ObjectName : String = ''; ExtractType : TExtractType = etForeign);
-    procedure ListFunctions(FunctionName : String = '');
+    procedure ListExternalFunctions(FunctionName : String = '');
+    procedure ListFunctions(ProcDDLType: TProcDDLType = pdCreateProc; FunctionName : String = ''; IncludeGrants:boolean=false);
     procedure ListGenerators(GeneratorName : String = ''; ExtractTypes: TExtractTypes=[]);
     procedure ListIndex(ObjectName : String = ''; ExtractType : TExtractType = etIndex);
     procedure ListViews(ViewName : String = '');
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function PrintSet(var Used : Boolean) : String;
     function QuoteIdentifier(Value: String): String;
+    function GetFieldType(qry: TIBSQL): string; overload;
 
-    { Protected declarations }
   public
     { Public declarations }
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
     function GetArrayField(FieldName : String) : String;
-    function GetFieldType(FieldType, FieldSubType, FieldScale, FieldSize,
-      FieldPrec, FieldLen : Integer) : String;
+    function GetFieldType(FieldType, FieldSubType, FieldScale, FieldPrecision,
+      FieldLength: integer;
+      HasCharacterSet: boolean=false;
+      FieldCharacterSetID: integer=0;
+      FieldCharacterLength: integer=0;
+      FieldSegmentLen: integer=0;
+      IsArray: boolean=false;
+      FieldSourceName: string=''): String; overload;
     function GetCharacterSets(CharSetId, Collation : integer;	CollateOnly : Boolean) : String;
     procedure ExtractObject(ObjectType : TExtractObjectTypes; ObjectName : String = '';
       ExtractTypes : TExtractTypes = []);
@@ -173,7 +182,14 @@ type
 
   TSQLTypes = Array[0..19] of TSQLType;
 
+  TUserPrivilege = record
+    Privilege: string;
+    mask: cardinal;
+  end;
+
 const
+  MAX_INTSUBTYPES = 2;
+  MAXSUBTYPES = 8;     { Top of subtypes array }
 
   priv_UNKNOWN = 1;
   priv_SELECT = 2;
@@ -193,7 +209,7 @@ const
   (PrivFlag : priv_REFERENCES; PrivString : 'REFERENCES'),
   (PrivFlag : priv_USAGE; PrivString : 'USAGE' ));
 
- 	ColumnTypes : TSQLTypes = (
+  ColumnTypes : TSQLTypes = (
     (SqlType : blr_short; TypeName :	'SMALLINT'),		{ NTX: keyword }
     (SqlType : blr_long; TypeName : 'INTEGER'),		{ NTX: keyword }
     (SqlType : blr_quad; TypeName : 'QUAD'),		{ NTX: keyword }
@@ -209,14 +225,14 @@ const
     (SqlType : blr_timestamp; TypeName : 'TIMESTAMP'),		{ NTX: keyword }
     (SqlType : blr_int64; TypeName : 'BIGINT'),
     (SqlType : blr_bool; TypeName : 'BOOLEAN'),
-    (SqlType : blr_dec64; TypeName : 'DECFLOAT(16)'),
+    (SqlType : blr_dec64; TypeName : 'DECFLOAT'),
     (SqlType : blr_dec128; TypeName : 'DECFLOAT'),
     (SqlType : blr_dec_fixed; TypeName : 'NUMERIC'),
     (SqlType : blr_sql_time_tz; TypeName : 'TIME WITH TIME ZONE'),
     (SqlType : blr_timestamp_tz; TypeName : 'TIMESTAMP WITH TIME ZONE')
     );
 
-  SubTypes : Array[0..8] of String = (
+  SubTypes : Array[0..MAXSUBTYPES] of String = (
     'UNKNOWN',			{ NTX: keyword }
     'TEXT',				{ NTX: keyword }
     'BLR',				{ NTX: keyword }
@@ -227,7 +243,7 @@ const
     'TRANSACTION_DESCRIPTION',	{ NTX: keyword }
     'EXTERNAL_FILE_DESCRIPTION');	{ NTX: keyword }
 
-  IntegralSubtypes : Array[0..2] of String = (
+  IntegralSubtypes : Array[0..MAX_INTSUBTYPES] of String = (
     'UNKNOWN',			{ Defined type, NTX: keyword }
     'NUMERIC',			{ NUMERIC, NTX: keyword }
     'DECIMAL'); 			{ DECIMAL, NTX: keyword }
@@ -257,8 +273,6 @@ const
 
 
 
-  MAX_INTSUBTYPES = 2;
-  MAXSUBTYPES = 8;     { Top of subtypes array }
 
 { Object types used in RDB$DEPENDENCIES and RDB$USER_PRIVILEGES }
 
@@ -286,6 +300,35 @@ const
   obj_function = 100;
   obj_domain = 101;
 
+  {User Privileges}
+  UserPrivileges: array [0..23] of TUserPrivilege = (
+  (Privilege:'USER_MANAGEMENT'; Mask: $02000000),	        {Manage users}
+  (Privilege:'READ_RAW_PAGES'; Mask: $04000000),	        {Read pages in raw format using Attachment::getInfo()}
+  (Privilege:'CREATE_USER_TYPES'; Mask: $08000000),	        {Add/change/delete non-system records in RDB$TYPES}
+  (Privilege:'USE_NBACKUP_UTILITY'; Mask: $10000000),	        {Use nbackup to create database copies}
+  (Privilege:'CHANGE_SHUTDOWN_MODE'; Mask: $20000000),	        {Shut down database and bring online}
+  (Privilege:'TRACE_ANY_ATTACHMENT'; Mask: $40000000),	        {Trace other users' attachments}
+  (Privilege:'MONITOR_ANY_ATTACHMENT'; Mask: $80000000),	{Monitor (tables MON$) other users' attachments}
+  (Privilege:'ACCESS_SHUTDOWN_DATABASE'; Mask: $00010000),	{Access database when it is shut down}
+  (Privilege:'CREATE_DATABASE'; Mask: $00020000),	        {Create new databases (given in security.db)}
+  (Privilege:'DROP_DATABASE'; Mask: $00040000),	                {Drop this database}
+  (Privilege:'USE_GBAK_UTILITY'; Mask: $00080000),	        {Use appropriate utility}
+  (Privilege:'USE_GSTAT_UTILITY'; Mask: $00100000),	        {...}
+  (Privilege:'USE_GFIX_UTILITY'; Mask: $00200000),	        {       ...}
+  (Privilege:'IGNORE_DB_TRIGGERS'; Mask: $00400000),	        {Instruct engine not to run DB-level triggers}
+  (Privilege:'CHANGE_HEADER_SETTINGS'; Mask: $00800000),	{Modify parameters in DB header page}
+  (Privilege:'SELECT_ANY_OBJECT_IN_DATABASE'; Mask: $00000100),	{Use SELECT for any selectable object}
+  (Privilege:'ACCESS_ANY_OBJECT_IN_DATABASE'; Mask: $00000200),	{Access (in any possible way) any object}
+  (Privilege:'MODIFY_ANY_OBJECT_IN_DATABASE'; Mask: $00000400),	{Modify (up to drop) any object}
+  (Privilege:'CHANGE_MAPPING_RULES'; Mask: $00000800),	        {Change authentication mappings}
+  (Privilege:'USE_GRANTED_BY_CLAUSE'; Mask: $00001000),	        {Use GRANTED BY in GRANT and REVOKE operators}
+  (Privilege:'GRANT_REVOKE_ON_ANY_OBJECT'; Mask: $00002000),	{GRANT and REVOKE rights on any object in database}
+  (Privilege:'GRANT_REVOKE_ANY_DDL_RIGHT'; Mask: $00004000),	{GRANT and REVOKE any DDL rights}
+  (Privilege:'CREATE_PRIVILEGED_ROLES'; Mask: $00008000),	{Use SET SYSTEM PRIVILEGES in roles}
+  (Privilege:'MODIFY_EXT_CONN_POOL'; Mask: $00000002)	        {Use command ALTER EXTERNAL CONNECTIONS POOL}
+  );
+
+
 implementation
 
 uses IBMessages, IBDataOutput;
@@ -293,25 +336,6 @@ uses IBMessages, IBDataOutput;
 const
   TERM = ';';
   ProcTerm = '^';
-
-  CollationSQL =
-    'SELECT CST.RDB$CHARACTER_SET_NAME, COL.RDB$COLLATION_NAME, CST.RDB$DEFAULT_COLLATE_NAME ' +
-    'FROM RDB$COLLATIONS COL JOIN RDB$CHARACTER_SETS CST ON ' +
-    '  COL.RDB$CHARACTER_SET_ID = CST.RDB$CHARACTER_SET_ID ' +
-    'WHERE ' +
-    '  COL.RDB$COLLATION_ID = :COLLATION AND ' +
-    '  CST.RDB$CHARACTER_SET_ID = :CHAR_SET_ID ' +
-    'ORDER BY COL.RDB$COLLATION_NAME, CST.RDB$CHARACTER_SET_NAME';
-
-  NonCollationSQL =
-    'SELECT CST.RDB$CHARACTER_SET_NAME ' +
-    'FROM RDB$CHARACTER_SETS CST ' +
-    'WHERE CST.RDB$CHARACTER_SET_ID = :CHARSETID ' +
-    'ORDER BY CST.RDB$CHARACTER_SET_NAME';
-
-  PrecisionSQL =
-    'SELECT * FROM RDB$FIELDS ' +
-    'WHERE RDB$FIELD_NAME = :FIELDNAME';
 
   ArraySQL =
     'SELECT * FROM RDB$FIELD_DIMENSIONS FDIM ' +
@@ -493,6 +517,8 @@ const
         ObjType: -1;
         SystemTableName: 'RDB$DATABASE';
         NameField: '';
+        NameSpaceField: '';
+        Condition: '';
         CommentType: ctDatabase)
 );
 { TIBExtract }
@@ -588,7 +614,7 @@ begin
   begin
     ListCreateDb;
     ListFilters;
-    ListFunctions;
+    ListExternalFunctions;
     ListDomains;
     ListAllTables(flag);
     if etData in ExtractTypes then
@@ -605,10 +631,12 @@ begin
     if DatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
       ListPackages(paHeader);
     ListProcs(pdCreateStub);
+    ListFunctions(pdCreateStub);
     ListTriggers;
     if DatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
       ListPackages(paBody);
     ListProcs(pdAlterProc);
+    ListFunctions(pdAlterProc);
     FMetaData.Add('');
     FMetaData.Add('/* Comments on System Objects */');
     FMetaData.Add('');
@@ -665,26 +693,19 @@ const
     'SELECT * FROM RDB$GENERATORS WHERE RDB$GENERATOR_NAME = :GENERATOR';
 
 var
-  Collation, CharSetId : integer;
-  i : integer;
   Column, Constraint : String;
-  SubType : integer;
-  IntChar : integer;
-  qryTables, qryPrecision, qryConstraints, qryRelConstraints, qryGenerators : TIBSQL;
-  PrecisionKnown, ValidRelation : Boolean;
-  FieldScale, FieldType : Integer;
+  qryTables, qryConstraints, qryRelConstraints, qryGenerators : TIBSQL;
+  ValidRelation : Boolean;
   CreateTable: string;
   TableType: integer;
   Comments: TStrings;
 begin
   Result := true;
-  IntChar := 0;
   ValidRelation := false;
 
   if DomainFlag then
     ListDomains(RelationName);
   qryTables := TIBSQL.Create(FDatabase);
-  qryPrecision := TIBSQL.Create(FDatabase);
   qryConstraints := TIBSQL.Create(FDatabase);
   qryRelConstraints := TIBSQL.Create(FDatabase);
   qryGenerators := TIBSQL.Create(FDatabase);
@@ -694,12 +715,12 @@ begin
     RelationName := trim(RelationName);
     qryTables.Params.ByName('RelationName').AsString := RelationName;
     qryTables.ExecQuery;
-    qryPrecision.SQL.Add(PrecisionSQL);
     qryConstraints.SQL.Add(ConstraintSQL);
     qryRelConstraints.SQL.Add(RelConstraintsSQL);
     qryGenerators.SQL.Add(GetGeneratorSQL);
     if not qryTables.Eof then
     begin
+      {Format Table Declaration header}
       ValidRelation := true;
       TableType := qryTables.FieldByName('RDB$RELATION_TYPE').AsInteger;
       if (not qryTables.FieldByName('RDB$OWNER_NAME').IsNull) and
@@ -723,15 +744,12 @@ begin
       AddComment(qryTables,ctTable,Comments);
     end;
 
+    {add columns}
     while not qryTables.Eof do
     begin
        AddComment(qryTables,ctColumn,Comments,'RDB$DESCRIPTION1');
-       Column := '  ' + QuoteIdentifier( qryTables.FieldByName('RDB$FIELD_NAME').AsString) + TAB;
-
-    {  Check first for computed fields, then domains.
-       If this is a known domain, then just print the domain rather than type
-       Domains won't have length, array, or blob definitions, but they
-       may have not null, default and check overriding their definitions }
+       Column := QuoteIdentifier( qryTables.FieldByName('RDB$FIELD_NAME').AsString) +
+                 TAB + GetFieldType(qryTables);
 
       if not qryTables.FieldByName('rdb$computed_blr').IsNull then
       begin
@@ -741,135 +759,6 @@ begin
       end
       else
       begin
-        FieldType := qryTables.FieldByName('RDB$FIELD_TYPE').AsInteger;
-        FieldScale := qryTables.FieldByName('RDB$FIELD_SCALE').AsInteger;
-        if not ((Copy(qryTables.FieldByName('RDB$FIELD_NAME1').AsString, 1, 4) = 'RDB$') and
-          (qryTables.FieldByName('RDB$FIELD_NAME1').AsString[5] in ['0'..'9'])) and
-          (qryTables.FieldByName('RDB$SYSTEM_FLAG').AsInteger <> 1) then
-        begin
-          Column := Column + QuoteIdentifier( trim(qryTables.FieldByName('RDB$FIELD_NAME1').AsString));
-          { International character sets }
-          if (qryTables.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying])
-              and (not qryTables.FieldByName('RDB$COLLATION_ID').IsNull)
-              and (qryTables.FieldByName('RDB$COLLATION_ID').AsInteger <> 0) then
-          begin
-            Collation := qryTables.FieldByName('RDB$COLLATION_ID').AsInteger;
-            Column := Column + GetCharacterSets(qryTables.FieldByName('RDB$CHARACTER_SET_ID').AsShort,
-                             Collation, true);
-          end;
-        end
-        else
-        begin
-  	      { Look through types array }
-          for i := Low(Columntypes) to High(ColumnTypes) do
-          begin
-            PrecisionKnown := false;
-            if qryTables.FieldByname('RDB$FIELD_TYPE').AsShort = ColumnTypes[i].SQLType then
-            begin
-
-              if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION10 then
-              begin
-                { Handle Integral subtypes NUMERIC and DECIMAL }
-                if qryTables.FieldByName('RDB$FIELD_TYPE').AsInteger in
-                        [blr_short, blr_long, blr_int64, blr_dec_fixed] then
-                begin
-                  qryPrecision.Params.ByName('FIELDNAME').AsString :=
-                    qryTables.FieldByName('RDB$FIELD_NAME1').AsString;
-                  qryPrecision.ExecQuery;
-
-                  { We are ODS >= 10 and could be any Dialect }
-                  if not qryPrecision.FieldByName('RDB$FIELD_PRECISION').IsNull then
-                  begin
-                  { We are Dialect >=3 since FIELD_PRECISION is non-NULL }
-                    if (qryPrecision.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger > 0) and
-                       (qryPrecision.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger <= MAX_INTSUBTYPES) then
-                    begin
-                      Column := column + Format('%s(%d, %d)',
-                         [IntegralSubtypes[qryPrecision.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger],
-                         qryPrecision.FieldByName('RDB$FIELD_PRECISION').AsInteger,
-                        -qryPrecision.FieldByName('RDB$FIELD_SCALE').AsInteger]);
-                      PrecisionKnown := TRUE;
-                    end;
-                  end;
-                  qryPrecision.Close;
-                end;
-              end;
-
-              if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
-              begin
-                {Handle DECFLOAT}
-                if qryTables.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_dec64, blr_dec128] then
-                begin
-                  qryPrecision.Params.ByName('FIELDNAME').AsString :=
-                    qryTables.FieldByName('RDB$FIELD_NAME1').AsString;
-                  qryPrecision.ExecQuery;
-
-                  { We are ODS >= 13 and could be any Dialect }
-                  if not qryPrecision.FieldByName('RDB$FIELD_PRECISION').IsNull then
-                  begin
-                    Column := Column + Format('DECFLOAT(%d)',[qryPrecision.FieldByName('RDB$FIELD_PRECISION').AsInteger]);
-                    PrecisionKnown := TRUE;
-                  end;
-                  qryPrecision.Close;
-                end;
-              end;
-
-              if PrecisionKnown = FALSE then
-              begin
-                { Take a stab at numerics and decimals }
-                if (FieldType = blr_short) and (FieldScale < 0) then
-                  Column := Column + Format('NUMERIC(4, %d)', [-FieldScale])
-                else
-                  if (FieldType = blr_long) and (FieldScale < 0) then
-                    Column := Column + Format('NUMERIC(9, %d)', [-FieldScale])
-                  else
-                    if (FieldType = blr_double) and (FieldScale < 0) then
-                      Column := Column + Format('NUMERIC(15, %d)', [-FieldScale])
-                    else
-                      Column := Column + ColumnTypes[i].TypeName;
-              end;
-            end;
-          end;
-          if FieldType in [blr_text, blr_varying] then
-            if qryTables.FieldByName('RDB$CHARACTER_LENGTH').IsNull then
-              Column := Column + Format('(%d)', [qryTables.FieldByName('RDB$FIELD_LENGTH').AsInteger])
-            else
-              Column := Column + Format('(%d)', [qryTables.FieldByName('RDB$CHARACTER_LENGTH').AsInteger]);
-
-          { Catch arrays after printing the type  }
-
-          if not qryTables.FieldByName('RDB$DIMENSIONS').IsNull and (qryTables.FieldByName('RDB$DIMENSIONS').AsInteger > 0) then
-            Column := column + GetArrayField(qryTables.FieldByName('RDB$FIELD_SOURCE').AsString);
-
-          if FieldType = blr_blob then
-          begin
-            subtype := qryTables.FieldByName('RDB$FIELD_SUB_TYPE').AsShort;
-            Column := Column + ' SUB_TYPE ';
-            if (subtype > 0) and (subtype <= MAXSUBTYPES) then
-              Column := Column + SubTypes[subtype]
-            else
-              Column := Column + IntToStr(subtype);
-            column := Column + Format(' SEGMENT SIZE %d',
-                [qryTables.FieldByName('RDB$SEGMENT_LENGTH').AsInteger]);
-          end;
-
-          { International character sets }
-          if ((FieldType in [blr_text, blr_varying]) or
-              (FieldType = blr_blob)) and
-             (not qryTables.FieldByName('RDB$CHARACTER_SET_ID').IsNull) and
-             (qryTables.FieldByName('RDB$CHARACTER_SET_ID').AsInteger <> 0) then
-          begin
-            { Override rdb$fields id with relation_fields if present }
-
-            CharSetId := 0;
-            if not qryTables.FieldByName('RDB$CHARACTER_SET_ID').IsNull then
-              CharSetId := qryTables.FieldByName('RDB$CHARACTER_SET_ID').AsInteger;
-
-            Column := Column + GetCharacterSets(CharSetId, 0, false);
-            intchar := 1;
-          end;
-        end;
-
         {Firebird 3 introduces IDENTITY columns. We need to check for them here}
         if qryTables.HasField('RDB$GENERATOR_NAME') and not qryTables.FieldByName('RDB$GENERATOR_NAME').IsNull then
         begin
@@ -923,26 +812,11 @@ begin
           Column := Column + ' NOT NULL';
         end;
 
-        if ((FieldType in [blr_text, blr_varying]) or
-            (FieldType = blr_blob)) and
-           (not qryTables.FieldByName('RDB$CHARACTER_SET_ID').IsNull) and
-           (qryTables.FieldByName('RDB$CHARACTER_SET_ID').AsInteger <> 0) and
-           (intchar <> 0) then
-        begin
-          Collation := 0;
-          if not qryTables.FieldByName('RDB$COLLATION_ID1').IsNull then
-            Collation := qryTables.FieldByName('RDB$COLLATION_ID1').AsInteger
-          else
-            if not qryTables.FieldByName('RDB$COLLATION_ID').IsNull then
-              Collation := qryTables.FieldByName('RDB$COLLATION_ID').AsInteger;
+        if not qryTables.FieldByName('RDB$CHARACTER_SET_ID').IsNull and
+           not qryTables.FieldByName('RDB$COLLATION_ID').IsNull then
+          Column := Column + GetCollationName(qryTables.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                                              qryTables.FieldByName('RDB$COLLATION_ID').AsInteger);
 
-          CharSetId := 0;
-          if not qryTables.FieldByName('RDB$CHARACTER_SET_ID').IsNull then
-            CharSetId := qryTables.FieldByName('RDB$CHARACTER_SET_ID').AsInteger;
-
-          if Collation <> 0 then
-            Column := Column + GetCharacterSets(CharSetId, Collation, true);
-        end;
       end;
       qryTables.Next;
       if not qryTables.Eof then
@@ -995,7 +869,6 @@ begin
   finally
     Comments.Free;
     qryTables.Free;
-    qryPrecision.Free;
     qryConstraints.Free;
     qryRelConstraints.Free;
     qryGenerators.Free;
@@ -1075,6 +948,22 @@ end;
 
 function TIBExtract.GetCharacterSets(CharSetId, Collation: integer;
   CollateOnly: Boolean): String;
+const
+  CollationSQL =
+    'SELECT CST.RDB$CHARACTER_SET_NAME, COL.RDB$COLLATION_NAME, CST.RDB$DEFAULT_COLLATE_NAME ' +
+    'FROM RDB$COLLATIONS COL JOIN RDB$CHARACTER_SETS CST ON ' +
+    '  COL.RDB$CHARACTER_SET_ID = CST.RDB$CHARACTER_SET_ID ' +
+    'WHERE ' +
+    '  COL.RDB$COLLATION_ID = :COLLATION AND ' +
+    '  CST.RDB$CHARACTER_SET_ID = :CHAR_SET_ID ' +
+    'ORDER BY COL.RDB$COLLATION_NAME, CST.RDB$CHARACTER_SET_NAME';
+
+  NonCollationSQL =
+    'SELECT CST.RDB$CHARACTER_SET_NAME ' +
+    'FROM RDB$CHARACTER_SETS CST ' +
+    'WHERE CST.RDB$CHARACTER_SET_ID = :CHARSETID ' +
+    'ORDER BY CST.RDB$CHARACTER_SET_NAME';
+
 var
   CharSetSQL : TIBSQL;
   DidActivate : Boolean;
@@ -1176,6 +1065,37 @@ begin
 
     cmt += ' IS ''' + SQLSafeString(Query.FieldByName(CommentFieldName).AsString) + '''' + TERM;
     OutStrings.Add(cmt);
+  end;
+end;
+
+function TIBExtract.GetCollationName(CharacterSetID, CollationID: integer
+  ): string;
+const
+  CollationSQL =
+    'SELECT CST.RDB$CHARACTER_SET_NAME, COL.RDB$COLLATION_NAME, CST.RDB$DEFAULT_COLLATE_NAME ' +
+    'FROM RDB$COLLATIONS COL JOIN RDB$CHARACTER_SETS CST ON ' +
+    '  COL.RDB$CHARACTER_SET_ID = CST.RDB$CHARACTER_SET_ID ' +
+    'WHERE ' +
+    '  COL.RDB$COLLATION_ID = :COLLATION AND ' +
+    '  CST.RDB$CHARACTER_SET_ID = :CHAR_SET_ID ' +
+    'ORDER BY COL.RDB$COLLATION_NAME, CST.RDB$CHARACTER_SET_NAME';
+
+var CharSetSQL : TIBSQL;
+begin
+  Result := '';
+  CharSetSQL := TIBSQL.Create(FDatabase);
+  try
+   CharSetSQL.SQL.Add(CollationSQL);
+   CharSetSQL.Params.ByName('Char_Set_Id').AsInteger := CharacterSetID;
+   CharSetSQL.Params.ByName('Collation').AsInteger := CollationID;
+   CharSetSQL.ExecQuery;
+
+   { Is specified collation the default collation for character set? }
+   if (Trim(CharSetSQL.FieldByName('RDB$DEFAULT_COLLATE_NAME').AsString) <>
+                  Trim(CharSetSQL.FieldByName('RDB$COLLATION_NAME').AsString)) then
+     Result := ' COLLATE ' + Trim(CharSetSQL.FieldByName('RDB$COLLATION_NAME').AsString)
+  finally
+    CharSetSQL.Free;
   end;
 end;
 
@@ -1640,8 +1560,8 @@ procedure TIBExtract.ListProcs(ProcDDLType: TProcDDLType;
   ProcedureName: String; IncludeGrants: boolean);
 const
   CreateProcedureStr1 = 'CREATE PROCEDURE %s ';
-  CreateProcedureStr2 = 'BEGIN EXIT; END %s%s';
-  CreateProcedureStr3 = 'BEGIN SUSPEND; EXIT; END %s%s';
+  CreateProcedureStr2 = 'BEGIN EXIT; END';
+  CreateProcedureStr3 = 'BEGIN SUSPEND; EXIT; END';
   ProcedureSQL =  {Order procedures by dependency order and then procedure name}
                   'with recursive Procs as ( ' +
                   'Select RDB$PROCEDURE_NAME, 1 as ProcLevel from RDB$PROCEDURES ' +
@@ -1727,9 +1647,19 @@ begin
              ProcName)]));
           GetProcedureArgs(ProcName);
           if qryProcedures.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 1 then
-            FMetaData.Add(Format(CreateProcedureStr3, [ProcTerm, LineEnding]))
+            FMetaData.Add(CreateProcedureStr3)
           else
-            FMetaData.Add(Format(CreateProcedureStr2, [ProcTerm, LineEnding]));
+            FMetaData.Add(CreateProcedureStr2);
+
+          {SQL Security added in Firebird 4}
+          if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
+          begin
+            qryProcSecurity.SQL.Text := ProcedureSecuritySQL;
+            qryProcSecurity.Params.ByName('ProcedureName').AsString := ProcName;
+            qryProcSecurity.ExecQuery;
+            FMetaData.Add(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
+          end;
+          FMetaData.Add(ProcTerm+ LineEnding);
         end;
 
       pdCreateProc:
@@ -1740,6 +1670,14 @@ begin
 
         GetProcedureArgs(ProcName);
 
+        if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
+        begin
+          SList.Text := qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
+          FMetaData.AddStrings(SList);
+        end
+        else
+          FMetaData.Add(CreateProcedureStr2);
+
         {SQL Security added in Firebird 4}
         if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
         begin
@@ -1749,14 +1687,8 @@ begin
           FMetaData.Add(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
         end;
 
-        if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
-        begin
-          SList.Text := qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
-          SList.Add(Format(' %s%s', [ProcTerm, LineEnding]));
-          FMetaData.AddStrings(SList);
-        end
-        else
-          FMetaData.Add(Format(CreateProcedureStr2, [ProcTerm, LineEnding]));
+        FMetaData.Add(ProcTerm + LineEnding);
+
       end;
 
       pdAlterProc:
@@ -2405,113 +2337,6 @@ var
   First : Boolean;
   qryDomains : TIBSQL;
   FieldName, Line : String;
-
-  function FormatDomainStr : String;
-  var
-    i, SubType : Integer;
-    PrecisionKnown : Boolean;
-  begin
-    Result := '';
-    for i := Low(ColumnTypes) to High(ColumnTypes) do
-      if qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger = ColumnTypes[i].SQLType then
-      begin
-        PrecisionKnown := FALSE;
-        if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION10 then
-        begin
-          if qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_short, blr_long, blr_int64] then
-          begin
-            { We are ODS >= 10 and could be any Dialect }
-            if (FDatabaseInfo.DBSQLDialect >= 3) and
-               (not qryDomains.FieldByName('RDB$FIELD_PRECISION').IsNull) and
-               (qryDomains.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger > 0) and
-               (qryDomains.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger <= MAX_INTSUBTYPES) then
-            begin
-              Result := Result + Format('%s(%d, %d)', [
-                IntegralSubtypes [qryDomains.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger],
-                qryDomains.FieldByName('RDB$FIELD_PRECISION').AsInteger,
-                -1 * qryDomains.FieldByName('RDB$FIELD_SCALE').AsInteger]);
-              PrecisionKnown := true;
-            end;
-          end;
-        end;
-        if PrecisionKnown = false then
-        begin
-          { Take a stab at numerics and decimals }
-          if (qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger = blr_short) and
-              (qryDomains.FieldByName('RDB$FIELD_SCALE').AsInteger < 0) then
-            Result := Result + Format('NUMERIC(4, %d)',
-              [-qryDomains.FieldByName('RDB$FIELD_SCALE').AsInteger] )
-          else
-            if (qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger = blr_long) and
-                (qryDomains.FieldByName('RDB$FIELD_SCALE').AsInteger < 0) then
-              Result := Result + Format('NUMERIC(9, %d)',
-                [-qryDomains.FieldByName('RDB$FIELD_SCALE').AsInteger] )
-            else
-              if (qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger = blr_double) and
-                  (qryDomains.FieldByName('RDB$FIELD_SCALE').AsInteger  < 0) then
-                Result := Result + Format('NUMERIC(15, %d)',
-                  [-qryDomains.FieldByName('RDB$FIELD_SCALE').AsInteger] )
-              else
-                Result := Result + ColumnTypes[i].TypeName;
-        end;
-        break;
-      end;
-
-    if qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger = blr_blob then
-    begin
-      subtype := qryDomains.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger;
-      Result := Result + ' SUB_TYPE ';
-      if (subtype > 0) and (subtype <= MAXSUBTYPES) then
-        Result := Result + SubTypes[subtype]
-      else
-        Result := Result + Format('%d', [subtype]);
-      Result := Result + Format(' SEGMENT SIZE %d', [qryDomains.FieldByName('RDB$SEGMENT_LENGTH').AsInteger]);
-    end //end_if
-    else
-    if (qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying]) then
-    begin
-       if not qryDomains.FieldByName('RDB$CHARACTER_LENGTH').IsNull then
-         Result := Result + Format('(%d)', [qryDomains.FieldByName('RDB$CHARACTER_LENGTH').AsInteger])
-       else
-         Result := Result + Format('(%d)', [qryDomains.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
-    end;
-
-    { since the character set is part of the field type, display that
-     information now. }
-    if not qryDomains.FieldByName('RDB$CHARACTER_SET_ID').IsNull then
-      Result := Result + GetCharacterSets(qryDomains.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
-         0, FALSE);
-    if not qryDomains.FieldByName('RDB$DIMENSIONS').IsNull then
-      Result := GetArrayField(qryDomains.FieldByName('RDB$FIELD_SOURCE').AsString);
-
-    if not qryDomains.FieldByName('RDB$DEFAULT_SOURCE').IsNull then
-      Result := Result + Format('%s%s %s', [LineEnding, TAB,
-         qryDomains.FieldByName('RDB$DEFAULT_SOURCE').AsString]);
-
-    if not qryDomains.FieldByName('RDB$VALIDATION_SOURCE').IsNull then
-      if Pos('CHECK', AnsiUpperCase(qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString)) = 1 then
-        Result := Result + Format('%s%s %s', [LineEnding, TAB,
-           qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString])
-      else
-        Result := Result + Format('%s%s /* %s */', [LineEnding, TAB,
-           qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString]);
-
-    if qryDomains.FieldByName('RDB$NULL_FLAG').AsInteger = 1 then
-      Result := Result + ' NOT NULL';
-
-    { Show the collation order if one has been specified.  If the collation
-       order is the default for the character set being used, then no collation
-       order will be shown ( because it isn't needed ).
-
-       If the collation id is 0, then the default for the character set is
-       being used so there is no need to retrieve the collation information.}
-
-    if (not qryDomains.FieldByName('RDB$COLLATION_ID').IsNull) and
-       (qryDomains.FieldByName('RDB$COLLATION_ID').AsInteger <> 0) then
-      Result := Result + GetCharacterSets(qryDomains.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
-        qryDomains.FieldByName('RDB$COLLATION_ID').AsInteger, true);
-  end;
-
 begin
   First := true;
   qryDomains := TIBSQL.Create(FDatabase);
@@ -2551,8 +2376,49 @@ begin
         First := false;
       end;
 
-      Line := Format('CREATE DOMAIN %s AS ', [FieldName]);
-      Line := Line + FormatDomainStr + Term;
+      Line := Format('CREATE DOMAIN %s AS ', [FieldName]) +
+         GetFieldType(qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger,
+                           qryDomains.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
+                           qryDomains.FieldByName('RDB$FIELD_SCALE').AsInteger,
+                           qryDomains.FieldByName('RDB$FIELD_PRECISION').AsInteger,
+                           qryDomains.FieldByName('RDB$FIELD_LENGTH').AsInteger,
+                           qryDomains.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                           qryDomains.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                           qryDomains.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
+                           qryDomains.FieldByName('RDB$SEGMENT_LENGTH').AsInteger,
+                           not qryDomains.FieldByName('RDB$DIMENSIONS').IsNull and
+                              (qryDomains.FieldByName('RDB$DIMENSIONS').AsInteger <> 0),
+                           FieldName);
+
+      if not qryDomains.FieldByName('RDB$DEFAULT_SOURCE').IsNull then
+        Line := Line + Format('%s%s %s', [LineEnding, TAB,
+           qryDomains.FieldByName('RDB$DEFAULT_SOURCE').AsString]);
+
+      if not qryDomains.FieldByName('RDB$VALIDATION_SOURCE').IsNull then
+      begin
+        if Pos('CHECK', AnsiUpperCase(qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString)) = 1 then
+          Line := Line + Format('%s%s %s', [LineEnding, TAB,
+             qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString])
+        else
+          Line := Line + Format('%s%s /* %s */', [LineEnding, TAB,
+             qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString]);
+      end;
+
+      if qryDomains.FieldByName('RDB$NULL_FLAG').AsInteger = 1 then
+        Line := Line + ' NOT NULL';
+
+      { Show the collation order if one has been specified.  If the collation
+         order is the default for the character set being used, then no collation
+         order will be shown ( because it isn't needed ).
+
+         If the collation id is 0, then the default for the character set is
+         being used so there is no need to retrieve the collation information.}
+
+      if (not qryDomains.FieldByName('RDB$COLLATION_ID').IsNull) and
+         (qryDomains.FieldByName('RDB$COLLATION_ID').AsInteger <> 0) then
+         Line := Line + GetCollationName(qryDomains.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                                         qryDomains.FieldByName('RDB$COLLATION_ID').AsInteger);
+      Line := Line + Term;
       FMetaData.Add(Line);
       AddComment(qryDomains,ctDomain,FMetaData);
       qryDomains.Next;
@@ -2796,7 +2662,7 @@ begin
   end;
 end;
 
-{    ListFunctions
+{    ListExternalFunctions
 
  Functional description
    List all external functions
@@ -2808,7 +2674,7 @@ end;
                 RETURNS INTEGER BY VALUE
                 ENTRY_POINT entrypoint MODULE_NAME module; }
 
-procedure TIBExtract.ListFunctions(FunctionName : String = '');
+procedure TIBExtract.ListExternalFunctions(FunctionName: String);
 const
   FunctionSQL =
     'SELECT * FROM RDB$FUNCTIONS WHERE RDB$SYSTEM_FLAG = 0 ' +
@@ -2825,30 +2691,58 @@ const
     '  :FUNCTION_NAME = RDB$FUNCTION_NAME ' +
     'ORDER BY RDB$ARGUMENT_POSITION';
 
-  FuncArgsPosSQL =
-    'SELECT * FROM RDB$FUNCTION_ARGUMENTS ' +
-    'WHERE ' +
-    '  RDB$FUNCTION_NAME = :RDB$FUNCTION_NAME AND ' +
-    '  RDB$ARGUMENT_POSITION = :RDB$ARGUMENT_POSITION';
+  function GetArgumentType(qryFuncArgs: TIBSQL): string;
+  var FieldType: integer;
+  begin
+    FieldType := qryFuncArgs.FieldByName('RDB$FIELD_TYPE').AsInteger;
+    if (FieldType = blr_cstring) or (FieldType = blr_cstring2) then
+      Result := Format(' CSTRING(%d)',[qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger])
+    else
+    if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION10 then
+      Result := GetFieldType(FieldType,
+                             qryFuncArgs.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
+                             qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger,
+                             qryFuncArgs.FieldByName('RDB$FIELD_PRECISION').AsInteger,
+                             qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger,
+                             not qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                             qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                             qryFuncArgs.FieldByName('RDB$CHARACTER_LENGTH').AsInteger)
+    else
+      Result := GetFieldType(FieldType,
+                             qryFuncArgs.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
+                             qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger,
+                             0,
+                             qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger,
+                             not qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                             qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                             qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger);
 
-  CharSetSQL =
-    'SELECT * FROM RDB$CHARACTER_SETS ' +
-    'WHERE ' +
-    '  RDB$CHARACTER_SET_ID = :CHARACTER_SET_ID';
+      case qryFuncArgs.FieldByName('RDB$MECHANISM').AsInteger of
+      0:
+       if qryFuncArgs.FieldByName('RDB$ARGUMENT_POSITION').AsInteger = 0 then {Return parameter}
+         Result := Result + ' BY VALUE';
+
+      1:
+        Result := Result + ' BY DESCRIPTOR';
+
+      5:
+        Result := Result + ' NULL';
+
+      -1:
+        Result := Result + ' FREE_IT';
+      end;
+end;
 
 var
-  qryFunctions, qryFuncArgs, qryCharSets, qryFuncPos : TIBSQL;
-  First, FirstArg, DidCharset, PrecisionKnown : Boolean;
-  ReturnBuffer, TypeBuffer, Line : String;
-  i, FieldType : Integer;
+  qryFunctions, qryFuncArgs : TIBSQL;
+  First, FirstArg: Boolean;
+  ReturnBuffer, Line : String;
   Comments: TStrings;
 begin
   First := true;
   Comments := TStringList.Create;
   qryFunctions := TIBSQL.Create(FDatabase);
   qryFuncArgs := TIBSQL.Create(FDatabase);
-  qryFuncPos := TIBSQL.Create(FDatabase);
-  qryCharSets := TIBSQL.Create(FDatabase);
   try
     if FunctionName = '' then
       qryFunctions.SQL.Text := FunctionSQL
@@ -2858,24 +2752,21 @@ begin
       qryFunctions.Params.ByName('FunctionName').AsString := FunctionName;
     end;
     qryFuncArgs.SQL.Text := FunctionArgsSQL;
-    qryFuncPos.SQL.Text := FuncArgsPosSQL;
-    qryCharSets.SQL.Text := CharSetSQL;
     qryFunctions.ExecQuery;
     while not qryFunctions.Eof do
     begin
+      if qryFunctions.HasField('RDB$LEGACY_FLAG') and (qryFunctions.FieldByName('RDB$LEGACY_FLAG').IsNULL or
+          (qryFunctions.FieldByName('RDB$LEGACY_FLAG').AsInteger = 0)) then
+        continue; {Internal stored procedure}
       if First then
       begin
-        FMEtaData.Add(Format('%s/*  Function declarations */%s',
+        FMEtaData.Add(Format('%s/* External Function declarations */%s',
           [LineEnding, LineEnding]));
         First := false;
       end; //end_if
       { Start new function declaration }
       AddComment(qryFunctions,ctExternalFunction,Comments);
-      if qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
-        FMetaData.Add(Format('DECLARE EXTERNAL FUNCTION %s',
-          [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]))
-      else
-        FMetaData.Add(Format('CREATE FUNCTION %s',
+      FMetaData.Add(Format('DECLARE EXTERNAL FUNCTION %s',
           [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
       Line := '';
 
@@ -2888,129 +2779,35 @@ begin
       begin
         AddComment(qryFuncArgs,ctParameter,Comments);
         { Find parameter type }
-        i := 0;
-        FieldType := qryFuncArgs.FieldByName('RDB$FIELD_TYPE').AsInteger;
-        while FieldType <> ColumnTypes[i].SQLType do
-          Inc(i);
-
-        { Print length where appropriate }
-        if FieldType in [ blr_text, blr_varying, blr_cstring] then
-        begin
-          DidCharset := false;
-
-          qryCharSets.Params.ByName('CHARACTER_SET_ID').AsString :=
-             qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').AsString;
-          qryCharSets.ExecQuery;
-          while not qryCharSets.Eof do
-          begin
-            DidCharset := true;
-            TypeBuffer := Format('%s(%d) CHARACTER SET %s',
-              [ColumnTypes[i].TypeName,
-               qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger div
-               Max(1,qryCharSets.FieldByName('RDB$BYTES_PER_CHARACTER').AsInteger),
-               qryCharSets.FieldByName('RDB$CHARACTER_SET_NAME').AsString]);
-            qryCharSets.Next;
-          end;
-          qryCharSets.Close;
-          if not DidCharset then
-            TypeBuffer := Format('%s(%d)', [ColumnTypes[i].TypeName,
-              qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
-        end //end_if
+        if qryFuncArgs.FieldByName('RDB$ARGUMENT_POSITION').AsInteger = 0 then {return argument}
+          ReturnBuffer := GetArgumentType(qryFuncArgs)
         else
+        if FirstArg then
         begin
-          PrecisionKnown := false;
-          if (FDatabaseInfo.ODSMajorVersion >= ODS_VERSION10) and
-              (FieldType in [blr_short, blr_long, blr_int64]) then
-          begin
-            qryFuncPos.Params.ByName('RDB$FUNCTION_NAME').AsString :=
-              qryFuncArgs.FieldByName('RDB$FUNCTION_NAME').AsString;
-            qryFuncPos.Params.ByName('RDB$ARGUMENT_POSITION').AsInteger :=
-              qryFuncArgs.FieldByName('RDB$ARGUMENT_POSITION').AsInteger;
-
-            qryFuncPos.ExecQuery;
-            while not qryFuncPos.Eof do
-            begin
-              { We are ODS >= 10 and could be any Dialect }
-              if not qryFuncPos.FieldByName('RDB$FIELD_PRECISION').IsNull then
-              begin
-                { We are Dialect >=3 since FIELD_PRECISION is non-NULL }
-                if (qryFuncPos.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger > 0) and
-                    (qryFuncPos.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger <= MAX_INTSUBTYPES) then
-                begin
-                  TypeBuffer := Format('%s(%d, %d)',
-                    [IntegralSubtypes[qryFuncPos.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger],
-                     qryFuncPos.FieldByName('RDB$FIELD_PRECISION').AsInteger,
-                     -qryFuncPos.FieldByName('RDB$FIELD_SCALE').AsInteger] );
-                  PrecisionKnown := true;
-                end; //end_if
-              end; { if field_precision is not null }
-              qryFuncPos.Next;
-            end;
-            qryFuncPos.Close;
-          end; { if major_ods >= ods_version10 && }
-          if not PrecisionKnown then
-          begin
-            { Take a stab at numerics and decimals }
-            if (FieldType = blr_short) and
-                (qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger < 0) then
-              TypeBuffer := Format('NUMERIC(4, %d)',
-                [-qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger])
-            else
-              if (FieldType = blr_long) and
-                  (qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger < 0) then
-                TypeBuffer := Format('NUMERIC(9, %d)',
-                  [-qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger])
-              else
-                if (FieldType = blr_double) and
-                    (qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger < 0) then
-                  TypeBuffer := Format('NUMERIC(15, %d)',
-                      [-qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger])
-                else
-                  TypeBuffer := ColumnTypes[i].TypeName;
-          end; { if  not PrecisionKnown  }
-        end; { if FCHAR or VARCHAR or CSTRING ... else }
-
-        if qryFunctions.FieldByName('RDB$RETURN_ARGUMENT').AsInteger =
-               qryFuncArgs.FieldByName('RDB$ARGUMENT_POSITION').AsInteger then
-        begin
-          ReturnBuffer := 'RETURNS ' + TypeBuffer;
-          if qryFuncArgs.FieldByName('RDB$MECHANISM').AsInteger = 0 then
-            ReturnBuffer := ReturnBuffer + ' BY VALUE ';
-          if qryFuncArgs.FieldByName('RDB$MECHANISM').AsInteger < 0 then
-            ReturnBuffer := ReturnBuffer + ' FREE_IT';
+          Line := Line + GetArgumentType(qryFuncArgs);
+          FirstArg := false;
         end
         else
-        begin
-          { First arg needs no comma }
-          if FirstArg then
-          begin
-            Line := Line + TypeBuffer;
-            FirstArg := false;
-          end
-          else
-            Line := Line + ', ' + TypeBuffer;
-        end; //end_else
+          Line := Line + ', ' + GetArgumentType(qryFuncArgs);
         qryFuncArgs.Next;
       end;
-
       qryFuncArgs.Close;
-
       FMetaData.Add(Line);
-      FMetaData.Add(ReturnBuffer);
 
-      {SQL Security added in Firebird 4}
-      if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
-        FMetaData.Add(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
-
-      if qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
-        FMetaData.Add(Format('ENTRY_POINT ''%s'' MODULE_NAME ''%s''%s%s%s',
-          [qryFunctions.FieldByName('RDB$ENTRYPOINT').AsString,
-           qryFunctions.FieldByName('RDB$MODULE_NAME').AsString,
-           Term, LineEnding, LineEnding]))
+      if qryFunctions.FieldByName('RDB$RETURN_ARGUMENT').AsInteger = 0 then
+        FMetaData.Add(' RETURNS ' + ReturnBuffer)
       else
-        FMetaData.Add(Format('AS%s%s%s%s%s',[LineEnding,
-                                             qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString,
-                                             TERM,LineEnding,LineEnding]));
+        FMetaData.Add(Format(' RETURNS PARAMETER %d',[qryFunctions.FieldByName('RDB$RETURN_ARGUMENT').AsInteger]));
+
+      FMetaData.Add(Format('ENTRY_POINT ''%s'' MODULE_NAME ''%s''',
+          [qryFunctions.FieldByName('RDB$ENTRYPOINT').AsString,
+           qryFunctions.FieldByName('RDB$MODULE_NAME').AsString]));
+
+       {SQL Security added in Firebird 4}
+       if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
+         FMetaData.Add(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
+
+      FMetaData.Add(TERM + LineEnding + LineEnding);
 
       qryFunctions.Next;
     end;
@@ -3018,10 +2815,164 @@ begin
   finally
     qryFunctions.Free;
     qryFuncArgs.Free;
-    qryCharSets.Free;
-    qryFuncPos.Free;
     Comments.Free;
   end;
+end;
+
+procedure TIBExtract.ListFunctions(ProcDDLType: TProcDDLType;
+  FunctionName: String; IncludeGrants: boolean);
+const
+  FunctionSQL =
+    'SELECT * FROM RDB$FUNCTIONS WHERE RDB$SYSTEM_FLAG = 0 and RDB$LEGACY_FLAG is not NULL and RDB$LEGACY_FLAG = 0 ' +
+    'ORDER BY RDB$FUNCTION_NAME';
+
+  FunctionNameSQL =
+    'SELECT * FROM RDB$FUNCTIONS ' +
+    'WHERE RDB$FUNCTION_NAME = :FunctionName ' +
+    'ORDER BY RDB$FUNCTION_NAME';
+
+  FunctionArgsSQL =
+    'SELECT * FROM RDB$FUNCTION_ARGUMENTS ' +
+    'WHERE ' +
+    '  :FUNCTION_NAME = RDB$FUNCTION_NAME ' +
+    'ORDER BY RDB$ARGUMENT_POSITION';
+
+ var
+  qryFunctions, qryFuncArgs : TIBSQL;
+  First, FirstArg: Boolean;
+  ReturnBuffer, Params : String;
+  Comments: TStrings;
+begin
+  if FDatabaseInfo.ODSMajorVersion < ODS_VERSION12 then {Nothing to do}
+    Exit;
+
+  First := true;
+  Comments := TStringList.Create;
+  qryFunctions := TIBSQL.Create(FDatabase);
+  qryFuncArgs := TIBSQL.Create(FDatabase);
+  try
+    if FunctionName = '' then
+      qryFunctions.SQL.Text := FunctionSQL
+    else
+    begin
+      qryFunctions.SQL.Text := FunctionNameSQL;
+      qryFunctions.Params.ByName('FunctionName').AsString := FunctionName;
+    end;
+    qryFuncArgs.SQL.Text := FunctionArgsSQL;
+    qryFunctions.ExecQuery;
+    while not qryFunctions.Eof do
+    begin
+       if First then
+       begin
+         FMetaData.Add('COMMIT WORK;');
+         FMetaData.Add('SET AUTODDL OFF;');
+         FMetaData.Add(Format('SET TERM %s %s', [ProcTerm, Term]));
+         FMetaData.Add(Format('%s/* Stored Function declarations */%s',
+         [LineEnding, LineEnding]));
+         First := false;
+       end;
+
+       AddComment(qryFunctions,ctFunction,Comments);
+       Params := '';
+
+       FirstArg := true;
+       qryFuncArgs.Params.ByName('FUNCTION_NAME').AsString :=
+          qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString;
+
+       qryFuncArgs.ExecQuery;
+       while not qryFuncArgs.Eof do
+       begin
+         AddComment(qryFuncArgs,ctParameter,Comments);
+         if qryFuncArgs.FieldByName('RDB$ARGUMENT_POSITION').AsInteger = 0 then {return argument}
+           ReturnBuffer := ' RETURNS' + GetFieldType(qryFuncArgs.FieldByName('RDB$FIELD_TYPE').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_PRECISION').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger,
+                                                      not qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                                                      qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$SEGMENT_LENGTH').AsInteger)
+         else
+         if not FirstArg then
+         begin
+           Params := Params + ', ';
+           FirstArg := false;
+         end;
+         Params := Params + qryFuncArgs.FieldByName('RDB$FIELD_NAME').AsString +
+                                       GetFieldType(qryFuncArgs.FieldByName('RDB$FIELD_TYPE').AsInteger,
+                                                    qryFuncArgs.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
+                                                    qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger,
+                                                    qryFuncArgs.FieldByName('RDB$FIELD_PRECISION').AsInteger,
+                                                    qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger,
+                                                    not qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                                                    qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                                                    qryFuncArgs.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
+                                                    qryFuncArgs.FieldByName('RDB$SEGMENT_LENGTH').AsInteger);
+         qryFuncArgs.Next;
+       end; // qryFuncArgs Iteration
+       qryFuncArgs.Close;
+
+       case ProcDDLType of
+       pdCreateStub:
+         begin
+           FMetaData.Add(Format('CREATE FUNCTION %s',
+             [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
+           FMetaData.Add('(' + Params + ')');
+           FMetaData.Add(ReturnBuffer);
+           FMetaData.Add(' AS BEGIN END');
+
+           {SQL Security added in Firebird 4}
+           if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
+             FMetaData.Add(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
+        end;
+
+       pdCreateProc:
+         begin
+           FMetaData.Add(Format('CREATE FUNCTION %s',
+             [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
+           FMetaData.Add('(' + Params + ')');
+           FMetaData.Add(ReturnBuffer);
+           if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
+             FMetaData.Add(' AS ' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
+           else
+             FMetaData.Add(' AS BEGIN END');
+
+           {SQL Security added in Firebird 4}
+           if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
+             FMetaData.Add(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
+         end;
+
+       pdAlterProc:
+         begin
+           FMetaData.Add(Format('ALTER FUNCTION %s',
+             [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
+           FMetaData.Add(ReturnBuffer);
+           if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
+             FMetaData.Add(' AS ' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
+           else
+             FMetaData.Add(' AS BEGIN END');
+         end;
+       end;
+       FMetaData.Add(ProcTerm + LineEnding + LineEnding);
+       if IncludeGrants then
+         ShowGrantsTo(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString,obj_Function,ProcTerm);
+
+       qryFunctions.Next;
+     end; // qryFunctions Iteration
+
+      if not First then
+      begin
+        FMetaData.Add(Format('SET TERM %s %s', [Term, ProcTerm]));
+        FMetaData.Add('COMMIT WORK;');
+        FMetaData.Add('SET AUTODDL ON;');
+      end;
+      FMetaData.AddStrings(Comments);
+    finally
+      qryFunctions.Free;
+      qryFuncArgs.Free;
+      Comments.Free;
+    end;
 end;
 
 {  ListGenerators
@@ -3457,6 +3408,7 @@ begin
     eoProcedure :
      begin
        ListProcs(pdCreateProc,ObjectName,etGrant in ExtractTypes);
+       ListFunctions(pdCreateProc,ObjectName,etGrant in ExtractTypes);
        if (ObjectName <> '' ) and (etGrant in ExtractTypes) then
          ShowGrants(ObjectName, Term);
      end;
@@ -3471,7 +3423,7 @@ begin
        else
          IBError(ibxeODSVersionRequired,['12.0']);
      end;
-    eoFunction : ListFunctions(ObjectName);
+    eoFunction : ListExternalFunctions(ObjectName);
     eoGenerator : ListGenerators(ObjectName,ExtractTypes);
     eoException : ListException(ObjectName);
     eoBLOBFilter : ListFilters(ObjectName);
@@ -3554,74 +3506,142 @@ begin
 end;
 
 function TIBExtract.GetFieldType(FieldType, FieldSubType, FieldScale,
-  FieldSize, FieldPrec, FieldLen: Integer): String;
-var
-  i : Integer;
-  PrecisionKnown : Boolean;
+  FieldPrecision, FieldLength: integer; HasCharacterSet: boolean;
+  FieldCharacterSetID: integer; FieldCharacterLength: integer;
+  FieldSegmentLen: integer; IsArray: boolean; FieldSourceName: string): String;
+
+const
+    GetCharacterSetSQL =
+    'SELECT CST.RDB$CHARACTER_SET_NAME ' +
+    'FROM RDB$CHARACTER_SETS CST ' +
+    'WHERE CST.RDB$CHARACTER_SET_ID = :CHARSETID ' +
+    'ORDER BY CST.RDB$CHARACTER_SET_NAME';
+
+
+  function GetCharacterSetName: string;
+  var CharSetSQL : TIBSQL;
+  begin
+    Result := '';
+    CharSetSQL := TIBSQL.Create(FDatabase);
+    try
+      CharSetSQL.SQL.Add(GetCharacterSetSQL);
+      CharSetSQL.Params.ByName('CHARSETID').AsInteger := FieldCharacterSetID;
+      CharSetSQL.ExecQuery;
+      if CharSetSQL.RecordCount > 0 then
+        Result := ' CHARACTER SET ' + Trim(CharSetSQL.FieldByName('RDB$CHARACTER_SET_NAME').AsString);
+    finally
+      CharSetSQL.Free;
+    end;
+  end;
+
+var i: integer;
+    TypeName: string;
+    DidActivate : Boolean;
 begin
   Result := '';
-  for i := Low(ColumnTypes) to High(ColumnTypes) do
-    if FieldType = ColumnTypes[i].SQLType then
+  if not FTransaction.Active then
+  begin
+    FTransaction.StartTransaction;
+    DidActivate := true;
+  end
+  else
+    DidActivate := false;
+
+  { Look through types array }
+  for i := Low(Columntypes) to High(ColumnTypes) do
+  begin
+    if FieldType = ColumnTypes[i].SQLType then {Process this and forget the rest}
     begin
-      PrecisionKnown := FALSE;
-      if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION10 then
-      begin
-        if FieldType in [blr_short, blr_long, blr_int64, blr_dec_fixed] then
-        begin
-          { We are ODS >= 10 and could be any Dialect }
-          if (FDatabaseInfo.DBSQLDialect >= 3) and
-             (FieldPrec <> 0) and
-             (FieldSubType > 0) and
-             (FieldSubType <= MAX_INTSUBTYPES) then
-          begin
-            Result := Result + Format('%s(%d, %d)', [
-              IntegralSubtypes [FieldSubType],
-              FieldPrec,
-              -1 * FieldScale]);
-            PrecisionKnown := true;
-          end;
-        end;
-      end;
+      TypeName := ColumnTypes[i].TypeName;
 
-      if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
-      begin
-        {Handle DECFLOAT}
-        if FieldType in [blr_dec64, blr_dec128] then
+      case FieldType of
+      blr_text,
+      blr_varying: {CHAR and VARCHAR}
         begin
-          { We are ODS >= 13 and could be any Dialect }
-          if FieldPrec <> 0 then
-          begin
-            Result := Result + Format('DECFLOAT(%d)',[FieldPrec]);
-            PrecisionKnown := TRUE;
-          end;
-        end;
-      end;
-
-      if PrecisionKnown = false then
-      begin
-        { Take a stab at numerics and decimals }
-        if (FieldType = blr_short) and
-            (FieldScale < 0) then
-          Result := Result + Format('NUMERIC(4, %d)',
-            [-FieldScale] )
-        else
-          if (FieldType = blr_long) and
-              (FieldScale < 0) then
-            Result := Result + Format('NUMERIC(9, %d)',
-              [-FieldScale] )
+          if FieldCharacterLength = 0 then
+             Result := TypeName + Format('(%d)', [FieldLength])
           else
-            if (FieldType = blr_double) and
-                (FieldScale  < 0) then
-              Result := Result + Format('NUMERIC(15, %d)',
-                [-FieldScale] )
+            Result := TypeName + Format('(%d)', [FieldCharacterLength]);
+          if HasCharacterSet then
+            Result :=  Result + GetCharacterSetName;
+        end;
+
+      blr_blob:
+        begin
+          if (FieldSubType > 0) and (FieldSubType <= MAXSUBTYPES) then
+            Result := TypeName + ' SUB_TYPE ' + SubTypes[FieldSubType]
+          else
+            Result := TypeName + ' SUB_TYPE ' + IntToStr(FieldSubType);
+
+          if FieldSegmentLen > 0 then
+            Result := Result + Format(' SEGMENT SIZE %d',[FieldSegmentLen]);
+          if HasCharacterSet then
+            Result :=  Result + GetCharacterSetName;
+        end;
+
+        blr_dec64: {DecFloat(16) }
+          begin
+            if FieldPrecision = 0 then
+              Result := TypeName + '(16)'
             else
-              Result := Result + ColumnTypes[i].TypeName;
+              Result := TypeName + Format('(%d)',[FieldPrecision]);
+          end;
+
+        blr_dec128: { DecFloat(34)}
+          begin
+            if FieldPrecision = 0 then
+              Result := TypeName + '(34)'
+            else
+              Result := TypeName + Format('(%d)',[FieldPrecision]);
+          end;
+
+        blr_short,
+        blr_long,
+        blr_int64,
+        blr_dec_fixed: {numeric types}
+          begin
+            if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION10 then
+            begin
+              { We are ODS >= 10 and could be any Dialect }
+              if FieldPrecision > 0 then
+              begin
+                { We are Dialect >=3 since FIELD_PRECISION is non-NULL }
+                if (FieldSubType > 0) and (FieldSubType <= MAX_INTSUBTYPES) then
+                begin
+                  Result := Format('%s(%d, %d)',
+                                         [IntegralSubtypes[FieldSubType],
+                                          FieldPrecision,
+                                          -FieldScale]);
+                  break;
+                end;
+              end;
+            end;
+
+            { Take a stab at numerics and decimals }
+            if (FieldType = blr_short) and (FieldScale < 0) then
+              Result :=  Format('NUMERIC(4, %d)', [-FieldScale])
+            else
+            if (FieldType = blr_long) and (FieldScale < 0) then
+                Result := Format('NUMERIC(9, %d)', [-FieldScale])
+            else
+            if (FieldType = blr_double) and (FieldScale < 0) then
+               Result :=  Format('NUMERIC(15, %d)', [-FieldScale])
+            else
+                Result :=  TypeName;
+          end;
+
+        else
+          Result := TypeName; {e.g. Timestamp}
       end;
-      break;
+
+      { Catch arrays after detrermining the type declaration }
+      if IsArray then
+        Result := Result + GetArrayField(FieldSourceName);
+      Break;
     end;
-  if (FieldType in [blr_text, blr_varying]) and
-     (FieldSize <> 0) then
-    Result := Result + Format('(%d)', [FieldSize]);
+  end;
+  if DidActivate then
+    FTransaction.Commit;
 end;
 
 {  S H O W _ g r a n t s
@@ -3687,6 +3707,9 @@ const
   '  UNION  '+
   '  Select RDB$PROCEDURE_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 5 as ObjectType  '+
   '  From RDB$PROCEDURES  '+
+  '  UNION  '+
+  '  Select RDB$FUNCTION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 100 as ObjectType  '+
+  '  From RDB$FUNCTIONS  '+
   '  UNION  '+
   '  Select RDB$EXCEPTION_NAME as METAOBJECTNAME, RDB$OWNER_NAME, 7 as ObjectType  '+
   '  From RDB$EXCEPTIONS  '+
@@ -3916,84 +3939,34 @@ const
     'ORDER BY PRM.RDB$PARAMETER_NUMBER';
 
 var
-  FirstTime, PrecisionKnown : Boolean;
+  FirstTime : Boolean;
   Line : String;
   qryHeader : TIBSQL;
 
   function FormatParamStr : String;
-  var
-    i, CollationID, CharSetID : Integer;
   begin
-    Result := Format('  %s ', [qryHeader.FieldByName('RDB$PARAMETER_NAME').AsString]);
-    for i := Low(ColumnTypes) to High(ColumnTypes) do
-      if qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger = ColumnTypes[i].SQLType then
-      begin
-        PrecisionKnown := FALSE;
-        if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION10 then
-        begin
-          if qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_short, blr_long, blr_int64] then
-          begin
-            { We are ODS >= 10 and could be any Dialect }
-            if (FDatabaseInfo.DBSQLDialect >= 3) and
-               (not qryHeader.FieldByName('RDB$FIELD_PRECISION').IsNull) and
-               (qryHeader.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger > 0) and
-               (qryHeader.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger <= MAX_INTSUBTYPES) then
-            begin
-              Result := Result + Format('%s(%d, %d)', [
-                IntegralSubtypes [qryHeader.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger],
-                qryHeader.FieldByName('RDB$FIELD_PRECISION').AsInteger,
-                -1 * qryHeader.FieldByName('RDB$FIELD_SCALE').AsInteger]);
-              PrecisionKnown := true;
-            end;
-          end;
-        end;
-        if PrecisionKnown = false then
-        begin
-          { Take a stab at numerics and decimals }
-          if (qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger = blr_short) and
-              (qryHeader.FieldByName('RDB$FIELD_SCALE').AsInteger < 0) then
-            Result := Result + Format('NUMERIC(4, %d)',
-              [-qryHeader.FieldByName('RDB$FIELD_SCALE').AsInteger] )
-          else
-            if (qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger = blr_long) and
-                (qryHeader.FieldByName('RDB$FIELD_SCALE').AsInteger < 0) then
-              Result := Result + Format('NUMERIC(9, %d)',
-                [-qryHeader.FieldByName('RDB$FIELD_SCALE').AsInteger] )
-            else
-              if (qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger = blr_double) and
-                  (qryHeader.FieldByName('RDB$FIELD_SCALE').AsInteger  < 0) then
-                Result := Result + Format('NUMERIC(15, %d)',
-                  [-qryHeader.FieldByName('RDB$FIELD_SCALE').AsInteger] )
-              else
-                Result := Result + ColumnTypes[i].TypeName;
-        end;
-        break;
-      end;
-    if (qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying]) then
-    begin
-       if not qryHeader.FieldByName('RDB$CHARACTER_LENGTH').IsNull then
-         Result := Result + Format('(%d)', [qryHeader.FieldByName('RDB$CHARACTER_LENGTH').AsInteger])
-       else
-         Result := Result + Format('(%d)', [qryHeader.FieldByName('RDB$FIELD_LENGTH').AsInteger]);
-    end;
+    Result := Format('  %s ', [qryHeader.FieldByName('RDB$PARAMETER_NAME').AsString]) +
+      GetFieldType(qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger,
+                           qryHeader.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
+                           qryHeader.FieldByName('RDB$FIELD_SCALE').AsInteger,
+                           qryHeader.FieldByName('RDB$FIELD_PRECISION').AsInteger,
+                           qryHeader.FieldByName('RDB$FIELD_LENGTH').AsInteger,
+                           not qryHeader.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                           qryHeader.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                           qryHeader.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
+                           qryHeader.FieldByName('RDB$SEGMENT_LENGTH').AsInteger);
 
-    { Show international character sets and collations }
+      if qryHeader.FieldByName('RDB$NULL_FLAG').AsInteger = 1 then
+         Result := Result + ' NOT NULL';
 
-    if (not qryHeader.FieldByName('RDB$COLLATION_ID').IsNull) or
-       (not qryHeader.FieldByName('RDB$CHARACTER_SET_ID').IsNull) then
-    begin
-      if qryHeader.FieldByName('RDB$COLLATION_ID').IsNull then
-        CollationId := 0
-      else
-        CollationId := qryHeader.FieldByName('RDB$COLLATION_ID').AsInteger;
+      if not qryHeader.FieldByName('RDB$CHARACTER_SET_ID').IsNull and
+         not qryHeader.FieldByName('RDB$COLLATION_ID').IsNull then
+        Result := Result + GetCollationName(qryHeader.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                                            qryHeader.FieldByName('RDB$COLLATION_ID').AsInteger);
 
-      if qryHeader.FieldByName('RDB$CHARACTER_SET_ID').IsNull then
-        CharSetId := 0
-      else
-        CharSetId := qryHeader.FieldByName('RDB$CHARACTER_SET_ID').AsInteger;
+      if not qryHeader.FieldByName('RDB$DEFAULT_SOURCE').IsNull then
+        Result := Result + ' = ' + qryHeader.FieldByName('RDB$DEFAULT_SOURCE').AsString;
 
-      Result := Result + GetCharacterSets(CharSetId, CollationId, false);
-    end;
   end;
 
 begin
@@ -4075,6 +4048,37 @@ begin
     Result := IBUtils.QuoteIdentifier(FDatabase.DBSQLDialect,Value)
   else
     Result := IBUtils.QuoteIdentifierIfNeeded(FDatabase.DBSQLDialect,Value)
+end;
+
+function TIBExtract.GetFieldType(qry: TIBSQL): string;
+var DomainName: string;
+begin
+  DomainName := qry.FieldByName('RDB$FIELD_SOURCE').AsString;
+  if not ((length(DomainName) > 4) and (system.Copy(DomainName, 1, 4) = 'RDB$') and (DomainName[5] in ['0'..'9'])) and
+    (qry.FieldByName('RDB$SYSTEM_FLAG').AsInteger <> 1) then
+  begin
+    {Must be a domain name}
+    Result := QuoteIdentifier(trim(DomainName));
+
+    { International character sets }
+    if (qry.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying])
+        and (not qry.FieldByName('RDB$COLLATION_ID').IsNull)
+        and (qry.FieldByName('RDB$COLLATION_ID').AsInteger <> 0) then
+      Result := Result + GetCharacterSets(qry.FieldByName('RDB$CHARACTER_SET_ID').AsShort,
+                                          qry.FieldByName('RDB$COLLATION_ID').AsInteger, true);
+  end
+  else
+    Result := GetFieldType(qry.FieldByName('RDB$FIELD_TYPE').AsInteger,
+                           qry.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
+                           qry.FieldByName('RDB$FIELD_SCALE').AsInteger,
+                           qry.FieldByName('RDB$FIELD_PRECISION').AsInteger,
+                           qry.FieldByName('RDB$FIELD_LENGTH').AsInteger,
+                           not qry.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                           qry.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                           qry.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
+                           qry.FieldByName('RDB$SEGMENT_LENGTH').AsInteger,
+                           not qry.FieldByName('RDB$DIMENSIONS').IsNull and (qry.FieldByName('RDB$DIMENSIONS').AsInteger <> 0),
+                           DomainName);
 end;
 
 procedure TIBExtract.ListData(ObjectName: String);
@@ -4159,6 +4163,9 @@ var
   qryRoles : TIBSQL;
   PrevOwner, RoleName, OwnerName : String;
   Comments: TStrings;
+  sPrivileges: string;
+  Privileges: cardinal;
+  i: integer;
 begin
   {Process GRANT roles}
   Comments := TStringList.Create;
@@ -4193,7 +4200,27 @@ begin
             FMetaData.Add('');
             PrevOwner := OwnerName;
           end;
-          FMetaData.Add('CREATE ROLE ' + RoleName + Term);
+          sPrivileges := '';
+          if (FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13) and
+                          qryRoles.HasField('RDB$SYSTEM_PRIVILEGES') then
+          begin
+            sPrivileges := qryRoles.FieldByName('RDB$SYSTEM_PRIVILEGES').AsString;
+            Privileges := byte(sPrivileges[1]) shr 24 + byte(sPrivileges[2]) shr 16 +
+                          byte(sPrivileges[3]) shr 8 +  byte(sPrivileges[4]);
+            sPrivileges := '';
+            for i := Low(UserPrivileges) to high(UserPrivileges) do
+              if (UserPrivileges[i].Mask and Privileges) <> 0 then
+                if sPrivileges = '' then
+                  sPrivileges := UserPrivileges[i].Privilege
+                else
+                  sPrivileges := sPrivileges + ',' +  UserPrivileges[i].Privilege;
+          end;
+
+          if sPrivileges <> '' then
+            FMetaData.Add('CREATE ROLE ' + RoleName + ' SET SYSTEM PRIVILEGES TO ' + sPrivileges + Term)
+          else
+            FMetaData.Add('CREATE ROLE ' + RoleName + Term);
+
           if IncludeGrants then
             ShowGrantsTo(qryRoles.FieldByName('rdb$Role_Name').AsString,obj_sql_role,Term);
           qryRoles.Next;
