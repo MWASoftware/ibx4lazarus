@@ -3241,7 +3241,7 @@ begin
             SQL_DEC16,
             SQL_DEC34,
             SQL_DEC_FIXED:
-              Param.AsBCD := Database.attachment.getFirebirdAPI.SQLDecFloatDecode(fdDataType,fdDataScale,data);
+              Param.AsBCD := Database.attachment.getFirebirdAPI.SQLDecFloatDecode(fdDataType,data);
           end;
         end;
       end;
@@ -3922,7 +3922,7 @@ begin
         SQL_DEC16,
         SQL_DEC34,
         SQL_DEC_FIXED:
-          pBCD(Buffer)^ := Database.attachment.getFirebirdAPI.SQLDecFloatDecode(fdDataType,fdDataScale,Data);
+          pBCD(Buffer)^ := Database.attachment.getFirebirdAPI.SQLDecFloatDecode(fdDataType,Data);
         else
           Move(Data^, Buffer^, Field.DataSize);
         end;
