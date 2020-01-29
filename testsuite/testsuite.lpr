@@ -9,7 +9,7 @@ uses
   {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
-  Classes, SysUtils, CustApp, TestManager, IB, Firebird;
+  Classes, SysUtils, CustApp, TestManager, IB, Firebird, Test01, IBXTestManager;
 
 type
 
@@ -32,6 +32,7 @@ var
   ErrorMsg: String;
   DoPrompt: boolean;
 begin
+  TestMgr.Application := self;
   OutFile := stdout;
   // quick check parameters
   ErrorMsg := CheckOptions('htupensbolrSPX', 'help test user passwd employeedb newdbname secondnewdbname backupfile outfile fbclientlibrary server stats port prompt');
@@ -95,7 +96,7 @@ begin
     {$IFEND}
 
     {Ensure consistent date reporting across platforms}
-    DefaultFormatSettings.ShortDateFormat := 'd/m/yyyy';
+    DefaultFormatSettings.ShortDateFormat := 'yyyy/m/d';
     DefaultFormatSettings.LongTimeFormat := 'HH:MM:SS';
     DefaultFormatSettings.DateSeparator := '/';
 

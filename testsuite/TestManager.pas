@@ -11,7 +11,7 @@ unit TestManager;
 interface
 
 uses
-  Classes, SysUtils, DB, IB, IBUtils, FmtBCD;
+  Classes, SysUtils, CustApp, IB, IBUtils, FmtBCD;
 
 {$IF not defined(LineEnding)}
 const
@@ -38,9 +38,10 @@ type
     procedure PrintDPB(DPB: IDPB);
     procedure PrintMetaData(meta: IMetaData);
     procedure ParamInfo(SQLParams: ISQLParams);
+    function ReportResults(Statement: IStatement): IResultSet;
+    procedure ReportResult(aValue: IResults);
     function StringToHex(octetString: string; MaxLineLength: integer=0): string;
     procedure WriteArray(ar: IArray);
-    procedure WriteBlob(blob: IBufferedBlob);
     procedure WriteAffectedRows(Statement: IStatement);
     procedure WriteDBInfo(DBInfo: IDBInformation);
     procedure WriteBytes(Bytes: TByteArray);
@@ -62,6 +63,7 @@ type
 
   TTestManager = class
   private
+    FApplication: TCustomApplication;
     FServer: AnsiString;
     FTests: TStringList;
     FEmployeeDatabaseName: AnsiString;
@@ -99,14 +101,7 @@ type
     property ShowStatistics: boolean read FShowStatistics write FShowStatistics;
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property Server: AnsiString read FServer;
-  end;
-
-  { TIBXTestBase }
-
-  TIBXTestBase = class(TTestBase)
-  protected
-    procedure ReportResults(aDataSet: TIBCustomDataset);
-    procedure ReportResult(aField: TField);
+    property Application: TCustomApplication read FApplication write FApplication;
   end;
 
 var
@@ -137,98 +132,6 @@ begin
     TestMgr := TTestManager.Create;
   test := aTest.Create(TestMgr);
   TestMgr.FTests.AddObject(test.GetTestID,test);
-end;
-
-{ TIBXTestBase }
-
-procedure TIBXTestBase.ReportResults(aDataSet: TIBCustomDataset);
-var i: integer;
-begin
-  aDataSet.First;
-  while not aDataSet.EOF do
-  begin
-    for i := 0 to aDataSet.FieldCount - 1 do
-      ReportResult(aDataSet.Fields[i]);
-    aDataSet.Next;
-  end;
-end;
-
-procedure TIBXTestBase.ReportResult(aField: TField);
-var s: AnsiString;
-    dt: TDateTime;
-begin
-  if aField.IsNull then
-    writeln(OutFile,aField.Name,' = NULL')
-  else
-  case aField.DataType of
-  ftArray:
-    begin
-      if not aField.IsNull then
-        WriteArray(TIBArrayField(aField).ArrayIntf);
-    end;
-
-  ftFloat:
-    writeln(OutFile, aField.Name,' = ',FormatFloat('#,##0.00',aField.AsFloat));
-
-  ftLargeint:
-    writeln(OutFile,aField.Name,' = ',aField.AsString);
-
-  ftBlob:
-    if TBlobField(aField).BlobType = ftMemo then
-    begin
-      s := aField.AsString;
-      if FHexStrings then
-      begin
-        write(OutFile,aField.Name,' = ');
-        PrintHexString(s);
-        writeln(OutFile,' (Charset = ',TIBMemoField(aField).CharacterSetName, ' Codepage = ',StringCodePage(s),')');
-      end
-      else
-      begin
-        writeln(OutFile,aField.Name,' (Charset  = ',TIBMemoField(aField).CharacterSetName, ' Codepage = ',StringCodePage(s),')');
-        writeln(OutFile);
-        writeln(OutFile,s);
-      end
-    end
-    else
-      writeln(OutFile,aField.Name,' = (blob), Length = ',TBlobField(aField).BlobSize);
-
-  SQL_TEXT,SQL_VARYING:
-  begin
-    s := aField.AsString;
-    if FHexStrings then
-    begin
-      write(OutFile,aField.Name,' = ');
-      PrintHexString(s);
-      writeln(OutFile,' (Charset Id = ',aField.GetCharSetID, ' Codepage = ',StringCodePage(s),')');
-    end
-    else
-    if aField.GetCharSetID > 0 then
-      writeln(OutFile,aField.Name,' = ',s,' (Charset Id = ',aField.GetCharSetID, ' Codepage = ',StringCodePage(s),')')
-    else
-      writeln(OutFile,aField.Name,' = ',s);
-  end;
-
-  SQL_TIMESTAMP:
-    writeln(OutFile,aField.Name,' = ',FBFormatDateTime('yyyy/mm/dd hh:nn:ss.zzzz',aField.AsDateTime));
-  SQL_TYPE_DATE:
-    writeln(OutFile,aField.Name,' = ',FBFormatDateTime('yyyy/mm/dd',aField.AsDate));
-  SQL_TYPE_TIME:
-    writeln(OutFile,aField.Name,' = ',FBFormatDateTime('hh:nn:ss.zzzz',aField.AsTime));
-  SQL_TIMESTAMP_TZ:
-  begin
-    aField.GetAsDateTime(dt,s);
-    writeln(OutFile,aField.Name,' = ',FBFormatDateTime('yyyy/mm/dd hh:nn:ss.zzzz',dt) + ' ' + s);
-  end;
-  SQL_TIME_TZ:
-  begin
-    aField.GetAsDateTime(dt,s);
-    writeln(OutFile,aField.Name,' = ',FBFormatDateTime('hh:nn:ss.zzzz',dt) + ' ' + s);
-  end;
-
-  else
-    writeln(OutFile,aField.Name,' = ',aField.AsString);
-  end;
 end;
 
 { TTestBase }
@@ -363,6 +266,106 @@ begin
   end;
 end;
 
+function TTestBase.ReportResults(Statement: IStatement): IResultSet;
+begin
+  Result := Statement.OpenCursor;
+  try
+    while Result.FetchNext do
+      ReportResult(Result);
+  finally
+    Result.Close;
+  end;
+  writeln(OutFile);
+end;
+
+procedure TTestBase.ReportResult(aValue: IResults);
+var i: integer;
+    s: AnsiString;
+    dt: TDateTime;
+begin
+  for i := 0 to aValue.getCount - 1 do
+  begin
+    if aValue[i].IsNull then
+      writeln(OutFile,aValue[i].Name,' = NULL')
+    else
+    case aValue[i].SQLType of
+    SQL_ARRAY:
+      begin
+        if not aValue[i].IsNull then
+          WriteArray(aValue[i].AsArray);
+      end;
+    SQL_FLOAT,SQL_DOUBLE,
+    SQL_D_FLOAT:
+      writeln(OutFile, aValue[i].Name,' = ',FormatFloat('#,##0.00',aValue[i].AsFloat));
+
+    SQL_INT64:
+      if aValue[i].Scale <> 0 then
+        writeln(OutFile, aValue[i].Name,' = ',FormatFloat('#,##0.00',aValue[i].AsFloat))
+      else
+        writeln(OutFile,aValue[i].Name,' = ',aValue[i].AsString);
+
+    SQL_BLOB:
+      if aValue[i].IsNull then
+        writeln(OutFile,aValue[i].Name,' = (null blob)')
+      else
+      if aValue[i].SQLSubType = 1 then
+      begin
+        s := aValue[i].AsString;
+        if FHexStrings then
+        begin
+          write(OutFile,aValue[i].Name,' = ');
+          PrintHexString(s);
+          writeln(OutFile,' (Charset Id = ',aValue[i].GetCharSetID, ' Codepage = ',StringCodePage(s),')');
+        end
+        else
+        begin
+          writeln(OutFile,aValue[i].Name,' (Charset Id = ',aValue[i].GetCharSetID, ' Codepage = ',StringCodePage(s),')');
+          writeln(OutFile);
+          writeln(OutFile,s);
+        end
+      end
+      else
+        writeln(OutFile,aValue[i].Name,' = (blob), Length = ',aValue[i].AsBlob.GetBlobSize);
+
+    SQL_TEXT,SQL_VARYING:
+    begin
+      s := aValue[i].AsString;
+      if FHexStrings then
+      begin
+        write(OutFile,aValue[i].Name,' = ');
+        PrintHexString(s);
+        writeln(OutFile,' (Charset Id = ',aValue[i].GetCharSetID, ' Codepage = ',StringCodePage(s),')');
+      end
+      else
+      if aValue[i].GetCharSetID > 0 then
+        writeln(OutFile,aValue[i].Name,' = ',s,' (Charset Id = ',aValue[i].GetCharSetID, ' Codepage = ',StringCodePage(s),')')
+      else
+        writeln(OutFile,aValue[i].Name,' = ',s);
+    end;
+
+    SQL_TIMESTAMP:
+      writeln(OutFile,aValue[i].Name,' = ',FBFormatDateTime('yyyy/mm/dd hh:nn:ss.zzzz',aValue[i].AsDateTime));
+    SQL_TYPE_DATE:
+      writeln(OutFile,aValue[i].Name,' = ',FBFormatDateTime('yyyy/mm/dd',aValue[i].AsDate));
+    SQL_TYPE_TIME:
+      writeln(OutFile,aValue[i].Name,' = ',FBFormatDateTime('hh:nn:ss.zzzz',aValue[i].AsTime));
+    SQL_TIMESTAMP_TZ:
+    begin
+      aValue[i].GetAsDateTime(dt,s);
+      writeln(OutFile,aValue[i].Name,' = ',FBFormatDateTime('yyyy/mm/dd hh:nn:ss.zzzz',dt) + ' ' + s);
+    end;
+    SQL_TIME_TZ:
+    begin
+      aValue[i].GetAsDateTime(dt,s);
+      writeln(OutFile,aValue[i].Name,' = ',FBFormatDateTime('hh:nn:ss.zzzz',dt) + ' ' + s);
+    end;
+
+    else
+      writeln(OutFile,aValue[i].Name,' = ',aValue[i].AsString);
+    end;
+  end;
+end;
+
 function TTestBase.StringToHex(octetString: string; MaxLineLength: integer
   ): string;
 
@@ -420,13 +423,6 @@ begin
     end;
   end;
   writeln(OutFile);
-end;
-
-procedure TTestBase.WriteBlob(blob: IBufferedBlob);
-begin
-  writeln(OutFile);
-  writeln(OutFile,StringToHex(blob.GetAsString));
-  writeln;
 end;
 
 procedure TTestBase.WriteAffectedRows(Statement: IStatement);
@@ -580,16 +576,20 @@ begin
 end;
 
 procedure TTestBase.WritePerfStats(stats: TPerfCounters);
+var LargeCompFormat: string;
+    ThreeSigPlacesFormat: string;
 begin
-  writeln(OutFile,'Current memory = ', stats[psCurrentMemory]);
-  writeln(OutFile,'Delta memory = ', stats[psDeltaMemory]);
-  writeln(OutFile,'Max memory = ', stats[psMaxMemory]);
-  writeln(OutFile,'Elapsed time= ', FormatFloat('#0.000',stats[psRealTime]/1000),' sec');
-  writeln(OutFile,'Cpu = ', FormatFloat('#0.000',stats[psUserTime]/1000),' sec');
-  writeln(OutFile,'Buffers = ', stats[psBuffers]);
-  writeln(OutFile,'Reads = ', stats[psReads]);
-  writeln(OutFile,'Writes = ', stats[psWrites]);
-  writeln(OutFile,'Fetches = ', stats[psFetches]);
+  LargeCompFormat := '#' + DefaultFormatSettings.ThousandSeparator + '##0';
+  ThreeSigPlacesFormat := '#0' + DefaultFormatSettings.DecimalSeparator + '000';
+  writeln(OutFile,'Current memory = ', FormatFloat(LargeCompFormat,stats[psCurrentMemory]));
+  writeln(OutFile,'Delta memory = ', FormatFloat(LargeCompFormat,stats[psDeltaMemory]));
+  writeln(OutFile,'Max memory = ', FormatFloat(LargeCompFormat,stats[psMaxMemory]));
+  writeln(OutFile,'Elapsed time= ', FormatFloat(ThreeSigPlacesFormat,stats[psRealTime]/1000),' sec');
+  writeln(OutFile,'Cpu = ', FormatFloat(ThreeSigPlacesFormat,stats[psUserTime]/1000),' sec');
+  writeln(OutFile,'Buffers = ', FormatFloat('#0',stats[psBuffers]));
+  writeln(OutFile,'Reads = ', FormatFloat('#0',stats[psReads]));
+  writeln(OutFile,'Writes = ', FormatFloat('#0',stats[psWrites]));
+  writeln(OutFile,'Fetches = ', FormatFloat('#0',stats[psFetches]));
 end;
 
 procedure TTestBase.CheckActivity(Attachment: IAttachment);
