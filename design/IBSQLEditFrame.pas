@@ -33,7 +33,7 @@ uses
   Classes, SysUtils, FileUtil, SynEdit, SynHighlighterSQL, LResources, Forms,
   Controls, ActnList, Menus, Dialogs, ComCtrls, ExtCtrls, StdCtrls, IBQuery,
   IBSQL, IBDatabase, IBUpdate, IBDatabaseInfo,
-  IBCustomDataset, db, LazSynTextArea, IB;
+  IBCustomDataSet, db, LazSynTextArea, IB;
 
 type
 
@@ -381,8 +381,8 @@ begin
   SQLTransaction.Active := false;
   SQLTransaction.DefaultDatabase := FDatabase;
   for i := 0 to ComponentCount - 1 do
-    if Components[i] is TIBCustomDataset then
-      TIBCustomDataset(Components[i]).Database := FDatabase
+    if Components[i] is TIBCustomDataSet then
+      TIBCustomDataSet(Components[i]).Database := FDatabase
     else
     if Components[i] is TIBSQL then
       TIBSQL(Components[i]).Database := FDatabase

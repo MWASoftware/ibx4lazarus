@@ -39,7 +39,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="87">
+    <Units Count="88">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -55,8 +55,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <TopLine Value="7"/>
-        <CursorPos X="41" Y="36"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="9" Y="36"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -281,9 +281,7 @@
       <Unit32>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2902"/>
-        <CursorPos X="50" Y="2926"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="10"/>
       </Unit32>
       <Unit33>
         <Filename Value="../../../fbintf/client/FBStatement.pas"/>
@@ -372,12 +370,10 @@
       </Unit44>
       <Unit45>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="136"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="137"/>
         <CursorPos X="23" Y="170"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit45>
       <Unit46>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/objpas.inc"/>
@@ -416,11 +412,10 @@
       </Unit50>
       <Unit51>
         <Filename Value="../../../fbintf/include/consts_pub.inc"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="217"/>
         <CursorPos X="27" Y="234"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit51>
       <Unit52>
         <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
@@ -672,6 +667,12 @@
         <CursorPos X="3" Y="3549"/>
         <UsageCount Value="10"/>
       </Unit86>
+      <Unit87>
+        <Filename Value="../../runtime/gui/IBDialogs.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="43"/>
+        <UsageCount Value="10"/>
+      </Unit87>
     </Units>
     <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
@@ -679,8 +680,8 @@
         <Caret Line="36" Column="41" TopLine="7"/>
       </Position1>
       <Position2>
-        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="148" Column="38" TopLine="136"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="36" Column="9" TopLine="7"/>
       </Position2>
     </JumpHistory>
   </ProjectOptions>

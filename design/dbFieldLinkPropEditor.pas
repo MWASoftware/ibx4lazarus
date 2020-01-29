@@ -251,7 +251,7 @@ end;
      I: integer;
  begin
   DetailedFieldListBox.Clear;
-  if Master is TIBCustomDataset then
+  if Master is TIBCustomDataSet then
    with TIBCustomDataSet(Master) do
      if (Database = nil) or not Database.Connected then Exit;
   IndexDefs.Update;

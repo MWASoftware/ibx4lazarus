@@ -200,7 +200,7 @@ var
   Application: TMyApplication;
 begin
   Application:=TMyApplication.Create(nil);
-  Application.Title:='IBX In Console Mode';
+  Application.Title := 'IBX In Console Mode';
   Application.Run;
   {$IFDEF WINDOWS}
   Readln; {Gives a chance to see the program output}

@@ -499,8 +499,8 @@ end;
 
 function TSelectSQLParser.GetFieldPosition(AliasName: string): integer;
 begin
-  if assigned(FDataSet) and (FDataSet is TIBCustomDataset) then
-    Result := TIBCustomDataset(FDataSet).GetFieldPosition(AliasName)
+  if assigned(FDataSet) and (FDataSet is TIBCustomDataSet) then
+    Result := TIBCustomDataSet(FDataSet).GetFieldPosition(AliasName)
   else
     Result := 0;
 end;

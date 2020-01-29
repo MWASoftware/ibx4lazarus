@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="10"/>
+    <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="41">
+    <Units Count="43">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="95"/>
-        <CursorPos X="58" Y="130"/>
+        <TopLine Value="38"/>
+        <CursorPos X="47" Y="54"/>
         <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -245,10 +244,10 @@
       </Unit33>
       <Unit34>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="756"/>
-        <CursorPos X="31" Y="784"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit34>
       <Unit35>
         <Filename Value="../../../fbintf/client/FBStatement.pas"/>
@@ -266,10 +265,11 @@
       </Unit36>
       <Unit37>
         <Filename Value="../../runtime/nongui/IBQuery.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="86"/>
-        <CursorPos X="24" Y="105"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="28"/>
+        <CursorPos X="37" Y="46"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit37>
       <Unit38>
         <Filename Value="../../../fbintf/IB.pas"/>
@@ -292,12 +292,24 @@
         <CursorPos X="21" Y="37"/>
         <UsageCount Value="10"/>
       </Unit40>
+      <Unit41>
+        <Filename Value="../../runtime/nongui/IBMessages.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="382"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit41>
+      <Unit42>
+        <Filename Value="../../ibnongui.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit42>
     </Units>
     <OtherDefines Count="2">
       <Define0 Value="UseCThreads"/>
       <Define1 Value="IBX_CONSOLE_MODE"/>
     </OtherDefines>
-    <JumpHistory Count="12" HistoryIndex="11">
+    <JumpHistory Count="15" HistoryIndex="14">
       <Position1>
         <Filename Value="project1.lpr"/>
         <Caret Line="18" Column="74" TopLine="18"/>
@@ -346,6 +358,22 @@
         <Filename Value="project1.lpr"/>
         <Caret Line="94" Column="30" TopLine="74"/>
       </Position12>
+      <Position13>
+        <Filename Value="project1.lpr"/>
+        <Caret Line="43" Column="5" TopLine="38"/>
+      </Position13>
+      <Position14>
+        <Filename Value="project1.lpr"/>
+        <Caret Line="54" Column="47" TopLine="38"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../runtime/nongui/IBQuery.pas"/>
+        <Caret Line="46" Column="37" TopLine="28"/>
+      </Position15>
     </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode="default"/>
+    </RunParams>
   </ProjectSession>
 </CONFIG>

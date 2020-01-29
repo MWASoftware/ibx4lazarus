@@ -5,7 +5,7 @@ unit IBXTestManager;
 interface
 
 uses
-  Classes, SysUtils, TestManager, DB, IBCustomDataset;
+  Classes, SysUtils, TestManager, DB, IBCustomDataSet;
 
 type
 
@@ -13,7 +13,7 @@ type
 
 TIBXTestBase = class(TTestBase)
 protected
-  procedure PrintDataSet(aDataSet: TIBCustomDataset);
+  procedure PrintDataSet(aDataSet: TIBCustomDataSet);
   procedure PrintDataSetRow(aField: TField);
   procedure PrintAffectedRows(query: TIBCustomDataSet);
 end;
@@ -22,7 +22,7 @@ implementation
 
 { TIBXTestBase }
 
-procedure TIBXTestBase.PrintDataSet(aDataSet: TIBCustomDataset);
+procedure TIBXTestBase.PrintDataSet(aDataSet: TIBCustomDataSet);
 var i: integer;
     rowno: integer;
 begin

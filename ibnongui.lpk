@@ -207,8 +207,8 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <UnitName Value="IBXServices"/>
       </Item20>
       <Item21>
-        <Filename Value="runtime/IBMessages.pas"/>
-        <UnitName Value="FBMessages"/>
+        <Filename Value="runtime/nongui/IBMessages.pas"/>
+        <UnitName Value="IBMessages"/>
       </Item21>
     </Files>
     <RequiredPkgs Count="3">

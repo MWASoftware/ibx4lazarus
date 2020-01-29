@@ -88,7 +88,7 @@ type
 
   { TIBArray }
 
-  {Wrapper class to support array cache in TIBCustomDataset and event handling}
+  {Wrapper class to support array cache in TIBCustomDataSet and event handling}
 
   TIBArray = class
   private

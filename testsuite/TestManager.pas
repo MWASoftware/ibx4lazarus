@@ -21,8 +21,6 @@ const
 type
   TTestManager = class;
 
-  TDirections = (drUp,drDown);
-
   { TTestBase }
 
   TTestBase = class
@@ -633,6 +631,8 @@ begin
   except
     raise Exception.CreateFmt('Invalid Test ID - %s',[aTestID]);
   end;
+  if Result = -1 then
+    raise Exception. CreateFmt('Invalid Test ID - %s',[aTestID]);
 end;
 
 constructor TTestManager.Create;

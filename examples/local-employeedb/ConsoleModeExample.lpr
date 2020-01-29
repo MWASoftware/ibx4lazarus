@@ -208,6 +208,7 @@ begin
   FLocalDB.OnGetDBVersionNo := @HandleGetDBVersionNo;
   FLocalDB.OnLogMessage := @HandleLogMessage;
   FLocalDB.RequiredVersionNo := 2;
+  FLocalDB.UpgradeConfFile := 'upgrade.conf'
 end;
 
 procedure TMyApplication.WriteHelp;

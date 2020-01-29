@@ -9,7 +9,8 @@ uses
   {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
-  Classes, SysUtils, CustApp, TestManager, IB, Firebird, Test01, IBXTestManager;
+  Classes, SysUtils, CustApp, TestManager, IB, Firebird, Test01, IBXTestManager,
+  Test02;
 
 type
 
@@ -153,7 +154,7 @@ var
   Application: TIBXTestSuite;
 begin
   Application := TIBXTestSuite.Create(nil);
-  Application.Title := 'IBX Testsuite';
+  Application.Title := 'IBX Test Suite';
   Application.Run;
   Application.Free;
 end.
