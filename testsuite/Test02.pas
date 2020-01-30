@@ -145,6 +145,7 @@ end;
 procedure TTest2.RunTest(CharSet: AnsiString; SQLDialect: integer);
 begin
   FIBDatabase := TIBDatabase.Create(Owner.Application);
+  FIBDatabase.FirebirdLibraryPathName := Owner.ClientLibraryPath;
   FIBDatabase.LoginPrompt := false;
   FIBTransaction := TIBTransaction.Create(Owner.Application);
   FIBDatabase.Params.Add('lc_ctype=UTF8');

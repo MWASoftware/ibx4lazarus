@@ -62,6 +62,7 @@ type
   TTestManager = class
   private
     FApplication: TCustomApplication;
+    FClientLibraryPath: string;
     FServer: AnsiString;
     FTests: TStringList;
     FEmployeeDatabaseName: AnsiString;
@@ -100,6 +101,7 @@ type
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property Server: AnsiString read FServer;
     property Application: TCustomApplication read FApplication write FApplication;
+    property ClientLibraryPath: string read FClientLibraryPath;
   end;
 
 var
@@ -746,6 +748,7 @@ end;
 procedure TTestManager.SetClientLibraryPath(aLibName: string);
 begin
   FFirebirdAPI := LoadFBLibrary(aLibName).GetFirebirdAPI;
+  FClientLibraryPath := aLibName;
 end;
 
 procedure TTestManager.SetUserName(aValue: AnsiString);

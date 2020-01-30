@@ -113,6 +113,7 @@ begin
   { In console Mode the application should own the database
     - ensures centralised exception handling }
   FIBDatabase := TIBDatabase.Create(Owner.Application);
+  FIBDatabase.FirebirdLibraryPathName := Owner.ClientLibraryPath;
   FIBTransaction := TIBTransaction.Create(Owner.Application);
   FIBDatabase.DatabaseName := Owner.GetEmployeeDatabaseName;
   FIBDatabase.Params.Add('user_name=' + Owner.GetUserName);
