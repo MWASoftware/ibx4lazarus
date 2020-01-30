@@ -10,7 +10,7 @@ uses
   cthreads,
   {$ENDIF}
   Classes, SysUtils, CustApp, TestManager, IB, Firebird, Test01, IBXTestManager,
-  Test02;
+  Test02, Test03;
 
 type
 
