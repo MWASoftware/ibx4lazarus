@@ -455,7 +455,8 @@ begin
   end;
 
   RegisterNoIcon([TIBStringField, TIBBCDField, TIBMemoField, TIBArrayField,
-    TIBSmallintField, TIBIntegerField, TIBLargeIntField]);
+    TIBSmallintField, TIBIntegerField, TIBLargeIntField, TIBDateTimeField,
+    TIBTimeField, TIBFmtBCDField]);
   {$if lcl_fullversion < 01010000}
   {see http://bugs.freepascal.org/view.php?id=19035 }
   RegisterNoIcon([TIntegerField]);
