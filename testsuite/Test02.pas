@@ -1,12 +1,6 @@
 unit Test02;
-{$IFDEF MSWINDOWS}
-{$DEFINE WINDOWS}
-{$ENDIF}
 
-{$IFDEF FPC}
-{$mode delphi}
-{$codepage utf8}
-{$ENDIF}
+{$mode objfpc}{$H+}
 
 {Test 2: Test use of the Local DB Manager}
 
@@ -23,7 +17,7 @@ unit Test02;
 interface
 
 uses
-  Classes, SysUtils, TestManager, IBXTestManager, IB, IBCMLocalDBSupport, IBSQL,
+  Classes, SysUtils, CustApp, TestManager, IBXTestManager, IB, IBCMLocalDBSupport, IBSQL,
   IBQuery, IBDatabase;
 
 const
@@ -36,15 +30,14 @@ type
 
   TTest2 = class(TIBXTestBase)
   private
-    FIBDatabase: TIBDatabase;
-    FIBTransaction: TIBTransaction;
     FLocalDB: TIBCMLocalDBSupport;
     procedure HandleGetDBVersionNo(Sender: TObject; var VersionNo: integer);
     procedure HandleLogMessage(Sender: TObject; Msg: string);
-    procedure DoQuery;
   protected
+    procedure CreateObjects(Application: TCustomApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
+    procedure InitTest; override;
   public
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
   end;
@@ -75,12 +68,12 @@ const
 procedure TTest2.HandleGetDBVersionNo(Sender: TObject; var VersionNo: integer);
 begin
   VersionNo := 0;
-  FIBTransaction.Active := true;
+  IBTransaction.Active := true;
   try
     with TIBSQL.Create(Owner.Application) do
     try
-      Database := FIBDatabase;
-      Transaction := FIBTransaction;
+      Database := IBDatabase;
+      Transaction := IBTransaction;
       SQL.Text := 'Select * From RDB$RELATIONS Where RDB$RELATION_NAME = ''DBVERSIONINFO''';
       ExecQuery;
       try
@@ -94,8 +87,8 @@ begin
 
     with TIBSQL.Create(Owner.Application)  do
     try
-      Database := FIBDatabase;
-      Transaction := FIBTransaction;
+      Database := IBDatabase;
+      Transaction := IBTransaction;
       SQL.Text := 'Select VersionNo From DBVersionInfo';
       ExecQuery;
       try
@@ -107,7 +100,7 @@ begin
       Free;
     end;
   finally
-    FIBTransaction.Commit;
+    IBTransaction.Commit;
   end;
 end;
 
@@ -116,20 +109,14 @@ begin
   writeln(OutFile,Msg);
 end;
 
-procedure TTest2.DoQuery;
-var qry: TIBQuery;
+procedure TTest2.CreateObjects(Application: TCustomApplication);
 begin
-  qry := TIBQuery.Create(Owner.Application);
-  with qry do
-  try
-     Database := FIBDatabase;
-     AllowAutoActivateTransaction := true;
-     SQL.Text := sqlExample;
-     Active := true;
-     PrintDataSet(qry);
-  finally
-    Free;
-  end;
+  inherited CreateObjects(Application);
+  FLocalDB := TIBCMLocalDBSupport.Create(Application);
+  FLocalDB.Database := IBDatabase;
+  FLocalDB.VendorName := 'MWA Software';
+  FLocalDB.OnGetDBVersionNo := @HandleGetDBVersionNo;
+  FLocalDB.OnLogMessage := @HandleLogMessage;
 end;
 
 function TTest2.GetTestID: AnsiString;
@@ -142,29 +129,27 @@ begin
   Result := aTestTitle;
 end;
 
-procedure TTest2.RunTest(CharSet: AnsiString; SQLDialect: integer);
+procedure TTest2.InitTest;
 begin
-  FIBDatabase := TIBDatabase.Create(Owner.Application);
-  FIBDatabase.FirebirdLibraryPathName := Owner.ClientLibraryPath;
-  FIBDatabase.LoginPrompt := false;
-  FIBTransaction := TIBTransaction.Create(Owner.Application);
-  FIBDatabase.Params.Add('lc_ctype=UTF8');
-  FIBDatabase.DatabaseName := 'nemo';
-  FIBTransaction.DefaultDatabase := FIBDatabase;
-  FIBTransaction.Params.Add('concurrency');
-  FIBTransaction.Params.Add('wait');
-  FLocalDB := TIBCMLocalDBSupport.Create(Owner.Application);
-  FLocalDB.Database := FIBDatabase;
+  IBDatabase.DatabaseName := 'nemo';
   FLocalDB.DatabaseName := ExtractDBName(Owner.GetNewDatabaseName);
   FLocalDB.EmptyDBArchive := 'employee.gbk';
-  FLocalDB.VendorName := 'MWA Software';
-  FLocalDB.OnGetDBVersionNo := HandleGetDBVersionNo;
-  FLocalDB.OnLogMessage := HandleLogMessage;
   FLocalDB.RequiredVersionNo := 2;
   FLocalDB.UpgradeConfFile := 'upgrade.conf';
-  FIBDatabase.Connected := true;
-  DoQuery;
-  FIBDatabase.DropDatabase;
+  ReadOnlyTransaction;
+end;
+
+procedure TTest2.RunTest(CharSet: AnsiString; SQLDialect: integer);
+begin
+  IBDatabase.Connected := true;
+  with IBQuery do
+  begin
+     AllowAutoActivateTransaction := true;
+     SQL.Text := sqlExample;
+     Active := true;
+     PrintDataSet(IBQuery);
+  end;
+  IBDatabase.DropDatabase;
 end;
 
 initialization

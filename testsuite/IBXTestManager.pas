@@ -5,22 +5,58 @@ unit IBXTestManager;
 interface
 
 uses
-  Classes, SysUtils, TestManager, DB, IBCustomDataSet;
+  Classes, SysUtils, TestManager, CustApp, DB, IBCustomDataSet, IBDatabase, IBQuery;
 
 type
 
 { TIBXTestBase }
 
 TIBXTestBase = class(TTestBase)
+private
+  FIBDatabase: TIBDatabase;
+  FIBTransaction: TIBTransaction;
+  FIBQuery: TIBQuery;
 protected
+  procedure ClientLibraryPathChanged; override;
+  procedure CreateObjects(Application: TCustomApplication); override;
   procedure PrintDataSet(aDataSet: TIBCustomDataSet);
   procedure PrintDataSetRow(aField: TField);
   procedure PrintAffectedRows(query: TIBCustomDataSet);
+  procedure ReadOnlyTransaction;
+  procedure ReadWriteTransaction;
+public
+  property IBDatabase: TIBDatabase read  FIBDatabase;
+  property IBTransaction: TIBTransaction read FIBTransaction;
+  property IBQuery: TIBQuery read FIBQuery;
 end;
 
 implementation
 
 { TIBXTestBase }
+
+procedure TIBXTestBase.ClientLibraryPathChanged;
+begin
+  inherited ClientLibraryPathChanged;
+  FIBDatabase.FirebirdLibraryPathName := Owner.ClientLibraryPath;
+end;
+
+procedure TIBXTestBase.CreateObjects(Application: TCustomApplication);
+begin
+  inherited CreateObjects(Application);
+  { In console Mode the application should own the database
+    - ensures centralised exception handling }
+  FIBDatabase := TIBDatabase.Create(Application);
+  FIBDatabase.FirebirdLibraryPathName := Owner.ClientLibraryPath;
+  FIBDatabase.LoginPrompt := false;
+  FIBDatabase.Params.Add('user_name=' + Owner.GetUserName);
+  FIBDatabase.Params.Add('password=' + Owner.GetPassword);
+  FIBDatabase.Params.Add('lc_ctype=UTF8');
+  FIBTransaction := TIBTransaction.Create(Application);
+  FIBTransaction.DefaultDatabase := FIBDatabase;
+  FIBDatabase.DefaultTransaction := FIBTransaction;
+  FIBQuery := TIBQuery.Create(Application);
+  FIBQuery.Database := FIBDatabase;
+end;
 
 procedure TIBXTestBase.PrintDataSet(aDataSet: TIBCustomDataSet);
 var i: integer;
@@ -110,6 +146,23 @@ begin
     writeln('Updates = ',UpdateCount);
     writeln('Deletes = ',DeleteCount);
   end;
+end;
+
+procedure TIBXTestBase.ReadOnlyTransaction;
+begin
+  FIBTransaction.Params.Clear;
+  FIBTransaction.Params.Add('concurrency');
+  FIBTransaction.Params.Add('wait');
+  FIBTransaction.Params.Add('read');
+end;
+
+
+procedure TIBXTestBase.ReadWriteTransaction;
+begin
+  FIBTransaction.Params.Clear;
+  FIBTransaction.Params.Add('concurrency');
+  FIBTransaction.Params.Add('wait');
+  FIBTransaction.Params.Add('write');
 end;
 
 end.

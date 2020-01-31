@@ -1,12 +1,6 @@
 unit TestTemplate;
-{$IFDEF MSWINDOWS}
-{$DEFINE WINDOWS}
-{$ENDIF}
 
-{$IFDEF FPC}
-{$mode delphi}
-{$codepage utf8}
-{$ENDIF}
+{$mode objfpc}{$H+}
 
 {Test 1: Titlecursor}
 
@@ -16,7 +10,7 @@ unit TestTemplate;
 interface
 
 uses
-  Classes, SysUtils, TestManager, IBXTestManager IB;
+  Classes, SysUtils, CustApp, TestManager, IBXTestManager, IB;
 
 const
   aTestID    = '1';
@@ -27,11 +21,11 @@ type
 { TTest1 }
 
   TTest1 = class(TIBXTestBase)
-  private
-    procedure DoQuery(Attachment: IAttachment);
   protected
+    procedure CreateObjects(Application: TCustomApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
+    procedure InitTest; override;
   public
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
   end;
@@ -41,9 +35,9 @@ implementation
 
 { TTest1 }
 
-procedure TTest1.DoQuery(Attachment: IAttachment);
+procedure TTest1.CreateObjects(Application: TCustomApplication);
 begin
-
+  inherited CreateObjects(Application);
 end;
 
 function TTest1.GetTestID: AnsiString;
@@ -54,6 +48,10 @@ end;
 function TTest1.GetTestTitle: AnsiString;
 begin
   Result := aTestTitle;
+end;
+
+procedure TTest1.InitTest;
+begin
 end;
 
 procedure TTest1.RunTest(CharSet: AnsiString; SQLDialect: integer);

@@ -29,6 +29,8 @@ type
     function GetFirebirdAPI: IFirebirdAPI;
   protected
     FHexStrings: boolean;
+    procedure ClientLibraryPathChanged; virtual;
+    procedure CreateObjects(Application: TCustomApplication); virtual;
     function ExtractDBName(ConnectString: AnsiString): AnsiString;
     function GetTestID: AnsiString; virtual; abstract;
     function GetTestTitle: AnsiString; virtual; abstract;
@@ -47,6 +49,7 @@ type
     procedure WritePerfStats(stats: TPerfCounters);
     procedure CheckActivity(Attachment: IAttachment); overload;
     procedure CheckActivity(Transaction: ITransaction); overload;
+    procedure InitTest; virtual;
   public
     constructor Create(aOwner: TTestManager);  virtual;
     function TestTitle: AnsiString;
@@ -74,9 +77,11 @@ type
     FShowStatistics: boolean;
     FFirebirdAPI: IFirebirdAPI;
     FPortNo: AnsiString;
+    FCreateObjectsDone: boolean;
     procedure CleanUp;
     function GetFirebirdAPI: IFirebirdAPI;
     function GetIndexByTestID(aTestID: AnsiString): integer;
+    procedure SetApplication(AValue: TCustomApplication);
   public
     constructor Create;
     destructor Destroy; override;
@@ -100,7 +105,7 @@ type
     property ShowStatistics: boolean read FShowStatistics write FShowStatistics;
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property Server: AnsiString read FServer;
-    property Application: TCustomApplication read FApplication write FApplication;
+    property Application: TCustomApplication read FApplication write SetApplication;
     property ClientLibraryPath: string read FClientLibraryPath;
   end;
 
@@ -132,6 +137,8 @@ begin
     TestMgr := TTestManager.Create;
   test := aTest.Create(TestMgr);
   TestMgr.FTests.AddObject(test.GetTestID,test);
+  if TestMgr.Application <> nil then
+    test.CreateObjects(TestMgr.Application);
 end;
 
 { TTestBase }
@@ -150,6 +157,16 @@ end;
 function TTestBase.GetFirebirdAPI: IFirebirdAPI;
 begin
   Result := FOwner.FirebirdAPI;
+end;
+
+procedure TTestBase.ClientLibraryPathChanged;
+begin
+  //Do nothing yet
+end;
+
+procedure TTestBase.CreateObjects(Application: TCustomApplication);
+begin
+  //Do nothing yet
 end;
 
 function TTestBase.ExtractDBName(ConnectString: AnsiString): AnsiString;
@@ -602,6 +619,11 @@ begin
   writeln(OutFile,'Transaction Activity = ',Transaction.HasActivity)
 end;
 
+procedure TTestBase.InitTest;
+begin
+  //Do nothing yet
+end;
+
 { TTestManager }
 
 procedure TTestManager.CleanUp;
@@ -635,6 +657,17 @@ begin
   end;
   if Result = -1 then
     raise Exception. CreateFmt('Invalid Test ID - %s',[aTestID]);
+end;
+
+procedure TTestManager.SetApplication(AValue: TCustomApplication);
+var i: integer;
+begin
+  if FApplication = AValue then Exit;
+  FApplication := AValue;
+  if not FCreateObjectsDone then
+    for i := 0 to FTests.Count - 1 do
+      TTestBase(FTests.Objects[i]).CreateObjects(AValue);
+  FCreateObjectsDone := true;
 end;
 
 constructor TTestManager.Create;
@@ -733,6 +766,7 @@ begin
     writeln(OutFile,'Running ' + TestTitle);
     writeln(ErrOutput,'Running ' + TestTitle);
     try
+      InitTest;
       RunTest('UTF8',3);
     except on E:Exception do
       begin
@@ -746,9 +780,13 @@ begin
 end;
 
 procedure TTestManager.SetClientLibraryPath(aLibName: string);
+var i: integer;
 begin
   FFirebirdAPI := LoadFBLibrary(aLibName).GetFirebirdAPI;
   FClientLibraryPath := aLibName;
+  for i := 0 to FTests.Count - 1 do
+    TTestBase(FTests.Objects[i]).ClientLibraryPathChanged;
+
 end;
 
 procedure TTestManager.SetUserName(aValue: AnsiString);

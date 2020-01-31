@@ -1,12 +1,6 @@
 unit Test01;
-{$IFDEF MSWINDOWS}
-{$DEFINE WINDOWS}
-{$ENDIF}
 
-{$IFDEF FPC}
-{$mode delphi}
-{$codepage utf8}
-{$ENDIF}
+{$mode objfpc}{$H+}
 
 {Test 1: Open and read from Employee Database}
 
@@ -42,13 +36,10 @@ type
 { TTest1 }
 
   TTest1 = class(TIBXTestBase)
-  private
-    FIBDatabase: TIBDatabase;
-    FIBTransaction: TIBTransaction;
-    procedure DoQuery;
   protected
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
+    procedure InitTest; override;
   public
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
   end;
@@ -76,28 +67,6 @@ const
 
   { TTest1 }
 
-procedure TTest1.DoQuery;
-var stats: TPerfCounters;
-    Query: TIBQuery;
-begin
-  Query := TIBQuery.Create(Owner.Application);
-  with Query do
-  try
-     AllowAutoActivateTransaction := true;
-     Database := FIBDatabase;
-     SQL.Text := sqlExample;
-     EnableStatistics := true;
-     Active := true;
-     PrintDataSet(Query);
-
-     if GetPerfStatistics(stats) then
-       WritePerfStats(stats);
-     PrintAffectedRows(query);
-  finally
-    Query.Free;
-  end;
-end;
-
 function TTest1.GetTestID: AnsiString;
 begin
   Result := aTestID;
@@ -108,19 +77,28 @@ begin
   Result := aTestTitle;
 end;
 
-procedure TTest1.RunTest(CharSet: AnsiString; SQLDialect: integer);
+procedure TTest1.InitTest;
 begin
-  { In console Mode the application should own the database
-    - ensures centralised exception handling }
-  FIBDatabase := TIBDatabase.Create(Owner.Application);
-  FIBDatabase.FirebirdLibraryPathName := Owner.ClientLibraryPath;
-  FIBTransaction := TIBTransaction.Create(Owner.Application);
-  FIBDatabase.DatabaseName := Owner.GetEmployeeDatabaseName;
-  FIBDatabase.Params.Add('user_name=' + Owner.GetUserName);
-  FIBDatabase.Params.Add('password=' + Owner.GetPassword);
-  FIBDatabase.Params.Add('lc_ctype=UTF8');
-  FIBTransaction.DefaultDatabase := FIBDatabase;
-  DoQuery;
+  inherited InitTest;
+  IBDatabase.DatabaseName := Owner.GetEmployeeDatabaseName;
+  ReadOnlyTransaction;
+end;
+
+procedure TTest1.RunTest(CharSet: AnsiString; SQLDialect: integer);
+var stats: TPerfCounters;
+begin
+  with IBQuery do
+  begin
+     AllowAutoActivateTransaction := true;
+     SQL.Text := sqlExample;
+     EnableStatistics := true;
+     Active := true;
+     PrintDataSet(IBQuery);
+
+     if GetPerfStatistics(stats) then
+       WritePerfStats(stats);
+     PrintAffectedRows(IBQuery);
+  end;
 end;
 
 initialization

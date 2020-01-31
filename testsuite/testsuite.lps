@@ -3,136 +3,137 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="19">
+    <Units Count="20">
       <Unit0>
         <Filename Value="testsuite.lpr"/>
         <IsPartOfProject Value="True"/>
         <TopLine Value="92"/>
         <CursorPos Y="108"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="IBXTestManager.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="25" Y="16"/>
-        <UsageCount Value="23"/>
+        <TopLine Value="37"/>
+        <CursorPos X="66" Y="40"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="Test01.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="97"/>
-        <CursorPos Y="122"/>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="75"/>
+        <CursorPos X="27" Y="100"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="TestManager.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="23"/>
-        <CursorPos X="34" Y="751"/>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="162"/>
+        <CursorPos X="19" Y="164"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="Test02.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="32"/>
-        <CursorPos Y="41"/>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="125"/>
+        <CursorPos X="37" Y="134"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
+        <Filename Value="Test03.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="10"/>
+        <CursorPos Y="36"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
         <CursorPos X="21" Y="34"/>
         <UsageCount Value="20"/>
-      </Unit5>
-      <Unit6>
+      </Unit6>
+      <Unit7>
         <Filename Value="../examples/local-employeedb/ConsoleModeExample.lpr"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="153"/>
         <CursorPos Y="114"/>
         <UsageCount Value="10"/>
-      </Unit6>
-      <Unit7>
+      </Unit7>
+      <Unit8>
         <Filename Value="../../../../fpcsrc/3.0.4/rtl/objpas/classes/stringl.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1230"/>
         <CursorPos Y="1247"/>
         <UsageCount Value="11"/>
-      </Unit7>
-      <Unit8>
+      </Unit8>
+      <Unit9>
         <Filename Value="../../fbintf/client/FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="116"/>
         <CursorPos X="14" Y="133"/>
         <UsageCount Value="11"/>
-      </Unit8>
-      <Unit9>
+      </Unit9>
+      <Unit10>
         <Filename Value="../../fbintf/client/FBAttachment.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="599"/>
         <CursorPos X="3" Y="602"/>
         <UsageCount Value="11"/>
-      </Unit9>
-      <Unit10>
+      </Unit10>
+      <Unit11>
         <Filename Value="../../fbintf/client/3.0/FB30Statement.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1050"/>
         <CursorPos Y="1066"/>
         <UsageCount Value="11"/>
-      </Unit10>
-      <Unit11>
+      </Unit11>
+      <Unit12>
         <Filename Value="../../fbintf/client/3.0/FB30Attachment.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="220"/>
         <CursorPos X="15" Y="234"/>
         <UsageCount Value="11"/>
-      </Unit11>
-      <Unit12>
-        <Filename Value="../runtime/nongui/IBDatabase.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="301"/>
-        <CursorPos X="37" Y="316"/>
-        <UsageCount Value="11"/>
       </Unit12>
       <Unit13>
+        <Filename Value="../runtime/nongui/IBDatabase.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="140"/>
+        <CursorPos X="17" Y="403"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit13>
+      <Unit14>
         <Filename Value="../../fbintf/client/3.0/FB30ClientAPI.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="186"/>
         <CursorPos X="79" Y="204"/>
         <UsageCount Value="11"/>
-      </Unit13>
-      <Unit14>
+      </Unit14>
+      <Unit15>
         <Filename Value="../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="273"/>
         <CursorPos Y="290"/>
         <UsageCount Value="10"/>
-      </Unit14>
-      <Unit15>
+      </Unit15>
+      <Unit16>
         <Filename Value="../../fbintf/IB.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1335"/>
         <CursorPos X="35" Y="1362"/>
         <UsageCount Value="10"/>
-      </Unit15>
-      <Unit16>
-        <Filename Value="Test03.pas"/>
-        <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="160"/>
-        <CursorPos X="43" Y="183"/>
-        <UsageCount Value="21"/>
-        <Loaded Value="True"/>
       </Unit16>
       <Unit17>
         <Filename Value="../examples/dbInfo/ViewDatabaseInfo.lpr"/>
@@ -145,127 +146,144 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="6"/>
-        <TopLine Value="29"/>
-        <CursorPos X="61" Y="35"/>
-        <UsageCount Value="10"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="17"/>
+        <CursorPos Y="29"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit18>
+      <Unit19>
+        <Filename Value="TestTemplate.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="31"/>
+        <CursorPos Y="55"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit19>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="testsuite.lpr"/>
-        <Caret Line="108" TopLine="92"/>
+        <Filename Value="../runtime/nongui/IBDatabase.pas"/>
+        <Caret Line="1684" Column="3" TopLine="1681"/>
       </Position1>
       <Position2>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="36" Column="19" TopLine="8"/>
+        <Filename Value="Test02.pas"/>
+        <Caret Line="44" Column="13" TopLine="19"/>
       </Position2>
       <Position3>
         <Filename Value="Test02.pas"/>
-        <Caret Line="49" Column="19" TopLine="30"/>
+        <Caret Line="47" Column="2" TopLine="19"/>
       </Position3>
       <Position4>
-        <Filename Value="../examples/dbInfo/Unit1.pas"/>
-        <Caret Line="52" Column="22" TopLine="34"/>
+        <Filename Value="Test02.pas"/>
+        <Caret Line="36" Column="22" TopLine="17"/>
       </Position4>
       <Position5>
-        <Filename Value="../examples/dbInfo/Unit1.pas"/>
-        <Caret Line="112" Column="18" TopLine="84"/>
+        <Filename Value="Test02.pas"/>
+        <Caret Line="113" TopLine="113"/>
       </Position5>
       <Position6>
-        <Filename Value="../examples/dbInfo/Unit1.pas"/>
-        <Caret Line="52" Column="15" TopLine="31"/>
+        <Filename Value="Test03.pas"/>
+        <Caret Line="34" TopLine="7"/>
       </Position6>
       <Position7>
-        <Filename Value="../examples/dbInfo/Unit1.pas"/>
-        <Caret Line="150" Column="3" TopLine="148"/>
+        <Filename Value="Test03.pas"/>
+        <Caret Line="36" Column="34" TopLine="13"/>
       </Position7>
       <Position8>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="33" TopLine="16"/>
+        <Filename Value="Test02.pas"/>
+        <Caret Line="40" Column="22" TopLine="27"/>
       </Position8>
       <Position9>
-        <Filename Value="../examples/dbInfo/Unit1.pas"/>
-        <Caret Line="50" Column="22" TopLine="35"/>
+        <Filename Value="Test03.pas"/>
+        <Caret Line="38" Column="20" TopLine="34"/>
       </Position9>
       <Position10>
         <Filename Value="Test03.pas"/>
-        <Caret Line="48" Column="26" TopLine="38"/>
+        <Caret Line="37" TopLine="26"/>
       </Position10>
       <Position11>
-        <Filename Value="Test02.pas"/>
-        <Caret Line="151" Column="32" TopLine="138"/>
+        <Filename Value="Test03.pas"/>
+        <Caret Line="120" Column="3" TopLine="40"/>
       </Position11>
       <Position12>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="27" Column="8" TopLine="17"/>
+        <Filename Value="TestManager.pas"/>
+        <Caret Line="32" Column="15" TopLine="15"/>
       </Position12>
       <Position13>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="29" Column="3" TopLine="17"/>
+        <Filename Value="TestManager.pas"/>
+        <Caret Line="163" Column="7" TopLine="161"/>
       </Position13>
       <Position14>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="34" Column="21" TopLine="18"/>
+        <Filename Value="IBXTestManager.pas"/>
+        <Caret Line="8" Column="44" TopLine="3"/>
       </Position14>
       <Position15>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="56" Column="18" TopLine="39"/>
+        <Filename Value="Test01.pas"/>
+        <Caret Line="83" Column="3" TopLine="66"/>
       </Position15>
       <Position16>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="110" Column="45" TopLine="103"/>
+        <Filename Value="Test01.pas"/>
+        <Caret Line="96" Column="21" TopLine="75"/>
       </Position16>
       <Position17>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="112" TopLine="103"/>
+        <Filename Value="Test01.pas"/>
+        <Caret Line="100" Column="27" TopLine="75"/>
       </Position17>
       <Position18>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="125" TopLine="101"/>
+        <Filename Value="Test02.pas"/>
+        <Caret Line="20" Column="31" TopLine="11"/>
       </Position18>
       <Position19>
         <Filename Value="Test03.pas"/>
-        <Caret Line="19" Column="90" TopLine="14"/>
+        <Caret Line="32" Column="27" TopLine="16"/>
       </Position19>
       <Position20>
         <Filename Value="Test03.pas"/>
-        <Caret Line="37" Column="43" TopLine="20"/>
+        <Caret Line="95" Column="35" TopLine="88"/>
       </Position20>
       <Position21>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="69" Column="65" TopLine="82"/>
+        <Filename Value="Test02.pas"/>
+        <Caret Line="116" Column="24" TopLine="99"/>
       </Position21>
       <Position22>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="66" TopLine="46"/>
+        <Filename Value="Test02.pas"/>
+        <Caret Line="151" Column="3" TopLine="125"/>
       </Position22>
       <Position23>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="65" Column="27" TopLine="48"/>
+        <Filename Value="Test02.pas"/>
+        <Caret Line="149" Column="26" TopLine="125"/>
       </Position23>
       <Position24>
         <Filename Value="Test03.pas"/>
-        <Caret Line="176" Column="60" TopLine="159"/>
+        <Caret Line="13" Column="31"/>
       </Position24>
       <Position25>
         <Filename Value="Test03.pas"/>
-        <Caret Line="180" Column="22" TopLine="160"/>
+        <Caret Line="111" Column="3" TopLine="94"/>
       </Position25>
       <Position26>
         <Filename Value="Test03.pas"/>
-        <Caret Line="185" Column="6" TopLine="160"/>
+        <Caret Line="165" Column="50" TopLine="151"/>
       </Position26>
       <Position27>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="186" Column="6" TopLine="160"/>
+        <Filename Value="TestManager.pas"/>
+        <Caret Line="95" Column="30" TopLine="76"/>
       </Position27>
       <Position28>
-        <Filename Value="Test03.pas"/>
-        <Caret Line="35" Column="22" TopLine="29"/>
+        <Filename Value="TestManager.pas"/>
+        <Caret Line="32" Column="49" TopLine="25"/>
       </Position28>
+      <Position29>
+        <Filename Value="IBXTestManager.pas"/>
+        <Caret Line="20" Column="48" TopLine="3"/>
+      </Position29>
+      <Position30>
+        <Filename Value="TestTemplate.pas"/>
+        <Caret Line="29" TopLine="19"/>
+      </Position30>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

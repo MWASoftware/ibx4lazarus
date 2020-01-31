@@ -1,12 +1,6 @@
 unit Test03;
-{$IFDEF MSWINDOWS}
-{$DEFINE WINDOWS}
-{$ENDIF}
 
-{$IFDEF FPC}
-{$mode delphi}
-{$codepage utf8}
-{$ENDIF}
+{$mode objfpc}{$H+}
 
 {Test 3: Database Information}
 
@@ -16,7 +10,7 @@ unit Test03;
 interface
 
 uses
-  Classes, SysUtils, TestManager, IBXTestManager, IB, IBDatabaseInfo, IBQuery, IBDatabase;
+  Classes, SysUtils, CustApp, TestManager, IBXTestManager, IB, IBDatabaseInfo, IBQuery, IBDatabase;
 
 const
   aTestID    = '3';
@@ -28,18 +22,17 @@ type
 
   Test3 = class(TIBXTestBase)
   private
-    FIBDatabase: TIBDatabase;
-    FIBTransaction: TIBTransaction;
     FIBDatabaseInfo: TIBDatabaseInfo;
     FTableNameLookup: TIBQuery;
-    procedure DoQuery;
     procedure AddPerfStats(Heading: string; stats: TStrings);
     procedure ShowBoolValue(aValue: integer; WhenTrue, WhenFalse: string);
     procedure ShowStrings(aCaption: string; List: TStrings);
     function HexString(s: AnsiString): string;
   protected
+    procedure CreateObjects(Application: TCustomApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
+    procedure InitTest; override;
   public
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
   end;
@@ -48,70 +41,6 @@ type
 implementation
 
 { Test3 }
-
-procedure Test3.DoQuery;
-var S: TStrings;
-    i: integer;
-begin
-  FIBTransaction.Active := true;
-  FTableNameLookup.Active := true;
-  writeln(OutFile,'Authentication Method = '+ FIBDatabase.AuthenticationMethod);
-  writeln(OutFile,'Remote Protocol = ' + FIBDatabase.RemoteProtocol);
-  writeln(OutFile,'Attachment SQLDialect = ' + IntToStr(FIBDatabase.DBSQLDialect));
-  S := TStringList.Create;
-  try
-    FIBDatabase.Attachment.getFBVersion(S);
-    for i := 0 to S.Count - 1 do
-      writeln(OutFile,S[i]);
-  finally
-    S.Free;
-  end;
-  with FIBDatabaseInfo do
-  begin
-    writeln(OutFile,'Firebird Library Pathname = ' + FIBDatabase.FirebirdAPI.GetFBLibrary.GetLibraryFilePath);
-    writeln(OutFile,'DB SQLDialect = ' + IntToStr(DBSQLDialect));
-    writeln(OutFile,'Allocation = ' + IntToStr(Allocation));
-    writeln(OutFile,'Base Level = ' + IntToStr(BaseLevel));
-    writeln(OutFile,'DB File Name = ' + DBFileName);
-    writeln(OutFile,'DB Site Name = ' + DBSiteName);
-    writeln(OutFile,'DB Implementation No = ' + IntToStr(DBImplementationNo));
-    writeln(OutFile,'Database Created: ' + DateTimeToStr(DateDBCreated));
-    writeln(OutFile,'DB Implementation Class = ' + IntToStr(DBImplementationClass));
-    ShowBoolValue(NoReserve, 'No Space Reserved','Space is Reserved');
-    writeln(OutFile,'ODS Minor Version = ' + IntToStr(ODSMinorVersion));
-    writeln(OutFile,'ODS Major Version = ' + IntToStr(ODSMajorVersion));
-    writeln(OutFile,'Page Size = ' + IntToStr(PageSize));
-    writeln(OutFile,'Version = ' + Version);
-    writeln(OutFile,'Current Memory = ' + IntToStr(CurrentMemory));
-    ShowBoolValue(ForcedWrites,'Forced Writes Enabled','Forced Writes Disabled');
-    writeln(OutFile,'Max Memory = ' + IntToStr(MaxMemory));
-    writeln(OutFile,'Number of Buffers = ' + IntToStr(NumBuffers));
-    writeln(OutFile,'Sweep Interval = ' + IntToStr(SweepInterval));
-    ShowStrings('User Names',UserNames);
-    writeln(OutFile,'Fetches = ' + IntToStr(Fetches));
-    writeln(OutFile,'Marks = ' + IntToStr(Marks));
-    writeln(OutFile,'Reads = ' + IntToStr(Reads));
-    writeln(OutFile,'Writes = ' + IntToStr(Writes));
-    if ODSMajorVersion >= 12 then
-    begin
-      writeln(OutFile,'Pages Free = ' + IntToStr(PagesFree));
-      writeln(OutFile,'Pages Used = ' + IntToStr(PagesUsed));
-    end;
-    writeln(OutFile,'Transaction Count = ' + IntToStr(TransactionCount));
-    AddPerfStats('Backout Count',BackoutCount);
-    AddPerfStats('Delete Count',DeleteCount);
-    AddPerfStats('Expunge Count',ExpungeCount);
-    AddPerfStats('Insert Count',InsertCount);
-    AddPerfStats('Purge Count',PurgeCount);
-    AddPerfStats('Read Idx Count',ReadIdxCount);
-    AddPerfStats('Read Seq Count',ReadSeqCount);
-    AddPerfStats('Update Count',UpdateCount);
-    writeln(OutFile,'');
-    ShowBoolValue(ReadOnly,'Database is Read Only','Database is Read/Write');
-    writeln(OutFile,'Hex Dump of Database Page 100:');
-    writeln(OutFile,HexString(GetDatabasePage(100)));
-  end;
-end;
 
 procedure Test3.AddPerfStats(Heading: string; stats: TStrings);
 var i: integer;
@@ -156,6 +85,17 @@ begin
     Result += Format('%x ',[byte(s[i])]);
 end;
 
+procedure Test3.CreateObjects(Application: TCustomApplication);
+begin
+  inherited CreateObjects(Application);
+  FIBDatabaseInfo := TIBDatabaseInfo.Create(Application);
+  FIBDatabaseInfo.Database := IBDatabase;
+  FTableNameLookup := TIBQuery.Create(Application);
+  FTableNameLookup.Database := IBDatabase;
+  FTableNameLookup.Transaction := IBTransaction;
+  FTableNameLookup.SQL.Text := 'SELECT r.RDB$RELATION_ID, trim(r.RDB$RELATION_NAME) as RDB$RELATION_NAME FROM RDB$RELATIONS r';
+end;
+
 function Test3.GetTestID: AnsiString;
 begin
   Result := aTestID;
@@ -166,27 +106,75 @@ begin
   Result := aTestTitle;
 end;
 
-procedure Test3.RunTest(CharSet: AnsiString; SQLDialect: integer);
+procedure Test3.InitTest;
 begin
-  FIBDatabase := TIBDatabase.Create(Owner.Application);
-  FIBDatabase.FirebirdLibraryPathName := Owner.ClientLibraryPath;
-  FIBDatabase.LoginPrompt := false;
-  FIBTransaction := TIBTransaction.Create(Owner.Application);
-  FIBDatabase.Params.Add('user_name=' + Owner.GetUserName);
-  FIBDatabase.Params.Add('password=' + Owner.GetPassword);
-  FIBDatabase.Params.Add('lc_ctype=UTF8');
-  FIBDatabase.DatabaseName := Owner.GetEmployeeDatabaseName;
-  FIBTransaction.DefaultDatabase := FIBDatabase;
-  FIBTransaction.Params.Add('concurrency');
-  FIBTransaction.Params.Add('wait');
-  FIBDatabaseInfo := TIBDatabaseInfo.Create(Owner.Application);
-  FIBDatabaseInfo.Database := FIBDatabase;
-  FTableNameLookup := TIBQuery.Create(Owner.Application);
-  FTableNameLookup.Database := FIBDatabase;
-  FTableNameLookup.Transaction := FIBTransaction;
-  FTableNameLookup.SQL.Text := 'SELECT r.RDB$RELATION_ID, trim(r.RDB$RELATION_NAME) as RDB$RELATION_NAME FROM RDB$RELATIONS r';
-  FIBDatabase.Connected := true;
-  DoQuery;
+  IBDatabase.DatabaseName := Owner.GetEmployeeDatabaseName;
+  ReadOnlyTransaction;
+end;
+
+procedure Test3.RunTest(CharSet: AnsiString; SQLDialect: integer);
+var S: TStrings;
+    i: integer;
+begin
+  IBDatabase.Connected := true;
+  IBTransaction.Active := true;
+  FTableNameLookup.Active := true;
+  writeln(OutFile,'Authentication Method = '+ IBDatabase.AuthenticationMethod);
+  writeln(OutFile,'Remote Protocol = ' + IBDatabase.RemoteProtocol);
+  writeln(OutFile,'Attachment SQLDialect = ' + IntToStr(IBDatabase.DBSQLDialect));
+  S := TStringList.Create;
+  try
+    IBDatabase.Attachment.getFBVersion(S);
+    for i := 0 to S.Count - 1 do
+      writeln(OutFile,S[i]);
+  finally
+    S.Free;
+  end;
+  with FIBDatabaseInfo do
+  begin
+    writeln(OutFile,'Firebird Library Pathname = ' + IBDatabase.FirebirdAPI.GetFBLibrary.GetLibraryFilePath);
+    writeln(OutFile,'DB SQLDialect = ' + IntToStr(DBSQLDialect));
+    writeln(OutFile,'Allocation = ' + IntToStr(Allocation));
+    writeln(OutFile,'Base Level = ' + IntToStr(BaseLevel));
+    writeln(OutFile,'DB File Name = ' + DBFileName);
+    writeln(OutFile,'DB Site Name = ' + DBSiteName);
+    writeln(OutFile,'DB Implementation No = ' + IntToStr(DBImplementationNo));
+    writeln(OutFile,'Database Created: ' + DateTimeToStr(DateDBCreated));
+    writeln(OutFile,'DB Implementation Class = ' + IntToStr(DBImplementationClass));
+    ShowBoolValue(NoReserve, 'No Space Reserved','Space is Reserved');
+    writeln(OutFile,'ODS Minor Version = ' + IntToStr(ODSMinorVersion));
+    writeln(OutFile,'ODS Major Version = ' + IntToStr(ODSMajorVersion));
+    writeln(OutFile,'Page Size = ' + IntToStr(PageSize));
+    writeln(OutFile,'Version = ' + Version);
+    writeln(OutFile,'Current Memory = ' + IntToStr(CurrentMemory));
+    ShowBoolValue(ForcedWrites,'Forced Writes Enabled','Forced Writes Disabled');
+    writeln(OutFile,'Max Memory = ' + IntToStr(MaxMemory));
+    writeln(OutFile,'Number of Buffers = ' + IntToStr(NumBuffers));
+    writeln(OutFile,'Sweep Interval = ' + IntToStr(SweepInterval));
+    ShowStrings('User Names',UserNames);
+    writeln(OutFile,'Fetches = ' + IntToStr(Fetches));
+    writeln(OutFile,'Marks = ' + IntToStr(Marks));
+    writeln(OutFile,'Reads = ' + IntToStr(Reads));
+    writeln(OutFile,'Writes = ' + IntToStr(Writes));
+    if ODSMajorVersion >= 12 then
+    begin
+      writeln(OutFile,'Pages Free = ' + IntToStr(PagesFree));
+      writeln(OutFile,'Pages Used = ' + IntToStr(PagesUsed));
+    end;
+    writeln(OutFile,'Transaction Count = ' + IntToStr(TransactionCount));
+    AddPerfStats('Backout Count',BackoutCount);
+    AddPerfStats('Delete Count',DeleteCount);
+    AddPerfStats('Expunge Count',ExpungeCount);
+    AddPerfStats('Insert Count',InsertCount);
+    AddPerfStats('Purge Count',PurgeCount);
+    AddPerfStats('Read Idx Count',ReadIdxCount);
+    AddPerfStats('Read Seq Count',ReadSeqCount);
+    AddPerfStats('Update Count',UpdateCount);
+    writeln(OutFile,'');
+    ShowBoolValue(ReadOnly,'Database is Read Only','Database is Read/Write');
+    writeln(OutFile,'Hex Dump of Database Page 100:');
+    writeln(OutFile,HexString(GetDatabasePage(100)));
+  end;
 end;
 
 initialization
