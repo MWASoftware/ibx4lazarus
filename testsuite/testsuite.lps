@@ -146,19 +146,17 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="17"/>
         <CursorPos Y="29"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit18>
       <Unit19>
         <Filename Value="TestTemplate.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="31"/>
-        <CursorPos Y="55"/>
+        <CursorPos X="28" Y="37"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit19>
