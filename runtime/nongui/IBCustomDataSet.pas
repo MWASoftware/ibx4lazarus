@@ -275,10 +275,9 @@ type
    private
      FHasTimeZone: boolean;
      FTimeZoneFormat: TIBTimeZoneFormat;
-     FTimeZoneID: TFBTimeZoneID;
      FTimeZoneNameIsKnown: boolean;
      FTimeZoneName: string;
-     FTimestamp: TDateTime; {date for computing dst offset}
+     function GetTimeZoneID: TFBTimeZoneID;
      function GetTimeZoneName: string;
      procedure SetTimeZoneID(aTimeZoneID: TFBTimeZoneID);
      procedure SetTimeZoneName(AValue: string);
@@ -293,7 +292,7 @@ type
      constructor Create(AOwner: TComponent); override;
      procedure Clear; override;
      property TimeZoneName: string read GetTimeZoneName write SetTimeZoneName;
-     property TimeZoneID: TFBTimeZoneID read FTimeZoneID;
+     property TimeZoneID: TFBTimeZoneID read GetTimeZoneID;
    published
      property HasTimeZone: boolean read FHasTimeZone;
      property TimeZoneFormat: TIBTimeZoneFormat read FTimeZoneFormat
@@ -1110,38 +1109,58 @@ type
 { TIBDateTimeField }
 
 function TIBDateTimeField.GetTimeZoneName: string;
+var DateTimeBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if not FTimeZoneNameIsKnown then
+  if not FTimeZoneNameIsKnown and GetData(@DateTimeBuffer,False) then
   with (DataSet as TIBCustomDataSet).Database, attachment.getFirebirdAPI do
   begin
-    if FTimeZoneID < MaxOffsetTimeZoneID then
-      FTimeZoneName := FormatTimeZoneOffset(FTimeZoneID - TimeZoneDisplaymentDelta)
+    if DateTimeBuffer.TimeZoneID < MaxOffsetTimeZoneID then
+      FTimeZoneName := FormatTimeZoneOffset(DateTimeBuffer.TimeZoneID - TimeZoneDisplaymentDelta)
     else
     if TimeZoneFormat = tfTimeZoneNameIfKnown then
-      FTimeZoneName := TimeZoneID2TimeZoneName(FTimeZoneID)
+      FTimeZoneName := TimeZoneID2TimeZoneName(DateTimeBuffer.TimeZoneID)
     else
     {Need to determine whether daylight savings time in use for date/timezone
      and then format time displayment.}
-    FTimeZoneName := FormatTimeZoneOffset(GetEffectiveOffsetMins(FTimestamp,
-                                          TimeZoneID2TimeZoneName(FTimeZoneID)));
+    FTimeZoneName := FormatTimeZoneOffset(GetEffectiveOffsetMins(DateTimeBuffer.Timestamp,
+                                          TimeZoneID2TimeZoneName(DateTimeBuffer.TimeZoneID)));
     FTimeZoneNameIsKnown := true;
   end;
   Result := FTimeZoneName;
 end;
 
-procedure TIBDateTimeField.SetTimeZoneID(aTimeZoneID: TFBTimeZoneID);
+function TIBDateTimeField.GetTimeZoneID: TFBTimeZoneID;
+var DateTimeBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  FTimeZoneNameIsKnown := FTimeZoneID = aTimeZoneID;
-  FTimeZoneID := aTimeZoneID;
+  if HasTimeZone then
+  begin
+    If GetData(@DateTimeBuffer,False) then
+      Result := DateTimeBuffer.TimeZoneID
+    else
+      Result := 0;
+  end
+  else
+    Result := TimeZoneID_GMT;
+end;
+
+procedure TIBDateTimeField.SetTimeZoneID(aTimeZoneID: TFBTimeZoneID);
+var DateTimeBuffer: TIBBufferedDateTimeWithTimeZone;
+begin
+  if  HasTimeZone and GetData(@DateTimeBuffer,False) and (DateTimeBuffer.TimeZoneID <> aTimeZoneID) then
+  begin
+    FTimeZoneNameIsKnown := false;
+    DateTimeBuffer.TimeZoneID := aTimeZoneID;
+    SetData(@DateTimeBuffer,False);
+  end;
 end;
 
 procedure TIBDateTimeField.SetTimeZoneName(AValue: string);
 begin
-  if FTimeZoneName <> AValue then
+  if not FTimeZoneNameIsKnown or (FTimeZoneName <> AValue) then
   with (DataSet as TIBCustomDataSet).Database.attachment.getFirebirdAPI do
   begin
     FTimeZoneName := AValue;
-    FTimeZoneID := TimeZoneName2TimeZoneID(FTimeZoneName);
+    SetTimeZoneID(TimeZoneName2TimeZoneID(FTimeZoneName));
     FTimeZoneNameIsKnown := true;
   end;
 end;
@@ -1162,12 +1181,8 @@ var DateTimeBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
   if HasTimeZone then
   begin
-    If GetData(@DateTimeBuffer,False) then
-    begin
-      Result := DateTimeBuffer.Timestamp;
-      FTimestamp := Result;
-      SetTimeZoneID(DateTimeBuffer.TimeZoneID);
-    end
+    if GetData(@DateTimeBuffer,False) then
+      Result := DateTimeBuffer.Timestamp
     else
       Result := 0;
   end
@@ -1192,11 +1207,10 @@ begin
     If not GetData(@DateTimeBuffer,False) then
       TheText := ''
     else
+    {$if declared(DefaultFormatSettings)}
+    with DefaultFormatSettings do
+    {$ifend}
     begin
-      FTimestamp := DateTimeBuffer.Timestamp;
-      SetTimeZoneID(DateTimeBuffer.TimeZoneID);
-      if not ((FTimeZoneID < MaxOffsetTimeZoneID) or (TimeZoneFormat = tfTimeZoneNameIfKnown)) then
-        FTimeZoneNameIsKnown := false; {force recomputation if need to know DST offset}
       if ADisplayText and (Length(DisplayFormat) <> 0) then
         F := DisplayFormat
       else
@@ -1204,9 +1218,9 @@ begin
          ftTime : F := LongTimeFormat;
          ftDate : F := ShortDateFormat;
         else
-         F := ShortDateFormat + LongTimeFormat;
+         F := ShortDateFormat + ' ' + LongTimeFormat;
         end;
-      TheText := FBFormatDateTime(F,DateTimeBuffer.Timestamp) + ' ' + TimeZoneName;
+      TheText := FBFormatDateTime(F,DateTimeBuffer.Timestamp) + ' ' + GetTimeZoneName(DateTimeBuffer.TimeZoneID)
     end;
   end
   else
@@ -1216,10 +1230,9 @@ end;
 procedure TIBDateTimeField.SetAsDateTime(AValue: TDateTime);
 var DateTimeBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if HasTimeZone then
+  if HasTimeZone and GetData(@DateTimeBuffer,False) then
   begin
     DateTimeBuffer.Timestamp := AValue;
-    DateTimeBuffer.TimeZoneID := FTimeZoneID;
     SetData(@DateTimeBuffer,False);
   end
   else
@@ -1236,10 +1249,17 @@ begin
   if HasTimeZone and ParseDateTimeTZString(AValue,DateTimeBuffer.TimeStamp,aTimeZone,DataType=ftTime) then
   begin
     if aTimeZone = '' then
-      SetTimeZoneID(TimeZoneID_GMT)
+    begin
+      DateTimeBuffer.TimeZoneID := TimeZoneID_GMT;
+      FTimeZoneName := '00:00'
+    end
     else
-      SetTimeZoneName(aTimeZone);
-    DateTimeBuffer.TimeZoneID := FTimeZoneID;
+    begin
+      FTimeZoneName := aTimeZone;
+      with (DataSet as TIBCustomDataSet).Database.attachment.getFirebirdAPI do
+        DateTimeBuffer.TimeZoneID := TimeZoneName2TimeZoneID(aTimeZone);
+    end;
+    FTimeZoneNameIsKnown := true;
     SetData(@DateTimeBuffer,false);
   end
   else
@@ -1250,14 +1270,12 @@ constructor TIBDateTimeField.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   SetDataType(ftDateTime);
-  FTimeZoneID := TimeZoneID_GMT;
   FTimeZoneFormat := tfTimeZoneNameIfKnown;
 end;
 
 procedure TIBDateTimeField.Clear;
 begin
   inherited Clear;
-  FTimeZoneID := TimeZoneID_GMT;
   FTimeZoneNameIsKnown := false;
 end;
 
@@ -5651,6 +5669,11 @@ begin
        (FGeneratorName <> '') and (FFieldName <> '') and Owner.FieldByName(FFieldName).IsNull then
     Owner.FieldByName(FFieldName).AsInteger := GetNextValue;
 end;
+
+initialization
+  RegisterClasses([TIBArrayField,TIBStringField,TIBBCDField, TIBFMTBCDField,
+                   TIBSmallintField,TIBIntegerField,TIBLargeIntField,
+                   TIBMemoField, TIBDateTimeField, TIBTimeField]);
 
 
 end.
