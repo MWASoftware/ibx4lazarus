@@ -177,23 +177,6 @@ type
     property Size default 8;
   end;
 
-  {TFMTBCDField is overridden so that the properties can be set correctly at
-   bind time and to enable IBX appplications to check for an Identity column}
-
-  { TIBFMTBCDField }
-
-  TIBFMTBCDField = class(TFMTBCDField)
-  private
-    FIdentityColumn: boolean;
-  protected
-    procedure Bind(Binding: Boolean); override;
-  public
-    constructor Create(AOwner: TComponent); override;
-    property IdentityColumn: boolean read FIdentityColumn;
-  published
-    property Size default 8;
-  end;
-
   {The following integer field types extend the built in versions to enable IBX appplications
    to check for an Identity column}
 
@@ -285,14 +268,17 @@ type
    protected
      procedure Bind(Binding: Boolean); override;
      function GetAsDateTime: TDateTime; override;
+     function GetAsVariant: variant; override;
      function GetDataSize: Integer; override;
      procedure GetText(var theText: string; ADisplayText: Boolean); override;
      procedure SetAsDateTime(AValue: TDateTime); override;
      procedure SetAsString(const AValue: string); override;
+     procedure SetVarValue(const AValue: Variant); override;
    public
      constructor Create(AOwner: TComponent); override;
      function GetAsDateTimeTZ(var aDateTime: TDateTime; var aTimeZoneID: TFBTimeZoneID): boolean; overload;
      function GetAsDateTimeTZ(var aDateTime: TDateTime; var aTimeZone: string): boolean; overload;
+     function GetAsUTCDateTime: TDateTime;
      procedure SetAsDateTimeTZ(aDateTime: TDateTime; aTimeZoneID: TFBTimeZoneID); overload;
      procedure SetAsDateTimeTZ(aDateTime: TDateTime; aTimeZone: string); overload;
      property TimeZoneName: string read GetTimeZoneName write SetTimeZoneName;
@@ -1029,7 +1015,7 @@ const
     nil,     { ftIDispatch }
     TGuidField,        { ftGuid }
     TIBDateTimeField,    {ftTimestamp}
-    TIBFMTBCDField,       {ftFMTBcd}
+    TFmtBCDField,       {ftFMTBcd}
     nil,  {ftFixedWideChar}
     nil);   {ftWideMemo}
 (*
@@ -1186,6 +1172,24 @@ begin
     Result := 0;
 end;
 
+function TIBDateTimeField.GetAsVariant: variant;
+var aDateTime: TDateTime;
+    aTimeZone: string;
+begin
+  if HasTimeZone then
+  begin
+    if GetAsDateTimeTZ(aDateTime,aTimeZone) then
+      Result := VarArrayOf([aDateTime,aTimeZone])
+    else
+    begin
+      aDateTime := 0;
+      Result := aDateTime;
+    end;
+  end
+  else
+    Result := inherited GetAsVariant;
+end;
+
 function TIBDateTimeField.GetDataSize: Integer;
 begin
   if HasTimeZone then
@@ -1260,6 +1264,14 @@ begin
     IBError(ibxeBadDateTimeTZString,[AValue]);
 end;
 
+procedure TIBDateTimeField.SetVarValue(const AValue: Variant);
+begin
+  if HasTimeZone and VarIsArray(AValue) then
+    SetAsDateTimeTZ(AValue[0],string(AValue[1]))
+  else
+    inherited SetVarValue(AValue);
+end;
+
 constructor TIBDateTimeField.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -1297,6 +1309,16 @@ begin
     aTimeZone := GetTimeZoneName(aDateTime,aTimeZoneID);
 end;
 
+function TIBDateTimeField.GetAsUTCDateTime: TDateTime;
+var aDateTime: TDateTime;
+    aTimeZone: string;
+begin
+  if GetAsDateTimeTZ(aDateTime,aTimeZone) then
+    Result := GetFirebirdAPI.LocalTimeToUTCTime(aDateTime,aTimeZone)
+  else
+    Result := 0;
+end;
+
 procedure TIBDateTimeField.SetAsDateTimeTZ(aDateTime: TDateTime;
   aTimeZoneID: TFBTimeZoneID);
 var DateTimeBuffer: TIBBufferedDateTimeWithTimeZone;
@@ -1323,21 +1345,6 @@ constructor TIBTimeField.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   SetDataType(ftTime);
-end;
-
-{ TIBFMTBCDField }
-
-procedure TIBFMTBCDField.Bind(Binding: Boolean);
-begin
-  inherited Bind(Binding);
-  if Binding and (FieldDef <> nil) then
-     FIdentityColumn := (FieldDef as TIBFieldDef).IdentityColumn;
-end;
-
-constructor TIBFMTBCDField.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  Size := 8;
 end;
 
 { TIBParserDataSet }
@@ -5709,7 +5716,7 @@ begin
 end;
 
 initialization
-  RegisterClasses([TIBArrayField,TIBStringField,TIBBCDField, TIBFMTBCDField,
+  RegisterClasses([TIBArrayField,TIBStringField,TIBBCDField,
                    TIBSmallintField,TIBIntegerField,TIBLargeIntField,
                    TIBMemoField, TIBDateTimeField, TIBTimeField]);
 
