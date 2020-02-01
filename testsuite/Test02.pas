@@ -33,6 +33,7 @@ type
     FLocalDB: TIBCMLocalDBSupport;
     procedure HandleGetDBVersionNo(Sender: TObject; var VersionNo: integer);
     procedure HandleLogMessage(Sender: TObject; Msg: string);
+    procedure GetSharedDirectory(Sender: TObject; var SharedDataDir: string);
   protected
     procedure CreateObjects(Application: TCustomApplication); override;
     function GetTestID: AnsiString; override;
@@ -109,6 +110,11 @@ begin
   writeln(OutFile,Msg);
 end;
 
+procedure TTest2.GetSharedDirectory(Sender: TObject; var SharedDataDir: string);
+begin
+  SharedDataDir := 'resources';
+end;
+
 procedure TTest2.CreateObjects(Application: TCustomApplication);
 begin
   inherited CreateObjects(Application);
@@ -117,6 +123,7 @@ begin
   FLocalDB.VendorName := 'MWA Software';
   FLocalDB.OnGetDBVersionNo := @HandleGetDBVersionNo;
   FLocalDB.OnLogMessage := @HandleLogMessage;
+  FLocalDB.OnGetSharedDataDir := @GetSharedDirectory;
 end;
 
 function TTest2.GetTestID: AnsiString;

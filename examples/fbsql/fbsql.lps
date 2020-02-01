@@ -9,8 +9,8 @@
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="323"/>
-        <CursorPos X="65" Y="332"/>
+        <TopLine Value="353"/>
+        <CursorPos X="3" Y="47"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -523,8 +523,8 @@
       <Unit70>
         <Filename Value="..\..\test\fbisqlTest\runtest.sh"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="4"/>
-        <UsageCount Value="9"/>
+        <TopLine Value="6"/>
+        <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="Bash"/>
       </Unit70>
       <Unit71>
@@ -569,7 +569,7 @@
         <UsageCount Value="10"/>
       </Unit76>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="6" HistoryIndex="5">
       <Position1>
         <Filename Value="fbsql.lpr"/>
         <Caret Line="186" Column="35" TopLine="155"/>
@@ -586,6 +586,14 @@
         <Filename Value="fbsql.lpr"/>
         <Caret Line="160" Column="3" TopLine="155"/>
       </Position4>
+      <Position5>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="357" Column="11" TopLine="348"/>
+      </Position5>
+      <Position6>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="56" Column="28" TopLine="50"/>
+      </Position6>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
