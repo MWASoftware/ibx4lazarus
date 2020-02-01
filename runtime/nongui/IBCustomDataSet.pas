@@ -187,8 +187,6 @@ type
     FIdentityColumn: boolean;
   protected
     procedure Bind(Binding: Boolean); override;
-    function GetAsString: string; override;
-    procedure GetText(var TheText: string; ADisplayText: Boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     property IdentityColumn: boolean read FIdentityColumn;
@@ -1334,17 +1332,6 @@ begin
   inherited Bind(Binding);
   if Binding and (FieldDef <> nil) then
      FIdentityColumn := (FieldDef as TIBFieldDef).IdentityColumn;
-end;
-
-function TIBFMTBCDField.GetAsString: string;
-begin
-  Result := StripLeadingZeros(inherited GetAsString);
-end;
-
-procedure TIBFMTBCDField.GetText(var TheText: string; ADisplayText: Boolean);
-begin
-  inherited GetText(TheText, ADisplayText);
-  TheText := StripLeadingZeros(TheText);
 end;
 
 constructor TIBFMTBCDField.Create(AOwner: TComponent);
