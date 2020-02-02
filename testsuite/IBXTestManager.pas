@@ -5,7 +5,8 @@ unit IBXTestManager;
 interface
 
 uses
-  Classes, SysUtils, TestManager, CustApp, DB, IBCustomDataSet, IBDatabase, IBQuery;
+  Classes, SysUtils, TestApplication, CustApp, DB, IBCustomDataSet, IBDatabase, IBQuery,
+  ibxscript, IBDataOutput;
 
 type
 
@@ -16,6 +17,9 @@ private
   FIBDatabase: TIBDatabase;
   FIBTransaction: TIBTransaction;
   FIBQuery: TIBQuery;
+  FIBXScript: TIBXScript;
+  procedure LogHandler(Sender: TObject; Msg: string);
+  procedure ErrorLogHandler(Sender: TObject; Msg: string);
 protected
   procedure ClientLibraryPathChanged; override;
   procedure CreateObjects(Application: TCustomApplication); override;
@@ -24,6 +28,8 @@ protected
   procedure PrintAffectedRows(query: TIBCustomDataSet);
   procedure ReadOnlyTransaction;
   procedure ReadWriteTransaction;
+  procedure RunScript(aFileName: string);
+  procedure ExecuteSQL(SQL: string);
 public
   property IBDatabase: TIBDatabase read  FIBDatabase;
   property IBTransaction: TIBTransaction read FIBTransaction;
@@ -33,6 +39,17 @@ end;
 implementation
 
 { TIBXTestBase }
+
+procedure TIBXTestBase.LogHandler(Sender: TObject; Msg: string);
+begin
+   writeln(OutFile,Msg);
+end;
+
+procedure TIBXTestBase.ErrorLogHandler(Sender: TObject; Msg: string);
+begin
+  writeln(OutFile,Msg);
+  writeln(Msg);
+end;
 
 procedure TIBXTestBase.ClientLibraryPathChanged;
 begin
@@ -56,6 +73,12 @@ begin
   FIBDatabase.DefaultTransaction := FIBTransaction;
   FIBQuery := TIBQuery.Create(Application);
   FIBQuery.Database := FIBDatabase;
+  FIBXScript := TIBXScript.Create(Application);
+  FIBXScript.Database := FIBDatabase;
+  FIBXScript.Transaction := FIBTransaction;
+  FIBXScript.OnOutputLog := @LogHandler;
+  FIBXScript.OnErrorLog := @ErrorLogHandler;
+  FIBXScript.DataOutputFormatter := TIBInsertStmtsOut.Create(Application);
 end;
 
 procedure TIBXTestBase.PrintDataSet(aDataSet: TIBCustomDataSet);
@@ -163,6 +186,16 @@ begin
   FIBTransaction.Params.Add('concurrency');
   FIBTransaction.Params.Add('wait');
   FIBTransaction.Params.Add('write');
+end;
+
+procedure TIBXTestBase.RunScript(aFileName: string);
+begin
+  FIBXScript.RunScript(aFileName);
+end;
+
+procedure TIBXTestBase.ExecuteSQL(SQL: string);
+begin
+  FIBXScript.ExecSQLScript(SQL);
 end;
 
 end.

@@ -17,7 +17,7 @@ unit Test02;
 interface
 
 uses
-  Classes, SysUtils, CustApp, TestManager, IBXTestManager, IB, IBCMLocalDBSupport, IBSQL,
+  Classes, SysUtils, CustApp, TestApplication, IBXTestManager, IB, IBCMLocalDBSupport, IBSQL,
   IBQuery, IBDatabase;
 
 const
@@ -71,7 +71,7 @@ begin
   VersionNo := 0;
   IBTransaction.Active := true;
   try
-    with TIBSQL.Create(Owner.Application) do
+    with TIBSQL.Create(Owner) do
     try
       Database := IBDatabase;
       Transaction := IBTransaction;
@@ -86,7 +86,7 @@ begin
       Free
     end;
 
-    with TIBSQL.Create(Owner.Application)  do
+    with TIBSQL.Create(Owner)  do
     try
       Database := IBDatabase;
       Transaction := IBTransaction;

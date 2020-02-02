@@ -25,7 +25,7 @@ unit Test01;
 interface
 
 uses
-  Classes, SysUtils, TestManager, IBXTestManager, IB, IBCustomDataSet, IBDatabase, IBQuery;
+  Classes, SysUtils, TestApplication, IBXTestManager, IB, IBCustomDataSet, IBDatabase, IBQuery;
 
 const
   aTestID    = '1';

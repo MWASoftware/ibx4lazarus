@@ -1,4 +1,4 @@
-unit TestManager;
+unit TestApplication;
 {$IFDEF MSWINDOWS} 
 {$DEFINE WINDOWS} 
 {$ENDIF}
@@ -11,22 +11,26 @@ unit TestManager;
 interface
 
 uses
-  Classes, SysUtils, CustApp, IB, IBUtils, FmtBCD;
+  Classes, SysUtils, CustApp, Firebird, IB, IBUtils, FmtBCD;
 
 {$IF not defined(LineEnding)}
 const
   LineEnding = #$0D#$0A;
 {$IFEND}
 
+const
+  Copyright = 'Copyright MWA Software 2020';
+
 type
-  TTestManager = class;
+  TTestApplication = class;
 
   { TTestBase }
 
   TTestBase = class
   private
-    FOwner: TTestManager;
+    FOwner: TTestApplication;
     function GetFirebirdAPI: IFirebirdAPI;
+    procedure SetOwner(AOwner: TTestApplication);
   protected
     FHexStrings: boolean;
     procedure ClientLibraryPathChanged; virtual;
@@ -51,23 +55,26 @@ type
     procedure CheckActivity(Transaction: ITransaction); overload;
     procedure InitTest; virtual;
   public
-    constructor Create(aOwner: TTestManager);  virtual;
+    constructor Create(aOwner: TTestApplication);  virtual;
     function TestTitle: AnsiString;
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); virtual; abstract;
-    property Owner: TTestManager read FOwner;
+    property Owner: TTestApplication read FOwner;
   end;
 
   TTest = class of TTestBase;
 
-  { TTestManager }
+  { TTestApplication }
 
-  TTestManager = class
+  TTestApplication = class(TCustomApplication)
   private
-    FApplication: TCustomApplication;
+    class var FTests: TStringList;
+  private
+    class procedure CreateTestList;
+    class procedure DestroyTestList;
+  private
     FClientLibraryPath: string;
     FServer: AnsiString;
-    FTests: TStringList;
     FEmployeeDatabaseName: AnsiString;
     FNewDatabaseName: AnsiString;
     FSecondNewDatabaseName: AnsiString;
@@ -81,18 +88,6 @@ type
     procedure CleanUp;
     function GetFirebirdAPI: IFirebirdAPI;
     function GetIndexByTestID(aTestID: AnsiString): integer;
-    procedure SetApplication(AValue: TCustomApplication);
-  public
-    constructor Create;
-    destructor Destroy; override;
-    function GetUserName: AnsiString;
-    function GetPassword: AnsiString;
-    function GetEmployeeDatabaseName: AnsiString;
-    function GetNewDatabaseName: AnsiString;
-    function GetSecondNewDatabaseName: AnsiString;
-    function GetBackupFileName: AnsiString;
-    procedure RunAll;
-    procedure Run(TestID: AnsiString);
     procedure SetClientLibraryPath(aLibName: string);
     procedure SetUserName(aValue: AnsiString);
     procedure SetPassword(aValue: AnsiString);
@@ -102,15 +97,31 @@ type
     procedure SetBackupFileName(aValue: AnsiString);
     procedure SetServerName(AValue: AnsiString);
     procedure SetPortNum(aValue: AnsiString);
+  protected
+    function GetShortOptions: AnsiString; virtual;
+    function GetLongOptions: AnsiString; virtual;
+    procedure GetParams(var DoPrompt: boolean; var TestID: AnsiString); virtual;
+    procedure DoRun; override;
+    procedure WriteHelp; virtual;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    function GetUserName: AnsiString;
+    function GetPassword: AnsiString;
+    function GetEmployeeDatabaseName: AnsiString;
+    function GetNewDatabaseName: AnsiString;
+    function GetSecondNewDatabaseName: AnsiString;
+    function GetBackupFileName: AnsiString;
+    procedure RunAll;
+    procedure RunTest(TestID: AnsiString);
     property ShowStatistics: boolean read FShowStatistics write FShowStatistics;
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property Server: AnsiString read FServer;
-    property Application: TCustomApplication read FApplication write SetApplication;
     property ClientLibraryPath: string read FClientLibraryPath;
   end;
 
 var
-  TestMgr: TTestManager = nil;
+  TestApp: TTestApplication = nil;
 
 var OutFile: text;
 
@@ -133,17 +144,16 @@ end;
 procedure RegisterTest(aTest: TTest);
 var test: TTestBase;
 begin
-  if TestMgr = nil then
-    TestMgr := TTestManager.Create;
-  test := aTest.Create(TestMgr);
-  TestMgr.FTests.AddObject(test.GetTestID,test);
-  if TestMgr.Application <> nil then
-    test.CreateObjects(TestMgr.Application);
+  TTestApplication.CreateTestList;
+  test := aTest.Create(TestApp);
+  TTestApplication.FTests.AddObject(test.GetTestID,test);
+  if TestApp <> nil then
+    test.CreateObjects(TestApp);
 end;
 
 { TTestBase }
 
-constructor TTestBase.Create(aOwner: TTestManager);
+constructor TTestBase.Create(aOwner: TTestApplication);
 begin
   inherited Create;
   FOwner := aOwner;
@@ -157,6 +167,11 @@ end;
 function TTestBase.GetFirebirdAPI: IFirebirdAPI;
 begin
   Result := FOwner.FirebirdAPI;
+end;
+
+procedure TTestBase.SetOwner(AOwner: TTestApplication);
+begin
+  FOwner := AOwner;
 end;
 
 procedure TTestBase.ClientLibraryPathChanged;
@@ -624,9 +639,30 @@ begin
   //Do nothing yet
 end;
 
-{ TTestManager }
+{ TTestApplication }
 
-procedure TTestManager.CleanUp;
+class procedure TTestApplication.CreateTestList;
+begin
+  if FTests = nil then
+  begin
+    FTests := TStringList.Create;
+    FTests.Sorted := true;
+    FTests.Duplicates := dupError;
+  end;
+end;
+
+class procedure TTestApplication.DestroyTestList;
+var i: integer;
+begin
+  if assigned(FTests) then
+  begin
+    for i := 0 to FTests.Count - 1 do
+      FTests.Objects[i].Free;
+    FreeAndNil(FTests);
+  end;
+end;
+
+procedure TTestApplication.CleanUp;
 var DPB: IDPB;
     Attachment: IAttachment;
 begin
@@ -641,14 +677,14 @@ begin
     Attachment.DropDatabase;
 end;
 
-function TTestManager.GetFirebirdAPI: IFirebirdAPI;
+function TTestApplication.GetFirebirdAPI: IFirebirdAPI;
 begin
   if FFirebirdAPI = nil then
     FFirebirdAPI := IB.FirebirdAPI;
   Result := FFirebirdAPI;
 end;
 
-function TTestManager.GetIndexByTestID(aTestID: AnsiString): integer;
+function TTestApplication.GetIndexByTestID(aTestID: AnsiString): integer;
 begin
   try
     Result := FTests.IndexOf(aTestID);
@@ -659,23 +695,12 @@ begin
     raise Exception. CreateFmt('Invalid Test ID - %s',[aTestID]);
 end;
 
-procedure TTestManager.SetApplication(AValue: TCustomApplication);
+constructor TTestApplication.Create(AOwner: TComponent);
 var i: integer;
 begin
-  if FApplication = AValue then Exit;
-  FApplication := AValue;
-  if not FCreateObjectsDone then
-    for i := 0 to FTests.Count - 1 do
-      TTestBase(FTests.Objects[i]).CreateObjects(AValue);
-  FCreateObjectsDone := true;
-end;
-
-constructor TTestManager.Create;
-begin
-  inherited Create;
-  FTests := TStringList.Create;
-  FTests.Sorted := true;
-  FTests.Duplicates := dupError;
+  inherited Create(AOwner);
+  TestApp := self;
+  CreateTestList;
   FNewDatabaseName :=  GetTempDir + 'fbtestsuite.fdb';
   FSecondNewDatabaseName :=  GetTempDir + 'fbtestsuite2.fdb';
   FUserName := 'SYSDBA';
@@ -683,31 +708,30 @@ begin
   FEmployeeDatabaseName := 'employee';
   FBackupFileName := GetTempDir + 'testbackup.gbk';
   FServer := 'localhost';
+  for i := 0 to FTests.Count - 1 do
+  begin
+    TTestBase(FTests.Objects[i]).SetOwner(self);
+    TTestBase(FTests.Objects[i]).CreateObjects(self);
+  end;
 end;
 
-destructor TTestManager.Destroy;
-var i: integer;
+destructor TTestApplication.Destroy;
 begin
-  if assigned(FTests) then
-  begin
-    for i := 0 to FTests.Count - 1 do
-      FTests.Objects[i].Free;
-    FTests.Free;
-  end;
+  TestApp := nil;
   inherited Destroy;
 end;
 
-function TTestManager.GetUserName: AnsiString;
+function TTestApplication.GetUserName: AnsiString;
 begin
   Result := FUserName;
 end;
 
-function TTestManager.GetPassword: AnsiString;
+function TTestApplication.GetPassword: AnsiString;
 begin
   Result := FPassword;
 end;
 
-function TTestManager.GetEmployeeDatabaseName: AnsiString;
+function TTestApplication.GetEmployeeDatabaseName: AnsiString;
 begin
   if FirebirdAPI.GetClientMajor < 3 then
     Result := MakeConnectString(FServer,  FEmployeeDatabaseName, TCP,FPortNo)
@@ -715,7 +739,7 @@ begin
     Result := MakeConnectString(FServer,  FEmployeeDatabaseName, inet,FPortNo);
 end;
 
-function TTestManager.GetNewDatabaseName: AnsiString;
+function TTestApplication.GetNewDatabaseName: AnsiString;
 begin
   if FirebirdAPI.GetClientMajor < 3 then
     Result := MakeConnectString(FServer,  FNewDatabaseName, TCP,FPortNo)
@@ -723,7 +747,7 @@ begin
     Result := MakeConnectString(FServer,  FNewDatabaseName, inet,FPortNo);
 end;
 
-function TTestManager.GetSecondNewDatabaseName: AnsiString;
+function TTestApplication.GetSecondNewDatabaseName: AnsiString;
 begin
   if FirebirdAPI.GetClientMajor < 3 then
     Result := MakeConnectString(FServer,  FSecondNewDatabaseName, TCP,FPortNo)
@@ -731,12 +755,12 @@ begin
     Result := MakeConnectString(FServer,  FSecondNewDatabaseName, inet,FPortNo);
 end;
 
-function TTestManager.GetBackupFileName: AnsiString;
+function TTestApplication.GetBackupFileName: AnsiString;
 begin
   Result := FBackupFileName;
 end;
 
-procedure TTestManager.RunAll;
+procedure TTestApplication.RunAll;
 var i: integer;
 begin
   CleanUP;
@@ -758,7 +782,7 @@ begin
   end;
 end;
 
-procedure TTestManager.Run(TestID: AnsiString);
+procedure TTestApplication.RunTest(TestID: AnsiString);
 begin
   CleanUp;
   with TTestBase(FTests.Objects[GetIndexByTestID(TestID)]) do
@@ -779,7 +803,7 @@ begin
   end;
 end;
 
-procedure TTestManager.SetClientLibraryPath(aLibName: string);
+procedure TTestApplication.SetClientLibraryPath(aLibName: string);
 var i: integer;
 begin
   FFirebirdAPI := LoadFBLibrary(aLibName).GetFirebirdAPI;
@@ -789,46 +813,177 @@ begin
 
 end;
 
-procedure TTestManager.SetUserName(aValue: AnsiString);
+procedure TTestApplication.SetUserName(aValue: AnsiString);
 begin
   FUserName := aValue;
 end;
 
-procedure TTestManager.SetPassword(aValue: AnsiString);
+procedure TTestApplication.SetPassword(aValue: AnsiString);
 begin
   FPassword := aValue;
 end;
 
-procedure TTestManager.SetEmployeeDatabaseName(aValue: AnsiString);
+procedure TTestApplication.SetEmployeeDatabaseName(aValue: AnsiString);
 begin
   FEmployeeDatabaseName := aValue;
 end;
 
-procedure TTestManager.SetNewDatabaseName(aValue: AnsiString);
+procedure TTestApplication.SetNewDatabaseName(aValue: AnsiString);
 begin
   FNewDatabaseName := aValue;
 end;
 
-procedure TTestManager.SetSecondNewDatabaseName(aValue: AnsiString);
+procedure TTestApplication.SetSecondNewDatabaseName(aValue: AnsiString);
 begin
   FSecondNewDatabaseName := aValue;
 end;
 
-procedure TTestManager.SetBackupFileName(aValue: AnsiString);
+procedure TTestApplication.SetBackupFileName(aValue: AnsiString);
 begin
   FBackupFileName := aValue;
 end;
 
-procedure TTestManager.SetServerName(AValue: AnsiString);
+procedure TTestApplication.SetServerName(AValue: AnsiString);
 begin
   if FServer = AValue then Exit;
   FServer := AValue;
 end;
 
-procedure TTestManager.SetPortNum(aValue: AnsiString);
+procedure TTestApplication.SetPortNum(aValue: AnsiString);
 begin
   FPortNo := aValue;
 end;
+
+function TTestApplication.GetShortOptions: AnsiString;
+begin
+  Result := 'htupensbolrSPX';
+end;
+
+function TTestApplication.GetLongOptions: AnsiString;
+begin
+  Result := 'help test user passwd employeedb newdbname secondnewdbname backupfile '+
+            'outfile fbclientlibrary server stats port prompt';
+end;
+
+procedure TTestApplication.GetParams(var DoPrompt: boolean; var TestID: AnsiString);
+var ErrorMsg: String;
+begin
+  // quick check parameters
+  ErrorMsg := CheckOptions(GetShortOptions,GetLongOptions);
+  if ErrorMsg <> '' then begin
+    ShowException(Exception.Create(ErrorMsg));
+    Terminate;
+    Exit;
+  end;
+
+  // parse parameters
+  if HasOption('h', 'help') then begin
+    WriteHelp;
+    Terminate;
+    Exit;
+  end;
+
+  if HasOption('t') then
+    TestID := GetOptionValue('t');
+
+  DoPrompt := HasOption('X','prompt');
+
+  if HasOption('u','user') then
+    SetUserName(GetOptionValue('u'));
+
+  if HasOption('p','passwd') then
+    SetPassword(GetOptionValue('p'));
+
+  if HasOption('e','employeedb') then
+    SetEmployeeDatabaseName(GetOptionValue('e'));
+
+  if HasOption('n','newdbname') then
+    SetNewDatabaseName(GetOptionValue('n'));
+
+  if HasOption('s','secondnewdbname') then
+    SetSecondNewDatabaseName(GetOptionValue('s'));
+
+  if HasOption('b','backupfile') then
+    SetBackupFileName(GetOptionValue('b'));
+
+  if HasOption('l','fbclientlibrary') then
+    SetClientLibraryPath(GetOptionValue('l'));
+
+  if HasOption('r','server') then
+    SetServerName(GetOptionValue('r'));
+
+  if HasOption('o','outfile') then
+  begin
+    system.Assign(outFile,GetOptionValue('o'));
+    ReWrite(outFile);
+  end;
+
+  if HasOption('P','port') then
+    SetPortNum(GetOptionValue('P'));
+
+  ShowStatistics := HasOption('S','stats');
+end;
+
+procedure TTestApplication.DoRun;
+var
+  DoPrompt: boolean;
+  TestID: AnsiString;
+begin
+  OutFile := stdout;
+  GetParams(DoPrompt,TestID);
+  {$IF declared(SetTextCodePage)}
+  {Ensure consistent UTF-8 output}
+  SetTextCodePage(OutFile,cp_utf8);
+  {$IFEND}
+
+  {Ensure consistent date reporting across platforms}
+  DefaultFormatSettings.ShortDateFormat := 'yyyy/m/d';
+  DefaultFormatSettings.LongTimeFormat := 'HH:MM:SS';
+  DefaultFormatSettings.DateSeparator := '/';
+
+  writeln(OutFile,Title);
+  writeln(OutFile,Copyright);
+  writeln(OutFile);
+  writeln(OutFile,'Starting Tests');
+  writeln(OutFile,'Client API Version = ',FirebirdAPI.GetImplementationVersion);
+  writeln(OutFile,'Firebird Environment Variable = ',GetEnvironmentVariable('FIREBIRD'));
+  if FirebirdAPI.GetClientMajor >= 3 then
+  begin
+    writeln(OutFile,'Firebird Bin Directory = ', IMaster(FirebirdAPI.GetIMaster).getConfigManager.getDirectory(IConfigManager.DIR_BIN));
+    writeln(OutFile,'Firebird Conf Directory = ', IMaster(FirebirdAPI.GetIMaster).getConfigManager.getDirectory(IConfigManager.DIR_CONF));
+  end;
+
+  try
+    if TestID = '' then
+      RunAll
+    else
+      RunTest(TestID);
+  except on E: Exception do
+    writeln('Exception: ',E.Message);
+  end;
+
+  writeln(OutFile,'Test Suite Ends');
+  Flush(OutFile);
+  {$IFDEF WINDOWS}
+  if DoPrompt then
+  begin
+    write('Press Entry to continue');
+    readln; {uncomment if running from IDE and console window closes before you can view results}
+  end;
+  {$ENDIF}
+
+  // stop program loop
+  Terminate;
+end;
+
+procedure TTestApplication.WriteHelp;
+begin
+  { add your help code here }
+  writeln(OutFile,'Usage: ', ExeName, ' -h');
+end;
+
+finalization
+  TTestApplication.DestroyTestList;
 
 end.
 
