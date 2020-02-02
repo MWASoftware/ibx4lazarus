@@ -1,4 +1,4 @@
-unit IBXTestManager;
+unit IBXTestBase;
 
 {$mode objfpc}{$H+}
 
@@ -18,11 +18,14 @@ private
   FIBTransaction: TIBTransaction;
   FIBQuery: TIBQuery;
   FIBXScript: TIBXScript;
+  procedure HandleCreateDatebase(Sender: TObject);
+  procedure HandleDBFileName(Sender: TObject; var DatabaseFileName: string);
   procedure LogHandler(Sender: TObject; Msg: string);
   procedure ErrorLogHandler(Sender: TObject; Msg: string);
 protected
   procedure ClientLibraryPathChanged; override;
   procedure CreateObjects(Application: TCustomApplication); override;
+  procedure InitialiseDatabase; virtual;
   procedure PrintDataSet(aDataSet: TIBCustomDataSet);
   procedure PrintDataSetRow(aField: TField);
   procedure PrintAffectedRows(query: TIBCustomDataSet);
@@ -40,6 +43,17 @@ implementation
 
 { TIBXTestBase }
 
+procedure TIBXTestBase.HandleCreateDatebase(Sender: TObject);
+begin
+  InitialiseDatabase;
+end;
+
+procedure TIBXTestBase.HandleDBFileName(Sender: TObject;
+  var DatabaseFileName: string);
+begin
+  DatabaseFileName := IBDatabase.DatabaseName;
+end;
+
 procedure TIBXTestBase.LogHandler(Sender: TObject; Msg: string);
 begin
    writeln(OutFile,Msg);
@@ -48,7 +62,6 @@ end;
 procedure TIBXTestBase.ErrorLogHandler(Sender: TObject; Msg: string);
 begin
   writeln(OutFile,Msg);
-  writeln(Msg);
 end;
 
 procedure TIBXTestBase.ClientLibraryPathChanged;
@@ -68,6 +81,7 @@ begin
   FIBDatabase.Params.Add('user_name=' + Owner.GetUserName);
   FIBDatabase.Params.Add('password=' + Owner.GetPassword);
   FIBDatabase.Params.Add('lc_ctype=UTF8');
+  FIBDatabase.OnCreateDatabase := @HandleCreateDatebase;
   FIBTransaction := TIBTransaction.Create(Application);
   FIBTransaction.DefaultDatabase := FIBDatabase;
   FIBDatabase.DefaultTransaction := FIBTransaction;
@@ -79,6 +93,13 @@ begin
   FIBXScript.OnOutputLog := @LogHandler;
   FIBXScript.OnErrorLog := @ErrorLogHandler;
   FIBXScript.DataOutputFormatter := TIBInsertStmtsOut.Create(Application);
+  FIBXScript.OnCreateDatabase := @HandleDBFileName;
+  FIBXScript.IgnoreCreateDatabase := true;
+end;
+
+procedure TIBXTestBase.InitialiseDatabase;
+begin
+  //Do nothing
 end;
 
 procedure TIBXTestBase.PrintDataSet(aDataSet: TIBCustomDataSet);

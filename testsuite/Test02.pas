@@ -17,7 +17,7 @@ unit Test02;
 interface
 
 uses
-  Classes, SysUtils, CustApp, TestApplication, IBXTestManager, IB, IBCMLocalDBSupport, IBSQL,
+  Classes, SysUtils, CustApp, TestApplication, IBXTestBase, IB, IBCMLocalDBSupport, IBSQL,
   IBQuery, IBDatabase;
 
 const
