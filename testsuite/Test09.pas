@@ -1,9 +1,8 @@
-unit Test10;
+unit Test09;
 
 {$mode objfpc}{$H+}
 
-{Test 1: Test 10: Create Database from SQL Script and Extract SQL}
-
+{Test 9: Extract DDL from example Employee Database}
 
 interface
 
@@ -11,14 +10,14 @@ uses
   Classes, SysUtils, CustApp, TestApplication, IBXTestbase, IB, IBExtract;
 
 const
-  aTestID    = '10';
-  aTestTitle = 'Test 10: Create Database from SQL Script and Extract SQL';
+  aTestID    = '9';
+  aTestTitle = 'Test 9: Extract DDL from example Employee Database';
 
 type
 
-{ TTest10 }
+{ TTest09 }
 
-  TTest10 = class(TIBXTestBase)
+  TTest09 = class(TIBXTestBase)
   private
     FExtract: TIBExtract;
     procedure HandleExtractLine(Sender: TObject; start, count: integer);
@@ -26,7 +25,6 @@ type
     procedure CreateObjects(Application: TCustomApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
-    procedure InitialiseDatabase; override;
     procedure InitTest; override;
   public
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
@@ -35,16 +33,16 @@ type
 
 implementation
 
-{ TTest10 }
+{ TTest09 }
 
-procedure TTest10.HandleExtractLine(Sender: TObject; start, count: integer);
+procedure TTest09.HandleExtractLine(Sender: TObject; start, count: integer);
 var i: integer;
 begin
   for i := 0 to count - 1 do
     writeln(OutFile,FExtract.Items[start + i]);
 end;
 
-procedure TTest10.CreateObjects(Application: TCustomApplication);
+procedure TTest09.CreateObjects(Application: TCustomApplication);
 begin
   inherited CreateObjects(Application);
   FExtract := TIBExtract.Create(Application);
@@ -53,42 +51,32 @@ begin
   FExtract.OnExtractLines := @HandleExtractLine;
 end;
 
-function TTest10.GetTestID: AnsiString;
+function TTest09.GetTestID: AnsiString;
 begin
   Result := aTestID;
 end;
 
-function TTest10.GetTestTitle: AnsiString;
+function TTest09.GetTestTitle: AnsiString;
 begin
   Result := aTestTitle;
 end;
 
-procedure TTest10.InitialiseDatabase;
+procedure TTest09.InitTest;
 begin
-  writeln(OutFile,'Creating Database');
-  writeln(OutFile);
-  RunScript('resources/Test10.sql');
+  ReadOnlyTransaction;
+  IBDatabase.DatabaseName := Owner.GetEmployeeDatabaseName;
 end;
 
-procedure TTest10.InitTest;
-begin
-  ReadWriteTransaction;
-  IBDatabase.DatabaseName := Owner.GetNewDatabaseName;
-  IBDatabase.CreateIfNotExists := true;
-end;
-
-procedure TTest10.RunTest(CharSet: AnsiString; SQLDialect: integer);
+procedure TTest09.RunTest(CharSet: AnsiString; SQLDialect: integer);
 begin
   IBDatabase.Connected := true;
   writeln(OutFile);
   writeln(OutFile,'Extracting Database Schema and Data');
-  FExtract.ExtractObject(eoDatabase,'',[etData,etGrantsToUser]);
-  WriteStrings(FExtract.Items);
-  IBDatabase.DropDatabase;
+  FExtract.ExtractObject(eoDatabase,'',[etGrantsToUser]);
 end;
 
 initialization
-  RegisterTest(TTest10);
+  RegisterTest(TTest09);
 
 end.
 

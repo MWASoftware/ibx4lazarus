@@ -70,6 +70,8 @@ type
 
   TProcDDLType = (pdCreateProc,pdCreateStub,pdAlterProc);
 
+  TDomainDDLType = (dtCreateDomain,dtCreateNoCheckConstraint, dtAddCheckConstraint);
+
   TPackageDDLType = (paHeader,paBody,paBoth);
 
   TCommentType = (ctDatabase, ctCharacterSet,ctCollation,ctDomain,ctException,
@@ -77,6 +79,8 @@ type
                   ctProcedure, ctFunction, ctRole, ctSequence, ctTable, ctTrigger,
                   ctView, ctColumn,ctParameter, ctArgument);
   TCommentTypes = set of TCommentType;
+
+  TOnExtractLines = procedure(Sender: TObject; start, count: integer) of object;
 
   { TIBExtract }
 
@@ -86,15 +90,22 @@ type
     FCaseSensitiveObjectNames: boolean;
     FDatabase : TIBDatabase;
     FIncludeMetaDataComments: boolean;
+    FOnExtractLines: TOnExtractLines;
     FTransaction : TIBTransaction;
     FMetaData: TStrings;
     FDatabaseInfo: TIBDatabaseInfo;
     FShowSystem: Boolean;
+    FDefaultCharSetName: string;
     { Private declarations }
     function AddSQLSecurity(SQLSecurity: ISQLData): string;
     procedure Add2MetaData(const Msg: string; IsError: boolean=true);
     procedure AddComment(Query: TIBSQL; cType: TCommentType; OutStrings: TStrings;
-        CommentFieldName: string = 'RDB$DESCRIPTION');
+        CommentFieldName: string = 'RDB$DESCRIPTION'); overload;
+    procedure AddComment(Query: TIBSQL; cType: TCommentType;
+        CommentFieldName: string = 'RDB$DESCRIPTION'); overload;
+    procedure ExtractOut(DDLLine: string); overload;
+    procedure ExtractOut(DDLStrings: TStrings); overload;
+    function GetCharacterSetName(CharSetID: integer; ForceCharSet: boolean=false): string;
     function GetCollationName(CharacterSetID, CollationID: integer): string;
     function GetDatabase: TIBDatabase;
     function GetIndexSegments ( indexname : String) : String;
@@ -126,7 +137,7 @@ type
     procedure ListCheck(ObjectName : String = ''; ExtractType : TExtractType = etCheck);
     procedure ListComments(CommentTypes: TCommentTypes = []);
     procedure ListCreateDb(TargetDb : String = '');
-    procedure ListDomains(ObjectName : String = ''; ExtractType : TExtractType = etDomain);
+    procedure ListDomains(DomainDDLType: TDomainDDLType; ObjectName : String = ''; ExtractType : TExtractType = etDomain);
     procedure ListException(ExceptionName : String = '');
     procedure ListFilters(FilterName : String = '');
     procedure ListForeign(ObjectName : String = ''; ExtractType : TExtractType = etForeign);
@@ -138,7 +149,7 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function PrintSet(var Used : Boolean) : String;
     function QuoteIdentifier(Value: String): String;
-    function GetFieldType(qry: TIBSQL): string; overload;
+    function GetFieldType(qry: TIBSQL; ForceCharSet: boolean=false): string; overload;
 
   public
     { Public declarations }
@@ -148,6 +159,7 @@ type
     function GetFieldType(FieldType, FieldSubType, FieldScale, FieldPrecision,
       FieldLength: integer;
       HasCharacterSet: boolean=false;
+      ForceCharSet: boolean=false;
       FieldCharacterSetID: integer=0;
       FieldCharacterLength: integer=0;
       FieldSegmentLen: integer=0;
@@ -168,6 +180,7 @@ type
     property AlwaysQuoteIdentifiers: boolean read FAlwaysQuoteIdentifiers write FAlwaysQuoteIdentifiers;
     property IncludeMetaDataComments: boolean read FIncludeMetaDataComments write FIncludeMetaDataComments default true;
     property CaseSensitiveObjectNames: boolean read FCaseSensitiveObjectNames write FCaseSensitiveObjectNames;
+    property OnExtractLines: TOnExtractLines read FOnExtractLines write FOnExtractLines;
   end;
 
   TSQLType = record
@@ -552,7 +565,7 @@ begin
              qryArray.FieldByName('RDB$UPPER_BOUND').AsString;
       qryArray.Next;
     end;
-    Result := Result + '] ';
+    Result := Result + ']';
   end;
 
   qryArray.Free;
@@ -595,9 +608,9 @@ begin
     didConnect := true;
   end;
 
-  FMetaData.Add(Format('SET SQL DIALECT %d;', [FDatabase.SQLDialect]));
-  FMetaData.Add('SET AUTODDL ON;');
-  FMetaData.Add('');
+  ExtractOut(Format('SET SQL DIALECT %d;', [FDatabase.SQLDialect]));
+  ExtractOut('SET AUTODDL ON;');
+  ExtractOut('');
 
   if not FTransaction.Active then
   begin
@@ -612,11 +625,12 @@ begin
   end
   else
   begin
+    FDefaultCharSetName := '';
     ListCreateDb;
     ListFilters;
-    ListExternalFunctions;
-    ListDomains;
+    ListDomains(dtCreateNoCheckConstraint);
     ListAllTables(flag);
+    ListExternalFunctions;
     if etData in ExtractTypes then
       ListData('');
     ListIndex;
@@ -626,6 +640,7 @@ begin
     else
       ListGenerators;
     ListViews;
+    ListDomains(dtAddCheckConstraint);
     ListCheck;
     ListException;
     if DatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
@@ -637,11 +652,12 @@ begin
       ListPackages(paBody);
     ListProcs(pdAlterProc);
     ListFunctions(pdAlterProc);
-    FMetaData.Add('');
-    FMetaData.Add('/* Comments on System Objects */');
-    FMetaData.Add('');
+    ExtractOut('');
+    ExtractOut('/* Comments on System Objects */');
+    ExtractOut('');
     ListComments([ctCollation,ctCharacterSet]);
     ListGrants(ExtractTypes);
+    FDefaultCharSetName := '';
   end;
 
   if DidStart then
@@ -693,23 +709,27 @@ const
     'SELECT * FROM RDB$GENERATORS WHERE RDB$GENERATOR_NAME = :GENERATOR';
 
 var
-  Column, Constraint : String;
+  Column, Constraint, Trailer : String;
   qryTables, qryConstraints, qryRelConstraints, qryGenerators : TIBSQL;
   ValidRelation : Boolean;
   CreateTable: string;
   TableType: integer;
   Comments: TStrings;
+  SQLSecurity: string;
+  Columns: TStringList;
 begin
   Result := true;
   ValidRelation := false;
+  SQLSecurity := '';
 
   if DomainFlag then
-    ListDomains(RelationName);
+    ListDomains(dtCreateDomain,RelationName);
   qryTables := TIBSQL.Create(FDatabase);
   qryConstraints := TIBSQL.Create(FDatabase);
   qryRelConstraints := TIBSQL.Create(FDatabase);
   qryGenerators := TIBSQL.Create(FDatabase);
   Comments := TStringList.Create;
+  Columns := TStringList.Create;
   try
     qryTables.SQL.Add(TableListSQL);
     RelationName := trim(RelationName);
@@ -718,37 +738,40 @@ begin
     qryConstraints.SQL.Add(ConstraintSQL);
     qryRelConstraints.SQL.Add(RelConstraintsSQL);
     qryGenerators.SQL.Add(GetGeneratorSQL);
-    if not qryTables.Eof then
-    begin
-      {Format Table Declaration header}
-      ValidRelation := true;
-      TableType := qryTables.FieldByName('RDB$RELATION_TYPE').AsInteger;
-      if (not qryTables.FieldByName('RDB$OWNER_NAME').IsNull) and
-         (Trim(qryTables.FieldByName('RDB$OWNER_NAME').AsString) <> '') then
-        FMetaData.Add(Format('%s/* Table: %s, Owner: %s */%s',
-          [LineEnding, RelationName,
-           qryTables.FieldByName('RDB$OWNER_NAME').AsString, LineEnding]));
-      if TableType > 3 then
-       CreateTable := 'CREATE GLOBAL TEMPORARY TABLE'
-      else
-        CreateTable := 'CREATE TABLE';
+    if qryTables.Eof then
+      Exit; {table does not exist}
 
-      if NewName <> '' then
-        FMetaData.Add(Format('%s %s ', [CreateTable,QuoteIdentifier(NewName)]))
-      else
-        FMetaData.Add(Format('%s %s ', [CreateTable,QuoteIdentifier(RelationName)]));
-      if not qryTables.FieldByName('RDB$EXTERNAL_FILE').IsNull then
-        FMetaData.Add(Format('EXTERNAL FILE %s ',
-          [QuotedStr(qryTables.FieldByName('RDB$EXTERNAL_FILE').AsString)]));
-      FMetaData.Add('(');
-      AddComment(qryTables,ctTable,Comments);
-    end;
+    {Format Table Declaration header}
+    ValidRelation := true;
+    TableType := qryTables.FieldByName('RDB$RELATION_TYPE').AsInteger;
+    if (not qryTables.FieldByName('RDB$OWNER_NAME').IsNull) and
+       (Trim(qryTables.FieldByName('RDB$OWNER_NAME').AsString) <> '') then
+      ExtractOut(Format('%s/* Table: %s, Owner: %s */%s',
+        [LineEnding, RelationName,
+         qryTables.FieldByName('RDB$OWNER_NAME').AsString, LineEnding]));
+    if TableType > 3 then
+     CreateTable := 'CREATE GLOBAL TEMPORARY TABLE'
+    else
+      CreateTable := 'CREATE TABLE';
+
+    if NewName <> '' then
+      ExtractOut(Format('%s %s ', [CreateTable,QuoteIdentifier(NewName)]))
+    else
+      ExtractOut(Format('%s %s ', [CreateTable,QuoteIdentifier(RelationName)]));
+    if not qryTables.FieldByName('RDB$EXTERNAL_FILE').IsNull then
+      ExtractOut(Format('EXTERNAL FILE %s ',
+        [QuotedStr(qryTables.FieldByName('RDB$EXTERNAL_FILE').AsString)]));
+    ExtractOut('(');
+    AddComment(qryTables,ctTable,Comments);
+
+    if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
+      SQLSecurity := AddSQLSecurity(qryTables.FieldByName('RDB$SQL_SECURITY'));
 
     {add columns}
     while not qryTables.Eof do
     begin
        AddComment(qryTables,ctColumn,Comments,'RDB$DESCRIPTION1');
-       Column := QuoteIdentifier( qryTables.FieldByName('RDB$FIELD_NAME').AsString) +
+       Column := TAB + QuoteIdentifier(trim(qryTables.FieldByName('RDB$FIELD_NAME').AsString)) +
                  TAB + GetFieldType(qryTables);
 
       if not qryTables.FieldByName('rdb$computed_blr').IsNull then
@@ -821,7 +844,7 @@ begin
       qryTables.Next;
       if not qryTables.Eof then
         Column := Column + ',';
-      FMetaData.Add(Column);
+      Columns.Add(Column);
     end;
 
     { Do primary and unique keys only. references come later }
@@ -831,42 +854,47 @@ begin
     while not qryRelConstraints.Eof do
     begin
       Constraint := '';
-      FMetaData.Strings[FMetaData.Count - 1] := FMetaData.Strings[FMetaData.Count - 1]  + ',';
+      Columns.Strings[Columns.Count - 1] := Columns.Strings[Columns.Count - 1]  + ',';
       { If the name of the constraint is not INTEG..., print it }
       if Pos('INTEG', qryRelConstraints.FieldByName('RDB$CONSTRAINT_NAME').AsString) <> 1 then
         Constraint := Constraint + 'CONSTRAINT ' +
           QuoteIdentifier(
-          qryRelConstraints.FieldByName('RDB$CONSTRAINT_NAME').AsString);
+          qryRelConstraints.FieldByName('RDB$CONSTRAINT_NAME').AsString) + ' ';
 
 
       if Pos('PRIMARY', qryRelConstraints.FieldByName('RDB$CONSTRAINT_TYPE').AsString) = 1 then
       begin
-        FMetaData.Add(Constraint + Format(' PRIMARY KEY (%s)',
+        Columns.Add(Constraint + Format('PRIMARY KEY (%s)',
            [GetIndexSegments(qryRelConstraints.FieldByName('RDB$INDEX_NAME').AsString)]));
       end
       else
         if Pos('UNIQUE', qryRelConstraints.FieldByName('RDB$CONSTRAINT_TYPE').AsString) = 1 then
         begin
-          FMetaData.Add(Constraint + Format(' UNIQUE (%s)',
+          Columns.Add(Constraint + Format('UNIQUE (%s)',
              [GetIndexSegments(qryRelConstraints.FieldByName('RDB$INDEX_NAME').AsString)]));
         end;
       qryRelConstraints.Next;
     end;
+    Trailer := '';
     if ValidRelation then
     begin
       if TableType = 4 then
-        FMetaData.Add(' ) ON COMMIT PRESERVE ROWS ')
+        Trailer := ' ) ON COMMIT PRESERVE ROWS '
       else
-       FMetaData.Add(')');
+       Trailer := ')';
     end;
     {SQL Security added in Firebird 4}
-    if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
-      FMetaData.Add(AddSQLSecurity(qryTables.FieldByName('RDB$SQL_SECURITY')));
+    if SQLSecurity <> '' then
+      Trailer := Trailer + SQLSecurity;
 
-    FMetaData.Add(TERM);
+    Trailer := Trailer + TERM;
 
-    FMetaData.AddStrings(Comments);
+    Columns.Add(Trailer);
+    ExtractOut(Columns);
+
+    ExtractOut(Comments);
   finally
+    Columns.Free;
     Comments.Free;
     qryTables.Free;
     qryConstraints.Free;
@@ -911,15 +939,15 @@ begin
     qryViews.ExecQuery;
     while not qryViews.Eof do
     begin
-      FMetaData.Add('');
+      ExtractOut('');
       AddComment(qryViews,ctView,Comments);
-      RelationName := QuoteIdentifier(
-          qryViews.FieldByName('RDB$RELATION_NAME').AsString);
-      FMetaData.Add(Format('%s/* View: %s, Owner: %s */%s', [
+      RelationName := QuoteIdentifier(trim(
+          qryViews.FieldByName('RDB$RELATION_NAME').AsString));
+      ExtractOut(Format('%s/* View: %s, Owner: %s */%s', [
         RelationName,
         Trim(qryViews.FieldByName('RDB$OWNER_NAME').AsString)]));
-      FMetaData.Add('');
-      FMetaData.Add(Format('CREATE VIEW %s (', [RelationName]));
+      ExtractOut('');
+      ExtractOut(Format('CREATE VIEW %s (', [RelationName]));
 
       { Get Column List}
       qryColumns.SQL.Add(ColumnsSQL);
@@ -934,12 +962,12 @@ begin
         if not qryColumns.Eof then
           ColList := ColList + ', ';
       end;
-      FMetaData.Add(ColList + ') AS');
-      FMetaData.Add(qryViews.FieldByName('RDB$VIEW_SOURCE').AsString + Term);
+      ExtractOut(ColList + ') AS');
+      ExtractOut(qryViews.FieldByName('RDB$VIEW_SOURCE').AsString + Term);
       qryViews.Next;
     end;
   finally
-    FMetaData.AddStrings(Comments);
+    ExtractOut(Comments);
     Comments.Free;
     qryViews.Free;
     qryColumns.Free;
@@ -1030,7 +1058,7 @@ end;
 
 procedure TIBExtract.Add2MetaData(const Msg: string; IsError: boolean);
 begin
-  FMetaData.Add(Msg);
+  ExtractOut(Msg);
 end;
 
 function TIBExtract.LookupDDLObject(cType: TCommentType): integer;
@@ -1066,6 +1094,30 @@ begin
     cmt += ' IS ''' + SQLSafeString(Query.FieldByName(CommentFieldName).AsString) + '''' + TERM;
     OutStrings.Add(cmt);
   end;
+end;
+
+procedure TIBExtract.AddComment(Query: TIBSQL; cType: TCommentType;
+  CommentFieldName: string);
+begin
+  AddComment(Query,cType,FMetaData,CommentFieldName);
+end;
+
+procedure TIBExtract.ExtractOut(DDLLine: string);
+var index: integer;
+begin
+  index := FMetaData.Count;
+  FMetaData.Add(DDLLine);
+  if assigned(FOnExtractLines) then
+    OnExtractLines(self,index,FMetaData.Count-index);
+end;
+
+procedure TIBExtract.ExtractOut(DDLStrings: TStrings);
+var index: integer;
+begin
+  index := FMetaData.Count;
+  FMetaData.AddStrings(DDLStrings);
+  if assigned(FOnExtractLines) then
+    OnExtractLines(self,index,FMetaData.Count-index);
 end;
 
 function TIBExtract.GetCollationName(CharacterSetID, CollationID: integer
@@ -1316,9 +1368,9 @@ begin
   { This version of cursor gets only sql tables identified by security class
      and misses views, getting only null view_source }
 
-    FMetaData.Add('');
-    FMetaData.Add('/* Grant permissions for this database */');
-    FMetaData.Add('');
+    ExtractOut('');
+    ExtractOut('/* Grant permissions for this database */');
+    ExtractOut('');
 
     try
       qryRoles.SQL.Text := SecuritySQL;
@@ -1443,7 +1495,7 @@ begin
         if (etGrantsToUser in ExtractTypes) or
            (qryRoles.FieldByName('RDB$USER_TYPE').AsInteger <> obj_user) or
            (qryRoles.FieldByName('RDB$USER').AsString = 'PUBLIC') then
-        FMetaData.Add(Format('GRANT %s %s TO %s %s %s%s', [
+        ExtractOut(Format('GRANT %s %s TO %s %s %s%s', [
                               qryRoles.FieldByName('Privilege').AsString,
                               qryRoles.FieldByName('METAOBJECTNAME').AsString,
                               qryRoles.FieldByName('USER_TYPE_NAME').AsString,
@@ -1462,7 +1514,7 @@ end;
 procedure TIBExtract.ListPackages(PackageDDLType: TPackageDDLType;
   PackageName: string; IncludeGrants: boolean);
 const
-  PackageSQL = 'Select * From RDB$PACKAGES order by RDB$PACKAGE_NAME';
+  PackageSQL = 'Select * From RDB$PACKAGES Where RDB$SYSTEM_FLAG = 0 order by RDB$PACKAGE_NAME';
   PackageNameSQL = 'Select * From RDB$PACKAGES Where RDB$PACKAGE_NAME = :PackageName order by RDB$PACKAGE_NAME';
   PackageHeaderSQL = 'CREATE PACKAGE %s%s%sAS%s';
   PackageBodySQL = 'CREATE PACKAGE BODY %s%sAS%s';
@@ -1492,10 +1544,10 @@ begin
     begin
       if Header then
       begin
-        FMetaData.Add('COMMIT WORK;');
-        FMetaData.Add('SET AUTODDL OFF;');
-        FMetaData.Add(Format('SET TERM %s %s', [ProcTerm, Term]));
-        FMetaData.Add(Format('%s/* Package Definitions */%s', [LineEnding, LineEnding]));
+        ExtractOut('COMMIT WORK;');
+        ExtractOut('SET AUTODDL OFF;');
+        ExtractOut(Format('SET TERM %s %s', [ProcTerm, Term]));
+        ExtractOut(Format('%s/* Package Definitions */%s', [LineEnding, LineEnding]));
         Header := false;
       end;
 
@@ -1509,20 +1561,20 @@ begin
         else
           SQLSecurity := '';
 
-       FMetaData.Add(Format(PackageHeaderSQL,[aPackageName,SQLSecurity,
+       ExtractOut(Format(PackageHeaderSQL,[aPackageName,SQLSecurity,
                                                LineEnding,LineEnding]));
         SList.Text :=  qryPackages.FieldByName('RDB$PACKAGE_HEADER_SOURCE').AsString;
         SList.Add(Format(' %s%s', [ProcTerm, LineEnding]));
-        FMetaData.AddStrings(SList);
+        ExtractOut(SList);
       end;
 
       if PackageDDLType in [paBody,paBoth] then
       begin
-        FMetaData.Add(Format(PackageBodySQL,[aPackageName,
+        ExtractOut(Format(PackageBodySQL,[aPackageName,
                                                LineEnding,LineEnding]));
         SList.Text :=  qryPackages.FieldByName('RDB$PACKAGE_BODY_SOURCE').AsString;
         SList.Add(Format(' %s%s', [ProcTerm, LineEnding]));
-        FMetaData.AddStrings(SList);
+        ExtractOut(SList);
       end;
 
       if IncludeGrants then
@@ -1533,11 +1585,11 @@ begin
 
     if not Header then
     begin
-      FMetaData.Add(Format('SET TERM %s %s', [Term, ProcTerm]));
-      FMetaData.Add('COMMIT WORK;');
-      FMetaData.Add('SET AUTODDL ON;');
+      ExtractOut(Format('SET TERM %s %s', [Term, ProcTerm]));
+      ExtractOut('COMMIT WORK;');
+      ExtractOut('SET AUTODDL ON;');
     end;
-    FMetaData.AddStrings(Comments);
+    ExtractOut(Comments);
   finally
     Comments.Free;
     SList.Free;
@@ -1597,7 +1649,7 @@ const
     'WHERE RDB$PROCEDURE_NAME = :ProcedureName ' +
     'ORDER BY RDB$PROCEDURE_NAME';
 
-  ProcedureSecuritySQL = 'Select RBD$SECURITY_CLASS From RDB$PROCEDURES WHERE RDB$PROCEDURE_NAME = :ProcedureName';
+  ProcedureSecuritySQL = 'Select RDB$SQL_SECURITY From RDB$PROCEDURES WHERE RDB$PROCEDURE_NAME = :ProcedureName';
 
 var
   qryProcedures : TIBSQL;
@@ -1631,10 +1683,15 @@ begin
     begin
       if Header then
       begin
-        FMetaData.Add('COMMIT WORK;');
-        FMetaData.Add('SET AUTODDL OFF;');
-        FMetaData.Add(Format('SET TERM %s %s', [ProcTerm, Term]));
-        FMetaData.Add(Format('%s/* Stored procedures */%s', [LineEnding, LineEnding]));
+        ExtractOut('COMMIT WORK;');
+        ExtractOut('SET AUTODDL OFF;');
+        ExtractOut(Format('SET TERM %s %s', [ProcTerm, Term]));
+        ExtractOut('');
+        if ProcDDLType in [pdCreateStub,pdCreateProc] then
+          ExtractOut('/* Stored procedures Definitions*/')
+        else
+          ExtractOut('/* Stored procedure Bodies */');
+        ExtractOut('');
         Header := false;
       end;
       ProcName := Trim(qryProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString);
@@ -1643,13 +1700,13 @@ begin
       pdCreateStub:
         begin
           AddComment(qryProcedures,ctProcedure,Comments);
-          FMetaData.Add(Format(CreateProcedureStr1, [QuoteIdentifier(
+          ExtractOut(Format(CreateProcedureStr1, [QuoteIdentifier(
              ProcName)]));
           GetProcedureArgs(ProcName);
           if qryProcedures.FieldByName('RDB$PROCEDURE_TYPE').AsInteger = 1 then
-            FMetaData.Add(CreateProcedureStr3)
+            ExtractOut(CreateProcedureStr3)
           else
-            FMetaData.Add(CreateProcedureStr2);
+            ExtractOut(CreateProcedureStr2);
 
           {SQL Security added in Firebird 4}
           if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
@@ -1657,15 +1714,15 @@ begin
             qryProcSecurity.SQL.Text := ProcedureSecuritySQL;
             qryProcSecurity.Params.ByName('ProcedureName').AsString := ProcName;
             qryProcSecurity.ExecQuery;
-            FMetaData.Add(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
+            ExtractOut(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
           end;
-          FMetaData.Add(ProcTerm+ LineEnding);
+          ExtractOut(ProcTerm+ LineEnding);
         end;
 
       pdCreateProc:
       begin
         AddComment(qryProcedures,ctProcedure,Comments);
-        FMetaData.Add(Format(CreateProcedureStr1, [QuoteIdentifier(
+        ExtractOut(Format(CreateProcedureStr1, [QuoteIdentifier(
            ProcName)]));
 
         GetProcedureArgs(ProcName);
@@ -1673,10 +1730,10 @@ begin
         if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
         begin
           SList.Text := qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
-          FMetaData.AddStrings(SList);
+          ExtractOut(SList);
         end
         else
-          FMetaData.Add(CreateProcedureStr2);
+          ExtractOut(CreateProcedureStr2);
 
         {SQL Security added in Firebird 4}
         if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
@@ -1684,16 +1741,16 @@ begin
           qryProcSecurity.SQL.Text := ProcedureSecuritySQL;
           qryProcSecurity.Params.ByName('ProcedureName').AsString := ProcName;
           qryProcSecurity.ExecQuery;
-          FMetaData.Add(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
+          ExtractOut(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
         end;
 
-        FMetaData.Add(ProcTerm + LineEnding);
+        ExtractOut(ProcTerm + LineEnding);
 
       end;
 
       pdAlterProc:
        begin
-         FMetaData.Add(Format('%sALTER PROCEDURE %s ', [LineEnding,
+         ExtractOut(Format('%sALTER PROCEDURE %s ', [LineEnding,
             QuoteIdentifier( ProcName)]));
          GetProcedureArgs(ProcName);
 
@@ -1701,10 +1758,10 @@ begin
          begin
            SList.Text := qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
            SList.Add(Format(' %s%s', [ProcTerm, LineEnding]));
-           FMetaData.AddStrings(SList);
+           ExtractOut(SList);
          end
          else
-           FMetaData.Add(Format(CreateProcedureStr2, [ProcTerm, LineEnding]));
+           ExtractOut(Format(CreateProcedureStr2, [ProcTerm, LineEnding]));
        end;
       end;
       if IncludeGrants then
@@ -1715,11 +1772,11 @@ begin
 
     if not Header then
     begin
-      FMetaData.Add(Format('SET TERM %s %s', [Term, ProcTerm]));
-      FMetaData.Add('COMMIT WORK;');
-      FMetaData.Add('SET AUTODDL ON;');
+      ExtractOut(Format('SET TERM %s %s', [Term, ProcTerm]));
+      ExtractOut('COMMIT WORK;');
+      ExtractOut('SET AUTODDL ON;');
     end;
-    FMetaData.AddStrings(Comments);
+    ExtractOut(Comments);
   finally
     qryProcedures.Free;
     qryProcSecurity.Free;
@@ -1818,6 +1875,7 @@ const
 var
   Header : Boolean;
   TriggerName, RelationName, InActive: String;
+  TriggerHeader: string;
   qryTriggers : TIBSQL;
   qryTriggerSec: TIBSQL;
   SList : TStrings;
@@ -1853,8 +1911,8 @@ begin
       SList.Clear;
       if Header then
       begin
-        FMetaData.Add(Format('SET TERM %s %s%s', [Procterm, Term, LineEnding]));
-        FMetaData.Add(Format('%s/* Triggers only will work for SQL triggers */%s',
+        ExtractOut(Format('SET TERM %s %s%s', [Procterm, Term, LineEnding]));
+        ExtractOut(Format('%s/* Triggers only will work for SQL triggers */%s',
 		       [LineEnding, LineEnding]));
         Header := false;
       end;
@@ -1877,14 +1935,18 @@ begin
           SList.Add('/* ');
 
         {Database or Transaction trigger}
-        SList.Add(Format('CREATE TRIGGER %s%s%s %s POSITION %d',
+        if RelationName <> '' then
+        SList.Add(Format('CREATE TRIGGER %s FOR %s%s%s %s POSITION %d',
+                [QuoteIdentifier( TriggerName), QuoteIdentifier( RelationName),
+                LineEnding, InActive,
+                GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInt64),
+                qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]))
+        else
+          SList.Add(Format('CREATE TRIGGER %s%s%s %s POSITION %d',
                   [QuoteIdentifier( TriggerName),
                   LineEnding, InActive,
                   GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInt64),
                   qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
-
-        if RelationName <> '' then
-          SList.Add('ON ' + QuoteIdentifier( RelationName));
 
         {SQL Security added in Firebird 4}
         if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
@@ -1892,7 +1954,8 @@ begin
           qryTriggerSec.SQL.Text := TriggerSecuritySQL;
           qryTriggerSec.Params.ByName('TriggerName').AsString := TriggerName;
           qryTriggerSec.ExecQuery;
-          SList.Add(AddSQLSecurity(qryTriggerSec.FieldByName('RDB$SQL_SECURITY')));
+          if not qryTriggerSec.FieldByName('RDB$SQL_SECURITY').IsNull then
+            SList.Add(AddSQLSecurity(qryTriggerSec.FieldByName('RDB$SQL_SECURITY')));
         end;
 
         if not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
@@ -1902,7 +1965,7 @@ begin
         SList.Add(' ' + ProcTerm);
         if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
           SList.Add(' */');
-        FMetaData.AddStrings(SList);
+        ExtractOut(SList);
         if etGrant in ExtractTypes then
           ShowGrantsTo(TriggerName,obj_trigger,ProcTerm);
       end;
@@ -1910,10 +1973,10 @@ begin
     end;
     if not Header then
     begin
-      FMetaData.Add('COMMIT WORK ' + ProcTerm);
-      FMetaData.Add('SET TERM ' + Term + ProcTerm);
+      ExtractOut('COMMIT WORK ' + ProcTerm);
+      ExtractOut('SET TERM ' + Term + ProcTerm);
     end;
-    FMetaData.AddStrings(Comments);
+    ExtractOut(Comments);
   finally
     Comments.Free;
     qryTriggers.Free;
@@ -1994,7 +2057,7 @@ begin
         SList.Text := SList.Text + qryChecks.FieldByName('RDB$TRIGGER_SOURCE').AsString;
 
       SList.Strings[SList.Count - 1] := SList.Strings[SList.Count - 1] + (Term) + LineEnding;
-      FMetaData.AddStrings(SList);
+      ExtractOut(SList);
       qryChecks.Next;
     end;
   finally
@@ -2036,7 +2099,7 @@ procedure TIBExtract.ListComments(CommentTypes: TCommentTypes);
       qryCmt.ExecQuery;
       while not qryCmt.Eof do
       begin
-        AddComment(qryCmt,cmt,FMetaData);
+        AddComment(qryCmt,cmt);
         qryCmt.Next;
       end;
     finally
@@ -2068,7 +2131,7 @@ const
     'WHERE NOT DBP.RDB$CHARACTER_SET_NAME IS NULL ' +
     '  AND DBP.RDB$CHARACTER_SET_NAME <> '' ''';
 
-  DBSecuritySQL = 'Select RDB$SQL_SECURITY FRROM RDB$DATABASE';
+  DBSecuritySQL = 'Select RDB$SQL_SECURITY FROM RDB$DATABASE';
 
   FilesSQL =
     'select * from RDB$FILES ' +
@@ -2111,7 +2174,7 @@ begin
   end;
   Buffer := Buffer + 'CREATE DATABASE ' + QuotedStr(TargetDb) + ' PAGE_SIZE ' +
     IntToStr(FDatabaseInfo.PageSize) + LineEnding;
-  FMetaData.Add(Buffer);
+  ExtractOut(Buffer);
   Buffer := '';
 
   Comments := TStringList.Create;
@@ -2121,13 +2184,16 @@ begin
     qryDB.ExecQuery;
 
     if not qryDB.EOF then
+    begin
+      FDefaultCharSetName := trim(qryDB.FieldByName('RDB$CHARACTER_SET_NAME').AsString);
       Buffer := Format(' DEFAULT CHARACTER SET %s',
-        [trim(qryDB.FieldByName('RDB$CHARACTER_SET_NAME').AsString)]);
+        [FDefaultCharSetName]);
+    end;
     if NoDB then
       Buffer := Buffer + Term + ' */'
     else
       Buffer := Buffer + Term;
-    FMetaData.Add(Buffer);
+    ExtractOut(Buffer);
     AddComment(qryDB,ctDatabase,Comments);
     qryDB.Close;
     {List secondary files and shadows as
@@ -2138,7 +2204,7 @@ begin
     begin
       if First then
       begin
-        FMetaData.Add(LineEnding + '/* Add secondary files in comments ');
+        ExtractOut(LineEnding + '/* Add secondary files in comments ');
         First := false;
       end; //end_if
 
@@ -2168,10 +2234,10 @@ begin
           Buffer := Buffer + Format(' STARTING %d', [FileStart]);
         if FileLength <> 0 then
           Buffer := Buffer + Format(' LENGTH %d', [FileLength]);
-        FMetaData.Add(Buffer);
+        ExtractOut(Buffer);
       end; //end_if
       if (FileFlags and FILE_cache) <> 0 then
-        FMetaData.Add(Format('%sALTER DATABASE ADD CACHE ''%s'' LENGTH %d',
+        ExtractOut(Format('%sALTER DATABASE ADD CACHE ''%s'' LENGTH %d',
           [LineEnding, qryDB.FieldByName('RDB$FILE_NAME').AsString, FileLength]));
 
       Buffer := '';
@@ -2198,7 +2264,7 @@ begin
           Buffer := Buffer + Format('LENGTH %d ', [FileLength]);
         if FileStart <> 0 then
           Buffer := Buffer + Format('STARTING %d ', [FileStart]);
-        FMetaData.Add(Buffer);
+        ExtractOut(Buffer);
       end; //end_if
       qryDB.Next;
     end;
@@ -2258,7 +2324,7 @@ begin
       { Any file can have a length }
       if FileLength <> 0 then
         Buffer := Buffer + Format(' SIZE %d ', [FileLength]);
-      FMetaData.Add(Buffer);
+      ExtractOut(Buffer);
       qryDB.Next;
     end;
     qryDB.Close;
@@ -2277,7 +2343,7 @@ begin
       Buffer := Buffer + PrintSet(SetUsed);
       Buffer := Buffer + Format('CHECK_POINT_LENGTH = %d',
           [GetLongDatabaseInfo(isc_info_wal_ckpt_length)]);
-      FMetaData.Add(Buffer);
+      ExtractOut(Buffer);
 
     end;
 
@@ -2287,18 +2353,18 @@ begin
       qryDB.SQL.Text := DBSecuritySQL;
       qryDB.ExecQuery;
       if not qryDB.FieldByName('RDB$SQL_SECURITY').IsNull then
-        FMetaData.Add(Format(DBSQLSecurity_SQL,[AddSQLSecurity(qryDB.FieldByName('RDB$SQL_SECURITY'))]));
+        ExtractOut(Format(DBSQLSecurity_SQL,[AddSQLSecurity(qryDB.FieldByName('RDB$SQL_SECURITY'))]));
     end;
 
     if not First then
     begin
       if NoDB then
-        FMetaData.Add(Format('%s */%s', [LineEnding, LineEnding]))
+        ExtractOut(Format('%s */%s', [LineEnding, LineEnding]))
       else
-        FMetaData.Add(Format('%s%s%s', [Term, LineEnding, LineEnding]));
+        ExtractOut(Format('%s%s%s', [Term, LineEnding, LineEnding]));
     end;
 
-    FMetaData.AddStrings(Comments);
+    ExtractOut(Comments);
   finally
     qryDB.Free;
     Comments.Free;
@@ -2315,7 +2381,8 @@ end;
 
   	Parameters:  table_name == only extract domains for this table }
 
-procedure TIBExtract.ListDomains(ObjectName: String; ExtractType : TExtractType);
+procedure TIBExtract.ListDomains(DomainDDLType: TDomainDDLType;
+  ObjectName: String; ExtractType: TExtractType);
 const
   DomainSQL =
     'SELECT distinct fld.* FROM RDB$FIELDS FLD JOIN RDB$RELATION_FIELDS RFR ON ' +
@@ -2360,7 +2427,7 @@ begin
     qryDomains.ExecQuery;
     while not qryDomains.Eof do
     begin
-      FieldName := qryDomains.FieldByName('RDB$FIELD_NAME').AsString;
+      FieldName := trim(qryDomains.FieldByName('RDB$FIELD_NAME').AsString);
       { Skip over artifical domains }
       if (Pos('RDB$',FieldName) = 1) and
          (FieldName[5] in ['0'..'9']) and
@@ -2372,40 +2439,56 @@ begin
 
       if First then
       begin
-        FMetaData.Add('/* Domain definitions */');
+        ExtractOut('');
+        if DomainDDLType in [dtCreateDomain,dtCreateNoCheckConstraint] then
+          ExtractOut('/* Domain definitions */')
+        else
+          ExtractOut('/* Add Domain Check Constraints */');
+        ExtractOut('');
         First := false;
       end;
 
-      Line := Format('CREATE DOMAIN %s AS ', [FieldName]) +
-         GetFieldType(qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger,
-                           qryDomains.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
-                           qryDomains.FieldByName('RDB$FIELD_SCALE').AsInteger,
-                           qryDomains.FieldByName('RDB$FIELD_PRECISION').AsInteger,
-                           qryDomains.FieldByName('RDB$FIELD_LENGTH').AsInteger,
-                           qryDomains.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
-                           qryDomains.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
-                           qryDomains.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
-                           qryDomains.FieldByName('RDB$SEGMENT_LENGTH').AsInteger,
-                           not qryDomains.FieldByName('RDB$DIMENSIONS').IsNull and
-                              (qryDomains.FieldByName('RDB$DIMENSIONS').AsInteger <> 0),
-                           FieldName);
-
-      if not qryDomains.FieldByName('RDB$DEFAULT_SOURCE').IsNull then
-        Line := Line + Format('%s%s %s', [LineEnding, TAB,
-           qryDomains.FieldByName('RDB$DEFAULT_SOURCE').AsString]);
-
-      if not qryDomains.FieldByName('RDB$VALIDATION_SOURCE').IsNull then
+      Line := '';
+      if DomainDDLType in [dtCreateDomain,dtCreateNoCheckConstraint] then
       begin
-        if Pos('CHECK', AnsiUpperCase(qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString)) = 1 then
+        Line := Format('CREATE DOMAIN %s AS ', [FieldName]) +
+           GetFieldType(qryDomains.FieldByName('RDB$FIELD_TYPE').AsInteger,
+                             qryDomains.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
+                             qryDomains.FieldByName('RDB$FIELD_SCALE').AsInteger,
+                             qryDomains.FieldByName('RDB$FIELD_PRECISION').AsInteger,
+                             qryDomains.FieldByName('RDB$FIELD_LENGTH').AsInteger,
+                             qryDomains.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                             false,
+                             qryDomains.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
+                             qryDomains.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
+                             qryDomains.FieldByName('RDB$SEGMENT_LENGTH').AsInteger,
+                             not qryDomains.FieldByName('RDB$DIMENSIONS').IsNull and
+                                (qryDomains.FieldByName('RDB$DIMENSIONS').AsInteger <> 0),
+                             FieldName);
+
+        if not qryDomains.FieldByName('RDB$DEFAULT_SOURCE').IsNull then
           Line := Line + Format('%s%s %s', [LineEnding, TAB,
-             qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString])
-        else
-          Line := Line + Format('%s%s /* %s */', [LineEnding, TAB,
-             qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString]);
+             qryDomains.FieldByName('RDB$DEFAULT_SOURCE').AsString]);
+
+        if qryDomains.FieldByName('RDB$NULL_FLAG').AsInteger = 1 then
+          Line := Line + ' NOT NULL';
       end;
 
-      if qryDomains.FieldByName('RDB$NULL_FLAG').AsInteger = 1 then
-        Line := Line + ' NOT NULL';
+      if  not qryDomains.FieldByName('RDB$VALIDATION_SOURCE').IsNull then
+      begin
+        if DomainDDLType = dtAddCheckConstraint then
+            Line := Format('ALTER DOMAIN %s ADD CONSTRAINT',[FieldName]);
+
+        if DomainDDLType in [dtCreateDomain,dtAddCheckConstraint]  then
+        begin
+          if Pos('CHECK', AnsiUpperCase(qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString)) = 1 then
+            Line := Line + Format('%s%s %s', [LineEnding, TAB,
+               trim(qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString)])
+          else
+            Line := Line + Format('%s%s /* %s */', [LineEnding, TAB,
+               trim(qryDomains.FieldByName('RDB$VALIDATION_SOURCE').AsString)]);
+        end;
+      end;
 
       { Show the collation order if one has been specified.  If the collation
          order is the default for the character set being used, then no collation
@@ -2414,13 +2497,16 @@ begin
          If the collation id is 0, then the default for the character set is
          being used so there is no need to retrieve the collation information.}
 
-      if (not qryDomains.FieldByName('RDB$COLLATION_ID').IsNull) and
+      if (DomainDDLType in [dtCreateDomain,dtCreateNoCheckConstraint]) and
+         (not qryDomains.FieldByName('RDB$COLLATION_ID').IsNull) and
          (qryDomains.FieldByName('RDB$COLLATION_ID').AsInteger <> 0) then
          Line := Line + GetCollationName(qryDomains.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
                                          qryDomains.FieldByName('RDB$COLLATION_ID').AsInteger);
-      Line := Line + Term;
-      FMetaData.Add(Line);
-      AddComment(qryDomains,ctDomain,FMetaData);
+      if Line <> '' then
+        Line := Line + Term;
+      ExtractOut(Line);
+      if (DomainDDLType in [dtCreateDomain,dtCreateNoCheckConstraint]) then
+        AddComment(qryDomains,ctDomain);
       qryDomains.Next;
     end;
   finally
@@ -2465,16 +2551,16 @@ begin
     begin
       if First then
       begin
-        FMetaData.Add('');
-        FMetaData.Add('/*  Exceptions */');
-        FMetaData.Add('');
+        ExtractOut('');
+        ExtractOut('/*  Exceptions */');
+        ExtractOut('');
         First := false;
       end; //end_if
       
-      FMetaData.Add(Format('CREATE EXCEPTION %s %s%s',
+      ExtractOut(Format('CREATE EXCEPTION %s %s%s',
         [QuoteIdentifier( qryException.FieldByName('RDB$EXCEPTION_NAME').AsString),
         QuotedStr(qryException.FieldByName('RDB$MESSAGE').AsString), Term]));
-      AddComment(qryException,ctException,FMetaData);
+      AddComment(qryException,ctException);
       qryException.Next;
     end;
   finally
@@ -2521,21 +2607,21 @@ begin
     begin
       if First then
       begin
-        FMetaData.Add('');
-        FMetaData.Add('/*  BLOB Filter declarations */');
-        FMetaData.Add('');
+        ExtractOut('');
+        ExtractOut('/*  BLOB Filter declarations */');
+        ExtractOut('');
         First := false;
       end; //end_if
 
-      FMetaData.Add(Format('DECLARE FILTER %s INPUT_TYPE %d OUTPUT_TYPE %d',
+      ExtractOut(Format('DECLARE FILTER %s INPUT_TYPE %d OUTPUT_TYPE %d',
         [qryFilters.FieldByName('RDB$FUNCTION_NAME').AsString,
          qryFilters.FieldByName('RDB$INPUT_SUB_TYPE').AsInteger,
          qryFilters.FieldByName('RDB$OUTPUT_SUB_TYPE').AsInteger]));
-      FMetaData.Add(Format('%sENTRY_POINT ''%s'' MODULE_NAME ''%s''%s%',
+      ExtractOut(Format('%sENTRY_POINT ''%s'' MODULE_NAME ''%s''%s%',
         [TAB, qryFilters.FieldByName('RDB$ENTRYPOINT').AsString,
          qryFilters.FieldByName('RDB$MODULE_NAME').AsString, Term]));
-      FMetaData.Add('');
-      AddComment(qryFilters,ctFilter,FMetaData);
+      ExtractOut('');
+      AddComment(qryFilters,ctFilter);
       qryFilters.Next;
     end;
 
@@ -2654,7 +2740,7 @@ begin
            [Trim(qryForeign.FieldByName('REFC_DELETE_RULE').AsString)]);
 
       Line := Line + Term;
-      FMetaData.Add(Line);
+      ExtractOut(Line);
       qryForeign.Next;
     end;
   finally
@@ -2696,7 +2782,8 @@ const
   begin
     FieldType := qryFuncArgs.FieldByName('RDB$FIELD_TYPE').AsInteger;
     if (FieldType = blr_cstring) or (FieldType = blr_cstring2) then
-      Result := Format(' CSTRING(%d)',[qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger])
+      Result := Format('CSTRING(%d)',[qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger]) +
+                         GetCharacterSetName(qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').AsInteger, true)
     else
     if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION10 then
       Result := GetFieldType(FieldType,
@@ -2705,6 +2792,7 @@ const
                              qryFuncArgs.FieldByName('RDB$FIELD_PRECISION').AsInteger,
                              qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger,
                              not qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                             true,
                              qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
                              qryFuncArgs.FieldByName('RDB$CHARACTER_LENGTH').AsInteger)
     else
@@ -2714,6 +2802,7 @@ const
                              0,
                              qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger,
                              not qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                             true,
                              qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
                              qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger);
 
@@ -2757,16 +2846,19 @@ begin
     begin
       if qryFunctions.HasField('RDB$LEGACY_FLAG') and (qryFunctions.FieldByName('RDB$LEGACY_FLAG').IsNULL or
           (qryFunctions.FieldByName('RDB$LEGACY_FLAG').AsInteger = 0)) then
+      begin
+        qryFunctions.Next;
         continue; {Internal stored procedure}
+      end;
       if First then
       begin
-        FMEtaData.Add(Format('%s/* External Function declarations */%s',
+        ExtractOut(Format('%s/* External Function declarations */%s',
           [LineEnding, LineEnding]));
         First := false;
       end; //end_if
       { Start new function declaration }
       AddComment(qryFunctions,ctExternalFunction,Comments);
-      FMetaData.Add(Format('DECLARE EXTERNAL FUNCTION %s',
+      ExtractOut(Format('DECLARE EXTERNAL FUNCTION %s',
           [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
       Line := '';
 
@@ -2792,26 +2884,26 @@ begin
         qryFuncArgs.Next;
       end;
       qryFuncArgs.Close;
-      FMetaData.Add(Line);
+      ExtractOut(Line);
 
       if qryFunctions.FieldByName('RDB$RETURN_ARGUMENT').AsInteger = 0 then
-        FMetaData.Add(' RETURNS ' + ReturnBuffer)
+        ExtractOut('RETURNS ' + ReturnBuffer)
       else
-        FMetaData.Add(Format(' RETURNS PARAMETER %d',[qryFunctions.FieldByName('RDB$RETURN_ARGUMENT').AsInteger]));
+        ExtractOut(Format('RETURNS PARAMETER %d',[qryFunctions.FieldByName('RDB$RETURN_ARGUMENT').AsInteger]));
 
-      FMetaData.Add(Format('ENTRY_POINT ''%s'' MODULE_NAME ''%s''',
+      ExtractOut(Format('ENTRY_POINT ''%s'' MODULE_NAME ''%s''',
           [qryFunctions.FieldByName('RDB$ENTRYPOINT').AsString,
            qryFunctions.FieldByName('RDB$MODULE_NAME').AsString]));
 
        {SQL Security added in Firebird 4}
        if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
-         FMetaData.Add(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
+         ExtractOut(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
 
-      FMetaData.Add(TERM + LineEnding + LineEnding);
+      ExtractOut(TERM + LineEnding + LineEnding);
 
       qryFunctions.Next;
     end;
-    FMetaData.AddStrings(Comments);
+    ExtractOut(Comments);
   finally
     qryFunctions.Free;
     qryFuncArgs.Free;
@@ -2828,13 +2920,13 @@ const
 
   FunctionNameSQL =
     'SELECT * FROM RDB$FUNCTIONS ' +
-    'WHERE RDB$FUNCTION_NAME = :FunctionName ' +
+    'WHERE RDB$FUNCTION_NAME = :FUNCTION_NAME ' +
     'ORDER BY RDB$FUNCTION_NAME';
 
   FunctionArgsSQL =
-    'SELECT * FROM RDB$FUNCTION_ARGUMENTS ' +
-    'WHERE ' +
-    '  :FUNCTION_NAME = RDB$FUNCTION_NAME ' +
+    'SELECT * FROM RDB$FUNCTION_ARGUMENTS RFA JOIN RDB$FIELDS FLD ' +
+    'ON RFA.RDB$FIELD_SOURCE = FLD.RDB$FIELD_NAME '+
+    'WHERE RDB$FUNCTION_NAME = :FUNCTION_NAME ' +
     'ORDER BY RDB$ARGUMENT_POSITION';
 
  var
@@ -2856,7 +2948,7 @@ begin
     else
     begin
       qryFunctions.SQL.Text := FunctionNameSQL;
-      qryFunctions.Params.ByName('FunctionName').AsString := FunctionName;
+      qryFunctions.Params.ByName('FUNCTION_NAME').AsString := FunctionName;
     end;
     qryFuncArgs.SQL.Text := FunctionArgsSQL;
     qryFunctions.ExecQuery;
@@ -2864,11 +2956,15 @@ begin
     begin
        if First then
        begin
-         FMetaData.Add('COMMIT WORK;');
-         FMetaData.Add('SET AUTODDL OFF;');
-         FMetaData.Add(Format('SET TERM %s %s', [ProcTerm, Term]));
-         FMetaData.Add(Format('%s/* Stored Function declarations */%s',
-         [LineEnding, LineEnding]));
+         ExtractOut('COMMIT WORK;');
+         ExtractOut('SET AUTODDL OFF;');
+         ExtractOut(Format('SET TERM %s %s', [ProcTerm, Term]));
+         ExtractOut('');
+         if ProcDDLType in [pdCreateStub,pdCreateProc] then
+           ExtractOut('/* Stored Function declarations */')
+         else
+           ExtractOut('/* Stored Function Body */');
+         ExtractOut('');
          First := false;
        end;
 
@@ -2877,38 +2973,40 @@ begin
 
        FirstArg := true;
        qryFuncArgs.Params.ByName('FUNCTION_NAME').AsString :=
-          qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString;
+          trim(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString);
 
        qryFuncArgs.ExecQuery;
        while not qryFuncArgs.Eof do
        begin
          AddComment(qryFuncArgs,ctParameter,Comments);
          if qryFuncArgs.FieldByName('RDB$ARGUMENT_POSITION').AsInteger = 0 then {return argument}
-           ReturnBuffer := ' RETURNS' + GetFieldType(qryFuncArgs.FieldByName('RDB$FIELD_TYPE').AsInteger,
-                                                      qryFuncArgs.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
-                                                      qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger,
-                                                      qryFuncArgs.FieldByName('RDB$FIELD_PRECISION').AsInteger,
-                                                      qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger,
-                                                      not qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
-                                                      qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
-                                                      qryFuncArgs.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
-                                                      qryFuncArgs.FieldByName('RDB$SEGMENT_LENGTH').AsInteger)
+           ReturnBuffer := ' RETURNS ' + GetFieldType(qryFuncArgs.FieldByName('RDB$FIELD_TYPE1').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_SUB_TYPE1').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_SCALE1').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_PRECISION1').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_LENGTH1').AsInteger,
+                                                      not qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID1').IsNull,
+                                                      true,
+                                                      qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID1').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$CHARACTER_LENGTH1').AsInteger)
          else
-         if not FirstArg then
          begin
-           Params := Params + ', ';
-           FirstArg := false;
+           if not FirstArg then
+           begin
+             Params := Params + ', ';
+             FirstArg := false;
+           end;
+           Params := Params + qryFuncArgs.FieldByName('RDB$ARGUMENT_NAME').AsString + ' ' +
+                                         GetFieldType(qryFuncArgs.FieldByName('RDB$FIELD_TYPE1').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_SUB_TYPE1').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_SCALE1').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_PRECISION1').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$FIELD_LENGTH1').AsInteger,
+                                                      not qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID1').IsNull,
+                                                      true,
+                                                      qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID1').AsInteger,
+                                                      qryFuncArgs.FieldByName('RDB$CHARACTER_LENGTH1').AsInteger);
          end;
-         Params := Params + qryFuncArgs.FieldByName('RDB$FIELD_NAME').AsString +
-                                       GetFieldType(qryFuncArgs.FieldByName('RDB$FIELD_TYPE').AsInteger,
-                                                    qryFuncArgs.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
-                                                    qryFuncArgs.FieldByName('RDB$FIELD_SCALE').AsInteger,
-                                                    qryFuncArgs.FieldByName('RDB$FIELD_PRECISION').AsInteger,
-                                                    qryFuncArgs.FieldByName('RDB$FIELD_LENGTH').AsInteger,
-                                                    not qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
-                                                    qryFuncArgs.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
-                                                    qryFuncArgs.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
-                                                    qryFuncArgs.FieldByName('RDB$SEGMENT_LENGTH').AsInteger);
          qryFuncArgs.Next;
        end; // qryFuncArgs Iteration
        qryFuncArgs.Close;
@@ -2916,45 +3014,53 @@ begin
        case ProcDDLType of
        pdCreateStub:
          begin
-           FMetaData.Add(Format('CREATE FUNCTION %s',
-             [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
-           FMetaData.Add('(' + Params + ')');
-           FMetaData.Add(ReturnBuffer);
-           FMetaData.Add(' AS BEGIN END');
+           if Params <> '' then
+             ExtractOut(Format('CREATE FUNCTION %s (%s)',
+               [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString, Params]))
+           else
+             ExtractOut(Format('CREATE FUNCTION %s',[qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
+           ExtractOut(ReturnBuffer);
+           ExtractOut(' AS BEGIN END');
 
            {SQL Security added in Firebird 4}
            if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
-             FMetaData.Add(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
+             ExtractOut(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
         end;
 
        pdCreateProc:
          begin
-           FMetaData.Add(Format('CREATE FUNCTION %s',
-             [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
-           FMetaData.Add('(' + Params + ')');
-           FMetaData.Add(ReturnBuffer);
-           if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
-             FMetaData.Add(' AS ' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
+           if Params <> '' then
+             ExtractOut(Format('CREATE FUNCTION %s (%s)',
+               [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString, Params]))
            else
-             FMetaData.Add(' AS BEGIN END');
+             ExtractOut(Format('CREATE FUNCTION %s',[qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
+           ExtractOut(ReturnBuffer);
+           if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
+             ExtractOut(' AS ' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
+           else
+             ExtractOut(' AS BEGIN END');
 
            {SQL Security added in Firebird 4}
            if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
-             FMetaData.Add(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
+             ExtractOut(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
          end;
 
        pdAlterProc:
          begin
-           FMetaData.Add(Format('ALTER FUNCTION %s',
-             [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
-           FMetaData.Add(ReturnBuffer);
-           if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
-             FMetaData.Add(' AS ' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
+           if Params <> '' then
+             ExtractOut(Format('ALTER FUNCTION %s (%s)',
+               [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString,Params]))
            else
-             FMetaData.Add(' AS BEGIN END');
+             ExtractOut(Format('ALTER FUNCTION %s',
+               [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
+           ExtractOut(ReturnBuffer);
+           if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
+             ExtractOut(' AS ' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
+           else
+             ExtractOut(' AS BEGIN END');
          end;
        end;
-       FMetaData.Add(ProcTerm + LineEnding + LineEnding);
+       ExtractOut(ProcTerm + LineEnding + LineEnding);
        if IncludeGrants then
          ShowGrantsTo(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString,obj_Function,ProcTerm);
 
@@ -2963,11 +3069,11 @@ begin
 
       if not First then
       begin
-        FMetaData.Add(Format('SET TERM %s %s', [Term, ProcTerm]));
-        FMetaData.Add('COMMIT WORK;');
-        FMetaData.Add('SET AUTODDL ON;');
+        ExtractOut(Format('SET TERM %s %s', [Term, ProcTerm]));
+        ExtractOut('COMMIT WORK;');
+        ExtractOut('SET AUTODDL ON;');
       end;
-      FMetaData.AddStrings(Comments);
+      ExtractOut(Comments);
     finally
       qryFunctions.Free;
       qryFuncArgs.Free;
@@ -3015,7 +3121,7 @@ begin
       qryGenerator.Params.ByName('GeneratorName').AsString := GeneratorName;
     end;
     qryGenerator.ExecQuery;
-    FMetaData.Add('');
+    ExtractOut('');
     while not qryGenerator.Eof do
     begin
       GenName := qryGenerator.FieldByName('RDB$GENERATOR_NAME').AsString;
@@ -3027,7 +3133,7 @@ begin
         qryGenerator.Next;
         continue;
       end;
-      FMetaData.Add(Format('CREATE SEQUENCE %s%s',
+      ExtractOut(Format('CREATE SEQUENCE %s%s',
         [QuoteIdentifier( GenName),
          Term]));
       if etData in ExtractTypes then
@@ -3036,14 +3142,14 @@ begin
         qryValue.ExecQuery;
         try
           if not qryValue.EOF then
-            FMetaData.Add(Format('ALTER SEQUENCE %s RESTART WITH %d;',
+            ExtractOut(Format('ALTER SEQUENCE %s RESTART WITH %d;',
                  [QuoteIdentifier( GenName),
                   qryValue.FieldByName('GENERATORVALUE').AsInt64]));
         finally
           qryValue.Close;
         end;
       end;
-      AddComment(qryGenerator,ctSequence,FMetaData);
+      AddComment(qryGenerator,ctSequence);
       qryGenerator.Next;
     end;
   finally
@@ -3122,9 +3228,9 @@ begin
       if First then
       begin
         if ObjectName = '' then
-          FMetaData.Add(LineEnding + '/*  Index definitions for all user tables */' + LineEnding)
+          ExtractOut(LineEnding + '/*  Index definitions for all user tables */' + LineEnding)
         else
-          FMetaData.Add(LineEnding + '/*  Index definitions for ' + ObjectName + ' */' + LineEnding);
+          ExtractOut(LineEnding + '/*  Index definitions for ' + ObjectName + ' */' + LineEnding);
         First := false;
       end; //end_if
 
@@ -3147,8 +3253,8 @@ begin
       Line := Line + GetIndexSegments(qryIndex.FieldByName('RDB$INDEX_NAME').AsString) +
           ')' + Term;
 
-      FMetaData.Add(Line);
-      AddComment(qryIndex,ctIndex,FMetaData);
+      ExtractOut(Line);
+      AddComment(qryIndex,ctIndex);
       qryIndex.Next;
     end;
   finally
@@ -3248,7 +3354,7 @@ begin
       if not qryView.FieldByName('RDB$VIEW_SOURCE').IsNull then
         SList.Text := SList.Text + qryView.FieldByName('RDB$VIEW_SOURCE').AsString;
       SList.Text := SList.Text + Format('%s%s', [Term, LineEnding]);
-      FMetaData.AddStrings(SList);
+      ExtractOut(SList);
       SList.Clear;
       qryView.Next;
     end;
@@ -3358,15 +3464,15 @@ begin
     eoDatabase : ExtractDDL(true, '', ExtractTypes);
     eoDomain :
       if etTable in ExtractTypes then
-        ListDomains(ObjectName, etTable)
+        ListDomains(dtCreateDomain,ObjectName, etTable)
       else
-        ListDomains(ObjectName);
+        ListDomains(dtCreateDomain,ObjectName);
     eoTable :
     begin
       if ObjectName <> '' then
       begin
         if etDomain in ExtractTypes then
-          ListDomains(ObjectName, etTable);
+          ListDomains(dtCreateDomain,ObjectName, etTable);
         ExtractListTable(ObjectName, '', false);
         if etIndex in ExtractTypes then
           ListIndex(ObjectName, etTable);
@@ -3505,11 +3611,9 @@ begin
   end;
 end;
 
-function TIBExtract.GetFieldType(FieldType, FieldSubType, FieldScale,
-  FieldPrecision, FieldLength: integer; HasCharacterSet: boolean;
-  FieldCharacterSetID: integer; FieldCharacterLength: integer;
-  FieldSegmentLen: integer; IsArray: boolean; FieldSourceName: string): String;
-
+function TIBExtract.GetCharacterSetName(CharSetID: integer; ForceCharSet: boolean): string;
+{If ForceCharSet is true then Character Set always added. Otherwise returns empty if charset is
+ database default}
 const
     GetCharacterSetSQL =
     'SELECT CST.RDB$CHARACTER_SET_NAME ' +
@@ -3517,23 +3621,32 @@ const
     'WHERE CST.RDB$CHARACTER_SET_ID = :CHARSETID ' +
     'ORDER BY CST.RDB$CHARACTER_SET_NAME';
 
-
-  function GetCharacterSetName: string;
-  var CharSetSQL : TIBSQL;
-  begin
-    Result := '';
-    CharSetSQL := TIBSQL.Create(FDatabase);
-    try
-      CharSetSQL.SQL.Add(GetCharacterSetSQL);
-      CharSetSQL.Params.ByName('CHARSETID').AsInteger := FieldCharacterSetID;
-      CharSetSQL.ExecQuery;
-      if CharSetSQL.RecordCount > 0 then
-        Result := ' CHARACTER SET ' + Trim(CharSetSQL.FieldByName('RDB$CHARACTER_SET_NAME').AsString);
-    finally
-      CharSetSQL.Free;
+var CharSetSQL : TIBSQL;
+    CharSetName: string;
+begin
+  Result := '';
+  CharSetSQL := TIBSQL.Create(FDatabase);
+  try
+    CharSetSQL.SQL.Add(GetCharacterSetSQL);
+    CharSetSQL.Params.ByName('CHARSETID').AsInteger := CharSetID;
+    CharSetSQL.ExecQuery;
+    if (CharSetSQL.RecordCount > 0) then
+    begin
+      CharSetName := Trim(CharSetSQL.FieldByName('RDB$CHARACTER_SET_NAME').AsString);
+      if ForceCharSet or (FDefaultCharSetName <> CharSetName) then
+      Result := ' CHARACTER SET ' + CharSetName;
     end;
+  finally
+    CharSetSQL.Free;
   end;
+end;
 
+
+function TIBExtract.GetFieldType(FieldType, FieldSubType, FieldScale,
+  FieldPrecision, FieldLength: integer; HasCharacterSet: boolean;
+  ForceCharSet: boolean; FieldCharacterSetID: integer;
+  FieldCharacterLength: integer; FieldSegmentLen: integer; IsArray: boolean;
+  FieldSourceName: string): String;
 var i: integer;
     TypeName: string;
     DidActivate : Boolean;
@@ -3563,7 +3676,7 @@ begin
           else
             Result := TypeName + Format('(%d)', [FieldCharacterLength]);
           if HasCharacterSet then
-            Result :=  Result + GetCharacterSetName;
+            Result :=  Result + GetCharacterSetName(FieldCharacterSetID,ForceCharSet);
         end;
 
       blr_blob:
@@ -3576,7 +3689,7 @@ begin
           if FieldSegmentLen > 0 then
             Result := Result + Format(' SEGMENT SIZE %d',[FieldSegmentLen]);
           if HasCharacterSet then
-            Result :=  Result + GetCharacterSetName;
+            Result :=  Result + GetCharacterSetName(FieldCharacterSetID,ForceCharSet);
         end;
 
         blr_dec64: {DecFloat(16) }
@@ -3768,7 +3881,7 @@ begin
           or (qryOwnerPriv.FieldByName('RDB$USER').AsString = 'PUBLIC') then
       begin
         if qryOwnerPriv.FieldByName('GRANTEDBY').IsNull then
-        FMetaData.Add(Format('GRANT %s ON %s %s TO %s %s %s %s', [
+        ExtractOut(Format('GRANT %s ON %s %s TO %s %s %s %s', [
                           qryOwnerPriv.FieldByName('Privileges').AsString,
                           qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
                           QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
@@ -3777,7 +3890,7 @@ begin
                           qryOwnerPriv.FieldByName('GRANTOPTION').AsString,
                           Terminator]))
         else
-          FMetaData.Add(Format('GRANT %s ON %s %s TO %s %s %s GRANTED BY %s %s', [
+          ExtractOut(Format('GRANT %s ON %s %s TO %s %s %s GRANTED BY %s %s', [
                             qryOwnerPriv.FieldByName('Privileges').AsString,
                             qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
                             QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
@@ -3854,7 +3967,7 @@ begin
     qryOwnerPriv.ExecQuery;
     while not qryOwnerPriv.Eof do
     begin
-      FMetaData.Add(Format('GRANT %s ON %s %s TO %s %s %s%s', [
+      ExtractOut(Format('GRANT %s ON %s %s TO %s %s %s%s', [
                             qryOwnerPriv.FieldByName('Privileges').AsString,
                             qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
                             QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
@@ -3868,7 +3981,7 @@ begin
   finally
     qryOwnerPriv.Free;
   end;
-  FMetaData.Add('');
+  ExtractOut('');
 end;
 
 {	  ShowGrantRoles
@@ -3910,7 +4023,7 @@ begin
         IsDefault := 'DEFAULT '
       else
         IsDefault := '';
-      FMetaData.Add(Format('GRANT %s%s TO %s%s%s%s',
+      ExtractOut(Format('GRANT %s%s TO %s%s%s%s',
         [ IsDefault, QuoteIdentifier( qryRole.FieldByName('RDB$RELATION_NAME').AsString),
          UserString, WithOption, Terminator, LineEnding]));
 
@@ -3952,6 +4065,7 @@ var
                            qryHeader.FieldByName('RDB$FIELD_PRECISION').AsInteger,
                            qryHeader.FieldByName('RDB$FIELD_LENGTH').AsInteger,
                            not qryHeader.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                           true,
                            qryHeader.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
                            qryHeader.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
                            qryHeader.FieldByName('RDB$SEGMENT_LENGTH').AsInteger);
@@ -3982,7 +4096,7 @@ begin
       if FirstTime then
       begin
         FirstTime := false;
-        FMetaData.Add('(');
+        ExtractOut('(');
       end;
 
       Line := FormatParamStr;
@@ -3990,13 +4104,13 @@ begin
       qryHeader.Next;
       if not qryHeader.Eof then
         Line := Line + ',';
-      FMetaData.Add(Line);
+      ExtractOut(Line);
     end;
 
     { If there was at least one param, close parens }
     if not FirstTime then
     begin
-      FMetaData.Add( ')');
+      ExtractOut( ')');
     end;
 
     FirstTime := true;
@@ -4009,7 +4123,7 @@ begin
       if FirstTime then
       begin
         FirstTime := false;
-        FMetaData.Add('RETURNS' + LineEnding + '(');
+        ExtractOut('RETURNS' + LineEnding + '(');
       end;
 
       Line := FormatParamStr;
@@ -4017,16 +4131,16 @@ begin
       qryHeader.Next;
       if not qryHeader.Eof then
         Line := Line + ',';
-      FMetaData.Add(Line);
+      ExtractOut(Line);
     end;
 
     { If there was at least one param, close parens }
     if not FirstTime then
     begin
-      FMetaData.Add( ')');
+      ExtractOut( ')');
     end;
 
-    FMetaData.Add('AS');
+    ExtractOut('AS');
   finally
     qryHeader.Free;
   end;
@@ -4050,7 +4164,8 @@ begin
     Result := IBUtils.QuoteIdentifierIfNeeded(FDatabase.DBSQLDialect,Value)
 end;
 
-function TIBExtract.GetFieldType(qry: TIBSQL): string;
+function TIBExtract.GetFieldType(qry: TIBSQL; ForceCharSet: boolean
+  ): string;
 var DomainName: string;
 begin
   DomainName := qry.FieldByName('RDB$FIELD_SOURCE').AsString;
@@ -4074,6 +4189,7 @@ begin
                            qry.FieldByName('RDB$FIELD_PRECISION').AsInteger,
                            qry.FieldByName('RDB$FIELD_LENGTH').AsInteger,
                            not qry.FieldByName('RDB$CHARACTER_SET_ID').IsNull,
+                           ForceCharSet,
                            qry.FieldByName('RDB$CHARACTER_SET_ID').AsInteger,
                            qry.FieldByName('RDB$CHARACTER_LENGTH').AsInteger,
                            qry.FieldByName('RDB$SEGMENT_LENGTH').AsInteger,
@@ -4106,13 +4222,13 @@ begin
       Database := FDatabase;
       SQL.Text := TableSQL;
       ExecQuery;
-      FMetaData.Add('/* Data Starts */');
+      ExtractOut('/* Data Starts */');
       while not EOF do
       begin
         ListData(Trim(FieldByName('RDB$RELATION_NAME').AsString));
         Next;
       end;
-      FMetaData.Add('/* Data Ends */');
+      ExtractOut('/* Data Ends */');
     finally
       Free;
     end;
@@ -4141,7 +4257,7 @@ begin
       Database := FDatabase;
       if DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier( ObjectName)]),
                 Add2MetaData) then
-        FMetaData.Add('COMMIT;');
+        ExtractOut('COMMIT;');
     finally
       Free
     end;
@@ -4174,9 +4290,9 @@ begin
     if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION9 then
     begin
       PrevOwner := '';
-      FMetaData.Add('');
-      FMetaData.Add('/* Grant Roles for this database */');
-      FMetaData.Add('');
+      ExtractOut('');
+      ExtractOut('/* Grant Roles for this database */');
+      ExtractOut('');
 
       if ObjectName = '' then
         qryRoles.SQL.Text := RolesSQL
@@ -4195,9 +4311,9 @@ begin
           OwnerName := Trim(qryRoles.FieldByName('rdb$Owner_Name').AsString);
           if PrevOwner <> OwnerName then
           begin
-            FMetaData.Add('');
-            FMetaData.Add(Format('/* Role: %s, Owner: %s */', [RoleName, OwnerName]));
-            FMetaData.Add('');
+            ExtractOut('');
+            ExtractOut(Format('/* Role: %s, Owner: %s */', [RoleName, OwnerName]));
+            ExtractOut('');
             PrevOwner := OwnerName;
           end;
           sPrivileges := '';
@@ -4205,8 +4321,8 @@ begin
                           qryRoles.HasField('RDB$SYSTEM_PRIVILEGES') then
           begin
             sPrivileges := qryRoles.FieldByName('RDB$SYSTEM_PRIVILEGES').AsString;
-            Privileges := byte(sPrivileges[1]) shr 24 + byte(sPrivileges[2]) shr 16 +
-                          byte(sPrivileges[3]) shr 8 +  byte(sPrivileges[4]);
+            Privileges := byte(sPrivileges[1]) shl 24 + byte(sPrivileges[2]) shl 16 +
+                          byte(sPrivileges[3]) shl 8 +  byte(sPrivileges[4]);
             sPrivileges := '';
             for i := Low(UserPrivileges) to high(UserPrivileges) do
               if (UserPrivileges[i].Mask and Privileges) <> 0 then
@@ -4217,9 +4333,9 @@ begin
           end;
 
           if sPrivileges <> '' then
-            FMetaData.Add('CREATE ROLE ' + RoleName + ' SET SYSTEM PRIVILEGES TO ' + sPrivileges + Term)
+            ExtractOut('CREATE ROLE ' + RoleName + ' SET SYSTEM PRIVILEGES TO ' + sPrivileges + Term)
           else
-            FMetaData.Add('CREATE ROLE ' + RoleName + Term);
+            ExtractOut('CREATE ROLE ' + RoleName + Term);
 
           if IncludeGrants then
             ShowGrantsTo(qryRoles.FieldByName('rdb$Role_Name').AsString,obj_sql_role,Term);
@@ -4228,7 +4344,7 @@ begin
       finally
         qryRoles.Close;
       end;
-      FMetaData.AddStrings(Comments);
+      ExtractOut(Comments);
     end;
   finally
     qryRoles.Free;

@@ -26,7 +26,6 @@ type
     FTableNameLookup: TIBQuery;
     procedure AddPerfStats(Heading: string; stats: TStrings);
     procedure ShowBoolValue(aValue: integer; WhenTrue, WhenFalse: string);
-    procedure ShowStrings(aCaption: string; List: TStrings);
     function HexString(s: AnsiString): string;
   protected
     procedure CreateObjects(Application: TCustomApplication); override;
@@ -61,20 +60,6 @@ begin
     writeln(OutFile,WhenTrue)
   else
     writeln(OutFile,WhenFalse);
-end;
-
-procedure Test3.ShowStrings(aCaption: string; List: TStrings);
-var s: string;
-    i: integer;
-begin
-  s := aCaption + ': ';
-  for i := 0 to List.Count - 1 do
-  begin
-    if i > 0 then
-      s := s + ', ';
-    s := s + List[i];
-  end;
- writeln(OutFile,s);
 end;
 
 function Test3.HexString(s: AnsiString): string;

@@ -32,6 +32,8 @@ protected
   procedure ReadOnlyTransaction;
   procedure ReadWriteTransaction;
   procedure RunScript(aFileName: string);
+  procedure ShowStrings(aCaption: string; List: TStrings);
+  procedure WriteStrings(List: TStrings);
   procedure ExecuteSQL(SQL: string);
 public
   property IBDatabase: TIBDatabase read  FIBDatabase;
@@ -212,6 +214,28 @@ end;
 procedure TIBXTestBase.RunScript(aFileName: string);
 begin
   FIBXScript.RunScript(aFileName);
+end;
+
+procedure TIBXTestBase.ShowStrings(aCaption: string; List: TStrings);
+var s: string;
+    i: integer;
+begin
+  s := aCaption + ': ';
+  for i := 0 to List.Count - 1 do
+  begin
+    if i > 0 then
+      s := s + ', ';
+    s := s + List[i];
+  end;
+ writeln(OutFile,s);
+end;
+
+procedure TIBXTestBase.WriteStrings(List: TStrings);
+var i: integer;
+begin
+  for i := 0 to List.Count - 1 do
+    writeln(OutFile,List[i]);
+  writeln(OutFile);
 end;
 
 procedure TIBXTestBase.ExecuteSQL(SQL: string);
