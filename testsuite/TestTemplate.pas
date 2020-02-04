@@ -10,7 +10,7 @@ unit TestTemplate;
 interface
 
 uses
-  Classes, SysUtils, CustApp, TestManager, IBXTestManager, IB;
+  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB;
 
 const
   aTestID    = '1';

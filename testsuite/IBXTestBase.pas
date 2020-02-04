@@ -136,7 +136,7 @@ begin
     end;
 
   ftFloat:
-    writeln(OutFile, aField.FieldName,' = ',FormatFloat('#,##0.00',aField.AsFloat));
+    writeln(OutFile, aField.FieldName,' = ',FormatFloat('#,##0.000',aField.AsFloat));
 
   ftLargeint:
     writeln(OutFile,aField.FieldName,' = ',aField.AsString);

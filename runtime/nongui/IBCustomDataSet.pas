@@ -4575,18 +4575,21 @@ begin
             begin
               FieldType := ftFmtBCD;
               FieldPrecision := 16;
+              FieldSize := 4; {For conversions from currency type}
             end;
 
           SQL_DEC34:
           begin
             FieldType := ftFmtBCD;
             FieldPrecision := 34;
+            FieldSize := 4; {For conversions from currency type}
           end;
 
           SQL_DEC_FIXED:
           begin
             FieldType := ftFmtBCD;
-            FieldPrecision := 34 - getScale;
+            FieldPrecision := 34;
+            FieldSize := -getScale;
           end;
 
           else

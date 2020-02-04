@@ -54,6 +54,7 @@ type
     procedure CheckActivity(Attachment: IAttachment); overload;
     procedure CheckActivity(Transaction: ITransaction); overload;
     procedure InitTest; virtual;
+    function SkipTest: boolean; virtual;
   public
     constructor Create(aOwner: TTestApplication);  virtual;
     function TestTitle: AnsiString;
@@ -639,6 +640,11 @@ begin
   //Do nothing yet
 end;
 
+function TTestBase.SkipTest: boolean;
+begin
+  Result := false;
+end;
+
 { TTestApplication }
 
 class procedure TTestApplication.CreateTestList;
@@ -766,6 +772,7 @@ begin
   CleanUP;
   for i := 0 to FTests.Count - 1 do
     with TTestBase(FTests.Objects[i]) do
+  if not SkipTest then
   begin
     writeln(OutFile,'Running ' + TestTitle);
     writeln(ErrOutput,'Running ' + TestTitle);
@@ -786,6 +793,7 @@ procedure TTestApplication.RunTest(TestID: AnsiString);
 begin
   CleanUp;
   with TTestBase(FTests.Objects[GetIndexByTestID(TestID)]) do
+  if not SkipTest then
   begin
     writeln(OutFile,'Running ' + TestTitle);
     writeln(ErrOutput,'Running ' + TestTitle);

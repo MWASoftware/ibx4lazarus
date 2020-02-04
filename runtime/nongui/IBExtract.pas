@@ -3997,7 +3997,7 @@ const
     'WHERE ' +
     '  RDB$OBJECT_TYPE = %d AND ' +
     '  RDB$USER_TYPE = %d AND ' +
-    '  RDB$PRIVILEGE = ''M'' ' +
+    '  RDB$PRIVILEGE = ''M'' AND RDB$USER <> ''SYSDBA''' +
     'ORDER BY  RDB$RELATION_NAME, RDB$USER';
 
 var
