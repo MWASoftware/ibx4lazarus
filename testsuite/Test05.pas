@@ -117,7 +117,12 @@ end;
 
 procedure TTest05.InitialiseDatabase;
 begin
-  RunScript('resources/Test05.sql');
+  if IBDatabase.attachment.GetODSMajorVersion < 13 then
+  begin
+    IBDatabase.DropDatabase;
+    raise ESkipException.Create('This test requires Firebird 4');
+  end;
+  inherited InitialiseDatabase;
 end;
 
 function TTest05.SkipTest: boolean;

@@ -26,7 +26,6 @@ type
     procedure CreateObjects(Application: TCustomApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
-    procedure InitialiseDatabase; override;
     procedure InitTest; override;
   public
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
@@ -61,13 +60,6 @@ end;
 function TTest10.GetTestTitle: AnsiString;
 begin
   Result := aTestTitle;
-end;
-
-procedure TTest10.InitialiseDatabase;
-begin
-  writeln(OutFile,'Creating Database');
-  writeln(OutFile);
-  RunScript('resources/Test10.sql');
 end;
 
 procedure TTest10.InitTest;

@@ -100,8 +100,19 @@ begin
 end;
 
 procedure TIBXTestBase.InitialiseDatabase;
+var aFileName: string;
+    aTestID: string;
 begin
-  //Do nothing
+  aTestID := GetTestID;
+  if Length(aTestID) = 1 then
+    aTestID := '0' + aTestID;
+  aFileName := Format('resources/Test%s.sql',[aTestID]);
+  if FileExists(aFileName) then
+  begin
+    writeln(OutFile,'Creating Database from ' + aFileName);
+    writeln(OutFile);
+    RunScript(aFileName);
+  end;
 end;
 
 procedure TIBXTestBase.PrintDataSet(aDataSet: TIBCustomDataSet);

@@ -61,6 +61,7 @@ type
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); virtual; abstract;
     property Owner: TTestApplication read FOwner;
+    property TestID: string read GetTestID;
   end;
 
   TTest = class of TTestBase;
@@ -120,6 +121,8 @@ type
     property Server: AnsiString read FServer;
     property ClientLibraryPath: string read FClientLibraryPath;
   end;
+
+  ESkipException = class(Exception);
 
 var
   TestApp: TTestApplication = nil;
@@ -771,14 +774,19 @@ var i: integer;
 begin
   CleanUP;
   for i := 0 to FTests.Count - 1 do
-    with TTestBase(FTests.Objects[i]) do
-  if not SkipTest then
+   with TTestBase(FTests.Objects[i]) do
+  if SkipTest then
+    writeln(OutFile,' Skipping ' + TestID)
+  else
   begin
     writeln(OutFile,'Running ' + TestTitle);
     writeln(ErrOutput,'Running ' + TestTitle);
     try
       RunTest('UTF8',3);
-    except on E:Exception do
+    except
+      on E:ESkipException do
+        writeln(OutFile,'Skipping Test: ' + E.Message);
+      on E:Exception do
       begin
         writeln(OutFile,'Test Completed with Error: ' + E.Message);
         Exit;
@@ -800,7 +808,10 @@ begin
     try
       InitTest;
       RunTest('UTF8',3);
-    except on E:Exception do
+    except
+      on E:ESkipException do
+        writeln(OutFile,'Skipping Test: ' + E.Message);
+      on E:Exception do
       begin
         writeln(OutFile,'Test Completed with Error: ' + E.Message);
         Exit;

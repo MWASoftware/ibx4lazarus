@@ -26,7 +26,6 @@ type
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
-    procedure InitialiseDatabase; override;
   public
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
   end;
@@ -131,11 +130,6 @@ begin
   IBDatabase.DatabaseName := Owner.GetNewDatabaseName;
   IBDatabase.CreateIfNotExists := true;
   ReadWriteTransaction;
-end;
-
-procedure TTest04.InitialiseDatabase;
-begin
-  RunScript('resources/Test04.sql');
 end;
 
 procedure TTest04.RunTest(CharSet: AnsiString; SQLDialect: integer);
