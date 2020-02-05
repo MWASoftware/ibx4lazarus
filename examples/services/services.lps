@@ -17,9 +17,8 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="12"/>
-        <CursorPos X="25" Y="35"/>
+        <TopLine Value="309"/>
+        <CursorPos X="34" Y="166"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
@@ -132,10 +131,12 @@
         <ComponentName Value="ShutdownDatabaseDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="155"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="158"/>
         <CursorPos X="107" Y="74"/>
         <UsageCount Value="100"/>
+        <Loaded Value="True"/>
       </Unit11>
       <Unit12>
         <Filename Value="ShutdownRegDlgUnit.pas"/>

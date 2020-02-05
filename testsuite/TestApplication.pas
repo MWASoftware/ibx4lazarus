@@ -119,6 +119,7 @@ type
     property ShowStatistics: boolean read FShowStatistics write FShowStatistics;
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
     property Server: AnsiString read FServer;
+    property PortNo: AnsiString read FPortNo;
     property ClientLibraryPath: string read FClientLibraryPath;
   end;
 

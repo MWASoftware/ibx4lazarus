@@ -21,6 +21,9 @@ IBX Change Log  version (2.3-5 Build 11661) Thu, 11 Apr 2019 09:43:38 +0100
 
 7. IBExtract: revert create trigger to legacy syntax as worksaround for Firebird Bug CORE-6243
 
+8. IBXServices: Server version no. parsing now allows any letter before major version number
+   and is no longer restricted to 'V' e.g. "LI-T4.0.0.1436 Firebird 4.0 Beta 1"
+
 IBX Change Log  version (2.3-4 Build 11661) Thu, 11 Apr 2019 09:43:38 +0100
 
 1.  TIBXDataSet and Generators: Generator Names that are not all upper case or

@@ -26,7 +26,7 @@ protected
   procedure ClientLibraryPathChanged; override;
   procedure CreateObjects(Application: TCustomApplication); override;
   procedure InitialiseDatabase; virtual;
-  procedure PrintDataSet(aDataSet: TIBCustomDataSet);
+  procedure PrintDataSet(aDataSet: TDataSet);
   procedure PrintDataSetRow(aField: TField);
   procedure PrintAffectedRows(query: TIBCustomDataSet);
   procedure ReadOnlyTransaction;
@@ -115,7 +115,7 @@ begin
   end;
 end;
 
-procedure TIBXTestBase.PrintDataSet(aDataSet: TIBCustomDataSet);
+procedure TIBXTestBase.PrintDataSet(aDataSet: TDataSet);
 var i: integer;
     rowno: integer;
 begin

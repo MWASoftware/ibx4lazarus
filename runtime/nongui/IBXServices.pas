@@ -3022,7 +3022,7 @@ begin
   try
     {extact database file spec}
     RegexObj.ModifierG := false; {turn off greedy matches}
-    RegexObj.Expression := '[A-Z][A-Z]-V([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+) .*';
+    RegexObj.Expression := '[A-Z][A-Z]-[A-Z]([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+) .*';
     s := Results[0].AsString;
     if RegexObj.Exec(s) then
     begin

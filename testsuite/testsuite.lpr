@@ -9,8 +9,8 @@ uses
   {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
-  Classes, SysUtils, CustApp, TestApplication, IB, Test01, IBXTestBase,
-  Test02, Test03, Test10, Test09, Test04, Test05, Test17, Test23, Test14;
+  Classes, SysUtils, CustApp, TestApplication, IB, Test01, IBXTestBase, Test02,
+  Test03, Test10, Test09, Test04, Test05, Test17, Test23, Test14, Test12;
 
 type
 
