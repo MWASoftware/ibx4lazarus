@@ -9,7 +9,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="14"/>
-        <UsageCount Value="106"/>
+        <UsageCount Value="110"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainFormUnit.pas"/>
@@ -17,15 +17,15 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="309"/>
-        <CursorPos X="34" Y="166"/>
+        <TopLine Value="367"/>
+        <CursorPos X="19" Y="387"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
           <TopLine Value="235"/>
           <CursorPos X="18" Y="252"/>
         </ExtraEditor1>
-        <UsageCount Value="106"/>
+        <UsageCount Value="110"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -35,10 +35,12 @@
         <ComponentName Value="BackupDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="101"/>
-        <CursorPos X="121" Y="123"/>
-        <UsageCount Value="106"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="89"/>
+        <CursorPos Y="112"/>
+        <UsageCount Value="110"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="ChgPasswordDlgUnit.pas"/>
@@ -48,7 +50,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="123" Y="22"/>
-        <UsageCount Value="106"/>
+        <UsageCount Value="110"/>
       </Unit3>
       <Unit4>
         <Filename Value="LimboTransactionsUnit.pas"/>
@@ -59,7 +61,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="60"/>
         <CursorPos X="97" Y="80"/>
-        <UsageCount Value="106"/>
+        <UsageCount Value="110"/>
       </Unit4>
       <Unit5>
         <Filename Value="ListUsersUnit.pas"/>
@@ -67,10 +69,12 @@
         <ComponentName Value="ListUsersForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="72"/>
-        <CursorPos X="89" Y="92"/>
-        <UsageCount Value="106"/>
+        <CursorPos X="70" Y="89"/>
+        <UsageCount Value="110"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="NewUserDlgUnit.pas"/>
@@ -80,7 +84,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="104" Y="24"/>
-        <UsageCount Value="106"/>
+        <UsageCount Value="110"/>
       </Unit6>
       <Unit7>
         <Filename Value="RestoreDlgUnit.pas"/>
@@ -88,10 +92,13 @@
         <ComponentName Value="RestoreDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="76"/>
-        <CursorPos X="43" Y="86"/>
-        <UsageCount Value="106"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="79"/>
+        <CursorPos Y="95"/>
+        <UsageCount Value="110"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="ServicesLoginDlgUnit.pas"/>
@@ -101,7 +108,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="104" Y="27"/>
-        <UsageCount Value="106"/>
+        <UsageCount Value="110"/>
       </Unit8>
       <Unit9>
         <Filename Value="SelectValidationDlgUnit.pas"/>
@@ -112,7 +119,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="17"/>
         <CursorPos X="94" Y="42"/>
-        <UsageCount Value="106"/>
+        <UsageCount Value="110"/>
       </Unit9>
       <Unit10>
         <Filename Value="SelectDBDlgUnit.pas"/>
@@ -123,7 +130,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="41"/>
         <CursorPos X="104" Y="68"/>
-        <UsageCount Value="106"/>
+        <UsageCount Value="110"/>
       </Unit10>
       <Unit11>
         <Filename Value="ShutdownDatabaseDlgUnit.pas"/>
@@ -131,12 +138,12 @@
         <ComponentName Value="ShutdownDatabaseDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="158"/>
-        <CursorPos X="107" Y="74"/>
-        <UsageCount Value="100"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="140"/>
+        <CursorPos X="59" Y="186"/>
+        <UsageCount Value="104"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit11>
       <Unit12>
         <Filename Value="ShutdownRegDlgUnit.pas"/>
@@ -147,7 +154,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="48"/>
         <CursorPos X="93" Y="73"/>
-        <UsageCount Value="100"/>
+        <UsageCount Value="104"/>
       </Unit12>
       <Unit13>
         <Filename Value="AltDBSvcLoginDlgUnit.pas"/>
@@ -665,10 +672,11 @@
       </Unit83>
       <Unit84>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="3007"/>
-        <CursorPos X="23" Y="3029"/>
-        <UsageCount Value="11"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="465"/>
+        <CursorPos X="5" Y="482"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
       </Unit84>
       <Unit85>
         <Filename Value="../../runtime/nongui/IBTypes.pas"/>
@@ -704,7 +712,7 @@
         <UsageCount Value="10"/>
       </Unit89>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="4" HistoryIndex="3">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="115" Column="42" TopLine="93"/>
@@ -713,6 +721,14 @@
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="35" Column="25" TopLine="12"/>
       </Position2>
+      <Position3>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="387" Column="19" TopLine="367"/>
+      </Position3>
+      <Position4>
+        <Filename Value="RestoreDlgUnit.pas"/>
+        <Caret Line="94" Column="43" TopLine="76"/>
+      </Position4>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
