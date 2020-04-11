@@ -23,7 +23,7 @@ type
     FExtract: TIBExtract;
     procedure HandleExtractLine(Sender: TObject; start, count: integer);
   protected
-    procedure CreateObjects(Application: TCustomApplication); override;
+    procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
@@ -43,7 +43,7 @@ begin
     writeln(OutFile,FExtract.Items[start + i]);
 end;
 
-procedure TTest10.CreateObjects(Application: TCustomApplication);
+procedure TTest10.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
   FExtract := TIBExtract.Create(Application);

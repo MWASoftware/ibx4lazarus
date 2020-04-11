@@ -28,7 +28,7 @@ type
     procedure ShowBoolValue(aValue: integer; WhenTrue, WhenFalse: string);
     function HexString(s: AnsiString): string;
   protected
-    procedure CreateObjects(Application: TCustomApplication); override;
+    procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
@@ -70,7 +70,7 @@ begin
     Result += Format('%x ',[byte(s[i])]);
 end;
 
-procedure Test3.CreateObjects(Application: TCustomApplication);
+procedure Test3.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
   FIBDatabaseInfo := TIBDatabaseInfo.Create(Application);

@@ -35,7 +35,7 @@ type
     procedure HandleLogMessage(Sender: TObject; Msg: string);
     procedure GetSharedDirectory(Sender: TObject; var SharedDataDir: string);
   protected
-    procedure CreateObjects(Application: TCustomApplication); override;
+    procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
@@ -115,7 +115,7 @@ begin
   SharedDataDir := 'resources';
 end;
 
-procedure TTest30.CreateObjects(Application: TCustomApplication);
+procedure TTest30.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
   FLocalDB := TIBCMLocalDBSupport.Create(Application);

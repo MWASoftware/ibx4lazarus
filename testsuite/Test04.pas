@@ -21,8 +21,13 @@ type
   private
     FDataSet: TIBDataSet;
     procedure HandleAfterInsert(DataSet: TDataSet);
+    procedure HandleTransactionEdit(Sender: TObject);
+    procedure HandleTransactionDelete(Sender: TObject);
+    procedure HandleTransactionInsert(Sender: TObject);
+    procedure HandleTransactionPost(Sender: TObject);
+    procedure HandleTransactionExecQuery(Sender: TObject);
   protected
-    procedure CreateObjects(Application: TCustomApplication); override;
+    procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
@@ -33,7 +38,7 @@ type
 
 implementation
 
-uses DateUtils;
+uses DateUtils, IBSQL;
 
 { TTest04 }
 
@@ -65,13 +70,50 @@ begin
   end;
 end;
 
-procedure TTest04.CreateObjects(Application: TCustomApplication);
+procedure TTest04.HandleTransactionEdit(Sender: TObject);
+begin
+  writeln(OutFile,'Transaction Edit');
+end;
+
+procedure TTest04.HandleTransactionDelete(Sender: TObject);
+begin
+  writeln(OutFile,'Transaction Delete');
+end;
+
+procedure TTest04.HandleTransactionInsert(Sender: TObject);
+begin
+  writeln(OutFile,'Transaction Insert');
+end;
+
+procedure TTest04.HandleTransactionPost(Sender: TObject);
+begin
+  writeln(OutFile,'Transaction Post');
+end;
+
+procedure TTest04.HandleTransactionExecQuery(Sender: TObject);
+begin
+  write(OutFile,'Transaction Exec Query ');
+  if Sender is TIBSQL then
+    writeln(OutFile,(Sender as TIBSQL).SQL.Text)
+  else
+    writeln(OutFile);
+end;
+
+procedure TTest04.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
   FDataSet := TIBDataSet.Create(Application);
   with FDataSet do
   begin
     Database := IBDatabase;
+    with IBTransaction do
+    begin
+      AfterEdit := @HandleTransactionEdit;
+      AfterDelete := @HandleTransactionDelete;
+      AfterInsert := @HandleTransactionInsert;
+      AfterPost := @HandleTransactionPost;
+      AfterExecQuery := @HandleTransactionExecQuery;
+    end;
     SelectSQL.Text := 'Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6,'+
       ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.'+
       'GRANTS, A."My Field" as MYFIELD1, A."MY Field" as MYFIELD2 From IBXTEST A';
@@ -107,7 +149,7 @@ begin
       'Delete From IBXTEST A '+
       'Where A.TABLEKEY = :OLD_TABLEKEY';
     DataSetCloseAction := dcSaveChanges;
-    AutoCommit := acCommitRetaining;
+    AutoCommit := acDisabled;
     GeneratorField.Generator := 'IBXGEN';
     GeneratorField.Field := 'TABLEKEY';
     GeneratorField.ApplyOnEvent := gaeOnNewRecord;
@@ -148,10 +190,40 @@ begin
     FDataSet.FieldByName('MYField1').AsString := 'My Field';
     FDataSet.FieldByName('MYFIELD2').AsString := 'MY Field';
     FDataSet.Post;
+    IBTransaction.Commit;
+
+    IBTransaction.Active := true;
+    FDataSet.Active := true;
     PrintDataSet(FDataSet);
     writeln(OutFile,'Delete a record');
     FDataSet.First;
     FDataSet.Delete;
+    PrintDataSet(FDataSet);
+    writeln(OutFile,'Rollback Retaining');
+    IBTransaction.RollbackRetaining;
+    FDataSet.Active := false;
+    FDataSet.Active := true;
+    PrintDataSet(FDataSet);
+    writeln(OutFile,'Delete a record');
+    FDataSet.First;
+    FDataSet.Delete;
+    PrintDataSet(FDataSet);
+    writeln(OutFile,'Rollback');
+    IBTransaction.Rollback;
+    IBTransaction.Active := true;
+    FDataSet.Active := true;
+    PrintDataSet(FDataSet);
+    writeln(OutFile,'Commit Retaining');
+    FDataSet.Append;
+    FDataSet.Post;
+    IBTransaction.CommitRetaining;
+    FDataSet.Active := false;
+    FDataSet.Active := true;
+    PrintDataSet(FDataSet);
+    writeln(OutFile,'Commit');
+    IBTransaction.Commit;
+    IBTransaction.Active := true;
+    FDataSet.Active := true;
     PrintDataSet(FDataSet);
   finally
     IBDatabase.DropDatabase;

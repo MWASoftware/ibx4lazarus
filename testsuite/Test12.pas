@@ -43,7 +43,7 @@ type
     procedure DatabaseSweepDB;
     procedure BackupRestore;
   protected
-    procedure CreateObjects(Application: TCustomApplication); override;
+    procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
@@ -209,7 +209,7 @@ begin
   writeln(Outfile,'Restore Completed');
 end;
 
-procedure TTest12.CreateObjects(Application: TCustomApplication);
+procedure TTest12.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
   FIBXServicesConnection := TIBXServicesConnection.Create(Application);

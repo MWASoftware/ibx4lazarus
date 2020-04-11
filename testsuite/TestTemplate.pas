@@ -22,7 +22,7 @@ type
 
   TTest1 = class(TIBXTestBase)
   protected
-    procedure CreateObjects(Application: TCustomApplication); override;
+    procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
@@ -35,7 +35,7 @@ implementation
 
 { TTest1 }
 
-procedure TTest1.CreateObjects(Application: TCustomApplication);
+procedure TTest1.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
 end;

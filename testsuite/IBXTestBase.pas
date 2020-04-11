@@ -24,14 +24,14 @@ private
   procedure ErrorLogHandler(Sender: TObject; Msg: string);
 protected
   procedure ClientLibraryPathChanged; override;
-  procedure CreateObjects(Application: TCustomApplication); override;
-  procedure InitialiseDatabase; virtual;
+  procedure CreateObjects(Application: TTestApplication); override;
+  procedure InitialiseDatabase(aDatabase: TIBDatabase); virtual;
   procedure PrintDataSet(aDataSet: TDataSet);
   procedure PrintDataSetRow(aField: TField);
   procedure PrintAffectedRows(query: TIBCustomDataSet);
   procedure ReadOnlyTransaction;
   procedure ReadWriteTransaction;
-  procedure RunScript(aFileName: string);
+  procedure RunScript(aDatabase: TIBDatabase; aFileName: string);
   procedure ShowStrings(aCaption: string; List: TStrings);
   procedure WriteStrings(List: TStrings);
   procedure ExecuteSQL(SQL: string);
@@ -48,7 +48,7 @@ implementation
 
 procedure TIBXTestBase.HandleCreateDatebase(Sender: TObject);
 begin
-  InitialiseDatabase;
+  InitialiseDatabase(IBDatabase);
 end;
 
 procedure TIBXTestBase.HandleDBFileName(Sender: TObject;
@@ -73,7 +73,7 @@ begin
   FIBDatabase.FirebirdLibraryPathName := Owner.ClientLibraryPath;
 end;
 
-procedure TIBXTestBase.CreateObjects(Application: TCustomApplication);
+procedure TIBXTestBase.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
   { In console Mode the application should own the database
@@ -102,7 +102,7 @@ begin
   FIBXScript.IgnoreCreateDatabase := true;
 end;
 
-procedure TIBXTestBase.InitialiseDatabase;
+procedure TIBXTestBase.InitialiseDatabase(aDatabase: TIBDatabase);
 var aFileName: string;
     aTestID: string;
 begin
@@ -114,7 +114,7 @@ begin
   begin
     writeln(OutFile,'Creating Database from ' + aFileName);
     writeln(OutFile);
-    RunScript(aFileName);
+    RunScript(aDatabase,aFileName);
   end;
 end;
 
@@ -124,6 +124,9 @@ var i: integer;
 begin
   aDataSet.First;
   rowno := 1;
+  if aDataSet.EOF then
+    writeln(OutFile,'Dataset Empty')
+  else
   while not aDataSet.EOF do
   begin
     writeln(OutFile,'Row No = ',rowno);
@@ -225,8 +228,11 @@ begin
   FIBTransaction.Params.Add('write');
 end;
 
-procedure TIBXTestBase.RunScript(aFileName: string);
+procedure TIBXTestBase.RunScript(aDatabase: TIBDatabase; aFileName: string);
 begin
+  FIBXScript.Database := aDatabase;
+  aDatabase.DefaultTransaction.Active := true;
+  FIBXScript.Transaction := aDatabase.DefaultTransaction;
   FIBXScript.RunScript(aFileName);
 end;
 

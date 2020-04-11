@@ -8,7 +8,7 @@ interface
 
 uses
   Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, DB, IB, IBCustomDataSet,
-  IBExtract;
+  IBDatabase, IBExtract;
 
 const
   aTestID    = '05';
@@ -25,11 +25,11 @@ type
     procedure HandleExtractLine(Sender: TObject; start, count: integer);
     procedure HandleAfterInsert(DataSet: TDataSet);
   protected
-    procedure CreateObjects(Application: TCustomApplication); override;
+    procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
-    procedure InitialiseDatabase; override;
+    procedure InitialiseDatabase(aDatabase: TIBDatabase) override;
     function SkipTest: boolean; override;
   public
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
@@ -61,7 +61,7 @@ begin
   end;
 end;
 
-procedure TTest05.CreateObjects(Application: TCustomApplication);
+procedure TTest05.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
   FDataSet := TIBDataSet.Create(Application);
@@ -115,14 +115,14 @@ begin
   ReadWriteTransaction;
 end;
 
-procedure TTest05.InitialiseDatabase;
+procedure TTest05.InitialiseDatabase(aDatabase: TIBDatabase);
 begin
-  if IBDatabase.attachment.GetODSMajorVersion < 13 then
+  if aDatabase.attachment.GetODSMajorVersion < 13 then
   begin
-    IBDatabase.DropDatabase;
+    aDatabase.DropDatabase;
     raise ESkipException.Create('This test requires Firebird 4');
   end;
-  inherited InitialiseDatabase;
+  inherited InitialiseDatabase(aDatabase);
 end;
 
 function TTest05.SkipTest: boolean;

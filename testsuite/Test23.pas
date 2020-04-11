@@ -23,7 +23,7 @@ type
     procedure AddRow;
     procedure ShowData;
   protected
-    procedure CreateObjects(Application: TCustomApplication); override;
+    procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
@@ -68,7 +68,7 @@ begin
   writeln(Outfile);
 end;
 
-procedure TTest23.CreateObjects(Application: TCustomApplication);
+procedure TTest23.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
   FIBSQL := TIBSQL.Create(Application);
