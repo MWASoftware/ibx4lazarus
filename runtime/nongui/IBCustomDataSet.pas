@@ -2457,7 +2457,9 @@ begin
         SQL_TYPE_TIME:
           fdDataSize := SizeOf(TDateTime);
         SQL_TIMESTAMP_TZ,
-        SQL_TIME_TZ:
+        SQL_TIMESTAMP_TZ_EX,
+        SQL_TIME_TZ,
+        SQL_TIME_TZ_EX:
           fdDataSize := SizeOf(TIBBufferedDateTimeWithTimeZone);
         SQL_SHORT, SQL_LONG:
         begin
@@ -2549,7 +2551,9 @@ begin
           LocalData := PByte(@LocalDate);
         end;
         SQL_TIMESTAMP_TZ,
-        SQL_TIME_TZ:
+        SQL_TIMESTAMP_TZ_EX,
+        SQL_TIME_TZ,
+        SQL_TIME_TZ_EX:
         begin
           ColData.GetAsDateTime(LocalTimeWithTimeZone.Timestamp, LocalTimeWithTimeZone.TimeZoneID);
           LocalData := PByte(@LocalTimeWithTimeZone);
@@ -3293,9 +3297,11 @@ begin
             SQL_TIMESTAMP:
             {This is an IBX native format and not the TDataset approach. See also SetFieldData}
               Param.AsDateTime := PDateTime(data)^;
+            SQL_TIMESTAMP_TZ_EX,
             SQL_TIMESTAMP_TZ:
               with PIBBufferedDateTimeWithTimeZone(data)^ do
                 Param.SetAsDateTime(Timestamp,TimeZoneID);
+            SQL_TIME_TZ_EX,
             SQL_TIME_TZ:
               with PIBBufferedDateTimeWithTimeZone(data)^ do
                 Param.SetAsTime(Timestamp,TimeZoneID);
@@ -3305,6 +3311,8 @@ begin
             SQL_DEC34,
             SQL_DEC_FIXED:
               Param.AsBCD := Database.attachment.getFirebirdAPI.SQLDecFloatDecode(fdDataType,data);
+            else
+              IBError(ibxeUnknownSQLType,[fdDataType]);
           end;
         end;
       end;
@@ -4533,12 +4541,14 @@ begin
           SQL_TIMESTAMP: FieldType := ftDateTime;
           SQL_TYPE_TIME: FieldType := ftTime;
           SQL_TYPE_DATE: FieldType := ftDate;
-          SQL_TIMESTAMP_TZ:
+          SQL_TIMESTAMP_TZ,
+          SQL_TIMESTAMP_TZ_EX:
             begin
               FieldType := ftDateTime;
               FieldHasTimeZone := true;
             end;
-          SQL_TIME_TZ:
+          SQL_TIME_TZ,
+          SQL_TIME_TZ_EX:
             begin
               FieldType := ftTime;
               FieldHasTimeZone := true;

@@ -169,7 +169,8 @@ type
       ibxErrorParsing,
       ibxeParameterNameNotFound,
       ibxeListFieldNotFound,
-      ibxeBadDateTimeTZString
+      ibxeBadDateTimeTZString,
+      ibxeUnknownSQLType
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -304,6 +305,7 @@ resourcestring
   SParameterNameNotFound = 'Parameter Name (%s) not found';
   SListFieldNotFound = 'ListField Name is not a valid dataset column name (%s)';
   SBadDateTimeTZString = 'Unable to parse Date/Time Time Zone string "%s"';
+  SUnknownSQLType = 'Unknown SQL Type (%d)';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -400,7 +402,8 @@ const
     SErrorParsing,
     SParameterNameNotFound,
     SListFieldNotFound,
-    SBadDateTimeTZString
+    SBadDateTimeTZString,
+    SUnknownSQLType
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

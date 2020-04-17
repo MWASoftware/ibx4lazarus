@@ -84,8 +84,8 @@ var Database: TIBDatabase;
 begin
   Result := false;
   if not (AGenerator.Owner is TIBTable) and
-   ((AGenerator.Owner is TIBQuery and ((AGenerator.Owner as TIBQuery).SQL.Text = '')) or
-   (AGenerator.Owner is TIBDataSet and ((AGenerator.Owner as TIBDataSet).SelectSQL.Text = ''))) then
+   (((AGenerator.Owner is TIBQuery) and ((AGenerator.Owner as TIBQuery).SQL.Text = '')) or
+   ((AGenerator.Owner is TIBDataSet) and ((AGenerator.Owner as TIBDataSet).SelectSQL.Text = ''))) then
   begin
     ShowMessage('No Select SQL Found!');
     Exit
