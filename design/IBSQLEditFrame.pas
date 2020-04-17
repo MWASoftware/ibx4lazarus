@@ -206,7 +206,7 @@ type
 
 implementation
 
-Uses IBUtils, FBMessages, Variants;
+Uses IBUtils, IBMessages, Variants;
 
 {$R *.lfm}
 

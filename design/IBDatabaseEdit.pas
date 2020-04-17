@@ -122,7 +122,7 @@ implementation
 
 {$R *.lfm}
 
-uses TypInfo, FBMessages, IBUtils;
+uses TypInfo, IBMessages, IBUtils;
 
 function EditIBDatabase(ADatabase: TIBDatabase): Boolean;
 begin

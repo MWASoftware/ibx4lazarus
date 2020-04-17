@@ -399,7 +399,7 @@ implementation
 {$R *.lfm}
 
 uses DataModule, ShutdownRegDlgUnit, AddSecondaryFileDlgUnit, NewUserDlgUnit,
-  ChgPasswordDlgUnit, FBMessages, ExecuteSQLScriptDlgUnit;
+  ChgPasswordDlgUnit, IBMessages, ExecuteSQLScriptDlgUnit;
 
 { TMainForm }
 

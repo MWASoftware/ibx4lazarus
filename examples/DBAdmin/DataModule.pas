@@ -282,7 +282,7 @@ implementation
 
 {$R *.lfm}
 
-uses DBLoginDlgUnit, IBUtils, FBMessages, ShutdownDatabaseDlgUnit,
+uses DBLoginDlgUnit, IBUtils, IBMessages, ShutdownDatabaseDlgUnit,
   BackupDlgUnit, RestoreDlgUnit, AddShadowSetDlgUnit, IBErrorCodes;
 
 const

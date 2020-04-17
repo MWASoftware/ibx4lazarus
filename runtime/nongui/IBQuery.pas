@@ -143,7 +143,7 @@ end;
 
 implementation
 
-uses FBMessages, IBUtils;
+uses IBMessages, IBUtils;
 
 { TIBQuery }
 

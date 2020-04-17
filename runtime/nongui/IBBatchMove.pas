@@ -104,7 +104,7 @@ type
 
 implementation
 
-uses FBMessages;
+uses IBMessages;
 
 { TIBBatchMove }
 

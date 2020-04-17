@@ -275,7 +275,7 @@ const
 
 implementation
 
-uses FBMessages, IBDataOutput;
+uses IBMessages, IBDataOutput;
 
 const
   TERM = ';';

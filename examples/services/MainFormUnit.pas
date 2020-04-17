@@ -111,7 +111,7 @@ implementation
 
 {$R *.lfm}
 
-uses FBMessages, ServicesLoginDlgUnit, SelectValidationDlgUnit, SelectDBDlgUnit,
+uses IBMessages, ServicesLoginDlgUnit, SelectValidationDlgUnit, SelectDBDlgUnit,
   BackupDlgUnit, RestoreDlgUnit,  ListUsersUnit, LimboTransactionsUnit,
   ShutdownDatabaseDlgUnit, ShutdownRegDlgUnit;
 
