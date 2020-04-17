@@ -39,7 +39,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="83">
+    <Units Count="84">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -56,7 +56,7 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="7"/>
+        <TopLine Value="91"/>
         <CursorPos X="19" Y="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -176,8 +176,8 @@
       <Unit17>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="49" Y="7"/>
-        <UsageCount Value="5"/>
+        <CursorPos X="17" Y="23"/>
+        <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit17>
       <Unit18>
@@ -642,6 +642,17 @@
         <CursorPos X="4" Y="21"/>
         <UsageCount Value="10"/>
       </Unit82>
+      <Unit83>
+        <Filename Value="../../design/ibgeneratoreditor.pas"/>
+        <ComponentName Value="GeneratorEditor"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="IBGeneratorEditor"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="161"/>
+        <CursorPos X="42" Y="187"/>
+        <UsageCount Value="10"/>
+      </Unit83>
     </Units>
     <JumpHistory HistoryIndex="-1"/>
   </ProjectOptions>

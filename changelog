@@ -19,6 +19,9 @@ IBX Change Log  version (2.3-4 Build 11661) Thu, 11 Apr 2019 09:43:38 +0100
    been opened in SQL Dialect 3, then the ListField Name is converted to upper case
    if it then matches a field name. Otherwise, a Listfield not valid exception occurs.
 
+7. IBGeneratoreditor.pas: Add missing parenthesis around "IS" statement for compliance
+   with fpc 3.2.
+
 IBX Change Log  version (2.3-3 Build 11512) Fri, 28 Dec 2018 10:04:17 +0000
 
 
