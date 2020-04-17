@@ -5,10 +5,9 @@ object IBSQLEditFrame: TIBSQLEditFrame
   Width = 789
   ClientHeight = 585
   ClientWidth = 789
-  LCLVersion = '2.0.0.2'
   TabOrder = 0
-  DesignLeft = 1025
-  DesignTop = 371
+  DesignLeft = 793
+  DesignTop = 388
   inline SQLText: TSynEdit
     Left = 0
     Height = 559
@@ -534,7 +533,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     end
     object ToolButton3: TToolButton
       Left = 49
-      Height = 8
+      Height = 22
       Top = 2
       Caption = 'ToolButton3'
       Style = tbsSeparator
@@ -556,7 +555,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     end
     object ToolButton7: TToolButton
       Left = 126
-      Height = 8
+      Height = 22
       Top = 2
       Caption = 'ToolButton7'
       Style = tbsSeparator
@@ -1050,6 +1049,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BeforeOpen = UserTablesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -1075,6 +1075,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BeforeOpen = FieldNameListBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = UserTableSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -1116,6 +1117,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     Transaction = SQLTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = UserTableSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -1158,6 +1160,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BeforeOpen = UserProceduresBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -1183,6 +1186,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     Transaction = SQLTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = UserProcSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -1223,6 +1227,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     top = 400
   end
   object IdentifyStatementSQL: TIBSQL
+    CaseSensitiveParameterNames = False
     GenerateParamNames = False
     UniqueParamNames = False
     ParamCheck = True
@@ -1235,6 +1240,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     Transaction = SQLTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = UserProcSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -1307,6 +1313,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     Transaction = SQLTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = UserTableSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -1351,6 +1358,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     Transaction = SQLTransaction
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = UserTableSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -1398,6 +1406,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     BeforeClose = PackageNamesBeforeClose
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
