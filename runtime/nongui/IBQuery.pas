@@ -129,6 +129,8 @@ type
     property UpdateObject;
     property Filtered;
     property DataSetCloseAction;
+    property TZTextOption;
+    property DefaultTZDate;
 
     property BeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect;

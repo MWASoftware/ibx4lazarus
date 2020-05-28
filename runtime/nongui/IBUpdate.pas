@@ -60,7 +60,7 @@ type
 
 implementation
 
-uses variants, FmtBCD;
+uses variants, FmtBCD, DateUtils;
 
 type
 
@@ -73,6 +73,7 @@ type
       Value: variant;
       Modified: boolean;
       TimeZoneID: TFBTimeZoneID;
+      DataSet: TDataSet;
     end;
   private
     FDatabase: TIBDatabase;
@@ -99,6 +100,7 @@ type
   private
     FIndex: integer;
     FOwner: TParamListIntf;
+    function GetDataSet: TDataSet;
   public
     constructor Create(aOwner: TParamListIntf; aIndex: integer);
     function GetIndex: integer;
@@ -114,9 +116,13 @@ type
     function GetAsBoolean: boolean;
     function GetAsCurrency: Currency;
     function GetAsInt64: Int64;
-    function GetAsDateTime: TDateTime;
-    procedure GetAsDateTime(var aDateTime: TDateTime; var aTimezoneID: TFBTimeZoneID); overload;
-    procedure GetAsDateTime(var aDateTime: TDateTime; var aTimezone: AnsiString); overload;
+    function GetAsDateTime: TDateTime; overload;
+    procedure GetAsDateTime(var aDateTime: TDateTime; var dstOffset: smallint; var aTimezoneID: TFBTimeZoneID); overload;
+    procedure GetAsDateTime(var aDateTime: TDateTime; var dstOffset: smallint; var aTimezone: AnsiString); overload;
+    procedure GetAsTime(var aTime: TDateTime; var dstOffset: smallint; var aTimezoneID: TFBTimeZoneID; OnDate: TDateTime); overload;
+    procedure GetAsTime(var aTime: TDateTime; var dstOffset: smallint; var aTimezone: AnsiString; OnDate: TDateTime); overload;
+    procedure GetAsTime(var aTime: TDateTime; var dstOffset: smallint; var aTimezoneID: TFBTimeZoneID); overload;
+    procedure GetAsTime(var aTime: TDateTime; var dstOffset: smallint; var aTimezone: AnsiString); overload;
     function GetAsUTCDateTime: TDateTime;
     function GetAsDouble: Double;
     function GetAsFloat: Float;
@@ -130,6 +136,8 @@ type
     function GetAsBlob: IBlob;
     function GetAsArray: IArray;
     function GetAsBCD: tBCD;
+    function GetStatement: IStatement;
+    function GetTransaction: ITransaction;
     procedure Clear;
     function GetModified: boolean;
     procedure SetAsBoolean(AValue: boolean);
@@ -140,10 +148,12 @@ type
     procedure SetAsTime(aValue: TDateTime); overload;
     procedure SetAsTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID); overload;
     procedure SetAsTime(aValue: TDateTime; aTimeZone: AnsiString); overload;
+    procedure SetAsTime(aValue: TDateTime; OnDate: TDateTime; aTimeZoneID: TFBTimeZoneID); overload;
+    procedure SetAsTime(aValue: TDateTime; OnDate: TDateTime; aTimeZone: AnsiString); overload;
     procedure SetAsDateTime(aValue: TDateTime); overload;
     procedure SetAsDateTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID); overload;
     procedure SetAsDateTime(aValue: TDateTime; aTimeZone: AnsiString); overload;
-    procedure SetAsUTCDateTime(aUTCTime: TDateTime; aTimeZone: AnsiString);
+    procedure SetAsUTCDateTime(aUTCTime: TDateTime);
     procedure SetAsDouble(aValue: Double);
     procedure SetAsFloat(aValue: Float);
     procedure SetAsPointer(aValue: Pointer);
@@ -159,6 +169,11 @@ type
   end;
 
 { TParamIntf }
+
+function TParamIntf.GetDataSet: TDataSet;
+begin
+  Result := FOwner.FParams[FIndex].DataSet;
+end;
 
 constructor TParamIntf.Create(aOwner: TParamListIntf; aIndex: integer);
 begin
@@ -239,46 +254,112 @@ begin
 end;
 
 procedure TParamIntf.GetAsDateTime(var aDateTime: TDateTime;
-  var aTimezoneID: TFBTimeZoneID);
+  var dstOffset: smallint; var aTimezoneID: TFBTimeZoneID);
 begin
   with FOwner.FParams[FIndex] do
   if VarIsArray(Value) then
   begin
     aDateTime := Value[0];
-    if VarType(Value[1]) in [varSmallint, varInteger, varByte, varWord, varShortInt] then
-      aTimezoneID := Value[1]
+    dstOffset := Value[1];
+    if VarType(Value[2]) in [varSmallint, varInteger, varByte, varWord, varShortInt] then
+      aTimezoneID := Value[2]
     else
-      aTimeZoneID := FOwner.DataBase.attachment.getFirebirdAPI.TimeZoneName2TimeZoneID(Value[1]);
+      aTimeZoneID := FOwner.DataBase.attachment.GetTimeZoneServices.TimeZoneName2TimeZoneID(Value[2]);
   end
   else
   begin
     aDateTime := FOwner.FParams[FIndex].Value;
+    dstOffset := 0;
     aTimeZoneID := TimeZoneID_GMT;
   end;
 end;
 
 procedure TParamIntf.GetAsDateTime(var aDateTime: TDateTime;
-  var aTimezone: AnsiString);
+  var dstOffset: smallint; var aTimezone: AnsiString);
 begin
   with FOwner.FParams[FIndex] do
   if VarIsArray(Value) then
   begin
     aDateTime := Value[0];
-    if VarType(Value[1]) in [varSmallint, varInteger, varByte, varWord, varShortInt] then
-      aTimeZone := FOwner.DataBase.attachment.getFirebirdAPI.TimeZoneID2TimeZoneName(Value[1])
+    dstOffset := Value[1];
+    if VarType(Value[2]) in [varSmallint, varInteger, varByte, varWord, varShortInt] then
+      aTimeZone := FOwner.DataBase.attachment.GetTimeZoneServices.TimeZoneID2TimeZoneName(Value[2])
     else
-      aTimezone := Value[1];
+      aTimezone := Value[2];
   end
   else
   begin
     aDateTime := FOwner.FParams[FIndex].Value;
+    dstOffset := 0;
     aTimeZone := 'GMT';
   end;
 end;
 
+procedure TParamIntf.GetAsTime(var aTime: TDateTime; var dstOffset: smallint;
+  var aTimezoneID: TFBTimeZoneID; OnDate: TDateTime);
+var LocalTime: TDateTime;
+begin
+  with FOwner.FParams[FIndex] do
+  if VarIsArray(Value) then
+  begin
+    LocalTime := OnDate + TimeOf(Value[0]);
+    dstOffset := Value[1];
+    if VarType(Value[2]) in [varSmallint, varInteger, varByte, varWord, varShortInt] then
+      aTimezoneID := Value[2]
+    else
+      aTimeZoneID := FOwner.DataBase.attachment.GetTimeZoneServices.TimeZoneName2TimeZoneID(Value[2]);
+    aTime := TimeOf(FOwner.DataBase.attachment.GetTimeZoneServices.GMTToLocalTime(IncMinute(LocalTime,-dstOffset),aTimeZoneID))
+  end
+  else
+  begin
+    aTime := FOwner.FParams[FIndex].Value;
+    dstOffset := 0;
+    aTimeZoneID := TimeZoneID_GMT;
+  end;
+end;
+
+procedure TParamIntf.GetAsTime(var aTime: TDateTime; var dstOffset: smallint;
+  var aTimezone: AnsiString; OnDate: TDateTime);
+var LocalTime: TDateTime;
+begin
+  with FOwner.FParams[FIndex] do
+  if VarIsArray(Value) then
+  begin
+    LocalTime := OnDate + TimeOf(Value[0]);
+    dstOffset := Value[1];
+    if VarType(Value[2]) in [varSmallint, varInteger, varByte, varWord, varShortInt] then
+      aTimeZone := FOwner.DataBase.attachment.GetTimeZoneServices.TimeZoneID2TimeZoneName(Value[2])
+    else
+      aTimezone := Value[2];
+    aTime := TimeOf(FOwner.DataBase.attachment.GetTimeZoneServices.GMTToLocalTime(IncMinute(LocalTime,-dstOffset),aTimeZone))
+  end
+  else
+  begin
+    aTime := FOwner.FParams[FIndex].Value;
+    dstOffset := 0;
+    aTimeZone := 'GMT';
+  end;
+end;
+
+procedure TParamIntf.GetAsTime(var aTime: TDateTime; var dstOffset: smallint;
+  var aTimezoneID: TFBTimeZoneID);
+begin
+  GetAsTime(aTime,dstOffset,aTimeZoneID,(GetDataSet as TIBCustomDataSet).DefaultTZDate);
+end;
+
+procedure TParamIntf.GetAsTime(var aTime: TDateTime; var dstOffset: smallint;
+  var aTimezone: AnsiString);
+begin
+  GetAsTime(aTime,dstOffset,aTimeZone,(GetDataSet as TIBCustomDataSet).DefaultTZDate);
+end;
+
 function TParamIntf.GetAsUTCDateTime: TDateTime;
 begin
-  IBError(ibxeNotSupported,[]);
+  with FOwner.FParams[FIndex] do
+  if VarIsArray(Value) then
+    Result := IncMinute(Value[0],-Value[1])
+  else
+    Result := FOwner.FParams[FIndex].Value;
 end;
 
 function TParamIntf.GetAsDouble: Double;
@@ -375,6 +456,16 @@ begin
   Result := VarToBCD(FOwner.FParams[FIndex].Value);
 end;
 
+function TParamIntf.GetStatement: IStatement;
+begin
+  IBError(ibxeNotSupported,[]);
+end;
+
+function TParamIntf.GetTransaction: ITransaction;
+begin
+  IBError(ibxeNotSupported,[]);
+end;
+
 procedure TParamIntf.Clear;
 begin
   FOwner.SetParam(FIndex,NULL);
@@ -417,13 +508,30 @@ end;
 
 procedure TParamIntf.SetAsTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID);
 begin
-  FOwner.SetParam(FIndex,AValue);
-  FOwner.SetTimeZoneID(FIndex,aTimeZoneID);
+  SetAsTime(aValue,(GetDataSet as TIBCustomDataSet).DefaultTZDate,aTimeZoneID);
 end;
 
 procedure TParamIntf.SetAsTime(aValue: TDateTime; aTimeZone: AnsiString);
 begin
-  FOwner.SetParam(FIndex,VarArrayOf([aValue,aTimeZone]));
+  SetAsTime(aValue,(GetDataSet as TIBCustomDataSet).DefaultTZDate,aTimeZone);
+end;
+
+procedure TParamIntf.SetAsTime(aValue: TDateTime; OnDate: TDateTime;
+  aTimeZoneID: TFBTimeZoneID);
+var dstOffset: smallint;
+begin
+  aValue := TimeOf(aValue);
+  dstOffset := FOwner.Database.Attachment.GetTimeZoneServices.GetEffectiveOffsetMins(OnDate + aValue,aTimeZoneID);
+  FOwner.SetParam(FIndex,VarArrayOf([aValue,dstOffset,aTimeZoneID]));
+end;
+
+procedure TParamIntf.SetAsTime(aValue: TDateTime; OnDate: TDateTime;
+  aTimeZone: AnsiString);
+var dstOffset: smallint;
+begin
+  aValue := TimeOf(aValue);
+  dstOffset := FOwner.Database.Attachment.GetTimeZoneServices.GetEffectiveOffsetMins(OnDate + aValue,aTimeZone);
+  FOwner.SetParam(FIndex,VarArrayOf([aValue,dstOffset,aTimeZone]));
 end;
 
 procedure TParamIntf.SetAsDateTime(aValue: TDateTime);
@@ -433,18 +541,26 @@ end;
 
 procedure TParamIntf.SetAsDateTime(aValue: TDateTime; aTimeZoneID: TFBTimeZoneID
   );
+var dstOffset: smallint;
 begin
-  with FOwner.DataBase.attachment.getFirebirdAPI do
-    FOwner.SetParam(FIndex,VarArrayOf([aValue,TimeZoneID2TimeZoneName(aTimeZoneID)]));
+  with FOwner.DataBase.attachment.GetTimeZoneServices do
+  begin
+    dstOffset := GetEffectiveOffsetMins(aValue,aTimeZoneID);
+    FOwner.SetParam(FIndex,VarArrayOf([aValue,aTimeZoneID]));
+  end;
 end;
 
 procedure TParamIntf.SetAsDateTime(aValue: TDateTime; aTimeZone: AnsiString);
+var dstOffset: smallint;
 begin
-  FOwner.SetParam(FIndex,VarArrayOf([aValue,aTimeZone]));
+  with FOwner.DataBase.attachment.GetTimeZoneServices do
+  begin
+    dstOffset := GetEffectiveOffsetMins(aValue,aTimeZone);
+    FOwner.SetParam(FIndex,VarArrayOf([aValue,aTimeZone]));
+  end;
 end;
 
-procedure TParamIntf.SetAsUTCDateTime(aUTCTime: TDateTime; aTimeZone: AnsiString
-  );
+procedure TParamIntf.SetAsUTCDateTime(aUTCTime: TDateTime);
 begin
   IBError(ibxeNotSupported,[]);
 end;
@@ -546,10 +662,12 @@ begin
     FParams[j].Name := aFields[i].FieldName;
     FParams[j].Value := NULL;
     FParams[j].Modified := false;
+    FParams[j].DataSet := aFields[i].DataSet;
     Inc(j);
     FParams[j].Name := 'OLD_' + aFields[i].FieldName;
     FParams[j].Value := NULL;
     FParams[j].Modified := false;
+    FParams[j].DataSet := aFields[i].DataSet;
     Inc(j);
   end;
   SetLength(FParams,j);

@@ -240,7 +240,7 @@ const
     (SqlType : blr_bool; TypeName : 'BOOLEAN'),
     (SqlType : blr_dec64; TypeName : 'DECFLOAT'),
     (SqlType : blr_dec128; TypeName : 'DECFLOAT'),
-    (SqlType : blr_dec_fixed; TypeName : 'NUMERIC'),
+    (SqlType : blr_int128; TypeName : 'NUMERIC'),
     (SqlType : blr_sql_time_tz; TypeName : 'TIME WITH TIME ZONE'),
     (SqlType : blr_timestamp_tz; TypeName : 'TIMESTAMP WITH TIME ZONE')
     );
@@ -3711,7 +3711,7 @@ begin
         blr_short,
         blr_long,
         blr_int64,
-        blr_dec_fixed: {numeric types}
+        blr_int128: {numeric types}
           begin
             if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION10 then
             begin

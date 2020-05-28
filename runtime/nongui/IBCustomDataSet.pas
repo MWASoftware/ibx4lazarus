@@ -243,7 +243,12 @@ type
      property CodePage: TSystemCodePage read FFCodePage write FFCodePage;
    end;
 
-   TIBTimeZoneFormat = (tfOffsetFromGMT, tfTimeZoneNameIfKnown);
+   PIBBufferedDateTimeWithTimeZone = ^TIBBufferedDateTimeWithTimeZone;
+   TIBBufferedDateTimeWithTimeZone = packed record
+     Timestamp: TDateTime;
+     dstOffset: smallint;
+     TimeZoneID: ISC_USHORT;
+   end;
 
    { TIBDateTimeField }
 
@@ -257,14 +262,13 @@ type
    TIBDateTimeField = class(TTimeField)
    private
      FHasTimeZone: boolean;
-     FTimeZoneFormat: TIBTimeZoneFormat;
-     function GetFirebirdAPI: IFirebirdAPI;
+     FTimeZoneServices: ITimeZoneServices;
+     function GetTimeZoneServices: ITimeZoneServices;
+     function GetDateTimeBuffer(var aBuffer: TIBBufferedDateTimeWithTimeZone): boolean;
      function GetTimeZoneID: TFBTimeZoneID;
-     function GetTimeZoneName: string; overload;
+     function GetTimeZoneName: string;
      procedure SetTimeZoneID(aValue: TFBTimeZoneID);
      procedure SetTimeZoneName(AValue: string);
-     function GetTimeZoneName(aDateTime: TDateTime; aTimeZoneID: TFBTimeZoneID
-       ): string; overload;
    protected
      procedure Bind(Binding: Boolean); override;
      function GetAsDateTime: TDateTime; override;
@@ -276,8 +280,10 @@ type
      procedure SetVarValue(const AValue: Variant); override;
    public
      constructor Create(AOwner: TComponent); override;
-     function GetAsDateTimeTZ(var aDateTime: TDateTime; var aTimeZoneID: TFBTimeZoneID): boolean; overload;
-     function GetAsDateTimeTZ(var aDateTime: TDateTime; var aTimeZone: string): boolean; overload;
+     function GetAsDateTimeTZ(var aDateTime: TDateTime; var dstOffset: smallint;
+                              var aTimeZoneID: TFBTimeZoneID): boolean; overload;
+     function GetAsDateTimeTZ(var aDateTime: TDateTime; var dstOffset: smallint;
+                              var aTimeZone: string): boolean; overload;
      function GetAsUTCDateTime: TDateTime;
      procedure SetAsDateTimeTZ(aDateTime: TDateTime; aTimeZoneID: TFBTimeZoneID); overload;
      procedure SetAsDateTimeTZ(aDateTime: TDateTime; aTimeZone: string); overload;
@@ -285,8 +291,6 @@ type
      property TimeZoneID: TFBTimeZoneID read GetTimeZoneID;
    published
      property HasTimeZone: boolean read FHasTimeZone;
-     property TimeZoneFormat: TIBTimeZoneFormat read FTimeZoneFormat
-                                            write FTimeZoneFormat Default tfTimeZoneNameIfKnown;
    end;
 
    { TIBTimeField }
@@ -382,12 +386,6 @@ type
 
   TOnDeleteReturning = procedure (Sender: TObject; QryResults: IResults) of object;
 
-  PIBBufferedDateTimeWithTimeZone = ^TIBBufferedDateTimeWithTimeZone;
-  TIBBufferedDateTimeWithTimeZone = packed record
-    Timestamp: TDateTime;
-    TimeZoneID: ISC_USHORT;
-  end;
-
   { TIBCustomDataSet }
 
   TIBCustomDataSet = class(TDataset)
@@ -459,6 +457,7 @@ type
     FArrayCacheOffset: integer;
     FAutoCommit: TIBAutoCommit;
     FCaseSensitiveParameterNames: boolean;
+    FDefaultTZDate: TDateTime;
     FEnableStatistics: boolean;
     FGenerateParamNames: Boolean;
     FGeneratorField: TIBGenerator;
@@ -500,6 +499,7 @@ type
     FRecordCount: Integer;
     FRecordSize: Integer;
     FDataSetCloseAction: TDataSetCloseAction;
+    FTZTextOption: TTZTextOptions;
     FUniDirectional: Boolean;
     FUpdateMode: TUpdateMode;
     FUpdateObject: TIBDataSetUpdateObject;
@@ -535,6 +535,7 @@ type
     procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
     function GetSelectStmtIntf: IStatement;
     procedure SetCaseSensitiveParameterNames(AValue: boolean);
+    procedure SetDefaultTZDate(AValue: TDateTime);
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
 
@@ -710,6 +711,8 @@ type
     property QModify: TIBSQL read FQModify;
     property StatementType: TIBSQLStatementTypes read GetStatementType;
     property SelectStmtHandle: IStatement read GetSelectStmtIntf;
+    property Parser: TSelectSQLParser read GetParser;
+    property BaseSQLSelect: TStrings read FBaseSQLSelect;
 
     {Likely to be made published by descendant classes}
     property CaseSensitiveParameterNames: boolean read FCaseSensitiveParameterNames
@@ -725,8 +728,7 @@ type
     property ModifySQL: TStrings read GetModifySQL write SetModifySQL;
     property UpdateMode: TUpdateMode read FUpdateMode write SetUpdateMode default upWhereAll;
     property ParamCheck: Boolean read FParamCheck write FParamCheck default True;
-    property Parser: TSelectSQLParser read GetParser;
-    property BaseSQLSelect: TStrings read FBaseSQLSelect;
+    property TZTextOption: TTZTextOptions read FTZTextOption write FTZTextOption;
 
     property BeforeDatabaseDisconnect: TNotifyEvent read FBeforeDatabaseDisconnect
                                                  write FBeforeDatabaseDisconnect;
@@ -788,6 +790,7 @@ type
     property MasterDetailDelay: integer read GetMasterDetailDelay write SetMasterDetailDelay;
     property DataSetCloseAction: TDataSetCloseAction
                read FDataSetCloseAction write FDataSetCloseAction;
+    property DefaultTZDate: TDateTime read FDefaultTZDate write SetDefaultTZDate;
 
   public
     {Performance Statistics}
@@ -892,6 +895,8 @@ type
     property UniDirectional;
     property Filtered;
     property DataSetCloseAction;
+    property TZTextOption;
+    property DefaultTZDate;
 
     property BeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect;
@@ -1034,7 +1039,7 @@ const
 
 implementation
 
-uses Variants, FmtBCD, LazUTF8, IBMessages, IBQuery;
+uses Variants, FmtBCD, LazUTF8, IBMessages, IBQuery, DateUtils;
 
 type
 
@@ -1099,59 +1104,55 @@ type
 { TIBDateTimeField }
 
 function TIBDateTimeField.GetTimeZoneName: string;
-var aDateTime: TDateTime;
+var aBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if not GetAsDateTimeTZ(aDateTime,Result) then
+  if GetDateTimeBuffer(aBuffer) then
+    Result := GetTimeZoneServices.TimeZoneID2TimeZoneName(aBuffer.TimeZoneID)
+  else
     Result := '';
 end;
 
-function TIBDateTimeField.GetFirebirdAPI: IFirebirdAPI;
+function TIBDateTimeField.GetTimeZoneServices: ITimeZoneServices;
 begin
-  if (DataSet <> nil) and ((DataSet as TIBCustomDataSet).Database <> nil)
+  if (FTimeZoneServices = nil) and
+     (DataSet <> nil) and ((DataSet as TIBCustomDataSet).Database <> nil)
       and ((DataSet as TIBCustomDataSet).Database.attachment <> nil) then
-    Result := (DataSet as TIBCustomDataSet).Database.attachment.getFirebirdAPI
-  else
-    Result := FirebirdAPI; {use the default if not dataset available}
+    FTimeZoneServices := (DataSet as TIBCustomDataSet).Database.attachment.GetTimeZoneServices;
+  Result := FTimeZoneServices;
+end;
+
+function TIBDateTimeField.GetDateTimeBuffer(
+  var aBuffer: TIBBufferedDateTimeWithTimeZone): boolean;
+begin
+  Result := HasTimeZone;
+  if Result then
+    Result := GetData(@aBuffer,False);
 end;
 
 function TIBDateTimeField.GetTimeZoneID: TFBTimeZoneID;
-var aDateTime: TDateTime;
+var aBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if not GetAsDateTimeTZ(aDateTime,Result) then
+  if GetDateTimeBuffer(aBuffer) then
+    Result := aBuffer.TimeZoneID
+  else
     Result := TimeZoneID_GMT;
 end;
 
 procedure TIBDateTimeField.SetTimeZoneID(aValue: TFBTimeZoneID);
-var aDateTime: TDateTime;
-    aTimeZoneID: TFBTimeZoneID;
+var aBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if HasTimeZone then
-  begin
-    if not GetAsDateTimeTZ(aDateTime,aTimeZoneID) then
-      aDateTime := 0;
-    SetAsDateTimeTZ(aDateTime,aValue)
-  end;
+  if GetDateTimeBuffer(aBuffer) then
+    SetAsDateTimeTZ(aBuffer.Timestamp,aValue)
 end;
 
 procedure TIBDateTimeField.SetTimeZoneName(AValue: string);
+var aBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
   if HasTimeZone then
-    SetTimeZoneID(GetFirebirdAPI.TimeZoneName2TimeZoneID(AValue));
-end;
-
-function TIBDateTimeField.GetTimeZoneName(aDateTime: TDateTime; aTimeZoneID: TFBTimeZoneID): string;
-begin
-  if aTimeZoneID < MaxOffsetTimeZoneID then
-    Result := FormatTimeZoneOffset(aTimeZoneID - TimeZoneDisplaymentDelta)
-  else
-  with GetFirebirdAPI do
-  if TimeZoneFormat = tfTimeZoneNameIfKnown then
-    Result := TimeZoneID2TimeZoneName(aTimeZoneID)
-  else
-  {Need to determine whether daylight savings time in use for date/timezone
-   and then format time displayment.}
-    Result := FormatTimeZoneOffset(
-                     GetEffectiveOffsetMins(aDateTime,TimeZoneID2TimeZoneName(aTimeZoneID)));
+  begin
+    if GetDateTimeBuffer(aBuffer) then
+      SetAsDateTimeTZ(aBuffer.Timestamp,aValue)
+  end;
 end;
 
 procedure TIBDateTimeField.Bind(Binding: Boolean);
@@ -1166,26 +1167,20 @@ begin
 end;
 
 function TIBDateTimeField.GetAsDateTime: TDateTime;
-var aTimeZoneID: TFBTimeZoneID;
+var aBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if not GetAsDateTimeTZ(Result,aTimeZoneID) then
+  if GetDateTimeBuffer(aBuffer) then
+    Result := aBuffer.Timestamp
+  else
     Result := 0;
 end;
 
 function TIBDateTimeField.GetAsVariant: variant;
-var aDateTime: TDateTime;
-    aTimeZone: string;
+var aBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if HasTimeZone then
-  begin
-    if GetAsDateTimeTZ(aDateTime,aTimeZone) then
-      Result := VarArrayOf([aDateTime,aTimeZone])
-    else
-    begin
-      aDateTime := 0;
-      Result := aDateTime;
-    end;
-  end
+  if GetDateTimeBuffer(aBuffer) then
+    with aBuffer do
+      Result := VarArrayOf([Timestamp,dstOffset,TimeZoneID])
   else
     Result := inherited GetAsVariant;
 end;
@@ -1199,15 +1194,10 @@ begin
 end;
 
 procedure TIBDateTimeField.GetText(var theText: string; ADisplayText: Boolean);
-var aDateTime: TDateTime;
-    aTimeZone: string;
+var aBuffer: TIBBufferedDateTimeWithTimeZone;
     F: string;
 begin
-  if HasTimeZone then
-  begin
-    if not GetAsDateTimeTZ(aDateTime,aTimeZone) then
-      TheText := ''
-    else
+  if GetDateTimeBuffer(aBuffer) and (DataSet <> nil) then
     {$if declared(DefaultFormatSettings)}
     with DefaultFormatSettings do
     {$else}
@@ -1215,17 +1205,25 @@ begin
     with FormatSettings do
     {$ifend}
     {$ifend}
-    begin
-      if ADisplayText and (Length(DisplayFormat) <> 0) then
-        F := DisplayFormat
+  begin
+    if ADisplayText and (Length(DisplayFormat) <> 0) then
+      F := DisplayFormat
+    else
+      Case DataType of
+       ftTime : F := LongTimeFormat;
+       ftDate : F := ShortDateFormat;
       else
-        Case DataType of
-         ftTime : F := LongTimeFormat;
-         ftDate : F := ShortDateFormat;
-        else
-         F := ShortDateFormat + ' ' + LongTimeFormat;
-        end;
-      TheText := FBFormatDateTime(F,aDateTime) + ' ' + aTimeZone
+       F := ShortDateFormat + ' ' + LongTimeFormat;
+      end;
+
+    with aBuffer do
+    case (DataSet as TIBCustomDataSet).TZTextOption of
+    tzOffset:
+      TheText := FBFormatDateTime(F,timestamp) + ' ' + FormatTimeZoneOffset(dstOffset);
+    tzGMT:
+      TheText := FBFormatDateTime(F,IncMinute(Timestamp,-dstOffset));
+    tzOriginalID:
+      TheText := FBFormatDateTime(F,timestamp) + ' ' + GetTimeZoneServices.TimeZoneID2TimeZoneName(TimeZoneID);
     end;
   end
   else
@@ -1233,15 +1231,10 @@ begin
 end;
 
 procedure TIBDateTimeField.SetAsDateTime(AValue: TDateTime);
-var aDateTime: TDateTime;
-    aTimeZoneID: TFBTimeZoneID;
+var aBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if HasTimeZone then
-  begin
-    if not GetAsDateTimeTZ(aDateTime,aTimeZoneID) then
-      aTimeZoneID := TimeZoneID_GMT;
-    SetAsDateTimeTZ(AValue,aTimeZoneID)
-  end
+  if GetDateTimeBuffer(aBuffer) then
+    SetAsDateTimeTZ(AValue,aBuffer.TimeZoneID)
   else
     inherited SetAsDateTime(AValue)
 end;
@@ -1267,7 +1260,7 @@ end;
 procedure TIBDateTimeField.SetVarValue(const AValue: Variant);
 begin
   if HasTimeZone and VarIsArray(AValue) then
-    SetAsDateTimeTZ(AValue[0],string(AValue[1]))
+    SetAsDateTimeTZ(AValue[0],string(AValue[2]))
   else
     inherited SetVarValue(AValue);
 end;
@@ -1276,45 +1269,35 @@ constructor TIBDateTimeField.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   SetDataType(ftDateTime);
-  FTimeZoneFormat := tfTimeZoneNameIfKnown;
 end;
 
 function TIBDateTimeField.GetAsDateTimeTZ(var aDateTime: TDateTime;
-  var aTimeZoneID: TFBTimeZoneID): boolean;
-var DateTimeBuffer: TIBBufferedDateTimeWithTimeZone;
+  var dstOffset: smallint; var aTimeZoneID: TFBTimeZoneID): boolean;
+var aBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if HasTimeZone then
+  Result := GetDateTimeBuffer(aBuffer);
+  if Result then
   begin
-    Result := GetData(@DateTimeBuffer,False);
-    if Result then
-    begin
-      aDateTime := DateTimeBuffer.Timestamp;
-      aTimeZoneID := DateTimeBuffer.TimeZoneID;
-    end;
-  end
-  else
-  begin
-    aDateTime := inherited GetAsDateTime;
-    aTimeZoneID := TimeZoneID_GMT;
-    Result := true;
+    aDateTime := aBuffer.Timestamp;
+    dstOffset := aBuffer.dstOffset;
+    aTimeZoneID := aBuffer.TimeZoneID;
   end;
 end;
 
 function TIBDateTimeField.GetAsDateTimeTZ(var aDateTime: TDateTime;
-  var aTimeZone: string): boolean;
+  var dstOffset: smallint; var aTimeZone: string): boolean;
 var aTimeZoneID: TFBTimeZoneID;
 begin
-  Result := GetAsDateTimeTZ(aDateTime,aTimeZoneID);
+  Result := GetAsDateTimeTZ(aDateTime,dstOffset,aTimeZoneID);
   if Result then
-    aTimeZone := GetTimeZoneName(aDateTime,aTimeZoneID);
+    aTimeZone := GetTimeZoneServices.TimeZoneID2TimeZoneName(aTimeZoneID);
 end;
 
 function TIBDateTimeField.GetAsUTCDateTime: TDateTime;
-var aDateTime: TDateTime;
-    aTimeZone: string;
+var aBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if GetAsDateTimeTZ(aDateTime,aTimeZone) then
-    Result := GetFirebirdAPI.LocalTimeToUTCTime(aDateTime,aTimeZone)
+  if GetDateTimeBuffer(aBuffer) then
+    Result := IncMinute(aBuffer.timestamp,-aBuffer.dstOffset)
   else
     Result := 0;
 end;
@@ -1326,6 +1309,7 @@ begin
   if HasTimeZone then
   begin
     DateTimeBuffer.Timestamp := aDateTime;
+    DateTimeBuffer.dstOffset := GetTimeZoneServices.GetEffectiveOffsetMins(aDateTime,aTimeZoneID);
     DateTimeBuffer.TimeZoneID := aTimeZoneID;
     SetData(@DateTimeBuffer,False);
   end
@@ -1336,7 +1320,7 @@ end;
 procedure TIBDateTimeField.SetAsDateTimeTZ(aDateTime: TDateTime;
   aTimeZone: string);
 begin
-  SetAsDateTimeTZ(aDateTime,GetFirebirdAPI.TimeZoneName2TimeZoneID(aTimeZone));
+  SetAsDateTimeTZ(aDateTime,GetTimeZoneServices.TimeZoneName2TimeZoneID(aTimeZone));
 end;
 
 { TIBTimeField }
@@ -1893,6 +1877,8 @@ begin
     if AOwner is TIBTransaction then
       Transaction := TIBTransaction(AOwner);
   FBaseSQLSelect := TStringList.Create;
+  FTZTextOption := tzOffset;
+  FDefaultTZDate := EncodeDate(2020,1,1);
 end;
 
 destructor TIBCustomDataSet.Destroy;
@@ -2491,8 +2477,9 @@ begin
           fdCodePage := colMetadata.getCodePage;
         SQL_DEC16,
         SQL_DEC34,
-        SQL_DEC_FIXED:
-          fdDataSize := colMetadata.GetSize;
+        SQL_DEC_FIXED,
+        SQL_INT128:
+          fdDataSize := sizeof(tBCD);
         end;
         fdDataOfs := FRecordSize;
         Inc(FRecordSize, fdDataSize);
@@ -2531,6 +2518,7 @@ var
   LocalBool: wordBool;
   LocalInt64: Int64;
   LocalCurrency: Currency;
+  LocalBCD: tBCD;
   ColData: ISQLData;
   LocalTimeWithTimeZone: TIBBufferedDateTimeWithTimeZone;
 begin
@@ -2555,7 +2543,8 @@ begin
         SQL_TIME_TZ,
         SQL_TIME_TZ_EX:
         begin
-          ColData.GetAsDateTime(LocalTimeWithTimeZone.Timestamp, LocalTimeWithTimeZone.TimeZoneID);
+          with LocalTimeWithTimeZone do
+            ColData.GetAsTime(Timestamp, dstOffset,TimeZoneID, DefaultTZDate);
           LocalData := PByte(@LocalTimeWithTimeZone);
         end;
         SQL_SHORT, SQL_LONG:
@@ -2605,6 +2594,14 @@ begin
         begin
           LocalBool := ColData.AsBoolean;
           LocalData := PByte(@LocalBool);
+        end;
+        SQL_DEC16,
+        SQL_DEC34,
+        SQL_DEC_FIXED,
+        SQL_INT128:
+        begin
+          LocalBCD := ColData.GetAsBCD;
+          LocalData := PByte(@LocalBCD);
         end;
       end;
 
@@ -3304,13 +3301,14 @@ begin
             SQL_TIME_TZ_EX,
             SQL_TIME_TZ:
               with PIBBufferedDateTimeWithTimeZone(data)^ do
-                Param.SetAsTime(Timestamp,TimeZoneID);
+                Param.SetAsTime(Timestamp,DefaultTZDate,TimeZoneID);
             SQL_BOOLEAN:
               Param.AsBoolean := PWordBool(data)^;
             SQL_DEC16,
             SQL_DEC34,
-            SQL_DEC_FIXED:
-              Param.AsBCD := Database.attachment.getFirebirdAPI.SQLDecFloatDecode(fdDataType,data);
+            SQL_DEC_FIXED,
+            SQL_INT128:
+              Param.AsBCD := pBCD(data)^;
             else
               IBError(ibxeUnknownSQLType,[fdDataType]);
           end;
@@ -3989,14 +3987,7 @@ begin
             IBError(ibxeFieldSizeError,[Field.FieldName])
         end
         else
-        case fdDataType of
-        SQL_DEC16,
-        SQL_DEC34,
-        SQL_DEC_FIXED:
-          pBCD(Buffer)^ := Database.attachment.getFirebirdAPI.SQLDecFloatDecode(fdDataType,Data);
-        else
           Move(Data^, Buffer^, Field.DataSize);
-        end;
       end;
   end;
 end;
@@ -4595,11 +4586,12 @@ begin
             FieldSize := 4; {For conversions from currency type}
           end;
 
-          SQL_DEC_FIXED:
+          SQL_DEC_FIXED,
+          SQL_INT128:
           begin
             FieldType := ftFmtBCD;
-            FieldPrecision := 34;
-            FieldSize := -getScale;
+            FieldPrecision := 38;
+            FieldSize := -getScale; {For conversions from currency type}
           end;
 
           else
@@ -4726,7 +4718,7 @@ begin
           ftTime:
             if (cur_field is TIBDateTimeField) and TIBDateTimeField(cur_field).HasTimeZone
               and (cur_param.GetSQLType = SQL_TIME_TZ) then
-              cur_param.SetAsDateTime(cur_Field.asDateTime,TIBDateTimeField(cur_field).TimeZoneID)
+              cur_param.SetAsTime(cur_Field.asDateTime,DefaultTZDate,TIBDateTimeField(cur_field).TimeZoneID)
             else
               cur_param.AsTime := cur_field.AsDateTime;
           ftDateTime:
@@ -5040,14 +5032,7 @@ begin
           fdIsNull := True
         else
         begin
-          case fdDataType of
-          SQL_DEC16,
-          SQL_DEC34,
-          SQL_DEC_FIXED:
-            Database.attachment.getFirebirdAPI.SQLDecFloatEncode(pBCD(Buffer)^,fdDataType,PByte(Buff + fdDataOfs));
-          else
-            Move(Buffer^, Buff[fdDataOfs],fdDataSize);
-          end;
+          Move(Buffer^, Buff[fdDataOfs],fdDataSize);
           if (fdDataType = SQL_TEXT) or (fdDataType = SQL_VARYING) then
             fdDataLength := StrLen(PChar(Buffer));
           fdIsNull := False;
@@ -5197,6 +5182,11 @@ begin
   FCaseSensitiveParameterNames := AValue;
   if assigned(FQSelect) then
     FQSelect.CaseSensitiveParameterNames := AValue;
+end;
+
+procedure TIBCustomDataSet.SetDefaultTZDate(AValue: TDateTime);
+begin
+  FDefaultTZDate := DateOf(AValue);
 end;
 
 procedure TIBCustomDataSet.SetMasterDetailDelay(AValue: integer);
