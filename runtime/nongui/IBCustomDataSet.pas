@@ -2512,20 +2512,14 @@ procedure TIBCustomDataSet.ColumnDataToBuffer(QryResults: IResults;
                ColumnIndex, FieldIndex: integer; Buffer: PChar);
 var
   LocalData: PByte;
-  LocalDate: TDateTime;
-  LocalDouble: Double;
-  LocalInt: Integer;
-  LocalBool: wordBool;
-  LocalInt64: Int64;
-  LocalCurrency: Currency;
-  LocalBCD: tBCD;
+  BufPtr: PByte;
   ColData: ISQLData;
-  LocalTimeWithTimeZone: TIBBufferedDateTimeWithTimeZone;
 begin
   LocalData := nil;
   with PRecordData(Buffer)^.rdFields[FieldIndex], FFieldColumns^[FieldIndex] do
   begin
     QryResults.GetData(ColumnIndex,fdIsNull,fdDataLength,LocalData);
+    BufPtr := PByte(Buffer + fdDataOfs);
     if not fdIsNull then
     begin
       ColData := QryResults[ColumnIndex];
@@ -2533,88 +2527,69 @@ begin
         SQL_TYPE_DATE,
         SQL_TYPE_TIME,
         SQL_TIMESTAMP:
-        begin
           {This is an IBX native format and not the TDataset approach. See also GetFieldData}
-          LocalDate := ColData.AsDateTime;
-          LocalData := PByte(@LocalDate);
-        end;
+          PDateTime(BufPtr)^ := ColData.AsDateTime;
+
         SQL_TIMESTAMP_TZ,
-        SQL_TIMESTAMP_TZ_EX,
+        SQL_TIMESTAMP_TZ_EX:
+        begin
+          with PIBBufferedDateTimeWithTimeZone(Bufptr)^ do
+            ColData.GetAsDateTime(Timestamp,dstOffset,TimeZoneID);
+        end;
+
         SQL_TIME_TZ,
         SQL_TIME_TZ_EX:
         begin
-          with LocalTimeWithTimeZone do
+          with PIBBufferedDateTimeWithTimeZone(Bufptr)^ do
             ColData.GetAsTime(Timestamp, dstOffset,TimeZoneID, DefaultTZDate);
-          LocalData := PByte(@LocalTimeWithTimeZone);
         end;
         SQL_SHORT, SQL_LONG:
         begin
           if (fdDataScale = 0) then
-          begin
-            LocalInt := ColData.AsLong;
-            LocalData := PByte(@LocalInt);
-          end
+            PInteger(BufPtr)^ := ColData.AsLong
           else
           if (fdDataScale >= (-4)) then
-          begin
-            LocalCurrency := ColData.AsCurrency;
-            LocalData := PByte(@LocalCurrency);
-          end
+            PCurrency(BufPtr)^ := ColData.AsCurrency
           else
-          begin
-           LocalDouble := ColData.AsDouble;
-           LocalData := PByte(@LocalDouble);
-          end;
+           PDouble(BufPtr)^ := ColData.AsDouble;
         end;
         SQL_INT64:
         begin
           if (fdDataScale = 0) then
-          begin
-            LocalInt64 := ColData.AsInt64;
-            LocalData := PByte(@LocalInt64);
-          end
+            PInt64(BufPtr)^ := ColData.AsInt64
           else
           if (fdDataScale >= (-4)) then
-          begin
-            LocalCurrency := ColData.AsCurrency;
-            LocalData := PByte(@LocalCurrency);
-            end
-            else
-            begin
-              LocalDouble := ColData.AsDouble;
-              LocalData := PByte(@LocalDouble);
-            end
+            PCurrency(BufPtr)^ := ColData.AsCurrency
+          else
+            PDouble(BufPtr)^ := ColData.AsDouble;
         end;
+
         SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
-        begin
-          LocalDouble := ColData.AsDouble;
-          LocalData := PByte(@LocalDouble);
-        end;
+          PDouble(BufPtr)^ := ColData.AsDouble;
+
         SQL_BOOLEAN:
-        begin
-          LocalBool := ColData.AsBoolean;
-          LocalData := PByte(@LocalBool);
-        end;
+          PBoolean(BufPtr)^ := ColData.AsBoolean;
+
         SQL_DEC16,
         SQL_DEC34,
         SQL_DEC_FIXED,
         SQL_INT128:
-        begin
-          LocalBCD := ColData.GetAsBCD;
-          LocalData := PByte(@LocalBCD);
-        end;
-      end;
+          pBCD(BufPtr)^ := ColData.GetAsBCD;
 
-      if fdDataType = SQL_VARYING then
-        Move(LocalData^, Buffer[fdDataOfs], fdDataLength)
       else
-        Move(LocalData^, Buffer[fdDataOfs], fdDataSize)
+        begin
+          if fdDataType = SQL_VARYING then
+            Move(LocalData^, BufPtr^, fdDataLength)
+          else
+            Move(LocalData^, BufPtr^, fdDataSize)
+        end;
+      end; {case}
     end
     else {Null column}
     if fdDataType = SQL_VARYING then
-      FillChar(Buffer[fdDataOfs],fdDataLength,0)
+      FillChar(BufPtr^,fdDataLength,0)
     else
-      FillChar(Buffer[fdDataOfs],fdDataSize,0);
+      FillChar(BufPtr^,fdDataSize,0);
   end;
 end;
 
