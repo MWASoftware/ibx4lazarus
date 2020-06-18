@@ -3,14 +3,14 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="73">
+    <Units Count="74">
       <Unit0>
         <Filename Value="testsuite.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <WindowIndex Value="1"/>
-        <CursorPos X="33" Y="13"/>
+        <TopLine Value="2"/>
+        <CursorPos X="18" Y="14"/>
         <UsageCount Value="55"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -32,13 +32,10 @@
       </Unit2>
       <Unit3>
         <Filename Value="TestApplication.pas"/>
-        <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="40"/>
         <CursorPos X="14" Y="46"/>
         <UsageCount Value="55"/>
-        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="Test02.pas"/>
@@ -538,121 +535,35 @@
       </Unit71>
       <Unit72>
         <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
+        <EditorIndex Value="-1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="41"/>
         <CursorPos X="15" Y="36"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit72>
+      <Unit73>
+        <Filename Value="testApp/TestApplication.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="20"/>
+      </Unit73>
     </Units>
-    <General>
-      <ActiveWindowIndexAtStart Value="1"/>
-    </General>
-    <JumpHistory Count="26" HistoryIndex="25">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
-        <Filename Value="TestApplication.pas"/>
-        <Caret Line="37" TopLine="22"/>
-      </Position1>
-      <Position2>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="32" Column="31" TopLine="22"/>
-      </Position2>
-      <Position3>
-        <Filename Value="TestApplication.pas"/>
-        <Caret Line="221" Column="49" TopLine="204"/>
-      </Position3>
-      <Position4>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="160" Column="100" TopLine="145"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="38" Column="25" TopLine="33"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="39" Column="19" TopLine="34"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="284" Column="3" TopLine="279"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="40" Column="15" TopLine="23"/>
-      </Position8>
-      <Position9>
-        <Filename Value="TestApplication.pas"/>
-        <Caret Line="49" Column="23" TopLine="32"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="317" Column="102" TopLine="299"/>
-      </Position10>
-      <Position11>
-        <Filename Value="TestApplication.pas"/>
-        <Caret Line="478" Column="54" TopLine="461"/>
-      </Position11>
-      <Position12>
         <Filename Value="IBXTestBase.pas"/>
         <Caret Line="65" Column="92" TopLine="54"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="42" Column="28" TopLine="24"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="334" Column="3" TopLine="330"/>
-      </Position14>
-      <Position15>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="52" Column="24" TopLine="26"/>
-      </Position15>
-      <Position16>
-        <Filename Value="TestApplication.pas"/>
-        <Caret Line="47" Column="23" TopLine="37"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="650" Column="31" TopLine="625"/>
-      </Position17>
-      <Position18>
-        <Filename Value="TestApplication.pas"/>
-        <Caret Line="419" Column="43" TopLine="393"/>
-      </Position18>
-      <Position19>
-        <Filename Value="TestApplication.pas"/>
-        <Caret Line="56" TopLine="31"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="52" Column="21" TopLine="38"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="729" Column="51" TopLine="718"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="35" Column="15" TopLine="30"/>
-      </Position22>
-      <Position23>
-        <Filename Value="TestApplication.pas"/>
-        <Caret Line="659" Column="31" TopLine="641"/>
-      </Position23>
-      <Position24>
-        <Filename Value="TestApplication.pas"/>
-        <Caret Line="47" Column="15" TopLine="40"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../fbintf/testsuite/TestManager.pas"/>
-        <Caret Line="209" Column="76" TopLine="200"/>
-      </Position25>
-      <Position26>
-        <Filename Value="TestApplication.pas"/>
-        <Caret Line="333" Column="26" TopLine="322"/>
-      </Position26>
+      </Position1>
+      <Position2>
+        <Filename Value="testsuite.lpr"/>
+        <Caret Line="13" Column="33"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../changelog"/>
+        <Caret Line="25" Column="80"/>
+      </Position3>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
