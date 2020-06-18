@@ -54,7 +54,7 @@ begin
   with DataSet do
   begin
     (FieldByName('F1') as TIBDateTimeField).SetAsDateTimeTZ(EncodeDate(1918,11,11) + FBEncodeTime(0,11,0,1111),'+05:00'); ;
-    (FieldByName('f2') as TIBDateTimeField).SetAsDateTimeTZ(EncodeTime(22,02,10,5),'-08:00');
+    (FieldByName('f2') as TIBTimeField).SetAsDateTimeTZ(EncodeTime(22,02,10,5),'-08:00');
     FieldByName('F3').AsCurrency := 12345678912.12;
     FieldByName('f4').AsBCD := StrToBCD('64100000000.011');
     FieldByName('F5').AsBCD := StrToBCD('123456123456123456123456.123456');

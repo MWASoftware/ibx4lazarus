@@ -19,7 +19,7 @@ const
 {$IFEND}
 
 const
-  Copyright = 'Copyright MWA Software 2020';
+  Copyright = 'Copyright MWA Software 2016-2020';
 
 type
   TTestApplication = class;
@@ -33,6 +33,7 @@ type
     procedure SetOwner(AOwner: TTestApplication);
   protected
     FHexStrings: boolean;
+    procedure DumpBCD(bcd: tBCD);
     procedure ClientLibraryPathChanged; virtual;
     procedure CreateObjects(Application: TCustomApplication); virtual;
     function ExtractDBName(ConnectString: AnsiString): AnsiString;
@@ -51,6 +52,7 @@ type
     procedure WriteBytes(Bytes: TByteArray);
     procedure WriteOperationCounts(Category: AnsiString; ops: TDBOperationCounts);
     procedure WritePerfStats(stats: TPerfCounters);
+    procedure WriteSQLData(aValue: ISQLData);
     procedure CheckActivity(Attachment: IAttachment); overload;
     procedure CheckActivity(Transaction: ITransaction); overload;
     procedure InitTest; virtual;
@@ -177,6 +179,24 @@ end;
 procedure TTestBase.SetOwner(AOwner: TTestApplication);
 begin
   FOwner := AOwner;
+end;
+
+procedure TTestBase.DumpBCD(bcd: tBCD);
+var i,l: integer;
+begin
+  with bcd do
+  begin
+    writeln(OutFile,'  Precision = ',bcd.Precision);
+    writeln(OutFile,'  Sign = ',(SignSpecialPlaces and $80) shr 7);
+    writeln(OutFile,'  Special = ', (SignSpecialPlaces and $40) shl 6);
+    writeln(OutFile,'  Places = ', SignSpecialPlaces and $7F);
+    write(OutFile,'  Digits = ');
+    l := Precision div 2;
+    if not odd(Precision) then l := l - 1;
+    for i := 0 to l do
+      write(OutFile,Format('%.2x',[Fraction[i]]),' ');
+    writeln(OutFile);
+  end;
 end;
 
 procedure TTestBase.ClientLibraryPathChanged;
@@ -317,90 +337,9 @@ end;
 
 procedure TTestBase.ReportResult(aValue: IResults);
 var i: integer;
-    s: AnsiString;
-    dt: TDateTime;
 begin
   for i := 0 to aValue.getCount - 1 do
-  begin
-    if aValue[i].IsNull then
-      writeln(OutFile,aValue[i].Name,' = NULL')
-    else
-    case aValue[i].SQLType of
-    SQL_ARRAY:
-      begin
-        if not aValue[i].IsNull then
-          WriteArray(aValue[i].AsArray);
-      end;
-    SQL_FLOAT,SQL_DOUBLE,
-    SQL_D_FLOAT:
-      writeln(OutFile, aValue[i].Name,' = ',FormatFloat('#,##0.00',aValue[i].AsFloat));
-
-    SQL_INT64:
-      if aValue[i].Scale <> 0 then
-        writeln(OutFile, aValue[i].Name,' = ',FormatFloat('#,##0.00',aValue[i].AsFloat))
-      else
-        writeln(OutFile,aValue[i].Name,' = ',aValue[i].AsString);
-
-    SQL_BLOB:
-      if aValue[i].IsNull then
-        writeln(OutFile,aValue[i].Name,' = (null blob)')
-      else
-      if aValue[i].SQLSubType = 1 then
-      begin
-        s := aValue[i].AsString;
-        if FHexStrings then
-        begin
-          write(OutFile,aValue[i].Name,' = ');
-          PrintHexString(s);
-          writeln(OutFile,' (Charset Id = ',aValue[i].GetCharSetID, ' Codepage = ',StringCodePage(s),')');
-        end
-        else
-        begin
-          writeln(OutFile,aValue[i].Name,' (Charset Id = ',aValue[i].GetCharSetID, ' Codepage = ',StringCodePage(s),')');
-          writeln(OutFile);
-          writeln(OutFile,s);
-        end
-      end
-      else
-        writeln(OutFile,aValue[i].Name,' = (blob), Length = ',aValue[i].AsBlob.GetBlobSize);
-
-    SQL_TEXT,SQL_VARYING:
-    begin
-      s := aValue[i].AsString;
-      if FHexStrings then
-      begin
-        write(OutFile,aValue[i].Name,' = ');
-        PrintHexString(s);
-        writeln(OutFile,' (Charset Id = ',aValue[i].GetCharSetID, ' Codepage = ',StringCodePage(s),')');
-      end
-      else
-      if aValue[i].GetCharSetID > 0 then
-        writeln(OutFile,aValue[i].Name,' = ',s,' (Charset Id = ',aValue[i].GetCharSetID, ' Codepage = ',StringCodePage(s),')')
-      else
-        writeln(OutFile,aValue[i].Name,' = ',s);
-    end;
-
-    SQL_TIMESTAMP:
-      writeln(OutFile,aValue[i].Name,' = ',FBFormatDateTime('yyyy/mm/dd hh:nn:ss.zzzz',aValue[i].AsDateTime));
-    SQL_TYPE_DATE:
-      writeln(OutFile,aValue[i].Name,' = ',FBFormatDateTime('yyyy/mm/dd',aValue[i].AsDate));
-    SQL_TYPE_TIME:
-      writeln(OutFile,aValue[i].Name,' = ',FBFormatDateTime('hh:nn:ss.zzzz',aValue[i].AsTime));
-    SQL_TIMESTAMP_TZ:
-    begin
-      aValue[i].GetAsDateTime(dt,s);
-      writeln(OutFile,aValue[i].Name,' = ',FBFormatDateTime('yyyy/mm/dd hh:nn:ss.zzzz',dt) + ' ' + s);
-    end;
-    SQL_TIME_TZ:
-    begin
-      aValue[i].GetAsDateTime(dt,s);
-      writeln(OutFile,aValue[i].Name,' = ',FBFormatDateTime('hh:nn:ss.zzzz',dt) + ' ' + s);
-    end;
-
-    else
-      writeln(OutFile,aValue[i].Name,' = ',aValue[i].AsString);
-    end;
-  end;
+    WriteSQLData(aValue[i]);
 end;
 
 function TTestBase.StringToHex(octetString: string; MaxLineLength: integer
@@ -627,6 +566,109 @@ begin
   writeln(OutFile,'Reads = ', FormatFloat('#0',stats[psReads]));
   writeln(OutFile,'Writes = ', FormatFloat('#0',stats[psWrites]));
   writeln(OutFile,'Fetches = ', FormatFloat('#0',stats[psFetches]));
+end;
+
+procedure TTestBase.WriteSQLData(aValue: ISQLData);
+var s: AnsiString;
+    dt: TDateTime;
+    dstOffset: SmallInt;
+    aTimeZone: AnsiString;
+begin
+  if aValue.IsNull then
+    writeln(OutFile,aValue.Name,' = NULL')
+  else
+  case aValue.SQLType of
+  SQL_ARRAY:
+    begin
+      write(OutFile, aValue.Name,' = ');
+      if not aValue.IsNull then
+        WriteArray(aValue.AsArray)
+      else
+        writeln(OutFile,'NULL');
+    end;
+  SQL_FLOAT,SQL_DOUBLE,
+  SQL_D_FLOAT:
+    writeln(OutFile, aValue.Name,' = ',FormatFloat('#,##0.00',aValue.AsFloat));
+
+  SQL_INT64:
+    if aValue.Scale <> 0 then
+      writeln(OutFile, aValue.Name,' = ',FormatFloat('#,##0.00',aValue.AsFloat))
+    else
+      writeln(OutFile,aValue.Name,' = ',aValue.AsString);
+
+  SQL_BLOB:
+    if aValue.IsNull then
+      writeln(OutFile,aValue.Name,' = (null blob)')
+    else
+    if aValue.SQLSubType = 1 then
+    begin
+      s := aValue.AsString;
+      if FHexStrings then
+      begin
+        write(OutFile,aValue.Name,' = ');
+        PrintHexString(s);
+        writeln(OutFile,' (Charset Id = ',aValue.GetCharSetID, ' Codepage = ',StringCodePage(s),')');
+      end
+      else
+      begin
+        writeln(OutFile,aValue.Name,' (Charset Id = ',aValue.GetCharSetID, ' Codepage = ',StringCodePage(s),')');
+        writeln(OutFile);
+        writeln(OutFile,s);
+      end
+    end
+    else
+      writeln(OutFile,aValue.Name,' = (blob), Length = ',aValue.AsBlob.GetBlobSize);
+
+  SQL_TEXT,SQL_VARYING:
+  begin
+    s := aValue.AsString;
+    if FHexStrings then
+    begin
+      write(OutFile,aValue.Name,' = ');
+      PrintHexString(s);
+      writeln(OutFile,' (Charset Id = ',aValue.GetCharSetID, ' Codepage = ',StringCodePage(s),')');
+    end
+    else
+    if aValue.GetCharSetID > 0 then
+      writeln(OutFile,aValue.Name,' = ',s,' (Charset Id = ',aValue.GetCharSetID, ' Codepage = ',StringCodePage(s),')')
+    else
+      writeln(OutFile,aValue.Name,' = ',s);
+  end;
+
+  SQL_TIMESTAMP:
+    writeln(OutFile,aValue.Name,' = ',FBFormatDateTime('yyyy/mm/dd hh:nn:ss.zzzz',aValue.AsDateTime));
+  SQL_TYPE_DATE:
+    writeln(OutFile,aValue.Name,' = ',FBFormatDateTime('yyyy/mm/dd',aValue.AsDate));
+  SQL_TYPE_TIME:
+    writeln(OutFile,aValue.Name,' = ',FBFormatDateTime('hh:nn:ss.zzzz',aValue.AsTime));
+  SQL_TIMESTAMP_TZ,
+  SQL_TIMESTAMP_TZ_EX:
+  begin
+    aValue.GetAsDateTime(dt,dstOffset,aTimeZone);
+    writeln(OutFile,aValue.Name,' =');
+    writeln(OutFile,'  AsString  = ',aValue.GetAsString);
+    writeln(OutFile,'  Formatted = ',FBFormatDateTime('yyyy/mm/dd hh:nn:ss.zzzz',dt),' ',aTimeZone);
+    writeln(OutFile,'  TimeZoneID = ',aValue.GetStatement.GetAttachment.GetTimeZoneServices.TimeZoneName2TimeZoneID(aTimeZone));
+    writeln(OutFile,'  Time Zone Name = ',aTimeZone);
+    writeln(OutFile,'  UTC Time = ',DateTimeToStr( aValue.GetAsUTCDateTime));
+    writeln(OutFile,'  DST Offset = ',dstOffset);
+  end;
+  SQL_TIME_TZ,
+  SQL_TIME_TZ_EX:
+  begin
+    aValue.GetAsDateTime(dt,dstOffset,aTimeZone);
+    writeln(OutFile,aValue.Name,' =');
+    writeln(OutFile,'  AsString =  ',aValue.GetAsString);
+    writeln(OutFile,'  Formatted = ',FBFormatDateTime('hh:nn:ss.zzzz',dt),' ',aTimeZone);
+    writeln(OutFile,'  TimeZoneID = ',aValue.GetStatement.GetAttachment.GetTimeZoneServices.TimeZoneName2TimeZoneID(aTimeZone));
+    writeln(OutFile,'  Time Zone Name = ',aTimeZone);
+    writeln(OutFile,'  UTC Time = ',TimeToStr( aValue.GetAsUTCDateTime));
+    writeln(OutFile,'  DST Offset = ',dstOffset);
+  end;
+
+  else
+    writeln(OutFile,aValue.Name,' = ',aValue.AsString);
+  end;
 end;
 
 procedure TTestBase.CheckActivity(Attachment: IAttachment);
@@ -972,6 +1014,7 @@ begin
     writeln(OutFile,'Firebird Bin Directory = ', IMaster(FirebirdAPI.GetIMaster).getConfigManager.getDirectory(IConfigManager.DIR_BIN));
     writeln(OutFile,'Firebird Conf Directory = ', IMaster(FirebirdAPI.GetIMaster).getConfigManager.getDirectory(IConfigManager.DIR_CONF));
   end;
+  writeln(OutFile,'Firebird Client Library Path = ',FirebirdAPI.GetFBLibrary.GetLibraryFilePath);
 
   try
     if TestID = '' then

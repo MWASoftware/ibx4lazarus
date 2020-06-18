@@ -7,7 +7,7 @@ CREATE DATABASE '\fbsql-test\employee.fdb' PAGE_SIZE 8192
  DEFAULT CHARACTER SET NONE;
 COMMENT ON DATABASE  IS 'Employee Test DB';
 /* Domain definitions */
-REATE DOMAIN ADDRESSLINE AS VARCHAR(30);
+CREATE DOMAIN ADDRESSLINE AS VARCHAR(30);
 CREATE DOMAIN BUDGET AS DECIMAL(12, 2)
 	 DEFAULT 50000;
 CREATE DOMAIN COUNTRYNAME AS VARCHAR(15);
@@ -25,6 +25,7 @@ CREATE DOMAIN PRODTYPE AS VARCHAR(12)
 CREATE DOMAIN PROJNO AS CHAR(5);
 CREATE DOMAIN SALARY AS NUMERIC(10, 2)
 	 DEFAULT 0;
+create domain fb$out_type as blob sub_type text character set utf8 not null;
 
 /* Table: COUNTRIES, Owner: SYSDBA */
 
@@ -1158,7 +1159,7 @@ CREATE PROCEDURE ADD_EMP_PROJ
   PROJ_ID CHAR(5)
 )
 AS
-BEGIN SUSPEND; EXIT; END ^
+BEGIN EXIT; END ^
 
 CREATE PROCEDURE ALL_LANGS 
 RETURNS
@@ -1176,7 +1177,7 @@ CREATE PROCEDURE DELETE_EMPLOYEE
   EMP_NUM INTEGER
 )
 AS
-BEGIN SUSPEND; EXIT; END ^
+BEGIN EXIT; END ^
 
 CREATE PROCEDURE DEPT_BUDGET 
 (
@@ -1240,7 +1241,7 @@ CREATE PROCEDURE SHIP_ORDER
   PO_NUM CHAR(8)
 )
 AS
-BEGIN SUSPEND; EXIT; END ^
+BEGIN EXIT; END ^
 
 CREATE PROCEDURE SUB_TOT_BUDGET 
 (
@@ -1796,7 +1797,6 @@ BEGIN
 	WHEN SQLCODE -530 DO
 		EXCEPTION unknown_emp_id;
 	END
-	SUSPEND;
 END
  ^
 
@@ -1852,7 +1852,6 @@ BEGIN
 	IF (any_sales > 0) THEN
 	BEGIN
 		EXCEPTION reassign_sales;
-		SUSPEND;
 	END
 
 	/*
@@ -1887,7 +1886,6 @@ BEGIN
 	DELETE FROM employee
 	WHERE emp_no = :emp_num;
 
-	SUSPEND;
 END
  ^
 
@@ -2092,14 +2090,12 @@ BEGIN
 	IF (ord_stat = 'shipped') THEN
 	BEGIN
 		EXCEPTION order_already_shipped;
-		SUSPEND;
 	END
 
 	/*	Customer is on hold. */
 	ELSE IF (hold_stat = '*') THEN
 	BEGIN
 		EXCEPTION customer_on_hold;
-		SUSPEND;
 	END
 
 	/*
@@ -2121,7 +2117,6 @@ BEGIN
 		SET on_hold = '*'
 		WHERE cust_no = :cust_no;
 
-		SUSPEND;
 	END
 
 	/*
@@ -2131,7 +2126,6 @@ BEGIN
 	SET order_status = 'shipped', ship_date = 'NOW'
 	WHERE po_number = :po_num;
 
-	SUSPEND;
 END
  ^
 
