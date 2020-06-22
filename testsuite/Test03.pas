@@ -14,7 +14,7 @@ uses
 
 const
   aTestID    = '3';
-  aTestTitle = 'Test 3: Database Information';
+  aTestTitle = 'Database Information';
 
 type
 

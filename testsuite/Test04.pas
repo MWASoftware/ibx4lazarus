@@ -11,7 +11,7 @@ uses
 
 const
   aTestID    = '4';
-  aTestTitle = 'Test 4: handling of data types up to Firebird 3';
+  aTestTitle = 'handling of data types up to Firebird 3';
 
 type
 

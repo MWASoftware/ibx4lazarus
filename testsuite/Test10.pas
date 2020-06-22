@@ -12,7 +12,7 @@ uses
 
 const
   aTestID    = '10';
-  aTestTitle = 'Test 10: Create Database from SQL Script and Extract SQL';
+  aTestTitle = 'Create Database from SQL Script and Extract SQL';
 
 type
 

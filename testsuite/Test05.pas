@@ -12,7 +12,7 @@ uses
 
 const
   aTestID    = '5';
-  aTestTitle = 'Test 5: Firebird 4 Data Types';
+  aTestTitle = 'Firebird 4 Data Types';
 
 type
 

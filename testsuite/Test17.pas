@@ -15,7 +15,7 @@ uses
 
 const
   aTestID    = '17';
-  aTestTitle = 'Test 17: IB Parser Tests';
+  aTestTitle = 'IB Parser Tests';
 
 const
   TestStrings: array [0..13] of string = (

@@ -7,19 +7,6 @@ unit Test01;
 {  This is a simple use of IBX to access the employee database in console mode.
   The program opens the database, runs a query and writes the result to stdout.
 
-  Key points to note:
-
-  1. In console mode, you have to create the Database and Transaction objects
-     explicitly and link them to each other.
-
-  2. The Database properties have to be set explicitly. This includes username
-     and password. In the example, these are set from literals. You could update
-     this to (e.g.) parse the command line arguments from "ParamStr".
-     However, this is left as an exercise for the implementor.
-
-  3. It's a good idea to have the application own the IBDatabase. This ensures that
-     exceptions are routed through your application object's exception handler.
-
 }
 
 interface
@@ -29,7 +16,7 @@ uses
 
 const
   aTestID    = '1';
-  aTestTitle = 'Test 1: read from employee database';
+  aTestTitle = 'Open and read from Employee Database';
 
 type
 

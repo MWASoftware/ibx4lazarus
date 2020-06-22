@@ -861,6 +861,13 @@ var
             FieldList := FieldList +
               QuoteIdentifier(DataBase.SQLDialect, Name) +
               ' BLOB SUB_TYPE 0'; {do not localize}
+          ftFmtBCD:
+            if Database.Attachment.HasDecFloatSupport then
+              FieldList := FieldList +
+                QuoteIdentifier(DataBase.SQLDialect, Name) +
+                ' Decfloat(34)' {do not localize}
+            else
+              IBError(ibxeFieldUnsupportedType,[nil]);
           ftUnknown, ftADT, ftArray, ftReference, ftDataSet,
           ftCursor, ftWideString, ftAutoInc:
             IBError(ibxeFieldUnsupportedType,[nil]);

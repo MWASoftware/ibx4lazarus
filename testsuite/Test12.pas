@@ -14,7 +14,7 @@ uses
 
 const
   aTestID    = '12';
-  aTestTitle = 'Test 12: Test use of Services Connection';
+  aTestTitle = 'Test use of Services Connection';
 
 type
 

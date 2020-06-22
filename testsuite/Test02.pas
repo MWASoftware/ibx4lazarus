@@ -22,7 +22,7 @@ uses
 
 const
   aTestID    = '2';
-  aTestTitle = 'Test 2: create, bring up-to-date and read from local database';
+  aTestTitle = 'create, bring up-to-date and read from local database';
 
 type
 

@@ -11,7 +11,7 @@ uses
 
 const
   aTestID    = '23';
-  aTestTitle = 'Test 23: Transliteration Tests';
+  aTestTitle = 'Transliteration Tests';
 
 type
 

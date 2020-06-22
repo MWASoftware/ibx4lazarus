@@ -3710,6 +3710,7 @@ begin
 
         blr_short,
         blr_long,
+        blr_double,
         blr_int64,
         blr_int128: {numeric types}
           begin
@@ -3739,6 +3740,12 @@ begin
             else
             if (FieldType = blr_double) and (FieldScale < 0) then
                Result :=  Format('NUMERIC(15, %d)', [-FieldScale])
+            else
+            if (FieldType = blr_int64) and (FieldScale < 0) then
+               Result :=  Format('NUMERIC(18, %d)', [-FieldScale])
+            else
+            if (FieldType = blr_int128) and (FieldScale < 0) then
+               Result :=  Format('NUMERIC(38, %d)', [-FieldScale])
             else
                 Result :=  TypeName;
           end;

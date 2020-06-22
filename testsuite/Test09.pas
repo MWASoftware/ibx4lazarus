@@ -11,7 +11,7 @@ uses
 
 const
   aTestID    = '9';
-  aTestTitle = 'Test 9: Extract DDL from example Employee Database';
+  aTestTitle = 'Extract DDL from example Employee Database';
 
 type
 
