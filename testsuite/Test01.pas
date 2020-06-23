@@ -15,7 +15,7 @@ uses
   Classes, SysUtils, TestApplication, IBXTestBase, IB, IBCustomDataSet, IBDatabase, IBQuery;
 
 const
-  aTestID    = '1';
+  aTestID    = '01';
   aTestTitle = 'Open and read from Employee Database';
 
 type
@@ -77,6 +77,7 @@ begin
   with IBQuery do
   begin
      AllowAutoActivateTransaction := true;
+     Unidirectional := true;
      SQL.Text := sqlExample;
      EnableStatistics := true;
      Active := true;
