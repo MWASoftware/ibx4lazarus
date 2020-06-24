@@ -54,7 +54,7 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IB,  IBSQL, Db,
-  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, IBTypes;
+  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo;
 
 type
   TIBCustomDataSet = class;
@@ -306,7 +306,7 @@ type
   private
     FDataSet: TIBCustomDataSet;
     FDelayTimerValue: integer;
-    FTimer: TIBTimerInf;
+    FTimer: IIBTimerInf;
     procedure HandleRefreshTimer(Sender: TObject);
     procedure SetDelayTimerValue(AValue: integer);
   protected

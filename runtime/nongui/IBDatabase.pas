@@ -551,7 +551,7 @@ type
                                           write SetTransaction;
   end;
 
-    TIBTimerInf = interface
+    IIBTimerInf = interface
       function GetEnabled: boolean;
       procedure SetEnabled(Value: Boolean);
       function GetInterval: Cardinal;
@@ -569,7 +569,7 @@ type
       property OnStopTimer: TNotifyEvent read GetOnStopTimer write SetOnStopTimer;
     end;
 
-    TIBGUIInterface = interface
+    IIBGUIInterface = interface
       function ServerLoginDialog(var AServerName: string;
                                  var AUserName, APassword: string): Boolean;
       function LoginDialogEx(var ADatabaseName: string;
@@ -577,14 +577,14 @@ type
                                  NameReadOnly: Boolean): Boolean;
       procedure SetCursor;
       procedure RestoreCursor;
-      function CreateTimer: TIBTimerInf;
+      function CreateTimer: IIBTimerInf;
     end;
 
-  const  IBGUIInterface : TIBGUIInterface = nil;
+  const  IBGUIInterface : IIBGUIInterface = nil;
 
 implementation
 
-uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils, IBTypes,
+uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
      typInfo, IBMessages, IBErrorCodes {$IFDEF WINDOWS}, Windirs {$ENDIF};
 
 { TIBXMonitoredComponent }

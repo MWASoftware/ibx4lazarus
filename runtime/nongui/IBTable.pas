@@ -185,7 +185,7 @@ type
 
 implementation
 
-uses IBMessages, IBTypes;
+uses IBMessages;
 
 type
 
@@ -194,7 +194,7 @@ type
   TIBMasterDataLink = class(TMasterDataLink)
   private
     FDelayTimerValue: integer;
-    FTimer: TIBTimerInf;
+    FTimer: IIBTimerInf;
     procedure HandleRefreshTimer(Sender: TObject);
     procedure SetDelayTimerValue(AValue: integer);
   protected

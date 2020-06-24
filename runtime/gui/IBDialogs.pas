@@ -39,13 +39,13 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes,  Controls,
-  Forms, StdCtrls, ExtCtrls, IB, IBTypes;
+  Forms, StdCtrls, ExtCtrls, IB, IBDatabase;
 
 type
 
   { TIBLCLInterface }
 
-  TIBLCLInterface = class(TInterfacedObject,TIBGUIInterface)
+  TIBLCLInterface = class(TInterfacedObject,IIBGUIInterface)
     private
       FSetCursorDepth: integer;
   public
@@ -56,7 +56,7 @@ type
                                NameReadOnly: Boolean): Boolean; virtual;
     procedure SetCursor;
     procedure RestoreCursor;
-    function CreateTimer: TIBTimerInf;
+    function CreateTimer: IIBTimerInf;
   end;
 
 implementation
@@ -86,7 +86,7 @@ type
 
   { TIBTimer }
 
-  TIBTimer = class(TInterfacedObject,TIBTimerInf)
+  TIBTimer = class(TInterfacedObject,IIBTimerInf)
   private
     FTimer: TCustomTimer;
   public
@@ -247,7 +247,7 @@ begin
   end;
 end;
 
-function TIBLCLInterface.CreateTimer: TIBTimerInf;
+function TIBLCLInterface.CreateTimer: IIBTimerInf;
 begin
   Result := TIBTimer.Create;
 end;
