@@ -109,7 +109,7 @@
         <Filename Value="testApp/TestApplication.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="94"/>
+        <TopLine Value="974"/>
         <CursorPos X="21" Y="1007"/>
         <UsageCount Value="35"/>
         <Loaded Value="True"/>
@@ -123,18 +123,17 @@
       </Unit14>
       <Unit15>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="11"/>
-        <TopLine Value="292"/>
-        <CursorPos X="14" Y="309"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="4463"/>
+        <CursorPos Y="4491"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <WindowIndex Value="-1"/>
-          <TopLine Value="4463"/>
-          <CursorPos Y="4491"/>
+          <TopLine Value="292"/>
+          <CursorPos X="14" Y="309"/>
         </ExtraEditor1>
         <UsageCount Value="19"/>
-        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="../examples/local-employeedb/ConsoleModeExample.lpr"/>
@@ -180,9 +179,9 @@
       </Unit21>
       <Unit22>
         <Filename Value="../runtime/nongui/IBDatabase.pas"/>
-        <EditorIndex Value="12"/>
-        <TopLine Value="563"/>
-        <CursorPos X="30" Y="580"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="548"/>
+        <CursorPos X="16" Y="554"/>
         <UsageCount Value="17"/>
         <Loaded Value="True"/>
       </Unit22>
@@ -346,8 +345,9 @@
       </Unit44>
       <Unit45>
         <Filename Value="../changelog"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="22"/>
-        <CursorPos X="41" Y="33"/>
+        <CursorPos X="50" Y="34"/>
         <UsageCount Value="29"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
@@ -617,7 +617,7 @@
       </Unit81>
       <Unit82>
         <Filename Value="../runtime/nongui/IBTable.pas"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="180"/>
         <CursorPos X="14" Y="197"/>
         <UsageCount Value="10"/>
@@ -651,11 +651,10 @@
       </Unit86>
       <Unit87>
         <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="227"/>
         <CursorPos Y="240"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit87>
       <Unit88>
         <Filename Value="../runtime/nongui/IBSQLParser.pas"/>
@@ -674,15 +673,14 @@
       </Unit89>
       <Unit90>
         <Filename Value="../runtime/gui/IBDialogs.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="25"/>
         <CursorPos X="44" Y="42"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit90>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="28" HistoryIndex="27">
       <Position1>
         <Filename Value="IBXTestBase.pas"/>
         <Caret Line="29" Column="13" TopLine="12"/>
@@ -776,33 +774,25 @@
         <Caret Line="42" Column="62" TopLine="33"/>
       </Position23>
       <Position24>
-        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="57" Column="47" TopLine="40"/>
-      </Position24>
-      <Position25>
         <Filename Value="../runtime/nongui/IBDatabase.pas"/>
         <Caret Line="587" Column="70" TopLine="570"/>
-      </Position25>
-      <Position26>
+      </Position24>
+      <Position25>
         <Filename Value="../runtime/gui/IBDialogs.pas"/>
         <Caret Line="89" Column="39" TopLine="66"/>
-      </Position26>
-      <Position27>
+      </Position25>
+      <Position26>
         <Filename Value="../runtime/nongui/IBDatabase.pas"/>
         <Caret Line="580" Column="30" TopLine="563"/>
-      </Position27>
-      <Position28>
-        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="309" Column="14" TopLine="292"/>
-      </Position28>
-      <Position29>
+      </Position26>
+      <Position27>
         <Filename Value="../runtime/gui/IBDialogs.pas"/>
         <Caret Line="59" Column="28" TopLine="42"/>
-      </Position29>
-      <Position30>
+      </Position27>
+      <Position28>
         <Filename Value="../runtime/gui/IBDialogs.pas"/>
         <Caret Line="252" Column="3" TopLine="225"/>
-      </Position30>
+      </Position28>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
