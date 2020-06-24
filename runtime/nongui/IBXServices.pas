@@ -670,7 +670,7 @@ function IsGbakFile(aFileName: string): boolean;
 
 implementation
 
-uses IBMessages, IBUtils, RegExpr, CustApp, IBErrorCodes, IBTypes;
+uses IBMessages, IBUtils, RegExpr, CustApp, IBErrorCodes;
 
 const
   SPBPrefix = 'isc_spb_';
