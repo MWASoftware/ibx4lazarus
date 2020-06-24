@@ -38,7 +38,7 @@ unit IBXServices;
 interface
 
 uses
-  Classes, SysUtils, DB, IB, IBDatabase, IBTypes, IBSQLMonitor, IBExternals, memds;
+  Classes, SysUtils, DB, IB, IBDatabase, IBSQLMonitor, IBExternals, memds;
 
 type
   TIBXCustomService = class;
@@ -670,7 +670,7 @@ function IsGbakFile(aFileName: string): boolean;
 
 implementation
 
-uses IBMessages, IBUtils, RegExpr, CustApp, IBErrorCodes;
+uses IBMessages, IBUtils, RegExpr, CustApp, IBErrorCodes, IBTypes;
 
 const
   SPBPrefix = 'isc_spb_';

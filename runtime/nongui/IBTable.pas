@@ -39,8 +39,7 @@ unit IBTable;
 
 interface
 
-uses SysUtils, Classes, DB, IB,  IBCustomDataSet,
-     IBSQL, IBUtils;
+uses SysUtils, Classes, DB, IB,  IBCustomDataSet, IBDatabase, IBSQL, IBUtils;
      
 type
 

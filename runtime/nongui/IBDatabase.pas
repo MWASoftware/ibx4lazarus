@@ -45,7 +45,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, FPTimer, IBExternals, DB, IB, CustApp, IBTypes;
+  SysUtils, Classes, FPTimer, IBExternals, DB, IB, CustApp;
 
 const
   DPBPrefix = 'isc_dpb_';
@@ -175,6 +175,33 @@ const
   );
 
 type
+    TTraceFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
+       tfTransact, tfBlob, tfService, tfMisc);
+    TTraceFlags = set of TTraceFlag;
+
+    { TIBXMonitoredComponent }
+
+    TIBXMonitoredComponent = class(TComponent)
+    private
+      FTraceFlags: TTraceFlags;
+    public
+      constructor Create(aOwner: TComponent); override;
+      property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
+    end;
+
+    TIBMonitoredService = class(TIBXMonitoredComponent);
+    TIBXMonitoredService = class(TIBXMonitoredComponent);
+
+    { TIBXMonitoredConnection }
+
+    TIBXMonitoredConnection = class(TCustomConnection)
+    private
+      FTraceFlags: TTraceFlags;
+    public
+      constructor Create(aOwner: TComponent); override;
+      property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
+    end;
+
 
   TIBDatabase = class;
   TIBTransaction = class;
@@ -186,7 +213,7 @@ type
 
   TIBFileName = type string;
   { TIBDatabase }
-  TIBDataBase = class(TCustomConnection)
+  TIBDataBase = class(TIBXMonitoredConnection)
   private
     type TIBDatabaseCloseActions = (caNormal,caForce, caDropDatabase);
   private
@@ -201,7 +228,6 @@ type
     FOnCreateDatabase: TNotifyEvent;
     FOnLogin: TIBDatabaseLoginEvent;
     FSQLHourGlass: Boolean;
-    FTraceFlags: TTraceFlags;
     FSQLDialect: Integer;
     FOnDialectDowngradeWarning: TNotifyEvent;
     FSQLObjects: TList;
@@ -327,7 +353,7 @@ type
     property IdleTimer: Integer read GetIdleTimer write SetIdleTimer;
     property SQLDialect : Integer read FSQLDialect write SetSQLDialect default 3;
     property SQLHourGlass: Boolean read FSQLHourGlass write FSQLHourGlass default true;
-    property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
+    property TraceFlags;
     property UseDefaultSystemCodePage: boolean read FUseDefaultSystemCodePage
                                                write FUseDefaultSystemCodePage;
     property WireCompression: boolean read GetWireCompression write SetWireCompression
@@ -525,11 +551,57 @@ type
                                           write SetTransaction;
   end;
 
+    TIBTimerInf = interface
+      function GetEnabled: boolean;
+      procedure SetEnabled(Value: Boolean);
+      function GetInterval: Cardinal;
+      procedure SetInterval(Value: Cardinal);
+      function GetOnTimer: TNotifyEvent;
+      procedure SetOnTimer(Value: TNotifyEvent);
+      function GetOnStartTimer: TNotifyEvent;
+      procedure SetOnStartTimer(Value: TNotifyEvent);
+      function GetOnStopTimer: TNotifyEvent;
+      procedure SetOnStopTimer(Value: TNotifyEvent);
+      property Enabled: Boolean read GetEnabled write SetEnabled;
+      property Interval: Cardinal read GetInterval write SetInterval;
+      property OnTimer: TNotifyEvent read GetOnTimer write SetOnTimer;
+      property OnStartTimer: TNotifyEvent read GetOnStartTimer write SetOnStartTimer;
+      property OnStopTimer: TNotifyEvent read GetOnStopTimer write SetOnStopTimer;
+    end;
+
+    TIBGUIInterface = interface
+      function ServerLoginDialog(var AServerName: string;
+                                 var AUserName, APassword: string): Boolean;
+      function LoginDialogEx(var ADatabaseName: string;
+                                 var AUserName, APassword: string;
+                                 NameReadOnly: Boolean): Boolean;
+      procedure SetCursor;
+      procedure RestoreCursor;
+      function CreateTimer: TIBTimerInf;
+    end;
+
+  const  IBGUIInterface : TIBGUIInterface = nil;
 
 implementation
 
-uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
+uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils, IBTypes,
      typInfo, IBMessages, IBErrorCodes {$IFDEF WINDOWS}, Windirs {$ENDIF};
+
+{ TIBXMonitoredComponent }
+
+constructor TIBXMonitoredComponent.Create(aOwner: TComponent);
+begin
+  inherited Create(aOwner);
+  FTraceFlags := [];
+end;
+
+{ TIBXMonitoredConnection }
+
+constructor TIBXMonitoredConnection.Create(aOwner: TComponent);
+begin
+  inherited Create(aOwner);
+  FTraceFlags := [];
+end;
 
 { TIBDatabase }
 
@@ -557,7 +629,6 @@ begin
   FTimer.Interval := 0;
   FTimer.OnTimer := TimeoutConnection;
   FSQLDialect := 3;
-  FTraceFlags := [];
   FDataSets := TList.Create;
   CheckStreamConnect;
   FCloseAction := caNormal;

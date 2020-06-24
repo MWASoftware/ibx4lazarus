@@ -33,41 +33,6 @@ interface
 uses
   Classes, SysUtils;
 
-type
-  TIBTimerInf = interface
-    function GetEnabled: boolean;
-    procedure SetEnabled(Value: Boolean);
-    function GetInterval: Cardinal;
-    procedure SetInterval(Value: Cardinal);
-    function GetOnTimer: TNotifyEvent;
-    procedure SetOnTimer(Value: TNotifyEvent);
-    function GetOnStartTimer: TNotifyEvent;
-    procedure SetOnStartTimer(Value: TNotifyEvent);
-    function GetOnStopTimer: TNotifyEvent;
-    procedure SetOnStopTimer(Value: TNotifyEvent);
-    property Enabled: Boolean read GetEnabled write SetEnabled;
-    property Interval: Cardinal read GetInterval write SetInterval;
-    property OnTimer: TNotifyEvent read GetOnTimer write SetOnTimer;
-    property OnStartTimer: TNotifyEvent read GetOnStartTimer write SetOnStartTimer;
-    property OnStopTimer: TNotifyEvent read GetOnStopTimer write SetOnStopTimer;
-  end;
-
-  TIBGUIInterface = interface
-    function ServerLoginDialog(var AServerName: string;
-                               var AUserName, APassword: string): Boolean;
-    function LoginDialogEx(var ADatabaseName: string;
-                               var AUserName, APassword: string;
-                               NameReadOnly: Boolean): Boolean;
-    procedure SetCursor;
-    procedure RestoreCursor;
-    function CreateTimer: TIBTimerInf;
-  end;
-
-  TTraceFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
-     tfTransact, tfBlob, tfService, tfMisc);
-  TTraceFlags = set of TTraceFlag;
-
-const  IBGUIInterface : TIBGUIInterface = nil;
 
 implementation
 

@@ -47,7 +47,7 @@ interface
 
 uses
   IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase,  DB,
-  IBTypes ,SysUtils,  Classes,
+  SysUtils,  Classes,
 {$IFDEF WINDOWS }
   Windows
 {$ENDIF}
@@ -105,29 +105,6 @@ type
     property OnSQL;
     property TraceFlags;
     property Enabled;
-  end;
-
-  TIBMonitoredService = class(TComponent)
-  private
-    FTraceFlags: TTraceFlags;
-  protected
-    property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
-  end;
-
-  { TIBXMonitoredService }
-
-  TIBXMonitoredService = class(TComponent)
-  private
-    FTraceFlags: TTraceFlags;
-  protected
-    property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
-  end;
-
-  TIBXMonitoredConnection = class(TCustomConnection)
-  private
-    FTraceFlags: TTraceFlags;
-  protected
-    property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
   end;
 
   IIBSQLMonitorHook = interface
