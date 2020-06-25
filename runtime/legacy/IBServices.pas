@@ -52,7 +52,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, IB, IBExternals, CustApp, IBSQLMonitor;
+  SysUtils, Classes, IB, IBExternals, IBInternals, CustApp, IBSQLMonitor;
 
 const
   DefaultBufferSize = 32000;
@@ -101,7 +101,7 @@ type
 
   { TIBCustomService }
 
-  TIBCustomService = class(TIBXMonitoredService)
+  TIBCustomService = class(TIBMonitoredService)
   private
     FParamsChanged : Boolean;
     FPortNo: string;

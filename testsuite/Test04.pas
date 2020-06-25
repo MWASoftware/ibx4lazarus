@@ -10,7 +10,7 @@ uses
   Classes, SysUtils, CustApp, TestApplication, IBXTestBase, DB, IB, IBCustomDataSet;
 
 const
-  aTestID    = '4';
+  aTestID    = '04';
   aTestTitle = 'handling of data types up to Firebird 3';
 
 type

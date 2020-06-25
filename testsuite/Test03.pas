@@ -13,7 +13,7 @@ uses
   Classes, SysUtils, CustApp, TestApplication, IBXTestBase, IB, IBDatabaseInfo, IBQuery, IBDatabase;
 
 const
-  aTestID    = '3';
+  aTestID    = '03';
   aTestTitle = 'Database Information';
 
 type

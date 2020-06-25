@@ -11,7 +11,7 @@ uses
   IBExtract;
 
 const
-  aTestID    = '5';
+  aTestID    = '05';
   aTestTitle = 'Firebird 4 Data Types';
 
 type
@@ -53,8 +53,8 @@ procedure TTest05.HandleAfterInsert(DataSet: TDataSet);
 begin
   with DataSet do
   begin
-    (FieldByName('F1') as TIBDateTimeField).SetAsDateTimeTZ(EncodeDate(1918,11,11) + FBEncodeTime(0,11,0,1111),'+05:00'); ;
-    (FieldByName('f2') as TIBTimeField).SetAsDateTimeTZ(EncodeTime(22,02,10,5),'-08:00');
+    (FieldByName('F1') as TIBDateTimeField).SetAsDateTimeTZ(EncodeDate(1918,11,11) + FBEncodeTime(0,11,0,1111),'CET'); ;
+    (FieldByName('f2') as TIBTimeField).SetAsDateTimeTZ(EncodeTime(22,02,10,5),'America/Los_Angeles');
     FieldByName('F3').AsCurrency := 12345678912.12;
     FieldByName('f4').AsBCD := StrToBCD('64100000000.011');
     FieldByName('F5').AsBCD := StrToBCD('123456123456123456123456.123456');
@@ -150,6 +150,10 @@ begin
     PrintDataSet(FDataSet);
     writeln(OutFile,'F1 in UTC Time = ', DateTimeToStr((FDataSet.FieldByName('F1') as TIBDateTimeField).GetAsUTCDateTime));
     writeln(OutFile,'F2 in UTC Time = ', FBFormatDateTime('HH:MM:SS.zzzz',(FDataSet.FieldByName('F2') as TIBDateTimeField).GetAsUTCDateTime));
+    FDataset.TZTextOption := tzGMT;
+    PrintDataSet(FDataSet);
+    FDataset.TZTextOption := tzOriginalID;
+    PrintDataSet(FDataSet);
   finally
     DefaultFormatSettings := OldDefaultFormatSettings;
     IBDatabase.DropDatabase;

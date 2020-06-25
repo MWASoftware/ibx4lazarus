@@ -38,7 +38,8 @@ unit IBXServices;
 interface
 
 uses
-  Classes, SysUtils, DB, IB, IBDatabase, IBSQLMonitor, IBExternals, memds;
+  Classes, SysUtils, DB, IB, IBDatabase, IBSQLMonitor, IBExternals, IBInternals,
+  memds;
 
 type
   TIBXCustomService = class;

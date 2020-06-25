@@ -10,7 +10,7 @@ uses
   Classes, SysUtils, CustApp, TestApplication, IBXTestbase, IB, IBExtract;
 
 const
-  aTestID    = '9';
+  aTestID    = '09';
   aTestTitle = 'Extract DDL from example Employee Database';
 
 type

@@ -45,7 +45,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, FPTimer, IBExternals, DB, IB, CustApp;
+  SysUtils, Classes, FPTimer, IBExternals, DB, IB, CustApp, IBInternals;
 
 const
   DPBPrefix = 'isc_dpb_';
@@ -175,34 +175,6 @@ const
   );
 
 type
-    TTraceFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
-       tfTransact, tfBlob, tfService, tfMisc);
-    TTraceFlags = set of TTraceFlag;
-
-    { TIBXMonitoredComponent }
-
-    TIBXMonitoredComponent = class(TComponent)
-    private
-      FTraceFlags: TTraceFlags;
-    public
-      constructor Create(aOwner: TComponent); override;
-      property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
-    end;
-
-    TIBMonitoredService = class(TIBXMonitoredComponent);
-    TIBXMonitoredService = class(TIBXMonitoredComponent);
-
-    { TIBXMonitoredConnection }
-
-    TIBXMonitoredConnection = class(TCustomConnection)
-    private
-      FTraceFlags: TTraceFlags;
-    public
-      constructor Create(aOwner: TComponent); override;
-      property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
-    end;
-
-
   TIBDatabase = class;
   TIBTransaction = class;
   TIBBase = class;
@@ -551,57 +523,11 @@ type
                                           write SetTransaction;
   end;
 
-    IIBTimerInf = interface
-      function GetEnabled: boolean;
-      procedure SetEnabled(Value: Boolean);
-      function GetInterval: Cardinal;
-      procedure SetInterval(Value: Cardinal);
-      function GetOnTimer: TNotifyEvent;
-      procedure SetOnTimer(Value: TNotifyEvent);
-      function GetOnStartTimer: TNotifyEvent;
-      procedure SetOnStartTimer(Value: TNotifyEvent);
-      function GetOnStopTimer: TNotifyEvent;
-      procedure SetOnStopTimer(Value: TNotifyEvent);
-      property Enabled: Boolean read GetEnabled write SetEnabled;
-      property Interval: Cardinal read GetInterval write SetInterval;
-      property OnTimer: TNotifyEvent read GetOnTimer write SetOnTimer;
-      property OnStartTimer: TNotifyEvent read GetOnStartTimer write SetOnStartTimer;
-      property OnStopTimer: TNotifyEvent read GetOnStopTimer write SetOnStopTimer;
-    end;
-
-    IIBGUIInterface = interface
-      function ServerLoginDialog(var AServerName: string;
-                                 var AUserName, APassword: string): Boolean;
-      function LoginDialogEx(var ADatabaseName: string;
-                                 var AUserName, APassword: string;
-                                 NameReadOnly: Boolean): Boolean;
-      procedure SetCursor;
-      procedure RestoreCursor;
-      function CreateTimer: IIBTimerInf;
-    end;
-
-  const  IBGUIInterface : IIBGUIInterface = nil;
 
 implementation
 
 uses  IBSQLMonitor, IBCustomDataSet, IBDatabaseInfo, IBSQL, IBUtils,
      typInfo, IBMessages, IBErrorCodes {$IFDEF WINDOWS}, Windirs {$ENDIF};
-
-{ TIBXMonitoredComponent }
-
-constructor TIBXMonitoredComponent.Create(aOwner: TComponent);
-begin
-  inherited Create(aOwner);
-  FTraceFlags := [];
-end;
-
-{ TIBXMonitoredConnection }
-
-constructor TIBXMonitoredConnection.Create(aOwner: TComponent);
-begin
-  inherited Create(aOwner);
-  FTraceFlags := [];
-end;
 
 { TIBDatabase }
 

@@ -53,7 +53,7 @@ uses
 {$IFDEF UNIX}
   unix,
 {$ENDIF}
-  SysUtils, Classes, IBDatabase, IBExternals, IB,  IBSQL, Db,
+  SysUtils, Classes, IBDatabase, IBExternals, IBInternals, IB,  IBSQL, Db,
   IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo;
 
 type

@@ -185,7 +185,7 @@ type
 
 implementation
 
-uses IBMessages;
+uses IBMessages, IBInternals;
 
 type
 

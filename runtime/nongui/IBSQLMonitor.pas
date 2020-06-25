@@ -46,7 +46,7 @@ unit IBSQLMonitor;
 interface
 
 uses
-  IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase,  DB,
+  IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase,  DB, IBInternals,
   SysUtils,  Classes,
 {$IFDEF WINDOWS }
   Windows
