@@ -7,7 +7,7 @@
       <Unit0>
         <Filename Value="testsuite.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <CursorPos Y="39"/>
         <UsageCount Value="78"/>
         <Loaded Value="True"/>
@@ -15,7 +15,7 @@
       <Unit1>
         <Filename Value="IBXTestBase.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="75"/>
         <CursorPos X="3" Y="77"/>
         <UsageCount Value="78"/>
@@ -47,7 +47,7 @@
       <Unit5>
         <Filename Value="Test10.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="7"/>
         <TopLine Value="7"/>
         <CursorPos X="64" Y="15"/>
         <UsageCount Value="72"/>
@@ -87,7 +87,7 @@
       <Unit10>
         <Filename Value="Test23.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <UsageCount Value="50"/>
         <Loaded Value="True"/>
       </Unit10>
@@ -110,7 +110,7 @@
       <Unit13>
         <Filename Value="testApp/TestApplication.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="784"/>
         <CursorPos Y="801"/>
         <UsageCount Value="43"/>
@@ -344,7 +344,7 @@
       <Unit45>
         <Filename Value="../changelog"/>
         <TopLine Value="10"/>
-        <CursorPos X="50" Y="34"/>
+        <CursorPos X="40" Y="33"/>
         <UsageCount Value="33"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
@@ -664,10 +664,12 @@
       </Unit89>
       <Unit90>
         <Filename Value="../runtime/gui/IBDialogs.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="25"/>
-        <CursorPos X="44" Y="42"/>
-        <UsageCount Value="9"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="31"/>
+        <CursorPos X="32" Y="41"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit90>
       <Unit91>
         <Filename Value="Test30.pas"/>
@@ -685,15 +687,14 @@
       </Unit92>
       <Unit93>
         <Filename Value="../runtime/nongui/IBInternals.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="28"/>
+        <TopLine Value="76"/>
         <CursorPos X="67" Y="30"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit93>
     </Units>
-    <JumpHistory Count="15" HistoryIndex="14">
+    <JumpHistory Count="16" HistoryIndex="15">
       <Position1>
         <Filename Value="testApp/TestApplication.pas"/>
         <Caret Line="84" Column="14" TopLine="67"/>
@@ -754,6 +755,10 @@
         <Filename Value="../runtime/nongui/IBInternals.pas"/>
         <Caret Line="33" Column="24" TopLine="13"/>
       </Position15>
+      <Position16>
+        <Filename Value="../runtime/nongui/IBInternals.pas"/>
+        <Caret Line="30" Column="67" TopLine="76"/>
+      </Position16>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
