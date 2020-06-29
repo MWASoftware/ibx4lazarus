@@ -2,7 +2,7 @@ unit Test10;
 
 {$mode objfpc}{$H+}
 
-{Test 1: Test 10: Create Database from SQL Script and Extract SQL}
+{Test 10: Create Database from SQL Script and Extract SQL}
 
 
 interface

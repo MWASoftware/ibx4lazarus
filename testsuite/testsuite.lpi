@@ -88,7 +88,6 @@
       <Unit13>
         <Filename Value="Test30.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Test02"/>
       </Unit13>
     </Units>
   </ProjectOptions>

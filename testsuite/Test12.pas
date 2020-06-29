@@ -2,7 +2,7 @@ unit Test12;
 
 {$mode objfpc}{$H+}
 
-{Test 1: Titlecursor}
+{Test 12 Test use of Services Connection}
 
 { Description
 }
