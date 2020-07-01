@@ -101,6 +101,8 @@ procedure Test3.RunTest(CharSet: AnsiString; SQLDialect: integer);
 var S: TStrings;
     i: integer;
 begin
+  if FirebirdAPI.GetClientMajor >= 3 then
+    IBDatabase.WireCompression := true;
   IBDatabase.Connected := true;
   IBTransaction.Active := true;
   FTableNameLookup.Active := true;
@@ -115,6 +117,7 @@ begin
   finally
     S.Free;
   end;
+  ShowFBVersion(IBDatabase.attachment);  {Wire Compression on if includes 'Z' flag}
   with FIBDatabaseInfo do
   begin
     writeln(OutFile,'Firebird Library Pathname = ' + IBDatabase.FirebirdAPI.GetFBLibrary.GetLibraryFilePath);

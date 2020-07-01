@@ -47,133 +47,6 @@ uses
 {$ENDIF}
   SysUtils, Classes, FPTimer, IBExternals, DB, IB, CustApp, IBInternals;
 
-const
-  DPBPrefix = 'isc_dpb_';
-  DPBConstantNames: array[1..isc_dpb_last_dpb_constant] of string = (
-    'cdd_pathname',
-    'allocation',
-    'journal',
-    'page_size',
-    'num_buffers',
-    'buffer_length',
-    'debug',
-    'garbage_collect',
-    'verify',
-    'sweep',
-    'enable_journal',
-    'disable_journal',
-    'dbkey_scope',
-    'number_of_users',
-    'trace',
-    'no_garbage_collect',
-    'damaged',
-    'license',
-    'sys_user_name',
-    'encrypt_key',
-    'activate_shadow',
-    'sweep_interval',
-    'delete_shadow',
-    'force_write',
-    'begin_log',
-    'quit_log',
-    'no_reserve',
-    'user_name',
-    'password',
-    'password_enc',
-    'sys_user_name_enc',
-    'interp',
-    'online_dump',
-    'old_file_size',
-    'old_num_files',
-    'old_file',
-    'old_start_page',
-    'old_start_seqno',
-    'old_start_file',
-    'drop_walfile',
-    'old_dump_id',
-    'wal_backup_dir',
-    'wal_chkptlen',
-    'wal_numbufs',
-    'wal_bufsize',
-    'wal_grp_cmt_wait',
-    'lc_messages',
-    'lc_ctype',
-    'cache_manager',
-    'shutdown',
-    'online',
-    'shutdown_delay',
-    'reserved',
-    'overwrite',
-    'sec_attach',
-    'disable_wal',
-    'connect_timeout',
-    'dummy_packet_interval',
-    'gbak_attach',
-    'sql_role_name',
-    'set_page_buffers',
-    'working_directory',
-    'sql_dialect',
-    'set_db_readonly',
-    'set_db_sql_dialect',
-    'gfix_attach',
-    'gstat_attach',
-    'set_db_charset',
-    'gsec_attach',
-    'address_path' ,
-    'process_id',
-    'no_db_triggers',
-    'trusted_auth',
-    'process_name',
-    'trusted_role',
-    'org_filename',
-    'utf8_ilename',
-    'ext_call_depth',
-    'auth_block',
-    'client_version',
-    'remote_protocol',
-    'host_name',
-    'os_user',
-    'specific_auth_data',
-    'auth_plugin_list',
-    'auth_plugin_name',
-    'config',
-    'nolinger',
-    'reset_icu',
-    'map_attach',
-    'session_time_zone',
-    'set_db_replica',
-    'set_bind',
-    'decfloat_round',
-    'decfloat_traps'
-    );
-
-  TPBPrefix = 'isc_tpb_';
-  TPBConstantNames: array[1..isc_tpb_last_tpb_constant] of string = (
-    'consistency',
-    'concurrency',
-    'shared',
-    'protected',
-    'exclusive',
-    'wait',
-    'nowait',
-    'read',
-    'write',
-    'lock_read',
-    'lock_write',
-    'verb_time',
-    'commit_time',
-    'ignore_limbo',
-    'read_committed',
-    'autocommit',
-    'rec_version',
-    'no_rec_version',
-    'restart_requests',
-    'no_auto_undo',
-    'lock_timeout',
-    'read_consistency',
-    'at_snapshot_number'
-  );
-
 type
   TIBDatabase = class;
   TIBTransaction = class;
@@ -222,6 +95,7 @@ type
     function GetDefaultCharSetID: integer;
     function GetDefaultCharSetName: AnsiString;
     function GetDefaultCodePage: TSystemCodePage;
+    function GetDPBConstantNames(index: byte): string;
     function GetFirebirdAPI: IFirebirdAPI;
     function GetRemoteProtocol: string;
     function GetSQLObjectsCount: Integer;
@@ -242,7 +116,7 @@ type
     function GetTransactionCount: Integer;
     function Login(var aDatabaseName: string): Boolean;
     procedure SetDatabaseName(const Value: TIBFileName);
-    procedure SetDBParamByDPB(const Idx: Integer; Value: String);
+    procedure SetDBParamByDPB(const Idx: byte; Value: String);
     procedure SetDBParams(Value: TStrings);
     procedure SetDefaultTransaction(Value: TIBTransaction);
     procedure SetIdleTimer(Value: Integer);
@@ -295,6 +169,7 @@ type
 
     property Attachment: IAttachment read FAttachment write SetAttachment;
     property FirebirdAPI: IFirebirdAPI read GetFirebirdAPI;
+    property DPBConstantNames[index: byte]: string read GetDPBConstantNames;
     property DBSQLDialect : Integer read GetDBSQLDialect;
     property IsReadOnly: Boolean read GetIsReadOnly;
     property SQLObjectCount: Integer read GetSQLObjectCount; {ignores nil objects}
@@ -385,6 +260,7 @@ type
     function GetInTransaction: Boolean;
     function GetIdleTimer: Integer;
     procedure BeforeDatabaseDisconnect(DB: TIBDatabase);
+    function GetTPBConstantNames(index: byte): string;
     procedure SetActive(Value: Boolean);
     procedure SetDefaultDatabase(Value: TIBDatabase);
     procedure SetIdleTimer(Value: Integer);
@@ -427,6 +303,7 @@ type
     property InTransaction: Boolean read GetInTransaction;
     property TransactionIntf: ITransaction read FTransactionIntf;
     property TPB: ITPB read FTPB;
+    property TPBConstantNames[index: byte]: string read GetTPBConstantNames;
   published
     property Active: Boolean read GetInTransaction write SetActive;
     property DefaultDatabase: TIBDatabase read FDefaultDatabase
@@ -572,6 +449,7 @@ begin
       SQLObjects[i].DoDatabaseFree;
   RemoveSQLObjects;
   RemoveTransactions;
+  FTimer.Free;
   FInternalTransaction.Free;
   FConfigOverrides.Free;
   FDBParams.Free;
@@ -1282,7 +1160,7 @@ begin
   end;
 end;
 
- procedure TIBDataBase.SetDBParamByDPB( const Idx: Integer; Value: String);
+ procedure TIBDataBase.SetDBParamByDPB( const Idx: byte; Value: String);
 var
   ConstIdx: Integer;
 begin
@@ -1446,6 +1324,13 @@ begin
     Attachment.CharSetID2CodePage(DefaultCharSetID,Result)
   else
     Result := CP_NONE;
+end;
+
+function TIBDataBase.GetDPBConstantNames(index: byte): string;
+begin
+  Result := FirebirdAPI.AllocateDPB.GetDPBParamTypeName(index);
+  if Result = '' then
+    IBError(ibxeDPBConstantUnknown,[index]);
 end;
 
 function TIBDataBase.GetFirebirdAPI: IFirebirdAPI;
@@ -2030,6 +1915,16 @@ begin
   FTransactionIntf := nil;
 end;
 
+function TIBTransaction.GetTPBConstantNames(index: byte): string;
+begin
+  CheckDatabasesInList;
+  if FTPB = nil then
+    FTPB := Databases[0].FirebirdAPI.AllocateTPB;
+  Result := FTPB.GetDPBParamTypeName(index);
+  if Result = '' then
+    IBError(ibxeTPBConstantUnknown,[index]);
+end;
+
 procedure TIBTransaction.RemoveDatabase(Idx: Integer);
 var
   DB: TIBDatabase;
@@ -2188,7 +2083,7 @@ begin
          else
            IBError(ibxeDatabaseClosed, [nil]);
      end;
-    if FTRParamsChanged then
+    if FTRParamsChanged or (FTPB = nil) then
     begin
       FTRParamsChanged := False;
       FTPB :=  GenerateTPB(Databases[0].FirebirdAPI,FTRParams);
@@ -2414,9 +2309,9 @@ end;
 
 function TIBDataBase.GenerateDPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): IDPB;
 var
-  i, j: Integer;
-  DPBVal: UShort;
-  ParamName, ParamValue: string;
+  i: Integer;
+  ParamValue: string;
+  DPBItem: IDPBItem;
 begin
   Result := FirebirdAPI.AllocateDPB;
 
@@ -2430,57 +2325,44 @@ begin
     }
     if (Trim(sl.Names[i]) = '') then
       continue;
-    ParamName := LowerCase(sl.Names[i]); {mbcs ok}
-    ParamValue := Copy(sl[i], Pos('=', sl[i]) + 1, Length(sl[i])); {mbcs ok}
-    if (Pos(DPBPrefix, ParamName) = 1) then {mbcs ok}
-      Delete(ParamName, 1, Length(DPBPrefix));
-     { We want to translate the parameter name to some Integer
-       value. We do this by scanning through a list of known
-       database parameter names (DPBConstantNames, defined above) }
-    DPBVal := 0;
-    { Find the parameter }
-    for j := 1 to isc_dpb_last_dpb_constant do
-      if (ParamName = DPBConstantNames[j]) then
-      begin
-        DPBVal := j;
-        break;
-      end;
+
+    DPBItem := Result.AddByTypeName(sl.Names[i]); {mbcs ok}
+    ParamValue := sl.ValueFromIndex[i]; {mbcs ok}
      {  A database parameter either contains a string value (case 1)
        or an Integer value (case 2)
        or no value at all (case 3)
        or an error needs to be generated (case else)  }
-    case DPBVal of
+    case DPBItem.getParamType of
       isc_dpb_user_name, isc_dpb_password, isc_dpb_password_enc,
       isc_dpb_sys_user_name, isc_dpb_license, isc_dpb_encrypt_key,
       isc_dpb_lc_messages, isc_dpb_lc_ctype, isc_dpb_page_size,
-      isc_dpb_sql_role_name, isc_dpb_sql_dialect:
+      isc_dpb_sql_role_name:
+        DPBItem.SetAsString(ParamValue);
+
+      isc_dpb_sql_dialect:
       begin
-        if DPBVal = isc_dpb_sql_dialect then
-          ParamValue[1] := Char(Ord(ParamValue[1]) - 48);
-        Result.Add(DPBVal).SetAsString(ParamValue);
+        if (ParamValue = '') or (ParamValue[1] = '3') then
+          DPBItem.SetAsString(#03)
+        else
+          DPBItem.SetAsString(#01)
       end;
+
 
       isc_dpb_num_buffers, isc_dpb_dbkey_scope, isc_dpb_force_write,
       isc_dpb_no_reserve, isc_dpb_damaged, isc_dpb_verify:
-        Result.Add(DPBVal).SetAsByte(byte(ParamValue[1]));
+        DPBItem.SetAsByte(byte(ParamValue[1]));
 
       isc_dpb_sweep:
-        Result.Add(DPBVal).SetAsByte(isc_dpb_records);
+        DPBItem.SetAsByte(isc_dpb_records);
 
       isc_dpb_sweep_interval:
-        Result.Add(DPBVal).SetAsInteger(StrToInt(ParamValue));
+        DPBItem.SetAsInteger(StrToInt(ParamValue));
 
       isc_dpb_activate_shadow, isc_dpb_delete_shadow, isc_dpb_begin_log,
       isc_dpb_map_attach, isc_dpb_quit_log:
-        Result.Add(DPBVal).SetAsByte(0);
+        DPBItem.SetAsByte(0);
       else
-      begin
-        if (DPBVal > 0) and
-           (DPBVal <= isc_dpb_last_dpb_constant) then
-          IBError(ibxeDPBConstantNotSupported, [DPBConstantNames[DPBVal]])
-        else
-          IBError(ibxeDPBConstantUnknownEx, [sl.Names[i]]);
-      end;
+          IBError(ibxeDPBConstantNotSupported, [DPBItem.getParamTypeName])
     end;
   end;
   if FConfigOverrides.Count > 0 then
@@ -2494,8 +2376,9 @@ end;
   TPB and TPBLength, respectively. }
 function TIBTransaction.GenerateTPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): ITPB;
 var
-  i, j, TPBVal: Integer;
+  i: Integer;
   ParamName, ParamValue: string;
+  TPBItem: ITPBItem;
 begin
   Result := FirebirdAPI.AllocateTPB;
   for i := 0 to sl.Count - 1 do
@@ -2503,42 +2386,23 @@ begin
     if (Trim(sl[i]) =  '') then
       Continue;
 
-    if (Pos('=', sl[i]) = 0) then {mbcs ok}
-      ParamName := LowerCase(sl[i]) {mbcs ok}
-    else
-    begin
-      ParamName := LowerCase(sl.Names[i]); {mbcs ok}
-      ParamValue := Copy(sl[i], Pos('=', sl[i]) + 1, Length(sl[i])); {mbcs ok}
-    end;
-    if (Pos(TPBPrefix, ParamName) = 1) then {mbcs ok}
-      Delete(ParamName, 1, Length(TPBPrefix));
-    TPBVal := 0;
-    { Find the parameter }
-    for j := 1 to isc_tpb_last_tpb_constant do
-      if (ParamName = TPBConstantNames[j]) then
-      begin
-        TPBVal := j;
-        break;
-      end;
-    { Now act on it }
-    case TPBVal of
+    ParamName := sl.Names[i];
+    if ParamName = '' then ParamName := sl[i];
+    TPBItem := Result.AddByTypeName(ParamName);
+    ParamValue := sl.ValueFromIndex[i];
+
+    case TPBItem.getParamType of
       isc_tpb_consistency, isc_tpb_exclusive, isc_tpb_protected,
       isc_tpb_concurrency, isc_tpb_shared, isc_tpb_wait, isc_tpb_nowait,
       isc_tpb_read, isc_tpb_write, isc_tpb_ignore_limbo,
       isc_tpb_read_committed, isc_tpb_rec_version, isc_tpb_no_rec_version:
-        Result.Add(TPBVal);
+        {nothing more to do};
 
       isc_tpb_lock_read, isc_tpb_lock_write:
-        Result.Add(TPBVal).SetAsString(ParamValue);
+        TPBItem.SetAsString(ParamValue);
 
       else
-      begin
-        if (TPBVal > 0) and
-           (TPBVal <= isc_tpb_last_tpb_constant) then
-          IBError(ibxeTPBConstantNotSupported, [TPBConstantNames[TPBVal]])
-        else
-          IBError(ibxeTPBConstantUnknownEx, [sl.Names[i]]);
-      end;
+          IBError(ibxeTPBConstantNotSupported, [TPBItem.getParamTypeName])
     end;
   end;
 end;

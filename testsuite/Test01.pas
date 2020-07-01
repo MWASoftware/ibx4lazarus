@@ -86,6 +86,11 @@ begin
      if GetPerfStatistics(stats) then
        WritePerfStats(stats);
      PrintAffectedRows(IBQuery);
+     writeln(OutFile);
+     writeln(OutFile,'Reconnect');
+     IBDatabase.ReConnect;
+     Active := true;
+     PrintDataSet(IBQuery);
   end;
 end;
 

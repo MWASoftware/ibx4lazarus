@@ -5,7 +5,7 @@ unit IBXTestBase;
 interface
 
 uses
-  Classes, SysUtils, TestApplication, CustApp, DB, IBCustomDataSet, IBDatabase, IBQuery,
+  Classes, SysUtils, TestApplication, CustApp, DB, IB, IBCustomDataSet, IBDatabase, IBQuery,
   ibxscript, IBDataOutput;
 
 type
@@ -35,6 +35,7 @@ protected
   procedure ShowStrings(aCaption: string; List: TStrings);
   procedure WriteStrings(List: TStrings);
   procedure ExecuteSQL(SQL: string);
+  procedure ShowFBVersion(attachment: IAttachment);
 public
   property IBDatabase: TIBDatabase read  FIBDatabase;
   property IBTransaction: TIBTransaction read FIBTransaction;
@@ -84,9 +85,11 @@ begin
   FIBDatabase.Params.Add('password=' + Owner.GetPassword);
   FIBDatabase.Params.Add('lc_ctype=UTF8');
   FIBDatabase.OnCreateDatabase := @HandleCreateDatebase;
+  FIBDatabase.Name := 'Test_Database_' + GetTestID;
   FIBTransaction := TIBTransaction.Create(Application);
   FIBTransaction.DefaultDatabase := FIBDatabase;
   FIBDatabase.DefaultTransaction := FIBTransaction;
+  FIBTransaction.Name := 'Test_Transaction_' + GetTestID;
   FIBQuery := TIBQuery.Create(Application);
   FIBQuery.Database := FIBDatabase;
   FIBXScript := TIBXScript.Create(Application);
@@ -252,6 +255,18 @@ end;
 procedure TIBXTestBase.ExecuteSQL(SQL: string);
 begin
   FIBXScript.ExecSQLScript(SQL);
+end;
+
+procedure TIBXTestBase.ShowFBVersion(attachment: IAttachment);
+var S: TStrings;
+begin
+  S := TStringList.Create;
+  try
+    attachment.getFBVersion(S);
+    ShowStrings('FB Version',S);
+  finally
+    S.Free;
+  end;
 end;
 
 end.

@@ -134,7 +134,7 @@ end;
 
 procedure TTest04.RunTest(CharSet: AnsiString; SQLDialect: integer);
 begin
-  IBDatabase.Connected := true;
+  IBDatabase.CreateDatabase;
   try
     IBTransaction.Active := true;
     FDataSet.Active := true;
@@ -156,6 +156,29 @@ begin
   finally
     IBDatabase.DropDatabase;
   end;
+
+  writeln(Outfile,'Creating Database from SQL');
+  IBDatabase.CreateDatabase('CREATE DATABASE ''' + Owner.GetNewDatabaseName +
+                            ''' USER ''' + Owner.GetUserName +
+                            ''' PASSWORD ''' + Owner.GetPassword + '''');
+  if IBDatabase.Connected then
+  begin
+    writeln(Outfile,'Database Name = ',IBDatabase.DatabaseName);
+    try
+      IBTransaction.Active := true;
+      FDataSet.Active := true;
+      writeln(OutFile,'Add a record');
+      FDataSet.Append;
+      FDataSet.Post;
+      FDataSet.First;
+      PrintDataSet(FDataSet);
+    finally
+      IBDatabase.DropDatabase;
+    end;
+
+  end
+  else
+    writeln(OutFile,'Create Database failed');
 end;
 
 initialization
