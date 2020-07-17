@@ -10,7 +10,7 @@ IBX Change Log  version (2.3-5 Build 12212) Fri, 17 Jul 2020 15:24:08 +0100
     SQLFilterParams property is assumed to be a SQL condition clause and
     ANDed into the Where clause of the SQL Select statement provided as a
     dataset property. Each such SQL condition thus acts as an additional filter
-    on the dataset.
+    on the dataset. (Not yet tested)
 
 3.  The Filtered property inherited from TDataset is no longer used for SQL (server
     side filters).
