@@ -101,6 +101,7 @@ type
     property StoredProcName: string read FProcName write SetProcName;
     property Params: TParams read FParams write SetParamsList;
     property Filtered;
+    property Filter;
 
     property BeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect;

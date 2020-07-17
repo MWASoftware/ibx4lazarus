@@ -441,6 +441,8 @@ type
     FRecordCount: Integer;
     FRecordSize: Integer;
     FDataSetCloseAction: TDataSetCloseAction;
+    FSQLFiltered: boolean;
+    FSQLFilterParams: TStrings;
     FUniDirectional: Boolean;
     FUpdateMode: TUpdateMode;
     FUpdateObject: TIBDataSetUpdateObject;
@@ -476,6 +478,8 @@ type
     procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
     function GetSelectStmtIntf: IStatement;
     procedure SetCaseSensitiveParameterNames(AValue: boolean);
+    procedure SetSQLFiltered(AValue: boolean);
+    procedure SetSQLFilterParams(AValue: TStrings);
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
 
@@ -509,6 +513,7 @@ type
     function GetModifySQL: TStrings;
     function GetTransaction: TIBTransaction;
     function GetParser: TSelectSQLParser;
+    procedure HandleSQLFilterParamsChanged(Sender: TObject);
     procedure InternalDeleteRecord(Qry: TIBSQL; Buff: Pointer); virtual;
     function InternalLocate(const KeyFields: string; const KeyValues: Variant;
                             Options: TLocateOptions): Boolean; virtual;
@@ -668,6 +673,8 @@ type
     property ParamCheck: Boolean read FParamCheck write FParamCheck default True;
     property Parser: TSelectSQLParser read GetParser;
     property BaseSQLSelect: TStrings read FBaseSQLSelect;
+    property SQLFiltered: boolean read FSQLFiltered write SetSQLFiltered;
+    property SQLFilterParams: TStrings read FSQLFilterParams write SetSQLFilterParams;
 
     property BeforeDatabaseDisconnect: TNotifyEvent read FBeforeDatabaseDisconnect
                                                  write FBeforeDatabaseDisconnect;
@@ -781,7 +788,6 @@ type
 
   TIBParserDataSet = class(TIBCustomDataSet)
   protected
-    procedure SetFilterText(const Value: string); override;
     procedure DoBeforeOpen; override;
   public
     property Parser;
@@ -833,6 +839,8 @@ type
     property UniDirectional;
     property Filtered;
     property DataSetCloseAction;
+    property SQLFiltered;
+    property SQLFilterParams;
 
     property BeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect;
@@ -1037,24 +1045,14 @@ type
 
 { TIBParserDataSet }
 
-procedure TIBParserDataSet.SetFilterText(const Value: string);
-begin
-  if Filter = Value then Exit;
-  inherited SetFilterText(Value);
-  if Active and Filtered then {reopen dataset}
-  begin
-    Active := false;
-    Active := true;
-  end;
-end;
-
 procedure TIBParserDataSet.DoBeforeOpen;
 var i: integer;
 begin
   if assigned(FParser) then
      FParser.RestoreClauseValues;
-  if Filtered and (Filter <> '') then
-    Parser.Add2WhereClause(Filter);
+  if SQLFiltered then
+    for i := 0 to SQLFilterParams.Count - 1 do
+      Parser.Add2WhereClause(SQLFilterParams[i]);
   for i := 0 to FIBLinks.Count - 1 do
     TIBControlLink(FIBLinks[i]).UpdateSQL(self);
   inherited DoBeforeOpen;
@@ -1588,6 +1586,8 @@ begin
     if AOwner is TIBTransaction then
       Transaction := TIBTransaction(AOwner);
   FBaseSQLSelect := TStringList.Create;
+  FSQLFilterParams := TStringList.Create;
+  TStringList(FSQLFilterParams).OnChange :=  HandleSQLFilterParamsChanged;
 end;
 
 destructor TIBCustomDataSet.Destroy;
@@ -1610,6 +1610,7 @@ begin
   FMappedFieldPosition := nil;
   if assigned(FBaseSQLSelect) then FBaseSQLSelect.Free;
   if assigned(FParser) then FParser.Free;
+  if assigned(FSQLFilterParams) then FSQLFilterParams.Free;
   inherited Destroy;
 end;
 
@@ -4798,6 +4799,23 @@ begin
     FQSelect.CaseSensitiveParameterNames := AValue;
 end;
 
+procedure TIBCustomDataSet.SetSQLFiltered(AValue: boolean);
+begin
+  if FSQLFiltered = AValue then Exit;
+  FSQLFiltered := AValue;
+  if Active then
+  begin
+    Active := false;
+    Active := true;
+  end;
+end;
+
+procedure TIBCustomDataSet.SetSQLFilterParams(AValue: TStrings);
+begin
+  if FSQLFilterParams = AValue then Exit;
+  FSQLFilterParams.Assign(AValue);
+end;
+
 procedure TIBCustomDataSet.SetMasterDetailDelay(AValue: integer);
 begin
   FDataLink.DelayTimerValue := AValue;
@@ -4808,6 +4826,11 @@ begin
   if not assigned(FParser) then
     FParser := CreateParser;
   Result := FParser
+end;
+
+procedure TIBCustomDataSet.HandleSQLFilterParamsChanged(Sender: TObject);
+begin
+  Active := false;
 end;
 
 procedure TIBCustomDataSet.ResetParser;

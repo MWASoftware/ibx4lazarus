@@ -128,6 +128,9 @@ type
     property UniDirectional default False;
     property UpdateObject;
     property Filtered;
+    property Filter;
+    property SQLFiltered;
+    property SQLFilterParams;
     property DataSetCloseAction;
 
     property BeforeDatabaseDisconnect;

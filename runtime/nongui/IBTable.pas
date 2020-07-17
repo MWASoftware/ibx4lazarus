@@ -161,6 +161,8 @@ type
     property EnableStatistics;
     property Filter;
     property Filtered;
+    property SQLFiltered;
+    property SQLFilterParams;
     property GeneratorField;
     property IndexDefs: TIndexDefs read FIndexDefs write SetIndexDefs stored IndexDefsStored;
     property IndexFieldNames: string read GetIndexFieldNames write SetIndexFieldNames;
