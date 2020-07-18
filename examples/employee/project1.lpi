@@ -55,7 +55,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="20"/>
         <CursorPos X="5" Y="37"/>
         <UsageCount Value="200"/>
@@ -281,10 +280,12 @@
       </Unit31>
       <Unit32>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1048"/>
-        <CursorPos X="48" Y="1055"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1342"/>
+        <CursorPos X="34" Y="1370"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit32>
       <Unit33>
         <Filename Value="../../../fbintf/client/FBStatement.pas"/>
@@ -662,7 +663,19 @@
         <UsageCount Value="10"/>
       </Unit84>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="3" HistoryIndex="2">
+      <Position1>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="1064" Column="59" TopLine="1048"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="1207" Column="23" TopLine="1179"/>
+      </Position3>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
