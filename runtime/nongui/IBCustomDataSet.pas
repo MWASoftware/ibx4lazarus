@@ -500,6 +500,8 @@ type
     FRecordSize: Integer;
     FDataSetCloseAction: TDataSetCloseAction;
     FTZTextOption: TTZTextOptions;
+    FSQLFiltered: boolean;
+    FSQLFilterParams: TStrings;
     FUniDirectional: Boolean;
     FUpdateMode: TUpdateMode;
     FUpdateObject: TIBDataSetUpdateObject;
@@ -536,6 +538,8 @@ type
     function GetSelectStmtIntf: IStatement;
     procedure SetCaseSensitiveParameterNames(AValue: boolean);
     procedure SetDefaultTZDate(AValue: TDateTime);
+    procedure SetSQLFiltered(AValue: boolean);
+    procedure SetSQLFilterParams(AValue: TStrings);
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
 
@@ -569,6 +573,7 @@ type
     function GetModifySQL: TStrings;
     function GetTransaction: TIBTransaction;
     function GetParser: TSelectSQLParser;
+    procedure HandleSQLFilterParamsChanged(Sender: TObject);
     procedure InternalDeleteRecord(Qry: TIBSQL; Buff: Pointer); virtual;
     function InternalLocate(const KeyFields: string; const KeyValues: Variant;
                             Options: TLocateOptions): Boolean; virtual;
@@ -729,6 +734,8 @@ type
     property UpdateMode: TUpdateMode read FUpdateMode write SetUpdateMode default upWhereAll;
     property ParamCheck: Boolean read FParamCheck write FParamCheck default True;
     property TZTextOption: TTZTextOptions read FTZTextOption write FTZTextOption;
+    property SQLFiltered: boolean read FSQLFiltered write SetSQLFiltered;
+    property SQLFilterParams: TStrings read FSQLFilterParams write SetSQLFilterParams;
 
     property BeforeDatabaseDisconnect: TNotifyEvent read FBeforeDatabaseDisconnect
                                                  write FBeforeDatabaseDisconnect;
@@ -843,7 +850,6 @@ type
 
   TIBParserDataSet = class(TIBCustomDataSet)
   protected
-    procedure SetFilterText(const Value: string); override;
     procedure DoBeforeOpen; override;
   public
     property Parser;
@@ -897,6 +903,8 @@ type
     property DataSetCloseAction;
     property TZTextOption;
     property DefaultTZDate;
+    property SQLFiltered;
+    property SQLFilterParams;
 
     property BeforeDatabaseDisconnect;
     property AfterDatabaseDisconnect;
@@ -1333,24 +1341,14 @@ end;
 
 { TIBParserDataSet }
 
-procedure TIBParserDataSet.SetFilterText(const Value: string);
-begin
-  if Filter = Value then Exit;
-  inherited SetFilterText(Value);
-  if Active and Filtered then {reopen dataset}
-  begin
-    Active := false;
-    Active := true;
-  end;
-end;
-
 procedure TIBParserDataSet.DoBeforeOpen;
 var i: integer;
 begin
   if assigned(FParser) then
      FParser.RestoreClauseValues;
-  if Filtered and (Filter <> '') then
-    Parser.Add2WhereClause(Filter);
+  if SQLFiltered then
+    for i := 0 to SQLFilterParams.Count - 1 do
+      Parser.Add2WhereClause(SQLFilterParams[i]);
   for i := 0 to FIBLinks.Count - 1 do
     TIBControlLink(FIBLinks[i]).UpdateSQL(self);
   inherited DoBeforeOpen;
@@ -1664,10 +1662,14 @@ begin
       SetCodePage(s,CodePage,false);
       if (CodePage <> CP_NONE) and (CodePage <> CP_UTF8) then
         SetCodePage(s,CP_UTF8,true);  {LCL only accepts UTF8}
-      if UTF8Length(s) > Size then
+
+      if (CodePage = CP_UTF8) and (UTF8Length(s) > Size) then
+        {truncate to max. number of UTF8 characters - usually a problem with
+         fixed width columns right padded with white space}
         Value := UTF8Copy(s,1,Size)
       else
         Value := s;
+
 //      writeln(FieldName,': ', StringCodePage(Value),', ',Value);
       if Transliterate and (Value <> '') then
         DataSet.Translate(PChar(Value), PChar(Value), False);
@@ -1882,6 +1884,8 @@ begin
   FBaseSQLSelect := TStringList.Create;
   FTZTextOption := tzOffset;
   FDefaultTZDate := EncodeDate(2020,1,1);
+  FSQLFilterParams := TStringList.Create;
+  TStringList(FSQLFilterParams).OnChange :=  HandleSQLFilterParamsChanged;
 end;
 
 destructor TIBCustomDataSet.Destroy;
@@ -1904,6 +1908,7 @@ begin
   FMappedFieldPosition := nil;
   if assigned(FBaseSQLSelect) then FBaseSQLSelect.Free;
   if assigned(FParser) then FParser.Free;
+  if assigned(FSQLFilterParams) then FSQLFilterParams.Free;
   inherited Destroy;
 end;
 
@@ -5167,6 +5172,23 @@ begin
   FDefaultTZDate := DateOf(AValue);
 end;
 
+procedure TIBCustomDataSet.SetSQLFiltered(AValue: boolean);
+begin
+  if FSQLFiltered = AValue then Exit;
+  FSQLFiltered := AValue;
+  if Active then
+  begin
+    Active := false;
+    Active := true;
+  end;
+end;
+
+procedure TIBCustomDataSet.SetSQLFilterParams(AValue: TStrings);
+begin
+  if FSQLFilterParams = AValue then Exit;
+  FSQLFilterParams.Assign(AValue);
+end;
+
 procedure TIBCustomDataSet.SetMasterDetailDelay(AValue: integer);
 begin
   FDataLink.DelayTimerValue := AValue;
@@ -5177,6 +5199,11 @@ begin
   if not assigned(FParser) then
     FParser := CreateParser;
   Result := FParser
+end;
+
+procedure TIBCustomDataSet.HandleSQLFilterParamsChanged(Sender: TObject);
+begin
+  Active := false;
 end;
 
 procedure TIBCustomDataSet.ResetParser;

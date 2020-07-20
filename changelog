@@ -40,6 +40,23 @@ IBX Change Log  version (2.4-0 Build 11661) Thu, 11 Apr 2019 09:43:38 +0100
     truncated to its fixed character width rather than being right padded with
     white space to the maximum data size.
 
+IBX Change Log  version (2.3-5 Build 12212) Fri, 17 Jul 2020 15:24:08 +0100
+
+1.  TIBStringField: when a string value is read from a dataset buffer, if the
+    number of UTF8 characters exceeds the string size then string is truncated
+    to the maximum string size. This is  usually a problem with fixed width columns
+    right padded with white space.
+
+2.  SQLFiltered and SQLFilterParams added to TIBQuery, TIBTable and TIBDataset.
+    If SQLFiltered is set then when a dataset is opened, each line in the
+    SQLFilterParams property is assumed to be a SQL condition clause and
+    ANDed into the Where clause of the SQL Select statement provided as a
+    dataset property. Each such SQL condition thus acts as an additional filter
+    on the dataset. (Not yet tested)
+
+3.  The Filtered property inherited from TDataset is no longer used for SQL (server
+    side filters).
+
 IBX Change Log  version (2.3-4 Build 12019) Fri, 17 Apr 2020 10:45:20 +0100
 
 1.  TIBXDataSet and Generators: Generator Names that are not all upper case or
