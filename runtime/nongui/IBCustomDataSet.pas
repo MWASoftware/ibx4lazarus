@@ -1664,7 +1664,10 @@ begin
       SetCodePage(s,CodePage,false);
       if (CodePage <> CP_NONE) and (CodePage <> CP_UTF8) then
         SetCodePage(s,CP_UTF8,true);  {LCL only accepts UTF8}
-      Value := s;
+      if UTF8Length(s) > Size then
+        Value := UTF8Copy(s,1,Size)
+      else
+        Value := s;
 //      writeln(FieldName,': ', StringCodePage(Value),', ',Value);
       if Transliterate and (Value <> '') then
         DataSet.Translate(PChar(Value), PChar(Value), False);

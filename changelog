@@ -36,6 +36,10 @@ IBX Change Log  version (2.4-0 Build 11661) Thu, 11 Apr 2019 09:43:38 +0100
 12. Constants: DPBPrefix and TPBPrefix moved to IB unit. DPBConstantNames and TPBConstantNames
     now accessible as properties of TIBDatabase and TIBTransaction respectively.
 
+13. String Fields: when a fixed character with (CHAR) field is returned, it is now
+    truncated to its fixed character width rather than being right padded with
+    white space to the maximum data size.
+
 IBX Change Log  version (2.3-4 Build 12019) Fri, 17 Apr 2020 10:45:20 +0100
 
 1.  TIBXDataSet and Generators: Generator Names that are not all upper case or
