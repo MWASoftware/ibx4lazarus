@@ -370,9 +370,9 @@ begin
                  UTF8Insert(sPrefixText, sResultText, 1);
                end;
                Text := sResultText;
-               SelStart := iSelStart;
-               SelLength := UTF8Length(Text) - iSelStart;
              end;
+             SelStart := iSelStart;
+             SelLength := UTF8Length(Text) - iSelStart;
            end
            else
            begin
