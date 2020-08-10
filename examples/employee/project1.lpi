@@ -124,8 +124,8 @@
       <Unit10>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="88"/>
-        <CursorPos X="47" Y="111"/>
+        <TopLine Value="1454"/>
+        <CursorPos X="15" Y="1471"/>
         <UsageCount Value="28"/>
       </Unit10>
       <Unit11>
@@ -176,7 +176,7 @@
       <Unit17>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="17" Y="23"/>
+        <CursorPos X="19" Y="16"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit17>
@@ -227,9 +227,9 @@
       <Unit24>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="547"/>
-        <CursorPos X="3" Y="558"/>
-        <UsageCount Value="6"/>
+        <TopLine Value="1304"/>
+        <CursorPos X="3" Y="1307"/>
+        <UsageCount Value="10"/>
       </Unit24>
       <Unit25>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/sysutils/dati.inc"/>
@@ -309,16 +309,16 @@
       <Unit36>
         <Filename Value="../../runtime/nongui/IBQuery.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="353"/>
-        <CursorPos Y="373"/>
-        <UsageCount Value="5"/>
+        <TopLine Value="118"/>
+        <CursorPos X="24" Y="133"/>
+        <UsageCount Value="10"/>
       </Unit36>
       <Unit37>
         <Filename Value="../../runtime/nongui/IBTable.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1463"/>
-        <CursorPos X="25" Y="1473"/>
-        <UsageCount Value="6"/>
+        <TopLine Value="148"/>
+        <CursorPos X="29" Y="165"/>
+        <UsageCount Value="10"/>
       </Unit37>
       <Unit38>
         <Filename Value="../../runtime/nongui/IBDataOutput.pas"/>
@@ -472,8 +472,9 @@
       <Unit59>
         <Filename Value="../../runtime/nongui/IBStoredProc.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="58"/>
-        <UsageCount Value="4"/>
+        <TopLine Value="86"/>
+        <CursorPos X="21" Y="104"/>
+        <UsageCount Value="10"/>
       </Unit59>
       <Unit60>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/astrings.inc"/>
@@ -698,7 +699,19 @@
         <UsageCount Value="10"/>
       </Unit90>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="3" HistoryIndex="2">
+      <Position1>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="1064" Column="59" TopLine="1048"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="1207" Column="23" TopLine="1179"/>
+      </Position3>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
