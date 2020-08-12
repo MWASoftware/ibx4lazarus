@@ -1,4 +1,4 @@
-IBX Change Log  version (2.3-5 Build 12234) Sat, 18 Jul 2020 11:13:30 +0100
+IBX Change Log  version (2.3-5 Build 12297) Wed, 12 Aug 2020 12:03:34 +0100
 
 1.  TIBStringField: when a string value is read from a dataset buffer, if the
     number of UTF8 characters exceeds the string size then string is truncated
@@ -14,6 +14,12 @@ IBX Change Log  version (2.3-5 Build 12234) Sat, 18 Jul 2020 11:13:30 +0100
 
 3.  The Filtered property inherited from TDataset is no longer used for SQL (server
     side filters).
+
+4. IBLookupComboEditBox: Selection should no longer reset to start of text when
+   text matches complete entry.
+
+5. TIBDataLink: Detail Dataset params not refreshed unless both master and detail
+   dataset are active (avoids risk of access violation if master is inactive)
 
 IBX Change Log  version (2.3-4 Build 12041) Fri, 17 Apr 2020 14:00:32 +0100
 
