@@ -268,6 +268,7 @@ begin
   begin
     FEventIntf := nil;
     FRegistered := false;
+    FStartEvent := true;
   end;
 end;
 
