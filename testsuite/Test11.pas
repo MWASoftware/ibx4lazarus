@@ -44,7 +44,7 @@ implementation
 procedure TTest11.EventHandler(Sender: TObject; EventName: string;
   EventCount: longint; var CancelAlerts: Boolean);
 begin
-  writeln(OutFile,'Event Handled: ',EventName);
+  writeln(OutFile,'Event Handled: ',EventName, ', Count = ',EventCount);
 end;
 
 procedure TTest11.CreateObjects(Application: TTestApplication);
@@ -54,6 +54,7 @@ begin
   FEvents.Database := IBDatabase;
   FEvents.OnEventAlert := @EventHandler;
   FEvents.Events.Add('EVENT1');
+  FEvents.Events.Add('EVENT2');
   FExecProc := TIBStoredProc.Create(Application);
   FExecProc.Database := IBDatabase;
 end;
@@ -89,23 +90,24 @@ begin
     FExecProc.ExecProc;
     writeln(OutFile,'Event Called');
     IBTransaction.Commit;
-    CheckSynchronize(1);
+    CheckSynchronize(5);
   finally
     IBDatabase.DropDatabase;
   end;
   writeln(OutFile,'Case #2: Event Registration after DB Open');
   IBDatabase.Connected := true;
   try
-    IBTransaction.Active := true;
     FEvents.Registered := true;
+    IBTransaction.Active := true;
     CheckSynchronize(1);
     FExecProc.StoredProcName := 'CALLEVENT';
     FExecProc.Prepare;
-    FExecProc.Params[0].AsString := 'EVENT1';
+    FExecProc.Params[0].AsString := 'EVENT2';
     FExecProc.ExecProc;
     writeln(OutFile,'Event Called');
     IBTransaction.Commit;
-    CheckSynchronize(1);
+    CheckSynchronize(5);
+    FEvents.UnRegisterEvents;
   finally
     IBDatabase.DropDatabase;
   end;

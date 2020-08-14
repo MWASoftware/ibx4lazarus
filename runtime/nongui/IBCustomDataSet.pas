@@ -1798,7 +1798,7 @@ end;
 
 procedure TIBDataLink.ActiveChanged;
 begin
-  if FDataSet.Active then
+  if DetailDataSet.Active and DataSet.Active then
     FDataSet.RefreshParams;
 end;
 
