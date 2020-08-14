@@ -5660,7 +5660,7 @@ end;
 
 procedure TIBGenerator.SetQuerySQL;
 begin
-  if Database <> nil then
+  if (Database <> nil) and (FGeneratorName <> '') then
     FQuery.SQL.Text := Format('Select Gen_ID(%s,%d) From RDB$Database',
       [QuoteIdentifierIfNeeded(Database.SQLDialect,FGeneratorName),Increment]);
 end;
