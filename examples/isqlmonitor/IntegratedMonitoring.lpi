@@ -57,8 +57,8 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="28"/>
-        <CursorPos X="12" Y="36"/>
+        <TopLine Value="165"/>
+        <CursorPos X="3" Y="402"/>
         <UsageCount Value="123"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -69,10 +69,13 @@
         <ComponentName Value="MonitorForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="42" Y="15"/>
+        <TopLine Value="41"/>
+        <CursorPos X="3" Y="63"/>
         <UsageCount Value="25"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="SelectDeptDlgUnit.pas"/>
@@ -319,7 +322,7 @@
         <UsageCount Value="10"/>
       </Unit32>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="4" HistoryIndex="3">
       <Position1>
         <Filename Value="MainForm.pas"/>
         <Caret Line="37" Column="4" TopLine="28"/>
@@ -328,6 +331,14 @@
         <Filename Value="MainForm.pas"/>
         <Caret Line="36" Column="12" TopLine="28"/>
       </Position2>
+      <Position3>
+        <Filename Value="MonitorFormUnit.pas"/>
+        <Caret Line="4" Column="65"/>
+      </Position3>
+      <Position4>
+        <Filename Value="MainForm.pas"/>
+        <Caret Line="35" Column="7" TopLine="28"/>
+      </Position4>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

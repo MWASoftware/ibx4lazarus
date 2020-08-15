@@ -32,7 +32,7 @@
         <PackageName Value="ibnongui"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="17">
+    <Units Count="18">
       <Unit0>
         <Filename Value="testsuite.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -101,6 +101,10 @@
         <Filename Value="Test11.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit16>
+      <Unit17>
+        <Filename Value="Test13.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit17>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

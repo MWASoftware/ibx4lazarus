@@ -89,6 +89,7 @@ begin
      writeln(OutFile);
      writeln(OutFile,'Reconnect');
      IBDatabase.ReConnect;
+     Unidirectional := false;
      Active := true;
      PrintDataSet(IBQuery);
   end;

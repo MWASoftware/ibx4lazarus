@@ -129,6 +129,7 @@ begin
   else
   while not aDataSet.EOF do
   begin
+    CheckSynchronize(1);
     writeln(OutFile,'Row No = ',rowno);
     for i := 0 to aDataSet.FieldCount - 1 do
       PrintDataSetRow(aDataSet.Fields[i]);
