@@ -3915,6 +3915,7 @@ end;
 procedure TIBCustomDataSet.InternalFirst;
 begin
   FCurrentRecord := -1;
+  if Unidirectional then GetNextRecord;
 end;
 
 procedure TIBCustomDataSet.InternalGotoBookmark(Bookmark: Pointer);
