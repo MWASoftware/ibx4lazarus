@@ -17,7 +17,7 @@ interface
 
 uses
   Classes, SysUtils, TestApplication, IBXTestBase, IB, IBCustomDataSet, IBDatabase,
-  IBQuery, IBInternals, IBSQLMonitor, Process, BaseUnix;
+  IBQuery, IBInternals, IBSQLMonitor, Process {$IFDEF UNIX}, BaseUnix {$ENDIF};
 
 const
   aTestID    = '14';
@@ -36,9 +36,11 @@ type
     FProcess: TProcess;
     FIsChild: boolean;
     FLogFile: Text;
+    {$IFDEF UNIX}
     Foa,Fna : PSigActionRec;
-    procedure HandleOnSQL(EventText: String; EventTime : TDateTime);
     procedure SetupSignalHandler;
+    {$ENDIF}
+    procedure HandleOnSQL(EventText: String; EventTime : TDateTime);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -77,9 +79,13 @@ const
 procedure TTest14.HandleOnSQL(EventText: String; EventTime: TDateTime);
 begin
   if FIsChild then
+  begin
     writeln(FLogFile,'*Monitor* '+DateTimeToStr(EventTime)+' '+EventText);
+    Flush(FLogFile);
+  end;
 end;
 
+{$IFDEF UNIX}
 procedure DoSigTerm(sig : cint);cdecl;
 begin
   TTest14.FTerminated := true;
@@ -102,6 +108,7 @@ begin
     halt(1);
   end;
 end;
+{$ENDIF}
 
 procedure TTest14.CreateObjects(Application: TTestApplication);
 begin
@@ -134,7 +141,9 @@ begin
   FIsChild := Owner.TestOption <> '';
   if FIsChild then
   begin
+    {$IFDEF UNIX}
     SetupSignalHandler;
+    {$ENDIF}
     FIBSQLMonitor.Enabled := true;
     assignFile(FLogFile,Owner.TestOption);
     Rewrite(FLogFile);
@@ -200,6 +209,7 @@ begin
   CheckSynchronize(1);
   DisableMonitoring;
   FProcess.Terminate(0);
+  Sleep(1000);
   assignFile(aLogFile,LogFileName);
   Reset(aLogFile);
   while not EOF(aLogFile) do

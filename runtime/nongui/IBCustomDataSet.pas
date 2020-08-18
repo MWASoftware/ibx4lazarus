@@ -2576,7 +2576,7 @@ begin
           PDouble(BufPtr)^ := ColData.AsDouble;
 
         SQL_BOOLEAN:
-          PBoolean(BufPtr)^ := ColData.AsBoolean;
+          system.PBoolean(BufPtr)^ := ColData.AsBoolean;
 
         SQL_DEC16,
         SQL_DEC34,
