@@ -2,29 +2,26 @@ unit Test14;
 
 {$mode objfpc}{$H+}
 
-{ Test 14: IBStored Proc with packages}
+{Test 14: Open and read from Employee Database with ISQLMonitor}
 
-{
-This demonstrates the use of TIBStoredProc with the Firebird 3 packages example
-provided with the Firebird 3 source code. A database is created in a temporary
-location when the application is first run. Once this completes, IBStoredProc2 calls
-the global stored procedure "test", which populates the temporary table FB$OUT.
+{  This is a simple use of IBX to access the employee database in console mode.
+  The program opens the database, runs a query and writes the result to stdout.
 
-IBStoredProc1 then calls the GET_LINES procedure in the FB$OUT package. It returns
-a text blob which is then printed out.
+  ISQLMonitor is used to trace the activity.
+
+  The Monitor is in a separate process
 
 }
-
 
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB, IBStoredProc,
-  IBDatabase;
+  Classes, SysUtils, TestApplication, IBXTestBase, IB, IBCustomDataSet, IBDatabase,
+  IBQuery, IBInternals, IBSQLMonitor, Process, BaseUnix;
 
 const
   aTestID    = '14';
-  aTestTitle = 'IBStored Proc with packages';
+  aTestTitle = 'Open and read from Employee Database with ISQLMonitor';
 
 type
 
@@ -32,32 +29,91 @@ type
 
   TTest14 = class(TIBXTestBase)
   private
-    FIBStoredProc1: TIBStoredProc;
-    FIBStoredProc2: TIBStoredProc;
+    class var FTerminated: boolean;
+  private
+    FIBSQLMonitor: TIBSQLMonitor;
+    FLog: TStringList;
+    FProcess: TProcess;
+    FIsChild: boolean;
+    FLogFile: Text;
+    Foa,Fna : PSigActionRec;
+    procedure HandleOnSQL(EventText: String; EventTime : TDateTime);
+    procedure SetupSignalHandler;
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
-    procedure InitialiseDatabase(aDatabase: TIBDatabase); override;
-    function SkipTest: boolean; override;
   public
+    destructor Destroy; override;
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
   end;
 
 
 implementation
 
-{ TTest14 }
+const
+  sqlExample =
+'with recursive Depts As (   '+
+'Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,'+
+'cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH '+
+'From DEPARTMENT Where HEAD_DEPT is NULL '+
+'UNION ALL '+
+'Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  '' / '' || D.DEPARTMENT as DEPT_PATH,'+
+'Depts.DEPT_KEY_PATH || '';'' || D.DEPT_NO as DEPT_KEY_PATH '+
+'From DEPARTMENT D '+
+'JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO '+
+')'+
+
+'Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,'+
+'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH '+
+'From EMPLOYEE A '+
+'JOIN Depts D On D.DEPT_NO = A.DEPT_NO';
+
+  LogFileName = 'Test_ISQLMonitor'  + '.log';
+
+  { TTest14 }
+
+procedure TTest14.HandleOnSQL(EventText: String; EventTime: TDateTime);
+begin
+  if FIsChild then
+    writeln(FLogFile,'*Monitor* '+DateTimeToStr(EventTime)+' '+EventText);
+end;
+
+procedure DoSigTerm(sig : cint);cdecl;
+begin
+  TTest14.FTerminated := true;
+end;
+
+procedure TTest14.SetupSignalHandler;
+begin
+  FTerminated := false;
+  new(Fna);
+  new(Foa);
+  Fna^.sa_Handler:=SigActionHandler(@DoSigTerm);
+  fillchar(Fna^.Sa_Mask,sizeof(Fna^.sa_mask),#0);
+  Fna^.Sa_Flags:=0;
+  {$ifdef Linux}               // Linux specific
+    Fna^.Sa_Restorer:=Nil;
+  {$endif}
+  if fpSigAction(SigTerm,Fna,Foa)<>0 then
+  begin
+    writeln('Error setting signal handler: ',fpgeterrno,'.');
+    halt(1);
+  end;
+end;
 
 procedure TTest14.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
-  IBQuery.SQL.Text := 'Select A.LINE_NUM, A.CONTENT From FB$OUT_TABLE A';
-  FIBStoredProc1 := TIBStoredProc.Create(Application);
-  FIBStoredProc1.Database := IBDatabase;
-  FIBStoredProc2 := TIBStoredProc.Create(Application);
-  FIBStoredProc2.Database := IBDatabase;
+  FIBSQLMonitor := TIBSQLMonitor.Create(Application);
+  FIBSQLMonitor.TraceFlags := [tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
+     tfTransact, tfBlob, tfService, tfMisc];
+  IBDatabase.TraceFlags := [tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
+     tfTransact, tfBlob, tfService, tfMisc];
+  FIBSQLMonitor.OnSQL := @HandleOnSQL;
+  FLog := TStringList.Create;
+  FProcess := TProcess.Create(Application);
 end;
 
 function TTest14.GetTestID: AnsiString;
@@ -72,46 +128,84 @@ end;
 
 procedure TTest14.InitTest;
 begin
-  IBDatabase.DatabaseName := Owner.GetNewDatabaseName;
-  IBDatabase.CreateIfNotExists := true;
-  FIBStoredProc1.PackageName := 'FB$OUT';
-  FIBStoredProc1.StoredProcName := 'GET_LINES';
-  FIBStoredProc2.StoredProcName := 'TEST';
-  ReadWriteTransaction;
-end;
-
-procedure TTest14.InitialiseDatabase(aDatabase: TIBDatabase);
-begin
-  if aDatabase.attachment.GetODSMajorVersion < 12 then
+  inherited InitTest;
+  IBDatabase.DatabaseName := Owner.GetEmployeeDatabaseName;
+  ReadOnlyTransaction;
+  FIsChild := Owner.TestOption <> '';
+  if FIsChild then
   begin
-    aDatabase.DropDatabase;
-    raise ESkipException.Create('This test requires Firebird 3');
+    SetupSignalHandler;
+    FIBSQLMonitor.Enabled := true;
+    assignFile(FLogFile,Owner.TestOption);
+    Rewrite(FLogFile);
+  end
+  else
+  begin
+     FProcess.Executable := ParamStr(0);
+     FProcess.Parameters.Clear;
+     FProcess.Parameters.Add('-q');
+     FProcess.Parameters.Add('-t');
+     FProcess.Parameters.Add(GetTestID);
+     FProcess.Parameters.Add('-O');
+     FProcess.Parameters.Add(LogFileName);
+     FProcess.Options := [];
   end;
-  RunScript(aDatabase,'resources/fbout-header.sql');
-  RunScript(aDatabase,'resources/fbout-body.sql');
-  RunScript(aDatabase,'resources/fbout-test.sql');
-  IBTransaction.Commit;
 end;
 
-function TTest14.SkipTest: boolean;
+destructor TTest14.Destroy;
 begin
-  Result := FirebirdAPI.GetClientMajor < 3;
+  FLog.Free;
+  inherited Destroy;
 end;
 
 procedure TTest14.RunTest(CharSet: AnsiString; SQLDialect: integer);
+var stats: TPerfCounters;
+    i: integer;
+    aLogFile: Text;
+    Line: string;
 begin
-  IBDatabase.Connected := true;
-  try
-    IBTransaction.Active := true;
-    FIBStoredProc2.ExecProc;
-    IBTransaction.Commit;
-    IBTransaction.Active := true;
-    IBQuery.Active := true;
-    PrintDataSet(IBQuery);
-    FIBStoredProc1.ExecProc;
-    writeln(OutFile,FIBStoredProc1.ParamByName('LINES').AsString);
-  finally
-    IBDatabase.DropDatabase;
+  writeln(OutFile);
+  EnableMonitoring;
+  if not FIsChild then
+    FProcess.Execute
+  else
+  begin
+    while not FTerminated do
+      CheckSynchronize(1);  //loop until terminated
+    Close(FLogFile);
+    Exit;
+  end;
+
+  CheckSynchronize(1);
+  with IBQuery do
+  begin
+     AllowAutoActivateTransaction := true;
+     Unidirectional := true;
+     SQL.Text := sqlExample;
+     EnableStatistics := true;
+     Active := true;
+     PrintDataSet(IBQuery);
+
+     if GetPerfStatistics(stats) then
+       WritePerfStats(stats);
+     PrintAffectedRows(IBQuery);
+     writeln(OutFile);
+     writeln(OutFile,'Reconnect');
+     IBDatabase.ReConnect;
+     Unidirectional := false;
+     Active := true;
+     PrintDataSet(IBQuery);
+  end;
+  IBDatabase.Connected := false;
+  CheckSynchronize(1);
+  DisableMonitoring;
+  FProcess.Terminate(0);
+  assignFile(aLogFile,LogFileName);
+  Reset(aLogFile);
+  while not EOF(aLogFile) do
+  begin
+     readln(aLogFile,Line);
+     writeln(OutFile,Line);
   end;
 end;
 
