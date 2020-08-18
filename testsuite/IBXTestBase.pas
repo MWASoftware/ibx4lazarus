@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, TestApplication, CustApp, DB, IB, IBCustomDataSet, IBDatabase, IBQuery,
-  ibxscript, IBDataOutput;
+  ibxscript, IBDataOutput, IBSQL;
 
 type
 
@@ -28,7 +28,8 @@ protected
   procedure InitialiseDatabase(aDatabase: TIBDatabase); virtual;
   procedure PrintDataSet(aDataSet: TDataSet);
   procedure PrintDataSetRow(aField: TField);
-  procedure PrintAffectedRows(query: TIBCustomDataSet);
+  procedure PrintAffectedRows(query: TIBCustomDataSet); overload;
+  procedure PrintAffectedRows(query: TIBSQL); overload;
   procedure ReadOnlyTransaction;
   procedure ReadWriteTransaction;
   procedure RunScript(aDatabase: TIBDatabase; aFileName: string);
@@ -204,6 +205,18 @@ procedure TIBXTestBase.PrintAffectedRows(query: TIBCustomDataSet);
 var SelectCount, InsertCount, UpdateCount, DeleteCount: integer;
 begin
   if query.GetRowsAffected(SelectCount, InsertCount, UpdateCount, DeleteCount) then
+  begin
+    writeln('Selects = ',SelectCount);
+    writeln('Inserts = ',InsertCount);
+    writeln('Updates = ',UpdateCount);
+    writeln('Deletes = ',DeleteCount);
+  end;
+end;
+
+procedure TIBXTestBase.PrintAffectedRows(query: TIBSQL);
+var SelectCount, InsertCount, UpdateCount, DeleteCount: integer;
+begin
+  if query.statement.GetRowsAffected(SelectCount, InsertCount, UpdateCount, DeleteCount) then
   begin
     writeln('Selects = ',SelectCount);
     writeln('Inserts = ',InsertCount);

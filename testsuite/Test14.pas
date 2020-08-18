@@ -21,7 +21,7 @@ uses
 
 const
   aTestID    = '14';
-  aTestTitle = 'Open and read from Employee Database with ISQLMonitor';
+  aTestTitle = 'Open and read from Employee Database with ISQLMonitor and external monitor';
 
 type
 
