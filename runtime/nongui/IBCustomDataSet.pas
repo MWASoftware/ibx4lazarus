@@ -1314,7 +1314,7 @@ begin
     IBFieldDef := FieldDef as TIBFieldDef;
     CharacterSetSize := IBFieldDef.CharacterSetSize;
     CharacterSetName := IBFieldDef.CharacterSetName;
-    FDataSize := IBFieldDef.DataSize + 1;
+    FDataSize := IBFieldDef.DataSize;
     if AutoFieldSize then
       Size := IBFieldDef.Size;
     CodePage := IBFieldDef.CodePage;
@@ -1357,7 +1357,7 @@ var
   s: RawByteString;
 begin
   Buffer := nil;
-  IBAlloc(Buffer, 0, DataSize);
+  IBAlloc(Buffer, 0, DataSize + 1); {allow for trailing #0}
   try
     Result := GetData(Buffer);
     if Result then
@@ -1389,12 +1389,12 @@ var
   s: RawByteString;
 begin
   Buffer := nil;
-  IBAlloc(Buffer, 0, DataSize);
+  IBAlloc(Buffer, 0, DataSize + 1); {allow for trailing #0}
   try
     s := Value;
     if StringCodePage(s) <> CodePage then
       SetCodePage(s,CodePage,CodePage<>CP_NONE);
-    StrLCopy(Buffer, PChar(s), DataSize-1);
+    StrLCopy(Buffer, PChar(s), DataSize);
     if Transliterate then
       DataSet.Translate(Buffer, Buffer, True);
     SetData(Buffer);
@@ -3643,7 +3643,7 @@ begin
         Data := Buff + fdDataOfs;
         if (fdDataType = SQL_VARYING) or (fdDataType = SQL_TEXT) then
         begin
-          if fdDataLength < Field.DataSize then
+          if fdDataLength <= Field.DataSize then
           begin
             Move(Data^, Buffer^, fdDataLength);
             PChar(Buffer)[fdDataLength] := #0;
@@ -3652,7 +3652,10 @@ begin
             IBError(ibxeFieldSizeError,[Field.FieldName])
         end
         else
-          Move(Data^, Buffer^, Field.DataSize);
+        if fdDataLength <= Field.DataSize then
+          Move(Data^, Buffer^, Field.DataSize)
+        else
+          IBError(ibxeFieldSizeError,[Field.FieldName])
       end;
   end;
 end;
@@ -4648,7 +4651,11 @@ begin
           fdIsNull := True
         else
         begin
-          Move(Buffer^, Buff[fdDataOfs],fdDataSize);
+          if fdDataSize >= Field.DataSize then
+            Move(Buffer^, Buff[fdDataOfs],fdDataSize)
+          else
+            IBError(ibxeDBBufferTooSmall,[fdDataSize,Field.FieldName,Field.DataSize]);
+
           if (fdDataType = SQL_TEXT) or (fdDataType = SQL_VARYING) then
             fdDataLength := StrLen(PChar(Buffer));
           fdIsNull := False;

@@ -39,7 +39,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="85">
+    <Units Count="89">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -70,7 +70,7 @@
         <UnitName Value="Unit2"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="39" Y="9"/>
-        <UsageCount Value="113"/>
+        <UsageCount Value="114"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -174,9 +174,12 @@
       </Unit16>
       <Unit17>
         <Filename Value="../../changelog"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="19" Y="16"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="10"/>
+        <CursorPos X="18" Y="36"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit17>
       <Unit18>
@@ -280,10 +283,9 @@
       </Unit31>
       <Unit32>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1342"/>
-        <CursorPos X="34" Y="1370"/>
+        <TopLine Value="4627"/>
+        <CursorPos X="48" Y="4623"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit32>
@@ -662,8 +664,36 @@
         <CursorPos X="3" Y="603"/>
         <UsageCount Value="10"/>
       </Unit84>
+      <Unit85>
+        <Filename Value="../../runtime/IBMessages.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="381"/>
+        <CursorPos X="22" Y="403"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit85>
+      <Unit86>
+        <Filename Value="../../../ibx.fb4/runtime/nongui/IBCustomDataSet.ex.pas"/>
+        <UnitName Value="IBCustomDataSet"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit86>
+      <Unit87>
+        <Filename Value="../../../ibx.fb4/runtime/nongui/IBCustomDataSet.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="5005"/>
+        <CursorPos X="11" Y="5031"/>
+        <UsageCount Value="10"/>
+      </Unit87>
+      <Unit88>
+        <Filename Value="../../../ibx.fb4/runtime/nongui/IBMessages.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="391"/>
+        <CursorPos X="20" Y="409"/>
+        <UsageCount Value="10"/>
+      </Unit88>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="13" HistoryIndex="12">
       <Position1>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
         <Caret Line="1064" Column="59" TopLine="1048"/>
@@ -675,6 +705,46 @@
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
         <Caret Line="1207" Column="23" TopLine="1179"/>
       </Position3>
+      <Position4>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="1358" Column="34" TopLine="1342"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="141" Column="14" TopLine="130"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="1391" Column="27" TopLine="1375"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="5355" Column="5" TopLine="5322"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="13" Column="89"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="140" Column="3" TopLine="115"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="1311" Column="3" TopLine="1380"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../runtime/IBMessages.pas"/>
+        <Caret Line="410" TopLine="381"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="3659" TopLine="3642"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="631" Column="15" TopLine="616"/>
+      </Position13>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
