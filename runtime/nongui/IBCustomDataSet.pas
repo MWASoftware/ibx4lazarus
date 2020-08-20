@@ -1180,7 +1180,7 @@ begin
   if GetDateTimeBuffer(aBuffer) then
     Result := aBuffer.Timestamp
   else
-    Result := 0;
+    Result := inherited GetAsDateTime;
 end;
 
 function TIBDateTimeField.GetAsVariant: variant;

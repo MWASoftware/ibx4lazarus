@@ -27,7 +27,8 @@ protected
   procedure CreateObjects(Application: TTestApplication); override;
   procedure InitialiseDatabase(aDatabase: TIBDatabase); virtual;
   procedure PrintDataSet(aDataSet: TDataSet);
-  procedure PrintDataSetRow(aField: TField);
+  procedure PrintDataSetRow(aDataSet: TDataSet); overload;
+  procedure PrintDataSetRow(aField: TField); overload;
   procedure PrintAffectedRows(query: TIBCustomDataSet); overload;
   procedure PrintAffectedRows(query: TIBSQL); overload;
   procedure ReadOnlyTransaction;
@@ -120,8 +121,7 @@ begin
 end;
 
 procedure TIBXTestBase.PrintDataSet(aDataSet: TDataSet);
-var i: integer;
-    rowno: integer;
+var rowno: integer;
 begin
   aDataSet.First;
   rowno := 1;
@@ -132,12 +132,18 @@ begin
   begin
     CheckSynchronize(1);
     writeln(OutFile,'Row No = ',rowno);
-    for i := 0 to aDataSet.FieldCount - 1 do
-      PrintDataSetRow(aDataSet.Fields[i]);
+    PrintDataSetRow(aDataset);
     aDataSet.Next;
     Inc(rowno);
     writeln(OutFile);
   end;
+end;
+
+procedure TIBXTestBase.PrintDataSetRow(aDataSet: TDataSet);
+var i: integer;
+begin
+  for i := 0 to aDataSet.FieldCount - 1 do
+    PrintDataSetRow(aDataSet.Fields[i]);
 end;
 
 procedure TIBXTestBase.PrintDataSetRow(aField: TField);
