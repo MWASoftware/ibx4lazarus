@@ -1658,7 +1658,7 @@ var
   s: RawByteString;
 begin
   Buffer := nil;
-  IBAlloc(Buffer, 0, DataSize + 1);  {allow for trailing #0}
+  IBAlloc(Buffer, 0, DataSize + 1); {allow for trailing #0}
   try
     Result := GetData(Buffer);
     if Result then
@@ -5028,6 +5028,7 @@ begin
             Move(Buffer^, Buff[fdDataOfs],fdDataSize)
           else
             IBError(ibxeDBBufferTooSmall,[fdDataSize,Field.FieldName,Field.DataSize]);
+
           if (fdDataType = SQL_TEXT) or (fdDataType = SQL_VARYING) then
             fdDataLength := StrLen(PChar(Buffer));
           fdIsNull := False;
