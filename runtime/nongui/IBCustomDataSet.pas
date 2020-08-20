@@ -1047,7 +1047,7 @@ const
 
 implementation
 
-uses Variants, FmtBCD, LazUTF8, IBMessages, IBQuery, DateUtils;
+uses Variants, FmtBCD, LazUTF8, IBMessages, IBQuery, DateUtils, dbconst;
 
 type
 
@@ -1156,11 +1156,8 @@ end;
 procedure TIBDateTimeField.SetTimeZoneName(AValue: string);
 var aBuffer: TIBBufferedDateTimeWithTimeZone;
 begin
-  if HasTimeZone then
-  begin
-    if GetDateTimeBuffer(aBuffer) then
-      SetAsDateTimeTZ(aBuffer.Timestamp,aValue)
-  end;
+  if GetDateTimeBuffer(aBuffer) then
+    SetAsDateTimeTZ(aBuffer.Timestamp,aValue)
 end;
 
 procedure TIBDateTimeField.Bind(Binding: Boolean);
@@ -1205,7 +1202,10 @@ procedure TIBDateTimeField.GetText(var theText: string; ADisplayText: Boolean);
 var aBuffer: TIBBufferedDateTimeWithTimeZone;
     F: string;
 begin
-  if GetDateTimeBuffer(aBuffer) and (DataSet <> nil) then
+  if Dataset = nil then
+    DatabaseErrorFmt(SNoDataset,[FieldName]);
+
+  if GetDateTimeBuffer(aBuffer) then
     {$if declared(DefaultFormatSettings)}
     with DefaultFormatSettings do
     {$else}
@@ -1267,8 +1267,8 @@ end;
 
 procedure TIBDateTimeField.SetVarValue(const AValue: Variant);
 begin
-  if HasTimeZone and VarIsArray(AValue) then
-    SetAsDateTimeTZ(AValue[0],string(AValue[2]))
+  if HasTimeZone and VarIsArray(AValue)then
+      SetAsDateTimeTZ(AValue[0],string(AValue[2]))
   else
     inherited SetVarValue(AValue);
 end;
@@ -1289,7 +1289,9 @@ begin
     aDateTime := aBuffer.Timestamp;
     dstOffset := aBuffer.dstOffset;
     aTimeZoneID := aBuffer.TimeZoneID;
-  end;
+  end
+  else
+    aDateTime := inherited GetAsDateTime
 end;
 
 function TIBDateTimeField.GetAsDateTimeTZ(var aDateTime: TDateTime;
@@ -1307,7 +1309,7 @@ begin
   if GetDateTimeBuffer(aBuffer) then
     Result := IncMinute(aBuffer.timestamp,-aBuffer.dstOffset)
   else
-    Result := 0;
+    Result := inherited GetAsDateTime;
 end;
 
 procedure TIBDateTimeField.SetAsDateTimeTZ(aDateTime: TDateTime;
@@ -1328,7 +1330,10 @@ end;
 procedure TIBDateTimeField.SetAsDateTimeTZ(aDateTime: TDateTime;
   aTimeZone: string);
 begin
-  SetAsDateTimeTZ(aDateTime,GetTimeZoneServices.TimeZoneName2TimeZoneID(aTimeZone));
+  if HasTimeZone then
+    SetAsDateTimeTZ(aDateTime,GetTimeZoneServices.TimeZoneName2TimeZoneID(aTimeZone))
+  else
+    inherited SetAsDateTime(aDateTime);
 end;
 
 { TIBTimeField }
