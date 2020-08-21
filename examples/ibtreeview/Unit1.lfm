@@ -10,7 +10,7 @@ object Form1: TForm1
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '2.0.11.0'
   object Panel1: TPanel
     Left = 11
     Height = 367
@@ -29,7 +29,6 @@ object Form1: TForm1
       Align = alLeft
       TextField = 'DEPARTMENT'
       DataSource = DataSource1
-      DefaultItemHeight = 16
       DragMode = dmAutomatic
       Images = ImageList1
       HasChildField = 'CHILDCOUNT'
@@ -73,15 +72,15 @@ object Form1: TForm1
         TabOrder = 0
         object Label2: TLabel
           Left = 11
-          Height = 13
+          Height = 15
           Top = 16
-          Width = 20
+          Width = 25
           Caption = 'Title'
           ParentColor = False
         end
         object DBEdit1: TDBEdit
           Left = 11
-          Height = 21
+          Height = 25
           Top = 31
           Width = 373
           DataField = 'DEPARTMENT'
@@ -93,15 +92,15 @@ object Form1: TForm1
         end
         object Label3: TLabel
           Left = 13
-          Height = 13
+          Height = 15
           Top = 71
-          Width = 40
+          Width = 51
           Caption = 'Location'
           ParentColor = False
         end
         object DBEdit4: TDBEdit
           Left = 13
-          Height = 21
+          Height = 25
           Top = 86
           Width = 179
           DataField = 'LOCATION'
@@ -112,15 +111,15 @@ object Form1: TForm1
         end
         object Label4: TLabel
           Left = 219
-          Height = 13
+          Height = 15
           Top = 71
-          Width = 34
+          Width = 44
           Caption = 'Budget'
           ParentColor = False
         end
         object DBEdit2: TDBEdit
           Left = 219
-          Height = 21
+          Height = 25
           Top = 86
           Width = 165
           DataField = 'BUDGET'
@@ -132,15 +131,15 @@ object Form1: TForm1
         end
         object Label5: TLabel
           Left = 219
-          Height = 13
+          Height = 15
           Top = 121
-          Width = 50
+          Width = 61
           Caption = 'Phone No.'
           ParentColor = False
         end
         object DBEdit3: TDBEdit
           Left = 219
-          Height = 21
+          Height = 25
           Top = 136
           Width = 165
           DataField = 'PHONE_NO'
@@ -152,15 +151,15 @@ object Form1: TForm1
         end
         object Label6: TLabel
           Left = 12
-          Height = 13
+          Height = 15
           Top = 121
-          Width = 42
+          Width = 52
           Caption = 'Manager'
           ParentColor = False
         end
         object IBLookupComboEditBox1: TIBLookupComboEditBox
           Left = 13
-          Height = 21
+          Height = 27
           Top = 136
           Width = 180
           DataField = 'MNGR_NO'
@@ -173,13 +172,13 @@ object Form1: TForm1
           TabOrder = 4
           AutoInsert = False
           AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          ItemHeight = 13
+          ItemHeight = 0
         end
         object Label7: TLabel
           Left = 12
-          Height = 13
+          Height = 15
           Top = 172
-          Width = 92
+          Width = 115
           Caption = 'Departmental Staff'
           ParentColor = False
         end
@@ -251,9 +250,9 @@ object Form1: TForm1
   end
   object Label1: TLabel
     Left = 11
-    Height = 13
+    Height = 15
     Top = 17
-    Width = 62
+    Width = 79
     Caption = 'Departments'
     ParentColor = False
   end
@@ -313,6 +312,8 @@ object Form1: TForm1
     AfterInsert = DepartmentsAfterInsert
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
+    EnableStatistics = False
     DeleteSQL.Strings = (
       'Delete From DEPARTMENT A'
       'Where A.DEPT_NO = :DEPT_NO'
@@ -354,6 +355,7 @@ object Form1: TForm1
     GeneratorField.Field = 'DEPT_NO'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
+    MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
     AfterTransactionEnd = DepartmentsAfterTransactionEnd
     left = 144
@@ -438,19 +440,18 @@ object Form1: TForm1
       ReadOnly = False
       Required = False
     end
-    object DepartmentsCHILDCOUNT: TIntegerField
-      DisplayWidth = 10
+    object DepartmentsIMAGEINDEX: TIBIntegerField
       FieldKind = fkData
-      FieldName = 'CHILDCOUNT'
+      FieldName = 'IMAGEINDEX'
       Index = 7
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = True
     end
-    object DepartmentsIMAGEINDEX: TIBIntegerField
+    object DepartmentsCHILDCOUNT: TIBLargeIntField
       FieldKind = fkData
-      FieldName = 'IMAGEINDEX'
+      FieldName = 'CHILDCOUNT'
       Index = 8
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
@@ -474,8 +475,11 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select A.EMP_NO, A.FULL_NAME From EMPLOYEE A'
       'order by 2'
@@ -496,9 +500,12 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = DataSource1
+    EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
+    MasterDetailDelay = 0
     SQL.Strings = (
       'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE, A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME From EMPLOYEE A'
       'Where A.DEPT_NO =:DEPT_NO'

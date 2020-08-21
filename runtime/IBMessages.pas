@@ -277,7 +277,7 @@ resourcestring
   STPBConstantUnknownEx = 'TPB Constant (%s) is unknown';
   SSV5APIError = 'SV5 API API Error - %s';
   SThreadFailed = '%s Thread failed with Exception: %s';
-  SFieldSizeError = 'Field %s is too small to receive the data';
+  SFieldSizeError = 'Field %s is too small (%d bytes) to receive the data (%d bytes)';
   SNoLoginDialog = 'Default Login Dlalog not found. Have you included ibexpress ' +
                    'in your program uses list?';
   SInfoBufferIndexError = 'Info Buffer Index Out of Range (%d)';
@@ -303,7 +303,7 @@ resourcestring
   SErrorParsing = 'Error parsing SQL Statement at clause starting with %s';
   SParameterNameNotFound = 'Parameter Name (%s) not found';
   SListFieldNotFound = 'ListField Name is not a valid dataset column name (%s)';
-  SDBBufferTooSmall = 'Dataset buffer is too small (%d) to receive the data from Field %s (%d)';
+  SDBBufferTooSmall = 'Dataset buffer is too small (%d bytes) to receive the data from Field %s (%d bytes)';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (

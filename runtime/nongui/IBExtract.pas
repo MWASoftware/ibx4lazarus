@@ -733,7 +733,7 @@ begin
           (qryTables.FieldByName('RDB$FIELD_NAME1').AsString[5] in ['0'..'9'])) and
           (qryTables.FieldByName('RDB$SYSTEM_FLAG').AsInteger <> 1) then
         begin
-          Column := Column + QuoteIdentifier( trim(qryTables.FieldByName('RDB$FIELD_NAME1').AsString));
+          Column := Column + QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect, trim(qryTables.FieldByName('RDB$FIELD_NAME1').AsString));
           { International character sets }
           if (qryTables.FieldByName('RDB$FIELD_TYPE').AsInteger in [blr_text, blr_varying])
               and (not qryTables.FieldByName('RDB$COLLATION_ID').IsNull)
@@ -1859,7 +1859,7 @@ begin
 
         {Database or Transaction trigger}
         SList.Add(Format('CREATE TRIGGER %s%s%s %s POSITION %d',
-                  [QuoteIdentifier( TriggerName),
+                  [QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect, TriggerName),
                   LineEnding, InActive,
                   GetTriggerType(qryTriggers.FieldByName('RDB$TRIGGER_TYPE').AsInt64),
                   qryTriggers.FieldByName('RDB$TRIGGER_SEQUENCE').AsInteger]));
@@ -2439,7 +2439,7 @@ begin
         First := false;
       end;
 
-      Line := Format('CREATE DOMAIN %s AS ', [FieldName]);
+      Line := Format('CREATE DOMAIN %s AS ', [TrimRight(FieldName)]);
       Line := Line + FormatDomainStr + Term;
       FMetaData.Add(Line);
       AddComment(qryDomains,ctDomain,FMetaData);
@@ -2494,7 +2494,7 @@ begin
       end; //end_if
       
       FMetaData.Add(Format('CREATE EXCEPTION %s %s%s',
-        [QuoteIdentifier( qryException.FieldByName('RDB$EXCEPTION_NAME').AsString),
+        [QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect, qryException.FieldByName('RDB$EXCEPTION_NAME').AsString),
         QuotedStr(qryException.FieldByName('RDB$MESSAGE').AsString), Term]));
       AddComment(qryException,ctException,FMetaData);
       qryException.Next;
@@ -3151,7 +3151,7 @@ begin
          [LineEnding, qryView.FieldByName('RDB$RELATION_NAME').AsString,
           qryView.FieldByName('RDB$OWNER_NAME').AsString, LineEnding]));
 
-      SList.Add(Format('CREATE VIEW %s (', [QuoteIdentifier(
+      SList.Add(Format('CREATE VIEW %s (', [QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect,
         qryView.FieldByName('RDB$RELATION_NAME').AsString)]));
 
       qryColumns.Params.ByName('RELATION_NAME').AsString :=
@@ -3159,7 +3159,7 @@ begin
       qryColumns.ExecQuery;
       while not qryColumns.Eof do
       begin
-        SList.Add('  ' + QuoteIdentifier(
+        SList.Add('  ' + QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect,
            qryColumns.FieldByName('RDB$FIELD_NAME').AsString));
         qryColumns.Next;
         if not qryColumns.Eof then
@@ -3605,21 +3605,21 @@ begin
         if qryOwnerPriv.FieldByName('GRANTEDBY').IsNull then
         FMetaData.Add(Format('GRANT %s ON %s %s TO %s %s %s %s', [
                           qryOwnerPriv.FieldByName('Privileges').AsString,
-                          qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
-                          QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
-                          qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString,
-                          QuoteIdentifier(qryOwnerPriv.FieldByName('RDB$USER').AsString),
-                          qryOwnerPriv.FieldByName('GRANTOPTION').AsString,
+                          TrimRight(qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString),
+                          QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect,qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
+                          TrimRight(qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString),
+                          QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect,qryOwnerPriv.FieldByName('RDB$USER').AsString),
+                          TrimRight(qryOwnerPriv.FieldByName('GRANTOPTION').AsString),
                           Terminator]))
         else
           FMetaData.Add(Format('GRANT %s ON %s %s TO %s %s %s GRANTED BY %s %s', [
                             qryOwnerPriv.FieldByName('Privileges').AsString,
                             qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
-                            QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
+                            QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect,qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
                             qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString,
-                            QuoteIdentifier(qryOwnerPriv.FieldByName('RDB$USER').AsString),
+                            QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect,qryOwnerPriv.FieldByName('RDB$USER').AsString),
                             qryOwnerPriv.FieldByName('GRANTOPTION').AsString,
-                            QuoteIdentifier(qryOwnerPriv.FieldByName('GRANTEDBY').AsString),
+                            QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect,qryOwnerPriv.FieldByName('GRANTEDBY').AsString),
                             Terminator]));
       end;
       qryOwnerPriv.Next;
@@ -3691,11 +3691,11 @@ begin
     begin
       FMetaData.Add(Format('GRANT %s ON %s %s TO %s %s %s%s', [
                             qryOwnerPriv.FieldByName('Privileges').AsString,
-                            qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
-                            QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
-                            qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString,
-                            QuoteIdentifier(qryOwnerPriv.FieldByName('RDB$USER').AsString),
-                            qryOwnerPriv.FieldByName('GRANTOPTION').AsString,
+                            TrimRight(qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString),
+                            QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect,qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
+                            TrimRight(qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString),
+                            QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect,qryOwnerPriv.FieldByName('RDB$USER').AsString),
+                            TrimRight(qryOwnerPriv.FieldByName('GRANTOPTION').AsString),
                             Terminator]));
       qryOwnerPriv.Next;
     end;
@@ -3742,7 +3742,7 @@ begin
       else
         WithOption := '';
       FMetaData.Add(Format('GRANT %s TO %s%s%s%s',
-        [ QuoteIdentifier( qryRole.FieldByName('RDB$RELATION_NAME').AsString),
+        [ QuoteIdentifierIfNeeded(FDatabaseInfo.DBSQLDialect,qryRole.FieldByName('RDB$RELATION_NAME').AsString),
          UserString, WithOption, Terminator, LineEnding]));
 
       qryRole.Next;
