@@ -18,7 +18,6 @@
         <ComponentName Value="DBAMainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="347"/>
         <CursorPos X="74" Y="372"/>
         <UsageCount Value="117"/>
@@ -364,10 +363,12 @@
       </Unit35>
       <Unit36>
         <Filename Value="../../runtime/nongui/IBExtract.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="3730"/>
-        <CursorPos X="62" Y="3745"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="3777"/>
+        <CursorPos X="109" Y="3781"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit36>
       <Unit37>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/filutilh.inc"/>
@@ -400,10 +401,11 @@
       </Unit40>
       <Unit41>
         <Filename Value="../../../fbintf/IBUtils.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="738"/>
-        <CursorPos X="6" Y="739"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="971"/>
+        <CursorPos X="3" Y="973"/>
         <UsageCount Value="15"/>
+        <Loaded Value="True"/>
       </Unit41>
       <Unit42>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
@@ -540,8 +542,7 @@
       <Unit60>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="22"/>
-        <CursorPos X="19" Y="45"/>
+        <CursorPos X="73" Y="38"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit60>
@@ -844,7 +845,31 @@
         <UsageCount Value="10"/>
       </Unit102>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="6" HistoryIndex="5">
+      <Position1>
+        <Filename Value="../../runtime/nongui/IBExtract.pas"/>
+        <Caret Line="3745" Column="62" TopLine="3730"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../runtime/nongui/IBExtract.pas"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="742" Column="28" TopLine="720"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../../fbintf/IBUtils.pas"/>
+        <Caret Line="625" Column="10" TopLine="607"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/nongui/IBExtract.pas"/>
+        <Caret Line="3745" Column="27" TopLine="3718"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/nongui/IBExtract.pas"/>
+        <Caret Line="104" Column="15" TopLine="89"/>
+      </Position6>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode=""/>
