@@ -52,7 +52,7 @@ type
     DBEdit2: TDBEdit;
     DBEdit3: TDBEdit;
     DBEdit4: TDBEdit;
-    DepartmentsCHILDCOUNT: TIntegerField;
+    DepartmentsCHILDCOUNT: TIBLargeIntField;
     DepartmentsIMAGEINDEX: TIBIntegerField;
     IBDynamicGrid1: TIBDynamicGrid;
     IBLookupComboEditBox1: TIBLookupComboEditBox;

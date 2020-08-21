@@ -441,7 +441,7 @@ var SQLDialect: integer;
     FieldNames: TStringList;
 begin
   if (ListSource = nil) or (ListSource.DataSet = nil) or
-     not (ListSource.DataSet is TIBCustomDataSet) or
+    not (ListSource.DataSet is TIBCustomDataSet) or
      ((ListSource.DataSet as TIBCustomDataSet).Database = nil) then Exit;
   SQLDialect := (ListSource.DataSet as TIBCustomDataSet).Database.SQLDialect;
   FieldNames := TStringList.Create;

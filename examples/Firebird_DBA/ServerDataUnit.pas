@@ -83,7 +83,7 @@ var
 
 implementation
 
-uses IBTypes, PasswordCacheUnit, LocalDataModule, IBSQL, DBADataModule;
+uses IBInternals, PasswordCacheUnit, LocalDataModule, IBSQL, DBADataModule;
 
 { TServerDataList }
 

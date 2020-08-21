@@ -1,4 +1,4 @@
-unit Test17;
+unit Test24;
 
 {$mode objfpc}{$H+}
 
@@ -14,7 +14,7 @@ uses
   Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB, IBSQLParser, IBUtils;
 
 const
-  aTestID    = '17';
+  aTestID    = '24';
   aTestTitle = 'IB Parser Tests';
 
 const
@@ -149,9 +149,9 @@ const
        '')  ;
 type
 
-{ TTest17 }
+{ TTest24 }
 
-  TTest17 = class(TIBXTestBase)
+  TTest24 = class(TIBXTestBase)
   private
     procedure WriteSelect(parser: TSelectSQLParser);
   protected
@@ -164,9 +164,9 @@ type
 
 implementation
 
-{ TTest17 }
+{ TTest24 }
 
-procedure TTest17.WriteSelect(parser: TSelectSQLParser);
+procedure TTest24.WriteSelect(parser: TSelectSQLParser);
 var j: integer;
 begin
   with parser do
@@ -201,17 +201,17 @@ begin
   end;
 end;
 
-function TTest17.GetTestID: AnsiString;
+function TTest24.GetTestID: AnsiString;
 begin
   Result := aTestID;
 end;
 
-function TTest17.GetTestTitle: AnsiString;
+function TTest24.GetTestTitle: AnsiString;
 begin
   Result := aTestTitle;
 end;
 
-procedure TTest17.RunTest(CharSet: AnsiString; SQLDialect: integer);
+procedure TTest24.RunTest(CharSet: AnsiString; SQLDialect: integer);
 var i: integer;
     parser: TSelectSQLParser;
 begin
@@ -242,7 +242,7 @@ begin
 end;
 
 initialization
-  RegisterTest(TTest17);
+  RegisterTest(TTest24);
 
 end.
 

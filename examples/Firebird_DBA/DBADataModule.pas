@@ -67,7 +67,7 @@ implementation
 
 {$R *.lfm}
 
-uses PasswordCacheUnit, LocalDataModule, IBTypes, IBMessages, IBUtils,
+uses PasswordCacheUnit, LocalDataModule, IBInternals, IBMessages, IBUtils,
   IBXCreateDatabaseFromSQLDlgUnit, DBACreateDatabaseDlgUnit,
   IBXUpgradeDatabaseDlg, IBXUpgradeConfFile;
 
