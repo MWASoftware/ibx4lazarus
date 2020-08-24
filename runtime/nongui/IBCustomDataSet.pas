@@ -1314,7 +1314,7 @@ begin
     IBFieldDef := FieldDef as TIBFieldDef;
     CharacterSetSize := IBFieldDef.CharacterSetSize;
     CharacterSetName := IBFieldDef.CharacterSetName;
-    FDataSize := IBFieldDef.DataSize + 1;
+    FDataSize := IBFieldDef.DataSize;
     if AutoFieldSize then
       Size := IBFieldDef.Size;
     CodePage := IBFieldDef.CodePage;
@@ -1357,7 +1357,7 @@ var
   s: RawByteString;
 begin
   Buffer := nil;
-  IBAlloc(Buffer, 0, DataSize);
+  IBAlloc(Buffer, 0, DataSize + 1); {allow for trailing #0}
   try
     Result := GetData(Buffer);
     if Result then
@@ -1389,12 +1389,12 @@ var
   s: RawByteString;
 begin
   Buffer := nil;
-  IBAlloc(Buffer, 0, DataSize);
+  IBAlloc(Buffer, 0, DataSize + 1); {allow for trailing #0}
   try
     s := Value;
     if StringCodePage(s) <> CodePage then
       SetCodePage(s,CodePage,CodePage<>CP_NONE);
-    StrLCopy(Buffer, PChar(s), DataSize-1);
+    StrLCopy(Buffer, PChar(s), DataSize);
     if Transliterate then
       DataSet.Translate(Buffer, Buffer, True);
     SetData(Buffer);
@@ -3643,7 +3643,7 @@ begin
         Data := Buff + fdDataOfs;
         if (fdDataType = SQL_VARYING) or (fdDataType = SQL_TEXT) then
         begin
-          if fdDataLength < Field.DataSize then
+          if fdDataLength <= Field.DataSize then
           begin
             Move(Data^, Buffer^, fdDataLength);
             PChar(Buffer)[fdDataLength] := #0;
@@ -3652,7 +3652,10 @@ begin
             IBError(ibxeFieldSizeError,[Field.FieldName])
         end
         else
-          Move(Data^, Buffer^, Field.DataSize);
+        if fdDataLength <= Field.DataSize then
+          Move(Data^, Buffer^, Field.DataSize)
+        else
+          IBError(ibxeFieldSizeError,[Field.FieldName,Field.DataSize,fdDataLength])
       end;
   end;
 end;
@@ -3823,6 +3826,7 @@ var
   Buff: PChar;
   CurRec: Integer;
   pda: PArrayDataArray;
+  pbd: PBlobDataArray;
   i: integer;
 begin
   inherited InternalCancel;
@@ -3830,12 +3834,15 @@ begin
   if Buff <> nil then
   begin
     pda := PArrayDataArray(Buff + FArrayCacheOffset);
+    pbd := PBlobDataArray(Buff + FBlobCacheOffset);
     for i := 0 to ArrayFieldCount - 1 do
       pda^[i].ArrayIntf.CancelChanges;
     CurRec := FCurrentRecord;
     AdjustRecordOnInsert(Buff);
     if (State = dsEdit) then begin
       CopyRecordBuffer(FOldBuffer, Buff);
+      for i := 0 to BlobFieldCount - 1 do
+        pbd^[i] := nil;
       WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Buff);
     end else begin
       CopyRecordBuffer(FModelBuffer, Buff);
@@ -3915,6 +3922,7 @@ end;
 procedure TIBCustomDataSet.InternalFirst;
 begin
   FCurrentRecord := -1;
+  if Unidirectional then GetNextRecord;
 end;
 
 procedure TIBCustomDataSet.InternalGotoBookmark(Bookmark: Pointer);
@@ -3940,7 +3948,7 @@ begin
 procedure TIBCustomDataSet.FieldDefsFromQuery(SourceQuery: TIBSQL);
 const
   DefaultSQL = 'Select F.RDB$COMPUTED_BLR, ' + {do not localize}
-               'F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME ' + {do not localize}
+               'F.RDB$DEFAULT_VALUE, Trim(R.RDB$FIELD_NAME) as RDB$FIELD_NAME ' + {do not localize}
                'from RDB$RELATION_FIELDS R, RDB$FIELDS F ' + {do not localize}
                'where R.RDB$RELATION_NAME = :RELATION ' +  {do not localize}
                'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '+ {do not localize}
@@ -3948,7 +3956,7 @@ const
                '     (not F.RDB$DEFAULT_VALUE is NULL)) '; {do not localize}
 
   DefaultSQLODS12 = 'Select F.RDB$COMPUTED_BLR, ' + {do not localize}
-               'F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE ' + {do not localize}
+               'F.RDB$DEFAULT_VALUE, Trim(R.RDB$FIELD_NAME) as RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE ' + {do not localize}
                'from RDB$RELATION_FIELDS R, RDB$FIELDS F ' + {do not localize}
                'where R.RDB$RELATION_NAME = :RELATION ' +  {do not localize}
                'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '+ {do not localize}
@@ -4647,7 +4655,11 @@ begin
           fdIsNull := True
         else
         begin
-          Move(Buffer^, Buff[fdDataOfs],fdDataSize);
+          if fdDataSize >= Field.DataSize then
+            Move(Buffer^, Buff[fdDataOfs],fdDataSize)
+          else
+            IBError(ibxeDBBufferTooSmall,[fdDataSize,Field.FieldName,Field.DataSize]);
+
           if (fdDataType = SQL_TEXT) or (fdDataType = SQL_VARYING) then
             fdDataLength := StrLen(PChar(Buffer));
           fdIsNull := False;

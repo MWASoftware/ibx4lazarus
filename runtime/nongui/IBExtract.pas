@@ -2439,7 +2439,7 @@ begin
         First := false;
       end;
 
-      Line := Format('CREATE DOMAIN %s AS ', [FieldName]);
+      Line := Format('CREATE DOMAIN %s AS ', [TrimRight(FieldName)]);
       Line := Line + FormatDomainStr + Term;
       FMetaData.Add(Line);
       AddComment(qryDomains,ctDomain,FMetaData);
@@ -3605,11 +3605,11 @@ begin
         if qryOwnerPriv.FieldByName('GRANTEDBY').IsNull then
         FMetaData.Add(Format('GRANT %s ON %s %s TO %s %s %s %s', [
                           qryOwnerPriv.FieldByName('Privileges').AsString,
-                          qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
+                          TrimRight(qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString),
                           QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
-                          qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString,
+                          TrimRight(qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString),
                           QuoteIdentifier(qryOwnerPriv.FieldByName('RDB$USER').AsString),
-                          qryOwnerPriv.FieldByName('GRANTOPTION').AsString,
+                          TrimRight(qryOwnerPriv.FieldByName('GRANTOPTION').AsString),
                           Terminator]))
         else
           FMetaData.Add(Format('GRANT %s ON %s %s TO %s %s %s GRANTED BY %s %s', [
@@ -3691,11 +3691,11 @@ begin
     begin
       FMetaData.Add(Format('GRANT %s ON %s %s TO %s %s %s%s', [
                             qryOwnerPriv.FieldByName('Privileges').AsString,
-                            qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
+                            TrimRight(qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString),
                             QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
-                            qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString,
+                            TrimRight(qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString),
                             QuoteIdentifier(qryOwnerPriv.FieldByName('RDB$USER').AsString),
-                            qryOwnerPriv.FieldByName('GRANTOPTION').AsString,
+                            TrimRight(qryOwnerPriv.FieldByName('GRANTOPTION').AsString),
                             Terminator]));
       qryOwnerPriv.Next;
     end;
@@ -3742,7 +3742,7 @@ begin
       else
         WithOption := '';
       FMetaData.Add(Format('GRANT %s TO %s%s%s%s',
-        [ QuoteIdentifier( qryRole.FieldByName('RDB$RELATION_NAME').AsString),
+        [ QuoteIdentifier(qryRole.FieldByName('RDB$RELATION_NAME').AsString),
          UserString, WithOption, Terminator, LineEnding]));
 
       qryRole.Next;
@@ -3778,7 +3778,7 @@ var
   var
     i, CollationID, CharSetID : Integer;
   begin
-    Result := Format('  %s ', [qryHeader.FieldByName('RDB$PARAMETER_NAME').AsString]);
+    Result := Format('  %s ', [QuoteIdentifier(qryHeader.FieldByName('RDB$PARAMETER_NAME').AsString)]) + TAB;
     for i := Low(ColumnTypes) to High(ColumnTypes) do
       if qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger = ColumnTypes[i].SQLType then
       begin

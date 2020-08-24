@@ -4,36 +4,27 @@ inherited DBAMainForm: TDBAMainForm
   Top = 265
   Width = 1174
   Caption = 'Firebird Database Administrator'
-  ClientHeight = 605
+  ClientHeight = 604
   ClientWidth = 1174
   OnClose = FormClose
   inherited ToolBar1: TToolBar
     Width = 1174
-    inherited ToolButton2: TToolButton
-      Height = 22
-    end
-    inherited ToolButton4: TToolButton
-      Height = 22
-    end
-    inherited ToolButton6: TToolButton
-      Height = 22
-    end
   end
   inherited StatusBar1: TStatusBar
-    Top = 583
+    Top = 581
     Width = 1174
   end
   inherited PageControl1: TPageControl
     Left = 157
-    Height = 557
+    Height = 555
     Width = 1017
     inherited Properties: TTabSheet
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
       inherited Panel7: TPanel
-        Height = 525
+        Height = 522
         Width = 1011
-        ClientHeight = 525
+        ClientHeight = 522
         ClientWidth = 1011
         inherited ConnectString: TEdit
           ReadOnly = True
@@ -73,11 +64,12 @@ inherited DBAMainForm: TDBAMainForm
           ReadOnly = True
         end
         inherited DBComments: TMemo
-          Height = 90
+          Height = 87
           Width = 590
         end
         inherited ClientLibrary: TLabel
           Left = 914
+          Height = 11
           Top = 508
           Anchors = [akTop, akRight, akBottom]
         end
@@ -96,7 +88,7 @@ inherited DBAMainForm: TDBAMainForm
           TabOrder = 27
           object Label55: TLabel
             Left = 74
-            Height = 14
+            Height = 15
             Top = 16
             Width = 49
             Caption = 'Schema'
@@ -104,7 +96,7 @@ inherited DBAMainForm: TDBAMainForm
           end
           object SchemaTitle: TEdit
             Left = 133
-            Height = 24
+            Height = 25
             Top = 12
             Width = 464
             Anchors = [akTop, akLeft, akRight]
@@ -114,7 +106,7 @@ inherited DBAMainForm: TDBAMainForm
           end
           object Label56: TLabel
             Left = 27
-            Height = 14
+            Height = 15
             Top = 48
             Width = 96
             Caption = 'Schema Version'
@@ -122,7 +114,7 @@ inherited DBAMainForm: TDBAMainForm
           end
           object SchemaVersion: TEdit
             Left = 133
-            Height = 24
+            Height = 25
             Top = 44
             Width = 89
             Alignment = taRightJustify
@@ -143,11 +135,11 @@ inherited DBAMainForm: TDBAMainForm
       end
     end
     inherited FilesTab: TTabSheet
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
     end
     inherited AttachmentsTab: TTabSheet
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
       inherited AttmtGrid: TIBDynamicGrid
         Height = 525
@@ -155,7 +147,7 @@ inherited DBAMainForm: TDBAMainForm
       end
     end
     inherited StatisticsTab: TTabSheet
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
       inherited StatsOptions: TComboBox
         Left = 772
@@ -165,7 +157,7 @@ inherited DBAMainForm: TDBAMainForm
       end
     end
     inherited SchemaTab: TTabSheet
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
       inherited SynEdit1: TSynEdit
         Width = 1011
@@ -173,7 +165,7 @@ inherited DBAMainForm: TDBAMainForm
     end
     inherited ServerTab: TTabSheet
       Tag = 1
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
       OnShow = ServerTabShow
       inherited Panel1: TPanel
@@ -215,7 +207,7 @@ inherited DBAMainForm: TDBAMainForm
     end
     inherited UserManagerTab: TTabSheet
       Tag = 1
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
       OnShow = UserManagerTabShow
       inherited Panel4: TPanel
@@ -265,7 +257,7 @@ inherited DBAMainForm: TDBAMainForm
       end
     end
     inherited AccessRightsTab: TTabSheet
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
       inherited AccessRightsTreeView: TIBTreeView
         Height = 525
@@ -279,7 +271,7 @@ inherited DBAMainForm: TDBAMainForm
       end
     end
     inherited MappingsTab: TTabSheet
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
       inherited IBDynamicGrid5: TIBDynamicGrid
         Width = 997
@@ -289,7 +281,7 @@ inherited DBAMainForm: TDBAMainForm
       end
     end
     inherited RepairTab: TTabSheet
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
       inherited SelectRepairAction: TComboBox
         Left = 757
@@ -298,16 +290,6 @@ inherited DBAMainForm: TDBAMainForm
       inherited Button2: TButton
         Left = 965
         Top = 8
-      end
-      inherited ValidateOptions: TPageControl
-        inherited ValidateOptionsTab: TTabSheet
-          ClientHeight = 104
-          ClientWidth = 318
-        end
-        inherited RepairOptionsTab: TTabSheet
-          ClientHeight = 104
-          ClientWidth = 318
-        end
       end
       inherited Panel8: TPanel
         Width = 990
@@ -322,7 +304,7 @@ inherited DBAMainForm: TDBAMainForm
       end
     end
     inherited LimboTab: TTabSheet
-      ClientHeight = 525
+      ClientHeight = 522
       ClientWidth = 1011
       inherited IBDynamicGrid3: TIBDynamicGrid
         Width = 990
@@ -333,8 +315,6 @@ inherited DBAMainForm: TDBAMainForm
     end
   end
   inherited UpdateColsPanel: TPanel
-    ClientHeight = 62
-    ClientWidth = 542
     inherited DBEdit5: TDBEdit
       Width = 364
     end
@@ -344,7 +324,7 @@ inherited DBAMainForm: TDBAMainForm
   end
   object RegisteredObjectsTree: TIBTreeView[4]
     Left = 0
-    Height = 557
+    Height = 555
     Top = 26
     Width = 152
     Align = alLeft
@@ -369,7 +349,7 @@ inherited DBAMainForm: TDBAMainForm
   end
   object Splitter6: TSplitter[5]
     Left = 152
-    Height = 557
+    Height = 555
     Top = 26
     Width = 5
   end
@@ -646,14 +626,14 @@ inherited DBAMainForm: TDBAMainForm
       ReadOnly = False
       Required = False
     end
-    object ServersAndDatabasesHASCHILD: TIntegerField
+    object ServersAndDatabasesHASCHILD: TIBLargeIntField
       FieldKind = fkData
       FieldName = 'HASCHILD'
       Index = 4
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
-      Required = False
+      Required = True
     end
   end
   object TreeSource: TDataSource[37]

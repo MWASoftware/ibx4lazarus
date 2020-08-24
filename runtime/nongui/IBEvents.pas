@@ -113,6 +113,7 @@ procedure TIBEvents.ValidateDatabase( Database: TIBDatabase);
 begin
   if not assigned( Database) then
     IBError(ibxeDatabaseNameMissing, [nil]);
+  if csDesigning in ComponentState then Exit;
   if not Database.Connected then
     IBError(ibxeDatabaseClosed, [nil]);
 end;
@@ -267,6 +268,7 @@ begin
   begin
     FEventIntf := nil;
     FRegistered := false;
+    FStartEvent := true;
   end;
 end;
 

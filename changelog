@@ -1,4 +1,4 @@
-IBX Change Log  version (2.3-5 Build 12297) Wed, 12 Aug 2020 12:03:34 +0100
+IBX Change Log  version (2.3-5 Build 12341) Mon, 24 Aug 2020 10:23:35 +0100
 
 1.  TIBStringField: when a string value is read from a dataset buffer, if the
     number of UTF8 characters exceeds the string size then string is truncated
@@ -20,6 +20,33 @@ IBX Change Log  version (2.3-5 Build 12297) Wed, 12 Aug 2020 12:03:34 +0100
 
 5. TIBDataLink: Detail Dataset params not refreshed unless both master and detail
    dataset are active (avoids risk of access violation if master is inactive)
+
+6. TIBEvents: Registered property can now be set at design time even if database not open
+
+7. TIBEvents: component now correctly re-initialised after call to UnregisterEvents.
+   This should prevent "spillover" of events between sessions.
+
+8. TIBCustomDataset: GetNextRecord now called when reseting to first record of a unidirectional dataset.
+   This should ensure that the internal buffer is set up correctly and avoids
+   a duplicate initial row.
+
+9. TIBStringField: DataSize now given as byte size of string less trailing any zero character.
+   That is, the DataSize should be the field size * character set width. The
+   value returned by DataSize is now the same as the Dataset buffer size reserved
+   for the field.
+
+10. IBExtact: Tidyup of SQL generation. Avoid unnecessary double quotes.
+
+11. TIBCustomDataset: Add checks on buffer sizes when copying data from row to field buffer
+    and vice-versa. This may result in an exception being raised (correctly) for
+    older programs when using dataset fields added to a form and the database has been
+    upgraded. For example, computed fields can change from 32-bit to 64-bit integers.
+    In such cases, the field needs to be deleted in the IDE fields editor and then
+    added back in.
+
+12. IBCustomDataset: Blob data is now cleared when TDataSet.Cancel is called. This
+    should ensure that (e.g.) a TDBMemo is correctly refreshed after a dataset edit
+    is cancelled.
 
 IBX Change Log  version (2.3-4 Build 12041) Fri, 17 Apr 2020 14:00:32 +0100
 

@@ -16,6 +16,7 @@ type
   { TDBAMainForm }
 
   TDBAMainForm = class(TMainForm)
+    ServersAndDatabasesHASCHILD: TIBLargeIntField;
     UpgradeButton: TButton;
     DBADropDatabase: TAction;
     ConnectAs: TAction;
@@ -46,7 +47,6 @@ type
     MenuItem22: TMenuItem;
     PopupMenu1: TPopupMenu;
     ServersAndDatabases: TIBDataSet;
-    ServersAndDatabasesHASCHILD: TIntegerField;
     ServersAndDatabasesID: TIntegerField;
     ServersAndDatabasesITEMNAME: TIBStringField;
     ServersAndDatabasesITEMTYPE: TIntegerField;
