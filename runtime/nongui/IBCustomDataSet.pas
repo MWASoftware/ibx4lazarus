@@ -3826,6 +3826,7 @@ var
   Buff: PChar;
   CurRec: Integer;
   pda: PArrayDataArray;
+  pbd: PBlobDataArray;
   i: integer;
 begin
   inherited InternalCancel;
@@ -3833,12 +3834,15 @@ begin
   if Buff <> nil then
   begin
     pda := PArrayDataArray(Buff + FArrayCacheOffset);
+    pbd := PBlobDataArray(Buff + FBlobCacheOffset);
     for i := 0 to ArrayFieldCount - 1 do
       pda^[i].ArrayIntf.CancelChanges;
     CurRec := FCurrentRecord;
     AdjustRecordOnInsert(Buff);
     if (State = dsEdit) then begin
       CopyRecordBuffer(FOldBuffer, Buff);
+      for i := 0 to BlobFieldCount - 1 do
+        pbd^[i] := nil;
       WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Buff);
     end else begin
       CopyRecordBuffer(FModelBuffer, Buff);
