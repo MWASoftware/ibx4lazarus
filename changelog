@@ -1,4 +1,4 @@
-IBX Change Log  version (2.3-5 Build 12341) Mon, 24 Aug 2020 10:23:35 +0100
+IBX Change Log  version (2.3-5 Build 12350) Tue, 25 Aug 2020 16:11:02 +0100
 
 1.  TIBStringField: when a string value is read from a dataset buffer, if the
     number of UTF8 characters exceeds the string size then string is truncated
@@ -35,7 +35,7 @@ IBX Change Log  version (2.3-5 Build 12341) Mon, 24 Aug 2020 10:23:35 +0100
    value returned by DataSize is now the same as the Dataset buffer size reserved
    for the field.
 
-10. IBExtact: Tidyup of SQL generation. Avoid unnecessary double quotes.
+10. IBExtract: Tidyup of SQL generation. Avoid unnecessary double quotes.
 
 11. TIBCustomDataset: Add checks on buffer sizes when copying data from row to field buffer
     and vice-versa. This may result in an exception being raised (correctly) for
@@ -43,6 +43,9 @@ IBX Change Log  version (2.3-5 Build 12341) Mon, 24 Aug 2020 10:23:35 +0100
     upgraded. For example, computed fields can change from 32-bit to 64-bit integers.
     In such cases, the field needs to be deleted in the IDE fields editor and then
     added back in.
+
+12. IBCustomDataSet: CanInsert, CanEdit, CanDelete and CanRefresh updated to return
+    false if query contains white space and not just empty.
 
 12. IBCustomDataset: Blob data is now cleared when TDataSet.Cancel is called. This
     should ensure that (e.g.) a TDBMemo is correctly refreshed after a dataset edit
