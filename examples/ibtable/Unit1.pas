@@ -43,13 +43,13 @@ type
     CheckBox1: TCheckBox;
     Datasource1: TDataSource;
     DataSource2: TDataSource;
+    EmployeesFULL_NAME: TIBStringField;
     IBDatabase1: TIBDatabase;
     IBDynamicGrid1: TIBDynamicGrid;
     Employees: TIBTable;
     EmployeesDEPT_NO: TIBStringField;
     EmployeesEMP_NO: TSmallintField;
     EmployeesFIRST_NAME: TIBStringField;
-    EmployeesFULL_NAME: TIBStringField;
     EmployeesHIRE_DATE: TDateTimeField;
     EmployeesJOB_CODE: TIBStringField;
     EmployeesJOB_COUNTRY: TIBStringField;

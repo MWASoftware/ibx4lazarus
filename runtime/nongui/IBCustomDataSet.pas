@@ -1961,22 +1961,22 @@ var
   Buff: PRecordData;
 begin
   Buff := PRecordData(GetActiveBuf);
-  result := (FQModify.SQL.Text <> '') or
-    (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukModify).Text <> '')) or
+  result := (Trim(FQModify.SQL.Text) <> '') or
+    (Assigned(FUpdateObject) and (Trim(FUpdateObject.GetSQL(ukModify).Text) <> '')) or
     ((Buff <> nil) and (Buff^.rdCachedUpdateStatus = cusInserted) and
       (FCachedUpdates));
 end;
 
 function TIBCustomDataSet.CanInsert: Boolean;
 begin
-  result := (FQInsert.SQL.Text <> '') or
-    (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukInsert).Text <> ''));
+  result := (Trim(FQInsert.SQL.Text) <> '') or
+    (Assigned(FUpdateObject) and (Trim(FUpdateObject.GetSQL(ukInsert).Text) <> ''));
 end;
 
 function TIBCustomDataSet.CanDelete: Boolean;
 begin
-  if (FQDelete.SQL.Text <> '') or
-    (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukDelete).Text <> '')) then
+  if (Trim(FQDelete.SQL.Text) <> '') or
+    (Assigned(FUpdateObject) and (Trim(FUpdateObject.GetSQL(ukDelete).Text) <> '')) then
     result := True
   else
     result := False;
@@ -1984,8 +1984,8 @@ end;
 
 function TIBCustomDataSet.CanRefresh: Boolean;
 begin
-  result := (FQRefresh.SQL.Text <> '') or
-    (Assigned(FUpdateObject) and (FUpdateObject.RefreshSQL.Text <> ''));
+  result := (Trim(FQRefresh.SQL.Text) <> '') or
+    (Assigned(FUpdateObject) and (Trim(FUpdateObject.RefreshSQL.Text) <> ''));
 end;
 
 procedure TIBCustomDataSet.CheckEditState;
@@ -2637,7 +2637,7 @@ begin
     begin
       if Buff <> nil then
       begin
-        if (Assigned(FUpdateObject) and (FUpdateObject.RefreshSQL.Text <> '')) then
+        if (Assigned(FUpdateObject) and (Trim(FUpdateObject.RefreshSQL.Text) <> '')) then
         begin
           Qry := TIBSQL.Create(self);
           Qry.Database := Database;
