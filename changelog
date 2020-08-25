@@ -1,4 +1,4 @@
-IBX Change Log  version (2.3-5 Build 12341) Mon, 24 Aug 2020 10:23:35 +0100
+IBX Change Log  version (2.3-5 Build 12350) Tue, 25 Aug 2020 16:11:02 +0100
 
 1.  TIBStringField: when a string value is read from a dataset buffer, if the
     number of UTF8 characters exceeds the string size then string is truncated
