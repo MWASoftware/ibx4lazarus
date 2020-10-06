@@ -51,6 +51,9 @@ IBX Change Log  version (2.3-5 Build 12350) Tue, 25 Aug 2020 16:11:02 +0100
     should ensure that (e.g.) a TDBMemo is correctly refreshed after a dataset edit
     is cancelled.
 
+13. IBCustomDataset: SetArrayIntf should no longer cause an access violation if
+    called on a null field.
+
 IBX Change Log  version (2.3-4 Build 12041) Fri, 17 Apr 2020 14:00:32 +0100
 
 1.  TIBXDataSet and Generators: Generator Names that are not all upper case or

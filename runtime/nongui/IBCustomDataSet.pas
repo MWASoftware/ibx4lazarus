@@ -3397,16 +3397,33 @@ end;
 procedure TIBCustomDataSet.SetArrayIntf(AnArray: IArray; Field: TIBArrayField);
 var Buff: PChar;
     pda: PArrayDataArray;
+    MappedFieldPos: integer;
 begin
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
   Buff := GetActiveBuf;
   if Buff <> nil then
+  with PRecordData(Buff)^ do
   begin
     AdjustRecordOnInsert(Buff);
-    pda := PArrayDataArray(Buff + FArrayCacheOffset);
-    pda^[Field.FCacheOffset].FArray := AnArray;
-    WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
+    MappedFieldPos := FMappedFieldPosition[Field.FieldNo - 1];
+    if (MappedFieldPos > 0) and
+       (MappedFieldPos <= rdFieldCount) then
+    begin
+      rdFields[MappedFieldPos].fdIsNull := AnArray = nil;
+      pda := PArrayDataArray(Buff + FArrayCacheOffset);
+      if pda^[Field.FCacheOffset] = nil then
+      begin
+        if not rdFields[MappedFieldPos].fdIsNull then
+        begin
+          pda^[Field.FCacheOffset] := TIBArray.Create(Field,AnArray);
+          FArrayList.Add(pda^[Field.FCacheOffset]);
+        end
+      end
+      else
+        pda^[Field.FCacheOffset].FArray := AnArray;
+      WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
+    end;
   end;
 end;
 
