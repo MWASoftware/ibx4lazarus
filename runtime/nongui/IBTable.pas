@@ -553,7 +553,7 @@ var
         ExtractIdentifier(Database.SQLDialect,
           QuoteIdentifier(DataBase.SQLDialect, Name)) +
         ''' ' +
-        'AND RDB$CONSTRAINT_TYPE = ''PRIMARY KEY''';
+        'AND Trim(RDB$CONSTRAINT_TYPE) = ''PRIMARY KEY''';
       Query.Prepare;
       Query.ExecQuery;
       if not Query.EOF then
@@ -747,7 +747,7 @@ begin
     Query.Database := DataBase;
     Query.Transaction := Database.InternalTransaction;
     Query.SQL.Text :=
-    'Select USER from RDB$RELATIONS where RDB$RELATION_NAME = ' + {do not localize}
+    'Select USER from RDB$RELATIONS where Trim(RDB$RELATION_NAME) = ' + {do not localize}
     '''' +
     ExtractIdentifier(Database.SQLDialect,
       QuoteIdentifier(DataBase.SQLDialect, FTableName)) + '''';
@@ -1001,7 +1001,7 @@ begin
     Query.Database := DataBase;
     Query.Transaction := Database.InternalTransaction;
     Query.SQL.Text := 'Select RDB$SYSTEM_FLAG, RDB$DBKEY_LENGTH ' + {do not localize}
-                    'from RDB$RELATIONS where RDB$RELATION_NAME = ' + {do not localize}
+                    'from RDB$RELATIONS where Trim(RDB$RELATION_NAME)  = ' + {do not localize}
                     '''' +
                     ExtractIdentifier(Database.SQLDialect,
                       QuoteIdentifier(DataBase.SQLDialect, FTableName)) + '''';

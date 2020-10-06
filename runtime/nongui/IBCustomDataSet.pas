@@ -2264,22 +2264,22 @@ var
   Buff: PRecordData;
 begin
   Buff := PRecordData(GetActiveBuf);
-  result := (FQModify.SQL.Text <> '') or
-    (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukModify).Text <> '')) or
+  result := (Trim(FQModify.SQL.Text) <> '') or
+    (Assigned(FUpdateObject) and (Trim(FUpdateObject.GetSQL(ukModify).Text) <> '')) or
     ((Buff <> nil) and (Buff^.rdCachedUpdateStatus = cusInserted) and
       (FCachedUpdates));
 end;
 
 function TIBCustomDataSet.CanInsert: Boolean;
 begin
-  result := (FQInsert.SQL.Text <> '') or
-    (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukInsert).Text <> ''));
+  result := (Trim(FQInsert.SQL.Text) <> '') or
+    (Assigned(FUpdateObject) and (Trim(FUpdateObject.GetSQL(ukInsert).Text) <> ''));
 end;
 
 function TIBCustomDataSet.CanDelete: Boolean;
 begin
-  if (FQDelete.SQL.Text <> '') or
-    (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukDelete).Text <> '')) then
+  if (Trim(FQDelete.SQL.Text) <> '') or
+    (Assigned(FUpdateObject) and (Trim(FUpdateObject.GetSQL(ukDelete).Text) <> '')) then
     result := True
   else
     result := False;
@@ -2287,8 +2287,8 @@ end;
 
 function TIBCustomDataSet.CanRefresh: Boolean;
 begin
-  result := (FQRefresh.SQL.Text <> '') or
-    (Assigned(FUpdateObject) and (FUpdateObject.RefreshSQL.Text <> ''));
+  result := (Trim(FQRefresh.SQL.Text) <> '') or
+    (Assigned(FUpdateObject) and (Trim(FUpdateObject.RefreshSQL.Text) <> ''));
 end;
 
 procedure TIBCustomDataSet.CheckEditState;
@@ -2944,7 +2944,7 @@ begin
     begin
       if Buff <> nil then
       begin
-        if (Assigned(FUpdateObject) and (FUpdateObject.RefreshSQL.Text <> '')) then
+        if (Assigned(FUpdateObject) and (Trim(FUpdateObject.RefreshSQL.Text) <> '')) then
         begin
           Qry := TIBSQL.Create(self);
           Qry.Database := Database;
@@ -3719,16 +3719,33 @@ end;
 procedure TIBCustomDataSet.SetArrayIntf(AnArray: IArray; Field: TIBArrayField);
 var Buff: PChar;
     pda: PArrayDataArray;
+    MappedFieldPos: integer;
 begin
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
   Buff := GetActiveBuf;
   if Buff <> nil then
+  with PRecordData(Buff)^ do
   begin
     AdjustRecordOnInsert(Buff);
-    pda := PArrayDataArray(Buff + FArrayCacheOffset);
-    pda^[Field.FCacheOffset].FArray := AnArray;
-    WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
+    MappedFieldPos := FMappedFieldPosition[Field.FieldNo - 1];
+    if (MappedFieldPos > 0) and
+       (MappedFieldPos <= rdFieldCount) then
+    begin
+      rdFields[MappedFieldPos].fdIsNull := AnArray = nil;
+      pda := PArrayDataArray(Buff + FArrayCacheOffset);
+      if pda^[Field.FCacheOffset] = nil then
+      begin
+        if not rdFields[MappedFieldPos].fdIsNull then
+        begin
+          pda^[Field.FCacheOffset] := TIBArray.Create(Field,AnArray);
+          FArrayList.Add(pda^[Field.FCacheOffset]);
+        end
+      end
+      else
+        pda^[Field.FCacheOffset].FArray := AnArray;
+      WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
+    end;
   end;
 end;
 
@@ -4149,6 +4166,7 @@ var
   Buff: PChar;
   CurRec: Integer;
   pda: PArrayDataArray;
+  pbd: PBlobDataArray;
   i: integer;
 begin
   inherited InternalCancel;
@@ -4156,12 +4174,15 @@ begin
   if Buff <> nil then
   begin
     pda := PArrayDataArray(Buff + FArrayCacheOffset);
+    pbd := PBlobDataArray(Buff + FBlobCacheOffset);
     for i := 0 to ArrayFieldCount - 1 do
       pda^[i].ArrayIntf.CancelChanges;
     CurRec := FCurrentRecord;
     AdjustRecordOnInsert(Buff);
     if (State = dsEdit) then begin
       CopyRecordBuffer(FOldBuffer, Buff);
+      for i := 0 to BlobFieldCount - 1 do
+        pbd^[i] := nil;
       WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Buff);
     end else begin
       CopyRecordBuffer(FModelBuffer, Buff);
@@ -4267,7 +4288,7 @@ begin
 procedure TIBCustomDataSet.FieldDefsFromQuery(SourceQuery: TIBSQL);
 const
   DefaultSQL = 'Select F.RDB$COMPUTED_BLR, ' + {do not localize}
-               'F.RDB$DEFAULT_VALUE, Trim(R.RDB$FIELD_NAME) as RDB$FIELD_NAME ' + {do not localize}
+               'F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME ' + {do not localize}
                'from RDB$RELATION_FIELDS R, RDB$FIELDS F ' + {do not localize}
                'where R.RDB$RELATION_NAME = :RELATION ' +  {do not localize}
                'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '+ {do not localize}
@@ -4275,7 +4296,7 @@ const
                '     (not F.RDB$DEFAULT_VALUE is NULL)) '; {do not localize}
 
   DefaultSQLODS12 = 'Select F.RDB$COMPUTED_BLR, ' + {do not localize}
-               'F.RDB$DEFAULT_VALUE, Trim(R.RDB$FIELD_NAME) as RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE ' + {do not localize}
+               'F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE ' + {do not localize}
                'from RDB$RELATION_FIELDS R, RDB$FIELDS F ' + {do not localize}
                'where R.RDB$RELATION_NAME = :RELATION ' +  {do not localize}
                'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '+ {do not localize}
@@ -4320,7 +4341,7 @@ var
     while not Query.Eof do
     begin
       FField := TFieldNode.Create;
-      FField.FieldName := Query.Fields[2].AsString;
+      FField.FieldName := TrimRight(Query.Fields[2].AsString);
       FField.DEFAULT_VALUE := not Query.Fields[1].IsNull;
       FField.COMPUTED_BLR := not Query.Fields[0].IsNull;
       FField.IDENTITY_COLUMN := (Query.FieldCount > 3) and not Query.Fields[3].IsNull;

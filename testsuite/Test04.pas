@@ -20,6 +20,7 @@ type
   TTest04 = class(TIBXTestBase)
   private
     FDataSet: TIBDataSet;
+    FCreateArrayOnInsert: boolean;
     procedure HandleAfterInsert(DataSet: TDataSet);
     procedure HandleTransactionEdit(Sender: TObject);
     procedure HandleTransactionDelete(Sender: TObject);
@@ -44,6 +45,9 @@ uses DateUtils, IBSQL;
 
 procedure TTest04.HandleAfterInsert(DataSet: TDataSet);
 var S, F: TStream;
+    Str: TStringList;
+    i,j: integer;
+    ar: IArray;
 begin
   with DataSet do
   begin
@@ -59,6 +63,24 @@ begin
     FieldByName('F11').AsLargeInt := 9223372036854775807;
     FieldByName('F12').AsInteger := 65566;
     FieldByName('F13').AsDateTime := EncodeDateTime(2007,12,26,12,30,45,0);
+    Str := TStringList.Create;
+    try
+      Str.LoadFromFile('resources/Test04.txt');
+      FieldByName('F14').AsString := Str.Text;
+    finally
+      Str.Free;
+    end;
+    if FCreateArrayOnInsert then
+      ar := TIBArrayField(FieldByName('MyArray')).CreateArray
+    else
+      ar := (DataSet as TIBCustomDataset).GetArray(TIBArrayField(FieldByName('MyArray')));
+    j := 100;
+    for i := 0 to 16 do
+    begin
+      ar.SetAsInteger([i],j);
+      dec(j);
+    end;
+    TIBArrayField(FieldByName('MyArray')).ArrayIntf := ar;
     S := CreateBlobStream(FieldByName('F10'),bmWrite);
     F := TFileStream.Create('resources/Test04.jpg',fmOpenRead);
     try
@@ -115,15 +137,15 @@ begin
       AfterExecQuery := @HandleTransactionExecQuery;
     end;
     SelectSQL.Text := 'Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6,'+
-      ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.'+
+      ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.'+
       'GRANTS, A."My Field" as MYFIELD1, A."MY Field" as MYFIELD2 From IBXTEST A';
     InsertSQL.Text :=
-      'Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13,'+
+      'Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray, '+
       ' GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,'+
-      ':F8, :F9, :F10, :F11, :F12, :F13, :GRANTS)';
+      ':F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS)';
     RefreshSQL.Text :=
       'Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6,' +
-      ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.'+
+      ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.'+
       'GRANTS, A."My Field" as MYFIELD1, A."MY Field"  as MYFIELD2 From IBXTEST A '+
       'Where A.TABLEKEY = :TABLEKEY';
     ModifySQL.Text :=
@@ -141,6 +163,8 @@ begin
         '  A.F11 = :F11,' +
         '  A."f12" = :F12,' +
         '  A.F13 = :F13,' +
+        '  A.F14 = :F14,' +
+        '  A.MyArray = :MyArray, ' +
         '  A."My Field"  = :MYFIELD1,'+
         '  A."MY Field" = :MYFIELD2,'+
         '  A.GRANTS = :GRANTS '+
@@ -184,6 +208,7 @@ begin
     FDataSet.Append;
     FDataSet.Post;
     writeln(OutFile,'Add and edit a record');
+    FCreateArrayOnInsert := true;
     FDataSet.Append;
     FDataSet.Post;
     FDataSet.Edit;
@@ -232,7 +257,8 @@ begin
   writeln(Outfile,'Creating Database from SQL');
   IBDatabase.CreateDatabase('CREATE DATABASE ''' + Owner.GetNewDatabaseName +
                             ''' USER ''' + Owner.GetUserName +
-                            ''' PASSWORD ''' + Owner.GetPassword + '''');
+                            ''' PASSWORD ''' + Owner.GetPassword + '''' +
+                            ' DEFAULT CHARACTER SET UTF8');
   if IBDatabase.Connected then
   begin
     writeln(Outfile,'Database Name = ',IBDatabase.DatabaseName);

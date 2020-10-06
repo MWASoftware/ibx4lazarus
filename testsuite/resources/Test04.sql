@@ -13,6 +13,8 @@ Create Table IBXTest (
  F11 BigInt,
  "f12" Integer,
  F13 Time,
+ F14 Blob sub_type text,
+ MyArray Integer [0:16],
  "GRANTS" VarChar(20),
  "My Field" VarChar(32),
  "MY Field" VarChar(32),
