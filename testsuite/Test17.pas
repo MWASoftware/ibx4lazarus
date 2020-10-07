@@ -12,7 +12,7 @@ unit Test17;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB, IBCustomDataSet;
+  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, DB, IB, IBCustomDataSet;
 
 const
   aTestID    = '17';
@@ -29,6 +29,28 @@ type
     FIBDataSet1: TIBDataSet;
     FIBDataSet2: TIBDataSet;
     procedure HandleDeleteReturning(Sender: TObject; QryResults: IResults);
+    procedure HandleBeforeOpen(DataSet: TDataSet);
+    procedure HandleAfterOpen(DataSet: TDataSet);
+    procedure HandleBeforeClose(DataSet: TDataSet);
+    procedure HandleAfterClose(DataSet: TDataSet);
+    procedure HandleBeforeInsert(DataSet: TDataSet);
+    procedure HandleAfterInsert(DataSet: TDataSet);
+    procedure HandleBeforeEdit(DataSet: TDataSet);
+    procedure HandleAfterEdit(DataSet: TDataSet);
+    procedure HandleBeforePost(DataSet: TDataSet);
+    procedure HandleAfterPost(DataSet: TDataSet);
+    procedure HandleBeforeCancel(DataSet: TDataSet);
+    procedure HandleAfterCancel(DataSet: TDataSet);
+    procedure HandleBeforeDelete(DataSet: TDataSet);
+    procedure HandleAfterDelete(DataSet: TDataSet);
+    procedure HandleBeforeScroll(DataSet: TDataSet);
+    procedure HandleAfterScroll(DataSet: TDataSet);
+    procedure HandleBeforeRefresh(DataSet: TDataSet);
+    procedure HandleAfterRefresh(DataSet: TDataSet);
+    procedure ValidatePostOK(Sender: TObject; var CancelPost: boolean);
+    procedure ValidatePostCancel(Sender: TObject; var CancelPost: boolean);
+    procedure HandlePostError(DataSet: TDataSet; E: EDatabaseError;
+                     var DataAction: TDataAction);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -50,6 +72,98 @@ begin
   writeln(OutFile);
 end;
 
+procedure TTest17.HandleBeforeOpen(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event BeforeOpen: State = ',DataSet.State);
+end;
+procedure TTest17.HandleAfterOpen(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event AfterOpen: State = ',DataSet.State);
+end;
+procedure TTest17.HandleBeforeClose(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event BeforeClose: State = ',DataSet.State);
+end;
+procedure TTest17.HandleAfterClose(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event AfterClose: State = ',DataSet.State);
+end;
+procedure TTest17.HandleBeforeInsert(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event BeforeInsert: State = ',DataSet.State);
+end;
+procedure TTest17.HandleAfterInsert(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event AfterInsert: State = ',DataSet.State);
+end;
+procedure TTest17.HandleBeforeEdit(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event BeforeEdit: State = ',DataSet.State);
+end;
+procedure TTest17.HandleAfterEdit(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event AfterEdit: State = ',DataSet.State);
+end;
+procedure TTest17.HandleBeforePost(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event BeforePost: State = ',DataSet.State);
+end;
+procedure TTest17.HandleAfterPost(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event AfterPost: State = ',DataSet.State);
+end;
+procedure TTest17.HandleBeforeCancel(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event BeforeCancel: State = ',DataSet.State);
+end;
+procedure TTest17.HandleAfterCancel(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event AfterCancel: State = ',DataSet.State);
+end;
+procedure TTest17.HandleBeforeDelete(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event BeforeDelete: State = ',DataSet.State);
+end;
+procedure TTest17.HandleAfterDelete(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event AfterDelete: State = ',DataSet.State);
+end;
+procedure TTest17.HandleBeforeScroll(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event BeforeScroll: State = ',DataSet.State);
+end;
+procedure TTest17.HandleAfterScroll(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event AfterScroll: State = ',DataSet.State);
+end;
+procedure TTest17.HandleBeforeRefresh(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event BeforeRefresh: State = ',DataSet.State);
+end;
+procedure TTest17.HandleAfterRefresh(DataSet: TDataSet);
+Begin
+  writeln(Outfile,'Dataset Event AfterRefresh: State = ',DataSet.State);
+end;
+
+procedure TTest17.ValidatePostOK(Sender: TObject; var CancelPost: boolean);
+begin
+  writeln(Outfile,'Validate Post OK called');
+  CancelPost := false;
+end;
+
+procedure TTest17.ValidatePostCancel(Sender: TObject; var CancelPost: boolean);
+begin
+  writeln(Outfile,'Validate Post Cancel called');
+  CancelPost := true;
+end;
+
+procedure TTest17.HandlePostError(DataSet: TDataSet; E: EDatabaseError;
+  var DataAction: TDataAction);
+begin
+  writeln(Outfile,'Post Error Called: ',E.Message);
+  DataAction := daFail;
+end;
+
 procedure TTest17.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
@@ -66,6 +180,7 @@ begin
     GeneratorField.Field := 'KeyField';
     GeneratorField.Generator := 'AGENERATOR';
     GeneratorField.Increment := 1;
+    OnPostError := @HandlePostError;
   end;
   FIBDataSet2 := TIBDataSet.Create(Application);
   with FIBDataSet2 do
@@ -78,6 +193,24 @@ begin
     DeleteSQL.Add('Delete from IBDataSetTest Where KeyField = :old_KeyField Returning KeyField');
     RefreshSQL.Add('Select * from IBDataSetTest Where KeyField = :KeyField');
     OnDeleteReturning := @HandleDeleteReturning;
+    BeforeOpen := @HandleBeforeOpen;
+    AfterOpen := @HandleAfterOpen;
+    BeforeClose := @HandleBeforeClose;
+    AfterClose := @HandleAfterClose;
+    BeforeInsert := @HandleBeforeInsert;
+    AfterInsert := @HandleAfterInsert;
+    BeforeEdit := @HandleBeforeEdit;
+    AfterEdit := @HandleAfterEdit;
+    BeforePost := @HandleBeforePost;
+    AfterPost := @HandleAfterPost;
+    BeforeCancel := @HandleBeforeCancel;
+    AfterCancel := @HandleAfterCancel;
+    BeforeDelete := @HandleBeforeDelete;
+    AfterDelete := @HandleAfterDelete;
+    BeforeScroll := @HandleBeforeScroll;
+    AfterScroll := @HandleAfterScroll;
+    BeforeRefresh := @HandleBeforeRefresh;
+    AfterRefresh := @HandleAfterRefresh;
   end;
 end;
 
@@ -99,6 +232,7 @@ begin
 end;
 
 procedure TTest17.RunTest(CharSet: AnsiString; SQLDialect: integer);
+var lastKey: integer;
 begin
   IBDatabase.CreateDatabase;
   try
@@ -128,8 +262,50 @@ begin
       First;
       Delete;
       PrintDataSet(FIBDataSet1);
+      writeln(Outfile,'On Post KeyField Assignment');
+      FIBDataSet1.GeneratorField.ApplyOnEvent := gaeOnPostRecord;
+      Append;
+      FieldByName('PlainText').AsString := 'On Post KeyField test';
+      PrintDataSetRow(FIBDataSet1);
+      Post;
+      writeln(Outfile,'Row data after post');
+      PrintDataSetRow(FIBDataSet1);
+
+      writeln(Outfile,'Catch a Post Error - duplicate key');
+      lastkey := FieldByName('KeyField').AsInteger;
+      Append;
+      FieldByName('KeyField').AsInteger := lastkey;
+      FieldByName('PlainText').AsString := 'On Post Error test';
+      try
+        Post;
+      except on E: Exception do
+        writeln(Outfile,'Exception handled: ',E.Message);
+      end;
+
+      IBTransaction.Rollback;
+      IBTransaction.Active := true;
+      DataSetCloseAction := dcSaveChanges;
+      Active := true;
+      writeln(OutFile,'FIBDataSet1: Simple Append with automatic posting on close');
+      Append;
+      FieldByName('PlainText').AsString := 'This is a test';
+      Active := false;
+      Active := true;
+      PrintDataSet(FIBDataSet1);
+
+      IBTransaction.Rollback;
+      IBTransaction.Active := true;
+      DataSetCloseAction := dcDiscardChanges;
+      Active := true;
+      writeln(OutFile,'FIBDataSet1: Simple Append with discard on close');
+      Append;
+      FieldByName('PlainText').AsString := 'This is a test';
+      Active := false;
+      Active := true;
+      PrintDataSet(FIBDataSet1);
 
     end;
+    writeln(Outfile,'==================================');
     IBTransaction.Rollback;
     IBTransaction.Active := true;
     with FIBDataSet2 do
@@ -157,6 +333,25 @@ begin
       First;
       Delete;
       PrintDataSet(FIBDataSet2);
+      OnValidatePost := @ValidatePostOK;
+      writeln(Outfile,'Validate Post OK');
+      Append;
+      FieldByName('PlainText').AsString := 'This is a validated Post';
+      Post;
+      PrintDataSetRow(FIBDataSet2);
+      OnValidatePost := @ValidatePostCancel;
+      writeln(Outfile,'Validate Post Cancel');
+      Append;
+      FieldByName('PlainText').AsString := 'This is a validated Post which should have been cancelled';
+      Post;
+      PrintDataSetRow(FIBDataSet2);
+      OnValidatePost := nil;
+      writeln(OutFile,'FIBDataSet2: Simple Append with Forced Refresh');
+      ForcedRefresh := true;
+      Append;
+      FieldByName('PlainText').AsString := 'This is a test';
+      Post;
+      PrintDataSetRow(FIBDataSet2);
 
     end;
   finally
