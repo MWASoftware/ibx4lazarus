@@ -10,8 +10,8 @@ uses
   cthreads,
   {$ENDIF}
   Classes, SysUtils, CustApp, IB, Test01, IBXTestBase, Test03, Test10, Test09,
-  Test04, Test05, Test23, Test14, Test12, Test30, Test02, Test06,
-  Test11, Test13, Test07, Test08, Test24, Test16, Test17, TestApplication;
+  Test04, Test05, Test23, Test14, Test12, Test30, Test02, Test06, Test11,
+  Test13, Test07, Test08, Test24, Test16, Test17, Test19, TestApplication;
 
 type
 

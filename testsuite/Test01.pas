@@ -12,7 +12,7 @@ unit Test01;
 interface
 
 uses
-  Classes, SysUtils, TestApplication, IBXTestBase, IB, IBCustomDataSet, IBDatabase, IBQuery;
+  Classes, SysUtils, TestApplication, IBXTestBase, DB, IB, IBCustomDataSet, IBDatabase, IBQuery;
 
 const
   aTestID    = '01';
@@ -23,6 +23,9 @@ type
 { TTest1 }
 
   TTest1 = class(TIBXTestBase)
+  private
+    procedure ClientSideFilter(DataSet: TDataSet; var Accept: Boolean);
+    procedure HandleBeforeOpen(DataSet: TDataSet);
   protected
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
@@ -54,6 +57,17 @@ const
 
   { TTest1 }
 
+procedure TTest1.ClientSideFilter(DataSet: TDataSet; var Accept: Boolean);
+begin
+  Accept := DataSet.FieldByName('HIRE_DATE').AsDateTime > EncodeDate(1994 ,1,1);
+end;
+
+procedure TTest1.HandleBeforeOpen(DataSet: TDataSet);
+begin
+  (DataSet as TIBParserDataSet).Parser.Add2WhereClause('FIRST_NAME = :FN');
+  (DataSet as TIBQuery).ParamByName('FN').AsString := 'Claudia';
+end;
+
 function TTest1.GetTestID: AnsiString;
 begin
   Result := aTestID;
@@ -77,6 +91,7 @@ begin
   with IBQuery do
   begin
      AllowAutoActivateTransaction := true;
+     writeln(OutFile,'Read dataset unidirectional buffering');
      Unidirectional := true;
      SQL.Text := sqlExample;
      EnableStatistics := true;
@@ -88,10 +103,31 @@ begin
      PrintAffectedRows(IBQuery);
      writeln(OutFile);
      writeln(OutFile,'Reconnect');
+     writeln(OutFile,'Read dataset bidirectional buffering');
      IBDatabase.ReConnect;
      Unidirectional := false;
      Active := true;
      PrintDataSet(IBQuery);
+     Active := false;
+     writeln(OutFile,'Server Side Filter: Hire Date < 1/1/90');
+     SQLFiltered := true;
+     SQLFilterParams.Text := 'HIRE_DATE < ''1990.01.01''';
+     Active := true;
+     PrintDataSet(IBQuery);
+     Active := false;
+     writeln(Outfile,'Client side Filter: Hire Date > 1/1/94');
+     SQLFiltered := false;
+     Filtered := true;
+     OnFilterRecord := @ClientSideFilter;
+     Active := true;
+     PrintDataSet(IBQuery);
+     Active := false;
+     Filtered := false;
+     writeln(Outfile,'TIBQuery with open parameters - select only records with First Name = Claudia');
+     BeforeOpen := @HandleBeforeOpen;
+     Active := true;
+     PrintDataSet(IBQuery);
+
   end;
 end;
 
