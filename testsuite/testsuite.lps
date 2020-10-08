@@ -8,7 +8,7 @@
         <Filename Value="testsuite.lpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="18" Y="15"/>
-        <UsageCount Value="167"/>
+        <UsageCount Value="168"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -17,7 +17,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="123"/>
         <CursorPos X="3" Y="127"/>
-        <UsageCount Value="167"/>
+        <UsageCount Value="168"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
@@ -26,7 +26,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="78"/>
         <CursorPos Y="86"/>
-        <UsageCount Value="167"/>
+        <UsageCount Value="168"/>
       </Unit2>
       <Unit3>
         <Filename Value="Test03.pas"/>
@@ -34,7 +34,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="83"/>
         <CursorPos X="19" Y="107"/>
-        <UsageCount Value="165"/>
+        <UsageCount Value="166"/>
       </Unit3>
       <Unit4>
         <Filename Value="Test10.pas"/>
@@ -42,7 +42,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="9"/>
         <CursorPos X="58" Y="26"/>
-        <UsageCount Value="161"/>
+        <UsageCount Value="162"/>
       </Unit4>
       <Unit5>
         <Filename Value="Test09.pas"/>
@@ -50,7 +50,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="8"/>
         <CursorPos X="58" Y="25"/>
-        <UsageCount Value="159"/>
+        <UsageCount Value="160"/>
       </Unit5>
       <Unit6>
         <Filename Value="Test04.pas"/>
@@ -58,7 +58,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="199"/>
         <CursorPos Y="199"/>
-        <UsageCount Value="149"/>
+        <UsageCount Value="150"/>
       </Unit6>
       <Unit7>
         <Filename Value="Test05.pas"/>
@@ -66,7 +66,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="49"/>
         <CursorPos Y="141"/>
-        <UsageCount Value="145"/>
+        <UsageCount Value="146"/>
       </Unit7>
       <Unit8>
         <Filename Value="Test23.pas"/>
@@ -74,14 +74,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="46"/>
         <CursorPos X="58" Y="26"/>
-        <UsageCount Value="139"/>
+        <UsageCount Value="140"/>
       </Unit8>
       <Unit9>
         <Filename Value="Test14.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="19" Y="14"/>
-        <UsageCount Value="138"/>
+        <UsageCount Value="139"/>
       </Unit9>
       <Unit10>
         <Filename Value="Test12.pas"/>
@@ -89,14 +89,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="231"/>
         <CursorPos X="8" Y="251"/>
-        <UsageCount Value="137"/>
+        <UsageCount Value="138"/>
       </Unit10>
       <Unit11>
         <Filename Value="testApp/TestApplication.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="6"/>
         <TopLine Value="85"/>
-        <UsageCount Value="132"/>
+        <UsageCount Value="133"/>
         <Loaded Value="True"/>
       </Unit11>
       <Unit12>
@@ -105,7 +105,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="73"/>
         <CursorPos X="58" Y="38"/>
-        <UsageCount Value="116"/>
+        <UsageCount Value="117"/>
       </Unit12>
       <Unit13>
         <Filename Value="Test02.pas"/>
@@ -113,7 +113,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="21"/>
         <CursorPos X="58" Y="38"/>
-        <UsageCount Value="89"/>
+        <UsageCount Value="90"/>
       </Unit13>
       <Unit14>
         <Filename Value="Test06.pas"/>
@@ -121,7 +121,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="29"/>
         <CursorPos Y="97"/>
-        <UsageCount Value="69"/>
+        <UsageCount Value="70"/>
       </Unit14>
       <Unit15>
         <Filename Value="Test11.pas"/>
@@ -129,7 +129,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="71"/>
         <CursorPos X="21" Y="93"/>
-        <UsageCount Value="66"/>
+        <UsageCount Value="67"/>
       </Unit15>
       <Unit16>
         <Filename Value="Test13.pas"/>
@@ -137,7 +137,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="110"/>
         <CursorPos X="30" Y="129"/>
-        <UsageCount Value="58"/>
+        <UsageCount Value="59"/>
       </Unit16>
       <Unit17>
         <Filename Value="Test15.pas"/>
@@ -145,7 +145,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="86"/>
         <CursorPos X="23" Y="119"/>
-        <UsageCount Value="57"/>
+        <UsageCount Value="58"/>
       </Unit17>
       <Unit18>
         <Filename Value="Test07.pas"/>
@@ -153,21 +153,21 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="119"/>
         <CursorPos X="27" Y="169"/>
-        <UsageCount Value="53"/>
+        <UsageCount Value="54"/>
       </Unit18>
       <Unit19>
         <Filename Value="Test08.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="65" Y="17"/>
-        <UsageCount Value="50"/>
+        <UsageCount Value="51"/>
       </Unit19>
       <Unit20>
         <Filename Value="Test24.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="23" Y="245"/>
-        <UsageCount Value="38"/>
+        <UsageCount Value="39"/>
       </Unit20>
       <Unit21>
         <Filename Value="Test16.pas"/>
@@ -175,7 +175,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="111"/>
         <CursorPos X="20" Y="142"/>
-        <UsageCount Value="38"/>
+        <UsageCount Value="39"/>
       </Unit21>
       <Unit22>
         <Filename Value="Test17.pas"/>
@@ -183,7 +183,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="301"/>
         <CursorPos Y="327"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="32"/>
         <Loaded Value="True"/>
       </Unit22>
       <Unit23>
@@ -192,7 +192,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="107"/>
         <CursorPos X="32" Y="109"/>
-        <UsageCount Value="25"/>
+        <UsageCount Value="26"/>
       </Unit23>
       <Unit24>
         <Filename Value="Test18.pas"/>
@@ -200,8 +200,8 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="180"/>
-        <CursorPos X="6" Y="192"/>
-        <UsageCount Value="22"/>
+        <CursorPos Y="192"/>
+        <UsageCount Value="23"/>
         <Loaded Value="True"/>
       </Unit24>
       <Unit25>

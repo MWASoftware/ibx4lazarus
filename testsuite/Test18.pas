@@ -189,7 +189,7 @@ begin
       Active := false;
       Active := true;
       PrintDataSet(FIBDataSet);
-exit;
+
       writeln(OutFile);
       writeln(OutFile,'Delete First and Last records and Cancel');
       First;
