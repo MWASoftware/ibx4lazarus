@@ -197,9 +197,10 @@
       <Unit24>
         <Filename Value="Test18.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="50"/>
-        <CursorPos X="73" Y="52"/>
+        <TopLine Value="180"/>
+        <CursorPos X="6" Y="192"/>
         <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit24>
@@ -212,9 +213,8 @@
       </Unit25>
       <Unit26>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="2007"/>
+        <TopLine Value="2025"/>
         <CursorPos X="21" Y="2039"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>

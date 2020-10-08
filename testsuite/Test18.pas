@@ -181,6 +181,16 @@ begin
       PrintDataSet(FIBDataSet);
 
       writeln(OutFile);
+      writeln(OutFile,'Update of First and Last records and implicitly apply');
+      DataSetCloseAction := dcSaveChanges;
+      First;
+      Edit;
+      FieldByName('PlainText').AsString := 'This is an updated test (implicit apply updates)';
+      Active := false;
+      Active := true;
+      PrintDataSet(FIBDataSet);
+exit;
+      writeln(OutFile);
       writeln(OutFile,'Delete First and Last records and Cancel');
       First;
       Delete;
