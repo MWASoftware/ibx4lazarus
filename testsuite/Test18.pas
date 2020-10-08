@@ -27,6 +27,7 @@ type
                                    var UpdateAction: TIBUpdateAction);
     procedure HandleUpdateError(DataSet: TDataSet; E: EDatabaseError;
                                  UpdateKind: TUpdateKind; var TheUpdateAction: TIBUpdateAction);
+    procedure DoTest(aUnidirectional: boolean);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -54,6 +55,145 @@ procedure TTest18.HandleUpdateError(DataSet: TDataSet; E: EDatabaseError;
 begin
   writeln(Outfile,'Update Error raised: ',E.Message);
   TheUpdateAction := uaFail;
+end;
+
+procedure TTest18.DoTest(aUnidirectional: boolean);
+var lastkey: integer;
+begin
+  with FIBDataSet do
+  begin
+    Unidirectional := aUnidirectional;
+    Active := true;
+    writeln(Outfile,'Unidirectional caching = ',aUnidirectional);
+    writeln(OutFile,'Simple Append i.e. caching of inserted records and cancel');
+    if aUnidirectional then Insert else Append;
+    FieldByName('PlainText').AsString := 'This is a test';
+    Post;
+    if aUnidirectional then Insert else Append;
+    FieldByName('PlainText').AsString := 'This is another test';
+    Post;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Cancel Updates');
+    CancelUpdates;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Now reopen and show empty');
+    Active := false;
+    Active := true;
+    PrintDataSet(FIBDataSet);
+
+    writeln(Outfile);
+    writeln(OutFile,'Simple Append i.e. caching of inserted records and apply updates');
+    if aUnidirectional then Insert else Append;
+    FieldByName('PlainText').AsString := 'This is a test';
+    Post;
+    if aUnidirectional then Insert else Append;
+    FieldByName('PlainText').AsString := 'This is another test';
+    Post;
+    if aUnidirectional then Insert else Append;
+    FieldByName('PlainText').AsString := 'And another';
+    Post;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Apply Updates');
+    ApplyUpdates;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Now reopen and show still there');
+    Active := false;
+    Active := true;
+    PrintDataSet(FIBDataSet);
+
+    writeln(OutFile);
+    writeln(OutFile,'Update of First and Last records and cancel');
+    First;
+    Edit;
+    FieldByName('PlainText').AsString := 'This is an updated test';
+    Post;
+    Last;
+    Edit;
+    FieldByName('PlainText').AsString := 'This is another updated test';
+    Post;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Cancel Updates');
+    CancelUpdates;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Now reopen and show no change');
+    Active := false;
+    Active := true;
+    PrintDataSet(FIBDataSet);
+
+    writeln(OutFile);
+    writeln(OutFile,'Update of First and Last records and apply');
+    First;
+    Edit;
+    FieldByName('PlainText').AsString := 'This is an updated test';
+    Post;
+    Last;
+    Edit;
+    FieldByName('PlainText').AsString := 'This is another updated test';
+    Post;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Apply Updates');
+    ApplyUpdates;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Now reopen and show still there');
+    Active := false;
+    Active := true;
+    PrintDataSet(FIBDataSet);
+
+    writeln(OutFile);
+    writeln(OutFile,'Update of First and Last records and implicitly apply');
+    DataSetCloseAction := dcSaveChanges;
+    First;
+    Edit;
+    FieldByName('PlainText').AsString := 'This is an updated test (implicit apply updates)';
+    Active := false;
+    Active := true;
+    PrintDataSet(FIBDataSet);
+
+    writeln(OutFile);
+    writeln(OutFile,'Delete First and Last records and Cancel');
+    First;
+    Delete;
+    Last;
+    Delete;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Cancel Updates');
+    CancelUpdates;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Now reopen and show no change');
+    Active := false;
+    Active := true;
+    PrintDataSet(FIBDataSet);
+
+    writeln(OutFile);
+    writeln(OutFile,'Delete First and Last records and Apply');
+    First;
+    Delete;
+    Last;
+    Delete;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Apply Updates');
+    ApplyUpdates;
+    PrintDataSet(FIBDataSet);
+    writeln(Outfile,'Now reopen and show no change');
+    Active := false;
+    Active := true;
+    PrintDataSet(FIBDataSet);
+
+    writeln(OutFile);
+    writeln(OutFile, 'Test Error Handling');
+    First;
+    lastkey := FieldByName('KEYFIELD').AsInteger;
+    Append;
+    FieldByName('KEYFIELD').AsInteger := lastkey;
+    Post;
+    PrintDataSet(FIBDataSet);
+    try
+      ApplyUpdates;
+    except on E: Exception do
+      writeln(OutFile,'Exception caught: ',E.Message);
+    end;
+    CancelUpdates;
+  end;
 end;
 
 procedure TTest18.CreateObjects(Application: TTestApplication);
@@ -97,143 +237,11 @@ begin
 end;
 
 procedure TTest18.RunTest(CharSet: AnsiString; SQLDialect: integer);
-var lastkey: integer;
 begin
   IBDatabase.CreateDatabase;
   try
     IBTransaction.Active := true;
-    with FIBDataSet do
-    begin
-      Active := true;
-      writeln(Outfile,'Bidirectional caching');
-      writeln(OutFile,'Simple Append i.e. caching of inserted records and cancel');
-      Append;
-      FieldByName('PlainText').AsString := 'This is a test';
-      Post;
-      Append;
-      FieldByName('PlainText').AsString := 'This is another test';
-      Post;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Cancel Updates');
-      CancelUpdates;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Now reopen and show empty');
-      Active := false;
-      Active := true;
-      PrintDataSet(FIBDataSet);
-
-      writeln(Outfile);
-      writeln(OutFile,'Simple Append i.e. caching of inserted records and apply updates');
-      Append;
-      FieldByName('PlainText').AsString := 'This is a test';
-      Post;
-      Append;
-      FieldByName('PlainText').AsString := 'This is another test';
-      Post;
-      Append;
-      FieldByName('PlainText').AsString := 'And another';
-      Post;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Apply Updates');
-      ApplyUpdates;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Now reopen and show still there');
-      Active := false;
-      Active := true;
-      PrintDataSet(FIBDataSet);
-
-      writeln(OutFile);
-      writeln(OutFile,'Update of First and Last records and cancel');
-      First;
-      Edit;
-      FieldByName('PlainText').AsString := 'This is an updated test';
-      Post;
-      Last;
-      Edit;
-      FieldByName('PlainText').AsString := 'This is another updated test';
-      Post;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Cancel Updates');
-      CancelUpdates;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Now reopen and show no change');
-      Active := false;
-      Active := true;
-      PrintDataSet(FIBDataSet);
-
-      writeln(OutFile);
-      writeln(OutFile,'Update of First and Last records and apply');
-      First;
-      Edit;
-      FieldByName('PlainText').AsString := 'This is an updated test';
-      Post;
-      Last;
-      Edit;
-      FieldByName('PlainText').AsString := 'This is another updated test';
-      Post;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Apply Updates');
-      ApplyUpdates;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Now reopen and show still there');
-      Active := false;
-      Active := true;
-      PrintDataSet(FIBDataSet);
-
-      writeln(OutFile);
-      writeln(OutFile,'Update of First and Last records and implicitly apply');
-      DataSetCloseAction := dcSaveChanges;
-      First;
-      Edit;
-      FieldByName('PlainText').AsString := 'This is an updated test (implicit apply updates)';
-      Active := false;
-      Active := true;
-      PrintDataSet(FIBDataSet);
-
-      writeln(OutFile);
-      writeln(OutFile,'Delete First and Last records and Cancel');
-      First;
-      Delete;
-      Last;
-      Delete;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Cancel Updates');
-      CancelUpdates;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Now reopen and show no change');
-      Active := false;
-      Active := true;
-      PrintDataSet(FIBDataSet);
-
-      writeln(OutFile);
-      writeln(OutFile,'Delete First and Last records and Apply');
-      First;
-      Delete;
-      Last;
-      Delete;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Apply Updates');
-      ApplyUpdates;
-      PrintDataSet(FIBDataSet);
-      writeln(Outfile,'Now reopen and show no change');
-      Active := false;
-      Active := true;
-      PrintDataSet(FIBDataSet);
-
-      writeln(OutFile);
-      writeln(OutFile, 'Test Error Handling');
-      First;
-      lastkey := FieldByName('KEYFIELD').AsInteger;
-      Append;
-      FieldByName('KEYFIELD').AsInteger := lastkey;
-      Post;
-      PrintDataSet(FIBDataSet);
-      try
-        ApplyUpdates;
-      except on E: Exception do
-        writeln(OutFile,'Exception caught: ',E.Message);
-      end;
-    end;
+    DoTest(true);
   finally
     IBDatabase.DropDatabase;
   end;
