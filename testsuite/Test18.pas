@@ -62,6 +62,7 @@ begin
   FIBDataSet := TIBDataSet.Create(Application);
   with FIBDataSet do
   begin
+    Name := 'IBTestData';
     Database := IBDatabase;
     Transaction := IBTransaction;
     SelectSQL.Add('Select * From IBDataSetTest');
@@ -96,6 +97,7 @@ begin
 end;
 
 procedure TTest18.RunTest(CharSet: AnsiString; SQLDialect: integer);
+var lastkey: integer;
 begin
   IBDatabase.CreateDatabase;
   try
@@ -104,7 +106,7 @@ begin
     begin
       Active := true;
       writeln(Outfile,'Bidirectional caching');
-      writeln(OutFile,'Simple Append i.e. caching of inserted records');
+      writeln(OutFile,'Simple Append i.e. caching of inserted records and cancel');
       Append;
       FieldByName('PlainText').AsString := 'This is a test';
       Post;
@@ -119,6 +121,108 @@ begin
       Active := false;
       Active := true;
       PrintDataSet(FIBDataSet);
+
+      writeln(Outfile);
+      writeln(OutFile,'Simple Append i.e. caching of inserted records and apply updates');
+      Append;
+      FieldByName('PlainText').AsString := 'This is a test';
+      Post;
+      Append;
+      FieldByName('PlainText').AsString := 'This is another test';
+      Post;
+      Append;
+      FieldByName('PlainText').AsString := 'And another';
+      Post;
+      PrintDataSet(FIBDataSet);
+      writeln(Outfile,'Apply Updates');
+      ApplyUpdates;
+      PrintDataSet(FIBDataSet);
+      writeln(Outfile,'Now reopen and show still there');
+      Active := false;
+      Active := true;
+      PrintDataSet(FIBDataSet);
+
+      writeln(OutFile);
+      writeln(OutFile,'Update of First and Last records and cancel');
+      First;
+      Edit;
+      FieldByName('PlainText').AsString := 'This is an updated test';
+      Post;
+      Last;
+      Edit;
+      FieldByName('PlainText').AsString := 'This is another updated test';
+      Post;
+      PrintDataSet(FIBDataSet);
+      writeln(Outfile,'Cancel Updates');
+      CancelUpdates;
+      PrintDataSet(FIBDataSet);
+      writeln(Outfile,'Now reopen and show no change');
+      Active := false;
+      Active := true;
+      PrintDataSet(FIBDataSet);
+
+      writeln(OutFile);
+      writeln(OutFile,'Update of First and Last records and apply');
+      First;
+      Edit;
+      FieldByName('PlainText').AsString := 'This is an updated test';
+      Post;
+      Last;
+      Edit;
+      FieldByName('PlainText').AsString := 'This is another updated test';
+      Post;
+      PrintDataSet(FIBDataSet);
+      writeln(Outfile,'Apply Updates');
+      ApplyUpdates;
+      PrintDataSet(FIBDataSet);
+      writeln(Outfile,'Now reopen and show still there');
+      Active := false;
+      Active := true;
+      PrintDataSet(FIBDataSet);
+
+      writeln(OutFile);
+      writeln(OutFile,'Delete First and Last records and Cancel');
+      First;
+      Delete;
+      Last;
+      Delete;
+      PrintDataSet(FIBDataSet);
+      writeln(Outfile,'Cancel Updates');
+      CancelUpdates;
+      PrintDataSet(FIBDataSet);
+      writeln(Outfile,'Now reopen and show no change');
+      Active := false;
+      Active := true;
+      PrintDataSet(FIBDataSet);
+
+      writeln(OutFile);
+      writeln(OutFile,'Delete First and Last records and Apply');
+      First;
+      Delete;
+      Last;
+      Delete;
+      PrintDataSet(FIBDataSet);
+      writeln(Outfile,'Apply Updates');
+      ApplyUpdates;
+      PrintDataSet(FIBDataSet);
+      writeln(Outfile,'Now reopen and show no change');
+      Active := false;
+      Active := true;
+      PrintDataSet(FIBDataSet);
+
+      writeln(OutFile);
+      writeln(OutFile, 'Test Error Handling');
+      First;
+      lastkey := FieldByName('KEYFIELD').AsInteger;
+      Append;
+      FieldByName('KEYFIELD').AsInteger := lastkey;
+      Post;
+      PrintDataSet(FIBDataSet);
+      try
+        ApplyUpdates;
+      except on E: Exception do
+        writeln(OutFile,'Exception caught: ',E.Message);
+      end;
     end;
   finally
     IBDatabase.DropDatabase;

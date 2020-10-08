@@ -123,6 +123,8 @@ end;
 procedure TIBXTestBase.PrintDataSet(aDataSet: TDataSet);
 var rowno: integer;
 begin
+  if aDataSet.Name <> '' then
+    writeln(OutFile,'Print Dataset for ',aDataSet.Name);
   aDataSet.First;
   rowno := 1;
   if aDataSet.EOF then

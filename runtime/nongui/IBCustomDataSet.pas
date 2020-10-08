@@ -3554,6 +3554,8 @@ end;
 procedure TIBCustomDataSet.ReadRecordCache(RecordNumber: Integer; Buffer: PChar;
                                           ReadOldBuffer: Boolean);
 begin
+  if RecordNumber = -1 then
+    Exit; {nothing to do}
   if FUniDirectional then
     RecordNumber := RecordNumber mod UniCache;
   if (ReadOldBuffer) then
