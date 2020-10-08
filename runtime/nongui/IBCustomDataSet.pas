@@ -1695,16 +1695,14 @@ var
 
   procedure UpdateUsingOnUpdateRecord;
   begin
-    UpdateAction := uaFail;
     try
       FOnUpdateRecord(Self, UpdateKind, UpdateAction);
     except
       on E: Exception do
       begin
+        UpdateAction := uaFail;
         if (E is EDatabaseError) and Assigned(FOnUpdateError) then
-          FOnUpdateError(Self, EIBError(E), UpdateKind, UpdateAction);
-        if UpdateAction = uaFail then
-            raise;
+          FOnUpdateError(Self, EDatabaseError(E), UpdateKind, UpdateAction);
       end;
     end;
   end;
@@ -1713,11 +1711,14 @@ var
   begin
     try
       FUpdateObject.Apply(UpdateKind,PChar(Buffer));
-      ResetBufferUpdateStatus;
+      UpdateAction := uaApplied;
     except
       on E: Exception do
+      begin
+        UpdateAction := uaFail;
         if (E is EDatabaseError) and Assigned(FOnUpdateError) then
-          FOnUpdateError(Self, EIBError(E), UpdateKind, UpdateAction);
+          FOnUpdateError(Self, EDatabaseError(E), UpdateKind, UpdateAction);
+      end;
     end;
   end;
 
@@ -1732,16 +1733,12 @@ var
         cusDeleted:
           InternalDeleteRecord(FQDelete, Buffer);
       end;
+      UpdateAction := uaApplied;
     except
-      on E: EIBError do begin
+      on E: Exception do begin
         UpdateAction := uaFail;
-        if Assigned(FOnUpdateError) then
-          FOnUpdateError(Self, E, UpdateKind, UpdateAction);
-        case UpdateAction of
-          uaFail: raise;
-          uaAbort: SysUtils.Abort;
-          uaSkip: bRecordsSkipped := True;
-        end;
+        if (E is EDatabaseError) and Assigned(FOnUpdateError) then
+          FOnUpdateError(Self, EDatabaseError(E), UpdateKind, UpdateAction);
       end;
     end;
   end;
@@ -1763,31 +1760,29 @@ begin
       Buffer := PRecordData(GetActiveBuf);
       GetUpdateKind;
       UpdateAction := uaApply;
-      if Assigned(FUpdateObject) or Assigned(FOnUpdateRecord) then
+      if (Assigned(FOnUpdateRecord)) then
+        UpdateUsingOnUpdateRecord;
+      if UpdateAction = uaApply then
       begin
-        if (Assigned(FOnUpdateRecord)) then
-          UpdateUsingOnUpdateRecord
+        if Assigned(FUpdateObject) then
+          UpdateUsingUpdateObject
         else
-          if Assigned(FUpdateObject) then
-            UpdateUsingUpdateObject;
-        case UpdateAction of
-          uaFail:
-            IBError(ibxeUserAbort, [nil]);
-          uaAbort:
-            SysUtils.Abort;
-          uaApplied:
-            ResetBufferUpdateStatus;
-          uaSkip:
-            bRecordsSkipped := True;
-          uaRetry:
-            Continue;
-        end;
+          UpdateUsingInternalquery;
       end;
-      if (not Assigned(FUpdateObject)) and (UpdateAction = UaApply) then
-      begin
-        UpdateUsingInternalquery;
-        UpdateAction := uaApplied;
+
+      case UpdateAction of
+        uaFail:
+          IBError(ibxeUserAbort, [nil]);
+        uaAbort:
+          SysUtils.Abort;
+        uaApplied:
+          ResetBufferUpdateStatus;
+        uaSkip:
+          bRecordsSkipped := True;
+        uaRetry:
+          Continue;
       end;
+
       Next;
     end;
     FUpdatesPending := bRecordsSkipped;
