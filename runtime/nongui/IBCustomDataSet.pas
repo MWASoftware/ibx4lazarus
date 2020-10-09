@@ -4986,7 +4986,8 @@ end;
 
 procedure TIBCustomDataSet.SetBookmarkData(Buffer: PChar; Data: Pointer);
 begin
-  PRecordData(Buffer)^.rdRecordNumber := PInteger(Data)^;
+  if Data <> nil then
+    PRecordData(Buffer)^.rdRecordNumber := PInteger(Data)^;
 end;
 
 procedure TIBCustomDataSet.SetBookmarkFlag(Buffer: PChar; Value: TBookmarkFlag);

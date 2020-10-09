@@ -172,6 +172,7 @@ begin
   begin
     Database := IBDatabase;
     Transaction := IBTransaction;
+    Unidirectional := false;
     SelectSQL.Add('Select * From IBDataSetTest');
     InsertSQL.Add('Insert into IBDataSetTest(KeyField,PlainText) Values (:KeyField,:PlainText)');
     ModifySQL.Add('Update IBDataSetTest Set KeyField = :KeyField, PlainText = :PlainText Where KeyField = :Old_KeyField');
@@ -187,6 +188,7 @@ begin
   begin
     Database := IBDatabase;
     Transaction := IBTransaction;
+    Unidirectional := false;
     SelectSQL.Add('Select * From IBDataSetTest');
     InsertSQL.Add('Insert into IBDataSetTest(KeyField,PlainText) Values (Gen_ID(AGenerator,1),:PlainText) Returning KeyField, TextAndKey');
     ModifySQL.Add('Update IBDataSetTest Set KeyField = :KeyField, PlainText = :PlainText Where KeyField = :Old_KeyField Returning TextAndKey,ServerSideText');
@@ -242,6 +244,7 @@ begin
       Active := true;
       writeln(OutFile,'FIBDataSet1: Simple Append');
       Append;
+//      writeln(outfile,'BOF = ',BOF,', EOF = ',EOF);
       FieldByName('PlainText').AsString := 'This is a test';
       Post;
       PrintDataSetRow(FIBDataSet1);
@@ -270,6 +273,7 @@ begin
       Post;
       writeln(Outfile,'Row data after post');
       PrintDataSetRow(FIBDataSet1);
+      FIBDataSet1.GeneratorField.ApplyOnEvent := gaeOnNewRecord; {restore}
 
       writeln(Outfile,'Catch a Post Error - duplicate key');
       lastkey := FieldByName('KeyField').AsInteger;
@@ -303,6 +307,44 @@ begin
       Active := false;
       Active := true;
       PrintDataSet(FIBDataSet1);
+
+      {See https://bugs.freepascal.org/view.php?id=37900}
+
+(*      IBTransaction.Rollback;
+      IBTransaction.Active := true;
+      writeln(Outfile);
+      writeln(Outfile,'Unidirectional editing');
+      Unidirectional := true;
+      Active := true;
+      writeln(OutFile,'FIBDataSet1: Simple Append - unidirectional');
+      Insert;
+      writeln(outfile,'BOF = ',BOF,', EOF = ',EOF);
+      FieldByName('PlainText').AsString := 'This is a test - unidirectional';
+      PrintDataSetRow(FIBDataSet1);
+      Post;
+      writeln(outfile,'BOF = ',BOF,', EOF = ',EOF);
+      PrintDataSetRow(FIBDataSet1);
+      Refresh;
+      writeln(OutFile,'After Refresh - unidirectional');
+      PrintDataSetRow(FIBDataSet1);
+      writeln(OutFile,'Append and Update');
+      Insert;
+      FieldByName('PlainText').AsString := 'This is another test - unidirectional';
+      Post;
+      PrintDataSetRow(FIBDataSet1);
+      Edit;
+      FieldByName('PlainText').AsString := 'This is the update test - unidirectional';
+      Post;
+      PrintDataSetRow(FIBDataSet1);
+      writeln(OutFile,'Now delete the first row - unidirectional');
+      PrintDataSet(FIBDataSet1);
+      First;
+      Delete;
+      PrintDataSet(FIBDataSet1);
+      writeln(Outfile,'Ensure dataset saved to database');
+      Active := false;
+      Active := true;
+      PrintDataSet(FIBDataSet1);  *)
 
     end;
     writeln(Outfile,'==================================');

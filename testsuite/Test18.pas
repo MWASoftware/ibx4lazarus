@@ -241,7 +241,8 @@ begin
   IBDatabase.CreateDatabase;
   try
     IBTransaction.Active := true;
-    DoTest(true);
+    DoTest(false);
+//    DoTest(true); {See https://bugs.freepascal.org/view.php?id=37900}
   finally
     IBDatabase.DropDatabase;
   end;
