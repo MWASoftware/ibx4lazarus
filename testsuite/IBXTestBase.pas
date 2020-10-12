@@ -18,6 +18,7 @@ private
   FIBTransaction: TIBTransaction;
   FIBQuery: TIBQuery;
   FIBXScript: TIBXScript;
+  function GetRoleName: AnsiString;
   procedure HandleCreateDatebase(Sender: TObject);
   procedure HandleDBFileName(Sender: TObject; var DatabaseFileName: string);
   procedure LogHandler(Sender: TObject; Msg: string);
@@ -42,6 +43,7 @@ public
   property IBDatabase: TIBDatabase read  FIBDatabase;
   property IBTransaction: TIBTransaction read FIBTransaction;
   property IBQuery: TIBQuery read FIBQuery;
+  property RoleName: AnsiString read GetRoleName;
 end;
 
 implementation
@@ -51,6 +53,15 @@ implementation
 procedure TIBXTestBase.HandleCreateDatebase(Sender: TObject);
 begin
   InitialiseDatabase(IBDatabase);
+end;
+
+function TIBXTestBase.GetRoleName: AnsiString;
+begin
+  if IBDatabase.Connected then
+    Result := IBDatabase.Attachment.OpenCursorAtStart(IBTransaction.TransactionIntf,
+                  'Select CURRENT_ROLE From RDB$Database',[])[0].AsString
+  else
+    Result := '';
 end;
 
 procedure TIBXTestBase.HandleDBFileName(Sender: TObject;

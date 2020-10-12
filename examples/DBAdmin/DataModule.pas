@@ -449,8 +449,8 @@ begin
   DataSet.FieldByName('SEC$ACTIVE').AsBoolean := false;
   DataSet.FieldByName('DBCreator').AsBoolean := false;
   DataSet.FieldByName('SEC$PLUGIN').AsString := 'Srp';
-  DataSet.FieldByName('UserID').AsInteger := 0;
-  DataSet.FieldByName('GroupID').AsInteger := 0;
+//  DataSet.FieldByName('UserID').AsInteger := 0;
+//  DataSet.FieldByName('GroupID').AsInteger := 0;
   DataSet.FieldByName('SEC$PASSWORD').Clear;
   RoleNameList.Active := false; {Prevent role assignments until saved}
   UserTags.Active := false; {ditto}

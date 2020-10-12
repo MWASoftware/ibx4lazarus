@@ -4,6 +4,7 @@ object DBDataModule: TDBDataModule
   HorizontalOffset = 767
   VerticalOffset = 395
   Width = 730
+  PPI = 96
   object IBDatabase1: TIBDatabase
     Connected = True
     AfterConnect = IBDatabase1AfterConnect
@@ -67,6 +68,7 @@ object DBDataModule: TDBDataModule
       'SELECT * FROM RDB$DATABASE, MON$DATABASE'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcSaveChanges
     left = 288
     top = 24
@@ -91,6 +93,7 @@ object DBDataModule: TDBDataModule
     )
     Params = <>
     UpdateObject = UpdateCharSet
+    SQLFiltered = False
     DataSetCloseAction = dcSaveChanges
     left = 424
     top = 32
@@ -112,6 +115,7 @@ object DBDataModule: TDBDataModule
       'Order by RDB$Shadow_Number, RDB$FILE_SEQUENCE'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 32
     top = 208
@@ -202,6 +206,7 @@ object DBDataModule: TDBDataModule
       'Where SEC$MAP_NAME = ''AutoAdminImplementationMapping'''
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 288
     top = 112
@@ -224,6 +229,7 @@ object DBDataModule: TDBDataModule
       ''
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 160
     top = 104
@@ -244,6 +250,7 @@ object DBDataModule: TDBDataModule
       'Order by RDB$FILE_SEQUENCE'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 32
     top = 104
@@ -278,6 +285,7 @@ object DBDataModule: TDBDataModule
       'Where MON$ATTACHMENT_ID = CURRENT_CONNECTION'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 544
     top = 112
@@ -299,6 +307,7 @@ object DBDataModule: TDBDataModule
       'FROM RDB$RELATIONS r'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 288
     top = 283
@@ -336,6 +345,7 @@ object DBDataModule: TDBDataModule
     )
     Params = <>
     UpdateObject = UpdateUsers
+    SQLFiltered = False
     DataSetCloseAction = dcSaveChanges
     left = 416
     top = 352
@@ -516,6 +526,7 @@ object DBDataModule: TDBDataModule
         ParamType = ptInput
       end>
     UpdateObject = UpdateUserRoles
+    SQLFiltered = False
     DataSetCloseAction = dcSaveChanges
     left = 424
     top = 280
@@ -573,6 +584,7 @@ object DBDataModule: TDBDataModule
         ParamType = ptInput
       end>
     UpdateObject = TagsUpdate
+    SQLFiltered = False
     DataSetCloseAction = dcSaveChanges
     left = 424
     top = 192
@@ -621,6 +633,7 @@ object DBDataModule: TDBDataModule
     )
     Params = <>
     UpdateObject = AttUpdate
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 280
     top = 433
@@ -963,6 +976,7 @@ object DBDataModule: TDBDataModule
     )
     Params = <>
     UpdateObject = DBTablesUpdate
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 520
     top = 488
@@ -1027,6 +1041,7 @@ object DBDataModule: TDBDataModule
       ''
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 657
     top = 118
@@ -1094,6 +1109,7 @@ object DBDataModule: TDBDataModule
       ''
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 648
     top = 264
@@ -1226,6 +1242,7 @@ object DBDataModule: TDBDataModule
         Name = 'ID'
         ParamType = ptInput
       end>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 648
     top = 336

@@ -4,14 +4,36 @@ inherited DBADatabaseData: TDBADatabaseData
   HorizontalOffset = 482
   VerticalOffset = 322
   Width = 730
+  PPI = 96
   inherited IBDatabase1: TIBDatabase
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     OnLogin = IBDatabase1Login
     Params.Strings = (
       'sql_role_name=RDB$ADMIN'
+      'user_name=SYSDBA'
     )
     OnCreateDatabase = IBDatabase1CreateDatabase
+  end
+  inherited UpdateUsers: TIBUpdate
+    RefreshSQL.Strings = (
+      'Select A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
+      'A.SEC$ACTIVE, Trim(A.SEC$USER_NAME) as SEC$USER_NAME, A.SEC$MIDDLE_NAME,'
+      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME,'
+      'cast(NULL as VarChar(32)) as SEC$PASSWORD, CURRENT_CONNECTION,'
+      'case when Count(B.MON$ATTACHMENT_ID) > 0 then true else false end as LoggedIn,'
+      'case When C.SEC$USER is not null then true else false end as DBCreator'
+      'From SEC$USERS A'
+      'Left Outer Join MON$ATTACHMENTS B'
+      'On A.SEC$USER_NAME = B.MON$USER'
+      'Left Outer Join SEC$DB_CREATORS  C on C.SEC$USER = A.SEC$USER_NAME'
+      'Where  A.SEC$USER_NAME = :SEC$USER_NAME'
+      'Group By A.SEC$DESCRIPTION, A.SEC$PLUGIN, A.SEC$ADMIN,'
+      'A.SEC$ACTIVE, A.SEC$USER_NAME, A.SEC$MIDDLE_NAME,'
+      'A.SEC$FIRST_NAME, A.SEC$LAST_NAME, C.SEC$USER'
+      ''
+    )
   end
   inherited RoleNameList: TIBQuery
     ParamData = <    
