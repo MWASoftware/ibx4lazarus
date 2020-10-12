@@ -14,7 +14,7 @@ uses
 
 const
   aTestID    = '18';
-  aTestTitle = 'Test 18: Cached Updates';
+  aTestTitle = 'Cached Updates';
 
 type
 

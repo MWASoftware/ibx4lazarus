@@ -693,6 +693,7 @@ type
     function IsCursorOpen: Boolean; override;
     procedure Loaded; override;
     procedure ReQuery;
+    procedure ResetBufferCache;
     procedure SetBookmarkFlag(Buffer: PChar; Value: TBookmarkFlag); override;
     procedure SetBookmarkData(Buffer: PChar; Data: Pointer); override;
     procedure SetCachedUpdates(Value: Boolean);
@@ -4197,27 +4198,14 @@ begin
   if FDidActivate then
     DeactivateTransaction;
   FQSelect.Close;
-  ClearBlobCache;
-  ClearArrayCache;
+  ResetBufferCache;
   FreeRecordBuffer(FModelBuffer);
   FreeRecordBuffer(FOldBuffer);
   FCurrentRecord := -1;
   FOpen := False;
-  FRecordCount := 0;
-  FDeletedRecords := 0;
   FRecordSize := 0;
-  FBPos := 0;
-  FOBPos := 0;
-  FCacheSize := 0;
-  FOldCacheSize := 0;
-  FBEnd := 0;
-  FOBEnd := 0;
-  FreeMem(FBufferCache);
-  FBufferCache := nil;
   FreeMem(FFieldColumns);
   FFieldColumns := nil;
-  FreeMem(FOldBufferCache);
-  FOldBufferCache := nil;
   BindFields(False);
   ResetParser;
   if DefaultFields then DestroyFields;
@@ -4777,6 +4765,24 @@ begin
   FQSelect.ExecQuery;
   FOpen := FQSelect.Open;
   First;
+end;
+
+procedure TIBCustomDataSet.ResetBufferCache;
+begin
+  ClearBlobCache;
+  ClearArrayCache;
+  FRecordCount := 0;
+  FDeletedRecords := 0;
+  FBPos := 0;
+  FOBPos := 0;
+  FCacheSize := 0;
+  FOldCacheSize := 0;
+  FBEnd := 0;
+  FOBEnd := 0;
+  FreeMem(FBufferCache);
+  FBufferCache := nil;
+  FreeMem(FOldBufferCache);
+  FOldBufferCache := nil;
 end;
 
 procedure TIBCustomDataSet.InternalOpen;

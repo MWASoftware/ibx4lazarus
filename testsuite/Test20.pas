@@ -15,7 +15,7 @@ uses
 
 const
   aTestID    = '20';
-  aTestTitle = 'Test 20: TIBUpdateSQL Tests';
+  aTestTitle = 'TIBUpdateSQL Tests';
 
 type
 

@@ -965,6 +965,7 @@ begin
     if Active then
     begin
       ClearBuffers;
+      ResetBufferCache;
       DataEvent(deDataSetChange, 0);
     end;
   finally
