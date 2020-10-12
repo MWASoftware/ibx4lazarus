@@ -6,6 +6,6 @@ Create Table IBXTest (
  F4 DecFloat(34),
  F5 Numeric (24,6),
  Primary Key(TableKey)
-);
+) SQL SECURITY DEFINER;
 
 Create Generator IBXGen;

@@ -1049,7 +1049,7 @@ begin
   Result := '';
   if (FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13) and not SQLSecurity.IsNull then
   begin
-    if SQLSecurity.AsInteger <> 0 then
+    if SQLSecurity.AsBoolean then
       Result := ' SQL SECURITY DEFINER'
     else
     Result := ' SQL SECURITY INVOKER';
