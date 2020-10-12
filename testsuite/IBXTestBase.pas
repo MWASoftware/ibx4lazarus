@@ -45,6 +45,7 @@ public
   property IBTransaction: TIBTransaction read FIBTransaction;
   property IBQuery: TIBQuery read FIBQuery;
   property RoleName: AnsiString read GetRoleName;
+  property IBXScriptObj: TIBXScript read FIBXScript;
 end;
 
 implementation

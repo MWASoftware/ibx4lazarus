@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, DB, IB, IBTable,
-  IBCustomDataSet, IBExtract;
+  IBCustomDataSet, IBExtract, IBXScript;
 
 const
   aTestID    = '25';
@@ -123,7 +123,7 @@ begin
     FIBExtract.ExtractObject(eoTable,'TestTable');
     writeln(Outfile,FIBExtract.Items.Text);
   finally
-    IBDatabase.DropDatabase;
+    IBXScriptObj.ExecSQLScript('Drop Database');
   end;
 end;
 
