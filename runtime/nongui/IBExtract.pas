@@ -790,15 +790,15 @@ begin
           if not qryGenerators.Eof then
           begin
             Column := Column + ' GENERATED';
-            if qryTables.HasField('RDB$IDENTITY_TYPE') and (qryTables.FieldByName('RDB$IDENTITY_TYPE').AsInteger = 0) then
+            if qryTables.HasField('RDB$IDENTITY_TYPE') and (qryTables.FieldByName('RDB$IDENTITY_TYPE').AsInteger = 1) then
               Column := Column + ' BY DEFAULT'
             else
               Column := Column + ' ALWAYS';
-            Column := Column + Format(' (START WITH %d',
+            Column := Column + ' AS IDENTITY' + Format(' (START WITH %d',
                      [qryGenerators.FieldByName('RDB$INITIAL_VALUE').AsInt64]);
-            {INCREMENTED BY Added in Firebird 4}
+            {INCREMENT BY Added in Firebird 4}
             if (FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13) and qryGenerators.HasField('RDB$GENERATOR_INCREMENT') then
-            Column := Column + Format(' INCREMENTED BY %d',
+            Column := Column + Format(' INCREMENT BY %d',
                      [qryGenerators.FieldByName('RDB$GENERATOR_INCREMENT').AsInt64]);
             Column := Column + ')';
           end;
@@ -1496,11 +1496,11 @@ begin
            (qryRoles.FieldByName('RDB$USER_TYPE').AsInteger <> obj_user) or
            (qryRoles.FieldByName('RDB$USER').AsString = 'PUBLIC') then
         ExtractOut(Format('GRANT %s %s TO %s %s %s%s', [
-                              qryRoles.FieldByName('Privilege').AsString,
-                              qryRoles.FieldByName('METAOBJECTNAME').AsString,
-                              qryRoles.FieldByName('USER_TYPE_NAME').AsString,
-                              QuoteIdentifier(qryRoles.FieldByName('RDB$USER').AsString),
-                              qryRoles.FieldByName('GRANTOPTION').AsString,
+                              TrimRight(qryRoles.FieldByName('Privilege').AsString),
+                              TrimRight(qryRoles.FieldByName('METAOBJECTNAME').AsString),
+                              TrimRight(qryRoles.FieldByName('USER_TYPE_NAME').AsString),
+                              QuoteIdentifier(TrimRight(qryRoles.FieldByName('RDB$USER').AsString)),
+                              TrimRight(qryRoles.FieldByName('GRANTOPTION').AsString),
                               Term]));
         qryRoles.Next;
       end;
@@ -2811,14 +2811,15 @@ const
        if qryFuncArgs.FieldByName('RDB$ARGUMENT_POSITION').AsInteger = 0 then {Return parameter}
          Result := Result + ' BY VALUE';
 
-      1:
+      2:
         Result := Result + ' BY DESCRIPTOR';
 
       5:
         Result := Result + ' NULL';
 
       -1:
-        Result := Result + ' FREE_IT';
+       if qryFuncArgs.FieldByName('RDB$ARGUMENT_POSITION').AsInteger = 0 then {Return parameter}
+         Result := Result + ' FREE_IT';
       end;
 end;
 
@@ -2859,7 +2860,7 @@ begin
       { Start new function declaration }
       AddComment(qryFunctions,ctExternalFunction,Comments);
       ExtractOut(Format('DECLARE EXTERNAL FUNCTION %s',
-          [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
+          [TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString)]));
       Line := '';
 
       FirstArg := true;
@@ -2892,8 +2893,8 @@ begin
         ExtractOut(Format('RETURNS PARAMETER %d',[qryFunctions.FieldByName('RDB$RETURN_ARGUMENT').AsInteger]));
 
       ExtractOut(Format('ENTRY_POINT ''%s'' MODULE_NAME ''%s''',
-          [qryFunctions.FieldByName('RDB$ENTRYPOINT').AsString,
-           qryFunctions.FieldByName('RDB$MODULE_NAME').AsString]));
+          [TrimRight(qryFunctions.FieldByName('RDB$ENTRYPOINT').AsString),
+           TrimRight(qryFunctions.FieldByName('RDB$MODULE_NAME').AsString)]));
 
        {SQL Security added in Firebird 4}
        if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
@@ -2996,7 +2997,7 @@ begin
              Params := Params + ', ';
              FirstArg := false;
            end;
-           Params := Params + qryFuncArgs.FieldByName('RDB$ARGUMENT_NAME').AsString + ' ' +
+           Params := Params + TrimRight(qryFuncArgs.FieldByName('RDB$ARGUMENT_NAME').AsString) + ' ' +
                                          GetFieldType(qryFuncArgs.FieldByName('RDB$FIELD_TYPE1').AsInteger,
                                                       qryFuncArgs.FieldByName('RDB$FIELD_SUB_TYPE1').AsInteger,
                                                       qryFuncArgs.FieldByName('RDB$FIELD_SCALE1').AsInteger,
@@ -3016,9 +3017,9 @@ begin
          begin
            if Params <> '' then
              ExtractOut(Format('CREATE FUNCTION %s (%s)',
-               [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString, Params]))
+               [TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString), Params]))
            else
-             ExtractOut(Format('CREATE FUNCTION %s',[qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
+             ExtractOut(Format('CREATE FUNCTION %s',[TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString)]));
            ExtractOut(ReturnBuffer);
            ExtractOut(' AS BEGIN END');
 
@@ -3031,9 +3032,9 @@ begin
          begin
            if Params <> '' then
              ExtractOut(Format('CREATE FUNCTION %s (%s)',
-               [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString, Params]))
+               [TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString), Params]))
            else
-             ExtractOut(Format('CREATE FUNCTION %s',[qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
+             ExtractOut(Format('CREATE FUNCTION %s',[TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString)]));
            ExtractOut(ReturnBuffer);
            if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
              ExtractOut(' AS ' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
@@ -3049,10 +3050,10 @@ begin
          begin
            if Params <> '' then
              ExtractOut(Format('ALTER FUNCTION %s (%s)',
-               [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString,Params]))
+               [TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString),Params]))
            else
              ExtractOut(Format('ALTER FUNCTION %s',
-               [qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString]));
+               [TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString)]));
            ExtractOut(ReturnBuffer);
            if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
              ExtractOut(' AS ' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
@@ -3889,22 +3890,22 @@ begin
       begin
         if qryOwnerPriv.FieldByName('GRANTEDBY').IsNull then
         ExtractOut(Format('GRANT %s ON %s %s TO %s %s %s %s', [
-                          qryOwnerPriv.FieldByName('Privileges').AsString,
+                          TrimRight(qryOwnerPriv.FieldByName('Privileges').AsString),
                           TrimRight(qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString),
-                          QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
-                          TrimRight(qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString),
-                          QuoteIdentifier(qryOwnerPriv.FieldByName('RDB$USER').AsString),
+                          QuoteIdentifier(TrimRight(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString)),
+                          Trim(qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString),
+                          QuoteIdentifier(TrimRight(qryOwnerPriv.FieldByName('RDB$USER').AsString)),
                           TrimRight(qryOwnerPriv.FieldByName('GRANTOPTION').AsString),
                           Terminator]))
         else
           ExtractOut(Format('GRANT %s ON %s %s TO %s %s %s GRANTED BY %s %s', [
-                            qryOwnerPriv.FieldByName('Privileges').AsString,
-                            qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString,
-                            QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
-                            qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString,
-                            QuoteIdentifier(qryOwnerPriv.FieldByName('RDB$USER').AsString),
-                            qryOwnerPriv.FieldByName('GRANTOPTION').AsString,
-                            QuoteIdentifier(qryOwnerPriv.FieldByName('GRANTEDBY').AsString),
+                            TrimRight(qryOwnerPriv.FieldByName('Privileges').AsString),
+                            TrimRight(qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString),
+                            QuoteIdentifier(TrimRight(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString)),
+                            TrimRight(qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString),
+                            QuoteIdentifier(TrimRight(qryOwnerPriv.FieldByName('RDB$USER').AsString)),
+                            TrimRight(qryOwnerPriv.FieldByName('GRANTOPTION').AsString),
+                            QuoteIdentifier(TrimRight(qryOwnerPriv.FieldByName('GRANTEDBY').AsString)),
                             Terminator]));
       end;
       qryOwnerPriv.Next;
@@ -3975,11 +3976,11 @@ begin
     while not qryOwnerPriv.Eof do
     begin
       ExtractOut(Format('GRANT %s ON %s %s TO %s %s %s%s', [
-                            qryOwnerPriv.FieldByName('Privileges').AsString,
+                            TrimRight(qryOwnerPriv.FieldByName('Privileges').AsString),
                             TrimRight(qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString),
-                            QuoteIdentifier(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString),
+                            QuoteIdentifier(TrimRight(qryOwnerPriv.FieldByName('METAOBJECTNAME').AsString)),
                             TrimRight(qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString),
-                            QuoteIdentifier(qryOwnerPriv.FieldByName('RDB$USER').AsString),
+                            QuoteIdentifier(TrimRight(qryOwnerPriv.FieldByName('RDB$USER').AsString)),
                             TrimRight(qryOwnerPriv.FieldByName('GRANTOPTION').AsString),
                             Terminator]));
       qryOwnerPriv.Next;
@@ -4031,7 +4032,7 @@ begin
       else
         IsDefault := '';
       ExtractOut(Format('GRANT %s%s TO %s%s%s%s',
-        [ IsDefault, QuoteIdentifier( qryRole.FieldByName('RDB$RELATION_NAME').AsString),
+        [ IsDefault, QuoteIdentifier(TrimRight(qryRole.FieldByName('RDB$RELATION_NAME').AsString)),
          UserString, WithOption, Terminator, LineEnding]));
 
       qryRole.Next;
@@ -4065,7 +4066,7 @@ var
 
   function FormatParamStr : String;
   begin
-    Result := Format('  %s ', [qryHeader.FieldByName('RDB$PARAMETER_NAME').AsString]) +
+    Result := Format('  %s ', [TrimRight(qryHeader.FieldByName('RDB$PARAMETER_NAME').AsString)]) +
       GetFieldType(qryHeader.FieldByName('RDB$FIELD_TYPE').AsInteger,
                            qryHeader.FieldByName('RDB$FIELD_SUB_TYPE').AsInteger,
                            qryHeader.FieldByName('RDB$FIELD_SCALE').AsInteger,

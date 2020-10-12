@@ -18,6 +18,7 @@ private
   FIBTransaction: TIBTransaction;
   FIBQuery: TIBQuery;
   FIBXScript: TIBXScript;
+  FInitialising: boolean;
   function GetRoleName: AnsiString;
   procedure HandleCreateDatebase(Sender: TObject);
   procedure HandleDBFileName(Sender: TObject; var DatabaseFileName: string);
@@ -52,7 +53,15 @@ implementation
 
 procedure TIBXTestBase.HandleCreateDatebase(Sender: TObject);
 begin
-  InitialiseDatabase(IBDatabase);
+  if not FInitialising then
+  begin
+    FInitialising := true;
+    try
+      InitialiseDatabase(IBDatabase);
+    finally
+      FInitialising := false;
+    end;
+  end;
 end;
 
 function TIBXTestBase.GetRoleName: AnsiString;
@@ -112,7 +121,7 @@ begin
   FIBXScript.OnErrorLog := @ErrorLogHandler;
   FIBXScript.DataOutputFormatter := TIBInsertStmtsOut.Create(Application);
   FIBXScript.OnCreateDatabase := @HandleDBFileName;
-  FIBXScript.IgnoreCreateDatabase := true;
+  FIBXScript.IgnoreCreateDatabase := FALSE;
 end;
 
 procedure TIBXTestBase.InitialiseDatabase(aDatabase: TIBDatabase);

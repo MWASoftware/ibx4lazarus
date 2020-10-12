@@ -76,6 +76,7 @@ begin
   writeln(OutFile,'Extracting Database Schema and Data');
   FExtract.ExtractObject(eoDatabase,'',[etData,etGrantsToUser]);
   WriteStrings(FExtract.Items);
+  FExtract.Items.SaveToFile('Test10.out');
   IBDatabase.DropDatabase;
 end;
 
