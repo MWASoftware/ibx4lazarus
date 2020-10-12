@@ -119,7 +119,7 @@ begin
     FIBTable.DeleteTable;
     IBTransaction.Commit;
     IBTransaction.Active := true;
-    writeln(Outfile,'Extract table after drop');
+    writeln(Outfile,'Extract table after drop - should be empty');
     FIBExtract.ExtractObject(eoTable,'TestTable');
     writeln(Outfile,FIBExtract.Items.Text);
   finally

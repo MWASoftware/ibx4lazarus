@@ -150,9 +150,27 @@ begin
     PrintDataSet(FDataSet);
     writeln(OutFile,'F1 in UTC Time = ', DateTimeToStr((FDataSet.FieldByName('F1') as TIBDateTimeField).GetAsUTCDateTime));
     writeln(OutFile,'F2 in UTC Time = ', FBFormatDateTime('HH:MM:SS.zzzz',(FDataSet.FieldByName('F2') as TIBDateTimeField).GetAsUTCDateTime));
+    writeln(Outfile,'TZ Text Option = GMT');
     FDataset.TZTextOption := tzGMT;
     PrintDataSet(FDataSet);
+    writeln(Outfile,'TZ Text Option = Original format');
     FDataset.TZTextOption := tzOriginalID;
+    PrintDataSet(FDataSet);
+    writeln(Outfile,'TZ Text Option = offset with Default time zone date of 2020/1/1');
+    FDataset.Active := false;
+    FDataset.TZTextOption := tzOffset;
+    FDataset.DefaultTZDate := EncodeDate(2020,7,1);
+    FDataset.Active := true;
+    PrintDataSet(FDataSet);
+    writeln(Outfile,'Update a record with a non default time zone date');
+    FDataset.Edit;
+    (FDataSet.FieldByName('F2') as TIBDateTimeField).SetAsDateTimeTZ(EncodeTime(11,02,10,15),'America/New_York');
+    FDataSet.Post;
+    PrintDataSet(FDataSet);
+    writeln(Outfile,'Restore original default time zone date');
+    FDataset.Active := false;
+    FDataset.DefaultTZDate := EncodeDate(2020,1,1);
+    FDataset.Active := true;
     PrintDataSet(FDataSet);
   finally
     DefaultFormatSettings := OldDefaultFormatSettings;
