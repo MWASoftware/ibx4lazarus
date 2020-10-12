@@ -8,4 +8,6 @@ Create Table IBXTest (
  Primary Key(TableKey)
 ) SQL SECURITY DEFINER;
 
+ALTER DATABASE SET DEFAULT SQL SECURITY DEFINER;
+
 Create Generator IBXGen;
