@@ -1912,6 +1912,7 @@ begin
   FOwnsInStream := false;
   FLineIndex := 1;
   FIndex := 1;
+  FCurLine := '';
 end;
 
 procedure TBatchSQLStatementReader.SetStreamSource(Lines: TStrings);
