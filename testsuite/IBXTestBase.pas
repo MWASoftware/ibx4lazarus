@@ -27,6 +27,8 @@ private
 protected
   procedure ClientLibraryPathChanged; override;
   procedure CreateObjects(Application: TTestApplication); override;
+  function GetFullTestID: string;
+  function GetOutFile: string;
   procedure InitialiseDatabase(aDatabase: TIBDatabase); virtual;
   procedure PrintDataSet(aDataSet: TDataSet);
   procedure PrintDataSetRow(aDataSet: TDataSet); overload;
@@ -41,6 +43,7 @@ protected
   procedure ExecuteSQL(SQL: string);
   procedure ShowFBVersion(attachment: IAttachment);
   procedure ShowBoolValue(aValue: integer; WhenTrue, WhenFalse: string);
+  procedure ProcessResults; override;
 public
   property IBDatabase: TIBDatabase read  FIBDatabase;
   property IBTransaction: TIBTransaction read FIBTransaction;
@@ -50,6 +53,12 @@ public
 end;
 
 implementation
+
+uses Process;
+
+const
+  sqlScriptTemplate = 'resources/Test%s.sql';
+  outFileTemplate   = 'Test%s.out';
 
 { TIBXTestBase }
 
@@ -126,14 +135,22 @@ begin
   FIBXScript.IgnoreCreateDatabase := FALSE;
 end;
 
+function TIBXTestBase.GetFullTestID: string;
+begin
+  Result := GetTestID;
+  if Length(Result) = 1 then
+    Result := '0' + Result;
+end;
+
+function TIBXTestBase.GetOutFile: string;
+begin
+  Result := Format(outFileTemplate,[GetFullTestID]);
+end;
+
 procedure TIBXTestBase.InitialiseDatabase(aDatabase: TIBDatabase);
 var aFileName: string;
-    aTestID: string;
 begin
-  aTestID := GetTestID;
-  if Length(aTestID) = 1 then
-    aTestID := '0' + aTestID;
-  aFileName := Format('resources/Test%s.sql',[aTestID]);
+  aFileName := Format(sqlScriptTemplate,[GetFullTestID]);
   if FileExists(aFileName) then
   begin
     writeln(OutFile,'Creating Database from ' + aFileName);
@@ -328,6 +345,35 @@ begin
    writeln(OutFile,WhenTrue)
  else
    writeln(OutFile,WhenFalse);
+end;
+
+procedure TIBXTestBase.ProcessResults;
+var DiffExe: string;
+    ResourceFile: string;
+    S: TStrings;
+    Results: string;
+    ExitStatus: integer;
+begin
+   ResourceFile := Format(sqlScriptTemplate,[GetFullTestID]);
+   if FileExists(GetOutFile) and FileExists(ResourceFile) then
+   begin
+     DiffExe := GetEnvironmentVariable('DIFF');
+     if DiffExe = '' then
+       DiffExe := 'diff';
+     S := TStringList.Create;
+     try
+       RunCommandInDir(GetCurrentDir,DiffExe ,[ResourceFile,GetOutFile],Results,ExitStatus);
+       writeln(OutFile,'Run diff command returns ',ExitStatus);
+       if Results <> '' then
+       begin
+         S.Text := Results;
+         writeln(Outfile,'Output from diff command');
+         WriteStrings(S);
+       end;
+     finally
+       S.Free;
+     end;
+   end;
 end;
 
 end.
