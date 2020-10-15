@@ -17,20 +17,9 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
-      <environment>
-        <UserOverrides Count="1">
-          <Variable0 Name="FIREBIRD" Value="/opt/firebird4b2"/>
-        </UserOverrides>
-      </environment>
       <FormatVersion Value="2"/>
       <Modes Count="1">
-        <Mode0 Name="default">
-          <environment>
-            <UserOverrides Count="1">
-              <Variable0 Name="FIREBIRD" Value="/opt/firebird4b2"/>
-            </UserOverrides>
-          </environment>
-        </Mode0>
+        <Mode0 Name="default"/>
       </Modes>
     </RunParams>
     <RequiredPackages Count="7">
