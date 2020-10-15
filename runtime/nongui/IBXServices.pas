@@ -2348,11 +2348,21 @@ begin
 end;
 
 procedure TIBXControlService.SetDatabaseName(AValue: string);
+var ServerName, aDatabaseName: AnsiString;
+    Protocol: TProtocolAll;
+    PortNo: AnsiString;
 begin
   if FDatabaseName = AValue then Exit;
   CheckServiceNotRunning;
-  FDatabaseName := AValue;
-  DatabaseNameChanged;
+  if ParseConnectString(AValue,ServerName,aDatabaseName,Protocol,PortNo) then
+  begin
+    if (ServerName <> '') and (AnsiUpperCase(ServicesConnection.ServerName) <> AnsiUpperCase(ServerName)) then
+      IBError(ibxeServerMismatch,[ServerName,ServicesConnection.ServerName]);
+    FDatabaseName := aDatabaseName;
+    DatabaseNameChanged;
+  end
+  else
+    IBError(ibxeBadConnectString,[AValue]);
 end;
 
 procedure TIBXControlService.DatabaseNameChanged;
@@ -3056,7 +3066,7 @@ begin
   Connected := false;
   if not ParseConnectString(AValue,FServerName,aServiceName,aProtocol,FPortNo)
     or (aServiceName <> 'service_mgr') or (aProtocol = unknownProtocol) then
-    IBError(ibxeBadConnectString, [nil]);
+    IBError(ibxeBadConnectString, [AValue]);
   FConnectString := AValue;
   FProtocol := TProtocol(aProtocol);
 end;

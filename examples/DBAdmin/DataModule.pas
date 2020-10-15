@@ -1059,8 +1059,15 @@ begin
 end;
 
 procedure TDBDataModule.ActivateShadow;
+var DBConnected: boolean;
 begin
-  IBConfigService1.ActivateShadow;
+  DBConnected := IBDatabase1.Connected;
+  IBDatabase1.Connected := false;
+  try
+    IBConfigService1.ActivateShadow;
+  finally
+    IBDatabase1.Connected := DBConnected;
+  end;
   MessageDlg('Shadow Database activated. You should now rename the file or change the database alias name to point to the shadow',
     mtInformation,[mbOK],0);
 end;
@@ -1496,6 +1503,7 @@ end;
 
 procedure TDBDataModule.IBDatabase1BeforeDisconnect(Sender: TObject);
 begin
+  FDBHeaderScanned := false;
   FDisconnecting := true;
 end;
 

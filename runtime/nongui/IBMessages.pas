@@ -171,7 +171,8 @@ type
       ibxeListFieldNotFound,
       ibxeDBBufferTooSmall,
       ibxeBadDateTimeTZString,
-      ibxeUnknownSQLType
+      ibxeUnknownSQLType,
+      ibxeServerMismatch
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -308,6 +309,7 @@ resourcestring
   SDBBufferTooSmall = 'Dataset buffer is too small (%d) to receive the data from Field %s (%d)';
   SBadDateTimeTZString = 'Unable to parse Date/Time Time Zone string "%s"';
   SUnknownSQLType = 'Unknown SQL Type (%d)';
+  SServerMismatch = 'Unexpected Server Name - expecting "%s" found "%s"';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -406,7 +408,8 @@ const
     SListFieldNotFound,
     SDBBufferTooSmall,
     SBadDateTimeTZString,
-    SUnknownSQLType
+    SUnknownSQLType,
+    SServerMismatch
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

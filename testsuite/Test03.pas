@@ -25,7 +25,6 @@ type
     FIBDatabaseInfo: TIBDatabaseInfo;
     FTableNameLookup: TIBQuery;
     procedure AddPerfStats(Heading: string; stats: TStrings);
-    procedure ShowBoolValue(aValue: integer; WhenTrue, WhenFalse: string);
     function HexString(s: AnsiString): string;
   protected
     procedure CreateObjects(Application: TTestApplication); override;
@@ -52,14 +51,6 @@ begin
     if FTableNameLookup.Locate('RDB$RELATION_ID',stats.Names[i],[]) then
       writeln(OutFile,'  ' + FTableNameLookup.FieldByName('RDB$RELATION_NAME').AsString + ' = ' + stats.ValueFromIndex[i]);
   end;
-end;
-
-procedure Test3.ShowBoolValue(aValue: integer; WhenTrue, WhenFalse: string);
-begin
-  if aValue <> 0 then
-    writeln(OutFile,WhenTrue)
-  else
-    writeln(OutFile,WhenFalse);
 end;
 
 function Test3.HexString(s: AnsiString): string;

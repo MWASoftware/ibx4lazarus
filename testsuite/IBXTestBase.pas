@@ -37,9 +37,10 @@ protected
   procedure ReadWriteTransaction;
   procedure RunScript(aDatabase: TIBDatabase; aFileName: string);
   procedure ShowStrings(aCaption: string; List: TStrings);
-  procedure WriteStrings(List: TStrings);
+  procedure WriteStrings(List: TStrings; limit: integer=0);
   procedure ExecuteSQL(SQL: string);
   procedure ShowFBVersion(attachment: IAttachment);
+  procedure ShowBoolValue(aValue: integer; WhenTrue, WhenFalse: string);
 public
   property IBDatabase: TIBDatabase read  FIBDatabase;
   property IBTransaction: TIBTransaction read FIBTransaction;
@@ -219,7 +220,7 @@ begin
       writeln(OutFile,' (Charset = ',TIBStringField(aField).CharacterSetName, ' Codepage = ',StringCodePage(s),')');
     end
     else
-    if TIBStringField(aField).CharacterSetName <> 'NONE' then
+    if (aField is TIBStringField) and (TIBStringField(aField).CharacterSetName <> 'NONE') then
       writeln(OutFile,aField.FieldName,' = ',s,' (Charset = ',TIBStringField(aField).CharacterSetName, ' Codepage = ',StringCodePage(s),')')
     else
       writeln(OutFile,aField.FieldName,' = ',s);
@@ -293,10 +294,12 @@ begin
  writeln(OutFile,s);
 end;
 
-procedure TIBXTestBase.WriteStrings(List: TStrings);
+procedure TIBXTestBase.WriteStrings(List: TStrings; limit: integer);
 var i: integer;
 begin
-  for i := 0 to List.Count - 1 do
+ if Limit <= 0 then
+   Limit := List.Count - 1;
+  for i := 0 to limit do
     writeln(OutFile,List[i]);
   writeln(OutFile);
 end;
@@ -316,6 +319,15 @@ begin
   finally
     S.Free;
   end;
+end;
+
+procedure TIBXTestBase.ShowBoolValue(aValue: integer; WhenTrue,
+  WhenFalse: string);
+begin
+ if aValue <> 0 then
+   writeln(OutFile,WhenTrue)
+ else
+   writeln(OutFile,WhenFalse);
 end;
 
 end.
