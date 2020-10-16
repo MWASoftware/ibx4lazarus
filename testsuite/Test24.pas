@@ -221,7 +221,7 @@ begin
     try
     with parser do
     begin
-      writeln(OutFile,'Next Test');
+      writeln(OutFile,'Test String ',i);
       writeln(OutFile,'---------------------------------------------------');
       writeln(OutFile,TestStrings[i]);
       writeln(OutFile,'---------------------------------------------------');
@@ -233,7 +233,11 @@ begin
       end;
       if i = 4 then
         Add2WhereClause('JOB_CODE = 2');
+      if i = 5 then
+         OrderByClause := '1';
       WriteSelect(parser);
+      writeln(Outfile,'Updated SQL');
+      writeln(OutFile,SQLText);
     end;
     finally
       parser.Free
