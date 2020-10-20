@@ -39,6 +39,8 @@ type
 
   TIBCMLocalDBSupport = class(TCustomIBLocalDBSupport)
   private
+    FBackupService: TIBXServerSideBackupService;
+    FRestoreService: TIBXServerSideRestoreService;
     FOnLogMessage: TOnLogMessage;
     FOnProgressEvent: TOnProgressEvent;
     procedure Add2Log(Sender: TObject; Msg: string);
@@ -53,6 +55,8 @@ type
     function RestoreDatabaseFromArchive(aFilename: string): boolean; override;
     function RunUpgradeDatabase(TargetVersionNo: integer): boolean; override;
     function SaveDatabaseToArchive( aFilename: string): boolean; override;
+    property RestoreService: TIBXServerSideRestoreService read FRestoreService;
+    property BackupService: TIBXServerSideBackupService read FBackupService;
   public
     constructor Create(aOwner: TComponent); override;
     property OnLogMessage: TOnLogMessage read FOnLogMessage write FOnLogMessage;
@@ -170,6 +174,8 @@ begin
   begin
     BackupFiles.Clear;
     BackupFiles.Add(aFilename);
+    DatabaseFiles.Clear;
+    DatabaseFiles.Add(Database.DatabaseName);
     Options := [Replace];
     Execute(nil);
   end;
@@ -195,11 +201,13 @@ begin
 end;
 
 function TIBCMLocalDBSupport.SaveDatabaseToArchive(aFilename: string): boolean;
-var Service: TIBXClientSideBackupService;
 begin
   Result := true;
   with BackupService do
   begin
+    DatabaseName := Database.DatabaseName;
+    BackupFiles.Clear;
+    BackupFiles.Add(aFileName);
     Execute(nil);
     WriteLog(Format(sBackupDone,[aFileName]));
   end;
@@ -208,8 +216,14 @@ end;
 constructor TIBCMLocalDBSupport.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
-  RestoreService.OnGetNextLine := @HandleOnGetNextLine;
-  BackupService.OnGetNextLine := @HandleOnGetNextLine;
+  FBackupService := TIBXServerSideBackupService.Create(self);
+  FBackupService.ServicesConnection := ServicesConnection;
+  FBackupService.Verbose := true;
+  FRestoreService := TIBXServerSideRestoreService.Create(self);
+  FRestoreService.ServicesConnection := ServicesConnection;
+  FRestoreService.Verbose := true;
+  FRestoreService.OnGetNextLine := @HandleOnGetNextLine;
+  FBackupService.OnGetNextLine := @HandleOnGetNextLine;
 end;
 
 end.
