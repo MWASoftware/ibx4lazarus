@@ -6,3 +6,5 @@ Create table GoodTable(
 
 Create table blah;
 
+INSERT INTO DBVERSIONINFO (VERSIONNO) VALUES(2);
+

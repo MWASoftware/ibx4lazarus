@@ -29,6 +29,7 @@ type
     procedure HandleGetDBVersionNo(Sender: TObject; var VersionNo: integer);
     procedure HandleLogMessage(Sender: TObject; Msg: string);
     procedure GetSharedDirectory(Sender: TObject; var SharedDataDir: string);
+    procedure InsertRecord;
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -100,6 +101,21 @@ begin
   SharedDataDir := 'resources/Test28';
 end;
 
+procedure TTest28.InsertRecord;
+begin
+  with TIBSQL.Create(nil) do
+  try
+    Database := IBDatabase;
+    Transaction := IBTransaction;
+    Transaction.Active := true;
+    SQL.Text := 'INSERT INTO IBDATASETTEST (KeyField,PlainText) Values(Gen_ID(AGenerator,1),''Test'')';
+    ExecQuery;
+    Transaction.Commit;
+  finally
+    Free;
+  end;
+end;
+
 procedure TTest28.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
@@ -131,6 +147,7 @@ begin
   FLocalDB.DatabaseName := ExtractDBName(Owner.GetNewDatabaseName);
   FLocalDB.EmptyDBArchive := 'schema.sql';
   FLocalDB.RequiredVersionNo := 1;
+  ReadWriteTransaction;
 end;
 
 procedure TTest28.RunTest(CharSet: AnsiString; SQLDialect: integer);
@@ -140,11 +157,19 @@ begin
     writeln(Outfile,'Show schema for ',IBDatabase.DatabaseName);
     FExtract.ExtractObject(eoDatabase,'',[etGrantsToUser,etData]);
 
+    InsertRecord;
     writeln(Outfile,'Now test out an upgrade failure');
     IBDatabase.connected := false;
     FLocalDB.RequiredVersionNo := 2;
     FLocalDB.UpgradeConfFile := 'upgrade.conf';
-    IBDatabase.connected := true;
+    try
+      IBDatabase.connected := true;
+    except on E:Exception do
+      begin
+        writeln(Outfile,'Upgrade failed (as expected): ',E.Message);
+        FLocalDB.RequiredVersionNo := 1;
+      end;
+    end;
     writeln(Outfile,'Schema after failed upgrade is');
     FExtract.ExtractObject(eoDatabase,'',[etGrantsToUser,etData]);
   finally

@@ -39,10 +39,12 @@ type
 
   TIBCMLocalDBSupport = class(TCustomIBLocalDBSupport)
   private
+    FBackupService: TIBXServerSideBackupService;
+    FRestoreService: TIBXServerSideRestoreService;
     FOnLogMessage: TOnLogMessage;
     FOnProgressEvent: TOnProgressEvent;
     procedure Add2Log(Sender: TObject; Msg: string);
-    procedure DoUpgrade(IBXScript: TIBXScript; TargetVersionNo: integer);
+    function DoUpgrade(IBXScript: TIBXScript; TargetVersionNo: integer): boolean;
     procedure WriteLog(Msg: string);
     procedure HandleOnGetNextLine(Sender: TObject; var Line: string);
     procedure IBXScriptCreateDatabase(Sender: TObject;
@@ -53,6 +55,8 @@ type
     function RestoreDatabaseFromArchive(aFilename: string): boolean; override;
     function RunUpgradeDatabase(TargetVersionNo: integer): boolean; override;
     function SaveDatabaseToArchive( aFilename: string): boolean; override;
+    property RestoreService: TIBXServerSideRestoreService read FRestoreService;
+    property BackupService: TIBXServerSideBackupService read FBackupService;
   public
     constructor Create(aOwner: TComponent); override;
     property OnLogMessage: TOnLogMessage read FOnLogMessage write FOnLogMessage;
@@ -75,8 +79,8 @@ begin
   WriteLog(Msg);
 end;
 
-procedure TIBCMLocalDBSupport.DoUpgrade(IBXScript: TIBXScript;
-  TargetVersionNo: integer);
+function TIBCMLocalDBSupport.DoUpgrade(IBXScript: TIBXScript;
+  TargetVersionNo: integer): boolean;
 var UpdateAvailable: boolean;
     UpgradeInfo: TUpgradeInfo;
     DBArchive: string;
@@ -96,7 +100,8 @@ begin
       end;
       Add2Log(self,UpgradeInfo.UserMessage);
       Add2Log(self,Format(sUpdateMsg,[UpgradeInfo.UpdateSQLFile]));
-      if not IBXScript.RunScript(UpgradeInfo.UpdateSQLFile) then
+      Result := IBXScript.RunScript(UpgradeInfo.UpdateSQLFile);
+      if not Result then
        break;
       UpdateVersionNo;
     end;
@@ -125,7 +130,9 @@ end;
 
 procedure TIBCMLocalDBSupport.Downgrade(DBArchive: string);
 begin
+  inherited;
   RestoreDatabase(DBArchive);
+  DowngradeDone;
 end;
 
 function TIBCMLocalDBSupport.InternalCreateNewDatabase(DBArchive: string
@@ -170,6 +177,8 @@ begin
   begin
     BackupFiles.Clear;
     BackupFiles.Add(aFilename);
+    DatabaseFiles.Clear;
+    DatabaseFiles.Add(Database.DatabaseName);
     Options := [Replace];
     Execute(nil);
   end;
@@ -179,7 +188,6 @@ function TIBCMLocalDBSupport.RunUpgradeDatabase(TargetVersionNo: integer
   ): boolean;
 var IBXScript: TIBXScript;
 begin
-  Result := true;
   IBXScript := TIBXScript.Create(self);
   try
     IBXScript.Database := Database;
@@ -187,7 +195,7 @@ begin
     IBXScript.OnOutputLog := @Add2Log;
     if assigned(UpgradeConf) then
       IBXScript.GetParamValue := @UpgradeConf.GetParamValue;
-    DoUpgrade(IBXScript, TargetVersionNo);
+    Result := DoUpgrade(IBXScript, TargetVersionNo);
   finally
     IBXScript.Free;
   end;
@@ -199,6 +207,9 @@ begin
   Result := true;
   with BackupService do
   begin
+    DatabaseName := Database.DatabaseName;
+    BackupFiles.Clear;
+    BackupFiles.Add(aFileName);
     Execute(nil);
     WriteLog(Format(sBackupDone,[aFileName]));
   end;
@@ -207,8 +218,14 @@ end;
 constructor TIBCMLocalDBSupport.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
-  RestoreService.OnGetNextLine := @HandleOnGetNextLine;
-  BackupService.OnGetNextLine := @HandleOnGetNextLine;
+  FBackupService := TIBXServerSideBackupService.Create(self);
+  FBackupService.ServicesConnection := ServicesConnection;
+  FBackupService.Verbose := true;
+  FRestoreService := TIBXServerSideRestoreService.Create(self);
+  FRestoreService.ServicesConnection := ServicesConnection;
+  FRestoreService.Verbose := true;
+  FRestoreService.OnGetNextLine := @HandleOnGetNextLine;
+  FBackupService.OnGetNextLine := @HandleOnGetNextLine;
 end;
 
 end.

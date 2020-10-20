@@ -172,7 +172,8 @@ type
       ibxeDBBufferTooSmall,
       ibxeBadDateTimeTZString,
       ibxeUnknownSQLType,
-      ibxeServerMismatch
+      ibxeServerMismatch,
+      ibxeUpgradeFailed
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -310,6 +311,7 @@ resourcestring
   SBadDateTimeTZString = 'Unable to parse Date/Time Time Zone string "%s"';
   SUnknownSQLType = 'Unknown SQL Type (%d)';
   SServerMismatch = 'Unexpected Server Name - expecting "%s" found "%s"';
+  SUpgradeFailed = 'Upgrade Failed. Database Version No. is %d';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -409,7 +411,8 @@ const
     SDBBufferTooSmall,
     SBadDateTimeTZString,
     SUnknownSQLType,
-    SServerMismatch
+    SServerMismatch,
+    SUpgradeFailed
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
