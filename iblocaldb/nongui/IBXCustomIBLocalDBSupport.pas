@@ -195,7 +195,7 @@ type
 implementation
 
 {$IFDEF Unix} uses initc, regexpr {$ENDIF}
-{$IFDEF WINDOWS} uses Windows ,Windirs {$ENDIF}, IBUtils;
+{$IFDEF WINDOWS} uses Windows ,Windirs {$ENDIF}, IBUtils, IBMessages;
 
 resourcestring
   sNoDowngrade = 'Database Schema is %d. Unable to downgrade to version %d';
@@ -526,9 +526,12 @@ procedure TCustomIBLocalDBSupport.PerformUpgrade(TargetVersionNo: integer);
       Result := SharedDataDir + Result;
   end;
 
+var OldVersionNo: integer;
+
 begin
   if FInUpgrade then Exit;
 
+  OldVersionNo := CurrentDBVersionNo;
   FUpgradeConf := TUpgradeConfFile.Create(GetUpgradeConfFile);
   try
     FUpgradeConf.CheckUpgradeAvailable(TargetVersionNo);
@@ -536,7 +539,12 @@ begin
     try
       ServicesConnection.ConnectUsing(Database);
       try
-        RunUpgradeDatabase(TargetVersionNo);
+        if not RunUpgradeDatabase(TargetVersionNo) then
+        begin
+          {DownGrade if possible}
+          PerformDowngrade(OldVersionNo);
+          IBError(ibxeUpgradeFailed,[CurrentDBVersionNo]);
+        end;
       finally
         ServicesConnection.Connected := false;
       end;

@@ -169,7 +169,8 @@ type
       ibxErrorParsing,
       ibxeParameterNameNotFound,
       ibxeListFieldNotFound,
-      ibxeDBBufferTooSmall
+      ibxeDBBufferTooSmall,
+      ibxeUpgradeFailed
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -304,6 +305,7 @@ resourcestring
   SParameterNameNotFound = 'Parameter Name (%s) not found';
   SListFieldNotFound = 'ListField Name is not a valid dataset column name (%s)';
   SDBBufferTooSmall = 'Dataset buffer is too small (%d bytes) to receive the data from Field %s (%d bytes)';
+  SUpgradeFailed = 'Upgrade Failed. Database Version No. is %d';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -400,7 +402,8 @@ const
     SErrorParsing,
     SParameterNameNotFound,
     SListFieldNotFound,
-    SDBBufferTooSmall
+    SDBBufferTooSmall,
+    SUpgradeFailed
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

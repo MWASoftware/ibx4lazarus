@@ -44,7 +44,7 @@ type
     FOnLogMessage: TOnLogMessage;
     FOnProgressEvent: TOnProgressEvent;
     procedure Add2Log(Sender: TObject; Msg: string);
-    procedure DoUpgrade(IBXScript: TIBXScript; TargetVersionNo: integer);
+    function DoUpgrade(IBXScript: TIBXScript; TargetVersionNo: integer): boolean;
     procedure WriteLog(Msg: string);
     procedure HandleOnGetNextLine(Sender: TObject; var Line: string);
     procedure IBXScriptCreateDatabase(Sender: TObject;
@@ -79,8 +79,8 @@ begin
   WriteLog(Msg);
 end;
 
-procedure TIBCMLocalDBSupport.DoUpgrade(IBXScript: TIBXScript;
-  TargetVersionNo: integer);
+function TIBCMLocalDBSupport.DoUpgrade(IBXScript: TIBXScript;
+  TargetVersionNo: integer): boolean;
 var UpdateAvailable: boolean;
     UpgradeInfo: TUpgradeInfo;
     DBArchive: string;
@@ -100,7 +100,8 @@ begin
       end;
       Add2Log(self,UpgradeInfo.UserMessage);
       Add2Log(self,Format(sUpdateMsg,[UpgradeInfo.UpdateSQLFile]));
-      if not IBXScript.RunScript(UpgradeInfo.UpdateSQLFile) then
+      Result := IBXScript.RunScript(UpgradeInfo.UpdateSQLFile);
+      if not Result then
        break;
       UpdateVersionNo;
     end;
@@ -129,7 +130,9 @@ end;
 
 procedure TIBCMLocalDBSupport.Downgrade(DBArchive: string);
 begin
+  inherited;
   RestoreDatabase(DBArchive);
+  DowngradeDone;
 end;
 
 function TIBCMLocalDBSupport.InternalCreateNewDatabase(DBArchive: string
@@ -185,7 +188,6 @@ function TIBCMLocalDBSupport.RunUpgradeDatabase(TargetVersionNo: integer
   ): boolean;
 var IBXScript: TIBXScript;
 begin
-  Result := true;
   IBXScript := TIBXScript.Create(self);
   try
     IBXScript.Database := Database;
@@ -193,7 +195,7 @@ begin
     IBXScript.OnOutputLog := @Add2Log;
     if assigned(UpgradeConf) then
       IBXScript.GetParamValue := @UpgradeConf.GetParamValue;
-    DoUpgrade(IBXScript, TargetVersionNo);
+    Result := DoUpgrade(IBXScript, TargetVersionNo);
   finally
     IBXScript.Free;
   end;
