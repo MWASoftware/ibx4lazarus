@@ -1,8 +1,8 @@
-unit Test30;
+unit Test27;
 
 {$mode objfpc}{$H+}
 
-{Test 30: create, bring up-to-date and read from local database}
+{Test 27: create, bring up-to-date and read from local database}
 
 {
   Requires Firebird Embedded Server - with FB 2.5 and lower this implies FBEmbedded
@@ -21,14 +21,14 @@ uses
   IBQuery, IBDatabase;
 
 const
-  aTestID    = '30';
+  aTestID    = '27';
   aTestTitle = 'create, bring up-to-date and read from local database';
 
 type
 
-{ TTest30 }
+{ TTest27 }
 
-  TTest30 = class(TIBXTestBase)
+  TTest27 = class(TIBXTestBase)
   private
     FLocalDB: TIBCMLocalDBSupport;
     procedure HandleGetDBVersionNo(Sender: TObject; var VersionNo: integer);
@@ -64,9 +64,9 @@ const
 'From EMPLOYEE A '+
 'JOIN Depts D On D.DEPT_NO = A.DEPT_NO';
 
-  { TTest30 }
+  { TTest27 }
 
-procedure TTest30.HandleGetDBVersionNo(Sender: TObject; var VersionNo: integer);
+procedure TTest27.HandleGetDBVersionNo(Sender: TObject; var VersionNo: integer);
 begin
   VersionNo := 0;
   IBTransaction.Active := true;
@@ -105,17 +105,17 @@ begin
   end;
 end;
 
-procedure TTest30.HandleLogMessage(Sender: TObject; Msg: string);
+procedure TTest27.HandleLogMessage(Sender: TObject; Msg: string);
 begin
   writeln(OutFile,Msg);
 end;
 
-procedure TTest30.GetSharedDirectory(Sender: TObject; var SharedDataDir: string);
+procedure TTest27.GetSharedDirectory(Sender: TObject; var SharedDataDir: string);
 begin
-  SharedDataDir := 'resources';
+  SharedDataDir := 'resources/Test27';
 end;
 
-procedure TTest30.CreateObjects(Application: TTestApplication);
+procedure TTest27.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
   FLocalDB := TIBCMLocalDBSupport.Create(Application);
@@ -126,17 +126,17 @@ begin
   FLocalDB.OnGetSharedDataDir := @GetSharedDirectory;
 end;
 
-function TTest30.GetTestID: AnsiString;
+function TTest27.GetTestID: AnsiString;
 begin
   Result := aTestID;
 end;
 
-function TTest30.GetTestTitle: AnsiString;
+function TTest27.GetTestTitle: AnsiString;
 begin
   Result := aTestTitle;
 end;
 
-procedure TTest30.InitTest;
+procedure TTest27.InitTest;
 begin
   IBDatabase.DatabaseName := 'nemo';
   FLocalDB.DatabaseName := ExtractDBName(Owner.GetNewDatabaseName);
@@ -146,7 +146,7 @@ begin
   ReadOnlyTransaction;
 end;
 
-procedure TTest30.RunTest(CharSet: AnsiString; SQLDialect: integer);
+procedure TTest27.RunTest(CharSet: AnsiString; SQLDialect: integer);
 begin
   IBDatabase.Connected := true;
   with IBQuery do
@@ -160,7 +160,7 @@ begin
 end;
 
 initialization
-  RegisterTest(TTest30);
+  RegisterTest(TTest27);
 
 end.
 

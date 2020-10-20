@@ -195,7 +195,6 @@ begin
 end;
 
 function TIBCMLocalDBSupport.SaveDatabaseToArchive(aFilename: string): boolean;
-var Service: TIBXClientSideBackupService;
 begin
   Result := true;
   with BackupService do
