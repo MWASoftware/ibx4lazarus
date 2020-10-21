@@ -87,6 +87,7 @@ type
 
   TCustomIBLocalDBSupport = class(TComponent)
   private
+    FMinimumVersionNo: integer;
     { Private declarations }
     FServicesConnection: TIBXServicesConnection;
     FActiveDatabasePathName: string;
@@ -110,6 +111,7 @@ type
     FSharedDataDir: string;
     FUpgradeConf: TUpgradeConfFile;
     FInOnCreateDB: boolean;
+    FUpgradeFailed: boolean;
     procedure CheckEnabled;
     function GetDatabase: TIBDatabase;
     function GetSharedDataDir: string;
@@ -128,6 +130,7 @@ type
     procedure UpgradeCheck;
   protected
     { Protected declarations }
+    procedure Add2Log(Sender: TObject; Msg: string); virtual;
     function AllowInitialisation: boolean; virtual;
     function AllowRestore: boolean; virtual;
     procedure CreateDir(DirName: string);
@@ -182,6 +185,7 @@ type
     property FirebirdDirectory: string read FFirebirdDirectory write SetFirebirdDirectory;
     property Options: TIBLocalOptions read FOptions write FOptions;
     property RequiredVersionNo: integer read FRequiredVersionNo write FRequiredVersionNo;
+    property MinimumVersionNo: integer read FMinimumVersionNo write FMinimumVersionNo;
     property UpgradeConfFile: string read FUpgradeConfFile write FUpgradeConfFile;
     property VendorName: string read FVendorName write FVendorName;
     property OnGetDatabaseName: TOnGetDatabaseName read FOnGetDatabaseName write FOnGetDatabaseName;
@@ -204,6 +208,9 @@ resourcestring
   sEmptyDBArchiveNotFound = 'Unable to create database - empty DB archive file (%s) not found';
   sNoEmbeddedServer = 'Firebird Embedded Server is required but is not installed';
   sCreateFailed = 'Unable to Create Personal Database';
+  sPerformUpgrade = 'Upgrading to version %d';
+  sDowngrade = 'Downgrading to version %d';
+  sSkipUpgrade = 'Previous attempt at upgrade to %d failed. Skipping upgrade';
 
 { TCustomIBLocalDBSupport }
 
@@ -384,7 +391,24 @@ begin
     PerformDowngrade(RequiredVersionNo)
   else
   if (CurrentDBVersionNo < RequiredVersionNo) and (iblAutoUpgrade in FOptions) then
-    PerformUpgrade(RequiredVersionNo);
+  begin
+    if FUpgradeFailed then
+    begin
+      Add2Log(self,Format(sSkipUpgrade,[RequiredVersionNo]));
+      if MinimumVersionNo > CurrentDBVersionNo then
+      begin
+        Database.ForceClose;
+        IBError(ibxDBVersionProblem,[CurrentDBVersionNo, MinimumVersionNo]);
+      end
+    end
+    else
+      PerformUpgrade(RequiredVersionNo);
+  end;
+end;
+
+procedure TCustomIBLocalDBSupport.Add2Log(Sender: TObject; Msg: string);
+begin
+  //Do nothing
 end;
 
 function TCustomIBLocalDBSupport.AllowInitialisation: boolean;
@@ -510,7 +534,10 @@ begin
   DBArchive := ChangeFileExt(ActiveDatabasePathName,'') +
                    '.' + IntToStr(TargetVersionNo) + '.gbk';
   if FileExists(DBArchive) then
+  begin
+    Add2Log(self,Format(sDowngrade,[TargetVersionNo]));
     Downgrade(DBArchive)
+  end
   else
     raise EIBLocalFatalError.CreateFmt(sNoDowngrade,[CurrentDBVersionNo,TargetVersionNo]);
 end;
@@ -539,10 +566,13 @@ begin
     try
       ServicesConnection.ConnectUsing(Database);
       try
+        Add2Log(self,Format(sPerformUpgrade,[TargetVersionNo]));
         if not RunUpgradeDatabase(TargetVersionNo) then
         begin
           {DownGrade if possible}
           PerformDowngrade(OldVersionNo);
+          Database.ForceClose;
+          FUpgradeFailed := true;
           IBError(ibxeUpgradeFailed,[CurrentDBVersionNo]);
         end;
       finally
@@ -553,6 +583,12 @@ begin
     end;
   finally
     FreeAndNil(FUpgradeConf);
+  end;
+  FUpgradeFailed := false;
+  if CurrentDBVersionNo < MinimumVersionNo then
+  begin
+    Database.ForceClose;
+    IBError(ibxDBVersionProblem,[CurrentDBVersionNo,MinimumVersionNo]);
   end;
 end;
 

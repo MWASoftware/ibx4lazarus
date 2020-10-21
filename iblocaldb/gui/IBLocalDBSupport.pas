@@ -58,6 +58,7 @@ type
     property FirebirdDirectory;
     property Options;
     property RequiredVersionNo;
+    property MinimumVersionNo;
     property UpgradeConfFile;
     property VendorName;
     property OnGetDatabaseName;

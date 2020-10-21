@@ -173,7 +173,8 @@ type
       ibxeBadDateTimeTZString,
       ibxeUnknownSQLType,
       ibxeServerMismatch,
-      ibxeUpgradeFailed
+      ibxeUpgradeFailed,
+      ibxDBVersionProblem
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -181,7 +182,8 @@ function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
 {IBError is used internally and by IBX to throw an EIBClientError}
 
 procedure IBError(ErrMess: TIBClientError; const Args: array of const);
- resourcestring
+
+resourcestring
   { generic strings used in code }
   SEOFReached = 'SEOFReached';
   SCantPrintValue = 'Cannot print value';
@@ -312,6 +314,7 @@ resourcestring
   SUnknownSQLType = 'Unknown SQL Type (%d)';
   SServerMismatch = 'Unexpected Server Name - expecting "%s" found "%s"';
   SUpgradeFailed = 'Upgrade Failed. Database Version No. is %d';
+  SDBVersionProblem = 'Database Version too low. Required %d, found %d';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -412,7 +415,8 @@ const
     SBadDateTimeTZString,
     SUnknownSQLType,
     SServerMismatch,
-    SUpgradeFailed
+    SUpgradeFailed,
+    SDBVersionProblem
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

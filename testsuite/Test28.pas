@@ -168,6 +168,7 @@ begin
       begin
         writeln(Outfile,'Upgrade failed (as expected): ',E.Message);
         FLocalDB.RequiredVersionNo := 1;
+        IBDatabase.Connected := true;
       end;
     end;
     writeln(Outfile,'Schema after failed upgrade is');
