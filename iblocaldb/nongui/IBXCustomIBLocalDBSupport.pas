@@ -208,7 +208,6 @@ resourcestring
   sEmptyDBArchiveNotFound = 'Unable to create database - empty DB archive file (%s) not found';
   sNoEmbeddedServer = 'Firebird Embedded Server is required but is not installed';
   sCreateFailed = 'Unable to Create Personal Database';
-  sPerformUpgrade = 'Upgrading to version %d';
   sDowngrade = 'Downgrading to version %d';
   sSkipUpgrade = 'Previous attempt at upgrade to %d failed. Skipping upgrade';
 
@@ -566,7 +565,6 @@ begin
     try
       ServicesConnection.ConnectUsing(Database);
       try
-        Add2Log(self,Format(sPerformUpgrade,[TargetVersionNo]));
         if not RunUpgradeDatabase(TargetVersionNo) then
         begin
           {DownGrade if possible}
