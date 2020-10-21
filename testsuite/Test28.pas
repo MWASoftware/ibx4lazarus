@@ -151,6 +151,7 @@ begin
 end;
 
 procedure TTest28.RunTest(CharSet: AnsiString; SQLDialect: integer);
+var BackupFileName: string;
 begin
   IBDatabase.Connected := true;
   try
@@ -172,6 +173,14 @@ begin
       end;
     end;
     writeln(Outfile,'Schema after failed upgrade is');
+    FExtract.ExtractObject(eoDatabase,'',[etGrantsToUser,etData]);
+    writeln(Outfile,'Save and Restore Tests');
+    InsertRecord;
+    BackupFileName := Owner.GetBackupFileName;
+    FLocalDB.SaveDatabase(BackupFileName);
+    InsertRecord;
+    FLocalDB.RestoreDatabase(BackupFileName);
+    writeln(Outfile,'Database after restore');
     FExtract.ExtractObject(eoDatabase,'',[etGrantsToUser,etData]);
   finally
     IBDatabase.DropDatabase;
