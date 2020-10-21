@@ -43,13 +43,13 @@ type
     FRestoreService: TIBXServerSideRestoreService;
     FOnLogMessage: TOnLogMessage;
     FOnProgressEvent: TOnProgressEvent;
-    procedure Add2Log(Sender: TObject; Msg: string);
     function DoUpgrade(IBXScript: TIBXScript; TargetVersionNo: integer): boolean;
     procedure WriteLog(Msg: string);
     procedure HandleOnGetNextLine(Sender: TObject; var Line: string);
     procedure IBXScriptCreateDatabase(Sender: TObject;
       var DatabaseFileName: string);
   protected
+    procedure Add2Log(Sender: TObject; Msg: string); override;
     procedure Downgrade(DBArchive: string); override;
     function InternalCreateNewDatabase(DBArchive: string): boolean; override;
     function RestoreDatabaseFromArchive(aFilename: string): boolean; override;
