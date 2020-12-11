@@ -2,7 +2,12 @@ unit Test04;
 
 {$mode objfpc}{$H+}
 
-{Test 4: handling of data types up to Firebird 3}
+{Test 4: handling of data types up to Firebird 3.
+
+         Tests, Append, Edit and Delete operations
+
+         Test both default createdatabase and createdatabasefromSQL
+}
 
 interface
 
@@ -60,6 +65,14 @@ begin
     FieldByName('F7').AsDateTime := EncodeDateTime(2007,12,25,12,30,29,130);
     FieldByName('F8').AsString := 'XX';
     FieldByName('F9').AsString := 'The Quick Brown Fox jumped over the lazy dog';
+    S := CreateBlobStream(FieldByName('F10'),bmWrite);
+    F := TFileStream.Create('resources/Test04.jpg',fmOpenRead);
+    try
+      S.CopyFrom(F,0);
+    finally
+      S.Free;
+      F.Free;
+    end;
     FieldByName('F11').AsLargeInt := 9223372036854775807;
     FieldByName('F12').AsInteger := 65566;
     FieldByName('F13').AsDateTime := EncodeDateTime(2007,12,26,12,30,45,0);
@@ -81,14 +94,6 @@ begin
       dec(j);
     end;
     TIBArrayField(FieldByName('MyArray')).ArrayIntf := ar;
-    S := CreateBlobStream(FieldByName('F10'),bmWrite);
-    F := TFileStream.Create('resources/Test04.jpg',fmOpenRead);
-    try
-      S.CopyFrom(F,0);
-    finally
-      S.Free;
-      F.Free;
-    end;
   end;
 end;
 
@@ -116,7 +121,7 @@ procedure TTest04.HandleTransactionExecQuery(Sender: TObject);
 begin
   write(OutFile,'Transaction Exec Query ');
   if Sender is TIBSQL then
-    writeln(OutFile,(Sender as TIBSQL).SQL.Text)
+    writeln(OutFile,'"',(Sender as TIBSQL).SQL.Text,'"')
   else
     writeln(OutFile);
 end;
@@ -199,9 +204,12 @@ begin
 end;
 
 procedure TTest04.RunTest(CharSet: AnsiString; SQLDialect: integer);
+var OldDefaultFormatSettings: TFormatSettings;
 begin
+  OldDefaultFormatSettings := DefaultFormatSettings;
   IBDatabase.CreateDatabase;
   try
+    DefaultFormatSettings.LongTimeFormat := 'HH:MM:SS.zzzz';
     IBTransaction.Active := true;
     FDataSet.Active := true;
     writeln(OutFile,'Add a record');

@@ -54,7 +54,7 @@ end;
 
 implementation
 
-uses Process;
+uses Process, IBUtils;
 
 const
   sqlScriptTemplate = 'resources/Test%s.sql';
@@ -178,6 +178,8 @@ begin
     Inc(rowno);
     writeln(OutFile);
   end;
+  writeln(Outfile,'Rows printed = ',IntToStr(rowno-1));
+  writeln(Outfile);
 end;
 
 procedure TIBXTestBase.PrintDataSetRow(aDataSet: TDataSet);
@@ -202,12 +204,12 @@ begin
     end;
 
   ftFloat:
-    writeln(OutFile, aField.FieldName,' = ',FormatFloat('#,##0.000',aField.AsFloat));
+    writeln(OutFile, aField.FieldName,' = ',FormatFloat('#,##0.00000000',aField.AsFloat));
 
   ftLargeint:
     writeln(OutFile,aField.FieldName,' = ',aField.AsString);
 
-  ftBlob:
+  ftmemo, ftBlob:
     if TBlobField(aField).BlobType = ftMemo then
     begin
       s := aField.AsString;

@@ -7,6 +7,13 @@ unit Test01;
 {  This is a simple use of IBX to access the employee database in console mode.
   The program opens the database, runs a query and writes the result to stdout.
 
+  The test is run first with unidirectional buffering and then with bi-directional
+  buffering.
+
+  Both client side and server side filters are tested with bi-directional buffering.
+
+  Finally, a beforeOpen handler is used to dynamically filter the results.
+
 }
 
 interface

@@ -6,6 +6,10 @@ unit Test02;
 
 { This test opens and closes a database in order to test the connect/disconnect
   handlers. The database is re-opened to test disconnect on idle.
+
+  The transaction handlers are also tested, along with Transaction end on idle.
+
+  SQL Dialect Downgrade warning tested.
 }
 
 interface

@@ -4,7 +4,10 @@ unit Test03;
 
 {Test 3: Database Information}
 
-{ Open the employee database and show database information
+{ Open the employee database and show database information.
+
+  Also tests wire compression and hence config overrides, along with a lookup table
+  for a system table.
 }
 
 interface

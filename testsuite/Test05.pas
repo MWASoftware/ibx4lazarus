@@ -156,7 +156,7 @@ begin
     writeln(Outfile,'TZ Text Option = Original format');
     FDataset.TZTextOption := tzOriginalID;
     PrintDataSet(FDataSet);
-    writeln(Outfile,'TZ Text Option = offset with Default time zone date of 2020/1/1');
+    writeln(Outfile,'TZ Text Option = offset with Default time zone date of 2020/7/1');
     FDataset.Active := false;
     FDataset.TZTextOption := tzOffset;
     FDataset.DefaultTZDate := EncodeDate(2020,7,1);
