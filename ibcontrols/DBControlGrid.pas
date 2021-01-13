@@ -307,6 +307,7 @@ begin
   Container := TBitmap.Create;
   try
     Container.SetSize(Control.Width,Control.Height);
+    Container.Canvas.Brush.Color := control.Color;
     Control.PaintTo(Container.Canvas,0,0);
   except
     Container.Free;
@@ -665,7 +666,8 @@ procedure TDBControlGrid.KeyDownHandler(Sender: TObject; var Key: Word;
 var Done: boolean;
     AControl: TControl;
 begin
-  if Visible and assigned(FDrawPanel) and FDrawPanel.Visible and FWeHaveFocus then
+  if Visible and assigned(FDrawPanel) and FDrawPanel.Visible and FWeHaveFocus
+    and (Self.Owner=Screen.ActiveForm) then
   begin
     AControl := ActiveControl;
     if (AControl <> nil) and (AControl is TCustomComboBox)
@@ -1688,6 +1690,8 @@ begin
     FDataLink.Free;
   end;
   if assigned(FRowCache) then FRowCache.Free;
+  if not (csDesigning in ComponentState) then
+    Application.RemoveOnKeyDownBeforeHandler( @KeyDownHandler );
   Application.RemoveAsyncCalls(self);
   inherited Destroy;
 end;
