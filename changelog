@@ -49,6 +49,8 @@ IBX Change Log  version (2.4-0 Build 11661) Thu, 11 Apr 2019 09:43:38 +0100
 16. TIBXControlService descendents: DatabaseName may now be set using a database
     connect string. The database name is extracted from the connect string.
 
+17. DBControlGrid: Minor bug fixes. avoid AV on form closure, avoid black panel
+
 IBX Change Log  version (2.3-5 Build 12350) Tue, 25 Aug 2020 16:11:02 +0100
 
 1.  TIBStringField: when a string value is read from a dataset buffer, if the
