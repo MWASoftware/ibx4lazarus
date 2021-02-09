@@ -29,6 +29,7 @@ protected
   procedure CreateObjects(Application: TTestApplication); override;
   function GetFullTestID: string;
   function GetOutFile: string;
+  function GetSSBackupFile: string;
   procedure InitialiseDatabase(aDatabase: TIBDatabase); virtual;
   procedure PrintDataSet(aDataSet: TDataSet);
   procedure PrintDataSetRow(aDataSet: TDataSet); overload;
@@ -147,6 +148,11 @@ begin
   Result := Format(outFileTemplate,[GetFullTestID]);
 end;
 
+function TIBXTestBase.GetSSBackupFile: string;
+begin
+  Result := ChangeFileExt(Owner.GetBackupFileName,'.fbk');
+end;
+
 procedure TIBXTestBase.InitialiseDatabase(aDatabase: TIBDatabase);
 var aFileName: string;
 begin
@@ -204,7 +210,7 @@ begin
     end;
 
   ftFloat:
-    writeln(OutFile, aField.FieldName,' = ',FormatFloat('#,##0.00000000',aField.AsFloat));
+    writeln(OutFile, aField.FieldName,' = ',FormatFloat('#,##0.000000000000',aField.AsFloat));
 
   ftLargeint:
     writeln(OutFile,aField.FieldName,' = ',aField.AsString);

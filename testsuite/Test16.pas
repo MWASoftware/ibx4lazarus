@@ -123,7 +123,6 @@ begin
       writeln(OutFile,'Unable to locate Dept 600');
     if FDepartmentTable.Locate('DEPT_NO','621',[]) then
     begin
-      PrintDataSet(FEmployeeTable);
       writeln(OutFile);
       writeln(OutFile,'Department No ',FDepartmentTable.FieldByName('DEPT_NO').AsString,' Selected');
       PrintDataSet(FEmployeeTable);

@@ -72,7 +72,7 @@ object Form1: TForm1
         TabOrder = 0
         object Label2: TLabel
           Left = 11
-          Height = 15
+          Height = 13
           Top = 16
           Width = 25
           Caption = 'Title'
@@ -80,7 +80,7 @@ object Form1: TForm1
         end
         object DBEdit1: TDBEdit
           Left = 11
-          Height = 25
+          Height = 24
           Top = 31
           Width = 373
           DataField = 'DEPARTMENT'
@@ -92,15 +92,15 @@ object Form1: TForm1
         end
         object Label3: TLabel
           Left = 13
-          Height = 15
+          Height = 13
           Top = 71
-          Width = 51
+          Width = 50
           Caption = 'Location'
           ParentColor = False
         end
         object DBEdit4: TDBEdit
           Left = 13
-          Height = 25
+          Height = 24
           Top = 86
           Width = 179
           DataField = 'LOCATION'
@@ -111,7 +111,7 @@ object Form1: TForm1
         end
         object Label4: TLabel
           Left = 219
-          Height = 15
+          Height = 13
           Top = 71
           Width = 44
           Caption = 'Budget'
@@ -119,7 +119,7 @@ object Form1: TForm1
         end
         object DBEdit2: TDBEdit
           Left = 219
-          Height = 25
+          Height = 24
           Top = 86
           Width = 165
           DataField = 'BUDGET'
@@ -131,7 +131,7 @@ object Form1: TForm1
         end
         object Label5: TLabel
           Left = 219
-          Height = 15
+          Height = 13
           Top = 121
           Width = 61
           Caption = 'Phone No.'
@@ -139,7 +139,7 @@ object Form1: TForm1
         end
         object DBEdit3: TDBEdit
           Left = 219
-          Height = 25
+          Height = 24
           Top = 136
           Width = 165
           DataField = 'PHONE_NO'
@@ -151,7 +151,7 @@ object Form1: TForm1
         end
         object Label6: TLabel
           Left = 12
-          Height = 15
+          Height = 13
           Top = 121
           Width = 52
           Caption = 'Manager'
@@ -176,7 +176,7 @@ object Form1: TForm1
         end
         object Label7: TLabel
           Left = 12
-          Height = 15
+          Height = 13
           Top = 172
           Width = 115
           Caption = 'Departmental Staff'
@@ -250,7 +250,7 @@ object Form1: TForm1
   end
   object Label1: TLabel
     Left = 11
-    Height = 15
+    Height = 13
     Top = 17
     Width = 79
     Caption = 'Departments'
@@ -277,7 +277,7 @@ object Form1: TForm1
     TabOrder = 2
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     CreateIfNotExists = False
     AllowStreamedConnected = False
     DatabaseName = 'localhost:employee'
@@ -357,6 +357,7 @@ object Form1: TForm1
     GenerateParamNames = False
     MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
+    SQLFiltered = False
     AfterTransactionEnd = DepartmentsAfterTransactionEnd
     left = 144
     top = 176
@@ -485,6 +486,7 @@ object Form1: TForm1
       'order by 2'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 144
     top = 224
@@ -516,6 +518,7 @@ object Form1: TForm1
         Name = 'DEPT_NO'
         ParamType = ptInput
       end>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
     left = 144
     top = 272

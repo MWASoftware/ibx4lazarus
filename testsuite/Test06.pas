@@ -4,7 +4,8 @@ unit Test06;
 
 {Test 6: Multi-Database Transaction}
 
-{ Description
+{ creates two databases and adds a record to each as a multi-database transaction.
+  Commit and print results.
 }
 
 interface

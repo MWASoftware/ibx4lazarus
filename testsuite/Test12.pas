@@ -4,7 +4,20 @@ unit Test12;
 
 {Test 12 Test use of Services Connection}
 
-{ Description
+{ Tests out the Services Interface for functions:
+  1. Show Server Properties
+  2. Show Database Stats
+  3. Show Server Log
+  4. Validate Database
+  5. Database Sweep
+  6. User List Handling (Show users, create user, Edit user, Delete User)
+  7. Shutdown DB and bring back online
+  8. Client side backup/restore
+  9. Server Side Backup/restore
+  10. Limbo Transaction Resolution.
+  11. Show Database Properties
+  12. Update Database Properties
+  13. Create, Remove and Activate a Shadow File.
 }
 
 interface
@@ -303,6 +316,7 @@ begin
     S.Free;
   end;
   writeln(Outfile,'Restore Completed');
+  DeleteFile(Owner.GetBackupFileName);
 end;
 
 procedure TTest12.SSBackupRestore;
@@ -312,7 +326,7 @@ begin
   writeln(OutFile,'Starting Server Side Backup');
   S := TStringList.Create;
   try
-    FSSBackupService.BackupFiles.Add(Owner.GetBackupFileName);
+    FSSBackupService.BackupFiles.Add(GetSSBackupFile);
     FSSBackupService.Verbose := true;
     FSSBackupService.Execute(S);
     WriteStrings(S);
@@ -345,7 +359,7 @@ end;
 
 procedure TTest12.DatabasePropertiesTests;
 begin
-  writeln(Outfile,'Update properties');
+  writeln(Outfile,'Update properties for ',IBDatabase.DatabaseName);
   IBDatabase.Connected := false;
   with FIBConfigService do
   begin

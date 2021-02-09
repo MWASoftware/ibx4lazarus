@@ -4,7 +4,8 @@ unit Test21;
 
 {Test 21: Big dataset test}
 
-{ Description
+{ create a 100,000 record database.
+  read it back and check for errors using an MD5 message digest.
 }
 
 interface

@@ -87,7 +87,7 @@ begin
   IBDatabase.Connected := true;
   with FIBSQL do
   begin
-     SQL.Text := sqlExample;
+     SQL.Text := sqlExample + ' Order By 1';
      Transaction.Active := true;
      Prepare;
      PrintMetaData(MetaData);
@@ -108,6 +108,7 @@ begin
        WritePerfStats(stats);
      PrintAffectedRows(IBQuery);
      writeln(OutFile);
+     writeln(OutFile,'------------------------------------------------------');
      writeln(OutFile,'With Named Parameter');
      SQL.Text := sqlExample + ' Where Hire_Date < :HireDate';
      Transaction.Active := true;
@@ -158,7 +159,7 @@ begin
      end;
 
      writeln(OutFile);
-     writeln(OutFile,'Call Delete Employee');
+     writeln(OutFile,'Call Delete Employee - exception expected');
      SQL.Text := 'Execute Procedure Delete_EMPLOYEE :EMP_NO';
      ParamByName('EMP_NO').AsInteger := 11;
      try

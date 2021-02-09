@@ -67,7 +67,7 @@ const
 'Select A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,'+
 'A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH '+
 'From EMPLOYEE A '+
-'JOIN Depts D On D.DEPT_NO = A.DEPT_NO';
+'JOIN Depts D On D.DEPT_NO = A.DEPT_NO order by 1';
 
 { TCalcQuery }
 
@@ -168,6 +168,7 @@ begin
      writeln(OutFile,'Back to EMP_NO = 12');
      PrintDataSetRow(FQuery);
 
+     writeln(OutFile,'Locate Employee 20, First Name and Last Name');
      aResultFields := Lookup('EMP_NO',20,'FIRST_NAME;LAST_NAME');
      if varType(aResultFields) <> varNull then
      begin

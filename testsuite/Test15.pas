@@ -103,9 +103,12 @@ begin
   IBDatabase.Connected := true;
   try
     IBTransaction.Active := true;
+    writeln(Outfile,'-------------------------------------------------------');
+    writeln(Outfile,'Exec TEST proc');
     FIBStoredProc2.ExecProc;
     IBTransaction.Commit;
     IBTransaction.Active := true;
+    writeln(Outfile,'Show FB$OUT_TABLE');
     IBQuery.Active := true;
     PrintDataSet(IBQuery);
     FIBStoredProc1.ExecProc;

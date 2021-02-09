@@ -4,7 +4,9 @@ unit Test11;
 
 {Test 11: Event Handling}
 
-{ Description
+{ This tests calling an event handler in response to a database event.
+  A simple database is used consisting of a stored procedure only.
+  Two cases are tested: event registration before and after DB Open.
 }
 
 interface

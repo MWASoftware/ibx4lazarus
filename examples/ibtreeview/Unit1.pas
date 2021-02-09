@@ -32,7 +32,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, DbCtrls, ActnList, Menus, db, IBTreeView, IBDatabase,
+  StdCtrls, DbCtrls, ActnList, Menus, db, DBTreeView, IBTreeView, IBDatabase,
   IBCustomDataSet, IBLookupComboEditBox, IBQuery, IBDynamicGrid, ComCtrls;
 
 type
@@ -182,7 +182,7 @@ procedure TForm1.DeleteNodeExecute(Sender: TObject);
 begin
   if MessageDlg(Format('Do you want to delete the %s department?',[IBTreeview1.Selected.Text]),
               mtConfirmation,[mbYes,mbNo],0) = mrYes then
-    TIBTreeNode(IBTreeview1.Selected).DeleteAll
+    TDBTreeNode(IBTreeview1.Selected).DeleteAll
 end;
 
 procedure TForm1.DeleteNodeUpdate(Sender: TObject);
