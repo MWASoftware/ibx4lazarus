@@ -175,13 +175,13 @@ begin
     begin
       write(OutFile,'CTE',j);
       if CTES[j]^.Recursive then write(OutFile,' recursive');
-      writeln(': ',CTES[j]^.Name,' as ',CTEs[j]^.text);
+      writeln(OutFile,': ',CTES[j]^.Name,' as ',CTEs[j]^.text);
     end;
-    writeln('Select:' ,SelectClause);
-    writeln('From: ',FromClause);
-    writeln('Where: ',WhereClause);
-    writeln('Group By: ',GroupClause);
-    writeln('Having: ',HavingClause);
+    writeln(OutFile,'Select: ' ,SelectClause);
+    writeln(OutFile,'From: ',FromClause);
+    writeln(OutFile,'Where: ',WhereClause);
+    writeln(OutFile,'Group By: ',GroupClause);
+    writeln(OutFile,'Having: ',HavingClause);
     if Union <> nil then
     begin
       write(OutFile,'Union');
@@ -189,11 +189,11 @@ begin
       writeln(OutFile);
       WriteSelect(Union);
     end;
-    writeln('Order by: ',OrderByClause);
-    writeln('Plan: ',PlanClause);
-    writeln('Rows: ',RowsClause);
-    writeln('SQL: ',SQLText);
-    writeln('Params: ');
+    writeln(OutFile,'Order by: ',OrderByClause);
+    writeln(OutFile,'Plan: ',PlanClause);
+    writeln(OutFile,'Rows: ',RowsClause);
+    writeln(OutFile,'SQL: ',SQLText);
+    writeln(OutFile,'Params: ');
     for j := 0 to ParamList.Count - 1 do
       write(OutFile,ParamList[j],',');
     writeln(OutFile);

@@ -48,6 +48,7 @@ type
     procedure InitTest; override;
   public
     destructor Destroy; override;
+    function ChildProcess: boolean; override;
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
   end;
 
@@ -104,7 +105,7 @@ begin
   {$endif}
   if fpSigAction(SigTerm,Fna,Foa)<>0 then
   begin
-    writeln('Error setting signal handler: ',fpgeterrno,'.');
+    writeln(OutFile,'Error setting signal handler: ',fpgeterrno,'.');
     halt(1);
   end;
 end;
@@ -165,6 +166,11 @@ destructor TTest14.Destroy;
 begin
   FLog.Free;
   inherited Destroy;
+end;
+
+function TTest14.ChildProcess: boolean;
+begin
+  Result := Owner.TestOption <> '';
 end;
 
 procedure TTest14.RunTest(CharSet: AnsiString; SQLDialect: integer);

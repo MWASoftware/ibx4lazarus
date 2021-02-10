@@ -17,7 +17,7 @@ uses
 
 const
   aTestID    = '11';
-  aTestTitle = 'Test 11';
+  aTestTitle = 'Event Handling';
 
 type
 

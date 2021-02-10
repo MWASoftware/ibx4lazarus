@@ -1,0 +1,16 @@
+[requires]
+packages=fcl-res
+libc=y
+
+[compiler]
+options= -MObjFPC -Scghi -Cg -Cr -O1 -g -gl -gh -l -vewnhibq -dUseCThreads
+
+unittargetdir=testunits/$(CPU_TARGET)-$(OS_TARGET)
+includedir=$(FBINTF)/client/3.0/firebird $(FBINTF)/client/include ../include
+unitdir=testApp $(FBINTF) $(FBINTF)/client $(FBINTF)/client/3.0/firebird $(FBINTF)/client/2.5 . $(FBINTF)/client/3.0 ../runtime/nongui ../iblocaldb/nongui $(LAZARUS)/components/lazutils
+
+[target]
+programs=testsuite 
+
+
+

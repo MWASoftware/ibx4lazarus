@@ -46,6 +46,7 @@ protected
   procedure ShowBoolValue(aValue: integer; WhenTrue, WhenFalse: string);
   procedure ProcessResults; override;
 public
+  destructor Destroy; override;
   property IBDatabase: TIBDatabase read  FIBDatabase;
   property IBTransaction: TIBTransaction read FIBTransaction;
   property IBQuery: TIBQuery read FIBQuery;
@@ -261,10 +262,10 @@ var SelectCount, InsertCount, UpdateCount, DeleteCount: integer;
 begin
   if query.GetRowsAffected(SelectCount, InsertCount, UpdateCount, DeleteCount) then
   begin
-    writeln('Selects = ',SelectCount);
-    writeln('Inserts = ',InsertCount);
-    writeln('Updates = ',UpdateCount);
-    writeln('Deletes = ',DeleteCount);
+    writeln(OutFile,'Selects = ',SelectCount);
+    writeln(OutFile,'Inserts = ',InsertCount);
+    writeln(OutFile,'Updates = ',UpdateCount);
+    writeln(OutFile,'Deletes = ',DeleteCount);
   end;
 end;
 
@@ -273,10 +274,10 @@ var SelectCount, InsertCount, UpdateCount, DeleteCount: integer;
 begin
   if query.statement.GetRowsAffected(SelectCount, InsertCount, UpdateCount, DeleteCount) then
   begin
-    writeln('Selects = ',SelectCount);
-    writeln('Inserts = ',InsertCount);
-    writeln('Updates = ',UpdateCount);
-    writeln('Deletes = ',DeleteCount);
+    writeln(OutFile,'Selects = ',SelectCount);
+    writeln(OutFile,'Inserts = ',InsertCount);
+    writeln(OutFile,'Updates = ',UpdateCount);
+    writeln(OutFile,'Deletes = ',DeleteCount);
   end;
 end;
 
@@ -382,6 +383,12 @@ begin
        S.Free;
      end;
    end;
+end;
+
+destructor TIBXTestBase.Destroy;
+begin
+  IBDatabase.Connected := false;
+  inherited Destroy;
 end;
 
 end.

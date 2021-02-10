@@ -77,6 +77,7 @@ type
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
   public
+    destructor Destroy; override;
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
   end;
 
@@ -221,8 +222,13 @@ begin
     WriteStrings(S);
     S.Clear;
     writeln(OutFile,'Normal Validation');
-    FIBValidationService.Options := [ValidateFull];
-    FIBValidationService.Execute(S);
+    FIBConfigService.ShutDownDatabase(Forced,0);
+    try
+      FIBValidationService.Options := [ValidateFull];
+      FIBValidationService.Execute(S);
+    finally
+      FIBConfigService.BringDatabaseOnline;
+      end;
     WriteStrings(S);
   finally
     S.Free;
@@ -321,6 +327,9 @@ end;
 
 procedure TTest12.SSBackupRestore;
 var S: TStringList;
+    ServerDatabase: TIBDatabase;
+    ServerTransaction: TIBTransaction;
+    ServerQuery: TIBQuery;
 begin
   writeln(OutFile);
   writeln(OutFile,'Starting Server Side Backup');
@@ -339,6 +348,34 @@ begin
     S.Free;
   end;
   writeln(Outfile,'Restore Completed');
+  ServerDatabase := TIBDatabase.Create(Owner);
+  ServerTransaction := TIBTransaction.Create(Owner);
+  ServerQuery := TIBQuery.Create(Owner);
+  try
+    with FIBXServicesConnection do
+      ServerDatabase.DatabaseName := MakeConnectString(ServerName,FSSRestoreService.DatabaseFiles[0],Protocol,PortNo);
+    ServerDatabase.FirebirdLibraryPathName := Owner.ClientLibraryPath;
+    ServerDatabase.LoginPrompt := false;
+    ServerDatabase.Params.Assign(IBDatabase.Params);
+    ServerTransaction.DefaultDatabase := ServerDatabase;
+    ServerTransaction.Params.Assign(IBTransaction.Params);
+    ServerDatabase.DefaultTransaction := ServerTransaction;
+    ServerQuery.Database := ServerDatabase;
+    ServerQuery.SQL.Text := 'Select * From EMPLOYEE Order by EMP_NO';
+    ServerDatabase.Connected := true;
+    try
+      ServerTransaction.Active := true;
+      ServerQuery.Active := true;
+      writeln(OutFile,'Show the EMPLOYEE Table from the restored database');
+      PrintDataset(ServerQuery);
+    finally
+      ServerDatabase.DropDatabase;
+    end;
+  finally
+    ServerQuery.Free;
+    ServerTransaction.Free;
+    ServerDatabase.Free;
+  end;
 end;
 
 procedure TTest12.LimboTransactionResolution;
@@ -564,62 +601,65 @@ begin
   FIBShadowDatabase.Params.Assign(IBDatabase.Params);
 end;
 
+destructor TTest12.Destroy;
+begin
+  FIBShadowDatabase.Connected := false;
+  FIBXServicesConnection.Connected := false;
+  inherited Destroy;
+end;
+
 procedure TTest12.RunTest(CharSet: AnsiString; SQLDialect: integer);
 begin
   FIBXServicesConnection.Connected := true;
-  ShowServerProperties;
-  ShowStatistics;
-  ShowServerLog;
-  ValidateDatabase;
-  DatabaseSweepDB;
-  UserListHandling;
-  DBUpDown;
-  BackupRestore;
-  writeln(OutFile,'Show the EMPLOYEE Table from the restored database');
-  IBDatabase.Connected := true;
   try
-    IBTransaction.Active := true;
-    IBQuery.Active := true;
-    PrintDataset(IBQuery);
+    ShowServerProperties;
+    ShowStatistics;
+    ShowServerLog;
+    ValidateDatabase;
+    DatabaseSweepDB;
+    UserListHandling;
+    DBUpDown;
+    BackupRestore;
+    writeln(OutFile,'Show the EMPLOYEE Table from the restored database');
+    IBDatabase.Connected := true;
+    try
+      IBTransaction.Active := true;
+      IBQuery.Active := true;
+      PrintDataset(IBQuery);
+    finally
+      IBDatabase.DropDatabase;
+    end;
+    SSBackupRestore;
+    exit;
+    LimboTransactionResolution;
+    IBDatabase.DatabaseName := Owner.GetNewDatabaseName;
+    FIBConfigService.DatabaseName := IBDatabase.DatabaseName;
+    FIBXServicesConnection.Connected := false;
+    writeln(Outfile,'Creating an empty database ',IBDatabase.DatabaseName);
+    IBDatabase.CreateDatabase;
+    try
+      FIBXServicesConnection.Connected := true;
+      ShowDatabaseProperties;
+      DatabasePropertiesTests;
+    finally
+      IBDatabase.DropDatabase;
+    end;
+    writeln(Outfile,'Create and activate a shadow file');
+    IBDatabase.CreateDatabase;
+    try
+      CreateShadow;
+      ShowShadowFiles;
+      RemoveShadow;
+      IBDatabase.Connected := false;
+      writeln(Outfile,FIBShadowDatabase.DatabaseName,' Is Shadow Database = ',IsShadowDatabase(FIBShadowDatabase.DatabaseName));
+      ActivateShadow;
+      writeln(Outfile,FIBShadowDatabase.DatabaseName,' Is Shadow Database = ',IsShadowDatabase(FIBShadowDatabase.DatabaseName));
+    finally
+      IBDatabase.DropDatabase;
+      FIBShadowDatabase.DropDatabase;
+    end;
   finally
-    IBDatabase.DropDatabase;
-  end;
-  SSBackupRestore;
-  writeln(OutFile,'Show the EMPLOYEE Table from the restored database');
-  IBDatabase.Connected := true;
-  try
-    IBTransaction.Active := true;
-    IBQuery.Active := true;
-    PrintDataset(IBQuery);
-  finally
-    IBDatabase.DropDatabase;
-  end;
-  LimboTransactionResolution;
-  IBDatabase.DatabaseName := Owner.GetNewDatabaseName;
-  FIBConfigService.DatabaseName := IBDatabase.DatabaseName;
-  FIBXServicesConnection.Connected := false;
-  writeln(Outfile,'Creating an empty database ',IBDatabase.DatabaseName);
-  IBDatabase.CreateDatabase;
-  try
-    FIBXServicesConnection.Connected := true;
-    ShowDatabaseProperties;
-    DatabasePropertiesTests;
-  finally
-    IBDatabase.DropDatabase;
-  end;
-  writeln(Outfile,'Create and activate a shadow file');
-  IBDatabase.CreateDatabase;
-  try
-    CreateShadow;
-    ShowShadowFiles;
-    RemoveShadow;
-    IBDatabase.Connected := false;
-    writeln(Outfile,FIBShadowDatabase.DatabaseName,' Is Shadow Database = ',IsShadowDatabase(FIBShadowDatabase.DatabaseName));
-    ActivateShadow;
-    writeln(Outfile,FIBShadowDatabase.DatabaseName,' Is Shadow Database = ',IsShadowDatabase(FIBShadowDatabase.DatabaseName));
-  finally
-    IBDatabase.DropDatabase;
-    FIBShadowDatabase.DropDatabase;
+    FIBXServicesConnection.Connected := false;
   end;
 end;
 

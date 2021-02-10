@@ -10,7 +10,7 @@ unit Test28;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB, IBCMLocalDBSupport,
+  Classes, SysUtils,   TestApplication, IBXTestBase, IB, IBCMLocalDBSupport,
   IBExtract, IBSQL;
 
 const
