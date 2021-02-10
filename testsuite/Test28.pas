@@ -56,7 +56,7 @@ begin
   VersionNo := 0;
   IBTransaction.Active := true;
   try
-    with TIBSQL.Create(Owner) do
+    with TIBSQL.Create(nil) do
     try
       Database := IBDatabase;
       Transaction := IBTransaction;
@@ -71,7 +71,7 @@ begin
       Free
     end;
 
-    with TIBSQL.Create(Owner)  do
+    with TIBSQL.Create(nil)  do
     try
       Database := IBDatabase;
       Transaction := IBTransaction;

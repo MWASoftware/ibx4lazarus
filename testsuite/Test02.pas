@@ -15,7 +15,7 @@ unit Test02;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB;
+  Classes, SysUtils,   TestApplication, IBXTestBase, IB;
 
 const
   aTestID    = '02';

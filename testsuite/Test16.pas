@@ -20,7 +20,7 @@ unit Test16;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, DB, IB, IBTable,
+  Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBTable,
   IBCustomDataset;
 
 const

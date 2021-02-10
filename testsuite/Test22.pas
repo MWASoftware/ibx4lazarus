@@ -11,7 +11,7 @@ unit Test22;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, DB, IB, IBSQL, IBUpdate,
+  Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBSQL, IBUpdate,
   IBQuery, IBCustomDataset;
 
 const

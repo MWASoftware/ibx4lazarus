@@ -7,7 +7,7 @@ unit Test05;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, DB, IB, IBCustomDataSet,
+  Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBCustomDataSet,
   IBDatabase, IBExtract;
 
 const

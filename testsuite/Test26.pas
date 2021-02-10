@@ -10,7 +10,7 @@ unit Test26;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB,
+  Classes, SysUtils,   TestApplication, IBXTestBase, IB,
   IBXScript, IBDataOutput;
 
 const

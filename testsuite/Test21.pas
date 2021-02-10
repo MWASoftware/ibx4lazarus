@@ -11,7 +11,7 @@ unit Test21;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB, IBSQL, MD5;
+  Classes, SysUtils,   TestApplication, IBXTestBase, IB, IBSQL, MD5;
 
 const
   aTestID    = '21';

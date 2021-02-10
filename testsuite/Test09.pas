@@ -7,7 +7,7 @@ unit Test09;
 interface
 
 uses
-  Classes, SysUtils, CustApp, TestApplication, IBXTestbase, IB, IBExtract;
+  Classes, SysUtils,  TestApplication, IBXTestbase, IB, IBExtract;
 
 const
   aTestID    = '09';

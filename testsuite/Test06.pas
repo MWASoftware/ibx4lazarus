@@ -11,7 +11,7 @@ unit Test06;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB, IBDatabase, IBSQL;
+  Classes, SysUtils,   TestApplication, IBXTestBase, IB, IBDatabase, IBSQL;
 
 const
   aTestID    = '06';

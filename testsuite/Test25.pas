@@ -10,7 +10,7 @@ unit Test25;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, DB, IB, IBTable,
+  Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBTable,
   IBCustomDataSet, IBExtract, IBXScript;
 
 const

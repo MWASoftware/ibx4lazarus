@@ -10,7 +10,7 @@ unit Test20;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, DB, IB,
+  Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB,
   IBCustomDataSet, IBUpdateSQL, IBQuery;
 
 const

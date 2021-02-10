@@ -19,7 +19,7 @@ a text blob which is then printed out.
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB, IBStoredProc,
+  Classes, SysUtils,   TestApplication, IBXTestBase, IB, IBStoredProc,
   IBDatabase;
 
 const

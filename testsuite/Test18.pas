@@ -10,7 +10,7 @@ unit Test18;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, Db, IB, IBCustomDataSet;
+  Classes, SysUtils,   TestApplication, IBXTestBase, Db, IB, IBCustomDataSet;
 
 const
   aTestID    = '18';

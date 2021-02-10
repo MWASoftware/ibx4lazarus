@@ -13,7 +13,7 @@ unit Test03;
 interface
 
 uses
-  Classes, SysUtils, CustApp, TestApplication, IBXTestBase, IB, IBDatabaseInfo, IBQuery, IBDatabase;
+  Classes, SysUtils,  TestApplication, IBXTestBase, IB, IBDatabaseInfo, IBQuery, IBDatabase;
 
 const
   aTestID    = '03';

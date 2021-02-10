@@ -12,7 +12,7 @@ unit Test04;
 interface
 
 uses
-  Classes, SysUtils, CustApp, TestApplication, IBXTestBase, DB, IB, IBCustomDataSet;
+  Classes, SysUtils,  TestApplication, IBXTestBase, DB, IB, IBCustomDataSet;
 
 const
   aTestID    = '04';

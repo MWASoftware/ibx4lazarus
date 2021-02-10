@@ -14,7 +14,7 @@ unit Test23;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB, IBSQL;
+  Classes, SysUtils,   TestApplication, IBXTestBase, IB, IBSQL;
 
 const
   aTestID    = '23';

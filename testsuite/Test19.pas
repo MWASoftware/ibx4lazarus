@@ -12,7 +12,7 @@ unit Test19;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, DB, IB, IBQuery,
+  Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBQuery,
   fpTimer, IBInternals;
 
 const

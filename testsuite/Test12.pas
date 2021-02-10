@@ -23,7 +23,7 @@ unit Test12;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, DB, IB, IBXServices,
+  Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBXServices,
   IBDatabaseInfo, IBQuery, IBSQL, IBDatabase;
 
 const

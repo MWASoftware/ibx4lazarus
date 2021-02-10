@@ -12,7 +12,7 @@ unit Test11;
 interface
 
 uses
-  Classes, SysUtils, CustApp,  TestApplication, IBXTestBase, IB, IBEvents,
+  Classes, SysUtils,   TestApplication, IBXTestBase, IB, IBEvents,
   IBStoredProc;
 
 const
