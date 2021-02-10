@@ -2,7 +2,7 @@ unit Test24;
 
 {$mode objfpc}{$H+}
 
-{Test 17: IB Parser Tests}
+{Test 24: IB Parser Tests}
 
 {Iterates through a set of test strings, parsing each one and displaying the
  results including any parameters found. Note last string is the empty string}
@@ -41,7 +41,7 @@ const
         'JOIN Depts D On D.DEPT_NO = A.DEPT_NO',
 
         'Update EMPLOYEE A Set '#13#10'  A.DEPT_NO = :DEPT_NO,'#13#10 +
-        '  A.FIRST_NAME = ''Mr'' || :FIRST_NAME,'#13#10+
+        '  A.FIRST_NAME = ''Mr/Ms '' || :FIRST_NAME,'#13#10+
         '  A.HIRE_DATE = :HIRE_DATE,'#13#10+
         '  A.JOB_CODE = :JOB_CODE,'#13#10'  A.JOB_COUNTRY = :JOB_COUNTRY,'#13#10+
         '  A.JOB_GRADE = :JOB_GRADE,'#13#10'  A.LAST_NAME = :LAST_NAME,'#13#10+
@@ -231,11 +231,11 @@ begin
         writeln(OutFile,'Not a Select Statement');
         continue;
       end;
+      WriteSelect(parser);
       if i = 4 then
         Add2WhereClause('JOB_CODE = 2');
       if i = 5 then
          OrderByClause := '1';
-      WriteSelect(parser);
       writeln(Outfile,'Updated SQL');
       writeln(OutFile,SQLText);
     end;

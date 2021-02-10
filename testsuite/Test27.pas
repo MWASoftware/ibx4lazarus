@@ -148,15 +148,18 @@ end;
 
 procedure TTest27.RunTest(CharSet: AnsiString; SQLDialect: integer);
 begin
-  IBDatabase.Connected := true;
-  with IBQuery do
-  begin
-     AllowAutoActivateTransaction := true;
-     SQL.Text := sqlExample;
-     Active := true;
-     PrintDataSet(IBQuery);
+  try
+    IBDatabase.Connected := true;
+    with IBQuery do
+    begin
+      AllowAutoActivateTransaction := true;
+      SQL.Text := sqlExample;
+      Active := true;
+      PrintDataSet(IBQuery);
+    end;
+ finally
+    IBDatabase.DropDatabase;
   end;
-  IBDatabase.DropDatabase;
 end;
 
 initialization

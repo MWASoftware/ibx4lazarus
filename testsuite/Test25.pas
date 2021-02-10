@@ -4,7 +4,7 @@ unit Test25;
 
 {Test 25: TIBTable Tests}
 
-{ Description
+{ Append, Update, Delete tests on TIBTable
 }
 
 interface

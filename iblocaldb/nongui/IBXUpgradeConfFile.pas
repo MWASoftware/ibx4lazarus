@@ -123,7 +123,7 @@ type
 
 implementation
 
-uses ZStream, IBBlob, ibxscript;
+uses ZStream, IBBlob, ibxscript, IBMessages;
 
 const
   sSectionheader      = 'Version.%.3d';
@@ -217,7 +217,8 @@ begin
     Blob.Database := (Sender as TIBXScript).Database;
     Blob.Transaction := (Sender as TIBXScript).Transaction;
     Blob.Mode := bmWrite;
-    if not GetSourceFile(ParamName,FileName) then Exit;
+    if not GetSourceFile(ParamName,FileName) then
+      IBError(ibxeResourceFileNotFound,[FileName]);
 
     if CompareText(ExtractFileExt(FileName),'.gz') = 0 then  {gzip compressed file}
       Source := TGZFileStream.Create(FileName,gzopenread)

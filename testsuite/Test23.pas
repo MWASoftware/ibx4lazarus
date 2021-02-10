@@ -2,7 +2,14 @@ unit Test23;
 
 {$mode objfpc}{$H+}
 
-{Test 23: Transliteration Tests}
+{Test 23: Transliteration Tests
+
+ A test database is created with a row containing text data types and then
+ initialised to text is European Character sets i.e. not just ASCII.
+
+ The text is read back both as text and as hex characters with various
+ connection character sets.
+}
 
 interface
 

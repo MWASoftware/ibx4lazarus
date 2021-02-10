@@ -4,7 +4,8 @@ unit Test22;
 
 {Test 22: TIBUpdate Tests}
 
-{ Description
+{ This test uses TIBUpdate to allow a list of database users to be presented
+  as a table and edited using normal insert/edit/delete/post methods.
 }
 
 interface

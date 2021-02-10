@@ -4,7 +4,7 @@ unit Test26;
 
 {Test 26: IBXScript data out and exceptional conditions}
 
-{ Description
+{ Dumps data in CSV, Insert and Table formats + error conditions
 }
 
 interface
@@ -89,13 +89,13 @@ begin
   try
     IBTransaction.Active := true;
     IBXScriptObj.DataOutputFormatter := FDataOutputCSVFormater;
-    writeln(Outfile,'Dump employee table to CSV');
+    writeln(Outfile,'Dump project table to CSV');
     IBXScriptObj.ExecSQLScript(sQuery);
     IBXScriptObj.DataOutputFormatter := FDataOutputSQLFormater;
-    writeln(Outfile,'Dump employee table to Insert Statements');
+    writeln(Outfile,'Dump project table to Insert Statements');
     IBXScriptObj.ExecSQLScript(sQuery);
     IBXScriptObj.DataOutputFormatter := FDataOutputBlockFormater;
-    writeln(Outfile,'Dump employee table to Data Block Format');
+    writeln(Outfile,'Dump project table to Data Block Format');
     IBXScriptObj.ExecSQLScript(sQuery);
     writeln(Outfile,'Unknown SET statement - stop on first error');
     IBXScriptObj.StopOnFirstError := true;
