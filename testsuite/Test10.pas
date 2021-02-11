@@ -8,7 +8,7 @@ unit Test10;
 interface
 
 uses
-  Classes, SysUtils,  TestApplication, IBXTestbase, IB, IBExtract;
+  Classes, SysUtils,  TestApplication, IBXTestbase, IB, IBExtract, IBDatabase;
 
 const
   aTestID    = '10';
@@ -27,6 +27,7 @@ type
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
+    procedure InitialiseDatabase(aDatabase: TIBDatabase); override;
   public
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
   end;
@@ -69,6 +70,12 @@ begin
   IBDatabase.CreateIfNotExists := true;
 end;
 
+procedure TTest10.InitialiseDatabase(aDatabase: TIBDatabase);
+begin
+  IBXScriptObj.StopOnFirstError := false;
+  inherited InitialiseDatabase(aDatabase);
+end;
+
 procedure TTest10.RunTest(CharSet: AnsiString; SQLDialect: integer);
 begin
   IBDatabase.Connected := true;
@@ -77,6 +84,7 @@ begin
   FExtract.ExtractObject(eoDatabase,'',[etData,etGrantsToUser]);
   WriteStrings(FExtract.Items);
   FExtract.Items.SaveToFile(GetOutFile);
+  writeln(OutFile,'Schema written to ',GetOutFile);
   IBDatabase.DropDatabase;
 end;
 

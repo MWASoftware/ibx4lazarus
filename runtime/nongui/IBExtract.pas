@@ -748,7 +748,7 @@ begin
        (Trim(qryTables.FieldByName('RDB$OWNER_NAME').AsString) <> '') then
       ExtractOut(Format('%s/* Table: %s, Owner: %s */%s',
         [LineEnding, RelationName,
-         qryTables.FieldByName('RDB$OWNER_NAME').AsString, LineEnding]));
+         TrimRight(qryTables.FieldByName('RDB$OWNER_NAME').AsString), LineEnding]));
     if TableType > 3 then
      CreateTable := 'CREATE GLOBAL TEMPORARY TABLE'
     else
@@ -771,8 +771,10 @@ begin
     while not qryTables.Eof do
     begin
        AddComment(qryTables,ctColumn,Comments,'RDB$DESCRIPTION1');
-       Column := TAB + QuoteIdentifier(trim(qryTables.FieldByName('RDB$FIELD_NAME').AsString)) +
-                 TAB + GetFieldType(qryTables);
+       Column := TAB + QuoteIdentifier(trim(qryTables.FieldByName('RDB$FIELD_NAME').AsString));
+
+      if qryTables.FieldByName('rdb$computed_blr').IsNull then
+         Column := Column + TAB + GetFieldType(qryTables);
 
       if not qryTables.FieldByName('rdb$computed_blr').IsNull then
       begin
@@ -3333,8 +3335,8 @@ begin
     while not qryView.Eof do
     begin
       SList.Add(Format('%s/* View: %s, Owner: %s */%s',
-         [LineEnding, qryView.FieldByName('RDB$RELATION_NAME').AsString,
-          qryView.FieldByName('RDB$OWNER_NAME').AsString, LineEnding]));
+         [LineEnding, TrimRight(qryView.FieldByName('RDB$RELATION_NAME').AsString),
+          TrimRight(qryView.FieldByName('RDB$OWNER_NAME').AsString), LineEnding]));
 
       SList.Add(Format('CREATE VIEW %s (', [QuoteIdentifier(
         qryView.FieldByName('RDB$RELATION_NAME').AsString)]));
@@ -4252,7 +4254,7 @@ begin
       ExecQuery;
       try
         if not EOF then
-          FieldList := Fields[0].AsString;
+          FieldList := TrimRight(Fields[0].AsString);
       finally
         Close;
       end;
@@ -4263,7 +4265,7 @@ begin
     with TIBInsertStmtsOut.Create(self) do
     try
       Database := FDatabase;
-      if DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier( ObjectName)]),
+      if DataOut(Format('Select %s From %s',[FieldList,QuoteIdentifier( TrimRight(ObjectName))]),
                 Add2MetaData) then
         ExtractOut('COMMIT;');
     finally

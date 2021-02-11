@@ -76,6 +76,7 @@ type
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
+    procedure ProcessResults; override;
   public
     destructor Destroy; override;
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
@@ -601,10 +602,19 @@ begin
   FIBShadowDatabase.Params.Assign(IBDatabase.Params);
 end;
 
-destructor TTest12.Destroy;
+procedure TTest12.ProcessResults;
 begin
+  inherited ProcessResults;
   FIBShadowDatabase.Connected := false;
   FIBXServicesConnection.Connected := false;
+end;
+
+destructor TTest12.Destroy;
+begin
+  if FIBShadowDatabase <> nil then
+    FIBShadowDatabase.Connected := false;
+  if FIBXServicesConnection <> nil then
+    FIBXServicesConnection.Connected := false;
   inherited Destroy;
 end;
 

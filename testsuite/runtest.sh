@@ -43,7 +43,7 @@ if [ -x testsuite ]; then
   else
     diff FB4reference.log testout.log >diff.log
   fi
-  cat diff.log 
+ # cat diff.log 
 else
   echo "Unable to run test suite"
 fi

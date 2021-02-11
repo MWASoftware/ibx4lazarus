@@ -46,6 +46,7 @@ type
     function GetTestID: AnsiString; override;
     function GetTestTitle: AnsiString; override;
     procedure InitTest; override;
+    procedure ProcessResults; override;
   public
     destructor Destroy; override;
     function ChildProcess: boolean; override;
@@ -162,9 +163,21 @@ begin
   end;
 end;
 
+procedure TTest14.ProcessResults;
+begin
+  inherited ProcessResults;
+  if assigned(FLog) then
+    FreeAndNil(FLog);
+  if assigned(FProcess) then
+    FreeAndNil(FProcess);
+end;
+
 destructor TTest14.Destroy;
 begin
-  FLog.Free;
+  if assigned(FLog) then
+  FreeAndNil(FLog);
+  if assigned(FProcess) then
+    FreeAndNil(FProcess);
   inherited Destroy;
 end;
 

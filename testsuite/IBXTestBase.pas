@@ -383,11 +383,13 @@ begin
        S.Free;
      end;
    end;
+   IBDatabase.Connected := false;
 end;
 
 destructor TIBXTestBase.Destroy;
 begin
-  IBDatabase.Connected := false;
+  if IBDatabase <> nil then
+    IBDatabase.Connected := false;
   inherited Destroy;
 end;
 

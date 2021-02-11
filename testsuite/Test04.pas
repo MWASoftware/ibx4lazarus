@@ -16,7 +16,7 @@ uses
 
 const
   aTestID    = '04';
-  aTestTitle = 'handling of data types up to Firebird 3';
+  aTestTitle = 'Handling of data types up to Firebird 3';
 
 type
 
@@ -64,7 +64,7 @@ begin
     FieldByName('F6').AsDateTime := EncodeDateTime(2007,12,25,12,30,15,0);
     FieldByName('F7').AsDateTime := EncodeDateTime(2007,12,25,12,30,29,130);
     FieldByName('F8').AsString := 'XX';
-    FieldByName('F9').AsString := 'The Quick Brown Fox jumped over the lazy dog';
+    FieldByName('F9').AsString := 'The Quick Brown Fox jumps over the lazy dog';
     S := CreateBlobStream(FieldByName('F10'),bmWrite);
     F := TFileStream.Create('resources/Test04.jpg',fmOpenRead);
     try
