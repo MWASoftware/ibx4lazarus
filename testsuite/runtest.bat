@@ -2,6 +2,7 @@
 REM Test suite Configuration parameters (FPCDIR and FPCBIN)
 REM These may be modified if needed to suite local requirements
 
+LAZARUS=C:\lazarus
 FOR %%V in (3.2.0 3.0.4 3.0.2 3.0.0) do (
   if EXIST C:\lazarus\fpc\%%V\bin\i386-win32\fpc.exe (
     set FPCDIR=C:\lazarus\fpc\%%V
@@ -39,22 +40,24 @@ rd /s /q testunits
 mkdir %TESTOUTDIR%
 
 IF EXIST "..\fbintf" (
-  FBINTF=".\fbintf"
+  FBINTF=../fbintf
   goto COMPILE2
  )
 if EXISTS "..\..\fbintf" (
-  FBINTF="..\..\fbintf" 
+  FBINTF=../../fbintf 
   goto COMPILE2
  )
 echo Error: unable to locate Pascal Firebird Interface API"
 goto :EOF
 
 :COMPILE2
+set INCDIR=%FBINTF%/client/3.0/firebird %FBINTF%/client/include
+set UNITDIR=%FBINTF% %FBINTF%/client %FBINTF%/client/3.0/firebird %FBINTF%/client/2.5 %FBINTF%/client/3.0  %LAZARUS%/components/lazutils
 
-LAZARUS=\lazarus
+
 %FPCBIN%\fpcmake
 %FPCBIN%\make clean
-%FPCBIN%\make
+%FPCBIN%\make INCDIR="$INCDIR" UNITDIR="$UNITDIR"
 echo( 
 echo Starting Testsuite
 echo( 

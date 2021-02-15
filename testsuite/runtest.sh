@@ -20,7 +20,9 @@ else
   exit 2
 fi
 
-export LAZARUS=$HOME/lazarus
+LAZARUS=$HOME/lazarus
+INCDIR="$FBINTF/client/3.0/firebird $FBINTF/client/include"
+UNITDIR="$FBINTF $FBINTF/client $FBINTF/client/3.0/firebird $FBINTF/client/2.5 $FBINTF/client/3.0  $LAZARUS/components/lazutils"
 
 cd `dirname $0`
 mkdir -p $TESTOUTDIR
@@ -28,7 +30,7 @@ chmod 777 $TESTOUTDIR
 export FPCDIR=/usr/lib/fpc/`fpc -iV`
 fpcmake
 make clean
-make
+make INCDIR="$INCDIR" UNITDIR="$UNITDIR"
 if [ -x testsuite ]; then
   if [ -n "$FIREBIRD" ]; then
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$FIREBIRD/lib
