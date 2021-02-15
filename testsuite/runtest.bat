@@ -37,6 +37,21 @@ set DIFF=%FPCBIN%\diff.exe
 
 rd /s /q testunits
 mkdir %TESTOUTDIR%
+
+IF EXIST "..\fbintf" (
+  FBINTF=".\fbintf"
+  goto COMPILE2
+ )
+if EXISTS "..\..\fbintf" (
+  FBINTF="..\..\fbintf" 
+  goto COMPILE2
+ )
+echo Error: unable to locate Pascal Firebird Interface API"
+goto :EOF
+
+:COMPILE2
+
+LAZARUS=\lazarus
 %FPCBIN%\fpcmake
 %FPCBIN%\make clean
 %FPCBIN%\make
