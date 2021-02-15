@@ -1211,7 +1211,12 @@ var
 begin
   TextOut := TStringList.Create;
   try
-    s := Format('<array dim = "%d" sqltype = "%d" length = "%d" relation_name = "%s" column_name = "%s"',
+    if ar.GetCharSetWidth = 0 then
+      s := Format('<array dim = "%d" sqltype = "%d" length = "%d" relation_name = "%s" column_name = "%s"',
+                              [ar.GetDimensions,ar.GetSQLType,ar.GetSize,
+                               ar.GetTableName,ar.GetColumnName])
+    else
+      s := Format('<array dim = "%d" sqltype = "%d" length = "%d" relation_name = "%s" column_name = "%s"',
                                 [ar.GetDimensions,ar.GetSQLType,ar.GetSize div ar.GetCharSetWidth,
                                  ar.GetTableName,ar.GetColumnName]);
     case ar.GetSQLType of

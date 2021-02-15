@@ -297,6 +297,7 @@ begin
   SetupFirebirdEnv;
   CreateIfNotExists := true;
   PrepareDBParams(DBParams);
+  ServicesConnection.SetDBParams(DBParams);
 end;
 
 procedure TCustomIBLocalDBSupport.OnDatabaseConnected(Sender: TObject);
@@ -470,12 +471,18 @@ procedure TCustomIBLocalDBSupport.PrepareDBParams(DBParams: TStrings);
   end;
 
 begin
+ {$IFDEF UNIX}
+  if Database.FirebirdAPI.GetClientMajor >= 3 then
+  begin
     Remove('user_name');
     Remove('password');
     DBParams.Values['user_name'] := 'SYSDBA';
-    {$IFDEF WINDOWS}
-      DBParams.Values['password'] := 'masterkey';
-    {$ENDIF}
+  end;
+ {$ENDIF}
+ {$IFDEF WINDOWS}
+    DBParams.Values['user_name'] := 'SYSDBA';
+    DBParams.Values['password'] := 'masterkey';
+  {$ENDIF}
 end;
 
 procedure TCustomIBLocalDBSupport.SetDatabaseName(AValue: string);

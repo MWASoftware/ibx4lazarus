@@ -36,7 +36,6 @@ done
 fi
 
 export FIREBIRD=/opt/firebird$FB$BUILD
-export LD_LIBRARY_PATH=$FIREBIRD/lib
 
 if [ ! -d "$FIREBIRD" ]; then
   echo "$FIREBIRD not found"

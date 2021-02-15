@@ -19,7 +19,9 @@ private
   FIBQuery: TIBQuery;
   FIBXScript: TIBXScript;
   FInitialising: boolean;
+  FScriptFile: AnsiString;
   function GetRoleName: AnsiString;
+  function GetScriptFile: AnsiString;
   procedure HandleCreateDatebase(Sender: TObject);
   procedure HandleDBFileName(Sender: TObject; var DatabaseFileName: string);
   procedure LogHandler(Sender: TObject; Msg: string);
@@ -60,6 +62,7 @@ uses Process, IBUtils;
 
 const
   sqlScriptTemplate = 'resources/Test%s.sql';
+  sqlCustomScriptTemplate = 'resources/Test%s.%d.sql';
   outFileTemplate   = 'Test%s.out';
 
 { TIBXTestBase }
@@ -84,6 +87,16 @@ begin
                   'Select CURRENT_ROLE From RDB$Database',[])[0].AsString
   else
     Result := '';
+end;
+
+function TIBXTestBase.GetScriptFile: AnsiString;
+begin
+  FScriptFile := '';
+  if IBDatabase.Attachment <> nil then
+    FScriptFile := Format(sqlCustomScriptTemplate,[GetFullTestID,IBDatabase.Attachment.GetODSMajorVersion]);
+  if not FileExists(FScriptFile) then
+    FScriptFile := Format(sqlScriptTemplate,[GetFullTestID]);
+  Result := FScriptFile;
 end;
 
 procedure TIBXTestBase.HandleDBFileName(Sender: TObject;
@@ -157,7 +170,7 @@ end;
 procedure TIBXTestBase.InitialiseDatabase(aDatabase: TIBDatabase);
 var aFileName: string;
 begin
-  aFileName := Format(sqlScriptTemplate,[GetFullTestID]);
+  aFileName := GetScriptFile;
   if FileExists(aFileName) then
   begin
     writeln(OutFile,'Creating Database from ' + aFileName);
@@ -363,7 +376,7 @@ var DiffExe: string;
     Results: string;
     ExitStatus: integer;
 begin
-   ResourceFile := Format(sqlScriptTemplate,[GetFullTestID]);
+   ResourceFile := FScriptFile;
    if FileExists(GetOutFile) and FileExists(ResourceFile) then
    begin
      DiffExe := GetEnvironmentVariable('DIFF');

@@ -30,6 +30,9 @@ fpcmake
 make clean
 make
 if [ -x testsuite ]; then
+  if [ -n "$FIREBIRD" ]; then
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$FIREBIRD/lib
+  fi
   echo ""
   echo "Starting Testsuite"
   echo ""
@@ -43,7 +46,8 @@ if [ -x testsuite ]; then
   else
     diff FB4reference.log testout.log >diff.log
   fi
- # cat diff.log 
+ # cat diff.log
+  echo "`cat diff.log|wc -l` lines in diff"
 else
   echo "Unable to run test suite"
 fi
