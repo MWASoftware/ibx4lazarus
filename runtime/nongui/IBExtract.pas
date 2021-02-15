@@ -3750,6 +3750,9 @@ begin
             if (FieldType = blr_int128) and (FieldScale < 0) then
                Result :=  Format('NUMERIC(38, %d)', [-FieldScale])
             else
+            if FieldType = blr_int128 then
+              Result := 'INT128'
+            else
                 Result :=  TypeName;
           end;
 
