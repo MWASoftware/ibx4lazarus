@@ -169,12 +169,19 @@ end;
 
 procedure TIBXTestBase.InitialiseDatabase(aDatabase: TIBDatabase);
 var aFileName: string;
+    F: text;
+    line: AnsiString;
 begin
   aFileName := GetScriptFile;
   if FileExists(aFileName) then
   begin
     writeln(OutFile,'Creating Database from ' + aFileName);
     writeln(OutFile);
+    assignfile(F,aFileName);
+    Reset(F);
+    readln(F,line);
+    if Pos('link ',Line) = 1 then
+       aFileName := ExtractFilePath(aFileName) + system.copy(Line,6,Length(Line)-5);
     RunScript(aDatabase,aFileName);
   end;
 end;

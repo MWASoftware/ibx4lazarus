@@ -2,7 +2,7 @@
 REM Test suite Configuration parameters (FPCDIR and FPCBIN)
 REM These may be modified if needed to suite local requirements
 
-LAZARUS=C:\lazarus
+set LAZARUS=C:\lazarus
 FOR %%V in (3.2.0 3.0.4 3.0.2 3.0.0) do (
   if EXIST C:\lazarus\fpc\%%V\bin\i386-win32\fpc.exe (
     set FPCDIR=C:\lazarus\fpc\%%V
@@ -27,7 +27,7 @@ if not EXIST %FPCBIN%\fpc.exe (
 )
 
 :COMPILE
-set TESTOUTDIR=%TEMP%\fbintf-testsuite
+set TESTOUTDIR=%TEMP%\ibx-testsuite
 set USERNAME=SYSDBA
 set PASSWORD=masterkey
 set EMPLOYEEDB=employee
@@ -40,11 +40,11 @@ rd /s /q testunits
 mkdir %TESTOUTDIR%
 
 IF EXIST "..\fbintf" (
-  FBINTF=../fbintf
+  set FBINTF=../fbintf
   goto COMPILE2
  )
-if EXISTS "..\..\fbintf" (
-  FBINTF=../../fbintf 
+if EXIST "..\..\fbintf" (
+  set FBINTF=../../fbintf
   goto COMPILE2
  )
 echo Error: unable to locate Pascal Firebird Interface API"
@@ -54,10 +54,11 @@ goto :EOF
 set INCDIR=%FBINTF%/client/3.0/firebird %FBINTF%/client/include
 set UNITDIR=%FBINTF% %FBINTF%/client %FBINTF%/client/3.0/firebird %FBINTF%/client/2.5 %FBINTF%/client/3.0  %LAZARUS%/components/lazutils
 
+echo UNITDIR= %UNITDIR%
 
 %FPCBIN%\fpcmake
 %FPCBIN%\make clean
-%FPCBIN%\make INCDIR="$INCDIR" UNITDIR="$UNITDIR"
+%FPCBIN%\make INCDIR="%INCDIR%" UNITDIR="%UNITDIR%"
 echo( 
 echo Starting Testsuite
 echo( 
