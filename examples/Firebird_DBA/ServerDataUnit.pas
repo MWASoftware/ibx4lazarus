@@ -12,7 +12,7 @@ type
 
   { TServerData }
 
-  TServerData = class
+  TServerData = class(TComponent)
   private
     const
       sqlInsert = 'Insert into SERVERS(ServerId,ServerName,DomainName,DefaultUserName) ' +
@@ -267,7 +267,7 @@ end;
 constructor TServerData.Create(aOwner: TServerDataList; aServerName,
   aDomainName, aDefaultUserName: string);
 begin
-  inherited Create;
+  inherited Create(nil);
   FOwner := aOwner;
   FSecDatabase := 'Default';
   FServerName := aServerName;
@@ -284,7 +284,7 @@ end;
 constructor TServerData.Create(aOwner: TServerDataList; aServerID: integer;
   aSecDatabase: string);
 begin
-  inherited Create;
+  inherited Create(nil);
   FOwner := aOwner;
   FSecDatabase := aSecDatabase;
   FServerID := aServerID;

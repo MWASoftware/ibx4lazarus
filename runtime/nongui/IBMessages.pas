@@ -284,7 +284,7 @@ resourcestring
   STPBConstantUnknownEx = 'TPB Constant (%s) is unknown';
   SSV5APIError = 'SV5 API API Error - %s';
   SThreadFailed = '%s Thread failed with Exception: %s';
-  SFieldSizeError = 'Field %s is too small to receive the data';
+  SFieldSizeError = 'Field %s is too small to receive the data. Expected %d, Actual %d';
   SNoLoginDialog = 'Default Login Dlalog not found. Have you included ibexpress ' +
                    'in your program uses list?';
   SInfoBufferIndexError = 'Info Buffer Index Out of Range (%d)';

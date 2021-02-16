@@ -50,6 +50,8 @@ type
     procedure ConnectServicesAPI; override;
     function CallLoginDlg(var aDatabaseName, aUserName, aPassword: string;
       var aCreateIfNotExist: boolean): TModalResult; override;
+    procedure Notification(AComponent: TComponent;
+          Operation: TOperation); override;
   public
     function Connect: boolean; override;
     procedure Disconnect; override;
@@ -254,6 +256,8 @@ end;
 procedure TDBADatabaseData.SetServerData(AValue: TServerData);
 begin
   if FServerData = AValue then Exit;
+  if FServerData <> nil then
+    FServerData.RemoveFreeNotification(self);
   FServerData := AValue;
   FServiceConnectCount := 0;
   if FServerData = nil then
@@ -261,6 +265,7 @@ begin
     IBXServicesConnection1.Connected := false;
     Exit;
   end;
+  FServerData.FreeNotification(self);
 
   IBXServicesConnection1.ServiceIntf := ServerData.ServiceIntf;
   while not IBXServicesConnection1.Connected do
@@ -358,6 +363,14 @@ begin
   end
   else
     Result := mrOK;
+end;
+
+procedure TDBADatabaseData.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (AComponent = FServerData) and (Operation = opRemove) then
+    FServerData := nil;
 end;
 
 function TDBADatabaseData.Connect: boolean;

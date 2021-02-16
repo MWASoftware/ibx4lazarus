@@ -4,9 +4,7 @@ inherited DBADatabaseData: TDBADatabaseData
   HorizontalOffset = 482
   VerticalOffset = 322
   Width = 730
-  PPI = 96
   inherited IBDatabase1: TIBDatabase
-    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     OnLogin = IBDatabase1Login
@@ -73,8 +71,8 @@ inherited DBADatabaseData: TDBADatabaseData
     ShowAffectedRows = False
     ShowPerformanceStats = False
     OnCreateDatabase = IBXScript1CreateDatabase
-    left = 103
-    top = 67
+    Left = 103
+    Top = 67
   end
   object IBXClientSideRestoreService1: TIBXClientSideRestoreService[42]
     ServicesConnection = IBXServicesConnection1
@@ -82,7 +80,7 @@ inherited DBADatabaseData: TDBADatabaseData
     PageSize = 0
     PageBuffers = 0
     StatisticsRequested = []
-    left = 101
-    top = 155
+    Left = 101
+    Top = 155
   end
 end

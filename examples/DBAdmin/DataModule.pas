@@ -31,7 +31,7 @@ type
   { TDBDataModule }
 
   TDBDataModule = class(TDataModule)
-    AccessRightsCHILDCOUNT: TIBLargeIntField;
+    AccessRightsCHILDCOUNT: TIBIntegerField;
     AccessRightsDisplayName: TStringField;
     AccessRightsID: TIBStringField;
     AccessRightsImageIndex: TLongintField;
@@ -458,7 +458,8 @@ end;
 
 procedure TDBDataModule.UserListAfterOpen(DataSet: TDataSet);
 begin
-  UserListSource.DataSet := UserList;
+  if UserListSource.DataSet <> DataSet then
+    UserListSource.DataSet := DataSet;
   RoleNameList.Active := true;
   UserTags.Active := true;
 end;

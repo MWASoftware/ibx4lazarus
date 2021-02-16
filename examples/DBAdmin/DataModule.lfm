@@ -4,9 +4,8 @@ object DBDataModule: TDBDataModule
   HorizontalOffset = 767
   VerticalOffset = 395
   Width = 730
-  PPI = 96
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -23,8 +22,8 @@ object DBDataModule: TDBDataModule
     IdleTimer = 0
     TraceFlags = []
     UseDefaultSystemCodePage = False
-    left = 40
-    top = 24
+    Left = 40
+    Top = 24
   end
   object CurrentTransaction: TIBTransaction
     Active = False
@@ -35,8 +34,8 @@ object DBDataModule: TDBDataModule
       'nowait'
     )
     AfterTransactionEnd = CurrentTransactionAfterTransactionEnd
-    left = 168
-    top = 24
+    Left = 168
+    Top = 24
   end
   object ExecDDL: TIBSQL
     Database = IBDatabase1
@@ -48,8 +47,8 @@ object DBDataModule: TDBDataModule
       ''
     )
     Transaction = CurrentTransaction
-    left = 152
-    top = 208
+    Left = 152
+    Top = 208
   end
   object DatabaseQuery: TIBQuery
     AllowAutoActivateTransaction = False
@@ -70,8 +69,10 @@ object DBDataModule: TDBDataModule
     Params = <>
     SQLFiltered = False
     DataSetCloseAction = dcSaveChanges
-    left = 288
-    top = 24
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 288
+    Top = 24
   end
   object DBCharSet: TIBQuery
     AllowAutoActivateTransaction = False
@@ -95,8 +96,10 @@ object DBDataModule: TDBDataModule
     UpdateObject = UpdateCharSet
     SQLFiltered = False
     DataSetCloseAction = dcSaveChanges
-    left = 424
-    top = 32
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 424
+    Top = 32
   end
   object ShadowFiles: TIBQuery
     AllowAutoActivateTransaction = False
@@ -117,8 +120,10 @@ object DBDataModule: TDBDataModule
     Params = <>
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 32
-    top = 208
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 32
+    Top = 208
     object ShadowFilesRDBFILE_NAME: TIBStringField
       FieldKind = fkData
       FieldName = 'RDB$FILE_NAME'
@@ -208,8 +213,10 @@ object DBDataModule: TDBDataModule
     Params = <>
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 288
-    top = 112
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 288
+    Top = 112
   end
   object CharSetLookup: TIBQuery
     AllowAutoActivateTransaction = False
@@ -231,8 +238,10 @@ object DBDataModule: TDBDataModule
     Params = <>
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 160
-    top = 104
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 160
+    Top = 104
   end
   object DBSecFiles: TIBQuery
     AllowAutoActivateTransaction = False
@@ -252,8 +261,10 @@ object DBDataModule: TDBDataModule
     Params = <>
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 32
-    top = 104
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 32
+    Top = 104
   end
   object UpdateCharSet: TIBUpdate
     RefreshSQL.Strings = (
@@ -261,13 +272,13 @@ object DBDataModule: TDBDataModule
       ' From RDB$DATABASE A'
     )
     OnApplyUpdates = UpdateCharSetApplyUpdates
-    left = 424
-    top = 104
+    Left = 424
+    Top = 104
   end
   object IBDatabaseInfo: TIBDatabaseInfo
     Database = IBDatabase1
-    left = 280
-    top = 200
+    Left = 280
+    Top = 200
   end
   object AttmtQuery: TIBQuery
     AllowAutoActivateTransaction = False
@@ -287,8 +298,10 @@ object DBDataModule: TDBDataModule
     Params = <>
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 544
-    top = 112
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 544
+    Top = 112
   end
   object TableNameLookup: TIBQuery
     AllowAutoActivateTransaction = False
@@ -309,8 +322,10 @@ object DBDataModule: TDBDataModule
     Params = <>
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 288
-    top = 283
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 288
+    Top = 283
   end
   object UserList: TIBQuery
     AllowAutoActivateTransaction = False
@@ -347,8 +362,10 @@ object DBDataModule: TDBDataModule
     UpdateObject = UpdateUsers
     SQLFiltered = False
     DataSetCloseAction = dcSaveChanges
-    left = 416
-    top = 352
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 416
+    Top = 352
     object UserListSECPLUGIN: TIBStringField
       FieldKind = fkData
       FieldName = 'SEC$PLUGIN'
@@ -492,8 +509,8 @@ object DBDataModule: TDBDataModule
       'Where  A.SEC$USER_NAME = :SEC$USER_NAME'
     )
     OnApplyUpdates = UpdateUsersApplyUpdates
-    left = 544
-    top = 360
+    Left = 544
+    Top = 360
   end
   object RoleNameList: TIBQuery
     AllowAutoActivateTransaction = False
@@ -528,8 +545,10 @@ object DBDataModule: TDBDataModule
     UpdateObject = UpdateUserRoles
     SQLFiltered = False
     DataSetCloseAction = dcSaveChanges
-    left = 424
-    top = 280
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 424
+    Top = 280
     ParamData = <    
       item
         DataType = ftUnknown
@@ -550,13 +569,13 @@ object DBDataModule: TDBDataModule
       'Where  r.RDB$ROLE_NAME = :RDB$ROLE_NAME'
     )
     OnApplyUpdates = UpdateUserRolesApplyUpdates
-    left = 544
-    top = 288
+    Left = 544
+    Top = 288
   end
   object ApplicationProperties1: TApplicationProperties
     OnException = ApplicationProperties1Exception
-    left = 528
-    top = 32
+    Left = 528
+    Top = 32
   end
   object UserTags: TIBQuery
     AllowAutoActivateTransaction = False
@@ -586,8 +605,10 @@ object DBDataModule: TDBDataModule
     UpdateObject = TagsUpdate
     SQLFiltered = False
     DataSetCloseAction = dcSaveChanges
-    left = 424
-    top = 192
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 424
+    Top = 192
     ParamData = <    
       item
         DataType = ftUnknown
@@ -603,13 +624,13 @@ object DBDataModule: TDBDataModule
       '  and A.SEC$KEY = :SEC$KEY'
     )
     OnApplyUpdates = TagsUpdateApplyUpdates
-    left = 536
-    top = 200
+    Left = 536
+    Top = 200
   end
   object UserListSource: TDataSource
     DataSet = UserList
-    left = 304
-    top = 360
+    Left = 304
+    Top = 360
   end
   object Attachments: TIBQuery
     AllowAutoActivateTransaction = False
@@ -635,8 +656,10 @@ object DBDataModule: TDBDataModule
     UpdateObject = AttUpdate
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 280
-    top = 433
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 280
+    Top = 433
     object AttachmentsMONATTACHMENT_ID: TIBLargeIntField
       FieldKind = fkData
       FieldName = 'MON$ATTACHMENT_ID'
@@ -940,8 +963,8 @@ object DBDataModule: TDBDataModule
   end
   object AttUpdate: TIBUpdate
     OnApplyUpdates = AttUpdateApplyUpdates
-    left = 376
-    top = 432
+    Left = 376
+    Top = 432
   end
   object AdminUserQuery: TIBSQL
     Database = IBDatabase1
@@ -954,8 +977,8 @@ object DBDataModule: TDBDataModule
       'Where SEC$USER_NAME = CURRENT_USER'
     )
     Transaction = CurrentTransaction
-    left = 424
-    top = 496
+    Left = 424
+    Top = 496
   end
   object DBTables: TIBQuery
     AllowAutoActivateTransaction = False
@@ -978,16 +1001,18 @@ object DBDataModule: TDBDataModule
     UpdateObject = DBTablesUpdate
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 520
-    top = 488
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 520
+    Top = 488
   end
   object DBTablesUpdate: TIBUpdate
     RefreshSQL.Strings = (
       ''
     )
     OnApplyUpdates = DBTablesUpdateApplyUpdates
-    left = 592
-    top = 480
+    Left = 592
+    Top = 480
   end
   object AuthMappings: TIBQuery
     AllowAutoActivateTransaction = False
@@ -1043,8 +1068,10 @@ object DBDataModule: TDBDataModule
     Params = <>
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 657
-    top = 118
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 657
+    Top = 118
   end
   object AccessRights: TIBQuery
     AllowAutoActivateTransaction = False
@@ -1095,7 +1122,7 @@ object DBDataModule: TDBDataModule
       'From ('
       'Select A.ID as ID, Trim(A.SUBJECT_NAME )as SUBJECT_NAME, A.SUBJECT_TYPE as SUBJECT_TYPE,'
       '       case When A.Parent is NULL then Trim(T.RDB$TYPE_NAME) || A.SUBJECT_TYPE Else A.Parent End as Parent,'
-      '       sum(A.ChildCount) as ChildCount'
+      '       cast (sum(A.ChildCount) as Integer) as ChildCount'
       '       from AccessRights A'
       '       JOIN RDB$TYPES T On T.RDB$TYPE = A.SUBJECT_TYPE and RDB$FIELD_NAME = ''RDB$OBJECT_TYPE'''
       '       Group By A.ID, A.SUBJECT_NAME, A.SUBJECT_TYPE, A.Parent, T.RDB$TYPE_NAME'
@@ -1111,8 +1138,10 @@ object DBDataModule: TDBDataModule
     Params = <>
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 648
-    top = 264
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 648
+    Top = 264
     object AccessRightsID: TIBStringField
       FieldKind = fkData
       FieldName = 'ID'
@@ -1152,19 +1181,10 @@ object DBDataModule: TDBDataModule
       Required = False
       Size = 37
     end
-    object AccessRightsCHILDCOUNT: TIBLargeIntField
-      FieldKind = fkData
-      FieldName = 'CHILDCOUNT'
-      Index = 4
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-    end
     object AccessRightsImageIndex: TLongintField
       FieldKind = fkCalculated
       FieldName = 'ImageIndex'
-      Index = 5
+      Index = 4
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -1173,12 +1193,21 @@ object DBDataModule: TDBDataModule
     object AccessRightsDisplayName: TStringField
       FieldKind = fkCalculated
       FieldName = 'DisplayName'
-      Index = 6
+      Index = 5
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = False
       Size = 64
+    end
+    object AccessRightsCHILDCOUNT: TIBIntegerField
+      FieldKind = fkData
+      FieldName = 'CHILDCOUNT'
+      Index = 6
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
     end
   end
   object SubjectAccessRights: TIBQuery
@@ -1244,8 +1273,10 @@ object DBDataModule: TDBDataModule
       end>
     SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 648
-    top = 336
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 648
+    Top = 336
     ParamData = <    
       item
         DataType = ftUnknown
@@ -1261,33 +1292,33 @@ object DBDataModule: TDBDataModule
       'sql_role_name=RDB$ADMIN'
     )
     TraceFlags = []
-    left = 640
-    top = 48
+    Left = 640
+    Top = 48
   end
   object IBStatisticalService1: TIBXStatisticalService
     ServicesConnection = IBXServicesConnection1
     TraceFlags = []
     Options = [HeaderPages]
-    left = 48
-    top = 287
+    Left = 48
+    Top = 287
   end
   object IBConfigService1: TIBXConfigService
     ServicesConnection = IBXServicesConnection1
     TraceFlags = []
-    left = 168
-    top = 283
+    Left = 168
+    Top = 283
   end
   object IBServerProperties1: TIBXServerProperties
     ServicesConnection = IBXServicesConnection1
     TraceFlags = []
-    left = 40
-    top = 365
+    Left = 40
+    Top = 365
   end
   object IBLogService1: TIBXLogService
     ServicesConnection = IBXServicesConnection1
     TraceFlags = []
-    left = 168
-    top = 365
+    Left = 168
+    Top = 365
   end
   object IBSecurityService1: TIBXSecurityService
     ServicesConnection = IBXServicesConnection1
@@ -1295,23 +1326,23 @@ object DBDataModule: TDBDataModule
     UserID = 0
     GroupID = 0
     AdminRole = False
-    left = 36
-    top = 437
+    Left = 36
+    Top = 437
   end
   object IBValidationService1: TIBXValidationService
     ServicesConnection = IBXServicesConnection1
     TraceFlags = []
     OnGetNextLine = IBValidationService1GetNextLine
     Options = [ValidateFull]
-    left = 632
-    top = 416
+    Left = 632
+    Top = 416
   end
   object IBOnlineValidationService1: TIBXOnlineValidationService
     ServicesConnection = IBXServicesConnection1
     TraceFlags = []
     OnGetNextLine = IBValidationService1GetNextLine
-    left = 40
-    top = 503
+    Left = 40
+    Top = 503
   end
   object LegacyUserList: TIBXServicesUserList
     FieldDefs = <    
@@ -1382,8 +1413,8 @@ object DBDataModule: TDBDataModule
     AfterInsert = UserListAfterInsert
     AfterPost = LegacyUserListAfterPost
     Source = IBSecurityService1
-    left = 167
-    top = 438
+    Left = 167
+    Top = 438
   end
   object InLimboList: TIBXServicesLimboTransactionsList
     FieldDefs = <    
@@ -1435,15 +1466,15 @@ object DBDataModule: TDBDataModule
         Size = 32
       end>
     Source = IBLimboTrans
-    left = 296
-    top = 496
+    Left = 296
+    Top = 496
   end
   object IBLimboTrans: TIBXLimboTransactionResolutionService
     ServicesConnection = IBXServicesConnection1
     TraceFlags = []
     GlobalAction = CommitGlobal
-    left = 176
-    top = 496
+    Left = 176
+    Top = 496
   end
   object ConfigDataset: TMemDataset
     FieldDefs = <    
@@ -1457,7 +1488,7 @@ object DBDataModule: TDBDataModule
         DataType = ftInteger
       end>
     AfterClose = ConfigDatasetAfterClose
-    left = 528
-    top = 424
+    Left = 528
+    Top = 424
   end
 end
