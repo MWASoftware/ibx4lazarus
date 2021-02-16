@@ -17,7 +17,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="2"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="158"/>
         <CursorPos X="37" Y="34"/>
         <UsageCount Value="82"/>
         <Loaded Value="True"/>
@@ -241,11 +242,10 @@
       </Unit35>
       <Unit36>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="23"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="42"/>
         <CursorPos X="13" Y="75"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit36>
       <Unit37>
         <Filename Value="../../runtime/IBQuery.pas"/>
@@ -312,167 +312,40 @@
       </Unit45>
       <Unit46>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1331"/>
         <CursorPos X="42" Y="1359"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit46>
       <Unit47>
         <Filename Value="../../ibcontrols/DBTreeView.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="95"/>
         <CursorPos Y="121"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit47>
       <Unit48>
         <Filename Value="/tmp/dbtreeview.pas"/>
         <UnitName Value="DBTreeView"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="105"/>
         <CursorPos X="15" Y="109"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit48>
       <Unit49>
         <Filename Value="../../../../lcl/forms.pp"/>
         <UnitName Value="Forms"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit49>
       <Unit50>
         <Filename Value="../../ibcontrols/SQLQueryTreeView.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="134"/>
-        <CursorPos Y="65"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="40" Y="81"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit50>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
-      <Position1>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="107" Column="18" TopLine="93"/>
-      </Position1>
-      <Position2>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="326" Column="23" TopLine="298"/>
-      </Position2>
-      <Position3>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="539" Column="23" TopLine="511"/>
-      </Position3>
-      <Position4>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="744" Column="43" TopLine="716"/>
-      </Position4>
-      <Position5>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="752" Column="77" TopLine="747"/>
-      </Position5>
-      <Position6>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-      </Position6>
-      <Position7>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="119" Column="26" TopLine="93"/>
-      </Position7>
-      <Position8>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="407" Column="18" TopLine="379"/>
-      </Position8>
-      <Position9>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="417" Column="18" TopLine="389"/>
-      </Position9>
-      <Position10>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="549" Column="34" TopLine="521"/>
-      </Position10>
-      <Position11>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="698" Column="22" TopLine="670"/>
-      </Position11>
-      <Position12>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="706" Column="15" TopLine="678"/>
-      </Position12>
-      <Position13>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="119" Column="26" TopLine="104"/>
-      </Position13>
-      <Position14>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="407" Column="18" TopLine="379"/>
-      </Position14>
-      <Position15>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="417" Column="18" TopLine="389"/>
-      </Position15>
-      <Position16>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="549" Column="34" TopLine="521"/>
-      </Position16>
-      <Position17>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="698" Column="22" TopLine="670"/>
-      </Position17>
-      <Position18>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="706" Column="15" TopLine="678"/>
-      </Position18>
-      <Position19>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="120" Column="16" TopLine="112"/>
-      </Position19>
-      <Position20>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="590" Column="3" TopLine="586"/>
-      </Position20>
-      <Position21>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="698" Column="22" TopLine="670"/>
-      </Position21>
-      <Position22>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="706" Column="15" TopLine="678"/>
-      </Position22>
-      <Position23>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="119" Column="26" TopLine="104"/>
-      </Position23>
-      <Position24>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="407" Column="18" TopLine="379"/>
-      </Position24>
-      <Position25>
-        <Filename Value="/tmp/dbtreeview.pas"/>
-        <Caret Line="414" Column="28" TopLine="389"/>
-      </Position25>
-      <Position26>
-        <Filename Value="../../ibcontrols/SQLQueryTreeView.pas"/>
-        <Caret Line="121" Column="33" TopLine="114"/>
-      </Position26>
-      <Position27>
-        <Filename Value="../../ibcontrols/SQLQueryTreeView.pas"/>
-        <Caret Line="29" Column="55" TopLine="13"/>
-      </Position27>
-      <Position28>
-        <Filename Value="../../ibcontrols/SQLQueryTreeView.pas"/>
-        <Caret Line="82" Column="3" TopLine="80"/>
-      </Position28>
-      <Position29>
-        <Filename Value="../../ibcontrols/SQLQueryTreeView.pas"/>
-        <Caret Line="30" Column="21" TopLine="12"/>
-      </Position29>
-      <Position30>
-        <Filename Value="../../ibcontrols/SQLQueryTreeView.pas"/>
-        <Caret Line="27" Column="28" TopLine="9"/>
-      </Position30>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>

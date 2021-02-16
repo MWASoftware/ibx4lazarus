@@ -27,10 +27,10 @@ IBX Change Log  version (2.4-0 Build 11661) Thu, 11 Apr 2019 09:43:38 +0100
 9. TIBDataSet and TIBQuery: new property TZTextOption. Used to determine the default
    format for rendering a time zone.
 
-10.TIBDataSet and TIBQuery: new property DefaultTZDate. Used to provide the default date
-   to convert TIME WITH TIME ZONE data type values to and from GMT.
+10. TIBDataSet and TIBQuery: new property DefaultTZDate. Used to provide the default date
+     to convert TIME WITH TIME ZONE data type values to and from GMT.
 
-11. Unit IBTypes changed to IBInternals. Internal interfaces TIBGUIInterface and TIBTimerInf renamed to
+11. Unit name IBTypes changed to IBInternals. Internal interfaces TIBGUIInterface and TIBTimerInf renamed to
     IIBGUIInterface and IIBTimerInf respectively.
 
 12. Constants: DPBPrefix and TPBPrefix moved to IB unit. DPBConstantNames and TPBConstantNames
@@ -53,8 +53,11 @@ IBX Change Log  version (2.4-0 Build 11661) Thu, 11 Apr 2019 09:43:38 +0100
 
 18. TIBExtract: Data type of COMPUTED By columns is no longer included in SQL.
 
-19. Local database on Linux and with legacy API: fixed problem with password
+19. Local database on Linux and with legacy API and FB 2.5 embedded server: fixed problem with password
     not being present as required.
+
+20. IBTreeView split into DBTreeView and IBTreeView. This former is an IBX indepedent
+    version that can be customised to work with other database drivers.
 
 IBX Change Log  version (2.3-5 Build 12350) Tue, 25 Aug 2020 16:11:02 +0100
 
@@ -103,7 +106,7 @@ IBX Change Log  version (2.3-5 Build 12350) Tue, 25 Aug 2020 16:11:02 +0100
     added back in.
 
 12. IBCustomDataSet: CanInsert, CanEdit, CanDelete and CanRefresh updated to return
-    false if query contains white space and not just empty.
+    false if query contains only white space and not just empty.
 
 12. IBCustomDataset: Blob data is now cleared when TDataSet.Cancel is called. This
     should ensure that (e.g.) a TDBMemo is correctly refreshed after a dataset edit
@@ -113,7 +116,8 @@ IBX Change Log  version (2.3-5 Build 12350) Tue, 25 Aug 2020 16:11:02 +0100
     called on a null field.
 
 14. IBCustomDataSet: An access violation should no longer occur when calling CancelUpdates
-    results in an empty dataset.
+    results in an empty dataTC86		Client side Filtered Dataset	1	X
+set.
 
 15. IBCustomDataSet: OnUpdateError should now be called in all circumstances when
     a cached update is applied and an exception is raised.

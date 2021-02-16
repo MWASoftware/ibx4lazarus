@@ -42,6 +42,7 @@ type
   }
 
   TIBTreeView = class;
+  TIBTreeNode = TDBTreeNode;
 
   { TIBTreeViewControlLink }
 

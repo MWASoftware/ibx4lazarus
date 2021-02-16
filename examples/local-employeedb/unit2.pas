@@ -32,7 +32,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls, db,
-  IBTreeView, IBQuery;
+  DBTreeView, IBTreeView, IBQuery;
 
 type
 

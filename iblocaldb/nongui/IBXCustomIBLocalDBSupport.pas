@@ -90,6 +90,8 @@ type
     FMinimumVersionNo: integer;
     { Private declarations }
     FServicesConnection: TIBXServicesConnection;
+    FBackupService: TIBXServerSideBackupService;
+    FRestoreService: TIBXServerSideRestoreService;
     FActiveDatabasePathName: string;
     FCurrentDBVersionNo: integer;
     FEmptyDBArchive: string;
@@ -144,6 +146,8 @@ type
     function UpdateVersionNo: boolean;
     property DownGradeArchive: string read FDownGradeArchive;
     property UpgradeConf: TUpgradeConfFile read FUpgradeConf;
+    property RestoreService: TIBXServerSideRestoreService read FRestoreService;
+    property BackupService: TIBXServerSideBackupService read FBackupService;
  public
     { Public declarations }
     constructor Create(aOwner: TComponent); override;
@@ -512,6 +516,12 @@ begin
   FServicesConnection := TIBXServicesConnection.Create(self);
   FServicesConnection.LoginPrompt := false;
   FServicesConnection.Params.Values['user_name'] := 'SYSDBA';
+  FBackupService := TIBXServerSideBackupService.Create(self);
+  FBackupService.ServicesConnection := ServicesConnection;
+  FBackupService.Verbose := true;
+  FRestoreService := TIBXServerSideRestoreService.Create(self);
+  FRestoreService.ServicesConnection := ServicesConnection;
+  FRestoreService.Verbose := true;
 end;
 
 destructor TCustomIBLocalDBSupport.Destroy;

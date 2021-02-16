@@ -39,8 +39,6 @@ type
 
   TIBCMLocalDBSupport = class(TCustomIBLocalDBSupport)
   private
-    FBackupService: TIBXServerSideBackupService;
-    FRestoreService: TIBXServerSideRestoreService;
     FOnLogMessage: TOnLogMessage;
     FOnProgressEvent: TOnProgressEvent;
     function DoUpgrade(IBXScript: TIBXScript; TargetVersionNo: integer): boolean;
@@ -55,8 +53,6 @@ type
     function RestoreDatabaseFromArchive(aFilename: string): boolean; override;
     function RunUpgradeDatabase(TargetVersionNo: integer): boolean; override;
     function SaveDatabaseToArchive( aFilename: string): boolean; override;
-    property RestoreService: TIBXServerSideRestoreService read FRestoreService;
-    property BackupService: TIBXServerSideBackupService read FBackupService;
   public
     constructor Create(aOwner: TComponent); override;
     property OnLogMessage: TOnLogMessage read FOnLogMessage write FOnLogMessage;
@@ -218,14 +214,8 @@ end;
 constructor TIBCMLocalDBSupport.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
-  FBackupService := TIBXServerSideBackupService.Create(self);
-  FBackupService.ServicesConnection := ServicesConnection;
-  FBackupService.Verbose := true;
-  FRestoreService := TIBXServerSideRestoreService.Create(self);
-  FRestoreService.ServicesConnection := ServicesConnection;
-  FRestoreService.Verbose := true;
-  FRestoreService.OnGetNextLine := @HandleOnGetNextLine;
-  FBackupService.OnGetNextLine := @HandleOnGetNextLine;
+  RestoreService.OnGetNextLine := @HandleOnGetNextLine;
+  BackupService.OnGetNextLine := @HandleOnGetNextLine;
 end;
 
 end.

@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
   StdCtrls, DBCtrls, Menus, ActnList, db, SynEdit, SynHighlighterSQL,
-  MainFormUnit, IBLookupComboEditBox, IBDynamicGrid, IBTreeView, IBDatabaseInfo,
+  MainFormUnit, IBLookupComboEditBox, IBDynamicGrid, DBTreeView, IBTreeView, IBDatabaseInfo,
   IBExtract, IBCustomDataSet, IB;
 
 type

@@ -43,7 +43,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="45">
+    <Units Count="46">
       <Unit0>
         <Filename Value="LocalDBExample.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -59,7 +59,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
+        <TopLine Value="3"/>
         <CursorPos X="13" Y="36"/>
         <UsageCount Value="173"/>
         <Loaded Value="True"/>
@@ -72,9 +72,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="52" Y="4"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="8"/>
+        <CursorPos X="19" Y="35"/>
         <UsageCount Value="36"/>
+        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../iblocaldb/IBXCreateDatabaseDlg.pas"/>
@@ -398,16 +400,29 @@
         <CursorPos X="3" Y="236"/>
         <UsageCount Value="10"/>
       </Unit44>
+      <Unit45>
+        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="19"/>
+        <CursorPos X="29" Y="45"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit45>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="37" Column="22"/>
       </Position1>
       <Position2>
         <Filename Value="unit1.pas"/>
-        <Caret Line="36" Column="13"/>
+        <Caret Line="36" Column="13" TopLine="3"/>
       </Position2>
+      <Position3>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="35" Column="19" TopLine="8"/>
+      </Position3>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
