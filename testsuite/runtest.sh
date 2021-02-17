@@ -10,6 +10,7 @@ EMPLOYEEDB=employee
 NEWDBNAME=$TESTOUTDIR/testsuite1.fdb
 NEWDBNAME2=$TESTOUTDIR/testsuite2.fdb
 BAKFILE=$TESTOUTDIR/testsuite.gbk
+LOGFILE=testout.`date +%N`.log
 
 if [ -d "../fbintf" ]; then
   export FBINTF="../fbintf"
@@ -38,21 +39,22 @@ if [ -x testsuite ]; then
   echo ""
   echo "Starting Testsuite"
   echo ""
-  ./testsuite -u $USERNAME -p $PASSWORD -e $EMPLOYEEDB -n $NEWDBNAME -s $NEWDBNAME2 -b $BAKFILE -o testout.log $@
+  ./testsuite -u $USERNAME -p $PASSWORD -e $EMPLOYEEDB -n $NEWDBNAME -s $NEWDBNAME2 -b $BAKFILE -o $LOGFILE $@
   echo "Comparing results with reference log"
   echo ""
-  if grep 'ODS Major Version = 11' testout.log >/dev/null; then
-    diff FB2reference.log testout.log >diff.log
-  elif grep 'ODS Major Version = 12' testout.log >/dev/null; then
-    diff FB3reference.log testout.log >diff.log
+  if grep 'ODS Major Version = 11' $LOGFILE >/dev/null; then
+    diff FB2reference.log $LOGFILE >diff.log
+  elif grep 'ODS Major Version = 12' $LOGFILE >/dev/null; then
+    diff FB3reference.log $LOGFILE >diff.log
   else
-    diff FB4reference.log testout.log >diff.log
+    diff FB4reference.log $LOGFILE >diff.log
   fi
  # cat diff.log
   echo "`cat diff.log|wc -l` lines in diff"
 else
   echo "Unable to run test suite"
 fi
+echo "Log File is $LOGFILE"
 rm -r testunits
 rm testsuite
 exit 0
