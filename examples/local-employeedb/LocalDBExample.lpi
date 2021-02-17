@@ -72,6 +72,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="8"/>
         <CursorPos X="19" Y="35"/>
@@ -402,12 +403,10 @@
       </Unit44>
       <Unit45>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="19"/>
         <CursorPos X="29" Y="45"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit45>
     </Units>
     <JumpHistory Count="3" HistoryIndex="2">

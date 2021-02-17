@@ -7,6 +7,7 @@
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="38"/>
         <CursorPos X="47" Y="54"/>
         <UsageCount Value="28"/>
@@ -244,10 +245,9 @@
       </Unit33>
       <Unit34>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="70"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit34>
       <Unit35>
         <Filename Value="../../../fbintf/client/FBStatement.pas"/>
@@ -265,11 +265,10 @@
       </Unit36>
       <Unit37>
         <Filename Value="../../runtime/nongui/IBQuery.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="28"/>
         <CursorPos X="37" Y="46"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit37>
       <Unit38>
         <Filename Value="../../../fbintf/IB.pas"/>
@@ -294,10 +293,8 @@
       </Unit40>
       <Unit41>
         <Filename Value="../../runtime/nongui/IBMessages.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="382"/>
+        <EditorIndex Value="-1"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit41>
       <Unit42>
         <Filename Value="../../ibnongui.pas"/>
@@ -309,7 +306,7 @@
       <Define0 Value="UseCThreads"/>
       <Define1 Value="IBX_CONSOLE_MODE"/>
     </OtherDefines>
-    <JumpHistory Count="15" HistoryIndex="14">
+    <JumpHistory Count="14" HistoryIndex="13">
       <Position1>
         <Filename Value="project1.lpr"/>
         <Caret Line="18" Column="74" TopLine="18"/>
@@ -366,10 +363,6 @@
         <Filename Value="project1.lpr"/>
         <Caret Line="54" Column="47" TopLine="38"/>
       </Position14>
-      <Position15>
-        <Filename Value="../../runtime/nongui/IBQuery.pas"/>
-        <Caret Line="46" Column="37" TopLine="28"/>
-      </Position15>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

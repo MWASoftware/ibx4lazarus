@@ -40,7 +40,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="17">
+    <Units Count="18">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -55,7 +55,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="37"/>
         <CursorPos X="23" Y="37"/>
         <UsageCount Value="207"/>
@@ -69,9 +68,12 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="49" Y="13"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="26"/>
+        <CursorPos X="8" Y="35"/>
         <UsageCount Value="24"/>
+        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="unit4.pas"/>
@@ -130,7 +132,8 @@
       <Unit10>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="238"/>
+        <TopLine Value="61"/>
+        <CursorPos X="43" Y="88"/>
         <UsageCount Value="10"/>
       </Unit10>
       <Unit11>
@@ -180,8 +183,24 @@
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
+      <Unit17>
+        <Filename Value="../../ibcontrols/DBTreeView.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="223"/>
+        <CursorPos Y="239"/>
+        <UsageCount Value="10"/>
+      </Unit17>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="2" HistoryIndex="1">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="37" Column="23" TopLine="37"/>
+      </Position1>
+      <Position2>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="35" Column="8" TopLine="26"/>
+      </Position2>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

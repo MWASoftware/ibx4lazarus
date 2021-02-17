@@ -32,7 +32,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls, db,
-  DBTreeView,IBTreeView, IBQuery;
+  IBTreeView, IBQuery;
 
 type
 
@@ -85,7 +85,7 @@ procedure TSelectDeptDlg.FormClose(Sender: TObject; var CloseAction: TCloseActio
 begin
   FDept_no := '';
   if assigned(DeptsTreeView.Selected) then
-    FDept_no := TDBTreeNode(DeptsTreeView.Selected).KeyValue;
+    FDept_no := TIBTreeNode(DeptsTreeView.Selected).KeyValue;
   Depts.Active := false
 end;
 

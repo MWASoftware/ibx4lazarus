@@ -36,12 +36,10 @@
         <ComponentName Value="BackupDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="89"/>
         <CursorPos Y="112"/>
         <UsageCount Value="110"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="ChgPasswordDlgUnit.pas"/>
@@ -70,12 +68,10 @@
         <ComponentName Value="ListUsersForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="72"/>
         <CursorPos X="70" Y="89"/>
         <UsageCount Value="110"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="NewUserDlgUnit.pas"/>
@@ -93,12 +89,10 @@
         <ComponentName Value="RestoreDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="79"/>
         <CursorPos Y="95"/>
         <UsageCount Value="110"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="ServicesLoginDlgUnit.pas"/>
@@ -138,12 +132,10 @@
         <ComponentName Value="ShutdownDatabaseDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="140"/>
         <CursorPos X="59" Y="186"/>
         <UsageCount Value="104"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit11>
       <Unit12>
         <Filename Value="ShutdownRegDlgUnit.pas"/>
@@ -672,11 +664,10 @@
       </Unit83>
       <Unit84>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="465"/>
         <CursorPos X="5" Y="482"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit84>
       <Unit85>
         <Filename Value="../../runtime/nongui/IBTypes.pas"/>
@@ -712,7 +703,7 @@
         <UsageCount Value="10"/>
       </Unit89>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="115" Column="42" TopLine="93"/>
@@ -725,10 +716,6 @@
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="387" Column="19" TopLine="367"/>
       </Position3>
-      <Position4>
-        <Filename Value="RestoreDlgUnit.pas"/>
-        <Caret Line="94" Column="43" TopLine="76"/>
-      </Position4>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

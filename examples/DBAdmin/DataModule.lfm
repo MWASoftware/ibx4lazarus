@@ -5,7 +5,7 @@ object DBDataModule: TDBDataModule
   VerticalOffset = 395
   Width = 730
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect

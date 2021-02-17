@@ -71,9 +71,22 @@ type
     destructor Destroy; override;
   end;
 
+function StrIntListToVar(s: string): TVariantArray;
+function VarToStrIntList(a: TVariantArray): string;
+
 implementation
 
 uses IBQuery;
+
+function StrIntListToVar(s: string): TVariantArray;
+begin
+  Result := DBTreeView.StrIntListToVar(s);
+end;
+
+function VarToStrIntList(a: TVariantArray): string;
+begin
+  Result := DBTreeView.VarToStrIntList(a);
+end;
 
 
 { TIBTreeViewControlLink }

@@ -1388,7 +1388,8 @@ end;
 
 procedure TDBDataModule.LegacyUserListAfterOpen(DataSet: TDataSet);
 begin
-  UserListSource.DataSet := LegacyUserList;
+  if UserListSource.DataSet <> LegacyUserList then
+    UserListSource.DataSet := LegacyUserList;
   if IBDatabase1.Connected then
   begin
     CurrentTransaction.Active := true;
