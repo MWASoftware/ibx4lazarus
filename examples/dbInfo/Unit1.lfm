@@ -9,7 +9,7 @@ object Form1: TForm1
   DefaultMonitor = dmPrimary
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.0.0.2'
+  LCLVersion = '2.0.11.0'
   object Memo1: TMemo
     Left = 12
     Height = 302
@@ -28,7 +28,7 @@ object Form1: TForm1
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = False
     AllowStreamedConnected = False
-    DatabaseName = 'employee'
+    DatabaseName = 'localhost:employee'
     Params.Strings = (
       'lc_ctype=UTF8'
       'user_name=SYSDBA'
@@ -40,13 +40,13 @@ object Form1: TForm1
     SQLDialect = 1
     TraceFlags = []
     UseDefaultSystemCodePage = False
-    left = 224
-    top = 56
+    Left = 224
+    Top = 56
   end
   object IBDatabaseInfo1: TIBDatabaseInfo
     Database = IBDatabase1
-    left = 328
-    top = 56
+    Left = 328
+    Top = 56
   end
   object TableNameLookup: TIBQuery
     AllowAutoActivateTransaction = False
@@ -54,6 +54,7 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -64,9 +65,12 @@ object Form1: TForm1
       'FROM RDB$RELATIONS r'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 336
-    top = 128
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 336
+    Top = 128
   end
   object IBTransaction1: TIBTransaction
     Active = False
@@ -75,7 +79,7 @@ object Form1: TForm1
       'read'
       'consistency'
     )
-    left = 328
-    top = 212
+    Left = 328
+    Top = 212
   end
 end

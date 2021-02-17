@@ -10,7 +10,7 @@ object Form1: TForm1
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.3.0'
+  LCLVersion = '2.0.11.0'
   object Button1: TButton
     Left = 915
     Height = 25
@@ -40,7 +40,7 @@ object Form1: TForm1
   end
   object Label1: TLabel
     Left = 17
-    Height = 14
+    Height = 13
     Top = 14
     Width = 87
     Caption = 'Started Before'
@@ -61,7 +61,7 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 241
-    Height = 14
+    Height = 13
     Top = 14
     Width = 78
     Caption = 'Started After'
@@ -251,7 +251,7 @@ object Form1: TForm1
       Visible = False
       object Label3: TLabel
         Left = 0
-        Height = 14
+        Height = 13
         Top = 7
         Width = 83
         Caption = 'Employee No.'
@@ -270,7 +270,7 @@ object Form1: TForm1
       end
       object Label4: TLabel
         Left = 12
-        Height = 14
+        Height = 13
         Top = 32
         Width = 64
         Caption = 'First Name'
@@ -289,7 +289,7 @@ object Form1: TForm1
       end
       object Label5: TLabel
         Left = 12
-        Height = 14
+        Height = 13
         Top = 56
         Width = 64
         Caption = 'Last Name'
@@ -308,7 +308,7 @@ object Form1: TForm1
       end
       object Label6: TLabel
         Left = 216
-        Height = 14
+        Height = 13
         Top = 7
         Width = 77
         Caption = 'Date Started'
@@ -331,7 +331,7 @@ object Form1: TForm1
       end
       object Label7: TLabel
         Left = 252
-        Height = 14
+        Height = 13
         Top = 32
         Width = 37
         Caption = 'Salary'
@@ -350,7 +350,7 @@ object Form1: TForm1
       end
       object Label8: TLabel
         Left = 708
-        Height = 14
+        Height = 13
         Top = 54
         Width = 24
         Anchors = [akTop, akRight]
@@ -371,15 +371,15 @@ object Form1: TForm1
       end
       object Label9: TLabel
         Left = 536
-        Height = 14
+        Height = 13
         Top = 7
-        Width = 51
+        Width = 50
         Caption = 'Location'
         ParentColor = False
       end
       object Label10: TLabel
         Left = 413
-        Height = 14
+        Height = 13
         Top = 9
         Width = 59
         Caption = 'Job Grade'
@@ -408,7 +408,7 @@ object Form1: TForm1
       end
       object Label11: TLabel
         Left = 536
-        Height = 14
+        Height = 13
         Top = 32
         Width = 48
         Caption = 'Job Title'
@@ -416,7 +416,7 @@ object Form1: TForm1
       end
       object Label12: TLabel
         Left = 256
-        Height = 14
+        Height = 13
         Top = 54
         Width = 33
         Caption = 'Dept.'
@@ -487,7 +487,7 @@ object Form1: TForm1
   end
   object Label13: TLabel
     Left = 456
-    Height = 14
+    Height = 13
     Top = 14
     Width = 79
     Caption = 'Salary Range'
@@ -525,8 +525,8 @@ object Form1: TForm1
     IdleTimer = 0
     TraceFlags = [tfQPrepare, tfStmt, tfConnect]
     UseDefaultSystemCodePage = False
-    left = 832
-    top = 168
+    Left = 832
+    Top = 168
   end
   object IBTransaction1: TIBTransaction
     Active = False
@@ -536,17 +536,17 @@ object Form1: TForm1
       'rec_version'
       'nowait'
     )
-    left = 872
-    top = 168
+    Left = 872
+    Top = 168
   end
   object EmployeeSource: TDataSource
     DataSet = Employees
-    left = 832
-    top = 336
+    Left = 832
+    Top = 336
   end
   object ActionList1: TActionList
-    left = 832
-    top = 416
+    Left = 832
+    Top = 416
     object AddEmployee: TAction
       Caption = 'Add'
       OnExecute = AddEmployeeExecute
@@ -578,8 +578,8 @@ object Form1: TForm1
   end
   object CountrySource: TDataSource
     DataSet = Countries
-    left = 832
-    top = 296
+    Left = 832
+    Top = 296
   end
   object TotalsQuery: TIBQuery
     AllowAutoActivateTransaction = False
@@ -588,18 +588,22 @@ object Form1: TForm1
     BeforeOpen = EmployeesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     MasterDetailDelay = 0
     SQL.Strings = (
-      'Select sum(Salary) as TotalSalaries'
+      'Select cast(sum(Salary) as Numeric(12,2)) as TotalSalaries'
       'From EMPLOYEE'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 872
-    top = 376
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 872
+    Top = 376
     object TotalsQueryTOTALSALARIES: TIBBCDField
       DisplayWidth = 18
       FieldKind = fkData
@@ -619,8 +623,8 @@ object Form1: TForm1
   end
   object TotalsSource: TDataSource
     DataSet = TotalsQuery
-    left = 832
-    top = 376
+    Left = 832
+    Top = 376
   end
   object Employees: TIBDataSet
     AllowAutoActivateTransaction = False
@@ -635,6 +639,7 @@ object Form1: TForm1
     BeforeOpen = EmployeesBeforeOpen
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     DeleteSQL.Strings = (
       'Delete From EMPLOYEE A'
@@ -698,10 +703,13 @@ object Form1: TForm1
     GenerateParamNames = False
     MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    SQLFiltered = False
     AfterTransactionEnd = EmployeesAfterTransactionEnd
     OnValidatePost = EmployeesValidatePost
-    left = 872
-    top = 336
+    Left = 872
+    Top = 336
     object EmployeesEMP_NO: TSmallintField
       DisplayWidth = 10
       FieldKind = fkData
@@ -856,6 +864,7 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = EmployeeSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -878,9 +887,12 @@ object Form1: TForm1
         Name = 'JOB_GRADE'
         ParamType = ptInput
       end>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 872
-    top = 296
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 872
+    Top = 296
     ParamData = <    
       item
         DataType = ftUnknown
@@ -895,8 +907,8 @@ object Form1: TForm1
   end
   object JobCodeSource: TDataSource
     DataSet = JobCodes
-    left = 832
-    top = 256
+    Left = 832
+    Top = 256
   end
   object JobCodes: TIBQuery
     AllowAutoActivateTransaction = False
@@ -904,6 +916,7 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     DataSource = EmployeeSource
     EnableStatistics = False
     GenerateParamNames = False
@@ -925,9 +938,12 @@ object Form1: TForm1
         Name = 'JOB_GRADE'
         ParamType = ptInput
       end>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 872
-    top = 256
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 872
+    Top = 256
     ParamData = <    
       item
         DataType = ftUnknown
@@ -946,6 +962,7 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BufferChunks = 1000
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
     EnableStatistics = False
     GenerateParamNames = False
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
@@ -956,25 +973,28 @@ object Form1: TForm1
       'Order by Upper(Department)'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 872
-    top = 210
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 872
+    Top = 210
   end
   object DeptsSource: TDataSource
     DataSet = Depts
-    left = 832
-    top = 208
+    Left = 832
+    Top = 208
   end
   object JobGradeChangeTimer: TTimer
     Interval = 0
     OnTimer = JobGradeChangeTimerTimer
-    left = 928
-    top = 175
+    Left = 928
+    Top = 175
   end
   object JobCodeChangeTimer: TTimer
     Interval = 0
     OnTimer = JobCodeChangeTimerTimer
-    left = 927
-    top = 224
+    Left = 927
+    Top = 224
   end
 end

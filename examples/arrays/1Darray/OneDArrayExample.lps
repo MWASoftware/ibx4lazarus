@@ -19,6 +19,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="29"/>
         <CursorPos X="35" Y="34"/>
         <UsageCount Value="37"/>
@@ -67,12 +68,10 @@
       </Unit6>
       <Unit7>
         <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="283"/>
         <CursorPos X="66" Y="311"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="../../../../../lcl/grids.pas"/>
@@ -143,7 +142,7 @@
       <Unit17>
         <Filename Value="../../../changelog"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="22"/>
+        <TopLine Value="25"/>
         <CursorPos Y="44"/>
         <UsageCount Value="14"/>
         <DefaultSyntaxHighlighter Value="None"/>
@@ -295,7 +294,7 @@
         <UsageCount Value="11"/>
       </Unit37>
     </Units>
-    <JumpHistory Count="9" HistoryIndex="8">
+    <JumpHistory Count="8" HistoryIndex="7">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="218" Column="34" TopLine="186"/>
@@ -328,9 +327,6 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="34" Column="35" TopLine="29"/>
       </Position8>
-      <Position9>
-        <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
-      </Position9>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
