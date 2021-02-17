@@ -3,13 +3,13 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="17">
+    <Units Count="21">
       <Unit0>
         <Filename Value="sqlparser.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="18" Y="10"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="38"/>
       </Unit0>
       <Unit1>
         <Filename Value="MainForm.pas"/>
@@ -18,9 +18,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="43"/>
-        <CursorPos X="10" Y="71"/>
-        <UsageCount Value="33"/>
+        <TopLine Value="44"/>
+        <CursorPos X="48" Y="49"/>
+        <UsageCount Value="38"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -132,6 +132,34 @@
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
+      <Unit17>
+        <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="198"/>
+        <CursorPos X="14" Y="213"/>
+        <UsageCount Value="10"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="../../../fbintf/client/3.0/FB30ClientAPI.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="634"/>
+        <CursorPos X="3" Y="643"/>
+        <UsageCount Value="10"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="../../../fbintf/client/3.0/firebird/Firebird.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2616"/>
+        <CursorPos X="9" Y="2624"/>
+        <UsageCount Value="10"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="../../../fbintf/client/3.0/FB30Attachment.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="421"/>
+        <CursorPos X="3" Y="449"/>
+        <UsageCount Value="10"/>
+      </Unit20>
     </Units>
     <JumpHistory Count="1">
       <Position1>
