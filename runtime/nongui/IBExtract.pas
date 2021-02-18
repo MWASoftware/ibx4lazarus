@@ -240,7 +240,7 @@ const
     (SqlType : blr_bool; TypeName : 'BOOLEAN'),
     (SqlType : blr_dec64; TypeName : 'DECFLOAT'),
     (SqlType : blr_dec128; TypeName : 'DECFLOAT'),
-    (SqlType : blr_int128; TypeName : 'NUMERIC'),
+    (SqlType : blr_int128; TypeName : 'INT128'),
     (SqlType : blr_sql_time_tz; TypeName : 'TIME WITH TIME ZONE'),
     (SqlType : blr_timestamp_tz; TypeName : 'TIMESTAMP WITH TIME ZONE')
     );
@@ -3749,9 +3749,6 @@ begin
             else
             if (FieldType = blr_int128) and (FieldScale < 0) then
                Result :=  Format('NUMERIC(38, %d)', [-FieldScale])
-            else
-            if FieldType = blr_int128 then
-              Result := 'INT128'
             else
                 Result :=  TypeName;
           end;

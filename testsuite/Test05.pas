@@ -58,6 +58,7 @@ begin
     FieldByName('F3').AsCurrency := 12345678912.12;
     FieldByName('f4').AsBCD := StrToBCD('64100000000.011');
     FieldByName('F5').AsBCD := StrToBCD('123456123456123456123456.123456');
+    FieldByName('F6').AsBCD := StrToBCD('123456789123456789');
   end;
 end;
 
@@ -70,7 +71,7 @@ begin
     Database := IBDatabase;
     SelectSQL.Text := 'Select * From IBXTEST A';
     InsertSQL.Text :=
-      'Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5)';
+      'Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6)';
     RefreshSQL.Text :=
       'Select * From IBXTEST A '+
       'Where A.TABLEKEY = :TABLEKEY';
@@ -80,7 +81,8 @@ begin
         '  A.F2 = :F2,' +
         '  A.F3 = :F3,' +
         '  A.F4 = :F4,' +
-        '  A.F5 = :F5 ' +
+        '  A.F5 = :F5,' +
+        '  A.F6 = :F6 ' +
         'Where A.TABLEKEY = :OLD_TABLEKEY';
     DeleteSQL.Text :=
       'Delete From IBXTEST A '+

@@ -5,6 +5,7 @@ Create Table IBXTest (
  F3 DecFloat(16),
  F4 DecFloat(34),
  F5 Numeric (24,6),
+ F6 INT128,
  Primary Key(TableKey)
 ) SQL SECURITY DEFINER;
 
