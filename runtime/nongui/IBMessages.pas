@@ -175,7 +175,8 @@ type
       ibxeServerMismatch,
       ibxeUpgradeFailed,
       ibxDBVersionProblem ,
-      ibxeResourceFileNotFound
+      ibxeResourceFileNotFound,
+      ibxeMissedRead
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -317,6 +318,7 @@ resourcestring
   SUpgradeFailed = 'Upgrade Failed. Database Version No. is %d';
   SDBVersionProblem = 'Database Version too low. Required %d, found %d';
   SResourceFileNotFound = 'Unable to load resource file "%s"';
+  SMissedRead = 'Lost Trace Message. Found %d, expected %d';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -419,7 +421,8 @@ const
     SServerMismatch,
     SUpgradeFailed,
     SDBVersionProblem,
-    SResourceFileNotFound
+    SResourceFileNotFound,
+    SMissedRead
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

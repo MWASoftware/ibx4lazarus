@@ -36,7 +36,7 @@ uses
 
 type
   TTraceFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
-     tfTransact, tfBlob, tfService, tfMisc);
+     tfTransact, tfBlob, tfService, tfMisc, tfDisabled);
   TTraceFlags = set of TTraceFlag;
 
   { TIBXMonitoredComponent }

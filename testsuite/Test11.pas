@@ -109,6 +109,7 @@ begin
     writeln(OutFile,'Event Called');
     IBTransaction.Commit;
     CheckSynchronize(5);
+    Sleep(1000);
     FEvents.UnRegisterEvents;
   finally
     IBDatabase.DropDatabase;

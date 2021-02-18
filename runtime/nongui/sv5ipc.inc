@@ -9,7 +9,7 @@ const
   cReadFinishedEventSemaphore = 4;
   cDataAvailableEventSemaphore = 6;
   cWriterBusyEventSemaphore = 8;
-  cDefaultTimeout = 1; { 1 seconds }
+  cDefaultTimeout = 10; {seconds }
 
 {$IF FPC_FULLVERSION = 30000 }
 {Fix regression in FPC 3.0.0 ipc.pp unit. Expected to be fixed in fpc 3.0.2}
@@ -215,6 +215,7 @@ type
     FTraceDataType,
     FBufferSize: PInteger;
     FTimeStamp: PDateTime;
+    FMsgNumber: PInteger;
     FReadReadyEvent: TMultiLockGate;
     FReadFinishedEvent: TMultiLockGate;
     FDataAvailableEvent: TSingleLockGate;
@@ -479,7 +480,7 @@ begin
   begin
     FSignalledState^ := 1;
     sem_op(FMutex,-1,0); //Acquire Mutex
-    //writeln(ClassName + ': Unlocking' ,FSemaphore);
+    {$IFDEF DEBUG}writeln(ClassName + ': Unlocking' ,FSemaphore);{$ENDIF}
     sem_op(FSemaphore,FWaitingThreads^,0);
     FWaitingThreads^ := 0;
     sem_op(FMutex,1,0); //Release Mutex
@@ -490,7 +491,7 @@ procedure TSingleLockGate.Lock;
 begin
   if FSignalledState^ = 1 then
   begin
-    //writeln(ClassName + ': Locking Gate ',FSemaphore);
+    {$IFDEF DEBUG}writeln(ClassName + ': Locking Gate ',FSemaphore);{$ENDIF}
     SemInit(FSemaphore,0);
     FSignalledState^ := 0;
   end;
@@ -523,7 +524,7 @@ begin
     sem_op(FMutex,-1,0); //Acquire Mutex
     if FLockCount^ = 0 then
     begin
-      //writeln(ClassName,': Locking ',FSemaphore);
+      {$IFDEF DEBUG}writeln(ClassName,': Locking ',FSemaphore);{$ENDIF}
       SemInit(FSemaphore,0);
     end;
     Inc(FLockCount^);
@@ -536,7 +537,7 @@ begin
     Dec(FLockCount^);
     if FLockCount^ <= 0 then
     begin
-      //writeln(ClassName,': UnLocking ',FSemaphore);
+      {$IFDEF DEBUG}writeln(ClassName,': UnLocking ',FSemaphore);{$ENDIF}
       SemInit(FSemaphore,1);
       FLockCount^ := 0
     end;
@@ -547,10 +548,11 @@ procedure TMultilockGate.PassthroughGate;
 begin
   if FLockCount^ = 0 then
     Exit;
-  //writeln(ClassName,': Waiting on ',FSemaphore);
+  {$IFDEF DEBUG}writeln(ClassName,': Waiting on ',FSemaphore);{$ENDIF}
   while sem_timedop(FSemaphore,-1,cDefaultTimeout) < 0 do
   {looks like we lost a reader}
   begin
+    {$IFDEF DEBUG}writeln(ClassName,': reader lost timeout');{$ENDIF}
     if FLockCount^ > 0 then
     begin
       UnLock;
@@ -559,7 +561,7 @@ begin
     end
   end;
   sem_op(FSemaphore,1);
-  //writeln(ClassName,': Wait done on ',FSemaphore);
+  {$IFDEF DEBUG}writeln(ClassName,': Wait done on ',FSemaphore);{$ENDIF}
 end;
 
 
@@ -587,13 +589,15 @@ begin
   FTraceDataType := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
   FTimeStamp := PDateTime(FSharedMemory.Allocate(sizeof(TDateTime)));
   FBufferSize := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
+  FMsgNumber := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
   FBuffer := FSharedMemory.Allocate(0); //All remaining
   FMaxBufferSize := FSharedMemory.LastAllocationSize;
 
   if FInitialiser then
   begin
     FBufferSize^ := 0;
-    FDataAvailableEvent.Lock
+    FDataAvailableEvent.Lock;
+    FMsgNumber^ := 0;
   end;
 end;
 
@@ -623,6 +627,7 @@ begin
   FTraceDataType^ := Integer(TraceObject.FDataType);
   FTimeStamp^ := TraceObject.FTimeStamp;
   FBufferSize^ := Min(Length(TraceObject.FMsg), MaxBufferSize);
+  FMsgNumber^ := TraceObject.FMsgNumber;
   Move(TraceObject.FMsg[1], FBuffer^, FBufferSize^);
 end;
 
@@ -631,6 +636,7 @@ begin
   SetString(TraceObject.FMsg, FBuffer, FBufferSize^);
   TraceObject.FDataType := TTraceFlag(FTraceDataType^);
   TraceObject.FTimeStamp := TDateTime(FTimeStamp^);
+  TraceObject.FMsgNumber := FMsgNumber^;
 end;
 
 

@@ -59,6 +59,16 @@ IBX Change Log  version (2.4-0 Build 12473) Wed, 17 Feb 2021 10:49:57 +0000
 20. IBTreeView split into DBTreeView and IBTreeView. This former is an IBX indepedent
     version that can be customised to work with other database drivers.
 
+21. ISQLMonitor: use platform specific LineEnding to delimit messages. Avoids
+    unnecessary CR at end of line on Unix platforms.
+
+22. ISQLMonitor: Unix: Default semaphore timeout increased from 1 second to 10
+    seconds in order to reduce risk of message loss.
+
+23. ISQLMonitor: read and write count statistics now available via:
+      property TIBSQLMonitor.ReadCount;
+      IIBSQLMonitorHook.GetWriteCount: integer;
+
 IBX Change Log  version (2.3-5 Build 12350) Tue, 25 Aug 2020 16:11:02 +0100
 
 1.  TIBStringField: when a string value is read from a dataset buffer, if the

@@ -41,6 +41,7 @@ type
     procedure SetupSignalHandler;
     {$ENDIF}
     procedure HandleOnSQL(EventText: String; EventTime : TDateTime);
+    procedure ShowStatistics(Sender: TObject);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -82,8 +83,18 @@ procedure TTest14.HandleOnSQL(EventText: String; EventTime: TDateTime);
 begin
   if FIsChild then
   begin
-    writeln(FLogFile,'*Monitor* '+DateTimeToStr(EventTime)+' '+EventText);
+    writeln(FLogFile,'*Monitor* '{+DateTimeToStr(EventTime)}+' '+EventText);
     Flush(FLogFile);
+  end;
+end;
+
+procedure TTest14.ShowStatistics(Sender: TObject);
+begin
+  if ChildProcess then
+  begin
+    writeln(FLogFile,FIBSQLMonitor.ReadCount,' ISQL Monitor Messages Received');
+    Flush(FLogFile);
+    Close(FLogFile);
   end;
 end;
 
@@ -106,7 +117,7 @@ begin
   {$endif}
   if fpSigAction(SigTerm,Fna,Foa)<>0 then
   begin
-    writeln(OutFile,'Error setting signal handler: ',fpgeterrno,'.');
+    writeln('Error setting signal handler: ',fpgeterrno,'.');
     halt(1);
   end;
 end;
@@ -115,14 +126,21 @@ end;
 procedure TTest14.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
-  FIBSQLMonitor := TIBSQLMonitor.Create(Application);
-  FIBSQLMonitor.TraceFlags := [tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
-     tfTransact, tfBlob, tfService, tfMisc];
-  IBDatabase.TraceFlags := [tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
-     tfTransact, tfBlob, tfService, tfMisc];
-  FIBSQLMonitor.OnSQL := @HandleOnSQL;
-  FLog := TStringList.Create;
-  FProcess := TProcess.Create(Application);
+  if ChildProcess then
+  begin
+    FIBSQLMonitor := TIBSQLMonitor.Create(Application);
+    FIBSQLMonitor.TraceFlags := [tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
+       tfTransact, tfBlob, tfService, tfMisc];
+    FIBSQLMonitor.OnSQL := @HandleOnSQL;
+    FIBSQLMonitor.OnMonitoringDisabled := @ShowStatistics;
+  end
+  else
+  begin
+    IBDatabase.TraceFlags := [tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
+        tfTransact, tfBlob, tfService, tfMisc];
+    FLog := TStringList.Create;
+    FProcess := TProcess.Create(Application);
+  end;
 end;
 
 function TTest14.GetTestID: AnsiString;
@@ -200,10 +218,10 @@ begin
   begin
     while not FTerminated do
       CheckSynchronize(1);  //loop until terminated
-    Close(FLogFile);
     Exit;
   end;
 
+  Sleep(1000); {wait for child to become ready}
   CheckSynchronize(1);
   with IBQuery do
   begin
@@ -225,8 +243,12 @@ begin
      PrintDataSet(IBQuery);
   end;
   IBDatabase.Connected := false;
+  Sleep(1000);
   CheckSynchronize(1);
+  Sleep(1000);
   DisableMonitoring;
+  writeln(Outfile,MonitorHook.GetWriteCount,' ISQL Monitor Messages written');
+  Sleep(1000);
   FProcess.Terminate(0);
   Sleep(1000);
   assignFile(aLogFile,LogFileName);

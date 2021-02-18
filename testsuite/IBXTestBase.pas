@@ -207,7 +207,7 @@ begin
   else
   while not aDataSet.EOF do
   begin
-    CheckSynchronize(1);
+    CheckSynchronize(100);
     writeln(OutFile,'Row No = ',rowno);
     PrintDataSetRow(aDataset);
     aDataSet.Next;
