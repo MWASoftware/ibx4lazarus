@@ -3,11 +3,10 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="186">
+    <Units Count="185">
       <Unit0>
         <Filename Value="testsuite.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos Y="10"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
@@ -678,8 +677,8 @@
       <Unit88>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="749"/>
-        <CursorPos X="54" Y="762"/>
+        <TopLine Value="1076"/>
+        <CursorPos X="86" Y="1082"/>
         <UsageCount Value="18"/>
       </Unit88>
       <Unit89>
@@ -732,8 +731,8 @@
       <Unit96>
         <Filename Value="../runtime/nongui/sv5ipc.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="598"/>
-        <CursorPos X="67" Y="613"/>
+        <TopLine Value="620"/>
+        <CursorPos X="3" Y="623"/>
         <UsageCount Value="19"/>
       </Unit96>
       <Unit97>
@@ -1330,32 +1329,31 @@
       <Unit183>
         <Filename Value="../runtime/nongui/winipc.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="19"/>
-        <CursorPos X="20" Y="287"/>
+        <CursorPos X="51" Y="437"/>
         <UsageCount Value="13"/>
       </Unit183>
       <Unit184>
         <Filename Value="../runtime/nongui/IBIPC.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="155"/>
-        <CursorPos Y="171"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="115"/>
+        <CursorPos X="35" Y="140"/>
         <UsageCount Value="23"/>
+        <Loaded Value="True"/>
       </Unit184>
-      <Unit185>
-        <Filename Value="../../../../../lazarus/fpc/3.0.4/source/rtl/win/wininc/struct.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="4406"/>
-        <CursorPos X="6" Y="4419"/>
-        <UsageCount Value="10"/>
-      </Unit185>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="../runtime/nongui/IBIPC.pas"/>
+        <Caret Line="180" Column="12" TopLine="154"/>
+      </Position1>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="1" ActiveMode="default">
         <Mode0 Name="default">
           <local>
-            <CommandLineParams Value="-t 13 -X"/>
+            <CommandLineParams Value="-t 13"/>
           </local>
           <environment>
             <UserOverrides Count="2">

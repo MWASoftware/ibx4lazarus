@@ -11,7 +11,7 @@ const
     'FB.SQL.MONITOR.ReadEvent1_0',
     'FB.SQL.MONITOR.ReadFinishedEvent1_0'
   );
-  cDefaultTimeout = 1000; {seconds }
+  cDefaultTimeout = 10000; {milli seconds }
 
 type
   {Interprocess Communication Objects. All platform dependent IPC is abstracted

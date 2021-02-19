@@ -11,7 +11,7 @@ const
   cReadFinishedEventSemaphore = 4;
   cDataAvailableEventSemaphore = 6;
   cWriterBusyEventSemaphore = 8;
-  cDefaultTimeout = 1000; {seconds }
+  cDefaultTimeout = 10; {seconds }
 
 {$IF FPC_FULLVERSION = 30000 }
 {Fix regression in FPC 3.0.0 ipc.pp unit. Expected to be fixed in fpc 3.0.2}
@@ -39,9 +39,7 @@ type
 
   TIpcCommon = class(TInterfacedObject)
   protected
-    FInitialiser: boolean;  static;
-    FSemaphoreSetID: cint;  static;
-    FSharedMemoryID: cint;  static;
+    class var FSemaphoreSetID: cint;  {Initialised by TSharedMemory. Used by other classes}
     function sem_op(SemNum, op: integer; flags: cshort = 0): cint;
     function sem_timedop(SemNum, op: integer; timeout_secs: integer; flags: cshort = 0): cint;
     function GetSemValue(SemNum: integer): cint;
@@ -71,13 +69,20 @@ type
     Note that the Linux semaphore set is also created with the shared memory.
   }
 
+  ISharedMemoryExt = interface(ISharedMemory)
+  ['{7449e122-61c0-4ea9-acf4-f0a420af14aa}']
+  function IsInitialiser: boolean;
+  end;
+
   TSharedMemory = class(TIpcCommon,ISharedMemory)
   private
+    FSharedMemoryID: cint;
     FBuffer: PByte;
     FLastAllocationSize: integer;
     FUnused: integer;
     FBufptr: PByte;
     FIPCFileName: AnsiString;
+    FInitialiser: boolean;
     procedure DropSharedMemory;
     procedure GetSharedMemory(MemSize: integer);
   public
@@ -85,6 +90,7 @@ type
     destructor Destroy; override;
     function Allocate(Size: integer): PByte;
     function GetLastAllocationSize: integer;
+    function IsInitialiser: boolean;
     property LastAllocationSize: integer read GetLastAllocationSize;
   end;
 
@@ -95,7 +101,7 @@ type
     FMutexSemaphore: cint;
     FLockCount: integer;
   public
-    constructor Create(SemNumber: cint);
+    constructor Create(SemNumber: cint; IsInitialiser: boolean);
     procedure Lock;
     procedure Unlock;
   end;
@@ -133,14 +139,14 @@ type
 
   TSingleLockGate = class(TIpcCommon,ISingleLockGate)
   private
-    FSharedMemory: ISharedMemory;
+    FSharedMemory: ISharedMemoryExt;
     FSemaphore: cint;
     FMutex: cint;
     FSignalledState: PInteger;
     FWaitingThreads: PInteger;
     function GetWaitingThreads: integer;
   public
-    constructor Create(SemNum: cint; sm: ISharedMemory);
+    constructor Create(SemNum: cint; sm: ISharedMemoryExt);
     property WaitingThreads: integer read GetWaitingThreads;
   public
     procedure PassthroughGate;
@@ -186,14 +192,14 @@ type
 
   TMultilockGate = class(TIpcCommon,IMultiLockGate)
   private
-    FSharedMemory: ISharedMemory;
+    FSharedMemory: ISharedMemoryExt;
     FOnGateTimeout: TNotifyEvent;
     FSemaphore: cint;
     FMutex: cint;
     FLockCount: PInteger;
     function GetLockCount: integer;
   public
-    constructor Create(SemNum: cint; sm: ISharedMemory);
+    constructor Create(SemNum: cint; sm: ISharedMemoryExt);
     procedure Lock;
     procedure Unlock;
     procedure PassthroughGate;
@@ -208,7 +214,7 @@ type
   TIPCInterface = class(TIpcCommon,IIPCInterface)
   private
     FMaxBufferSize: integer;
-    FSharedMemory: ISharedMemory;
+    FSharedMemory: ISharedMemoryExt;
     FWriteLock: IMutex;
     FBuffer: PByte;
     FTraceDataType,
@@ -367,6 +373,11 @@ begin
   Result := FLastAllocationSize;
 end;
 
+function TSharedMemory.IsInitialiser: boolean;
+begin
+  Result := FInitialiser;
+end;
+
 { TIpcCommon }
 
 function TIpcCommon.GetSa: PSecurityAttributes;
@@ -421,11 +432,11 @@ end;
 
   { TMutex }
 
-constructor TMutex.Create(SemNumber: cint);
+constructor TMutex.Create(SemNumber: cint; IsInitialiser: boolean);
 begin
   inherited Create;
   FMutexSemaphore := SemNumber;
-  if FInitialiser then
+  if IsInitialiser then
     SemInit(FMutexSemaphore,1)
 end;
 
@@ -459,7 +470,7 @@ begin
   Result := FWaitingThreads^
 end;
 
-constructor TSingleLockGate.Create(SemNum: cint; sm: ISharedMemory);
+constructor TSingleLockGate.Create(SemNum: cint; sm: ISharedMemoryExt);
 begin
   inherited Create;
   FSharedMemory := sm;
@@ -467,7 +478,7 @@ begin
   FWaitingThreads := PInteger(FSharedMemory.Allocate(sizeof(FWaitingThreads)));
   FSemaphore := SemNum;
   FMutex := SemNum + 1;
-  if FInitialiser then
+  if FSharedMemory.IsInitialiser then
   begin
     FSignalledState^ := 1;
     FWaitingThreads^ := 0;
@@ -514,14 +525,14 @@ end;
 
 { TMultilockGate }
 
-constructor TMultilockGate.Create(SemNum: cint; sm: ISharedMemory);
+constructor TMultilockGate.Create(SemNum: cint; sm: ISharedMemoryExt);
 begin
   inherited Create;
   FSemaphore := SemNum;
   FMutex := SemNum + 1;
   FSharedMemory := sm;
   FLockCount := PInteger(FSharedMemory.Allocate(sizeof(FLockCount)));
-  if FInitialiser then
+  if FSharedMemory.IsInitialiser then
   begin
     FLockCount^ := 0;
     SemInit(FSemaphore,1);
@@ -612,14 +623,14 @@ begin
   inherited Create;
   FSharedMemory := TSharedMemory.Create(cMonitorHookSize);
 
-  FWriteLock := TMutex.Create(cMutexSemaphore);
+  FWriteLock := TMutex.Create(cMutexSemaphore,FSharedMemory.IsInitialiser);
 
   FDataAvailableEvent := TSingleLockGate.Create(cDataAvailableEventSemaphore,FSharedMemory);
   FWriterBusyEvent := TSingleLockGate.Create(cWriterBusyEventSemaphore,FSharedMemory);
   FReadReadyEvent := TMultiLockGate.Create(cReadReadyEventSemaphore,FSharedMemory);
   FReadFinishedEvent := TMultiLockGate.Create(cReadFinishedEventSemaphore,FSharedMemory);
 
-  if FInitialiser then
+  if FSharedMemory.IsInitialiser then
     SemInit(cMonitorCounter,0);
   FTraceDataType := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
   FTimeStamp := PDateTime(FSharedMemory.Allocate(sizeof(TDateTime)));
@@ -628,7 +639,7 @@ begin
   FBuffer := FSharedMemory.Allocate(0); //All remaining
   FMaxBufferSize := FSharedMemory.LastAllocationSize;
 
-  if FInitialiser then
+  if FSharedMemory.IsInitialiser then
   begin
     FBufferSize^ := 0;
     FDataAvailableEvent.Lock;
