@@ -137,11 +137,8 @@ begin
      Active := true;
      PrintDataSet(IBQuery);
   end;
-  Sleep(1000);
   IBDatabase.Connected := false;
-  Sleep(1000);
   CheckSynchronize(1);
-  Sleep(1000);
   DisableMonitoring;
   writeln(Outfile,MonitorHook.GetWriteCount,' ISQL Monitor Messages written');
   Sleep(1000);

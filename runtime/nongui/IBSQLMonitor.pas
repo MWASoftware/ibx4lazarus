@@ -71,10 +71,6 @@ uses
 {$DEFINE USE_SV5_IPC}
 {$ENDIF}
 
-{$IFDEF LINUX}
-{$DEFINE HAS_SEMTIMEDOP}
-{$ENDIF}
-
 type
   TIBCustomSQLMonitor = class;
 

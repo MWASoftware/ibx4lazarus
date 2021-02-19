@@ -24,13 +24,16 @@
       <FormatVersion Value="2"/>
       <Modes Count="0"/>
     </RunParams>
-    <RequiredPackages Count="2">
+    <RequiredPackages Count="3">
       <Item1>
-        <PackageName Value="iblocalnongui"/>
+        <PackageName Value="LCL"/>
       </Item1>
       <Item2>
-        <PackageName Value="ibnongui"/>
+        <PackageName Value="iblocalnongui"/>
       </Item2>
+      <Item3>
+        <PackageName Value="ibnongui"/>
+      </Item3>
     </RequiredPackages>
     <Units Count="31">
       <Unit0>

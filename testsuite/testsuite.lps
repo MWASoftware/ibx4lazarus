@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="183">
+    <Units Count="185">
       <Unit0>
         <Filename Value="testsuite.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -75,7 +75,7 @@
       <Unit9>
         <Filename Value="Test14.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="193"/>
         <CursorPos X="47" Y="224"/>
         <UsageCount Value="200"/>
@@ -117,7 +117,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="55"/>
         <CursorPos X="28" Y="8"/>
-        <UsageCount Value="188"/>
+        <UsageCount Value="189"/>
       </Unit13>
       <Unit14>
         <Filename Value="Test11.pas"/>
@@ -125,15 +125,15 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="89"/>
         <CursorPos X="17" Y="112"/>
-        <UsageCount Value="185"/>
+        <UsageCount Value="186"/>
       </Unit14>
       <Unit15>
         <Filename Value="Test13.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="109"/>
-        <CursorPos Y="120"/>
-        <UsageCount Value="177"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="122"/>
+        <CursorPos X="46" Y="147"/>
+        <UsageCount Value="178"/>
         <Loaded Value="True"/>
       </Unit15>
       <Unit16>
@@ -142,7 +142,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="73"/>
         <CursorPos Y="99"/>
-        <UsageCount Value="176"/>
+        <UsageCount Value="177"/>
       </Unit16>
       <Unit17>
         <Filename Value="Test07.pas"/>
@@ -150,7 +150,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="10"/>
         <CursorPos X="16" Y="27"/>
-        <UsageCount Value="172"/>
+        <UsageCount Value="173"/>
       </Unit17>
       <Unit18>
         <Filename Value="Test08.pas"/>
@@ -158,7 +158,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="164"/>
         <CursorPos X="41" Y="171"/>
-        <UsageCount Value="169"/>
+        <UsageCount Value="170"/>
       </Unit18>
       <Unit19>
         <Filename Value="Test24.pas"/>
@@ -166,7 +166,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="214"/>
         <CursorPos X="3" Y="218"/>
-        <UsageCount Value="157"/>
+        <UsageCount Value="158"/>
       </Unit19>
       <Unit20>
         <Filename Value="Test16.pas"/>
@@ -174,7 +174,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="114"/>
         <CursorPos Y="126"/>
-        <UsageCount Value="157"/>
+        <UsageCount Value="158"/>
       </Unit20>
       <Unit21>
         <Filename Value="Test17.pas"/>
@@ -182,7 +182,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="364"/>
         <CursorPos X="57" Y="311"/>
-        <UsageCount Value="150"/>
+        <UsageCount Value="151"/>
       </Unit21>
       <Unit22>
         <Filename Value="Test19.pas"/>
@@ -190,7 +190,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="239"/>
         <CursorPos X="32" Y="236"/>
-        <UsageCount Value="144"/>
+        <UsageCount Value="145"/>
       </Unit22>
       <Unit23>
         <Filename Value="Test18.pas"/>
@@ -198,7 +198,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="222"/>
         <CursorPos Y="255"/>
-        <UsageCount Value="141"/>
+        <UsageCount Value="142"/>
       </Unit23>
       <Unit24>
         <Filename Value="Test20.pas"/>
@@ -206,7 +206,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="188"/>
         <CursorPos X="17" Y="18"/>
-        <UsageCount Value="139"/>
+        <UsageCount Value="140"/>
       </Unit24>
       <Unit25>
         <Filename Value="Test21.pas"/>
@@ -214,7 +214,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="30"/>
         <CursorPos X="18" Y="45"/>
-        <UsageCount Value="130"/>
+        <UsageCount Value="131"/>
       </Unit25>
       <Unit26>
         <Filename Value="Test22.pas"/>
@@ -222,7 +222,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="8"/>
         <CursorPos X="70" Y="8"/>
-        <UsageCount Value="129"/>
+        <UsageCount Value="130"/>
       </Unit26>
       <Unit27>
         <Filename Value="Test25.pas"/>
@@ -230,7 +230,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="95"/>
         <CursorPos X="43" Y="7"/>
-        <UsageCount Value="126"/>
+        <UsageCount Value="127"/>
       </Unit27>
       <Unit28>
         <Filename Value="Test26.pas"/>
@@ -238,7 +238,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="65"/>
         <CursorPos X="34" Y="98"/>
-        <UsageCount Value="117"/>
+        <UsageCount Value="118"/>
       </Unit28>
       <Unit29>
         <Filename Value="Test27.pas"/>
@@ -246,7 +246,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="135"/>
         <CursorPos Y="153"/>
-        <UsageCount Value="102"/>
+        <UsageCount Value="103"/>
       </Unit29>
       <Unit30>
         <Filename Value="Test28.pas"/>
@@ -254,7 +254,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="156"/>
         <CursorPos Y="156"/>
-        <UsageCount Value="102"/>
+        <UsageCount Value="103"/>
       </Unit30>
       <Unit31>
         <Filename Value="Test30.pas"/>
@@ -444,11 +444,10 @@
       </Unit55>
       <Unit56>
         <Filename Value="../../fbintf/client/FBMessages.pas"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="146"/>
         <CursorPos X="31" Y="159"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit56>
       <Unit57>
         <Filename Value="../../fbintf/client/FBSQLData.pas"/>
@@ -466,19 +465,17 @@
       </Unit58>
       <Unit59>
         <Filename Value="../runtime/nongui/IBMessages.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="11"/>
-        <TopLine Value="404"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="403"/>
         <CursorPos X="26" Y="422"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit59>
       <Unit60>
         <Filename Value="../changelog"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="7"/>
         <TopLine Value="46"/>
         <CursorPos X="7" Y="70"/>
-        <UsageCount Value="58"/>
+        <UsageCount Value="59"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit60>
@@ -682,10 +679,10 @@
       </Unit87>
       <Unit88>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <EditorIndex Value="6"/>
-        <TopLine Value="120"/>
-        <CursorPos X="20" Y="117"/>
-        <UsageCount Value="16"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="103"/>
+        <CursorPos X="22" Y="180"/>
+        <UsageCount Value="17"/>
         <Loaded Value="True"/>
       </Unit88>
       <Unit89>
@@ -737,9 +734,10 @@
       </Unit95>
       <Unit96>
         <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <EditorIndex Value="9"/>
-        <CursorPos X="100" Y="8"/>
-        <UsageCount Value="16"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="62"/>
+        <CursorPos Y="87"/>
+        <UsageCount Value="17"/>
         <Loaded Value="True"/>
       </Unit96>
       <Unit97>
@@ -765,11 +763,10 @@
       </Unit99>
       <Unit100>
         <Filename Value="../runtime/nongui/IBInternals.pas"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="19"/>
         <CursorPos X="55" Y="39"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit100>
       <Unit101>
         <Filename Value="resources/Test23.sql"/>
@@ -1293,11 +1290,10 @@
       </Unit176>
       <Unit177>
         <Filename Value="../../../../fpcsrc/3.2.0/rtl/inc/thread.inc"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="340"/>
         <CursorPos X="6" Y="357"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit177>
       <Unit178>
         <Filename Value="../../../../fpcsrc/3.2.0/rtl/objpas/classes/classes.inc"/>
@@ -1308,11 +1304,10 @@
       </Unit178>
       <Unit179>
         <Filename Value="/usr/share/fpcsrc/rtl/unix/cthreads.pp"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="295"/>
         <CursorPos Y="311"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit179>
       <Unit180>
         <Filename Value="/usr/share/fpcsrc/rtl/inc/threadvr.inc"/>
@@ -1324,141 +1319,156 @@
       <Unit181>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/contnrs.pp"/>
         <UnitName Value="Contnrs"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="73"/>
         <CursorPos X="14" Y="90"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit181>
       <Unit182>
         <Filename Value="../../../../fpcsrc/3.2.0/rtl/unix/tthread.inc"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="78"/>
         <CursorPos Y="94"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit182>
+      <Unit183>
+        <Filename Value="../runtime/nongui/winipc.inc"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="127"/>
+        <CursorPos X="28" Y="10"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit183>
+      <Unit184>
+        <Filename Value="../runtime/nongui/IBIPC.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="45"/>
+        <CursorPos X="43" Y="127"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit184>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="361" TopLine="333"/>
+        <Caret Line="908" Column="64" TopLine="901"/>
       </Position1>
       <Position2>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="384" TopLine="356"/>
+        <Caret Line="80" Column="35" TopLine="63"/>
       </Position2>
       <Position3>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="91" TopLine="69"/>
+        <Caret Line="46" Column="3" TopLine="39"/>
       </Position3>
       <Position4>
-        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="807" Column="3" TopLine="779"/>
+        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
+        <Caret Line="8" Column="100"/>
       </Position4>
       <Position5>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="275" Column="21" TopLine="254"/>
+        <Caret Line="74" TopLine="53"/>
       </Position5>
       <Position6>
-        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="891" Column="3" TopLine="889"/>
+        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
+        <Caret Line="209" Column="35" TopLine="189"/>
       </Position6>
       <Position7>
-        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="271" Column="15" TopLine="259"/>
+        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
+        <Caret Line="51" Column="14" TopLine="29"/>
       </Position7>
       <Position8>
-        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="928" TopLine="924"/>
+        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
+        <Caret Line="365" Column="5" TopLine="362"/>
       </Position8>
       <Position9>
-        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="292" Column="15" TopLine="275"/>
+        <Filename Value="../runtime/nongui/winipc.inc"/>
+        <Caret Line="2" Column="12"/>
       </Position9>
       <Position10>
-        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="1101" Column="3" TopLine="1099"/>
+        <Filename Value="../runtime/nongui/winipc.inc"/>
+        <Caret Line="198" Column="58" TopLine="170"/>
       </Position10>
       <Position11>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="271" Column="15" TopLine="254"/>
+        <Caret Line="214" Column="19" TopLine="202"/>
       </Position11>
       <Position12>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="937" Column="12" TopLine="925"/>
+        <Caret Line="387" Column="3" TopLine="385"/>
       </Position12>
       <Position13>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="268" Column="15" TopLine="268"/>
+        <Caret Line="214" Column="17" TopLine="197"/>
       </Position13>
       <Position14>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="907" Column="24" TopLine="901"/>
+        <Caret Line="97" Column="21" TopLine="73"/>
       </Position14>
       <Position15>
-        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <Caret Line="151" Column="15" TopLine="133"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="313" Column="3" TopLine="310"/>
       </Position15>
       <Position16>
-        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <Caret Line="494" Column="77" TopLine="469"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="97" Column="17" TopLine="113"/>
       </Position16>
       <Position17>
-        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <Caret Line="151" Column="17" TopLine="128"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="88" Column="20" TopLine="70"/>
       </Position17>
       <Position18>
-        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <Caret Line="492" Column="3" TopLine="490"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="372" Column="30" TopLine="365"/>
       </Position18>
       <Position19>
-        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <Caret Line="150" Column="15" TopLine="134"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="115" Column="52" TopLine="106"/>
       </Position19>
       <Position20>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="906" Column="29" TopLine="901"/>
+        <Caret Line="90" Column="19" TopLine="81"/>
       </Position20>
       <Position21>
-        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <Caret Line="202" Column="15" TopLine="176"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="186" Column="19" TopLine="167"/>
       </Position21>
       <Position22>
-        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <Caret Line="552" Column="41" TopLine="547"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="188" Column="17" TopLine="167"/>
       </Position22>
       <Position23>
-        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <Caret Line="12" Column="22" TopLine="12"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="347" Column="44" TopLine="319"/>
       </Position23>
       <Position24>
-        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <Caret Line="202" Column="15" TopLine="185"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="853" Column="44" TopLine="832"/>
       </Position24>
       <Position25>
-        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <Caret Line="552" Column="43" TopLine="547"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="962" Column="28" TopLine="934"/>
       </Position25>
       <Position26>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="908" Column="64" TopLine="901"/>
+        <Caret Line="963" Column="24" TopLine="935"/>
       </Position26>
       <Position27>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="46" Column="3" TopLine="63"/>
+        <Caret Line="968" Column="27" TopLine="940"/>
       </Position27>
       <Position28>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="80" Column="35" TopLine="63"/>
+        <Caret Line="996" Column="17" TopLine="968"/>
       </Position28>
       <Position29>
-        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <Caret Line="46" Column="3" TopLine="39"/>
+        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
+        <Caret Line="27" TopLine="100"/>
       </Position29>
       <Position30>
-        <Filename Value="../runtime/nongui/IBMessages.pas"/>
-        <Caret Line="320" TopLine="299"/>
+        <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
+        <Caret Line="981" Column="36" TopLine="970"/>
       </Position30>
     </JumpHistory>
     <RunParams>
@@ -1466,7 +1476,7 @@
       <Modes Count="1" ActiveMode="default">
         <Mode0 Name="default">
           <local>
-            <CommandLineParams Value="-t 14"/>
+            <CommandLineParams Value="-t 13"/>
           </local>
           <environment>
             <UserOverrides Count="2">

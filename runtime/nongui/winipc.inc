@@ -7,7 +7,7 @@ const
     'FB.SQL.MONITOR.ReadEvent1_0',
     'FB.SQL.MONITOR.ReadFinishedEvent1_0'
   );
-  cDefaultTimeout = 1000; { 1 seconds }
+  cDefaultTimeout = 1000; {seconds }
 
 type
   TGlobalInterface = class;

@@ -24,11 +24,6 @@ SEM_SETALL  = 9;
 {$ENDIF}
 {$ENDIF}
 
-{
-  The call to semctl in ipc is broken in FPC release 2.4.2 and earlier. Hence
-  need to replace with a working libc call. semtimedop is not present in 2.4.2 and earlier.
-}
-
 function GetLastErrno: cint;
 begin
   Result := fpgetErrno
@@ -378,11 +373,11 @@ begin
     sembuf.sem_flg := flags or SEM_UNDO;
     timeout.tv_sec := timeout_secs;
     timeout.tv_nsec := 0;
-{$IFDEF HAS_SEMTIMEDOP}
+{$IF declared(semtimedop)}
     Result := semtimedop(FSemaphoreSetID,@sembuf,1,@timeout);
 {$ELSE}
     Result := semop(FSemaphoreSetID,@sembuf,1);    {May hang on race condition}
-{$ENDIF}
+{$IFEND}
 end;
 
 function TIpcCommon.GetSemValue(SemNum: integer): cint;
