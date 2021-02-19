@@ -486,7 +486,7 @@ begin
   if FInitialiser then
   begin
     FBufferSize^ := 0;
-    FDataAvailableEvent.Lock
+    FDataAvailableEvent.Lock;
     FMsgNumber^ := 0;
   end;
 end;

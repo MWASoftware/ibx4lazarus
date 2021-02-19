@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="11"/>
+    <Version Value="10"/>
     <BuildModes Active="Default"/>
     <Units Count="185">
       <Unit0>
@@ -233,10 +233,11 @@
       <Unit28>
         <Filename Value="Test26.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="65"/>
-        <CursorPos X="34" Y="98"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="28"/>
+        <CursorPos X="44" Y="89"/>
         <UsageCount Value="123"/>
+        <Loaded Value="True"/>
       </Unit28>
       <Unit29>
         <Filename Value="Test27.pas"/>
@@ -400,9 +401,9 @@
       </Unit49>
       <Unit50>
         <Filename Value="../runtime/nongui/IBDataOutput.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="386"/>
-        <CursorPos X="39" Y="402"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="451"/>
+        <CursorPos Y="473"/>
         <UsageCount Value="15"/>
       </Unit50>
       <Unit51>
@@ -1332,8 +1333,8 @@
         <Filename Value="../runtime/nongui/winipc.inc"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="503"/>
-        <CursorPos Y="519"/>
+        <TopLine Value="474"/>
+        <CursorPos X="30" Y="489"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit183>
@@ -1346,7 +1347,7 @@
         <Loaded Value="True"/>
       </Unit184>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="../runtime/nongui/winipc.inc"/>
         <Caret Line="178" TopLine="173"/>
@@ -1463,22 +1464,21 @@
         <Filename Value="../runtime/nongui/sv5ipc.inc"/>
         <Caret Line="659" Column="32" TopLine="644"/>
       </Position29>
+      <Position30>
+        <Filename Value="../runtime/nongui/winipc.inc"/>
+        <Caret Line="519" TopLine="503"/>
+      </Position30>
     </JumpHistory>
-    <RunParams>
-      <FormatVersion Value="2"/>
-      <Modes Count="1" ActiveMode="default">
-        <Mode0 Name="default">
-          <local>
-            <CommandLineParams Value="-t 14 -X"/>
-          </local>
-          <environment>
-            <UserOverrides Count="2">
-              <Variable0 Name="FIREBIRD" Value="/opt/firebird2.5.9"/>
-              <Variable1 Name="LD_LIBRARY_PATH" Value="/opt/firebird2.5.9/lib"/>
-            </UserOverrides>
-          </environment>
-        </Mode0>
-      </Modes>
-    </RunParams>
   </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="../runtime/nongui/IBDataOutput.pas"/>
+        <Line Value="473"/>
+      </Item1>
+    </BreakPoints>
+  </Debugging>
 </CONFIG>
