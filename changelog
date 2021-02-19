@@ -69,6 +69,8 @@ IBX Change Log  version (2.4-0 Build 12473) Wed, 17 Feb 2021 10:49:57 +0000
       property TIBSQLMonitor.ReadCount;
       IIBSQLMonitorHook.GetWriteCount: integer;
 
+24. ISQLMonitor tidy up and unit split. IPC functions moved to new unit IBIPC.
+
 IBX Change Log  version (2.3-5 Build 12350) Tue, 25 Aug 2020 16:11:02 +0100
 
 1.  TIBStringField: when a string value is read from a dataset buffer, if the

@@ -1,3 +1,7 @@
+{Used by IBIPC and implements System V IPC}
+
+uses IBMessages, Windows;
+
 const
   MonitorHookNames: array[0..5] of String = (
     'FB.SQL.MONITOR.Mutex1_0',
@@ -10,16 +14,12 @@ const
   cDefaultTimeout = 1000; {seconds }
 
 type
-  TGlobalInterface = class;
-
   {Interprocess Communication Objects. All platform dependent IPC is abstracted
    into this set of objects }
 
   { TIpcCommon }
 
-  TIpcCommon = class
-  private
-    function GetSa: PSecurityAttributes;
+  TIpcCommon = class(TInterfacedObject)
   protected
     class var FInitialiser: boolean;
     FSa : TSecurityAttributes;
@@ -27,6 +27,7 @@ type
     Sd : TSecurityDescriptor;
   public
     constructor Create;
+    function GetSa: PSecurityAttributes;
     property Sa : PSecurityAttributes read GetSa;
   end;
 
@@ -48,24 +49,25 @@ type
 
   }
 
-  TSharedMemory = class(TIpcCommon)
+  TSharedMemory = class(TIpcCommon,ISharedMemory)
   private
-    FBuffer: PChar;
+    FBuffer: PByte;
     FLastAllocationSize: integer;
     FUnused: integer;
-    FBufptr: PChar;
+    FBufptr: PByte;
     FSharedBuffer: THandle;
     procedure GetSharedMemory(MemSize: integer);
   public
     constructor Create(MemSize: integer);
     destructor Destroy; override;
     function Allocate(Size: integer): PChar;
-    property LastAllocationSize: integer read FLastAllocationSize;
+    function GetLastAllocationSize: integer;
+    property LastAllocationSize: integer read GetLastAllocationSize;
   end;
 
   {TMutex}
 
-  TMutex = class(TIpcCommon)
+  TMutex = class(TIpcCommon, IMutex)
   private
     FMutex: THandle;
   public
@@ -96,12 +98,11 @@ type
     Always initialised to the Unlocked state
   }
 
-  TSingleLockGate = class(TIpcCommon)
+  TSingleLockGate = class(TIpcCommon,ISingleLockGate)
   private
-    FOwner: TGlobalInterface;
     FEvent: THandle;
   public
-    constructor Create(EventName: string; AOwner: TGlobalInterface);
+    constructor Create(EventName: string; AOwner: IIPCInterface);
     destructor Destroy; override;
     procedure PassthroughGate;
     procedure Unlock;
@@ -139,37 +140,39 @@ type
 
   TMultilockGate = class(TIpcCommon)
   private
+    FSharedMemory: ISharedMemory;
     FOnGateTimeout: TNotifyEvent;
-    FOwner: TGlobalInterface;
     FEvent: THandle;
     FLockCount: PInteger;
     FMutex: TMutex;
-   function GetLockCount: integer;
   public
-    constructor Create(EventName: string; AOwner: TGlobalInterface);
+    constructor Create(EventName: string; AOwner: TIPCInterface);
     destructor Destroy; override;
     procedure Lock;
     procedure Unlock;
     procedure PassthroughGate;
+    function GetLockCount: integer;
+    function GetOnGateTimeout: TNotifyEvent;
+    procedure SetOnGateTimeout(aValue: TNotifyEvent);
     property LockCount: integer read GetLockCount;
-    property OnGateTimeout: TNotifyEvent read FOnGateTimeout write FOnGateTimeout;
+    property OnGateTimeout: TNotifyEvent read GetOnGateTimeout write SetOnGateTimeout;
   end;
 
-  { TGlobalInterface }
+  { TIPCInterface }
 
-  TGlobalInterface = class(TIpcCommon)
+  TIPCInterface = class(TIpcCommon, IIPCInterface)
   private
     FMaxBufferSize: integer;
-    FSharedMemory: TSharedMemory;
-    FWriteLock: TMutex;
-    FBuffer: PChar;
+    FSharedMemory: ISharedMemory;
+    FWriteLock: IMutex;
+    FBuffer: PByte;
     FTraceDataType,
     FBufferSize: PInteger;
     FTimeStamp: PDateTime;
-    FReadReadyEvent: TMultiLockGate;
-    FReadFinishedEvent: TMultiLockGate;
-    FDataAvailableEvent: TSingleLockGate;
-    FWriterBusyEvent: TSingleLockGate;
+    FReadReadyEvent: IMultiLockGate;
+    FReadFinishedEvent: IMultiLockGate;
+    FDataAvailableEvent: ISingleLockGate;
+    FWriterBusyEvent: ISingleLockGate;
     FMonitorCount: PInteger;
     procedure HandleGateTimeout(Sender: TObject);
     function GetMonitorCount: integer;
@@ -180,14 +183,22 @@ type
     procedure DecMonitorCount;
     procedure SendTrace(TraceObject: TTraceObject);
     procedure ReceiveTrace(TraceObject: TTraceObject);
-    property DataAvailableEvent: TSingleLockGate read FDataAvailableEvent;
-    property WriterBusyEvent: TSingleLockGate read FWriterBusyEvent;
-    property ReadReadyEvent: TMultiLockGate read FReadReadyEvent;
-    property ReadFinishedEvent: TMultiLockGate read FReadFinishedEvent;
-    property WriteLock: TMutex read FWriteLock;
+    function GetDataAvailableEvent: ISingleLockGate;
+    function GetWriterBusyEvent: ISingleLockGate;
+    function GetReadReadyEvent: IMultiLockGate;
+    function GetReadFinishedEvent: IMultiLockGate;
+    function GetWriteLock: IMutex;
+    function GetMonitorCount: integer;
+    function GetSharedMemory: ISharedMemory;
+    function GetMaxBufferSize: integer;
+    property DataAvailableEvent: ISingleLockGate read GetDataAvailableEvent;
+    property WriterBusyEvent: ISingleLockGate read GetWriterBusyEvent;
+    property ReadReadyEvent: IMultiLockGate read GetReadReadyEvent;
+    property ReadFinishedEvent: IMultiLockGate read GetReadFinishedEvent;
+    property WriteLock: IMutex read GetWriteLock;
     property MonitorCount: integer read GetMonitorCount;
-    property SharedMemory: TSharedMemory read FSharedMemory;
-    property MaxBufferSize: integer read FMaxBufferSize;
+    property SharedMemory: ISharedMemory read GetSharedMemory;
+    property MaxBufferSize: integer read GetMaxBufferSize;
   end;
 
 { TSharedMemory }
@@ -225,7 +236,7 @@ begin
   inherited Destroy;
 end;
 
-function TSharedMemory.Allocate(Size: integer): PChar;
+function TSharedMemory.Allocate(Size: integer): PByte;
 begin
   if Size > FUnused then
       IBError(ibxeCannotCreateSharedResource, ['Not enough shared memory']);
@@ -242,6 +253,11 @@ begin
     Dec(FUnused,Size);
   end;
   Inc(FBufPtr,Size)
+end;
+
+function TSharedMemory.GetLastAllocationSize: integer;
+begin
+  Result := FLastAllocationSize;
 end;
 
 { TIpcCommon }
@@ -299,14 +315,13 @@ begin
 end;
 
 { TSingleLockGate }
-constructor TSingleLockGate.Create(EventName: string; AOwner: TGlobalInterface);
+constructor TSingleLockGate.Create(EventName: string);
 begin
   inherited Create;
-  FOwner := AOwner;
   if FInitialiser then
-    FEvent := CreateEvent(sa, true, true, PChar(EventName))
+    FEvent := CreateEvent(sa, true, true, PAnsiChar(EventName))
   else
-    FEvent := OpenEvent(EVENT_ALL_ACCESS, true, PChar(EventName));
+    FEvent := OpenEvent(EVENT_ALL_ACCESS, true, PAnsiChar(EventName));
 
   if FEvent = 0 then
     IBError(ibxeCannotCreateSharedResource, [GetLastError])
@@ -336,11 +351,11 @@ end;
 
 { TMultilockGate }
 
-constructor TMultilockGate.Create(EventName: string; AOwner: TGlobalInterface);
+constructor TMultilockGate.Create(EventName: string; AOwner: TIPCInterface);
 begin
   inherited Create;
-  FOwner := AOwner;
-  FLockCount := PInteger(FOwner.SharedMemory.Allocate(sizeof(FLockCount)));
+  FSharedMemory := AOwner.SharedMemory;
+  FLockCount := PInteger(FSharedMemory.Allocate(sizeof(FLockCount)));
   FMutex := TMutex.Create(EventName + '.Mutex');
   if FInitialiser then
   begin
@@ -364,6 +379,16 @@ end;
 function TMultilockGate.GetLockCount: integer;
 begin
   Result := FLockCount^
+end;
+
+function TMultilockGate.GetOnGateTimeout: TNotifyEvent;
+begin
+  Result := FOnGateTimeout;
+end;
+
+procedure TMultilockGate.SetOnGateTimeout(AValue: TNotifyEvent);
+begin
+  FOnGateTimeout := AValue;
 end;
 
 procedure TMultilockGate.Lock;
@@ -412,20 +437,30 @@ begin
 end;
 
 
-{ TGlobalInterface }
+{ TIPCInterface }
 
-function TGlobalInterface.GetMonitorCount: integer;
+function TIPCInterface.GetMonitorCount: integer;
 begin
   Result := FMonitorCount^
 end;
 
-procedure TGlobalInterface.HandleGateTimeout(Sender: TObject);
+function TIPCInterface.GetSharedMemory: ISharedMemory;
+begin
+  Result := FSharedMemory;
+end;
+
+function TIPCInterface.GetMaxBufferSize: integer;
+begin
+  Result := FMaxBufferSize;
+end;
+
+procedure TIPCInterface.HandleGateTimeout(Sender: TObject);
 begin
   //writeln(ClassName+': Gate TimeOut');
   DecMonitorCount
 end;
 
-constructor TGlobalInterface.Create;
+constructor TIPCInterface.Create;
 begin
   inherited Create;
   FSharedMemory := TSharedMemory.Create(cMonitorHookSize);
@@ -455,28 +490,17 @@ begin
   end;
 end;
 
-destructor TGlobalInterface.Destroy;
-begin
-  if assigned(FWriteLock) then FWriteLock.Free;
-  if assigned(FDataAvailableEvent) then FDataAvailableEvent.Free;
-  if assigned(FWriterBusyEvent) then FWriterBusyEvent.Free;
-  if assigned(FReadReadyEvent) then FReadReadyEvent.Free;
-  if assigned(FReadFinishedEvent) then FReadFinishedEvent.Free;
-  if assigned(FSharedMemory) then FSharedMemory.Free;
-  inherited Destroy;
-end;
-
-procedure TGlobalInterface.IncMonitorCount;
+procedure TIPCInterface.IncMonitorCount;
 begin
   InterlockedIncrement(FMonitorCount^)
 end;
 
-procedure TGlobalInterface.DecMonitorCount;
+procedure TIPCInterface.DecMonitorCount;
 begin
    InterlockedDecrement(FMonitorCount^)
 end;
 
-procedure TGlobalInterface.SendTrace(TraceObject: TTraceObject);
+procedure TIPCInterface.SendTrace(TraceObject: TTraceObject);
 begin
   FTraceDataType^ := Integer(TraceObject.FDataType);
   FTimeStamp^ := TraceObject.FTimeStamp;
@@ -484,11 +508,36 @@ begin
   Move(TraceObject.FMsg[1], FBuffer^, FBufferSize^);
 end;
 
-procedure TGlobalInterface.ReceiveTrace(TraceObject: TTraceObject);
+procedure TIPCInterface.ReceiveTrace(TraceObject: TTraceObject);
 begin
   SetString(TraceObject.FMsg, FBuffer, FBufferSize^);
   TraceObject.FDataType := TTraceFlag(FTraceDataType^);
   TraceObject.FTimeStamp := TDateTime(FTimeStamp^);
+end;
+
+function TIPCInterface.GetDataAvailableEvent: ISingleLockGate;
+begin
+  Result := FDataAvailableEvent;
+end;
+
+function TIPCInterface.GetWriterBusyEvent: ISingleLockGate;
+begin
+  Result := FWriterBusyEvent;
+end;
+
+function TIPCInterface.GetReadReadyEvent: IMultiLockGate;
+begin
+  Result := FReadReadyEvent;
+end;
+
+function TIPCInterface.GetReadFinishedEvent: IMultiLockGate;
+begin
+  Result := FReadFinishedEvent;
+end;
+
+function TIPCInterface.GetWriteLock: IMutex;
+begin
+  Result := FWriteLock;
 end;
 
 
