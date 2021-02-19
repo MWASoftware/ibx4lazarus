@@ -1,6 +1,6 @@
 {Used by IBIPC and implements System V IPC}
 
-uses IBMessages, Windows;
+uses IBMessages;
 
 const
   MonitorHookNames: array[0..5] of String = (
@@ -60,7 +60,7 @@ type
   public
     constructor Create(MemSize: integer);
     destructor Destroy; override;
-    function Allocate(Size: integer): PChar;
+    function Allocate(Size: integer): PByte;
     function GetLastAllocationSize: integer;
     property LastAllocationSize: integer read GetLastAllocationSize;
   end;
@@ -102,7 +102,7 @@ type
   private
     FEvent: THandle;
   public
-    constructor Create(EventName: string; AOwner: IIPCInterface);
+    constructor Create(EventName: string);
     destructor Destroy; override;
     procedure PassthroughGate;
     procedure Unlock;
@@ -138,7 +138,7 @@ type
     Always initialised to the Unlocked state
   }
 
-  TMultilockGate = class(TIpcCommon)
+  TMultilockGate = class(TIpcCommon, IMultilockGate)
   private
     FSharedMemory: ISharedMemory;
     FOnGateTimeout: TNotifyEvent;
@@ -146,7 +146,7 @@ type
     FLockCount: PInteger;
     FMutex: TMutex;
   public
-    constructor Create(EventName: string; AOwner: TIPCInterface);
+    constructor Create(EventName: string; AOwner: IIPCInterface);
     destructor Destroy; override;
     procedure Lock;
     procedure Unlock;
@@ -175,10 +175,8 @@ type
     FWriterBusyEvent: ISingleLockGate;
     FMonitorCount: PInteger;
     procedure HandleGateTimeout(Sender: TObject);
-    function GetMonitorCount: integer;
   public
     constructor Create;
-    destructor Destroy; override;
     procedure IncMonitorCount;
     procedure DecMonitorCount;
     procedure SendTrace(TraceObject: TTraceObject);
@@ -351,7 +349,7 @@ end;
 
 { TMultilockGate }
 
-constructor TMultilockGate.Create(EventName: string; AOwner: TIPCInterface);
+constructor TMultilockGate.Create(EventName: string; AOwner: IIPCInterface);
 begin
   inherited Create;
   FSharedMemory := AOwner.SharedMemory;
@@ -466,8 +464,8 @@ begin
   FSharedMemory := TSharedMemory.Create(cMonitorHookSize);
 
   FWriteLock := TMutex.Create(PChar(MonitorHookNames[0]));
-  FDataAvailableEvent := TSingleLockGate.Create(MonitorHookNames[2],self);
-  FWriterBusyEvent := TSingleLockGate.Create(MonitorHookNames[3],self);
+  FDataAvailableEvent := TSingleLockGate.Create(MonitorHookNames[2]);
+  FWriterBusyEvent := TSingleLockGate.Create(MonitorHookNames[3]);
   FReadReadyEvent := TMultiLockGate.Create(MonitorHookNames[4],self);
   FReadReadyEvent.OnGateTimeout  := HandleGateTimeout;
   FReadFinishedEvent := TMultiLockGate.Create(MonitorHookNames[5],self);
@@ -510,7 +508,7 @@ end;
 
 procedure TIPCInterface.ReceiveTrace(TraceObject: TTraceObject);
 begin
-  SetString(TraceObject.FMsg, FBuffer, FBufferSize^);
+  SetString(TraceObject.FMsg, PAnsiChar(FBuffer), FBufferSize^);
   TraceObject.FDataType := TTraceFlag(FTraceDataType^);
   TraceObject.FTimeStamp := TDateTime(FTimeStamp^);
 end;

@@ -57,7 +57,7 @@ unit IBIPC;
 interface
 
 uses
-  Classes, SysUtils, syncobjs, IBInternals;
+  Classes, SysUtils, syncobjs, IBInternals {$IFDEF WINDOWS}, Windows{$ENDIF};
 
 const
   cMonitorHookSize = 4096;
@@ -181,7 +181,6 @@ implementation
    {$ENDIF}
 
    {$IFDEF USE_WINDOWS_IPC}
-   , Windows;
    {$I winipc.inc}
    {$ENDIF}
 
