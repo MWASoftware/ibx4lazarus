@@ -4,14 +4,14 @@ object Form1: TForm1
   Top = 351
   Width = 1043
   Caption = 'Employee List'
-  ClientHeight = 462
+  ClientHeight = 461
   ClientWidth = 1043
   DefaultMonitor = dmPrimary
   Menu = MainMenu1
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.0.0.3'
+  LCLVersion = '2.0.11.0'
   object Button1: TButton
     Left = 956
     Height = 25
@@ -41,7 +41,7 @@ object Form1: TForm1
   end
   object Label1: TLabel
     Left = 17
-    Height = 14
+    Height = 13
     Top = 14
     Width = 87
     Caption = 'Started Before'
@@ -62,7 +62,7 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 241
-    Height = 14
+    Height = 13
     Top = 14
     Width = 78
     Caption = 'Started After'
@@ -83,19 +83,19 @@ object Form1: TForm1
   end
   object Panel1: TPanel
     Left = 0
-    Height = 414
+    Height = 413
     Top = 42
     Width = 921
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
-    ClientHeight = 414
+    ClientHeight = 413
     ClientWidth = 921
     Color = clBackground
     ParentColor = False
     TabOrder = 5
     object IBDynamicGrid1: TIBDynamicGrid
       Left = 0
-      Height = 364
+      Height = 363
       Top = 0
       Width = 921
       Align = alClient
@@ -198,7 +198,7 @@ object Form1: TForm1
     object Panel2: TPanel
       Left = 0
       Height = 50
-      Top = 364
+      Top = 363
       Width = 921
       Align = alBottom
       BevelOuter = bvNone
@@ -252,7 +252,7 @@ object Form1: TForm1
       Visible = False
       object Label3: TLabel
         Left = 0
-        Height = 14
+        Height = 13
         Top = 7
         Width = 83
         Caption = 'Employee No.'
@@ -271,7 +271,7 @@ object Form1: TForm1
       end
       object Label4: TLabel
         Left = 12
-        Height = 14
+        Height = 13
         Top = 32
         Width = 64
         Caption = 'First Name'
@@ -290,7 +290,7 @@ object Form1: TForm1
       end
       object Label5: TLabel
         Left = 12
-        Height = 14
+        Height = 13
         Top = 56
         Width = 64
         Caption = 'Last Name'
@@ -309,7 +309,7 @@ object Form1: TForm1
       end
       object Label6: TLabel
         Left = 216
-        Height = 14
+        Height = 13
         Top = 7
         Width = 77
         Caption = 'Date Started'
@@ -332,7 +332,7 @@ object Form1: TForm1
       end
       object Label7: TLabel
         Left = 252
-        Height = 14
+        Height = 13
         Top = 32
         Width = 37
         Caption = 'Salary'
@@ -351,7 +351,7 @@ object Form1: TForm1
       end
       object Label8: TLabel
         Left = 696
-        Height = 14
+        Height = 13
         Top = 54
         Width = 24
         Anchors = [akTop, akRight]
@@ -372,15 +372,15 @@ object Form1: TForm1
       end
       object Label9: TLabel
         Left = 536
-        Height = 14
+        Height = 13
         Top = 7
-        Width = 51
+        Width = 50
         Caption = 'Location'
         ParentColor = False
       end
       object Label10: TLabel
         Left = 413
-        Height = 14
+        Height = 13
         Top = 9
         Width = 59
         Caption = 'Job Grade'
@@ -409,7 +409,7 @@ object Form1: TForm1
       end
       object Label11: TLabel
         Left = 536
-        Height = 14
+        Height = 13
         Top = 32
         Width = 48
         Caption = 'Job Title'
@@ -417,7 +417,7 @@ object Form1: TForm1
       end
       object Label12: TLabel
         Left = 256
-        Height = 14
+        Height = 13
         Top = 54
         Width = 33
         Caption = 'Dept.'
@@ -513,7 +513,7 @@ object Form1: TForm1
   end
   object Label13: TLabel
     Left = 456
-    Height = 14
+    Height = 13
     Top = 14
     Width = 79
     Caption = 'Salary Range'
@@ -538,7 +538,7 @@ object Form1: TForm1
     Text = 'None Specified'
   end
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     LoginPrompt = False
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = False
@@ -552,8 +552,8 @@ object Form1: TForm1
     IdleTimer = 0
     TraceFlags = []
     UseDefaultSystemCodePage = False
-    left = 832
-    top = 168
+    Left = 832
+    Top = 168
   end
   object IBTransaction1: TIBTransaction
     Active = False
@@ -563,17 +563,17 @@ object Form1: TForm1
       'rec_version'
       'nowait'
     )
-    left = 872
-    top = 168
+    Left = 872
+    Top = 168
   end
   object EmployeeSource: TDataSource
     DataSet = Employees
-    left = 832
-    top = 336
+    Left = 832
+    Top = 336
   end
   object ActionList1: TActionList
-    left = 832
-    top = 416
+    Left = 832
+    Top = 416
     object AddEmployee: TAction
       Caption = 'Add'
       OnExecute = AddEmployeeExecute
@@ -624,8 +624,8 @@ object Form1: TForm1
   end
   object CountrySource: TDataSource
     DataSet = Countries
-    left = 832
-    top = 296
+    Left = 832
+    Top = 296
   end
   object TotalsQuery: TIBQuery
     AllowAutoActivateTransaction = False
@@ -640,13 +640,16 @@ object Form1: TForm1
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     MasterDetailDelay = 0
     SQL.Strings = (
-      'Select sum(Salary) as TotalSalaries'
+      'Select cast(sum(Salary) as Numeric(12,2)) as TotalSalaries'
       'From EMPLOYEE'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 872
-    top = 376
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 872
+    Top = 376
     object TotalsQueryTOTALSALARIES: TIBBCDField
       DisplayWidth = 18
       FieldKind = fkData
@@ -666,8 +669,8 @@ object Form1: TForm1
   end
   object TotalsSource: TDataSource
     DataSet = TotalsQuery
-    left = 832
-    top = 376
+    Left = 832
+    Top = 376
   end
   object Employees: TIBDataSet
     AllowAutoActivateTransaction = False
@@ -715,10 +718,13 @@ object Form1: TForm1
     GenerateParamNames = False
     MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    SQLFiltered = False
     AfterTransactionEnd = EmployeesAfterTransactionEnd
     OnValidatePost = EmployeesValidatePost
-    left = 872
-    top = 336
+    Left = 872
+    Top = 336
     object EmployeesEMP_NO: TSmallintField
       DisplayWidth = 10
       FieldKind = fkData
@@ -906,9 +912,12 @@ object Form1: TForm1
         Name = 'JOB_GRADE'
         ParamType = ptInput
       end>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 872
-    top = 296
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 872
+    Top = 296
     ParamData = <    
       item
         DataType = ftUnknown
@@ -923,8 +932,8 @@ object Form1: TForm1
   end
   object JobCodeSource: TDataSource
     DataSet = JobCodes
-    left = 832
-    top = 256
+    Left = 832
+    Top = 256
   end
   object JobCodes: TIBQuery
     AllowAutoActivateTransaction = False
@@ -954,9 +963,12 @@ object Form1: TForm1
         Name = 'JOB_GRADE'
         ParamType = ptInput
       end>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 872
-    top = 256
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 872
+    Top = 256
     ParamData = <    
       item
         DataType = ftUnknown
@@ -986,26 +998,29 @@ object Form1: TForm1
       'Order by Upper(Department)'
     )
     Params = <>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 872
-    top = 208
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 872
+    Top = 208
   end
   object DeptsSource: TDataSource
     DataSet = Depts
-    left = 832
-    top = 208
+    Left = 832
+    Top = 208
   end
   object JobGradeChangeTimer: TTimer
     Interval = 0
     OnTimer = JobGradeChangeTimerTimer
-    left = 928
-    top = 175
+    Left = 928
+    Top = 175
   end
   object JobCodeChangeTimer: TTimer
     Interval = 0
     OnTimer = JobCodeChangeTimerTimer
-    left = 927
-    top = 224
+    Left = 927
+    Top = 224
   end
   object IBLocalDBSupport1: TIBLocalDBSupport
     Database = IBDatabase1
@@ -1013,15 +1028,16 @@ object Form1: TForm1
     EmptyDBArchive = 'employee.gbk'
     Options = [iblAutoUpgrade, iblAllowDowngrade]
     RequiredVersionNo = 2
+    MinimumVersionNo = 0
     UpgradeConfFile = 'upgrade.conf'
     VendorName = 'MWA Software'
     OnGetDBVersionNo = IBLocalDBSupport1GetDBVersionNo
-    left = 937
-    top = 264
+    Left = 937
+    Top = 264
   end
   object MainMenu1: TMainMenu
-    left = 937
-    top = 318
+    Left = 937
+    Top = 318
     object MenuItem1: TMenuItem
       Caption = 'File'
       object MenuItem2: TMenuItem
@@ -1054,8 +1070,8 @@ object Form1: TForm1
       'Select * From RDB$RELATIONS Where RDB$RELATION_NAME = ''DBVERSIONINFO'';'
     )
     Transaction = IBTransaction1
-    left = 937
-    top = 358
+    Left = 937
+    Top = 358
   end
   object GetDBVersionNoQuery: TIBSQL
     Database = IBDatabase1
@@ -1067,7 +1083,7 @@ object Form1: TForm1
       'Select VersionNo From DBVersionInfo'
     )
     Transaction = IBTransaction1
-    left = 936
-    top = 399
+    Left = 936
+    Top = 399
   end
 end

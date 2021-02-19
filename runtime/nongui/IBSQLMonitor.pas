@@ -43,18 +43,13 @@ unit IBSQLMonitor;
 
 {$codepage UTF8}
 
+{ $DEFINE DEBUG}
+
 interface
 
 uses
   IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase,  DB, IBInternals,
-  SysUtils,  Classes,
-{$IFDEF WINDOWS }
-  Windows
-{$ENDIF}
-{$IFDEF UNIX}
-  unix
-{$ENDIF}
-;
+  SysUtils,  Classes;
 
 {Note that the original inter-thread communication between the Reader Thread and
  the ISQL Monitor used the Windows PostMessage interface. This is currently not
@@ -69,10 +64,6 @@ uses
 {$DEFINE USE_SV5_IPC}
 {$ENDIF}
 
-{$IFDEF LINUX}
-{$DEFINE HAS_SEMTIMEDOP}
-{$ENDIF}
-
 type
   TIBCustomSQLMonitor = class;
 
@@ -82,20 +73,24 @@ type
 
   TIBCustomSQLMonitor = class(TComponent)
   private
+    FOnMonitoringDisabled: TNotifyEvent;
     FOnSQLEvent: TSQLEvent;
     FTraceFlags: TTraceFlags;
     FEnabled: Boolean;
+    function GetReadCount: integer;
     procedure SetEnabled(const Value: Boolean);
   protected
     procedure ReleaseObject;  {Called from Writer Thread}
     procedure ReceiveMessage(Msg: TObject);    {Called from Reader Thread}
     property OnSQL: TSQLEvent read FOnSQLEvent write FOnSQLEvent;
+    property OnMonitoringDisabled: TNotifyEvent read FOnMonitoringDisabled write FOnMonitoringDisabled;
     property TraceFlags: TTraceFlags read FTraceFlags write FTraceFlags;
     property Enabled : Boolean read FEnabled write SetEnabled default true;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Release;
+    property ReadCount: integer read GetReadCount;
   end;
 
   { TIBSQLMonitor }
@@ -103,6 +98,7 @@ type
   TIBSQLMonitor = class(TIBCustomSQLMonitor)
   published
     property OnSQL;
+    property OnMonitoringDisabled;
     property TraceFlags;
     property Enabled;
   end;
@@ -133,6 +129,7 @@ type
     procedure SendMisc(Msg : String);
     function GetTraceFlags : TTraceFlags;
     function GetMonitorCount : Integer;
+    function GetWriteCount: integer;
     procedure SetTraceFlags(const Value : TTraceFlags);
     function GetEnabled : boolean;
     procedure SetEnabled(const Value : Boolean);
@@ -148,65 +145,24 @@ function MonitoringEnabled: Boolean;
 
 implementation
 
-uses
-   contnrs, syncobjs, CustApp, IBMessages
-   {$IFDEF USE_SV5_IPC}
-   ,ipc, Errors, baseunix
-   {$ENDIF};
-
+uses  IBIPC, contnrs, syncobjs, CustApp, IBMessages;
 
 const
-  cMonitorHookSize = 1024;
-  cMsgWaitTime = 1000;
   cWriteMessageAvailable = 'WriterMsgQueue';
 
 type
-  { There are two possible objects.  One is a trace message object.
-    This object holds the flag of the trace type plus the message.
-    The second object is a Release object.  It holds the handle that
-    the CM_RELEASE message is to be queued to. }
-
-  { TTraceObject }
-
-  TTraceObject = Class(TObject)
-    FDataType : TTraceFlag;
-    FMsg : String;
-    FTimeStamp : TDateTime;
-  public
-    constructor Create(Msg : String; DataType : TTraceFlag); overload;
-    constructor Create(obj : TTraceObject); overload;
-    constructor Create(obj : TTraceObject; MsgOffset, MsgLen: integer); overload;
-  end;
-
-  { TReleaseObject }
-
-  TReleaseObject = Class(TObject)
-    FMonitor : TIBCustomSQLMonitor;
-  public
-    constructor Create(Monitor : TIBCustomSQLMonitor);
-  end;
-
-  {$IFDEF USE_SV5_IPC}
-  {$I sv5ipc.inc}
-  {$ENDIF}
-  {$IFDEF USE_WINDOWS_IPC}
-  {$I winipc.inc}
-  {$ENDIF}
-
-type
-
   { TIBSQLMonitorHook }
 
   TIBSQLMonitorHook = class(TInterfacedObject, IIBSQLMonitorHook)
   private
-    FGlobalInterface: TGlobalInterface;
+    FIPCInterface: IIPCInterface;
     FTraceFlags: TTraceFlags;
     FEnabled: Boolean;
+    FWriteCount: integer;
   protected
     procedure WriteSQLData(Text: String; DataType: TTraceFlag);
   public
     constructor Create;
-    destructor Destroy; override;
     procedure RegisterMonitor(SQLMonitor : TIBCustomSQLMonitor);
     procedure UnregisterMonitor(SQLMonitor : TIBCustomSQLMonitor);
     procedure ReleaseMonitor(Arg : TIBCustomSQLMonitor);
@@ -232,6 +188,7 @@ type
     function GetEnabled: Boolean;
     function GetTraceFlags: TTraceFlags;
     function GetMonitorCount : Integer;
+    function GetWriteCount: integer;
     procedure SetEnabled(const Value: Boolean);
     procedure SetTraceFlags(const Value: TTraceFlags);
     procedure ForceRelease;
@@ -244,10 +201,11 @@ type
   TWriterThread = class(TThread)
   private
     { Private declarations }
-    FGlobalInterface: TGlobalInterface;
+    FIPCInterface: IIPCInterface;
     FMsgs : TObjectList;
     FCriticalSection: TCriticalSection;
     FMsgAvailable: TEventObject;
+    FWriteCount: integer;
     procedure RemoveFromList;
     procedure PostRelease;
   public
@@ -258,7 +216,7 @@ type
     procedure Execute; override;
     procedure WriteToBuffer;
   public
-    constructor Create(GlobalInterface: TGlobalInterface);
+    constructor Create(IPCInterface: IIPCInterface);
     destructor Destroy; override;
     procedure WriteSQLData(Msg : String; DataType : TTraceFlag);
   end;
@@ -270,8 +228,9 @@ type
     { Private declarations }
     st : TTraceObject;
     FMonitors : TObjectList;
-    FGlobalInterface: TGlobalInterface;
+    FIPCInterface: IIPCInterface;
     FCriticalSection: TCriticalSection;
+    FReadCount: integer;
     procedure AlertMonitors;
   protected
     procedure BeginRead;
@@ -279,7 +238,7 @@ type
     procedure ReadSQLData;
     procedure Execute; override;
   public
-    constructor Create(GlobalInterface: TGlobalInterface);
+    constructor Create(IPCInterface: IIPCInterface);
     destructor Destroy; override;
     procedure AddMonitor(Arg : TIBCustomSQLMonitor);
     procedure RemoveMonitor(Arg : TIBCustomSQLMonitor);
@@ -348,6 +307,8 @@ begin
   if (Assigned(FOnSQLEvent)) and
          (st.FDataType in FTraceFlags) then
         FOnSQLEvent(st.FMsg, st.FTimeStamp);
+  if assigned(OnMonitoringDisabled) and (st.FDataType = tfDisabled) then
+    OnMonitoringDisabled(self);
   st.Free;
 end;
 
@@ -364,19 +325,19 @@ begin
   end;
 end;
 
+function TIBCustomSQLMonitor.GetReadCount: integer;
+begin
+  Result := FReaderThread.FReadCount;
+end;
+
 { TIBSQLMonitorHook }
 
 constructor TIBSQLMonitorHook.Create;
 begin
   inherited Create;
   FTraceFlags := [tfQPrepare..tfMisc];
+  FIPCInterface := CreateIPCInterface;
   FEnabled := false;
-end;
-
-destructor TIBSQLMonitorHook.Destroy;
-begin
-  if assigned(FGlobalInterface) then FGlobalInterface.Free;
-  inherited Destroy;
 end;
 
 procedure TIBSQLMonitorHook.DBConnect(db: TIBDatabase);
@@ -413,7 +374,15 @@ end;
 
 function TIBSQLMonitorHook.GetMonitorCount: Integer;
 begin
-  Result := FGlobalInterface.MonitorCount
+  Result := FIPCInterface.MonitorCount
+end;
+
+function TIBSQLMonitorHook.GetWriteCount: integer;
+begin
+  if assigned(FWriterThread) then
+    Result := FWriterThread.FWriteCount
+  else
+    Result := FWriteCount;
 end;
 
 function TIBSQLMonitorHook.GetTraceFlags: TTraceFlags;
@@ -424,10 +393,8 @@ end;
 procedure TIBSQLMonitorHook.RegisterMonitor(SQLMonitor: TIBCustomSQLMonitor);
 begin
    {$IFDEF DEBUG}writeln('Register Monitor');{$ENDIF}
-  if not assigned(FGlobalInterface) then
-    FGlobalInterface := TGlobalInterface.Create;
  if not Assigned(FReaderThread) then
-    FReaderThread := TReaderThread.Create(FGlobalInterface);
+    FReaderThread := TReaderThread.Create(FIPCInterface);
   FReaderThread.AddMonitor(SQLMonitor);
 end;
 
@@ -550,16 +517,24 @@ end;
 
 procedure TIBSQLMonitorHook.SetEnabled(const Value: Boolean);
 begin
-  {$ifdef UNIX}
-  if Value and not IsMultiThread then
-    IBError(ibxeMultiThreadRequired,['IBSQLMonitor']);
-  {$endif}
-  if FEnabled <> Value then
-    FEnabled := Value;
+  if FEnabled = Value then Exit;
+
+  FEnabled := Value;
+  if FEnabled then
+  begin
+    if not Assigned(FWriterThread) then
+      FWriterThread := TWriterThread.Create(FIPCInterface);
+  (*  {$ifdef UNIX}
+    if not IsMultiThread then
+      IBError(ibxeMultiThreadRequired,['IBSQLMonitor']);
+    {$endif}*)
+  end;
   if (not FEnabled) and (Assigned(FWriterThread)) then
   begin
+    WriteSQLData('Monitoring Disabled',tfDisabled);
     FWriterThread.Terminate;
     FWriterThread.WaitFor;
+    FWriteCount := FWriterThread.FWriteCount;
     FreeAndNil(FWriterThread);
   end;
 end;
@@ -575,7 +550,7 @@ begin
     begin
       FReaderThread.Terminate;
       if not Assigned(FWriterThread) then
-        FWriterThread := TWriterThread.Create(FGlobalInterface);
+        FWriterThread := TWriterThread.Create(FIPCInterface);
       FWriterThread.WriteSQLData(' ', tfMisc);
     end;
 end;
@@ -597,7 +572,7 @@ begin
     st := st + ': [Execute] ' + qry.SQL.Text; {do not localize}
     if qry.Params.GetCount > 0 then begin
       for i := 0 to qry.Params.GetCount - 1 do begin
-        st := st + CRLF + '  ' + qry.Params[i].Name + ' = '; 
+        st := st + LineEnding + '  ' + qry.Params[i].Name + ' = '; 
         try
           if qry.Params[i].IsNull then
             st := st + '<NULL>'; {do not localize}
@@ -626,7 +601,7 @@ begin
       st := qry.Name;
     st := st + ': [Fetch] ' + qry.SQL.Text; {do not localize}
     if (qry.EOF) then
-      st := st + CRLF + '  ' + SEOFReached;
+      st := st + LineEnding + '  ' + SEOFReached;
     WriteSQLData(st, tfQFetch);
   end;
 end;
@@ -644,7 +619,7 @@ begin
       st := TIBCustomDataSet(qry.Owner).Name
     else
       st := qry.Name;
-    st := st + ': [Prepare] ' + qry.SQL.Text + CRLF; {do not localize}
+    st := st + ': [Prepare] ' + qry.SQL.Text + LineEnding; {do not localize}
     st := st + '  Plan: ' + qry.Plan; {do not localize}
     WriteSQLData(st, tfQPrepare);
   end;
@@ -741,7 +716,7 @@ begin
       Created := false;
       if not Assigned(FWriterThread) then
       begin
-        FWriterThread := TWriterThread.Create(FGlobalInterface);
+        FWriterThread := TWriterThread.Create(FIPCInterface);
         Created := true;
       end;
       FWriterThread.WriteSQLData(' ', tfMisc);
@@ -769,26 +744,22 @@ end;
 procedure TIBSQLMonitorHook.WriteSQLData(Text: String;
   DataType: TTraceFlag);
 begin
- {$IFDEF DEBUG}writeln('Write SQL Data: '+Text);{$ENDIF}
-  if not assigned(FGlobalInterface) then
-    FGlobalInterface := TGlobalInterface.Create;
-  Text := CRLF + '[Application: ' + ApplicationTitle + ']' + CRLF + Text; {do not localize}
-  if not Assigned(FWriterThread) then
-    FWriterThread := TWriterThread.Create(FGLobalInterface);
+// {$IFDEF DEBUG}writeln('Write SQL Data: '+Text);{$ENDIF}
+  Text := LineEnding + '[Application: ' + ApplicationTitle + ']' + LineEnding + Text; {do not localize}
   FWriterThread.WriteSQLData(Text, DataType);
 end;
 
 { TWriterThread }
 
-constructor TWriterThread.Create(GlobalInterface: TGlobalInterface);
+constructor TWriterThread.Create(IPCInterface: IIPCInterface);
 
 begin
   inherited Create(true);
   {$IFDEF DEBUG}writeln('Write Object Created');{$ENDIF}
-  FGlobalInterface := GlobalInterface;
+  FIPCInterface := IPCInterface;
   FMsgs := TObjectList.Create(true);
   FCriticalSection := TCriticalSection.Create;
-  FMsgAvailable := TEventObject.Create(FGlobalInterface.Sa,true,false,cWriteMessageAvailable);
+  FMsgAvailable := TEventObject.Create(FIPCInterface.Sa,true,false,cWriteMessageAvailable);
   Start;
 end;
 
@@ -810,7 +781,7 @@ begin
   begin
     FMsgAvailable.WaitFor(cMsgWaitTime);
     { Any one listening? }
-    if FGlobalInterface.MonitorCount = 0 then
+    if FIPCInterface.MonitorCount = 0 then
     begin
       if FMsgs.Count <> 0 then
       begin
@@ -859,7 +830,8 @@ procedure TWriterThread.WriteSQLData(Msg : String; DataType: TTraceFlag);
 begin
   FCriticalSection.Enter;
   try
-    FMsgs.Add(TTraceObject.Create(Msg, DataType));
+    FMsgs.Add(TTraceObject.Create(Msg, DataType,FWriteCount));
+    Inc(FWriteCount);
   finally
     FCriticalSection.Leave;
   end;
@@ -869,7 +841,7 @@ end;
 procedure TWriterThread.BeginWrite;
 begin
 {$IFDEF DEBUG}writeln('Begin Write');{$ENDIF}
-  with FGlobalInterface do
+  with FIPCInterface do
   begin
     ReadReadyEvent.PassThroughGate;    {Wait for readers to become ready }
     WriterBusyEvent.Lock;     {Set Busy State}
@@ -880,7 +852,7 @@ end;
 procedure TWriterThread.EndWrite;
 begin
   {$IFDEF DEBUG}writeln('End Write');{$ENDIF}
-  with FGlobalInterface do
+  with FIPCInterface do
   begin
     DataAvailableEvent.Unlock;   { Signal Data Available. }
     ReadFinishedEvent.PassThroughGate; {Wait for readers to finish }
@@ -891,54 +863,28 @@ begin
   end;
 
 procedure TWriterThread.WriteToBuffer;
-var I, len: integer;
-    Temp: TTraceObject;
 begin
-  {$IFDEF DEBUG}writeln('Write to Buffer');{$ENDIF}
-  FGlobalInterface.WriteLock.Lock;
+  FIPCInterface.WriteLock.Lock;
   try
     { If there are no monitors throw out the message
       The alternative is to have messages queue up until a
       monitor is ready.}
 
-    if FGlobalInterface.MonitorCount = 0 then
+    if FIPCInterface.MonitorCount = 0 then
       RemoveFromList
     else
     begin
-      i := 1;
-      len := Length(TTraceObject(FMsgs[0]).FMsg);
-      if len <= FGlobalInterface.MaxBufferSize then
-      begin
-        BeginWrite;
-        try
-          FGlobalInterface.SendTrace(TTraceObject(FMsgs[0]))
-        finally
-          RemoveFromList;
-          EndWrite
-        end;
-      end
-      else
+      BeginWrite;
       try
-        while len > 0 do
-        begin
-          {$IFDEF DEBUG}writeln('Sending Partial Message, len = ',len);{$ENDIF}
-          Temp := TTraceObject.Create(TTraceObject(FMsgs[0]),i,Min(len,FGlobalInterface.MaxBufferSize));
-          try
-            BeginWrite;
-            FGlobalInterface.SendTrace(Temp);
-            Inc(i,FGlobalInterface.MaxBufferSize);
-            Dec(len,FGlobalInterface.MaxBufferSize);
-          finally
-            Temp.Free;
-            EndWrite
-          end
-        end;
+       {$IFDEF DEBUG}writeln('Write to Buffer. Msg No. ',TTraceObject(FMsgs[0]).FMsgNumber);{$ENDIF}
+        FIPCInterface.SendTrace(TTraceObject(FMsgs[0]))
       finally
         RemoveFromList;
+        EndWrite
       end
     end;
   finally
-    FGlobalInterface.WriteLock.Unlock;
+    FIPCInterface.WriteLock.Unlock;
   end;
   {$IFDEF DEBUG}writeln('Done Write');{$ENDIF}
 end;
@@ -957,43 +903,13 @@ end;
 procedure TWriterThread.PostRelease;
 var Monitor: TIBCustomSQLMonitor;
 begin
-  Monitor := TReleaseObject(FMsgs.Items[0]).FMonitor;
+  Monitor := TReleaseObject(FMsgs.Items[0]).FMonitor as TIBCustomSQLMonitor;
   Monitor.ReleaseObject
 end;
 
 procedure TWriterThread.ReleaseMonitor(Arg : TIBCustomSQLMonitor);
 begin
   FMsgs.Add(TReleaseObject.Create(Arg));
-end;
-
-{ TTraceObject }
-
-constructor TTraceObject.Create(Msg : String; DataType: TTraceFlag);
-begin
-  FMsg := Msg;
-  FDataType := DataType;
-  FTimeStamp := Now;
-end;
-
-constructor TTraceObject.Create(obj: TTraceObject);
-begin
-  FMsg := obj.FMsg;
-  FDataType := obj.FDataType;
-  FTimeStamp := obj.FTimeStamp;
-end;
-
-constructor TTraceObject.Create(obj: TTraceObject; MsgOffset, MsgLen: integer);
-begin
-  FDataType := obj.FDataType;
-  FTimeStamp := obj.FTimeStamp;
-  FMsg := copy(obj.FMsg,MsgOffset,MsgLen)
-end;
-
-{ TReleaseObject }
-
-constructor TReleaseObject.Create(Monitor : TIBCustomSQLMonitor);
-begin
-  FMonitor := Monitor;
 end;
 
 { ReaderThread }
@@ -1026,7 +942,7 @@ end;
 procedure TReaderThread.BeginRead;
 begin
 {$IFDEF DEBUG}writeln('Begin Read');{$ENDIF}
-  with FGlobalInterface do
+  with FIPCInterface do
   begin
     WriterBusyEvent.PassthroughGate;     { Wait for Writer not busy}
     ReadFinishedEvent.Lock;          { Prepare Read Finished Gate}
@@ -1037,25 +953,25 @@ begin
 {$IFDEF DEBUG}writeln('Begin Read Complete');{$ENDIF}
 end;
 
-constructor TReaderThread.Create(GlobalInterface: TGlobalInterface);
+constructor TReaderThread.Create(IPCInterface: IIPCInterface);
 begin
   inherited Create(true);
-  FGlobalInterface := GlobalInterface;
+  FIPCInterface := IPCInterface;
   st := TTraceObject.Create('', tfMisc);
-  FGlobalInterface.IncMonitorCount;
+  FIPCInterface.IncMonitorCount;
   FMonitors := TObjectList.Create(false);
   FCriticalSection := TCriticalSection.Create;
   {$IFDEF DEBUG}writeln('Reader Thread Created');{$ENDIF}
-  FGlobalInterface.ReadReadyEvent.Lock;           { Initialise Read Ready}
+  FIPCInterface.ReadReadyEvent.Lock;           { Initialise Read Ready}
   Start;
 end;
 
 destructor TReaderThread.Destroy;
 begin
 {$IFDEF DEBUG}writeln('Reader Thread Destory');{$ENDIF}
-  FGlobalInterface.ReadReadyEvent.UnLock;
-  if assigned(FGlobalInterface) and (FGlobalInterface.MonitorCount > 0) then
-     FGlobalInterface.DecMonitorCount;
+  FIPCInterface.ReadReadyEvent.UnLock;
+  if assigned(FIPCInterface) and (FIPCInterface.MonitorCount > 0) then
+     FIPCInterface.DecMonitorCount;
   FMonitors.Free;
   if assigned(FCriticalSection) then FCriticalSection.Free;
   st.Free;
@@ -1065,8 +981,8 @@ end;
 procedure TReaderThread.EndRead;
 begin
 {$IFDEF DEBUG}writeln('End Read');{$ENDIF}
-  FGlobalInterface.ReadReadyEvent.Lock;           { reset Read Ready}
-  FGlobalInterface.ReadFinishedEvent.Unlock; {Signal Read completed }
+  FIPCInterface.ReadReadyEvent.Lock;           { reset Read Ready}
+  FIPCInterface.ReadFinishedEvent.Unlock; {Signal Read completed }
   {$IFDEF DEBUG}writeln('End Read Complete');{$ENDIF}
 end;
 
@@ -1094,7 +1010,14 @@ begin
   BeginRead;
   if not bDone then
   try
-    FGlobalInterface.ReceiveTrace(st)
+    FIPCInterface.ReceiveTrace(st);
+    {$IFDEF DEBUG}writeln('Msg No. ',st.FMsgNumber,' received');{$ENDIF}
+{    if st.FMsgNumber < FReadCount then
+      FReadCount := 0
+    else
+    if st.FMsgNumber <> FReadCount then
+      IBError(ibxeMissedRead,[st.FMsgNumber,FReadCount]);}
+    Inc(FReadCount);
   finally
     EndRead;
   end;
@@ -1129,6 +1052,8 @@ end;
 
 procedure EnableMonitoring;
 begin
+  if assigned(FWriterThread) then
+    FWriterThread.FWriteCount := 0;
   MonitorHook.Enabled := True;
 end;
 
@@ -1165,12 +1090,6 @@ initialization
   FWriterThread := nil;
   FReaderThread := nil;
   bDone := False;
-{$IFDEF USE_SV5_IPC}
-  if GetEnvironmentVariable('FBSQL_IPCFILENAME') <> '' then
-    IPCFileName := GetEnvironmentVariable('FBSQL_IPCFILENAME')
-  else
-    IPCFileName := GetTempDir(true) + IPCFileName + '.' + GetEnvironmentVariable('USER');
-{$ENDIF}
 
 finalization
   {$IFDEF DEBUG}writeln('Entered Finalisation');{$ENDIF}

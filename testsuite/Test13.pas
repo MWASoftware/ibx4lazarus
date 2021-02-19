@@ -30,6 +30,7 @@ type
     FIBSQLMonitor: TIBSQLMonitor;
     FLog: TStringList;
     procedure HandleOnSQL(EventText: String; EventTime : TDateTime);
+    procedure ShowStatistics(Sender: TObject);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -65,7 +66,12 @@ const
 
 procedure TTest13.HandleOnSQL(EventText: String; EventTime: TDateTime);
 begin
-  FLog.Add('*Monitor* '+DateTimeToStr(EventTime)+' '+EventText);
+  FLog.Add('*Monitor* ' {+DateTimeToStr(EventTime)}+' '+EventText);
+end;
+
+procedure TTest13.ShowStatistics(Sender: TObject);
+begin
+  writeln(OutFile,FIBSQLMonitor.ReadCount,' ISQL Monitor Messages Received');
 end;
 
 procedure TTest13.CreateObjects(Application: TTestApplication);
@@ -77,6 +83,7 @@ begin
   IBDatabase.TraceFlags := [tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
      tfTransact, tfBlob, tfService, tfMisc];
   FIBSQLMonitor.OnSQL := @HandleOnSQL;
+  FIBSQLMonitor.OnMonitoringDisabled := @ShowStatistics;
   FIBSQLMonitor.Enabled := true;
   FLog := TStringList.Create;
 end;
@@ -133,8 +140,11 @@ begin
   IBDatabase.Connected := false;
   CheckSynchronize(1);
   DisableMonitoring;
+  writeln(Outfile,MonitorHook.GetWriteCount,' ISQL Monitor Messages written');
+  Sleep(1000);
   for i := 0 to FLog.Count - 1 do
     writeln(OutFile,FLog[i]);
+  writeln(OutFile,FIBSQLMonitor.ReadCount,' ISQL Monitor Messages Received');
 end;
 
 initialization

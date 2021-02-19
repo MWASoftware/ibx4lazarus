@@ -21,7 +21,7 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <TopLine Value="29"/>
-        <CursorPos X="49" Y="34"/>
+        <CursorPos X="35" Y="34"/>
         <UsageCount Value="37"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -69,8 +69,8 @@
       <Unit7>
         <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="597"/>
-        <CursorPos X="3" Y="601"/>
+        <TopLine Value="283"/>
+        <CursorPos X="66" Y="311"/>
         <UsageCount Value="10"/>
       </Unit7>
       <Unit8>
@@ -142,7 +142,7 @@
       <Unit17>
         <Filename Value="../../../changelog"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="22"/>
+        <TopLine Value="25"/>
         <CursorPos Y="44"/>
         <UsageCount Value="14"/>
         <DefaultSyntaxHighlighter Value="None"/>
@@ -325,7 +325,7 @@
       </Position7>
       <Position8>
         <Filename Value="Unit1.pas"/>
-        <Caret Line="34" Column="49" TopLine="29"/>
+        <Caret Line="34" Column="35" TopLine="29"/>
       </Position8>
     </JumpHistory>
     <RunParams>

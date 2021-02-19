@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="90">
+    <Units Count="92">
       <Unit0>
         <Filename Value="services.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -702,8 +702,22 @@
         <CursorPos X="24" Y="1072"/>
         <UsageCount Value="10"/>
       </Unit89>
+      <Unit90>
+        <Filename Value="../../../wst/semaphore.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="66"/>
+        <CursorPos X="18" Y="83"/>
+        <UsageCount Value="10"/>
+      </Unit90>
+      <Unit91>
+        <Filename Value="../../../ibx.editable/runtime/legacy/IBServices.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="38"/>
+        <CursorPos X="48" Y="55"/>
+        <UsageCount Value="10"/>
+      </Unit91>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="4" HistoryIndex="3">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="115" Column="42" TopLine="93"/>
@@ -716,6 +730,10 @@
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="387" Column="19" TopLine="367"/>
       </Position3>
+      <Position4>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="371" Column="13" TopLine="367"/>
+      </Position4>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

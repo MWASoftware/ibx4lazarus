@@ -644,8 +644,8 @@ Rows printed = 42
 Current memory = 19,651,152
 Delta memory = 13,040
 Max memory = 19,779,424
-Elapsed time= 0.023 sec
-Cpu = 0.010 sec
+Elapsed time= 0.026 sec
+Cpu = 0.020 sec
 Buffers = 2048
 Reads = 2
 Writes = 0
@@ -1445,7 +1445,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost/employee Disconnected after 23 ms
+inet://localhost/employee Disconnected after 24 ms
 Before Connect
 Connected to inet://localhost/employee
 DPB: Item Count = 3
@@ -1454,7 +1454,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost/employee Disconnected after 3990 ms
+inet://localhost/employee Disconnected after 4005 ms
 Idle Timer Expired for Test_Database_02
 Database Closed
 Transaction Events
@@ -1494,7 +1494,7 @@ Transaction Ending
 Transaction Ended after 2000 ms
 Idle Timer Expired for Test_Transaction_02
 Before Disconnect
-inet://localhost/employee Disconnected after 2037 ms
+inet://localhost/employee Disconnected after 2036 ms
 SQL Dialect Downgrade test
 Before Connect
 Connected to inet://localhost//tmp/ibx-testsuite/testsuite1.fdb
@@ -1506,7 +1506,7 @@ DPB: Item Count = 4
 
 inet://localhost//tmp/ibx-testsuite/testsuite1.fdb created
 Before Disconnect
-inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 23 ms
+inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 24 ms
 Before Connect
 Warning: SQL Dialect Downgrade of inet://localhost//tmp/ibx-testsuite/testsuite1.fdb
 Connected to inet://localhost//tmp/ibx-testsuite/testsuite1.fdb
@@ -1516,7 +1516,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 21 ms
+inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 26 ms
 
 
 ------------------------------------------------------
@@ -11659,20 +11659,20 @@ Message File Location = /opt/firebird3.0.5/
 Database Statistics for employee
 
 Database "/opt/firebird3.0.5/examples/empbuild/employee.fdb"
-Gstat execution time Wed Feb 17 10:39:32 2021
+Gstat execution time Thu Feb 18 17:01:35 2021
 
 Database header page information:
 Flags			0
-Generation		1865
+Generation		1989
 System Change Number	0
 Page size		8192
 ODS version		12.0
-Oldest transaction	2037
-Oldest active		2038
-Oldest snapshot		2038
-Next transaction	2038
+Oldest transaction	2191
+Oldest active		2192
+Oldest snapshot		2192
+Next transaction	2192
 Sequence number		0
-Next attachment ID	1752
+Next attachment ID	1924
 Implementation		HW=AMD/Intel/x64 little-endian OS=Linux CC=gcc
 Shadow count		0
 Page buffers		0
@@ -11819,7 +11819,7 @@ Fill distribution:
 60 - 79% = 0
 80 - 99% = 0
 
-Gstat completion time Wed Feb 17 10:39:32 2021
+Gstat completion time Thu Feb 18 17:01:35 2021
 
 
 
@@ -11829,87 +11829,87 @@ zeus	Tue Jun  9 15:11:28 2020
 bin/fbguard: guardian starting /opt/firebird3.0.5/bin/firebird
 
 Online Validation
-10:39:32.49 Validation started
+17:01:36.08 Validation started
 
-10:39:32.49 Relation 128 (COUNTRY)
-10:39:32.49   process pointer page    0 of    1
-10:39:32.49 Index 1 (RDB$PRIMARY1)
-10:39:32.49 Relation 128 (COUNTRY) is ok
+17:01:36.08 Relation 128 (COUNTRY)
+17:01:36.08   process pointer page    0 of    1
+17:01:36.08 Index 1 (RDB$PRIMARY1)
+17:01:36.08 Relation 128 (COUNTRY) is ok
 
-10:39:32.49 Relation 129 (JOB)
-10:39:32.49   process pointer page    0 of    1
-10:39:32.49 Index 1 (RDB$PRIMARY2)
-10:39:32.49 Index 2 (RDB$FOREIGN3)
-10:39:32.49 Index 3 (MAXSALX)
-10:39:32.49 Index 4 (MINSALX)
-10:39:32.49 Relation 129 (JOB) is ok
+17:01:36.08 Relation 129 (JOB)
+17:01:36.08   process pointer page    0 of    1
+17:01:36.08 Index 1 (RDB$PRIMARY2)
+17:01:36.08 Index 2 (RDB$FOREIGN3)
+17:01:36.08 Index 3 (MAXSALX)
+17:01:36.08 Index 4 (MINSALX)
+17:01:36.08 Relation 129 (JOB) is ok
 
-10:39:32.49 Relation 130 (DEPARTMENT)
-10:39:32.49   process pointer page    0 of    1
-10:39:32.49 Index 1 (RDB$4)
-10:39:32.49 Index 2 (RDB$PRIMARY5)
-10:39:32.49 Index 3 (RDB$FOREIGN6)
-10:39:32.49 Index 4 (BUDGETX)
-10:39:32.49 Index 5 (RDB$FOREIGN10)
-10:39:32.49 Relation 130 (DEPARTMENT) is ok
+17:01:36.08 Relation 130 (DEPARTMENT)
+17:01:36.08   process pointer page    0 of    1
+17:01:36.08 Index 1 (RDB$4)
+17:01:36.08 Index 2 (RDB$PRIMARY5)
+17:01:36.08 Index 3 (RDB$FOREIGN6)
+17:01:36.08 Index 4 (BUDGETX)
+17:01:36.08 Index 5 (RDB$FOREIGN10)
+17:01:36.08 Relation 130 (DEPARTMENT) is ok
 
-10:39:32.49 Relation 131 (EMPLOYEE)
-10:39:32.49   process pointer page    0 of    1
-10:39:32.49 Index 1 (RDB$PRIMARY7)
-10:39:32.49 Index 2 (RDB$FOREIGN8)
-10:39:32.49 Index 3 (RDB$FOREIGN9)
-10:39:32.49 Index 4 (NAMEX)
-10:39:32.49 Relation 131 (EMPLOYEE) is ok
+17:01:36.08 Relation 131 (EMPLOYEE)
+17:01:36.08   process pointer page    0 of    1
+17:01:36.08 Index 1 (RDB$PRIMARY7)
+17:01:36.08 Index 2 (RDB$FOREIGN8)
+17:01:36.08 Index 3 (RDB$FOREIGN9)
+17:01:36.08 Index 4 (NAMEX)
+17:01:36.08 Relation 131 (EMPLOYEE) is ok
 
-10:39:32.49 Relation 133 (PROJECT)
-10:39:32.49   process pointer page    0 of    1
-10:39:32.49 Index 1 (RDB$11)
-10:39:32.49 Index 2 (RDB$PRIMARY12)
-10:39:32.49 Index 3 (RDB$FOREIGN13)
-10:39:32.49 Index 4 (PRODTYPEX)
-10:39:32.49 Relation 133 (PROJECT) is ok
+17:01:36.08 Relation 133 (PROJECT)
+17:01:36.08   process pointer page    0 of    1
+17:01:36.08 Index 1 (RDB$11)
+17:01:36.08 Index 2 (RDB$PRIMARY12)
+17:01:36.08 Index 3 (RDB$FOREIGN13)
+17:01:36.08 Index 4 (PRODTYPEX)
+17:01:36.08 Relation 133 (PROJECT) is ok
 
-10:39:32.49 Relation 134 (EMPLOYEE_PROJECT)
-10:39:32.49   process pointer page    0 of    1
-10:39:32.49 Index 1 (RDB$PRIMARY14)
-10:39:32.49 Index 2 (RDB$FOREIGN15)
-10:39:32.50 Index 3 (RDB$FOREIGN16)
-10:39:32.50 Relation 134 (EMPLOYEE_PROJECT) is ok
+17:01:36.08 Relation 134 (EMPLOYEE_PROJECT)
+17:01:36.08   process pointer page    0 of    1
+17:01:36.08 Index 1 (RDB$PRIMARY14)
+17:01:36.09 Index 2 (RDB$FOREIGN15)
+17:01:36.09 Index 3 (RDB$FOREIGN16)
+17:01:36.09 Relation 134 (EMPLOYEE_PROJECT) is ok
 
-10:39:32.50 Relation 135 (PROJ_DEPT_BUDGET)
-10:39:32.50   process pointer page    0 of    1
-10:39:32.50 Index 1 (RDB$PRIMARY17)
-10:39:32.50 Index 2 (RDB$FOREIGN18)
-10:39:32.50 Index 3 (RDB$FOREIGN19)
-10:39:32.50 Relation 135 (PROJ_DEPT_BUDGET) is ok
+17:01:36.09 Relation 135 (PROJ_DEPT_BUDGET)
+17:01:36.09   process pointer page    0 of    1
+17:01:36.09 Index 1 (RDB$PRIMARY17)
+17:01:36.09 Index 2 (RDB$FOREIGN18)
+17:01:36.09 Index 3 (RDB$FOREIGN19)
+17:01:36.09 Relation 135 (PROJ_DEPT_BUDGET) is ok
 
-10:39:32.50 Relation 136 (SALARY_HISTORY)
-10:39:32.50   process pointer page    0 of    1
-10:39:32.50 Index 1 (RDB$PRIMARY20)
-10:39:32.50 Index 2 (RDB$FOREIGN21)
-10:39:32.50 Index 3 (CHANGEX)
-10:39:32.50 Index 4 (UPDATERX)
-10:39:32.50 Relation 136 (SALARY_HISTORY) is ok
+17:01:36.09 Relation 136 (SALARY_HISTORY)
+17:01:36.09   process pointer page    0 of    1
+17:01:36.09 Index 1 (RDB$PRIMARY20)
+17:01:36.09 Index 2 (RDB$FOREIGN21)
+17:01:36.09 Index 3 (CHANGEX)
+17:01:36.09 Index 4 (UPDATERX)
+17:01:36.09 Relation 136 (SALARY_HISTORY) is ok
 
-10:39:32.50 Relation 137 (CUSTOMER)
-10:39:32.50   process pointer page    0 of    1
-10:39:32.50 Index 1 (RDB$PRIMARY22)
-10:39:32.50 Index 2 (RDB$FOREIGN23)
-10:39:32.50 Index 3 (CUSTNAMEX)
-10:39:32.50 Index 4 (CUSTREGION)
-10:39:32.50 Relation 137 (CUSTOMER) is ok
+17:01:36.09 Relation 137 (CUSTOMER)
+17:01:36.09   process pointer page    0 of    1
+17:01:36.09 Index 1 (RDB$PRIMARY22)
+17:01:36.09 Index 2 (RDB$FOREIGN23)
+17:01:36.09 Index 3 (CUSTNAMEX)
+17:01:36.09 Index 4 (CUSTREGION)
+17:01:36.09 Relation 137 (CUSTOMER) is ok
 
-10:39:32.50 Relation 138 (SALES)
-10:39:32.50   process pointer page    0 of    1
-10:39:32.50 Index 1 (RDB$PRIMARY24)
-10:39:32.50 Index 2 (RDB$FOREIGN25)
-10:39:32.51 Index 3 (RDB$FOREIGN26)
-10:39:32.51 Index 4 (NEEDX)
-10:39:32.51 Index 5 (QTYX)
-10:39:32.51 Index 6 (SALESTATX)
-10:39:32.51 Relation 138 (SALES) is ok
+17:01:36.10 Relation 138 (SALES)
+17:01:36.10   process pointer page    0 of    1
+17:01:36.10 Index 1 (RDB$PRIMARY24)
+17:01:36.10 Index 2 (RDB$FOREIGN25)
+17:01:36.10 Index 3 (RDB$FOREIGN26)
+17:01:36.10 Index 4 (NEEDX)
+17:01:36.10 Index 5 (QTYX)
+17:01:36.10 Index 6 (SALESTATX)
+17:01:36.10 Relation 138 (SALES) is ok
 
-10:39:32.51 Validation finished
+17:01:36.10 Validation finished
 
 
 Normal Validation
@@ -13241,13 +13241,15 @@ DEPT_KEY_PATH = 000 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 2
 
-*Monitor* 17/2/2021 10:39:34.784 
+33 ISQL Monitor Messages Received
+33 ISQL Monitor Messages written
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Database_13: [Connect]
-*Monitor* 17/2/2021 10:39:34.784 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Transaction_13: [Start transaction]
-*Monitor* 17/2/2021 10:39:34.794 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Prepare] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
@@ -13259,8 +13261,7 @@ Select Expression
                 -> Filter
                     -> Table "DEPARTMENT" as "DEPTS DEPARTMENT" Access By ID
                         -> Bitmap
-   
-*Monitor* 17/2/2021 10:39:34.794                          -> Index "RDB$FOREIGN6" Range Scan (full match)
+                            -> Index "RDB$FOREIGN6" Range Scan (full match)
                 -> Filter
                     -> Table "DEPARTMENT" as "DEPTS D" Access By ID
                         -> Bitmap
@@ -13269,10 +13270,10 @@ Select Expression
                 -> Table "EMPLOYEE" as "A" Access By ID
                     -> Bitmap
                         -> Index "RDB$FOREIGN8" Range Scan (full match)
-*Monitor* 17/2/2021 10:39:34.803 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Start transaction]
-*Monitor* 17/2/2021 10:39:34.810 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
@@ -13287,57 +13288,57 @@ Select Expression
             -> Table "RDB$FIELDS" as "F" Access By ID
                 -> Bitmap
                     -> Index "RDB$INDEX_2" Unique Scan
-*Monitor* 17/2/2021 10:39:34.810 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
   RELATION = EMPLOYEE
-*Monitor* 17/2/2021 10:39:34.811 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
-*Monitor* 17/2/2021 10:39:34.811 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
-*Monitor* 17/2/2021 10:39:34.811 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
   SEOFReached
-*Monitor* 17/2/2021 10:39:34.813 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:34.820 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Execute] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:34.821 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:34.822 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:34.822 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
   SEOFReached
-*Monitor* 17/2/2021 10:39:34.823 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Transaction_13: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:34.836 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Database_13: [Disconnect]
-*Monitor* 17/2/2021 10:39:34.888 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Database_13: [Connect]
-*Monitor* 17/2/2021 10:39:34.889 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Transaction_13: [Start transaction]
-*Monitor* 17/2/2021 10:39:34.899 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Prepare] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
@@ -13349,8 +13350,7 @@ Select Expression
                 -> Filter
                     -> Table "DEPARTMENT" as "DEPTS DEPARTMENT" Access By ID
                         -> Bitmap
-   
-*Monitor* 17/2/2021 10:39:34.899                          -> Index "RDB$FOREIGN6" Range Scan (full match)
+                            -> Index "RDB$FOREIGN6" Range Scan (full match)
                 -> Filter
                     -> Table "DEPARTMENT" as "DEPTS D" Access By ID
                         -> Bitmap
@@ -13359,10 +13359,10 @@ Select Expression
                 -> Table "EMPLOYEE" as "A" Access By ID
                     -> Bitmap
                         -> Index "RDB$FOREIGN8" Range Scan (full match)
-*Monitor* 17/2/2021 10:39:34.908 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Start transaction]
-*Monitor* 17/2/2021 10:39:34.913 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
@@ -13377,50 +13377,51 @@ Select Expression
             -> Table "RDB$FIELDS" as "F" Access By ID
                 -> Bitmap
                     -> Index "RDB$INDEX_2" Unique Scan
-*Monitor* 17/2/2021 10:39:34.913 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
   RELATION = EMPLOYEE
-*Monitor* 17/2/2021 10:39:34.914 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
-*Monitor* 17/2/2021 10:39:34.914 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
-*Monitor* 17/2/2021 10:39:34.914 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
   SEOFReached
-*Monitor* 17/2/2021 10:39:34.920 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:34.922 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Execute] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:34.924 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:34.924 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:34.925 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
   SEOFReached
-*Monitor* 17/2/2021 10:39:34.926 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Transaction_13: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:34.936 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Database_13: [Disconnect]
+33 ISQL Monitor Messages Received
 
 
 ------------------------------------------------------
@@ -13461,7 +13462,7 @@ Rows printed = 2
 Current memory = 19,651,616
 Delta memory = 12,688
 Max memory = 19,780,240
-Elapsed time= 0.002 sec
+Elapsed time= 0.102 sec
 Cpu = 0.000 sec
 Buffers = 2048
 Reads = 2
@@ -13505,251 +13506,14 @@ DEPT_KEY_PATH = 000 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 2
 
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Start transaction]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  Plan: 
-PLAN JOIN (R INDEX (RDB$INDEX_4), F INDEX (RDB$INDEX_2))
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  RELATION = EMPLOYEE
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  SEOFReached
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Execute] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-  SEOFReached
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-Test_Transaction_14: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-Test_Database_14: [Disconnect]
-*Monitor* 17/2/2021 10:31:31 
+33 ISQL Monitor Messages written
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Database_14: [Connect]
-*Monitor* 17/2/2021 10:31:31 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Transaction_14: [Start transaction]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Prepare] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-  Plan: 
-PLAN JOIN ((DEPTS DEPARTMENT INDEX (RDB$FOREIGN6))
-PLAN (DEPTS D INDEX (RDB$FOREIGN6)), A INDEX (RDB$FOREIGN8))
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Start transaction]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  Plan: 
-PLAN JOIN (R INDEX (RDB$INDEX_4), F INDEX (RDB$INDEX_2))
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  RELATION = EMPLOYEE
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  SEOFReached
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Execute] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-  SEOFReached
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-Test_Transaction_14: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-Test_Database_14: [Disconnect]
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Start transaction]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  Plan: 
-PLAN JOIN (R INDEX (RDB$INDEX_4), F INDEX (RDB$INDEX_2))
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  RELATION = EMPLOYEE
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  SEOFReached
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Execute] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-  SEOFReached
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-Test_Transaction_14: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-Test_Database_14: [Disconnect]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-Test_Database_14: [Connect]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-Test_Transaction_14: [Start transaction]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Prepare] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-  Plan: 
-PLAN JOIN ((DEPTS DEPARTMENT INDEX (RDB$FOREIGN6))
-PLAN (DEPTS D INDEX (RDB$FOREIGN6)), A INDEX (RDB$FOREIGN8))
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Start transaction]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  Plan: 
-PLAN JOIN (R INDEX (RDB$INDEX_4), F INDEX (RDB$INDEX_2))
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  RELATION = EMPLOYEE
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL)) 
-
-  SEOFReached
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Execute] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-  SEOFReached
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-Test_Transaction_14: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:31:31 
-[Application: IBX Test Suite]
-Test_Database_14: [Disconnect]
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-Test_Database_13: [Connect]
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-Test_Transaction_13: [Start transaction]
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Prepare] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
@@ -13761,8 +13525,7 @@ Select Expression
                 -> Filter
                     -> Table "DEPARTMENT" as "DEPTS DEPARTMENT" Access By ID
                         -> Bitmap
-   
-*Monitor* 17/2/2021 10:39:34                          -> Index "RDB$FOREIGN6" Range Scan (full match)
+                            -> Index "RDB$FOREIGN6" Range Scan (full match)
                 -> Filter
                     -> Table "DEPARTMENT" as "DEPTS D" Access By ID
                         -> Bitmap
@@ -13771,10 +13534,10 @@ Select Expression
                 -> Table "EMPLOYEE" as "A" Access By ID
                     -> Bitmap
                         -> Index "RDB$FOREIGN8" Range Scan (full match)
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Start transaction]
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
@@ -13789,237 +13552,57 @@ Select Expression
             -> Table "RDB$FIELDS" as "F" Access By ID
                 -> Bitmap
                     -> Index "RDB$INDEX_2" Unique Scan
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
   RELATION = EMPLOYEE
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
   SEOFReached
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Execute] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-  SEOFReached
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-Test_Transaction_13: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-Test_Database_13: [Disconnect]
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-Test_Database_13: [Connect]
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-Test_Transaction_13: [Start transaction]
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Prepare] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-  Plan: 
-Select Expression
-    -> First N Records
-        -> Nested Loop Join (inner)
-            -> Recursion
-                -> Filter
-                    -> Table "DEPARTMENT" as "DEPTS DEPARTMENT" Access By ID
-                        -> Bitmap
-   
-*Monitor* 17/2/2021 10:39:34                          -> Index "RDB$FOREIGN6" Range Scan (full match)
-                -> Filter
-                    -> Table "DEPARTMENT" as "DEPTS D" Access By ID
-                        -> Bitmap
-                            -> Index "RDB$FOREIGN6" Range Scan (full match)
-            -> Filter
-                -> Table "EMPLOYEE" as "A" Access By ID
-                    -> Bitmap
-                        -> Index "RDB$FOREIGN8" Range Scan (full match)
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Start transaction]
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
-
-  Plan: 
-Select Expression
-    -> Nested Loop Join (inner)
-        -> Filter
-            -> Table "RDB$RELATION_FIELDS" as "R" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_4" Range Scan (full match)
-        -> Filter
-            -> Table "RDB$FIELDS" as "F" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_2" Unique Scan
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
-
-  RELATION = EMPLOYEE
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
-
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
-
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
-
-  SEOFReached
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Execute] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:39:34 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
   SEOFReached
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-Test_Transaction_13: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:34 
-[Application: IBX Test Suite]
-Test_Database_13: [Disconnect]
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-Test_Database_14: [Connect]
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-Test_Transaction_14: [Start transaction]
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Prepare] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-  Plan: 
-Select Expression
-    -> First N Records
-        -> Nested Loop Join (inner)
-            -> Recursion
-                -> Filter
-                    -> Table "DEPARTMENT" as "DEPTS DEPARTMENT" Access By ID
-                        -> Bitmap
-   
-*Monitor* 17/2/2021 10:39:36                          -> Index "RDB$FOREIGN6" Range Scan (full match)
-                -> Filter
-                    -> Table "DEPARTMENT" as "DEPTS D" Access By ID
-                        -> Bitmap
-                            -> Index "RDB$FOREIGN6" Range Scan (full match)
-            -> Filter
-                -> Table "EMPLOYEE" as "A" Access By ID
-                    -> Bitmap
-                        -> Index "RDB$FOREIGN8" Range Scan (full match)
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Start transaction]
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
-
-  Plan: 
-Select Expression
-    -> Nested Loop Join (inner)
-        -> Filter
-            -> Table "RDB$RELATION_FIELDS" as "R" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_4" Range Scan (full match)
-        -> Filter
-            -> Table "RDB$FIELDS" as "F" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_2" Unique Scan
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
-
-  RELATION = EMPLOYEE
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
-
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
-
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
-
-  SEOFReached
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Execute] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-*Monitor* 17/2/2021 10:39:36 
-[Application: IBX Test Suite]
-: [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
-
-  SEOFReached
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Transaction_14: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Database_14: [Disconnect]
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Database_14: [Connect]
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Transaction_14: [Start transaction]
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Prepare] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
@@ -14031,8 +13614,7 @@ Select Expression
                 -> Filter
                     -> Table "DEPARTMENT" as "DEPTS DEPARTMENT" Access By ID
                         -> Bitmap
-   
-*Monitor* 17/2/2021 10:39:36                          -> Index "RDB$FOREIGN6" Range Scan (full match)
+                            -> Index "RDB$FOREIGN6" Range Scan (full match)
                 -> Filter
                     -> Table "DEPARTMENT" as "DEPTS D" Access By ID
                         -> Bitmap
@@ -14041,10 +13623,10 @@ Select Expression
                 -> Table "EMPLOYEE" as "A" Access By ID
                     -> Bitmap
                         -> Index "RDB$FOREIGN8" Range Scan (full match)
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Start transaction]
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
@@ -14059,50 +13641,51 @@ Select Expression
             -> Table "RDB$FIELDS" as "F" Access By ID
                 -> Bitmap
                     -> Index "RDB$INDEX_2" Unique Scan
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
   RELATION = EMPLOYEE
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
 
   SEOFReached
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Execute] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 : [Fetch] with recursive Depts As (   Select DEPT_NO, DEPARTMENT, HEAD_DEPT, cast(DEPARTMENT  as VarChar(256)) as DEPT_PATH,cast(DEPT_NO as VarChar(64)) as DEPT_KEY_PATH From DEPARTMENT Where HEAD_DEPT is NULL UNION ALL Select D.DEPT_NO, D.DEPARTMENT, D.HEAD_DEPT, Depts.DEPT_PATH ||  ' / ' || D.DEPARTMENT as DEPT_PATH,Depts.DEPT_KEY_PATH || ';' || D.DEPT_NO as DEPT_KEY_PATH From DEPARTMENT D JOIN Depts On D.HEAD_DEPT = Depts.DEPT_NO )Select First 2 A.EMP_NO, A.FIRST_NAME, A.LAST_NAME, A.PHONE_EXT, A.HIRE_DATE, A.DEPT_NO, A.JOB_CODE,A.JOB_GRADE, A.JOB_COUNTRY, A.SALARY, A.FULL_NAME, D.DEPT_PATH, D.DEPT_KEY_PATH From EMPLOYEE A JOIN Depts D On D.DEPT_NO = A.DEPT_NO
 
   SEOFReached
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Transaction_14: [Commit (Hard commit)]
-*Monitor* 17/2/2021 10:39:36 
+*Monitor*  
 [Application: IBX Test Suite]
 Test_Database_14: [Disconnect]
+33 ISQL Monitor Messages Received
 
 
 ------------------------------------------------------
@@ -15494,12 +15077,12 @@ Create Table LotsOfData (
     MyText VarChar(1024), 
     Primary Key (RowID) 
   );                 
-Loading data into database table. Started at 17/2/2021 10:39:56.328
-Data load completed at 17/2/2021 10:41:26.558 Elapsed Time = 90230 ms, 100000 records loaded
- MD5 checksum = bab48fcf928b5720e5e1735e5401803e
-Database Read started at 17/2/2021 10:41:26.568
-Read Dataset completed at 17/2/2021 10:41:57.747 Elapsed Time = 31179 ms, 100000 records read
- MD5 checksum = bab48fcf928b5720e5e1735e5401803e
+Loading data into database table. Started at 18/2/2021 17:02:23.963
+Data load completed at 18/2/2021 17:04:01.973 Elapsed Time = 98010 ms, 100000 records loaded
+ MD5 checksum = e299f7080fd2afa5d1b70b92831668b0
+Database Read started at 18/2/2021 17:04:01.983
+Read Dataset completed at 18/2/2021 17:04:31.867 Elapsed Time = 29884 ms, 100000 records read
+ MD5 checksum = e299f7080fd2afa5d1b70b92831668b0
 Test Completed successfully
 
 

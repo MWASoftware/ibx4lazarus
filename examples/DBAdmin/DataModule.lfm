@@ -12,7 +12,7 @@ object DBDataModule: TDBDataModule
     OnLogin = IBDatabase1Login
     CreateIfNotExists = False
     AllowStreamedConnected = False
-    DatabaseName = 'employee'
+    DatabaseName = 'localhost:employee'
     Params.Strings = (
       'lc_ctype=UTF8'
       'user_name=SYSDBA'

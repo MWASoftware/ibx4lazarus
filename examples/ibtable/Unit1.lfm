@@ -185,7 +185,7 @@ object Form1: TForm1
     AfterConnect = IBDatabase1AfterConnect
     CreateIfNotExists = False
     AllowStreamedConnected = False
-    DatabaseName = 'employee'
+    DatabaseName = 'localhost:employee'
     Params.Strings = (
       'user_name=SYSDBA'
       'lc_ctype=UTF-8'
@@ -194,8 +194,8 @@ object Form1: TForm1
     IdleTimer = 0
     TraceFlags = []
     UseDefaultSystemCodePage = False
-    left = 184
-    top = 56
+    Left = 184
+    Top = 56
   end
   object IBTransaction1: TIBTransaction
     Active = False
@@ -205,8 +205,8 @@ object Form1: TForm1
       'rec_version'
       'nowait'
     )
-    left = 272
-    top = 56
+    Left = 272
+    Top = 56
   end
   object Depts: TIBTable
     AllowAutoActivateTransaction = True
@@ -225,8 +225,8 @@ object Form1: TForm1
     MasterDetailDelay = 500
     ReadOnly = True
     TableName = 'DEPARTMENT'
-    left = 424
-    top = 56
+    Left = 424
+    Top = 56
     object DeptsDEPT_NO: TIBStringField
       DisplayWidth = 3
       FieldKind = fkData
@@ -309,13 +309,13 @@ object Form1: TForm1
   end
   object DataSource2: TDataSource
     DataSet = Depts
-    left = 360
-    top = 56
+    Left = 360
+    Top = 56
   end
   object Datasource1: TDataSource
     DataSet = Employees
-    left = 496
-    top = 56
+    Left = 496
+    Top = 56
   end
   object Employees: TIBTable
     AllowAutoActivateTransaction = False
@@ -336,8 +336,8 @@ object Form1: TForm1
     MasterSource = DataSource2
     MasterDetailDelay = 300
     TableName = 'EMPLOYEE'
-    left = 576
-    top = 56
+    Left = 576
+    Top = 56
     object EmployeesEMP_NO: TSmallintField
       DisplayWidth = 10
       FieldKind = fkData

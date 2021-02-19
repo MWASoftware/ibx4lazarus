@@ -10,7 +10,7 @@ uses
   IBBatchMove, IBBlob, IBCustomDataSet, IBDatabase, IBDatabaseInfo, 
   IBDataOutput, IBEvents, IBExtract, IBQuery, IBSQL, IBSQLMonitor, 
   IBSQLParser, IBStoredProc, IBTable, IBUpdate, IBUpdateSQL, IBVersion, 
-  ibxscript, IBXServices, IBMessages, IBInternals;
+  ibxscript, IBXServices, IBMessages, IBInternals, IBIPC;
 
 implementation
 

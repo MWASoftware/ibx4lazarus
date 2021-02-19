@@ -308,6 +308,7 @@ begin
   try
     Container.SetSize(Control.Width,Control.Height);
     Container.Canvas.Brush.Color := control.Color;
+    Container.Canvas.FillRect(0,0,Control.Width,Control.Height);
     Control.PaintTo(Container.Canvas,0,0);
   except
     Container.Free;
