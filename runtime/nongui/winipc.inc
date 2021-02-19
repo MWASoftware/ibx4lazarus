@@ -48,12 +48,16 @@ type
 
   }
 
-  ISharedMemoryExt = interface(ISharedMemory)
-  ['{7449e122-61c0-4ea9-acf4-f0a420af14aa}']
+  ISharedMemory = interface
+  ['{db77bdd4-233a-4c9c-9212-dd7945e2e57c}']
   function IsInitialiser: boolean;
+  function Allocate(Size: integer): PByte;
+  function GetLastAllocationSize: integer;
+  property LastAllocationSize: integer read GetLastAllocationSize;
   end;
 
-  TSharedMemory = class(TIpcCommon,ISharedMemoryExt)
+
+  TSharedMemory = class(TIpcCommon,ISharedMemory)
   private
     FBuffer: PByte;
     FLastAllocationSize: integer;
@@ -146,13 +150,13 @@ type
 
   TMultilockGate = class(TIpcCommon, IMultilockGate)
   private
-    FSharedMemory: ISharedMemoryExt;
+    FSharedMemory: ISharedMemory;
     FOnGateTimeout: TNotifyEvent;
     FEvent: THandle;
     FLockCount: PInteger;
     FMutex: TMutex;
   public
-    constructor Create(EventName: string; sm: ISharedMemoryExt);
+    constructor Create(EventName: string; sm: ISharedMemory);
     destructor Destroy; override;
     procedure Lock;
     procedure Unlock;
@@ -169,7 +173,7 @@ type
   TIPCInterface = class(TIpcCommon, IIPCInterface)
   private
     FMaxBufferSize: integer;
-    FSharedMemory: ISharedMemoryExt;
+    FSharedMemory: ISharedMemory;
     FWriteLock: IMutex;
     FBuffer: PByte;
     FTraceDataType,
@@ -194,7 +198,6 @@ type
     function GetReadFinishedEvent: IMultiLockGate;
     function GetWriteLock: IMutex;
     function GetMonitorCount: integer;
-    function GetSharedMemory: ISharedMemory;
     function GetMaxBufferSize: integer;
     property DataAvailableEvent: ISingleLockGate read GetDataAvailableEvent;
     property WriterBusyEvent: ISingleLockGate read GetWriterBusyEvent;
@@ -202,7 +205,6 @@ type
     property ReadFinishedEvent: IMultiLockGate read GetReadFinishedEvent;
     property WriteLock: IMutex read GetWriteLock;
     property MonitorCount: integer read GetMonitorCount;
-    property SharedMemory: ISharedMemory read GetSharedMemory;
     property MaxBufferSize: integer read GetMaxBufferSize;
   end;
 
@@ -361,7 +363,7 @@ end;
 
 { TMultilockGate }
 
-constructor TMultilockGate.Create(EventName: string; sm: ISharedMemoryExt);
+constructor TMultilockGate.Create(EventName: string; sm: ISharedMemory);
 begin
   inherited Create;
   FSharedMemory := sm;
@@ -452,11 +454,6 @@ end;
 function TIPCInterface.GetMonitorCount: integer;
 begin
   Result := FMonitorCount^
-end;
-
-function TIPCInterface.GetSharedMemory: ISharedMemory;
-begin
-  Result := FSharedMemory;
 end;
 
 function TIPCInterface.GetMaxBufferSize: integer;

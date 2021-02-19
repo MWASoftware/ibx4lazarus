@@ -676,10 +676,11 @@
       </Unit87>
       <Unit88>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1076"/>
-        <CursorPos X="86" Y="1082"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="1075"/>
+        <CursorPos X="54" Y="1090"/>
         <UsageCount Value="18"/>
+        <Loaded Value="True"/>
       </Unit88>
       <Unit89>
         <Filename Value="../runtime/nongui/IBBatchMove.pas"/>
@@ -730,10 +731,12 @@
       </Unit95>
       <Unit96>
         <Filename Value="../runtime/nongui/sv5ipc.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="620"/>
-        <CursorPos X="3" Y="623"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="98"/>
+        <CursorPos X="3" Y="324"/>
         <UsageCount Value="19"/>
+        <Loaded Value="True"/>
       </Unit96>
       <Unit97>
         <Filename Value="../runtime/nongui/IBSQLParser.pas"/>
@@ -1328,25 +1331,62 @@
       </Unit182>
       <Unit183>
         <Filename Value="../runtime/nongui/winipc.inc"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="51" Y="437"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="49"/>
+        <CursorPos Y="201"/>
         <UsageCount Value="13"/>
+        <Loaded Value="True"/>
       </Unit183>
       <Unit184>
         <Filename Value="../runtime/nongui/IBIPC.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="115"/>
-        <CursorPos X="35" Y="140"/>
+        <TopLine Value="138"/>
+        <CursorPos Y="141"/>
         <UsageCount Value="23"/>
         <Loaded Value="True"/>
       </Unit184>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="10" HistoryIndex="9">
       <Position1>
         <Filename Value="../runtime/nongui/IBIPC.pas"/>
         <Caret Line="180" Column="12" TopLine="154"/>
       </Position1>
+      <Position2>
+        <Filename Value="../runtime/nongui/IBIPC.pas"/>
+        <Caret Line="160" TopLine="141"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
+        <Caret Line="624" Column="29" TopLine="607"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
+        <Caret Line="80" Column="36" TopLine="50"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
+        <Caret Line="614" TopLine="604"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../runtime/nongui/winipc.inc"/>
+        <Caret Line="59" TopLine="34"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../runtime/nongui/winipc.inc"/>
+        <Caret Line="201" Column="29" TopLine="182"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../runtime/nongui/winipc.inc"/>
+        <Caret Line="214" Column="40" TopLine="186"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../runtime/nongui/winipc.inc"/>
+        <Caret Line="231" Column="18" TopLine="203"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../runtime/nongui/sv5ipc.inc"/>
+        <Caret Line="89" Column="18" TopLine="65"/>
+      </Position10>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

@@ -69,9 +69,12 @@ type
     Note that the Linux semaphore set is also created with the shared memory.
   }
 
-  ISharedMemoryExt = interface(ISharedMemory)
-  ['{7449e122-61c0-4ea9-acf4-f0a420af14aa}']
+  ISharedMemory = interface
+  ['{db77bdd4-233a-4c9c-9212-dd7945e2e57c}']
   function IsInitialiser: boolean;
+  function Allocate(Size: integer): PByte;
+  function GetLastAllocationSize: integer;
+  property LastAllocationSize: integer read GetLastAllocationSize;
   end;
 
   TSharedMemory = class(TIpcCommon,ISharedMemory)
@@ -139,14 +142,14 @@ type
 
   TSingleLockGate = class(TIpcCommon,ISingleLockGate)
   private
-    FSharedMemory: ISharedMemoryExt;
+    FSharedMemory: ISharedMemory;
     FSemaphore: cint;
     FMutex: cint;
     FSignalledState: PInteger;
     FWaitingThreads: PInteger;
     function GetWaitingThreads: integer;
   public
-    constructor Create(SemNum: cint; sm: ISharedMemoryExt);
+    constructor Create(SemNum: cint; sm: ISharedMemory);
     property WaitingThreads: integer read GetWaitingThreads;
   public
     procedure PassthroughGate;
@@ -192,14 +195,14 @@ type
 
   TMultilockGate = class(TIpcCommon,IMultiLockGate)
   private
-    FSharedMemory: ISharedMemoryExt;
+    FSharedMemory: ISharedMemory;
     FOnGateTimeout: TNotifyEvent;
     FSemaphore: cint;
     FMutex: cint;
     FLockCount: PInteger;
     function GetLockCount: integer;
   public
-    constructor Create(SemNum: cint; sm: ISharedMemoryExt);
+    constructor Create(SemNum: cint; sm: ISharedMemory);
     procedure Lock;
     procedure Unlock;
     procedure PassthroughGate;
@@ -214,7 +217,7 @@ type
   TIPCInterface = class(TIpcCommon,IIPCInterface)
   private
     FMaxBufferSize: integer;
-    FSharedMemory: ISharedMemoryExt;
+    FSharedMemory: ISharedMemory;
     FWriteLock: IMutex;
     FBuffer: PByte;
     FTraceDataType,
@@ -237,7 +240,6 @@ type
     function GetReadFinishedEvent: IMultiLockGate;
     function GetWriteLock: IMutex;
     function GetMonitorCount: integer;
-    function GetSharedMemory: ISharedMemory;
     function GetMaxBufferSize: integer;
     property DataAvailableEvent: ISingleLockGate read GetDataAvailableEvent;
     property WriterBusyEvent: ISingleLockGate read GetWriterBusyEvent;
@@ -245,7 +247,6 @@ type
     property ReadFinishedEvent: IMultiLockGate read GetReadFinishedEvent;
     property WriteLock: IMutex read GetWriteLock;
     property MonitorCount: integer read GetMonitorCount;
-    property SharedMemory: ISharedMemory read GetSharedMemory;
     property MaxBufferSize: integer read GetMaxBufferSize;
   end;
 
@@ -470,7 +471,7 @@ begin
   Result := FWaitingThreads^
 end;
 
-constructor TSingleLockGate.Create(SemNum: cint; sm: ISharedMemoryExt);
+constructor TSingleLockGate.Create(SemNum: cint; sm: ISharedMemory);
 begin
   inherited Create;
   FSharedMemory := sm;
@@ -525,7 +526,7 @@ end;
 
 { TMultilockGate }
 
-constructor TMultilockGate.Create(SemNum: cint; sm: ISharedMemoryExt);
+constructor TMultilockGate.Create(SemNum: cint; sm: ISharedMemory);
 begin
   inherited Create;
   FSemaphore := SemNum;
@@ -606,11 +607,6 @@ end;
 function TIPCInterface.GetMonitorCount: integer;
 begin
   Result := GetSemValue(cMonitorCounter)
-end;
-
-function TIPCInterface.GetSharedMemory: ISharedMemory;
-begin
-  Result := FSharedMemory;
 end;
 
 function TIPCInterface.GetMaxBufferSize: integer;
