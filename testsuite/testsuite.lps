@@ -3,10 +3,11 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="185">
+    <Units Count="186">
       <Unit0>
         <Filename Value="testsuite.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <CursorPos Y="10"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
@@ -677,8 +678,8 @@
       <Unit88>
         <Filename Value="../runtime/nongui/IBSQLMonitor.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1076"/>
-        <CursorPos X="86" Y="1082"/>
+        <TopLine Value="749"/>
+        <CursorPos X="54" Y="762"/>
         <UsageCount Value="18"/>
       </Unit88>
       <Unit89>
@@ -1328,38 +1329,33 @@
       </Unit182>
       <Unit183>
         <Filename Value="../runtime/nongui/winipc.inc"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="452"/>
-        <CursorPos X="80" Y="472"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="19"/>
+        <CursorPos X="20" Y="287"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit183>
       <Unit184>
         <Filename Value="../runtime/nongui/IBIPC.pas"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="154"/>
-        <CursorPos X="12" Y="180"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="155"/>
+        <CursorPos Y="171"/>
         <UsageCount Value="23"/>
-        <Loaded Value="True"/>
       </Unit184>
+      <Unit185>
+        <Filename Value="../../../../../lazarus/fpc/3.0.4/source/rtl/win/wininc/struct.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4406"/>
+        <CursorPos X="6" Y="4419"/>
+        <UsageCount Value="10"/>
+      </Unit185>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
-      <Position1>
-        <Filename Value="../runtime/nongui/IBIPC.pas"/>
-        <Caret Line="180" Column="12" TopLine="154"/>
-      </Position1>
-      <Position2>
-        <Filename Value="../runtime/nongui/winipc.inc"/>
-        <Caret Line="141" Column="13" TopLine="128"/>
-      </Position2>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="1" ActiveMode="default">
         <Mode0 Name="default">
           <local>
-            <CommandLineParams Value="-t 13"/>
+            <CommandLineParams Value="-t 13 -X"/>
           </local>
           <environment>
             <UserOverrides Count="2">

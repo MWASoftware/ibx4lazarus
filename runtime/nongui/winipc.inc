@@ -21,7 +21,6 @@ type
 
   TIpcCommon = class(TInterfacedObject)
   protected
-    class var FInitialiser: boolean;
     FSa : TSecurityAttributes;
   private
     Sd : TSecurityDescriptor;
@@ -49,19 +48,26 @@ type
 
   }
 
-  TSharedMemory = class(TIpcCommon,ISharedMemory)
+  ISharedMemoryExt = interface(ISharedMemory)
+  ['{7449e122-61c0-4ea9-acf4-f0a420af14aa}']
+  function IsInitialiser: boolean;
+  end;
+
+  TSharedMemory = class(TIpcCommon,ISharedMemoryExt)
   private
     FBuffer: PByte;
     FLastAllocationSize: integer;
     FUnused: integer;
     FBufptr: PByte;
     FSharedBuffer: THandle;
+    FInitialiser: boolean;
     procedure GetSharedMemory(MemSize: integer);
   public
     constructor Create(MemSize: integer);
     destructor Destroy; override;
     function Allocate(Size: integer): PByte;
     function GetLastAllocationSize: integer;
+    function IsInitialiser: boolean;
     property LastAllocationSize: integer read GetLastAllocationSize;
   end;
 
@@ -71,7 +77,7 @@ type
   private
     FMutex: THandle;
   public
-    constructor Create(MutexName: string);
+    constructor Create(MutexName: string; IsInitialiser: boolean);
     destructor Destroy; override;
     procedure Lock;
     procedure Unlock;
@@ -102,7 +108,7 @@ type
   private
     FEvent: THandle;
   public
-    constructor Create(EventName: string);
+    constructor Create(EventName: string; IsInitialiser: boolean);
     destructor Destroy; override;
     procedure PassthroughGate;
     procedure Unlock;
@@ -140,13 +146,13 @@ type
 
   TMultilockGate = class(TIpcCommon, IMultilockGate)
   private
-    FSharedMemory: ISharedMemory;
+    FSharedMemory: ISharedMemoryExt;
     FOnGateTimeout: TNotifyEvent;
     FEvent: THandle;
     FLockCount: PInteger;
     FMutex: TMutex;
   public
-    constructor Create(EventName: string; sm: ISharedMemory);
+    constructor Create(EventName: string; sm: ISharedMemoryExt);
     destructor Destroy; override;
     procedure Lock;
     procedure Unlock;
@@ -163,7 +169,7 @@ type
   TIPCInterface = class(TIpcCommon, IIPCInterface)
   private
     FMaxBufferSize: integer;
-    FSharedMemory: ISharedMemory;
+    FSharedMemory: ISharedMemoryExt;
     FWriteLock: IMutex;
     FBuffer: PByte;
     FTraceDataType,
@@ -259,6 +265,11 @@ begin
   Result := FLastAllocationSize;
 end;
 
+function TSharedMemory.IsInitialiser: boolean;
+begin
+  Result := FInitialiser;
+end;
+
 { TIpcCommon }
 
 function TIpcCommon.GetSa: PSecurityAttributes;
@@ -281,10 +292,10 @@ end;
 
   { TMutex }
 
-constructor TMutex.Create(MutexName: string);
+constructor TMutex.Create(MutexName: string; IsInitialiser: boolean);
 begin
   inherited Create;
-  if FInitialiser then
+  if IsInitialiser then
     FMutex := CreateMutex(sa, False, PChar(MutexName))
   else
     FMutex := OpenMutex(MUTEX_ALL_ACCESS, False, PChar(MutexName));
@@ -314,10 +325,10 @@ begin
 end;
 
 { TSingleLockGate }
-constructor TSingleLockGate.Create(EventName: string);
+constructor TSingleLockGate.Create(EventName: string; IsInitialiser: boolean);
 begin
   inherited Create;
-  if FInitialiser then
+  if IsInitialiser then
     FEvent := CreateEvent(sa, true, true, PAnsiChar(EventName))
   else
     FEvent := OpenEvent(EVENT_ALL_ACCESS, true, PAnsiChar(EventName));
@@ -350,13 +361,13 @@ end;
 
 { TMultilockGate }
 
-constructor TMultilockGate.Create(EventName: string; sm: ISharedMemory);
+constructor TMultilockGate.Create(EventName: string; sm: ISharedMemoryExt);
 begin
   inherited Create;
   FSharedMemory := sm;
   FLockCount := PInteger(FSharedMemory.Allocate(sizeof(FLockCount)));
-  FMutex := TMutex.Create(EventName + '.Mutex');
-  if FInitialiser then
+  FMutex := TMutex.Create(EventName + '.Mutex',FSharedMemory.IsInitialiser);
+  if FSharedMemory.IsInitialiser then
   begin
     FEvent := CreateEvent(sa, true, true, PChar(EventName));
     FLockCount^ := 0;
@@ -385,7 +396,7 @@ begin
   Result := FOnGateTimeout;
 end;
 
-procedure TMultilockGate.SetOnGateTimeout(AValue: TNotifyEvent);
+procedure TMultilockGate.SetOnGateTimeout(aValue: TNotifyEvent);
 begin
   FOnGateTimeout := AValue;
 end;
@@ -464,9 +475,9 @@ begin
   inherited Create;
   FSharedMemory := TSharedMemory.Create(cMonitorHookSize);
 
-  FWriteLock := TMutex.Create(PChar(MonitorHookNames[0]));
-  FDataAvailableEvent := TSingleLockGate.Create(MonitorHookNames[2]);
-  FWriterBusyEvent := TSingleLockGate.Create(MonitorHookNames[3]);
+  FWriteLock := TMutex.Create(PChar(MonitorHookNames[0]),FSharedMemory.IsInitialiser);
+  FDataAvailableEvent := TSingleLockGate.Create(MonitorHookNames[2],FSharedMemory.IsInitialiser);
+  FWriterBusyEvent := TSingleLockGate.Create(MonitorHookNames[3],FSharedMemory.IsInitialiser);
   FReadReadyEvent := TMultiLockGate.Create(MonitorHookNames[4],FSharedMemory);
   FReadReadyEvent.OnGateTimeout  := HandleGateTimeout;
   FReadFinishedEvent := TMultiLockGate.Create(MonitorHookNames[5],FSharedMemory);
@@ -474,7 +485,7 @@ begin
 
   FMonitorCount := PInteger(FSharedMemory.Allocate(sizeof(FMonitorCount)));
 
-  if FInitialiser then
+  if FSharedMemory.IsInitialiser then
     FMonitorCount^ := 0;
   FTraceDataType := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
   FTimeStamp := PDateTime(FSharedMemory.Allocate(sizeof(TDateTime)));
@@ -483,7 +494,7 @@ begin
   FBuffer := FSharedMemory.Allocate(0); //All remaining
   FMaxBufferSize := FSharedMemory.LastAllocationSize;
 
-  if FInitialiser then
+  if FSharedMemory.IsInitialiser then
   begin
     FBufferSize^ := 0;
     FDataAvailableEvent.Lock;
