@@ -140,7 +140,7 @@ type
     FWaitingThreads: PInteger;
     function GetWaitingThreads: integer;
   public
-    constructor Create(SemNum: cint; AOwner: IIPCInterface);
+    constructor Create(SemNum: cint; sm: ISharedMemory);
     property WaitingThreads: integer read GetWaitingThreads;
   public
     procedure PassthroughGate;
@@ -193,7 +193,7 @@ type
     FLockCount: PInteger;
     function GetLockCount: integer;
   public
-    constructor Create(SemNum: cint; AOwner: IIPCInterface);
+    constructor Create(SemNum: cint; sm: ISharedMemory);
     procedure Lock;
     procedure Unlock;
     procedure PassthroughGate;
@@ -459,10 +459,10 @@ begin
   Result := FWaitingThreads^
 end;
 
-constructor TSingleLockGate.Create(SemNum: cint; AOwner: IIPCInterface);
+constructor TSingleLockGate.Create(SemNum: cint; sm: ISharedMemory);
 begin
   inherited Create;
-  FSharedMemory := AOwner.GetSharedMemory;
+  FSharedMemory := sm;
   FSignalledState := PInteger(FSharedMemory.Allocate(sizeof(FSignalledState)));
   FWaitingThreads := PInteger(FSharedMemory.Allocate(sizeof(FWaitingThreads)));
   FSemaphore := SemNum;
@@ -514,12 +514,12 @@ end;
 
 { TMultilockGate }
 
-constructor TMultilockGate.Create(SemNum: cint; AOwner: IIPCInterface);
+constructor TMultilockGate.Create(SemNum: cint; sm: ISharedMemory);
 begin
   inherited Create;
   FSemaphore := SemNum;
   FMutex := SemNum + 1;
-  FSharedMemory := AOwner.SharedMemory;
+  FSharedMemory := sm;
   FLockCount := PInteger(FSharedMemory.Allocate(sizeof(FLockCount)));
   if FInitialiser then
   begin
@@ -614,10 +614,10 @@ begin
 
   FWriteLock := TMutex.Create(cMutexSemaphore);
 
-  FDataAvailableEvent := TSingleLockGate.Create(cDataAvailableEventSemaphore,self);
-  FWriterBusyEvent := TSingleLockGate.Create(cWriterBusyEventSemaphore,self);
-  FReadReadyEvent := TMultiLockGate.Create(cReadReadyEventSemaphore,self);
-  FReadFinishedEvent := TMultiLockGate.Create(cReadFinishedEventSemaphore,self);
+  FDataAvailableEvent := TSingleLockGate.Create(cDataAvailableEventSemaphore,FSharedMemory);
+  FWriterBusyEvent := TSingleLockGate.Create(cWriterBusyEventSemaphore,FSharedMemory);
+  FReadReadyEvent := TMultiLockGate.Create(cReadReadyEventSemaphore,FSharedMemory);
+  FReadFinishedEvent := TMultiLockGate.Create(cReadFinishedEventSemaphore,FSharedMemory);
 
   if FInitialiser then
     SemInit(cMonitorCounter,0);

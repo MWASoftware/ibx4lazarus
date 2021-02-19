@@ -146,7 +146,7 @@ type
     FLockCount: PInteger;
     FMutex: TMutex;
   public
-    constructor Create(EventName: string; AOwner: IIPCInterface);
+    constructor Create(EventName: string; sm: ISharedMemory);
     destructor Destroy; override;
     procedure Lock;
     procedure Unlock;
@@ -350,10 +350,10 @@ end;
 
 { TMultilockGate }
 
-constructor TMultilockGate.Create(EventName: string; AOwner: IIPCInterface);
+constructor TMultilockGate.Create(EventName: string; sm: ISharedMemory);
 begin
   inherited Create;
-  FSharedMemory := AOwner.SharedMemory;
+  FSharedMemory := sm;
   FLockCount := PInteger(FSharedMemory.Allocate(sizeof(FLockCount)));
   FMutex := TMutex.Create(EventName + '.Mutex');
   if FInitialiser then
@@ -467,9 +467,9 @@ begin
   FWriteLock := TMutex.Create(PChar(MonitorHookNames[0]));
   FDataAvailableEvent := TSingleLockGate.Create(MonitorHookNames[2]);
   FWriterBusyEvent := TSingleLockGate.Create(MonitorHookNames[3]);
-  FReadReadyEvent := TMultiLockGate.Create(MonitorHookNames[4],self);
+  FReadReadyEvent := TMultiLockGate.Create(MonitorHookNames[4],FSharedMemory);
   FReadReadyEvent.OnGateTimeout  := HandleGateTimeout;
-  FReadFinishedEvent := TMultiLockGate.Create(MonitorHookNames[5],self);
+  FReadFinishedEvent := TMultiLockGate.Create(MonitorHookNames[5],FSharedMemory);
   FReadFinishedEvent.OnGateTimeout  := HandleGateTimeout;
 
   FMonitorCount := PInteger(FSharedMemory.Allocate(sizeof(FMonitorCount)));
