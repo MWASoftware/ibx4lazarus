@@ -169,6 +169,7 @@ type
     FTraceDataType,
     FBufferSize: PInteger;
     FTimeStamp: PDateTime;
+    FMsgNumber: PInteger;
     FReadReadyEvent: IMultiLockGate;
     FReadFinishedEvent: IMultiLockGate;
     FDataAvailableEvent: ISingleLockGate;
@@ -478,6 +479,7 @@ begin
   FTraceDataType := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
   FTimeStamp := PDateTime(FSharedMemory.Allocate(sizeof(TDateTime)));
   FBufferSize := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
+  FMsgNumber := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
   FBuffer := FSharedMemory.Allocate(0); //All remaining
   FMaxBufferSize := FSharedMemory.LastAllocationSize;
 
@@ -485,6 +487,7 @@ begin
   begin
     FBufferSize^ := 0;
     FDataAvailableEvent.Lock
+    FMsgNumber^ := 0;
   end;
 end;
 
@@ -503,6 +506,7 @@ begin
   FTraceDataType^ := Integer(TraceObject.FDataType);
   FTimeStamp^ := TraceObject.FTimeStamp;
   FBufferSize^ := Min(Length(TraceObject.FMsg), MaxBufferSize);
+  FMsgNumber^ := TraceObject.FMsgNumber;
   Move(TraceObject.FMsg[1], FBuffer^, FBufferSize^);
 end;
 
@@ -511,6 +515,7 @@ begin
   SetString(TraceObject.FMsg, PAnsiChar(FBuffer), FBufferSize^);
   TraceObject.FDataType := TTraceFlag(FTraceDataType^);
   TraceObject.FTimeStamp := TDateTime(FTimeStamp^);
+  TraceObject.FMsgNumber := FMsgNumber^;
 end;
 
 function TIPCInterface.GetDataAvailableEvent: ISingleLockGate;
