@@ -38,12 +38,6 @@ type
   { TIpcCommon }
 
   TIpcCommon = class(TInterfacedObject)
-  protected
-    class var FSemaphoreSetID: cint;  {Initialised by TSharedMemory. Used by other classes}
-    function sem_op(SemNum, op: integer; flags: cshort = 0): cint;
-    function sem_timedop(SemNum, op: integer; timeout_secs: integer; flags: cshort = 0): cint;
-    function GetSemValue(SemNum: integer): cint;
-    procedure SemInit(SemNum, AValue: cint);
   public
     function GetSa: PSecurityAttributes;
     property Sa : PSecurityAttributes read GetSa;
@@ -74,12 +68,17 @@ type
   function IsInitialiser: boolean;
   function Allocate(Size: integer): PByte;
   function GetLastAllocationSize: integer;
+  function sem_op(SemNum, op: integer; flags: cshort = 0): cint;
+  function sem_timedop(SemNum, op: integer; timeout_secs: integer; flags: cshort = 0): cint;
+  function GetSemValue(SemNum: integer): cint;
+  procedure SemInit(SemNum, AValue: cint);
   property LastAllocationSize: integer read GetLastAllocationSize;
   end;
 
   TSharedMemory = class(TIpcCommon,ISharedMemory)
   private
     FSharedMemoryID: cint;
+    FSemaphoreSetID: cint;
     FBuffer: PByte;
     FLastAllocationSize: integer;
     FUnused: integer;
@@ -94,6 +93,10 @@ type
     function Allocate(Size: integer): PByte;
     function GetLastAllocationSize: integer;
     function IsInitialiser: boolean;
+    function sem_op(SemNum, op: integer; flags: cshort = 0): cint;
+    function sem_timedop(SemNum, op: integer; timeout_secs: integer; flags: cshort = 0): cint;
+    function GetSemValue(SemNum: integer): cint;
+    procedure SemInit(SemNum, AValue: cint);
     property LastAllocationSize: integer read GetLastAllocationSize;
   end;
 
@@ -101,10 +104,11 @@ type
 
   TMutex = class(TIpcCommon,IMutex)
   private
+    FSharedMemory: ISharedMemory;
     FMutexSemaphore: cint;
     FLockCount: integer;
   public
-    constructor Create(SemNumber: cint; IsInitialiser: boolean);
+    constructor Create(SemNumber: cint; sm: ISharedMemory);
     procedure Lock;
     procedure Unlock;
   end;
@@ -379,14 +383,7 @@ begin
   Result := FInitialiser;
 end;
 
-{ TIpcCommon }
-
-function TIpcCommon.GetSa: PSecurityAttributes;
-begin
-  Result := nil
-end;
-
-function TIpcCommon.sem_op(SemNum, op: integer; flags: cshort): cint;
+function TSharedMemory.sem_op(SemNum, op: integer; flags: cshort): cint;
 var sembuf: TSEMbuf;
 begin
     sembuf.sem_num := SemNum;
@@ -395,7 +392,7 @@ begin
     Result := semop(FSemaphoreSetID,@sembuf,1);
 end;
 
-function TIpcCommon.sem_timedop(SemNum, op: integer; timeout_secs: integer;
+function TSharedMemory.sem_timedop(SemNum, op: integer; timeout_secs: integer;
   flags: cshort): cint;
 var sembuf: TSEMbuf;
     timeout: TimeSpec;
@@ -412,7 +409,7 @@ begin
 {$IFEND}
 end;
 
-function TIpcCommon.GetSemValue(SemNum: integer): cint;
+function TSharedMemory.GetSemValue(SemNum: integer): cint;
 var args :TSEMun;
 begin
   Result := semctl(FSemaphoreSetID,SemNum,SEM_GETVAL,args);
@@ -420,7 +417,7 @@ begin
      IBError(ibxeSV5APIError,['GetSemValue: '+strError(GetLastErrno)]);
 end;
 
-procedure TIpcCommon.SemInit(SemNum, AValue: cint);
+procedure TSharedMemory.SemInit(SemNum, AValue: cint);
 var args :TSEMun;
 begin
   //writeln('Initialising ',SemNum,' to ',AValue);
@@ -431,14 +428,22 @@ begin
 
 end;
 
+{ TIpcCommon }
+
+function TIpcCommon.GetSa: PSecurityAttributes;
+begin
+  Result := nil
+end;
+
   { TMutex }
 
-constructor TMutex.Create(SemNumber: cint; IsInitialiser: boolean);
+constructor TMutex.Create(SemNumber: cint; sm: ISharedMemory);
 begin
   inherited Create;
+  FSharedMemory := sm;
   FMutexSemaphore := SemNumber;
-  if IsInitialiser then
-    SemInit(FMutexSemaphore,1)
+  if FSharedMemory.IsInitialiser then
+    FSharedMemory.SemInit(FMutexSemaphore,1)
 end;
 
 { Obtain ownership of the Mutex and prevent other threads from accessing protected resource }
@@ -447,7 +452,7 @@ procedure TMutex.Lock;
 begin
   //writeln('Lock: Entering Mutex ',FMutexSemaphore,' LockCount=',FLockCount,' State = ',GetSemValue(FMutexSemaphore));
   if FLockCount = 0 then
-    sem_op(FMutexSemaphore,-1);
+    FSharedMemory.sem_op(FMutexSemaphore,-1);
   Inc(FLockCount);
   //writeln('Lock: Mutex Exit');
 end;
@@ -460,7 +465,7 @@ begin
   if FLockCount = 0 then Exit;
   Dec(FLockCount);
   if FLockCount = 0 then
-    sem_op(FMutexSemaphore,1);
+    FSharedMemory.sem_op(FMutexSemaphore,1);
   //writeln('UnLock: Mutex Exit',' State = ',GetSemValue(FMutexSemaphore));
 end;
 
@@ -483,8 +488,8 @@ begin
   begin
     FSignalledState^ := 1;
     FWaitingThreads^ := 0;
-    SemInit(FSemaphore,0);
-    SemInit(FMutex,1);
+    FSharedMemory.SemInit(FSemaphore,0);
+    FSharedMemory.SemInit(FMutex,1);
   end;
 end;
 
@@ -492,11 +497,11 @@ procedure TSingleLockGate.PassthroughGate;
 begin
   if FSignalledState^ = 0 then
   begin
-    sem_op(FMutex,-1,0); //Acquire Mutex
+    FSharedMemory.sem_op(FMutex,-1,0); //Acquire Mutex
     Inc(FWaitingThreads^);
-    sem_op(FMutex,1,0); //Release Mutex
+    FSharedMemory.sem_op(FMutex,1,0); //Release Mutex
     //writeln(ClassName + ': Wait State Entered ',FSemaphore,' = ',GetSemValue(FSemaphore));
-    sem_op(FSemaphore,-1,0); //Enter Wait
+    FSharedMemory.sem_op(FSemaphore,-1,0); //Enter Wait
     //writeln(ClassName + ': Wait State Ends ',FSemaphore);
   end;
 end;
@@ -506,11 +511,11 @@ begin
   if FSignalledState^ = 0 then
   begin
     FSignalledState^ := 1;
-    sem_op(FMutex,-1,0); //Acquire Mutex
+    FSharedMemory.sem_op(FMutex,-1,0); //Acquire Mutex
     {$IFDEF DEBUG}writeln(ClassName + ': Unlocking' ,FSemaphore);{$ENDIF}
-    sem_op(FSemaphore,FWaitingThreads^,0);
+    FSharedMemory.sem_op(FSemaphore,FWaitingThreads^,0);
     FWaitingThreads^ := 0;
-    sem_op(FMutex,1,0); //Release Mutex
+    FSharedMemory.sem_op(FMutex,1,0); //Release Mutex
   end;
 end;
 
@@ -519,7 +524,7 @@ begin
   if FSignalledState^ = 1 then
   begin
     {$IFDEF DEBUG}writeln(ClassName + ': Locking Gate ',FSemaphore);{$ENDIF}
-    SemInit(FSemaphore,0);
+    FSharedMemory.SemInit(FSemaphore,0);
     FSignalledState^ := 0;
   end;
 end;
@@ -536,8 +541,8 @@ begin
   if FSharedMemory.IsInitialiser then
   begin
     FLockCount^ := 0;
-    SemInit(FSemaphore,1);
-    SemInit(FMutex,1);
+    FSharedMemory.SemInit(FSemaphore,1);
+    FSharedMemory.SemInit(FMutex,1);
   end;
 end;
 
@@ -558,27 +563,27 @@ end;
 
 procedure TMultilockGate.Lock;
 begin
-    sem_op(FMutex,-1,0); //Acquire Mutex
+    FSharedMemory.sem_op(FMutex,-1,0); //Acquire Mutex
     if FLockCount^ = 0 then
     begin
       {$IFDEF DEBUG}writeln(ClassName,': Locking ',FSemaphore);{$ENDIF}
-      SemInit(FSemaphore,0);
+      FSharedMemory.SemInit(FSemaphore,0);
     end;
     Inc(FLockCount^);
-    sem_op(FMutex,1,0); //Release Mutex
+    FSharedMemory.sem_op(FMutex,1,0); //Release Mutex
 end;
 
 procedure TMultilockGate.Unlock;
 begin
-    sem_op(FMutex,-1,0); //Acquire Mutex
+    FSharedMemory.sem_op(FMutex,-1,0); //Acquire Mutex
     Dec(FLockCount^);
     if FLockCount^ <= 0 then
     begin
       {$IFDEF DEBUG}writeln(ClassName,': UnLocking ',FSemaphore);{$ENDIF}
-      SemInit(FSemaphore,1);
+      FSharedMemory.SemInit(FSemaphore,1);
       FLockCount^ := 0
     end;
-    sem_op(FMutex,1,0); //Release Mutex
+    FSharedMemory.sem_op(FMutex,1,0); //Release Mutex
 end;
 
 procedure TMultilockGate.PassthroughGate;
@@ -586,7 +591,7 @@ begin
   if FLockCount^ = 0 then
     Exit;
   {$IFDEF DEBUG}writeln(ClassName,': Waiting on ',FSemaphore);{$ENDIF}
-  while sem_timedop(FSemaphore,-1,cDefaultTimeout) < 0 do
+  while FSharedMemory.sem_timedop(FSemaphore,-1,cDefaultTimeout) < 0 do
   {looks like we lost a reader}
   begin
     {$IFDEF DEBUG}writeln(ClassName,': reader lost timeout');{$ENDIF}
@@ -597,7 +602,7 @@ begin
         OnGateTimeout(self)
     end
   end;
-  sem_op(FSemaphore,1);
+  FSharedMemory.sem_op(FSemaphore,1);
   {$IFDEF DEBUG}writeln(ClassName,': Wait done on ',FSemaphore);{$ENDIF}
 end;
 
@@ -606,7 +611,7 @@ end;
 
 function TIPCInterface.GetMonitorCount: integer;
 begin
-  Result := GetSemValue(cMonitorCounter)
+  Result := FSharedMemory.GetSemValue(cMonitorCounter)
 end;
 
 function TIPCInterface.GetMaxBufferSize: integer;
@@ -619,7 +624,7 @@ begin
   inherited Create;
   FSharedMemory := TSharedMemory.Create(cMonitorHookSize);
 
-  FWriteLock := TMutex.Create(cMutexSemaphore,FSharedMemory.IsInitialiser);
+  FWriteLock := TMutex.Create(cMutexSemaphore,FSharedMemory);
 
   FDataAvailableEvent := TSingleLockGate.Create(cDataAvailableEventSemaphore,FSharedMemory);
   FWriterBusyEvent := TSingleLockGate.Create(cWriterBusyEventSemaphore,FSharedMemory);
@@ -627,7 +632,7 @@ begin
   FReadFinishedEvent := TMultiLockGate.Create(cReadFinishedEventSemaphore,FSharedMemory);
 
   if FSharedMemory.IsInitialiser then
-    SemInit(cMonitorCounter,0);
+    FSharedMemory.SemInit(cMonitorCounter,0);
   FTraceDataType := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
   FTimeStamp := PDateTime(FSharedMemory.Allocate(sizeof(TDateTime)));
   FBufferSize := PInteger(FSharedMemory.Allocate(sizeof(Integer)));
@@ -645,12 +650,12 @@ end;
 
 procedure TIPCInterface.IncMonitorCount;
 begin
-  sem_op(cMonitorCounter,1);
+  FSharedMemory.sem_op(cMonitorCounter,1);
 end;
 
 procedure TIPCInterface.DecMonitorCount;
 begin
-  sem_op(cMonitorCounter,-1,IPC_NOWAIT);
+  FSharedMemory.sem_op(cMonitorCounter,-1,IPC_NOWAIT);
 end;
 
 procedure TIPCInterface.SendTrace(TraceObject: TTraceObject);
