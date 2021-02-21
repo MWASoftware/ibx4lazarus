@@ -1,8 +1,13 @@
 @echo off
+
+REM These assumptions may be changed to suit local configuration
+
+set LAZARUS=C:\lazarus
+set PASSWORD=masterkey
+
 REM Test suite Configuration parameters (FPCDIR and FPCBIN)
 REM These may be modified if needed to suite local requirements
 
-set LAZARUS=C:\lazarus
 FOR %%V in (3.2.0 3.0.4 3.0.2 3.0.0) do (
   if EXIST C:\lazarus\fpc\%%V\bin\i386-win32\fpc.exe (
     set FPCDIR=C:\lazarus\fpc\%%V
@@ -29,7 +34,6 @@ if not EXIST %FPCBIN%\fpc.exe (
 :COMPILE
 set TESTOUTDIR=%TEMP%\ibx-testsuite
 set USERNAME=SYSDBA
-set PASSWORD=masterkey
 set EMPLOYEEDB=employee
 set NEWDBNAME=%TESTOUTDIR%\testsuite1.fdb
 set NEWDBNAME2=%TESTOUTDIR%\testsuite2.fdb
