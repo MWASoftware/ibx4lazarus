@@ -159,8 +159,9 @@ type
     FTraceFlags: TTraceFlags;
     FEnabled: Boolean;
     FWriteCount: integer;
+    procedure NeedIPCInterface;
   protected
-    procedure WriteSQLData(Text: String; DataType: TTraceFlag);
+    procedure WriteSQLData(Text: String; DataType: TTraceControlFlag);
   public
     constructor Create;
     procedure RegisterMonitor(SQLMonitor : TIBCustomSQLMonitor);
@@ -336,7 +337,6 @@ constructor TIBSQLMonitorHook.Create;
 begin
   inherited Create;
   FTraceFlags := [tfQPrepare..tfMisc];
-  FIPCInterface := CreateIPCInterface;
   FEnabled := false;
 end;
 
@@ -393,14 +393,16 @@ end;
 procedure TIBSQLMonitorHook.RegisterMonitor(SQLMonitor: TIBCustomSQLMonitor);
 begin
    {$IFDEF DEBUG}writeln('Register Monitor');{$ENDIF}
- if not Assigned(FReaderThread) then
+  NeedIPCInterface;
+  if not Assigned(FReaderThread) then
     FReaderThread := TReaderThread.Create(FIPCInterface);
   FReaderThread.AddMonitor(SQLMonitor);
 end;
 
 procedure TIBSQLMonitorHook.ReleaseMonitor(Arg: TIBCustomSQLMonitor);
 begin
-  FWriterThread.ReleaseMonitor(Arg);
+  if FWriterThread <> nil then
+    FWriterThread.ReleaseMonitor(Arg);
 end;
 
 procedure TIBSQLMonitorHook.SendMisc(Msg: String);
@@ -522,6 +524,7 @@ begin
   FEnabled := Value;
   if FEnabled then
   begin
+    NeedIPCInterface;
     if not Assigned(FWriterThread) then
       FWriterThread := TWriterThread.Create(FIPCInterface);
   (*  {$ifdef UNIX}
@@ -741,8 +744,14 @@ begin
   {$IFDEF DEBUG}writeln('Unregister done'){$ENDIF}
 end;
 
+procedure TIBSQLMonitorHook.NeedIPCInterface;
+begin
+  if FIPCInterface = nil then
+    FIPCInterface := CreateIPCInterface;
+end;
+
 procedure TIBSQLMonitorHook.WriteSQLData(Text: String;
-  DataType: TTraceFlag);
+  DataType: TTraceControlFlag);
 begin
 // {$IFDEF DEBUG}writeln('Write SQL Data: '+Text);{$ENDIF}
   Text := LineEnding + '[Application: ' + ApplicationTitle + ']' + LineEnding + Text; {do not localize}

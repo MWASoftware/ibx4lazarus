@@ -72,7 +72,7 @@ type
   { TTraceObject }
 
   TTraceObject = Class(TObject)
-    FDataType : TTraceFlag;
+    FDataType : TTraceControlFlag;
     FMsg : String;
     FTimeStamp : TDateTime;
     FMsgNumber: integer;
