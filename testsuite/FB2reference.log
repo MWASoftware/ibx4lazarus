@@ -642,7 +642,7 @@ Rows printed = 42
 Current memory = 960,760
 Delta memory = 9,624
 Max memory = 1,012,104
-Elapsed time= 0.033 sec
+Elapsed time= 0.034 sec
 Cpu = 0.002 sec
 Buffers = 75
 Reads = 3
@@ -1443,7 +1443,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-localhost:employee Disconnected after 21 ms
+localhost:employee Disconnected after 23 ms
 Before Connect
 Connected to localhost:employee
 DPB: Item Count = 3
@@ -1452,7 +1452,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-localhost:employee Disconnected after 3989 ms
+localhost:employee Disconnected after 3949 ms
 Idle Timer Expired for Test_Database_02
 Database Closed
 Transaction Events
@@ -1475,7 +1475,7 @@ TPB: Item Count = 3
   isc_tpb_read
 
 Transaction Ending
-Transaction Ended after 11 ms
+Transaction Ended after 7 ms
 Transaction idle timer test
 Requested TPB: Item Count = 3
   isc_tpb_concurrency
@@ -1489,10 +1489,10 @@ TPB: Item Count = 3
   isc_tpb_read
 
 Transaction Ending
-Transaction Ended after 2012 ms
+Transaction Ended after 2007 ms
 Idle Timer Expired for Test_Transaction_02
 Before Disconnect
-localhost:employee Disconnected after 2056 ms
+localhost:employee Disconnected after 2053 ms
 SQL Dialect Downgrade test
 Before Connect
 Connected to localhost:/tmp/ibx-testsuite/testsuite1.fdb
@@ -1504,7 +1504,7 @@ DPB: Item Count = 4
 
 localhost:/tmp/ibx-testsuite/testsuite1.fdb created
 Before Disconnect
-localhost:/tmp/ibx-testsuite/testsuite1.fdb Disconnected after 28 ms
+localhost:/tmp/ibx-testsuite/testsuite1.fdb Disconnected after 29 ms
 Before Connect
 Warning: SQL Dialect Downgrade of localhost:/tmp/ibx-testsuite/testsuite1.fdb
 Connected to localhost:/tmp/ibx-testsuite/testsuite1.fdb
@@ -1514,7 +1514,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-localhost:/tmp/ibx-testsuite/testsuite1.fdb Disconnected after 22 ms
+localhost:/tmp/ibx-testsuite/testsuite1.fdb Disconnected after 29 ms
 
 
 ------------------------------------------------------
@@ -3151,8 +3151,8 @@ DEPT_KEY_PATH = 000;600;620;622
 Current memory = 952,624
 Delta memory = 9,608
 Max memory = 1,013,496
-Elapsed time= 0.032 sec
-Cpu = 0.001 sec
+Elapsed time= 0.026 sec
+Cpu = 0.002 sec
 Buffers = 75
 Reads = 3
 Writes = 0
@@ -10048,21 +10048,21 @@ Message File Location = /opt/firebird2.5.9/
 Database Statistics for employee
 
 Database "/opt/firebird2.5.9/examples/empbuild/employee.fdb"
-Gstat execution time Thu Feb 18 16:54:16 2021
+Gstat execution time Mon Feb 22 10:28:12 2021
 
 Database header page information:
 Flags			0
 Checksum		12345
-Generation		3858
+Generation		4475
 Page size		4096
 ODS version		11.2
-Oldest transaction	2330
-Oldest active		2331
-Oldest snapshot		2331
-Next transaction	2331
+Oldest transaction	2730
+Oldest active		2731
+Oldest snapshot		2731
+Next transaction	2731
 Bumped transaction	1
 Sequence number		0
-Next attachment ID	761
+Next attachment ID	918
 Implementation ID	24
 Shadow count		0
 Page buffers		0
@@ -10187,87 +10187,87 @@ zeus	Tue Jun  9 14:31:01 2020
 INET/inet_error: connect errno = 111
 
 Online Validation
-16:54:17.46 Validation started
+10:28:13.55 Validation started
 
-16:54:17.46 Relation 128 (COUNTRY)
-16:54:17.46   process pointer page    0 of    1
-16:54:17.46 Index 1 (RDB$PRIMARY1)
-16:54:17.46 Relation 128 (COUNTRY) is ok
+10:28:13.55 Relation 128 (COUNTRY)
+10:28:13.55   process pointer page    0 of    1
+10:28:13.56 Index 1 (RDB$PRIMARY1)
+10:28:13.56 Relation 128 (COUNTRY) is ok
 
-16:54:17.46 Relation 129 (JOB)
-16:54:17.46   process pointer page    0 of    1
-16:54:17.46 Index 1 (RDB$PRIMARY2)
-16:54:17.46 Index 2 (RDB$FOREIGN3)
-16:54:17.46 Index 3 (MAXSALX)
-16:54:17.46 Index 4 (MINSALX)
-16:54:17.46 Relation 129 (JOB) is ok
+10:28:13.56 Relation 129 (JOB)
+10:28:13.56   process pointer page    0 of    1
+10:28:13.56 Index 1 (RDB$PRIMARY2)
+10:28:13.56 Index 2 (RDB$FOREIGN3)
+10:28:13.56 Index 3 (MAXSALX)
+10:28:13.56 Index 4 (MINSALX)
+10:28:13.56 Relation 129 (JOB) is ok
 
-16:54:17.46 Relation 130 (DEPARTMENT)
-16:54:17.46   process pointer page    0 of    1
-16:54:17.46 Index 1 (RDB$4)
-16:54:17.46 Index 2 (RDB$PRIMARY5)
-16:54:17.46 Index 3 (RDB$FOREIGN6)
-16:54:17.46 Index 4 (BUDGETX)
-16:54:17.46 Index 5 (RDB$FOREIGN10)
-16:54:17.46 Relation 130 (DEPARTMENT) is ok
+10:28:13.56 Relation 130 (DEPARTMENT)
+10:28:13.56   process pointer page    0 of    1
+10:28:13.56 Index 1 (RDB$4)
+10:28:13.56 Index 2 (RDB$PRIMARY5)
+10:28:13.56 Index 3 (RDB$FOREIGN6)
+10:28:13.56 Index 4 (BUDGETX)
+10:28:13.56 Index 5 (RDB$FOREIGN10)
+10:28:13.56 Relation 130 (DEPARTMENT) is ok
 
-16:54:17.46 Relation 131 (EMPLOYEE)
-16:54:17.46   process pointer page    0 of    1
-16:54:17.46 Index 1 (RDB$PRIMARY7)
-16:54:17.46 Index 2 (RDB$FOREIGN8)
-16:54:17.46 Index 3 (RDB$FOREIGN9)
-16:54:17.46 Index 4 (NAMEX)
-16:54:17.46 Relation 131 (EMPLOYEE) is ok
+10:28:13.56 Relation 131 (EMPLOYEE)
+10:28:13.56   process pointer page    0 of    1
+10:28:13.56 Index 1 (RDB$PRIMARY7)
+10:28:13.56 Index 2 (RDB$FOREIGN8)
+10:28:13.56 Index 3 (RDB$FOREIGN9)
+10:28:13.56 Index 4 (NAMEX)
+10:28:13.56 Relation 131 (EMPLOYEE) is ok
 
-16:54:17.46 Relation 133 (PROJECT)
-16:54:17.46   process pointer page    0 of    1
-16:54:17.46 Index 1 (RDB$11)
-16:54:17.46 Index 2 (RDB$PRIMARY12)
-16:54:17.47 Index 3 (RDB$FOREIGN13)
-16:54:17.47 Index 4 (PRODTYPEX)
-16:54:17.47 Relation 133 (PROJECT) is ok
+10:28:13.56 Relation 133 (PROJECT)
+10:28:13.56   process pointer page    0 of    1
+10:28:13.56 Index 1 (RDB$11)
+10:28:13.56 Index 2 (RDB$PRIMARY12)
+10:28:13.56 Index 3 (RDB$FOREIGN13)
+10:28:13.56 Index 4 (PRODTYPEX)
+10:28:13.56 Relation 133 (PROJECT) is ok
 
-16:54:17.47 Relation 134 (EMPLOYEE_PROJECT)
-16:54:17.47   process pointer page    0 of    1
-16:54:17.47 Index 1 (RDB$PRIMARY14)
-16:54:17.47 Index 2 (RDB$FOREIGN15)
-16:54:17.47 Index 3 (RDB$FOREIGN16)
-16:54:17.47 Relation 134 (EMPLOYEE_PROJECT) is ok
+10:28:13.56 Relation 134 (EMPLOYEE_PROJECT)
+10:28:13.56   process pointer page    0 of    1
+10:28:13.56 Index 1 (RDB$PRIMARY14)
+10:28:13.56 Index 2 (RDB$FOREIGN15)
+10:28:13.57 Index 3 (RDB$FOREIGN16)
+10:28:13.57 Relation 134 (EMPLOYEE_PROJECT) is ok
 
-16:54:17.47 Relation 135 (PROJ_DEPT_BUDGET)
-16:54:17.47   process pointer page    0 of    1
-16:54:17.47 Index 1 (RDB$PRIMARY17)
-16:54:17.47 Index 2 (RDB$FOREIGN18)
-16:54:17.47 Index 3 (RDB$FOREIGN19)
-16:54:17.47 Relation 135 (PROJ_DEPT_BUDGET) is ok
+10:28:13.57 Relation 135 (PROJ_DEPT_BUDGET)
+10:28:13.57   process pointer page    0 of    1
+10:28:13.57 Index 1 (RDB$PRIMARY17)
+10:28:13.57 Index 2 (RDB$FOREIGN18)
+10:28:13.57 Index 3 (RDB$FOREIGN19)
+10:28:13.57 Relation 135 (PROJ_DEPT_BUDGET) is ok
 
-16:54:17.47 Relation 136 (SALARY_HISTORY)
-16:54:17.47   process pointer page    0 of    1
-16:54:17.47 Index 1 (RDB$PRIMARY20)
-16:54:17.47 Index 2 (RDB$FOREIGN21)
-16:54:17.47 Index 3 (CHANGEX)
-16:54:17.47 Index 4 (UPDATERX)
-16:54:17.48 Relation 136 (SALARY_HISTORY) is ok
+10:28:13.57 Relation 136 (SALARY_HISTORY)
+10:28:13.57   process pointer page    0 of    1
+10:28:13.57 Index 1 (RDB$PRIMARY20)
+10:28:13.57 Index 2 (RDB$FOREIGN21)
+10:28:13.57 Index 3 (CHANGEX)
+10:28:13.57 Index 4 (UPDATERX)
+10:28:13.57 Relation 136 (SALARY_HISTORY) is ok
 
-16:54:17.48 Relation 137 (CUSTOMER)
-16:54:17.48   process pointer page    0 of    1
-16:54:17.48 Index 1 (RDB$PRIMARY22)
-16:54:17.48 Index 2 (RDB$FOREIGN23)
-16:54:17.48 Index 3 (CUSTNAMEX)
-16:54:17.48 Index 4 (CUSTREGION)
-16:54:17.48 Relation 137 (CUSTOMER) is ok
+10:28:13.57 Relation 137 (CUSTOMER)
+10:28:13.57   process pointer page    0 of    1
+10:28:13.57 Index 1 (RDB$PRIMARY22)
+10:28:13.57 Index 2 (RDB$FOREIGN23)
+10:28:13.57 Index 3 (CUSTNAMEX)
+10:28:13.57 Index 4 (CUSTREGION)
+10:28:13.57 Relation 137 (CUSTOMER) is ok
 
-16:54:17.48 Relation 138 (SALES)
-16:54:17.48   process pointer page    0 of    1
-16:54:17.48 Index 1 (RDB$PRIMARY24)
-16:54:17.48 Index 2 (RDB$FOREIGN25)
-16:54:17.48 Index 3 (RDB$FOREIGN26)
-16:54:17.48 Index 4 (NEEDX)
-16:54:17.48 Index 5 (QTYX)
-16:54:17.48 Index 6 (SALESTATX)
-16:54:17.48 Relation 138 (SALES) is ok
+10:28:13.57 Relation 138 (SALES)
+10:28:13.58   process pointer page    0 of    1
+10:28:13.58 Index 1 (RDB$PRIMARY24)
+10:28:13.58 Index 2 (RDB$FOREIGN25)
+10:28:13.58 Index 3 (RDB$FOREIGN26)
+10:28:13.58 Index 4 (NEEDX)
+10:28:13.58 Index 5 (QTYX)
+10:28:13.58 Index 6 (SALESTATX)
+10:28:13.58 Relation 138 (SALES) is ok
 
-16:54:17.48 Validation finished
+10:28:13.58 Validation finished
 
 
 Normal Validation
@@ -11555,8 +11555,8 @@ Rows printed = 2
 Current memory = 966,728
 Delta memory = 9,344
 Max memory = 1,012,400
-Elapsed time= 0.005 sec
-Cpu = 0.001 sec
+Elapsed time= 0.004 sec
+Cpu = 0.000 sec
 Buffers = 75
 Reads = 2
 Writes = 0
@@ -11733,6 +11733,9 @@ Test_Transaction_13: [Commit (Hard commit)]
 *Monitor*  
 [Application: IBX Test Suite]
 Test_Database_13: [Disconnect]
+*Monitor*  
+[Application: IBX Test Suite]
+Monitoring Disabled
 33 ISQL Monitor Messages Received
 
 
@@ -11774,7 +11777,7 @@ Rows printed = 2
 Current memory = 966,728
 Delta memory = 9,344
 Max memory = 1,012,400
-Elapsed time= 0.104 sec
+Elapsed time= 0.103 sec
 Cpu = 0.000 sec
 Buffers = 75
 Reads = 2
@@ -11951,6 +11954,9 @@ Test_Transaction_14: [Commit (Hard commit)]
 *Monitor*  
 [Application: IBX Test Suite]
 Test_Database_14: [Disconnect]
+*Monitor*  
+[Application: IBX Test Suite]
+Monitoring Disabled
 33 ISQL Monitor Messages Received
 
 
@@ -13110,13 +13116,14 @@ Create Table LotsOfData (
     MyText VarChar(1024), 
     Primary Key (RowID) 
   );                 
-Loading data into database table. Started at 18/2/2021 16:55:02.151
-Data load completed at 18/2/2021 16:58:00.820 Elapsed Time = 178669 ms, 100000 records loaded
- MD5 checksum = 17ea6e3376ac304ecab02428b4872b52
-Database Read started at 18/2/2021 16:58:00.841
-Read Dataset completed at 18/2/2021 16:58:31.837 Elapsed Time = 30997 ms, 100000 records read
- MD5 checksum = 17ea6e3376ac304ecab02428b4872b52
+Loading data into database table. Started at 22/2/2021 10:29:05.094
+Data load completed at 22/2/2021 10:31:52.887 Elapsed Time = 167794 ms, 100000 records loaded
+ MD5 checksum = 2bd6187c4b844d60db96a46a04785c20
+Database Read started at 22/2/2021 10:31:52.899
+Read Dataset completed at 22/2/2021 10:32:25.605 Elapsed Time = 32706 ms, 100000 records read
+ MD5 checksum = 2bd6187c4b844d60db96a46a04785c20
 Test Completed successfully
+22/2/2021 10:32:25.605Test 21 passes as long as the MD5 sums are identical
 
 
 ------------------------------------------------------
