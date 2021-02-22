@@ -219,7 +219,7 @@ type
   public
     constructor Create(IPCInterface: IIPCInterface);
     destructor Destroy; override;
-    procedure WriteSQLData(Msg : String; DataType : TTraceFlag);
+    procedure WriteSQLData(Msg : String; DataType : TTraceControlFlag);
   end;
 
   { TReaderThread }
@@ -305,8 +305,8 @@ var
   st: TTraceObject;
 begin
   st := (Msg as TTraceObject);
-  if (Assigned(FOnSQLEvent)) and
-         (st.FDataType in FTraceFlags) then
+  if (Assigned(FOnSQLEvent)) and ((st.FDataType = tfDisabled) or
+         (st.FDataType in FTraceFlags)) then
         FOnSQLEvent(st.FMsg, st.FTimeStamp);
   if assigned(OnMonitoringDisabled) and (st.FDataType = tfDisabled) then
     OnMonitoringDisabled(self);
@@ -835,7 +835,7 @@ begin
   {$IFDEF DEBUG}writeln('Write Thread Ends');{$ENDIF}
 end;
 
-procedure TWriterThread.WriteSQLData(Msg : String; DataType: TTraceFlag);
+procedure TWriterThread.WriteSQLData(Msg: String; DataType: TTraceControlFlag);
 begin
   FCriticalSection.Enter;
   try

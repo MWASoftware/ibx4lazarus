@@ -77,7 +77,7 @@ type
     FTimeStamp : TDateTime;
     FMsgNumber: integer;
   public
-    constructor Create(Msg : String; DataType : TTraceFlag; MsgNo: integer=0); overload;
+    constructor Create(Msg : String; DataType : TTraceControlFlag; MsgNo: integer=0); overload;
     constructor Create(obj : TTraceObject); overload;
     constructor Create(obj : TTraceObject; MsgOffset, MsgLen: integer); overload;
   end;
@@ -183,7 +183,7 @@ end;
 
 { TTraceObject }
 
-constructor TTraceObject.Create(Msg: String; DataType: TTraceFlag;
+constructor TTraceObject.Create(Msg: String; DataType: TTraceControlFlag;
   MsgNo: integer);
 begin
   FMsg := Msg;

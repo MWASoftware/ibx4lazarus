@@ -168,7 +168,7 @@ begin
       writeln(Outfile,'Test Completed successfully')
     else
       writeln(Outfile,'Test failed. MD5 checksum error');
-    writeln(Outfile,DateTimeToStr(Now),'This test passes as long as the MD5 sums are identical');
+    writeln(Outfile,DateTimeToStr(Now),'Test ',aTestID,' passes as long as the MD5 sums are identical');
   finally
     IBDatabase.DropDatabase;
   end;
