@@ -35,8 +35,9 @@ uses
   Classes, SysUtils, DB;
 
 type
-  TTraceFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
+  TTraceControlFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
      tfTransact, tfBlob, tfService, tfMisc, tfDisabled);
+  TTraceFlag = tfQPrepare..tfMisc;
   TTraceFlags = set of TTraceFlag;
 
   { TIBXMonitoredComponent }

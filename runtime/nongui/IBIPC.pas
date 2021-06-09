@@ -72,12 +72,12 @@ type
   { TTraceObject }
 
   TTraceObject = Class(TObject)
-    FDataType : TTraceFlag;
+    FDataType : TTraceControlFlag;
     FMsg : String;
     FTimeStamp : TDateTime;
     FMsgNumber: integer;
   public
-    constructor Create(Msg : String; DataType : TTraceFlag; MsgNo: integer=0); overload;
+    constructor Create(Msg : String; DataType : TTraceControlFlag; MsgNo: integer=0); overload;
     constructor Create(obj : TTraceObject); overload;
     constructor Create(obj : TTraceObject; MsgOffset, MsgLen: integer); overload;
   end;
@@ -138,13 +138,6 @@ type
   procedure Unlock;
   end;
 
-  ISharedMemory = interface
-  ['{db77bdd4-233a-4c9c-9212-dd7945e2e57c}']
-  function Allocate(Size: integer): PByte;
-  function GetLastAllocationSize: integer;
-  property LastAllocationSize: integer read GetLastAllocationSize;
-  end;
-
   IIPCInterface = interface
   ['{84760945-c014-454c-b69b-e4c5da88d9d6}']
   procedure IncMonitorCount;
@@ -157,7 +150,6 @@ type
   function GetReadFinishedEvent: IMultiLockGate;
   function GetWriteLock: IMutex;
   function GetMonitorCount: integer;
-  function GetSharedMemory: ISharedMemory;
   function GetMaxBufferSize: integer;
   function GetSa: PSecurityAttributes;
   property DataAvailableEvent: ISingleLockGate read GetDataAvailableEvent;
@@ -166,7 +158,6 @@ type
   property ReadFinishedEvent: IMultiLockGate read GetReadFinishedEvent;
   property WriteLock: IMutex read GetWriteLock;
   property MonitorCount: integer read GetMonitorCount;
-  property SharedMemory: ISharedMemory read GetSharedMemory;
   property MaxBufferSize: integer read GetMaxBufferSize;
   property Sa : PSecurityAttributes read GetSa;
   end;
@@ -192,7 +183,7 @@ end;
 
 { TTraceObject }
 
-constructor TTraceObject.Create(Msg: String; DataType: TTraceFlag;
+constructor TTraceObject.Create(Msg: String; DataType: TTraceControlFlag;
   MsgNo: integer);
 begin
   FMsg := Msg;
