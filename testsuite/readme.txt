@@ -3,7 +3,7 @@ IBX Test Suite
 
 This is the IBX Test Suite. It is intended to provide a set of tests with a pass/fail result determined by a simple inspection of the "diff" file.
 
-The test suite comprises 28 separate tests, testing 230 identified features. It is intended to provide full test coverage of all test features in order to demonstrate a high degreee of confidence that the software performs as expected and when run on different platforms (32 bit and 64 bit, Linux and Windows) and with different versions of the Firebird database (2.5, 3 and 4). It also supports regression testing. See doc/TestCoverage.pdf for a list of tests and test features and which test covers which test features.
+The test suite comprises 28 separate tests, testing 230 identified features present in the IBX non-visual components. It is intended to provide comprehensive test coverage of all test features in order to demonstrate a high degreee of confidence that the software performs as expected and when run on different platforms (32 bit and 64 bit, Linux and Windows) and with different versions of the Firebird database (2.5, 3 and 4). It also supports regression testing. See doc/TestCoverage.pdf for a list of tests and test features and which test covers which test features.
 
 The test environment requires that a Firebird Server is available and running, and ideally this should also include the Firebird embedded server. The example "employee" database must also be installed. The standard Firebird distributions available from firebirdsql.org are suitable for testing. In order to test the embedded server operation, the "employee" database should be read/writable from the user under which the tests are run.
 
