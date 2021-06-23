@@ -233,7 +233,7 @@ begin
   Opts := TStringList.Create;
   NonOpts := TStringList.Create;
   try
-    ErrorMsg := CheckOptions('aAhbegu:i:o:p:r:s:t:',['help','user','pass','role'],Opts,NonOpts);
+    ErrorMsg := CheckOptions('aAhbegu:i:o:p:r:s:t:c:',['help','user','pass','role'],Opts,NonOpts);
     {Database name is last parameter if given and not an option}
     if (NonOpts.Count > 0) and ((Opts.Count = 0) or
              ((Opts.ValueFromIndex[Opts.Count-1] <> NonOpts[NonOpts.Count-1])) or
@@ -332,6 +332,9 @@ begin
 
   if HasOption('u','user') then
     FIBDatabase.Params.Values['user_name'] := GetOptionValue('u','user');
+
+  if HasOption('c','charset') then
+    FIBDatabase.Params.Values['lc_ctype'] := GetOptionValue('c','charset');
 
   {Validation}
 
@@ -446,6 +449,7 @@ begin
   writeln(stderr,'              CSV for CSV format');
   writeln(stderr,'              INS for Insert Statement format');
   writeln(stderr,'-u <username> open database with this username (defaults to SYSDBA)');
+  writeln(stderr,'-c <character set name> connection charset');
   writeln;
   writeln(stderr,'Environment Variables:');
   writeln(stderr,'ISC_USER      Login user Name');

@@ -1,3 +1,8 @@
+IBX Change Log  version (2.4-1 Build 12543) Mon, 22 Feb 2021 11:00:08 +0000
+
+1. -c command line option added to fbsql example program. Used to set connection
+   character set.
+
 IBX Change Log  version (2.4-0 Build 12543) Mon, 22 Feb 2021 11:00:08 +0000
 
 1. Firebird 4 support added.

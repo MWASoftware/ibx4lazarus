@@ -8,9 +8,8 @@
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="353"/>
-        <CursorPos X="3" Y="47"/>
+        <TopLine Value="272"/>
+        <CursorPos X="3" Y="228"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -97,7 +96,7 @@
         <Filename Value="..\..\..\fbintf\client\FBClientAPI.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="165"/>
-        <CursorPos X="15" Y="182"/>
+        <CursorPos X="62" Y="176"/>
         <UsageCount Value="16"/>
       </Unit12>
       <Unit13>
@@ -123,10 +122,11 @@
       </Unit15>
       <Unit16>
         <Filename Value="..\..\changelog"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="22"/>
-        <CursorPos X="87" Y="26"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="18" Y="4"/>
         <UsageCount Value="28"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit16>
       <Unit17>
@@ -244,9 +244,9 @@
       <Unit32>
         <Filename Value="..\..\..\fbintf\client\FBAttachment.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="569"/>
-        <CursorPos Y="589"/>
-        <UsageCount Value="11"/>
+        <TopLine Value="200"/>
+        <CursorPos X="42" Y="218"/>
+        <UsageCount Value="13"/>
       </Unit32>
       <Unit33>
         <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\rtl\unix\sysunixh.inc"/>
@@ -336,8 +336,8 @@
         <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\packages\fcl-base\src\custapp.pp"/>
         <UnitName Value="CustApp"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="61"/>
-        <CursorPos X="14" Y="80"/>
+        <TopLine Value="533"/>
+        <CursorPos X="3" Y="537"/>
         <UsageCount Value="10"/>
       </Unit44>
       <Unit45>
@@ -569,7 +569,7 @@
         <UsageCount Value="10"/>
       </Unit76>
     </Units>
-    <JumpHistory Count="6" HistoryIndex="5">
+    <JumpHistory Count="23" HistoryIndex="22">
       <Position1>
         <Filename Value="fbsql.lpr"/>
         <Caret Line="186" Column="35" TopLine="155"/>
@@ -594,6 +594,73 @@
         <Filename Value="fbsql.lpr"/>
         <Caret Line="56" Column="28" TopLine="50"/>
       </Position6>
+      <Position7>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="310" Column="16" TopLine="288"/>
+      </Position7>
+      <Position8>
+        <Filename Value="fbsql.lpr"/>
+      </Position8>
+      <Position9>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="53" Column="16" TopLine="25"/>
+      </Position9>
+      <Position10>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="241" Column="18" TopLine="213"/>
+      </Position10>
+      <Position11>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="270" Column="16" TopLine="243"/>
+      </Position11>
+      <Position12>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="273" Column="16" TopLine="246"/>
+      </Position12>
+      <Position13>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="310" Column="16" TopLine="283"/>
+      </Position13>
+      <Position14>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="313" Column="16" TopLine="286"/>
+      </Position14>
+      <Position15>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="334" Column="16" TopLine="307"/>
+      </Position15>
+      <Position16>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="338" Column="42" TopLine="311"/>
+      </Position16>
+      <Position17>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="339" Column="43" TopLine="312"/>
+      </Position17>
+      <Position18>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="362" Column="39" TopLine="335"/>
+      </Position18>
+      <Position19>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="236" Column="25" TopLine="218"/>
+      </Position19>
+      <Position20>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="337" Column="76" TopLine="324"/>
+      </Position20>
+      <Position21>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="69" Column="15" TopLine="53"/>
+      </Position21>
+      <Position22>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="452" Column="63" TopLine="435"/>
+      </Position22>
+      <Position23>
+        <Filename Value="fbsql.lpr"/>
+        <Caret Line="65" Column="15" TopLine="58"/>
+      </Position23>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
