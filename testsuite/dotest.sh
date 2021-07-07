@@ -33,6 +33,10 @@ while true ; do
         esac
 done
 
+if [ -n "$BUILD" ]; then
+  FB="4"
+fi
+
 export FIREBIRD=/opt/firebird$FB$BUILD
 
 if [ ! -d "$FIREBIRD" ]; then
