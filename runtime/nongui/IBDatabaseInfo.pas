@@ -47,9 +47,9 @@ type
     function GetDateDBCreated: TDateTime;
     function GetEncrypted: boolean;
     function GetEncryptionKeyName: string;
-    function GetPagesFree: Long;
-    function GetPagesUsed: Long;
-    function GetTransactionCount: Long;
+    function GetPagesFree: int64;
+    function GetPagesUsed: int64;
+    function GetTransactionCount: int64;
   protected
     FDatabase: TIBDatabase;
     FUserNames   : TStringList;
@@ -62,27 +62,27 @@ type
     FReadSeqCount: TStringList;
     FUpdateCount: TStringList;
     procedure CheckDatabase;
-    function GetAllocation: Long;
-    function GetBaseLevel: Long;
+    function GetAllocation: int64;
+    function GetBaseLevel: byte;
     function GetDBFileName: String;
     function GetDBSiteName: String;
-    function GetDBImplementationNo: Long;
-    function GetDBImplementationClass: Long;
-    function GetNoReserve: Long;
-    function GetODSMinorVersion: Long;
-    function GetODSMajorVersion: Long;
-    function GetPageSize: Long;
+    function GetDBImplementationNo: byte;
+    function GetDBImplementationClass: byte;
+    function GetNoReserve: int64;
+    function GetODSMinorVersion: integer;
+    function GetODSMajorVersion: integer;
+    function GetPageSize: int64;
     function GetVersion: String;
-    function GetCurrentMemory: Long;
-    function GetForcedWrites: Long;
-    function GetMaxMemory: Long;
-    function GetNumBuffers: Long;
-    function GetSweepInterval: Long;
+    function GetCurrentMemory: Int64;
+    function GetForcedWrites: Int64;
+    function GetMaxMemory: Int64;
+    function GetNumBuffers: Int64;
+    function GetSweepInterval: Int64;
     function GetUserNames: TStringList;
-    function GetFetches: Long;
-    function GetMarks: Long;
-    function GetReads: Long;
-    function GetWrites: Long;
+    function GetFetches: Int64;
+    function GetMarks: Int64;
+    function GetReads: Int64;
+    function GetWrites: Int64;
     function GetBackoutCount: TStringList;
     function GetDeleteCount: TStringList;
     function GetExpungeCount: TStringList;
@@ -92,39 +92,40 @@ type
     function GetReadSeqCount: TStringList;
     function GetUpdateCount: TStringList;
     function GetOperationCounts(DBInfoCommand: Integer; var FOperation: TStringList): TStringList;
-    function GetReadOnly: Long;
+    function GetReadOnly: Int64;
     function GetStringDatabaseInfo(DatabaseInfoCommand: Integer): String;
-    function GetDBSQLDialect: Long;
+    function GetDBSQLDialect: Int64;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function GetLongDatabaseInfo(DatabaseInfoCommand: Integer): Long;
+    function GetLongDatabaseInfo(DatabaseInfoCommand: Integer): long;  deprecated 'Use GetIntDatabaseInfo instead';
+    function GetIntDatabaseInfo(DatabaseInfoCommand: Integer): Int64;
     function GetDatabasePage(PageNo: integer): string;
-    property Allocation: Long read GetAllocation;
-    property BaseLevel: Long read GetBaseLevel;
+    property Allocation: Int64 read GetAllocation;
+    property BaseLevel: byte read GetBaseLevel;
     property DateDBCreated: TDateTime read GetDateDBCreated;
     property DBFileName: String read GetDBFileName;
     property DBSiteName: String read GetDBSiteName;
-    property DBImplementationNo: Long read GetDBImplementationNo;
-    property DBImplementationClass: Long read GetDBImplementationClass;
+    property DBImplementationNo: byte read GetDBImplementationNo;
+    property DBImplementationClass: byte read GetDBImplementationClass;
     property Encrypted: boolean read GetEncrypted;
     property EncryptionKeyName: string read GetEncryptionKeyName;
-    property NoReserve: Long read GetNoReserve;
-    property ODSMinorVersion: Long read GetODSMinorVersion;
-    property ODSMajorVersion: Long read GetODSMajorVersion;
-    property PageSize: Long read GetPageSize;
+    property NoReserve: Int64 read GetNoReserve;
+    property ODSMinorVersion: integer read GetODSMinorVersion;
+    property ODSMajorVersion: integer read GetODSMajorVersion;
+    property PageSize: Int64 read GetPageSize;
     property Version: String read GetVersion;
-    property CurrentMemory: Long read GetCurrentMemory;
-    property ForcedWrites: Long read GetForcedWrites;
-    property MaxMemory: Long read GetMaxMemory;
-    property NumBuffers: Long read GetNumBuffers;
-    property SweepInterval: Long read GetSweepInterval;
+    property CurrentMemory: Int64 read GetCurrentMemory;
+    property ForcedWrites: Int64 read GetForcedWrites;
+    property MaxMemory: Int64 read GetMaxMemory;
+    property NumBuffers: Int64 read GetNumBuffers;
+    property SweepInterval: Int64 read GetSweepInterval;
     property UserNames: TStringList read GetUserNames;
-    property Fetches: Long read GetFetches;
-    property Marks: Long read GetMarks;
-    property Reads: Long read GetReads;
-    property Writes: Long read GetWrites;
-    property TransactionCount: Long read GetTransactionCount;
+    property Fetches: Int64 read GetFetches;
+    property Marks: Int64 read GetMarks;
+    property Reads: Int64 read GetReads;
+    property Writes: Int64 read GetWrites;
+    property TransactionCount: Int64 read GetTransactionCount;
     property BackoutCount: TStringList read GetBackoutCount;
     property DeleteCount: TStringList read GetDeleteCount;
     property ExpungeCount: TStringList read GetExpungeCount;
@@ -133,10 +134,10 @@ type
     property ReadIdxCount: TStringList read GetReadIdxCount;
     property ReadSeqCount: TStringList read GetReadSeqCount;
     property UpdateCount: TStringList read GetUpdateCount;
-    property DBSQLDialect : Long read GetDBSQLDialect;
-    property PagesUsed: Long read GetPagesUsed;
-    property PagesFree: Long read GetPagesFree;
-    property ReadOnly: Long read GetReadOnly;
+    property DBSQLDialect : Int64 read GetDBSQLDialect;
+    property PagesUsed: Int64 read GetPagesUsed;
+    property PagesFree: Int64 read GetPagesFree;
+    property ReadOnly: Int64 read GetReadOnly;
   published
     property Database: TIBDatabase read FDatabase write FDatabase;
   end;
@@ -187,12 +188,12 @@ begin
 end;
 
 function TIBDatabaseInfo.GetEncrypted: boolean;
-var ConnFlags: Long;
+var ConnFlags: Int64;
 begin
   Result := ODSMajorVersion >= 12;
   if Result then
   try
-    ConnFlags := GetLongDatabaseInfo(fb_info_conn_flags);
+    ConnFlags := GetIntDatabaseInfo(fb_info_conn_flags);
     Result := (ConnFlags and fb_info_crypt_encrypted) <> 0;
   except
     Result := false; {Introduced in Firebird 3.0.3}
@@ -210,19 +211,19 @@ begin
      IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
-function TIBDatabaseInfo.GetPagesFree: Long;
+function TIBDatabaseInfo.GetPagesFree: int64;
 begin
-  result := GetLongDatabaseInfo(fb_info_pages_used);
+  result := GetIntDatabaseInfo(fb_info_pages_used);
 end;
 
-function TIBDatabaseInfo.GetPagesUsed: Long;
+function TIBDatabaseInfo.GetPagesUsed: int64;
 begin
-  result := GetLongDatabaseInfo(fb_info_pages_free);
+  result := GetIntDatabaseInfo(fb_info_pages_free);
 end;
 
-function TIBDatabaseInfo.GetTransactionCount: Long;
+function TIBDatabaseInfo.GetTransactionCount: int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_active_tran_count);
+  result := GetIntDatabaseInfo(isc_info_active_tran_count);
 end;
 
 procedure TIBDatabaseInfo.CheckDatabase;
@@ -233,12 +234,12 @@ begin
     IBError(ibxeDatabaseClosed,[]);
 end;
 
-function TIBDatabaseInfo.GetAllocation: Long;
+function TIBDatabaseInfo.GetAllocation: int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_allocation);
+  result := GetIntDatabaseInfo(isc_info_allocation);
 end;
 
-function TIBDatabaseInfo.GetBaseLevel: Long;
+function TIBDatabaseInfo.GetBaseLevel: byte;
 var Response: TByteArray;
 begin
   CheckDatabase;
@@ -278,7 +279,7 @@ begin
        IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
-function TIBDatabaseInfo.GetDBImplementationNo: Long;
+function TIBDatabaseInfo.GetDBImplementationNo: byte;
 var Response: TByteArray;
 begin
   CheckDatabase;
@@ -292,7 +293,7 @@ begin
      IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
-function TIBDatabaseInfo.GetDBImplementationClass: Long;
+function TIBDatabaseInfo.GetDBImplementationClass: byte;
 var Response: TByteArray;
 begin
   CheckDatabase;
@@ -306,26 +307,26 @@ begin
      IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
-function TIBDatabaseInfo.GetNoReserve: Long;
+function TIBDatabaseInfo.GetNoReserve: int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_no_reserve);
+  result := GetIntDatabaseInfo(isc_info_no_reserve);
 end;
 
-function TIBDatabaseInfo.GetODSMinorVersion: Long;
+function TIBDatabaseInfo.GetODSMinorVersion: integer;
 begin
   CheckDatabase;
   Result := Database.Attachment.GetODSMinorVersion;
 end;
 
-function TIBDatabaseInfo.GetODSMajorVersion: Long;
+function TIBDatabaseInfo.GetODSMajorVersion: integer;
 begin
   CheckDatabase;
   Result := Database.Attachment.GetODSMajorVersion;
 end;
 
-function TIBDatabaseInfo.GetPageSize: Long;
+function TIBDatabaseInfo.GetPageSize: int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_page_size);
+  result := GetIntDatabaseInfo(isc_info_page_size);
 end;
 
 function TIBDatabaseInfo.GetVersion: String;
@@ -339,29 +340,29 @@ begin
      IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
-function TIBDatabaseInfo.GetCurrentMemory: Long;
+function TIBDatabaseInfo.GetCurrentMemory: Int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_current_memory);
+  result := GetIntDatabaseInfo(isc_info_current_memory);
 end;
 
-function TIBDatabaseInfo.GetForcedWrites: Long;
+function TIBDatabaseInfo.GetForcedWrites: Int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_forced_writes);
+  result := GetIntDatabaseInfo(isc_info_forced_writes);
 end;
 
-function TIBDatabaseInfo.GetMaxMemory: Long;
+function TIBDatabaseInfo.GetMaxMemory: Int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_max_memory);
+  result := GetIntDatabaseInfo(isc_info_max_memory);
 end;
 
-function TIBDatabaseInfo.GetNumBuffers: Long;
+function TIBDatabaseInfo.GetNumBuffers: Int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_num_buffers);
+  result := GetIntDatabaseInfo(isc_info_num_buffers);
 end;
 
-function TIBDatabaseInfo.GetSweepInterval: Long; 
+function TIBDatabaseInfo.GetSweepInterval: Int64; 
 begin
-  result := GetLongDatabaseInfo(isc_info_sweep_interval);
+  result := GetIntDatabaseInfo(isc_info_sweep_interval);
 end;
 
 function TIBDatabaseInfo.GetUserNames: TStringList;
@@ -376,24 +377,24 @@ begin
      IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 
-function TIBDatabaseInfo.GetFetches: Long;
+function TIBDatabaseInfo.GetFetches: Int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_fetches);
+  result := GetIntDatabaseInfo(isc_info_fetches);
 end;
 
-function TIBDatabaseInfo.GetMarks: Long;
+function TIBDatabaseInfo.GetMarks: Int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_marks);
+  result := GetIntDatabaseInfo(isc_info_marks);
 end;
 
-function TIBDatabaseInfo.GetReads: Long;
+function TIBDatabaseInfo.GetReads: Int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_reads);
+  result := GetIntDatabaseInfo(isc_info_reads);
 end;
 
-function TIBDatabaseInfo.GetWrites: Long;
+function TIBDatabaseInfo.GetWrites: Int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_writes);
+  result := GetIntDatabaseInfo(isc_info_writes);
 end;
 
 function TIBDatabaseInfo.GetOperationCounts(DBInfoCommand: Integer;
@@ -453,12 +454,19 @@ begin
   result := GetOperationCounts(isc_info_update_count,FUpdateCount);
 end;
 
-function TIBDatabaseInfo.GetReadOnly: Long;
+function TIBDatabaseInfo.GetReadOnly: Int64;
 begin
-  result := GetLongDatabaseInfo(isc_info_db_read_only);
+  result := GetIntDatabaseInfo(isc_info_db_read_only);
 end;
 
-function TIBDatabaseInfo.GetLongDatabaseInfo(DatabaseInfoCommand: Integer): Long;
+function TIBDatabaseInfo.GetLongDatabaseInfo(DatabaseInfoCommand: Integer
+  ): long;
+begin
+  Result := GetIntDatabaseInfo(DatabaseInfoCommand);
+end;
+
+function TIBDatabaseInfo.GetIntDatabaseInfo(DatabaseInfoCommand: Integer
+  ): Int64;
 begin
   CheckDatabase;
   with Database.Attachment.GetDBInformation([DatabaseInfoCommand]) do
@@ -491,7 +499,7 @@ begin
 end;
 
 
-function TIBDatabaseInfo.GetDBSQLDialect: Long;
+function TIBDatabaseInfo.GetDBSQLDialect: Int64;
 begin
   CheckDatabase;
   with Database.Attachment.GetDBInformation([isc_info_db_SQL_Dialect]) do

@@ -77,12 +77,12 @@ object MainForm: TMainForm
     Height = 550
     Top = 26
     Width = 976
-    ActivePage = UserManagerTab
+    ActivePage = SchemaTab
     Align = alClient
     MultiLine = True
     ParentShowHint = False
     ShowHint = True
-    TabIndex = 6
+    TabIndex = 4
     TabOrder = 2
     Options = [nboMultiLine]
     object Properties: TTabSheet
@@ -2312,7 +2312,7 @@ object MainForm: TMainForm
       OnShow = AccessRightsTabShow
       object AccessRightsTreeView: TIBTreeView
         Left = 0
-        Height = 519
+        Height = 517
         Top = 0
         Width = 300
         Align = alLeft
@@ -2332,13 +2332,13 @@ object MainForm: TMainForm
       end
       object Splitter5: TSplitter
         Left = 300
-        Height = 519
+        Height = 517
         Top = 0
         Width = 5
       end
       object SubjectAccessRightsGrid: TIBDynamicGrid
         Left = 305
-        Height = 519
+        Height = 517
         Top = 0
         Width = 665
         Align = alClient
