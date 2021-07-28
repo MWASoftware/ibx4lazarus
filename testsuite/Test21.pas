@@ -50,10 +50,8 @@ type
   TTest21 = class(TIBXTestBase)
   private
     FIBSQL: TIBSQL;
-    function StuffDatabase(UseBatchIntf: boolean): TMDDigest;
+    function StuffDatabase: TMDDigest;
     function ReadDatabase: TMDDigest;
-    procedure doTest(UseBatchIntf: boolean);
-    procedure WriteBatchCompletion(bc: IBatchCompletion);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -74,17 +72,12 @@ const
 
 { TTest21 }
 
-function TTest21.StuffDatabase(UseBatchIntf: boolean): TMDDigest;
+function TTest21.StuffDatabase: TMDDigest;
 var i: integer;
     HashString: AnsiString;
     MD5Context: TMDContext;
     Started: TDateTime;
-    action: TExecuteActions;
 begin
-  if UseBatchIntf then
-    action := eaDefer
-  else
-    action := eaApply;
   Started := Now;
   writeln(Outfile,'Loading data into database table. Started at ',DateTimeToStr(Started));
   MDInit(MD5Context,MD_VERSION_5);
@@ -96,13 +89,8 @@ begin
     Params[1].AsString := DateTimeToStr(Now) + testText + testText + testText + testText;
     Params[2].AsDateTime := Now;
     HashString := Params[0].Asstring + Params[1].AsString + DateTimeToStr(Params[2].AsDateTime);
-    ExecQuery(action);
+    ExecQuery;
     MDUpdate(MD5Context,PAnsiChar(HashString)^,Length(HashString));
-  end;
-  if UseBatchIntf then
-  begin
-    FIBSQL.ExecQuery(eaApplyIgnoreCurrent);
-    WriteBatchCompletion(FIBSQL.Statement.GetBatchCompletion);
   end;
   IBTransaction.Commit;
   MDFinal(MD5Context,Result);
@@ -139,43 +127,6 @@ begin
   writeln(Outfile,' MD5 checksum = ',MD5Print(Result));
 end;
 
-procedure TTest21.doTest(UseBatchIntf: boolean);
-var Digest: TMD5Digest;
-begin
-  IBDatabase.CreateDatabase;
-  try
-    if UseBatchIntf then
-    begin
-      if IBDatabase.Attachment.HasBatchMode then
-        writeln(Outfile,'Using batch update')
-      else
-        Exit;
-    end;
-    Digest := StuffDatabase(UseBatchIntf);  {This creates a database holding a large 100,000 record table}
-    if MD5Match(Digest,ReadDatabase) then
-      writeln(Outfile,'Test Completed successfully')
-    else
-      writeln(Outfile,'Test failed. MD5 checksum error');
-    writeln(Outfile,DateTimeToStr(Now),' Test ',aTestID,' passes as long as the MD5 sums are identical');
-  finally
-    IBDatabase.DropDatabase;
-  end;
-end;
-
-procedure TTest21.WriteBatchCompletion(bc: IBatchCompletion);
-var updated: integer;
-begin
-if bc <> nil then
-  with bc do
-  begin
-    writeln(OutFile,'Batch Completion Info');
-    writeln(OutFile,'Total rows processed = ',getTotalProcessed);
-    updated := getUpdated;
-    writeln(Outfile,'Updated Records = ',updated);
-    writeln(Outfile,'Row ',updated,' State = ',getState(updated-1),' Msg = ',getStatusMessage(updated-1));
-  end;
-end;
-
 procedure TTest21.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
@@ -208,9 +159,19 @@ begin
 end;
 
 procedure TTest21.RunTest(CharSet: AnsiString; SQLDialect: integer);
+var Digest: TMD5Digest;
 begin
-  doTest(false);
-//  doTest(true);
+  IBDatabase.CreateDatabase;
+  try
+    Digest := StuffDatabase;  {This creates a database holding a large 100,000 record table}
+    if MD5Match(Digest,ReadDatabase) then
+      writeln(Outfile,'Test Completed successfully')
+    else
+      writeln(Outfile,'Test failed. MD5 checksum error');
+    writeln(Outfile,DateTimeToStr(Now),' Test ',aTestID,' passes as long as the MD5 sums are identical');
+  finally
+    IBDatabase.DropDatabase;
+  end;
 end;
 
 initialization

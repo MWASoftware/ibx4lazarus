@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <General>
-      <MainUnit Value="0"/>
+      <Flags>
+        <CompatibilityMode Value="True"/>
+      </Flags>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <Icon Value="0"/>
@@ -348,7 +350,7 @@
         <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="728"/>
+        <TopLine Value="727"/>
         <CursorPos X="16" Y="738"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>

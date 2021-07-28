@@ -206,7 +206,7 @@ type
     procedure CheckOpen;             { raise error if query is not open.}
     procedure CheckValidStatement;   { raise error if statement is invalid.}
     procedure Close;
-    procedure ExecQuery(action: TExecuteActions=eaApply);
+    procedure ExecQuery;
     function HasField(FieldName: String): boolean; {Note: case sensitive match}
     function FieldByName(FieldName: String): ISQLData;
     function ParamByName(ParamName: String): ISQLParam;
@@ -230,6 +230,13 @@ type
     property UniqueRelationName: String read GetUniqueRelationName;
     property Statement: IStatement read FStatement;
     property MetaData: IMetaData read FMetaData;
+  public
+   {Batch Interface}
+   function HasBatchMode: boolean;
+   function IsInBatchMode: boolean;
+   function AddToBatch(ExceptionOnError: boolean=true): TStatusCode;
+   function ExecuteBatch: IBatchCompletion;
+   procedure CancelBatch;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property CaseSensitiveParameterNames: boolean read FCaseSensitiveParameterNames
@@ -696,7 +703,7 @@ begin
   FreeHandle;
 end;
 
-procedure TIBSQL.ExecQuery(action: TExecuteActions);
+procedure TIBSQL.ExecQuery;
   {$IFDEF IBXQUERYSTATS}
 var
   stats: TPerfCounters;
@@ -727,7 +734,7 @@ begin
   end
   else
   begin
-    FResults := FStatement.Execute(action);
+    FResults := FStatement.Execute;
     if not (csDesigning in ComponentState) then
       MonitorHook.SQLExecute(Self);
   end;
@@ -934,6 +941,36 @@ begin
     result := FMetaData.GetUniqueRelationName
   else
     result := '';
+end;
+
+function TIBSQL.HasBatchMode: boolean;
+begin
+  CheckValidStatement;
+  Result := Statement.HasBatchMode;
+end;
+
+function TIBSQL.IsInBatchMode: boolean;
+begin
+  CheckValidStatement;
+  Result := Statement.IsInBatchMode;
+end;
+
+function TIBSQL.AddToBatch(ExceptionOnError: boolean): TStatusCode;
+begin
+  CheckValidStatement;
+  Result := Statement.AddToBatch(ExceptionOnError);
+end;
+
+function TIBSQL.ExecuteBatch: IBatchCompletion;
+begin
+  CheckValidStatement;
+  Result := Statement.ExecuteBatch;
+end;
+
+procedure TIBSQL.CancelBatch;
+begin
+  CheckValidStatement;
+  Statement.CancelBatch;
 end;
 
 procedure TIBSQL.SetSQL(Value: TStrings);
