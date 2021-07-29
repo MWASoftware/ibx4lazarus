@@ -188,7 +188,7 @@ type
     function GetFieldIndex(FieldName: String): Integer;
     function GetPlan: String;
     function GetRecordCount: Integer;
-    function GetRowsAffected: Integer;
+    function GetRowsAffected: Int64;
     function GetSQLParams: ISQLParams;
     function GetTransaction: TIBTransaction;
     procedure SetDatabase(Value: TIBDatabase);
@@ -225,11 +225,19 @@ type
     property Plan: String read GetPlan;
     property Prepared: Boolean read GetPrepared;
     property RecordCount: Integer read GetRecordCount;
-    property RowsAffected: Integer read GetRowsAffected;
+    property RowsAffected: Int64 read GetRowsAffected;
     property SQLStatementType: TIBSQLStatementTypes read GetSQLStatementType;
     property UniqueRelationName: String read GetUniqueRelationName;
     property Statement: IStatement read FStatement;
     property MetaData: IMetaData read FMetaData;
+  public
+   {Batch Interface}
+   function HasBatchMode: boolean;
+   function IsInBatchMode: boolean;
+   function AddToBatch(ExceptionOnError: boolean=true): TStatusCode;
+   function ExecuteBatch: IBatchCompletion;
+   procedure CancelBatch;
+   function GetBatchCompletion: IBatchCompletion;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property CaseSensitiveParameterNames: boolean read FCaseSensitiveParameterNames
@@ -864,7 +872,7 @@ begin
   Result := FRecordCount;
 end;
 
- function TIBSQL.GetRowsAffected: Integer;
+ function TIBSQL.GetRowsAffected: Int64;
 var
   SelectCount, InsertCount, UpdateCount, DeleteCount: integer;
 begin
@@ -934,6 +942,42 @@ begin
     result := FMetaData.GetUniqueRelationName
   else
     result := '';
+end;
+
+function TIBSQL.HasBatchMode: boolean;
+begin
+  CheckValidStatement;
+  Result := Statement.HasBatchMode;
+end;
+
+function TIBSQL.IsInBatchMode: boolean;
+begin
+  CheckValidStatement;
+  Result := Statement.IsInBatchMode;
+end;
+
+function TIBSQL.AddToBatch(ExceptionOnError: boolean): TStatusCode;
+begin
+  CheckValidStatement;
+  Result := Statement.AddToBatch(ExceptionOnError);
+end;
+
+function TIBSQL.ExecuteBatch: IBatchCompletion;
+begin
+  CheckValidStatement;
+  Result := Statement.ExecuteBatch;
+end;
+
+procedure TIBSQL.CancelBatch;
+begin
+  CheckValidStatement;
+  Statement.CancelBatch;
+end;
+
+function TIBSQL.GetBatchCompletion: IBatchCompletion;
+begin
+  CheckValidStatement;
+  Result := Statement.GetBatchCompletion;
 end;
 
 procedure TIBSQL.SetSQL(Value: TStrings);

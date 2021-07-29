@@ -1,7 +1,26 @@
-IBX Change Log  version (2.4-2 Build 12579) Fri, 16 Jul 2021 11:18:00 +0100
+IBX Change Log  version (2.4-2 Build 12693) Thu, 29 Jul 2021 12:33:31 +0100
 
-1. IBDatabaseInfo: review and tidy-up of property types. Most widen to int64 with the
+1. TIBDatabaseInfo: review and tidy-up of property types. Most widen to int64 with the
    exception of those defined to be one byte wide e.g. DBImplementationNo.
+
+2. TIBSQL: Batch Update/Insert support added.
+
+3. TIBStoredProc: when generating the SQL, the value of the StoredProcName property
+   is no longer automatically converted to upper case when it is syntactically a
+   SQL Identifier. This is to support the use of stored procedures defined e.g.
+   as CREATE PROCEDURE "iCASE".
+
+   There could be a backwards compatibility issue when the StoredProcName was entered
+   manually at design time. That is not selected from the drop down list. If the
+   StoredProcName is entered in mixed case and the procedure was declared e.g. as
+   CREATE PROCEDURE iCASE, then the SQL generation will be incorrect. You should
+   ensure that the value of the StoredProcName is all upper case, unless it was
+   declared under dialect 3 and explicitly as mixed case (i.e. delimited by double
+   quotes).
+
+   Note that when a stored procedure name was declared delimited in double quotes,
+   as in the first example above, the value of the StoredProcName property must not
+   include the delimiters (double quotes).
 
 IBX Change Log  version (2.4-1 Build 12550) Wed, 23 Jun 2021 13:59:14 +0100
 
