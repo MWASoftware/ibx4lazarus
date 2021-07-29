@@ -977,7 +977,7 @@ end;
 function TIBSQL.GetBatchCompletion: IBatchCompletion;
 begin
   CheckValidStatement;
-  Result := IStatement.GetBatchCompletion;
+  Result := Statement.GetBatchCompletion;
 end;
 
 procedure TIBSQL.SetSQL(Value: TStrings);

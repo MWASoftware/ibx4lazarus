@@ -1,4 +1,4 @@
-IBX Change Log  version (2.4-2 Build 12579) Fri, 16 Jul 2021 11:18:00 +0100
+IBX Change Log  version (2.4-2 Build 12693) Thu, 29 Jul 2021 12:33:31 +0100
 
 1. TIBDatabaseInfo: review and tidy-up of property types. Most widen to int64 with the
    exception of those defined to be one byte wide e.g. DBImplementationNo.
