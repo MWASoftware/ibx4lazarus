@@ -231,7 +231,7 @@ var Params: TStringList;
   function FormatProcName(Dialect: Integer; Value: String): String;
   begin
     Value := Trim(Value);
-    if (Dialect = 1) or IsSQLIdentifier(Value) then
+    if Dialect = 1 then
        Result := AnsiUpperCase(Value)
     else
       Result := SQLSafeString(Value);

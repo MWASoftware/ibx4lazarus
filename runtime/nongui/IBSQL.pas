@@ -237,6 +237,7 @@ type
    function AddToBatch(ExceptionOnError: boolean=true): TStatusCode;
    function ExecuteBatch: IBatchCompletion;
    procedure CancelBatch;
+   function GetBatchCompletion: IBatchCompletion;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property CaseSensitiveParameterNames: boolean read FCaseSensitiveParameterNames
@@ -971,6 +972,12 @@ procedure TIBSQL.CancelBatch;
 begin
   CheckValidStatement;
   Statement.CancelBatch;
+end;
+
+function TIBSQL.GetBatchCompletion: IBatchCompletion;
+begin
+  CheckValidStatement;
+  Result := IStatement.GetBatchCompletion;
 end;
 
 procedure TIBSQL.SetSQL(Value: TStrings);
