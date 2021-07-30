@@ -37,7 +37,7 @@ unit Test21;
 interface
 
 uses
-  Classes, SysUtils,   TestApplication, IBXTestBase, IB, IBSQL, MD5;
+  Classes, SysUtils,   TestApplication, IBXTestBase, IB, IBSQL;
 
 const
   aTestID    = '21';
@@ -50,8 +50,8 @@ type
   TTest21 = class(TIBXTestBase)
   private
     FIBSQL: TIBSQL;
-    function StuffDatabase: TMDDigest;
-    function ReadDatabase: TMDDigest;
+    function StuffDatabase: TMsgHash;
+    function ReadDatabase: TMsgHash;
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -72,15 +72,14 @@ const
 
 { TTest21 }
 
-function TTest21.StuffDatabase: TMDDigest;
+function TTest21.StuffDatabase: TMsgHash;
 var i: integer;
     HashString: AnsiString;
-    MD5Context: TMDContext;
     Started: TDateTime;
 begin
   Started := Now;
+  Result := TMsgHash.CreateMsgHash;
   writeln(Outfile,'Loading data into database table. Started at ',DateTimeToStr(Started));
-  MDInit(MD5Context,MD_VERSION_5);
   IBTransaction.Active := true;
   for i := 1 to RecordCount do
   with FIBSQL do
@@ -90,22 +89,21 @@ begin
     Params[2].AsDateTime := Now;
     HashString := Params[0].Asstring + Params[1].AsString + DateTimeToStr(Params[2].AsDateTime);
     ExecQuery;
-    MDUpdate(MD5Context,PAnsiChar(HashString)^,Length(HashString));
+    Result.AddText(HashString);
   end;
   IBTransaction.Commit;
-  MDFinal(MD5Context,Result);
+  Result.Finalise;
   writeln(OutFile, 'Data load completed at ',DateTimeToStr(Now), ' Elapsed Time = ',
     (MilliSecondsBetween(Now,Started)),' ms, ',RecordCount,' records loaded');
-  writeln(Outfile,' MD5 checksum = ',MD5Print(Result));
+  writeln(Outfile,' Message Hash = ',Result.Digest);
 end;
 
-function TTest21.ReadDatabase: TMDDigest;
-var MD5Context: TMDContext;
-    Started: TDateTime;
+function TTest21.ReadDatabase: TMsgHash;
+var Started: TDateTime;
     HashString: AnsiString;
     Count: integer;
 begin
-  MDInit(MD5Context,MD_VERSION_5);
+  Result := TMsgHash.CreateMsgHash;
   IBTransaction.Active := true;
   Started := Now;
   Count := 0;
@@ -117,14 +115,14 @@ begin
     begin
       Inc(Count);
       HashString := Fields[0].AsString + Fields[1].AsString + DateTimeToStr(Fields[2].AsDateTime);
-      MDUpdate(MD5Context,PAnsiChar(HashString)^,Length(HashString));
+      Result.AddText(HashString);
       Next;
     end;
   end;
   writeln(OutFile, 'Read Dataset completed at ',DateTimeToStr(Now), ' Elapsed Time = ',
     (MilliSecondsBetween(Now,Started)), ' ms, ',Count,' records read');
-  MDFinal(MD5Context,Result);
-  writeln(Outfile,' MD5 checksum = ',MD5Print(Result));
+  Result.Finalise;
+  writeln(Outfile,' Message Hash = ',Result.Digest);
 end;
 
 procedure TTest21.CreateObjects(Application: TTestApplication);
@@ -159,16 +157,25 @@ begin
 end;
 
 procedure TTest21.RunTest(CharSet: AnsiString; SQLDialect: integer);
-var Digest: TMD5Digest;
+var InHash,OutHash: TMsgHash;
 begin
   IBDatabase.CreateDatabase;
   try
-    Digest := StuffDatabase;  {This creates a database holding a large 100,000 record table}
-    if MD5Match(Digest,ReadDatabase) then
-      writeln(Outfile,'Test Completed successfully')
-    else
-      writeln(Outfile,'Test failed. MD5 checksum error');
-    writeln(Outfile,DateTimeToStr(Now),' Test ',aTestID,' passes as long as the MD5 sums are identical');
+    InHash := StuffDatabase;  {This creates a database holding a large 100,000 record table}
+    try
+      OutHash := ReadDatabase;
+      try
+        if InHash.SameHash(OutHash) then
+          writeln(Outfile,'Test Completed successfully')
+        else
+          writeln(Outfile,'Test failed. Message checksum error');
+        writeln(Outfile,DateTimeToStr(Now),' Test ',aTestID,' passes as long as the checksums are identical');
+      finally
+        OutHash.Free;
+      end;
+    finally
+      Inhash.Free;
+    end;
   finally
     IBDatabase.DropDatabase;
   end;
