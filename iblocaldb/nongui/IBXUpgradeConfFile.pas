@@ -112,7 +112,8 @@ type
     destructor Destroy; override;
     class function IsAbsolutePath(aPath: string): boolean;
     function CheckUpgradeAvailable(RequiredVersionNo: integer): boolean;
-    function GetUpgradeInfo(VersionNo: integer; var UpgradeInfo: TUpgradeInfo): boolean;
+    function GetUpgradeInfo(SectionHeaderTemplate: string; VersionNo: integer;
+      var UpgradeInfo: TUpgradeInfo): boolean;
     function GetSourceFile(aName: string; var FileName: string): boolean;
     procedure GetParamValue(Sender: TObject; ParamName: string; var BlobID: TISC_QUAD);
     property UpgradeAvailableToVersion: integer read GetUpgradeAvailableToVersion;
@@ -124,9 +125,6 @@ type
 implementation
 
 uses ZStream, IBBlob, ibxscript, IBMessages;
-
-const
-  sSectionheader      = 'Version.%.3d';
 
 resourcestring
   sInvalidConfFile = 'Database Upgrade Required, but the Upgrade File (%s) is missing or not specified';
@@ -177,11 +175,11 @@ begin
     raise EUpgradeConfFileError.CreateFmt(sUpgradeRequired, [RequiredVersionNo,CurVersion]);
 end;
 
-function TUpgradeConfFile.GetUpgradeInfo(VersionNo: integer;
+function TUpgradeConfFile.GetUpgradeInfo(SectionHeaderTemplate: string; VersionNo: integer;
   var UpgradeInfo: TUpgradeInfo): boolean;
 begin
    Result := false;
-   FCurrentVersion := Format(sSectionheader,[VersionNo]);
+   FCurrentVersion := Format(SectionHeaderTemplate,[VersionNo]);
    UpgradeInfo.UserMessage := FUpgradeInfo.ReadString(FCurrentVersion,'Msg',
                                 Format(sNoInfo,[VersionNo]));
    UpgradeInfo.UpdateSQLFile := FUpgradeInfo.ReadString(FCurrentVersion,'Upgrade','');
@@ -192,7 +190,10 @@ begin
      if not IsAbsolutePath(UpgradeInfo.UpdateSQLFile) then
        UpgradeInfo.UpdateSQLFile := ExtractFilePath(FConfFileName) + UpgradeInfo.UpdateSQLFile;
      UpgradeInfo.BackupDB := CompareText(FUpgradeInfo.ReadString(FCurrentVersion,'BackupDatabase','no'),'yes') = 0;
-     Result := FileExists(UpgradeInfo.UpdateSQLFile);
+     if not FileExists(UpgradeInfo.UpdateSQLFile) then
+       IBError(ibxePatchFileNotFound,[FUpgradeInfo.FileName,UpgradeInfo.UpdateSQLFile, FCurrentVersion])
+     else
+       Result := true;
    end;
 end;
 

@@ -88,6 +88,7 @@ type
   TCustomIBLocalDBSupport = class(TComponent)
   private
     FMinimumVersionNo: integer;
+    FSectionHeaderTemplate: string;
     { Private declarations }
     FServicesConnection: TIBXServicesConnection;
     FBackupService: TIBXServerSideBackupService;
@@ -191,6 +192,7 @@ type
     property RequiredVersionNo: integer read FRequiredVersionNo write FRequiredVersionNo;
     property MinimumVersionNo: integer read FMinimumVersionNo write FMinimumVersionNo;
     property UpgradeConfFile: string read FUpgradeConfFile write FUpgradeConfFile;
+    property SectionHeaderTemplate: string read FSectionHeaderTemplate write FSectionHeaderTemplate;
     property VendorName: string read FVendorName write FVendorName;
     property OnGetDatabaseName: TOnGetDatabaseName read FOnGetDatabaseName write FOnGetDatabaseName;
     property OnGetDBVersionNo: TOnGetDBVersionNo read FOnGetDBVersionNo write FOnGetDBVersionNo;
@@ -204,6 +206,9 @@ implementation
 
 {$IFDEF Unix} uses initc, regexpr {$ENDIF}
 {$IFDEF WINDOWS} uses Windows ,Windirs {$ENDIF}, IBUtils, IBMessages;
+
+const
+  sSectionheader      = 'Version.%.3d';
 
 resourcestring
   sNoDowngrade = 'Database Schema is %d. Unable to downgrade to version %d';
@@ -522,6 +527,7 @@ begin
   FRestoreService := TIBXServerSideRestoreService.Create(self);
   FRestoreService.ServicesConnection := ServicesConnection;
   FRestoreService.Verbose := true;
+  FSectionHeaderTemplate := sSectionheader;
 end;
 
 destructor TCustomIBLocalDBSupport.Destroy;

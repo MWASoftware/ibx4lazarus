@@ -60,6 +60,7 @@ type
     property RequiredVersionNo;
     property MinimumVersionNo;
     property UpgradeConfFile;
+    property SectionHeaderTemplate;
     property VendorName;
     property OnGetDatabaseName;
     property OnGetDBVersionNo;
@@ -153,7 +154,7 @@ function TIBLocalDBSupport.RunUpgradeDatabase(TargetVersionNo: integer
   ): boolean;
 begin
   Result := IBXUpgradeDatabaseDlg.RunUpgradeDatabase(Database,BackupService,UpgradeConf,
-                  ChangeFileExt(ActiveDatabasePathName,''),
+                  SectionHeaderTemplate, ChangeFileExt(ActiveDatabasePathName,''),
                   TargetVersionNo,@HandleGetDBVersionNo, @HandleUpgradeStepCompleted);
 end;
 

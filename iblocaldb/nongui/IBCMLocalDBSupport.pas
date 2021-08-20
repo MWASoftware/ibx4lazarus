@@ -85,7 +85,7 @@ begin
   repeat
     if CurrentDBVersionNo >= TargetVersionNo then break;
     LastVersionNo := CurrentDBVersionNo;
-    UpdateAvailable := UpgradeConf.GetUpgradeInfo(CurrentDBVersionNo+1,UpgradeInfo);
+    UpdateAvailable := UpgradeConf.GetUpgradeInfo(SectionHeaderTemplate,CurrentDBVersionNo+1,UpgradeInfo);
     if UpdateAvailable then
     begin
       if UpgradeInfo.BackupDB then
