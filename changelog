@@ -1,4 +1,4 @@
-IBX Change Log  version (2.4-2 Build 12704) Thu, 29 Jul 2021 16:04:39 +0100
+IBX Change Log  version (2.4-2 Build 12773) Mon, 23 Aug 2021 11:59:42 +0100
 
 1. TIBDatabaseInfo: review and tidy-up of property types. Most widen to int64 with the
    exception of those defined to be one byte wide e.g. DBImplementationNo.
@@ -21,6 +21,13 @@ IBX Change Log  version (2.4-2 Build 12704) Thu, 29 Jul 2021 16:04:39 +0100
    Note that when a stored procedure name was declared delimited in double quotes,
    as in the first example above, the value of the StoredProcName property must not
    include the delimiters (double quotes).
+
+4. IBXUpgradeConfFile: an exception is now raised if a patch file specified in
+   upgrade.conf was not found. This replaces silently ignoring the problem.
+
+5. TIBLocalDBSupport: new property "SectionHeaderTemplate". This defaults to
+   'Version.%.3d' and is used to generate the section header names (for a given
+   version no.) in the upgrade.conf file.
 
 IBX Change Log  version (2.4-1 Build 12550) Wed, 23 Jun 2021 13:59:14 +0100
 

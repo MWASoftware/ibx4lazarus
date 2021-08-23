@@ -59,6 +59,7 @@ type
     FUpgradeLog: TStrings;
     FTargetVersionNo: integer;
     FUpgradeConf: TUpgradeConfFile;
+    FSectionHeaderTemplate: string;
     FArchiveStub: string;
     procedure DoUpdate(Data: PtrInt);
     function CurrentDBVersionNo: integer;
@@ -80,6 +81,7 @@ var
 function RunUpgradeDatabase(aDatabase: TIBDatabase;
                             aBackupService: TIBXServerSideBackupService;
                             UpgradeConf: TUpgradeConfFile;
+                            SectionHeaderTemplate: string;
                             ArchiveStub: string;
                             TargetVersionNo: integer;
                             aOnGetDatabaseVersionNo: TGetDatabaseVersionNo;
@@ -100,8 +102,8 @@ resourcestring
   sUpdateFailed    = 'Update Failed - %s';
 
 function RunUpgradeDatabase(aDatabase: TIBDatabase;
-  aBackupService: TIBXServerSideBackupService;
-  UpgradeConf: TUpgradeConfFile; ArchiveStub: string; TargetVersionNo: integer;
+  aBackupService: TIBXServerSideBackupService; UpgradeConf: TUpgradeConfFile;
+  SectionHeaderTemplate: string; ArchiveStub: string; TargetVersionNo: integer;
   aOnGetDatabaseVersionNo: TGetDatabaseVersionNo;
   aOnUpgradeStepCompleted: TNotifyEvent): boolean;
 begin
@@ -113,6 +115,7 @@ begin
     FTargetVersionNo := TargetVersionNo;
     FBackupService := aBackupService;
     FUpgradeConf := UpgradeConf;
+    FSectionHeaderTemplate := SectionHeaderTemplate;
     FArchiveStub := ArchiveStub;
     IBXScript.Database := aDatabase;
     UpdateTransaction.DefaultDatabase := aDatabase;
@@ -185,7 +188,7 @@ begin
     repeat
       if CurVersionNo >= FTargetVersionNo then break;
       LastVersionNo := CurVersionNo;
-      UpdateAvailable := FUpgradeConf.GetUpgradeInfo(CurVersionNo+1,UpgradeInfo);
+      UpdateAvailable := FUpgradeConf.GetUpgradeInfo(FSectionHeaderTemplate,CurVersionNo+1,UpgradeInfo);
       if UpdateAvailable then
       begin
         if UpgradeInfo.BackupDB and (FBackupService <> nil) then

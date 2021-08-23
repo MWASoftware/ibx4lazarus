@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="45">
+    <Units Count="46">
       <Unit0>
         <Filename Value="ViewDatabaseInfo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -19,11 +19,10 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="83"/>
-        <CursorPos X="40" Y="116"/>
+        <TopLine Value="85"/>
+        <CursorPos X="31" Y="90"/>
         <UsageCount Value="31"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="../employee/unit1.pas"/>
@@ -281,7 +280,7 @@
         <Filename Value="../../runtime/nongui/IBDatabaseInfo.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="98"/>
+        <TopLine Value="97"/>
         <CursorPos X="38" Y="115"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
@@ -317,7 +316,7 @@
       <Unit42>
         <Filename Value="Unit1.lfm"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="16"/>
+        <CursorPos Y="13"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit42>
@@ -335,8 +334,16 @@
         <CursorPos X="53" Y="3090"/>
         <UsageCount Value="10"/>
       </Unit44>
+      <Unit45>
+        <Filename Value="../../../oauth2/examples/gui/MainFrame.lfm"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="54"/>
+        <CursorPos Y="83"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit45>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="../../runtime/nongui/IBDatabaseInfo.pas"/>
         <Caret Line="221" Column="3" TopLine="219"/>
@@ -451,16 +458,12 @@
       </Position28>
       <Position29>
         <Filename Value="../../runtime/nongui/IBDatabaseInfo.pas"/>
-        <Caret Line="104" Column="14" TopLine="113"/>
-      </Position29>
-      <Position30>
-        <Filename Value="../../runtime/nongui/IBDatabaseInfo.pas"/>
         <Caret Line="105" Column="29" TopLine="89"/>
-      </Position30>
+      </Position29>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0" ActiveMode="default"/>
+      <Modes ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
 </CONFIG>
