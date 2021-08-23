@@ -234,10 +234,12 @@ type
    {Batch Interface}
    function HasBatchMode: boolean;
    function IsInBatchMode: boolean;
-   function AddToBatch(ExceptionOnError: boolean=true): TStatusCode;
+   procedure AddToBatch;
    function ExecuteBatch: IBatchCompletion;
    procedure CancelBatch;
    function GetBatchCompletion: IBatchCompletion;
+   function GetBatchRowLimit: integer;
+   procedure SetBatchRowLimit(aLimit: integer);
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property CaseSensitiveParameterNames: boolean read FCaseSensitiveParameterNames
@@ -956,10 +958,10 @@ begin
   Result := Statement.IsInBatchMode;
 end;
 
-function TIBSQL.AddToBatch(ExceptionOnError: boolean): TStatusCode;
+procedure TIBSQL.AddToBatch;
 begin
   CheckValidStatement;
-  Result := Statement.AddToBatch(ExceptionOnError);
+  Statement.AddToBatch;
 end;
 
 function TIBSQL.ExecuteBatch: IBatchCompletion;
@@ -978,6 +980,18 @@ function TIBSQL.GetBatchCompletion: IBatchCompletion;
 begin
   CheckValidStatement;
   Result := Statement.GetBatchCompletion;
+end;
+
+function TIBSQL.GetBatchRowLimit: integer;
+begin
+  CheckValidStatement;
+  Result := Statement.GetBatchRowLimit;
+end;
+
+procedure TIBSQL.SetBatchRowLimit(aLimit: integer);
+begin
+  CheckValidStatement;
+  Statement.SetBatchRowLimit(aLimit);
 end;
 
 procedure TIBSQL.SetSQL(Value: TStrings);
