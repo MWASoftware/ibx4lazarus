@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <BuildModes Active="Default"/>
     <Units Count="145">
       <Unit0>
@@ -18,7 +18,6 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="1077"/>
         <CursorPos X="3" Y="1079"/>
         <UsageCount Value="170"/>
@@ -779,10 +778,12 @@
       </Unit100>
       <Unit101>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="860"/>
-        <CursorPos X="23" Y="879"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1051"/>
+        <CursorPos X="32" Y="1056"/>
         <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit101>
       <Unit102>
         <Filename Value="../../runtime/nongui/IBSQLMonitor.pas"/>
@@ -1096,7 +1097,7 @@
         <UsageCount Value="10"/>
       </Unit144>
     </Units>
-    <JumpHistory Count="11" HistoryIndex="10">
+    <JumpHistory Count="12" HistoryIndex="11">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="849" TopLine="721"/>
@@ -1141,10 +1142,21 @@
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="390" Column="15" TopLine="390"/>
       </Position11>
+      <Position12>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="1079" Column="3" TopLine="1077"/>
+      </Position12>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0" ActiveMode="default"/>
+      <Modes ActiveMode="default"/>
     </RunParams>
+    <HistoryLists Count="3">
+      <List0 Name="WorkingDirectory" Type="File" Count="1"/>
+      <List1 Name="LaunchingApplication" Type="File" Count="1">
+        <Item1 Value="/usr/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      </List1>
+      <List2 Name="CommandLineParameters" Count="1"/>
+    </HistoryLists>
   </ProjectSession>
 </CONFIG>

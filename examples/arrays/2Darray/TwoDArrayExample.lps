@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="10"/>
+    <Version Value="12"/>
     <BuildModes Active="Default"/>
     <Units Count="61">
       <Unit0>
@@ -20,7 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <CursorPos X="9" Y="35"/>
+        <TopLine Value="13"/>
+        <CursorPos X="8" Y="35"/>
         <UsageCount Value="71"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -304,13 +305,12 @@
       <Unit40>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="583"/>
-        <CursorPos X="3" Y="594"/>
+        <TopLine Value="82"/>
+        <CursorPos X="33" Y="107"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="82"/>
-          <CursorPos X="33" Y="107"/>
+          <TopLine Value="256"/>
         </ExtraEditor1>
         <UsageCount Value="16"/>
       </Unit40>
@@ -456,6 +456,15 @@
         <UsageCount Value="10"/>
       </Unit60>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="35" Column="8" TopLine="13"/>
+      </Position1>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode="default"/>
+    </RunParams>
   </ProjectSession>
 </CONFIG>

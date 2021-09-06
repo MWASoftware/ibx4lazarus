@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <General>
+      <Flags>
+        <CompatibilityMode Value="True"/>
+      </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <MainUnit Value="0"/>
       <Title Value="DBAdmin"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
@@ -17,9 +19,22 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
+      <environment>
+        <UserOverrides Count="2">
+          <Variable0 Name="FIREBIRD" Value="/opt/firebird4.0.0"/>
+          <Variable1 Name="LD_LIBRARY_PATH" Value="/opt/firebird4.0.0/lib"/>
+        </UserOverrides>
+      </environment>
       <FormatVersion Value="2"/>
       <Modes Count="1">
-        <Mode0 Name="default"/>
+        <Mode0 Name="default">
+          <environment>
+            <UserOverrides Count="2">
+              <Variable0 Name="FIREBIRD" Value="/opt/firebird4.0.0"/>
+              <Variable1 Name="LD_LIBRARY_PATH" Value="/opt/firebird4.0.0/lib"/>
+            </UserOverrides>
+          </environment>
+        </Mode0>
       </Modes>
     </RunParams>
     <RequiredPackages Count="7">

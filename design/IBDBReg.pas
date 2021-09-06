@@ -444,14 +444,22 @@ const
    SIBDatabaseEditor = 'Da&tabase Editor...';
    SIBTransactionEditor = '&Transaction Editor...';
    SIBUpdateLayout = 'Update Layout';
+   SFBLibLoadProblem = 'IBX is unable to locate or otherwise load the Firebird Library - have you remembered to install it?';
 
 procedure Register;
 begin
   AllowUseOfFBLIB := true;
-  if not TryIBLoad then
-  begin
-    MessageDlg('IBX is unable to locate the Firebird Library - have you remembered to install it?',mtError,[mbOK],0);
-    Exit;
+  try
+    if not TryIBLoad then
+    begin
+      MessageDlg(SFBLibLoadProblem,mtError,[mbOK],0);
+      Exit;
+    end;
+  except on E: Exception do
+    begin
+      MessageDlg(SFBLibLoadProblem + ' - ' + E.Message,mtError,[mbOK],0);
+      Exit;
+    end;
   end;
 
   RegisterNoIcon([TIBStringField, TIBBCDField, TIBMemoField, TIBArrayField,

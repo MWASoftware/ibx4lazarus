@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <BuildModes Active="Default"/>
     <Units Count="86">
       <Unit0>
@@ -17,9 +17,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="7"/>
-        <CursorPos X="15" Y="36"/>
+        <TopLine Value="13"/>
+        <CursorPos X="17" Y="36"/>
         <UsageCount Value="58"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -37,18 +36,20 @@
       </Unit2>
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="490"/>
-        <CursorPos X="15" Y="520"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="611"/>
+        <CursorPos X="20" Y="615"/>
         <UsageCount Value="27"/>
+        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="../../../../lcl/dbctrls.pp"/>
         <UnitName Value="DBCtrls"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="851"/>
-        <CursorPos X="20" Y="869"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="880"/>
+        <CursorPos X="15" Y="896"/>
         <UsageCount Value="20"/>
+        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="../../../../lcl/include/dblookup.inc"/>
@@ -66,10 +67,12 @@
       </Unit6>
       <Unit7>
         <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="99"/>
-        <CursorPos X="33" Y="99"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="29"/>
+        <CursorPos X="3" Y="33"/>
         <UsageCount Value="20"/>
+        <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="../../../../lcl/include/customdbcombobox.inc"/>
@@ -167,10 +170,11 @@
       </Unit21>
       <Unit22>
         <Filename Value="../../../../lcl/include/customcombobox.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="209"/>
-        <CursorPos X="9" Y="216"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1060"/>
+        <CursorPos Y="1076"/>
         <UsageCount Value="14"/>
+        <Loaded Value="True"/>
       </Unit22>
       <Unit23>
         <Filename Value="../../runtime/IBSQLParser.pas"/>
@@ -591,10 +595,11 @@
       </Unit80>
       <Unit81>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="3929"/>
-        <CursorPos X="3" Y="3924"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="4786"/>
+        <CursorPos Y="4796"/>
         <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit81>
       <Unit82>
         <Filename Value="../../../fbintf/IBUtils.pas"/>
@@ -625,15 +630,110 @@
         <UsageCount Value="10"/>
       </Unit85>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="22" HistoryIndex="21">
       <Position1>
         <Filename Value="Unit1.pas"/>
-        <Caret Line="36" Column="15" TopLine="7"/>
+        <Caret Line="36" Column="17" TopLine="13"/>
       </Position1>
+      <Position2>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="205" Column="68" TopLine="198"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="219" Column="52" TopLine="198"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="240" Column="45" TopLine="214"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="243" Column="48" TopLine="217"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="244" Column="22" TopLine="218"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="247" Column="47" TopLine="221"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="300" Column="45" TopLine="274"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="330" Column="24" TopLine="304"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="587" Column="22" TopLine="561"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="609" Column="68" TopLine="583"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="610" Column="17" TopLine="584"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="3933" Column="86" TopLine="3924"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="688" Column="15" TopLine="674"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="4796" TopLine="4786"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="615" TopLine="599"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
+        <Caret Line="52" TopLine="36"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="665" TopLine="649"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../../../../lcl/include/dblookupcombobox.inc"/>
+        <Caret Line="53" Column="11" TopLine="36"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="139" Column="22" TopLine="126"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <Caret Line="615" Column="20" TopLine="611"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../../../lcl/dbctrls.pp"/>
+        <Caret Line="896" Column="15" TopLine="880"/>
+      </Position22>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0" ActiveMode="default"/>
+      <Modes ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
+  <Debugging>
+    <BreakPoints>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Line Value="4796"/>
+      </Item>
+    </BreakPoints>
+  </Debugging>
 </CONFIG>
