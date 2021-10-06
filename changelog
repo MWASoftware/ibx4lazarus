@@ -1,4 +1,4 @@
-IBX Change Log  version (2.4-3 Build 12796) Mon, 06 Sep 2021 11:26:41 +0100
+IBX Change Log  version (2.4-3 Build 12803) Wed, 06 Oct 2021 10:20:04 +0100
 
 1. Add try-..except check when initially loading library in IDE. This should
 ensure that IDE continues to load even when a failure occurs in IBX load
