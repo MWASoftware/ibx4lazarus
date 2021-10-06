@@ -4,6 +4,10 @@ IBX Change Log  version (2.4-3 Build 12796) Mon, 06 Sep 2021 11:26:41 +0100
 ensure that IDE continues to load even when a failure occurs in IBX load
 library.
 
+2. IBXScript: now recognises a CASE...END block within a stored procedure and
+   hence will correctly detect end of the outer containing block when the block
+   contains a SELECT ... CASE ... END construct.
+
 IBX Change Log  version (2.4-2 Build 12773) Mon, 23 Aug 2021 11:59:42 +0100
 
 1. TIBDatabaseInfo: review and tidy-up of property types. Most widen to int64 with the

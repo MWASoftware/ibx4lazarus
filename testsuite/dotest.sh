@@ -1,5 +1,7 @@
 #!/bin/sh
 
+LAZARUS=$HOME/lazarus/2.2
+
 usage()
 {
   echo "dotest.sh [-2] [-3] [-4 b1|b2] [-t <testid>]"
@@ -42,6 +44,6 @@ export FIREBIRD=/opt/firebird$FB$BUILD
 if [ ! -d "$FIREBIRD" ]; then
   echo "$FIREBIRD not found"
 else
-  ./runtest.sh $TEST
+  ./runtest.sh -L $LAZARUS $TEST
 fi
 
