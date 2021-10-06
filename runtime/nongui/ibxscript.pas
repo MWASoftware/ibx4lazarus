@@ -556,6 +556,19 @@ begin
             end;
           end;
 
+        sqltCase:
+          {case constructs can appear within select statement in nested blocks.
+           We need to match the case constructs END token in order to parse the
+           block correctly. This is a simple parser and the only objective is
+           to determine the correct end of block. We therefore do not check to
+           ensure that the next end properly matches the case. The CASE is thus
+           treated the same as BEGIN. The Firebird SQL Parser will flag any errors
+           due to mismatched CASE/BEGIN END}
+          begin
+            Inc(Nested);
+            stmt += TokenText;
+          end;
+
         sqltComment:
           stmt += '/*' + TokenText + '*/';
 

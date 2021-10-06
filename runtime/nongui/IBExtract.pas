@@ -1613,7 +1613,7 @@ end;
 procedure TIBExtract.ListProcs(ProcDDLType: TProcDDLType;
   ProcedureName: String; IncludeGrants: boolean);
 const
-  CreateProcedureStr1 = 'CREATE PROCEDURE %s ';
+  CreateProcedureStr1 = 'CREATE PROCEDURE %s';
   CreateProcedureStr2 = 'BEGIN EXIT; END';
   CreateProcedureStr3 = 'BEGIN SUSPEND; EXIT; END';
   ProcedureSQL =  {Order procedures by dependency order and then procedure name}
@@ -1718,7 +1718,7 @@ begin
             qryProcSecurity.ExecQuery;
             ExtractOut(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
           end;
-          ExtractOut(ProcTerm+ LineEnding);
+          ExtractOut(ProcTerm);
         end;
 
       pdCreateProc:
@@ -1746,24 +1746,24 @@ begin
           ExtractOut(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
         end;
 
-        ExtractOut(ProcTerm + LineEnding);
+        ExtractOut(ProcTerm);
 
       end;
 
       pdAlterProc:
        begin
-         ExtractOut(Format('%sALTER PROCEDURE %s ', [LineEnding,
+         ExtractOut(Format('%sALTER PROCEDURE %s', [LineEnding,
             QuoteIdentifier( ProcName)]));
          GetProcedureArgs(ProcName);
 
          if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
          begin
            SList.Text := qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
-           SList.Add(Format(' %s%s', [ProcTerm, LineEnding]));
+           SList.Add(Format('%s', [ProcTerm]));
            ExtractOut(SList);
          end
          else
-           ExtractOut(Format(CreateProcedureStr2, [ProcTerm, LineEnding]));
+           ExtractOut(CreateProcedureStr2 + ProcTerm);
        end;
       end;
       if IncludeGrants then
