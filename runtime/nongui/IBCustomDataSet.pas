@@ -1031,18 +1031,17 @@ const
     TIBDateTimeField,   { ftTimestamp }
     TFmtBCDField,       { ftFMTBcd }
     nil,                { ftFixedWideChar }
-    nil);               { ftWideMemo }
-(*
-    TADTField,          { ftADT }
-    TArrayField,        { ftArray }
-    TReferenceField,    { ftReference }
-    TDataSetField,     { ftDataSet }
-    TBlobField,         { ftOraBlob }
-    TMemoField,         { ftOraClob }
-    TVariantField,      { ftVariant }
-    TInterfaceField,    { ftInterface }
-    TIDispatchField,     { ftIDispatch }
-    TGuidField);        { ftGuid } *)
+    nil                 { ftWideMemo }
+{$IF FPC_FULLVERSION > 30202 }
+    ,
+    nil,                {ftOraTimeStamp}
+    nil,                {ftOraInterval}
+    nil,                {ftLongWord}
+    nil,                {ftShortint}
+    nil,                {ftByte}
+    nil                 {ftExtended}
+{$ENDIF}
+    );
 (*var
   CreateProviderProc: function(DataSet: TIBCustomDataSet): IProvider = nil;*)
 
