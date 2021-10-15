@@ -1484,7 +1484,7 @@ begin
   while FSQLReader.GetNextStatement(stmt) do
   try
     stmt := trim(stmt);
-//    writeln('stmt = ',stmt);
+//    writeln('stmt = "',stmt,'"');
     if stmt = '' then continue;
     if not ProcessStatement(stmt) then
       ExecSQL(stmt);

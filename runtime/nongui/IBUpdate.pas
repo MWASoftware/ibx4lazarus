@@ -103,6 +103,7 @@ type
     function GetDataSet: TDataSet;
   public
     constructor Create(aOwner: TParamListIntf; aIndex: integer);
+    function getColMetadata: IParamMetaData;
     function GetIndex: integer;
     function GetSQLType: cardinal;
     function GetSQLTypeName: AnsiString;
@@ -179,6 +180,11 @@ constructor TParamIntf.Create(aOwner: TParamListIntf; aIndex: integer);
 begin
   FOwner := aOwner;
   FIndex := aIndex;
+end;
+
+function TParamIntf.getColMetadata: IParamMetaData;
+begin
+  IBError(ibxeNotSupported,[]);
 end;
 
 function TParamIntf.GetIndex: integer;
