@@ -13,6 +13,8 @@ library.
 4. IBCustomDataSet: DefaultFieldClasses array updated for compatibility with
    FPC version > 3.2.2 TFieldType declaration.
 
+5. IBUpdate: updated to reflect changes to ISQLParam.
+
 IBX Change Log  version (2.4-2 Build 12773) Mon, 23 Aug 2021 11:59:42 +0100
 
 1. TIBDatabaseInfo: review and tidy-up of property types. Most widen to int64 with the

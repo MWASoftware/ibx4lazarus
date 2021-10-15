@@ -103,14 +103,13 @@ type
     function GetDataSet: TDataSet;
   public
     constructor Create(aOwner: TParamListIntf; aIndex: integer);
+    function getColMetadata: IParamMetaData;
     function GetIndex: integer;
     function GetSQLType: cardinal;
-    function GetColumnSQLType: cardinal;
     function GetSQLTypeName: AnsiString;
     function getSubtype: integer;
     function getName: AnsiString;
     function getScale: integer;
-    function getColumnScale: integer;
     function getCharSetID: cardinal;
     function getCodePage: TSystemCodePage;
     function getIsNullable: boolean;
@@ -183,17 +182,17 @@ begin
   FIndex := aIndex;
 end;
 
+function TParamIntf.getColMetadata: IParamMetaData;
+begin
+  IBError(ibxeNotSupported,[]);
+end;
+
 function TParamIntf.GetIndex: integer;
 begin
   Result := Findex;
 end;
 
 function TParamIntf.GetSQLType: cardinal;
-begin
-  IBError(ibxeNotSupported,[]);
-end;
-
-function TParamIntf.GetColumnSQLType: cardinal;
 begin
   IBError(ibxeNotSupported,[]);
 end;
@@ -214,11 +213,6 @@ begin
 end;
 
 function TParamIntf.getScale: integer;
-begin
-  IBError(ibxeNotSupported,[]);
-end;
-
-function TParamIntf.getColumnScale: integer;
 begin
   IBError(ibxeNotSupported,[]);
 end;

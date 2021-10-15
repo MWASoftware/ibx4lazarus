@@ -347,9 +347,9 @@
       </Unit42>
       <Unit43>
         <Filename Value="../../fbintf/IB.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="770"/>
-        <CursorPos Y="790"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="638"/>
+        <CursorPos X="45" Y="656"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
@@ -357,6 +357,7 @@
           <CursorPos Y="799"/>
         </ExtraEditor1>
         <UsageCount Value="53"/>
+        <Loaded Value="True"/>
       </Unit43>
       <Unit44>
         <Filename Value="../examples/dbInfo/ViewDatabaseInfo.lpr"/>
@@ -475,9 +476,11 @@
       </Unit59>
       <Unit60>
         <Filename Value="../changelog"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="49" Y="14"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="6"/>
+        <CursorPos X="53" Y="16"/>
         <UsageCount Value="59"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit60>
       <Unit61>
@@ -534,7 +537,7 @@
       </Unit67>
       <Unit68>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="698"/>
         <CursorPos X="21" Y="701"/>
         <UsageCount Value="10"/>
@@ -724,10 +727,9 @@
       </Unit93>
       <Unit94>
         <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="215"/>
-        <CursorPos Y="224"/>
+        <TopLine Value="185"/>
+        <CursorPos X="32" Y="187"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit94>
@@ -1438,7 +1440,7 @@
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit197>
     </Units>
-    <JumpHistory Count="19" HistoryIndex="18">
+    <JumpHistory Count="27" HistoryIndex="26">
       <Position1>
         <Filename Value="../runtime/nongui/IBExtract.pas"/>
         <Caret Line="1730" Column="17" TopLine="1714"/>
@@ -1515,6 +1517,38 @@
         <Filename Value="../runtime/nongui/IBUpdate.pas"/>
         <Caret Line="113" Column="23" TopLine="92"/>
       </Position19>
+      <Position20>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="226" Column="41" TopLine="215"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="108" Column="14" TopLine="98"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="196" TopLine="196"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="112" TopLine="93"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="215" TopLine="215"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="112" TopLine="97"/>
+      </Position25>
+      <Position26>
+        <Filename Value="../../fbintf/IB.pas"/>
+        <Caret Line="784" Column="75" TopLine="770"/>
+      </Position26>
+      <Position27>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="107" Column="5" TopLine="92"/>
+      </Position27>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
