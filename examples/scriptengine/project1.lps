@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="97"/>
+        <UsageCount Value="98"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -23,7 +23,7 @@
         <IsVisibleTab Value="True"/>
         <TopLine Value="2"/>
         <CursorPos X="79" Y="21"/>
-        <UsageCount Value="97"/>
+        <UsageCount Value="98"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -37,14 +37,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="5"/>
         <CursorPos X="33" Y="17"/>
-        <UsageCount Value="91"/>
+        <UsageCount Value="92"/>
       </Unit2>
       <Unit3>
         <Filename Value="tests/SelectQuery.sql"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="26" Y="2"/>
-        <UsageCount Value="90"/>
+        <UsageCount Value="91"/>
         <DefaultSyntaxHighlighter Value="SQL"/>
       </Unit3>
       <Unit4>
@@ -385,13 +385,13 @@
       <Unit50>
         <Filename Value="../../runtime/nongui/ibxscript.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="490"/>
-        <CursorPos X="26" Y="505"/>
+        <TopLine Value="604"/>
+        <CursorPos X="23" Y="619"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="604"/>
-          <CursorPos X="23" Y="619"/>
+          <TopLine Value="1477"/>
+          <CursorPos X="3" Y="1487"/>
         </ExtraEditor1>
         <UsageCount Value="20"/>
       </Unit50>

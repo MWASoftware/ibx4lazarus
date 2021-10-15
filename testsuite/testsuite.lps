@@ -181,7 +181,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="364"/>
         <CursorPos X="57" Y="311"/>
-        <UsageCount Value="198"/>
+        <UsageCount Value="200"/>
       </Unit21>
       <Unit22>
         <Filename Value="Test19.pas"/>
@@ -189,7 +189,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="239"/>
         <CursorPos X="32" Y="236"/>
-        <UsageCount Value="192"/>
+        <UsageCount Value="194"/>
       </Unit22>
       <Unit23>
         <Filename Value="Test18.pas"/>
@@ -197,7 +197,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="222"/>
         <CursorPos Y="255"/>
-        <UsageCount Value="189"/>
+        <UsageCount Value="191"/>
       </Unit23>
       <Unit24>
         <Filename Value="Test20.pas"/>
@@ -205,7 +205,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="188"/>
         <CursorPos X="17" Y="18"/>
-        <UsageCount Value="187"/>
+        <UsageCount Value="189"/>
       </Unit24>
       <Unit25>
         <Filename Value="Test21.pas"/>
@@ -213,7 +213,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="71"/>
         <CursorPos X="22" Y="71"/>
-        <UsageCount Value="178"/>
+        <UsageCount Value="180"/>
       </Unit25>
       <Unit26>
         <Filename Value="Test22.pas"/>
@@ -221,7 +221,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="8"/>
         <CursorPos X="70" Y="8"/>
-        <UsageCount Value="177"/>
+        <UsageCount Value="179"/>
       </Unit26>
       <Unit27>
         <Filename Value="Test25.pas"/>
@@ -229,7 +229,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="95"/>
         <CursorPos X="43" Y="7"/>
-        <UsageCount Value="174"/>
+        <UsageCount Value="176"/>
       </Unit27>
       <Unit28>
         <Filename Value="Test26.pas"/>
@@ -237,7 +237,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="65"/>
         <CursorPos X="34" Y="98"/>
-        <UsageCount Value="165"/>
+        <UsageCount Value="167"/>
       </Unit28>
       <Unit29>
         <Filename Value="Test27.pas"/>
@@ -245,7 +245,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="135"/>
         <CursorPos Y="153"/>
-        <UsageCount Value="150"/>
+        <UsageCount Value="152"/>
       </Unit29>
       <Unit30>
         <Filename Value="Test28.pas"/>
@@ -253,7 +253,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos X="44" Y="65"/>
-        <UsageCount Value="150"/>
+        <UsageCount Value="152"/>
       </Unit30>
       <Unit31>
         <Filename Value="Test30.pas"/>
@@ -270,7 +270,7 @@
       </Unit32>
       <Unit33>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="655"/>
         <CursorPos X="14" Y="670"/>
         <ExtraEditorCount Value="1"/>
@@ -279,7 +279,7 @@
           <TopLine Value="983"/>
           <CursorPos X="40" Y="994"/>
         </ExtraEditor1>
-        <UsageCount Value="45"/>
+        <UsageCount Value="46"/>
         <Loaded Value="True"/>
       </Unit33>
       <Unit34>
@@ -347,7 +347,7 @@
       </Unit42>
       <Unit43>
         <Filename Value="../../fbintf/IB.pas"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="638"/>
         <CursorPos X="45" Y="656"/>
         <ExtraEditorCount Value="1"/>
@@ -356,7 +356,7 @@
           <TopLine Value="775"/>
           <CursorPos Y="799"/>
         </ExtraEditor1>
-        <UsageCount Value="53"/>
+        <UsageCount Value="54"/>
         <Loaded Value="True"/>
       </Unit43>
       <Unit44>
@@ -389,18 +389,19 @@
       </Unit47>
       <Unit48>
         <Filename Value="../runtime/nongui/ibxscript.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1361"/>
-        <CursorPos X="3" Y="1349"/>
-        <UsageCount Value="18"/>
+        <TopLine Value="459"/>
+        <CursorPos X="3" Y="474"/>
+        <UsageCount Value="19"/>
         <Loaded Value="True"/>
       </Unit48>
       <Unit49>
         <Filename Value="../runtime/nongui/IBExtract.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="1709"/>
         <CursorPos X="27" Y="1709"/>
-        <UsageCount Value="28"/>
+        <UsageCount Value="29"/>
         <Loaded Value="True"/>
       </Unit49>
       <Unit50>
@@ -476,10 +477,9 @@
       </Unit59>
       <Unit60>
         <Filename Value="../changelog"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="7"/>
         <CursorPos X="53" Y="16"/>
-        <UsageCount Value="59"/>
+        <UsageCount Value="60"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit60>
@@ -515,10 +515,10 @@
       <Unit65>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <UnitName Value="DB"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="2194"/>
         <CursorPos X="3" Y="2194"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit65>
       <Unit66>
@@ -537,10 +537,10 @@
       </Unit67>
       <Unit68>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="698"/>
         <CursorPos X="21" Y="701"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit68>
       <Unit69>
@@ -552,10 +552,11 @@
       </Unit69>
       <Unit70>
         <Filename Value="../../fbintf/IBUtils.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1194"/>
-        <CursorPos X="38" Y="1203"/>
-        <UsageCount Value="22"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="1435"/>
+        <CursorPos X="3" Y="1453"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
       </Unit70>
       <Unit71>
         <Filename Value="../test/IBParserTest/testIBParser.lpr"/>
@@ -727,10 +728,10 @@
       </Unit93>
       <Unit94>
         <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="185"/>
         <CursorPos X="32" Y="187"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit94>
       <Unit95>
@@ -1440,115 +1441,127 @@
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit197>
     </Units>
-    <JumpHistory Count="27" HistoryIndex="26">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="../runtime/nongui/IBExtract.pas"/>
-        <Caret Line="1730" Column="17" TopLine="1714"/>
+        <Caret Line="1709" Column="27" TopLine="1691"/>
       </Position1>
       <Position2>
-        <Filename Value="../runtime/nongui/IBExtract.pas"/>
-        <Caret Line="122" Column="15" TopLine="122"/>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="56" Column="73" TopLine="28"/>
       </Position2>
       <Position3>
-        <Filename Value="../runtime/nongui/IBExtract.pas"/>
-        <Caret Line="4153" Column="8" TopLine="4130"/>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="994" Column="14" TopLine="978"/>
       </Position3>
       <Position4>
-        <Filename Value="../runtime/nongui/IBExtract.pas"/>
-        <Caret Line="4052" Column="34" TopLine="4047"/>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="3942" Column="32" TopLine="3916"/>
       </Position4>
       <Position5>
-        <Filename Value="../runtime/nongui/IBExtract.pas"/>
-        <Caret Line="122" Column="31" TopLine="108"/>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="3940" Column="36" TopLine="3916"/>
       </Position5>
       <Position6>
-        <Filename Value="../runtime/nongui/IBExtract.pas"/>
-        <Caret Line="1709" Column="27" TopLine="1691"/>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="670" Column="27" TopLine="656"/>
       </Position6>
       <Position7>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="56" Column="73" TopLine="28"/>
+        <Caret Line="3940" Column="40" TopLine="3914"/>
       </Position7>
       <Position8>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="994" Column="14" TopLine="978"/>
+        <Caret Line="670" Column="14" TopLine="655"/>
       </Position8>
       <Position9>
-        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="3942" Column="32" TopLine="3916"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="3940" Column="36" TopLine="3916"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="670" Column="27" TopLine="656"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="3940" Column="40" TopLine="3914"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="670" Column="14" TopLine="655"/>
-      </Position13>
-      <Position14>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <Caret Line="1560" Column="15" TopLine="1547"/>
-      </Position14>
-      <Position15>
+      </Position9>
+      <Position10>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
         <Caret Line="701" Column="21" TopLine="698"/>
-      </Position15>
-      <Position16>
+      </Position10>
+      <Position11>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <Caret Line="2194" Column="3" TopLine="2194"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="108" Column="23" TopLine="89"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="198" TopLine="189"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="113" Column="23" TopLine="92"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="226" Column="41" TopLine="215"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
+        <Caret Line="108" Column="14" TopLine="98"/>
       </Position16>
       <Position17>
         <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <Caret Line="108" Column="23" TopLine="89"/>
+        <Caret Line="196" TopLine="196"/>
       </Position17>
       <Position18>
         <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <Caret Line="198" TopLine="189"/>
+        <Caret Line="112" TopLine="93"/>
       </Position18>
       <Position19>
         <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <Caret Line="113" Column="23" TopLine="92"/>
+        <Caret Line="215" TopLine="215"/>
       </Position19>
       <Position20>
         <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <Caret Line="226" Column="41" TopLine="215"/>
+        <Caret Line="112" TopLine="97"/>
       </Position20>
       <Position21>
-        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <Caret Line="108" Column="14" TopLine="98"/>
+        <Filename Value="../../fbintf/IB.pas"/>
+        <Caret Line="784" Column="75" TopLine="770"/>
       </Position21>
       <Position22>
         <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <Caret Line="196" TopLine="196"/>
+        <Caret Line="107" Column="5" TopLine="92"/>
       </Position22>
       <Position23>
-        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <Caret Line="112" TopLine="93"/>
+        <Filename Value="../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="1349" Column="3" TopLine="1328"/>
       </Position23>
       <Position24>
-        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <Caret Line="215" TopLine="215"/>
+        <Filename Value="../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="260" Column="14" TopLine="245"/>
       </Position24>
       <Position25>
-        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <Caret Line="112" TopLine="97"/>
+        <Filename Value="../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="1628" Column="3" TopLine="1750"/>
       </Position25>
       <Position26>
-        <Filename Value="../../fbintf/IB.pas"/>
-        <Caret Line="784" Column="75" TopLine="770"/>
+        <Filename Value="../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="261" Column="14" TopLine="247"/>
       </Position26>
       <Position27>
-        <Filename Value="../runtime/nongui/IBUpdate.pas"/>
-        <Caret Line="107" Column="5" TopLine="92"/>
+        <Filename Value="../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="1484" Column="28" TopLine="1479"/>
       </Position27>
+      <Position28>
+        <Filename Value="../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="153" Column="14" TopLine="153"/>
+      </Position28>
+      <Position29>
+        <Filename Value="../runtime/nongui/ibxscript.pas"/>
+        <Caret Line="473" Column="20" TopLine="459"/>
+      </Position29>
+      <Position30>
+        <Filename Value="../../fbintf/IBUtils.pas"/>
+        <Caret Line="579" Column="14" TopLine="564"/>
+      </Position30>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
