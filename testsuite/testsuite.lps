@@ -391,8 +391,8 @@
         <Filename Value="../runtime/nongui/ibxscript.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="459"/>
-        <CursorPos X="3" Y="474"/>
+        <TopLine Value="622"/>
+        <CursorPos Y="636"/>
         <UsageCount Value="19"/>
         <Loaded Value="True"/>
       </Unit48>
@@ -478,7 +478,7 @@
       <Unit60>
         <Filename Value="../changelog"/>
         <EditorIndex Value="7"/>
-        <CursorPos X="53" Y="16"/>
+        <CursorPos X="87" Y="18"/>
         <UsageCount Value="60"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
@@ -1441,7 +1441,7 @@
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit197>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="../runtime/nongui/IBExtract.pas"/>
         <Caret Line="1709" Column="27" TopLine="1691"/>
@@ -1540,28 +1540,24 @@
       </Position24>
       <Position25>
         <Filename Value="../runtime/nongui/ibxscript.pas"/>
-        <Caret Line="1628" Column="3" TopLine="1750"/>
+        <Caret Line="261" Column="14" TopLine="247"/>
       </Position25>
       <Position26>
         <Filename Value="../runtime/nongui/ibxscript.pas"/>
-        <Caret Line="261" Column="14" TopLine="247"/>
+        <Caret Line="1484" Column="28" TopLine="1479"/>
       </Position26>
       <Position27>
         <Filename Value="../runtime/nongui/ibxscript.pas"/>
-        <Caret Line="1484" Column="28" TopLine="1479"/>
+        <Caret Line="153" Column="14" TopLine="153"/>
       </Position27>
       <Position28>
         <Filename Value="../runtime/nongui/ibxscript.pas"/>
-        <Caret Line="153" Column="14" TopLine="153"/>
+        <Caret Line="473" Column="20" TopLine="459"/>
       </Position28>
       <Position29>
-        <Filename Value="../runtime/nongui/ibxscript.pas"/>
-        <Caret Line="473" Column="20" TopLine="459"/>
-      </Position29>
-      <Position30>
         <Filename Value="../../fbintf/IBUtils.pas"/>
         <Caret Line="579" Column="14" TopLine="564"/>
-      </Position30>
+      </Position29>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

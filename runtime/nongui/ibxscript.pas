@@ -631,6 +631,9 @@ begin
         sqltCommentLine:
           stmt += '/* ' + TokenText + ' */' + LineEnding;
 
+        sqltQuotedString:
+          stmt += '''' + SQLSafeString(TokenText) + '''';  {exists some DECLARE with cursor having SELECT ...\... rc.rdb$constraint_type = 'PRIMARY KEY');}
+
         sqltSemiColon:
           begin
             State := stInStmt;
