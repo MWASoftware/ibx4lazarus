@@ -990,8 +990,10 @@ type
     property HasTimeZone: boolean read FHasTimeZone write FHasTimeZone default false;
   end;
 
+TIBFieldType = ftUnknown..ftWideMemo;
+
 const
-  DefaultFieldClasses: array[TFieldType] of TFieldClass = (
+  DefaultFieldClasses: array[TIBFieldType] of TFieldClass = (
     nil,                { ftUnknown }
     TIBStringField,     { ftString }
     TIBSmallintField,   { ftSmallint }
@@ -1032,7 +1034,7 @@ const
     TFmtBCDField,       { ftFMTBcd }
     nil,                { ftFixedWideChar }
     nil                 { ftWideMemo }
-{$IF FPC_FULLVERSION > 30202 }
+(*Not yet supported}
     ,
     nil,                {ftOraTimeStamp}
     nil,                {ftOraInterval}
@@ -1040,7 +1042,7 @@ const
     nil,                {ftShortint}
     nil,                {ftByte}
     nil                 {ftExtended}
-{$ENDIF}
+*)
     );
 (*var
   CreateProviderProc: function(DataSet: TIBCustomDataSet): IProvider = nil;*)
@@ -3939,7 +3941,10 @@ end;
 
 function TIBCustomDataSet.GetFieldClass(FieldType: TFieldType): TFieldClass;
 begin
-  Result := DefaultFieldClasses[FieldType];
+ if (FieldType >= Low(TIBFieldType)) and (FieldType <= High(TIBFieldType)) then
+    Result := DefaultFieldClasses[FieldType]
+ else
+    Result := nil;
 end;
 
 function TIBCustomDataSet.GetFieldData(FieldNo: Integer; Buffer: Pointer): Boolean;

@@ -10,8 +10,8 @@ library.
 
 3. IBExtract: some further tidying up to remove extraneous white space.
 
-4. IBCustomDataSet: DefaultFieldClasses array updated for compatibility with
-   FPC version > 3.2.2 TFieldType declaration.
+4. IBCustomDataSet: DefaultFieldClasses array declaration updated to avoid compile time
+   errors when declaration of DB.TFieldType changes.
 
 5. IBUpdate: updated to reflect changes to ISQLParam.
 
