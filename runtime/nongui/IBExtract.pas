@@ -1518,8 +1518,8 @@ procedure TIBExtract.ListPackages(PackageDDLType: TPackageDDLType;
 const
   PackageSQL = 'Select * From RDB$PACKAGES Where RDB$SYSTEM_FLAG = 0 order by RDB$PACKAGE_NAME';
   PackageNameSQL = 'Select * From RDB$PACKAGES Where RDB$PACKAGE_NAME = :PackageName order by RDB$PACKAGE_NAME';
-  PackageHeaderSQL = 'CREATE PACKAGE %s%s%sAS%s';
-  PackageBodySQL = 'CREATE PACKAGE BODY %s%sAS%s';
+  PackageHeaderSQL = 'CREATE PACKAGE %s%s%sAS';
+  PackageBodySQL = 'CREATE PACKAGE BODY %s%sAS';
 var
   qryPackages : TIBSQL;
   Header : Boolean;
@@ -1564,7 +1564,7 @@ begin
           SQLSecurity := '';
 
        ExtractOut(Format(PackageHeaderSQL,[aPackageName,SQLSecurity,
-                                               LineEnding,LineEnding]));
+                                               LineEnding]));
         SList.Text :=  qryPackages.FieldByName('RDB$PACKAGE_HEADER_SOURCE').AsString;
         SList.Add(Format('%s%s', [ProcTerm, LineEnding]));
         ExtractOut(SList);
@@ -1572,8 +1572,7 @@ begin
 
       if PackageDDLType in [paBody,paBoth] then
       begin
-        ExtractOut(Format(PackageBodySQL,[aPackageName,
-                                               LineEnding,LineEnding]));
+        ExtractOut(Format(PackageBodySQL,[aPackageName,LineEnding]));
         SList.Text :=  qryPackages.FieldByName('RDB$PACKAGE_BODY_SOURCE').AsString;
         SList.Add(Format('%s%s', [ProcTerm, LineEnding]));
         ExtractOut(SList);
@@ -1967,6 +1966,7 @@ begin
         else
           SList.Add('AS BEGIN EXIT; END');
         SList.Add(ProcTerm);
+        SList.Add('');
         if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
           SList.Add(' */');
         ExtractOut(SList);
@@ -3117,6 +3117,7 @@ var
   qryGenerator : TIBSQL;
   qryValue: TIBSQL;
   GenName : String;
+  NextSeq: int64;
 begin
   qryGenerator := TIBSQL.Create(FDatabase);
   qryValue := TIBSQL.Create(FDatabase);
@@ -3150,9 +3151,14 @@ begin
         qryValue.ExecQuery;
         try
           if not qryValue.EOF then
+          begin
+            if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
+              NextSeq := qryValue.FieldByName('GENERATORVALUE').AsInt64 + 1
+            else
+              NextSeq := qryValue.FieldByName('GENERATORVALUE').AsInt64;
             ExtractOut(Format('ALTER SEQUENCE %s RESTART WITH %d;',
-                 [QuoteIdentifier( GenName),
-                  qryValue.FieldByName('GENERATORVALUE').AsInt64 + 1]));
+                 [QuoteIdentifier( GenName),NextSeq]));
+          end;
         finally
           qryValue.Close;
         end;
@@ -3358,7 +3364,7 @@ begin
           SList.Strings[SList.Count - 1] := SList.Strings[SList.Count - 1] + ',';
       end;
       qryColumns.Close;
-      SList.Text := SList.Text + Format(') AS%s', [LineEnding]);
+      SList.Text := SList.Text + ') AS';
       if not qryView.FieldByName('RDB$VIEW_SOURCE').IsNull then
         SList.Text := SList.Text + qryView.FieldByName('RDB$VIEW_SOURCE').AsString;
       SList.Text := SList.Text + Format('%s%s', [Term, LineEnding]);

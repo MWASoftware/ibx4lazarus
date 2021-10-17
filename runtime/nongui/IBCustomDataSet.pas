@@ -3940,10 +3940,7 @@ end;
 
 function TIBCustomDataSet.GetFieldClass(FieldType: TFieldType): TFieldClass;
 begin
- if FieldType <= High(FieldType) then
-    Result := DefaultFieldClasses[FieldType]
- else
-    Result := nil;
+  Result := DefaultFieldClasses[FieldType];
 end;
 
 function TIBCustomDataSet.GetFieldData(FieldNo: Integer; Buffer: Pointer): Boolean;
