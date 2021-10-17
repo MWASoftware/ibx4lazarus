@@ -34,7 +34,7 @@ unit Test10;
 interface
 
 uses
-  Classes, SysUtils,  TestApplication, IBXTestbase, IB, IBExtract, IBDatabase;
+  Classes, SysUtils,  TestApplication, IBXTestBase, IB, IBExtract, IBDatabase;
 
 const
   aTestID    = '10';

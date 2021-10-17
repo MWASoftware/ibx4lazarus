@@ -755,9 +755,9 @@ begin
       CreateTable := 'CREATE TABLE';
 
     if NewName <> '' then
-      ExtractOut(Format('%s %s ', [CreateTable,QuoteIdentifier(NewName)]))
+      ExtractOut(Format('%s %s', [CreateTable,QuoteIdentifier(NewName)]))
     else
-      ExtractOut(Format('%s %s ', [CreateTable,QuoteIdentifier(RelationName)]));
+      ExtractOut(Format('%s %s', [CreateTable,QuoteIdentifier(RelationName)]));
     if not qryTables.FieldByName('RDB$EXTERNAL_FILE').IsNull then
       ExtractOut(Format('EXTERNAL FILE %s ',
         [QuotedStr(qryTables.FieldByName('RDB$EXTERNAL_FILE').AsString)]));
@@ -1548,13 +1548,13 @@ begin
       begin
         ExtractOut('COMMIT WORK;');
         ExtractOut('SET AUTODDL OFF;');
-        ExtractOut(Format('SET TERM %s %s', [ProcTerm, Term]));
+        ExtractOut(Format('SET TERM %s%s', [ProcTerm, Term]));
         ExtractOut(Format('%s/* Package Definitions */%s', [LineEnding, LineEnding]));
         Header := false;
       end;
 
       AddComment(qryPackages,ctPackage,Comments);
-      aPackageName := qryPackages.FieldByName('RDB$PACKAGE_NAME').AsString;
+      aPackageName := Trim(qryPackages.FieldByName('RDB$PACKAGE_NAME').AsString);
       if PackageDDLType in [paHeader,paBoth] then
       begin
          {SQL Security added in Firebird 4}
@@ -1566,7 +1566,7 @@ begin
        ExtractOut(Format(PackageHeaderSQL,[aPackageName,SQLSecurity,
                                                LineEnding,LineEnding]));
         SList.Text :=  qryPackages.FieldByName('RDB$PACKAGE_HEADER_SOURCE').AsString;
-        SList.Add(Format(' %s%s', [ProcTerm, LineEnding]));
+        SList.Add(Format('%s%s', [ProcTerm, LineEnding]));
         ExtractOut(SList);
       end;
 
@@ -1575,7 +1575,7 @@ begin
         ExtractOut(Format(PackageBodySQL,[aPackageName,
                                                LineEnding,LineEnding]));
         SList.Text :=  qryPackages.FieldByName('RDB$PACKAGE_BODY_SOURCE').AsString;
-        SList.Add(Format(' %s%s', [ProcTerm, LineEnding]));
+        SList.Add(Format('%s%s', [ProcTerm, LineEnding]));
         ExtractOut(SList);
       end;
 
@@ -1587,7 +1587,7 @@ begin
 
     if not Header then
     begin
-      ExtractOut(Format('SET TERM %s %s', [Term, ProcTerm]));
+      ExtractOut(Format('SET TERM %s%s', [Term, ProcTerm]));
       ExtractOut('COMMIT WORK;');
       ExtractOut('SET AUTODDL ON;');
     end;
@@ -1687,7 +1687,7 @@ begin
       begin
         ExtractOut('COMMIT WORK;');
         ExtractOut('SET AUTODDL OFF;');
-        ExtractOut(Format('SET TERM %s %s', [ProcTerm, Term]));
+        ExtractOut(Format('SET TERM %s%s', [ProcTerm, Term]));
         ExtractOut('');
         if ProcDDLType in [pdCreateStub,pdCreateProc] then
           ExtractOut('/* Stored procedures Definitions*/')
@@ -1716,7 +1716,8 @@ begin
             qryProcSecurity.SQL.Text := ProcedureSecuritySQL;
             qryProcSecurity.Params.ByName('ProcedureName').AsString := ProcName;
             qryProcSecurity.ExecQuery;
-            ExtractOut(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
+            if not qryProcSecurity.FieldByName('RDB$SQL_SECURITY').IsNull then
+              ExtractOut(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
           end;
           ExtractOut(ProcTerm);
         end;
@@ -1743,7 +1744,8 @@ begin
           qryProcSecurity.SQL.Text := ProcedureSecuritySQL;
           qryProcSecurity.Params.ByName('ProcedureName').AsString := ProcName;
           qryProcSecurity.ExecQuery;
-          ExtractOut(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
+          if not qryProcSecurity.FieldByName('RDB$SQL_SECURITY').IsNull then
+            ExtractOut(AddSQLSecurity(qryProcSecurity.FieldByName('RDB$SQL_SECURITY')));
         end;
 
         ExtractOut(ProcTerm);
@@ -1752,20 +1754,20 @@ begin
 
       pdAlterProc:
        begin
-         ExtractOut(Format('%sALTER PROCEDURE %s', [LineEnding,
-            QuoteIdentifier( ProcName)]));
+         ExtractOut(Format('ALTER PROCEDURE %s', [QuoteIdentifier( ProcName)]));
          GetProcedureArgs(ProcName);
 
          if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
          begin
            SList.Text := qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
-           SList.Add(Format('%s', [ProcTerm]));
+           SList.Add(ProcTerm);
            ExtractOut(SList);
          end
          else
            ExtractOut(CreateProcedureStr2 + ProcTerm);
        end;
       end;
+      ExtractOut('');
       if IncludeGrants then
         ShowGrantsTo(ProcName,obj_procedure,ProcTerm);
       qryProcedures.Next;
@@ -1774,7 +1776,7 @@ begin
 
     if not Header then
     begin
-      ExtractOut(Format('SET TERM %s %s', [Term, ProcTerm]));
+      ExtractOut(Format('SET TERM %s%s', [Term, ProcTerm]));
       ExtractOut('COMMIT WORK;');
       ExtractOut('SET AUTODDL ON;');
     end;
@@ -1913,7 +1915,7 @@ begin
       SList.Clear;
       if Header then
       begin
-        ExtractOut(Format('SET TERM %s %s%s', [Procterm, Term, LineEnding]));
+        ExtractOut(Format('SET TERM %s%s%s', [Procterm, Term, LineEnding]));
         ExtractOut(Format('%s/* Triggers only will work for SQL triggers */%s',
 		       [LineEnding, LineEnding]));
         Header := false;
@@ -1964,7 +1966,7 @@ begin
           SList.Add(qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString)
         else
           SList.Add('AS BEGIN EXIT; END');
-        SList.Add(' ' + ProcTerm);
+        SList.Add(ProcTerm);
         if qryTriggers.FieldByName('RDB$FLAGS').AsInteger <> 1 then
           SList.Add(' */');
         ExtractOut(SList);
@@ -1975,7 +1977,7 @@ begin
     end;
     if not Header then
     begin
-      ExtractOut('COMMIT WORK ' + ProcTerm);
+      ExtractOut('COMMIT WORK' + ProcTerm);
       ExtractOut('SET TERM ' + Term + ProcTerm);
     end;
     ExtractOut(Comments);
@@ -2899,7 +2901,8 @@ begin
            TrimRight(qryFunctions.FieldByName('RDB$MODULE_NAME').AsString)]));
 
        {SQL Security added in Firebird 4}
-       if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
+       if (FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13) and
+          not qryFunctions.FieldByName('RDB$SQL_SECURITY').IsNull then
          ExtractOut(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
 
       ExtractOut(TERM + LineEnding + LineEnding);
@@ -2961,7 +2964,7 @@ begin
        begin
          ExtractOut('COMMIT WORK;');
          ExtractOut('SET AUTODDL OFF;');
-         ExtractOut(Format('SET TERM %s %s', [ProcTerm, Term]));
+         ExtractOut(Format('SET TERM %s%s', [ProcTerm, Term]));
          ExtractOut('');
          if ProcDDLType in [pdCreateStub,pdCreateProc] then
            ExtractOut('/* Stored Function declarations */')
@@ -3026,7 +3029,8 @@ begin
            ExtractOut(' AS BEGIN END');
 
            {SQL Security added in Firebird 4}
-           if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
+           if (FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13) and
+               not qryFunctions.FieldByName('RDB$SQL_SECURITY').IsNull then
              ExtractOut(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
         end;
 
@@ -3039,12 +3043,13 @@ begin
              ExtractOut(Format('CREATE FUNCTION %s',[TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString)]));
            ExtractOut(ReturnBuffer);
            if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
-             ExtractOut(' AS ' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
+             ExtractOut('AS' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
            else
-             ExtractOut(' AS BEGIN END');
+             ExtractOut('AS BEGIN END');
 
            {SQL Security added in Firebird 4}
-           if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13 then
+           if (FDatabaseInfo.ODSMajorVersion >= ODS_VERSION13) and
+               not qryFunctions.FieldByName('RDB$SQL_SECURITY').IsNull then
              ExtractOut(AddSQLSecurity(qryFunctions.FieldByName('RDB$SQL_SECURITY')));
          end;
 
@@ -3058,12 +3063,12 @@ begin
                [TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString)]));
            ExtractOut(ReturnBuffer);
            if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
-             ExtractOut(' AS ' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
+             ExtractOut('AS' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
            else
-             ExtractOut(' AS BEGIN END');
+             ExtractOut('AS BEGIN END');
          end;
        end;
-       ExtractOut(ProcTerm + LineEnding + LineEnding);
+       ExtractOut(ProcTerm + LineEnding);
        if IncludeGrants then
          ShowGrantsTo(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString,obj_Function,ProcTerm);
 
@@ -3072,7 +3077,7 @@ begin
 
       if not First then
       begin
-        ExtractOut(Format('SET TERM %s %s', [Term, ProcTerm]));
+        ExtractOut(Format('SET TERM %s%s', [Term, ProcTerm]));
         ExtractOut('COMMIT WORK;');
         ExtractOut('SET AUTODDL ON;');
       end;
@@ -3147,7 +3152,7 @@ begin
           if not qryValue.EOF then
             ExtractOut(Format('ALTER SEQUENCE %s RESTART WITH %d;',
                  [QuoteIdentifier( GenName),
-                  qryValue.FieldByName('GENERATORVALUE').AsInt64]));
+                  qryValue.FieldByName('GENERATORVALUE').AsInt64 + 1]));
         finally
           qryValue.Close;
         end;
@@ -3350,7 +3355,7 @@ begin
            qryColumns.FieldByName('RDB$FIELD_NAME').AsString));
         qryColumns.Next;
         if not qryColumns.Eof then
-          SList.Strings[SList.Count - 1] := SList.Strings[SList.Count - 1] + ', ';
+          SList.Strings[SList.Count - 1] := SList.Strings[SList.Count - 1] + ',';
       end;
       qryColumns.Close;
       SList.Text := SList.Text + Format(') AS%s', [LineEnding]);
@@ -3725,7 +3730,7 @@ begin
                 { We are Dialect >=3 since FIELD_PRECISION is non-NULL }
                 if (FieldSubType > 0) and (FieldSubType <= MAX_INTSUBTYPES) then
                 begin
-                  Result := Format('%s(%d, %d)',
+                  Result := Format('%s(%d,%d)',
                                          [IntegralSubtypes[FieldSubType],
                                           FieldPrecision,
                                           -FieldScale]);
@@ -3736,19 +3741,19 @@ begin
 
             { Take a stab at numerics and decimals }
             if (FieldType = blr_short) and (FieldScale < 0) then
-              Result :=  Format('NUMERIC(4, %d)', [-FieldScale])
+              Result :=  Format('NUMERIC(4,%d)', [-FieldScale])
             else
             if (FieldType = blr_long) and (FieldScale < 0) then
-                Result := Format('NUMERIC(9, %d)', [-FieldScale])
+                Result := Format('NUMERIC(9,%d)', [-FieldScale])
             else
             if (FieldType = blr_double) and (FieldScale < 0) then
-               Result :=  Format('NUMERIC(15, %d)', [-FieldScale])
+               Result :=  Format('NUMERIC(15,%d)', [-FieldScale])
             else
             if (FieldType = blr_int64) and (FieldScale < 0) then
-               Result :=  Format('NUMERIC(18, %d)', [-FieldScale])
+               Result :=  Format('NUMERIC(18,%d)', [-FieldScale])
             else
             if (FieldType = blr_int128) and (FieldScale < 0) then
-               Result :=  Format('NUMERIC(38, %d)', [-FieldScale])
+               Result :=  Format('NUMERIC(38,%d)', [-FieldScale])
             else
                 Result :=  TypeName;
           end;

@@ -11,7 +11,7 @@ library.
 3. IBExtract: some further tidying up to remove extraneous white space.
 
 4. IBCustomDataSet: DefaultFieldClasses array declaration updated to avoid compile time
-   errors when declaration of DB.TFieldType changes.
+   errors when extra elements are added to DB.TFieldType.
 
 5. IBUpdate: updated to reflect changes to ISQLParam.
 
