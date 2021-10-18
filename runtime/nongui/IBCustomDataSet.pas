@@ -1032,7 +1032,8 @@ const
     TFmtBCDField,       { ftFMTBcd }
     nil,                { ftFixedWideChar }
     nil                 { ftWideMemo }
-{$IF FPC_FULLVERSION > 30202 }
+{$IF declared(ftOraTimeStamp)}
+    {These six extra elements were added to the FPC fixes_3_2 branch in Q3 2021}
     ,
     nil,                {ftOraTimeStamp}
     nil,                {ftOraInterval}
@@ -1040,7 +1041,7 @@ const
     nil,                {ftShortint}
     nil,                {ftByte}
     nil                 {ftExtended}
-{$ENDIF}
+{$IFEND}
     );
 (*var
   CreateProviderProc: function(DataSet: TIBCustomDataSet): IProvider = nil;*)
