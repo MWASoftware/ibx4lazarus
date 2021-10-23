@@ -33,6 +33,8 @@ unit Test07;
 {  This is a simple use of IBX to access the employee database in console mode.
   The program opens the database, runs a query and writes the result to stdout.
 
+  If Scrollable cursors are supported then these calls are excercised.
+
 }
 
 interface
@@ -51,6 +53,7 @@ type
   TTest07 = class(TIBXTestBase)
   private
     FIBSQL: TIBSQL;
+    procedure DoScrollableQuery;
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -82,6 +85,45 @@ const
 'JOIN Depts D On D.DEPT_NO = A.DEPT_NO';
 
   { TTest07 }
+
+procedure TTest07.DoScrollableQuery;
+begin
+  with FIBSQL do
+  begin
+    Scrollable := true;
+    GoToFirstRecordOnExecute := false;
+    writeln(OutFile);
+    writeln(Outfile,'Scollable Cursors');
+    SQL.Text := 'Select * from EMPLOYEE order by EMP_NO';
+    Transaction.Active := true;
+    Prepare;
+    ExecQuery;
+    writeln(Outfile,'Do Fetch Next:');
+    if FetchNext then
+      ReportResult(Current);
+    writeln(Outfile,'Do Fetch Last:');
+    if FetchLast then
+      ReportResult(Current);
+    writeln(Outfile,'Do Fetch Prior:');
+    if FetchPrior then
+      ReportResult(Current);
+    writeln(Outfile,'Do Fetch First:');
+    if FetchFirst then
+      ReportResult(Current);
+    writeln(Outfile,'Do Fetch Abs 8 :');
+    if FetchAbsolute(8) then
+      ReportResult(Current);
+    writeln(Outfile,'Do Fetch Relative -2 :');
+    if FetchRelative(-2) then
+      ReportResult(Current);
+    writeln(Outfile,'Do Fetch beyond EOF :');
+    if FetchAbsolute(150) then
+        ReportResult(Current)
+    else
+      writeln(Outfile,'Fetch returned false');
+    Close;
+  end;
+end;
 
 procedure TTest07.CreateObjects(Application: TTestApplication);
 begin
@@ -194,7 +236,14 @@ begin
        writeln(OutFile,'Terminated with Exception:',E.Message);
      end;
      Transaction.Rollback;
+     if FIBSQL.HasScollableCursors then
+        DoScrollableQuery;
   end;
+  IBDatabase.Connected := false;
+  IBDatabase.DatabaseName := ExtractDBName(Owner.GetEmployeeDatabaseName); {open as local database}
+  IBDatabase.Connected := true;
+  if FIBSQL.HasScollableCursors then
+     DoScrollableQuery;
 end;
 
 initialization

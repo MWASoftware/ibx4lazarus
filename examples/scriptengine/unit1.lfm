@@ -9,22 +9,20 @@ object Form1: TForm1
   DefaultMonitor = dmPrimary
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.0.11.0'
+  LCLVersion = '2.2.0.2'
   object Label1: TLabel
     Left = 14
-    Height = 13
+    Height = 15
     Top = 16
     Width = 99
     Caption = 'Database Name:'
-    ParentColor = False
   end
   object Label2: TLabel
     Left = 14
-    Height = 13
+    Height = 15
     Top = 56
     Width = 36
     Caption = 'Script'
-    ParentColor = False
   end
   object IBScript: TMemo
     Left = 14
@@ -35,8 +33,9 @@ object Form1: TForm1
     Lines.Strings = (
       'IBScript'
     )
-    ScrollBars = ssAutoVertical
+    ScrollBars = ssAutoHorizontal
     TabOrder = 0
+    WordWrap = False
   end
   object Button1: TButton
     Left = 369
@@ -49,12 +48,11 @@ object Form1: TForm1
   end
   object Label3: TLabel
     Left = 459
-    Height = 13
+    Height = 15
     Top = 56
     Width = 68
     Anchors = [akTop, akRight]
     Caption = 'Results Log'
-    ParentColor = False
   end
   object ResultsLog: TMemo
     Left = 460
@@ -87,11 +85,10 @@ object Form1: TForm1
   end
   object DBName: TLabel
     Left = 119
-    Height = 13
+    Height = 15
     Top = 16
     Width = 52
     Caption = 'DBName'
-    ParentColor = False
   end
   object StopOnError: TCheckBox
     Left = 104

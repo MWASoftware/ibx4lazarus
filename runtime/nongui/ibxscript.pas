@@ -398,7 +398,7 @@ resourcestring
   sArrayIndexError = 'Array Index Error (%d)';
   sBlobIndexError = 'Blob Index Error (%d)';
   sStatementError = 'Error processing SQL statement: %s %s - for statement "%s"';
-  sNotInArray = 'elt tag found but not in an XML array tag';
+//  sNotInArray = 'elt tag found but not in an XML array tag';
   sNoDatabase = 'Missing database for xml tag import';
   sNoTransaction = 'Missing transaction for xml tag import';
 
@@ -516,8 +516,6 @@ begin
           sqltIdentifierInDoubleQuotes:
             stmt += '"' + TokenText + '"';
 
-          sqltCR: {ignore};
-
           sqltEOL:
             stmt += LineEnding;
 
@@ -581,8 +579,6 @@ begin
         sqltIdentifierInDoubleQuotes:
           stmt += '"' + TokenText + '"';
 
-        sqltCR: {ignore};
-
         sqltEOL:
           stmt += LineEnding;
 
@@ -608,8 +604,6 @@ begin
           stmt += TokenText;
           State := stInStmt;
         end;
-
-        sqltCR: {ignore};
 
         sqltEOL:
           stmt += LineEnding;
@@ -639,8 +633,6 @@ begin
             State := stInStmt;
             stmt += TokenText;
           end;
-
-        sqltCR: {ignore};
 
         sqltEOL:
           stmt += LineEnding;
@@ -1027,7 +1019,7 @@ begin
       end;
 
     sqltSpace,
-    sqltCR, sqltEOL:
+    sqltEOL:
       QueueToken(token);
 
     else
@@ -1044,7 +1036,7 @@ begin
       end;
 
       sqltSpace,
-      sqltCR, sqltEOL:
+      sqltEOL:
         QueueToken(token);
 
       sqltIdentifier:
@@ -1078,7 +1070,7 @@ begin
       end;
 
     sqltSpace,
-    sqltCR, sqltEOL:
+    sqltEOL:
       QueueToken(token);
 
     else
@@ -1136,7 +1128,7 @@ begin
       end;
 
     sqltSpace,
-    sqltCR, sqltEOL:
+    sqltEOL:
       QueueToken(token);
 
     else
@@ -1910,6 +1902,7 @@ begin
       FIndex := 1;
     end
     else
+    if Result <> CR then
     begin
       FCurLine += Result;
       Inc(FIndex);
