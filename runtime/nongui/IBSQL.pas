@@ -160,12 +160,12 @@ type
   private
     FCaseSensitiveParameterNames: boolean;
     FMetaData: IMetaData;
+    FScrollable: boolean;
     FSQLParams: ISQLParams;
     FStatement: IStatement;
     FOnSQLChanged: TNotifyEvent;
     FUniqueParamNames: Boolean;
-    FBOF: boolean;
-    FEOF: boolean;
+    function GetBOF: Boolean;
     function GetFieldCount: integer;
     function GetOpen: Boolean;
     function GetPrepared: Boolean;
@@ -208,13 +208,20 @@ type
     procedure Close;
     procedure ExecQuery;
     function HasField(FieldName: String): boolean; {Note: case sensitive match}
+    function HasScollableCursors: boolean;
     function FieldByName(FieldName: String): ISQLData;
     function ParamByName(ParamName: String): ISQLParam;
     procedure FreeHandle;
     function Next: boolean;
+    function FetchNext: boolean; {fetch next record}
+    function FetchPrior: boolean; {fetch previous record}
+    function FetchFirst:boolean; {fetch first record}
+    function FetchLast: boolean; {fetch last record}
+    function FetchAbsolute(position: Integer): boolean; {fetch record by its absolute position in result set}
+    function FetchRelative(offset: Integer): boolean; {fetch record by position relative to current}
     procedure Prepare;
     function GetUniqueRelationName: String;
-    property Bof: Boolean read FBOF;
+    property Bof: Boolean read GetBOF;
     property Eof: Boolean read GetEOF;
     property Current: IResults read FResults;
     property Fields[const Idx: Integer]: ISQLData read GetFields; default;
@@ -251,6 +258,7 @@ type
                                                default True;
     property ParamCheck: Boolean read FParamCheck write FParamCheck;
     property SQL: TStrings read FSQL write SetSQL;
+    property Scrollable: boolean read FScrollable write FScrollable;
     property Transaction: TIBTransaction read GetTransaction write SetTransaction;
     property OnSQLChanging: TNotifyEvent read FOnSQLChanging write FOnSQLChanging;
     property OnSQLChanged: TNotifyEvent read FOnSQLChanged write FOnSQLChanged;
@@ -660,8 +668,6 @@ begin
     FResults.SetRetainInterfaces(false);
   FResultSet := nil;
   FResults := nil;
-  FBOF := false;
-  FEOF := false;
   FRecordCount := 0;
 end;
 
@@ -674,6 +680,11 @@ begin
     Result := FMetaData.GetCount
   else
     Result := 0;
+end;
+
+function TIBSQL.GetBOF: Boolean;
+begin
+  Result := (FResultSet = nil) or FResultSet.IsBof;
 end;
 
 function TIBSQL.GetOpen: Boolean;
@@ -724,11 +735,9 @@ begin
   {$ENDIF}
   if SQLStatementType = SQLSelect then
   begin
-    FResultSet := FStatement.OpenCursor;
+    FResultSet := FStatement.OpenCursor(Scrollable);
     FResults := FResultSet;
     FResults.SetRetainInterfaces(true);
-    FBOF := True;
-    FEOF := False;
     FRecordCount := 0;
     if not (csDesigning in ComponentState) then
       MonitorHook.SQLExecute(Self);
@@ -770,9 +779,14 @@ begin
   end;
 end;
 
+function TIBSQL.HasScollableCursors: boolean;
+begin
+  Result := Database.Attachment.HasScollableCursors;
+end;
+
 function TIBSQL.GetEOF: Boolean;
 begin
-  result := FEOF or (FResultSet = nil);
+  result := (FResultSet = nil) or FResultSet.IsEof;
 end;
 
 function TIBSQL.FieldByName(FieldName: String): ISQLData;
@@ -817,8 +831,13 @@ end;
 
 function TIBSQL.Next: boolean;
 begin
+  Result := FetchNext;
+end;
+
+function TIBSQL.FetchNext: boolean;
+begin
   result := false;
-  if not FEOF then
+  if not EOF then
   begin
     CheckOpen;
     try
@@ -828,17 +847,90 @@ begin
       raise;
     end;
 
-    if Result then
-    begin
+    if Result and not Scrollable then
       Inc(FRecordCount);
-      FBOF := False;
-    end
-    else
-      FEOF := true;
 
     if not (csDesigning in ComponentState) then
       MonitorHook.SQLFetch(Self);
   end;
+end;
+
+function TIBSQL.FetchPrior: boolean;
+begin
+  result := false;
+  if not BOF then
+  begin
+    CheckOpen;
+    try
+      Result := FResultSet.FetchPrior;
+    except
+      Close;
+      raise;
+    end;
+
+    if not (csDesigning in ComponentState) then
+      MonitorHook.SQLFetch(Self);
+  end;
+end;
+
+function TIBSQL.FetchFirst: boolean;
+begin
+  result := false;
+  CheckOpen;
+  try
+    Result := FResultSet.FetchFirst;
+  except
+    Close;
+    raise;
+  end;
+
+  if not (csDesigning in ComponentState) then
+    MonitorHook.SQLFetch(Self);
+end;
+
+function TIBSQL.FetchLast: boolean;
+begin
+  result := false;
+  CheckOpen;
+  try
+    Result := FResultSet.FetchLast;
+  except
+    Close;
+    raise;
+  end;
+
+  if not (csDesigning in ComponentState) then
+    MonitorHook.SQLFetch(Self);
+end;
+
+function TIBSQL.FetchAbsolute(position: Integer): boolean;
+begin
+  result := false;
+  CheckOpen;
+  try
+    Result := FResultSet.FetchAbsolute(position);
+  except
+    Close;
+    raise;
+  end;
+
+  if not (csDesigning in ComponentState) then
+    MonitorHook.SQLFetch(Self);
+end;
+
+function TIBSQL.FetchRelative(offset: Integer): boolean;
+begin
+  result := false;
+  CheckOpen;
+  try
+    Result := FResultSet.FetchRelative(offset);
+  except
+    Close;
+    raise;
+  end;
+
+  if not (csDesigning in ComponentState) then
+    MonitorHook.SQLFetch(Self);
 end;
 
 procedure TIBSQL.FreeHandle;

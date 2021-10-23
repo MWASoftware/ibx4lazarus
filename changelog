@@ -19,6 +19,8 @@ library.
 
 7. IBExtract: for ODS >=13, increment generator value by one for ALTER SEQUENCE statement.
 
+8. IBSQL: Support for scrollable cursors added (note: local databases only)
+
 IBX Change Log  version (2.4-2 Build 12773) Mon, 23 Aug 2021 11:59:42 +0100
 
 1. TIBDatabaseInfo: review and tidy-up of property types. Most widen to int64 with the
