@@ -178,6 +178,16 @@ begin
       ExecDDL.SQL.Text := 'ALTER USER ' + UserName + ' GRANT ADMIN ROLE';
       ExecDDL.ExecQuery;
     end;
+    if Params.ByName('DBCreator').AsBoolean then
+    begin
+      ExecDDL.SQL.Text := 'GRANT CREATE DATABASE TO USER ' + UserName;
+      ExecDDL.ExecQuery;
+    end
+    else
+    begin
+      ExecDDL.SQL.Text := 'REVOKE CREATE DATABASE FROM USER ' + UserName;
+      ExecDDL.ExecQuery;
+    end;
   end
   else
   if UpdateKind = ukModify then
@@ -193,21 +203,21 @@ begin
     begin
       ExecDDL.SQL.Text := 'ALTER USER ' + UserName + ' REVOKE ADMIN ROLE';
       ExecDDL.ExecQuery;
-    end
-  end;
+    end;
 
-  {Update DB Creator Role}
-  if Params.ByName('DBCreator').AsBoolean and not Params.ByName('OLD_DBCreator').AsBoolean then
-  begin
-    ExecDDL.SQL.Text := 'GRANT CREATE DATABASE TO USER ' + UserName;
-    ExecDDL.ExecQuery;
-  end
-  else
-  if not Params.ByName('DBCreator').AsBoolean and Params.ByName('OLD_DBCreator').AsBoolean then
-  begin
-    ExecDDL.SQL.Text := 'REVOKE CREATE DATABASE FROM USER ' + UserName;
-    ExecDDL.ExecQuery;
-  end
+    {Update DB Creator Role}
+    if Params.ByName('DBCreator').AsBoolean and not Params.ByName('OLD_DBCreator').AsBoolean then
+    begin
+      ExecDDL.SQL.Text := 'GRANT CREATE DATABASE TO USER ' + UserName;
+      ExecDDL.ExecQuery;
+    end
+    else
+    if not Params.ByName('DBCreator').AsBoolean and Params.ByName('OLD_DBCreator').AsBoolean then
+    begin
+      ExecDDL.SQL.Text := 'REVOKE CREATE DATABASE FROM USER ' + UserName;
+      ExecDDL.ExecQuery;
+    end;
+  end;
 end;
 
 procedure TTest22.CreateObjects(Application: TTestApplication);

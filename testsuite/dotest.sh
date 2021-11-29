@@ -9,7 +9,7 @@ usage()
 
 BUILD=
 #Parse Parameters
-TEMP=`getopt h234b:t: "$@"`
+TEMP=`getopt h234db:t: "$@"`
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
 eval set -- "$TEMP"
@@ -23,6 +23,8 @@ while true ; do
         \-3) 	FB="3.0.5"; shift 1;;
 
         \-4) 	FB="4.0.0"; shift 1;;
+
+	-d)	FB="dev"; shift 1;;
        
 	-b)	BUILD="$2"; shift 2;;
         

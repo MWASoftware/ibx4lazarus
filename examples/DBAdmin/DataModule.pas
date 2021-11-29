@@ -411,6 +411,16 @@ begin
       ExecDDL.SQL.Text := 'ALTER USER ' + UserName + ' GRANT ADMIN ROLE';
       ExecDDL.ExecQuery;
     end;
+    if Params.ByName('DBCreator').AsBoolean then
+    begin
+      ExecDDL.SQL.Text := 'GRANT CREATE DATABASE TO USER ' + UserName;
+      ExecDDL.ExecQuery;
+    end
+    else
+    begin
+      ExecDDL.SQL.Text := 'REVOKE CREATE DATABASE FROM USER ' + UserName;
+      ExecDDL.ExecQuery;
+    end
   end
   else
   if UpdateKind = ukModify then

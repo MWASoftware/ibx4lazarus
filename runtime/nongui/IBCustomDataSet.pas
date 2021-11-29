@@ -1854,10 +1854,10 @@ begin
   FDataLink := TIBDataLink.Create(Self);
   FQDelete := TIBSQL.Create(Self);
   FQDelete.OnSQLChanging := SQLChanging;
-  FQDelete.GoToFirstRecordOnExecute := False;
+  FQDelete.GoToFirstRecordOnExecute := True;
   FQInsert := TIBSQL.Create(Self);
   FQInsert.OnSQLChanging := SQLChanging;
-  FQInsert.GoToFirstRecordOnExecute := False;
+  FQInsert.GoToFirstRecordOnExecute := true;
   FQRefresh := TIBSQL.Create(Self);
   FQRefresh.OnSQLChanging := SQLChanging;
   FQRefresh.GoToFirstRecordOnExecute := False;
@@ -1867,7 +1867,7 @@ begin
   FQSelect.GoToFirstRecordOnExecute := False;
   FQModify := TIBSQL.Create(Self);
   FQModify.OnSQLChanging := SQLChanging;
-  FQModify.GoToFirstRecordOnExecute := False;
+  FQModify.GoToFirstRecordOnExecute := True;  {In Firebird 5, Update..Returning returns a cursor}
   FUpdateRecordTypes := [cusUnmodified, cusModified, cusInserted];
   FParamCheck := True;
   FGenerateParamNames := False;
