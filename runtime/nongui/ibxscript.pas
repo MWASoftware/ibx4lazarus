@@ -125,7 +125,8 @@ type
    public
      constructor Create;
      procedure FreeDataObjects;
-     class function FormatBlob(Field: ISQLData): string;
+     class function FormatBlob(Field: ISQLData): string; overload;
+     class function FormatBlob(contents: string; subtype:integer): string; overload;
      class function FormatArray(Database: TIBDatabase; ar: IArray): string;
      property BlobData[index: integer]: TBlobData read GetBlobData;
      property BlobDataCount: integer read GetBlobDataCount;
@@ -1168,18 +1169,25 @@ begin
 end;
 
 class function TSQLXMLReader.FormatBlob(Field: ISQLData): string;
+begin
+  Result := FormatBlob(Field.AsString,Field.getSubtype);
+end;
+
+class function TSQLXMLReader.FormatBlob(contents: string; subtype: integer
+  ): string;
 var TextOut: TStrings;
 begin
   TextOut := TStringList.Create;
   try
-    TextOut.Add(Format('<blob subtype="%d">',[Field.getSubtype]));
-    StringToHex(Field.AsString,TextOut,BlobLineLength);
+    TextOut.Add(Format('<blob subtype="%d">',[subtype]));
+    StringToHex(contents,TextOut,BlobLineLength);
     TextOut.Add('</blob>');
     Result := TextOut.Text;
   finally
     TextOut.Free;
   end;
 end;
+
 
 class function TSQLXMLReader.FormatArray(Database: TIBDatabase; ar: IArray
   ): string;
