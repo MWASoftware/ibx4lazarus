@@ -176,7 +176,8 @@ type
       ibxeUpgradeFailed,
       ibxDBVersionProblem ,
       ibxeResourceFileNotFound,
-      ibxePatchFileNotFound
+      ibxePatchFileNotFound,
+      ibxeJournalHookOverwrite
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -319,6 +320,7 @@ resourcestring
   SDBVersionProblem = 'Database Version too low. Required %d, found %d';
   SResourceFileNotFound = 'Unable to load resource file "%s"';
   SPatchFileNotFound = 'In section [%s] of the Upgrade File (%s), unable to open %s (SQL script to patch).';
+  SJournalHookOverwrite = 'Cannot replace an existing Journal Hook';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -422,7 +424,8 @@ const
     SUpgradeFailed,
     SDBVersionProblem,
     SResourceFileNotFound,
-    SPatchFileNotFound
+    SPatchFileNotFound,
+    SJournalHookOverwrite
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

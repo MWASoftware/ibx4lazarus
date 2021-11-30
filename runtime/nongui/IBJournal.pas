@@ -56,12 +56,13 @@ type
 
   TIBJournal = class(TComponent,IJournallingHook)
   private
-    const DefaultVendor      = 'Snake Oil (Sales) Ltd';
-    const sQueryJournal      = '!Q%d,%d:%s' + LineEnding;
-    const sTransStartJnl     = '!S%d,%d,%s' + LineEnding;
-    const sTransCommitJnl    = '!C%s%d' + LineEnding;
-    const sTransRollBackJnl  = '!R%s%d' + LineEnding;
-    const sTransEndJnl       = '!E%d' + LineEnding;
+    const DefaultVendor          = 'Snake Oil (Sales) Ltd';
+    const DefaultJournalTemplate = 'Journal.%d.log';
+    const sQueryJournal          = '!Q%d,%d:%s' + LineEnding;
+    const sTransStartJnl         = '!S%d,%d,%s' + LineEnding;
+    const sTransCommitJnl        = '!C%s%d' + LineEnding;
+    const sTransRollBackJnl      = '!R%s%d' + LineEnding;
+    const sTransEndJnl           = '!E%d' + LineEnding;
   private
     FApplicationName: string;
     FBase: TIBBase;
@@ -72,22 +73,26 @@ type
     FJournalFileStream: TStream;
     FVendorName: string;
     FSessionId: integer;
+    procedure EnsurePathExists(FileName: string);
     function GetDatabase: TIBDatabase;
     function GetJournalFilePath: string;
     procedure SetDatabase(AValue: TIBDatabase);
     procedure SetEnabled(AValue: boolean);
+    procedure HandleBeforeDatabaseDisconnect(Sender: TObject);
     procedure HandleDatabaseConnect(Sender: TObject);
     procedure HandleDatabaseDisconnect(Sender: TObject);
     function HasTable(TableName: string): boolean;
+    procedure InitDatabaseConnection;
+    procedure StopJournalling;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   public
     {IJournallingHook}
-    procedure ExecQuery(IBSQL: TIBSQL);
+    procedure ExecQuery(aIBSQL: TObject);
     procedure TransactionStart(Tr: TIBTransaction);
     procedure TransactionEnd(Tr: TIBTransaction; Action: TTransactionAction);
-    procedure TransactionEndDone(Tr: TIBTransaction);
+    procedure TransactionEndDone(TransactionID: integer);
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Enabled: boolean read FEnabled write SetEnabled;
@@ -118,10 +123,10 @@ const
 
   sqlGetNextSessionID = 'Select Gen_ID(IBX$SESSIONS,1) as SessionID From RDB$DATABASE';
 
-  sqlInitJournalEntry = 'Insert into ' + sqlCreateJournalTable + '(IBX$SessionID,IBX$LastTransactionID) '+
+  sqlInitJournalEntry = 'Insert into ' + sJournalTableName + '(IBX$SessionID,IBX$LastTransactionID) '+
                         'Values(?,0)';
 
-  sqlUpdateJournalEntry = 'Update or Insert into ' + sqlCreateJournalTable + ' (IBX$SessionID,IBX$LastTransactionID) '+
+  sqlUpdateJournalEntry = 'Update or Insert into ' + sJournalTableName + ' (IBX$SessionID,IBX$LastTransactionID) '+
                           'Values(?,?) Matching (IBX$SessionID)';
 
 type
@@ -169,6 +174,9 @@ function TQueryProcessor.GetParamValue(ParamIndex: integer): AnsiString;
 begin
   with FIBSQL.Params[ParamIndex] do
   begin
+    if IsNull then
+      Result := 'NULL'
+    else
     case GetSQLType of
     SQL_BLOB:
       if getSubType = 1 then {string}
@@ -179,7 +187,14 @@ begin
       Result := TSQLXMLReader.FormatArray(FIBSQL.Database,getAsArray);
 
     SQL_VARYING,
-    SQL_TEXT:
+    SQL_TEXT,
+    SQL_TIMESTAMP,
+    SQL_TYPE_DATE,
+    SQL_TYPE_TIME,
+    SQL_TIMESTAMP_TZ_EX,
+    SQL_TIME_TZ_EX,
+    SQL_TIMESTAMP_TZ,
+    SQL_TIME_TZ:
       Result := '''' + SQLSafeString(GetAsString) + '''';
     else
       Result := GetAsString;
@@ -201,7 +216,7 @@ end;
 class function TQueryProcessor.Execute(IBSQL: TIBSQL): AnsiString;
 begin
   if not IBSQL.Prepared then
-    IBError(ibxeNotPrepared);
+    IBError(ibxeSQLClosed,[]);
   with self.Create do
   try
     FIBSQL := IBSQL;
@@ -215,6 +230,15 @@ end;
 
 
 { TIBJournal }
+
+procedure TIBJournal.EnsurePathExists(FileName: string);
+var Path: string;
+begin
+  Path := ExtractFileDir(FileName);
+  if (Path <> '') and not DirectoryExists(Path) then
+    EnsurePathExists(Path);
+  CreateDir(Path);
+end;
 
 function TIBJournal.GetDatabase: TIBDatabase;
 begin
@@ -246,8 +270,8 @@ end;
 
 procedure TIBJournal.SetDatabase(AValue: TIBDatabase);
 begin
-  if Value = FBase.Database then Exit;
-  FBase.Database; := AValue;
+  if AValue = FBase.Database then Exit;
+  FBase.Database := AValue;
 end;
 
 procedure TIBJournal.SetEnabled(AValue: boolean);
@@ -257,34 +281,34 @@ begin
   if not (csDesigning in ComponentState) and Database.Connected then
   begin
     if FEnabled then
+    begin
+      InitDatabaseConnection;
       FBase.JournalHook := self
+    end
     else
-      FBase.JournalHook := nil;
+      StopJournalling;
   end;
+end;
+
+procedure TIBJournal.HandleBeforeDatabaseDisconnect(Sender: TObject);
+begin
+  StopJournalling;
 end;
 
 procedure TIBJournal.HandleDatabaseConnect(Sender: TObject);
 begin
   if not (csDesigning in ComponentState) and Enabled then
-  with Database.Attachment do
   begin
-    if not HasTable(sJournalTableName) then
-    begin
-      ExecImmediate([isc_tpb_write,isc_tpb_wait,isc_tpb_consistency],sqlCreateJournalTable);
-      ExecImmediate([isc_tpb_write,isc_tpb_wait,isc_tpb_consistency],sqlCreateSequnce);
-    end;
-    FSessionID := OpenCursorAtStart(sqlGetNextSessionID)[0].AsInteger;
-    ExecuteSQL([isc_tpb_write,isc_tpb_nowait,isc_tpb_concurrency],sqlInitJournalEntry,[FSessionID]);
+    InitDatabaseConnection;
     FBase.JournalHook := self;
   end;
   FJournalFilePath := GetJournalFilePath;
-  FJournalFileStream := TFileStream.Create(FJournalFilePath,fmOpenWrite);
+  EnsurePathExists(FJournalFilePath);
+  FJournalFileStream := TFileStream.Create(FJournalFilePath,fmCreate);
 end;
 
 procedure TIBJournal.HandleDatabaseDisconnect(Sender: TObject);
 begin
-  FreeAndNil(FJournalFileStream);
-  FBase.JournalHook := nil;
   {Delete the Journal File and IBX$JOURNAL entry}
 end;
 
@@ -295,13 +319,36 @@ begin
           [TableName])[0].AsInteger > 0;
 end;
 
+procedure TIBJournal.InitDatabaseConnection;
+begin
+  with Database.Attachment do
+  begin
+    if not HasTable(sJournalTableName) then
+    begin
+      ExecImmediate([isc_tpb_write,isc_tpb_wait,isc_tpb_consistency],sqlCreateJournalTable);
+      ExecImmediate([isc_tpb_write,isc_tpb_wait,isc_tpb_consistency],sqlCreateSequence);
+    end;
+    FSessionID := OpenCursorAtStart(sqlGetNextSessionID)[0].AsInteger;
+    ExecuteSQL([isc_tpb_write,isc_tpb_nowait,isc_tpb_concurrency],sqlInitJournalEntry,[FSessionID]);
+  end;
+end;
+
+procedure TIBJournal.StopJournalling;
+begin
+  FreeAndNil(FJournalFileStream);
+  FSessionID := -1;
+  FBase.JournalHook := nil;
+end;
+
 constructor TIBJournal.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FBase := TIBBase.Create(Self);
+  FBase.BeforeDatabaseDisconnect := @HandleBeforeDatabaseDisconnect;
   FBase.AfterDatabaseConnect := @HandleDatabaseConnect;
   FBase.AfterDatabaseDisconnect := @HandleDatabaseDisconnect;
   FVendorName := DefaultVendor;
+  FJournalFileTemplate := DefaultJournalTemplate;
   FJournalAll := false;
 end;
 
@@ -312,14 +359,17 @@ begin
   inherited Destroy;
 end;
 
-procedure TIBJournal.ExecQuery(IBSQL: TIBSQL);
+procedure TIBJournal.ExecQuery(aIBSQL: TObject);
 var SQL: AnsiString;
     LogEntry: AnsiString;
+    IBSQL: TIBSQL;
 begin
-  if assigned(FJournalFileStream) and (FJournalAll or (IBSQL.RowsAffected > 0)) then
+  IBSQL := aIBSQL as TIBSQL;
+  if assigned(FJournalFileStream) and (FJournalAll or
+    (not IBSQL.Transaction.IsReadOnly and (IBSQL.RowsAffected > 0))) then
   begin
-    SQL := (TQueryProcessor.Execute(IBSQL);
-    LogEntry := Format(sQueryJournal,[IBSQL.Transaction.LocalTransactionID,Length(LogEntry),LogEntry]);
+    SQL := TQueryProcessor.Execute(IBSQL);
+    LogEntry := Format(sQueryJournal,[IBSQL.Transaction.TransactionID,Length(SQL),SQL]);
     FJournalFileStream.Write(LogEntry[1],Length(LogEntry));
   end;
 end;
@@ -330,15 +380,15 @@ var LogEntry: AnsiString;
     i: integer;
 begin
   TPBText := '[';
-  with Tr.TPB do;
+  with Tr.TPB do
     for i := 0 to getCount - 1 do
     begin
-      TPBText := TPBText + Items[i].getTypeName;
+      TPBText := TPBText + GetParamTypeName(Items[i].getParamType);
       if i < getCount - 1 then
         TPBText := TPBText + ',';
     end;
   TPBText := TPBText + ']';
-  LogEntry := Format(sTransStartJnl,[FSessionID,FTr.LocalTransactionID,TPBText]);
+  LogEntry := Format(sTransStartJnl,[FSessionID,Tr.TransactionID,TPBText]);
   if assigned(FJournalFileStream) then
     FJournalFileStream.Write(LogEntry[1],Length(LogEntry));
 end;
@@ -349,24 +399,24 @@ var LogEntry: AnsiString;
 begin
   case Action of
   TARollback:
-    LogEntry := Format(sTransRollbackJnl,['',Tr.LocalTransactionID]);
+    LogEntry := Format(sTransRollbackJnl,['',Tr.TransactionID]);
   TACommit:
-    LogEntry := Format(sTransCommitJnl,['',Tr.LocalTransactionID]);
+    LogEntry := Format(sTransCommitJnl,['',Tr.TransactionID]);
   TACommitRetaining:
-    LogEntry := Format(sTransCommitJnl,['R',Tr.LocalTransactionID]);
+    LogEntry := Format(sTransCommitJnl,['R',Tr.TransactionID]);
   TARollbackRetaining:
-    LogEntry := Format(sTransRollbackJnl,['R',Tr.LocalTransactionID]);
+    LogEntry := Format(sTransRollbackJnl,['R',Tr.TransactionID]);
   end;
   Database.Attachment.ExecuteSQL(Tr.TransactionIntf,
-           sqlUpdateJournalEntry,[FSessionID,LocalTransactionID]);
+           sqlUpdateJournalEntry,[FSessionID,Tr.TransactionID]);
   if assigned(FJournalFileStream) then
     FJournalFileStream.Write(LogEntry[1],Length(LogEntry));
 end;
 
-procedure TIBJournal.TransactionEndDone(Tr: TIBTransaction);
+procedure TIBJournal.TransactionEndDone(TransactionID: integer);
 var LogEntry: AnsiString;
 begin
-  LogEntry := Format(sTransEndJnl,[Tr.LocalTransactionID]);
+  LogEntry := Format(sTransEndJnl,[TransactionID]);
   if assigned(FJournalFileStream) then
     FJournalFileStream.Write(LogEntry[1],Length(LogEntry));
 end;

@@ -45,12 +45,14 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  SysUtils, Classes, FPTimer, IBExternals, DB, IB, CustApp, IBInternals;
+  SysUtils, Classes, FPTimer, IBExternals, DB, IB, CustApp, IBInternals,
+  syncobjs;
 
 type
   TIBDatabase = class;
   TIBTransaction = class;
   TIBBase = class;
+  IJournallingHook = interface;
 
   TIBDatabaseLoginEvent = procedure(Database: TIBDatabase;
     LoginParams: TStrings) of object;
@@ -224,7 +226,6 @@ type
   TIBTransaction = class(TComponent)
   private
     class var FCriticalSection: TCriticalSection;
-    class var FNextLocalTransactionID: integer;
   private
     FTransactionIntf: ITransaction;
     FAfterDelete: TNotifyEvent;
@@ -247,7 +248,6 @@ type
     FTRParamsChanged    : Boolean;
     FInEndTransaction   : boolean;
     FEndAction          : TTransactionAction;
-    FLocalTransactionID : integer;
     procedure DoBeforeTransactionEnd;
     procedure DoAfterTransactionEnd;
     procedure DoOnStartTransaction;
@@ -260,12 +260,14 @@ type
     procedure EndTransaction(Action: TTransactionAction; Force: Boolean);
     function GetDatabase(Index: Integer): TIBDatabase;
     function GetDatabaseCount: Integer;
+    function GetIsReadOnly: boolean;
     function GetSQLObject(Index: Integer): TIBBase;
     function GetSQLObjectCount: Integer;
     function GetInTransaction: Boolean;
     function GetIdleTimer: Integer;
     procedure BeforeDatabaseDisconnect(DB: TIBDatabase);
     function GetTPBConstantNames(index: byte): string;
+    function GetTransactionID: integer;
     procedure SetActive(Value: Boolean);
     procedure SetDefaultDatabase(Value: TIBDatabase);
     procedure SetIdleTimer(Value: Integer);
@@ -309,7 +311,8 @@ type
     property TransactionIntf: ITransaction read FTransactionIntf;
     property TPB: ITPB read FTPB;
     property TPBConstantNames[index: byte]: string read GetTPBConstantNames;
-    property LocalTransactionID: integer read FLocalTransactionID;
+    property TransactionID: integer read GetTransactionID;
+    property IsReadOnly: boolean read GetIsReadOnly;
   published
     property Active: Boolean read GetInTransaction write SetActive;
     property DefaultDatabase: TIBDatabase read FDefaultDatabase
@@ -337,11 +340,11 @@ type
                               var DBName: string; var CreateIfNotExists: boolean) of object;
 
   IJournallingHook = interface
-    ['{7d3e45e0-3628-416a-9e22-c20474825031]']
+    ['{7d3e45e0-3628-416a-9e22-c20474825031}']
     procedure TransactionStart(Tr: TIBTransaction);
     procedure TransactionEnd(Tr: TIBTransaction; Action: TTransactionAction);
-    procedure TransactionEndDone(Tr: TIBTransaction);
-    procedure ExecQuery(IBSQL: TIBSQL);
+    procedure TransactionEndDone(TransactionID: integer);
+    procedure ExecQuery(IBSQL: TObject);
   end;
 
   { TIBBase }
@@ -1597,13 +1600,6 @@ begin
   FTimer.Interval := 0;
   FTimer.OnTimer := TimeoutTransaction;
   FDefaultAction := taCommit;
-  FCriticalSection.Enter;
-  try
-    FLocalTransactionID := FNextLocalTransactionID;
-    Inc(FNextLocalTransactionID);
-  finally
-    FCriticalSection.Leave;
-  end;
 end;
 
 destructor TIBTransaction.Destroy;
@@ -1759,110 +1755,140 @@ end;
 
 procedure TIBTransaction.EndTransaction(Action: TTransactionAction;
   Force: Boolean);
-var
-  i: Integer;
-begin
-  CheckInTransaction;
-  if FInEndTransaction then Exit;
-  FInEndTransaction := true;
-  FEndAction := Action;
-  try
-  case Action of
-    TARollback, TACommit:
-    begin
+
+var TempTransactionID: integer;
+
+  procedure DoJournalBeforeEnd;
+  var i: integer;
+  begin
+    if not (csDesigning in ComponentState) then
+    for i := 0 to FDatabases.Count - 1 do
+     if  FDatabases[i] <> nil then
+     begin
+       with TIBDatabase(FDatabases[i]) do
+         if assigned(FJournalHook) then
+           FJournalHook.TransactionEnd(self, Action);
+     end;
+    TempTransactionID := TransactionID;
+  end;
+
+  procedure DoJournalAfterEnd;
+  var i: integer;
+  begin
+    if not (csDesigning in ComponentState) then
+    for i := 0 to FDatabases.Count - 1 do
+     if  FDatabases[i] <> nil then
+     begin
+       with TIBDatabase(FDatabases[i]) do
+         if assigned(FJournalHook) then
+           FJournalHook.TransactionEndDone(TempTransactionID);
+     end;
+  end;
+
+  procedure InternalDoBeforeTransactionEnd;
+  var i: integer;
+  begin
+    try
+      DoBeforeTransactionEnd;
+    except on E: EIBInterBaseError do
+      begin
+        if not Force then
+          raise;
+      end;
+    end;
+
+    for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
+    try
+      SQLObjects[i].DoBeforeTransactionEnd(Action);
+    except on E: EIBInterBaseError do
+      begin
+        if not Force then
+            raise;
+        end;
+    end;
+  end;
+
+  procedure InternalDoAfterTransctionEnd;
+  var i: integer;
+  begin
+    for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
       try
-        DoBeforeTransactionEnd;
+        SQLObjects[i].DoAfterTransactionEnd;
       except on E: EIBInterBaseError do
         begin
           if not Force then
             raise;
         end;
       end;
-
-      for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
-      try
-        SQLObjects[i].DoBeforeTransactionEnd(Action);
-      except on E: EIBInterBaseError do
-        begin
-          if not Force then
-              raise;
-          end;
-      end;
-
-      if InTransaction then
+    try
+      DoAfterTransactionEnd;
+    except on E: EIBInterBaseError do
       begin
-        {Journalling}
-        for i := 0 to FDatabases.Count - 1 do
-         if  FDatabases[i] <> nil then
-         begin
-           with TIBDatabase(FDatabases[i]) do
-             if assigned(FJournalHook) then
-               FJournalHook.TransactionEnd(self, Action);
-         end;
-
-        if (Action = TARollback) then
-            FTransactionIntf.Rollback(Force)
-        else
-        try
-          FTransactionIntf.Commit;
-        except on E: EIBInterBaseError do
-          begin
-            if Force then
-              FTransactionIntf.Rollback(Force)
-            else
-              raise;
-          end;
-        end;
-
-        {Journalling}
-        for i := 0 to FDatabases.Count - 1 do
-         if  FDatabases[i] <> nil then
-         begin
-           with TIBDatabase(FDatabases[i]) do
-             if assigned(FJournalHook) then
-               FJournalHook.TransactionEndDone(self);
-         end;
-
-        for i := 0 to FSQLObjects.Count - 1 do if FSQLObjects[i] <> nil then
-          try
-            SQLObjects[i].DoAfterTransactionEnd;
-          except on E: EIBInterBaseError do
-            begin
-              if not Force then
-                raise;
-            end;
-          end;
-        try
-          DoAfterTransactionEnd;
-        except on E: EIBInterBaseError do
-          begin
-            if not Force then
-              raise;
-          end;
-        end;
+        if not Force then
+          raise;
       end;
     end;
-    TACommitRetaining:
-      FTransactionIntf.CommitRetaining;
+  end;
 
-    TARollbackRetaining:
-      FTransactionIntf.RollbackRetaining;
-  end;
-  if not (csDesigning in ComponentState) then
-  begin
-    case Action of
-      TACommit:
-        MonitorHook.TRCommit(Self);
-      TARollback:
-        MonitorHook.TRRollback(Self);
-      TACommitRetaining:
-        MonitorHook.TRCommitRetaining(Self);
-      TARollbackRetaining:
-        MonitorHook.TRRollbackRetaining(Self);
-    end;
-  end;
+begin
+  CheckInTransaction;
+  if FInEndTransaction then Exit;
+  FCriticalSection.Enter; {Ensure that only one thread can commit a transaction
+                           at any one time}
+  FEndAction := Action;
+  FInEndTransaction := true;
+  try
+   case Action of
+     TARollback:
+       begin
+         InternalDoBeforeTransactionEnd;
+         DoJournalBeforeEnd;
+         FTransactionIntf.Rollback(Force);
+         DoJournalAfterEnd;
+         InternalDoAfterTransctionEnd;
+         if not (csDesigning in ComponentState) then
+           MonitorHook.TRRollback(Self);
+       end;
+     TACommit:
+       begin
+         InternalDoBeforeTransactionEnd;
+         DoJournalBeforeEnd;
+         try
+           FTransactionIntf.Commit;
+           DoJournalAfterEnd;
+         except on E: EIBInterBaseError do
+           begin
+             if Force then
+               FTransactionIntf.Rollback(Force)
+             else
+               raise;
+           end;
+         end;
+         InternalDoAfterTransctionEnd;
+         if not (csDesigning in ComponentState) then
+           MonitorHook.TRCommit(Self);
+      end;
+     TACommitRetaining:
+       begin
+         DoJournalBeforeEnd;
+         FTransactionIntf.CommitRetaining;
+         DoJournalAfterEnd;
+         if not (csDesigning in ComponentState) then
+           MonitorHook.TRCommitRetaining(Self);
+       end;
+
+     TARollbackRetaining:
+       begin
+         DoJournalBeforeEnd;
+         FTransactionIntf.RollbackRetaining;
+         DoJournalAfterEnd;
+         if not (csDesigning in ComponentState) then
+           MonitorHook.TRRollbackRetaining(Self);
+       end;
+     end;
   finally
-    FInEndTransaction := false
+    FInEndTransaction := false;
+    FCriticalSection.Leave;
   end;
 end;
 
@@ -1879,6 +1905,12 @@ begin
   Cnt := FDatabases.Count - 1;
   for i := 0 to Cnt do if FDatabases[i] <> nil then
     Inc(result);
+end;
+
+function TIBTransaction.GetIsReadOnly: boolean;
+begin
+  CheckInTransaction;
+  Result := FTransactionIntf.GetIsReadOnly;
 end;
 
 function TIBTransaction.GetSQLObject(Index: Integer): TIBBase;
@@ -1965,6 +1997,12 @@ begin
   Result := FTPB.GetDPBParamTypeName(index);
   if Result = '' then
     IBError(ibxeTPBConstantUnknown,[index]);
+end;
+
+function TIBTransaction.GetTransactionID: integer;
+begin
+  CheckInTransaction;
+  Result := FTransactionIntf.GetTransactionID;
 end;
 
 procedure TIBTransaction.RemoveDatabase(Idx: Integer);

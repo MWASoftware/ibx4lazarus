@@ -749,11 +749,13 @@ begin
     FResults := FStatement.Execute;
     if not (csDesigning in ComponentState) then
     begin
-      if assigned(FBase.JournalHook) then
-        FBase.JournalHook.ExecQuery(self);
       MonitorHook.SQLExecute(Self);
     end;
   end;
+
+  if not (csDesigning in ComponentState) and assigned(FBase.JournalHook) then
+    FBase.JournalHook.ExecQuery(self);
+
   {$IFDEF IBXQUERYTIME}
   writeln('Executing ',FStatement.GetSQLText,
     ' Response time= ',Format('%f msecs',[TimeStampToMSecs(DateTimeToTimeStamp(Now)) - tmsecs]));
