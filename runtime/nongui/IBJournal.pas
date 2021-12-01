@@ -66,13 +66,13 @@ type
   private
     const DefaultVendor          = 'Snake Oil (Sales) Ltd';
     const DefaultJournalTemplate = 'Journal.%d.log';
-    const sQueryJournal          = '!Q:%d,%d,%d,%d:%s' + LineEnding;
-    const sTransStartJnl         = '!S:%d,%d,%d:%s' + LineEnding;
-    const sTransCommitJnl        = '!C:%d,%d,%d' + LineEnding;
-    const sTransCommitRetJnl     = '!c:%d,%d,%d' + LineEnding;
-    const sTransRollBackJnl      = '!R:%d,%d,%d' + LineEnding;
-    const sTransRollBackRetJnl   = '!e:%d,%d,%d' + LineEnding;
-    const sTransEndJnl           = '!E:%d,%d' + LineEnding;
+    const sQueryJournal          = '*Q:%d,%d,%d,%d:%s' + LineEnding;
+    const sTransStartJnl         = '*S:%d,%d,%d:%s' + LineEnding;
+    const sTransCommitJnl        = '*C:%d,%d,%d' + LineEnding;
+    const sTransCommitRetJnl     = '*c:%d,%d,%d' + LineEnding;
+    const sTransRollBackJnl      = '*R:%d,%d,%d' + LineEnding;
+    const sTransRollBackRetJnl   = '*e:%d,%d,%d' + LineEnding;
+    const sTransEndJnl           = '*E:%d,%d' + LineEnding;
   private
     FApplicationName: string;
     FBase: TIBBase;
@@ -119,6 +119,32 @@ type
   end;
 
 
+  TJnlEntryType = (jeTransStart, jeTransCommit, jeTransCommitRet, jeTransRollback,
+                 jeTransRollbackRet, jeTransEnd, jeQuery,jeUnknown);
+
+  TOnNextJournalEntry = procedure(JnlEntryType: TJnlEntryType; SessionID, TransactionID, PhaseNo: integer;
+                                 Description: AnsiString) of object;
+
+  { TJournalProcessor }
+
+  TJournalProcessor = class(TSQLTokeniser)
+  private
+    type TLineState = (lsInit, lsJnlFound, lsGotJnlType,  lsGotSessionID, lsGotTransactionID, lsGotPhaseNo, lsGotLength);
+  private
+    FOnNextJournalEntry: TOnNextJournalEntry;
+    FOwner: TIBJournal;
+    FInStream: TStream;
+    procedure DoExecute;
+    function IdentifyJnlEntry(aTokenText: AnsiString): TJnlEntryType;
+  protected
+    function GetChar: AnsiChar; override;
+  public
+    destructor Destroy; override;
+    class procedure Execute(Owner: TIBJournal; aFileName: string);
+    property OnNextJournalEntry: TOnNextJournalEntry read FOnNextJournalEntry write FOnNextJournalEntry;
+  end;
+
+
 implementation
 
 uses IBMessages,IBXScript;
@@ -160,6 +186,171 @@ type
   public
     class function Execute(Owner: TIBJournal; IBSQL: TIBSQL): AnsiString;
   end;
+
+{ TJournalProcessor }
+
+procedure TJournalProcessor.DoExecute;
+var token: TSQLTokens;
+    LineState: TLineState;
+    JnlEntryType: TJnlEntryType;
+    SessionID, TransactionID, PhaseNo: integer;
+    Len: integer;
+    Description: AnsiString;
+begin
+  LineState := lsInit;
+  while not EOF do
+  begin
+    if LineState = lsInit then
+    begin
+      SessionID := 0;
+      TransactionID := 0;
+      PhaseNo := 0;
+      Len := 0;
+      Description := '';
+      JnlEntryType := jeUnknown;
+    end;
+    token := GetNextToken;
+    case token of
+    sqltAsterisk:
+      if LineState = lsInit then
+        LineState := lsJnlFound;
+
+    sqltIdentifier:
+      if LineState = lsJnlFound then
+        begin
+          JnlEntryType := IdentifyJnlEntry(TokenText);
+          LineState := lsGotJnlType;
+        end
+      else
+        LineState := lsInit;
+
+    sqltColon:
+      if LineState = lsGotLength then
+      begin
+        Setlength(Description,Len);
+        FInStream.Read(Description[1],Len);
+        if assigned(FOnNextJournalEntry) then
+          OnNextJournalEntry(JnlEntryType,SessionID, TransactionID, PhaseNo, Description);
+        LineState := lsInit;
+      end
+      else
+      if LineState <> lsGotJnlType then
+        LineState := lsInit;
+
+   sqltComma:
+     if not (LineState in [lsGotSessionID,lsGotTransactionID,lsGotPhaseNo]) then
+       LineState := lsInit;
+
+   sqltNumberString:
+     case LineState of
+     lsGotJnlType:
+       begin
+         SessionID := StrToInt(TokenText);
+         LineState := lsGotSessionID;
+       end;
+
+     lsGotSessionID:
+       begin
+         TransactionID := StrToInt(TokenText);
+         LineState := lsGotTransactionID;
+     end;
+
+     lsGotTransactionID:
+       begin
+         case JnlEntryType of
+         jeTransStart:
+           begin
+             len := StrToInt(TokenText);
+             LineState := lsGotLength;
+           end;
+
+           jeTransCommit,
+           jeTransCommitRet,
+           jeTransRollback,
+           jeTransRollbackRet:
+             begin
+               PhaseNo := StrToInt(TokenText);
+               if assigned(FOnNextJournalEntry) then
+                 OnNextJournalEntry(JnlEntryType,SessionID, TransactionID, PhaseNo, Description);
+               LineState := lsInit;
+             end;
+
+           jeTransEnd:
+             begin
+               if assigned(FOnNextJournalEntry) then
+                 OnNextJournalEntry(JnlEntryType,SessionID, TransactionID, PhaseNo, Description);
+               LineState := lsInit;
+             end;
+
+           jeQuery:
+             begin
+               PhaseNo := StrToInt(TokenText);
+               LineState := lsGotPhaseNo;
+             end;
+           else
+             LineState := lsInit;
+         end; {case JnlEntryType}
+       end;
+
+     lsGotPhaseNo:
+       if JnlEntryType = jeQuery then
+       begin
+         len :=  StrToInt(TokenText);
+         LineState := lsGotLength;
+       end
+       else
+         LineState := lsInit;
+
+     end; {case LineState}
+    end; {case token}
+  end; {while}
+end;
+
+function TJournalProcessor.IdentifyJnlEntry(aTokenText: AnsiString
+  ): TJnlEntryType;
+begin
+  Result := jeUnknown;
+  if Length(aTokenText) > 0 then
+  case aTokenText[1] of
+  'S':
+    Result := jeTransStart;
+  'C':
+    Result := jeTransCommit;
+  'c':
+    Result := jeTransCommitRet;
+  'R':
+    Result := jeTransRollback;
+  'r':
+    Result := jeTransRollbackRet;
+  'E':
+    Result := jeTransEnd;
+  'Q':
+    Result := jeQuery;
+  end;
+end;
+
+function TJournalProcessor.GetChar: AnsiChar;
+begin
+  FInStream.Read(Result,1);
+end;
+
+destructor TJournalProcessor.Destroy;
+begin
+  FInStream.Free;
+  inherited Destroy;
+end;
+
+class procedure TJournalProcessor.Execute(Owner: TIBJournal; aFileName: string
+  );
+begin
+  with TJournalProcessor.Create do
+  try
+    FInStream := TFileStream.Create(aFileName,fmOpenRead);
+    DoExecute;
+  finally
+    Free
+  end;
+end;
 
 { TQueryProcessor }
 
