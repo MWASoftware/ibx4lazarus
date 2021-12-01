@@ -36,7 +36,8 @@ unit Test29;
 interface
 
 uses
-  Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBJournal, IBCustomDataSet;
+  Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBJournal,
+  IBCustomDataSet, IBSQL;
 
 const
   aTestID    = '29';
@@ -53,6 +54,8 @@ type
     FCreateArrayOnInsert: boolean;
     procedure HandleAfterInsert(DataSet: TDataSet);
     procedure PrintJournalTable;
+    procedure GetArrayFieldIndex(Sender: TObject; aIBSQL: TIBSQL; ParamIndex: integer;
+                                var FieldIndex: integer);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -86,16 +89,15 @@ begin
     FieldByName('F7').AsDateTime := EncodeDateTime(2007,12,25,12,30,29,130);
     FieldByName('F8').AsString := 'XX';
     FieldByName('F9').AsString := 'The Quick Brown Fox jumps over the lazy dog';
-    Exit;
 
-    S := CreateBlobStream(FieldByName('F10'),bmWrite);
+{    S := CreateBlobStream(FieldByName('F10'),bmWrite);
     F := TFileStream.Create('resources/Test04.jpg',fmOpenRead);
     try
       S.CopyFrom(F,0);
     finally
       S.Free;
       F.Free;
-    end;
+    end; }
     FieldByName('F11').AsLargeInt := 9223372036854775807;
     FieldByName('F12').AsInteger := 65566;
     FieldByName('F13').AsDateTime := EncodeDateTime(2007,12,26,12,30,45,0);
@@ -117,13 +119,28 @@ begin
       dec(j);
     end;
     TIBArrayField(FieldByName('MyArray')).ArrayIntf := ar;
+//    WriteArray(TIBArrayField(FieldByName('MyArray')).ArrayIntf);
   end;
 end;
 
 procedure TTest29.PrintJournalTable;
+var Results: IResultSet;
 begin
   writeln(OutFile,'IBX Journal Table');
-  ReportResult(IBDatabase.Attachment.OpenCursorAtStart('Select * From IBX$JOURNALS'));
+  Results := IBDatabase.Attachment.OpenCursorAtStart('Select * From IBX$JOURNALS');
+  while not Results.IsEof do
+  begin
+    ReportResult(Results);
+    Results.Fetchnext;
+  end;
+end;
+
+procedure TTest29.GetArrayFieldIndex(Sender: TObject; aIBSQL: TIBSQL;
+  ParamIndex: integer; var FieldIndex: integer);
+begin
+  {if ParamIndex <> 15 then
+    raise Exception.CreateFmt('Unexpected ParamIndex %d',[ParamIndex]);}
+  FieldIndex := 0;
 end;
 
 procedure TTest29.CreateObjects(Application: TTestApplication);
@@ -140,7 +157,7 @@ begin
     InsertSQL.Text :=
       'Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray, '+
       ' GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,'+
-      ':F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS)';
+      ':F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS) Returning MyArray';
     RefreshSQL.Text :=
       'Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6,' +
       ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.'+
@@ -166,7 +183,7 @@ begin
         '  A."My Field"  = :MYFIELD1,'+
         '  A."MY Field" = :MYFIELD2,'+
         '  A.GRANTS = :GRANTS '+
-        'Where A.TABLEKEY = :OLD_TABLEKEY';
+        'Where A.TABLEKEY = :OLD_TABLEKEY RETURNING A.MyArray';
     DeleteSQL.Text :=
       'Delete From IBXTEST A '+
       'Where A.TABLEKEY = :OLD_TABLEKEY';
@@ -182,6 +199,8 @@ begin
   begin
     Database := IBDatabase;
     ApplicationName := 'Test29';
+    RetainJournal := true;
+    OnGetArrayFieldIndex := @GetArrayFieldIndex;
   end;
 end;
 
@@ -208,6 +227,7 @@ begin
   OldDefaultFormatSettings := DefaultFormatSettings;
   IBDatabase.CreateDatabase;
   try
+   try
     DefaultFormatSettings.LongTimeFormat := 'HH:MM:SS.zzzz';
     FJournal.Enabled := true;
     IBTransaction.Active := true;
@@ -223,6 +243,16 @@ begin
     FDataSet.FieldByName('MYField1').AsString := 'My Field';
     FDataSet.FieldByName('MYFIELD2').AsString := 'MY Field';
     FDataSet.Post;
+{    PrintTPB(IBTransaction.TransactionIntf.getTPB);
+    WriteTRInfo(IBTransaction.TransactionIntf.GetTrInformation([isc_info_tra_id,
+                                                            isc_info_tra_oldest_interesting,
+                                                            isc_info_tra_oldest_active,
+                                                            isc_info_tra_oldest_snapshot,
+                                                            fb_info_tra_snapshot_number,
+                                                            isc_info_tra_lock_timeout,
+                                                            fb_info_tra_dbpath,
+                                                            isc_info_tra_access,
+                                                            isc_info_tra_isolation]));}
     IBTransaction.Commit;
 
     IBTransaction.Active := true;
@@ -258,7 +288,15 @@ begin
     IBTransaction.Active := true;
     FDataSet.Active := true;
     PrintDataSet(FDataSet);
+    IBTransaction.Active := false;
     PrintJournalTable;
+
+   except on E: Exception do
+     begin
+       writeln('Terminated with Exception: ' + E.Message);
+       IBDatabase.ForceClose;
+     end;
+   end;
   finally
     IBDatabase.DropDatabase;
   end;

@@ -2502,7 +2502,17 @@ end;
 procedure TIBCustomDataSet.UpdateRecordFromQuery(QryResults: IResults;
   Buffer: PChar);
 var i, j: integer;
+    pda: PArrayDataArray;
+    pbd: PBlobDataArray;
 begin
+  { Make sure blob cache is empty }
+  pbd := PBlobDataArray(Buffer + FBlobCacheOffset);
+  pda := PArrayDataArray(Buffer + FArrayCacheOffset);
+  for i := 0 to BlobFieldCount - 1 do
+    pbd^[i] := nil;
+  for i := 0 to ArrayFieldCount - 1 do
+    pda^[i] := nil;
+
   for i := 0 to QryResults.Count - 1 do
   begin
     j := GetFieldPosition(QryResults[i].GetAliasName);

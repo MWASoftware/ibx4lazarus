@@ -10,7 +10,7 @@ object Form1: TForm1
   OnClose = FormClose
   OnShow = FormShow
   Position = poMainFormCenter
-  LCLVersion = '2.0.11.0'
+  LCLVersion = '2.2.0.2'
   object Button1: TButton
     Left = 845
     Height = 25
@@ -40,11 +40,10 @@ object Form1: TForm1
   end
   object Label1: TLabel
     Left = 17
-    Height = 13
+    Height = 15
     Top = 14
     Width = 87
     Caption = 'Started Before'
-    ParentColor = False
   end
   object BeforeDate: TDateEdit
     Left = 112
@@ -61,11 +60,10 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 241
-    Height = 13
+    Height = 15
     Top = 14
     Width = 78
     Caption = 'Started After'
-    ParentColor = False
   end
   object AfterDate: TDateEdit
     Left = 333
@@ -232,7 +230,6 @@ object Form1: TForm1
         Anchors = [akTop, akLeft, akBottom]
         DataField = 'TOTALSALARIES'
         DataSource = TotalsSource
-        ParentColor = False
       end
     end
     object EmployeeEditorPanel: TPanel
@@ -251,11 +248,10 @@ object Form1: TForm1
       Visible = False
       object Label3: TLabel
         Left = 0
-        Height = 13
+        Height = 15
         Top = 7
         Width = 83
         Caption = 'Employee No.'
-        ParentColor = False
       end
       object DBEdit1: TDBEdit
         Left = 90
@@ -264,17 +260,15 @@ object Form1: TForm1
         Width = 120
         DataField = 'EMP_NO'
         DataSource = EmployeeSource
-        CharCase = ecNormal
         MaxLength = 0
         TabOrder = 0
       end
       object Label4: TLabel
         Left = 12
-        Height = 13
+        Height = 15
         Top = 32
         Width = 64
         Caption = 'First Name'
-        ParentColor = False
       end
       object DBEdit2: TDBEdit
         Left = 90
@@ -283,17 +277,15 @@ object Form1: TForm1
         Width = 120
         DataField = 'FIRST_NAME'
         DataSource = EmployeeSource
-        CharCase = ecNormal
         MaxLength = 0
         TabOrder = 1
       end
       object Label5: TLabel
         Left = 12
-        Height = 13
+        Height = 15
         Top = 56
         Width = 64
         Caption = 'Last Name'
-        ParentColor = False
       end
       object DBEdit3: TDBEdit
         Left = 90
@@ -302,17 +294,15 @@ object Form1: TForm1
         Width = 120
         DataField = 'LAST_NAME'
         DataSource = EmployeeSource
-        CharCase = ecNormal
         MaxLength = 0
         TabOrder = 2
       end
       object Label6: TLabel
         Left = 216
-        Height = 13
+        Height = 15
         Top = 7
         Width = 77
         Caption = 'Date Started'
-        ParentColor = False
       end
       object IBDateEdit1: TDBDateEdit
         Left = 300
@@ -331,11 +321,10 @@ object Form1: TForm1
       end
       object Label7: TLabel
         Left = 252
-        Height = 13
+        Height = 15
         Top = 32
         Width = 37
         Caption = 'Salary'
-        ParentColor = False
       end
       object DBEdit4: TDBEdit
         Left = 300
@@ -344,18 +333,16 @@ object Form1: TForm1
         Width = 104
         DataField = 'SALARY'
         DataSource = EmployeeSource
-        CharCase = ecNormal
         MaxLength = 0
         TabOrder = 5
       end
       object Label8: TLabel
         Left = 708
-        Height = 13
+        Height = 15
         Top = 54
         Width = 24
         Anchors = [akTop, akRight]
         Caption = 'Ext.'
-        ParentColor = False
       end
       object DBEdit5: TDBEdit
         Left = 732
@@ -365,25 +352,22 @@ object Form1: TForm1
         DataField = 'PHONE_EXT'
         DataSource = EmployeeSource
         Anchors = [akTop, akRight]
-        CharCase = ecNormal
         MaxLength = 0
         TabOrder = 4
       end
       object Label9: TLabel
         Left = 536
-        Height = 13
+        Height = 15
         Top = 7
         Width = 50
         Caption = 'Location'
-        ParentColor = False
       end
       object Label10: TLabel
         Left = 413
-        Height = 13
+        Height = 15
         Top = 9
         Width = 59
         Caption = 'Job Grade'
-        ParentColor = False
       end
       object JobGradeDBComboBox: TDBComboBox
         Left = 480
@@ -408,19 +392,17 @@ object Form1: TForm1
       end
       object Label11: TLabel
         Left = 536
-        Height = 13
+        Height = 15
         Top = 32
         Width = 48
         Caption = 'Job Title'
-        ParentColor = False
       end
       object Label12: TLabel
         Left = 256
-        Height = 13
+        Height = 15
         Top = 54
         Width = 33
         Caption = 'Dept.'
-        ParentColor = False
       end
       object SpeedButton1: TSpeedButton
         Left = 680
@@ -439,7 +421,6 @@ object Form1: TForm1
         DataSource = EmployeeSource
         ReadOnly = True
         Anchors = [akTop, akLeft, akRight]
-        CharCase = ecNormal
         MaxLength = 0
         TabOrder = 7
       end
@@ -487,11 +468,10 @@ object Form1: TForm1
   end
   object Label13: TLabel
     Left = 456
-    Height = 13
+    Height = 15
     Top = 14
     Width = 79
     Caption = 'Salary Range'
-    ParentColor = False
   end
   object SalaryRange: TComboBox
     Left = 544
@@ -512,7 +492,7 @@ object Form1: TForm1
     Text = 'None Specified'
   end
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     CreateIfNotExists = False
     AllowStreamedConnected = False
     DatabaseName = 'localhost:employee'

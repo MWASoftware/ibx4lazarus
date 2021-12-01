@@ -226,6 +226,7 @@ type
   TIBTransaction = class(TComponent)
   private
     class var FCriticalSection: TCriticalSection;
+    class var FTransactionList: TList;
   private
     FTransactionIntf: ITransaction;
     FAfterDelete: TNotifyEvent;
@@ -248,6 +249,8 @@ type
     FTRParamsChanged    : Boolean;
     FInEndTransaction   : boolean;
     FEndAction          : TTransactionAction;
+    FTransactionName    : string;
+    FPhaseNo            : integer;
     procedure DoBeforeTransactionEnd;
     procedure DoAfterTransactionEnd;
     procedure DoOnStartTransaction;
@@ -279,7 +282,7 @@ type
     procedure RemoveSQLObject(Idx: Integer);
     procedure RemoveSQLObjects;
     function GenerateTPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): ITPB;
-
+    procedure CreateTransactionName;
   protected
     procedure Loaded; override;
     procedure Notification( AComponent: TComponent; Operation: TOperation); override;
@@ -298,6 +301,7 @@ type
     function AddDatabase(db: TIBDatabase): Integer;
     function FindDatabase(db: TIBDatabase): Integer;
     function FindDefaultDatabase: TIBDatabase;
+    class function FindTransactionNyName(aTransactionName: string): TIBTransaction;
     function GetEndAction: TTransactionAction;
     procedure RemoveDatabase(Idx: Integer);
     procedure RemoveDatabases;
@@ -313,6 +317,8 @@ type
     property TPBConstantNames[index: byte]: string read GetTPBConstantNames;
     property TransactionID: integer read GetTransactionID;
     property IsReadOnly: boolean read GetIsReadOnly;
+    property TransactionName: string read FTransactionName;
+    property PhaseNo: integer read FPhaseNo;
   published
     property Active: Boolean read GetInTransaction write SetActive;
     property DefaultDatabase: TIBDatabase read FDefaultDatabase
@@ -447,6 +453,13 @@ begin
   TStringList(FDBParams).OnChanging := DBParamsChanging;
   FInternalTransaction := TIBTransaction.Create(self);
   FInternalTransaction.DefaultDatabase := Self;
+  with FInternalTransaction.Params do
+  begin
+    Clear;
+    Add('concurrency');
+    Add('wait');
+    Add('write');
+  end;
   FTimer := TFPTimer.Create(Self);
   FTimer.Enabled := False;
   FTimer.Interval := 0;
@@ -1600,6 +1613,7 @@ begin
   FTimer.Interval := 0;
   FTimer.OnTimer := TimeoutTransaction;
   FDefaultAction := taCommit;
+  FTransactionList.Add(self);
 end;
 
 destructor TIBTransaction.Destroy;
@@ -1613,6 +1627,8 @@ begin
       SQLObjects[i].DoTransactionFree;
   RemoveSQLObjects;
   RemoveDatabases;
+  if assigned(FTransactionList) then
+    FTransactionList.Remove(self);
   FTPB := nil;
   FTRParams.Free;
   FSQLObjects.Free;
@@ -1873,6 +1889,7 @@ begin
          DoJournalBeforeEnd;
          FTransactionIntf.CommitRetaining;
          DoJournalAfterEnd;
+         Inc(FPhaseNo);
          if not (csDesigning in ComponentState) then
            MonitorHook.TRCommitRetaining(Self);
        end;
@@ -1882,6 +1899,7 @@ begin
          DoJournalBeforeEnd;
          FTransactionIntf.RollbackRetaining;
          DoJournalAfterEnd;
+         Inc(FPhaseNo);
          if not (csDesigning in ComponentState) then
            MonitorHook.TRRollbackRetaining(Self);
        end;
@@ -1961,6 +1979,19 @@ begin
         break;
       end;
   end;
+end;
+
+class function TIBTransaction.FindTransactionNyName(aTransactionName: string
+  ): TIBTransaction;
+var i: integer;
+begin
+  Result := nil;
+  for i := 0 to FTransactionList.Count - 1 do
+    if TIBTransaction(FTransactionList[i]).TransactionName = aTransactionName then
+    begin
+      Result := FTransactionList[i];
+      break;
+    end;
 end;
 
 function TIBTransaction.GetEndAction: TTransactionAction;
@@ -2146,6 +2177,7 @@ var
 begin
   CheckNotInTransaction;
   CheckDatabasesInList;
+  FPhaseNo := 0;
   if TransactionIntf <> nil then
     TransactionIntf.Start(DefaultAction)
   else
@@ -2190,6 +2222,7 @@ begin
   if not (csDesigning in ComponentState) then
   begin
     {Journalling}
+    CreateTransactionName;
     for i := 0 to FDatabases.Count - 1 do
      if  FDatabases[i] <> nil then
      begin
@@ -2513,11 +2546,26 @@ begin
   end;
 end;
 
+procedure TIBTransaction.CreateTransactionName;
+begin
+  FTransactionName := '';
+  if Name <> '' then
+  begin
+    if HasParent then
+      FTransactionName := GetParentComponent.Name + '.' + Name
+    else
+    if Owner <> nil then
+      FTransactionName := Owner.Name + '.' + Name
+  end;
+end;
+
 Initialization
   TIBTransaction.FCriticalSection := TCriticalSection.Create;
+  TIBTransaction.FTransactionList := TList.Create;
 
 Finalization
   if assigned(TIBTransaction.FCriticalSection) then TIBTransaction.FCriticalSection.Free;
+  if assigned(TIBTransaction.FTransactionList) then TIBTransaction.FTransactionList.Free;
 
 end.
 
