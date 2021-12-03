@@ -399,7 +399,7 @@ begin
           if ar = nil then
             s += 'NULL'
           else
-            s += TSQLXMLReader.FormatArray(Database,ar);
+            s += TSQLXMLReader.FormatArray(ar);
         end;
 
       SQL_TEXT, SQL_VARYING:

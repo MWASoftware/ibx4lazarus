@@ -52,7 +52,6 @@ type
   TIBDatabase = class;
   TIBTransaction = class;
   TIBBase = class;
-  IJournallingHook = interface;
 
   TIBDatabaseLoginEvent = procedure(Database: TIBDatabase;
     LoginParams: TStrings) of object;
@@ -91,7 +90,6 @@ type
     FUseDefaultSystemCodePage: boolean;
     FUseHiddenPassword: boolean;
     FFirebirdAPI: IFirebirdAPI;
-    FJournalHook: IJournallingHook;
     procedure EnsureInactive;
     function GetAuthenticationMethod: string;
     function GetDBSQLDialect: Integer;
@@ -250,7 +248,6 @@ type
     FInEndTransaction   : boolean;
     FEndAction          : TTransactionAction;
     FTransactionName    : string;
-    FPhaseNo            : integer;
     procedure DoBeforeTransactionEnd;
     procedure DoAfterTransactionEnd;
     procedure DoOnStartTransaction;
@@ -274,6 +271,7 @@ type
     procedure SetActive(Value: Boolean);
     procedure SetDefaultDatabase(Value: TIBDatabase);
     procedure SetIdleTimer(Value: Integer);
+    procedure SetTransactionName(AValue: string);
     procedure SetTRParams(Value: TStrings);
     procedure TimeoutTransaction(Sender: TObject);
     procedure TRParamsChange(Sender: TObject);
@@ -282,7 +280,6 @@ type
     procedure RemoveSQLObject(Idx: Integer);
     procedure RemoveSQLObjects;
     function GenerateTPB(FirebirdAPI: IFirebirdAPI; sl: TStrings): ITPB;
-    procedure CreateTransactionName;
   protected
     procedure Loaded; override;
     procedure Notification( AComponent: TComponent; Operation: TOperation); override;
@@ -317,8 +314,7 @@ type
     property TPBConstantNames[index: byte]: string read GetTPBConstantNames;
     property TransactionID: integer read GetTransactionID;
     property IsReadOnly: boolean read GetIsReadOnly;
-    property TransactionName: string read FTransactionName;
-    property PhaseNo: integer read FPhaseNo;
+    property TransactionName: string read FTransactionName write SetTransactionName;
   published
     property Active: Boolean read GetInTransaction write SetActive;
     property DefaultDatabase: TIBDatabase read FDefaultDatabase
@@ -345,14 +341,6 @@ type
   TBeforeDatabaseConnectEvent = procedure (Sender: TObject; DBParams: TStrings;
                               var DBName: string; var CreateIfNotExists: boolean) of object;
 
-  IJournallingHook = interface
-    ['{7d3e45e0-3628-416a-9e22-c20474825031}']
-    procedure TransactionStart(Tr: TIBTransaction);
-    procedure TransactionEnd(Tr: TIBTransaction; Action: TTransactionAction);
-    procedure TransactionEndDone(TransactionID: integer);
-    procedure ExecQuery(IBSQL: TObject);
-  end;
-
   { TIBBase }
 
   { Virtually all components in IB are "descendents" of TIBBase.
@@ -361,8 +349,6 @@ type
   TIBBase = class(TObject)
   private
     FOnCreateDatabase: TNotifyEvent;
-    function GetJournalHook: IJournallingHook;
-    procedure SetJournalHook(AValue: IJournallingHook);
   protected
     FBeforeDatabaseConnect: TBeforeDatabaseConnectEvent;
     FDatabase: TIBDatabase;
@@ -423,7 +409,6 @@ type
     property Owner: TObject read FOwner;
     property Transaction: TIBTransaction read FTransaction
                                           write SetTransaction;
-    property JournalHook: IJournallingHook read GetJournalHook write SetJournalHook;
   end;
 
 
@@ -1772,34 +1757,6 @@ end;
 procedure TIBTransaction.EndTransaction(Action: TTransactionAction;
   Force: Boolean);
 
-var TempTransactionID: integer;
-
-  procedure DoJournalBeforeEnd;
-  var i: integer;
-  begin
-    if not (csDesigning in ComponentState) then
-    for i := 0 to FDatabases.Count - 1 do
-     if  FDatabases[i] <> nil then
-     begin
-       with TIBDatabase(FDatabases[i]) do
-         if assigned(FJournalHook) then
-           FJournalHook.TransactionEnd(self, Action);
-     end;
-    TempTransactionID := TransactionID;
-  end;
-
-  procedure DoJournalAfterEnd;
-  var i: integer;
-  begin
-    if not (csDesigning in ComponentState) then
-    for i := 0 to FDatabases.Count - 1 do
-     if  FDatabases[i] <> nil then
-     begin
-       with TIBDatabase(FDatabases[i]) do
-         if assigned(FJournalHook) then
-           FJournalHook.TransactionEndDone(TempTransactionID);
-     end;
-  end;
 
   procedure InternalDoBeforeTransactionEnd;
   var i: integer;
@@ -1858,9 +1815,7 @@ begin
      TARollback:
        begin
          InternalDoBeforeTransactionEnd;
-         DoJournalBeforeEnd;
          FTransactionIntf.Rollback(Force);
-         DoJournalAfterEnd;
          InternalDoAfterTransctionEnd;
          if not (csDesigning in ComponentState) then
            MonitorHook.TRRollback(Self);
@@ -1868,10 +1823,8 @@ begin
      TACommit:
        begin
          InternalDoBeforeTransactionEnd;
-         DoJournalBeforeEnd;
          try
            FTransactionIntf.Commit;
-           DoJournalAfterEnd;
          except on E: EIBInterBaseError do
            begin
              if Force then
@@ -1886,20 +1839,14 @@ begin
       end;
      TACommitRetaining:
        begin
-         DoJournalBeforeEnd;
          FTransactionIntf.CommitRetaining;
-         DoJournalAfterEnd;
-         Inc(FPhaseNo);
          if not (csDesigning in ComponentState) then
            MonitorHook.TRCommitRetaining(Self);
        end;
 
      TARollbackRetaining:
        begin
-         DoJournalBeforeEnd;
          FTransactionIntf.RollbackRetaining;
-         DoJournalAfterEnd;
-         Inc(FPhaseNo);
          if not (csDesigning in ComponentState) then
            MonitorHook.TRRollbackRetaining(Self);
        end;
@@ -2164,6 +2111,13 @@ begin
       end;
 end;
 
+procedure TIBTransaction.SetTransactionName(AValue: string);
+begin
+  if FTransactionName = AValue then Exit;
+  CheckNotInTransaction;
+  FTransactionName := AValue;
+end;
+
 procedure TIBTransaction.SetTRParams(Value: TStrings);
 begin
   FTRParams.Assign(Value);
@@ -2177,7 +2131,6 @@ var
 begin
   CheckNotInTransaction;
   CheckDatabasesInList;
-  FPhaseNo := 0;
   if TransactionIntf <> nil then
     TransactionIntf.Start(DefaultAction)
   else
@@ -2206,7 +2159,8 @@ begin
       if Databases[i] <> nil then Inc(ValidDatabaseCount);
 
     if ValidDatabaseCount = 1 then
-      FTransactionIntf := Databases[0].Attachment.StartTransaction(FTPB,DefaultAction)
+      FTransactionIntf := Databases[0].Attachment.StartTransaction(FTPB,
+                                                DefaultAction,TransactionName)
     else
     begin
       SetLength(Attachments,ValidDatabaseCount);
@@ -2214,24 +2168,15 @@ begin
         if Databases[i] <> nil then
           Attachments[i] := Databases[i].Attachment;
 
-      FTransactionIntf := Databases[0].FirebirdAPI.StartTransaction(Attachments,FTPB,DefaultAction);
+      FTransactionIntf := Databases[0].FirebirdAPI.StartTransaction(Attachments,FTPB,
+                                              DefaultAction,TransactionName);
     end;
 
   end;
 
   if not (csDesigning in ComponentState) then
-  begin
-    {Journalling}
-    CreateTransactionName;
-    for i := 0 to FDatabases.Count - 1 do
-     if  FDatabases[i] <> nil then
-     begin
-       with TIBDatabase(FDatabases[i]) do
-         if assigned(FJournalHook) then
-           FJournalHook.TransactionStart(self);
-     end;
      MonitorHook.TRStart(Self);
-  end;
+
   DoOnStartTransaction;
 end;
 
@@ -2309,21 +2254,6 @@ begin
   if FTransaction = nil then
     IBError(ibxeTransactionNotAssigned, [nil]);
   FTransaction.CheckInTransaction;
-end;
-
-procedure TIBBase.SetJournalHook(AValue: IJournallingHook);
-begin
-  CheckDatabase;
-  if Database.FJournalHook = AValue then Exit;
-  if (AValue <> nil) and (Database.FJournalHook <> nil) then
-    IBError(ibxeJournalHookOverwrite,[]);
-  Database.FJournalHook := AValue;
-end;
-
-function TIBBase.GetJournalHook: IJournallingHook;
-begin
-  CheckDatabase;
-  Result := Database.FJournalHook;
 end;
 
 procedure TIBBase.DoBeforeDatabaseConnect(DBParams: TStrings;
@@ -2546,18 +2476,6 @@ begin
   end;
 end;
 
-procedure TIBTransaction.CreateTransactionName;
-begin
-  FTransactionName := '';
-  if Name <> '' then
-  begin
-    if HasParent then
-      FTransactionName := GetParentComponent.Name + '.' + Name
-    else
-    if Owner <> nil then
-      FTransactionName := Owner.Name + '.' + Name
-  end;
-end;
 
 Initialization
   TIBTransaction.FCriticalSection := TCriticalSection.Create;

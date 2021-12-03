@@ -12,6 +12,8 @@ IBX Change Log  version (2.5-0 Build 12886) Sat, 23 Oct 2021 14:58:30 +0100
    Insert or Update...Returning. This allows blobs and arrays to be returned
    by the statement.
 
+4. TXMLReader moved from IBXScript to package fbintf unit IBUtils.
+
 IBX Change Log  version (2.4-3 Build 12886) Sat, 23 Oct 2021 14:58:30 +0100
 
 1. Add try-..except check when initially loading library in IDE. This should

@@ -56,6 +56,8 @@ type
     procedure PrintJournalTable;
     procedure GetArrayFieldIndex(Sender: TObject; aIBSQL: TIBSQL; ParamIndex: integer;
                                 var FieldIndex: integer);
+    procedure HandleOnJnlEntry(JnlEntryType: TJnlEntryType; SessionID, TransactionID, PhaseNo: integer;
+                                 Description: AnsiString);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -89,15 +91,14 @@ begin
     FieldByName('F7').AsDateTime := EncodeDateTime(2007,12,25,12,30,29,130);
     FieldByName('F8').AsString := 'XX';
     FieldByName('F9').AsString := 'The Quick Brown Fox jumps over the lazy dog';
-
-{    S := CreateBlobStream(FieldByName('F10'),bmWrite);
+    S := CreateBlobStream(FieldByName('F10'),bmWrite);
     F := TFileStream.Create('resources/Test04.jpg',fmOpenRead);
     try
       S.CopyFrom(F,0);
     finally
       S.Free;
       F.Free;
-    end; }
+    end;
     FieldByName('F11').AsLargeInt := 9223372036854775807;
     FieldByName('F12').AsInteger := 65566;
     FieldByName('F13').AsDateTime := EncodeDateTime(2007,12,26,12,30,45,0);
@@ -141,6 +142,39 @@ begin
   {if ParamIndex <> 15 then
     raise Exception.CreateFmt('Unexpected ParamIndex %d',[ParamIndex]);}
   FieldIndex := 0;
+end;
+
+procedure TTest29.HandleOnJnlEntry(JnlEntryType: TJnlEntryType; SessionID,
+  TransactionID, PhaseNo: integer; Description: AnsiString);
+
+  function JnlEntryText(je: TJnlEntryType): string;
+  begin
+    case je of
+    jeTransStart:
+      Result := 'Transaction Start';
+    jeTransCommit:
+      Result := 'Commit';
+    jeTransCommitRet:
+      Result := 'Commit Retaining';
+    jeTransRollback:
+      Result := 'Rollback';
+    jeTransRollbackRet:
+      Result := 'Rollback Retaining';
+    jeTransEnd:
+      Result := 'Transaction End';
+    jeQuery:
+      Result := 'Query';
+    jeUnknown:
+      Result := 'Unknown';
+    end;
+  end;
+
+begin
+  writeln(OutFile,'Journal Entry = ',JnlEntryText(JnlEntryType));
+  writeln(OutFile,'Session ID = ',SessionID);
+  writeln(OutFile,'Transaction ID = ',TransactionID);
+  writeln(OutFile,'Phase No = ',PhaseNo);
+  writeln(OutFile,'Description = "',Description,'"');
 end;
 
 procedure TTest29.CreateObjects(Application: TTestApplication);
@@ -296,6 +330,13 @@ begin
        writeln('Terminated with Exception: ' + E.Message);
        IBDatabase.ForceClose;
      end;
+   end;
+   FJournal.Enabled := false;
+   with TJournalProcessor.Create do
+   try
+      Execute(FJournal.JournalFilePath,@HandleOnJnlEntry);
+   finally
+     Free
    end;
   finally
     IBDatabase.DropDatabase;

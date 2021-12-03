@@ -748,13 +748,8 @@ begin
   begin
     FResults := FStatement.Execute;
     if not (csDesigning in ComponentState) then
-    begin
       MonitorHook.SQLExecute(Self);
-    end;
   end;
-
-  if not (csDesigning in ComponentState) and assigned(FBase.JournalHook) then
-    FBase.JournalHook.ExecQuery(self);
 
   {$IFDEF IBXQUERYTIME}
   writeln('Executing ',FStatement.GetSQLText,
