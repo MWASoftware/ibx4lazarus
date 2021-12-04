@@ -37,7 +37,7 @@ interface
 
 uses
   Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBJournal,
-  IBCustomDataSet, IBSQL;
+  IBCustomDataSet;
 
 const
   aTestID    = '29';
@@ -53,11 +53,6 @@ type
     FJournal: TIBJournal;
     FCreateArrayOnInsert: boolean;
     procedure HandleAfterInsert(DataSet: TDataSet);
-    procedure PrintJournalTable;
-    procedure GetArrayFieldIndex(Sender: TObject; aIBSQL: TIBSQL; ParamIndex: integer;
-                                var FieldIndex: integer);
-    procedure HandleOnJnlEntry(JnlEntryType: TJnlEntryType; SessionID, TransactionID, PhaseNo: integer;
-                                 Description: AnsiString);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -124,59 +119,6 @@ begin
   end;
 end;
 
-procedure TTest29.PrintJournalTable;
-var Results: IResultSet;
-begin
-  writeln(OutFile,'IBX Journal Table');
-  Results := IBDatabase.Attachment.OpenCursorAtStart('Select * From IBX$JOURNALS');
-  while not Results.IsEof do
-  begin
-    ReportResult(Results);
-    Results.Fetchnext;
-  end;
-end;
-
-procedure TTest29.GetArrayFieldIndex(Sender: TObject; aIBSQL: TIBSQL;
-  ParamIndex: integer; var FieldIndex: integer);
-begin
-  {if ParamIndex <> 15 then
-    raise Exception.CreateFmt('Unexpected ParamIndex %d',[ParamIndex]);}
-  FieldIndex := 0;
-end;
-
-procedure TTest29.HandleOnJnlEntry(JnlEntryType: TJnlEntryType; SessionID,
-  TransactionID, PhaseNo: integer; Description: AnsiString);
-
-  function JnlEntryText(je: TJnlEntryType): string;
-  begin
-    case je of
-    jeTransStart:
-      Result := 'Transaction Start';
-    jeTransCommit:
-      Result := 'Commit';
-    jeTransCommitRet:
-      Result := 'Commit Retaining';
-    jeTransRollback:
-      Result := 'Rollback';
-    jeTransRollbackRet:
-      Result := 'Rollback Retaining';
-    jeTransEnd:
-      Result := 'Transaction End';
-    jeQuery:
-      Result := 'Query';
-    jeUnknown:
-      Result := 'Unknown';
-    end;
-  end;
-
-begin
-  writeln(OutFile,'Journal Entry = ',JnlEntryText(JnlEntryType));
-  writeln(OutFile,'Session ID = ',SessionID);
-  writeln(OutFile,'Transaction ID = ',TransactionID);
-  writeln(OutFile,'Phase No = ',PhaseNo);
-  writeln(OutFile,'Description = "',Description,'"');
-end;
-
 procedure TTest29.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
@@ -234,7 +176,6 @@ begin
     Database := IBDatabase;
     ApplicationName := 'Test29';
     RetainJournal := true;
-    OnGetArrayFieldIndex := @GetArrayFieldIndex;
   end;
 end;
 
@@ -323,7 +264,7 @@ begin
     FDataSet.Active := true;
     PrintDataSet(FDataSet);
     IBTransaction.Active := false;
-    PrintJournalTable;
+    PrintJournalTable(IBDatabase.Attachment);
 
    except on E: Exception do
      begin
@@ -332,13 +273,9 @@ begin
      end;
    end;
    FJournal.Enabled := false;
-   with TJournalProcessor.Create do
-   try
-      Execute(FJournal.JournalFilePath,@HandleOnJnlEntry);
-   finally
-     Free
-   end;
+   PrintJournalFile(FJournal.JournalFilePath);
   finally
+    DefaultFormatSettings := OldDefaultFormatSettings;
     IBDatabase.DropDatabase;
   end;
 end;

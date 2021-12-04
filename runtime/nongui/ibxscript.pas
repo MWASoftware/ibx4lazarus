@@ -37,21 +37,9 @@ type
 
   TOnNextLine = procedure(Sender: TObject; Line: string) of object;
 
-  { TIBSQLXMLReader }
-
-  TIBSQLXMLReader = class(TSQLXMLReader)
-  private
-    FDatabase: TIBDatabase;
-    FTransaction: TIBTransaction;
-  public
-    function GetNextStatement(var stmt: string) : boolean; virtual;
-    property Database: TIBDatabase read FDatabase write FDatabase;
-    property Transaction: TIBTransaction read FTransaction write FTransaction;
-  end;
-
   { TSQLStatementReader }
 
-  TSQLStatementReader = class(TIBSQLXMLReader)
+  TSQLStatementReader = class(TSQLXMLReader)
   private
     type
       TSQLState = (stDefault, stInStmt, stInBlock, stInArrayDim, stInDeclare);
@@ -63,7 +51,7 @@ type
     procedure EchoNextLine(aLine: string);
   public
     constructor Create;
-    function GetNextStatement(var stmt: string) : boolean; override;
+    function GetNextStatement(var stmt: string) : boolean; virtual;
     property HasBegin: boolean read FHasBegin;
     property Terminator: char read FTerminator write FTerminator default DefaultTerminator;
     property OnNextLine: TOnNextLine read FOnNextLine write FOnNextLine;
@@ -300,14 +288,6 @@ resourcestring
   sResolveQueryParam =  'Resolving Query Parameter: %s';
   sStatementError = 'Error processing SQL statement: %s %s - for statement "%s"';
 
-{ TIBSQLXMLReader }
-
-function TIBSQLXMLReader.GetNextStatement(var stmt: string): boolean;
-begin
-  Result := false;
-  copy attachment
-end;
-
 { TSQLStatementReader }
 
 procedure TSQLStatementReader.EchoNextLine(aLine: string);
@@ -328,7 +308,6 @@ var State: TSQLState;
     token: TSQLTokens;
     EndOfStatement: boolean;
 begin
-  Result := inherited;
   FHasBegin := false;
   EndOfStatement := false;
   Nested := 0;
@@ -664,7 +643,6 @@ begin
  if not (csLoading in ComponentState) and (FDatabase = AValue) then Exit;
  FDatabase := AValue;
  FISQL.Database := AValue;
- FSQLReader.Database := AValue;
  FInternalTransaction.Active := false;
  FInternalTransaction.DefaultDatabase := AValue;
 end;
@@ -727,28 +705,38 @@ function TCustomIBXScript.ProcessStream: boolean;
 var stmt: string;
 begin
   Result := false;
-  while FSQLReader.GetNextStatement(stmt) do
+  FSQLReader.Attachment := Database.Attachment;
+  if FTransaction = nil then
+    FSQLReader.Transaction := FInternalTransaction.TransactionIntf
+  else
+    FSQLReader.Transaction := FTransaction.TransactionIntf;
   try
-    stmt := trim(stmt);
-//    writeln('stmt = "',stmt,'"');
-    if stmt = '' then continue;
-    if not ProcessStatement(stmt) then
-      ExecSQL(stmt);
+    while FSQLReader.GetNextStatement(stmt) do
+    try
+      stmt := trim(stmt);
+  //    writeln('stmt = "',stmt,'"');
+      if stmt = '' then continue;
+      if not ProcessStatement(stmt) then
+        ExecSQL(stmt);
 
-  except on E:Exception do
-      begin
-        with GetTransaction do
-          if InTransaction then Rollback;
-        FSQLReader.Terminator := TSQLStatementReader.DefaultTerminator;
-        if assigned(OnErrorLog) then
+    except on E:Exception do
         begin
-          Add2Log(Format(sStatementError,[FSQLReader.GetErrorPrefix,
-                             E.Message,stmt]),true);
-                             if StopOnFirstError then Exit;
+          with GetTransaction do
+            if InTransaction then Rollback;
+          FSQLReader.Terminator := TSQLStatementReader.DefaultTerminator;
+          if assigned(OnErrorLog) then
+          begin
+            Add2Log(Format(sStatementError,[FSQLReader.GetErrorPrefix,
+                               E.Message,stmt]),true);
+                               if StopOnFirstError then Exit;
+          end
+          else
+            raise;
         end
-        else
-          raise;
-      end
+    end;
+  finally
+    FSQLReader.Attachment := nil;
+    FSQLReader.Transaction := nil;
   end;
   Result := true;
 end;
@@ -758,7 +746,6 @@ procedure TCustomIBXScript.SetSQLStatementReader(
 begin
   FSQLReader := SQLStatementReader;
   FSQLReader.OnNextLine := @EchoNextLine;
-  FSQLReader.Transaction := FInternalTransaction;
 end;
 
 function TCustomIBXScript.ProcessStatement(stmt: string): boolean;
@@ -1032,10 +1019,6 @@ procedure TCustomIBXScript.SetTransaction(AValue: TIBTransaction);
 begin
   if FTransaction = AValue then Exit;
   FTransaction := AValue;
-  if FTransaction = nil then
-    FSQLReader.Transaction := FInternalTransaction
-  else
-    FSQLReader.Transaction := FTransaction;
 end;
 
 constructor TCustomIBXScript.Create(aOwner: TComponent);

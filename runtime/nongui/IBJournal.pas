@@ -38,6 +38,7 @@ type
     FJournalFileTemplate: string;
     FJournalFilePath: string;
     FJournalFileStream: TStream;
+    FOptions: TJournalOptions;
     FRetainJournal: boolean;
     FVendorName: string;
     FSessionId: integer;
@@ -70,8 +71,6 @@ type
 implementation
 
 uses IBMessages;
-
-type
 
 { TIBJournal }
 
@@ -158,6 +157,7 @@ end;
 procedure TIBJournal.EndSession;
 begin
   FSessionID := -1;
+  Database.Attachment.StopJournaling;
 end;
 
 constructor TIBJournal.Create(AOwner: TComponent);

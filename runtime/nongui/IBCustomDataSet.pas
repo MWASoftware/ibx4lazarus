@@ -3204,12 +3204,13 @@ end;
 
 procedure TIBCustomDataSet.SetInternalSQLParams(Params: ISQLParams; Buffer: Pointer);
 var
-  i, j: Integer;
+  i, j, arr: Integer;
   cr, data: PByte;
   fn: string;
   st: RawByteString;
   OldBuffer: Pointer;
   Param: ISQLParam;
+  pda: PArrayDataArray;
 begin
   if (Buffer = nil) then
     IBError(ibxeBufferNotSet, [nil]);
@@ -3217,6 +3218,8 @@ begin
     InternalPrepare;
   OldBuffer := nil;
   try
+    pda := PArrayDataArray(PChar(Buffer) + FArrayCacheOffset);
+    arr := 0;
     for i := 0 to Params.GetCount - 1 do
     begin
       Param := Params[i];
@@ -3281,8 +3284,16 @@ begin
               else
                 Param.AsDouble := PDouble(data)^;
             end;
-            SQL_BLOB, SQL_ARRAY, SQL_QUAD:
+            SQL_BLOB, SQL_QUAD:
               Param.AsQuad := PISC_QUAD(data)^;
+            SQL_ARRAY:
+              begin
+                if pda[arr] = nil then
+                  Param.AsQuad := PISC_QUAD(data)^
+                else
+                  Param.AsArray := pda[arr].ArrayIntf;
+                Inc(arr);
+              end;
             SQL_TYPE_DATE,
             SQL_TYPE_TIME,
             SQL_TIMESTAMP:
