@@ -87,7 +87,7 @@ begin
     FieldByName('F8').AsString := 'XX';
     FieldByName('F9').AsString := 'The Quick Brown Fox jumps over the lazy dog';
     S := CreateBlobStream(FieldByName('F10'),bmWrite);
-    F := TFileStream.Create('resources/Test04.jpg',fmOpenRead);
+    F := TFileStream.Create('resources/Test29.dat',fmOpenRead);
     try
       S.CopyFrom(F,0);
     finally
