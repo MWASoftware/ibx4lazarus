@@ -1,4 +1,4 @@
-IBX Change Log  version (2.5-0 Build 12886) Sat, 23 Oct 2021 14:58:30 +0100
+IBX Change Log  version (2.5-0 Build 12933) Mon, 29 Nov 2021 14:59:54 +0000
 
 1. IBCustomDataset: Modify TISQL component now defaults to GoToFirstRecordOnExecute := true.
    This is for compatibility with Firebird 5 where Update...Returning can return
