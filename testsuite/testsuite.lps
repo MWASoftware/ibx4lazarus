@@ -1489,8 +1489,8 @@
         <Filename Value="../runtime/nongui/IBJournal.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="68"/>
-        <CursorPos X="34" Y="83"/>
+        <TopLine Value="2"/>
+        <CursorPos X="58" Y="8"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>

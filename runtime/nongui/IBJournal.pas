@@ -5,7 +5,7 @@ unit IBJournal;
 interface
 
 uses
-  Classes, SysUtils, IB, IBDatabase, IBUtils, IBInternals, IBSQL;
+  Classes, SysUtils, IB, IBDatabase, IBUtils, IBInternals;
 
 { Database Journalling.
 
@@ -28,7 +28,6 @@ type
     FEnabled: boolean;
     FJournalFileTemplate: string;
     FJournalFilePath: string;
-    FJournalFileStream: TStream;
     FOptions: TJournalOptions;
     FRetainJournal: boolean;
     FVendorName: string;
