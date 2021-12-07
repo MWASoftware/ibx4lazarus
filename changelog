@@ -1,3 +1,27 @@
+IBX Change Log  version (2.5-0 Build 12949) Tue, 07 Dec 2021 11:24:05 +0000
+
+1. TIBTransaction: new properties
+    property TransactionID: integer read GetTransactionID;
+    property IsReadOnly: boolean read GetIsReadOnly;
+    {published}
+    property TransactionName: string read FTransactionName write SetTransactionName;
+
+2. IBCustomDataset: per row blob and array buffer cached clear before processing
+   Insert or Update...Returning. This allows blobs and arrays to be returned
+   by the statement.
+
+3. TXMLReader moved from IBXScript to package fbintf unit IBUtils.
+
+4.  TransactionName initialised to a newly generated GUID if empty.
+
+5. New unit: IBJournal. This provides the TIBJournal component which is a wrapper
+   for the fbintf package's journaling capability. TIBJournal is used to set the
+   file path and filename for the journal file and to Enabled (start journaling) and
+   disable (stop journaling). See fbintf/doc/README.ClientSideJournaling.pdf for
+   more information, and comments in IBJournal.pas.
+
+6. TIBDatabase.InternalTransaction is now a read only transaction.
+
 IBX Change Log  version (2.5-0 Build 12933) Mon, 29 Nov 2021 14:59:54 +0000
 
 1. IBCustomDataset: Modify TISQL component now defaults to GoToFirstRecordOnExecute := true.

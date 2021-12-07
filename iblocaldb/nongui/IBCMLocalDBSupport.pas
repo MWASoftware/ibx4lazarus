@@ -30,7 +30,7 @@ unit IBCMLocalDBSupport;
 interface
 
 uses
-  Classes, SysUtils, IBXCustomIBLocalDBSupport, ibxscript, IBXServices;
+  Classes, SysUtils, IBXCustomIBLocalDBSupport, ibxscript, IBXServices, IBUtils;
 
 type
   TOnLogMessage = procedure(Sender: TObject; Msg: string) of object;

@@ -4,13 +4,14 @@
 
 unit ibnongui;
 
+{$warn 5023 off : no warning about unused units}
 interface
 
 uses
   IBBatchMove, IBBlob, IBCustomDataSet, IBDatabase, IBDatabaseInfo, 
   IBDataOutput, IBEvents, IBExtract, IBQuery, IBSQL, IBSQLMonitor, 
   IBSQLParser, IBStoredProc, IBTable, IBUpdate, IBUpdateSQL, IBVersion, 
-  ibxscript, IBXServices, IBMessages, IBInternals, IBIPC;
+  ibxscript, IBXServices, IBMessages, IBInternals, IBIPC, IBJournal;
 
 implementation
 

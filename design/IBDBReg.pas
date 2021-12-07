@@ -425,7 +425,7 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet, IBMessages,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
      IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
      IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport, IBDSDialogs,
-     IBArrayGrid, IBVersion, IBDataOutput, IBXServiceEditor;
+     IBArrayGrid, IBVersion, IBDataOutput, IBXServiceEditor, IBJournal;
 
 const
   IBPalette1 = 'Firebird'; {do not localize}
@@ -472,7 +472,7 @@ begin
   RegisterComponents(IBPalette1, [ TIBQuery, TIBDataSet,
    TIBDatabase, TIBTransaction, TIBUpdateSQL, TIBUpdate, TIBEvents,
      TIBSQL, TIBDatabaseInfo, TIBSQLMonitor,
-       TIBStoredProc,TIBBatchMove,  TIBTable,TIBExtract, TIBXScript, TIBLocalDBSupport,
+       TIBStoredProc,TIBBatchMove,  TIBTable,TIBExtract, TIBXScript, TIBJournal, TIBLocalDBSupport,
        TIBBlockFormatOut,TIBCSVDataOut,TIBInsertStmtsOut]);
   if FirebirdAPI.HasServiceAPI  then
   begin
