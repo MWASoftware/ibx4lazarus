@@ -80,7 +80,7 @@ type
 
 implementation
 
-uses IBMessages;
+uses IBMessages {$IFDEF WINDOWS}, Windows ,Windirs {$ENDIF};
 
 { TIBJournal }
 

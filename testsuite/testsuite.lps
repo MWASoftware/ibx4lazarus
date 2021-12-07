@@ -278,8 +278,7 @@
       </Unit33>
       <Unit34>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="4700"/>
         <CursorPos X="3" Y="4705"/>
         <ExtraEditorCount Value="1"/>
@@ -337,7 +336,7 @@
       </Unit40>
       <Unit41>
         <Filename Value="../runtime/nongui/IBDatabase.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="7"/>
         <TopLine Value="424"/>
         <CursorPos X="14" Y="446"/>
         <UsageCount Value="45"/>
@@ -352,14 +351,15 @@
       </Unit42>
       <Unit43>
         <Filename Value="../iblocaldb/nongui/IBXCustomIBLocalDBSupport.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="83"/>
-        <CursorPos X="14" Y="122"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="195"/>
+        <CursorPos X="48" Y="208"/>
         <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit43>
       <Unit44>
         <Filename Value="../../fbintf/IB.pas"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="666"/>
         <CursorPos X="3" Y="660"/>
         <ExtraEditorCount Value="1"/>
@@ -487,7 +487,7 @@
       </Unit60>
       <Unit61>
         <Filename Value="../changelog"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <CursorPos X="67" Y="23"/>
         <UsageCount Value="66"/>
         <Loaded Value="True"/>
@@ -715,7 +715,7 @@
       </Unit91>
       <Unit92>
         <Filename Value="../runtime/nongui/IBTable.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="1270"/>
         <CursorPos X="35" Y="1294"/>
         <UsageCount Value="10"/>
@@ -723,7 +723,7 @@
       </Unit92>
       <Unit93>
         <Filename Value="../runtime/nongui/IBStoredProc.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="502"/>
         <CursorPos X="35" Y="526"/>
         <UsageCount Value="10"/>
@@ -1155,7 +1155,7 @@
       </Unit155>
       <Unit156>
         <Filename Value="../../fbintf/client/3.0/FB30Array.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="297"/>
         <CursorPos X="1024" Y="327"/>
         <UsageCount Value="11"/>
@@ -1487,9 +1487,10 @@
       </Unit203>
       <Unit204>
         <Filename Value="../runtime/nongui/IBJournal.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="50"/>
-        <CursorPos X="49" Y="76"/>
+        <TopLine Value="68"/>
+        <CursorPos X="34" Y="83"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
