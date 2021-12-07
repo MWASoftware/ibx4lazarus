@@ -314,8 +314,8 @@ type
     property TPBConstantNames[index: byte]: string read GetTPBConstantNames;
     property TransactionID: integer read GetTransactionID;
     property IsReadOnly: boolean read GetIsReadOnly;
-    property TransactionName: string read FTransactionName write SetTransactionName;
   published
+    property TransactionName: string read FTransactionName write SetTransactionName;
     property Active: Boolean read GetInTransaction write SetActive;
     property DefaultDatabase: TIBDatabase read FDefaultDatabase
                                            write SetDefaultDatabase;
@@ -443,7 +443,7 @@ begin
     Clear;
     Add('concurrency');
     Add('wait');
-    Add('write');
+    Add('read');
   end;
   FTimer := TFPTimer.Create(Self);
   FTimer.Enabled := False;
@@ -1584,6 +1584,7 @@ end;
 { TIBTransaction }
 
 constructor TIBTransaction.Create(AOwner: TComponent);
+var uuid: TGUID;
 begin
   inherited Create(AOwner);
   FDatabases := TList.Create;
@@ -1599,6 +1600,8 @@ begin
   FTimer.OnTimer := TimeoutTransaction;
   FDefaultAction := taCommit;
   FTransactionList.Add(self);
+  if (FTransactionName = '') and (CreateGUID(uuid) = 0) then
+    FTransactionName := GUIDToString(uuid);
 end;
 
 destructor TIBTransaction.Destroy;

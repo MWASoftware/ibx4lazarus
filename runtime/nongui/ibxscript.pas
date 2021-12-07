@@ -44,17 +44,23 @@ type
     type
       TSQLState = (stDefault, stInStmt, stInBlock, stInArrayDim, stInDeclare);
   private
+    FDatabase: TIBDatabase;
     FHasBegin: boolean;
     FOnNextLine: TOnNextLine;
     FTerminator: char;
+    FTransaction: TIBTransaction;
   protected
     procedure EchoNextLine(aLine: string);
+    function GetAttachment: IAttachment; override;
+    function GetTransaction: ITransaction; override;
   public
     constructor Create;
     function GetNextStatement(var stmt: string) : boolean; virtual;
     property HasBegin: boolean read FHasBegin;
     property Terminator: char read FTerminator write FTerminator default DefaultTerminator;
     property OnNextLine: TOnNextLine read FOnNextLine write FOnNextLine;
+    property Database: TIBDatabase read FDatabase write FDatabase;
+    property Transaction: TIBTransaction read FTransaction write FTransaction;
   end;
 
 
@@ -294,6 +300,22 @@ procedure TSQLStatementReader.EchoNextLine(aLine: string);
 begin
   if assigned(FOnNextLine) then
     OnNextLine(self,aLine);
+end;
+
+function TSQLStatementReader.GetAttachment: IAttachment;
+begin
+  if FDatabase <> nil then
+    Result := FDatabase.Attachment
+  else
+    Result := nil;
+end;
+
+function TSQLStatementReader.GetTransaction: ITransaction;
+begin
+  if FTransaction <> nil then
+    Result := FTransaction.TransactionIntf
+  else
+    Result := nil;
 end;
 
 constructor TSQLStatementReader.Create;
@@ -705,38 +727,33 @@ function TCustomIBXScript.ProcessStream: boolean;
 var stmt: string;
 begin
   Result := false;
-  FSQLReader.Attachment := Database.Attachment;
+  FSQLReader.Database := Database;
   if FTransaction = nil then
-    FSQLReader.Transaction := FInternalTransaction.TransactionIntf
+    FSQLReader.Transaction := FInternalTransaction
   else
-    FSQLReader.Transaction := FTransaction.TransactionIntf;
+    FSQLReader.Transaction := FTransaction;
+  while FSQLReader.GetNextStatement(stmt) do
   try
-    while FSQLReader.GetNextStatement(stmt) do
-    try
-      stmt := trim(stmt);
-  //    writeln('stmt = "',stmt,'"');
-      if stmt = '' then continue;
-      if not ProcessStatement(stmt) then
-        ExecSQL(stmt);
+    stmt := trim(stmt);
+//    writeln('stmt = "',stmt,'"');
+    if stmt = '' then continue;
+    if not ProcessStatement(stmt) then
+      ExecSQL(stmt);
 
-    except on E:Exception do
+  except on E:Exception do
+      begin
+        with GetTransaction do
+          if InTransaction then Rollback;
+        FSQLReader.Terminator := TSQLStatementReader.DefaultTerminator;
+        if assigned(OnErrorLog) then
         begin
-          with GetTransaction do
-            if InTransaction then Rollback;
-          FSQLReader.Terminator := TSQLStatementReader.DefaultTerminator;
-          if assigned(OnErrorLog) then
-          begin
-            Add2Log(Format(sStatementError,[FSQLReader.GetErrorPrefix,
-                               E.Message,stmt]),true);
-                               if StopOnFirstError then Exit;
-          end
-          else
-            raise;
+          Add2Log(Format(sStatementError,[FSQLReader.GetErrorPrefix,
+                             E.Message,stmt]),true);
+                             if StopOnFirstError then Exit;
         end
-    end;
-  finally
-    FSQLReader.Attachment := nil;
-    FSQLReader.Transaction := nil;
+        else
+          raise;
+      end
   end;
   Result := true;
 end;

@@ -13,15 +13,6 @@ uses
   updates, inserts and deletes made by the client during a session. Support for
   creating the Journal is provided by the fbintf package. This component is an
   IBX front end.
-
-  The Journal file is saved in:
-
-  Unix:
-  $HOME/.<vendor name>/<application name>/ibxjournal<nnn>.log
-
-  Windows:
-  <User Application Data Dir>\<vendor name>\<application name>\ibxjournal<nnn>.log
-
 }
 
 type
@@ -56,14 +47,33 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property JournalFilePath: string read FJournalFilePath;
+    property SessionID: integer read FSessionID;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
+      {When enabled is true, journaling is performed. Enabled may be set before
+       a database is opened, in which case, journaling starts as soon as
+       }
     property Enabled: boolean read FEnabled write SetEnabled;
+     {JournalFileTemplate determines the name of the journal file and should
+      include a %d where %d is replaced with the session no at run time.}
     property JournalFileTemplate: string read FJournalFileTemplate write FJournalFileTemplate;
+     {Journaling options - see fbintf/doc/README.ClientSideJournaling.pdf }
     property Options: TJournalOptions read FOptions write FOptions;
-    {JournalFileTemplate should include a %d where %d is replaced with the session no.}
+     {Vendor Name and ApplicationName determine the location of the Journal file.
+      The Journal file is saved in:
+
+      Unix:
+      $HOME/.<vendor name>/<application name>/
+
+      Windows:
+      <User Application Data Dir>\<vendor name>\<application name>\
+     }
     property VendorName: string read FVendorName write FVendorName;
     property ApplicationName: string read FApplicationName write FApplicationName;
+     {If RetainJournal is true then when journaling terminats Enabled := false,
+      or a normal database close, the journal file and journal table (IBX$JOURNALS)
+      entries are retained. Otherwise, they are discarded. Note: always retained
+      on a Force Disconnect or a lost connection}
     property RetainJournal: boolean read FRetainJournal write FRetainJournal;
   end;
 
@@ -151,13 +161,13 @@ procedure TIBJournal.StartSession;
 begin
   FJournalFilePath := GetJournalFilePath;
   EnsurePathExists(FJournalFilePath);
-  FSessionID := Database.Attachment.StartJournaling(JournalFilePath,RetainJournal,Options);
+  FSessionID := Database.Attachment.StartJournaling(JournalFilePath,Options);
 end;
 
 procedure TIBJournal.EndSession;
 begin
   FSessionID := -1;
-  Database.Attachment.StopJournaling;
+  Database.Attachment.StopJournaling(RetainJournal);
 end;
 
 constructor TIBJournal.Create(AOwner: TComponent);

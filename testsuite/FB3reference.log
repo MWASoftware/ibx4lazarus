@@ -644,7 +644,7 @@ Rows printed = 42
 Current memory = 19,651,872
 Delta memory = 13,040
 Max memory = 19,780,144
-Elapsed time= 0.026 sec
+Elapsed time= 0.019 sec
 Cpu = 0.010 sec
 Buffers = 2048
 Reads = 2
@@ -1445,7 +1445,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost/employee Disconnected after 19 ms
+inet://localhost/employee Disconnected after 23 ms
 Before Connect
 Connected to inet://localhost/employee
 DPB: Item Count = 3
@@ -1454,7 +1454,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost/employee Disconnected after 4018 ms
+inet://localhost/employee Disconnected after 3967 ms
 Idle Timer Expired for Test_Database_02
 Database Closed
 Transaction Events
@@ -1506,7 +1506,7 @@ DPB: Item Count = 4
 
 inet://localhost//tmp/ibx-testsuite/testsuite1.fdb created
 Before Disconnect
-inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 15 ms
+inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 14 ms
 Before Connect
 Warning: SQL Dialect Downgrade of inet://localhost//tmp/ibx-testsuite/testsuite1.fdb
 Connected to inet://localhost//tmp/ibx-testsuite/testsuite1.fdb
@@ -1516,7 +1516,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 21 ms
+inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 23 ms
 
 
 ------------------------------------------------------
@@ -3171,7 +3171,7 @@ DEPT_KEY_PATH = 000;600;620;622 (Charset Id = 4 Codepage = 65001)
 Current memory = 19,654,224
 Delta memory = 13,072
 Max memory = 19,730,048
-Elapsed time= 0.023 sec
+Elapsed time= 0.027 sec
 Cpu = 0.020 sec
 Buffers = 2048
 Reads = 2
@@ -3428,69 +3428,7 @@ JOB_COUNTRY = USA
 SALARY = 105,900.00
 FULL_NAME = Nelson, Robert
 Do Fetch Last:
-EMP_NO = 145
-FIRST_NAME = Mark
-LAST_NAME = Guckenheimer
-PHONE_EXT = 221
-HIRE_DATE = 1994/05/02 00:00:00.0000
-DEPT_NO = 622
-JOB_CODE = Eng
-JOB_GRADE = 5
-JOB_COUNTRY = USA
-SALARY = 32,000.00
-FULL_NAME = Guckenheimer, Mark
-Do Fetch Prior:
-EMP_NO = 144
-FIRST_NAME = John
-LAST_NAME = Montgomery
-PHONE_EXT = 820
-HIRE_DATE = 1994/03/30 00:00:00.0000
-DEPT_NO = 672
-JOB_CODE = Eng
-JOB_GRADE = 5
-JOB_COUNTRY = USA
-SALARY = 35,000.00
-FULL_NAME = Montgomery, John
-Do Fetch First:
-EMP_NO = 2
-FIRST_NAME = Robert
-LAST_NAME = Nelson
-PHONE_EXT = 250
-HIRE_DATE = 1988/12/28 00:00:00.0000
-DEPT_NO = 600
-JOB_CODE = VP
-JOB_GRADE = 2
-JOB_COUNTRY = USA
-SALARY = 105,900.00
-FULL_NAME = Nelson, Robert
-Do Fetch Abs 8 :
-EMP_NO = 14
-FIRST_NAME = Stewart
-LAST_NAME = Hall
-PHONE_EXT = 227
-HIRE_DATE = 1990/06/04 00:00:00.0000
-DEPT_NO = 900
-JOB_CODE = Finan
-JOB_GRADE = 3
-JOB_COUNTRY = USA
-SALARY = 69,482.63
-FULL_NAME = Hall, Stewart
-Do Fetch Relative -2 :
-EMP_NO = 11
-FIRST_NAME = K. J.
-LAST_NAME = Weston
-PHONE_EXT = 34
-HIRE_DATE = 1990/01/17 00:00:00.0000
-DEPT_NO = 130
-JOB_CODE = SRep
-JOB_GRADE = 4
-JOB_COUNTRY = USA
-SALARY = 86,292.94
-FULL_NAME = Weston, K. J.
-Do Fetch beyond EOF :
-Fetch returned false
-
-
+Test Completed with Error: feature is not supported
 ------------------------------------------------------
 Running Test 08: TIBDataset: Locate, Bookmark and Lookup
 Field No 1 Name = EMP_NO DataType = ftSmallint
@@ -11989,20 +11927,20 @@ Message File Location = /opt/firebird3.0.5/
 Database Statistics for employee
 
 Database "/opt/firebird3.0.5/examples/empbuild/employee.fdb"
-Gstat execution time Sat Oct 23 13:38:43 2021
+Gstat execution time Tue Dec  7 10:59:34 2021
 
 Database header page information:
 Flags			0
-Generation		4226
+Generation		4544
 System Change Number	0
 Page size		8192
 ODS version		12.0
-Oldest transaction	4708
-Oldest active		4709
-Oldest snapshot		4709
-Next transaction	4709
+Oldest transaction	5073
+Oldest active		5074
+Oldest snapshot		5074
+Next transaction	5074
 Sequence number		0
-Next attachment ID	4314
+Next attachment ID	4601
 Implementation		HW=AMD/Intel/x64 little-endian OS=Linux CC=gcc
 Shadow count		0
 Page buffers		0
@@ -12149,7 +12087,7 @@ Fill distribution:
 60 - 79% = 0
 80 - 99% = 0
 
-Gstat completion time Sat Oct 23 13:38:43 2021
+Gstat completion time Tue Dec  7 10:59:34 2021
 
 
 
@@ -12159,87 +12097,87 @@ zeus	Tue Jun  9 15:11:28 2020
 bin/fbguard: guardian starting /opt/firebird3.0.5/bin/firebird
 
 Online Validation
-13:38:44.65 Validation started
+10:59:35.29 Validation started
 
-13:38:44.65 Relation 128 (COUNTRY)
-13:38:44.65   process pointer page    0 of    1
-13:38:44.65 Index 1 (RDB$PRIMARY1)
-13:38:44.65 Relation 128 (COUNTRY) is ok
+10:59:35.29 Relation 128 (COUNTRY)
+10:59:35.29   process pointer page    0 of    1
+10:59:35.29 Index 1 (RDB$PRIMARY1)
+10:59:35.29 Relation 128 (COUNTRY) is ok
 
-13:38:44.65 Relation 129 (JOB)
-13:38:44.65   process pointer page    0 of    1
-13:38:44.65 Index 1 (RDB$PRIMARY2)
-13:38:44.65 Index 2 (RDB$FOREIGN3)
-13:38:44.65 Index 3 (MAXSALX)
-13:38:44.67 Index 4 (MINSALX)
-13:38:44.68 Relation 129 (JOB) is ok
+10:59:35.29 Relation 129 (JOB)
+10:59:35.29   process pointer page    0 of    1
+10:59:35.29 Index 1 (RDB$PRIMARY2)
+10:59:35.29 Index 2 (RDB$FOREIGN3)
+10:59:35.29 Index 3 (MAXSALX)
+10:59:35.31 Index 4 (MINSALX)
+10:59:35.31 Relation 129 (JOB) is ok
 
-13:38:44.68 Relation 130 (DEPARTMENT)
-13:38:44.68   process pointer page    0 of    1
-13:38:44.68 Index 1 (RDB$4)
-13:38:44.68 Index 2 (RDB$PRIMARY5)
-13:38:44.68 Index 3 (RDB$FOREIGN6)
-13:38:44.68 Index 4 (BUDGETX)
-13:38:44.68 Index 5 (RDB$FOREIGN10)
-13:38:44.68 Relation 130 (DEPARTMENT) is ok
+10:59:35.31 Relation 130 (DEPARTMENT)
+10:59:35.31   process pointer page    0 of    1
+10:59:35.31 Index 1 (RDB$4)
+10:59:35.31 Index 2 (RDB$PRIMARY5)
+10:59:35.31 Index 3 (RDB$FOREIGN6)
+10:59:35.31 Index 4 (BUDGETX)
+10:59:35.31 Index 5 (RDB$FOREIGN10)
+10:59:35.31 Relation 130 (DEPARTMENT) is ok
 
-13:38:44.68 Relation 131 (EMPLOYEE)
-13:38:44.68   process pointer page    0 of    1
-13:38:44.68 Index 1 (RDB$PRIMARY7)
-13:38:44.68 Index 2 (RDB$FOREIGN8)
-13:38:44.68 Index 3 (RDB$FOREIGN9)
-13:38:44.68 Index 4 (NAMEX)
-13:38:44.68 Relation 131 (EMPLOYEE) is ok
+10:59:35.31 Relation 131 (EMPLOYEE)
+10:59:35.32   process pointer page    0 of    1
+10:59:35.32 Index 1 (RDB$PRIMARY7)
+10:59:35.32 Index 2 (RDB$FOREIGN8)
+10:59:35.32 Index 3 (RDB$FOREIGN9)
+10:59:35.32 Index 4 (NAMEX)
+10:59:35.32 Relation 131 (EMPLOYEE) is ok
 
-13:38:44.68 Relation 133 (PROJECT)
-13:38:44.68   process pointer page    0 of    1
-13:38:44.68 Index 1 (RDB$11)
-13:38:44.68 Index 2 (RDB$PRIMARY12)
-13:38:44.68 Index 3 (RDB$FOREIGN13)
-13:38:44.68 Index 4 (PRODTYPEX)
-13:38:44.69 Relation 133 (PROJECT) is ok
+10:59:35.32 Relation 133 (PROJECT)
+10:59:35.32   process pointer page    0 of    1
+10:59:35.32 Index 1 (RDB$11)
+10:59:35.32 Index 2 (RDB$PRIMARY12)
+10:59:35.32 Index 3 (RDB$FOREIGN13)
+10:59:35.32 Index 4 (PRODTYPEX)
+10:59:35.32 Relation 133 (PROJECT) is ok
 
-13:38:44.69 Relation 134 (EMPLOYEE_PROJECT)
-13:38:44.69   process pointer page    0 of    1
-13:38:44.69 Index 1 (RDB$PRIMARY14)
-13:38:44.69 Index 2 (RDB$FOREIGN15)
-13:38:44.69 Index 3 (RDB$FOREIGN16)
-13:38:44.69 Relation 134 (EMPLOYEE_PROJECT) is ok
+10:59:35.32 Relation 134 (EMPLOYEE_PROJECT)
+10:59:35.32   process pointer page    0 of    1
+10:59:35.32 Index 1 (RDB$PRIMARY14)
+10:59:35.32 Index 2 (RDB$FOREIGN15)
+10:59:35.32 Index 3 (RDB$FOREIGN16)
+10:59:35.32 Relation 134 (EMPLOYEE_PROJECT) is ok
 
-13:38:44.69 Relation 135 (PROJ_DEPT_BUDGET)
-13:38:44.69   process pointer page    0 of    1
-13:38:44.70 Index 1 (RDB$PRIMARY17)
-13:38:44.70 Index 2 (RDB$FOREIGN18)
-13:38:44.70 Index 3 (RDB$FOREIGN19)
-13:38:44.70 Relation 135 (PROJ_DEPT_BUDGET) is ok
+10:59:35.32 Relation 135 (PROJ_DEPT_BUDGET)
+10:59:35.32   process pointer page    0 of    1
+10:59:35.33 Index 1 (RDB$PRIMARY17)
+10:59:35.33 Index 2 (RDB$FOREIGN18)
+10:59:35.33 Index 3 (RDB$FOREIGN19)
+10:59:35.33 Relation 135 (PROJ_DEPT_BUDGET) is ok
 
-13:38:44.70 Relation 136 (SALARY_HISTORY)
-13:38:44.70   process pointer page    0 of    1
-13:38:44.70 Index 1 (RDB$PRIMARY20)
-13:38:44.70 Index 2 (RDB$FOREIGN21)
-13:38:44.70 Index 3 (CHANGEX)
-13:38:44.70 Index 4 (UPDATERX)
-13:38:44.70 Relation 136 (SALARY_HISTORY) is ok
+10:59:35.33 Relation 136 (SALARY_HISTORY)
+10:59:35.33   process pointer page    0 of    1
+10:59:35.33 Index 1 (RDB$PRIMARY20)
+10:59:35.33 Index 2 (RDB$FOREIGN21)
+10:59:35.33 Index 3 (CHANGEX)
+10:59:35.33 Index 4 (UPDATERX)
+10:59:35.33 Relation 136 (SALARY_HISTORY) is ok
 
-13:38:44.70 Relation 137 (CUSTOMER)
-13:38:44.70   process pointer page    0 of    1
-13:38:44.70 Index 1 (RDB$PRIMARY22)
-13:38:44.70 Index 2 (RDB$FOREIGN23)
-13:38:44.70 Index 3 (CUSTNAMEX)
-13:38:44.70 Index 4 (CUSTREGION)
-13:38:44.70 Relation 137 (CUSTOMER) is ok
+10:59:35.33 Relation 137 (CUSTOMER)
+10:59:35.33   process pointer page    0 of    1
+10:59:35.33 Index 1 (RDB$PRIMARY22)
+10:59:35.33 Index 2 (RDB$FOREIGN23)
+10:59:35.33 Index 3 (CUSTNAMEX)
+10:59:35.33 Index 4 (CUSTREGION)
+10:59:35.33 Relation 137 (CUSTOMER) is ok
 
-13:38:44.70 Relation 138 (SALES)
-13:38:44.70   process pointer page    0 of    1
-13:38:44.70 Index 1 (RDB$PRIMARY24)
-13:38:44.70 Index 2 (RDB$FOREIGN25)
-13:38:44.70 Index 3 (RDB$FOREIGN26)
-13:38:44.70 Index 4 (NEEDX)
-13:38:44.70 Index 5 (QTYX)
-13:38:44.70 Index 6 (SALESTATX)
-13:38:44.70 Relation 138 (SALES) is ok
+10:59:35.33 Relation 138 (SALES)
+10:59:35.33   process pointer page    0 of    1
+10:59:35.33 Index 1 (RDB$PRIMARY24)
+10:59:35.33 Index 2 (RDB$FOREIGN25)
+10:59:35.33 Index 3 (RDB$FOREIGN26)
+10:59:35.33 Index 4 (NEEDX)
+10:59:35.33 Index 5 (QTYX)
+10:59:35.33 Index 6 (SALESTATX)
+10:59:35.33 Relation 138 (SALES) is ok
 
-13:38:44.70 Validation finished
+10:59:35.33 Validation finished
 
 
 Normal Validation
@@ -13795,8 +13733,8 @@ Rows printed = 2
 Current memory = 19,652,336
 Delta memory = 12,688
 Max memory = 19,780,960
-Elapsed time= 0.104 sec
-Cpu = 0.010 sec
+Elapsed time= 0.103 sec
+Cpu = 0.000 sec
 Buffers = 2048
 Reads = 2
 Writes = 0
@@ -15413,14 +15351,14 @@ Create Table LotsOfData (
     MyText VarChar(1024), 
     Primary Key (RowID) 
   );                 
-Loading data into database table. Started at 23/10/2021 13:39:35.904
-Data load completed at 23/10/2021 13:41:21.474 Elapsed Time = 105570 ms, 100000 records loaded
- Message Hash = 74ca9d8999ced80d351dfb9f693ac23e
-Database Read started at 23/10/2021 13:41:21.484
-Read Dataset completed at 23/10/2021 13:41:51.025 Elapsed Time = 29541 ms, 100000 records read
- Message Hash = 74ca9d8999ced80d351dfb9f693ac23e
+Loading data into database table. Started at 07/12/2021 11:00:25.567
+Data load completed at 07/12/2021 11:02:25.474 Elapsed Time = 119907 ms, 100000 records loaded
+ Message Hash = 977f458d39d2649ac5fb981ea5986e56
+Database Read started at 07/12/2021 11:02:25.483
+Read Dataset completed at 07/12/2021 11:02:55.671 Elapsed Time = 30188 ms, 100000 records read
+ Message Hash = 977f458d39d2649ac5fb981ea5986e56
 Test Completed successfully
-23/10/2021 13:41:51.026 Test 21 passes as long as the checksums are identical
+07/12/2021 11:02:55.671 Test 21 passes as long as the checksums are identical
 
 
 ------------------------------------------------------
@@ -15455,7 +15393,7 @@ SEC$MIDDLE_NAME = NULL
 SEC$LAST_NAME = Tester (Charset = UTF8 Codepage = 65001)
 SEC$PASSWORD = NULL
 LOGGEDIN = False
-DBCREATOR = True
+DBCREATOR = False
 
 Row No = 2
 SEC$DESCRIPTION = NULL
@@ -17495,6 +17433,934 @@ SET TERM ;^
 
 
 /* Grant permissions for this database */
+
+
+
+------------------------------------------------------
+Running Test 29: Test 29: IBJournal Tests
+Creating Database from resources/Test29.sql
+
+Create Table IBXTest (
+ TableKey Integer not null,
+ F1 Smallint,
+ F2 Float,
+ F3 Double Precision,
+ F4 Decimal(9,3),
+ F5 Decimal(18,4),
+ F6 Date,
+ F7 Timestamp,
+ F8 Char (2),
+ F9 VarChar(256),
+ F10 Blob,
+ F11 BigInt,
+ "f12" Integer,
+ F13 Time,
+ F14 Blob sub_type text,
+ MyArray Integer [0:16],
+ "GRANTS" VarChar(20),
+ "My Field" VarChar(32),
+ "MY Field" VarChar(32),
+ Primary Key(TableKey)
+);
+
+Create Generator IBXGen;
+Add a record
+Add and edit a record
+Row No = 1
+TABLEKEY = 1
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = (blob), Length = 100
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 (Charset  = UTF8 Codepage = 65001)
+
+If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o'er my ear like the sweet south,
+That breathes upon a bank of violets,
+Stealing and giving odour! Enough; no more:
+'Tis not so sweet now as it was before.
+O spirit of love! how quick and fresh art thou,
+That, notwithstanding thy capacity	10
+Receiveth as the sea, nought enters there,
+Of what validity and pitch soe'er,
+But falls into abatement and low price,
+Even in a minute: so full of shapes is fancy
+That it alone is high fantastical.
+
+Si la musique est la nourriture de l'amour, continuez à jouer;
+Donnez-m'en un excès, que, surexcité,
+L'appétit peut devenir malade et ainsi mourir.
+Cette souche encore! il a eu une chute mourante:
+Oh, ça m'est venu à l'oreille comme le doux sud,
+Qui souffle sur une banque de violettes,
+Voler et donner de l'odeur! Assez; Pas plus:
+«Ce n'est pas si doux maintenant qu'avant.
+O esprit d'amour! comme tu es rapide et fraîche,
+Que, malgré ta capacité 10
+Reçoit comme la mer, rien n'y entre,
+De quelle validité et de quelle hauteur soe'er,
+Mais tombe dans l'abattement et le prix bas,
+Même en une minute: si plein de formes est fantaisie
+Que cela seul est fantastique.
+
+
+
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = NULL
+MYFIELD2 = NULL
+
+Row No = 2
+TABLEKEY = 2
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = NULL
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 = NULL
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
+MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
+
+Rows printed = 2
+
+Delete a record
+Row No = 1
+TABLEKEY = 2
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = NULL
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 = NULL
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
+MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
+
+Rows printed = 1
+
+Rollback Retaining
+Row No = 1
+TABLEKEY = 1
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = (blob), Length = 100
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 (Charset  = UTF8 Codepage = 65001)
+
+If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o'er my ear like the sweet south,
+That breathes upon a bank of violets,
+Stealing and giving odour! Enough; no more:
+'Tis not so sweet now as it was before.
+O spirit of love! how quick and fresh art thou,
+That, notwithstanding thy capacity	10
+Receiveth as the sea, nought enters there,
+Of what validity and pitch soe'er,
+But falls into abatement and low price,
+Even in a minute: so full of shapes is fancy
+That it alone is high fantastical.
+
+Si la musique est la nourriture de l'amour, continuez à jouer;
+Donnez-m'en un excès, que, surexcité,
+L'appétit peut devenir malade et ainsi mourir.
+Cette souche encore! il a eu une chute mourante:
+Oh, ça m'est venu à l'oreille comme le doux sud,
+Qui souffle sur une banque de violettes,
+Voler et donner de l'odeur! Assez; Pas plus:
+«Ce n'est pas si doux maintenant qu'avant.
+O esprit d'amour! comme tu es rapide et fraîche,
+Que, malgré ta capacité 10
+Reçoit comme la mer, rien n'y entre,
+De quelle validité et de quelle hauteur soe'er,
+Mais tombe dans l'abattement et le prix bas,
+Même en une minute: si plein de formes est fantaisie
+Que cela seul est fantastique.
+
+
+
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = NULL
+MYFIELD2 = NULL
+
+Row No = 2
+TABLEKEY = 2
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = NULL
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 = NULL
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
+MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
+
+Rows printed = 2
+
+Delete a record
+Row No = 1
+TABLEKEY = 2
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = NULL
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 = NULL
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
+MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
+
+Rows printed = 1
+
+Rollback
+Row No = 1
+TABLEKEY = 1
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = (blob), Length = 100
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 (Charset  = UTF8 Codepage = 65001)
+
+If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o'er my ear like the sweet south,
+That breathes upon a bank of violets,
+Stealing and giving odour! Enough; no more:
+'Tis not so sweet now as it was before.
+O spirit of love! how quick and fresh art thou,
+That, notwithstanding thy capacity	10
+Receiveth as the sea, nought enters there,
+Of what validity and pitch soe'er,
+But falls into abatement and low price,
+Even in a minute: so full of shapes is fancy
+That it alone is high fantastical.
+
+Si la musique est la nourriture de l'amour, continuez à jouer;
+Donnez-m'en un excès, que, surexcité,
+L'appétit peut devenir malade et ainsi mourir.
+Cette souche encore! il a eu une chute mourante:
+Oh, ça m'est venu à l'oreille comme le doux sud,
+Qui souffle sur une banque de violettes,
+Voler et donner de l'odeur! Assez; Pas plus:
+«Ce n'est pas si doux maintenant qu'avant.
+O esprit d'amour! comme tu es rapide et fraîche,
+Que, malgré ta capacité 10
+Reçoit comme la mer, rien n'y entre,
+De quelle validité et de quelle hauteur soe'er,
+Mais tombe dans l'abattement et le prix bas,
+Même en une minute: si plein de formes est fantaisie
+Que cela seul est fantastique.
+
+
+
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = NULL
+MYFIELD2 = NULL
+
+Row No = 2
+TABLEKEY = 2
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = NULL
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 = NULL
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
+MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
+
+Rows printed = 2
+
+Commit Retaining
+Row No = 1
+TABLEKEY = 1
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = (blob), Length = 100
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 (Charset  = UTF8 Codepage = 65001)
+
+If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o'er my ear like the sweet south,
+That breathes upon a bank of violets,
+Stealing and giving odour! Enough; no more:
+'Tis not so sweet now as it was before.
+O spirit of love! how quick and fresh art thou,
+That, notwithstanding thy capacity	10
+Receiveth as the sea, nought enters there,
+Of what validity and pitch soe'er,
+But falls into abatement and low price,
+Even in a minute: so full of shapes is fancy
+That it alone is high fantastical.
+
+Si la musique est la nourriture de l'amour, continuez à jouer;
+Donnez-m'en un excès, que, surexcité,
+L'appétit peut devenir malade et ainsi mourir.
+Cette souche encore! il a eu une chute mourante:
+Oh, ça m'est venu à l'oreille comme le doux sud,
+Qui souffle sur une banque de violettes,
+Voler et donner de l'odeur! Assez; Pas plus:
+«Ce n'est pas si doux maintenant qu'avant.
+O esprit d'amour! comme tu es rapide et fraîche,
+Que, malgré ta capacité 10
+Reçoit comme la mer, rien n'y entre,
+De quelle validité et de quelle hauteur soe'er,
+Mais tombe dans l'abattement et le prix bas,
+Même en une minute: si plein de formes est fantaisie
+Que cela seul est fantastique.
+
+
+
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = NULL
+MYFIELD2 = NULL
+
+Row No = 2
+TABLEKEY = 2
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = NULL
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 = NULL
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
+MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
+
+Row No = 3
+TABLEKEY = 3
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = (blob), Length = 100
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 (Charset  = UTF8 Codepage = 65001)
+
+If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o'er my ear like the sweet south,
+That breathes upon a bank of violets,
+Stealing and giving odour! Enough; no more:
+'Tis not so sweet now as it was before.
+O spirit of love! how quick and fresh art thou,
+That, notwithstanding thy capacity	10
+Receiveth as the sea, nought enters there,
+Of what validity and pitch soe'er,
+But falls into abatement and low price,
+Even in a minute: so full of shapes is fancy
+That it alone is high fantastical.
+
+Si la musique est la nourriture de l'amour, continuez à jouer;
+Donnez-m'en un excès, que, surexcité,
+L'appétit peut devenir malade et ainsi mourir.
+Cette souche encore! il a eu une chute mourante:
+Oh, ça m'est venu à l'oreille comme le doux sud,
+Qui souffle sur une banque de violettes,
+Voler et donner de l'odeur! Assez; Pas plus:
+«Ce n'est pas si doux maintenant qu'avant.
+O esprit d'amour! comme tu es rapide et fraîche,
+Que, malgré ta capacité 10
+Reçoit comme la mer, rien n'y entre,
+De quelle validité et de quelle hauteur soe'er,
+Mais tombe dans l'abattement et le prix bas,
+Même en une minute: si plein de formes est fantaisie
+Que cela seul est fantastique.
+
+
+
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = NULL
+MYFIELD2 = NULL
+
+Rows printed = 3
+
+Commit
+Row No = 1
+TABLEKEY = 1
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = (blob), Length = 100
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 (Charset  = UTF8 Codepage = 65001)
+
+If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o'er my ear like the sweet south,
+That breathes upon a bank of violets,
+Stealing and giving odour! Enough; no more:
+'Tis not so sweet now as it was before.
+O spirit of love! how quick and fresh art thou,
+That, notwithstanding thy capacity	10
+Receiveth as the sea, nought enters there,
+Of what validity and pitch soe'er,
+But falls into abatement and low price,
+Even in a minute: so full of shapes is fancy
+That it alone is high fantastical.
+
+Si la musique est la nourriture de l'amour, continuez à jouer;
+Donnez-m'en un excès, que, surexcité,
+L'appétit peut devenir malade et ainsi mourir.
+Cette souche encore! il a eu une chute mourante:
+Oh, ça m'est venu à l'oreille comme le doux sud,
+Qui souffle sur une banque de violettes,
+Voler et donner de l'odeur! Assez; Pas plus:
+«Ce n'est pas si doux maintenant qu'avant.
+O esprit d'amour! comme tu es rapide et fraîche,
+Que, malgré ta capacité 10
+Reçoit comme la mer, rien n'y entre,
+De quelle validité et de quelle hauteur soe'er,
+Mais tombe dans l'abattement et le prix bas,
+Même en une minute: si plein de formes est fantaisie
+Que cela seul est fantastique.
+
+
+
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = NULL
+MYFIELD2 = NULL
+
+Row No = 2
+TABLEKEY = 2
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = NULL
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 = NULL
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
+MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
+
+Row No = 3
+TABLEKEY = 3
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = (blob), Length = 100
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 (Charset  = UTF8 Codepage = 65001)
+
+If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o'er my ear like the sweet south,
+That breathes upon a bank of violets,
+Stealing and giving odour! Enough; no more:
+'Tis not so sweet now as it was before.
+O spirit of love! how quick and fresh art thou,
+That, notwithstanding thy capacity	10
+Receiveth as the sea, nought enters there,
+Of what validity and pitch soe'er,
+But falls into abatement and low price,
+Even in a minute: so full of shapes is fancy
+That it alone is high fantastical.
+
+Si la musique est la nourriture de l'amour, continuez à jouer;
+Donnez-m'en un excès, que, surexcité,
+L'appétit peut devenir malade et ainsi mourir.
+Cette souche encore! il a eu une chute mourante:
+Oh, ça m'est venu à l'oreille comme le doux sud,
+Qui souffle sur une banque de violettes,
+Voler et donner de l'odeur! Assez; Pas plus:
+«Ce n'est pas si doux maintenant qu'avant.
+O esprit d'amour! comme tu es rapide et fraîche,
+Que, malgré ta capacité 10
+Reçoit comme la mer, rien n'y entre,
+De quelle validité et de quelle hauteur soe'er,
+Mais tombe dans l'abattement et le prix bas,
+Même en une minute: si plein de formes est fantaisie
+Que cela seul est fantastique.
+
+
+
+Array: (0: 100) (1: 99) (2: 98) (3: 97) (4: 96) (5: 95) (6: 94) (7: 93) (8: 92) (9: 91) (10: 90) (11: 89) (12: 88) (13: 87) (14: 86) (15: 85) (16: 84) 
+
+GRANTS = NULL
+MYFIELD1 = NULL
+MYFIELD2 = NULL
+
+Rows printed = 3
+
+Journal Table
+IBX$SESSIONID = 1
+IBX$TRANSACTIONID = 10
+IBX$OLDTRANSACTIONID = NULL
+IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
+IBX$CREATED = 2021/12/07 11:03:25.0870
+IBX$SESSIONID = 1
+IBX$TRANSACTIONID = 15
+IBX$OLDTRANSACTIONID = NULL
+IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
+IBX$CREATED = 2021/12/07 11:03:26.2430
+IBX$SESSIONID = 1
+IBX$TRANSACTIONID = 17
+IBX$OLDTRANSACTIONID = 15
+IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
+IBX$CREATED = 2021/12/07 11:03:26.6180
+Journal Entries
+Journal Entry = jeTransStart(Transaction Start)
+Timestamp = 2021/12/07 11:03:25.0880
+Session ID = 1
+Transaction ID = 10
+Transaction Name = "{DA7F1B4D-F444-4B74-9A76-CA37E24363F4}"
+TPB: Item Count = 3
+  isc_tpb_concurrency
+  isc_tpb_wait
+  isc_tpb_write
+
+Default Completion = TACommit
+
+Journal Entry = jeQuery(Query)
+Timestamp = 2021/12/07 11:03:25.1560
+Session ID = 1
+Transaction ID = 10
+Query = Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(1, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
+0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
+01000000010000001A01050001000000DA000000
+</blob>
+, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o''er my ear like the sweet south,
+That breathes upon a bank of violets,
+Stealing and giving odour! Enough; no more:
+''Tis not so sweet now as it was before.
+O spirit of love! how quick and fresh art thou,
+That, notwithstanding thy capacity	10
+Receiveth as the sea, nought enters there,
+Of what validity and pitch soe''er,
+But falls into abatement and low price,
+Even in a minute: so full of shapes is fancy
+That it alone is high fantastical.
+
+Si la musique est la nourriture de l''amour, continuez à jouer;
+Donnez-m''en un excès, que, surexcité,
+L''appétit peut devenir malade et ainsi mourir.
+Cette souche encore! il a eu une chute mourante:
+Oh, ça m''est venu à l''oreille comme le doux sud,
+Qui souffle sur une banque de violettes,
+Voler et donner de l''odeur! Assez; Pas plus:
+«Ce n''est pas si doux maintenant qu''avant.
+O esprit d''amour! comme tu es rapide et fraîche,
+Que, malgré ta capacité 10
+Reçoit comme la mer, rien n''y entre,
+De quelle validité et de quelle hauteur soe''er,
+Mais tombe dans l''abattement et le prix bas,
+Même en une minute: si plein de formes est fantaisie
+Que cela seul est fantastique.
+
+
+', <array dim = "1" sqltype = "496" length = "4" relation_name = "IBXTEST" column_name = "MYARRAY" scale = "0" bounds="0:16">
+ <elt ix="0">100</elt>
+ <elt ix="1">99</elt>
+ <elt ix="2">98</elt>
+ <elt ix="3">97</elt>
+ <elt ix="4">96</elt>
+ <elt ix="5">95</elt>
+ <elt ix="6">94</elt>
+ <elt ix="7">93</elt>
+ <elt ix="8">92</elt>
+ <elt ix="9">91</elt>
+ <elt ix="10">90</elt>
+ <elt ix="11">89</elt>
+ <elt ix="12">88</elt>
+ <elt ix="13">87</elt>
+ <elt ix="14">86</elt>
+ <elt ix="15">85</elt>
+ <elt ix="16">84</elt>
+</array>
+, NULL) Returning MyArray
+
+Journal Entry = jeQuery(Query)
+Timestamp = 2021/12/07 11:03:25.1680
+Session ID = 1
+Transaction ID = 10
+Query = Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(2, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
+0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
+01000000010000001A01050001000000DA000000
+</blob>
+, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o''er my ear like the sweet south,
+That breathes upon a bank of violets,
+Stealing and giving odour! Enough; no more:
+''Tis not so sweet now as it was before.
+O spirit of love! how quick and fresh art thou,
+That, notwithstanding thy capacity	10
+Receiveth as the sea, nought enters there,
+Of what validity and pitch soe''er,
+But falls into abatement and low price,
+Even in a minute: so full of shapes is fancy
+That it alone is high fantastical.
+
+Si la musique est la nourriture de l''amour, continuez à jouer;
+Donnez-m''en un excès, que, surexcité,
+L''appétit peut devenir malade et ainsi mourir.
+Cette souche encore! il a eu une chute mourante:
+Oh, ça m''est venu à l''oreille comme le doux sud,
+Qui souffle sur une banque de violettes,
+Voler et donner de l''odeur! Assez; Pas plus:
+«Ce n''est pas si doux maintenant qu''avant.
+O esprit d''amour! comme tu es rapide et fraîche,
+Que, malgré ta capacité 10
+Reçoit comme la mer, rien n''y entre,
+De quelle validité et de quelle hauteur soe''er,
+Mais tombe dans l''abattement et le prix bas,
+Même en une minute: si plein de formes est fantaisie
+Que cela seul est fantastique.
+
+
+', <array dim = "1" sqltype = "496" length = "4" relation_name = "IBXTEST" column_name = "MYARRAY" scale = "0" bounds="0:16">
+ <elt ix="0">100</elt>
+ <elt ix="1">99</elt>
+ <elt ix="2">98</elt>
+ <elt ix="3">97</elt>
+ <elt ix="4">96</elt>
+ <elt ix="5">95</elt>
+ <elt ix="6">94</elt>
+ <elt ix="7">93</elt>
+ <elt ix="8">92</elt>
+ <elt ix="9">91</elt>
+ <elt ix="10">90</elt>
+ <elt ix="11">89</elt>
+ <elt ix="12">88</elt>
+ <elt ix="13">87</elt>
+ <elt ix="14">86</elt>
+ <elt ix="15">85</elt>
+ <elt ix="16">84</elt>
+</array>
+, NULL) Returning MyArray
+
+Journal Entry = jeQuery(Query)
+Timestamp = 2021/12/07 11:03:25.1990
+Session ID = 1
+Transaction ID = 10
+Query = Update IBXTEST A Set   A.F1 = 2,  A.F2 = 0.314,  A.F3 = 0.31412345678,  A.F4 = 101.314,  A.F5 = 101.99,  A.F6 = '25/12/2007 12:30:15.0000',  A.F7 = '25/12/2007 12:30:29.1300',  A.F8 = 'XX',  A.F9 = 'The Quick Brown Fox jumps over the lazy dog',  A.F10 = NULL,  A.F11 = 9223372036854775807,  A.f12 = 65566,  A.F13 = '26/12/2007 12:30:45.0000',  A.F14 = NULL,  A.MyArray = <array dim = "1" sqltype = "496" length = "4" relation_name = "IBXTEST" column_name = "MYARRAY" scale = "0" bounds="0:16">
+ <elt ix="0">100</elt>
+ <elt ix="1">99</elt>
+ <elt ix="2">98</elt>
+ <elt ix="3">97</elt>
+ <elt ix="4">96</elt>
+ <elt ix="5">95</elt>
+ <elt ix="6">94</elt>
+ <elt ix="7">93</elt>
+ <elt ix="8">92</elt>
+ <elt ix="9">91</elt>
+ <elt ix="10">90</elt>
+ <elt ix="11">89</elt>
+ <elt ix="12">88</elt>
+ <elt ix="13">87</elt>
+ <elt ix="14">86</elt>
+ <elt ix="15">85</elt>
+ <elt ix="16">84</elt>
+</array>
+,   A.My Field  = 'My Field',  A.MY Field = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray
+
+Journal Entry = jeTransCommit(Commit)
+Timestamp = 2021/12/07 11:03:25.3020
+Session ID = 1
+Transaction ID = 10
+
+Journal Entry = jeTransStart(Transaction Start)
+Timestamp = 2021/12/07 11:03:25.3280
+Session ID = 1
+Transaction ID = 12
+Transaction Name = "{DA7F1B4D-F444-4B74-9A76-CA37E24363F4}"
+TPB: Item Count = 3
+  isc_tpb_concurrency
+  isc_tpb_wait
+  isc_tpb_write
+
+Default Completion = TACommit
+
+Journal Entry = jeQuery(Query)
+Timestamp = 2021/12/07 11:03:25.5960
+Session ID = 1
+Transaction ID = 12
+Query = Delete From IBXTEST A Where A.TABLEKEY = 1
+
+Journal Entry = jeTransRollbackRet(Rollback Retaining)
+Timestamp = 2021/12/07 11:03:25.7980
+Session ID = 1
+Transaction ID = 14
+Old TransactionID = 12
+
+Journal Entry = jeQuery(Query)
+Timestamp = 2021/12/07 11:03:26.0330
+Session ID = 1
+Transaction ID = 14
+Query = Delete From IBXTEST A Where A.TABLEKEY = 1
+
+Journal Entry = jeTransRollback(Rollback)
+Timestamp = 2021/12/07 11:03:26.2140
+Session ID = 1
+Transaction ID = 14
+
+Journal Entry = jeTransStart(Transaction Start)
+Timestamp = 2021/12/07 11:03:26.2450
+Session ID = 1
+Transaction ID = 15
+Transaction Name = "{DA7F1B4D-F444-4B74-9A76-CA37E24363F4}"
+TPB: Item Count = 3
+  isc_tpb_concurrency
+  isc_tpb_wait
+  isc_tpb_write
+
+Default Completion = TACommit
+
+Journal Entry = jeQuery(Query)
+Timestamp = 2021/12/07 11:03:26.5300
+Session ID = 1
+Transaction ID = 15
+Query = Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(3, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
+0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
+01000000010000001A01050001000000DA000000
+</blob>
+, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+Give me excess of it, that, surfeiting,
+The appetite may sicken, and so die.
+That strain again! it had a dying fall:
+O, it came o''er my ear like the sweet south,
+That breathes upon a bank of violets,
+Stealing and giving odour! Enough; no more:
+''Tis not so sweet now as it was before.
+O spirit of love! how quick and fresh art thou,
+That, notwithstanding thy capacity	10
+Receiveth as the sea, nought enters there,
+Of what validity and pitch soe''er,
+But falls into abatement and low price,
+Even in a minute: so full of shapes is fancy
+That it alone is high fantastical.
+
+Si la musique est la nourriture de l''amour, continuez à jouer;
+Donnez-m''en un excès, que, surexcité,
+L''appétit peut devenir malade et ainsi mourir.
+Cette souche encore! il a eu une chute mourante:
+Oh, ça m''est venu à l''oreille comme le doux sud,
+Qui souffle sur une banque de violettes,
+Voler et donner de l''odeur! Assez; Pas plus:
+«Ce n''est pas si doux maintenant qu''avant.
+O esprit d''amour! comme tu es rapide et fraîche,
+Que, malgré ta capacité 10
+Reçoit comme la mer, rien n''y entre,
+De quelle validité et de quelle hauteur soe''er,
+Mais tombe dans l''abattement et le prix bas,
+Même en une minute: si plein de formes est fantaisie
+Que cela seul est fantastique.
+
+
+', <array dim = "1" sqltype = "496" length = "4" relation_name = "IBXTEST" column_name = "MYARRAY" scale = "0" bounds="0:16">
+ <elt ix="0">100</elt>
+ <elt ix="1">99</elt>
+ <elt ix="2">98</elt>
+ <elt ix="3">97</elt>
+ <elt ix="4">96</elt>
+ <elt ix="5">95</elt>
+ <elt ix="6">94</elt>
+ <elt ix="7">93</elt>
+ <elt ix="8">92</elt>
+ <elt ix="9">91</elt>
+ <elt ix="10">90</elt>
+ <elt ix="11">89</elt>
+ <elt ix="12">88</elt>
+ <elt ix="13">87</elt>
+ <elt ix="14">86</elt>
+ <elt ix="15">85</elt>
+ <elt ix="16">84</elt>
+</array>
+, NULL) Returning MyArray
+
+Journal Entry = jeTransCommitRet(Commit Retaining)
+Timestamp = 2021/12/07 11:03:26.6140
+Session ID = 1
+Transaction ID = 17
+Old TransactionID = 15
+
+Journal Entry = jeTransCommit(Commit)
+Timestamp = 2021/12/07 11:03:26.9970
+Session ID = 1
+Transaction ID = 17
+
+Journal Entry = jeTransStart(Transaction Start)
+Timestamp = 2021/12/07 11:03:27.0120
+Session ID = 1
+Transaction ID = 18
+Transaction Name = "{DA7F1B4D-F444-4B74-9A76-CA37E24363F4}"
+TPB: Item Count = 3
+  isc_tpb_concurrency
+  isc_tpb_wait
+  isc_tpb_write
+
+Default Completion = TACommit
+
+Journal Entry = jeTransRollback(Rollback)
+Timestamp = 2021/12/07 11:03:27.4600
+Session ID = 1
+Transaction ID = 18
 
 
 

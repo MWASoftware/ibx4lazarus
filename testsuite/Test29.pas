@@ -41,7 +41,7 @@ uses
 
 const
   aTestID    = '29';
-  aTestTitle = 'Test 29';
+  aTestTitle = 'IBJournal Tests';
 
 type
 
@@ -218,16 +218,6 @@ begin
     FDataSet.FieldByName('MYField1').AsString := 'My Field';
     FDataSet.FieldByName('MYFIELD2').AsString := 'MY Field';
     FDataSet.Post;
-{    PrintTPB(IBTransaction.TransactionIntf.getTPB);
-    WriteTRInfo(IBTransaction.TransactionIntf.GetTrInformation([isc_info_tra_id,
-                                                            isc_info_tra_oldest_interesting,
-                                                            isc_info_tra_oldest_active,
-                                                            isc_info_tra_oldest_snapshot,
-                                                            fb_info_tra_snapshot_number,
-                                                            isc_info_tra_lock_timeout,
-                                                            fb_info_tra_dbpath,
-                                                            isc_info_tra_access,
-                                                            isc_info_tra_isolation]));}
     IBTransaction.Commit;
 
     IBTransaction.Active := true;
