@@ -22,6 +22,12 @@ IBX Change Log  version (2.5-0 Build 12949) Tue, 07 Dec 2021 11:24:05 +0000
 
 6. TIBDatabase.InternalTransaction is now a read only transaction.
 
+7. Bug fix: blob id no longer set to null on update when blob has not been
+   retrieved.
+
+8. Row auto refreshed on update/insert if blob or array field updated and field
+   not in a returning clause.
+
 IBX Change Log  version (2.5-0 Build 12933) Mon, 29 Nov 2021 14:59:54 +0000
 
 1. IBCustomDataset: Modify TISQL component now defaults to GoToFirstRecordOnExecute := true.

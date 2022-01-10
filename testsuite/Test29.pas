@@ -128,7 +128,7 @@ begin
     Database := IBDatabase;
     Transaction := IBTransaction;
     SelectSQL.Text := 'Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6,'+
-      ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.'+
+      ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.F15, A.MyArray, A.'+
       'GRANTS, A."My Field" as MYFIELD1, A."MY Field" as MYFIELD2 From IBXTEST A';
     InsertSQL.Text :=
       'Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray, '+
@@ -159,7 +159,7 @@ begin
         '  A."My Field"  = :MYFIELD1,'+
         '  A."MY Field" = :MYFIELD2,'+
         '  A.GRANTS = :GRANTS '+
-        'Where A.TABLEKEY = :OLD_TABLEKEY RETURNING A.MyArray';
+        'Where A.TABLEKEY = :OLD_TABLEKEY RETURNING A.MyArray, A.F15';
     DeleteSQL.Text :=
       'Delete From IBXTEST A '+
       'Where A.TABLEKEY = :OLD_TABLEKEY';
