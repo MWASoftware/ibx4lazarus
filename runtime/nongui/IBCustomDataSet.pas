@@ -2888,14 +2888,14 @@ begin
           pbd^[j].BlobID;
         PRecordData(Buff)^.rdFields[k].fdIsNull := pbd^[j].Size = 0;
       end
-      else
+ {     else
       begin
         PRecordData(Buff)^.rdFields[k].fdIsNull := true;
         with PISC_QUAD(PChar(Buff) + FFieldColumns^[k].fdDataOfs)^ do
         begin
           gds_quad_high := 0;
           gds_quad_low := 0;
-        end;
+        end};
       end;
       Inc(j);
     end
