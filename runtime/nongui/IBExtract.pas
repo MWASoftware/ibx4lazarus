@@ -1613,8 +1613,8 @@ procedure TIBExtract.ListProcs(ProcDDLType: TProcDDLType;
   ProcedureName: String; IncludeGrants: boolean);
 const
   CreateProcedureStr1 = 'CREATE PROCEDURE %s';
-  CreateProcedureStr2 = 'BEGIN EXIT; END';
-  CreateProcedureStr3 = 'BEGIN SUSPEND; EXIT; END';
+  CreateProcedureStr2 = 'AS BEGIN EXIT; END';
+  CreateProcedureStr3 = 'AS BEGIN SUSPEND; EXIT; END';
   ProcedureSQL =  {Order procedures by dependency order and then procedure name}
                   'with recursive Procs as ( ' +
                   'Select RDB$PROCEDURE_NAME, 1 as ProcLevel from RDB$PROCEDURES ' +
@@ -1729,8 +1729,15 @@ begin
 
         GetProcedureArgs(ProcName);
 
+        if qryProcedures.HasField('RDB$ENGINE_NAME') and
+            not qryProcedures.FieldByName('RDB$ENGINE_NAME').IsNull then
+          ExtractOut('EXTERNAL NAME ''' +
+            qryProcedures.FieldByName('RDB$ENTRYPOINT').AsString +
+            ''' ENGINE ' + qryProcedures.FieldByName('RDB$ENGINE_NAME').AsString + ProcTerm)
+        else
         if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
         begin
+          ExtractOut('AS');
           SList.Text := qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
           ExtractOut(SList);
         end
@@ -1756,8 +1763,15 @@ begin
          ExtractOut(Format('ALTER PROCEDURE %s', [QuoteIdentifier( ProcName)]));
          GetProcedureArgs(ProcName);
 
+         if qryProcedures.HasField('RDB$ENGINE_NAME') and
+             not qryProcedures.FieldByName('RDB$ENGINE_NAME').IsNull then
+           ExtractOut('EXTERNAL NAME ''' +
+             qryProcedures.FieldByName('RDB$ENTRYPOINT').AsString +
+             ''' ENGINE ' + qryProcedures.FieldByName('RDB$ENGINE_NAME').AsString + ProcTerm)
+         else
          if not qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').IsNull then
          begin
+           ExtractOut('AS');
            SList.Text := qryProcedures.FieldByName('RDB$PROCEDURE_SOURCE').AsString;
            SList.Add(ProcTerm);
            ExtractOut(SList);
@@ -1878,7 +1892,6 @@ const
 var
   Header : Boolean;
   TriggerName, RelationName, InActive: String;
-  TriggerHeader: string;
   qryTriggers : TIBSQL;
   qryTriggerSec: TIBSQL;
   SList : TStrings;
@@ -1961,6 +1974,12 @@ begin
             SList.Add(AddSQLSecurity(qryTriggerSec.FieldByName('RDB$SQL_SECURITY')));
         end;
 
+        if qryTriggers.HasField('RDB$ENGINE_NAME') and
+            not qryTriggers.FieldByName('RDB$ENGINE_NAME').IsNull then
+          SList.Add('EXTERNAL NAME ''' +
+            qryTriggers.FieldByName('RDB$ENTRYPOINT').AsString +
+            ''' ENGINE ' + qryTriggers.FieldByName('RDB$ENGINE_NAME').AsString)
+        else
         if not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
           SList.Add(qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString)
         else
@@ -3042,6 +3061,12 @@ begin
            else
              ExtractOut(Format('CREATE FUNCTION %s',[TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString)]));
            ExtractOut(ReturnBuffer);
+           if qryFunctions.HasField('RDB$ENGINE_NAME') and
+               not qryFunctions.FieldByName('RDB$ENGINE_NAME').IsNull then
+             ExtractOut('EXTERNAL NAME ''' +
+               qryFunctions.FieldByName('RDB$ENTRYPOINT').AsString +
+               ''' ENGINE ' + qryFunctions.FieldByName('RDB$ENGINE_NAME').AsString + ProcTerm)
+           else
            if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
              ExtractOut('AS' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
            else
@@ -3062,6 +3087,12 @@ begin
              ExtractOut(Format('ALTER FUNCTION %s',
                [TrimRight(qryFunctions.FieldByName('RDB$FUNCTION_NAME').AsString)]));
            ExtractOut(ReturnBuffer);
+           if qryFunctions.HasField('RDB$ENGINE_NAME') and
+               not qryFunctions.FieldByName('RDB$ENGINE_NAME').IsNull then
+             ExtractOut('EXTERNAL NAME ''' +
+               qryFunctions.FieldByName('RDB$ENTRYPOINT').AsString +
+               ''' ENGINE ' + qryFunctions.FieldByName('RDB$ENGINE_NAME').AsString + ProcTerm)
+           else
            if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
              ExtractOut('AS' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
            else
@@ -4161,7 +4192,6 @@ begin
       ExtractOut( ')');
     end;
 
-    ExtractOut('AS');
   finally
     qryHeader.Free;
   end;
