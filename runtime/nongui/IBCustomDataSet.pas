@@ -532,6 +532,7 @@ type
     FInsertCount: integer;
     FUpdateCount: integer;
     FDeleteCount: integer;
+    FComputedFieldNames: TStringList;
     procedure ColumnDataToBuffer(QryResults: IResults; ColumnIndex,
       FieldIndex: integer; Buffer: PChar);
     procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
@@ -1892,6 +1893,9 @@ begin
   FDefaultTZDate := EncodeDate(2020,1,1);
   FSQLFilterParams := TStringList.Create;
   TStringList(FSQLFilterParams).OnChange :=  HandleSQLFilterParamsChanged;
+  FComputedFieldNames := TStringList.Create;
+  FComputedFieldNames.Duplicates := dupError;
+  FComputedFieldNames.CaseSensitive := true;
 end;
 
 destructor TIBCustomDataSet.Destroy;
@@ -1915,6 +1919,7 @@ begin
   if assigned(FBaseSQLSelect) then FBaseSQLSelect.Free;
   if assigned(FParser) then FParser.Free;
   if assigned(FSQLFilterParams) then FSQLFilterParams.Free;
+  if assigned(FComputedFieldNames) then FComputedFieldNames.Free;
   inherited Destroy;
 end;
 
@@ -2444,7 +2449,7 @@ begin
         fdDataSize := colMetadata.GetSize;
         fdDataLength := 0;
         fdCodePage := CP_NONE;
-        fdIsComputed := colMetadata.getIsComputedValue;
+        fdIsComputed := FComputedFieldNames.IndexOf(colMetadata.GetAliasName) <> -1;
 
         case fdDataType of
         SQL_TIMESTAMP,
@@ -4661,6 +4666,7 @@ begin
               begin
                 Attributes := [faReadOnly];
                 InternalCalcField := True;
+                FComputedFieldNames.Add(DBAliasName);
               end
               else
               begin
@@ -5200,6 +5206,7 @@ begin
     FieldDefs.Updated := false;
     FInternalPrepared := False;
     Setlength(FAliasNameList,0);
+    FComputedFieldNames.Clear;
   end;
 end;
 
