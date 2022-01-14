@@ -125,19 +125,20 @@ begin
   FDataSet := TIBDataSet.Create(Application);
   with FDataSet do
   begin
+    Name := 'Dataset' + GetTestID;
     Database := IBDatabase;
     Transaction := IBTransaction;
     SelectSQL.Text := 'Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6,'+
-      ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.'+
+      ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.F15, A.MyArray, A.'+
       'GRANTS, A."My Field" as MYFIELD1, A."MY Field" as MYFIELD2 From IBXTEST A';
     InsertSQL.Text :=
       'Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray, '+
       ' GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,'+
-      ':F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS) Returning MyArray';
+      ':F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS) Returning MyArray, F15';
     RefreshSQL.Text :=
       'Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6,' +
       ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.'+
-      'GRANTS, A."My Field" as MYFIELD1, A."MY Field"  as MYFIELD2 From IBXTEST A '+
+      'GRANTS, A."My Field" as MYFIELD1, A."MY Field" as MYFIELD2 From IBXTEST A '+
       'Where A.TABLEKEY = :TABLEKEY';
     ModifySQL.Text :=
         'Update IBXTEST A Set ' +
@@ -159,7 +160,7 @@ begin
         '  A."My Field"  = :MYFIELD1,'+
         '  A."MY Field" = :MYFIELD2,'+
         '  A.GRANTS = :GRANTS '+
-        'Where A.TABLEKEY = :OLD_TABLEKEY RETURNING A.MyArray';
+        'Where A.TABLEKEY = :OLD_TABLEKEY RETURNING A.MyArray, A.F15';
     DeleteSQL.Text :=
       'Delete From IBXTEST A '+
       'Where A.TABLEKEY = :OLD_TABLEKEY';
@@ -207,6 +208,7 @@ begin
     FJournal.Enabled := true;
     IBTransaction.Active := true;
     FDataSet.Active := true;
+    ListFields(FDataset);
     writeln(OutFile,'Add a record');
     FDataSet.Append;
     FDataSet.Post;
@@ -215,8 +217,10 @@ begin
     FDataSet.Append;
     FDataSet.Post;
     FDataSet.Edit;
+    FDataSet.FieldByName('F1').AsInteger := 199;
     FDataSet.FieldByName('MYField1').AsString := 'My Field';
     FDataSet.FieldByName('MYFIELD2').AsString := 'MY Field';
+    PrintDataSetRow(FDataSet);
     FDataSet.Post;
     IBTransaction.Commit;
 
