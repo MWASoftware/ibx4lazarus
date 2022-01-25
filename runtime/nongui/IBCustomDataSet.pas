@@ -53,7 +53,7 @@ uses
 {$IFDEF UNIX}
   unix,
 {$ENDIF}
-  SysUtils, Classes, IBDatabase, IBExternals, IBInternals, IB,  IBSQL, Db,
+  SysUtils, Classes, IBDatabase, IBExternals, IBInternals, IB,  IBSQL, DB,
   IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo;
 
 type
@@ -427,6 +427,8 @@ type
         fdDataSize: Short;
         fdDataOfs: Integer;
         fdCodePage: TSystemCodePage;
+        fdIsComputed: boolean;
+        fdRefreshRequired: boolean;
       end;
 
       PFieldColumns = ^TFieldColumns;
@@ -441,7 +443,6 @@ type
 
     TRecordData = record
       rdBookmarkFlag: TBookmarkFlag;
-      rdFieldCount: Short;
       rdRecordNumber: Integer;
       rdCachedUpdateStatus: TCachedUpdateStatus;
       rdUpdateStatus: TUpdateStatus;
@@ -461,7 +462,6 @@ type
     FEnableStatistics: boolean;
     FGenerateParamNames: Boolean;
     FGeneratorField: TIBGenerator;
-    FNeedsRefresh: Boolean;
     FForcedRefresh: Boolean;
     FDidActivate: Boolean;
     FBase: TIBBase;
@@ -527,11 +527,12 @@ type
     FInTransactionEnd: boolean;
     FIBLinks: TList;
     FFieldColumns: PFieldColumns;
-    FBufferUpdatedOnQryReturn: boolean;
+    FColumnCount: integer;
     FSelectCount: integer;
     FInsertCount: integer;
     FUpdateCount: integer;
     FDeleteCount: integer;
+    FComputedFieldNames: TStringList;
     procedure ColumnDataToBuffer(QryResults: IResults; ColumnIndex,
       FieldIndex: integer; Buffer: PChar);
     procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
@@ -1892,6 +1893,9 @@ begin
   FDefaultTZDate := EncodeDate(2020,1,1);
   FSQLFilterParams := TStringList.Create;
   TStringList(FSQLFilterParams).OnChange :=  HandleSQLFilterParamsChanged;
+  FComputedFieldNames := TStringList.Create;
+  FComputedFieldNames.Duplicates := dupError;
+  FComputedFieldNames.CaseSensitive := true;
 end;
 
 destructor TIBCustomDataSet.Destroy;
@@ -1915,6 +1919,7 @@ begin
   if assigned(FBaseSQLSelect) then FBaseSQLSelect.Free;
   if assigned(FParser) then FParser.Free;
   if assigned(FSQLFilterParams) then FSQLFilterParams.Free;
+  if assigned(FComputedFieldNames) then FComputedFieldNames.Free;
   inherited Destroy;
 end;
 
@@ -2407,7 +2412,6 @@ begin
   p := PRecordData(Buffer);
   { Get record information }
   p^.rdBookmarkFlag := bfCurrent;
-  p^.rdFieldCount := Qry.FieldCount;
   p^.rdRecordNumber := -1;
   p^.rdUpdateStatus := usUnmodified;
   p^.rdCachedUpdateStatus := cusUnmodified;
@@ -2445,6 +2449,7 @@ begin
         fdDataSize := colMetadata.GetSize;
         fdDataLength := 0;
         fdCodePage := CP_NONE;
+        fdIsComputed := FComputedFieldNames.IndexOf(colMetadata.GetAliasName) <> -1;
 
         case fdDataType of
         SQL_TIMESTAMP,
@@ -2502,14 +2507,24 @@ end;
 procedure TIBCustomDataSet.UpdateRecordFromQuery(QryResults: IResults;
   Buffer: PChar);
 var i, j: integer;
+    pda: PArrayDataArray;
+    pbd: PBlobDataArray;
 begin
+  { Make sure blob cache is empty }
+  pbd := PBlobDataArray(Buffer + FBlobCacheOffset);
+  pda := PArrayDataArray(Buffer + FArrayCacheOffset);
+  for i := 0 to BlobFieldCount - 1 do
+    pbd^[i] := nil;
+  for i := 0 to ArrayFieldCount - 1 do
+    pda^[i] := nil;
+
   for i := 0 to QryResults.Count - 1 do
   begin
     j := GetFieldPosition(QryResults[i].GetAliasName);
     if j > 0 then
     begin
+       FFieldColumns^[j].fdRefreshRequired := false; {no need as updated by "returning"}
       ColumnDataToBuffer(QryResults,i,j,Buffer);
-      FBufferUpdatedOnQryReturn := true;
     end;
   end;
 end;
@@ -2529,6 +2544,7 @@ begin
   begin
     QryResults.GetData(ColumnIndex,fdIsNull,fdDataLength,LocalData);
     BufPtr := PByte(Buffer + fdDataOfs);
+//    with QryResults[ColumnIndex] do writeln(GetName,' = ',ColumnIndex,',',FieldIndex,',',fdIsNull);
     if not fdIsNull then
     begin
       ColData := QryResults[ColumnIndex];
@@ -2634,7 +2650,6 @@ begin
 
   { Get record information }
   p^.rdBookmarkFlag := bfCurrent;
-  p^.rdFieldCount := Qry.FieldCount;
   p^.rdRecordNumber := RecordNumber;
   p^.rdUpdateStatus := usUnmodified;
   p^.rdCachedUpdateStatus := cusUnmodified;
@@ -2858,6 +2873,24 @@ begin
 end;
 
 procedure TIBCustomDataSet.InternalPostRecord(Qry: TIBSQL; Buff: Pointer);
+
+  function NeedRefresh: boolean;
+  var i: integer;
+  begin
+    Result := true;
+    for i := 1 to FColumnCount do
+      if FFieldColumns^[i].fdRefreshRequired then Exit;
+    Result := false;
+  end;
+
+ { procedure ShowRefreshState;
+  var i: integer;
+  begin
+    writeln('Refresh Required Flags');
+    for i := 1 to FColumnCount do
+      writeln(FAliasNameList[i-1],' = ', FFieldColumns^[i].fdRefreshRequired);
+  end; }
+
 var
   i, j, k, arr: Integer;
   pbd: PBlobDataArray;
@@ -2865,8 +2898,13 @@ var
 begin
   pbd := PBlobDataArray(PChar(Buff) + FBlobCacheOffset);
   pda := PArrayDataArray(PChar(Buff) + FArrayCacheOffset);
+  for i := 1 to FColumnCount do
+    with FFieldColumns^[i] do
+      fdRefreshRequired := fdIsComputed; {by default only computed columns need a refresh}
+
   j := 0; arr := 0;
   for i := 0 to FieldCount - 1 do
+  begin
     if Fields[i].IsBlob then
     begin
       k := FMappedFieldPosition[Fields[i].FieldNo -1];
@@ -2877,15 +2915,7 @@ begin
           PChar(Buff) + FFieldColumns^[k].fdDataOfs)^ :=
           pbd^[j].BlobID;
         PRecordData(Buff)^.rdFields[k].fdIsNull := pbd^[j].Size = 0;
-      end
-      else
-      begin
-        PRecordData(Buff)^.rdFields[k].fdIsNull := true;
-        with PISC_QUAD(PChar(Buff) + FFieldColumns^[k].fdDataOfs)^ do
-        begin
-          gds_quad_high := 0;
-          gds_quad_low := 0;
-        end;
+        FFieldColumns^[k].fdRefreshRequired := true; {need refresh if a blob}
       end;
       Inc(j);
     end
@@ -2898,10 +2928,11 @@ begin
         PISC_QUAD(
           PChar(Buff) + FFieldColumns^[k].fdDataOfs)^ :=  pda^[arr].ArrayIntf.GetArrayID;
         PRecordData(Buff)^.rdFields[k].fdIsNull := pda^[arr].ArrayIntf.IsEmpty;
+        FFieldColumns^[k].fdRefreshRequired := true; {need refresh is an array}
       end;
       Inc(arr);
     end;
-  FBufferUpdatedOnQryReturn := false;
+  end;
   if Assigned(FUpdateObject) then
   begin
     if (Qry = FQDelete) then
@@ -2916,14 +2947,16 @@ begin
     SetInternalSQLParams(Qry.Params, Buff);
     Qry.ExecQuery;
     Qry.Statement.GetRowsAffected(FSelectCount, FInsertCount, FUpdateCount, FDeleteCount);
+//    write('before ');ShowRefreshState;
     if Qry.FieldCount > 0 then {Has RETURNING Clause}
       UpdateRecordFromQuery(Qry.Current,Buff);
+//    write('after ');ShowRefreshState;
   end;
   PRecordData(Buff)^.rdUpdateStatus := usUnmodified;
   PRecordData(Buff)^.rdCachedUpdateStatus := cusUnmodified;
   SetModified(False);
   WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Buff);
-  if (FForcedRefresh or (FNeedsRefresh and not FBufferUpdatedOnQryReturn)) and CanRefresh then
+  if (FForcedRefresh or NeedRefresh) and CanRefresh then
     InternalRefreshRow;
 end;
 
@@ -3194,12 +3227,13 @@ end;
 
 procedure TIBCustomDataSet.SetInternalSQLParams(Params: ISQLParams; Buffer: Pointer);
 var
-  i, j: Integer;
+  i, j, arr: Integer;
   cr, data: PByte;
   fn: string;
   st: RawByteString;
   OldBuffer: Pointer;
   Param: ISQLParam;
+  pda: PArrayDataArray;
 begin
   if (Buffer = nil) then
     IBError(ibxeBufferNotSet, [nil]);
@@ -3207,6 +3241,8 @@ begin
     InternalPrepare;
   OldBuffer := nil;
   try
+    pda := PArrayDataArray(PChar(Buffer) + FArrayCacheOffset);
+    arr := 0;
     for i := 0 to Params.GetCount - 1 do
     begin
       Param := Params[i];
@@ -3271,8 +3307,16 @@ begin
               else
                 Param.AsDouble := PDouble(data)^;
             end;
-            SQL_BLOB, SQL_ARRAY, SQL_QUAD:
+            SQL_BLOB, SQL_QUAD:
               Param.AsQuad := PISC_QUAD(data)^;
+            SQL_ARRAY:
+              begin
+                if pda[arr] = nil then
+                  Param.AsQuad := PISC_QUAD(data)^
+                else
+                  Param.AsArray := pda[arr].ArrayIntf;
+                Inc(arr);
+              end;
             SQL_TYPE_DATE,
             SQL_TYPE_TIME,
             SQL_TIMESTAMP:
@@ -3728,7 +3772,7 @@ begin
     AdjustRecordOnInsert(Buff);
     MappedFieldPos := FMappedFieldPosition[Field.FieldNo - 1];
     if (MappedFieldPos > 0) and
-       (MappedFieldPos <= rdFieldCount) then
+       (MappedFieldPos <= FColumnCount) then
     begin
       rdFields[MappedFieldPos].fdIsNull := AnArray = nil;
       pda := PArrayDataArray(Buff + FArrayCacheOffset);
@@ -3971,7 +4015,7 @@ begin
   end
   else
   if (FMappedFieldPosition[Field.FieldNo - 1] > 0) and
-     (FMappedFieldPosition[Field.FieldNo - 1] <= CurrentRecord^.rdFieldCount) then
+     (FMappedFieldPosition[Field.FieldNo - 1] <= FColumnCount) then
   with CurrentRecord^.rdFields[FMappedFieldPosition[Field.FieldNo - 1]],
                          FFieldColumns^[FMappedFieldPosition[Field.FieldNo - 1]] do
   begin
@@ -4427,7 +4471,6 @@ var
 
 begin
   FRelationNodes := TRelationNode.Create;
-  FNeedsRefresh := False;
   if not Database.InternalTransaction.InTransaction then
     Database.InternalTransaction.StartTransaction;
   Query := TIBSQL.Create(self);
@@ -4623,7 +4666,7 @@ begin
               begin
                 Attributes := [faReadOnly];
                 InternalCalcField := True;
-                FNeedsRefresh := True;
+                FComputedFieldNames.Add(DBAliasName);
               end
               else
               begin
@@ -4633,7 +4676,6 @@ begin
                     Attributes := [faRequired];
                 end
                 else
-                  FNeedsRefresh := True;
               end;
             end;
           end;
@@ -4829,6 +4871,7 @@ begin
       FRecordSize := RecordDataLength(FQSelect.FieldCount);
       {Step 2, 3}
       GetMem(FFieldColumns,sizeof(TFieldColumns) * (FQSelect.FieldCount));
+      FColumnCount := FQSelect.FieldCount;
       IBAlloc(FModelBuffer, 0, FRecordSize);
       InitModelBuffer(FQSelect, FModelBuffer);
       {Step 4}
@@ -5040,7 +5083,7 @@ begin
       AdjustRecordOnInsert(Buff);
       MappedFieldPos := FMappedFieldPosition[Field.FieldNo - 1];
       if (MappedFieldPos > 0) and
-         (MappedFieldPos <= rdFieldCount) then
+         (MappedFieldPos <= FColumnCount) then
       with rdFields[MappedFieldPos], FFieldColumns^[MappedFieldPos] do
       begin
         Field.Validate(Buffer);
@@ -5163,6 +5206,7 @@ begin
     FieldDefs.Updated := false;
     FInternalPrepared := False;
     Setlength(FAliasNameList,0);
+    FComputedFieldNames.Clear;
   end;
 end;
 

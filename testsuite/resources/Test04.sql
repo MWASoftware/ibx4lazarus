@@ -14,6 +14,7 @@ Create Table IBXTest (
  "f12" Integer,
  F13 Time,
  F14 Blob sub_type text,
+ F15 Double Precision Computed by (F2 + F3),
  MyArray Integer [0:16],
  "GRANTS" VarChar(20),
  "My Field" VarChar(32),

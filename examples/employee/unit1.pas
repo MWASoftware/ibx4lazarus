@@ -373,8 +373,16 @@ end;
 procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   FClosing := true;
-  if IBTransaction1.InTransaction then
-    IBTransaction1.Commit;
+  try
+    if IBTransaction1.InTransaction then
+      IBTransaction1.Commit;
+
+  except on E: Exception do
+    begin
+      MessageDlg(E.Message,mtError,[mbOK],0);
+      IBDatabase1.ForceClose;
+    end;
+  end;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);

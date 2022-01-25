@@ -60,7 +60,7 @@ type
 
 implementation
 
-uses variants, FmtBCD, DateUtils;
+uses variants, FmtBCD, DateUtils, FBNumeric;
 
 type
 
@@ -92,6 +92,10 @@ type
     function ByName(Idx: AnsiString): ISQLParam ;
     function GetModified: Boolean;
     function GetHasCaseSensitiveParams: Boolean;
+    function GetStatement: IStatement;
+    function GetTransaction: ITransaction;
+    function GetAttachment: IAttachment;
+    procedure Clear;
   end;
 
   { TParamIntf }
@@ -137,8 +141,10 @@ type
     function GetAsBlob: IBlob;
     function GetAsArray: IArray;
     function GetAsBCD: tBCD;
+    function GetAsNumeric: IFBNumeric;
     function GetStatement: IStatement;
     function GetTransaction: ITransaction;
+    function GetAttachment: IAttachment;
     procedure Clear;
     function GetModified: boolean;
     procedure SetAsBoolean(AValue: boolean);
@@ -167,6 +173,7 @@ type
     procedure SetAsQuad(aValue: TISC_QUAD);
     procedure SetCharSetID(aValue: cardinal);
     procedure SetAsBcd(aValue: tBCD);
+    procedure SetAsNumeric(Value: IFBNumeric);
   end;
 
 { TParamIntf }
@@ -462,12 +469,22 @@ begin
   Result := VarToBCD(FOwner.FParams[FIndex].Value);
 end;
 
+function TParamIntf.GetAsNumeric: IFBNumeric;
+begin
+  IBError(ibxeNotSupported,[]);
+end;
+
 function TParamIntf.GetStatement: IStatement;
 begin
   IBError(ibxeNotSupported,[]);
 end;
 
 function TParamIntf.GetTransaction: ITransaction;
+begin
+  IBError(ibxeNotSupported,[]);
+end;
+
+function TParamIntf.GetAttachment: IAttachment;
 begin
   IBError(ibxeNotSupported,[]);
 end;
@@ -638,6 +655,11 @@ begin
   FOwner.SetParam(FIndex,VarFmtBCDCreate(AValue));
 end;
 
+procedure TParamIntf.SetAsNumeric(Value: IFBNumeric);
+begin
+  IBError(ibxeNotSupported,[]);
+end;
+
 { TParamListIntf }
 
 procedure TParamListIntf.SetParam(index: integer; aValue: variant);
@@ -717,6 +739,28 @@ end;
 function TParamListIntf.GetHasCaseSensitiveParams: Boolean;
 begin
   Result := false;
+end;
+
+function TParamListIntf.GetStatement: IStatement;
+begin
+  IBError(ibxeNotSupported,[]);
+end;
+
+function TParamListIntf.GetTransaction: ITransaction;
+begin
+  IBError(ibxeNotSupported,[]);
+end;
+
+function TParamListIntf.GetAttachment: IAttachment;
+begin
+  Result := Database.Attachment;
+end;
+
+procedure TParamListIntf.Clear;
+var i: integer;
+begin
+  for i := 0 to getCount - 1 do
+    getSQLParam(i).Clear;
 end;
 
 { TIBUpdate }

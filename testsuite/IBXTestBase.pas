@@ -59,6 +59,7 @@ protected
   function GetOutFile: string;
   function GetSSBackupFile: string;
   procedure InitialiseDatabase(aDatabase: TIBDatabase); virtual;
+  procedure ListFields(aDataset: TDataSet);
   procedure PrintDataSet(aDataSet: TDataSet);
   procedure PrintDataSetRow(aDataSet: TDataSet); overload;
   procedure PrintDataSetRow(aField: TField); overload;
@@ -219,6 +220,15 @@ begin
     {$ENDIF}
     RunScript(aDatabase,aFileName);
   end;
+end;
+
+procedure TIBXTestBase.ListFields(aDataset: TDataSet);
+var i: integer;
+begin
+  writeln(OutFile,'Field Names for ',aDataSet.Name);
+  for i := 0 to aDataSet.Fields.Count - 1 do
+    writeln(OutFile,aDataSet.Fields[i].FieldName);
+  writeln(OutFile);
 end;
 
 procedure TIBXTestBase.PrintDataSet(aDataSet: TDataSet);

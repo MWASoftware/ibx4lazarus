@@ -750,6 +750,7 @@ begin
     if not (csDesigning in ComponentState) then
       MonitorHook.SQLExecute(Self);
   end;
+
   {$IFDEF IBXQUERYTIME}
   writeln('Executing ',FStatement.GetSQLText,
     ' Response time= ',Format('%f msecs',[TimeStampToMSecs(DateTimeToTimeStamp(Now)) - tmsecs]));
