@@ -89,6 +89,7 @@ type
     {ISQLParams}
     function getCount: integer;
     function getSQLParam(index: integer): ISQLParam;
+    function ParamExists(Idx: AnsiString): boolean;
     function ByName(Idx: AnsiString): ISQLParam ;
     function GetModified: Boolean;
     function GetHasCaseSensitiveParams: Boolean;
@@ -717,6 +718,11 @@ begin
   if (index < 0) or (index >= getCount) then
     IBError(ibxeInvalidColumnIndex,[nil]);
   Result := TParamIntf.Create(self,index);
+end;
+
+function TParamListIntf.ParamExists(Idx: AnsiString): boolean;
+begin
+  Result := ByName(Idx) <> nil;
 end;
 
 function TParamListIntf.ByName(Idx: AnsiString): ISQLParam;
