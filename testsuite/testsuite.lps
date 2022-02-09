@@ -1813,16 +1813,16 @@
           </local>
           <environment>
             <UserOverrides Count="2">
-              <Variable0 Name="FIREBIRD" Value="/opt/firebird4.0.1"/>
-              <Variable1 Name="LD_LIBRARY_PATH" Value="/opt/firebird4.0.1/lib"/>
+              <Variable0 Name="FIREBIRD" Value="/opt/firebird/4.0.1"/>
+              <Variable1 Name="LD_LIBRARY_PATH" Value="/opt/firebird/4.0.1/lib"/>
             </UserOverrides>
           </environment>
         </Mode0>
       </Modes>
     </RunParams>
     <HistoryLists Count="3">
-      <List0 Name="LaunchingApplication" Type="File" Count="1">
-        <Item1 Value="/usr/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      <List0 Name="LaunchingApplication" Type="File" Count="2">
+        <Item2 Value="/usr/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
       </List0>
       <List1 Name="CommandLineParameters" Count="10">
         <Item1 Value="-t 29"/>
@@ -1836,6 +1836,7 @@
         <Item9 Value="-t 21"/>
         <Item10 Value="-t 15"/>
       </List1>
+      <List2 Name="WorkingDirectory" Type="File" Count="1"/>
     </HistoryLists>
   </ProjectSession>
   <Debugging>
