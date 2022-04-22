@@ -60,8 +60,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="367"/>
-        <CursorPos Y="382"/>
+        <CursorPos X="25" Y="379"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -76,7 +77,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="29"/>
         <CursorPos X="40" Y="84"/>
-        <UsageCount Value="115"/>
+        <UsageCount Value="116"/>
       </Unit2>
       <Unit3>
         <Filename Value="../../runtime/IBDatabase.pas"/>
@@ -377,11 +378,10 @@
       </Unit44>
       <Unit45>
         <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="145"/>
-        <CursorPos X="15" Y="160"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2388"/>
+        <CursorPos X="3" Y="2388"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit45>
       <Unit46>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/objpas.inc"/>
@@ -650,12 +650,10 @@
       </Unit82>
       <Unit83>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="387"/>
         <CursorPos Y="403"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit83>
       <Unit84>
         <Filename Value="../../../fbintf/client/2.5/FB25Statement.pas"/>
@@ -777,14 +775,13 @@
       </Unit101>
       <Unit102>
         <Filename Value="../../../fbintf/client/FBTransaction.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="319"/>
         <CursorPos Y="334"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit102>
     </Units>
-    <JumpHistory Count="17" HistoryIndex="16">
+    <JumpHistory Count="10" HistoryIndex="9">
       <Position1>
         <Filename Value="unit1.pas"/>
         <Caret Line="25" Column="33" TopLine="15"/>
@@ -806,53 +803,25 @@
         <Caret Line="382" Column="44" TopLine="367"/>
       </Position5>
       <Position6>
-        <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
-        <Caret Line="403" TopLine="387"/>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="382" TopLine="367"/>
       </Position6>
       <Position7>
         <Filename Value="unit1.pas"/>
-        <Caret Line="382" TopLine="367"/>
+        <Caret Line="378" TopLine="367"/>
       </Position7>
       <Position8>
-        <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
-        <Caret Line="404" TopLine="387"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../../fbintf/client/FBTransaction.pas"/>
-        <Caret Line="334" TopLine="319"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1908" TopLine="1893"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1909" TopLine="1893"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1911" TopLine="1893"/>
-      </Position12>
-      <Position13>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="378" TopLine="367"/>
-      </Position13>
-      <Position14>
         <Filename Value="unit1.pas"/>
         <Caret Line="384" TopLine="367"/>
-      </Position14>
-      <Position15>
+      </Position8>
+      <Position9>
         <Filename Value="unit1.pas"/>
         <Caret Line="382" TopLine="367"/>
-      </Position15>
-      <Position16>
-        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1911" TopLine="1893"/>
-      </Position16>
-      <Position17>
+      </Position9>
+      <Position10>
         <Filename Value="unit1.pas"/>
         <Caret Line="382" TopLine="367"/>
-      </Position17>
+      </Position10>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
