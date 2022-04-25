@@ -557,7 +557,7 @@ begin
   EnsurePathExists(FJournalFilePath);
   F := TFileStream.Create(JournalFilePath,fmCreate);
   try
-    S := TJournalStream.Create(self,S);
+    S := TJournalStream.Create(self,F);
     try
      FSessionID := Database.Attachment.StartJournaling(S,Options);
     except
