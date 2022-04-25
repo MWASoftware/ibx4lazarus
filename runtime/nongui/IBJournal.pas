@@ -45,6 +45,7 @@ uses
 }
 
 type
+  TOnJournalEntry = procedure(Sender: TObject; aJnlEntry: PJnlEntry) of object;
   { TIBJournal }
 
   TIBJournal = class(TComponent)
@@ -57,6 +58,7 @@ type
     FEnabled: boolean;
     FJournalFileTemplate: string;
     FJournalFilePath: string;
+    FOnJournalEntry: TOnJournalEntry;
     FOptions: TJournalOptions;
     FRetainJournal: boolean;
     FVendorName: string;
@@ -71,6 +73,8 @@ type
     procedure HandleDatabaseDisconnect(Sender: TObject);
     procedure StartSession;
     procedure EndSession;
+    function HasJournalHandler: boolean;
+    procedure DoJournalHandler(aJnlEntry: PtrInt);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -104,6 +108,7 @@ type
       entries are retained. Otherwise, they are discarded. Note: always retained
       on a Force Disconnect or a lost connection}
     property RetainJournal: boolean read FRetainJournal write FRetainJournal;
+    property OnJournalEntry: TOnJournalEntry read FOnJournalEntry write FOnJournalEntry;
   end;
 
   { TJournalPlayer }
@@ -158,6 +163,120 @@ uses IBMessages {$IFDEF WINDOWS}, Windows ,Windirs {$ENDIF};
 
 const
   sqlFindTransaction = 'Select * From IBX$JOURNALS Where IBX$SessionID = ? and IBX$TransactionID = ?';
+
+type
+
+  { TJournalEntryParser }
+
+  TJournalEntryParser = class(TCustomJournalProcessor)
+  private
+    FJnlEntry: TJnlEntry;
+    FText: AnsiString;
+    FIndex: integer;
+  protected
+    procedure DoNextJournalEntry(JnlEntry: TJnlEntry);
+    function GetChar: AnsiChar; override;
+  public
+    function ParseJnlEntry(aText: AnsiString; var JnlEntry: TJnlEntry): boolean;
+  end;
+
+  {The TJournalStream is intended to be used to receive Journal entries from
+   an IAttachment interface. When called in a GUI application, the
+   TApplication.QueueAsyncCall method is used to process each entry in the context
+   of the main loop. Entries are also written through to the FOutStream, if present.}
+
+  { TJournalStream }
+
+  TJournalStream = class(TStream)
+  private
+    FParent: TIBJournal;
+    FOutStream: TStream;
+    FParser: TJournalEntryParser;
+  public
+    constructor Create(aParent: TIBJournal; OutStream: TStream);
+    destructor Destroy; override;
+    function Write(const Buffer; Count: Longint): Longint; override;
+  end;
+
+{ TJournalStream }
+
+function TJournalStream.Write(const Buffer; Count: Longint): Longint;
+var JnlEntry: PJnlEntry;
+    aText: AnsiString;
+begin
+  if not FParent.HasJournalHandler then
+  begin
+    if FOutStream <> nil then
+      Result := FOutStream.Write(Buffer,Count);
+  end
+  else
+  begin
+    SetLength(aText,Count);
+    Move(Buffer,aText[1],Count);
+    new(JnlEntry);
+    if FParser.ParseJnlEntry(aText,JnlEntry^) then
+    begin
+      if assigned(IBGUIInterface) then
+      begin
+        IBGUIInterface.QueueAsyncCall(@FParent.DoJournalHandler, PtrInt(JnlEntry));
+        Exit
+      end
+      else
+        FParent.DoJournalHandler(PtrInt(JnlEntry));
+    end
+    else
+      dispose(JnlEntry);
+    repeat
+      Dec(Count,FOutStream.Write(Buffer,Count));
+    until Count = 0;
+    Result := Count;
+  end;
+end;
+
+constructor TJournalStream.Create(aParent: TIBJournal; OutStream: TStream);
+begin
+  inherited Create;
+  FParent := aParent;
+  FOutStream := OutStream;
+  if aParent.Database = nil then
+    IBError(ibxeDatabaseNotAssigned,[nil]);
+  FParser := TJournalEntryParser.Create(aParent.Database.FirebirdAPI);
+end;
+
+destructor TJournalStream.Destroy;
+begin
+  if FOutStream <> nil then FOutStream.Free;
+  if FParser <> nil then FParser.Free;
+  inherited Destroy;
+end;
+
+{ TJournalEntryParser }
+
+procedure TJournalEntryParser.DoNextJournalEntry(JnlEntry: TJnlEntry);
+begin
+  FJnlEntry := JnlEntry;
+end;
+
+function TJournalEntryParser.GetChar: AnsiChar;
+begin
+  if FIndex > Length(FText) then
+    Result := #0
+  else
+  begin
+    Result := FText[FIndex];
+    Inc(FIndex);
+  end;
+end;
+
+function TJournalEntryParser.ParseJnlEntry(aText: AnsiString;
+  var JnlEntry: TJnlEntry): boolean;
+begin
+  FText := aText;
+  FIndex := 1;
+  DoExecute;
+  JnlEntry := FJnlEntry;
+  Result := JnlEntry.JnlEntryType <> jeUnknown;
+end;
 
 { TJournalPlayer }
 
@@ -293,7 +412,9 @@ procedure TJournalPlayer.LoadJournalFile(aFilename: string;
   Database: TIBDatabase);
 begin
   Clear;
-  with TJournalProcessor.Create do
+  if Database = nil then
+    IBError(ibxeDatabaseNotAssigned,[nil]);
+  with TJournalProcessor.Create(Database.FirebirdAPI) do
   try
      Execute(aFilename,Database.FirebirdAPI,@HandleOnJnlEntry);
   finally
@@ -339,7 +460,7 @@ begin
     jeQuery:
       if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
         Database.Attachment.ExecuteSQL(item^.Transaction^.tr,
-                                       item^.JnlEntry.QueryText);
+                                       item^.JnlEntry.QueryText,[]);
 
     end;
   end;
@@ -429,16 +550,42 @@ begin
 end;
 
 procedure TIBJournal.StartSession;
+var S: TJournalStream;
+    F: TFileStream;
 begin
   FJournalFilePath := GetJournalFilePath;
   EnsurePathExists(FJournalFilePath);
-  FSessionID := Database.Attachment.StartJournaling(JournalFilePath,Options);
+  F := TFileStream.Create(JournalFilePath,fmCreate);
+  try
+    S := TJournalStream.Create(self,S);
+    try
+     FSessionID := Database.Attachment.StartJournaling(S,Options);
+    except
+      S.Free;
+      raise;
+    end;
+  except
+    F.Free;
+    raise;
+  end;
 end;
 
 procedure TIBJournal.EndSession;
 begin
   FSessionID := -1;
   Database.Attachment.StopJournaling(RetainJournal);
+end;
+
+function TIBJournal.HasJournalHandler: boolean;
+begin
+  Result := assigned(FOnJournalEntry);
+end;
+
+procedure TIBJournal.DoJournalHandler(aJnlEntry: PtrInt);
+begin
+  if HasJournalHandler then
+    OnJournalEntry(self,PJnlEntry(aJnlEntry));
+  dispose(PJnlEntry(aJnlEntry));
 end;
 
 constructor TIBJournal.Create(AOwner: TComponent);
@@ -461,7 +608,15 @@ begin
 end;
 
 procedure TIBJournal.ReplayJournal(aJournalFile: string);
+var player: TJournalPlayer;
 begin
+  player := TJournalPlayer.Create;
+  try
+   player.LoadJournalFile(aJournalFile,Database);
+   player.PlayBack(Database);
+  finally
+    player.Free;
+  end;
 end;
 
 end.

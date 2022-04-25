@@ -56,6 +56,7 @@ type
     procedure SetCursor;
     procedure RestoreCursor;
     function CreateTimer: IIBTimerInf;
+    procedure QueueAsyncCall(const AMethod: TIBDataEvent;  Data: PtrInt);
   end;
 
 implementation
@@ -249,6 +250,12 @@ end;
 function TIBLCLInterface.CreateTimer: IIBTimerInf;
 begin
   Result := TIBTimer.Create;
+end;
+
+procedure TIBLCLInterface.QueueAsyncCall(const AMethod: TIBDataEvent;
+  Data: PtrInt);
+begin
+  Application.QueueAsyncCall(AMethod,Data);
 end;
 
 initialization

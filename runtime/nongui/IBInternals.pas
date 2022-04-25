@@ -82,6 +82,8 @@ type
     property OnStopTimer: TNotifyEvent read GetOnStopTimer write SetOnStopTimer;
   end;
 
+  TIBDataEvent = procedure (Data: PtrInt) of object;
+
   IIBGUIInterface = interface
     function ServerLoginDialog(var AServerName: string;
                                var AUserName, APassword: string): Boolean;
@@ -91,6 +93,7 @@ type
     procedure SetCursor;
     procedure RestoreCursor;
     function CreateTimer: IIBTimerInf;
+    procedure QueueAsyncCall(const AMethod: TIBDataEvent;  Data: PtrInt);
   end;
 
 const  IBGUIInterface : IIBGUIInterface = nil;
