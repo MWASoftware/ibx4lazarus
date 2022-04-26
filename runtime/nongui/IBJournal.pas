@@ -138,6 +138,8 @@ type
     FTransactionList: TList; {Used when replaying journals}
     FJnlEntryList: TList;  {Used when replaying journals}
     function FindTransaction(aSessionID, aTransactionID: integer): PJnlTransaction;
+    function GetJnlEntry(index: integer): PJnlEntry;
+    function GetJnlEntryCount: integer;
     procedure HandleOnJnlEntry(JnlEntry: TJnlEntry);
     procedure SetTransactionStatus(att: IAttachment);
   public
@@ -154,8 +156,11 @@ type
      journal file that are part of uncompleted transactions, and commits/Rollbacks the
      transactions as determined by their Default Completion.}
     procedure PlayBack(Database: TIBDatabase);
+    property JnlEntryCount: integer read GetJnlEntryCount;
+    property JnlEntry[index: integer]: PJnlEntry read GetJnlEntry;
   end;
 
+function IBFormatJnlEntry(JnlEntry: PJnlEntry): string;
 
 implementation
 
@@ -163,6 +168,22 @@ uses IBMessages {$IFDEF WINDOWS}, Windows ,Windirs {$ENDIF};
 
 const
   sqlFindTransaction = 'Select * From IBX$JOURNALS Where IBX$SessionID = ? and IBX$TransactionID = ?';
+
+resourcestring
+  SJnlEntryLayout = 'Journal Entry at %s:' + LineEnding +
+                    '  Type               = %s' + LineEnding +
+                    '  Attachment ID      = %d' + LineEnding +
+                    '  Session ID         = %d' + LineEnding +
+                    '  Transaction ID     = %d' + LineEnding;
+
+  SJnlEntryTStart = '  Transaction Name   = "%s"' + LineEnding +
+                    '  TPB                = %s'+ LineEnding +
+                    '  Default Completion = %s' + LineEnding;
+
+  SJnlEntryQuery =  '  Query Text         = "%s"' + LineEnding;
+
+  SJnlEntryEnd =    '  Old Transaction ID = %d' + LineEnding;
+
 
 type
 
@@ -197,6 +218,40 @@ type
     destructor Destroy; override;
     function Write(const Buffer; Count: Longint): Longint; override;
   end;
+
+function IBFormatJnlEntry(JnlEntry: PJnlEntry): string;
+
+  function CompletionAsText(C: TTransactionCompletion): string;
+  begin
+    case C of
+    TACommit: Result := 'TACommit';
+    TARollback: Result := 'TARollback';
+    else Result := 'Unknown';
+    end;
+  end;
+
+begin
+  with JnlEntry^ do
+  begin
+    Result := Format(SJnlEntryLayout,[FBFormatDateTime('yyyy/mm/dd hh:nn:ss.zzzz',Timestamp),
+                                      TJournalProcessor.JnlEntryText(JnlEntryType),
+                                      AttachmentID,
+                                      SessionID,
+                                      TransactionID]);
+    case JnlEntryType of
+       jeTransStart:
+         Result := Result + Format(SJnlEntryTStart,[TransactionName,
+                                                    TPB.AsText,
+                                                    CompletionAsText(DefaultCompletion)]);
+       jeQuery:
+         Result := Result + Format(SJnlEntryQuery,[QueryText]);
+
+       jeTransCommitRet,
+       jeTransRollbackRet:
+         Result := Result + Format(SJnlEntryEnd,[OldTransactionID]);
+    end;
+  end;
+end;
 
 { TJournalStream }
 
@@ -294,6 +349,16 @@ begin
       end;
 end;
 
+function TJournalPlayer.GetJnlEntry(index: integer): PJnlEntry;
+begin
+  Result := @(PJnlListItem(FJnlEntryList[index])^.JnlEntry);
+end;
+
+function TJournalPlayer.GetJnlEntryCount: integer;
+begin
+  Result := FJnlEntryList.Count;
+end;
+
 procedure TJournalPlayer.HandleOnJnlEntry(JnlEntry: TJnlEntry);
 
   function NewTransaction: PJnlTransaction;
@@ -367,16 +432,16 @@ end;
 
 procedure TJournalPlayer.SetTransactionStatus(att: IAttachment);
 var i: integer;
-    tr: ITransaction;
+    LocalTr: ITransaction;
     Cursor: IResultset;
 begin
   if not att.HasTable('IBX$JOURNALS') then Exit;
 
-  tr := att.StartTransaction([isc_tpb_read,isc_tpb_nowait,isc_tpb_concurrency],taCommit);
+  LocalTr := att.StartTransaction([isc_tpb_read,isc_tpb_nowait,isc_tpb_concurrency],taCommit);
   for i := 0 to FTransactionList.Count - 1 do
     with PJnlTransaction(FTransactionList[i])^ do
     begin
-      Cursor := att.OpenCursor(tr,sqlFindTransaction,[SessionID,TransactionID]);
+      Cursor := att.OpenCursor(LocalTr,sqlFindTransaction,[SessionID,TransactionID]);
       {No entry found then transaction did not complete}
       ReplayRequired := Cursor.isEOF or not Cursor.FetchNext;
     end;

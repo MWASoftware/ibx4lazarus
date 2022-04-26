@@ -199,6 +199,7 @@ end;
 
 procedure TTest29.RunTest(CharSet: AnsiString; SQLDialect: integer);
 var OldDefaultFormatSettings: TFormatSettings;
+    i: integer;
 begin
   OldDefaultFormatSettings := DefaultFormatSettings;
   IBDatabase.CreateDatabase;
@@ -267,7 +268,19 @@ begin
      end;
    end;
    FJournal.Enabled := false;
+   writeln(OutFile,'Low Level Journal File Print out');
    PrintJournalFile(FJournal.JournalFilePath);
+   writeln(OutFile);
+   writeln(OutFile,'Print out Journal File using TIBJournal');
+   with TJournalPlayer.Create do
+   try
+     LoadJournalFile(FJournal.JournalFilePath, FJournal.Database);
+     for i := 0 to JnlEntryCount - 1 do
+       writeln(OutFile,IBFormatJnlEntry(JnlEntry[i]));
+       writeln(OutFile);
+   finally
+     Free;
+   end;
   finally
     DefaultFormatSettings := OldDefaultFormatSettings;
     IBDatabase.DropDatabase;
