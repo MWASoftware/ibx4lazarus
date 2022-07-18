@@ -31,7 +31,7 @@ unit IBJournal;
 interface
 
 uses
-  Classes, SysUtils, IB, IBDatabase, IBUtils, IBInternals;
+  Classes, SysUtils, IB, IBDatabase, IBUtils, IBInternals, ibxscript;
 
 { Database Journalling.
 
@@ -111,6 +111,19 @@ type
     property OnJournalEntry: TOnJournalEntry read FOnJournalEntry write FOnJournalEntry;
   end;
 
+  { TJnlQueryParser }
+
+  TJnlQueryParser = class(TSQLStatementReader)
+  private
+    FStatement: AnsiString;
+    FIndex: integer;
+  protected
+    function GetChar: AnsiChar; override;
+    function GetErrorPrefix: AnsiString; override;
+  public
+    function ParseStatement(stmt: AnsiString): AnsiString;
+  end;
+
   { TJournalPlayer }
 
   TJournalPlayer = class
@@ -137,6 +150,7 @@ type
   private
     FTransactionList: TList; {Used when replaying journals}
     FJnlEntryList: TList;  {Used when replaying journals}
+    FQueryParser: TJnlQueryParser;
     function FindTransaction(aSessionID, aTransactionID: integer): PJnlTransaction;
     function GetJnlEntry(index: integer): PJnlEntry;
     function GetJnlEntryCount: integer;
@@ -195,7 +209,7 @@ type
     FText: AnsiString;
     FIndex: integer;
   protected
-    procedure DoNextJournalEntry(JnlEntry: TJnlEntry);
+    procedure DoNextJournalEntry(JnlEntry: TJnlEntry); override;
     function GetChar: AnsiChar; override;
   public
     function ParseJnlEntry(aText: AnsiString; var JnlEntry: TJnlEntry): boolean;
@@ -230,6 +244,14 @@ function IBFormatJnlEntry(JnlEntry: PJnlEntry): string;
     end;
   end;
 
+  function SafeTPBAsText(tpb: ITPB): string;
+  begin
+    if tpb <> nil then
+      Result := tpb.AsText
+    else
+      Result := 'nil';
+  end;
+
 begin
   with JnlEntry^ do
   begin
@@ -241,7 +263,7 @@ begin
     case JnlEntryType of
        jeTransStart:
          Result := Result + Format(SJnlEntryTStart,[TransactionName,
-                                                    TPB.AsText,
+                                                    SafeTPBAsText(TPB),
                                                     CompletionAsText(DefaultCompletion)]);
        jeQuery:
          Result := Result + Format(SJnlEntryQuery,[QueryText]);
@@ -251,6 +273,33 @@ begin
          Result := Result + Format(SJnlEntryEnd,[OldTransactionID]);
     end;
   end;
+end;
+
+{ TJnlQueryParser }
+
+function TJnlQueryParser.GetChar: AnsiChar;
+begin
+  if FIndex < Length(FStatement) then
+  begin
+    Result := FStatement[FIndex];
+    Inc(FIndex);
+  end
+  else
+    Result := #0;
+end;
+
+function TJnlQueryParser.GetErrorPrefix: AnsiString;
+begin
+  Result := '';
+end;
+
+function TJnlQueryParser.ParseStatement(stmt: AnsiString): AnsiString;
+begin
+  Reset;
+  FStatement := stmt;
+  FIndex := 1;
+  Result := '';
+  GetNextStatement(Result);
 end;
 
 { TJournalStream }
@@ -326,6 +375,7 @@ end;
 function TJournalEntryParser.ParseJnlEntry(aText: AnsiString;
   var JnlEntry: TJnlEntry): boolean;
 begin
+  Reset;
   FText := aText;
   FIndex := 1;
   DoExecute;
@@ -452,11 +502,13 @@ begin
   inherited Create;
   FTransactionList := TList.Create;
   FJnlEntryList := TList.Create;
+  FQueryParser := TJnlQueryParser.Create;
 end;
 
 destructor TJournalPlayer.Destroy;
 begin
   Clear;
+  if assigned(FQueryParser) then FQueryParser.Free;
   if assigned(FJnlEntryList) then FJnlEntryList.Free;
   if assigned(FTransactionList) then FTransactionList.Free;
   inherited Destroy;
@@ -491,8 +543,28 @@ end;
 
 procedure TJournalPlayer.PlayBack(Database: TIBDatabase);
 
-var i: integer;
+  procedure SetParamValue(SQLVar: ISQLParam);
+  var ix: integer;
+  begin
+    if (SQLVar.SQLType = SQL_BLOB) and (Pos(TSQLXMLReader.ibx_blob,SQLVar.Name) = 1) then
+    begin
+      ix := StrToInt(system.copy(SQLVar.Name,length(TSQLXMLReader.ibx_blob)+1,length(SQLVar.Name)-length(TSQLXMLReader.ibx_blob)));
+      SQLVar.AsBlob := FQueryParser.BlobData[ix].BlobIntf;
+    end
+    else
+    if (SQLVar.SQLType = SQL_ARRAY) and (Pos(TSQLXMLReader.ibx_array,SQLVar.Name) = 1) then
+    begin
+      ix := StrToInt(system.copy(SQLVar.Name,length(TSQLXMLReader.ibx_array)+1,length(SQLVar.Name)-length(TSQLXMLReader.ibx_array)));
+      SQLVar.AsArray := FQueryParser.ArrayData[ix].ArrayIntf;
+    end
+    else
+      IBError(ibxeUnrecognisedParamName,[SQLVar.Name]);
+  end;
+
+var i, j: integer;
     item: PJnlListItem;
+    query: string;
+    stmt: IStatement;
 begin
   for i := 0 to FJnlEntryList.Count - 1 do
   begin
@@ -524,8 +596,14 @@ begin
 
     jeQuery:
       if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
-        Database.Attachment.ExecuteSQL(item^.Transaction^.tr,
-                                       item^.JnlEntry.QueryText,[]);
+      begin
+        query := FQueryParser.ParseStatement(item^.JnlEntry.QueryText);
+        stmt := Database.Attachment.PrepareWithNamedParameters(item^.Transaction^.tr,query);
+        for j := 0 to stmt.SQLParams.Count - 1 do
+          SetParamValue(stmt.SQLParams[j]);
+        stmt.Execute;
+        stmt := nil;
+      end;
 
     end;
   end;

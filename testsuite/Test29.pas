@@ -37,7 +37,7 @@ interface
 
 uses
   Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBJournal,
-  IBCustomDataSet;
+  IBCustomDataSet, IBUtils;
 
 const
   aTestID    = '29';
@@ -53,6 +53,7 @@ type
     FJournal: TIBJournal;
     FCreateArrayOnInsert: boolean;
     procedure HandleAfterInsert(DataSet: TDataSet);
+    procedure HandleOnJournalEntry(Sender: TObject; aJnlEntry: PJnlEntry);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -119,6 +120,13 @@ begin
   end;
 end;
 
+procedure TTest29.HandleOnJournalEntry(Sender: TObject; aJnlEntry: PJnlEntry);
+begin
+  writeln(OutFile,'Journalling');
+  writeln(OutFile,IBFormatJnlEntry(aJnlEntry));
+  writeln(OutFile);
+end;
+
 procedure TTest29.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
@@ -177,6 +185,7 @@ begin
     Database := IBDatabase;
     ApplicationName := 'Test29';
     RetainJournal := true;
+    OnJournalEntry := @HandleOnJournalEntry;
   end;
 end;
 

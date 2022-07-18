@@ -465,7 +465,7 @@ begin
   RegisterNoIcon([TIBStringField, TIBBCDField, TIBMemoField, TIBArrayField,
     TIBSmallintField, TIBIntegerField, TIBLargeIntField, TIBDateTimeField,
     TIBTimeField]);
-  {$if lcl_fullversion < 01010000}
+  {$if not declared(TIntegerField)}
   {see http://bugs.freepascal.org/view.php?id=19035 }
   RegisterNoIcon([TIntegerField]);
   {$endif}

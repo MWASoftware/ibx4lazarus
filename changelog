@@ -34,6 +34,9 @@ IBX Change Log  version (2.5-0 Build 13136) Mon, 31 Jan 2022 14:55:28 +0000
 
 10. IBExtract: support added for UDR Functions, Procedure and Trigger declarations.
 
+11. TIBDatabaseInfo. New property FirebirdVersion. This returns the correct Firebird version
+    string. Note that the Version property returns an InterBase compatible version string.
+
 IBX Change Log  version (2.5-0 Build 12933) Mon, 29 Nov 2021 14:59:54 +0000
 
 1. IBCustomDataset: Modify TISQL component now defaults to GoToFirstRecordOnExecute := true.
