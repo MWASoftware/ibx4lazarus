@@ -45,7 +45,41 @@ uses
 }
 
 type
+    { TJournalEntryParser }
+
+  TJournalEntryParser = class(TCustomJournalProcessor)
+  private
+    FJnlEntry: TJnlEntry;
+    FText: AnsiString;
+    FIndex: integer;
+  protected
+    procedure DoNextJournalEntry(JnlEntry: TJnlEntry); override;
+    function GetChar: AnsiChar; override;
+  public
+    function ParseJnlEntry(aText: AnsiString; var JnlEntry: TJnlEntry): boolean;
+  end;
+
+  {The TJournalStream is intended to be used to receive Journal entries from
+   an IAttachment interface. When called in a GUI application, the
+   TApplication.QueueAsyncCall method is used to process each entry in the context
+   of the main loop. Entries are also written through to the FOutStream, if present.}
+
+  { TJournalStream }
+
+  TIBJournal = class;
+  TJournalStream = class(TStream)
+  private
+    FParent: TIBJournal;
+    FOutStream: TStream;
+    FParser: TJournalEntryParser;
+  public
+    constructor Create(aParent: TIBJournal; OutStream: TStream);
+    destructor Destroy; override;
+    function Write(const Buffer; Count: Longint): Longint; override;
+  end;
+
   TOnJournalEntry = procedure(Sender: TObject; aJnlEntry: PJnlEntry) of object;
+
   { TIBJournal }
 
   TIBJournal = class(TComponent)
@@ -63,6 +97,7 @@ type
     FRetainJournal: boolean;
     FVendorName: string;
     FSessionId: integer;
+    FJournalStream: TJournalStream;
     procedure EnsurePathExists(FileName: string);
     function GetDatabase: TIBDatabase;
     function GetJournalFilePath: string;
@@ -198,40 +233,6 @@ resourcestring
 
   SJnlEntryEnd =    '  Old Transaction ID = %d' + LineEnding;
 
-
-type
-
-  { TJournalEntryParser }
-
-  TJournalEntryParser = class(TCustomJournalProcessor)
-  private
-    FJnlEntry: TJnlEntry;
-    FText: AnsiString;
-    FIndex: integer;
-  protected
-    procedure DoNextJournalEntry(JnlEntry: TJnlEntry); override;
-    function GetChar: AnsiChar; override;
-  public
-    function ParseJnlEntry(aText: AnsiString; var JnlEntry: TJnlEntry): boolean;
-  end;
-
-  {The TJournalStream is intended to be used to receive Journal entries from
-   an IAttachment interface. When called in a GUI application, the
-   TApplication.QueueAsyncCall method is used to process each entry in the context
-   of the main loop. Entries are also written through to the FOutStream, if present.}
-
-  { TJournalStream }
-
-  TJournalStream = class(TStream)
-  private
-    FParent: TIBJournal;
-    FOutStream: TStream;
-    FParser: TJournalEntryParser;
-  public
-    constructor Create(aParent: TIBJournal; OutStream: TStream);
-    destructor Destroy; override;
-    function Write(const Buffer; Count: Longint): Longint; override;
-  end;
 
 function IBFormatJnlEntry(JnlEntry: PJnlEntry): string;
 
@@ -693,18 +694,18 @@ begin
 end;
 
 procedure TIBJournal.StartSession;
-var S: TJournalStream;
-    F: TFileStream;
+var F: TFileStream;
 begin
+  EndSession;
   FJournalFilePath := GetJournalFilePath;
   EnsurePathExists(FJournalFilePath);
   F := TFileStream.Create(JournalFilePath,fmCreate);
   try
-    S := TJournalStream.Create(self,F);
+    FJournalStream := TJournalStream.Create(self,F);
     try
-     FSessionID := Database.Attachment.StartJournaling(S,Options);
+     FSessionID := Database.Attachment.StartJournaling(FJournalStream,Options);
     except
-      S.Free;
+      FreeAndNil(FJournalStream);
       raise;
     end;
   except
@@ -715,8 +716,10 @@ end;
 
 procedure TIBJournal.EndSession;
 begin
+  if FSessionID = -1 then Exit;
   FSessionID := -1;
   Database.Attachment.StopJournaling(RetainJournal);
+  FreeAndNil(FJournalStream);
 end;
 
 function TIBJournal.HasJournalHandler: boolean;

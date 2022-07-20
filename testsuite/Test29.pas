@@ -122,7 +122,7 @@ end;
 
 procedure TTest29.HandleOnJournalEntry(Sender: TObject; aJnlEntry: PJnlEntry);
 begin
-  writeln(OutFile,'Journalling');
+  writeln(OutFile,'Journal Entry Made');
   writeln(OutFile,IBFormatJnlEntry(aJnlEntry));
   writeln(OutFile);
 end;
@@ -277,6 +277,7 @@ begin
      end;
    end;
    FJournal.Enabled := false;
+   writeln(OutFile);
    writeln(OutFile,'Low Level Journal File Print out');
    PrintJournalFile(FJournal.JournalFilePath);
    writeln(OutFile);
