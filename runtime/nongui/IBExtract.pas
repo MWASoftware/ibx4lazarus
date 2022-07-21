@@ -4250,7 +4250,7 @@ end;
 
 procedure TIBExtract.ListData(ObjectName: String);
 const
-  SelectFieldListSQL = 'Select List(RDB$FIELD_NAME) From ( '+
+  SelectFieldListSQL = 'Select List(''"''||Trim(RDB$FIELD_NAME)||''"'') From ( '+
     'Select RF.RDB$FIELD_NAME From RDB$RELATION_FIELDS RF '+
     'JOIN RDB$FIELDS F On F.RDB$FIELD_NAME = RF.RDB$FIELD_SOURCE '+
     'Where F.RDB$COMPUTED_BLR is NULL and RF.RDB$RELATION_NAME = Upper(:Relation) '+

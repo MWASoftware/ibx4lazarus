@@ -567,53 +567,69 @@ var i, j: integer;
     query: string;
     stmt: IStatement;
 begin
-  for i := 0 to FJnlEntryList.Count - 1 do
-  begin
-    item := PJnlListItem(FJnlEntryList[i]);
-    if (item^.Transaction <> nil) and (item^.Transaction^.ReplayRequired) then
-    case item^.JnlEntry.JnlEntryType of
-    jeTransStart:
-      if item^.Transaction <> nil then
-        with item^.Transaction^ do
-          tr := Database.Attachment.StartTransaction(TPB,DefaultCompletion);
+  FQueryParser.Database := Database;
+  try
+     Database.InternalTransaction.Active := true;
+     FQueryParser.Transaction := Database.InternalTransaction;
+   for i := 0 to FJnlEntryList.Count - 1 do
+   begin
+     item := PJnlListItem(FJnlEntryList[i]);
+     if (item^.Transaction <> nil) and (item^.Transaction^.ReplayRequired) then
+     case item^.JnlEntry.JnlEntryType of
+     jeTransStart:
+       if item^.Transaction <> nil then
+         with item^.Transaction^ do
+           tr := Database.Attachment.StartTransaction(TPB,DefaultCompletion);
 
-    jeTransCommit,
-    jeTransCommitFail:
-      if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
-        item^.Transaction^.tr.Commit;
+     jeTransCommit,
+     jeTransCommitFail:
+       if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
+       begin
+         item^.Transaction^.tr.Commit;
+         item^.Transaction^.tr := nil;
+       end;
 
-    jeTransRollback,
-    jeTransRollbackFail:
-      if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
-        item^.Transaction^.tr.Rollback;
+     jeTransRollback,
+     jeTransRollbackFail:
+       if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
+       begin
+         item^.Transaction^.tr.Rollback;
+         item^.Transaction^.tr := nil;
+       end;
 
-    jeTransCommitRet:
-      if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
-        item^.Transaction^.tr.CommitRetaining;
+     jeTransCommitRet:
+       if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
+         item^.Transaction^.tr.CommitRetaining;
 
-    jeTransRollbackRet:
-      if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
-        item^.Transaction^.tr.RollbackRetaining;
+     jeTransRollbackRet:
+       if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
+         item^.Transaction^.tr.RollbackRetaining;
 
-    jeQuery:
-      if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
-      begin
-        query := FQueryParser.ParseStatement(item^.JnlEntry.QueryText);
-        stmt := Database.Attachment.PrepareWithNamedParameters(item^.Transaction^.tr,query);
-        for j := 0 to stmt.SQLParams.Count - 1 do
-          SetParamValue(stmt.SQLParams[j]);
-        stmt.Execute;
-        stmt := nil;
-      end;
+     jeQuery:
+       if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
+       begin
+         query := FQueryParser.ParseStatement(item^.JnlEntry.QueryText);
+         stmt := Database.Attachment.PrepareWithNamedParameters(item^.Transaction^.tr,query);
+         for j := 0 to stmt.SQLParams.Count - 1 do
+           SetParamValue(stmt.SQLParams[j]);
+         stmt.Execute;
+         stmt := nil;
+       end;
 
-    end;
-  end;
-  {Complete using Default Completion any open transaction }
-  for i := 0 to FJnlEntryList.Count - 1 do
-  begin
-    item := PJnlListItem(FJnlEntryList[i]);
-    if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
-      item^.Transaction^.tr := nil;
+     end;
+   end;
+   {Complete using Default Completion any open transaction }
+   for i := 0 to FJnlEntryList.Count - 1 do
+   begin
+     item := PJnlListItem(FJnlEntryList[i]);
+     if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
+       item^.Transaction^.tr := nil;
+   end;
+
+  finally
+    Database.InternalTransaction.Active := false;
+    FQueryParser.Transaction := nil;
+    FQueryParser.Database := nil;
   end;
 
 end;

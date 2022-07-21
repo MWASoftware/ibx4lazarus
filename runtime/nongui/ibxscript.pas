@@ -509,6 +509,7 @@ begin
         end;
       end;
     end;
+//    writeln(stmt);
   end;
   Result := stmt <> '';
 end;
