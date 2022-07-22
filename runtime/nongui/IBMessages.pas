@@ -177,7 +177,8 @@ type
       ibxDBVersionProblem ,
       ibxeResourceFileNotFound,
       ibxePatchFileNotFound,
-      ibxeUnrecognisedParamName
+      ibxeUnrecognisedParamName,
+      ibxeBadQueryReplay
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -321,6 +322,7 @@ resourcestring
   SResourceFileNotFound = 'Unable to load resource file "%s"';
   SPatchFileNotFound = 'In section [%s] of the Upgrade File (%s), unable to open %s (SQL script to patch).';
   SUnrecognisedParamName = 'Unrecognised Parameter Name (%s)';
+  SBadQueryReplay = 'Playback execution error for "%s"' + LineEnding + '%s';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -425,7 +427,8 @@ const
     SDBVersionProblem,
     SResourceFileNotFound,
     SPatchFileNotFound,
-    SUnrecognisedParamName
+    SUnrecognisedParamName,
+    SBadQueryReplay
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

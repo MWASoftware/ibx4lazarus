@@ -311,6 +311,11 @@ begin
     {Dump Database to text file}
     dbDumpFile := ChangeFileExt(GetOutFile,'.db1');
     IBTransaction.Active := true;
+    {Drop journaling suuport before dumping database}
+    IBDatabase.Attachment.ExecImmediate(IBTransaction.TransactionIntf,'Drop Table IBX$JOURNALS');
+    IBDatabase.Attachment.ExecImmediate(IBTransaction.TransactionIntf,'Drop Sequence IBX$SESSIONS');
+    IBTransaction.Commit;
+    IBTransaction.Active := true;
     FExtract.ExtractObject(eoDatabase,'',[etData,etGrantsToUser]);
     FExtract.Items.SaveToFile(dbDumpFile);
     IBTransaction.Active := false;
@@ -330,9 +335,12 @@ begin
      IBDatabase.DropDatabase;
    end;
 
+   writeln(OutFile);
+   writeln(OutFile,'Comparing original database with restored database');
+   CompareFiles(dbDumpFile, ChangeFileExt(dbDumpFile,'.db2'));
   except on E: Exception do
     begin
-      writeln('Terminated with Exception: ' + E.Message);
+      writeln(OutFile,'Terminated with Exception: ' + E.Message);
       IBDatabase.ForceClose;
     end;
   end;

@@ -152,11 +152,14 @@ type
   private
     FStatement: AnsiString;
     FIndex: integer;
+    FTransaction: ITransaction;
   protected
     function GetChar: AnsiChar; override;
     function GetErrorPrefix: AnsiString; override;
+    function GetTransaction: ITransaction; override;
   public
     function ParseStatement(stmt: AnsiString): AnsiString;
+    procedure SetTransaction(aValue: ITransaction);
   end;
 
   { TJournalPlayer }
@@ -280,7 +283,7 @@ end;
 
 function TJnlQueryParser.GetChar: AnsiChar;
 begin
-  if FIndex < Length(FStatement) then
+  if FIndex <= Length(FStatement) then
   begin
     Result := FStatement[FIndex];
     Inc(FIndex);
@@ -294,6 +297,11 @@ begin
   Result := '';
 end;
 
+function TJnlQueryParser.GetTransaction: ITransaction;
+begin
+  Result := FTransaction;
+end;
+
 function TJnlQueryParser.ParseStatement(stmt: AnsiString): AnsiString;
 begin
   Reset;
@@ -301,6 +309,11 @@ begin
   FIndex := 1;
   Result := '';
   GetNextStatement(Result);
+end;
+
+procedure TJnlQueryParser.SetTransaction(aValue: ITransaction);
+begin
+  FTransaction := aValue;
 end;
 
 { TJournalStream }
@@ -569,8 +582,6 @@ var i, j: integer;
 begin
   FQueryParser.Database := Database;
   try
-     Database.InternalTransaction.Active := true;
-     FQueryParser.Transaction := Database.InternalTransaction;
    for i := 0 to FJnlEntryList.Count - 1 do
    begin
      item := PJnlListItem(FJnlEntryList[i]);
@@ -608,11 +619,17 @@ begin
      jeQuery:
        if (item^.Transaction <> nil) and (item^.Transaction^.tr <> nil) then
        begin
+         FQueryParser.SetTransaction(item^.Transaction^.tr);
          query := FQueryParser.ParseStatement(item^.JnlEntry.QueryText);
          stmt := Database.Attachment.PrepareWithNamedParameters(item^.Transaction^.tr,query);
          for j := 0 to stmt.SQLParams.Count - 1 do
            SetParamValue(stmt.SQLParams[j]);
-         stmt.Execute;
+         try
+           stmt.Execute;
+         except on E: Exception do
+           IBError(ibxeBadQueryReplay,[query,E.Message]);
+         end;
+         FQueryParser.SetTransaction(nil);
          stmt := nil;
        end;
 
@@ -627,8 +644,6 @@ begin
    end;
 
   finally
-    Database.InternalTransaction.Active := false;
-    FQueryParser.Transaction := nil;
     FQueryParser.Database := nil;
   end;
 
