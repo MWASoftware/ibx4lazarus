@@ -641,10 +641,10 @@ DEPT_KEY_PATH = 000;900 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 42
 
-Current memory = 19,660,656
+Current memory = 19,660,848
 Delta memory = 16,384
-Max memory = 19,754,928
-Elapsed time= 0.021 sec
+Max memory = 19,755,120
+Elapsed time= 0.010 sec
 Cpu = 0.000 sec
 Buffers = 2048
 Reads = 2
@@ -1445,7 +1445,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost/employee Disconnected after 4 ms
+inet://localhost/employee Disconnected after 3 ms
 Before Connect
 Connected to inet://localhost/employee
 DPB: Item Count = 3
@@ -1454,7 +1454,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost/employee Disconnected after 1987 ms
+inet://localhost/employee Disconnected after 1986 ms
 Idle Timer Expired for Test_Database_02
 Database Closed
 Transaction Events
@@ -1477,7 +1477,7 @@ TPB: Item Count = 3
   isc_tpb_read
 
 Transaction Ending
-Transaction Ended after 0 ms
+Transaction Ended after 1 ms
 Transaction idle timer test
 Requested TPB: Item Count = 3
   isc_tpb_concurrency
@@ -1506,7 +1506,7 @@ DPB: Item Count = 4
 
 inet://localhost//tmp/ibx-testsuite/testsuite1.fdb created
 Before Disconnect
-inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 3 ms
+inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 5 ms
 Before Connect
 Warning: SQL Dialect Downgrade of inet://localhost//tmp/ibx-testsuite/testsuite1.fdb
 Connected to inet://localhost//tmp/ibx-testsuite/testsuite1.fdb
@@ -3547,8 +3547,8 @@ DEPT_KEY_PATH = 000;600;620;622 (Charset Id = 4 Codepage = 65001)
 Current memory = 19,662,256
 Delta memory = 16,416
 Max memory = 19,757,200
-Elapsed time= 0.011 sec
-Cpu = 0.000 sec
+Elapsed time= 0.009 sec
+Cpu = 0.010 sec
 Buffers = 2048
 Reads = 2
 Writes = 0
@@ -12324,20 +12324,20 @@ Message File Location = /opt/firebird/4.0.1/
 Database Statistics for employee
 
 Database "/opt/firebird/4.0.1/examples/empbuild/employee.fdb"
-Gstat execution time Wed Jul 20 15:18:07 2022
+Gstat execution time Fri Jul 22 14:56:22 2022
 
 Database header page information:
 Flags			0
-Generation		280
+Generation		418
 System Change Number	0
 Page size		8192
 ODS version		13.0
-Oldest transaction	300
-Oldest active		301
-Oldest snapshot		301
-Next transaction	301
+Oldest transaction	461
+Oldest active		462
+Oldest snapshot		462
+Next transaction	462
 Sequence number		0
-Next attachment ID	203
+Next attachment ID	353
 Implementation		HW=AMD/Intel/x64 little-endian OS=Linux CC=gcc
 Shadow count		0
 Page buffers		0
@@ -12411,7 +12411,7 @@ EMPLOYEE_PROJECT (134)
 Primary pointer page: 258, Index root page: 259
 Pointer pages: 1, data page slots: 1
 Data pages: 1, average fill: 10%
-Primary pages: 1, secondary pages: 0, swept pages: 1
+Primary pages: 1, secondary pages: 0, swept pages: 0
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 1
@@ -12424,7 +12424,7 @@ JOB (129)
 Primary pointer page: 229, Index root page: 230
 Pointer pages: 1, data page slots: 2
 Data pages: 2, average fill: 54%
-Primary pages: 1, secondary pages: 1, swept pages: 1
+Primary pages: 1, secondary pages: 1, swept pages: 0
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 0
@@ -12463,7 +12463,7 @@ SALARY_HISTORY (136)
 Primary pointer page: 270, Index root page: 271
 Pointer pages: 1, data page slots: 1
 Data pages: 1, average fill: 30%
-Primary pages: 1, secondary pages: 0, swept pages: 1
+Primary pages: 1, secondary pages: 0, swept pages: 0
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 0
@@ -12485,7 +12485,7 @@ Fill distribution:
 60 - 79% = 0
 80 - 99% = 0
 
-Gstat completion time Wed Jul 20 15:18:07 2022
+Gstat completion time Fri Jul 22 14:56:22 2022
 
 
 
@@ -12495,87 +12495,87 @@ zeus	Sun Jan  2 14:13:30 2022
 firebird4.0.1/bin/fbguard: guardian starting /opt/firebird4.0.1/bin/firebird
 
 Online Validation
-15:18:08.98 Validation started
+14:56:23.79 Validation started
 
-15:18:08.98 Relation 128 (COUNTRY)
-15:18:08.98   process pointer page    0 of    1
-15:18:08.98 Index 1 (RDB$PRIMARY1)
-15:18:08.98 Relation 128 (COUNTRY) is ok
+14:56:23.79 Relation 128 (COUNTRY)
+14:56:23.79   process pointer page    0 of    1
+14:56:23.79 Index 1 (RDB$PRIMARY1)
+14:56:23.79 Relation 128 (COUNTRY) is ok
 
-15:18:08.98 Relation 129 (JOB)
-15:18:08.98   process pointer page    0 of    1
-15:18:08.98 Index 1 (RDB$PRIMARY2)
-15:18:08.98 Index 2 (RDB$FOREIGN3)
-15:18:08.98 Index 3 (MAXSALX)
-15:18:08.98 Index 4 (MINSALX)
-15:18:08.98 Relation 129 (JOB) is ok
+14:56:23.79 Relation 129 (JOB)
+14:56:23.79   process pointer page    0 of    1
+14:56:23.79 Index 1 (RDB$PRIMARY2)
+14:56:23.79 Index 2 (RDB$FOREIGN3)
+14:56:23.79 Index 3 (MAXSALX)
+14:56:23.79 Index 4 (MINSALX)
+14:56:23.79 Relation 129 (JOB) is ok
 
-15:18:08.98 Relation 130 (DEPARTMENT)
-15:18:08.98   process pointer page    0 of    1
-15:18:08.98 Index 1 (RDB$4)
-15:18:08.98 Index 2 (RDB$PRIMARY5)
-15:18:08.98 Index 3 (RDB$FOREIGN6)
-15:18:08.98 Index 4 (BUDGETX)
-15:18:08.98 Index 5 (RDB$FOREIGN10)
-15:18:08.98 Relation 130 (DEPARTMENT) is ok
+14:56:23.79 Relation 130 (DEPARTMENT)
+14:56:23.79   process pointer page    0 of    1
+14:56:23.79 Index 1 (RDB$4)
+14:56:23.79 Index 2 (RDB$PRIMARY5)
+14:56:23.79 Index 3 (RDB$FOREIGN6)
+14:56:23.79 Index 4 (BUDGETX)
+14:56:23.79 Index 5 (RDB$FOREIGN10)
+14:56:23.79 Relation 130 (DEPARTMENT) is ok
 
-15:18:08.98 Relation 131 (EMPLOYEE)
-15:18:08.98   process pointer page    0 of    1
-15:18:08.98 Index 1 (RDB$PRIMARY7)
-15:18:08.98 Index 2 (RDB$FOREIGN8)
-15:18:08.98 Index 3 (RDB$FOREIGN9)
-15:18:08.98 Index 4 (NAMEX)
-15:18:08.98 Relation 131 (EMPLOYEE) is ok
+14:56:23.79 Relation 131 (EMPLOYEE)
+14:56:23.79   process pointer page    0 of    1
+14:56:23.79 Index 1 (RDB$PRIMARY7)
+14:56:23.79 Index 2 (RDB$FOREIGN8)
+14:56:23.79 Index 3 (RDB$FOREIGN9)
+14:56:23.79 Index 4 (NAMEX)
+14:56:23.79 Relation 131 (EMPLOYEE) is ok
 
-15:18:08.98 Relation 133 (PROJECT)
-15:18:08.98   process pointer page    0 of    1
-15:18:08.98 Index 1 (RDB$11)
-15:18:08.98 Index 2 (RDB$PRIMARY12)
-15:18:08.98 Index 3 (RDB$FOREIGN13)
-15:18:08.98 Index 4 (PRODTYPEX)
-15:18:08.98 Relation 133 (PROJECT) is ok
+14:56:23.79 Relation 133 (PROJECT)
+14:56:23.79   process pointer page    0 of    1
+14:56:23.79 Index 1 (RDB$11)
+14:56:23.79 Index 2 (RDB$PRIMARY12)
+14:56:23.79 Index 3 (RDB$FOREIGN13)
+14:56:23.79 Index 4 (PRODTYPEX)
+14:56:23.79 Relation 133 (PROJECT) is ok
 
-15:18:08.98 Relation 134 (EMPLOYEE_PROJECT)
-15:18:08.98   process pointer page    0 of    1
-15:18:08.98 Index 1 (RDB$PRIMARY14)
-15:18:08.98 Index 2 (RDB$FOREIGN15)
-15:18:08.98 Index 3 (RDB$FOREIGN16)
-15:18:08.98 Relation 134 (EMPLOYEE_PROJECT) is ok
+14:56:23.79 Relation 134 (EMPLOYEE_PROJECT)
+14:56:23.79   process pointer page    0 of    1
+14:56:23.79 Index 1 (RDB$PRIMARY14)
+14:56:23.79 Index 2 (RDB$FOREIGN15)
+14:56:23.79 Index 3 (RDB$FOREIGN16)
+14:56:23.79 Relation 134 (EMPLOYEE_PROJECT) is ok
 
-15:18:08.98 Relation 135 (PROJ_DEPT_BUDGET)
-15:18:08.98   process pointer page    0 of    1
-15:18:08.98 Index 1 (RDB$PRIMARY17)
-15:18:08.98 Index 2 (RDB$FOREIGN18)
-15:18:08.98 Index 3 (RDB$FOREIGN19)
-15:18:08.99 Relation 135 (PROJ_DEPT_BUDGET) is ok
+14:56:23.79 Relation 135 (PROJ_DEPT_BUDGET)
+14:56:23.79   process pointer page    0 of    1
+14:56:23.79 Index 1 (RDB$PRIMARY17)
+14:56:23.79 Index 2 (RDB$FOREIGN18)
+14:56:23.79 Index 3 (RDB$FOREIGN19)
+14:56:23.79 Relation 135 (PROJ_DEPT_BUDGET) is ok
 
-15:18:08.99 Relation 136 (SALARY_HISTORY)
-15:18:08.99   process pointer page    0 of    1
-15:18:08.99 Index 1 (RDB$PRIMARY20)
-15:18:08.99 Index 2 (RDB$FOREIGN21)
-15:18:08.99 Index 3 (CHANGEX)
-15:18:08.99 Index 4 (UPDATERX)
-15:18:08.99 Relation 136 (SALARY_HISTORY) is ok
+14:56:23.79 Relation 136 (SALARY_HISTORY)
+14:56:23.79   process pointer page    0 of    1
+14:56:23.79 Index 1 (RDB$PRIMARY20)
+14:56:23.80 Index 2 (RDB$FOREIGN21)
+14:56:23.80 Index 3 (CHANGEX)
+14:56:23.80 Index 4 (UPDATERX)
+14:56:23.80 Relation 136 (SALARY_HISTORY) is ok
 
-15:18:08.99 Relation 137 (CUSTOMER)
-15:18:08.99   process pointer page    0 of    1
-15:18:08.99 Index 1 (RDB$PRIMARY22)
-15:18:08.99 Index 2 (RDB$FOREIGN23)
-15:18:08.99 Index 3 (CUSTNAMEX)
-15:18:08.99 Index 4 (CUSTREGION)
-15:18:08.99 Relation 137 (CUSTOMER) is ok
+14:56:23.80 Relation 137 (CUSTOMER)
+14:56:23.80   process pointer page    0 of    1
+14:56:23.80 Index 1 (RDB$PRIMARY22)
+14:56:23.80 Index 2 (RDB$FOREIGN23)
+14:56:23.80 Index 3 (CUSTNAMEX)
+14:56:23.80 Index 4 (CUSTREGION)
+14:56:23.80 Relation 137 (CUSTOMER) is ok
 
-15:18:08.99 Relation 138 (SALES)
-15:18:08.99   process pointer page    0 of    1
-15:18:08.99 Index 1 (RDB$PRIMARY24)
-15:18:08.99 Index 2 (RDB$FOREIGN25)
-15:18:08.99 Index 3 (RDB$FOREIGN26)
-15:18:08.99 Index 4 (NEEDX)
-15:18:08.99 Index 5 (QTYX)
-15:18:08.99 Index 6 (SALESTATX)
-15:18:08.99 Relation 138 (SALES) is ok
+14:56:23.80 Relation 138 (SALES)
+14:56:23.80   process pointer page    0 of    1
+14:56:23.80 Index 1 (RDB$PRIMARY24)
+14:56:23.80 Index 2 (RDB$FOREIGN25)
+14:56:23.80 Index 3 (RDB$FOREIGN26)
+14:56:23.80 Index 4 (NEEDX)
+14:56:23.80 Index 5 (QTYX)
+14:56:23.80 Index 6 (SALESTATX)
+14:56:23.80 Relation 138 (SALES) is ok
 
-15:18:08.99 Validation finished
+14:56:23.80 Validation finished
 
 
 Normal Validation
@@ -13863,7 +13863,7 @@ Rows printed = 2
 Current memory = 19,660,480
 Delta memory = 16,032
 Max memory = 19,755,344
-Elapsed time= 0.002 sec
+Elapsed time= 0.001 sec
 Cpu = 0.000 sec
 Buffers = 2048
 Reads = 2
@@ -14131,7 +14131,7 @@ Rows printed = 2
 Current memory = 19,660,480
 Delta memory = 16,032
 Max memory = 19,755,344
-Elapsed time= 0.103 sec
+Elapsed time= 0.105 sec
 Cpu = 0.000 sec
 Buffers = 2048
 Reads = 2
@@ -15752,14 +15752,14 @@ Create Table LotsOfData (
     MyText VarChar(1024), 
     Primary Key (RowID) 
   );                 
-Loading data into database table. Started at 20/7/2022 15:18:42.795
-Data load completed at 20/7/2022 15:19:50.992 Elapsed Time = 68197 ms, 100000 records loaded
- Message Hash = 51ad4dfa47aada646a5f73370cc332c4
-Database Read started at 20/7/2022 15:19:50.994
-Read Dataset completed at 20/7/2022 15:20:21.923 Elapsed Time = 30929 ms, 100000 records read
- Message Hash = 51ad4dfa47aada646a5f73370cc332c4
+Loading data into database table. Started at 22/7/2022 14:56:57.660
+Data load completed at 22/7/2022 14:58:25.633 Elapsed Time = 87973 ms, 100000 records loaded
+ Message Hash = 800bc65ae57f21ad63fa73aa4cdf235e
+Database Read started at 22/7/2022 14:58:25.634
+Read Dataset completed at 22/7/2022 14:58:55.555 Elapsed Time = 29921 ms, 100000 records read
+ Message Hash = 800bc65ae57f21ad63fa73aa4cdf235e
 Test Completed successfully
-20/7/2022 15:20:21.923 Test 21 passes as long as the checksums are identical
+22/7/2022 14:58:55.555 Test 21 passes as long as the checksums are identical
 
 
 ------------------------------------------------------
@@ -17870,12 +17870,12 @@ Create Table IBXTest (
 
 Create Generator IBXGen;
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:31.3690:
+Journal Entry at 2022/07/22 14:59:05.1360:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 10
-  Transaction Name   = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+  Transaction Name   = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -17904,17 +17904,17 @@ MYFIELD2
 
 Add a record
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:31.4340:
+Journal Entry at 2022/07/22 14:59:05.1980:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 10
-  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(1, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(1, 2, 0.314, 0.31412345678, 101.314, 101.99, '2007-12-25', '2007-12-25 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+, 9223372036854775807, 65566, '12:30:45.0000', 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -17971,17 +17971,17 @@ Que cela seul est fantastique.
 
 Add and edit a record
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:31.4600:
+Journal Entry at 2022/07/22 14:59:05.2200:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 10
-  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(2, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(2, 2, 0.314, 0.31412345678, 101.314, 101.99, '2007-12-25', '2007-12-25 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+, 9223372036854775807, 65566, '12:30:45.0000', 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -18093,17 +18093,17 @@ GRANTS = NULL
 MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
 MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:31.4890:
+Journal Entry at 2022/07/22 14:59:05.2450:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 10
-  Query Text         = "Update IBXTEST A Set   A.F1 = 199,  A.F2 = 0.314000010490417,  A.F3 = 0.31412345678,  A.F4 = 101.314,  A.F5 = 101.99,  A.F6 = '25/12/2007 00:00:00.0000',  A.F7 = '25/12/2007 12:30:29.1300',  A.F8 = 'XX      ',  A.F9 = 'The Quick Brown Fox jumps over the lazy dog',  A.F10 = <blob subtype="0">
+  Query Text         = "Update IBXTEST A Set   A.F1 = 199,  A.F2 = 0.314000010490417,  A.F3 = 0.31412345678,  A.F4 = 101.314,  A.F5 = 101.99,  A.F6 = '2007-12-25',  A.F7 = '2007-12-25 12:30:29.1300',  A.F8 = 'XX      ',  A.F9 = 'The Quick Brown Fox jumps over the lazy dog',  A.F10 = <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-,  A.F11 = 9223372036854775807,  A.f12 = 65566,  A.F13 = '30/12/1899 12:30:45.0000',  A.F14 = 'If music be the food of love, play on;
+,  A.F11 = 9223372036854775807,  A."f12" = 65566,  A.F13 = '12:30:45.0000',  A.F14 = 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -18155,11 +18155,11 @@ Que cela seul est fantastique.
  <elt ix="15">85</elt>
  <elt ix="16">84</elt>
 </array>
-,   A.My Field  = 'My Field',  A.MY Field = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15"
+,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15"
 
 
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:31.5100:
+Journal Entry at 2022/07/22 14:59:05.2700:
   Type               = Commit
   Attachment ID      = 4
   Session ID         = 1
@@ -18167,12 +18167,12 @@ Journal Entry at 2022/07/20 15:20:31.5100:
 
 
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:31.5140:
+Journal Entry at 2022/07/22 14:59:05.2750:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 12
-  Transaction Name   = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+  Transaction Name   = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -18298,7 +18298,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:31.7800:
+Journal Entry at 2022/07/22 14:59:05.5410:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -18369,7 +18369,7 @@ Rows printed = 1
 
 Rollback Retaining
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:31.8880:
+Journal Entry at 2022/07/22 14:59:05.6470:
   Type               = Rollback Retaining
   Attachment ID      = 4
   Session ID         = 1
@@ -18498,7 +18498,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:32.1230:
+Journal Entry at 2022/07/22 14:59:05.8770:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -18569,7 +18569,7 @@ Rows printed = 1
 
 Rollback
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:32.2340:
+Journal Entry at 2022/07/22 14:59:05.9860:
   Type               = Rollback
   Attachment ID      = 4
   Session ID         = 1
@@ -18577,12 +18577,12 @@ Journal Entry at 2022/07/20 15:20:32.2340:
 
 
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:32.2370:
+Journal Entry at 2022/07/22 14:59:05.9920:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 15
-  Transaction Name   = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+  Transaction Name   = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -18708,17 +18708,17 @@ Rows printed = 2
 
 Commit Retaining
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:32.5180:
+Journal Entry at 2022/07/22 14:59:06.2720:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 15
-  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(3, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(3, 2, 0.314, 0.31412345678, 101.314, 101.99, '2007-12-25', '2007-12-25 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+, 9223372036854775807, 65566, '12:30:45.0000', 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -18774,7 +18774,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:32.5350:
+Journal Entry at 2022/07/22 14:59:06.2910:
   Type               = Commit Retaining
   Attachment ID      = 4
   Session ID         = 1
@@ -18961,7 +18961,7 @@ Rows printed = 3
 
 Commit
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:32.8760:
+Journal Entry at 2022/07/22 14:59:06.6320:
   Type               = Commit
   Attachment ID      = 4
   Session ID         = 1
@@ -18969,12 +18969,12 @@ Journal Entry at 2022/07/20 15:20:32.8760:
 
 
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:32.8800:
+Journal Entry at 2022/07/22 14:59:06.6360:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 18
-  Transaction Name   = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+  Transaction Name   = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -19157,7 +19157,7 @@ MYFIELD2 = NULL
 Rows printed = 3
 
 Journal Entry Made
-Journal Entry at 2022/07/20 15:20:33.2630:
+Journal Entry at 2022/07/22 14:59:07.0230:
   Type               = Rollback
   Attachment ID      = 4
   Session ID         = 1
@@ -19169,26 +19169,26 @@ IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 10
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2022/07/20 15:20:31.3670
+IBX$CREATED = 2022/07/22 14:59:05.1340
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 15
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2022/07/20 15:20:32.2360
+IBX$CREATED = 2022/07/22 14:59:05.9910
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 17
 IBX$OLDTRANSACTIONID = 15
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2022/07/20 15:20:32.5370
+IBX$CREATED = 2022/07/22 14:59:06.2930
 
 Low Level Journal File Print out
 Journal Entries
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2022/07/20 15:20:31.3690
+Timestamp = 2022/07/22 14:59:05.1360
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 10
-Transaction Name = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+Transaction Name = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19197,16 +19197,16 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/20 15:20:31.4340
+Timestamp = 2022/07/22 14:59:05.1980
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 10
-Query = Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(1, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+Query = Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(1, 2, 0.314, 0.31412345678, 101.314, 101.99, '2007-12-25', '2007-12-25 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+, 9223372036854775807, 65566, '12:30:45.0000', 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -19261,16 +19261,16 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/20 15:20:31.4600
+Timestamp = 2022/07/22 14:59:05.2200
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 10
-Query = Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(2, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+Query = Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(2, 2, 0.314, 0.31412345678, 101.314, 101.99, '2007-12-25', '2007-12-25 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+, 9223372036854775807, 65566, '12:30:45.0000', 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -19325,16 +19325,16 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/20 15:20:31.4890
+Timestamp = 2022/07/22 14:59:05.2450
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 10
-Query = Update IBXTEST A Set   A.F1 = 199,  A.F2 = 0.314000010490417,  A.F3 = 0.31412345678,  A.F4 = 101.314,  A.F5 = 101.99,  A.F6 = '25/12/2007 00:00:00.0000',  A.F7 = '25/12/2007 12:30:29.1300',  A.F8 = 'XX      ',  A.F9 = 'The Quick Brown Fox jumps over the lazy dog',  A.F10 = <blob subtype="0">
+Query = Update IBXTEST A Set   A.F1 = 199,  A.F2 = 0.314000010490417,  A.F3 = 0.31412345678,  A.F4 = 101.314,  A.F5 = 101.99,  A.F6 = '2007-12-25',  A.F7 = '2007-12-25 12:30:29.1300',  A.F8 = 'XX      ',  A.F9 = 'The Quick Brown Fox jumps over the lazy dog',  A.F10 = <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-,  A.F11 = 9223372036854775807,  A.f12 = 65566,  A.F13 = '30/12/1899 12:30:45.0000',  A.F14 = 'If music be the food of love, play on;
+,  A.F11 = 9223372036854775807,  A."f12" = 65566,  A.F13 = '12:30:45.0000',  A.F14 = 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -19386,20 +19386,20 @@ Que cela seul est fantastique.
  <elt ix="15">85</elt>
  <elt ix="16">84</elt>
 </array>
-,   A.My Field  = 'My Field',  A.MY Field = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15
+,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2022/07/20 15:20:31.5100
+Timestamp = 2022/07/22 14:59:05.2700
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 10
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2022/07/20 15:20:31.5140
+Timestamp = 2022/07/22 14:59:05.2750
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 12
-Transaction Name = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+Transaction Name = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19408,38 +19408,38 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/20 15:20:31.7800
+Timestamp = 2022/07/22 14:59:05.5410
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 12
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollbackRet(Rollback Retaining)
-Timestamp = 2022/07/20 15:20:31.8880
+Timestamp = 2022/07/22 14:59:05.6470
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 14
 Old TransactionID = 12
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/20 15:20:32.1230
+Timestamp = 2022/07/22 14:59:05.8770
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 14
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2022/07/20 15:20:32.2340
+Timestamp = 2022/07/22 14:59:05.9860
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 14
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2022/07/20 15:20:32.2370
+Timestamp = 2022/07/22 14:59:05.9920
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 15
-Transaction Name = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+Transaction Name = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19448,16 +19448,16 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/20 15:20:32.5180
+Timestamp = 2022/07/22 14:59:06.2720
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 15
-Query = Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(3, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+Query = Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(3, 2, 0.314, 0.31412345678, 101.314, 101.99, '2007-12-25', '2007-12-25 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+, 9223372036854775807, 65566, '12:30:45.0000', 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -19512,24 +19512,24 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeTransCommitRet(Commit Retaining)
-Timestamp = 2022/07/20 15:20:32.5350
+Timestamp = 2022/07/22 14:59:06.2910
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 17
 Old TransactionID = 15
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2022/07/20 15:20:32.8760
+Timestamp = 2022/07/22 14:59:06.6320
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 17
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2022/07/20 15:20:32.8800
+Timestamp = 2022/07/22 14:59:06.6360
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 18
-Transaction Name = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+Transaction Name = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19538,33 +19538,33 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2022/07/20 15:20:33.2630
+Timestamp = 2022/07/22 14:59:07.0230
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 18
 
 
 Print out Journal File using TIBJournal
-Journal Entry at 2022/07/20 15:20:31.3690:
+Journal Entry at 2022/07/22 14:59:05.1360:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 10
-  Transaction Name   = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+  Transaction Name   = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2022/07/20 15:20:31.4340:
+Journal Entry at 2022/07/22 14:59:05.1980:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 10
-  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(1, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(1, 2, 0.314, 0.31412345678, 101.314, 101.99, '2007-12-25', '2007-12-25 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+, 9223372036854775807, 65566, '12:30:45.0000', 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -19618,17 +19618,17 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2022/07/20 15:20:31.4600:
+Journal Entry at 2022/07/22 14:59:05.2200:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 10
-  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(2, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(2, 2, 0.314, 0.31412345678, 101.314, 101.99, '2007-12-25', '2007-12-25 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+, 9223372036854775807, 65566, '12:30:45.0000', 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -19682,17 +19682,17 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2022/07/20 15:20:31.4890:
+Journal Entry at 2022/07/22 14:59:05.2450:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 10
-  Query Text         = "Update IBXTEST A Set   A.F1 = 199,  A.F2 = 0.314000010490417,  A.F3 = 0.31412345678,  A.F4 = 101.314,  A.F5 = 101.99,  A.F6 = '25/12/2007 00:00:00.0000',  A.F7 = '25/12/2007 12:30:29.1300',  A.F8 = 'XX      ',  A.F9 = 'The Quick Brown Fox jumps over the lazy dog',  A.F10 = <blob subtype="0">
+  Query Text         = "Update IBXTEST A Set   A.F1 = 199,  A.F2 = 0.314000010490417,  A.F3 = 0.31412345678,  A.F4 = 101.314,  A.F5 = 101.99,  A.F6 = '2007-12-25',  A.F7 = '2007-12-25 12:30:29.1300',  A.F8 = 'XX      ',  A.F9 = 'The Quick Brown Fox jumps over the lazy dog',  A.F10 = <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-,  A.F11 = 9223372036854775807,  A.f12 = 65566,  A.F13 = '30/12/1899 12:30:45.0000',  A.F14 = 'If music be the food of love, play on;
+,  A.F11 = 9223372036854775807,  A."f12" = 65566,  A.F13 = '12:30:45.0000',  A.F14 = 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -19744,70 +19744,70 @@ Que cela seul est fantastique.
  <elt ix="15">85</elt>
  <elt ix="16">84</elt>
 </array>
-,   A.My Field  = 'My Field',  A.MY Field = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15"
+,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15"
 
-Journal Entry at 2022/07/20 15:20:31.5100:
+Journal Entry at 2022/07/22 14:59:05.2700:
   Type               = Commit
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 10
 
-Journal Entry at 2022/07/20 15:20:31.5140:
+Journal Entry at 2022/07/22 14:59:05.2750:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 12
-  Transaction Name   = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+  Transaction Name   = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2022/07/20 15:20:31.7800:
+Journal Entry at 2022/07/22 14:59:05.5410:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 12
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2022/07/20 15:20:31.8880:
+Journal Entry at 2022/07/22 14:59:05.6470:
   Type               = Rollback Retaining
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 14
   Old Transaction ID = 12
 
-Journal Entry at 2022/07/20 15:20:32.1230:
+Journal Entry at 2022/07/22 14:59:05.8770:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 14
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2022/07/20 15:20:32.2340:
+Journal Entry at 2022/07/22 14:59:05.9860:
   Type               = Rollback
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 14
 
-Journal Entry at 2022/07/20 15:20:32.2370:
+Journal Entry at 2022/07/22 14:59:05.9920:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 15
-  Transaction Name   = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+  Transaction Name   = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2022/07/20 15:20:32.5180:
+Journal Entry at 2022/07/22 14:59:06.2720:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 15
-  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, f12, F13, F14, MyArray,  GRANTS) Values(3, 2, 0.314, 0.31412345678, 101.314, 101.99, '25/12/2007 12:30:15.0000', '25/12/2007 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
+  Query Text         = "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(3, 2, 0.314, 0.31412345678, 101.314, 101.99, '2007-12-25', '2007-12-25 12:30:29.1300','XX', 'The Quick Brown Fox jumps over the lazy dog', <blob subtype="0">
 FFD8FFE000104A46494600010101004800480000FFE11E0545786966000049492A00080000000C00
 0E010200200000009E0000000F01020014000000BE0000001001020008000000D200000012010300
 01000000010000001A01050001000000DA000000
 </blob>
-, 9223372036854775807, 65566, '26/12/2007 12:30:45.0000', 'If music be the food of love, play on;
+, 9223372036854775807, 65566, '12:30:45.0000', 'If music be the food of love, play on;
 Give me excess of it, that, surfeiting,
 The appetite may sicken, and so die.
 That strain again! it had a dying fall:
@@ -19861,34 +19861,70 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2022/07/20 15:20:32.5350:
+Journal Entry at 2022/07/22 14:59:06.2910:
   Type               = Commit Retaining
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 17
   Old Transaction ID = 15
 
-Journal Entry at 2022/07/20 15:20:32.8760:
+Journal Entry at 2022/07/22 14:59:06.6320:
   Type               = Commit
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 17
 
-Journal Entry at 2022/07/20 15:20:32.8800:
+Journal Entry at 2022/07/22 14:59:06.6360:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 18
-  Transaction Name   = "{3EE001CB-103E-443E-BCE7-C71BA3E7DF01}"
+  Transaction Name   = "{69B9FDFF-AA4B-4FF6-A0F8-8AAD59665184}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2022/07/20 15:20:33.2630:
+Journal Entry at 2022/07/22 14:59:07.0230:
   Type               = Rollback
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 18
 
+
+Creating Database from resources/Test29.sql
+
+Create Table IBXTest (
+ TableKey Integer not null,
+ F1 Smallint,
+ F2 Float,
+ F3 Double Precision,
+ F4 Decimal(9,3),
+ F5 Decimal(18,4),
+ F6 Date,
+ F7 Timestamp,
+ F8 Char (2),
+ F9 VarChar(256),
+ F10 Blob,
+ F11 BigInt,
+ "f12" Integer,
+ F13 Time,
+ F14 Blob sub_type text,
+ F15 Double Precision Computed by (F2 + F3),
+ MyArray Integer [0:16],
+ "GRANTS" VarChar(20),
+ "My Field" VarChar(32),
+ "MY Field" VarChar(32),
+ Primary Key(TableKey)
+);
+
+Create Generator IBXGen;
+
+Comparing original database with restored database
+Run diff command returns 256
+Output from diff command
+216c216
+< ALTER SEQUENCE IBXGEN RESTART WITH 4;
+---
+> ALTER SEQUENCE IBXGEN RESTART WITH 1;
 
 
 
