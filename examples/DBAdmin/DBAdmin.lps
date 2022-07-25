@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="145">
+    <Units Count="146">
       <Unit0>
         <Filename Value="DBAdmin.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -30,7 +30,6 @@
         <ComponentName Value="DBDataModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="409"/>
         <CursorPos Y="425"/>
@@ -1098,8 +1097,17 @@
         <CursorPos Y="432"/>
         <UsageCount Value="10"/>
       </Unit144>
+      <Unit145>
+        <Filename Value="../../../fbintf/client/IB.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="680"/>
+        <CursorPos X="3" Y="684"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit145>
     </Units>
-    <JumpHistory Count="14" HistoryIndex="13">
+    <JumpHistory Count="15" HistoryIndex="14">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="849" TopLine="721"/>
@@ -1156,12 +1164,16 @@
         <Filename Value="DataModule.pas"/>
         <Caret Line="1372" Column="3" TopLine="1368"/>
       </Position14>
+      <Position15>
+        <Filename Value="../../../fbintf/client/IB.pas"/>
+        <Caret Line="7" Column="13"/>
+      </Position15>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode="default"/>
     </RunParams>
-    <HistoryLists Count="3">
+    <HistoryLists Count="1">
       <List0 Name="LaunchingApplication" Type="File" Count="1">
         <Item1 Value="/usr/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
       </List0>

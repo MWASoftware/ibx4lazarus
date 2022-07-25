@@ -101,6 +101,7 @@ type
     procedure SetCursor;
     procedure RestoreCursor;
     function CreateTimer: IIBTimerInf;
+    procedure QueueAsyncCall(const AMethod: TIBDataEvent;  Data: PtrInt);
   end;
 
 
@@ -133,6 +134,12 @@ end;
 function TDummyGUIInterface.CreateTimer: IIBTimerInf;
 begin
   Result := TNonGUITimer.Create;
+end;
+
+procedure TDummyGUIInterface.QueueAsyncCall(const AMethod: TIBDataEvent;
+  Data: PtrInt);
+begin
+  raise Exception.Create('Unsupported Dummy interface call');
 end;
 
 { TNonGUITimer }

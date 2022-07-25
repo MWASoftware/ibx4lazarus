@@ -47,6 +47,7 @@ type
     function GetDateDBCreated: TDateTime;
     function GetEncrypted: boolean;
     function GetEncryptionKeyName: string;
+    function GetFirebirdVersion: String;
     function GetPagesFree: int64;
     function GetPagesUsed: int64;
     function GetTransactionCount: int64;
@@ -114,6 +115,7 @@ type
     property ODSMinorVersion: integer read GetODSMinorVersion;
     property ODSMajorVersion: integer read GetODSMajorVersion;
     property PageSize: Int64 read GetPageSize;
+    property FirebirdVersion: String read GetFirebirdVersion;
     property Version: String read GetVersion;
     property CurrentMemory: Int64 read GetCurrentMemory;
     property ForcedWrites: Int64 read GetForcedWrites;
@@ -208,6 +210,17 @@ begin
     if (Count > 0) and (Items[0].GetItemType = fb_info_crypt_key) then
       Result := Items[0].AsString
     else
+     IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
+end;
+
+function TIBDatabaseInfo.GetFirebirdVersion: String;
+var Version: byte;
+begin
+  CheckDatabase;
+  with Database.Attachment.GetDBInformation([isc_info_firebird_version]) do
+    if (Count > 0) and (Items[0].GetItemType = isc_info_firebird_version) then
+      Items[0].DecodeVersionString(Version,Result)
+  else
      IBError(ibxeUnexpectedDatabaseInfoResp,[nil]);
 end;
 

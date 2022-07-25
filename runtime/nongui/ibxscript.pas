@@ -77,8 +77,8 @@ type
     FIndex: integer;
     FCurLine: string;
   protected
-    function GetChar: char; override;
-    function GetErrorPrefix: string; override;
+    function GetChar: AnsiChar; override;
+    function GetErrorPrefix: AnsiString; override;
   public
     procedure Reset; override;
     procedure SetStreamSource(Lines: TStrings); overload;
@@ -102,8 +102,8 @@ type
     FNextStatement: boolean;
     function GetNextLine(var Line: string):boolean;
   protected
-    function GetChar: char; override;
-    function GetErrorPrefix: string; override;
+    function GetChar: AnsiChar; override;
+    function GetErrorPrefix: AnsiString; override;
   public
     constructor Create(aPrompt: string='SQL>'; aContinue: string = 'CON>');
     function GetNextStatement(var stmt: string) : boolean; override;
@@ -509,6 +509,7 @@ begin
         end;
       end;
     end;
+//    writeln(stmt);
   end;
   Result := stmt <> '';
 end;
@@ -1070,7 +1071,7 @@ end;
 
 { TInteractiveSQLStatementReader }
 
-function TInteractiveSQLStatementReader.GetErrorPrefix: string;
+function TInteractiveSQLStatementReader.GetErrorPrefix: AnsiString;
 begin
   Result := '';
 end;
@@ -1089,7 +1090,7 @@ begin
   end;
 end;
 
-function TInteractiveSQLStatementReader.GetChar: char;
+function TInteractiveSQLStatementReader.GetChar: AnsiChar;
 begin
   if Terminated then
     Result := #0
@@ -1138,7 +1139,7 @@ end;
 
 { TBatchSQLStatementReader }
 
-function TBatchSQLStatementReader.GetChar: char;
+function TBatchSQLStatementReader.GetChar: AnsiChar;
 begin
   if not EOF and assigned(FInStream) and not (FInStream.Position = FInStream.Size) then
   begin
@@ -1163,7 +1164,7 @@ begin
     Result := #0;
 end;
 
-function TBatchSQLStatementReader.GetErrorPrefix: string;
+function TBatchSQLStatementReader.GetErrorPrefix: AnsiString;
 begin
   Result := Format(sOnLineError,[FLineIndex,FIndex]);
 end;

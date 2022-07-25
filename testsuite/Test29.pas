@@ -37,7 +37,7 @@ interface
 
 uses
   Classes, SysUtils,   TestApplication, IBXTestBase, DB, IB, IBJournal,
-  IBCustomDataSet;
+  IBCustomDataSet, IBUtils, IBExtract;
 
 const
   aTestID    = '29';
@@ -51,8 +51,11 @@ type
   private
     FDataSet: TIBDataSet;
     FJournal: TIBJournal;
+    FExtract: TIBExtract;
     FCreateArrayOnInsert: boolean;
     procedure HandleAfterInsert(DataSet: TDataSet);
+    procedure HandleOnJournalEntry(Sender: TObject; aJnlEntry: PJnlEntry);
+    procedure DoPlayback(dbDumpFile: string);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
     function GetTestID: AnsiString; override;
@@ -119,6 +122,27 @@ begin
   end;
 end;
 
+procedure TTest29.HandleOnJournalEntry(Sender: TObject; aJnlEntry: PJnlEntry);
+begin
+  writeln(OutFile,'Journal Entry Made');
+  writeln(OutFile,IBFormatJnlEntry(aJnlEntry));
+  writeln(OutFile);
+end;
+
+procedure TTest29.DoPlayback(dbDumpFile: string);
+begin
+  with TJournalPlayer.Create do
+  try
+    FJournal.ReplayJournal(FJournal.JournalFilePath);
+    IBTransaction.Active := true;
+    FExtract.ExtractObject(eoDatabase,'',[etData,etGrantsToUser]);
+    FExtract.Items.SaveToFile(dbDumpFile);
+    IBTransaction.Active := false;
+  finally
+    Free;
+  end;
+end;
+
 procedure TTest29.CreateObjects(Application: TTestApplication);
 begin
   inherited CreateObjects(Application);
@@ -177,7 +201,11 @@ begin
     Database := IBDatabase;
     ApplicationName := 'Test29';
     RetainJournal := true;
+    OnJournalEntry := @HandleOnJournalEntry;
   end;
+  FExtract := TIBExtract.Create(Application);
+  FExtract.Database := IBDatabase;
+  FExtract.Transaction := IBTransaction;
 end;
 
 function TTest29.GetTestID: AnsiString;
@@ -199,6 +227,8 @@ end;
 
 procedure TTest29.RunTest(CharSet: AnsiString; SQLDialect: integer);
 var OldDefaultFormatSettings: TFormatSettings;
+    i: integer;
+    dbDumpFile: string;
 begin
   OldDefaultFormatSettings := DefaultFormatSettings;
   IBDatabase.CreateDatabase;
@@ -260,17 +290,58 @@ begin
     IBTransaction.Active := false;
     PrintJournalTable(IBDatabase.Attachment);
 
-   except on E: Exception do
-     begin
-       writeln('Terminated with Exception: ' + E.Message);
-       IBDatabase.ForceClose;
-     end;
+    FJournal.Enabled := false;
+    writeln(OutFile);
+    {print out journal}
+    writeln(OutFile,'Low Level Journal File Print out');
+    PrintJournalFile(FJournal.JournalFilePath);
+    writeln(OutFile);
+    writeln(OutFile,'Print out Journal File using TIBJournal');
+    with TJournalPlayer.Create do
+    try
+      LoadJournalFile(FJournal.JournalFilePath, FJournal.Database);
+      for i := 0 to JnlEntryCount - 1 do
+        writeln(OutFile,IBFormatJnlEntry(JnlEntry[i]));
+        writeln(OutFile);
+    finally
+      Free;
+    end;
+
+    {Dump Database to text file}
+    dbDumpFile := ChangeFileExt(GetOutFile,'.db1');
+    IBTransaction.Active := true;
+    {Drop journaling suuport before dumping database}
+    IBDatabase.Attachment.ExecImmediate(IBTransaction.TransactionIntf,'Drop Table IBX$JOURNALS');
+    IBDatabase.Attachment.ExecImmediate(IBTransaction.TransactionIntf,'Drop Sequence IBX$SESSIONS');
+    IBTransaction.Commit;
+    IBTransaction.Active := true;
+    FExtract.ExtractObject(eoDatabase,'',[etData,etGrantsToUser]);
+    FExtract.Items.SaveToFile(dbDumpFile);
+    IBTransaction.Active := false;
+
+   finally
+     DefaultFormatSettings := OldDefaultFormatSettings;
+     IBDatabase.DropDatabase;
    end;
-   FJournal.Enabled := false;
-   PrintJournalFile(FJournal.JournalFilePath);
-  finally
-    DefaultFormatSettings := OldDefaultFormatSettings;
-    IBDatabase.DropDatabase;
+
+   {now playback the log and restore the database}
+   IBDatabase.CreateDatabase;
+   try
+     DefaultFormatSettings.LongTimeFormat := 'HH:MM:SS.zzzz';
+     DoPlayback(ChangeFileExt(dbDumpFile,'.db2'));
+   finally
+     DefaultFormatSettings := OldDefaultFormatSettings;
+     IBDatabase.DropDatabase;
+   end;
+
+   writeln(OutFile);
+   writeln(OutFile,'Comparing original database with restored database');
+   CompareFiles(dbDumpFile, ChangeFileExt(dbDumpFile,'.db2'));
+  except on E: Exception do
+    begin
+      writeln(OutFile,'Terminated with Exception: ' + E.Message);
+      IBDatabase.ForceClose;
+    end;
   end;
 end;
 

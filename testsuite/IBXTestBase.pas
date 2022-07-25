@@ -76,6 +76,7 @@ protected
   procedure ProcessResults; override;
 public
   destructor Destroy; override;
+  procedure CompareFiles(F1, F2: string);
   property IBDatabase: TIBDatabase read  FIBDatabase;
   property IBTransaction: TIBTransaction read FIBTransaction;
   property IBQuery: TIBQuery read FIBQuery;
@@ -422,32 +423,8 @@ begin
 end;
 
 procedure TIBXTestBase.ProcessResults;
-var DiffExe: string;
-    ResourceFile: string;
-    S: TStrings;
-    Results: string;
-    ExitStatus: integer;
 begin
-   ResourceFile := FScriptFile;
-   if FileExists(GetOutFile) and FileExists(ResourceFile) then
-   begin
-     DiffExe := GetEnvironmentVariable('DIFF');
-     if DiffExe = '' then
-       DiffExe := 'diff';
-     S := TStringList.Create;
-     try
-       RunCommandInDir(GetCurrentDir,DiffExe ,[ResourceFile,GetOutFile],Results,ExitStatus);
-       writeln(OutFile,'Run diff command returns ',ExitStatus);
-       if Results <> '' then
-       begin
-         S.Text := Results;
-         writeln(Outfile,'Output from diff command');
-         WriteStrings(S);
-       end;
-     finally
-       S.Free;
-     end;
-   end;
+   CompareFiles(FScriptFile,GetOutFile);
    IBDatabase.Connected := false;
 end;
 
@@ -456,6 +433,33 @@ begin
   if IBDatabase <> nil then
     IBDatabase.Connected := false;
   inherited Destroy;
+end;
+
+procedure TIBXTestBase.CompareFiles(F1, F2: string);
+var DiffExe: string;
+    Results: string;
+    S: TStringList;
+    ExitStatus: integer;
+begin
+  if FileExists(F1) and FileExists(F2) then
+  begin
+    DiffExe := GetEnvironmentVariable('DIFF');
+    if DiffExe = '' then
+      DiffExe := 'diff';
+    S := TStringList.Create;
+    try
+      RunCommandInDir(GetCurrentDir,DiffExe ,[F1,F2],Results,ExitStatus);
+      writeln(OutFile,'Run diff command returns ',ExitStatus);
+      if Results <> '' then
+      begin
+        S.Text := Results;
+        writeln(Outfile,'Output from diff command');
+        WriteStrings(S);
+      end;
+    finally
+      S.Free;
+    end;
+  end;
 end;
 
 end.

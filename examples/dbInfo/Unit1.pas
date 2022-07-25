@@ -113,7 +113,8 @@ begin
     Memo1.Lines.Add('ODS Minor Version = ' + IntToStr(ODSMinorVersion));
     Memo1.Lines.Add('ODS Major Version = ' + IntToStr(ODSMajorVersion));
     Memo1.Lines.Add('Page Size = ' + IntToStr(PageSize));
-    Memo1.Lines.Add('Version = ' + Version);
+    Memo1.Lines.Add('Version (legacy) = ' + Version);
+    Memo1.Lines.Add('Firebird Version = ' + FirebirdVersion);
     Memo1.Lines.Add('Current Memory = ' + IntToStr(CurrentMemory));
     ShowBoolValue(ForcedWrites,'Forced Writes Enabled','Forced Writes Disabled');
     Memo1.Lines.Add('Max Memory = ' + IntToStr(MaxMemory));
