@@ -125,7 +125,7 @@ type
      {JournalFileTemplate determines the name of the journal file and should
       include a %d where %d is replaced with the session no at run time.}
     property JournalFileTemplate: string read FJournalFileTemplate write FJournalFileTemplate;
-     {Journaling options - see fbintf/doc/README.ClientSideJournaling.pdf }
+     {Journaling options - see Firebird Pascal API Guide section 14.1 }
     property Options: TJournalOptions read FOptions write FOptions;
      {Vendor Name and ApplicationName determine the location of the Journal file.
       The Journal file is saved in:
@@ -138,7 +138,7 @@ type
      }
     property VendorName: string read FVendorName write FVendorName;
     property ApplicationName: string read FApplicationName write FApplicationName;
-     {If RetainJournal is true then when journaling terminats Enabled := false,
+     {If RetainJournal is true then when journaling terminates (Enabled := false),
       or a normal database close, the journal file and journal table (IBX$JOURNALS)
       entries are retained. Otherwise, they are discarded. Note: always retained
       on a Force Disconnect or a lost connection}

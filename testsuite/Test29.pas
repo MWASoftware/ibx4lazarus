@@ -133,8 +133,7 @@ procedure TTest29.DoPlayback(dbDumpFile: string);
 begin
   with TJournalPlayer.Create do
   try
-    LoadJournalFile(FJournal.JournalFilePath, FJournal.Database);
-    Playback(FJournal.Database);
+    FJournal.ReplayJournal(FJournal.JournalFilePath);
     IBTransaction.Active := true;
     FExtract.ExtractObject(eoDatabase,'',[etData,etGrantsToUser]);
     FExtract.Items.SaveToFile(dbDumpFile);
