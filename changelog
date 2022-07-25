@@ -1,4 +1,4 @@
-IBX Change Log  version (2.5-0 Build 13136) Mon, 31 Jan 2022 14:55:28 +0000
+IBX Change Log  version (2.5-0 Build 13835) Mon, 25 Jul 2022 15:33:32 +0100
 
 1. TIBTransaction: new properties
     property TransactionID: integer read GetTransactionID;
