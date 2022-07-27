@@ -19,7 +19,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <TopLine Value="1077"/>
-        <CursorPos X="3" Y="1079"/>
+        <CursorPos X="36" Y="1086"/>
         <UsageCount Value="170"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -30,9 +30,10 @@
         <ComponentName Value="DBDataModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="409"/>
-        <CursorPos Y="425"/>
+        <CursorPos X="25" Y="411"/>
         <UsageCount Value="170"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1099,7 +1100,6 @@
       </Unit144>
       <Unit145>
         <Filename Value="../../../fbintf/client/IB.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="680"/>
         <CursorPos X="3" Y="684"/>
