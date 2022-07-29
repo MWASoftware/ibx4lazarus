@@ -8,7 +8,7 @@ set PASSWORD=masterkey
 REM Test suite Configuration parameters (FPCDIR and FPCBIN)
 REM These may be modified if needed to suite local requirements
 
-FOR %%V in (3.2.0 3.0.4 3.0.2 3.0.0) do (
+FOR %%V in (3.2.2 3.2.0 3.0.4 3.0.2 3.0.0) do (
   if EXIST C:\lazarus\fpc\%%V\bin\i386-win32\fpc.exe (
     set FPCDIR=C:\lazarus\fpc\%%V
     set FPCBIN=C:\lazarus\fpc\%%V\bin\i386-win32
