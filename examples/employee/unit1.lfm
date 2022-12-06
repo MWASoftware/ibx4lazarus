@@ -1,5 +1,5 @@
 object Form1: TForm1
-  Left = 480
+  Left = 482
   Height = 482
   Top = 407
   Width = 932
@@ -230,6 +230,24 @@ object Form1: TForm1
         Anchors = [akTop, akLeft, akBottom]
         DataField = 'TOTALSALARIES'
         DataSource = TotalsSource
+      end
+      object DBNavigator1: TDBNavigator
+        Left = 210
+        Height = 25
+        Top = 19
+        Width = 241
+        BevelOuter = bvNone
+        ChildSizing.EnlargeHorizontal = crsScaleChilds
+        ChildSizing.EnlargeVertical = crsScaleChilds
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclLeftToRightThenTopToBottom
+        ChildSizing.ControlsPerLine = 100
+        ClientHeight = 25
+        ClientWidth = 241
+        DataSource = EmployeeSource
+        Options = []
+        TabOrder = 2
       end
     end
     object EmployeeEditorPanel: TPanel
@@ -508,6 +526,7 @@ object Form1: TForm1
     Top = 168
   end
   object IBTransaction1: TIBTransaction
+    TransactionName = '{DEC4CF7B-7B75-4E9D-BD3F-A183A6B47148}'
     Active = False
     DefaultDatabase = IBDatabase1
     Params.Strings = (

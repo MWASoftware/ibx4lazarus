@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="7">
+    <Units Count="13">
       <Unit0>
         <Filename Value="IdentityColumns.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="21"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -19,10 +19,9 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="64"/>
-        <CursorPos X="39" Y="89"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="94"/>
+        <CursorPos X="77" Y="126"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -61,16 +60,124 @@
         <TopLine Value="392"/>
         <UsageCount Value="10"/>
       </Unit6>
+      <Unit7>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="3963"/>
+        <CursorPos X="41" Y="3979"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="17"/>
+        <CursorPos X="30" Y="36"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="../../../../../main/lcl/grids.pas"/>
+        <UnitName Value="Grids"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1035"/>
+        <CursorPos X="27" Y="1060"/>
+        <UsageCount Value="10"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="../../../../../main/lcl/lclversion.pas"/>
+        <UnitName Value="LCLVersion"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="21"/>
+        <CursorPos X="10" Y="35"/>
+        <UsageCount Value="10"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="../../../../components/lazutils/lazversion.pas"/>
+        <UnitName Value="LazVersion"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="../../../../../main/components/lazutils/lazversion.pas"/>
+        <UnitName Value="LazVersion"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit12>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="17" HistoryIndex="16">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="70" TopLine="57"/>
       </Position1>
+      <Position2>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="80" Column="65" TopLine="64"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="15" Column="57"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="995" Column="16" TopLine="985"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="3986" Column="41" TopLine="3960"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="1038" TopLine="1019"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="3982" Column="19" TopLine="3952"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="3980" Column="31" TopLine="3963"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="23" Column="66" TopLine="10"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="200" Column="15" TopLine="172"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="463" Column="26" TopLine="459"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="199" Column="17" TopLine="184"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="36" Column="27" TopLine="16"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="57" Column="43" TopLine="35"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="60" Column="19" TopLine="35"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="199" Column="37" TopLine="184"/>
+      </Position17>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0" ActiveMode="default"/>
+      <Modes ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
 </CONFIG>

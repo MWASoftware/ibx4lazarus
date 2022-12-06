@@ -42,6 +42,7 @@ type
 
   TForm1 = class(TForm)
     DBEdit6: TDBEdit;
+    DBNavigator1: TDBNavigator;
     EmployeesDEPT_KEY_PATH: TIBStringField;
     EmployeesDEPT_PATH: TIBStringField;
     EmployeesTEst: TStringField;

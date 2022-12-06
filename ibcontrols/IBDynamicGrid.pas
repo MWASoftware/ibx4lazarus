@@ -33,7 +33,7 @@ interface
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DBGrids, DB,
   IBSQLParser, Grids, IBLookupComboEditBox, LMessages, StdCtrls, ExtCtrls,
-  IBCustomDataSet;
+  IBCustomDataSet, LCLVersion;
 
 type
   {
@@ -196,7 +196,11 @@ end;
     procedure DoGridResize;
     procedure DoEditorHide; override;
     procedure DoEditorShow; override;
+    {$IF (LCL_FULLVERSION < 2030000)}
     procedure DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; aText: String); override;
+    {$ELSE}
+    procedure DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; const aText: String); override;
+    {$IFEND}
     Function  EditingAllowed(ACol : Integer = -1) : Boolean; override;
     procedure EditorHide; override;
     procedure IndicatorClicked(Button: TMouseButton; Shift:TShiftState); virtual;
@@ -452,8 +456,12 @@ begin
     inherited DoEditorShow;
 end;
 
+{$IF LCL_FULLVERSION < 2030000}
 procedure TDBDynamicGrid.DrawCellText(aCol, aRow: Integer; aRect: TRect;
   aState: TGridDrawState; aText: String);
+{$ELSE}
+procedure TDBDynamicGrid.DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; const aText: String); override;
+{$IFEND}
 var Style: TTextStyle;
     OldStyle: TTextStyle;
 begin

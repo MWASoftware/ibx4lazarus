@@ -123,7 +123,7 @@ begin
   if IBDatabaseInfo1.ODSMajorVersion < 12 then
   begin
     IBDatabase1.DropDatabase;
-    raise EIBClientError.Create(0,'This example requires Firebird 3');
+    raise EIBClientError.Create(0,'This example requires Firebird 3 or later');
   end
   else
   with IBDatabase1.Attachment do
