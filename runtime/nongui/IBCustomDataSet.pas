@@ -436,10 +436,10 @@ type
 
   protected
     type
-      TIBDBKey = record
-        DBKey: array[0..7] of Byte;
+    PIBDBKey = ^TIBDBKey;
+    TIBDBKey = record
+      DBKey: array[0..7] of Byte;
       end;
-      PIBDBKey = ^TIBDBKey;
 
     TRecordData = record
       rdBookmarkFlag: TBookmarkFlag;

@@ -178,7 +178,11 @@ type
       ibxeResourceFileNotFound,
       ibxePatchFileNotFound,
       ibxeUnrecognisedParamName,
-      ibxeBadQueryReplay
+      ibxeBadQueryReplay,
+      ibxeNotABuffer,
+      ibxeEmptyBufferPool,
+      ibxeNotEnoughBuffers,
+      ibxeUnrecognisedHeaderType
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -323,6 +327,10 @@ resourcestring
   SPatchFileNotFound = 'In section [%s] of the Upgrade File (%s), unable to open %s (SQL script to patch).';
   SUnrecognisedParamName = 'Unrecognised Parameter Name (%s)';
   SBadQueryReplay = 'Playback execution error for "%s"' + LineEnding + '%s';
+  SNotABuffer = '%s: Invalid Buffer Pointer';
+  SEmptyBufferPool = '%s Buffer Pool is empty';
+  SNotEnoughBuffers = '%s: Buffers per Block must be greater than 1';
+  SUnrecognisedHeaderType = 'Unrecognised header type (%d)';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -428,7 +436,11 @@ const
     SResourceFileNotFound,
     SPatchFileNotFound,
     SUnrecognisedParamName,
-    SBadQueryReplay
+    SBadQueryReplay,
+    SNotABuffer,
+    SEmptyBufferPool,
+    SNotEnoughBuffers,
+    SUnrecognisedHeaderType
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
