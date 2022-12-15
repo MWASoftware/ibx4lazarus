@@ -128,15 +128,17 @@ type
     FFirstRecord: PByte;
     FLastRecord: PByte;
     function GetNext(P: PByte): PByte;
+    function GetRecDBkey(aBuffer: PByte): TIBDBKey;
+    procedure SetRecDBKey(aBuffer: PByte; AValue: TIBDBKey);
+    function InternalGetNextBuffer(aBuffer: PByte): PByte;
   protected
+    function AddBuffer: PByte; override;
     procedure CheckValidBuffer(P:PByte); override;
   public
     constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
-    function AddBuffer: PByte; override;
     procedure Clear; override;
     function GetFirst: PByte; override;
     function GetLast: PByte; override;
-    function GetRecDBkey(aBuffer: PByte): TIBDBKey;
     function GetBuffer(RecNo: cardinal): PByte; override;
     function GetNextBuffer(aBuffer: PByte): PByte; override;
     function GetPriorBuffer(aBuffer: PByte): PByte; override;
@@ -147,8 +149,51 @@ type
     procedure Delete(aBuffer: PByte);
     function GetBookmarkFlag(aBuffer: PByte): TBookmarkFlag; virtual;
     procedure SetBookmarkFlag(aBuffer: PByte; aBookmarkFlag: TBookmarkFlag); virtual;
+    property RecDBKey[aBuffer: PByte]:TIBDBKey  read GetRecDBkey write SetRecDBKey;
   end;
 
+  {
+    TIIBOldBufferPool is used to support cached updates. When a record is updated
+    a new buffer is allocated from this pool. The caller may then copy the
+    record data into this buffer. The buffer header includes the cached update
+    status and a pointer back to the buffer containing the updated data.
+
+    Insertions and Deletions do not need a data copy. This only applies to updated
+    records.
+
+    Forward and backwards iterators are provided. The Forward iterator may be used
+    to apply updates while the backwards iterator may be used to cancel updates. In
+    each case the update status is used to determine the actual and the pointer to
+    the data buffer is used to access the updated data.
+  }
+
+  TIIBOldBufferPool = class(TINSimpleBufferPool)
+   private type
+     TCachedUpdateStatus = (
+                        cusUnmodified=0, cusModified, cusInserted,
+                        cusDeleted, cusUninserted
+                       );
+
+     TRecordData = record
+       rdStatus: TCachedUpdateStatus;
+       DataBuffer: PByte;
+     end;
+   public type
+     TIterator = procedure(status: TCachedUpdateStatus; DataBuffer, OldBuffer: PByte) of object;
+
+   public
+    constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
+    destructor Destroy; override;
+    function AddBuffer: PByte; override;
+    function GetFirst: PByte; override;
+    function GetLast: PByte; override;
+    function GetBuffer(RecNo: cardinal): PByte; override;
+    function GetNextBuffer(aBuffer: PByte): PByte; override;
+    function GetPriorBuffer(aBuffer: PByte): PByte; override;
+    function GetRecNo(aBuffer: PByte): cardinal; virtual;
+    procedure ForwardIterator(iterator: TIterator);
+    procedure BackwardsIterator(iterator: TIterator);
+  end;
 
 
 implementation
@@ -399,6 +444,7 @@ end;
 
 function TIBBufferPool.AddBuffer: PByte;
 begin
+  Result := nil;
   IBError(ibxeNotSupported,[]);
 end;
 
@@ -428,24 +474,16 @@ begin
   Result := PRecordData(aBuffer)^.rdDBKey;
 end;
 
-function TIBBufferPool.GetBuffer(RecNo: cardinal): PByte;
-begin
-  Result := inherited GetBuffer(RecNo);
-  if Result <> nil then
-    Inc(Result,sizeof(TRecordData));
-end;
-
-function TIBBufferPool.GetNext(P: PByte): PByte;
-begin
-  repeat
-    P := inherited GetNextBuffer(P);
-  until (P = nil) or (PRecordData(P)^.rdStatus <> rsDeleted);
-end;
-
-function TIBBufferPool.GetNextBuffer(aBuffer: PByte): PByte;
+procedure TIBBufferPool.SetRecDBKey(aBuffer: PByte; AValue: TIBDBKey);
 begin
   Dec(aBuffer,sizeof(TRecordData));
   CheckValidBuffer(aBuffer);
+  PRecordData(aBuffer)^.rdDBKey := AValue;
+end;
+
+function TIBBufferPool.InternalGetNextBuffer(aBuffer: PByte): PByte;
+{aBuffer points to TRecordData}
+begin
   Result := aBuffer;
 
   case  PRecordData(aBuffer)^.rdStatus of
@@ -458,15 +496,12 @@ begin
     IBError(ibxeRecordisDeleted,[inherited GetRecNo(aBuffer)]);
 
   rsInserted:
-    {First look forward to find the next undeleted buffer with a previous pointer
-    to this buffer. Terminates when an appended buffer is found. Then walk
-    backwards to first previous appended buffer and then walk forwards}
-
     begin
       Result := GetNext(aBuffer);
       if (Result <> nil) and (PRecordData(Result)^.rdPreviousBuffer <> aBuffer) then {otherwise found it}
       begin
         Result := aBuffer;
+        {Go back to insertion point}
         repeat
           Result := PRecordData(Result)^.rdPreviousBuffer;
         until (Result = nil) or (PRecordData(Result)^.rdStatus = rsAppended);
@@ -474,7 +509,12 @@ begin
         if Result <> nil then {now back at the point where the buffer(s) were
                                inserted.}
         begin
-          Result := GetNext(Result);
+          {find the next appended buffer}
+          repeat
+            Result := GetNext(Result);
+          until (Result = nil) or (PRecordData(Result)^.rdStatus = rsAppended);
+
+          {now work backwards to find the next buffer in the sequence}
           while (Result <> nil) and (PRecordData(Result)^.rdPreviousBuffer <> aBuffer) do
             {look backwards for the next undeleted buffer with a previous pointer to this buffer}
             Result := PRecordData(Result)^.rdPreviousBuffer;
@@ -483,6 +523,27 @@ begin
     end;
   end;
 
+end;
+
+function TIBBufferPool.GetBuffer(RecNo: cardinal): PByte;
+begin
+  Result := inherited GetBuffer(RecNo);
+  if Result <> nil then
+    Inc(Result,sizeof(TRecordData));
+end;
+
+function TIBBufferPool.GetNext(P: PByte): PByte;
+begin
+  repeat
+    Result := inherited GetNextBuffer(P);
+  until (Result = nil) or (PRecordData(Result)^.rdStatus <> rsDeleted);
+end;
+
+function TIBBufferPool.GetNextBuffer(aBuffer: PByte): PByte;
+begin
+  Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
+  Result := InternalGetNextBuffer(aBuffer);
   if Result <> nil then
     Inc(Result,sizeof(TRecordData));
 end;
@@ -535,8 +596,8 @@ begin
     else
     begin
       rdStatus := rsInserted;
-      {assumes GetNext can never return nil given aBuffer is not last}
-      PRecordData(GetNext(aBuffer))^.rdPreviousBuffer := Result;
+      {assumes InternalGetNextBuffer can never return nil given aBuffer is not last}
+      PRecordData(InternalGetNextBuffer(aBuffer))^.rdPreviousBuffer := Result;
     end;
   end;
   Inc(Result,sizeof(TRecordData));
@@ -544,13 +605,23 @@ end;
 
 function TIBBufferPool.Append: PByte;
 begin
-  Result := InsertAfter(GetLast);
+  Result := AddBuffer;
+  with PRecordData(Result)^ do
+  begin
+    rdPreviousBuffer := FLastRecord;
+    rdBookmarkFlag := bfCurrent;
+    rdStatus := rsAppended;
+    FLastRecord := Result;
+    if FFirstRecord = nil then
+      FFirstRecord := Result;
+  end;
+  Inc(Result,sizeof(TRecordData));
 end;
 
 procedure TIBBufferPool.Delete(aBuffer: PByte);
 var NextBuffer: PByte;
 begin
-  NextBuffer := GetNextBuffer(aBuffer);
+  NextBuffer := GetNextBuffer(aBuffer); {checks valid buffer}
   Dec(aBuffer,sizeof(TRecordData));
   with PRecordData(aBuffer)^ do
   begin
