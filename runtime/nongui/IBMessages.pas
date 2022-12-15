@@ -182,7 +182,8 @@ type
       ibxeNotABuffer,
       ibxeEmptyBufferPool,
       ibxeNotEnoughBuffers,
-      ibxeUnrecognisedHeaderType
+      ibxeUnrecognisedHeaderType,
+      ibxeRecordisDeleted
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -331,6 +332,7 @@ resourcestring
   SEmptyBufferPool = '%s Buffer Pool is empty';
   SNotEnoughBuffers = '%s: Buffers per Block must be greater than 1';
   SUnrecognisedHeaderType = 'Unrecognised header type (%d)';
+  SRecordisDeleted = 'Record No. %d has been deleted!';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -440,7 +442,8 @@ const
     SNotABuffer,
     SEmptyBufferPool,
     SNotEnoughBuffers,
-    SUnrecognisedHeaderType
+    SUnrecognisedHeaderType,
+    SRecordisDeleted
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

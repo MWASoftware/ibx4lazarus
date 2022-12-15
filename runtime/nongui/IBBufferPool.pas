@@ -58,10 +58,9 @@ type
       RecNo: cardinal;
     end;
 
-  private
+  strict private
     FFirstBlock: PByte;
     FLastBlock: PByte;
-    FBlockSize: integer;
     FBufferSize: integer;  {user buffer size i.e. not including header}
     FBuffersPerBlock: integer;
     FFirstBlockBuffers: integer;
@@ -73,10 +72,10 @@ type
   protected
     procedure CheckValidBuffer(P:PByte); virtual;
   public
-    constructor Create(aName: string; bufSize, buffersPerBlock, firstBlockBuffers: integer);
+    constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
     destructor Destroy; override;
     function AddBuffer: PByte; virtual;
-    procedure Clear;
+    procedure Clear; virtual;
     function GetFirst: PByte; virtual;
     function GetLast: PByte; virtual;
     function GetBuffer(RecNo: cardinal): PByte; virtual;
@@ -125,14 +124,16 @@ type
       rdStatus: TRecordStatus;
       rdPreviousBuffer: PByte;
     end;
-  private
-    FFirstBuffer: PByte;
-    FLastBuffer: PByte;
+  strict private
+    FFirstRecord: PByte;
+    FLastRecord: PByte;
+    function GetNext(P: PByte): PByte;
   protected
     procedure CheckValidBuffer(P:PByte); override;
   public
-    constructor Create(aName: string; bufSize, buffersPerBlock, firstBlockBuffers: integer);
+    constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
     function AddBuffer: PByte; override;
+    procedure Clear; override;
     function GetFirst: PByte; override;
     function GetLast: PByte; override;
     function GetRecDBkey(aBuffer: PByte): TIBDBKey;
@@ -143,6 +144,7 @@ type
     function InsertBefore(aBuffer: PByte): PByte; virtual;
     function InsertAfter(aBuffer: PByte): PByte; virtual;
     function Append: PByte;
+    procedure Delete(aBuffer: PByte);
     function GetBookmarkFlag(aBuffer: PByte): TBookmarkFlag; virtual;
     procedure SetBookmarkFlag(aBuffer: PByte; aBookmarkFlag: TBookmarkFlag); virtual;
   end;
@@ -205,15 +207,15 @@ begin
      IBError(ibxeEmptyBufferPool,[FName]);
 end;
 
-constructor TIBSimpleBufferPool.Create(aName: string; bufSize, buffersPerBlock,
-  firstBlockBuffers: integer);
+constructor TIBSimpleBufferPool.Create(aName: string; bufSize,
+  aBuffersPerBlock, firstBlockBuffers: integer);
 begin
   inherited Create;
   FName := aName;
   FBufferSize := bufSize;
   if (buffersPerBlock <= 1) or (firstBlockBuffers <= 1) then
      IBError(ibxeNotEnoughBuffers,[FName]);
-  FBuffersPerBlock := buffersPerBlock;
+  FBuffersPerBlock := aBuffersPerBlock;
   FFirstBlockBuffers := firstBlockBuffers;
   FBufferIndex := TList.Create;
 end;
@@ -389,10 +391,10 @@ begin
   inherited CheckValidBuffer(P);
 end;
 
-constructor TIBBufferPool.Create(aName: string; bufSize, buffersPerBlock,
+constructor TIBBufferPool.Create(aName: string; bufSize, aBuffersPerBlock,
   firstBlockBuffers: integer);
 begin
-  inherited Create(aName,bufSize + sizeof(TRecordData), buffersPerBlock, firstBlockBuffers);
+  inherited Create(aName,bufSize + sizeof(TRecordData), aBuffersPerBlock, firstBlockBuffers);
 end;
 
 function TIBBufferPool.AddBuffer: PByte;
@@ -400,14 +402,23 @@ begin
   IBError(ibxeNotSupported,[]);
 end;
 
+procedure TIBBufferPool.Clear;
+begin
+  inherited Clear;
+  FFirstRecord := nil;
+  FLastRecord := nil;
+end;
+
 function TIBBufferPool.GetFirst: PByte;
 begin
-  Result := FFirstBuffer;
+  Result := FFirstRecord;
+  Inc(Result,sizeof(TRecordData));
 end;
 
 function TIBBufferPool.GetLast: PByte;
 begin
-  Result := FLastBuffer;
+  Result := FLastRecord;
+  Inc(Result,sizeof(TRecordData));
 end;
 
 function TIBBufferPool.GetRecDBkey(aBuffer: PByte): TIBDBKey;
@@ -424,16 +435,24 @@ begin
     Inc(Result,sizeof(TRecordData));
 end;
 
+function TIBBufferPool.GetNext(P: PByte): PByte;
+begin
+  repeat
+    P := inherited GetNextBuffer(P);
+  until (P = nil) or (PRecordData(P)^.rdStatus <> rsDeleted);
+end;
+
 function TIBBufferPool.GetNextBuffer(aBuffer: PByte): PByte;
 begin
   Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
   Result := aBuffer;
+
   case  PRecordData(aBuffer)^.rdStatus of
   rsAppended:
     repeat {look for the next undeleted buffer with a previous pointer to this buffer}
-      Result := inherited GetNextBuffer(Result);
-    until (Result = nil) or ((PRecordData(Result)^.rdStatus <> rsDeleted)
-                             and (PRecordData(Result)^.rdPreviousBuffer = aBuffer));
+      Result := GetNext(Result);
+    until (Result = nil) or ( PRecordData(Result)^.rdPreviousBuffer = aBuffer);
 
   rsDeleted:
     IBError(ibxeRecordisDeleted,[inherited GetRecNo(aBuffer)]);
@@ -442,65 +461,125 @@ begin
     {First look forward to find the next undeleted buffer with a previous pointer
     to this buffer. Terminates when an appended buffer is found. Then walk
     backwards to first previous appended buffer and then walk forwards}
+
     begin
-      repeat
-        Result := inherited GetNextBuffer(Result);
-        if Result <> nil then
+      Result := GetNext(aBuffer);
+      if (Result <> nil) and (PRecordData(Result)^.rdPreviousBuffer <> aBuffer) then {otherwise found it}
+      begin
+        Result := aBuffer;
+        repeat
+          Result := PRecordData(Result)^.rdPreviousBuffer;
+        until (Result = nil) or (PRecordData(Result)^.rdStatus = rsAppended);
+
+        if Result <> nil then {now back at the point where the buffer(s) were
+                               inserted.}
         begin
-          case PRecordData(Result)^.rdStatus:
-          rsDeleted:
-            ; {ignore}
-
-          rsAppended:
-            break; {exit repeat loop}
-
-          rsInserted:
-            if PRecordData(Result)^.rdPreviousBuffer = aBuffer then
-              break;
-          end;
-        end ;
-      until Result = nil;
+          Result := GetNext(Result);
+          while (Result <> nil) and (PRecordData(Result)^.rdPreviousBuffer <> aBuffer) do
+            {look backwards for the next undeleted buffer with a previous pointer to this buffer}
+            Result := PRecordData(Result)^.rdPreviousBuffer;
+        end;
+      end;
+    end;
   end;
 
-
-  Inc(Result,sizeof(TRecordData));
+  if Result <> nil then
+    Inc(Result,sizeof(TRecordData));
 end;
 
 function TIBBufferPool.GetPriorBuffer(aBuffer: PByte): PByte;
 begin
   Dec(aBuffer,sizeof(TRecordData));
-  Result:=inherited GetPriorBuffer(aBuffer);
+  CheckValidBuffer(aBuffer);
+  Result := PRecordData(aBuffer)^.rdPreviousBuffer
 end;
 
 function TIBBufferPool.GetRecNo(aBuffer: PByte): cardinal;
 begin
-  Result:=inherited GetRecNo(aBuffer);
+  Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
+  Result := inherited GetRecNo(aBuffer);
 end;
 
 function TIBBufferPool.InsertBefore(aBuffer: PByte): PByte;
 begin
-
+  Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
+  Result := AddBuffer;
+  with PRecordData(Result)^ do
+  begin
+    rdBookmarkFlag := bfInserted;
+    rdStatus := rsInserted;
+    rdPreviousBuffer := PRecordData(aBuffer)^.rdPreviousBuffer;
+  end;
+  PRecordData(aBuffer)^.rdPreviousBuffer := Result;
+  if aBuffer = FFirstRecord then
+    FFirstRecord := Result;
+  Inc(Result,sizeof(TRecordData));
 end;
 
 function TIBBufferPool.InsertAfter(aBuffer: PByte): PByte;
 begin
-
+  Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
+  Result := AddBuffer;
+  with PRecordData(Result)^ do
+  begin
+    rdPreviousBuffer := aBuffer;
+    rdBookmarkFlag := bfCurrent;
+    if aBuffer = FLastRecord then
+    begin
+      rdStatus := rsAppended;
+      FLastRecord := Result;
+    end
+    else
+    begin
+      rdStatus := rsInserted;
+      {assumes GetNext can never return nil given aBuffer is not last}
+      PRecordData(GetNext(aBuffer))^.rdPreviousBuffer := Result;
+    end;
+  end;
+  Inc(Result,sizeof(TRecordData));
 end;
 
 function TIBBufferPool.Append: PByte;
 begin
+  Result := InsertAfter(GetLast);
+end;
 
+procedure TIBBufferPool.Delete(aBuffer: PByte);
+var NextBuffer: PByte;
+begin
+  NextBuffer := GetNextBuffer(aBuffer);
+  Dec(aBuffer,sizeof(TRecordData));
+  with PRecordData(aBuffer)^ do
+  begin
+    if NextBuffer <> nil then
+      PRecordData(NextBuffer - sizeof(TRecordData))^.rdPreviousBuffer := rdPreviousBuffer;
+
+    if FLastRecord = aBuffer then
+      FLastRecord := rdPreviousBuffer;
+
+    if FFirstRecord = aBuffer then
+      FFirstRecord := NextBuffer;
+
+    rdStatus := rsDeleted;
+  end;
 end;
 
 function TIBBufferPool.GetBookmarkFlag(aBuffer: PByte): TBookmarkFlag;
 begin
-
+  Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
+  Result := PRecordData(aBuffer)^.rdBookmarkFlag;
 end;
 
 procedure TIBBufferPool.SetBookmarkFlag(aBuffer: PByte;
   aBookmarkFlag: TBookmarkFlag);
 begin
-
+  Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
+  PRecordData(aBuffer)^.rdBookmarkFlag := aBookmarkFlag;
 end;
 
 end.
