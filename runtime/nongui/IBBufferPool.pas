@@ -1,11 +1,12 @@
 unit IBBufferPool;
 
-{$mode objfpc}{$H+}
+{$mode Delphi}
+{$codepage UTF8}
 
 interface
 
 uses
-  Classes, SysUtils, DB;
+  Classes, SysUtils, DB, IB, IBBlob, IBExternals;
 
 type
   { The TIBSimpleBufferPool provides basic buffer management for IBX. The pool consists
@@ -71,9 +72,6 @@ type
     procedure CheckBuffersAvailable;
   protected
     procedure CheckValidBuffer(P:PByte); virtual;
-  public
-    constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
-    destructor Destroy; override;
     function AddBuffer: PByte; virtual;
     procedure Clear; virtual;
     function GetFirst: PByte; virtual;
@@ -81,6 +79,9 @@ type
     function GetBuffer(RecNo: cardinal): PByte; virtual;
     function GetNextBuffer(aBuffer: PByte): PByte; virtual;
     function GetPriorBuffer(aBuffer: PByte): PByte; virtual;
+  public
+    constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
+    destructor Destroy; override;
     function GetRecNo(aBuffer: PByte): cardinal; virtual;
     function Empty: boolean;
     property BuffersPerBlock: integer read FBuffersPerBlock write FBuffersPerBlock;
@@ -132,7 +133,6 @@ type
     procedure SetRecDBKey(aBuffer: PByte; AValue: TIBDBKey);
     function InternalGetNextBuffer(aBuffer: PByte): PByte;
   protected
-    function AddBuffer: PByte; override;
     procedure CheckValidBuffer(P:PByte); override;
   public
     constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
@@ -167,38 +167,257 @@ type
     the data buffer is used to access the updated data.
   }
 
-  TIIBOldBufferPool = class(TINSimpleBufferPool)
-   private type
-     TCachedUpdateStatus = (
-                        cusUnmodified=0, cusModified, cusInserted,
-                        cusDeleted, cusUninserted
-                       );
+  TCachedUpdateStatus = (
+                     cusUnmodified=0, cusModified, cusInserted,
+                     cusDeleted, cusUninserted
+                    );
 
+  TIBUpdateRecordTypes = set of TCachedUpdateStatus;
+
+  TIIBOldBufferPool = class(TIBSimpleBufferPool)
+   private type
+     PRecordData = ^TRecordData;
      TRecordData = record
        rdStatus: TCachedUpdateStatus;
-       DataBuffer: PByte;
+       rdDataBuffer: PByte;
      end;
+
    public type
      TIterator = procedure(status: TCachedUpdateStatus; DataBuffer, OldBuffer: PByte) of object;
 
    public
     constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
-    destructor Destroy; override;
-    function AddBuffer: PByte; override;
-    function GetFirst: PByte; override;
-    function GetLast: PByte; override;
+    function Append(status: TCachedUpdateStatus; DataBuffer: PByte): PByte;
     function GetBuffer(RecNo: cardinal): PByte; override;
-    function GetNextBuffer(aBuffer: PByte): PByte; override;
-    function GetPriorBuffer(aBuffer: PByte): PByte; override;
-    function GetRecNo(aBuffer: PByte): cardinal; virtual;
+    function GetRecNo(aBuffer: PByte): cardinal; override;
+    procedure SetStatus(aBuffer: PByte; status: TCachedUpdateStatus);
     procedure ForwardIterator(iterator: TIterator);
     procedure BackwardsIterator(iterator: TIterator);
   end;
+
+  {
+    TIBCursorBase provides common functions for uni-directional, bi-directional
+    and bi-directional with cached updates cursors.
+
+    The IB Cursor classes support a common interface that is used to satisfy the
+    TDataset abstract methods used in buffer management including AllocRecordBuffer
+    and GetRecord. The opaque pointer to a buffer returned to TDataset is an
+    integer index to an array of pointers to actual buffer. This approach is used to
+    avoid in memory copies every time the dataset is scolled.
+  }
+
+  TIBCursorBase = class(TInterfacedObject)
+  private type
+    type
+      {Wrapper class to support array cache and event handling}
+
+      { TIBArray }
+
+      TIBArray = class
+      private
+        FArray: IArray;
+        FRecNo: integer;
+        FField: TField;
+        procedure EventHandler(Sender: IArray; Reason: TArrayEventReason);
+      public
+        constructor Create(aField: TField; anArray: IArray);
+        destructor Destroy; override;
+        property ArrayIntf: IArray read FArray;
+      end;
+
+      TArrayDataArray = array [0..0] of TIBArray;
+      PArrayDataArray = ^TArrayDataArray;
+
+      TBlobDataArray = array[0..0] of TIBBlobStream;
+      PBlobDataArray = ^TBlobDataArray;
+
+      PFieldData = ^TFieldData;
+      TFieldData = record
+        fdIsNull: Boolean;
+        fdDataLength: Short;
+      end;
+
+      PColumnData = ^TColumnData;
+      TColumnData = record
+        fdDataType: Short;
+        fdDataScale: Short;
+        fdNullable: Boolean;
+        fdDataSize: Short;
+        fdDataOfs: Integer;
+        fdCodePage: TSystemCodePage;
+        fdIsComputed: boolean;
+        fdRefreshRequired: boolean;
+      end;
+
+      PFieldColumns = ^TFieldColumns;
+      TFieldColumns =  array[1..1] of TColumnData;
+
+      THackedField = class(TField); {Used to access protected method TField.DataChange}
+
+  strict private
+    FBuffers: TBufferArray;
+    FBufferCount: integer;
+    FBufferIndex: PtrUint;
+    FRecordBufferSize: Integer;
+    FRecordCount: Integer;
+    FRecordSize: Integer;
+    FSelectStmt: IStatement;
+    FFieldColumns: PFieldColumns;
+    FColumnCount: integer;
+    FCalcFieldsOffset: Integer;
+    FCalcFieldsSize: integer;
+    FBlobFieldCount: Longint;
+    FBlobCacheOffset: Integer;
+    FBlobStreamList: TList;
+    FArrayList: TList;
+    FArrayFieldCount: integer;
+    FArrayCacheOffset: integer;
+    procedure ComputeRecordSize;
+    function GetBuffers(index: TRecordBuffer): PByte;
+  protected
+    function InternalAllocRecordBuffer: PByte; virtual; abstract;
+    procedure InternalFreeRecordBuffer(aBuffer: PByte); virtual; abstract;
+    property Buffers[index: TRecordBuffer]:PByte read GetBuffers;
+  public
+    constructor Create(selectStmt: IStatement; aCalcFieldsSize, aBlobFieldCount, aArrayFieldCount: integer);
+    destructor Destroy; override;
+    procedure Clear; virtual;
+
+    {TDataset Interface}
+    function AllocRecordBuffer: TRecordBuffer; virtual;
+    procedure SetBufListSize(aValue: Longint);
+
+  public
+    property RecordSize: integer read FRecordSize;
+    property RecordBufferSize: integer read FRecordBufferSize;
+    property ColumnCount: integer read FColumnCount;
+    property RecordCount: integer read FRecordCount;
+    property CalcFieldsSize: integer read FCalcFieldsSize;
+    property BlobFieldCount: integer read FBlobFieldCount;
+    property ArrayFieldCount: integer read FArrayFieldCount;
+    end;
 
 
 implementation
 
 uses IBMessages;
+
+{ TIBCursorBase.TIBArray }
+
+procedure TIBCursorBase.TIBArray.EventHandler(Sender: IArray;
+  Reason: TArrayEventReason);
+begin
+  case Reason of
+  arChanging:
+    if FRecNo <> FField.Dataset.RecNo then
+      IBError(ibxeNotCurrentArray,[nil]);
+
+  arChanged:
+    THackedField(FField).DataChanged;
+  end;
+end;
+
+constructor TIBCursorBase.TIBArray.Create(aField: TField; anArray: IArray);
+begin
+  inherited Create;
+  FField := aField;
+  FArray := anArray;
+  FRecNo := FField.Dataset.RecNo;
+  FArray.AddEventHandler(EventHandler);
+end;
+
+destructor TIBCursorBase.TIBArray.Destroy;
+begin
+  FArray.RemoveEventHandler(EventHandler);
+  inherited Destroy;
+end;
+
+{ TIBCursorBase }
+
+procedure TIBCursorBase.ComputeRecordSize;
+
+  function RecordDataLength(n: Integer): Long;
+  begin
+    Result := (n - 1) * SizeOf(TFieldData);
+  end;
+
+begin
+  { Initialize offsets, buffer sizes, etc... }
+  FColumnCount := FSelectStmt.MetaData.Count;
+  FRecordSize := RecordDataLength(FSelectStmt.MetaData.Count);
+  GetMem(FFieldColumns,sizeof(TFieldColumns) * (FSelectStmt.MetaData.Count));
+  FCalcFieldsOffset := FRecordSize;
+  FBlobCacheOffset := FCalcFieldsOffset + CalcFieldsSize;
+  FArrayCacheOffset := (FBlobCacheOffset + (BlobFieldCount * SizeOf(TIBBlobStream)));
+  FRecordBufferSize := FArrayCacheOffset + (ArrayFieldCount * sizeof(IArray));
+
+end;
+
+function TIBCursorBase.GetBuffers(index: TRecordBuffer): PByte;
+begin
+  Result := PByte(FBuffers[PtrUInt(index)-1]);
+end;
+
+constructor TIBCursorBase.Create(selectStmt: IStatement; aCalcFieldsSize,
+  aBlobFieldCount, aArrayFieldCount: integer);
+begin
+  inherited Create;
+  FSelectStmt := selectStmt;
+  FCalcFieldsSize := aCalcFieldsSize;
+  FBlobFieldCount := aBlobFieldCount;
+  FArrayFieldCount := aArrayFieldCount;
+  ComputeRecordSize;
+end;
+
+destructor TIBCursorBase.Destroy;
+begin
+  Clear;
+  inherited Destroy;
+end;
+
+procedure TIBCursorBase.Clear;
+begin
+  FreeMem(FBuffers);
+  FBuffers := nil;
+  FBufferIndex := 0;
+  FBufferCount := 0;
+  FreeMem(FFieldColumns);
+  FFieldColumns := nil;
+  FCalcFieldsSize := 0;
+  FBlobFieldCount := 0;
+  FArrayFieldCount := 0;
+  FRecordCount := 0;
+  FColumnCount := 0;
+  FRecordSize := 0;
+  FCalcFieldsOffset := 0;
+  FBlobCacheOffset := 0;
+  FArrayCacheOffset := 0;
+  FRecordBufferSize := 0;
+end;
+
+function TIBCursorBase.AllocRecordBuffer: TRecordBuffer;
+begin
+  if FBufferIndex > FBufferCount then
+    IBError(ibxeBuffersExceeded,[FBufferIndex,FBufferCount]);
+  Result := TRecordBuffer(FBufferIndex);
+  Inc(FBufferIndex);
+end;
+
+procedure TIBCursorBase.SetBufListSize(aValue: Longint);
+var i: integer;
+begin
+  {if decreasing the free up buffers}
+  for i := aValue to FBufferCount - 1 do
+    InternalFreeRecordBuffer(PByte(FBuffers[i]));
+
+  ReAllocMem(FBuffers,aValue*SizeOf(TRecordBuffer));
+
+  {if increasing then allocate buffers}
+  for i := FBufferCount to aValue - 1 do
+    FBuffers[i] := TRecordBuffer(InternalAllocRecordBuffer);
+
+  FBufferCount := aValue;
+end;
 
 { TIBSimpleBufferPool }
 
@@ -442,12 +661,6 @@ begin
   inherited Create(aName,bufSize + sizeof(TRecordData), aBuffersPerBlock, firstBlockBuffers);
 end;
 
-function TIBBufferPool.AddBuffer: PByte;
-begin
-  Result := nil;
-  IBError(ibxeNotSupported,[]);
-end;
-
 procedure TIBBufferPool.Clear;
 begin
   inherited Clear;
@@ -651,6 +864,71 @@ begin
   Dec(aBuffer,sizeof(TRecordData));
   CheckValidBuffer(aBuffer);
   PRecordData(aBuffer)^.rdBookmarkFlag := aBookmarkFlag;
+end;
+
+{ TIIBOldBufferPool }
+
+constructor TIIBOldBufferPool.Create(aName: string; bufSize, aBuffersPerBlock,
+  firstBlockBuffers: integer);
+begin
+  inherited Create(aName,bufSize + sizeof(TRecordData),aBuffersPerBlock,
+    firstBlockBuffers);
+end;
+
+function TIIBOldBufferPool.Append(status: TCachedUpdateStatus; DataBuffer: PByte
+  ): PByte;
+begin
+  Result := AddBuffer;
+  with PRecordData(Result)^ do
+  begin
+    rdStatus := status;
+    rdDataBuffer := DataBuffer;
+  end;
+  Inc(Result,sizeof(TRecordData));
+end;
+
+function TIIBOldBufferPool.GetBuffer(RecNo: cardinal): PByte;
+begin
+  Result:=inherited GetBuffer(RecNo);
+  if Result <> nil then
+    Inc(Result,sizeof(TRecordData));
+end;
+
+function TIIBOldBufferPool.GetRecNo(aBuffer: PByte): cardinal;
+begin
+  Result := inherited GetRecNo(aBuffer - sizeof(TRecordData));
+end;
+
+procedure TIIBOldBufferPool.SetStatus(aBuffer: PByte;
+  status: TCachedUpdateStatus);
+begin
+  Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
+  PRecordData(aBuffer)^.rdStatus := status;
+end;
+
+procedure TIIBOldBufferPool.ForwardIterator(iterator: TIterator);
+var buf: PByte;
+begin
+  buf := GetFirst;
+  while (buf <> nil) do
+    with PRecordData(buf)^ do
+    begin
+      iterator(rdStatus,rdDataBuffer,buf + sizeof(TRecordData));
+      buf := GetNextBuffer(buf);
+    end;
+end;
+
+procedure TIIBOldBufferPool.BackwardsIterator(iterator: TIterator);
+var buf: PByte;
+begin
+  buf := GetLast;
+  while (buf <> nil) do
+    with PRecordData(buf)^ do
+    begin
+      iterator(rdStatus,rdDataBuffer,buf + sizeof(TRecordData));
+      buf := GetPriorBuffer(buf);
+    end;
 end;
 
 end.
