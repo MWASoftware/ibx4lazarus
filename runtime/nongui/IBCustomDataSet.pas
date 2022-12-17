@@ -54,7 +54,7 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IBInternals, IB,  IBSQL, DB,
-  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo;
+  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, IBBufferPool;
 
 type
   TIBCustomDataSet = class;
@@ -243,12 +243,6 @@ type
      property CodePage: TSystemCodePage read FFCodePage write FFCodePage;
    end;
 
-   PIBBufferedDateTimeWithTimeZone = ^TIBBufferedDateTimeWithTimeZone;
-   TIBBufferedDateTimeWithTimeZone = packed record
-     Timestamp: TDateTime;
-     dstOffset: smallint;
-     TimeZoneID: ISC_USHORT;
-   end;
 
    { TIBDateTimeField }
 
@@ -944,24 +938,6 @@ type
     property OnPostError;
     property OnValidatePost;
     property OnDeleteReturning;
-  end;
-
-  { TIBDSBlobStream }
-  TIBDSBlobStream = class(TStream)
-  private
-    FHasWritten: boolean;
-  protected
-    FField: TField;
-    FBlobStream: TIBBlobStream;
-    function  GetSize: Int64; override;
-  public
-    constructor Create(AField: TField; ABlobStream: TIBBlobStream;
-                       Mode: TBlobStreamMode);
-    destructor Destroy; override;
-    function Read(var Buffer; Count: Longint): Longint; override;
-    function Seek(Offset: Longint; Origin: Word): Longint; override;
-    procedure SetSize(NewSize: Longint); override;
-    function Write(const Buffer; Count: Longint): Longint; override;
   end;
 
   {Extended Field Def for character set info}
@@ -5661,62 +5637,6 @@ begin
   ukDelete:
     DataSet.DoDeleteReturning(QryResults);
   end;
-end;
-
-function TIBDSBlobStream.GetSize: Int64;
-begin
-  Result := FBlobStream.BlobSize;
-end;
-
-{ TIBDSBlobStream }
-constructor TIBDSBlobStream.Create(AField: TField; ABlobStream: TIBBlobStream;
-                                    Mode: TBlobStreamMode);
-begin
-  FField := AField;
-  FBlobStream := ABlobStream;
-  FBlobStream.Seek(0, soFromBeginning);
-  if (Mode = bmWrite) then
-  begin
-    FBlobStream.Truncate;
-    TIBCustomDataSet(FField.DataSet).RecordModified(True);
-    TBlobField(FField).Modified := true;
-    FHasWritten := true;
-  end;
-end;
-
-destructor TIBDSBlobStream.Destroy;
-begin
-  if FHasWritten then
-     TIBCustomDataSet(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
-  inherited Destroy;
-end;
-
-function TIBDSBlobStream.Read(var Buffer; Count: Longint): Longint;
-begin
-  result := FBlobStream.Read(Buffer, Count);
-end;
-
-function TIBDSBlobStream.Seek(Offset: Longint; Origin: Word): Longint;
-begin
-  result := FBlobStream.Seek(Offset, Origin);
-end;
-
-procedure TIBDSBlobStream.SetSize(NewSize: Longint);
-begin
-  FBlobStream.SetSize(NewSize);
-end;
-
-function TIBDSBlobStream.Write(const Buffer; Count: Longint): Longint;
-begin
-  if not (FField.DataSet.State in [dsEdit, dsInsert]) then
-    IBError(ibxeNotEditing, [nil]);
-  TIBCustomDataSet(FField.DataSet).RecordModified(True);
-  TBlobField(FField).Modified := true;
-  result := FBlobStream.Write(Buffer, Count);
-  FHasWritten := true;
-{  TIBCustomDataSet(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
-  Removed as this caused a seek to beginning of the blob stream thus corrupting
-  the blob stream. Moved to the destructor i.e. called after blob written}
 end;
 
 { TIBGenerator }
