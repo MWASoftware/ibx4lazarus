@@ -184,7 +184,9 @@ type
       ibxeNotEnoughBuffers,
       ibxeUnrecognisedHeaderType,
       ibxeRecordisDeleted,
-      ibxeBuffersExceeded
+      ibxeBuffersExceeded,
+      ibxeBadFieldNo,
+      ibxeUnknownParamName
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -335,6 +337,8 @@ resourcestring
   SUnrecognisedHeaderType = 'Unrecognised header type (%d)';
   SRecordisDeleted = 'Record No. %d has been deleted!';
   SBuffersExceeded = 'More buffers requested (%d) than are available (%d)';
+  SBadFieldNo = 'Bad FieldNo %d. Valid Range 1..%d';
+  SUnknownParamName = 'Unknown SQL Parameter Name: %s';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -446,7 +450,9 @@ const
     SNotEnoughBuffers,
     SUnrecognisedHeaderType,
     SRecordisDeleted,
-    SBuffersExceeded
+    SBuffersExceeded,
+    SBadFieldNo,
+    SUnknownParamName
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

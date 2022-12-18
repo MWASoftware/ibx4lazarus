@@ -56,6 +56,9 @@ uses
   SysUtils, Classes, IBDatabase, IBExternals, IBInternals, IB,  IBSQL, DB,
   IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, IBBufferPool;
 
+const
+  sDBkeyAlias = 'IBX_INTERNAL_DBKEY';
+
 type
   TIBCustomDataSet = class;
   TIBDataSet = class;
@@ -125,6 +128,7 @@ type
     property ArrayIntf: IArray read GetArrayIntf write SetArrayIntf;
     property ArrayDimensions: integer read FArrayDimensions write FArrayDimensions;
     property ArrayBounds: TArrayBounds read FArrayBounds write FArrayBounds;
+    property RelationName: string read FRelationName;
   end;
 
   { TIBStringField allows us to have strings longer than 8196 }
@@ -2641,7 +2645,7 @@ begin
         Dec(FieldsLoaded);
     end;
     with FQSelect.MetaData[j - 1] do
-      if GetAliasname = 'IBX_INTERNAL_DBKEY' then {do not localize}
+      if GetAliasname = sDBkeyAlias then {do not localize}
       begin
         if (GetSize <= 8) then
           p^.rdDBKey := PIBDBKEY(Qry[i].AsPointer)^;
@@ -3236,7 +3240,7 @@ begin
       if (j > 0) then
         with PRecordData(cr)^,rdFields[j], FFieldColumns^[j] do
         begin
-          if Param.name = 'IBX_INTERNAL_DBKEY' then {do not localize}
+          if Param.name = sDBkeyAlias then {do not localize}
           begin
             PIBDBKey(Param.AsPointer)^ := rdDBKey;
             continue;
@@ -4610,7 +4614,7 @@ begin
             FieldType := ftUnknown;
         end;
         FieldPosition := i + 1;
-        if (FieldType <> ftUnknown) and (FieldAliasName <> 'IBX_INTERNAL_DBKEY') then {do not localize}
+        if (FieldType <> ftUnknown) and (FieldAliasName <> sDBkeyAlias) then {do not localize}
         begin
           FMappedFieldPosition[FieldIndex] := FieldPosition;
           Inc(FieldIndex);
@@ -4746,7 +4750,7 @@ begin
             try
               s := DataSource.DataSet.
                      CreateBlobStream(cur_field, bmRead);
-              cur_param.AsBlob := TIBDSBlobStream(s).FBlobStream.Blob;
+              cur_param.AsBlob := TIBDSBlobStream(s).BlobStream.Blob;
             finally
               s.free;
             end;

@@ -1338,7 +1338,7 @@ begin
   SQL := TStringList.Create;
   SQL.Text := 'select ' + {do not localize}
     QuoteIdentifier(DataBase.SQLDialect, FTableName) + '.*, ' {do not localize}
-    + 'RDB$DB_KEY as IBX_INTERNAL_DBKEY from ' {do not localize}
+    + 'RDB$DB_KEY as ' + sDBkeyAlias + ' from ' {do not localize}
     + QuoteIdentifier(DataBase.SQLDialect, FTableName);
   if Filtered and (Filter <> '') then
   begin
@@ -1372,9 +1372,9 @@ begin
   SelectSQL.Assign(SQL);
   RefreshSQL.Text := 'select ' + {do not localize}
     QuoteIdentifier(DataBase.SQLDialect, FTableName) + '.*, ' {do not localize}
-    + 'RDB$DB_KEY as IBX_INTERNAL_DBKEY from ' {do not localize}
+    + 'RDB$DB_KEY as ' + sDBkeyAlias + ' from ' {do not localize}
     + QuoteIdentifier(DataBase.SQLDialect, FTableName) +
-    ' where RDB$DB_KEY = :IBX_INTERNAL_DBKEY'; {do not localize}
+    ' where RDB$DB_KEY = :' + sDBkeyAlias; {do not localize}
   WhereDBKeyRefreshSQL.Assign(RefreshSQL);
   InternalPrepare;
   SQL.Free;
@@ -1479,7 +1479,7 @@ begin
   begin
     DeleteSQL.Text := 'delete from ' + {do not localize}
       QuoteIdentifier(DataBase.SQLDialect, FTableName) +
-      ' where RDB$DB_KEY = ' + ':IBX_INTERNAL_DBKEY'; {do not localize}
+      ' where RDB$DB_KEY = ' + ':' + sDBkeyAlias; {do not localize}
     GenerateFieldLists;
     InsertSQL.Text := 'insert into ' + {do not localize}
       QuoteIdentifier(DataBase.SQLDialect, FTableName) +
@@ -1488,10 +1488,10 @@ begin
     ModifySQL.Text := 'update ' +
       QuoteIdentifier(DataBase.SQLDialect, FTableName) +
       ' set ' + UpdateFieldList + {do not localize}
-      ' where RDB$DB_KEY = :IBX_INTERNAL_DBKEY' + UpdateReturningFieldList; {do not localize}
+      ' where RDB$DB_KEY = :' + sDBkeyAlias + UpdateReturningFieldList; {do not localize}
     WhereAllRefreshSQL.Text := 'select ' +  {do not localize}
       QuoteIdentifier(DataBase.SQLDialect, FTableName) + '.*, '
-      + 'RDB$DB_KEY as IBX_INTERNAL_DBKEY from ' {do not localize}
+      + 'RDB$DB_KEY as ' + sDBkeyAlias + ' from ' {do not localize}
       + QuoteIdentifier(DataBase.SQLDialect, FTableName) +
       ' where ' + WhereAllFieldList ; {do not localize}
     if FPrimaryIndexFields <> '' then
@@ -1499,7 +1499,7 @@ begin
       GenerateWherePrimaryFieldList;
       WherePrimaryRefreshSQL.Text := 'select ' + {do not localize}
         QuoteIdentifier(DataBase.SQLDialect, FTableName) + '.*, ' {do not localize}
-        + 'RDB$DB_KEY as IBX_INTERNAL_DBKEY from ' {do not localize}
+        + 'RDB$DB_KEY as ' + sDBkeyAlias + ' from ' {do not localize}
         + QuoteIdentifier(DataBase.SQLDialect, FTableName) +
         ' where ' + WherePrimaryFieldList; {do not localize}
     end;

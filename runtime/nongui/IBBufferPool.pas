@@ -121,7 +121,6 @@ type
     PRecordData = ^TRecordData;
     TRecordData = record
       rdBookmarkFlag: TBookmarkFlag;
-      rdDBKey: TIBDBKey;
       rdStatus: TRecordStatus;
       rdPreviousBuffer: PByte;
     end;
@@ -129,8 +128,6 @@ type
     FFirstRecord: PByte;
     FLastRecord: PByte;
     function GetNext(P: PByte): PByte;
-    function GetRecDBkey(aBuffer: PByte): TIBDBKey;
-    procedure SetRecDBKey(aBuffer: PByte; AValue: TIBDBKey);
     function InternalGetNextBuffer(aBuffer: PByte): PByte;
   protected
     procedure CheckValidBuffer(P:PByte); override;
@@ -149,7 +146,6 @@ type
     procedure Delete(aBuffer: PByte);
     function GetBookmarkFlag(aBuffer: PByte): TBookmarkFlag; virtual;
     procedure SetBookmarkFlag(aBuffer: PByte; aBookmarkFlag: TBookmarkFlag); virtual;
-    property RecDBKey[aBuffer: PByte]:TIBDBKey  read GetRecDBkey write SetRecDBKey;
   end;
 
   {
@@ -219,7 +215,26 @@ type
     function Seek(Offset: Longint; Origin: Word): Longint; override;
     procedure SetSize(NewSize: Longint); override;
     function Write(const Buffer; Count: Longint): Longint; override;
+    property BlobStream: TIBBlobStream read FBlobStream;
   end;
+
+    IIBCursor = interface
+    ['{909621f7-e7fe-4b39-a8c5-f25c40a71c12}']
+      function AllocRecordBuffer: TRecordBuffer;
+      procedure SetBufListSize(aValue: Longint);
+      function CreateBlobStream(aBufID: TRecordBuffer; Field: TField; Mode: TBlobStreamMode): TStream;
+      function GetArray(aBufID: TRecordBuffer; Field: TField): IArray;
+      procedure SetArrayIntf(aBufID: TRecordBuffer; AnArray: IArray; Field: TField);
+      function GetRecDBkey(aBufID: TRecordBuffer): TIBDBKey;
+      function GetFieldData(aBufID: TRecordBuffer; field: TField; outBuffer: PByte): boolean;
+      procedure SetFieldData(aBufID: TRecordBuffer; field: TField; inBuffer: PByte);
+      procedure SetSQLParams(aBufID: TRecordBuffer; params: ISQLParams);
+      procedure UpdateRecordFromQuery(aBufID: TRecordBuffer; QryResults: IResults);
+      function NeedRefresh: boolean;
+      function GetRecord(aBufID: TRecordBuffer; GetMode: TGetMode;
+                         DoCheck: Boolean): TGetResult;
+      procedure SetCurrentRecord(Index: Longint);
+    end;
 
     {
     TIBCursorBase provides common functions for uni-directional, bi-directional
@@ -258,6 +273,7 @@ type
       PBlobDataArray = ^TBlobDataArray;
 
       TColumnMetadata = record
+        fdSQLColIndex: Integer;
         fdDataType: Short;
         fdDataScale: Short;
         fdNullable: Boolean;
@@ -266,19 +282,20 @@ type
         fdCodePage: TSystemCodePage;
         fdIsComputed: boolean;
         fdRefreshRequired: boolean;
+        fdArrayIndex: Integer; {used for Blob and Array columns}
+        fdAliasName: AnsiString;
       end;
 
       THackedField = class(TField); {Used to access protected method TField.DataChange}
 
   strict private
-    FBuffers: array of TRecordBuffer;
+    FBuffers: array of PByte;
     FCalcFields: array of PByte;
     FBufferCount: integer;
     FBufferIndex: PtrUint;
     FRecordBufferSize: Integer;
     FRecordCount: Integer;
     FRecordSize: Integer;
-    FSelectStmt: IStatement;
     FColumnMetaData: array of TColumnMetadata;
     FColumnCount: integer;
     FCalcFieldsSize: integer;
@@ -288,27 +305,50 @@ type
     FArrayList: TList;
     FArrayFieldCount: integer;
     FArrayCacheOffset: integer;
+    FDBKeyFieldColumn: integer;
     FFieldNo2ColumnMap: array of integer;
-    procedure ComputeRecordSize(aFields: TFields; ComputedFieldNames: TStrings);
-    function GetBuffer(index: TRecordBuffer): PByte; inline;
+    FNullColBitmapOffset: integer;
+    FCursor: IResultSet;
+    FDefaultTZDate: TDateTime;
+    procedure SetupBufferStructure(metadata: IMetadata; aFields: TFields;
+      ComputedFieldNames: TStrings);
     procedure ClearBlobCache;
     procedure ClearArrayCache;
+    procedure ClearRecordCache(aBuffer: PByte);
+    procedure CopyCursorDataToBuffer(QryResults: IResults; ColIndex: integer;
+      destBuff: PByte);
+    function InternalGetIsNull(Buff: PByte; ColIndex: integer): boolean;
+    procedure InternalSetIsNull(Buff: PByte; ColIndex: integer; IsNull: boolean);
+    procedure SaveBlobsAndArrays(Buff: PByte);
   protected
+    function ColIndexByName(aName: AnsiString): integer;
+    procedure FetchCurrentRecord(destBuffer: PByte);
+    procedure FieldChanged(aBuffer: PByte; aField: TField); virtual;
+    function GetBuffer(index: TRecordBuffer): PByte; inline;
+    function GetCalcFields(index: TRecordBuffer): PByte; inline;
+    function GetOldBuffer(aBuffer: PByte): PByte; virtual; abstract;
+    function FieldNo2ColumnIndex(aField: TField): integer; inline;
     function InternalAllocRecordBuffer: PByte; virtual; abstract;
     procedure InternalFreeRecordBuffer(aBuffer: PByte); virtual; abstract;
     property Buffers[index: TRecordBuffer]:PByte read GetBuffer;
+    property Cursor: IResultSet read FCursor;
   public
-    constructor Create(selectStmt: IStatement; aFields: TFields; ComputedFieldNames: TStrings;
-        aCalcFieldsSize, aBlobFieldCount, aArrayFieldCount: integer);
+    constructor Create(cursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
+        aCalcFieldsSize: integer; aDefaultTZDate: TDateTime);
     destructor Destroy; override;
 
     {TDataset Interface}
     function AllocRecordBuffer: TRecordBuffer; virtual;
     procedure SetBufListSize(aValue: Longint);
     function CreateBlobStream(aBufID: TRecordBuffer; Field: TField; Mode: TBlobStreamMode): TStream;
-    function GetArray(aBufID: TRecordBuffer; Field: TIBArrayField): IArray;
-    procedure SetArrayIntf(aBufID: TRecordBuffer; AnArray: IArray; Field: TIBArrayField);
-
+    function GetArray(aBufID: TRecordBuffer; Field: TField): IArray;
+    procedure SetArrayIntf(aBufID: TRecordBuffer; AnArray: IArray; Field: TField);
+    function GetRecDBkey(aBufID: TRecordBuffer): TIBDBKey;
+    function GetFieldData(aBufID: TRecordBuffer; field: TField; outBuffer: PByte): boolean;
+    procedure SetFieldData(aBufID: TRecordBuffer; field: TField; inBuffer: PByte);
+    procedure SetSQLParams(aBufID: TRecordBuffer; params: ISQLParams);
+    procedure UpdateRecordFromQuery(aBufID: TRecordBuffer; QryResults: IResults);
+    function NeedRefresh: boolean;
   public
     property RecordSize: integer read FRecordSize;
     property RecordBufferSize: integer read FRecordBufferSize;
@@ -319,10 +359,178 @@ type
     property ArrayFieldCount: integer read FArrayFieldCount;
   end;
 
+  {
+    TIBUniDirectionalCursor provides a simple forwards only cursor with edit support
+  }
+
+  TIBUniDirectionalCursor = class(TIBCursorBase, IIBCursor)
+  private type
+    PRecordData = ^TRecordData;
+
+    { TRecordData }
+
+    TRecordData = record
+      rdBookmarkFlag: TBookmarkFlag;
+      rdRecNo: cardinal;
+    end;
+
+    TCursorState = (csBrowse,csEdit);
+
+  private
+    FCurrentRecNo: cardinal;
+    FOldBuffer: PByte;
+    FState: TCursorState;
+    procedure CheckState;
+  protected
+    function GetOldBuffer(aBuffer: PByte): PByte; override;
+    function InternalAllocRecordBuffer: PByte; override;
+    procedure InternalFreeRecordBuffer(aBuffer: PByte); override;
+  public
+    constructor Create(cursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
+        aCalcFieldsSize: integer; aDefaultTZDate: TDateTime);
+    destructor Destroy; override;
+    function AllocRecordBuffer: TRecordBuffer; override;
+    function GetRecord(aBufID: TRecordBuffer; GetMode: TGetMode;
+                       DoCheck: Boolean): TGetResult;
+    procedure SetCurrentRecord(Index: Longint);
+    procedure Edit;
+    procedure EditingDone;
+    procedure CancelEdit;
+  end;
+
 
 implementation
 
 uses IBMessages, IBCustomDataSet;
+
+{ TIBUniDirectionalCursor }
+
+procedure TIBUniDirectionalCursor.CheckState;
+begin
+  if FState <> csBrowse then
+    IBError(ibxeUniCursorState,[]);
+end;
+
+function TIBUniDirectionalCursor.GetOldBuffer(aBuffer: PByte): PByte;
+begin
+  Result := FOldBuffer;
+end;
+
+function TIBUniDirectionalCursor.InternalAllocRecordBuffer: PByte;
+begin
+  Result :=  GetMem(RecordBufferSize + sizeof(TRecordData);
+  if Result = nil then
+    OutOfMemoryError;
+  FillChar(Result^,RecordBufferSize + sizeof(TRecordData),0);
+  Inc(Result,sizeof(TRecordData));
+end;
+
+procedure TIBUniDirectionalCursor.InternalFreeRecordBuffer(aBuffer: PByte);
+begin
+  if aBuffer = nil then
+  begin
+    Dec(aBuffer,sizeof(TRecordData));
+    FreeMem(aBuffer);
+  end;
+end;
+
+constructor TIBUniDirectionalCursor.Create(cursor: IResultSet;
+  aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
+  aDefaultTZDate: TDateTime);
+begin
+  inherited Create(cursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
+  FOldBuffer := InternalAllocRecordBuffer;
+  FCurrentRecNo := 1;
+end;
+
+destructor TIBUniDirectionalCursor.Destroy;
+begin
+  InternalFreeRecordBuffer(FOldBuffer);
+  inherited Destroy;
+end;
+
+function TIBUniDirectionalCursor.AllocRecordBuffer: TRecordBuffer;
+begin
+  Result:=inherited AllocRecordBuffer;
+end;
+
+function TIBUniDirectionalCursor.GetRecord(aBufID: TRecordBuffer;
+  GetMode: TGetMode; DoCheck: Boolean): TGetResult;
+var Buff: PByte;
+begin
+  CheckState;
+  Result := grError;
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then Exit;
+
+  case GetMode of
+  gmCurrent:
+    begin
+      if Cursor.IsEof then
+        Result := grEOF
+      else
+      begin
+        if PRecordData(Buff-sizeof(TRecordData))^.rdRecNo <> FCurrentRecNo then
+        begin
+          FetchCurrentRecord(Buff);
+          PRecordData(Buff-sizeof(TRecordData))^.rdRecNo := FCurrentRecNo;
+        end;
+        Result := grOK;
+      end;
+    end;
+
+    gmNext:
+      begin
+        if Cursor.IsEof or not Cursor.FetchNext then
+          Result := grEOF
+        else
+        begin
+          FetchCurrentRecord(Buff);
+          Inc(FCurrentRecord);
+          PRecordData(Buff-sizeof(TRecordData))^.rdRecNo := FCurrentRecNo;
+          Result := grOK;
+        end;
+      end;
+  end;
+end;
+
+procedure TIBUniDirectionalCursor.SetCurrentRecord(Index: Longint);
+begin
+  CheckState;
+  if Index < FCurrentRecNo then
+    IBError(ibxeUniDirectional,[FCurrentRecNo, index]);
+  while FCurrentRecNo < Index do
+  begin
+    Inc(FCurrentRecNo);
+    if not Cursor.FetchNext then
+      IBError(ibxBeyondEof,[]);
+  end;
+end;
+
+procedure TIBUniDirectionalCursor.Edit;
+begin
+  CheckState;
+  FState := csEdit;
+  SaveCurrentBuffer;
+end;
+
+procedure TIBUniDirectionalCursor.EditingDone;
+begin
+  if FState = csEdit then
+  begin
+    FState := csBrowse;
+    FillChar(FOldBuffer-sizeof(TRecordDate),RecordBufferSize+ sizeof(TRecodData),0);
+  end;
+end;
+
+procedure TIBUniDirectionalCursor.CancelEdit;
+begin
+  if FState = csEdit then
+  begin
+    FState := csBrowse;
+    RestoreCurrentBuffer;
+  end;
+end;
 
 { TIBCursorBase.TIBArray }
 
@@ -364,32 +572,61 @@ end;
      Note: for VarChar the column data is sizeof(short) longer to allow for a length
      indicator
   3. Additional space for the blob and array caches,
+
+  The Column Metadata and Field No. mapping is also established. The interesting
+  metadata is copied from the IStatement into the FColumnMetadata dynamic array, and which
+  also includes the SQL Column Index. This latter mapping is necessary because an
+  IStatement column is ignored if it is not reference from the list of fields, or
+  it's aliasname is not the IBX specical field sDBkeyAlias (used by TIBTable).
+
+  Likewise a mapping between the Field.FieldNo (a 1 -based sequence nu. and the
+  corresponding index into the 0 -based FColumnMetadata dynamic array. This is
+  not just because of the different base, but because the use of IBX special field can
+  result in and FColumnMetadata that is not linked to a TField.
 }
 
-procedure TIBCursorBase.ComputeRecordSize(aFields: TFields;
-  ComputedFieldNames: TStrings);
+procedure TIBCursorBase.SetupBufferStructure(metadata: IMetadata;
+  aFields: TFields; ComputedFieldNames: TStrings);
 var i: integer;
     colMetadata: IColumnMetaData;
     field: TField;
+    ColUsed: boolean;
+    ColMetaDataIndex: integer;
 begin
   FArrayFieldCount := 0;
   FBlobFieldCount := 0;
-  SetLength(FFieldNo2ColumnMap,aFields.Count);
+  FDBKeyFieldColumn := -1;
+  ColMetaDataIndex := 0;
+  SetLength(FFieldNo2ColumnMap,aFields.Count+1); {Note: FieldNos are 1-based - index 0 is not used}
 
   { Initialize offsets, buffer sizes, etc... }
-  FColumnCount := FSelectStmt.MetaData.Count;
+  FColumnCount := metadata.Count;
   SetLength(FColumnMetadata,FColumnCount);
-  {Reserve space for null column bitmap}
-  FRecordSize := ((FColumnCount - 1) div 8) + 1;
+  FRecordSize := 0;
 
   {Now determine how much space needs to be reserved for each column and column metadata}
   for i := 0 to FColumnCount - 1 do
-  with FColumnMetadata[i] do
+  with FColumnMetadata[ColMetaDataIndex] do
   begin
-    colMetadata := FSelectStmt.MetaData[i];
-    field := aFields.FindField(GetAliasName);
+    fdSQLColIndex := i;
+    colMetadata := metadata[i];
+    ColUsed := false;
+
+    if colMetadata.GetAliasName = sDBkeyAlias then {special case for TIBTable support}
+    begin
+      FDBKeyFieldColumn := ColMetaDataIndex;
+      ColUsed := true;
+    end;
+
+    field := aFields.FindField(colMetadata.GetAliasName);
     if field <> nil then
-      FFieldNo2ColumnMap[field.FieldNo] := i;
+    begin
+      FFieldNo2ColumnMap[field.FieldNo] := ColMetaDataIndex;
+      Colused := true;
+    end;
+
+    if not Colused then continue;
+
     fdDataType := colMetadata.GetSQLType;
     if fdDataType = SQL_BLOB then
       fdDataScale := 0
@@ -398,7 +635,8 @@ begin
     fdNullable := colMetadata.getIsNullable;
     fdDataSize := colMetadata.GetSize;
     fdCodePage := CP_NONE;
-    fdIsComputed := ComputedFieldNames.IndexOf(colMetadata.GetAliasName) <> -1;
+    fdAliasName := colMetadata.GetAliasName;
+    fdIsComputed := ComputedFieldNames.IndexOf(fdAliasName) <> -1;
 
     case fdDataType of
     SQL_TIMESTAMP,
@@ -435,32 +673,62 @@ begin
     SQL_BOOLEAN:
       fdDataSize := SizeOf(wordBool);
     SQL_VARYING,
-    SQL_TEXT,
-    SQL_BLOB:
+    SQL_TEXT:
       fdCodePage := colMetadata.getCodePage;
+    SQL_BLOB:
+      begin
+        fdArrayIndex := FBlobFieldCount;
+        Inc(FBlobFieldCount);
+        fdCodePage := colMetadata.getCodePage;
+      end;
     SQL_DEC16,
     SQL_DEC34,
     SQL_DEC_FIXED,
     SQL_INT128:
       fdDataSize := sizeof(tBCD);
+    SQL_Array:
+      begin
+        fdArrayIndex := FArrayFieldCount;
+        Inc(FArrayFieldCount);
+      end;
     end;
     fdDataOfs := FRecordSize;
     if fdDataType = SQL_VARYING then
       Inc(FRecordSize, fdDataSize + sizeof(short))
     else
       Inc(FRecordSize, fdDataSize);
+    Inc(ColMetaDataIndex);
   end;
+
+  FColumnCount := ColMetaDataIndex;
+  {Reserve space for null column bitmap}
+  FNullColBitmapOffset := FRecordSize;
+  Inc(FRecordSize, ((FColumnCount - 1) div 8) + 1);
+
 
   {Add in space for offsets}
   FBlobCacheOffset := FRecordSize;
   FArrayCacheOffset := (FBlobCacheOffset + (BlobFieldCount * SizeOf(TIBBlobStream)));
   {FRecordBufferSize is how much space needs to be reserved}
-  FRecordBufferSize := FArrayCacheOffset + (ArrayFieldCount * sizeof(IArray));
+  FRecordBufferSize := FArrayCacheOffset + (ArrayFieldCount * sizeof(TIBArray));
 end;
 
 function TIBCursorBase.GetBuffer(index: TRecordBuffer): PByte;
 begin
-  Result := PByte(FBuffers[PtrUInt(index)-1]);
+  Result := FBuffers[PtrUInt(index)-1];
+end;
+
+function TIBCursorBase.GetCalcFields(index: TRecordBuffer): PByte;
+begin
+  Result := FCalcFields[PtrUInt(index)-1];
+end;
+
+function TIBCursorBase.FieldNo2ColumnIndex(aField: TField): integer;
+begin
+  if (aField.FieldNo < 1) or (aField.FieldNo > Length(FFieldNo2ColumnMap)) then
+    IBError(ibxeBadFieldNo,[aField.FieldNo, Length(FFieldNo2ColumnMap)-1]);
+
+  Result  := FFieldNo2ColumnMap[aField.FieldNo];
 end;
 
 procedure TIBCursorBase.ClearBlobCache;
@@ -485,18 +753,202 @@ begin
   FArrayList.Pack;
 end;
 
-constructor TIBCursorBase.Create(selectStmt: IStatement; aFields: TFields;
-  ComputedFieldNames: TStrings; aCalcFieldsSize, aBlobFieldCount,
-  aArrayFieldCount: integer);
+procedure TIBCursorBase.ClearRecordCache(aBuffer: PByte);
+var pbd: PBlobDataArray;
+    pda: PArrayDataArray;
+    i: Integer;
+begin
+  pbd := PBlobDataArray(aBuffer + FBlobCacheOffset);
+  pda := PArrayDataArray(aBuffer + FArrayCacheOffset);
+  for i := 0 to BlobFieldCount - 1 do
+    pbd^[i] := nil;
+  for i := 0 to ArrayFieldCount - 1 do
+    pda^[i] := nil;
+end;
+
+procedure TIBCursorBase.CopyCursorDataToBuffer(QryResults: IResults;
+  ColIndex: integer; destBuff: PByte);
+var LocalData: PByte;
+    ColData: ISQLData;
+    IsNull: boolean;
+    DataLength: Short;
+    BufPtr: PByte;
+begin
+  QryResults.GetData(ColIndex,IsNull,DataLength,LocalData);
+  with FColumnMetaData[ColIndex] do
+  begin
+    InternalSetIsNull(destBuff,ColIndex,IsNull);
+    BufPtr := destBuff + fdDataOfs;
+    if IsNull then
+      FillChar(BufPtr^,fdDataSize,0)
+    else
+    begin
+      ColData := FCursor[fdSQLColIndex];
+      case fdDataType of  {Get Formatted data for column types that need formatting}
+        SQL_TYPE_DATE,
+        SQL_TYPE_TIME,
+        SQL_TIMESTAMP:
+          {This is an IBX native format and not the TDataset approach. See also GetFieldData}
+          PDateTime(BufPtr)^ := ColData.AsDateTime;
+
+        SQL_TIMESTAMP_TZ,
+        SQL_TIMESTAMP_TZ_EX:
+        begin
+          with PIBBufferedDateTimeWithTimeZone(Bufptr)^ do
+            ColData.GetAsDateTime(Timestamp,dstOffset,TimeZoneID);
+        end;
+
+        SQL_TIME_TZ,
+        SQL_TIME_TZ_EX:
+        begin
+          with PIBBufferedDateTimeWithTimeZone(Bufptr)^ do
+            ColData.GetAsTime(Timestamp, dstOffset,TimeZoneID, FDefaultTZDate);
+        end;
+        SQL_SHORT, SQL_LONG:
+        begin
+          if (fdDataScale = 0) then
+            PInteger(BufPtr)^ := ColData.AsLong
+          else
+          if (fdDataScale >= (-4)) then
+            PCurrency(BufPtr)^ := ColData.AsCurrency
+          else
+           PDouble(BufPtr)^ := ColData.AsDouble;
+        end;
+        SQL_INT64:
+        begin
+          if (fdDataScale = 0) then
+            PInt64(BufPtr)^ := ColData.AsInt64
+          else
+          if (fdDataScale >= (-4)) then
+            PCurrency(BufPtr)^ := ColData.AsCurrency
+          else
+            PDouble(BufPtr)^ := ColData.AsDouble;
+        end;
+
+        SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
+          PDouble(BufPtr)^ := ColData.AsDouble;
+
+        SQL_BOOLEAN:
+          system.PBoolean(BufPtr)^ := ColData.AsBoolean;
+
+        SQL_DEC16,
+        SQL_DEC34,
+        SQL_DEC_FIXED,
+        SQL_INT128:
+          pBCD(BufPtr)^ := ColData.GetAsBCD;
+
+      else
+        begin
+          if fdDataType = SQL_VARYING then
+          begin
+            PShort(BufPtr)^ := DataLength;
+            Move(LocalData^, (BufPtr + sizeof(Short))^, DataLength);
+          end
+          else
+            Move(LocalData^, BufPtr^, fdDataSize)
+        end;
+      end; {case}
+    end;
+  end;
+end;
+
+function TIBCursorBase.InternalGetIsNull(Buff: PByte; ColIndex: integer
+  ): boolean;
+var pBitmap: PByte;
+    mask: byte;
+begin
+  pBitmap := Buff + FNullColBitmapOffset + ColIndex div 8;
+  mask := $01 shl (ColIndex mod 8);
+  Result := (pBitmap^ and mask) = 0; {bit is 0 => null}
+end;
+
+procedure TIBCursorBase.InternalSetIsNull(Buff: PByte; ColIndex: integer;
+  IsNull: boolean);
+var pBitmap: PByte;
+    mask: byte;
+begin
+  pBitmap := Buff + FNullColBitmapOffset + ColIndex div 8;
+  mask := $01 shl (ColIndex mod 8);
+  if IsNull then
+    pBitmap^ := pBitmap^ and not mask {unset bit}
+  else
+    pBitmap^ := pBitmap^ or mask;     {set bit}
+end;
+
+procedure TIBCursorBase.SaveBlobsAndArrays(Buff: PByte);
+var  pbd: PBlobDataArray;
+     pda: PArrayDataArray;
+     i: integer;
+begin
+  pbd := PBlobDataArray(Buff + FBlobCacheOffset);
+  pda := PArrayDataArray(Buff + FArrayCacheOffset);
+
+  for i := 0 to FColumnCount - 1 do
+  with FColumnMetadata[i] do
+  begin
+    if fdDataType = SQL_Blob then
+    begin
+      if pbd^[fdArrayIndex] <> nil then
+      begin
+        pbd^[fdArrayIndex].Finalize;
+        PISC_QUAD(Buff + fdDataOfs)^ := pbd^[fdArrayIndex].BlobID;
+        InternalSetIsNull(Buff,i, pbd^[fdArrayIndex].Size = 0);
+        fdRefreshRequired := true;
+      end;
+    end
+    else
+    if fdDataType = SQL_ARRAY then
+    begin
+      if pda^[fdArrayIndex] <> nil then
+      begin
+        PISC_QUAD(Buff + fdDataOfs)^ := pda^[fdArrayIndex].ArrayIntf.GetArrayID;
+        InternalSetIsNull(Buff,i, pda^[fdArrayIndex].ArrayIntf.IsEmpty);
+        fdRefreshRequired := true;
+      end;
+    end;
+  end;
+end;
+
+function TIBCursorBase.ColIndexByName(aName: AnsiString): integer;
+var i: integer;
+begin
+  Result := -1;
+  for i := 0 to FColumnCount - 1 do
+    if FColumnMetaData[i].fdAliasName = aName then
+    begin
+      Result := i;
+      Exit;
+    end;
+end;
+
+procedure TIBCursorBase.FetchCurrentRecord(destBuffer: PByte);
+var  i: Integer;
+begin
+   { Make sure blob and array caches are empty }
+  ClearRecordCache(destBuffer);
+
+  if FDBKeyFieldColumn <> -1 then
+      CopyCursorDataToBuffer(FCursor,FDBKeyFieldColumn,destBuffer);
+  for i := 0 to FColumnCount - 1 do
+    CopyCursorDataToBuffer(FCursor,i,destBuffer);
+end;
+
+procedure TIBCursorBase.FieldChanged(aBuffer: PByte; aField: TField);
+begin
+  THackedField(aField).DataChanged;
+end;
+
+constructor TIBCursorBase.Create(cursor: IResultSet; aFields: TFields;
+  ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
+  aDefaultTZDate: TDateTime);
 begin
   inherited Create;
   FBlobStreamList := TList.Create;
   FArrayList := TList.Create;
-  FSelectStmt := selectStmt;
+  FCursor := cursor;
   FCalcFieldsSize := aCalcFieldsSize;
-  FBlobFieldCount := aBlobFieldCount;
-  FArrayFieldCount := aArrayFieldCount;
-  ComputeRecordSize(aFieldsComputedFieldNames);
+  FDefaultTZDate := aDefaultTZDate;
+  SetupBufferStructure(cursor.GetStatement.MetaData,aFields,ComputedFieldNames);
 end;
 
 destructor TIBCursorBase.Destroy;
@@ -539,7 +991,7 @@ begin
   {if increasing then allocate buffers}
   for i := FBufferCount to aValue - 1 do
   begin
-    FBuffers[i] := TRecordBuffer(InternalAllocRecordBuffer);
+    FBuffers[i] := InternalAllocRecordBuffer;
     FCalcFields[i] := GetMem(FCalcFieldsSize);
   end;
 
@@ -551,9 +1003,10 @@ end;
 
 function TIBCursorBase.CreateBlobStream(aBufID: TRecordBuffer; Field: TField;
   Mode: TBlobStreamMode): TStream;
-var pb: PBlobDataArray;
+var pdb: PBlobDataArray;
     fs: TIBBlobStream;
     Buff: PByte;
+    ColMetadata: TColumnMetadata;
 begin
   Buff := GetBuffer(aBufID);
   if Buff = nil then
@@ -567,17 +1020,19 @@ begin
     Result := TIBDSBlobStream.Create(Field, fs, Mode);
     Exit;
   end;
-  pb := PBlobDataArray(Buff + BlobCacheOffset);
-  if pb^[Field.Offset] = nil then {not yet assigned}
+
+  ColMetadata := FColumnMetaData[FieldNo2ColumnIndex(Field)];
+  pdb := PBlobDataArray(Buff + FBlobCacheOffset);
+  if pdb^[ColMetadata.fdArrayIndex] = nil then {not yet assigned}
   begin
-    pb^[Field.Offset] := TIBBlobStream.Create;
-    fs := pb^[Field.Offset];
-    FBlobStreamList.Add(Pointer(fs));
+    fs := TIBBlobStream.Create;;
     fs.Mode := bmReadWrite;
     fs.Database :=  (Field.Dataset as TIBCustomDataset).Database;
     fs.Transaction :=  (Field.Dataset as TIBCustomDataset).Transaction;
     fs.SetField(Field);
-    fs.BlobID := PISC_QUAD(Buff + FColumnMetadata[FFieldNo2ColumnMap[Field.FieldNo]].fdDataOfs])^;
+    fs.BlobID := PISC_QUAD(Buff + ColMetaData.fdDataOfs)^;
+    pdb^[ColMetadata.fdArrayIndex] := fs;
+    FBlobStreamList.Add(Pointer(fs));
     {note move to descendant class
     if (CachedUpdates) then
     begin
@@ -594,34 +1049,41 @@ begin
         Database.Close;
     end;}
   end else
-    fs := pb^[Field.Offset];
+    fs := pdb^[ColMetadata.fdArrayIndex];
   Result := TIBDSBlobStream.Create(Field, fs, Mode);
 end;
 
-function TIBCursorBase.GetArray(aBufID: TRecordBuffer; Field: TIBArrayField
+function TIBCursorBase.GetArray(aBufID: TRecordBuffer; Field: TField
   ): IArray;
 var Buff: PByte;
     pda: PArrayDataArray;
+    ColIndex: integer;
+    ColMetadata: TColumnMetadata;
+    ar: TIBArray;
 begin
   Buff := GetBuffer(aBufID);
-  with (Field.Dataset as TIBCustomDataset) do
+  with Field.Dataset as TIBCustomDataset do
   begin
     if Buff = nil then
       Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,
-                                Field.RelationName,Field.FieldName)
+                                (Field as TIBArrayField).RelationName,Field.FieldName)
     else
     begin
-      pda := PArrayDataArray(Buff + ArrayCacheOffset);
-      if pda^[Field.FCacheOffset] = nil then
+      ColIndex := FieldNo2ColumnIndex(Field);
+      ColMetadata := FColumnMetaData[ColIndex];
+      pda := PArrayDataArray(Buff + FArrayCacheOffset);
+      if pda^[ColMetadata.fdArrayIndex] = nil then
       begin
-        if Field.IsNull then
+        if InternalGetIsNull(Buff,ColIndex) then
           Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,
-                                  Field.FRelationName,Field.FieldName)
+                                  (Field as TIBArrayField).RelationName,Field.FieldName)
         else
           Result := Database.Attachment.OpenArray(Transaction.TransactionIntf,
-                              Field.FRelationName,Field.FieldName,Field.ArrayID);
-        pda^[Field.FCacheOffset] := TIBArray.Create(Field,Result);
-        FArrayList.Add(pda^[Field.FCacheOffset]);
+                              (Field as TIBArrayField).RelationName,Field.FieldName,
+                              PISC_QUAD(Buff + ColMetaData.fdDataOfs)^);
+        ar := TIBArray.Create(Field,Result);
+        pda^[ColMetadata.fdArrayIndex] := ar;
+        FArrayList.Add(ar);
             {note move to descendant class
         if (CachedUpdates) then
         begin
@@ -639,39 +1101,325 @@ begin
         end;   }
       end
       else
-        Result := pda^[Field.FCacheOffset].ArrayIntf;
+        Result := pda^[ColMetadata.fdArrayIndex].ArrayIntf;
     end;
   end;
 end;
 
 procedure TIBCursorBase.SetArrayIntf(aBufID: TRecordBuffer; AnArray: IArray;
-  Field: TIBArrayField);
-var Buff: PChar;
+  Field: TField);
+var Buff: PByte;
     pda: PArrayDataArray;
+    ColIndex: integer;
+    ColMetadata: TColumnMetadata;
+    ar: TIBArray;
+    IsNull: boolean;
 begin
   Buff := GetBuffer(aBufID);
   if Buff <> nil then
-  with PRecordData(Buff)^ do
   begin
-    MappedFieldPos := FMappedFieldPosition[Field.FieldNo - 1];
-    if (MappedFieldPos > 0) and
-       (MappedFieldPos <= FColumnCount) then
+    ColIndex := FieldNo2ColumnIndex(Field);
+    ColMetadata := FColumnMetaData[ColIndex];
+    IsNull := AnArray = nil;
+    InternalSetIsNull(Buff,ColIndex,IsNull);
+    pda := PArrayDataArray(Buff + FArrayCacheOffset);
+    if pda^[ColMetadata.fdArrayIndex] = nil then
     begin
-      rdFields[MappedFieldPos].fdIsNull := AnArray = nil;
-      pda := PArrayDataArray(Buff + FArrayCacheOffset);
-      if pda^[Field.FCacheOffset] = nil then
+      if not IsNull then
       begin
-        if not rdFields[MappedFieldPos].fdIsNull then
-        begin
-          pda^[Field.FCacheOffset] := TIBArray.Create(Field,AnArray);
-          FArrayList.Add(pda^[Field.FCacheOffset]);
-        end
+        ar := TIBArray.Create(Field,AnArray);
+        pda^[ColMetadata.fdArrayIndex] := ar;
+        FArrayList.Add(ar);
       end
       else
-        pda^[Field.FCacheOffset].FArray := AnArray;
+        pda^[ColMetadata.fdArrayIndex].FArray := AnArray;
+    end;
+    FieldChanged(Buff,Field);
+  end;
+end;
+
+function TIBCursorBase.GetRecDBkey(aBufID: TRecordBuffer): TIBDBKey;
+var Buff: PByte;
+begin
+  FillChar(Result,sizeof(TIBDBKey),0);
+  if FDBKeyFieldColumn >= 0 then
+  with FColumnMetaData[FDBKeyFieldColumn] do
+  begin
+    Buff := GetBuffer(aBufID);
+    if (Buff <> nil) and (fdDataSize <= 8) then
+      Result := PIBDBKEY(Buff + fdDataOfs)^;
+  end;
+end;
+
+function TIBCursorBase.GetFieldData(aBufID: TRecordBuffer; field: TField;
+  outBuffer: PByte): boolean;
+var Buff: PByte;
+    ColIndex: integer;
+    Data: PByte;
+    len: Short;
+begin
+  Result := false;
+  if field.FieldNo < 0 then  {Calculated Field}
+  begin
+    Buff := GetCalcFields(aBufID);
+    if Buff = nil then Exit;
+
+    Inc(Buff, field.Offset); {For CalcFields, TField.offset is the buffer offset}
+    Result := Boolean(Buff[0]);
+
+    if Result then
+      Move(Buff[1], outBuffer^, field.DataSize);
+  end
+  else
+  begin
+    Buff := GetBuffer(aBufID);
+    if Buff = nil then Exit;
+
+    ColIndex := FieldNo2ColumnIndex(field);
+    Result := not InternalGetIsNull(Buff,ColIndex);
+    if Result then
+    with FColumnMetaData[ColIndex] do
+    begin
+      Data := Buff + fdDataOfs;
+      if fdDataType = SQL_VARYING then
+      begin
+        len := PShort(Data)^;
+        if len <= field.DataSize then
+        begin
+          Move(Data^, outBuffer^, len);
+          PAnsiChar(outBuffer)[len] := #0;
+        end
+        else
+          IBError(ibxeFieldSizeError,[field.FieldName,field.DataSize,len])
+      end
+      else
+      if fdDataSize <= Field.DataSize then
+        Move(Data^, outBuffer^, fdDataSize)
+      else
+        IBError(ibxeFieldSizeError,[field.FieldName,field.DataSize,fdDataSize])
+    end;
+  end;
+
+end;
+
+procedure TIBCursorBase.SetFieldData(aBufID: TRecordBuffer; field: TField;
+  inBuffer: PByte);
+var Buff: PByte;
+    ColIndex: integer;
+    Data: PByte;
+    DataSize: Short;
+    len: Short;
+    IsNull: boolean;
+begin
+  if field.FieldNo < 0 then {calaculated field}
+  begin
+    Buff := GetCalcFields(aBufID);
+    if Buff = nil then Exit;
+
+    Inc(Buff, field.Offset); {For CalcFields, TField.offset is the buffer offset}
+    IsNull := LongBool(inBuffer);
+    Boolean(Buff[0]) := IsNull;
+    if not IsNull then
+      Move(inBuffer^, Buff[1], Field.DataSize);
+  end
+  else
+  begin
+    Buff := GetBuffer(aBufID);
+    if Buff = nil then Exit;
+
+    ColIndex := FieldNo2ColumnIndex(field);
+    Field.Validate(inBuffer);
+    IsNull := (inBuffer = nil) or
+              (Field is TStringField) and (PAnsiChar(inBuffer)^ = #0);
+    InternalSetIsNull(Buff,Colindex,IsNull);
+    if not IsNull then
+    with FColumnMetadata[ColIndex] do
+    begin
+      Data := Buff + fdDataOfs;
+      DataSize := fdDataSize;
+      FillChar(Data^,DataSize,0);
+      if fdDataType = SQL_VARYING then
+      begin
+        len := StrLen(PAnsiChar(inBuffer));
+        PShort(Data)^ := len;
+        Inc(Data,sizeof(Short));
+        Dec(DataSize,sizeof(Short));
+      end;
+
+      if DataSize >= field.DataSize then
+         Move(inBuffer^, Data^,DataSize)
+       else
+         IBError(ibxeDBBufferTooSmall,[DataSize,field.FieldName,field.DataSize]);
+
+      FieldChanged(Buff,field);
     end;
   end;
 end;
+
+procedure TIBCursorBase.SetSQLParams(aBufID: TRecordBuffer; params: ISQLParams);
+const
+  sOldPrefix = 'OLD_';
+  sNewPrefix = 'NEW';
+
+var Buff: PByte;
+    OldBuffer: PByte;
+    i: integer;
+    Param: ISQLParam;
+    ParamName: AnsiString;
+    srcBuffer: PByte;
+    ColIndex: integer;
+    Data: PByte;
+    DataLength: Short;
+    st: RawByteString;
+    pda: PArrayDataArray;
+begin
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then
+    IBError(ibxeBufferNotSet, [nil]);
+
+  SaveBlobsAndArrays(Buff);
+
+  OldBuffer := GetOldBuffer(Buff);
+  for i := 0 to Params.GetCount - 1 do
+  begin
+     Param := params[i];
+     ParamName := Param.Name;
+
+     {Determine source buffer}
+     if pos(sOldPrefix,ParamName) = 1 then
+     begin
+       system.Delete(ParamName,1,length(sOldPrefix));
+       srcBuffer := OldBuffer;
+     end
+     else
+     if pos(sNewPrefix,ParamName) = 1 then
+     begin
+       system.Delete(ParamName,1,length(sNewPrefix));
+       srcBuffer := Buff;
+     end
+     else
+      srcBuffer := Buff;
+
+     ColIndex := ColIndexByName(ParamName);
+     if ColIndex = -1 then
+       IBError(ibxeUnknownParamName,[ParamName]);
+
+     Param.IsNull := InternalGetIsNull(srcBuffer,ColIndex);
+     if not Param.IsNull then
+     with FColumnMetaData[ColIndex] do
+     begin
+       pda := PArrayDataArray(srcBuffer + FArrayCacheOffset);
+       Data := srcBuffer + fdDataOfs;
+       case fdDataType of
+         SQL_TEXT:
+           begin
+             SetString(st, PAnsiChar(data), fdDataSize);
+             SetCodePage(st,fdCodePage,false);
+             Param.AsString := st;
+           end;
+         SQL_VARYING:
+         begin
+           DataLength := PShort(Data)^;
+           Inc(Data,sizeof(Short));
+           SetString(st, PAnsiChar(Data), DataLength);
+           SetCodePage(st,fdCodePage,false);
+           Param.AsString := st;
+         end;
+       SQL_FLOAT, SQL_DOUBLE, SQL_D_FLOAT:
+         Param.AsDouble := PDouble(Data)^;
+       SQL_SHORT, SQL_LONG:
+       begin
+         if fdDataScale = 0 then
+           Param.AsLong := PLong(Data)^
+         else
+         if fdDataScale >= (-4) then
+           Param.AsCurrency := PCurrency(Data)^
+         else
+           Param.AsDouble := PDouble(Data)^;
+       end;
+       SQL_INT64:
+       begin
+         if fdDataScale = 0 then
+           Param.AsInt64 := PInt64(Data)^
+         else
+         if fdDataScale >= (-4) then
+           Param.AsCurrency := PCurrency(Data)^
+         else
+           Param.AsDouble := PDouble(Data)^;
+       end;
+       SQL_BLOB, SQL_QUAD:
+         Param.AsQuad := PISC_QUAD(Data)^;
+       SQL_ARRAY:
+         begin
+           if pda^[fdArrayIndex] = nil then
+             Param.AsQuad := PISC_QUAD(Data)^
+           else
+             Param.AsArray := pda^[fdArrayIndex].ArrayIntf;
+         end;
+       SQL_TYPE_DATE,
+       SQL_TYPE_TIME,
+       SQL_TIMESTAMP:
+       {This is an IBX native format and not the TDataset approach. See also SetFieldData}
+         Param.AsDateTime := PDateTime(Data)^;
+       SQL_TIMESTAMP_TZ_EX,
+       SQL_TIMESTAMP_TZ:
+         with PIBBufferedDateTimeWithTimeZone(Data)^ do
+           Param.SetAsDateTime(Timestamp,TimeZoneID);
+       SQL_TIME_TZ_EX,
+       SQL_TIME_TZ:
+         with PIBBufferedDateTimeWithTimeZone(Data)^ do
+           Param.SetAsTime(Timestamp,FDefaultTZDate,TimeZoneID);
+       SQL_BOOLEAN:
+         Param.AsBoolean := PWordBool(Data)^;
+       SQL_DEC16,
+       SQL_DEC34,
+       SQL_DEC_FIXED,
+       SQL_INT128:
+         Param.AsBCD := pBCD(Data)^;
+       else
+         IBError(ibxeUnknownSQLType,[fdDataType]);
+       end;
+     end;
+  end;
+end;
+
+{This method is called either using a Row Refresh query or an update/insert query
+ with a returning clause}
+
+procedure TIBCursorBase.UpdateRecordFromQuery(aBufID: TRecordBuffer;
+  QryResults: IResults);
+var Buff: PByte;
+    ColIndex: integer;
+    i: integer;
+begin
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then
+    IBError(ibxeBufferNotSet, [nil]);
+  ClearRecordCache(Buff);
+
+  for i := 0 to QryResults.Count - 1  do
+  begin
+    ColIndex := ColIndexByName(QryResults[i].GetAliasName);
+    with FColumnMetaData[i] do
+    begin
+      CopyCursorDataToBuffer(QryResults, fdSQLColIndex,Buff);
+      fdRefreshRequired := false;
+    end;
+  end;
+end;
+
+function TIBCursorBase.NeedRefresh: boolean;
+var i: integer;
+begin
+  Result := false;
+  for i := 0 to FColumnCount - 1 do
+    if FColumnMetadata[i].fdRefreshRequired then
+    begin
+      Result := true;
+      Exit;
+    end;
+end;
+
 
 { TIBSimpleBufferPool }
 
@@ -934,19 +1682,6 @@ begin
   Inc(Result,sizeof(TRecordData));
 end;
 
-function TIBBufferPool.GetRecDBkey(aBuffer: PByte): TIBDBKey;
-begin
-  Dec(aBuffer,sizeof(TRecordData));
-  CheckValidBuffer(aBuffer);
-  Result := PRecordData(aBuffer)^.rdDBKey;
-end;
-
-procedure TIBBufferPool.SetRecDBKey(aBuffer: PByte; AValue: TIBDBKey);
-begin
-  Dec(aBuffer,sizeof(TRecordData));
-  CheckValidBuffer(aBuffer);
-  PRecordData(aBuffer)^.rdDBKey := AValue;
-end;
 
 function TIBBufferPool.InternalGetNextBuffer(aBuffer: PByte): PByte;
 {aBuffer points to TRecordData}
@@ -1201,7 +1936,7 @@ begin
   if (Mode = bmWrite) then
   begin
     FBlobStream.Truncate;
-    THackedDataset(FField.DataSet).DataEvent(self,0);
+    THackedDataset(FField.DataSet).DataEvent(deFieldChange,0);
     TBlobField(FField).Modified := true;
     FHasWritten := true;
   end;
@@ -1210,7 +1945,7 @@ end;
 destructor TIBDSBlobStream.Destroy;
 begin
   if FHasWritten then
-     TIBCustomDataSet(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
+     THackedDataset(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
   inherited Destroy;
 end;
 
@@ -1233,7 +1968,7 @@ function TIBDSBlobStream.Write(const Buffer; Count: Longint): Longint;
 begin
   if not (FField.DataSet.State in [dsEdit, dsInsert]) then
     IBError(ibxeNotEditing, [nil]);
-  TIBCustomDataSet(FField.DataSet).RecordModified(True);
+  THackedDataset(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
   TBlobField(FField).Modified := true;
   result := FBlobStream.Write(Buffer, Count);
   FHasWritten := true;
