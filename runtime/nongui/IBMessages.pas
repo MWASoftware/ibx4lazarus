@@ -186,7 +186,12 @@ type
       ibxeRecordisDeleted,
       ibxeBuffersExceeded,
       ibxeBadFieldNo,
-      ibxeUnknownParamName
+      ibxeUnknownParamName,
+      ibxeUniDirectional,
+      ibxeBeyondEof,
+      ibxeSaveBufferNotReleased,
+      ibxeUnableToRestore,
+      ibxeUnableToReleaseSaveBuffer
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -339,6 +344,11 @@ resourcestring
   SBuffersExceeded = 'More buffers requested (%d) than are available (%d)';
   SBadFieldNo = 'Bad FieldNo %d. Valid Range 1..%d';
   SUnknownParamName = 'Unknown SQL Parameter Name: %s';
+  SUniDirectional = 'Dataset is uni-directional. At record %d, record %d requested';
+  SBeyondEof = 'Record No. is after EOF. Dataset has %d rows, row %d requested';
+  SSaveBufferNotReleased = 'Cannot save record %d. Record No. %d has not been released';
+  SUnableToRestore = 'Unable to restore record %d. Record No. %d in save buffer';
+  SUnableToReleaseSaveBuffer = 'Unable to release saved record. Request to release record %d, but record %d saved';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -452,7 +462,12 @@ const
     SRecordisDeleted,
     SBuffersExceeded,
     SBadFieldNo,
-    SUnknownParamName
+    SUnknownParamName,
+    SUniDirectional,
+    SBeyondEof,
+    SSaveBufferNotReleased,
+    SUnableToRestore,
+    SUnableToReleaseSaveBuffer
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
