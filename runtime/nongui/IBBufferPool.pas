@@ -233,7 +233,10 @@ type
       function NeedRefresh: boolean;
       function GetRecord(aBufID: TRecordBuffer; GetMode: TGetMode;
                          DoCheck: Boolean): TGetResult;
+      function GetRecNo(aBufID: TRecordBuffer): cardinal;
       procedure SetCurrentRecord(Index: Longint);
+      procedure SaveBuffer(aBufID: TRecordBuffer);
+      procedure RestoreBuffer(aBufID: TRecordBuffer);
     end;
 
     {
@@ -326,7 +329,7 @@ type
     procedure FieldChanged(aBuffer: PByte; aField: TField); virtual;
     function GetBuffer(index: TRecordBuffer): PByte; inline;
     function GetCalcFields(index: TRecordBuffer): PByte; inline;
-    function GetOldBuffer(aBuffer: PByte): PByte; virtual; abstract;
+    function GetOldBufferFor(aBuffer: PByte): PByte; virtual; abstract;
     function FieldNo2ColumnIndex(aField: TField): integer; inline;
     function InternalAllocRecordBuffer: PByte; virtual; abstract;
     procedure InternalFreeRecordBuffer(aBuffer: PByte); virtual; abstract;
@@ -338,7 +341,7 @@ type
     destructor Destroy; override;
 
     {TDataset Interface}
-    function AllocRecordBuffer: TRecordBuffer; virtual;
+    function AllocRecordBuffer: TRecordBuffer;
     procedure SetBufListSize(aValue: Longint);
     function CreateBlobStream(aBufID: TRecordBuffer; Field: TField; Mode: TBlobStreamMode): TStream;
     function GetArray(aBufID: TRecordBuffer; Field: TField): IArray;
@@ -348,7 +351,7 @@ type
     procedure SetFieldData(aBufID: TRecordBuffer; field: TField; inBuffer: PByte);
     procedure SetSQLParams(aBufID: TRecordBuffer; params: ISQLParams);
     procedure UpdateRecordFromQuery(aBufID: TRecordBuffer; QryResults: IResults);
-    function NeedRefresh: boolean;
+    function NeedRefresh(aBufID: TRecordBuffer): boolean;
   public
     property RecordSize: integer read FRecordSize;
     property RecordBufferSize: integer read FRecordBufferSize;
@@ -374,28 +377,25 @@ type
       rdRecNo: cardinal;
     end;
 
-    TCursorState = (csBrowse,csEdit);
-
   private
     FCurrentRecNo: cardinal;
     FOldBuffer: PByte;
-    FState: TCursorState;
-    procedure CheckState;
+    function InternalGetRecNo(aBuffer : PByte) : cardinal; inline;
+    procedure CopyBuffers(src, dest: PByte);
   protected
-    function GetOldBuffer(aBuffer: PByte): PByte; override;
+    function GetOldBufferFor(aBuffer: PByte): PByte; override;
     function InternalAllocRecordBuffer: PByte; override;
     procedure InternalFreeRecordBuffer(aBuffer: PByte); override;
   public
     constructor Create(cursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
         aCalcFieldsSize: integer; aDefaultTZDate: TDateTime);
     destructor Destroy; override;
-    function AllocRecordBuffer: TRecordBuffer; override;
     function GetRecord(aBufID: TRecordBuffer; GetMode: TGetMode;
                        DoCheck: Boolean): TGetResult;
+    function GetRecNo(aBufID: TRecordBuffer): cardinal;
     procedure SetCurrentRecord(Index: Longint);
-    procedure Edit;
-    procedure EditingDone;
-    procedure CancelEdit;
+    procedure SaveBuffer(aBufID: TRecordBuffer);
+    procedure RestoreBuffer(aBufID: TRecordBuffer);
   end;
 
 
@@ -405,13 +405,19 @@ uses IBMessages, IBCustomDataSet;
 
 { TIBUniDirectionalCursor }
 
-procedure TIBUniDirectionalCursor.CheckState;
-begin
-  if FState <> csBrowse then
-    IBError(ibxeUniCursorState,[]);
-end;
+ function TIBUniDirectionalCursor.InternalGetRecNo(aBuffer: PByte) : cardinal;
+ begin
+   Result := (aBuffer - sizeof(TRecordData))^.rdRecNo;
+ end;
 
-function TIBUniDirectionalCursor.GetOldBuffer(aBuffer: PByte): PByte;
+ procedure TIBUniDirectionalCursor.CopyBuffers(src, dest : PByte);
+ begin
+   Dec(src,sizeof(TRecordData));
+   Dec(dest,sizeof(TRecordData));
+   Move(src^,dest^,RecordBufferSize + sizeof(TRecordData));
+ end ;
+
+ function TIBUniDirectionalCursor.GetOldBufferFor(aBuffer : PByte) : PByte;
 begin
   Result := FOldBuffer;
 end;
@@ -449,16 +455,10 @@ begin
   inherited Destroy;
 end;
 
-function TIBUniDirectionalCursor.AllocRecordBuffer: TRecordBuffer;
-begin
-  Result:=inherited AllocRecordBuffer;
-end;
-
 function TIBUniDirectionalCursor.GetRecord(aBufID: TRecordBuffer;
   GetMode: TGetMode; DoCheck: Boolean): TGetResult;
 var Buff: PByte;
 begin
-  CheckState;
   Result := grError;
   Buff := GetBuffer(aBufID);
   if Buff = nil then Exit;
@@ -494,9 +494,17 @@ begin
   end;
 end;
 
+function TIBUniDirectionalCursor.GetRecNo(aBufID : TRecordBuffer) : cardinal;
+var Buff: PByte;
+begin
+  Result := -1;
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then Exit;
+  Result := InternalGetRecNo(Buff);
+end ;
+
 procedure TIBUniDirectionalCursor.SetCurrentRecord(Index: Longint);
 begin
-  CheckState;
   if Index < FCurrentRecNo then
     IBError(ibxeUniDirectional,[FCurrentRecNo, index]);
   while FCurrentRecNo < Index do
@@ -507,30 +515,25 @@ begin
   end;
 end;
 
-procedure TIBUniDirectionalCursor.Edit;
+procedure TIBUniDirectionalCursor.SaveBuffer(aBufID : TRecordBuffer);
+var Buff: PByte;
 begin
-  CheckState;
-  FState := csEdit;
-  SaveCurrentBuffer;
-end;
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then Exit;
 
-procedure TIBUniDirectionalCursor.EditingDone;
-begin
-  if FState = csEdit then
-  begin
-    FState := csBrowse;
-    FillChar(FOldBuffer-sizeof(TRecordDate),RecordBufferSize+ sizeof(TRecodData),0);
-  end;
-end;
+  CopyBuffers(Buff,FOldBuffer);
+end ;
 
-procedure TIBUniDirectionalCursor.CancelEdit;
-begin
-  if FState = csEdit then
-  begin
-    FState := csBrowse;
-    RestoreCurrentBuffer;
-  end;
-end;
+procedure TIBUniDirectionalCursor.RestoreBuffer(aBufID : TRecordBuffer);
+ var Buff: PByte;begin
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then Exit;
+
+  if InternalGetRecNo(Buff) <> InternalGetRecNo(FOldBuffer) then
+    IBError(ibxeUnableToRestore,[InternalGetRecNo(Buff),InternalGetRecNo(FOldBuffer) ]);
+
+  CopyBuffers(FOldBuffer,Buff);
+end ;
 
 { TIBCursorBase.TIBArray }
 
@@ -1408,7 +1411,7 @@ begin
   end;
 end;
 
-function TIBCursorBase.NeedRefresh: boolean;
+ function TIBCursorBase.NeedRefresh(aBufID : TRecordBuffer) : boolean;
 var i: integer;
 begin
   Result := false;
