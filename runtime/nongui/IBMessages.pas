@@ -191,7 +191,10 @@ type
       ibxeBeyondEof,
       ibxeSaveBufferNotReleased,
       ibxeUnableToRestore,
-      ibxeUnableToReleaseSaveBuffer
+      ibxeUnableToReleaseSaveBuffer,
+      ibxeCursorAtEOF,
+      ibxeInsertBeyondEOF,
+      ibxeDeleteBeyondEOF
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -349,6 +352,9 @@ resourcestring
   SSaveBufferNotReleased = 'Cannot save record %d. Record No. %d has not been released';
   SUnableToRestore = 'Unable to restore record %d. Record No. %d in save buffer';
   SUnableToReleaseSaveBuffer = 'Unable to release saved record. Request to release record %d, but record %d saved';
+  SCursorAtEOF = 'Attempt to read cursor beyond EOF';
+  SInsertBeyondEOF = 'Insert beyond EOF';
+  SDeleteBeyondEOF = 'Delete beyond EOF';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -467,7 +473,10 @@ const
     SBeyondEof,
     SSaveBufferNotReleased,
     SUnableToRestore,
-    SUnableToReleaseSaveBuffer
+    SUnableToReleaseSaveBuffer,
+    SCursorAtEOF,
+    SInsertBeyondEOF,
+    SDeleteBeyondEOF
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
