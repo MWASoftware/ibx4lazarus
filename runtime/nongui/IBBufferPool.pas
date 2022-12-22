@@ -67,10 +67,12 @@ type
     FFirstBlockBuffers: integer;
     FBufferIndex: TList;
     FLastBuffer: PByte;
+    FCurrent: PByte;
     FName: string;
     FRecordCount: cardinal;
     function AllocBlock(buffers: integer): PByte;
     procedure CheckBuffersAvailable;
+    procedure InternalCheckValidBuffer(P:PByte);
   protected
     procedure CheckValidBuffer(P:PByte); virtual;
     function AddBuffer: PByte; virtual;
@@ -89,6 +91,7 @@ type
     property BuffersPerBlock: integer read FBuffersPerBlock write FBuffersPerBlock;
     property Name: string read FName;
     property RecordCount: cardinal read FRecordCount;
+    property BufferSize: integer read FBufferSize;
   end;
 
   PIBDBKey = ^TIBDBKey;
@@ -170,6 +173,8 @@ type
 
   TIBUpdateRecordTypes = set of TCachedUpdateStatus;
 
+  { TIBOldBufferPool }
+
   TIBOldBufferPool = class(TIBSimpleBufferPool)
    private type
      PRecordData = ^TRecordData;
@@ -177,6 +182,9 @@ type
        rdStatus: TCachedUpdateStatus;
        rdDataBuffer: PByte;
      end;
+
+   protected
+     procedure CheckValidBuffer(P:PByte); override;
 
    public type
      TIterator = procedure(status: TCachedUpdateStatus; DataBuffer, OldBuffer: PByte) of object;
@@ -197,6 +205,8 @@ type
       dstOffset: smallint;
       TimeZoneID: ISC_USHORT;
     end;
+
+  { TIBDSBlobStream }
 
   TIBDSBlobStream = class(TStream)
   private type
@@ -254,7 +264,9 @@ type
 
     The IB Cursor classes support a common interface that is used to satisfy the
     TDataset abstract methods used in buffer management including AllocRecordBuffer
-    and GetRecord. The opaque pointer to a buffer returned to TDataset is an
+    and GetRecord.
+
+    The opaque pointer to a buffer returned to TDataset is an
     integer index to an array of pointers to actual buffer. This approach is used to
     avoid in memory copies every time the dataset is scolled.
   }
@@ -285,7 +297,7 @@ type
       PBlobDataArray = ^TBlobDataArray;
 
       TColumnMetadata = record
-        fdSQLColIndex: Integer;
+        fdSQLColIndex: Integer;  {Corresponding element index in ISQLData}
         fdDataType: Short;
         fdDataScale: Short;
         fdNullable: Boolean;
@@ -302,33 +314,36 @@ type
         rdBookmarkFlag: TBookmarkFlag;
       end;
 
-      THackedField = class(TField); {Used to access protected method TField.DataChange}
+      THackedField = class(TField); {Used to access to protected method TField.DataChange}
 
   strict private
-    FBuffers: array of PByte;
-    FCalcFields: array of PByte;
-    FBufferCount: integer;
-    FBufferIndex: PtrUint;
-    FRecordBufferSize: Integer;
-    FRecordCount: Integer;
-    FRecordSize: Integer;
-    FColumnMetaData: array of TColumnMetadata;
-    FColumnCount: integer;
-    FCalcFieldsSize: integer;
-    FBlobFieldCount: Longint;
-    FBlobCacheOffset: Integer;
-    FBlobStreamList: TList;
-    FBufferDataOffset: integer;
-    FArrayList: TList;
-    FArrayFieldCount: integer;
-    FArrayCacheOffset: integer;
-    FDBKeyFieldColumn: integer;
-    FFieldNo2ColumnMap: array of integer;
-    FNullColBitmapOffset: integer;
-    FRefreshRequiredBitmapOffset: integer;
-    FRefreshRequiredSize: integer;
-    FCursor: IResultSet;
-    FDefaultTZDate: TDateTime;
+    FBuffers: array of PByte;     {Display buffer. TRecordBuffer is a PtrUInt used to index this array}
+    FCalcFields: array of PByte;  {Used to hold calculated fields buffer for each Display buffer}
+    FBufferCount: integer;        {No. of elements in array}
+    FBufferIndex: PtrUint;        {First unassigned array element}
+    FRecordBufferSize: Integer;   {Calculated size in bytes for each record buffer}
+    FRecordCount: Integer;        {No. of records held in buffer pool. Total in dataset with Cursor.IsEof}
+    FColumnMetaData: array of TColumnMetadata; {Metadata extracted from cursor + per column info.
+                                                Note: only includes columns required i.e. there is
+                                                a corresponding field for the column or is the DBKey}
+    FColumnCount: integer;        {size of metadata array}
+    FCalcFieldsSize: integer;     {size in bytes of calculated fields buffer}
+    FBlobFieldCount: Longint;     {Number of blob fields in each record}
+    FBlobCacheOffset: Integer;    {start of blob field cache in each record buffer}
+    FBlobStreamList: TList;       {Keeps track of TIBBlobStream objects created}
+    FBufferDataOffset: integer;   {Start of per record data in each record buffer}
+    FArrayList: TList;            {Keeps track of TIBArry objects created}
+    FArrayFieldCount: integer;    {Number of array fields in each record}
+    FArrayCacheOffset: integer;   {start of array cache in each record buffer}
+    FDBKeyFieldColumn: integer;   {FColumnMetadata index of DBKey with alias sDBKeyAIias}
+    FFieldNo2ColumnMap: array of integer; {TField.FieldNo to FColumnMetadata index map}
+    FNullColBitmapOffset: integer;{start of NullColumn Bitmap in each record buffer}
+    FRefreshRequiredBitmapOffset: integer; {start of Refresh Requried Bitmap in each record buffer}
+    FRefreshRequiredSize: integer;{number of bytes in RefreshRequired bitmap}
+    FCursor: IResultSet;          {The Cursor}
+    FDefaultTZDate: TDateTime;    {Default Time Zone time}
+    FName: string;                {Local cursor name - set by creator}
+
     procedure SetupBufferStructure(metadata: IMetadata; aFields: TFields;
       ComputedFieldNames: TStrings);
     procedure ClearBlobCache;
@@ -341,7 +356,7 @@ type
     procedure SaveBlobsAndArrays(Buff: PByte);
   protected
     procedure ClearRecordCache(aBuffer: PByte);
-    procedure CopyBuffers(src, dest: PByte);
+    procedure CopyBuffers(src, dest: PByte); inline;
     function ColIndexByName(aName: AnsiString): integer;
     procedure FetchCurrentRecord(destBuffer: PByte);
     procedure FieldChanged(aBuffer: PByte; aField: TField); virtual;
@@ -357,7 +372,7 @@ type
   public type
     TIterator = procedure(status: TCachedUpdateStatus; DataBuffer: PByte) of object;
   public
-    constructor Create(aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
+    constructor Create(aName: string; aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
         aCalcFieldsSize: integer; aDefaultTZDate: TDateTime);
     destructor Destroy; override;
 
@@ -378,13 +393,13 @@ type
     procedure ApplyUpdates(iterator: TIterator); virtual;
     procedure CancelUpdates; virtual;
   public
-    property RecordSize: integer read FRecordSize;
     property RecordBufferSize: integer read FRecordBufferSize;
     property ColumnCount: integer read FColumnCount;
     property RecordCount: integer read FRecordCount;
     property CalcFieldsSize: integer read FCalcFieldsSize;
     property BlobFieldCount: integer read FBlobFieldCount;
     property ArrayFieldCount: integer read FArrayFieldCount;
+    property Name: string read FName;
   end;
 
   {
@@ -413,7 +428,7 @@ type
     function InternalAllocRecordBuffer: PByte; override;
     procedure InternalFreeRecordBuffer(aBuffer: PByte); override;
   public
-    constructor Create(cursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
+    constructor Create(aName: string ;aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
         aCalcFieldsSize: integer; aDefaultTZDate: TDateTime);
     destructor Destroy; override;
     function GetRecord(aBufID: TRecordBuffer; GetMode: TGetMode;
@@ -447,7 +462,7 @@ type
      procedure InternalFreeRecordBuffer(aBuffer: PByte); override;
      procedure InternalRestoreBuffer(aBuffer: PByte);
   public
-    constructor Create(aCursor: IResultSet; aFields: TFields;
+    constructor Create(aName: string; aCursor: IResultSet; aFields: TFields;
       ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
       aDefaultTZDate: TDateTime; aBuffersPerBlock, aFirstBlockBuffers: integer);
     destructor Destroy; override;
@@ -477,7 +492,7 @@ type
    protected
      procedure CreateOldBuffer; override;
    public
-     constructor Create(aCursor: IResultSet; aFields: TFields;
+     constructor Create(aName: string; aCursor: IResultSet; aFields: TFields;
        ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
        aDefaultTZDate: TDateTime; aBuffersPerBlock, aFirstBlockBuffers: integer);
      destructor Destroy; override;
@@ -529,13 +544,13 @@ begin
   //Do nothing
 end;
 
-constructor TIBCachedCursor.Create(aCursor: IResultSet; aFields: TFields;
-  ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
+constructor TIBCachedCursor.Create(aName: string; aCursor: IResultSet;
+  aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
   aDefaultTZDate: TDateTime; aBuffersPerBlock, aFirstBlockBuffers: integer);
 begin
-  inherited Create(aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate,
+  inherited Create(aName, aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate,
                     aBuffersPerBlock, aFirstBlockBuffers);
-  FOldBufferCache := TIBOldBufferPool.Create('Old Buffer Cache', RecordBufferSize,
+  FOldBufferCache := TIBOldBufferPool.Create(aName + ': Old Buffer Cache', RecordBufferSize,
                                              aBuffersPerBlock, aFirstBlockBuffers);
 end;
 
@@ -637,13 +652,13 @@ begin
   // Do nothing
 end;
 
-constructor TIBBiDirectionalCursor.Create(aCursor: IResultSet;
+constructor TIBBiDirectionalCursor.Create(aName: string; aCursor: IResultSet;
   aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
   aDefaultTZDate: TDateTime; aBuffersPerBlock, aFirstBlockBuffers: integer);
 begin
-  inherited Create(aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
+  inherited Create(aName,aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
   CreateOldBuffer;
-  FBufferPool := TIBBufferPool.Create('BiDirectional record cache',
+  FBufferPool := TIBBufferPool.Create(aName+ ': BiDirectional record cache',
                       RecordBufferSize,aBuffersPerBlock, aFirstBlockBuffers);
   FCurrentRecNo := 1;
 end;
@@ -830,11 +845,11 @@ begin
   end;
 end;
 
-constructor TIBUniDirectionalCursor.Create(cursor: IResultSet;
+constructor TIBUniDirectionalCursor.Create(aName: string; aCursor: IResultSet;
   aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
   aDefaultTZDate: TDateTime);
 begin
-  inherited Create(cursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
+  inherited Create(aName,aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
   FOldBuffer := GetMem(RecordBufferSize);
   if FOldBuffer = nil then
      OutOfMemoryError;
@@ -1026,11 +1041,13 @@ end;
 {
   A record buffer is structured into
 
-  1. a little endian bitmap giving each column's null status. 0 => null, 1 => not null
-  2. Space for each field's column data determined from the metadate datasize.
+  1. Space for each field's column data determined from the metadate datasize.
      Note: for VarChar the column data is sizeof(short) longer to allow for a length
-     indicator
-  3. Additional space for the blob and array caches,
+     indicator.
+  2. Buffer Header for per record local data
+  3. a little endian bitmap giving each column's null status. 0 => null, 1 => not null
+  4. Another bitmap to keep track of each colmn's refresh required status.
+  5. Additional space for the blob and array caches,
 
   The Column Metadata and Field No. mapping is also established. The interesting
   metadata is copied from the IStatement into the FColumnMetadata dynamic array, and which
@@ -1051,6 +1068,7 @@ var i: integer;
     field: TField;
     ColUsed: boolean;
     ColMetaDataIndex: integer;
+    RecordSize: integer;
 begin
   FArrayFieldCount := 0;
   FBlobFieldCount := 0;
@@ -1061,7 +1079,7 @@ begin
   { Initialize offsets, buffer sizes, etc... }
   FColumnCount := metadata.Count;
   SetLength(FColumnMetadata,FColumnCount);
-  FRecordSize := 0;
+  RecordSize := 0;
 
   {Now determine how much space needs to be reserved for each column and column metadata}
   for i := 0 to FColumnCount - 1 do
@@ -1151,28 +1169,31 @@ begin
         Inc(FArrayFieldCount);
       end;
     end;
-    fdDataOfs := FRecordSize;
+    fdDataOfs := RecordSize;
     if fdDataType = SQL_VARYING then
-      Inc(FRecordSize, fdDataSize + sizeof(short))
+      Inc(RecordSize, fdDataSize + sizeof(short))
     else
-      Inc(FRecordSize, fdDataSize);
+      Inc(RecordSize, fdDataSize);
     Inc(ColMetaDataIndex);
   end;
 
-  FColumnCount := ColMetaDataIndex;
-  FBufferDataOffset := FRecordSize;
-  Inc(FRecordSize,sizeof(TBufferData));
+  FColumnCount := ColMetaDataIndex; {set to number of columns in use}
+
+  {Reserve space for per record buffer local data}
+  FBufferDataOffset := RecordSize;
+  Inc(RecordSize,sizeof(TBufferData));
 
   {Reserve space for null column bitmap}
-  FNullColBitmapOffset := FRecordSize;
-  Inc(FRecordSize, ((FColumnCount - 1) div 8) + 1);
+  FNullColBitmapOffset := RecordSize;
+  Inc(RecordSize, ((FColumnCount - 1) div 8) + 1);
 
-  FRefreshRequiredBitmapOffset := FRecordSize;
+  {Reserve space for Refresh Required bit map}
+  FRefreshRequiredBitmapOffset := RecordSize;
   FRefreshRequiredSize := ((FColumnCount - 1) div 8) + 1;
-  Inc(FRecordSize, FRefreshRequiredSize);
+  Inc(RecordSize, FRefreshRequiredSize);
 
   {Add in space for offsets}
-  FBlobCacheOffset := FRecordSize;
+  FBlobCacheOffset := RecordSize;
   FArrayCacheOffset := (FBlobCacheOffset + (BlobFieldCount * SizeOf(TIBBlobStream)));
   {FRecordBufferSize is how much space needs to be reserved}
   FRecordBufferSize := FArrayCacheOffset + (ArrayFieldCount * sizeof(TIBArray));
@@ -1378,8 +1399,10 @@ begin
         PISC_QUAD(Buff + fdDataOfs)^ := pbd^[fdArrayIndex].BlobID;
         InternalSetIsNull(Buff,i, pbd^[fdArrayIndex].Size = 0);
         SetRefreshRequired(Buff,i,true);
-      end;
-    end
+      end
+      else
+         InternalSetIsNull(Buff,i, true);
+   end
     else
     if fdDataType = SQL_ARRAY then
     begin
@@ -1389,7 +1412,9 @@ begin
         InternalSetIsNull(Buff,i, pda^[fdArrayIndex].ArrayIntf.IsEmpty);
         SetRefreshRequired(Buff,i,true);
       end;
-    end;
+    end
+    else
+       InternalSetIsNull(Buff,i, true);
   end;
 end;
 
@@ -1438,13 +1463,14 @@ begin
       SetRefreshRequired(aBuffer,i,true);
 end;
 
-constructor TIBCursorBase.Create(aCursor: IResultSet; aFields: TFields;
-  ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
+constructor TIBCursorBase.Create(aName: string; aCursor: IResultSet;
+  aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
   aDefaultTZDate: TDateTime);
 begin
   inherited Create;
   FBlobStreamList := TList.Create;
   FArrayList := TList.Create;
+  FName := aName;
   FCursor := aCursor;
   FCalcFieldsSize := aCalcFieldsSize;
   FDefaultTZDate := aDefaultTZDate;
@@ -1463,7 +1489,7 @@ begin
   inherited Destroy;
 end;
 
-{Note bufferindex starrs at one to avoid confusion with a nil pointer}
+{Note bufferindex starts at one to avoid confusion with a nil pointer}
 
 function TIBCursorBase.AllocRecordBuffer: TRecordBuffer;
 begin
@@ -1962,7 +1988,7 @@ function TIBSimpleBufferPool.AllocBlock(buffers: integer): PByte;
 var blockSize: integer;
     userBufferAreaSize: integer;
 begin
-  userBufferAreaSize := buffers * (FBufferSize + sizeof(TBufferHeader));
+  userBufferAreaSize := buffers * (BufferSize + sizeof(TBufferHeader));
   blockSize := sizeof(TStartHeader) + userBufferAreaSize + sizeof(TEndHeader);
   Result := GetMem(blockSize);
   if Result <> nil then
@@ -1997,15 +2023,20 @@ end;
 
 procedure TIBSimpleBufferPool.CheckValidBuffer(P: PByte);
 begin
-  {note: P points to header and not the user data}
-  if not (PBufferHeader(P)^.HeaderType in [htFirstBuffer,htBuffer]) then
-   IBError(ibxeNotABuffer,[FName]);
+  Dec(P,sizeof(TBufferHeader));
+  InternalCheckValidBuffer(P);
 end;
 
 procedure TIBSimpleBufferPool.CheckBuffersAvailable;
 begin
   if FFirstBlock = nil then
      IBError(ibxeEmptyBufferPool,[FName]);
+end;
+
+procedure TIBSimpleBufferPool.InternalCheckValidBuffer(P: PByte);
+begin
+  if not (PBufferHeader(P)^.HeaderType in [htFirstBuffer,htBuffer]) then
+   IBError(ibxeNotABuffer,[FName]);
 end;
 
 constructor TIBSimpleBufferPool.Create(aName: string; bufSize,
@@ -2035,7 +2066,7 @@ begin
     FFirstBlock := AllocBlock(FFirstBlockBuffers);
 
   with PStartHeader(FLastBlock)^ do
-    if BuffersInUse = MaxBuffers then
+    if BuffersInUse >= MaxBuffers then
        AllocBlock(FBuffersPerBlock); {Add a Block and set FLastBlock to newly added block}
 
   with PStartHeader(FLastBlock)^ do
@@ -2069,6 +2100,7 @@ begin
   FFirstBlock := nil;
   FLastBlock := nil;
   FLastBuffer := nil;
+  FCurrent := nil;
   FBufferIndex.Clear;
 end;
 
@@ -2076,7 +2108,8 @@ function TIBSimpleBufferPool.GetFirst: PByte;
 begin
   CheckBuffersAvailable;
   Result := FFirstBlock + sizeof(TStartHeader);
-  CheckValidBuffer(Result);
+  InternalCheckValidBuffer(Result);
+  FCurrent := Result;
   Inc(Result,sizeof(TBufferHeader))
 end;
 
@@ -2084,22 +2117,33 @@ function TIBSimpleBufferPool.GetLast: PByte;
 begin
   CheckBuffersAvailable;
   Result := FLastBuffer;
+  InternalCheckValidBuffer(Result);
+  FCurrent := Result;
+  Inc(Result,sizeof(TBufferHeader))
 end;
 
 function TIBSimpleBufferPool.GetBuffer(RecNo: cardinal): PByte;
 var  i: integer;
 begin
   Result := nil;
+  CheckBuffersAvailable;
+
   for i := 0 to FBufferIndex.Count - 1 do
   begin
     with PStartHeader(FBufferIndex[i]) ^ do
       if (BuffersInUse > 0 ) and (RecNo < FirstRecNo + BuffersInUse) then
       begin
         Result := FBufferIndex[i] + sizeof(TStartHeader) +
-           (RecNo - FirstRecNo) * (sizeof(TBufferHeader) + FBufferSize) +
-           sizeof(TBufferHeader); {adjust to start of user buffer}
+           (RecNo - FirstRecNo) * (sizeof(TBufferHeader) + FBufferSize);
         break;
       end;
+  end;
+
+  if Result <> nil then
+  begin
+    InternalCheckValidBuffer(Result);
+    FCurrent := Result;
+    Inc(Result, sizeof(TBufferHeader));
   end;
 end;
 
@@ -2111,37 +2155,38 @@ begin
   Result := nil;
   CheckBuffersAvailable;
 
-  if aBuffer = nil then  {get first buffer if available}
-  begin
-    Result := GetFirst;
-    Exit;
-  end;
-
-  P := aBuffer - sizeof(TBufferHeader);
-  CheckValidBuffer(P);
-  Inc(P,sizeof(TBufferHeader)+FBufferSize);
-  case PBufferHeader(P)^.HeaderType of
-  htFirstBuffer,htBuffer:
-    Result := P + sizeof(TBufferHeader);
-
-  htEmptyslot:
-    ; {No more buffers}
-
-  htEnd:
-    {get first buffer in next block if available}
-    begin
-      P := PStartHeader(PEndHeader(P)^.StartHeader)^.NextBlock;
-      if (P <> nil) and (PStartHeader(P)^.BuffersInUse <> 0) then
-      begin
-        Result := P + sizeof(TStartHeader);
-        CheckValidBuffer(Result);
-        Inc(Result, sizeof(TBufferHeader));
-      end;
-    end;
-
+  if aBuffer = nil then {Implicit request for current buffer}
+    Result := FCurrent
   else
-    IBError(ibxeUnrecognisedHeaderType,[ord(PBufferHeader(P)^.HeaderType)]);
-  end
+  begin
+    P := aBuffer - sizeof(TBufferHeader);
+    InternalCheckValidBuffer(P);
+    Inc(P,sizeof(TBufferHeader)+FBufferSize);
+    case PBufferHeader(P)^.HeaderType of
+    htFirstBuffer,htBuffer:
+      Result := P ;
+
+    htEmptyslot:
+      ; {No more buffers}
+
+    htEnd:
+      {get first buffer in next block if available}
+      begin
+        P := PStartHeader(PEndHeader(P)^.StartHeader)^.NextBlock;
+        if (P <> nil) and (PStartHeader(P)^.BuffersInUse <> 0) then
+          Result := P + sizeof(TStartHeader);
+      end;
+
+    else
+      IBError(ibxeUnrecognisedHeaderType,[ord(PBufferHeader(P)^.HeaderType)]);
+    end;
+  end;
+  if Result <> nil then
+  begin
+    InternalCheckValidBuffer(Result);
+    FCurrent := Result;
+    Inc(Result, sizeof(TBufferHeader));
+  end;
 end;
 
 {returns either pointer to previous user buffer or nil if BOF}
@@ -2152,31 +2197,36 @@ begin
   Result := nil;
   CheckBuffersAvailable;
 
-  if aBuffer = nil then  {get first buffer if available}
+  if aBuffer = nil then   {Implicit request for current buffer}
+    Result := FCurrent
+  else
   begin
-    Result := GetFirst;
-    Exit;
+    P := aBuffer - sizeof(TBufferHeader);
+    InternalCheckValidBuffer(P);
+    if PBufferHeader(P)^.HeaderType = htFirstBuffer then
+    begin
+      P := PStartHeader(P- sizeof(TStartHeader))^.PreviousBlock;
+      if (P <> nil) and (PStartHeader(P)^.BuffersInUse <> 0) then
+        Result :=  P + sizeof(TStartHeader) +
+                  (PStartHeader(P)^.BuffersInUse - 1)*(sizeof(TBufferHeader) + FBufferSize);
+    end
+    else
+      Result := P - FBufferSize - sizeof(TBufferHeader);
   end;
 
-
-  P := aBuffer - sizeof(TBufferHeader);
-  CheckValidBuffer(P);
-  if PBufferHeader(P)^.HeaderType = htFirstBuffer then
+  if Result <> nil then
   begin
-    P := PStartHeader(P- sizeof(TStartHeader))^.PreviousBlock;
-    if P = nil then Exit;
-    Result :=  P + sizeof(TStartHeader) + (PStartHeader(P)^.BuffersInUse - 1)*(sizeof(TBufferHeader) + FBufferSize);
-  end
-  else
-    Result := P - FBufferSize;
-  CheckValidBuffer(Result);
+    InternalCheckValidBuffer(Result);
+    FCurrent := Result;
+    Inc(Result, sizeof(TBufferHeader));
+  end;
 end;
 
 function TIBSimpleBufferPool.GetRecNo(aBuffer: PByte): cardinal;
 var P: PByte;
 begin
   P := aBuffer - sizeof(TBufferHeader);
-  CheckValidBuffer(P);
+  InternalCheckValidBuffer(P);
   Result := PBufferHeader(P)^.RecNo;
 end;
 
@@ -2229,25 +2279,42 @@ begin
     Inc(Result,sizeof(TRecordData));
 end;
 
+{InternalGetNextBuffer skips over deleted records and tries to find the next
+ record that points back to aBuffer}
 
 function TIBBufferPool.InternalGetNextBuffer(aBuffer: PByte;
   IncludeDeleted: boolean): PByte;
 {aBuffer points to TRecordData}
+var P: PByte;
 begin
   Result := aBuffer;
   repeat
+    P := Result;
     case  PRecordData(aBuffer)^.rdStatus of
+
+    {records are always appended in sequence but the sequence may be interrupted by
+     inserted out of sequence records. These should generally be ignored but could
+     be the next in sequence - so have to check them}
+
     rsAppended, rsAppendDeleted:
       repeat {look for the next undeleted buffer with a previous pointer to this buffer}
-        Result := GetNextBuffer(Result);
-      until (Result = nil) or ( PRecordData(Result)^.rdPreviousBuffer = aBuffer);
+        Result := inherited GetNextBuffer(Result);
+      until (Result = nil) or ( PRecordData(Result)^.rdPreviousBuffer = P);
+
+    {Inserted records are typically out of sequence, but can be part of a local
+     sequence of inserted buffers.
+
+     1. lookahead until either the next in sequence is found or the local sequence
+        breaks.
+     2.
+     }
 
     rsInserted, rsInsertDeleted:
       begin
-        Result := GetNextBuffer(aBuffer);
-        if (Result <> nil) and (PRecordData(Result)^.rdPreviousBuffer <> aBuffer) then {otherwise found it}
+        Result := inherited GetNextBuffer(P);
+        if (Result <> nil) and (PRecordData(Result)^.rdPreviousBuffer <> P) then {otherwise found it}
         begin
-          Result := aBuffer;
+          Result := P;
           {Go back to insertion point}
           repeat
             Result := PRecordData(Result)^.rdPreviousBuffer;
@@ -2258,18 +2325,18 @@ begin
           begin
             {find the next appended buffer}
             repeat
-              Result := GetNextBuffer(Result);
+              Result := inherited GetNextBuffer(Result);
             until (Result = nil) or (PRecordData(Result)^.rdStatus in [rsAppended, rsAppendDeleted]);
 
             {now work backwards to find the next buffer in the sequence}
-            while (Result <> nil) and (PRecordData(Result)^.rdPreviousBuffer <> aBuffer) do
-              {look backwards for the next undeleted buffer with a previous pointer to this buffer}
+            while (Result <> nil) and (PRecordData(Result)^.rdPreviousBuffer <> P) do
+              {look backwards for the next buffer with a previous pointer to this buffer}
               Result := PRecordData(Result)^.rdPreviousBuffer;
           end;
         end;
       end;
     end;
-    until IncludeDeleted or (PRecordData(Result)^.rdStatus in [rsAppended,rsInserted]);
+  until (Result = nil) or IncludeDeleted or (PRecordData(Result)^.rdStatus in [rsAppended,rsInserted]);
 end;
 
 function TIBBufferPool.GetBuffer(RecNo: cardinal): PByte;
@@ -2328,8 +2395,13 @@ end;
 
 function TIBBufferPool.InsertAfter(aBuffer: PByte): PByte;
 begin
-  Dec(aBuffer,sizeof(TRecordData));
-  CheckValidBuffer(aBuffer);
+  if Empty then
+     aBuffer := nil
+  else
+  begin
+    Dec(aBuffer,sizeof(TRecordData));
+    CheckValidBuffer(aBuffer);
+  end;
   Result := AddBuffer;
   with PRecordData(Result)^ do
   begin
@@ -2364,10 +2436,9 @@ begin
 end;
 
 procedure TIBBufferPool.Delete(aBuffer: PByte);
-var NextBuffer: PByte;
 begin
-  NextBuffer := GetNextBuffer(aBuffer); {checks valid buffer}
   Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
   case PRecordData(aBuffer)^.rdStatus of
   rsInserted:
     PRecordData(aBuffer)^.rdStatus := rsInsertDeleted;
@@ -2378,6 +2449,8 @@ end;
 
 procedure TIBBufferPool.UnDelete(aBuffer: PByte);
 begin
+  Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
   case PRecordData(aBuffer)^.rdStatus of
   rsInsertDeleted:
     PRecordData(aBuffer)^.rdStatus := rsInserted;
@@ -2387,6 +2460,12 @@ begin
 end;
 
 { TIBOldBufferPool }
+
+procedure TIBOldBufferPool.CheckValidBuffer(P: PByte);
+begin
+  Dec(P,sizeof(TRecordData));
+  inherited CheckValidBuffer(P);
+end;
 
 constructor TIBOldBufferPool.Create(aName: string; bufSize, aBuffersPerBlock,
   firstBlockBuffers: integer);
@@ -2408,7 +2487,7 @@ end;
 
 function TIBOldBufferPool.GetBuffer(RecNo: cardinal): PByte;
 begin
-  Result:=inherited GetBuffer(RecNo);
+  Result := inherited GetBuffer(RecNo);
   if Result <> nil then
     Inc(Result,sizeof(TRecordData));
 end;
