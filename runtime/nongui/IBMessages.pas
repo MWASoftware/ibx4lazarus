@@ -186,7 +186,6 @@ type
       ibxeRecordisDeleted,
       ibxeBuffersExceeded,
       ibxeBadFieldNo,
-      ibxeUnknownParamName,
       ibxeUniDirectional,
       ibxeBeyondEof,
       ibxeSaveBufferNotReleased,
@@ -344,9 +343,8 @@ resourcestring
   SNotEnoughBuffers = '%s: Buffers per Block must be greater than 1';
   SUnrecognisedHeaderType = 'Unrecognised header type (%d)';
   SRecordisDeleted = 'Record No. %d has been deleted!';
-  SBuffersExceeded = 'More buffers requested (%d) than are available (%d)';
+  SBuffersExceeded = 'More buffers requested than are available (%d)';
   SBadFieldNo = 'Bad FieldNo %d. Valid Range 1..%d';
-  SUnknownParamName = 'Unknown SQL Parameter Name: %s';
   SUniDirectional = 'Dataset is uni-directional. At record %d, record %d requested';
   SBeyondEof = 'Record No. is after EOF. Dataset has %d rows, row %d requested';
   SSaveBufferNotReleased = 'Cannot save record %d. Record No. %d has not been released';
@@ -468,7 +466,6 @@ const
     SRecordisDeleted,
     SBuffersExceeded,
     SBadFieldNo,
-    SUnknownParamName,
     SUniDirectional,
     SBeyondEof,
     SSaveBufferNotReleased,
