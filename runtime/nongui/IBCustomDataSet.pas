@@ -54,7 +54,7 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IBInternals, IB,  IBSQL, DB,
-  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, IBBufferPool;
+  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, IBBufferedCursors;
 
 const
   sDBkeyAlias = 'IBX_INTERNAL_DBKEY';
@@ -88,22 +88,6 @@ type
   end;
 
   TIBArrayField = class;
-
-  { TIBArray }
-
-  {Wrapper class to support array cache in TIBCustomDataSet and event handling}
-
-  TIBArray = class
-  private
-    FArray: IArray;
-    FRecNo: integer;
-    FField: TIBArrayField;
-    procedure EventHandler(Sender: IArray; Reason: TArrayEventReason);
-  public
-    constructor Create(aField: TIBArrayField; anArray: IArray);
-    destructor Destroy; override;
-    property ArrayIntf: IArray read FArray;
-  end;
 
   { TIBArrayField }
 
@@ -255,7 +239,7 @@ type
     may want to coerce a TField to a TTimeField. If this is to work then
     TIBTimeField has to descend from TTimeField. Hence the declation. As
     TTimeField also descends from TDateTimeField this should not result in any
-    problems - unless someone makes a drastic change to TTimeField.}
+    problems - unless someone makes a drastic change to TTimeField...}
 
    TIBDateTimeField = class(TTimeField)
    private
@@ -390,70 +374,9 @@ type
   private
     const
       BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
-      UniCache           =  2;     { Uni-directional cache is 2 records big }
-
-      {Buffer cache constants for record selection}
-      FILE_BEGIN = 0;
-      FILE_CURRENT = 1;
-      FILE_END = 2;
-
-      {internal type declarations}
-    type
-      TArrayDataArray = array [0..0] of TIBArray;
-      PArrayDataArray = ^TArrayDataArray;
-
-      TBlobDataArray = array[0..0] of TIBBlobStream;
-      PBlobDataArray = ^TBlobDataArray;
-
-      TCachedUpdateStatus = (
-                         cusUnmodified, cusModified, cusInserted,
-                         cusDeleted, cusUninserted
-                        );
-      TIBUpdateRecordTypes = set of TCachedUpdateStatus;
-
-      PFieldData = ^TFieldData;
-      TFieldData = record
-        fdIsNull: Boolean;
-        fdDataLength: Short;
-      end;
-
-      PColumnData = ^TColumnData;
-      TColumnData = record
-        fdDataType: Short;
-        fdDataScale: Short;
-        fdNullable: Boolean;
-        fdDataSize: Short;
-        fdDataOfs: Integer;
-        fdCodePage: TSystemCodePage;
-        fdIsComputed: boolean;
-        fdRefreshRequired: boolean;
-      end;
-
-      PFieldColumns = ^TFieldColumns;
-      TFieldColumns =  array[1..1] of TColumnData;
-
-  protected
-    type
-    PIBDBKey = ^TIBDBKey;
-    TIBDBKey = record
-      DBKey: array[0..7] of Byte;
-      end;
-
-    TRecordData = record
-      rdBookmarkFlag: TBookmarkFlag;
-      rdRecordNumber: Integer;
-      rdCachedUpdateStatus: TCachedUpdateStatus;
-      rdUpdateStatus: TUpdateStatus;
-      rdSavedOffset: DWORD;
-      rdDBKey: TIBDBKey;
-      rdFields: array[1..1] of TFieldData;
-    end;
-    PRecordData = ^TRecordData;
 
   private
     FAllowAutoActivateTransaction: Boolean;
-    FArrayFieldCount: integer;
-    FArrayCacheOffset: integer;
     FAutoCommit: TIBAutoCommit;
     FCaseSensitiveParameterNames: boolean;
     FDefaultTZDate: TDateTime;
@@ -463,23 +386,8 @@ type
     FForcedRefresh: Boolean;
     FDidActivate: Boolean;
     FBase: TIBBase;
-    FBlobCacheOffset: Integer;
-    FBlobStreamList: TList;
-    FArrayList: TList;
     FBufferChunks: Integer;
-    FBufferCache,
-    FOldBufferCache: PChar;
-    FBufferChunkSize,
-    FCacheSize,
-    FOldCacheSize: Integer;
-    FFilterBuffer: PChar;
-    FBPos,
-    FOBPos,
-    FBEnd,
-    FOBEnd: DWord;
     FCachedUpdates: Boolean;
-    FCalcFieldsOffset: Integer;
-    FCurrentRecord: Long;
     FDeletedRecords: Long;
     FModelBuffer,
     FOldBuffer: PChar;
@@ -1360,35 +1268,6 @@ begin
   inherited Bind(Binding);
   if Binding and (FieldDef <> nil) then
      FIdentityColumn := (FieldDef as TIBFieldDef).IdentityColumn;
-end;
-
-{ TIBArray }
-
-procedure TIBArray.EventHandler(Sender: IArray; Reason: TArrayEventReason);
-begin
-  case Reason of
-  arChanging:
-    if FRecNo <> FField.Dataset.RecNo then
-      IBError(ibxeNotCurrentArray,[nil]);
-
-  arChanged:
-    FField.DataChanged;
-  end;
-end;
-
-constructor TIBArray.Create(aField: TIBArrayField; anArray: IArray);
-begin
-  inherited Create;
-  FField := aField;
-  FArray := anArray;
-  FRecNo := FField.Dataset.RecNo;
-  FArray.AddEventHandler(EventHandler);
-end;
-
-destructor TIBArray.Destroy;
-begin
-  FArray.RemoveEventHandler(EventHandler);
-  inherited Destroy;
 end;
 
 { TIBArrayField }
