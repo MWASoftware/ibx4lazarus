@@ -388,9 +388,6 @@ type
     FBase: TIBBase;
     FBufferChunks: Integer;
     FCachedUpdates: Boolean;
-    FDeletedRecords: Long;
-    FModelBuffer,
-    FOldBuffer: PChar;
     FOnDeleteReturning: TOnDeleteReturning;
     FOnValidatePost: TOnValidatePost;
     FOpen: Boolean;
@@ -401,9 +398,6 @@ type
     FQSelect,
     FQModify: TIBSQL;
     FDatabaseInfo: TIBDatabaseInfo;
-    FRecordBufferSize: Integer;
-    FRecordCount: Integer;
-    FRecordSize: Integer;
     FDataSetCloseAction: TDataSetCloseAction;
     FTZTextOption: TTZTextOptions;
     FSQLFiltered: boolean;
@@ -412,11 +406,8 @@ type
     FUpdateMode: TUpdateMode;
     FUpdateObject: TIBDataSetUpdateObject;
     FParamCheck: Boolean;
-    FUpdatesPending: Boolean;
     FUpdateRecordTypes: TIBUpdateRecordTypes;
-    FMappedFieldPosition: array of Integer;
     FDataLink: TIBDataLink;
-
     FBeforeDatabaseDisconnect,
     FAfterDatabaseDisconnect,
     FDatabaseFree: TNotifyEvent;
@@ -425,23 +416,18 @@ type
     FBeforeTransactionEnd,
     FAfterTransactionEnd,
     FTransactionFree: TNotifyEvent;
-    FAliasNameMap: array of string;
-    FAliasNameList: array of string;
     FBaseSQLSelect: TStrings;
     FParser: TSelectSQLParser;
     FCloseAction: TTransactionAction;
     FInTransactionEnd: boolean;
     FIBLinks: TList;
-    FFieldColumns: PFieldColumns;
     FColumnCount: integer;
     FSelectCount: integer;
     FInsertCount: integer;
     FUpdateCount: integer;
     FDeleteCount: integer;
     FComputedFieldNames: TStringList;
-    procedure ColumnDataToBuffer(QryResults: IResults; ColumnIndex,
-      FieldIndex: integer; Buffer: PChar);
-    procedure InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
+    FCursor: IIBCursor;
     function GetSelectStmtIntf: IStatement;
     procedure SetCaseSensitiveParameterNames(AValue: boolean);
     procedure SetDefaultTZDate(AValue: TDateTime);
@@ -450,17 +436,12 @@ type
     procedure SetUpdateMode(const Value: TUpdateMode);
     procedure SetUpdateObject(Value: TIBDataSetUpdateObject);
 
-    function AdjustCurrentRecord(Buffer: Pointer; GetMode: TGetMode): TGetResult;
-    procedure AdjustRecordOnInsert(Buffer: Pointer);
     function CanEdit: Boolean;
     function CanInsert: Boolean;
     function CanDelete: Boolean;
     function CanRefresh: Boolean;
     procedure CheckEditState;
-    procedure ClearBlobCache;
-    procedure ClearArrayCache;
     procedure ClearIBLinks;
-    procedure CopyRecordBuffer(Source, Dest: Pointer);
     procedure DoBeforeDatabaseDisconnect(Sender: TObject);
     procedure DoAfterDatabaseDisconnect(Sender: TObject);
     procedure DoDatabaseFree(Sender: TObject);
@@ -468,8 +449,6 @@ type
     procedure DoAfterTransactionEnd(Sender: TObject);
     procedure DoTransactionFree(Sender: TObject);
     procedure DoDeleteReturning(QryResults: IResults);
-    procedure FetchCurrentRecordToBuffer(Qry: TIBSQL; RecordNumber: Integer;
-                                         Buffer: PChar);
     function GetDatabase: TIBDatabase;
     function GetDeleteSQL: TStrings;
     function GetInsertSQL: TStrings;
@@ -481,7 +460,6 @@ type
     function GetTransaction: TIBTransaction;
     function GetParser: TSelectSQLParser;
     procedure HandleSQLFilterParamsChanged(Sender: TObject);
-    procedure InternalDeleteRecord(Qry: TIBSQL; Buff: Pointer); virtual;
     function InternalLocate(const KeyFields: string; const KeyValues: Variant;
                             Options: TLocateOptions): Boolean; virtual;
     procedure InternalPostRecord(Qry: TIBSQL; Buff: Pointer); virtual;
@@ -489,7 +467,6 @@ type
     function IsVisible(Buffer: PChar): Boolean;
     procedure RegisterIBLink(Sender: TIBControlLink);
     procedure UnRegisterIBLink(Sender: TIBControlLink);
-    procedure SaveOldBuffer(Buffer: PChar);
     procedure SetBufferChunks(Value: Integer);
     procedure SetDatabase(Value: TIBDatabase);
     procedure SetDeleteSQL(Value: TStrings);
@@ -501,19 +478,7 @@ type
     procedure SetTransaction(Value: TIBTransaction);
     procedure SetUpdateRecordTypes(Value: TIBUpdateRecordTypes);
     procedure SetUniDirectional(Value: Boolean);
-    procedure UpdateRecordFromQuery(QryResults: IResults; Buffer: PChar);
     procedure RefreshParams;
-    function AdjustPosition(FCache: PChar; Offset: DWORD;
-                            Origin: Integer): DWORD;
-    procedure ReadCache(FCache: PChar; Offset: DWORD; Origin: Integer;
-                       Buffer: PChar);
-    procedure ReadRecordCache(RecordNumber: Integer; Buffer: PChar;
-                              ReadOldBuffer: Boolean);
-    procedure WriteCache(FCache: PChar; Offset: DWORD; Origin: Integer;
-                        Buffer: PChar);
-    procedure WriteRecordCache(RecordNumber: Integer; Buffer: PChar);
-    function InternalGetRecord(Buffer: PChar; GetMode: TGetMode;
-                       DoCheck: Boolean): TGetResult; virtual;
 
   protected
     function GetMasterDetailDelay: integer; virtual;
@@ -696,7 +661,6 @@ type
     procedure Post; override;
     function ParamByName(ParamName: String): ISQLParam;
     function FindParam(ParamName: String): ISQLParam;
-    property ArrayFieldCount: integer read FArrayFieldCount;
     property DatabaseInfo: TIBDatabaseInfo read FDatabaseInfo;
     property UpdateObject: TIBDataSetUpdateObject read FUpdateObject write SetUpdateObject;
     property UpdatesPending: Boolean read FUpdatesPending;
@@ -1696,12 +1660,8 @@ begin
   FBase := TIBBase.Create(Self);
   FDatabaseInfo := TIBDatabaseInfo.Create(self);
   FIBLinks := TList.Create;
-  FCurrentRecord := -1;
-  FDeletedRecords := 0;
   FUniDirectional := False;
   FBufferChunks := BufferCacheSize;
-  FBlobStreamList := TList.Create;
-  FArrayList := TList.Create;
   FGeneratorField := TIBGenerator.Create(self);
   FDataLink := TIBDataLink.Create(Self);
   FQDelete := TIBSQL.Create(Self);
@@ -1726,8 +1686,8 @@ begin
   FForcedRefresh := False;
   FAutoCommit:= acDisabled;
   FDataSetCloseAction := dcDiscardChanges;
-  {Bookmark Size is Integer for IBX}
-  BookmarkSize := SizeOf(Integer);
+  {Bookmark Size is cardinal for IBX}
+  BookmarkSize := sizeof(TIBRecordNumber);
   FBase.BeforeDatabaseDisconnect := DoBeforeDatabaseDisconnect;
   FBase.AfterDatabaseDisconnect := DoAfterDatabaseDisconnect;
   FBase.OnDatabaseFree := DoDatabaseFree;
@@ -1755,18 +1715,8 @@ begin
   if assigned(FGeneratorField) then FGeneratorField.Free;
   FDataLink.Free;
   FBase.Free;
-  ClearBlobCache;
   ClearIBLinks;
   FIBLinks.Free;
-  FBlobStreamList.Free;
-  FArrayList.Free;
-  FreeMem(FBufferCache);
-  FBufferCache := nil;
-  FreeMem(FOldBufferCache);
-  FOldBufferCache := nil;
-  FCacheSize := 0;
-  FOldCacheSize := 0;
-  FMappedFieldPosition := nil;
   if assigned(FBaseSQLSelect) then FBaseSQLSelect.Free;
   if assigned(FParser) then FParser.Free;
   if assigned(FSQLFilterParams) then FSQLFilterParams.Free;
@@ -1774,41 +1724,6 @@ begin
   inherited Destroy;
 end;
 
-function TIBCustomDataSet.AdjustCurrentRecord(Buffer: Pointer; GetMode: TGetMode):
-                                             TGetResult;
-begin
-  while not IsVisible(Buffer) do
-  begin
-    if GetMode = gmPrior then
-    begin
-      Dec(FCurrentRecord);
-      if FCurrentRecord = -1 then
-      begin
-        result := grBOF;
-        exit;
-      end;
-      ReadRecordCache(FCurrentRecord, Buffer, False);
-    end
-    else begin
-      Inc(FCurrentRecord);
-      if (FCurrentRecord = FRecordCount) then
-      begin
-        if (not FQSelect.EOF) and FQSelect.Next  then
-        begin
-          FetchCurrentRecordToBuffer(FQSelect, FCurrentRecord, Buffer);
-          Inc(FRecordCount);
-        end
-        else begin
-          result := grEOF;
-          exit;
-        end;
-      end
-      else
-        ReadRecordCache(FCurrentRecord, Buffer, False);
-    end;
-  end;
-  result := grOK;
-end;
 
 procedure TIBCustomDataSet.ApplyUpdates;
 var

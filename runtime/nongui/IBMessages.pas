@@ -184,7 +184,6 @@ type
       ibxeNotEnoughBuffers,
       ibxeUnrecognisedHeaderType,
       ibxeRecordisDeleted,
-      ibxeBuffersExceeded,
       ibxeBadFieldNo,
       ibxeUniDirectional,
       ibxeBeyondEof,
@@ -193,7 +192,8 @@ type
       ibxeUnableToReleaseSaveBuffer,
       ibxeCursorAtEOF,
       ibxeInsertBeyondEOF,
-      ibxeDeleteBeyondEOF
+      ibxeDeleteBeyondEOF,
+      ibxeUpdatesNotAppled
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -343,7 +343,6 @@ resourcestring
   SNotEnoughBuffers = '%s: Buffers per Block must be greater than 1';
   SUnrecognisedHeaderType = 'Unrecognised header type (%d)';
   SRecordisDeleted = 'Record No. %d has been deleted!';
-  SBuffersExceeded = 'More buffers requested than are available (%d)';
   SBadFieldNo = 'Bad FieldNo %d. Valid Range 1..%d';
   SUniDirectional = 'Dataset is uni-directional. At record %d, record %d requested';
   SBeyondEof = 'Record No. is after EOF. Dataset has %d rows, row %d requested';
@@ -353,6 +352,7 @@ resourcestring
   SCursorAtEOF = 'Attempt to read cursor beyond EOF';
   SInsertBeyondEOF = 'Insert beyond EOF';
   SDeleteBeyondEOF = 'Delete beyond EOF';
+  SUpdatesNotAppled = 'Cannot disable Cached Updates when updates are pending';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -464,7 +464,6 @@ const
     SNotEnoughBuffers,
     SUnrecognisedHeaderType,
     SRecordisDeleted,
-    SBuffersExceeded,
     SBadFieldNo,
     SUniDirectional,
     SBeyondEof,
@@ -473,7 +472,8 @@ const
     SUnableToReleaseSaveBuffer,
     SCursorAtEOF,
     SInsertBeyondEOF,
-    SDeleteBeyondEOF
+    SDeleteBeyondEOF,
+    SUpdatesNotAppled
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

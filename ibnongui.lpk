@@ -219,8 +219,8 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
         <UnitName Value="IBJournal"/>
       </Item23>
       <Item24>
-        <Filename Value="runtime/nongui/IBBufferPool.pas"/>
-        <UnitName Value="IBBufferPool"/>
+        <Filename Value="runtime/nongui/IBBufferedCursors.pas"/>
+        <UnitName Value="IBBufferedCursors"/>
       </Item24>
     </Files>
     <RequiredPkgs Count="3">

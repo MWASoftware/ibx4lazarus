@@ -32,6 +32,8 @@ type
     offset from the start header.
   }
 
+  TIBRecordNumber = cardinal;
+
   { TIBSimpleBufferPool }
 
   TIBSimpleBufferPool = class
@@ -44,7 +46,7 @@ type
       NextBlock: PByte;
       MaxBuffers: integer;
       BuffersInUse: integer;
-      FirstRecNo: cardinal;  {1- based}
+      FirstRecNo: TIBRecordNumber;  {1- based}
     end;
 
     PEndHeader = ^TEndHeader;
@@ -56,7 +58,7 @@ type
     PBufferHeader = ^TBufferHeader;
     TBufferHeader = record
       HeaderType: THeaderTypes;
-      RecNo: cardinal;
+      RecNo: TIBRecordNumber;
     end;
 
   strict private
@@ -69,7 +71,7 @@ type
     FLastBuffer: PByte;
     FCurrent: PByte;
     FName: string;
-    FRecordCount: cardinal;
+    FRecordCount: TIBRecordNumber;
     function AllocBlock(buffers: integer): PByte;
     procedure CheckBuffersAvailable;
     procedure InternalCheckValidBuffer(P:PByte);
@@ -79,18 +81,18 @@ type
     procedure Clear; virtual;
     function GetFirst: PByte; virtual;
     function GetLast: PByte; virtual;
-    function GetBuffer(RecNo: cardinal): PByte; virtual;
+    function GetBuffer(RecNo: TIBRecordNumber): PByte; virtual;
     function GetNextBuffer(aBuffer: PByte): PByte; virtual;
     function GetPriorBuffer(aBuffer: PByte): PByte; virtual;
   public
     constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
     destructor Destroy; override;
-    function GetRecNo(aBuffer: PByte): cardinal; virtual;
-    function GetRecordCount: cardinal;
+    function GetRecNo(aBuffer: PByte): TIBRecordNumber; virtual;
+    function GetRecordCount: TIBRecordNumber;
     function Empty: boolean;
     property BuffersPerBlock: integer read FBuffersPerBlock write FBuffersPerBlock;
     property Name: string read FName;
-    property RecordCount: cardinal read FRecordCount;
+    property RecordCount: TIBRecordNumber read FRecordCount;
     property BufferSize: integer read FBufferSize;
   end;
 
@@ -142,10 +144,10 @@ type
     procedure Clear; override;
     function GetFirst: PByte; override;
     function GetLast: PByte; override;
-    function GetBuffer(RecNo: cardinal): PByte; override;
+    function GetBuffer(RecNo: TIBRecordNumber): PByte; override;
     function GetNextBuffer(aBuffer: PByte): PByte; override;
     function GetPriorBuffer(aBuffer: PByte): PByte; override;
-    function GetRecNo(aBuffer: PByte): cardinal; override;
+    function GetRecNo(aBuffer: PByte): TIBRecordNumber; override;
     function InsertBefore(aBuffer: PByte): PByte; virtual;
     function InsertAfter(aBuffer: PByte): PByte; virtual;
     function Append: PByte;
@@ -196,8 +198,8 @@ type
    public
     constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
     function Append(DataBuffer: PByte): PByte;
-    function GetBuffer(RecNo: cardinal): PByte; override;
-    function GetRecNo(aBuffer: PByte): cardinal; override;
+    function GetBuffer(RecNo: TIBRecordNumber): PByte; override;
+    function GetRecNo(aBuffer: PByte): TIBRecordNumber; override;
     procedure SetStatus(aBuffer: PByte; status: TCachedUpdateStatus);
     procedure ForwardIterator(iterator: TIterator);
     procedure BackwardsIterator(iterator: TIterator);
@@ -235,7 +237,7 @@ type
     IIBCursor = interface
     ['{909621f7-e7fe-4b39-a8c5-f25c40a71c12}']
       function AllocRecordBuffer: TRecordBuffer;
-      procedure SetBufListSize(aValue: Longint);
+      procedure FreeRecordBuffer(var Buffer: TRecordBuffer);
       function CreateBlobStream(aBufID: TRecordBuffer; Field: TField; Mode: TBlobStreamMode): TStream;
       function GetArray(aBufID: TRecordBuffer; Field: TField): IArray;
       procedure SetArrayIntf(aBufID: TRecordBuffer; AnArray: IArray; Field: TField);
@@ -251,9 +253,9 @@ type
                          DoCheck: Boolean): TGetResult;
       procedure GotoFirst;
       procedure GotoLast;
-      function GetRecNo(aBufID: TRecordBuffer): cardinal;
-      function GetCurrentRecNo: cardinal;
-      function GetRecordCount: cardinal;
+      function GetRecNo(aBufID: TRecordBuffer): TIBRecordNumber;
+      function GetCurrentRecNo: TIBRecordNumber;
+      function GetRecordCount: TIBRecordNumber;
       procedure SetCurrentRecord(aBufID: TRecordBuffer);
       procedure SaveBuffer(aBufID: TRecordBuffer);
       procedure RestoreBuffer(aBufID: TRecordBuffer);
@@ -264,6 +266,9 @@ type
 
       function GetInsertedRecords: integer;
       function GetDeletedRecords: integer;
+      function UpdatesPending: boolean;
+      function GetCachedUpdatesEnabled:boolean;
+      procedure SetCacbedUpdatesEnabled(enabled: boolean);
     end;
 
     {
@@ -274,9 +279,11 @@ type
     TDataset abstract methods used in buffer management including AllocRecordBuffer
     and GetRecord.
 
-    The opaque pointer to a buffer returned to TDataset is an
-    integer index to an array of pointers to actual buffer. This approach is used to
-    avoid in memory copies every time the dataset is scolled.
+    The opaque pointer to a buffer returned to TDataset is a pointer to an internal
+    data structure including a pointer to the actual buffer and a pointer to a separate
+    buffer for cached updates. This approach is used to avoid in memory copies every
+    time the dataset is scolled. It also avoids the cached rows buffers having to
+    include space for the calculated fields.
   }
 
   TIBCursorBase = class(TInterfacedObject)
@@ -324,15 +331,13 @@ type
 
       THackedField = class(TField); {Used to access to protected method TField.DataChange}
 
+      PDisplayBuffer = ^TDisplaybuffer;
       TDisplayBuffer = record
-        dbAllocated: boolean;
         dbBuffer: PByte;
         dbCalcFields: PByte;
       end;
 
   strict private
-    FBuffers: array of TDisplayBuffer;     {Display buffer. TRecordBuffer is a PtrUInt used to index this array}
-    FBufferCount: integer;                 {No. of elements in array}
     FRecordBufferSize: Integer;            {Calculated size in bytes for each record buffer}
     FRecordCount: Integer;                 {No. of records held in buffer pool. Total in dataset with Cursor.IsEof}
     FColumnMetaData: array of TColumnMetadata; {Metadata extracted from cursor + per column info.
@@ -368,8 +373,6 @@ type
     procedure SaveBlobsAndArrays(Buff: PByte);
   protected
     FCurrentRecord: PByte;
-    FOldBuffer: PByte;
-    FSavedRecNo: cardinal;
     procedure CreateOldBuffer; virtual;
     procedure FreeOldBuffer; virtual;
     procedure ClearRecordCache(aBuffer: PByte);
@@ -377,14 +380,14 @@ type
     function ColIndexByName(aName: AnsiString): integer;
     procedure FetchCurrentRecord(destBuffer: PByte);
     procedure FieldChanged(aBuffer: PByte; aField: TField); virtual;
-    function GetBuffer(index: TRecordBuffer): PByte; inline;
-    procedure SetBuffer(index: TRecordBuffer; aBuffer: PByte); inline;
-    function GetCalcFields(index: TRecordBuffer): PByte; inline;
+    function GetBuffer(aBufID: TRecordBuffer): PByte; inline;
+    procedure SetBuffer(aBufID: TRecordBuffer; aBuffer: PByte); inline;
+    function GetCalcFields(aBufID: TRecordBuffer): PByte; inline;
     function GetOldBufferFor(aBuffer: PByte): PByte; virtual; abstract;
     function FieldNo2ColumnIndex(aField: TField): integer; inline;
     function InternalAllocRecordBuffer: PByte; virtual; abstract;
     procedure InternalFreeRecordBuffer(aBuffer: PByte); virtual; abstract;
-    procedure ReleaseSaveBuffer(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); virtual; abstract;
+    function InternalGetRecNo(aBuffer: PByte): TIBRecordNumber; virtual; abstract;
     property Buffers[index: TRecordBuffer]:PByte read GetBuffer;
     property Cursor: IResultSet read FCursor;
   public type
@@ -397,7 +400,6 @@ type
     {TDataset Interface}
     function AllocRecordBuffer: TRecordBuffer;
     procedure FreeRecordBuffer(var Buffer: TRecordBuffer);
-    procedure SetBufListSize(aValue: Longint);
     procedure SetCurrentRecord(aBufID: TRecordBuffer);
     function CreateBlobStream(aBufID: TRecordBuffer; Field: TField; Mode: TBlobStreamMode): TStream;  virtual;
     function GetArray(aBufID: TRecordBuffer; Field: TField): IArray;
@@ -411,8 +413,6 @@ type
     function GetBookmarkFlag(aBufID: TRecordBuffer): TBookmarkFlag;
     procedure SetBookmarkFlag(aBufID: TRecordBuffer; aBookmarkFlag: TBookmarkFlag);
     procedure EditingDone(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); virtual;
-    procedure ApplyUpdates(iterator: TIterator); virtual;
-    procedure CancelUpdates; virtual;
   public
     property RecordBufferSize: integer read FRecordBufferSize;
     property ColumnCount: integer read FColumnCount;
@@ -423,42 +423,70 @@ type
     property Name: string read FName;
   end;
 
+  { TIBEditableCursor adds the means the save a copy of the current buffer during
+    a row edit and to restore it later. This may either be a single save buffer
+    or, if cached updates are enabled, a save buffer allocated from the old buffer pool.}
+
+  TIBEditableCursor = class(TIBCursorBase)
+  private
+    const OldBuffersPerBlock = 1024;
+  strict private
+    FApplyUpdates: TIterator;
+    FSaveBuffer: PByte;
+    FOldBufferCache: TIBOldBufferPool;
+    FCachedUpdatesEnabled: boolean;
+    FOldBuffer: PByte;
+    FSavedRecNo: TIBRecordNumber;
+    procedure ApplyUpdatesIterator(status: TCachedUpdateStatus; DataBuffer, OldBuffer: PByte);
+    procedure CancelUpdatesIterator(status: TCachedUpdateStatus; DataBuffer, OldBuffer: PByte);
+  protected
+    function GetOldBufferFor(aBuffer: PByte): PByte; override;
+  public
+    constructor Create(aName: string; aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
+      aCalcFieldsSize: integer; aDefaultTZDate: TDateTime);
+    destructor Destroy; override;
+    procedure SaveBuffer(aBufID: TRecordBuffer);
+    procedure RestoreBuffer(aBufID: TRecordBuffer);
+    procedure ReleaseSaveBuffer(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus);
+    procedure ApplyUpdates(iterator: TIterator);
+    procedure CancelUpdates;
+    function UpdatesPending: boolean;
+    function GetCachedUpdatesEnabled:boolean;
+    procedure SetCacbedUpdatesEnabled(enabled: boolean);
+  end;
+
   {
     TIBUniDirectionalCursor provides a simple forwards only cursor with edit support.
 
   }
 
-  TIBUniDirectionalCursor = class(TIBCursorBase, IIBCursor)
+  TIBUniDirectionalCursor = class(TIBEditableCursor, IIBCursor)
   private type
     PRecordData = ^TRecordData;
 
     { TRecordData }
 
     TRecordData = record
-      rdRecNo: cardinal;
+      rdRecNo: TIBRecordNumber;
     end;
 
   private
-    FRecordCount: cardinal;
+    FRecordCount: TIBRecordNumber;
     FInserting: boolean;
     FInsertedRecords: integer;
     FDeletedRecords: integer;
-    function InternalGetRecNo(aBuffer : PByte) : cardinal; inline;
   protected
-    function GetOldBufferFor(aBuffer: PByte): PByte; override;
     function InternalAllocRecordBuffer: PByte; override;
     procedure InternalFreeRecordBuffer(aBuffer: PByte); override;
-    procedure ReleaseSaveBuffer(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); override;
+    function InternalGetRecNo(aBuffer : PByte) : TIBRecordNumber; override;
   public
     function GetRecord(aBufID: TRecordBuffer; GetMode: TGetMode;
                        DoCheck: Boolean): TGetResult;
-    function GetRecNo(aBufID: TRecordBuffer): cardinal;
-    function GetCurrentRecNo: cardinal;
-    function GetRecordCount: cardinal;
+    function GetRecNo(aBufID: TRecordBuffer): TIBRecordNumber;
+    function GetCurrentRecNo: TIBRecordNumber;
+    function GetRecordCount: TIBRecordNumber;
     procedure GotoFirst;
     procedure GotoLast;
-    procedure SaveBuffer(aBufID: TRecordBuffer);
-    procedure RestoreBuffer(aBufID: TRecordBuffer);
     procedure EditingDone(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); override;
     procedure InsertBeforeCurrent(aBufID: TRecordBuffer);
     procedure InsertAfterCurrent(aBufID: TRecordBuffer);
@@ -474,12 +502,9 @@ type
     FBufferPool: TIBBufferPool;
     function InternalGetRecord(GetMode: TGetMode): PByte;
   protected
-     function GetOldBufferFor(aBuffer: PByte): PByte; override;
      function InternalAllocRecordBuffer: PByte; override;
      procedure InternalFreeRecordBuffer(aBuffer: PByte); override;
-     procedure InternalRestoreBuffer(aBuffer: PByte);
-     function InternalGetRecNo(aBuffer: PByte): cardinal; inline;
-     procedure ReleaseSaveBuffer(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); override;
+     function InternalGetRecNo(aBuffer: PByte): TIBRecordNumber; override;
   public
     constructor Create(aName: string; aCursor: IResultSet; aFields: TFields;
       ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
@@ -487,13 +512,11 @@ type
     destructor Destroy; override;
     function GetRecord(aBufID: TRecordBuffer; GetMode: TGetMode;
                      DoCheck: Boolean): TGetResult;
-    function GetRecNo(aBufID: TRecordBuffer): cardinal;
-    function GetCurrentRecNo: cardinal;
+    function GetRecNo(aBufID: TRecordBuffer): TIBRecordNumber;
+    function GetCurrentRecNo: TIBRecordNumber;
     procedure GotoFirst;
     procedure GotoLast;
-    function GetRecordCount: cardinal;
-    procedure SaveBuffer(aBufID: TRecordBuffer); virtual;
-    procedure RestoreBuffer(aBufID: TRecordBuffer); virtual;
+    function GetRecordCount: TIBRecordNumber;
     procedure InsertBeforeCurrent(aBufID: TRecordBuffer);
     procedure InsertAfterCurrent(aBufID: TRecordBuffer);
     procedure DeleteCurrent;
@@ -501,36 +524,13 @@ type
     function GetDeletedRecords: integer;
   end;
 
-  {TIBCachedCursor is a bi-directional cursor that supports cached updates}
-
-   TIBCachedCursor = class(TIBBiDirectionalCursor)
-   private
-     FOldBufferCache: TIBOldBufferPool;
-     FApplyUpdates: TIterator;
-     procedure ApplyUpdatesIterator(status: TCachedUpdateStatus; DataBuffer, OldBuffer: PByte);
-     procedure CancelUpdatesIterator(status: TCachedUpdateStatus; DataBuffer, OldBuffer: PByte);
-   protected
-     procedure CreateOldBuffer; override;
-     procedure FreeOldBuffer; override;
-   public
-     constructor Create(aName: string; aCursor: IResultSet; aFields: TFields;
-       ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
-       aDefaultTZDate: TDateTime; aBuffersPerBlock, aFirstBlockBuffers: integer);
-     destructor Destroy; override;
-     procedure SaveBuffer(aBufID: TRecordBuffer); override;
-     procedure RestoreBuffer(aBufID: TRecordBuffer); override;
-     procedure ReleaseSaveBuffer(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); override;
-     procedure ApplyUpdates(iterator: TIterator); override;
-     procedure CancelUpdates; override;
-  end;
-
 implementation
 
-uses IBMessages, IBCustomDataSet;
+uses IBMessages{, IBCustomDataSet};
 
-{ TIBCachedCursor }
+{ TIBEditableCursor }
 
-procedure TIBCachedCursor.ApplyUpdatesIterator(status: TCachedUpdateStatus;
+procedure TIBEditableCursor.ApplyUpdatesIterator(status: TCachedUpdateStatus;
   DataBuffer, OldBuffer: PByte);
 begin
   FOldBuffer := OldBuffer;
@@ -543,7 +543,7 @@ begin
   end;
 end;
 
-procedure TIBCachedCursor.CancelUpdatesIterator(status: TCachedUpdateStatus;
+procedure TIBEditableCursor.CancelUpdatesIterator(status: TCachedUpdateStatus;
   DataBuffer, OldBuffer: PByte);
 begin
   FOldBuffer := OldBuffer;
@@ -557,7 +557,7 @@ begin
         FBufferPool.UnDelete(DataBuffer);
 
       cusModified:
-        InternalRestoreBuffer(DataBuffer);
+        CopyBuffers(FOldBuffer,DataBuffer);
     end;
   finally
     FOldBuffer := nil;
@@ -565,34 +565,34 @@ begin
   end;
 end;
 
-procedure TIBCachedCursor.CreateOldBuffer;
+function TIBEditableCursor.GetOldBufferFor(aBuffer: PByte): PByte;
 begin
-  //Do nothing
+  if InternalGetRecNo(aBuffer) = FSavedRecNo then
+    Result := FOldBuffer
+  else
+    Result := nil;
 end;
 
-procedure TIBCachedCursor.FreeOldBuffer;
-begin
- //Do nothing
-end;
-
-constructor TIBCachedCursor.Create(aName: string; aCursor: IResultSet;
+constructor TIBEditableCursor.Create(aName: string; aCursor: IResultSet;
   aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
-  aDefaultTZDate: TDateTime; aBuffersPerBlock, aFirstBlockBuffers: integer);
+  aDefaultTZDate: TDateTime);
 begin
-  inherited Create(aName, aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate,
-                    aBuffersPerBlock, aFirstBlockBuffers);
-  FOldBufferCache := TIBOldBufferPool.Create(aName + ': Old Buffer Cache', RecordBufferSize,
-                                             aBuffersPerBlock, aFirstBlockBuffers);
+  inherited Create(aName, aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
+  FSaveBuffer := GetMem(RecordBufferSize);
+  if FSaveBuffer = nil then
+     OutOfMemoryError;
 end;
 
-destructor TIBCachedCursor.Destroy;
+destructor TIBEditableCursor.Destroy;
 begin
+  if FSaveBuffer <> nil then
+    FreeMem(FSaveBuffer);
   if FOldBufferCache <> nil then
     FOldBufferCache.Free;
-  inherited Destroy;
+ inherited Destroy;
 end;
 
-procedure TIBCachedCursor.SaveBuffer(aBufID: TRecordBuffer);
+procedure TIBEditableCursor.SaveBuffer(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
   Buff := GetBuffer(aBufID);
@@ -602,27 +602,53 @@ begin
   if FSavedRecNo <> 0 then
     IBError(ibxeSaveBufferNotReleased,[InternalGetRecNo(Buff),FSavedRecNo]);
 
-  FOldBuffer := FOldBufferCache.Append(Buff);
+  if FCachedUpdatesEnabled then
+    FOldBuffer := FOldBufferCache.Append(Buff);
+  else
+    FOldBuffer := FSaveBuffer;
+
   CopyBuffers(Buff,FOldBuffer);
   FSavedRecNo := InternalGetRecNo(Buff);
 end;
 
-procedure TIBCachedCursor.RestoreBuffer(aBufID: TRecordBuffer);
+procedure TIBEditableCursor.RestoreBuffer(aBufID: TRecordBuffer);
+var Buff: PByte;
 begin
-  inherited RestoreBuffer(aBufID);
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then
+    IBError(ibxeBufferNotSet, [nil]);
+
+  if InternalGetRecNo(Buff) <> FSavedRecNo then
+    IBError(ibxeUnableToRestore,[InternalGetRecNo(Buff),FSavedRecNo]);
+
+  CopyBuffers(FOldBuffer,Buff);
+  if FCachedUpdatesEnabled then
+    FOldBufferCache.SetStatus(FOldBuffer,cusUnModified);
   FOldBuffer := nil;
+  FSavedRecNo := 0;
 end;
 
-procedure TIBCachedCursor.ReleaseSaveBuffer(aBufID: TRecordBuffer;
+procedure TIBEditableCursor.ReleaseSaveBuffer(aBufID: TRecordBuffer;
   UpdateStatus: TCachedUpdateStatus);
+var Buff: PByte;
 begin
-  inherited ReleaseSaveBuffer(aBufID,UpdateStatus);
-  FOldBufferCache.SetStatus(FOldBuffer,UpdateStatus);
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then
+    IBError(ibxeBufferNotSet, [nil]);
+
+  if FSavedRecNo <> InternalGetRecNo(Buff) then
+    IBError(ibxeUnableToReleaseSaveBuffer,[InternalGetRecNo(Buff),FSavedRecNo]);
+
+  if FCachedUpdatesEnabled then
+    FOldBufferCache.SetStatus(FOldBuffer,UpdateStatus);
   FOldBuffer := nil;
+  FSavedRecNo := 0;
 end;
 
-procedure TIBCachedCursor.ApplyUpdates(iterator: TIterator);
+procedure TIBEditableCursor.ApplyUpdates(iterator: TIterator);
 begin
+  if not FCachedUpdatesEnabled or not UpdatesPending then  Exit;
+
   if FSavedRecNo <> 0 then
     IBError(ibxeSaveBufferNotReleased,[0,FSavedRecNo]);
 
@@ -630,16 +656,43 @@ begin
   FOldBuffer := nil;
   FSavedRecNo := 0;
   FOldBufferCache.ForwardIterator(ApplyUpdatesIterator);
+  FOldBufferCache.Clear;
 end;
 
-procedure TIBCachedCursor.CancelUpdates;
+procedure TIBEditableCursor.CancelUpdates;
 begin
+  if not FCachedUpdatesEnabled or not UpdatesPending then  Exit;
+
   if FSavedRecNo <> 0 then
     IBError(ibxeSaveBufferNotReleased,[0,FSavedRecNo]);
 
   FOldBuffer := nil;
   FSavedRecNo := 0;
   FOldBufferCache.BackwardsIterator(CancelUpdatesIterator);
+  FOldBufferCache.Clear;
+end;
+
+function TIBEditableCursor.UpdatesPending: boolean;
+begin
+  Result := FOldBufferCache.RecordCount > 0;
+end;
+
+function TIBEditableCursor.GetCachedUpdatesEnabled: boolean;
+begin
+  Result := FCachedUpdatesEnabled/
+end;
+
+procedure TIBEditableCursor.SetCacbedUpdatesEnabled(enabled: boolean);
+begin
+  if enabled <> FCachedUpdatesEnabled then
+  begin
+    if not enabled and UpdatesPending then
+       IBError(ibxeUpdatesNotAppled,[]);
+    if enabled and (FOldBufferCache = nil) then
+    FOldBufferCache := TIBOldBufferPool.Create(aName + ': Old Buffer Cache', RecordBufferSize,
+                                               OldBuffersPerBlock, OldBuffersPerBlock);
+    FCachedUpdatesEnabled := enabled;
+  end;
 end;
 
 { TIBBiDirectionalCursor }
@@ -674,27 +727,9 @@ begin
   FCurrentRecord := Result;
 end;
 
-procedure TIBBiDirectionalCursor.InternalRestoreBuffer(aBuffer: PByte);
-var Buff: PByte;
-begin
-  if FBufferPool.GetRecNo(Buff) <> FSavedRecNo then
-    IBError(ibxeUnableToRestore,[FBufferPool.GetRecNo(Buff),FSavedRecNo]);
-
-  CopyBuffers(FOldBuffer,Buff);
-  FSavedRecNo := 0;
-end;
-
-function TIBBiDirectionalCursor.InternalGetRecNo(aBuffer: PByte): cardinal;
+function TIBBiDirectionalCursor.InternalGetRecNo(aBuffer: PByte): TIBRecordNumber;
 begin
   Result := FBufferPool.GetRecNo(aBuffer);
-end;
-
-function TIBBiDirectionalCursor.GetOldBufferFor(aBuffer: PByte): PByte;
-begin
-  if FBufferPool.GetRecNo(aBuffer) = FSavedRecNo then
-    Result := FOldBuffer
-  else
-    Result := nil;
 end;
 
 function TIBBiDirectionalCursor.InternalAllocRecordBuffer: PByte;
@@ -745,7 +780,7 @@ begin
  end;
 end;
 
-function TIBBiDirectionalCursor.GetRecNo(aBufID: TRecordBuffer): cardinal;
+function TIBBiDirectionalCursor.GetRecNo(aBufID: TRecordBuffer): TIBRecordNumber;
 var Buff: PByte;
 begin
   Buff := GetBuffer(aBufID);
@@ -754,7 +789,7 @@ begin
   Result := InternalGetRecNo(Buff);
 end;
 
-function TIBBiDirectionalCursor.GetCurrentRecNo: cardinal;
+function TIBBiDirectionalCursor.GetCurrentRecNo: TIBRecordNumber;
 begin
     Result := InternalGetRecNo(FCurrentRecord);
 end;
@@ -780,48 +815,9 @@ begin
   end;
 end;
 
-function TIBBiDirectionalCursor.GetRecordCount: cardinal;
+function TIBBiDirectionalCursor.GetRecordCount: TIBRecordNumber;
 begin
   Result := FBufferPool.GetRecordCount;
-end;
-
-procedure TIBBiDirectionalCursor.SaveBuffer(aBufID: TRecordBuffer);
-var Buff: PByte;
-begin
-  Buff := GetBuffer(aBufID);
-  if Buff = nil then
-    IBError(ibxeBufferNotSet, [nil]);
-
-  if FSavedRecNo <> 0 then
-    IBError(ibxeSaveBufferNotReleased,[InternalGetRecNo(Buff),FSavedRecNo]);
-
-  CopyBuffers(Buff,FOldBuffer);
-  FSavedRecNo := InternalGetRecNo(Buff);
-end;
-
-procedure TIBBiDirectionalCursor.RestoreBuffer(aBufID: TRecordBuffer);
-var Buff: PByte;
-begin
-  Buff := GetBuffer(aBufID);
-  if Buff = nil then
-    IBError(ibxeBufferNotSet, [nil]);
-
-  InternalRestoreBuffer(Buff);
-end;
-
-procedure TIBBiDirectionalCursor.ReleaseSaveBuffer(aBufID: TRecordBuffer;
-  UpdateStatus: TCachedUpdateStatus);
-var Buff: PByte;
-begin
-  {Note: UpdateStatus is only used for cached updates}
-  Buff := GetBuffer(aBufID);
-  if Buff = nil then
-    IBError(ibxeBufferNotSet, [nil]);
-
-  if FSavedRecNo <> InternalGetRecNo(Buff) then
-    IBError(ibxeUnableToReleaseSaveBuffer,[InternalGetRecNo(Buff),FSavedRecNo]);
-
-  FSavedRecNo := 0;
 end;
 
 procedure TIBBiDirectionalCursor.InsertBeforeCurrent(aBufID: TRecordBuffer);
@@ -865,21 +861,13 @@ end;
 
 { TIBUniDirectionalCursor }
 
-function TIBUniDirectionalCursor.InternalGetRecNo(aBuffer: PByte) : cardinal;
+function TIBUniDirectionalCursor.InternalGetRecNo(aBuffer: PByte) : TIBRecordNumber;
 begin
   if aBuffer = nil then
     Result := 0
   else
     Result := PRecordData(aBuffer - sizeof(TRecordData))^.rdRecNo;
  end;
-
-function TIBUniDirectionalCursor.GetOldBufferFor(aBuffer : PByte) : PByte;
-begin
-  if InternalGetRecNo(aBuffer) = FSavedRecNo then
-    Result := FOldBuffer
-  else
-    Result := nil;
-end;
 
 function TIBUniDirectionalCursor.InternalAllocRecordBuffer: PByte;
 begin
@@ -941,7 +929,7 @@ begin
   end;
 end;
 
-function TIBUniDirectionalCursor.GetRecNo(aBufID : TRecordBuffer) : cardinal;
+function TIBUniDirectionalCursor.GetRecNo(aBufID : TRecordBuffer) : TIBRecordNumber;
 var Buff: PByte;
 begin
   Result := 0;
@@ -951,12 +939,12 @@ begin
   Result := InternalGetRecNo(Buff);
 end ;
 
-function TIBUniDirectionalCursor.GetCurrentRecNo: cardinal;
+function TIBUniDirectionalCursor.GetCurrentRecNo: TIBRecordNumber;
 begin
   Result := InternalGetRecNo(FCurrentRecord)
 end;
 
-function TIBUniDirectionalCursor.GetRecordCount: cardinal;
+function TIBUniDirectionalCursor.GetRecordCount: TIBRecordNumber;
 begin
   Result := FRecordCount;
 end;
@@ -974,34 +962,6 @@ begin
   FCurrentRecord := nil;
 end;
 
-procedure TIBUniDirectionalCursor.SaveBuffer(aBufID : TRecordBuffer);
-var Buff: PByte;
-begin
-  Buff := GetBuffer(aBufID);
-  if Buff = nil then
-    IBError(ibxeBufferNotSet, [nil]);
-
-  if FSavedRecNo <> 0 then
-    IBError(ibxeSaveBufferNotReleased,[InternalGetRecNo(Buff),FSavedRecNo]);
-
-  CopyBuffers(Buff,FOldBuffer);
-  FSavedRecNo := InternalGetRecNo(Buff);
-end ;
-
-procedure TIBUniDirectionalCursor.RestoreBuffer(aBufID : TRecordBuffer);
-var Buff: PByte;
-begin
-  Buff := GetBuffer(aBufID);
-  if Buff = nil then
-    IBError(ibxeBufferNotSet, [nil]);
-
-  if InternalGetRecNo(Buff) <> FSavedRecNo then
-    IBError(ibxeUnableToRestore,[InternalGetRecNo(Buff),FSavedRecNo]);
-
-  CopyBuffers(FOldBuffer,Buff);
-  FSavedRecNo := 0;
-end ;
-
 procedure TIBUniDirectionalCursor.EditingDone(aBufID: TRecordBuffer;
   UpdateStatus: TCachedUpdateStatus);
 begin
@@ -1009,23 +969,8 @@ begin
   FInserting := false;
 end;
 
-procedure TIBUniDirectionalCursor.ReleaseSaveBuffer(aBufID: TRecordBuffer;
-  UpdateStatus: TCachedUpdateStatus);
-var Buff: PByte;
-begin
-  {Note: UpdateStatus is only used for cached updates}
-  Buff := GetBuffer(aBufID);
-  if Buff = nil then
-    IBError(ibxeBufferNotSet, [nil]);
-
-  if FSavedRecNo <> InternalGetRecNo(Buff) then
-    IBError(ibxeUnableToReleaseSaveBuffer,[InternalGetRecNo(Buff),FSavedRecNo]);
-
-  FSavedRecNo := 0;
-end;
-
 procedure TIBUniDirectionalCursor.InsertBeforeCurrent(aBufID: TRecordBuffer);
-var CurRecNo: cardinal;
+var CurRecNo: TIBRecordNumber;
 begin
   CurRecNo := InternalGetRecNo(FCurrentRecord);
   IBError(ibxeUniDirectional,[CurRecNo,CurRecNo - 1]);
@@ -1256,19 +1201,19 @@ begin
   FRecordBufferSize := FArrayCacheOffset + (ArrayFieldCount * sizeof(TIBArray));
 end;
 
-function TIBCursorBase.GetBuffer(index: TRecordBuffer): PByte;
+function TIBCursorBase.GetBuffer(aBufID: TRecordBuffer): PByte;
 begin
-  Result := FBuffers[PtrUInt(index)-1].dbBuffer;
+  Result := PDisplayBuffer(aBufID)^.dbBuffer;
 end;
 
-procedure TIBCursorBase.SetBuffer(index: TRecordBuffer; aBuffer: PByte);
+procedure TIBCursorBase.SetBuffer(aBufID: TRecordBuffer; aBuffer: PByte);
 begin
-  FBuffers[PtrUInt(index)-1].dbBuffer := aBuffer;
+  PDisplayBuffer(aBufID)^.dbBuffer := aBuffer;
 end;
 
-function TIBCursorBase.GetCalcFields(index: TRecordBuffer): PByte;
+function TIBCursorBase.GetCalcFields(aBufID: TRecordBuffer): PByte;
 begin
-  Result := FBuffers[PtrUInt(index)-1].dbCalcFields;
+  Result := PDisplayBuffer(aBufID)^.dbCalcFields;
 end;
 
 function TIBCursorBase.FieldNo2ColumnIndex(aField: TField): integer;
@@ -1566,52 +1511,29 @@ end;
  FBuffers array.}
 
 function TIBCursorBase.AllocRecordBuffer: TRecordBuffer;
-var i: PtrUInt;
 begin
-  Result := nil;
-  for i := 0 to FBufferCount - 1 do
-    with FBuffers[i] do
-      if not dbAllocated then
-      begin
-        dbAllocated := true;
-        Result := TRecordBuffer(i);
-        Exit;
-      end;
-
-  IBError(ibxeBuffersExceeded,[FBufferCount]);
+  Result := GetMem(sizeof(TDisplayBuffer));
+  if Result = nil then
+    OutofMemoryError;
+  with PDisplayBuffer(Result)^ do
+  begin
+    dbBuffer := InternalAllocRecordBuffer;
+    dbCalcFields := GetMem(FCalcFieldsSize);
+    if dbCalcFields = nil then
+      OutOfMemoryError;
+  end;
 end;
 
 procedure TIBCursorBase.FreeRecordBuffer(var Buffer: TRecordBuffer);
 begin
-  FBuffers[PtrUInt(Buffer)].dbAllocated := false;
-  Buffer := nil;
-end;
-
-procedure TIBCursorBase.SetBufListSize(aValue: Longint);
-var i: integer;
-begin
-  Inc(aValue); {always allocate one more than requested}
-
-  {if decreasing then free up buffers}
-  for i := aValue to FBufferCount - 1 do
-  with FBuffers[i] do
+  if Buffer <> nil then
+  with PDisplayBuffer(Buffer)^ do
   begin
     InternalFreeRecordBuffer(dbBuffer);
     FreeMem(dbCalcFields);
   end;
-
-  SetLength(FBuffers,aValue);
-
-  {if increasing then allocate buffers}
-  for i := FBufferCount to aValue - 1 do
-  with FBuffers[i] do
-  begin
-    dbBuffer := InternalAllocRecordBuffer;
-    dbCalcFields := GetMem(FCalcFieldsSize);
-    dbAllocated := false;
-  end;
-
-  FBufferCount := aValue;
+  FreeMem(Buffer);
+  Buffer := nil;
 end;
 
 procedure TIBCursorBase.SetCurrentRecord(aBufID: TRecordBuffer);
@@ -2045,16 +1967,6 @@ begin
     ReleaseSaveBuffer(aBufID, UpdateStatus);
 end;
 
-procedure TIBCursorBase.ApplyUpdates(iterator: TIterator);
-begin
-  //Do nothing
-end;
-
-procedure TIBCursorBase.CancelUpdates;
-begin
-  //Do nothing
-end;
-
 
 { TIBSimpleBufferPool }
 
@@ -2176,6 +2088,7 @@ begin
   FLastBuffer := nil;
   FCurrent := nil;
   FBufferIndex.Clear;
+  FRecordCount := 0;
 end;
 
 function TIBSimpleBufferPool.GetFirst: PByte;
@@ -2196,7 +2109,7 @@ begin
   Inc(Result,sizeof(TBufferHeader))
 end;
 
-function TIBSimpleBufferPool.GetBuffer(RecNo: cardinal): PByte;
+function TIBSimpleBufferPool.GetBuffer(RecNo: TIBRecordNumber): PByte;
 var  i: integer;
 begin
   Result := nil;
@@ -2296,7 +2209,7 @@ begin
   end;
 end;
 
-function TIBSimpleBufferPool.GetRecNo(aBuffer: PByte): cardinal;
+function TIBSimpleBufferPool.GetRecNo(aBuffer: PByte): TIBRecordNumber;
 var P: PByte;
 begin
   P := aBuffer - sizeof(TBufferHeader);
@@ -2304,7 +2217,7 @@ begin
   Result := PBufferHeader(P)^.RecNo;
 end;
 
-function TIBSimpleBufferPool.GetRecordCount: cardinal;
+function TIBSimpleBufferPool.GetRecordCount: TIBRecordNumber;
 begin
   Result := FRecordCount;
 end;
@@ -2413,7 +2326,7 @@ begin
   until (Result = nil) or IncludeDeleted or (PRecordData(Result)^.rdStatus in [rsAppended,rsInserted]);
 end;
 
-function TIBBufferPool.GetBuffer(RecNo: cardinal): PByte;
+function TIBBufferPool.GetBuffer(RecNo: TIBRecordNumber): PByte;
 begin
   Result := inherited GetBuffer(RecNo);
   if PRecordData(Result)^.rdStatus in [rsInsertDeleted, rsAppendDeleted] then
@@ -2442,7 +2355,7 @@ begin
     Inc(Result,sizeof(TRecordData));
 end;
 
-function TIBBufferPool.GetRecNo(aBuffer: PByte): cardinal;
+function TIBBufferPool.GetRecNo(aBuffer: PByte): TIBRecordNumber;
 begin
   if aBuffer = nil then
     Result := 0
@@ -2570,14 +2483,14 @@ begin
   Inc(Result,sizeof(TRecordData));
 end;
 
-function TIBOldBufferPool.GetBuffer(RecNo: cardinal): PByte;
+function TIBOldBufferPool.GetBuffer(RecNo: TIBRecordNumber): PByte;
 begin
   Result := inherited GetBuffer(RecNo);
   if Result <> nil then
     Inc(Result,sizeof(TRecordData));
 end;
 
-function TIBOldBufferPool.GetRecNo(aBuffer: PByte): cardinal;
+function TIBOldBufferPool.GetRecNo(aBuffer: PByte): TIBRecordNumber;
 begin
   Result := inherited GetRecNo(aBuffer - sizeof(TRecordData));
 end;
