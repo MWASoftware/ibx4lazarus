@@ -518,10 +518,10 @@ type
 
     { TDataSet support }
     procedure InternalInsert; override;
-    procedure InitRecord(Buffer: PChar); override;
+    procedure InitRecord(Buffer: TRecordBuffer); override;
     procedure Disconnect; virtual;
     function ConstraintsStored: Boolean;
-    procedure ClearCalcFields(Buffer: PChar); override;
+    procedure ClearCalcFields(Buffer: TRecordBuffer); override;
     function AllocRecordBuffer: TRecordBuffer; override;
     procedure DoBeforeDelete; override;
     procedure DoAfterDelete; override;
@@ -550,6 +550,7 @@ type
     procedure InternalCancel; override;
     procedure InternalClose; override;
     procedure InternalDelete; override;
+    procedure InternalEdit; override;
     procedure InternalFirst; override;
     procedure InternalGotoBookmark(Bookmark: Pointer); override;
     procedure InternalHandleException; override;
@@ -564,7 +565,6 @@ type
     function IsCursorOpen: Boolean; override;
     procedure Loaded; override;
     procedure ReQuery;
-    procedure ResetBufferCache;
     procedure SetBookmarkFlag(Buffer: PChar; Value: TBookmarkFlag); override;
     procedure SetBookmarkData(Buffer: PChar; Data: Pointer); override;
     procedure SetCachedUpdates(Value: Boolean);
@@ -3913,6 +3913,11 @@ begin
   end;
 end;
 
+procedure TIBCustomDataSet.InternalEdit;
+begin
+  FCursor.SaveBuffer(ActiveBuffer);
+end;
+
 procedure TIBCustomDataSet.InternalFirst;
 begin
   FCursor.GotoFirst;
@@ -4419,24 +4424,6 @@ begin
   First;
 end;
 
-procedure TIBCustomDataSet.ResetBufferCache;
-begin
-  ClearBlobCache;
-  ClearArrayCache;
-  FRecordCount := 0;
-  FDeletedRecords := 0;
-  FBPos := 0;
-  FOBPos := 0;
-  FCacheSize := 0;
-  FOldCacheSize := 0;
-  FBEnd := 0;
-  FOBEnd := 0;
-  FreeMem(FBufferCache);
-  FBufferCache := nil;
-  FreeMem(FOldBufferCache);
-  FOldBufferCache := nil;
-end;
-
 procedure TIBCustomDataSet.InternalOpen;
 begin
   FBase.SetCursor;
@@ -4472,6 +4459,7 @@ begin
 
 
       FFilterBuffer := FCursor.AllocRecordBuffer;
+      FCursor.SetCacbedUpdatesEnabled(CachedUpdates);
    end
     else
       FQSelect.ExecQuery;
@@ -4620,11 +4608,13 @@ end;
 
 procedure TIBCustomDataSet.SetCachedUpdates(Value: Boolean);
 begin
-  if not Value and FCachedUpdates then
-    CancelUpdates;
+  if not Value and FCachedUpdates and assigned (FCursor) then
+    FCursor.CancelUpdates;
   if (not (csReading in ComponentState)) and Value then
     CheckDatasetClosed;
   FCachedUpdates := Value;
+  if assigned(FCursor) then
+    FCursor.SetCacbedUpdatesEnabled(Value);
 end;
 
 procedure TIBCustomDataSet.SetDataSource(Value: TDataSource);
@@ -4756,7 +4746,7 @@ begin
   Result := Constraints.Count > 0;
 end;
 
-procedure TIBCustomDataSet.ClearCalcFields(Buffer: PChar);
+procedure TIBCustomDataSet.ClearCalcFields(Buffer: TRecordBuffer);
 begin
  FillChar(Buffer[FRecordSize], CalcFieldsSize, 0);
 end;
@@ -4889,20 +4879,15 @@ begin
   Disconnect
 end;
 
-procedure TIBCustomDataSet.InitRecord(Buffer: PChar);
+procedure TIBCustomDataSet.InitRecord(Buffer: TRecordBuffer);
 begin
   inherited InitRecord(Buffer);
-  with PRecordData(Buffer)^ do
-  begin
-    rdUpdateStatus := TUpdateStatus(usInserted);
-    rdBookMarkFlag := bfInserted;
-    rdRecordNumber := -1;
-  end;
+  FCursor.InitBuffer(Buffer);
 end;
 
 procedure TIBCustomDataSet.InternalInsert;
 begin
-  CursorPosChanged;
+  FCursor.InsertBeforeCurrent(ActiveBuffer);
 end;
 
 { TIBDataSet IProviderSupport }
