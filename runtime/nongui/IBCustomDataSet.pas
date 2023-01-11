@@ -427,6 +427,7 @@ type
     FCursor: IIBCursor;
     FUpdatesPending: Boolean;
     FFilterBuffer: TRecordBuffer;
+    FAliasNameMap: array of string;
     FAliasNameList: array of AnsiString;
     function GetSelectStmtIntf: IStatement;
     procedure SetCaseSensitiveParameterNames(AValue: boolean);
@@ -3411,57 +3412,10 @@ begin
 end;
 
 function TIBCustomDataSet.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
-var
-  pb: PBlobDataArray;
-  fs: TIBBlobStream;
-  Buff: PChar;
-  bTr, bDB: Boolean;
 begin
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
-  Buff := GetActiveBuf;
-  if Buff = nil then
-  begin
-    fs := TIBBlobStream.Create;
-    fs.Mode := bmReadWrite;
-    fs.Database := Database;
-    fs.Transaction := Transaction;
-    fs.SetField(Field);
-    FBlobStreamList.Add(Pointer(fs));
-    result := TIBDSBlobStream.Create(Field, fs, Mode);
-    exit;
-  end;
-  pb := PBlobDataArray(Buff + FBlobCacheOffset);
-  if pb^[Field.Offset] = nil then
-  begin
-    AdjustRecordOnInsert(Buff);
-    pb^[Field.Offset] := TIBBlobStream.Create;
-    fs := pb^[Field.Offset];
-    FBlobStreamList.Add(Pointer(fs));
-    fs.Mode := bmReadWrite;
-    fs.Database := Database;
-    fs.Transaction := Transaction;
-    fs.SetField(Field);
-    fs.BlobID :=
-      PISC_QUAD(@Buff[FFieldColumns^[FMappedFieldPosition[Field.FieldNo - 1]].fdDataOfs])^;
-    if (CachedUpdates) then
-    begin
-      bTr := not Transaction.InTransaction;
-      bDB := not Database.Connected;
-      if bDB then
-        Database.Open;
-      if bTr then
-        Transaction.StartTransaction;
-      fs.Seek(0, soFromBeginning);
-      if bTr then
-        Transaction.Commit;
-      if bDB then
-        Database.Close;
-    end;
-    WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
-  end else
-    fs := pb^[Field.Offset];
-  result := TIBDSBlobStream.Create(Field, fs, Mode);
+  Result := FCursor.CreateBlobStream(GetActiveBuf,Fild,Mode);
 end;
 
 function TIBCustomDataSet.GetArray(Field: TIBArrayField): IArray;
@@ -3680,7 +3634,7 @@ end;
 procedure TIBCustomDataSet.GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
 var RecNo: TIBRecordNumber;
 begin
-  RecNo := FCursor.GetRecNo(Buffer););
+  RecNo := FCursor.GetRecNo(Buffer);
   Move(RecNo, Data^, BookmarkSize);
 end;
 
@@ -4442,16 +4396,15 @@ begin
         CreateFields;
       FArrayFieldCount := 0;
       BindFields(True);
-      FCurrentRecord := -1;
       FQSelect.ExecQuery;
       FOpen := FQSelect.Open;
       if UniDirectional then
-        FCursor := TIBUniDirectionalCursor.create(Name = ': cursor',
+        FCursor := TIBUniDirectionalCursor.create(Name + ': unidirectional cursor',
                                                        FQSelect.CurrentCursor,Fields,
                                                        FComputedFieldNames, CalcFieldsSize,
                                                        FDefaultTZData)
       else
-        FCursor := TIBBiDirectionalCursor.create(Name = ': cursor',
+        FCursor := TIBBiDirectionalCursor.create(Name + ': bidirectional cursor',
                                                        FQSelect.CurrentCursor,Fields,
                                                        FComputedFieldNames, CalcFieldsSize,
                                                        FDefaultTZData, BuffersPerBlock,
@@ -4524,7 +4477,7 @@ end;
 
 procedure TIBCustomDataSet.InternalSetToRecord(Buffer: TRecordBuffer);
 begin
-  InternalGotoBookmark(FCursor.GetRecNo(Buffer));
+  FCursor.SetCurrentRecord(Buffer);
 end;
 
 function TIBCustomDataSet.IsCursorOpen: Boolean;
@@ -5117,7 +5070,7 @@ begin
   if not Assigned(Bookmark) then
     exit;
   Move(pointer(Bookmark)^,RecNo,BookmarkSize);
-  Result := RecNo < FCursor.GetRecordCount;
+  Result := RecNo <= FCursor.GetRecordCount;
 end;
 
 function TIBCustomDataSet.GetFieldData(Field: TField;

@@ -799,13 +799,24 @@ begin
     csRowBuffer:
       begin
         FCurrentRecord := FBufferPool.GetPriorBuffer(FCurrentRecord);
-        Result := grOK;
+        if FCurrentRecord = nil then
+        begin
+          FCurrentRecordStatus := csBOF;
+          Result := grBOF
+        end
+        else
+          Result := grOK;
       end;
     csEOF:
       begin
         FCurentRecord := FBufferPool.GetLast;
-        FCurrentRecordStatus := csRowBuffer;
-        Result := grOK;
+        if FCurrentRecord = nil then
+          Result := grEOF
+        else
+        begin
+          FCurrentRecordStatus := csRowBuffer;
+          Result := grOK;
+        end;
       end;
     end;
 
@@ -1927,6 +1938,7 @@ begin
         len := PShort(Data)^;
         if len <= field.DataSize then
         begin
+          Inc(Data,sizeof(short));
           Move(Data^, outBuffer^, len);
           PAnsiChar(outBuffer)[len] := #0;
         end
@@ -2175,7 +2187,7 @@ end;
 
 function TIBCursorBase.GetRecordSize: integer;
 begin
-  Result := RecordBufferSize;
+  Result := sizeof(TDisplayBuffer);
 end;
 
 function TIBCursorBase.GetCurrentRecNo: TIBRecordNumber;
