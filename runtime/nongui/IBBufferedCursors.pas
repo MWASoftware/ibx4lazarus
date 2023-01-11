@@ -263,8 +263,8 @@ type
       function GetRecordCount: TIBRecordNumber;
       function GetRecordSize: word;
       procedure SetCurrentRecord(aBufID: TRecordBuffer);
-      procedure SaveBuffer(aBufID: TRecordBuffer);
-      procedure RestoreBuffer(aBufID: TRecordBuffer);
+      procedure EditBuffer(aBufID: TRecordBuffer);
+      procedure CancelChanges(aBufID: TRecordBuffer);
       procedure EditingDone(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus);
       procedure InsertBeforeCurrent(aBufID: TRecordBuffer);
       procedure InsertAfterCurrent(aBufID: TRecordBuffer);
@@ -376,12 +376,13 @@ type
     function InternalGetIsNull(Buff: PByte; ColIndex: integer): boolean;
     procedure InternalSetIsNull(Buff: PByte; ColIndex: integer; IsNull: boolean);
     procedure SetRefreshRequired(Buff: PByte; ColIndex: integer; RefreshRequired: boolean);
+    procedure CancelBlobAndArrayChanges(Buff: PByte);
     procedure SaveBlobsAndArrays(Buff: PByte);
   protected
     FCurrentRecord: PByte;
     FCurrentRecordStatus: (csBOF, csRowBuffer, csEOF);
+    FSaveBufferSize: integer;
     procedure ClearRecordCache(aBuffer: PByte);
-    procedure CopyBuffers(src, dest: PByte); inline;
     function ColIndexByName(aName: AnsiString): integer;
     procedure FetchCurrentRecord(destBuffer: PByte);
     procedure FieldChanged(aBuffer: PByte; aField: TField); virtual;
@@ -451,6 +452,7 @@ type
   protected
     FOldBuffer: PByte;  {Points to current save buffer}
     FSavedRecNo: TIBRecordNumber; {record number of saved buffer if any}
+    procedure CopyBuffers(src, dest: PByte); inline;
     procedure DoCancelUpdates; virtual; abstract;
     function GetOldBufferFor(aBuffer: PByte): PByte; override;
     procedure InitCachedUpdates; virtual;
@@ -461,8 +463,8 @@ type
       aCalcFieldsSize: integer; aDefaultTZDate: TDateTime);
     destructor Destroy; override;
     procedure EditingDone(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); virtual;
-    procedure SaveBuffer(aBufID: TRecordBuffer);
-    procedure RestoreBuffer(aBufID: TRecordBuffer);
+    procedure EditBuffer(aBufID: TRecordBuffer);
+    procedure CancelChanges(aBufID: TRecordBuffer);
     procedure ApplyUpdates(iterator: TIterator);
     procedure CancelUpdates;
     function UpdatesPending: boolean;
@@ -567,6 +569,11 @@ begin
   end;
 end;
 
+procedure TIBEditableCursor.CopyBuffers(src, dest: PByte);
+begin
+  Move(src^,dest^,FSaveBufferSize);
+end;
+
 function TIBEditableCursor.GetOldBufferFor(aBuffer: PByte): PByte;
 begin
   if InternalGetRecNo(aBuffer) = FSavedRecNo then
@@ -587,7 +594,7 @@ constructor TIBEditableCursor.Create(aName: string; aCursor: IResultSet;
   aDefaultTZDate: TDateTime);
 begin
   inherited Create(aName, aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
-  FSaveBuffer := GetMem(RecordBufferSize);
+  FSaveBuffer := GetMem(FSaveBufferSize);
   if FSaveBuffer = nil then
      OutOfMemoryError;
 end;
@@ -608,7 +615,7 @@ begin
     ReleaseSaveBuffer(aBufID, UpdateStatus);
 end;
 
-procedure TIBEditableCursor.SaveBuffer(aBufID: TRecordBuffer);
+procedure TIBEditableCursor.EditBuffer(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
   Buff := GetBuffer(aBufID);
@@ -627,7 +634,7 @@ begin
   FSavedRecNo := InternalGetRecNo(Buff);
 end;
 
-procedure TIBEditableCursor.RestoreBuffer(aBufID: TRecordBuffer);
+procedure TIBEditableCursor.CancelChanges(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
   Buff := GetBuffer(aBufID);
@@ -637,6 +644,7 @@ begin
   if InternalGetRecNo(Buff) <> FSavedRecNo then
     IBError(ibxeUnableToRestore,[InternalGetRecNo(Buff),FSavedRecNo]);
 
+  CancelBlobAndArrayChanges(Buff)
   CopyBuffers(FOldBuffer,Buff);
   if FCachedUpdatesEnabled then
     FOldBufferCache.SetStatus(FOldBuffer,cusUnModified);
@@ -1008,7 +1016,7 @@ begin
   inherited InitCachedUpdates;
   if FDataBufferCache = nil then
     FDataBufferCache := TIBSimpleBufferPool.Create(Name + ': Data Buffer Cacne',
-           RecordBufferSize,
+           FSaveBufferSize,
            DataBuffersPerBlock,DataBuffersPerBlock);
 end;
 
@@ -1423,6 +1431,7 @@ begin
   FRefreshRequiredBitmapOffset := RecordSize;
   FRefreshRequiredSize := ((FColumnCount - 1) div 8) + 1;
   Inc(RecordSize, FRefreshRequiredSize);
+  FSaveBufferSize := RecordSize;
 
   {Add in space for offsets}
   FBlobCacheOffset := RecordSize;
@@ -1612,6 +1621,34 @@ begin
     pBitmap^ := pBitmap^ and not mask;     {unset bit}
 end;
 
+procedure TIBCursorBase.CancelBlobAndArrayChanges(Buff: PByte);
+var  pbd: PBlobDataArray;
+     pda: PArrayDataArray;
+     i: integer;
+begin
+  pbd := PBlobDataArray(Buff + FBlobCacheOffset);
+  pda := PArrayDataArray(Buff + FArrayCacheOffset);
+
+  for i := 0 to FColumnCount - 1 do
+  with FColumnMetadata[i] do
+  begin
+    if fdDataType = SQL_Blob then
+    begin
+      if pbd^[fdArrayIndex] <> nil then
+        pbd^[fdArrayIndex] := nil;
+    end
+    else
+    if fdDataType = SQL_ARRAY then
+    begin
+      if pda^[fdArrayIndex] <> nil then
+      begin
+        pda^[fdArrayIndex].ArrayIntf.CancelChanges;
+        pda^[fdArrayIndex] := nil;
+      end;
+    end
+  end;
+end;
+
 procedure TIBCursorBase.SaveBlobsAndArrays(Buff: PByte);
 var  pbd: PBlobDataArray;
      pda: PArrayDataArray;
@@ -1648,11 +1685,6 @@ begin
     else
        InternalSetIsNull(Buff,i, true);
   end;
-end;
-
-procedure TIBCursorBase.CopyBuffers(src, dest: PByte);
-begin
-  Move(src^,dest^,RecordBufferSize);
 end;
 
 function TIBCursorBase.ColIndexByName(aName: AnsiString): integer;
