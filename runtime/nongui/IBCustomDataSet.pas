@@ -2679,19 +2679,8 @@ begin
         Qry.ExecQuery;
         try
           if (Qry.SQLStatementType = SQLExecProcedure) or Qry.Next then
-          begin
-            ofs := PRecordData(Buff)^.rdSavedOffset;
-            FetchCurrentRecordToBuffer(Qry,
-                                       PRecordData(Buff)^.rdRecordNumber,
-                                       Buff);
-            if FCachedUpdates and (ofs <> $FFFFFFFF) then
-            begin
-              PRecordData(Buff)^.rdSavedOffset := ofs;
-              WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Buff);
-              SaveOldBuffer(Buff);
-            end;
-          end;
-        finally
+            FCursor.UpdateRecordFromQuery(Buffer,Qry.Current);
+         finally
           Qry.Close;
         end;
         if Qry <> FQRefresh then
@@ -3620,32 +3609,26 @@ begin
 end;
 
 procedure TIBCustomDataSet.InternalDelete;
-var
-  Buff: PChar;
 begin
   FBase.SetCursor;
   try
-    Buff := GetActiveBuf;
     if CanDelete then
     begin
-      if not CachedUpdates then
-        InternalDeleteRecord(FQDelete, Buff)
-      else
+      if not FCursor.GetCachedUpdatesEnabled then
       begin
-        with PRecordData(Buff)^ do
+        if (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukDelete).Text <> '')) then
+          FUpdateObject.Apply(ukDelete,Buff)
+        else
         begin
-          if rdCachedUpdateStatus = cusInserted then
-            rdCachedUpdateStatus := cusUninserted
-          else begin
-            rdUpdateStatus := usDeleted;
-            rdCachedUpdateStatus := cusDeleted;
-          end;
+          FCursor.SetSQLParams(ActiveBuffer,FQDelete.Params);
+          FQDelete.ExecQuery;
+          if (FQDelete.FieldCount > 0)  then
+            DoDeleteReturning(FQDelete.Current);
         end;
-        WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Buff);
+        FCursor.Delete(ActiveBuffer);
       end;
-      Inc(FDeletedRecords);
-      FUpdatesPending := True;
-    end else
+    end
+    else
       IBError(ibxeCannotDelete, [nil]);
   finally
     FBase.RestoreCursor;
@@ -4207,40 +4190,23 @@ begin
 end;
 
 procedure TIBCustomDataSet.InternalPost;
-var
-  Qry: TIBSQL;
-  bInserting: Boolean;
 begin
   FBase.SetCursor;
   try
     CheckEditState;
     if (State = dsInsert) then
     begin
-      bInserting := True;
-      Qry := FQInsert;
+       if (not CachedUpdates) then
+         InternalPostRecord(FQInsert)
       FCursor.EditingDone(cusInserted);
+      Inc(FRecordCount);
     end
     else
     begin
-      bInserting := False;
-      Qry := FQModify;
+      if (not CachedUpdates) then
+        InternalPostRecord(FQModify)
       FCursor.EditingDone(cusModified);
-{      if PRecordData(Buff)^.rdCachedUpdateStatus = cusUnmodified then
-      begin
-        PRecordData(Buff)^.rdUpdateStatus := usModified;
-        PRecordData(Buff)^.rdCachedUpdateStatus := cusModified;
-      end
-      else if PRecordData(Buff)^.
-                    rdCachedUpdateStatus = cusUninserted then
-            begin
-              PRecordData(Buff)^.rdCachedUpdateStatus := cusInserted;
-              Dec(FDeletedRecords);
-            end;    }
     end;
-    if (not CachedUpdates) then
-      InternalPostRecord(Qry)
-    if bInserting then
-      Inc(FRecordCount);
   finally
     FBase.RestoreCursor;
   end;
