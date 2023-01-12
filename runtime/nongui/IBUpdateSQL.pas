@@ -58,8 +58,8 @@ type
     function GetDataSet: TIBCustomDataSet; override;
     procedure SetDataSet(ADataSet: TIBCustomDataSet); override;
     procedure SQLChanged(Sender: TObject);
-    procedure Apply(UpdateKind: TUpdateKind; buff: PChar); override;
-    procedure ExecSQL(UpdateKind: TUpdateKind; buff: PChar);
+    procedure Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer); override;
+    procedure ExecSQL(UpdateKind: TUpdateKind; buff: TRecordBuffer);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -112,7 +112,7 @@ begin
     Result := inherited;
 end;
 
-procedure TIBUpdateSQL.ExecSQL(UpdateKind: TUpdateKind; buff: PChar);
+procedure TIBUpdateSQL.ExecSQL(UpdateKind: TUpdateKind; buff: TRecordBuffer);
 begin
   InternalPrepare(UpdateKind);
   with Query[UpdateKind] do
@@ -193,7 +193,7 @@ begin
     end;
 end;
 
-procedure TIBUpdateSQL.Apply(UpdateKind: TUpdateKind; buff: PChar);
+procedure TIBUpdateSQL.Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer);
 begin
   if not Assigned(FDataSet) then Exit;
   InternalPrepare(UpdateKind);

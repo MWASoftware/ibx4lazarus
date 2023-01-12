@@ -69,11 +69,11 @@ type
   protected
     function GetDataSet: TIBCustomDataSet; virtual; abstract;
     procedure SetDataSet(ADataSet: TIBCustomDataSet); virtual; abstract;
-    procedure Apply(UpdateKind: TUpdateKind; buff: PChar); virtual; abstract;
+    procedure Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer); virtual; abstract;
     function GetSQL(UpdateKind: TUpdateKind): TStrings; virtual; abstract;
-    procedure InternalSetParams(Params: ISQLParams; buff: PChar); overload;
-    procedure InternalSetParams(Query: TIBSQL; buff: PChar); overload;
-    procedure UpdateRecordFromQuery(UpdateKind: TUpdateKind; QryResults: IResults; Buffer: PChar);
+    procedure InternalSetParams(Params: ISQLParams; buff: TRecordBuffer); overload;
+    procedure InternalSetParams(Query: TIBSQL; buff: TRecordBuffer); overload;
+    procedure UpdateRecordFromQuery(UpdateKind: TUpdateKind; QryResults: IResults; Buffer: TRecordBuffer);
     property DataSet: TIBCustomDataSet read GetDataSet write SetDataSet;
   public
     constructor Create(AOwner: TComponent); override;
@@ -93,7 +93,6 @@ type
     FArrayBounds: TArrayBounds;
     FArrayDimensions: integer;
     FRelationName: string;
-    FCacheOffset: word;
     function GetArrayID: TISC_QUAD;
     function GetArrayIntf: IArray;
     procedure SetArrayIntf(AValue: IArray);
@@ -425,11 +424,14 @@ type
     FDeleteCount: integer;
     FComputedFieldNames: TStringList;
     FCursor: IIBCursor;
-    FUpdatesPending: Boolean;
     FFilterBuffer: TRecordBuffer;
     FAliasNameMap: array of string;
     FAliasNameList: array of AnsiString;
+    FCachedUpdatesBuffer: TRecordBuffer;
+    procedure ApplyUpdatesIterator(status: TCachedUpdateStatus; aBufID: TRecordBuffer
+      );
     function GetSelectStmtIntf: IStatement;
+    function GetUpdatesPending: Boolean;
     procedure SetCaseSensitiveParameterNames(AValue: boolean);
     procedure SetDefaultTZDate(AValue: TDateTime);
     procedure SetSQLFiltered(AValue: boolean);
@@ -463,9 +465,7 @@ type
     procedure HandleSQLFilterParamsChanged(Sender: TObject);
     function InternalLocate(const KeyFields: string; const KeyValues: Variant;
                             Options: TLocateOptions): Boolean; virtual;
-    procedure InternalPostRecord(Qry: TIBSQL); virtual;
-    procedure InternalRevertRecord(RecordNumber: Integer); virtual;
-    function IsVisible(Buffer: PChar): Boolean;
+    procedure InternalPostRecord(Qry: TIBSQL; Buff: TRecordBuffer); virtual;
     procedure RegisterIBLink(Sender: TIBControlLink);
     procedure UnRegisterIBLink(Sender: TIBControlLink);
     procedure SetBufferChunks(Value: Integer);
@@ -496,7 +496,7 @@ type
     procedure InternalPrepare; virtual;
     procedure InternalUnPrepare; virtual;
     procedure InternalExecQuery; virtual;
-    procedure InternalRefreshRow; virtual;
+    procedure InternalRefreshRow(Buff: TRecordBuffer); virtual;
     procedure InternalSetParamsFromCursor; virtual;
     procedure CheckNotUniDirectional;
     procedure SQLChanging(Sender: TObject); virtual;
@@ -550,12 +550,12 @@ type
     procedure InternalCancel; override;
     procedure InternalClose; override;
     procedure InternalDelete; override;
+    procedure InternalDeleteRecord(aBuffID: TRecordBuffer);
     procedure InternalEdit; override;
     procedure InternalFirst; override;
     procedure InternalGotoBookmark(Bookmark: Pointer); override;
     procedure InternalHandleException; override;
     procedure InternalInitFieldDefs; override;
-    procedure InternalInitRecord(Buffer: PChar); override;
     procedure InternalLast; override;
     procedure InternalOpen; override;
     procedure InternalPost; override;
@@ -565,8 +565,7 @@ type
     function IsCursorOpen: Boolean; override;
     procedure Loaded; override;
     procedure ReQuery;
-    procedure SetBookmarkFlag(Buffer: PChar; Value: TBookmarkFlag); override;
-    procedure SetBookmarkData(Buffer: PChar; Data: Pointer); override;
+    procedure SetBookmarkFlag(Buffer: TRecordBuffer; Value: TBookmarkFlag); override;
     procedure SetCachedUpdates(Value: Boolean);
     procedure SetDataSource(Value: TDataSource);
     procedure SetGenerateParamNames(AValue: Boolean); virtual;
@@ -578,6 +577,7 @@ type
   protected
     {Likely to be made public by descendant classes}
     property AutoCommit: TIBAutoCommit read FAutoCommit write FAutoCommit default acDisabled;
+    property Cursor: IIBCursor read FCursor;
     property SQLParams: ISQLParams read GetSQLParams;
     property Params: ISQLParams read GetSQLParams;
     property InternalPrepared: Boolean read FInternalPrepared;
@@ -634,7 +634,6 @@ type
     function LocateNext(const KeyFields: string; const KeyValues: Variant;
                         Options: TLocateOptions): Boolean;
     procedure RecordModified(Value: Boolean);
-    procedure RevertRecord;
     procedure Undelete;
     procedure ResetParser; virtual;
     function HasParser: boolean;
@@ -662,7 +661,7 @@ type
     function FindParam(ParamName: String): ISQLParam;
     property DatabaseInfo: TIBDatabaseInfo read FDatabaseInfo;
     property UpdateObject: TIBDataSetUpdateObject read FUpdateObject write SetUpdateObject;
-    property UpdatesPending: Boolean read FUpdatesPending;
+    property UpdatesPending: Boolean read GetUpdatesPending;
     property UpdateRecordTypes: TIBUpdateRecordTypes read FUpdateRecordTypes
                                                       write SetUpdateRecordTypes;
     property MasterDetailDelay: integer read GetMasterDetailDelay write SetMasterDetailDelay;
@@ -1271,8 +1270,6 @@ begin
   inherited Bind(Binding);
   if Binding then
   begin
-    FCacheOffset := TIBCustomDataSet(DataSet).ArrayFieldCount;
-    Inc(TIBCustomDataSet(DataSet).FArrayFieldCount);
     if FieldDef <> nil then
     begin
       FRelationName := TIBFieldDef(FieldDef).FRelationName;
@@ -1470,7 +1467,7 @@ end;
 
 function TIBStringField.GetValue(var Value: string): Boolean;
 var
-  Buffer: PChar;
+  Buffer: Pointer;
   s: RawByteString;
 begin
   Buffer := nil;
@@ -1502,7 +1499,7 @@ end;
 
 procedure TIBStringField.SetAsString(const Value: string);
 var
-  Buffer: PChar;
+  Buffer: Pointer;
   s: RawByteString;
 begin
   Buffer := nil;
@@ -1511,7 +1508,7 @@ begin
     s := Value;
     if StringCodePage(s) <> CodePage then
       SetCodePage(s,CodePage,CodePage<>CP_NONE);
-    StrLCopy(Buffer, PChar(s), DataSize);
+    StrLCopy(Buffer, PAnsiChar(s), DataSize);
     if Transliterate then
       DataSet.Translate(Buffer, Buffer, True);
     SetData(Buffer);
@@ -1723,68 +1720,46 @@ begin
   inherited Destroy;
 end;
 
+procedure TIBCustomDataSet.ApplyUpdatesIterator(status: TCachedUpdateStatus; aBufID: TRecordBuffer);
 
-procedure TIBCustomDataSet.ApplyUpdates;
-var
-  CurBookmark: TBookmark;
-  Buffer: PRecordData;
-  CurUpdateTypes: TIBUpdateRecordTypes;
-  UpdateAction: TIBUpdateAction;
-  UpdateKind: TUpdateKind;
-  bRecordsSkipped: Boolean;
+var UpdateAction: TIBUpdateAction;
+    UpdateKind: TUpdateKind;
 
   procedure GetUpdateKind;
   begin
-    case Buffer^.rdCachedUpdateStatus of
-      cusModified:
-        UpdateKind := ukModify;
-      cusInserted:
-        UpdateKind := ukInsert;
-      else
-        UpdateKind := ukDelete;
+    case status of
+    cusModified:
+      UpdateKind := ukModify;
+    cusInserted:
+      UpdateKind := ukInsert;
+    else
+      UpdateKind := ukDelete;
     end;
-  end;
-
-  procedure ResetBufferUpdateStatus;
-  begin
-    case Buffer^.rdCachedUpdateStatus of
-      cusModified:
-      begin
-        PRecordData(Buffer)^.rdUpdateStatus := usUnmodified;
-        PRecordData(Buffer)^.rdCachedUpdateStatus := cusUnmodified;
-      end;
-      cusInserted:
-      begin
-        PRecordData(Buffer)^.rdUpdateStatus := usUnmodified;
-        PRecordData(Buffer)^.rdCachedUpdateStatus := cusUnmodified;
-      end;
-      cusDeleted:
-      begin
-        PRecordData(Buffer)^.rdUpdateStatus := usDeleted;
-        PRecordData(Buffer)^.rdCachedUpdateStatus := cusUnmodified;
-      end;
-    end;
-    WriteRecordCache(PRecordData(Buffer)^.rdRecordNumber, Pointer(Buffer));
   end;
 
   procedure UpdateUsingOnUpdateRecord;
   begin
+    FCachedUpdatesBuffer := aBufID;
     try
-      FOnUpdateRecord(Self, UpdateKind, UpdateAction);
-    except
-      on E: Exception do
-      begin
-        UpdateAction := uaFail;
-        if (E is EDatabaseError) and Assigned(FOnUpdateError) then
-          FOnUpdateError(Self, EDatabaseError(E), UpdateKind, UpdateAction);
+      try
+        FOnUpdateRecord(Self, UpdateKind, UpdateAction);
+      except
+        on E: Exception do
+        begin
+          UpdateAction := uaFail;
+          if (E is EDatabaseError) and Assigned(FOnUpdateError) then
+            FOnUpdateError(Self, EDatabaseError(E), UpdateKind, UpdateAction);
+        end;
       end;
+    finally
+      FCachedUpdatesBuffer := nil;
     end;
   end;
 
   procedure UpdateUsingUpdateObject;
   begin
     try
-      FUpdateObject.Apply(UpdateKind,PChar(Buffer));
+      FUpdateObject.Apply(UpdateKind,aBufID);
       UpdateAction := uaApplied;
     except
       on E: Exception do
@@ -1799,13 +1774,13 @@ var
   procedure UpdateUsingInternalquery;
   begin
     try
-      case Buffer^.rdCachedUpdateStatus of
+      case status of
         cusModified:
-          InternalPostRecord(FQModify, Buffer);
+          InternalPostRecord(FQModify, aBufID);
         cusInserted:
-          InternalPostRecord(FQInsert, Buffer);
+          InternalPostRecord(FQInsert, aBufID);
         cusDeleted:
-          InternalDeleteRecord(FQDelete, Buffer);
+          InternalDeleteRecord(FQDelete, aBufID);
       end;
       UpdateAction := uaApplied;
     except
@@ -1818,6 +1793,39 @@ var
   end;
 
 begin
+  GetUpdateKind;
+  repeat
+    UpdateAction := uaApply;
+    if (Assigned(FOnUpdateRecord)) then
+      UpdateUsingOnUpdateRecord;
+    if UpdateAction = uaApply then
+    begin
+      if Assigned(FUpdateObject) then
+        UpdateUsingUpdateObject
+      else
+        UpdateUsingInternalquery;
+    end;
+
+    case UpdateAction of
+      uaFail:
+        IBError(ibxeUserAbort, [nil]);
+      uaAbort:
+        SysUtils.Abort;
+      uaApplied: ;
+      uaSkip:
+        FRecordsSkipped := True;
+      uaRetry:  ;
+    end;
+  until UpdateAction <> usRetry;
+end;
+
+procedure TIBCustomDataSet.ApplyUpdates;
+var
+  CurBookmark: TBookmark;
+  CurUpdateTypes: TIBUpdateRecordTypes;
+
+
+begin
   if State in [dsEdit, dsInsert] then
     Post;
   FBase.CheckDatabase;
@@ -1827,39 +1835,7 @@ begin
   CurUpdateTypes := FUpdateRecordTypes;
   FUpdateRecordTypes := [cusModified, cusInserted, cusDeleted];
   try
-    First;
-    bRecordsSkipped := False;
-    while not EOF do
-    begin
-      Buffer := PRecordData(GetActiveBuf);
-      GetUpdateKind;
-      UpdateAction := uaApply;
-      if (Assigned(FOnUpdateRecord)) then
-        UpdateUsingOnUpdateRecord;
-      if UpdateAction = uaApply then
-      begin
-        if Assigned(FUpdateObject) then
-          UpdateUsingUpdateObject
-        else
-          UpdateUsingInternalquery;
-      end;
-
-      case UpdateAction of
-        uaFail:
-          IBError(ibxeUserAbort, [nil]);
-        uaAbort:
-          SysUtils.Abort;
-        uaApplied:
-          ResetBufferUpdateStatus;
-        uaSkip:
-          bRecordsSkipped := True;
-        uaRetry:
-          Continue;
-      end;
-
-      Next;
-    end;
-    FUpdatesPending := bRecordsSkipped;
+    FCursor.ApplyUpdates(AppyUpdatesIterator);
   finally
     FUpdateRecordTypes := CurUpdateTypes;
     Bookmark := CurBookmark;
@@ -1888,32 +1864,16 @@ begin
 end;
 
 procedure TIBCustomDataSet.CancelUpdates;
-var
-  CurUpdateTypes: TIBUpdateRecordTypes;
 begin
   if State in [dsEdit, dsInsert] then
     Post;
-  if FCachedUpdates and FUpdatesPending then
+  if FCachedUpdates and UpdatesPending then
   begin
     DisableControls;
-    CurUpdateTypes := UpdateRecordTypes;
-    UpdateRecordTypes := [cusModified, cusInserted, cusDeleted];
     try
-      First;
-      while not EOF do
-      begin
-        if UpdateStatus = usInserted then
-          RevertRecord
-        else
-        begin
-          RevertRecord;
-          Next;
-        end;
-      end;
+      FCursor.CancelUpdates;
     finally
-      UpdateRecordTypes := CurUpdateTypes;
       First;
-      FUpdatesPending := False;
       EnableControls;
     end;
   end;
@@ -2011,6 +1971,9 @@ end;
 
 function TIBCustomDataSet.GetActiveBuf: TRecordBuffer;
 begin
+  if FCachedUpdatesBuffer <> nil then
+    Result := FCachedUpdatesBuffer
+  else
   case State of
   dsBrowse:
     if IsEmpty then
@@ -2186,292 +2149,15 @@ begin
      OnDeleteReturning(self,QryResults);
 end;
 
-procedure TIBCustomDataSet.InitModelBuffer(Qry: TIBSQL; Buffer: PChar);
-var i, j: Integer;
-    FieldsLoaded: integer;
-    p: PRecordData;
-    colMetadata: IColumnMetaData;
-begin
-  p := PRecordData(Buffer);
-  { Get record information }
-  p^.rdBookmarkFlag := bfCurrent;
-  p^.rdRecordNumber := -1;
-  p^.rdUpdateStatus := usUnmodified;
-  p^.rdCachedUpdateStatus := cusUnmodified;
-  p^.rdSavedOffset := $FFFFFFFF;
-
-  { Load up the fields }
-  FieldsLoaded := FQSelect.MetaData.Count;
-  j := 1;
-  for i := 0 to Qry.MetaData.Count - 1 do
-  begin
-    if (Qry = FQSelect) then
-      j := i + 1
-    else
-    begin
-      if FieldsLoaded = 0 then
-        break;
-      j := FQSelect.FieldIndex[Qry[i].Name] + 1;
-      if j < 1 then
-        continue
-      else
-        Dec(FieldsLoaded);
-    end;
-    if j > 0 then
-    begin
-      colMetadata := Qry.MetaData[i];
-      with p^.rdFields[j], FFieldColumns^[j] do
-      begin
-        fdDataType := colMetadata.GetSQLType;
-        if fdDataType = SQL_BLOB then
-          fdDataScale := 0
-        else
-          fdDataScale := colMetadata.getScale;
-        fdNullable := colMetadata.getIsNullable;
-        fdIsNull := true;
-        fdDataSize := colMetadata.GetSize;
-        fdDataLength := 0;
-        fdCodePage := CP_NONE;
-        fdIsComputed := FComputedFieldNames.IndexOf(colMetadata.GetAliasName) <> -1;
-
-        case fdDataType of
-        SQL_TIMESTAMP,
-        SQL_TYPE_DATE,
-        SQL_TYPE_TIME:
-          fdDataSize := SizeOf(TDateTime);
-        SQL_TIMESTAMP_TZ,
-        SQL_TIMESTAMP_TZ_EX,
-        SQL_TIME_TZ,
-        SQL_TIME_TZ_EX:
-          fdDataSize := SizeOf(TIBBufferedDateTimeWithTimeZone);
-        SQL_SHORT, SQL_LONG:
-        begin
-          if (fdDataScale = 0) then
-            fdDataSize := SizeOf(Integer)
-          else
-          if (fdDataScale >= (-4)) then
-            fdDataSize := SizeOf(Currency)
-          else
-            fdDataSize := SizeOf(Double);
-        end;
-        SQL_INT64:
-        begin
-          if (fdDataScale = 0) then
-            fdDataSize := SizeOf(Int64)
-          else
-          if (fdDataScale >= (-4)) then
-            fdDataSize := SizeOf(Currency)
-          else
-            fdDataSize := SizeOf(Double);
-        end;
-        SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
-          fdDataSize := SizeOf(Double);
-        SQL_BOOLEAN:
-          fdDataSize := SizeOf(wordBool);
-        SQL_VARYING,
-        SQL_TEXT,
-        SQL_BLOB:
-          fdCodePage := colMetadata.getCodePage;
-        SQL_DEC16,
-        SQL_DEC34,
-        SQL_DEC_FIXED,
-        SQL_INT128:
-          fdDataSize := sizeof(tBCD);
-        end;
-        fdDataOfs := FRecordSize;
-        Inc(FRecordSize, fdDataSize);
-      end;
-    end;
-  end;
-end;
-
-{Update Buffer Fields from Query Results}
-
-procedure TIBCustomDataSet.UpdateRecordFromQuery(QryResults: IResults;
-  Buffer: PChar);
-var i, j: integer;
-    pda: PArrayDataArray;
-    pbd: PBlobDataArray;
-begin
-  { Make sure blob cache is empty }
-  pbd := PBlobDataArray(Buffer + FBlobCacheOffset);
-  pda := PArrayDataArray(Buffer + FArrayCacheOffset);
-  for i := 0 to BlobFieldCount - 1 do
-    pbd^[i] := nil;
-  for i := 0 to ArrayFieldCount - 1 do
-    pda^[i] := nil;
-
-  for i := 0 to QryResults.Count - 1 do
-  begin
-    j := GetFieldPosition(QryResults[i].GetAliasName);
-    if j > 0 then
-    begin
-       FFieldColumns^[j].fdRefreshRequired := false; {no need as updated by "returning"}
-      ColumnDataToBuffer(QryResults,i,j,Buffer);
-    end;
-  end;
-end;
-
-
-{Move column data returned from query to row buffer}
-
-procedure TIBCustomDataSet.ColumnDataToBuffer(QryResults: IResults;
-               ColumnIndex, FieldIndex: integer; Buffer: PChar);
-var
-  LocalData: PByte;
-  BufPtr: PByte;
-  ColData: ISQLData;
-begin
-  LocalData := nil;
-  with PRecordData(Buffer)^.rdFields[FieldIndex], FFieldColumns^[FieldIndex] do
-  begin
-    QryResults.GetData(ColumnIndex,fdIsNull,fdDataLength,LocalData);
-    BufPtr := PByte(Buffer + fdDataOfs);
-//    with QryResults[ColumnIndex] do writeln(GetName,' = ',ColumnIndex,',',FieldIndex,',',fdIsNull);
-    if not fdIsNull then
-    begin
-      ColData := QryResults[ColumnIndex];
-      case fdDataType of  {Get Formatted data for column types that need formatting}
-        SQL_TYPE_DATE,
-        SQL_TYPE_TIME,
-        SQL_TIMESTAMP:
-          {This is an IBX native format and not the TDataset approach. See also GetFieldData}
-          PDateTime(BufPtr)^ := ColData.AsDateTime;
-
-        SQL_TIMESTAMP_TZ,
-        SQL_TIMESTAMP_TZ_EX:
-        begin
-          with PIBBufferedDateTimeWithTimeZone(Bufptr)^ do
-            ColData.GetAsDateTime(Timestamp,dstOffset,TimeZoneID);
-        end;
-
-        SQL_TIME_TZ,
-        SQL_TIME_TZ_EX:
-        begin
-          with PIBBufferedDateTimeWithTimeZone(Bufptr)^ do
-            ColData.GetAsTime(Timestamp, dstOffset,TimeZoneID, DefaultTZDate);
-        end;
-        SQL_SHORT, SQL_LONG:
-        begin
-          if (fdDataScale = 0) then
-            PInteger(BufPtr)^ := ColData.AsLong
-          else
-          if (fdDataScale >= (-4)) then
-            PCurrency(BufPtr)^ := ColData.AsCurrency
-          else
-           PDouble(BufPtr)^ := ColData.AsDouble;
-        end;
-        SQL_INT64:
-        begin
-          if (fdDataScale = 0) then
-            PInt64(BufPtr)^ := ColData.AsInt64
-          else
-          if (fdDataScale >= (-4)) then
-            PCurrency(BufPtr)^ := ColData.AsCurrency
-          else
-            PDouble(BufPtr)^ := ColData.AsDouble;
-        end;
-
-        SQL_DOUBLE, SQL_FLOAT, SQL_D_FLOAT:
-          PDouble(BufPtr)^ := ColData.AsDouble;
-
-        SQL_BOOLEAN:
-          system.PBoolean(BufPtr)^ := ColData.AsBoolean;
-
-        SQL_DEC16,
-        SQL_DEC34,
-        SQL_DEC_FIXED,
-        SQL_INT128:
-          pBCD(BufPtr)^ := ColData.GetAsBCD;
-
-      else
-        begin
-          if fdDataType = SQL_VARYING then
-            Move(LocalData^, BufPtr^, fdDataLength)
-          else
-            Move(LocalData^, BufPtr^, fdDataSize)
-        end;
-      end; {case}
-    end
-    else {Null column}
-    if fdDataType = SQL_VARYING then
-      FillChar(BufPtr^,fdDataLength,0)
-    else
-      FillChar(BufPtr^,fdDataSize,0);
-  end;
-end;
-
 function TIBCustomDataSet.GetMasterDetailDelay: integer;
 begin
   Result := FDataLink.DelayTimerValue;
 end;
 
-{ Read the record from FQSelect.Current into the record buffer
-  Then write the buffer to in memory cache }
-procedure TIBCustomDataSet.FetchCurrentRecordToBuffer(Qry: TIBSQL;
-  RecordNumber: Integer; Buffer: PChar);
-var
-  pbd: PBlobDataArray;
-  pda: PArrayDataArray;
-  i, j: Integer;
-  FieldsLoaded: Integer;
-  p: PRecordData;
-begin
-  if RecordNumber = -1 then
-  begin
-    InitModelBuffer(Qry,Buffer);
-    Exit;
-  end;
-  p := PRecordData(Buffer);
-  { Make sure blob cache is empty }
-  pbd := PBlobDataArray(Buffer + FBlobCacheOffset);
-  pda := PArrayDataArray(Buffer + FArrayCacheOffset);
-  for i := 0 to BlobFieldCount - 1 do
-    pbd^[i] := nil;
-  for i := 0 to ArrayFieldCount - 1 do
-    pda^[i] := nil;
-
-  { Get record information }
-  p^.rdBookmarkFlag := bfCurrent;
-  p^.rdRecordNumber := RecordNumber;
-  p^.rdUpdateStatus := usUnmodified;
-  p^.rdCachedUpdateStatus := cusUnmodified;
-  p^.rdSavedOffset := $FFFFFFFF;
-
-  { Load up the fields }
-  FieldsLoaded := FQSelect.MetaData.Count;
-  j := 1;
-  for i := 0 to Qry.FieldCount - 1 do
-  begin
-    if (Qry = FQSelect) then
-      j := i + 1
-    else
-    begin
-      if FieldsLoaded = 0 then
-        break;
-      j := FQSelect.FieldIndex[Qry[i].Name] + 1;
-      if j < 1 then
-        continue
-      else
-        Dec(FieldsLoaded);
-    end;
-    with FQSelect.MetaData[j - 1] do
-      if GetAliasname = sDBkeyAlias then {do not localize}
-      begin
-        if (GetSize <= 8) then
-          p^.rdDBKey := PIBDBKEY(Qry[i].AsPointer)^;
-        continue;
-      end;
-    if j > 0 then
-      ColumnDataToBuffer(Qry.Current,i,j,Buffer);
-  end;
-  WriteRecordCache(RecordNumber, Buffer);
-end;
-
 function TIBCustomDataSet.CachedUpdateStatus: TCachedUpdateStatus;
 begin
   if Active then
-    result := PRecordData(GetActiveBuf)^.rdCachedUpdateStatus
+    result := FCursor.GetCachedUpdateStatus(GetActiveBuf)
   else
     result := cusUnmodified;
 end;
@@ -2523,23 +2209,20 @@ begin
   result := FBase.Transaction;
 end;
 
-procedure TIBCustomDataSet.InternalDeleteRecord(Qry: TIBSQL; Buff: Pointer);
+procedure TIBCustomDataSet.InternalDeleteRecord(aBuffID: TRecordBuffer);
 begin
-  if (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukDelete).Text <> '')) then
-    FUpdateObject.Apply(ukDelete,Buff)
-  else
   begin
-    SetInternalSQLParams(FQDelete.Params, Buff);
-    FQDelete.ExecQuery;
-    if (FQDelete.FieldCount > 0)  then
-      DoDeleteReturning(FQDelete.Current);
+    if (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukDelete).Text <> '')) then
+      FUpdateObject.Apply(ukDelete,aBuffID)
+    else
+    begin
+      FCursor.SetSQLParams(aBuffID,FQDelete.Params);
+      FQDelete.ExecQuery;
+      if (FQDelete.FieldCount > 0)  then
+        DoDeleteReturning(FQDelete.Current);
+    end;
+    FCursor.Delete(ActiveBuffer);
   end;
-  with PRecordData(Buff)^ do
-  begin
-    rdUpdateStatus := usDeleted;
-    rdCachedUpdateStatus := cusUnmodified;
-  end;
-  WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Buff);
 end;
 
 function TIBCustomDataSet.InternalLocate(const KeyFields: string;
@@ -2626,7 +2309,7 @@ begin
   end;
 end;
 
-procedure TIBCustomDataSet.InternalPostRecord(Qry: TIBSQL);
+procedure TIBCustomDataSet.InternalPostRecord(Qry: TIBSQL; Buff: TRecordBuffer);
 begin
   if Assigned(FUpdateObject) then
   begin
@@ -2640,27 +2323,25 @@ begin
   end
   else
   begin
-    FCursor.SetSQLParams(ActiveBuffer,Qry.Params));
+    FCursor.SetSQLParams(Buff,Qry.Params));
     Qry.ExecQuery;
     Qry.Statement.GetRowsAffected(FSelectCount, FInsertCount, FUpdateCount, FDeleteCount);
 //    write('before ');ShowRefreshState;
     if Qry.FieldCount > 0 then {Has RETURNING Clause}
-      FCursor.UpdateRecordFromQuery(ActiveBuffer,Qry.Current);
+      FCursor.UpdateRecordFromQuery(Buff,Qry.Current);
 //    write('after ');ShowRefreshState;
   end;
   SetModified(False);
-  if (FForcedRefresh or FCursor.NeedRefresh(ActiveBuffer)) and CanRefresh then
-    InternalRefreshRow;
+  if (FForcedRefresh or FCursor.NeedRefresh(Buff)) and CanRefresh then
+    InternalRefreshRow(Buff);
 end;
 
-procedure TIBCustomDataSet.InternalRefreshRow;
+procedure TIBCustomDataSet.InternalRefreshRow(Buff: TRecordBuffer);
 var
-  Buff: TRecordBuffer;
   Qry: TIBSQL;
 begin
   FBase.SetCursor;
   try
-    Buff := ActiveBuffer;
     if CanRefresh then
     begin
       if Buff <> nil then
@@ -2693,60 +2374,6 @@ begin
     FBase.RestoreCursor;
   end;
 end;
-
-procedure TIBCustomDataSet.InternalRevertRecord(RecordNumber: Integer);
-var
-  NewBuffer, OldBuffer: PRecordData;
-
-begin
-  NewBuffer := nil;
-  OldBuffer := nil;
-  NewBuffer := PRecordData(AllocRecordBuffer);
-  OldBuffer := PRecordData(AllocRecordBuffer);
-  try
-    ReadRecordCache(RecordNumber, PChar(NewBuffer), False);
-    ReadRecordCache(RecordNumber, PChar(OldBuffer), True);
-    case NewBuffer^.rdCachedUpdateStatus of
-      cusInserted:
-      begin
-        NewBuffer^.rdCachedUpdateStatus := cusUninserted;
-        Inc(FDeletedRecords);
-      end;
-      cusModified,
-      cusDeleted:
-      begin
-        if (NewBuffer^.rdCachedUpdateStatus = cusDeleted) then
-          Dec(FDeletedRecords);
-        CopyRecordBuffer(OldBuffer, NewBuffer);
-      end;
-    end;
-
-    if State in dsEditModes then
-      Cancel;
-
-    WriteRecordCache(RecordNumber, PChar(NewBuffer));
-
-    if (NewBuffer^.rdCachedUpdateStatus = cusUninserted ) then
-      ReSync([]);
-  finally
-    FreeRecordBuffer(PChar(NewBuffer));
-    FreeRecordBuffer(PChar(OldBuffer));
-  end;
-end;
-
-{ A visible record is one that is not truly deleted,
-  and it is also listed in the FUpdateRecordTypes set }
-
-function TIBCustomDataSet.IsVisible(Buffer: PChar): Boolean;
-begin
-  result := True;
-  if not (State = dsOldValue) then
-    result :=
-      (PRecordData(Buffer)^.rdCachedUpdateStatus in FUpdateRecordTypes) and
-      (not ((PRecordData(Buffer)^.rdCachedUpdateStatus = cusUnmodified) and
-        (PRecordData(Buffer)^.rdUpdateStatus = usDeleted)));
-end;
-
 
 function TIBCustomDataSet.LocateNext(const KeyFields: string;
   const KeyValues: Variant; Options: TLocateOptions): Boolean;
@@ -2811,56 +2438,6 @@ end;
 procedure TIBCustomDataSet.RecordModified(Value: Boolean);
 begin
   SetModified(Value);
-end;
-
-procedure TIBCustomDataSet.RevertRecord;
-var
-  Buff: PRecordData;
-begin
-  if FCachedUpdates and FUpdatesPending then
-  begin
-    Buff := PRecordData(GetActiveBuf);
-    InternalRevertRecord(Buff^.rdRecordNumber);
-    ReadRecordCache(Buff^.rdRecordNumber, PChar(Buff), False);
-    DataEvent(deRecordChange, 0);
-  end;
-end;
-
-procedure TIBCustomDataSet.SaveOldBuffer(Buffer: PChar);
-var
-  OldBuffer: Pointer;
-  procedure CopyOldBuffer;
-  begin
-    CopyRecordBuffer(Buffer, OldBuffer);
-    if BlobFieldCount > 0 then
-      FillChar(PChar(OldBuffer)[FBlobCacheOffset],
-               BlobFieldCount * SizeOf(TIBBlobStream) + ArrayFieldCount * SizeOf(IArray),
-               0);
-  end;
-
-begin
-  if (Buffer <> nil) and (PRecordData(Buffer)^.rdRecordNumber >= 0) then
-  begin
-    OldBuffer := AllocRecordBuffer;
-    try
-      if (PRecordData(Buffer)^.rdSavedOffset = $FFFFFFFF) then
-      begin
-        PRecordData(Buffer)^.rdSavedOffset := AdjustPosition(FOldBufferCache, 0,
-                                                             FILE_END);
-        CopyOldBuffer;
-          WriteCache(FOldBufferCache, 0, FILE_CURRENT, OldBuffer);
-          WriteCache(FBufferCache, PRecordData(Buffer)^.rdRecordNumber * FRecordBufferSize,
-                     FILE_BEGIN, Buffer);
-      end
-      else begin
-        CopyOldBuffer;
-        WriteCache(FOldBufferCache, PRecordData(Buffer)^.rdSavedOffset, FILE_BEGIN,
-                   OldBuffer);
-      end;
-    finally
-      FreeRecordBuffer(PChar(OldBuffer));
-    end;
-  end;
 end;
 
 procedure TIBCustomDataSet.SetBufferChunks(Value: Integer);
@@ -3092,122 +2669,6 @@ begin
      FQSelect.Statement.GetPerfStatistics(stats);
 end;
 
-{Beware: the parameter FCache is used as an identifier to determine which
- cache is being operated on and is not referenced in the computation.
- The result is an adjusted offset into the identified cache, either the
- Buffer Cache or the old Buffer Cache.}
-
-function TIBCustomDataSet.AdjustPosition(FCache: PChar; Offset: DWORD;
-                                        Origin: Integer): DWORD;
-var
-  OldCacheSize: Integer;
-begin
-  if (FCache = FBufferCache) then
-  begin
-    case Origin of
-      FILE_BEGIN:    FBPos := Offset;
-      FILE_CURRENT:  FBPos := FBPos + Offset;
-      FILE_END:      FBPos := DWORD(FBEnd) + Offset;
-    end;
-    OldCacheSize := FCacheSize;
-    while (FBPos >= DWORD(FCacheSize)) do
-      Inc(FCacheSize, FBufferChunkSize);
-    if FCacheSize > OldCacheSize then
-      IBAlloc(FBufferCache, FCacheSize, FCacheSize);
-    result := FBPos;
-  end
-  else begin
-    case Origin of
-      FILE_BEGIN:    FOBPos := Offset;
-      FILE_CURRENT:  FOBPos := FOBPos + Offset;
-      FILE_END:      FOBPos := DWORD(FOBEnd) + Offset;
-    end;
-    OldCacheSize := FOldCacheSize;
-    while (FBPos >= DWORD(FOldCacheSize)) do
-      Inc(FOldCacheSize, FBufferChunkSize);
-    if FOldCacheSize > OldCacheSize then
-      IBAlloc(FOldBufferCache, FOldCacheSize, FOldCacheSize);
-    result := FOBPos;
-  end;
-end;
-
-procedure TIBCustomDataSet.ReadCache(FCache: PChar; Offset: DWORD; Origin: Integer;
-                                    Buffer: PChar);
-var
-  pCache: PChar;
-  AdjustedOffset: DWORD;
-  bOld: Boolean;
-begin
-  bOld := (FCache = FOldBufferCache);
-  AdjustedOffset := AdjustPosition(FCache, Offset, Origin);
-  if not bOld then
-    pCache := FBufferCache + AdjustedOffset
-  else
-    pCache := FOldBufferCache + AdjustedOffset;
-  Move(pCache^, Buffer^, DWORD(FRecordBufferSize));
-  AdjustPosition(FCache, FRecordBufferSize, FILE_CURRENT);
-end;
-
-procedure TIBCustomDataSet.ReadRecordCache(RecordNumber: Integer; Buffer: PChar;
-                                          ReadOldBuffer: Boolean);
-begin
-  if RecordNumber = -1 then
-    Exit; {nothing to do}
-  if FUniDirectional then
-    RecordNumber := RecordNumber mod UniCache;
-  if (ReadOldBuffer) then
-  begin
-    ReadRecordCache(RecordNumber, Buffer, False);
-    if FCachedUpdates and
-      (PRecordData(Buffer)^.rdSavedOffset <> $FFFFFFFF) then
-      ReadCache(FOldBufferCache, PRecordData(Buffer)^.rdSavedOffset, FILE_BEGIN,
-                Buffer)
-    else
-      if ReadOldBuffer and
-         (PRecordData(FOldBuffer)^.rdRecordNumber = RecordNumber) then
-         CopyRecordBuffer( FOldBuffer, Buffer )
-  end
-  else
-    ReadCache(FBufferCache, RecordNumber * FRecordBufferSize, FILE_BEGIN, Buffer);
-end;
-
-procedure TIBCustomDataSet.WriteCache(FCache: PChar; Offset: DWORD; Origin: Integer;
-                                     Buffer: PChar);
-var
-  pCache: PChar;
-  AdjustedOffset: DWORD;
-  bOld: Boolean;
-  dwEnd: DWORD;
-begin
-  bOld := (FCache = FOldBufferCache);
-  AdjustedOffset := AdjustPosition(FCache, Offset, Origin);
-  if not bOld then
-    pCache := FBufferCache + AdjustedOffset
-  else
-    pCache := FOldBufferCache + AdjustedOffset;
-  Move(Buffer^, pCache^, FRecordBufferSize);
-  dwEnd := AdjustPosition(FCache, FRecordBufferSize, FILE_CURRENT);
-  if not bOld then
-  begin
-    if (dwEnd > FBEnd) then
-      FBEnd := dwEnd;
-  end
-  else begin
-    if (dwEnd > FOBEnd) then
-      FOBEnd := dwEnd;
-  end;
-end;
-
-procedure TIBCustomDataSet.WriteRecordCache(RecordNumber: Integer; Buffer: PChar);
-begin
-  if RecordNumber >= 0 then
-  begin
-    if FUniDirectional then
-      RecordNumber := RecordNumber mod UniCache;
-    WriteCache(FBufferCache, RecordNumber * FRecordBufferSize, FILE_BEGIN, Buffer);
-  end;
-end;
-
 function TIBCustomDataSet.AllocRecordBuffer: TRecordBuffer;
 begin
   Result := FCursor.AllocRecordBuffer;
@@ -3221,82 +2682,17 @@ begin
 end;
 
 function TIBCustomDataSet.GetArray(Field: TIBArrayField): IArray;
-var Buff: PChar;
-    pda: PArrayDataArray;
-    bTr, bDB: Boolean;
 begin
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
-  Buff := GetActiveBuf;
-  if Buff = nil then
-    Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,
-                              Field.FRelationName,Field.FieldName)
-  else
-  begin
-    pda := PArrayDataArray(Buff + FArrayCacheOffset);
-    if pda^[Field.FCacheOffset] = nil then
-    begin
-      AdjustRecordOnInsert(Buff);
-      if Field.IsNull then
-        Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,
-                                Field.FRelationName,Field.FieldName)
-      else
-        Result := Database.Attachment.OpenArray(Transaction.TransactionIntf,
-                            Field.FRelationName,Field.FieldName,Field.ArrayID);
-      pda^[Field.FCacheOffset] := TIBArray.Create(Field,Result);
-      FArrayList.Add(pda^[Field.FCacheOffset]);
-      if (CachedUpdates) then
-      begin
-        bTr := not Transaction.InTransaction;
-        bDB := not Database.Connected;
-        if bDB then
-          Database.Open;
-        if bTr then
-          Transaction.StartTransaction;
-         pda^[Field.FCacheOffset].ArrayIntf.PreLoad;
-        if bTr then
-          Transaction.Commit;
-        if bDB then
-          Database.Close;
-      end;
-      WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
-    end
-    else
-      Result := pda^[Field.FCacheOffset].ArrayIntf;
-  end;
+  Result := FCursor.GetArray(GetAciveBuf,Field);
 end;
 
 procedure TIBCustomDataSet.SetArrayIntf(AnArray: IArray; Field: TIBArrayField);
-var Buff: PChar;
-    pda: PArrayDataArray;
-    MappedFieldPos: integer;
 begin
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
-  Buff := GetActiveBuf;
-  if Buff <> nil then
-  with PRecordData(Buff)^ do
-  begin
-    AdjustRecordOnInsert(Buff);
-    MappedFieldPos := FMappedFieldPosition[Field.FieldNo - 1];
-    if (MappedFieldPos > 0) and
-       (MappedFieldPos <= FColumnCount) then
-    begin
-      rdFields[MappedFieldPos].fdIsNull := AnArray = nil;
-      pda := PArrayDataArray(Buff + FArrayCacheOffset);
-      if pda^[Field.FCacheOffset] = nil then
-      begin
-        if not rdFields[MappedFieldPos].fdIsNull then
-        begin
-          pda^[Field.FCacheOffset] := TIBArray.Create(Field,AnArray);
-          FArrayList.Add(pda^[Field.FCacheOffset]);
-        end
-      end
-      else
-        pda^[Field.FCacheOffset].FArray := AnArray;
-      WriteRecordCache(PRecordData(Buff)^.rdRecordNumber, Pointer(Buff));
-    end;
-  end;
+  FCursor.SetArrayIntf(GetActiveBuf,AnArrau,Field);
 end;
 
 function TIBCustomDataSet.CompareBookmarks(Bookmark1, Bookmark2: TBookmark): Integer;
@@ -3322,15 +2718,9 @@ begin
 end;
 
 procedure TIBCustomDataSet.DoBeforeDelete;
-var
-  Buff: PRecordData;
 begin
   if not CanDelete then
     IBError(ibxeCannotDelete, [nil]);
-  Buff := PRecordData(GetActiveBuf);
-  if FCachedUpdates and
-    (Buff^.rdCachedUpdateStatus in [cusUnmodified]) then
-    SaveOldBuffer(PChar(Buff));
   inherited DoBeforeDelete;
 end;
 
@@ -3349,9 +2739,6 @@ begin
   if not(CanEdit or (FQModify.SQL.Count <> 0) or
     (FCachedUpdates and Assigned(FOnUpdateRecord))) then
     IBError(ibxeCannotUpdate, [nil]);
-  if FCachedUpdates and (Buff^.rdCachedUpdateStatus in [cusUnmodified, cusInserted]) then
-    SaveOldBuffer(PChar(Buff));
-  CopyRecordBuffer(GetActiveBuf, FOldBuffer);
   inherited DoBeforeEdit;
 end;
 
@@ -3615,18 +3002,7 @@ begin
     if CanDelete then
     begin
       if not FCursor.GetCachedUpdatesEnabled then
-      begin
-        if (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukDelete).Text <> '')) then
-          FUpdateObject.Apply(ukDelete,Buff)
-        else
-        begin
-          FCursor.SetSQLParams(ActiveBuffer,FQDelete.Params);
-          FQDelete.ExecQuery;
-          if (FQDelete.FieldCount > 0)  then
-            DoDeleteReturning(FQDelete.Current);
-        end;
-        FCursor.Delete(ActiveBuffer);
-      end;
+        InternalDeleteRecord(ActiveBuffer);
     end
     else
       IBError(ibxeCannotDelete, [nil]);
@@ -4043,11 +3419,6 @@ begin
   end;
 end;
 
-procedure TIBCustomDataSet.InternalInitRecord(Buffer: PChar);
-begin
-  CopyRecordBuffer(FModelBuffer, Buffer);
-end;
-
 procedure TIBCustomDataSet.InternalLast;
 begin
   FCursor.GotoLast;
@@ -4197,14 +3568,14 @@ begin
     if (State = dsInsert) then
     begin
        if (not CachedUpdates) then
-         InternalPostRecord(FQInsert)
+         InternalPostRecord(FQInsert,ActiveBuffer)
       FCursor.EditingDone(cusInserted);
       Inc(FRecordCount);
     end
     else
     begin
       if (not CachedUpdates) then
-        InternalPostRecord(FQModify)
+        InternalPostRecord(FQModify,ActiveBuffer)
       FCursor.EditingDone(cusModified);
     end;
   finally
@@ -4215,7 +3586,7 @@ end;
 procedure TIBCustomDataSet.InternalRefresh;
 begin
   inherited InternalRefresh;
-  InternalRefreshRow;
+  InternalRefreshRow(GetActiveBuf);
 end;
 
 procedure TIBCustomDataSet.InternalSetToRecord(Buffer: TRecordBuffer);
@@ -4291,15 +3662,10 @@ begin
   end;
 end;
 
-procedure TIBCustomDataSet.SetBookmarkData(Buffer: PChar; Data: Pointer);
+procedure TIBCustomDataSet.SetBookmarkFlag(Buffer: TRecordBuffer;
+  Value: TBookmarkFlag);
 begin
-  if Data <> nil then
-    PRecordData(Buffer)^.rdRecordNumber := PInteger(Data)^;
-end;
-
-procedure TIBCustomDataSet.SetBookmarkFlag(Buffer: PChar; Value: TBookmarkFlag);
-begin
-  PRecordData(Buffer)^.rdBookmarkFlag := Value;
+  FCursor.SetBookmarkFlag(Buffer,Value);
 end;
 
 procedure TIBCustomDataSet.SetCachedUpdates(Value: Boolean);
@@ -4309,8 +3675,6 @@ begin
   if (not (csReading in ComponentState)) and Value then
     CheckDatasetClosed;
   FCachedUpdates := Value;
-  if assigned(FCursor) then
-    FCursor.SetCacbedUpdatesEnabled(Value);
 end;
 
 procedure TIBCustomDataSet.SetDataSource(Value: TDataSource);
@@ -4447,6 +3811,11 @@ end;
 function TIBCustomDataSet.GetSelectStmtIntf: IStatement;
 begin
   Result := FQSelect.Statement;
+end;
+
+function TIBCustomDataSet.GetUpdatesPending: Boolean;
+begin
+  Result := FCursor.UpdatesPending;
 end;
 
 procedure TIBCustomDataSet.SetCaseSensitiveParameterNames(AValue: boolean);
@@ -4825,24 +4194,24 @@ begin
 end;
 
 procedure TIBDataSetUpdateObject.InternalSetParams(Params: ISQLParams;
-  buff: PChar);
+  buff: TRecordBuffer);
 begin
   if not Assigned(DataSet) then Exit;
-  DataSet.SetInternalSQLParams(Params, buff);
+  DataSet.FCursor.SetSQLParams(buff,Params);
 end;
 
-procedure TIBDataSetUpdateObject.InternalSetParams(Query: TIBSQL; buff: PChar);
+procedure TIBDataSetUpdateObject.InternalSetParams(Query: TIBSQL; buff: TRecordBuffer);
 begin
   InternalSetParams(Query.Params,buff);
 end;
 
 procedure TIBDataSetUpdateObject.UpdateRecordFromQuery(UpdateKind: TUpdateKind;
-  QryResults: IResults; Buffer: PChar);
+  QryResults: IResults; Buffer: TRecordBuffer);
 begin
   if not Assigned(DataSet) then Exit;
   case UpdateKind of
   ukModify, ukInsert:
-    DataSet.UpdateRecordFromQuery(QryResults, Buffer);
+    DataSet.FCursor.UpdateRecordFromQuery(Buffer,QryResults);
   ukDelete:
     DataSet.DoDeleteReturning(QryResults);
   end;

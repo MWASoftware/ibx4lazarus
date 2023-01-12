@@ -187,7 +187,7 @@ type
 
 implementation
 
-uses IBMessages, IBInternals;
+uses IBMessages, IBInternals, IBBufferCursors;
 
 type
 
@@ -1546,7 +1546,7 @@ begin
     result := False;
     First;
     while ((not result) and (not EOF)) do begin
-      if (DBKeyCompare (DBKey, PRecordData(GetActiveBuf)^.rdDBKey)) then
+      if (DBKeyCompare (DBKey, GetCurrentDBKey)) then
         result := True
       else
         Next;
@@ -1561,15 +1561,9 @@ begin
 end;
 
 function TIBTable.GetCurrentDBKey: TIBDBKey;
-var
-  Buf: pChar;
 begin
   CheckActive;
-  buf := GetActiveBuf;
-  if Buf <> nil then
-    Result := PRecordData(Buf)^.rdDBKey
-  else
-    Result.DBKey[0] := 0;
+  Result := Cursor.GetRecDBkey(GetActiveBuf);
 end;
 
 procedure TIBTable.Reopen;

@@ -48,7 +48,7 @@ type
     function GetSQL(UpdateKind: TUpdateKind): TStrings; override;
     function GetDataSet: TIBCustomDataSet; override;
     procedure SetDataSet(ADataSet: TIBCustomDataSet); override;
-    procedure Apply(UpdateKind: TUpdateKind; buff: PChar); override;
+    procedure Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -786,7 +786,7 @@ begin
   FDataSet := ADataset;
 end;
 
-procedure TIBUpdate.Apply(UpdateKind: TUpdateKind; buff: PChar);
+procedure TIBUpdate.Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer);
 var Params: ISQLParams;
 begin
   Params := TParamListIntf.Create(Dataset.Fields,(DataSet.Database as TIBDatabase));
