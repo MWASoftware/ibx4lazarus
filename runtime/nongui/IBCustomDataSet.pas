@@ -4044,7 +4044,10 @@ end;
 function TIBCustomDataSet.GetFieldData(Field: TField;
   Buffer: Pointer): Boolean;
 begin
-  Result := FCursor.GetFieldData(GetActiveBuf,Field, Buffer);
+  if FCursor = nil then
+    Result := false
+  else
+    Result := FCursor.GetFieldData(GetActiveBuf,Field, Buffer);
 end;
 
 function TIBCustomDataSet.GetFieldData(Field: TField; Buffer: Pointer;

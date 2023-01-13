@@ -2135,6 +2135,7 @@ var Buff: PByte;
     len: Short;
 begin
   Result := false;
+  if aBufID = nil then Exit;
   if field.FieldNo < 0 then  {Calculated Field}
   begin
     Buff := GetCalcFields(aBufID);
@@ -2563,7 +2564,7 @@ begin
   inherited Create;
   FName := aName;
   FBufferSize := bufSize;
-  if (buffersPerBlock <= 1) or (firstBlockBuffers <= 1) then
+  if (aBuffersPerBlock <= 1) or (firstBlockBuffers <= 1) then
      IBError(ibxeNotEnoughBuffers,[FName]);
   FBuffersPerBlock := aBuffersPerBlock;
   FFirstBlockBuffers := firstBlockBuffers;
