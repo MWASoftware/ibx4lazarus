@@ -39,7 +39,8 @@ unit IBTable;
 
 interface
 
-uses SysUtils, Classes, DB, IB,  IBCustomDataSet, IBDatabase, IBSQL, IBUtils;
+uses SysUtils, Classes, DB, IB,  IBCustomDataSet, IBDatabase, IBSQL, IBUtils,
+  IBBufferedCursors;
      
 type
 
@@ -126,7 +127,7 @@ type
     procedure SetFiltered(Value: Boolean); override;
     procedure SetFilterText(const Value: string); override;
     procedure SetFilterOptions(Value: TFilterOptions); override;
-    procedure InternalRefreshRow; override;
+    procedure InternalRefreshRow(Buff: TRecordBuffer); override;
     function GetMasterDetailDelay: integer; override;
     procedure SetMasterDetailDelay(AValue: integer); override;
 
@@ -187,7 +188,7 @@ type
 
 implementation
 
-uses IBMessages, IBInternals, IBBufferCursors;
+uses IBMessages, IBInternals;
 
 type
 
@@ -356,7 +357,7 @@ begin
     IBError(ibxeNotSupported, [nil]);
 end;
 
-procedure TIBTable.InternalRefreshRow;
+procedure TIBTable.InternalRefreshRow(Buff: TRecordBuffer);
 begin
   if CurrentDBKey.DBKey[0] <> 0 then
     QRefresh.SQL.Assign(WhereDBKeyRefreshSQL)
@@ -364,7 +365,7 @@ begin
     QRefresh.SQL.Assign(WherePrimaryRefreshSQL)
   else
     QRefresh.SQL.Assign(WhereAllRefreshSQL);
-  inherited InternalRefreshRow;
+  inherited InternalRefreshRow(Buff);
 end;
 
 function TIBTable.GetMasterDetailDelay: integer;
@@ -965,7 +966,6 @@ begin
     if Active then
     begin
       ClearBuffers;
-      ResetBufferCache;
       DataEvent(deDataSetChange, 0);
     end;
   finally

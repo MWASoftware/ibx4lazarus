@@ -193,7 +193,10 @@ type
       ibxeCursorAtEOF,
       ibxeInsertBeyondEOF,
       ibxeDeleteBeyondEOF,
-      ibxeUpdatesNotAppled
+      ibxeUpdatesNotAppled,
+      ibxeCannotUnDelete,
+      ibxeDeleteAtBOF,
+      ibxeInsertBeforeBOF
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -353,6 +356,9 @@ resourcestring
   SInsertBeyondEOF = 'Insert beyond EOF';
   SDeleteBeyondEOF = 'Delete beyond EOF';
   SUpdatesNotAppled = 'Cannot disable Cached Updates when updates are pending';
+  SCannotUnDelete = 'Undelete not available';
+  SDeleteAtBOF = 'Cannot delete at BOF';
+  SInsertBeforeBOF = 'Cannot insert before BOF';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -473,7 +479,10 @@ const
     SCursorAtEOF,
     SInsertBeyondEOF,
     SDeleteBeyondEOF,
-    SUpdatesNotAppled
+    SUpdatesNotAppled,
+    SCannotUnDelete,
+    SDeleteAtBOF,
+    SInsertBeforeBOF
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
