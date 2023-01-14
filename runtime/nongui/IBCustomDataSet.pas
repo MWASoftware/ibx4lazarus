@@ -4044,15 +4044,14 @@ end;
 function TIBCustomDataSet.GetFieldData(Field: TField;
   Buffer: Pointer): Boolean;
 begin
-  if FCursor = nil then
-    Result := false
-  else
-    Result := FCursor.GetFieldData(GetActiveBuf,Field, Buffer);
+  CheckActive;
+  Result := FCursor.GetFieldData(GetActiveBuf,Field, Buffer);
 end;
 
 function TIBCustomDataSet.GetFieldData(Field: TField; Buffer: Pointer;
   NativeFormat: Boolean): Boolean;
 begin
+  CheckActive;
   {These datatypes use IBX conventions and not TDataset conventions}
   if (Field.DataType in [ftBCD,ftDateTime,ftDate,ftTime]) and not NativeFormat then
     Result := FCursor.GetFieldData(GetActiveBuf,Field, Buffer)
@@ -4062,12 +4061,14 @@ end;
 
 procedure TIBCustomDataSet.SetFieldData(Field: TField; Buffer: Pointer);
 begin
-    InternalSetFieldData(Field, Buffer);
+  CheckActive;
+  InternalSetFieldData(Field, Buffer);
 end;
 
 procedure TIBCustomDataSet.SetFieldData(Field: TField; Buffer: Pointer;
   NativeFormat: Boolean);
 begin
+  CheckActive;
   {These datatypes use IBX conventions and not TDataset conventions}
   if (not NativeFormat) and (Field.DataType in [ftBCD,ftDateTime,ftDate,ftTime]) then
     InternalSetFieldData(Field, Buffer)

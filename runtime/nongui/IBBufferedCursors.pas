@@ -140,8 +140,6 @@ type
     FInsertedRecords: integer;
     FDeletedRecords: integer;
     function InternalGetNextBuffer(aBuffer: PByte; IncludeDeleted: boolean): PByte;
-  protected
-    procedure CheckValidBuffer(P:PByte); override;
   public
     constructor Create(aName: string; bufSize, aBuffersPerBlock, firstBlockBuffers: integer);
     procedure Clear; override;
@@ -995,7 +993,10 @@ begin
         if (FCurrentRecord = nil) then
           Result := ReadNext
         else
+        begin
+          FCurrentRecordStatus := csRowBuffer;
           Result := grOK;
+        end;
       end;
     csRowBuffer:
       begin
@@ -1063,6 +1064,7 @@ begin
   else
   begin
     FCurrentRecordStatus := csRowBuffer;
+    if not Cursor.IsEof then
     while Cursor.FetchNext do
     begin
       FCurrentRecord := NewBuffer;
@@ -1078,6 +1080,7 @@ begin
   else
   begin
     FCurrentRecord := FBufferPool.GetLast;
+    if not Cursor.IsEOF then
     while (FBufferPool.GetRecNo(FCurrentRecord) < RecNo) and Cursor.FetchNext do
     begin
       FCurrentRecord := NewBuffer;
@@ -1234,11 +1237,10 @@ begin
           Result := grEOF;
         csBOF, csRowBuffer:
           begin
-            if Cursor.IsEOF then
+            if Cursor.IsEOF or not Cursor.FetchNext then
               Result := grEOF
             else
             begin
-              Cursor.FetchNext;
               FetchCurrentRecord(Buff);
               Inc(FRecordCount);
               InternalSetRecNo(Buff,FRecordCount);
@@ -1285,11 +1287,9 @@ end;
 
 procedure TIBUniDirectionalCursor.GotoLast;
 begin
-  while not Cursor.IsEOF do
-  begin
-    Cursor.FetchNext;
-    Inc(FRecordCount);
-  end;
+  if not Cursor.IsEOF then
+    while Cursor.FetchNext do
+      Inc(FRecordCount);
   FCurrentRecord := nil;
   FCurrentRecordStatus := csRowBuffer;
 end;
@@ -1297,6 +1297,7 @@ end;
 function TIBUniDirectionalCursor.GotoRecordNumber(RecNo: TIBRecordNumber
   ): boolean;
 begin
+  if not Cursor.IsEOF then
     while (FRecordCount < RecNo) and Cursor.FetchNext do
       Inc(FRecordCount);
   Result := FRecordCount = RecNo;
@@ -1376,7 +1377,7 @@ begin
     FCurrentRecordStatus := csRowBuffer;
     if not FInserting then
     begin
-      if not Cursor.FetchNext then
+      if Cursor.IsEOF or not Cursor.FetchNext then
         FCurrentRecordStatus := csEOF
     end
   end;
@@ -1531,7 +1532,17 @@ begin
     SQL_TIME_TZ,
     SQL_TIME_TZ_EX:
       fdDataSize := SizeOf(TIBBufferedDateTimeWithTimeZone);
-    SQL_SHORT, SQL_LONG:
+    SQL_SHORT:
+    begin
+      if (fdDataScale = 0) then
+        fdDataSize := SizeOf(smallint)
+      else
+      if (fdDataScale >= (-4)) then
+        fdDataSize := SizeOf(Currency)
+      else
+        fdDataSize := SizeOf(Double);
+    end;
+    SQL_LONG:
     begin
       if (fdDataScale = 0) then
         fdDataSize := SizeOf(Integer)
@@ -1721,7 +1732,17 @@ begin
           with PIBBufferedDateTimeWithTimeZone(Bufptr)^ do
             ColData.GetAsTime(Timestamp, dstOffset,TimeZoneID, FDefaultTZDate);
         end;
-        SQL_SHORT, SQL_LONG:
+        SQL_SHORT:
+        begin
+          if (fdDataScale = 0) then
+            PInteger(BufPtr)^ := ColData.AsShort
+          else
+          if (fdDataScale >= (-4)) then
+            PCurrency(BufPtr)^ := ColData.AsCurrency
+          else
+           PDouble(BufPtr)^ := ColData.AsDouble;
+        end;
+        SQL_LONG:
         begin
           if (fdDataScale = 0) then
             PInteger(BufPtr)^ := ColData.AsLong
@@ -1855,7 +1876,7 @@ begin
       end
       else
          InternalSetIsNull(Buff,i, true);
-   end
+    end
     else
     if fdDataType = SQL_ARRAY then
     begin
@@ -1864,10 +1885,10 @@ begin
         PISC_QUAD(Buff + fdDataOfs)^ := pda^[fdArrayIndex].ArrayIntf.GetArrayID;
         InternalSetIsNull(Buff,i, pda^[fdArrayIndex].ArrayIntf.IsEmpty);
         SetRefreshRequired(Buff,i,true);
-      end;
+      end
+      else
+          InternalSetIsNull(Buff,i, true);
     end
-    else
-       InternalSetIsNull(Buff,i, true);
   end;
 end;
 
@@ -1932,7 +1953,7 @@ begin
   FDefaultTZDate := aDefaultTZDate;
   SetupBufferStructure(cursor.GetStatement.MetaData,aFields,ComputedFieldNames);
   FCurrentRecord := nil;
-  FCurrentRecordStatus := csEOF;
+  FCurrentRecordStatus := csBOF;
 end;
 
 destructor TIBCursorBase.Destroy;
@@ -2154,7 +2175,7 @@ begin
 
     ColIndex := FieldNo2ColumnIndex(field);
     Result := not InternalGetIsNull(Buff,ColIndex);
-    if Result then
+    if Result and (outBuffer <> nil) then
     with FColumnMetaData[ColIndex] do
     begin
       Data := Buff + fdDataOfs;
@@ -2282,7 +2303,6 @@ begin
      if not Param.IsNull then
      with FColumnMetaData[ColIndex] do
      begin
-       pda := PArrayDataArray(srcBuffer + FArrayCacheOffset);
        Data := srcBuffer + fdDataOfs;
        case fdDataType of
          SQL_TEXT:
@@ -2301,7 +2321,17 @@ begin
          end;
        SQL_FLOAT, SQL_DOUBLE, SQL_D_FLOAT:
          Param.AsDouble := PDouble(Data)^;
-       SQL_SHORT, SQL_LONG:
+       SQL_SHORT:
+       begin
+         if fdDataScale = 0 then
+           Param.AsLong := PShort(Data)^
+         else
+         if fdDataScale >= (-4) then
+           Param.AsCurrency := PCurrency(Data)^
+         else
+           Param.AsDouble := PDouble(Data)^;
+       end;
+       SQL_LONG:
        begin
          if fdDataScale = 0 then
            Param.AsLong := PLong(Data)^
@@ -2325,6 +2355,7 @@ begin
          Param.AsQuad := PISC_QUAD(Data)^;
        SQL_ARRAY:
          begin
+           pda := PArrayDataArray(srcBuffer + FArrayCacheOffset);
            if pda^[fdArrayIndex] = nil then
              Param.AsQuad := PISC_QUAD(Data)^
            else
@@ -2767,12 +2798,6 @@ end;
 
 { TIBBufferPool }
 
-procedure TIBBufferPool.CheckValidBuffer(P: PByte);
-begin
-  Dec(P,sizeof(TRecordData));
-  inherited CheckValidBuffer(P);
-end;
-
 constructor TIBBufferPool.Create(aName: string; bufSize, aBuffersPerBlock,
   firstBlockBuffers: integer);
 begin
@@ -3164,7 +3189,7 @@ begin
   if (Mode = bmWrite) then
   begin
     FBlobStream.Truncate;
-    THackedDataset(FField.DataSet).DataEvent(deFieldChange,0);
+    THackedDataset(FField.DataSet).DataEvent(deFieldChange,PtrInt(FField));
     TBlobField(FField).Modified := true;
     FHasWritten := true;
   end;
