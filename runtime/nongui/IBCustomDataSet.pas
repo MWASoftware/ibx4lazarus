@@ -517,7 +517,7 @@ type
     function PSUpdateRecord(UpdateKind: TUpdateKind; Delta: TDataSet): Boolean; override;
 
     { TDataSet support }
-    procedure InternalInsert; override;
+    procedure DoOnNewRecord; override;
     procedure InitRecord(Buffer: TRecordBuffer); override;
     procedure Disconnect; virtual;
     function ConstraintsStored: Boolean;
@@ -573,6 +573,7 @@ type
     procedure SetFieldData(Field : TField; Buffer : Pointer;
       NativeFormat : Boolean); overload; override;
     procedure SetRecNo(Value: Integer); override;
+    procedure SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); override;
 
   protected
     {Likely to be made public by descendant classes}
@@ -1682,8 +1683,6 @@ begin
   FForcedRefresh := False;
   FAutoCommit:= acDisabled;
   FDataSetCloseAction := dcDiscardChanges;
-  {Bookmark Size is cardinal for IBX}
-  BookmarkSize := sizeof(TIBRecordNumber);
   FBase.BeforeDatabaseDisconnect := DoBeforeDatabaseDisconnect;
   FBase.AfterDatabaseDisconnect := DoAfterDatabaseDisconnect;
   FBase.OnDatabaseFree := DoDatabaseFree;
@@ -2756,10 +2755,8 @@ begin
 end;
 
 procedure TIBCustomDataSet.GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
-var RecNo: TIBRecordNumber;
 begin
-  RecNo := FCursor.GetRecNo(Buffer);
-  Move(RecNo, Data^, BookmarkSize);
+  FCursor.GetBookmarkData(Buffer,Data);
 end;
 
 function TIBCustomDataSet.GetBookmarkFlag(Buffer: TRecordBuffer): TBookmarkFlag;
@@ -2893,9 +2890,9 @@ procedure TIBCustomDataSet.InternalAddRecord(Buffer: Pointer; Append: Boolean);
 begin
   CheckEditState;
   if Append then
-    FCursor.InsertAfterCurrent(Buffer)
+    FCursor.Append(Buffer)
   else
-    FCursor.InsertBeforeCurrent(Buffer);
+    FCursor.InsertBefore(Buffer);
 
   if not CachedUpdates then
     InternalPostRecord(FQInsert, Buffer);
@@ -3463,6 +3460,7 @@ begin
 
 
       FFilterBuffer := FCursor.AllocRecordBuffer;
+      BookmarkSize := FCursor.GetBookmarkSize;
    end
     else
       FQSelect.ExecQuery;
@@ -3623,6 +3621,12 @@ begin
     Resync([]);
     DoAfterScroll;
   end;
+end;
+
+procedure TIBCustomDataSet.SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer
+  );
+begin
+  FCursor.SetBookmarkData(Buffer,Data);
 end;
 
 procedure TIBCustomDataSet.Disconnect;
@@ -3806,9 +3810,12 @@ begin
   FCursor.InitRecord(Buffer);
 end;
 
-procedure TIBCustomDataSet.InternalInsert;
+procedure TIBCustomDataSet.DoOnNewRecord;
 begin
-  FCursor.InsertBeforeCurrent(ActiveBuffer);
+  if FCursor.GetBookmarkFlag(ActiveBuffer) = bfEOF then
+    FCursor.Append(ActiveBuffer)
+  else
+   FCursor.InsertBefore(ActiveBuffer); {Bookmark data determines insertion point}
 end;
 
 { TIBDataSet IProviderSupport }

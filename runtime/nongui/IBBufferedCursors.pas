@@ -263,6 +263,9 @@ type
       function NeedRefresh(aBufID: TRecordBuffer): boolean;
       function GetBookmarkFlag(aBufID: TRecordBuffer): TBookmarkFlag;
       procedure SetBookmarkFlag(aBufID: TRecordBuffer; aBookmarkFlag: TBookmarkFlag);
+      procedure GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
+      procedure SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
+      function GetBookmarkSize: integer;
       function GetRecord(aBufID: TRecordBuffer; GetMode: TGetMode;
                          DoCheck: Boolean): TGetResult;
       procedure GotoFirst;
@@ -276,8 +279,8 @@ type
       procedure EditBuffer(aBufID: TRecordBuffer);
       procedure CancelChanges(aBufID: TRecordBuffer);
       procedure EditingDone(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus);
-      procedure InsertBeforeCurrent(aBufID: TRecordBuffer);
-      procedure InsertAfterCurrent(aBufID: TRecordBuffer);
+      procedure InsertBefore(aBufID: TRecordBuffer);
+      procedure Append(aBufID: TRecordBuffer);
       procedure Delete(aBufID: TRecordBuffer);
       procedure UnDelete(aBufID: TRecordBuffer);
       function GetCachedUpdateStatus(aBufID: TRecordBuffer): TCachedUpdateStatus;
@@ -355,6 +358,7 @@ type
       PDisplayBuffer = ^TDisplaybuffer;
       TDisplayBuffer = record
         dbBookmarkFlag: TBookmarkFlag;
+        dbBookmarkData: array [1..sizeof(TIBRecordNumber)] of Byte;
         dbBuffer: PByte;
         dbCalcFields: PByte;
       end;
@@ -391,7 +395,7 @@ type
       ComputedFieldNames: TStrings);
     procedure ClearBlobCache;
     procedure ClearArrayCache;
-    procedure CopyCursorDataToBuffer(QryResults: IResults; ColIndex: integer;
+    procedure CopyCursorDataToBuffer(QryResults: IResults; QryIndex, ColIndex: integer;
       destBuff: PByte);
     function InternalGetIsNull(Buff: PByte; ColIndex: integer): boolean;
     procedure InternalSetIsNull(Buff: PByte; ColIndex: integer; IsNull: boolean);
@@ -404,7 +408,7 @@ type
     FSaveBufferSize: integer;
     function CalcRecordHdrSize: integer; virtual;
     procedure ClearRecordCache(aBuffer: PByte);
-    function ColIndexByName(aName: AnsiString): integer;
+    function ColIndexByName(aName: AnsiString; caseSensitive: boolean=false): integer;
     procedure FetchCurrentRecord(destBuffer: PByte);
     procedure FieldChanged(aBuffer: PByte; aField: TField); virtual;
     function GetBuffer(aBufID: TRecordBuffer): PByte; inline;
@@ -445,6 +449,10 @@ type
     function NeedRefresh(aBufID: TRecordBuffer): boolean;
     function GetBookmarkFlag(aBufID: TRecordBuffer): TBookmarkFlag;
     procedure SetBookmarkFlag(aBufID: TRecordBuffer; aBookmarkFlag: TBookmarkFlag);
+    procedure SetBookmarkData(aBufID: TRecordBuffer; RecNo: TIBRecordNumber); overload;
+    procedure GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
+    procedure SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); overload;
+   function GetBookmarkSize: integer;
     function GetRecordSize: word;
     function GetCurrentRecNo: TIBRecordNumber;
     procedure SwapDataBuffer(buf1, buf2: TRecordBuffer);
@@ -554,8 +562,8 @@ type
     procedure GotoLast;
     function GotoRecordNumber(RecNo: TIBRecordNumber): boolean;
     procedure EditingDone(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); override;
-    procedure InsertBeforeCurrent(aBufID: TRecordBuffer);
-    procedure InsertAfterCurrent(aBufID: TRecordBuffer);
+    procedure InsertBefore(aBufID: TRecordBuffer);
+    procedure Append(aBufID: TRecordBuffer);
      function GetInsertedRecords: integer;
     function GetDeletedRecords: integer;
     procedure InitRecord(aBufID: TRecordBuffer); override;
@@ -588,8 +596,8 @@ type
     procedure GotoLast;
     function GotoRecordNumber(RecNo: TIBRecordNumber): boolean;
     function GetRecordCount: TIBRecordNumber;
-    procedure InsertBeforeCurrent(aBufID: TRecordBuffer);
-    procedure InsertAfterCurrent(aBufID: TRecordBuffer);
+    procedure InsertBefore(aBufID: TRecordBuffer);
+    procedure Append(aBufID: TRecordBuffer);
     function GetInsertedRecords: integer;
     function GetDeletedRecords: integer;
     procedure InitRecord(aBufID: TRecordBuffer);  override;
@@ -1028,6 +1036,8 @@ begin
       SetBookmarkFlag(aBufID,bfEOF);
     end;
   end;
+
+  SetBookmarkData(aBufID,InternalGetRecNo(FCurrentRecord));
 end;
 
 function TIBBiDirectionalCursor.GetRecNo(aBufID: TRecordBuffer): TIBRecordNumber;
@@ -1095,8 +1105,15 @@ begin
   Result := FBufferPool.GetRecordCount - FBufferPool.DeletedRecords;
 end;
 
-procedure TIBBiDirectionalCursor.InsertBeforeCurrent(aBufID: TRecordBuffer);
+
+procedure TIBBiDirectionalCursor.InsertBefore(aBufID: TRecordBuffer);
+var RecNo: TIBRecordNumber;
 begin
+  GetBookmarkData(aBufID,@RecNo);
+  if RecNo = 0 then
+    GotoFirst
+  else
+    GotoRecordNumber(RecNo);
   case FCurrentRecordStatus of
   csBOF:
     IBError(ibxeInsertBeforeBOF,[]);
@@ -1110,17 +1127,13 @@ begin
   FCurrentRecordStatus := csRowBuffer;
 end;
 
-procedure TIBBiDirectionalCursor.InsertAfterCurrent(aBufID: TRecordBuffer);
+procedure TIBBiDirectionalCursor.Append(aBufID: TRecordBuffer);
 begin
-  case FCurrentRecordStatus of
-  csBOF:
-    FCurrentRecord := FBufferPool.InsertBefore(FBufferPool.GetFirst);
-  csRowBuffer:
+  GotoLast;
+  if FCurrentRecordStatus = csEOF then
+    FCurrentRecord := FBufferPool.Append
+  else
     FCurrentRecord := FBufferPool.InsertAfter(FCurrentRecord);
-  csEOF:
-    IBError(ibxeInsertBeyondEOF,[]);
-  end;
-
   InternalSetUpdateStatus(FCurrentRecord,usInserted);
   SetBuffer(aBufID,FCurrentRecord);
   FCurrentRecordStatus := csRowBuffer
@@ -1262,6 +1275,7 @@ begin
       SetBookmarkFlag(aBufID,bfEOF);
   end;
 
+  SetBookmarkData(aBufID,InternalGetRecNo(FCurrentRecord));
 end;
 
 function TIBUniDirectionalCursor.GetRecNo(aBufID : TRecordBuffer) : TIBRecordNumber;
@@ -1324,10 +1338,17 @@ begin
   FInserting := false;
 end;
 
-procedure TIBUniDirectionalCursor.InsertBeforeCurrent(aBufID: TRecordBuffer);
+procedure TIBUniDirectionalCursor.InsertBefore(aBufID: TRecordBuffer);
 var CurRecNo: TIBRecordNumber;
     Buff: PByte;
+    RecNo: TIBRecordNumber;
 begin
+  GetBookmarkData(aBufID,@RecNo);
+  if RecNo = 0 then
+    GotoFirst
+  else
+    GotoRecordNumber(RecNo);
+
   if FCurrentRecordStatus = csEOF then
   begin
     Buff := GetBuffer(aBufID);
@@ -1348,13 +1369,14 @@ begin
   end;
 end;
 
-procedure TIBUniDirectionalCursor.InsertAfterCurrent(aBufID: TRecordBuffer);
+procedure TIBUniDirectionalCursor.Append(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
   Buff := GetBuffer(aBufID);
   if Buff = nil then
     IBError(ibxeBufferNotSet, [nil]);
 
+  GotoLast;
   Inc(FRecordCount);
   InternalSetRecNo(Buff,FRecordCount);
   FCurrentRecord := Buff;
@@ -1694,7 +1716,7 @@ begin
   FillChar((aBuffer)^,FBlobCacheOffset,0);
 end;
 
-procedure TIBCursorBase.CopyCursorDataToBuffer(QryResults: IResults;
+procedure TIBCursorBase.CopyCursorDataToBuffer(QryResults: IResults; QryIndex,
   ColIndex: integer; destBuff: PByte);
 var LocalData: PByte;
     ColData: ISQLData;
@@ -1702,7 +1724,7 @@ var LocalData: PByte;
     DataLength: Short;
     BufPtr: PByte;
 begin
-  QryResults.GetData(ColIndex,IsNull,DataLength,LocalData);
+  QryResults.GetData(QryIndex,IsNull,DataLength,LocalData);
   with FColumnMetaData[ColIndex] do
   begin
     InternalSetIsNull(destBuff,ColIndex,IsNull);
@@ -1711,7 +1733,7 @@ begin
       FillChar(BufPtr^,fdDataSize,0)
     else
     begin
-      ColData := FCursor[fdSQLColIndex];
+      ColData := QryResults[fdSQLColIndex];
       case fdDataType of  {Get Formatted data for column types that need formatting}
         SQL_TYPE_DATE,
         SQL_TYPE_TIME,
@@ -1735,7 +1757,7 @@ begin
         SQL_SHORT:
         begin
           if (fdDataScale = 0) then
-            PInteger(BufPtr)^ := ColData.AsShort
+            PShort(BufPtr)^ := ColData.AsShort
           else
           if (fdDataScale >= (-4)) then
             PCurrency(BufPtr)^ := ColData.AsCurrency
@@ -1745,7 +1767,7 @@ begin
         SQL_LONG:
         begin
           if (fdDataScale = 0) then
-            PInteger(BufPtr)^ := ColData.AsLong
+            PLong(BufPtr)^ := ColData.AsLong
           else
           if (fdDataScale >= (-4)) then
             PCurrency(BufPtr)^ := ColData.AsCurrency
@@ -1897,16 +1919,30 @@ begin
   Result := sizeof(TRecordHeader);
 end;
 
-function TIBCursorBase.ColIndexByName(aName: AnsiString): integer;
+function TIBCursorBase.ColIndexByName(aName: AnsiString; caseSensitive: boolean
+  ): integer;
 var i: integer;
 begin
   Result := -1;
+  if caseSensitive then
   for i := 0 to FColumnCount - 1 do
+  begin
     if FColumnMetaData[i].fdAliasName = aName then
     begin
       Result := i;
       Exit;
-    end;
+    end
+  end
+  else
+  begin
+    aName := AnsiUpperCase(aName);
+    for i := 0 to FColumnCount - 1 do
+      if AnsiUpperCase(FColumnMetaData[i].fdAliasName) = aName then
+      begin
+        Result := i;
+        Exit;
+      end
+  end;
 end;
 
 procedure TIBCursorBase.FetchCurrentRecord(destBuffer: PByte);
@@ -1919,9 +1955,9 @@ begin
     IBError(ibxeCursorAtEOF,[]);
 
   if FDBKeyFieldColumn <> -1 then
-      CopyCursorDataToBuffer(FCursor,FDBKeyFieldColumn,destBuffer);
+      CopyCursorDataToBuffer(FCursor,FColumnMetaData[FDBKeyFieldColumn].fdSQLColIndex,FDBKeyFieldColumn,destBuffer);
   for i := 0 to FColumnCount - 1 do
-    CopyCursorDataToBuffer(FCursor,i,destBuffer);
+    CopyCursorDataToBuffer(FCursor,FColumnMetaData[i].fdSQLColIndex,i,destBuffer);
   InternalSetUpdateStatus(destBuffer,usUnModified);
 end;
 
@@ -1972,12 +2008,13 @@ end;
 
 function TIBCursorBase.AllocRecordBuffer: TRecordBuffer;
 begin
-  Result := GetMem(sizeof(TDisplayBuffer));
+  Result := GetMem(sizeof(TDisplayBuffer));;
   if Result = nil then
     OutofMemoryError;
   with PDisplayBuffer(Result)^ do
   begin
     dbBookmarkFlag := bfCurrent;
+    FillChar(dbBookmarkData,sizeof(dbBookmarkData),0);
     dbBuffer := InternalAllocRecordBuffer;
     dbCalcFields := GetMem(FCalcFieldsSize);
     if dbCalcFields = nil then
@@ -2295,7 +2332,7 @@ begin
          system.Delete(ParamName,1,length(sNewPrefix));
      end;
 
-     ColIndex := ColIndexByName(ParamName);
+     ColIndex := ColIndexByName(ParamName,params.GetHasCaseSensitiveParams);
      if ColIndex = -1 then
        continue;
 
@@ -2307,7 +2344,10 @@ begin
        case fdDataType of
          SQL_TEXT:
            begin
-             SetString(st, PAnsiChar(data), fdDataSize);
+             DataLength := strlen(PAnsiChar(data));
+             if DataLength > fdDataSize then
+               DataLength := fdDataSize;
+             SetString(st, PAnsiChar(data), DataLength);
              SetCodePage(st,fdCodePage,false);
              Param.AsString := st;
            end;
@@ -2324,7 +2364,7 @@ begin
        SQL_SHORT:
        begin
          if fdDataScale = 0 then
-           Param.AsLong := PShort(Data)^
+           Param.AsShort := PShort(Data)^
          else
          if fdDataScale >= (-4) then
            Param.AsCurrency := PCurrency(Data)^
@@ -2405,11 +2445,8 @@ begin
   for i := 0 to QryResults.Count - 1  do
   begin
     ColIndex := ColIndexByName(QryResults[i].GetAliasName);
-    with FColumnMetaData[i] do
-    begin
-      CopyCursorDataToBuffer(QryResults, fdSQLColIndex,Buff);
-      SetRefreshRequired(Buff,ColIndex,false);
-    end;
+    CopyCursorDataToBuffer(QryResults,i,ColIndex,Buff);
+    SetRefreshRequired(Buff,ColIndex,false);
   end;
 end;
 
@@ -2439,6 +2476,27 @@ procedure TIBCursorBase.SetBookmarkFlag(aBufID: TRecordBuffer;
   aBookmarkFlag: TBookmarkFlag);
 begin
   PDisplayBuffer(aBufID)^.dbBookmarkFlag := aBookmarkFlag;
+end;
+
+procedure TIBCursorBase.SetBookmarkData(aBufID: TRecordBuffer;
+  RecNo: TIBRecordNumber);
+begin
+  Move(RecNo,PDisplayBuffer(aBufID)^.dbBookmarkData,GetBookmarkSize);
+end;
+
+procedure TIBCursorBase.GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
+begin
+  Move(PDisplayBuffer(Buffer)^.dbBookmarkData,Data^,GetBookmarkSize);
+end;
+
+procedure TIBCursorBase.SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
+begin
+  Move(Data^,PDisplayBuffer(Buffer)^.dbBookmarkData, GetBookmarkSize);
+end;
+
+function TIBCursorBase.GetBookmarkSize: integer;
+begin
+  Result := sizeof(TIBRecordNumber);
 end;
 
 function TIBCursorBase.GetRecordSize: word;
@@ -2480,6 +2538,7 @@ begin
   begin
     dbBookmarkFlag := bfInserted;
     Fillchar(dbCalcFields^,CalcFieldsSize,0);
+    FillChar(dbBookmarkData,GetBookmarkSize,0);
     if dbBuffer <> nil then
       InternalSetUpdateStatus(dbBuffer,usInserted);
   end;
