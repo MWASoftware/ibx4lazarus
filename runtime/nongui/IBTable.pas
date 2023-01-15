@@ -1046,7 +1046,6 @@ end;
 procedure TIBTable.MasterDisabled(Sender: TObject);
 begin
   DataEvent(dePropertyChange, 0);
-  ReQuery;
 end;
 
 function TIBTable.GetDataSource: TDataSource;

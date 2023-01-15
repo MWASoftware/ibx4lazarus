@@ -3429,8 +3429,9 @@ end;
 
 procedure TIBCustomDataSet.ReQuery;
 begin
-  Active := false;
-  Active := true;
+  FQSelect.Close;
+  FQSelect.ExecQuery;
+  FCursor.SetCursor(FQSelect.CurrentCursor);
   First;
 end;
 

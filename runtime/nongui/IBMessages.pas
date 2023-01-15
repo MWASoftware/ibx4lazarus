@@ -196,7 +196,8 @@ type
       ibxeUpdatesNotAppled,
       ibxeCannotUnDelete,
       ibxeDeleteAtBOF,
-      ibxeInsertBeforeBOF
+      ibxeInsertBeforeBOF,
+      ibxeDifferentStatement
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -359,6 +360,7 @@ resourcestring
   SCannotUnDelete = 'Undelete not available';
   SDeleteAtBOF = 'Cannot delete at BOF';
   SInsertBeforeBOF = 'Cannot insert before BOF';
+  SDifferentStatement = 'A Cursor can only be replaced using a new cursor from the same statement';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -482,7 +484,8 @@ const
     SUpdatesNotAppled,
     SCannotUnDelete,
     SDeleteAtBOF,
-    SInsertBeforeBOF
+    SInsertBeforeBOF,
+    SDifferentStatement
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
