@@ -3816,6 +3816,7 @@ begin
     FCursor.Append(ActiveBuffer)
   else
    FCursor.InsertBefore(ActiveBuffer); {Bookmark data determines insertion point}
+  inherited DoOnNewRecord;
 end;
 
 { TIBDataSet IProviderSupport }

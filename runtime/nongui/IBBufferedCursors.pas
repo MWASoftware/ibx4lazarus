@@ -681,9 +681,14 @@ constructor TIBEditableCursor.Create(aName: string; aCursor: IResultSet;
 begin
   FCachedUpdatesEnabled := CachedUpdates;
   inherited Create(aName, aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
-  FSaveBuffer := GetMem(FSaveBufferSize);
-  if FSaveBuffer = nil then
-     OutOfMemoryError;
+  if FCachedUpdatesEnabled then
+    InitCachedUpdates
+  else
+  begin
+    FSaveBuffer := GetMem(FSaveBufferSize);
+    if FSaveBuffer = nil then
+       OutOfMemoryError;
+  end ;
 end;
 
 destructor TIBEditableCursor.Destroy;
@@ -1733,7 +1738,7 @@ begin
       FillChar(BufPtr^,fdDataSize,0)
     else
     begin
-      ColData := QryResults[fdSQLColIndex];
+      ColData := QryResults[QryIndex];
       case fdDataType of  {Get Formatted data for column types that need formatting}
         SQL_TYPE_DATE,
         SQL_TYPE_TIME,
