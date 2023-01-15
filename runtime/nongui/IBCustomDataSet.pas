@@ -553,6 +553,7 @@ type
     procedure InternalDeleteRecord(Qry: TIBSQL; aBuffID: TRecordBuffer);
     procedure InternalEdit; override;
     procedure InternalFirst; override;
+    procedure InternalInsert; override;
     procedure InternalGotoBookmark(Bookmark: Pointer); override;
     procedure InternalHandleException; override;
     procedure InternalInitFieldDefs; override;
@@ -2789,7 +2790,7 @@ end;
 
  function TIBCustomDataSet.GetDBAliasName(FieldNo: integer): string;
 begin
-  Result := FCursor.GetAliasName(FieldNo);
+  Result := FAliasNameMap[FieldNo-1]
 end;
 
  function TIBCustomDataSet.GetFieldDefFromAlias(aliasName: string): TFieldDef;
@@ -2909,7 +2910,8 @@ procedure TIBCustomDataSet.InternalClose;
 begin
   if FDidActivate then
     DeactivateTransaction;
-  FCursor.FreeRecordBuffer(FFilterBuffer);
+  if (FCursor <> nil) and (FFilterBuffer <> nil) then
+    FCursor.FreeRecordBuffer(FFilterBuffer);
   FCursor := nil;
   FQSelect.Close;
   FOpen := False;
@@ -2942,6 +2944,12 @@ end;
 procedure TIBCustomDataSet.InternalFirst;
 begin
   FCursor.GotoFirst;
+  ActivateBuffers;
+end;
+
+procedure TIBCustomDataSet.InternalInsert;
+begin
+  CursorPosChanged;
 end;
 
 procedure TIBCustomDataSet.InternalGotoBookmark(Bookmark: Pointer);

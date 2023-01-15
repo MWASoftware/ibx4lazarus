@@ -901,7 +901,10 @@ begin
   csEOF:
     IBError(ibxeDeleteBeyondEOF,[]);
   csRowBuffer:
-    FCurrentRecord := FBufferPool.Delete(FCurrentRecord);
+    begin
+      FCurrentRecord := FBufferPool.Delete(FCurrentRecord);
+      if FCurrentRecord = nil then GotoLast;
+    end;
   end;
 end;
 
@@ -2328,7 +2331,10 @@ begin
      if pos(sOldPrefix,ParamName) = 1 then
      begin
        system.Delete(ParamName,1,length(sOldPrefix));
-       srcBuffer := OldBuffer;
+       if OldBuffer = nil then {On delete, for example}
+         srcBuffer := Buff
+       else
+         srcBuffer := OldBuffer;
      end
      else
      begin
@@ -3066,7 +3072,7 @@ function TIBBufferPool.Delete(aBuffer: PByte): PByte;
 begin
   Dec(aBuffer,sizeof(TRecordData));
   CheckValidBuffer(aBuffer);
-  Result := GetNextBuffer(aBuffer);
+  Result := InternalGetNextBuffer(aBuffer,false);
   case PRecordData(aBuffer)^.rdStatus of
   rsInserted:
     PRecordData(aBuffer)^.rdStatus := rsInsertDeleted;
@@ -3074,6 +3080,8 @@ begin
     PRecordData(aBuffer)^.rdStatus := rsAppendDeleted;
   end;
   Inc(FDeletedRecords);
+  if Result <> nil then
+    Inc(Result,sizeof(TRecordData));
 end;
 
 procedure TIBBufferPool.UnDelete(aBuffer: PByte);
