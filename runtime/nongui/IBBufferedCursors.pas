@@ -809,7 +809,8 @@ end;
 
 procedure TIBEditableCursor.InternalSetOldBuffer(aBuffer, OldBuffer: PByte);
 begin
-  PLocalHeader(aBuffer + FLocalHdrOffset)^.lhOldBuffer := OldBuffer;
+  if FCachedUpdatesEnabled then
+    PLocalHeader(aBuffer + FLocalHdrOffset)^.lhOldBuffer := OldBuffer;
 end;
 
 procedure TIBEditableCursor.Reset;
@@ -1601,7 +1602,7 @@ begin
     SQL_SHORT:
     begin
       if (fdDataScale = 0) then
-        fdDataSize := SizeOf(smallint)
+        fdDataSize := SizeOf(short)
       else
       if (fdDataScale >= (-4)) then
         fdDataSize := SizeOf(Currency)
@@ -1767,7 +1768,6 @@ begin
     pbd^[i] := nil;
   for i := 0 to ArrayFieldCount - 1 do
     pda^[i] := nil;
-  FillChar((aBuffer)^,FBlobCacheOffset,0);
 end;
 
 procedure TIBCursorBase.CopyCursorDataToBuffer(QryResults: IResults; QryIndex,
@@ -2008,8 +2008,6 @@ begin
   if Cursor.IsEOF then
     IBError(ibxeCursorAtEOF,[]);
 
-  if FDBKeyFieldColumn <> -1 then
-      CopyCursorDataToBuffer(FCursor,FColumnMetaData[FDBKeyFieldColumn].fdSQLColIndex,FDBKeyFieldColumn,destBuffer);
   for i := 0 to FColumnCount - 1 do
     CopyCursorDataToBuffer(FCursor,FColumnMetaData[i].fdSQLColIndex,i,destBuffer);
   InternalSetUpdateStatus(destBuffer,usUnModified);
@@ -2109,8 +2107,12 @@ begin
       Buff := GetBuffer(aBufID);
       if Buff = nil then
         IBError(ibxeBufferNotSet, [nil]);
-      FCurrentRecord := Buff;
-      FCurrentRecordStatus := csRowBuffer;
+   {     FCurrentRecordStatus := CSbof
+      else
+      begin  }
+        FCurrentRecord := Buff;
+        FCurrentRecordStatus := csRowBuffer;
+ //     end ;
     end;
   end;
 end;
@@ -2254,9 +2256,9 @@ begin
     if Buff = nil then Exit;
 
     Inc(Buff, field.Offset); {For CalcFields, TField.offset is the buffer offset}
-    Result := Boolean(Buff[0]);
+    Result := not Boolean(Buff[0]);
 
-    if Result then
+    if Result and (outBuffer <> nil) then
       Move(Buff[1], outBuffer^, field.DataSize);
   end
   else
@@ -2306,7 +2308,7 @@ begin
     if Buff = nil then Exit;
 
     Inc(Buff, field.Offset); {For CalcFields, TField.offset is the buffer offset}
-    IsNull := LongBool(inBuffer);
+    IsNull := inBuffer = nil;
     Boolean(Buff[0]) := IsNull;
     if not IsNull then
       Move(inBuffer^, Buff[1], Field.DataSize);
@@ -2374,13 +2376,10 @@ begin
      ParamName := Param.Name;
 
      {Determine source buffer}
-     if pos(sOldPrefix,ParamName) = 1 then
+     if (OldBuffer <> nil) and (pos(sOldPrefix,ParamName) = 1) then
      begin
        system.Delete(ParamName,1,length(sOldPrefix));
-       if OldBuffer = nil then {On delete, for example}
-         srcBuffer := Buff
-       else
-         srcBuffer := OldBuffer;
+       srcBuffer := OldBuffer;
      end
      else
      begin
@@ -2400,14 +2399,7 @@ begin
        Data := srcBuffer + fdDataOfs;
        case fdDataType of
          SQL_TEXT:
-           begin
-             DataLength := strlen(PAnsiChar(data));
-             if DataLength > fdDataSize then
-               DataLength := fdDataSize;
-             SetString(st, PAnsiChar(data), DataLength);
-             SetCodePage(st,fdCodePage,false);
-             Param.AsString := st;
-           end;
+           Param.SetAsPointer(Data);
          SQL_VARYING:
          begin
            DataLength := PShort(Data)^;

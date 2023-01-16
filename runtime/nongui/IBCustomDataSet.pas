@@ -3492,6 +3492,7 @@ begin
     else
     begin
       if (not CachedUpdates) then
+        InternalPostRecord(FQModify,ActiveBuffer);
       FCursor.EditingDone(ActiveBuffer,cusModified);
     end;
   finally
@@ -3603,12 +3604,9 @@ end;
 
 procedure TIBCustomDataSet.InternalSetFieldData(Field: TField; Buffer: Pointer);
 begin
-  if Field.FieldNo > 0 then
-  begin
-    CheckEditState;
-    FCursor.SetFieldData(ActiveBuffer,Field,Buffer);
-    SetModified(True);
-  end;
+  CheckEditState;
+  FCursor.SetFieldData(ActiveBuffer,Field,Buffer);
+  SetModified(True);
   if not (State in [dsCalcFields, dsFilter, dsNewValue]) then
       DataEvent(deFieldChange, PtrInt(Field));
 end;
