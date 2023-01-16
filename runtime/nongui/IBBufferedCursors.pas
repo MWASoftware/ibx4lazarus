@@ -503,6 +503,7 @@ type
     procedure CancelBlobAndArrayChanges(aBuffer: PByte);
     procedure CopyBuffers(src, dest: PByte); inline;
     procedure DoCancelUpdates; virtual; abstract;
+    procedure DoOnInserted(aBuffer: PByte);
     function GetOldBufferFor(aBuffer: PByte): PByte; override;
     procedure InitCachedUpdates; virtual;
     procedure ReleaseSaveBuffer(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus);
@@ -665,6 +666,16 @@ end;
 procedure TIBEditableCursor.CopyBuffers(src, dest: PByte);
 begin
   Move(src^,dest^,FSaveBufferSize);
+end;
+
+procedure TIBEditableCursor.DoOnInserted(aBuffer: PByte);
+var OldBuffer: PByte;
+begin
+  if FCachedUpdatesEnabled then
+  begin
+    OldBuffer := FOldBufferCache.Append(InternalGetRecNo(aBuffer),aBuffer);
+    FOldBufferCache.SetStatus(OldBuffer,cusInserted);
+  end;
 end;
 
 function TIBEditableCursor.GetOldBufferFor(aBuffer: PByte): PByte;
@@ -1082,20 +1093,8 @@ end;
 
 procedure TIBBiDirectionalCursor.GotoFirst;
 begin
-  FCurrentRecord := FBufferPool.GetFirst;
-  if FCurrentRecord = nil then
-  begin
-    if Cursor.IsEOF then
-      FCurrentRecordStatus := csEOF
-    else
-    begin
-      if Cursor.IsBof then Cursor.FetchNext;
-      FCurrentRecord := NewBuffer;
-      FetchCurrentRecord(FCurrentRecord);
-      FCurrentRecordStatus := csRowBuffer;
-    end;
-  end;
-
+  FCurrentRecord := nil;
+  FCurrentRecordStatus := csBOF;
 end;
 
 procedure TIBBiDirectionalCursor.GotoLast;
@@ -1155,6 +1154,7 @@ begin
     FCurrentRecord := NewBuffer;
   end;
   InternalSetUpdateStatus(FCurrentRecord,usInserted);
+  DoOnInserted(FCurrentRecord);
   SetBuffer(aBufID, FCurrentRecord);
   FCurrentRecordStatus := csRowBuffer;
 end;
@@ -1167,6 +1167,7 @@ begin
   else
     FCurrentRecord := FBufferPool.InsertAfter(FCurrentRecord);
   InternalSetUpdateStatus(FCurrentRecord,usInserted);
+  DoOnInserted(FCurrentRecord);
   SetBuffer(aBufID,FCurrentRecord);
   FCurrentRecordStatus := csRowBuffer
 end;
@@ -1395,6 +1396,7 @@ begin
     FInserting := true;
     Inc(FInsertedRecords);
     InternalSetUpdateStatus(FCurrentRecord,usInserted);
+    DoOnInserted(FCurrentRecord);
   end
   else
   begin
@@ -1418,6 +1420,7 @@ begin
   FInserting := true;
   Inc(FInsertedRecords);
   InternalSetUpdateStatus(FCurrentRecord,usInserted);
+  DoOnInserted(FCurrentRecord);
 end;
 
 procedure TIBUniDirectionalCursor.InternalDelete(aBufID: TRecordBuffer);
@@ -3139,6 +3142,7 @@ begin
   rsAppended:
     PRecordData(aBuffer)^.rdStatus := rsAppendDeleted;
   end;
+//  writeln('Rec No = ',inherited GetRecNo(aBuffer),' status = ', PRecordData(aBuffer)^.rdStatus);
   Inc(FDeletedRecords);
   if Result <> nil then
     Inc(Result,sizeof(TRecordData));
@@ -3264,8 +3268,8 @@ end;
 procedure TIBOldBufferPool.SetStatus(aBuffer: PByte;
   status: TCachedUpdateStatus);
 begin
-  Dec(aBuffer,sizeof(TRecordData));
   CheckValidBuffer(aBuffer);
+  Dec(aBuffer,sizeof(TRecordData));
   if PRecordData(aBuffer)^.rdStatus <> status then
   begin
     PRecordData(aBuffer)^.rdStatus := status;

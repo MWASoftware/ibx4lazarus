@@ -1873,6 +1873,7 @@ begin
     DisableControls;
     try
       FCursor.CancelUpdates;
+      CursorPosChanged;
     finally
       First;
       EnableControls;
@@ -1983,6 +1984,8 @@ begin
       Result := ActiveBuffer;
   dsFilter:
     Result := FFilterBuffer;
+  dsCalcFields:
+    Result := CalcBuffer;
   else
     if not FOpen then
       Result := nil
@@ -3605,7 +3608,7 @@ end;
 procedure TIBCustomDataSet.InternalSetFieldData(Field: TField; Buffer: Pointer);
 begin
   CheckEditState;
-  FCursor.SetFieldData(ActiveBuffer,Field,Buffer);
+  FCursor.SetFieldData(GetActiveBuf,Field,Buffer);
   SetModified(True);
   if not (State in [dsCalcFields, dsFilter, dsNewValue]) then
       DataEvent(deFieldChange, PtrInt(Field));
