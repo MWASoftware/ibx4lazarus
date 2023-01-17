@@ -90,6 +90,7 @@ begin
   begin
     Unidirectional := aUnidirectional;
     Active := true;
+    PrintDataSet(FIBDataSet);
     writeln(Outfile,'Unidirectional caching = ',aUnidirectional);
     writeln(OutFile,'Simple Append i.e. caching of inserted records and cancel');
     if aUnidirectional then Insert else Append;

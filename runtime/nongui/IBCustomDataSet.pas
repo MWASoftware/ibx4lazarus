@@ -1873,7 +1873,7 @@ begin
     DisableControls;
     try
       FCursor.CancelUpdates;
-      CursorPosChanged;
+      Resync([]);
     finally
       First;
       EnableControls;
@@ -2947,7 +2947,6 @@ end;
 procedure TIBCustomDataSet.InternalFirst;
 begin
   FCursor.GotoFirst;
-  ActivateBuffers;
 end;
 
 procedure TIBCustomDataSet.InternalInsert;

@@ -155,6 +155,7 @@ type
     function Delete(aBuffer: PByte): PByte;
     procedure UnDelete(aBuffer: PByte);
     function GetUpdateStatus(aBuffer: PByte): TUpdateStatus;
+    function GetRecordStatus(aBuffer: PByte): TRecordStatus;
     property InsertedRecords: integer read FInsertedRecords;
     property DeletedRecords: integer read FDeletedRecords;
   end;
@@ -911,6 +912,7 @@ end;
 procedure TIBBiDirectionalCursor.DoCancelUpdates;
 begin
   OldBufferCache.BackwardsIterator(CancelUpdatesIterator);
+  GotoLast;
 end;
 
 function TIBBiDirectionalCursor.InternalGetRecNo(aBuffer: PByte): TIBRecordNumber;
@@ -930,7 +932,8 @@ begin
   csRowBuffer:
     begin
       FCurrentRecord := FBufferPool.Delete(FCurrentRecord);
-      if FCurrentRecord = nil then GotoLast;
+      if FCurrentRecord = nil then
+        GotoLast;
     end;
   end;
 end;
@@ -1078,7 +1081,11 @@ begin
       SetBookmarkFlag(aBufID,bfEOF);
     end;
   end;
-
+{  if FCurrentRecord <> nil then
+    writeln('Get Record request ',GetMode,' Returns Rec No ',InternalGetRecNo(FCurrentRecord),' Status = ',
+      FBufferPool.GetRecordStatus(FCurrentRecord))
+  else
+    writeln('Get Record request ',GetMode,' Returns ',Result); }
   SetBookmarkData(aBufID,InternalGetRecNo(FCurrentRecord));
 end;
 
@@ -3142,7 +3149,7 @@ begin
   rsAppended:
     PRecordData(aBuffer)^.rdStatus := rsAppendDeleted;
   end;
-//  writeln('Rec No = ',inherited GetRecNo(aBuffer),' status = ', PRecordData(aBuffer)^.rdStatus);
+ // writeln('Rec No = ',inherited GetRecNo(aBuffer),' status = ', PRecordData(aBuffer)^.rdStatus);
   Inc(FDeletedRecords);
   if Result <> nil then
     Inc(Result,sizeof(TRecordData));
@@ -3177,6 +3184,13 @@ begin
    else
      Result := usUnmodified;
   end;
+end;
+
+function TIBBufferPool.GetRecordStatus(aBuffer: PByte): TRecordStatus;
+begin
+  Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
+  Result := PRecordData(aBuffer)^.rdStatus;
 end;
 
 { TIBOldBufferPool }
