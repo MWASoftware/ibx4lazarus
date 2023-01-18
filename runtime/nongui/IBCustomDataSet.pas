@@ -417,7 +417,6 @@ type
     FCloseAction: TTransactionAction;
     FInTransactionEnd: boolean;
     FIBLinks: TList;
-    FColumnCount: integer;
     FSelectCount: integer;
     FInsertCount: integer;
     FUpdateCount: integer;
@@ -2925,12 +2924,15 @@ end;
 
 procedure TIBCustomDataSet.InternalDelete;
 begin
+  if State = dsEdit then Cancel;
   FBase.SetCursor;
   try
     if CanDelete then
     begin
       if not FCursor.GetCachedUpdatesEnabled then
-        InternalDeleteRecord(FQDelete,ActiveBuffer);
+        InternalDeleteRecord(FQDelete,ActiveBuffer)
+      else
+        FCursor.Delete(ActiveBuffer);
     end
     else
       IBError(ibxeCannotDelete, [nil]);

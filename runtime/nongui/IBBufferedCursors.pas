@@ -682,7 +682,10 @@ end;
 function TIBEditableCursor.GetOldBufferFor(aBuffer: PByte): PByte;
 begin
   if InternalGetRecNo(aBuffer) = FSavedRecNo then
-    Result := PLocalHeader(aBuffer + FLocalHdrOffset)^.lhOldBuffer
+    if FCachedUpdatesEnabled then
+      Result := PLocalHeader(aBuffer + FLocalHdrOffset)^.lhOldBuffer
+    else
+      Result := FSaveBuffer
   else
     Result := nil;
 end;
@@ -933,7 +936,7 @@ begin
     begin
       FCurrentRecord := FBufferPool.Delete(FCurrentRecord);
       if FCurrentRecord = nil then
-        GotoLast;
+        FCurrentRecordStatus := csBOF;
     end;
   end;
 end;
@@ -2386,10 +2389,11 @@ begin
      ParamName := Param.Name;
 
      {Determine source buffer}
-     if (OldBuffer <> nil) and (pos(sOldPrefix,ParamName) = 1) then
+     if pos(sOldPrefix,ParamName) = 1 then
      begin
        system.Delete(ParamName,1,length(sOldPrefix));
-       srcBuffer := OldBuffer;
+       if OldBuffer <> nil then
+         srcBuffer := OldBuffer;
      end
      else
      begin
@@ -2409,7 +2413,16 @@ begin
        Data := srcBuffer + fdDataOfs;
        case fdDataType of
          SQL_TEXT:
-           Param.SetAsPointer(Data);
+           if Param.getColMetadata.getCharSetID <= 1 {NONE or OCTETS} then
+             Param.SetAsPointer(Data)
+           else
+           begin
+             DataLength := strlen(PAnsiChar(Data));
+             if DataLength > fdDataSize then
+               DataLength := fdDataSize;
+             SetCodePage(st,fdCodePage,false);
+             Param.AsString := st;
+           end;
          SQL_VARYING:
          begin
            DataLength := PShort(Data)^;
@@ -3051,8 +3064,9 @@ function TIBBufferPool.GetPriorBuffer(aBuffer: PByte): PByte;
 begin
   Dec(aBuffer,sizeof(TRecordData));
   CheckValidBuffer(aBuffer);
+  Result := aBuffer;
   repeat
-    Result := PRecordData(aBuffer)^.rdPreviousBuffer
+    Result := PRecordData(Result)^.rdPreviousBuffer
   until (Result = nil) or (PRecordData(Result)^.rdStatus in [rsAppended,rsInserted]);
   if Result <> nil then
     Inc(Result,sizeof(TRecordData));
@@ -3142,7 +3156,7 @@ function TIBBufferPool.Delete(aBuffer: PByte): PByte;
 begin
   Dec(aBuffer,sizeof(TRecordData));
   CheckValidBuffer(aBuffer);
-  Result := InternalGetNextBuffer(aBuffer,false);
+  Result := PRecordData(aBuffer)^.rdPreviousBuffer;
   case PRecordData(aBuffer)^.rdStatus of
   rsInserted:
     PRecordData(aBuffer)^.rdStatus := rsInsertDeleted;

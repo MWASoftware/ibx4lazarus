@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="219">
+    <Units Count="220">
       <Unit0>
         <Filename Value="testsuite.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -15,7 +15,7 @@
       <Unit1>
         <Filename Value="IBXTestBase.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="12"/>
         <TopLine Value="234"/>
         <CursorPos X="3" Y="238"/>
         <UsageCount Value="201"/>
@@ -55,10 +55,11 @@
       <Unit6>
         <Filename Value="Test04.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="236"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="226"/>
         <CursorPos X="15" Y="306"/>
         <UsageCount Value="201"/>
+        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="Test05.pas"/>
@@ -196,9 +197,8 @@
       <Unit23>
         <Filename Value="Test18.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="7"/>
-        <TopLine Value="196"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="106"/>
         <CursorPos Y="106"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
@@ -265,7 +265,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="172"/>
         <CursorPos X="19" Y="193"/>
-        <UsageCount Value="147"/>
+        <UsageCount Value="149"/>
       </Unit31>
       <Unit32>
         <Filename Value="Test30.pas"/>
@@ -282,15 +282,15 @@
       </Unit33>
       <Unit34>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <TopLine Value="2945"/>
-        <CursorPos Y="2950"/>
+        <TopLine Value="2172"/>
+        <CursorPos Y="2180"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
           <TopLine Value="1799"/>
           <CursorPos X="13" Y="1827"/>
         </ExtraEditor1>
-        <UsageCount Value="83"/>
+        <UsageCount Value="84"/>
         <Loaded Value="True"/>
       </Unit34>
       <Unit35>
@@ -309,18 +309,19 @@
       </Unit36>
       <Unit37>
         <Filename Value="../../fbintf/client/FBClientAPI.pas"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="397"/>
-        <CursorPos X="25" Y="404"/>
-        <UsageCount Value="44"/>
+        <CursorPos Y="413"/>
+        <UsageCount Value="45"/>
         <Loaded Value="True"/>
       </Unit37>
       <Unit38>
         <Filename Value="../../fbintf/client/FBAttachment.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="578"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="327"/>
         <CursorPos X="9" Y="594"/>
-        <UsageCount Value="32"/>
+        <UsageCount Value="33"/>
+        <Loaded Value="True"/>
       </Unit38>
       <Unit39>
         <Filename Value="../../fbintf/client/3.0/FB30Statement.pas"/>
@@ -481,15 +482,15 @@
         <EditorIndex Value="3"/>
         <TopLine Value="472"/>
         <CursorPos Y="498"/>
-        <UsageCount Value="24"/>
+        <UsageCount Value="25"/>
         <Loaded Value="True"/>
       </Unit60>
       <Unit61>
         <Filename Value="../changelog"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="7"/>
         <CursorPos X="91" Y="38"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="97"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit61>
@@ -1425,10 +1426,11 @@
       </Unit194>
       <Unit195>
         <Filename Value="../../fbintf/client/IB.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="710"/>
-        <CursorPos X="3" Y="684"/>
-        <UsageCount Value="39"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="668"/>
+        <CursorPos X="28" Y="686"/>
+        <UsageCount Value="40"/>
+        <Loaded Value="True"/>
       </Unit195>
       <Unit196>
         <Filename Value="../../fbintf/client/FBNumeric.pas"/>
@@ -1515,10 +1517,11 @@
       </Unit207>
       <Unit208>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="3140"/>
-        <CursorPos X="4" Y="3152"/>
-        <UsageCount Value="22"/>
+        <TopLine Value="3154"/>
+        <CursorPos Y="3160"/>
+        <UsageCount Value="23"/>
         <Loaded Value="True"/>
       </Unit208>
       <Unit209>
@@ -1537,10 +1540,10 @@
       </Unit210>
       <Unit211>
         <Filename Value="FB4reference.log"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="169"/>
         <CursorPos X="16" Y="14945"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit211>
@@ -1554,17 +1557,17 @@
       <Unit213>
         <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1649"/>
-        <CursorPos X="36" Y="1673"/>
-        <UsageCount Value="16"/>
+        <TopLine Value="1615"/>
+        <CursorPos X="15" Y="1630"/>
+        <UsageCount Value="17"/>
         <Loaded Value="True"/>
       </Unit213>
       <Unit214>
         <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="784"/>
-        <CursorPos X="45" Y="810"/>
-        <UsageCount Value="16"/>
+        <TopLine Value="1550"/>
+        <CursorPos X="3" Y="1553"/>
+        <UsageCount Value="17"/>
         <Loaded Value="True"/>
       </Unit214>
       <Unit215>
@@ -1595,125 +1598,133 @@
         <CursorPos Y="700"/>
         <UsageCount Value="10"/>
       </Unit218>
+      <Unit219>
+        <Filename Value="/usr/lib/fpcsrc/rtl/objpas/sysutils/syswideh.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="10" Y="32"/>
+        <UsageCount Value="10"/>
+      </Unit219>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="1896" Column="95" TopLine="1870"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="2380" TopLine="2368"/>
       </Position1>
       <Position2>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="1932" Column="9" TopLine="1906"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="2383" TopLine="2368"/>
       </Position2>
       <Position3>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="1952" Column="36" TopLine="1926"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="2385" TopLine="2368"/>
       </Position3>
       <Position4>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="1972" Column="15" TopLine="1948"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="2386" TopLine="2368"/>
       </Position4>
       <Position5>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="1987" Column="9" TopLine="1962"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="2388" TopLine="2368"/>
       </Position5>
       <Position6>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="2021" Column="28" TopLine="1996"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="2389" TopLine="2368"/>
       </Position6>
       <Position7>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="2032" Column="57" TopLine="2007"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="2395" Column="27" TopLine="2374"/>
       </Position7>
       <Position8>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/db.pas"/>
-        <Caret Line="1425" Column="6" TopLine="1400"/>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="2180" TopLine="2172"/>
       </Position8>
       <Position9>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="2133" Column="25" TopLine="2126"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="3067" Column="28" TopLine="3052"/>
       </Position9>
       <Position10>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="3069" TopLine="3052"/>
       </Position10>
       <Position11>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="38" Column="7" TopLine="12"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="1012" TopLine="997"/>
       </Position11>
       <Position12>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="73" Column="7" TopLine="47"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="592" Column="15" TopLine="576"/>
       </Position12>
       <Position13>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="1001" Column="3" TopLine="1058"/>
+        <Caret Line="937" Column="38" TopLine="926"/>
       </Position13>
       <Position14>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="273" Column="35" TopLine="258"/>
+        <Caret Line="155" Column="14" TopLine="155"/>
       </Position14>
       <Position15>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="604" Column="33" TopLine="573"/>
+        <Caret Line="3165" Column="32" TopLine="3154"/>
       </Position15>
       <Position16>
-        <Filename Value="Test18.pas"/>
-        <Caret Line="93" Column="5" TopLine="85"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="3160" TopLine="3154"/>
       </Position16>
       <Position17>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="273" Column="16" TopLine="258"/>
+        <Caret Line="3159" Column="9" TopLine="3154"/>
       </Position17>
       <Position18>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="536" Column="29" TopLine="530"/>
+        <Caret Line="3062" Column="79" TopLine="3046"/>
       </Position18>
       <Position19>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="273" Column="16" TopLine="258"/>
+        <Caret Line="3160" TopLine="3144"/>
       </Position19>
       <Position20>
-        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2950" Column="3" TopLine="2945"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="3164" TopLine="3144"/>
       </Position20>
       <Position21>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="273" Column="16" TopLine="258"/>
+        <Caret Line="3167" TopLine="3144"/>
       </Position21>
       <Position22>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="271" Column="16" TopLine="265"/>
+        <Caret Line="3168" TopLine="3144"/>
       </Position22>
       <Position23>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="601" Column="19" TopLine="586"/>
+        <Caret Line="3170" TopLine="3144"/>
       </Position23>
       <Position24>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="1088" Column="65" TopLine="1062"/>
+        <Caret Line="938" TopLine="922"/>
       </Position24>
       <Position25>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <Caret Line="155" Column="20" TopLine="135"/>
+        <Caret Line="939" TopLine="922"/>
       </Position25>
       <Position26>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="159" Column="22" TopLine="155"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="942" TopLine="922"/>
       </Position26>
       <Position27>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="3058" Column="40" TopLine="3053"/>
       </Position27>
       <Position28>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="69" Column="35" TopLine="43"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="592" Column="15" TopLine="576"/>
       </Position28>
       <Position29>
-        <Filename Value="/usr/lib/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
-        <Caret Line="768" Column="45" TopLine="742"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="928" Column="3" TopLine="926"/>
       </Position29>
       <Position30>
-        <Filename Value="Test18.pas"/>
-        <Caret Line="106" TopLine="85"/>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="155" Column="14" TopLine="140"/>
       </Position30>
     </JumpHistory>
     <RunParams>
@@ -1721,7 +1732,7 @@
       <Modes Count="1" ActiveMode="default">
         <Mode0 Name="default">
           <local>
-            <CommandLineParams Value="-t 18"/>
+            <CommandLineParams Value="-t 4"/>
           </local>
           <environment>
             <UserOverrides Count="2">
