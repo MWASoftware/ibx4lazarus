@@ -456,11 +456,11 @@ begin
     inherited DoEditorShow;
 end;
 
-{$IF LCL_FULLVERSION < 2030000}
+{$IF (LCL_FULLVERSION < 2030000)}
 procedure TDBDynamicGrid.DrawCellText(aCol, aRow: Integer; aRect: TRect;
   aState: TGridDrawState; aText: String);
 {$ELSE}
-procedure TDBDynamicGrid.DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; const aText: String); override;
+procedure TDBDynamicGrid.DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; const aText: String);
 {$IFEND}
 var Style: TTextStyle;
     OldStyle: TTextStyle;

@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, Grids,
-  Db, DBCtrls, IBCustomDataSet, IB;
+  Db, DBCtrls, IBCustomDataSet, IB, LCLVersion;
 
 type
 
@@ -149,7 +149,11 @@ type
     { Protected declarations }
     procedure DefineProperties(Filer: TFiler); override;
     procedure DefineCellsProperty(Filer: TFiler); override;
+    {$IF (LCL_FULLVERSION < 2030000)}
     procedure DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; aText: String); override;
+    {$ELSE}
+    procedure DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; const aText: String); override;
+    {$IFEND}
     procedure EditorHide; override;
     function  EditorIsReadOnly: boolean; override;
     procedure Loaded; override;
@@ -586,8 +590,12 @@ begin
   //Do Nothing
 end;
 
+{$IF (LCL_FULLVERSION < 2030000)}
 procedure TIBArrayGrid.DrawCellText(aCol, aRow: Integer; aRect: TRect;
   aState: TGridDrawState; aText: String);
+{$ELSE}
+procedure TIBArrayGrid.DrawCellText(aCol,aRow: Integer; aRect: TRect; aState: TGridDrawState; const aText: String);
+{$IFEND}
 var Style: TTextStyle;
     oldAlignment: TAlignment;
 begin
