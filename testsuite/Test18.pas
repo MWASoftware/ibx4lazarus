@@ -217,9 +217,11 @@ begin
     try
       ApplyUpdates;
     except on E: Exception do
-      writeln(OutFile,'Exception caught: ',E.Message);
+      begin
+        writeln(OutFile,'Exception caught: ',E.Message);
+        CancelUpdates;
+      end;
     end;
-    CancelUpdates;
   end;
 end;
 
