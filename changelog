@@ -4,6 +4,8 @@ IBX Change Log  version (2.5-1 Build nnn) Tue, 6 Dec 2022 23:13:00 +0000
 
 2. TIBDynamicGrid: change DrawCellText declaration to comply with laz 2.3.0
 
+3. TIBArrayGrid: change DrawCellText declaration to comply with laz 2.3.0
+
 IBX Change Log  version (2.5-0 Build 13868) Fri, 29 Jul 2022 09:52:01 +0100
 
 1. TIBTransaction: new properties
