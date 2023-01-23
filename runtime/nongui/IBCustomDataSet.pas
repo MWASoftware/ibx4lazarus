@@ -1821,24 +1821,19 @@ end;
 
 procedure TIBCustomDataSet.ApplyUpdates;
 var
-  CurBookmark: TBookmark;
   CurUpdateTypes: TIBUpdateRecordTypes;
-
-
 begin
   if State in [dsEdit, dsInsert] then
     Post;
   FBase.CheckDatabase;
   FBase.CheckTransaction;
   DisableControls;
-  CurBookmark := Bookmark;
   CurUpdateTypes := FUpdateRecordTypes;
   FUpdateRecordTypes := [cusModified, cusInserted, cusDeleted];
   try
     FCursor.ApplyUpdates(ApplyUpdatesIterator);
   finally
     FUpdateRecordTypes := CurUpdateTypes;
-    Bookmark := CurBookmark;
     EnableControls;
   end;
 end;

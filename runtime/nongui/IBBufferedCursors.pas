@@ -871,11 +871,16 @@ begin
 
   if not FCachedUpdatesEnabled or not UpdatesPending then  Exit;
 
-  FApplyUpdates := iterator;
-  FSavedRecNo := 0;
-  FOldBufferCache.ForwardIterator(ApplyUpdatesIterator);
-  if FOldBufferCache.ModifiedRecords = 0 then
-     FOldBufferCache.Clear;
+  FCachedUpdatesEnabled := false;
+  try
+    FApplyUpdates := iterator;
+    FSavedRecNo := 0;
+    FOldBufferCache.ForwardIterator(ApplyUpdatesIterator);
+    if FOldBufferCache.ModifiedRecords = 0 then
+       FOldBufferCache.Clear;
+  finally
+    FCachedUpdatesEnabled := true;
+  end;
 end;
 
 procedure TIBEditableCursor.CancelUpdates;
@@ -885,9 +890,14 @@ begin
 
   if not FCachedUpdatesEnabled or not UpdatesPending then  Exit;
 
-  FSavedRecNo := 0;
-  DoCancelUpdates;
-  FOldBufferCache.Clear;
+  FCachedUpdatesEnabled := false;
+  try
+    FSavedRecNo := 0;
+    DoCancelUpdates;
+    FOldBufferCache.Clear;
+  finally
+    FCachedUpdatesEnabled := true;
+  end;
 end;
 
 function TIBEditableCursor.UpdatesPending: boolean;
@@ -1166,7 +1176,7 @@ begin
       FetchCurrentRecord(FCurrentRecord);
     end;
   end;
-  Result :=  FBufferPool.GetRecNo(FCurrentRecord) = RecNo;
+  Result :=  (FBufferPool.GetRecNo(FCurrentRecord) = RecNo);
 end;
 
 function TIBBiDirectionalCursor.GetRecordCount: TIBRecordNumber;
@@ -2438,6 +2448,7 @@ begin
              DataLength := strlen(PAnsiChar(Data));
              if DataLength > fdDataSize then
                DataLength := fdDataSize;
+             SetString(st, PAnsiChar(Data), DataLength);
              SetCodePage(st,fdCodePage,false);
              Param.AsString := st;
            end;

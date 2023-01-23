@@ -219,9 +219,9 @@ begin
     except on E: Exception do
       begin
         writeln(OutFile,'Exception caught: ',E.Message);
-        CancelUpdates;
       end;
     end;
+    CancelUpdates;
   end;
 end;
 
