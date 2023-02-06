@@ -253,10 +253,9 @@ type
   { TIBDSBlobStream }
 
   TIBDSBlobStream = class(TStream)
-  private type
-    THackedDataset = class(TDataset); {used to call DataEvent}
   private
     FHasWritten: boolean;
+    procedure FieldChanged;
   protected
     FField: TField;
     FBlobStream: TIBBlobStream;
@@ -377,8 +376,6 @@ type
         fdObjOffset: Integer; {used for Blob and Array columns}
         fdAliasName: AnsiString;
       end;
-
-      THackedField = class(TField); {Used to access to protected method TField.DataChange}
 
       PDisplayBuffer = ^TDisplaybuffer;
       TDisplayBuffer = record
@@ -635,6 +632,9 @@ type
 implementation
 
 uses IBMessages, IBCustomDataSet, IBInternals;
+
+type
+  THackedField = class(TField); {Used to access to protected method TField.DataChange}
 
 { TIBEditableCursor }
 
@@ -1989,8 +1989,6 @@ begin
           InternalSetIsNull(Buff,i, pdb^.Size = 0);
           SetRefreshRequired(Buff,i,true);
         end
-        else
-           InternalSetIsNull(Buff,i, true);
       end;
 
     SQL_ARRAY:
@@ -2002,8 +2000,6 @@ begin
           InternalSetIsNull(Buff,i, pda^.ArrayIntf.IsEmpty);
           SetRefreshRequired(Buff,i,true);
         end
-        else
-          InternalSetIsNull(Buff,i, true);
       end;
     end;
   end;
@@ -3374,6 +3370,12 @@ end;
 
 { TIBDSBlobStream }
 
+procedure TIBDSBlobStream.FieldChanged;
+begin
+  TBlobField(FField).Modified := true;
+  THackedField(FField).DataChanged;
+end;
+
 function TIBDSBlobStream.GetSize: Int64;
 begin
   Result := FBlobStream.BlobSize;
@@ -3388,8 +3390,7 @@ begin
   if (Mode = bmWrite) then
   begin
     FBlobStream.Truncate;
-    THackedDataset(FField.DataSet).DataEvent(deFieldChange,PtrInt(FField));
-    TBlobField(FField).Modified := true;
+    FieldChanged;
     FHasWritten := true;
   end;
 end;
@@ -3397,7 +3398,7 @@ end;
 destructor TIBDSBlobStream.Destroy;
 begin
   if FHasWritten then
-     THackedDataset(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
+    FieldChanged;
   inherited Destroy;
 end;
 
@@ -3420,8 +3421,7 @@ function TIBDSBlobStream.Write(const Buffer; Count: Longint): Longint;
 begin
   if not (FField.DataSet.State in [dsEdit, dsInsert]) then
     IBError(ibxeNotEditing, [nil]);
-  THackedDataset(FField.DataSet).DataEvent(deFieldChange, PtrInt(FField));
-  TBlobField(FField).Modified := true;
+  FieldChanged;
   result := FBlobStream.Write(Buffer, Count);
   FHasWritten := true;
 end;

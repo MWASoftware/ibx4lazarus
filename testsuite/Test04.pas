@@ -249,6 +249,13 @@ begin
     FDataSet.FieldByName('MYField1').AsString := 'My Field';
     FDataSet.FieldByName('MYFIELD2').AsString := 'MY Field';
     FDataSet.Post;
+    writeln(OutFile,'Clear Blob and Array');
+    FDataSet.Append;
+    FDataSet.Post;
+    FDataSet.Edit;
+    FDataSet.FieldByName('F14').Clear;
+    FDataSet.FieldByName('MYARRAY').Clear;
+    FDataSet.Post;
     IBTransaction.Commit;
 
     IBTransaction.Active := true;
