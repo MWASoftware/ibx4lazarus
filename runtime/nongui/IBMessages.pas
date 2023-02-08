@@ -223,6 +223,8 @@ resourcestring
   SFalse = 'false';
   SArray = '(array)';
   SBlob = '(blob)';
+  SUniCursor = 'unidirectional cursor';
+  SBiDirCursor = 'bidirectional cursor';
 
 implementation
 

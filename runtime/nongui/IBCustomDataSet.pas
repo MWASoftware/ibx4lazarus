@@ -478,6 +478,7 @@ type
     procedure SetUpdateRecordTypes(Value: TIBUpdateRecordTypes);
     procedure SetUniDirectional(Value: Boolean);
     procedure RefreshParams;
+    procedure HandleOnMonitorEvent(Sender: TObject; eventType: TIBMonitorEventType; stmt: IStatement);
 
   protected
     function GetMasterDetailDelay: integer; virtual;
@@ -892,7 +893,7 @@ const
 
 implementation
 
-uses Variants, FmtBCD, LazUTF8, IBMessages, IBQuery, DateUtils, dbconst;
+uses Variants, FmtBCD, LazUTF8, IBMessages, IBQuery, DateUtils, dbconst, IBSQLMonitor;
 
 type
 
@@ -2516,6 +2517,16 @@ begin
   end;
 end;
 
+procedure TIBCustomDataSet.HandleOnMonitorEvent(Sender: TObject;
+  eventType: TIBMonitorEventType; stmt: IStatement);
+begin
+  if not (csDesigning in ComponentState) then
+    case eventType of
+      mtFetch: MonitorHook.SQLFetch(FQSelect);
+      mtExecute:;
+    end;
+end;
+
 procedure TIBCustomDataSet.RegisterIBLink(Sender: TIBControlLink);
 begin
   if FIBLinks.IndexOf(Sender) = -1 then
@@ -3454,15 +3465,15 @@ begin
       FQSelect.ExecQuery;
       FOpen := FQSelect.Open;
       if UniDirectional then
-        FCursor := TIBUniDirectionalCursor.create(Name + ': unidirectional cursor',
+        FCursor := TIBUniDirectionalCursor.create(Name + ': ' + SUniCursor,
                                                        FQSelect.CurrentCursor,Fields,
                                                        FComputedFieldNames, CalcFieldsSize,
-                                                       FDefaultTZDate,CachedUpdates)
+                                                       FDefaultTZDate,HandleOnMonitorEvent, CachedUpdates)
       else
-        FCursor := TIBBiDirectionalCursor.create(Name + ': bidirectional cursor',
+        FCursor := TIBBiDirectionalCursor.create(Name + ': ' + SBiDirCursor,
                                                        FQSelect.CurrentCursor,Fields,
                                                        FComputedFieldNames, CalcFieldsSize,
-                                                       FDefaultTZDate, CachedUpdates,
+                                                       FDefaultTZDate, HandleOnMonitorEvent, CachedUpdates,
                                                        FBufferChunks,
                                                        FBufferChunks);
 

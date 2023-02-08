@@ -327,8 +327,11 @@ type
       procedure SetCursor(aCursor: IResultSet);
     end;
 
+    TIBMonitorEventType = (mtFetch, mtExecute);
+    TIBMonitorEvent = procedure(Sender: TObject; eventType: TIBMonitorEventType; stmt: IStatement) of object;
+
     {
-    TIBCursorBase provides common functions for uni-directional, bi-directional
+    TIBSelectCursor provides common functions for uni-directional, bi-directional
     and bi-directional with cached updates cursors.
 
     The IB Cursor classes support a common interface that is used to satisfy the
@@ -342,7 +345,7 @@ type
     include space for the calculated fields.
   }
 
-  TIBCursorBase = class(TInterfacedObject)
+  TIBSelectCursor = class(TInterfacedObject)
   private type
     type
       {Wrapper class to support array cache and event handling}
@@ -412,6 +415,7 @@ type
     FCursor: IResultSet;                   {The Cursor}
     FDefaultTZDate: TDateTime;             {Default Time Zone time}
     FName: string;                         {Local cursor name - set by creator}
+    FOnMonitorEvent: TIBMonitorEvent;      {Used to report row fetch e.g. for monitor hook}
 
     procedure SetupBufferStructure(metadata: IMetadata; aFields: TFields;
       ComputedFieldNames: TStrings);
@@ -446,13 +450,14 @@ type
     procedure InternalSetUpdateStatus(aBuffer: PByte; status: TUpdateStatus); inline;
     procedure SetUpdateStatus(aBufID: TRecordBuffer; status: TUpdateStatus);
     procedure Reset; virtual;
+    function FetchNext: boolean;
   protected
     property Buffers[index: TRecordBuffer]:PByte read GetBuffer;
     property Cursor: IResultSet read FCursor;
     property ColumnMetaData: TColumnMetadataArray read FColumnMetaData;
   public
     constructor Create(aName: string; aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
-        aCalcFieldsSize: integer; aDefaultTZDate: TDateTime);
+        aCalcFieldsSize: integer; aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent);
     destructor Destroy; override;
 
     {TDataset Interface}
@@ -500,7 +505,7 @@ type
     a row edit and to restore it later. This may either be a single save buffer
     or, if cached updates are enabled, a save buffer allocated from the old buffer pool.}
 
-  TIBEditableCursor = class(TIBCursorBase)
+  TIBEditableCursor = class(TIBSelectCursor)
   private
     const OldBuffersPerBlock = 1024;
     type
@@ -532,7 +537,7 @@ type
     procedure Reset; override;
   public
     constructor Create(aName: string; aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
-      aCalcFieldsSize: integer; aDefaultTZDate: TDateTime; CachedUpdates: boolean);
+      aCalcFieldsSize: integer; aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent; CachedUpdates: boolean);
     destructor Destroy; override;
     procedure EditingDone(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); virtual;
     procedure EditBuffer(aBufID: TRecordBuffer);
@@ -612,7 +617,7 @@ type
   public
     constructor Create(aName: string; aCursor: IResultSet; aFields: TFields;
       ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
-      aDefaultTZDate: TDateTime; CachedUpdates: boolean;
+      aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent; CachedUpdates: boolean;
       aBuffersPerBlock, aFirstBlockBuffers: integer);
     destructor Destroy; override;
     function GetRecord(aBufID: TRecordBuffer; GetMode: TGetMode;
@@ -727,10 +732,10 @@ end;
 
 constructor TIBEditableCursor.Create(aName: string; aCursor: IResultSet;
   aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
-  aDefaultTZDate: TDateTime; CachedUpdates: boolean);
+  aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent; CachedUpdates: boolean);
 begin
   FCachedUpdatesEnabled := CachedUpdates;
-  inherited Create(aName, aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
+  inherited Create(aName, aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate, OnMonitorEvent);
   if FCachedUpdatesEnabled then
     InitCachedUpdates
   else
@@ -1004,10 +1009,10 @@ end;
 
 constructor TIBBiDirectionalCursor.Create(aName: string; aCursor: IResultSet;
   aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
-  aDefaultTZDate: TDateTime; CachedUpdates: boolean; aBuffersPerBlock,
-  aFirstBlockBuffers: integer);
+  aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent; CachedUpdates: boolean;
+  aBuffersPerBlock, aFirstBlockBuffers: integer);
 begin
-  inherited Create(aName,aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate,CachedUpdates);
+  inherited Create(aName,aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate,OnMonitorEvent,CachedUpdates);
   FBufferPool := TIBBufferPool.Create(aName+ ': BiDirectional record cache',
                       RecordBufferSize,aBuffersPerBlock, aFirstBlockBuffers);
 end;
@@ -1024,7 +1029,7 @@ function TIBBiDirectionalCursor.GetRecord(aBufID: TRecordBuffer;
 
   function ReadNext: TGetResult;
   begin
-    if not Cursor.IsEof and Cursor.FetchNext then
+    if not Cursor.IsEof and FetchNext then
     begin
       FCurrentRecord :=  NewBuffer;
       FetchCurrentRecord(FCurrentRecord);
@@ -1154,7 +1159,7 @@ begin
   begin
     FCurrentRecordStatus := csRowBuffer;
     if not Cursor.IsEof then
-    while Cursor.FetchNext do
+    while FetchNext do
     begin
       FCurrentRecord := NewBuffer;
       FetchCurrentRecord(FCurrentRecord);
@@ -1170,7 +1175,7 @@ begin
   begin
     FCurrentRecord := FBufferPool.GetLast;
     if not Cursor.IsEOF then
-    while (FBufferPool.GetRecNo(FCurrentRecord) < RecNo) and Cursor.FetchNext do
+    while (FBufferPool.GetRecNo(FCurrentRecord) < RecNo) and FetchNext do
     begin
       FCurrentRecord := NewBuffer;
       FetchCurrentRecord(FCurrentRecord);
@@ -1331,7 +1336,7 @@ begin
           Result := grEOF;
         csBOF, csRowBuffer:
           begin
-            if Cursor.IsEOF or not Cursor.FetchNext then
+            if Cursor.IsEOF or not FetchNext then
               Result := grEOF
             else
             begin
@@ -1385,7 +1390,7 @@ end;
 procedure TIBUniDirectionalCursor.GotoLast;
 begin
   if not Cursor.IsEOF then
-    while Cursor.FetchNext do
+    while FetchNext do
       Inc(FRecordCount);
   FCurrentRecord := nil;
   FCurrentRecordStatus := csRowBuffer;
@@ -1395,7 +1400,7 @@ function TIBUniDirectionalCursor.GotoRecordNumber(RecNo: TIBRecordNumber
   ): boolean;
 begin
   if not Cursor.IsEOF then
-    while (FRecordCount < RecNo) and Cursor.FetchNext do
+    while (FRecordCount < RecNo) and FetchNext do
       Inc(FRecordCount);
   Result := FRecordCount = RecNo;
 end;
@@ -1484,7 +1489,7 @@ begin
     FCurrentRecordStatus := csRowBuffer;
     if not FInserting then
     begin
-      if Cursor.IsEOF or not Cursor.FetchNext then
+      if Cursor.IsEOF or not FetchNext then
         FCurrentRecordStatus := csEOF
     end
   end;
@@ -1531,9 +1536,9 @@ begin
 end;
 
 
-{ TIBCursorBase.TIBArray }
+{ TIBSelectCursor.TIBArray }
 
-procedure TIBCursorBase.TIBArray.EventHandler(Sender: IArray;
+procedure TIBSelectCursor.TIBArray.EventHandler(Sender: IArray;
   Reason: TArrayEventReason);
 begin
   case Reason of
@@ -1546,7 +1551,7 @@ begin
   end;
 end;
 
-constructor TIBCursorBase.TIBArray.Create(aField: TField; anArray: IArray);
+constructor TIBSelectCursor.TIBArray.Create(aField: TField; anArray: IArray);
 begin
   inherited Create;
   FField := aField;
@@ -1555,13 +1560,13 @@ begin
   FArray.AddEventHandler(EventHandler);
 end;
 
-destructor TIBCursorBase.TIBArray.Destroy;
+destructor TIBSelectCursor.TIBArray.Destroy;
 begin
   FArray.RemoveEventHandler(EventHandler);
   inherited Destroy;
 end;
 
-{ TIBCursorBase }
+{ TIBSelectCursor }
 
 {
   A record buffer is structured into
@@ -1586,7 +1591,7 @@ end;
   result in and FColumnMetadata that is not linked to a TField.
 }
 
-procedure TIBCursorBase.SetupBufferStructure(metadata: IMetadata;
+procedure TIBSelectCursor.SetupBufferStructure(metadata: IMetadata;
   aFields: TFields; ComputedFieldNames: TStrings);
 var i: integer;
     colMetadata: IColumnMetaData;
@@ -1748,22 +1753,22 @@ begin
   FRecordBufferSize := RecordSize;
 end;
 
-function TIBCursorBase.GetBuffer(aBufID: TRecordBuffer): PByte;
+function TIBSelectCursor.GetBuffer(aBufID: TRecordBuffer): PByte;
 begin
   Result := PDisplayBuffer(aBufID)^.dbBuffer;
 end;
 
-procedure TIBCursorBase.SetBuffer(aBufID: TRecordBuffer; aBuffer: PByte);
+procedure TIBSelectCursor.SetBuffer(aBufID: TRecordBuffer; aBuffer: PByte);
 begin
   PDisplayBuffer(aBufID)^.dbBuffer := aBuffer;
 end;
 
-function TIBCursorBase.GetCalcFields(aBufID: TRecordBuffer): PByte;
+function TIBSelectCursor.GetCalcFields(aBufID: TRecordBuffer): PByte;
 begin
   Result := PDisplayBuffer(aBufID)^.dbCalcFields;
 end;
 
-function TIBCursorBase.FieldNo2ColumnIndex(aField: TField): integer;
+function TIBSelectCursor.FieldNo2ColumnIndex(aField: TField): integer;
 begin
   if (aField.FieldNo < 1) or (aField.FieldNo > Length(FFieldNo2ColumnMap)) then
     IBError(ibxeBadFieldNo,[aField.FieldNo, Length(FFieldNo2ColumnMap)-1]);
@@ -1771,18 +1776,18 @@ begin
   Result  := FFieldNo2ColumnMap[aField.FieldNo];
 end;
 
-function TIBCursorBase.InternalGetUpdateStatus(aBuffer: PByte): TUpdateStatus;
+function TIBSelectCursor.InternalGetUpdateStatus(aBuffer: PByte): TUpdateStatus;
 begin
   Result := PRecordHeader(aBuffer)^.rhUpdateStatus;
 end;
 
-procedure TIBCursorBase.InternalSetUpdateStatus(aBuffer: PByte;
+procedure TIBSelectCursor.InternalSetUpdateStatus(aBuffer: PByte;
   status: TUpdateStatus);
 begin
   PRecordHeader(aBuffer)^.rhUpdateStatus:= status;
 end;
 
-procedure TIBCursorBase.SetUpdateStatus(aBufID: TRecordBuffer;
+procedure TIBSelectCursor.SetUpdateStatus(aBufID: TRecordBuffer;
   status: TUpdateStatus);
 var Buff: PByte;
 begin
@@ -1793,7 +1798,7 @@ begin
   InternalSetUpdateStatus(Buff,status);
 end;
 
-procedure TIBCursorBase.Reset;
+procedure TIBSelectCursor.Reset;
 begin
   FRecordCount := 0;
   ClearBlobCache;
@@ -1803,7 +1808,14 @@ begin
   FCurrentRecordStatus := csBOF;
 end;
 
-procedure TIBCursorBase.ClearBlobCache;
+function TIBSelectCursor.FetchNext: boolean;
+begin
+  Result := Cursor.FetchNext;
+  if Result and assigned(FOnMonitorEvent) then
+    FOnMonitorEvent(self,mtFetch,Cursor.GetStatement);
+end;
+
+procedure TIBSelectCursor.ClearBlobCache;
 var  i: Integer;
 begin
   for i := 0 to FBlobStreamList.Count - 1 do
@@ -1814,7 +1826,7 @@ begin
   FBlobStreamList.Pack;
 end;
 
-procedure TIBCursorBase.ClearArrayCache;
+procedure TIBSelectCursor.ClearArrayCache;
 var  i: Integer;
 begin
   for i := 0 to FArrayList.Count - 1 do
@@ -1825,7 +1837,7 @@ begin
   FArrayList.Pack;
 end;
 
-procedure TIBCursorBase.ClearRecordCache(aBuffer: PByte);
+procedure TIBSelectCursor.ClearRecordCache(aBuffer: PByte);
 var i: Integer;
 begin
   for i := 0 to FColumnCount - 1 do
@@ -1838,7 +1850,7 @@ begin
     end;
 end;
 
-procedure TIBCursorBase.CopyCursorDataToBuffer(QryResults: IResults; QryIndex,
+procedure TIBSelectCursor.CopyCursorDataToBuffer(QryResults: IResults; QryIndex,
   ColIndex: integer; destBuff: PByte);
 var LocalData: PByte;
     ColData: ISQLData;
@@ -1934,7 +1946,7 @@ begin
   end;
 end;
 
-function TIBCursorBase.InternalGetIsNull(Buff: PByte; ColIndex: integer
+function TIBSelectCursor.InternalGetIsNull(Buff: PByte; ColIndex: integer
   ): boolean;
 var pBitmap: PByte;
     mask: byte;
@@ -1944,7 +1956,7 @@ begin
   Result := (pBitmap^ and mask) = 0; {bit is 0 => null}
 end;
 
-procedure TIBCursorBase.InternalSetIsNull(Buff: PByte; ColIndex: integer;
+procedure TIBSelectCursor.InternalSetIsNull(Buff: PByte; ColIndex: integer;
   IsNull: boolean);
 var pBitmap: PByte;
     mask: byte;
@@ -1957,7 +1969,7 @@ begin
     pBitmap^ := pBitmap^ or mask;     {set bit}
 end;
 
-procedure TIBCursorBase.SetRefreshRequired(Buff: PByte; ColIndex: integer;
+procedure TIBSelectCursor.SetRefreshRequired(Buff: PByte; ColIndex: integer;
   RefreshRequired: boolean);
 var pBitmap: PByte;
     mask: byte;
@@ -1970,7 +1982,7 @@ begin
     pBitmap^ := pBitmap^ and not mask;     {unset bit}
 end;
 
-procedure TIBCursorBase.SaveBlobsAndArrays(Buff: PByte);
+procedure TIBSelectCursor.SaveBlobsAndArrays(Buff: PByte);
 var  pdb: PIBBlobStream;
      pda: PIBArray;
      i: integer;
@@ -2005,12 +2017,12 @@ begin
   end;
 end;
 
-function TIBCursorBase.CalcRecordHdrSize: integer;
+function TIBSelectCursor.CalcRecordHdrSize: integer;
 begin
   Result := sizeof(TRecordHeader);
 end;
 
-function TIBCursorBase.ColIndexByName(aName: AnsiString; caseSensitive: boolean
+function TIBSelectCursor.ColIndexByName(aName: AnsiString; caseSensitive: boolean
   ): integer;
 var i: integer;
 begin
@@ -2036,7 +2048,7 @@ begin
   end;
 end;
 
-procedure TIBCursorBase.FetchCurrentRecord(destBuffer: PByte);
+procedure TIBSelectCursor.FetchCurrentRecord(destBuffer: PByte);
 var  i: Integer;
 begin
    { Make sure blob and array caches are empty }
@@ -2050,7 +2062,7 @@ begin
   InternalSetUpdateStatus(destBuffer,usUnModified);
 end;
 
-procedure TIBCursorBase.FieldChanged(aBuffer: PByte; aField: TField);
+procedure TIBSelectCursor.FieldChanged(aBuffer: PByte; aField: TField);
 var i: integer;
 begin
   THackedField(aField).DataChanged;
@@ -2065,9 +2077,9 @@ begin
     InternalSetUpdateStatus(aBuffer,usModified);
 end;
 
-constructor TIBCursorBase.Create(aName: string; aCursor: IResultSet;
+constructor TIBSelectCursor.Create(aName: string; aCursor: IResultSet;
   aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
-  aDefaultTZDate: TDateTime);
+  aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent);
 begin
   inherited Create;
   FBlobStreamList := TList.Create;
@@ -2079,9 +2091,10 @@ begin
   SetupBufferStructure(cursor.GetStatement.MetaData,aFields,ComputedFieldNames);
   FCurrentRecord := nil;
   FCurrentRecordStatus := csBOF;
+  FOnMonitorEvent := OnMonitorEvent;
 end;
 
-destructor TIBCursorBase.Destroy;
+destructor TIBSelectCursor.Destroy;
 begin
   ClearBlobCache;
   ClearArrayCache;
@@ -2095,7 +2108,7 @@ end;
  The "buffer" is an opaque pointer - actually an integer index to the
  FBuffers array.}
 
-function TIBCursorBase.AllocRecordBuffer: TRecordBuffer;
+function TIBSelectCursor.AllocRecordBuffer: TRecordBuffer;
 begin
   Result := GetMem(sizeof(TDisplayBuffer));;
   if Result = nil then
@@ -2111,7 +2124,7 @@ begin
   end;
 end;
 
-procedure TIBCursorBase.FreeRecordBuffer(var Buffer: TRecordBuffer);
+procedure TIBSelectCursor.FreeRecordBuffer(var Buffer: TRecordBuffer);
 begin
   if Buffer <> nil then
   begin
@@ -2125,7 +2138,7 @@ begin
   Buffer := nil;
 end;
 
-procedure TIBCursorBase.SetCurrentRecord(aBufID: TRecordBuffer);
+procedure TIBSelectCursor.SetCurrentRecord(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
   case PDisplayBuffer(aBufID)^.dbBookmarkFlag of
@@ -2157,7 +2170,7 @@ end;
 {Field.offset is a zero based integer indexing the blob field
  Field.FieldNo is a one based field index accross all of a record's fields}
 
-function TIBCursorBase.CreateBlobStream(aBufID: TRecordBuffer; Field: TField;
+function TIBSelectCursor.CreateBlobStream(aBufID: TRecordBuffer; Field: TField;
   Mode: TBlobStreamMode): TStream;
 var pdb: PIBBlobStream;
     fs: TIBBlobStream;
@@ -2195,7 +2208,7 @@ begin
   Result := TIBDSBlobStream.Create(Field, fs, Mode);
 end;
 
-function TIBCursorBase.GetArray(aBufID: TRecordBuffer; Field: TField
+function TIBSelectCursor.GetArray(aBufID: TRecordBuffer; Field: TField
   ): IArray;
 var Buff: PByte;
     pda: PIBArray;
@@ -2233,7 +2246,7 @@ begin
   end;
 end;
 
-procedure TIBCursorBase.SetArrayIntf(aBufID: TRecordBuffer; AnArray: IArray;
+procedure TIBSelectCursor.SetArrayIntf(aBufID: TRecordBuffer; AnArray: IArray;
   Field: TField);
 var Buff: PByte;
     pda: PIBArray;
@@ -2265,7 +2278,7 @@ begin
   end;
 end;
 
-function TIBCursorBase.GetRecDBkey(aBufID: TRecordBuffer): TIBDBKey;
+function TIBSelectCursor.GetRecDBkey(aBufID: TRecordBuffer): TIBDBKey;
 var Buff: PByte;
 begin
   FillChar(Result,sizeof(TIBDBKey),0);
@@ -2278,7 +2291,7 @@ begin
   end;
 end;
 
-function TIBCursorBase.GetFieldData(aBufID: TRecordBuffer; field: TField;
+function TIBSelectCursor.GetFieldData(aBufID: TRecordBuffer; field: TField;
   outBuffer: PByte): boolean;
 var Buff: PByte;
     ColIndex: integer;
@@ -2330,7 +2343,7 @@ begin
   end;
 end;
 
-procedure TIBCursorBase.SetFieldData(aBufID: TRecordBuffer; field: TField;
+procedure TIBSelectCursor.SetFieldData(aBufID: TRecordBuffer; field: TField;
   inBuffer: PByte);
 var Buff: PByte;
     ColIndex: integer;
@@ -2383,7 +2396,7 @@ begin
   end;
 end;
 
-procedure TIBCursorBase.SetSQLParams(aBufID: TRecordBuffer; params: ISQLParams);
+procedure TIBSelectCursor.SetSQLParams(aBufID: TRecordBuffer; params: ISQLParams);
 const
   sOldPrefix = 'OLD_';
   sNewPrefix = 'NEW';
@@ -2528,7 +2541,7 @@ end;
 {This method is called either using a Row Refresh query or an update/insert query
  with a returning clause}
 
-procedure TIBCursorBase.UpdateRecordFromQuery(aBufID: TRecordBuffer;
+procedure TIBSelectCursor.UpdateRecordFromQuery(aBufID: TRecordBuffer;
   QryResults: IResults);
 var Buff: PByte;
     ColIndex: integer;
@@ -2547,7 +2560,7 @@ begin
   end;
 end;
 
-function TIBCursorBase.NeedRefresh(aBufID : TRecordBuffer) : boolean;
+function TIBSelectCursor.NeedRefresh(aBufID : TRecordBuffer) : boolean;
 var i: integer;
     Buff: PByte;
 begin
@@ -2564,44 +2577,44 @@ begin
     end;
 end;
 
-function TIBCursorBase.GetBookmarkFlag(aBufID: TRecordBuffer): TBookmarkFlag;
+function TIBSelectCursor.GetBookmarkFlag(aBufID: TRecordBuffer): TBookmarkFlag;
 begin
   Result := PDisplayBuffer(aBufID)^.dbBookmarkFlag;;
 end;
 
-procedure TIBCursorBase.SetBookmarkFlag(aBufID: TRecordBuffer;
+procedure TIBSelectCursor.SetBookmarkFlag(aBufID: TRecordBuffer;
   aBookmarkFlag: TBookmarkFlag);
 begin
   PDisplayBuffer(aBufID)^.dbBookmarkFlag := aBookmarkFlag;
 end;
 
-procedure TIBCursorBase.SetBookmarkData(aBufID: TRecordBuffer;
+procedure TIBSelectCursor.SetBookmarkData(aBufID: TRecordBuffer;
   RecNo: TIBRecordNumber);
 begin
   Move(RecNo,PDisplayBuffer(aBufID)^.dbBookmarkData,GetBookmarkSize);
 end;
 
-procedure TIBCursorBase.GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
+procedure TIBSelectCursor.GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
 begin
   Move(PDisplayBuffer(Buffer)^.dbBookmarkData,Data^,GetBookmarkSize);
 end;
 
-procedure TIBCursorBase.SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
+procedure TIBSelectCursor.SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
 begin
   Move(Data^,PDisplayBuffer(Buffer)^.dbBookmarkData, GetBookmarkSize);
 end;
 
-function TIBCursorBase.GetBookmarkSize: integer;
+function TIBSelectCursor.GetBookmarkSize: integer;
 begin
   Result := sizeof(TIBRecordNumber);
 end;
 
-function TIBCursorBase.GetRecordSize: word;
+function TIBSelectCursor.GetRecordSize: word;
 begin
   Result := sizeof(TDisplayBuffer);
 end;
 
-function TIBCursorBase.GetCurrentRecNo: TIBRecordNumber;
+function TIBSelectCursor.GetCurrentRecNo: TIBRecordNumber;
 begin
   case FCurrentRecordStatus of
   csBOF:
@@ -2613,7 +2626,7 @@ begin
   end;
 end;
 
-procedure TIBCursorBase.SwapDataBuffer(buf1, buf2: TRecordBuffer);
+procedure TIBSelectCursor.SwapDataBuffer(buf1, buf2: TRecordBuffer);
 var TmpBuf: PByte;
     TmpBookmarkFlag: TBookmarkFlag;
     TmpBookmarkData1: TBytes;
@@ -2633,7 +2646,7 @@ begin
   SetBookmarkData(buf2,pointer(TmpBookmarkData1));
 end;
 
-function TIBCursorBase.GetAliasName(FieldNo: integer): AnsiString;
+function TIBSelectCursor.GetAliasName(FieldNo: integer): AnsiString;
 begin
   if (FieldNo < 1) or (FieldNo > Length(FFieldNo2ColumnMap)) then
     IBError(ibxeBadFieldNo,[FieldNo, Length(FFieldNo2ColumnMap)-1]);
@@ -2641,7 +2654,7 @@ begin
   Result  := FColumnMetaData[ FFieldNo2ColumnMap[FieldNo] ].fdAliasName;
 end;
 
-procedure TIBCursorBase.InitRecord(aBufID: TRecordBuffer);
+procedure TIBSelectCursor.InitRecord(aBufID: TRecordBuffer);
 begin
   with PDisplayBuffer(aBufID)^ do
   begin
@@ -2653,17 +2666,17 @@ begin
   end;
 end;
 
-function TIBCursorBase.AtBOF: boolean;
+function TIBSelectCursor.AtBOF: boolean;
 begin
   Result := FCurrentRecordStatus = csBOF;
 end;
 
-function TIBCursorBase.AtEOF: boolean;
+function TIBSelectCursor.AtEOF: boolean;
 begin
   Result := (FCurrentRecordStatus = csEOF) and Cursor.IsEof;
 end;
 
-procedure TIBCursorBase.Delete(aBufID: TRecordBuffer);
+procedure TIBSelectCursor.Delete(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
   Buff := GetBuffer(aBufID);
@@ -2673,7 +2686,7 @@ begin
   InternalDelete(aBufID);
 end;
 
-procedure TIBCursorBase.UnDelete(aBufID: TRecordBuffer);
+procedure TIBSelectCursor.UnDelete(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
   Buff := GetBuffer(aBufID);
@@ -2683,7 +2696,7 @@ begin
   InternalUnDelete(Buff);
 end;
 
-function TIBCursorBase.GetUpdateStatus(aBufID: TRecordBuffer): TUpdateStatus;
+function TIBSelectCursor.GetUpdateStatus(aBufID: TRecordBuffer): TUpdateStatus;
 var Buff: PByte;
 begin
   Buff := GetBuffer(aBufID);
@@ -2692,14 +2705,14 @@ begin
   Result := InternalGetUpdateStatus(Buff);
 end;
 
-procedure TIBCursorBase.ClearCalcFields(aBufID: TRecordBuffer);
+procedure TIBSelectCursor.ClearCalcFields(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
   Buff := GetCalcFields(aBufID);
   FillChar(Buff^,FCalcFieldsSize,0);
 end;
 
-procedure TIBCursorBase.SetCursor(aCursor: IResultSet);
+procedure TIBSelectCursor.SetCursor(aCursor: IResultSet);
 begin
   if (FCursor <> nil) and (FCursor.GetStatement <> aCursor.GetStatement) then
     IBError(ibxeDifferentStatement,[]);
