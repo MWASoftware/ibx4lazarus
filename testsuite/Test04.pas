@@ -159,6 +159,7 @@ begin
   with FDataSet do
   begin
     Database := IBDatabase;
+    Transaction := IBTransaction;
     with IBTransaction do
     begin
       AfterEdit := @HandleTransactionEdit;
@@ -261,6 +262,12 @@ begin
     IBTransaction.Active := true;
     FDataSet.Active := true;
     PrintDataSet(FDataSet);
+    FDataset.Last;
+    FDataset.Delete;  {Remove clear Blob row}
+    IBTransaction.Commit;
+    IBTransaction.Active := true;
+    FDataSet.Active := true;
+
     writeln(OutFile,'Delete a record');
     FDataSet.First;
     FDataSet.Delete;

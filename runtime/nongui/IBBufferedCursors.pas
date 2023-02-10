@@ -1153,9 +1153,7 @@ end;
 procedure TIBBiDirectionalCursor.GotoLast;
 begin
   FCurrentRecord := FBufferPool.GetLast;
-  if (FCurrentRecord = nil) and Cursor.IsEOF then
-    FCurrentRecordStatus := csEOF
-  else
+  if (FCurrentRecord <> nil) or not Cursor.IsEOF then
   begin
     FCurrentRecordStatus := csRowBuffer;
     if not Cursor.IsEof then
@@ -1165,6 +1163,8 @@ begin
       FetchCurrentRecord(FCurrentRecord);
     end;
   end;
+  FCurrentRecord := nil;
+  FCurrentRecordStatus := csEOF;
 end;
 
 function TIBBiDirectionalCursor.GotoRecordNumber(RecNo: TIBRecordNumber): boolean;
@@ -2424,6 +2424,7 @@ begin
   begin
      Param := params[i];
      ParamName := Param.Name;
+     srcBuffer := Buff;
 
      {Determine source buffer}
      if pos(sOldPrefix,ParamName) = 1 then
@@ -2434,7 +2435,6 @@ begin
      end
      else
      begin
-       srcBuffer := Buff;
        if pos(sNewPrefix,ParamName) = 1 then
          system.Delete(ParamName,1,length(sNewPrefix));
      end;
