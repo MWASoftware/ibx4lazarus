@@ -168,6 +168,7 @@ begin
   ukDelete:
     ExecDDL.SQL.Text := 'DROP USER ' + UserName;
   end;
+  writeln(OutFile,'Query Text = ',ExecDDL.SQL.Text);
   ExecDDL.ExecQuery;
 
   if UpdateKind = ukInsert then

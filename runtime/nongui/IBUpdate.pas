@@ -249,7 +249,10 @@ end;
 
 function TParamIntf.GetAsBoolean: boolean;
 begin
-  Result := FOwner.FParams[FIndex].Value;
+  if VarIsNull(FOwner.FParams[FIndex].Value) then
+    Result := false
+  else
+    Result := FOwner.FParams[FIndex].Value;
 end;
 
 function TParamIntf.GetAsCurrency: Currency;
