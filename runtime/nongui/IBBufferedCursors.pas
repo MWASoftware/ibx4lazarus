@@ -519,6 +519,7 @@ type
     FOldBufferCache: TIBOldBufferPool;
     FCachedUpdatesEnabled: boolean;
     FLocalHdrOffset: integer;
+    FEditState: (esBrowse, esEdit, esInsert);
     procedure ApplyUpdatesIterator(status: TCachedUpdateStatus; DataBuffer, OldBuffer: PByte);
   protected
     FSavedRecNo: TIBRecordNumber; {record number of saved buffer if any}
@@ -710,6 +711,7 @@ begin
     OldBuffer := FOldBufferCache.Append(InternalGetRecNo(aBuffer),aBuffer);
     FOldBufferCache.SetStatus(OldBuffer,cusInserted);
   end;
+  FEditState := esInsert;
 end;
 
 function TIBEditableCursor.GetOldBufferFor(aBuffer: PByte): PByte;
@@ -743,7 +745,8 @@ begin
     FSaveBuffer := GetMem(FSaveBufferSize);
     if FSaveBuffer = nil then
        OutOfMemoryError;
-  end ;
+  end;
+  FEditState := esBrowse;
 end;
 
 destructor TIBEditableCursor.Destroy;
@@ -760,6 +763,7 @@ procedure TIBEditableCursor.EditingDone(aBufID: TRecordBuffer;
 begin
   if FSavedRecNo <> 0 then
     ReleaseSaveBuffer(aBufID, UpdateStatus);
+  FEditState := esBrowse;
 end;
 
 procedure TIBEditableCursor.EditBuffer(aBufID: TRecordBuffer);
@@ -781,6 +785,7 @@ begin
   InternalSetOldBuffer(Buff,OldBuffer);
   CopyBuffers(Buff,OldBuffer);
   FSavedRecNo := InternalGetRecNo(Buff);
+  FEditState := esEdit;
 end;
 
 procedure TIBEditableCursor.CancelChanges(aBufID: TRecordBuffer);
@@ -791,16 +796,25 @@ begin
   if Buff = nil then
     IBError(ibxeBufferNotSet, [nil]);
 
-  if InternalGetRecNo(Buff) <> FSavedRecNo then
-    IBError(ibxeUnableToRestore,[InternalGetRecNo(Buff),FSavedRecNo]);
+  case FEditState of
+  esInsert:
+    InternalDelete(aBufID);
 
-  CancelBlobAndArrayChanges(Buff);
-  OldBuffer := GetOldBufferFor(Buff);
-  CopyBuffers(OldBuffer,Buff);
-  if FCachedUpdatesEnabled then
-    FOldBufferCache.SetStatus(OldBuffer,cusUnModified);
-  InternalSetOldBuffer(Buff,nil);
-  FSavedRecNo := 0;
+  esEdit:
+    begin
+      if InternalGetRecNo(Buff) <> FSavedRecNo then
+        IBError(ibxeUnableToRestore,[InternalGetRecNo(Buff),FSavedRecNo]);
+
+      CancelBlobAndArrayChanges(Buff);
+      OldBuffer := GetOldBufferFor(Buff);
+      CopyBuffers(OldBuffer,Buff);
+      if FCachedUpdatesEnabled then
+        FOldBufferCache.SetStatus(OldBuffer,cusUnModified);
+      InternalSetOldBuffer(Buff,nil);
+      FSavedRecNo := 0;
+    end;
+  end;
+  FEditState := esBrowse;
 end;
 
 procedure TIBEditableCursor.ReleaseSaveBuffer(aBufID: TRecordBuffer;
@@ -1811,7 +1825,7 @@ end;
 function TIBSelectCursor.FetchNext: boolean;
 begin
   Result := Cursor.FetchNext;
-  if Result and assigned(FOnMonitorEvent) then
+  if assigned(FOnMonitorEvent) then
     FOnMonitorEvent(self,mtFetch,Cursor.GetStatement);
 end;
 
@@ -2141,7 +2155,7 @@ end;
 procedure TIBSelectCursor.SetCurrentRecord(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
-  case PDisplayBuffer(aBufID)^.dbBookmarkFlag of
+{  case PDisplayBuffer(aBufID)^.dbBookmarkFlag of
     bfBOF:
       begin
         FCurrentRecord := nil;
@@ -2153,18 +2167,14 @@ begin
         FCurrentRecordStatus := csEOF;
       end;
     else
-    begin
+    begin    }
       Buff := GetBuffer(aBufID);
       if Buff = nil then
         IBError(ibxeBufferNotSet, [nil]);
-   {     FCurrentRecordStatus := CSbof
-      else
-      begin  }
         FCurrentRecord := Buff;
         FCurrentRecordStatus := csRowBuffer;
- //     end ;
-    end;
-  end;
+//    end;
+ // end;
 end;
 
 {Field.offset is a zero based integer indexing the blob field

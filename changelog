@@ -1,3 +1,7 @@
+IBX Change Log  version (2.6-0 Build nnn) Tue, 6 Dec 2022 23:13:00 +0000
+
+1.
+
 IBX Change Log  version (2.5-1 Build nnn) Tue, 6 Dec 2022 23:13:00 +0000
 
 1. IBCustomDataset: avoid problem with additions to TFieldType by using a subset instead.

@@ -2910,6 +2910,7 @@ end;
 
 procedure TIBCustomDataSet.InternalCancel;
 begin
+  inherited InternalCancel;
   FCursor.CancelChanges(ActiveBuffer);
 end;
 

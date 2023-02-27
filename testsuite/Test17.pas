@@ -377,7 +377,7 @@ begin
     IBTransaction.Rollback;
     IBTransaction.Active := true;
     with FIBDataSet2 do
-    begin
+    try
       Active := true;
       writeln(OutFile,'FIBDataSet2: Simple Append');
       Append;
@@ -420,7 +420,8 @@ begin
       FieldByName('PlainText').AsString := 'This is a test';
       Post;
       PrintDataSetRow(FIBDataSet2);
-
+    except on E: Exception do
+     writeln(Outfile,E.Message);
     end;
   finally
     IBDatabase.DropDatabase;
