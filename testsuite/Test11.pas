@@ -118,8 +118,10 @@ begin
     FExecProc.ExecProc;
     writeln(OutFile,'Event Called');
     IBTransaction.Commit;
-    CheckSynchronize(5);
+    CheckSynchronize(100);
+    FEvents.UnRegisterEvents;
   finally
+    CheckSynchronize(100);
     IBDatabase.DropDatabase;
   end;
   writeln(OutFile,'Case #2: Event Registration after DB Open');
@@ -134,10 +136,11 @@ begin
     FExecProc.ExecProc;
     writeln(OutFile,'Event Called');
     IBTransaction.Commit;
-    CheckSynchronize(5);
-    Sleep(1000);
+    CheckSynchronize(100);
+//    Sleep(1000);
     FEvents.UnRegisterEvents;
   finally
+    CheckSynchronize(100);
     IBDatabase.DropDatabase;
   end;
 end;

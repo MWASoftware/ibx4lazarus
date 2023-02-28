@@ -642,7 +642,7 @@ Rows printed = 42
 Current memory = 950,616
 Delta memory = 9,544
 Max memory = 1,001,928
-Elapsed time= 0.034 sec
+Elapsed time= 0.033 sec
 Cpu = 0.002 sec
 Buffers = 75
 Reads = 3
@@ -1443,7 +1443,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-localhost:employee Disconnected after 1 ms
+localhost:employee Disconnected after 4 ms
 Before Connect
 Connected to localhost:employee
 DPB: Item Count = 3
@@ -1452,7 +1452,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-localhost:employee Disconnected after 1993 ms
+localhost:employee Disconnected after 1994 ms
 Idle Timer Expired for Test_Database_02
 Database Closed
 Transaction Events
@@ -1489,10 +1489,10 @@ TPB: Item Count = 3
   isc_tpb_read
 
 Transaction Ending
-Transaction Ended after 2002 ms
+Transaction Ended after 2000 ms
 Idle Timer Expired for Test_Transaction_02
 Before Disconnect
-localhost:employee Disconnected after 2008 ms
+localhost:employee Disconnected after 2007 ms
 SQL Dialect Downgrade test
 Before Connect
 Connected to localhost:/tmp/ibx-testsuite/testsuite1.fdb
@@ -1504,7 +1504,7 @@ DPB: Item Count = 4
 
 localhost:/tmp/ibx-testsuite/testsuite1.fdb created
 Before Disconnect
-localhost:/tmp/ibx-testsuite/testsuite1.fdb Disconnected after 1 ms
+localhost:/tmp/ibx-testsuite/testsuite1.fdb Disconnected after 2 ms
 Before Connect
 Warning: SQL Dialect Downgrade of localhost:/tmp/ibx-testsuite/testsuite1.fdb
 Connected to localhost:/tmp/ibx-testsuite/testsuite1.fdb
@@ -1514,7 +1514,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-localhost:/tmp/ibx-testsuite/testsuite1.fdb Disconnected after 2 ms
+localhost:/tmp/ibx-testsuite/testsuite1.fdb Disconnected after 3 ms
 
 
 ------------------------------------------------------
@@ -1633,22 +1633,31 @@ Add a record
 Transaction Exec Query "Select Gen_ID(IBXGEN,1) From RDB$Database
 "
 Transaction Insert
-Transaction Exec Query "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,:F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS)
-"
-Transaction Exec Query "Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6, A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.GRANTS, A."My Field" as MYFIELD1, A."MY Field"  as MYFIELD2 From IBXTEST A Where A.TABLEKEY = :TABLEKEY
+Transaction Exec Query "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,:F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS) Returning MyArray, F10, F14, F15
 "
 Transaction Post
 Add and edit a record
 Transaction Exec Query "Select Gen_ID(IBXGEN,1) From RDB$Database
 "
 Transaction Insert
-Transaction Exec Query "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,:F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS)
-"
-Transaction Exec Query "Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6, A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.GRANTS, A."My Field" as MYFIELD1, A."MY Field"  as MYFIELD2 From IBXTEST A Where A.TABLEKEY = :TABLEKEY
+Transaction Exec Query "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,:F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS) Returning MyArray, F10, F14, F15
 "
 Transaction Post
 Transaction Edit
 Transaction Exec Query "Update IBXTEST A Set   A.F1 = :F1,  A.F2 = :F2,  A.F3 = :F3,  A.F4 = :F4,  A.F5 = :F5,  A.F6 = :F6,  A.F7 = :F7,  A.F8 = :F8,  A.F9 = :F9,  A.F10 = :F10,  A.F11 = :F11,  A."f12" = :F12,  A.F13 = :F13,  A.F14 = :F14,  A.MyArray = :MyArray,   A."My Field"  = :MYFIELD1,  A."MY Field" = :MYFIELD2,  A.GRANTS = :GRANTS Where A.TABLEKEY = :OLD_TABLEKEY
+"
+Transaction Post
+Clear Blob and Array
+Transaction Exec Query "Select Gen_ID(IBXGEN,1) From RDB$Database
+"
+Transaction Insert
+Transaction Exec Query "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,:F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS) Returning MyArray, F10, F14, F15
+"
+Transaction Post
+Transaction Edit
+Transaction Exec Query "Update IBXTEST A Set   A.F1 = :F1,  A.F2 = :F2,  A.F3 = :F3,  A.F4 = :F4,  A.F5 = :F5,  A.F6 = :F6,  A.F7 = :F7,  A.F8 = :F8,  A.F9 = :F9,  A.F10 = :F10,  A.F11 = :F11,  A."f12" = :F12,  A.F13 = :F13,  A.F14 = :F14,  A.MyArray = :MyArray,   A."My Field"  = :MYFIELD1,  A."MY Field" = :MYFIELD2,  A.GRANTS = :GRANTS Where A.TABLEKEY = :OLD_TABLEKEY
+"
+Transaction Exec Query "Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6, A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.GRANTS, A."My Field" as MYFIELD1, A."MY Field"  as MYFIELD2 From IBXTEST A Where A.TABLEKEY = :TABLEKEY
 "
 Transaction Post
 Transaction Exec Query "Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6, A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.GRANTS, A."My Field" as MYFIELD1, A."MY Field" as MYFIELD2 From IBXTEST A
@@ -1767,8 +1776,34 @@ GRANTS = NULL
 MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
 MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
 
-Rows printed = 2
+Row No = 3
+TABLEKEY = 3
+F1 = 2
+F2 = 0.314000010490
+F3 = 0.314123456780
+F4 = 101.314
+F5 = 101.99
+F6 = 25/12/2007
+F7 = 25/12/2007 12:30:29.130
+F8 = XX (Charset = UTF8 Codepage = 65001)
+F9 = The Quick Brown Fox jumps over the lazy dog (Charset = UTF8 Codepage = 65001)
+F10 = (blob), Length = 543916
+F11 = 9223372036854775807
+F12 = 65566
+F13 = 12:30:45.000
+F14 = NULL
+MYARRAY = NULL
+GRANTS = NULL
+MYFIELD1 = NULL
+MYFIELD2 = NULL
 
+Rows printed = 3
+
+Transaction Exec Query "Delete From IBXTEST A Where A.TABLEKEY = :OLD_TABLEKEY
+"
+Transaction Delete
+Transaction Exec Query "Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6, A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.GRANTS, A."My Field" as MYFIELD1, A."MY Field" as MYFIELD2 From IBXTEST A
+"
 Delete a record
 Transaction Exec Query "Delete From IBXTEST A Where A.TABLEKEY = :OLD_TABLEKEY
 "
@@ -2137,9 +2172,7 @@ Commit Retaining
 Transaction Exec Query "Select Gen_ID(IBXGEN,1) From RDB$Database
 "
 Transaction Insert
-Transaction Exec Query "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,:F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS)
-"
-Transaction Exec Query "Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6, A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.GRANTS, A."My Field" as MYFIELD1, A."MY Field"  as MYFIELD2 From IBXTEST A Where A.TABLEKEY = :TABLEKEY
+Transaction Exec Query "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,:F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS) Returning MyArray, F10, F14, F15
 "
 Transaction Post
 Transaction Exec Query "Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6, A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.GRANTS, A."My Field" as MYFIELD1, A."MY Field" as MYFIELD2 From IBXTEST A
@@ -2259,7 +2292,7 @@ MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
 MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
 
 Row No = 3
-TABLEKEY = 3
+TABLEKEY = 4
 F1 = 2
 F2 = 0.314000010490
 F3 = 0.314123456780
@@ -2435,7 +2468,7 @@ MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
 MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
 
 Row No = 3
-TABLEKEY = 3
+TABLEKEY = 4
 F1 = 2
 F2 = 0.314000010490
 F3 = 0.314123456780
@@ -2554,15 +2587,13 @@ Add a record
 Transaction Exec Query "Select Gen_ID(IBXGEN,1) From RDB$Database
 "
 Transaction Insert
-Transaction Exec Query "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,:F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS)
-"
-Transaction Exec Query "Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6, A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.GRANTS, A."My Field" as MYFIELD1, A."MY Field"  as MYFIELD2 From IBXTEST A Where A.TABLEKEY = :TABLEKEY
+Transaction Exec Query "Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray,  GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,:F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS) Returning MyArray, F10, F14, F15
 "
 Transaction Post
 Row No = 1
 TABLEKEY = 1
 F1 = 2
-F2 = 0.314000010490
+F2 = 0.314000000000
 F3 = 0.314123456780
 F4 = 101.314
 F5 = 101.99
@@ -3398,8 +3429,8 @@ DEPT_KEY_PATH = 000;600;620;622
 Current memory = 942,504
 Delta memory = 9,520
 Max memory = 1,003,368
-Elapsed time= 0.022 sec
-Cpu = 0.000 sec
+Elapsed time= 0.019 sec
+Cpu = 0.002 sec
 Buffers = 75
 Reads = 3
 Writes = 0
@@ -10193,21 +10224,21 @@ Message File Location = /opt/firebird/2.5.9/
 Database Statistics for employee
 
 Database "/opt/firebird/2.5.9/examples/empbuild/employee.fdb"
-Gstat execution time Fri Jul 22 15:20:09 2022
+Gstat execution time Tue Feb 28 14:59:52 2023
 
 Database header page information:
 Flags			0
 Checksum		12345
-Generation		10970
+Generation		11332
 Page size		4096
 ODS version		11.2
-Oldest transaction	6614
-Oldest active		6615
-Oldest snapshot		6615
-Next transaction	6615
+Oldest transaction	6825
+Oldest active		6826
+Oldest snapshot		6826
+Next transaction	6826
 Bumped transaction	1
 Sequence number		0
-Next attachment ID	2148
+Next attachment ID	2251
 Implementation ID	24
 Shadow count		0
 Page buffers		0
@@ -10332,87 +10363,87 @@ zeus	Tue Jun  9 14:31:01 2020
 INET/inet_error: connect errno = 111
 
 Online Validation
-15:20:11.48 Validation started
+14:59:54.47 Validation started
 
-15:20:11.48 Relation 128 (COUNTRY)
-15:20:11.48   process pointer page    0 of    1
-15:20:11.48 Index 1 (RDB$PRIMARY1)
-15:20:11.48 Relation 128 (COUNTRY) is ok
+14:59:54.47 Relation 128 (COUNTRY)
+14:59:54.47   process pointer page    0 of    1
+14:59:54.47 Index 1 (RDB$PRIMARY1)
+14:59:54.47 Relation 128 (COUNTRY) is ok
 
-15:20:11.48 Relation 129 (JOB)
-15:20:11.48   process pointer page    0 of    1
-15:20:11.48 Index 1 (RDB$PRIMARY2)
-15:20:11.48 Index 2 (RDB$FOREIGN3)
-15:20:11.48 Index 3 (MAXSALX)
-15:20:11.48 Index 4 (MINSALX)
-15:20:11.48 Relation 129 (JOB) is ok
+14:59:54.47 Relation 129 (JOB)
+14:59:54.47   process pointer page    0 of    1
+14:59:54.47 Index 1 (RDB$PRIMARY2)
+14:59:54.47 Index 2 (RDB$FOREIGN3)
+14:59:54.47 Index 3 (MAXSALX)
+14:59:54.47 Index 4 (MINSALX)
+14:59:54.47 Relation 129 (JOB) is ok
 
-15:20:11.48 Relation 130 (DEPARTMENT)
-15:20:11.48   process pointer page    0 of    1
-15:20:11.48 Index 1 (RDB$4)
-15:20:11.48 Index 2 (RDB$PRIMARY5)
-15:20:11.48 Index 3 (RDB$FOREIGN6)
-15:20:11.48 Index 4 (BUDGETX)
-15:20:11.48 Index 5 (RDB$FOREIGN10)
-15:20:11.48 Relation 130 (DEPARTMENT) is ok
+14:59:54.47 Relation 130 (DEPARTMENT)
+14:59:54.47   process pointer page    0 of    1
+14:59:54.47 Index 1 (RDB$4)
+14:59:54.47 Index 2 (RDB$PRIMARY5)
+14:59:54.47 Index 3 (RDB$FOREIGN6)
+14:59:54.47 Index 4 (BUDGETX)
+14:59:54.47 Index 5 (RDB$FOREIGN10)
+14:59:54.47 Relation 130 (DEPARTMENT) is ok
 
-15:20:11.48 Relation 131 (EMPLOYEE)
-15:20:11.48   process pointer page    0 of    1
-15:20:11.48 Index 1 (RDB$PRIMARY7)
-15:20:11.48 Index 2 (RDB$FOREIGN8)
-15:20:11.48 Index 3 (RDB$FOREIGN9)
-15:20:11.48 Index 4 (NAMEX)
-15:20:11.48 Relation 131 (EMPLOYEE) is ok
+14:59:54.47 Relation 131 (EMPLOYEE)
+14:59:54.47   process pointer page    0 of    1
+14:59:54.47 Index 1 (RDB$PRIMARY7)
+14:59:54.47 Index 2 (RDB$FOREIGN8)
+14:59:54.47 Index 3 (RDB$FOREIGN9)
+14:59:54.47 Index 4 (NAMEX)
+14:59:54.47 Relation 131 (EMPLOYEE) is ok
 
-15:20:11.48 Relation 133 (PROJECT)
-15:20:11.48   process pointer page    0 of    1
-15:20:11.48 Index 1 (RDB$11)
-15:20:11.48 Index 2 (RDB$PRIMARY12)
-15:20:11.48 Index 3 (RDB$FOREIGN13)
-15:20:11.48 Index 4 (PRODTYPEX)
-15:20:11.48 Relation 133 (PROJECT) is ok
+14:59:54.47 Relation 133 (PROJECT)
+14:59:54.47   process pointer page    0 of    1
+14:59:54.47 Index 1 (RDB$11)
+14:59:54.47 Index 2 (RDB$PRIMARY12)
+14:59:54.47 Index 3 (RDB$FOREIGN13)
+14:59:54.47 Index 4 (PRODTYPEX)
+14:59:54.47 Relation 133 (PROJECT) is ok
 
-15:20:11.48 Relation 134 (EMPLOYEE_PROJECT)
-15:20:11.48   process pointer page    0 of    1
-15:20:11.48 Index 1 (RDB$PRIMARY14)
-15:20:11.48 Index 2 (RDB$FOREIGN15)
-15:20:11.48 Index 3 (RDB$FOREIGN16)
-15:20:11.48 Relation 134 (EMPLOYEE_PROJECT) is ok
+14:59:54.47 Relation 134 (EMPLOYEE_PROJECT)
+14:59:54.47   process pointer page    0 of    1
+14:59:54.47 Index 1 (RDB$PRIMARY14)
+14:59:54.47 Index 2 (RDB$FOREIGN15)
+14:59:54.47 Index 3 (RDB$FOREIGN16)
+14:59:54.47 Relation 134 (EMPLOYEE_PROJECT) is ok
 
-15:20:11.48 Relation 135 (PROJ_DEPT_BUDGET)
-15:20:11.48   process pointer page    0 of    1
-15:20:11.48 Index 1 (RDB$PRIMARY17)
-15:20:11.48 Index 2 (RDB$FOREIGN18)
-15:20:11.48 Index 3 (RDB$FOREIGN19)
-15:20:11.48 Relation 135 (PROJ_DEPT_BUDGET) is ok
+14:59:54.47 Relation 135 (PROJ_DEPT_BUDGET)
+14:59:54.47   process pointer page    0 of    1
+14:59:54.47 Index 1 (RDB$PRIMARY17)
+14:59:54.47 Index 2 (RDB$FOREIGN18)
+14:59:54.47 Index 3 (RDB$FOREIGN19)
+14:59:54.48 Relation 135 (PROJ_DEPT_BUDGET) is ok
 
-15:20:11.49 Relation 136 (SALARY_HISTORY)
-15:20:11.49   process pointer page    0 of    1
-15:20:11.49 Index 1 (RDB$PRIMARY20)
-15:20:11.49 Index 2 (RDB$FOREIGN21)
-15:20:11.49 Index 3 (CHANGEX)
-15:20:11.49 Index 4 (UPDATERX)
-15:20:11.49 Relation 136 (SALARY_HISTORY) is ok
+14:59:54.48 Relation 136 (SALARY_HISTORY)
+14:59:54.48   process pointer page    0 of    1
+14:59:54.48 Index 1 (RDB$PRIMARY20)
+14:59:54.48 Index 2 (RDB$FOREIGN21)
+14:59:54.48 Index 3 (CHANGEX)
+14:59:54.48 Index 4 (UPDATERX)
+14:59:54.48 Relation 136 (SALARY_HISTORY) is ok
 
-15:20:11.49 Relation 137 (CUSTOMER)
-15:20:11.49   process pointer page    0 of    1
-15:20:11.49 Index 1 (RDB$PRIMARY22)
-15:20:11.49 Index 2 (RDB$FOREIGN23)
-15:20:11.49 Index 3 (CUSTNAMEX)
-15:20:11.49 Index 4 (CUSTREGION)
-15:20:11.49 Relation 137 (CUSTOMER) is ok
+14:59:54.48 Relation 137 (CUSTOMER)
+14:59:54.48   process pointer page    0 of    1
+14:59:54.48 Index 1 (RDB$PRIMARY22)
+14:59:54.48 Index 2 (RDB$FOREIGN23)
+14:59:54.48 Index 3 (CUSTNAMEX)
+14:59:54.48 Index 4 (CUSTREGION)
+14:59:54.48 Relation 137 (CUSTOMER) is ok
 
-15:20:11.49 Relation 138 (SALES)
-15:20:11.49   process pointer page    0 of    1
-15:20:11.49 Index 1 (RDB$PRIMARY24)
-15:20:11.49 Index 2 (RDB$FOREIGN25)
-15:20:11.49 Index 3 (RDB$FOREIGN26)
-15:20:11.49 Index 4 (NEEDX)
-15:20:11.49 Index 5 (QTYX)
-15:20:11.49 Index 6 (SALESTATX)
-15:20:11.49 Relation 138 (SALES) is ok
+14:59:54.48 Relation 138 (SALES)
+14:59:54.48   process pointer page    0 of    1
+14:59:54.48 Index 1 (RDB$PRIMARY24)
+14:59:54.48 Index 2 (RDB$FOREIGN25)
+14:59:54.48 Index 3 (RDB$FOREIGN26)
+14:59:54.48 Index 4 (NEEDX)
+14:59:54.48 Index 5 (QTYX)
+14:59:54.48 Index 6 (SALESTATX)
+14:59:54.48 Relation 138 (SALES) is ok
 
-15:20:11.50 Validation finished
+14:59:54.48 Validation finished
 
 
 Normal Validation
@@ -11744,7 +11775,7 @@ DEPT_KEY_PATH = 000
 
 Rows printed = 2
 
-33 ISQL Monitor Messages Received
+33 ISQL Monitor Messages Received (Monitoring Disabled)
 33 ISQL Monitor Messages written
 *Monitor*  
 [Application: IBX Test Suite]
@@ -11922,7 +11953,7 @@ Rows printed = 2
 Current memory = 956,584
 Delta memory = 9,248
 Max memory = 1,002,256
-Elapsed time= 0.104 sec
+Elapsed time= 0.105 sec
 Cpu = 0.000 sec
 Buffers = 75
 Reads = 2
@@ -12471,6 +12502,10 @@ As
 Begin
   new.ServerSideText = new.KeyField || ' - ' || new.PlainText;
 End
+Print Dataset for IBTestData
+Dataset Empty
+Rows printed = 0
+
 Unidirectional caching = FALSE
 Simple Append i.e. caching of inserted records and cancel
 Print Dataset for IBTestData
@@ -13261,14 +13296,14 @@ Create Table LotsOfData (
     MyText VarChar(1024), 
     Primary Key (RowID) 
   );                 
-Loading data into database table. Started at 22/7/2022 15:20:43.651
-Data load completed at 22/7/2022 15:21:56.962 Elapsed Time = 73311 ms, 100000 records loaded
- Message Hash = 9328894a5017a7661d5d7bece17ac7b7
-Database Read started at 22/7/2022 15:21:56.963
-Read Dataset completed at 22/7/2022 15:22:27.625 Elapsed Time = 30662 ms, 100000 records read
- Message Hash = 9328894a5017a7661d5d7bece17ac7b7
+Loading data into database table. Started at 28/2/2023 15:00:26.680
+Data load completed at 28/2/2023 15:01:44.575 Elapsed Time = 77895 ms, 100000 records loaded
+ Message Hash = 6e985b5bcbfbd2def6f1ce3ce0c80f38
+Database Read started at 28/2/2023 15:01:44.576
+Read Dataset completed at 28/2/2023 15:01:49.351 Elapsed Time = 4775 ms, 100000 records read
+ Message Hash = 6e985b5bcbfbd2def6f1ce3ce0c80f38
 Test Completed successfully
-22/7/2022 15:22:27.625 Test 21 passes as long as the checksums are identical
+28/2/2023 15:01:49.351 Test 21 passes as long as the checksums are identical
 
 
 ------------------------------------------------------
@@ -15305,12 +15340,12 @@ Create Table IBXTest (
 
 Create Generator IBXGen;
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:35.1890:
+Journal Entry at 2023/02/28 15:01:56.9410:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 9
-  Transaction Name   = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -15339,7 +15374,7 @@ MYFIELD2
 
 Add a record
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:35.2530:
+Journal Entry at 2023/02/28 15:01:57.0000:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -15406,7 +15441,7 @@ Que cela seul est fantastique.
 
 Add and edit a record
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:35.2770:
+Journal Entry at 2023/02/28 15:01:57.0270:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -15528,7 +15563,7 @@ GRANTS = NULL
 MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
 MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:35.2980:
+Journal Entry at 2023/02/28 15:01:57.0520:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -15594,7 +15629,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:35.3140:
+Journal Entry at 2023/02/28 15:01:57.0710:
   Type               = Commit
   Attachment ID      = 2
   Session ID         = 1
@@ -15602,12 +15637,12 @@ Journal Entry at 2022/07/22 15:22:35.3140:
 
 
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:35.3170:
+Journal Entry at 2023/02/28 15:01:57.0730:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 11
-  Transaction Name   = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -15733,7 +15768,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:35.5800:
+Journal Entry at 2023/02/28 15:01:57.3250:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -15804,7 +15839,7 @@ Rows printed = 1
 
 Rollback Retaining
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:35.6880:
+Journal Entry at 2023/02/28 15:01:57.4340:
   Type               = Rollback Retaining
   Attachment ID      = 2
   Session ID         = 1
@@ -15933,7 +15968,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:35.9090:
+Journal Entry at 2023/02/28 15:01:57.6620:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -16004,7 +16039,7 @@ Rows printed = 1
 
 Rollback
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:36.0190:
+Journal Entry at 2023/02/28 15:01:57.7720:
   Type               = Rollback
   Attachment ID      = 2
   Session ID         = 1
@@ -16012,12 +16047,12 @@ Journal Entry at 2022/07/22 15:22:36.0190:
 
 
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:36.0250:
+Journal Entry at 2023/02/28 15:01:57.7760:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 14
-  Transaction Name   = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -16143,7 +16178,7 @@ Rows printed = 2
 
 Commit Retaining
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:36.3000:
+Journal Entry at 2023/02/28 15:01:58.0680:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -16209,7 +16244,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:36.3140:
+Journal Entry at 2023/02/28 15:01:58.0860:
   Type               = Commit Retaining
   Attachment ID      = 2
   Session ID         = 1
@@ -16396,7 +16431,7 @@ Rows printed = 3
 
 Commit
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:36.6510:
+Journal Entry at 2023/02/28 15:01:58.4260:
   Type               = Commit
   Attachment ID      = 2
   Session ID         = 1
@@ -16404,12 +16439,12 @@ Journal Entry at 2022/07/22 15:22:36.6510:
 
 
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:36.6550:
+Journal Entry at 2023/02/28 15:01:58.4300:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 17
-  Transaction Name   = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -16592,7 +16627,7 @@ MYFIELD2 = NULL
 Rows printed = 3
 
 Journal Entry Made
-Journal Entry at 2022/07/22 15:22:37.0200:
+Journal Entry at 2023/02/28 15:01:58.8080:
   Type               = Rollback
   Attachment ID      = 2
   Session ID         = 1
@@ -16604,26 +16639,26 @@ IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 9
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2022/07/22 15:22:35.1870
+IBX$CREATED = 2023/02/28 15:01:56.9390
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 14
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2022/07/22 15:22:36.0240
+IBX$CREATED = 2023/02/28 15:01:57.7750
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 16
 IBX$OLDTRANSACTIONID = 14
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2022/07/22 15:22:36.3150
+IBX$CREATED = 2023/02/28 15:01:58.0890
 
 Low Level Journal File Print out
 Journal Entries
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2022/07/22 15:22:35.1890
+Timestamp = 2023/02/28 15:01:56.9410
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 9
-Transaction Name = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+Transaction Name = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -16632,7 +16667,7 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/22 15:22:35.2530
+Timestamp = 2023/02/28 15:01:57.0000
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 9
@@ -16696,7 +16731,7 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/22 15:22:35.2770
+Timestamp = 2023/02/28 15:01:57.0270
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 9
@@ -16760,7 +16795,7 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/22 15:22:35.2980
+Timestamp = 2023/02/28 15:01:57.0520
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 9
@@ -16824,17 +16859,17 @@ Que cela seul est fantastique.
 ,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2022/07/22 15:22:35.3140
+Timestamp = 2023/02/28 15:01:57.0710
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 9
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2022/07/22 15:22:35.3170
+Timestamp = 2023/02/28 15:01:57.0730
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 11
-Transaction Name = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+Transaction Name = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -16843,38 +16878,38 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/22 15:22:35.5800
+Timestamp = 2023/02/28 15:01:57.3250
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 11
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollbackRet(Rollback Retaining)
-Timestamp = 2022/07/22 15:22:35.6880
+Timestamp = 2023/02/28 15:01:57.4340
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 13
 Old TransactionID = 11
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/22 15:22:35.9090
+Timestamp = 2023/02/28 15:01:57.6620
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 13
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2022/07/22 15:22:36.0190
+Timestamp = 2023/02/28 15:01:57.7720
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 13
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2022/07/22 15:22:36.0250
+Timestamp = 2023/02/28 15:01:57.7760
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 14
-Transaction Name = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+Transaction Name = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -16883,7 +16918,7 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2022/07/22 15:22:36.3000
+Timestamp = 2023/02/28 15:01:58.0680
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 14
@@ -16947,24 +16982,24 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeTransCommitRet(Commit Retaining)
-Timestamp = 2022/07/22 15:22:36.3140
+Timestamp = 2023/02/28 15:01:58.0860
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 16
 Old TransactionID = 14
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2022/07/22 15:22:36.6510
+Timestamp = 2023/02/28 15:01:58.4260
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 16
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2022/07/22 15:22:36.6550
+Timestamp = 2023/02/28 15:01:58.4300
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 17
-Transaction Name = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+Transaction Name = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -16973,23 +17008,23 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2022/07/22 15:22:37.0200
+Timestamp = 2023/02/28 15:01:58.8080
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 17
 
 
 Print out Journal File using TIBJournal
-Journal Entry at 2022/07/22 15:22:35.1890:
+Journal Entry at 2023/02/28 15:01:56.9410:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 9
-  Transaction Name   = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2022/07/22 15:22:35.2530:
+Journal Entry at 2023/02/28 15:01:57.0000:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -17053,7 +17088,7 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2022/07/22 15:22:35.2770:
+Journal Entry at 2023/02/28 15:01:57.0270:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -17117,7 +17152,7 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2022/07/22 15:22:35.2980:
+Journal Entry at 2023/02/28 15:01:57.0520:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -17181,58 +17216,58 @@ Que cela seul est fantastique.
 </array>
 ,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15"
 
-Journal Entry at 2022/07/22 15:22:35.3140:
+Journal Entry at 2023/02/28 15:01:57.0710:
   Type               = Commit
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 9
 
-Journal Entry at 2022/07/22 15:22:35.3170:
+Journal Entry at 2023/02/28 15:01:57.0730:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 11
-  Transaction Name   = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2022/07/22 15:22:35.5800:
+Journal Entry at 2023/02/28 15:01:57.3250:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 11
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2022/07/22 15:22:35.6880:
+Journal Entry at 2023/02/28 15:01:57.4340:
   Type               = Rollback Retaining
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 13
   Old Transaction ID = 11
 
-Journal Entry at 2022/07/22 15:22:35.9090:
+Journal Entry at 2023/02/28 15:01:57.6620:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 13
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2022/07/22 15:22:36.0190:
+Journal Entry at 2023/02/28 15:01:57.7720:
   Type               = Rollback
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 13
 
-Journal Entry at 2022/07/22 15:22:36.0250:
+Journal Entry at 2023/02/28 15:01:57.7760:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 14
-  Transaction Name   = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2022/07/22 15:22:36.3000:
+Journal Entry at 2023/02/28 15:01:58.0680:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -17296,29 +17331,29 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2022/07/22 15:22:36.3140:
+Journal Entry at 2023/02/28 15:01:58.0860:
   Type               = Commit Retaining
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 16
   Old Transaction ID = 14
 
-Journal Entry at 2022/07/22 15:22:36.6510:
+Journal Entry at 2023/02/28 15:01:58.4260:
   Type               = Commit
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 16
 
-Journal Entry at 2022/07/22 15:22:36.6550:
+Journal Entry at 2023/02/28 15:01:58.4300:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 17
-  Transaction Name   = "{F552512C-9CDC-4B54-A8AD-47E51021922C}"
+  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2022/07/22 15:22:37.0200:
+Journal Entry at 2023/02/28 15:01:58.8080:
   Type               = Rollback
   Attachment ID      = 2
   Session ID         = 1
