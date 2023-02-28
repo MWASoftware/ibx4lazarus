@@ -345,14 +345,14 @@ type
     include space for the calculated fields.
   }
 
+  TOnValuesReturned = procedure(qryResults: IResults) of object;
+
   TIBSelectCursor = class(TInterfacedObject)
   private type
     type
-      {Wrapper class to support array cache and event handling}
-
       { TIBArray }
 
-      TIBArray = class
+      TIBArray = class   {Wrapper class to support array cache and event handling}
       private
         FArray: IArray;
         FRecNo: integer;
@@ -395,6 +395,16 @@ type
 
       TColumnMetadataArray = array of TColumnMetadata;
 
+      TRegisteredQueryTypes = (rqInsert,rqModify,rqDelete,rqRefresh);
+
+      TRegisteredQuery = record
+        stmt: IStatement;
+        ParamMap: array of integer;
+        UseOldValue: array of boolean;
+        ColMap: array of integer;  {return values}
+        OnValuesReturned: TOnValuesReturned;
+      end;
+
   strict private
     FRecordBufferSize: Integer;            {Calculated size in bytes for each record buffer}
     FRecordCount: Integer;                 {No. of records held in buffer pool. Total in dataset with Cursor.IsEof}
@@ -416,6 +426,7 @@ type
     FDefaultTZDate: TDateTime;             {Default Time Zone time}
     FName: string;                         {Local cursor name - set by creator}
     FOnMonitorEvent: TIBMonitorEvent;      {Used to report row fetch e.g. for monitor hook}
+    FRegisteredQueries: array[TRegisteredQueryTypes] of TRegisteredQuery; {cached query info}
 
     procedure SetupBufferStructure(metadata: IMetadata; aFields: TFields;
       ComputedFieldNames: TStrings);
@@ -451,6 +462,8 @@ type
     procedure SetUpdateStatus(aBufID: TRecordBuffer; status: TUpdateStatus);
     procedure Reset; virtual;
     function FetchNext: boolean;
+    function NormaliseParamName(aName: AnsiString; var UseOldValue: boolean): AnsiString;
+    procedure ClearRegisteredQueries;
   protected
     property Buffers[index: TRecordBuffer]:PByte read GetBuffer;
     property Cursor: IResultSet read FCursor;
@@ -491,6 +504,10 @@ type
     function GetUpdateStatus(aBufID: TRecordBuffer): TUpdateStatus;
     procedure ClearCalcFields(aBufID: TRecordBuffer);
     procedure SetCursor(aCursor: IResultSet);
+     procedure RegisterQuery(qryType : TRegisteredQueryTypes; qry : IStatement;
+       OnValuesReturnedProc : TOnValuesReturned);
+    procedure ExecRegisteredQuery(qryType : TRegisteredQueryTypes; aBufID: TRecordBuffer);
+    procedure SetParamValue(Buff: PByte; colIndex: integer; Param: ISQLParam);
   public
     property RecordBufferSize: integer read FRecordBufferSize;
     property ColumnCount: integer read FColumnCount;
@@ -1829,6 +1846,33 @@ begin
     FOnMonitorEvent(self,mtFetch,Cursor.GetStatement);
 end;
 
+function TIBSelectCursor.NormaliseParamName(aName : AnsiString;
+   var UseOldValue : boolean) : AnsiString;
+const
+  sOldPrefix = 'OLD_';
+  sNewPrefix = 'NEW';
+begin
+  UseOldValue := false;
+  Result := aName;
+  if pos(sOldPrefix,Result) = 1 then
+  begin
+    system.Delete(Result,1,length(sOldPrefix));
+    UseOldValue := true;
+  end
+  else
+  begin
+    if pos(sNewPrefix,Result) = 1 then
+      system.Delete(Result,1,length(sNewPrefix));
+  end;
+end ;
+
+procedure TIBSelectCursor.ClearRegisteredQueries;
+var i: TRegisteredQueryTypes;
+begin
+  for i := low(FRegisteredQueries) to high(FRegisteredQueries) do
+    FRegisteredQueries[i].stmt := nil;
+end ;
+
 procedure TIBSelectCursor.ClearBlobCache;
 var  i: Integer;
 begin
@@ -2106,6 +2150,7 @@ begin
   FCurrentRecord := nil;
   FCurrentRecordStatus := csBOF;
   FOnMonitorEvent := OnMonitorEvent;
+  ClearRegisteredQueries;
 end;
 
 destructor TIBSelectCursor.Destroy;
@@ -2115,6 +2160,7 @@ begin
   FBlobStreamList.Free;
   FArrayList.Free;
   SetLength(FColumnMetadata,0);
+  ClearRegisteredQueries;
   inherited Destroy;
 end;
 
@@ -2392,10 +2438,6 @@ begin
 end;
 
 procedure TIBSelectCursor.SetSQLParams(aBufID: TRecordBuffer; params: ISQLParams);
-const
-  sOldPrefix = 'OLD_';
-  sNewPrefix = 'NEW';
-
 var Buff: PByte;
     OldBuffer: PByte;
     i: integer;
@@ -2403,10 +2445,7 @@ var Buff: PByte;
     ParamName: AnsiString;
     srcBuffer: PByte;
     ColIndex: integer;
-    Data: PByte;
-    DataLength: Short;
-    st: RawByteString;
-    pda: PIBArray;
+    UseOldValue: boolean;
 begin
   Buff := GetBuffer(aBufID);
   if Buff = nil then
@@ -2418,119 +2457,19 @@ begin
   for i := 0 to Params.GetCount - 1 do
   begin
      Param := params[i];
-     ParamName := Param.Name;
-     srcBuffer := Buff;
+     ParamName := NormaliseParamName(Param.Name,UseOldValue);
 
      {Determine source buffer}
-     if pos(sOldPrefix,ParamName) = 1 then
-     begin
-       system.Delete(ParamName,1,length(sOldPrefix));
-       if OldBuffer <> nil then
-         srcBuffer := OldBuffer;
-     end
+     if UseOldValue and (OldBuffer <> nil) then
+       srcBuffer := OldBuffer
      else
-     begin
-       if pos(sNewPrefix,ParamName) = 1 then
-         system.Delete(ParamName,1,length(sNewPrefix));
-     end;
+       srcBuffer := Buff;
 
      ColIndex := ColIndexByName(ParamName,params.GetHasCaseSensitiveParams);
      if ColIndex = -1 then
        continue;
 
-     if InternalGetIsNull(srcBuffer,ColIndex) then
-       Param.IsNull := true
-     else
-     with FColumnMetaData[ColIndex] do
-     begin
-       Data := srcBuffer + fdDataOfs;
-       case fdDataType of
-         SQL_TEXT:
-           if Param.getColMetadata.getCharSetID <= 1 {NONE or OCTETS} then
-             Param.SetAsPointer(Data)
-           else
-           begin
-             DataLength := strlen(PAnsiChar(Data));
-             if DataLength > fdDataSize then
-               DataLength := fdDataSize;
-             SetString(st, PAnsiChar(Data), DataLength);
-             SetCodePage(st,fdCodePage,false);
-             Param.AsString := st;
-           end;
-         SQL_VARYING:
-         begin
-           DataLength := PShort(Data)^;
-           Inc(Data,sizeof(Short));
-           SetString(st, PAnsiChar(Data), DataLength);
-           SetCodePage(st,fdCodePage,false);
-           Param.AsString := st;
-         end;
-       SQL_FLOAT, SQL_DOUBLE, SQL_D_FLOAT:
-         Param.AsDouble := PDouble(Data)^;
-       SQL_SHORT:
-       begin
-         if fdDataScale = 0 then
-           Param.AsShort := PShort(Data)^
-         else
-         if fdDataScale >= (-4) then
-           Param.AsCurrency := PCurrency(Data)^
-         else
-           Param.AsDouble := PDouble(Data)^;
-       end;
-       SQL_LONG:
-       begin
-         if fdDataScale = 0 then
-           Param.AsLong := PLong(Data)^
-         else
-         if fdDataScale >= (-4) then
-           Param.AsCurrency := PCurrency(Data)^
-         else
-           Param.AsDouble := PDouble(Data)^;
-       end;
-       SQL_INT64:
-       begin
-         if fdDataScale = 0 then
-           Param.AsInt64 := PInt64(Data)^
-         else
-         if fdDataScale >= (-4) then
-           Param.AsCurrency := PCurrency(Data)^
-         else
-           Param.AsDouble := PDouble(Data)^;
-       end;
-       SQL_BLOB, SQL_QUAD:
-         Param.AsQuad := PISC_QUAD(Data)^;
-       SQL_ARRAY:
-         begin
-           pda := PIBArray(srcBuffer + fdObjOffset);
-           if pda^ = nil then
-             Param.AsQuad := PISC_QUAD(Data)^
-           else
-             Param.AsArray := pda^.ArrayIntf;
-         end;
-       SQL_TYPE_DATE,
-       SQL_TYPE_TIME,
-       SQL_TIMESTAMP:
-       {This is an IBX native format and not the TDataset approach. See also SetFieldData}
-         Param.AsDateTime := PDateTime(Data)^;
-       SQL_TIMESTAMP_TZ_EX,
-       SQL_TIMESTAMP_TZ:
-         with PIBBufferedDateTimeWithTimeZone(Data)^ do
-           Param.SetAsDateTime(Timestamp,TimeZoneID);
-       SQL_TIME_TZ_EX,
-       SQL_TIME_TZ:
-         with PIBBufferedDateTimeWithTimeZone(Data)^ do
-           Param.SetAsTime(Timestamp,FDefaultTZDate,TimeZoneID);
-       SQL_BOOLEAN:
-         Param.AsBoolean := PWordBool(Data)^;
-       SQL_DEC16,
-       SQL_DEC34,
-       SQL_DEC_FIXED,
-       SQL_INT128:
-         Param.AsBCD := pBCD(Data)^;
-       else
-         IBError(ibxeUnknownSQLType,[fdDataType]);
-       end;
-     end;
+     SetParamValue(srcBuffer,ColIndex,Param);
   end;
 end;
 
@@ -2717,6 +2656,176 @@ begin
     IBError(ibxeDifferentStatement,[]);
   Reset;
   FCursor := aCursor;
+end;
+
+ procedure TIBSelectCursor.RegisterQuery(qryType : TRegisteredQueryTypes;
+   qry : IStatement; OnValuesReturnedProc : TOnValuesReturned);
+var i: integer;
+    ParamName: AnsiString;
+begin
+  with FRegisteredQueries[qryType] do
+  begin
+    stmt :=  qry;
+    OnValuesReturned := OnValuesReturnedProc;
+    SetLength(ParamMap,Qry.SQLParams.count);
+    SetLength(UseOldValue, Qry.SQLParams.count);
+    for i := 0 to Qry.SQLParams.Count - 1 do
+    begin
+      ParamName := NormaliseParamName(Qry.SQLParams[i].Name,UseOldValue[i]);
+      ParamMap[i] := ColIndexByName(ParamName,Qry.SQLParams.GetHasCaseSensitiveParams);
+    end;
+
+    SetLength(ColMap,qry.MetaData.Count);
+    for i := 0 to qry.MetaData.Count - 1 do
+      ColMap[i] := ColIndexByName(qry.MetaData[i].getAliasName);
+  end;
+end;
+
+procedure TIBSelectCursor.ExecRegisteredQuery(qryType : TRegisteredQueryTypes;
+   aBufID : TRecordBuffer);
+var Buff: PByte;
+    i: integer;
+    OldBuffer: PByte;
+    qryResults: IResults;
+begin
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then
+    IBError(ibxeBufferNotSet, [nil]);
+
+  SaveBlobsAndArrays(Buff);
+  OldBuffer := GetOldBufferFor(Buff);
+
+  with FRegisteredQueries[qryType] do
+  begin
+    {set param values}
+    for i := 0 to Length(ParamMap) - 1 do
+      if ParamMap[i] <> -1 then
+      begin
+         if UseOldValue[i] and (OldBuffer <> nil) then
+           SetParamValue(OldBuffer,ParamMap[i],stmt.SQLParams[i])
+         else
+           SetParamValue(Buff,ParamMap[i],stmt.SQLParams[i]);
+      end;
+
+    {exeute query}
+    qryResults := stmt.Execute;
+
+    {process any return values}
+    if qryType <> rqDelete then
+    begin
+      ClearRecordCache(Buff);
+      for i := 0 to Length(ColMap) - 1 do
+        if ColMap[i] <> -1 then
+        begin
+          CopyCursorDataToBuffer(qryResults,i,ColMap[i],Buff);
+          SetRefreshRequired(Buff,ColMap[i],false);
+        end;
+    end;
+    if (qryResults <> nil) and assigned(OnValuesReturned) then
+      OnValuesReturned(qryResults);
+  end;
+end;
+
+ procedure TIBSelectCursor.SetParamValue(Buff : PByte; colIndex : integer;
+   Param : ISQLParam);
+var Data: PByte;
+    DataLength: Short;
+    st: RawByteString;
+    pda: PIBArray;
+begin
+  if InternalGetIsNull(Buff,ColIndex) then
+    Param.IsNull := true
+  else
+  with FColumnMetaData[ColIndex] do
+  begin
+    Data := Buff + fdDataOfs;
+    case fdDataType of
+      SQL_TEXT:
+        if Param.getColMetadata.getCharSetID <= 1 {NONE or OCTETS} then
+          Param.SetAsPointer(Data)
+        else
+        begin
+          DataLength := strlen(PAnsiChar(Data));
+          if DataLength > fdDataSize then
+            DataLength := fdDataSize;
+          SetString(st, PAnsiChar(Data), DataLength);
+          SetCodePage(st,fdCodePage,false);
+          Param.AsString := st;
+        end;
+      SQL_VARYING:
+      begin
+        DataLength := PShort(Data)^;
+        Inc(Data,sizeof(Short));
+        SetString(st, PAnsiChar(Data), DataLength);
+        SetCodePage(st,fdCodePage,false);
+        Param.AsString := st;
+      end;
+    SQL_FLOAT, SQL_DOUBLE, SQL_D_FLOAT:
+      Param.AsDouble := PDouble(Data)^;
+    SQL_SHORT:
+    begin
+      if fdDataScale = 0 then
+        Param.AsShort := PShort(Data)^
+      else
+      if fdDataScale >= (-4) then
+        Param.AsCurrency := PCurrency(Data)^
+      else
+        Param.AsDouble := PDouble(Data)^;
+    end;
+    SQL_LONG:
+    begin
+      if fdDataScale = 0 then
+        Param.AsLong := PLong(Data)^
+      else
+      if fdDataScale >= (-4) then
+        Param.AsCurrency := PCurrency(Data)^
+      else
+        Param.AsDouble := PDouble(Data)^;
+    end;
+    SQL_INT64:
+    begin
+      if fdDataScale = 0 then
+        Param.AsInt64 := PInt64(Data)^
+      else
+      if fdDataScale >= (-4) then
+        Param.AsCurrency := PCurrency(Data)^
+      else
+        Param.AsDouble := PDouble(Data)^;
+    end;
+    SQL_BLOB, SQL_QUAD:
+      Param.AsQuad := PISC_QUAD(Data)^;
+    SQL_ARRAY:
+      begin
+        pda := PIBArray(Buff + fdObjOffset);
+        if pda^ = nil then
+          Param.AsQuad := PISC_QUAD(Data)^
+        else
+          Param.AsArray := pda^.ArrayIntf;
+      end;
+    SQL_TYPE_DATE,
+    SQL_TYPE_TIME,
+    SQL_TIMESTAMP:
+    {This is an IBX native format and not the TDataset approach. See also SetFieldData}
+      Param.AsDateTime := PDateTime(Data)^;
+    SQL_TIMESTAMP_TZ_EX,
+    SQL_TIMESTAMP_TZ:
+      with PIBBufferedDateTimeWithTimeZone(Data)^ do
+        Param.SetAsDateTime(Timestamp,TimeZoneID);
+    SQL_TIME_TZ_EX,
+    SQL_TIME_TZ:
+      with PIBBufferedDateTimeWithTimeZone(Data)^ do
+        Param.SetAsTime(Timestamp,FDefaultTZDate,TimeZoneID);
+    SQL_BOOLEAN:
+      Param.AsBoolean := PWordBool(Data)^;
+    SQL_DEC16,
+    SQL_DEC34,
+    SQL_DEC_FIXED,
+    SQL_INT128:
+      Param.AsBCD := pBCD(Data)^;
+    else
+      IBError(ibxeUnknownSQLType,[fdDataType]);
+    end;
+  end;
 end;
 
 { TIBSimpleBufferPool }
