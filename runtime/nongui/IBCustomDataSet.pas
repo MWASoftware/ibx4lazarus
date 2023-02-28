@@ -2178,7 +2178,7 @@ begin
       if (Qry.FieldCount > 0)  then
         DoDeleteReturning(Qry.Current);
     end;
-    FCursor.Delete(ActiveBuffer);
+    FCursor.Delete(aBuffID);
   end;
 end;
 
