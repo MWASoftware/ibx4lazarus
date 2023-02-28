@@ -966,6 +966,7 @@ begin
     if Active then
     begin
       ClearBuffers;
+      ReQuery;
       DataEvent(deDataSetChange, 0);
     end;
   finally

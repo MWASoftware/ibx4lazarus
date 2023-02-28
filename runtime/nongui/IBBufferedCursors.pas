@@ -2155,26 +2155,11 @@ end;
 procedure TIBSelectCursor.SetCurrentRecord(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
-{  case PDisplayBuffer(aBufID)^.dbBookmarkFlag of
-    bfBOF:
-      begin
-        FCurrentRecord := nil;
-        FCurrentRecordStatus := csBOF;
-      end;
-    bfEOF:
-      begin
-        FCurrentRecord := nil;
-        FCurrentRecordStatus := csEOF;
-      end;
-    else
-    begin    }
-      Buff := GetBuffer(aBufID);
-      if Buff = nil then
-        IBError(ibxeBufferNotSet, [nil]);
-        FCurrentRecord := Buff;
-        FCurrentRecordStatus := csRowBuffer;
-//    end;
- // end;
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then
+    IBError(ibxeBufferNotSet, [nil]);
+  FCurrentRecord := Buff;
+  FCurrentRecordStatus := csRowBuffer;
 end;
 
 {Field.offset is a zero based integer indexing the blob field
@@ -2453,8 +2438,9 @@ begin
      if ColIndex = -1 then
        continue;
 
-     Param.IsNull := InternalGetIsNull(srcBuffer,ColIndex);
-     if not Param.IsNull then
+     if InternalGetIsNull(srcBuffer,ColIndex) then
+       Param.IsNull := true
+     else
      with FColumnMetaData[ColIndex] do
      begin
        Data := srcBuffer + fdDataOfs;
@@ -2565,8 +2551,11 @@ begin
   for i := 0 to QryResults.Count - 1  do
   begin
     ColIndex := ColIndexByName(QryResults[i].GetAliasName);
-    CopyCursorDataToBuffer(QryResults,i,ColIndex,Buff);
-    SetRefreshRequired(Buff,ColIndex,false);
+    if ColIndex >= 0 then
+    begin
+      CopyCursorDataToBuffer(QryResults,i,ColIndex,Buff);
+      SetRefreshRequired(Buff,ColIndex,false);
+    end ;
   end;
 end;
 
@@ -2729,7 +2718,6 @@ begin
   Reset;
   FCursor := aCursor;
 end;
-
 
 { TIBSimpleBufferPool }
 

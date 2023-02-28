@@ -2283,10 +2283,8 @@ begin
     FCursor.SetSQLParams(Buff,Qry.Params);
     Qry.ExecQuery;
     Qry.Statement.GetRowsAffected(FSelectCount, FInsertCount, FUpdateCount, FDeleteCount);
-//    write('before ');ShowRefreshState;
     if Qry.FieldCount > 0 then {Has RETURNING Clause}
       FCursor.UpdateRecordFromQuery(Buff,Qry.Current);
-//    write('after ');ShowRefreshState;
   end;
   SetModified(False);
   if (FForcedRefresh or FCursor.NeedRefresh(Buff)) and CanRefresh then
@@ -2711,6 +2709,8 @@ begin
   inherited DoBeforeClose;
   if FInTransactionEnd and (FCloseAction = TARollback) then
      Exit;
+  if not Transaction.Active then Exit;
+
   if State in [dsInsert,dsEdit] then
   begin
     if DataSetCloseAction = dcSaveChanges then
@@ -3497,13 +3497,13 @@ begin
     if (State = dsInsert) then
     begin
        if (not CachedUpdates) then
-         InternalPostRecord(FQInsert,ActiveBuffer);
+         InternalPostRecord(FQInsert,GetActiveBuf);
       FCursor.EditingDone(ActiveBuffer,cusInserted);
     end
     else
     begin
       if (not CachedUpdates) then
-        InternalPostRecord(FQModify,ActiveBuffer);
+        InternalPostRecord(FQModify,GetActiveBuf);
       FCursor.EditingDone(ActiveBuffer,cusModified);
     end;
   finally
