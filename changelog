@@ -6,6 +6,11 @@ IBX Change Log  version (2.6-0 Build nnn) Tue, 6 Dec 2022 23:13:00 +0000
 2. TIBUpdateSQL: changes to SQL text will close linked dataset if open. This is
    to ensure same behaviour as TIBDataset, TIBTable and TIBStoredProcedure.
 
+3. Field Provider Flags: pfRefreshOnInsert and pfRefreshOnUpdate are now supported.
+   If either or both of these flags are set at design time (using the fields editor)
+   then this forces a row refresh on respectively insert or update when the
+   corresponding field is not present in an SQL RETURNING clause.
+
 IBX Change Log  version (2.5-1 Build nnn) Tue, 6 Dec 2022 23:13:00 +0000
 
 1. IBCustomDataset: avoid problem with additions to TFieldType by using a subset instead.

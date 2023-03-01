@@ -428,7 +428,6 @@ type
     FInsertCount: integer;
     FUpdateCount: integer;
     FDeleteCount: integer;
-    FComputedFieldNames: TStringList;
     FCursor: IIBCursor;
     FFilterBuffer: TRecordBuffer;
     FAliasNameMap: array of string;
@@ -1707,9 +1706,6 @@ begin
   FDefaultTZDate := EncodeDate(2020,1,1);
   FSQLFilterParams := TStringList.Create;
   TStringList(FSQLFilterParams).OnChange :=  HandleSQLFilterParamsChanged;
-  FComputedFieldNames := TStringList.Create;
-  FComputedFieldNames.Duplicates := dupError;
-  FComputedFieldNames.CaseSensitive := true;
 end;
 
 destructor TIBCustomDataSet.Destroy;
@@ -1723,7 +1719,6 @@ begin
   if assigned(FBaseSQLSelect) then FBaseSQLSelect.Free;
   if assigned(FParser) then FParser.Free;
   if assigned(FSQLFilterParams) then FSQLFilterParams.Free;
-  if assigned(FComputedFieldNames) then FComputedFieldNames.Free;
   inherited Destroy;
 end;
 
@@ -3359,7 +3354,6 @@ begin
               begin
                 Attributes := [faReadOnly];
                 InternalCalcField := True;
-                FComputedFieldNames.Add(DBAliasName);
               end
               else
               begin
@@ -3495,12 +3489,12 @@ begin
       if UniDirectional then
         FCursor := TIBUniDirectionalCursor.create(self,Name + ': ' + SUniCursor,
                                                        FQSelect.CurrentCursor,Fields,
-                                                       FComputedFieldNames, CalcFieldsSize,
+                                                       CalcFieldsSize,
                                                        FDefaultTZDate, CachedUpdates)
       else
         FCursor := TIBBiDirectionalCursor.create(self,Name + ': ' + SBiDirCursor,
                                                        FQSelect.CurrentCursor,Fields,
-                                                       FComputedFieldNames, CalcFieldsSize,
+                                                       CalcFieldsSize,
                                                        FDefaultTZDate,  CachedUpdates,
                                                        FBufferChunks,
                                                        FBufferChunks);
@@ -3751,7 +3745,6 @@ begin
     FieldDefs.Updated := false;
     FInternalPrepared := False;
     Setlength(FAliasNameList,0);
-    FComputedFieldNames.Clear;
     FCursor := nil;
   end;
 end;

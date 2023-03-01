@@ -380,7 +380,6 @@ type
         fdDataSize: Short;
         fdDataOfs: Integer;
         fdCodePage: TSystemCodePage;
-        fdIsComputed: boolean;
         fdRefreshOnInsert: boolean;
         fdRefreshOnUpdate: boolean;
         fdObjOffset: Integer; {used for Blob and Array columns}
@@ -434,8 +433,7 @@ type
     FDataset: TDataSet;
 
     function GetSQLParams : ISQLParams;
-    procedure SetupBufferStructure(metadata: IMetadata; aFields: TFields;
-      ComputedFieldNames: TStrings);
+    procedure SetupBufferStructure(metadata: IMetadata; aFields: TFields);
     procedure ClearBlobCache;
     procedure ClearArrayCache;
     procedure CopyCursorDataToBuffer(QryResults: IResults; QryIndex, ColIndex: integer;
@@ -476,7 +474,7 @@ type
     property Cursor: IResultSet read FCursor;
     property ColumnMetaData: TColumnMetadataArray read FColumnMetaData;
   public
-    constructor Create(aDataset: TDataset; aName: string; aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
+    constructor Create(aDataset: TDataset; aName: string; aCursor: IResultSet; aFields: TFields;
         aCalcFieldsSize: integer; aDefaultTZDate: TDateTime);
     destructor Destroy; override;
 
@@ -566,7 +564,7 @@ type
     procedure InternalSetOldBuffer(aBuffer, OldBuffer: PByte); inline;
     procedure Reset; override;
   public
-    constructor Create(aDataset: TDataset; aName: string; aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
+    constructor Create(aDataset: TDataset; aName: string; aCursor: IResultSet; aFields: TFields;
       aCalcFieldsSize: integer; aDefaultTZDate: TDateTime; CachedUpdates: boolean);
     destructor Destroy; override;
     procedure EditingDone(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); virtual;
@@ -646,7 +644,7 @@ type
     procedure Reset; override;
   public
     constructor Create(aDataset: TDataset; aName: string; aCursor: IResultSet; aFields: TFields;
-      ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
+      aCalcFieldsSize: integer;
       aDefaultTZDate: TDateTime;  CachedUpdates: boolean;
       aBuffersPerBlock, aFirstBlockBuffers: integer);
     destructor Destroy; override;
@@ -744,7 +742,7 @@ begin
   FEditState := esInsert;
   for i := 0 to ColumnCount - 1 do
     with ColumnMetaData[i] do
-     if fdIsComputed or fdRefreshOnInsert then
+     if fdRefreshOnInsert then
        SetRefreshRequired(aBuffer,i,true);
 end;
 
@@ -775,13 +773,12 @@ begin
                                                OldBuffersPerBlock, OldBuffersPerBlock);
 end;
 
- constructor TIBEditableCursor.Create(aDataset : TDataset; aName : string;
-   aCursor : IResultSet; aFields : TFields; ComputedFieldNames : TStrings;
-   aCalcFieldsSize : integer; aDefaultTZDate : TDateTime;
-   CachedUpdates : boolean);
+  constructor TIBEditableCursor.Create(aDataset : TDataset; aName : string;
+   aCursor : IResultSet; aFields : TFields; aCalcFieldsSize : integer;
+   aDefaultTZDate : TDateTime; CachedUpdates : boolean);
 begin
   FCachedUpdatesEnabled := CachedUpdates;
-  inherited Create(aDataset, aName, aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
+  inherited Create(aDataset, aName, aCursor,aFields, aCalcFieldsSize, aDefaultTZDate);
   if FCachedUpdatesEnabled then
     InitCachedUpdates
   else
@@ -833,7 +830,7 @@ begin
   FEditState := esEdit;
   for i := 0 to ColumnCount - 1 do
     with ColumnMetaData[i] do
-      if fdIsComputed or fdRefreshOnUpdate then
+      if fdRefreshOnUpdate then
         SetRefreshRequired(Buff,i,true);
 end;
 
@@ -1070,12 +1067,12 @@ begin
   // Do nothing
 end;
 
- constructor TIBBiDirectionalCursor.Create(aDataset : TDataset; aName : string;
-   aCursor : IResultSet; aFields : TFields; ComputedFieldNames : TStrings;
-   aCalcFieldsSize : integer; aDefaultTZDate : TDateTime;
-   CachedUpdates : boolean; aBuffersPerBlock, aFirstBlockBuffers : integer);
+  constructor TIBBiDirectionalCursor.Create(aDataset : TDataset; aName : string;
+   aCursor : IResultSet; aFields : TFields; aCalcFieldsSize : integer;
+   aDefaultTZDate : TDateTime; CachedUpdates : boolean; aBuffersPerBlock,
+   aFirstBlockBuffers : integer);
 begin
-  inherited Create(aDataset,aName,aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate,CachedUpdates);
+  inherited Create(aDataset,aName,aCursor,aFields, aCalcFieldsSize, aDefaultTZDate,CachedUpdates);
   FBufferPool := TIBBufferPool.Create(aName+ ': BiDirectional record cache',
                       RecordBufferSize,aBuffersPerBlock, aFirstBlockBuffers);
 end;
@@ -1654,8 +1651,8 @@ end;
   result in and FColumnMetadata that is not linked to a TField.
 }
 
-procedure TIBSelectCursor.SetupBufferStructure(metadata: IMetadata;
-  aFields: TFields; ComputedFieldNames: TStrings);
+procedure TIBSelectCursor.SetupBufferStructure(metadata : IMetadata;
+  aFields : TFields);
 var i: integer;
     colMetadata: IColumnMetaData;
     field: TField;
@@ -1693,8 +1690,11 @@ begin
     begin
       FFieldNo2ColumnMap[field.FieldNo] := ColMetaDataIndex;
       Colused := true;
-      fdRefreshOnInsert := pfRefreshOnInsert in field.ProviderFlags;
-      fdRefreshOnUpdate := pfRefreshOnUpdate in field.ProviderFlags;
+      fdRefreshOnInsert := (pfRefreshOnInsert in field.ProviderFlags) or
+                           (TIBFieldDef(field.FieldDef).IdentityColumn) or
+                            field.FieldDef.InternalCalcField;
+      fdRefreshOnUpdate := (pfRefreshOnUpdate in field.ProviderFlags) or
+                            field.FieldDef.InternalCalcField;
     end;
 
     if not Colused then continue;
@@ -1708,7 +1708,6 @@ begin
     fdDataSize := colMetadata.GetSize;
     fdCodePage := CP_NONE;
     fdAliasName := colMetadata.GetAliasName;
-    fdIsComputed := ComputedFieldNames.IndexOf(fdAliasName) <> -1;
 
     case fdDataType of
     SQL_TIMESTAMP,
@@ -2170,9 +2169,9 @@ begin
   THackedField(aField).DataChanged;
 end;
 
-  constructor TIBSelectCursor.Create(aDataset : TDataset; aName : string;
-   aCursor : IResultSet; aFields : TFields; ComputedFieldNames : TStrings;
-   aCalcFieldsSize : integer; aDefaultTZDate : TDateTime);
+constructor TIBSelectCursor.Create(aDataset : TDataset; aName : string;
+    aCursor : IResultSet; aFields : TFields; aCalcFieldsSize : integer;
+    aDefaultTZDate : TDateTime);
 begin
   inherited Create;
   FBlobStreamList := TList.Create;
@@ -2182,7 +2181,7 @@ begin
   FCursor := aCursor;
   FCalcFieldsSize := aCalcFieldsSize;
   FDefaultTZDate := aDefaultTZDate;
-  SetupBufferStructure(cursor.GetStatement.MetaData,aFields,ComputedFieldNames);
+  SetupBufferStructure(cursor.GetStatement.MetaData,aFields);
   FCurrentRecord := nil;
   FCurrentRecordStatus := csBOF;
   ClearRegisteredQueries;
