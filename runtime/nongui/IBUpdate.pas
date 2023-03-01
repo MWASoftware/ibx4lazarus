@@ -41,13 +41,10 @@ type
 
   TIBUpdate = class(TIBDataSetUpdateObject)
   private
-    FDataSet: TIBCustomDataSet;
     FDummySQL: TStrings;
     FOnApplyUpdates: TOnApplyUpdates;
   protected
     function GetSQL(UpdateKind: TUpdateKind): TStrings; override;
-    function GetDataSet: TIBCustomDataSet; override;
-    procedure SetDataSet(ADataSet: TIBCustomDataSet); override;
     procedure Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -777,16 +774,6 @@ end;
 function TIBUpdate.GetSQL(UpdateKind: TUpdateKind): TStrings;
 begin
   Result := FDummySQL; {non empty result}
-end;
-
-function TIBUpdate.GetDataSet: TIBCustomDataSet;
-begin
-  Result := FDataSet;
-end;
-
-procedure TIBUpdate.SetDataSet(ADataSet: TIBCustomDataSet);
-begin
-  FDataSet := ADataset;
 end;
 
 procedure TIBUpdate.Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer);

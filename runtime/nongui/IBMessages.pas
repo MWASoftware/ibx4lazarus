@@ -197,7 +197,8 @@ type
       ibxeCannotUnDelete,
       ibxeDeleteAtBOF,
       ibxeInsertBeforeBOF,
-      ibxeDifferentStatement
+      ibxeDifferentStatement,
+      ibxeIncorrectQueryType
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -363,6 +364,7 @@ resourcestring
   SDeleteAtBOF = 'Cannot delete at BOF';
   SInsertBeforeBOF = 'Cannot insert before BOF';
   SDifferentStatement = 'A Cursor can only be replaced using a new cursor from the same statement';
+  SIncorrectQueryType = 'Unexpected Query used to post record';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -487,7 +489,8 @@ const
     SCannotUnDelete,
     SDeleteAtBOF,
     SInsertBeforeBOF,
-    SDifferentStatement
+    SDifferentStatement,
+    SIncorrectQueryType
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

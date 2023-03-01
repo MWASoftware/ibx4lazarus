@@ -274,6 +274,10 @@ type
     TUpdatesIterator = procedure(status: TCachedUpdateStatus; aBufID: TRecordBuffer;
                        var RecordSkipped: boolean) of object;
 
+    TOnValuesReturned = procedure(qryResults: IResults) of object;
+
+    TRegisteredQueryTypes = (rqInsert,rqModify,rqDelete,rqRefresh);
+
     IIBCursor = interface
     ['{909621f7-e7fe-4b39-a8c5-f25c40a71c12}']
       function AllocRecordBuffer: TRecordBuffer;
@@ -325,10 +329,13 @@ type
       function AtEOF: boolean;
       procedure ClearCalcFields(aBufID: TRecordBuffer);
       procedure SetCursor(aCursor: IResultSet);
-    end;
+      procedure RegisterQuery(qryType : TRegisteredQueryTypes; qry : IStatement;
+         OnValuesReturnedProc : TOnValuesReturned);
+      procedure ExecRegisteredQuery(qryType : TRegisteredQueryTypes; aBufID: TRecordBuffer;
+         var SelectCount, InsertCount, UpdateCount, DeleteCount: integer);
 
-    TIBMonitorEventType = (mtFetch, mtExecute);
-    TIBMonitorEvent = procedure(Sender: TObject; eventType: TIBMonitorEventType; stmt: IStatement) of object;
+      function HasRegisteredQuery(qryType : TRegisteredQueryTypes): boolean;
+    end;
 
     {
     TIBSelectCursor provides common functions for uni-directional, bi-directional
@@ -344,8 +351,6 @@ type
     time the dataset is scolled. It also avoids the cached rows buffers having to
     include space for the calculated fields.
   }
-
-  TOnValuesReturned = procedure(qryResults: IResults) of object;
 
   TIBSelectCursor = class(TInterfacedObject)
   private type
@@ -395,8 +400,6 @@ type
 
       TColumnMetadataArray = array of TColumnMetadata;
 
-      TRegisteredQueryTypes = (rqInsert,rqModify,rqDelete,rqRefresh);
-
       TRegisteredQuery = record
         stmt: IStatement;
         ParamMap: array of integer;
@@ -425,9 +428,10 @@ type
     FCursor: IResultSet;                   {The Cursor}
     FDefaultTZDate: TDateTime;             {Default Time Zone time}
     FName: string;                         {Local cursor name - set by creator}
-    FOnMonitorEvent: TIBMonitorEvent;      {Used to report row fetch e.g. for monitor hook}
     FRegisteredQueries: array[TRegisteredQueryTypes] of TRegisteredQuery; {cached query info}
+    FDataset: TDataSet;
 
+    function GetSQLParams : ISQLParams;
     procedure SetupBufferStructure(metadata: IMetadata; aFields: TFields;
       ComputedFieldNames: TStrings);
     procedure ClearBlobCache;
@@ -438,6 +442,9 @@ type
     procedure InternalSetIsNull(Buff: PByte; ColIndex: integer; IsNull: boolean);
     procedure SetRefreshRequired(Buff: PByte; ColIndex: integer; RefreshRequired: boolean);
     procedure SaveBlobsAndArrays(Buff: PByte);
+    function NormaliseParamName(aName: AnsiString; var UseOldValue: boolean): AnsiString;
+    procedure ClearRegisteredQueries;
+    procedure SetParamValue(Buff: PByte; colIndex: integer; Param: ISQLParam);
   protected
     FCurrentRecord: PByte;
     FCurrentRecordStatus: (csBOF, csRowBuffer, csEOF);
@@ -462,15 +469,13 @@ type
     procedure SetUpdateStatus(aBufID: TRecordBuffer; status: TUpdateStatus);
     procedure Reset; virtual;
     function FetchNext: boolean;
-    function NormaliseParamName(aName: AnsiString; var UseOldValue: boolean): AnsiString;
-    procedure ClearRegisteredQueries;
   protected
     property Buffers[index: TRecordBuffer]:PByte read GetBuffer;
     property Cursor: IResultSet read FCursor;
     property ColumnMetaData: TColumnMetadataArray read FColumnMetaData;
   public
-    constructor Create(aName: string; aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
-        aCalcFieldsSize: integer; aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent);
+    constructor Create(aDataset: TDataset; aName: string; aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
+        aCalcFieldsSize: integer; aDefaultTZDate: TDateTime);
     destructor Destroy; override;
 
     {TDataset Interface}
@@ -491,7 +496,7 @@ type
     procedure SetBookmarkData(aBufID: TRecordBuffer; RecNo: TIBRecordNumber); overload;
     procedure GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
     procedure SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); overload;
-   function GetBookmarkSize: integer;
+    function GetBookmarkSize: integer;
     function GetRecordSize: word;
     function GetCurrentRecNo: TIBRecordNumber;
     procedure SwapDataBuffer(buf1, buf2: TRecordBuffer);
@@ -499,15 +504,17 @@ type
     procedure InitRecord(aBufID: TRecordBuffer); virtual;
     function AtBOF: boolean;
     function AtEOF: boolean;
+    function CursorAtEOF: boolean;
     procedure Delete(aBufID: TRecordBuffer);
     procedure UnDelete(aBufID: TRecordBuffer);
     function GetUpdateStatus(aBufID: TRecordBuffer): TUpdateStatus;
     procedure ClearCalcFields(aBufID: TRecordBuffer);
     procedure SetCursor(aCursor: IResultSet);
-     procedure RegisterQuery(qryType : TRegisteredQueryTypes; qry : IStatement;
+    procedure RegisterQuery(qryType : TRegisteredQueryTypes; qry : IStatement;
        OnValuesReturnedProc : TOnValuesReturned);
-    procedure ExecRegisteredQuery(qryType : TRegisteredQueryTypes; aBufID: TRecordBuffer);
-    procedure SetParamValue(Buff: PByte; colIndex: integer; Param: ISQLParam);
+    procedure ExecRegisteredQuery(qryType : TRegisteredQueryTypes; aBufID: TRecordBuffer;
+       var SelectCount, InsertCount, UpdateCount, DeleteCount: integer);
+    function HasRegisteredQuery(qryType : TRegisteredQueryTypes): boolean;
   public
     property RecordBufferSize: integer read FRecordBufferSize;
     property ColumnCount: integer read FColumnCount;
@@ -516,6 +523,8 @@ type
     property BlobFieldCount: integer read FBlobFieldCount;
     property ArrayFieldCount: integer read FArrayFieldCount;
     property Name: string read FName;
+    property Dataset: TDataset read FDataset;
+    property Params: ISQLParams read GetSQLParams;
   end;
 
   { TIBEditableCursor adds the means the save a copy of the current buffer during
@@ -554,8 +563,8 @@ type
     procedure InternalSetOldBuffer(aBuffer, OldBuffer: PByte); inline;
     procedure Reset; override;
   public
-    constructor Create(aName: string; aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
-      aCalcFieldsSize: integer; aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent; CachedUpdates: boolean);
+    constructor Create(aDataset: TDataset; aName: string; aCursor: IResultSet; aFields: TFields; ComputedFieldNames: TStrings;
+      aCalcFieldsSize: integer; aDefaultTZDate: TDateTime; CachedUpdates: boolean);
     destructor Destroy; override;
     procedure EditingDone(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus); virtual;
     procedure EditBuffer(aBufID: TRecordBuffer);
@@ -633,9 +642,9 @@ type
     procedure InternalUnDelete(aBuffer: PByte); override;
     procedure Reset; override;
   public
-    constructor Create(aName: string; aCursor: IResultSet; aFields: TFields;
+    constructor Create(aDataset: TDataset; aName: string; aCursor: IResultSet; aFields: TFields;
       ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
-      aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent; CachedUpdates: boolean;
+      aDefaultTZDate: TDateTime;  CachedUpdates: boolean;
       aBuffersPerBlock, aFirstBlockBuffers: integer);
     destructor Destroy; override;
     function GetRecord(aBufID: TRecordBuffer; GetMode: TGetMode;
@@ -654,7 +663,7 @@ type
 
 implementation
 
-uses IBMessages, IBCustomDataSet, IBInternals;
+uses IBMessages, IBCustomDataSet, IBInternals, IBSQLMonitor;
 
 type
   THackedField = class(TField); {Used to access to protected method TField.DataChange}
@@ -749,12 +758,13 @@ begin
                                                OldBuffersPerBlock, OldBuffersPerBlock);
 end;
 
-constructor TIBEditableCursor.Create(aName: string; aCursor: IResultSet;
-  aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
-  aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent; CachedUpdates: boolean);
+ constructor TIBEditableCursor.Create(aDataset : TDataset; aName : string;
+   aCursor : IResultSet; aFields : TFields; ComputedFieldNames : TStrings;
+   aCalcFieldsSize : integer; aDefaultTZDate : TDateTime;
+   CachedUpdates : boolean);
 begin
   FCachedUpdatesEnabled := CachedUpdates;
-  inherited Create(aName, aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate, OnMonitorEvent);
+  inherited Create(aDataset, aName, aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate);
   if FCachedUpdatesEnabled then
     InitCachedUpdates
   else
@@ -1038,12 +1048,12 @@ begin
   // Do nothing
 end;
 
-constructor TIBBiDirectionalCursor.Create(aName: string; aCursor: IResultSet;
-  aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
-  aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent; CachedUpdates: boolean;
-  aBuffersPerBlock, aFirstBlockBuffers: integer);
+ constructor TIBBiDirectionalCursor.Create(aDataset : TDataset; aName : string;
+   aCursor : IResultSet; aFields : TFields; ComputedFieldNames : TStrings;
+   aCalcFieldsSize : integer; aDefaultTZDate : TDateTime;
+   CachedUpdates : boolean; aBuffersPerBlock, aFirstBlockBuffers : integer);
 begin
-  inherited Create(aName,aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate,OnMonitorEvent,CachedUpdates);
+  inherited Create(aDataset,aName,aCursor,aFields,ComputedFieldNames, aCalcFieldsSize, aDefaultTZDate,CachedUpdates);
   FBufferPool := TIBBufferPool.Create(aName+ ': BiDirectional record cache',
                       RecordBufferSize,aBuffersPerBlock, aFirstBlockBuffers);
 end;
@@ -1784,6 +1794,11 @@ begin
   FRecordBufferSize := RecordSize;
 end;
 
+function TIBSelectCursor.GetSQLParams : ISQLParams;
+begin
+  Result := FCursor.GetStatement.SQLParams;
+end;
+
 function TIBSelectCursor.GetBuffer(aBufID: TRecordBuffer): PByte;
 begin
   Result := PDisplayBuffer(aBufID)^.dbBuffer;
@@ -1842,8 +1857,8 @@ end;
 function TIBSelectCursor.FetchNext: boolean;
 begin
   Result := Cursor.FetchNext;
-  if assigned(FOnMonitorEvent) then
-    FOnMonitorEvent(self,mtFetch,Cursor.GetStatement);
+  if not (csDesigning in Dataset.ComponentState) then
+    MonitorHook.SQLFetch(self,Cursor.GetStatement.GetSQLText);
 end;
 
 function TIBSelectCursor.NormaliseParamName(aName : AnsiString;
@@ -1870,7 +1885,13 @@ procedure TIBSelectCursor.ClearRegisteredQueries;
 var i: TRegisteredQueryTypes;
 begin
   for i := low(FRegisteredQueries) to high(FRegisteredQueries) do
-    FRegisteredQueries[i].stmt := nil;
+  with FRegisteredQueries[i] do
+  begin
+    stmt := nil;
+    SetLength(ParamMap,0);
+    SetLength(UseOldValue,0);
+    SetLength(ColMap,0);
+  end;
 end ;
 
 procedure TIBSelectCursor.ClearBlobCache;
@@ -2135,13 +2156,14 @@ begin
     InternalSetUpdateStatus(aBuffer,usModified);
 end;
 
-constructor TIBSelectCursor.Create(aName: string; aCursor: IResultSet;
-  aFields: TFields; ComputedFieldNames: TStrings; aCalcFieldsSize: integer;
-  aDefaultTZDate: TDateTime; OnMonitorEvent: TIBMonitorEvent);
+  constructor TIBSelectCursor.Create(aDataset : TDataset; aName : string;
+   aCursor : IResultSet; aFields : TFields; ComputedFieldNames : TStrings;
+   aCalcFieldsSize : integer; aDefaultTZDate : TDateTime);
 begin
   inherited Create;
   FBlobStreamList := TList.Create;
   FArrayList := TList.Create;
+  FDataset := aDataset;
   FName := aName;
   FCursor := aCursor;
   FCalcFieldsSize := aCalcFieldsSize;
@@ -2149,7 +2171,6 @@ begin
   SetupBufferStructure(cursor.GetStatement.MetaData,aFields,ComputedFieldNames);
   FCurrentRecord := nil;
   FCurrentRecordStatus := csBOF;
-  FOnMonitorEvent := OnMonitorEvent;
   ClearRegisteredQueries;
 end;
 
@@ -2614,6 +2635,11 @@ begin
   Result := (FCurrentRecordStatus = csEOF) and Cursor.IsEof;
 end;
 
+function TIBSelectCursor.CursorAtEOF : boolean;
+begin
+  Result := FCursor.IsEof;
+end;
+
 procedure TIBSelectCursor.Delete(aBufID: TRecordBuffer);
 var Buff: PByte;
 begin
@@ -2681,12 +2707,14 @@ begin
   end;
 end;
 
-procedure TIBSelectCursor.ExecRegisteredQuery(qryType : TRegisteredQueryTypes;
-   aBufID : TRecordBuffer);
+ procedure TIBSelectCursor.ExecRegisteredQuery(qryType : TRegisteredQueryTypes;
+   aBufID : TRecordBuffer; var SelectCount, InsertCount, UpdateCount,
+   DeleteCount : integer);
 var Buff: PByte;
     i: integer;
     OldBuffer: PByte;
     qryResults: IResults;
+    qryResultSet: IResultSet;
 begin
   Buff := GetBuffer(aBufID);
   if Buff = nil then
@@ -2708,10 +2736,22 @@ begin
       end;
 
     {exeute query}
-    qryResults := stmt.Execute;
+    if stmt.SQLStatementType =  SQLSelect then
+    begin
+      qryResultSet := stmt.OpenCursor;
+      qryResultSet.FetchNext;
+      qryResults := qryResultSet;  {Only single results expected}
+    end
+    else
+      qryResults := stmt.Execute;
+    stmt.GetRowsAffected(SelectCount, InsertCount, UpdateCount, DeleteCount);
+    if not (csDesigning in Dataset.ComponentState) then
+      MonitorHook.SQLExecute(self,stmt.GetSQLText);
 
     {process any return values}
-    if qryType <> rqDelete then
+    if qryType = rqDelete then
+      InternalDelete(aBufID)
+    else
     begin
       ClearRecordCache(Buff);
       for i := 0 to Length(ColMap) - 1 do
@@ -2726,7 +2766,13 @@ begin
   end;
 end;
 
- procedure TIBSelectCursor.SetParamValue(Buff : PByte; colIndex : integer;
+function TIBSelectCursor.HasRegisteredQuery(qryType : TRegisteredQueryTypes
+   ) : boolean;
+begin
+  Result := FRegisteredQueries[qryType].stmt <> nil;
+end;
+
+procedure TIBSelectCursor.SetParamValue(Buff : PByte; colIndex : integer;
    Param : ISQLParam);
 var Data: PByte;
     DataLength: Short;

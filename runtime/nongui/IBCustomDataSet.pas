@@ -64,24 +64,31 @@ type
 
   TIBDataSetUpdateObject = class(TComponent)
   private
-    FRefreshSQL: TStrings;
+    FQRefresh: TIBSQL;
+    FDataSet: TIBCustomDataSet;
+    function GetQRefresh : TIBSQL;
+    function GetRefreshSQL : TStrings;
     procedure SetRefreshSQL(value: TStrings);
   protected
-    function GetDataSet: TIBCustomDataSet; virtual; abstract;
-    procedure SetDataSet(ADataSet: TIBCustomDataSet); virtual; abstract;
     procedure Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer); virtual; abstract;
     function GetSQL(UpdateKind: TUpdateKind): TStrings; virtual; abstract;
     procedure InternalSetParams(Params: ISQLParams; buff: TRecordBuffer); overload;
     procedure InternalSetParams(Query: TIBSQL; buff: TRecordBuffer); overload;
+    procedure RegisterQuery(qryType: TRegisteredQueryTypes; qry: TIBSQL);
+    procedure SetDataSet(AValue : TIBCustomDataSet); virtual;
+    procedure SQLChanging(Sender: TObject);
     procedure UpdateRecordFromQuery(UpdateKind: TUpdateKind; QryResults: IResults; Buffer: TRecordBuffer);
-    property DataSet: TIBCustomDataSet read GetDataSet write SetDataSet;
+  protected
+    property DataSet: TIBCustomDataSet read FDataSet write SetDataSet;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function GetRowsAffected(var SelectCount, InsertCount, UpdateCount,
                                  DeleteCount: integer): boolean; virtual;
+    procedure RegisterQueries; virtual;
+    property QRefresh: TIBSQL read GetQRefresh;
   published
-    property RefreshSQL: TStrings read FRefreshSQL write SetRefreshSQL;
+    property RefreshSQL: TStrings read GetRefreshSQL write SetRefreshSQL;
   end;
 
   TIBArrayField = class;
@@ -478,7 +485,6 @@ type
     procedure SetUpdateRecordTypes(Value: TIBUpdateRecordTypes);
     procedure SetUniDirectional(Value: Boolean);
     procedure RefreshParams;
-    procedure HandleOnMonitorEvent(Sender: TObject; eventType: TIBMonitorEventType; stmt: IStatement);
 
   protected
     function GetMasterDetailDelay: integer; virtual;
@@ -2169,16 +2175,25 @@ procedure TIBCustomDataSet.InternalDeleteRecord(Qry: TIBSQL;
   aBuffID: TRecordBuffer);
 begin
   begin
-    if (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukDelete).Text <> '')) then
-      FUpdateObject.Apply(ukDelete,aBuffID)
+    if FCursor.HasRegisteredQuery(rqDelete) then
+    begin
+      FCursor.ExecRegisteredQuery(rqDelete,aBuffID,FSelectCount, FInsertCount, FUpdateCount, FDeleteCount);
+      FBase.DoAfterExecQuery(FQDelete);
+    end
     else
     begin
-      FCursor.SetSQLParams(aBuffID,Qry.Params);
-      Qry.ExecQuery;
-      if (Qry.FieldCount > 0)  then
-        DoDeleteReturning(Qry.Current);
+      if (Assigned(FUpdateObject) and (FUpdateObject.GetSQL(ukDelete).Text <> '')) then
+        FUpdateObject.Apply(ukDelete,aBuffID)
+      else
+      begin
+        FCursor.SetSQLParams(aBuffID,Qry.Params);
+        Qry.ExecQuery;
+        Qry.Statement.GetRowsAffected(FSelectCount, FInsertCount, FUpdateCount, FDeleteCount);
+        if (Qry.FieldCount > 0)  then
+          DoDeleteReturning(Qry.Current);
+      end;
+      FCursor.Delete(aBuffID);
     end;
-    FCursor.Delete(aBuffID);
   end;
 end;
 
@@ -2268,14 +2283,28 @@ end;
 
 procedure TIBCustomDataSet.InternalPostRecord(Qry: TIBSQL; Buff: TRecordBuffer);
 begin
+  if (Qry = FQInsert) and FCursor.HasRegisteredQuery(rqInsert) then
+  begin
+    FCursor.ExecRegisteredQuery(rqInsert,Buff,FSelectCount, FInsertCount, FUpdateCount, FDeleteCount);
+    FBase.DoAfterExecQuery(FQInsert);
+  end
+  else
+  if (qry = FQModify) and FCursor.HasRegisteredQuery(rqModify) then
+  begin
+    FCursor.ExecRegisteredQuery(rqModify,Buff,FSelectCount, FInsertCount, FUpdateCount, FDeleteCount);
+    FBase.DoAfterExecQuery(FQModify);
+  end
+  else
   if Assigned(FUpdateObject) then
   begin
-    if (Qry = FQDelete) then
-      FUpdateObject.Apply(ukDelete,Buff)
-    else if (Qry = FQInsert) then
+    if (Qry = FQInsert) then
       FUpdateObject.Apply(ukInsert,Buff)
     else
-      FUpdateObject.Apply(ukModify,Buff);
+    if (qry = FQModify) then
+      FUpdateObject.Apply(ukModify,Buff)
+    else
+      IBError(ibxeIncorrectQueryType,[nil]);
+
     FUpdateObject.GetRowsAffected(FSelectCount, FInsertCount, FUpdateCount, FDeleteCount);
   end
   else
@@ -2294,6 +2323,7 @@ end;
 procedure TIBCustomDataSet.InternalRefreshRow(Buff: TRecordBuffer);
 var
   Qry: TIBSQL;
+  SelectCount, InsertCount, UpdateCount, DeleteCount: integer;
 begin
   FBase.SetCursor;
   try
@@ -2301,27 +2331,27 @@ begin
     begin
       if Buff <> nil then
       begin
-        if (Assigned(FUpdateObject) and (Trim(FUpdateObject.RefreshSQL.Text) <> '')) then
+        if FCursor.HasRegisteredQuery(rqRefresh) then
         begin
-          Qry := TIBSQL.Create(self);
-          Qry.Database := Database;
-          Qry.Transaction := Transaction;
-          Qry.GoToFirstRecordOnExecute := False;
-          Qry.SQL.Text := FUpdateObject.RefreshSQL.Text;
+          FCursor.ExecRegisteredQuery(rqRefresh,Buff,SelectCount, InsertCount, UpdateCount, DeleteCount);
+          FBase.DoAfterExecQuery(FQRefresh);
         end
         else
-          Qry := FQRefresh;
-        FCursor.SetSQLParams(Buff,Qry.Params);
-        Qry.ExecQuery;
-        try
-          if (Qry.SQLStatementType = SQLExecProcedure) or Qry.Next then
-            FCursor.UpdateRecordFromQuery(Buff,Qry.Current);
-         finally
-          Qry.Close;
+        begin
+          if (Assigned(FUpdateObject) and (Trim(FUpdateObject.RefreshSQL.Text) <> '')) then
+            Qry := FUpdateObject.QRefresh
+          else
+            Qry := FQRefresh;
+          FCursor.SetSQLParams(Buff,Qry.Params);
+          Qry.ExecQuery;
+          try
+            if (Qry.SQLStatementType = SQLExecProcedure) or Qry.Next then
+              FCursor.UpdateRecordFromQuery(Buff,Qry.Current);
+           finally
+            Qry.Close;
+          end;
         end;
-        if Qry <> FQRefresh then
-          Qry.Free;
-      end
+      end;
     end
     else
       IBError(ibxeCannotRefresh, [nil]);
@@ -2513,16 +2543,6 @@ begin
   finally
     EnableControls;
   end;
-end;
-
-procedure TIBCustomDataSet.HandleOnMonitorEvent(Sender: TObject;
-  eventType: TIBMonitorEventType; stmt: IStatement);
-begin
-  if not (csDesigning in ComponentState) then
-    case eventType of
-      mtFetch: MonitorHook.SQLFetch(FQSelect);
-      mtExecute:;
-    end;
 end;
 
 procedure TIBCustomDataSet.RegisterIBLink(Sender: TIBControlLink);
@@ -3466,21 +3486,36 @@ begin
       FQSelect.ExecQuery;
       FOpen := FQSelect.Open;
       if UniDirectional then
-        FCursor := TIBUniDirectionalCursor.create(Name + ': ' + SUniCursor,
+        FCursor := TIBUniDirectionalCursor.create(self,Name + ': ' + SUniCursor,
                                                        FQSelect.CurrentCursor,Fields,
                                                        FComputedFieldNames, CalcFieldsSize,
-                                                       FDefaultTZDate,HandleOnMonitorEvent, CachedUpdates)
+                                                       FDefaultTZDate, CachedUpdates)
       else
-        FCursor := TIBBiDirectionalCursor.create(Name + ': ' + SBiDirCursor,
+        FCursor := TIBBiDirectionalCursor.create(self,Name + ': ' + SBiDirCursor,
                                                        FQSelect.CurrentCursor,Fields,
                                                        FComputedFieldNames, CalcFieldsSize,
-                                                       FDefaultTZDate, HandleOnMonitorEvent, CachedUpdates,
+                                                       FDefaultTZDate,  CachedUpdates,
                                                        FBufferChunks,
                                                        FBufferChunks);
 
 
       FFilterBuffer := FCursor.AllocRecordBuffer;
       BookmarkSize := FCursor.GetBookmarkSize;
+
+      {Register Queries}
+      if assigned(FUpdateObject) then
+        FUpdateObject.RegisterQueries
+      else
+      begin
+         if FQInsert.Prepared then
+           FCursor.RegisterQuery(rqInsert,FQInsert.Statement,nil);
+         if FQDelete.Prepared then
+           FCursor.RegisterQuery(rqDelete,FQDelete.Statement,DoDeleteReturning);
+         if FQModify.Prepared then
+           FCursor.RegisterQuery(rqModify,FQModify.Statement,nil);
+         if FQRefresh.Prepared then
+           FCursor.RegisterQuery(rqRefresh,FQRefresh.Statement,nil);
+      end;
    end
     else
       FQSelect.ExecQuery;
@@ -3514,7 +3549,8 @@ end;
 procedure TIBCustomDataSet.InternalRefresh;
 begin
   inherited InternalRefresh;
-  InternalRefreshRow(GetActiveBuf);
+  if not CachedUpdates then
+    InternalRefreshRow(GetActiveBuf);
 end;
 
 procedure TIBCustomDataSet.InternalSetToRecord(Buffer: TRecordBuffer);
@@ -3709,6 +3745,7 @@ begin
     FInternalPrepared := False;
     Setlength(FAliasNameList,0);
     FComputedFieldNames.Clear;
+    FCursor := nil;
   end;
 end;
 
@@ -4107,12 +4144,15 @@ end;
 constructor TIBDataSetUpdateObject.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRefreshSQL := TStringList.Create;
+  FQRefresh := TIBSQL.Create(self);
+  FQRefresh.OnSQLChanging := SQLChanging;
+  FQRefresh.GoToFirstRecordOnExecute := false;
 end;
 
 destructor TIBDataSetUpdateObject.Destroy;
 begin
-  FRefreshSQL.Free;
+  if assigned(FQRefresh) then
+    FQRefresh.Free;
   inherited Destroy;
 end;
 
@@ -4126,9 +4166,45 @@ begin
   DeleteCount := 0;
 end;
 
+procedure TIBDataSetUpdateObject.RegisterQueries;
+begin
+  RegisterQuery(rqRefresh,QRefresh);
+end;
+
 procedure TIBDataSetUpdateObject.SetRefreshSQL(value: TStrings);
 begin
-  FRefreshSQL.Assign(Value);
+  FQRefresh.SQL.Assign(Value);
+end;
+
+function TIBDataSetUpdateObject.GetRefreshSQL : TStrings;
+begin
+  Result := FQRefresh.SQL;
+end;
+
+function TIBDataSetUpdateObject.GetQRefresh : TIBSQL;
+begin
+  Result := FQRefresh;
+  if assigned (Result) and not Result.Prepared and (RefreshSQL.Text <> '') then
+    Result.Prepare;
+end;
+
+procedure TIBDataSetUpdateObject.SetDataSet(AValue : TIBCustomDataSet);
+begin
+  if FDataSet = AValue then Exit;
+  FDataSet := AValue;
+  if assigned(FQRefresh) then
+  begin
+    if assigned(Dataset) then
+    begin
+      FQRefresh.Database := Dataset.Database;
+      FQRefresh.Transaction := Dataset.Transaction;
+    end
+    else
+    begin
+      FQRefresh.Database := nil;
+      FQRefresh.Transaction := nil;
+    end;
+  end;
 end;
 
 procedure TIBDataSetUpdateObject.InternalSetParams(Params: ISQLParams;
@@ -4141,6 +4217,24 @@ end;
 procedure TIBDataSetUpdateObject.InternalSetParams(Query: TIBSQL; buff: TRecordBuffer);
 begin
   InternalSetParams(Query.Params,buff);
+end;
+
+procedure TIBDataSetUpdateObject.RegisterQuery(
+   qryType : TRegisteredQueryTypes; qry : TIBSQL);
+begin
+  if assigned(qry) and qry.Prepared and assigned(Dataset) and assigned(Dataset.FCursor) then
+  begin
+    if qryType = rqDelete then
+      Dataset.FCursor.RegisterQuery(qryType,QRefresh.Statement,Dataset.DoDeleteReturning)
+    else
+      Dataset.FCursor.RegisterQuery(qryType,QRefresh.Statement,nil);
+  end;
+end;
+
+ procedure TIBDataSetUpdateObject.SQLChanging(Sender : TObject);
+begin
+  if not Assigned(DataSet) then Exit;
+  Dataset.SQLChanging(Sender);
 end;
 
 procedure TIBDataSetUpdateObject.UpdateRecordFromQuery(UpdateKind: TUpdateKind;
