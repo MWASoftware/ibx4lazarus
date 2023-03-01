@@ -118,13 +118,16 @@ var
 begin
   inherited RegisterQueries;
   for UpdateKind := Low(TUpdateKind) to High(TUpdateKind) do
-  case UpdateKind of
-    ukInsert:
-      RegisterQuery(rqInsert,Query[UpdateKind]);
-    ukModify:
-      RegisterQuery(rqModify,Query[UpdateKind]);
-    ukDelete:
-      RegisterQuery(rqDelete,Query[UpdateKind]);
+  begin
+    InternalPrepare(UpdateKind);
+    case UpdateKind of
+      ukInsert:
+        RegisterQuery(rqInsert,Query[UpdateKind]);
+      ukModify:
+        RegisterQuery(rqModify,Query[UpdateKind]);
+      ukDelete:
+        RegisterQuery(rqDelete,Query[UpdateKind]);
+    end;
   end;
 end;
 
@@ -180,17 +183,17 @@ begin
 
   inherited SetDataSet(AValue);
   for i := low(TUpdateKind) to high(TUpdateKind) do
-    if assigned(FQueries[i]) then
+    if assigned(Query[i]) then
     begin
       if assigned(DataSet) then
       begin
-        FQueries[i].Database := DataSet.Database;
-        FQueries[i].Transaction := DataSet.Transaction;
+        Query[i].Database := DataSet.Database;
+        Query[i].Transaction := DataSet.Transaction;
       end
       else
       begin
-        FQueries[i].Database := nil;
-        FQueries[i].Transaction := nil;
+        Query[i].Database := nil;
+        Query[i].Transaction := nil;
       end;
     end;
 end;

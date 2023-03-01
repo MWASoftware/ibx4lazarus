@@ -538,6 +538,7 @@ type
     procedure DoBeforeClose; override;
     procedure DoBeforePost; override;
     procedure DoAfterPost; override;
+    procedure DoAfterBindFields; virtual;
     procedure FreeRecordBuffer(var Buffer: TRecordBuffer); override;
     procedure GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); override;
     function GetBookmarkFlag(Buffer: TRecordBuffer): TBookmarkFlag; override;
@@ -2757,6 +2758,11 @@ begin
   InternalAutoCommit;
 end;
 
+procedure TIBCustomDataSet.DoAfterBindFields;
+begin
+   // nothing to do
+end;
+
 procedure TIBCustomDataSet.FetchAll;
 var
   CurBookmark: TBookmark;
@@ -3483,6 +3489,7 @@ begin
       if DefaultFields then
         CreateFields;
       BindFields(True);
+      DoAfterBindFields;
       FQSelect.ExecQuery;
       FOpen := FQSelect.Open;
       if UniDirectional then
@@ -4225,9 +4232,9 @@ begin
   if assigned(qry) and qry.Prepared and assigned(Dataset) and assigned(Dataset.FCursor) then
   begin
     if qryType = rqDelete then
-      Dataset.FCursor.RegisterQuery(qryType,QRefresh.Statement,Dataset.DoDeleteReturning)
+      Dataset.FCursor.RegisterQuery(qryType,qry.Statement,Dataset.DoDeleteReturning)
     else
-      Dataset.FCursor.RegisterQuery(qryType,QRefresh.Statement,nil);
+      Dataset.FCursor.RegisterQuery(qryType,qry.Statement,nil);
   end;
 end;
 

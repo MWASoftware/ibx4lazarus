@@ -381,6 +381,8 @@ type
         fdDataOfs: Integer;
         fdCodePage: TSystemCodePage;
         fdIsComputed: boolean;
+        fdRefreshOnInsert: boolean;
+        fdRefreshOnUpdate: boolean;
         fdObjOffset: Integer; {used for Blob and Array columns}
         fdAliasName: AnsiString;
       end;
@@ -440,7 +442,6 @@ type
       destBuff: PByte);
     function InternalGetIsNull(Buff: PByte; ColIndex: integer): boolean;
     procedure InternalSetIsNull(Buff: PByte; ColIndex: integer; IsNull: boolean);
-    procedure SetRefreshRequired(Buff: PByte; ColIndex: integer; RefreshRequired: boolean);
     procedure SaveBlobsAndArrays(Buff: PByte);
     function NormaliseParamName(aName: AnsiString; var UseOldValue: boolean): AnsiString;
     procedure ClearRegisteredQueries;
@@ -466,6 +467,7 @@ type
     procedure InternalUnDelete(aBuffer: PByte); virtual; abstract;
     function InternalGetUpdateStatus(aBuffer: PByte): TUpdateStatus; inline;
     procedure InternalSetUpdateStatus(aBuffer: PByte; status: TUpdateStatus); inline;
+    procedure SetRefreshRequired(Buff: PByte; ColIndex: integer; RefreshRequired: boolean);
     procedure SetUpdateStatus(aBufID: TRecordBuffer; status: TUpdateStatus);
     procedure Reset; virtual;
     function FetchNext: boolean;
@@ -554,6 +556,7 @@ type
     procedure CopyBuffers(src, dest: PByte); inline;
     procedure DoCancelUpdates; virtual; abstract;
     procedure DoOnInserted(aBuffer: PByte);
+    procedure FieldChanged(aBuffer: PByte; aField: TField); override;
     function GetOldBufferFor(aBuffer: PByte): PByte; override;
     procedure InitCachedUpdates; virtual;
     procedure ReleaseSaveBuffer(aBufID: TRecordBuffer; UpdateStatus: TCachedUpdateStatus);
@@ -731,6 +734,7 @@ end;
 
 procedure TIBEditableCursor.DoOnInserted(aBuffer: PByte);
 var OldBuffer: PByte;
+    i: integer;
 begin
   if FCachedUpdatesEnabled then
   begin
@@ -738,6 +742,19 @@ begin
     FOldBufferCache.SetStatus(OldBuffer,cusInserted);
   end;
   FEditState := esInsert;
+  for i := 0 to ColumnCount - 1 do
+    with ColumnMetaData[i] do
+     if fdIsComputed or fdRefreshOnInsert then
+       SetRefreshRequired(aBuffer,i,true);
+end;
+
+procedure TIBEditableCursor.FieldChanged(aBuffer : PByte; aField : TField);
+var I: integer;
+begin
+  inherited FieldChanged(aBuffer, aField);
+
+  if InternalGetUpdateStatus(aBuffer) = usUnModified then
+    InternalSetUpdateStatus(aBuffer,usModified);
 end;
 
 function TIBEditableCursor.GetOldBufferFor(aBuffer: PByte): PByte;
@@ -796,6 +813,7 @@ end;
 procedure TIBEditableCursor.EditBuffer(aBufID: TRecordBuffer);
 var Buff: PByte;
     OldBuffer: PByte;
+    i: integer;
 begin
   Buff := GetBuffer(aBufID);
   if Buff = nil then
@@ -813,6 +831,10 @@ begin
   CopyBuffers(Buff,OldBuffer);
   FSavedRecNo := InternalGetRecNo(Buff);
   FEditState := esEdit;
+  for i := 0 to ColumnCount - 1 do
+    with ColumnMetaData[i] do
+      if fdIsComputed or fdRefreshOnUpdate then
+        SetRefreshRequired(Buff,i,true);
 end;
 
 procedure TIBEditableCursor.CancelChanges(aBufID: TRecordBuffer);
@@ -1671,6 +1693,8 @@ begin
     begin
       FFieldNo2ColumnMap[field.FieldNo] := ColMetaDataIndex;
       Colused := true;
+      fdRefreshOnInsert := pfRefreshOnInsert in field.ProviderFlags;
+      fdRefreshOnUpdate := pfRefreshOnUpdate in field.ProviderFlags;
     end;
 
     if not Colused then continue;
@@ -2142,18 +2166,8 @@ begin
 end;
 
 procedure TIBSelectCursor.FieldChanged(aBuffer: PByte; aField: TField);
-var i: integer;
 begin
   THackedField(aField).DataChanged;
-
-  {Once a field has changed, we need to make sure that all computed values are updated
-   the next time the record is saved}
-
-  for i := 0 to FColumnCount - 1 do
-    if FColumnMetaData[i].fdIsComputed then
-      SetRefreshRequired(aBuffer,i,true);
-  if InternalGetUpdateStatus(aBuffer) = usUnModified then
-    InternalSetUpdateStatus(aBuffer,usModified);
 end;
 
   constructor TIBSelectCursor.Create(aDataset : TDataset; aName : string;
@@ -2735,7 +2749,7 @@ begin
            SetParamValue(Buff,ParamMap[i],stmt.SQLParams[i]);
       end;
 
-    {exeute query}
+    {execute query}
     if stmt.SQLStatementType =  SQLSelect then
     begin
       qryResultSet := stmt.OpenCursor;

@@ -51,7 +51,9 @@ type
   private
     FUpdateSQL: TIBUpdateSQL;
     FUpdateSQL2: TIBUpdateSQL;
+    FUpdateSQL3: TIBUpdateSQL;
     FIBQuery2: TIBQuery;
+    FIBQuery3: TIBQuery;
     procedure HandleDeleteReturning(Sender: TObject; QryResults: IResults);
   protected
     procedure CreateObjects(Application: TTestApplication); override;
@@ -66,6 +68,26 @@ type
 implementation
 
 { TTest20 }
+
+type
+
+  { TIBQuery2 }
+
+  TIBQuery3 = class(TIBQuery) {used to set field Provider Flag}
+  protected
+    procedure DoAfterBindFields; override;
+  end;
+
+{ TIBQuery2 }
+
+procedure TIBQuery3.DoAfterBindFields;
+var field: TField;
+begin
+  field := FindField('ServerSideText');
+  if field <> nil then
+    field.ProviderFlags := field.ProviderFlags + [pfRefreshOnInsert,pfRefreshOnUpdate];
+end;
+
 
 procedure TTest20.HandleDeleteReturning(Sender: TObject; QryResults: IResults);
 begin
@@ -104,6 +126,23 @@ begin
     OnDeleteReturning := @HandleDeleteReturning;
   end;
   with FUpdateSQL2 do
+  begin
+    InsertSQL.Add('Insert into IBDataSetTest(KeyField,PlainText) Values (Gen_ID(AGenerator,1),:PlainText) Returning KeyField, TextAndKey');
+    ModifySQL.Add('Update IBDataSetTest Set KeyField = :KeyField, PlainText = :PlainText Where KeyField = :Old_KeyField Returning TextAndKey,ServerSideText');
+    DeleteSQL.Add('Delete from IBDataSetTest Where KeyField = :old_KeyField Returning KeyField');
+    RefreshSQL.Add('Select * from IBDataSetTest Where KeyField = :KeyField');
+  end;
+  FIBQuery3 := TIBQuery3.Create(Application);
+  FUpdateSQL3 := TIBUpdateSQL.Create(Application);
+  with FIBQuery3 do
+  begin
+    Database := IBDatabase;
+    Transaction := IBTransaction;
+    UpdateObject := FUpdateSQL3;
+    SQL.Add('Select * From IBDataSetTest');
+    OnDeleteReturning := @HandleDeleteReturning;
+  end;
+  with FUpdateSQL3 do
   begin
     InsertSQL.Add('Insert into IBDataSetTest(KeyField,PlainText) Values (Gen_ID(AGenerator,1),:PlainText) Returning KeyField, TextAndKey');
     ModifySQL.Add('Update IBDataSetTest Set KeyField = :KeyField, PlainText = :PlainText Where KeyField = :Old_KeyField Returning TextAndKey,ServerSideText');
@@ -206,6 +245,7 @@ begin
       writeln(Outfile,'close and re-open and print again');
       PrintDataSet(IBQuery);
     end;
+    IBTransaction.Rollback;
     IBTransaction.Active := true;
     with FIBQuery2 do
     begin
@@ -233,7 +273,22 @@ begin
       Delete;
       writeln(Outfile,'Dataset after delete');
       PrintDataSet(FIBQuery2);
-
+      Active := false;
+    end;
+    IBTransaction.Rollback;
+    IBTransaction.Active := true;
+    with FIBQuery3 do
+    begin
+      Active := true;
+      writeln(OutFile,'FIBQuery3: Simple Append - test refresh on insert');
+      Append;
+      FieldByName('PlainText').AsString := 'This is a test';
+      Post;
+      PrintDataSetRow(FIBQuery3);
+      Edit;
+      FieldByName('PlainText').AsString := 'This is the update test';
+      Post;
+      PrintDataSetRow(FIBQuery3);
     end;
   finally
     IBDatabase.DropDatabase;
