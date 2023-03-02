@@ -642,8 +642,8 @@ Rows printed = 42
 Current memory = 950,616
 Delta memory = 9,544
 Max memory = 1,001,928
-Elapsed time= 0.033 sec
-Cpu = 0.002 sec
+Elapsed time= 0.030 sec
+Cpu = 0.003 sec
 Buffers = 75
 Reads = 3
 Writes = 0
@@ -1443,7 +1443,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-localhost:employee Disconnected after 4 ms
+localhost:employee Disconnected after 1 ms
 Before Connect
 Connected to localhost:employee
 DPB: Item Count = 3
@@ -1492,7 +1492,7 @@ Transaction Ending
 Transaction Ended after 2000 ms
 Idle Timer Expired for Test_Transaction_02
 Before Disconnect
-localhost:employee Disconnected after 2007 ms
+localhost:employee Disconnected after 2008 ms
 SQL Dialect Downgrade test
 Before Connect
 Connected to localhost:/tmp/ibx-testsuite/testsuite1.fdb
@@ -3429,8 +3429,8 @@ DEPT_KEY_PATH = 000;600;620;622
 Current memory = 942,504
 Delta memory = 9,520
 Max memory = 1,003,368
-Elapsed time= 0.019 sec
-Cpu = 0.002 sec
+Elapsed time= 0.016 sec
+Cpu = 0.001 sec
 Buffers = 75
 Reads = 3
 Writes = 0
@@ -10224,21 +10224,21 @@ Message File Location = /opt/firebird/2.5.9/
 Database Statistics for employee
 
 Database "/opt/firebird/2.5.9/examples/empbuild/employee.fdb"
-Gstat execution time Tue Feb 28 14:59:52 2023
+Gstat execution time Thu Mar  2 16:42:41 2023
 
 Database header page information:
 Flags			0
 Checksum		12345
-Generation		11332
+Generation		11418
 Page size		4096
 ODS version		11.2
-Oldest transaction	6825
-Oldest active		6826
-Oldest snapshot		6826
-Next transaction	6826
+Oldest transaction	6872
+Oldest active		6873
+Oldest snapshot		6873
+Next transaction	6873
 Bumped transaction	1
 Sequence number		0
-Next attachment ID	2251
+Next attachment ID	2278
 Implementation ID	24
 Shadow count		0
 Page buffers		0
@@ -10363,87 +10363,87 @@ zeus	Tue Jun  9 14:31:01 2020
 INET/inet_error: connect errno = 111
 
 Online Validation
-14:59:54.47 Validation started
+16:42:44.14 Validation started
 
-14:59:54.47 Relation 128 (COUNTRY)
-14:59:54.47   process pointer page    0 of    1
-14:59:54.47 Index 1 (RDB$PRIMARY1)
-14:59:54.47 Relation 128 (COUNTRY) is ok
+16:42:44.14 Relation 128 (COUNTRY)
+16:42:44.14   process pointer page    0 of    1
+16:42:44.14 Index 1 (RDB$PRIMARY1)
+16:42:44.14 Relation 128 (COUNTRY) is ok
 
-14:59:54.47 Relation 129 (JOB)
-14:59:54.47   process pointer page    0 of    1
-14:59:54.47 Index 1 (RDB$PRIMARY2)
-14:59:54.47 Index 2 (RDB$FOREIGN3)
-14:59:54.47 Index 3 (MAXSALX)
-14:59:54.47 Index 4 (MINSALX)
-14:59:54.47 Relation 129 (JOB) is ok
+16:42:44.14 Relation 129 (JOB)
+16:42:44.14   process pointer page    0 of    1
+16:42:44.14 Index 1 (RDB$PRIMARY2)
+16:42:44.14 Index 2 (RDB$FOREIGN3)
+16:42:44.14 Index 3 (MAXSALX)
+16:42:44.14 Index 4 (MINSALX)
+16:42:44.14 Relation 129 (JOB) is ok
 
-14:59:54.47 Relation 130 (DEPARTMENT)
-14:59:54.47   process pointer page    0 of    1
-14:59:54.47 Index 1 (RDB$4)
-14:59:54.47 Index 2 (RDB$PRIMARY5)
-14:59:54.47 Index 3 (RDB$FOREIGN6)
-14:59:54.47 Index 4 (BUDGETX)
-14:59:54.47 Index 5 (RDB$FOREIGN10)
-14:59:54.47 Relation 130 (DEPARTMENT) is ok
+16:42:44.14 Relation 130 (DEPARTMENT)
+16:42:44.14   process pointer page    0 of    1
+16:42:44.14 Index 1 (RDB$4)
+16:42:44.14 Index 2 (RDB$PRIMARY5)
+16:42:44.14 Index 3 (RDB$FOREIGN6)
+16:42:44.14 Index 4 (BUDGETX)
+16:42:44.14 Index 5 (RDB$FOREIGN10)
+16:42:44.14 Relation 130 (DEPARTMENT) is ok
 
-14:59:54.47 Relation 131 (EMPLOYEE)
-14:59:54.47   process pointer page    0 of    1
-14:59:54.47 Index 1 (RDB$PRIMARY7)
-14:59:54.47 Index 2 (RDB$FOREIGN8)
-14:59:54.47 Index 3 (RDB$FOREIGN9)
-14:59:54.47 Index 4 (NAMEX)
-14:59:54.47 Relation 131 (EMPLOYEE) is ok
+16:42:44.14 Relation 131 (EMPLOYEE)
+16:42:44.14   process pointer page    0 of    1
+16:42:44.14 Index 1 (RDB$PRIMARY7)
+16:42:44.14 Index 2 (RDB$FOREIGN8)
+16:42:44.14 Index 3 (RDB$FOREIGN9)
+16:42:44.14 Index 4 (NAMEX)
+16:42:44.14 Relation 131 (EMPLOYEE) is ok
 
-14:59:54.47 Relation 133 (PROJECT)
-14:59:54.47   process pointer page    0 of    1
-14:59:54.47 Index 1 (RDB$11)
-14:59:54.47 Index 2 (RDB$PRIMARY12)
-14:59:54.47 Index 3 (RDB$FOREIGN13)
-14:59:54.47 Index 4 (PRODTYPEX)
-14:59:54.47 Relation 133 (PROJECT) is ok
+16:42:44.14 Relation 133 (PROJECT)
+16:42:44.14   process pointer page    0 of    1
+16:42:44.14 Index 1 (RDB$11)
+16:42:44.14 Index 2 (RDB$PRIMARY12)
+16:42:44.14 Index 3 (RDB$FOREIGN13)
+16:42:44.14 Index 4 (PRODTYPEX)
+16:42:44.14 Relation 133 (PROJECT) is ok
 
-14:59:54.47 Relation 134 (EMPLOYEE_PROJECT)
-14:59:54.47   process pointer page    0 of    1
-14:59:54.47 Index 1 (RDB$PRIMARY14)
-14:59:54.47 Index 2 (RDB$FOREIGN15)
-14:59:54.47 Index 3 (RDB$FOREIGN16)
-14:59:54.47 Relation 134 (EMPLOYEE_PROJECT) is ok
+16:42:44.14 Relation 134 (EMPLOYEE_PROJECT)
+16:42:44.14   process pointer page    0 of    1
+16:42:44.14 Index 1 (RDB$PRIMARY14)
+16:42:44.14 Index 2 (RDB$FOREIGN15)
+16:42:44.14 Index 3 (RDB$FOREIGN16)
+16:42:44.14 Relation 134 (EMPLOYEE_PROJECT) is ok
 
-14:59:54.47 Relation 135 (PROJ_DEPT_BUDGET)
-14:59:54.47   process pointer page    0 of    1
-14:59:54.47 Index 1 (RDB$PRIMARY17)
-14:59:54.47 Index 2 (RDB$FOREIGN18)
-14:59:54.47 Index 3 (RDB$FOREIGN19)
-14:59:54.48 Relation 135 (PROJ_DEPT_BUDGET) is ok
+16:42:44.14 Relation 135 (PROJ_DEPT_BUDGET)
+16:42:44.14   process pointer page    0 of    1
+16:42:44.14 Index 1 (RDB$PRIMARY17)
+16:42:44.15 Index 2 (RDB$FOREIGN18)
+16:42:44.15 Index 3 (RDB$FOREIGN19)
+16:42:44.15 Relation 135 (PROJ_DEPT_BUDGET) is ok
 
-14:59:54.48 Relation 136 (SALARY_HISTORY)
-14:59:54.48   process pointer page    0 of    1
-14:59:54.48 Index 1 (RDB$PRIMARY20)
-14:59:54.48 Index 2 (RDB$FOREIGN21)
-14:59:54.48 Index 3 (CHANGEX)
-14:59:54.48 Index 4 (UPDATERX)
-14:59:54.48 Relation 136 (SALARY_HISTORY) is ok
+16:42:44.15 Relation 136 (SALARY_HISTORY)
+16:42:44.15   process pointer page    0 of    1
+16:42:44.15 Index 1 (RDB$PRIMARY20)
+16:42:44.15 Index 2 (RDB$FOREIGN21)
+16:42:44.15 Index 3 (CHANGEX)
+16:42:44.15 Index 4 (UPDATERX)
+16:42:44.15 Relation 136 (SALARY_HISTORY) is ok
 
-14:59:54.48 Relation 137 (CUSTOMER)
-14:59:54.48   process pointer page    0 of    1
-14:59:54.48 Index 1 (RDB$PRIMARY22)
-14:59:54.48 Index 2 (RDB$FOREIGN23)
-14:59:54.48 Index 3 (CUSTNAMEX)
-14:59:54.48 Index 4 (CUSTREGION)
-14:59:54.48 Relation 137 (CUSTOMER) is ok
+16:42:44.15 Relation 137 (CUSTOMER)
+16:42:44.15   process pointer page    0 of    1
+16:42:44.15 Index 1 (RDB$PRIMARY22)
+16:42:44.15 Index 2 (RDB$FOREIGN23)
+16:42:44.15 Index 3 (CUSTNAMEX)
+16:42:44.15 Index 4 (CUSTREGION)
+16:42:44.15 Relation 137 (CUSTOMER) is ok
 
-14:59:54.48 Relation 138 (SALES)
-14:59:54.48   process pointer page    0 of    1
-14:59:54.48 Index 1 (RDB$PRIMARY24)
-14:59:54.48 Index 2 (RDB$FOREIGN25)
-14:59:54.48 Index 3 (RDB$FOREIGN26)
-14:59:54.48 Index 4 (NEEDX)
-14:59:54.48 Index 5 (QTYX)
-14:59:54.48 Index 6 (SALESTATX)
-14:59:54.48 Relation 138 (SALES) is ok
+16:42:44.15 Relation 138 (SALES)
+16:42:44.15   process pointer page    0 of    1
+16:42:44.15 Index 1 (RDB$PRIMARY24)
+16:42:44.15 Index 2 (RDB$FOREIGN25)
+16:42:44.15 Index 3 (RDB$FOREIGN26)
+16:42:44.15 Index 4 (NEEDX)
+16:42:44.15 Index 5 (QTYX)
+16:42:44.15 Index 6 (SALESTATX)
+16:42:44.15 Relation 138 (SALES) is ok
 
-14:59:54.48 Validation finished
+16:42:44.15 Validation finished
 
 
 Normal Validation
@@ -11731,7 +11731,7 @@ Rows printed = 2
 Current memory = 956,584
 Delta memory = 9,248
 Max memory = 1,002,256
-Elapsed time= 0.001 sec
+Elapsed time= 0.003 sec
 Cpu = 0.000 sec
 Buffers = 75
 Reads = 2
@@ -11953,7 +11953,7 @@ Rows printed = 2
 Current memory = 956,584
 Delta memory = 9,248
 Max memory = 1,002,256
-Elapsed time= 0.105 sec
+Elapsed time= 0.103 sec
 Cpu = 0.000 sec
 Buffers = 75
 Reads = 2
@@ -13140,7 +13140,7 @@ KEYFIELD = 2
 PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
 TEXTANDKEY = 2: This is the update test (Charset = UTF8 Codepage = 65001)
 SERVERSIDETEXT = 2 - This is the update test (Charset = UTF8 Codepage = 65001)
-Now delete the first row
+Show the whole dataset
 Row No = 1
 KEYFIELD = 1
 PLAINTEXT = This is a test (Charset = UTF8 Codepage = 65001)
@@ -13155,6 +13155,16 @@ SERVERSIDETEXT = 2 - This is the update test (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 2
 
+Now delete the first row
+Row No = 1
+KEYFIELD = 2
+PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
+TEXTANDKEY = 2: This is the update test (Charset = UTF8 Codepage = 65001)
+SERVERSIDETEXT = 2 - This is the update test (Charset = UTF8 Codepage = 65001)
+
+Rows printed = 1
+
+Show the whole dataset after close/reopen
 Row No = 1
 KEYFIELD = 2
 PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
@@ -13194,7 +13204,7 @@ KEYFIELD = 5
 PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
 TEXTANDKEY = NULL
 SERVERSIDETEXT = NULL
-Now delete the first row
+Show the whole dataset
 Row No = 1
 KEYFIELD = 4
 PLAINTEXT = This is a test (Charset = UTF8 Codepage = 65001)
@@ -13209,6 +13219,7 @@ SERVERSIDETEXT = NULL
 
 Rows printed = 2
 
+Now delete the first row
 Row No = 1
 KEYFIELD = 5
 PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
@@ -13245,31 +13256,7 @@ KEYFIELD = 7
 PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
 TEXTANDKEY = 7: This is the update test (Charset = UTF8 Codepage = 65001)
 SERVERSIDETEXT = 7 - This is the update test (Charset = UTF8 Codepage = 65001)
-Now delete the first row
-Row No = 1
-KEYFIELD = 5
-PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
-TEXTANDKEY = 5: This is the update test (Charset = UTF8 Codepage = 65001)
-SERVERSIDETEXT = 5 - This is the update test (Charset = UTF8 Codepage = 65001)
-
-Row No = 2
-KEYFIELD = 6
-PLAINTEXT = This is a test (Charset = UTF8 Codepage = 65001)
-TEXTANDKEY = 6: This is a test (Charset = UTF8 Codepage = 65001)
-SERVERSIDETEXT = 6 - This is a test (Charset = UTF8 Codepage = 65001)
-
-Row No = 3
-KEYFIELD = 7
-PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
-TEXTANDKEY = 7: This is the update test (Charset = UTF8 Codepage = 65001)
-SERVERSIDETEXT = 7 - This is the update test (Charset = UTF8 Codepage = 65001)
-
-Rows printed = 3
-
-Delete Returning
-KEYFIELD = 5
-
-Dataset after delete
+Show the whole dataset
 Row No = 1
 KEYFIELD = 6
 PLAINTEXT = This is a test (Charset = UTF8 Codepage = 65001)
@@ -13284,6 +13271,37 @@ SERVERSIDETEXT = 7 - This is the update test (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 2
 
+Now delete the first row
+Delete Returning
+KEYFIELD = 6
+
+Dataset after delete
+Row No = 1
+KEYFIELD = 7
+PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
+TEXTANDKEY = 7: This is the update test (Charset = UTF8 Codepage = 65001)
+SERVERSIDETEXT = 7 - This is the update test (Charset = UTF8 Codepage = 65001)
+
+Rows printed = 1
+
+FIBQuery3: Simple Append - test refresh on insert
+KEYFIELD = 8
+PLAINTEXT = This is a test (Charset = UTF8 Codepage = 65001)
+TEXTANDKEY = 8: This is a test (Charset = UTF8 Codepage = 65001)
+SERVERSIDETEXT = 8 - This is a test (Charset = UTF8 Codepage = 65001)
+KEYFIELD = 8
+PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
+TEXTANDKEY = 8: This is the update test (Charset = UTF8 Codepage = 65001)
+SERVERSIDETEXT = 8 - This is the update test (Charset = UTF8 Codepage = 65001)
+close and re-open and print again
+Row No = 1
+KEYFIELD = 8
+PLAINTEXT = This is the update test (Charset = UTF8 Codepage = 65001)
+TEXTANDKEY = 8: This is the update test (Charset = UTF8 Codepage = 65001)
+SERVERSIDETEXT = 8 - This is the update test (Charset = UTF8 Codepage = 65001)
+
+Rows printed = 1
+
 
 
 ------------------------------------------------------
@@ -13296,14 +13314,14 @@ Create Table LotsOfData (
     MyText VarChar(1024), 
     Primary Key (RowID) 
   );                 
-Loading data into database table. Started at 28/2/2023 15:00:26.680
-Data load completed at 28/2/2023 15:01:44.575 Elapsed Time = 77895 ms, 100000 records loaded
- Message Hash = 6e985b5bcbfbd2def6f1ce3ce0c80f38
-Database Read started at 28/2/2023 15:01:44.576
-Read Dataset completed at 28/2/2023 15:01:49.351 Elapsed Time = 4775 ms, 100000 records read
- Message Hash = 6e985b5bcbfbd2def6f1ce3ce0c80f38
+Loading data into database table. Started at 02/3/2023 16:43:16.405
+Data load completed at 02/3/2023 16:44:32.123 Elapsed Time = 75718 ms, 100000 records loaded
+ Message Hash = a186ea537ce89775fdc3e5f783530648
+Database Read started at 02/3/2023 16:44:32.124
+Read Dataset completed at 02/3/2023 16:44:36.881 Elapsed Time = 4757 ms, 100000 records read
+ Message Hash = a186ea537ce89775fdc3e5f783530648
 Test Completed successfully
-28/2/2023 15:01:49.351 Test 21 passes as long as the checksums are identical
+02/3/2023 16:44:36.881 Test 21 passes as long as the checksums are identical
 
 
 ------------------------------------------------------
@@ -15340,12 +15358,12 @@ Create Table IBXTest (
 
 Create Generator IBXGen;
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:56.9410:
+Journal Entry at 2023/03/02 16:44:44.4810:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 9
-  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+  Transaction Name   = "{9E849147-E08D-426C-9607-6B49B368C69E}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -15374,7 +15392,7 @@ MYFIELD2
 
 Add a record
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:57.0000:
+Journal Entry at 2023/03/02 16:44:44.5480:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -15441,7 +15459,7 @@ Que cela seul est fantastique.
 
 Add and edit a record
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:57.0270:
+Journal Entry at 2023/03/02 16:44:44.5710:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -15563,7 +15581,7 @@ GRANTS = NULL
 MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
 MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:57.0520:
+Journal Entry at 2023/03/02 16:44:44.5900:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -15629,7 +15647,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:57.0710:
+Journal Entry at 2023/03/02 16:44:44.6060:
   Type               = Commit
   Attachment ID      = 2
   Session ID         = 1
@@ -15637,12 +15655,12 @@ Journal Entry at 2023/02/28 15:01:57.0710:
 
 
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:57.0730:
+Journal Entry at 2023/03/02 16:44:44.6090:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 11
-  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+  Transaction Name   = "{9E849147-E08D-426C-9607-6B49B368C69E}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -15768,7 +15786,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:57.3250:
+Journal Entry at 2023/03/02 16:44:44.8730:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -15839,7 +15857,7 @@ Rows printed = 1
 
 Rollback Retaining
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:57.4340:
+Journal Entry at 2023/03/02 16:44:44.9820:
   Type               = Rollback Retaining
   Attachment ID      = 2
   Session ID         = 1
@@ -15968,7 +15986,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:57.6620:
+Journal Entry at 2023/03/02 16:44:45.2060:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -16039,7 +16057,7 @@ Rows printed = 1
 
 Rollback
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:57.7720:
+Journal Entry at 2023/03/02 16:44:45.3160:
   Type               = Rollback
   Attachment ID      = 2
   Session ID         = 1
@@ -16047,12 +16065,12 @@ Journal Entry at 2023/02/28 15:01:57.7720:
 
 
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:57.7760:
+Journal Entry at 2023/03/02 16:44:45.3200:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 14
-  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+  Transaction Name   = "{9E849147-E08D-426C-9607-6B49B368C69E}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -16178,7 +16196,7 @@ Rows printed = 2
 
 Commit Retaining
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:58.0680:
+Journal Entry at 2023/03/02 16:44:45.6060:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -16244,7 +16262,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:58.0860:
+Journal Entry at 2023/03/02 16:44:45.6220:
   Type               = Commit Retaining
   Attachment ID      = 2
   Session ID         = 1
@@ -16431,7 +16449,7 @@ Rows printed = 3
 
 Commit
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:58.4260:
+Journal Entry at 2023/03/02 16:44:45.9620:
   Type               = Commit
   Attachment ID      = 2
   Session ID         = 1
@@ -16439,12 +16457,12 @@ Journal Entry at 2023/02/28 15:01:58.4260:
 
 
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:58.4300:
+Journal Entry at 2023/03/02 16:44:45.9650:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 17
-  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+  Transaction Name   = "{9E849147-E08D-426C-9607-6B49B368C69E}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -16627,7 +16645,7 @@ MYFIELD2 = NULL
 Rows printed = 3
 
 Journal Entry Made
-Journal Entry at 2023/02/28 15:01:58.8080:
+Journal Entry at 2023/03/02 16:44:46.3380:
   Type               = Rollback
   Attachment ID      = 2
   Session ID         = 1
@@ -16639,26 +16657,26 @@ IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 9
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2023/02/28 15:01:56.9390
+IBX$CREATED = 2023/03/02 16:44:44.4780
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 14
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2023/02/28 15:01:57.7750
+IBX$CREATED = 2023/03/02 16:44:45.3190
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 16
 IBX$OLDTRANSACTIONID = 14
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2023/02/28 15:01:58.0890
+IBX$CREATED = 2023/03/02 16:44:45.6260
 
 Low Level Journal File Print out
 Journal Entries
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2023/02/28 15:01:56.9410
+Timestamp = 2023/03/02 16:44:44.4810
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 9
-Transaction Name = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+Transaction Name = "{9E849147-E08D-426C-9607-6B49B368C69E}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -16667,7 +16685,7 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/02/28 15:01:57.0000
+Timestamp = 2023/03/02 16:44:44.5480
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 9
@@ -16731,7 +16749,7 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/02/28 15:01:57.0270
+Timestamp = 2023/03/02 16:44:44.5710
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 9
@@ -16795,7 +16813,7 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/02/28 15:01:57.0520
+Timestamp = 2023/03/02 16:44:44.5900
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 9
@@ -16859,17 +16877,17 @@ Que cela seul est fantastique.
 ,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2023/02/28 15:01:57.0710
+Timestamp = 2023/03/02 16:44:44.6060
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 9
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2023/02/28 15:01:57.0730
+Timestamp = 2023/03/02 16:44:44.6090
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 11
-Transaction Name = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+Transaction Name = "{9E849147-E08D-426C-9607-6B49B368C69E}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -16878,38 +16896,38 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/02/28 15:01:57.3250
+Timestamp = 2023/03/02 16:44:44.8730
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 11
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollbackRet(Rollback Retaining)
-Timestamp = 2023/02/28 15:01:57.4340
+Timestamp = 2023/03/02 16:44:44.9820
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 13
 Old TransactionID = 11
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/02/28 15:01:57.6620
+Timestamp = 2023/03/02 16:44:45.2060
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 13
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2023/02/28 15:01:57.7720
+Timestamp = 2023/03/02 16:44:45.3160
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 13
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2023/02/28 15:01:57.7760
+Timestamp = 2023/03/02 16:44:45.3200
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 14
-Transaction Name = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+Transaction Name = "{9E849147-E08D-426C-9607-6B49B368C69E}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -16918,7 +16936,7 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/02/28 15:01:58.0680
+Timestamp = 2023/03/02 16:44:45.6060
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 14
@@ -16982,24 +17000,24 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeTransCommitRet(Commit Retaining)
-Timestamp = 2023/02/28 15:01:58.0860
+Timestamp = 2023/03/02 16:44:45.6220
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 16
 Old TransactionID = 14
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2023/02/28 15:01:58.4260
+Timestamp = 2023/03/02 16:44:45.9620
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 16
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2023/02/28 15:01:58.4300
+Timestamp = 2023/03/02 16:44:45.9650
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 17
-Transaction Name = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+Transaction Name = "{9E849147-E08D-426C-9607-6B49B368C69E}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -17008,23 +17026,23 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2023/02/28 15:01:58.8080
+Timestamp = 2023/03/02 16:44:46.3380
 Attachment ID = 2
 Session ID = 1
 Transaction ID = 17
 
 
 Print out Journal File using TIBJournal
-Journal Entry at 2023/02/28 15:01:56.9410:
+Journal Entry at 2023/03/02 16:44:44.4810:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 9
-  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+  Transaction Name   = "{9E849147-E08D-426C-9607-6B49B368C69E}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2023/02/28 15:01:57.0000:
+Journal Entry at 2023/03/02 16:44:44.5480:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -17088,7 +17106,7 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2023/02/28 15:01:57.0270:
+Journal Entry at 2023/03/02 16:44:44.5710:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -17152,7 +17170,7 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2023/02/28 15:01:57.0520:
+Journal Entry at 2023/03/02 16:44:44.5900:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -17216,58 +17234,58 @@ Que cela seul est fantastique.
 </array>
 ,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15"
 
-Journal Entry at 2023/02/28 15:01:57.0710:
+Journal Entry at 2023/03/02 16:44:44.6060:
   Type               = Commit
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 9
 
-Journal Entry at 2023/02/28 15:01:57.0730:
+Journal Entry at 2023/03/02 16:44:44.6090:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 11
-  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+  Transaction Name   = "{9E849147-E08D-426C-9607-6B49B368C69E}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2023/02/28 15:01:57.3250:
+Journal Entry at 2023/03/02 16:44:44.8730:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 11
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2023/02/28 15:01:57.4340:
+Journal Entry at 2023/03/02 16:44:44.9820:
   Type               = Rollback Retaining
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 13
   Old Transaction ID = 11
 
-Journal Entry at 2023/02/28 15:01:57.6620:
+Journal Entry at 2023/03/02 16:44:45.2060:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 13
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2023/02/28 15:01:57.7720:
+Journal Entry at 2023/03/02 16:44:45.3160:
   Type               = Rollback
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 13
 
-Journal Entry at 2023/02/28 15:01:57.7760:
+Journal Entry at 2023/03/02 16:44:45.3200:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 14
-  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+  Transaction Name   = "{9E849147-E08D-426C-9607-6B49B368C69E}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2023/02/28 15:01:58.0680:
+Journal Entry at 2023/03/02 16:44:45.6060:
   Type               = Query
   Attachment ID      = 2
   Session ID         = 1
@@ -17331,29 +17349,29 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2023/02/28 15:01:58.0860:
+Journal Entry at 2023/03/02 16:44:45.6220:
   Type               = Commit Retaining
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 16
   Old Transaction ID = 14
 
-Journal Entry at 2023/02/28 15:01:58.4260:
+Journal Entry at 2023/03/02 16:44:45.9620:
   Type               = Commit
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 16
 
-Journal Entry at 2023/02/28 15:01:58.4300:
+Journal Entry at 2023/03/02 16:44:45.9650:
   Type               = Transaction Start
   Attachment ID      = 2
   Session ID         = 1
   Transaction ID     = 17
-  Transaction Name   = "{14526DE8-4DC1-4ADF-9B38-ECCB71436025}"
+  Transaction Name   = "{9E849147-E08D-426C-9607-6B49B368C69E}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2023/02/28 15:01:58.8080:
+Journal Entry at 2023/03/02 16:44:46.3380:
   Type               = Rollback
   Attachment ID      = 2
   Session ID         = 1

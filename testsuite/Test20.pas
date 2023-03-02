@@ -193,10 +193,15 @@ begin
       FieldByName('PlainText').AsString := 'This is the update test';
       Post;
       PrintDataSetRow(IBQuery);
-      writeln(OutFile,'Now delete the first row');
+      writeln(OutFile,'Show the whole dataset');
       PrintDataSet(IBQuery);
+      writeln(OutFile,'Now delete the first row');
       First;
       Delete;
+      PrintDataSet(IBQuery);
+      Active := false;
+      Active := true;
+      writeln(OutFile,'Show the whole dataset after close/reopen');
       PrintDataSet(IBQuery);
       writeln(Outfile,'On Post KeyField Assignment');
       GeneratorField.ApplyOnEvent := gaeOnPostRecord;
@@ -234,8 +239,9 @@ begin
       FieldByName('PlainText').AsString := 'This is the update test';
       Post;
       PrintDataSetRow(IBQuery);
-      writeln(OutFile,'Now delete the first row');
+      writeln(OutFile,'Show the whole dataset');
       PrintDataSet(IBQuery);
+      writeln(OutFile,'Now delete the first row');
       First;
       Delete;
       PrintDataSet(IBQuery);
@@ -267,8 +273,9 @@ begin
       FieldByName('PlainText').AsString := 'This is the update test';
       Post;
       PrintDataSetRow(FIBQuery2);
-      writeln(OutFile,'Now delete the first row');
+      writeln(OutFile,'Show the whole dataset');
       PrintDataSet(FIBQuery2);
+      writeln(OutFile,'Now delete the first row');
       First;
       Delete;
       writeln(Outfile,'Dataset after delete');
@@ -289,6 +296,10 @@ begin
       FieldByName('PlainText').AsString := 'This is the update test';
       Post;
       PrintDataSetRow(FIBQuery3);
+      Active := false;
+      Active := true;
+      writeln(Outfile,'close and re-open and print again');
+      PrintDataSet(FIBQuery3);
     end;
   finally
     IBDatabase.DropDatabase;
