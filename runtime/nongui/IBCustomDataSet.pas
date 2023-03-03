@@ -371,12 +371,15 @@ type
 
   TOnDeleteReturning = procedure (Sender: TObject; QryResults: IResults) of object;
 
+
   { TIBCustomDataSet }
 
   TIBCustomDataSet = class(TDataset)
   private
     const
       BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
+
+
 
   private
     FAllowAutoActivateTransaction: Boolean;
@@ -495,7 +498,6 @@ type
     procedure CheckDatasetOpen;
     function CreateParser: TSelectSQLParser; virtual;
     function GetActiveBuf: TRecordBuffer;
-    procedure FieldDefsFromQuery(SourceQuery: TIBSQL);
     procedure InternalBatchInput(InputObject: TIBBatchInput); virtual;
     procedure InternalBatchOutput(OutputObject: TIBBatchOutput); virtual;
     procedure InternalPrepare; virtual;
@@ -538,6 +540,7 @@ type
     procedure DoBeforePost; override;
     procedure DoAfterPost; override;
     procedure DoAfterBindFields; virtual;
+    procedure FieldDefsFromQuery(Query: TIBSQL);
     procedure FreeRecordBuffer(var Buffer: TRecordBuffer); override;
     procedure GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); override;
     function GetBookmarkFlag(Buffer: TRecordBuffer): TBookmarkFlag; override;
@@ -902,23 +905,50 @@ implementation
 uses Variants, FmtBCD, LazUTF8, IBMessages, IBQuery, DateUtils, dbconst, IBSQLMonitor;
 
 type
+      { TFieldDefsMaker }
 
-  TFieldNode = class(TObject)
-  protected
-    FieldName : String;
-    COMPUTED_BLR : Boolean;
-    DEFAULT_VALUE : boolean;
-    IDENTITY_COLUMN : boolean;
-    NextField : TFieldNode;
-  end;
+  TFieldDefsMaker = class
+  private
+    type
+      TFieldNode = class(TObject)
+      protected
+        FieldName : String;
+        COMPUTED_BLR : Boolean;
+        DEFAULT_VALUE : boolean;
+        IDENTITY_COLUMN : boolean;
+        NextField : TFieldNode;
+      end;
 
-  TRelationNode = class(TObject)
-  protected
-    RelationName : String;
-    FieldNodes : TFieldNode;
-    NextRelation : TRelationNode;
-  end;
+      TRelationNode = class(TObject)
+      protected
+        RelationName : String;
+        FieldNodes : TFieldNode;
+        NextRelation : TRelationNode;
+     end;
 
+  private
+    FDataset: TIBCustomDataset;
+    FRelationNodes: TRelationNode;
+    FQuery: TIBSQL;
+    FFieldIndex: integer;
+    function Add_Node(aRelationName: string): TRelationNode;
+    function GetDatabase: TIBDatabase;
+    function Has_COMPUTED_BLR(aRelationName, aFieldName: String) : Boolean;
+    function Has_DEFAULT_VALUE(aRelationName, aFieldName: String): Boolean;
+    function Is_IDENTITY_COLUMN(aRelationName, aFieldName: String) : Boolean;
+    procedure FreeNodes;
+    procedure MakeFieldDef(FieldDefs: TFieldDefs; ColMetaData: IColumnMetaData;
+                    var DBAliasName: string; var aFieldNo: integer);
+  public
+    AliasNameMap: array of string;
+    AliasNameList: array of AnsiString;
+  public
+    constructor Create(aDataset: TIBCustomDataSet);
+    destructor Destroy; override;
+    procedure MakeFieldDefs(MetaData: IMetaData; FieldDefs: TFieldDefs);
+    property Dataset: TIBCustomDataset read FDataset;
+    property Database: TIBDatabase read GetDatabase;
+end;
 
   {  Copied from LCLProc in order to avoid LCL dependency
 
@@ -960,6 +990,416 @@ type
     end;
     Result := str;
   end;
+
+{ TFieldDefsMaker }
+
+function TFieldDefsMaker.Add_Node(aRelationName: string): TRelationNode;
+var
+  Field : TFieldNode;
+begin
+  if FRelationNodes.RelationName = '' then
+    Result := FRelationNodes
+  else
+  begin
+    Result := TRelationNode.Create;
+    Result.NextRelation := FRelationNodes;
+  end;
+  Result.RelationName := aRelationName;
+  FRelationNodes := Result;
+  FQuery.Params[0].AsString := aRelationName;
+  FQuery.ExecQuery;
+  while not FQuery.Eof do
+  begin
+    Field := TFieldNode.Create;
+    Field.FieldName := TrimRight(FQuery.Fields[2].AsString);
+    Field.DEFAULT_VALUE := not FQuery.Fields[1].IsNull;
+    Field.COMPUTED_BLR := not FQuery.Fields[0].IsNull;
+    Field.IDENTITY_COLUMN := (FQuery.FieldCount > 3) and not FQuery.Fields[3].IsNull;
+    Field.NextField := Result.FieldNodes;
+    Result.FieldNodes := Field;
+    FQuery.Next;
+  end;
+  FQuery.Close;
+end;
+
+function TFieldDefsMaker.GetDatabase: TIBDatabase;
+begin
+  Result := FDataset.Database;
+end;
+
+function TFieldDefsMaker.Has_COMPUTED_BLR(aRelationName, aFieldName: String): Boolean;
+var
+  Relation : TRelationNode;
+  Field : TFieldNode;
+begin
+  Relation := FRelationNodes;
+  while Assigned(Relation) and
+       (Relation.RelationName <> aRelationName) do
+    Relation :=Relation.NextRelation;
+  if not Assigned(Relation) then
+    Relation := Add_Node(aRelationName);
+  Result := false;
+  Field := Relation.FieldNodes;
+  while Assigned(Field) do
+    if Field.FieldName = aFieldName then
+    begin
+      Result := Field.COMPUTED_BLR;
+      Exit;
+    end
+    else
+      Field := Field.NextField;
+end;
+
+function TFieldDefsMaker.Has_DEFAULT_VALUE(aRelationName, aFieldName: String): Boolean;
+var
+  Relation : TRelationNode;
+  Field : TFieldNode;
+begin
+  Relation := FRelationNodes;
+  while Assigned(Relation) and
+       (Relation.RelationName <> aRelationName) do
+    Relation := Relation.NextRelation;
+  if not Assigned(Relation) then
+    Relation := Add_Node(aRelationName);
+  Result := false;
+  Field := Relation.FieldNodes;
+  while Assigned(Field) do
+    if Field.FieldName = aFieldName then
+    begin
+      Result := Field.DEFAULT_VALUE;
+      Exit;
+    end
+    else
+      Field := Field.NextField;
+end;
+
+function TFieldDefsMaker.Is_IDENTITY_COLUMN(aRelationName, aFieldName: String): Boolean;
+var
+  Relation : TRelationNode;
+  Field : TFieldNode;
+begin
+  Relation := FRelationNodes;
+  while Assigned(Relation) and
+       (Relation.RelationName <> aRelationName) do
+    Relation := Relation.NextRelation;
+  if not Assigned(Relation) then
+    Relation := Add_Node(aRelationName);
+  Result := false;
+  Field := Relation.FieldNodes;
+  while Assigned(Field) do
+    if Field.FieldName = aFieldName then
+    begin
+      Result := Field.IDENTITY_COLUMN;
+      Exit;
+    end
+    else
+      Field := Field.NextField;
+end;
+
+procedure TFieldDefsMaker.FreeNodes;
+var
+  Relation : TRelationNode;
+  Field : TFieldNode;
+begin
+  while Assigned(FRelationNodes) do
+  begin
+    while Assigned(FRelationNodes.FieldNodes) do
+    begin
+      Field := FRelationNodes.FieldNodes.NextField;
+      FRelationNodes.FieldNodes.Free;
+      FRelationNodes.FieldNodes := Field;
+    end;
+    Relation := FRelationNodes.NextRelation;
+    FRelationNodes.Free;
+    FRelationNodes := Relation;
+  end;
+end;
+
+procedure TFieldDefsMaker.MakeFieldDef(FieldDefs: TFieldDefs;
+  ColMetaData: IColumnMetaData; var DBAliasName: string; var aFieldNo: integer);
+var
+  FieldType: TFieldType;
+  FieldSize: Word;
+  FieldDataSize: integer;
+  CharSetSize: integer;
+  CharSetName: RawByteString;
+  FieldCodePage: TSystemCodePage;
+  FieldNullable : Boolean;
+  FieldPrecision: Integer;
+  FieldAliasName: string;
+  aRelationName, FieldName: string;
+  FieldIndex: Integer;
+  aArrayDimensions: integer;
+  aArrayBounds: TArrayBounds;
+  ArrayMetaData: IArrayMetaData;
+  FieldHasTimeZone: boolean;
+begin
+   aFieldNo := 0;
+   FieldSize := 0;
+   FieldPrecision := 0;
+   FieldHasTimeZone := false;
+   CharSetSize := 0;
+   CharSetName := '';
+   FieldCodePage := CP_NONE;
+   aArrayDimensions := 0;
+   SetLength(aArrayBounds,0);
+   with ColMetadata do
+   begin
+     FieldAliasName := GetName; { Get the field name }
+     DBAliasName := GetAliasname;
+     aRelationName := getRelationName;
+     FieldName := getSQLName;
+     FieldDataSize := GetSize;
+     FieldNullable := IsNullable;
+     case SQLType of
+       { All VARCHAR's must be converted to strings before recording
+        their values }
+       SQL_VARYING, SQL_TEXT:
+       begin
+         if not Database.Attachment.CharSetWidth(getCharSetID,CharSetSize) then
+           CharSetSize := 1;
+         CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
+         Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
+         FieldSize := FieldDataSize div CharSetSize;
+         FieldType := ftString;
+       end;
+       { All Doubles/Floats should be cast to doubles }
+       SQL_DOUBLE, SQL_FLOAT:
+         FieldType := ftFloat;
+       SQL_SHORT:
+       begin
+         if (getScale = 0) then
+           FieldType := ftSmallInt
+         else begin
+           FieldType := ftBCD;
+           FieldPrecision := 4;
+           FieldSize := -getScale;
+         end;
+       end;
+       SQL_LONG:
+       begin
+         if (getScale = 0) then
+           FieldType := ftInteger
+         else if (getScale >= (-4)) then
+         begin
+           FieldType := ftBCD;
+           FieldPrecision := 9;
+           FieldSize := -getScale;
+         end
+         else
+         if Database.SQLDialect = 1 then
+           FieldType := ftFloat
+         else
+         begin
+           FieldType := ftBCD;
+           FieldPrecision := 9;
+           FieldSize := -getScale;
+         end;
+       end;
+
+       SQL_INT64:
+       begin
+         if (getScale = 0) then
+           FieldType := ftLargeInt
+         else if (getScale >= (-4)) then
+         begin
+           FieldType := ftBCD;
+           FieldPrecision := 18;
+           FieldSize := -getScale;
+         end
+         else
+           FieldType := ftFloat;
+       end;
+       SQL_TIMESTAMP: FieldType := ftDateTime;
+       SQL_TYPE_TIME: FieldType := ftTime;
+       SQL_TYPE_DATE: FieldType := ftDate;
+       SQL_TIMESTAMP_TZ,
+       SQL_TIMESTAMP_TZ_EX:
+         begin
+           FieldType := ftDateTime;
+           FieldHasTimeZone := true;
+         end;
+       SQL_TIME_TZ,
+       SQL_TIME_TZ_EX:
+         begin
+           FieldType := ftTime;
+           FieldHasTimeZone := true;
+         end;
+       SQL_BLOB:
+       begin
+         FieldSize := sizeof (TISC_QUAD);
+         if (getSubtype = 1) then
+         begin
+           if not Database.Attachment.CharSetWidth(getCharSetID,CharSetSize) then
+             CharSetSize := 1;
+           CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
+           Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
+           FieldType := ftMemo;
+         end
+         else
+           FieldType := ftBlob;
+       end;
+       SQL_ARRAY:
+       begin
+         FieldSize := sizeof (TISC_QUAD);
+         FieldType := ftArray;
+         ArrayMetaData := GetArrayMetaData;
+         if ArrayMetaData <> nil then
+         begin
+           aArrayDimensions := ArrayMetaData.GetDimensions;
+           aArrayBounds := ArrayMetaData.GetBounds;
+         end;
+       end;
+       SQL_BOOLEAN:
+          FieldType:= ftBoolean;
+
+       SQL_DEC16:
+         begin
+           FieldType := ftFmtBCD;
+           FieldPrecision := 16;
+           FieldSize := 4; {For conversions from currency type}
+         end;
+
+       SQL_DEC34:
+       begin
+         FieldType := ftFmtBCD;
+         FieldPrecision := 34;
+         FieldSize := 4; {For conversions from currency type}
+       end;
+
+       SQL_DEC_FIXED,
+       SQL_INT128:
+       begin
+         FieldType := ftFmtBCD;
+         FieldPrecision := 38;
+         FieldSize := -getScale; {For conversions from currency type}
+       end;
+
+       else
+         FieldType := ftUnknown;
+     end;
+     if (FieldType <> ftUnknown) and (FieldAliasName <> sDBkeyAlias) then {do not localize}
+     begin
+       Inc(FFieldIndex);
+       with TIBFieldDef.Create(FieldDefs,'',FieldType,0,False,FieldDefs.Count+1) do
+       begin
+         aFieldNo := FieldNo;
+         Name := FieldAliasName;
+         Size := FieldSize;
+         DataSize := FieldDataSize;
+         Precision := FieldPrecision;
+         Required := not FieldNullable;
+         RelationName := aRelationName;
+         InternalCalcField := False;
+         CharacterSetSize := CharSetSize;
+         CharacterSetName := CharSetName;
+         CodePage := FieldCodePage;
+         ArrayDimensions := aArrayDimensions;
+         ArrayBounds := aArrayBounds;
+         HasTimezone := FieldHasTimeZone;
+         if (FieldName <> '') and (RelationName <> '') then
+         begin
+           IdentityColumn := Is_IDENTITY_COLUMN(RelationName, FieldName);
+           if Has_COMPUTED_BLR(RelationName, FieldName) then
+           begin
+             Attributes := [faReadOnly];
+             InternalCalcField := True;
+           end
+           else
+           begin
+             if Has_DEFAULT_VALUE(RelationName, FieldName) then
+             begin
+               if not FieldNullable then
+                 Attributes := [faRequired];
+             end
+           end;
+         end;
+       end;
+     end;
+   end;
+end;
+
+const
+ DefaultSQL = 'Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, ' + {do not localize}
+               'X.RDB$CONSTRAINT_TYPE ' + {do not localize}
+               'from RDB$RELATION_FIELDS R ' + {do not localize}
+               'JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME ' + {do not localize}
+               'Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE ' + {do not localize}
+               '  From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME ' + {do not localize}
+               '  Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'') X ' + {do not localize}
+               '  On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME ' + {do not localize}
+               'where R.RDB$RELATION_NAME = :RELATION  and '  + {do not localize}
+               ' ( F.RDB$COMPUTED_BLR is not NULL or ' + {do not localize}
+                       'F.RDB$DEFAULT_VALUE is not NULL or ' + {do not localize}
+                        'X.RDB$CONSTRAINT_TYPE is not null) '; {do not localize}
+
+ DefaultSQLODS12 = 'Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, ' + {do not localize}
+               'R.RDB$IDENTITY_TYPE,X.RDB$CONSTRAINT_TYPE ' + {do not localize}
+               'from RDB$RELATION_FIELDS R ' + {do not localize}
+               'JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME ' + {do not localize}
+               'Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE ' + {do not localize}
+               '  From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME ' + {do not localize}
+               '  Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'') X ' + {do not localize}
+               '  On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME ' + {do not localize}
+               'where R.RDB$RELATION_NAME = :RELATION  and ' + {do not localize}
+               ' ( F.RDB$COMPUTED_BLR is not NULL or ' + {do not localize}
+                       'F.RDB$DEFAULT_VALUE is not NULL or ' + {do not localize}
+                       'R.RDB$IDENTITY_TYPE is not NULL or ' + {do not localize}
+                        'X.RDB$CONSTRAINT_TYPE is not null) '; {do not localize}
+
+
+
+constructor TFieldDefsMaker.Create(aDataset: TIBCustomDataSet);
+begin
+  inherited Create;
+  FRelationNodes := TRelationNode.Create;
+  FDataset := aDataset;
+  if not Database.InternalTransaction.InTransaction then
+    Database.InternalTransaction.StartTransaction;
+
+  {create a query to use to look up system table info}
+  FQuery := TIBSQL.Create(aDataset);
+  FQuery.Database := DataBase;
+  FQuery.Transaction := Database.InternalTransaction;
+  if Dataset.FDatabaseInfo.ODSMajorVersion >= 12 then
+    FQuery.SQL.Text := DefaultSQLODS12
+  else
+    FQuery.SQL.Text := DefaultSQL;
+  FQuery.Prepare;
+end;
+
+destructor TFieldDefsMaker.Destroy;
+begin
+  if FQuery <> nil then
+    FQuery.free;
+  FreeNodes;
+  Database.InternalTransaction.Commit;
+  inherited Destroy;
+end;
+
+procedure TFieldDefsMaker.MakeFieldDefs(MetaData: IMetaData;
+  FieldDefs: TFieldDefs);
+var i: integer;
+    DBAliasName: string;
+    FieldNo: integer;
+begin
+  FFieldIndex := 0;
+  FieldDefs.BeginUpdate;
+  try
+    FieldDefs.Clear;
+    SetLength(AliasNameMap, MetaData.Count);
+    SetLength(AliasNameList, MetaData.Count);
+    for i := 0 to MetaData.Count - 1 do
+    begin
+       MakeFieldDef(FieldDefs,MetaData[i],DBAliasName,FieldNo);
+       AliasNameList[i] := DBAliasName;
+       if FieldNo > 0 then
+         AliasNameMap[FieldNo-1] := DBAliasName;
+    end;
+  finally
+    FieldDefs.EndUpdate;
+  end;
+end;
 
 { TIBDateTimeField }
 
@@ -2758,6 +3198,19 @@ begin
    // nothing to do
 end;
 
+procedure TIBCustomDataSet.FieldDefsFromQuery(Query: TIBSQL);
+begin
+  with TFieldDefsMaker.Create(self) do
+  try
+    MakeFieldDefs(Query.MetaData,FieldDefs);
+    FieldDefs.Updated := true;
+    FAliasNameMap := AliasNameMap;
+    FAliasNameList := AliasNameList;
+  finally
+    Free;
+  end;
+end;
+
 procedure TIBCustomDataSet.FetchAll;
 var
   CurBookmark: TBookmark;
@@ -3003,379 +3456,8 @@ begin
     InternalPrepare;
     exit;
   end;
-   FieldDefsFromQuery(FQSelect);
+  FieldDefsFromQuery(FQSelect);
  end;
-
-procedure TIBCustomDataSet.FieldDefsFromQuery(SourceQuery: TIBSQL);
-const
-  DefaultSQL = 'Select F.RDB$COMPUTED_BLR, ' + {do not localize}
-               'F.RDB$DEFAULT_VALUE,  R.RDB$FIELD_NAME ' + {do not localize}
-               'from RDB$RELATION_FIELDS R, RDB$FIELDS F ' + {do not localize}
-               'where R.RDB$RELATION_NAME = :RELATION ' +  {do not localize}
-               'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '+ {do not localize}
-               'and ((not F.RDB$COMPUTED_BLR is NULL) or ' + {do not localize}
-               '     (not F.RDB$DEFAULT_VALUE is NULL)) '; {do not localize}
-
-  DefaultSQLODS12 = 'Select F.RDB$COMPUTED_BLR, ' + {do not localize}
-               'F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE ' + {do not localize}
-               'from RDB$RELATION_FIELDS R, RDB$FIELDS F ' + {do not localize}
-               'where R.RDB$RELATION_NAME = :RELATION ' +  {do not localize}
-               'and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME '+ {do not localize}
-               'and ((not F.RDB$COMPUTED_BLR is NULL) or ' + {do not localize}
-               '     (not F.RDB$DEFAULT_VALUE is NULL) or ' + {do not localize}
-               '     ( not R.RDB$IDENTITY_TYPE is NULL))' ; {do not localize}
-
-var
-  FieldType: TFieldType;
-  FieldSize: Word;
-  FieldDataSize: integer;
-  CharSetSize: integer;
-  CharSetName: RawByteString;
-  FieldCodePage: TSystemCodePage;
-  FieldNullable : Boolean;
-  i, FieldPrecision: Integer;
-  FieldAliasName, DBAliasName: string;
-  aRelationName, FieldName: string;
-  Query : TIBSQL;
-  FieldIndex: Integer;
-  FRelationNodes : TRelationNode;
-  aArrayDimensions: integer;
-  aArrayBounds: TArrayBounds;
-  ArrayMetaData: IArrayMetaData;
-  FieldHasTimeZone: boolean;
-
-  function Add_Node(Relation, Field : String) : TRelationNode;
-  var
-    FField : TFieldNode;
-  begin
-    if FRelationNodes.RelationName = '' then
-      Result := FRelationNodes
-    else
-    begin
-      Result := TRelationNode.Create;
-      Result.NextRelation := FRelationNodes;
-    end;
-    Result.RelationName := Relation;
-    FRelationNodes := Result;
-    Query.Params[0].AsString := Relation;
-    Query.ExecQuery;
-    while not Query.Eof do
-    begin
-      FField := TFieldNode.Create;
-      FField.FieldName := TrimRight(Query.Fields[2].AsString);
-      FField.DEFAULT_VALUE := not Query.Fields[1].IsNull;
-      FField.COMPUTED_BLR := not Query.Fields[0].IsNull;
-      FField.IDENTITY_COLUMN := (Query.FieldCount > 3) and not Query.Fields[3].IsNull;
-      FField.NextField := Result.FieldNodes;
-      Result.FieldNodes := FField;
-      Query.Next;
-    end;
-    Query.Close;
-  end;
-
-  function Has_COMPUTED_BLR(Relation, Field : String) : Boolean;
-  var
-    FRelation : TRelationNode;
-    FField : TFieldNode;
-  begin
-    FRelation := FRelationNodes;
-    while Assigned(FRelation) and
-         (FRelation.RelationName <> Relation) do
-      FRelation := FRelation.NextRelation;
-    if not Assigned(FRelation) then
-      FRelation := Add_Node(Relation, Field);
-    Result := false;
-    FField := FRelation.FieldNodes;
-    while Assigned(FField) do
-      if FField.FieldName = Field then
-      begin
-        Result := Ffield.COMPUTED_BLR;
-        Exit;
-      end
-      else
-        FField := Ffield.NextField;
-  end;
-
-  function Has_DEFAULT_VALUE(Relation, Field : String) : Boolean;
-  var
-    FRelation : TRelationNode;
-    FField : TFieldNode;
-  begin
-    FRelation := FRelationNodes;
-    while Assigned(FRelation) and
-         (FRelation.RelationName <> Relation) do
-      FRelation := FRelation.NextRelation;
-    if not Assigned(FRelation) then
-      FRelation := Add_Node(Relation, Field);
-    Result := false;
-    FField := FRelation.FieldNodes;
-    while Assigned(FField) do
-      if FField.FieldName = Field then
-      begin
-        Result := Ffield.DEFAULT_VALUE;
-        Exit;
-      end
-      else
-        FField := Ffield.NextField;
-  end;
-
-  function Is_IDENTITY_COLUMN(Relation, Field : String) : Boolean;
-  var
-    FRelation : TRelationNode;
-    FField : TFieldNode;
-  begin
-    FRelation := FRelationNodes;
-    while Assigned(FRelation) and
-         (FRelation.RelationName <> Relation) do
-      FRelation := FRelation.NextRelation;
-    if not Assigned(FRelation) then
-      FRelation := Add_Node(Relation, Field);
-    Result := false;
-    FField := FRelation.FieldNodes;
-    while Assigned(FField) do
-      if FField.FieldName = Field then
-      begin
-        Result := Ffield.IDENTITY_COLUMN;
-        Exit;
-      end
-      else
-        FField := Ffield.NextField;
-  end;
-
-  Procedure FreeNodes;
-  var
-    FRelation : TRelationNode;
-    FField : TFieldNode;
-  begin
-    while Assigned(FRelationNodes) do
-    begin
-      While Assigned(FRelationNodes.FieldNodes) do
-      begin
-        FField := FRelationNodes.FieldNodes.NextField;
-        FRelationNodes.FieldNodes.Free;
-        FRelationNodes.FieldNodes := FField;
-      end;
-      FRelation := FRelationNodes.NextRelation;
-      FRelationNodes.Free;
-      FRelationNodes := FRelation;
-    end;
-  end;
-
-begin
-  FRelationNodes := TRelationNode.Create;
-  if not Database.InternalTransaction.InTransaction then
-    Database.InternalTransaction.StartTransaction;
-  Query := TIBSQL.Create(self);
-  try
-    Query.Database := DataBase;
-    Query.Transaction := Database.InternalTransaction;
-    FieldDefs.BeginUpdate;
-    FieldDefs.Clear;
-    FieldIndex := 0;
-    if FDatabaseInfo.ODSMajorVersion >= 12 then
-      Query.SQL.Text := DefaultSQLODS12
-    else
-      Query.SQL.Text := DefaultSQL;
-    Query.Prepare;
-    SetLength(FAliasNameMap, SourceQuery.MetaData.Count);
-    SetLength(FAliasNameList, SourceQuery.MetaData.Count);
-    for i := 0 to SourceQuery.MetaData.GetCount - 1 do
-      with SourceQuery.MetaData[i] do
-      begin
-        { Get the field name }
-        FieldAliasName := GetName;
-        DBAliasName := GetAliasname;
-        aRelationName := getRelationName;
-        FieldName := getSQLName;
-        FAliasNameList[i] := DBAliasName;
-        FieldSize := 0;
-        FieldDataSize := GetSize;
-        FieldPrecision := 0;
-        FieldNullable := IsNullable;
-        FieldHasTimeZone := false;
-        CharSetSize := 0;
-        CharSetName := '';
-        FieldCodePage := CP_NONE;
-        aArrayDimensions := 0;
-        SetLength(aArrayBounds,0);
-        case SQLType of
-          { All VARCHAR's must be converted to strings before recording
-           their values }
-          SQL_VARYING, SQL_TEXT:
-          begin
-            if not Database.Attachment.CharSetWidth(getCharSetID,CharSetSize) then
-              CharSetSize := 1;
-            CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
-            Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
-            FieldSize := FieldDataSize div CharSetSize;
-            FieldType := ftString;
-          end;
-          { All Doubles/Floats should be cast to doubles }
-          SQL_DOUBLE, SQL_FLOAT:
-            FieldType := ftFloat;
-          SQL_SHORT:
-          begin
-            if (getScale = 0) then
-              FieldType := ftSmallInt
-            else begin
-              FieldType := ftBCD;
-              FieldPrecision := 4;
-              FieldSize := -getScale;
-            end;
-          end;
-          SQL_LONG:
-          begin
-            if (getScale = 0) then
-              FieldType := ftInteger
-            else if (getScale >= (-4)) then
-            begin
-              FieldType := ftBCD;
-              FieldPrecision := 9;
-              FieldSize := -getScale;
-            end
-            else
-            if Database.SQLDialect = 1 then
-              FieldType := ftFloat
-            else
-            if (FieldCount > i) and (Fields[i] is TFloatField) then
-              FieldType := ftFloat
-            else
-            begin
-              FieldType := ftBCD;
-              FieldPrecision := 9;
-              FieldSize := -getScale;
-            end;
-          end;
-
-          SQL_INT64:
-          begin
-            if (getScale = 0) then
-              FieldType := ftLargeInt
-            else if (getScale >= (-4)) then
-            begin
-              FieldType := ftBCD;
-              FieldPrecision := 18;
-              FieldSize := -getScale;
-            end
-            else
-              FieldType := ftFloat;
-          end;
-          SQL_TIMESTAMP: FieldType := ftDateTime;
-          SQL_TYPE_TIME: FieldType := ftTime;
-          SQL_TYPE_DATE: FieldType := ftDate;
-          SQL_TIMESTAMP_TZ,
-          SQL_TIMESTAMP_TZ_EX:
-            begin
-              FieldType := ftDateTime;
-              FieldHasTimeZone := true;
-            end;
-          SQL_TIME_TZ,
-          SQL_TIME_TZ_EX:
-            begin
-              FieldType := ftTime;
-              FieldHasTimeZone := true;
-            end;
-          SQL_BLOB:
-          begin
-            FieldSize := sizeof (TISC_QUAD);
-            if (getSubtype = 1) then
-            begin
-              if not Database.Attachment.CharSetWidth(getCharSetID,CharSetSize) then
-                CharSetSize := 1;
-              CharSetName := Database.Attachment.GetCharsetName(getCharSetID);
-              Database.Attachment.CharSetID2CodePage(getCharSetID,FieldCodePage);
-              FieldType := ftMemo;
-            end
-            else
-              FieldType := ftBlob;
-          end;
-          SQL_ARRAY:
-          begin
-            FieldSize := sizeof (TISC_QUAD);
-            FieldType := ftArray;
-            ArrayMetaData := GetArrayMetaData;
-            if ArrayMetaData <> nil then
-            begin
-              aArrayDimensions := ArrayMetaData.GetDimensions;
-              aArrayBounds := ArrayMetaData.GetBounds;
-            end;
-          end;
-          SQL_BOOLEAN:
-             FieldType:= ftBoolean;
-
-          SQL_DEC16:
-            begin
-              FieldType := ftFmtBCD;
-              FieldPrecision := 16;
-              FieldSize := 4; {For conversions from currency type}
-            end;
-
-          SQL_DEC34:
-          begin
-            FieldType := ftFmtBCD;
-            FieldPrecision := 34;
-            FieldSize := 4; {For conversions from currency type}
-          end;
-
-          SQL_DEC_FIXED,
-          SQL_INT128:
-          begin
-            FieldType := ftFmtBCD;
-            FieldPrecision := 38;
-            FieldSize := -getScale; {For conversions from currency type}
-          end;
-
-          else
-            FieldType := ftUnknown;
-        end;
-        if (FieldType <> ftUnknown) and (FieldAliasName <> sDBkeyAlias) then {do not localize}
-        begin
-          Inc(FieldIndex);
-          with TIBFieldDef.Create(FieldDefs,'',FieldType,0,False,FieldDefs.Count+1) do
-          begin
-            Name := FieldAliasName;
-            FAliasNameMap[FieldNo-1] := DBAliasName;
-            Size := FieldSize;
-            DataSize := FieldDataSize;
-            Precision := FieldPrecision;
-            Required := not FieldNullable;
-            RelationName := aRelationName;
-            InternalCalcField := False;
-            CharacterSetSize := CharSetSize;
-            CharacterSetName := CharSetName;
-            CodePage := FieldCodePage;
-            ArrayDimensions := aArrayDimensions;
-            ArrayBounds := aArrayBounds;
-            HasTimezone := FieldHasTimeZone;
-            if (FieldName <> '') and (RelationName <> '') then
-            begin
-              IdentityColumn := Is_IDENTITY_COLUMN(RelationName, FieldName);
-              if Has_COMPUTED_BLR(RelationName, FieldName) then
-              begin
-                Attributes := [faReadOnly];
-                InternalCalcField := True;
-              end
-              else
-              begin
-                if Has_DEFAULT_VALUE(RelationName, FieldName) then
-                begin
-                  if not FieldNullable then
-                    Attributes := [faRequired];
-                end
-                else
-              end;
-            end;
-          end;
-        end;
-      end;
-  finally
-    Query.free;
-    FreeNodes;
-    Database.InternalTransaction.Commit;
-    FieldDefs.EndUpdate;
-    FieldDefs.Updated := true;
-  end;
-end;
 
 procedure TIBCustomDataSet.InternalLast;
 begin
