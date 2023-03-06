@@ -334,9 +334,7 @@ begin
       Active := true;
       PrintDataSet(FIBDataSet1);
 
-      {See https://bugs.freepascal.org/view.php?id=37900}
-
-(*      IBTransaction.Rollback;
+      IBTransaction.Rollback;
       IBTransaction.Active := true;
       writeln(Outfile);
       writeln(Outfile,'Unidirectional editing');
@@ -370,7 +368,7 @@ begin
       writeln(Outfile,'Ensure dataset saved to database');
       Active := false;
       Active := true;
-      PrintDataSet(FIBDataSet1);  *)
+      PrintDataSet(FIBDataSet1);
 
     end;
     writeln(Outfile,'==================================');

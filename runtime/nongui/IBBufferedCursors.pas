@@ -1441,8 +1441,6 @@ end;
 
 procedure TIBUniDirectionalCursor.GotoFirst;
 begin
-  if FRecordCount <> 1 then
-    IBError(ibxeUniDirectional,[FRecordCount,1]);
   FCurrentRecord := nil;
   FCurrentRecordStatus := csBOF;
 end;
@@ -2573,7 +2571,8 @@ end;
 
 procedure TIBSelectCursor.SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
 begin
-  Move(Data^,PDisplayBuffer(Buffer)^.dbBookmarkData, GetBookmarkSize);
+  if Data <> nil then
+    Move(Data^,PDisplayBuffer(Buffer)^.dbBookmarkData, GetBookmarkSize);
 end;
 
 function TIBSelectCursor.GetBookmarkSize: integer;
