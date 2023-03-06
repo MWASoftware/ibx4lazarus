@@ -436,6 +436,7 @@ type
     FAliasNameMap: array of string;
     FAliasNameList: array of AnsiString;
     FCachedUpdatesBuffer: TRecordBuffer;
+    FPrimaryKeys: TStrings;
     procedure ApplyUpdatesIterator(status: TCachedUpdateStatus;
       aBufID: TRecordBuffer; var RecordSkipped: boolean);
     function GetSelectStmtIntf: IStatement;
@@ -685,6 +686,7 @@ type
     function GetRowsAffected(var SelectCount, InsertCount, UpdateCount, DeleteCount: integer): boolean;
     function GetPerfStatistics(var stats: TPerfCounters): boolean;
     property EnableStatistics: boolean read FEnableStatistics write FEnableStatistics;
+    property PrimaryKeys: TStrings read FPrimaryKeys;
 
   published
     property AllowAutoActivateTransaction: Boolean read FAllowAutoActivateTransaction
@@ -916,6 +918,7 @@ type
         COMPUTED_BLR : Boolean;
         DEFAULT_VALUE : boolean;
         IDENTITY_COLUMN : boolean;
+        PRIMARY_KEY: boolean;
         NextField : TFieldNode;
       end;
 
@@ -928,6 +931,7 @@ type
 
   private
     FDataset: TIBCustomDataset;
+    FPrimaryKeys : TStrings;
     FRelationNodes: TRelationNode;
     FQuery: TIBSQL;
     FFieldIndex: integer;
@@ -936,6 +940,7 @@ type
     function Has_COMPUTED_BLR(aRelationName, aFieldName: String) : Boolean;
     function Has_DEFAULT_VALUE(aRelationName, aFieldName: String): Boolean;
     function Is_IDENTITY_COLUMN(aRelationName, aFieldName: String) : Boolean;
+    function Is_PRIMARY_KEY(aRelationName, aFieldName: String) : Boolean;
     procedure FreeNodes;
     procedure MakeFieldDef(FieldDefs: TFieldDefs; ColMetaData: IColumnMetaData;
                     var DBAliasName: string; var aFieldNo: integer);
@@ -948,6 +953,7 @@ type
     procedure MakeFieldDefs(MetaData: IMetaData; FieldDefs: TFieldDefs);
     property Dataset: TIBCustomDataset read FDataset;
     property Database: TIBDatabase read GetDatabase;
+    property PrimaryKeys: TStrings read FPrimaryKeys;
 end;
 
   {  Copied from LCLProc in order to avoid LCL dependency
@@ -1011,10 +1017,11 @@ begin
   while not FQuery.Eof do
   begin
     Field := TFieldNode.Create;
-    Field.FieldName := TrimRight(FQuery.Fields[2].AsString);
-    Field.DEFAULT_VALUE := not FQuery.Fields[1].IsNull;
     Field.COMPUTED_BLR := not FQuery.Fields[0].IsNull;
-    Field.IDENTITY_COLUMN := (FQuery.FieldCount > 3) and not FQuery.Fields[3].IsNull;
+    Field.DEFAULT_VALUE := not FQuery.Fields[1].IsNull;
+    Field.FieldName := TrimRight(FQuery.Fields[2].AsString);
+    Field.PRIMARY_KEY := not FQuery.Fields[3].IsNull;
+    Field.IDENTITY_COLUMN := (FQuery.FieldCount > 4) and not FQuery.Fields[4].IsNull;
     Field.NextField := Result.FieldNodes;
     Result.FieldNodes := Field;
     FQuery.Next;
@@ -1090,6 +1097,30 @@ begin
     if Field.FieldName = aFieldName then
     begin
       Result := Field.IDENTITY_COLUMN;
+      Exit;
+    end
+    else
+      Field := Field.NextField;
+end;
+
+function TFieldDefsMaker.Is_PRIMARY_KEY(aRelationName, aFieldName : String
+  ) : Boolean;
+var
+  Relation : TRelationNode;
+  Field : TFieldNode;
+begin
+  Relation := FRelationNodes;
+  while Assigned(Relation) and
+       (Relation.RelationName <> aRelationName) do
+    Relation := Relation.NextRelation;
+  if not Assigned(Relation) then
+    Relation := Add_Node(aRelationName);
+  Result := false;
+  Field := Relation.FieldNodes;
+  while Assigned(Field) do
+    if Field.FieldName = aFieldName then
+    begin
+      Result := Field.PRIMARY_KEY;
       Exit;
     end
     else
@@ -1299,6 +1330,8 @@ begin
          HasTimezone := FieldHasTimeZone;
          if (FieldName <> '') and (RelationName <> '') then
          begin
+           if Is_PRIMARY_KEY(RelationName,FieldName) then
+             FPrimaryKeys.Add(FieldName);
            IdentityColumn := Is_IDENTITY_COLUMN(RelationName, FieldName);
            if Has_COMPUTED_BLR(RelationName, FieldName) then
            begin
@@ -1334,7 +1367,7 @@ const
                         'X.RDB$CONSTRAINT_TYPE is not null) '; {do not localize}
 
  DefaultSQLODS12 = 'Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, ' + {do not localize}
-               'R.RDB$IDENTITY_TYPE,X.RDB$CONSTRAINT_TYPE ' + {do not localize}
+               'X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE ' + {do not localize}
                'from RDB$RELATION_FIELDS R ' + {do not localize}
                'JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME ' + {do not localize}
                'Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE ' + {do not localize}
@@ -1354,6 +1387,7 @@ begin
   inherited Create;
   FRelationNodes := TRelationNode.Create;
   FDataset := aDataset;
+  FPrimaryKeys := TStringList.Create;
   if not Database.InternalTransaction.InTransaction then
     Database.InternalTransaction.StartTransaction;
 
@@ -1370,8 +1404,9 @@ end;
 
 destructor TFieldDefsMaker.Destroy;
 begin
+  if FPrimaryKeys <> nil then PrimaryKeys.Free;
   if FQuery <> nil then
-    FQuery.free;
+    FQuery.Free;
   FreeNodes;
   Database.InternalTransaction.Commit;
   inherited Destroy;
@@ -1384,6 +1419,7 @@ var i: integer;
     FieldNo: integer;
 begin
   FFieldIndex := 0;
+  FPrimaryKeys.Clear;
   FieldDefs.BeginUpdate;
   try
     FieldDefs.Clear;
@@ -2141,6 +2177,9 @@ begin
   else
     if AOwner is TIBTransaction then
       Transaction := TIBTransaction(AOwner);
+  FPrimaryKeys := TStringList.Create;
+  FPrimaryKeys.LineBreak := ';';
+  FPrimaryKeys.TrailingLineBreak := false;
   FBaseSQLSelect := TStringList.Create;
   FTZTextOption := tzOffset;
   FDefaultTZDate := EncodeDate(2020,1,1);
@@ -2156,6 +2195,7 @@ begin
   FBase.Free;
   ClearIBLinks;
   FIBLinks.Free;
+  if assigned(FPrimaryKeys) then FPrimaryKeys.Free;
   if assigned(FBaseSQLSelect) then FBaseSQLSelect.Free;
   if assigned(FParser) then FParser.Free;
   if assigned(FSQLFilterParams) then FSQLFilterParams.Free;
@@ -3206,6 +3246,8 @@ begin
     FieldDefs.Updated := true;
     FAliasNameMap := AliasNameMap;
     FAliasNameList := AliasNameList;
+    self.FPrimaryKeys.Assign(PrimaryKeys);
+    self.FPrimaryKeys.TrailingLineBreak := false;
   finally
     Free;
   end;
@@ -3630,10 +3672,24 @@ begin
 end;
 
 procedure TIBCustomDataSet.InternalRefresh;
+var KeyValues: array of variant;
+    I: integer;
 begin
-  inherited InternalRefresh;
-  if not CachedUpdates then
-    InternalRefreshRow(GetActiveBuf);
+  if  CachedUpdates then
+    ApplyUpdates;
+
+  {save primary Key values for current record}
+  Setlength(KeyValues,PrimaryKeys.Count);
+  if RecordCount > 0 then
+    for i := 0 to PrimaryKeys.Count - 1 do
+      KeyValues[i] := FieldByName(PrimaryKeys[i]).AsVariant;
+
+  ReQuery;
+
+    {restore curent record}
+  if Length(KeyValues) > 0 then
+    Locate(PrimaryKeys.Text,KeyValues,[]);
+
 end;
 
 procedure TIBCustomDataSet.InternalSetToRecord(Buffer: TRecordBuffer);
@@ -3672,7 +3728,7 @@ var
 begin
   DisableControls;
   try
-    CurBookmark := Bookmark;
+      CurBookmark := Bookmark;
     First;
     result := InternalLocate(KeyFields, KeyValues, Options);
     if not result then

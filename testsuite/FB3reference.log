@@ -641,9 +641,9 @@ DEPT_KEY_PATH = 000;900 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 42
 
-Current memory = 19,404,592
+Current memory = 19,405,360
 Delta memory = 13,040
-Max memory = 19,511,712
+Max memory = 19,543,248
 Elapsed time= 0.027 sec
 Cpu = 0.010 sec
 Buffers = 2048
@@ -1454,7 +1454,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost/employee Disconnected after 1985 ms
+inet://localhost/employee Disconnected after 1990 ms
 Idle Timer Expired for Test_Database_02
 Database Closed
 Transaction Events
@@ -1477,7 +1477,7 @@ TPB: Item Count = 3
   isc_tpb_read
 
 Transaction Ending
-Transaction Ended after 0 ms
+Transaction Ended after 1 ms
 Transaction idle timer test
 Requested TPB: Item Count = 3
   isc_tpb_concurrency
@@ -1491,10 +1491,10 @@ TPB: Item Count = 3
   isc_tpb_read
 
 Transaction Ending
-Transaction Ended after 2002 ms
+Transaction Ended after 2001 ms
 Idle Timer Expired for Test_Transaction_02
 Before Disconnect
-inet://localhost/employee Disconnected after 2010 ms
+inet://localhost/employee Disconnected after 2013 ms
 SQL Dialect Downgrade test
 Before Connect
 Connected to inet://localhost//tmp/ibx-testsuite/testsuite1.fdb
@@ -1543,15 +1543,15 @@ ODS Minor Version = 0
 ODS Major Version = 12
 Page Size = 8192
 Version = LI-V6.3.10.33601 Firebird 3.0
-Current Memory = 19156048
+Current Memory = 19176096
 Forced Writes Enabled
-Max Memory = 19280400
+Max Memory = 19320048
 Number of Buffers = 2048
 Sweep Interval = 20000
 User Names: SYSDBA
-Fetches = 671
+Fetches = 773
 Marks = 8
-Reads = 66
+Reads = 71
 Writes = 2
 Pages Free = 298
 Pages Used = 9
@@ -1559,14 +1559,14 @@ Transaction Count = 1
 
 Read Idx Count
   RDB$FIELDS = 17
-  RDB$INDICES = 32
+  RDB$INDICES = 36
   RDB$RELATION_FIELDS = 17
-  RDB$RELATIONS = 18
-  RDB$SECURITY_CLASSES = 8
-  RDB$TYPES = 1
-  RDB$TRIGGERS = 19
-  RDB$CHARACTER_SETS = 2
-  RDB$COLLATIONS = 2
+  RDB$RELATIONS = 19
+  RDB$SECURITY_CLASSES = 12
+  RDB$TYPES = 2
+  RDB$TRIGGERS = 21
+  RDB$CHARACTER_SETS = 3
+  RDB$COLLATIONS = 3
 
 Read Seq Count
   RDB$PAGES = 94
@@ -3449,7 +3449,7 @@ DEPT_KEY_PATH = 000;600;620;622 (Charset Id = 4 Codepage = 65001)
 Current memory = 19,405,152
 Delta memory = 13,072
 Max memory = 19,513,872
-Elapsed time= 0.013 sec
+Elapsed time= 0.021 sec
 Cpu = 0.010 sec
 Buffers = 2048
 Reads = 2
@@ -12243,20 +12243,20 @@ Message File Location = /opt/firebird/3.0.10/
 Database Statistics for employee
 
 Database "/opt/firebird/3.0.10/examples/empbuild/employee.fdb"
-Gstat execution time Thu Mar  2 16:27:29 2023
+Gstat execution time Mon Mar  6 15:59:53 2023
 
 Database header page information:
 Flags			0
-Generation		405
+Generation		459
 System Change Number	0
 Page size		8192
 ODS version		12.0
-Oldest transaction	445
-Oldest active		446
-Oldest snapshot		446
-Next transaction	446
+Oldest transaction	510
+Oldest active		511
+Oldest snapshot		511
+Next transaction	511
 Sequence number		0
-Next attachment ID	422
+Next attachment ID	518
 Implementation		HW=AMD/Intel/x64 little-endian OS=Linux CC=gcc
 Shadow count		0
 Page buffers		0
@@ -12403,7 +12403,7 @@ Fill distribution:
 60 - 79% = 0
 80 - 99% = 0
 
-Gstat completion time Thu Mar  2 16:27:29 2023
+Gstat completion time Mon Mar  6 15:59:53 2023
 
 
 
@@ -12413,87 +12413,87 @@ zeus	Tue Feb 28 14:29:07 2023
 firebird/3.0.10/bin/fbguard: guardian starting /opt/firebird/3.0.10/bin/firebird
 
 Online Validation
-16:27:30.04 Validation started
+15:59:53.34 Validation started
 
-16:27:30.04 Relation 128 (COUNTRY)
-16:27:30.04   process pointer page    0 of    1
-16:27:30.04 Index 1 (RDB$PRIMARY1)
-16:27:30.04 Relation 128 (COUNTRY) is ok
+15:59:53.34 Relation 128 (COUNTRY)
+15:59:53.34   process pointer page    0 of    1
+15:59:53.34 Index 1 (RDB$PRIMARY1)
+15:59:53.34 Relation 128 (COUNTRY) is ok
 
-16:27:30.04 Relation 129 (JOB)
-16:27:30.04   process pointer page    0 of    1
-16:27:30.04 Index 1 (RDB$PRIMARY2)
-16:27:30.04 Index 2 (RDB$FOREIGN3)
-16:27:30.04 Index 3 (MAXSALX)
-16:27:30.04 Index 4 (MINSALX)
-16:27:30.04 Relation 129 (JOB) is ok
+15:59:53.34 Relation 129 (JOB)
+15:59:53.34   process pointer page    0 of    1
+15:59:53.34 Index 1 (RDB$PRIMARY2)
+15:59:53.34 Index 2 (RDB$FOREIGN3)
+15:59:53.34 Index 3 (MAXSALX)
+15:59:53.34 Index 4 (MINSALX)
+15:59:53.34 Relation 129 (JOB) is ok
 
-16:27:30.04 Relation 130 (DEPARTMENT)
-16:27:30.04   process pointer page    0 of    1
-16:27:30.04 Index 1 (RDB$4)
-16:27:30.04 Index 2 (RDB$PRIMARY5)
-16:27:30.04 Index 3 (RDB$FOREIGN6)
-16:27:30.04 Index 4 (BUDGETX)
-16:27:30.04 Index 5 (RDB$FOREIGN10)
-16:27:30.04 Relation 130 (DEPARTMENT) is ok
+15:59:53.34 Relation 130 (DEPARTMENT)
+15:59:53.34   process pointer page    0 of    1
+15:59:53.34 Index 1 (RDB$4)
+15:59:53.34 Index 2 (RDB$PRIMARY5)
+15:59:53.34 Index 3 (RDB$FOREIGN6)
+15:59:53.34 Index 4 (BUDGETX)
+15:59:53.34 Index 5 (RDB$FOREIGN10)
+15:59:53.34 Relation 130 (DEPARTMENT) is ok
 
-16:27:30.04 Relation 131 (EMPLOYEE)
-16:27:30.04   process pointer page    0 of    1
-16:27:30.04 Index 1 (RDB$PRIMARY7)
-16:27:30.04 Index 2 (RDB$FOREIGN8)
-16:27:30.04 Index 3 (RDB$FOREIGN9)
-16:27:30.04 Index 4 (NAMEX)
-16:27:30.04 Relation 131 (EMPLOYEE) is ok
+15:59:53.34 Relation 131 (EMPLOYEE)
+15:59:53.34   process pointer page    0 of    1
+15:59:53.34 Index 1 (RDB$PRIMARY7)
+15:59:53.34 Index 2 (RDB$FOREIGN8)
+15:59:53.34 Index 3 (RDB$FOREIGN9)
+15:59:53.34 Index 4 (NAMEX)
+15:59:53.34 Relation 131 (EMPLOYEE) is ok
 
-16:27:30.04 Relation 133 (PROJECT)
-16:27:30.04   process pointer page    0 of    1
-16:27:30.04 Index 1 (RDB$11)
-16:27:30.04 Index 2 (RDB$PRIMARY12)
-16:27:30.04 Index 3 (RDB$FOREIGN13)
-16:27:30.04 Index 4 (PRODTYPEX)
-16:27:30.04 Relation 133 (PROJECT) is ok
+15:59:53.34 Relation 133 (PROJECT)
+15:59:53.34   process pointer page    0 of    1
+15:59:53.34 Index 1 (RDB$11)
+15:59:53.34 Index 2 (RDB$PRIMARY12)
+15:59:53.34 Index 3 (RDB$FOREIGN13)
+15:59:53.34 Index 4 (PRODTYPEX)
+15:59:53.34 Relation 133 (PROJECT) is ok
 
-16:27:30.04 Relation 134 (EMPLOYEE_PROJECT)
-16:27:30.04   process pointer page    0 of    1
-16:27:30.04 Index 1 (RDB$PRIMARY14)
-16:27:30.04 Index 2 (RDB$FOREIGN15)
-16:27:30.04 Index 3 (RDB$FOREIGN16)
-16:27:30.04 Relation 134 (EMPLOYEE_PROJECT) is ok
+15:59:53.34 Relation 134 (EMPLOYEE_PROJECT)
+15:59:53.34   process pointer page    0 of    1
+15:59:53.34 Index 1 (RDB$PRIMARY14)
+15:59:53.34 Index 2 (RDB$FOREIGN15)
+15:59:53.34 Index 3 (RDB$FOREIGN16)
+15:59:53.34 Relation 134 (EMPLOYEE_PROJECT) is ok
 
-16:27:30.04 Relation 135 (PROJ_DEPT_BUDGET)
-16:27:30.04   process pointer page    0 of    1
-16:27:30.04 Index 1 (RDB$PRIMARY17)
-16:27:30.04 Index 2 (RDB$FOREIGN18)
-16:27:30.04 Index 3 (RDB$FOREIGN19)
-16:27:30.04 Relation 135 (PROJ_DEPT_BUDGET) is ok
+15:59:53.34 Relation 135 (PROJ_DEPT_BUDGET)
+15:59:53.34   process pointer page    0 of    1
+15:59:53.34 Index 1 (RDB$PRIMARY17)
+15:59:53.35 Index 2 (RDB$FOREIGN18)
+15:59:53.35 Index 3 (RDB$FOREIGN19)
+15:59:53.35 Relation 135 (PROJ_DEPT_BUDGET) is ok
 
-16:27:30.04 Relation 136 (SALARY_HISTORY)
-16:27:30.05   process pointer page    0 of    1
-16:27:30.05 Index 1 (RDB$PRIMARY20)
-16:27:30.05 Index 2 (RDB$FOREIGN21)
-16:27:30.05 Index 3 (CHANGEX)
-16:27:30.05 Index 4 (UPDATERX)
-16:27:30.05 Relation 136 (SALARY_HISTORY) is ok
+15:59:53.35 Relation 136 (SALARY_HISTORY)
+15:59:53.35   process pointer page    0 of    1
+15:59:53.35 Index 1 (RDB$PRIMARY20)
+15:59:53.35 Index 2 (RDB$FOREIGN21)
+15:59:53.35 Index 3 (CHANGEX)
+15:59:53.35 Index 4 (UPDATERX)
+15:59:53.35 Relation 136 (SALARY_HISTORY) is ok
 
-16:27:30.05 Relation 137 (CUSTOMER)
-16:27:30.05   process pointer page    0 of    1
-16:27:30.05 Index 1 (RDB$PRIMARY22)
-16:27:30.05 Index 2 (RDB$FOREIGN23)
-16:27:30.05 Index 3 (CUSTNAMEX)
-16:27:30.05 Index 4 (CUSTREGION)
-16:27:30.05 Relation 137 (CUSTOMER) is ok
+15:59:53.35 Relation 137 (CUSTOMER)
+15:59:53.35   process pointer page    0 of    1
+15:59:53.35 Index 1 (RDB$PRIMARY22)
+15:59:53.35 Index 2 (RDB$FOREIGN23)
+15:59:53.35 Index 3 (CUSTNAMEX)
+15:59:53.35 Index 4 (CUSTREGION)
+15:59:53.35 Relation 137 (CUSTOMER) is ok
 
-16:27:30.05 Relation 138 (SALES)
-16:27:30.05   process pointer page    0 of    1
-16:27:30.05 Index 1 (RDB$PRIMARY24)
-16:27:30.05 Index 2 (RDB$FOREIGN25)
-16:27:30.05 Index 3 (RDB$FOREIGN26)
-16:27:30.05 Index 4 (NEEDX)
-16:27:30.05 Index 5 (QTYX)
-16:27:30.05 Index 6 (SALESTATX)
-16:27:30.05 Relation 138 (SALES) is ok
+15:59:53.35 Relation 138 (SALES)
+15:59:53.35   process pointer page    0 of    1
+15:59:53.35 Index 1 (RDB$PRIMARY24)
+15:59:53.35 Index 2 (RDB$FOREIGN25)
+15:59:53.35 Index 3 (RDB$FOREIGN26)
+15:59:53.35 Index 4 (NEEDX)
+15:59:53.35 Index 5 (QTYX)
+15:59:53.35 Index 6 (SALESTATX)
+15:59:53.35 Relation 138 (SALES) is ok
 
-16:27:30.05 Validation finished
+15:59:53.35 Validation finished
 
 
 Normal Validation
@@ -13778,10 +13778,10 @@ DEPT_KEY_PATH = 000 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 2
 
-Current memory = 19,404,416
+Current memory = 19,405,184
 Delta memory = 12,688
-Max memory = 19,512,224
-Elapsed time= 0.001 sec
+Max memory = 19,543,424
+Elapsed time= 0.002 sec
 Cpu = 0.000 sec
 Buffers = 2048
 Reads = 2
@@ -13825,8 +13825,8 @@ DEPT_KEY_PATH = 000 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 2
 
-33 ISQL Monitor Messages Received (Monitoring Disabled)
-33 ISQL Monitor Messages written
+35 ISQL Monitor Messages Received (Monitoring Disabled)
+35 ISQL Monitor Messages written
 *Monitor*  
 [Application: IBX Test Suite]
 Test_Database_13: [Connect]
@@ -13859,35 +13859,51 @@ Select Expression
 : [Start transaction]
 *Monitor*  
 [Application: IBX Test Suite]
-: [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Prepare] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   Plan: 
 Select Expression
-    -> Nested Loop Join (inner)
-        -> Filter
-            -> Table "RDB$RELATION_FIELDS" as "R" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_4" Range Scan (full match)
-        -> Filter
-            -> Table "RDB$FIELDS" as "F" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_2" Unique Scan
+    -> Filter
+        -> Nested Loop Join (outer)
+            -> Nested Loop Join (inner)
+                -> Filter
+                    -> Table "RDB$RELATION_FIELDS" as "R" Access By ID
+                        -> Bitmap
+                            -> Index "RDB$INDEX_4" Range Scan (full match)
+                -> Filter
+                    -> Table "RDB$FIELDS" as "F" Access By ID
+                        -> Bitmap
+                            -> Index "RDB$INDEX_2" Unique Scan
+            -> Filter
+                -> Nested Loop Join (inner)
+                    -> Filter
+                        -> Table "RDB$RELATION_CONSTRAINTS" as "X C" Access By ID
+                            -> Bitmap
+                                -> Index "RDB$INDEX_42" Range Scan (full match)
+                    -> Filter
+                        -> Table "RDB$INDEX_SEGMENTS" as "X S" Access By ID
+                            -> Bitmap
+                                -> Index "RDB$INDEX_6" Range Scan (full match)
 *Monitor*  
 [Application: IBX Test Suite]
-: [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Execute] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   RELATION = EMPLOYEE
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
+
+*Monitor*  
+[Application: IBX Test Suite]
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   SEOFReached
 *Monitor*  
@@ -13948,35 +13964,51 @@ Select Expression
 : [Start transaction]
 *Monitor*  
 [Application: IBX Test Suite]
-: [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Prepare] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   Plan: 
 Select Expression
-    -> Nested Loop Join (inner)
-        -> Filter
-            -> Table "RDB$RELATION_FIELDS" as "R" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_4" Range Scan (full match)
-        -> Filter
-            -> Table "RDB$FIELDS" as "F" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_2" Unique Scan
+    -> Filter
+        -> Nested Loop Join (outer)
+            -> Nested Loop Join (inner)
+                -> Filter
+                    -> Table "RDB$RELATION_FIELDS" as "R" Access By ID
+                        -> Bitmap
+                            -> Index "RDB$INDEX_4" Range Scan (full match)
+                -> Filter
+                    -> Table "RDB$FIELDS" as "F" Access By ID
+                        -> Bitmap
+                            -> Index "RDB$INDEX_2" Unique Scan
+            -> Filter
+                -> Nested Loop Join (inner)
+                    -> Filter
+                        -> Table "RDB$RELATION_CONSTRAINTS" as "X C" Access By ID
+                            -> Bitmap
+                                -> Index "RDB$INDEX_42" Range Scan (full match)
+                    -> Filter
+                        -> Table "RDB$INDEX_SEGMENTS" as "X S" Access By ID
+                            -> Bitmap
+                                -> Index "RDB$INDEX_6" Range Scan (full match)
 *Monitor*  
 [Application: IBX Test Suite]
-: [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Execute] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   RELATION = EMPLOYEE
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
+
+*Monitor*  
+[Application: IBX Test Suite]
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   SEOFReached
 *Monitor*  
@@ -14008,7 +14040,7 @@ Test_Database_13: [Disconnect]
 *Monitor*  
 [Application: IBX Test Suite]
 Monitoring Disabled
-33 ISQL Monitor Messages Received
+35 ISQL Monitor Messages Received
 
 
 ------------------------------------------------------
@@ -14046,10 +14078,10 @@ DEPT_KEY_PATH = 000 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 2
 
-Current memory = 19,404,416
+Current memory = 19,405,184
 Delta memory = 12,688
-Max memory = 19,512,224
-Elapsed time= 0.104 sec
+Max memory = 19,543,424
+Elapsed time= 0.103 sec
 Cpu = 0.000 sec
 Buffers = 2048
 Reads = 2
@@ -14093,7 +14125,7 @@ DEPT_KEY_PATH = 000 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 2
 
-33 ISQL Monitor Messages written
+35 ISQL Monitor Messages written
 *Monitor*  
 [Application: IBX Test Suite]
 Test_Database_14: [Connect]
@@ -14126,35 +14158,51 @@ Select Expression
 : [Start transaction]
 *Monitor*  
 [Application: IBX Test Suite]
-: [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Prepare] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   Plan: 
 Select Expression
-    -> Nested Loop Join (inner)
-        -> Filter
-            -> Table "RDB$RELATION_FIELDS" as "R" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_4" Range Scan (full match)
-        -> Filter
-            -> Table "RDB$FIELDS" as "F" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_2" Unique Scan
+    -> Filter
+        -> Nested Loop Join (outer)
+            -> Nested Loop Join (inner)
+                -> Filter
+                    -> Table "RDB$RELATION_FIELDS" as "R" Access By ID
+                        -> Bitmap
+                            -> Index "RDB$INDEX_4" Range Scan (full match)
+                -> Filter
+                    -> Table "RDB$FIELDS" as "F" Access By ID
+                        -> Bitmap
+                            -> Index "RDB$INDEX_2" Unique Scan
+            -> Filter
+                -> Nested Loop Join (inner)
+                    -> Filter
+                        -> Table "RDB$RELATION_CONSTRAINTS" as "X C" Access By ID
+                            -> Bitmap
+                                -> Index "RDB$INDEX_42" Range Scan (full match)
+                    -> Filter
+                        -> Table "RDB$INDEX_SEGMENTS" as "X S" Access By ID
+                            -> Bitmap
+                                -> Index "RDB$INDEX_6" Range Scan (full match)
 *Monitor*  
 [Application: IBX Test Suite]
-: [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Execute] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   RELATION = EMPLOYEE
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
+
+*Monitor*  
+[Application: IBX Test Suite]
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   SEOFReached
 *Monitor*  
@@ -14215,35 +14263,51 @@ Select Expression
 : [Start transaction]
 *Monitor*  
 [Application: IBX Test Suite]
-: [Prepare] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Prepare] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   Plan: 
 Select Expression
-    -> Nested Loop Join (inner)
-        -> Filter
-            -> Table "RDB$RELATION_FIELDS" as "R" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_4" Range Scan (full match)
-        -> Filter
-            -> Table "RDB$FIELDS" as "F" Access By ID
-                -> Bitmap
-                    -> Index "RDB$INDEX_2" Unique Scan
+    -> Filter
+        -> Nested Loop Join (outer)
+            -> Nested Loop Join (inner)
+                -> Filter
+                    -> Table "RDB$RELATION_FIELDS" as "R" Access By ID
+                        -> Bitmap
+                            -> Index "RDB$INDEX_4" Range Scan (full match)
+                -> Filter
+                    -> Table "RDB$FIELDS" as "F" Access By ID
+                        -> Bitmap
+                            -> Index "RDB$INDEX_2" Unique Scan
+            -> Filter
+                -> Nested Loop Join (inner)
+                    -> Filter
+                        -> Table "RDB$RELATION_CONSTRAINTS" as "X C" Access By ID
+                            -> Bitmap
+                                -> Index "RDB$INDEX_42" Range Scan (full match)
+                    -> Filter
+                        -> Table "RDB$INDEX_SEGMENTS" as "X S" Access By ID
+                            -> Bitmap
+                                -> Index "RDB$INDEX_6" Range Scan (full match)
 *Monitor*  
 [Application: IBX Test Suite]
-: [Execute] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Execute] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   RELATION = EMPLOYEE
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
 *Monitor*  
 [Application: IBX Test Suite]
-: [Fetch] Select F.RDB$COMPUTED_BLR, F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R, RDB$FIELDS F where R.RDB$RELATION_NAME = :RELATION and R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME and ((not F.RDB$COMPUTED_BLR is NULL) or      (not F.RDB$DEFAULT_VALUE is NULL) or      ( not R.RDB$IDENTITY_TYPE is NULL))
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
+
+*Monitor*  
+[Application: IBX Test Suite]
+: [Fetch] Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, X.RDB$CONSTRAINT_TYPE, R.RDB$IDENTITY_TYPE from RDB$RELATION_FIELDS R JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME Left Outer Join (Select C.RDB$RELATION_NAME, S.RDB$FIELD_NAME, C.RDB$CONSTRAINT_TYPE   From RDB$RELATION_CONSTRAINTS C JOIN RDB$INDEX_SEGMENTS S On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME   Where C.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY') X   On X.RDB$RELATION_NAME = R.RDB$RELATION_NAME and X.RDB$FIELD_NAME = R.RDB$FIELD_NAME where R.RDB$RELATION_NAME = :RELATION  and  ( F.RDB$COMPUTED_BLR is not NULL or F.RDB$DEFAULT_VALUE is not NULL or R.RDB$IDENTITY_TYPE is not NULL or X.RDB$CONSTRAINT_TYPE is not null) 
 
   SEOFReached
 *Monitor*  
@@ -14275,7 +14339,7 @@ Test_Database_14: [Disconnect]
 *Monitor*  
 [Application: IBX Test Suite]
 Monitoring Disabled
-33 ISQL Monitor Messages Received
+35 ISQL Monitor Messages Received
 
 
 ------------------------------------------------------
@@ -14753,6 +14817,10 @@ PLAINTEXT = This is a test (Charset = UTF8 Codepage = 65001)
 TEXTANDKEY = 7: This is a test (Charset = UTF8 Codepage = 65001)
 SERVERSIDETEXT = NULL
 Dataset Event BeforeRefresh: State = dsBrowse
+Dataset Event BeforeScroll: State = dsBrowse
+Dataset Event AfterScroll: State = dsBrowse
+Dataset Event BeforeScroll: State = dsBrowse
+Dataset Event AfterScroll: State = dsBrowse
 Dataset Event AfterRefresh: State = dsBrowse
 After Refresh
 KEYFIELD = 7
@@ -15571,8 +15639,8 @@ SERVERSIDETEXT = NULL
 After Refresh
 KEYFIELD = 4
 PLAINTEXT = This is a test (Charset = UTF8 Codepage = 65001)
-TEXTANDKEY = NULL
-SERVERSIDETEXT = NULL
+TEXTANDKEY = 4: This is a test (Charset = UTF8 Codepage = 65001)
+SERVERSIDETEXT = 4 - This is a test (Charset = UTF8 Codepage = 65001)
 Append and Update
 KEYFIELD = 5
 PLAINTEXT = This is another test (Charset = UTF8 Codepage = 65001)
@@ -15586,8 +15654,8 @@ Show the whole dataset
 Row No = 1
 KEYFIELD = 4
 PLAINTEXT = This is a test (Charset = UTF8 Codepage = 65001)
-TEXTANDKEY = NULL
-SERVERSIDETEXT = NULL
+TEXTANDKEY = 4: This is a test (Charset = UTF8 Codepage = 65001)
+SERVERSIDETEXT = 4 - This is a test (Charset = UTF8 Codepage = 65001)
 
 Row No = 2
 KEYFIELD = 5
@@ -15692,14 +15760,14 @@ Create Table LotsOfData (
     MyText VarChar(1024), 
     Primary Key (RowID) 
   );                 
-Loading data into database table. Started at 02/3/2023 16:28:04.448
-Data load completed at 02/3/2023 16:29:28.798 Elapsed Time = 84350 ms, 100000 records loaded
- Message Hash = 1c676292687de4675d0603a2f0154981
-Database Read started at 02/3/2023 16:29:28.800
-Read Dataset completed at 02/3/2023 16:29:33.348 Elapsed Time = 4548 ms, 100000 records read
- Message Hash = 1c676292687de4675d0603a2f0154981
+Loading data into database table. Started at 06/3/2023 16:00:37.502
+Data load completed at 06/3/2023 16:01:59.345 Elapsed Time = 81843 ms, 100000 records loaded
+ Message Hash = 8dc92ae56306fb17788a6bbe4f94f696
+Database Read started at 06/3/2023 16:01:59.347
+Read Dataset completed at 06/3/2023 16:02:03.997 Elapsed Time = 4650 ms, 100000 records read
+ Message Hash = 8dc92ae56306fb17788a6bbe4f94f696
 Test Completed successfully
-02/3/2023 16:29:33.348 Test 21 passes as long as the checksums are identical
+06/3/2023 16:02:03.997 Test 21 passes as long as the checksums are identical
 
 
 ------------------------------------------------------
@@ -17808,12 +17876,12 @@ Create Table IBXTest (
 
 Create Generator IBXGen;
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:42.8470:
+Journal Entry at 2023/03/06 16:02:13.4990:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 11
-  Transaction Name   = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+  Transaction Name   = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -17842,7 +17910,7 @@ MYFIELD2
 
 Add a record
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:42.9270:
+Journal Entry at 2023/03/06 16:02:13.5700:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -17909,7 +17977,7 @@ Que cela seul est fantastique.
 
 Add and edit a record
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:42.9520:
+Journal Entry at 2023/03/06 16:02:13.5940:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -18031,7 +18099,7 @@ GRANTS = NULL
 MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
 MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:42.9760:
+Journal Entry at 2023/03/06 16:02:13.6230:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -18097,7 +18165,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:42.9930:
+Journal Entry at 2023/03/06 16:02:13.6420:
   Type               = Commit
   Attachment ID      = 8
   Session ID         = 1
@@ -18105,12 +18173,12 @@ Journal Entry at 2023/03/02 16:29:42.9930:
 
 
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:42.9960:
+Journal Entry at 2023/03/06 16:02:13.6450:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 13
-  Transaction Name   = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+  Transaction Name   = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -18236,7 +18304,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:43.2660:
+Journal Entry at 2023/03/06 16:02:13.9160:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -18307,7 +18375,7 @@ Rows printed = 1
 
 Rollback Retaining
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:43.3760:
+Journal Entry at 2023/03/06 16:02:14.0250:
   Type               = Rollback Retaining
   Attachment ID      = 8
   Session ID         = 1
@@ -18436,7 +18504,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:43.6100:
+Journal Entry at 2023/03/06 16:02:14.2610:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -18507,7 +18575,7 @@ Rows printed = 1
 
 Rollback
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:43.7220:
+Journal Entry at 2023/03/06 16:02:14.3740:
   Type               = Rollback
   Attachment ID      = 8
   Session ID         = 1
@@ -18515,12 +18583,12 @@ Journal Entry at 2023/03/02 16:29:43.7220:
 
 
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:43.7260:
+Journal Entry at 2023/03/06 16:02:14.3780:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 16
-  Transaction Name   = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+  Transaction Name   = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -18646,7 +18714,7 @@ Rows printed = 2
 
 Commit Retaining
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:44.0140:
+Journal Entry at 2023/03/06 16:02:14.6660:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -18712,7 +18780,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:44.0320:
+Journal Entry at 2023/03/06 16:02:14.6850:
   Type               = Commit Retaining
   Attachment ID      = 8
   Session ID         = 1
@@ -18899,7 +18967,7 @@ Rows printed = 3
 
 Commit
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:44.3820:
+Journal Entry at 2023/03/06 16:02:15.0330:
   Type               = Commit
   Attachment ID      = 8
   Session ID         = 1
@@ -18907,12 +18975,12 @@ Journal Entry at 2023/03/02 16:29:44.3820:
 
 
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:44.3860:
+Journal Entry at 2023/03/06 16:02:15.0370:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 19
-  Transaction Name   = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+  Transaction Name   = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -19095,7 +19163,7 @@ MYFIELD2 = NULL
 Rows printed = 3
 
 Journal Entry Made
-Journal Entry at 2023/03/02 16:29:44.7760:
+Journal Entry at 2023/03/06 16:02:15.4330:
   Type               = Rollback
   Attachment ID      = 8
   Session ID         = 1
@@ -19107,26 +19175,26 @@ IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 11
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2023/03/02 16:29:42.8450
+IBX$CREATED = 2023/03/06 16:02:13.4970
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 16
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2023/03/02 16:29:43.7250
+IBX$CREATED = 2023/03/06 16:02:14.3770
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 18
 IBX$OLDTRANSACTIONID = 16
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2023/03/02 16:29:44.0350
+IBX$CREATED = 2023/03/06 16:02:14.6870
 
 Low Level Journal File Print out
 Journal Entries
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2023/03/02 16:29:42.8470
+Timestamp = 2023/03/06 16:02:13.4990
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 11
-Transaction Name = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+Transaction Name = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19135,7 +19203,7 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/03/02 16:29:42.9270
+Timestamp = 2023/03/06 16:02:13.5700
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 11
@@ -19199,7 +19267,7 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/03/02 16:29:42.9520
+Timestamp = 2023/03/06 16:02:13.5940
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 11
@@ -19263,7 +19331,7 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/03/02 16:29:42.9760
+Timestamp = 2023/03/06 16:02:13.6230
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 11
@@ -19327,17 +19395,17 @@ Que cela seul est fantastique.
 ,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2023/03/02 16:29:42.9930
+Timestamp = 2023/03/06 16:02:13.6420
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 11
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2023/03/02 16:29:42.9960
+Timestamp = 2023/03/06 16:02:13.6450
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 13
-Transaction Name = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+Transaction Name = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19346,38 +19414,38 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/03/02 16:29:43.2660
+Timestamp = 2023/03/06 16:02:13.9160
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 13
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollbackRet(Rollback Retaining)
-Timestamp = 2023/03/02 16:29:43.3760
+Timestamp = 2023/03/06 16:02:14.0250
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 15
 Old TransactionID = 13
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/03/02 16:29:43.6100
+Timestamp = 2023/03/06 16:02:14.2610
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 15
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2023/03/02 16:29:43.7220
+Timestamp = 2023/03/06 16:02:14.3740
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 15
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2023/03/02 16:29:43.7260
+Timestamp = 2023/03/06 16:02:14.3780
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 16
-Transaction Name = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+Transaction Name = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19386,7 +19454,7 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2023/03/02 16:29:44.0140
+Timestamp = 2023/03/06 16:02:14.6660
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 16
@@ -19450,24 +19518,24 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeTransCommitRet(Commit Retaining)
-Timestamp = 2023/03/02 16:29:44.0320
+Timestamp = 2023/03/06 16:02:14.6850
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 18
 Old TransactionID = 16
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2023/03/02 16:29:44.3820
+Timestamp = 2023/03/06 16:02:15.0330
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 18
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2023/03/02 16:29:44.3860
+Timestamp = 2023/03/06 16:02:15.0370
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 19
-Transaction Name = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+Transaction Name = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19476,23 +19544,23 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2023/03/02 16:29:44.7760
+Timestamp = 2023/03/06 16:02:15.4330
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 19
 
 
 Print out Journal File using TIBJournal
-Journal Entry at 2023/03/02 16:29:42.8470:
+Journal Entry at 2023/03/06 16:02:13.4990:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 11
-  Transaction Name   = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+  Transaction Name   = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2023/03/02 16:29:42.9270:
+Journal Entry at 2023/03/06 16:02:13.5700:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -19556,7 +19624,7 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2023/03/02 16:29:42.9520:
+Journal Entry at 2023/03/06 16:02:13.5940:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -19620,7 +19688,7 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2023/03/02 16:29:42.9760:
+Journal Entry at 2023/03/06 16:02:13.6230:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -19684,58 +19752,58 @@ Que cela seul est fantastique.
 </array>
 ,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15"
 
-Journal Entry at 2023/03/02 16:29:42.9930:
+Journal Entry at 2023/03/06 16:02:13.6420:
   Type               = Commit
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 11
 
-Journal Entry at 2023/03/02 16:29:42.9960:
+Journal Entry at 2023/03/06 16:02:13.6450:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 13
-  Transaction Name   = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+  Transaction Name   = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2023/03/02 16:29:43.2660:
+Journal Entry at 2023/03/06 16:02:13.9160:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 13
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2023/03/02 16:29:43.3760:
+Journal Entry at 2023/03/06 16:02:14.0250:
   Type               = Rollback Retaining
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 15
   Old Transaction ID = 13
 
-Journal Entry at 2023/03/02 16:29:43.6100:
+Journal Entry at 2023/03/06 16:02:14.2610:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 15
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2023/03/02 16:29:43.7220:
+Journal Entry at 2023/03/06 16:02:14.3740:
   Type               = Rollback
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 15
 
-Journal Entry at 2023/03/02 16:29:43.7260:
+Journal Entry at 2023/03/06 16:02:14.3780:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 16
-  Transaction Name   = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+  Transaction Name   = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2023/03/02 16:29:44.0140:
+Journal Entry at 2023/03/06 16:02:14.6660:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -19799,29 +19867,29 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2023/03/02 16:29:44.0320:
+Journal Entry at 2023/03/06 16:02:14.6850:
   Type               = Commit Retaining
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 18
   Old Transaction ID = 16
 
-Journal Entry at 2023/03/02 16:29:44.3820:
+Journal Entry at 2023/03/06 16:02:15.0330:
   Type               = Commit
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 18
 
-Journal Entry at 2023/03/02 16:29:44.3860:
+Journal Entry at 2023/03/06 16:02:15.0370:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 19
-  Transaction Name   = "{4452A13F-C1C4-45EF-B4FA-25111072C7B2}"
+  Transaction Name   = "{A4A087C1-9580-4D68-B572-32E01E9C197C}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2023/03/02 16:29:44.7760:
+Journal Entry at 2023/03/06 16:02:15.4330:
   Type               = Rollback
   Attachment ID      = 8
   Session ID         = 1
