@@ -3658,13 +3658,13 @@ begin
     begin
        if (not CachedUpdates) then
          InternalPostRecord(FQInsert,GetActiveBuf);
-      FCursor.EditingDone(ActiveBuffer,cusInserted);
+      FCursor.EditingDone(GetActiveBuf,cusInserted);
     end
     else
     begin
       if (not CachedUpdates) then
         InternalPostRecord(FQModify,GetActiveBuf);
-      FCursor.EditingDone(ActiveBuffer,cusModified);
+      FCursor.EditingDone(GetActiveBuf,cusModified);
     end;
   finally
     FBase.RestoreCursor;
@@ -4005,10 +4005,14 @@ end;
 
 procedure TIBCustomDataSet.DoOnNewRecord;
 begin
-  if FCursor.GetBookmarkFlag(ActiveBuffer) = bfEOF then
+  if not unidirectional and (FCursor.GetBookmarkFlag(ActiveBuffer) = bfEOF) then
     FCursor.Append(ActiveBuffer)
   else
+  begin
+   if RecordCount = 0 then
+     ActivateBuffers;
    FCursor.InsertBefore(ActiveBuffer); {Bookmark data determines insertion point}
+  end;
   inherited DoOnNewRecord;
 end;
 

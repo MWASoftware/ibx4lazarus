@@ -359,9 +359,8 @@ begin
       Edit;
       FieldByName('PlainText').AsString := 'This is the update test - unidirectional';
       Post;
-      PrintDataSetRow(FIBDataSet1);
-      writeln(OutFile,'Now delete the first row - unidirectional');
       PrintDataSet(FIBDataSet1);
+      writeln(OutFile,'Now delete the first row - unidirectional');
       First;
       Delete;
       PrintDataSet(FIBDataSet1);

@@ -258,6 +258,9 @@ end;
 procedure TIBXTestBase.PrintDataSetRow(aDataSet: TDataSet);
 var i: integer;
 begin
+  if aDataset.IsEmpty then
+    writeln(Outfile,'Dataset is empty!')
+  else
   for i := 0 to aDataSet.FieldCount - 1 do
     PrintDataSetRow(aDataSet.Fields[i]);
 end;

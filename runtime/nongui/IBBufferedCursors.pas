@@ -590,6 +590,7 @@ type
     PUniDirRecordHdr = ^TUniDirRecordHdr;
     TUniDirRecordHdr = record
       rdRecNo: TIBRecordNumber;
+      rdDeleted: boolean;
     end;
 
   private
@@ -1343,7 +1344,8 @@ end;
 
 procedure TIBUniDirectionalCursor.DoCancelUpdates;
 begin
-  FDataBufferCache.Clear;
+  if FDataBufferCache <> nil then
+    FDataBufferCache.Clear;
 end;
 
 function TIBUniDirectionalCursor.InternalAllocRecordBuffer: PByte;
@@ -1363,6 +1365,22 @@ end;
 function TIBUniDirectionalCursor.GetRecord(aBufID: TRecordBuffer;
   GetMode: TGetMode; DoCheck: Boolean): TGetResult;
 var Buff: PByte;
+
+  function GetNext: TGetResult;
+  begin
+    if Cursor.IsEOF or not FetchNext then
+       Result := grEOF
+     else
+     begin
+       FetchCurrentRecord(Buff);
+       Inc(FRecordCount);
+       InternalSetRecNo(Buff,FRecordCount);
+       FCurrentRecord := Buff;
+       FCurrentRecordStatus := csRowBuffer;
+       Result := grOK;
+     end;
+  end;
+
 begin
   Result := grError;
   Buff := GetBuffer(aBufID);
@@ -1378,6 +1396,9 @@ begin
         Result := grEOF;
       csRowBuffer:
         begin
+          if PUniDirRecordHdr(FCurrentRecord + FUniDirHdrOffset)^.rdDeleted then
+            Result := GetNext
+          else
           if Buff <> FCurrentRecord then
           begin
             FetchCurrentRecord(Buff);
@@ -1395,19 +1416,7 @@ begin
         csEOF:
           Result := grEOF;
         csBOF, csRowBuffer:
-          begin
-            if Cursor.IsEOF or not FetchNext then
-              Result := grEOF
-            else
-            begin
-              FetchCurrentRecord(Buff);
-              Inc(FRecordCount);
-              InternalSetRecNo(Buff,FRecordCount);
-              FCurrentRecord := Buff;
-              FCurrentRecordStatus := csRowBuffer;
-              Result := grOK;
-            end;
-          end;
+          Result := GetNext;
         end;
       end;
    end;
@@ -1469,7 +1478,7 @@ var Buff: PByte;
     DataBuffer: PByte;
     OldBuffer: PByte;
 begin
-  if FSavedRecNo <> 0 then
+  if GetCachedUpdatesEnabled and (FSavedRecNo <> 0) then
   begin
     Buff := GetBuffer(aBufID);
     if Buff = nil then
@@ -1495,7 +1504,7 @@ begin
   else
     GotoRecordNumber(RecNo);
 
-  if FCurrentRecordStatus = csEOF then
+  if FCurrentRecordStatus in [csBOF,csEOF] then
   begin
     Buff := GetBuffer(aBufID);
     if Buff = nil then
@@ -1539,6 +1548,9 @@ begin
   inherited InternalDelete(aBufID);
   SetCurrentRecord(aBufID);
 
+  if FCurrentRecordStatus= csRowBuffer then
+    PUniDirRecordHdr(FCurrentRecord+ FUniDirHdrOffset)^.rdDeleted := true;
+
   FCurrentRecord := nil;
   if Cursor.IsEof then
     FCurrentRecordStatus := csEOF
@@ -1557,6 +1569,7 @@ end;
 procedure TIBUniDirectionalCursor.InternalUnDelete(aBuffer: PByte);
 begin
   inherited InternalUnDelete(aBuffer);
+  PUniDirRecordHdr(aBuffer+ FUniDirHdrOffset)^.rdDeleted := false;
   Dec(FDeletedRecords);
 end;
 
