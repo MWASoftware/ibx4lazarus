@@ -448,8 +448,9 @@ type
     FCurrentRecord: PByte;
     FCurrentRecordStatus: (csBOF, csRowBuffer, csEOF);
     FSaveBufferSize: integer;
+    FEditState: (esBrowse, esEdit, esInsert);
     function CalcRecordHdrSize: integer; virtual;
-    procedure ClearRecordCache(aBuffer: PByte);
+    procedure ClearRowCache(aBuffer: PByte);
     function ColIndexByName(aName: AnsiString; caseSensitive: boolean=false): integer;
     procedure FetchCurrentRecord(destBuffer: PByte);
     procedure FieldChanged(aBuffer: PByte; aField: TField); virtual;
@@ -545,7 +546,6 @@ type
     FOldBufferCache: TIBOldBufferPool;
     FCachedUpdatesEnabled: boolean;
     FLocalHdrOffset: integer;
-    FEditState: (esBrowse, esEdit, esInsert);
     procedure ApplyUpdatesIterator(status: TCachedUpdateStatus; DataBuffer, OldBuffer: PByte);
   protected
     FSavedRecNo: TIBRecordNumber; {record number of saved buffer if any}
@@ -590,7 +590,6 @@ type
     PUniDirRecordHdr = ^TUniDirRecordHdr;
     TUniDirRecordHdr = record
       rdRecNo: TIBRecordNumber;
-      rdDeleted: boolean;
     end;
 
   private
@@ -1386,7 +1385,7 @@ begin
   Buff := GetBuffer(aBufID);
   if Buff = nil then Exit;
 
-  ClearRecordCache(Buff);
+  ClearRowCache(Buff);
   case GetMode of
   gmCurrent:
     begin
@@ -1396,9 +1395,9 @@ begin
         Result := grEOF;
       csRowBuffer:
         begin
-          if PUniDirRecordHdr(FCurrentRecord + FUniDirHdrOffset)^.rdDeleted then
+  {        if InternalGetDeleted(FCurrentRecord) then
             Result := GetNext
-          else
+          else}
           if Buff <> FCurrentRecord then
           begin
             FetchCurrentRecord(Buff);
@@ -1450,8 +1449,8 @@ end;
 
 procedure TIBUniDirectionalCursor.GotoFirst;
 begin
-  FCurrentRecord := nil;
-  FCurrentRecordStatus := csBOF;
+  if FCurrentRecordStatus <> csBOF then
+    IBError(ibxeDataSetUniDirectional,[]);
 end;
 
 procedure TIBUniDirectionalCursor.GotoLast;
@@ -1467,8 +1466,12 @@ function TIBUniDirectionalCursor.GotoRecordNumber(RecNo: TIBRecordNumber
   ): boolean;
 begin
   if not Cursor.IsEOF then
+  begin
     while (FRecordCount < RecNo) and FetchNext do
       Inc(FRecordCount);
+    FCurrentRecord := nil;
+    FCurrentRecordStatus := csRowBuffer;
+  end;
   Result := FRecordCount = RecNo;
 end;
 
@@ -1494,35 +1497,21 @@ begin
 end;
 
 procedure TIBUniDirectionalCursor.InsertBefore(aBufID: TRecordBuffer);
-var CurRecNo: TIBRecordNumber;
-    Buff: PByte;
-    RecNo: TIBRecordNumber;
+var Buff: PByte;
 begin
-  GetBookmarkData(aBufID,@RecNo);
-  if RecNo = 0 then
-    GotoFirst
-  else
-    GotoRecordNumber(RecNo);
+  SetCurrentRecord(aBufID);
 
-  if FCurrentRecordStatus in [csBOF,csEOF] then
-  begin
-    Buff := GetBuffer(aBufID);
-    if Buff = nil then
-      IBError(ibxeBufferNotSet, [nil]);
-    Inc(FRecordCount);
-    InternalSetRecNo(Buff,FRecordCount);
-    FCurrentRecord := Buff;
-    FCurrentRecordStatus := csRowBuffer;
-    FInserting := true;
-    Inc(FInsertedRecords);
-    InternalSetUpdateStatus(FCurrentRecord,usInserted);
-    DoOnInserted(FCurrentRecord);
-  end
-  else
-  begin
-    CurRecNo := InternalGetRecNo(FCurrentRecord);
-    IBError(ibxeUniDirectional,[CurRecNo,CurRecNo - 1]);
-  end;
+  Buff := GetBuffer(aBufID);
+  if Buff = nil then
+    IBError(ibxeBufferNotSet, [nil]);
+  Inc(FRecordCount);
+  InternalSetRecNo(Buff,FRecordCount);
+  FCurrentRecord := Buff;
+  FCurrentRecordStatus := csRowBuffer;
+  FInserting := true;
+  Inc(FInsertedRecords);
+  InternalSetUpdateStatus(FCurrentRecord,usInserted);
+  DoOnInserted(FCurrentRecord);
 end;
 
 procedure TIBUniDirectionalCursor.Append(aBufID: TRecordBuffer);
@@ -1548,28 +1537,13 @@ begin
   inherited InternalDelete(aBufID);
   SetCurrentRecord(aBufID);
 
-  if FCurrentRecordStatus= csRowBuffer then
-    PUniDirRecordHdr(FCurrentRecord+ FUniDirHdrOffset)^.rdDeleted := true;
-
-  FCurrentRecord := nil;
-  if Cursor.IsEof then
-    FCurrentRecordStatus := csEOF
-  else
-  begin
-    FCurrentRecordStatus := csRowBuffer;
-    if not FInserting then
-    begin
-      if Cursor.IsEOF or not FetchNext then
-        FCurrentRecordStatus := csEOF
-    end
-  end;
+  GetRecord(aBufID,gmNext,false);
   Inc(FDeletedRecords);
 end;
 
 procedure TIBUniDirectionalCursor.InternalUnDelete(aBuffer: PByte);
 begin
   inherited InternalUnDelete(aBuffer);
-  PUniDirRecordHdr(aBuffer+ FUniDirHdrOffset)^.rdDeleted := false;
   Dec(FDeletedRecords);
 end;
 
@@ -1601,7 +1575,7 @@ begin
   Buff := GetBuffer(aBufID);
   if Buff = nil then
     IBError(ibxeBufferNotSet, [nil]);
-  ClearRecordCache(Buff);
+  ClearRowCache(Buff);
   Fillchar(Buff^,RecordBufferSize,0);
   InternalSetUpdateStatus(Buff,usInserted);
 end;
@@ -1950,7 +1924,7 @@ begin
   FArrayList.Pack;
 end;
 
-procedure TIBSelectCursor.ClearRecordCache(aBuffer: PByte);
+procedure TIBSelectCursor.ClearRowCache(aBuffer: PByte);
 var i: Integer;
 begin
   for i := 0 to FColumnCount - 1 do
@@ -2165,7 +2139,7 @@ procedure TIBSelectCursor.FetchCurrentRecord(destBuffer: PByte);
 var  i: Integer;
 begin
    { Make sure blob and array caches are empty }
-  ClearRecordCache(destBuffer);
+  ClearRowCache(destBuffer);
 
   if Cursor.IsEOF then
     IBError(ibxeCursorAtEOF,[]);
@@ -2245,12 +2219,28 @@ end;
 
 procedure TIBSelectCursor.SetCurrentRecord(aBufID: TRecordBuffer);
 var Buff: PByte;
+
+  procedure SetBuffer;
+  begin
+    Buff := GetBuffer(aBufID);
+    if Buff = nil then
+      IBError(ibxeBufferNotSet, [nil]);
+    FCurrentRecord := Buff;
+    FCurrentRecordStatus := csRowBuffer;
+  end;
+
 begin
-  Buff := GetBuffer(aBufID);
-  if Buff = nil then
-    IBError(ibxeBufferNotSet, [nil]);
-  FCurrentRecord := Buff;
-  FCurrentRecordStatus := csRowBuffer;
+  case GetBookmarkFlag(aBufID) of
+  bfBOF:
+    FCurrentRecordStatus := csBOF;
+  bfEOF:
+    if FEditState = esInsert then
+      SetBuffer
+    else
+      FCurrentRecordStatus := csEOF;
+  else
+    SetBuffer;
+  end;
 end;
 
 {Field.offset is a zero based integer indexing the blob field
@@ -2530,7 +2520,7 @@ begin
   Buff := GetBuffer(aBufID);
   if Buff = nil then
     IBError(ibxeBufferNotSet, [nil]);
-  ClearRecordCache(Buff);
+  ClearRowCache(Buff);
 
   for i := 0 to QryResults.Count - 1  do
   begin
@@ -2778,7 +2768,7 @@ begin
       InternalDelete(aBufID)
     else
     begin
-      ClearRecordCache(Buff);
+      ClearRowCache(Buff);
       for i := 0 to Length(ColMap) - 1 do
         if ColMap[i] <> -1 then
         begin

@@ -3471,7 +3471,8 @@ end;
 
 procedure TIBCustomDataSet.InternalFirst;
 begin
-  FCursor.GotoFirst;
+  if not FUniDirectional then
+    FCursor.GotoFirst;
 end;
 
 procedure TIBCustomDataSet.InternalInsert;
@@ -3586,6 +3587,7 @@ procedure TIBCustomDataSet.ReQuery;
 begin
   FQSelect.Close;
   FQSelect.ExecQuery;
+  ClearBuffers;
   FCursor.SetCursor(FQSelect.CurrentCursor);
   First;
 end;
