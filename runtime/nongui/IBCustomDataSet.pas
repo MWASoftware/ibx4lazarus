@@ -378,12 +378,13 @@ type
   private
     const
       BufferCacheSize    =  1000;  { Allocate cache in this many record chunks}
-
+      InitialBufferCacheSize = 50; {Allocate first block cache in this many record chunks}
 
 
   private
     FAllowAutoActivateTransaction: Boolean;
     FAutoCommit: TIBAutoCommit;
+    FBufferChunksInFirstBlock: integer;
     FCaseSensitiveParameterNames: boolean;
     FDefaultTZDate: TDateTime;
     FEnableStatistics: boolean;
@@ -441,6 +442,7 @@ type
       aBufID: TRecordBuffer; var RecordSkipped: boolean);
     function GetSelectStmtIntf: IStatement;
     function GetUpdatesPending: Boolean;
+    procedure SetBufferChunksInFirstBlock(AValue: integer);
     procedure SetCaseSensitiveParameterNames(AValue: boolean);
     procedure SetDefaultTZDate(AValue: TDateTime);
     procedure SetSQLFiltered(AValue: boolean);
@@ -607,6 +609,7 @@ type
     property CaseSensitiveParameterNames: boolean read FCaseSensitiveParameterNames
                                                   write SetCaseSensitiveParameterNames;
     property BufferChunks: Integer read FBufferChunks write SetBufferChunks;
+    property BufferChunksInFirstBlock: integer read FBufferChunksInFirstBlock write SetBufferChunksInFirstBlock;
     property CachedUpdates: Boolean read FCachedUpdates write SetCachedUpdates;
     property UniDirectional: Boolean read FUniDirectional write SetUniDirectional default False;
     property GeneratorField: TIBGenerator read FGeneratorField write FGeneratorField;
@@ -769,6 +772,7 @@ type
     { TIBCustomDataSet }
     property AutoCommit;
     property BufferChunks;
+    property BufferChunksInFirstBlock;
     property CachedUpdates;
     property CaseSensitiveParameterNames;
     property EnableStatistics;
@@ -2142,6 +2146,7 @@ begin
   FIBLinks := TList.Create;
   FUniDirectional := False;
   FBufferChunks := BufferCacheSize;
+  FBufferChunksInFirstBlock := InitialBufferCacheSize;
   FGeneratorField := TIBGenerator.Create(self);
   FDataLink := TIBDataLink.Create(Self);
   FQDelete := TIBSQL.Create(Self);
@@ -2179,7 +2184,7 @@ begin
       Transaction := TIBTransaction(AOwner);
   FPrimaryKeys := TStringList.Create;
   FPrimaryKeys.LineBreak := ';';
-  FPrimaryKeys.TrailingLineBreak := false;
+  FPrimaryKeys.SkipLastLineBreak := true;
   FBaseSQLSelect := TStringList.Create;
   FTZTextOption := tzOffset;
   FDefaultTZDate := EncodeDate(2020,1,1);
@@ -3247,7 +3252,7 @@ begin
     FAliasNameMap := AliasNameMap;
     FAliasNameList := AliasNameList;
     self.FPrimaryKeys.Assign(PrimaryKeys);
-    self.FPrimaryKeys.TrailingLineBreak := false;
+    self.FPrimaryKeys.SkipLastLineBreak := true;
   finally
     Free;
   end;
@@ -3589,6 +3594,7 @@ begin
   FQSelect.ExecQuery;
   ClearBuffers;
   FCursor.SetCursor(FQSelect.CurrentCursor);
+  ActivateBuffers;
   First;
 end;
 
@@ -3623,7 +3629,7 @@ begin
                                                        CalcFieldsSize,
                                                        FDefaultTZDate,  CachedUpdates,
                                                        FBufferChunks,
-                                                       FBufferChunks);
+                                                       FBufferChunksInFirstBlock);
 
 
       FFilterBuffer := FCursor.AllocRecordBuffer;
@@ -3923,6 +3929,14 @@ end;
 function TIBCustomDataSet.GetUpdatesPending: Boolean;
 begin
   Result := FCursor.UpdatesPending;
+end;
+
+procedure TIBCustomDataSet.SetBufferChunksInFirstBlock(AValue: integer);
+begin
+  if (AValue <= 0) then
+    FBufferChunksInFirstBlock := InitialBufferCacheSize
+  else
+    FBufferChunksInFirstBlock := AValue;
 end;
 
 procedure TIBCustomDataSet.SetCaseSensitiveParameterNames(AValue: boolean);

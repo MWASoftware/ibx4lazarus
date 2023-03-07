@@ -114,6 +114,7 @@ type
     property Active;
     property AutoCommit;
     property BufferChunks;
+    property BufferChunksInFirstBlock;
     property CachedUpdates;
     property CaseSensitiveParameterNames;
     property DataSource read GetDataSource write SetDataSource;

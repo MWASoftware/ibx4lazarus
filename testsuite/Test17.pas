@@ -286,8 +286,9 @@ begin
       FieldByName('PlainText').AsString := 'This is the update test';
       Post;
       PrintDataSetRow(FIBDataSet1);
-      writeln(OutFile,'Now delete the first row');
+      writeln(Outfile,'Show whole Dataset');
       PrintDataSet(FIBDataSet1);
+      writeln(OutFile,'Now delete the first row');
       First;
       Delete;
       PrintDataSet(FIBDataSet1);
@@ -351,7 +352,8 @@ begin
       Refresh;
       writeln(OutFile,'After Refresh - unidirectional');
       PrintDataSetRow(FIBDataSet1);
-      writeln(OutFile,'Append and Update');
+      writeln(OutFile,' Record Count = ',FIBDataSet1.RecordCount);
+      writeln(OutFile,'Insert and Update');
       Insert;
       FieldByName('PlainText').AsString := 'This is another test - unidirectional';
       Post;
@@ -360,12 +362,13 @@ begin
       FieldByName('PlainText').AsString := 'This is the update test - unidirectional';
       Post;
       PrintDataSetRow(FIBDataSet1);
-      writeln(OutFile,'Now delete the first row - unidirectional');
+      writeln(OutFile,'Now delete the first row - unidirectional with Record Count = ',FIBDataSet1.RecordCount);
       Active := false;
       Active := true;
       Delete;
       writeln(OutFile,'Show Current Row');
       PrintDataSetRow(FIBDataSet1);
+      writeln(OutFile,' Record Count = ',FIBDataSet1.RecordCount);
       writeln(Outfile,'Ensure dataset saved to database');
       Active := false;
       Active := true;

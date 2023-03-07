@@ -154,6 +154,7 @@ type
     property AutoCommit;
     property Active;
     property BufferChunks;
+    property BufferChunksInFirstBlock;
     property CachedUpdates;
     property DataSetCloseAction;
 //    property Constraints stored ConstraintsStored;

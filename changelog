@@ -1,14 +1,23 @@
 IBX Change Log  version (2.6-0 Build nnn) Tue, 6 Dec 2022 23:13:00 +0000
 
 1. Complete rewrite of internal buffer management in order to improve performance
-   and maintainability.
+   and maintainability. Highlights:
+
+   * Extending the size of the buffer pool no longer has to copy the entire record
+     cache. Instead, a new extent is simply added to the buffer pool.
+   * A memory to memory copy of each display buffer now is avoided when scolling the
+     dataset.
+   * A separate set of buffers is now used for calculated fields. This avoids
+     having to keep copies of calculated field values in the buffer cache.
+   * Compact bitmaps are used to record null status and need to refresh in each
+     buffer.
 
 2. TIBUpdateSQL: changes to SQL text will close linked dataset if open. This is
    to ensure same behaviour as TIBDataset, TIBTable and TIBStoredProcedure.
 
-3. Field Provider Flags: pfRefreshOnInsert and pfRefreshOnUpdate are now supported.
+3. TField Provider Flags: pfRefreshOnInsert and pfRefreshOnUpdate are now supported.
    If either or both of these flags are set at design time (using the fields editor)
-   then this forces a row refresh on respectively insert or update when the
+   then this forces a row refresh on respectively insert or update, or both, when the
    corresponding field is not present in an SQL RETURNING clause.
 
 4. TIBCustomDataset.FieldDefsFromQuery moved to a helper class in order to improve
@@ -16,13 +25,23 @@ IBX Change Log  version (2.6-0 Build nnn) Tue, 6 Dec 2022 23:13:00 +0000
 
 5. TIBQuery, TIBDataset and TIBTable. Traditionally, IBX has implemented the Refresh method
    as a refresh of the current row. However, this is different behaviour to that described
-   in the FPC document for TDataset.Refresh which is described as "refetches the data in
+   in the FPC documentation for TDataset.Refresh which is described as "refetches the data in
    the dataset from the underlying database, and attempts to reposition the cursor on
-   the same record as it was". A progammatic Row Refresh should no longer be required.
+   the same record as it was".
+
+6. A progammatic Row Refresh should no longer be required.
    Use Insert/Update... returning to refresh any fields that may change following an
-   insert or update i.e. Identify Iinsert only), Computed By, Blob and array fields.
-   If there are any others (e.g. updated by triggers) set the appropriate ProviderFlag
-   for the field at Design Time to forece a row refresh if not in the returning clause.
+   insert or update (Identify fields on Insert only), Computed By, Blob and array fields
+   on both. f there are any others (e.g. updated by triggers) set the appropriate ProviderFlag
+   for the field at Design Time to force a row refresh if not in the returning clause.
+
+7. It should now be possible to insert a row into an empty unidirectional dataset.
+
+8. New TIBQery, TIBDataSet and TIBTable property: BufferChunksInFirstBlock (default 50).
+   This gives the number of buffers in the initial block for the buffer pool in
+   bi-directional datasets. BufferChunks (default 1000) gives the number of buffers
+   in subsequent buffer pool blocks. This avoids large and mostly unused memory allocations
+   for small datasets.
 
 IBX Change Log  version (2.5-1 Build nnn) Tue, 6 Dec 2022 23:13:00 +0000
 
