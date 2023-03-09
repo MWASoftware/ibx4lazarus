@@ -35,13 +35,13 @@ uses
 
 type
   { The TIBSimpleBufferPool provides basic buffer management for IBX. The pool consists
-    of one or more memeory blocks organised as a bi-directional linked list. They do
+    of one or more memory blocks organised as a bi-directional linked list. The blocks do
     not have to be the same size and the first is typically a small block with
     subsequent blocks larger in size. This allows for efficient memory allocation
     for small datasets whilst efficiently extending the pool for larger datasets.
 
     Each block comprises a "start header", one or more fixed size "buffers" and a trailing end
-    heaer. Each type is distinguished by the first byte value. Additionally, the
+    header. Each type is distinguished by the first byte value. Additionally, the
     first byte of the first buffer in a block is separately identified. This
     allows for a block to be parsed in either direction with the end header terminating
     forward parsing while the first buffer identifier terminates parsing in the
@@ -101,7 +101,7 @@ type
     FRecordCount: TIBRecordNumber;
     function AllocBlock(buffers: integer): PByte;
     procedure CheckBuffersAvailable;
-    procedure InternalCheckValidBuffer(P:PByte);
+    procedure InternalCheckValidBuffer(P:PByte); inline;
   protected
     procedure CheckValidBuffer(P:PByte); virtual;
     function AddBuffer: PByte; virtual;
@@ -2936,7 +2936,7 @@ end;
 
 procedure TIBSimpleBufferPool.CheckBuffersAvailable;
 begin
-  if FFirstBlock = nil then
+  if Empty then
      IBError(ibxeEmptyBufferPool,[FName]);
 end;
 

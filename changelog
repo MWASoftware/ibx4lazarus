@@ -11,6 +11,8 @@ IBX Change Log  version (2.6-0 Build nnn) Tue, 6 Dec 2022 23:13:00 +0000
      having to keep copies of calculated field values in the buffer cache.
    * Compact bitmaps are used to record null status and need to refresh in each
      buffer.
+   * Display buffer type changed from PChar to TRecordBuffer in line with change of
+     buffer type in FCL-DB.
 
 2. TIBUpdateSQL: changes to SQL text will close linked dataset if open. This is
    to ensure same behaviour as TIBDataset, TIBTable and TIBStoredProcedure.
