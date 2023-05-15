@@ -3215,7 +3215,8 @@ begin
 
      1. lookahead until either the next in sequence is found or the local sequence
         breaks.
-     2.
+     2. If not foudn then work backwards to current sequence insertion point
+     3. Then walk forwards to find the buffer
      }
 
     rsInserted, rsInsertDeleted:

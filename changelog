@@ -22,24 +22,24 @@ IBX Change Log  version (2.6-0 Build nnn) Tue, 6 Dec 2022 23:13:00 +0000
    then this forces a row refresh on respectively insert or update, or both, when the
    corresponding field is not present in an SQL RETURNING clause.
 
-4. TIBCustomDataset.FieldDefsFromQuery moved to a helper class in order to improve
+4. TIBCustomDataset.FieldDefsFromQuery moved to a helper class (TFieldDefsMaker) in order to improve
    maintainability and readability and to add identification of primary key fields.
 
 5. TIBQuery, TIBDataset and TIBTable. Traditionally, IBX has implemented the Refresh method
    as a refresh of the current row. However, this is different behaviour to that described
    in the FPC documentation for TDataset.Refresh which is described as "refetches the data in
    the dataset from the underlying database, and attempts to reposition the cursor on
-   the same record as it was".
+   the same record as it was". IBX now complies with the FPC definition of Refresh.
 
 6. A progammatic Row Refresh should no longer be required.
    Use Insert/Update... returning to refresh any fields that may change following an
-   insert or update (Identify fields on Insert only), Computed By, Blob and array fields
-   on both. f there are any others (e.g. updated by triggers) set the appropriate ProviderFlag
+   insert or update i.e. Identify fields on Insert only, Computed By, Blob and array fields
+   on both. If there are any other fields (e.g. updated by triggers) set the appropriate ProviderFlag
    for the field at Design Time to force a row refresh if not in the returning clause.
 
 7. It should now be possible to insert a row into an empty unidirectional dataset.
 
-8. New TIBQery, TIBDataSet and TIBTable property: BufferChunksInFirstBlock (default 50).
+8. New TIBQuery, TIBDataSet and TIBTable property: BufferChunksInFirstBlock (default 50).
    This gives the number of buffers in the initial block for the buffer pool in
    bi-directional datasets. BufferChunks (default 1000) gives the number of buffers
    in subsequent buffer pool blocks. This avoids large and mostly unused memory allocations
