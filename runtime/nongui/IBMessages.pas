@@ -178,7 +178,27 @@ type
       ibxeResourceFileNotFound,
       ibxePatchFileNotFound,
       ibxeUnrecognisedParamName,
-      ibxeBadQueryReplay
+      ibxeBadQueryReplay,
+      ibxeNotABuffer,
+      ibxeEmptyBufferPool,
+      ibxeNotEnoughBuffers,
+      ibxeUnrecognisedHeaderType,
+      ibxeRecordisDeleted,
+      ibxeBadFieldNo,
+      ibxeUniDirectional,
+      ibxeBeyondEof,
+      ibxeSaveBufferNotReleased,
+      ibxeUnableToRestore,
+      ibxeUnableToReleaseSaveBuffer,
+      ibxeCursorAtEOF,
+      ibxeInsertBeyondEOF,
+      ibxeDeleteBeyondEOF,
+      ibxeUpdatesNotAppled,
+      ibxeCannotUnDelete,
+      ibxeDeleteAtBOF,
+      ibxeInsertBeforeBOF,
+      ibxeDifferentStatement,
+      ibxeIncorrectQueryType
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -204,6 +224,8 @@ resourcestring
   SFalse = 'false';
   SArray = '(array)';
   SBlob = '(blob)';
+  SUniCursor = 'unidirectional cursor';
+  SBiDirCursor = 'bidirectional cursor';
 
 implementation
 
@@ -323,6 +345,26 @@ resourcestring
   SPatchFileNotFound = 'In section [%s] of the Upgrade File (%s), unable to open %s (SQL script to patch).';
   SUnrecognisedParamName = 'Unrecognised Parameter Name (%s)';
   SBadQueryReplay = 'Playback execution error for "%s"' + LineEnding + '%s';
+  SNotABuffer = '%s: Invalid Buffer Pointer';
+  SEmptyBufferPool = '%s Buffer Pool is empty';
+  SNotEnoughBuffers = '%s: Buffers per Block must be greater than 1';
+  SUnrecognisedHeaderType = 'Unrecognised header type (%d)';
+  SRecordisDeleted = 'Record No. %d has been deleted!';
+  SBadFieldNo = 'Bad FieldNo %d. Valid Range 1..%d';
+  SUniDirectional = 'Dataset is uni-directional. At record %d, record %d requested';
+  SBeyondEof = 'Record No. is after EOF. Dataset has %d rows, row %d requested';
+  SSaveBufferNotReleased = 'Cannot save record %d. Record No. %d has not been released';
+  SUnableToRestore = 'Unable to restore record %d. Record No. %d in save buffer';
+  SUnableToReleaseSaveBuffer = 'Unable to release saved record. Request to release record %d, but record %d saved';
+  SCursorAtEOF = 'Attempt to read cursor beyond EOF';
+  SInsertBeyondEOF = 'Insert beyond EOF';
+  SDeleteBeyondEOF = 'Delete beyond EOF';
+  SUpdatesNotAppled = 'Cannot disable Cached Updates when updates are pending';
+  SCannotUnDelete = 'Undelete not available';
+  SDeleteAtBOF = 'Cannot delete at BOF';
+  SInsertBeforeBOF = 'Cannot insert before BOF';
+  SDifferentStatement = 'A Cursor can only be replaced using a new cursor from the same statement';
+  SIncorrectQueryType = 'Unexpected Query used to post record';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -428,7 +470,27 @@ const
     SResourceFileNotFound,
     SPatchFileNotFound,
     SUnrecognisedParamName,
-    SBadQueryReplay
+    SBadQueryReplay,
+    SNotABuffer,
+    SEmptyBufferPool,
+    SNotEnoughBuffers,
+    SUnrecognisedHeaderType,
+    SRecordisDeleted,
+    SBadFieldNo,
+    SUniDirectional,
+    SBeyondEof,
+    SSaveBufferNotReleased,
+    SUnableToRestore,
+    SUnableToReleaseSaveBuffer,
+    SCursorAtEOF,
+    SInsertBeyondEOF,
+    SDeleteBeyondEOF,
+    SUpdatesNotAppled,
+    SCannotUnDelete,
+    SDeleteAtBOF,
+    SInsertBeforeBOF,
+    SDifferentStatement,
+    SIncorrectQueryType
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

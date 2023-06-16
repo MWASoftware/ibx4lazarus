@@ -41,14 +41,11 @@ type
 
   TIBUpdate = class(TIBDataSetUpdateObject)
   private
-    FDataSet: TIBCustomDataSet;
     FDummySQL: TStrings;
     FOnApplyUpdates: TOnApplyUpdates;
   protected
     function GetSQL(UpdateKind: TUpdateKind): TStrings; override;
-    function GetDataSet: TIBCustomDataSet; override;
-    procedure SetDataSet(ADataSet: TIBCustomDataSet); override;
-    procedure Apply(UpdateKind: TUpdateKind; buff: PChar); override;
+    procedure Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -249,7 +246,10 @@ end;
 
 function TParamIntf.GetAsBoolean: boolean;
 begin
-  Result := FOwner.FParams[FIndex].Value;
+  if VarIsNull(FOwner.FParams[FIndex].Value) then
+    Result := false
+  else
+    Result := FOwner.FParams[FIndex].Value;
 end;
 
 function TParamIntf.GetAsCurrency: Currency;
@@ -776,17 +776,7 @@ begin
   Result := FDummySQL; {non empty result}
 end;
 
-function TIBUpdate.GetDataSet: TIBCustomDataSet;
-begin
-  Result := FDataSet;
-end;
-
-procedure TIBUpdate.SetDataSet(ADataSet: TIBCustomDataSet);
-begin
-  FDataSet := ADataset;
-end;
-
-procedure TIBUpdate.Apply(UpdateKind: TUpdateKind; buff: PChar);
+procedure TIBUpdate.Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer);
 var Params: ISQLParams;
 begin
   Params := TParamListIntf.Create(Dataset.Fields,(DataSet.Database as TIBDatabase));

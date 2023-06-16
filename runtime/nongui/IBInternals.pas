@@ -34,6 +34,9 @@ interface
 uses
   Classes, SysUtils, DB;
 
+const
+  sDBkeyAlias = 'IBX_INTERNAL_DBKEY'; {Special case for TIBTable support}
+
 type
   TTraceControlFlag = (tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect,
      tfTransact, tfBlob, tfService, tfMisc, tfDisabled);

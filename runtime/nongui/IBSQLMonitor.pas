@@ -48,8 +48,8 @@ unit IBSQLMonitor;
 interface
 
 uses
-  IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase,  DB, IBInternals,
-  SysUtils,  Classes;
+  IB, IBUtils, IBSQL, IBCustomDataSet, IBDatabase,  IBInternals,
+  SysUtils,  Classes, IBBufferedCursors;
 
 {Note that the original inter-thread communication between the Reader Thread and
  the ISQL Monitor used the Windows PostMessage interface. This is currently not
@@ -109,8 +109,10 @@ type
     procedure UnregisterMonitor(SQLMonitor : TIBCustomSQLMonitor);
     procedure ReleaseMonitor(Arg : TIBCustomSQLMonitor);
     procedure SQLPrepare(qry: TIBSQL); 
-    procedure SQLExecute(qry: TIBSQL);
-    procedure SQLFetch(qry: TIBSQL); 
+    procedure SQLExecute(qry: TIBSQL);  overload;
+    procedure SQLExecute(qry: TIBSelectCursor; qryText: string);  overload;
+    procedure SQLFetch(qry: TIBSQL); overload;
+    procedure SQLFetch(qry: TIBSelectCursor; qryText: string); overload;
     procedure DBConnect(db: TIBDatabase);
     procedure DBDisconnect(db: TIBDatabase);
     procedure TRStart(tr: TIBTransaction); 
@@ -168,8 +170,10 @@ type
     procedure UnregisterMonitor(SQLMonitor : TIBCustomSQLMonitor);
     procedure ReleaseMonitor(Arg : TIBCustomSQLMonitor);
     procedure SQLPrepare(qry: TIBSQL); virtual;
-    procedure SQLExecute(qry: TIBSQL); virtual;
-    procedure SQLFetch(qry: TIBSQL); virtual;
+    procedure SQLExecute(qry: TIBSQL);  virtual;  overload;
+    procedure SQLExecute(qry: TIBSelectCursor; qryText: string);  virtual;  overload;
+    procedure SQLFetch(qry: TIBSQL); overload;
+    procedure SQLFetch(qry: TIBSelectCursor; qryText: string); overload;
     procedure DBConnect(db: TIBDatabase); virtual;
     procedure DBDisconnect(db: TIBDatabase); virtual;
     procedure TRStart(tr: TIBTransaction); virtual;
@@ -589,6 +593,38 @@ begin
   end;
 end;
 
+ procedure TIBSQLMonitorHook.SQLExecute(qry : TIBSelectCursor; qryText : string
+   );
+var
+  st: String;
+  i: Integer;
+begin
+  if FEnabled then
+  begin
+    if not ((tfQExecute in (FTraceFlags * (qry.Dataset as TIBCustomDataSet).Database.TraceFlags)) or
+            (tfStmt in (FTraceFlags * (qry.Dataset as TIBCustomDataSet).Database.TraceFlags)) ) then
+      Exit;
+    st := qry.Name;
+    i := Pos(':',st);
+    if i > 0 then
+      system.Delete(st,i,maxint);
+
+    st := st + ': [Execute] ' + qryText; {do not localize}
+    if qry.Params.GetCount > 0 then begin
+      for i := 0 to qry.Params.GetCount - 1 do begin
+        st := st + LineEnding + '  ' + qry.Params[i].Name + ' = ';
+        try
+          if qry.Params[i].IsNull then
+            st := st + '<NULL>'; {do not localize}
+          st := st + qry.Params[i].AsString;
+        except
+          st := st + '<' + SCantPrintValue + '>';
+        end;
+      end;
+    end;
+    WriteSQLData(st, tfQExecute);
+  end; end;
+
 procedure TIBSQLMonitorHook.SQLFetch(qry: TIBSQL);
 var
   st: String;
@@ -598,6 +634,7 @@ begin
     if not ((tfQFetch in (FTraceFlags * qry.Database.TraceFlags)) or
             (tfStmt in (FTraceFlags * qry.Database.TraceFlags))) then
       Exit;
+
     if qry.Owner is TIBCustomDataSet then
       st := TIBCustomDataSet(qry.Owner).Name
     else
@@ -608,6 +645,27 @@ begin
     WriteSQLData(st, tfQFetch);
   end;
 end;
+
+ procedure TIBSQLMonitorHook.SQLFetch(qry : TIBSelectCursor; qryText : string);
+var
+  st: String;
+   i: integer;
+begin
+  if FEnabled then
+  begin
+    if not ((tfQFetch in (FTraceFlags * (qry.Dataset as TIBCustomDataSet).Database.TraceFlags)) or
+            (tfStmt in (FTraceFlags * (qry.Dataset as TIBCustomDataSet).Database.TraceFlags))) then
+      Exit;
+
+    st := qry.Name;
+    i := Pos(':',st);
+    if i > 0 then
+      system.Delete(st,i,maxint);
+    st := st + ': [Fetch] ' + qryText; {do not localize}
+    if (qry.CursorAtEOF) then
+      st := st + LineEnding + '  ' + SEOFReached;
+    WriteSQLData(st, tfQFetch);
+  end;   end;
 
 procedure TIBSQLMonitorHook.SQLPrepare(qry: TIBSQL);
 var

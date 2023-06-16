@@ -97,7 +97,7 @@ end;
 
 procedure TTest13.ShowStatistics(Sender: TObject);
 begin
-  writeln(OutFile,FIBSQLMonitor.ReadCount,' ISQL Monitor Messages Received');
+  writeln(OutFile,FIBSQLMonitor.ReadCount,' ISQL Monitor Messages Received (Monitoring Disabled)');
 end;
 
 procedure TTest13.CreateObjects(Application: TTestApplication);

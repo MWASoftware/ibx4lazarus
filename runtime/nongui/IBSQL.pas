@@ -206,6 +206,7 @@ type
     procedure CheckOpen;             { raise error if query is not open.}
     procedure CheckValidStatement;   { raise error if statement is invalid.}
     procedure Close;
+    function CurrentCursor: IResultSet;
     procedure ExecQuery;
     function HasField(FieldName: String): boolean; {Note: case sensitive match}
     function HasScollableCursors: boolean;
@@ -669,6 +670,12 @@ begin
   FResultSet := nil;
   FResults := nil;
   FRecordCount := 0;
+end;
+
+function TIBSQL.CurrentCursor: IResultSet;
+begin
+  CheckOpen;
+  Result := FResultSet;
 end;
 
 function TIBSQL.GetFieldCount: integer;

@@ -39,7 +39,8 @@ unit IBTable;
 
 interface
 
-uses SysUtils, Classes, DB, IB,  IBCustomDataSet, IBDatabase, IBSQL, IBUtils;
+uses SysUtils, Classes, DB, IB,  IBCustomDataSet, IBDatabase, IBSQL, IBUtils,
+  IBBufferedCursors;
      
 type
 
@@ -126,7 +127,7 @@ type
     procedure SetFiltered(Value: Boolean); override;
     procedure SetFilterText(const Value: string); override;
     procedure SetFilterOptions(Value: TFilterOptions); override;
-    procedure InternalRefreshRow; override;
+    procedure InternalRefreshRow(Buff: TRecordBuffer); override;
     function GetMasterDetailDelay: integer; override;
     procedure SetMasterDetailDelay(AValue: integer); override;
 
@@ -153,6 +154,7 @@ type
     property AutoCommit;
     property Active;
     property BufferChunks;
+    property BufferChunksInFirstBlock;
     property CachedUpdates;
     property DataSetCloseAction;
 //    property Constraints stored ConstraintsStored;
@@ -356,7 +358,7 @@ begin
     IBError(ibxeNotSupported, [nil]);
 end;
 
-procedure TIBTable.InternalRefreshRow;
+procedure TIBTable.InternalRefreshRow(Buff: TRecordBuffer);
 begin
   if CurrentDBKey.DBKey[0] <> 0 then
     QRefresh.SQL.Assign(WhereDBKeyRefreshSQL)
@@ -364,7 +366,7 @@ begin
     QRefresh.SQL.Assign(WherePrimaryRefreshSQL)
   else
     QRefresh.SQL.Assign(WhereAllRefreshSQL);
-  inherited InternalRefreshRow;
+  inherited InternalRefreshRow(Buff);
 end;
 
 function TIBTable.GetMasterDetailDelay: integer;
@@ -965,7 +967,7 @@ begin
     if Active then
     begin
       ClearBuffers;
-      ResetBufferCache;
+      ReQuery;
       DataEvent(deDataSetChange, 0);
     end;
   finally
@@ -1046,7 +1048,6 @@ end;
 procedure TIBTable.MasterDisabled(Sender: TObject);
 begin
   DataEvent(dePropertyChange, 0);
-  ReQuery;
 end;
 
 function TIBTable.GetDataSource: TDataSource;
@@ -1338,7 +1339,7 @@ begin
   SQL := TStringList.Create;
   SQL.Text := 'select ' + {do not localize}
     QuoteIdentifier(DataBase.SQLDialect, FTableName) + '.*, ' {do not localize}
-    + 'RDB$DB_KEY as IBX_INTERNAL_DBKEY from ' {do not localize}
+    + 'RDB$DB_KEY as ' + sDBkeyAlias + ' from ' {do not localize}
     + QuoteIdentifier(DataBase.SQLDialect, FTableName);
   if Filtered and (Filter <> '') then
   begin
@@ -1372,9 +1373,9 @@ begin
   SelectSQL.Assign(SQL);
   RefreshSQL.Text := 'select ' + {do not localize}
     QuoteIdentifier(DataBase.SQLDialect, FTableName) + '.*, ' {do not localize}
-    + 'RDB$DB_KEY as IBX_INTERNAL_DBKEY from ' {do not localize}
+    + 'RDB$DB_KEY as ' + sDBkeyAlias + ' from ' {do not localize}
     + QuoteIdentifier(DataBase.SQLDialect, FTableName) +
-    ' where RDB$DB_KEY = :IBX_INTERNAL_DBKEY'; {do not localize}
+    ' where RDB$DB_KEY = :' + sDBkeyAlias; {do not localize}
   WhereDBKeyRefreshSQL.Assign(RefreshSQL);
   InternalPrepare;
   SQL.Free;
@@ -1479,7 +1480,7 @@ begin
   begin
     DeleteSQL.Text := 'delete from ' + {do not localize}
       QuoteIdentifier(DataBase.SQLDialect, FTableName) +
-      ' where RDB$DB_KEY = ' + ':IBX_INTERNAL_DBKEY'; {do not localize}
+      ' where RDB$DB_KEY = ' + ':' + sDBkeyAlias; {do not localize}
     GenerateFieldLists;
     InsertSQL.Text := 'insert into ' + {do not localize}
       QuoteIdentifier(DataBase.SQLDialect, FTableName) +
@@ -1488,10 +1489,10 @@ begin
     ModifySQL.Text := 'update ' +
       QuoteIdentifier(DataBase.SQLDialect, FTableName) +
       ' set ' + UpdateFieldList + {do not localize}
-      ' where RDB$DB_KEY = :IBX_INTERNAL_DBKEY' + UpdateReturningFieldList; {do not localize}
+      ' where RDB$DB_KEY = :' + sDBkeyAlias + UpdateReturningFieldList; {do not localize}
     WhereAllRefreshSQL.Text := 'select ' +  {do not localize}
       QuoteIdentifier(DataBase.SQLDialect, FTableName) + '.*, '
-      + 'RDB$DB_KEY as IBX_INTERNAL_DBKEY from ' {do not localize}
+      + 'RDB$DB_KEY as ' + sDBkeyAlias + ' from ' {do not localize}
       + QuoteIdentifier(DataBase.SQLDialect, FTableName) +
       ' where ' + WhereAllFieldList ; {do not localize}
     if FPrimaryIndexFields <> '' then
@@ -1499,7 +1500,7 @@ begin
       GenerateWherePrimaryFieldList;
       WherePrimaryRefreshSQL.Text := 'select ' + {do not localize}
         QuoteIdentifier(DataBase.SQLDialect, FTableName) + '.*, ' {do not localize}
-        + 'RDB$DB_KEY as IBX_INTERNAL_DBKEY from ' {do not localize}
+        + 'RDB$DB_KEY as ' + sDBkeyAlias + ' from ' {do not localize}
         + QuoteIdentifier(DataBase.SQLDialect, FTableName) +
         ' where ' + WherePrimaryFieldList; {do not localize}
     end;
@@ -1546,7 +1547,7 @@ begin
     result := False;
     First;
     while ((not result) and (not EOF)) do begin
-      if (DBKeyCompare (DBKey, PRecordData(GetActiveBuf)^.rdDBKey)) then
+      if (DBKeyCompare (DBKey, GetCurrentDBKey)) then
         result := True
       else
         Next;
@@ -1561,15 +1562,9 @@ begin
 end;
 
 function TIBTable.GetCurrentDBKey: TIBDBKey;
-var
-  Buf: pChar;
 begin
   CheckActive;
-  buf := GetActiveBuf;
-  if Buf <> nil then
-    Result := PRecordData(Buf)^.rdDBKey
-  else
-    Result.DBKey[0] := 0;
+  Result := Cursor.GetRecDBkey(GetActiveBuf);
 end;
 
 procedure TIBTable.Reopen;

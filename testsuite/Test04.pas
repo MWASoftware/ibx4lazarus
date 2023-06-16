@@ -159,6 +159,7 @@ begin
   with FDataSet do
   begin
     Database := IBDatabase;
+    Transaction := IBTransaction;
     with IBTransaction do
     begin
       AfterEdit := @HandleTransactionEdit;
@@ -173,7 +174,7 @@ begin
     InsertSQL.Text :=
       'Insert Into IBXTEST(TABLEKEY, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, "f12", F13, F14, MyArray, '+
       ' GRANTS) Values(:TABLEKEY, :F1, :F2, :F3, :F4, :F5, :F6, :F7,'+
-      ':F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS)';
+      ':F8, :F9, :F10, :F11, :F12, :F13, :F14, :MyArray, :GRANTS) Returning MyArray, F10, F14, F15';
     RefreshSQL.Text :=
       'Select A.TABLEKEY, A.F1, A.F2, A.F3, A.F4, A.F5, A.F6,' +
       ' A.F7, A.F8, A.F9, A.F10, A.F11, A."f12", A.F13, A.F14, A.MyArray, A.'+
@@ -249,11 +250,24 @@ begin
     FDataSet.FieldByName('MYField1').AsString := 'My Field';
     FDataSet.FieldByName('MYFIELD2').AsString := 'MY Field';
     FDataSet.Post;
+    writeln(OutFile,'Clear Blob and Array');
+    FDataSet.Append;
+    FDataSet.Post;
+    FDataSet.Edit;
+    FDataSet.FieldByName('F14').Clear;
+    FDataSet.FieldByName('MYARRAY').Clear;
+    FDataSet.Post;
     IBTransaction.Commit;
 
     IBTransaction.Active := true;
     FDataSet.Active := true;
     PrintDataSet(FDataSet);
+    FDataset.Last;
+    FDataset.Delete;  {Remove clear Blob row}
+    IBTransaction.Commit;
+    IBTransaction.Active := true;
+    FDataSet.Active := true;
+
     writeln(OutFile,'Delete a record');
     FDataSet.First;
     FDataSet.Delete;

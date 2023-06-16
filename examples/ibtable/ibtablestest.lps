@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <BuildModes Active="Default"/>
     <Units Count="73">
       <Unit0>
@@ -18,7 +18,6 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="18"/>
         <CursorPos X="43" Y="29"/>
         <UsageCount Value="45"/>
@@ -210,10 +209,12 @@
       </Unit27>
       <Unit28>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1706"/>
-        <CursorPos X="19" Y="1706"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="2778"/>
+        <CursorPos Y="2795"/>
         <UsageCount Value="14"/>
+        <Loaded Value="True"/>
       </Unit28>
       <Unit29>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>
@@ -527,34 +528,34 @@
     <JumpHistory Count="1">
       <Position1>
         <Filename Value="Unit1.pas"/>
-        <Caret Line="29" Column="11" TopLine="19"/>
+        <Caret Line="29" Column="43" TopLine="18"/>
       </Position1>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0" ActiveMode="default"/>
+      <Modes ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
   <Debugging>
-    <BreakPoints Count="1">
-      <Item1>
+    <BreakPoints>
+      <Item>
         <Kind Value="bpkSource"/>
         <WatchScope Value="wpsLocal"/>
         <WatchKind Value="wpkWrite"/>
         <Source Value="/usr/share/fpcsrc/rtl/objpas/classes/compon.inc"/>
         <Line Value="676"/>
-      </Item1>
+      </Item>
     </BreakPoints>
-    <Watches Count="3">
-      <Item1>
+    <Watches>
+      <Item>
         <Expression Value="FieldName"/>
-      </Item1>
-      <Item2>
+      </Item>
+      <Item>
         <Expression Value="Relation"/>
-      </Item2>
-      <Item3>
+      </Item>
+      <Item>
         <Expression Value="Field"/>
-      </Item3>
+      </Item>
     </Watches>
   </Debugging>
 </CONFIG>

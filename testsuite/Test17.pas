@@ -286,8 +286,9 @@ begin
       FieldByName('PlainText').AsString := 'This is the update test';
       Post;
       PrintDataSetRow(FIBDataSet1);
-      writeln(OutFile,'Now delete the first row');
+      writeln(Outfile,'Show whole Dataset');
       PrintDataSet(FIBDataSet1);
+      writeln(OutFile,'Now delete the first row');
       First;
       Delete;
       PrintDataSet(FIBDataSet1);
@@ -334,9 +335,7 @@ begin
       Active := true;
       PrintDataSet(FIBDataSet1);
 
-      {See https://bugs.freepascal.org/view.php?id=37900}
-
-(*      IBTransaction.Rollback;
+      IBTransaction.Rollback;
       IBTransaction.Active := true;
       writeln(Outfile);
       writeln(Outfile,'Unidirectional editing');
@@ -353,7 +352,8 @@ begin
       Refresh;
       writeln(OutFile,'After Refresh - unidirectional');
       PrintDataSetRow(FIBDataSet1);
-      writeln(OutFile,'Append and Update');
+      writeln(OutFile,' Record Count = ',FIBDataSet1.RecordCount);
+      writeln(OutFile,'Insert and Update');
       Insert;
       FieldByName('PlainText').AsString := 'This is another test - unidirectional';
       Post;
@@ -362,22 +362,24 @@ begin
       FieldByName('PlainText').AsString := 'This is the update test - unidirectional';
       Post;
       PrintDataSetRow(FIBDataSet1);
-      writeln(OutFile,'Now delete the first row - unidirectional');
-      PrintDataSet(FIBDataSet1);
-      First;
+      writeln(OutFile,'Now delete the first row - unidirectional with Record Count = ',FIBDataSet1.RecordCount);
+      Active := false;
+      Active := true;
       Delete;
-      PrintDataSet(FIBDataSet1);
+      writeln(OutFile,'Show Current Row');
+      PrintDataSetRow(FIBDataSet1);
+      writeln(OutFile,' Record Count = ',FIBDataSet1.RecordCount);
       writeln(Outfile,'Ensure dataset saved to database');
       Active := false;
       Active := true;
-      PrintDataSet(FIBDataSet1);  *)
+      PrintDataSet(FIBDataSet1);
 
     end;
     writeln(Outfile,'==================================');
     IBTransaction.Rollback;
     IBTransaction.Active := true;
     with FIBDataSet2 do
-    begin
+    try
       Active := true;
       writeln(OutFile,'FIBDataSet2: Simple Append');
       Append;
@@ -420,7 +422,8 @@ begin
       FieldByName('PlainText').AsString := 'This is a test';
       Post;
       PrintDataSetRow(FIBDataSet2);
-
+    except on E: Exception do
+     writeln(Outfile,E.Message);
     end;
   finally
     IBDatabase.DropDatabase;

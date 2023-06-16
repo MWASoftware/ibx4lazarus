@@ -331,6 +331,7 @@
       </Unit42>
       <Unit43>
         <Filename Value="../../../ibcontrols/IBDynamicGrid.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="16"/>
         <CursorPos X="30" Y="36"/>
@@ -445,7 +446,6 @@
       </Unit58>
       <Unit59>
         <Filename Value="../../../changelog"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <CursorPos X="74" Y="7"/>
         <UsageCount Value="10"/>
@@ -460,45 +460,41 @@
         <UsageCount Value="10"/>
       </Unit60>
     </Units>
-    <JumpHistory Count="10" HistoryIndex="9">
+    <JumpHistory Count="9" HistoryIndex="8">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="35" Column="10" TopLine="13"/>
       </Position1>
       <Position2>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret TopLine="58"/>
+        <Filename Value="../../../ibcontrols/IBDynamicGrid.pas"/>
       </Position2>
       <Position3>
-        <Filename Value="../../../ibcontrols/IBDynamicGrid.pas"/>
+        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
+        <Caret Line="156" TopLine="126"/>
       </Position3>
       <Position4>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="156" TopLine="126"/>
+        <Caret Line="244" Column="24" TopLine="219"/>
       </Position4>
       <Position5>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="244" Column="24" TopLine="219"/>
-      </Position5>
-      <Position6>
         <Filename Value="../../../ibcontrols/IBDynamicGrid.pas"/>
         <Caret Line="204" Column="39" TopLine="183"/>
-      </Position6>
-      <Position7>
+      </Position5>
+      <Position6>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
         <Caret Line="599" TopLine="572"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="444" Column="17" TopLine="437"/>
       </Position7>
       <Position8>
         <Filename Value="../../../ibcontrols/IBDynamicGrid.pas"/>
-        <Caret Line="444" Column="17" TopLine="437"/>
       </Position8>
       <Position9>
-        <Filename Value="../../../ibcontrols/IBDynamicGrid.pas"/>
-      </Position9>
-      <Position10>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
         <Caret Line="34" Column="47" TopLine="10"/>
-      </Position10>
+      </Position9>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
