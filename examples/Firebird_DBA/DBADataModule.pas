@@ -402,8 +402,8 @@ var UpgradeConfFile: TUpgradeConfFile;
 begin
   UpgradeConfFile := TUpgradeConfFile.Create(FDatabaseData.UpgradeConfFile);
   try
-    RunUpgradeDatabase(IBDatabase1,nil,UpgradeConfFile,'',FDatabaseData.
-                       CurrentVersion,@GetSchemaVersion2,aOnUpgradeDone);
+    RunUpgradeDatabase(IBDatabase1,nil,UpgradeConfFile,'','',FDatabaseData.CurrentVersion,
+                        @GetSchemaVersion2,aOnUpgradeDone);
   finally
     UpgradeConfFile.Free;
   end;

@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="61">
+    <Units Count="63">
       <Unit0>
         <Filename Value="TwoDArrayExample.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -19,8 +19,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="13"/>
-        <CursorPos X="10" Y="35"/>
+        <TopLine Value="36"/>
+        <CursorPos X="26" Y="56"/>
         <UsageCount Value="71"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -303,7 +303,7 @@
       </Unit39>
       <Unit40>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="578"/>
         <CursorPos X="23" Y="597"/>
         <ExtraEditorCount Value="1"/>
@@ -331,8 +331,7 @@
       </Unit42>
       <Unit43>
         <Filename Value="../../../ibcontrols/IBDynamicGrid.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="16"/>
         <CursorPos X="30" Y="36"/>
         <UsageCount Value="10"/>
@@ -375,11 +374,12 @@
       </Unit48>
       <Unit49>
         <Filename Value="../../../../../lcl/dbctrls.pp"/>
-        <UnitName Value="DbCtrls"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="76"/>
-        <CursorPos X="26" Y="93"/>
+        <UnitName Value="DBCtrls"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1370"/>
+        <CursorPos X="15" Y="1394"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit49>
       <Unit50>
         <Filename Value="../../../../fbintf/client/FBOutputBlock.pas"/>
@@ -446,7 +446,7 @@
       </Unit58>
       <Unit59>
         <Filename Value="../../../changelog"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="4"/>
         <CursorPos X="74" Y="7"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
@@ -459,8 +459,25 @@
         <CursorPos Y="147"/>
         <UsageCount Value="10"/>
       </Unit60>
+      <Unit61>
+        <Filename Value="../../../runtime/nongui/IBBufferedCursors.pas"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="2279"/>
+        <CursorPos X="43" Y="2298"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit61>
+      <Unit62>
+        <Filename Value="../../../../../lcl/include/dbcustomnavigator.inc"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="477"/>
+        <CursorPos X="3" Y="479"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit62>
     </Units>
-    <JumpHistory Count="9" HistoryIndex="8">
+    <JumpHistory Count="17" HistoryIndex="16">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="35" Column="10" TopLine="13"/>
@@ -495,6 +512,38 @@
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
         <Caret Line="34" Column="47" TopLine="10"/>
       </Position9>
+      <Position10>
+        <Filename Value="../../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="36" Column="30" TopLine="16"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="2294" Column="39" TopLine="2279"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="2295" TopLine="2279"/>
+      </Position12>
+      <Position13>
+        <Filename Value="Unit1.pas"/>
+        <Caret Line="56" Column="26" TopLine="36"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../../../../lcl/dbctrls.pp"/>
+        <Caret Line="1452" Column="30" TopLine="1435"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../../../../lcl/dbctrls.pp"/>
+        <Caret Line="1386" Column="27" TopLine="1369"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../../../../lcl/include/dbcustomnavigator.inc"/>
+        <Caret Line="400" Column="3" TopLine="398"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../../../../../lcl/dbctrls.pp"/>
+        <Caret Line="1394" Column="15" TopLine="1370"/>
+      </Position17>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
