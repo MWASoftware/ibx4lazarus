@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="67">
+    <Units Count="68">
       <Unit0>
         <Filename Value="TwoDArrayExample.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -461,9 +461,8 @@
       </Unit60>
       <Unit61>
         <Filename Value="../../../runtime/nongui/IBBufferedCursors.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="7"/>
+        <TopLine Value="55"/>
         <CursorPos X="3" Y="31"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
@@ -478,7 +477,7 @@
       </Unit62>
       <Unit63>
         <Filename Value="../../../../../../../fpcsrc/3.2.2/rtl/inc/generic.inc"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="817"/>
         <CursorPos Y="837"/>
         <UsageCount Value="13"/>
@@ -486,7 +485,7 @@
       </Unit63>
       <Unit64>
         <Filename Value="../../../runtime/nongui/IBMessages.pas"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="10"/>
         <TopLine Value="476"/>
         <CursorPos Y="503"/>
         <UsageCount Value="13"/>
@@ -494,7 +493,7 @@
       </Unit64>
       <Unit65>
         <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="2656"/>
         <CursorPos X="3" Y="2659"/>
         <UsageCount Value="13"/>
@@ -502,12 +501,20 @@
       </Unit65>
       <Unit66>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/syncobjs.pp"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="96"/>
         <CursorPos Y="112"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit66>
+      <Unit67>
+        <Filename Value="../../../testsuite/Test17.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="40"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit67>
     </Units>
     <JumpHistory Count="29" HistoryIndex="28">
       <Position1>

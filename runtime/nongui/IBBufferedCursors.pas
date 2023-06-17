@@ -1214,8 +1214,9 @@ var Buff: PByte;
 begin
   Buff := GetBuffer(aBufID);
   if Buff = nil then
-    IBError(ibxeBufferNotSet, [nil]);
-  Result := InternalGetRecNo(Buff);
+    Result := 0
+  else
+    Result := InternalGetRecNo(Buff);
 end;
 
 procedure TIBBiDirectionalCursor.GotoFirst;
@@ -3221,6 +3222,7 @@ function TIBBufferPool.InternalGetNextBuffer(aBuffer: PByte;
   IncludeDeleted: boolean): PByte;
 {aBuffer points to TRecordData}
 var CurBuffer:PByte;
+    temp: PByte;
 begin
   Result := aBuffer;
   repeat
@@ -3251,8 +3253,17 @@ begin
         if Result = nil then
         begin
           {go back to insertion point and walk forwards}
-          if PRecordData(CurBuffer)^.rdPreviousBuffer <> nil then
-            Result := inherited GetNextBuffer(PRecordData(CurBuffer)^.rdPreviousBuffer)
+          Result := CurBuffer;
+          temp := PRecordData(Result)^.rdPreviousBuffer;
+          while (temp <> nil) and
+            (PRecordData(temp)^.rdStatus in [rsInsertDeleted, rsAppendDeleted]) do
+          begin
+              Result := PRecordData(temp)^.rdPreviousBuffer;
+              temp := PRecordData(Result)^.rdPreviousBuffer;
+          end;
+
+          if PRecordData(Result)^.rdPreviousBuffer <> nil then
+            Result := inherited GetNextBuffer(PRecordData(Result)^.rdPreviousBuffer)
           else
           {inserted at start. Have to walk the pool to find the next buffer}
             Result := LocatePreviousBuffer(CurBuffer);
