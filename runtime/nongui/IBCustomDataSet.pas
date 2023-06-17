@@ -2318,6 +2318,7 @@ begin
   DisableControls;
   CurUpdateTypes := FUpdateRecordTypes;
   FUpdateRecordTypes := [cusModified, cusInserted, cusDeleted];
+  if FCursor <> nil then
   try
     FCursor.ApplyUpdates(ApplyUpdatesIterator);
   finally
@@ -2486,7 +2487,7 @@ function TIBCustomDataSet.CanEdit: Boolean;
 begin
   Result := (Trim(FQModify.SQL.Text) <> '') or
     (Assigned(FUpdateObject) and (Trim(FUpdateObject.GetSQL(ukModify).Text) <> '')) or
-    (FCachedUpdates and (FCursor.GetCachedUpdateStatus(GetActiveBuf) = cusInserted));
+    (FCachedUpdates and (FCursor <> nil) and (FCursor.GetCachedUpdateStatus(GetActiveBuf) = cusInserted));
 end;
 
 function TIBCustomDataSet.CanInsert: Boolean;
@@ -3121,6 +3122,7 @@ end;
 
 function TIBCustomDataSet.CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream;
 begin
+  CheckActive;
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
   Result := FCursor.CreateBlobStream(GetActiveBuf,Field,Mode);
@@ -3128,6 +3130,7 @@ end;
 
 function TIBCustomDataSet.GetArray(Field: TIBArrayField): IArray;
 begin
+  CheckActive;
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
   Result := FCursor.GetArray(GetActiveBuf,Field);
@@ -3135,6 +3138,7 @@ end;
 
 procedure TIBCustomDataSet.SetArrayIntf(AnArray: IArray; Field: TIBArrayField);
 begin
+  CheckActive;
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
   FCursor.SetArrayIntf(GetActiveBuf,AnArray,Field);
@@ -3286,12 +3290,16 @@ end;
 
 procedure TIBCustomDataSet.GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer);
 begin
+  CheckActive;
   FCursor.GetBookmarkData(Buffer,Data);
 end;
 
 function TIBCustomDataSet.GetBookmarkFlag(Buffer: TRecordBuffer): TBookmarkFlag;
 begin
- Result := FCursor.GetBookmarkFlag(Buffer);
+ if FCursor <> nil then
+   Result := FCursor.GetBookmarkFlag(Buffer)
+ else
+   Result := bfBOF;
 end;
 
 function TIBCustomDataSet.GetCanModify: Boolean;
@@ -3304,6 +3312,7 @@ end;
 
 function TIBCustomDataSet.GetCurrentRecord(Buffer: TRecordBuffer): Boolean;
 begin
+  CheckActive;
   Result := not IsEmpty and (FCursor.GetRecord(Buffer,gmCurrent, false) = grOK);
   if Result then
     UpdateCursorPos;
@@ -3354,7 +3363,7 @@ end;
 
 function TIBCustomDataSet.GetRecNo: Integer;
 begin
-  if GetActiveBuf = nil then
+  if not Active or (GetActiveBuf = nil) then
     result := 0
   else
     result := FCursor.GetRecNo(GetActiveBuf);
@@ -3396,12 +3405,18 @@ end;
 
 function TIBCustomDataSet.GetRecordCount: Integer;
 begin
-  result := FCursor.GetRecordCount;
+  if FCursor <> nil then
+    result := FCursor.GetRecordCount
+  else
+    result := 0;
 end;
 
 function TIBCustomDataSet.GetRecordSize: Word;
 begin
-  result := FCursor.GetRecordSize;
+  if FCursor <> nil then
+    result := FCursor.GetRecordSize
+  else
+    result := 0;
 end;
 
 procedure TIBCustomDataSet.InternalAutoCommit;
@@ -3590,6 +3605,7 @@ end;
 
 procedure TIBCustomDataSet.ReQuery;
 begin
+  CheckActive;
   FQSelect.Close;
   FQSelect.ExecQuery;
   ClearBuffers;
@@ -3776,6 +3792,7 @@ end;
 procedure TIBCustomDataSet.SetBookmarkFlag(Buffer: TRecordBuffer;
   Value: TBookmarkFlag);
 begin
+  CheckActive;
   FCursor.SetBookmarkFlag(Buffer,Value);
 end;
 
@@ -3827,6 +3844,7 @@ end;
 procedure TIBCustomDataSet.SetBookmarkData(Buffer: TRecordBuffer; Data: Pointer
   );
 begin
+  CheckActive;
   FCursor.SetBookmarkData(Buffer,Data);
 end;
 
@@ -3928,7 +3946,10 @@ end;
 
 function TIBCustomDataSet.GetUpdatesPending: Boolean;
 begin
-  Result := FCursor.UpdatesPending;
+  if FCursor <> nil then
+    Result := FCursor.UpdatesPending
+  else
+    Result := false;
 end;
 
 procedure TIBCustomDataSet.SetBufferChunksInFirstBlock(AValue: integer);
@@ -4256,6 +4277,7 @@ function TIBCustomDataSet.BookmarkValid(Bookmark: TBookmark): Boolean;
 var RecNo: TIBRecordNumber;
 begin
   Result := false;
+  if not Active then Exit;
   if not Assigned(Bookmark) then
     exit;
   Move(pointer(Bookmark)^,RecNo,BookmarkSize);
@@ -4341,12 +4363,19 @@ end;
 
 function TIBDataSetUpdateObject.GetQRefresh : TIBSQL;
 begin
+  if assigned(Dataset) then
+  begin
+    FQRefresh.Database := Dataset.Database;
+    FQRefresh.Transaction := Dataset.Transaction;
+  end;
+
   Result := FQRefresh;
   if assigned (Result) and not Result.Prepared and (RefreshSQL.Text <> '') then
     Result.Prepare;
 end;
 
 procedure TIBDataSetUpdateObject.SetDataSet(AValue : TIBCustomDataSet);
+var aDatabase: TIBDatabase;
 begin
   if FDataSet = AValue then Exit;
   FDataSet := AValue;
@@ -4354,7 +4383,8 @@ begin
   begin
     if assigned(Dataset) then
     begin
-      FQRefresh.Database := Dataset.Database;
+      aDatabase :=  Dataset.Database;
+      FQRefresh.Database := aDatabase;
       FQRefresh.Transaction := Dataset.Transaction;
     end
     else

@@ -143,7 +143,7 @@ begin
       with Statement.GetSQLParams do
       begin
         ByName('rowid').AsInteger := row;
-        ByName('title').AsString := 'Row ' + IntToStr(row);
+        ByName('title').AsString := 'Matrix ' + IntToStr(row);
       end;
       Statement.Execute;
 

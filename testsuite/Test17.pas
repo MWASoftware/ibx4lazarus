@@ -261,6 +261,8 @@ end;
 
 procedure TTest17.RunTest(CharSet: AnsiString; SQLDialect: integer);
 var lastKey: integer;
+    i: integer;
+    B: TBookmark;
 begin
   IBDatabase.CreateDatabase;
   try
@@ -425,6 +427,67 @@ begin
     except on E: Exception do
      writeln(Outfile,E.Message);
     end;
+    IBTransaction.Rollback;
+    IBTransaction.Active := true;
+    with FIBDataSet1 do
+    try
+      Unidirectional := false;
+      Active := true;
+      writeln(outfile,'----------------------------------------------');
+      writeln(OutFile,'FIBDataSet1: Insert at start');
+      for i := 1 to 2 do
+      begin
+        Append;
+        FieldByName('PlainText').AsString := 'Row ' + IntToStr(i);
+        Post;
+      end;
+      First;
+      Insert;
+      FieldByName('PlainText').AsString := 'This is an insert test';
+      Post;
+      B := Bookmark;
+      PrintDataSet(FIBDataSet1);
+      writeln(outfile,'Delete inserted row');
+      Bookmark := B;
+      Delete;
+      PrintDataSet(FIBDataSet1);
+      writeln(outfile,'Repeat');
+      First;
+      Insert;
+      FieldByName('PlainText').AsString := 'This is an insert test #1';
+      Post;
+      B := Bookmark;
+      PrintDataSet(FIBDataSet1);
+      writeln(outfile,'Delete inserted row');
+      Bookmark := B;
+      Delete;
+      PrintDataSet(FIBDataSet1);
+      writeln('Insert/Delete after first row');
+      Next;
+      Insert;
+      FieldByName('PlainText').AsString := 'This is an insert test #2';
+      Post;
+      B := Bookmark;
+      PrintDataSet(FIBDataSet1);
+      writeln(outfile,'Delete inserted row');
+      Bookmark := B;
+      Delete;
+      PrintDataSet(FIBDataSet1);
+      writeln('Insert/Delete at last row');
+      Last;
+      Insert;
+      FieldByName('PlainText').AsString := 'This is an insert test #3';
+      Post;
+      B := Bookmark;
+      PrintDataSet(FIBDataSet1);
+      writeln(outfile,'Delete inserted row');
+      Bookmark := B;
+      Delete;
+      PrintDataSet(FIBDataSet1);
+    except on E: Exception do
+       writeln(Outfile,E.Message);
+    end;
+
   finally
     IBDatabase.DropDatabase;
   end;

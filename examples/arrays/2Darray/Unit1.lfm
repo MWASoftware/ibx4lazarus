@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 397
+  Left = 2386
   Height = 432
-  Top = 360
+  Top = 305
   Width = 994
   Caption = '2D Array Example'
   ClientHeight = 432
@@ -10,7 +10,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poDefaultSizeOnly
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '2.2.0.2'
   object IBArrayGrid1: TIBArrayGrid
     Left = 24
     Height = 335
@@ -46,38 +46,39 @@ object Form1: TForm1
     DefaultColWidth = 40
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
     TabOrder = 0
-    ColCount = 29
-    RowCount = 21
+    ColCount = 30
+    RowCount = 22
     ColWidths = (
       80
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      30
-      39
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      29
+      37
     )
   end
   object DBEdit1: TDBEdit
@@ -87,7 +88,6 @@ object Form1: TForm1
     Width = 232
     DataField = 'TITLE'
     DataSource = DataSource1
-    CharCase = ecNormal
     MaxLength = 0
     TabOrder = 1
   end
@@ -125,10 +125,11 @@ object Form1: TForm1
     TraceFlags = []
     UseDefaultSystemCodePage = False
     OnCreateDatabase = IBDatabase1CreateDatabase
-    left = 624
-    top = 24
+    Left = 624
+    Top = 24
   end
   object IBTransaction1: TIBTransaction
+    TransactionName = '{1B583E8A-EB53-4806-A83F-D07393B2B542}'
     Active = False
     DefaultDatabase = IBDatabase1
     Params.Strings = (
@@ -136,20 +137,23 @@ object Form1: TForm1
       'rec_version'
       'nowait'
     )
-    left = 624
-    top = 86
+    Left = 624
+    Top = 86
   end
   object DataSource1: TDataSource
     DataSet = IBDataSet1
-    left = 624
-    top = 184
+    Left = 624
+    Top = 184
   end
   object IBDataSet1: TIBDataSet
     AllowAutoActivateTransaction = True
     Database = IBDatabase1
     Transaction = IBTransaction1
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
+    EnableStatistics = False
     DeleteSQL.Strings = (
       'Delete From TESTDATA A'
       'Where A.ROWID = :ROWID'
@@ -177,8 +181,12 @@ object Form1: TForm1
     GeneratorField.Field = 'ROWID'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
+    MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
-    left = 624
-    top = 144
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    SQLFiltered = False
+    Left = 624
+    Top = 144
   end
 end
