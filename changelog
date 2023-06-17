@@ -1,4 +1,4 @@
-IBX Change Log  version (2.6-0 Build 13957) Tue, 6 Dec 2022 23:13:00 +0000
+IBX Change Log  version (2.6-0 Build 13968) Sat, 17 Jun 2023 15:14:14 +0100
 
 1. Complete rewrite of internal buffer management in order to improve performance
    and maintainability. Highlights:
