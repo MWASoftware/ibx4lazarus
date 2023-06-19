@@ -179,7 +179,6 @@
       <Unit21>
         <Filename Value="Test17.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
         <TopLine Value="454"/>
         <CursorPos X="32" Y="476"/>
@@ -459,6 +458,7 @@
       </Unit56>
       <Unit57>
         <Filename Value="../changelog"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
         <TopLine Value="7"/>
         <CursorPos X="82" Y="25"/>
