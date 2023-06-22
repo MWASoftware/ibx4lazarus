@@ -264,8 +264,8 @@ procedure TForm1.Reopen(Data: PtrInt);
 begin
   with IBTransaction1 do
     if not InTransaction then StartTransaction;
-  Countries.Active := true;
   Employees.Active := true;
+  Countries.Active := true;
   JobCodes.Active := true;
   Depts.Active := true;
 end;

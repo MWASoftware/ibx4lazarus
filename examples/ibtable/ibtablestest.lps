@@ -18,6 +18,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="18"/>
         <CursorPos X="43" Y="29"/>
         <UsageCount Value="45"/>
@@ -209,12 +210,10 @@
       </Unit27>
       <Unit28>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="2778"/>
         <CursorPos Y="2795"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit28>
       <Unit29>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/dataset.inc"/>

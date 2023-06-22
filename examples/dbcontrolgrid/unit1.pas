@@ -112,7 +112,6 @@ type
     procedure EditJobCodeActionExecute(Sender: TObject);
     procedure EditJobCodeActionUpdate(Sender: TObject);
     procedure EditLocationActionExecute(Sender: TObject);
-    procedure EmployeesAfterPost(DataSet: TDataSet);
     procedure JobGradeDBComboBoxCloseUp(Sender: TObject);
     procedure SelectDeptExecute(Sender: TObject);
     procedure AddEmployeeExecute(Sender: TObject);
@@ -229,6 +228,8 @@ var Dept_No: string;
 begin
   if SelectDeptDlg.ShowModal(EmployeesDEPT_KEY_PATH.AsString,Dept_No) = mrOK then
   begin
+    Employees.DisableControls;
+    try
     Employees.Edit;
     EmployeesDEPT_NO.AsString := Dept_No;
     try
@@ -237,12 +238,10 @@ begin
       Employees.Cancel;
       raise;
     end;
+    finally
+      Employees.EnableControls
+    end;
   end;
-end;
-
-procedure TForm1.EmployeesAfterPost(DataSet: TDataSet);
-begin
-  Employees.Refresh
 end;
 
 procedure TForm1.EditJobCodeActionUpdate(Sender: TObject);

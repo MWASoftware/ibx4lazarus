@@ -3611,6 +3611,7 @@ begin
   ClearBuffers;
   FCursor.SetCursor(FQSelect.CurrentCursor);
   ActivateBuffers;
+  DataEvent(deDataSetChange,0);
   First;
 end;
 
