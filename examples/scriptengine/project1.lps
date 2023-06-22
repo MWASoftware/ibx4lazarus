@@ -20,6 +20,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="2"/>
         <CursorPos X="18" Y="10"/>
         <UsageCount Value="109"/>
@@ -232,11 +233,10 @@
       </Unit28>
       <Unit29>
         <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1657"/>
         <CursorPos X="3" Y="1656"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit29>
       <Unit30>
         <Filename Value="../../../fbintf/client/FBClientAPI.pas"/>
@@ -247,11 +247,10 @@
       </Unit30>
       <Unit31>
         <Filename Value="../../../fbintf/IB.pas"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="605"/>
         <CursorPos Y="623"/>
         <UsageCount Value="27"/>
-        <Loaded Value="True"/>
       </Unit31>
       <Unit32>
         <Filename Value="../../../fbintf/include/consts_pub.inc"/>
@@ -287,11 +286,10 @@
       </Unit35>
       <Unit36>
         <Filename Value="../../../fbintf/changelog"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="61"/>
         <CursorPos X="86" Y="76"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit36>
       <Unit37>
@@ -387,25 +385,23 @@
       </Unit49>
       <Unit50>
         <Filename Value="../../runtime/nongui/ibxscript.pas"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="1474"/>
-        <CursorPos Y="1481"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1477"/>
+        <CursorPos X="3" Y="1487"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="1477"/>
-          <CursorPos X="3" Y="1487"/>
+          <TopLine Value="1223"/>
+          <CursorPos Y="1222"/>
         </ExtraEditor1>
         <UsageCount Value="25"/>
-        <Loaded Value="True"/>
       </Unit50>
       <Unit51>
         <Filename Value="../../../fbintf/IBUtils.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1468"/>
         <CursorPos Y="1481"/>
         <UsageCount Value="24"/>
-        <Loaded Value="True"/>
       </Unit51>
       <Unit52>
         <Filename Value="../../../ibx.trunk/runtime/nongui/ibxscript.pas"/>
@@ -423,11 +419,10 @@
       </Unit53>
       <Unit54>
         <Filename Value="../../runtime/nongui/IBDataOutput.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="380"/>
         <CursorPos Y="388"/>
         <UsageCount Value="16"/>
-        <Loaded Value="True"/>
       </Unit54>
       <Unit55>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/classes/streams.inc"/>
@@ -466,144 +461,20 @@
       </Unit59>
       <Unit60>
         <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="828"/>
         <CursorPos X="34" Y="844"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit60>
       <Unit61>
         <Filename Value="../../runtime/nongui/IBExtract.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="4257"/>
         <CursorPos X="14" Y="4279"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit61>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
-      <Position1>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="210" Column="15" TopLine="195"/>
-      </Position1>
-      <Position2>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="729" Column="43" TopLine="726"/>
-      </Position2>
-      <Position3>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="222" TopLine="195"/>
-      </Position3>
-      <Position4>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="854" Column="3" TopLine="845"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="215" Column="14" TopLine="201"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="828" TopLine="825"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
-        <Caret Line="1497" Column="45" TopLine="1493"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
-        <Caret Line="308" Column="34" TopLine="293"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="178" TopLine="151"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="717" Column="4" TopLine="709"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="218" Column="20" TopLine="195"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="858" TopLine="833"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="177" Column="15" TopLine="171"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="215" Column="21" TopLine="190"/>
-      </Position14>
-      <Position15>
-        <Filename Value="../../../fbintf/client/3.0/FB30Statement.pas"/>
-        <Caret Line="308" Column="22" TopLine="289"/>
-      </Position15>
-      <Position16>
-        <Filename Value="../../../fbintf/IBUtils.pas"/>
-        <Caret Line="629" Column="10" TopLine="614"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../../../fbintf/IBUtils.pas"/>
-        <Caret Line="579" Column="14" TopLine="564"/>
-      </Position17>
-      <Position18>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="884" Column="44" TopLine="870"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="891" TopLine="880"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="894" TopLine="879"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="185" Column="19" TopLine="167"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="781" Column="51" TopLine="778"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="186" Column="14" TopLine="171"/>
-      </Position23>
-      <Position24>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="688" Column="19" TopLine="676"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="215" Column="20" TopLine="192"/>
-      </Position25>
-      <Position26>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="927" Column="53" TopLine="808"/>
-      </Position26>
-      <Position27>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="670" TopLine="654"/>
-      </Position27>
-      <Position28>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="686" Column="42" TopLine="670"/>
-      </Position28>
-      <Position29>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="740" TopLine="725"/>
-      </Position29>
-      <Position30>
-        <Filename Value="../../runtime/nongui/IBSQL.pas"/>
-        <Caret Line="828" Column="11" TopLine="813"/>
-      </Position30>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode="default"/>

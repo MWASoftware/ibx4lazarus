@@ -10,14 +10,13 @@ object Form1: TForm1
   OnClose = FormClose
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.0.5.0'
+  LCLVersion = '2.2.0.2'
   object Label1: TLabel
     Left = 16
-    Height = 14
+    Height = 15
     Top = 16
     Width = 98
     Caption = 'Employee Name'
-    ParentColor = False
   end
   object IBLookupComboEditBox1: TIBLookupComboEditBox
     Left = 16
@@ -39,11 +38,10 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 16
-    Height = 14
+    Height = 15
     Top = 79
     Width = 103
     Caption = 'Employee Details'
-    ParentColor = False
   end
   object Panel1: TPanel
     Left = 19
@@ -58,11 +56,10 @@ object Form1: TForm1
     TabOrder = 1
     object Label3: TLabel
       Left = 14
-      Height = 14
+      Height = 15
       Top = 18
       Width = 64
       Caption = 'First Name'
-      ParentColor = False
     end
     object DBEdit1: TDBEdit
       Left = 14
@@ -71,17 +68,15 @@ object Form1: TForm1
       Width = 136
       DataField = 'FIRST_NAME'
       DataSource = EmployeeSource
-      CharCase = ecNormal
       MaxLength = 0
       TabOrder = 0
     end
     object Label4: TLabel
       Left = 168
-      Height = 14
+      Height = 15
       Top = 18
       Width = 64
       Caption = 'Last Name'
-      ParentColor = False
     end
     object DBEdit2: TDBEdit
       Left = 168
@@ -90,18 +85,16 @@ object Form1: TForm1
       Width = 144
       DataField = 'LAST_NAME'
       DataSource = EmployeeSource
-      CharCase = ecNormal
       MaxLength = 0
       TabOrder = 1
     end
     object Label5: TLabel
       Left = 547
-      Height = 14
+      Height = 15
       Top = 120
       Width = 24
       Anchors = [akTop, akRight]
       Caption = 'Ext.'
-      ParentColor = False
     end
     object DBEdit3: TDBEdit
       Left = 547
@@ -111,25 +104,22 @@ object Form1: TForm1
       DataField = 'PHONE_EXT'
       DataSource = EmployeeSource
       Anchors = [akTop, akRight]
-      CharCase = ecNormal
       MaxLength = 0
       TabOrder = 3
     end
     object Label6: TLabel
       Left = 16
-      Height = 14
+      Height = 15
       Top = 65
       Width = 56
       Caption = 'Hire Date'
-      ParentColor = False
     end
     object Label7: TLabel
       Left = 172
-      Height = 14
+      Height = 15
       Top = 65
       Width = 37
       Caption = 'Salary'
-      ParentColor = False
     end
     object DBEdit4: TDBEdit
       Left = 168
@@ -138,25 +128,22 @@ object Form1: TForm1
       Width = 144
       DataField = 'SALARY'
       DataSource = EmployeeSource
-      CharCase = ecNormal
       MaxLength = 0
       TabOrder = 4
     end
     object Label8: TLabel
       Left = 392
-      Height = 14
+      Height = 15
       Top = 16
-      Width = 51
+      Width = 50
       Caption = 'Location'
-      ParentColor = False
     end
     object Label9: TLabel
       Left = 331
-      Height = 14
+      Height = 15
       Top = 16
       Width = 36
       Caption = 'Grade'
-      ParentColor = False
     end
     object DBComboBox1: TDBComboBox
       Left = 331
@@ -180,19 +167,17 @@ object Form1: TForm1
     end
     object Label10: TLabel
       Left = 333
-      Height = 14
+      Height = 15
       Top = 65
       Width = 48
       Caption = 'Job Title'
-      ParentColor = False
     end
     object Label11: TLabel
       Left = 17
-      Height = 14
+      Height = 15
       Top = 122
       Width = 73
       Caption = 'Department'
-      ParentColor = False
     end
     object DBEdit5: TDBEdit
       Left = 17
@@ -203,7 +188,6 @@ object Form1: TForm1
       DataSource = EmployeeSource
       ReadOnly = True
       Anchors = [akTop, akLeft, akRight]
-      CharCase = ecNormal
       MaxLength = 0
       TabOrder = 5
     end
@@ -315,14 +299,15 @@ object Form1: TForm1
     IdleTimer = 0
     TraceFlags = []
     UseDefaultSystemCodePage = False
-    left = 224
-    top = 18
+    Left = 224
+    Top = 18
   end
   object IBTransaction1: TIBTransaction
+    TransactionName = '{EBA94BDA-A83F-46A5-89EA-CCE4EA6CC49D}'
     Active = False
     DefaultDatabase = IBDatabase1
-    left = 136
-    top = 18
+    Left = 136
+    Top = 18
   end
   object Employees: TIBDataSet
     AllowAutoActivateTransaction = False
@@ -333,6 +318,7 @@ object Form1: TForm1
     AfterInsert = EmployeesAfterInsert
     AfterPost = EmployeesAfterPost
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -394,9 +380,12 @@ object Form1: TForm1
     GenerateParamNames = False
     MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    SQLFiltered = False
     AfterTransactionEnd = EmployeesAfterTransactionEnd
-    left = 376
-    top = 264
+    Left = 376
+    Top = 264
     object EmployeesEMP_NO: TSmallintField
       DisplayWidth = 10
       FieldKind = fkData
@@ -549,13 +538,13 @@ object Form1: TForm1
   object EmployeeSource: TDataSource
     DataSet = Employees
     OnDataChange = EmployeeSourceDataChange
-    left = 272
-    top = 264
+    Left = 272
+    Top = 264
   end
   object ApplicationProperties1: TApplicationProperties
     OnIdle = ApplicationProperties1Idle
-    left = 152
-    top = 280
+    Left = 152
+    Top = 280
   end
   object Countries: TIBQuery
     AllowAutoActivateTransaction = False
@@ -563,6 +552,7 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BeforeOpen = CountriesBeforeOpen
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -585,9 +575,12 @@ object Form1: TForm1
         Name = 'JOB_GRADE'
         ParamType = ptInput
       end>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 616
-    top = 16
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 616
+    Top = 16
     ParamData = <    
       item
         DataType = ftUnknown
@@ -602,8 +595,8 @@ object Form1: TForm1
   end
   object CountriesSource: TDataSource
     DataSet = Countries
-    left = 528
-    top = 18
+    Left = 528
+    Top = 18
   end
   object JobCodes: TIBQuery
     AllowAutoActivateTransaction = False
@@ -611,6 +604,7 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BeforeOpen = JobCodesBeforeOpen
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -628,9 +622,12 @@ object Form1: TForm1
         Name = 'JOB_GRADE'
         ParamType = ptInput
       end>
+    SQLFiltered = False
     DataSetCloseAction = dcDiscardChanges
-    left = 416
-    top = 18
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    Left = 416
+    Top = 18
     ParamData = <    
       item
         DataType = ftUnknown
@@ -640,7 +637,7 @@ object Form1: TForm1
   end
   object JobCodeSource: TDataSource
     DataSet = JobCodes
-    left = 328
-    top = 18
+    Left = 328
+    Top = 18
   end
 end

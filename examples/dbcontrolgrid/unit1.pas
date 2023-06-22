@@ -112,7 +112,6 @@ type
     procedure EditJobCodeActionExecute(Sender: TObject);
     procedure EditJobCodeActionUpdate(Sender: TObject);
     procedure EditLocationActionExecute(Sender: TObject);
-    procedure EmployeesAfterPost(DataSet: TDataSet);
     procedure JobGradeDBComboBoxCloseUp(Sender: TObject);
     procedure SelectDeptExecute(Sender: TObject);
     procedure AddEmployeeExecute(Sender: TObject);
@@ -243,11 +242,6 @@ begin
       Employees.EnableControls
     end;
   end;
-end;
-
-procedure TForm1.EmployeesAfterPost(DataSet: TDataSet);
-begin
-//  Employees.Refresh
 end;
 
 procedure TForm1.EditJobCodeActionUpdate(Sender: TObject);

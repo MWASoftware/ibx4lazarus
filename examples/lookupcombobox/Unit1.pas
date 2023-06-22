@@ -205,9 +205,9 @@ procedure TForm1.OpenDataSets(Data: PtrInt);
 begin
   FDirty := false;
   IBTransaction1.StartTransaction;
+  Employees.Active := true;
   JobCodes.Active := true;
   Countries.Active := true;
-  Employees.Active := true;
 end;
 
 procedure TForm1.ApplicationProperties1Idle(Sender: TObject; var Done: Boolean);
