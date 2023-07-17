@@ -1,9 +1,12 @@
-IBX Change Log  version (2.6-1 Build 13976) Thu, 22 Jun 2023 13:49:22 +0100
+IBX Change Log  version (2.6-1 Build 13985) Mon, 17 Jul 2023 14:16:41 +0100
 
 1. Maintenance update of 2.6.0. This version is still at beta.
 
 2. Reverse out changes to DrawCellText signature in IBArrayGrid and IBDynamic Grid.
    See https://gitlab.com/freepascal.org/lazarus/lazarus/-/commit/53aaae9c5e2a5edac5b1d2f70739a8ef7b0a9623
+
+3. ibxscript: When parsing a store procedure or function with a variable name
+   enclosed in doublequotes, the double quotes are no longer removed.
 
 IBX Change Log  version (2.6-0 Build 13976) Thu, 22 Jun 2023 13:49:22 +0100
 

@@ -495,7 +495,10 @@ begin
         sqltQuotedString:
           stmt += '''' + SQLSafeString(TokenText) + '''';  {exists some DECLARE with cursor having SELECT ...\... rc.rdb$constraint_type = 'PRIMARY KEY');}
 
-        sqltSemiColon:
+        sqltIdentifierInDoubleQuotes:
+          stmt += '"' + TokenText + '"';
+
+       sqltSemiColon:
           begin
             State := stInStmt;
             stmt += TokenText;
