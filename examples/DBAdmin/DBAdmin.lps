@@ -18,11 +18,11 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="405"/>
         <CursorPos X="3" Y="408"/>
         <UsageCount Value="171"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="DataModule.pas"/>
@@ -470,10 +470,11 @@
       </Unit56>
       <Unit57>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1222"/>
-        <CursorPos Y="1241"/>
-        <UsageCount Value="9"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="428"/>
+        <CursorPos Y="457"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit57>
       <Unit58>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/inc/generic.inc"/>
@@ -512,9 +513,11 @@
       </Unit62>
       <Unit63>
         <Filename Value="../../changelog"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="75" Y="4"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="107" Y="6"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit63>
       <Unit64>
@@ -588,9 +591,11 @@
       </Unit73>
       <Unit74>
         <Filename Value="../../ibcontrols/IBArrayGrid.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="16" Y="25"/>
-        <UsageCount Value="5"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="562"/>
+        <CursorPos Y="591"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit74>
       <Unit75>
         <Filename Value="../../iblocaldb/IBXCreateDatabaseFromSQLDlgUnit.pas"/>
@@ -1116,7 +1121,7 @@
         <UsageCount Value="10"/>
       </Unit147>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="9" HistoryIndex="8">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="1044" Column="14" TopLine="1028"/>
@@ -1133,6 +1138,25 @@
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="350" Column="15" TopLine="335"/>
       </Position4>
+      <Position5>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="1263" Column="31" TopLine="1259"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
+        <Caret Line="200" TopLine="177"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../ibcontrols/IBArrayGrid.pas"/>
+        <Caret Line="25" Column="16"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../ibcontrols/IBArrayGrid.pas"/>
+        <Caret Line="153" TopLine="126"/>
+      </Position9>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
