@@ -362,7 +362,6 @@ type
 
   TIBSelectCursor = class(TInterfacedObject)
   private type
-    type
       { TIBArray }
 
       TIBArray = class   {Wrapper class to support array cache and event handling}
