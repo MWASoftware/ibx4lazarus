@@ -2784,11 +2784,13 @@ begin
       end;
 
     {execute query}
+    qryResultSet := nil;
+    qryResults := nil;
     if stmt.SQLStatementType =  SQLSelect then
     begin
       qryResultSet := stmt.OpenCursor;
-      qryResultSet.FetchNext;
-      qryResults := qryResultSet;  {Only single results expected}
+      if qryResultSet.FetchNext then
+        qryResults := qryResultSet;  {Only single results expected}
     end
     else
       qryResults := stmt.Execute;
@@ -2800,9 +2802,9 @@ begin
     if qryType = rqDelete then
       InternalDelete(aBufID)
     else
-    if (qryResultSet <> nil) and not qryResultSet.IsEof then
     begin
       ClearRowCache(Buff);
+      if qryResults <> nil then
       for i := 0 to Length(ColMap) - 1 do
         if ColMap[i] <> -1 then
         begin
