@@ -2800,6 +2800,7 @@ begin
     if qryType = rqDelete then
       InternalDelete(aBufID)
     else
+    if (qryResultSet <> nil) and not qryResultSet.IsEof then
     begin
       ClearRowCache(Buff);
       for i := 0 to Length(ColMap) - 1 do

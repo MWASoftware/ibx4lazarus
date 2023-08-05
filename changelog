@@ -7,7 +7,9 @@ IBX Change Log  version (2.6-2 Build 14000) Sat, 05 Aug 2023 10:58:57 +0100
 
 3. IBUpdateSQL: Do not prepare an empty internal query.
 
-4. IBBufferCursors: avoid range error when max field no. is > fields.count
+4. IBBufferedCursors: avoid range error when max field no. is > fields.count
+
+5. IBBufferedCursors: avoid End of File error if refresh query returns and empty row count
 
 IBX Change Log  version (2.6-1 Build 13985) Mon, 17 Jul 2023 14:16:41 +0100
 
