@@ -69,13 +69,14 @@ type
     function GetQRefresh : TIBSQL;
     function GetRefreshSQL : TStrings;
     procedure SetRefreshSQL(value: TStrings);
+    procedure SetDataSet(AValue : TIBCustomDataSet);
   protected
     procedure Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer); virtual; abstract;
+    procedure DatabaseChanged; virtual;
     function GetSQL(UpdateKind: TUpdateKind): TStrings; virtual; abstract;
     procedure InternalSetParams(Params: ISQLParams; buff: TRecordBuffer); overload;
     procedure InternalSetParams(Query: TIBSQL; buff: TRecordBuffer); overload;
     procedure RegisterQuery(qryType: TRegisteredQueryTypes; qry: TIBSQL);
-    procedure SetDataSet(AValue : TIBCustomDataSet); virtual;
     procedure SQLChanging(Sender: TObject);
     procedure UpdateRecordFromQuery(UpdateKind: TUpdateKind; QryResults: IResults; Buffer: TRecordBuffer);
   protected
@@ -2929,6 +2930,12 @@ begin
     FQModify.Database := Value;
     FDatabaseInfo.Database := Value;
     FGeneratorField.Database := Value;
+    if Assigned(FUpdateObject) then
+    begin
+      if Assigned(FUpdateObject.DataSet) then
+        FUpdateObject.DataSet := nil;
+      FUpdateObject.DataSet := Self;
+    end;
   end;
 end;
 
@@ -3638,12 +3645,12 @@ begin
       if UniDirectional then
         FCursor := TIBUniDirectionalCursor.create(self,Name + ': ' + SUniCursor,
                                                        FQSelect.CurrentCursor,Fields,
-                                                       CalcFieldsSize,
+                                                       FieldDefs.Count, CalcFieldsSize,
                                                        FDefaultTZDate, CachedUpdates)
       else
         FCursor := TIBBiDirectionalCursor.create(self,Name + ': ' + SBiDirCursor,
                                                        FQSelect.CurrentCursor,Fields,
-                                                       CalcFieldsSize,
+                                                       FieldDefs.Count, CalcFieldsSize,
                                                        FDefaultTZDate,  CachedUpdates,
                                                        FBufferChunks,
                                                        FBufferChunksInFirstBlock);
@@ -4357,6 +4364,23 @@ begin
   FQRefresh.SQL.Assign(Value);
 end;
 
+procedure TIBDataSetUpdateObject.DatabaseChanged;
+begin
+  if assigned(FQRefresh) then
+  begin
+    if assigned(Dataset) then
+    begin
+      FQRefresh.Database := Dataset.Database;
+      FQRefresh.Transaction := Dataset.Transaction;
+    end
+    else
+    begin
+      FQRefresh.Database := nil;
+      FQRefresh.Transaction := nil;
+    end;
+  end;
+end;
+
 function TIBDataSetUpdateObject.GetRefreshSQL : TStrings;
 begin
   Result := FQRefresh.SQL;
@@ -4380,20 +4404,7 @@ var aDatabase: TIBDatabase;
 begin
   if FDataSet = AValue then Exit;
   FDataSet := AValue;
-  if assigned(FQRefresh) then
-  begin
-    if assigned(Dataset) then
-    begin
-      aDatabase :=  Dataset.Database;
-      FQRefresh.Database := aDatabase;
-      FQRefresh.Transaction := Dataset.Transaction;
-    end
-    else
-    begin
-      FQRefresh.Database := nil;
-      FQRefresh.Transaction := nil;
-    end;
-  end;
+  DatabaseChanged;
 end;
 
 procedure TIBDataSetUpdateObject.InternalSetParams(Params: ISQLParams;
