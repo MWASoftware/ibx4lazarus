@@ -52,12 +52,12 @@ type
     procedure SetSQL(UpdateKind: TUpdateKind; Value: TStrings);
     procedure SetSQLIndex(Index: Integer; Value: TStrings);
   protected
+    procedure DatabaseChanged; override;
     function GetSQL(UpdateKind: TUpdateKind): TStrings; override;
     procedure InternalPrepare(UpdateKind: TUpdateKind);
     procedure SQLChanged(Sender: TObject);
     procedure Apply(UpdateKind: TUpdateKind; buff: TRecordBuffer); override;
     procedure ExecSQL(UpdateKind: TUpdateKind; buff: TRecordBuffer);
-    procedure SetDataSet(AValue : TIBCustomDataSet); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -118,6 +118,7 @@ var
 begin
   inherited RegisterQueries;
   for UpdateKind := Low(TUpdateKind) to High(TUpdateKind) do
+  if Trim(Query[UpdateKind].SQL.Text) <> '' then
   begin
     InternalPrepare(UpdateKind);
     case UpdateKind of
@@ -176,12 +177,10 @@ begin
   SetSQL(TUpdateKind(Index), Value);
 end;
 
-procedure TIBUpdateSQL.SetDataSet(AValue : TIBCustomDataSet);
+procedure TIBUpdateSQL.DatabaseChanged;
 var i: TUpdateKind;
 begin
-  if Dataset = AValue then Exit;
-
-  inherited SetDataSet(AValue);
+  inherited DatabaseChanged;
   for i := low(TUpdateKind) to high(TUpdateKind) do
     if assigned(Query[i]) then
     begin

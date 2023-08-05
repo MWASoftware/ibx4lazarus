@@ -1,7 +1,13 @@
-IBX Change Log  version (2.6-2 Build 13992) Mon, 24 Jul 2023 09:26:32 +0100
+IBX Change Log  version (2.6-2 Build 14000) Sat, 05 Aug 2023 10:58:57 +0100
 
 1. Fixed repeated "type" keyword in IBBufferCursors. This may cause a compile error
    with later versions of fpc - later than 3.2.2.
+
+2. IBUpdateSQL. update internal queries if parent dataset database changed.
+
+3. IBUpdateSQL: Do not prepare an empty internal query.
+
+4. IBBufferCursors: avoid range error when max field no. is > fields.count
 
 IBX Change Log  version (2.6-1 Build 13985) Mon, 17 Jul 2023 14:16:41 +0100
 
