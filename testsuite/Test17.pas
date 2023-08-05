@@ -462,7 +462,7 @@ begin
       Bookmark := B;
       Delete;
       PrintDataSet(FIBDataSet1);
-      writeln('Insert/Delete after first row');
+      writeln(outfile,'Insert/Delete after first row');
       Next;
       Insert;
       FieldByName('PlainText').AsString := 'This is an insert test #2';
@@ -473,7 +473,7 @@ begin
       Bookmark := B;
       Delete;
       PrintDataSet(FIBDataSet1);
-      writeln('Insert/Delete at last row');
+      writeln(outfile,'Insert/Delete at last row');
       Last;
       Insert;
       FieldByName('PlainText').AsString := 'This is an insert test #3';
