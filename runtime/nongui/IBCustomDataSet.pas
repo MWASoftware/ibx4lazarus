@@ -2931,11 +2931,7 @@ begin
     FDatabaseInfo.Database := Value;
     FGeneratorField.Database := Value;
     if Assigned(FUpdateObject) then
-    begin
-      if Assigned(FUpdateObject.DataSet) then
-        FUpdateObject.DataSet := nil;
-      FUpdateObject.DataSet := Self;
-    end;
+      FUpdateObject.DatabaseChanged;
   end;
 end;
 
