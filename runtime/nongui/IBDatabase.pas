@@ -1081,7 +1081,7 @@ begin
                         and aCreateIfNotExists and not (csDesigning in ComponentState) then
          FCreateDatabase := true
        else
-         raise EIBInterBaseError.Create(Status);
+         raise EIBInterBaseError.Create(Status,CP_ACP);
      end;
 
      if UseDefaultSystemCodePage and (FAttachment <> nil) then

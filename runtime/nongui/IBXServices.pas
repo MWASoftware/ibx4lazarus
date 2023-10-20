@@ -2407,7 +2407,7 @@ begin
       done := ServicesConnection.ServiceIntf.Start(SRB,false);
       if not done then
       begin
-        theError := EIBInterBaseError.Create(ServicesConnection.GetFirebirdAPI.GetStatus);
+        theError := EIBInterBaseError.Create(ServicesConnection.GetFirebirdAPI.GetStatus,CP_ACP);
         if theError.IBErrorCode = isc_sec_context then
         begin
           HandleSecContextErr;
@@ -2447,7 +2447,7 @@ begin
     begin
       if ServicesConnection.GetFirebirdAPI.GetStatus.GetIBErrorCode = isc_sec_context then
       begin
-        theError := EIBInterBaseError.Create(ServicesConnection.GetFirebirdAPI.GetStatus); {save exception}
+        theError := EIBInterBaseError.Create(ServicesConnection.GetFirebirdAPI.GetStatus,CP_ACP); {save exception}
         HandleSecContextErr;
         if FAction = scReconnect then
         begin
@@ -2727,7 +2727,7 @@ begin
     FServiceQueryResults := nil;
     DoServiceQuery;
     if (FServiceQueryResults = nil) and RaiseExceptionOnError then
-      raise EIBInterBaseError.Create(ServicesConnection.GetFirebirdAPI.GetStatus);
+      raise EIBInterBaseError.Create(ServicesConnection.GetFirebirdAPI.GetStatus,CP_ACP);
   finally
     FSQPB := nil;
     FSRB := nil;

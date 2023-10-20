@@ -1965,12 +1965,11 @@ begin
     Result := GetData(Buffer);
     if Result then
     begin
-      s := strpas(Buffer);
-      SetCodePage(s,CodePage,false);
+      s := PCharToAnsiString(Buffer,CodePage);
       if (CodePage <> CP_NONE) and (CodePage <> CP_UTF8) then
         SetCodePage(s,CP_UTF8,true);  {LCL only accepts UTF8}
 
-      if (CodePage = CP_UTF8) and (UTF8Length(s) > Size) then
+      if UTF8Length(s) > Size then
         {truncate to max. number of UTF8 characters - usually a problem with
          fixed width columns right padded with white space}
         Value := UTF8Copy(s,1,Size)
