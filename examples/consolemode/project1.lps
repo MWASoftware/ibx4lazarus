@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <BuildModes Active="Default"/>
     <Units Count="43">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="38"/>
+        <TopLine Value="152"/>
         <CursorPos X="47" Y="54"/>
         <UsageCount Value="28"/>
         <Loaded Value="True"/>
@@ -366,7 +366,7 @@
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0" ActiveMode="default"/>
+      <Modes ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
 </CONFIG>

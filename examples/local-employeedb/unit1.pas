@@ -489,9 +489,9 @@ end;
 
 procedure TForm1.EmployeesBeforeOpen(DataSet: TDataSet);
 begin
-  if BeforeDate.Date > 0 then
+  if BeforeDate.Date <> NullDate then
      (DataSet as TIBParserDataSet).Parser.Add2WhereClause('HIRE_DATE < :BeforeDate');
-  if AfterDate.Date > 0 then
+  if AfterDate.Date <> NullDate then
      (DataSet as TIBParserDataSet).Parser.Add2WhereClause('HIRE_DATE > :AfterDate');
 
   case SalaryRange.ItemIndex of
@@ -506,9 +506,9 @@ begin
 
 
   {Parameter value must be set after all SQL changes have been made}
-  if BeforeDate.Date > 0 then
+  if BeforeDate.Date <> NullDate then
      (DataSet as TIBParserDataSet).ParamByName('BeforeDate').AsDateTime := BeforeDate.Date;
-  if AfterDate.Date > 0 then
+  if AfterDate.Date <> NullDate then
    (DataSet as TIBParserDataSet).ParamByName('AfterDate').AsDateTime := AfterDate.Date;
 
 end;
