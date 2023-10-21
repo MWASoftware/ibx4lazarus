@@ -585,6 +585,7 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BeforeOpen = EmployeesBeforeOpen
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -637,6 +638,7 @@ object Form1: TForm1
     BeforeClose = EmployeesBeforeClose
     BeforeOpen = EmployeesBeforeOpen
     BufferChunks = 5000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = True
     EnableStatistics = False
@@ -855,6 +857,7 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BeforeOpen = CountriesBeforeOpen
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -907,6 +910,7 @@ object Form1: TForm1
     Transaction = IBTransaction1
     BeforeOpen = JobCodesBeforeOpen
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -952,6 +956,7 @@ object Form1: TForm1
     Database = IBDatabase1
     Transaction = IBTransaction1
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False

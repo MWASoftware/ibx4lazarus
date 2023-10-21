@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <BuildModes Active="Default"/>
     <Units Count="21">
       <Unit0>
@@ -64,8 +64,7 @@
       <Unit8>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="28"/>
-        <CursorPos X="6" Y="49"/>
+        <CursorPos X="75" Y="7"/>
         <UsageCount Value="12"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit8>
@@ -169,7 +168,7 @@
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0" ActiveMode="default"/>
+      <Modes ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
 </CONFIG>
