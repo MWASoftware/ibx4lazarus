@@ -1,4 +1,4 @@
-IBX Change Log  version (2.6-3 Build 14073) Fri, 20 Oct 2023 11:36:40 +0100
+IBX Change Log  version (2.6-3 Build 14080) Sat, 21 Oct 2023 14:14:22 +0100
 
 1. Update to calls to EInterbaseError to add default code page. Consequential
    on change to fbintf.

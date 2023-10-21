@@ -513,7 +513,7 @@
    All Rights Reserved.
 
    Contributor(s): ______________________________________. "/>
-    <Version Major="2" Minor="6" Release = "3" Build="14073" />
+    <Version Major="2" Minor="6" Release = "3" Build="14080" />
     <Files Count="6">
       <Item1>
         <Filename Value="ibcontrols/IBLookupComboEditBox.pas"/>
