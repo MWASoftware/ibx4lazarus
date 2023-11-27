@@ -2315,11 +2315,11 @@ begin
     Post;
   FBase.CheckDatabase;
   FBase.CheckTransaction;
-  DisableControls;
-  CurUpdateTypes := FUpdateRecordTypes;
-  FUpdateRecordTypes := [cusModified, cusInserted, cusDeleted];
   if FCursor <> nil then
   try
+    DisableControls;
+    CurUpdateTypes := FUpdateRecordTypes;
+    FUpdateRecordTypes := [cusModified, cusInserted, cusDeleted];
     FCursor.ApplyUpdates(ApplyUpdatesIterator);
   finally
     FUpdateRecordTypes := CurUpdateTypes;
@@ -3127,7 +3127,10 @@ begin
   CheckActive;
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
-  Result := FCursor.CreateBlobStream(GetActiveBuf,Field,Mode);
+  if IsEmpty then
+    Result := nil
+  else
+    Result := FCursor.CreateBlobStream(GetActiveBuf,Field,Mode);
 end;
 
 function TIBCustomDataSet.GetArray(Field: TIBArrayField): IArray;
@@ -3771,9 +3774,9 @@ var
   fl: TList;
   CurBookmark: TBookmark;
 begin
-  DisableControls;
   fl := TList.Create;
   CurBookmark := Bookmark;
+  DisableControls;
   try
     First;
     if InternalLocate(KeyFields, KeyValues, []) then

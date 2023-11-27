@@ -1,3 +1,11 @@
+IBX Change Log  version (2.6-4 Build 14094) Sat, 21 Oct 2023 15:03:30 +0100
+
+1. TIBCustomDataSet.ApplyUpdates: ensure controls are not permanently disabled
+   if ApplyUpdates called before a cursor exists.
+
+2. TIBCustomDataSet.CreateBlobStream: add check for empty dataset before
+   creating the blob.
+
 IBX Change Log  version (2.6-3 Build 14080) Sat, 21 Oct 2023 14:14:22 +0100
 
 1. Update to calls to EInterbaseError to add default code page. Consequential
