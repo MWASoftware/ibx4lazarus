@@ -286,10 +286,13 @@ type
 
     TRegisteredQueryTypes = (rqInsert,rqModify,rqDelete,rqRefresh);
 
+    { IIBCursor }
+
     IIBCursor = interface
     ['{909621f7-e7fe-4b39-a8c5-f25c40a71c12}']
       function AllocRecordBuffer: TRecordBuffer;
       procedure FreeRecordBuffer(var Buffer: TRecordBuffer);
+      procedure ClearRecordBuffer(Buffer: TRecordBuffer);
       function CreateBlobStream(aBufID: TRecordBuffer; Field: TField; Mode: TBlobStreamMode): TStream;
       function GetArray(aBufID: TRecordBuffer; Field: TField): IArray;
       procedure SetArrayIntf(aBufID: TRecordBuffer; AnArray: IArray; Field: TField);
@@ -489,6 +492,7 @@ type
     {TDataset Interface}
     function AllocRecordBuffer: TRecordBuffer;
     procedure FreeRecordBuffer(var Buffer: TRecordBuffer);
+    procedure ClearRecordBuffer(Buffer: TRecordBuffer);
     procedure SetCurrentRecord(aBufID: TRecordBuffer);
     function CreateBlobStream(aBufID: TRecordBuffer; Field: TField; Mode: TBlobStreamMode): TStream;  virtual;
     function GetArray(aBufID: TRecordBuffer; Field: TField): IArray;
@@ -2248,6 +2252,19 @@ begin
     FreeMem(Buffer);
   end;
   Buffer := nil;
+end;
+
+procedure TIBSelectCursor.ClearRecordBuffer(Buffer: TRecordBuffer);
+begin
+  if Buffer <> nil then
+  begin
+    with PDisplayBuffer(Buffer)^ do
+    begin
+      InternalFreeRecordBuffer(dbBuffer);
+      dbBuffer := InternalAllocRecordBuffer;
+    end;
+    ClearCalcFields(Buffer);
+  end;
 end;
 
 procedure TIBSelectCursor.SetCurrentRecord(aBufID: TRecordBuffer);
