@@ -3609,11 +3609,14 @@ begin
 end;
 
 procedure TIBCustomDataSet.ReQuery;
+var i: integer;
 begin
   CheckActive;
   FQSelect.Close;
   FQSelect.ExecQuery;
   ClearBuffers;
+  for i := 0 to BufferCount do
+    FCursor.ClearRecordBuffer(Buffers[i]);
   FCursor.SetCursor(FQSelect.CurrentCursor);
   ActivateBuffers;
   DataEvent(deDataSetChange,0);
