@@ -532,6 +532,7 @@ type
     procedure InitRecord(Buffer: TRecordBuffer); override;
     procedure Disconnect; virtual;
     function ConstraintsStored: Boolean;
+    procedure ClearBuffers; override;
     procedure ClearCalcFields(Buffer: TRecordBuffer); override;
     function AllocRecordBuffer: TRecordBuffer; override;
     procedure DoBeforeDelete; override;
@@ -3609,14 +3610,11 @@ begin
 end;
 
 procedure TIBCustomDataSet.ReQuery;
-var i: integer;
 begin
   CheckActive;
   FQSelect.Close;
   FQSelect.ExecQuery;
   ClearBuffers;
-  for i := 0 to BufferCount do
-    FCursor.ClearRecordBuffer(Buffers[i]);
   FCursor.SetCursor(FQSelect.CurrentCursor);
   ActivateBuffers;
   DataEvent(deDataSetChange,0);
@@ -3892,6 +3890,15 @@ end;
 function TIBCustomDataSet.ConstraintsStored: Boolean;
 begin
   Result := Constraints.Count > 0;
+end;
+
+procedure TIBCustomDataSet.ClearBuffers;
+var i: integer;
+begin
+  inherited ClearBuffers;
+  if FCursor <> nil then
+  for i := 0 to BufferCount do
+    FCursor.ClearRecordBuffer(Buffers[i]);
 end;
 
 procedure TIBCustomDataSet.ClearCalcFields(Buffer: TRecordBuffer);
