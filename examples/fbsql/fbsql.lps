@@ -2,14 +2,15 @@
 <CONFIG>
   <ProjectSession>
     <PathDelim Value="\"/>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <BuildModes Active="Default"/>
     <Units Count="79">
       <Unit0>
         <Filename Value="fbsql.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="272"/>
-        <CursorPos X="3" Y="228"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="307"/>
+        <CursorPos X="26" Y="311"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -576,9 +577,8 @@
       </Unit77>
       <Unit78>
         <Filename Value="..\..\..\fbintf\testsuite\Test2.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="123"/>
+        <TopLine Value="20"/>
         <CursorPos X="73" Y="144"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
@@ -683,14 +683,21 @@
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0" ActiveMode="default"/>
+      <Modes ActiveMode="default"/>
     </RunParams>
+    <HistoryLists Count="3">
+      <List0 Name="WorkingDirectory" Type="File" Count="1"/>
+      <List1 Name="LaunchingApplication" Type="File" Count="1"/>
+      <List2 Name="CommandLineParameters" Count="1">
+        <Item1 Value="-u SYSDBA employee"/>
+      </List2>
+    </HistoryLists>
   </ProjectSession>
   <Debugging>
-    <Watches Count="1">
-      <Item1>
+    <Watches>
+      <Item>
         <Expression Value="Column"/>
-      </Item1>
+      </Item>
     </Watches>
   </Debugging>
 </CONFIG>
