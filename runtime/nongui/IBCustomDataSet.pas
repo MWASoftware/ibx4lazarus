@@ -1394,6 +1394,8 @@ begin
   FRelationNodes := TRelationNode.Create;
   FDataset := aDataset;
   FPrimaryKeys := TStringList.Create;
+  FPrimaryKeys.Delimiter := ';';
+  FPrimaryKeys.StrictDelimiter := true;
   if not Database.InternalTransaction.InTransaction then
     Database.InternalTransaction.StartTransaction;
 
@@ -2184,8 +2186,8 @@ begin
     if AOwner is TIBTransaction then
       Transaction := TIBTransaction(AOwner);
   FPrimaryKeys := TStringList.Create;
-  FPrimaryKeys.LineBreak := ';';
-  FPrimaryKeys.SkipLastLineBreak := true;
+  FPrimaryKeys.Delimiter := ';';
+  FPrimaryKeys.StrictDelimiter := true;
   FBaseSQLSelect := TStringList.Create;
   FTZTextOption := tzOffset;
   FDefaultTZDate := EncodeDate(2020,1,1);
@@ -3719,7 +3721,7 @@ begin
 
     {restore curent record}
   if Length(KeyValues) > 0 then
-    Locate(PrimaryKeys.Text,KeyValues,[]);
+    Locate(PrimaryKeys.DelimitedText,KeyValues,[]);
 
 end;
 

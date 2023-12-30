@@ -54,6 +54,7 @@ type
   private
     FIBDataSet1: TIBDataSet;
     FIBDataSet2: TIBDataSet;
+    F2KeyDataset: TIBDataset;
     procedure HandleDeleteReturning(Sender: TObject; QryResults: IResults);
     procedure HandleBeforeOpen(DataSet: TDataSet);
     procedure HandleAfterOpen(DataSet: TDataSet);
@@ -240,6 +241,15 @@ begin
     BeforeRefresh := @HandleBeforeRefresh;
     AfterRefresh := @HandleAfterRefresh;
   end;
+  F2KeyDataset := TIBDataSet.Create(Application);
+  with F2KeyDataset do
+  begin
+    Database := IBDatabase;
+    Transaction := IBTransaction;
+    SelectSQL.Text := 'Select Key1, Key2 From IBXTest2';
+    InsertSQL.Text := 'Insert into IBXTest2(Key1,Key2) Values(:Key1,:Key2)';
+    RefreshSQL.Text := 'Select Key1, Key2 From IBXTest2 where Key1 = :Key1 and Key2 = :Key2';
+ end;
 end;
 
 function TTest17.GetTestID: AnsiString;
@@ -487,6 +497,25 @@ begin
     except on E: Exception do
        writeln(Outfile,E.Message);
     end;
+
+    writeln(outfile,'Refresh Dataset wit two primary keys');
+    with F2KeyDataset do
+    try
+      Transaction.Active := true;
+      Active := true;
+      Append;
+      FieldByName('Key1').AsInteger := 1;
+      FieldByName('Key2').AsInteger := 1;
+      Post;
+      Append;
+      FieldByName('Key1').AsInteger := 1;
+      FieldByName('Key2').AsInteger := 2;
+      Post;
+      Refresh;
+      PrintDataset(F2KeyDataset);
+    except on E: Exception do
+        writeln(Outfile,E.Message);
+     end;
 
   finally
     IBDatabase.DropDatabase;

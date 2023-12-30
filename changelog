@@ -1,4 +1,4 @@
-IBX Change Log  version (2.6-4 Build 14139) Tue, 05 Dec 2023 14:55:21 +0000
+IBX Change Log  version (2.6-4 Build 14153) Sat, 30 Dec 2023 16:01:23 +0000
 
 1. TIBCustomDataSet.ApplyUpdates: ensure controls are not permanently disabled
    if ApplyUpdates called before a cursor exists.
@@ -8,6 +8,10 @@ IBX Change Log  version (2.6-4 Build 14139) Tue, 05 Dec 2023 14:55:21 +0000
 
 3. TIBCustomDataset.Requery: The display buffer pool is now also reset avoiding
    issues with left over pointers to invalid internal buffers.
+
+4. TIBCustomDataset.PrimaryKeys when used in InternalRefresh. when more than one
+   primary key is used by the dataset then the list of primary keys is now
+   properly separated by a ';'.
 
 IBX Change Log  version (2.6-3 Build 14080) Sat, 21 Oct 2023 14:14:22 +0100
 
