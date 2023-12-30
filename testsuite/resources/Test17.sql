@@ -14,3 +14,9 @@ As
 Begin
   new.ServerSideText = new.KeyField || ' - ' || new.PlainText;
 End
+
+Create Table IBXTest2 (
+ Key1 integer not null,
+ Key2 integer not null,
+ primary key(key1,key2)
+);
