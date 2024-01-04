@@ -1291,6 +1291,7 @@ begin
   InternalSetUpdateStatus(FCurrentRecord,usInserted);
   DoOnInserted(FCurrentRecord);
   SetBuffer(aBufID, FCurrentRecord);
+  SetBookmarkFlag(aBufID,bfCurrent);
   FCurrentRecordStatus := csRowBuffer;
   {$ifdef PrintBuf}
   FBufferPool.PrintBufferList;
@@ -1310,6 +1311,7 @@ begin
   InternalSetUpdateStatus(FCurrentRecord,usInserted);
   DoOnInserted(FCurrentRecord);
   SetBuffer(aBufID,FCurrentRecord);
+  SetBookmarkFlag(aBufID,bfCurrent);
   FCurrentRecordStatus := csRowBuffer;
   {$ifdef PrintBuf}
   FBufferPool.PrintBufferList;
@@ -1542,6 +1544,7 @@ begin
   FInserting := true;
   Inc(FInsertedRecords);
   InternalSetUpdateStatus(FCurrentRecord,usInserted);
+  SetBookmarkFlag(aBufID,bfCurrent);
   DoOnInserted(FCurrentRecord);
 end;
 
@@ -1560,6 +1563,7 @@ begin
   FInserting := true;
   Inc(FInsertedRecords);
   InternalSetUpdateStatus(FCurrentRecord,usInserted);
+  SetBookmarkFlag(aBufID,bfCurrent);
   DoOnInserted(FCurrentRecord);
 end;
 
