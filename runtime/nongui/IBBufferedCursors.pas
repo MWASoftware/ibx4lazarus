@@ -2682,7 +2682,7 @@ procedure TIBSelectCursor.InitRecord(aBufID: TRecordBuffer);
 begin
   with PDisplayBuffer(aBufID)^ do
   begin
-    dbBookmarkFlag := bfInserted;
+    dbBookmarkFlag := bfCurrent;
     Fillchar(dbCalcFields^,CalcFieldsSize,0);
     FillChar(dbBookmarkData,GetBookmarkSize,0);
     if dbBuffer <> nil then

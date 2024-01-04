@@ -3707,6 +3707,7 @@ end;
 procedure TIBCustomDataSet.InternalRefresh;
 var KeyValues: array of variant;
     I: integer;
+    CurrentRec: integer;
 begin
   if  CachedUpdates then
     ApplyUpdates;
@@ -3714,14 +3715,22 @@ begin
   {save primary Key values for current record}
   Setlength(KeyValues,PrimaryKeys.Count);
   if RecordCount > 0 then
+  begin
     for i := 0 to PrimaryKeys.Count - 1 do
       KeyValues[i] := FieldByName(PrimaryKeys[i]).AsVariant;
+  end
+  else
+    {If no primary keys then use internal record no.}
+    CurrentRec := GetRecNo;
 
   ReQuery;
 
     {restore curent record}
   if Length(KeyValues) > 0 then
-    Locate(PrimaryKeys.DelimitedText,KeyValues,[]);
+    Locate(PrimaryKeys.DelimitedText,KeyValues,[])
+  else
+    {use record no. and hope that they still correspond}
+    SetRecNo(CurrentRec);
 
 end;
 

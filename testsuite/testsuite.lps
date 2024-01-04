@@ -284,8 +284,8 @@
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="3705"/>
-        <CursorPos X="33" Y="3724"/>
+        <TopLine Value="3703"/>
+        <CursorPos X="80" Y="3721"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
@@ -1511,123 +1511,127 @@
         <Loaded Value="True"/>
       </Unit204>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="25">
       <Position1>
         <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="135" TopLine="118"/>
+        <Caret Line="655" TopLine="639"/>
       </Position1>
       <Position2>
         <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="136" TopLine="118"/>
+        <Caret Line="658" TopLine="639"/>
       </Position2>
       <Position3>
-        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2188" TopLine="2163"/>
+        <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
+        <Caret Line="659" TopLine="639"/>
       </Position3>
       <Position4>
         <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="92" TopLine="76"/>
+        <Caret Line="80" Column="24" TopLine="65"/>
       </Position4>
       <Position5>
-        <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="655" TopLine="639"/>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="2187" TopLine="2163"/>
       </Position5>
       <Position6>
         <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="658" TopLine="639"/>
+        <Caret Line="780" TopLine="764"/>
       </Position6>
       <Position7>
         <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="659" TopLine="639"/>
+        <Caret Line="197" TopLine="181"/>
       </Position7>
       <Position8>
         <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="80" Column="24" TopLine="65"/>
+        <Caret Line="198" TopLine="181"/>
       </Position8>
       <Position9>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2187" TopLine="2163"/>
+        <Caret Line="2186" Column="11" TopLine="2163"/>
       </Position9>
       <Position10>
-        <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="780" TopLine="764"/>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="441" Column="17" TopLine="435"/>
       </Position10>
       <Position11>
-        <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="197" TopLine="181"/>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="694" Column="53" TopLine="668"/>
       </Position11>
       <Position12>
-        <Filename Value="../../../../../fpcsrc/3.2.2/rtl/objpas/classes/stringl.inc"/>
-        <Caret Line="198" TopLine="181"/>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="940" Column="17" TopLine="913"/>
       </Position12>
       <Position13>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2186" Column="11" TopLine="2163"/>
+        <Caret Line="962" Column="53" TopLine="936"/>
       </Position13>
       <Position14>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="441" Column="17" TopLine="435"/>
+        <Caret Line="1340" Column="26" TopLine="1314"/>
       </Position14>
       <Position15>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="694" Column="53" TopLine="668"/>
+        <Caret Line="1396" Column="15" TopLine="1369"/>
       </Position15>
       <Position16>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="940" Column="17" TopLine="913"/>
+        <Caret Line="1413" Column="42" TopLine="1386"/>
       </Position16>
       <Position17>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="962" Column="53" TopLine="936"/>
+        <Caret Line="1428" Column="15" TopLine="1401"/>
       </Position17>
       <Position18>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1340" Column="26" TopLine="1314"/>
+        <Caret Line="2186" Column="15" TopLine="2160"/>
       </Position18>
       <Position19>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1396" Column="15" TopLine="1369"/>
+        <Caret Line="2187" Column="15" TopLine="2161"/>
       </Position19>
       <Position20>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1413" Column="42" TopLine="1386"/>
+        <Caret Line="2188" Column="15" TopLine="2162"/>
       </Position20>
       <Position21>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1428" Column="15" TopLine="1401"/>
+        <Caret Line="2204" Column="46" TopLine="2177"/>
       </Position21>
       <Position22>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2186" Column="15" TopLine="2160"/>
+        <Caret Line="3264" Column="26" TopLine="3201"/>
       </Position22>
       <Position23>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2187" Column="15" TopLine="2161"/>
+        <Caret Line="644" Column="16" TopLine="630"/>
       </Position23>
       <Position24>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2188" Column="15" TopLine="2162"/>
+        <Caret Line="2191" TopLine="2165"/>
       </Position24>
       <Position25>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2204" Column="46" TopLine="2177"/>
+        <Caret Line="577" Column="15" TopLine="562"/>
       </Position25>
       <Position26>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="3264" Column="26" TopLine="3201"/>
+        <Caret Line="3715" Column="42" TopLine="3705"/>
       </Position26>
       <Position27>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="644" Column="16" TopLine="630"/>
+        <Caret Line="557" Column="14" TopLine="543"/>
       </Position27>
       <Position28>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2191" TopLine="2165"/>
+        <Caret Line="3374" Column="3" TopLine="3370"/>
       </Position28>
       <Position29>
         <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="577" Column="15" TopLine="562"/>
+        <Caret Line="590" Column="15" TopLine="577"/>
       </Position29>
+      <Position30>
+        <Filename Value="../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="3836" Column="3" TopLine="3832"/>
+      </Position30>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
@@ -1649,8 +1653,6 @@
       <List0 Name="CommandLineParameters" Count="1">
         <Item1 Value="-t 17"/>
       </List0>
-      <List1 Name="WorkingDirectory" Type="File" Count="1"/>
-      <List2 Name="LaunchingApplication" Type="File" Count="1"/>
     </HistoryLists>
   </ProjectSession>
   <Debugging>
