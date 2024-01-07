@@ -28,6 +28,12 @@ IBX Change Log  version (2.6-4 Build 14172) Thu, 04 Jan 2024 11:55:41 +0000
 7. Inserting a record into an empty grid and then resizing the grid should
    no longer result in an apparent duplication of records in the grid.
 
+8. IBBufferedCursor. FCurrentRecordStatus now set correctly when selecting a
+   specific record number.
+
+9. IBCustomDataset: Calls to AfterScroll during a Locate operation are now suppressed
+   until the end of the locate operation.
+
 IBX Change Log  version (2.6-3 Build 14080) Sat, 21 Oct 2023 14:14:22 +0100
 
 1. Update to calls to EInterbaseError to add default code page. Consequential
