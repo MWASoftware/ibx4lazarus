@@ -439,6 +439,7 @@ type
     FAliasNameList: array of AnsiString;
     FCachedUpdatesBuffer: TRecordBuffer;
     FPrimaryKeys: TStrings;
+    FInLocate: boolean;
     procedure ApplyUpdatesIterator(status: TCachedUpdateStatus;
       aBufID: TRecordBuffer; var RecordSkipped: boolean);
     function GetSelectStmtIntf: IStatement;
@@ -545,6 +546,7 @@ type
     procedure DoBeforePost; override;
     procedure DoAfterPost; override;
     procedure DoAfterBindFields; virtual;
+    procedure DoAfterScroll; override;
     procedure FieldDefsFromQuery(Query: TIBSQL);
     procedure FreeRecordBuffer(var Buffer: TRecordBuffer); override;
     procedure GetBookmarkData(Buffer: TRecordBuffer; Data: Pointer); override;
@@ -3255,6 +3257,12 @@ begin
    // nothing to do
 end;
 
+procedure TIBCustomDataSet.DoAfterScroll;
+begin
+  if FInLocate then Exit;
+  inherited DoAfterScroll;
+end;
+
 procedure TIBCustomDataSet.FieldDefsFromQuery(Query: TIBSQL);
 begin
   with TFieldDefsMaker.Create(self) do
@@ -3769,15 +3777,19 @@ var
   CurBookmark: TBookmark;
 begin
   DisableControls;
+  FInLocate := true;
   try
-      CurBookmark := Bookmark;
+    CurBookmark := Bookmark;
     First;
     result := InternalLocate(KeyFields, KeyValues, Options);
     if not result then
       Bookmark := CurBookmark;
   finally
+    FInLocate := false;
     EnableControls;
   end;
+  if result and (curBookmark <> BookMark) then
+    DoAfterScroll;
 end;
 
 function TIBCustomDataSet.Lookup(const KeyFields: string; const KeyValues: Variant;

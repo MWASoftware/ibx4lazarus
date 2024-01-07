@@ -1249,16 +1249,26 @@ end;
 function TIBBiDirectionalCursor.GotoRecordNumber(RecNo: TIBRecordNumber): boolean;
 begin
   if FBufferPool.GetRecordCount >= RecNo then
-    FCurrentRecord := FBufferPool.GetBuffer(RecNo)
+  begin
+    FCurrentRecord := FBufferPool.GetBuffer(RecNo);
+    FCurrentRecordStatus := csRowBuffer;
+  end
   else
   begin
     FCurrentRecord := FBufferPool.GetLast;
     if not Cursor.IsEOF then
-    while (FBufferPool.GetRecNo(FCurrentRecord) < RecNo) and FetchNext do
     begin
-      FCurrentRecord := NewBuffer;
-      FetchCurrentRecord(FCurrentRecord);
+      while (FBufferPool.GetRecNo(FCurrentRecord) < RecNo) and FetchNext do
+      begin
+        FCurrentRecord := NewBuffer;
+        FetchCurrentRecord(FCurrentRecord);
+      end;
     end;
+    if FCurrentRecord = nil then
+      FCurrentRecordStatus := csBOF
+    else
+    if FBufferPool.GetRecNo(FCurrentRecord) < RecNo then
+      FCurrentRecordStatus := csEOF;
   end;
   Result :=  (FBufferPool.GetRecNo(FCurrentRecord) = RecNo);
 end;
