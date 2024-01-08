@@ -546,6 +546,7 @@ type
     procedure DoBeforePost; override;
     procedure DoAfterPost; override;
     procedure DoAfterBindFields; virtual;
+    procedure DoBeforeScroll; override;
     procedure DoAfterScroll; override;
     procedure FieldDefsFromQuery(Query: TIBSQL);
     procedure FreeRecordBuffer(var Buffer: TRecordBuffer); override;
@@ -3257,6 +3258,12 @@ begin
    // nothing to do
 end;
 
+procedure TIBCustomDataSet.DoBeforeScroll;
+begin
+  if FInLocate then Exit;
+  inherited DoBeforeScroll;
+end;
+
 procedure TIBCustomDataSet.DoAfterScroll;
 begin
   if FInLocate then Exit;
@@ -3776,6 +3783,7 @@ function TIBCustomDataSet.Locate(const KeyFields: string; const KeyValues: Varia
 var
   CurBookmark: TBookmark;
 begin
+  DoBeforeScroll; {suppressed during search}
   DisableControls;
   FInLocate := true;
   try

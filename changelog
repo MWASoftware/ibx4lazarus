@@ -1,4 +1,4 @@
-IBX Change Log  version (2.6-4 Build 14180) Sun, 07 Jan 2024 16:15:32 +0000
+IBX Change Log  version (2.6-4 Build 14188) Mon, 08 Jan 2024 15:20:50 +0000
 
 1. TIBCustomDataSet.ApplyUpdates: ensure controls are not permanently disabled
    if ApplyUpdates called before a cursor exists.
@@ -33,6 +33,9 @@ IBX Change Log  version (2.6-4 Build 14180) Sun, 07 Jan 2024 16:15:32 +0000
 
 9. IBCustomDataset: Calls to AfterScroll during a Locate operation are now suppressed
    until the end of the locate operation.
+
+10.IBCustomDataset: Calls to BeforeScroll during a Locate operation are now suppressed.
+   BeforeScroll is called once before the locate operation.
 
 IBX Change Log  version (2.6-3 Build 14080) Sat, 21 Oct 2023 14:14:22 +0100
 
