@@ -32,8 +32,8 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, DBGrids, DB,
-  IBSQLParser, Grids, IBLookupComboEditBox, LMessages, StdCtrls, ExtCtrls,
-  IBCustomDataSet, LCLVersion;
+  Grids, IBLookupComboEditBox, LMessages, StdCtrls, ExtCtrls,
+  LCLVersion, IBDynamicInterfaces;
 
 type
   {
@@ -229,28 +229,16 @@ end;
                                                        write FOnSelectPanelEditor;
  end;
 
-  {TIBGridControlLink}
-
-  TIBGridControlLink = class(TIBControlLink)
-  private
-    FOwner: TIBDynamicGrid;
-  protected
-    procedure UpdateSQL(Sender: TObject); override;
-  public
-    constructor Create(AOwner: TIBDynamicGrid);
-  end;
-
   TLocationArray = array of variant;
   PLocationArray = ^TLocationArray;
   TOnRestorePosition = procedure(Sender: TObject; Location: PLocationArray) of object;
 
   { TIBDynamicGrid }
 
-  TIBDynamicGrid = class(TDBDynamicGrid)
+  TIBDynamicGrid = class(TDBDynamicGrid,IDynamicSQLComponent)
   private
     { Private declarations }
     FAllowColumnSort: boolean;
-    FIBControlLink: TIBGridControlLink;
     FOnColumnHeaderClick: TOnColumnHeaderClick;
     FOnRestorePosition: TOnRestorePosition;
     FOnUpdateSortOrder: TOnUpdateSortOrder;
@@ -263,16 +251,16 @@ end;
     FBookmark: TLocationArray;
     FDBLookupCellEditor: TDBLookupCellEditor;
     FActive: boolean;
-    FFieldPosition: integer;
+    FOldDataSet: TDataSet; {reference to Dataset on last call to DataSetChanged}
     procedure ColumnHeaderClick(Index: integer);
+    function GetDataSet : TDataSet;
     function GetDataSource: TDataSource;
     function GetEditorBorderStyle: TBorderStyle;
-    procedure IBControlLinkChanged;
+    procedure DataSetChanged;
     procedure SetDataSource(AValue: TDataSource);
     procedure SetEditorBorderStyle(AValue: TBorderStyle);
     procedure ProcessColumns;
     procedure SetIndexFieldNames(AValue: string);
-    procedure UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
     procedure UpdateSortColumn(Sender: TObject);
     procedure RestorePosition;
     procedure SavePosition;
@@ -288,12 +276,16 @@ end;
     procedure MoveSelection; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure UpdateActive; override;
+    {IDynamicSQLComponent}
+    procedure UpdateSQL(Sender: IDynamicSQLEditor);
+    procedure SetParams(Sender: IDynamicSQLParam);
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy; override;
     function  EditorByStyle(Style: TColumnButtonStyle): TWinControl; override;
     property LastSortColumn: integer read FLastColIndex;
+    property DataSet: TDataSet read GetDataSet;
   published
     { Published declarations }
     property AllowColumnSort: boolean read FAllowColumnSort write FAllowColumnSort default true;
@@ -310,19 +302,6 @@ end;
 implementation
 
 uses LCLType, Variants, EditBtn;
-
-{ TIBGridControlLink }
-
-constructor TIBGridControlLink.Create(AOwner: TIBDynamicGrid);
-begin
-  inherited Create;
-  FOwner := AOwner;
-end;
-
-procedure TIBGridControlLink.UpdateSQL(Sender: TObject);
-begin
-  FOwner.UpdateSQL(self,TIBParserDataSet(Sender).Parser)
-end;
 
 { TDBLookupProperties }
 
@@ -1016,19 +995,24 @@ begin
       OnColumnHeaderClick(self,Index);
 
     FLastColIndex := Index;
-    FFieldPosition := 0;
-    if assigned(DataSource) and assigned(DataSource.DataSet) and DataSource.DataSet.Active
-       and (DataSource.DataSet is TIBParserDataSet) then
+    if assigned(DataSource) and assigned(DataSource.DataSet) and DataSource.DataSet.Active then
     begin
       if FLastColIndex < Columns.Count then
       {try and cache field position while dataset still open}
-        FFieldPosition := TIBParserDataSet(DataSource.DataSet).Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
       DataSource.DataSet.Active := false;
       Application.QueueAsyncCall(@DoReopen,0)
     end;
   finally
     FColHeaderClick := false
   end;
+end;
+
+function TIBDynamicGrid.GetDataSet : TDataSet;
+begin
+  if DataSource <> nil then
+    Result := DataSource.Dataset
+  else
+    Result := nil;
 end;
 
 function TIBDynamicGrid.GetDataSource: TDataSource;
@@ -1049,8 +1033,10 @@ end;
 
 procedure TIBDynamicGrid.SetDataSource(AValue: TDataSource);
 begin
+  if DataSet <> nil then
+    (DataSet as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
   inherited DataSource := AValue;
-  IBControlLinkChanged;
+  DataSetChanged;
 end;
 
 procedure TIBDynamicGrid.SetEditorBorderStyle(AValue: TBorderStyle);
@@ -1070,10 +1056,7 @@ begin
   for i := 0 to Columns.Count - 1 do
   begin
     if TIBDynamicGridColumn(columns[i]).InitialSortColumn then
-    begin
-      FFieldPosition := 0;
       FLastColIndex := i
-    end
   end
 end;
 
@@ -1086,33 +1069,6 @@ begin
   FIndexFieldsList.Clear;
   while idx <= Length(AValue) do
         FIndexFieldsList.Add(ExtractFieldName(AValue,idx));
-end;
-
-procedure TIBDynamicGrid.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
-var OrderBy: string;
-begin
-    if assigned(DataSource) and assigned(DataSource.DataSet)
-      and (DataSource.DataSet is TIBCustomDataSet) then
-    begin
-      if (FFieldPosition = 0) and (FLastColIndex >= 0) and (FLastColIndex < Columns.Count) then
-        {Not cached - let's hope we can find it before the dataset is opened.
-         Won't work if dynamic columns}
-        FFieldPosition := Parser.GetFieldPosition(Columns[FLastColIndex].FieldName);
-      if FFieldPosition > 0 then
-      begin
-        if Descending then
-          Parser.OrderByClause := IntToStr(FFieldPosition) + ' desc'
-        else
-          Parser.OrderByClause := IntToStr(FFieldPosition) + ' asc';
-      end;
-
-      if assigned(FOnUpdateSortOrder) then
-      begin
-        OrderBy := Parser.OrderByClause;
-        OnUpdateSortOrder(self,FLastColIndex,OrderBy);
-        Parser.OrderByClause := OrderBy
-      end
-    end;
 end;
 
 procedure TIBDynamicGrid.UpdateSortColumn(Sender: TObject);
@@ -1161,12 +1117,26 @@ begin
   DataSource.DataSet.Active := true;
 end;
 
-procedure TIBDynamicGrid.IBControlLinkChanged;
+procedure TIBDynamicGrid.DataSetChanged;
+var obj: pointer;
 begin
-  if (DataSource <> nil) and (DataSource.DataSet <> nil) and (DataSource.DataSet is TIBParserDataSet) then
-    FIBControlLink.IBDataSet := TIBCustomDataSet(DataSource.DataSet)
-  else
-    FIBControlLink.IBDataSet := nil;
+  if FOldDataSet <> DataSet then
+  begin
+    if FOldDataSet <> nil then
+      (FOldDataSet as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
+    FOldDataSet := nil;
+    if DataSet <> nil then
+    begin
+      (DataSet as IUnknown).QueryInterface(IDynamicSQLDataset,obj);
+      if obj <> nil then
+      begin
+        (DataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
+        FOldDataSet := DataSet;
+      end
+      else
+        raise Exception.Create('Dataset does not provide the IDynamicSQLDataset interface');
+    end;
+  end;
 end;
 
 procedure TIBDynamicGrid.SetupEditor(aEditor: TDBLookupCellEditor; aCol: integer
@@ -1191,7 +1161,6 @@ end;
 procedure TIBDynamicGrid.Loaded;
 begin
   inherited Loaded;
-  IBControlLinkChanged;
   ProcessColumns;
 end;
 
@@ -1238,7 +1207,7 @@ end;
 
 procedure TIBDynamicGrid.LinkActive(Value: Boolean);
 begin
-  IBControlLinkChanged;
+  DataSetChanged;
   inherited LinkActive(Value);
   if (FActive <> Value) and Value then
     RestorePosition;
@@ -1252,9 +1221,6 @@ begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) then
   begin
-    if (FIBControlLink <> nil) and (AComponent = DataSource) then
-      FIBControlLink.IBDataSet := nil
-    else
     if AComponent is TDataSource then
     begin
       for i := 0 to Columns.Count - 1 do
@@ -1267,16 +1233,34 @@ end;
 procedure TIBDynamicGrid.UpdateActive;
 begin
   inherited UpdateActive;
+  DataSetChanged;
   if assigned(DataLink) and assigned(DataLink.DataSet) and
      DataLink.DataSet.Active and (DataLink.DataSet.State = dsInsert) then
    SavePosition;
+end;
+
+procedure TIBDynamicGrid.UpdateSQL(Sender : IDynamicSQLEditor);
+var OrderBy: string;
+begin
+  Sender.OrderBy(Columns[FLastColIndex].FieldName,not Descending);
+
+ if assigned(FOnUpdateSortOrder) then
+ begin
+   OrderBy := Sender.GetOrderByClause;
+   OnUpdateSortOrder(self,FLastColIndex,OrderBy);
+   Sender.SetOrderByClause(OrderBy);
+ end
+end;
+
+procedure TIBDynamicGrid.SetParams(Sender : IDynamicSQLParam);
+begin
+
 end;
 
 constructor TIBDynamicGrid.Create(TheComponent: TComponent);
 begin
   inherited Create(TheComponent);
   FAllowColumnSort := true;
-  FIBControlLink := TIBGridControlLink.Create(self);
   FIndexFieldsList := TStringList.Create;
   FIndexFieldsList.Delimiter := ';';
   FIndexFieldsList.StrictDelimiter := true;
@@ -1288,7 +1272,8 @@ end;
 
 destructor TIBDynamicGrid.Destroy;
 begin
-  if assigned(FIBControlLink) then FIBControlLink.Free;
+  if DataSet <> nil then
+    (DataSet as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
   if assigned(FIndexFieldsList) then FIndexFieldsList.Free;
   if assigned(FDBLookupCellEditor) then FDBLookupCellEditor.Free;
   Application.RemoveAsyncCalls(self);

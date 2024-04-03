@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LCLType, LResources, Forms, Controls, Graphics, Dialogs, DbCtrls,
-  ExtCtrls, IBSQLParser, DB, StdCtrls, IBCustomDataSet, LCLVersion;
+  ExtCtrls,  DB, StdCtrls,  LCLVersion, IBDynamicInterfaces;
 
 type
 
@@ -63,25 +63,12 @@ type
     constructor Create(AOwner: TIBLookupComboEditBox);
   end;
 
-  { TIBLookupControlLink }
-
-  TIBLookupControlLink = class(TIBControlLink)
-  private
-    FOwner: TIBLookupComboEditBox;
-  protected
-    procedure UpdateSQL(Sender: TObject); override;
-  public
-    constructor Create(AOwner: TIBLookupComboEditBox);
-  end;
-
-
   { TIBLookupComboEditBox }
 
-  TIBLookupComboEditBox = class(TDBLookupComboBox)
+  TIBLookupComboEditBox = class(TDBLookupComboBox,IDynamicSQLComponent)
   private
     { Private declarations }
     FDataLink: TIBLookupComboDataLink;
-    FIBLookupControlLink: TIBLookupControlLink;
     FAutoComplete: boolean;
     FAutoInsert: boolean;
     FKeyPressInterval: integer;
@@ -99,18 +86,19 @@ type
     FLastKeyValue: variant;
     FCurText: string;
     FModified: boolean;
+    FOldListDataset: TDataset;
     procedure DoActiveChanged(Data: PtrInt);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
+    function GetListDatset : TDataset;
     function GetListSource: TDataSource;
     function GetRelationNameQualifier: string;
     procedure HandleTimer(Sender: TObject);
-    procedure IBControlLinkChanged;
+    procedure ListDatasetChanged;
     procedure ResetParser;
     procedure RecordChanged(Sender: TObject; aField: TField);
     procedure SetAutoCompleteText(AValue: TComboBoxAutoCompleteText);
     procedure SetListSource(AValue: TDataSource);
     procedure UpdateList;
-    procedure UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
     procedure HandleEnter(Data: PtrInt);
     procedure UpdateLinkData(Sender: TObject);
     procedure ValidateListField;
@@ -132,16 +120,18 @@ type
     procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
     {$ifend}
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
-    procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetItemIndex(const Val: integer); override;
     procedure UpdateShowing; override;
     procedure UpdateData(Sender: TObject); override;
+    procedure UpdateSQL(Sender: IDynamicSQLEditor);
+    procedure SetParams(Sender: IDynamicSQLParam);
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
     destructor Destroy; override;
     procedure EditingDone; override;
+    property ListDataSet: TDataset read GetListDatset;
   published
     { Published declarations }
     property AutoInsert: boolean read FAutoInsert write FAutoInsert;
@@ -161,19 +151,6 @@ type
 implementation
 
 uses Variants, LCLProc, LazUTF8, IBUtils, IBMessages;
-
-{ TIBLookupControlLink }
-
-constructor TIBLookupControlLink.Create(AOwner: TIBLookupComboEditBox);
-begin
-  inherited Create;
-  FOwner := AOwner;
-end;
-
-procedure TIBLookupControlLink.UpdateSQL(Sender: TObject);
-begin
-  FOwner.UpdateSQL(self,TIBParserDataSet(Sender).Parser)
-end;
 
 { TIBLookupComboDataLink }
 
@@ -216,12 +193,26 @@ begin
   UpdateList
 end;
 
-procedure TIBLookupComboEditBox.IBControlLinkChanged;
+procedure TIBLookupComboEditBox.ListDatasetChanged;
+var obj: pointer;
 begin
-  if (ListSource <> nil) and (ListSource.DataSet <> nil) and (ListSource.DataSet is TIBParserDataSet) then
-    FIBLookupControlLink.IBDataSet := TIBCustomDataSet(ListSource.DataSet)
-  else
-    FIBLookupControlLink.IBDataSet := nil;
+  if FOldListDataSet <> ListDataSet then
+  begin
+    if FOldListDataSet <> nil then
+      (FOldListDataSet as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
+    FOldListDataSet := nil;
+    if ListDataSet <> nil then
+    begin
+      (ListDataSet as IUnknown).QueryInterface(IDynamicSQLDataset,obj);
+      if obj <> nil then
+      begin
+        (ListDataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
+        FOldListDataSet := ListDataSet;
+      end
+      else
+        raise Exception.Create('List Dataset does not provide the IDynamicSQLDataset interface');
+    end;
+  end;
 end;
 
 function TIBLookupComboEditBox.GetListSource: TDataSource;
@@ -241,7 +232,7 @@ procedure TIBLookupComboEditBox.ActiveChanged(Sender: TObject);
 begin
   if not FInserting and not FUpdating then
      Application.QueueAsyncCall(@DoActiveChanged,0);
-  IBControlLinkChanged;
+  ListDatasetChanged;
 end;
 
 procedure TIBLookupComboEditBox.DoActiveChanged(Data: PtrInt);
@@ -281,6 +272,14 @@ begin
   Result := inherited AutoCompleteText;
   if AutoComplete then
      Result := Result + [cbactEnabled]
+end;
+
+function TIBLookupComboEditBox.GetListDatset : TDataset;
+begin
+  if ListSource = nil then
+    Result := nil
+  else
+    Result := ListSource.Dataset;
 end;
 
 procedure TIBLookupComboEditBox.ResetParser;
@@ -327,7 +326,7 @@ begin
   begin
     FDataLink.DataSource := AValue;
     inherited ListSource := AValue;
-    IBControlLinkChanged;
+    ListDatasetChanged;
   end;
 end;
 
@@ -340,7 +339,7 @@ var
   iSelStart: Integer; // char position
   sCompleteText, sPrefixText, sResultText: string;
 begin
-  if assigned(ListSource) and assigned(ListSource.DataSet) and (ListSource.DataSet is TIBCustomDataSet)
+  if assigned(ListSource) and assigned(ListSource.DataSet)
      and ListSource.DataSet.Active then
   begin
     FCurText := Text;
@@ -387,41 +386,6 @@ begin
   end;
 end;
 
-procedure TIBLookupComboEditBox.UpdateSQL(Sender: TObject;
-  Parser: TSelectSQLParser);
-var FieldPosition: integer;
-    FilterText: string;
-    SQLDialect: integer;
-begin
-  if FFiltered then
-  begin
-    if FUpdating then
-      FilterText := FCurText
-    else
-      FilterText := Text;
-
-    if Parser.DataSet <> nil then
-      SQLDialect := (Parser.DataSet as TIBCustomDataSet).Database.SQLDialect
-    else
-      SQLDialect := 1;
-
-    if cbactSearchCaseSensitive in AutoCompleteText then
-      Parser.Add2WhereClause(GetRelationNameQualifier + QuoteIdentifierIfNeeded(SQLDialect,ListField) + ' Like ''' +
-                                  SQLSafeString(FilterText) + '%''')
-    else
-      Parser.Add2WhereClause('Upper(' + GetRelationNameQualifier + QuoteIdentifierIfNeeded(SQLDialect,ListField) + ') Like Upper(''' +
-                                  SQLSafeString(FilterText) + '%'')');
-
-    if cbactSearchAscending in AutoCompleteText then
-    begin
-      FieldPosition := Parser.GetFieldPosition(ListField);
-      if FieldPosition = 0 then Exit;
-
-      Parser.OrderByClause := IntToStr(FieldPosition) + ' ascending';
-    end;
-  end;
-end;
-
 procedure TIBLookupComboEditBox.HandleEnter(Data: PtrInt);
 begin
   if AppDestroying in Application.Flags then Exit;
@@ -437,13 +401,9 @@ end;
 {Check to ensure that ListField exists and convert to upper case if necessary}
 
 procedure TIBLookupComboEditBox.ValidateListField;
-var SQLDialect: integer;
-    FieldNames: TStringList;
+var  FieldNames: TStringList;
 begin
-  if (ListSource = nil) or (ListSource.DataSet = nil) or
-    not (ListSource.DataSet is TIBCustomDataSet) or
-     ((ListSource.DataSet as TIBCustomDataSet).Database = nil) then Exit;
-  SQLDialect := (ListSource.DataSet as TIBCustomDataSet).Database.SQLDialect;
+  if (ListSource = nil) or (ListSource.DataSet = nil) then Exit;
   FieldNames := TStringList.Create;
   try
     FieldNames.CaseSensitive := true;
@@ -452,7 +412,7 @@ begin
     ListSource.DataSet.GetFieldNames(FieldNames);
     if FieldNames.IndexOf(ListField) = -1 then {not found}
     begin
-      if (SQLDialect = 3) and (FieldNames.IndexOf(AnsiUpperCase(ListField)) <> - 1) then {normalise to upper case}
+      if FieldNames.IndexOf(AnsiUpperCase(ListField)) <> - 1 then {normalise to upper case}
         ListField := AnsiUpperCase(ListField)
       else
         IBError(ibxeListFieldNotFound,[ListField])
@@ -581,12 +541,6 @@ begin
   end;
 end;
 
-procedure TIBLookupComboEditBox.Loaded;
-begin
-  inherited Loaded;
-  IBControlLinkChanged;
-end;
-
 procedure TIBLookupComboEditBox.Notification(AComponent: TComponent;
   Operation: TOperation);
 begin
@@ -616,6 +570,36 @@ begin
   if FCurText <> '' then
     Text := FCurText + Text;
   FModified := false;
+end;
+
+procedure TIBLookupComboEditBox.UpdateSQL(Sender : IDynamicSQLEditor);
+var FilterText: string;
+begin
+  if FFiltered then
+  begin
+    if FUpdating then
+      FilterText := FCurText
+    else
+      FilterText := Text;
+
+    with ListDataset as IDynamicSQLEditor do
+    begin
+      if cbactSearchCaseSensitive in AutoCompleteText then
+        Add2WhereClause(GetRelationNameQualifier + QuoteIdentifierIfNeeded(ListField) + ' Like ''' +
+                                    SQLSafeString(FilterText) + '%''')
+      else
+        Add2WhereClause('Upper(' + GetRelationNameQualifier + QuoteIdentifierIfNeeded(ListField) + ') Like Upper(''' +
+                                    SQLSafeString(FilterText) + '%'')');
+
+      if cbactSearchAscending in AutoCompleteText then
+        Orderby(ListField,true);
+    end;
+  end;
+end;
+
+procedure TIBLookupComboEditBox.SetParams(Sender : IDynamicSQLParam);
+begin
+
 end;
 
 
@@ -691,7 +675,6 @@ constructor TIBLookupComboEditBox.Create(TheComponent: TComponent);
 begin
   inherited Create(TheComponent);
   FDataLink := TIBLookupComboDataLink.Create(self);
-  FIBLookupControlLink := TIBLookupControlLink.Create(self);
   FKeyPressInterval := 200;
   FAutoComplete := true;
   FTimer := TTimer.Create(nil);
@@ -702,8 +685,9 @@ end;
 
 destructor TIBLookupComboEditBox.Destroy;
 begin
+  if ListDataset <> nil then
+    (ListDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
   if assigned(FDataLink) then FDataLink.Free;
-  if assigned(FIBLookupControlLink) then FIBLookupControlLink.Free;
   if assigned(FTimer) then FTimer.Free;
   Application.RemoveAsyncCalls(self);
   inherited Destroy;

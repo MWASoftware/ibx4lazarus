@@ -54,7 +54,8 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IBInternals, IB,  IBSQL, DB,
-  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, IBBufferedCursors;
+  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, IBBufferedCursors,
+  IBDynamicInterfaces;
 
 type
   TIBCustomDataSet = class;
@@ -342,20 +343,6 @@ type
     property ApplyOnEvent: TIBGeneratorApplyOnEvent read FApplyOnEvent write FApplyOnEvent;
   end;
 
-  {TIBControlLink - Allows IB Aware controls to react to dataset state changes}
-
-  TIBControlLink = class
-  private
-    FTIBDataSet: TIBCustomDataSet;
-    procedure SetIBDataSet(AValue: TIBCustomDataSet);
-  protected
-    procedure UpdateSQL(Sender: TObject); virtual;
-    procedure UpdateParams(Sender: TObject); virtual;
-  public
-    destructor Destroy; override;
-    property IBDataSet: TIBCustomDataSet read FTIBDataSet write SetIBDataSet;
-  end;
-
   TIBAutoCommit = (acDisabled, acCommitRetaining);
 
   TIBUpdateAction = (uaFail, uaAbort, uaSkip, uaRetry, uaApply, uaApplied);
@@ -428,7 +415,6 @@ type
     FParser: TSelectSQLParser;
     FCloseAction: TTransactionAction;
     FInTransactionEnd: boolean;
-    FIBLinks: TList;
     FSelectCount: integer;
     FInsertCount: integer;
     FUpdateCount: integer;
@@ -457,7 +443,6 @@ type
     function CanDelete: Boolean;
     function CanRefresh: Boolean;
     procedure CheckEditState;
-    procedure ClearIBLinks;
     procedure DoBeforeDatabaseDisconnect(Sender: TObject);
     procedure DoAfterDatabaseDisconnect(Sender: TObject);
     procedure DoDatabaseFree(Sender: TObject);
@@ -479,8 +464,6 @@ type
     function InternalLocate(const KeyFields: string; const KeyValues: Variant;
                             Options: TLocateOptions): Boolean; virtual;
     procedure InternalPostRecord(Qry: TIBSQL; Buff: TRecordBuffer); virtual;
-    procedure RegisterIBLink(Sender: TIBControlLink);
-    procedure UnRegisterIBLink(Sender: TIBControlLink);
     procedure SetBufferChunks(Value: Integer);
     procedure SetDatabase(Value: TIBDatabase);
     procedure SetDeleteSQL(Value: TStrings);
@@ -739,10 +722,28 @@ type
 
   { TIBParserDataSet }
 
-  TIBParserDataSet = class(TIBCustomDataSet)
+  TIBParserDataSet = class(TIBCustomDataSet,IDynamicSQLDataset,IDynamicSQLEditor,IDynamicSQLParam)
+  private
+    FDynamicComponents: TList;
   protected
     procedure DoBeforeOpen; override;
+  protected
+    {IDynamicSQLDataset}
+    procedure RegisterDynamicComponent(aComponent: TComponent);
+    procedure UnRegisterDynamicComponent(aComponent: TComponent);
+    {IDynamicSQLEditor}
+    procedure OrderBy(fieldname: string; ascending: boolean);
+    procedure Add2WhereClause(Condition: string; OrClause: boolean=false);
+    function QuoteIdentifierIfNeeded(const s: string): string;
+    function SQLSafeString(const s: string): string;
+    function GetOrderByClause: string;
+    procedure SetOrderByClause(Value : string);
+    {IDynamicSQLParam}
+    function GetParamValue(ParamName: string): variant; virtual;
+    procedure SetParamValue(ParamName: string; ParamValue: variant); virtual;
   public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
     property Parser;
   end;
 
@@ -1693,11 +1694,96 @@ begin
   if SQLFiltered then
     for i := 0 to SQLFilterParams.Count - 1 do
       Parser.Add2WhereClause(SQLFilterParams[i]);
-  for i := 0 to FIBLinks.Count - 1 do
-    TIBControlLink(FIBLinks[i]).UpdateSQL(self);
+  for i := 0 to FDynamicComponents.Count - 1 do
+    (TObject(FDynamicComponents[i]) as IDynamicSQLComponent).UpdateSQL(self);
   inherited DoBeforeOpen;
-  for i := 0 to FIBLinks.Count - 1 do
-    TIBControlLink(FIBLinks[i]).UpdateParams(self);
+  for i := 0 to FDynamicComponents.Count - 1 do
+  (TObject(FDynamicComponents[i]) as IDynamicSQLComponent).SetParams(self);
+end;
+
+procedure TIBParserDataSet.RegisterDynamicComponent(aComponent : TComponent);
+begin
+  if FDynamicComponents.IndexOf(aComponent) = -1 then
+  begin
+    FDynamicComponents.Add(aComponent);
+    if Active then
+    begin
+      Active := false;
+      Active := true;
+    end;
+  end;
+end;
+
+procedure TIBParserDataSet.UnRegisterDynamicComponent(aComponent : TComponent);
+begin
+  FDynamicComponents.Remove(aComponent);
+end;
+
+procedure TIBParserDataSet.OrderBy(fieldname : string; ascending : boolean);
+var FieldPosition: integer;
+begin
+  FieldPosition := Parser.GetFieldPosition(fieldname);
+  if FieldPosition > 0 then
+   begin
+     if ascending then
+       Parser.OrderByClause := IntToStr(FieldPosition) + ' asc'
+     else
+       Parser.OrderByClause := IntToStr(FieldPosition) + ' desc';
+   end;
+end;
+
+procedure TIBParserDataSet.Add2WhereClause(Condition : string;
+  OrClause : boolean);
+begin
+  Parser.Add2WhereClause(Condition,OrClause);
+end;
+
+function TIBParserDataSet.QuoteIdentifierIfNeeded(const s : string) : string;
+begin
+  Result := IBUtils.QuoteIdentifierIfNeeded(Database.SQLDialect,s);
+end;
+
+function TIBParserDataSet.SQLSafeString(const s : string) : string;
+begin
+  Result := IBUtils.SQLSafeString(s);
+end;
+
+function TIBParserDataSet.GetOrderByClause : string;
+begin
+  if Parser <> nil then
+    Result := Parser.OrderByClause
+  else
+    Result := '';
+end;
+
+procedure TIBParserDataSet.SetOrderByClause(Value : string);
+begin
+  if Parser <> nil then
+    Parser.OrderByClause := Value;
+end;
+
+function TIBParserDataSet.GetParamValue(ParamName : string) : variant;
+begin
+  Result := ParamByName(ParamName).AsVariant;
+end;
+
+procedure TIBParserDataSet.SetParamValue(ParamName : string;
+  ParamValue : variant);
+begin
+  ParamByName(ParamName).AsVariant := ParamValue;
+end;
+
+constructor TIBParserDataSet.Create(aOwner : TComponent);
+begin
+  inherited Create(aOwner);
+  FDynamicComponents := TList.Create;
+end;
+
+destructor TIBParserDataSet.Destroy;
+begin
+  if FDynamicComponents <> nil then
+    FDynamicComponents.Free;
+  inherited Destroy;
 end;
 
 { TIBLargeIntField }
@@ -1881,34 +1967,6 @@ begin
   inherited Create(AOwner);
   BlobType := ftMemo;
   FCodePage := CP_NONE;
-end;
-
-{ TIBControlLink }
-
-destructor TIBControlLink.Destroy;
-begin
-  IBDataSet := nil;
-  inherited Destroy;
-end;
-
-procedure TIBControlLink.UpdateParams(Sender: TObject);
-begin
-
-end;
-
-procedure TIBControlLink.UpdateSQL(Sender: TObject);
-begin
-
-end;
-
-procedure TIBControlLink.SetIBDataSet(AValue: TIBCustomDataSet);
-begin
-  if FTIBDataSet = AValue then Exit;
-  if IBDataSet <> nil then
-    IBDataSet.UnRegisterIBLink(self);
-  FTIBDataSet := AValue;
-  if IBDataSet <> nil then
-    IBDataSet.RegisterIBLink(self);
 end;
 
 
@@ -2149,7 +2207,6 @@ begin
   inherited Create(AOwner);
   FBase := TIBBase.Create(Self);
   FDatabaseInfo := TIBDatabaseInfo.Create(self);
-  FIBLinks := TList.Create;
   FUniDirectional := False;
   FBufferChunks := BufferCacheSize;
   FBufferChunksInFirstBlock := InitialBufferCacheSize;
@@ -2204,8 +2261,6 @@ begin
   if assigned(FGeneratorField) then FGeneratorField.Free;
   FDataLink.Free;
   FBase.Free;
-  ClearIBLinks;
-  FIBLinks.Free;
   if assigned(FPrimaryKeys) then FPrimaryKeys.Free;
   if assigned(FBaseSQLSelect) then FBaseSQLSelect.Free;
   if assigned(FParser) then FParser.Free;
@@ -3035,19 +3090,6 @@ begin
   end;
 end;
 
-procedure TIBCustomDataSet.RegisterIBLink(Sender: TIBControlLink);
-begin
-  if FIBLinks.IndexOf(Sender) = -1 then
-  begin
-    FIBLinks.Add(Sender);
-    if Active then
-    begin
-      Active := false;
-      Active := true;
-    end;
-  end;
-end;
-
 
 procedure TIBCustomDataSet.SQLChanging(Sender: TObject);
 begin
@@ -3071,11 +3113,6 @@ procedure TIBCustomDataSet.Undelete;
 begin
   CheckActive;
   FCursor.UnDelete(GetActiveBuf);
-end;
-
-procedure TIBCustomDataSet.UnRegisterIBLink(Sender: TIBControlLink);
-begin
-  FIBLinks.Remove(Sender);
 end;
 
 function TIBCustomDataSet.UpdateStatus: TUpdateStatus;
@@ -3936,14 +3973,6 @@ procedure TIBCustomDataSet.ClearCalcFields(Buffer: TRecordBuffer);
 begin
   FCursor.ClearCalcFields(Buffer);
 end;
-
-procedure TIBCustomDataSet.ClearIBLinks;
-var i: integer;
-begin
-  for i := FIBLinks.Count - 1 downto 0 do
-    TIBControlLink(FIBLinks[i]).IBDataSet := nil;
-end;
-
 
 procedure TIBCustomDataSet.InternalUnPrepare;
 begin

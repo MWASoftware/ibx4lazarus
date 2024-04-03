@@ -44,7 +44,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="122">
+    <Units Count="131">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -61,8 +61,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="34"/>
-        <CursorPos X="14" Y="36"/>
+        <TopLine Value="19"/>
+        <CursorPos X="56" Y="36"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -131,9 +131,9 @@
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <UnitName Value="DB"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="173"/>
-        <CursorPos X="14" Y="189"/>
-        <UsageCount Value="29"/>
+        <TopLine Value="1773"/>
+        <CursorPos X="15" Y="1798"/>
+        <UsageCount Value="30"/>
       </Unit10>
       <Unit11>
         <Filename Value="../../design/IBSQLEditFrame.pas"/>
@@ -291,9 +291,9 @@
       <Unit32>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1186"/>
-        <CursorPos X="31" Y="1188"/>
-        <UsageCount Value="58"/>
+        <TopLine Value="1706"/>
+        <CursorPos X="43" Y="1728"/>
+        <UsageCount Value="59"/>
       </Unit32>
       <Unit33>
         <Filename Value="../../../fbintf/client/FBStatement.pas"/>
@@ -317,7 +317,8 @@
       <Unit36>
         <Filename Value="../../runtime/nongui/IBQuery.pas"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="22" Y="10"/>
+        <TopLine Value="583"/>
+        <CursorPos X="44" Y="602"/>
         <UsageCount Value="10"/>
       </Unit36>
       <Unit37>
@@ -393,9 +394,9 @@
       <Unit47>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="106"/>
-        <CursorPos X="21" Y="130"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="397"/>
+        <CursorPos X="61" Y="415"/>
+        <UsageCount Value="11"/>
       </Unit47>
       <Unit48>
         <Filename Value="../../../../../lazarus18/otherComponents/ibx/runtime/nongui/IBCustomDataSet.pas"/>
@@ -630,8 +631,8 @@
       <Unit80>
         <Filename Value="/usr/share/fpcsrc/rtl/inc/objpash.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="265"/>
-        <CursorPos X="8" Y="284"/>
+        <TopLine Value="233"/>
+        <CursorPos X="33" Y="261"/>
         <UsageCount Value="22"/>
       </Unit80>
       <Unit81>
@@ -665,17 +666,17 @@
       <Unit85>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="25"/>
-        <CursorPos X="77" Y="34"/>
-        <UsageCount Value="12"/>
+        <TopLine Value="1035"/>
+        <CursorPos Y="1059"/>
+        <UsageCount Value="13"/>
       </Unit85>
       <Unit86>
         <Filename Value="../../../../lcl/dbgrids.pas"/>
         <UnitName Value="DBGrids"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="3191"/>
-        <CursorPos Y="3212"/>
-        <UsageCount Value="12"/>
+        <TopLine Value="481"/>
+        <CursorPos X="30" Y="495"/>
+        <UsageCount Value="13"/>
       </Unit86>
       <Unit87>
         <Filename Value="../../runtime/gui/IBDialogs.pas"/>
@@ -919,8 +920,77 @@
         <CursorPos X="10" Y="817"/>
         <UsageCount Value="10"/>
       </Unit121>
+      <Unit122>
+        <Filename Value="../../runtime/nongui/IBDynamicInterfaces.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="67"/>
+        <CursorPos X="20" Y="74"/>
+        <UsageCount Value="11"/>
+      </Unit122>
+      <Unit123>
+        <Filename Value="../../../../lcl/grids.pas"/>
+        <UnitName Value="Grids"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit123>
+      <Unit124>
+        <Filename Value="../../../../lcl/controls.pp"/>
+        <UnitName Value="Controls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1116"/>
+        <CursorPos X="28" Y="1122"/>
+        <UsageCount Value="10"/>
+      </Unit124>
+      <Unit125>
+        <Filename Value="../../../../lcl/lclclasses.pp"/>
+        <UnitName Value="LCLClasses"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="29"/>
+        <CursorPos X="31" Y="43"/>
+        <UsageCount Value="10"/>
+      </Unit125>
+      <Unit126>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1966"/>
+        <CursorPos X="14" Y="1980"/>
+        <UsageCount Value="11"/>
+      </Unit126>
+      <Unit127>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/compon.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="66"/>
+        <CursorPos X="2" Y="69"/>
+        <UsageCount Value="10"/>
+      </Unit127>
+      <Unit128>
+        <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/datasource.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="33"/>
+        <CursorPos X="3" Y="39"/>
+        <UsageCount Value="11"/>
+      </Unit128>
+      <Unit129>
+        <Filename Value="../../../../../../fpcsrc/3.2.2/rtl/objpas/classes/lists.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="41"/>
+        <CursorPos Y="56"/>
+        <UsageCount Value="10"/>
+      </Unit129>
+      <Unit130>
+        <Filename Value="../../../../../../fpcsrc/3.2.2/rtl/inc/objpas.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="65"/>
+        <CursorPos Y="84"/>
+        <UsageCount Value="10"/>
+      </Unit130>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="36" Column="56" TopLine="19"/>
+      </Position1>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

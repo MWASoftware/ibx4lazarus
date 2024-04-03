@@ -90,6 +90,9 @@ type
     procedure SQLChanged(Sender: TObject); override;
     procedure SQLChanging(Sender: TObject); override;
 
+    {IDynamicSQLParam}
+    function GetParamValue(ParamName: string): variant; override;
+    procedure SetParamValue(ParamName: string; ParamValue: variant); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -587,6 +590,16 @@ procedure TIBQuery.SQLChanging(Sender: TObject);
 begin
   inherited SQLChanging(Sender);
   Prepared := false;
+end;
+
+function TIBQuery.GetParamValue(ParamName : string) : variant;
+begin
+  Result := ParamByName(ParamName).Value;
+end;
+
+procedure TIBQuery.SetParamValue(ParamName : string; ParamValue : variant);
+begin
+ ParamByName(ParamName).Value := ParamValue;
 end;
 
 { TIBQuery IProviderSupport }

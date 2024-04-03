@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, ComCtrls,
-  DB, DBTreeView, IBSQLParser, IBCustomDataSet;
+  DB, DBTreeView, IBDynamicInterfaces;
 
 type
   {
@@ -44,30 +44,18 @@ type
   TIBTreeView = class;
   TIBTreeNode = TDBTreeNode;
 
-  { TIBTreeViewControlLink }
-
-  TIBTreeViewControlLink = class(TIBControlLink)
-  private
-    FOwner: TIBTreeView;
-  protected
-    procedure UpdateSQL(Sender: TObject); override;
-    procedure UpdateParams(Sender: TObject); override;
-  public
-    constructor Create(AOwner: TIBTreeView);
-  end;
-
-  TIBTreeView = class(TDBTreeView)
+  TIBTreeView = class(TDBTreeView,IDynamicSQLComponent)
   private
     { Private declarations }
-    FIBTreeViewControlLink: TIBTreeViewControlLink;
-    procedure UpdateParams(Sender: TObject; Parser: TSelectSQLParser);
-    procedure UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
+    FOldDataSet: TDataSet; {reference to Dataset on last call to DataSetChanged}
    protected
      procedure DataSourceChanged; override;
      procedure RefreshDataset; override;
+     {IDynamicSQLComponent}
+     procedure UpdateSQL(Sender: IDynamicSQLEditor);
+     procedure SetParams(Sender: IDynamicSQLParam);
   public
     { Public declarations }
-    constructor Create(TheComponent: TComponent); override;
     destructor Destroy; override;
   end;
 
@@ -91,70 +79,26 @@ end;
 
 { TIBTreeViewControlLink }
 
-constructor TIBTreeViewControlLink.Create(AOwner: TIBTreeView);
-begin
-  inherited Create;
-  FOwner := AOwner;
-end;
-
-procedure TIBTreeViewControlLink.UpdateParams(Sender: TObject);
-begin
-  FOwner.UpdateParams(self,TIBParserDataSet(Sender).Parser)
-end;
-
-procedure TIBTreeViewControlLink.UpdateSQL(Sender: TObject);
-begin
-  FOwner.UpdateSQL(self,TIBParserDataSet(Sender).Parser)
-end;
-
-
-procedure TIBTreeView.UpdateParams(Sender: TObject; Parser: TSelectSQLParser);
-begin
-  if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
-   begin
-     if DataSource.DataSet is TIBQuery then
-       TIBQuery(DataSource.DataSet).ParamByName('IBX_KEY_VALUE').Value :=
-         FUpdateNode.KeyValue
-     else
-     if DataSource.DataSet is TIBDataSet then
-       TIBDataSet(DataSource.DataSet).ParamByName('IBX_KEY_VALUE').Value :=
-         FUpdateNode.KeyValue
-   end
-  else
-  if assigned(FExpandNode) then
-  begin
-    if DataSource.DataSet is TIBQuery then
-      TIBQuery(DataSource.DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
-        TDBTreeNode(FExpandNode).KeyValue
-    else
-    if DataSource.DataSet is TIBDataSet then
-      TIBDataSet(DataSource.DataSet).ParamByName('IBX_PARENT_VALUE').Value :=
-        TDBTreeNode(FExpandNode).KeyValue
-  end;
-end;
-
-procedure TIBTreeView.UpdateSQL(Sender: TObject; Parser: TSelectSQLParser);
-begin
-    if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
-      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + KeyField + '" = :IBX_KEY_VALUE')
-    else
-    if (Items.Count = 0) then
-      {Need to Load Root Nodes}
-      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + ParentField + '" is null')
-    else
-    if assigned(FExpandNode) then
-    begin
-      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + ParentField + '" = :IBX_PARENT_VALUE');
-      Parser.Add2WhereClause(GetRelationNameQualifier + '"' + KeyField + '" = :IBX_PARENT_VALUE',true);
-    end;
-end;
-
 procedure TIBTreeView.DataSourceChanged;
+var obj: pointer;
 begin
-    if assigned(DataSource) and (DataSource.DataSet <> nil) and (DataSource.DataSet is TIBParserDataset) then
-      FIBTreeViewControllink.IBDataSet := TIBCustomDataSet(DataSource.DataSet)
-    else
-      FIBTreeViewControllink.IBDataSet := nil;
+  if FOldDataSet <> DataSet then
+  begin
+    if FOldDataSet <> nil then
+      (FOldDataSet as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
+    FOldDataSet := nil;
+    if DataSet <> nil then
+    begin
+      (DataSet as IUnknown).QueryInterface(IDynamicSQLDataset,obj);
+      if obj <> nil then
+      begin
+        (DataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
+        FOldDataSet := DataSet;
+      end
+      else
+        raise Exception.Create('Dataset does not provide the IDynamicSQLDataset interface');
+    end;
+  end;
 end;
 
 procedure TIBTreeView.RefreshDataset;
@@ -163,15 +107,37 @@ begin
   DataSet.Active := true;
 end;
 
-constructor TIBTreeView.Create(TheComponent: TComponent);
+procedure TIBTreeView.UpdateSQL(Sender : IDynamicSQLEditor);
 begin
-  inherited Create(TheComponent);
-  FIBTreeViewControlLink := TIBTreeViewControlLink.Create(self);
+  with Dataset as IDynamicSQLEditor do
+  if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
+    Add2WhereClause(GetRelationNameQualifier + '"' + KeyField + '" = :IBX_KEY_VALUE')
+  else
+  if (Items.Count = 0) then
+    {Need to Load Root Nodes}
+    Add2WhereClause(GetRelationNameQualifier + '"' + ParentField + '" is null')
+  else
+  if assigned(FExpandNode) then
+  begin
+    Add2WhereClause(GetRelationNameQualifier + '"' + ParentField + '" = :IBX_PARENT_VALUE');
+    Add2WhereClause(GetRelationNameQualifier + '"' + KeyField + '" = :IBX_PARENT_VALUE',true);
+  end;
+end;
+
+procedure TIBTreeView.SetParams(Sender : IDynamicSQLParam);
+begin
+  with Dataset as IDynamicSQLParam do
+  if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
+    SetParamValue('IBX_KEY_VALUE',FUpdateNode.KeyValue)
+  else
+  if assigned(FExpandNode) then
+    SetParamValue('IBX_PARENT_VALUE',TDBTreeNode(FExpandNode).KeyValue);
 end;
 
 destructor TIBTreeView.Destroy;
 begin
-  if assigned(FIBTreeViewControlLink) then FIBTreeViewControlLink.Free;
+  if DataSet <> nil then
+    (DataSet as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
   inherited Destroy;
 end;
 

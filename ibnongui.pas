@@ -12,7 +12,7 @@ uses
   IBDataOutput, IBEvents, IBExtract, IBQuery, IBSQL, IBSQLMonitor, 
   IBSQLParser, IBStoredProc, IBTable, IBUpdate, IBUpdateSQL, IBVersion, 
   ibxscript, IBXServices, IBMessages, IBInternals, IBIPC, IBJournal, 
-  IBBufferedCursors;
+  IBBufferedCursors, IBDynamicInterfaces;
 
 implementation
 
