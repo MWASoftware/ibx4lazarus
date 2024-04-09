@@ -251,7 +251,7 @@ end;
     FBookmark: TLocationArray;
     FDBLookupCellEditor: TDBLookupCellEditor;
     FActive: boolean;
-    FOldDataSet: TDataSet; {reference to Dataset on last call to DataSetChanged}
+    FCurDataset: TDataSet; {reference to Dataset on last call to DataSetChanged}
     procedure ColumnHeaderClick(Index: integer);
     function GetDataSet : TDataSet;
     function GetDataSource: TDataSource;
@@ -1118,23 +1118,16 @@ begin
 end;
 
 procedure TIBDynamicGrid.DataSetChanged;
-var obj: pointer;
 begin
-  if FOldDataSet <> DataSet then
+  if FCurDataset <> DataSet then
   begin
-    if FOldDataSet <> nil then
-      (FOldDataSet as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
-    FOldDataSet := nil;
-    if DataSet <> nil then
+    if FCurDataset <> nil then
+      (FCurDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
+    FCurDataset := nil;
+    if ProvidesIDynamicSQLDataset(DataSet) then
     begin
-      (DataSet as IUnknown).QueryInterface(IDynamicSQLDataset,obj);
-      if obj <> nil then
-      begin
-        (DataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
-        FOldDataSet := DataSet;
-      end
-      else
-        raise Exception.Create('Dataset does not provide the IDynamicSQLDataset interface');
+      (DataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
+      FCurDataset := DataSet;
     end;
   end;
 end;

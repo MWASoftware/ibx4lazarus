@@ -3,13 +3,13 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="54">
+    <Units Count="59">
       <Unit0>
         <Filename Value="usingibtreeview.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="9"/>
-        <UsageCount Value="82"/>
+        <UsageCount Value="84"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -17,9 +17,10 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="19"/>
-        <CursorPos X="55" Y="36"/>
-        <UsageCount Value="82"/>
+        <CursorPos X="53" Y="36"/>
+        <UsageCount Value="84"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -62,10 +63,11 @@
       </Unit7>
       <Unit8>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
+        <UnitName Value="DB"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1951"/>
-        <CursorPos X="3" Y="1942"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="1911"/>
+        <CursorPos X="22" Y="1927"/>
+        <UsageCount Value="11"/>
       </Unit8>
       <Unit9>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/database.inc"/>
@@ -114,9 +116,10 @@
       </Unit15>
       <Unit16>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/datasource.inc"/>
-        <TopLine Value="93"/>
-        <CursorPos X="3" Y="97"/>
-        <UsageCount Value="7"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="541"/>
+        <CursorPos Y="544"/>
+        <UsageCount Value="10"/>
       </Unit16>
       <Unit17>
         <Filename Value="../../../../lcl/controls.pp"/>
@@ -235,17 +238,16 @@
       <Unit35>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="277"/>
-        <CursorPos X="21" Y="284"/>
+        <TopLine Value="195"/>
+        <CursorPos Y="198"/>
         <UsageCount Value="10"/>
       </Unit35>
       <Unit36>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="31"/>
-        <CursorPos X="14" Y="34"/>
-        <UsageCount Value="13"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="82"/>
+        <CursorPos X="49" Y="89"/>
+        <UsageCount Value="14"/>
       </Unit36>
       <Unit37>
         <Filename Value="../../runtime/IBQuery.pas"/>
@@ -270,12 +272,10 @@
       </Unit39>
       <Unit40>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="1241"/>
-        <CursorPos X="3" Y="1245"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1114"/>
+        <CursorPos Y="1121"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit40>
       <Unit41>
         <Filename Value="../../../../lcl/include/customdbcombobox.inc"/>
@@ -287,8 +287,8 @@
       <Unit42>
         <Filename Value="../../changelog"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="54" Y="5"/>
-        <UsageCount Value="10"/>
+        <CursorPos X="75" Y="3"/>
+        <UsageCount Value="11"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit42>
       <Unit43>
@@ -314,18 +314,17 @@
       </Unit45>
       <Unit46>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="2427"/>
-        <CursorPos X="3" Y="2432"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1701"/>
+        <CursorPos X="96" Y="1706"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit46>
       <Unit47>
         <Filename Value="../../ibcontrols/DBTreeView.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="7"/>
-        <UsageCount Value="12"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="42"/>
+        <CursorPos X="36" Y="50"/>
+        <UsageCount Value="13"/>
       </Unit47>
       <Unit48>
         <Filename Value="/tmp/dbtreeview.pas"/>
@@ -358,120 +357,61 @@
       <Unit52>
         <Filename Value="../../runtime/nongui/IBDynamicInterfaces.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="68"/>
-        <CursorPos X="20" Y="74"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="115"/>
+        <CursorPos X="38" Y="131"/>
+        <UsageCount Value="11"/>
       </Unit52>
       <Unit53>
         <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="499"/>
-        <CursorPos X="47" Y="503"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="73"/>
+        <CursorPos X="47" Y="74"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit53>
+      <Unit54>
+        <Filename Value="../../runtime/nongui/IBMessages.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="94"/>
+        <UsageCount Value="10"/>
+      </Unit54>
+      <Unit55>
+        <Filename Value="../../../fbintf/client/IBUtils.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="681"/>
+        <CursorPos X="14" Y="690"/>
+        <UsageCount Value="10"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="../../../fbintf/client/FBAttachment.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="786"/>
+        <CursorPos X="25" Y="810"/>
+        <UsageCount Value="10"/>
+      </Unit56>
+      <Unit57>
+        <Filename Value="../../runtime/nongui/ibxscript.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="671"/>
+        <CursorPos X="65" Y="695"/>
+        <UsageCount Value="10"/>
+      </Unit57>
+      <Unit58>
+        <Filename Value="../../../../../../fpcsrc/3.2.2/packages/fcl-db/src/base/datasource.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="530"/>
+        <CursorPos Y="544"/>
+        <UsageCount Value="10"/>
+      </Unit58>
     </Units>
-    <JumpHistory Count="25" HistoryIndex="24">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="Unit1.pas"/>
-        <Caret Line="35" Column="57" TopLine="19"/>
+        <Caret Line="36" Column="27" TopLine="19"/>
       </Position1>
       <Position2>
-        <Filename Value="../../ibcontrols/IBTreeView.pas"/>
-        <Caret Line="34" Column="14" TopLine="31"/>
-      </Position2>
-      <Position3>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1344" Column="51" TopLine="1332"/>
-      </Position3>
-      <Position4>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="351" Column="23" TopLine="333"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="346" TopLine="333"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="469" Column="38" TopLine="455"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="3099" Column="10" TopLine="3095"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="418" TopLine="418"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1705" TopLine="1679"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2206" TopLine="2182"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2261" TopLine="2237"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="3090" TopLine="3075"/>
-      </Position12>
-      <Position13>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="468" TopLine="461"/>
-      </Position13>
-      <Position14>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="733" Column="31" TopLine="723"/>
-      </Position14>
-      <Position15>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1715" TopLine="1705"/>
-      </Position15>
-      <Position16>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="3979" TopLine="3968"/>
-      </Position16>
-      <Position17>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="446" TopLine="427"/>
-      </Position17>
-      <Position18>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="2264" TopLine="2240"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="735" Column="21" TopLine="724"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1725" Column="33" TopLine="1722"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
-        <Caret Line="171" Column="14" TopLine="158"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
-        <Caret Line="503" Column="47" TopLine="499"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="635" Column="14" TopLine="622"/>
-      </Position23>
-      <Position24>
         <Filename Value="Unit1.pas"/>
-        <Caret Line="36" Column="55" TopLine="19"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
-        <Caret Line="280" Column="27" TopLine="260"/>
-      </Position25>
+        <Caret Line="36" Column="53" TopLine="19"/>
+      </Position2>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

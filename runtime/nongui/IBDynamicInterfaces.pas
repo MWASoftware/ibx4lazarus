@@ -30,7 +30,14 @@ unit IBDynamicInterfaces;
 interface
 
 uses
-  Classes , SysUtils;
+  Classes , SysUtils, DB;
+
+{
+  The purpose of this unit is to define a set of interfaces that permit the
+  IBControls package to be independent of the IBX package. These interfaces
+  are provided by IBX but may also be provided by other database adapters for
+  Firebird and other databases.
+}
 
 {
   The following interfaces allow a dynamic component to register with a dataset
@@ -108,7 +115,94 @@ type
     procedure SetParams(Sender: IDynamicSQLParam);
   end;
 
+  {The IArrayField interface provides access to a TField instance that is for
+   an array field.
+  }
+  IArrayFieldDef = interface
+  ['{10d1c460-168f-40a8-b98c-05c6971c09f5}']
+    function GetArrayDimensions: integer;
+    function GetArrayLowerBound(dim: integer): integer;
+    function GetArrayUpperBound(dim: integer): integer;
+  end;
+
+  IArrayField = interface(IArrayFieldDef)
+  ['{1c2492a4-09c7-4515-852e-f6affc6f78da}']
+    function IsEmpty: boolean;
+    function GetEltAsString(index: array of integer): string;
+    procedure SetEltAsString(index: array of integer; aValue: string);
+  end;
+
+function ProvidesIDynamicSQLDataset(Dataset: TDataset; RaiseException:boolean=true): boolean;
+function ProvidesIDynamicSQLComponent(aComponent: TComponent; RaiseException:boolean=true): boolean;
+function ProvidesIArrayFieldDef(aFieldDef: TFieldDef; RaiseException:boolean=true): boolean;
+function ProvidesIArrayField(aField: TField; RaiseException:boolean=true): boolean;
+
 implementation
+
+resourcestring
+  sNoIDynamicSQLDataset = 'Dataset (%s) does not provide the IDynamicSQLDataset interface';
+  sNoIDynamicSQLComponent = 'Component (%s) does not provide the IDynamicSQLComponent interface';
+  sNoIArrayFieldDef = 'FieldDef  (%s) does not provide the IArrayFieldDef interface';
+  sNoIArrayField = 'Field (%s) does not provide the IArrayField interface';
+
+function ProvidesIDynamicSQLDataset(Dataset : TDataset; RaiseException : boolean
+  ) : boolean;
+var obj: pointer;
+begin
+  Result := false;
+  if Dataset <> nil then
+  begin
+    (DataSet as IUnknown).QueryInterface(IDynamicSQLDataset,obj);
+    Result := obj <> nil;
+  end
+  else
+  if RaiseException then
+    raise Exception.CreateFmt(sNoIDynamicSQLDataset,[Dataset.Name])
+end;
+
+function ProvidesIDynamicSQLComponent(aComponent: TComponent; RaiseException:boolean): boolean;
+var obj: pointer;
+begin
+  Result := false;
+  if aComponent <> nil then
+  begin
+    (aComponent as IUnknown).QueryInterface(IDynamicSQLComponent,obj);
+    Result := obj <> nil;
+  end
+  else
+  if RaiseException then
+    raise Exception.CreateFmt(sNoIDynamicSQLComponent,[aComponent.Name])
+end;
+
+function ProvidesIArrayFieldDef(aFieldDef: TFieldDef; RaiseException : boolean
+  ) : boolean;
+var obj: pointer;
+begin
+  Result := false;
+  if (aFieldDef <> nil) and (aFieldDef.DataType = ftArray) then
+  begin
+    aFieldDef.GetInterface(IArrayFieldDef,obj);
+    Result := obj <> nil;
+  end
+  else
+  if RaiseException then
+    raise Exception.CreateFmt(sNoIArrayFieldDef,[aFieldDef.Name])
+end;
+
+function ProvidesIArrayField(aField : TField; RaiseException : boolean
+  ) : boolean;
+var obj: pointer;
+begin
+  Result := false;
+  if aField <> nil then
+  begin
+    aField.GetInterface(IArrayField,obj);
+    Result := obj <> nil;
+  end
+  else
+  if RaiseException then
+    raise Exception.CreateFmt(sNoIArrayField,[aField.Name])
+end;
 
 end.
 

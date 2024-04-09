@@ -31,7 +31,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, Grids,
-  Db, DBCtrls, IBCustomDataSet, IB, LCLVersion;
+  Db, DBCtrls, IBDynamicInterfaces, LCLVersion;
 
 type
 
@@ -110,7 +110,7 @@ type
     FColumnLabelAlignment: TAlignment;
     FColumnLabelFont: TFont;
     FDataLink: TFieldDataLink;
-    FArray: IArray;
+    FArray: IArrayField;
     FActive: boolean;
     FRowLabelAlignment: TAlignment;
     FRowLabelColumnWidth: integer;
@@ -127,7 +127,7 @@ type
     function GetDataSource: TDataSource;
     function GetField: TField;
     function GetReadOnly: Boolean;
-    procedure LoadGridData(ArrayDimensions: integer; ArrayBounds: TArrayBounds);
+    procedure LoadGridData;
     procedure ReadColCount(Reader: TReader);
     procedure ReadRowCount(Reader: TReader);
     procedure RowLabelChanged(Sender: TObject);
@@ -161,7 +161,6 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure UpdateLayout;
-    property ArrayIntf: IArray read FArray;
     property DataSet: TDataSet read GetDataSet;
     property Field: TField read GetField;
   published
@@ -294,11 +293,8 @@ begin
     if (DataSet <> nil) and DataSet.Active then
     begin
       FActive := true;
-      if Field = nil then
-        raise Exception.CreateFmt(sNotAnArrayField,['Unknown']);
-      if not (Field is TIBArrayField) then
-        raise Exception.CreateFmt(sNotAnArrayField,[Field.Name]);
-      UpdateLayout;
+      if ProvidesIArrayField(Field) then
+        UpdateLayout;
       DataChange(Sender);
     end
     else
@@ -331,11 +327,10 @@ end;
 
 procedure TIBArrayGrid.DataChange(Sender: TObject);
 begin
-  if (DataSet <> nil) and DataSet.Active and FActive then
-  with TIBArrayField(Field) do
+  if (DataSet <> nil) and DataSet.Active and FActive and ProvidesIArrayField(Field) then
   begin
-    FArray := ArrayIntf;
-    LoadGridData(ArrayDimensions,ArrayBounds);
+    Field.GetInterface(IArrayField,FArray);
+    LoadGridData;
   end;
 end;
 
@@ -364,45 +359,48 @@ begin
   Result := FDataLink.ReadOnly;
 end;
 
-procedure TIBArrayGrid.LoadGridData(ArrayDimensions: integer;
-  ArrayBounds: TArrayBounds);
+procedure TIBArrayGrid.LoadGridData;
 var i, j, k, l: integer;
+    LowerBound,
+    UpperBound: integer;
 begin
   if (FArray = nil) or (FDataLink.Editing and not FArray.IsEmpty)
      then Exit;
-  case ArrayDimensions of
-  1:
+  with FArray do
+  begin
+    LowerBound := GetArrayLowerBound(0);
+    UpperBound := GetArrayUpperBound(0);
+    case GetArrayDimensions of
+    1:
     begin
       if RowCount - FixedRows  <> 1 then
-         raise Exception.CreateFmt(sArrayDimensionsOutofRange,[ArrayDimensions]);
+         raise Exception.CreateFmt(sArrayDimensionsOutofRange,[GetArrayDimensions]);
 
-      with ArrayBounds[0] do
       for i := LowerBound to UpperBound do
         if (i - LowerBound >= 0) and (i - LowerBound < ColCount) then
-          Cells[i - LowerBound,FixedRows] := FArray.GetAsString([i]);
+          Cells[i - LowerBound,FixedRows] := GetEltAsString([i]);
     end;
 
-  2:
+    2:
     begin
-      with ArrayBounds[0] do
       for i := LowerBound to UpperBound do
       begin
         k := i - LowerBound + FixedCols;
         if (k >= 0) and (k < ColCount) then
         begin
-          with ArrayBounds[1] do
-          for j := LowerBound to UpperBound do
+          for j := GetArrayLowerBound(1) to GetArrayUpperBound(1) do
           begin
-            l := j - LowerBound + FixedRows;
+            l := j - GetArrayLowerBound(1) + FixedRows;
             if ( l >= 0) and (l < RowCount) then
-              Cells[k,l] := FArray.GetAsString([i,j]);
+              Cells[k,l] := GetEltAsString([i,j]);
           end;
         end;
       end;
     end;
 
-  else
-     raise Exception.CreateFmt(sArrayDimensionsOutofRange,[ArrayDimensions]);
+    else
+      raise Exception.CreateFmt(sArrayDimensionsOutofRange,[GetArrayDimensions]);
+    end;
   end;
 end;
 
@@ -526,6 +524,7 @@ end;
 
 procedure TIBArrayGrid.UpdateLayout;
 var i: integer;
+    intf: IArrayFieldDef;
 begin
   if csLoading in ComponentState then Exit;
   if (DataSource <> nil) and (DataSet <> nil) and (DataField <> '') then
@@ -534,25 +533,28 @@ begin
     DataSet.FieldDefs.Update;
     if DataSet.FieldDefs.Count > 0 then
     for i := 0 to DataSet.FieldDefs.Count - 1 do
-    if (DataSet.FieldDefs[i] <> nil) and (DataSet.FieldDefs[i].Name = DataField)
-       and (DataSet.FieldDefs[i] is TIBFieldDef) and (DataSet.FieldDefs[i].DataType = ftArray) then
-    with TIBFieldDef(DataSet.FieldDefs[i]) do
     begin
-      case ArrayDimensions of
-      1:
-        RowCount := 1 + FixedRows;
+      if (DataSet.FieldDefs[i] <> nil) and (DataSet.FieldDefs[i].Name = DataField)
+         and ProvidesIArrayFieldDef(DataSet.FieldDefs[i],false) then
+      begin
+         DataSet.FieldDefs[i].GetInterface(IArrayFieldDef,intf);
+         with intf do
+         begin
+           case GetArrayDimensions of
+           1:
+             RowCount := 1 + FixedRows;
 
-      2:
-        with ArrayBounds[1] do
-          RowCount := UpperBound - LowerBound + 1 + FixedRows;
+           2:
+             RowCount := GetArrayUpperBound(1) - GetArrayLowerBound(1) + 1 + FixedRows;
 
-      else
-        raise Exception.CreateFmt(sArrayDimensionsOutofRange,[ArrayDimensions]);
-      end;
-      with ArrayBounds[0] do
-        ColCount := UpperBound - LowerBound + 1 + FixedCols;
-      UpdateLabels;
-      Exit;
+           else
+             raise Exception.CreateFmt(sArrayDimensionsOutofRange,[GetArrayDimensions]);
+           end;
+           ColCount := GetArrayUpperBound(0) - GetArrayLowerBound(0) + 1 + FixedCols;
+           UpdateLabels;
+           Exit;
+         end;
+       end;
     end;
     raise Exception.CreateFmt(sNotAnArrayField,[DataField]);
   except
@@ -622,22 +624,22 @@ begin
   try
     if not FTextChanged or (FArray = nil) then Exit;
 
-    with TIBArrayField(Field) do
+    with FArray do
     begin
-      k := Col + ArrayBounds[0].LowerBound - FixedCols;
-      if ArrayDimensions = 1 then
+      k := Col + GetArrayLowerBound(0) - FixedCols;
+      if GetArrayDimensions = 1 then
       try
-        FArray.SetAsString([k],Cells[Col,Row])
+        SetEltAsString([k],Cells[Col,Row])
       except
-        Cells[Col,Row] := FArray.GetAsString([k]);
+        Cells[Col,Row] := GetEltAsString([k]);
         raise;
       end
       else
       try
-        l := Row + ArrayBounds[1].LowerBound - FixedRows;
-        FArray.SetAsString([k,l],Cells[Col,Row]);
+        l := Row + GetArrayLowerBound(1) - FixedRows;
+        SetEltAsString([k,l],Cells[Col,Row]);
       except
-        Cells[Col,Row] := FArray.GetAsString([k,l]);
+        Cells[Col,Row] := GetEltAsString([k,l]);
         raise;
       end;
   end;
@@ -730,6 +732,7 @@ end;
 
 destructor TIBArrayGrid.Destroy;
 begin
+  FArray := nil;
   if assigned(FColumnLabelFont) then FColumnLabelFont.Free;
   if assigned(FRowLabelFont) then FRowLabelFont.Free;
   if assigned(FColumnLabels) then FColumnLabels.Free;

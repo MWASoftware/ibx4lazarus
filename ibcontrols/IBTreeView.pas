@@ -47,7 +47,7 @@ type
   TIBTreeView = class(TDBTreeView,IDynamicSQLComponent)
   private
     { Private declarations }
-    FOldDataSet: TDataSet; {reference to Dataset on last call to DataSetChanged}
+    FCurDataset: TDataSet; {reference to Dataset on last call to DataSetChanged}
    protected
      procedure DataSourceChanged; override;
      procedure RefreshDataset; override;
@@ -80,23 +80,16 @@ end;
 { TIBTreeViewControlLink }
 
 procedure TIBTreeView.DataSourceChanged;
-var obj: pointer;
 begin
-  if FOldDataSet <> DataSet then
+  if FCurDataset <> DataSet then
   begin
-    if FOldDataSet <> nil then
-      (FOldDataSet as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
-    FOldDataSet := nil;
-    if DataSet <> nil then
+    if FCurDataset <> nil then
+      (FCurDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
+    FCurDataset := nil;
+    if ProvidesIDynamicSQLDataset(DataSet) then
     begin
-      (DataSet as IUnknown).QueryInterface(IDynamicSQLDataset,obj);
-      if obj <> nil then
-      begin
-        (DataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
-        FOldDataSet := DataSet;
-      end
-      else
-        raise Exception.Create('Dataset does not provide the IDynamicSQLDataset interface');
+      (DataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
+      FCurDataset := DataSet;
     end;
   end;
 end;
@@ -109,7 +102,7 @@ end;
 
 procedure TIBTreeView.UpdateSQL(Sender : IDynamicSQLEditor);
 begin
-  with Dataset as IDynamicSQLEditor do
+  with Sender as IDynamicSQLEditor do
   if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
     Add2WhereClause(GetRelationNameQualifier + '"' + KeyField + '" = :IBX_KEY_VALUE')
   else
@@ -126,7 +119,7 @@ end;
 
 procedure TIBTreeView.SetParams(Sender : IDynamicSQLParam);
 begin
-  with Dataset as IDynamicSQLParam do
+  with Sender as IDynamicSQLParam do
   if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
     SetParamValue('IBX_KEY_VALUE',FUpdateNode.KeyValue)
   else

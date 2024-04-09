@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="4">
+  <Package Version="5">
     <Name Value="ibcontrols"/>
     <Type Value="RunAndDesignTime"/>
     <Author Value="Tony Whyman"/>
@@ -17,7 +17,7 @@
       </Other>
     </CompilerOptions>
     <Description Value="Data and IBX Aware controls"/>
-    <License Value="      Initial Developer's PUBLIC LICENSE
+    <License Value="      Initial Developer&apos;s PUBLIC LICENSE
                Version 1.0 
 
    1. Definitions
@@ -25,36 +25,36 @@
       1.0 &quot;Commercial Use&quot; means distribution or otherwise making the Covered 
       Code available to a third party. 
 
-      1.1 ''Contributor'' means each entity that creates or contributes to the 
+      1.1 &apos;&apos;Contributor&apos;&apos; means each entity that creates or contributes to the 
       creation of Modifications. 
 
-      1.2 ''Contributor Version'' means the combination of the Original Code, prior 
+      1.2 &apos;&apos;Contributor Version&apos;&apos; means the combination of the Original Code, prior 
       Modifications used by a Contributor, and the Modifications made by that 
       particular Contributor. 
 
-      1.3. ''Covered Code'' means the Original Code or Modifications or the 
+      1.3. &apos;&apos;Covered Code&apos;&apos; means the Original Code or Modifications or the 
       combination of the Original Code and Modifications, in each case including 
       portions thereof. 
 
-      1.4. ''Electronic Distribution Mechanism'' means a mechanism generally 
+      1.4. &apos;&apos;Electronic Distribution Mechanism&apos;&apos; means a mechanism generally 
       accepted in the software development community for the electronic transfer of 
       data. 
 
-      1.5. ''Executable'' means Covered Code in any form other than Source Code. 
+      1.5. &apos;&apos;Executable&apos;&apos; means Covered Code in any form other than Source Code. 
 
-      1.6. ''Initial Developer'' means the individual or entity identified as the Initial 
+      1.6. &apos;&apos;Initial Developer&apos;&apos; means the individual or entity identified as the Initial 
       Developer in the Source Code notice required by Exhibit A. 
 
-      1.7. ''Larger Work'' means a work which combines Covered Code or portions 
+      1.7. &apos;&apos;Larger Work&apos;&apos; means a work which combines Covered Code or portions 
       thereof with code not governed by the terms of this License. 
 
-      1.8. ''License'' means this document. 
+      1.8. &apos;&apos;License&apos;&apos; means this document. 
 
          1.8.1. &quot;Licensable&quot; means having the right to grant, to the maximum 
          extent possible, whether at the time of the initial grant or subsequently 
          acquired, any and all of the rights conveyed herein.
 
-      1.9. ''Modifications'' means any addition to or deletion from the substance or 
+      1.9. &apos;&apos;Modifications&apos;&apos; means any addition to or deletion from the substance or 
       structure of either the Original Code or any previous Modifications. When 
       Covered Code is released as a series of files, a Modification is: 
 
@@ -64,7 +64,7 @@
          Any new file that contains any part of the Original Code or previous 
          Modifications. 
 
-      1.10. ''Original Code'' means Source Code of computer software code which 
+      1.10. &apos;&apos;Original Code&apos;&apos; means Source Code of computer software code which 
       is described in the Source Code notice required by Exhibit A as Original Code, 
       and which, at the time of its release under this License is not already Covered 
       Code governed by this License. 
@@ -73,20 +73,20 @@
          hereafter acquired, including without limitation, method, process, and 
          apparatus claims, in any patent Licensable by grantor.
 
-      1.11. ''Source Code'' means the preferred form of the Covered Code for 
+      1.11. &apos;&apos;Source Code&apos;&apos; means the preferred form of the Covered Code for 
       making modifications to it, including all modules it contains, plus any associated 
       interface definition files, scripts used to control compilation and installation of 
       an Executable, or source code differential comparisons against either the 
       Original Code or another well known, available Covered Code of the 
-      Contributor's choice. The Source Code can be in a compressed or archival 
+      Contributor&apos;s choice. The Source Code can be in a compressed or archival 
       form, provided the appropriate decompression or de-archiving software is 
       widely available for no charge.
 
-      1.12. &quot;You'' (or &quot;Your&quot;) means an individual or a legal entity exercising rights 
+      1.12. &quot;You&apos;&apos; (or &quot;Your&quot;) means an individual or a legal entity exercising rights 
       under, and complying with all of the terms of, this License or a future version 
-      of this License issued under Section 6.1. For legal entities, &quot;You'' includes any 
+      of this License issued under Section 6.1. For legal entities, &quot;You&apos;&apos; includes any 
       entity w hich controls, is controlled by, or is under common control with You. 
-      For purposes of this definition, &quot;control'' means (a) the power, direct or 
+      For purposes of this definition, &quot;control&apos;&apos; means (a) the power, direct or 
       indirect, to cause the direction or management of such entity, whether by 
       contract or otherwise, or (b) ownership of more than fifty percent (50%) of 
       the outstanding shares or beneficial ownership of such entity. 
@@ -172,7 +172,7 @@
       License released under Section 6.1, and You must include a copy of this 
       License with every copy of the Source Code You distribute. You may not offer 
       or impose any terms on any Source Code version that alters or restricts the 
-      applicable version of this License or the recipients' rights hereunder. However, 
+      applicable version of this License or the recipients&apos; rights hereunder. However, 
       You may include an additional document offering the additional rights described 
       in Section 3.5. 
 
@@ -206,10 +206,10 @@
       3.4. Intellectual Property Matters
 
          a) Third Party Claims. If Contributor has knowledge that a license under 
-         a third party's intellectual property rights is required to exercise the 
+         a third party&apos;s intellectual property rights is required to exercise the 
          rights granted by such Contributor under Sections 2.1 or 2.2, 
          Contributor must include a text file with the Source Code distribution 
-         titled &quot;LEGAL'' which describes the claim and the party making the claim 
+         titled &quot;LEGAL&apos;&apos; which describes the claim and the party making the claim 
          in sufficient detail that a recipient will know whom to contact. If 
          Contributor obtains such knowledge after the Modification is made 
          available as described in Section 3.2, Contributor shall promptly modify 
@@ -218,15 +218,15 @@
          newsgroups) reasonably calculated to inform those who received the 
          Covered Code that new knowledge has been obtained. 
 
-         (b) Contributor APIs. If Contributor's Modifications include an application 
+         (b) Contributor APIs. If Contributor&apos;s Modifications include an application 
          programming interface and Contributor has knowledge of patent 
          licenses which are reasonably necessary to implement that API, 
          Contributor must also include this information in the LEGAL file. 
 
 
          (c) Representations. Contributor represents that, except as disclosed 
-         pursuant to Section 3.4(a) above, Contributor believes that Contributor's 
-         Modifications are Contributor's original creation(s) and/or Contributor 
+         pursuant to Section 3.4(a) above, Contributor believes that Contributor&apos;s 
+         Modifications are Contributor&apos;s original creation(s) and/or Contributor 
          has sufficient rights to grant the rights conveyed by this License. 
 
 
@@ -237,7 +237,7 @@
       notice. If You created one or more Modification(s) You may add your name as 
       a Contributor to the notice described in Exhibit A. You must also duplicate this 
       License in any documentation for the Source Code where You describe 
-      recipients' rights or ownership rights relating to Covered Code. You may 
+      recipients&apos; rights or ownership rights relating to Covered Code. You may 
       choose to offer, and to charge a fee for, warranty, support, indemnity or 
       liability obligations to one or more recipients of Covered Code. However, You 
       may do so only on Your own behalf, and not on behalf of the Initial Developer 
@@ -255,11 +255,11 @@
       including a description of how and where You have fulfilled the obligations of 
       Section 3.2. The notice must be conspicuously included in any notice in an 
       Executable version, related documentation or collateral in which You describe 
-      recipients' rights relating to the Covered Code. You may distribute the 
+      recipients&apos; rights relating to the Covered Code. You may distribute the 
       Executable version of Covered Code or ownership rights under a license of 
       Your choice, which may contain terms different from this License, provided 
       that You are in compliance with the terms of this License and hat the license 
-      for the Executable version does not attempt to limit or alter the recipient's rights 
+      for the Executable version does not attempt to limit or alter the recipient&apos;s rights 
       in the Source Code version from the rights set forth in this License. If You 
       distribute the Executable version under a different license You must make it 
       absolutely clear that any terms which differ from this License are offered by 
@@ -320,8 +320,8 @@
       (which you may only do in order to apply it to code which is not already 
       Covered Code governed by this License), You must 
 
-         (a) rename Your license so that the phrases ''Mozilla'', ''MOZILLAPL'', 
-         ''MOZPL'', ''Netscape'', &quot;MPL&quot;, ''NPL&quot;, or any confusingly similar phrases 
+         (a) rename Your license so that the phrases &apos;&apos;Mozilla&apos;&apos;, &apos;&apos;MOZILLAPL&apos;&apos;, 
+         &apos;&apos;MOZPL&apos;&apos;, &apos;&apos;Netscape&apos;&apos;, &quot;MPL&quot;, &apos;&apos;NPL&quot;, or any confusingly similar phrases 
          do not appear in your license (except to note that your license differs 
          from this License) and 
 
@@ -332,7 +332,7 @@
          be deemed to be modifications of this License.) 
 
 
-      6.4 Origin of the Initial Developer's Public License. The Initial Developer's 
+      6.4 Origin of the Initial Developer&apos;s Public License. The Initial Developer&apos;s 
       Public License is based on the Mozilla Public License V 1.1 with the following 
       changes: 
 
@@ -341,11 +341,11 @@
 
          2) The license can be modified and used for code which is not already 
          governed by this license. Modified versions of the license must be 
-         renamed to avoid confusion with Netscape's license Initial Developer's's 
+         renamed to avoid confusion with Netscape&apos;s license Initial Developer&apos;s&apos;s 
          license and must include a description of changes from the Initial 
-         Developer's Public License. 
+         Developer&apos;s Public License. 
 
-         3) The name of the license in Exhibit A is the &quot;Initial Developer's Public 
+         3) The name of the license in Exhibit A is the &quot;Initial Developer&apos;s Public 
          License&quot;.
 
          4) The reference to an alternative license in Exhibit A has been removed
@@ -360,7 +360,7 @@
 
     
 
-   COVERED CODE IS PROVIDED UNDER THIS LICENSE ON AN &quot;AS IS'' BASIS, WITHOUT 
+   COVERED CODE IS PROVIDED UNDER THIS LICENSE ON AN &quot;AS IS&apos;&apos; BASIS, WITHOUT 
    WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, WITHOUT 
    LIMITATION, WARRANTIES THAT THE COVERED CODE IS FREE OF DEFECTS, 
    MERCHANTABLE, FIT FOR A PARTICULAR PURPOSE OR NON-INFRINGING. THE 
@@ -388,7 +388,7 @@
       Developer or Contributor against whom You file such action is referred to as 
       &quot;Participant&quot;) alleging that:
 
-         (a) such Participant's Contributor Version directly or indirectly infringes 
+         (a) such Participant&apos;s Contributor Version directly or indirectly infringes 
          any patent, then any and all rights granted by such Participant to You 
          under Sections 2.1 and/or 2.2 of this License shall, upon 60 days notice 
          from Participant terminate prospectively, unless if within 60 days after 
@@ -408,14 +408,14 @@
          You under Sections 2.1 and/or 2.2 automatically terminate at the 
          expiration of the 60 day notice period specified above. 
 
-         (b) any software, hardware, or device, other than such Participant's 
+         (b) any software, hardware, or device, other than such Participant&apos;s 
          Contributor Version, directly or indirectly infringes any patent, then any 
          rights granted to You by such Participant under Sections 2.1(b) and 
          2.2(b) are revoked effective as of the date You first made, used, sold, 
          distributed, or had made, Modifications made by that Participant. 
 
       8.3. If You assert a patent infringement claim against Participant alleging that 
-      such Participant's Contributor Version directly or indirectly infringes any patent 
+      such Participant&apos;s Contributor Version directly or indirectly infringes any patent 
       where such claim is resolved (such as by license or settlement) prior to the 
       initiation of patent infringement litigation, then the reasonable value of the 
       licenses granted by such Participant under Sections 2.1 or 2.2 shall be taken 
@@ -440,7 +440,7 @@
    AND ALL OTHER COMMERCIAL DAMAGES OR LOSSES, EVEN IF SUCH PARTY 
    SHALL HAVE BEEN INFORMED OF THE POSSIBILITY OF SUCH DAMAGES. THIS 
    LIMITATION OF LIABILITY SHALL NOT APPLY TO LIABILITY FOR DEATH OR 
-   PERSONAL INJURY RESULTING FROM SUCH PARTY'S NEGLIGENCE TO THE EXTENT 
+   PERSONAL INJURY RESULTING FROM SUCH PARTY&apos;S NEGLIGENCE TO THE EXTENT 
    APPLICABLE LAW PROHIBITS SUCH LIMITATION. SOME JURISDICTIONS DO NOT 
    ALLOW THE EXCLUSION OR LIMITATION OF INCIDENTAL OR CONSEQUENTIAL 
    DAMAGES, SO THIS EXCLUSION AND LIMITATION MAY NOT APPLY TO YOU. 
@@ -449,9 +449,9 @@
    10. U.S. GOVERNMENT END USERS.
 
 
-   The Covered Code is a ''commercial item,'' as that term is defined in 48 C.F.R. 2.101 
-   (Oct. 1995), consisting of ''commercial computer software'' and ''commercial computer 
-   software documentation,'' as such terms are used in 48 C.F.R. 12.212 (Sept. 1995). 
+   The Covered Code is a &apos;&apos;commercial item,&apos;&apos; as that term is defined in 48 C.F.R. 2.101 
+   (Oct. 1995), consisting of &apos;&apos;commercial computer software&apos;&apos; and &apos;&apos;commercial computer 
+   software documentation,&apos;&apos; as such terms are used in 48 C.F.R. 12.212 (Sept. 1995). 
    Consistent with 48 C.F.R. 12.212 and 48 C.F.R. 227.7202-1 through 227.7202-4 (June 
    1995), all U.S. Government End Users acquire Covered Code with only those rights 
    set forth herein. 
@@ -469,7 +469,7 @@
    business in the United States of America, any litigation relating to this License shall be 
    subject to the jurisdiction of the Federal Courts of the Northern District of California, 
    with venue lying in Santa Clara County, California, with the losing party responsible for 
-   costs, including without limitation, court costs and reasonable attorneys' fees and 
+   costs, including without limitation, court costs and reasonable attorneys&apos; fees and 
    expenses. The application of the United Nations Convention on Contracts for the 
    International Sale of Goods is expressly excluded. Any law or regulation which 
    provides that the language of a contract shall be construed against the drafter shall 
@@ -494,9 +494,9 @@
    the Covered Code under Your choice of the IDPL or the alternative licenses, if any, 
    specified by the Initial Developer in the file described in Exhibit A. 
 
-   EXHIBIT A -Initial Developer's Public License.
+   EXHIBIT A -Initial Developer&apos;s Public License.
 
-   The contents of this file are subject to the Initial Developer's Public License Version 1.0 
+   The contents of this file are subject to the Initial Developer&apos;s Public License Version 1.0 
    (the &quot;License&quot;); you may not use this file except in compliance with the License. You 
    may obtain a copy of the License at http://www.firebirdsql.org/index.php?op=doc&amp;id=idpl Software 
    distributed under the License is distributed on an &quot;AS IS&quot; basis, WITHOUT WARRANTY 
@@ -513,7 +513,7 @@
    All Rights Reserved.
 
    Contributor(s): ______________________________________. "/>
-    <Version Major="2" Minor="6" Release = "4" Build="14337" />
+    <Version Major="2" Minor="6" Release="4" Build="9999"/>
     <Files Count="6">
       <Item1>
         <Filename Value="ibcontrols/IBLookupComboEditBox.pas"/>
@@ -540,12 +540,13 @@
         <UnitName Value="DBTreeView"/>
       </Item6>
     </Files>
+    <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="LCL"/>
+        <PackageName Value="ibexpress"/>
       </Item1>
       <Item2>
-        <PackageName Value="ibexpress"/>
+        <PackageName Value="LCL"/>
       </Item2>
       <Item3>
         <PackageName Value="FCL"/>

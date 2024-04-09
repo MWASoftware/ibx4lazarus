@@ -97,7 +97,7 @@ type
 
   { TIBArrayField }
 
-  TIBArrayField = class(TField)
+  TIBArrayField = class(TField,IArrayField)
   private
     FArrayBounds: TArrayBounds;
     FArrayDimensions: integer;
@@ -118,6 +118,14 @@ type
     property ArrayDimensions: integer read FArrayDimensions write FArrayDimensions;
     property ArrayBounds: TArrayBounds read FArrayBounds write FArrayBounds;
     property RelationName: string read FRelationName;
+  public
+    {IArrayField}
+    function IsEmpty: boolean;
+    function GetArrayDimensions: integer;
+    function GetArrayLowerBound(dim: integer): integer;
+    function GetArrayUpperBound(dim: integer): integer;
+    function GetEltAsString(index: array of integer): string;
+    procedure SetEltAsString(index: array of integer; aValue: string);
   end;
 
   { TIBStringField allows us to have strings longer than 8196 }
@@ -841,7 +849,7 @@ type
 
   { TIBFieldDef }
 
-  TIBFieldDef = class(TFieldDef)
+  TIBFieldDef = class(TFieldDef,IArrayFieldDef)
   private
     FArrayBounds: TArrayBounds;
     FArrayDimensions: integer;
@@ -852,6 +860,15 @@ type
     FIdentityColumn: boolean;
     FRelationName: string;
     FDataSize: integer;
+  public
+    {IArrayFieldDef}
+    function GetArrayDimensions: integer;
+    function GetArrayLowerBound(dim: integer): integer;
+    function GetArrayUpperBound(dim: integer): integer;
+    {IUnknown emulation}
+    function QueryInterface({$IFDEF FPC_HAS_CONSTREF}constref{$ELSE}const{$ENDIF} iid : tguid;out obj) : longint;{$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+    function _AddRef : longint;{$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+    function _Release : longint;{$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
   published
     property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
@@ -1006,6 +1023,39 @@ end;
     end;
     Result := str;
   end;
+
+{ TIBFieldDef }
+
+function TIBFieldDef.GetArrayDimensions : integer;
+begin
+  Result := ArrayDimensions;
+end;
+
+function TIBFieldDef.GetArrayLowerBound(dim : integer) : integer;
+begin
+  Result := ArrayBounds[dim].LowerBound;
+end;
+
+function TIBFieldDef.GetArrayUpperBound(dim : integer) : integer;
+begin
+   Result := ArrayBounds[dim].UpperBound;
+end;
+
+function TIBFieldDef.QueryInterface(constref iid : tguid; out obj) : longint;
+  cdecl;
+begin
+  raise exception.create('no Iunknown');
+end;
+
+function TIBFieldDef._AddRef : longint; cdecl;
+begin
+  Result := -1;
+end;
+
+function TIBFieldDef._Release : longint; cdecl;
+begin
+  Result := -1;
+end;
 
 { TFieldDefsMaker }
 
@@ -1703,7 +1753,7 @@ end;
 
 procedure TIBParserDataSet.RegisterDynamicComponent(aComponent : TComponent);
 begin
-  if FDynamicComponents.IndexOf(aComponent) = -1 then
+  if ProvidesIDynamicSQLComponent(aComponent) and (FDynamicComponents.IndexOf(aComponent) = -1) then
   begin
     FDynamicComponents.Add(aComponent);
     if Active then
@@ -1868,8 +1918,39 @@ end;
 
 function TIBArrayField.CreateArray: IArray;
 begin
-with DataSet as TIBCustomDataSet do
-  Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,FRelationName,FieldName);
+  with DataSet as TIBCustomDataSet do
+    Result := Database.Attachment.CreateArray(Transaction.TransactionIntf,FRelationName,FieldName);
+end;
+
+function TIBArrayField.IsEmpty : boolean;
+begin
+  Result := ArrayIntf.IsEmpty;
+end;
+
+function TIBArrayField.GetArrayDimensions : integer;
+begin
+  Result := FArrayDimensions;
+end;
+
+function TIBArrayField.GetArrayLowerBound(dim : integer) : integer;
+begin
+  Result := FArrayBounds[dim].LowerBound;
+end;
+
+function TIBArrayField.GetArrayUpperBound(dim : integer) : integer;
+begin
+  Result := FArrayBounds[dim].UpperBound;
+end;
+
+function TIBArrayField.GetEltAsString(index : array of integer) : string;
+begin
+  Result := ArrayIntf.GetAsString(index);
+end;
+
+procedure TIBArrayField.SetEltAsString(index : array of integer; aValue : string
+  );
+begin
+  ArrayIntf.SetAsString(index,aValue);
 end;
 
 { TIBMemoField }

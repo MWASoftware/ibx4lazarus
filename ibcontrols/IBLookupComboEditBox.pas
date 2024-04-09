@@ -86,7 +86,7 @@ type
     FLastKeyValue: variant;
     FCurText: string;
     FModified: boolean;
-    FOldListDataset: TDataset;
+    FCurListDataset: TDataset;
     procedure DoActiveChanged(Data: PtrInt);
     function GetAutoCompleteText: TComboBoxAutoCompleteText;
     function GetListDatset : TDataset;
@@ -124,6 +124,7 @@ type
     procedure SetItemIndex(const Val: integer); override;
     procedure UpdateShowing; override;
     procedure UpdateData(Sender: TObject); override;
+    {IDynamicSQLComponent}
     procedure UpdateSQL(Sender: IDynamicSQLEditor);
     procedure SetParams(Sender: IDynamicSQLParam);
   public
@@ -194,23 +195,16 @@ begin
 end;
 
 procedure TIBLookupComboEditBox.ListDatasetChanged;
-var obj: pointer;
 begin
-  if FOldListDataSet <> ListDataSet then
+  if FCurListDataset <> ListDataSet then
   begin
-    if FOldListDataSet <> nil then
-      (FOldListDataSet as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
-    FOldListDataSet := nil;
-    if ListDataSet <> nil then
+    if FCurListDataset <> nil then
+      (FCurListDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
+    FCurListDataset := nil;
+    if ProvidesIDynamicSQLDataset(ListDataSet) then
     begin
-      (ListDataSet as IUnknown).QueryInterface(IDynamicSQLDataset,obj);
-      if obj <> nil then
-      begin
-        (ListDataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
-        FOldListDataSet := ListDataSet;
-      end
-      else
-        raise Exception.Create('List Dataset does not provide the IDynamicSQLDataset interface');
+      (ListDataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
+      FCurListDataset := ListDataSet;
     end;
   end;
 end;
@@ -582,7 +576,7 @@ begin
     else
       FilterText := Text;
 
-    with ListDataset as IDynamicSQLEditor do
+    with Sender as IDynamicSQLEditor do
     begin
       if cbactSearchCaseSensitive in AutoCompleteText then
         Add2WhereClause(GetRelationNameQualifier + QuoteIdentifierIfNeeded(ListField) + ' Like ''' +
