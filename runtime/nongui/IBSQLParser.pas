@@ -166,6 +166,8 @@ type
   public
     constructor Create(SQLText: TStrings); overload;
     constructor Create(const SQLText: string); overload;
+    constructor Create(aDataSet: TDataSet; SQLText: TStrings); overload; deprecated;
+    constructor Create(aDataSet: TDataSet; const SQLText: string); overload; deprecated;
     destructor Destroy; override;
     procedure Add2HavingClause(const Condition: string; OrClause: boolean=false;
       IncludeUnions: boolean = false);
@@ -437,6 +439,17 @@ begin
   FInString := SQLText;
   FIndex := 1;
   Create(TSelectSQLParser(nil));
+end;
+
+constructor TSelectSQLParser.Create(aDataSet : TDataSet; SQLText : TStrings);
+begin
+  Create(SQLText);
+end;
+
+constructor TSelectSQLParser.Create(aDataSet : TDataSet; const SQLText : string
+  );
+begin
+  Create(SQLText);
 end;
 
 destructor TSelectSQLParser.Destroy;

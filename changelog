@@ -6,6 +6,8 @@ IBX Change Log  version (2.7-0 Build 14337) Mon, 08 Jan 2024 15:20:55 +0000
     the IDynamicSQLDataset, IDynamicSQLEditor and IDynamicSQLParam interfaces.
 
 2. SQLParser: Removed dependencies on IBCustomDataSet.
+     - DataSet property removed
+     - No longer necessary to provide a dataset reference in the constructor;
 
 3. IArrayField added to IBDynamicInterfaces. This removes the IBControl IBArrayGrid 
    dependency on TIBArrayField in IBCustomDataSet.

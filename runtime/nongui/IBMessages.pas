@@ -458,7 +458,6 @@ const
     SODSVersionRequired,
     SErrorParsing,
     SParameterNameNotFound,
-    SListFieldNotFound,
     SDBBufferTooSmall,
     SBadDateTimeTZString,
     SUnknownSQLType,
