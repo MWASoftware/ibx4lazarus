@@ -102,7 +102,7 @@ end;
 
 procedure TIBTreeView.UpdateSQL(Sender : IDynamicSQLEditor);
 begin
-  with Sender as IDynamicSQLEditor do
+  with Sender do
   if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
     Add2WhereClause(GetRelationNameQualifier + '"' + KeyField + '" = :IBX_KEY_VALUE')
   else
@@ -119,7 +119,7 @@ end;
 
 procedure TIBTreeView.SetParams(Sender : IDynamicSQLParam);
 begin
-  with Sender as IDynamicSQLParam do
+  with Sender do
   if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
     SetParamValue('IBX_KEY_VALUE',FUpdateNode.KeyValue)
   else

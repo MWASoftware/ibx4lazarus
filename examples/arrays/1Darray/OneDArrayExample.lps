@@ -19,6 +19,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="29"/>
         <CursorPos X="45" Y="34"/>
         <UsageCount Value="40"/>
@@ -60,12 +61,10 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="631"/>
         <CursorPos X="33" Y="642"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
@@ -247,26 +246,24 @@
       </Unit31>
       <Unit32>
         <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="1924"/>
-        <CursorPos X="30" Y="1927"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3393"/>
+        <CursorPos X="29" Y="3406"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="3393"/>
-          <CursorPos X="29" Y="3406"/>
+          <TopLine Value="1738"/>
+          <CursorPos X="3" Y="1729"/>
         </ExtraEditor1>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit32>
       <Unit33>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <UnitName Value="DB"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="125"/>
         <CursorPos X="29" Y="134"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit33>
       <Unit34>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/fields.inc"/>
@@ -277,11 +274,10 @@
       </Unit34>
       <Unit35>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="423"/>
         <CursorPos X="27" Y="429"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit35>
       <Unit36>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/lists.inc"/>
@@ -298,167 +294,41 @@
       </Unit37>
       <Unit38>
         <Filename Value="../../../../fbintf/client/IB.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="383"/>
         <CursorPos X="3" Y="340"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit38>
       <Unit39>
         <Filename Value="../../../runtime/nongui/IBDynamicInterfaces.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="107"/>
-        <CursorPos Y="131"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="29"/>
+        <CursorPos X="36" Y="44"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit39>
       <Unit40>
         <Filename Value="/usr/share/fpcsrc/rtl/inc/objpash.inc"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="240"/>
         <CursorPos Y="262"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit40>
       <Unit41>
         <Filename Value="/usr/share/fpcsrc/rtl/inc/objpas.inc"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="822"/>
         <CursorPos X="60" Y="834"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit41>
       <Unit42>
         <Filename Value="../../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="19"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="109"/>
         <CursorPos X="41" Y="34"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit42>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
-      <Position1>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="460" Column="17" TopLine="436"/>
-      </Position1>
-      <Position2>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="472" Column="17" TopLine="448"/>
-      </Position2>
-      <Position3>
-        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <Caret Line="483" Column="30" TopLine="478"/>
-      </Position3>
-      <Position4>
-        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <Caret Line="429" Column="27" TopLine="423"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../../runtime/nongui/IBDynamicInterfaces.pas"/>
-        <Caret Line="136" Column="26" TopLine="116"/>
-      </Position5>
-      <Position6>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="560" TopLine="541"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../../runtime/nongui/IBDynamicInterfaces.pas"/>
-        <Caret Line="183" Column="14" TopLine="169"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="851" Column="17" TopLine="837"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../../runtime/nongui/IBDynamicInterfaces.pas"/>
-        <Caret Line="128" Column="50" TopLine="112"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="560" TopLine="522"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="124" Column="15" TopLine="112"/>
-      </Position11>
-      <Position12>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="334" TopLine="327"/>
-      </Position12>
-      <Position13>
-        <Filename Value="/usr/share/fpcsrc/rtl/inc/objpash.inc"/>
-        <Caret Line="243" Column="29" TopLine="237"/>
-      </Position13>
-      <Position14>
-        <Filename Value="/usr/share/fpcsrc/rtl/inc/objpas.inc"/>
-        <Caret Line="830" Column="11" TopLine="829"/>
-      </Position14>
-      <Position15>
-        <Filename Value="/usr/share/fpcsrc/rtl/inc/objpash.inc"/>
-        <Caret Line="243" Column="20" TopLine="226"/>
-      </Position15>
-      <Position16>
-        <Filename Value="/usr/share/fpcsrc/rtl/inc/objpas.inc"/>
-        <Caret Line="855" Column="32" TopLine="847"/>
-      </Position16>
-      <Position17>
-        <Filename Value="/usr/share/fpcsrc/rtl/inc/objpas.inc"/>
-        <Caret Line="830" Column="34" TopLine="822"/>
-      </Position17>
-      <Position18>
-        <Filename Value="/usr/share/fpcsrc/rtl/inc/objpas.inc"/>
-        <Caret Line="834" Column="60" TopLine="822"/>
-      </Position18>
-      <Position19>
-        <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="870" TopLine="853"/>
-      </Position19>
-      <Position20>
-        <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1049" Column="16" TopLine="1041"/>
-      </Position20>
-      <Position21>
-        <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="851" Column="38" TopLine="846"/>
-      </Position21>
-      <Position22>
-        <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="869" TopLine="846"/>
-      </Position22>
-      <Position23>
-        <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1046" Column="41" TopLine="1043"/>
-      </Position23>
-      <Position24>
-        <Filename Value="../../../ibcontrols/IBLookupComboEditBox.pas"/>
-        <Caret Line="34" Column="41" TopLine="19"/>
-      </Position24>
-      <Position25>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="164" TopLine="151"/>
-      </Position25>
-      <Position26>
-        <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1046" Column="41" TopLine="1043"/>
-      </Position26>
-      <Position27>
-        <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="124" TopLine="102"/>
-      </Position27>
-      <Position28>
-        <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1927" Column="30" TopLine="1924"/>
-      </Position28>
-      <Position29>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="396" Column="35" TopLine="377"/>
-      </Position29>
-      <Position30>
-        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <Caret Line="391" TopLine="377"/>
-      </Position30>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode="default"/>

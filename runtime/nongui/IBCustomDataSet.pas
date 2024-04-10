@@ -640,7 +640,7 @@ type
     procedure ApplyUpdates;
     function CachedUpdateStatus: TCachedUpdateStatus;
     procedure CancelUpdates;
-    function GetFieldPosition(AliasName: string): integer;
+    procedure GetFieldPosition(Sender: TObject; AliasName: string; var FieldPosition: integer);
     procedure FetchAll;
     function LocateNext(const KeyFields: string; const KeyValues: Variant;
                         Options: TLocateOptions): Boolean;
@@ -730,7 +730,7 @@ type
 
   { TIBParserDataSet }
 
-  TIBParserDataSet = class(TIBCustomDataSet,IDynamicSQLDataset,IDynamicSQLEditor,IDynamicSQLParam)
+  TIBParserDataSet = class(TIBCustomDataSet,IDynamicSQLDataset,IDynamicSQLParam)
   private
     FDynamicComponents: TList;
   protected
@@ -739,13 +739,6 @@ type
     {IDynamicSQLDataset}
     procedure RegisterDynamicComponent(aComponent: TComponent);
     procedure UnRegisterDynamicComponent(aComponent: TComponent);
-    {IDynamicSQLEditor}
-    procedure OrderBy(fieldname: string; ascending: boolean);
-    procedure Add2WhereClause(Condition: string; OrClause: boolean=false);
-    function QuoteIdentifierIfNeeded(const s: string): string;
-    function SQLSafeString(const s: string): string;
-    function GetOrderByClause: string;
-    procedure SetOrderByClause(Value : string);
     {IDynamicSQLParam}
     function GetParamValue(ParamName: string): variant; virtual;
     procedure SetParamValue(ParamName: string; ParamValue: variant); virtual;
@@ -865,10 +858,6 @@ type
     function GetArrayDimensions: integer;
     function GetArrayLowerBound(dim: integer): integer;
     function GetArrayUpperBound(dim: integer): integer;
-    {IUnknown emulation}
-    function QueryInterface({$IFDEF FPC_HAS_CONSTREF}constref{$ELSE}const{$ENDIF} iid : tguid;out obj) : longint;{$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
-    function _AddRef : longint;{$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
-    function _Release : longint;{$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
   published
     property CharacterSetName: RawByteString read FCharacterSetName write FCharacterSetName;
     property CharacterSetSize: integer read FCharacterSetSize write FCharacterSetSize;
@@ -1041,21 +1030,6 @@ begin
    Result := ArrayBounds[dim].UpperBound;
 end;
 
-function TIBFieldDef.QueryInterface(constref iid : tguid; out obj) : longint;
-  cdecl;
-begin
-  raise exception.create('no Iunknown');
-end;
-
-function TIBFieldDef._AddRef : longint; cdecl;
-begin
-  Result := -1;
-end;
-
-function TIBFieldDef._Release : longint; cdecl;
-begin
-  Result := -1;
-end;
 
 { TFieldDefsMaker }
 
@@ -1739,16 +1713,20 @@ end;
 procedure TIBParserDataSet.DoBeforeOpen;
 var i: integer;
 begin
-  if assigned(FParser) then
-     FParser.RestoreClauseValues;
-  if SQLFiltered then
-    for i := 0 to SQLFilterParams.Count - 1 do
-      Parser.Add2WhereClause(SQLFilterParams[i]);
-  for i := 0 to FDynamicComponents.Count - 1 do
-    (TObject(FDynamicComponents[i]) as IDynamicSQLComponent).UpdateSQL(self);
+  if (FDynamicComponents.Count > 0) or SQLFIltered then
+  begin
+    if not HasParser then
+        CreateParser;
+    Parser.RestoreClauseValues;
+    if SQLFiltered then
+      for i := 0 to SQLFilterParams.Count - 1 do
+        Parser.Add2WhereClause(SQLFilterParams[i]);
+    for i := 0 to FDynamicComponents.Count - 1 do
+      (TObject(FDynamicComponents[i]) as IDynamicSQLComponent).UpdateSQL(Parser);
+  end;
   inherited DoBeforeOpen;
   for i := 0 to FDynamicComponents.Count - 1 do
-  (TObject(FDynamicComponents[i]) as IDynamicSQLComponent).SetParams(self);
+    (TObject(FDynamicComponents[i]) as IDynamicSQLComponent).SetParams(self);
 end;
 
 procedure TIBParserDataSet.RegisterDynamicComponent(aComponent : TComponent);
@@ -1767,49 +1745,6 @@ end;
 procedure TIBParserDataSet.UnRegisterDynamicComponent(aComponent : TComponent);
 begin
   FDynamicComponents.Remove(aComponent);
-end;
-
-procedure TIBParserDataSet.OrderBy(fieldname : string; ascending : boolean);
-var FieldPosition: integer;
-begin
-  FieldPosition := Parser.GetFieldPosition(fieldname);
-  if FieldPosition > 0 then
-   begin
-     if ascending then
-       Parser.OrderByClause := IntToStr(FieldPosition) + ' asc'
-     else
-       Parser.OrderByClause := IntToStr(FieldPosition) + ' desc';
-   end;
-end;
-
-procedure TIBParserDataSet.Add2WhereClause(Condition : string;
-  OrClause : boolean);
-begin
-  Parser.Add2WhereClause(Condition,OrClause);
-end;
-
-function TIBParserDataSet.QuoteIdentifierIfNeeded(const s : string) : string;
-begin
-  Result := IBUtils.QuoteIdentifierIfNeeded(Database.SQLDialect,s);
-end;
-
-function TIBParserDataSet.SQLSafeString(const s : string) : string;
-begin
-  Result := IBUtils.SQLSafeString(s);
-end;
-
-function TIBParserDataSet.GetOrderByClause : string;
-begin
-  if Parser <> nil then
-    Result := Parser.OrderByClause
-  else
-    Result := '';
-end;
-
-procedure TIBParserDataSet.SetOrderByClause(Value : string);
-begin
-  if Parser <> nil then
-    Parser.OrderByClause := Value;
 end;
 
 function TIBParserDataSet.GetParamValue(ParamName : string) : variant;
@@ -2506,11 +2441,12 @@ begin
   end;
 end;
 
-function TIBCustomDataSet.GetFieldPosition(AliasName: string): integer;
+procedure TIBCustomDataSet.GetFieldPosition(Sender : TObject;
+  AliasName : string; var FieldPosition : integer);
 var i: integer;
     Prepared: boolean;
 begin
-  Result := 0;
+  FieldPosition := 0;
   Prepared := FInternalPrepared;
   if not Prepared then
     InternalPrepare;
@@ -2518,7 +2454,7 @@ begin
     for i := 0 to Length(FAliasNameList) - 1 do
       if FAliasNameList[i] = AliasName then
       begin
-        Result := i + 1;
+        FieldPosition := i + 1;
         Exit
       end;
   finally
@@ -2592,7 +2528,10 @@ end;
 
 function TIBCustomDataSet.CreateParser: TSelectSQLParser;
 begin
-  Result := TSelectSQLParser.Create(self,FBaseSQLSelect);
+  Result := TSelectSQLParser.Create(FBaseSQLSelect);
+  if Database <> nil then
+    Result.SQLDialect := Database.SQLDialect;
+  Result.OnGetFieldPosition := GetFieldPosition;
   Result.OnSQLChanging := SQLChanging
 end;
 
@@ -3073,6 +3012,8 @@ begin
     FGeneratorField.Database := Value;
     if Assigned(FUpdateObject) then
       FUpdateObject.DatabaseChanged;
+    if Assigned(FParser) then
+      FParser.SQLDialect := Database.SQLDialect;
   end;
 end;
 

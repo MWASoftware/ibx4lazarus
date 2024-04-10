@@ -26,6 +26,7 @@
 unit IBDynamicInterfaces;
 
 {$mode objfpc}{$H+}
+{$interfaces corba}
 
 interface
 
@@ -37,6 +38,10 @@ uses
   IBControls package to be independent of the IBX package. These interfaces
   are provided by IBX but may also be provided by other database adapters for
   Firebird and other databases.
+
+  Note the use of CORBA interfaces. In this mode, the interface is not a
+  managed type. Any objects providing such an interface must be both
+  explicitly created and destroyed.
 }
 
 {
@@ -55,7 +60,7 @@ type
    must provide the IDynamicSQLComponent. Otherwise an exception is raised
    when RegisterDynamicComponent is called.}
 
-  IDynamicSQLDataset = interface(IUnknown)
+  IDynamicSQLDataset = interface
   ['{c94afb6a-a28d-4b2b-b62e-8611816cf21e}']
     procedure RegisterDynamicComponent(aComponent: TComponent);
     procedure UnRegisterDynamicComponent(aComponent: TComponent);
@@ -81,11 +86,11 @@ type
   IDynamicSQLEditor = interface
   ['{3367a89a-4059-49c5-b25f-3ff0fa4f3d55}']
     procedure OrderBy(fieldname: string; ascending: boolean);
-    procedure Add2WhereClause(Condition: string; OrClause: boolean=false);
+    procedure Add2WhereClause(const Condition: string; OrClause: boolean=false; IncludeUnions: boolean = false);
     function QuoteIdentifierIfNeeded(const s: string): string;
     function SQLSafeString(const s: string): string;
     function GetOrderByClause: string;
-    procedure SetOrderByClause(Value: string);
+    procedure SetOrderByClause(const Value: string);
   end;
 
   {The IDynamicSQLParam interface is provided by a Dynamic SQL Dataset. This allows
@@ -152,7 +157,7 @@ begin
   Result := false;
   if Dataset <> nil then
   begin
-    (DataSet as IUnknown).QueryInterface(IDynamicSQLDataset,obj);
+    DataSet.GetInterface(IDynamicSQLDataset,obj);
     Result := obj <> nil;
   end
   else
@@ -166,7 +171,7 @@ begin
   Result := false;
   if aComponent <> nil then
   begin
-    (aComponent as IUnknown).QueryInterface(IDynamicSQLComponent,obj);
+    aComponent.GetInterface(IDynamicSQLComponent,obj);
     Result := obj <> nil;
   end
   else

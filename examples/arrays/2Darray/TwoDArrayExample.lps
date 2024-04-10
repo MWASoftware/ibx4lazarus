@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="68">
+    <Units Count="72">
       <Unit0>
         <Filename Value="TwoDArrayExample.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="79"/>
       </Unit0>
       <Unit1>
         <Filename Value="Unit1.pas"/>
@@ -20,9 +20,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="36"/>
-        <CursorPos X="26" Y="56"/>
-        <UsageCount Value="78"/>
+        <TopLine Value="18"/>
+        <CursorPos X="9" Y="35"/>
+        <UsageCount Value="79"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -305,14 +305,15 @@
       <Unit40>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="256"/>
+        <TopLine Value="578"/>
+        <CursorPos X="23" Y="597"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
-          <TopLine Value="578"/>
-          <CursorPos X="23" Y="597"/>
+          <TopLine Value="16"/>
+          <CursorPos X="26" Y="34"/>
         </ExtraEditor1>
-        <UsageCount Value="19"/>
+        <UsageCount Value="20"/>
       </Unit40>
       <Unit41>
         <Filename Value="../../../../../lcl/grids.pas"/>
@@ -487,9 +488,9 @@
       <Unit65>
         <Filename Value="../../../runtime/nongui/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2656"/>
-        <CursorPos X="3" Y="2659"/>
-        <UsageCount Value="13"/>
+        <TopLine Value="2517"/>
+        <CursorPos X="32" Y="2531"/>
+        <UsageCount Value="14"/>
       </Unit65>
       <Unit66>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-base/src/syncobjs.pp"/>
@@ -503,6 +504,34 @@
         <EditorIndex Value="-1"/>
         <UsageCount Value="10"/>
       </Unit67>
+      <Unit68>
+        <Filename Value="../../../runtime/nongui/IBDynamicInterfaces.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="76"/>
+        <CursorPos X="37" Y="85"/>
+        <UsageCount Value="11"/>
+      </Unit68>
+      <Unit69>
+        <Filename Value="../../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="564"/>
+        <CursorPos X="17" Y="579"/>
+        <UsageCount Value="10"/>
+      </Unit69>
+      <Unit70>
+        <Filename Value="../../../ibcontrols/IBTreeView.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="90"/>
+        <CursorPos X="14" Y="122"/>
+        <UsageCount Value="10"/>
+      </Unit70>
+      <Unit71>
+        <Filename Value="../../../runtime/nongui/IBSQLParser.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="94"/>
+        <CursorPos X="108" Y="108"/>
+        <UsageCount Value="10"/>
+      </Unit71>
     </Units>
     <JumpHistory HistoryIndex="-1"/>
     <RunParams>

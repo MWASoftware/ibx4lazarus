@@ -576,7 +576,7 @@ begin
     else
       FilterText := Text;
 
-    with Sender as IDynamicSQLEditor do
+    with Sender do
     begin
       if cbactSearchCaseSensitive in AutoCompleteText then
         Add2WhereClause(GetRelationNameQualifier + QuoteIdentifierIfNeeded(ListField) + ' Like ''' +

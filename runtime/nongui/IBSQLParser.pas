@@ -31,7 +31,7 @@ unit IBSQLParser;
 
 interface
 
-uses Classes, DB, IBUtils;
+uses Classes, DB, IBUtils, IBDynamicInterfaces;
 
 {
   The SQL Parser is a partial SQL Parser intended to parser a Firebird DML (Select)
@@ -81,6 +81,7 @@ type
 
       TSQLStates = set of TSQLState;
   private
+    FSQLDialect : integer;
     FSQLState: TSQLState;
     FNested: integer;
     FNextToken: TSQLTokens;
@@ -101,11 +102,14 @@ type
     procedure Clear; virtual;
     property ParamList: TStrings read FParamList;
     property NotaSelectStmt: boolean read GetNotaSelectStmt;
+    property SQLDialect: integer read FSQLDialect write FSQLDialect;
   end;
+
+  TFieldPositionEvent = procedure(Sender: TObject; FieldName: string; var FieldPosition: integer) of object;
 
   { TSelectSQLParser }
 
-  TSelectSQLParser = class(TSelectSQLTokeniser)
+  TSelectSQLParser = class(TSelectSQLTokeniser,IDynamicSQLEditor)
   public
     type
       PCTEDef = ^TCTEDef;
@@ -116,7 +120,8 @@ type
       end;
 
   private
-    FDataSet: TDataSet;
+    FDataSet : TDataSet;
+    FOnGetFieldPosition : TFieldPositionEvent;
     FOwner: TSelectSQLParser;
     FOnSQLChanging: TNotifyEvent;
     FDestroying: boolean;
@@ -150,7 +155,6 @@ type
     procedure FlushCTEs;
     function GetSQLText: string;
     procedure SetSelectClause(const Value: string);
-    procedure SetOrderByClause(const Value: string);
     procedure SetGroupClause(const Value: string);
     procedure SetFromClause(const Value: string);
   protected
@@ -158,24 +162,31 @@ type
     procedure Assign(source: TSQLTokeniser); override;
     procedure Changed;
     function GetChar: char; override;
+    function GetFieldPosition(AliasName: string): integer;
   public
-    constructor Create(aDataSet: TDataSet; SQLText: TStrings); overload;
-    constructor Create(aDataSet: TDataSet; const SQLText: string); overload;
+    constructor Create(SQLText: TStrings); overload;
+    constructor Create(const SQLText: string); overload;
     destructor Destroy; override;
-    procedure Add2WhereClause(const Condition: string; OrClause: boolean=false;
-      IncludeUnions: boolean = false);
     procedure Add2HavingClause(const Condition: string; OrClause: boolean=false;
       IncludeUnions: boolean = false);
     procedure Clear; override;
     procedure DropUnion;
-    function GetFieldPosition(AliasName: string): integer;
     procedure ResetWhereClause;
     procedure ResetHavingClause;
     procedure ResetOrderByClause;
     procedure RestoreClauseValues;
+  public
+    {IDynamicSQLEditor}
+    procedure OrderBy(fieldname: string; ascending: boolean);
+    procedure Add2WhereClause(const Condition: string; OrClause: boolean=false;
+      IncludeUnions: boolean = false);
+    function QuoteIdentifierIfNeeded(const s: string): string;
+    function SQLSafeString(const s: string): string;
+    function GetOrderByClause: string;
+    procedure SetOrderByClause(const Value: string);
+  public
     property CTEs[Index: integer]: PCTEDef read GetCTE;
     property CTECount: integer read GetCTECount;
-    property DataSet: TDataSet read FDataSet;
     property SelectClause: string read FSelectClause write SetSelectClause;
     property FromClause: string read FFromClause write SetFromClause;
     property GroupClause: string read FGroupClause write SetGroupClause;
@@ -189,13 +200,14 @@ type
     property UnionAll: boolean read FUnionAll write FUnionAll;
              {When true this is joined by "Union All" to the parent Select}
     property OnSQLChanging: TNotifyEvent read FOnSQLChanging write FOnSQLChanging;
+    property OnGetFieldPosition: TFieldPositionEvent read FOnGetFieldPosition write FOnGetFieldPosition;
   end;
 
   TFilterCallback = procedure(Parser: TSelectSQLParser; Key: integer) of object;
 
 implementation
 
-uses Sysutils, IBCustomDataSet, IBMessages;
+uses Sysutils, IBMessages;
 
 { TSelectSQLParser }
 
@@ -377,7 +389,6 @@ begin
   FOwner := aOwner;
   if assigned(FOwner) then
   begin
-    FDataSet := FOwner.DataSet;
     {copy state}
     Assign(aOwner);
   end;
@@ -414,20 +425,18 @@ begin
     Result := #0;
 end;
 
-constructor TSelectSQLParser.Create(aDataSet: TDataSet; SQLText: TStrings);
+constructor TSelectSQLParser.Create(SQLText: TStrings);
 begin
-  FDataSet := aDataSet;
   FInString := SQLText.Text;
   FIndex := 1;
-  Create(nil);
+  Create(TSelectSQLParser(nil));
 end;
 
-constructor TSelectSQLParser.Create(aDataSet: TDataSet; const SQLText: string);
+constructor TSelectSQLParser.Create(const SQLText: string);
 begin
-  FDataSet := aDataSet;
   FInString := SQLText;
   FIndex := 1;
-  Create(nil);
+  Create(TSelectSQLParser(nil));
 end;
 
 destructor TSelectSQLParser.Destroy;
@@ -499,10 +508,9 @@ end;
 
 function TSelectSQLParser.GetFieldPosition(AliasName: string): integer;
 begin
-  if assigned(FDataSet) and (FDataSet is TIBCustomDataSet) then
-    Result := TIBCustomDataSet(FDataSet).GetFieldPosition(AliasName)
-  else
-    Result := 0;
+  Result := 0;
+  if assigned(FOnGetFieldPosition) then
+    OnGetFieldPosition(self,AliasName,Result);
 end;
 
 procedure TSelectSQLParser.ResetWhereClause;
@@ -534,6 +542,34 @@ begin
  ResetWhereClause;
  ResetHavingClause;
  ResetOrderByClause
+end;
+
+procedure TSelectSQLParser.OrderBy(fieldname : string; ascending : boolean);
+var FieldPosition: integer;
+begin
+  FieldPosition := GetFieldPosition(fieldname);
+  if FieldPosition > 0 then
+   begin
+     if ascending then
+       OrderByClause := IntToStr(FieldPosition) + ' asc'
+     else
+       OrderByClause := IntToStr(FieldPosition) + ' desc';
+   end;
+end;
+
+function TSelectSQLParser.QuoteIdentifierIfNeeded(const s : string) : string;
+begin
+   Result := IBUtils.QuoteIdentifierIfNeeded(SQLDialect,s);
+end;
+
+function TSelectSQLParser.SQLSafeString(const s : string) : string;
+begin
+  Result := IBUtils.SQLSafeString(s);
+end;
+
+function TSelectSQLParser.GetOrderByClause : string;
+begin
+  Result := FOrderByClause;
 end;
 
 { TSelectSQLTokeniser }

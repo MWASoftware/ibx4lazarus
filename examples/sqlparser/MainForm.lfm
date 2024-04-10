@@ -8,14 +8,13 @@ object Form1: TForm1
   ClientWidth = 854
   DefaultMonitor = dmPrimary
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '2.2.0.2'
   object Label1: TLabel
     Left = 14
-    Height = 14
+    Height = 15
     Top = 24
     Width = 74
     Caption = 'Original SQL'
-    ParentColor = False
   end
   object OriginalSQL: TMemo
     Left = 16
@@ -27,11 +26,10 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 16
-    Height = 14
+    Height = 15
     Top = 208
     Width = 126
     Caption = 'Add to Where Clause'
-    ParentColor = False
   end
   object WhereCondition: TEdit
     Left = 17
@@ -73,11 +71,10 @@ object Form1: TForm1
   end
   object Label3: TLabel
     Left = 440
-    Height = 14
+    Height = 15
     Top = 24
     Width = 91
     Caption = 'Generated SQL'
-    ParentColor = False
   end
   object GeneratedSQL: TMemo
     Left = 440
@@ -98,11 +95,10 @@ object Form1: TForm1
   end
   object Label4: TLabel
     Left = 14
-    Height = 14
+    Height = 15
     Top = 360
     Width = 129
     Caption = 'Add to Having Clause'
-    ParentColor = False
   end
   object HavingCondition: TEdit
     Left = 15
@@ -143,11 +139,10 @@ object Form1: TForm1
   end
   object Label5: TLabel
     Left = 15
-    Height = 14
+    Height = 15
     Top = 520
-    Width = 178
+    Width = 179
     Caption = 'Replacement Order By Clause'
-    ParentColor = False
   end
   object OrderBy: TEdit
     Left = 16
