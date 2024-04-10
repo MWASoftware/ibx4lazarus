@@ -1716,7 +1716,7 @@ begin
   if (FDynamicComponents.Count > 0) or SQLFIltered then
   begin
     if not HasParser then
-        CreateParser;
+        FParser := CreateParser;
     Parser.RestoreClauseValues;
     if SQLFiltered then
       for i := 0 to SQLFilterParams.Count - 1 do

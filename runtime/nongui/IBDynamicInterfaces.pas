@@ -159,10 +159,9 @@ begin
   begin
     DataSet.GetInterface(IDynamicSQLDataset,obj);
     Result := obj <> nil;
+    if not Result and RaiseException then
+      raise Exception.CreateFmt(sNoIDynamicSQLDataset,[Dataset.Name])
   end
-  else
-  if RaiseException then
-    raise Exception.CreateFmt(sNoIDynamicSQLDataset,[Dataset.Name])
 end;
 
 function ProvidesIDynamicSQLComponent(aComponent: TComponent; RaiseException:boolean): boolean;
@@ -173,10 +172,9 @@ begin
   begin
     aComponent.GetInterface(IDynamicSQLComponent,obj);
     Result := obj <> nil;
+    if not Result and RaiseException then
+      raise Exception.CreateFmt(sNoIDynamicSQLComponent,[aComponent.Name])
   end
-  else
-  if RaiseException then
-    raise Exception.CreateFmt(sNoIDynamicSQLComponent,[aComponent.Name])
 end;
 
 function ProvidesIArrayFieldDef(aFieldDef: TFieldDef; RaiseException : boolean
@@ -188,10 +186,9 @@ begin
   begin
     aFieldDef.GetInterface(IArrayFieldDef,obj);
     Result := obj <> nil;
+    if not Result and RaiseException then
+      raise Exception.CreateFmt(sNoIArrayFieldDef,[aFieldDef.Name])
   end
-  else
-  if RaiseException then
-    raise Exception.CreateFmt(sNoIArrayFieldDef,[aFieldDef.Name])
 end;
 
 function ProvidesIArrayField(aField : TField; RaiseException : boolean
@@ -203,10 +200,9 @@ begin
   begin
     aField.GetInterface(IArrayField,obj);
     Result := obj <> nil;
+    if not Result and RaiseException then
+      raise Exception.CreateFmt(sNoIArrayField,[aField.Name])
   end
-  else
-  if RaiseException then
-    raise Exception.CreateFmt(sNoIArrayField,[aField.Name])
 end;
 
 end.
