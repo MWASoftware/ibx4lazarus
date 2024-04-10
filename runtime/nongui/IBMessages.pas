@@ -168,7 +168,6 @@ type
       ibxeODSVersionRequired,
       ibxErrorParsing,
       ibxeParameterNameNotFound,
-      ibxeListFieldNotFound,
       ibxeDBBufferTooSmall,
       ibxeBadDateTimeTZString,
       ibxeUnknownSQLType,
@@ -334,7 +333,6 @@ resourcestring
   SODSVersionRequired = 'This feature requires ODS Version %s or later';
   SErrorParsing = 'Error parsing SQL Statement at clause starting with %s';
   SParameterNameNotFound = 'Parameter Name (%s) not found';
-  SListFieldNotFound = 'ListField Name is not a valid dataset column name (%s)';
   SDBBufferTooSmall = 'Dataset buffer is too small (%d) to receive the data from Field %s (%d)';
   SBadDateTimeTZString = 'Unable to parse Date/Time Time Zone string "%s"';
   SUnknownSQLType = 'Unknown SQL Type (%d)';

@@ -69,8 +69,6 @@ function VarToStrIntList(a: TVariantArray): string;
 
 implementation
 
-uses IBQuery;
-
 function StrIntListToVar(s: string): TVariantArray;
 begin
   Result := DBTreeView.StrIntListToVar(s);
@@ -82,7 +80,6 @@ begin
 end;
 
 
-{ TIBTreeViewControlLink }
 
 procedure TIBTreeView.DataSourceChanged;
 begin

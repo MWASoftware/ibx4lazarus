@@ -1,22 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <Package Version="5">
-    <Name Value="ibcontrols"/>
-    <Type Value="RunAndDesignTime"/>
+    <Name Value="ibinterfaces"/>
     <Author Value="Tony Whyman"/>
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
-        <OtherUnitFiles Value="ibcontrols"/>
-        <UnitOutputDirectory Value="ibcontrols/lib/$(TargetCPU)-$(TargetOS)"/>
+        <OtherUnitFiles Value="ibinterfaces"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)/"/>
       </SearchPaths>
-      <Other>
-        <CompilerMessages>
-          <IgnoredMessages idx5024="True"/>
-        </CompilerMessages>
-      </Other>
     </CompilerOptions>
-    <Description Value="Data and IBX Aware controls"/>
+    <Description Value="ibinterfaces provides the IBDynamicInterfaces unit. This declares the interface between the ibcontrols and a dataset provider of the IBDynamic interface (e.g. IBQuery, IBDataset)."/>
     <License Value="      Initial Developer&apos;s PUBLIC LICENSE
                Version 1.0 
 
@@ -513,50 +507,23 @@
    All Rights Reserved.
 
    Contributor(s): ______________________________________. "/>
-    <Version Major="2" Minor="6" Release="4" Build="9999"/>
-    <Files Count="6">
-      <Item1>
-        <Filename Value="ibcontrols/IBLookupComboEditBox.pas"/>
-        <UnitName Value="IBLookupComboEditBox"/>
-      </Item1>
-      <Item2>
-        <Filename Value="ibcontrols/IBDynamicGrid.pas"/>
-        <UnitName Value="IBDynamicGrid"/>
-      </Item2>
-      <Item3>
-        <Filename Value="ibcontrols/IBTreeView.pas"/>
-        <UnitName Value="IBTreeView"/>
-      </Item3>
-      <Item4>
-        <Filename Value="ibcontrols/DBControlGrid.pas"/>
-        <UnitName Value="DBControlGrid"/>
-      </Item4>
-      <Item5>
-        <Filename Value="ibcontrols/IBArrayGrid.pas"/>
-        <UnitName Value="IBArrayGrid"/>
-      </Item5>
-      <Item6>
-        <Filename Value="ibcontrols/DBTreeView.pas"/>
-        <UnitName Value="DBTreeView"/>
-      </Item6>
+    <Files>
+      <Item>
+        <Filename Value="ibinterfaces/IBDynamicInterfaces.pas"/>
+        <UnitName Value="IBDynamicInterfaces"/>
+      </Item>
     </Files>
-    <CompatibilityMode Value="True"/>
-    <RequiredPkgs Count="3">
-      <Item1>
-        <PackageName Value="ibinterfaces"/>
-      </Item1>
-      <Item2>
-        <PackageName Value="LCL"/>
-      </Item2>
-      <Item3>
+    <RequiredPkgs>
+      <Item>
         <PackageName Value="FCL"/>
-      </Item3>
+      </Item>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
     </UsageOptions>
     <PublishOptions>
       <Version Value="2"/>
+      <UseFileFilters Value="True"/>
     </PublishOptions>
   </Package>
 </CONFIG>

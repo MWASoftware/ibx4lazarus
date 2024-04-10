@@ -155,7 +155,11 @@ type
 
 implementation
 
-uses Variants, LCLProc, LazUTF8, IBUtils, IBMessages;
+uses Variants, LCLProc, LazUTF8;
+
+resourcestring
+  ibxeListFieldNotFound = 'ListField Name is not a valid dataset column name (%s)';
+
 
 { TIBLookupComboDataLink }
 
@@ -413,7 +417,7 @@ begin
       if FieldNames.IndexOf(AnsiUpperCase(ListField)) <> - 1 then {normalise to upper case}
         ListField := AnsiUpperCase(ListField)
       else
-        IBError(ibxeListFieldNotFound,[ListField])
+        raise Exception.CreateFmt(ibxeListFieldNotFound,[ListField])
     end;
   finally
     FieldNames.Free;

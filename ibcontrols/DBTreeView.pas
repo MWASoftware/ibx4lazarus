@@ -241,6 +241,9 @@ implementation
 
 uses Variants;
 
+resourcestring
+  sOrdinalTypeNotFound = 'Ordinal Type Expected when converting to integer string';
+
 function StrIntListToVar(s: string): TVariantArray;
 var i, idx: integer;
     List: TStringList;
@@ -272,7 +275,7 @@ begin
           Result := Result + ';' + IntToStr(a[i])
       end
       else
-        raise Exception.Create('Ordinal Type Expected when converting to integer string');
+        raise Exception.Create(sOrdinalTypeNotFound);
 end;
 
 { TDBTreeNode }
