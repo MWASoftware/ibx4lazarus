@@ -191,6 +191,8 @@ object Form1: TForm1
       EditorBorderStyle = bsSingle
       DefaultPositionAtEnd = False
       IndexFieldNames = 'EMP_NO'
+      OnUpdateSQL = IBDynamicGrid1UpdateSQL
+      OnSetParams = IBDynamicGrid1SetParams
     end
     object Panel2: TPanel
       Left = 0

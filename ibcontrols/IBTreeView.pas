@@ -48,15 +48,20 @@ type
   private
     { Private declarations }
     FCurDataset: TDataSet; {reference to Dataset on last call to DataSetChanged}
+    FOnSetParams : TOnSetParams;
+    FOnUpdateSQL : TOnUpdateSQL;
    protected
      procedure DataSourceChanged; override;
      procedure RefreshDataset; override;
      {IDynamicSQLComponent}
-     procedure UpdateSQL(Sender: IDynamicSQLEditor);
-     procedure SetParams(Sender: IDynamicSQLParam);
+     procedure UpdateSQL(SQLEditor: IDynamicSQLEditor);
+     procedure SetParams(SQLParamProvider: IDynamicSQLParam);
   public
     { Public declarations }
     destructor Destroy; override;
+  published
+    property OnUpdateSQL: TOnUpdateSQL read FOnUpdateSQL write FOnUpdateSQL;
+    property OnSetParams: TOnSetParams read FOnSetParams write FOnSetParams;
   end;
 
 function StrIntListToVar(s: string): TVariantArray;
@@ -100,9 +105,9 @@ begin
   DataSet.Active := true;
 end;
 
-procedure TIBTreeView.UpdateSQL(Sender : IDynamicSQLEditor);
+procedure TIBTreeView.UpdateSQL(SQLEditor : IDynamicSQLEditor);
 begin
-  with Sender do
+  with SQLEditor do
   if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
     Add2WhereClause(GetRelationNameQualifier + '"' + KeyField + '" = :IBX_KEY_VALUE')
   else
@@ -115,16 +120,21 @@ begin
     Add2WhereClause(GetRelationNameQualifier + '"' + ParentField + '" = :IBX_PARENT_VALUE');
     Add2WhereClause(GetRelationNameQualifier + '"' + KeyField + '" = :IBX_PARENT_VALUE',true);
   end;
+  if assigned(FOnUpdateSQL) then
+    OnUpdateSQL(self,SQLEditor);
 end;
 
-procedure TIBTreeView.SetParams(Sender : IDynamicSQLParam);
+procedure TIBTreeView.SetParams(SQLParamProvider : IDynamicSQLParam);
 begin
-  with Sender do
+  with SQLParamProvider do
   if not assigned(FExpandNode) and assigned(FUpdateNode)  then {Scrolling dataset}
     SetParamValue('IBX_KEY_VALUE',FUpdateNode.KeyValue)
   else
   if assigned(FExpandNode) then
     SetParamValue('IBX_PARENT_VALUE',TDBTreeNode(FExpandNode).KeyValue);
+
+  if assigned(FOnSetParams) then
+    OnSetParams(self, SQLParamProvider);
 end;
 
 destructor TIBTreeView.Destroy;

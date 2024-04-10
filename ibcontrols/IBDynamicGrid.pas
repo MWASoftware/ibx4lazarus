@@ -241,6 +241,7 @@ end;
     FAllowColumnSort: boolean;
     FOnColumnHeaderClick: TOnColumnHeaderClick;
     FOnRestorePosition: TOnRestorePosition;
+    FOnSetParams : TOnSetParams;
     FOnUpdateSortOrder: TOnUpdateSortOrder;
     FDefaultPositionAtEnd: boolean;
     FDescending: boolean;
@@ -252,6 +253,7 @@ end;
     FDBLookupCellEditor: TDBLookupCellEditor;
     FActive: boolean;
     FCurDataset: TDataSet; {reference to Dataset on last call to DataSetChanged}
+    FOnUpdateSQL : TOnUpdateSQL;
     procedure ColumnHeaderClick(Index: integer);
     function GetDataSet : TDataSet;
     function GetDataSource: TDataSource;
@@ -277,8 +279,8 @@ end;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure UpdateActive; override;
     {IDynamicSQLComponent}
-    procedure UpdateSQL(Sender: IDynamicSQLEditor);
-    procedure SetParams(Sender: IDynamicSQLParam);
+    procedure UpdateSQL(SQLEditor: IDynamicSQLEditor);
+    procedure SetParams(SQLParamProvider: IDynamicSQLParam);
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
@@ -297,6 +299,8 @@ end;
     property OnColumnHeaderClick: TOnColumnHeaderClick read FOnColumnHeaderClick write FOnColumnHeaderClick;
     property OnRestorePosition: TOnRestorePosition read FOnRestorePosition write FOnRestorePosition;
     property OnUpdateSortOrder: TOnUpdateSortOrder read FOnUpdateSortOrder write FOnUpdateSortOrder;
+    property OnUpdateSQL: TOnUpdateSQL read FOnUpdateSQL write FOnUpdateSQL;
+    property OnSetParams: TOnSetParams read FOnSetParams write FOnSetParams;
  end;
 
 implementation
@@ -1232,22 +1236,26 @@ begin
    SavePosition;
 end;
 
-procedure TIBDynamicGrid.UpdateSQL(Sender : IDynamicSQLEditor);
+procedure TIBDynamicGrid.UpdateSQL(SQLEditor : IDynamicSQLEditor);
 var OrderBy: string;
 begin
-  Sender.OrderBy(Columns[FLastColIndex].FieldName,not Descending);
+  SQLEditor.OrderBy(Columns[FLastColIndex].FieldName,not Descending);
 
  if assigned(FOnUpdateSortOrder) then
  begin
-   OrderBy := Sender.GetOrderByClause;
+   OrderBy := SQLEditor.GetOrderByClause;
    OnUpdateSortOrder(self,FLastColIndex,OrderBy);
-   Sender.SetOrderByClause(OrderBy);
- end
+   SQLEditor.SetOrderByClause(OrderBy);
+ end;
+
+ if assigned(FOnUpdateSQL) then
+   OnUpdateSQL(self,SQLEditor);
 end;
 
-procedure TIBDynamicGrid.SetParams(Sender : IDynamicSQLParam);
+procedure TIBDynamicGrid.SetParams(SQLParamProvider : IDynamicSQLParam);
 begin
-
+  if assigned(FOnSetParams) then
+    OnSetParams(self, SQLParamProvider);
 end;
 
 constructor TIBDynamicGrid.Create(TheComponent: TComponent);

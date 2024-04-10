@@ -116,9 +116,15 @@ type
 
   IDynamicSQLComponent = interface
   ['{4814f5fd-9292-4028-afde-0106ed00ef84}']
-    procedure UpdateSQL(Sender: IDynamicSQLEditor);
-    procedure SetParams(Sender: IDynamicSQLParam);
+    procedure UpdateSQL(SQLEditor: IDynamicSQLEditor);
+    procedure SetParams(SQLParamProvider: IDynamicSQLParam);
   end;
+
+  {The following two types are used, when required, to support component events
+   called by an IDynamicSQLComponent provider}
+
+  TOnUpdateSQL = procedure(Sender: TObject; SQLEditor: IDynamicSQLEditor) of object;
+  TOnSetParams = procedure(Sender: TObject; SQLParamProvider: IDynamicSQLParam) of object;
 
   {The IArrayField interface provides access to a TField instance that is for
    an array field.

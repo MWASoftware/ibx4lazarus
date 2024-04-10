@@ -34,7 +34,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, DBGrids,
   StdCtrls, ActnList, EditBtn, DbCtrls, ExtCtrls, Buttons, IBDatabase, IBQuery,
   IBCustomDataSet, IBUpdateSQL, IBDynamicGrid, IBLookupComboEditBox,
-  db, DBExtCtrls;
+  db, DBExtCtrls, IBDynamicInterfaces;
 
 type
 
@@ -127,6 +127,10 @@ type
     IBDatabase1: TIBDatabase;
     IBTransaction1: TIBTransaction;
     procedure EmployeesValidatePost(Sender: TObject; var CancelPost: boolean);
+    procedure IBDynamicGrid1SetParams(Sender : TObject;
+      SQLParamProvider : IDynamicSQLParam);
+    procedure IBDynamicGrid1UpdateSQL(Sender : TObject;
+      SQLEditor : IDynamicSQLEditor);
     procedure JobCodeChangeTimerTimer(Sender: TObject);
     procedure JobGradeChangeTimerTimer(Sender: TObject);
     procedure JobGradeDBComboBoxCloseUp(Sender: TObject);
@@ -249,6 +253,33 @@ begin
   CancelPost := (EmployeesLAST_NAME.AsString = sNoName) and  (EmployeesFIRST_NAME.AsString = sNoName);
 end;
 
+procedure TForm1.IBDynamicGrid1SetParams(Sender : TObject;
+  SQLParamProvider : IDynamicSQLParam);
+begin
+  if BeforeDate.Date <> NullDate then
+     SQLParamProvider.SetParamValue('BeforeDate',BeforeDate.Date);
+  if AfterDate.Date <> NullDate then
+   SQLParamProvider.SetParamValue('AfterDate',AfterDate.Date);
+end;
+
+procedure TForm1.IBDynamicGrid1UpdateSQL(Sender : TObject;
+  SQLEditor : IDynamicSQLEditor);
+begin
+   if BeforeDate.Date <> NullDate then
+     SQLEditor.Add2WhereClause('HIRE_DATE < :BeforeDate');
+  if AfterDate.Date <> NullDate then
+     SQLEditor.Add2WhereClause('HIRE_DATE > :AfterDate');
+
+  case SalaryRange.ItemIndex of
+  1:
+    SQLEditor.Add2WhereClause('Salary < 40000');
+  2:
+    SQLEditor.Add2WhereClause('Salary >= 40000 and Salary < 100000');
+  3:
+    SQLEditor.Add2WhereClause('Salary >= 100000');
+  end;
+end;
+
 procedure TForm1.JobCodeChangeTimerTimer(Sender: TObject);
 begin
   Countries.Active := false;
@@ -336,29 +367,6 @@ end;
 
 procedure TForm1.EmployeesBeforeOpen(DataSet: TDataSet);
 begin
-  if BeforeDate.Date <> NullDate then
-     (DataSet as TIBParserDataSet).Parser.Add2WhereClause('HIRE_DATE < :BeforeDate');
-  if AfterDate.Date <> NullDate then
-     (DataSet as TIBParserDataSet).Parser.Add2WhereClause('HIRE_DATE > :AfterDate');
-
-
-  case SalaryRange.ItemIndex of
-  1:
-    (DataSet as TIBParserDataSet).Parser.Add2WhereClause('Salary < 40000');
-  2:
-    (DataSet as TIBParserDataSet).Parser.Add2WhereClause('Salary >= 40000 and Salary < 100000');
-  3:
-    (DataSet as TIBParserDataSet).Parser.Add2WhereClause('Salary >= 100000');
-  end;
-
-
-
-  {Parameter value must be set after all SQL changes have been made}
-  if BeforeDate.Date <> NullDate then
-     (DataSet as TIBParserDataSet).ParamByName('BeforeDate').AsDateTime := BeforeDate.Date;
-  if AfterDate.Date <> NullDate then
-   (DataSet as TIBParserDataSet).ParamByName('AfterDate').AsDateTime := AfterDate.Date;
-
 end;
 
 procedure TForm1.EmployeesJOB_CODEChange(Sender: TField);

@@ -73,6 +73,8 @@ type
     FAutoInsert: boolean;
     FKeyPressInterval: integer;
     FOnCanAutoInsert: TCanAutoInsert;
+    FOnSetParams : TOnSetParams;
+    FOnUpdateSQL : TOnUpdateSQL;
     FRelationName: string;
     FTimer: TTimer;
     FFiltered: boolean;
@@ -125,8 +127,8 @@ type
     procedure UpdateShowing; override;
     procedure UpdateData(Sender: TObject); override;
     {IDynamicSQLComponent}
-    procedure UpdateSQL(Sender: IDynamicSQLEditor);
-    procedure SetParams(Sender: IDynamicSQLParam);
+    procedure UpdateSQL(SQLEditor: IDynamicSQLEditor);
+    procedure SetParams(SQLParamProvider: IDynamicSQLParam);
   public
     { Public declarations }
     constructor Create(TheComponent: TComponent); override;
@@ -146,6 +148,8 @@ type
     property RelationName: string read FRelationName write FRelationName;
     property OnAutoInsert: TAutoInsert read FOnAutoInsert write FOnAutoInsert;
     property OnCanAutoInsert: TCanAutoInsert read FOnCanAutoInsert write FOnCanAutoInsert;
+    property OnUpdateSQL: TOnUpdateSQL read FOnUpdateSQL write FOnUpdateSQL;
+    property OnSetParams: TOnSetParams read FOnSetParams write FOnSetParams;
   end;
 
 
@@ -566,7 +570,7 @@ begin
   FModified := false;
 end;
 
-procedure TIBLookupComboEditBox.UpdateSQL(Sender : IDynamicSQLEditor);
+procedure TIBLookupComboEditBox.UpdateSQL(SQLEditor : IDynamicSQLEditor);
 var FilterText: string;
 begin
   if FFiltered then
@@ -576,7 +580,7 @@ begin
     else
       FilterText := Text;
 
-    with Sender do
+    with SQLEditor do
     begin
       if cbactSearchCaseSensitive in AutoCompleteText then
         Add2WhereClause(GetRelationNameQualifier + QuoteIdentifierIfNeeded(ListField) + ' Like ''' +
@@ -589,11 +593,14 @@ begin
         Orderby(ListField,true);
     end;
   end;
+  if assigned(FOnUpdateSQL) then
+    OnUpdateSQL(self,SQLEditor);
 end;
 
-procedure TIBLookupComboEditBox.SetParams(Sender : IDynamicSQLParam);
+procedure TIBLookupComboEditBox.SetParams(SQLParamProvider : IDynamicSQLParam);
 begin
-
+  if assigned(FOnSetParams) then
+    OnSetParams(self, SQLParamProvider);
 end;
 
 

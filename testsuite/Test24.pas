@@ -243,7 +243,7 @@ var i: integer;
 begin
   for i := 0 to Length(TestStrings) -1 do
   begin
-    parser :=  TSelectSQLParser.Create(nil,TestStrings[i]);
+    parser :=  TSelectSQLParser.Create(TestStrings[i]);
     try
     with parser do
     begin
