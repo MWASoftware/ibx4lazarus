@@ -24,6 +24,7 @@
  *
 *)
 
+{$interfaces corba}
 
 {
   The purpose of these interfaces is to define a set of interfaces that permit the

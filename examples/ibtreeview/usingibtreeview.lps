@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="62">
+    <Units Count="67">
       <Unit0>
         <Filename Value="usingibtreeview.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -322,7 +322,7 @@
       </Unit46>
       <Unit47>
         <Filename Value="../../ibcontrols/DBTreeView.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="348"/>
         <CursorPos Y="364"/>
         <UsageCount Value="13"/>
@@ -406,10 +406,9 @@
       </Unit58>
       <Unit59>
         <Filename Value="../../include/IBDynamicInterfaces.inc"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <CursorPos Y="16"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit59>
       <Unit60>
         <Filename Value="../../runtime/gui/IBDialogs.pas"/>
@@ -423,13 +422,46 @@
         <Filename Value="../../runtime/nongui/IBInternals.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="82"/>
-        <CursorPos X="47" Y="96"/>
+        <TopLine Value="103"/>
+        <CursorPos X="5" Y="128"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit61>
+      <Unit62>
+        <Filename Value="../../include/IBDynamicInterfacesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="94"/>
+        <CursorPos Y="28"/>
+        <UsageCount Value="10"/>
+      </Unit62>
+      <Unit63>
+        <Filename Value="../../ibcontrols/IBDynamicInterfaces.pas"/>
+        <EditorIndex Value="7"/>
+        <CursorPos X="2" Y="10"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit63>
+      <Unit64>
+        <Filename Value="../../../fbintf/client/IB.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="139"/>
+        <UsageCount Value="10"/>
+      </Unit64>
+      <Unit65>
+        <Filename Value="../../runtime/include/IBDynamicInterfaces.inc"/>
+        <EditorIndex Value="5"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit65>
+      <Unit66>
+        <Filename Value="../../runtime/include/IBDynamicInterfacesh.inc"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="13"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit66>
     </Units>
-    <JumpHistory Count="19" HistoryIndex="18">
+    <JumpHistory Count="20" HistoryIndex="19">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="36" Column="27" TopLine="19"/>
@@ -455,57 +487,61 @@
         <Caret Line="364" TopLine="348"/>
       </Position6>
       <Position7>
-        <Filename Value="../../include/IBDynamicInterfaces.inc"/>
-        <Caret Line="11"/>
-      </Position7>
-      <Position8>
-        <Filename Value="../../include/IBDynamicInterfaces.inc"/>
-        <Caret Line="12"/>
-      </Position8>
-      <Position9>
-        <Filename Value="../../include/IBDynamicInterfaces.inc"/>
-        <Caret Line="14"/>
-      </Position9>
-      <Position10>
-        <Filename Value="../../include/IBDynamicInterfaces.inc"/>
-        <Caret Line="15"/>
-      </Position10>
-      <Position11>
-        <Filename Value="../../include/IBDynamicInterfaces.inc"/>
-        <Caret Line="16"/>
-      </Position11>
-      <Position12>
         <Filename Value="../../runtime/gui/IBDialogs.pas"/>
         <Caret Line="263" Column="35" TopLine="237"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/gui/IBDialogs.pas"/>
+        <Caret Line="59" Column="30" TopLine="45"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/nongui/IBInternals.pas"/>
+        <Caret Line="73" Column="14" TopLine="56"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/gui/IBDialogs.pas"/>
+        <Caret Line="95" Column="19" TopLine="84"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../runtime/gui/IBDialogs.pas"/>
+        <Caret Line="118" Column="3" TopLine="116"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
+        <Caret Line="1713" Column="15" TopLine="1701"/>
       </Position12>
       <Position13>
         <Filename Value="../../runtime/gui/IBDialogs.pas"/>
-        <Caret Line="59" Column="30" TopLine="45"/>
+        <Caret Line="48" Column="55" TopLine="27"/>
       </Position13>
       <Position14>
         <Filename Value="../../runtime/nongui/IBInternals.pas"/>
-        <Caret Line="73" Column="14" TopLine="56"/>
+        <Caret Line="73" Column="20" TopLine="52"/>
       </Position14>
       <Position15>
-        <Filename Value="../../runtime/gui/IBDialogs.pas"/>
-        <Caret Line="95" Column="19" TopLine="84"/>
+        <Filename Value="../../runtime/nongui/IBInternals.pas"/>
+        <Caret Line="38" Column="19" TopLine="16"/>
       </Position15>
       <Position16>
-        <Filename Value="../../runtime/gui/IBDialogs.pas"/>
-        <Caret Line="118" Column="3" TopLine="116"/>
+        <Filename Value="../../ibcontrols/IBDynamicInterfaces.pas"/>
+        <Caret Line="14" Column="5"/>
       </Position16>
       <Position17>
-        <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
-        <Caret Line="1713" Column="15" TopLine="1701"/>
+        <Filename Value="../../ibcontrols/IBDynamicInterfaces.pas"/>
+        <Caret Line="10" Column="2"/>
       </Position17>
       <Position18>
-        <Filename Value="../../runtime/gui/IBDialogs.pas"/>
-        <Caret Line="48" Column="55" TopLine="27"/>
+        <Filename Value="../../runtime/include/IBDynamicInterfacesh.inc"/>
+        <Caret TopLine="13"/>
       </Position18>
       <Position19>
-        <Filename Value="../../runtime/nongui/IBInternals.pas"/>
-        <Caret Line="73" Column="20" TopLine="52"/>
+        <Filename Value="../../ibcontrols/IBDynamicInterfaces.pas"/>
+        <Caret Line="14" Column="5"/>
       </Position19>
+      <Position20>
+        <Filename Value="../../runtime/nongui/IBInternals.pas"/>
+        <Caret Line="37" Column="5" TopLine="28"/>
+      </Position20>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

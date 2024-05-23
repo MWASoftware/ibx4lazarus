@@ -26,7 +26,6 @@
 unit IBInternals;
 
 {$mode objfpc}{$H+}
-{$interfaces corba}
 
 {Interfaces used internally and not normally made visible to users}
 
@@ -35,7 +34,8 @@ interface
 uses
   Classes, SysUtils, DB;
 
-{$I ../../include/IBDynamicInterfacesh.inc}
+{$I IBDynamicInterfacesh.inc}
+{$interfaces com}
 
 const
   sDBkeyAlias = 'IBX_INTERNAL_DBKEY'; {Special case for TIBTable support}
@@ -70,7 +70,7 @@ type
   end;
 
 
-  {$interfaces com}
+
   IIBTimerInf = interface
     ['{cf6ec1c6-e39f-4932-b244-84c70513e6b8}']
     function GetEnabled: boolean;
@@ -125,7 +125,7 @@ begin
   FTraceFlags := [];
 end;
 
-{$I ../../include/IBDynamicInterfaces.inc}
+{$I IBDynamicInterfaces.inc}
 
 end.
 

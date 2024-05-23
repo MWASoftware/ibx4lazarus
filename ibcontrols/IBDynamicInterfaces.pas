@@ -1,18 +1,17 @@
 unit IBDynamicInterfaces;
 
 {$mode objfpc}{$H+}
-{$interfaces corba}
 
 interface
 
 uses
   Classes , SysUtils, DB;
 
-{$I ../include/IBDynamicInterfacesh.inc}
+{$I IBDynamicInterfacesh.inc}
 
 implementation
 
-{$I ../include/IBDynamicInterfaces.inc}
+{$I IBDynamicInterfaces.inc}
 
 end.
 

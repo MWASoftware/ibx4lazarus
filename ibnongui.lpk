@@ -6,6 +6,7 @@
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
+        <IncludeFiles Value="runtime/include"/>
         <OtherUnitFiles Value="runtime/nongui;runtime"/>
         <UnitOutputDirectory Value="runtime/nongui/lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
