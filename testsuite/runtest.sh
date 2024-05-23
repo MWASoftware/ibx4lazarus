@@ -19,6 +19,9 @@ NEWDBNAME2=$TESTOUTDIR/testsuite2.fdb
 BAKFILE=$TESTOUTDIR/testsuite.gbk
 LOGFILE=testout.`date +%N`.log
 LAZARUS=$HOME/lazarus
+if [ -z "$FPC" ]; then
+  export FPC=fpc
+fi
 
 if [ -d "../fbintf" ]; then
   export FBINTF="../fbintf"

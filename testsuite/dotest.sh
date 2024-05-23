@@ -4,12 +4,12 @@ LAZARUS=$HOME/lazarus/2.2
 
 usage()
 {
-  echo "dotest.sh [-2] [-3] [-4 b1|b2] [-5] [-t <testid>]"
+  echo "dotest.sh [-2] [-3] [-4 b1|b2] [-5] [-t <testid>] [-p <fpc version>]"
 }
 
 BUILD=
 #Parse Parameters
-TEMP=`getopt h2345db:t: "$@"`
+TEMP=`getopt h2345db:t:p: "$@"`
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
 eval set -- "$TEMP"
@@ -28,6 +28,8 @@ while true ; do
 
 	-d)	FB="master"; shift 1;;
        
+	-p) export FPCDIR=/usr/lib/fpc/$2; shift 2;;
+
 	-b)	BUILD="$2"; shift 2;;
         
         -t)    TEST="-t $2"; shift 2;;
@@ -41,6 +43,10 @@ done
 
 if [ -n "$BUILD" ]; then
   FB="4"
+fi
+
+if [ -n "$FPCDIR" ]  && [ -d "$FPCDIR" ]; then
+  export FPC=$FPCDIR/ppcx64
 fi
 
 export FIREBIRD=/opt/firebird/$FB$BUILD
