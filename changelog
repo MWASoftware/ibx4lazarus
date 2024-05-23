@@ -19,6 +19,8 @@ IBX Change Log  version (2.7-0 Build 14337) Mon, 08 Jan 2024 15:20:55 +0000
    ibcontrols with their datasets by providing the interfaces declared in
    IBDynamicInterfaces.
 
+5. Firebird 5 support tested and passed.
+
 IBX Change Log  version (2.6-4 Build 14337) Mon, 08 Jan 2024 15:20:55 +0000
 
 1. TIBCustomDataSet.ApplyUpdates: ensure controls are not permanently disabled

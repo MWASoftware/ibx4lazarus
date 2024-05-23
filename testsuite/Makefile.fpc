@@ -7,7 +7,7 @@ options= -MObjFPC -Scghi -Cg -Cr -O1 -g -gl -gh -l -vewnhibq -dUseCThreads
 
 unittargetdir=testunits/$(CPU_TARGET)-$(OS_TARGET)
 includedir=../include
-unitdir=testApp  . ../runtime/nongui ../iblocaldb/nongui
+unitdir=testApp  . ../runtime/nongui ../iblocaldb/nongui ../ibinterfaces
 
 [target]
 programs=testsuite 

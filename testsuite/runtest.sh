@@ -79,8 +79,10 @@ if [ -x testsuite ]; then
     diff FB2reference.log $LOGFILE >diff.log
   elif grep 'ODS Major Version = 12' $LOGFILE >/dev/null; then
     diff FB3reference.log $LOGFILE >diff.log
-  else
+  elif grep 'ODS Major Version = 13' $LOGFILE >/dev/null  && grep 'ODS Minor Version = 0' $LOGFILE >/dev/null; then
     diff FB4reference.log $LOGFILE >diff.log
+  else
+    diff FB5reference.log $LOGFILE >diff.log
   fi
  # cat diff.log
   echo "`cat diff.log|wc -l` lines in diff"
