@@ -54,8 +54,7 @@ uses
   unix,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBExternals, IBInternals, IB,  IBSQL, DB,
-  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, IBBufferedCursors,
-  IBDynamicInterfaces;
+  IBUtils, IBBlob, IBSQLParser, IBDatabaseInfo, IBBufferedCursors;
 
 type
   TIBCustomDataSet = class;
@@ -1711,7 +1710,7 @@ end;
 { TIBParserDataSet }
 
 procedure TIBParserDataSet.DoBeforeOpen;
-var i: integer;
+  var i: integer;
 begin
   if (FDynamicComponents.Count > 0) or SQLFIltered then
   begin

@@ -31,7 +31,7 @@ unit IBSQLParser;
 
 interface
 
-uses Classes, DB, IBUtils, IBDynamicInterfaces;
+uses Classes, DB, IBUtils, IBInternals;
 
 {
   The SQL Parser is a partial SQL Parser intended to parser a Firebird DML (Select)

@@ -26,6 +26,7 @@
 unit IBInternals;
 
 {$mode objfpc}{$H+}
+{$interfaces corba}
 
 {Interfaces used internally and not normally made visible to users}
 
@@ -33,6 +34,8 @@ interface
 
 uses
   Classes, SysUtils, DB;
+
+{$I ../../include/IBDynamicInterfacesh.inc}
 
 const
   sDBkeyAlias = 'IBX_INTERNAL_DBKEY'; {Special case for TIBTable support}
@@ -67,7 +70,9 @@ type
   end;
 
 
+  {$interfaces com}
   IIBTimerInf = interface
+    ['{cf6ec1c6-e39f-4932-b244-84c70513e6b8}']
     function GetEnabled: boolean;
     procedure SetEnabled(Value: Boolean);
     function GetInterval: Cardinal;
@@ -88,6 +93,7 @@ type
   TIBDataEvent = procedure (Data: PtrInt) of object;
 
   IIBGUIInterface = interface
+    ['{8a789c60-86e5-45ac-8d02-60e7361ba973}']
     function ServerLoginDialog(var AServerName: string;
                                var AUserName, APassword: string): Boolean;
     function LoginDialogEx(var ADatabaseName: string;
@@ -118,6 +124,8 @@ begin
   inherited Create(aOwner);
   FTraceFlags := [];
 end;
+
+{$I ../../include/IBDynamicInterfaces.inc}
 
 end.
 

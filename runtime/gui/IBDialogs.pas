@@ -29,6 +29,7 @@
 unit IBDialogs;
 
 {$mode objfpc}{$H+}
+{$interfaces com}
 
 interface
 

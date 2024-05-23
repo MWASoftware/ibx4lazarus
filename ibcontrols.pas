@@ -9,7 +9,7 @@ interface
 
 uses
   IBLookupComboEditBox, IBDynamicGrid, IBTreeView, DBControlGrid, IBArrayGrid, 
-  DBTreeView, LazarusPackageIntf;
+  DBTreeView, IBDynamicInterfaces, LazarusPackageIntf;
 
 implementation
 
@@ -18,5 +18,5 @@ begin
 end;
 
 initialization
-  RegisterPackage('ibcontrols', @Register);
+  RegisterPackage('ibcontrols' , @Register);
 end.

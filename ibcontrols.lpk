@@ -514,7 +514,7 @@
 
    Contributor(s): ______________________________________. "/>
     <Version Major="2" Minor="6" Release="4" Build="9999"/>
-    <Files Count="6">
+    <Files Count="7">
       <Item1>
         <Filename Value="ibcontrols/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
@@ -539,18 +539,19 @@
         <Filename Value="ibcontrols/DBTreeView.pas"/>
         <UnitName Value="DBTreeView"/>
       </Item6>
+      <Item7>
+        <Filename Value="ibcontrols/IBDynamicInterfaces.pas"/>
+        <UnitName Value="IBDynamicInterfaces"/>
+      </Item7>
     </Files>
     <CompatibilityMode Value="True"/>
-    <RequiredPkgs Count="3">
+    <RequiredPkgs Count="2">
       <Item1>
-        <PackageName Value="ibinterfaces"/>
+        <PackageName Value="LCL"/>
       </Item1>
       <Item2>
-        <PackageName Value="LCL"/>
-      </Item2>
-      <Item3>
         <PackageName Value="FCL"/>
-      </Item3>
+      </Item2>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

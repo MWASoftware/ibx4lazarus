@@ -231,19 +231,16 @@ II.3. Product Names. Contributor Versions and Larger Works may not be called &qu
       </Item24>
     </Files>
     <CompatibilityMode Value="True"/>
-    <RequiredPkgs Count="4">
+    <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="ibinterfaces"/>
+        <PackageName Value="LazUtils"/>
       </Item1>
       <Item2>
-        <PackageName Value="LazUtils"/>
+        <PackageName Value="fbintf"/>
       </Item2>
       <Item3>
-        <PackageName Value="fbintf"/>
-      </Item3>
-      <Item4>
         <PackageName Value="FCL"/>
-      </Item4>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
