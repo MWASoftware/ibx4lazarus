@@ -59,8 +59,8 @@ type
     procedure UnRegisterDynamicComponent(aComponent: TComponent);
   end;
 
-  {The IDynamicSQLEditor interface is also provided by a Dynamic SQL Dataset.
-   This interface allows a user to update the dataset's select SQL.
+  {The IDynamicSQLEditor interface allows a user to update the dataset's select SQL.
+   It is provided by a dataset or a specialised SQL parser.
 
    OrderBy: the select SQL Order By clause is updated to order the dataset by
    the field name in ascending or descending order.
