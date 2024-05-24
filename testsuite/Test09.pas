@@ -94,11 +94,27 @@ begin
 end;
 
 procedure TTest09.RunTest(CharSet: AnsiString; SQLDialect: integer);
+const
+  sCreateConditionIndexSQL = 'Create index test10 on EMPLOYEE (EMP_NO) Where Dept_no = ''000''';
 begin
   IBDatabase.Connected := true;
   writeln(OutFile);
+  with IBDatabase.Attachment do
+  if ((GetODSMajorVersion = 13) and (GetODSMinorVersion >= 1)) or
+    (GetODSMajorVersion > 13) then
+  begin
+    writeln(OutFile,'Adding Conditional Index');
+    ExecImmediate([isc_tpb_write,isc_tpb_nowait,isc_tpb_concurrency],sCreateConditionIndexSQL);
+  end;
   writeln(OutFile,'Extracting Database Schema and Data');
-  FExtract.ExtractObject(eoDatabase,'',[etGrantsToUser]);
+  try
+    FExtract.ExtractObject(eoDatabase,'',[etGrantsToUser]);
+  finally
+    with IBDatabase.Attachment do
+    if ((GetODSMajorVersion = 13) and (GetODSMinorVersion >= 1)) or
+      (GetODSMajorVersion > 13) then
+      ExecImmediate([isc_tpb_write,isc_tpb_nowait,isc_tpb_concurrency],'Drop index test10');
+  end;
 end;
 
 initialization

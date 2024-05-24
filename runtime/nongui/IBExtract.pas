@@ -109,6 +109,7 @@ type
     function GetCollationName(CharacterSetID, CollationID: integer): string;
     function GetDatabase: TIBDatabase;
     function GetIndexSegments ( indexname : String) : String;
+    function GetIndexCondition(indexname: string): string;
     function GetTransaction: TIBTransaction;
     function GetTriggerType(TypeID: Int64): string;
     function LookupDDLObject(cType: TCommentType): integer;
@@ -1191,6 +1192,31 @@ begin
     end;
   finally
     qryColNames.Free;
+  end;
+end;
+
+function TIBExtract.GetIndexCondition(IndexName : string) : string;
+const
+  GetIndexConditionSQL =
+    'SELECT RDB$CONDITION_SOURCE FROM RDB$INDICES ' +
+    'WHERE RDB$INDEX_NAME = :INDEXNAME ';
+var
+  qryCondition : TIBSQL;
+begin
+  Result := '';
+  if ((FDatabaseInfo.ODSMajorVersion = 13) and (FDatabaseInfo.ODSMinorVersion >= 1))
+      or (FDatabaseInfo.ODSMajorVersion > 13) then
+  begin
+    qryCondition := TIBSQL.Create(FDatabase);
+    try
+      qryCondition.SQL.Add(GetIndexConditionSQL);
+      qryCondition.Params.ByName('IndexName').AsString := IndexName;
+      qryCondition.ExecQuery;
+      if not qryCondition.Eof and not qryCondition.FieldByName('RDB$CONDITION_SOURCE').IsNull then
+        Result := ' ' + qryCondition.FieldByName('RDB$CONDITION_SOURCE').AsString;
+    finally
+      qryCondition.Free;
+    end;
   end;
 end;
 
@@ -3295,8 +3321,8 @@ begin
         QuoteIdentifier(
             qryIndex.FieldByName('RDB$RELATION_NAME').AsString)]);
 
-      Line := Line + GetIndexSegments(qryIndex.FieldByName('RDB$INDEX_NAME').AsString) +
-          ')' + Term;
+      Line := Line + GetIndexSegments(qryIndex.FieldByName('RDB$INDEX_NAME').AsString) + ')' +
+                     GetIndexCondition(qryIndex.FieldByName('RDB$INDEX_NAME').AsString) + Term;
 
       ExtractOut(Line);
       AddComment(qryIndex,ctIndex);

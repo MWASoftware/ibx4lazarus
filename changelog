@@ -22,6 +22,8 @@ IBX Change Log  version (2.7-0 Build 14337) Mon, 08 Jan 2024 15:20:55 +0000
 
 6. Tested with FPC development version 3.3.1.
 
+7. IBExtract: support added for Firebird 5 conditional indexes.
+
 IBX Change Log  version (2.6-4 Build 14337) Mon, 08 Jan 2024 15:20:55 +0000
 
 1. TIBCustomDataSet.ApplyUpdates: ensure controls are not permanently disabled
