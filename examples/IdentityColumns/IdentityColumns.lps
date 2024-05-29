@@ -20,7 +20,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="128"/>
+        <TopLine Value="126"/>
         <CursorPos X="77" Y="126"/>
         <UsageCount Value="35"/>
         <Loaded Value="True"/>
@@ -197,12 +197,7 @@
         <UsageCount Value="10"/>
       </Unit25>
     </Units>
-    <JumpHistory Count="1">
-      <Position1>
-        <Filename Value="Unit1.pas"/>
-        <Caret Line="126" Column="77" TopLine="128"/>
-      </Position1>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode="default"/>
