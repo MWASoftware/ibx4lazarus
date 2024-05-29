@@ -209,7 +209,7 @@ begin
     if FCurListDataset <> nil then
       (FCurListDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
     FCurListDataset := nil;
-    if ProvidesIDynamicSQLDataset(ListDataSet) then
+    if ProvidesIDynamicSQLDataset(ListDataSet,false) then
     begin
       (ListDataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
       FCurListDataset := ListDataSet;

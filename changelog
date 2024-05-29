@@ -1,4 +1,4 @@
-IBX Change Log  version (2.7-0 Build 15716) Fri, 24 May 2024 16:41:40 +0100
+IBX Change Log  version (2.7-0 Build 15724) Wed, 29 May 2024 15:32:58 +0100
 
 1. Pascal interface defined between the IB dynamic controls and IBX datasets.
    Its purpose is to remove any dependency of ibcontrols on the IBX datasets. 
@@ -62,6 +62,8 @@ IBX Change Log  version (2.6-4 Build 14337) Mon, 08 Jan 2024 15:20:55 +0000
 
 10.IBCustomDataset: Calls to BeforeScroll during a Locate operation are now suppressed.
    BeforeScroll is called once before the locate operation.
+
+11. IBBufferedCursors: added check for null pointer in TIBSelectCursor.GetRecDBkey.
 
 IBX Change Log  version (2.6-3 Build 14080) Sat, 21 Oct 2023 14:14:22 +0100
 

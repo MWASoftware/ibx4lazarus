@@ -88,7 +88,7 @@ begin
     if FCurDataset <> nil then
       (FCurDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
     FCurDataset := nil;
-    if ProvidesIDynamicSQLDataset(DataSet) then
+    if ProvidesIDynamicSQLDataset(DataSet,false) then
     begin
       (DataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
       FCurDataset := DataSet;
