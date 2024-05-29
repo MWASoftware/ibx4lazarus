@@ -1,4 +1,4 @@
-IBX Change Log  version (2.7-0 Build 14337) Mon, 08 Jan 2024 15:20:55 +0000
+IBX Change Log  version (2.7-0 Build 15716) Fri, 24 May 2024 16:41:40 +0100
 
 1. Pascal interface defined between the IB dynamic controls and IBX datasets.
    Its purpose is to remove any dependency of ibcontrols on the IBX datasets. 
