@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="148">
+    <Units Count="153">
       <Unit0>
         <Filename Value="DBAdmin.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -19,8 +19,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="405"/>
-        <CursorPos X="3" Y="408"/>
+        <TopLine Value="266"/>
+        <CursorPos X="12" Y="269"/>
         <UsageCount Value="171"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -33,7 +33,7 @@
         <ResourceBaseClass Value="DataModule"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
-        <CursorPos X="32" Y="33"/>
+        <CursorPos X="21" Y="28"/>
         <UsageCount Value="171"/>
       </Unit2>
       <Unit3>
@@ -108,8 +108,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="79"/>
-        <CursorPos X="3" Y="79"/>
+        <TopLine Value="38"/>
+        <CursorPos X="5" Y="49"/>
         <UsageCount Value="165"/>
       </Unit9>
       <Unit10>
@@ -119,8 +119,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="39"/>
-        <CursorPos X="41" Y="41"/>
+        <TopLine Value="56"/>
+        <CursorPos X="52" Y="56"/>
         <UsageCount Value="165"/>
       </Unit10>
       <Unit11>
@@ -472,8 +472,8 @@
       <Unit57>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="428"/>
-        <CursorPos Y="457"/>
+        <TopLine Value="1116"/>
+        <CursorPos X="34" Y="1131"/>
         <UsageCount Value="10"/>
       </Unit57>
       <Unit58>
@@ -507,8 +507,8 @@
       <Unit62>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="155"/>
-        <CursorPos X="34" Y="179"/>
+        <TopLine Value="67"/>
+        <CursorPos X="48" Y="91"/>
         <UsageCount Value="10"/>
       </Unit62>
       <Unit63>
@@ -590,8 +590,8 @@
       <Unit74>
         <Filename Value="../../ibcontrols/IBArrayGrid.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="562"/>
-        <CursorPos Y="591"/>
+        <TopLine Value="296"/>
+        <CursorPos X="29" Y="296"/>
         <UsageCount Value="10"/>
       </Unit74>
       <Unit75>
@@ -1117,8 +1117,43 @@
         <CursorPos Y="1004"/>
         <UsageCount Value="10"/>
       </Unit147>
+      <Unit148>
+        <Filename Value="../../runtime/include/IBDynamicInterfaces.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="69" Y="7"/>
+        <UsageCount Value="10"/>
+      </Unit148>
+      <Unit149>
+        <Filename Value="dlg/AddShadowSetDlgUnit.lfm"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="31" Y="17"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit149>
+      <Unit150>
+        <Filename Value="../../runtime/include/IBDynamicInterfacesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="115"/>
+        <CursorPos X="29" Y="142"/>
+        <UsageCount Value="10"/>
+      </Unit150>
+      <Unit151>
+        <Filename Value="../../ibcontrols/DBTreeView.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="93"/>
+        <CursorPos X="98" Y="95"/>
+        <UsageCount Value="10"/>
+      </Unit151>
+      <Unit152>
+        <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="188"/>
+        <CursorPos X="52" Y="212"/>
+        <UsageCount Value="10"/>
+      </Unit152>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="6" HistoryIndex="5">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="1044" Column="14" TopLine="1028"/>
@@ -1135,6 +1170,14 @@
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="350" Column="15" TopLine="335"/>
       </Position4>
+      <Position5>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="408" Column="3" TopLine="405"/>
+      </Position5>
+      <Position6>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="619" Column="11" TopLine="604"/>
+      </Position6>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

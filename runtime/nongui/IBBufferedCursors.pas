@@ -2422,7 +2422,7 @@ function TIBSelectCursor.GetRecDBkey(aBufID: TRecordBuffer): TIBDBKey;
 var Buff: PByte;
 begin
   FillChar(Result,sizeof(TIBDBKey),0);
-  if FDBKeyFieldColumn >= 0 then
+  if (aBufID <> nil) and (FDBKeyFieldColumn >= 0) then
   with FColumnMetaData[FDBKeyFieldColumn] do
   begin
     Buff := GetBuffer(aBufID);
