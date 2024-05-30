@@ -44,7 +44,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="137">
+    <Units Count="138">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -666,8 +666,8 @@
       <Unit85>
         <Filename Value="../../ibcontrols/IBDynamicGrid.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1122"/>
-        <CursorPos X="10" Y="1132"/>
+        <TopLine Value="1073"/>
+        <CursorPos X="49" Y="1097"/>
         <UsageCount Value="13"/>
       </Unit85>
       <Unit86>
@@ -1023,6 +1023,13 @@
         <CursorPos X="52" Y="56"/>
         <UsageCount Value="10"/>
       </Unit136>
+      <Unit137>
+        <Filename Value="../../ibcontrols/IBControlsRegisterUnit.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="163"/>
+        <CursorPos X="16" Y="56"/>
+        <UsageCount Value="10"/>
+      </Unit137>
     </Units>
     <JumpHistory Count="10" HistoryIndex="9">
       <Position1>

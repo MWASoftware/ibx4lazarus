@@ -9,7 +9,7 @@ object FieldListEditor: TFieldListEditor
   ClientWidth = 437
   OnClose = FormClose
   OnShow = FormShow
-  LCLVersion = '1.2.6.0'
+  LCLVersion = '2.2.0.2'
   object Bevel1: TBevel
     Left = 7
     Height = 237
@@ -151,19 +151,17 @@ object FieldListEditor: TFieldListEditor
     Top = 17
     Width = 89
     Caption = 'Selected Fields'
-    ParentColor = False
   end
   object Label2: TLabel
     Left = 202
     Height = 15
     Top = 17
-    Width = 89
+    Width = 90
     Caption = 'Available Fields'
-    ParentColor = False
   end
   object ApplicationProperties1: TApplicationProperties
     OnIdle = ApplicationProperties1Idle
-    left = 400
-    top = 224
+    Left = 400
+    Top = 224
   end
 end

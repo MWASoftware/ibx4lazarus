@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="43">
+    <Units Count="45">
       <Unit0>
         <Filename Value="OneDArrayExample.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -20,8 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="29"/>
-        <CursorPos X="45" Y="34"/>
+        <TopLine Value="65"/>
+        <CursorPos X="35" Y="79"/>
         <UsageCount Value="40"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -61,10 +61,11 @@
       </Unit5>
       <Unit6>
         <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="631"/>
-        <CursorPos X="33" Y="642"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="507"/>
+        <CursorPos X="3" Y="510"/>
         <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="../../../ibcontrols/DBControlGrid.pas"/>
@@ -327,8 +328,61 @@
         <CursorPos X="41" Y="34"/>
         <UsageCount Value="10"/>
       </Unit42>
+      <Unit43>
+        <Filename Value="../../../ibcontrols/IBControlsRegisterUnit.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="87"/>
+        <CursorPos X="35" Y="97"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit43>
+      <Unit44>
+        <Filename Value="../../../../fbintf/client/3.0/firebird/FirebirdOOAPI.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="10608"/>
+        <CursorPos Y="10623"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit44>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="9" HistoryIndex="8">
+      <Position1>
+        <Filename Value="../../../ibcontrols/IBControlsRegisterUnit.pas"/>
+        <Caret Line="91" Column="29" TopLine="70"/>
+      </Position1>
+      <Position2>
+        <Filename Value="../../../ibcontrols/IBControlsRegisterUnit.pas"/>
+        <Caret Line="101" Column="28" TopLine="77"/>
+      </Position2>
+      <Position3>
+        <Filename Value="../../../ibcontrols/IBControlsRegisterUnit.pas"/>
+        <Caret Line="114" Column="28" TopLine="90"/>
+      </Position3>
+      <Position4>
+        <Filename Value="../../../ibcontrols/IBControlsRegisterUnit.pas"/>
+        <Caret Line="97" Column="35" TopLine="87"/>
+      </Position4>
+      <Position5>
+        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
+        <Caret Line="163" Column="15" TopLine="149"/>
+      </Position5>
+      <Position6>
+        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
+        <Caret Line="546" Column="4" TopLine="531"/>
+      </Position6>
+      <Position7>
+        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
+        <Caret Line="554" Column="17" TopLine="531"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
+        <Caret Line="144" Column="15" TopLine="144"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../../ibcontrols/IBArrayGrid.pas"/>
+        <Caret Line="510" Column="3" TopLine="507"/>
+      </Position9>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode="default"/>

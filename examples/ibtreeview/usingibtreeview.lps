@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="72">
+    <Units Count="73">
       <Unit0>
         <Filename Value="usingibtreeview.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -489,6 +489,12 @@
         <CursorPos X="3" Y="592"/>
         <UsageCount Value="10"/>
       </Unit71>
+      <Unit72>
+        <Filename Value="../../ibcontrols/IBControlsRegisterUnit.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="166"/>
+        <UsageCount Value="10"/>
+      </Unit72>
     </Units>
     <JumpHistory Count="1">
       <Position1>

@@ -55,7 +55,7 @@ interface
 uses SysUtils, Classes, Graphics, Dialogs, Controls, Forms, TypInfo,
      DB, IBTable, IBDatabase,  IBEventsEditor,  LazarusPackageIntf,
       IBUpdateSQL, IBUpdate, ComponentEditors, PropEdits, DBPropEdits, FieldsEditor,
-     dbFieldLinkPropEditor, dbFieldListPropEditor, IBDialogs;
+     dbFieldLinkPropEditor, IBDialogs;
 
 type
 
@@ -143,15 +143,6 @@ type
 { TIBTransactionEditor }
 
   TIBTransactionEditor = class(TComponentEditor)
-  public
-    procedure ExecuteVerb(Index: Integer); override;
-    function GetVerb(Index: Integer): string; override;
-    function GetVerbCount: Integer; override;
-  end;
-
-  { TIBArrayGridEditor }
-
-  TIBArrayGridEditor = class(TComponentEditor)
   public
     procedure ExecuteVerb(Index: Integer); override;
     function GetVerb(Index: Integer): string; override;
@@ -368,36 +359,6 @@ type
     procedure Edit; override;
   end;
 
-  { TDBDynamicGridFieldProperty }
-
-  TDBDynamicGridFieldProperty = class(TFieldProperty)
-  public
-    procedure FillValues(const Values: TStringList); override;
-  end;
-
-  { TDBLookupPropertiesGridFieldProperty }
-
-  TDBLookupPropertiesGridFieldProperty = class(TFieldProperty)
-  public
-    procedure FillValues(const Values: TStringList); override;
-  end;
-
-  { TIBTreeViewFieldProperty }
-
-  TIBTreeViewFieldProperty = class(TFieldProperty)
-  public
-    procedure FillValues(const Values: TStringList); override;
-  end;
-
-  { TIBDynamicGridIndexNamesProperty }
-
-  TIBDynamicGridIndexNamesProperty = class(TIndexFieldNamesProperty)
-  protected
-    function GetFieldDefs: TFieldDefs; override;
-    function GetIndexFieldNames: string; override;
-    procedure SetIndexFieldNames(const Value: string); override;
-  end;
-
   { TIBFieldDefsProperty }
 
   TIBFieldDefsProperty = class(TCollectionPropertyEditor)
@@ -423,15 +384,13 @@ uses IB, IBQuery, IBStoredProc, IBCustomDataSet, IBMessages,
      IBBatchMove, IBExtract,LResources, IBSelectSQLEditor,
      IBModifySQLEditor,IBDeleteSQLEditor,IBRefreshSQLEditor,
      IBInsertSQLEditor, IBGeneratorEditor, IBUpdateSQLEditor, IBDataSetEditor,
-     IBSQLEditor, ibserviceeditor, LCLVersion, IBDynamicGrid, IBLookupComboEditBox,
-     IBTreeView, DBControlGrid, ibxscript, IBLocalDBSupport, IBDSDialogs,
-     IBArrayGrid, IBVersion, IBDataOutput, IBXServiceEditor, IBJournal;
+     IBSQLEditor, ibserviceeditor, LCLVersion, ibxscript, IBLocalDBSupport, IBDSDialogs,
+     IBVersion, IBDataOutput, IBXServiceEditor, IBJournal;
 
 const
   IBPalette1 = 'Firebird'; {do not localize}
   IBPalette2 = 'Firebird Legacy Admin'; {do not localize}
-  IBPalette3 = 'Firebird Data Controls';   {do not localize}
-  IBPalette4 = 'Firebird Admin'; {do not localize}
+  IBPalette3 = 'Firebird Admin'; {do not localize}
 
  resourcestring
    SInterbaseExpressVersion = 'Firebird Express for Lazarus ' + IBX_VERSION;
@@ -443,7 +402,6 @@ const
    SExecute = 'E&xecute';
    SIBDatabaseEditor = 'Da&tabase Editor...';
    SIBTransactionEditor = '&Transaction Editor...';
-   SIBUpdateLayout = 'Update Layout';
    SFBLibLoadProblem = 'IBX is unable to locate or otherwise load the Firebird Library - have you remembered to install it?';
 
 procedure Register;
@@ -476,7 +434,7 @@ begin
        TIBBlockFormatOut,TIBCSVDataOut,TIBInsertStmtsOut]);
   if FirebirdAPI.HasServiceAPI  then
   begin
-    RegisterComponents(IBPalette4, [TIBXServicesConnection, TIBXConfigService,
+    RegisterComponents(IBPalette3, [TIBXServicesConnection, TIBXConfigService,
       TIBXClientSideBackupService, TIBXServerSideBackupService,
       TIBXClientSideRestoreService, TIBXServerSideRestoreService,
       TIBXValidationService, TIBXOnlineValidationService, TIBXStatisticalService,
@@ -488,7 +446,6 @@ begin
       TIBLogService, TIBSecurityService, TIBServerProperties]);
   end;
 
-  RegisterComponents(IBPalette3,[TIBLookupComboEditBox,TIBDynamicGrid,TIBTreeView,TDBControlGrid, TIBArrayGrid]);
 
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'DatabaseName', TIBFileNameProperty); {do not localize}
   RegisterPropertyEditor(TypeInfo(TIBFileName), TIBDatabase, 'FirebirdLibraryPathName', TIBLibraryNameProperty); {do not localize}
@@ -527,45 +484,9 @@ begin
   RegisterComponentEditor(TIBStoredProc, TIBStoredProcEditor);
   RegisterComponentEditor(TIBSQL, TIBSQLEditor);
   RegisterComponentEditor(TIBCustomService, TIBServiceEditor);
-  RegisterComponentEditor(TIBArrayGrid, TIBArrayGridEditor);
   RegisterComponentEditor(TIBXServicesConnection, TIBXServiceEditor);
 
-
-  {Firebird Data Access Controls}
-  RegisterPropertyEditor(TypeInfo(string), TDBLookupProperties, 'KeyField', TDBDynamicGridFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string), TDBLookupProperties, 'ListField', TDBDynamicGridFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string), TIBDynamicGrid, 'IndexFieldNames', TIBDynamicGridIndexNamesProperty);
-  RegisterPropertyEditor(TypeInfo(string), TDBLookupProperties, 'DataFieldName', TDBLookupPropertiesGridFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'KeyField', TIBTreeViewFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'TextField', TIBTreeViewFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ParentField', TIBTreeViewFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'HasChildField', TIBTreeViewFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'ImageIndexField', TIBTreeViewFieldProperty);
-  RegisterPropertyEditor(TypeInfo(string), TIBTreeView, 'SelectedIndexField', TIBTreeViewFieldProperty);
-
   IBGUIInterface :=  TIBDSLCLInterface.Create;
-end;
-
-procedure LoadDataSourceFields(DataSource: TDataSource; List: TStrings);
-var
-  DataSet: TDataSet;
-  i: Integer;
-begin
-  if Assigned(DataSource) then
-  begin
-    DataSet := DataSource.DataSet;
-    if Assigned(DataSet) then
-    begin
-      if DataSet.Fields.Count > 0 then
-        DataSet.GetFieldNames(List)
-      else
-      begin
-        DataSet.FieldDefs.Update;
-        for i := 0 to DataSet.FieldDefs.Count - 1 do
-          List.Add(DataSet.FieldDefs[i].Name);
-      end;
-    end;
-  end;
 end;
 
 { TIBLibraryNameProperty }
@@ -669,94 +590,6 @@ begin
   if FieldDefs <> nil then
     FieldDefs.Update;
   inherited Edit;
-end;
-
-{ TIBArrayGridEditor }
-
-procedure TIBArrayGridEditor.ExecuteVerb(Index: Integer);
-begin
-  if Index < inherited GetVerbCount then
-    inherited ExecuteVerb(Index)
-  else
-  case Index of
-    0: TIBArrayGrid(Component).UpdateLayout;
-  end;
-end;
-
-function TIBArrayGridEditor.GetVerb(Index: Integer): string;
-begin
-  if Index < inherited GetVerbCount then
-    Result := inherited GetVerb(Index) else
-  begin
-    Dec(Index, inherited GetVerbCount);
-    case Index of
-      0: Result := SIBUpdateLayout;
-      1 : Result := SInterbaseExpressVersion ;
-    end;
-  end;
-end;
-
-function TIBArrayGridEditor.GetVerbCount: Integer;
-begin
-  Result := 2;
-end;
-
-{ TDBLookupPropertiesGridFieldProperty }
-
-procedure TDBLookupPropertiesGridFieldProperty.FillValues(
-  const Values: TStringList);
-var
-  P: TDBLookupProperties;
-begin
-  P :=TDBLookupProperties(GetComponent(0));
-  if not (P is TDBLookupProperties) then exit;
-  LoadDataSourceFields(TIBDynamicGrid(P.Owner.Grid).DataSource, Values);
-end;
-
-{ TIBTreeViewFieldProperty }
-
-procedure TIBTreeViewFieldProperty.FillValues(const Values: TStringList);
-var ListSource: TDataSource;
-begin
-  ListSource :=  TIBTreeView(GetComponent(0)).DataSource;
-  LoadDataSourceFields(ListSource, Values);
-end;
-
-{ TIBDynamicGridIndexNamesProperty }
-
-function TIBDynamicGridIndexNamesProperty.GetFieldDefs: TFieldDefs;
-var Grid: TIBDynamicGrid;
-begin
-  Result := nil;
-  Grid := TIBDynamicGrid(GetComponent(0));
-  if assigned(Grid.DataSource) and assigned(Grid.DataSource.DataSet) then
-     Result := Grid.DataSource.DataSet.FieldDefs
-end;
-
-function TIBDynamicGridIndexNamesProperty.GetIndexFieldNames: string;
-var Grid: TIBDynamicGrid;
-begin
-  Grid := TIBDynamicGrid(GetComponent(0));
-  Result := Grid.IndexFieldNames
-end;
-
-procedure TIBDynamicGridIndexNamesProperty.SetIndexFieldNames(
-  const Value: string);
-var Grid: TIBDynamicGrid;
-begin
-  Grid := TIBDynamicGrid(GetComponent(0));
-  Grid.IndexFieldNames := Value
-end;
-
-{ TDBDynamicGridFieldProperty }
-
-procedure TDBDynamicGridFieldProperty.FillValues(const Values: TStringList);
-var
-  P: TDBLookupProperties;
-begin
-  P :=TDBLookupProperties(GetComponent(0));
-  if not (P is TDBLookupProperties) then exit;
-  LoadDataSourceFields(P.ListSource, Values);
 end;
 
 { TIBServiceEditor }
