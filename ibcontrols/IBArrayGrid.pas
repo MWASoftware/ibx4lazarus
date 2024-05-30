@@ -535,7 +535,7 @@ begin
     for i := 0 to DataSet.FieldDefs.Count - 1 do
     begin
       if (DataSet.FieldDefs[i] <> nil) and (DataSet.FieldDefs[i].Name = DataField)
-         and ProvidesIArrayFieldDef(DataSet.FieldDefs[i],false) then
+         and ProvidesIArrayFieldDef(DataSet.FieldDefs[i]) then
       begin
          DataSet.FieldDefs[i].GetInterface(IArrayFieldDef,intf);
          with intf do

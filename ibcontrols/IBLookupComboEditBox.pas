@@ -210,8 +210,10 @@ begin
       (FCurListDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
     FCurListDataset := nil;
     if ProvidesIDynamicSQLDataset(ListDataSet,false) then
+    with ListDataSet as IDynamicSQLDataset do
+    if [dcUpdateWhereClause,dcSetParams] <= GetCapabilities then
     begin
-      (ListDataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
+      RegisterDynamicComponent(self);
       FCurListDataset := ListDataSet;
     end;
   end;

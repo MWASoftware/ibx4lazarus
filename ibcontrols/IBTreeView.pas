@@ -89,8 +89,10 @@ begin
       (FCurDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
     FCurDataset := nil;
     if ProvidesIDynamicSQLDataset(DataSet,false) then
+    with DataSet as IDynamicSQLDataset do
+    if [dcUpdateWhereClause,dcChangeDatasetOrder] <= GetCapabilities then
     begin
-      (DataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
+      RegisterDynamicComponent(self);
       FCurDataset := DataSet;
     end;
   end;

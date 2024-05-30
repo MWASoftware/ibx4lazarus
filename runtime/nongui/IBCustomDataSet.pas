@@ -738,6 +738,7 @@ type
     {IDynamicSQLDataset}
     procedure RegisterDynamicComponent(aComponent: TComponent);
     procedure UnRegisterDynamicComponent(aComponent: TComponent);
+    function GetCapabilities: TDynamicDatasetCapabilities;
     {IDynamicSQLParam}
     function GetParamValue(ParamName: string): variant; virtual;
     procedure SetParamValue(ParamName: string; ParamValue: variant); virtual;
@@ -1744,6 +1745,11 @@ end;
 procedure TIBParserDataSet.UnRegisterDynamicComponent(aComponent : TComponent);
 begin
   FDynamicComponents.Remove(aComponent);
+end;
+
+function TIBParserDataSet.GetCapabilities : TDynamicDatasetCapabilities;
+begin
+  Result := [dcChangeDatasetOrder,dcUpdateWhereClause,dcSetParams];
 end;
 
 function TIBParserDataSet.GetParamValue(ParamName : string) : variant;
