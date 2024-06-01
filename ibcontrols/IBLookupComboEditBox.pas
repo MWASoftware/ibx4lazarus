@@ -206,16 +206,13 @@ procedure TIBLookupComboEditBox.ListDatasetChanged;
 begin
   if FCurListDataset <> ListDataSet then
   begin
-    if FCurListDataset <> nil then
+    if (FCurListDataset <> nil) and (FCurListDataset is IDynamicSQLDataset) then
       (FCurListDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
-    FCurListDataset := nil;
-    if ProvidesIDynamicSQLDataset(ListDataSet,false) then
+    if (ListDataSet <> nil) and (ListDataSet is IDynamicSQLDataset) then
     with ListDataSet as IDynamicSQLDataset do
     if [dcUpdateWhereClause,dcSetParams] <= GetCapabilities then
-    begin
       RegisterDynamicComponent(self);
-      FCurListDataset := ListDataSet;
-    end;
+    FCurListDataset := ListDataSet;
   end;
 end;
 

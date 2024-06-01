@@ -105,13 +105,7 @@ type
     procedure QueueAsyncCall(const AMethod: TIBDataEvent;  Data: PtrInt);
   end;
 
-function ProvidesIDynamicSQLComponent(aComponent: TComponent; RaiseException:boolean=true): boolean;
-
 const  IBGUIInterface : IIBGUIInterface = nil;
-
-resourcestring
-  sNoIDynamicSQLComponent = 'Component (%s) does not provide the IDynamicSQLComponent interface';
-
 
 implementation
 
@@ -129,19 +123,6 @@ constructor TIBXMonitoredConnection.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
   FTraceFlags := [];
-end;
-
-function ProvidesIDynamicSQLComponent(aComponent: TComponent; RaiseException:boolean): boolean;
-var obj: pointer;
-begin
-  Result := false;
-  if aComponent <> nil then
-  begin
-    aComponent.GetInterface(IDynamicSQLComponent,obj);
-    Result := obj <> nil;
-    if not Result and RaiseException then
-      raise Exception.CreateFmt(sNoIDynamicSQLComponent,[aComponent.Name])
-  end
 end;
 
 end.

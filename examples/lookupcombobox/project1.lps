@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="91">
+    <Units Count="92">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -17,6 +17,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="192"/>
         <CursorPos X="42" Y="203"/>
         <UsageCount Value="58"/>
@@ -37,8 +38,8 @@
       <Unit3>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="410"/>
-        <CursorPos X="34" Y="420"/>
+        <TopLine Value="198"/>
+        <CursorPos Y="215"/>
         <UsageCount Value="27"/>
       </Unit3>
       <Unit4>
@@ -653,15 +654,20 @@
       </Unit89>
       <Unit90>
         <Filename Value="../../ibcontrols/IBControlsRegisterUnit.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="171"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="66"/>
         <CursorPos X="55" Y="185"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit90>
+      <Unit91>
+        <Filename Value="../../ibcontrols/IBDynamicInterfaces.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="32"/>
+        <CursorPos Y="46"/>
+        <UsageCount Value="10"/>
+      </Unit91>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="36" Column="17" TopLine="13"/>
@@ -674,10 +680,6 @@
         <Filename Value="Unit1.pas"/>
         <Caret Line="203" Column="42" TopLine="192"/>
       </Position3>
-      <Position4>
-        <Filename Value="../../ibcontrols/IBControlsRegisterUnit.pas"/>
-        <Caret Line="185" Column="55" TopLine="171"/>
-      </Position4>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

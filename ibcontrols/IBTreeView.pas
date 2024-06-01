@@ -85,16 +85,13 @@ procedure TIBTreeView.DataSourceChanged;
 begin
   if FCurDataset <> DataSet then
   begin
-    if FCurDataset <> nil then
+    if (FCurDataset <> nil) and (FCurDataset is IDynamicSQLDataset) then
       (FCurDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
-    FCurDataset := nil;
-    if ProvidesIDynamicSQLDataset(DataSet,false) then
+    if (Dataset <> nil) and (DataSet is IDynamicSQLDataset) then
     with DataSet as IDynamicSQLDataset do
     if [dcUpdateWhereClause,dcChangeDatasetOrder] <= GetCapabilities then
-    begin
       RegisterDynamicComponent(self);
-      FCurDataset := DataSet;
-    end;
+    FCurDataset := DataSet;
   end;
 end;
 

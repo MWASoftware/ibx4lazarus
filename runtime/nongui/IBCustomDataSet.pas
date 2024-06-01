@@ -1731,7 +1731,10 @@ end;
 
 procedure TIBParserDataSet.RegisterDynamicComponent(aComponent : TComponent);
 begin
-  if ProvidesIDynamicSQLComponent(aComponent) and (FDynamicComponents.IndexOf(aComponent) = -1) then
+  if not (aComponent is IDynamicSQLComponent) then
+    IBError(ibxeNotADynamicComponent,[aComponent.Name]);
+
+  if FDynamicComponents.IndexOf(aComponent) = -1 then
   begin
     FDynamicComponents.Add(aComponent);
     if Active then
