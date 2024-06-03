@@ -104,8 +104,8 @@ type
 
   {The IDynamicSQLComponent interface is provided by a Dynamic SQL Component.
    This interface is used by a Dynamic SQL Dataset to tell the component
-   when is should Update the SQL and when it should set parameters. Typically,
-   the UpdateSQL procedure is called before the dataset is opened and before the
+   when it should Update the SQL and when it should set parameters.
+   The UpdateSQL procedure is called before the dataset is opened and before the
    OnBeforeOpen event is called. The SetParams procedure is called before the dataset
    is opened and after the OnBeforeOpen event is called. This sequence allows
    a user to set dataset parameters in an OnBeforeOpen event handler, while
