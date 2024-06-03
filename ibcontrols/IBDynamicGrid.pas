@@ -1037,8 +1037,6 @@ end;
 
 procedure TIBDynamicGrid.SetDataSource(AValue: TDataSource);
 begin
-  if DataSet <> nil then
-    (DataSet as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
   inherited DataSource := AValue;
   DataSetChanged;
 end;
@@ -1125,14 +1123,15 @@ procedure TIBDynamicGrid.DataSetChanged;
 begin
   if FCurDataset <> DataSet then
   begin
-    if FCurDataset <> nil then
+    if (FCurDataset <> nil) and (FCurDataset is IDynamicSQLDataset) then
       (FCurDataset as IDynamicSQLDataset).UnRegisterDynamicComponent(self);
-    FCurDataset := nil;
-    if ProvidesIDynamicSQLDataset(DataSet,false) then
+    if (Dataset <> nil) and (DataSet is IDynamicSQLDataset) then
     begin
-      (DataSet as IDynamicSQLDataset).RegisterDynamicComponent(self);
-      FCurDataset := DataSet;
+      with DataSet as IDynamicSQLDataset do
+      if dcChangeDatasetOrder in GetCapabilities then
+        RegisterDynamicComponent(self)
     end;
+    FCurDataset := DataSet;
   end;
 end;
 

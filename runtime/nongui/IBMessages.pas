@@ -197,7 +197,8 @@ type
       ibxeDeleteAtBOF,
       ibxeInsertBeforeBOF,
       ibxeDifferentStatement,
-      ibxeIncorrectQueryType
+      ibxeIncorrectQueryType,
+      ibxeNotADynamicComponent
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -363,6 +364,7 @@ resourcestring
   SInsertBeforeBOF = 'Cannot insert before BOF';
   SDifferentStatement = 'A Cursor can only be replaced using a new cursor from the same statement';
   SIncorrectQueryType = 'Unexpected Query used to post record';
+  SNotADynamicComponent = '%s is not  provider of the IDynamicSQLComponent interface';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -487,7 +489,8 @@ const
     SDeleteAtBOF,
     SInsertBeforeBOF,
     SDifferentStatement,
-    SIncorrectQueryType
+    SIncorrectQueryType,
+    SNotADynamicComponent
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

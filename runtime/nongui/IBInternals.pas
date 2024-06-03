@@ -34,7 +34,7 @@ interface
 uses
   Classes, SysUtils, DB;
 
-{$I IBDynamicInterfacesh.inc}
+{$I IBDynamicInterfaces.inc}
 {$interfaces com}
 
 const
@@ -124,8 +124,6 @@ begin
   inherited Create(aOwner);
   FTraceFlags := [];
 end;
-
-{$I IBDynamicInterfaces.inc}
 
 end.
 

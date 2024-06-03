@@ -514,8 +514,8 @@
    All Rights Reserved.
 
    Contributor(s): ______________________________________. "/>
-    <Version Major="2" Minor="7" Release = "0" Build="15724" />
-    <Files Count="7">
+    <Version Major="2" Minor="7" Release = "0" Build="15737" />
+    <Files Count="9">
       <Item1>
         <Filename Value="ibcontrols/IBLookupComboEditBox.pas"/>
         <UnitName Value="IBLookupComboEditBox"/>
@@ -544,15 +544,27 @@
         <Filename Value="ibcontrols/IBDynamicInterfaces.pas"/>
         <UnitName Value="IBDynamicInterfaces"/>
       </Item7>
+      <Item8>
+        <Filename Value="ibcontrols/IBControlsRegisterUnit.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="IBControlsRegisterUnit"/>
+      </Item8>
+      <Item9>
+        <Filename Value="ibcontrols/dbFieldListPropEditor.pas"/>
+        <UnitName Value="dbFieldListPropEditor"/>
+      </Item9>
     </Files>
     <CompatibilityMode Value="True"/>
-    <RequiredPkgs Count="2">
+    <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="LCL"/>
+        <PackageName Value="IDEIntf"/>
       </Item1>
       <Item2>
-        <PackageName Value="FCL"/>
+        <PackageName Value="LCL"/>
       </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

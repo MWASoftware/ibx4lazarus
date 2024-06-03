@@ -9,12 +9,14 @@ interface
 
 uses
   IBLookupComboEditBox, IBDynamicGrid, IBTreeView, DBControlGrid, IBArrayGrid, 
-  DBTreeView, IBDynamicInterfaces, LazarusPackageIntf;
+  DBTreeView, IBDynamicInterfaces, IBControlsRegisterUnit, 
+  dbFieldListPropEditor, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
+  RegisterUnit('IBControlsRegisterUnit' , @IBControlsRegisterUnit.Register);
 end;
 
 initialization

@@ -11,16 +11,15 @@ uses
   IBDBReg, IBEventsEditor, IBTransactionEdit, IBDatabaseEdit, 
   ibdeletesqleditor, IBGeneratorEditor, ibinsertsqleditor, ibmodifysqleditor, 
   ibselectsqleditor, ibupdatesqleditor, ibsqleditor, dbFieldLinkPropEditor, 
-  dbFieldListPropEditor, IBDSDialogs, IBSQLEditFrame, ibserviceeditor, 
-  LazarusPackageIntf;
+  IBDSDialogs, IBSQLEditFrame, ibserviceeditor, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
-  RegisterUnit('IBDBReg', @IBDBReg.Register);
+  RegisterUnit('IBDBReg' , @IBDBReg.Register);
 end;
 
 initialization
-  RegisterPackage('dclibx', @Register);
+  RegisterPackage('dclibx' , @Register);
 end.

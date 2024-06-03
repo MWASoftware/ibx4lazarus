@@ -293,7 +293,7 @@ begin
     if (DataSet <> nil) and DataSet.Active then
     begin
       FActive := true;
-      if ProvidesIArrayField(Field) then
+      if Field is IArrayField then
         UpdateLayout;
       DataChange(Sender);
     end
@@ -327,9 +327,9 @@ end;
 
 procedure TIBArrayGrid.DataChange(Sender: TObject);
 begin
-  if (DataSet <> nil) and DataSet.Active and FActive and ProvidesIArrayField(Field) then
+  if (DataSet <> nil) and DataSet.Active and FActive and (Field is IArrayField) then
   begin
-    Field.GetInterface(IArrayField,FArray);
+    FArray := Field as IArrayField;
     LoadGridData;
   end;
 end;
@@ -524,7 +524,6 @@ end;
 
 procedure TIBArrayGrid.UpdateLayout;
 var i: integer;
-    intf: IArrayFieldDef;
 begin
   if csLoading in ComponentState then Exit;
   if (DataSource <> nil) and (DataSet <> nil) and (DataField <> '') then
@@ -535,10 +534,9 @@ begin
     for i := 0 to DataSet.FieldDefs.Count - 1 do
     begin
       if (DataSet.FieldDefs[i] <> nil) and (DataSet.FieldDefs[i].Name = DataField)
-         and ProvidesIArrayFieldDef(DataSet.FieldDefs[i],false) then
+         and (DataSet.FieldDefs[i] is IArrayFieldDef) then
       begin
-         DataSet.FieldDefs[i].GetInterface(IArrayFieldDef,intf);
-         with intf do
+         with DataSet.FieldDefs[i] as IArrayFieldDef do
          begin
            case GetArrayDimensions of
            1:
