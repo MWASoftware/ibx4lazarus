@@ -42,7 +42,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="29">
+    <Units Count="30">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -269,6 +269,13 @@
         <CursorPos Y="3225"/>
         <UsageCount Value="11"/>
       </Unit28>
+      <Unit29>
+        <Filename Value="../../runtime/nongui/IBDatabase.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1070"/>
+        <CursorPos X="19" Y="1080"/>
+        <UsageCount Value="10"/>
+      </Unit29>
     </Units>
     <JumpHistory Count="3" HistoryIndex="2">
       <Position1>

@@ -61,8 +61,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="254"/>
-        <CursorPos X="2" Y="254"/>
+        <TopLine Value="243"/>
+        <CursorPos X="40" Y="247"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -131,8 +131,8 @@
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/db.pas"/>
         <UnitName Value="DB"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1773"/>
-        <CursorPos X="15" Y="1798"/>
+        <TopLine Value="263"/>
+        <CursorPos X="3" Y="268"/>
         <UsageCount Value="30"/>
       </Unit10>
       <Unit11>
@@ -291,8 +291,8 @@
       <Unit32>
         <Filename Value="../../runtime/nongui/IBCustomDataSet.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1718"/>
-        <CursorPos X="62" Y="1725"/>
+        <TopLine Value="422"/>
+        <CursorPos X="19" Y="422"/>
         <UsageCount Value="59"/>
       </Unit32>
       <Unit33>
@@ -394,8 +394,8 @@
       <Unit47>
         <Filename Value="../../ibcontrols/IBLookupComboEditBox.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="291"/>
-        <CursorPos X="65" Y="304"/>
+        <TopLine Value="602"/>
+        <CursorPos X="3" Y="605"/>
         <UsageCount Value="11"/>
       </Unit47>
       <Unit48>
@@ -712,8 +712,8 @@
       <Unit91>
         <Filename Value="../../ibcontrols/IBTreeView.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="75"/>
-        <CursorPos X="16" Y="81"/>
+        <TopLine Value="96"/>
+        <CursorPos X="29" Y="92"/>
         <UsageCount Value="10"/>
       </Unit91>
       <Unit92>
@@ -852,8 +852,8 @@
       <Unit112>
         <Filename Value="../../runtime/nongui/IBSQLParser.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="545"/>
-        <CursorPos X="55" Y="551"/>
+        <TopLine Value="175"/>
+        <CursorPos X="15" Y="188"/>
         <UsageCount Value="10"/>
       </Unit112>
       <Unit113>
@@ -999,8 +999,8 @@
       <Unit133>
         <Filename Value="../../ibcontrols/IBDynamicInterfaces.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="48"/>
-        <CursorPos X="3" Y="52"/>
+        <TopLine Value="13"/>
+        <CursorPos X="17" Y="35"/>
         <UsageCount Value="10"/>
       </Unit133>
       <Unit134>
@@ -1012,15 +1012,15 @@
       <Unit135>
         <Filename Value="../../ibcontrols/IBArrayGrid.pas"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="520"/>
-        <CursorPos X="57" Y="538"/>
+        <TopLine Value="525"/>
+        <CursorPos X="53" Y="537"/>
         <UsageCount Value="10"/>
       </Unit135>
       <Unit136>
         <Filename Value="../../runtime/include/IBDynamicInterfaces.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="49"/>
-        <CursorPos X="52" Y="56"/>
+        <TopLine Value="118"/>
+        <CursorPos X="10" Y="136"/>
         <UsageCount Value="10"/>
       </Unit136>
       <Unit137>
