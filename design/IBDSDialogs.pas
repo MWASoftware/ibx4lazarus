@@ -135,11 +135,13 @@ begin
 end;
 
 procedure TIBDSLCLInterface.SaveDatabaseParams(DatabaseName, UserName: string);
+var ProjectName: string;
 begin
+  ProjectName := StringReplace(GetProjectName,' ','_',[rfReplaceAll]);
   With GetIDEConfigStorage(ConfigFile,True) do
   try
-    SetValue(GetProjectName + '/Database',DatabaseName);
-    SetValue(GetProjectName + '/UserName',UserName);
+    SetValue(ProjectName + '/Database',DatabaseName);
+    SetValue(ProjectName + '/UserName',UserName);
     WriteToDisk;
   finally
     Free

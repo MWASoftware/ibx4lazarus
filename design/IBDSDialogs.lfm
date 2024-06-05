@@ -1,5 +1,5 @@
 object IBXDSLoginDlg: TIBXDSLoginDlg
-  Left = 1794
+  Left = 1920
   Height = 257
   Top = 408
   Width = 385
@@ -10,7 +10,7 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
   ClientHeight = 257
   ClientWidth = 385
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '2.2.0.2'
   object Bevel1: TBevel
     Left = 15
     Height = 202
@@ -20,35 +20,31 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
   end
   object ProjectName: TLabel
     Left = 144
-    Height = 14
+    Height = 15
     Top = 40
     Width = 35
     Caption = 'Name'
-    ParentColor = False
   end
   object TargetCaption: TLabel
     Left = 33
-    Height = 14
+    Height = 15
     Top = 84
     Width = 60
     Caption = 'Database:'
-    ParentColor = False
   end
   object Label2: TLabel
     Left = 32
-    Height = 14
+    Height = 15
     Top = 128
     Width = 74
     Caption = 'User  Name:'
-    ParentColor = False
   end
   object Label3: TLabel
     Left = 33
-    Height = 14
+    Height = 15
     Top = 176
-    Width = 59
+    Width = 60
     Caption = 'Password:'
-    ParentColor = False
   end
   object Button1: TButton
     Left = 297
@@ -97,11 +93,10 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
   end
   object Label1: TLabel
     Left = 33
-    Height = 14
+    Height = 15
     Top = 40
     Width = 80
     Caption = 'Project Name'
-    ParentColor = False
   end
   object SpeedButton1: TSpeedButton
     Left = 338
@@ -193,7 +188,7 @@ object IBXDSLoginDlg: TIBXDSLoginDlg
     DefaultExt = '.*.fdb'
     Filter = 'Firebird Databases|*.fdb;*.gdb'
     Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
-    left = 336
-    top = 34
+    Left = 336
+    Top = 34
   end
 end
