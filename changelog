@@ -1,3 +1,8 @@
+IBX Change Log  version (2.7-1 Build 15737) Mon, 03 Jun 2024 11:40:25 +0100
+
+1. IBDynamicGrid. Check for zero column count in UpdateSQL.
+
+
 IBX Change Log  version (2.7-0 Build 15737) Mon, 03 Jun 2024 11:40:25 +0100
 
 1. Pascal interface defined between the IB dynamic controls and IBX datasets.

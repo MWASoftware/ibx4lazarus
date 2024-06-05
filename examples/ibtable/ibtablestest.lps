@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="75">
+    <Units Count="76">
       <Unit0>
         <Filename Value="ibtablestest.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -18,7 +18,7 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="113"/>
+        <TopLine Value="112"/>
         <CursorPos X="3" Y="124"/>
         <UsageCount Value="45"/>
         <Loaded Value="True"/>
@@ -245,12 +245,10 @@
       </Unit32>
       <Unit33>
         <Filename Value="../../runtime/nongui/IBTable.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1317"/>
         <CursorPos X="3" Y="1328"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit33>
       <Unit34>
         <Filename Value="/usr/share/fpcsrc/packages/fcl-db/src/base/datasource.inc"/>
@@ -538,8 +536,17 @@
         <CursorPos X="37" Y="2421"/>
         <UsageCount Value="10"/>
       </Unit74>
+      <Unit75>
+        <Filename Value="../../../fbintf/client/3.0/firebird/FirebirdOOAPI.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1138"/>
+        <CursorPos X="9" Y="1152"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit75>
     </Units>
-    <JumpHistory Count="8" HistoryIndex="7">
+    <JumpHistory Count="5" HistoryIndex="4">
       <Position1>
         <Filename Value="Unit1.pas"/>
         <Caret Line="29" Column="43" TopLine="18"/>
@@ -549,29 +556,17 @@
         <Caret Line="35" Column="40" TopLine="35"/>
       </Position2>
       <Position3>
-        <Filename Value="../../runtime/nongui/IBTable.pas"/>
-        <Caret Line="1567" TopLine="1552"/>
-      </Position3>
-      <Position4>
-        <Filename Value="../../runtime/nongui/IBTable.pas"/>
-        <Caret Line="1567" TopLine="1552"/>
-      </Position4>
-      <Position5>
-        <Filename Value="../../runtime/nongui/IBTable.pas"/>
-        <Caret Line="1312" TopLine="1298"/>
-      </Position5>
-      <Position6>
         <Filename Value="Unit1.pas"/>
         <Caret Line="35" Column="41" TopLine="29"/>
-      </Position6>
-      <Position7>
-        <Filename Value="../../runtime/nongui/IBTable.pas"/>
-        <Caret Line="85" Column="21" TopLine="84"/>
-      </Position7>
-      <Position8>
+      </Position3>
+      <Position4>
         <Filename Value="Unit1.pas"/>
         <Caret Line="38" Column="61" TopLine="29"/>
-      </Position8>
+      </Position4>
+      <Position5>
+        <Filename Value="../../../fbintf/client/3.0/firebird/FirebirdOOAPI.pas"/>
+        <Caret Line="24" Column="42"/>
+      </Position5>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
