@@ -9,6 +9,7 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
   OnShow = FormShow
   inherited Label3: TLabel
     Left = 312
+    Height = 15
   end
   inherited Button1: TButton
     Left = 576
@@ -36,11 +37,26 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
     ShowTabs = False
     inherited SelectPage: TTabSheet
       ClientHeight = 450
+      inherited Label1: TLabel
+        Height = 15
+      end
+      inherited Label2: TLabel
+        Height = 15
+      end
+      inherited Label4: TLabel
+        Height = 15
+      end
       inherited FieldNamesGrid: TIBDynamicGrid
         Height = 104
       end
       inherited SelectSelectAll: TCheckBox
         Top = 424
+      end
+      inherited Label6: TLabel
+        Height = 15
+      end
+      inherited Label5: TLabel
+        Height = 15
       end
       inherited ReadOnlyGrid: TIBDynamicGrid
         Left = 9
@@ -50,12 +66,17 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
       ClientHeight = 450
       inherited Label16: TLabel
         Left = 10
+        Height = 15
       end
       inherited Label17: TLabel
+        Height = 15
         Top = 128
+        Width = 105
       end
       inherited Label18: TLabel
+        Height = 15
         Top = 280
+        Width = 115
       end
       inherited ProcedureNames: TIBLookupComboEditBox
         Left = 10
@@ -93,16 +114,19 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
             DBLookupProperties.AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
           end>
       end
+      inherited PackageNameLabel: TLabel
+        Height = 15
+        Width = 89
+      end
       object SelectProcedure: TLabel[8]
         Left = 10
-        Height = 13
-        Top = 104
+        Height = 14
+        Top = 103
         Width = 168
         Anchors = [akLeft, akBottom]
         Caption = 'This is a ''Select Procedure'''
         Font.Height = -11
         Font.Style = [fsBold]
-        ParentColor = False
         ParentFont = False
         Visible = False
       end
@@ -129,6 +153,12 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
     end
     inherited ToolBar1: TToolBar
       Width = 447
+      inherited ToolButton3: TToolButton
+        Height = 22
+      end
+      inherited ToolButton7: TToolButton
+        Height = 22
+      end
     end
     inherited FieldNameList: TIBQuery
       ParamData = <      
@@ -185,8 +215,8 @@ inherited IBSQLEditorForm: TIBSQLEditorForm
         end>
     end
     inherited ReadOnlyFieldsSource: TDataSource
-      left = 436
-      top = 203
+      Left = 436
+      Top = 203
     end
     inherited PackageNames: TIBQuery
       BeforeClose = nil

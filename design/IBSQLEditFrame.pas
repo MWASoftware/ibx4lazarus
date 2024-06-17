@@ -133,6 +133,7 @@ type
     procedure WrapTextExecute(Sender: TObject);
     procedure WrapTextUpdate(Sender: TObject);
   private
+    FClearEditorOnGenerateSQL : boolean;
     FDatabase: TIBDatabase;
     FExcludeIdentityColumns: boolean;
     FExecuteOnlyProcs: boolean;
@@ -201,6 +202,7 @@ type
     property ExcludeIdentityColumns: boolean read FExcludeIdentityColumns write SetExcludeIdentityColumns;
     property ExecuteOnlyProcs: boolean read FExecuteOnlyProcs write SetExecuteOnlyProcs;
     property SelectProcs: boolean read FSelectProcs write SetSelectProcs;
+    property ClearEditorOnGenerateSQL: boolean read FClearEditorOnGenerateSQL write FClearEditorOnGenerateSQL;
     property OnUserTablesOpened: TNotifyEvent read FOnUserTablesOpened write FOnUserTablesOpened;
   end;
 
@@ -433,6 +435,7 @@ constructor TIBSQLEditFrame.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
   FIncludeReadOnlyFields := true;
+  FClearEditorOnGenerateSQL := true;
 end;
 
 procedure TIBSQLEditFrame.DoWrapText;
@@ -600,7 +603,8 @@ var FieldNames: TStrings;
     PrimaryKeyNames: TStrings;
     ReadOnlyFieldNames: TStrings;
 begin
-  SQL.Clear;
+  if ClearEditorOnGenerateSQL then
+    SQL.Clear;
   FieldNames := TStringList.Create;
   PrimaryKeyNames := TStringList.Create;
   ReadOnlyFieldNames := TStringList.Create;
@@ -624,7 +628,8 @@ end;
 procedure TIBSQLEditFrame.GenerateRefreshSQL(QuotedStrings: boolean;
   SQL: TStrings; AddReadOnlyFields: boolean);
 begin
-  SQL.Clear;
+  if ClearEditorOnGenerateSQL then
+    SQL.Clear;
   GenerateSelectSQL(QuotedStrings,SQL,AddReadOnlyFields);
   AddWhereClause(QuotedStrings,SQL,false);
 end;
@@ -676,7 +681,8 @@ var FieldNames: TStrings;
     InsertFields: TStrings;
     I: integer;
 begin
-  SQL.Clear;
+  if ClearEditorOnGenerateSQL then
+    SQL.Clear;
   FieldNames := TStringList.Create;
   ReadOnlyFieldNames := TStringList.Create;
   InsertFields := TStringList.Create;
@@ -703,7 +709,8 @@ var FieldNames: TStrings;
     ReadOnlyFieldNames: TStrings;
     UpdateFields: TStrings;
 begin
-  SQL.Clear;
+    if ClearEditorOnGenerateSQL then
+    SQL.Clear;
   FieldNames := TStringList.Create;
   ReadOnlyFieldNames := TStringList.Create;
   UpdateFields := TStringList.Create;
@@ -726,7 +733,8 @@ procedure TIBSQLEditFrame.GenerateDeleteSQL(QuotedStrings: boolean;
   SQL: TStrings);
 var ReadOnlyFieldNames: TStrings;
 begin
-  SQL.Clear;
+  if ClearEditorOnGenerateSQL then
+      SQL.Clear;
   ReadOnlyFieldNames := TStringList.Create;
   try
     GetFieldNames(ReadOnlyFields,ReadOnlyFieldNames,true);
