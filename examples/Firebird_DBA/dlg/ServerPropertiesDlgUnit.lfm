@@ -1,8 +1,0 @@
-inherited ServerPropertiesDlg: TServerPropertiesDlg
-  Caption = 'Server Properties'
-  OnClose = FormClose
-  OnShow = FormShow
-  inherited LocalBtn: TRadioButton
-    TabStop = True
-  end
-end
