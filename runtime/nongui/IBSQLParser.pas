@@ -179,7 +179,8 @@ type
     procedure RestoreClauseValues;
   public
     {IDynamicSQLEditor}
-    procedure OrderBy(fieldname: string; ascending: boolean);
+    procedure OrderBy(fieldname: string; ascending: boolean); overload;
+    procedure OrderBy(columnNo: integer; ascending: boolean); overload;
     procedure Add2WhereClause(const Condition: string; OrClause: boolean=false;
       IncludeUnions: boolean = false);
     function QuoteIdentifierIfNeeded(const s: string): string;
@@ -558,16 +559,16 @@ begin
 end;
 
 procedure TSelectSQLParser.OrderBy(fieldname : string; ascending : boolean);
-var FieldPosition: integer;
 begin
-  FieldPosition := GetFieldPosition(fieldname);
-  if FieldPosition > 0 then
-   begin
-     if ascending then
-       OrderByClause := IntToStr(FieldPosition) + ' asc'
-     else
-       OrderByClause := IntToStr(FieldPosition) + ' desc';
-   end;
+  OrderBy(GetFieldPosition(fieldname),ascending);
+end;
+
+procedure TSelectSQLParser.OrderBy(columnNo : integer; ascending : boolean);
+begin
+  if ascending then
+    OrderByClause := IntToStr(columnNo) + ' asc'
+  else
+    OrderByClause := IntToStr(columnNo) + ' desc';
 end;
 
 function TSelectSQLParser.QuoteIdentifierIfNeeded(const s : string) : string;

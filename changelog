@@ -5,6 +5,11 @@ IBX Change Log  version (2.7-1 Build 15737) Mon, 03 Jun 2024 11:40:25 +0100
 2. At Design time, guard against database open dialog error when Project Name
 contains spaces.
 
+3. IBDynamicGrid: Allow sorting on column header click with ad hoc columns i.e.
+   Columns dynamically created when dataset is opened.
+
+4. Layout tidyup for design time SQL Editors.
+
 
 IBX Change Log  version (2.7-0 Build 15737) Mon, 03 Jun 2024 11:40:25 +0100
 

@@ -84,7 +84,8 @@ type
 
   IDynamicSQLEditor = interface
   ['{3367a89a-4059-49c5-b25f-3ff0fa4f3d55}']
-    procedure OrderBy(fieldname: string; ascending: boolean);
+    procedure OrderBy(fieldname: string; ascending: boolean); overload;
+    procedure OrderBy(columnNo: integer; ascending: boolean); overload;
     procedure Add2WhereClause(const Condition: string; OrClause: boolean=false; IncludeUnions: boolean = false);
     function QuoteIdentifierIfNeeded(const s: string): string;
     function SQLSafeString(const s: string): string;

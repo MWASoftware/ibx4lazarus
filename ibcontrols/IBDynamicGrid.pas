@@ -1239,7 +1239,9 @@ procedure TIBDynamicGrid.UpdateSQL(SQLEditor : IDynamicSQLEditor);
 var OrderBy: string;
 begin
   if Columns.Count > 0 then
-    SQLEditor.OrderBy(Columns[FLastColIndex].FieldName,not Descending);
+    SQLEditor.OrderBy(Columns[FLastColIndex].FieldName,not Descending)
+  else
+    SQLEditor.OrderBy(FLastColIndex+1,not Descending);
 
  if assigned(FOnUpdateSortOrder) then
  begin
