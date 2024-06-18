@@ -1,27 +1,19 @@
 object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
-  Left = 678
-  Height = 487
-  Top = 264
-  Width = 795
+  Left = 750
+  Height = 510
+  Top = 149
+  Width = 856
   ActiveControl = PageControl
   Caption = 'Select SQL Editor'
-  ClientHeight = 487
-  ClientWidth = 795
+  ClientHeight = 510
+  ClientWidth = 856
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '2.0.0.2'
-  object Label3: TLabel
-    Left = 278
-    Height = 14
-    Top = 8
-    Width = 24
-    Caption = 'SQL'
-    ParentColor = False
-  end
+  LCLVersion = '2.2.0.2'
   object Button1: TButton
-    Left = 598
+    Left = 659
     Height = 30
-    Top = 429
+    Top = 452
     Width = 72
     Anchors = [akRight, akBottom]
     Caption = 'OK'
@@ -30,9 +22,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 0
   end
   object Button2: TButton
-    Left = 686
+    Left = 747
     Height = 30
-    Top = 429
+    Top = 452
     Width = 72
     Anchors = [akRight, akBottom]
     Cancel = True
@@ -41,9 +33,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 1
   end
   object GenerateBtn: TButton
-    Left = 326
+    Left = 387
     Height = 30
-    Top = 429
+    Top = 452
     Width = 101
     Anchors = [akRight, akBottom]
     Caption = 'Generate SQL'
@@ -51,9 +43,9 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 2
   end
   object TestBtn: TButton
-    Left = 462
+    Left = 523
     Height = 30
-    Top = 429
+    Top = 452
     Width = 66
     Anchors = [akRight, akBottom]
     Caption = 'Test'
@@ -63,14 +55,14 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   object QuoteFields: TCheckBox
     Left = 24
     Height = 22
-    Top = 440
+    Top = 464
     Width = 125
     Caption = '&Quote Identifiers'
     TabOrder = 4
   end
   object PageControl: TPageControl
     Left = 24
-    Height = 405
+    Height = 428
     Top = 8
     Width = 232
     ActivePage = SelectPage
@@ -78,32 +70,29 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     TabOrder = 5
     object SelectPage: TTabSheet
       Caption = 'Tables'
-      ClientHeight = 373
+      ClientHeight = 395
       ClientWidth = 226
       OnShow = SelectPageShow
       object Label1: TLabel
         Left = 7
-        Height = 14
+        Height = 15
         Top = 4
         Width = 69
         Caption = 'Table Name'
-        ParentColor = False
       end
       object Label2: TLabel
         Left = 8
-        Height = 14
+        Height = 15
         Top = 160
         Width = 33
         Caption = 'Fields'
-        ParentColor = False
       end
       object Label4: TLabel
         Left = 8
-        Height = 14
+        Height = 15
         Top = 80
         Width = 77
         Caption = 'Primary Keys'
-        ParentColor = False
       end
       object SelectTableNames: TIBLookupComboEditBox
         Left = 7
@@ -222,32 +211,29 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
     end
     object ExecutePage: TTabSheet
       Caption = 'Procedures'
-      ClientHeight = 373
+      ClientHeight = 395
       ClientWidth = 226
       OnShow = ExecutePageShow
       object Label16: TLabel
         Left = 9
-        Height = 14
+        Height = 15
         Top = 56
         Width = 100
         Caption = 'Procedure Name'
-        ParentColor = False
       end
       object Label17: TLabel
         Left = 9
-        Height = 14
+        Height = 15
         Top = 111
-        Width = 104
+        Width = 105
         Caption = 'Input Parameters'
-        ParentColor = False
       end
       object Label18: TLabel
         Left = 10
-        Height = 14
+        Height = 15
         Top = 229
-        Width = 114
+        Width = 115
         Caption = 'Output Parameters'
-        ParentColor = False
       end
       object ProcedureNames: TIBLookupComboEditBox
         Left = 9
@@ -335,11 +321,10 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
       end
       object PackageNameLabel: TLabel
         Left = 10
-        Height = 14
+        Height = 15
         Top = 8
-        Width = 88
+        Width = 89
         Caption = 'Package Name'
-        ParentColor = False
       end
       object PackageNames: TIBLookupComboEditBox
         Left = 9
@@ -364,88 +349,106 @@ object IBSelectSQLEditorForm: TIBSelectSQLEditorForm
   object GenerateParams: TCheckBox
     Left = 24
     Height = 22
-    Top = 416
+    Top = 440
     Width = 171
     Caption = 'Allow DSQL Placeholders'
     TabOrder = 6
   end
-  inline IBSQLEditFrame1: TIBSQLEditFrame
-    Left = 282
-    Height = 389
-    Top = 24
-    Width = 496
+  object Panel1: TPanel
+    Left = 272
+    Height = 428
+    Top = 8
+    Width = 555
     Anchors = [akTop, akLeft, akRight, akBottom]
-    ClientHeight = 389
-    ClientWidth = 496
+    BevelOuter = bvNone
+    ClientHeight = 428
+    ClientWidth = 555
     TabOrder = 7
-    DesignLeft = 1974
-    DesignTop = 200
-    inherited SQLText: TSynEdit
-      Height = 363
-      Width = 496
+    object Label3: TLabel
+      Left = 0
+      Height = 15
+      Top = 0
+      Width = 555
+      Align = alTop
+      Caption = 'SQL'
     end
-    inherited ToolBar1: TToolBar
-      Width = 496
-      inherited ToolButton3: TToolButton
-        Height = 22
+    inline IBSQLEditFrame1: TIBSQLEditFrame
+      Height = 413
+      Top = 15
+      Width = 555
+      Align = alClient
+      AutoSize = True
+      ClientHeight = 413
+      ClientWidth = 555
+      inherited SQLText: TSynEdit
+        Height = 387
+        Width = 555
       end
-      inherited ToolButton7: TToolButton
-        Height = 22
+      inherited ToolBar1: TToolBar
+        Width = 555
+        inherited ToolButton3: TToolButton
+          Height = 22
+        end
+        inherited ToolButton7: TToolButton
+          Height = 22
+        end
       end
-    end
-    inherited FieldNameList: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$RELATION_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited PrimaryKeys: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$RELATION_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited ProcInputParams: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$PROCEDURE_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited ProcOutputParams: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$PROCEDURE_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited SQLTransaction: TIBTransaction
-      Params.Strings = (      )
-    end
-    inherited IdentityCols: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$RELATION_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited ReadOnlyFields: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$RELATION_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited PackageNames: TIBQuery
-      BeforeClose = nil
+      inherited ActionList1: TActionList
+        inherited Commit: TAction
+          Visible = False
+        end
+        inherited Rollback: TAction
+          Visible = False
+        end
+      end
+      inherited FieldNameList: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$RELATION_NAME'
+            ParamType = ptInput
+          end>
+      end
+      inherited PrimaryKeys: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$RELATION_NAME'
+            ParamType = ptInput
+          end>
+      end
+      inherited ProcInputParams: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$PROCEDURE_NAME'
+            ParamType = ptInput
+          end>
+      end
+      inherited ProcOutputParams: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$PROCEDURE_NAME'
+            ParamType = ptInput
+          end>
+      end
+      inherited IdentityCols: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$RELATION_NAME'
+            ParamType = ptInput
+          end>
+      end
+      inherited ReadOnlyFields: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$RELATION_NAME'
+            ParamType = ptInput
+          end>
+      end
     end
   end
 end

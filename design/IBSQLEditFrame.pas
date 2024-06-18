@@ -40,6 +40,8 @@ type
   { TIBSQLEditFrame }
 
   TIBSQLEditFrame = class(TFrame)
+    Rollback : TAction;
+    Commit : TAction;
     PackageNameSource: TDataSource;
     PackageNames: TIBQuery;
     ReadOnlyFieldsSource: TDataSource;
@@ -66,6 +68,8 @@ type
     Redo: TAction;
     ToolButton10: TToolButton;
     ToolButton11: TToolButton;
+    ToolButton12 : TToolButton;
+    ToolButton13 : TToolButton;
     Undo: TAction;
     SaveToFile: TAction;
     LoadFromFile: TAction;

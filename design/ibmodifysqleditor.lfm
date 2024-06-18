@@ -17,8 +17,13 @@ inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
   inherited TestBtn: TButton
     Top = 457
   end
+  inherited QuoteFields: TCheckBox
+    Top = 472
+  end
   inherited PageControl: TPageControl
+    Height = 428
     inherited SelectPage: TTabSheet
+      ClientHeight = 395
       inherited Label2: TLabel
         Left = 7
         Top = 224
@@ -40,11 +45,10 @@ inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
       end
       object Label5: TLabel[8]
         Left = 9
-        Height = 14
+        Height = 15
         Top = 152
         Width = 138
         Caption = 'Computed By Columns'
-        ParentColor = False
       end
       object ReadOnlyGrid: TIBDynamicGrid[9]
         Left = 9
@@ -85,6 +89,7 @@ inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
       end
     end
     inherited ExecutePage: TTabSheet
+      ClientHeight = 395
       inherited Label18: TLabel
         Top = 240
       end
@@ -123,89 +128,79 @@ inherited IBModifySQLEditorForm: TIBModifySQLEditorForm
       end
     end
   end
-  inherited IBSQLEditFrame1: TIBSQLEditFrame
-    Left = 282
-    Height = 389
-    Top = 24
-    Width = 448
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    ClientHeight = 389
-    ClientWidth = 448
-    TabOrder = 7
-    DesignLeft = 1974
-    DesignTop = 200
-    inherited SQLText: TSynEdit
-      Height = 363
-      Width = 448
-    end
-    inherited ToolBar1: TToolBar
-      Width = 448
-    end
-    inherited FieldNameList: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$RELATION_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited PrimaryKeys: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$RELATION_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited ProcInputParams: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$PROCEDURE_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited ProcOutputParams: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$PROCEDURE_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited SQLTransaction: TIBTransaction
-      Params.Strings = (      )
-    end
-    inherited IdentityCols: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$RELATION_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited ReadOnlyFields: TIBQuery
-      ParamData = <      
-        item
-          DataType = ftUnknown
-          Name = 'RDB$RELATION_NAME'
-          ParamType = ptInput
-        end>
-    end
-    inherited ReadOnlyFieldsSource: TDataSource
-      left = 436
-      top = 203
-    end
-    inherited PackageNames: TIBQuery
-      BeforeClose = nil
-    end
+  inherited GenerateParams: TCheckBox
+    Top = 448
   end
-  object IncludePrimaryKeys: TCheckBox[9]
-    Left = 24
-    Height = 22
-    Top = 465
-    Width = 241
-    Caption = 'Include Primary keys in Update SQL'
-    TabOrder = 8
+  inherited Panel1: TPanel
+    inherited IBSQLEditFrame1: TIBSQLEditFrame
+      Height = 413
+      Top = 15
+      Width = 555
+      Align = alClient
+      AutoSize = True
+      ClientHeight = 413
+      ClientWidth = 555
+      inherited SQLText: TSynEdit
+        Height = 387
+        Width = 555
+      end
+      inherited ToolBar1: TToolBar
+        Width = 555
+        inherited ToolButton3: TToolButton
+          Height = 22
+        end
+        inherited ToolButton7: TToolButton
+          Height = 22
+        end
+      end
+      inherited FieldNameList: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$RELATION_NAME'
+            ParamType = ptInput
+          end>
+      end
+      inherited PrimaryKeys: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$RELATION_NAME'
+            ParamType = ptInput
+          end>
+      end
+      inherited ProcInputParams: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$PROCEDURE_NAME'
+            ParamType = ptInput
+          end>
+      end
+      inherited ProcOutputParams: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$PROCEDURE_NAME'
+            ParamType = ptInput
+          end>
+      end
+      inherited IdentityCols: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$RELATION_NAME'
+            ParamType = ptInput
+          end>
+      end
+      inherited ReadOnlyFields: TIBQuery
+        ParamData = <        
+          item
+            DataType = ftUnknown
+            Name = 'RDB$RELATION_NAME'
+            ParamType = ptInput
+          end>
+      end
+    end
   end
 end

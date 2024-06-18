@@ -88,7 +88,6 @@ begin
       SelectProcs := true;
       SQLText.Lines.Assign(aIBSQL.SQL);
     end;
-    IncludePrimaryKeys.Checked := false;
     Result := ShowModal = mrOK;
     if Result then
     begin

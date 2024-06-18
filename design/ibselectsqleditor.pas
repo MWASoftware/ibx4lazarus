@@ -32,7 +32,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ComCtrls, db, IBSQLEditFrame, IBDatabase, IBCustomDataSet,
+  ComCtrls , ExtCtrls, db, IBSQLEditFrame, IBDatabase, IBCustomDataSet,
   IBLookupComboEditBox, IBDynamicGrid, IB;
 
 type
@@ -42,6 +42,8 @@ type
   TIBSelectSQLEditorForm = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    IBSQLEditFrame1 : TIBSQLEditFrame;
+    Label3 : TLabel;
     PackageNames: TIBLookupComboEditBox;
     InputProcGrid: TIBDynamicGrid;
     PackageNameLabel: TLabel;
@@ -50,8 +52,8 @@ type
     GenerateBtn: TButton;
     GenerateParams: TCheckBox;
     FieldNamesGrid: TIBDynamicGrid;
+    Panel1 : TPanel;
     PrimaryKeysGrid: TIBDynamicGrid;
-    IBSQLEditFrame1: TIBSQLEditFrame;
     ProcedureNames: TIBLookupComboEditBox;
     SelectSelectAll: TCheckBox;
     SelectTableNames: TIBLookupComboEditBox;
@@ -61,7 +63,6 @@ type
     Label17: TLabel;
     Label18: TLabel;
     Label2: TLabel;
-    Label3: TLabel;
     Label4: TLabel;
     PageControl: TPageControl;
     QuoteFields: TCheckBox;
