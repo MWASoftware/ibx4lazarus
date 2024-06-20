@@ -700,8 +700,8 @@ begin
   Add2Log('Current memory = ' + FormatFloat(LargeCompFormat,stats[psCurrentMemory]));
   Add2Log('Delta memory = ' + FormatFloat(LargeCompFormat,stats[psDeltaMemory]));
   Add2Log('Max memory = ' + FormatFloat(LargeCompFormat,stats[psMaxMemory]));
-  Add2Log('Elapsed time= ' + FormatFloat(ThreeSigPlacesFormat,stats[psRealTime]/1000) +' sec');
-  Add2Log('Cpu = ' + FormatFloat(ThreeSigPlacesFormat,stats[psUserTime]/1000) + ' clock ticks');
+  Add2Log('Elapsed time = ' + FormatFloat(ThreeSigPlacesFormat,stats[psRealTime]/1000) +' sec');
+  Add2Log('Cpu = ' + IntToStr(stats[psUserTime]) + ' clock ticks');
   Add2Log('Buffers = ' + FormatFloat('#0',stats[psBuffers]));
   Add2Log('Reads = ' + FormatFloat('#0',stats[psReads]));
   Add2Log('Writes = ' + FormatFloat('#0',stats[psWrites]));
