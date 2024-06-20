@@ -88,7 +88,8 @@ type
     procedure Assign(Source: TPersistent); override;
     function DataOut(SelectQuery: string; Add2Log: TAdd2Log): boolean;
     procedure SetCommand(command, aValue, stmt: string; var Done: boolean); virtual;
-    class procedure ShowPerfStats(Statement: IStatement; Add2Log: TAdd2Log);
+    class procedure ShowPerfStats(Statement: IStatement; Add2Log: TAdd2Log); overload;
+    class procedure ShowPerfStats(stats: TPerfCounters; Add2Log: TAdd2Log); overload;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Transaction: TIBTransaction read GetTransaction write SetTransaction;
@@ -683,24 +684,28 @@ end;
 
 class procedure TIBCustomDataOutput.ShowPerfStats(Statement: IStatement;
   Add2Log: TAdd2Log);
-var stats: TPerfCounters;
-    LargeCompFormat: string;
+var stats : TPerfCounters;
+begin
+  if Statement.GetPerfStatistics(stats) then
+    ShowPerfStats(stats,Add2Log);
+end;
+
+class procedure TIBCustomDataOutput.ShowPerfStats(stats: TPerfCounters;
+  Add2Log : TAdd2Log);
+var LargeCompFormat: string;
     ThreeSigPlacesFormat: string;
 begin
   LargeCompFormat := '#' + DefaultFormatSettings.ThousandSeparator + '##0';
   ThreeSigPlacesFormat := '#0' + DefaultFormatSettings.DecimalSeparator + '000';
-  if Statement.GetPerfStatistics(stats) then
-  begin
-    Add2Log('Current memory = ' + FormatFloat(LargeCompFormat,stats[psCurrentMemory]));
-    Add2Log('Delta memory = ' + FormatFloat(LargeCompFormat,stats[psDeltaMemory]));
-    Add2Log('Max memory = ' + FormatFloat(LargeCompFormat,stats[psMaxMemory]));
-    Add2Log('Elapsed time= ' + FormatFloat(ThreeSigPlacesFormat,stats[psRealTime]/1000) +' sec');
-    Add2Log('Cpu = ' + FormatFloat(ThreeSigPlacesFormat,stats[psUserTime]/1000) + ' sec');
-    Add2Log('Buffers = ' + FormatFloat('#0',stats[psBuffers]));
-    Add2Log('Reads = ' + FormatFloat('#0',stats[psReads]));
-    Add2Log('Writes = ' + FormatFloat('#0',stats[psWrites]));
-    Add2Log('Fetches = ' + FormatFloat('#0',stats[psFetches]));
- end;
+  Add2Log('Current memory = ' + FormatFloat(LargeCompFormat,stats[psCurrentMemory]));
+  Add2Log('Delta memory = ' + FormatFloat(LargeCompFormat,stats[psDeltaMemory]));
+  Add2Log('Max memory = ' + FormatFloat(LargeCompFormat,stats[psMaxMemory]));
+  Add2Log('Elapsed time= ' + FormatFloat(ThreeSigPlacesFormat,stats[psRealTime]/1000) +' sec');
+  Add2Log('Cpu = ' + FormatFloat(ThreeSigPlacesFormat,stats[psUserTime]/1000) + ' clock ticks');
+  Add2Log('Buffers = ' + FormatFloat('#0',stats[psBuffers]));
+  Add2Log('Reads = ' + FormatFloat('#0',stats[psReads]));
+  Add2Log('Writes = ' + FormatFloat('#0',stats[psWrites]));
+  Add2Log('Fetches = ' + FormatFloat('#0',stats[psFetches]));
 end;
 
 end.
