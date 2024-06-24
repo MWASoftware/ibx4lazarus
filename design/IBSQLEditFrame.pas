@@ -40,6 +40,8 @@ type
   { TIBSQLEditFrame }
 
   TIBSQLEditFrame = class(TFrame)
+    NextScript : TAction;
+    PreviousScript : TAction;
     Rollback : TAction;
     Commit : TAction;
     PackageNameSource: TDataSource;
@@ -66,6 +68,8 @@ type
     ProcOutputParams: TIBQuery;
     ProcOutputSource: TDataSource;
     Redo: TAction;
+    PrevBtn : TToolButton;
+    NextBtn : TToolButton;
     ToolButton10: TToolButton;
     ToolButton11: TToolButton;
     ToolButton12 : TToolButton;
@@ -79,8 +83,8 @@ type
     OpenDialog1: TOpenDialog;
     SaveDialog1: TSaveDialog;
     ToolBar1: TToolBar;
-    ToolButton1: TToolButton;
-    ToolButton2: TToolButton;
+    ToolButtonOpen: TToolButton;
+    ToolButtonSave: TToolButton;
     ToolButton3: TToolButton;
     ToolButton4: TToolButton;
     ToolButton5: TToolButton;
