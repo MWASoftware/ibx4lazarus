@@ -683,6 +683,7 @@ type
     {Performance Statistics}
     function GetRowsAffected(var SelectCount, InsertCount, UpdateCount, DeleteCount: integer): boolean;
     function GetPerfStatistics(var stats: TPerfCounters): boolean;
+    function GetPlan: string;
     property EnableStatistics: boolean read FEnableStatistics write FEnableStatistics;
     property PrimaryKeys: TStrings read FPrimaryKeys;
 
@@ -3188,6 +3189,11 @@ function TIBCustomDataSet.GetPerfStatistics(var stats: TPerfCounters): boolean;
 begin
   Result := EnableStatistics and (FQSelect.Statement <> nil) and
      FQSelect.Statement.GetPerfStatistics(stats);
+end;
+
+function TIBCustomDataSet.GetPlan : string;
+begin
+  Result := FQSelect.Plan;
 end;
 
 function TIBCustomDataSet.AllocRecordBuffer: TRecordBuffer;
