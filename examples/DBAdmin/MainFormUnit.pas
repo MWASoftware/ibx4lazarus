@@ -48,6 +48,7 @@ type
     Edit7: TEdit;
     Edit8: TEdit;
     Edit9: TEdit;
+    IncludeUserGrants : TCheckBox;
     Label44: TLabel;
     ClientServerVersion: TMemo;
     Label45: TLabel;
@@ -64,12 +65,12 @@ type
     MenuItem20: TMenuItem;
     MenuItem21: TMenuItem;
     Panel10: TPanel;
+    SchemaPanel : TPanel;
     RunScript: TAction;
     AutoAdmin: TCheckBox;
     DatabaseAliasName: TEdit;
     DBEdit5: TDBEdit;
     DBEdit6: TDBEdit;
-    IncludeUserGrants: TCheckBox;
     Label41: TLabel;
     Label42: TLabel;
     Label43: TLabel;
@@ -101,6 +102,7 @@ type
     MappingsTab: TTabSheet;
     AccessRightsTab: TTabSheet;
     Splitter5: TSplitter;
+    SynEdit1 : TSynEdit;
     ToolButton6: TToolButton;
     ToolButton7: TToolButton;
     UpdateColsPanel: TPanel;
@@ -284,7 +286,6 @@ type
     StatusBar1: TStatusBar;
     SweepInterval: TEdit;
     SyncWrites: TCheckBox;
-    SynEdit1: TSynEdit;
     SynSQLSyn1: TSynSQLSyn;
     AttachmentsTab: TTabSheet;
     ToolBar1: TToolBar;
@@ -1041,7 +1042,7 @@ end;
 
 procedure TMainForm.DoDBOpen(Data: PtrInt);
 begin
-  ConnectToDatabase;
+    ConnectToDatabase;
 end;
 
 procedure TMainForm.HandleDBConnect(Sender: TObject);
