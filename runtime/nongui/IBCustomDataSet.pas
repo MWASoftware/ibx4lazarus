@@ -127,6 +127,15 @@ type
     procedure SetEltAsString(index: array of integer; aValue: string);
   end;
 
+  {TIBFloat Field allows us to override the default formatting method}
+
+  { TIBFloatField }
+
+  TIBFloatField = class(TFloatField)
+  protected
+   procedure GetText(var AText: string; ADisplayText: Boolean); override;
+  end;
+
   { TIBStringField allows us to have strings longer than 8196 }
 
   TIBStringField = class(TStringField)
@@ -381,6 +390,7 @@ type
     FAutoCommit: TIBAutoCommit;
     FBufferChunksInFirstBlock: integer;
     FCaseSensitiveParameterNames: boolean;
+    FDefaultFloatFormat : string;
     FDefaultTZDate: TDateTime;
     FEnableStatistics: boolean;
     FGenerateParamNames: Boolean;
@@ -691,6 +701,7 @@ type
     property AllowAutoActivateTransaction: Boolean read FAllowAutoActivateTransaction
                  write FAllowAutoActivateTransaction;
     property Database: TIBDatabase read GetDatabase write SetDatabase;
+    property DefaultFloatFormat: string read FDefaultFloatFormat write FDefaultFloatFormat;
     property Transaction: TIBTransaction read GetTransaction
                                           write SetTransaction;
     property ForcedRefresh: Boolean read FForcedRefresh
@@ -881,7 +892,7 @@ const
     TIBIntegerField,    { ftInteger }
     TWordField,         { ftWord }
     TBooleanField,      { ftBoolean }
-    TFloatField,        { ftFloat }
+    TIBFloatField,        { ftFloat }
     TCurrencyField,     { ftCurrency }
     TIBBCDField,        { ftBCD }
     TDateField,         { ftDate }
@@ -1013,6 +1024,23 @@ end;
     end;
     Result := str;
   end;
+
+{ TIBFloatField }
+
+procedure TIBFloatField.GetText(var AText : string; ADisplayText : Boolean);
+var f : Double;
+begin
+  if ADisplayText and (DataSet <> nil) and (DataSet is TIBCustomDataSet) and
+    ((DataSet as TIBCustomDataSet).DefaultFloatFormat <> '') then
+  begin
+    If GetData(@f) then
+      AText := FormatFloat((DataSet as TIBCustomDataSet).DefaultFloatFormat,f)
+    else
+      AText := '';
+  end
+  else
+    AText := GetAsString;
+end;
 
 { TIBFieldDef }
 

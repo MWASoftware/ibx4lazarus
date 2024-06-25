@@ -13,6 +13,22 @@ contains spaces.
 5. IBQuery, IBDataset: function GetPlan: string; added. Returns the current plan
    for the select SQL statement.
 
+6. IBExtract: Fix formatting issues with Trigger source.
+
+7. IBExtract: New extract type 'eoExternalFunction'. This is used to explicitly
+   extract external functions. Extract type eoFunction now refers only to
+   internal functions.
+
+8. IBExtract: If etGrant include in extract types when extracting exceptions,
+   generators or external functions, grants to objects using the extracted object
+   are included in the extracted SQL. This is exising behaviour for procedures and
+   functions.
+
+9. IBCustomDataset and subclasses (e.g. TIBQuery, TIBDataset): new published property
+   DefaultFloatFormat. If not empty then the property value is assumed to be a
+   valid format string for "FormatFloat" and floating point display text is
+   formatted and displayed using this format instead of the FloatStr default.
+
 
 IBX Change Log  version (2.7-0 Build 15737) Mon, 03 Jun 2024 11:40:25 +0100
 

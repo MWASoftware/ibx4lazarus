@@ -57,7 +57,7 @@ uses
 
 type
   TExtractObjectTypes =
-    (eoDatabase, eoDomain, eoTable, eoView, eoProcedure, eoFunction, eoPackage,
+    (eoDatabase, eoDomain, eoTable, eoView, eoProcedure, eoExternalFunction, eoFunction, eoPackage,
      eoGenerator, eoException, eoBLOBFilter, eoRole, eoTrigger, eoForeign,
      eoIndexes, eoChecks, eoComments, eoData);
 
@@ -1722,6 +1722,9 @@ begin
         Header := false;
       end;
       ProcName := Trim(qryProcedures.FieldByName('RDB$PROCEDURE_NAME').AsString);
+      ExtractOut(Format('/* Stored Procedure: %s, Owner: %s */',[ProcName,
+                            Trim(qryProcedures.FieldByName('RDB$OWNER_NAME').AsString)]));
+      ExtractOut('');
 
       case ProcDDLType of
       pdCreateStub:
@@ -1921,6 +1924,7 @@ var
   qryTriggers : TIBSQL;
   qryTriggerSec: TIBSQL;
   SList : TStrings;
+  TriggerSource: TStrings;
   Comments: TStrings;
 begin
   Header := true;
@@ -1928,6 +1932,7 @@ begin
     ExtractTypes -= [etDatabaseTriggers,etDDLTriggers];
   SList := TStringList.Create;
   Comments := TStringList.Create;
+  TriggerSource := TStringList.Create;
   qryTriggers := TIBSQL.Create(FDatabase);
   qryTriggerSec := TIBSQL.Create(FDatabase);
   try
@@ -2007,7 +2012,10 @@ begin
             ''' ENGINE ' + qryTriggers.FieldByName('RDB$ENGINE_NAME').AsString)
         else
         if not qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').IsNull then
-          SList.Add(qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString)
+        begin
+          TriggerSource.Text := qryTriggers.FieldByName('RDB$TRIGGER_SOURCE').AsString;
+          SList.AddStrings(TriggerSource);
+        end
         else
           SList.Add('AS BEGIN EXIT; END');
         SList.Add(ProcTerm);
@@ -2031,6 +2039,7 @@ begin
     qryTriggers.Free;
     qryTriggerSec.Free;
     SList.Free;
+    TriggerSource.Free;
   end;
 end;
 
@@ -3534,10 +3543,14 @@ begin
   case ObjectType of
     eoDatabase : ExtractDDL(true, '', ExtractTypes);
     eoDomain :
+     begin
       if etTable in ExtractTypes then
         ListDomains(dtCreateDomain,ObjectName, etTable)
       else
         ListDomains(dtCreateDomain,ObjectName);
+      if (ObjectName <> '' ) and (etGrant in ExtractTypes) then
+          ShowGrants(ObjectName, Term);
+     end;
     eoTable :
     begin
       if ObjectName <> '' then
@@ -3585,6 +3598,11 @@ begin
     eoProcedure :
      begin
        ListProcs(pdCreateProc,ObjectName,etGrant in ExtractTypes);
+       if (ObjectName <> '' ) and (etGrant in ExtractTypes) then
+         ShowGrants(ObjectName, Term);
+     end;
+    eoFunction:
+     begin
        ListFunctions(pdCreateProc,ObjectName,etGrant in ExtractTypes);
        if (ObjectName <> '' ) and (etGrant in ExtractTypes) then
          ShowGrants(ObjectName, Term);
@@ -3600,9 +3618,24 @@ begin
        else
          IBError(ibxeODSVersionRequired,['12.0']);
      end;
-    eoFunction : ListExternalFunctions(ObjectName);
-    eoGenerator : ListGenerators(ObjectName,ExtractTypes);
-    eoException : ListException(ObjectName);
+    eoExternalFunction :
+      begin
+        ListExternalFunctions(ObjectName);
+        if (ObjectName <> '' ) and (etGrant in ExtractTypes) then
+          ShowGrants(ObjectName, Term);
+      end;
+    eoGenerator :
+      begin
+        ListGenerators(ObjectName,ExtractTypes);
+        if (ObjectName <> '' ) and (etGrant in ExtractTypes) then
+          ShowGrants(ObjectName, Term);
+      end;
+    eoException :
+      begin
+        ListException(ObjectName);
+        if (ObjectName <> '' ) and (etGrant in ExtractTypes) then
+         ShowGrants(ObjectName, Term);
+      end;
     eoBLOBFilter : ListFilters(ObjectName);
     eoRole : ListRoles(ObjectName,etGrant in ExtractTypes);
     eoTrigger : 
