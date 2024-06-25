@@ -34,6 +34,14 @@ type
   TMainForm = class(TForm)
     AccessRightsPopup: TPopupMenu;
     AccessRightsSource: TDataSource;
+    SchemaMenuItem22 : TMenuItem;
+    SchemaMenuItem23 : TMenuItem;
+    SchemaMenuItem24 : TMenuItem;
+    SchemaPopup : TPopupMenu;
+    SaveSchema : TAction;
+    SchemaSelectAll : TAction;
+    ClearSchema : TAction;
+    CopyText : TAction;
     ClientLibrary: TLabel;
     ConfigDataGrid: TIBDynamicGrid;
     ConfigDataLabel: TLabel;
@@ -313,9 +321,12 @@ type
     procedure BackupExecute(Sender: TObject);
     procedure ChgPasswordExecute(Sender: TObject);
     procedure ChgPasswordUpdate(Sender: TObject);
+    procedure ClearSchemaExecute(Sender : TObject);
     procedure Commit2PhaseExecute(Sender: TObject);
     procedure CommitAllExecute(Sender: TObject);
     procedure CommitAllUpdate(Sender: TObject);
+    procedure CopyTextExecute(Sender : TObject);
+    procedure CopyTextUpdate(Sender : TObject);
     procedure DatabaseOnlineChange(Sender: TObject);
     procedure DBCharacterSetEditingDone(Sender: TObject);
     procedure DBCommentsEditingDone(Sender: TObject);
@@ -340,6 +351,8 @@ type
     procedure RevokeAllExecute(Sender: TObject);
     procedure RevokeAllUpdate(Sender: TObject);
     procedure RunScriptExecute(Sender: TObject);
+    procedure SaveSchemaExecute(Sender : TObject);
+    procedure SchemaSelectAllExecute(Sender : TObject);
     procedure SelectAllTablesChange(Sender: TObject);
     procedure SelectedTablesOnlyChange(Sender: TObject);
     procedure SelectRepairActionCloseUp(Sender: TObject);
@@ -617,6 +630,11 @@ begin
   (Sender as TAction).Enabled := UserListSource.DataSet.Active and (UserListSource.DataSet.RecordCount > 0);
 end;
 
+procedure TMainForm.ClearSchemaExecute(Sender : TObject);
+begin
+  Synedit1.Clear;
+end;
+
 procedure TMainForm.Commit2PhaseExecute(Sender: TObject);
 begin
   DBDataModule.LimboResolution(RecoverTwoPhaseGlobal,LimboReport.Lines);
@@ -631,6 +649,16 @@ procedure TMainForm.CommitAllUpdate(Sender: TObject);
 begin
   with LimboListSource.DataSet do
   (Sender as TAction).Enabled := Active and (RecordCount > 0);
+end;
+
+procedure TMainForm.CopyTextExecute(Sender : TObject);
+begin
+  SynEdit1.CopyToClipboard;
+end;
+
+procedure TMainForm.CopyTextUpdate(Sender : TObject);
+begin
+  (Sender as TAction).Enabled := SynEdit1.Lines.Text <> '';
 end;
 
 procedure TMainForm.DatabaseOnlineChange(Sender: TObject);
@@ -784,6 +812,17 @@ end;
 procedure TMainForm.RunScriptExecute(Sender: TObject);
 begin
   ExecuteSQLScriptDlg.ShowModal;
+end;
+
+procedure TMainForm.SaveSchemaExecute(Sender : TObject);
+begin
+  if SQLSaveDialog.Execute then
+    SynEdit1.Lines.SaveToFile(SQLSaveDialog.FileName);
+end;
+
+procedure TMainForm.SchemaSelectAllExecute(Sender : TObject);
+begin
+  SynEdit1.SelectAll;
 end;
 
 procedure TMainForm.SelectAllTablesChange(Sender: TObject);
