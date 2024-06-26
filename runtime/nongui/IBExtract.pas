@@ -1959,8 +1959,6 @@ begin
       if Header then
       begin
         ExtractOut(Format('SET TERM %s%s%s', [Procterm, Term, LineEnding]));
-        ExtractOut(Format('%s/* Triggers only will work for SQL triggers */%s',
-		       [LineEnding, LineEnding]));
         Header := false;
       end;
       TriggerName := qryTriggers.FieldByName('RDB$TRIGGER_NAME').AsString;
@@ -3973,11 +3971,13 @@ const
   ') '+ GrantsBaseSelect;
 
 var qryOwnerPriv : TIBSQL;
+    HeadingDone: boolean;
 
 begin
   if MetaObject = '' then
     exit;
 
+  HeadingDone := false;
   qryOwnerPriv := TIBSQL.Create(FDatabase);
   try
     if FDatabaseInfo.ODSMajorVersion >= ODS_VERSION12 then
@@ -3988,6 +3988,12 @@ begin
     qryOwnerPriv.ExecQuery;
     while not qryOwnerPriv.Eof do
     begin
+      if not HeadingDone then
+      begin
+        ExtractOut(Format('/* Access Rights on %s %s */',
+              [TrimRight(qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString), MetaObject]));
+        HeadingDone := true;
+      end;
       if not NoUserGrants or (qryOwnerPriv.FieldByName('RDB$USER_TYPE').AsInteger <> obj_user)
           or (qryOwnerPriv.FieldByName('RDB$USER').AsString = 'PUBLIC') then
       begin
@@ -4065,11 +4071,13 @@ const
   'ORDER BY METAOBJECTNAME';
 
 var qryOwnerPriv : TIBSQL;
+    HeadingDone: boolean;
 
 begin
   if MetaObject = '' then
     exit;
 
+  HeadingDone := false;
   qryOwnerPriv := TIBSQL.Create(FDatabase);
   try
     qryOwnerPriv.SQL.Text := GrantsSQL;
@@ -4078,6 +4086,12 @@ begin
     qryOwnerPriv.ExecQuery;
     while not qryOwnerPriv.Eof do
     begin
+      if not HeadingDone then
+      begin
+        ExtractOut(Format('/* Access Rights given to %s %s */',
+                [TrimRight(qryOwnerPriv.FieldByName('USER_TYPE_NAME').AsString), MetaObject]));
+        HeadingDone := true;
+      end;
       ExtractOut(Format('GRANT %s ON %s %s TO %s %s %s%s', [
                             TrimRight(qryOwnerPriv.FieldByName('Privileges').AsString),
                             TrimRight(qryOwnerPriv.FieldByName('OBJECT_TYPE_NAME').AsString),

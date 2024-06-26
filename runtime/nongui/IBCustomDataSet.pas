@@ -93,6 +93,7 @@ type
   end;
 
   TIBArrayField = class;
+  TIBArrayIndex = array of integer;
 
   { TIBArrayField }
 
@@ -103,12 +104,14 @@ type
     FRelationName: string;
     function GetArrayID: TISC_QUAD;
     function GetArrayIntf: IArray;
+    function GetElementList(aDim: integer; index: TIBArrayIndex): string;
     procedure SetArrayIntf(AValue: IArray);
   protected
+    procedure Bind(Binding: Boolean); override;
     class procedure CheckTypeSize(AValue: Longint); override;
     function GetAsString: string; override;
     function GetDataSize: Integer; override;
-    procedure Bind(Binding: Boolean); override;
+    procedure GetText(var AText: string; ADisplayText: Boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     function CreateArray: IArray;
@@ -1842,6 +1845,38 @@ begin
   Result := TIBCustomDataSet(DataSet).GetArray(self);
 end;
 
+function TIBArrayField.GetElementList(aDim : integer; index : TIBArrayIndex
+  ) : string;
+var i: integer;
+    l: integer;
+    separator: string;
+begin
+  Result := '';
+  separator := '';
+  l := Length(index);
+  SetLength(index,l + 1);
+  Result := '[';
+  if aDim < ArrayDimensions then
+  begin
+    for i := ArrayBounds[aDim-1].LowerBound to ArrayBounds[aDim-1].UpperBound do
+    begin
+      index[l] := i;
+      Result := Result + separator + GetElementList(aDim+1,index);
+      separator := ',';
+    end;
+  end
+  else
+  begin
+    for i := ArrayBounds[aDim-1].LowerBound to ArrayBounds[aDim-1].UpperBound do
+    begin
+      index[l] := i;
+      Result := Result + separator + GetEltAsString(index);
+      separator := ',';
+    end;
+  end;
+  Result := Result + ']';
+end;
+
 function TIBArrayField.GetArrayID: TISC_QUAD;
 begin
   GetData(@Result);
@@ -1866,6 +1901,14 @@ end;
 function TIBArrayField.GetDataSize: Integer;
 begin
   Result := sizeof(TISC_QUAD);
+end;
+
+procedure TIBArrayField.GetText(var AText : string; ADisplayText : Boolean);
+begin
+  if ADisplayText then
+    AText := GetElementList(1,[])
+  else
+    inherited GetText(AText , ADisplayText);
 end;
 
 procedure TIBArrayField.Bind(Binding: Boolean);
