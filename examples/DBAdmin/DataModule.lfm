@@ -5,7 +5,7 @@ object DBDataModule: TDBDataModule
   VerticalOffset = 395
   Width = 730
   object IBDatabase1: TIBDatabase
-    Connected = True
+    Connected = False
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -26,6 +26,7 @@ object DBDataModule: TDBDataModule
     Top = 24
   end
   object CurrentTransaction: TIBTransaction
+    TransactionName = '{11114B40-D7B3-4054-9908-09B8FED3D0D8}'
     Active = False
     DefaultDatabase = IBDatabase1
     Params.Strings = (
@@ -58,6 +59,7 @@ object DBDataModule: TDBDataModule
     AfterOpen = DatabaseQueryAfterOpen
     BeforeClose = DatabaseQueryBeforeClose
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -83,6 +85,7 @@ object DBDataModule: TDBDataModule
     BeforeOpen = DBCharSetBeforeOpen
     AutoCommit = acCommitRetaining
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -108,6 +111,7 @@ object DBDataModule: TDBDataModule
     Transaction = CurrentTransaction
     OnCalcFields = ShadowFilesCalcFields
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -200,6 +204,7 @@ object DBDataModule: TDBDataModule
     Database = IBDatabase1
     Transaction = CurrentTransaction
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -224,6 +229,7 @@ object DBDataModule: TDBDataModule
     Database = IBDatabase1
     Transaction = CurrentTransaction
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -249,6 +255,7 @@ object DBDataModule: TDBDataModule
     Database = IBDatabase1
     Transaction = CurrentTransaction
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -286,6 +293,7 @@ object DBDataModule: TDBDataModule
     Database = IBDatabase1
     Transaction = CurrentTransaction
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -309,6 +317,7 @@ object DBDataModule: TDBDataModule
     Database = IBDatabase1
     Transaction = CurrentTransaction
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -338,6 +347,7 @@ object DBDataModule: TDBDataModule
     AfterScroll = UserListAfterScroll
     BeforeClose = UserListBeforeClose
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -519,6 +529,7 @@ object DBDataModule: TDBDataModule
     Transaction = CurrentTransaction
     AutoCommit = acCommitRetaining
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     DataSource = UserListSource
@@ -584,6 +595,7 @@ object DBDataModule: TDBDataModule
     Transaction = CurrentTransaction
     AfterInsert = UserTagsAfterInsert
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     DataSource = UserListSource
@@ -641,6 +653,7 @@ object DBDataModule: TDBDataModule
     AfterOpen = AttachmentsAfterOpen
     BeforeOpen = AttachmentsBeforeOpen
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -987,6 +1000,7 @@ object DBDataModule: TDBDataModule
     Database = IBDatabase1
     Transaction = CurrentTransaction
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -1021,6 +1035,7 @@ object DBDataModule: TDBDataModule
     Database = IBDatabase1
     Transaction = CurrentTransaction
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -1081,6 +1096,7 @@ object DBDataModule: TDBDataModule
     Transaction = CurrentTransaction
     OnCalcFields = AccessRightsCalcFields
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False
@@ -1218,6 +1234,7 @@ object DBDataModule: TDBDataModule
     Transaction = CurrentTransaction
     BeforeOpen = SubjectAccessRightsBeforeOpen
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
     CaseSensitiveParameterNames = False
     EnableStatistics = False

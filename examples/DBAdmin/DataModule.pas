@@ -991,7 +991,9 @@ end;
 
 function TDBDataModule.GetUserAdminPrivilege: boolean;
 begin
-  Result := false;
+  Result := IBDatabase1.RemoteProtocol = '';
+  if Result then Exit;
+
   {For ODS 12 use SEC$USERS table}
   if IBDatabase1.Connected and (IBDatabaseInfo.ODSMajorVersion >= 12) then
   with AdminUserQuery do
