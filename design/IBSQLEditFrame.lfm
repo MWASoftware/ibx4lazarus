@@ -5,6 +5,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
   Width = 789
   ClientHeight = 585
   ClientWidth = 789
+  LCLVersion = '2.2.0.2'
   TabOrder = 0
   DesignLeft = 793
   DesignTop = 388
@@ -533,7 +534,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     end
     object ToolButton3: TToolButton
       Left = 49
-      Height = 22
+      Height = 8
       Top = 2
       Caption = 'ToolButton3'
       Style = tbsSeparator
@@ -555,7 +556,7 @@ object IBSQLEditFrame: TIBSQLEditFrame
     end
     object ToolButton7: TToolButton
       Left = 126
-      Height = 22
+      Height = 8
       Top = 2
       Caption = 'ToolButton7'
       Style = tbsSeparator

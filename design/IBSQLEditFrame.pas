@@ -1143,7 +1143,7 @@ begin
         end;
       end
     end;
-    Lines.Add(SQL + ';');
+    Lines.Add(SQL);
     ExecuteSQL.AddStrings(Lines);
   finally
     Lines.Free
