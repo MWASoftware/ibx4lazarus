@@ -2992,6 +2992,7 @@ const
   First, FirstArg: Boolean;
   ReturnBuffer, Params : String;
   Comments: TStrings;
+  FunctionSource: TStrings;
 begin
   if FDatabaseInfo.ODSMajorVersion < ODS_VERSION12 then {Nothing to do}
     Exit;
@@ -3000,6 +3001,7 @@ begin
   Comments := TStringList.Create;
   qryFunctions := TIBSQL.Create(FDatabase);
   qryFuncArgs := TIBSQL.Create(FDatabase);
+  FunctionSource := TStringList.Create;
   try
     if FunctionName = '' then
       qryFunctions.SQL.Text := FunctionSQL
@@ -3101,7 +3103,11 @@ begin
                ''' ENGINE ' + qryFunctions.FieldByName('RDB$ENGINE_NAME').AsString + ProcTerm)
            else
            if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
-             ExtractOut('AS' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
+           begin
+             FunctionSource.Text := qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString;
+             ExtractOut('AS' + LineEnding);
+             ExtractOut(FunctionSource);
+           end
            else
              ExtractOut('AS BEGIN END');
 
@@ -3127,7 +3133,11 @@ begin
                ''' ENGINE ' + qryFunctions.FieldByName('RDB$ENGINE_NAME').AsString + ProcTerm)
            else
            if not qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').IsNull then
-             ExtractOut('AS' + LineEnding + qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString)
+           begin
+             FunctionSource.Text := qryFunctions.FieldByName('RDB$FUNCTION_SOURCE').AsString;
+             ExtractOut('AS' + LineEnding);
+             ExtractOut(FunctionSource);
+           end
            else
              ExtractOut('AS BEGIN END');
          end;
@@ -3150,6 +3160,7 @@ begin
       qryFunctions.Free;
       qryFuncArgs.Free;
       Comments.Free;
+      FunctionSource.Free;
     end;
 end;
 
