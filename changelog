@@ -13,7 +13,7 @@ contains spaces.
 5. IBQuery, IBDataset: function GetPlan: string; added. Returns the current plan
    for the select SQL statement.
 
-6. IBExtract: Fix formatting issues with Trigger source.
+6. IBExtract: Fix formatting issues with Trigger and function source.
 
 7. IBExtract: New extract type 'eoExternalFunction'. This is used to explicitly
    extract external functions. Extract type eoFunction now refers only to
