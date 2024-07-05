@@ -1238,17 +1238,20 @@ end;
 procedure TIBDynamicGrid.UpdateSQL(SQLEditor : IDynamicSQLEditor);
 var OrderBy: string;
 begin
-  if Columns.Count > 0 then
-    SQLEditor.OrderBy(Columns[FLastColIndex].FieldName,not Descending)
-  else
-    SQLEditor.OrderBy(FLastColIndex+1,not Descending);
+  if AllowColumnSort then
+  begin
+    if Columns.Count > 0 then
+      SQLEditor.OrderBy(Columns[FLastColIndex].FieldName,not Descending)
+    else
+      SQLEditor.OrderBy(FLastColIndex+1,not Descending);
 
- if assigned(FOnUpdateSortOrder) then
- begin
-   OrderBy := SQLEditor.GetOrderByClause;
-   OnUpdateSortOrder(self,FLastColIndex,OrderBy);
-   SQLEditor.SetOrderByClause(OrderBy);
- end;
+   if assigned(FOnUpdateSortOrder) then
+   begin
+     OrderBy := SQLEditor.GetOrderByClause;
+     OnUpdateSortOrder(self,FLastColIndex,OrderBy);
+     SQLEditor.SetOrderByClause(OrderBy);
+   end;
+  end;
 
  if assigned(FOnUpdateSQL) then
    OnUpdateSQL(self,SQLEditor);

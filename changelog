@@ -29,6 +29,10 @@ contains spaces.
    valid format string for "FormatFloat" and floating point display text is
    formatted and displayed using this format instead of the FloatStr default.
 
+10. IBDynamicGrid: When AllowColumnSort is false the dataset will be presented
+    using the default sort method as given by the sql query rather than by the
+    initial sort column.
+
 
 IBX Change Log  version (2.7-0 Build 15737) Mon, 03 Jun 2024 11:40:25 +0100
 
