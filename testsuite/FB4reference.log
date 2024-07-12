@@ -641,11 +641,11 @@ DEPT_KEY_PATH = 000;900 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 42
 
-Current memory = 19,668,016
-Delta memory = 17,408
-Max memory = 19,785,648
-Elapsed time= 0.009 sec
-Cpu = 0.000 sec
+Current memory = 19,668,768
+Delta memory = 17,840
+Max memory = 19,785,968
+Elapsed time= 0.028 sec
+Cpu = 0.010 sec
 Buffers = 2048
 Reads = 2
 Writes = 0
@@ -1445,7 +1445,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost/employee Disconnected after 5 ms
+inet://localhost/employee Disconnected after 3 ms
 Before Connect
 Connected to inet://localhost/employee
 DPB: Item Count = 3
@@ -1454,7 +1454,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost/employee Disconnected after 1984 ms
+inet://localhost/employee Disconnected after 1979 ms
 Idle Timer Expired for Test_Database_02
 Database Closed
 Transaction Events
@@ -1494,7 +1494,7 @@ Transaction Ending
 Transaction Ended after 2001 ms
 Idle Timer Expired for Test_Transaction_02
 Before Disconnect
-inet://localhost/employee Disconnected after 2020 ms
+inet://localhost/employee Disconnected after 2017 ms
 SQL Dialect Downgrade test
 Before Connect
 Connected to inet://localhost//tmp/ibx-testsuite/testsuite1.fdb
@@ -1516,7 +1516,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 4 ms
+inet://localhost//tmp/ibx-testsuite/testsuite1.fdb Disconnected after 5 ms
 
 
 ------------------------------------------------------
@@ -1549,12 +1549,12 @@ Max Memory = 19638032
 Number of Buffers = 2048
 Sweep Interval = 20000
 User Names: SYSDBA
-Fetches = 2080
+Fetches = 2090
 Marks = 8
 Reads = 107
 Writes = 2
-Pages Free = 311
-Pages Used = 35
+Pages Free = 312
+Pages Used = 34
 Transaction Count = 1
 
 Read Idx Count
@@ -1565,7 +1565,7 @@ Read Idx Count
   RDB$SECURITY_CLASSES = 12
   RDB$TYPES = 2
   RDB$TRIGGERS = 27
-  RDB$USER_PRIVILEGES = 947
+  RDB$USER_PRIVILEGES = 957
   RDB$GENERATORS = 5
   RDB$CHARACTER_SETS = 2
   RDB$COLLATIONS = 2
@@ -3579,11 +3579,11 @@ SALARY = 32,000.00
 FULL_NAME = Guckenheimer, Mark
 DEPT_PATH = Corporate Headquarters / Engineering / Software Products Div. / Quality Assurance (Charset Id = 4 Codepage = 65001)
 DEPT_KEY_PATH = 000;600;620;622 (Charset Id = 4 Codepage = 65001)
-Current memory = 19,669,424
-Delta memory = 19,360
-Max memory = 19,761,888
-Elapsed time= 0.015 sec
-Cpu = 0.010 sec
+Current memory = 19,669,984
+Delta memory = 19,792
+Max memory = 19,762,016
+Elapsed time= 0.027 sec
+Cpu = 0.020 sec
 Buffers = 2048
 Reads = 2
 Writes = 0
@@ -4502,6 +4502,8 @@ SET TERM ^;
 
 /* Stored procedures Definitions*/
 
+/* Stored Procedure: SHOW_LANGS, Owner: SYSDBA */
+
 CREATE PROCEDURE SHOW_LANGS
 (
   CODE VARCHAR(5) CHARACTER SET NONE,
@@ -4515,6 +4517,8 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: ADD_EMP_PROJ, Owner: SYSDBA */
+
 CREATE PROCEDURE ADD_EMP_PROJ
 (
   EMP_NO SMALLINT,
@@ -4522,6 +4526,8 @@ CREATE PROCEDURE ADD_EMP_PROJ
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: ALL_LANGS, Owner: SYSDBA */
 
 CREATE PROCEDURE ALL_LANGS
 RETURNS
@@ -4534,12 +4540,16 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: DELETE_EMPLOYEE, Owner: SYSDBA */
+
 CREATE PROCEDURE DELETE_EMPLOYEE
 (
   EMP_NUM INTEGER
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: DEPT_BUDGET, Owner: SYSDBA */
 
 CREATE PROCEDURE DEPT_BUDGET
 (
@@ -4552,6 +4562,8 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: GET_EMP_PROJ, Owner: SYSDBA */
+
 CREATE PROCEDURE GET_EMP_PROJ
 (
   EMP_NO SMALLINT
@@ -4562,6 +4574,8 @@ RETURNS
 )
 AS BEGIN SUSPEND; EXIT; END
 ^
+
+/* Stored Procedure: MAIL_LABEL, Owner: SYSDBA */
 
 CREATE PROCEDURE MAIL_LABEL
 (
@@ -4579,6 +4593,8 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: ORG_CHART, Owner: SYSDBA */
+
 CREATE PROCEDURE ORG_CHART
 RETURNS
 (
@@ -4591,12 +4607,16 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: SHIP_ORDER, Owner: SYSDBA */
+
 CREATE PROCEDURE SHIP_ORDER
 (
   PO_NUM CHAR(8) CHARACTER SET NONE
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: SUB_TOT_BUDGET, Owner: SYSDBA */
 
 CREATE PROCEDURE SUB_TOT_BUDGET
 (
@@ -4616,9 +4636,6 @@ SET TERM ;^
 COMMIT WORK;
 SET AUTODDL ON;
 SET TERM ^;
-
-
-/* Triggers only will work for SQL triggers */
 
 CREATE TRIGGER SET_CUST_NO FOR CUSTOMER
 ACTIVE BEFORE INSERT POSITION 0
@@ -4670,6 +4687,8 @@ SET TERM ^;
 
 /* Stored procedure Bodies */
 
+/* Stored Procedure: SHOW_LANGS, Owner: SYSDBA */
+
 ALTER PROCEDURE SHOW_LANGS
 (
   CODE VARCHAR(5) CHARACTER SET NONE,
@@ -4698,6 +4717,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: ADD_EMP_PROJ, Owner: SYSDBA */
+
 ALTER PROCEDURE ADD_EMP_PROJ
 (
   EMP_NO SMALLINT,
@@ -4712,6 +4733,8 @@ BEGIN
 	END
 END
 ^
+
+/* Stored Procedure: ALL_LANGS, Owner: SYSDBA */
 
 ALTER PROCEDURE ALL_LANGS
 RETURNS
@@ -4740,6 +4763,8 @@ BEGIN
 	END
     END
 ^
+
+/* Stored Procedure: DELETE_EMPLOYEE, Owner: SYSDBA */
 
 ALTER PROCEDURE DELETE_EMPLOYEE
 (
@@ -4799,6 +4824,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: DEPT_BUDGET, Owner: SYSDBA */
+
 ALTER PROCEDURE DEPT_BUDGET
 (
   DNO CHAR(3) CHARACTER SET NONE
@@ -4835,6 +4862,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: GET_EMP_PROJ, Owner: SYSDBA */
+
 ALTER PROCEDURE GET_EMP_PROJ
 (
   EMP_NO SMALLINT
@@ -4853,6 +4882,8 @@ BEGIN
 		SUSPEND;
 END
 ^
+
+/* Stored Procedure: MAIL_LABEL, Owner: SYSDBA */
 
 ALTER PROCEDURE MAIL_LABEL
 (
@@ -4924,6 +4955,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: ORG_CHART, Owner: SYSDBA */
+
 ALTER PROCEDURE ORG_CHART
 RETURNS
 (
@@ -4965,6 +4998,8 @@ BEGIN
 	END
 END
 ^
+
+/* Stored Procedure: SHIP_ORDER, Owner: SYSDBA */
 
 ALTER PROCEDURE SHIP_ORDER
 (
@@ -5019,6 +5054,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: SUB_TOT_BUDGET, Owner: SYSDBA */
+
 ALTER PROCEDURE SUB_TOT_BUDGET
 (
   HEAD_DEPT CHAR(3) CHARACTER SET NONE
@@ -5052,26 +5089,47 @@ SET AUTODDL ON;
 
 /* Grant permissions for this database */
 
+/* Access Rights on TABLE COUNTRY */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE COUNTRY TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE CUSTOMER */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE CUSTOMER TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE DEPARTMENT */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE DEPARTMENT TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE EMPLOYEE */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE EMPLOYEE TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE EMPLOYEE_PROJECT */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE EMPLOYEE_PROJECT TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE JOB */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE JOB TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE PHONE_LIST */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE PHONE_LIST TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE PROJECT */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE PROJECT TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE PROJ_DEPT_BUDGET */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE PROJ_DEPT_BUDGET TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE SALARY_HISTORY */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE SALARY_HISTORY TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE SALES */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE SALES TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE ADD_EMP_PROJ */
 GRANT EXECUTE ON PROCEDURE ADD_EMP_PROJ TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE ALL_LANGS */
 GRANT EXECUTE ON PROCEDURE ALL_LANGS TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE DELETE_EMPLOYEE */
 GRANT EXECUTE ON PROCEDURE DELETE_EMPLOYEE TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE DEPT_BUDGET */
 GRANT EXECUTE ON PROCEDURE DEPT_BUDGET TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE GET_EMP_PROJ */
 GRANT EXECUTE ON PROCEDURE GET_EMP_PROJ TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE MAIL_LABEL */
 GRANT EXECUTE ON PROCEDURE MAIL_LABEL TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE ORG_CHART */
 GRANT EXECUTE ON PROCEDURE ORG_CHART TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE SHIP_ORDER */
 GRANT EXECUTE ON PROCEDURE SHIP_ORDER TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE SHOW_LANGS */
 GRANT EXECUTE ON PROCEDURE SHOW_LANGS TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE SUB_TOT_BUDGET */
 GRANT EXECUTE ON PROCEDURE SUB_TOT_BUDGET TO USER PUBLIC  WITH GRANT OPTION ;
 
 
@@ -8617,6 +8675,8 @@ SET TERM ^;
 
 /* Stored procedures Definitions*/
 
+/* Stored Procedure: SHOW_LANGS, Owner: SYSDBA */
+
 CREATE PROCEDURE SHOW_LANGS
 (
   CODE VARCHAR(5) CHARACTER SET NONE,
@@ -8630,6 +8690,8 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: ADD_EMP_PROJ, Owner: SYSDBA */
+
 CREATE PROCEDURE ADD_EMP_PROJ
 (
   EMP_NO SMALLINT,
@@ -8637,6 +8699,8 @@ CREATE PROCEDURE ADD_EMP_PROJ
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: ALL_LANGS, Owner: SYSDBA */
 
 CREATE PROCEDURE ALL_LANGS
 RETURNS
@@ -8649,12 +8713,16 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: DELETE_EMPLOYEE, Owner: SYSDBA */
+
 CREATE PROCEDURE DELETE_EMPLOYEE
 (
   EMP_NUM INTEGER
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: DEPT_BUDGET, Owner: SYSDBA */
 
 CREATE PROCEDURE DEPT_BUDGET
 (
@@ -8666,6 +8734,8 @@ RETURNS
 )
 AS BEGIN SUSPEND; EXIT; END
 ^
+
+/* Stored Procedure: EMPLOYEE_PAY_STATUS, Owner: SYSDBA */
 
 CREATE PROCEDURE EMPLOYEE_PAY_STATUS
 (
@@ -8679,6 +8749,8 @@ RETURNS
 AS BEGIN EXIT; END
 ^
 
+/* Stored Procedure: GET_EMP_PROJ, Owner: SYSDBA */
+
 CREATE PROCEDURE GET_EMP_PROJ
 (
   EMP_NO SMALLINT
@@ -8690,12 +8762,16 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: Has Space, Owner: SYSDBA */
+
 CREATE PROCEDURE "Has Space"
 (
   ARG1 INTEGER
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: MAIL_LABEL, Owner: SYSDBA */
 
 CREATE PROCEDURE MAIL_LABEL
 (
@@ -8713,6 +8789,8 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: ORG_CHART, Owner: SYSDBA */
+
 CREATE PROCEDURE ORG_CHART
 RETURNS
 (
@@ -8725,12 +8803,16 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: SHIP_ORDER, Owner: SYSDBA */
+
 CREATE PROCEDURE SHIP_ORDER
 (
   PO_NUM CHAR(8) CHARACTER SET NONE
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: SUB_TOT_BUDGET, Owner: SYSDBA */
 
 CREATE PROCEDURE SUB_TOT_BUDGET
 (
@@ -8746,12 +8828,16 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: UC SPACE, Owner: SYSDBA */
+
 CREATE PROCEDURE "UC SPACE"
 (
   ARG1 INTEGER
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: iCASE, Owner: SYSDBA */
 
 CREATE PROCEDURE "iCASE"
 AS BEGIN EXIT; END
@@ -8775,9 +8861,6 @@ SET TERM ;^
 COMMIT WORK;
 SET AUTODDL ON;
 SET TERM ^;
-
-
-/* Triggers only will work for SQL triggers */
 
 CREATE TRIGGER "After Create Database"
 ACTIVE ON CONNECT POSITION 0
@@ -9339,6 +9422,8 @@ SET TERM ^;
 
 /* Stored procedure Bodies */
 
+/* Stored Procedure: SHOW_LANGS, Owner: SYSDBA */
+
 ALTER PROCEDURE SHOW_LANGS
 (
   CODE VARCHAR(5) CHARACTER SET NONE,
@@ -9367,6 +9452,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: ADD_EMP_PROJ, Owner: SYSDBA */
+
 ALTER PROCEDURE ADD_EMP_PROJ
 (
   EMP_NO SMALLINT,
@@ -9381,6 +9468,8 @@ BEGIN
 	END
 END
 ^
+
+/* Stored Procedure: ALL_LANGS, Owner: SYSDBA */
 
 ALTER PROCEDURE ALL_LANGS
 RETURNS
@@ -9409,6 +9498,8 @@ BEGIN
 	END
     END
 ^
+
+/* Stored Procedure: DELETE_EMPLOYEE, Owner: SYSDBA */
 
 ALTER PROCEDURE DELETE_EMPLOYEE
 (
@@ -9469,6 +9560,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: DEPT_BUDGET, Owner: SYSDBA */
+
 ALTER PROCEDURE DEPT_BUDGET
 (
   DNO CHAR(3) CHARACTER SET NONE
@@ -9505,6 +9598,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: EMPLOYEE_PAY_STATUS, Owner: SYSDBA */
+
 ALTER PROCEDURE EMPLOYEE_PAY_STATUS
 (
   EMP_NUM SMALLINT
@@ -9528,6 +9623,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: GET_EMP_PROJ, Owner: SYSDBA */
+
 ALTER PROCEDURE GET_EMP_PROJ
 (
   EMP_NO SMALLINT
@@ -9547,6 +9644,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: Has Space, Owner: SYSDBA */
+
 ALTER PROCEDURE "Has Space"
 (
   ARG1 INTEGER
@@ -9554,6 +9653,8 @@ ALTER PROCEDURE "Has Space"
 AS
 Begin End
 ^
+
+/* Stored Procedure: MAIL_LABEL, Owner: SYSDBA */
 
 ALTER PROCEDURE MAIL_LABEL
 (
@@ -9625,6 +9726,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: ORG_CHART, Owner: SYSDBA */
+
 ALTER PROCEDURE ORG_CHART
 RETURNS
 (
@@ -9666,6 +9769,8 @@ BEGIN
 	END
 END
 ^
+
+/* Stored Procedure: SHIP_ORDER, Owner: SYSDBA */
 
 ALTER PROCEDURE SHIP_ORDER
 (
@@ -9726,6 +9831,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: SUB_TOT_BUDGET, Owner: SYSDBA */
+
 ALTER PROCEDURE SUB_TOT_BUDGET
 (
   HEAD_DEPT CHAR(3) CHARACTER SET NONE
@@ -9747,6 +9854,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: UC SPACE, Owner: SYSDBA */
+
 ALTER PROCEDURE "UC SPACE"
 (
   ARG1 INTEGER
@@ -9754,6 +9863,8 @@ ALTER PROCEDURE "UC SPACE"
 AS
 Begin End
 ^
+
+/* Stored Procedure: iCASE, Owner: SYSDBA */
 
 ALTER PROCEDURE "iCASE"
 AS
@@ -9772,6 +9883,7 @@ SET TERM ^;
 ALTER FUNCTION F (X INTEGER)
  RETURNS INTEGER
 AS
+
 BEGIN
 RETURN X+1;
 END
@@ -9793,35 +9905,59 @@ CREATE ROLE TESTROLE SET SYSTEM PRIVILEGES TO CREATE_DATABASE;
 
 /* Grant permissions for this database */
 
+/* Access Rights on TABLE COUNTRIES */
 GRANT REFERENCES ON TABLE COUNTRIES TO USER BOB  ;
+/* Access Rights on TABLE COUNTRY */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE COUNTRY TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE CUSTOMER */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE CUSTOMER TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE DEPARTMENT */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE DEPARTMENT TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE EMPLOYEE */
 GRANT SELECT ON TABLE EMPLOYEE TO USER ALICE  WITH GRANT OPTION GRANTED BY BOB ;
 GRANT SELECT,Update(LAST_NAME,FIRST_NAME) ON TABLE EMPLOYEE TO USER BOB  ;
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE EMPLOYEE TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE EMPLOYEE_PROJECT */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE EMPLOYEE_PROJECT TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE FB$OUT_TABLE */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE FB$OUT_TABLE TO PACKAGE FB$OUT  ;
+/* Access Rights on TABLE JOB */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE JOB TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE PHONE_LIST */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE PHONE_LIST TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE PROJECT */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE PROJECT TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE PROJ_DEPT_BUDGET */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE PROJ_DEPT_BUDGET TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE SALARY_HISTORY */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE SALARY_HISTORY TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE SALES */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE SALES TO USER PUBLIC  WITH GRANT OPTION ;
 GRANT RDB$ADMIN TO ALICE;
 
 GRANT RDB$ADMIN TO BOB;
 
+/* Access Rights on PROCEDURE ADD_EMP_PROJ */
 GRANT EXECUTE ON PROCEDURE ADD_EMP_PROJ TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE ALL_LANGS */
 GRANT EXECUTE ON PROCEDURE ALL_LANGS TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE DELETE_EMPLOYEE */
 GRANT EXECUTE ON PROCEDURE DELETE_EMPLOYEE TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE DEPT_BUDGET */
 GRANT EXECUTE ON PROCEDURE DEPT_BUDGET TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE GET_EMP_PROJ */
 GRANT EXECUTE ON PROCEDURE GET_EMP_PROJ TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE MAIL_LABEL */
 GRANT EXECUTE ON PROCEDURE MAIL_LABEL TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE ORG_CHART */
 GRANT EXECUTE ON PROCEDURE ORG_CHART TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE SHIP_ORDER */
 GRANT EXECUTE ON PROCEDURE SHIP_ORDER TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE SHOW_LANGS */
 GRANT EXECUTE ON PROCEDURE SHOW_LANGS TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE SUB_TOT_BUDGET */
 GRANT EXECUTE ON PROCEDURE SUB_TOT_BUDGET TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PACKAGE FB$OUT */
 GRANT EXECUTE ON PACKAGE FB$OUT TO USER PUBLIC  ;
 GRANT CREATE TABLE TO USER BOB ;
 GRANT CREATE COLLATION TO USER BOB ;
@@ -10989,6 +11125,8 @@ SET TERM ^;
 
 /* Stored procedures Definitions*/
 
+/* Stored Procedure: SHOW_LANGS, Owner: SYSDBA */
+
 CREATE PROCEDURE SHOW_LANGS
 (
   CODE VARCHAR(5) CHARACTER SET NONE,
@@ -11002,6 +11140,8 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: ADD_EMP_PROJ, Owner: SYSDBA */
+
 CREATE PROCEDURE ADD_EMP_PROJ
 (
   EMP_NO SMALLINT,
@@ -11009,6 +11149,8 @@ CREATE PROCEDURE ADD_EMP_PROJ
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: ALL_LANGS, Owner: SYSDBA */
 
 CREATE PROCEDURE ALL_LANGS
 RETURNS
@@ -11021,12 +11163,16 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: DELETE_EMPLOYEE, Owner: SYSDBA */
+
 CREATE PROCEDURE DELETE_EMPLOYEE
 (
   EMP_NUM INTEGER
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: DEPT_BUDGET, Owner: SYSDBA */
 
 CREATE PROCEDURE DEPT_BUDGET
 (
@@ -11038,6 +11184,8 @@ RETURNS
 )
 AS BEGIN SUSPEND; EXIT; END
 ^
+
+/* Stored Procedure: EMPLOYEE_PAY_STATUS, Owner: SYSDBA */
 
 CREATE PROCEDURE EMPLOYEE_PAY_STATUS
 (
@@ -11051,6 +11199,8 @@ RETURNS
 AS BEGIN EXIT; END
 ^
 
+/* Stored Procedure: GET_EMP_PROJ, Owner: SYSDBA */
+
 CREATE PROCEDURE GET_EMP_PROJ
 (
   EMP_NO SMALLINT
@@ -11062,12 +11212,16 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: Has Space, Owner: SYSDBA */
+
 CREATE PROCEDURE "Has Space"
 (
   ARG1 INTEGER
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: MAIL_LABEL, Owner: SYSDBA */
 
 CREATE PROCEDURE MAIL_LABEL
 (
@@ -11085,6 +11239,8 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: ORG_CHART, Owner: SYSDBA */
+
 CREATE PROCEDURE ORG_CHART
 RETURNS
 (
@@ -11097,12 +11253,16 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: SHIP_ORDER, Owner: SYSDBA */
+
 CREATE PROCEDURE SHIP_ORDER
 (
   PO_NUM CHAR(8) CHARACTER SET NONE
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: SUB_TOT_BUDGET, Owner: SYSDBA */
 
 CREATE PROCEDURE SUB_TOT_BUDGET
 (
@@ -11118,12 +11278,16 @@ RETURNS
 AS BEGIN SUSPEND; EXIT; END
 ^
 
+/* Stored Procedure: UC SPACE, Owner: SYSDBA */
+
 CREATE PROCEDURE "UC SPACE"
 (
   ARG1 INTEGER
 )
 AS BEGIN EXIT; END
 ^
+
+/* Stored Procedure: iCASE, Owner: SYSDBA */
 
 CREATE PROCEDURE "iCASE"
 AS BEGIN EXIT; END
@@ -11147,9 +11311,6 @@ SET TERM ;^
 COMMIT WORK;
 SET AUTODDL ON;
 SET TERM ^;
-
-
-/* Triggers only will work for SQL triggers */
 
 CREATE TRIGGER "After Create Database"
 ACTIVE ON CONNECT POSITION 0
@@ -11711,6 +11872,8 @@ SET TERM ^;
 
 /* Stored procedure Bodies */
 
+/* Stored Procedure: SHOW_LANGS, Owner: SYSDBA */
+
 ALTER PROCEDURE SHOW_LANGS
 (
   CODE VARCHAR(5) CHARACTER SET NONE,
@@ -11739,6 +11902,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: ADD_EMP_PROJ, Owner: SYSDBA */
+
 ALTER PROCEDURE ADD_EMP_PROJ
 (
   EMP_NO SMALLINT,
@@ -11753,6 +11918,8 @@ BEGIN
 	END
 END
 ^
+
+/* Stored Procedure: ALL_LANGS, Owner: SYSDBA */
 
 ALTER PROCEDURE ALL_LANGS
 RETURNS
@@ -11781,6 +11948,8 @@ BEGIN
 	END
     END
 ^
+
+/* Stored Procedure: DELETE_EMPLOYEE, Owner: SYSDBA */
 
 ALTER PROCEDURE DELETE_EMPLOYEE
 (
@@ -11841,6 +12010,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: DEPT_BUDGET, Owner: SYSDBA */
+
 ALTER PROCEDURE DEPT_BUDGET
 (
   DNO CHAR(3) CHARACTER SET NONE
@@ -11877,6 +12048,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: EMPLOYEE_PAY_STATUS, Owner: SYSDBA */
+
 ALTER PROCEDURE EMPLOYEE_PAY_STATUS
 (
   EMP_NUM SMALLINT
@@ -11900,6 +12073,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: GET_EMP_PROJ, Owner: SYSDBA */
+
 ALTER PROCEDURE GET_EMP_PROJ
 (
   EMP_NO SMALLINT
@@ -11919,6 +12094,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: Has Space, Owner: SYSDBA */
+
 ALTER PROCEDURE "Has Space"
 (
   ARG1 INTEGER
@@ -11926,6 +12103,8 @@ ALTER PROCEDURE "Has Space"
 AS
 Begin End
 ^
+
+/* Stored Procedure: MAIL_LABEL, Owner: SYSDBA */
 
 ALTER PROCEDURE MAIL_LABEL
 (
@@ -11997,6 +12176,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: ORG_CHART, Owner: SYSDBA */
+
 ALTER PROCEDURE ORG_CHART
 RETURNS
 (
@@ -12038,6 +12219,8 @@ BEGIN
 	END
 END
 ^
+
+/* Stored Procedure: SHIP_ORDER, Owner: SYSDBA */
 
 ALTER PROCEDURE SHIP_ORDER
 (
@@ -12098,6 +12281,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: SUB_TOT_BUDGET, Owner: SYSDBA */
+
 ALTER PROCEDURE SUB_TOT_BUDGET
 (
   HEAD_DEPT CHAR(3) CHARACTER SET NONE
@@ -12119,6 +12304,8 @@ BEGIN
 END
 ^
 
+/* Stored Procedure: UC SPACE, Owner: SYSDBA */
+
 ALTER PROCEDURE "UC SPACE"
 (
   ARG1 INTEGER
@@ -12126,6 +12313,8 @@ ALTER PROCEDURE "UC SPACE"
 AS
 Begin End
 ^
+
+/* Stored Procedure: iCASE, Owner: SYSDBA */
 
 ALTER PROCEDURE "iCASE"
 AS
@@ -12144,6 +12333,7 @@ SET TERM ^;
 ALTER FUNCTION F (X INTEGER)
  RETURNS INTEGER
 AS
+
 BEGIN
 RETURN X+1;
 END
@@ -12166,35 +12356,59 @@ CREATE ROLE TESTROLE SET SYSTEM PRIVILEGES TO CREATE_DATABASE;
 
 /* Grant permissions for this database */
 
+/* Access Rights on TABLE COUNTRIES */
 GRANT REFERENCES ON TABLE COUNTRIES TO USER BOB  ;
+/* Access Rights on TABLE COUNTRY */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE COUNTRY TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE CUSTOMER */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE CUSTOMER TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE DEPARTMENT */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE DEPARTMENT TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE EMPLOYEE */
 GRANT SELECT ON TABLE EMPLOYEE TO USER ALICE  WITH GRANT OPTION GRANTED BY BOB ;
 GRANT SELECT,Update(LAST_NAME,FIRST_NAME) ON TABLE EMPLOYEE TO USER BOB  ;
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE EMPLOYEE TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE EMPLOYEE_PROJECT */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE EMPLOYEE_PROJECT TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE FB$OUT_TABLE */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE FB$OUT_TABLE TO PACKAGE FB$OUT  ;
+/* Access Rights on TABLE JOB */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE JOB TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE PHONE_LIST */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE PHONE_LIST TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE PROJECT */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE PROJECT TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE PROJ_DEPT_BUDGET */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE PROJ_DEPT_BUDGET TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE SALARY_HISTORY */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE SALARY_HISTORY TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on TABLE SALES */
 GRANT DELETE,INSERT,REFERENCES,SELECT,UPDATE ON TABLE SALES TO USER PUBLIC  WITH GRANT OPTION ;
 GRANT RDB$ADMIN TO ALICE;
 
 GRANT RDB$ADMIN TO BOB;
 
+/* Access Rights on PROCEDURE ADD_EMP_PROJ */
 GRANT EXECUTE ON PROCEDURE ADD_EMP_PROJ TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE ALL_LANGS */
 GRANT EXECUTE ON PROCEDURE ALL_LANGS TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE DELETE_EMPLOYEE */
 GRANT EXECUTE ON PROCEDURE DELETE_EMPLOYEE TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE DEPT_BUDGET */
 GRANT EXECUTE ON PROCEDURE DEPT_BUDGET TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE GET_EMP_PROJ */
 GRANT EXECUTE ON PROCEDURE GET_EMP_PROJ TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE MAIL_LABEL */
 GRANT EXECUTE ON PROCEDURE MAIL_LABEL TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE ORG_CHART */
 GRANT EXECUTE ON PROCEDURE ORG_CHART TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE SHIP_ORDER */
 GRANT EXECUTE ON PROCEDURE SHIP_ORDER TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE SHOW_LANGS */
 GRANT EXECUTE ON PROCEDURE SHOW_LANGS TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PROCEDURE SUB_TOT_BUDGET */
 GRANT EXECUTE ON PROCEDURE SUB_TOT_BUDGET TO USER PUBLIC  WITH GRANT OPTION ;
+/* Access Rights on PACKAGE FB$OUT */
 GRANT EXECUTE ON PACKAGE FB$OUT TO USER PUBLIC  ;
 GRANT CREATE TABLE TO USER BOB ;
 GRANT CREATE COLLATION TO USER BOB ;
@@ -12229,80 +12443,218 @@ Output from diff command
 < 	"KEY"	INTEGER GENERATED BY DEFAULT AS IDENTITY (START WITH 0) NOT NULL,
 ---
 > 	"KEY"	INTEGER GENERATED BY DEFAULT AS IDENTITY (START WITH 0 INCREMENT BY 1) NOT NULL,
-1160,1161c1160
+1149a1150,1151
+> /* Stored Procedure: SHOW_LANGS, Owner: SYSDBA */
+> 
+1160,1161c1162
 < AS
 < BEGIN SUSPEND; EXIT; END
 ---
 > AS BEGIN SUSPEND; EXIT; END
-1169,1170c1168
+1163a1165,1166
+> /* Stored Procedure: ADD_EMP_PROJ, Owner: SYSDBA */
+> 
+1169,1170c1172
 < AS
 < BEGIN EXIT; END
 ---
 > AS BEGIN EXIT; END
-1181,1182c1179
+1172a1175,1176
+> /* Stored Procedure: ALL_LANGS, Owner: SYSDBA */
+> 
+1181,1182c1185
 < AS
 < BEGIN SUSPEND; EXIT; END
 ---
 > AS BEGIN SUSPEND; EXIT; END
-1189,1190c1186
+1184a1188,1189
+> /* Stored Procedure: DELETE_EMPLOYEE, Owner: SYSDBA */
+> 
+1189,1190c1194
 < AS
 < BEGIN EXIT; END
 ---
 > AS BEGIN EXIT; END
-1201,1202c1197
+1192a1197,1198
+> /* Stored Procedure: DEPT_BUDGET, Owner: SYSDBA */
+> 
+1201,1202c1207
 < AS
 < BEGIN SUSPEND; EXIT; END
 ---
 > AS BEGIN SUSPEND; EXIT; END
-1214,1215c1209
+1204a1210,1211
+> /* Stored Procedure: EMPLOYEE_PAY_STATUS, Owner: SYSDBA */
+> 
+1214,1215c1221
 < AS
 < BEGIN EXIT; END
 ---
 > AS BEGIN EXIT; END
-1226,1227c1220
+1217a1224,1225
+> /* Stored Procedure: GET_EMP_PROJ, Owner: SYSDBA */
+> 
+1226,1227c1234
 < AS
 < BEGIN SUSPEND; EXIT; END
 ---
 > AS BEGIN SUSPEND; EXIT; END
-1234,1235c1227
+1229a1237,1238
+> /* Stored Procedure: Has Space, Owner: SYSDBA */
+> 
+1234,1235c1243
 < AS
 < BEGIN EXIT; END
 ---
 > AS BEGIN EXIT; END
-1251,1252c1243
+1237a1246,1247
+> /* Stored Procedure: MAIL_LABEL, Owner: SYSDBA */
+> 
+1251,1252c1261
 < AS
 < BEGIN SUSPEND; EXIT; END
 ---
 > AS BEGIN SUSPEND; EXIT; END
-1264,1265c1255
+1254a1264,1265
+> /* Stored Procedure: ORG_CHART, Owner: SYSDBA */
+> 
+1264,1265c1275
 < AS
 < BEGIN SUSPEND; EXIT; END
 ---
 > AS BEGIN SUSPEND; EXIT; END
-1272,1273c1262
+1267a1278,1279
+> /* Stored Procedure: SHIP_ORDER, Owner: SYSDBA */
+> 
+1272,1273c1284
 < AS
 < BEGIN EXIT; END
 ---
 > AS BEGIN EXIT; END
-1287,1288c1276
+1275a1287,1288
+> /* Stored Procedure: SUB_TOT_BUDGET, Owner: SYSDBA */
+> 
+1287,1288c1300
 < AS
 < BEGIN SUSPEND; EXIT; END
 ---
 > AS BEGIN SUSPEND; EXIT; END
-1295,1296c1283
+1290a1303,1304
+> /* Stored Procedure: UC SPACE, Owner: SYSDBA */
+> 
+1295,1296c1309
 < AS
 < BEGIN EXIT; END
 ---
 > AS BEGIN EXIT; END
-1300,1301c1287
+1298a1312,1313
+> /* Stored Procedure: iCASE, Owner: SYSDBA */
+> 
+1300,1301c1315
 < AS
 < BEGIN EXIT; END
 ---
 > AS BEGIN EXIT; END
-2346c2332
+1323,1325d1336
+< 
+< /* Triggers only will work for SQL triggers */
+< 
+1885a1897,1898
+> /* Stored Procedure: SHOW_LANGS, Owner: SYSDBA */
+> 
+1913a1927,1928
+> /* Stored Procedure: ADD_EMP_PROJ, Owner: SYSDBA */
+> 
+1928a1944,1945
+> /* Stored Procedure: ALL_LANGS, Owner: SYSDBA */
+> 
+1956a1974,1975
+> /* Stored Procedure: DELETE_EMPLOYEE, Owner: SYSDBA */
+> 
+2015a2035,2036
+> /* Stored Procedure: DEPT_BUDGET, Owner: SYSDBA */
+> 
+2051a2073,2074
+> /* Stored Procedure: EMPLOYEE_PAY_STATUS, Owner: SYSDBA */
+> 
+2074a2098,2099
+> /* Stored Procedure: GET_EMP_PROJ, Owner: SYSDBA */
+> 
+2093a2119,2120
+> /* Stored Procedure: Has Space, Owner: SYSDBA */
+> 
+2101a2129,2130
+> /* Stored Procedure: MAIL_LABEL, Owner: SYSDBA */
+> 
+2171a2201,2202
+> /* Stored Procedure: ORG_CHART, Owner: SYSDBA */
+> 
+2213a2245,2246
+> /* Stored Procedure: SHIP_ORDER, Owner: SYSDBA */
+> 
+2272a2306,2307
+> /* Stored Procedure: SUB_TOT_BUDGET, Owner: SYSDBA */
+> 
+2293a2329,2330
+> /* Stored Procedure: UC SPACE, Owner: SYSDBA */
+> 
+2301a2339,2340
+> /* Stored Procedure: iCASE, Owner: SYSDBA */
+> 
+2318a2358
+> 
+2340a2381
+> /* Access Rights on TABLE COUNTRIES */
+2341a2383
+> /* Access Rights on TABLE COUNTRY */
+2342a2385
+> /* Access Rights on TABLE CUSTOMER */
+2343a2387
+> /* Access Rights on TABLE DEPARTMENT */
+2344a2389
+> /* Access Rights on TABLE EMPLOYEE */
+2346c2391
 < GRANT SELECT,Update(FIRST_NAME,LAST_NAME) ON TABLE EMPLOYEE TO USER BOB  ;
 ---
 > GRANT SELECT,Update(LAST_NAME,FIRST_NAME) ON TABLE EMPLOYEE TO USER BOB  ;
+2347a2393
+> /* Access Rights on TABLE EMPLOYEE_PROJECT */
+2348a2395
+> /* Access Rights on TABLE FB$OUT_TABLE */
+2349a2397
+> /* Access Rights on TABLE JOB */
+2350a2399
+> /* Access Rights on TABLE PHONE_LIST */
+2351a2401
+> /* Access Rights on TABLE PROJECT */
+2352a2403
+> /* Access Rights on TABLE PROJ_DEPT_BUDGET */
+2353a2405
+> /* Access Rights on TABLE SALARY_HISTORY */
+2354a2407
+> /* Access Rights on TABLE SALES */
+2359a2413
+> /* Access Rights on PROCEDURE ADD_EMP_PROJ */
+2360a2415
+> /* Access Rights on PROCEDURE ALL_LANGS */
+2361a2417
+> /* Access Rights on PROCEDURE DELETE_EMPLOYEE */
+2362a2419
+> /* Access Rights on PROCEDURE DEPT_BUDGET */
+2363a2421
+> /* Access Rights on PROCEDURE GET_EMP_PROJ */
+2364a2423
+> /* Access Rights on PROCEDURE MAIL_LABEL */
+2365a2425
+> /* Access Rights on PROCEDURE ORG_CHART */
+2366a2427
+> /* Access Rights on PROCEDURE SHIP_ORDER */
+2367a2429
+> /* Access Rights on PROCEDURE SHOW_LANGS */
+2368a2431
+> /* Access Rights on PROCEDURE SUB_TOT_BUDGET */
+2369a2433
+> /* Access Rights on PACKAGE FB$OUT */
 
 
 
@@ -12359,20 +12711,20 @@ Message File Location = /opt/firebird/4.0.4/
 Database Statistics for employee
 
 Database "/opt/firebird/4.0.4/examples/empbuild/employee.fdb"
-Gstat execution time Thu May 23 14:47:06 2024
+Gstat execution time Fri Jul 12 12:19:11 2024
 
 Database header page information:
 Flags			0
-Generation		1758
+Generation		2493
 System Change Number	0
 Page size		8192
 ODS version		13.0
-Oldest transaction	172
-Oldest active		2546
-Oldest snapshot		2546
-Next transaction	2546
+Oldest transaction	3782
+Oldest active		3783
+Oldest snapshot		3783
+Next transaction	3783
 Sequence number		0
-Next attachment ID	884
+Next attachment ID	1712
 Implementation		HW=AMD/Intel/x64 little-endian OS=Linux CC=gcc
 Shadow count		0
 Page buffers		0
@@ -12394,7 +12746,7 @@ COUNTRY (128)
 Primary pointer page: 222, Index root page: 223
 Pointer pages: 1, data page slots: 1
 Data pages: 1, average fill: 8%
-Primary pages: 1, secondary pages: 0, swept pages: 0
+Primary pages: 1, secondary pages: 0, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 1
@@ -12407,7 +12759,7 @@ CUSTOMER (137)
 Primary pointer page: 276, Index root page: 277
 Pointer pages: 1, data page slots: 1
 Data pages: 1, average fill: 26%
-Primary pages: 1, secondary pages: 0, swept pages: 0
+Primary pages: 1, secondary pages: 0, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 0
@@ -12420,7 +12772,7 @@ DEPARTMENT (130)
 Primary pointer page: 236, Index root page: 237
 Pointer pages: 1, data page slots: 1
 Data pages: 1, average fill: 24%
-Primary pages: 1, secondary pages: 0, swept pages: 0
+Primary pages: 1, secondary pages: 0, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 0
@@ -12446,7 +12798,7 @@ EMPLOYEE_PROJECT (134)
 Primary pointer page: 258, Index root page: 259
 Pointer pages: 1, data page slots: 1
 Data pages: 1, average fill: 10%
-Primary pages: 1, secondary pages: 0, swept pages: 0
+Primary pages: 1, secondary pages: 0, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 1
@@ -12459,7 +12811,7 @@ JOB (129)
 Primary pointer page: 229, Index root page: 230
 Pointer pages: 1, data page slots: 2
 Data pages: 2, average fill: 54%
-Primary pages: 1, secondary pages: 1, swept pages: 0
+Primary pages: 1, secondary pages: 1, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 0
@@ -12472,7 +12824,7 @@ PROJECT (133)
 Primary pointer page: 251, Index root page: 252
 Pointer pages: 1, data page slots: 2
 Data pages: 2, average fill: 7%
-Primary pages: 1, secondary pages: 1, swept pages: 0
+Primary pages: 1, secondary pages: 1, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 2
@@ -12485,7 +12837,7 @@ PROJ_DEPT_BUDGET (135)
 Primary pointer page: 265, Index root page: 266
 Pointer pages: 1, data page slots: 2
 Data pages: 2, average fill: 20%
-Primary pages: 1, secondary pages: 1, swept pages: 0
+Primary pages: 1, secondary pages: 1, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 1
@@ -12498,7 +12850,7 @@ SALARY_HISTORY (136)
 Primary pointer page: 270, Index root page: 271
 Pointer pages: 1, data page slots: 1
 Data pages: 1, average fill: 30%
-Primary pages: 1, secondary pages: 0, swept pages: 0
+Primary pages: 1, secondary pages: 0, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 0
@@ -12511,7 +12863,7 @@ SALES (138)
 Primary pointer page: 283, Index root page: 284
 Pointer pages: 1, data page slots: 1
 Data pages: 1, average fill: 35%
-Primary pages: 1, secondary pages: 0, swept pages: 0
+Primary pages: 1, secondary pages: 0, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 0
@@ -12520,7 +12872,7 @@ Fill distribution:
 60 - 79% = 0
 80 - 99% = 0
 
-Gstat completion time Thu May 23 14:47:06 2024
+Gstat completion time Fri Jul 12 12:19:11 2024
 
 
 
@@ -12530,87 +12882,87 @@ zeus	Wed Mar 20 10:47:37 2024
 firebird/4.0.4/bin/fbguard: guardian starting /opt/firebird/4.0.4/bin/firebird
 
 Online Validation
-14:47:06.35 Validation started
+12:19:12.15 Validation started
 
-14:47:06.35 Relation 128 (COUNTRY)
-14:47:06.35   process pointer page    0 of    1
-14:47:06.35 Index 1 (RDB$PRIMARY1)
-14:47:06.35 Relation 128 (COUNTRY) is ok
+12:19:12.15 Relation 128 (COUNTRY)
+12:19:12.15   process pointer page    0 of    1
+12:19:12.15 Index 1 (RDB$PRIMARY1)
+12:19:12.15 Relation 128 (COUNTRY) is ok
 
-14:47:06.35 Relation 129 (JOB)
-14:47:06.35   process pointer page    0 of    1
-14:47:06.35 Index 1 (RDB$PRIMARY2)
-14:47:06.35 Index 2 (RDB$FOREIGN3)
-14:47:06.35 Index 3 (MAXSALX)
-14:47:06.35 Index 4 (MINSALX)
-14:47:06.35 Relation 129 (JOB) is ok
+12:19:12.15 Relation 129 (JOB)
+12:19:12.15   process pointer page    0 of    1
+12:19:12.15 Index 1 (RDB$PRIMARY2)
+12:19:12.15 Index 2 (RDB$FOREIGN3)
+12:19:12.15 Index 3 (MAXSALX)
+12:19:12.15 Index 4 (MINSALX)
+12:19:12.15 Relation 129 (JOB) is ok
 
-14:47:06.35 Relation 130 (DEPARTMENT)
-14:47:06.36   process pointer page    0 of    1
-14:47:06.36 Index 1 (RDB$4)
-14:47:06.36 Index 2 (RDB$PRIMARY5)
-14:47:06.36 Index 3 (RDB$FOREIGN6)
-14:47:06.36 Index 4 (BUDGETX)
-14:47:06.36 Index 5 (RDB$FOREIGN10)
-14:47:06.36 Relation 130 (DEPARTMENT) is ok
+12:19:12.15 Relation 130 (DEPARTMENT)
+12:19:12.15   process pointer page    0 of    1
+12:19:12.15 Index 1 (RDB$4)
+12:19:12.15 Index 2 (RDB$PRIMARY5)
+12:19:12.15 Index 3 (RDB$FOREIGN6)
+12:19:12.15 Index 4 (BUDGETX)
+12:19:12.15 Index 5 (RDB$FOREIGN10)
+12:19:12.15 Relation 130 (DEPARTMENT) is ok
 
-14:47:06.36 Relation 131 (EMPLOYEE)
-14:47:06.36   process pointer page    0 of    1
-14:47:06.36 Index 1 (RDB$PRIMARY7)
-14:47:06.36 Index 2 (RDB$FOREIGN8)
-14:47:06.36 Index 3 (RDB$FOREIGN9)
-14:47:06.36 Index 4 (NAMEX)
-14:47:06.36 Relation 131 (EMPLOYEE) is ok
+12:19:12.15 Relation 131 (EMPLOYEE)
+12:19:12.15   process pointer page    0 of    1
+12:19:12.15 Index 1 (RDB$PRIMARY7)
+12:19:12.15 Index 2 (RDB$FOREIGN8)
+12:19:12.15 Index 3 (RDB$FOREIGN9)
+12:19:12.15 Index 4 (NAMEX)
+12:19:12.15 Relation 131 (EMPLOYEE) is ok
 
-14:47:06.36 Relation 133 (PROJECT)
-14:47:06.36   process pointer page    0 of    1
-14:47:06.36 Index 1 (RDB$11)
-14:47:06.36 Index 2 (RDB$PRIMARY12)
-14:47:06.36 Index 3 (RDB$FOREIGN13)
-14:47:06.36 Index 4 (PRODTYPEX)
-14:47:06.36 Relation 133 (PROJECT) is ok
+12:19:12.15 Relation 133 (PROJECT)
+12:19:12.15   process pointer page    0 of    1
+12:19:12.15 Index 1 (RDB$11)
+12:19:12.15 Index 2 (RDB$PRIMARY12)
+12:19:12.15 Index 3 (RDB$FOREIGN13)
+12:19:12.15 Index 4 (PRODTYPEX)
+12:19:12.15 Relation 133 (PROJECT) is ok
 
-14:47:06.36 Relation 134 (EMPLOYEE_PROJECT)
-14:47:06.36   process pointer page    0 of    1
-14:47:06.36 Index 1 (RDB$PRIMARY14)
-14:47:06.36 Index 2 (RDB$FOREIGN15)
-14:47:06.36 Index 3 (RDB$FOREIGN16)
-14:47:06.36 Relation 134 (EMPLOYEE_PROJECT) is ok
+12:19:12.16 Relation 134 (EMPLOYEE_PROJECT)
+12:19:12.16   process pointer page    0 of    1
+12:19:12.16 Index 1 (RDB$PRIMARY14)
+12:19:12.16 Index 2 (RDB$FOREIGN15)
+12:19:12.16 Index 3 (RDB$FOREIGN16)
+12:19:12.16 Relation 134 (EMPLOYEE_PROJECT) is ok
 
-14:47:06.36 Relation 135 (PROJ_DEPT_BUDGET)
-14:47:06.36   process pointer page    0 of    1
-14:47:06.36 Index 1 (RDB$PRIMARY17)
-14:47:06.36 Index 2 (RDB$FOREIGN18)
-14:47:06.36 Index 3 (RDB$FOREIGN19)
-14:47:06.36 Relation 135 (PROJ_DEPT_BUDGET) is ok
+12:19:12.16 Relation 135 (PROJ_DEPT_BUDGET)
+12:19:12.16   process pointer page    0 of    1
+12:19:12.16 Index 1 (RDB$PRIMARY17)
+12:19:12.16 Index 2 (RDB$FOREIGN18)
+12:19:12.16 Index 3 (RDB$FOREIGN19)
+12:19:12.16 Relation 135 (PROJ_DEPT_BUDGET) is ok
 
-14:47:06.36 Relation 136 (SALARY_HISTORY)
-14:47:06.36   process pointer page    0 of    1
-14:47:06.36 Index 1 (RDB$PRIMARY20)
-14:47:06.36 Index 2 (RDB$FOREIGN21)
-14:47:06.36 Index 3 (CHANGEX)
-14:47:06.36 Index 4 (UPDATERX)
-14:47:06.36 Relation 136 (SALARY_HISTORY) is ok
+12:19:12.16 Relation 136 (SALARY_HISTORY)
+12:19:12.16   process pointer page    0 of    1
+12:19:12.16 Index 1 (RDB$PRIMARY20)
+12:19:12.16 Index 2 (RDB$FOREIGN21)
+12:19:12.16 Index 3 (CHANGEX)
+12:19:12.16 Index 4 (UPDATERX)
+12:19:12.16 Relation 136 (SALARY_HISTORY) is ok
 
-14:47:06.36 Relation 137 (CUSTOMER)
-14:47:06.36   process pointer page    0 of    1
-14:47:06.36 Index 1 (RDB$PRIMARY22)
-14:47:06.36 Index 2 (RDB$FOREIGN23)
-14:47:06.36 Index 3 (CUSTNAMEX)
-14:47:06.36 Index 4 (CUSTREGION)
-14:47:06.37 Relation 137 (CUSTOMER) is ok
+12:19:12.16 Relation 137 (CUSTOMER)
+12:19:12.16   process pointer page    0 of    1
+12:19:12.16 Index 1 (RDB$PRIMARY22)
+12:19:12.16 Index 2 (RDB$FOREIGN23)
+12:19:12.16 Index 3 (CUSTNAMEX)
+12:19:12.16 Index 4 (CUSTREGION)
+12:19:12.17 Relation 137 (CUSTOMER) is ok
 
-14:47:06.37 Relation 138 (SALES)
-14:47:06.37   process pointer page    0 of    1
-14:47:06.37 Index 1 (RDB$PRIMARY24)
-14:47:06.37 Index 2 (RDB$FOREIGN25)
-14:47:06.37 Index 3 (RDB$FOREIGN26)
-14:47:06.37 Index 4 (NEEDX)
-14:47:06.37 Index 5 (QTYX)
-14:47:06.37 Index 6 (SALESTATX)
-14:47:06.37 Relation 138 (SALES) is ok
+12:19:12.17 Relation 138 (SALES)
+12:19:12.17   process pointer page    0 of    1
+12:19:12.17 Index 1 (RDB$PRIMARY24)
+12:19:12.17 Index 2 (RDB$FOREIGN25)
+12:19:12.17 Index 3 (RDB$FOREIGN26)
+12:19:12.17 Index 4 (NEEDX)
+12:19:12.17 Index 5 (QTYX)
+12:19:12.17 Index 6 (SALESTATX)
+12:19:12.17 Relation 138 (SALES) is ok
 
-14:47:06.37 Validation finished
+12:19:12.17 Validation finished
 
 
 Normal Validation
@@ -12746,7 +13098,7 @@ Employee Database is Online = FALSE
 Employee Database is Online = TRUE
 
 Starting Backup
-Backup Completed - File Size = 81408 bytes
+Backup Completed - File Size = 81920 bytes
 Restore Started
 
 Restore Completed
@@ -13895,9 +14247,9 @@ DEPT_KEY_PATH = 000 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 2
 
-Current memory = 19,666,096
+Current memory = 19,666,224
 Delta memory = 15,312
-Max memory = 19,785,824
+Max memory = 19,785,952
 Elapsed time= 0.002 sec
 Cpu = 0.000 sec
 Buffers = 2048
@@ -14195,10 +14547,10 @@ DEPT_KEY_PATH = 000 (Charset = UTF8 Codepage = 65001)
 
 Rows printed = 2
 
-Current memory = 19,666,096
+Current memory = 19,666,224
 Delta memory = 15,312
-Max memory = 19,785,824
-Elapsed time= 0.103 sec
+Max memory = 19,785,952
+Elapsed time= 0.102 sec
 Cpu = 0.010 sec
 Buffers = 2048
 Reads = 2
@@ -16096,14 +16448,14 @@ Create Table LotsOfData (
     MyText VarChar(1024), 
     Primary Key (RowID) 
   );                 
-Loading data into database table. Started at 23/5/2024 14:47:42.920
-Data load completed at 23/5/2024 14:48:40.472 Elapsed Time = 57552 ms, 100000 records loaded
- Message Hash = 8e867ad0b3e37da7efc8fe9c6b0ee51a
-Database Read started at 23/5/2024 14:48:40.473
-Read Dataset completed at 23/5/2024 14:48:45.169 Elapsed Time = 4696 ms, 100000 records read
- Message Hash = 8e867ad0b3e37da7efc8fe9c6b0ee51a
+Loading data into database table. Started at 12/7/2024 12:19:50.060
+Data load completed at 12/7/2024 12:20:42.449 Elapsed Time = 52389 ms, 100000 records loaded
+ Message Hash = cd5b074cf7254caec42e8a48a7aea4c5
+Database Read started at 12/7/2024 12:20:42.450
+Read Dataset completed at 12/7/2024 12:20:47.082 Elapsed Time = 4632 ms, 100000 records read
+ Message Hash = cd5b074cf7254caec42e8a48a7aea4c5
 Test Completed successfully
-23/5/2024 14:48:45.170 Test 21 passes as long as the checksums are identical
+12/7/2024 12:20:47.083 Test 21 passes as long as the checksums are identical
 
 
 ------------------------------------------------------
@@ -17767,9 +18119,6 @@ CREATE SEQUENCE AGENERATOR;
 ALTER SEQUENCE AGENERATOR RESTART WITH 1;
 SET TERM ^;
 
-
-/* Triggers only will work for SQL triggers */
-
 CREATE TRIGGER BEFOREINSERTTEST FOR IBDATASETTEST
 ACTIVE BEFORE INSERT or UPDATE POSITION 0
 As
@@ -17971,9 +18320,6 @@ CREATE SEQUENCE AGENERATOR;
 ALTER SEQUENCE AGENERATOR RESTART WITH 2;
 SET TERM ^;
 
-
-/* Triggers only will work for SQL triggers */
-
 CREATE TRIGGER BEFOREINSERTTEST FOR IBDATASETTEST
 ACTIVE BEFORE INSERT or UPDATE POSITION 0
 As
@@ -18160,9 +18506,6 @@ CREATE SEQUENCE AGENERATOR;
 ALTER SEQUENCE AGENERATOR RESTART WITH 3;
 SET TERM ^;
 
-
-/* Triggers only will work for SQL triggers */
-
 CREATE TRIGGER BEFOREINSERTTEST FOR IBDATASETTEST
 ACTIVE BEFORE INSERT or UPDATE POSITION 0
 As
@@ -18216,12 +18559,12 @@ Create Generator IBXGen;
 
 
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:54.7280:
+Journal Entry at 2024/07/12 12:20:56.6480:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 12
-  Transaction Name   = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+  Transaction Name   = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -18250,7 +18593,7 @@ MYFIELD2
 
 Add a record
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:54.8000:
+Journal Entry at 2024/07/12 12:20:56.7250:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -18317,7 +18660,7 @@ Que cela seul est fantastique.
 
 Add and edit a record
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:54.8280:
+Journal Entry at 2024/07/12 12:20:56.7410:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -18439,7 +18782,7 @@ GRANTS = NULL
 MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
 MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:54.8520:
+Journal Entry at 2024/07/12 12:20:56.7710:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -18505,7 +18848,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:54.8780:
+Journal Entry at 2024/07/12 12:20:56.7930:
   Type               = Commit
   Attachment ID      = 4
   Session ID         = 1
@@ -18513,12 +18856,12 @@ Journal Entry at 2024/05/23 14:48:54.8780:
 
 
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:54.8810:
+Journal Entry at 2024/07/12 12:20:56.7970:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 14
-  Transaction Name   = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+  Transaction Name   = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -18644,7 +18987,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:55.1490:
+Journal Entry at 2024/07/12 12:20:57.0710:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -18715,7 +19058,7 @@ Rows printed = 1
 
 Rollback Retaining
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:55.2590:
+Journal Entry at 2024/07/12 12:20:57.1810:
   Type               = Rollback Retaining
   Attachment ID      = 4
   Session ID         = 1
@@ -18844,7 +19187,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:55.4910:
+Journal Entry at 2024/07/12 12:20:57.4140:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -18915,7 +19258,7 @@ Rows printed = 1
 
 Rollback
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:55.6030:
+Journal Entry at 2024/07/12 12:20:57.5260:
   Type               = Rollback
   Attachment ID      = 4
   Session ID         = 1
@@ -18923,12 +19266,12 @@ Journal Entry at 2024/05/23 14:48:55.6030:
 
 
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:55.6060:
+Journal Entry at 2024/07/12 12:20:57.5310:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 17
-  Transaction Name   = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+  Transaction Name   = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -19054,7 +19397,7 @@ Rows printed = 2
 
 Commit Retaining
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:55.8960:
+Journal Entry at 2024/07/12 12:20:57.8190:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -19120,7 +19463,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:55.9150:
+Journal Entry at 2024/07/12 12:20:57.8380:
   Type               = Commit Retaining
   Attachment ID      = 4
   Session ID         = 1
@@ -19307,7 +19650,7 @@ Rows printed = 3
 
 Commit
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:56.2570:
+Journal Entry at 2024/07/12 12:20:58.1860:
   Type               = Commit
   Attachment ID      = 4
   Session ID         = 1
@@ -19315,12 +19658,12 @@ Journal Entry at 2024/05/23 14:48:56.2570:
 
 
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:56.2600:
+Journal Entry at 2024/07/12 12:20:58.1890:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 20
-  Transaction Name   = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+  Transaction Name   = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -19503,7 +19846,7 @@ MYFIELD2 = NULL
 Rows printed = 3
 
 Journal Entry Made
-Journal Entry at 2024/05/23 14:48:56.6460:
+Journal Entry at 2024/07/12 12:20:58.5870:
   Type               = Rollback
   Attachment ID      = 4
   Session ID         = 1
@@ -19515,26 +19858,26 @@ IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 12
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2024/05/23 14:48:54.7260
+IBX$CREATED = 2024/07/12 12:20:56.6470
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 17
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2024/05/23 14:48:55.6050
+IBX$CREATED = 2024/07/12 12:20:57.5300
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 19
 IBX$OLDTRANSACTIONID = 17
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2024/05/23 14:48:55.9170
+IBX$CREATED = 2024/07/12 12:20:57.8400
 
 Low Level Journal File Print out
 Journal Entries
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2024/05/23 14:48:54.7280
+Timestamp = 2024/07/12 12:20:56.6480
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 12
-Transaction Name = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+Transaction Name = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19543,7 +19886,7 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2024/05/23 14:48:54.8000
+Timestamp = 2024/07/12 12:20:56.7250
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 12
@@ -19607,7 +19950,7 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2024/05/23 14:48:54.8280
+Timestamp = 2024/07/12 12:20:56.7410
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 12
@@ -19671,7 +20014,7 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2024/05/23 14:48:54.8520
+Timestamp = 2024/07/12 12:20:56.7710
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 12
@@ -19735,17 +20078,17 @@ Que cela seul est fantastique.
 ,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2024/05/23 14:48:54.8780
+Timestamp = 2024/07/12 12:20:56.7930
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 12
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2024/05/23 14:48:54.8810
+Timestamp = 2024/07/12 12:20:56.7970
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 14
-Transaction Name = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+Transaction Name = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19754,38 +20097,38 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2024/05/23 14:48:55.1490
+Timestamp = 2024/07/12 12:20:57.0710
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 14
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollbackRet(Rollback Retaining)
-Timestamp = 2024/05/23 14:48:55.2590
+Timestamp = 2024/07/12 12:20:57.1810
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 16
 Old TransactionID = 14
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2024/05/23 14:48:55.4910
+Timestamp = 2024/07/12 12:20:57.4140
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 16
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2024/05/23 14:48:55.6030
+Timestamp = 2024/07/12 12:20:57.5260
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 16
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2024/05/23 14:48:55.6060
+Timestamp = 2024/07/12 12:20:57.5310
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 17
-Transaction Name = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+Transaction Name = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19794,7 +20137,7 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2024/05/23 14:48:55.8960
+Timestamp = 2024/07/12 12:20:57.8190
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 17
@@ -19858,24 +20201,24 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeTransCommitRet(Commit Retaining)
-Timestamp = 2024/05/23 14:48:55.9150
+Timestamp = 2024/07/12 12:20:57.8380
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 19
 Old TransactionID = 17
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2024/05/23 14:48:56.2570
+Timestamp = 2024/07/12 12:20:58.1860
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 19
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2024/05/23 14:48:56.2600
+Timestamp = 2024/07/12 12:20:58.1890
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 20
-Transaction Name = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+Transaction Name = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19884,23 +20227,23 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2024/05/23 14:48:56.6460
+Timestamp = 2024/07/12 12:20:58.5870
 Attachment ID = 4
 Session ID = 1
 Transaction ID = 20
 
 
 Print out Journal File using TIBJournal
-Journal Entry at 2024/05/23 14:48:54.7280:
+Journal Entry at 2024/07/12 12:20:56.6480:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 12
-  Transaction Name   = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+  Transaction Name   = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2024/05/23 14:48:54.8000:
+Journal Entry at 2024/07/12 12:20:56.7250:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -19964,7 +20307,7 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2024/05/23 14:48:54.8280:
+Journal Entry at 2024/07/12 12:20:56.7410:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -20028,7 +20371,7 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2024/05/23 14:48:54.8520:
+Journal Entry at 2024/07/12 12:20:56.7710:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -20092,58 +20435,58 @@ Que cela seul est fantastique.
 </array>
 ,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15"
 
-Journal Entry at 2024/05/23 14:48:54.8780:
+Journal Entry at 2024/07/12 12:20:56.7930:
   Type               = Commit
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 12
 
-Journal Entry at 2024/05/23 14:48:54.8810:
+Journal Entry at 2024/07/12 12:20:56.7970:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 14
-  Transaction Name   = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+  Transaction Name   = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2024/05/23 14:48:55.1490:
+Journal Entry at 2024/07/12 12:20:57.0710:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 14
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2024/05/23 14:48:55.2590:
+Journal Entry at 2024/07/12 12:20:57.1810:
   Type               = Rollback Retaining
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 16
   Old Transaction ID = 14
 
-Journal Entry at 2024/05/23 14:48:55.4910:
+Journal Entry at 2024/07/12 12:20:57.4140:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 16
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2024/05/23 14:48:55.6030:
+Journal Entry at 2024/07/12 12:20:57.5260:
   Type               = Rollback
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 16
 
-Journal Entry at 2024/05/23 14:48:55.6060:
+Journal Entry at 2024/07/12 12:20:57.5310:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 17
-  Transaction Name   = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+  Transaction Name   = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2024/05/23 14:48:55.8960:
+Journal Entry at 2024/07/12 12:20:57.8190:
   Type               = Query
   Attachment ID      = 4
   Session ID         = 1
@@ -20207,29 +20550,29 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2024/05/23 14:48:55.9150:
+Journal Entry at 2024/07/12 12:20:57.8380:
   Type               = Commit Retaining
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 19
   Old Transaction ID = 17
 
-Journal Entry at 2024/05/23 14:48:56.2570:
+Journal Entry at 2024/07/12 12:20:58.1860:
   Type               = Commit
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 19
 
-Journal Entry at 2024/05/23 14:48:56.2600:
+Journal Entry at 2024/07/12 12:20:58.1890:
   Type               = Transaction Start
   Attachment ID      = 4
   Session ID         = 1
   Transaction ID     = 20
-  Transaction Name   = "{2F66CFD6-BDD3-4F0A-8E3F-F5C501B0DBFC}"
+  Transaction Name   = "{59A55BEA-2988-4A26-8C42-C8C665788992}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2024/05/23 14:48:56.6460:
+Journal Entry at 2024/07/12 12:20:58.5870:
   Type               = Rollback
   Attachment ID      = 4
   Session ID         = 1
