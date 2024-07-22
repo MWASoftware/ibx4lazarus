@@ -132,7 +132,7 @@ II. Trademark Usage.
 II.1. Advertising Materials. All advertising materials mentioning features or use of the covered Code must display the following acknowledgement: &quot;This product includes software developed by Inprise Corporation. &quot;
 II.2. Endorsements. The names &quot;Inprise,&quot; &quot;InterBase,&quot; &quot;ISC,&quot; and &quot;IB&quot; must not be used to endorse or promote Contributor Versions or Larger Works without the prior written permission of Inprise.
 II.3. Product Names. Contributor Versions and Larger Works may not be called &quot;Inprise&quot; or &quot;InterBase&quot; nor may the words &quot;Inprise&quot; or &quot;InterBase&quot; appear in their names without the prior written permission of Inprise Corporation."/>
-    <Version Major="2" Minor="7" Release = "1" Build="15825" />
+    <Version Major="2" Minor="7" Release = "1" Build="15850" />
     <Files Count="24">
       <Item1>
         <Filename Value="runtime/nongui/IBBatchMove.pas"/>

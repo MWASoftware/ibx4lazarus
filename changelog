@@ -1,4 +1,4 @@
-IBX Change Log  version (2.7-1 Build 15825) Fri, 12 Jul 2024 13:39:51 +0100
+IBX Change Log  version (2.7-1 Build 15850) Mon, 22 Jul 2024 15:13:17 +0100
 
 1. IBDynamicGrid. Check for zero column count in UpdateSQL.
 
@@ -32,6 +32,11 @@ contains spaces.
 10. IBDynamicGrid: When AllowColumnSort is false the dataset will be presented
     using the default sort method as given by the sql query rather than by the
     initial sort column.
+
+19. IBXScript: now recognises SET TIME ZONE statement.
+
+20. The internal type TIBFloatField is now registered as a "NoIcon" class in
+the IDE. The IDE should be re-compiled when updating to this version.
 
 
 IBX Change Log  version (2.7-0 Build 15737) Mon, 03 Jun 2024 11:40:25 +0100

@@ -422,7 +422,7 @@ begin
 
   RegisterNoIcon([TIBStringField, TIBBCDField, TIBMemoField, TIBArrayField,
     TIBSmallintField, TIBIntegerField, TIBLargeIntField, TIBDateTimeField,
-    TIBTimeField]);
+    TIBTimeField, TIBFloatField]);
   {$if not declared(TIntegerField)}
   {see http://bugs.freepascal.org/view.php?id=19035 }
   RegisterNoIcon([TIntegerField]);
