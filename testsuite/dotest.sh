@@ -49,7 +49,7 @@ if [ -n "$FPCDIR" ]  && [ -d "$FPCDIR" ]; then
   export FPC=$FPCDIR/ppcx64
 fi
 
-export FIREBIRD=/opt/firebird/$FB$BUILD
+export FIREBIRD=/opt/firebirdVersions/$FB$BUILD
 
 if [ ! -d "$FIREBIRD" ]; then
   echo "$FIREBIRD not found"
