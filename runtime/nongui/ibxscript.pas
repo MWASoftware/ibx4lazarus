@@ -968,6 +968,14 @@ begin
       Exit;
     end;
 
+    {process Set Time Zone}
+    RegexObj.Expression := '^ *SET +TIME +ZONE +(LOCAL|''[A-Za-z0-9/]+'') *(\' + Terminator + '|)';
+    if RegexObj.Exec(stmt) then
+    begin
+      {pass through}
+      Database.Attachment.ExecImmediate([isc_tpb_write,isc_tpb_wait,isc_tpb_concurrency],stmt);
+      Exit;
+    end;
     {Process Remaining Set statements}
     RegexObj.Expression := '^ *SET +([A-Z]+)( +[A-Z0-9]+|) *(\' + Terminator + '|)';
     if RegexObj.Exec(stmt) then

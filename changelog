@@ -33,6 +33,8 @@ contains spaces.
     using the default sort method as given by the sql query rather than by the
     initial sort column.
 
+19. IBXScript: now recognises SET TIME ZONE statement.
+
 
 IBX Change Log  version (2.7-0 Build 15737) Mon, 03 Jun 2024 11:40:25 +0100
 
