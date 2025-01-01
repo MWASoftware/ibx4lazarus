@@ -7,6 +7,8 @@ The test suite comprises 28 separate tests, testing 230 identified features pres
 
 The test environment requires that a Firebird Server is available and running, and ideally this should also include the Firebird embedded server. The example "employee" database must also be installed. The standard Firebird distributions available from firebirdsql.org are suitable for testing. In order to test the embedded server operation, the "employee" database should be read/writable from the user under which the tests are run.
 
+There is also a script "dotest.sh" which is used to support test environments where multiple versions of the Firebird Server are available. See below.
+
 -----------------------------------------------------------------------
 
 Under Linux, the test suite is run from the ibx/testsuite directory using the script "runtest.sh":
@@ -42,11 +44,79 @@ export FIREBIRD=/home/tester/firebird
 
 Under Windows, the test suite is run from the ibx\testsuite directory using the script "runtest.bat". This script does not have any command line arguments.
 
-The script assumes that lazarus is installed in C:\lazarus and includes the FPC compiler and binary tools. If lazarus is installed elsewhere then the script must be edited and the LAZARUS variable updated. e.g.
+The script assumes that lazarus is installed in C:\lazarus and includes the FPC compiler and binary tools. If lazarus is installed elsewhere then the script must be edited and the LAZARUS variable updated. e.g.#!/bin/sh
+
+cd /opt
+for FB in `ls -d firebirdVersions/*`; do
+  if [ -z "`ps ax|grep /opt/$FB/bin/fb_smp_server|grep -v grep`" ] && [ -z "`ps ax|grep /opt/$FB/bin/firebird|grep -v grep`" ]; then
+    echo "starting $FB/bin/fbguard"
+    export FIREBIRD=/opt/$FB
+    export LD_LIBRARY_PATH=/opt/$FB/lib
+    $FB/bin/fbguard&
+  else
+    echo "$FB not started"
+  fi
+done
+
 
 set LAZARUS=D:\lazarus
 
 Similarly, if the SYSDBA password is other than the default "masterkey" the script must be edited and the PASSWORD variable changed to set the actual SYSDBA password.
 
 Otherwise, the script works similarly to the linux version except that the results are always output to "testout.log".
+
+Multiple Firebird Servers
+=========================
+
+The script dotest.sh is made available as an example of how testing with multiple Firebird servers and multiple versions of the FPC compiler can be scripted.
+
+The general idea is that the directory /opt/firebirdVersions contains one or more subdirectories each of which contain a copy of the Firebird installation. These subdirectories are given names that reflect the release e.g. 4.0.4 and the files within them are just a copy of the files distributed in a Firebird installation binary (but with no attempt to run the installation script. The main role of the dotest.sh script is to set up the FIREBIRD environment variable and to invoke "runtest.sh". It can also select the appropriate FPC compiler.
+
+Each Firebird installation is configured by:
+
+1. Editing firebird.conf to set the server port to some obscure but unique port no.
+
+2. The employee database is decompressed #!/bin/sh
+
+cd /opt
+for FB in `ls -d firebirdVersions/*`; do
+  if [ -z "`ps ax|grep /opt/$FB/bin/fb_smp_server|grep -v grep`" ] && [ -z "`ps ax|grep /opt/$FB/bin/firebird|grep -v grep`" ]; then
+    echo "starting $FB/bin/fbguard"
+    export FIREBIRD=/opt/$FB
+    export LD_LIBRARY_PATH=/opt/$FB/lib
+    $FB/bin/fbguard&
+  else
+    echo "$FB not started"
+  fi
+done
+if necessary and otherwise made available for use.
+
+3. The SYSDBA password is enabled and set to (e.g.) masterkey by
+
+export FIREBIRD=/opt/firebirdVersions/4.0.4
+export LD_LIBRARY_PATH=$FIREBIRD/lib
+$FIREBIRD/bin/isql -user SYSDBA employee
+CREATE USER SYSDBA PASSWORD 'masterkey';
+exit;
+
+The servers can then be started by a simple script such as:
+#!/bin/sh
+
+cd /opt
+for FB in `ls -d firebirdVersions/*`; do
+  if [ -z "`ps ax|grep /opt/$FB/bin/fb_smp_server|grep -v grep`" ] && [ -z "`ps ax|grep /opt/$FB/bin/firebird|grep -v grep`" ]; then
+    echo "starting $FB/bin/fbguard"
+    export FIREBIRD=/opt/$FB
+    export LD_LIBRARY_PATH=/opt/$FB/lib
+    $FB/bin/fbguard&
+  else
+    echo "$FB not started"
+  fi
+done
+
+and dotest.sh should then be able to do its magic.
+
+
+
+
 
