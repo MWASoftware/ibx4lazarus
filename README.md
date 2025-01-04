@@ -10,7 +10,8 @@ See the "doc" directory for more information and installation instructions.
 
 See the "changelog" for information on changes from previous releases
 
-Note 1. The MWA Software packages "fbintf" and "ibcontrols" are required dependencies and 
+Note 1. The MWA Software packages "fbintf" (https://github.com/MWASoftware/fbintf) and 
+        "ibcontrols" (https://github.com/MWASoftware/ibcontrols) are required dependencies and 
         must be installed before IBX for Lazarus is itself installed.
 
 Note 2. The Firebird RDBMS (https://www.firebirdsql.org/) is also required and again should

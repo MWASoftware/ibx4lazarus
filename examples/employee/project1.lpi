@@ -61,7 +61,7 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="243"/>
+        <TopLine Value="244"/>
         <CursorPos X="40" Y="247"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -1084,6 +1084,7 @@
     </SearchPaths>
     <Linking>
       <Debugging>
+        <DebugInfoType Value="dsDwarf3"/>
         <UseHeaptrc Value="True"/>
       </Debugging>
       <Options>
