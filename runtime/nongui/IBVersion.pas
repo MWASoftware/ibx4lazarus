@@ -41,8 +41,8 @@ uses
 const
   IBX_MAJOR = 2;
   IBX_MINOR = 7;
-  IBX_RELEASE = 1;
-  IBX_VERSION = '2.7.1';
+  IBX_RELEASE = 2;
+  IBX_VERSION = '2.7.2';
 
 implementation
 

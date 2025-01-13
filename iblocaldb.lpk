@@ -40,7 +40,7 @@
  *  Contributor(s): ______________________________________.
  *
 "/>
-    <Version Major="2" Minor="7" Release = "1" Build="15850" />
+    <Version Major="2" Minor="7" Release = "2" Build="1650" />
     <Files Count="6">
       <Item1>
         <Filename Value="iblocaldb/gui/IBLocalDBSupport.pas"/>
