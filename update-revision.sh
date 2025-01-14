@@ -48,7 +48,7 @@ doupdate ()
 	  if [ ! -f "$PDF" ] || [ "$DOC" -nt "$PDF" ]; then
 	    OUTDIR=`dirname "$DOC"`
 	    libreoffice --invisible --convert-to pdf --outdir "$OUTDIR" "$DOC"
-	    svn add "$PDF" >/dev/null 2>&1
+	    git add "$PDF" >/dev/null 2>&1
 	  fi
 	done
 	

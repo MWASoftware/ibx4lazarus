@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LAZARUS=$HOME/lazarus/2.2
+LAZARUS=$HOME/lazarus
 
 usage()
 {
