@@ -1,3 +1,8 @@
+IBX Change Log  version (2.7-3 Build 1652) Tue, 14 Jan 2025 15:08:49 +0000
+
+1. DBAdmin example. Widen SUBJECT_NAME field in access rights to 64
+characters.
+
 IBX Change Log  version (2.7-2 Build 1650) Wed, 8 Jan 2025 14:14:16 +0000
 
 1. Package split with ibcontrols now a separate package.

@@ -146,7 +146,6 @@ type
     procedure EmployeesAfterOpen(DataSet: TDataSet);
     procedure EmployeesAfterScroll(DataSet: TDataSet);
     procedure EmployeesBeforeClose(DataSet: TDataSet);
-    procedure EmployeesBeforeOpen(DataSet: TDataSet);
     procedure EmployeesJOB_CODEChange(Sender: TField);
     procedure EmployeesJOB_GRADEChange(Sender: TField);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -363,10 +362,6 @@ end;
 procedure TForm1.EmployeesBeforeClose(DataSet: TDataSet);
 begin
   TotalsQuery.Active := false
-end;
-
-procedure TForm1.EmployeesBeforeOpen(DataSet: TDataSet);
-begin
 end;
 
 procedure TForm1.EmployeesJOB_CODEChange(Sender: TField);

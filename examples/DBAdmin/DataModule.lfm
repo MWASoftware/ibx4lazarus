@@ -5,7 +5,7 @@ object DBDataModule: TDBDataModule
   VerticalOffset = 395
   Width = 730
   object IBDatabase1: TIBDatabase
-    Connected = False
+    Connected = True
     AfterConnect = IBDatabase1AfterConnect
     AfterDisconnect = IBDatabase1AfterDisconnect
     BeforeDisconnect = IBDatabase1BeforeDisconnect
@@ -1124,9 +1124,9 @@ object DBDataModule: TDBDataModule
       '    ),'
       ''
       '   AccessRights as ('
-      '  select cast(Trim(SUBJECT_NAME) || SUBJECT_TYPE as Char(33)) as ID,SUBJECT_TYPE, SUBJECT_NAME,'
+      '  select cast(Trim(SUBJECT_NAME) || SUBJECT_TYPE as Char(65)) as ID,SUBJECT_TYPE, SUBJECT_NAME,'
       '         OBJECT_TYPE, OBJECT_NAME, OBJECT_TYPE_NAME, Granted_Privileges,GRANTOR, GRANT_OPTION,'
-      '         cast(NULL as Char(33) ) as Parent, ChildCount'
+      '         cast(NULL as Char(65) ) as Parent, ChildCount'
       '         From AccessRight'
       '  UNION all'
       '  Select Trim(B.SUBJECT_NAME) || B.SUBJECT_TYPE as ID, B.SUBJECT_TYPE, B.SUBJECT_NAME,'
@@ -1170,20 +1170,10 @@ object DBDataModule: TDBDataModule
       Required = False
       Size = 37
     end
-    object AccessRightsSUBJECT_NAME: TIBStringField
-      FieldKind = fkData
-      FieldName = 'SUBJECT_NAME'
-      Index = 1
-      LookupCache = False
-      ProviderFlags = [pfInUpdate, pfInWhere]
-      ReadOnly = False
-      Required = False
-      Size = 32
-    end
     object AccessRightsSUBJECT_TYPE: TIBSmallintField
       FieldKind = fkData
       FieldName = 'SUBJECT_TYPE'
-      Index = 2
+      Index = 1
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -1192,7 +1182,7 @@ object DBDataModule: TDBDataModule
     object AccessRightsPARENT: TIBStringField
       FieldKind = fkData
       FieldName = 'PARENT'
-      Index = 3
+      Index = 2
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -1202,7 +1192,7 @@ object DBDataModule: TDBDataModule
     object AccessRightsImageIndex: TLongintField
       FieldKind = fkCalculated
       FieldName = 'ImageIndex'
-      Index = 4
+      Index = 3
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -1211,7 +1201,7 @@ object DBDataModule: TDBDataModule
     object AccessRightsDisplayName: TStringField
       FieldKind = fkCalculated
       FieldName = 'DisplayName'
-      Index = 5
+      Index = 4
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
@@ -1221,11 +1211,21 @@ object DBDataModule: TDBDataModule
     object AccessRightsCHILDCOUNT: TIBIntegerField
       FieldKind = fkData
       FieldName = 'CHILDCOUNT'
+      Index = 5
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = False
+    end
+    object AccessRightsSUBJECT_NAME: TIBStringField
+      FieldKind = fkData
+      FieldName = 'SUBJECT_NAME'
       Index = 6
       LookupCache = False
       ProviderFlags = [pfInUpdate, pfInWhere]
       ReadOnly = False
       Required = False
+      Size = 64
     end
   end
   object SubjectAccessRights: TIBQuery
