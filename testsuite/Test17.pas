@@ -494,6 +494,19 @@ begin
       Bookmark := B;
       Delete;
       PrintDataSet(FIBDataSet1);
+      Last;
+      Insert;
+      FieldByName('PlainText').AsString := 'This is an insert test #4 - inserted record #1';
+      Post;
+      Insert;
+      FieldByName('PlainText').AsString := 'This is an insert test #4 - inserted record #2';
+      Post;
+      B := Bookmark;
+      PrintDataSet(FIBDataSet1);
+      Bookmark := B;
+      writeln(outfile,'Delete last inserted row');
+      Delete;
+      PrintDataSet(FIBDataSet1);
     except on E: Exception do
        writeln(Outfile,E.Message);
     end;

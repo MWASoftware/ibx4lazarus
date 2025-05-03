@@ -138,20 +138,17 @@ type
   {
     The TIBBufferPool builds on TIBSimpleBufferPool and adds the ability to
     insert buffers before and after a given buffer and to mark a buffer as
-    deleted.
+    deleted. In support of this objective, the buffers are linked as a doubly
+    linked list.
 
-    In order to avoid large memory to memory copies, a previousBuffer pointer
-    is added to each buffer header. InsertBefore is thus simply achieved by
-    adding a buffer to the pool and inserting it into the backwards chain.
-    GetPriorBuffer is then amended to follow the previous pointer.
+    InsertBefore is thus simply achieved by   adding a buffer to the pool and
+    inserting it into the backwards chain. GetPriorBuffer is then amended to follow
+    the previous pointer.
 
     InsertAfter is implemented similarly. However, those appended to the pool
-    have to be identified as appended instead of simply inserted. This is because
-    GetNextBuffer is implemented using the inherited method while skipping
-    inserted and deleted buffers. That is the inherited method is called repeatedly
-    until an appended buffer is returned or EOF is reached.
+    have to be identified as appended instead of simply inserted.
 
-    Deletion is implemetned by marking a buffer as deleted and adjusting the previous
+    Deletion is implemented by marking a buffer as deleted and adjusting the previous
     pointer of the next buffer in sequence
   }
   { TIBBufferPool }
@@ -3284,26 +3281,18 @@ end;
 
 function TIBBufferPool.GetNextBuffer(aBuffer: PByte): PByte;
 begin
-  Dec(aBuffer,sizeof(TRecordData));
-  CheckValidBuffer(aBuffer);
-  Result := PRecordData(aBuffer)^.rdNextBuffer;
-  while (Result <> nil) and (PRecordData(Result)^.rdStatus in [rsAppendDeleted,rsInsertDeleted]) do
-    Result := PRecordData(Result)^.rdNextBuffer;
-  if Result <> nil then
-    Inc(Result,sizeof(TRecordData));
+  Result := GetNextBuffer(aBuffer,false);
 end;
 
 function TIBBufferPool.GetNextBuffer(aBuffer : PByte; IncludeDeleted : boolean
   ) : PByte;
 begin
+  Dec(aBuffer,sizeof(TRecordData));
+  CheckValidBuffer(aBuffer);
+  Result := PRecordData(aBuffer)^.rdNextBuffer;
   if not IncludeDeleted then
-    Result := GetNextBuffer(aBuffer)
-  else
-  begin
-    Dec(aBuffer,sizeof(TRecordData));
-    CheckValidBuffer(aBuffer);
-    Result := PRecordData(aBuffer)^.rdNextBuffer;
-  end;
+    while (Result <> nil) and (PRecordData(Result)^.rdStatus in [rsAppendDeleted,rsInsertDeleted]) do
+      Result := PRecordData(Result)^.rdNextBuffer;
   if Result <> nil then
     Inc(Result,sizeof(TRecordData));
 end;
@@ -3329,8 +3318,9 @@ begin
     Dec(aBuffer,sizeof(TRecordData));
     CheckValidBuffer(aBuffer);
     if PRecordData(aBuffer)^.rdStatus in [rsInsertDeleted, rsAppendDeleted] then
-      Result := 0;
-    Result := inherited GetRecNo(aBuffer);
+      Result := 0
+    else
+      Result := inherited GetRecNo(aBuffer);
   end;
 end;
 
@@ -3382,7 +3372,7 @@ begin
         rdPreviousBuffer := aBuffer;
         rdNextBuffer := CurNextBuf;
       end;
-      {assumes PRecordData(aBuffer)^.rdNextBuffer can never return nil given aBuffer is not last}
+      {assumes PRecordData(CurNextBuf)^.rdNextBuffer can never return nil given aBuffer is not last}
       PRecordData(CurNextBuf).rdPreviousBuffer := Result;
       PRecordData(aBuffer)^.rdNextBuffer := Result;
     end;
@@ -3470,6 +3460,7 @@ begin
   with PRecordData(aBuffer)^ do
   begin
     writeln('Previous Buffer = ',PtrUInt(rdPreviousBuffer));
+    writeln('Next Buffer = ',PtrUInt(rdNextBuffer));
     writeln('Status = ',rdStatus);
   end;
 end;
@@ -3483,7 +3474,7 @@ begin
   while buff <> nil do
   begin
     writeln('Rec No = ',GetRecNo(buff),' status = ',GetRecordStatus(buff),' previous = ',
-      GetRecNo(GetPriorBuffer(buff)));
+      GetRecNo(GetPriorBuffer(buff)), ' next = ',GetRecNo(GetNextBuffer(buff)));
     buff := GetNextBuffer(buff);
   end;
   writeln('Include Deleted');
