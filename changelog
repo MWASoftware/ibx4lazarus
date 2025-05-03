@@ -1,4 +1,4 @@
-IBX Change Log  version (2.7-4 Build 1652) Tue, 14 Jan 2025 15:08:49 +0000
+IBX Change Log  version (2.7-4 Build 1655) Sat, 3 May 2025 14:03:33 +0100
 
 1. IBBufferPool changed to use a doubly linked list in order to simplify code
    and improve robustness in response to problems reported with double inserts.
