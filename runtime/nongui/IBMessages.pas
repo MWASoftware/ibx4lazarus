@@ -198,7 +198,9 @@ type
       ibxeInsertBeforeBOF,
       ibxeDifferentStatement,
       ibxeIncorrectQueryType,
-      ibxeNotADynamicComponent
+      ibxeNotADynamicComponent,
+      ibxeInvalidFieldnameForOrderBy,
+      ibxeInvalidColumnNo
       );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;
@@ -365,6 +367,8 @@ resourcestring
   SDifferentStatement = 'A Cursor can only be replaced using a new cursor from the same statement';
   SIncorrectQueryType = 'Unexpected Query used to post record';
   SNotADynamicComponent = '%s is not  provider of the IDynamicSQLComponent interface';
+  SInvalidFieldnameForOrderBy = '%s does not correspond to any query column. Check your column fieldname';
+  SInvalidColumnNo = '%d is not a valid column number';
 
 const
   IBErrorMessages: array[TIBClientError] of string = (
@@ -490,7 +494,9 @@ const
     SInsertBeforeBOF,
     SDifferentStatement,
     SIncorrectQueryType,
-    SNotADynamicComponent
+    SNotADynamicComponent,
+    SInvalidFieldnameForOrderBy,
+    SInvalidColumnNo
   );
 
 function GetErrorMessage(ErrMess: TIBClientError): AnsiString;

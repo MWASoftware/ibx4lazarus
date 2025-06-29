@@ -1,3 +1,8 @@
+IBX Change Log  version (2.7-5 Build 1656) Sat, 3 May 2025 14:04:08 +0100
+
+1. IBSQLParser.OrderBy now returns an error message when an invalid column no or
+   fieldname is given as an argument.
+
 IBX Change Log  version (2.7-4 Build 1656) Sat, 3 May 2025 14:04:08 +0100
 
 1. IBBufferPool changed to use a doubly linked list in order to simplify code

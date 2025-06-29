@@ -559,12 +559,18 @@ begin
 end;
 
 procedure TSelectSQLParser.OrderBy(fieldname : string; ascending : boolean);
+var ColNo: integer;
 begin
-  OrderBy(GetFieldPosition(fieldname),ascending);
+  ColNo := GetFieldPosition(fieldname);
+  if ColNo <= 0 then
+    IBError(ibxeInvalidFieldnameForOrderBy,[fieldname]);
+  OrderBy(ColNo,ascending);
 end;
 
 procedure TSelectSQLParser.OrderBy(columnNo : integer; ascending : boolean);
 begin
+  if columnNo <= 0 then
+    IBError(ibxeInvalidColumnNo,[ColumnNo]);
   if ascending then
     OrderByClause := IntToStr(columnNo) + ' asc'
   else
