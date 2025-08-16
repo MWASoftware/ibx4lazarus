@@ -64,6 +64,18 @@ type
     procedure RunTest(CharSet: AnsiString; SQLDialect: integer); override;
   end;
 
+  {TWorkerThread is used to test IBX event handling when running in a thread other than
+   the main thread}
+
+  TWorkerThread = class(TThread)
+  private
+    FOwner: TTest11;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(aOwner: TTest11);
+  end;
+
 
 implementation
 
@@ -143,6 +155,64 @@ begin
     CheckSynchronize(100);
     IBDatabase.DropDatabase;
   end;
+
+  with TWorkerThread.Create(self) do
+    WaitFor;
+end;
+
+{ TWorkerThread }
+
+procedure TWorkerThread.Execute;
+begin
+  writeln(OutFile,'Running in Worker Thread');
+
+  {Test is the same except no call to checksynchronize}
+
+  writeln(OutFile,'WT Case #1: Deferred Event Registration');
+  with FOwner do
+  begin
+    FEvents.Events.Clear;
+    FEvents.Events.Add('EVENT3');
+    FEvents.Events.Add('EVENT4');
+    FEvents.DeferredRegister := true;
+    IBDatabase.Connected := true;
+    try
+      IBTransaction.Active := true;
+      FExecProc.StoredProcName := 'CALLEVENT';
+      FExecProc.Prepare;
+      FExecProc.Params[0].AsString := 'EVENT3';
+      FExecProc.ExecProc;
+      writeln(OutFile,'Event Called');
+      IBTransaction.Commit;
+      FEvents.UnRegisterEvents;
+    finally
+      IBDatabase.DropDatabase;
+    end;
+
+    writeln(OutFile,'WT Case #2: Event Registration after DB Open');
+    IBDatabase.Connected := true;
+    try
+      FEvents.Registered := true;
+      IBTransaction.Active := true;
+      FExecProc.StoredProcName := 'CALLEVENT';
+      FExecProc.Prepare;
+      FExecProc.Params[0].AsString := 'EVENT4';
+      FExecProc.ExecProc;
+      writeln(OutFile,'Event Called');
+      IBTransaction.Commit;
+  //    Sleep(1000);
+      FEvents.UnRegisterEvents;
+    finally
+      IBDatabase.DropDatabase;
+    end;
+  end;
+end;
+
+constructor TWorkerThread.Create(aOwner: TTest11);
+begin
+  inherited Create(false);
+  FOwner := aOwner;
+  FreeOnTerminate := true;
 end;
 
 initialization
