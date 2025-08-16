@@ -92,6 +92,7 @@ type
     FStartEvent: boolean;
     FCallerIsMainThread: boolean;
     FEventHandlerThread: TEventHandlerThread;
+    FLastEventCounts: TEventCounts;
     procedure EventHandler(Sender: IEvents);
     procedure ProcessEvents;
     procedure EventChange(sender: TObject);
@@ -187,21 +188,29 @@ begin
   if (csDestroying in ComponentState) or (FEventIntf = nil) then Exit;
   CancelAlerts := false;
   EventCounts := FEventIntf.ExtractEventCounts;
-  if FStartEvent then
-    FStartEvent := false {ignore the first one}
-  else
+//  if FStartEvent then
+  //  FStartEvent := false {ignore the first one}
+ // else
   if assigned(FOnEventAlert) then
   begin
-    CancelAlerts := false;
+    SetLength(FLastEventCounts,Length(EventCounts));
     for i := 0 to Length(EventCounts) -1 do
     begin
-      OnEventAlert(self,EventCounts[i].EventName,EventCounts[i].Count,CancelAlerts);
-      if CancelAlerts then break;
+      if (Length(FLastEventCounts) > i) and
+         (FLastEventCounts[i].EventName = EventCounts[i].EventName) and
+         (FLastEventCounts[i].Count <> EventCounts[i].Count) then
+      begin
+        OnEventAlert(self,EventCounts[i].EventName,EventCounts[i].Count,CancelAlerts);
+        if CancelAlerts then break;
+      end;
+      FLastEventCounts[i].EventName := EventCounts[i].EventName;
+      FLastEventCounts[i].Count := EventCounts[i].Count;
     end;
   end;
   if CancelAlerts then
     UnRegisterEvents
   else
+  if assigned(FEventIntf) then
     FEventIntf.AsyncWaitForEvent(@EventHandler);
 end;
 
@@ -250,6 +259,7 @@ begin
       FEventIntf := Database.Attachment.GetEventHandler(Events);
       FEventIntf.AsyncWaitForEvent(@EventHandler);
       FCallerIsMainThread := (MainThreadID = GetCurrentThreadID);
+      SetLength(FLastEventCounts,0);
       FRegistered := true;
     end;
   end;
@@ -301,6 +311,7 @@ begin
     FEventIntf := nil;
     FRegistered := false;
     FCallerIsMainThread := false;
+    SetLength(FLastEventCounts,0);
     FStartEvent := true;
   end;
 end;
