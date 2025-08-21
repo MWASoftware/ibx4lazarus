@@ -174,15 +174,18 @@ begin
   begin
     if not IsMainThread then
       FEventAlertLock.Enter;
+    try
 
-    for i := 0 to Length(EventCounts) -1 do
-    begin
-      OnEventAlert(self,EventCounts[i].EventName,EventCounts[i].Count,CancelAlerts);
-      if CancelAlerts then break;
+      for i := 0 to Length(EventCounts) -1 do
+      begin
+        OnEventAlert(self,EventCounts[i].EventName,EventCounts[i].Count,CancelAlerts);
+        if CancelAlerts then break;
+      end;
+
+    finally
+      if not IsMainThread then
+        FEventAlertLock.Leave;
     end;
-
-    if not IsMainThread then
-      FEventAlertLock.Leave;
   end;
   if CancelAlerts then
     UnRegisterEvents
