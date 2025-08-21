@@ -174,8 +174,8 @@ begin
   begin
     if not IsMainThread then
       FEventAlertLock.Enter;
-    try
 
+    try
       for i := 0 to Length(EventCounts) -1 do
       begin
         OnEventAlert(self,EventCounts[i].EventName,EventCounts[i].Count,CancelAlerts);
