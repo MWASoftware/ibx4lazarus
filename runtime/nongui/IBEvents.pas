@@ -67,34 +67,19 @@ type
   { TIBEvents }
 
   TIBEvents = class(TComponent)
-  private type
-
-    { TEventHandlerThread }
-
-    TEventHandlerThread = class(TThread)
-    private
-      FOwner: TIBEvents;
-   protected
-      procedure Execute; override;
-    public
-      constructor Create(aOwner: TIBEvents);
-      procedure Terminate;
-    end;
-
   private
     FBase: TIBBase;
     FEventIntf: IEvents;
     FEvents: TStrings;
     FOnEventAlert: TEventAlert;
-    FOnEventAlertLock: TCriticalSection;
+    FEventAlertLock: TCriticalSection;
     FRegistered: boolean;
     FDeferredRegister: boolean;
     FStartEvent: boolean;
     FCallerIsMainThread: boolean;
-    FEventHandlerThread: TEventHandlerThread;
-    FLastEventCounts: TEventCounts;
     procedure EventHandler(Sender: IEvents);
     procedure ProcessEvents;
+    function IsMainThread: boolean;
     procedure EventChange(sender: TObject);
     function GetDatabase: TIBDatabase;
     procedure SetDatabase( value: TIBDatabase);
@@ -113,7 +98,7 @@ type
     procedure UnRegisterEvents;
     property DeferredRegister: boolean read FDeferredRegister write FDeferredRegister;
     property EventIntf: IEvents read FEventIntf;
-    property OnEventAlertLock: TCriticalSection read FOnEventAlertLock;
+    property EventAlertLock: TCriticalSection read FEventAlertLock;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Events: TStrings read FEvents write SetEvents;
@@ -143,7 +128,7 @@ begin
   FBase := TIBBase.Create(Self);
   FBase.BeforeDatabaseDisconnect := @DoBeforeDatabaseDisconnect;
   FBase.AfterDatabaseConnect := @DoAfterDatabaseConnect;
-  FOnEventAlertLock := TCriticalSection.Create;
+  FEventAlertLock := TCriticalSection.Create;
   FEvents := TStringList.Create;
   FStartEvent := true;
   with TStringList( FEvents) do
@@ -156,10 +141,8 @@ end;
 destructor TIBEvents.Destroy;
 begin
   UnregisterEvents;
-  if assigned(FOnEventAlertLock) then FOnEventAlertLock.Free;
   SetDatabase(nil);
-  if assigned(FEventHandlerThread) then
-    FEventHandlerThread.Terminate;
+  if assigned(FEventAlertLock) then FEventAlertLock.Free;
   TStringList(FEvents).OnChange := nil;
   FBase.Free;
   FEvents.Free;
@@ -172,12 +155,7 @@ begin
   if FCallerIsMainThread then
     TThread.Synchronize(nil,@ProcessEvents)
   else
-  begin
-    if not assigned(FEventHandlerThread) then
-      FEventHandlerThread := TEventHandlerThread.Create(self)
-    else
-      FEventHandlerThread.Resume;
-  end;
+    ProcessEvents;
 end;
 
 procedure TIBEvents.ProcessEvents;
@@ -187,31 +165,34 @@ var EventCounts: TEventCounts;
 begin
   if (csDestroying in ComponentState) or (FEventIntf = nil) then Exit;
   CancelAlerts := false;
+  if not assigned(FEventIntf) then Exit;
   EventCounts := FEventIntf.ExtractEventCounts;
-//  if FStartEvent then
-  //  FStartEvent := false {ignore the first one}
- // else
+  if FStartEvent then
+    FStartEvent := false {ignore the first one}
+  else
   if assigned(FOnEventAlert) then
   begin
-    SetLength(FLastEventCounts,Length(EventCounts));
+    if not IsMainThread then
+      FEventAlertLock.Enter;
+
     for i := 0 to Length(EventCounts) -1 do
     begin
-      if (Length(FLastEventCounts) > i) and
-         (FLastEventCounts[i].EventName = EventCounts[i].EventName) and
-         (FLastEventCounts[i].Count <> EventCounts[i].Count) then
-      begin
-        OnEventAlert(self,EventCounts[i].EventName,EventCounts[i].Count,CancelAlerts);
-        if CancelAlerts then break;
-      end;
-      FLastEventCounts[i].EventName := EventCounts[i].EventName;
-      FLastEventCounts[i].Count := EventCounts[i].Count;
+      OnEventAlert(self,EventCounts[i].EventName,EventCounts[i].Count,CancelAlerts);
+      if CancelAlerts then break;
     end;
+
+    if not IsMainThread then
+      FEventAlertLock.Leave;
   end;
   if CancelAlerts then
     UnRegisterEvents
   else
-  if assigned(FEventIntf) then
     FEventIntf.AsyncWaitForEvent(@EventHandler);
+end;
+
+function TIBEvents.IsMainThread: boolean;
+begin
+  Result := (MainThreadID = GetCurrentThreadID);
 end;
 
 procedure TIBEvents.EventChange( sender: TObject);
@@ -258,8 +239,7 @@ begin
     begin
       FEventIntf := Database.Attachment.GetEventHandler(Events);
       FEventIntf.AsyncWaitForEvent(@EventHandler);
-      FCallerIsMainThread := (MainThreadID = GetCurrentThreadID);
-      SetLength(FLastEventCounts,0);
+      FCallerIsMainThread := IsMainThread;
       FRegistered := true;
     end;
   end;
@@ -311,7 +291,6 @@ begin
     FEventIntf := nil;
     FRegistered := false;
     FCallerIsMainThread := false;
-    SetLength(FLastEventCounts,0);
     FStartEvent := true;
   end;
 end;
@@ -326,34 +305,5 @@ begin
   if FDeferredRegister then
     Registered := true
 end;
-
-{ TIBEvents.TEventHandlerThread }
-
-procedure TIBEvents.TEventHandlerThread.Execute;
-begin
-  repeat
-    FOwner.FOnEventAlertLock.Enter;
-    try
-      FOwner.ProcessEvents;
-    finally
-      FOwner.FOnEventAlertLock.Leave;
-    end;
-    Suspend;
-  until Terminated;
-end;
-
-constructor TIBEvents.TEventHandlerThread.Create(aOwner: TIBEvents);
-begin
-  inherited Create(false);
-  FOwner := aOwner;
-  FreeOnTerminate := true;
-end;
-
-procedure TIBEvents.TEventHandlerThread.Terminate;
-begin
-  inherited Terminate;
-  Resume;
-end;
-
 
 end.

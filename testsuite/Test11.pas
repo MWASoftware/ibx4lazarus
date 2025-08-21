@@ -184,6 +184,7 @@ begin
       FExecProc.ExecProc;
       writeln(OutFile,'Event Called');
       IBTransaction.Commit;
+      Sleep(100);
       FEvents.UnRegisterEvents;
     finally
       IBDatabase.DropDatabase;
@@ -200,7 +201,7 @@ begin
       FExecProc.ExecProc;
       writeln(OutFile,'Event Called');
       IBTransaction.Commit;
-  //    Sleep(1000);
+      Sleep(100);
       FEvents.UnRegisterEvents;
     finally
       IBDatabase.DropDatabase;
