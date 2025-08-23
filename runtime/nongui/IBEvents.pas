@@ -75,7 +75,6 @@ type
     FEventAlertLock: TCriticalSection;
     FRegistered: boolean;
     FDeferredRegister: boolean;
-    FStartEvent: boolean;
     FCallerIsMainThread: boolean;
     procedure EventHandler(Sender: IEvents);
     procedure ProcessEvents;
@@ -130,7 +129,6 @@ begin
   FBase.AfterDatabaseConnect := @DoAfterDatabaseConnect;
   FEventAlertLock := TCriticalSection.Create;
   FEvents := TStringList.Create;
-  FStartEvent := true;
   with TStringList( FEvents) do
   begin
     OnChange := @EventChange;
@@ -152,6 +150,15 @@ end;
 procedure TIBEvents.EventHandler(Sender: IEvents);
 begin
   if not FRegistered then Exit;
+  {
+    if RegisterEvents was called in the main thread then use TThread.Synchronize
+    to process the events in the context of the main thread, otherwise process the
+    events in the EventHandler thread.
+
+    Note. Further events may be raised while waiting for the main thread to execute
+    ProcessEvents. However, this should not be a problem. Multiple events will result
+    in an EventCounts value > 1.
+  }
   if FCallerIsMainThread then
     TThread.Synchronize(nil,@ProcessEvents)
   else
@@ -161,30 +168,34 @@ end;
 procedure TIBEvents.ProcessEvents;
 var EventCounts: TEventCounts;
     CancelAlerts: Boolean;
-    i: integer;
-begin
-  if (csDestroying in ComponentState) or (FEventIntf = nil) then Exit;
-  CancelAlerts := false;
-  if not assigned(FEventIntf) then Exit;
-  EventCounts := FEventIntf.ExtractEventCounts;
-  if FStartEvent then
-    FStartEvent := false {ignore the first one}
-  else
-  if assigned(FOnEventAlert) then
-  begin
-    if not IsMainThread then
-      FEventAlertLock.Enter;
 
-    try
+    procedure DoEventAlerts;
+    var i: integer;
+    begin
       for i := 0 to Length(EventCounts) -1 do
       begin
         OnEventAlert(self,EventCounts[i].EventName,EventCounts[i].Count,CancelAlerts);
         if CancelAlerts then break;
       end;
+    end;
 
-    finally
-      if not IsMainThread then
+begin
+  if (csDestroying in ComponentState) or (FEventIntf = nil) then Exit;
+  CancelAlerts := false;
+  if not assigned(FEventIntf) then Exit;
+  EventCounts := FEventIntf.ExtractEventCounts;
+  if assigned(FOnEventAlert) then
+  begin
+    if IsMainThread then
+       DoEventAlerts
+    else
+    begin
+      FEventAlertLock.Enter;
+      try
+        DoEventAlerts;
+      finally
         FEventAlertLock.Leave;
+      end;
     end;
   end;
   if CancelAlerts then
@@ -294,7 +305,6 @@ begin
     FEventIntf := nil;
     FRegistered := false;
     FCallerIsMainThread := false;
-    FStartEvent := true;
   end;
 end;
 
