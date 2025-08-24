@@ -644,8 +644,8 @@ Rows printed = 42
 Current memory = 19,412,272
 Delta memory = 15,312
 Max memory = 19,547,888
-Elapsed time= 0.027 sec
-Cpu = 0.010 sec
+Elapsed time= 0.029 sec
+Cpu = 0.020 sec
 Buffers = 2048
 Reads = 2
 Writes = 0
@@ -1454,7 +1454,7 @@ DPB: Item Count = 3
   isc_dpb_lc_ctype = UTF8
 
 Before Disconnect
-inet://localhost/employee Disconnected after 1988 ms
+inet://localhost/employee Disconnected after 1990 ms
 Idle Timer Expired for Test_Database_02
 Database Closed
 Transaction Events
@@ -1491,10 +1491,10 @@ TPB: Item Count = 3
   isc_tpb_read
 
 Transaction Ending
-Transaction Ended after 2001 ms
+Transaction Ended after 2000 ms
 Idle Timer Expired for Test_Transaction_02
 Before Disconnect
-inet://localhost/employee Disconnected after 2017 ms
+inet://localhost/employee Disconnected after 2015 ms
 SQL Dialect Downgrade test
 Before Connect
 Connected to inet://localhost//tmp/ibx-testsuite/testsuite1.fdb
@@ -3453,7 +3453,7 @@ DEPT_KEY_PATH = 000;600;620;622 (Charset Id = 4 Codepage = 65001)
 Current memory = 19,412,064
 Delta memory = 15,344
 Max memory = 19,519,008
-Elapsed time= 0.016 sec
+Elapsed time= 0.023 sec
 Cpu = 0.010 sec
 Buffers = 2048
 Reads = 2
@@ -12580,6 +12580,39 @@ set term ;^
 Event Called
 Event Handled: EVENT1, Count = 0
 Event Handled: EVENT2, Count = 1
+Running in Worker Thread
+WT Case #1: Deferred Event Registration
+Creating Database from resources/Test11.sql
+
+Set Term ^;
+Create Procedure CallEvent(
+  EventName VarChar(32)
+)
+As
+Begin
+  Post_Event :EventName;
+End^
+set term ;^
+  
+Event Called
+Event Handled: EVENT3, Count = 1
+Event Handled: EVENT4, Count = 0
+WT Case #2: Event Registration after DB Open
+Creating Database from resources/Test11.sql
+
+Set Term ^;
+Create Procedure CallEvent(
+  EventName VarChar(32)
+)
+As
+Begin
+  Post_Event :EventName;
+End^
+set term ;^
+  
+Event Called
+Event Handled: EVENT3, Count = 0
+Event Handled: EVENT4, Count = 1
 
 
 ------------------------------------------------------
@@ -12599,20 +12632,20 @@ Message File Location = /opt/firebirdVersions/3.0.10/
 Database Statistics for employee
 
 Database "/opt/firebirdVersions/3.0.10/examples/empbuild/employee.fdb"
-Gstat execution time Sat May  3 13:52:07 2025
+Gstat execution time Sun Aug 24 11:59:22 2025
 
 Database header page information:
 Flags			0
-Generation		1859
+Generation		2041
 System Change Number	0
 Page size		8192
 ODS version		12.0
-Oldest transaction	2388
-Oldest active		2389
-Oldest snapshot		2389
-Next transaction	2389
+Oldest transaction	2640
+Oldest active		2641
+Oldest snapshot		2641
+Next transaction	2641
 Sequence number		0
-Next attachment ID	2249
+Next attachment ID	2511
 Implementation		HW=AMD/Intel/x64 little-endian OS=Linux CC=gcc
 Shadow count		0
 Page buffers		0
@@ -12685,7 +12718,7 @@ EMPLOYEE_PROJECT (134)
 Primary pointer page: 226, Index root page: 227
 Pointer pages: 1, data page slots: 1
 Data pages: 1, average fill: 10%
-Primary pages: 1, secondary pages: 0, swept pages: 0
+Primary pages: 1, secondary pages: 0, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 1
@@ -12737,7 +12770,7 @@ SALARY_HISTORY (136)
 Primary pointer page: 246, Index root page: 247
 Pointer pages: 1, data page slots: 1
 Data pages: 1, average fill: 30%
-Primary pages: 1, secondary pages: 0, swept pages: 0
+Primary pages: 1, secondary pages: 0, swept pages: 1
 Empty pages: 0, full pages: 0
 Fill distribution:
 0 - 19% = 0
@@ -12759,7 +12792,7 @@ Fill distribution:
 60 - 79% = 0
 80 - 99% = 0
 
-Gstat completion time Sat May  3 13:52:07 2025
+Gstat completion time Sun Aug 24 11:59:22 2025
 
 
 
@@ -12769,87 +12802,87 @@ zeus	Tue Feb 28 14:29:07 2023
 firebird/3.0.10/bin/fbguard: guardian starting /opt/firebird/3.0.10/bin/firebird
 
 Online Validation
-13:52:08.48 Validation started
+11:59:22.87 Validation started
 
-13:52:08.49 Relation 128 (COUNTRY)
-13:52:08.49   process pointer page    0 of    1
-13:52:08.49 Index 1 (RDB$PRIMARY1)
-13:52:08.49 Relation 128 (COUNTRY) is ok
+11:59:22.87 Relation 128 (COUNTRY)
+11:59:22.87   process pointer page    0 of    1
+11:59:22.87 Index 1 (RDB$PRIMARY1)
+11:59:22.87 Relation 128 (COUNTRY) is ok
 
-13:52:08.49 Relation 129 (JOB)
-13:52:08.49   process pointer page    0 of    1
-13:52:08.49 Index 1 (RDB$PRIMARY2)
-13:52:08.49 Index 2 (RDB$FOREIGN3)
-13:52:08.49 Index 3 (MAXSALX)
-13:52:08.49 Index 4 (MINSALX)
-13:52:08.49 Relation 129 (JOB) is ok
+11:59:22.87 Relation 129 (JOB)
+11:59:22.87   process pointer page    0 of    1
+11:59:22.87 Index 1 (RDB$PRIMARY2)
+11:59:22.87 Index 2 (RDB$FOREIGN3)
+11:59:22.87 Index 3 (MAXSALX)
+11:59:22.87 Index 4 (MINSALX)
+11:59:22.87 Relation 129 (JOB) is ok
 
-13:52:08.49 Relation 130 (DEPARTMENT)
-13:52:08.49   process pointer page    0 of    1
-13:52:08.49 Index 1 (RDB$4)
-13:52:08.49 Index 2 (RDB$PRIMARY5)
-13:52:08.49 Index 3 (RDB$FOREIGN6)
-13:52:08.49 Index 4 (BUDGETX)
-13:52:08.49 Index 5 (RDB$FOREIGN10)
-13:52:08.49 Relation 130 (DEPARTMENT) is ok
+11:59:22.87 Relation 130 (DEPARTMENT)
+11:59:22.87   process pointer page    0 of    1
+11:59:22.87 Index 1 (RDB$4)
+11:59:22.87 Index 2 (RDB$PRIMARY5)
+11:59:22.87 Index 3 (RDB$FOREIGN6)
+11:59:22.87 Index 4 (BUDGETX)
+11:59:22.87 Index 5 (RDB$FOREIGN10)
+11:59:22.87 Relation 130 (DEPARTMENT) is ok
 
-13:52:08.49 Relation 131 (EMPLOYEE)
-13:52:08.49   process pointer page    0 of    1
-13:52:08.49 Index 1 (RDB$PRIMARY7)
-13:52:08.49 Index 2 (RDB$FOREIGN8)
-13:52:08.49 Index 3 (RDB$FOREIGN9)
-13:52:08.49 Index 4 (NAMEX)
-13:52:08.49 Relation 131 (EMPLOYEE) is ok
+11:59:22.87 Relation 131 (EMPLOYEE)
+11:59:22.87   process pointer page    0 of    1
+11:59:22.87 Index 1 (RDB$PRIMARY7)
+11:59:22.87 Index 2 (RDB$FOREIGN8)
+11:59:22.87 Index 3 (RDB$FOREIGN9)
+11:59:22.87 Index 4 (NAMEX)
+11:59:22.87 Relation 131 (EMPLOYEE) is ok
 
-13:52:08.49 Relation 133 (PROJECT)
-13:52:08.49   process pointer page    0 of    1
-13:52:08.49 Index 1 (RDB$11)
-13:52:08.49 Index 2 (RDB$PRIMARY12)
-13:52:08.49 Index 3 (RDB$FOREIGN13)
-13:52:08.49 Index 4 (PRODTYPEX)
-13:52:08.49 Relation 133 (PROJECT) is ok
+11:59:22.87 Relation 133 (PROJECT)
+11:59:22.87   process pointer page    0 of    1
+11:59:22.87 Index 1 (RDB$11)
+11:59:22.87 Index 2 (RDB$PRIMARY12)
+11:59:22.87 Index 3 (RDB$FOREIGN13)
+11:59:22.87 Index 4 (PRODTYPEX)
+11:59:22.87 Relation 133 (PROJECT) is ok
 
-13:52:08.49 Relation 134 (EMPLOYEE_PROJECT)
-13:52:08.49   process pointer page    0 of    1
-13:52:08.49 Index 1 (RDB$PRIMARY14)
-13:52:08.49 Index 2 (RDB$FOREIGN15)
-13:52:08.49 Index 3 (RDB$FOREIGN16)
-13:52:08.50 Relation 134 (EMPLOYEE_PROJECT) is ok
+11:59:22.87 Relation 134 (EMPLOYEE_PROJECT)
+11:59:22.87   process pointer page    0 of    1
+11:59:22.87 Index 1 (RDB$PRIMARY14)
+11:59:22.87 Index 2 (RDB$FOREIGN15)
+11:59:22.87 Index 3 (RDB$FOREIGN16)
+11:59:22.87 Relation 134 (EMPLOYEE_PROJECT) is ok
 
-13:52:08.50 Relation 135 (PROJ_DEPT_BUDGET)
-13:52:08.50   process pointer page    0 of    1
-13:52:08.50 Index 1 (RDB$PRIMARY17)
-13:52:08.50 Index 2 (RDB$FOREIGN18)
-13:52:08.50 Index 3 (RDB$FOREIGN19)
-13:52:08.50 Relation 135 (PROJ_DEPT_BUDGET) is ok
+11:59:22.88 Relation 135 (PROJ_DEPT_BUDGET)
+11:59:22.88   process pointer page    0 of    1
+11:59:22.88 Index 1 (RDB$PRIMARY17)
+11:59:22.88 Index 2 (RDB$FOREIGN18)
+11:59:22.88 Index 3 (RDB$FOREIGN19)
+11:59:22.88 Relation 135 (PROJ_DEPT_BUDGET) is ok
 
-13:52:08.50 Relation 136 (SALARY_HISTORY)
-13:52:08.50   process pointer page    0 of    1
-13:52:08.50 Index 1 (RDB$PRIMARY20)
-13:52:08.50 Index 2 (RDB$FOREIGN21)
-13:52:08.50 Index 3 (CHANGEX)
-13:52:08.50 Index 4 (UPDATERX)
-13:52:08.50 Relation 136 (SALARY_HISTORY) is ok
+11:59:22.88 Relation 136 (SALARY_HISTORY)
+11:59:22.88   process pointer page    0 of    1
+11:59:22.88 Index 1 (RDB$PRIMARY20)
+11:59:22.88 Index 2 (RDB$FOREIGN21)
+11:59:22.88 Index 3 (CHANGEX)
+11:59:22.88 Index 4 (UPDATERX)
+11:59:22.88 Relation 136 (SALARY_HISTORY) is ok
 
-13:52:08.50 Relation 137 (CUSTOMER)
-13:52:08.50   process pointer page    0 of    1
-13:52:08.50 Index 1 (RDB$PRIMARY22)
-13:52:08.50 Index 2 (RDB$FOREIGN23)
-13:52:08.50 Index 3 (CUSTNAMEX)
-13:52:08.50 Index 4 (CUSTREGION)
-13:52:08.50 Relation 137 (CUSTOMER) is ok
+11:59:22.88 Relation 137 (CUSTOMER)
+11:59:22.88   process pointer page    0 of    1
+11:59:22.88 Index 1 (RDB$PRIMARY22)
+11:59:22.88 Index 2 (RDB$FOREIGN23)
+11:59:22.88 Index 3 (CUSTNAMEX)
+11:59:22.88 Index 4 (CUSTREGION)
+11:59:22.88 Relation 137 (CUSTOMER) is ok
 
-13:52:08.50 Relation 138 (SALES)
-13:52:08.50   process pointer page    0 of    1
-13:52:08.50 Index 1 (RDB$PRIMARY24)
-13:52:08.50 Index 2 (RDB$FOREIGN25)
-13:52:08.51 Index 3 (RDB$FOREIGN26)
-13:52:08.51 Index 4 (NEEDX)
-13:52:08.51 Index 5 (QTYX)
-13:52:08.51 Index 6 (SALESTATX)
-13:52:08.51 Relation 138 (SALES) is ok
+11:59:22.88 Relation 138 (SALES)
+11:59:22.88   process pointer page    0 of    1
+11:59:22.88 Index 1 (RDB$PRIMARY24)
+11:59:22.89 Index 2 (RDB$FOREIGN25)
+11:59:22.89 Index 3 (RDB$FOREIGN26)
+11:59:22.89 Index 4 (NEEDX)
+11:59:22.89 Index 5 (QTYX)
+11:59:22.89 Index 6 (SALESTATX)
+11:59:22.89 Relation 138 (SALES) is ok
 
-13:52:08.51 Validation finished
+11:59:22.89 Validation finished
 
 
 Normal Validation
@@ -14437,7 +14470,7 @@ Rows printed = 2
 Current memory = 19,410,992
 Delta memory = 13,856
 Max memory = 19,548,064
-Elapsed time= 0.103 sec
+Elapsed time= 0.104 sec
 Cpu = 0.000 sec
 Buffers = 2048
 Reads = 2
@@ -16382,14 +16415,14 @@ Create Table LotsOfData (
     MyText VarChar(1024), 
     Primary Key (RowID) 
   );                 
-Loading data into database table. Started at 03/5/2025 13:52:45.728
-Data load completed at 03/5/2025 13:53:21.680 Elapsed Time = 35952 ms, 100000 records loaded
- Message Hash = 4af74903ae23420a19c6e0921a354ce7
-Database Read started at 03/5/2025 13:53:21.682
-Read Dataset completed at 03/5/2025 13:53:28.567 Elapsed Time = 6885 ms, 100000 records read
- Message Hash = 4af74903ae23420a19c6e0921a354ce7
+Loading data into database table. Started at 24/8/2025 12:00:00.144
+Data load completed at 24/8/2025 12:00:57.382 Elapsed Time = 57238 ms, 100000 records loaded
+ Message Hash = c7cfa6deb26a7bba2dd5c161fba37b80
+Database Read started at 24/8/2025 12:00:57.383
+Read Dataset completed at 24/8/2025 12:01:02.128 Elapsed Time = 4745 ms, 100000 records read
+ Message Hash = c7cfa6deb26a7bba2dd5c161fba37b80
 Test Completed successfully
-03/5/2025 13:53:28.567 Test 21 passes as long as the checksums are identical
+24/8/2025 12:01:02.128 Test 21 passes as long as the checksums are identical
 
 
 ------------------------------------------------------
@@ -18491,12 +18524,12 @@ Create Generator IBXGen;
 
 
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:39.4120:
+Journal Entry at 2025/08/24 12:01:11.6310:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 12
-  Transaction Name   = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+  Transaction Name   = "{F6D80004-8B1F-4681-807C-75DC51290342}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -18525,7 +18558,7 @@ MYFIELD2
 
 Add a record
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:39.4840:
+Journal Entry at 2025/08/24 12:01:11.7060:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -18592,7 +18625,7 @@ Que cela seul est fantastique.
 
 Add and edit a record
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:39.5070:
+Journal Entry at 2025/08/24 12:01:11.7310:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -18714,7 +18747,7 @@ GRANTS = NULL
 MYFIELD1 = My Field (Charset = UTF8 Codepage = 65001)
 MYFIELD2 = MY Field (Charset = UTF8 Codepage = 65001)
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:39.5370:
+Journal Entry at 2025/08/24 12:01:11.7590:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -18780,7 +18813,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:39.5560:
+Journal Entry at 2025/08/24 12:01:11.7790:
   Type               = Commit
   Attachment ID      = 8
   Session ID         = 1
@@ -18788,12 +18821,12 @@ Journal Entry at 2025/05/03 13:53:39.5560:
 
 
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:39.5590:
+Journal Entry at 2025/08/24 12:01:11.7830:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 14
-  Transaction Name   = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+  Transaction Name   = "{F6D80004-8B1F-4681-807C-75DC51290342}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -18919,7 +18952,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:39.8240:
+Journal Entry at 2025/08/24 12:01:12.0560:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -18990,7 +19023,7 @@ Rows printed = 1
 
 Rollback Retaining
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:39.9290:
+Journal Entry at 2025/08/24 12:01:12.1650:
   Type               = Rollback Retaining
   Attachment ID      = 8
   Session ID         = 1
@@ -19119,7 +19152,7 @@ Rows printed = 2
 
 Delete a record
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:40.1450:
+Journal Entry at 2025/08/24 12:01:12.3980:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -19190,7 +19223,7 @@ Rows printed = 1
 
 Rollback
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:40.2520:
+Journal Entry at 2025/08/24 12:01:12.5100:
   Type               = Rollback
   Attachment ID      = 8
   Session ID         = 1
@@ -19198,12 +19231,12 @@ Journal Entry at 2025/05/03 13:53:40.2520:
 
 
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:40.2550:
+Journal Entry at 2025/08/24 12:01:12.5140:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 17
-  Transaction Name   = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+  Transaction Name   = "{F6D80004-8B1F-4681-807C-75DC51290342}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -19329,7 +19362,7 @@ Rows printed = 2
 
 Commit Retaining
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:40.5240:
+Journal Entry at 2025/08/24 12:01:12.8030:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -19395,7 +19428,7 @@ Que cela seul est fantastique.
 
 
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:40.5480:
+Journal Entry at 2025/08/24 12:01:12.8220:
   Type               = Commit Retaining
   Attachment ID      = 8
   Session ID         = 1
@@ -19582,7 +19615,7 @@ Rows printed = 3
 
 Commit
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:40.8970:
+Journal Entry at 2025/08/24 12:01:13.1720:
   Type               = Commit
   Attachment ID      = 8
   Session ID         = 1
@@ -19590,12 +19623,12 @@ Journal Entry at 2025/05/03 13:53:40.8970:
 
 
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:40.9010:
+Journal Entry at 2025/08/24 12:01:13.1750:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 20
-  Transaction Name   = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+  Transaction Name   = "{F6D80004-8B1F-4681-807C-75DC51290342}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
@@ -19778,7 +19811,7 @@ MYFIELD2 = NULL
 Rows printed = 3
 
 Journal Entry Made
-Journal Entry at 2025/05/03 13:53:41.2910:
+Journal Entry at 2025/08/24 12:01:13.5730:
   Type               = Rollback
   Attachment ID      = 8
   Session ID         = 1
@@ -19790,26 +19823,26 @@ IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 12
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2025/05/03 13:53:39.4110
+IBX$CREATED = 2025/08/24 12:01:11.6290
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 17
 IBX$OLDTRANSACTIONID = NULL
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2025/05/03 13:53:40.2550
+IBX$CREATED = 2025/08/24 12:01:12.5140
 IBX$SESSIONID = 1
 IBX$TRANSACTIONID = 19
 IBX$OLDTRANSACTIONID = 17
 IBX$USER = SYSDBA (Charset Id = 4 Codepage = 65001)
-IBX$CREATED = 2025/05/03 13:53:40.5520
+IBX$CREATED = 2025/08/24 12:01:12.8260
 
 Low Level Journal File Print out
 Journal Entries
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2025/05/03 13:53:39.4120
+Timestamp = 2025/08/24 12:01:11.6310
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 12
-Transaction Name = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+Transaction Name = "{F6D80004-8B1F-4681-807C-75DC51290342}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -19818,7 +19851,7 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2025/05/03 13:53:39.4840
+Timestamp = 2025/08/24 12:01:11.7060
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 12
@@ -19882,7 +19915,7 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2025/05/03 13:53:39.5070
+Timestamp = 2025/08/24 12:01:11.7310
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 12
@@ -19946,7 +19979,7 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2025/05/03 13:53:39.5370
+Timestamp = 2025/08/24 12:01:11.7590
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 12
@@ -20010,17 +20043,17 @@ Que cela seul est fantastique.
 ,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2025/05/03 13:53:39.5560
+Timestamp = 2025/08/24 12:01:11.7790
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 12
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2025/05/03 13:53:39.5590
+Timestamp = 2025/08/24 12:01:11.7830
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 14
-Transaction Name = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+Transaction Name = "{F6D80004-8B1F-4681-807C-75DC51290342}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -20029,38 +20062,38 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2025/05/03 13:53:39.8240
+Timestamp = 2025/08/24 12:01:12.0560
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 14
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollbackRet(Rollback Retaining)
-Timestamp = 2025/05/03 13:53:39.9290
+Timestamp = 2025/08/24 12:01:12.1650
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 16
 Old TransactionID = 14
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2025/05/03 13:53:40.1450
+Timestamp = 2025/08/24 12:01:12.3980
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 16
 Query = Delete From IBXTEST A Where A.TABLEKEY = 1
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2025/05/03 13:53:40.2520
+Timestamp = 2025/08/24 12:01:12.5100
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 16
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2025/05/03 13:53:40.2550
+Timestamp = 2025/08/24 12:01:12.5140
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 17
-Transaction Name = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+Transaction Name = "{F6D80004-8B1F-4681-807C-75DC51290342}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -20069,7 +20102,7 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeQuery(Query)
-Timestamp = 2025/05/03 13:53:40.5240
+Timestamp = 2025/08/24 12:01:12.8030
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 17
@@ -20133,24 +20166,24 @@ Que cela seul est fantastique.
 , NULL) Returning MyArray, F15
 
 Journal Entry = jeTransCommitRet(Commit Retaining)
-Timestamp = 2025/05/03 13:53:40.5480
+Timestamp = 2025/08/24 12:01:12.8220
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 19
 Old TransactionID = 17
 
 Journal Entry = jeTransCommit(Commit)
-Timestamp = 2025/05/03 13:53:40.8970
+Timestamp = 2025/08/24 12:01:13.1720
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 19
 
 Journal Entry = jeTransStart(Transaction Start)
-Timestamp = 2025/05/03 13:53:40.9010
+Timestamp = 2025/08/24 12:01:13.1750
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 20
-Transaction Name = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+Transaction Name = "{F6D80004-8B1F-4681-807C-75DC51290342}"
 TPB: Item Count = 3
   isc_tpb_concurrency
   isc_tpb_wait
@@ -20159,23 +20192,23 @@ TPB: Item Count = 3
 Default Completion = TACommit
 
 Journal Entry = jeTransRollback(Rollback)
-Timestamp = 2025/05/03 13:53:41.2910
+Timestamp = 2025/08/24 12:01:13.5730
 Attachment ID = 8
 Session ID = 1
 Transaction ID = 20
 
 
 Print out Journal File using TIBJournal
-Journal Entry at 2025/05/03 13:53:39.4120:
+Journal Entry at 2025/08/24 12:01:11.6310:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 12
-  Transaction Name   = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+  Transaction Name   = "{F6D80004-8B1F-4681-807C-75DC51290342}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2025/05/03 13:53:39.4840:
+Journal Entry at 2025/08/24 12:01:11.7060:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -20239,7 +20272,7 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2025/05/03 13:53:39.5070:
+Journal Entry at 2025/08/24 12:01:11.7310:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -20303,7 +20336,7 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2025/05/03 13:53:39.5370:
+Journal Entry at 2025/08/24 12:01:11.7590:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -20367,58 +20400,58 @@ Que cela seul est fantastique.
 </array>
 ,   A."My Field"  = 'My Field',  A."MY Field" = 'MY Field',  A.GRANTS = NULL Where A.TABLEKEY = 2 RETURNING A.MyArray, A.F15"
 
-Journal Entry at 2025/05/03 13:53:39.5560:
+Journal Entry at 2025/08/24 12:01:11.7790:
   Type               = Commit
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 12
 
-Journal Entry at 2025/05/03 13:53:39.5590:
+Journal Entry at 2025/08/24 12:01:11.7830:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 14
-  Transaction Name   = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+  Transaction Name   = "{F6D80004-8B1F-4681-807C-75DC51290342}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2025/05/03 13:53:39.8240:
+Journal Entry at 2025/08/24 12:01:12.0560:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 14
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2025/05/03 13:53:39.9290:
+Journal Entry at 2025/08/24 12:01:12.1650:
   Type               = Rollback Retaining
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 16
   Old Transaction ID = 14
 
-Journal Entry at 2025/05/03 13:53:40.1450:
+Journal Entry at 2025/08/24 12:01:12.3980:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 16
   Query Text         = "Delete From IBXTEST A Where A.TABLEKEY = 1"
 
-Journal Entry at 2025/05/03 13:53:40.2520:
+Journal Entry at 2025/08/24 12:01:12.5100:
   Type               = Rollback
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 16
 
-Journal Entry at 2025/05/03 13:53:40.2550:
+Journal Entry at 2025/08/24 12:01:12.5140:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 17
-  Transaction Name   = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+  Transaction Name   = "{F6D80004-8B1F-4681-807C-75DC51290342}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2025/05/03 13:53:40.5240:
+Journal Entry at 2025/08/24 12:01:12.8030:
   Type               = Query
   Attachment ID      = 8
   Session ID         = 1
@@ -20482,29 +20515,29 @@ Que cela seul est fantastique.
 </array>
 , NULL) Returning MyArray, F15"
 
-Journal Entry at 2025/05/03 13:53:40.5480:
+Journal Entry at 2025/08/24 12:01:12.8220:
   Type               = Commit Retaining
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 19
   Old Transaction ID = 17
 
-Journal Entry at 2025/05/03 13:53:40.8970:
+Journal Entry at 2025/08/24 12:01:13.1720:
   Type               = Commit
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 19
 
-Journal Entry at 2025/05/03 13:53:40.9010:
+Journal Entry at 2025/08/24 12:01:13.1750:
   Type               = Transaction Start
   Attachment ID      = 8
   Session ID         = 1
   Transaction ID     = 20
-  Transaction Name   = "{49FFE4AC-8B9F-45D0-9B60-3AD9D4BFB89A}"
+  Transaction Name   = "{F6D80004-8B1F-4681-807C-75DC51290342}"
   TPB                = [isc_tpb_concurrency,isc_tpb_wait,isc_tpb_write]
   Default Completion = TACommit
 
-Journal Entry at 2025/05/03 13:53:41.2910:
+Journal Entry at 2025/08/24 12:01:13.5730:
   Type               = Rollback
   Attachment ID      = 8
   Session ID         = 1

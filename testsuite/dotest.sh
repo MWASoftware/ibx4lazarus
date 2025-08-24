@@ -24,7 +24,7 @@ while true ; do
 
         \-4) 	FB="4.0.4"; shift 1;;
 
-        \-5) 	FB="5.0.0"; shift 1;;
+        \-5) 	FB="5.0.3"; shift 1;;
 
 	-d)	FB="master"; shift 1;;
        
