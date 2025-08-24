@@ -1,3 +1,24 @@
+IBX Change Log  version (2.7-6 Build 1669) Sun, 24 Aug 2025 12:06:35 +0100
+
+1. Remove code in TIBEvents to suppress spurious first event. This was a workaround
+   for an issue with fbintf event handling, and which was fixed in fbintf version 1.4.7.
+   Note. This version of IBX is thus dependent on fbintf 1.4.7 or later for correct event processing.
+
+2. When TIBEvents.RegisterEvents is called from any thread other than the main thread,
+   TIBEvents.ProcessEvents is run in the Event Handler thread instead of the main thread.
+   This should avoid synchronisation issues in non gui applications where IBX runs in
+   a user thread and not the main thread.
+
+3. New Public Property TIBEvents.EventAlertLock: TCriticalSection. This is active when
+   TIBEvents.ProcessEvents is run in the Event Handler thread. The EventAlertLock
+   critical section is entered prior to calling the user's OnEventAlert handler, and left
+   once the handler returns.
+
+4. When TIBEvents.RegisterEvents is called from any thread other than the main thread,
+   the user is responsible for synchronisation with their EventHandler and other threads.
+   The TIBEvents.EventAlertLock property is provided to support access to common variables.
+   See IBX Documentation for further information.
+
 IBX Change Log  version (2.7-5 Build 1656) Sat, 3 May 2025 14:04:08 +0100
 
 1. IBSQLParser.OrderBy now returns an error message when an invalid column no or

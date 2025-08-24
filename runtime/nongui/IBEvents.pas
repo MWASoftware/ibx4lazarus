@@ -54,7 +54,7 @@ uses
 {$ELSE}
   unix,
 {$ENDIF}
-  Classes, IB, IBDatabase;
+  Classes, IB, IBDatabase, syncobjs;
 
 const
   MaxEvents = 15;
@@ -72,11 +72,14 @@ type
     FEventIntf: IEvents;
     FEvents: TStrings;
     FOnEventAlert: TEventAlert;
+    FEventAlertLock: TCriticalSection;
     FRegistered: boolean;
     FDeferredRegister: boolean;
-    FStartEvent: boolean;
+    FCallerIsMainThread: boolean;
     procedure EventHandler(Sender: IEvents);
+    function GetEventAlertLock: TCriticalSection;
     procedure ProcessEvents;
+    function IsMainThread: boolean;
     procedure EventChange(sender: TObject);
     function GetDatabase: TIBDatabase;
     procedure SetDatabase( value: TIBDatabase);
@@ -95,6 +98,7 @@ type
     procedure UnRegisterEvents;
     property DeferredRegister: boolean read FDeferredRegister write FDeferredRegister;
     property EventIntf: IEvents read FEventIntf;
+    property EventAlertLock: TCriticalSection read GetEventAlertLock;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Events: TStrings read FEvents write SetEvents;
@@ -125,7 +129,6 @@ begin
   FBase.BeforeDatabaseDisconnect := @DoBeforeDatabaseDisconnect;
   FBase.AfterDatabaseConnect := @DoAfterDatabaseConnect;
   FEvents := TStringList.Create;
-  FStartEvent := true;
   with TStringList( FEvents) do
   begin
     OnChange := @EventChange;
@@ -137,6 +140,7 @@ destructor TIBEvents.Destroy;
 begin
   UnregisterEvents;
   SetDatabase(nil);
+  if assigned(FEventAlertLock) then FEventAlertLock.Free;
   TStringList(FEvents).OnChange := nil;
   FBase.Free;
   FEvents.Free;
@@ -145,33 +149,71 @@ end;
 
 procedure TIBEvents.EventHandler(Sender: IEvents);
 begin
-  TThread.Synchronize(nil,@ProcessEvents);
+  if not FRegistered then Exit;
+  {
+    if RegisterEvents was called in the main thread then use TThread.Synchronize
+    to process the events in the context of the main thread, otherwise process the
+    events in the EventHandler thread.
+
+    Note. Further events may be raised while waiting for the main thread to execute
+    ProcessEvents. However, this should not be a problem. Multiple events will result
+    in an EventCounts value > 1.
+  }
+  if FCallerIsMainThread then
+    TThread.Synchronize(nil,@ProcessEvents)
+  else
+    ProcessEvents;
+end;
+
+function TIBEvents.GetEventAlertLock: TCriticalSection;
+begin
+  if FEventAlertLock = nil then
+    FEventAlertLock := TCriticalSection.Create;
+  Result := FEventAlertLock;
 end;
 
 procedure TIBEvents.ProcessEvents;
 var EventCounts: TEventCounts;
     CancelAlerts: Boolean;
-    i: integer;
+
+    procedure DoEventAlerts;
+    var i: integer;
+    begin
+      for i := 0 to Length(EventCounts) -1 do
+      begin
+        OnEventAlert(self,EventCounts[i].EventName,EventCounts[i].Count,CancelAlerts);
+        if CancelAlerts then break;
+      end;
+    end;
+
 begin
   if (csDestroying in ComponentState) or (FEventIntf = nil) then Exit;
   CancelAlerts := false;
+  if not assigned(FEventIntf) then Exit;
   EventCounts := FEventIntf.ExtractEventCounts;
-  if FStartEvent then
-    FStartEvent := false {ignore the first one}
-  else
   if assigned(FOnEventAlert) then
   begin
-    CancelAlerts := false;
-    for i := 0 to Length(EventCounts) -1 do
+    if IsMainThread then
+       DoEventAlerts
+    else
     begin
-      OnEventAlert(self,EventCounts[i].EventName,EventCounts[i].Count,CancelAlerts);
-      if CancelAlerts then break;
+      EventAlertLock.Enter;
+      try
+        DoEventAlerts;
+      finally
+        EventAlertLock.Leave;
+      end;
     end;
   end;
   if CancelAlerts then
     UnRegisterEvents
   else
     FEventIntf.AsyncWaitForEvent(@EventHandler);
+end;
+
+function TIBEvents.IsMainThread: boolean;
+begin
+  Result := (MainThreadID = GetCurrentThreadID);
 end;
 
 procedure TIBEvents.EventChange( sender: TObject);
@@ -218,6 +260,7 @@ begin
     begin
       FEventIntf := Database.Attachment.GetEventHandler(Events);
       FEventIntf.AsyncWaitForEvent(@EventHandler);
+      FCallerIsMainThread := IsMainThread;
       FRegistered := true;
     end;
   end;
@@ -268,7 +311,7 @@ begin
   begin
     FEventIntf := nil;
     FRegistered := false;
-    FStartEvent := true;
+    FCallerIsMainThread := false;
   end;
 end;
 
@@ -282,6 +325,5 @@ begin
   if FDeferredRegister then
     Registered := true
 end;
-
 
 end.
