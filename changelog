@@ -1,4 +1,4 @@
-IBX Change Log  version (2.7-6 Build 1656) Sat, 3 May 2025 14:04:08 +0100
+IBX Change Log  version (2.7-6 Build 1668) Sun, 24 Aug 2025 12:05:49 +0100
 
 1. Remove code in TIBEvents to suppress spurious first event. This was a workaround
    for an issue with fbintf event handling, and which was fixed in fbintf version 1.4.7.
