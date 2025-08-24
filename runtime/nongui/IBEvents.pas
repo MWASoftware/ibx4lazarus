@@ -77,6 +77,7 @@ type
     FDeferredRegister: boolean;
     FCallerIsMainThread: boolean;
     procedure EventHandler(Sender: IEvents);
+    function GetEventAlertLock: TCriticalSection;
     procedure ProcessEvents;
     function IsMainThread: boolean;
     procedure EventChange(sender: TObject);
@@ -97,7 +98,7 @@ type
     procedure UnRegisterEvents;
     property DeferredRegister: boolean read FDeferredRegister write FDeferredRegister;
     property EventIntf: IEvents read FEventIntf;
-    property EventAlertLock: TCriticalSection read FEventAlertLock;
+    property EventAlertLock: TCriticalSection read GetEventAlertLock;
   published
     property Database: TIBDatabase read GetDatabase write SetDatabase;
     property Events: TStrings read FEvents write SetEvents;
@@ -127,7 +128,6 @@ begin
   FBase := TIBBase.Create(Self);
   FBase.BeforeDatabaseDisconnect := @DoBeforeDatabaseDisconnect;
   FBase.AfterDatabaseConnect := @DoAfterDatabaseConnect;
-  FEventAlertLock := TCriticalSection.Create;
   FEvents := TStringList.Create;
   with TStringList( FEvents) do
   begin
@@ -165,6 +165,13 @@ begin
     ProcessEvents;
 end;
 
+function TIBEvents.GetEventAlertLock: TCriticalSection;
+begin
+  if FEventAlertLock = nil then
+    FEventAlertLock := TCriticalSection.Create;
+  Result := FEventAlertLock;
+end;
+
 procedure TIBEvents.ProcessEvents;
 var EventCounts: TEventCounts;
     CancelAlerts: Boolean;
@@ -190,11 +197,11 @@ begin
        DoEventAlerts
     else
     begin
-      FEventAlertLock.Enter;
+      EventAlertLock.Enter;
       try
         DoEventAlerts;
       finally
-        FEventAlertLock.Leave;
+        EventAlertLock.Leave;
       end;
     end;
   end;
