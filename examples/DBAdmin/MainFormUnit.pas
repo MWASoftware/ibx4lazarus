@@ -742,7 +742,7 @@ end;
 
 procedure TMainForm.DropDatabaseUpdate(Sender: TObject);
 begin
-  (Sender as TAction).Enabled := IBDatabaseInfo.Database.Connected;
+  (Sender as TAction).Enabled := (IBDatabaseInfo.Database <> nil) and IBDatabaseInfo.Database.Connected;
 end;
 
 procedure TMainForm.AccessRightsTreeViewSelectionChanged(Sender: TObject);
