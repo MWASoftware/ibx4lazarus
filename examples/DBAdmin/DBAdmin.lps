@@ -19,8 +19,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="266"/>
-        <CursorPos X="12" Y="269"/>
+        <TopLine Value="717"/>
+        <CursorPos X="71" Y="745"/>
         <UsageCount Value="171"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -31,10 +31,11 @@
         <ComponentName Value="DBDataModule"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="22"/>
-        <CursorPos X="21" Y="28"/>
+        <CursorPos X="67" Y="33"/>
         <UsageCount Value="171"/>
+        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="dlg/DBLoginDlgUnit.pas"/>
@@ -1153,7 +1154,7 @@
         <UsageCount Value="10"/>
       </Unit152>
     </Units>
-    <JumpHistory Count="6" HistoryIndex="5">
+    <JumpHistory Count="8" HistoryIndex="7">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="1044" Column="14" TopLine="1028"/>
@@ -1178,6 +1179,14 @@
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="619" Column="11" TopLine="604"/>
       </Position6>
+      <Position7>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="269" Column="12" TopLine="266"/>
+      </Position7>
+      <Position8>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="342" Column="33" TopLine="317"/>
+      </Position8>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
