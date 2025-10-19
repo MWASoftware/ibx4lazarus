@@ -2473,6 +2473,10 @@ begin
       isc_tpb_lock_read, isc_tpb_lock_write:
         TPBItem.SetAsString(ParamValue);
 
+      isc_tpb_lock_timeout,
+      isc_tpb_at_snapshot_number:
+        TPBItem.SetAsInteger(StrToInt(ParamValue));
+
       else
           IBError(ibxeTPBConstantNotSupported, [TPBItem.getParamTypeName])
     end;

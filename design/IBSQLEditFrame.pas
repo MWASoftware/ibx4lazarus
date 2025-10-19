@@ -153,6 +153,7 @@ type
     FQuerySync: boolean;
     procedure AddWhereClause(QuotedStrings: boolean; SQL: TStrings;
       UseOldValues: boolean);
+    function ExtractStatement(aSQL: string): string;
     function GetSQLType(SQLType: TIBSQLStatementTypes): string;
     procedure GetFieldNames(Dataset: TDataset; var FieldNames: TStrings;
       aIncludeReadOnly: boolean = true);
@@ -201,8 +202,8 @@ type
     procedure InsertSelectedIdentityCol;
     procedure InsertSelectedReadOnlyField;
     procedure OpenUserProcedures;
-    function SyncQueryBuilder: TIBSQLStatementTypes; overload;
-    function SyncQueryBuilder(SQL: TStrings): TIBSQLStatementTypes; overload;
+    function SyncQueryBuilder: TIBSQLStatementTypes;  overload;
+    function SyncQueryBuilder(SQL: TStrings): TIBSQLStatementTypes; virtual; overload;
     procedure TestSQL(GenerateParamNames: boolean);
     property Database: TIBDatabase read FDatabase write SetDatabase;
     property IncludeReadOnlyFields: boolean read FIncludeReadOnlyFields write SetIncludeReadOnlyFields;
@@ -216,7 +217,7 @@ type
 
 implementation
 
-Uses IBUtils, IBMessages, Variants;
+Uses IBUtils, IBMessages, Variants, ibxscript;
 
 {$R *.lfm}
 
@@ -225,7 +226,39 @@ const
                     '(Select RDB$FIELD_NAME FROM RDB$INDEX_SEGMENTS S JOIN RDB$RELATION_CONSTRAINTS C On C.RDB$INDEX_NAME = S.RDB$INDEX_NAME '+
                      'Where C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' and C.RDB$RELATION_NAME = RF.RDB$RELATION_NAME)';
 
-{ TIBSQLEditFrame }
+type
+
+  { TSQLStatementExtractor }
+
+  TSQLStatementExtractor = class(TSQLStatementReader)
+  private
+    FSQL: string;
+    FIndex: integer;
+  public
+    constructor Create(aSQL: string);
+    function GetChar: AnsiChar; override;
+  end;
+
+constructor TSQLStatementExtractor.Create(aSQL: string);
+begin
+  inherited Create;
+  FSQL := aSQL;
+  FIndex := 1;
+end;
+
+function TSQLStatementExtractor.GetChar: AnsiChar;
+begin
+  if FIndex > length(FSQL) then
+    Result := #0
+  else
+  begin
+    Result := FSQL[FIndex];
+    Inc(FIndex);
+  end;
+end;
+
+
+  { TIBSQLEditFrame }
 
 procedure TIBSQLEditFrame.CutUpdate(Sender: TObject);
 begin
@@ -817,6 +850,19 @@ begin
     SQL.Add(WhereClause);
 end;
 
+function TIBSQLEditFrame.ExtractStatement(aSQL: string): string;
+var SQLExtractor: TSQLStatementExtractor;
+    aStmt: string;
+begin
+  Result := '';
+  SQLExtractor := TSQLStatementExtractor.Create(aSQL);
+  try
+    SQLExtractor.GetNextStatement(Result);
+  finally
+    SQLExtractor.Free;
+  end;
+end;
+
 function TIBSQLEditFrame.GetSQLType(SQLType: TIBSQLStatementTypes): string;
 begin
   case SQLType of
@@ -1288,7 +1334,7 @@ begin
   try
    try
     IdentifyStatementSQL.Transaction.Active := true;
-    IdentifyStatementSQL.SQL.Assign(SQL);
+    IdentifyStatementSQL.SQL.Text := ExtractStatement(SQL.Text);
     IdentifyStatementSQL.Prepare;
     Result := IdentifyStatementSQL.SQLStatementType;
     case Result  of
