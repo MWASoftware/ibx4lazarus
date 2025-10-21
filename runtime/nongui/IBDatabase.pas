@@ -2414,15 +2414,15 @@ begin
       isc_dpb_sql_dialect:
       begin
         if (ParamValue = '') or (ParamValue[1] = '3') then
-          DPBItem.SetAsString(#03)
+          DPBItem.SetAsByte(3)
         else
-          DPBItem.SetAsString(#01)
+          DPBItem.SetAsByte(1)
       end;
 
 
       isc_dpb_num_buffers, isc_dpb_dbkey_scope, isc_dpb_force_write,
       isc_dpb_no_reserve, isc_dpb_damaged, isc_dpb_verify:
-        DPBItem.SetAsByte(byte(ParamValue[1]));
+        DPBItem.SetAsByte(byte(StrToUInt(ParamValue)));
 
       isc_dpb_sweep:
         DPBItem.SetAsByte(isc_dpb_records);
