@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectSession>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <BuildModes Active="Default"/>
     <Units Count="92">
       <Unit0>
@@ -17,9 +17,8 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="367"/>
-        <CursorPos X="13" Y="371"/>
+        <TopLine Value="343"/>
+        <CursorPos X="10" Y="348"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
@@ -89,10 +88,13 @@
         <ComponentName Value="RestoreDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="79"/>
-        <CursorPos Y="95"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="78"/>
+        <CursorPos X="35" Y="45"/>
         <UsageCount Value="110"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="ServicesLoginDlgUnit.pas"/>
@@ -664,10 +666,11 @@
       </Unit83>
       <Unit84>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="465"/>
-        <CursorPos X="5" Y="482"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="413"/>
+        <CursorPos X="30" Y="440"/>
         <UsageCount Value="13"/>
+        <Loaded Value="True"/>
       </Unit84>
       <Unit85>
         <Filename Value="../../runtime/nongui/IBTypes.pas"/>
@@ -717,7 +720,7 @@
         <UsageCount Value="10"/>
       </Unit91>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="16" HistoryIndex="12">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="115" Column="42" TopLine="93"/>
@@ -734,10 +737,58 @@
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="371" Column="13" TopLine="367"/>
       </Position4>
+      <Position5>
+        <Filename Value="MainFormUnit.pas"/>
+        <Caret Line="348" Column="10" TopLine="343"/>
+      </Position5>
+      <Position6>
+        <Filename Value="RestoreDlgUnit.pas"/>
+        <Caret Line="130" Column="18" TopLine="116"/>
+      </Position6>
+      <Position7>
+        <Filename Value="RestoreDlgUnit.pas"/>
+        <Caret Line="45" Column="35" TopLine="36"/>
+      </Position7>
+      <Position8>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="440" Column="25" TopLine="417"/>
+      </Position8>
+      <Position9>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="778" Column="3" TopLine="772"/>
+      </Position9>
+      <Position10>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="433" Column="50" TopLine="427"/>
+      </Position10>
+      <Position11>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="450" Column="25" TopLine="443"/>
+      </Position11>
+      <Position12>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="1746" Column="3" TopLine="1743"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="423" Column="79" TopLine="407"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="1773" Column="46" TopLine="1747"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="1775" Column="17" TopLine="1749"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="1781" Column="16" TopLine="1755"/>
+      </Position16>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0" ActiveMode="default"/>
+      <Modes ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
 </CONFIG>

@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 570
+  Left = 574
   Height = 620
-  Top = 225
+  Top = 226
   Width = 882
   Caption = '1D Array Example'
   ClientHeight = 620
@@ -10,7 +10,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.1.0'
+  LCLVersion = '3.7.0.0'
   object DBControlGrid1: TDBControlGrid
     Left = 20
     Height = 543
@@ -36,31 +36,31 @@ object Form1: TForm1
       Width = 819
       ClientHeight = 96
       ClientWidth = 819
+      ParentBackground = False
       TabOrder = 0
       object DBEdit1: TDBEdit
         Left = 8
-        Height = 24
+        Height = 27
         Top = 32
         Width = 264
         DataField = 'TITLE'
         DataSource = DataSource1
-        CharCase = ecNormal
         MaxLength = 0
         TabOrder = 0
       end
       object Label1: TLabel
         Left = 8
-        Height = 14
+        Height = 17
         Top = 16
-        Width = 73
+        Width = 68
         Caption = 'Department'
         ParentColor = False
       end
       object Label2: TLabel
         Left = 296
-        Height = 14
+        Height = 17
         Top = 16
-        Width = 67
+        Width = 64
         Caption = 'Sales Value'
         ParentColor = False
       end
@@ -73,6 +73,7 @@ object Form1: TForm1
         Caption = 'If you can see this, goto http://bugs.freepascal.org/view.php?id=30892'
         ClientHeight = 44
         ClientWidth = 496
+        ParentBackground = False
         TabOrder = 1
         object IBArrayGrid1: TIBArrayGrid
           Left = 0
@@ -106,8 +107,10 @@ object Form1: TForm1
           ScrollBars = ssNone
           TabOrder = 0
           ColCount = 12
-          RowCount = 4
+          RowCount = 5
           ColWidths = (
+            42
+            42
             41
             41
             41
@@ -118,8 +121,6 @@ object Form1: TForm1
             41
             41
             41
-            41
-            43
           )
         end
       end
@@ -132,8 +133,8 @@ object Form1: TForm1
     Width = 75
     Anchors = [akRight, akBottom]
     Caption = 'Save'
-    OnClick = SaveBtnClick
     TabOrder = 1
+    OnClick = SaveBtnClick
   end
   object CancelBtn: TButton
     Left = 696
@@ -142,8 +143,8 @@ object Form1: TForm1
     Width = 75
     Anchors = [akRight, akBottom]
     Caption = 'Cancel'
-    OnClick = CancelBtnClick
     TabOrder = 2
+    OnClick = CancelBtnClick
   end
   object Button1: TButton
     Left = 21
@@ -152,8 +153,8 @@ object Form1: TForm1
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = 'Insert'
-    OnClick = Button1Click
     TabOrder = 3
+    OnClick = Button1Click
   end
   object Button2: TButton
     Left = 104
@@ -162,8 +163,8 @@ object Form1: TForm1
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = 'Delete'
-    OnClick = Button2Click
     TabOrder = 4
+    OnClick = Button2Click
   end
   object IBDatabase1: TIBDatabase
     Connected = False
@@ -180,15 +181,16 @@ object Form1: TForm1
     TraceFlags = []
     UseDefaultSystemCodePage = False
     OnCreateDatabase = IBDatabase1CreateDatabase
-    left = 283
-    top = 244
+    Left = 283
+    Top = 244
   end
   object IBTransaction1: TIBTransaction
+    TransactionName = '{0962D7D9-595B-4605-9B41-F6F529124617}'
     Active = False
     DefaultDatabase = IBDatabase1
     AfterTransactionEnd = IBTransaction1AfterTransactionEnd
-    left = 327
-    top = 244
+    Left = 327
+    Top = 244
   end
   object IBDataSet1: TIBDataSet
     AllowAutoActivateTransaction = True
@@ -199,7 +201,10 @@ object Form1: TForm1
     AfterInsert = IBDataSet1AfterEdit
     AfterOpen = IBDataSet1AfterOpen
     BufferChunks = 1000
+    BufferChunksInFirstBlock = 50
     CachedUpdates = False
+    CaseSensitiveParameterNames = False
+    EnableStatistics = False
     DeleteSQL.Strings = (
       'Delete From TESTDATA A'
       'Where A.ROWID = :ROWID'
@@ -227,9 +232,13 @@ object Form1: TForm1
     GeneratorField.Field = 'ROWID'
     GeneratorField.ApplyOnEvent = gaeOnNewRecord
     GenerateParamNames = False
+    MasterDetailDelay = 0
     DataSetCloseAction = dcSaveChanges
-    left = 408
-    top = 244
+    TZTextOption = tzOffset
+    DefaultTZDate = 43831
+    SQLFiltered = False
+    Left = 408
+    Top = 244
     object IBDataSet1ROWID: TIntegerField
       FieldKind = fkData
       FieldName = 'ROWID'
@@ -261,7 +270,7 @@ object Form1: TForm1
   end
   object DataSource1: TDataSource
     DataSet = IBDataSet1
-    left = 368
-    top = 244
+    Left = 368
+    Top = 244
   end
 end

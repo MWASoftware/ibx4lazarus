@@ -1959,7 +1959,10 @@ end;
 
 function TIBArrayField.GetEltAsString(index : array of integer) : string;
 begin
-  Result := ArrayIntf.GetAsString(index);
+  if assigned(ArrayIntf) then
+    Result := ArrayIntf.GetAsString(index)
+  else
+    Result := '';
 end;
 
 procedure TIBArrayField.SetEltAsString(index : array of integer; aValue : string
@@ -3288,7 +3291,10 @@ begin
   CheckActive;
   if (Field = nil) or (Field.DataSet <> self) then
     IBError(ibxFieldNotinDataSet,[Field.Name,Name]);
-  Result := FCursor.GetArray(GetActiveBuf,Field);
+  if assigned(FCursor) and (GetActiveBuf <> nil) then
+    Result := FCursor.GetArray(GetActiveBuf,Field)
+  else
+    Result := nil;
 end;
 
 procedure TIBCustomDataSet.SetArrayIntf(AnArray: IArray; Field: TIBArrayField);

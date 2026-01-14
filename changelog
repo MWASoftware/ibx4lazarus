@@ -1,3 +1,8 @@
+IBX Change Log  version (2.7-9 Build 1675) Tue, 25 Nov 2025 11:27:33 +0000
+
+1. Avoid General Protection fault after deleting all rows in a dataset and
+   when the row contains an array column type.
+
 IBX Change Log  version (2.7-8 Build 1675) Tue, 25 Nov 2025 11:27:33 +0000
 
 1. Fixed corruption in idmodifysqleditor.lfm. Using this editor should no longer
