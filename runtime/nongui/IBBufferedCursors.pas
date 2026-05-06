@@ -297,7 +297,8 @@ type
       function GetArray(aBufID: TRecordBuffer; Field: TField): IArray;
       procedure SetArrayIntf(aBufID: TRecordBuffer; AnArray: IArray; Field: TField);
       function GetRecDBkey(aBufID: TRecordBuffer): TIBDBKey;
-      function GetFieldData(aBufID: TRecordBuffer; field: TField; outBuffer: PByte): boolean;
+      function GetFieldData(aBufID: TRecordBuffer; field: TField; outBuffer: PByte): boolean; overload;
+      function GetFieldData(aBufID: TRecordBuffer; field: TField; outBuffer: PByte; ReturnOldValue: boolean): boolean; overload;
       procedure SetFieldData(aBufID: TRecordBuffer; field: TField; inBuffer: PByte);
       procedure SetSQLParams(aBufID: TRecordBuffer; params: ISQLParams);
       procedure UpdateRecordFromQuery(aBufID: TRecordBuffer; QryResults: IResults);
@@ -498,7 +499,8 @@ type
     function GetArray(aBufID: TRecordBuffer; Field: TField): IArray;
     procedure SetArrayIntf(aBufID: TRecordBuffer; AnArray: IArray; Field: TField);
     function GetRecDBkey(aBufID: TRecordBuffer): TIBDBKey;
-    function GetFieldData(aBufID: TRecordBuffer; field: TField; outBuffer: PByte): boolean;
+    function GetFieldData(aBufID: TRecordBuffer; field: TField; outBuffer: PByte): boolean; overload;
+    function GetFieldData(aBufID: TRecordBuffer; field: TField; outBuffer: PByte; ReturnOldValue: boolean): boolean; overload;
     procedure SetFieldData(aBufID: TRecordBuffer; field: TField; inBuffer: PByte);
     procedure SetSQLParams(aBufID: TRecordBuffer; params: ISQLParams);
     procedure UpdateRecordFromQuery(aBufID: TRecordBuffer; QryResults: IResults);
@@ -2435,6 +2437,12 @@ end;
 
 function TIBSelectCursor.GetFieldData(aBufID: TRecordBuffer; field: TField;
   outBuffer: PByte): boolean;
+begin
+  Result := GetFieldData(aBufID,field,outBuffer,false);
+end;
+
+function TIBSelectCursor.GetFieldData(aBufID: TRecordBuffer; field: TField;
+  outBuffer: PByte; ReturnOldValue: boolean): boolean;
 var Buff: PByte;
     ColIndex: integer;
     Data: PByte;
@@ -2456,6 +2464,10 @@ begin
   else
   begin
     Buff := GetBuffer(aBufID);
+    if Buff = nil then Exit;
+
+    if ReturnOldValue then
+      Buff := GetOldBufferFor(Buff);
     if Buff = nil then Exit;
 
     ColIndex := FieldNo2ColumnIndex(field);

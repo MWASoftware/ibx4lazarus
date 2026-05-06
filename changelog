@@ -1,3 +1,7 @@
+IBX Change Log  version (2.7-9 Build 1668) Wed, 14 Jan 2026 12:04:13 +0000
+
+1. Restore TField.OldValue support.
+
 IBX Change Log  version (2.7-9 Build 1675) Tue, 25 Nov 2025 11:27:33 +0000
 
 1. Avoid General Protection fault after deleting all rows in a dataset and
