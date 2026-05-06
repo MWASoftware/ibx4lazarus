@@ -4477,7 +4477,7 @@ function TIBCustomDataSet.GetFieldData(Field: TField;
   Buffer: Pointer): Boolean;
 begin
   CheckActive;
-  Result := FCursor.GetFieldData(GetActiveBuf,Field, Buffer);
+  Result := FCursor.GetFieldData(GetActiveBuf,Field, Buffer,(State=dsOldValue));
 end;
 
 function TIBCustomDataSet.GetFieldData(Field: TField; Buffer: Pointer;
@@ -4486,7 +4486,7 @@ begin
   CheckActive;
   {These datatypes use IBX conventions and not TDataset conventions}
   if (Field.DataType in [ftBCD,ftDateTime,ftDate,ftTime]) and not NativeFormat then
-    Result := FCursor.GetFieldData(GetActiveBuf,Field, Buffer)
+    Result := FCursor.GetFieldData(GetActiveBuf,Field, Buffer,(State=dsOldValue))
   else
     Result := inherited GetFieldData(Field, Buffer, NativeFormat);
 end;

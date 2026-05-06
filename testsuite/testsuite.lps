@@ -31,10 +31,11 @@
       <Unit3>
         <Filename Value="Test03.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="10"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="27"/>
         <CursorPos X="22" Y="10"/>
         <UsageCount Value="200"/>
+        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="Test10.pas"/>
@@ -55,10 +56,12 @@
       <Unit6>
         <Filename Value="Test04.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="98"/>
-        <CursorPos X="22" Y="322"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="242"/>
+        <CursorPos X="23" Y="259"/>
         <UsageCount Value="201"/>
+        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="Test05.pas"/>
@@ -108,10 +111,11 @@
       <Unit12>
         <Filename Value="Test02.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="19"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="10"/>
         <CursorPos X="80" Y="10"/>
         <UsageCount Value="201"/>
+        <Loaded Value="True"/>
       </Unit12>
       <Unit13>
         <Filename Value="Test06.pas"/>
@@ -124,7 +128,7 @@
       <Unit14>
         <Filename Value="Test11.pas"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="22"/>
+        <TopLine Value="122"/>
         <CursorPos X="21" Y="151"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
@@ -328,12 +332,10 @@
       </Unit39>
       <Unit40>
         <Filename Value="../runtime/nongui/IBDatabase.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="2459"/>
         <CursorPos X="33" Y="2477"/>
         <UsageCount Value="79"/>
-        <Loaded Value="True"/>
       </Unit40>
       <Unit41>
         <Filename Value="../../fbintf/client/3.0/FB30ClientAPI.pas"/>
@@ -1318,9 +1320,9 @@
       </Unit179>
       <Unit180>
         <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2764"/>
-        <CursorPos X="3" Y="2771"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="758"/>
+        <CursorPos X="43" Y="771"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <EditorIndex Value="-1"/>
@@ -1328,6 +1330,7 @@
           <CursorPos X="3" Y="2001"/>
         </ExtraEditor1>
         <UsageCount Value="69"/>
+        <Loaded Value="True"/>
       </Unit180>
       <Unit181>
         <Filename Value="../../ibx.trunk/runtime/nongui/IBCustomDataSet.pas"/>
@@ -1718,14 +1721,13 @@
       </Unit235>
       <Unit236>
         <Filename Value="../../fbintf/client/include/consts_pub.inc"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="226"/>
         <CursorPos X="31" Y="254"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit236>
     </Units>
-    <JumpHistory Count="11" HistoryIndex="10">
+    <JumpHistory Count="18" HistoryIndex="17">
       <Position1>
         <Filename Value="Test11.pas"/>
         <Caret Line="131" Column="18" TopLine="114"/>
@@ -1755,28 +1757,55 @@
         <Caret Line="160" TopLine="134"/>
       </Position7>
       <Position8>
-        <Filename Value="../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="1084" TopLine="1070"/>
+        <Filename Value="Test04.pas"/>
+        <Caret Line="299" Column="70" TopLine="293"/>
       </Position8>
       <Position9>
-        <Filename Value="../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="282" Column="14" TopLine="268"/>
+        <Filename Value="Test04.pas"/>
       </Position9>
       <Position10>
-        <Filename Value="../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="2473" Column="17" TopLine="2452"/>
+        <Filename Value="Test04.pas"/>
+        <Caret Line="67" Column="15" TopLine="53"/>
       </Position10>
       <Position11>
-        <Filename Value="../runtime/nongui/IBDatabase.pas"/>
-        <Caret Line="2472" Column="37" TopLine="2452"/>
+        <Filename Value="Test04.pas"/>
+        <Caret Line="260" Column="72" TopLine="245"/>
       </Position11>
+      <Position12>
+        <Filename Value="Test04.pas"/>
+        <Caret Line="261" Column="70" TopLine="243"/>
+      </Position12>
+      <Position13>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="2791" Column="22" TopLine="2776"/>
+      </Position13>
+      <Position14>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="471" Column="19" TopLine="453"/>
+      </Position14>
+      <Position15>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="571" Column="29" TopLine="546"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../runtime/nongui/IBBufferedCursors.pas"/>
+        <Caret Line="697" Column="34" TopLine="672"/>
+      </Position16>
+      <Position17>
+        <Filename Value="Test04.pas"/>
+        <Caret Line="256" Column="96" TopLine="246"/>
+      </Position17>
+      <Position18>
+        <Filename Value="Test04.pas"/>
+        <Caret Line="259" Column="3" TopLine="241"/>
+      </Position18>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="1" ActiveMode="default">
         <Mode0 Name="default">
           <local>
-            <CommandLineParams Value="-t 11"/>
+            <CommandLineParams Value="-t 04"/>
             <WorkingDirectory Value="/home/tony/SoftwareDev/MWA/ibx/testsuite"/>
           </local>
           <environment>
@@ -1789,12 +1818,13 @@
       </Modes>
     </RunParams>
     <HistoryLists Count="3">
-      <List0 Name="CommandLineParameters" Count="5">
-        <Item1 Value="-t 11"/>
-        <Item2 Value="-t 5"/>
-        <Item3 Value="-t 17"/>
-        <Item4 Value="-t 9"/>
-        <Item5 Value="-t 10"/>
+      <List0 Name="CommandLineParameters" Count="6">
+        <Item1 Value="-t 04"/>
+        <Item2 Value="-t 11"/>
+        <Item3 Value="-t 5"/>
+        <Item4 Value="-t 17"/>
+        <Item5 Value="-t 9"/>
+        <Item6 Value="-t 10"/>
       </List0>
       <List1 Name="WorkingDirectory" Type="File" Count="2">
         <Item1 Value="/home/tony/SoftwareDev/MWA/ibx/testsuite"/>

@@ -70,7 +70,7 @@ type
 
 implementation
 
-uses DateUtils, IBSQL;
+uses DateUtils, IBSQL, Variants;
 
 { TTest04 }
 
@@ -253,7 +253,16 @@ begin
     writeln(OutFile,'Clear Blob and Array');
     FDataSet.Append;
     FDataSet.Post;
+    if VarIsNull(FDataSet.FieldByName('F12').OldValue) then
+      writeln(OutFile,'F12 Old Value when DS state is dsBrowse is NULL')
+    else
+      writeln(OutFile,'F12 Old Value when DS state is dsBrowse is ',FDataSet.FieldByName('F12').OldValue);
     FDataSet.Edit;
+    FDataSet.FieldByName('F12').AsInteger := 42;
+    writeln(Outfile,'Field F12: OldValue = ',
+                                  FDataSet.FieldByName('F12').OldValue,
+                                  ', NewValue = ',
+                                  FDataSet.FieldByName('F12').Value);
     FDataSet.FieldByName('F14').Clear;
     FDataSet.FieldByName('MYARRAY').Clear;
     FDataSet.Post;
