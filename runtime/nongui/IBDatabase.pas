@@ -2420,9 +2420,12 @@ begin
       end;
 
 
-      isc_dpb_num_buffers, isc_dpb_dbkey_scope, isc_dpb_force_write,
+      isc_dpb_dbkey_scope, isc_dpb_force_write,
       isc_dpb_no_reserve, isc_dpb_damaged, isc_dpb_verify:
         DPBItem.SetAsByte(byte(StrToUInt(ParamValue)));
+
+      isc_dpb_num_buffers:
+        DPBItem.SetAsInteger(StrToUInt(ParamValue));
 
       isc_dpb_sweep:
         DPBItem.SetAsByte(isc_dpb_records);

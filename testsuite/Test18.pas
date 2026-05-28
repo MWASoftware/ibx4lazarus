@@ -151,7 +151,11 @@ begin
     writeln(OutFile,'Update of First and Last records and apply');
     First;
     Edit;
+    writeln(Outfile,'OldValue Test');
+    writeln(Outfile,'Current PlainText is "',FieldByName('PlainText').AsString,'"');
     FieldByName('PlainText').AsString := 'This is an updated test';
+    writeln(Outfile,'New Value = "',FieldByName('PlainText').AsString,'" OldValue = "',
+       FieldByName('PlainText').OldValue,'"');
     Post;
     Last;
     Edit;
