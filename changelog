@@ -1,4 +1,4 @@
-IBX Change Log  version (2.7-10 Build 1668) Wed, 14 Jan 2026 12:04:13 +0000
+IBX Change Log  version (2.7-10 Build 1671) Sun, 31 May 2026 14:49:26 +0100
 
 1. isc_dpb_num_buffers in TIBDatabase has been widened from 8 bits to a 
    four byte integer
