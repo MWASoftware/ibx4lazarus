@@ -770,10 +770,10 @@ end;
 
 function TIBEditableCursor.GetOldBufferFor(aBuffer: PByte): PByte;
 begin
+  if FCachedUpdatesEnabled then
+    Result := PLocalHeader(aBuffer + FLocalHdrOffset)^.lhOldBuffer
+  else
   if InternalGetRecNo(aBuffer) = FSavedRecNo then
-    if FCachedUpdatesEnabled then
-      Result := PLocalHeader(aBuffer + FLocalHdrOffset)^.lhOldBuffer
-    else
       Result := FSaveBuffer
   else
     Result := nil;
@@ -890,7 +890,7 @@ begin
 
   if FCachedUpdatesEnabled then
     FOldBufferCache.SetStatus(GetOldBufferFor(Buff),UpdateStatus);
-  InternalSetOldBuffer(Buff,nil);
+//  InternalSetOldBuffer(Buff,nil);
   FSavedRecNo := 0;
 end;
 

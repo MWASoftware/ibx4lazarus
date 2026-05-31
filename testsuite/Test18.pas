@@ -66,6 +66,8 @@ type
 
 implementation
 
+uses variants;
+
 { TTest18 }
 
 procedure TTest18.HandleUpdateRecord(DataSet: TDataSet;
@@ -157,11 +159,27 @@ begin
     writeln(Outfile,'New Value = "',FieldByName('PlainText').AsString,'" OldValue = "',
        FieldByName('PlainText').OldValue,'"');
     Post;
+    if VarIsNull(FieldByName('PlainText').OldValue) then
+      writeln(OutFile,'PlainText Old Value when DS state is dsBrowse is NULL')
+    else
+    begin
+      writeln(OutFile,'PlainText Old Value when DS state is dsBrowse is "',FieldByName('PlainText').OldValue,'"');
+      writeln(OutFile,'The Current Value is "', FieldByName('PlainText').AsString,'"');
+    end;
     Last;
     Edit;
     FieldByName('PlainText').AsString := 'This is another updated test';
     Post;
     PrintDataSet(FIBDataSet);
+    First;
+    writeln(OutFile,'Returned to first record');
+    if VarIsNull(FieldByName('PlainText').OldValue) then
+      writeln(OutFile,'PlainText Old Value when DS state is dsBrowse is NULL')
+    else
+    begin
+      writeln(OutFile,'PlainText Old Value when DS state is dsBrowse is "',FieldByName('PlainText').OldValue,'"');
+      writeln(OutFile,'The Current Value is "', FieldByName('PlainText').AsString,'"');
+    end;
     writeln(Outfile,'Apply Updates');
     ApplyUpdates;
     PrintDataSet(FIBDataSet);
@@ -226,6 +244,15 @@ begin
       end;
     end;
     CancelUpdates;
+    First;
+    writeln(OutFile,'Returned to first record after cancelling updates');
+    if VarIsNull(FieldByName('PlainText').OldValue) then
+      writeln(OutFile,'PlainText Old Value when DS state is dsBrowse is NULL')
+    else
+    begin
+      writeln(OutFile,'PlainText Old Value when DS state is dsBrowse is "',FieldByName('PlainText').OldValue,'"');
+      writeln(OutFile,'The Current Value is "', FieldByName('PlainText').AsString,'"');
+    end;
   end;
 end;
 
