@@ -1,4 +1,4 @@
-IBX Change Log  version (2.7-11 Build 1671) Sun, 31 May 2026 14:49:26 +0100
+IBX Change Log  version (2.7-11 Build 1673) Tue, 2 Jun 2026 14:46:19 +0100
 
 1. Fixed issue when IBX has to disambiguate aliasnames. This occurs when aggregation
    or concatenation functions are used in SELECT queries and no aliasname is given.
