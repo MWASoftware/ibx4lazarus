@@ -1719,7 +1719,7 @@ begin
       ColUsed := true;
     end;
 
-    field := aFields.FindField(colMetadata.GetAliasName);
+    field := aFields.FindField(colMetadata.GetName);
     if field <> nil then
     begin
 {      if (field.FieldNo < 0) or (field.FieldNo >= Length(FFieldNo2ColumnMap)) then

@@ -38,7 +38,8 @@ unit Test04;
 interface
 
 uses
-  Classes, SysUtils,  TestApplication, IBXTestBase, DB, IB, IBCustomDataSet;
+  Classes, SysUtils,  TestApplication, IBXTestBase, DB, IB, IBCustomDataSet,
+  IBQuery;
 
 const
   aTestID    = '04';
@@ -51,6 +52,7 @@ type
   TTest04 = class(TIBXTestBase)
   private
     FDataSet: TIBDataSet;
+    FQuery: TIBQuery;
     FCreateArrayOnInsert: boolean;
     procedure HandleAfterInsert(DataSet: TDataSet);
     procedure HandleTransactionEdit(Sender: TObject);
@@ -211,6 +213,31 @@ begin
     GeneratorField.ApplyOnEvent := gaeOnNewRecord;
     AfterInsert := @HandleAfterInsert;
   end;
+  FQuery := TIBQuery.Create(Application);
+  with FQuery do
+  begin
+    Database := IBDatabase;
+    Transaction := IBTransaction;
+    SQL.Text :=     'SELECT' +
+'      ''1'' || '' = '' || ASCII_VAL(''1''),' +
+'      ''2'' || '' = '' || ASCII_VAL(''2''),' +
+'      ''3'' || '' = '' || ASCII_VAL(''3''),' +
+'      ''4'' || '' = '' || ASCII_VAL(''4''),' +
+'      ''5'' || '' = '' || ASCII_VAL(''5''),' +
+'      ''6'' || '' = '' || ASCII_VAL(''6''),' +
+'      ''7'' || '' = '' || ASCII_VAL(''7''),' +
+'      ''8'' || '' = '' || ASCII_VAL(''8''),' +
+'      ''9'' || '' = '' || ASCII_VAL(''9''),' +
+'      ''0'' || '' = '' || ASCII_VAL(''0''),' +
+'      ''A'' || '' = '' || ASCII_VAL(''A''),' +
+'      ''B'' || '' = '' || ASCII_VAL(''B''),' +
+'      ''C'' || '' = '' || ASCII_VAL(''C''),' +
+'      ''W'' || '' = '' || ASCII_VAL(''W''),' +
+'      ''Y'' || '' = '' || ASCII_VAL(''Y''),' +
+'      ''Z'' || '' = '' || ASCII_VAL(''Z'')' +
+'    FROM RDB$DATABASE;';
+  end;
+
 end;
 
 function TTest04.GetTestID: AnsiString;
@@ -307,6 +334,10 @@ begin
     IBTransaction.Active := true;
     FDataSet.Active := true;
     PrintDataSet(FDataSet);
+    FDataSet.Active := false;
+    writeln(Outfile,'Ambiguous Field Names Test');
+    FQuery.Active := true;
+    PrintDataSet(FQuery);
   finally
     IBDatabase.DropDatabase;
   end;
