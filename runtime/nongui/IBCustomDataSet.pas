@@ -1419,7 +1419,23 @@ begin
 end;
 
 const
- DefaultSQL = 'Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, ' + {do not localize}
+  DefaultSQLODS10 =
+     'Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, ' +
+     'C.RDB$CONSTRAINT_TYPE ' +
+     'from RDB$RELATION_FIELDS R ' +
+     'JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME ' +
+     'LEFT JOIN RDB$RELATION_CONSTRAINTS C ' +
+     '  ON C.RDB$RELATION_NAME = R.RDB$RELATION_NAME ' +
+     '  AND C.RDB$CONSTRAINT_TYPE = ''PRIMARY KEY'' ' +
+     'LEFT JOIN RDB$INDEX_SEGMENTS S ' +
+     '  ON S.RDB$INDEX_NAME = C.RDB$INDEX_NAME ' +
+     '  AND S.RDB$FIELD_NAME = R.RDB$FIELD_NAME ' +
+     'where R.RDB$RELATION_NAME = :RELATION and ' +
+     '  (F.RDB$COMPUTED_BLR is not NULL or ' +
+     '   F.RDB$DEFAULT_VALUE is not NULL or ' +
+     '   C.RDB$CONSTRAINT_TYPE is not null)';
+
+ DefaultSQLODS11 = 'Select F.RDB$COMPUTED_BLR,F.RDB$DEFAULT_VALUE, R.RDB$FIELD_NAME, ' + {do not localize}
                'X.RDB$CONSTRAINT_TYPE ' + {do not localize}
                'from RDB$RELATION_FIELDS R ' + {do not localize}
                'JOIN RDB$FIELDS F on R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME ' + {do not localize}
@@ -1466,7 +1482,10 @@ begin
   if Dataset.FDatabaseInfo.ODSMajorVersion >= 12 then
     FQuery.SQL.Text := DefaultSQLODS12
   else
-    FQuery.SQL.Text := DefaultSQL;
+  if Dataset.FDatabaseInfo.ODSMajorVersion = 11 then
+    FQuery.SQL.Text := DefaultSQLODS11
+  else
+    FQuery.SQL.Text := DefaultSQLODS10;
   FQuery.Prepare;
 end;
 

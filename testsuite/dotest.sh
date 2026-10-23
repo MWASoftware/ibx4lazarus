@@ -9,7 +9,7 @@ usage()
 
 BUILD=
 #Parse Parameters
-TEMP=`getopt h2345db:t:p: "$@"`
+TEMP=`getopt h12345db:t:p: "$@"`
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
 eval set -- "$TEMP"
@@ -17,6 +17,8 @@ eval set -- "$TEMP"
 while true ; do
         case "$1" in
         -h)     usage; exit 1;;
+
+        \-1)     FB="1.5.6"; export TARGET=i386;  shift 1;;
 
         \-2)     FB="2.5.9";  shift 1;;
 
@@ -41,9 +43,9 @@ while true ; do
         esac
 done
 
-if [ -n "$BUILD" ]; then
-  FB="4"
-fi
+#if [ -n "$BUILD" ]; then
+#  FB="4"
+#fi
 
 if [ -n "$FPCDIR" ]  && [ -d "$FPCDIR" ]; then
   export FPC=$FPCDIR/ppcx64

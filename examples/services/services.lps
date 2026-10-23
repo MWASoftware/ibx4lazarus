@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="12"/>
     <BuildModes Active="Default"/>
-    <Units Count="92">
+    <Units Count="94">
       <Unit0>
         <Filename Value="services.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -88,9 +88,8 @@
         <ComponentName Value="RestoreDlg"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="78"/>
+        <TopLine Value="45"/>
         <CursorPos X="35" Y="45"/>
         <UsageCount Value="110"/>
         <Loaded Value="True"/>
@@ -206,10 +205,11 @@
       </Unit19>
       <Unit20>
         <Filename Value="../../../fbintf/client/3.0/FB30Services.pas"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="141"/>
-        <CursorPos X="7" Y="176"/>
+        <CursorPos Y="157"/>
         <UsageCount Value="13"/>
+        <Loaded Value="True"/>
       </Unit20>
       <Unit21>
         <Filename Value="../../../../../fpcsrc/3.0.4/rtl/objpas/classes/persist.inc"/>
@@ -666,9 +666,10 @@
       </Unit83>
       <Unit84>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="413"/>
-        <CursorPos X="30" Y="440"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="2334"/>
+        <CursorPos X="20" Y="2351"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit84>
@@ -719,8 +720,24 @@
         <CursorPos X="48" Y="55"/>
         <UsageCount Value="10"/>
       </Unit91>
+      <Unit92>
+        <Filename Value="../../../fbintf/client/3.0/firebird/FirebirdOOAPI.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="841"/>
+        <CursorPos X="9" Y="849"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit92>
+      <Unit93>
+        <Filename Value="../../../fbintf/client/include/consts_pub.inc"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="371"/>
+        <CursorPos X="5" Y="389"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit93>
     </Units>
-    <JumpHistory Count="16" HistoryIndex="12">
+    <JumpHistory Count="24" HistoryIndex="23">
       <Position1>
         <Filename Value="MainFormUnit.pas"/>
         <Caret Line="115" Column="42" TopLine="93"/>
@@ -774,21 +791,64 @@
         <Caret Line="423" Column="79" TopLine="407"/>
       </Position13>
       <Position14>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1773" Column="46" TopLine="1747"/>
+        <Filename Value="RestoreDlgUnit.pas"/>
+        <Caret Line="45" Column="35" TopLine="45"/>
       </Position14>
       <Position15>
-        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1775" Column="17" TopLine="1749"/>
+        <Filename Value="../../../fbintf/client/3.0/firebird/FirebirdOOAPI.pas"/>
+        <Caret Line="8754" TopLine="8736"/>
       </Position15>
       <Position16>
         <Filename Value="../../runtime/nongui/IBXServices.pas"/>
-        <Caret Line="1781" Column="16" TopLine="1755"/>
+        <Caret Line="2764" TopLine="2746"/>
       </Position16>
+      <Position17>
+        <Filename Value="../../../fbintf/client/3.0/FB30Services.pas"/>
+        <Caret Line="157" TopLine="141"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="2764" TopLine="2746"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../../../fbintf/client/3.0/FB30Services.pas"/>
+        <Caret Line="157" TopLine="141"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../../../fbintf/client/3.0/firebird/FirebirdOOAPI.pas"/>
+        <Caret Line="8754" TopLine="8736"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../../runtime/nongui/IBXServices.pas"/>
+        <Caret Line="2351" Column="20" TopLine="2334"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../../../fbintf/client/include/consts_pub.inc"/>
+        <Caret Line="389" Column="5" TopLine="371"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../../../fbintf/client/3.0/firebird/FirebirdOOAPI.pas"/>
+        <Caret Line="8752" Column="38" TopLine="8736"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../../../fbintf/client/3.0/firebird/FirebirdOOAPI.pas"/>
+        <Caret Line="29" Column="17" TopLine="29"/>
+      </Position24>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes ActiveMode="default"/>
     </RunParams>
   </ProjectSession>
+  <Debugging>
+    <BreakPoints>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="../../../fbintf/client/3.0/firebird/FirebirdOOAPI.pas"/>
+        <Line Value="8754"/>
+      </Item>
+    </BreakPoints>
+  </Debugging>
 </CONFIG>

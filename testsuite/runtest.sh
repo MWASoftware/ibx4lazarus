@@ -70,12 +70,12 @@ make clean
 make INCDIR="$INCDIR" UNITDIR="$UNITDIR"
 if [ -x testsuite ]; then
   if [ -n "$FIREBIRD" ]; then
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$FIREBIRD/lib
-  fi
+    export LD_LIBRARY_PATH=$FIREBIRD/lib:$LD_LIBRARY_PATH
+  fi 
   echo ""
   echo "Starting Testsuite"
   echo ""
-  ./testsuite -u $USERNAME -p $PASSWORD -e $EMPLOYEEDB -n $NEWDBNAME -s $NEWDBNAME2 -b $BAKFILE -o $LOGFILE $TEST
+  ./testsuite -u $USERNAME -p $PASSWORD -e ${EMPLOYEEDB} -n $NEWDBNAME -s $NEWDBNAME2 -b $BAKFILE -o $LOGFILE $TEST
   echo "Comparing results with reference log"
   echo ""
   if grep 'ODS Major Version = 11' $LOGFILE >/dev/null; then
