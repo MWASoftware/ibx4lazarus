@@ -371,7 +371,7 @@ function TParamIntf.GetAsUTCDateTime: TDateTime;
 begin
   with FOwner.FParams[FIndex] do
   if VarIsArray(Value) then
-    Result := IncMinute(Value[0],-Value[1])
+    Result := IncMinute(Value[0],Int64(-Value[1]))
   else
     Result := FOwner.FParams[FIndex].Value;
 end;

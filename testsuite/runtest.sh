@@ -18,7 +18,6 @@ NEWDBNAME=$TESTOUTDIR/testsuite1.fdb
 NEWDBNAME2=$TESTOUTDIR/testsuite2.fdb
 BAKFILE=$TESTOUTDIR/testsuite.gbk
 LOGFILE=testout.`date +%N`.log
-LAZARUS=$HOME/lazarus
 if [ -z "$FPC" ]; then
   export FPC=fpc
 fi
