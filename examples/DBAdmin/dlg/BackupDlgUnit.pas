@@ -60,6 +60,7 @@ type
       var Line: string);
     procedure ReportTabShow(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
+    procedure DoOnGetNextDataBlock(Sender: TObject);
   private
     { private declarations }
     procedure DoClientBackup(Data: PtrInt);
@@ -83,6 +84,11 @@ begin
     BackupFileName.Text := SaveDialog1.Filename;
 end;
 
+procedure TBackupDlg.DoOnGetNextDataBlock(Sender: TObject);
+begin
+  Application.ProcessMessages;
+end;
+
 procedure TBackupDlg.DoClientBackup(Data: PtrInt);
 var BackupCount: integer;
 begin
@@ -90,6 +96,7 @@ begin
   with IBXClientSideBackupService1 do
   begin
     Options := [];
+    OnGetNextDataBlock := @DoOnGetNextDataBlock;
     if IgnoreChecksums.Checked then
       Options := Options + [IBXServices.IgnoreChecksums];
     if IgnoreLimboTransactions.Checked then
