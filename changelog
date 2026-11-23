@@ -1,4 +1,4 @@
-IBX Change Log  version (2.7-15 Build 1694) Mon, 23 Nov 2026 11:02:09 +0000
+IBX Change Log  version (2.7-15 Build 1695) Mon, 23 Nov 2026 11:02:27 +0000
 
 1. Add Event property OnGetNextDataBlock to IBXServices TIBXControlAndQueryService. This
    is intended to permit feedback when receiving an incoming data stream e.g. on
