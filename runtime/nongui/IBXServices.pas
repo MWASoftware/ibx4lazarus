@@ -266,6 +266,7 @@ end;
  TIBXControlAndQueryService = class (TIBXControlService)
  private
    FEof: Boolean;
+   FOnGetNextDataBlock: TNotifyEvent;
    FSendBytes: integer;
    FOnGetNextLine: TIBXOnGetNextLine;
    FServiceStarted: boolean;
@@ -277,6 +278,7 @@ end;
    function ReceiveNextChunk(stream: TStream): integer;
    function SendNextChunk(stream: TStream; var line: String): integer;
    procedure DoOnGetNextLine(Line: string);
+   procedure DoOnGetNextDataBlock;
    procedure OnBeforeDisconnect(Sender: TIBXServicesConnection); override;
    procedure Notification( AComponent: TComponent; Operation: TOperation); override;
    procedure RegisterDataSet(aDataSet: TDataSet);
@@ -288,6 +290,7 @@ end;
    property Eof: boolean read FEof;
  published
    property OnGetNextLine: TIBXOnGetNextLine read FOnGetNextLine write FOnGetNextLine;
+   property OnGetNextDataBlock: TNotifyEvent read FOnGetNextDataBlock write FOnGetNextDataBlock;
  end;
 
  { TIBXLogService }
@@ -2208,6 +2211,7 @@ begin
       isc_info_svc_to_eof:
       begin
         Result := CopyTo(stream,0);
+        DoOnGetNextDataBlock;
         FEof := (Result = 0) and not TimeOut;
       end;
 
@@ -2281,6 +2285,12 @@ procedure TIBXControlAndQueryService.DoOnGetNextLine(Line: string);
 begin
   if assigned(FOnGetNextLine) then
     OnGetNextLine(self,Line);
+end;
+
+procedure TIBXControlAndQueryService.DoOnGetNextDataBlock;
+begin
+  if assigned(FOnGetNextDataBlock) then
+    OnGetNextDataBlock(self);
 end;
 
 procedure TIBXControlAndQueryService.OnBeforeDisconnect(
